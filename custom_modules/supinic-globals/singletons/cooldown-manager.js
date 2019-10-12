@@ -86,6 +86,11 @@ module.exports = (function (Module) {
 		 * @param {ManagerChannel} channel Channel the command was invoked in
 		 */
 		set (command, user, channel) {
+			// If command cooldown is zero, do not apply the cooldown at all.
+			if (command.Cooldown === 0) {
+				return;
+			}
+
 			const targetChannel = this.channels.find(i => i.ID === channel.ID);
 			if (!targetChannel || command.Read_Only || targetChannel.mode === "Inactive" || targetChannel.mode === "Read") {
 				return;
