@@ -1,0 +1,19 @@
+{
+  "author": {
+    "name": "Supinic",
+    "email": "supinic@pm.me"
+  },
+  "deprecated": false,
+  "description": "Duration parser - takes human readable time and transforms it into milliseconds",
+  "engines": {
+    "node": ">= 8.0"
+  },
+  "files": [
+    "parser.js",
+    "units.json"
+  ],
+  "main": "parser.js",
+  "name": "duration-parser",
+  "private": true,
+  "version": "1.0.0"
+}

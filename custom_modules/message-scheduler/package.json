@@ -1,0 +1,21 @@
+{
+  "author": {
+    "name": "Supinic",
+    "email": "supinic@pm.me"
+  },
+  "dependencies": {
+    "long-timeout": "file:/code/custom_modules/long-timeout"
+  },
+  "deprecated": false,
+  "description": "Event-based message scheduler, makes sure to keep enough time passed between messages",
+  "engines": {
+    "node": ">= 8.0"
+  },
+  "files": [
+    "scheduler.js"
+  ],
+  "main": "scheduler.js",
+  "name": "message-scheduler",
+  "private": true,
+  "version": "1.0.0"
+}

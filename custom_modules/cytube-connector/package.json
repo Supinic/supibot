@@ -1,0 +1,22 @@
+{
+  "author": {
+    "name": "Supinic",
+    "email": "supinic@pm.me"
+  },
+  "dependencies": {
+    "request": "^2.88.0",
+    "socket.io-client": "^2.2.0"
+  },
+  "deprecated": false,
+  "description": "Simple Cytube client",
+  "engines": {
+    "node": ">= 8.0"
+  },
+  "files": [
+    "client.js"
+  ],
+  "main": "client.js",
+  "name": "cytube-connector",
+  "private": true,
+  "version": "1.0.0"
+}

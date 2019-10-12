@@ -1,0 +1,18 @@
+{
+  "author": {
+    "name": "Supinic",
+    "email": "supinic@pm.me"
+  },
+  "deprecated": false,
+  "description": "Languages ISO code parser",
+  "engines": {
+    "node": ">= 8.0"
+  },
+  "files": [
+    "index.js"
+  ],
+  "main": "index.js",
+  "name": "language-iso-codes",
+  "private": true,
+  "version": "1.0.0"
+}

@@ -1,0 +1,32 @@
+{
+  "name": "supinic-globals",
+  "version": "1.0.0",
+  "description": "Supinic projects' global namespace",
+  "main": "index.js",
+  "dependencies": {
+    "long-timeout": "file:../long-timeout",
+    "cron": "latest",
+    "rss-parser": "latest",
+    "fast-xml-parser": "latest",
+    "socket.io-client": "latest",
+    "youtube-dl": "latest",
+    "duration-parser": "file:../duration-parser",
+    "random-js": "latest",
+    "custom-request-promise": "file:../custom-request-promise",
+    "track-link-parser": "file:../track-link-parser",
+    "mariadb": "latest",
+    "youtube-search": "latest",
+    "transliterate": "latest",
+    "youtube-utils": "file:../youtube-utils",
+    "requestretry": "latest",
+    "language-iso-codes": "file:../language-iso-codes"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Supinic",
+  "license": "ISC"
+}
