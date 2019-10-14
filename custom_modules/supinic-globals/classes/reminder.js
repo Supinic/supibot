@@ -129,7 +129,7 @@ module.exports = (function () {
                     }
                     else {
                         if (channelData.Mirror) {
-                            sb.Master.mirror(message, channelData.Mirror);
+                            sb.Master.mirror(message, toUserData, channelData.Mirror);
                         }
 
                         message = await sb.Master.prepareMessage(message, channelData);
