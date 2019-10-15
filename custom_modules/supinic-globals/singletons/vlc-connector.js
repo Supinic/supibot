@@ -124,22 +124,51 @@ module.exports = (function () {
 		 * @returns {Promise<void|string>}
 		 */
 		async wrongSong (user) {
-			if (!this.requestsID[user]) {
-				return;
+			const userData = await sb.User.get(user);
+			if (!userData) {
+				return { success: false, reason: "no-user" };
 			}
 
-			throw new sb.Error("Not implemented. Fix pls");
-
-			const playingID = await this.currentlyPlaying(true);
-			const lastUserSongID = Math.max(...this.requestsID[user].filter(i => i > playingID));
-			if (lastUserSongID === -Infinity) {
-				return;
+			const userRequests = this.videoQueue.filter(i => i.user === userData.ID);
+			if (userRequests.length === 0) {
+				return { success: false, reason: "no-requests" };
 			}
 
-			const song = (await this.playlist()).children.find(i => Number(i.id) === lastUserSongID);
-			await this.delete(lastUserSongID);
+			const playingData = await this.currentlyPlayingData();
+			if (!playingData || !Number(playingData.vlcID)) {
+				playingData.vlcID = -Infinity;
+			}
 
-			return song.name;
+			try {
+				const firstUserSong = userRequests
+					.filter(i => i.vlcID >= playingData.vlcID)
+					.sort((a, b) => a.vlcID - b.vlcID)
+					[0];
+
+				const deletedSongData = await this.getDataByName(firstUserSong.name);
+				await this.delete(deletedSongData.id);
+
+				return { success: true, song: deletedSongData };
+			}
+			catch (e) {
+				console.error(e);
+				return { success: false, reason: "delete-failed" };
+			}
+		}
+
+		async currentlyPlayingData () {
+			const status = await this.status();
+			const targetURL = sb.Utils.linkParser.parseLink(status.information.category.meta.url);
+
+			return this.videoQueue.find(songData => {
+				const songURL = sb.Utils.linkParser.parseLink(songData.link);
+				return songURL === targetURL;
+			});
+		}
+
+		async getDataByName (name) {
+			const playlist = await this.playlist();
+			return playlist.children.find(i => i.name === name);
 		}
 
 		get modulePath () { return "vlc-connector"; }
