@@ -192,7 +192,7 @@ module.exports =  (function () {
 		}
 
 		/**
-		 * Checks blacklists for given combination of parameters.
+		 * Checks whitelists for given combination of parameters.
 		 * @param {FilterCheckOptions} options
 		 * @returns {boolean|string}
 		 * @throws {sb.Error} If an invalid filter configuration is encountered.
