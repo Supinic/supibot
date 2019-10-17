@@ -15,7 +15,8 @@ module.exports = (async function () {
 		AwayFromKeyboard: "afk",
 		Banphrase: "banphrase",
 		Reminder: "reminder",
-		Cron: "cron"
+		Cron: "cron",
+		MarkovChain: "markov-chain"
 	};
 
 	for (const target of Object.values(modules)) {
@@ -29,4 +30,3 @@ module.exports = (async function () {
 		}
 	}
 })();
-

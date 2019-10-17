@@ -19,7 +19,8 @@
     "transliterate": "latest",
     "youtube-utils": "file:../youtube-utils",
     "requestretry": "latest",
-    "language-iso-codes": "file:../language-iso-codes"
+    "language-iso-codes": "file:../language-iso-codes",
+    "markov-json": "latest"
   },
   "directories": {
     "test": "tests"
