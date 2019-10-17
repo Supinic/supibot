@@ -3,7 +3,7 @@ module.exports = (function (Module) {
 	"use strict";
 
 	const postURL = "https://pastebin.com/api/api_post.php";
-	const authURL = "https://pastebin.com/api/api_login.php\n";
+	const authURL = "https://pastebin.com/api/api_login.php";
 	const allowedPrivacyOptions = ["public", "unlisted", "private"];
 	const allowedExpirationOptions = {
 		"never": "N",
@@ -44,15 +44,22 @@ module.exports = (function (Module) {
 					.set("api_user_name", sb.Config.get("PASTEBIN_USER_NAME"))
 					.set("api_user_password", sb.Config.get("PASTEBIN_PASSWORD"));
 
-				this.authData = await sb.Utils.request({
-					method: "POST",
-					url: authURL,
-					body: authParams.toString(),
-					headers: {
-						"Content-Type": "application/x-www-form-urlencoded",
-						"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
-					}
-				});
+				try {
+					this.authData = await sb.Utils.request({
+						method: "POST",
+						url: authURL,
+						body: authParams.toString(),
+						headers: {
+							"Content-Type": "application/x-www-form-urlencoded",
+							"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
+						},
+						timeout: 5000
+					});
+				}
+				catch (e) {
+					console.log("Pastebin intitialize error", e);
+					this.authData = null;
+				}
 
 				return this;
 			})();
@@ -92,12 +99,15 @@ module.exports = (function (Module) {
 		async post (text, options = {}) {
 			const params = new sb.URLParams()
 				.set("api_dev_key", sb.Config.get("API_PASTEBIN"))
-				.set("api_user_key", this.authData)
 				.set("api_option", "paste")
 				.set("api_paste_code", text)
 				.set("api_paste_name", options.name || "untitled supibot paste")
 				.set("api_paste_private", (options.privacy) ? Pastebin.getPrivacy(options.privacy) : "1")
 				.set("api_paste_expire_date", (options.expiration) ? Pastebin.getExpiration(options.expiration) : "10M");
+
+			if (this.authData) {
+				params.set("api_user_key", this.authData);
+			}
 
 			if (options.format) {
 				params.set("api_paste_format", options.format);
