@@ -145,7 +145,8 @@ module.exports = (function () {
 					.sort((a, b) => a.vlcID - b.vlcID)
 					[0];
 
-				const deletedSongData = await this.getDataByName(firstUserSong.name);
+				const link = sb.Utils.linkParser.parseLink(firstUserSong.link);
+				const deletedSongData = await this.getDataByName(firstUserSong.name, link );
 				await this.delete(deletedSongData.id);
 
 				return { success: true, song: deletedSongData };
@@ -166,9 +167,9 @@ module.exports = (function () {
 			});
 		}
 
-		async getDataByName (name) {
+		async getDataByName (name, link) {
 			const playlist = await this.playlist();
-			return playlist.children.find(i => i.name === name);
+			return playlist.children.find(i => i.name === name || i.name === link);
 		}
 
 		get modulePath () { return "vlc-connector"; }
