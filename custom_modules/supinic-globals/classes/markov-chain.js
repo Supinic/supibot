@@ -101,7 +101,7 @@ module.exports = (function () {
 
 					if (data) {
 						result = new MarkovChain(data);
-						sb.MarkovChain.push(result);
+						MarkovChain.data.push(result);
 					}
 				}
 
@@ -119,7 +119,7 @@ module.exports = (function () {
 
 					if (data) {
 						result = new MarkovChain(data);
-						sb.MarkovChain.push(result);
+						MarkovChain.data.push(result);
 					}
 				}
 
