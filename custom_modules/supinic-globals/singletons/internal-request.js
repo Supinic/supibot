@@ -123,6 +123,17 @@ module.exports = (function (Module) {
 
 				sb.Master.send(query.username + " just followed the channel PagChomp !! Thank you supiniOkay", "supinic");
 			}
+			else if (query.type === "reload") {
+				if (query.module === "afk") {
+					await sb.AwayFromKeyboard.reloadData();
+				}
+				else {
+					throw new sb.Error({
+						message: "Unrecognized module",
+						args: query.module
+					});
+				}
+			}
 
 			res.end("OK");
 		}
