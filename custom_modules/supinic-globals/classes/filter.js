@@ -238,6 +238,9 @@ module.exports =  (function () {
 			if (!userData) {
 				return false;
 			}
+			else if (userData.Data.universalOptOut === true) {
+				return "That user is opted out globally!";
+			}
 
 			const optout = Filter.data.find(filter => (
 				filter.Active && filter.Type === "Opt-out" && filter.Command === commandID && filter.User_Alias === userData.ID
