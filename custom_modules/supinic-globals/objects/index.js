@@ -5,7 +5,8 @@ module.exports = (function () {
 	const files = [
 		"date",
 		"error",
-		"url-params"
+		"url-params",
+		"promise"
 	];
 
 	for (const file of files) {
