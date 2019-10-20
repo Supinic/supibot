@@ -122,7 +122,17 @@ module.exports = class Date extends global.Date {
 	setTimezoneOffset(offset) {
 		offset = Number(offset);
 		if (Number.isNaN(offset)) throw new Error("Invalid offset");
+
+		const dayUTC = this.getUTCDate();
 		this.setHours(this.getUTCHours() + offset);
+
+		if (dayUTC > this.getDate()) {
+			this.addDays(1);
+		}
+		else if (dayUtc < this.getDate()) {
+			this.addDays(-1);
+		}
+
 		return this;
 	}
 
