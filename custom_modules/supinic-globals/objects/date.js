@@ -116,23 +116,20 @@ module.exports = class Date extends global.Date {
 	}
 
 	/**
-	 * @param {number} offset
+	 * @param {number} offset in minutes
 	 * @returns {sb.Date}
 	 */
 	setTimezoneOffset(offset) {
 		offset = Number(offset);
-		if (Number.isNaN(offset)) throw new Error("Invalid offset");
 
-		const dayUTC = this.getUTCDate();
-		this.setHours(this.getUTCHours() + offset);
-
-		if (dayUTC > this.getDate()) {
-			this.addDays(1);
+		if (Number.isNaN(offset)) {
+			throw new Error("Invalid offset");
 		}
-		else if (dayUtc < this.getDate()) {
-			this.addDays(-1);
+		else if (offset % 15 !== 0) {
+			throw new Error("Unrecognized offset - make sure to use offset in minutes");
 		}
 
+		this.setMinutes(this.getMinutes() + this.getTimezoneOffset() + offset);
 		return this;
 	}
 
