@@ -337,7 +337,7 @@ module.exports = (function () {
 				}
 
 				const [command, ...args] = message.replace(/^\$\s*/, "$").split(" ");
-				this.handleCommand(
+				const result = await this.handleCommand(
 					command,
 					userData,
 					channelData,
@@ -349,6 +349,13 @@ module.exports = (function () {
 						privateMessage: (messageType === "whisper")
 					}
 				);
+
+				if (!result && messageType === "whisper") {
+					this.pm(userData.Name, sb.Config.get("PRIVATE_MESSAGE_NO_COMMAND"));
+				}
+			}
+			else if (messageType === "whisper") {
+				this.pm(userData.Name, sb.Config.get("PRIVATE_MESSAGE_UNRELATED"));
 			}
 		}
 
@@ -387,13 +394,14 @@ module.exports = (function () {
 		 * @param {string} channel
 		 * @param {string[]} [args]
 		 * @param {Object} options = {}
+		 * @returns {boolean} Whether or not a command has been executed.
 		 */
 		async handleCommand (command, user, channel, args = [], options = {}) {
 			const userData = await sb.User.get(user, false);
 			const channelData = sb.Channel.get(channel);
 			const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, options);
 			if (!execution || !execution.reply) {
-				return;
+				return false;
 			}
 
 			if (channelData.Mirror) {
@@ -409,6 +417,8 @@ module.exports = (function () {
 					this.send(message, channelData);
 				}
 			}
+
+			return true;
 		}
 
 		/**
@@ -529,7 +539,7 @@ module.exports = (function () {
 		}
 
 		restart (hard) {
-			setTimeout(() => sb.Master.reloadClientModule(this.platform, hard), 10e3);
+			setTimeout(() => sb.Master.reloadClientModule(this.platform, hard), 10.0e3);
 			this.destroy();
 		}
 	};
