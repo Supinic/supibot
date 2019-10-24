@@ -114,7 +114,7 @@ module.exports = (function () {
 				message.split(" ").forEach(word => {
 					const emote = channelObject.guild.reverseEmotes.get(word);
 					if (emote) {
-						const regex = new RegExp(emote.name, "g");
+						const regex = new RegExp("(?<!(:))" + emote.name + "(?!(:))", "g");
 						message = message.replace(regex, emote.toString());
 					}
 				});
@@ -128,7 +128,7 @@ module.exports = (function () {
 				}
 			}
 
-			channelObject.send(message);
+			channelObject.send(sb.Utils.wrapString(message, 2000));
 		}
 
 		/**
