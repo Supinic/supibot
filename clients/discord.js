@@ -114,6 +114,8 @@ module.exports = (function () {
 				message.split(" ").forEach(word => {
 					const emote = channelObject.guild.reverseEmotes.get(word);
 					if (emote) {
+						// This regex makes sure all emotes to be replaces are not preceded or followed by a ":" (colon) character
+						// All emotes on Discord are wrapped at least by colons
 						const regex = new RegExp("(?<!(:))" + emote.name + "(?!(:))", "g");
 						message = message.replace(regex, emote.toString());
 					}
