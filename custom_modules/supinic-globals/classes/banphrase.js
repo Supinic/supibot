@@ -135,12 +135,6 @@ module.exports = (function () {
 				if (typeof result !== "undefined") {
 					// Return immediately if the message was deemed to be ignored, or responded to with a custom response
 					if (banphrase.Type !== "Replacement") {
-						console.warn("Banphrase fired", {
-							banphraseID: banphrase.ID,
-							message: message,
-							result: result
-						});
-
 						return { string: result || null, passed: false };
 					}
 					// Otherwise, keep replacing the banphrases in a message
