@@ -409,7 +409,11 @@ module.exports = (function () {
 			}
 
 			if (options.privateMessage || execution.replyWithPrivateMessage) {
-				this.pm(userData.Name, execution.reply);
+				const message = await sb.Master.prepareMessage(execution.reply, null, {
+					platform: "twitch",
+					extraLength: ("/w " + userData.Name + " ").length
+				});
+				this.pm(userData.Name, message);
 			}
 			else {
 				const message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });

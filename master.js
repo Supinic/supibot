@@ -192,23 +192,41 @@
 		 * @returns {Promise<String|Boolean>} Returns prepared message, or false if nothing is to be sent (result is ignored)
 		 */
 		async prepareMessage (message, channel, options = {}) {
-			const channelData = sb.Channel.get(channel);
+			let platform = null;
+			let channelData = {};
+			let limit = Infinity;
 
-			// Read-only/Inactive/Nonexistent - do not send anything
-			if (!channelData || channelData.Mode === "Read" || channelData.Mode === "Inactive") {
-				return false;
+			if (channel === null) {
+				if (!options.platform) {
+					throw new sb.Error({
+						message: "No platform provided for a null channel (most likely private messages)"
+					});
+				}
+
+				limit = sb.Config.get("DEFAULT_MSG_LIMIT_" + options.platform.toUpperCase());
+				if (options.platform === "twitch") {
+					limit -= options.extraLength;
+				}
 			}
+			else {
+				channelData = sb.Channel.get(channel);
 
-			// Remove all links, if the channel requires it
-			if (!channelData.Links_Allowed) {
-				// replace all links with a placeholder
-				message = message.replace(sb.Config.get("LINK_REGEX"), "[LINK]");
+				// Read-only/Inactive/Nonexistent - do not send anything
+				if (!channelData || channelData.Mode === "Read" || channelData.Mode === "Inactive") {
+					return false;
+				}
+
+				// Remove all links, if the channel requires it
+				if (!channelData.Links_Allowed) {
+					// replace all links with a placeholder
+					message = message.replace(sb.Config.get("LINK_REGEX"), "[LINK]");
+				}
+
+				platform = channelData.Platform.toLowerCase();
+				if (!options.skipLengthCheck) {
+					limit = channelData.Message_Limit || sb.Config.get("DEFAULT_MSG_LIMIT_" + platform.toUpperCase());
+				}
 			}
-
-			const platform = channelData.Platform.toLowerCase();
-			const limit = (options.skipLengthCheck)
-				? Infinity
-				: channelData.Message_Limit || sb.Config.get("DEFAULT_MSG_LIMIT_" + platform.toUpperCase());
 
 			message = sb.Utils.wrapString(message, limit);
 
