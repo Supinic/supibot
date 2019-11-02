@@ -176,7 +176,7 @@ module.exports = (function () {
 		 * Checks if a command exists, and executes it if needed.
 		 * @param {Command|number|string} identifier
 		 * @param {string[]} argumentArray
-		 * @param {Channel} channelData
+		 * @param {Channel|null} channelData
 		 * @param {User} userData
 		 * @param {Object} options = {} any extra options that will be passed to the command as extra.append
 		 * @returns {CommandResult}
@@ -195,7 +195,7 @@ module.exports = (function () {
 				});
 			}
 
-			if (channelData.Mode === "Inactive" || channelData.Mode === "Read") {
+			if (channelData?.Mode === "Inactive" || channelData?.Mode === "Read") {
 				return {success: false, reason: "channel-" + channelData.Mode.toLowerCase()};
 			}
 
@@ -204,7 +204,7 @@ module.exports = (function () {
 				return {success: false, reason: "no-command"};
 			}
 			// Check for cooldowns, return if it did not pass yet
-			if (!sb.CooldownManager.check(command, userData, channelData)) {
+			if (channelData && !sb.CooldownManager.check(command, userData, channelData)) {
 				sb.SystemLogger.send("Command.Fail", command.Name + " - cooldown", channelData, userData);
 				return {success: false, reason: "cooldown"};
 			}
@@ -213,27 +213,29 @@ module.exports = (function () {
 			// therefore it is also safe to mark them as "well known". They will be loaded on next startup.
 			userData.saveProperty("Well_Known", true);
 
-			const filterCheck = sb.Filter.check({
-				userID: userData.ID,
-				channelID: channelData.ID,
-				commandID: command.ID
-			});
+			if (channelData) {
+				const filterCheck = sb.Filter.check({
+					userID: userData.ID,
+					channelID: channelData?.ID ?? null,
+					commandID: command.ID
+				});
 
-			if (filterCheck) {
-				sb.SystemLogger.send("Command.Fail", "Command " + command.ID + " filtered", channelData, userData);
-				const reply = (command.Whitelisted && command.Whitelist_Response)
-					? command.Whitelist_Response
-					: (typeof filterCheck === "string")
-						? filterCheck
-						: null;
+				if (filterCheck) {
+					sb.SystemLogger.send("Command.Fail", "Command " + command.ID + " filtered", channelData, userData);
+					const reply = (command.Whitelisted && command.Whitelist_Response)
+						? command.Whitelist_Response
+						: (typeof filterCheck === "string")
+							? filterCheck
+							: null;
 
-				sb.Runtime.incrementRejectedCommands();
+					sb.Runtime.incrementRejectedCommands();
 
-				return {
-					success: false,
-					reason: "filter",
-					reply: reply
-				};
+					return {
+						success: false,
+						reason: "filter",
+						reply: reply
+					};
+				}
 			}
 
 			// Check for opted out users
@@ -265,6 +267,7 @@ module.exports = (function () {
 
 			/** @type ExtraCommandData */
 			let data = {
+				platform: options.platform,
 				invocation: identifier,
 				user: userData,
 				channel: channelData,
@@ -315,7 +318,7 @@ module.exports = (function () {
 				return {success: !!execution.success};
 			}
 
-			if (!execution || !execution.meta || !execution.meta.skipCooldown) {
+			if (channelData && (!execution || !execution.meta || !execution.meta.skipCooldown)) {
 				sb.CooldownManager.set(command, userData, channelData);
 			}
 
@@ -323,7 +326,7 @@ module.exports = (function () {
 				execution.reply = sb.Utils.fixHTML(execution.reply);
 				execution.reply = execution.reply.replace(sb.Config.get("WHITESPACE_REGEX"), "");
 
-				if (command.Ping && channelData.Ping) {
+				if (command.Ping && channelData?.Ping) {
 					// @todo maybe {passed, string} is better in case the name is too bad? We'll see later on
 					const {string} = await sb.Banphrase.execute(userData.Name, channelData);
 					execution.reply = string + ", " + execution.reply;

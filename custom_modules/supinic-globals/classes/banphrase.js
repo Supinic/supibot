@@ -118,14 +118,14 @@ module.exports = (function () {
 		 * Checks all banphrases associated with given channel and platform. Global ones are checked as well.
 		 * If a channel is configured to use an external API, that is chcked too.
 		 * @param {string} message
-		 * @param {Channel} channelData
+		 * @param {Channel|null} channelData
 		 * @returns {Promise<BanphraseCheckResult>}
 		 */
 		static async execute (message, channelData) {
 			const banphraseList = Banphrase.data.filter(banphrase => (
 				(banphrase.Type !== "API response") && (
-					(banphrase.Channel === channelData.ID)
-					|| (banphrase.Channel === null && banphrase.Platform === channelData.Platform)
+					(banphrase.Channel === (channelData?.ID ?? null))
+					|| (banphrase.Channel === null && banphrase.Platform === channelData?.Platform)
 					|| (banphrase.Platform === null)
 				)
             ));
@@ -146,7 +146,7 @@ module.exports = (function () {
 			}
 
 			// If channel has a banphrase API, check it afterwards
-			if (channelData.Banphrase_API_Type) {
+			if (channelData?.Banphrase_API_Type) {
 				let response = null;
 				try {
 					response = await Banphrase.executeExternalAPI(message.slice(0, 1000), channelData.Banphrase_API_Type, channelData.Banphrase_API_URL);

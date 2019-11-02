@@ -75,7 +75,11 @@ module.exports = (function () {
              */
             this.Private_Message = data.Private_Message;
 
-
+            /**
+             * Platform of the reminder. Can be independent from the channel.
+             * @type {number|null}
+             */
+            this.Platform = data.Platform;
         }
 
         /**
@@ -94,7 +98,7 @@ module.exports = (function () {
 
             /** @type {module.LongTimeout} */
             this.timeout = new LongTimeout(async () => {
-                const channelData = sb.Channel.get(this.Channel);
+                const channelData = (this.Channel === null) ? null : sb.Channel.get(this.Channel);
                 const fromUserData = await sb.User.get(this.User_From, true);
                 const toUserData = await sb.User.get(this.User_To, true);
                 let message = null;
@@ -125,9 +129,22 @@ module.exports = (function () {
 
                 if (message) {
                     if (this.Private_Message) {
-                        sb.Master.pm(toUserData, message, channelData.Platform);
+                        let platform = channelData?.Platform ?? this.Platform;
+                        if (typeof platform === "number") {
+                            const row = await sb.Query.getRow("chat_data", "Platform");
+                            await row.load(platform);
+                            platform = row.values.Name;
+                        }
+
+                        await sb.Master.pm(toUserData, message, platform);
                     }
                     else {
+                        if (channelData === null) {
+                            throw new sb.Error({
+                                message: "Cannot post a non-private reminder in an unspecified channel!"
+                            })
+                        }
+
                         if (channelData.Mirror) {
                             sb.Master.mirror(message, toUserData, channelData.Mirror);
                         }
@@ -290,6 +307,16 @@ module.exports = (function () {
                         });
                     }
                 }
+            }
+
+            if (typeof data.Platform === "string") {
+                data.Platform = (await sb.Query.getRecordset(rs => rs
+                    .select("ID")
+                    .from("chat_data", "Platform")
+                    .where("Name = %s", data.Platform)
+                    .limit(1)
+                    .single()
+                )).ID;
             }
 
             const row = await sb.Query.getRow("chat_data", "Reminder");

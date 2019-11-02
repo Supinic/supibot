@@ -295,7 +295,6 @@ module.exports = (function () {
 			}
 			else {
 				sb.SystemLogger.send("Twitch.Other", "whisper: " + message, null, userData);
-				channelData = sb.Channel.get("supibot");
 				console.log("Whisper received: Twitch", userData.Name, message);
 			}
 
@@ -398,13 +397,15 @@ module.exports = (function () {
 		 */
 		async handleCommand (command, user, channel, args = [], options = {}) {
 			const userData = await sb.User.get(user, false);
-			const channelData = sb.Channel.get(channel);
+			const channelData = (channel === null) ? null : sb.Channel.get(channel);
+			options.platform = "twitch";
+
 			const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, options);
 			if (!execution || !execution.reply) {
 				return false;
 			}
 
-			if (channelData.Mirror) {
+			if (channelData?.Mirror) {
 				this.mirror(execution.reply, userData, channelData, true);
 			}
 
@@ -413,9 +414,16 @@ module.exports = (function () {
 					platform: "twitch",
 					extraLength: ("/w " + userData.Name + " ").length
 				});
+
 				this.pm(userData.Name, message);
 			}
 			else {
+				if (channelData === null) {
+					throw new sb.Error({
+						message: "If channelData is null, then it is not possible to send a channel-specific message!"
+					});
+				}
+
 				const message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
 				if (message) {
 					this.send(message, channelData);
