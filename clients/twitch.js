@@ -342,6 +342,7 @@ module.exports = (function () {
 					channelData,
 					args,
 					{
+						userBadges: userState.badges,
 						userBadgeInfo: userState.badgeInfo,
 						color: userState.color,
 						colorRaw: userState.colorRaw,
