@@ -441,7 +441,13 @@ module.exports = (function () {
             // Handle private reminders
             if (privateReply.length !== 0) {
                 for (const privateReminder of privateReply) {
-                    sb.Master.pm(targetUserData, privateReminder, channelData.Platform);
+                    sb.Master.pm(targetUserData, "Private reminder: " + privateReminder, channelData.Platform);
+                }
+
+                const publicMessage = `Hey ${targetUserData.Name} - I just whispered you ${privateReply.length} private reminder(s) - make sure to check them out!`;
+                sb.Master.send(publicMessage, channelData);
+                if (channelData.Mirror) {
+                    sb.Master.mirror(publicMessage, targetUserData, channelData.Mirror);
                 }
             }
         }
