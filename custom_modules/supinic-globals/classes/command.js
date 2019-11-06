@@ -260,6 +260,14 @@ module.exports = (function () {
 
 			const appendOptions = Object.assign({}, options);
 			const isPrivateMessage = Boolean(appendOptions.privateMessage);
+			if (command.Whitelisted && isPrivateMessage) {
+				return {
+					success: false,
+					reason: "filter",
+					reply: "Command is not available in private messages!"
+				};
+			}
+
 			if (typeof appendOptions.privateMessage !== "undefined") {
 				// @todo check if Object.fromEntries(Object.entries.map) is faster than delete
 				delete appendOptions.privateMessage;
