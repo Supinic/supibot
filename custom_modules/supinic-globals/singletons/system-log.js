@@ -43,6 +43,24 @@ module.exports = (function (Module) {
 			await row.save();
 		}
 
+		/**
+		 * Logs a new error, and returns its ID.
+		 * @param {string} tag
+		 * @param {Error} error
+		 * @returns {Promise<void>}
+		 */
+		async sendError (tag, error) {
+			const row = await sb.Query.getRow("chat_data", "Error");
+			row.setValues({
+				Type: tag,
+				Message: error.message ?? null,
+				Stack: error.stack
+			});
+
+			const { insertId } = await row.save();
+			return insertId;
+		}
+
 		get modulePath () { return "system-log"; }
 
 		destroy () { }

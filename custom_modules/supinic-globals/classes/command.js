@@ -310,15 +310,14 @@ module.exports = (function () {
 
 			}
 			catch (e) {
-				sb.SystemLogger.send(
-					"Command.Error",
-					identifier + " " + args.join(" ") + "\n" + e.toString() + "\n" + e.stack,
-					channelData,
-					userData
-				);
 				console.error(e);
+				const errorID = await sb.SystemLogger.sendError("Command", e);
 
-				execution = {success: false, reason: "error", reply: "An internal error occured!"};
+				execution = {
+					success: false,
+					reason: "error",
+					reply: "An internal error occured! Error ID: " + errorID
+				};
 			}
 
 			// Read-only commands never reply with anything - banphrases, pings and cooldowns are not checked
