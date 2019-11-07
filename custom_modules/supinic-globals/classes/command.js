@@ -213,29 +213,27 @@ module.exports = (function () {
 			// therefore it is also safe to mark them as "well known". They will be loaded on next startup.
 			userData.saveProperty("Well_Known", true);
 
-			if (channelData) {
-				const filterCheck = sb.Filter.check({
-					userID: userData.ID,
-					channelID: channelData?.ID ?? null,
-					commandID: command.ID
-				});
+			const accessBlocked = sb.Filter.check({
+				userID: userData.ID,
+				channelID: channelData?.ID ?? NaN,
+				commandID: command.ID
+			});
 
-				if (filterCheck) {
-					sb.SystemLogger.send("Command.Fail", "Command " + command.ID + " filtered", channelData, userData);
-					const reply = (command.Whitelisted && command.Whitelist_Response)
-						? command.Whitelist_Response
-						: (typeof filterCheck === "string")
-							? filterCheck
-							: null;
+			if (accessBlocked) {
+				sb.SystemLogger.send("Command.Fail", "Command " + command.ID + " filtered", channelData, userData);
+				const reply = (command.Whitelisted && command.Whitelist_Response)
+					? command.Whitelist_Response
+					: (typeof accessBlocked === "string")
+						? accessBlocked
+						: null;
 
-					sb.Runtime.incrementRejectedCommands();
+				sb.Runtime.incrementRejectedCommands();
 
-					return {
-						success: false,
-						reason: "filter",
-						reply: reply
-					};
-				}
+				return {
+					success: false,
+					reason: "filter",
+					reply: reply
+				};
 			}
 
 			// Check for opted out users
@@ -260,14 +258,6 @@ module.exports = (function () {
 
 			const appendOptions = Object.assign({}, options);
 			const isPrivateMessage = Boolean(appendOptions.privateMessage);
-			if (command.Whitelisted && isPrivateMessage) {
-				return {
-					success: false,
-					reason: "filter",
-					reply: "Command is not available in private messages!"
-				};
-			}
-
 			if (typeof appendOptions.privateMessage !== "undefined") {
 				// @todo check if Object.fromEntries(Object.entries.map) is faster than delete
 				delete appendOptions.privateMessage;

@@ -350,8 +350,13 @@ module.exports = (function () {
 					}
 				);
 
-				if (!result && messageType === "whisper") {
-					this.pm(userData.Name, sb.Config.get("PRIVATE_MESSAGE_NO_COMMAND"));
+				if (!result.success && messageType === "whisper") {
+					if (result.reason === "filter") {
+						this.pm(userData.Name, sb.Config.get("PRIVATE_MESSAGE_COMMAND_FILTERED"));
+					}
+					else if (result.reason === "no-command") {
+						this.pm(userData.Name, sb.Config.get("PRIVATE_MESSAGE_NO_COMMAND"));
+					}
 				}
 			}
 			else if (messageType === "whisper") {
@@ -403,7 +408,7 @@ module.exports = (function () {
 
 			const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, options);
 			if (!execution || !execution.reply) {
-				return false;
+				return execution;
 			}
 
 			if (channelData?.Mirror) {
@@ -419,19 +424,13 @@ module.exports = (function () {
 				this.pm(userData.Name, message);
 			}
 			else {
-				if (channelData === null) {
-					throw new sb.Error({
-						message: "If channelData is null, then it is not possible to send a channel-specific message!"
-					});
-				}
-
 				const message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
 				if (message) {
 					this.send(message, channelData);
 				}
 			}
 
-			return true;
+			return execution;
 		}
 
 		/**
