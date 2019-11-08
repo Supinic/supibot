@@ -103,6 +103,12 @@ module.exports = (function () {
              * @type {Channel.ID|null}
              */
             this.Mirror = data.Mirror;
+
+            /**
+             * A human-readable description of the channel.
+             * @type {string|null}
+             */
+            this.Description = data.Description ?? null;
         }
 
         /**
