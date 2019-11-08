@@ -301,7 +301,7 @@ module.exports = (function () {
 			}
 			catch (e) {
 				console.error(e);
-				const errorID = await sb.SystemLogger.sendError("Command", e);
+				const errorID = await sb.SystemLogger.sendError("Command", e, ...args);
 
 				execution = {
 					success: false,

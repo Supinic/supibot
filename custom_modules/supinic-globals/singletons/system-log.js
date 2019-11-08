@@ -47,14 +47,16 @@ module.exports = (function (Module) {
 		 * Logs a new error, and returns its ID.
 		 * @param {string} tag
 		 * @param {Error} error
+		 * @param {*[]} [args] Any additional arguments passed to code that produced this error
 		 * @returns {Promise<void>}
 		 */
-		async sendError (tag, error) {
+		async sendError (tag, error, ...args) {
 			const row = await sb.Query.getRow("chat_data", "Error");
 			row.setValues({
 				Type: tag,
 				Message: error.message ?? null,
-				Stack: error.stack
+				Stack: error.stack,
+				Arguments: (args) ? JSON.stringify(args) : null
 			});
 
 			const { insertId } = await row.save();
