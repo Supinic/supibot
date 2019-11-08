@@ -45,7 +45,8 @@ Some of the features backend provides include:
 
 - So-called `mirroring` of channel-to-channel (see [master.js](/master.js) and [/clients](/clients), methods `mirror` in each)
   - This takes all messages from one channel and re-sends them in another, across platforms if necessary
-  - Each channel can only have one mirror set up, in order to avoid exponential increase of messages sent (e.g. a `1-to-1` mirror sends one message per channel for a total of two, but a `2-to-2` mirror sends two messages per channel for a total of four, scaling `O(n^2)`)
-  - This practically means that a mirror relationship can be:
+  - Each channel can only have one mirror set up, in order to avoid exponential increase of messages sent.
+  - e.g. a simple mirror `1-to-1` sends one message per channel for a total of two, but a `1-to-1-to-1` mirror sends two messages per channel for a total of six, scaling `n*(n-1)` for `n` channels connected in this way, which is `O(n^2)`)
+  - Therefore, it is a design choice to keep the relationships limited to these practical cases:
     - `1-to-1` (channels are mirrored together)
     - `1-to-N` (channels are funneled to one aggregate channel) - This does not violate the exponential growth of messages, as an aggregate channel has its own mirror output disabled. Also, such a relationship does not yet exist in practice.  
