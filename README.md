@@ -30,7 +30,7 @@ Some of the features implemented commands provide include:
 Some of the features backend provides include:
 - Extensive custom and API banphrase checking
   - Custom banphrases:
-    - are all defined in the database as code (`chat_data.Banphrase`) and are parsed to code form on startup (`sb.Banphrase`, [banphase.js - class Banphrase](/custom_modules/supinic-globals/classes/banphrase.js))
+    - are all defined in the database as code (`chat_data.Banphrase`) and are parsed to code form on startup (`sb.Banphrase`, [banphrase.js - class Banphrase](/custom_modules/supinic-globals/classes/banphrase.js))
     - can be specific to channel, platform, or be global
     - can set to replace specific words, entire messages, or make the bot not reply at all
     - can be linked to API banphrases, in order to reply with a custom message (e.g. an API banphrase that rejects non-ASCII characters will not make the bot output a non-user friendly message, but rather something like "No special characters allowed!")
@@ -43,10 +43,9 @@ Some of the features backend provides include:
     - "Anti-ping" - Replies with "That message pings too many users" if a message contains more than X amount of unique users that the bot has in its database of users
     - "Celsius module" - Searches for all instances of a Fahrenheit temperature and appends a Celsius equivalent
 
-- So-called `mirroring` of channel-to-channel (see `/master.js` and `/clients/<client>.js`, methods `mirror`)
+- So-called `mirroring` of channel-to-channel (see [master.js](/master.js) and [/clients](/clients), methods `mirror` in each)
   - This takes all messages from one channel and re-sends them in another, across platforms if necessary
   - Each channel can only have one mirror set up, in order to avoid exponential increase of messages sent (e.g. a `1-to-1` mirror sends one message per channel for a total of two, but a `2-to-2` mirror sends two messages per channel for a total of four, scaling `O(n^2)`)
   - This practically means that a mirror relationship can be:
     - `1-to-1` (channels are mirrored together)
     - `1-to-N` (channels are funneled to one aggregate channel) - This does not violate the exponential growth of messages, as an aggregate channel has its own mirror output disabled. Also, such a relationship does not yet exist in practice.  
-- 
