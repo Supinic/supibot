@@ -33,6 +33,12 @@ module.exports = (function () {
 					await channelData.setup();
 				}
 
+				const channelDescription = guild.name + " - #" + messageObject.channel.name;
+				if (channelData.Description !== channelDescription) {
+					channelData.Description = channelDescription;
+					await channelData.saveProperty("Description", channelDescription);
+				}
+
 				let userData = await sb.User.getByProperty("Discord_ID", discordID);
 
 				// If no user with the given Discord ID exists, check and see if the name is already being used
