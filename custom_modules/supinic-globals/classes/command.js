@@ -89,6 +89,13 @@ module.exports = (function () {
 			this.Opt_Outable = data.Opt_Outable;
 
 			/**
+			 * If true, any user can "block" another user from targetting them with this command.
+			 * @example A user can opt-out from command remind for user XYZ. User XYZ will no longer be able to remind the user.
+			 * @type {boolean}
+			 */
+			this.Blockable = data.Blockable;
+
+			/**
 			 * If true, the command can be used as a part of the "pipe" command.
 			 * @type {boolean}
 			 */

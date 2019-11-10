@@ -56,6 +56,12 @@ module.exports =  (function () {
 			this.Reason = data.Reason;
 
 			/**
+			 * If the filter is a block, this is the user who is being blocked from targetting someone with a command.
+			 * @type {User.ID|null}
+			 */
+			this.Blocked_User = data.Blocked_User;
+
+			/**
 			 * Whether or not the filter is currently being enforced.
 			 * @type {boolean}
 			 */
@@ -277,6 +283,7 @@ module.exports =  (function () {
 				Reason: options.Reason || null,
 				Type: options.Type || "Blacklist",
 				Response: "Auto",
+				Blocked_User: options.Blocked_User || null,
 				Active: true
 			};
 
