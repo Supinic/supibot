@@ -411,10 +411,6 @@ module.exports = (function () {
 				return execution;
 			}
 
-			if (channelData?.Mirror) {
-				this.mirror(execution.reply, userData, channelData, true);
-			}
-
 			if (options.privateMessage || execution.replyWithPrivateMessage) {
 				const message = await sb.Master.prepareMessage(execution.reply, null, {
 					platform: "twitch",
@@ -424,6 +420,10 @@ module.exports = (function () {
 				this.pm(userData.Name, message);
 			}
 			else {
+				if (channelData?.Mirror) {
+					this.mirror(execution.reply, userData, channelData, true);
+				}
+
 				const message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
 				if (message) {
 					this.send(message, channelData);
