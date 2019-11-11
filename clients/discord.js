@@ -5,9 +5,6 @@ module.exports = (function () {
 	class Discord {
 		constructor (parent, options) {
 			this.platform = "Discord";
-
-			/** @type Master */
-			this.parent = parent;
 			this.name = options.name;
 
 			// @todo change client module name - collides with discord.js module
@@ -25,20 +22,10 @@ module.exports = (function () {
 			});
 
 			client.on("message", async (messageObject) => {
+				const commandPrefix = sb.Config.get("COMMAND_PREFIX");
 				const {discordID, msg, chan, user, mentions, guild, privateMessage} = Discord.parseMessage(messageObject);
 
-				let channelData = sb.Channel.get(chan);
-				if (!channelData) {
-					channelData = await sb.Channel.add(chan, 2);
-					await channelData.setup();
-				}
-
-				const channelDescription = guild.name + " - #" + messageObject.channel.name;
-				if (channelData.Description !== channelDescription) {
-					channelData.Description = channelDescription;
-					await channelData.saveProperty("Description", channelDescription);
-				}
-
+				let channelData = null;
 				let userData = await sb.User.getByProperty("Discord_ID", discordID);
 
 				// If no user with the given Discord ID exists, check and see if the name is already being used
@@ -49,7 +36,7 @@ module.exports = (function () {
 					// Needs to be fixed or flagged manually
 					if (nameCheckData && nameCheckData.Discord_ID !== null) {
 						const message = "User ID anomaly: " + user + " (" +  discordID + "), compared to " + nameCheckData.Name + " (" + nameCheckData.Discord_ID + ")";
-						sb.SystemLogger.send("Discord.Warning", message, channelData);
+						sb.SystemLogger.send("Discord.Warning", message);
 						return;
 					}
 					// Otherwise, set up the user with their Discord ID
@@ -59,31 +46,45 @@ module.exports = (function () {
 					}
 				}
 
-				// Do not process mirrored messages
-				if (userData.ID === sb.Config.get("SELF_ID") && sb.Config.get("MIRROR_IDENTIFIERS").includes(Array.from(msg)[0])) {
-					return;
+				if (!privateMessage) {
+					let channelData = sb.Channel.get(chan);
+					if (!channelData) {
+						channelData = await sb.Channel.add(chan, 2);
+						await channelData.setup();
+					}
+
+					const channelDescription = guild.name + " - #" + messageObject.channel.name;
+					if (channelData.Description !== channelDescription) {
+						channelData.Description = channelDescription;
+						await channelData.saveProperty("Description", channelDescription);
+					}
+
+					sb.Logger.push(msg, userData, channelData);
+
+					sb.AwayFromKeyboard.checkActive(userData, channelData);
+					sb.Reminder.checkActive(userData, channelData);
+
+					// Mirroring is set up - mirror the message to the target channel
+					if (channelData.Mirror) {
+						this.mirror(msg, userData, channelData);
+					}
 				}
-				
-				sb.Logger.push(msg, userData, channelData);
 
 				// Own message - skip
 				if (discordID === sb.Config.get("DISCORD_SELF_ID")) {
 					return;
 				}
 
-				sb.AwayFromKeyboard.checkActive(userData, channelData, this.parent);
-				sb.Reminder.checkActive(userData, channelData, this.parent);
-
-				// Mirroring is set up - mirror the message to the target channel
-				if (channelData.Mirror) {
-					this.mirror(msg, userData, channelData);
-				}
-
 				// Starts with correct prefix - handle command
-				if (msg.startsWith(this.parent.commandPrefix)) {
-					const command = msg.replace(this.parent.commandPrefix, "").split(" ")[0];
+				if (msg.startsWith(commandPrefix)) {
+					const command = msg.replace(commandPrefix, "").split(" ")[0];
 					const args = msg.split(/\s+/).slice(1).filter(Boolean);
-					this.handleCommand(command, args, channelData, userData, {mentions, guild, privateMessage});
+					this.handleCommand(command, args, channelData, userData, {
+						mentions,
+						guild,
+						privateMessage,
+						platform: "discord"
+					});
 				}
 			});
 
@@ -101,9 +102,6 @@ module.exports = (function () {
 		 */
 		async send (message, channel) {
 			const discordChannel = sb.Channel.get(channel).Name;
-
-			// @todo parse in/out discord emotes?
-
 			const channelObject = this.client.channels.get(discordChannel);
 			if (!channelObject) {
 				console.warn("No channel available!", channel);
@@ -168,15 +166,19 @@ module.exports = (function () {
 				return;
 			}
 
-			if (channelData.Mirror) {
+			if (channelData?.Mirror) {
 				this.mirror(execution.reply, userData,channelData, true);
 			}
 
-			const message = await this.parent.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
-			if (execution.replyWithPrivateMessage) {
+			if (options.privateMessage || execution.replyWithPrivateMessage) {
+				const message = await sb.Master.prepareMessage(execution.reply, null, {
+					platform: "discord",
+				});
+
 				this.pm(userData, message);
 			}
 			else if (message) {
+				const message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
 				this.send(message, channelData);
 			}
 		}
@@ -186,7 +188,7 @@ module.exports = (function () {
 				? "🇩 " + Discord.removeEmoteTags(message)
 				: "🇩 " + userData.Name[0] + userData.Name.slice(1) + ": " + Discord.removeEmoteTags(message);
 
-			this.parent.mirror(fixedMessage, userData, channelData.Mirror);
+			sb.Master.mirror(fixedMessage, userData, channelData.Mirror);
 		}
 
 		destroy () {
@@ -195,7 +197,7 @@ module.exports = (function () {
 		}
 
 		restart () {
-			this.parent.reloadClientModule(this.platform, false);
+			sb.Master.reloadClientModule(this.platform, false);
 			this.destroy();
 		}
 
@@ -206,6 +208,7 @@ module.exports = (function () {
 				).replace(/\s+/g, " "),
 				user: messageObject.author.username.toLowerCase().replace(/\s/g, "_"),
 				chan: messageObject.channel.id,
+				channelType: messageObject.channel.type,
 				discordID: String(messageObject.author.id),
 				author: messageObject.author,
 				mentions: messageObject.mentions,
