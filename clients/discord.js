@@ -47,7 +47,7 @@ module.exports = (function () {
 				}
 
 				if (!privateMessage) {
-					let channelData = sb.Channel.get(chan);
+					channelData = sb.Channel.get(chan);
 					if (!channelData) {
 						channelData = await sb.Channel.add(chan, 2);
 						await channelData.setup();
@@ -177,7 +177,7 @@ module.exports = (function () {
 
 				this.pm(userData, message);
 			}
-			else if (message) {
+			else {
 				const message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
 				this.send(message, channelData);
 			}
