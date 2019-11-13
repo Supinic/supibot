@@ -97,7 +97,7 @@ module.exports = (function () {
 				vlcID: newID,
 				user: user,
 				link: link,
-				length: data.length,
+				length: data.duration || data.length,
 				name: data.name,
 				requested: new sb.Date()
 			});
