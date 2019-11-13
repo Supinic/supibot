@@ -23,7 +23,6 @@ module.exports = (function (Module) {
 			this.videoTypes = [];
 			this.channels = [];
 			this.meta = {};
-			this.countMeta = {};
 			this.batches = {};
 
 			this.messageCron = new CronJob(sb.Config.get("CRON_MESSAGE_CONFIG"), async () => {
@@ -60,7 +59,7 @@ module.exports = (function (Module) {
 							Length: length
 						});
 					}
-					
+
 					this.metaBatch.add({
 						Timestamp: now,
 						Channel: channelID,
@@ -71,10 +70,20 @@ module.exports = (function (Module) {
 					this.meta[channelID] = { amount: 0, length: 0, users: {} };
 				}
 
-				await Promise.all([
-					this.metaBatch.insert(),
-					this.countMetaBatch.insert()
-				]);
+				try {
+					await Promise.all([
+						this.metaBatch.insert(),
+						this.countMetaBatch.insert()
+					]);
+				}
+				catch (e) {
+					if (e.code === "ER_DUP_ENTRY") {
+						await sb.SystemLogger.sendError("Database", e, null);
+					}
+					else {
+						throw e;
+					}
+				}
 			});
 			this.metaCron.start();
 
