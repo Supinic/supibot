@@ -16,7 +16,7 @@ module.exports = (function () {
 			this.client.use(new MixerClient.OAuthProvider(this.client, {
 				tokens: {
 					access: sb.Config.get("MIXER_OAUTH"),
-					expires: Date.now() + (365 * 24 * 60 * 60 * 1000)
+					expires: sb.Date.now() + (365 * 24 * 60 * 60 * 1000)
 				},
 			}));
 

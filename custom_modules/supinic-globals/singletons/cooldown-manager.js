@@ -108,7 +108,7 @@ module.exports = (function (Module) {
 				targetUser.commands.push(targetCommand);
 			}
 
-			const now = Date.now();
+			const now = sb.Date.now();
 			targetCommand.cooldown = now + (command.Cooldown || this.fallbackCooldown);
 		}
 
