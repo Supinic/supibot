@@ -127,6 +127,9 @@ module.exports = (function (Module) {
 				if (query.module === "afk") {
 					await sb.AwayFromKeyboard.reloadData();
 				}
+				else if (query.module === "reminder") {
+					await sb.Reminder.reloadData();
+				}
 				else {
 					throw new sb.Error({
 						message: "Unrecognized module",
