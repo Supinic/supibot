@@ -238,7 +238,11 @@ module.exports = (function () {
 
         static destroy () {
             for (const reminder of Reminder.data) {
-                reminder.deactivate(false);
+                reminder.Active = false;
+                if (reminder.timeout) {
+                    reminder.timeout.clear();
+                    reminder.timeout = null;
+                }
             }
             Reminder.data = [];
         }
