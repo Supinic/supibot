@@ -324,7 +324,7 @@ module.exports = class Recordset {
 				result.push(row);
 			}
 
-			result.sql = sql;
+			// result.sql = sql;
 			return (this.#fetchSingle)
 				? result[0]
 				: result;
