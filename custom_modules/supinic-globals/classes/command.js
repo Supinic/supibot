@@ -225,7 +225,6 @@ module.exports = (function () {
 				channelID: channelData?.ID ?? NaN,
 				commandID: command.ID
 			});
-
 			if (accessBlocked) {
 				sb.SystemLogger.send("Command.Fail", "Command " + command.ID + " filtered", channelData, userData);
 				const reply = (command.Whitelisted && command.Whitelist_Response)
@@ -234,6 +233,7 @@ module.exports = (function () {
 						? accessBlocked
 						: null;
 
+				sb.CooldownManager.set(command, userData, channelData);
 				sb.Runtime.incrementRejectedCommands();
 
 				return {
