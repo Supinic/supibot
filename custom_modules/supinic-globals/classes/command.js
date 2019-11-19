@@ -304,7 +304,6 @@ module.exports = (function () {
 					channelData,
 					userData
 				);
-
 			}
 			catch (e) {
 				console.error(e);
@@ -327,7 +326,11 @@ module.exports = (function () {
 			}
 
 			if (execution && execution.reply) {
-				execution.reply = sb.Utils.fixHTML(execution.reply);
+				if (typeof execution.reply !== "string") {
+					console.warn(`Execution of command ${command.ID} did not result with execution.reply of type string`, {command, execution, data});
+				}
+
+				execution.reply = sb.Utils.fixHTML(String(execution.reply));
 				execution.reply = execution.reply.replace(sb.Config.get("WHITESPACE_REGEX"), "");
 
 				if (command.Ping && channelData?.Ping) {
