@@ -330,13 +330,8 @@ module.exports = class Recordset {
 				: result;
 		}
 		catch (err) {
-			if (sb.SystemLogger) {
-				sb.SystemLogger.send("System.Error", "Recordset failed: " + sql.join("\n") + " => " + err);
-			}
-			else {
-				console.error("Recordset failed: " + sql.join("\n") + " => " + err );
-			}
-			return [];
+			console.error(err);
+			throw err;
 		}
 	}
 
