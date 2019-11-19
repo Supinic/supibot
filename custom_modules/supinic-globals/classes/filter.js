@@ -76,6 +76,39 @@ module.exports =  (function () {
 			await row.save();
 		}
 
+		/**
+		 * Changes the reason and response fields of a Filter accordingly.
+		 * @param {string|null} reason Changes the reason of the filter and the type to "Reason" if set to string.
+		 * Unsets the response (NULL) and sets the type to "Auto"
+		 * @returns {Promise<void>}
+		 */
+		async setReason (reason) {
+			if (typeof reason === "string") {
+				this.Reason = reason;
+				this.Response = "Reason";
+			}
+			else if (reason === null) {
+				this.Reason = null;
+				this.Response = "Auto";
+			}
+			else {
+				throw new sb.Error({
+					message: "Invalid reason type",
+					args: {
+						type: typeof reason
+					}
+				})
+			}
+
+			const row = await sb.Query.getRow("chat_data", "Filter");
+			await row.load(this.ID);
+
+			row.values.Reason = this.Reason;
+			row.values.Response = this.Response;
+
+			await row.save();
+		}
+
 		/** @override */
 		static async initialize () {
 			await Filter.loadData();
