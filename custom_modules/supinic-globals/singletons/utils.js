@@ -499,6 +499,40 @@ module.exports = (function (Module) {
 			return [yes, no];
 		}
 
+		/**
+		 * Attempts to fetch a Twitch ID from user cache.
+		 * If it doesn't find one, queries the Twitch API endpoint.
+		 * @param {string} user
+		 * @returns {Promise<null|number>}
+		 */
+		async getTwitchID (user) {
+			let userData = await sb.User.get(user, true);
+			if (userData && userData.Twitch_ID) {
+				return userData.Twitch_ID;
+			}
+			else {
+				const channelInfo = JSON.parse(await sb.Utils.request({
+					method: "GET",
+					url: "https://api.twitch.tv/helix/users?login=" + user,
+					headers: {
+						"Client-ID": sb.Config.get("TWITCH_CLIENT_ID")
+					}
+				}));
+
+				if (channelInfo.data.length !== 0) {
+					const {id, display_name: name} = channelInfo.data[0];
+					if (!userData) {
+						userData = await sb.User.get(name, false);
+					}
+
+					await userData.saveProperty("Twitch_ID", id);
+					return id;
+				}
+			}
+
+			return null;
+		}
+
 		parseURL (stringURL) {
 			return urlParser(stringURL);
 		}
