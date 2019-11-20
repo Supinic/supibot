@@ -472,6 +472,33 @@ module.exports = (function (Module) {
 			return transliterate(...args);
 		}
 
+		/**
+		 * Splits an array into two, based on the condition function.
+		 * @param {Array} array
+		 * @param {Function} filter Takes three arguments: (item, index, array)
+		 * @returns {[Array, Array]} Two arrays: First one with condition === true, second one with false.
+		 */
+		splitByCondition (array, filter) {
+			if (!Array.isArray(array)) {
+				throw new sb.Error({
+					message: "array must be an Array"
+				});
+			}
+
+			const yes = [];
+			const no = [];
+			for (let i = 0; i < array.length; i++) {
+				if (filter(array[i], i, array)) {
+					yes.push(array[i]);
+				}
+				else {
+					no.push(array[i]);
+				}
+			}
+
+			return [yes, no];
+		}
+
 		parseURL (stringURL) {
 			return urlParser(stringURL);
 		}
