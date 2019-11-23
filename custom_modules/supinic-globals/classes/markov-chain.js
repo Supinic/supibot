@@ -28,12 +28,18 @@ module.exports = (function () {
 
 			this.Name = data.Name;
 
-			try {
-				this.Definition = JSON.parse(data.Definition);
+			if (data.Definition) {
+				try {
+					this.Definition = JSON.parse(data.Definition);
+				}
+				catch (e) {
+					console.error("Markov chain model ID " + this.ID + " has invalid definition", e);
+					this.Definition = null;
+				}
 			}
-			catch (e) {
-				console.error("Markov chain model ID " + this.ID + " has invalid definition", e);
-				this.Definition = null;
+			else {
+				this.#model = new Markov();
+				this.#prepared = true;
 			}
 		}
 
@@ -70,6 +76,30 @@ module.exports = (function () {
 
 			this.#model = new Markov(this.Definition);
 			this.#prepared = true;
+		}
+
+		async save () {
+			const row = await sb.Query.getRow("data", "Markov_Chain");
+			if (this.ID) {
+				await row.load(this.ID);
+				row.values.Definition = JSON.stringify(this.#model.state);
+			}
+			else if (this.#prepared && Object.keys(this.#model.state).length > 9) {
+				row.setValues({
+					Name: this.Name,
+					Definition: JSON.stringify(this.#model.state)
+				})
+			}
+			else {
+				throw new sb.Error({
+					message: "Markov chain model is not loaded or active!"
+				})
+			}
+
+			const { insertId } = await row.save();
+			if (!this.ID) {
+				this.ID = insertId;
+			}
 		}
 
 		destroy () {
