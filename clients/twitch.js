@@ -128,8 +128,8 @@ module.exports = (function () {
 						messageObject.eventParams.viewerCount
 					);
 				}
-				else if (messageTypeID === "submysterygift") {
-					// ignore this event
+				else if (messageTypeID === "submysterygift" || messageTypeID === "primecommunitygiftreceived") {
+					// ignore these events
 				}
 				else if (messageObject.isRitual()) {
 					const userData = await sb.User.get(senderUsername, false);
