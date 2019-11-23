@@ -325,7 +325,27 @@ module.exports = (function () {
 				sb.CooldownManager.set(command, userData, channelData);
 			}
 
-			if (execution && execution.reply) {
+			if (execution && (execution.reply || execution.partialReplies)) {
+				if (Array.isArray(execution.partialReplies) && execution.partialReplies.every(i => i && i.constructor === Object)) {
+					const partResult = [];
+					for (const {message, bancheck} of execution.partialReplies) {
+						if (bancheck === true) {
+							const {string} = await sb.Banphrase.execute(message, channelData);
+							partResult.push(string);
+						}
+						else {
+							partResult.push(message);
+						}
+					}
+
+					execution.reply = partResult.join(" ");
+				}
+				else if (execution.partialReplies) {
+					throw new sb.Error({
+						message: "If set, partialReplies must be an Array of Objects"
+					});
+				}
+
 				if (typeof execution.reply !== "string") {
 					console.warn(`Execution of command ${command.ID} did not result with execution.reply of type string`, {command, execution, data});
 				}
