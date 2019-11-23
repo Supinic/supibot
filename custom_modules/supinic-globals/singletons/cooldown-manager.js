@@ -54,7 +54,7 @@ module.exports = (function (Module) {
 			}
 
 			const now = sb.Date.now();
-			const targetChannel = this.channels.find(i => i.ID === channel.ID);
+			const targetChannel = this.channels.find(i => i.ID === (channel?.ID ?? null));
 			if (!targetChannel) {
 				this.addChannel(channel);
 				return true;
@@ -83,7 +83,7 @@ module.exports = (function (Module) {
 		 * Sets a cooldown for given command, user and channel.
 		 * @param {ManagerCommand} command Invoked command
 		 * @param {ManagerUser} user Invoking user
-		 * @param {ManagerChannel} channel Channel the command was invoked in
+		 * @param {ManagerChannel|null} channel Channel the command was invoked in. If null, cooldown applies to private messages.
 		 */
 		set (command, user, channel) {
 			// If command cooldown is zero, do not apply the cooldown at all.
@@ -91,7 +91,7 @@ module.exports = (function (Module) {
 				return;
 			}
 
-			const targetChannel = this.channels.find(i => i.ID === channel.ID);
+			const targetChannel = this.channels.find(i => i.ID === (channel?.ID ?? null));
 			if (!targetChannel || command.Read_Only || targetChannel.mode === "Inactive" || targetChannel.mode === "Read") {
 				return;
 			}
@@ -134,14 +134,15 @@ module.exports = (function (Module) {
 		 * @param {ManagerChannel} channel
 		 */
 		addChannel (channel) {
-			if (typeof channel.ID !== "number") {
-				throw new Error("Channel ID must be provided and it must be a number");
+			if (channel.ID === null || typeof channel.ID === "number") {
+				this.channels.push({
+					ID: channel.ID, mode: channel.Mode || "Write",
+					users: []
+				});
 			}
-
-			this.channels.push({
-				ID: channel.ID, mode: channel.Mode || "Write",
-				users: []
-			});
+			else {
+				throw new Error("Channel ID must be either null, or provided and a number");
+			}
 		}
 
 		get modulePath () { return "cooldown-manager"; }
