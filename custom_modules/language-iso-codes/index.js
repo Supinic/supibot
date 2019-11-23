@@ -84,7 +84,7 @@ module.exports = (function () {
 				{ iso6391: "de", names: ["german"] },
 				{ iso6391: "el", names: ["greek"] },
 				{ iso6391: "gu", names: ["gujarati"] },
-				{ iso6391: "ht", names: ["haitian creole"] },
+				{ iso6391: "ht", names: ["haitian", "creole", "haitian creole"] },
 				{ iso6391: "ha", names: ["hausa"] },
 				{ iso6392: "haw", names: ["hawaiian"] },
 				{ iso6391: "iw", names: ["hebrew"] },
