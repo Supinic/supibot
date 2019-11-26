@@ -128,7 +128,7 @@ module.exports = (function () {
 						messageObject.eventParams.viewerCount
 					);
 				}
-				else if (messageTypeID === "submysterygift" || messageTypeID === "primecommunitygiftreceived") {
+				else if (sb.Config.get("TWITCH_IGNORED_USERNOTICE").includes(messageTypeID)) {
 					// ignore these events
 				}
 				else if (messageObject.isRitual()) {
