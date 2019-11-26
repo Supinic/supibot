@@ -87,11 +87,22 @@ module.exports = (function (Module) {
 			});
 			this.metaCron.start();
 
+			this.banCollector = new Map();
 			this.banCron = new CronJob(sb.Config.get("CRON_META_MESSAGE_CONFIG"), async () => {
 				if (!this.banBatch.ready) {
 					return;
 				}
 
+				const bannedUsers = await sb.User.getMultiple([...this.banCollector.keys()]);
+				for (const userData of bannedUsers) {
+					const linkedUser = this.banCollector.get(userData.Name);
+					if (linkedUser) {
+						linkedUser.User_Alias = userData.ID;
+						this.banBatch.add(linkedUser);
+					}
+				}
+
+				this.banCollector.clear();
 				await this.banBatch.insert();
 			});
 			this.banCron.start();
@@ -199,16 +210,15 @@ module.exports = (function (Module) {
 
 		/**
 		 * Inserts a Twitch-specific ban data to the database.
-		 * @param {User} userData
+		 * @param {string|number} identifier
 		 * @param {Channel} channelData
 		 * @param {number} length
 		 * @param {sb.Date} date
 		 * @param {string|null} notes
 		 * @returns {Promise<void>}
 		 */
-		logBan (userData, channelData, length, date, notes) {
-			this.banBatch.add({
-				User_Alias: userData.ID,
+		logBan (identifier, channelData, length, date, notes) {
+			this.banCollector.set(identifier, {
 				Channel: channelData.ID,
 				Length: length || null,
 				Issued: date,

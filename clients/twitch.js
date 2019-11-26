@@ -240,7 +240,6 @@ module.exports = (function () {
 			}
 
 			const now = sb.Date.now();
-
 			if (!userData.Twitch_ID && senderUserID && Math.abs(now - this.userIDTimeout) > 1000) {
 				userData.saveProperty("Twitch_ID", senderUserID);
 				this.userIDTimeout = now;
@@ -446,27 +445,10 @@ module.exports = (function () {
 		 * @returns {Promise<void>}
 		 */
 		async handleBan (user, channel, reason = null, length = null) {
-			const userData = await sb.User.get(user, true);
-
-			// If no user found, skip the processing - they have never been seen by supibot
-			// and therefore it is completely pointless
-			if (!userData) {
-				return;
-			}
-
 			const channelData = sb.Channel.get(channel);
-			if (channelData && typeof channelData.Custom_Code === "function") {
-				channelData.Custom_Code({
-					type: "ban",
-					user: userData,
-					channel: channelData,
-					length: length,
-					reason: reason,
-					issued: new sb.Date()
-				});
+			if (channelData) {
+				sb.Logger.logBan(user, channelData, length, new sb.Date(), reason);
 			}
-
-			sb.Logger.logBan(userData, channelData, length, new sb.Date(), reason);
 		}
 
 		/**
