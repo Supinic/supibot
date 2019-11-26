@@ -220,7 +220,7 @@ module.exports = (function () {
                         rs.where("Name IN %s+", strings);
                     }
                     else if (numbers.length > 0) {
-                        rs.where("Name IN %n+", numbers);
+                        rs.where("ID IN %n+", numbers);
                     }
                 });
 
