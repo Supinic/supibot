@@ -359,6 +359,16 @@ module.exports = (function () {
 					execution.reply = string + ", " + execution.reply;
 				}
 
+				const unpingUsers = await sb.User.getMultiple(sb.Filter.data
+					.filter(i => i.Command === command.ID && i.Type === "Unping")
+					.map(i => i.User_Alias)
+				);
+				for (const unpingUser of unpingUsers) {
+					const fixedName = unpingUser.Name[0] + `\u{E0000}` + unpingUser.Name.slice(1);
+					const regex = new RegExp(unpingUser.Name, "g");
+					execution.reply = execution.reply.replace(regex, fixedName);
+				}
+
 				const metaSkip = Boolean(execution.meta && execution.meta.skipBanphrases);
 				if (!command.Skip_Banphrases && !metaSkip) {
 					const {passed, string} = await sb.Banphrase.execute(execution.reply.slice(0, 1000), channelData);
