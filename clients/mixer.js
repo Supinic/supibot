@@ -103,7 +103,10 @@ module.exports = (function () {
 			}
 
 			const userData = await sb.User.get(user.name, false);
-			if (!userData.Mixer_ID) {
+			if (!userData) {
+				return;
+			}
+			else if (!userData.Mixer_ID) {
 				await userData.saveProperty("Mixer_ID", user.id);
 			}
 

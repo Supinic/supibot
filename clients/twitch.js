@@ -235,6 +235,10 @@ module.exports = (function () {
 
 			let channelData = null;
 			const userData = await sb.User.get(senderUsername, false);
+			if (!userData) {
+				return;
+			}
+
 			const now = sb.Date.now();
 
 			if (!userData.Twitch_ID && senderUserID && Math.abs(now - this.userIDTimeout) > 1000) {

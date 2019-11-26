@@ -80,6 +80,9 @@ module.exports = class Cytube {
 
 			const msg = sb.Utils.fixHTML(data.msg).replace(/<(?:.|\n)*?>/gm, "");
 			const userData = await sb.User.get(data.username.toLowerCase(), false);
+			if (!userData) {
+				return;
+			}
 
 			// Only unset AFK and fire reminders if the message wasn't private
 			if (!data.meta.private) {

@@ -2,6 +2,8 @@
 module.exports = (function () {
     "use strict";
 
+    const CronJob = require("cron").CronJob;
+
     /**
      * Represents a chat user.
      * Since there can be hundreds of thousands of users loaded, a class is used to simplify the prototype, and potentially save some memory and/or processing power with V8.
@@ -87,6 +89,18 @@ module.exports = (function () {
         /** @override */
         static async initialize () {
             User.data = new Map();
+            User.pendingNewUsers = new Set();
+
+            User.insertBatch = await sb.Query.getBatch("chat_data", "User_Alias", ["Name"]);
+            User.insertCron = new CronJob(
+                sb.Config.get("USER_INSERT_CRON_CONFIG"),
+                async () => {
+                    await User.insertBatch.insert();
+                    User.pendingNewUsers.clear();
+                }
+            );
+            User.insertCron.start();
+
             await User.loadData();
             return User;
         }
@@ -94,17 +108,6 @@ module.exports = (function () {
         static async loadData () {
             /** @type {Map<string, User>} */
             User.data = User.data || new Map();
-
-            const data = (await sb.Query.getRecordset(rs => rs
-                .select("User_Alias.*")
-                .from("chat_data", "User_Alias")
-                .where("Well_Known = %b", true)
-                .where("1 = 0") // @todo this is a temporary test - batch the users sometime else
-            ));
-
-            for (const row of data) {
-                User.data.set(row.Name, new User(row));
-            }
         }
 
         static async reloadData () {
@@ -146,18 +149,28 @@ module.exports = (function () {
                 let user = User.data.get(identifier);
 
                 if (!user) {
-                    const data = (await sb.Query.getRecordset(rs => rs
+                    const data = await sb.Query.getRecordset(rs => rs
                         .select("*")
                         .from("chat_data", "User_Alias")
                         .where("Name = %s", identifier)
-                    ))[0];
+                        .single()
+                    );
 
                     if (data) {
                         user = new User(data);
                         User.data.set(data.Name, user);
                     }
                     else if (!strict) {
-                        user = await User.add(identifier);
+                        // !!! EXPERIMENTAL !!!
+                        if (!User.pendingNewUsers.has(identifier)) {
+                            User.pendingNewUsers.add(identifier);
+                            User.insertBatch.add({
+                                Name: identifier
+                            });
+                        }
+
+                        return null;
+                        // user = await User.add(identifier);
                     }
                 }
 
@@ -169,6 +182,56 @@ module.exports = (function () {
                     args: { id: identifier, type: typeof identifier }
                 });
             }
+        }
+
+        /**
+         * Fetches a batch of users together.
+         * Takes existing records from cache, the rest is pulled from dataase.
+         * Does not support creating new records like `get()` does.
+         * @param {Array<User|string|number>} identifiers
+         * @returns {Promise<User[]>}
+         */
+        static async getMultiple (identifiers) {
+            const result = [];
+            const toFetch = [];
+            for (const identifier of identifiers) {
+                if (identifier instanceof User) {
+                    result.push(identifier);
+                }
+                else if (typeof identifier === "string" || typeof identifier === "number") {
+                    toFetch.push(identifier);
+                }
+                else {
+                    throw new sb.Error({
+                        message: "Invalid user identifier type",
+                        args: { id: identifier, type: typeof identifier }
+                    });
+                }
+            }
+
+            if (toFetch.length > 0) {
+                const [strings, numbers] = sb.Utils.splitByCondition(toFetch, i => typeof i === "string");
+                const fetched = await sb.Query.getRecordset(rs => {
+                    rs.select("*").from("chat_data", "User_Alias");
+                    if (strings.length > 0 && numbers.length > 0) {
+                        rs.where("Name IN %s+ OR ID IN %n+", strings, numbers);
+                    }
+                    else if (strings.length > 0) {
+                        rs.where("Name IN %s+", strings);
+                    }
+                    else if (numbers.length > 0) {
+                        rs.where("Name IN %n+", numbers);
+                    }
+                });
+
+                for (const rawUserData of fetched) {
+                    const userData = new User(rawUserData);
+                    result.push(userData);
+                    User.data.set(rawUserData.Name, userData);
+                }
+            }
+
+            return result;
         }
 
         /**
