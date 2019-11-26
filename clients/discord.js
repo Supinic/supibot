@@ -184,9 +184,10 @@ module.exports = (function () {
 		}
 
 		mirror (message, userData, channelData, commandUsed = false) {
+			const prefix = sb.Config.get("MIRROR_IDENTIFIER_DISCORD");
 			const fixedMessage = (commandUsed)
-				? "🇩 " + Discord.removeEmoteTags(message)
-				: "🇩 " + userData.Name[0] + userData.Name.slice(1) + ": " + Discord.removeEmoteTags(message);
+				? prefix + " " + Discord.removeEmoteTags(message)
+				: prefix + " " + userData.Name + ": " + Discord.removeEmoteTags(message);
 
 			sb.Master.mirror(fixedMessage, userData, channelData.Mirror);
 		}
