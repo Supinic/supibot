@@ -392,10 +392,20 @@ module.exports = (function () {
                         : channelData.Platform;
 
                     if (reminder.Private_Message) {
-                        const channelData = sb.Channel.get(reminder.Channel);
+                        let platform = null;
+                        if (reminder.Channel) {
+                            platform = sb.Channel.get(reminder.Channel).Platform;
+                        }
+                        else {
+                            const row = await sb.Query.getRow("chat_data", "Platform");
+                            await row.load(reminder.Platform);
+                            platform = row.values.Name;
+                        }
+
                         sb.Master.pm(
+                            fromUserData.Name,
                             fromUserData.Name + ", " + targetUserData.Name + " just typed in channel " + sourceChannelName,
-                            channelData.Platform
+                            platform.toLowerCase()
                         );
                     }
                     else {
