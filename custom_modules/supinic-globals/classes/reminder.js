@@ -104,13 +104,13 @@ module.exports = (function () {
                 let message = null;
 
                 if (this.User_From === this.User_To) {
-                    message = `${fromUserData.Name}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+                    message = `@${fromUserData.Name}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
                 }
                 else if (this.User_From === sb.Config.get("SELF_ID")) {
-                    message = `${toUserData.Name}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+                    message = `@${toUserData.Name}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
                 }
                 else if (this.User_To) {
-                    message = `${toUserData.Name}, timed reminder from ${fromUserData.Name} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+                    message = `@${toUserData.Name}, timed reminder from ${fromUserData.Name} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
                 }
 
                 const statusAFK = sb.AwayFromKeyboard.data.find(i => i.User_Alias === toUserData.ID);
@@ -404,13 +404,13 @@ module.exports = (function () {
 
                         sb.Master.pm(
                             fromUserData.Name,
-                            fromUserData.Name + ", " + targetUserData.Name + " just typed in channel " + sourceChannelName,
+                            "@" + fromUserData.Name + ", " + targetUserData.Name + " just typed in channel " + sourceChannelName,
                             platform.toLowerCase()
                         );
                     }
                     else {
                         sb.Master.send(
-                            fromUserData.Name + ", " + targetUserData.Name + " just typed in channel " + sourceChannelName,
+                            "@" + fromUserData.Name + ", " + targetUserData.Name + " just typed in channel " + sourceChannelName,
                             reminder.Channel
                         );
                     }
