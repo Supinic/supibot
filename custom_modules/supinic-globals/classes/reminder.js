@@ -424,11 +424,6 @@ module.exports = (function () {
                 const notifySymbol = (channelData.Platform === "Discord") ? "@" : "";
                 let message = notifySymbol + targetUserData.Name + ", reminders from: " + reply.join("; ");
 
-                // Make sure to mirror the reminder if the target channel is set up to be mirrored
-                if (channelData.Mirror) {
-                    sb.Master.mirror(message, targetUserData, channelData.Mirror);
-                }
-
                 // Check banphrases and do not check length limits, because it is later split manually
                 message = await sb.Master.prepareMessage(message, channelData, {
                     returnBooleanOnFail: true,
@@ -437,11 +432,24 @@ module.exports = (function () {
 
                 if (message) {
                     const limit = channelData.Message_Limit || sb.Config.get("DEFAULT_MSG_LIMIT_" + channelData.Platform.toUpperCase());
+
+                    // If the result message would be longer than twice the channel limit, post a list of reminder IDs
+	                // instead along with a link to the website, where the user can check them out.
+                    if (message.length > (limit * 2)) {
+                    	const listID = reminders.filter(i => !i.Private_Message).map(i => i.ID).join(" ");
+                    	message = `${notifySymbol}${targetUserData.Name} you have reminders, but they're too long to be posted here. Check these IDs: ${listID} here: https://supinic.com/bot/reminder/list`;
+                    }
+
                     const splitRegex = new RegExp(".{1," + limit + "}", "g");
                     const messageArray = message.match(splitRegex).filter(Boolean);
 
                     for (const splitMessage of messageArray) {
                         sb.Master.send(splitMessage, channelData);
+
+	                    // Make sure to mirror the reminder if the target channel is set up to be mirrored
+	                    if (channelData.Mirror) {
+		                    sb.Master.mirror(splitMessage, targetUserData, channelData.Mirror);
+	                    }
                     }
                 }
                 else {
