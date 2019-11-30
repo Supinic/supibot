@@ -23,6 +23,7 @@ module.exports = (function () {
 			this.queues = {};
 			this.evasion = {};
 			this.userIDTimeout = 0;
+			this.failedJoinChannels = new Set();
 
 			this.emoteFetchTimeout = 0;
 
@@ -34,6 +35,12 @@ module.exports = (function () {
 
 		initListeners () {
 			const client = this.client;
+
+			client.on("error", error => {
+				if (error instanceof DankTwitch.JoinError && error.failedChannelName) {
+					this.failedJoinChannels.add(error.failedChannelName);
+				}
+			});
 
 			client.on("JOIN", ({channelName, joinedUsername}) => {
 				console.debug(joinedUsername, channelName);
