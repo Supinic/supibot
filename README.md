@@ -17,15 +17,17 @@ Each client must implement basic methods of communication, regardless of the pla
 - `mirror` to mirror messages into a different channel
 
 ## Features
-The full command list can be found [here](https://supinic.com/bot/command/list). 
-If you are interested in the code of each command, the link can be found in each command's detail page.
+The full command list can be found [on author's website](https://supinic.com/bot/command/list) or in [its repository](https://github.com/Supinic/supibot-sql) as a list of SQL update scripts. 
 Some of the features implemented commands provide include:
 - setting an AFK status, and specifying a message when coming back
 - reminders from user to user, timed reminders to others or yourself
 - generating random lines in the scope of current channel, from a local database of chat lines
 - opening and gifting a daily fortune cookie (resets daily on midnight UTC)
 - various API commands, such as ones related to stream info, weather, time, cat/dog pictures, fun facts, and many more...
-- so-called "piping", which is executed through the `pipe` command
+- *opting-out* of specific commands, which makes all users unable to use that command with that user's name as a parameter
+- *blocking* specific people from specific commands, which makes specific users unable to use a specific command on that user
+- *ping opt-out*, which makes a specific command not *ping* (notify) that user 
+- so-called "piping", which is executed through the _pipe_ command
     - this allows to daisy-chain commands together, the first result being appended at the end of another command as extra arguments, and so on
     - example: `$pipe news DE | translate` will look up German news, and translate them to (default) English
     - example: `$pipe rw | urban | tt fancy` will generate a random word, search for its UrbanDictionary definition, and turn that into fancy text
