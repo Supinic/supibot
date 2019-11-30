@@ -351,7 +351,10 @@ module.exports = (function () {
 				}
 
 				execution.reply = sb.Utils.fixHTML(String(execution.reply));
-				execution.reply = execution.reply.replace(sb.Config.get("WHITESPACE_REGEX"), "");
+
+				if (!execution.meta?.skipWhitespaceCheck) {
+					execution.reply = execution.reply.replace(sb.Config.get("WHITESPACE_REGEX"), "");
+				}
 
 				if (command.Ping && channelData?.Ping) {
 					// @todo maybe {passed, string} is better in case the name is too bad? We'll see later on
