@@ -55,12 +55,14 @@ module.exports = (function () {
 
 					const channelDescription = guild.name + " - #" + messageObject.channel.name;
 					if (channelData.Description !== channelDescription) {
-						channelData.Description = channelDescription;
 						await channelData.saveProperty("Description", channelDescription);
 					}
 
-					sb.Logger.push(msg, userData, channelData);
+					if (channelData.NSFW !== messageObject.channel.nsfw) {
+						await channelData.saveProperty("NSFW", messageObject.channel.nsfw);
+					}
 
+					sb.Logger.push(msg, userData, channelData);
 					sb.AwayFromKeyboard.checkActive(userData, channelData);
 					sb.Reminder.checkActive(userData, channelData);
 

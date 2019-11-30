@@ -80,6 +80,13 @@ module.exports = (function () {
             this.Message_Limit = data.Message_Limit;
 
             /**
+             * Flag specifying channel's NSFW status.
+             * Mostly used for Discord channels.
+             * @type {number|null}
+             */
+            this.NSFW = data.NSFW;
+
+            /**
              * If not null, every message will be run through this code. Used for moderation, or other functionalities.
              * Callback arguments:
              * {Object} options
