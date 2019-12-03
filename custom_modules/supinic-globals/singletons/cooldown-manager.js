@@ -45,9 +45,11 @@ module.exports = (function (Module) {
 		 * @param {ManagerCommand} command
 		 * @param {ManagerUser} user
 		 * @param {ManagerChannel} channel
+		 * @param {Object} [options] Extra options
+		 * @param {boolean} [options.pipe] If a command is executed from pipe, the user's pending flag should not be checked.
 		 * @returns {boolean}
 		 */
-		check (command, user, channel) {
+		check (command, user, channel, options = {}) {
 			// Cooldown-immune users (aka mini-mods) are always given access
 			if (user && user.Data && user.Data.cooldownImmunity) {
 				return true;
@@ -66,6 +68,9 @@ module.exports = (function (Module) {
 			const targetUser = targetChannel.users.find(i => i.ID === user.ID);
 			if (!targetUser) {
 				return true;
+			}
+			else if (!options.pipe && targetUser.pending === true) {
+				return false;
 			}
 
 			const targetCommand = targetUser.commands.find(i => i.ID === command.ID);
@@ -110,6 +115,29 @@ module.exports = (function (Module) {
 
 			const now = sb.Date.now();
 			targetCommand.cooldown = now + (command.Cooldown || this.fallbackCooldown);
+		}
+
+		/**
+		 * Sets a user's pending value based on parameters.
+		 * Pending flag determines that a command is pending for given user in given channel and as such, that user
+		 * cannot use any commands in that channel until the command is settled (succeeds or fails).
+		 * @param {boolean} value
+		 * @param {number} user
+		 * @param {number|null} channel
+		 */
+		setPending (value, user, channel) {
+			const targetChannel = this.channels.find(i => i.ID === (channel?.ID ?? null));
+			if (!targetChannel || targetChannel.mode === "Inactive" || targetChannel.mode === "Read") {
+				return;
+			}
+
+			let targetUser = targetChannel.users.find(i => i.ID === user.ID);
+			if (!targetUser) {
+				targetUser = {ID: user.ID, commands: []};
+				targetChannel.users.push(targetUser);
+			}
+
+			targetUser.pending = value;
 		}
 
 		/**

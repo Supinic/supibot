@@ -215,7 +215,7 @@ module.exports = (function () {
 				return {success: false, reason: "no-command"};
 			}
 			// Check for cooldowns, return if it did not pass yet
-			if (channelData && !sb.CooldownManager.check(command, userData, channelData)) {
+			if (channelData && !sb.CooldownManager.check(command, userData, channelData, options)) {
 				sb.Logger.logCommandExecution({
 					User_Alias: userData.ID,
 					Command: command.ID,
@@ -231,6 +231,8 @@ module.exports = (function () {
 
 				return {success: false, reason: "cooldown"};
 			}
+
+			sb.CooldownManager.setPending(true, userData, channelData);
 
 			const accessBlocked = sb.Filter.check({
 				userID: userData.ID,
@@ -257,6 +259,7 @@ module.exports = (function () {
 						? accessBlocked
 						: null;
 
+				sb.CooldownManager.setPending(false, userData, channelData);
 				sb.CooldownManager.set(command, userData, channelData);
 				sb.Runtime.incrementRejectedCommands();
 
@@ -277,6 +280,7 @@ module.exports = (function () {
 						? (await sb.Banphrase.execute(optOutCheck, channelData)).string
 						: null;
 
+					sb.CooldownManager.setPending(false, userData, channelData);
 					sb.CooldownManager.set(command, userData, channelData);
 
 					return {
@@ -343,6 +347,8 @@ module.exports = (function () {
 					reply: "An internal error occured! Error ID: " + errorID
 				};
 			}
+
+			sb.CooldownManager.setPending(false, userData, channelData);
 
 			// Read-only commands never reply with anything - banphrases, pings and cooldowns are not checked
 			if (command.Read_Only) {
