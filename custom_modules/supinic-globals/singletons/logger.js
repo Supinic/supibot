@@ -107,12 +107,15 @@ module.exports = (function (Module) {
 			});
 			this.banCron.start();
 
+			this.commandCollector = new Set();
 			this.commandCron = new CronJob(sb.Config.get("COMMAND_LOG_CRON_CONFIG"), async () => {
 				if (!this.commandBatch.ready) {
 					return;
 				}
 
 				await this.commandBatch.insert();
+
+				this.commandCollector.clear();
 			});
 			this.commandCron.start();
 
@@ -258,6 +261,12 @@ module.exports = (function (Module) {
 		 * @param options
 		 */
 		logCommandExecution (options) {
+			if (this.commandCollector.has(options.Executed.valueOf())) {
+				return;
+			}
+
+			this.commandCollector.add(options.Executed.valueOf());
+
 			if (typeof options.Platform === "string") {
 				options.Platform = ({
 					twitch: 1,
