@@ -79,7 +79,9 @@ module.exports = (function () {
              * Platform of the reminder. Can be independent from the channel.
              * @type {number|null}
              */
-            this.Platform = data.Platform;
+            this.Platform = (data.Platform)
+                ? sb.Platform.get(data.Platform)
+                : null;
         }
 
         /**
@@ -129,13 +131,7 @@ module.exports = (function () {
 
                 if (message) {
                     if (this.Private_Message) {
-                        let platform = channelData?.Platform ?? this.Platform;
-                        if (typeof platform === "number") {
-                            const row = await sb.Query.getRow("chat_data", "Platform");
-                            await row.load(platform);
-                            platform = row.values.Name;
-                        }
-
+                        const platform = channelData?.Platform ?? this.Platform;
                         await sb.Master.pm(toUserData, message, platform);
                     }
                     else {
@@ -313,16 +309,6 @@ module.exports = (function () {
                 }
             }
 
-            if (typeof data.Platform === "string") {
-                data.Platform = (await sb.Query.getRecordset(rs => rs
-                    .select("ID")
-                    .from("chat_data", "Platform")
-                    .where("Name = %s", data.Platform)
-                    .limit(1)
-                    .single()
-                )).ID;
-            }
-
             const row = await sb.Query.getRow("chat_data", "Reminder");
             row.setValues(data);
             await row.save();
@@ -397,15 +383,13 @@ module.exports = (function () {
                             platform = sb.Channel.get(reminder.Channel).Platform;
                         }
                         else {
-                            const row = await sb.Query.getRow("chat_data", "Platform");
-                            await row.load(reminder.Platform);
-                            platform = row.values.Name;
+                            platform = sb.Platform.get(reminder.Platform);
                         }
 
                         sb.Master.pm(
                             fromUserData.Name,
                             "@" + fromUserData.Name + ", " + targetUserData.Name + " just typed in channel " + sourceChannelName,
-                            platform.toLowerCase()
+                            platform
                         );
                     }
                     else {
@@ -421,7 +405,7 @@ module.exports = (function () {
 
             // Handle non-private reminders
             if (reply.length !== 0) {
-                const notifySymbol = (channelData.Platform === "Discord") ? "@" : "";
+                const notifySymbol = (channelData.Platform.Name === "discord") ? "@" : "";
                 let message = notifySymbol + targetUserData.Name + ", reminders from: " + reply.join("; ");
 
                 // Check banphrases and do not check length limits, because it is later split manually
@@ -431,7 +415,7 @@ module.exports = (function () {
                 });
 
                 if (message) {
-                    const limit = channelData.Message_Limit || sb.Config.get("DEFAULT_MSG_LIMIT_" + channelData.Platform.toUpperCase());
+                    const limit = channelData.Message_Limit || sb.Config.get("DEFAULT_MSG_LIMIT_" + channelData.Platform.Name.toUpperCase());
 
                     // If the result message would be longer than twice the channel limit, post a list of reminder IDs
 	                // instead along with a link to the website, where the user can check them out.

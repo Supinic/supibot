@@ -7,8 +7,7 @@ module.exports = (function () {
 
 	class Mixer {
 		constructor () {
-			this.platform = "mixer";
-
+			this.platform = sb.Platform.get("mixer");
 			this.client = new MixerClient.Client(new MixerClient.DefaultRequestRunner());
 
 			// With OAuth we don't need to log in. The OAuth Provider will attach
@@ -163,7 +162,11 @@ module.exports = (function () {
 		 * @returns {Promise<void>}
 		 */
 		async handleCommand (command, userData, channelData, args = [], options = {}) {
-			const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, options);
+			const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
+				platform: this.platform,
+				...options
+			});
+
 			if (!execution || !execution.reply) {
 				return;
 			}

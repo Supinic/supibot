@@ -301,7 +301,7 @@ module.exports = (function () {
 				sb.Logger.logCommandExecution({
 					User_Alias: userData.ID,
 					Command: command.ID,
-					Platform: options.platform || channelData.Platform,
+					Platform: options.platform.ID,
 					Executed: new sb.Date(),
 					Channel: channelData?.ID ?? null,
 					Success: true,

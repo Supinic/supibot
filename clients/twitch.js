@@ -10,8 +10,7 @@ module.exports = (function () {
 		 * @param {Object} options
 		 */
 		constructor (parent, options) {
-			this.platform = "Twitch";
-			// this.selfUserData = sb.User.getByProperty("ID", sb.Config.get("SELF_ID"));
+			this.platform = sb.Platform.get("twitch");
 
 			this.name = sb.Config.get("TWITCH_USERNAME");
 			this.client = new DankTwitch.ChatClient({
@@ -412,9 +411,11 @@ module.exports = (function () {
 		async handleCommand (command, user, channel, args = [], options = {}) {
 			const userData = await sb.User.get(user, false);
 			const channelData = (channel === null) ? null : sb.Channel.get(channel);
-			options.platform = "twitch";
+			const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
+				platform: this.platform,
+				...options
+			});
 
-			const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, options);
 			if (!execution || !execution.reply) {
 				return execution;
 			}

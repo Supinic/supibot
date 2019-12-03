@@ -8,6 +8,7 @@ module.exports = (async function () {
 	"use strict";
 
 	const modules = {
+		Platform: "platform",
 		Filter: "filter",
 		Command: "command",
 		Channel: "channel",

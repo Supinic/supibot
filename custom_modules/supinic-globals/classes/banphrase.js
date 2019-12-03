@@ -67,7 +67,9 @@ module.exports = (function () {
 			 * Platform of banphrase.
 			 * @type {Platform}
 			 */
-			this.Platform = data.Platform_Name;
+			this.Platform = (data.Platform)
+				? sb.Platform.get(data.Platform)
+				: null;
 
 			/**
 			 * Channel of banphrase.
@@ -101,9 +103,7 @@ module.exports = (function () {
 		static async loadData () {
 			Banphrase.data = (await sb.Query.getRecordset(rs => rs
 				.select("Banphrase.*")
-				.select("Platform.Name AS Platform_Name")
 				.from("chat_data", "Banphrase")
-				.leftJoin("chat_data", "Platform")
 				.where("Type <> %s", "Inactive")
 				.orderBy("Priority DESC")
 			)).map(record => new Banphrase(record));

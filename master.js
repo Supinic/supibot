@@ -144,7 +144,7 @@
 		 */
 		send (message, channel) {
 			const channelData = sb.Channel.get(channel);
-			const platform = channelData.Platform.toLowerCase();
+			const platform = channelData.Platform.Name;
 			const client = this.clients[platform];
 
 			if (!client) {
@@ -172,11 +172,12 @@
 		 * Private messages a user on a given platform.
 		 * @param {string} user
 		 * @param {string} message
-		 * @param {string} platform
+		 * @param {Platform|number|string} platform
 		 * @returns {Promise<void>}
 		 */
 		async pm (user, message, platform) {
-			const client = this.clients[platform.toLowerCase()];
+			const platformData = sb.Platform.get(platform);
+			const client = this.clients[platformData.Name];
 			return await client.pm(user, message);
 		}
 
@@ -222,7 +223,7 @@
 					message = message.replace(sb.Config.get("LINK_REGEX"), "[LINK]");
 				}
 
-				platform = channelData.Platform.toLowerCase();
+				platform = channelData.Platform.Name;
 				if (!options.skipLengthCheck) {
 					limit = channelData.Message_Limit || sb.Config.get("DEFAULT_MSG_LIMIT_" + platform.toUpperCase());
 				}

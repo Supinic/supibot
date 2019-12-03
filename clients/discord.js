@@ -4,7 +4,7 @@ module.exports = (function () {
 
 	class Discord {
 		constructor (parent, options) {
-			this.platform = "Discord";
+			this.platform = sb.Platform.get("discord");
 			this.name = options.name;
 
 			// @todo change client module name - collides with discord.js module
@@ -49,7 +49,7 @@ module.exports = (function () {
 				if (!privateMessage) {
 					channelData = sb.Channel.get(chan);
 					if (!channelData) {
-						channelData = await sb.Channel.add(chan, 2);
+						channelData = await sb.Channel.add(chan, this.platform);
 						await channelData.setup();
 					}
 
@@ -84,8 +84,7 @@ module.exports = (function () {
 					this.handleCommand(command, args, channelData, userData, {
 						mentions,
 						guild,
-						privateMessage,
-						platform: "discord"
+						privateMessage
 					});
 				}
 			});
@@ -163,7 +162,11 @@ module.exports = (function () {
 		 * @returns {Promise<void>}
 		 */
 		async handleCommand (command, args, channelData, userData, options = {}) {
-			const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, options);
+			const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
+				platform: this.platform,
+				...options
+			});
+
 			if (!execution || !execution.reply) {
 				return;
 			}

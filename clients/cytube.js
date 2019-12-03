@@ -11,7 +11,7 @@ module.exports = class Cytube {
 	 * @param {string} options.chan
 	 */
 	constructor (parent, options) {
-		this.platform = "Cytube";
+		this.platform = sb.Platform.get("cytube");
 
 		const CytubeConnector = require("cytube-connector");
 		this.client = new CytubeConnector(options);
@@ -263,6 +263,7 @@ module.exports = class Cytube {
 		const channelData = this.channelData;
 		const userData = await sb.User.get(user, false);
 		const options = {
+			platform: this.platform,
 			privateMessage: Boolean(replyIntoPM)
 		};
 

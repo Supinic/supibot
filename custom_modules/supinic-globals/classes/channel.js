@@ -26,7 +26,7 @@ module.exports = (function () {
              * Platform name. Must be unique when combined with {@link Channel.Name}.
              * @type {PlatformIdentifier}
              */
-            this.Platform = (typeof data.Platform === "string") ? data.Platform : data.Platform_Name;
+            this.Platform = sb.Platform.get(data.Platform);
 
             /**
              * Platform-specific ID. Used in Mixer and Twitch, for example.
@@ -122,10 +122,10 @@ module.exports = (function () {
          * Sets up the logging table and triggers for a newly created channel.
          */
         async setup () {
-            const prefix = (this.Platform === "Twitch") ? "" : (this.Platform.toLowerCase() + "_");
+            const prefix = (this.Platform.Name === "twitch") ? "" : (this.Platform.Name + "_");
             const name = prefix + this.Name.toLowerCase();
             const limit = this.Message_Limit
-                || sb.Config.get("DEFAULT_MSG_LIMIT_" + this.Platform.toUpperCase())
+                || sb.Config.get("DEFAULT_MSG_LIMIT_" + this.Platform.Name.toUpperCase())
                 || sb.Config.get("DEFAULT_LOG_TABLE_VARCHAR_LIMIT");
 
             // Set up logging table
@@ -163,9 +163,9 @@ module.exports = (function () {
          * @returns {string}
          */
         getDatabaseName () {
-            return (this.Platform === "Twitch")
+            return (this.Platform.Name === "twitch")
                 ? this.Name
-                : this.Platform.toLowerCase() + "_" + this.Name;
+                : this.Platform.Name + "_" + this.Name;
         }
 
         /**
@@ -192,9 +192,7 @@ module.exports = (function () {
             /** @type Channel[] */
             Channel.data = (await sb.Query.getRecordset(rs => rs
                 .select("Channel.*")
-                .select("Platform.Name AS Platform_Name")
                 .from("chat_data", "Channel")
-                .join("chat_data", "Platform")
             )).map(record => new Channel(record));
         }
 
@@ -234,37 +232,32 @@ module.exports = (function () {
          * @returns {Channel[]}
          */
         static getJoinableForPlatform (platform) {
-            platform = sb.Utils.capitalize(platform);
-
+            const platformData = sb.Platform.get(platform);
             return Channel.data.filter(channel => (
-                channel.Platform === platform && channel.Mode !== "Inactive"
+                channel.Platform.ID === platformData.ID && channel.Mode !== "Inactive"
             ));
         }
 
         /**
          * Creates a new channel and pushes its definition to the database
          * @param {string} name
-         * @param {number} platformID
+         * @param {Platform} platformData
          * @param {string} mode
          * @returns {Promise<Channel>}
          */
-        static async add (name, platformID, mode = "Write") {
+        static async add (name, platformData, mode = "Write") {
             const channelName = name.replace(/^#/, "");
 
             // Creates Channel row
             const row = await sb.Query.getRow("chat_data", "Channel");
             row.setValues({
                 Name: channelName,
-                Platform: platformID,
+                Platform: platformData.ID,
                 Mode: mode
             });
             await row.save();
 
-            const platformRow = await sb.Query.getRow("chat_data", "Platform");
-            await platformRow.load(platformID);
-
-            const data = Object.assign(row.valuesObject, { Platform_Name: platformRow.values.Name });
-            const channel = new Channel(data);
+            const channel = new Channel({...row.valuesObject});
             await channel.setup();
 
             Channel.data.push(channel);

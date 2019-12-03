@@ -176,9 +176,7 @@ module.exports = (function (Module) {
 		async push (message, userData, channelData) {
 			const chan = channelData.ID;
 			if (!this.channels.includes(chan)) {
-				const name = (channelData.Platform !== "Twitch")
-					? (channelData.Platform.toLowerCase() + "_" + channelData.Name)
-					: channelData.Name;
+				const name = channelData.getDatabaseName();
 
 				this.batches[chan] = await sb.Query.getBatch("chat_line", name, ["User_Alias", "Text", "Posted"]);
 				this.meta[chan] = { amount: 0, length: 0, users: {} };
@@ -266,16 +264,6 @@ module.exports = (function (Module) {
 			}
 
 			this.commandCollector.add(options.Executed.valueOf());
-
-			if (typeof options.Platform === "string") {
-				options.Platform = ({
-					twitch: 1,
-					discord: 2,
-					cytube: 3,
-					mixer: 4
-				})[options.Platform.toLowerCase()];
-			}
-
 			this.commandBatch.add(options);
 		}
 
