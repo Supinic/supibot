@@ -92,8 +92,6 @@ module.exports = (function () {
 						break;
 					}
 
-
-
 					default:
 						console.debug("incoming notice:", channelData.Name, messageID, rest);
 				}
