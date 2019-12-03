@@ -207,18 +207,30 @@ module.exports = (function () {
 			}
 
 			const command = Command.get(identifier);
+			const args = argumentArray
+				.map(i => i.replace(sb.Config.get("WHITESPACE_REGEX"), ""))
+				.filter(Boolean);
+
 			if (!command) {
 				return {success: false, reason: "no-command"};
 			}
 			// Check for cooldowns, return if it did not pass yet
 			if (channelData && !sb.CooldownManager.check(command, userData, channelData)) {
-				sb.SystemLogger.send("Command.Fail", command.Name + " - cooldown", channelData, userData);
+				sb.Logger.logCommandExecution({
+					User_Alias: userData.ID,
+					Command: command.ID,
+					Platform: options.platform || channelData.Platform,
+					Executed: new sb.Date(),
+					Channel: channelData?.ID ?? null,
+					Success: false,
+					Invocation: identifier,
+					Arguments: JSON.stringify(args),
+					Result: "cooldown",
+					Execution_Time: null
+				});
+
 				return {success: false, reason: "cooldown"};
 			}
-
-			// At this point, it is safe to proclaim that the user is using the command,
-			// therefore it is also safe to mark them as "well known". They will be loaded on next startup.
-			userData.saveProperty("Well_Known", true);
 
 			const accessBlocked = sb.Filter.check({
 				userID: userData.ID,
@@ -226,7 +238,19 @@ module.exports = (function () {
 				commandID: command.ID
 			});
 			if (accessBlocked) {
-				sb.SystemLogger.send("Command.Fail", "Command " + command.ID + " filtered", channelData, userData);
+				sb.Logger.logCommandExecution({
+					User_Alias: userData.ID,
+					Command: command.ID,
+					Platform: options.platform || channelData.Platform,
+					Executed: new sb.Date(),
+					Channel: channelData?.ID ?? null,
+					Success: false,
+					Invocation: identifier,
+					Arguments: JSON.stringify(args),
+					Result: "filtered",
+					Execution_Time: null
+				});
+
 				const reply = (command.Whitelisted && command.Whitelist_Response)
 					? command.Whitelist_Response
 					: (typeof accessBlocked === "string")
@@ -288,22 +312,26 @@ module.exports = (function () {
 				data.transaction = await sb.Query.getTransaction();
 			}
 
-			const args = argumentArray
-				.map(i => i.replace(sb.Config.get("WHITESPACE_REGEX"), ""))
-				.filter(Boolean);
-
 			/** @type CommandResult */
 			let execution;
 			try {
+				const start = process.hrtime.bigint();
 				execution = await command.Code(data, ...args);
+				const end = process.hrtime.bigint();
 
 				sb.Runtime.incrementCommandsCounter();
-				sb.SystemLogger.send(
-					"Command.Success",
-					identifier + (args.length === 0 ? "": (" (" + args.join(" ") + ")")) + " => " + (execution && execution.reply),
-					channelData,
-					userData
-				);
+				sb.Logger.logCommandExecution({
+					User_Alias: userData.ID,
+					Command: command.ID,
+					Platform: options.platform || channelData.Platform,
+					Executed: new sb.Date(),
+					Channel: channelData?.ID ?? null,
+					Success: true,
+					Invocation: identifier,
+					Arguments: JSON.stringify(args),
+					Result: execution?.reply ?? null,
+					Execution_Time: sb.Utils.round(Number(end - start) / 1.0e6, 3)
+				});
 			}
 			catch (e) {
 				console.error(e);
@@ -321,7 +349,7 @@ module.exports = (function () {
 				return {success: !!execution.success};
 			}
 
-			if (channelData && (!execution || !execution.meta || !execution.meta.skipCooldown)) {
+			if (channelData && execution?.meta?.skipCooldown !== true) {
 				sb.CooldownManager.set(command, userData, channelData);
 			}
 

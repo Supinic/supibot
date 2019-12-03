@@ -107,6 +107,15 @@ module.exports = (function (Module) {
 			});
 			this.banCron.start();
 
+			this.commandCron = new CronJob(sb.Config.get("COMMAND_LOG_CRON_CONFIG"), async () => {
+				if (!this.commandBatch.ready) {
+					return;
+				}
+
+				await this.commandBatch.insert();
+			});
+			this.commandCron.start();
+
 			return (async () => {
 				this.metaBatch = await sb.Query.getBatch(
 					"chat_data",
@@ -124,6 +133,24 @@ module.exports = (function (Module) {
 					"chat_data",
 					"Twitch_Ban",
 					["User_Alias", "Channel", "Length", "Issued"]
+				);
+
+
+				this.commandBatch = await sb.Query.getBatch(
+					"chat_data",
+					"Command_Execution",
+					[
+						"User_Alias",
+						"Command",
+						"Platform",
+						"Executed",
+						"Channel",
+						"Success",
+						"Invocation",
+						"Arguments",
+						"Result",
+						"Execution_Time"
+					]
 				);
 
 				this.videoTypes = await sb.Query.getRecordset(rs => rs
@@ -224,6 +251,23 @@ module.exports = (function (Module) {
 				Issued: date,
 				Notes: notes || null
 			});
+		}
+
+		/**
+		 *
+		 * @param options
+		 */
+		logCommandExecution (options) {
+			if (typeof options.Platform === "string") {
+				options.Platform = ({
+					twitch: 1,
+					discord: 2,
+					cytube: 3,
+					mixer: 4
+				})[options.Platform.toLowerCase()];
+			}
+
+			this.commandBatch.add(options);
 		}
 
 		get modulePath () { return "logger"; }
