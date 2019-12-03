@@ -371,7 +371,7 @@ module.exports = (function () {
 				}
 
 				const unpingUsers = await sb.User.getMultiple(sb.Filter.data
-					.filter(i => i.Command === command.ID && i.Type === "Unping")
+					.filter(i => i.Active && i.Command === command.ID && i.Type === "Unping")
 					.map(i => i.User_Alias)
 				);
 				for (const unpingUser of unpingUsers) {
