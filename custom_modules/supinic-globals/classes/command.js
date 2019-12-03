@@ -216,19 +216,6 @@ module.exports = (function () {
 			}
 			// Check for cooldowns, return if it did not pass yet
 			if (channelData && !sb.CooldownManager.check(command, userData, channelData, options)) {
-				sb.Logger.logCommandExecution({
-					User_Alias: userData.ID,
-					Command: command.ID,
-					Platform: options.platform || channelData.Platform,
-					Executed: new sb.Date(),
-					Channel: channelData?.ID ?? null,
-					Success: false,
-					Invocation: identifier,
-					Arguments: JSON.stringify(args),
-					Result: "cooldown",
-					Execution_Time: null
-				});
-
 				return {success: false, reason: "cooldown"};
 			}
 
@@ -240,19 +227,6 @@ module.exports = (function () {
 				commandID: command.ID
 			});
 			if (accessBlocked) {
-				sb.Logger.logCommandExecution({
-					User_Alias: userData.ID,
-					Command: command.ID,
-					Platform: options.platform || channelData.Platform,
-					Executed: new sb.Date(),
-					Channel: channelData?.ID ?? null,
-					Success: false,
-					Invocation: identifier,
-					Arguments: JSON.stringify(args),
-					Result: "filtered",
-					Execution_Time: null
-				});
-
 				const reply = (command.Whitelisted && command.Whitelist_Response)
 					? command.Whitelist_Response
 					: (typeof accessBlocked === "string")
