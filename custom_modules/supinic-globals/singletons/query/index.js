@@ -90,7 +90,7 @@ module.exports = (function (Module) {
 
 		/**
 		 * Creates a new Recordset instance.
-		 * @param {Function} callback
+		 * @param {RecordsetCallback} callback
 		 * @returns {Promise<Array>}
 		 */
 		async getRecordset (callback) {
@@ -349,6 +349,11 @@ module.exports = (function (Module) {
 
 	};
 });
+
+/**
+ * @callback RecordsetCallback
+ * @param {Recordset} rs
+ */
 
 /**
  * @typedef TableDefinition
