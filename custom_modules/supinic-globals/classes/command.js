@@ -307,7 +307,9 @@ module.exports = (function () {
 					Success: true,
 					Invocation: identifier,
 					Arguments: JSON.stringify(args),
-					Result: execution?.reply ?? null,
+					Result: (typeof execution?.reply === "string")
+						? execution.reply.slice(0, 300)
+						: null,
 					Execution_Time: sb.Utils.round(Number(end - start) / 1.0e6, 3)
 				});
 			}
