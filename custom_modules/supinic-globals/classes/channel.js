@@ -116,6 +116,26 @@ module.exports = (function () {
              * @type {string|null}
              */
             this.Description = data.Description ?? null;
+
+            if (data.Data) {
+                try {
+                    data.Data = JSON.parse(data.Data);
+                    if (data.Data.constructor !== Object) {
+                        console.warn(`Channel ${this.Name} (ID ${this.ID}) does not result in an Object`);
+                        data.Data = null;
+                    }
+                }
+                catch (e) {
+                    console.warn(`Channel ${this.Name} (ID ${this.ID}) has incorrect data definition`, e);
+                    data.Data = null;
+                }
+            }
+
+            /**
+             * Optional channel data.
+             * @type {Object}
+             */
+            this.Data = data.Data || {};
         }
 
         /**
