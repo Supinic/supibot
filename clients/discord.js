@@ -106,18 +106,20 @@ module.exports = (function () {
 			const channelObject = this.client.channels.get(discordChannel);
 			if (!channelObject) {
 				console.warn("No channel available!", channel);
+				return;
 			}
 
 			if (channelObject.guild) {
-				message.split(" ").forEach(word => {
+				const wordList = message.split(/\W+/).filter(Boolean);
+				for (const word of wordList) {
 					const emote = channelObject.guild.emojis.find(i => i.name === word);
 					if (emote) {
 						// This regex makes sure all emotes to be replaces are not preceded or followed by a ":" (colon) character
 						// All emotes on Discord are wrapped at least by colons
-						const regex = new RegExp("(?<!(:))" + emote.name + "(?!(:))", "g");
+						const regex = new RegExp("(?<!(:))\\b" + emote.name + "\\b(?!(:))", "g");
 						message = message.replace(regex, emote.toString());
 					}
-				});
+				}
 
 				const mentionedUsers = await Discord.getMentionsInMessage(message);
 				for (const user of mentionedUsers) {
