@@ -68,44 +68,6 @@
 			};
 		}
 
-		initializeHandlers () {
-			/**
-			 * All reminders in the same reminder event will have the same target user (Reminder.To)
-			 */
-			this.on("userReminder", async (data) => {
-				const {reminders, targetUserData, channelData} = data;
-				let reply = [];
-
-				for (const reminder of reminders) {
-					if (reminder.User_From === targetUserData.ID) {
-						reply.push("yourself - " + reminder.Text + " (" + sb.Utils.timeDelta(reminder.Created));
-					}
-					else {
-						const fromUserData = await sb.User.get(reminder.User_From, false);
-						if (reminder.Text) {
-							reply.push(fromUserData.Name + " - " + reminder.Text + " (" + sb.Utils.timeDelta(reminder.Created) + ")");
-						}
-						else {
-							reply.push(fromUserData.Name + " just typed in chat");
-						}
-					}
-				}
-
-				let message = targetUserData.Name + ", reminders from: " + reply.join("; ");
-
-				// Make sure to mirror the reminder if the target channel is set up to be mirrored
-				if (channelData.Mirror) {
-					this.mirror(message, channelData.Mirror);
-				}
-
-				// Check banphrases and length limits
-				message = await this.prepareMessage(message, channelData);
-				if (message) {
-					this.send(message, channelData);
-				}
-			});
-		}
-
 		/**
 		 * Reload a given client module - used to hotload edited scripts in runtime with no downtime
 		 * @param {string} mod Module to reload
