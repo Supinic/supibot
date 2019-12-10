@@ -120,7 +120,7 @@ module.exports = (function () {
             if (data.Data) {
                 try {
                     data.Data = JSON.parse(data.Data);
-                    if (data.Data.constructor !== Object) {
+                    if (data.Data && data.Data.constructor !== Object) {
                         console.warn(`Channel ${this.Name} (ID ${this.ID}) does not result in an Object`);
                         data.Data = null;
                     }
@@ -186,6 +186,19 @@ module.exports = (function () {
             return (this.Platform.Name === "twitch")
                 ? this.Name
                 : this.Platform.Name + "_" + this.Name;
+        }
+
+        /**
+         * Returns a pretty-ish-fied name of the platform plus the channel, depending on the platform.
+         * @returns {string}
+         */
+        getPlatformName () {
+            if (this.Platform.Name === "twitch" || this.Platform.Name === "mixer") {
+               return this.Platform.capital + "-" + this.Name;
+            }
+            else {
+                return this.Platform.capital;
+            }
         }
 
         /**

@@ -373,9 +373,7 @@ module.exports = (function () {
                 }
                 else {
                     const fromUserData = await sb.User.get(reminder.User_From, false);
-                    const sourceChannelName = (channelData.Platform === "Twitch")
-                        ? channelData.Name
-                        : channelData.Platform;
+                    const channelName = channelData.getPlatformName();
 
                     if (reminder.Private_Message) {
                         let platform = null;
@@ -388,13 +386,13 @@ module.exports = (function () {
 
                         sb.Master.pm(
                             fromUserData.Name,
-                            "@" + fromUserData.Name + ", " + targetUserData.Name + " just typed in channel " + sourceChannelName,
+                            `@${fromUserData.Name}, ${targetUserData.Name} just typed in channel ${channelName}`,
                             platform
                         );
                     }
                     else {
                         sb.Master.send(
-                            "@" + fromUserData.Name + ", " + targetUserData.Name + " just typed in channel " + sourceChannelName,
+                            `@${fromUserData.Name}, ${targetUserData.Name} just typed in channel ${channelName}`,
                             reminder.Channel
                         );
                     }
