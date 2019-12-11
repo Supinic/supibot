@@ -159,8 +159,11 @@ module.exports = (function () {
 
 		async currentlyPlayingData () {
 			const status = await this.status();
-			const targetURL = sb.Utils.linkParser.parseLink(status.information.category.meta.url);
+			if (status.currentplid === -1) {
+				return null;
+			}
 
+			const targetURL = sb.Utils.linkParser.parseLink(status.information.category.meta.url);
 			return this.videoQueue.find(songData => {
 				const songURL = sb.Utils.linkParser.parseLink(songData.link);
 				return songURL === targetURL;
