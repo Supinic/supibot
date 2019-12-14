@@ -24,6 +24,8 @@ module.exports = (function (Module) {
 		constructor () {
 			super();
 
+			this.data = {};
+			this.pending = {};
 			this.server = http.createServer((req, res) => {
 				if (process.env.PROJECT_TYPE === "bot") {
 					this.processBotRequest(req, res);
@@ -32,6 +34,7 @@ module.exports = (function (Module) {
 					this.processSiteRequest(req, res);
 				}
 			});
+
 			this.server.listen(sb.Config.get("INTERNAL_REQUEST_PORT_" + process.env.PROJECT_TYPE.toUpperCase()));
 
 			if (process.env.PROJECT_TYPE === "bot") {
@@ -137,15 +140,35 @@ module.exports = (function (Module) {
 					});
 				}
 			}
+			else if (query.type === "queue") {
+				const params = new sb.URLParams().set("type", "queue");
+				await this.send(params, {
+					current: await sb.VideoLANConnector.currentlyPlayingData(),
+					queue: sb.VideoLANConnector.videoQueue
+				});
+			}
 
 			res.end("OK");
 		}
 
 		async processSiteRequest (req, res) {
+			const query = url.parse(req.url,true).query;
 
+			if (query.type === "queue") {
+				const data = [];
+
+				req.on("data", chunk => data.push(chunk));
+				req.on("end", () => {
+					if (this.pending.queue instanceof sb.Promise) {
+						this.pending.queue.resolve(JSON.parse(data));
+					}
+				});
+			}
+
+			res.end("OK");
 		}
 
-		async send (urlParams = "") {
+		async send (urlParams = "", data) {
 			if (urlParams && !(urlParams instanceof sb.URLParams)) {
 				throw new sb.Error("URL Params must be sb.URLParams if used");
 			}
@@ -154,7 +177,16 @@ module.exports = (function (Module) {
 				? sb.Config.get("INTERNAL_REQUEST_PORT_SITE")
 				: sb.Config.get("INTERNAL_REQUEST_PORT_BOT");
 
-			sb.Utils.request("http://localhost:" + targetPort + "/?" + urlParams.toString());
+			const requestObject = {
+				method: "POST",
+				uri: "http://localhost:" + targetPort + "/?" + urlParams.toString()
+			};
+
+			if (data) {
+				requestObject.json = data;
+			}
+
+			sb.Utils.request(requestObject);
 		}
 
 		addSubscription (valuesObject) {
