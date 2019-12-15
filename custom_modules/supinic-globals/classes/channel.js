@@ -73,6 +73,16 @@ module.exports = (function () {
             this.Banphrase_API_URL = data.Banphrase_API_URL;
 
             /**
+             * Bot behaviour when given banphrase API is not available (downtime).
+             * Ignore = Pretend as if the API was not there. Post messages as normal.
+             * Notify = As Ignore, but prepend a warning message that the API is unreachable.
+             * Refuse = Do not post the message at all, post a warning message instead.
+             * (null) = Default value for channels that have no banphrase API set up.
+             * @type {"Ignore"|"Notify"|"Refuse"|null}
+             */
+            this.Banphrase_API_Downtime = data.Banphrase_API_Downtime;
+
+            /**
              * Channel-specific character limit for any message sent in it.
              * If null, uses a global platform-specific setting instead.
              * @type {number|null}

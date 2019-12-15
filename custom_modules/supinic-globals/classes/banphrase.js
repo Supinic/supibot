@@ -149,15 +149,35 @@ module.exports = (function () {
 			if (channelData?.Banphrase_API_Type) {
 				let response = null;
 				try {
-					response = await Banphrase.executeExternalAPI(message.slice(0, 1000), channelData.Banphrase_API_Type, channelData.Banphrase_API_URL);
+					response = await Banphrase.executeExternalAPI(
+						message.slice(0, 1000),
+						channelData.Banphrase_API_Type,
+						channelData.Banphrase_API_URL
+					);
 				}
-				catch (e) {
-					sb.SystemLogger.send("Message.Timeout", "No API response (" + channelData.Banphrase_API_URL + "): " + e.toString(), channelData);
+				catch {
 					sb.Runtime.incrementBanphraseTimeouts(channelData.Name);
-					return {
-						string: sb.Config.get("DEFAULT_BANPHRASE_API_TIMEOUT_RESPONSE"),
-						passed: false
-					};
+
+					switch (channelData.Banphrase_API_Downtime) {
+						case "Ignore":
+							return {
+								string: message,
+								passed: true
+							};
+
+						case "Notify":
+							return {
+								string: sb.Config.get("BANPHRASE_API_UNREACHABLE_NOTIFY") + " " + message,
+								passed: true
+							};
+
+						default:
+						case "Refuse":
+							return {
+								string: sb.Config.get("DEFAULT_BANPHRASE_API_TIMEOUT_RESPONSE"),
+								passed: false
+							};
+					}
 				}
 
 				// If the message is banphrased, check for API responses and return one accordingly.
