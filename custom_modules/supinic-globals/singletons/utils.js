@@ -2,9 +2,9 @@
 module.exports = (function (Module) {
 	"use strict";
 	const RandomJS = require("random-js");
-	const requestRetry =  require("requestretry");
 	const LinkParserFactory = require("track-link-parser");
 	const requestPromise = require("custom-request-promise");
+	const Cheerio = require("cheerio");
 
 	const { parse: urlParser } = require("url");
 	const { transliterate } = require("transliteration");
@@ -85,10 +85,6 @@ module.exports = (function (Module) {
 		 */
 		async request(...args) {
 			return await requestPromise(...args);
-		}
-
-		async requestRetry (...args) {
-			return await requestRetry(...args);
 		}
 
 		/**
@@ -535,6 +531,15 @@ module.exports = (function (Module) {
 
 		parseURL (stringURL) {
 			return urlParser(stringURL);
+		}
+
+		/**
+		 * Utils wrapper for the cheerio module.
+		 * @param {string} html
+		 * @returns {Cheerio}
+		 */
+		cheerio (html) {
+			return Cheerio.load(html);
 		}
 
 		get modulePath () { return "utils"; }

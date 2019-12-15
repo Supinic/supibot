@@ -11,13 +11,10 @@ module.exports = (function () {
 				headers: {
 					"Content-Type": "application/x-www-form-urlencoded"
 				},
-				timeout: sb.Config.get("PAJBOT_API_TIMEOUT"),
-				maxAttempts: 3,
-				retryDelay: 500,
-				fullResponse: false
+				timeout: sb.Config.get("PAJBOT_API_TIMEOUT")
 			};
 
-			const data = JSON.parse(await sb.Utils.requestRetry(options));
+			const data = JSON.parse(await sb.Utils.request(options));
 			return (data.banned)
 				? data.banphrase_data.phrase
 				: false;
