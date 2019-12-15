@@ -40,6 +40,7 @@ module.exports = (function (Module) {
 
 		async fetch (code) {
 			code = code.toLowerCase();
+
 			const row = this.data.find(i => i.Code === code);
 			if (!row) {
 				throw new sb.Error({ message: "Extra news code does not exist!" });
@@ -47,8 +48,14 @@ module.exports = (function (Module) {
 
 			const url = row.URL + sb.Utils.randArray(row.Endpoints);
 			const feed = await RSS.parseURL(url);
+			const article = sb.Utils.randArray(feed.items);
 
-			return sb.Utils.randArray(feed.items).title;
+			return {
+				title: article.title,
+				content: article.content,
+				link: article.link || article.url,
+				published: new sb.Date(article.pubDate)
+			};
 		}
 
 		/**
