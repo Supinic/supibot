@@ -153,7 +153,6 @@ module.exports = (function (Module) {
 
 		async processSiteRequest (req, res) {
 			const query = url.parse(req.url,true).query;
-
 			if (query.type === "queue") {
 				const data = [];
 

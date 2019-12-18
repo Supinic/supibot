@@ -40,7 +40,10 @@ module.exports = (function () {
 			const cmd = (command) ? ("?command=" + command) : "";
 			const url = this.baseURL + parent + cmd + requestData;
 
-			return JSON.parse(await request(url));
+			return JSON.parse(await request({
+				url,
+				timeout: 1000
+			}));
 		}
 
 		/**
@@ -158,7 +161,19 @@ module.exports = (function () {
 		}
 
 		async currentlyPlayingData () {
-			const status = await this.status();
+			let status;
+			try {
+				status = await this.status();
+			}
+			catch (e) {
+				if (e.message === "ETIMEDOUT") {
+					return null;
+				}
+				else {
+					throw e;
+				}
+			}
+
 			if (status.currentplid === -1) {
 				return null;
 			}
