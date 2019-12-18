@@ -159,13 +159,15 @@ module.exports = (function () {
 						case "Ignore":
 							return {
 								string: message,
-								passed: true
+								passed: true,
+								warn: true
 							};
 
 						case "Notify":
 							return {
 								string: sb.Config.get("BANPHRASE_API_UNREACHABLE_NOTIFY") + " " + message,
-								passed: true
+								passed: true,
+								warn: true
 							};
 
 						default:
