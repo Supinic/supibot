@@ -244,14 +244,35 @@ module.exports = (function () {
 				};
 			}
 
+			// Check for blocked users
+			if (command.Blockable && argumentArray[0]) {
+				const block = await sb.Filter.checkBlocks(userData.ID, argumentArray[0], command.ID);
+
+				// If the user has blocked the person, disallow the usage of command.
+				if (block) {
+					const reply = (typeof block === "string")
+						? (await sb.Banphrase.execute(block, channelData)).string
+						: null;
+
+					sb.CooldownManager.setPending(false, userData, channelData);
+					sb.CooldownManager.set(command, userData, channelData);
+
+					return {
+						success: false,
+						reason: "block",
+						reply
+					};
+				}
+			}
+
 			// Check for opted out users
 			if (command.Opt_Outable && argumentArray[0]) {
-				const optOutCheck = await sb.Filter.checkOptOuts(argumentArray[0], command.ID);
+				const optout = await sb.Filter.checkOptOuts(argumentArray[0], command.ID);
 
 				// If the user is opted out AND the requesting user does not have an override, then return immediately.
-				if (optOutCheck && !userData.Data.bypassOptOuts) {
-					const reply = (typeof optOutCheck === "string")
-						? (await sb.Banphrase.execute(optOutCheck, channelData)).string
+				if (optout && !userData.Data.bypassOptOuts) {
+					const reply = (typeof optout === "string")
+						? (await sb.Banphrase.execute(optout, channelData)).string
 						: null;
 
 					sb.CooldownManager.setPending(false, userData, channelData);
@@ -260,7 +281,7 @@ module.exports = (function () {
 					return {
 						success: false,
 						reason: "opt-out",
-						reply: reply
+						reply
 					};
 				}
 			}

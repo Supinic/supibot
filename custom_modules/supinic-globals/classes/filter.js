@@ -282,7 +282,10 @@ module.exports =  (function () {
 			}
 
 			const optout = Filter.data.find(filter => (
-				filter.Active && filter.Type === "Opt-out" && filter.Command === commandID && filter.User_Alias === userData.ID
+				filter.Active
+				&& filter.Type === "Opt-out"
+				&& filter.Command === commandID
+				&& filter.User_Alias === userData.ID
 			));
 
 			if (!optout) {
@@ -296,6 +299,50 @@ module.exports =  (function () {
 			}
 			else {
 				return "That user has opted out from being the command target!";
+			}
+		}
+
+		/**
+		 * Checks opt-outs for given combination of parameters.
+		 * Used in specific commands' definitions, to check
+		 * @param {string} fromUser
+		 * @param {string} toUser
+		 * @param {number} commandID
+		 * @returns {boolean|string}
+		 */
+		static async checkBlocks (fromUser, toUser, commandID) {
+			if (!fromUser || !toUser || !commandID) {
+				return false;
+			}
+
+			const [fromUserData, toUserData] = await Promise.all([
+				sb.User.get(fromUser, true),
+				sb.User.get(toUser, true)
+			]);
+
+			if (!fromUserData || !toUserData) {
+				return false;
+			}
+
+			const block = sb.Filter.data.find(filter => (
+				filter.Active
+				&& filter.Type === "Block"
+				&& filter.Command === commandID
+				&& filter.User_Alias === fromUserData.ID
+				&& filter.Blocked_User === toUserData.ID
+			));
+
+			if (!block) {
+				return false;
+			}
+			else if (block.Response === "None") {
+				return true;
+			}
+			else if (block.Response === "Reason" && block.Reason) {
+				return block.Reason;
+			}
+			else {
+				return "That user has opted out from being the target of your command! 🚫";
 			}
 		}
 
