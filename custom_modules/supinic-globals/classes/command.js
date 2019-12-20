@@ -345,7 +345,9 @@ module.exports = (function () {
 				};
 			}
 
-			sb.CooldownManager.setPending(false, userData, channelData);
+			if (execution?.meta?.skipPending !== true) {
+				sb.CooldownManager.setPending(false, userData, channelData);
+			}
 
 			// Read-only commands never reply with anything - banphrases, pings and cooldowns are not checked
 			if (command.Read_Only) {
