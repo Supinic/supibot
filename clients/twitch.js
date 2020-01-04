@@ -291,10 +291,6 @@ module.exports = (function () {
 				sb.AwayFromKeyboard.checkActive(userData, channelData);
 				sb.Reminder.checkActive(userData, channelData);
 
-				if (message.indexOf("!afk") === 0 || message.indexOf("!gn") === 0) {
-					sb.AwayFromKeyboard.set(userData, message.split("!afk")[1], "afk", true);
-				}
-
 				// Mirror messages to a linked channel, if the channel has one
 				if (channelData.Mirror) {
 					this.mirror(message, userData, channelData);
