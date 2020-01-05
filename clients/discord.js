@@ -220,7 +220,7 @@ module.exports = (function () {
 				discordID: String(messageObject.author.id),
 				author: messageObject.author,
 				mentions: messageObject.mentions,
-				guild: (messageObject.member) ? messageObject.member.guild : null,
+				guild: messageObject?.channel?.guild ?? null,
 				privateMessage: Boolean(messageObject.channel.type === "dm")
 			};
 		}
