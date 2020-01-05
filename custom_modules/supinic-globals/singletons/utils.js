@@ -1,15 +1,35 @@
 /* global sb */
 module.exports = (function (Module) {
 	"use strict";
-	const RandomJS = require("random-js");
-	const LinkParserFactory = require("track-link-parser");
-	const requestPromise = require("custom-request-promise");
-	const Cheerio = require("cheerio");
 
+	const RandomJS = require("random-js");
+	const requestPromise = require("custom-request-promise");
 	const { parse: urlParser } = require("url");
-	const { transliterate } = require("transliteration");
 
 	return class Utils extends Module {
+		#linkParser = null;
+
+		get linkParser () {
+			if (!this.#linkParser) {
+				const LinkParserFactory = require("track-link-parser");
+				this.#linkParser = new LinkParserFactory({
+					youtube: {
+						key: sb.Config.get("API_GOOGLE_YOUTUBE")
+					},
+					bilibili: {
+						appKey: sb.Config.get("BILIBILI_APP_KEY"),
+						token: sb.Config.get("BILIBILI_PRIVATE_TOKEN"),
+						userAgentDescription: sb.Config.get("BILIBILI_USER_AGENT")
+					},
+					soundcloud: {
+						key: sb.Config.get("SOUNDCLOUD_CLIENT_ID")
+					}
+				});
+			}
+
+			return this.#linkParser;
+		}
+
 		/** @inheritDoc */
 		static singleton() {
 			if (!Utils.module) {
@@ -40,23 +60,14 @@ module.exports = (function (Module) {
 		constructor () {
 			super();
 
+			this.Cheerio  = null;
+			this.Transliterate = null;
+
 			this.YoutubeUtils = require("youtube-utils");
 			this.duration = new (require("duration-parser"))();
 			this.ytdl = require("youtube-dl");
 			this.fs = require("fs");
-			this.linkParser = new LinkParserFactory({
-				youtube: {
-					key: sb.Config.get("API_GOOGLE_YOUTUBE")
-				},
-				bilibili: {
-					appKey: sb.Config.get("BILIBILI_APP_KEY"),
-					token: sb.Config.get("BILIBILI_PRIVATE_TOKEN"),
-					userAgentDescription: sb.Config.get("BILIBILI_USER_AGENT")
-				},
-				soundcloud: {
-					key: sb.Config.get("SOUNDCLOUD_CLIENT_ID")
-				}
-			});
+
 			this.languageISO = require("language-iso-codes");
 
 			//this.nativeRandom = new Random();
@@ -465,7 +476,11 @@ module.exports = (function (Module) {
 		 * @returns {string}
 		 */
 		transliterate (...args) {
-			return transliterate(...args);
+			if (!this.Transliterate) {
+				this.Transliterate = require("transliteration").transliterate;
+			}
+
+			return this.Transliterate(...args);
 		}
 
 		/**
@@ -539,7 +554,11 @@ module.exports = (function (Module) {
 		 * @returns {Cheerio}
 		 */
 		cheerio (html) {
-			return Cheerio.load(html);
+			if (!this.Cheerio) {
+				this.Cheerio = require("cheerio");
+			}
+
+			return this.Cheerio.load(html);
 		}
 
 		get modulePath () { return "utils"; }
