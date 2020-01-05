@@ -518,7 +518,11 @@ module.exports = (function () {
 				});
 			}
 
-			const gifterData = await sb.User.get(gifter, false);
+			const gifterData = await sb.User.get(gifter, true);
+			if (!gifterData) {
+				return;
+			}
+
 			const logMessage = (data.recipient)
 				? (gifterData.Name + " gifted a subscription to " + data.recipient.Name)
 				: (gifterData.Name + " gifted " + data.gifted + " subs");
