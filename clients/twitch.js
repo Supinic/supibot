@@ -39,6 +39,9 @@ module.exports = (function () {
 				if (error instanceof DankTwitch.JoinError && error.failedChannelName) {
 					this.failedJoinChannels.add(error.failedChannelName);
 				}
+				else if (error.cause instanceof DankTwitch.SayError && error.message.includes("2000")) {
+					console.debug(error.message);
+				}
 			});
 
 			client.on("JOIN", ({channelName, joinedUsername}) => {
