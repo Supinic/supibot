@@ -20,14 +20,19 @@ module.exports = (async function () {
 		MarkovChain: "markov-chain"
 	};
 
+	console.groupCollapsed("classes load");
 	for (const target of Object.values(modules)) {
 		try {
+			const start = process.hrtime.bigint();
 			const mod = await require("./" + target);
 			sb[mod.name] = await mod.initialize();
-			console.log("Database class module " + target + " imported");
+			const time = Number(process.hrtime.bigint() - start);
+
+			console.log("Database class module " + target + " imported in " + Math.trunc(time / 1.0e6) + " ms");
 		}
 		catch (e) {
 			console.log("Import of database class module " + target + " failed", e);
 		}
 	}
+	console.groupEnd();
 })();

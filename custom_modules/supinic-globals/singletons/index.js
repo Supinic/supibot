@@ -57,15 +57,20 @@ module.exports = (async function () {
 		"pastebin"
 	];
 
+	console.groupCollapsed("singletons load");
 	for (const target of targets) {
 		try {
+			const start = process.hrtime.bigint();
 			const mod = await require("./" + target)(Module);
 			sb[mod.name] = await mod.singleton();
-			console.log("Singleton module " + target + " imported as " + mod.name);
+			const time = Number(process.hrtime.bigint() - start);
+
+			console.log("Singleton module " + target + " imported as " + mod.name + " in " + Math.trunc(time / 1.0e6) + " ms");
 		}
 		catch (e) {
 			console.log("Import of singleton module " + target + " failed", e.message, e.stack);
 		}
 	}
+	console.groupEnd();
 })();
 
