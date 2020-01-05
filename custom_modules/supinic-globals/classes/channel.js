@@ -245,18 +245,32 @@ module.exports = (function () {
         }
 
         /**
-         * Returns a Channel object, based on the identifier provided
+         * Returns a Channel object, based on the identifier provided, and a optional platform parameter
          * @param {Channel|number|string} identifier
+         * @param {Platform|number|string} [platform]
          * @returns {Channel|null}
          * @throws {sb.Error} If identifier type is not recognized
          */
-        static get (identifier) {
+        static get (identifier, platform) {
+            if (platform) {
+                platform = sb.Platform.get(platform);
+            }
+
             if (identifier instanceof Channel) {
                 return identifier;
             }
             else if (typeof identifier === "string") {
                 identifier = identifier.replace("#", "");
-                return Channel.data.find(i => i.Name === identifier || i.Specific_ID === identifier);
+
+                let result = Channel.data.filter(i => i.Name === identifier || i.Specific_ID === identifier);
+                if (platform) {
+                    result = result.find(i => i.Platform === platform);
+                }
+                else {
+                    result = result[0];
+                }
+
+                return result ?? null;
             }
             else if (typeof identifier === "number") {
                 return Channel.data.find(i => i.ID === identifier);
