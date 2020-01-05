@@ -179,11 +179,11 @@ module.exports = class Cytube {
 		client.on("error", (err) => {
 			console.error("Cytube error", err);
 
-			if (!this._restarting) {
-				setTimeout(() => this.restart(), 20e3);
-			}
-
-			this._restarting = true;
+			// if (!this._restarting) {
+			// 	setTimeout(() => this.restart(), 20e3);
+			// }
+			//
+			// this._restarting = true;
 		});
 
 		/**
