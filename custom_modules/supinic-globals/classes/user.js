@@ -58,7 +58,7 @@ module.exports = (function () {
                 this.Data = (data.Data) ? JSON.parse(data.Data) : {};
             }
             catch (e) {
-                console.warn("User data parse error", e);
+                console.warn("User data parse error for user ID " + this.ID, e);
                 this.Data = {};
             }
 
