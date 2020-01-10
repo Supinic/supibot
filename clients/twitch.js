@@ -235,7 +235,7 @@ module.exports = (function () {
 		}
 
 		async handleMessage (messageObject) {
-			const {badges, bits, channelName, messageText: message, senderUserID, senderUsername} = messageObject;
+			const {ircTags, badges, bits, channelName, messageText: message, senderUserID, senderUsername} = messageObject;
 			const messageType = (messageObject instanceof DankTwitch.WhisperMessage)
 				? "whisper"
 				: "message";
@@ -272,12 +272,13 @@ module.exports = (function () {
 				}
 
 				if (channelData.Custom_Code) {
-					await channelData.Custom_Code({
+					channelData.Custom_Code({
 						type: "message",
 						message: message,
 						user: userData,
 						channel: channelData,
-						bits: bits
+						bits: bits,
+						customRewardID: ircTags["custom-reward-id"] ?? null
 					});
 				}
 
