@@ -6,6 +6,7 @@ module.exports = class Recordset {
 	#query = null;
 	#fetchSingle = false;
 	#raw = null;
+	#options = {};
 
 	#select = [];
 	#from = { database: null, table: null };
@@ -34,6 +35,14 @@ module.exports = class Recordset {
 	single () {
 		this.#fetchSingle = true;
 		return this;
+	}
+
+	/**
+	 * Sets an option to be used when constructing the SQL query.
+	 * @param option
+	 */
+	use (option) {
+		this.#options[option] = value;
 	}
 
 	/**
@@ -312,15 +321,21 @@ module.exports = class Recordset {
 			const rows = await this.#query.raw(...sql);
 
 			let definition = {};
-			rows.meta.forEach(column => {
+			for (const column of rows.meta) {
 				definition[column.name()] = column.type;
-			});
+			}
 
 			let result = [];
 			for (const row of rows) {
-				Object.entries(row).forEach(([name, value]) => {
-					row[name] = this.#query.convertToJS(value, definition[name]);
-				});
+				for (const [name, value] of Object.entries(row)) {
+					let type = definition[name];
+					if (definition[name] === "LONGLONG" && !this.#options.bigint) {
+						type = "LONG";
+					}
+
+					row[name] = this.#query.convertToJS(value, type);
+				}
+
 				result.push(row);
 			}
 
