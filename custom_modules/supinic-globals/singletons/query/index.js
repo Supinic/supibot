@@ -211,6 +211,8 @@ module.exports = (function (Module) {
 				case "DATETIME":
 				case "TIMESTAMP": return new sb.Date(value);
 
+				case "LONGLONG": return BigInt(value);
+
 				case "JSON": return JSON.parse(value);
 
 				default: return value;
