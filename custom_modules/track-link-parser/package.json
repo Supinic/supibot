@@ -5,7 +5,7 @@
   },
   "deprecated": false,
   "dependencies": {
-    "custom-request-promise": "file:/code/custom_modules/custom-request-promise",
+    "custom-request-promise": "file:../custom-request-promise",
     "fast-xml-parser": "latest"
   },
   "description": "Parses many various video/audio sharing sites' links into a compact version",

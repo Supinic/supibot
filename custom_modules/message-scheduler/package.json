@@ -4,7 +4,7 @@
     "email": "supinic@pm.me"
   },
   "dependencies": {
-    "long-timeout": "file:/code/custom_modules/long-timeout"
+    "long-timeout": "file:../long-timeout"
   },
   "deprecated": false,
   "description": "Event-based message scheduler, makes sure to keep enough time passed between messages",
