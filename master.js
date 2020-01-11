@@ -41,17 +41,13 @@
 	 * @type Master
 	 * @extends EventEmitter
 	 */
-	class Master extends EventEmitter {
+	class Master {
 		constructor () {
-			super();
-
 			this.started = new sb.Date();
 			this.reloaded = new sb.Date();
 
 			this.flags = {};
 			this.data = {};
-
-			this.initializeHandlers();
 
 			this.clientClasses = {
 				cytube: require("./clients/cytube.js"),
