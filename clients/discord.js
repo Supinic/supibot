@@ -23,7 +23,7 @@ module.exports = (function () {
 
 			client.on("message", async (messageObject) => {
 				const commandPrefix = sb.Config.get("COMMAND_PREFIX");
-				const {discordID, msg, chan, user, mentions, guild, privateMessage} = Discord.parseMessage(messageObject);
+				const {commandArguments, discordID, msg, chan, user, mentions, guild, privateMessage} = Discord.parseMessage(messageObject);
 
 				let channelData = null;
 				let userData = await sb.User.getByProperty("Discord_ID", discordID);
@@ -81,7 +81,7 @@ module.exports = (function () {
 				if (msg.startsWith(commandPrefix)) {
 					const command = msg.replace(commandPrefix, "").split(" ")[0];
 					const args = msg.split(/\s+/).slice(1).filter(Boolean);
-					this.handleCommand(command, args, channelData, userData, {
+					this.handleCommand(command, commandArguments.slice(1), channelData, userData, {
 						mentions,
 						guild,
 						privateMessage
@@ -210,6 +210,17 @@ module.exports = (function () {
 		}
 
 		static parseMessage (messageObject) {
+			const args = messageObject.content.split(" ");
+			for (let i = 0; i < args.length; i++) {
+				const match = args[i].match(/<@!(\d+)>/);
+				if (match) {
+					const user = messageObject.mentions.users.get(match[1]);
+					if (user) {
+						args[i] = user.username;
+					}
+				}
+			}
+
 			return {
 				msg: Discord.removeEmoteTags(
 					messageObject.cleanContent.replace(/\n/g, " ") + " " + messageObject.attachments.map(i => i.proxyURL)
@@ -221,7 +232,8 @@ module.exports = (function () {
 				author: messageObject.author,
 				mentions: messageObject.mentions,
 				guild: messageObject?.channel?.guild ?? null,
-				privateMessage: Boolean(messageObject.channel.type === "dm")
+				privateMessage: Boolean(messageObject.channel.type === "dm"),
+				commandArguments: args
 			};
 		}
 

@@ -388,18 +388,19 @@ module.exports = (function (Module) {
 			let result = null;
 
 			if (options && options.mentions) {
-				stringUser = stringUser.replace(/^@/, "");
+				stringUser = stringUser.replace(/^@/, "").toLowerCase();
 
 				if (options.mentions.users.size === 0) {
 					return null;
 				}
 
 				// Take the first mention
-				const mention =  options.mentions.users.entries().next().value[1];
+				const mention = options.mentions.users.entries().next().value[1];
 
 				// Now, check if the mention at least contains the username we're trying to find.
 				if (mention.username.toLowerCase().includes(stringUser)) {
-					result = await sb.User.getByProperty("Discord_ID", mention.id);
+					const lookup = mention.username.toLowerCase().replace(/\s+/g, "_");
+					result = await sb.User.get(lookup, true);
 				}
 			}
 
