@@ -71,9 +71,16 @@ module.exports = (function (Module) {
 			return (result === "true");
 		}
 
-		async playTextToSpeech (string) {
+		async playTextToSpeech (options) {
 			const params = new sb.URLParams();
-			params.set("tts", string);
+			params.set("tts", options.text);
+
+			if (options.volume) {
+				params.set("volume", options.volume);
+			}
+			if (options.voice) {
+				params.set("voice", options.voice);
+			}
 
 			const result = await sb.Utils.request(this.url + "/?" + params.toString());
 			return (result === "true");
