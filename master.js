@@ -14,7 +14,6 @@
 	 */
 	await (require("supinic-globals"))();
 
-	const EventEmitter = require("events");
 	const options = {
 		twitch: {
 			url: "irc.chat.twitch.tv",
@@ -39,9 +38,8 @@
 	 * Master client instance.
 	 * Holds control over all clients.
 	 * @type Master
-	 * @extends EventEmitter
 	 */
-	class Master extends EventEmitter {
+	class Master {
 		constructor () {
 			super();
 
