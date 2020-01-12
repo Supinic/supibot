@@ -339,11 +339,11 @@ module.exports = (function () {
 
 			/** @type CommandResult */
 			let execution;
-			try {
-				const args = argumentArray
-					.map(i => i.replace(sb.Config.get("WHITESPACE_REGEX"), ""))
-					.filter(Boolean);
+			const args = argumentArray
+				.map(i => i.replace(sb.Config.get("WHITESPACE_REGEX"), ""))
+				.filter(Boolean);
 
+			try {
 				const start = process.hrtime.bigint();
 				execution = await command.Code(data, ...args);
 				const end = process.hrtime.bigint();
