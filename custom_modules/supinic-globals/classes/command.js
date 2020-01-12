@@ -214,12 +214,13 @@ module.exports = (function () {
 			if (!command) {
 				return {success: false, reason: "no-command"};
 			}
+
 			// Check for cooldowns, return if it did not pass yet
-			if (channelData && !sb.CooldownManager.check(command, userData, channelData, options)) {
+			if (channelData && !userData.Data.cooldownImmunity && !sb.CooldownManager.check(channelData.ID, userData.ID, command.ID)) {
 				return {success: false, reason: "cooldown"};
 			}
 
-			sb.CooldownManager.setPending(true, userData, channelData);
+			sb.CooldownManager.setPending(userData.ID);
 
 			const accessBlocked = sb.Filter.check({
 				userID: userData.ID,
@@ -233,8 +234,8 @@ module.exports = (function () {
 						? accessBlocked
 						: null;
 
-				sb.CooldownManager.setPending(false, userData, channelData);
-				sb.CooldownManager.set(command, userData, channelData);
+				sb.CooldownManager.unsetPending(userData.ID);
+				sb.CooldownManager.set(channelData.ID, userData.ID, command.ID, command.Cooldown);
 				sb.Runtime.incrementRejectedCommands();
 
 				return {
@@ -254,8 +255,8 @@ module.exports = (function () {
 						? (await sb.Banphrase.execute(block, channelData)).string
 						: null;
 
-					sb.CooldownManager.setPending(false, userData, channelData);
-					sb.CooldownManager.set(command, userData, channelData);
+					sb.CooldownManager.unsetPending(userData.ID);
+					sb.CooldownManager.set(channelData.ID, userData.ID, command.ID, command.Cooldown);
 
 					return {
 						success: false,
@@ -275,8 +276,8 @@ module.exports = (function () {
 						? (await sb.Banphrase.execute(optout, channelData)).string
 						: null;
 
-					sb.CooldownManager.setPending(false, userData, channelData);
-					sb.CooldownManager.set(command, userData, channelData);
+					sb.CooldownManager.unsetPending(userData.ID);
+					sb.CooldownManager.set(channelData.ID, userData.ID, command.ID, command.Cooldown);
 
 					return {
 						success: false,
@@ -345,18 +346,17 @@ module.exports = (function () {
 				};
 			}
 
-			if (execution?.meta?.skipPending !== true) {
-				sb.CooldownManager.setPending(false, userData, channelData);
-			}
-
 			// Read-only commands never reply with anything - banphrases, pings and cooldowns are not checked
 			if (command.Read_Only) {
 				return {success: !!execution.success};
 			}
 
-			if (channelData && execution?.meta?.skipCooldown !== true) {
-				sb.CooldownManager.set(command, userData, channelData);
+			// This should be removed once all deprecated calls are refactored
+			if (channelData && execution?.meta?.skipCooldown === true) {
+				console.warn("Deprecated return value - skipCooldown (use cooldown: null instead)", command.ID);
 			}
+
+			Command.handleCooldown(channelData, userData, command, execution.cooldown);
 
 			if (execution && (execution.reply || execution.partialReplies)) {
 				if (Array.isArray(execution.partialReplies) && execution.partialReplies.every(i => i && i.constructor === Object)) {
@@ -425,6 +425,43 @@ module.exports = (function () {
 			}
 
 			return execution;
+		}
+
+		/**
+		 * Handles the setting (or skipping) cooldowns for given combination of data.
+		 * @param {Channel} channelData
+		 * @param {User} userData
+		 * @param {Command} commandData
+		 * @param {Object} cooldownData
+		 */
+		static handleCooldown (channelData, userData, commandData, cooldownData) {
+			if (typeof cooldownData !== "undefined") {
+				if (cooldownData !== null) {
+					if (!Array.isArray(cooldownData)) {
+						cooldownData = [cooldownData];
+					}
+
+					for (const cooldown of cooldownData) {
+						const {
+							channel = channelData.ID,
+							user = userData.ID,
+							command = commandData.ID,
+							length,
+							options = {}
+						} = cooldown;
+
+						sb.CooldownManager.set(channel, user, command, length, options);
+					}
+				}
+				else {
+					// If cooldownData === null, no cooldown is set at all.
+				}
+			}
+			else {
+				sb.CooldownManager.set(channelData.ID, userData.ID, commandData.ID, commandData.Cooldown);
+			}
+
+			sb.CooldownManager.unsetPending(userData.ID);
 		}
 
 		/**
