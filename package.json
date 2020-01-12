@@ -7,7 +7,7 @@
     "dank-twitch-irc": "^2.5.2",
     "discord.js": "latest",
     "supinic-globals": "file:custom_modules/supinic-globals",
-    "message-scheduler": "file:custom_modules/message-scheduler",
+    "message-scheduler": "file:custom_modules/message-scheduler"
   },
   "main": "master.js",
   "devDependencies": {},
