@@ -215,27 +215,41 @@ module.exports = (function () {
 
 			// Check for cooldowns, return if it did not pass yet.
 			// If skipPending flag is set, do not check for pending status.
+			const channelID = (channelData?.ID ?? PRIVATE_MESSAGE_CHANNEL_ID);
 			if (
 				!userData.Data.cooldownImmunity
 				&& !sb.CooldownManager.check(
-					(channelData?.ID ?? PRIVATE_MESSAGE_CHANNEL_ID),
-					userData.ID, 
+					channelID,
+					userData.ID,
 					command.ID,
 					Boolean(options.skipPending)
 				)
 			) {
-				return {success: false, reason: "cooldown"};
+				const pending = sb.CooldownManager.fetchPending(userData.ID);
+				if (pending) {
+					if (options.privateMessage) {
+						return { reply: pending.description, reason: "pending" }
+					}
+					else {
+						return { success: false, reason: "pending" };
+					}
+				}
+				return { success: false, reason: "cooldown" };
 			}
 
 			// If skipPending flag is set, do not set the pending status at all.
 			// Used in pipe command, for instance.
 			if (!options.skipPending) {
-				sb.CooldownManager.setPending(userData.ID);
+				const sourceName = channelData?.Name ?? "private messages";
+				sb.CooldownManager.setPending(
+					userData.ID,
+					`You have a pending command: "${identifier}" used in "${sourceName}" at ${new sb.Date().sqlDateTime()}`
+				);
 			}
 
 			const accessBlocked = sb.Filter.check({
 				userID: userData.ID,
-				channelID: channelData?.ID ?? NaN,
+				channelID: channelID,
 				commandID: command.ID
 			});
 			if (accessBlocked) {
@@ -246,7 +260,7 @@ module.exports = (function () {
 						: null;
 
 				sb.CooldownManager.unsetPending(userData.ID);
-				sb.CooldownManager.set(channelData.ID, userData.ID, command.ID, command.Cooldown);
+				sb.CooldownManager.set(channelID, userData.ID, command.ID, command.Cooldown);
 				sb.Runtime.incrementRejectedCommands();
 
 				return {
@@ -267,7 +281,7 @@ module.exports = (function () {
 						: null;
 
 					sb.CooldownManager.unsetPending(userData.ID);
-					sb.CooldownManager.set(channelData.ID, userData.ID, command.ID, command.Cooldown);
+					sb.CooldownManager.set(channelID, userData.ID, command.ID, command.Cooldown);
 
 					return {
 						success: false,
@@ -288,7 +302,7 @@ module.exports = (function () {
 						: null;
 
 					sb.CooldownManager.unsetPending(userData.ID);
-					sb.CooldownManager.set(channelData.ID, userData.ID, command.ID, command.Cooldown);
+					sb.CooldownManager.set(channelID, userData.ID, command.ID, command.Cooldown);
 
 					return {
 						success: false,
@@ -371,7 +385,7 @@ module.exports = (function () {
 				console.warn("Deprecated return value - skipCooldown (use cooldown: null instead)", command.ID);
 			}
 
-			Command.handleCooldown(channelData, userData, command, execution.cooldown);
+			Command.handleCooldown(channelData, userData, command, execution?.cooldown);
 
 			if (execution && (execution.reply || execution.partialReplies)) {
 				if (Array.isArray(execution.partialReplies) && execution.partialReplies.every(i => i && i.constructor === Object)) {
@@ -495,9 +509,9 @@ module.exports = (function () {
  * @typedef {Object} CommandResult
  * @property {boolean} success If true, result contains reply; if false, result contains error
  * @property {string} [reply] Command result as a string to reply. If not provided, no message should be sent
+ * @property {Object} [cooldown] Dynamic cooldown settings
  * @property {string} [reason] Symbolic description of why command execution failed - used internally
  * @property {Object} [meta] Any other information passed back from the commend execution
- * @property {boolean} [meta.skipCooldown] True if the command requested for no cooldown to be applied
  */
 
 /**

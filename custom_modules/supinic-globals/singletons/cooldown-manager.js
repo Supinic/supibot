@@ -58,10 +58,15 @@ module.exports = (function (Module) {
 	}
 
 	class Pending extends Cooldown {
+		#description;
+
 		constructor (data) {
 			data.expires = Infinity;
 			super(data);
+			this.#description = data.description ?? "N/A";
 		}
+
+		get description () { return this.#description; }
 	}
 
 	/**
@@ -130,9 +135,10 @@ module.exports = (function (Module) {
 		/**
 		 * Sets a pending cooldown (it's really a status) for given user.
 		 * @param {number} user
+		 * @param {string} [description]
 		 */
-		setPending (user) {
-			this.data.push(new Pending({ user }));
+		setPending (user, description) {
+			this.data.push(new Pending({ user, description }));
 		}
 
 		/**
@@ -169,6 +175,15 @@ module.exports = (function (Module) {
 			for (const pending of pendings) {
 				pending.revoke();
 			}
+		}
+
+		/**
+		 * Fetches the Pending for given user. Used mostly for their description.
+		 * @param {number} user
+		 * @returns {Pending}
+		 */
+		fetchPending (user) {
+			return this.data.find(i => (i.constructor === Pending) && (i.user === user));
 		}
 
 		/**
