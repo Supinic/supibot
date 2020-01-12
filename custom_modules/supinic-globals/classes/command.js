@@ -207,20 +207,25 @@ module.exports = (function () {
 			}
 
 			const command = Command.get(identifier);
-			const args = argumentArray
-				.map(i => i.replace(sb.Config.get("WHITESPACE_REGEX"), ""))
-				.filter(Boolean);
-
 			if (!command) {
 				return {success: false, reason: "no-command"};
 			}
 
-			// Check for cooldowns, return if it did not pass yet
-			if (channelData && !userData.Data.cooldownImmunity && !sb.CooldownManager.check(channelData.ID, userData.ID, command.ID)) {
+			// Check for cooldowns, return if it did not pass yet.
+			// If skipPending flag is set, do not check for pending status.
+			if (
+				channelData
+				&& !userData.Data.cooldownImmunity
+				&& !sb.CooldownManager.check(channelData.ID, userData.ID, command.ID, Boolean(options.skipPending))
+			) {
 				return {success: false, reason: "cooldown"};
 			}
 
-			sb.CooldownManager.setPending(userData.ID);
+			// If skipPending flag is set, do not set the pending status at all.
+			// Used in pipe command, for instance.
+			if (!options.skipPending) {
+				sb.CooldownManager.setPending(userData.ID);
+			}
 
 			const accessBlocked = sb.Filter.check({
 				userID: userData.ID,
@@ -315,6 +320,10 @@ module.exports = (function () {
 			/** @type CommandResult */
 			let execution;
 			try {
+				const args = argumentArray
+					.map(i => i.replace(sb.Config.get("WHITESPACE_REGEX"), ""))
+					.filter(Boolean);
+
 				const start = process.hrtime.bigint();
 				execution = await command.Code(data, ...args);
 				const end = process.hrtime.bigint();

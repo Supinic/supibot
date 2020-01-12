@@ -94,12 +94,14 @@ module.exports = (function (Module) {
 		 * @param {number|null} channel
 		 * @param {number|null} user
 		 * @param {number|null} command
+		 * @param {boolean} skipPending If true, does not check for Pending status
 		 * @returns {boolean} True if it's safe to run the command, false if the execution should be denied.
 		 */
-		check (channel, user, command) {
+		check (channel, user, command, skipPending) {
 			const length = this.data.length;
 			for (let i = 0; i < length; i++) {
-				if (this.data[i].check(channel, user, command)) {
+				const cooldown = this.data[i];
+				if ((!skipPending || cooldown.constructor === Cooldown) && cooldown.check(channel, user, command)) {
 					return false;
 				}
 			}
@@ -183,6 +185,10 @@ module.exports = (function (Module) {
 		}
 
 		get modulePath () { return "cooldown-manager"; }
+
+		// Exporting the classes, just in case they're needed externally
+		static get Cooldown () { return Cooldown; }
+		static get Pending () { return Pending; }
 
 		/**
 		 * Cleans up.
