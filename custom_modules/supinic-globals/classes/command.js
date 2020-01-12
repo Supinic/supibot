@@ -1,6 +1,8 @@
 /* global sb */
 module.exports = (function () {
 	"use strict";
+	
+	const PRIVATE_MESSAGE_CHANNEL_ID = Symbol("private-message-channel");
 
 	/**
 	 * Represents a bot command.
@@ -214,9 +216,13 @@ module.exports = (function () {
 			// Check for cooldowns, return if it did not pass yet.
 			// If skipPending flag is set, do not check for pending status.
 			if (
-				channelData
-				&& !userData.Data.cooldownImmunity
-				&& !sb.CooldownManager.check(channelData.ID, userData.ID, command.ID, Boolean(options.skipPending))
+				!userData.Data.cooldownImmunity
+				&& !sb.CooldownManager.check(
+					(channelData?.ID ?? PRIVATE_MESSAGE_CHANNEL_ID),
+					userData.ID, 
+					command.ID,
+					Boolean(options.skipPending)
+				)
 			) {
 				return {success: false, reason: "cooldown"};
 			}
@@ -444,6 +450,9 @@ module.exports = (function () {
 		 * @param {Object} cooldownData
 		 */
 		static handleCooldown (channelData, userData, commandData, cooldownData) {
+			// Take care of private messages, where channel === null
+			const channelID = channelData?.ID ?? PRIVATE_MESSAGE_CHANNEL_ID;
+
 			if (typeof cooldownData !== "undefined") {
 				if (cooldownData !== null) {
 					if (!Array.isArray(cooldownData)) {
@@ -452,7 +461,7 @@ module.exports = (function () {
 
 					for (const cooldown of cooldownData) {
 						const {
-							channel = channelData.ID,
+							channel = channelID,
 							user = userData.ID,
 							command = commandData.ID,
 							length,
@@ -467,7 +476,7 @@ module.exports = (function () {
 				}
 			}
 			else {
-				sb.CooldownManager.set(channelData.ID, userData.ID, commandData.ID, commandData.Cooldown);
+				sb.CooldownManager.set(channelID, userData.ID, commandData.ID, commandData.Cooldown);
 			}
 
 			sb.CooldownManager.unsetPending(userData.ID);
