@@ -107,16 +107,14 @@ module.exports = (function () {
 			this.once("ready", () => {
 				this.connect();
 				this.emit("clientinit");
-				})
-				.once("connected", () => {
-					this.start();
-					this.emit("clientready");
-				})
-				.once("started", () => {
-					if (typeof this.assignLateHandlers === "function") {
-						this.assignLateHandlers();
-					}
-				});
+			}).once("connected", () => {
+				this.start();
+				this.emit("clientready");
+			}).once("started", () => {
+				if (typeof this.assignLateHandlers === "function") {
+					this.assignLateHandlers();
+				}
+			});
 
 			this.getSocketURL();
 		}
@@ -127,7 +125,7 @@ module.exports = (function () {
 				headers: {
 					"User-Agent": this.agent
 				},
-				timeout: 20e3
+				timeout: 20.0e3
 			};
 
 			request(options, (err, resp, body) => {
@@ -150,7 +148,7 @@ module.exports = (function () {
 					return;
 				}
 
-				let servers = [...data.servers];
+				const servers = [...data.servers];
 				while (servers.length) {
 					const server = servers.pop();
 					if (server.secure === this.secure && typeof server.ipv6 === "undefined") {
@@ -204,7 +202,7 @@ module.exports = (function () {
 
 			this.killswitch = setTimeout(() => {
 				this.emit("error", new Error("Channel connection failure - no response within 60 seconds"));
-			}, 60e3);
+			}, 60.0e3);
 
 			this.socket.once("login", (data) => {
 				if (typeof data === "undefined") {
@@ -247,6 +245,7 @@ module.exports = (function () {
 		destroy () {
 			if (this.socket) {
 				this.socket.disconnect(0);
+				this.socket = null;
 			}
 		}
 

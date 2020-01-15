@@ -57,8 +57,8 @@
 			};
 
 			this.clients = {
-				cytube: options.cytube.map(channel => new this.clientClasses.cytube(this, channel)),
-				discord: new this.clientClasses.discord(this, options.discord),
+				cytube: options.cytube.map(channel => new this.clientClasses.cytube(channel)),
+				discord: new this.clientClasses.discord(options.discord),
 				twitch: new this.clientClasses.twitch(this, options.twitch),
 				mixer: new this.clientClasses.mixer(this, options.mixer),
 			};

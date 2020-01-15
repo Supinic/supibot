@@ -2,22 +2,24 @@
 // @todo refactor Master and Cytube so that Cytube handles multiple channels, instead of Master managing that
 // @todo after this is done, create a common Client class all sub-clients extend
 
+const CytubeConnector = require("cytube-connector");
+
 module.exports = class Cytube {
 	/**
 	 * Cytube client.
-	 * @param {Master} parent
 	 * @param {Object} options
 	 * @param {string} options.name
 	 * @param {string} options.chan
 	 */
-	constructor (parent, options) {
+	constructor (options) {
 		this.platform = sb.Platform.get("cytube");
-
-		const CytubeConnector = require("cytube-connector");
+		this.options = options;
 		this.client = new CytubeConnector(options);
 
-		/** @type {Master} */
-		this.parent = parent;
+		this.restartInterval = null;
+		this.restartDelay = 60000;
+		this.restarting = false;
+
 		/** @type {string} */
 		this.name = sb.Config.get("CYTUBE_SELF");
 		/** @type {Channel} */
@@ -35,7 +37,10 @@ module.exports = class Cytube {
 		const client = this.client;
 
 		client.on("clientready", () => {
-			sb.SystemLogger.send("Cytube.Success", "Initialized", this.channelData);
+			console.log("Cytube connected!");
+
+			clearInterval(this.restartInterval);
+			this.restarting = false;
 		});
 
 		// Userlist initialize event - save current user data
@@ -104,9 +109,9 @@ module.exports = class Cytube {
 			}
 
 			// Handle commands if the message starts with the command prefix
-			if (msg.startsWith(this.parent.commandPrefix)) {
+			if (msg.startsWith(sb.Master.commandPrefix)) {
 				const arg = msg.trim().replace(/\s+/, " ").split(" ");
-				const command = arg.shift().slice(this.parent.commandPrefix.length);
+				const command = arg.shift().slice(sb.Master.commandPrefix.length);
 
 				this.handleCommand(command, userData, arg, data.meta.private);
 			}
@@ -147,17 +152,13 @@ module.exports = class Cytube {
 			this.userList.push(data);
 		});
 
-		/**
-		 * A user left channel
-		 * @listens "userLeave"
-		 */
-		const onUserLeave = (data) => {
+		// User left channel
+		client.on("userLeave", (data) => {
 			const index = this.userList.findIndex(i => i.name === data.name);
 			if (index !== -1) {
 				this.userList.splice(index, 1);
 			}
-		};
-		client.on("userLeave", onUserLeave);
+		});
 
 		// Video deleted from queue by moderator
 		client.on("delete", (data) => {
@@ -177,7 +178,12 @@ module.exports = class Cytube {
 		});
 
 		client.on("error", (err) => {
-			console.error("Cytube error", err);
+			if (this.restarting) {
+				return;
+			}
+
+			this.restarting = true;
+			this.restartInterval = setTimeout(() => this.restartClient(), this.restartDelay);
 
 			// if (!this._restarting) {
 			// 	setTimeout(() => this.restart(), 20e3);
@@ -280,7 +286,7 @@ module.exports = class Cytube {
 				this.mirror(execution.reply, userData, true);
 			}
 
-			const message = await this.parent.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
+			const message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
 			if (message) {
 				this.send(message);
 			}
@@ -315,7 +321,13 @@ module.exports = class Cytube {
 			? sb.Config.get("MIRROR_IDENTIFIER_CYTUBE") + " " + message
 			: sb.Config.get("MIRROR_IDENTIFIER_CYTUBE") + " " + userData.Name + ": " + message;
 
-		this.parent.mirror(fixedMessage, userData, this.channelData.Mirror);
+		sb.Master.mirror(fixedMessage, userData, this.channelData.Mirror);
+	}
+
+	restartClient () {
+		this.restarting = true;
+		this.client.destroy();
+		this.client = new CytubeConnector(this.options);
 	}
 
 	/**
@@ -323,7 +335,7 @@ module.exports = class Cytube {
 	 */
 	restart () {
 		// @todo: only restart one cytube client, not all of them (different hosts possible?)
-		this.parent.reloadClientModule("cytube");
+		sb.Master.reloadClientModule("cytube");
 		this.destroy();
 	}
 
