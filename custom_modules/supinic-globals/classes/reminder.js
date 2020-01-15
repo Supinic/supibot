@@ -142,7 +142,8 @@ module.exports = (function () {
                         }
 
                         if (channelData.Mirror) {
-                            sb.Master.mirror(message, toUserData, channelData.Mirror);
+                            const platformClient = sb.Master.clients[channelData.Platform.Name];
+                            platformClient.mirror(message, toUserData, channelData, false);
                         }
 
                         message = await sb.Master.prepareMessage(message, channelData);
