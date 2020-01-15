@@ -183,7 +183,12 @@ module.exports = (function (Module) {
 		 * @returns {Pending}
 		 */
 		fetchPending (user) {
-			return this.data.find(i => (i.constructor === Pending) && (i.user === user));
+			return this.data.find(i => (
+				i.constructor === Pending)
+				&& (i.user === user)
+				&& (i.expires !== 0)
+			);
+
 		}
 
 		/**

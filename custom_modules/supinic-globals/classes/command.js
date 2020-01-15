@@ -225,15 +225,16 @@ module.exports = (function () {
 					Boolean(options.skipPending)
 				)
 			) {
-				const pending = sb.CooldownManager.fetchPending(userData.ID);
-				if (pending) {
-					if (options.privateMessage) {
-						return { reply: pending.description, reason: "pending" }
-					}
-					else {
-						return { success: false, reason: "pending" };
+				if (!options.skipPending) {
+					const pending = sb.CooldownManager.fetchPending(userData.ID);
+					return {
+						reply: (options.privateMessage)
+							? pending.description
+							: null,
+						reason: "pending"
 					}
 				}
+
 				return { success: false, reason: "cooldown" };
 			}
 
