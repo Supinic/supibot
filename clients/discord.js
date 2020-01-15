@@ -3,7 +3,7 @@ module.exports = (function () {
 	"use strict";
 
 	class Discord {
-		constructor (parent, options) {
+		constructor (options) {
 			this.platform = sb.Platform.get("discord");
 			this.name = options.name;
 
@@ -30,13 +30,11 @@ module.exports = (function () {
 
 				// If no user with the given Discord ID exists, check and see if the name is already being used
 				if (!userData) {
-					const nameCheckData = await sb.User.getByProperty("Name", user);
+					const nameCheckData = await sb.User.get(user, true);
 
 					// If it is, skip entirely - the name must be matched precisely to the Discord ID, and this is an anomaly
 					// Needs to be fixed or flagged manually
-					if (nameCheckData && nameCheckData.Discord_ID !== null) {
-						const message = "User ID anomaly: " + user + " (" +  discordID + "), compared to " + nameCheckData.Name + " (" + nameCheckData.Discord_ID + ")";
-						sb.SystemLogger.send("Discord.Warning", message);
+					if (nameCheckData && nameCheckData.Discord_ID === null && nameCheckData.Twitch_ID !== null) {
 						return;
 					}
 					// Otherwise, set up the user with their Discord ID
