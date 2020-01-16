@@ -123,6 +123,12 @@ module.exports = (function () {
 			 * @type {Function}
 			 */
 			this.Code = data.Code;
+
+			/**
+			 * Session-specific data for the command that can be modified at runtime.
+			 * @type {Object}
+			 */
+			this.data = {};
 		}
 
 		/**
