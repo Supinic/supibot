@@ -20,7 +20,8 @@
     "youtube-utils": "file:../youtube-utils",
     "requestretry": "latest",
     "language-iso-codes": "file:../language-iso-codes",
-    "markov-json": "latest"
+    "markov-json": "latest",
+    "async-markov": "file:../async-markov"
   },
   "directories": {
     "test": "tests"

@@ -3,6 +3,7 @@ module.exports = (function () {
 	"use strict";
 
 	const Markov = require("markov-json").default;
+	const CustomMarkov = require("async-markov");
 
 	return class MarkovChain {
 		#model = null;
@@ -162,5 +163,7 @@ module.exports = (function () {
 				});
 			}
 		}
+
+		static get AsyncMarkov () { return CustomMarkov };
 	};
 })();

@@ -29,6 +29,11 @@ module.exports = (function (Module) {
 				const msgs = Object.values(this.batches).reduce((acc, cur) => acc += cur.records.length, 0);
 				const start = sb.Date.now();
 
+				if (sb.Master.data.realtimeMarkov) {
+					const messages = Object.values(sb.Logger.batches).map(i => i.records.map(j => j.Text)).flat();
+					await sb.Master.data.realtimeMarkov.process(messages.join(" "));
+				}
+
 				await Promise.all(Object.values(this.batches).map(batch => batch.insert()));
 
 				const delta = sb.Date.now() - start;
