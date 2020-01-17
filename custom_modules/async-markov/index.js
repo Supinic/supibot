@@ -3,11 +3,51 @@ module.exports = (function () {
 		setImmediate(() => resolve())
 	));
 
+	// @todo
+	// load + save methods
+	// save as json(?) maybe some other megadank format? json is fine tho
+
 	return class AsyncMarkov {
-		#words = {};
+		#words = Object.create(null);
 		#hasSentences = false;
 		#busy = false;
 		#prepared = false;
+
+		async processBuffer (buffer) {
+			if (this.#busy) {
+				return;
+			}
+
+			this.#busy = true;
+
+			let first = "";
+			let second = "";
+			const length = buffer.length;
+			for (let i = 0; i < length; i++) {
+				const char = buffer[i];
+				if (!this.#hasSentences) {
+					this.#hasSentences = (char === 33 || char === 46 || char === 63);
+				}
+
+				if (char === 32) {
+					if (first) {
+						this._addWords(first, second);
+						await waitImmediate();
+					}
+
+					first = second;
+					second = "";
+				}
+				else if (char > 32 && char < 127) {
+					second += String.fromCharCode(char);
+				}
+			}
+
+			this.#busy = false;
+			this.#prepared = true;
+
+			return this;
+		}
 
 		async process (string) {
 			if (this.#busy) {
@@ -24,27 +64,7 @@ module.exports = (function () {
 			const length = data.length;
 
 			for (let i = 0; i < length; i++) {
-				const first = data[i];
-				const second = data[i + 1];
-
-				if (typeof this.#words[first] === "undefined") {
-					this.#words[first] = {
-						total: 1,
-						related: {},
-						mapped: null
-					};
-				}
-				else {
-					this.#words[first].total++;
-				}
-
-				if (typeof this.#words[first].related[second] === "undefined") {
-					this.#words[first].related[second] = 1;
-				}
-				else {
-					this.#words[first].related[second]++;
-				}
-
+				this._addWords(data[i], data[i + 1]);
 				await waitImmediate();
 			}
 
@@ -66,10 +86,12 @@ module.exports = (function () {
 			}
 
 			const object = this.#words[root];
-			return AsyncMarkov.weightedPick(object);
+			return (object)
+				? AsyncMarkov.weightedPick(object)
+				: null;
 		}
 
-		words (amount, root = null) {
+		async words (amount, root = null) {
 			if (amount <= 0 || Math.trunc(amount) !== amount || !Number.isFinite(amount)) {
 				throw new Error("Input amount must be a positive finite integer");
 			}
@@ -82,13 +104,18 @@ module.exports = (function () {
 
 			while (amount--) {
 				current = this.word(current);
+				if (!current) {
+					current = this.word(null);
+				}
+
 				output.push(current);
+				await waitImmediate();
 			}
 
 			return output.join(" ");
 		}
 
-		sentences (amount, root = null) {
+		async sentences (amount, root = null) {
 			if (!this.#hasSentences) {
 				throw new Error("Model data has no sentences - cannot re-create");
 			}
@@ -106,12 +133,33 @@ module.exports = (function () {
 				current = this.word(current);
 				output.push(current);
 
+				await waitImmediate();
 				if (current.indexOf("?") !== -1 || current.indexOf("!") !== -1 || current.indexOf(".") !== -1) {
 					amount--;
 				}
 			}
 
 			return output.join(" ");
+		}
+
+		_addWords (first, second) {
+			if (typeof this.#words[first] === "undefined") {
+				this.#words[first] = {
+					total: 1,
+					related: {},
+					mapped: null
+				};
+			}
+			else {
+				this.#words[first].total++;
+			}
+
+			if (typeof this.#words[first].related[second] === "undefined") {
+				this.#words[first].related[second] = 1;
+			}
+			else {
+				this.#words[first].related[second]++;
+			}
 		}
 
 		get size () { return Object.keys(this.#words).length; }
