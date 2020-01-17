@@ -146,6 +146,13 @@ module.exports = (function () {
              * @type {Object}
              */
             this.Data = data.Data || {};
+
+            /**
+             * Session-specific data for a channel. Dyanamically updated at runtime.
+             * Is always reset on bot reset or channel reset.
+             * @type {Object}
+             */
+            this.sessionData = {};
         }
 
         /**
