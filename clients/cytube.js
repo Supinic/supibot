@@ -27,6 +27,8 @@ module.exports = class Cytube {
 
 		this.userList = [];
 		this.playlistData = [];
+		this.currentlyPlaying = null;
+
 		// this.isPlaying = false;
 		// this.lastSong = "<no previous song>";
 
@@ -169,9 +171,9 @@ module.exports = class Cytube {
 		});
 
 		// Video finished playing
-		client.on("changeMedia", () =>
-			this.playlistData.shift()
-		);
+		client.on("changeMedia", () => {
+			this.currentlyPlaying = this.playlistData.shift() ?? null;
+		});
 
 		client.on("queue", (data) => {
 			// console.log("Cytube queued video", data);
