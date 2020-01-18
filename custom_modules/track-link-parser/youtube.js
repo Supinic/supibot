@@ -7,13 +7,13 @@ module.exports = (function (TemplateParser) {
 	const durationRegex = /PT((?<hours>\d+)H)?((?<minutes>\d+)M)?((?<seconds>\d+)S)?/g;
 	const idTestRegex = /^[^#&?]{11}$/;
 	const splitRegex = /[/&?=#.\s]/g;
-	const noUrlRegex = /[^#&?]{11}/;
+	const noUrlRegex = /[a-zA-z0-9\-_]{11}/;
 	const patterns = [
-		/youtu\.be\/([^#&?]{11})/, // youtu.be/<id>
-		/\?v=([^#&?]{11})/, // ?v=<id>
-		/&v=([^#&?]{11})/, // &v=<id>
-		/embed\/([^#&?]{11})/, // embed/<id>
-		/\/v\/([^#&?]{11})/ // /v/<id>
+		/youtu\.be\/([a-zA-z0-9\-_]{11})/, // youtu.be/<id>
+		/\?v=([a-zA-z0-9\-_]{11})/, // ?v=<id>
+		/&v=([a-zA-z0-9\-_]{11})/, // &v=<id>
+		/embed\/([a-zA-z0-9\-_]{11})/, // embed/<id>
+		/\/v\/([a-zA-z0-9\-_]{11})/ // /v/<id>
 	];
 
 	class YoutubeParser extends TemplateParser {
@@ -55,6 +55,7 @@ module.exports = (function (TemplateParser) {
 				}
 			}
 
+			/*
 			// If that fails, split it apart and look for any exactly 11 character long key
 			const tokens = url.split(splitRegex);
 			for (const token of tokens) {
@@ -62,6 +63,7 @@ module.exports = (function (TemplateParser) {
 					return token;
 				}
 			}
+			*/
 
 			return null;
 		}
