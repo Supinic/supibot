@@ -76,7 +76,7 @@ module.exports = (function () {
 
 		word (root) {
 			if (!this.#prepared) {
-				throw new Error("Cannot generate words, model has no processed data");
+				throw new Error("Cannot generate words, this model has no processed data");
 			}
 
 			if (!root) {
@@ -162,7 +162,7 @@ module.exports = (function () {
 			}
 		}
 
-		get size () { return Object.keys(this.#words).length; }
+		get size () { return Objectty.keys(this.#words).length; }
 		get busy () { return this.#busy; }
 		get prepared () { return this.#prepared; }
 
