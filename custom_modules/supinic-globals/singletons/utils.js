@@ -265,6 +265,11 @@ module.exports = (function (Module) {
 				return stuff.join(":");
 			}
 			else {
+				if (seconds >= Utils.timeUnits.d.s) {
+					const days = Math.floor(seconds / Utils.timeUnits.d.s);
+					stuff.push(days + " days");
+					seconds -= (days * Utils.timeUnits.d.s);
+				}
 				if (seconds >= Utils.timeUnits.h.s) {
 					const hr = Math.floor(seconds / Utils.timeUnits.h.s);
 					stuff.push(hr + " hr");
@@ -276,7 +281,7 @@ module.exports = (function (Module) {
 					seconds -= (min * Utils.timeUnits.m.s);
 				}
 				if (seconds >= 0 || stuff.length === 0) {
-					stuff.push(seconds + " sec");
+					stuff.push(this.round(seconds, 3) + " sec");
 				}
 				return stuff.join(", ");
 			}
