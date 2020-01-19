@@ -79,11 +79,18 @@ module.exports = (function () {
 				if (msg.startsWith(commandPrefix)) {
 					const command = msg.replace(commandPrefix, "").split(" ")[0];
 					const args = msg.split(/\s+/).slice(1).filter(Boolean);
-					this.handleCommand(command, commandArguments.slice(1), channelData, userData, {
-						mentions,
-						guild,
-						privateMessage
-					});
+
+					this.handleCommand(
+						command,
+						commandArguments.slice(1).map(i => Discord.removeEmoteTags(i)),
+						channelData,
+						userData,
+						{
+							mentions,
+							guild,
+							privateMessage
+						}
+					);
 				}
 			});
 
