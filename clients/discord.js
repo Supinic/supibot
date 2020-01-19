@@ -51,6 +51,10 @@ module.exports = (function () {
 						await channelData.setup();
 					}
 
+					if (channelData.Mode === "Inactive") {
+						return;
+					}
+
 					const channelDescription = guild.name + " - #" + messageObject.channel.name;
 					if (channelData.Description !== channelDescription) {
 						await channelData.saveProperty("Description", channelDescription);
@@ -61,13 +65,20 @@ module.exports = (function () {
 					}
 
 					sb.Logger.push(msg, userData, channelData);
-					sb.AwayFromKeyboard.checkActive(userData, channelData);
-					sb.Reminder.checkActive(userData, channelData);
+
+					if (channelData.Mode !== "Read") {
+						sb.AwayFromKeyboard.checkActive(userData, channelData);
+						sb.Reminder.checkActive(userData, channelData);
+					}
 
 					// Mirroring is set up - mirror the message to the target channel
 					if (channelData.Mirror) {
 						this.mirror(msg, userData, channelData);
 					}
+				}
+
+				if (channelData && channelData.Mode === "Read") {
+					return;
 				}
 
 				// Own message - skip
