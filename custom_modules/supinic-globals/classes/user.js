@@ -88,6 +88,7 @@ module.exports = (function () {
 
         /** @override */
         static async initialize () {
+            User.bots = new Map();
             User.data = new Map();
             User.pendingNewUsers = new Set();
 
@@ -108,9 +109,25 @@ module.exports = (function () {
         static async loadData () {
             /** @type {Map<string, User>} */
             User.data = User.data || new Map();
+
+            const botData = await sb.Query.getRecordset(rs => rs
+                .select("Prefix", "Last_Verified", "Author", "Language")
+                .select("User_Alias.ID AS ID", "User_Alias.Name AS Name")
+                .from("bot_data", "Bot")
+                .join({
+                    toDatabase: "chat_data",
+                    toTable: "User_Alias",
+                    on: "Bot.Bot_Alias = User_Alias.ID"
+                })
+            );
+
+            for (const bot of botData) {
+                User.bots.set(bot.ID, bot);
+            }
         }
 
         static async reloadData () {
+            User.bots.clear();
             User.data.clear();
             await User.loadData();
         }
@@ -130,11 +147,12 @@ module.exports = (function () {
             else if (typeof identifier === "number") {
                 let user = User.getByProperty("ID", identifier);
                 if (!user) {
-                    const data = (await sb.Query.getRecordset(rs => rs
+                    const data = await sb.Query.getRecordset(rs => rs
                         .select("*")
                         .from("chat_data", "User_Alias")
                         .where("ID = %n", identifier)
-                    ))[0];
+                        .single()
+                    );
 
                     if (data) {
                         user = new User(data);
