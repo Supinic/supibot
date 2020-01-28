@@ -112,7 +112,7 @@ module.exports = (function (TemplateParser) {
 					type: "bilibili",
 					ID: videoID,
 					link: data.link,
-					name: data.title,
+					name: `https://www.bilibili.com/video/${videoID}`,
 					author: data.author,
 					authorID: data.mid,
 					description: data.description,
