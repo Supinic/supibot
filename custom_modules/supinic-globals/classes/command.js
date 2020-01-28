@@ -132,6 +132,17 @@ module.exports = (function () {
 		}
 
 		/**
+		 * Destroys the command instance.
+		 */
+		destroy () {
+			this.Code = null;
+			this.data = null;
+			this.Aliases = null;
+
+			this._destroyed = true;
+		}
+
+		/**
 		 * Executes the command.
 		 * @param {*[]} args
 		 * @returns CommandResult
@@ -157,6 +168,22 @@ module.exports = (function () {
 		static async reloadData () {
 			Command.data = [];
 			await Command.loadData();
+		}
+
+		static async reloadSpecific (...list) {
+			const reloadingCommands = list.map(i => Command.get(i)).filter(Boolean);
+			const data = await sb.Query.getRecordset(rs => rs
+				.select("*")
+				.from("chat_data", "Command")
+				.where("ID IN %n+", reloadingCommands.map(i => i.ID))
+				.where("Archived = %b", false)
+			);
+
+			for (const record of data) {
+				const existingIndex = Command.data.findIndex(i => i.ID === record.ID);
+				Command.data[existingIndex].destroy();
+				Command.data[existingIndex] = new Command(record);
+			}
 		}
 
 		/**
