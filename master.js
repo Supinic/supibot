@@ -4,7 +4,7 @@
 
 	process.env.PROJECT_TYPE = "bot";
 
-	/**  Database access keys are loaded here, and stored to process.env */
+	/** Database access keys are loaded here, and stored to process.env */
 	require("./db-access");
 
 	/**
