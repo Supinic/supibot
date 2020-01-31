@@ -81,6 +81,9 @@ module.exports = (function (Module) {
 			if (options.voice) {
 				params.set("voice", options.voice);
 			}
+			if (options.limit) {
+				params.set("limit", options.limit);
+			}
 
 			const result = await sb.Utils.request(this.url + "/?" + params.toString());
 			return (result === "true");
