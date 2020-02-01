@@ -110,22 +110,6 @@ module.exports = (function (Module) {
 					);
 				}
 			}
-			else if (query.type === "follow") {
-				const userData = await sb.User.get(query.username, true);
-				if (userData.Following) {
-					return;
-				}
-
-				await sb.Query.raw(`
-					INSERT INTO chat_data.Extra_User_Data 
-					(User_Alias, Following, Follow_Date)
-					VALUES
-					(${userData.ID}, 1, '${new sb.Date().sqlDateTime()}')
-					ON DUPLICATE KEY UPDATE Following = 1, Follow_Date = '${new sb.Date().sqlDateTime()}'
-				`);
-
-				sb.Master.send(query.username + " just followed the channel PagChomp !! Thank you supiniOkay", "supinic");
-			}
 			else if (query.type === "reload") {
 				if (query.module === "afk") {
 					await sb.AwayFromKeyboard.reloadData();

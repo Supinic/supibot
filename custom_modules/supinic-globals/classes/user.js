@@ -61,10 +61,6 @@ module.exports = (function () {
                 console.warn("User data parse error for user ID " + this.ID, e);
                 this.Data = {};
             }
-
-            this.Following = Boolean(data.Following);
-
-            this.Follow_Date = data.Follow_Date || null;
         }
 
         /**
