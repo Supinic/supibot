@@ -82,11 +82,12 @@ module.exports = (function () {
 			}
 
 			// This should only ever update one row, if everything is working properly
-			sb.Query.raw([
-				"UPDATE chat_data.AFK",
-				"SET Active = 0",
-				"WHERE Active = 1 AND User_Alias = " + userData.ID
-			].join(" "));
+			await sb.Query.getRecordUpdater(rs => rs
+				.update("chat_data", "AFK")
+				.set("Active", false)
+				.where("Active = %b", true)
+				.where("User_Alias = %n", userData.ID)
+			);
 
 			const data = AwayFromKeyboard.data[index];
 			const status = sb.Utils.randArray(sb.Config.get("AFK_RESPONSES")[data.Status]);
