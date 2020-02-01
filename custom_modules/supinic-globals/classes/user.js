@@ -280,21 +280,22 @@ module.exports = (function () {
          * @returns {Promise<User>}
          */
         static async add (name) {			
-			const escapedName = sb.Query.escapeString(name.toLowerCase().replace(/\s+/g, "_"));
-            const row = await sb.Query.getRow("chat_data", "User_Alias");
-			const data = await sb.Query.raw([
-				"INSERT INTO chat_data.User_Alias",
-				"(Name)",
-				`VALUES ("${escapedName}")`,
-				`ON DUPLICATE KEY UPDATE Name = "${escapedName}"`
-			].join(" "));
+			const preparedName = name.toLowerCase().replace(/\s+/g, "_");
+			const exists = await sb.Query.getRecordset(rs => rs
+                .select("Name")
+                .from("chat_data", "User_Alias")
+                .where("Name = %s", preparedName)
+                .limit(1)
+                .single()
+            );
 
-			// No user was added - do not continue
-			if (data.insertId === 0) {
-                return await User.get(escapedName);
+			if (exists) {
+                return await User.get(exists.Name);
             }
-			
-            await row.load(data.insertId);
+
+            const row = await sb.Query.getRow("chat_data", "User_Alias");
+			row.values.Name = preparedName;
+			await row.save();
 
             const user = new User(row.valuesObject);
             User.data.set(user.Name, user);
