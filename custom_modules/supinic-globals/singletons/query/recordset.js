@@ -186,8 +186,8 @@ module.exports = class Recordset {
 		}
 
 		let index = 0;
-		format = format.replace(Recordset.formatSymbolRegex, (fullMatch, param) => (
-			this.parseFormatSymbol(param, args[index++])
+		format = format.replace(this.#query.formatSymbolRegex, (fullMatch, param) => (
+			this.#query.parseFormatSymbol(param, args[index++])
 		));
 
 		if (type === "where") {
@@ -348,70 +348,6 @@ module.exports = class Recordset {
 			console.error(err);
 			throw err;
 		}
-	}
-
-	/**
-	 * Replaces format symbols used in WHERE/HAVING with their provided values and escapes/parses them.
-	 * @private
-	 * @param {string} type
-	 * @param {*} param
-	 * @returns {string}
-	 * @throws {sb.Error} If an unrecognized format symbol was encountered.
-	 */
-	parseFormatSymbol (type, param) {
-		switch (type) {
-			case "b":
-				if (typeof param !== "boolean") throw new sb.Error({ message: "Expected boolean, got " + param });
-				return (param ? "1" : "0");
-
-			case "d":
-				if (param instanceof Date && !(param instanceof sb.Date)) param = new sb.Date(param);
-				if (!(param instanceof sb.Date)) throw new sb.Error({ message: "Expected sb.Date, got " + param });
-				return param.sqlDate();
-
-			case "dt":
-				if (param instanceof Date && !(param instanceof sb.Date)) param = new sb.Date(param);
-				if (!(param instanceof sb.Date)) throw new sb.Error({ message: "Expected sb.Date, got " + param });
-				return param.sqlDateTime();
-
-			case "n":
-				if (typeof param !== "number") throw new sb.Error({ message: "Expected number, got " + param });
-				return String(param);
-
-			case "s":
-				if (typeof param !== "string") throw new sb.Error({ message: "Expected string, got " + param });
-				return "'" + this.#query.escapeString(param) + "'";
-
-			case "t":
-				if (param instanceof Date && !(param instanceof sb.Date)) param = new sb.Date(param);
-				if (!(param instanceof sb.Date)) throw new sb.Error({ message: "Expected sb.Date, got " + param });
-				return param.sqlTime();
-
-			case "s+":
-				if (!Array.isArray(param)) throw new sb.Error({ message: "Expected Array, got " + param });
-				return "(" + param.map(i => this.#query.escapeString(i)).map(i => `'${i}'`).join(",") + ")";
-
-			case "n+":
-				if (!Array.isArray(param)) throw new sb.Error({ message: "Expected Array, got " + param });
-				return "(" + param.join(",") + ")";
-
-			case "*like*":
-				if (typeof param !== "string") throw new sb.Error({ message: "Expected string, got " + param });
-				return " LIKE '%" + this.#query.escapeLikeString(param) + "%'";
-
-			default: throw new sb.Error({
-				message: "Unknown Recordset replace parameter",
-				args: type
-			});
-		}
-	}
-
-	/**
-	 * Regex used to parse out format symbols.
-	 * @returns {RegExp}
-	 */
-	static get formatSymbolRegex () {
-		return /%(s\+|n\+|b|d|dt|n|p|s|t|\*?like\*?)/g;
 	}
 };
 

@@ -2,10 +2,13 @@
 module.exports = (function (Module) {
 	"use strict";
 	const Maria = require("mariadb");
-	const Batch = require("./batch");
-	const Recordset = require("./recordset");
-	const Row = require("./row");
+	const Batch = require("./batch.js");
+	const Recordset = require("./recordset.js");
+	const RecordUpdater = require("./record-updater.js");
+	const Row = require("./row.js");
 
+	const formatSymbolRegex = /%(s\+|n\+|b|d|dt|n|p|s|t|\*?like\*?)/g;
+	
 	/**
 	 * Query represents every possible access to the database.
 	 * Exposes multiple ways to access, such as:
@@ -95,6 +98,17 @@ module.exports = (function (Module) {
 		 */
 		async getRecordset (callback) {
 			const rs = new Recordset(this);
+			callback(rs);
+			return await rs.fetch();
+		}
+
+		/**
+		 * Creates a new Recordset instance.
+		 * @param {RecordsetCallback} callback
+		 * @returns {Promise<Array>}
+		 */
+		async getRecordUpdater (callback) {
+			const rs = new RecordUpdater(this);
 			callback(rs);
 			return await rs.fetch();
 		}
@@ -315,6 +329,95 @@ module.exports = (function (Module) {
 			return this.escapeString(string).replace(/%/g, "\\%").replace(/_/g, "\\_");
 		}
 
+		/**
+		 * Replaces format symbols used in WHERE/HAVING with their provided values and escapes/parses them.
+		 * @private
+		 * @param {string} type
+		 * @param {*} param
+		 * @returns {string}
+		 * @throws {sb.Error} If an unrecognized format symbol was encountered.
+		 */
+		parseFormatSymbol (type, param) {
+			switch (type) {
+				case "b":
+					if (typeof param !== "boolean") {
+						throw new sb.Error({ message: "Expected boolean, got " + param });	
+					} 
+					
+					return (param ? "1" : "0");
+
+				case "d":
+					if (param instanceof Date && !(param instanceof sb.Date)) {
+						param = new sb.Date(param);
+					}					
+					if (!(param instanceof sb.Date)) {
+						throw new sb.Error({ message: "Expected sb.Date, got " + param });
+					}
+					
+					return param.sqlDate();
+
+				case "dt":
+					if (param instanceof Date && !(param instanceof sb.Date)) {
+						param = new sb.Date(param);
+					}					
+					if (!(param instanceof sb.Date)) {
+						throw new sb.Error({ message: "Expected sb.Date, got " + param });
+					}
+					
+					return param.sqlDateTime();
+
+				case "n":
+					if (typeof param !== "number") {
+						throw new sb.Error({ message: "Expected number, got " + param });
+					}
+					
+					return String(param);
+
+				case "s":
+					if (typeof param !== "string") {
+						throw new sb.Error({ message: "Expected string, got " + param });
+					}
+					
+					return "'" + this.escapeString(param) + "'";
+
+				case "t":
+					if (param instanceof Date && !(param instanceof sb.Date)) {
+						param = new sb.Date(param);
+					}
+					if (!(param instanceof sb.Date)) {
+						throw new sb.Error({ message: "Expected sb.Date, got " + param });
+					}
+					
+					return param.sqlTime();
+
+				case "s+":
+					if (!Array.isArray(param)) {
+						throw new sb.Error({ message: "Expected Array, got " + param });
+					}
+					
+					return "(" + param.map(i => this.escapeString(i)).map(i => `'${i}'`).join(",") + ")";
+
+				case "n+":
+					if (!Array.isArray(param)) {
+						throw new sb.Error({ message: "Expected Array, got " + param });
+					}
+					
+					return "(" + param.join(",") + ")";
+
+				case "*like*":
+					if (typeof param !== "string") {
+						throw new sb.Error({ message: "Expected string, got " + param });
+					}
+					
+					return " LIKE '%" + this.escapeLikeString(param) + "%'";
+
+				default: throw new sb.Error({
+					message: "Unknown Recordset replace parameter",
+					args: type
+				});
+			}
+		}
+		
 		static get sqlKeywords () {
 			return [ "SUM", "COUNT", "AVG" ];
 		}
@@ -338,7 +441,15 @@ module.exports = (function (Module) {
 				"NUM_FLAG": 32768
 			};
 		}
-
+		
+		/**
+		 * Regex used to parse out format symbols.
+		 * @returns {RegExp}
+		 */
+		get formatSymbolRegex () {
+			return formatSymbolRegex;
+		}
+			
 		get modulePath () { return "query"; }
 
 		/**
@@ -372,4 +483,14 @@ module.exports = (function (Module) {
  * @property {boolean} notNull If true, column can be set to null
  * @property {boolean} primaryKey If true, column is the primary key or a part of it
  * @property {boolean} unsigned If true, a numeric column is unsigned
+ */
+
+/**
+ * @typedef {Object} WhereHavingParams
+ * @property {boolean} [condition] If false, WHERE/HAVING will not be executed
+ * @property {string} [raw] If present, WHERE/HAVING will not be parsed, and instead will directly use this string
+ */
+
+/**
+ * @typedef {"%b"|"%d"|"%dt"|"%p"|"%n"|"%s"|"%t"|"%like"|"%*like"|"%like*"|"%*like*"} FormatSymbol
  */
