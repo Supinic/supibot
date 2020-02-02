@@ -180,8 +180,13 @@ module.exports = (function () {
 
 			const targetURL = sb.Utils.linkParser.parseLink(status.information.category.meta.url);
 			return this.videoQueue.find(songData => {
-				const songURL = sb.Utils.linkParser.parseLink(songData.link);
-				return songURL === targetURL;
+				try {
+					const songURL = sb.Utils.linkParser.parseLink(songData.link);
+					return songURL === targetURL;
+				}
+				catch {
+					return songData.link === targetURL;
+				}
 			});
 		}
 
