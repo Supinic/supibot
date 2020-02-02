@@ -38,7 +38,7 @@ module.exports = (function (Module) {
 			return false;
 		}
 
-		async fetch (code) {
+		async fetch (code, query = null) {
 			code = code.toLowerCase();
 
 			const row = this.data.find(i => i.Code === code);
@@ -48,7 +48,19 @@ module.exports = (function (Module) {
 
 			const url = row.URL + sb.Utils.randArray(row.Endpoints);
 			const feed = await RSS.parseURL(url);
+
+			if (query) {
+				query = query.toLowerCase();
+				feed.items = feed.items.filter(i => (
+					i.title && i.title.toLowerCase().includes(query)
+					|| i.content && i.content.toLowerCase().includes(query)
+				));
+			}
+
 			const article = sb.Utils.randArray(feed.items);
+			if (!article) {
+				return null;
+			}
 
 			return {
 				title: article.title,
