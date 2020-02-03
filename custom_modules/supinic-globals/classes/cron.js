@@ -106,7 +106,7 @@ module.exports = (function () {
 			if (process.env.PROJECT_TYPE === "bot") {
 				types.push("Bot");
 			}
-			else if (proecss.env.PROJECT_TYPE === "site") {
+			else if (process.env.PROJECT_TYPE === "site") {
 				types.push("Website");
 			}
 
