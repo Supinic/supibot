@@ -31,6 +31,7 @@ module.exports = class Row {
 			return true;
 		}
 	});
+	#loaded = false;
 
 	/**
 	 * Creates a new Row instance
@@ -71,9 +72,10 @@ module.exports = class Row {
 	/**
 	 * Loads a row based on its primary key.
 	 * @param {number} primaryKey
+	 * @param {boolean} ignoreError
 	 * @returns {Promise<Row>}
 	 */
-	async load (primaryKey) {
+	async load (primaryKey, ignoreError) {
 		if (typeof primaryKey === "undefined") {
 			throw new sb.Error({
 				message: "Primary key must be passed to Row.load"
@@ -91,14 +93,19 @@ module.exports = class Row {
 		].join(" "));
 
 		if (!data[0]) {
-			throw new sb.Error({
-				message: "Row load failed - no such PK",
-				args: {
-					primaryKeyField: this.fieldPK,
-					primaryKey: this.PK,
-					table: this.path
-				}
-			});
+			if (ignoreError) {
+				return this;
+			}
+			else {
+				throw new sb.Error({
+					message: "Row load failed - no such PK",
+					args: {
+						primaryKeyField: this.fieldPK,
+						primaryKey: this.PK,
+						table: this.path
+					}
+				});
+			}
 		}
 
 		for (const column of this.#definition.columns) {
@@ -107,6 +114,7 @@ module.exports = class Row {
 			this.#originalValues[column.name] = value;
 		}
 
+		this.#loaded = true;
 		return this;
 	}
 
@@ -186,6 +194,7 @@ module.exports = class Row {
 				"DELETE FROM " + this.path,
 				"WHERE " + this.query.escapeIdentifier(this.fieldPK.name) + " = " + this.escapedPK
 			].join(" "));
+			this.#loaded = false;
 		}
 		else {
 			throw new sb.Error({
@@ -200,6 +209,7 @@ module.exports = class Row {
 	 * Resets the data of the currently loaded row.
 	 */
 	reset () {
+		this.#loaded = false;
 		this.#primaryKey = null;
 		for (const column of this.#definition.columns) {
 			this.#values[column.name] = Symbol.for("unset");
@@ -245,4 +255,5 @@ module.exports = class Row {
 			});
 		}
 	}
+	get loaded () { return this.#loaded; }
 };
