@@ -10,3 +10,9 @@
 [submodule "custom_modules/custom-request-promise"]
 	path = custom_modules/custom-request-promise
 	url = https://github.com/Supinic/custom-request-promise
+[submodule "cytube-connector"]
+	path = cytube-connector
+	url = https://github.com/Supinic/cytube-connector
+[submodule "custom_modules/cytube-connector"]
+	path = custom_modules/cytube-connector
+	url = https://github.com/Supinic/cytube-connector
