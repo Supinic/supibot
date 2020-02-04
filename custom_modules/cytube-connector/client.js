@@ -1,7 +1,7 @@
 module.exports = (function () {
 	const EventEmitter = require("events");
 	const SocketIO = require("socket.io-client");
-	const request = require("request"); // @todo swap to request-promise and promisify the callbacks
+	const request = require("request");
 
 	const defaultConfig = {
 		secure : true,
@@ -17,6 +17,7 @@ module.exports = (function () {
 		cooldown: {},
 		socket: null
 	};
+
 	const handlers = [ "disconnect",
 		/*
 		 These are from CyTube /src/user.js
