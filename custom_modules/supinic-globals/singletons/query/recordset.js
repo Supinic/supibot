@@ -17,7 +17,8 @@ module.exports = class Recordset {
 	#join = [];
 	#limit = null;
 	#offset = null;
-	
+	#reference = null;
+
 	/**
 	 * Creates a new Recordset instance.
 	 * @param {Query} query
@@ -221,7 +222,7 @@ module.exports = class Recordset {
 			this.#join.push(left + "JOIN " + dot + " ON `" + this.#from.table + "`.`" + (customField || target) + "` = " + dot + ".ID");
 		}
 		else if (database && database.constructor === Object) {
-			const {toDatabase, toTable, toField, fromTable, fromField, alias, condition, on} = database;
+			const {toDatabase = this.#from.database, toTable, toField, fromTable, fromField, alias, condition, on} = database;
 			if (!toTable || !toDatabase) {
 				throw new sb.Error({
 					message: "Missing compulsory arguments for join",
@@ -266,6 +267,65 @@ module.exports = class Recordset {
 	 */
 	leftJoin (database, target, customField) {
 		return this.join(database, target, customField, "LEFT ");
+	}
+
+	/**
+	 *
+	 */
+	reference (options = {}) {
+		const {
+			sourceDatabase = this.#from.database,
+			sourceTable = this.#from.table,
+			sourceField = "ID",
+
+			referenceDatabase = this.#from.database,
+			referenceTable,
+
+			targetDatabase = this.#from.database,
+			targetTable,
+			targetField = "ID",
+
+			fields = [],
+			collapseOn,
+			left = false
+		} = options;
+
+		const joinType = (left) ? "leftJoin" : "join";
+		if (!referenceTable || !targetTable) {
+			throw new sb.Error({
+				message: "Both referenceTable and targetTable must be filled in!"
+			});
+		}
+
+		this[joinType]({
+			fromDatabase: sourceDatabase,
+			fromTable: sourceTable,
+			fromField: sourceField,
+			toDatabase: referenceDatabase,
+			toTable: referenceTable,
+			// Yes, this field is literally the name of the source table. This is a strict, rigid requirement
+			// for the database structure!
+			toField: sourceTable
+		});
+
+		this[joinType]({
+			fromDatabase: referenceDatabase,
+			fromTable: referenceTable,
+			// Yes, this field is literally the name of the target table. This is a strict, rigid requirement
+			// for the database structure!
+			fromField: targetTable,
+			toDatabase: targetDatabase,
+			toTable: targetTable,
+			toField: targetField
+		});
+
+		this.#reference = {
+			collapseOn: collapseOn ?? null,
+			columns: fields,
+			target: targetTable
+		};
+
+		return this;
 	}
 
 	/**
@@ -339,6 +399,10 @@ module.exports = class Recordset {
 				result.push(row);
 			}
 
+			if (this.#reference?.collapseOn) {
+				result = Recordset.collapseReferencedData(result, this.#reference);
+			}
+
 			// result.sql = sql;
 			return (this.#fetchSingle)
 				? result[0]
@@ -348,6 +412,43 @@ module.exports = class Recordset {
 			console.error(err);
 			throw err;
 		}
+	}
+
+	static collapseReferencedData (originalData, options) {
+		const keyMap = new Map();
+		const data = JSON.parse(JSON.stringify(originalData));
+		const { collapseOn: key, target, columns } = options;
+		const regex = new RegExp("^" + target + "_");
+
+		for (let i = data.length - 1; i >= 0; i--) {
+			let skip = false;
+			const row = data[i];
+			
+			if (!keyMap.has(row[key])) {
+				keyMap.set(row[key], []);
+			}
+			else {
+				skip = true;
+			}
+			
+			const copiedProperties = {};
+			for (const column of columns) {
+				copiedProperties[column.replace(regex, "")] = row[column];
+				delete row[column];
+			}
+			
+			if (skip) {
+				data.splice(i, 1);
+			}
+			
+			keyMap.get(row[key]).push(copiedProperties);
+		}
+		
+		for (const row of data) {
+			row[target] = keyMap.get(row[key]);
+		}
+		
+		return data;
 	}
 };
 
