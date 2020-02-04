@@ -94,6 +94,7 @@ module.exports = class Row {
 
 		if (!data[0]) {
 			if (ignoreError) {
+				this.#values[this.fieldPK.name] = primaryKey;
 				return this;
 			}
 			else {
@@ -129,7 +130,7 @@ module.exports = class Row {
 	async save (options = {}) {
 		let outputData = null;
 
-		if (this.PK !== null) { // UPDATE
+		if (this.PK !== null && this.#loaded) { // UPDATE
 			let setColumns = [];
 			for (const column of this.#definition.columns) {
 				if (this.#originalValues[column.name] === this.#values[column.name]) continue;
