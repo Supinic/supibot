@@ -7,3 +7,6 @@
 [submodule "custom_modules/long-timeout"]
 	path = custom_modules/long-timeout
 	url = https://github.com/Supinic/long-timeout
+[submodule "custom_modules/custom-request-promise"]
+	path = custom_modules/custom-request-promise
+	url = https://github.com/Supinic/custom-request-promise
