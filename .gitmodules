@@ -1,9 +1,6 @@
 [submodule "long-timeout"]
 	path = long-timeout
 	url = https://github.com/Supinic/long-timeout
-[submodule "custom_modules/long_timeout"]
-	path = custom_modules/long_timeout
-	url = https://github.com/Supinic/long-timeout
 [submodule "custom_modules/long-timeout"]
 	path = custom_modules/long-timeout
 	url = https://github.com/Supinic/long-timeout
