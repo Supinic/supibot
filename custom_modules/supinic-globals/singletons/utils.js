@@ -5,6 +5,7 @@ module.exports = (function (Module) {
 	const RandomJS = require("random-js");
 	const requestPromise = require("custom-request-promise");
 	const { parse: urlParser } = require("url");
+	const parseDuration = require("duration-parser");
 
 	return class Utils extends Module {
 		#linkParser = null;
@@ -64,7 +65,6 @@ module.exports = (function (Module) {
 			this.Transliterate = null;
 
 			this.YoutubeUtils = require("youtube-utils");
-			this.duration = new (require("duration-parser"))();
 			this.ytdl = require("youtube-dl");
 			this.fs = require("fs");
 
@@ -364,7 +364,7 @@ module.exports = (function (Module) {
 		 * @returns {number}
 		 */
 		parseDuration(string, unit) {
-			return this.duration.parse(string, unit);
+			return parseDuration(string, unit);
 		}
 
 		getVideoInfo (link) {

@@ -16,3 +16,6 @@
 [submodule "custom_modules/cytube-connector"]
 	path = custom_modules/cytube-connector
 	url = https://github.com/Supinic/cytube-connector
+[submodule "custom_modules/duration-parser"]
+	path = custom_modules/duration-parser
+	url = https://github.com/Supinic/duration-parser
