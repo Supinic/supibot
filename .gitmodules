@@ -28,3 +28,6 @@
 [submodule "custom_modules/youtube-utils"]
 	path = custom_modules/youtube-utils
 	url = https://github.com/Supinic/youtube-utils
+[submodule "custom_modules/async-markov"]
+	path = custom_modules/async-markov
+	url = https://github.com/Supinic/async-markov
