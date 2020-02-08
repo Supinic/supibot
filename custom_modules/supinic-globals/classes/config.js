@@ -195,7 +195,7 @@ module.exports = (function () {
 
 			await sb.Query.getRecordUpdater(rs => rs
 				.update("data", "Config")
-				.set("Value = %s", target.value)
+				.set("Value", target.value)
 				.where("Name = %s", variable)
 			);
 		}
