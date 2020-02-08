@@ -358,7 +358,7 @@ module.exports = (function () {
 				);
 
 				if ((!result || !result.success) && messageType === "whisper") {
-					if (result?.reason === "filter") {
+					if (!result?.reply && result?.reason === "filter") {
 						this.pm(userData.Name, sb.Config.get("PRIVATE_MESSAGE_COMMAND_FILTERED"));
 					}
 					else if (result?.reason === "no-command") {
