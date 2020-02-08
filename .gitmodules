@@ -25,3 +25,6 @@
 [submodule "custom_modules/track-link-parser"]
 	path = custom_modules/track-link-parser
 	url = https://github.com/Supinic/track-link-parser
+[submodule "custom_modules/youtube-utils"]
+	path = custom_modules/youtube-utils
+	url = https://github.com/Supinic/youtube-utils
