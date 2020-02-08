@@ -19,3 +19,6 @@
 [submodule "custom_modules/language-iso-codes"]
 	path = custom_modules/language-iso-codes
 	url = https://github.com/Supinic/language-iso-codes
+[submodule "custom_modules/message-scheduler"]
+	path = custom_modules/message-scheduler
+	url = https://github.com/Supinic/message-scheduler
