@@ -16,3 +16,6 @@
 [submodule "custom_modules/duration-parser"]
 	path = custom_modules/duration-parser
 	url = https://github.com/Supinic/duration-parser
+[submodule "custom_modules/language-iso-codes"]
+	path = custom_modules/language-iso-codes
+	url = https://github.com/Supinic/language-iso-codes
