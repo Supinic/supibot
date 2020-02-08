@@ -13,7 +13,8 @@ module.exports = (function (TemplateParser) {
 		/\?v=([a-zA-z0-9\-_]{11})/, // ?v=<id>
 		/&v=([a-zA-z0-9\-_]{11})/, // &v=<id>
 		/embed\/([a-zA-z0-9\-_]{11})/, // embed/<id>
-		/\/v\/([a-zA-z0-9\-_]{11})/ // /v/<id>
+		/\/v\/([a-zA-z0-9\-_]{11})/, // /v/<id>
+		/video_id=([a-zA-z0-9\-_]{11})/// https://www.youtube.com/get_video_info?video_id=2n9_RiWB6pc
 	];
 
 	class YoutubeParser extends TemplateParser {
