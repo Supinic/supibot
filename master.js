@@ -12,7 +12,7 @@
 	 * Used for various utilities, prototype changes and custom classes.
 	 * Assigned to global.sb upon requiring the globals module.
 	 */
-	await require("supinic-globals")("sb");
+	await require("supi-core")("sb");
 
 	const EventEmitter = require("events");
 	const options = {
@@ -246,7 +246,7 @@
 		get commandPrefix () { return sb.Config.get("COMMAND_PREFIX"); }
 	}
 
-	process.on("uncaughtException", () => process.kill(process.pid));
+	// process.on("uncaughtException", () => process.kill(process.pid));
 
 	sb.Master = new Master();
 })();
