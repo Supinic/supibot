@@ -1,33 +1,9 @@
-[submodule "long-timeout"]
-	path = long-timeout
-	url = https://github.com/Supinic/long-timeout
-[submodule "custom_modules/long-timeout"]
-	path = custom_modules/long-timeout
-	url = https://github.com/Supinic/long-timeout
-[submodule "custom_modules/custom-request-promise"]
-	path = custom_modules/custom-request-promise
-	url = https://github.com/Supinic/custom-request-promise
-[submodule "cytube-connector"]
-	path = cytube-connector
-	url = https://github.com/Supinic/cytube-connector
 [submodule "custom_modules/cytube-connector"]
 	path = custom_modules/cytube-connector
 	url = https://github.com/Supinic/cytube-connector
-[submodule "custom_modules/duration-parser"]
-	path = custom_modules/duration-parser
-	url = https://github.com/Supinic/duration-parser
-[submodule "custom_modules/language-iso-codes"]
-	path = custom_modules/language-iso-codes
-	url = https://github.com/Supinic/language-iso-codes
 [submodule "custom_modules/message-scheduler"]
 	path = custom_modules/message-scheduler
 	url = https://github.com/Supinic/message-scheduler
-[submodule "custom_modules/track-link-parser"]
-	path = custom_modules/track-link-parser
-	url = https://github.com/Supinic/track-link-parser
-[submodule "custom_modules/youtube-utils"]
-	path = custom_modules/youtube-utils
-	url = https://github.com/Supinic/youtube-utils
-[submodule "custom_modules/async-markov"]
-	path = custom_modules/async-markov
-	url = https://github.com/Supinic/async-markov
+[submodule "custom_modules/supi-core"]
+	path = custom_modules/supi-core
+	url = https://github.com/Supinic/supi-core
