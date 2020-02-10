@@ -6,15 +6,6 @@
         <serverdata>
           <mappings>
             <mapping deploy="/supibot2" local="$PROJECT_DIR$" web="/" />
-            <mapping deploy="custom_modules/cytube-connector" local="$PROJECT_DIR$/custom_modules/cytube-connector" web="/" />
-            <mapping deploy="custom_modules/duration-parser" local="$PROJECT_DIR$/custom_modules/duration-parser" web="/" />
-            <mapping deploy="custom_modules/message-scheduler" local="$PROJECT_DIR$/custom_modules/message-scheduler" web="/" />
-            <mapping deploy="/custom_modules/supinic-globals" local="$PROJECT_DIR$/custom_modules/supinic-globals" web="/" />
-            <mapping deploy="/custom_modules/youtube-utils" local="$PROJECT_DIR$/custom_modules/youtube-utils" web="/" />
-            <mapping deploy="/custom_modules/track-link-parser" local="$PROJECT_DIR$/custom_modules/track-link-parser" web="/" />
-            <mapping deploy="/custom_modules/custom-request-promise" local="$PROJECT_DIR$/custom_modules/custom-request-promise" web="/" />
-            <mapping deploy="/custom_modules/long-timeout" local="$PROJECT_DIR$/custom_modules/long-timeout" web="/" />
-            <mapping deploy="/custom_modules/async-markov" local="$PROJECT_DIR$/custom_modules/async-markov" web="/" />
           </mappings>
           <excludedPaths>
             <excludedPath local="true" path="$PROJECT_DIR$/db-access.js" />
