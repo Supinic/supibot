@@ -98,7 +98,7 @@ module.exports = (function () {
                 return this;
             }
 
-            /** @type {module.LongTimeout} */
+            /** @type {LongTimeout} */
             this.timeout = new LongTimeout(async () => {
                 const channelData = (this.Channel === null) ? null : sb.Channel.get(this.Channel);
                 const fromUserData = await sb.User.get(this.User_From, true);
