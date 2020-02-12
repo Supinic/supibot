@@ -89,7 +89,7 @@ module.exports = (function () {
 				.where("User_Alias = %n", userData.ID)
 			);
 
-			const data = AwayFromKeyboard.data[index];
+			const data = AwayFromKeyboard.data.splice(index, 1);
 			const status = sb.Utils.randArray(sb.Config.get("AFK_RESPONSES")[data.Status]);
 			if (!data.Silent) {
 				const message = `${userData.Name} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
@@ -105,8 +105,6 @@ module.exports = (function () {
 
 				sb.Master.send(fixedMessage, channelData);
 			}
-
-			AwayFromKeyboard.data.splice(index, 1);
 		}
 
 		/**
