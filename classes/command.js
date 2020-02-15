@@ -260,11 +260,11 @@ module.exports = (function () {
 			) {
 				if (!options.skipPending) {
 					const pending = sb.CooldownManager.fetchPending(userData.ID);
-					return {
-						reply: (options.privateMessage)
-							? pending.description
-							: null,
-						reason: "pending"
+					if (pending) {
+						return {
+							reply: (options.privateMessage) ? pending.description : null,
+							reason: "pending"
+						}
 					}
 				}
 
