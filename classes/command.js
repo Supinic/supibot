@@ -468,7 +468,7 @@ module.exports = (function () {
 					execution.reply = execution.reply.replace(regex, fixedName);
 				}
 
-				const metaSkip = Boolean(execution.meta && execution.meta.skipBanphrases);
+				const metaSkip = Boolean(options.skipBanphrases || execution?.meta?.skipBanphrases);
 				if (!command.Skip_Banphrases && !metaSkip) {
 					const {passed, string} = await sb.Banphrase.execute(execution.reply.slice(0, 1000), channelData);
 					execution.reply = string;
