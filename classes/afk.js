@@ -81,7 +81,11 @@ module.exports = (function () {
 				return;
 			}
 
-			// This should only ever update one row, if everything is working properly
+			// Extract the AFK data *FIRST*, before anything else is awaited!
+			// This makes sure that no more (possibly incorrect) messages are sent before the response is put together.
+			const [data] = AwayFromKeyboard.data.splice(index, 1);
+
+			// This should only ever update one row, if everything is working properly.
 			await sb.Query.getRecordUpdater(rs => rs
 				.update("chat_data", "AFK")
 				.set("Active", false)
@@ -89,7 +93,6 @@ module.exports = (function () {
 				.where("User_Alias = %n", userData.ID)
 			);
 
-			const [data] = AwayFromKeyboard.data.splice(index, 1);
 			const status = sb.Utils.randArray(sb.Config.get("AFK_RESPONSES")[data.Status]);
 			if (!data.Silent) {
 				const message = `${userData.Name} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
