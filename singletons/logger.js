@@ -26,11 +26,15 @@ module.exports = (function (Module) {
 			this.batches = {};
 
 			this.messageCron = new CronJob(sb.Config.get("CRON_MESSAGE_CONFIG"), async () => {
+				if (!sb.Config.get("MESSAGE_LOGGING_ENABLED")) {
+					return;
+				}
+
 				const msgs = Object.values(this.batches).reduce((acc, cur) => acc += cur.records.length, 0);
 				const start = sb.Date.now();
 
 				if (sb.Master && sb.Master.data.realtimeMarkov) {
-					const messages = Object.values(sb.Logger.batches).map(i => i.records.map(j => j.Text)).flat();
+					const messages = Object.values(Logger.batches).map(i => i.records.map(j => j.Text)).flat();
 					await sb.Master.data.realtimeMarkov.process(messages.join(" "));
 				}
 
@@ -45,7 +49,7 @@ module.exports = (function (Module) {
 			this.messageCron.start();
 
 			this.metaCron = new CronJob(sb.Config.get("CRON_META_MESSAGE_CONFIG"), async () => {
-				if (!this.metaBatch.ready) {
+				if (!sb.Config.get("MESSAGE_LOGGING_ENABLED") || !sb.Config.get("MESSAGE_META_LOGGING_ENABLED") || !this.metaBatch.ready) {
 					return;
 				}
 
@@ -114,7 +118,7 @@ module.exports = (function (Module) {
 
 			this.commandCollector = new Set();
 			this.commandCron = new CronJob(sb.Config.get("COMMAND_LOG_CRON_CONFIG"), async () => {
-				if (!this.commandBatch.ready) {
+				if (!sb.Config.get("COMMAND_LOGGING_ENABLED") || !this.commandBatch.ready) {
 					return;
 				}
 
@@ -179,6 +183,10 @@ module.exports = (function (Module) {
 		 * @returns {Promise<void>}
 		 */
 		async push (message, userData, channelData) {
+			if (!sb.Config.get("MESSAGE_LOGGING_ENABLED")) {
+				return;
+			}
+
 			const chan = channelData.ID;
 			if (!this.channels.includes(chan)) {
 				const name = channelData.getDatabaseName();
@@ -219,6 +227,10 @@ module.exports = (function (Module) {
 		 * @returns {Promise<void>}
 		 */
 		async logVideoRequest (link, typeIdentifier, length, userData, channelData) {
+			if (!sb.Config.get("CYTUBE_VIDEO_LOGGING_ENABLED")) {
+				return;
+			}
+
 			if (this.videoTypes.length === 0) {
 				return;
 			}
@@ -248,9 +260,12 @@ module.exports = (function (Module) {
 		 * @param {number} length
 		 * @param {sb.Date} date
 		 * @param {string|null} notes
-		 * @returns {Promise<void>}
 		 */
 		logBan (identifier, channelData, length, date, notes) {
+			if (!sb.Config.get("TWITCH_BAN_LOGGING_ENABLED")) {
+				return;
+			}
+
 			this.banCollector.set(identifier, {
 				Channel: channelData.ID,
 				Length: length || null,
@@ -264,6 +279,10 @@ module.exports = (function (Module) {
 		 * @param options
 		 */
 		logCommandExecution (options) {
+			if (!sb.Config.get("COMMAND_LOGGING_ENABLED")) {
+				return;
+			}
+
 			if (this.commandCollector.has(options.Executed.valueOf())) {
 				return;
 			}
