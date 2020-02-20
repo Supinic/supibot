@@ -3,11 +3,10 @@ module.exports = (function () {
 	"use strict";
 
 	class Discord {
-		constructor (options) {
+		constructor () {
 			this.platform = sb.Platform.get("discord");
-			this.name = options.name;
+			this.name = sb.Config.get("DISCORD_SELF");
 
-			// @todo change client module name - collides with discord.js module
 			this.client = new (require("discord.js")).Client();
 
 			this.initListeners();

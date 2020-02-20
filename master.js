@@ -14,83 +14,69 @@
 	 */
 	await require("supi-core")("sb");
 
-	const EventEmitter = require("events");
-	const options = {
-		twitch: {
-			url: "irc.chat.twitch.tv",
-			port: 6667,
-			nick: sb.Config.get("SELF"),
-			username: sb.Config.get("TWITCH_USERNAME"),
-			pass: sb.Config.get("TWITCH_OAUTH")
-		},
-		discord: {
-			name: sb.Config.get("DISCORD_SELF"),
-		},
-		cytube: [{
-			host: "cytu.be",
-			secure: true,
-			user: sb.Config.get("CYTUBE_SELF"),
-			auth: sb.Config.get("CYTUBE_BOT_PASSWORD"),
-			chan: "forsenoffline",
-		}]
-	};
-
 	/**
 	 * Master client instance.
 	 * Holds control over all clients.
 	 * @type Master
-	 * @extends EventEmitter
 	 */
 	class Master {
 		constructor () {
-			this.started = new sb.Date();
-			this.reloaded = new sb.Date();
-
 			this.flags = {};
 			this.data = {};
 
-			this.clientClasses = {
-				cytube: require("./clients/cytube.js"),
-				discord: require("./clients/discord.js"),
-				twitch: require("./clients/twitch.js"),
-				mixer: require("./clients/mixer.js")
-			};
+			const initialChannels = sb.Channel.data.filter(i => i.Mode !== "Inactive");
+			const initialPlatforms = new Set(initialChannels.map(i => i.Platform.Name));
 
-			this.clients = {
-				cytube: options.cytube.map(channel => new this.clientClasses.cytube(channel)),
-				discord: new this.clientClasses.discord(options.discord),
-				twitch: new this.clientClasses.twitch(this, options.twitch),
-				mixer: new this.clientClasses.mixer(this, options.mixer),
-			};
+			this.clients = {};
+			for (const platform of initialPlatforms) {
+				let platformModule = null;
+				try {
+					platformModule = require("./clients/" + platform);
+				}
+				catch (e) {
+					throw new sb.Error({
+						message: "Require of " + platform + " module failed"
+					}, e);
+				}
+
+				try {
+					this.clients[platform] = new platformModule();
+				}
+				catch (e) {
+					throw new sb.Error({
+						message: "Initialization of " + platform + " module failed"
+					}, e);
+				}
+			}
+
+			this.started = new sb.Date();
+			this.restarted = new sb.Date();
 		}
 
 		/**
 		 * Reload a given client module - used to hotload edited scripts in runtime with no downtime
-		 * @param {string} mod Module to reload
-		 * @param {boolean} [hard] If true, also reloads the require cache
+		 * @param {string} client Module to reload
 		 * @throws {sb.Error} If input module has not been recognized
 		 */
-		reloadClientModule (mod, hard) {
-			mod = mod.toLowerCase();
-			switch (mod) {
+		reloadClientModule (client) {
+			client = client.toLowerCase();
+
+			switch (client) {
 				case "cytube":
 				case "twitch":
 				case "discord":
-					this.clients[mod] = null;
+				case "mixer": {
+					const ClientConstructor = this.clients[client].constructor;
 
-					if (hard) {
-						this.clientClasses[mod] = null;
-						delete require.cache[require.resolve("./clients/" + mod + ".js")];
-						this.clientClasses[mod] = require("./clients/" + mod + ".js");
-					}
-
-					this.clients[mod] = new this.clientClasses[mod](this, options[mod]);
+					this.clients[client] = null;
+					this.clients[client] = new ClientConstructor();
 					break;
+				}
 
 				default:
 					throw new sb.Error({
 						message: "Unrecognized module name",
-						args: mod
+						args: client
 					});
 			}
 		}

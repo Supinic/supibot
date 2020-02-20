@@ -5,16 +5,15 @@
 const CytubeConnector = require("cytube-connector");
 
 module.exports = class Cytube {
-	/**
-	 * Cytube client.
-	 * @param {Object} options
-	 * @param {string} options.name
-	 * @param {string} options.chan
-	 */
-	constructor (options) {
+	constructor () {
 		this.platform = sb.Platform.get("cytube");
-		this.options = options;
-		this.client = new CytubeConnector(options);
+		this.client = new CytubeConnector({
+			host: "cytu.be",
+			secure: true,
+			user: sb.Config.get("CYTUBE_SELF"),
+			auth: sb.Config.get("CYTUBE_BOT_PASSWORD"),
+			chan: "forsenoffline" // @todo change this to be flexible
+		});
 
 		this.restartInterval = null;
 		this.restartDelay = 60000;

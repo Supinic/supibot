@@ -5,11 +5,7 @@ module.exports = (function () {
 	const DankTwitch = require("dank-twitch-irc");
 
 	return class Twitch {
-		/**
-		 * @param {Master} parent
-		 * @param {Object} options
-		 */
-		constructor (parent, options) {
+		constructor () {
 			this.platform = sb.Platform.get("twitch");
 
 			this.name = sb.Config.get("TWITCH_USERNAME");
