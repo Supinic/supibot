@@ -2,8 +2,6 @@
 module.exports = (function (Module) {
 	"use strict";
 
-	const postURL = "https://pastebin.com/api/api_post.php";
-	const authURL = "https://pastebin.com/api/api_login.php";
 	const allowedPrivacyOptions = ["public", "unlisted", "private"];
 	const allowedExpirationOptions = {
 		"never": "N",
@@ -24,45 +22,50 @@ module.exports = (function (Module) {
 	 * @type Pastebin()
 	 */
 	return class Pastebin extends Module {
+		#authData = null;
+		#authenticationPending = false;
+
 		/**
 		 * @inheritDoc
 		 * @returns {Pastebin}
 		 */
 		static async singleton () {
 			if (!Pastebin.module){
-				Pastebin.module = await new Pastebin();
+				Pastebin.module = new Pastebin();
 			}
 			return Pastebin.module;
 		}
 
-		constructor () {
-			super();
+		/**
+		 * Attempts to log in and preserves authentication data.
+		 * @returns {Promise<void>}
+		 */
+		async login () {
+			if (this.#authData || this.#authenticationPending) {
+				return;
+			}
 
-			return (async () => {
-				const authParams = new sb.URLParams()
+			this.#authenticationPending = true;
+
+			const { body, statusCode } = await sb.Got.instances.Pastebin({
+				method: "POST",
+				url: "api/api_login.php",
+				timeout: 5000,
+				body: new sb.URLParams()
 					.set("api_dev_key", sb.Config.get("API_PASTEBIN"))
 					.set("api_user_name", sb.Config.get("PASTEBIN_USER_NAME"))
-					.set("api_user_password", sb.Config.get("PASTEBIN_PASSWORD"));
+					.set("api_user_password", sb.Config.get("PASTEBIN_PASSWORD"))
+					.toString()
+			});
 
-				try {
-					this.authData = await sb.Utils.request({
-						method: "POST",
-						url: authURL,
-						body: authParams.toString(),
-						headers: {
-							"Content-Type": "application/x-www-form-urlencoded",
-							"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
-						},
-						timeout: 5000
-					});
-				}
-				catch (e) {
-					console.log("Pastebin intitialize error", e);
-					this.authData = null;
-				}
+			this.#authenticationPending = false;
 
-				return this;
-			})();
+			if (statusCode !== 200) {
+				this.#authData = null;
+			}
+			else {
+				this.#authData = body;
+			}
 		}
 
 		/**
@@ -71,19 +74,10 @@ module.exports = (function (Module) {
 		 * @returns {Promise<void>}
 		 */
 		async get (pasteID) {
-			let data = null;
-			try {
-				data = await sb.Utils.request(`https://pastebin.com/raw/${pasteID}`);
-			}
-			catch (e) {
-				console.error(e);
-			}
-
-			if (data && data.includes(`<title>Pastebin.com - Page Removed</title>`)) {
-				data = null;
-			}
-
-			return data;
+			const { body, statusCode } = await sb.Got.instances.Pastebin("raw/" + pasteID);
+			return (statusCode === 200)
+				? body
+				: null;
 		}
 
 		/**
@@ -97,6 +91,10 @@ module.exports = (function (Module) {
 		 * @returns {Promise<string>}
 		 */
 		async post (text, options = {}) {
+			if (!this.#authData) {
+				await this.login();
+			}
+
 			const params = new sb.URLParams()
 				.set("api_dev_key", sb.Config.get("API_PASTEBIN"))
 				.set("api_option", "paste")
@@ -105,23 +103,20 @@ module.exports = (function (Module) {
 				.set("api_paste_private", (options.privacy) ? Pastebin.getPrivacy(options.privacy) : "1")
 				.set("api_paste_expire_date", (options.expiration) ? Pastebin.getExpiration(options.expiration) : "10M");
 
-			if (this.authData) {
-				params.set("api_user_key", this.authData);
+			if (this.#authData) {
+				params.set("api_user_key", this.#authData);
 			}
 
 			if (options.format) {
 				params.set("api_paste_format", options.format);
 			}
 
-			return await sb.Utils.request({
+			return await sb.Got.instances.Pastebin({
 				method: "POST",
-				url: postURL,
+				url: "api_post.php",
 				body: params.toString(),
-				timeout: 5000,
-				headers: {
-					"Content-Type": "application/x-www-form-urlencoded"
-				}
-			});
+				timeout: 5000
+			}).text();
 		}
 
 		async delete (pasteID) {

@@ -7,14 +7,16 @@ module.exports = (function () {
 			const options = {
 				method: "POST",
 				url: "https://" + URL + "/api/v1/banphrases/test",
-				body: "message=" + sb.Utils.argsToFixedURL(message.split(" ")),
+				body: new sb.URLParams()
+					.set("message", message)
+					.toString(),
 				headers: {
 					"Content-Type": "application/x-www-form-urlencoded"
 				},
 				timeout: sb.Config.get("PAJBOT_API_TIMEOUT")
 			};
 
-			const data = JSON.parse(await sb.Utils.request(options));
+			const data = await sb.Got(options).json();
 			return (data.banned)
 				? data.banphrase_data.phrase
 				: false;
