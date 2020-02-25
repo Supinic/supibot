@@ -44,7 +44,7 @@ module.exports = (function () {
 				console.debug(joinedUsername, channelName);
 
 				if (joinedUsername.toLowerCase() === sb.Config.get("TWITCH_USERNAME") && channelName.includes("supinic")) {
-					client.say(channelName, "HONEYDETECTED RECONNECTED");
+					// client.say(channelName, "HONEYDETECTED RECONNECTED");
 				}
 			});
 
@@ -54,13 +54,10 @@ module.exports = (function () {
 				if (emoteSets !== this.availableEmoteSets) {
 					this.availableEmoteSets = emoteSets;
 
-					const emoteData = JSON.parse(await sb.Utils.request({
-						url: "https://api.twitch.tv/kraken/chat/emoticon_images?emotesets=" + emoteSets.join(","),
-						headers: {
-							Accept: "application/vnd.twitchtv.v5+json",
-							"Client-ID": sb.Config.get("TWITCH_CLIENT_ID")
-						}
-					}));
+					const emoteData = await sb.Got.instances.Twitch.Kraken({
+						url: "chat/emoticon_images",
+						searchParams: "emotesets=" + emoteSets.join(",")
+					});
 
 					this.availableEmotes = emoteData.emoticon_sets;
 				}

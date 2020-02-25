@@ -29,9 +29,12 @@ module.exports = (function () {
 			this.userInfo = (await this.client.request("GET", "/users/current")).body;
 
 			this.channelsData = await Promise.all(this.channels.map(async (channelData) => {
-				const channelID = JSON.parse(await sb.Utils.request(`https://mixer.com/api/v1/channels/${channelData.Name}?fields=id`)).id;
-				const chatData = (await new MixerClient.ChatService(this.client).join(channelID)).body;
+				const { id: channelID } = await sb.Got.instances.Mixer({
+					url: "channels/" + channelData.Name,
+					searchParams: "fields=id"
+				}).json();
 
+				const chatData = (await new MixerClient.ChatService(this.client).join(channelID)).body;
 				if (!channelData.Specific_ID) {
 					await channelData.saveProperty("Specific_ID", channelID);
 				}
