@@ -55,11 +55,11 @@
 
 		/**
 		 * Reload a given client module - used to hotload edited scripts in runtime with no downtime
-		 * @param {string} client Module to reload
+		 * @param {Platform} platform Module to reload
 		 * @throws {sb.Error} If input module has not been recognized
 		 */
-		reloadClientModule (client) {
-			client = client.toLowerCase();
+		reloadClientModule (platform) {
+			const client = sb.Platform.get(platform).Name;
 
 			switch (client) {
 				case "cytube":

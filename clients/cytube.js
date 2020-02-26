@@ -336,7 +336,7 @@ module.exports = class Cytube {
 	 */
 	restart () {
 		// @todo: only restart one cytube client, not all of them (different hosts possible?)
-		sb.Master.reloadClientModule("cytube");
+		sb.Master.reloadClientModule(this.platform);
 		this.destroy();
 	}
 
