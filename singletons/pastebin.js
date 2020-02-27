@@ -113,7 +113,7 @@ module.exports = (function (Module) {
 
 			return await sb.Got.instances.Pastebin({
 				method: "POST",
-				url: "api_post.php",
+				url: "api/api_post.php",
 				body: params.toString(),
 				timeout: 5000
 			}).text();
