@@ -19,6 +19,9 @@ module.exports = class Cytube {
 		this.restartDelay = 60000;
 		this.restarting = false;
 
+		// @todo assign each channel to a separate "room"
+		this.rooms = [];
+
 		/** @type {string} */
 		this.name = sb.Config.get("CYTUBE_SELF");
 		/** @type {Channel} */
@@ -219,8 +222,13 @@ module.exports = class Cytube {
 	 * Works by splitting the message into 200 character chunks and sending them repeatedly in order.
 	 * This is done because (for whatever reason) Cytube implements a tiny character limit, at least compared to other clients.
 	 * @param {string} message
+	 * @param {Channel} channelData
 	 */
-	send (message) {
+	send (message, channelData) {
+		if (channelData && this.room.length > 0) {
+			// @todo separate room handling for multiple channels
+		}
+
 		const messageLimit = sb.Config.get("CYTUBE_MESSAGE_LIMIT");
 		const lengthRegex = new RegExp(".{1," + messageLimit + "}", "g");
 		let arr = message
