@@ -16,6 +16,12 @@ Each client must implement basic methods of communication, regardless of the pla
 - `pm` to send private messages, if platform supports it (in the other case, make sure to set a flag)
 - `mirror` to mirror messages into a different channel
 
+### I want Supibot in my Twitch channel!
+Please follow the guide(s) specified in the panels of the [bot's Twitch profile](https://twitch.tv/supibot).
+
+### I want Supibot in my Discord server!How do I get Supibot in my Discord server?
+An admin of said server should PM me on Discord. See [Contact](https://supinic.com/contact) for further info on contacting me.
+
 ## Features
 The full command list can be found [on author's website](https://supinic.com/bot/command/list) or in [its repository](https://github.com/Supinic/supibot-sql) as a list of SQL update scripts. 
 Some of the features implemented commands provide include:
