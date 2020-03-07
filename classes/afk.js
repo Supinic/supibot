@@ -100,11 +100,14 @@ module.exports = (function () {
 					sb.Master.mirror(message, userData, channelData.Mirror);
 				}
 
-				const fixedMessage = (await Promise.all([
+				let fixedMessage = (await Promise.all([
 					sb.Master.prepareMessage(userData.Name + " " + status + ":", channelData),
 					sb.Master.prepareMessage(data.Text || "(no message)", channelData),
 					"(" + sb.Utils.timeDelta(data.Started) + ")"
 				])).join(" ");
+
+				const afkCommand = sb.Command.get("afk");
+				fixedMessage = await sb.Filter.applyUnping(afkCommand, fixedMessage);
 
 				sb.Master.send(fixedMessage, channelData);
 			}

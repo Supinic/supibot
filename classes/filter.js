@@ -379,6 +379,30 @@ module.exports =  (function () {
 		}
 
 		/**
+		 * Executes a unping process on a given string for a given command.
+		 * For each user that has decided to "unping" from a given command, their name will be replaced by a string
+		 * where on the second position a zero-width character is inserted. This makes sure that they won't be so-called
+		 * "pinged", aka notified based on a regex.
+		 * @param {Command|number|string} commandIdentifier
+		 * @param {string} string
+		 */
+		static async applyUnping (commandIdentifier, string) {
+			const { ID: commandID } = sb.Command.get(commandIdentifier);
+			const unpingUsers = await sb.User.getMultiple(Filter.data
+				.filter(i => i.Active && i.Command === commandID && i.Type === "Unping")
+				.map(i => i.User_Alias)
+			);
+
+			for (const user of unpingUsers) {
+				const fixedName = user.Name[0] + `\u{E0000}` + user.Name.slice(1);
+				const regex = new RegExp(user.Name, "gi");
+				string = string.replace(regex, fixedName);
+			}
+
+			return string;
+		}
+
+		/**
 		 * Cleans up.
 		 */
 		static destroy () {
