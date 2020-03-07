@@ -232,7 +232,10 @@
 		get commandPrefix () { return sb.Config.get("COMMAND_PREFIX"); }
 	}
 
-	// process.on("uncaughtException", () => process.kill(process.pid));
+	process.on("uncaughtException", (err) => {
+		console.error(err);
+		process.abort();
+	});
 
 	sb.Master = new Master();
 })();
