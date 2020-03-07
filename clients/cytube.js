@@ -9,6 +9,7 @@ module.exports = class Cytube {
 		this.platform = sb.Platform.get("cytube");
 		this.client = new CytubeConnector({
 			host: "cytu.be",
+			port: 443,
 			secure: true,
 			user: sb.Config.get("CYTUBE_SELF"),
 			auth: sb.Config.get("CYTUBE_BOT_PASSWORD"),
@@ -30,9 +31,6 @@ module.exports = class Cytube {
 		this.userList = [];
 		this.playlistData = [];
 		this.currentlyPlaying = null;
-
-		// this.isPlaying = false;
-		// this.lastSong = "<no previous song>";
 
 		this.initListeners();
 	}
