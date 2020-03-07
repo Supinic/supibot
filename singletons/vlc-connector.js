@@ -2,8 +2,6 @@
 module.exports = (function () {
 	"use strict";
 
-	const request = require("custom-request-promise");
-
 	return class VideoLANConnector {
 		static singleton () {
 			if (!VideoLANConnector.module) {
@@ -31,19 +29,22 @@ module.exports = (function () {
 		 * @param {string} parent
 		 * @returns {Promise<Object>}
 		 */
-		async send (command = "", options = {}, parent) {
-			let requestData = "";
+		async send (command, options = {}, parent) {
+			const params = new sb.URLParams();
 			for (const key of Object.keys(options)) {
-				requestData += "&" + key + "=" + encodeURIComponent(options[key]);
+				params.set(key, options[key]);
 			}
 
-			const cmd = (command) ? ("?command=" + command) : "";
-			const url = this.baseURL + parent + cmd + requestData;
+			if (command) {
+				params.set("command", command);
+			}
 
-			return JSON.parse(await request({
-				url,
+			return await sb.Got({
+				prefixUrl: this.baseURL,
+				url: parent ?? "",
+				searchParams: params.toString(),
 				timeout: 1000
-			}));
+			}).json();
 		}
 
 		/**
