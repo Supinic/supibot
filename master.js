@@ -95,21 +95,7 @@
 				return;
 			}
 
-			if (platform === "cytube") {
-				if (!client.find) {
-					return;
-				}
-
-				const target = client.find(i => i.channelData.ID === channelData.ID);
-				if (!target) {
-					return;
-				}
-
-				target.send(message);
-			}
-			else {
-				client.send(message, channelData);
-			}
+			client.send(message, channelData);
 		}
 
 		/**

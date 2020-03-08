@@ -21,7 +21,7 @@ module.exports = class Cytube {
 		this.restarting = false;
 
 		// @todo assign each channel to a separate "room"
-		this.rooms = [];
+		this.channels = [];
 
 		/** @type {string} */
 		this.name = sb.Config.get("CYTUBE_SELF");
@@ -223,7 +223,7 @@ module.exports = class Cytube {
 	 * @param {Channel} channelData
 	 */
 	send (message, channelData) {
-		if (channelData && this.room.length > 0) {
+		if (channelData && this.channels.length > 0) {
 			// @todo separate room handling for multiple channels
 		}
 
