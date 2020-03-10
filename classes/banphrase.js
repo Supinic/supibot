@@ -16,10 +16,7 @@ module.exports = (function () {
 				timeout: sb.Config.get("PAJBOT_API_TIMEOUT")
 			};
 
-			const data = await sb.Got(options).json();
-			return (data.banned)
-				? data.banphrase_data.phrase
-				: false;
+			return await sb.Got(options).json();
 		}
 	}
 
@@ -217,10 +214,21 @@ module.exports = (function () {
 		 * @param {string} message
 		 * @param {("Pajbot")} type Type of banphrase API - required to build request URL and data parsing
 		 * @param {string} URL Banphrase API URL
-		 * @returns {Promise<string|boolean>} False if no banphrase found, string specifying tha banphrase otherwise.
+		 * @param {Object} options = {} extra options
+		 * @param {boolean} [options.fullResponse] If true, returns the entire API response. Otherwise, returns
+		 * string (if banphrased) or false.
+		 * @returns {Promise<Object|string|boolean>} False if no banphrase found, string specifying tha banphrase otherwise.
 		 */
-		static async executeExternalAPI (message, type, URL) {
-			return await ExternalBanphraseAPI[type.toLowerCase()](message, URL);
+		static async executeExternalAPI (message, type, URL, options = {}) {
+			const reply = await ExternalBanphraseAPI[type.toLowerCase()](message, URL);
+			if (options.fullResponse) {
+				return reply;
+			}
+			else {
+				return reply.banned
+					? reply.banphrase_data.phrase
+					: false;
+			}
 		}
 
 		static destroy () {
