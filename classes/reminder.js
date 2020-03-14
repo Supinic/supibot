@@ -126,7 +126,7 @@ module.exports = (function () {
                         Schedule: null,
                         Text: "This timed reminder fired while you were AFK: " + this.ID,
                         Private_Message: true
-                    });
+                    }, true);
                 }
 
                 if (message) {
@@ -245,47 +245,69 @@ module.exports = (function () {
         }
 
         /**
+         * @typedef {Object} ReminderCreationResult
+         * @property {boolean} success Whether or not the reminder was created .
+         * @property {number} [ID] If successful, this is the new reminder ID.
+         * @property {string} [cause] If not successful, this is a string specifying what went wrong.
+         */
+
+        /**
          * Creates a new Reminder, and saves it to database.
          * Used mostly in commands to set up reminders.
-         * @params {Object} data {@link Reminder}-compliant data
-         * @params {boolean} [skipChecks = false] If true, skips all reminder checks. This is done for system reminders, so they always go through.
+         * @param {Object} data {@link Reminder}-compliant data
+         * @param {boolean} [skipChecks = false] If true, skips all reminder checks. This is done for system reminders, so they always go through.
+         * @return {ReminderCreationResult}
          * @throws {sb.Error} If maximum active reminders have been exceeded.
          */
         static async create (data, skipChecks = false) {
             data.Active = true;
 
             if (!skipChecks) {
-                const countCheckFrom = (await sb.Query.getRecordset(rs => rs
-                    .select("COUNT(*) AS Count")
-                    .from("chat_data", "Reminder")
-                    .where("Active = %b", true)
-                    .where("Schedule IS NULL")
-                    .where("User_From = %n", data.User_From)
-                    .single()
-                ));
-
-                let countCheckTo = 0;
-                if (data.User_To) {
-                    countCheckTo = (await sb.Query.getRecordset(rs => rs
-                        .select("COUNT(*) AS Count")
+                const [incomingData, outgoingData] = await Promise.all([
+                    sb.Query.getRecordset(rs => rs
+                        .select("Private_Message")
+                        .from("chat_data", "Reminder")
+                        .where("Active = %b", true)
+                        .where("Schedule IS NULL")
+                        .where("User_From = %n", data.User_From)
+                    ),
+                    sb.Query.getRecordset(rs => rs
+                        .select("Private_Message")
                         .from("chat_data", "Reminder")
                         .where("Active = %b", true)
                         .where("Schedule IS NULL")
                         .where("User_To = %n", data.User_To)
-                        .single()
-                    ));
-                }
+                    )
+                ]);
 
-                // @todo what an amazing fix, "* 2" 4HEad just make a new config (im too lazy to do this from RDP)
-                if (countCheckFrom && countCheckFrom.Count >= sb.Config.get("MAX_ACTIVE_REMINDERS") * 2) {
-                    throw new sb.Error({
-                        message: "You have too many pending reminders!"
-                    });
+                const incomingLimit = sb.Config.get("MAX_ACTIVE_INCOMING_REMINDERS");
+                const outgoingLimit = sb.Config.get("MAX_ACTIVE_OUTGOING_REMINDERS");
+                const [privateIncoming, publicIncoming] = sb.Utils.splitByCondition(incomingData, i => i.Private_Message);
+                const [privateOutgoing, publicOutgoing] = sb.Utils.splitByCondition(outgoingData, i => i.Private_Message);
+
+                if (publicIncoming.length >= incomingLimit) {
+                    return {
+                        success: false,
+                        cause: "public-incoming"
+                    };
                 }
-                else if (countCheckTo && countCheckTo.Count >= sb.Config.get("MAX_ACTIVE_REMINDERS")) {
-                    throw new sb.Error({
-                        message: "That person has too many pending reminders!"
-                    });
+                else if (publicOutgoing.length >= outgoingLimit) {
+                    return {
+                        success: false,
+                        cause: "public-outgoing"
+                    };
+                }
+                else if (privateIncoming.length >= incomingLimit) {
+                    return {
+                        success: false,
+                        cause: "private-outgoing"
+                    };
+                }
+                else if (privateOutgoing.length >= outgoingLimit) {
+                    return {
+                        success: false,
+                        cause: "private-outgoing"
+                    };
                 }
 
                 if (data.Schedule) {
@@ -319,7 +341,10 @@ module.exports = (function () {
             reminder.activateTimeout();
             Reminder.data.push(reminder);
 
-            return row.values.ID;
+            return {
+                success: true,
+                ID: row.values.ID
+            };
         }
 
         /**
