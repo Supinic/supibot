@@ -269,14 +269,14 @@ module.exports = (function () {
                         .from("chat_data", "Reminder")
                         .where("Active = %b", true)
                         .where("Schedule IS NULL")
-                        .where("User_To = %n", data.User_From)
+                        .where("User_To = %n", data.User_To)
                     ),
                     sb.Query.getRecordset(rs => rs
                         .select("Private_Message")
                         .from("chat_data", "Reminder")
                         .where("Active = %b", true)
                         .where("Schedule IS NULL")
-                        .where("User_From = %n", data.User_To)
+                        .where("User_From = %n", data.User_From)
                     )
                 ]);
 
@@ -324,7 +324,7 @@ module.exports = (function () {
                         .single()
                     ));
 
-                    if (scheduleCheck && scheduleCheck.Count >= sb.Config.get("MAX_ACTIVE_REMINDERS")) {
+                    if (scheduleCheck && scheduleCheck.Count >= sb.Config.get("MAX_ACTIVE_INCOMING_REMINDERS")) {
                         throw new sb.Error({
                             message: "That person has too many pending timed reminders for that target day!"
                         });
