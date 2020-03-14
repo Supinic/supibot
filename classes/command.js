@@ -113,8 +113,7 @@ module.exports = (function () {
 				data.Code = eval(data.Code);
 			}
 			catch (e) {
-				console.log("Command" + this.ID + " has invalid code definition: " + e.toString());
-				sb.SystemLogger.send("Command.Error", "Command " + this.Name + " (" + this.ID + ") has invalid code definition: " + e.toString() + "\n" + e.stack);
+				console.warn(`Command ${this.ID} has invalid code definition!`, e);
 				data.Code = async () => ({ reply: "Command has invalid code definition!" });
 			}
 
@@ -123,6 +122,22 @@ module.exports = (function () {
 			 * @type {Function}
 			 */
 			this.Code = data.Code;
+
+			/**
+			 * Data specific for the command. Usually hosts utils methods, or constants.
+			 * The object is deeply frozen, preventing any changes.
+			 * @type {Object}
+			 */
+			this.staticData = {};
+			if (data.Static_Data) {
+				try {
+					this.staticData = sb.Utils.deepFreeze(eval(data.Static_Data));
+				}
+				catch (e) {
+					console.warn(`Command ${this.ID} has invalid static data definition!`, e);
+					data.Code = async () => ({ reply: "Command has invalid static data definition!" });
+				}
+			}
 
 			/**
 			 * Session-specific data for the command that can be modified at runtime.
