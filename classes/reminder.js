@@ -269,14 +269,14 @@ module.exports = (function () {
                         .from("chat_data", "Reminder")
                         .where("Active = %b", true)
                         .where("Schedule IS NULL")
-                        .where("User_From = %n", data.User_From)
+                        .where("User_To = %n", data.User_From)
                     ),
                     sb.Query.getRecordset(rs => rs
                         .select("Private_Message")
                         .from("chat_data", "Reminder")
                         .where("Active = %b", true)
                         .where("Schedule IS NULL")
-                        .where("User_To = %n", data.User_To)
+                        .where("User_From = %n", data.User_To)
                     )
                 ]);
 
