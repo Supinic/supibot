@@ -21,10 +21,16 @@ Unlike AFK statuses, reminders are not public and so only reminders created by y
  - [Create a new reminder](https://supinic.com/api/#api-Bot-CreateReminder)
  - [List all your reminders](https://supinic.com/api/#api-Bot-ListReminders)
  - [Unset an active reminder](https://supinic.com/api/#api-Bot-UnsetReminder)
- 
+  
 ### Other endpoints
 - [List channels](https://supinic.com/api/#api-Bot-GetChannelList)
 - [Check optouts](https://supinic.com/api/#api-Bot-CheckFilterStatus)
 - [List all commands](https://supinic.com/api/#api-Bot-GetCommandList)
 - [Fortune cookie stats for a user](https://supinic.com/api/#api-Bot-GetCookieStatus)
 - [Fortune cookie stats globally](https://supinic.com/api/#api-Bot-ListCookieStats)
+
+### Stream-related endpoints
+These endpoints work with [my stream](https://twitch.tv/supinic) on Twitch.
+
+- [List playsounds](https://supinic.com/api/#api-Bot-GetPlaysoundList)
+- [Check playsounds status](https://supinic.com/api/#api-Bot-GetPlaysoundEnabled)
