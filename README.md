@@ -1,64 +1,26 @@
 # Supibot
-Main repository for the multi-platform chat bot Supibot.
+Main repository for the multi-platform, novelty and utility chat bot Supibot.
 
 ## Usage
 Supibot is not (yet) designed to be run as separate instances! Any changes to the code are welcome, but the bot was never designed to be run separately from its master instance. As such, all code changes will be reviewed on the master instance. I understand that this is not ideal for feature implementation, and separate instances will hopefully be supported soon.
 
 ## Platforms
-Supibot can and is currently run on four distinct platforms, each with a specific client file, located in `/clients/`.
-- Twitch
-- Discord
-- Cytube
-- Mixer
+Supibot can and is currently run on four distinct platforms, each with its own client file.
+- [Twitch](clients/twitch.js)
+- [Discord](clients/discord.js)
+- [Cytube](clients/cytube.js)
+- [Mixer](clients/mixer.js)
 
-Each client must implement basic methods of communication, regardless of the platform used. These include:
-- `send` to send messages to a specific channel
-- `pm` to send private messages, if platform supports it (in the other case, make sure to set a flag)
-- `mirror` to mirror messages into a different channel
+## I want to use Supibot!
+As Supibot is currently run as a single instance that joins multiple channel, it is required to follow one of these steps: 
 
-### I want Supibot in my Twitch channel!
-Please follow the guide(s) specified in the panels of the [bot's Twitch profile](https://twitch.tv/supibot).
+| Platform | Directions |
+| ------------- |:-------------:|
+| **Twitch channel** | Follow the guide in the panels of the bot's [Twitch profile](https://twitch.tv/supibot). |
+| **Discord server** | The admin of said server contact should PM me on Discord. See [Contact](https://supinic.com/contact). | 
+| **Cytube room**    | Not currently implemented. Please contact me for implementation details. |
+| **Mixer channel**  | Follow the guide in the description of the bot's [Mixer profile](https://mixer.com/supibot). |
 
-### I want Supibot in my Discord server!How do I get Supibot in my Discord server?
-An admin of said server should PM me on Discord. See [Contact](https://supinic.com/contact) for further info on contacting me.
-
-## Features
-The full command list can be found [on author's website](https://supinic.com/bot/command/list) or in [its repository](https://github.com/Supinic/supibot-sql) as a list of SQL update scripts. 
-Some of the features implemented commands provide include:
-- setting an AFK status, and specifying a message when coming back
-- reminders from user to user, timed reminders to others or yourself
-- generating random lines in the scope of current channel, from a local database of chat lines
-- opening and gifting a daily fortune cookie (resets daily on midnight UTC)
-- various API commands, such as ones related to stream info, weather, time, cat/dog pictures, fun facts, and many more...
-- *opting-out* of specific commands, which makes all users unable to use that command with that user's name as a parameter
-- *blocking* specific people from specific commands, which makes specific users unable to use a specific command on that user
-- *ping opt-out*, which makes a specific command not *ping* (notify) that user 
-- so-called "piping", which is executed through the _pipe_ command
-    - this allows to daisy-chain commands together, the first result being appended at the end of another command as extra arguments, and so on
-    - example: `$pipe news DE | translate` will look up German news, and translate them to (default) English
-    - example: `$pipe rw | urban | tt fancy` will generate a random word, search for its UrbanDictionary definition, and turn that into fancy text
-- many more commands, some of which use a local database
-
-Some of the features backend provides include:
-- Extensive custom and API banphrase checking
-  - Custom banphrases:
-    - are all defined in the database as code (`chat_data.Banphrase`) and are parsed to code form on startup (`sb.Banphrase`, [banphrase.js - class Banphrase](/custom_modules/supinic-globals/classes/banphrase.js))
-    - can be specific to channel, platform, or be global
-    - can set to replace specific words, entire messages, or make the bot not reply at all
-    - can be linked to API banphrases, in order to reply with a custom message (e.g. an API banphrase that rejects non-ASCII characters will not make the bot output a non-user friendly message, but rather something like "No special characters allowed!")
-    - if multiple exist for the same global/platform/channel context, then they are executed in a loop, ordered by Priority descending - if these are equal, then the banphrase ID is used instead
-  - API banphrases:
-    - are specific to certain channel
-    - currently only supports [Pajbot's](https://github.com/pajbot/pajbot) (and its forks') API banphrases
-    - for a closer look, inspect [banphrase.js - class ExternalBanphraseAPI](/custom_modules/supinic-globals/classes/banphrase.js)
-  - Since banphrases are all code-based and asynchronous by default, it is trivial to to create rather advanced "banphrase modules" that work with the messages in a way string-replacements or regular expressions could not achieve. Examples:
-    - "Anti-ping" - Replies with "That message pings too many users" if a message contains more than X amount of unique users that the bot has in its database of users
-    - "Celsius module" - Searches for all instances of a Fahrenheit temperature and appends a Celsius equivalent
-
-- So-called `mirroring` of channel-to-channel (see [master.js](/master.js) and [/clients](/clients), methods `mirror` in each)
-  - This takes all messages from one channel and re-sends them in another, across platforms if necessary
-  - Each channel can only have one mirror set up, in order to avoid exponential increase of messages sent.
-  - e.g. a simple mirror `1-to-1` sends one message per channel for a total of two, but a `1-to-1-to-1` mirror sends two messages per channel for a total of six, scaling `n*(n-1)` for `n` channels connected in this way, which is `O(n^2)`)
-  - Therefore, it is a design choice to keep the relationships limited to these practical cases:
-    - `1-to-1` (channels are mirrored together)
-    - `1-to-N` (channels are funneled to one aggregate channel) - This does not violate the exponential growth of messages, as an aggregate channel has its own mirror output disabled. Also, such a relationship does not yet exist in practice.  
+## Further reading
+- [API](docs/api.md)
+- [Feature overview](docs/features.md)
