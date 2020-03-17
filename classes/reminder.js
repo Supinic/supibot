@@ -474,7 +474,7 @@ module.exports = (function () {
                 };
             }
 
-            if (data.Schedule) {
+            if (schedule) {
                 const scheduleCheck = (await sb.Query.getRecordset(rs => rs
                     .select("COUNT(*) AS Count")
                     .from("chat_data", "Reminder")
