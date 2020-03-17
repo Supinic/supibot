@@ -257,78 +257,14 @@ module.exports = (function () {
          * @param {Object} data {@link Reminder}-compliant data
          * @param {boolean} [skipChecks = false] If true, skips all reminder checks. This is done for system reminders, so they always go through.
          * @return {ReminderCreationResult}
-         * @throws {sb.Error} If maximum active reminders have been exceeded.
          */
         static async create (data, skipChecks = false) {
             data.Active = true;
 
             if (!skipChecks) {
-                const [incomingData, outgoingData] = await Promise.all([
-                    sb.Query.getRecordset(rs => rs
-                        .select("Private_Message")
-                        .from("chat_data", "Reminder")
-                        .where("Active = %b", true)
-                        .where("Schedule IS NULL")
-                        .where("User_To = %n", data.User_To)
-                    ),
-                    sb.Query.getRecordset(rs => rs
-                        .select("Private_Message")
-                        .from("chat_data", "Reminder")
-                        .where("Active = %b", true)
-                        .where("Schedule IS NULL")
-                        .where("User_From = %n", data.User_From)
-                    )
-                ]);
-
-                const incomingLimit = sb.Config.get("MAX_ACTIVE_INCOMING_REMINDERS");
-                const outgoingLimit = sb.Config.get("MAX_ACTIVE_OUTGOING_REMINDERS");
-                const [privateIncoming, publicIncoming] = sb.Utils.splitByCondition(incomingData, i => i.Private_Message);
-                const [privateOutgoing, publicOutgoing] = sb.Utils.splitByCondition(outgoingData, i => i.Private_Message);
-
-                if (publicIncoming.length >= incomingLimit) {
-                    return {
-                        success: false,
-                        cause: "public-incoming"
-                    };
-                }
-                else if (publicOutgoing.length >= outgoingLimit) {
-                    return {
-                        success: false,
-                        cause: "public-outgoing"
-                    };
-                }
-                else if (privateIncoming.length >= incomingLimit) {
-                    return {
-                        success: false,
-                        cause: "private-outgoing"
-                    };
-                }
-                else if (privateOutgoing.length >= outgoingLimit) {
-                    return {
-                        success: false,
-                        cause: "private-outgoing"
-                    };
-                }
-
-                if (data.Schedule) {
-                    const scheduleCheck = (await sb.Query.getRecordset(rs => rs
-                        .select("COUNT(*) AS Count")
-                        .from("chat_data", "Reminder")
-                        .where("Active = %b", true)
-                        .where("Schedule IS NOT NULL")
-                        .where("User_To = %n", data.User_To)
-                        .where("DAY(Schedule) = %n", data.Schedule.day)
-                        .where("MONTH(Schedule) = %n", data.Schedule.month)
-                        .where("YEAR(Schedule) = %n", data.Schedule.year)
-                        .groupBy("YEAR(Schedule)", "MONTH(Schedule)", "DAY(Schedule)")
-                        .single()
-                    ));
-
-                    if (scheduleCheck && scheduleCheck.Count >= sb.Config.get("MAX_ACTIVE_INCOMING_REMINDERS")) {
-                        throw new sb.Error({
-                            message: "That person has too many pending timed reminders for that target day!"
-                        });
-                    }
+                const { success, message } = await Reminder.checkLimits(data.User_From, data.User_To, data.Schedule);
+                if (!success) {
+                    return { success, message };
                 }
             }
 
@@ -480,6 +416,89 @@ module.exports = (function () {
                     sb.Master.mirror(publicMessage, targetUserData, channelData.Mirror);
                 }
             }
+        }
+
+        /**
+         * Checks whether or not it is possible to set up a reminder for given user, respecting limits.
+         * Used mostly in commands to set up reminders.
+         * @param {number} userFrom
+         * @param {number} userTo
+         * @param {sb.Date} [schedule]
+         * @return {ReminderCreationResult}
+         */
+        static async checkLimits (userFrom, userTo, schedule) {
+            const [incomingData, outgoingData] = await Promise.all([
+                sb.Query.getRecordset(rs => rs
+                    .select("Private_Message")
+                    .from("chat_data", "Reminder")
+                    .where("Active = %b", true)
+                    .where("Schedule IS NULL")
+                    .where("User_To = %n", userTo)
+                ),
+                sb.Query.getRecordset(rs => rs
+                    .select("Private_Message")
+                    .from("chat_data", "Reminder")
+                    .where("Active = %b", true)
+                    .where("Schedule IS NULL")
+                    .where("User_From = %n", userFrom)
+                )
+            ]);
+
+            const incomingLimit = sb.Config.get("MAX_ACTIVE_INCOMING_REMINDERS");
+            const outgoingLimit = sb.Config.get("MAX_ACTIVE_OUTGOING_REMINDERS");
+            const [privateIncoming, publicIncoming] = sb.Utils.splitByCondition(incomingData, i => i.Private_Message);
+            const [privateOutgoing, publicOutgoing] = sb.Utils.splitByCondition(outgoingData, i => i.Private_Message);
+
+            if (publicIncoming.length >= incomingLimit) {
+                return {
+                    success: false,
+                    cause: "public-incoming"
+                };
+            }
+            else if (publicOutgoing.length >= outgoingLimit) {
+                return {
+                    success: false,
+                    cause: "public-outgoing"
+                };
+            }
+            else if (privateIncoming.length >= incomingLimit) {
+                return {
+                    success: false,
+                    cause: "private-outgoing"
+                };
+            }
+            else if (privateOutgoing.length >= outgoingLimit) {
+                return {
+                    success: false,
+                    cause: "private-outgoing"
+                };
+            }
+
+            if (data.Schedule) {
+                const scheduleCheck = (await sb.Query.getRecordset(rs => rs
+                    .select("COUNT(*) AS Count")
+                    .from("chat_data", "Reminder")
+                    .where("Active = %b", true)
+                    .where("Schedule IS NOT NULL")
+                    .where("User_To = %n", userTo)
+                    .where("DAY(Schedule) = %n", schedule.day)
+                    .where("MONTH(Schedule) = %n", schedule.month)
+                    .where("YEAR(Schedule) = %n", schedule.year)
+                    .groupBy("YEAR(Schedule)", "MONTH(Schedule)", "DAY(Schedule)")
+                    .single()
+                ));
+
+                if (scheduleCheck && scheduleCheck.Count >= incomingLimit) {
+                    return {
+                        success: false,
+                        cause: "scheduled-incoming"
+                    };
+                }
+            }
+
+            return {
+                success: false
+            };
         }
     };
 })();
