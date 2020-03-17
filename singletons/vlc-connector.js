@@ -175,7 +175,7 @@ module.exports = (function () {
 				}
 			}
 
-			if (status.currentplid === -1) {
+			if (status.currentplid === -1 || status.length === -1) {
 				return null;
 			}
 
