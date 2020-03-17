@@ -497,7 +497,7 @@ module.exports = (function () {
             }
 
             return {
-                success: false
+                success: true
             };
         }
     };
