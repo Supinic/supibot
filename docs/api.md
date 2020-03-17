@@ -32,5 +32,5 @@ Unlike AFK statuses, reminders are not public and so only reminders created by y
 ### Stream-related endpoints
 These endpoints work with [my stream](https://twitch.tv/supinic) on Twitch.
 
-- [List playsounds](https://supinic.com/api/#api-Bot-GetPlaysoundList)
-- [Check playsounds status](https://supinic.com/api/#api-Bot-GetPlaysoundEnabled)
+- [List playsounds](https://supinic.com/api/#api-Stream-GetPlaysoundList)
+- [Check playsounds status](https://supinic.com/api/#api-Stream-GetPlaysoundEnabled)
