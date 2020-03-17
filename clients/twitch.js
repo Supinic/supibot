@@ -49,9 +49,15 @@ module.exports = (function () {
 			});
 
 			client.on("USERSTATE", async (messageObject) => {
-				const {emoteSets} = messageObject;
+				const { emoteSets } = messageObject;
+				const strings = [
+					emoteSets.sort().join(","),
+					(this.availableEmoteSets)
+						? this.availableEmoteSets.sort().join(",")
+						: null
+				];
 
-				if (emoteSets !== this.availableEmoteSets) {
+				if (strings[0] !== strings[1]) {
 					this.availableEmoteSets = emoteSets;
 
 					const emoteData = await sb.Got.instances.Twitch.Kraken({
