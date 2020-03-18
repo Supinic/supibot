@@ -124,6 +124,12 @@ module.exports = (function () {
 			this.Code = data.Code;
 
 			/**
+			 * Session-specific data for the command that can be modified at runtime.
+			 * @type {Object}
+			 */
+			this.data = {};
+
+			/**
 			 * Data specific for the command. Usually hosts utils methods, or constants.
 			 * The object is deeply frozen, preventing any changes.
 			 * @type {Object}
@@ -138,12 +144,6 @@ module.exports = (function () {
 					data.Code = async () => ({ reply: "Command has invalid static data definition!" });
 				}
 			}
-
-			/**
-			 * Session-specific data for the command that can be modified at runtime.
-			 * @type {Object}
-			 */
-			this.data = {};
 		}
 
 		/**
