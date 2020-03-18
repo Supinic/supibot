@@ -262,9 +262,9 @@ module.exports = (function () {
             data.Active = true;
 
             if (!skipChecks) {
-                const { success, message } = await Reminder.checkLimits(data.User_From, data.User_To, data.Schedule);
+                const { success, cause } = await Reminder.checkLimits(data.User_From, data.User_To, data.Schedule);
                 if (!success) {
-                    return { success, message };
+                    return { success, cause };
                 }
             }
 
@@ -279,6 +279,7 @@ module.exports = (function () {
 
             return {
                 success: true,
+                cause: null,
                 ID: row.values.ID
             };
         }
