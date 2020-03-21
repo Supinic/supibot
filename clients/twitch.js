@@ -352,7 +352,10 @@ module.exports = (function () {
 						userBadgeInfo: userState.badgeInfo,
 						color: userState.color,
 						colorRaw: userState.colorRaw,
-						privateMessage: (messageType === "whisper")
+						privateMessage: (messageType === "whisper"),
+						messageID: ircTags.id,
+						emotes: ircTags.emotes,
+						customRewardID: ircTags["custom-reward-id"] ?? null
 					}
 				);
 
