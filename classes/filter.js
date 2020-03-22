@@ -158,11 +158,7 @@ module.exports =  (function () {
 		 * @throws {sb.Error} If an invalid filter configuration is encountered.
 		 */
 		static checkBlacklists (options) {
-			const {userID, channelID, commandID} = options;
-			if (sb.Config.get("BAN_IMMUNE_USERS").includes(userID)) {
-				return false;
-			}
-
+			const { userID, channelID, commandID } = options;
 			const blacklists = Filter.data.filter(i => i.Active && i.Type === "Blacklist");
 			const blacklist = blacklists.find(filter => {
 				if (filter.User_Alias === userID) {
@@ -204,7 +200,13 @@ module.exports =  (function () {
 				}
 				else if (blacklist.Channel && blacklist.User_Alias) {
 					// Impound a heavy cooldown for the user, as they are filterned channel-wide
-					sb.CooldownManager.penalize(userID, channelID);
+					sb.CooldownManager.set(
+						channelID,
+						userID,
+						null,
+						60 * 60_000
+					);
+
 					return "You cannot execute any commands in this channel.";
 				}
 				else if (blacklist.User_Alias && blacklist.Command) {
@@ -212,7 +214,12 @@ module.exports =  (function () {
 				}
 				else if (blacklist.User_Alias) {
 					// Impound a heavy cooldown for the user, as they are filterned bot-wide
-					sb.CooldownManager.penalize(userID);
+					sb.CooldownManager.set(
+						null,
+						userID,
+						null,
+						60 * 60_000
+					);
 					return "You cannot execute any commands in any channel.";
 				}
 				else if (blacklist.Command) {
