@@ -216,10 +216,6 @@ module.exports = class Cytube {
 			//
 			// request(data.image).pipe(fs.createWriteStream("/code/emotes/" + filename));
 		});
-
-		client.on("voteskip", (evt, a, b, c) => {
-			// console.log("Voteskip", evt, a, b, c);
-		});
 	}
 
 	/**
