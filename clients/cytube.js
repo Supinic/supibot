@@ -28,7 +28,7 @@ module.exports = class Cytube {
 		/** @type {Channel} */
 		this.channelData = sb.Channel.get("forsenoffline"); // @todo change this
 
-		this.userList = [];
+		this.userMap = new Map();
 		this.playlistData = [];
 		this.currentlyPlaying = null;
 
@@ -39,16 +39,17 @@ module.exports = class Cytube {
 		const client = this.client;
 
 		client.on("clientready", () => {
-			console.log("Cytube connected!");
-
 			clearInterval(this.restartInterval);
 			this.restarting = false;
 		});
 
 		// Userlist initialize event - save current user data
 		client.on("userlist", (data = []) => {
-			for (const user of data) {
-				this.userList.push(user);
+			for (const record of data) {
+				if (typeof record.name === "string") {
+					record.name = record.name.toLowerCase();
+					this.userMap.set(record.name, record);
+				}
 			}
 		});
 
@@ -86,8 +87,18 @@ module.exports = class Cytube {
 			}
 
 			const msg = sb.Utils.fixHTML(data.msg).replace(/<(?:.|\n)*?>/gm, "");
+			const platformUserData = this.userMap.get(data.username);
 			const userData = await sb.User.get(data.username.toLowerCase(), false);
+
 			if (!userData) {
+				return;
+			}
+			else if (!platformUserData) {
+				client.getUserList();
+				return;
+			}
+			else if (platformUserData.rank === 0) {
+				console.warn("Cytube: User with rank too low", { data, platformUserData });
 				return;
 			}
 
@@ -146,20 +157,16 @@ module.exports = class Cytube {
 
 		// User joined channel
 		client.on("addUser", async (data) => {
-			if (typeof data.username !== "string") {
-				return;
+			if (typeof data.name === "string") {
+				data.name = data.name.toLowerCase();
+				this.userMap.set(data.name, data);
 			}
-
-			sb.User.get(data.username.toLowerCase(), false);
-			this.userList.push(data);
 		});
 
 		// User left channel
 		client.on("userLeave", (data) => {
-			const index = this.userList.findIndex(i => i.name === data.name);
-			if (index !== -1) {
-				this.userList.splice(index, 1);
-			}
+			data.name = data.name.toLowerCase();
+			this.userMap.delete(data.name);
 		});
 
 		// Video deleted from queue by moderator
@@ -298,19 +305,6 @@ module.exports = class Cytube {
 				this.send(message);
 			}
 		}
-	}
-
-	queueVideo (id, type = "yt") {
-		return;
-
-		// this.client.emit("queue", JSON.stringify({
-		// 	type: type,
-		// 	id: id,
-		// 	temp: true,
-		// 	pos: "end",
-		// 	duration: 0,
-		// 	queueby: sb.Config.get("CYTUBE_SELF")
-		// }));
 	}
 
 	/**
