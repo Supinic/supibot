@@ -212,6 +212,10 @@
 			}
 		}
 
+		async globalMessageListener (platform, channel, user, message) {
+			// @todo
+		}
+
 		/**
 		 * @returns {string} Global command prefix.
 		 */

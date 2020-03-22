@@ -121,6 +121,13 @@ module.exports = class Cytube {
 				sb.SystemLogger.send("Cytube.Other", "PM: " + msg, this.channelData, userData);
 			}
 
+			sb.Master.globalMessageListener(
+				this.platform,
+				(data.meta.private) ? null : this.channelData,
+				userData,
+				msg
+			);
+
 			// Handle commands if the message starts with the command prefix
 			if (msg.startsWith(sb.Master.commandPrefix)) {
 				const arg = msg.trim().replace(/\s+/, " ").split(" ");

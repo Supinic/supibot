@@ -20,8 +20,6 @@ module.exports = (function () {
 			this.userIDTimeout = 0;
 			this.failedJoinChannels = new Set();
 
-			this.emoteFetchTimeout = 0;
-
 			this.initListeners();
 
 			this.client.connect();
@@ -333,6 +331,8 @@ module.exports = (function () {
 			if (typeof bits !== "undefined" && bits !== null) {
 				sb.SystemLogger.send("Twitch.Other", bits + " bits", channelData, userData);
 			}
+
+			sb.Master.globalMessageListener(this.platform, channelData, userData, message);
 
 			// Check and execute command if necessary
 			if (message.startsWith(sb.Config.get("COMMAND_PREFIX"))) {

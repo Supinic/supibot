@@ -123,9 +123,9 @@ module.exports = (function () {
 			if (channelData.Custom_Code) {
 				channelData.Custom_Code({
 					type: "message",
-					message: message,
 					user: userData,
-					channel: channelData
+					channel: channelData,
+					message
 				});
 			}
 
@@ -141,6 +141,8 @@ module.exports = (function () {
 			if (userData.Name === this.name) {
 				return;
 			}
+
+			sb.Master.globalMessageListener(this.platform, channelData, userData, message);
 
 			// Check and execute command if necessary
 			if (message.startsWith(sb.Config.get("COMMAND_PREFIX"))) {

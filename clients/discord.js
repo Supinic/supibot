@@ -85,6 +85,8 @@ module.exports = (function () {
 					return;
 				}
 
+				sb.Master.globalMessageListener(this.platform, channelData, userData, msg);
+
 				// Starts with correct prefix - handle command
 				if (msg.startsWith(commandPrefix)) {
 					const command = msg.replace(commandPrefix, "").split(" ")[0];
@@ -102,7 +104,7 @@ module.exports = (function () {
 						}
 					);
 				}
-			});
+			});wu
 
 			client.on("error", (err) => {
 				console.error(err);
