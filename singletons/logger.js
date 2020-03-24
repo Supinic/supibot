@@ -147,7 +147,6 @@ module.exports = (function (Module) {
 					["User_Alias", "Channel", "Length", "Issued"]
 				);
 
-
 				this.commandBatch = await sb.Query.getBatch(
 					"chat_data",
 					"Command_Execution",
