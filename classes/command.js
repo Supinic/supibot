@@ -397,6 +397,14 @@ module.exports = (function () {
 				execution = await command.Code(data, ...args);
 				const end = process.hrtime.bigint();
 
+				let result = null;
+				if (execution?.reply) {
+					result = execution.reply.slice(0, 300);
+				}
+				else if (execution?.partialReplies) {
+					result = execution.partialReplies.map(i => i.message).join(" ").slice(0, 300);
+				}
+
 				sb.Runtime.incrementCommandsCounter();
 				sb.Logger.logCommandExecution({
 					User_Alias: userData.ID,
@@ -407,9 +415,7 @@ module.exports = (function () {
 					Success: true,
 					Invocation: identifier,
 					Arguments: JSON.stringify(args),
-					Result: (typeof execution?.reply === "string")
-						? execution.reply.slice(0, 300)
-						: null,
+					Result: result,
 					Execution_Time: sb.Utils.round(Number(end - start) / 1.0e6, 3)
 				});
 			}
