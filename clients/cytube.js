@@ -86,9 +86,12 @@ module.exports = class Cytube {
 				return;
 			}
 
+			data.username = data.username.toLowerCase();
 			const msg = sb.Utils.fixHTML(data.msg).replace(/<(?:.|\n)*?>/gm, "");
-			const platformUserData = this.userMap.get(data.username);
-			const userData = await sb.User.get(data.username.toLowerCase(), false);
+			const userData = await sb.User.get(data.username, false);
+			const platformUserData = (data.username === "[server]")
+				? { rank: -1 }
+				: this.userMap.get(data.username);
 
 			if (!userData) {
 				return;
@@ -98,7 +101,7 @@ module.exports = class Cytube {
 				return;
 			}
 			else if (platformUserData.rank === 0) {
-				console.warn("Cytube: User with rank too low", { data, platformUserData });
+				console.warn("Cytube: user rank too low", { data, platformUserData });
 				return;
 			}
 
