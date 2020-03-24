@@ -104,7 +104,7 @@ module.exports = (function () {
 						}
 					);
 				}
-			});wu
+			});
 
 			client.on("error", (err) => {
 				console.error(err);
