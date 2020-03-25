@@ -455,6 +455,19 @@ module.exports = (function () {
 		async handleBan (user, channel, reason = null, length = null) {
 			const channelData = sb.Channel.get(channel);
 			if (channelData) {
+				if (typeof channelData.sessionData.recentBans === "undefined") {
+					channelData.sessionData.recentBans = 0;
+				}
+				if (channelData.sessionData.recentBans > sb.Config.get("TWITCH_RECENT_BANS_THRESHOLD")) {
+					console.log(`Parting channel ${channelData.Name} because ban threshold has been exceeded!`);
+					this.client.part(channelData.name);
+					setTimeout(() => {
+						console.log(`Re-joining channel ${channelData.Name}!`);
+						this.client.join(channelData.name)
+					}, 60_000);
+				}
+
+				channelData.sessionData.recentBans++;
 				sb.Logger.logBan(user, channelData, length, new sb.Date(), reason);
 			}
 		}
