@@ -458,12 +458,18 @@ module.exports = (function () {
 				if (typeof channelData.sessionData.recentBans === "undefined") {
 					channelData.sessionData.recentBans = 0;
 				}
-				if (channelData.sessionData.recentBans > sb.Config.get("TWITCH_RECENT_BANS_THRESHOLD")) {
+
+				if (!channelData.sessionData.parted && channelData.sessionData.recentBans > sb.Config.get("TWITCH_RECENT_BANS_THRESHOLD")) {
 					console.log(`Parting channel ${channelData.Name} because ban threshold has been exceeded!`);
-					this.client.part(channelData.name);
+
+					channelData.sessionData.parted = true;
+					this.client.part(channelData.Name);
+
 					setTimeout(() => {
 						console.log(`Re-joining channel ${channelData.Name}!`);
-						this.client.join(channelData.name)
+
+						channelData.sessionData.parted = false;
+						this.client.join(channelData.Name)
 					}, 60_000);
 				}
 
