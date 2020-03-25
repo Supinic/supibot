@@ -111,9 +111,9 @@ module.exports = (function (Module) {
 					}
 				}
 
-				const channelList = Array.from(new Set(...this.banCollector.values()))
-					.map(channelID => sb.Channel.get(channelID))
-					.filter(Boolean);
+				const channelList = Array.from(this.banCollector.values())
+					.map(record => sb.Channel.get(record.Channel))
+					.filter((i, ind, arr) => i && arr.indexOf(i) === ind);
 
 				for (const channelData of channelList) {
 					channelData.sessionData.recentBans = 0;
