@@ -436,15 +436,17 @@ module.exports = (function () {
 				}
 
 				// april fools "module"
+				let modified = false;
 				const now = new sb.Date();
 				if (now.month === 4 && now.day === 1 && typeof execution.reply === "string") {
+					modified = true;
 					execution.reply = Array.from(execution.reply)
 						.reverse()
 						.join("")
 						.replace(/[()]/g, (char) => (char === ")") ? "(": ")");
 				}
 
-				let message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
+				let message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: modified });
 				if (message) {
 					this.send(message, channelData);
 				}
