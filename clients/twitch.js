@@ -435,7 +435,16 @@ module.exports = (function () {
 					this.mirror(execution.reply, userData, channelData, true);
 				}
 
-				const message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
+				// april fools "module"
+				const now = new sb.Date();
+				if (now.month === 4 && now.day === 1 && typeof execution.reply === "string") {
+					execution.reply = Array.from(execution.reply)
+						.reverse()
+						.join("")
+						.replace(/[()]/g, (char) => (char === ")") ? "(": ")");
+				}
+
+				let message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
 				if (message) {
 					this.send(message, channelData);
 				}
