@@ -2,10 +2,35 @@
 module.exports = (function () {
 	"use strict";
 
+	const ClientVLC = require("node-vlc-http");
+	const actions = [
+		"play",
+		"pause",
+		"stop",
+		"resume",
+		"forcePause",
+		"playlistNext",
+		"playlistPrevious",
+		"playlistEmpty",
+		"sortPlaylist",
+		"toggleRandom",
+		"toggleLoop",
+		"toggleRpeat",
+		"toggleFullscreen",
+		"seek",
+		"seekToChapter"
+	];
+
 	return class VideoLANConnector {
 		static singleton () {
 			if (!VideoLANConnector.module) {
-				VideoLANConnector.module = new VideoLANConnector(sb.Config.get("LOCAL_VLC_BASE_URL"));
+				VideoLANConnector.module = new VideoLANConnector({
+					baseURL: sb.Config.get("LOCAL_VLC_BASE_URL"),
+					url: "192.168.0.100",
+					port: 8080,
+					username: "supinic",
+					password: "",
+				});
 			}
 			return VideoLANConnector.module;
 		}
@@ -15,11 +40,42 @@ module.exports = (function () {
 		 * @name sb.VideoLANConnector
 		 * @type VideoLANConnector()
 		 */
-		constructor (baseURL) {
-			this.baseURL = baseURL;
+		constructor (options = {}) {
+			this.client = new ClientVLC({
+				host: baseURL,
+				port: 8080,
+				username: options.username,
+				password: options.password,
+				autoUpdate: true,
+				changeEvents: true,
+				tickLengthMs: 1000,
+			});
+
+			this.baseURL = options.baseURL;
 			this.videoQueue = [];
 			this.requestsID = {};
+
+			this._actions = {};
+			for (const action of actions) {
+				this._actions[action] = (...args) => this.client[action](...args)
+			}
+
+			this.initListeners();
 		}
+
+		initListeners () {
+			const client = this.client;
+
+			client.on("statuschange", (prev, next) => {
+				console.log("VLC status change", {prev, next});
+			});
+
+			client.on("playlistchange", (prev, next) => {
+				console.log("VLC playlist change", {prev, next});
+			});
+		}
+
+		get actions () { return this._actions; }
 
 		/**
 		 * Sends a raw command to the API. Only used internally.
