@@ -479,9 +479,6 @@ module.exports = (function () {
 					execution.reply = string + ", " + execution.reply;
 				}
 
-				// Apply all unpings to the result.
-				execution.reply = await sb.Filter.applyUnping(command, execution.reply);
-
 				const metaSkip = Boolean(options.skipBanphrases || execution?.meta?.skipBanphrases);
 				if (!command.Skip_Banphrases && !metaSkip) {
 					const {passed, string} = await sb.Banphrase.execute(execution.reply.slice(0, 1000), channelData);
@@ -499,6 +496,9 @@ module.exports = (function () {
 				else if (command.Rollbackable) {
 					data.transaction.commit();
 				}
+
+				// Apply all unpings to the result.
+				execution.reply = await sb.Filter.applyUnping(command, execution.reply);
 			}
 
 			return execution;
