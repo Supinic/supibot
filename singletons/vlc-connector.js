@@ -2,8 +2,11 @@
 module.exports = (function () {
 	"use strict";
 
-	const ClientVLC = require("node-vlc-http");
+	const { VLC } = require("node-vlc-http");
 	const actions = [
+		"addToQueue",
+		"addToQueueAndPlay",
+		"addSubtitle",
 		"play",
 		"pause",
 		"stop",
@@ -15,7 +18,7 @@ module.exports = (function () {
 		"sortPlaylist",
 		"toggleRandom",
 		"toggleLoop",
-		"toggleRpeat",
+		"toggleRepeat",
 		"toggleFullscreen",
 		"seek",
 		"seekToChapter"
@@ -28,8 +31,8 @@ module.exports = (function () {
 					baseURL: sb.Config.get("LOCAL_VLC_BASE_URL"),
 					url: "192.168.0.100",
 					port: 8080,
-					username: "supinic",
-					password: "",
+					username: "",
+					password: "supinic",
 				});
 			}
 			return VideoLANConnector.module;
@@ -41,9 +44,9 @@ module.exports = (function () {
 		 * @type VideoLANConnector()
 		 */
 		constructor (options = {}) {
-			this.client = new ClientVLC({
-				host: baseURL,
-				port: 8080,
+			this.client = new VLC({
+				host: options.url,
+				port: options.port,
 				username: options.username,
 				password: options.password,
 				autoUpdate: true,
@@ -66,12 +69,60 @@ module.exports = (function () {
 		initListeners () {
 			const client = this.client;
 
-			client.on("statuschange", (prev, next) => {
-				console.log("VLC status change", {prev, next});
+			client.on("statuschange", (before, after) => {
+				const previous = before.currentplid;
+				const next = after.currentplid;
+
+				if (previous !== next) {
+					// Playlist is finished, nothing is playing.
+					if (next === -1) {
+						client.emit("videochange", null);
+					}
+					// Moving to new song in the queue.
+					else {
+						client.emit("videochange", this.currentPlaylistItem);
+					}
+				}
 			});
 
-			client.on("playlistchange", (prev, next) => {
-				console.log("VLC playlist change", {prev, next});
+			client.on("videochange", async (nowPlaying) => {
+				if (nowPlaying) {
+					const id = Number(nowPlaying.id);
+					await sb.Query.getRecordUpdater(rs => rs
+						.update("chat_data", "Song_Request")
+						.set("Status", "Inactive")
+						.where("Status = %s", "Current")
+						.where("VLC_ID <> %n", id)
+					);
+					await sb.Query.getRecordUpdater(rs => rs
+						.update("chat_data", "Song_Request")
+						.set("Status", "Current")
+						.where("VLC_ID = %n", id)
+						.where("Status = %s", "Queued")
+					);
+				}
+				else {
+					await sb.Query.getRecordUpdater(rs => rs
+						.update("chat_data", "Song_Request")
+						.set("Status", "Inactive")
+						.where("Status = %s", "Current")
+					);
+				}
+			});
+
+			client.on("playlistchange", async (prev, next) => {
+				const previousIDs = prev.children[0].children.map(i => Number(i.id));
+				const nextIDs = next.children[0].children.map(i => Number(i.id));
+
+				const missingIDs = previousIDs.filter(id => !nextIDs.includes(id));
+				if (missingIDs.length > 0) {
+					await sb.Query.getRecordUpdater(rs => rs
+						.update("chat_data", "Song_Request")
+						.set("Status", "Inactive")
+						.where("VLC_ID IN %n+", missingIDs)
+						.where("Status IN %s+", ["Queued", "Current"])
+					);
+				}
 			});
 		}
 
@@ -148,7 +199,7 @@ module.exports = (function () {
 				await this.getStatus("in_enqueue", {input: link});
 			}
 
-			const newID = Math.max(...(await this.getPlaylist()).children.map(i => i.id)) + 1;
+			const newID = Math.max(...(await this.getPlaylist()).children.map(i => i.id));
 
 			this.requestsID[user] = this.requestsID[user] || [];
 			this.requestsID[user].push(newID);
@@ -250,6 +301,16 @@ module.exports = (function () {
 		async getDataByName (name, link) {
 			const playlist = await this.playlist();
 			return playlist.children.find(i => i.name === name || i.name === link);
+		}
+		get currentPlaylist () {
+			return this.client._playlist?.children?.[0]?.children ?? [];
+		}
+
+		get currentPlaylistItem () {
+			return this.currentPlaylist.find(i => (
+				i.current === "current"
+				|| Array.isArray(i.children) && i.children.some(j => j.current === "current")
+			)) ?? null;
 		}
 
 		get modulePath () { return "vlc-connector"; }
