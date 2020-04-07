@@ -86,21 +86,38 @@ module.exports = (function () {
 			});
 
 			client.on("videochange", async (nowPlaying) => {
+				// Video changed from previous to next track.
 				if (nowPlaying) {
 					const id = Number(nowPlaying.id);
-					await sb.Query.getRecordUpdater(rs => rs
-						.update("chat_data", "Song_Request")
-						.set("Status", "Inactive")
-						.where("Status = %s", "Current")
-						.where("VLC_ID <> %n", id)
-					);
-					await sb.Query.getRecordUpdater(rs => rs
-						.update("chat_data", "Song_Request")
-						.set("Status", "Current")
-						.where("VLC_ID = %n", id)
-						.where("Status = %s", "Queued")
-					);
+					await Promise.all([
+						// Set all previous "queued" songs to inactive - preventive measure
+						sb.Query.getRecordUpdater(rs => rs
+							.update("chat_data", "Song_Request")
+							.set("Status", "Inactive")
+							.where("Status = %s", "Queued")
+							.where("VLC_ID < %n", id)
+						),
+
+						// Set the previous current song to "Inactive", as it is no longer playing.
+						sb.Query.getRecordUpdater(rs => rs
+							.update("chat_data", "Song_Request")
+							.set("Status", "Inactive")
+							.set("Ended", new sb.Date())
+							.where("Status = %s", "Current")
+							.where("VLC_ID <> %n", id)
+						),
+
+						// Set the next queued song to "Current", because it just started playing.
+						await sb.Query.getRecordUpdater(rs => rs
+							.update("chat_data", "Song_Request")
+							.set("Status", "Current")
+							.set("Started", new sb.Date())
+							.where("VLC_ID = %n", id)
+							.where("Status = %s", "Queued")
+						)
+					]);
 				}
+				// Video changed from previous track to empty playlist.
 				else {
 					await sb.Query.getRecordUpdater(rs => rs
 						.update("chat_data", "Song_Request")
