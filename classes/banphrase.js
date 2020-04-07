@@ -115,9 +115,10 @@ module.exports = (function () {
 		 * If a channel is configured to use an external API, that is chcked too.
 		 * @param {string} message
 		 * @param {Channel|null} channelData
+		 * @param {Object} options = {}
 		 * @returns {Promise<BanphraseCheckResult>}
 		 */
-		static async execute (message, channelData) {
+		static async execute (message, channelData, options= {}) {
 			const banphraseList = Banphrase.data.filter(banphrase => (
 				(banphrase.Type !== "API response") && (
 					(banphrase.Channel === (channelData?.ID ?? null))
@@ -142,7 +143,8 @@ module.exports = (function () {
 			}
 
 			// If channel has a banphrase API, check it afterwards
-			if (channelData?.Banphrase_API_Type) {
+			// Skip this check if it has been requested to be skipped
+			if (!options.skipBanphraseAPI && channelData?.Banphrase_API_Type) {
 				let response = null;
 				try {
 					response = await Banphrase.executeExternalAPI(
