@@ -422,11 +422,12 @@ module.exports = (function () {
 			catch (e) {
 				console.error(e);
 				const errorID = await sb.SystemLogger.sendError("Command", e, ...args);
+				const emote = (channelData?.ID === 38) ? "WEEWOO" : "";
 
 				execution = {
 					success: false,
 					reason: "error",
-					reply: "An internal error occured! Error ID: " + errorID
+					reply: `${emote} An error ID ${errorID} occured! ${emote}`
 				};
 			}
 
