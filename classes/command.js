@@ -522,7 +522,11 @@ module.exports = (function () {
 						cooldownData = [cooldownData];
 					}
 
-					for (const cooldown of cooldownData) {
+					for (let cooldown of cooldownData) {
+						if (typeof cooldown === "number") {
+							cooldown = { length: cooldown };
+						}
+
 						const {
 							channel = channelID,
 							user = userData.ID,
