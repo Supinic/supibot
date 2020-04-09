@@ -51,7 +51,7 @@ module.exports = (function () {
 				password: options.password,
 				autoUpdate: true,
 				changeEvents: true,
-				tickLengthMs: 1000,
+				tickLengthMs: 250,
 			});
 
 			this.baseURL = options.baseURL;
@@ -69,60 +69,41 @@ module.exports = (function () {
 		initListeners () {
 			const client = this.client;
 
-			client.on("statuschange", (before, after) => {
+			client.on("statuschange", async (before, after) => {
 				const previous = before.currentplid;
 				const next = after.currentplid;
 
 				if (previous !== next) {
-					// Playlist is finished, nothing is playing.
-					if (next === -1) {
-						client.emit("videochange", null);
-					}
-					// Moving to new song in the queue.
-					else {
-						client.emit("videochange", this.currentPlaylistItem);
-					}
+					const { children }  = await this.playlist();
+					client.emit("videochange", previous, next, children);
 				}
 			});
 
-			client.on("videochange", async (nowPlaying) => {
-				// Video changed from previous to next track.
-				if (nowPlaying) {
-					const id = Number(nowPlaying.id);
-					await Promise.all([
-						// Set all previous "queued" songs to inactive - preventive measure
-						sb.Query.getRecordUpdater(rs => rs
-							.update("chat_data", "Song_Request")
-							.set("Status", "Inactive")
-							.where("Status = %s", "Queued")
-							.where("VLC_ID < %n", id)
-						),
-
-						// Set the previous current song to "Inactive", as it is no longer playing.
-						sb.Query.getRecordUpdater(rs => rs
-							.update("chat_data", "Song_Request")
-							.set("Status", "Inactive")
-							.set("Ended", new sb.Date())
-							.where("Status = %s", "Current")
-							.where("VLC_ID <> %n", id)
-						),
-
-						// Set the next queued song to "Current", because it just started playing.
-						await sb.Query.getRecordUpdater(rs => rs
-							.update("chat_data", "Song_Request")
-							.set("Status", "Current")
-							.set("Started", new sb.Date())
-							.where("VLC_ID = %n", id)
-							.where("Status = %s", "Queued")
-						)
-					]);
+			client.on("videochange", async (previousID, nextID, playlist) => {
+				const previousTrack = this.matchParent(playlist, previousID);
+				const nextTrack = this.matchParent(playlist, nextID);
+				if (previousTrack === nextTrack) {
+					return;
 				}
-				// Video changed from previous track to empty playlist.
-				else {
+
+				if (previousTrack) {
+					// Finalize the previous video, if it exists (might not exist because of playlist being started)
 					await sb.Query.getRecordUpdater(rs => rs
 						.update("chat_data", "Song_Request")
 						.set("Status", "Inactive")
+						.set("Ended", new sb.Date())
 						.where("Status = %s", "Current")
+						.where("VLC_ID = %n", Number(previousTrack.id))
+					);
+				}
+				if (nextTrack) {
+					// Assign the started to the next video, because it just started playing.
+					await sb.Query.getRecordUpdater(rs => rs
+						.update("chat_data", "Song_Request")
+						.set("Status", "Current")
+						.set("Started", new sb.Date())
+						.where("VLC_ID = %n", Number(nextTrack.id))
+						.where("Status = %s", "Queued")
 					);
 				}
 			});
@@ -313,6 +294,20 @@ module.exports = (function () {
 					return songData.link === targetURL;
 				}
 			});
+		}
+
+		matchParent (list, targetID) {
+			for (const track of list) {
+				const ID = Number(track.id);
+				if (targetID === ID) {
+					return track;
+				}
+				else if (track.children && this.matchParent(track.children, targetID)) {
+					return track;
+				}
+			}
+
+			return null;
 		}
 
 		async getDataByName (name, link) {
