@@ -552,6 +552,20 @@ module.exports = (function () {
 			sb.SystemLogger.send("Twitch.Giftsub", logMessage, channelData, data.recipient || null);
 		}
 
+		/**
+		 * Determines if a user is an owner of a given channel.
+		 * @param {Channel} channelData
+		 * @param {User} userData
+		 * @returns {boolean}
+		 */
+		isUserChannelOwner (channelData, userData) {
+			if (userData === null || channelData === null) {
+				return false;
+			}
+
+			return (channelData.Specific_ID === userData.Twitch_ID);
+		}
+
 		mirror (message, userData, channelData, commandUsed = false) {
 			const fixedMessage = (commandUsed)
 				? sb.Config.get("MIRROR_IDENTIFIER_TWITCH") + " " + message

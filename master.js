@@ -228,4 +228,5 @@
 	});
 
 	sb.Master = new Master();
+	sb.Platform.assignClients(sb.Master.clients);
 })();
