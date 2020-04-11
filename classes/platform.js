@@ -27,10 +27,34 @@ module.exports = (function () {
 			 * @type {string}
 			 */
 			this.Name = data.Name.toLowerCase();
+
+			/**
+			 * Platform client
+			 * @type {Client|null}
+			 */
+			this.client = null;
 		}
 
 		get capital () {
 			return sb.Utils.capitalize(this.Name);
+		}
+
+		/**
+		 * Determines if a user is an "owner" of a given channel in the platform.
+		 * @param channel
+		 * @param user
+		 * @returns {null|boolean}
+		 */
+		isUserChannelOwner (channel, user) {
+			if (typeof this?.client?.isUserChannelOwner !== "function") {
+				return null;
+			}
+
+			return this.client.isUserChannelOwner(channel, user);
+		}
+
+		destroy () {
+			this.client = null;
 		}
 
 		/** @override */
@@ -49,6 +73,19 @@ module.exports = (function () {
 		static async reloadData () {
 			Platform.data = [];
 			await Platform.loadData();
+		}
+
+		/**
+		 * Assigns clients to each platform after the clients have been prepared properly.
+		 * @param {Object<string, Client>}clients
+		 */
+		static assignClients (clients) {
+			for (const [name, client] of Object.entries(clients)) {
+				const platform = Platform.get(name);
+				if (platform) {
+					platform.client = client;
+				}
+			}
 		}
 
 		static get (identifier) {
@@ -73,6 +110,10 @@ module.exports = (function () {
 		 * Cleans up.
 		 */
 		static destroy () {
+			for (const platform of Platform.data) {
+				platform.destroy();
+			}
+
 			Platform.data = null;
 		}
 	};

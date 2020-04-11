@@ -24,7 +24,7 @@ module.exports = (function () {
 
             /**
              * Platform name. Must be unique when combined with {@link Channel.Name}.
-             * @type {PlatformIdentifier}
+             * @type {Platform}
              */
             this.Platform = sb.Platform.get(data.Platform);
 
@@ -219,6 +219,15 @@ module.exports = (function () {
         }
 
         /**
+         * Determines if a user is the owner of the channel the instances represents.
+         * @param user
+         * @returns {Promise<null|boolean>}
+         */
+        isUserChannelOwner (user) {
+            return this.Platform.isUserChannelOwner(this, user);
+        }
+
+        /**
          * Pushes a property change to the dataabse.
          * @param {string} property
          * @param {*} value
@@ -307,9 +316,10 @@ module.exports = (function () {
          * @param {string} name
          * @param {Platform} platformData
          * @param {string} mode
+         * @param {string} [specificID]
          * @returns {Promise<Channel>}
          */
-        static async add (name, platformData, mode = "Write") {
+        static async add (name, platformData, mode = "Write", specificID) {
             const channelName = name.replace(/^#/, "");
 
             // Creates Channel row
@@ -317,7 +327,8 @@ module.exports = (function () {
             row.setValues({
                 Name: channelName,
                 Platform: platformData.ID,
-                Mode: mode
+                Mode: mode,
+                Specific_ID: specificID ?? null
             });
             await row.save();
 

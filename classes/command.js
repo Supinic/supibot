@@ -98,6 +98,12 @@ module.exports = (function () {
 			this.Blockable = data.Blockable;
 
 			/**
+			 * If true, the command's cooldown can be vastly reduced when a user invokes it in their own channel.
+			 * @type {boolean}
+			 */
+			this.Owner_Override = data.Owner_Override;
+
+			/**
 			 * If true, the command can be used as a part of the "pipe" command.
 			 * @type {boolean}
 			 */
@@ -516,7 +522,11 @@ module.exports = (function () {
 			// Take care of private messages, where channel === null
 			const channelID = channelData?.ID ?? PRIVATE_MESSAGE_CHANNEL_ID;
 
-			if (typeof cooldownData !== "undefined") {
+			if (commandData.Owner_Override && channelData?.isUserChannelOwner(userData)) {
+				// Set a very small, only technical cooldown
+				sb.CooldownManager.set(channelID, userData.ID, commandData.ID, 500);
+			}
+			else if (typeof cooldownData !== "undefined") {
 				if (cooldownData !== null) {
 					if (!Array.isArray(cooldownData)) {
 						cooldownData = [cooldownData];
