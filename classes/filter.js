@@ -35,6 +35,12 @@ module.exports =  (function () {
 			this.Command = data.Command;
 
 			/**
+			 * Unique numeric platform identifier
+			 * @type {Platform.ID|null}
+			 */
+			this.Platform = data.Platform;
+
+			/**
 			 * Filter type.
 			 * Blacklist disallows the usage for given combination of User_Alias/Channel/Command.
 			 * Whitelist disallows the usage of a command everywhere BUT the given combination of User_Alias/Channel.
@@ -140,6 +146,122 @@ module.exports =  (function () {
 					args: typeof identifier
 				});
 			}
+		}
+
+		static async execute (options) {
+			const { command, platform, user, targetUser } = options;
+			const channel = options.channel ?? Symbol("private-message");
+
+			const filtered = Filter.data.filter(row => (
+				row.Active
+				&& (row.Channel === channel.ID || row.Channel === null)
+				&& (row.Command === command.ID || row.Command === null)
+				&& (row.Platform === platform.ID || row.Platform === null)
+				&& (row.User_Alias === user.ID || row.User_Alias === null)
+			));
+
+			if (command.Whitelisted) {
+				const whitelist = filtered.find(i => i.Type === "Whitelist");
+				if (!whitelist) {
+					return {
+						pass: false,
+						reason: "whitelist",
+						filter: whitelist,
+						reply: command.Whitelist_Response ?? null
+					};
+				}
+			}
+			if (command.Opt_Outable) {
+				const optout = filtered.find(i => i.Type === "Opt-out");
+				if (optout) {
+					return {
+						pass: false,
+						reason: "opt-out",
+						filter: optout,
+						reply: (optout.Response === "Auto")
+							? "🚫 That user has opted out from being the command target!"
+							: (optout.Response === "Reason")
+								? optout.Reason
+								: null
+					};
+				}
+			}
+			if (command.Blockable && targetUser) {
+				const userFrom = user;
+				const userTo = await sb.User.get(targetUser);
+
+				if (userTo) {
+					const block = Filter.data.find(i =>
+						i.Active
+						&& i.Type === "Block"
+						&& i.User_Alias === userTo.ID
+						&& i.Blocked_User === userFrom.ID
+					);
+
+					if (block) {
+						return {
+							pass: false,
+							reason: "block",
+							filter: block,
+							reply: (block.Response === "Auto")
+								? "🚫 That user has opted out from being the target of your command!"
+								: (block.Response === "Reason")
+									? block.Reason
+									: null
+						};
+					}
+				}
+			}
+
+			const blacklist = filtered.find(i => i.Type === "Blacklist");
+			if (blacklist) {
+				let reply = null;
+				if (blacklist.Response === "Reason") {
+					reply = blacklist.Response;
+				}
+				else {
+					if (blacklist.Channel && blacklist.Command && blacklist.User_Alias) {
+						reply = "You cannot execute that command in this channel.";
+					}
+					else if (blacklist.Channel && blacklist.Command) {
+						reply = "This command cannot be executed in this channel.";
+					}
+					else if (blacklist.Channel && blacklist.User_Alias) {
+						reply = "You cannot execute any commands in this channel.";
+					}
+					else if (blacklist.User_Alias && blacklist.Command) {
+						reply = "You cannot execute this command in any channel.";
+					}
+					else if (blacklist.User_Alias) {
+						reply = "You cannot execute any commands in any channel.";
+					}
+					else if (blacklist.Command) {
+						reply = "This command cannot be executed anywhere.";
+					}
+					else if (blacklist.Channel) {
+						reply = "No commands can be executed in this channel.";
+					}
+					else {
+						throw new sb.Error({
+							message: "Unrecognized filter configuration", args: blacklist
+						});
+					}
+				}
+
+				return {
+					pass: false,
+					reason: "blacklist",
+					filter: blacklist,
+					reply
+				}
+			}
+
+			return {
+				pass: true,
+				reason: null,
+				filter: null,
+				reply: null
+			};
 		}
 
 		/**
