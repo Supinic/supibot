@@ -454,7 +454,12 @@ module.exports = (function () {
 					const partResult = [];
 					for (const {message, bancheck} of execution.partialReplies) {
 						if (bancheck === true) {
-							const {string} = await sb.Banphrase.execute(message, channelData);
+							const {string} = await sb.Banphrase.execute(
+								message,
+								channelData,
+								{ skipBanphraseAPI: true }
+							);
+
 							partResult.push(string);
 						}
 						else {
@@ -482,13 +487,18 @@ module.exports = (function () {
 
 				if (command.Ping && channelData?.Ping) {
 					// @todo maybe {passed, string} is better in case the name is too bad? We'll see later on
-					const {string} = await sb.Banphrase.execute(userData.Name, channelData);
+					const {string} = await sb.Banphrase.execute(
+						userData.Name,
+						channelData,
+						{ skipBanphraseAPI: true }
+					);
+
 					execution.reply = string + ", " + execution.reply;
 				}
 
 				const metaSkip = Boolean(options.skipBanphrases || execution?.meta?.skipBanphrases);
 				if (!command.Skip_Banphrases && !metaSkip) {
-					const {passed, string} = await sb.Banphrase.execute(execution.reply.slice(0, 1000), channelData);
+					const { passed, string } = await sb.Banphrase.execute(execution.reply.slice(0, 1000), channelData);
 					execution.reply = string;
 
 					if (command.Rollbackable) {
