@@ -9,7 +9,10 @@ module.exports = (function () {
 		"addSubtitle",
 		"play",
 		"pause",
-		"stop",
+		{
+			name: "stop",
+			command: "pl_stop"
+		},
 		"resume",
 		"forcePause",
 		"playlistNext",
@@ -60,7 +63,12 @@ module.exports = (function () {
 
 			this._actions = {};
 			for (const action of actions) {
-				this._actions[action] = (...args) => this.client[action](...args)
+				if (typeof action === "string") {
+					this._actions[action] = (...args) => this.client[action](...args);
+				}
+				else if (action?.constructor === Object) {
+					this._actions[action.name] = () => this.client._sendCommand("/requests/status.json", action.command);
+				}
 			}
 
 			this.initListeners();
