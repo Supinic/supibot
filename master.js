@@ -27,24 +27,25 @@
 			const initialChannels = sb.Channel.data.filter(i => i.Mode !== "Inactive");
 			const initialPlatforms = new Set(initialChannels.map(i => i.Platform.Name));
 
-			this.clients = {};
+			this.controllers = {};
 			for (const platform of initialPlatforms) {
-				let platformModule = null;
+				/** @type Controller */
+				let Controller = null;
 				try {
-					platformModule = require("./clients/" + platform);
+					Controller = require("./controllers/" + platform);
 				}
 				catch (e) {
 					throw new sb.Error({
-						message: "Require of " + platform + " module failed"
+						message: "Require of " + platform + " controller module failed"
 					}, e);
 				}
 
 				try {
-					this.clients[platform] = new platformModule();
+					this.controllers[platform] = new Controller();
 				}
 				catch (e) {
 					throw new sb.Error({
-						message: "Initialization of " + platform + " module failed"
+						message: "Initialization of " + platform + " controller module failed"
 					}, e);
 				}
 			}
@@ -66,10 +67,10 @@
 				case "twitch":
 				case "discord":
 				case "mixer": {
-					const ClientConstructor = this.clients[client].constructor;
+					const ClientConstructor = this.controllers[client].constructor;
 
-					this.clients[client] = null;
-					this.clients[client] = new ClientConstructor();
+					this.controllers[client] = null;
+					this.controllers[client] = new ClientConstructor();
 					break;
 				}
 
@@ -89,7 +90,7 @@
 		send (message, channel) {
 			const channelData = sb.Channel.get(channel);
 			const platform = channelData.Platform.Name;
-			const client = this.clients[platform];
+			const client = this.controllers[platform];
 
 			if (!client) {
 				return;
@@ -107,7 +108,7 @@
 		 */
 		async pm (user, message, platform) {
 			const platformData = sb.Platform.get(platform);
-			const client = this.clients[platformData.Name];
+			const client = this.controllers[platformData.Name];
 			return await client.pm(user, message);
 		}
 
@@ -228,5 +229,5 @@
 	});
 
 	sb.Master = new Master();
-	sb.Platform.assignClients(sb.Master.clients);
+	sb.Platform.assignControllers(sb.Master.controllers);
 })();
