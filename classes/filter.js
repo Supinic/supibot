@@ -72,6 +72,12 @@ module.exports =  (function () {
 			 * @type {boolean}
 			 */
 			this.Active = data.Active;
+
+			/**
+			 * Unique numeric user identifier of the person who created the filter.
+			 * @type {User.ID|null}
+			 */
+			this.Issued_By = data.Issued_By;
 		}
 
 		async toggle () {
@@ -151,17 +157,21 @@ module.exports =  (function () {
 		static async execute (options) {
 			const { command, platform, user, targetUser } = options;
 			const channel = options.channel ?? Symbol("private-message");
+			let userTo = null;
 
-			const filtered = Filter.data.filter(row => (
+			const localFilters = Filter.data.filter(row => (
 				row.Active
 				&& (row.Channel === channel.ID || row.Channel === null)
 				&& (row.Command === command.ID || row.Command === null)
 				&& (row.Platform === platform.ID || row.Platform === null)
-				&& (row.User_Alias === user.ID || row.User_Alias === null)
 			));
 
 			if (command.Whitelisted) {
-				const whitelist = filtered.find(i => i.Type === "Whitelist");
+				const whitelist = localFilters.find((
+					i => i.Type === "Whitelist"
+					&& i.User_Alias === user.ID
+				));
+
 				if (!whitelist) {
 					return {
 						pass: false,
@@ -172,7 +182,12 @@ module.exports =  (function () {
 				}
 			}
 			if (command.Opt_Outable) {
-				const optout = filtered.find(i => i.Type === "Opt-out");
+				userTo = await sb.User.get(targetUser);
+				const optout = localFilters.find(i => (
+					i.Type === "Opt-out"
+					&& i.User_Alias === userTo.ID
+				));
+
 				if (optout) {
 					return {
 						pass: false,
@@ -188,15 +203,14 @@ module.exports =  (function () {
 			}
 			if (command.Blockable && targetUser) {
 				const userFrom = user;
-				const userTo = await sb.User.get(targetUser);
+				userTo = userTo || await sb.User.get(targetUser);
 
 				if (userTo) {
-					const block = Filter.data.find(i =>
-						i.Active
-						&& i.Type === "Block"
+					const block = localFilters.find(i => (
+						i.Type === "Block"
 						&& i.User_Alias === userTo.ID
 						&& i.Blocked_User === userFrom.ID
-					);
+					));
 
 					if (block) {
 						return {
@@ -213,7 +227,11 @@ module.exports =  (function () {
 				}
 			}
 
-			const blacklist = filtered.find(i => i.Type === "Blacklist");
+			const blacklist = localFilters.find(i => (
+				i.Type === "Blacklist"
+				&& i.User_Alias === user.ID
+			));
+
 			if (blacklist) {
 				let reply = null;
 				if (blacklist.Response === "Reason") {
@@ -486,14 +504,16 @@ module.exports =  (function () {
 		 */
 		static async create (options) {
 			const data = {
-				Channel: options.Channel || null,
-				Command: options.Command || null,
-				User_Alias: options.User_Alias || null,
-				Reason: options.Reason || null,
-				Type: options.Type || "Blacklist",
+				Platform: options.Platform ?? null,
+				Channel: options.Channel ?? null,
+				Command: options.Command ?? null,
+				User_Alias: options.User_Alias ?? null,
+				Reason: options.Reason ?? null,
+				Type: options.Type ?? "Blacklist",
 				Response: "Auto",
-				Blocked_User: options.Blocked_User || null,
-				Active: true
+				Blocked_User: options.Blocked_User ?? null,
+				Active: true,
+				Issued_By: options.Issued_By ?? sb.Config.get("ADMINISTRATOR_USER_ID")
 			};
 
 			const row = await sb.Query.getRow("chat_data", "Filter");
