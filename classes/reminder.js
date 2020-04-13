@@ -100,6 +100,7 @@ module.exports = (function () {
 
             /** @type {LongTimeout} */
             this.timeout = new LongTimeout(async () => {
+                /** @type {Channel|null} */
                 const channelData = (this.Channel === null) ? null : sb.Channel.get(this.Channel);
                 const fromUserData = await sb.User.get(this.User_From, true);
                 const toUserData = await sb.User.get(this.User_To, true);
@@ -142,8 +143,7 @@ module.exports = (function () {
                         }
 
                         if (channelData.Mirror) {
-                            const platformClient = sb.Master.clients[channelData.Platform.Name];
-                            platformClient.mirror(message, toUserData, channelData, false);
+                            channelData.Platform.controller.mirror(message, toUserData, channelData, false);
                         }
 
                         message = await sb.Master.prepareMessage(message, channelData);

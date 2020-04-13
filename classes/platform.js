@@ -9,6 +9,12 @@ module.exports = (function () {
 	 */
 	return class Platform {
 		/**
+		 * Platform controller
+		 * @type {Controller}
+		 */
+		#controller = null;
+
+		/**
 		 * @param {Object} data
 		 * @param {number} data.User_Alias
 		 * @param {sb.Date} data.Started
@@ -27,12 +33,6 @@ module.exports = (function () {
 			 * @type {string}
 			 */
 			this.Name = data.Name.toLowerCase();
-
-			/**
-			 * Platform client
-			 * @type {Client|null}
-			 */
-			this.client = null;
 		}
 
 		get capital () {
@@ -46,15 +46,27 @@ module.exports = (function () {
 		 * @returns {null|boolean}
 		 */
 		isUserChannelOwner (channel, user) {
-			if (typeof this?.client?.isUserChannelOwner !== "function") {
+			if (typeof this.#controller.isUserChannelOwner !== "function") {
 				return null;
 			}
 
-			return this.client.isUserChannelOwner(channel, user);
+			return this.#controller.isUserChannelOwner(channel, user);
 		}
 
 		destroy () {
-			this.client = null;
+			this.#controller = null;
+		}
+
+		/**
+		 * Platform controller
+		 * @type {Controller}
+		 */
+		get controller () {
+			return this.#controller;
+		}
+
+		get client () {
+			return this?.#controller?.client ?? null;
 		}
 
 		/** @override */
@@ -76,14 +88,14 @@ module.exports = (function () {
 		}
 
 		/**
-		 * Assigns clients to each platform after the clients have been prepared properly.
-		 * @param {Object<string, Client>}clients
+		 * Assigns controllers to each platform after they have been prepared.
+		 * @param {Object<string, Controller>}controllers
 		 */
-		static assignClients (clients) {
-			for (const [name, client] of Object.entries(clients)) {
+		static assignControllers (controllers) {
+			for (const [name, controller] of Object.entries(controllers)) {
 				const platform = Platform.get(name);
 				if (platform) {
-					platform.client = client;
+					platform.#controller = controller;
 				}
 			}
 		}
