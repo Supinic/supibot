@@ -146,7 +146,7 @@ module.exports = class Discord extends require("./template.js") {
 			}
 		}
 
-		channelObject.send(sb.Utils.wrapString(message, 2000));
+		channelObject.send(sb.Utils.wrapString(message, Discord.messageLimit));
 	}
 
 	/**
@@ -237,10 +237,16 @@ module.exports = class Discord extends require("./template.js") {
 			}
 		}
 
+		let index = 0;
+		const links = messageObject.attachments.map(i => i.proxyURL);
+		let targetMessage = messageObject.cleanContent.replace(/\n/g, " ");
+		while (targetMessage.length < Discord.messageLimit && index < links.length) {
+			targetMessage += " " + link[index];
+			index++;
+		}
+
 		return {
-			msg: Discord.removeEmoteTags(
-				messageObject.cleanContent.replace(/\n/g, " ") + " " + messageObject.attachments.map(i => i.proxyURL)
-			).replace(/\s+/g, " "),
+			msg: Discord.removeTags(targetMessage.replace(/\s+/g, " ")),
 			user: messageObject.author.username.toLowerCase().replace(/\s/g, "_"),
 			chan: messageObject.channel.id,
 			channelType: messageObject.channel.type,
@@ -280,5 +286,9 @@ module.exports = class Discord extends require("./template.js") {
 				})
 				.map(user => sb.User.get(user))
 		)).filter(Boolean);
+	}
+
+	static get messageLimit () {
+		return sb.Config.get("DEFAULT_MSG_LIMIT_DISCORD");
 	}
 };
