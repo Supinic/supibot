@@ -156,33 +156,40 @@ module.exports =  (function () {
 
 		static async execute (options) {
 			const { command, platform, user, targetUser } = options;
-			const channel = options.channel ?? Symbol("private-message");
-			let userTo = null;
+			if (user.Data?.administrator) {
+				return { success: true };
+			}
 
+			let userTo = null;
+			const channel = options.channel ?? Symbol("private-message");
 			const localFilters = Filter.data.filter(row => (
 				row.Active
-				&& (row.Channel === channel.ID || row.Channel === null)
-				&& (row.Command === command.ID || row.Command === null)
-				&& (row.Platform === platform.ID || row.Platform === null)
+				&& (row.Channel === (channel?.ID ?? null) || row.Channel === null)
+				&& (row.Command === (command?.ID ?? null) || row.Command === null)
+				&& (row.Platform === (platform?.ID ?? null) || row.Platform === null)
 			));
 
 			if (command.Whitelisted) {
 				const whitelist = localFilters.find((
 					i => i.Type === "Whitelist"
-					&& i.User_Alias === user.ID
+					&& (i.User_Alias === user.ID || i.User_Alias === null)
 				));
 
 				if (!whitelist) {
 					return {
-						pass: false,
+						success: false,
 						reason: "whitelist",
 						filter: whitelist,
 						reply: command.Whitelist_Response ?? null
 					};
 				}
 			}
-			if (command.Opt_Outable) {
+
+			if ((command.Opt_Outable || command.Blockable) && targetUser) {
 				userTo = await sb.User.get(targetUser);
+			}
+
+			if (command.Opt_Outable && userTo) {
 				const optout = localFilters.find(i => (
 					i.Type === "Opt-out"
 					&& i.User_Alias === userTo.ID
@@ -190,7 +197,7 @@ module.exports =  (function () {
 
 				if (optout) {
 					return {
-						pass: false,
+						success: false,
 						reason: "opt-out",
 						filter: optout,
 						reply: (optout.Response === "Auto")
@@ -201,20 +208,17 @@ module.exports =  (function () {
 					};
 				}
 			}
-			if (command.Blockable && targetUser) {
+			if (command.Blockable && userTo) {
 				const userFrom = user;
-				userTo = userTo || await sb.User.get(targetUser);
+				const block = localFilters.find(i => (
+					i.Type === "Block"
+					&& i.User_Alias === userTo.ID
+					&& i.Blocked_User === userFrom.ID
+				));
 
-				if (userTo) {
-					const block = localFilters.find(i => (
-						i.Type === "Block"
-						&& i.User_Alias === userTo.ID
-						&& i.Blocked_User === userFrom.ID
-					));
-
-					if (block) {
+				if (block) {
 						return {
-							pass: false,
+							success: false,
 							reason: "block",
 							filter: block,
 							reply: (block.Response === "Auto")
@@ -224,7 +228,6 @@ module.exports =  (function () {
 									: null
 						};
 					}
-				}
 			}
 
 			const blacklist = localFilters.find(i => (
@@ -267,19 +270,14 @@ module.exports =  (function () {
 				}
 
 				return {
-					pass: false,
+					success: false,
 					reason: "blacklist",
 					filter: blacklist,
 					reply
 				}
 			}
 
-			return {
-				pass: true,
-				reason: null,
-				filter: null,
-				reply: null
-			};
+			return { success: true };
 		}
 
 		/**
