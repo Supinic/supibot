@@ -426,9 +426,20 @@ module.exports = (function () {
 				});
 			}
 			catch (e) {
-				console.error(e);
-				const errorID = await sb.SystemLogger.sendError("Command", e, ...args);
-				const emote = (channelData?.ID === 38) ? "WEEWOO" : "";
+				if (e instanceof sb.errors.APIError) {
+					const { apiName, reason, statusCode } = e;
+					console.warn("Command API Error", { apiName, statusCode, reason });
+
+					execution = {
+						success: false,
+						reason: "api-error",
+						reply: `${statusCode}: Couldn't execute command because ${apiName} failed! This is not my fault :)`
+					};
+				}
+				else {
+					console.error(e);
+					const errorID = await sb.SystemLogger.sendError("Command", e, ...args);
+					const emote = (channelData?.ID === 38) ? "WEEWOO" : "";
 
 				execution = {
 					success: false,
