@@ -302,69 +302,25 @@ module.exports = (function () {
 				);
 			}
 
-			const accessBlocked = sb.Filter.check({
-				userID: userData.ID,
-				channelID: channelID,
-				commandID: command.ID
+			const filterData = await sb.Filter.execute({
+				user: userData,
+				command: command,
+				channel: channelData ?? null,
+				platform: channelData?.Platform ?? null,
+				targetUser: argumentArray[0] ?? null
 			});
-			if (accessBlocked) {
-				const reply = (command.Whitelisted && command.Whitelist_Response)
-					? command.Whitelist_Response
-					: (typeof accessBlocked === "string")
-						? accessBlocked
-						: null;
 
+			if (!filterData.success) {
 				sb.CooldownManager.unsetPending(userData.ID);
 				sb.CooldownManager.set(channelID, userData.ID, command.ID, command.Cooldown);
 				sb.Runtime.incrementRejectedCommands();
 
-				return {
-					success: false,
-					reason: "filter",
-					reply: reply
-				};
-			}
-
-			// Check for blocked users
-			if (command.Blockable && argumentArray[0]) {
-				const block = await sb.Filter.checkBlocks(userData.ID, argumentArray[0], command.ID);
-
-				// If the user has blocked the person, disallow the usage of command.
-				if (block) {
-					const reply = (typeof block === "string")
-						? (await sb.Banphrase.execute(block, channelData)).string
-						: null;
-
-					sb.CooldownManager.unsetPending(userData.ID);
-					sb.CooldownManager.set(channelID, userData.ID, command.ID, command.Cooldown);
-
-					return {
-						success: false,
-						reason: "block",
-						reply
-					};
+				if (filterData.filter.Response === "Reason" && typeof filterData.reply === "string") {
+					const { string } = await sb.Banphrase.execute(filterData.reply, channelData);
+					filterData.reply = string;
 				}
-			}
 
-			// Check for opted out users
-			if (command.Opt_Outable && argumentArray[0]) {
-				const optout = await sb.Filter.checkOptOuts(argumentArray[0], command.ID);
-
-				// If the user is opted out AND the requesting user does not have an override, then return immediately.
-				if (optout && !userData.Data.bypassOptOuts) {
-					const reply = (typeof optout === "string")
-						? (await sb.Banphrase.execute(optout, channelData)).string
-						: null;
-
-					sb.CooldownManager.unsetPending(userData.ID);
-					sb.CooldownManager.set(channelID, userData.ID, command.ID, command.Cooldown);
-
-					return {
-						success: false,
-						reason: "opt-out",
-						reply
-					};
-				}
+				return filterData;
 			}
 
 			const appendOptions = Object.assign({}, options);
