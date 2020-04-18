@@ -241,12 +241,12 @@ module.exports = class Discord extends require("./template.js") {
 		const links = messageObject.attachments.map(i => i.proxyURL);
 		let targetMessage = messageObject.cleanContent.replace(/\n/g, " ");
 		while (targetMessage.length < Discord.messageLimit && index < links.length) {
-			targetMessage += " " + link[index];
+			targetMessage += " " + links[index];
 			index++;
 		}
 
 		return {
-			msg: Discord.removeTags(targetMessage.replace(/\s+/g, " ")),
+			msg: Discord.removeEmoteTags(targetMessage.replace(/\s+/g, " ")),
 			user: messageObject.author.username.toLowerCase().replace(/\s/g, "_"),
 			chan: messageObject.channel.id,
 			channelType: messageObject.channel.type,
