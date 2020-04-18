@@ -441,11 +441,12 @@ module.exports = (function () {
 					const errorID = await sb.SystemLogger.sendError("Command", e, ...args);
 					const emote = (channelData?.ID === 38) ? "WEEWOO" : "";
 
-				execution = {
-					success: false,
-					reason: "error",
-					reply: `${emote} An error ID ${errorID} occured! ${emote}`
-				};
+					execution = {
+						success: false,
+						reason: "error",
+						reply: `${emote} Command execution resulted in an error! ID ${errorID} ${emote}`
+					};
+				}
 			}
 
 			// Read-only commands never reply with anything - banphrases, pings and cooldowns are not checked
