@@ -147,7 +147,7 @@ module.exports = class Twitch extends require("./template.js") {
 				);
 			}
 			else {
-				console.log("Uncaught USERNOTICE event", messageObject);
+				console.warn("Uncaught USERNOTICE event", messageObject);
 			}
 		});
 
@@ -299,7 +299,7 @@ module.exports = class Twitch extends require("./template.js") {
 		}
 		else {
 			sb.SystemLogger.send("Twitch.Other", "whisper: " + message, null, userData);
-			console.log("Whisper received: Twitch", userData.Name, message);
+			console.debug("Whisper received: Twitch", userData.Name, message);
 		}
 
 		// Own message - check the regular/vip/mod/broadcaster status, and skip
@@ -460,13 +460,13 @@ module.exports = class Twitch extends require("./template.js") {
 			}
 
 			if (!channelData.sessionData.parted && channelData.sessionData.recentBans > sb.Config.get("TWITCH_RECENT_BANS_THRESHOLD")) {
-				console.log(`Parting channel ${channelData.Name} because ban threshold has been exceeded!`);
+				console.debug(`Parting channel ${channelData.Name} because ban threshold has been exceeded!`);
 
 				channelData.sessionData.parted = true;
 				this.client.part(channelData.Name);
 
 				setTimeout(() => {
-					console.log(`Re-joining channel ${channelData.Name}!`);
+					console.debug(`Re-joining channel ${channelData.Name}!`);
 
 					channelData.sessionData.parted = false;
 					this.client.join(channelData.Name)
