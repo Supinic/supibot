@@ -256,6 +256,10 @@ module.exports = class Twitch extends require("./template.js") {
 			if (!channelData) {
 				return sb.SystemLogger.send("Twitch.Error", "Cannot find channel " + channelName);
 			}
+			else if (channelData.Mode === "Last seen") {
+				sb.Logger.updateLastSeen({ userData, channelData, message });
+				return;
+			}
 			else if (channelData.Mode === "Inactive") {
 				return;
 			}
