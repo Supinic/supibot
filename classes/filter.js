@@ -179,7 +179,7 @@ module.exports =  (function () {
 					return {
 						success: false,
 						reason: "whitelist",
-						filter: whitelist,
+						filter:  { Reason: "Reply" },
 						reply: command.Whitelist_Response ?? null
 					};
 				}
@@ -217,22 +217,22 @@ module.exports =  (function () {
 				));
 
 				if (block) {
-						return {
-							success: false,
-							reason: "block",
-							filter: block,
-							reply: (block.Response === "Auto")
-								? "🚫 That user has opted out from being the target of your command!"
-								: (block.Response === "Reason")
-									? block.Reason
-									: null
-						};
-					}
+					return {
+						success: false,
+						reason: "block",
+						filter: block,
+						reply: (block.Response === "Auto")
+							? "🚫 That user has opted out from being the target of your command!"
+							: (block.Response === "Reason")
+								? block.Reason
+								: null
+					};
+				}
 			}
 
 			const blacklist = localFilters.find(i => (
 				i.Type === "Blacklist"
-				&& i.User_Alias === user.ID
+				&& (i.User_Alias === user.ID || i.User_Alias === null)
 			));
 
 			if (blacklist) {
