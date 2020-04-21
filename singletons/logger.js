@@ -24,6 +24,8 @@ module.exports = (function (Module) {
 			this.channels = [];
 			this.meta = {};
 			this.batches = {};
+			this.lastSeen = new Map();
+			this.lastSeenRunning = false;
 
 			this.messageCron = new CronJob(sb.Config.get("CRON_MESSAGE_CONFIG"), async () => {
 				if (!sb.Config.get("MESSAGE_LOGGING_ENABLED")) {
@@ -143,6 +145,35 @@ module.exports = (function (Module) {
 				this.commandCollector.clear();
 			});
 			this.commandCron.start();
+
+			this.lastSeenCron = new CronJob(sb.Config.get("CRON_CONFIG_USER_LAST_SEEN"), async () => {
+				if (!sb.Config.get("MESSAGE_META_LOGGING_ENABLED") || this.lastSeenRunning) {
+					return;
+				}
+
+				this.lastSeenRunning = true;
+
+				for (const [channelData, userMap] of this.lastSeen) {
+					for (const [userData, { count, date, message }] of userMap) {
+						await sb.Query.getRecordUpdater(ru => ru
+							.update("chat_data", "Message_Meta_User_Alias")
+							.set("Message_Count", {
+								useField: true,
+								value: `Message_Count + ${count}`
+							})
+							.set("Last_Message_Posted", date)
+							.set("Last_Message_Text", message)
+							.where("User_Alias = %n", userData.ID)
+							.where("Channel = %n", channelData.ID)
+						);
+					}
+
+					userMap.clear();
+				}
+
+				this.lastSeenRunning = false;
+			});
+			this.lastSeenCron.start();
 
 			return (async () => {
 				this.metaBatch = await sb.Query.getBatch(
@@ -304,6 +335,26 @@ module.exports = (function (Module) {
 
 			this.commandCollector.add(options.Executed.valueOf());
 			this.commandBatch.add(options);
+		}
+
+		async updateLastSeen (options) {
+			const { channelData, message, userData } = options;
+			if (!userData || !channelData || !message) {
+				throw new sb.Error({
+					message: "Missing some or all arguments for lastSeen data"
+				});
+			}
+
+			if (!this.lastSeen.has(channelData)) {
+				this.lastSeen.set(channelData, new Map());
+			}
+
+			const count = this.lastSeen.get(channelData).get(userData)?.count ?? 0;
+			this.lastSeen.get(channelData).set(userData, {
+				message,
+				count: count + 1,
+				date: new sb.Date()
+			});
 		}
 
 		get modulePath () { return "logger"; }
