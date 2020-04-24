@@ -66,7 +66,7 @@ module.exports = (function () {
 		}
 
 		get client () {
-			return this?.#controller?.client ?? null;
+			return this.#controller?.client ?? null;
 		}
 
 		/** @override */
