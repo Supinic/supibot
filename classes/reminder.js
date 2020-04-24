@@ -193,10 +193,14 @@ module.exports = (function () {
         }
 
         static async loadData () {
-            Reminder.data = (await sb.Query.getRecordset(rs => rs
+            const data = await sb.Query.getRecordset(rs => rs
                 .select("*")
                 .from("chat_data", "Reminder")
-                .where("Active = %b", true))).map(record => new Reminder(record));
+                .where("Active = %b", true)
+                .where("Schedule IS NULL OR Schedule < (NOW() + INTERVAL 1 YEAR)")
+            );
+
+            Reminder.data = data.map(record => new Reminder(record));
 
             // This will deactivate expired reminder automatically, and skip over non-scheduled reminders.
             for (const reminder of Reminder.data) {
@@ -207,6 +211,7 @@ module.exports = (function () {
         static async reloadData () {
             Reminder.destroy();
             Reminder.data = [];
+
             await Reminder.loadData();
         }
 
