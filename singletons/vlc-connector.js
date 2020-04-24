@@ -15,6 +15,7 @@ module.exports = (function () {
 		},
 		"resume",
 		"forcePause",
+		"playlistDelete",
 		"playlistNext",
 		"playlistPrevious",
 		"playlistEmpty",
@@ -96,13 +97,16 @@ module.exports = (function () {
 
 				if (previousTrack) {
 					// Finalize the previous video, if it exists (might not exist because of playlist being started)
+					const ID = Number(previousTrack.id);
 					await sb.Query.getRecordUpdater(rs => rs
 						.update("chat_data", "Song_Request")
 						.set("Status", "Inactive")
 						.set("Ended", new sb.Date())
 						.where("Status = %s", "Current")
-						.where("VLC_ID = %n", Number(previousTrack.id))
+						.where("VLC_ID = %n", ID)
 					);
+
+					await sb.VideoLANConnector.client.playlistDelete(ID);
 				}
 				if (nextTrack) {
 					// Assign the started to the next video, because it just started playing.
