@@ -153,23 +153,32 @@ module.exports = (function (Module) {
 
 				this.lastSeenRunning = true;
 
+				const data = [];
 				for (const [channelData, userMap] of this.lastSeen) {
 					for (const [userData, { count, date, message }] of userMap) {
-						await sb.Query.getRecordUpdater(ru => ru
-							.update("chat_data", "Message_Meta_User_Alias")
-							.set("Message_Count", {
-								useField: true,
-								value: `Message_Count + ${count}`
-							})
-							.set("Last_Message_Posted", date)
-							.set("Last_Message_Text", message)
-							.where("User_Alias = %n", userData.ID)
-							.where("Channel = %n", channelData.ID)
-						);
+						data.push({
+							count,
+							channel: channelData.ID,
+							date,
+							message,
+							user: userData.ID,
+						});
 					}
 
 					userMap.clear();
 				}
+
+				await sb.Query.batchUpdate(data, (ru, row) => ru
+					.update("chat_data", "Message_Meta_User_Alias")
+					.set("Message_Count", {
+						useField: true,
+						value: `Message_Count + ${row.count}`
+					})
+					.set("Last_Message_Posted", row.date)
+					.set("Last_Message_Text", row.message)
+					.where("User_Alias = %n", row.user)
+					.where("Channel = %n", row.channel)
+				);
 
 				this.lastSeenRunning = false;
 			});
