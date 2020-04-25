@@ -9,7 +9,7 @@ module.exports = class Discord extends require("./template.js") {
 			    message: "Discord platform has not been created"
 			});
 		}
-		else if (!this.platform.Specific_ID) {
+		else if (!this.platform.Self_ID) {
 			throw new sb.Error({
 				message: "Discord user ID has not been configured"
 			});
@@ -35,7 +35,16 @@ module.exports = class Discord extends require("./template.js") {
 		});
 
 		client.on("message", async (messageObject) => {
-			const {commandArguments, discordID, msg, chan, user, mentions, guild, privateMessage} = Discord.parseMessage(messageObject);
+			const {
+				commandArguments,
+				chan,
+				discordID,
+				guild,
+				msg,
+				mentions,
+				privateMessage,
+				user
+			} = this.parseMessage(messageObject);
 
 			let channelData = null;
 			let userData = await sb.User.getByProperty("Discord_ID", discordID);
@@ -238,7 +247,7 @@ module.exports = class Discord extends require("./template.js") {
 		this.destroy();
 	}
 
-	static parseMessage (messageObject) {
+	parseMessage (messageObject) {
 		const args = messageObject.content.split(" ");
 		for (let i = 0; i < args.length; i++) {
 			const match = args[i].match(/<@!(\d+)>/);
