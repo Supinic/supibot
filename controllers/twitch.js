@@ -201,16 +201,18 @@ module.exports = class Twitch extends require("./template.js") {
 				this.queues[channelName] = null;
 			}
 
+			const { defaultGlobalCooldown, defaultQueueSize, modes } = this.platform.Data;
 			const scheduler = new MessageScheduler({
 				mode: channelData.Mode,
 				channelID: channelData.ID,
-				timeout: sb.Config.get("CHANNEL_COOLDOWN_" + channelData.Mode.toUpperCase()),
-				maxSize: sb.Config.get("CHANNEL_SCHEDULER_MAX_SIZE_" + channelData.Mode.toUpperCase()),
+				timeout: modes[channelData.Mode]?.cooldown ?? defaultGlobalCooldown,
+				maxSize: modes[channelData.Mode]?.queueSize ?? defaultQueueSize
 			});
 
 			scheduler.on("message", (msg) => {
 				this.client.say(channelName, msg);
 			});
+
 			this.queues[channelName] = scheduler;
 		}
 
