@@ -324,7 +324,6 @@ module.exports = (function () {
                     );
                 }
                 else if (reminder.User_From === sb.Config.get("SELF_ID")) {
-                    const fromUserData = await sb.User.get(reminder.User_From, false);
                     await sorter(
                         reminder.Private_Message,
                         "System reminder - " + reminder.Text + " (" + sb.Utils.timeDelta(reminder.Created) + ")",
@@ -381,7 +380,7 @@ module.exports = (function () {
                 });
 
                 if (message) {
-                    const limit = channelData.Message_Limit || sb.Config.get("DEFAULT_MSG_LIMIT_" + channelData.Platform.Name.toUpperCase());
+                    const limit = channelData.Message_Limit ?? channelData.Platform.Message_Limit;
 
                     // If the result message would be longer than twice the channel limit, post a list of reminder IDs
 	                // instead along with a link to the website, where the user can check them out.
