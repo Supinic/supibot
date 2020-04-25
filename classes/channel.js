@@ -161,9 +161,7 @@ module.exports = (function () {
         async setup () {
             const prefix = (this.Platform.Name === "twitch") ? "" : (this.Platform.Name + "_");
             const name = prefix + this.Name.toLowerCase();
-            const limit = this.Message_Limit
-                || sb.Config.get("DEFAULT_MSG_LIMIT_" + this.Platform.Name.toUpperCase())
-                || sb.Config.get("DEFAULT_LOG_TABLE_VARCHAR_LIMIT");
+            const limit = this.Message_Limit ?? this.Platform.Message_Limit;
 
             // Set up logging table
             await sb.Query.raw([
