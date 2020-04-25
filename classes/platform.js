@@ -23,16 +23,34 @@ module.exports = (function () {
 		 */
 		constructor (data) {
 			/**
-			 * Unique numeric platform identifier
+			 * Unique numeric platform identifier.
 			 * @type {User.ID}
 			 */
 			this.ID = data.ID;
 
 			/**
-			 * Unique platform name
+			 * Unique platform name.
 			 * @type {string}
 			 */
 			this.Name = data.Name.toLowerCase();
+
+			/**
+			 * Fallback message limit.
+			 * @type {number}
+			 */
+			this.Message_Limit = data.Message_Limit;
+
+			/**
+			 * Name of the bot account in the given platform.
+			 * @type {string}
+			 */
+			this.Self_Name = data.Self_Name;
+
+			/**
+			 * A string identifier to recognize a platform for mirroring.
+			 * @type {string}
+			 */
+			this.Mirror_Identifier = data.Mirror_Identifier ?? "";
 		}
 
 		get capital () {
