@@ -50,7 +50,8 @@ module.exports = class Twitch extends require("./template.js") {
 		});
 
 		client.on("JOIN", ({ channelName, joinedUsername }) => {
-			if (this.platform.Data.reconnectAnnouncement && joinedUsername === this.name) {
+			// @todo: Could this possibly be a part of channelData? So that it is platform-independent...
+			if (this.platform.Data.reconnectAnnouncement && joinedUsername === this.name.toLowerCase()) {
 				const { channels, string } = this.platform.Data.reconnectAnnouncement;
 				if (channels.includes(channelName)) {
 					client.say(channelName, string);
