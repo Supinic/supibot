@@ -58,6 +58,22 @@ module.exports = (function () {
 			 * @type {string}
 			 */
 			this.Mirror_Identifier = data.Mirror_Identifier ?? "";
+
+			/**
+			 * Custom platform-specific data, parsed from JSON format.
+			 * @type {Object}
+			 */
+			this.Data = {};
+
+			if (data.Data) {
+				try {
+					this.Data = JSON.parse(data.Data);
+				}
+				catch (e) {
+					this.Data = {};
+					console.warn(`Platform ${this.Name} has incorrect data definition`, e);
+				}
+			}
 		}
 
 		get capital () {
