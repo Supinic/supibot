@@ -117,10 +117,12 @@ module.exports = (function () {
 		}
 
 		static async loadData () {
-			Platform.data = (await sb.Query.getRecordset(rs => rs
+			const data = await sb.Query.getRecordset(rs => rs
 				.select("*")
 				.from("chat_data", "Platform")
-			)).map(record => new Platform(record));
+			);
+
+			Platform.data = data.map(record => new Platform(record));
 		}
 
 		static async reloadData () {
