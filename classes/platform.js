@@ -41,10 +41,17 @@ module.exports = (function () {
 			this.Message_Limit = data.Message_Limit;
 
 			/**
-			 * Name of the bot account in the given platform.
+			 * Name of the bot's account in given platform.
 			 * @type {string}
 			 */
 			this.Self_Name = data.Self_Name;
+
+			/**
+			 * Specific ID of the bot's account in given platform.
+			 * Can be null if the platform does not support UIDs.
+			 * @type {string|null}
+			 */
+			this.Self_ID = data.Self_ID;
 
 			/**
 			 * A string identifier to recognize a platform for mirroring.
