@@ -8,11 +8,22 @@ module.exports = class Twitch extends require("./template.js") {
 		super();
 
 		this.platform = sb.Platform.get("twitch");
-		this.name = sb.Config.get("TWITCH_USERNAME");
+		if (!this.platform) {
+			throw new sb.Error({
+				message: "Twitch platform has not been created"
+			});
+		}
+		else if (!sb.Config.has("TWITCH_OAUTH", true)) {
+			throw new sb.Error({
+				message: "Twitch oauth token has not been configured"
+			});
+		}
+
+		this.name = this.platform.Self_Name;
 		this.client = new DankTwitch.ChatClient({
 			username: this.name,
 			password: sb.Config.get("TWITCH_OAUTH"),
-			rateLimits: sb.Config.get("TWITCH_ACCOUNT_TYPE")
+			rateLimits: this.platform.Data.rateLimits ?? "default"
 		});
 
 		this.queues = {};
@@ -38,11 +49,12 @@ module.exports = class Twitch extends require("./template.js") {
 			}
 		});
 
-		client.on("JOIN", ({channelName, joinedUsername}) => {
-			console.debug(joinedUsername, channelName);
-
-			if (joinedUsername.toLowerCase() === sb.Config.get("TWITCH_USERNAME") && channelName.includes("supinic")) {
-				// client.say(channelName, "HONEYDETECTED RECONNECTED");
+		client.on("JOIN", ({ channelName, joinedUsername }) => {
+			if (this.platform.Data.reconnectAnnouncement && joinedUsername === this.name) {
+				const { channels, string } = this.platform.Data.reconnectAnnouncement;
+				if (channels.includes(channelName)) {
+					client.say(channelName, string);
+				}
 			}
 		});
 
@@ -102,6 +114,9 @@ module.exports = class Twitch extends require("./template.js") {
 
 		client.on("USERNOTICE", async (messageObject) => {
 			const {messageText, messageTypeID, senderUsername, channelName} = messageObject;
+			if (this.platform.Data.ignoredUserNotices.includes?.(messageTypeID)) {
+				return; // ignore these events
+			}
 
 			if (messageObject.isSub() || messageObject.isResub()) {
 				this.handleSubscription(
@@ -131,9 +146,6 @@ module.exports = class Twitch extends require("./template.js") {
 					senderUsername,
 					messageObject.eventParams.viewerCount
 				);
-			}
-			else if (sb.Config.get("TWITCH_IGNORED_USERNOTICE").includes(messageTypeID)) {
-				// ignore these events
 			}
 			else if (messageObject.isRitual()) {
 				const userData = await sb.User.get(senderUsername, false);
@@ -428,7 +440,7 @@ module.exports = class Twitch extends require("./template.js") {
 
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
 			const message = await sb.Master.prepareMessage(execution.reply, null, {
-				platform: "twitch",
+				platform: this.platform,
 				extraLength: ("/w " + userData.Name + " ").length
 			});
 
@@ -572,8 +584,8 @@ module.exports = class Twitch extends require("./template.js") {
 
 	mirror (message, userData, channelData, commandUsed = false) {
 		const fixedMessage = (commandUsed)
-			? sb.Config.get("MIRROR_IDENTIFIER_TWITCH") + " " + message
-			: sb.Config.get("MIRROR_IDENTIFIER_TWITCH") + " " + userData.Name + ": " + message;
+			? `${this.platform.Mirror_Identifier} ${message}`
+			: `${this.platform.Mirror_Identifier} ${userData.Name}: ${message}`;
 
 		sb.Master.mirror(fixedMessage, userData, channelData.Mirror);
 	}
