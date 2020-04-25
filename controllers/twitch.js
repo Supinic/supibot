@@ -255,11 +255,8 @@ module.exports = class Twitch extends require("./template.js") {
 		if (!userData) {
 			return;
 		}
-
-		const now = sb.Date.now();
-		if (!userData.Twitch_ID && senderUserID && Math.abs(now - this.userIDTimeout) > 1000) {
+		if (!userData.Twitch_ID && senderUserID) {
 			userData.saveProperty("Twitch_ID", senderUserID);
-			this.userIDTimeout = now;
 		}
 
 		// Only check channels,
