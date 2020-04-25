@@ -256,7 +256,7 @@ module.exports = class Twitch extends require("./template.js") {
 			return;
 		}
 		if (!userData.Twitch_ID && senderUserID) {
-			userData.saveProperty("Twitch_ID", senderUserID);
+			await userData.saveProperty("Twitch_ID", senderUserID);
 		}
 
 		// Only check channels,
