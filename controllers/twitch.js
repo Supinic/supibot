@@ -70,9 +70,16 @@ module.exports = class Twitch extends require("./template.js") {
 			if (strings[0] !== strings[1]) {
 				this.availableEmoteSets = emoteSets;
 
+				// Reference: https://github.com/twitchdev/issues/issues/50
+				// The emote set "0" breaks the following API call, therefore it has to be removed in order for at least
+				// some emotes to be loaded.
+				const safeEmoteSets = emoteSets.slice(0);
+				const breakingEmoteSetIndex = emoteSets.findIndex(i => i === "0");
+				safeEmoteSets.splice(breakingEmoteSetIndex, 1);
+
 				const emoteData = await sb.Got.instances.Twitch.Kraken({
 					url: "chat/emoticon_images",
-					searchParams: "emotesets=" + emoteSets.join(",")
+					searchParams: "emotesets=" + safeEmoteSets.join(",")
 				});
 
 				this.availableEmotes = emoteData.emoticon_sets;
