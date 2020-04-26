@@ -394,13 +394,21 @@ module.exports = (function () {
 				}
 				else {
 					console.error(e);
-					const errorID = await sb.SystemLogger.sendError("Command", e, ...args);
-					const emote = (channelData?.ID === 38) ? "WEEWOO" : "";
+					const errorID = await sb.SystemLogger.sendError("Command", e, [identifier, ...args]);
+					let reply = sb.Utils.tag.trim `
+						Command execution resulted in an error! 
+						Please report this with the suggest command.
+						Include what you were doing and this ID: ${errorID}
+					`;
+
+					if (channelData?.ID === 38) {
+						reply = `WEEWOO Error: ${e.message} - ID ${errorID} WEEWOO`
+					}
 
 					execution = {
 						success: false,
 						reason: "error",
-						reply: `${emote} Command execution resulted in an error! ID ${errorID} ${emote}`
+						reply
 					};
 				}
 			}
