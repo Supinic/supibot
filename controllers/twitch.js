@@ -72,17 +72,25 @@ module.exports = class Twitch extends require("./template.js") {
 
 				// Reference: https://github.com/twitchdev/issues/issues/50
 				// The emote set "0" breaks the following API call, therefore it has to be removed in order for at least
-				// some emotes to be loaded.
+				// some emotes to be loaded. The global emotes are then fetched from TwitchEmotes API...
 				const safeEmoteSets = emoteSets.slice(0);
 				const breakingEmoteSetIndex = emoteSets.findIndex(i => i === "0");
 				safeEmoteSets.splice(breakingEmoteSetIndex, 1);
 
-				const emoteData = await sb.Got.instances.Twitch.Kraken({
-					url: "chat/emoticon_images",
-					searchParams: "emotesets=" + safeEmoteSets.join(",")
-				});
+				const [emoteData, globalEmoteData] = await Promise.all([
+					sb.Got.instances.Twitch.Kraken({
+						url: "chat/emoticon_images",
+						searchParams: "emotesets=" + safeEmoteSets.join(",")
+					}),
+					sb.Got({
+						url: "https://api.twitchemotes.com/api/v4/channels/0"
+					}).json()
+				]);
 
-				this.availableEmotes = emoteData.emoticon_sets;
+				this.availableEmotes = {
+					0: globalEmoteData.emotes.map(i => ({ code: i.code, id: i.id })),
+					...emoteData.emoticon_sets,
+				};
 			}
 		});
 
