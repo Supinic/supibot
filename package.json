@@ -10,10 +10,10 @@
     "message-scheduler": "file:./custom_modules/message-scheduler"
   },
   "engines": {
-    "node": ">= 13.2"
+    "node": ">= 14.0"
   },
   "scripts": {
-    "start": "node ./master.js --harmony-nullish --harmony-optional-chaining"
+    "start": "node ./master.js"
   },
   "main": "master.js",
   "devDependencies": {},
