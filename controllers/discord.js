@@ -20,10 +20,10 @@ module.exports = class Discord extends require("./template.js") {
 			});
 		}
 
-		this.name = this.platform.Self_Name;
 		this.client = new (require("discord.js")).Client();
 
 		this.initListeners();
+		
 		this.client.login(sb.Config.get("DISCORD_BOT_TOKEN"));
 	}
 

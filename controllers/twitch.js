@@ -19,9 +19,8 @@ module.exports = class Twitch extends require("./template.js") {
 			});
 		}
 
-		this.name = this.platform.Self_Name;
 		this.client = new DankTwitch.ChatClient({
-			username: this.name,
+			username: this.platform.Self_Name,
 			password: sb.Config.get("TWITCH_OAUTH"),
 			rateLimits: this.platform.Data.rateLimits ?? "default"
 		});
@@ -51,7 +50,7 @@ module.exports = class Twitch extends require("./template.js") {
 
 		client.on("JOIN", ({ channelName, joinedUsername }) => {
 			// @todo: Could this possibly be a part of channelData? So that it is platform-independent...
-			if (this.platform.Data.reconnectAnnouncement && joinedUsername === this.name.toLowerCase()) {
+			if (this.platform.Data.reconnectAnnouncement && joinedUsername === this.platform.Self_Name.toLowerCase()) {
 				const { channels, string } = this.platform.Data.reconnectAnnouncement;
 				if (channels.includes(channelName)) {
 					client.say(channelName, string);
@@ -319,7 +318,7 @@ module.exports = class Twitch extends require("./template.js") {
 		}
 
 		// Own message - check the regular/vip/mod/broadcaster status, and skip
-		if (userData.Name === this.name && channelData) {
+		if (userData.Name === this.platform.Self_Name && channelData) {
 			if (badges) {
 				const oldMode = channelData.Mode;
 

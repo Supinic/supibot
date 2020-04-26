@@ -35,8 +35,6 @@ module.exports = class Cytube extends require("./template.js") {
 
 		// @todo assign each channel to a separate "room"
 		this.channels = [];
-
-		this.name = this.platform.Self_Name;
 		this.channelData = sb.Channel.get("forsenoffline"); // @todo change this
 
 		this.userMap = new Map();
@@ -164,7 +162,7 @@ module.exports = class Cytube extends require("./template.js") {
 		client.on("queue", async (data) => {
 			const who = data.item.queueby.toLowerCase();
 			const media = data.item.media;
-			if (who === this.name) {
+			if (who === this.platform.Self_Name) {
 				return;
 			}
 
