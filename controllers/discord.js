@@ -4,11 +4,26 @@ module.exports = class Discord extends require("./template.js") {
 		super();
 
 		this.platform = sb.Platform.get("discord");
-		this.name = sb.Config.get("DISCORD_SELF");
+		if (!this.platform) {
+			throw new sb.Error({
+			    message: "Discord platform has not been created"
+			});
+		}
+		else if (!this.platform.Self_ID) {
+			throw new sb.Error({
+				message: "Discord user ID has not been configured"
+			});
+		}
+		else if (!sb.Config.has("DISCORD_BOT_TOKEN", true)) {
+			throw new sb.Error({
+				message: "Discord bot token has not been configured"
+			});
+		}
 
 		this.client = new (require("discord.js")).Client();
 
 		this.initListeners();
+		
 		this.client.login(sb.Config.get("DISCORD_BOT_TOKEN"));
 	}
 
@@ -20,8 +35,16 @@ module.exports = class Discord extends require("./template.js") {
 		});
 
 		client.on("message", async (messageObject) => {
-			const commandPrefix = sb.Config.get("COMMAND_PREFIX");
-			const {commandArguments, discordID, msg, chan, user, mentions, guild, privateMessage} = Discord.parseMessage(messageObject);
+			const {
+				commandArguments,
+				chan,
+				discordID,
+				guild,
+				msg,
+				mentions,
+				privateMessage,
+				user
+			} = this.parseMessage(messageObject);
 
 			let channelData = null;
 			let userData = await sb.User.getByProperty("Discord_ID", discordID);
@@ -80,17 +103,16 @@ module.exports = class Discord extends require("./template.js") {
 			}
 
 			// Own message - skip
-			if (discordID === sb.Config.get("DISCORD_SELF_ID")) {
+			if (discordID === this.platform.Self_ID) {
 				return;
 			}
 
 			sb.Master.globalMessageListener(this.platform, channelData, userData, msg);
 
 			// Starts with correct prefix - handle command
+			const commandPrefix = sb.Config.get("COMMAND_PREFIX");
 			if (msg.startsWith(commandPrefix)) {
 				const command = msg.replace(commandPrefix, "").split(" ")[0];
-				const args = msg.split(/\s+/).slice(1).filter(Boolean);
-
 				this.handleCommand(
 					command,
 					commandArguments.slice(1).map(i => Discord.removeEmoteTags(i)),
@@ -118,8 +140,8 @@ module.exports = class Discord extends require("./template.js") {
 	 * @param channel
 	 */
 	async send (message, channel) {
-		const discordChannel = sb.Channel.get(channel).Name;
-		const channelObject = this.client.channels.get(discordChannel);
+		const channelData = sb.Channel.get(channel).Name;
+		const channelObject = this.client.channels.get(channelData);
 		if (!channelObject) {
 			console.warn("No channel available!", channel);
 			return;
@@ -146,7 +168,7 @@ module.exports = class Discord extends require("./template.js") {
 			}
 		}
 
-		channelObject.send(sb.Utils.wrapString(message, Discord.messageLimit));
+		channelObject.send(sb.Utils.wrapString(message, channelData.Message_Limit ?? this.platform.Message_Limit));
 	}
 
 	/**
@@ -195,7 +217,7 @@ module.exports = class Discord extends require("./template.js") {
 
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
 			const message = await sb.Master.prepareMessage(execution.reply, null, {
-				platform: "discord",
+				platform: this.platform
 			});
 
 			this.pm(userData, message);
@@ -207,10 +229,10 @@ module.exports = class Discord extends require("./template.js") {
 	}
 
 	mirror (message, userData, channelData, commandUsed = false) {
-		const prefix = sb.Config.get("MIRROR_IDENTIFIER_DISCORD");
+		const preparedMessage = Discord.removeEmoteTags(message);
 		const fixedMessage = (commandUsed)
-			? prefix + " " + Discord.removeEmoteTags(message)
-			: prefix + " " + userData.Name + ": " + Discord.removeEmoteTags(message);
+			? `${this.platform.Mirror_Identifier} ${preparedMessage}`
+			: `${this.platform.Mirror_Identifier} ${userData.Name}: ${preparedMessage}`;
 
 		sb.Master.mirror(fixedMessage, userData, channelData.Mirror);
 	}
@@ -225,7 +247,7 @@ module.exports = class Discord extends require("./template.js") {
 		this.destroy();
 	}
 
-	static parseMessage (messageObject) {
+	parseMessage (messageObject) {
 		const args = messageObject.content.split(" ");
 		for (let i = 0; i < args.length; i++) {
 			const match = args[i].match(/<@!(\d+)>/);
@@ -240,7 +262,7 @@ module.exports = class Discord extends require("./template.js") {
 		let index = 0;
 		const links = messageObject.attachments.map(i => i.proxyURL);
 		let targetMessage = messageObject.cleanContent.replace(/\n/g, " ");
-		while (targetMessage.length < Discord.messageLimit && index < links.length) {
+		while (targetMessage.length < this.platform.Message_Limit && index < links.length) {
 			targetMessage += " " + links[index];
 			index++;
 		}
@@ -286,9 +308,5 @@ module.exports = class Discord extends require("./template.js") {
 				})
 				.map(user => sb.User.get(user))
 		)).filter(Boolean);
-	}
-
-	static get messageLimit () {
-		return sb.Config.get("DEFAULT_MSG_LIMIT_DISCORD");
 	}
 };

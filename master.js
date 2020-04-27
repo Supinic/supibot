@@ -119,23 +119,23 @@
 		 * @param {string} message
 		 * @param {Channel} channel
 		 * @param {Object} options = {}
+		 * @param {Platform} [options.platform] Platform object, if necessary. Usually used for PMs.
 		 * @param {boolean} [options.skipBanphrases] If true, no banphrases will be checked
 		 * @param {boolean} [options.skipLengthCheck] If true, length will not be checked
 		 * @returns {Promise<String|Boolean>} Returns prepared message, or false if nothing is to be sent (result is ignored)
 		 */
 		async prepareMessage (message, channel, options = {}) {
-			let platform = null;
-			let channelData = {};
+			let channelData = null;
 			let limit = Infinity;
 
 			if (channel === null) {
 				if (!options.platform) {
 					throw new sb.Error({
-						message: "No platform provided for a null channel (most likely private messages)"
+						message: "No platform provided for private messages"
 					});
 				}
 
-				limit = sb.Config.get("DEFAULT_MSG_LIMIT_" + options.platform.toUpperCase());
+				limit = options.platform.Message_Limit;
 				if (options.platform === "twitch") {
 					limit -= options.extraLength;
 				}
@@ -154,9 +154,8 @@
 					message = message.replace(sb.Config.get("LINK_REGEX"), "[LINK]");
 				}
 
-				platform = channelData.Platform.Name;
 				if (!options.skipLengthCheck) {
-					limit = channelData.Message_Limit || sb.Config.get("DEFAULT_MSG_LIMIT_" + platform.toUpperCase());
+					limit = channelData.Message_Limit ?? channelData.Platform.Message_Limit;
 				}
 			}
 
@@ -164,10 +163,8 @@
 
 			// Execute all eligible banphrases, if necessary
 			if (!options.skipBanphrases && sb.Banphrase) {
-				const {string, passed} = await sb.Banphrase.execute(message, channelData);
-
+				const { passed, string } = await sb.Banphrase.execute(message, channelData);
 				if (!passed) {
-					sb.SystemLogger.send("Message.Ban", "(" + string + ") => (" + message + ")", channelData);
 					if (options.returnBooleanOnFail) {
 						return passed;
 					}
@@ -176,7 +173,7 @@
 				message = string;
 			}
 
-			// False -> request do not reply at all
+			// If the result is not string, do not reply at all.
 			if (typeof message !== "string") {
 				return false;
 			}

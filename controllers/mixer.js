@@ -8,6 +8,17 @@ module.exports = class Mixer extends require("./template.js") {
 		super();
 
 		this.platform = sb.Platform.get("mixer");
+		if (!this.platform) {
+			throw new sb.Error({
+				message: "Mixer platform has not been created"
+			});
+		}
+		else if (!sb.Config.has("MIXER_OAUTH", true)) {
+			throw new sb.Error({
+				message: "Mixer oauth token has not been configured"
+			});
+		}
+
 		this.client = new MixerClient.Client(new MixerClient.DefaultRequestRunner());
 
 		// With OAuth we don't need to log in. The OAuth Provider will attach
@@ -92,7 +103,7 @@ module.exports = class Mixer extends require("./template.js") {
 	 * @throws {sb.Error} If the provided user has no Discord ID connected.
 	 */
 	async pm (user, msg) {
-		// todo
+		throw new sb.errors.NotImplemented();
 	}
 
 	async handleMessage (data) {
@@ -192,8 +203,8 @@ module.exports = class Mixer extends require("./template.js") {
 
 	mirror (message, userData, channelData, commandUsed = false) {
 		const fixedMessage = (commandUsed)
-			? sb.Config.get("MIRROR_IDENTIFIER_MIXER") + " " + message
-			: sb.Config.get("MIRROR_IDENTIFIER_MIXER") + " " + userData.Name + ": " + message;
+			? `${this.platform.Mirror_Identifier} ${message}`
+			: `${this.platform.Mirror_Identifier} ${userData.Name}: ${message}`;
 
 		sb.Master.mirror(fixedMessage, userData, channelData.Mirror);
 	}

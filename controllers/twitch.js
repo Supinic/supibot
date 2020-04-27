@@ -8,11 +8,21 @@ module.exports = class Twitch extends require("./template.js") {
 		super();
 
 		this.platform = sb.Platform.get("twitch");
-		this.name = sb.Config.get("TWITCH_USERNAME");
+		if (!this.platform) {
+			throw new sb.Error({
+				message: "Twitch platform has not been created"
+			});
+		}
+		else if (!sb.Config.has("TWITCH_OAUTH", true)) {
+			throw new sb.Error({
+				message: "Twitch oauth token has not been configured"
+			});
+		}
+
 		this.client = new DankTwitch.ChatClient({
-			username: this.name,
+			username: this.platform.Self_Name,
 			password: sb.Config.get("TWITCH_OAUTH"),
-			rateLimits: sb.Config.get("TWITCH_ACCOUNT_TYPE")
+			rateLimits: this.platform.Data.rateLimits ?? "default"
 		});
 
 		this.queues = {};
@@ -38,11 +48,13 @@ module.exports = class Twitch extends require("./template.js") {
 			}
 		});
 
-		client.on("JOIN", ({channelName, joinedUsername}) => {
-			console.debug(joinedUsername, channelName);
-
-			if (joinedUsername.toLowerCase() === sb.Config.get("TWITCH_USERNAME") && channelName.includes("supinic")) {
-				// client.say(channelName, "HONEYDETECTED RECONNECTED");
+		client.on("JOIN", ({ channelName, joinedUsername }) => {
+			// @todo: Could this possibly be a part of channelData? So that it is platform-independent...
+			if (this.platform.Data.reconnectAnnouncement && joinedUsername === this.platform.Self_Name.toLowerCase()) {
+				const { channels, string } = this.platform.Data.reconnectAnnouncement;
+				if (channels.includes(channelName)) {
+					client.say(channelName, string);
+				}
 			}
 		});
 
@@ -58,12 +70,27 @@ module.exports = class Twitch extends require("./template.js") {
 			if (strings[0] !== strings[1]) {
 				this.availableEmoteSets = emoteSets;
 
-				const emoteData = await sb.Got.instances.Twitch.Kraken({
-					url: "chat/emoticon_images",
-					searchParams: "emotesets=" + emoteSets.join(",")
-				});
+				// Reference: https://github.com/twitchdev/issues/issues/50
+				// The emote set "0" breaks the following API call, therefore it has to be removed in order for at least
+				// some emotes to be loaded. The global emotes are then fetched from TwitchEmotes API...
+				const safeEmoteSets = emoteSets.slice(0);
+				const breakingEmoteSetIndex = emoteSets.findIndex(i => i === "0");
+				safeEmoteSets.splice(breakingEmoteSetIndex, 1);
 
-				this.availableEmotes = emoteData.emoticon_sets;
+				const [emoteData, globalEmoteData] = await Promise.all([
+					sb.Got.instances.Twitch.Kraken({
+						url: "chat/emoticon_images",
+						searchParams: "emotesets=" + safeEmoteSets.join(",")
+					}),
+					sb.Got({
+						url: "https://api.twitchemotes.com/api/v4/channels/0"
+					}).json()
+				]);
+
+				this.availableEmotes = {
+					0: globalEmoteData.emotes.map(i => ({ code: i.code, id: i.id })),
+					...emoteData.emoticon_sets,
+				};
 			}
 		});
 
@@ -102,6 +129,9 @@ module.exports = class Twitch extends require("./template.js") {
 
 		client.on("USERNOTICE", async (messageObject) => {
 			const {messageText, messageTypeID, senderUsername, channelName} = messageObject;
+			if (this.platform.Data.ignoredUserNotices.includes?.(messageTypeID)) {
+				return; // ignore these events
+			}
 
 			if (messageObject.isSub() || messageObject.isResub()) {
 				this.handleSubscription(
@@ -131,9 +161,6 @@ module.exports = class Twitch extends require("./template.js") {
 					senderUsername,
 					messageObject.eventParams.viewerCount
 				);
-			}
-			else if (sb.Config.get("TWITCH_IGNORED_USERNOTICE").includes(messageTypeID)) {
-				// ignore these events
 			}
 			else if (messageObject.isRitual()) {
 				const userData = await sb.User.get(senderUsername, false);
@@ -188,16 +215,18 @@ module.exports = class Twitch extends require("./template.js") {
 				this.queues[channelName] = null;
 			}
 
+			const { defaultGlobalCooldown, defaultQueueSize, modes } = this.platform.Data;
 			const scheduler = new MessageScheduler({
 				mode: channelData.Mode,
 				channelID: channelData.ID,
-				timeout: sb.Config.get("CHANNEL_COOLDOWN_" + channelData.Mode.toUpperCase()),
-				maxSize: sb.Config.get("CHANNEL_SCHEDULER_MAX_SIZE_" + channelData.Mode.toUpperCase()),
+				timeout: modes[channelData.Mode]?.cooldown ?? defaultGlobalCooldown,
+				maxSize: modes[channelData.Mode]?.queueSize ?? defaultQueueSize
 			});
 
 			scheduler.on("message", (msg) => {
 				this.client.say(channelName, msg);
 			});
+
 			this.queues[channelName] = scheduler;
 		}
 
@@ -242,11 +271,8 @@ module.exports = class Twitch extends require("./template.js") {
 		if (!userData) {
 			return;
 		}
-
-		const now = sb.Date.now();
-		if (!userData.Twitch_ID && senderUserID && Math.abs(now - this.userIDTimeout) > 1000) {
-			userData.saveProperty("Twitch_ID", senderUserID);
-			this.userIDTimeout = now;
+		if (!userData.Twitch_ID && senderUserID) {
+			await userData.saveProperty("Twitch_ID", senderUserID);
 		}
 
 		// Only check channels,
@@ -255,6 +281,10 @@ module.exports = class Twitch extends require("./template.js") {
 
 			if (!channelData) {
 				return sb.SystemLogger.send("Twitch.Error", "Cannot find channel " + channelName);
+			}
+			else if (channelData.Mode === "Last seen") {
+				sb.Logger.updateLastSeen({ userData, channelData, message });
+				return;
 			}
 			else if (channelData.Mode === "Inactive") {
 				return;
@@ -303,7 +333,7 @@ module.exports = class Twitch extends require("./template.js") {
 		}
 
 		// Own message - check the regular/vip/mod/broadcaster status, and skip
-		if (userData.Name === this.name && channelData) {
+		if (userData.Name === this.platform.Self_Name && channelData) {
 			if (badges) {
 				const oldMode = channelData.Mode;
 
@@ -424,7 +454,7 @@ module.exports = class Twitch extends require("./template.js") {
 
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
 			const message = await sb.Master.prepareMessage(execution.reply, null, {
-				platform: "twitch",
+				platform: this.platform,
 				extraLength: ("/w " + userData.Name + " ").length
 			});
 
@@ -568,8 +598,8 @@ module.exports = class Twitch extends require("./template.js") {
 
 	mirror (message, userData, channelData, commandUsed = false) {
 		const fixedMessage = (commandUsed)
-			? sb.Config.get("MIRROR_IDENTIFIER_TWITCH") + " " + message
-			: sb.Config.get("MIRROR_IDENTIFIER_TWITCH") + " " + userData.Name + ": " + message;
+			? `${this.platform.Mirror_Identifier} ${message}`
+			: `${this.platform.Mirror_Identifier} ${userData.Name}: ${message}`;
 
 		sb.Master.mirror(fixedMessage, userData, channelData.Mirror);
 	}

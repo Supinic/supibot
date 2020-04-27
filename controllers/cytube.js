@@ -9,11 +9,22 @@ module.exports = class Cytube extends require("./template.js") {
 		super();
 
 		this.platform = sb.Platform.get("cytube");
+		if (!this.platform) {
+			throw new sb.Error({
+				message: "Cytube platform has not been created"
+			});
+		}
+		else if (!sb.Config.has("CYTUBE_BOT_PASSWORD", true)) {
+			throw new sb.Error({
+				message: "Cytube password has not been configured"
+			});
+		}
+
 		this.client = new CytubeConnector({
 			host: "cytu.be",
 			port: 443,
 			secure: true,
-			user: sb.Config.get("CYTUBE_SELF"),
+			user: this.platform.Self_Name,
 			auth: sb.Config.get("CYTUBE_BOT_PASSWORD"),
 			chan: "forsenoffline" // @todo change this to be flexible
 		});
@@ -24,10 +35,6 @@ module.exports = class Cytube extends require("./template.js") {
 
 		// @todo assign each channel to a separate "room"
 		this.channels = [];
-
-		/** @type {string} */
-		this.name = sb.Config.get("CYTUBE_SELF");
-		/** @type {Channel} */
 		this.channelData = sb.Channel.get("forsenoffline"); // @todo change this
 
 		this.userMap = new Map();
@@ -88,7 +95,9 @@ module.exports = class Cytube extends require("./template.js") {
 				return;
 			}
 
+			const originalUsername = data.username;
 			data.username = data.username.toLowerCase();
+
 			const msg = sb.Utils.fixHTML(data.msg).replace(/<(?:.|\n)*?>/gm, "");
 			const userData = await sb.User.get(data.username, false);
 			const platformUserData = (data.username === "[server]")
@@ -110,7 +119,8 @@ module.exports = class Cytube extends require("./template.js") {
 			// Only unset AFK and fire reminders if the message wasn't private
 			if (!data.meta.private) {
 				// Do not process mirrored messages
-				if (userData.ID === sb.Config.get("SELF_ID") && sb.Config.get("MIRROR_IDENTIFIERS").includes(Array.from(msg)[0])) {
+				const identifiers = sb.Platform.data.map(i => i.Mirror_Identifier);
+				if (originalUsername === this.platform.Self_Name && identifiers.includes(Array.from(msg)[0])) {
 					return;
 				}
 				
@@ -152,7 +162,7 @@ module.exports = class Cytube extends require("./template.js") {
 		client.on("queue", async (data) => {
 			const who = data.item.queueby.toLowerCase();
 			const media = data.item.media;
-			if (who === this.name) {
+			if (who === this.platform.Self_Name) {
 				return;
 			}
 
@@ -242,7 +252,7 @@ module.exports = class Cytube extends require("./template.js") {
 			// @todo separate room handling for multiple channels
 		}
 
-		const messageLimit = sb.Config.get("CYTUBE_MESSAGE_LIMIT");
+		const messageLimit = this.platform.Message_Limit;
 		const lengthRegex = new RegExp(".{1," + messageLimit + "}", "g");
 		let arr = message
 			.replace(/(\r?\n)/g, " ")
@@ -327,8 +337,8 @@ module.exports = class Cytube extends require("./template.js") {
 		}
 		
 		const fixedMessage = (commandUsed)
-			? sb.Config.get("MIRROR_IDENTIFIER_CYTUBE") + " " + message
-			: sb.Config.get("MIRROR_IDENTIFIER_CYTUBE") + " " + userData.Name + ": " + message;
+			? `${this.platform.Mirror_Identifier} ${message}`
+			: `${this.platform.Mirror_Identifier} ${userData.Name}: ${message}`;
 
 		sb.Master.mirror(fixedMessage, userData, this.channelData.Mirror);
 	}
