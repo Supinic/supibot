@@ -88,7 +88,11 @@ module.exports = (function () {
             User.data = new Map();
             User.pendingNewUsers = new Set();
 
-            User.insertBatch = await sb.Query.getBatch("chat_data", "User_Alias", ["Name"]);
+            User.insertBatch = await sb.Query.getBatch(
+                "chat_data",
+                "User_Alias",
+                ["Name", "Discord_ID", "Mixer_ID", "Twitch_ID"]
+            );
             User.insertCron = new CronJob(
                 sb.Config.get("USER_INSERT_CRON_CONFIG"),
                 async () => {
@@ -133,10 +137,11 @@ module.exports = (function () {
          * Returns immediately if identifier is already a User.
          * @param {User|number|string} identifier
          * @param {boolean} strict If false and searching for user via string, and it is not found, creates a new User.
+         * @param {Object} [options]
          * @returns {User|void}
          * @throws {sb.Error} If the type of identifier is unrecognized
          */
-        static async get (identifier, strict = true) {
+        static async get (identifier, strict = true, options = {}) {
             if (identifier instanceof User) {
                 return identifier;
             }
@@ -179,7 +184,10 @@ module.exports = (function () {
                         if (!User.pendingNewUsers.has(identifier)) {
                             User.pendingNewUsers.add(identifier);
                             User.insertBatch.add({
-                                Name: identifier
+                                Name: identifier,
+                                Discord_ID: options.Discord_ID ?? null,
+                                Mixer_ID: options.Mixer_ID ?? null,
+                                Twitch_ID: options.Twitch_ID ?? null
                             });
                         }
 
