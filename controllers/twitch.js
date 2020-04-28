@@ -267,12 +267,9 @@ module.exports = class Twitch extends require("./template.js") {
 			: "message";
 
 		let channelData = null;
-		const userData = await sb.User.get(senderUsername, false);
+		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserID });
 		if (!userData) {
 			return;
-		}
-		if (!userData.Twitch_ID && senderUserID) {
-			await userData.saveProperty("Twitch_ID", senderUserID);
 		}
 
 		// Only check channels,
