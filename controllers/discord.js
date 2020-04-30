@@ -23,15 +23,25 @@ module.exports = class Discord extends require("./template.js") {
 		this.client = new (require("discord.js")).Client();
 
 		this.initListeners();
-		
+
 		this.client.login(sb.Config.get("DISCORD_BOT_TOKEN"));
 	}
 
 	initListeners () {
 		const client = this.client;
 
-		client.on("ready", () => {
-			sb.SystemLogger.send("Discord.Success", "Initialized");
+		client.on("ready", async () => {
+			const active = client.channels.filter(i => i.type === "text");
+			const joinable = sb.Channel.getJoinableForPlatform("discord");
+
+			for (const channel of joinable) {
+				const exists = active.find(i => i.id === channel.Name);
+				if (!exists) {
+					channel.Mode = "Inactive";
+					await channel.saveProperty("Mode", channel.Mode);
+					console.debug("Discord channel set as inactive", channel);
+				}
+			}
 		});
 
 		client.on("message", async (messageObject) => {
@@ -72,8 +82,11 @@ module.exports = class Discord extends require("./template.js") {
 					await channelData.setup();
 				}
 
+				// If a message comes from a channel set as "Inactive", this means it is active again.
+				// Change its mode back to active.
 				if (channelData.Mode === "Inactive") {
-					return;
+					channel.Mode = "Write";
+					await channel.saveProperty("Mode", channel.Mode);
 				}
 
 				const channelDescription = guild.name + " - #" + messageObject.channel.name;
