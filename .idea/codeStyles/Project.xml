@@ -6,6 +6,7 @@
       <option name="FORCE_QUOTE_STYlE" value="true" />
       <option name="ENFORCE_TRAILING_COMMA" value="Remove" />
       <option name="VAR_DECLARATION_WRAP" value="5" />
+      <option name="OBJECT_LITERAL_WRAP" value="2" />
       <option name="SPACES_WITHIN_OBJECT_LITERAL_BRACES" value="true" />
     </JSCodeStyleSettings>
     <codeStyleSettings language="JavaScript">
@@ -16,7 +17,7 @@
       <option name="ALIGN_MULTILINE_FOR" value="false" />
       <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
       <option name="SPACE_BEFORE_METHOD_PARENTHESES" value="true" />
-      <option name="METHOD_CALL_CHAIN_WRAP" value="2" />
+      <option name="METHOD_CALL_CHAIN_WRAP" value="5" />
       <option name="TERNARY_OPERATION_WRAP" value="5" />
       <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
       <option name="ARRAY_INITIALIZER_WRAP" value="5" />

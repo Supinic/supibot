@@ -209,12 +209,14 @@ module.exports = class Cytube extends require("./template.js") {
 		});
 
 		client.on("error", (err) => {
+			console.error("Cytube error", err);
+
 			if (this.restarting) {
 				return;
 			}
 
 			this.restarting = true;
-			this.restartInterval = setTimeout(() => this.restartClient(), this.restartDelay);
+			this.restartInterval = setTimeout(() => this.restart(), this.restartDelay);
 
 			// if (!this._restarting) {
 			// 	setTimeout(() => this.restart(), 20e3);
@@ -357,12 +359,6 @@ module.exports = class Cytube extends require("./template.js") {
 	 */
 	destroy () {
 		this.client = null;
-	}
-
-	restartClient () {
-		this.restarting = true;
-		this.client.destroy();
-		this.client = new CytubeConnector(this.options);
 	}
 };
 
