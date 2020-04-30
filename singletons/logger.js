@@ -168,7 +168,7 @@ module.exports = (function (Module) {
 					userMap.clear();
 				}
 
-				await sb.Query.batchUpdate(data, { priority: "low" }, (ru, row) => ru
+				await sb.Query.batchUpdate(data, (ru, row) => ru
 					.update("chat_data", "Message_Meta_User_Alias")
 					.set("Message_Count", {
 						useField: true,
