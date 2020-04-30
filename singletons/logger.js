@@ -179,7 +179,7 @@ module.exports = (function (Module) {
 					.where("User_Alias = %n", row.user)
 					.where("Channel = %n", row.channel)
 					.priority("low")
-					.ignore()
+					.ignoreDuplicates()
 				);
 
 				this.lastSeenRunning = false;
