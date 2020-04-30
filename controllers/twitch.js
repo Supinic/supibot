@@ -146,12 +146,13 @@ module.exports = class Twitch extends require("./template.js") {
 				);
 			}
 			else if (messageObject.messageID === "anonsubgift" || messageObject.isSubgift()) {
-				const {months, recipientUserName: recipient, senderCount} = messageObject;
+				const { months, recipientUsername } = messageObject.eventParams;
+				const recipientData = await sb.User.get(recipientUsername);
+
 				this.handleGiftedSubscription(channelName, senderUsername || null, {
+					months,
 					gifted: 1,
-					recipient: recipient,
-					months: months,
-					totalCount: senderCount
+					recipient: recipientData
 				});
 			}
 			else if (messageObject.isRaid()) {
