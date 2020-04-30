@@ -191,8 +191,20 @@ module.exports = (function () {
 			await Command.loadData();
 		}
 
+		/**
+		 * Reloads a specific list of commands.
+		 * @param {string[]} list
+		 * @returns {Promise<void>} True if passed, false if 
+		 * @throws {sb.Error} If the list contains 0 valid commands
+		 */
 		static async reloadSpecific (...list) {
 			const reloadingCommands = list.map(i => Command.get(i)).filter(Boolean);
+			if (reloadingCommands.length === 0) {
+				throw new sb.Error({
+					message: "No valid commands provided"
+				});
+			}
+
 			const data = await sb.Query.getRecordset(rs => rs
 				.select("*")
 				.from("chat_data", "Command")
