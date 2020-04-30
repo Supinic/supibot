@@ -557,17 +557,18 @@ module.exports = class Twitch extends require("./template.js") {
 			return;
 		}
 
+		const gifterData = await sb.User.get(gifter, true);
 		if (channelData && typeof channelData.Custom_Code === "function") {
 			channelData.Custom_Code({
 				type: "subgift",
-				gifted: data.gifted,
+				subsGifted: data.gifted,
+				gifter: gifterData,
 				recipient: data.recipient || null,
 				months: data.months || null,
 				plan: null // @todo - find in event sub/resub.methods
 			});
 		}
 
-		const gifterData = await sb.User.get(gifter, true);
 		if (!gifterData) {
 			return;
 		}
