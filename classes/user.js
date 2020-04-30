@@ -70,11 +70,18 @@ module.exports = (function () {
          * @returns {Promise<void>}
          */
         async saveProperty (property, value) {
-            this[property] = value;
             const row = await sb.Query.getRow("chat_data", "User_Alias");
             await row.load(this.ID);
 
-            if (value && value.constructor === Object) {
+            if (typeof value !== "undefined") {
+                this[property] = value;
+
+            }
+            else {
+                value = this[property];
+            }
+
+            if (value?.constructor === Object) {
                 value = JSON.stringify(value, null, 4);
             }
 

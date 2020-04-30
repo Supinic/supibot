@@ -232,9 +232,21 @@ module.exports = (function () {
          * @returns {Promise<void>}
          */
         async saveProperty (property, value) {
-            this[property] = value;
             const row = await sb.Query.getRow("chat_data", "Channel");
             await row.load(this.ID);
+
+            if (typeof value !== "undefined") {
+                this[property] = value;
+
+            }
+            else {
+                value = this[property];
+            }
+
+            if (value?.constructor === Object) {
+                value = JSON.stringify(value, null, 4);
+            }
+
             row.values[property] = value;
             await row.save();
         }
