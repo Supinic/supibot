@@ -66,6 +66,24 @@ module.exports = class Discord extends require("./template.js") {
 				// If it is, skip entirely - the name must be matched precisely to the Discord ID, and this is an anomaly
 				// Needs to be fixed or flagged manually
 				if (nameCheckData && nameCheckData.Discord_ID === null && nameCheckData.Twitch_ID !== null) {
+					if (nameCheckData.Data.discordChallengeNotificationSent) {
+						return;
+					}
+
+					const { challenge } = await Discord.createAccountChallenge(nameCheckData, discordID);
+					nameCheckData.Data.discordChallengeNotificationSent = true;
+					await nameCheckData.saveProperty("Data");
+
+					const prefix = sb.Config.get("COMMAND_PREFIX");
+					await this.directPm(
+						discordID,
+						sb.Utils.tag.trim `
+							You were found to be likely to own a Twitch account with the same name as your current Discord account.
+							If you want to use my commands on Discord, whisper me the following command on Twitch:
+							${prefix}link ${challenge}
+						 `
+					);
+
 					return;
 				}
 				// Otherwise, set up the user with their Discord ID
@@ -206,6 +224,17 @@ module.exports = class Discord extends require("./template.js") {
 	}
 
 	/**
+	 * Directly sends a private message to user, without them necessarily being saved as a user.
+	 * @param {string} userID
+	 * @param {string }msg
+	 * @returns {Promise<void>}
+	 */
+	async directPm (userID, msg) {
+		const discordUser = await this.client.fetchUser(userID);
+		discordUser.send(msg);
+	}
+
+	/**
 	 * Handles command execution.
 	 * @param {string} command Command invocation string
 	 * @param {User} userData
@@ -298,6 +327,24 @@ module.exports = class Discord extends require("./template.js") {
 		return message.replace(/<a?:(.*?):(\d*)>/g, (total, emote) => emote + " ").trim();
 	}
 
+	static async createAccountChallenge (userData, discordID) {
+		const row = await sb.Query.getRow("chat_data", "User_Verification_Challenge");
+		const challenge = require("crypto").randomBytes(16).toString("hex");
+
+		row.setValues({
+			User_Alias: userData.ID,
+			Specific_ID: discordID,
+			Challenge: challenge,
+			Platform_From: sb.Platform.get("discord").ID,
+			Platform_To: sb.Platform.get("twitch").ID
+		});
+
+		await row.save();
+		return {
+			challenge
+		};
+	}
+
 	static async getMentionsInMessage (message) {
 		return (await Promise.all(
 			message.replace(/^.*?@/, "@")
@@ -322,4 +369,5 @@ module.exports = class Discord extends require("./template.js") {
 				.map(user => sb.User.get(user))
 		)).filter(Boolean);
 	}
+
 };
