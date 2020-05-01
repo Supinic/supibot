@@ -60,6 +60,22 @@ module.exports = (function () {
 			this.Mirror_Identifier = data.Mirror_Identifier ?? "";
 
 			/**
+			 * Settings related to logging permissions and levels.
+			 * @type {Object}
+			 */
+			this.Logging = {};
+
+			if (data.Logging) {
+				try {
+					this.Logging = JSON.parse(data.Logging);
+				}
+				catch (e) {
+					this.Logging = {};
+					console.warn(`Platform ${this.Name} has incorrect logging settings definition`, e);
+				}
+			}
+
+			/**
 			 * Custom platform-specific data, parsed from JSON format.
 			 * @type {Object}
 			 */
