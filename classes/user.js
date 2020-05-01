@@ -187,7 +187,6 @@ module.exports = (function () {
                         User.data.set(data.Name, user);
                     }
                     else if (!strict) {
-                        // !!! EXPERIMENTAL !!!
                         if (!User.pendingNewUsers.has(identifier)) {
                             User.pendingNewUsers.add(identifier);
                             User.insertBatch.add({
@@ -198,8 +197,10 @@ module.exports = (function () {
                             });
                         }
 
+                        // Returns null, which should usually abort working with user's message.
+                        // We lose a couple of messages from a brand new user, but this is an acceptable measure
+                        // in order to reduce the amount of user-insert db connections.
                         return null;
-                        // user = await User.add(identifier);
                     }
                 }
 
