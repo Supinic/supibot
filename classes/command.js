@@ -28,8 +28,7 @@ module.exports = (function () {
 				data.Aliases = eval(data.Aliases) || [];
 			}
 			catch (e) {
-				console.log("Command" + this.ID + " has invalid aliases definition: " + e.toString());
-				sb.SystemLogger.send("Command.Error", "Command " + this.Name + " (" + this.ID + ") has invalid aliases definition: " + e.toString() + "\n" + e.stack);
+				console.warn(`Command ${this.Name} (${this.ID}) has invalid aliases definition: ${e}`);
 				data.Aliases = [];
 			}
 

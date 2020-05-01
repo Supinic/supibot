@@ -89,20 +89,10 @@ module.exports = (function (Module) {
 					this.meta[channelID] = { amount: 0, length: 0, users: {} };
 				}
 
-				try {
-					await Promise.all([
-						this.metaBatch.insert({ ignore: true }),
-						this.countMetaBatch.insert({ ignore: true })
-					]);
-				}
-				catch (e) {
-					if (e.code === "ER_DUP_ENTRY") {
-						await sb.SystemLogger.sendError("Database", e, null);
-					}
-					else {
-						throw e;
-					}
-				}
+				await Promise.all([
+					this.metaBatch.insert({ ignore: true }),
+					this.countMetaBatch.insert({ ignore: true })
+				]);
 			});
 			this.metaCron.start();
 
@@ -284,18 +274,19 @@ module.exports = (function (Module) {
 		 * @returns {Promise<void>}
 		 */
 		async logVideoRequest (link, typeIdentifier, length, userData, channelData) {
-			if (!sb.Config.get("CYTUBE_VIDEO_LOGGING_ENABLED")) {
-				return;
-			}
-
 			if (this.videoTypes.length === 0) {
 				return;
 			}
 
 			const type = this.videoTypes.find(i => i.Type === typeIdentifier);
 			if (!type) {
-				sb.SystemLogger.send("Cytube.Fail", "Unsupported video type", type);
-				return;
+				throw new sb.Error({
+					message: "Video type not found",
+					args: {
+						input: type,
+						supported: this.videoTypes
+					}
+				});
 			}
 
 			const row = await sb.Query.getRow("cytube", "Video_Request");
@@ -307,6 +298,7 @@ module.exports = (function (Module) {
 				Length: length,
 				Channel: channelData.ID
 			});
+
 			await row.save();
 		}
 
