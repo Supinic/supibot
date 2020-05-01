@@ -167,12 +167,9 @@ module.exports = class Twitch extends require("./template.js") {
 				const userData = await sb.User.get(senderUsername, false);
 				const channelData = sb.Channel.get(channelName);
 
-				await sb.SystemLogger.send(
-					"Twitch.Ritual",
-					messageObject.systemMessage + " " + messageText,
-					channelData,
-					userData
-				);
+				if (this.platform.Logging.rituals) {
+					sb.SystemLogger.send("Twitch.Ritual", messageObject.systemMessage + " " + messageText, channelData, userData);
+				}
 			}
 			else {
 				console.warn("Uncaught USERNOTICE event", messageObject);
@@ -189,8 +186,10 @@ module.exports = class Twitch extends require("./template.js") {
 				this.handleBan(username, channelName, reason, messageObject.banDuration);
 			}
 			else if (messageObject.wasChatCleared()) {
-				const channelData = sb.Channel.get(channelName);
-				sb.SystemLogger.send("Twitch.Clearchat", null, channelData);
+				if (this.platform.Logging.clearChats) {
+					const channelData = sb.Channel.get(channelName);
+					sb.SystemLogger.send("Twitch.Clearchat", null, channelData);
+				}
 			}
 		});
 	}
@@ -278,7 +277,8 @@ module.exports = class Twitch extends require("./template.js") {
 			channelData = sb.Channel.get(channelName);
 
 			if (!channelData) {
-				return sb.SystemLogger.send("Twitch.Error", "Cannot find channel " + channelName);
+				console.error("Cannot find channel " + channelName);
+				return;
 			}
 			else if (channelData.Mode === "Last seen") {
 				sb.Logger.updateLastSeen({ userData, channelData, message });
@@ -288,7 +288,9 @@ module.exports = class Twitch extends require("./template.js") {
 				return;
 			}
 
-			sb.Logger.push(message, userData, channelData);
+			if (this.platform.Logging.messages) {
+				sb.Logger.push(message, userData, channelData);
+			}
 
 			// If channel is read-only, do not proceed with any processing
 			// Such as custom codes, un-AFK, reminders, commands (...)
@@ -326,7 +328,10 @@ module.exports = class Twitch extends require("./template.js") {
 			}
 		}
 		else {
-			sb.SystemLogger.send("Twitch.Other", "whisper: " + message, null, userData);
+			if (this.platform.Logging.whispers) {
+				sb.SystemLogger.send("Twitch.Other", "whisper: " + message, null, userData);
+			}
+
 			console.debug("Whisper received: Twitch", userData.Name, message);
 		}
 
@@ -356,7 +361,7 @@ module.exports = class Twitch extends require("./template.js") {
 			return;
 		}
 
-		if (typeof bits !== "undefined" && bits !== null) {
+		if (this.platform.Logging.bits && typeof bits !== "undefined" && bits !== null) {
 			sb.SystemLogger.send("Twitch.Other", bits + " bits", channelData, userData);
 		}
 
@@ -423,10 +428,9 @@ module.exports = class Twitch extends require("./template.js") {
 			});
 		}
 
-		sb.SystemLogger.send(
-			"Twitch.Host",
-			type + ": " + from + " => " + to + " for " + viewers + " viewers"
-		);
+		if (this.platform.Logging.hosts) {
+			sb.SystemLogger.send("Twitch.Host", `${type}: ${from} => ${to} for ${viewers} viewers`);
+		}
 	}
 
 	/**
@@ -502,7 +506,10 @@ module.exports = class Twitch extends require("./template.js") {
 			}
 
 			channelData.sessionData.recentBans++;
-			sb.Logger.logBan(user, channelData, length, new sb.Date(), reason);
+
+			if (this.platform.Logging.bans) {
+				sb.Logger.logBan(user, channelData, length, new sb.Date(), reason);
+			}
 		}
 	}
 
@@ -533,12 +540,9 @@ module.exports = class Twitch extends require("./template.js") {
 			});
 		}
 
-		sb.SystemLogger.send(
-			"Twitch.Sub",
-			plans[plan],
-			channelData,
-			userData
-		);
+		if (this.platform.Logging.subs) {
+			sb.SystemLogger.send("Twitch.Sub", plans[plan], channelData, userData);
+		}
 	}
 
 	/**
@@ -574,11 +578,13 @@ module.exports = class Twitch extends require("./template.js") {
 			return;
 		}
 
-		const logMessage = (data.recipient)
-			? (gifterData.Name + " gifted a subscription to " + data.recipient.Name)
-			: (gifterData.Name + " gifted " + data.gifted + " subs");
+		if (this.platform.Logging.giftSubs) {
+			const logMessage = (data.recipient)
+				? (gifterData.Name + " gifted a subscription to " + data.recipient.Name)
+				: (gifterData.Name + " gifted " + data.gifted + " subs");
 
-		sb.SystemLogger.send("Twitch.Giftsub", logMessage, channelData, data.recipient || null);
+			sb.SystemLogger.send("Twitch.Giftsub", logMessage, channelData, data.recipient || null);
+		}
 	}
 
 	/**
