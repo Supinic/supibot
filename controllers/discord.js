@@ -160,7 +160,6 @@ module.exports = class Discord extends require("./template.js") {
 
 		client.on("error", (err) => {
 			console.error(err);
-			sb.SystemLogger.send("Discord.Error", err.description);
 			this.restart();
 		});
 	}

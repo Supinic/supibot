@@ -70,8 +70,8 @@ module.exports = class Cytube extends require("./template.js") {
 		});
 
 		// Disconnect event fired - restart and reconnect
-		client.on("disconnect", () => {
-			sb.SystemLogger.send("Cytube.Restart", "Disconnected");
+		client.on("disconnect", (...args) => {
+			console.warn("Cytube disconnect", ...args);
 			this.restart();
 		});
 
@@ -133,7 +133,9 @@ module.exports = class Cytube extends require("./template.js") {
 				}
 			}
 			else {
-				sb.SystemLogger.send("Cytube.Other", "PM: " + msg, this.channelData, userData);
+				if (this.platform.Logging.whispers) {
+					sb.SystemLogger.send("Cytube.Other", "PM: " + msg, this.channelData, userData);
+				}
 			}
 
 			sb.Master.globalMessageListener(
@@ -167,7 +169,9 @@ module.exports = class Cytube extends require("./template.js") {
 			}
 
 			const userData = await sb.User.get(who, false);
-			sb.Logger.logVideoRequest(media.id, media.type, media.seconds, userData, this.channelData);
+			if (this.platform.Logging.videoRequests) {
+				sb.Logger.logVideoRequest(media.id, media.type, media.seconds, userData, this.channelData);
+			}
 
 			this.playlistData.push({
 				media: media,
