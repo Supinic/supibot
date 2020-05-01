@@ -103,7 +103,7 @@ module.exports = (function () {
             User.insertCron = new CronJob(
                 sb.Config.get("USER_INSERT_CRON_CONFIG"),
                 async () => {
-                    await User.insertBatch.insert();
+                    await User.insertBatch.insert({ ignore: true });
                     User.pendingNewUsers.clear();
                 }
             );

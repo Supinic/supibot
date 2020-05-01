@@ -59,7 +59,7 @@ module.exports = (function (Module) {
 			this.messageCron.start();
 
 			this.metaCron = new CronJob(sb.Config.get("CRON_META_MESSAGE_CONFIG"), async () => {
-				if (!sb.Config.get("MESSAGE_LOGGING_ENABLED") || !sb.Config.get("MESSAGE_META_LOGGING_ENABLED") || !this.metaBatch.ready) {
+				if (!this.metaBatch.ready) {
 					return;
 				}
 
@@ -91,8 +91,8 @@ module.exports = (function (Module) {
 
 				try {
 					await Promise.all([
-						this.metaBatch.insert(),
-						this.countMetaBatch.insert()
+						this.metaBatch.insert({ ignore: true }),
+						this.countMetaBatch.insert({ ignore: true })
 					]);
 				}
 				catch (e) {
@@ -140,7 +140,7 @@ module.exports = (function (Module) {
 					return;
 				}
 
-				await this.commandBatch.insert();
+				await this.commandBatch.insert({ ignore: true });
 
 				this.commandCollector.clear();
 			});
