@@ -31,13 +31,18 @@ module.exports = (function () {
 	return class VideoLANConnector {
 		static singleton () {
 			if (!VideoLANConnector.module) {
-				VideoLANConnector.module = new VideoLANConnector({
-					baseURL: sb.Config.get("LOCAL_VLC_BASE_URL"),
-					url: "192.168.0.100",
-					port: 8080,
-					username: "",
-					password: "supinic",
-				});
+				if (sb.Config.has("LOCAL_VLC_BASE_URL", false)) {
+					VideoLANConnector.module = {};
+				}
+				else {
+					VideoLANConnector.module = new VideoLANConnector({
+						baseURL: sb.Config.get("LOCAL_VLC_BASE_URL", true),
+						url: "192.168.0.100",
+						port: 8080,
+						username: "",
+						password: "supinic",
+					});
+				}
 			}
 			return VideoLANConnector.module;
 		}
