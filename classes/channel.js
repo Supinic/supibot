@@ -78,7 +78,7 @@ module.exports = (function () {
              * Notify = As Ignore, but prepend a warning message that the API is unreachable.
              * Refuse = Do not post the message at all, post a warning message instead.
              * (null) = Default value for channels that have no banphrase API set up.
-             * @type {"Ignore"|"Notify"|"Refuse"|null}
+             * @type {"Ignore"|"Notify"|"Refuse"|"Nothing"|"Whisper"|null}
              */
             this.Banphrase_API_Downtime = data.Banphrase_API_Downtime;
 

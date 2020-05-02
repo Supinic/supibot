@@ -413,7 +413,7 @@ module.exports = (function () {
 					`;
 
 					if (channelData?.ID === 38) {
-						reply = `WEEWOO Error: ${e.message} - ID ${errorID} WEEWOO`
+						reply = `WEEWOO Error: ${e.message} - ID ${errorID} WEEWOO`;
 					}
 
 					execution = {
@@ -485,8 +485,15 @@ module.exports = (function () {
 
 				const metaSkip = Boolean(options.skipBanphrases || execution?.meta?.skipBanphrases);
 				if (!command.Skip_Banphrases && !metaSkip) {
-					const { passed, string } = await sb.Banphrase.execute(execution.reply.slice(0, 1000), channelData);
+					const { passed, privateMessage, string } = await sb.Banphrase.execute(execution.reply.slice(0, 1000), channelData);
 					execution.reply = string;
+
+					if (
+						(typeof execution.replyWithPrivateMessage !== "boolean" )
+						&& (typeof privateMessage == "boolean")
+					) {
+						execution.replyWithPrivateMessage = privateMessage;
+					}
 
 					if (command.Rollbackable) {
 						if (passed) {
@@ -501,8 +508,10 @@ module.exports = (function () {
 					data.transaction.commit();
 				}
 
-				// Apply all unpings to the result.
-				execution.reply = await sb.Filter.applyUnping(command, execution.reply);
+				// Apply all unpings to the result, if it is still a string (aka the response should be sent)
+				if (typeof execution.reply === "string") {
+					execution.reply = await sb.Filter.applyUnping(command, execution.reply);
+				}
 			}
 
 			return execution;

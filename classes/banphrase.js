@@ -155,7 +155,8 @@ module.exports = (function () {
 						channelData.Banphrase_API_URL
 					);
 				}
-				catch {
+				catch (e) {
+					const { code } = e;
 					sb.Runtime.incrementBanphraseTimeouts(channelData.Name);
 
 					switch (channelData.Banphrase_API_Downtime) {
@@ -168,17 +169,37 @@ module.exports = (function () {
 
 						case "Notify":
 							return {
-								string: sb.Config.get("BANPHRASE_API_UNREACHABLE_NOTIFY") + " " + message,
+								string: `⚠ ${message}`,
 								passed: true,
 								warn: true
 							};
 
-						default:
-						case "Refuse":
+						case "Nothing":
 							return {
-								string: sb.Config.get("DEFAULT_BANPHRASE_API_TIMEOUT_RESPONSE"),
+								string: null,
+								passed: false,
+								warn: false
+							};
+
+						case "Refuse": {
+							const string = (code === "ETIMEDOUT")
+								? `Banphrase API did not respond in time - cannot reply.`
+								: `Banphrase API failed (${code}) - cannot reply.`;
+
+							return {
+								string,
 								passed: false
 							};
+						}
+
+						case "Whisper": {
+							return {
+								string: `Banphrase failed, your command result: ${message}.`,
+								passed: true,
+								privateMessage: true,
+								warn: true
+							};
+						}
 					}
 				}
 
