@@ -15,7 +15,12 @@ module.exports = class Twitch extends require("./template.js") {
 		}
 		else if (!sb.Config.has("TWITCH_OAUTH", true)) {
 			throw new sb.Error({
-				message: "Twitch oauth token has not been configured"
+				message: "Twitch oauth token (Config/TWITCH_OAUTH) has not been configured"
+			});
+		}
+		else if (!sb.Config.has("TWITCH_CLIENT_ID", true)) {
+			throw new sb.Error({
+				message: "Twitch client id (Config/TWITCH_CLIENT_ID) has not been configured"
 			});
 		}
 
