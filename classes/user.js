@@ -117,19 +117,22 @@ module.exports = (function () {
             /** @type {Map<string, User>} */
             User.data = User.data || new Map();
 
-            const botData = await sb.Query.getRecordset(rs => rs
-                .select("Prefix", "Last_Verified", "Author", "Language")
-                .select("User_Alias.ID AS ID", "User_Alias.Name AS Name")
-                .from("bot_data", "Bot")
-                .join({
-                    toDatabase: "chat_data",
-                    toTable: "User_Alias",
-                    on: "Bot.Bot_Alias = User_Alias.ID"
-                })
-            );
+            const botDataExist = await sb.Query.isTablePresent("bot_data", "Bot");
+            if (botDataExist) {
+                const botData = await sb.Query.getRecordset(rs => rs
+                    .select("Prefix", "Last_Verified", "Author", "Language")
+                    .select("User_Alias.ID AS ID", "User_Alias.Name AS Name")
+                    .from("bot_data", "Bot")
+                    .join({
+                        toDatabase: "chat_data",
+                        toTable: "User_Alias",
+                        on: "Bot.Bot_Alias = User_Alias.ID"
+                    })
+                );
 
-            for (const bot of botData) {
-                User.bots.set(bot.ID, bot);
+                for (const bot of botData) {
+                    User.bots.set(bot.ID, bot);
+                }
             }
         }
 
