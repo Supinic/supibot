@@ -156,7 +156,7 @@ module.exports = class Mixer extends require("./template.js") {
 		sb.Master.globalMessageListener(this.platform, channelData, userData, message);
 
 		// Check and execute command if necessary
-		if (message.startsWith(sb.Config.get("COMMAND_PREFIX"))) {
+		if (message.startsWith(sb.Command.prefix)) {
 			const [command, ...args] = message.replace(/^\$\s*/, "$").split(" ");
 			this.handleCommand(
 				command,

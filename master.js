@@ -213,11 +213,6 @@
 		async globalMessageListener (platform, channel, user, message) {
 			// @todo
 		}
-
-		/**
-		 * @returns {string} Global command prefix.
-		 */
-		get commandPrefix () { return sb.Config.get("COMMAND_PREFIX"); }
 	}
 
 	process.on("uncaughtException", (err) => {

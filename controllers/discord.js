@@ -74,13 +74,12 @@ module.exports = class Discord extends require("./template.js") {
 					nameCheckData.Data.discordChallengeNotificationSent = true;
 					await nameCheckData.saveProperty("Data");
 
-					const prefix = sb.Config.get("COMMAND_PREFIX");
 					await this.directPm(
 						discordID,
 						sb.Utils.tag.trim `
 							You were found to be likely to own a Twitch account with the same name as your current Discord account.
 							If you want to use my commands on Discord, whisper me the following command on Twitch:
-							${prefix}link ${challenge}
+							${sb.Command.prefix}link ${challenge}
 						 `
 					);
 
@@ -141,7 +140,7 @@ module.exports = class Discord extends require("./template.js") {
 			sb.Master.globalMessageListener(this.platform, channelData, userData, msg);
 
 			// Starts with correct prefix - handle command
-			const commandPrefix = sb.Config.get("COMMAND_PREFIX");
+			const commandPrefix = sb.Command.prefix;
 			if (msg.startsWith(commandPrefix)) {
 				const command = msg.replace(commandPrefix, "").split(" ")[0];
 				this.handleCommand(

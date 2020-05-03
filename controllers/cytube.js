@@ -146,9 +146,10 @@ module.exports = class Cytube extends require("./template.js") {
 			);
 
 			// Handle commands if the message starts with the command prefix
-			if (msg.startsWith(sb.Master.commandPrefix)) {
+			const commandPrefix = sb.Command.prefix;
+			if (msg.startsWith(commandPrefix)) {
 				const arg = msg.trim().replace(/\s+/, " ").split(" ");
-				const command = arg.shift().slice(sb.Master.commandPrefix.length);
+				const command = arg.shift().slice(commandPrefix.length);
 
 				this.handleCommand(command, userData, arg, data.meta.private);
 			}
