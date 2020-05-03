@@ -1,4 +1,12 @@
 /* global sb */
+
+let loginConfigMissingNotified = false;
+const loginConfigs = [
+	"API_PASTEBIN",
+	"PASTEBIN_USER_NAME",
+	"PASTEBIN_PASSWORD"
+];
+
 module.exports = (function (Module) {
 	"use strict";
 
@@ -16,8 +24,7 @@ module.exports = (function (Module) {
 	};
 
 	/**
-	 * Extra news module, for countries that are not included in the news command.
-	 * Constructor must be await-ed.
+	 * Pastebin module: allows easy get/post methods with potential authentication, if so desired.
 	 * @name sb.Pastebin
 	 * @type Pastebin()
 	 */
@@ -42,6 +49,14 @@ module.exports = (function (Module) {
 		 */
 		async login () {
 			if (this.#authData || this.#authenticationPending) {
+				return;
+			}
+			else if (loginConfigs.some(key => !sb.Config.has(key))) {
+				if (!loginConfigMissingNotified) {
+					console.debug("Pastebin module is missing login configs, will not attempt to log in.");
+					loginConfigMissingNotified = true;
+				}
+
 				return;
 			}
 
