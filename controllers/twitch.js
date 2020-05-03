@@ -224,8 +224,8 @@ module.exports = class Twitch extends require("./template.js") {
 			const scheduler = new MessageScheduler({
 				mode: channelData.Mode,
 				channelID: channelData.ID,
-				timeout: modes[channelData.Mode]?.cooldown ?? defaultGlobalCooldown,
-				maxSize: modes[channelData.Mode]?.queueSize ?? defaultQueueSize
+				timeout: modes?.[channelData.Mode]?.cooldown ?? defaultGlobalCooldown,
+				maxSize: modes?.[channelData.Mode]?.queueSize ?? defaultQueueSize
 			});
 
 			scheduler.on("message", (msg) => {
