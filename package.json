@@ -5,9 +5,9 @@
     "@mixer/client-node": "^3.4.0",
     "dank-twitch-irc": "^2.5.2",
     "discord.js": "latest",
-    "cytube-connector": "file:./custom_modules/cytube-connector",
-    "supi-core": "file:./custom_modules/supi-core",
-    "message-scheduler": "file:./custom_modules/message-scheduler"
+    "cytube-connector": "github:Supinic/cytube-connector",
+    "supi-core": "github:Supinic/supi-core",
+    "message-scheduler": "github:Supinic/message-scheduler"
   },
   "engines": {
     "node": ">= 13.2"
