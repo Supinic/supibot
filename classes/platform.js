@@ -139,6 +139,10 @@ module.exports = (function () {
 			);
 
 			Platform.data = data.map(record => new Platform(record));
+
+			if (Platform.data.length === 0) {
+				console.warn("No platforms initialized - bot will not attempt to log in to any services");
+			}
 		}
 
 		static async reloadData () {

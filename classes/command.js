@@ -178,11 +178,17 @@ module.exports = (function () {
 		}
 
 		static async loadData () {
-			Command.data = (await sb.Query.getRecordset(rs => rs
+			const data = await sb.Query.getRecordset(rs => rs
 				.select("*")
 				.from("chat_data", "Command")
 				.where("Archived = %b", false)
-			)).map(record => new Command(record));
+			);
+
+			Command.data = data.map(record => new Command(record));
+
+			if (Command.data.length === 0) {
+				console.warn("No commands initialized - bot will not respond to any command queries");
+			}
 		}
 
 		static async reloadData () {

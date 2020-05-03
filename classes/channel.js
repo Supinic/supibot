@@ -259,10 +259,16 @@ module.exports = (function () {
 
         static async loadData () {
             /** @type Channel[] */
-            Channel.data = (await sb.Query.getRecordset(rs => rs
+            const data = await sb.Query.getRecordset(rs => rs
                 .select("Channel.*")
                 .from("chat_data", "Channel")
-            )).map(record => new Channel(record));
+            );
+
+            Channel.data = data.map(record => new Channel(record));
+
+            if (Channel.data.length === 0) {
+                console.warn("No channels initialized - bot will not attempt to join any channels");
+            }
         }
 
         static async reloadData () {
