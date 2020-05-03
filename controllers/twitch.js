@@ -314,7 +314,7 @@ module.exports = class Twitch extends require("./template.js") {
 				});
 			}
 
-			const globalCustomCode = sb.Config.get("GLOBAL_CUSTOM_CHANNEL_CODE");
+			const globalCustomCode = sb.Config.get("GLOBAL_CUSTOM_CHANNEL_CODE", false);
 			if (globalCustomCode) {
 				await globalCustomCode({
 					type: "message",
