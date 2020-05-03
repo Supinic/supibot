@@ -266,7 +266,7 @@ module.exports = (function () {
 				return {success: false, reason: "no-identifier"};
 			}
 
-			const prefixRegex = new RegExp("^\\" + sb.Config.get("COMMAND_PREFIX"));
+			const prefixRegex = new RegExp("^\\" + Command.prefix);
 			identifier = identifier.replace(prefixRegex, "");
 
 			if (!Array.isArray(argumentArray)) {
@@ -576,6 +576,10 @@ module.exports = (function () {
 		 */
 		static destroy () {
 			Command.data = null;
+		}
+
+		static get prefix () {
+			return sb.Config.get("COMMAND_PREFIX", false) ?? null;
 		}
 	};
 })();
