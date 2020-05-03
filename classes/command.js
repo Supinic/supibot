@@ -189,6 +189,9 @@ module.exports = (function () {
 			if (Command.data.length === 0) {
 				console.warn("No commands initialized - bot will not respond to any command queries");
 			}
+			if (Command.prefix === null) {
+				console.warn("No command prefix configured - bot will not respond to any command queries");
+			}
 		}
 
 		static async reloadData () {
