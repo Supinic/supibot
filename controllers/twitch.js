@@ -237,7 +237,7 @@ module.exports = class Twitch extends require("./template.js") {
 
 		// Check if the bot is about the send an identical message to the last one
 		if (this.evasion[channelName] === message) {
-			const char = sb.Config.get("TWITCH_DUPLICATE_EVASION_CHARACTER");
+			const char = this.platform.Data.sameMessageEvasionCharacter;
 			if (message.includes(char)) {
 				const regex = new RegExp(char + "$");
 				message = message.replace(regex, "");
