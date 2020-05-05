@@ -23,5 +23,5 @@ As Supibot is currently run as a single instance that joins multiple channel, it
 
 ## Further reading
 - [Bot feature overview](docs/features.md)
-- [Command docs + how to make your own](docs/api.md)
+- [Command docs + how to make your own](docs/command.md)
 - [Website API with bot data](docs/api.md)
