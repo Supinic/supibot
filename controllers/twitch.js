@@ -379,7 +379,7 @@ module.exports = class Twitch extends require("./template.js") {
 				userState = messageObject.extractUserState();
 			}
 
-			const [command, ...args] = message.replace(/^\$\s*/, "$").split(" ");
+			const [command, ...args] = message.replace(sb.Command.prefix, "").split(" ").filter(Boolean);
 			const result = await this.handleCommand(
 				command,
 				userData,
