@@ -24,60 +24,78 @@ After figuring out that the user wants to invoke a command, each platform client
 This method is the backbone of (almost) all command execution performed in Supibot. 
 It will check whether a command exists in a given message, perform all additional parsing if needed, execute, handle all errors, and return to the platform client a string to reply with.
 
-### `checkAndExecute`
-Useful for creators of new platform clients.
+### `Command.checkAndExecute`
 
-`@todo`
+Useful for creators of new platform controllers.
+In short, this method will determine whether a command invocation exists, and if it does, it attempts to execute given command with provided arguments.
+It will also apply banphrases, string limits, cooldown and similar stuff.
+
+A platform controller must parse the message, determine if a command is present, and this method handles the rest.
+The controller must then send the reply based on the return value.
+This can be different for each platform, hence why this level of abstraction exists. 
 
 ### Command Code API
 The entirety of each command's code consists of a single function. 
-This function will be `await`ed in `checkAndExecute`, so if asynchronous behaviour is requred, the function should be declared as `async`.
+This function will be `await`-ed in `checkAndExecute` regardless of whether it is sync or async, so if asynchronous behaviour is requred, the function should be declared as `async`.
 
-`@todo`
-all command functions are await-ed, so if asynchronous operation(s) is required, feel free to make it async and use await inside
+All command functions are await-ed.
+So, if asynchronous operation is required, feel free to make the function `async` and use `await` inside of it.
 
-context: this = sb.Command instance
+Function input arguments:
+- `{Object} context` - contains information about the command execution context.
+	- `{string} context.invocation` - the actual string with which the command was invoked - i.e. the `randomline` command can be executed with its `rl` alias instead, and then `"rl"` will be its invocation.
+	- `{sb.User} context.user`- User instance of the person who invoked the command.
+	 Can never be `null `in proper cases, as a command must always be executed by someone.
+	 This does not apply for commands executed within other commands, but that's quite advanced and rarely enforced.  
+	- `{sb.Platform} context.platform` - Platform instance
+	- `{sb.Channel} [context.channel]` Channel instance, where the command was executed.
+	 Will be `null` if the command is executed in private messages - whispers, DMs, whatever.
+	- `{DatabaseConnector} context.transaction` If a command is rollbackable, it muse *this* database connector to ensure possible rollbacks.
+	 For an example, refer to the [cookie](https://github.com/Supinic/supibot-sql/blob/master/commands/cookie.sql) command code for an example of using transactions properly.
+	`{boolean} context.privateMessage` If true, the command is being invoked in PMs. Simply a visual sugar for checking `context.channel === null`.
+	- `{Object} contex.append` More data about invocation context, most likely platform-specific.
+	I.e. on Twitch, you can see the badges and user colour of the user who invoked it. 
+	- `{sb.Command} context.command` Self instance of the command - deprecated, use `this` instead.
+	All usages like this should be removed eventually.
 
-input arguments: context, ...args
+- `{*[]} ...args` Everything the user types after the name of command is handled as `rest` arguments after `context`.
+You can access each one separately, if needed; but if an unknown or variable amount is present, use the spread operator.
+See examples below. 
 
-context - object with extra command context
-{
-	platform - {sb.Platform} Platform instance
-	invocation - {string} the actual string with which the command was invoked
-	user - {sb.User} User instance
-	channel - {sb.Channel} Channel instance. Will be null if command is used in PMs
-	command: {sb.Command} instance - deprecated, use (this) instead
-	transaction: {DatabaseConnector} if a command is rollbackable, it muse this database connector to ensure possible rollbacks. see "cookie" command code for an example
-	privateMessage: {boolean} if true, the command is being invoked in PMs
-	append: {Object} more data, usually platform-specific
-}
+Each command must return something to signify its success or failure.
+This value is then processed by `Command.checkAndExecute`, and then used in a platform controller.
 
-(...args) - everything that the user types after the command, split by spaces
+Types of supported return values:
+- `{undefined|null|false}` Bot will not send any reply at all.
+ If such behaviour is required, return `null` for best code readability.
+- `{string|number|symbol|true|...}` Any other primitive is not supported.
+ Returning such value will result in undefined behaviour. Don't do it.
+- `{Object}` This is the proper way to return a value.
+    - `{boolean} [success]` Determines whether the command was invoked successfully.
+    Mostly used for meta commands, success itself is kind of redundant, because the bot will reply in either case.
+    This flag just signifies whether the result string is a notification of failure, or the actual reply.
+    If not defined, the command's state is considered a success. `false` must be explicitly stated to make the command result a failure.
+	- `{string} [reason]` If the command results in a failure, this is a symbolic description of what caused the failure.
+	Only used in meta commands, `Command.checkAndExecute` does not parse this option.
+	- `{string} [reply]` If `success` is not `false`, this is the command reply. If it is, this is the failure reply. 
+	- `{null|number|Object} [cooldown]` Dynamic cooldown.
+        - If not set, the default cooldown of given command will be applied to the current user/command/channel combination.
+        - If `null`, no cooldown be set at all, not even the implicit one. Use with caution!
+	    - If `number`, this value in milliseconds will be applied to the current user/command/channel combination.
+        - If `Object`, more options are available: 
+            - `{number} cooldown.length` Cooldown length in milliseconds. Must be set, otherwise the following options have no impact. 
+            - `{number} [cooldown.channel]` Channel ID the cooldown should apply to. If not set, the channels will apply to all commands in the result context.
+            - `{number} [cooldown.command]` Command ID the cooldown should apply to. If not set, the cooldown will apply to all commands in the result context.
+            - `{number} [cooldown.user]` User ID the cooldown should apply to. If not set, the cooldown will apply to all users in the result context.
+       - Examples
+            - `channel` and `command` are set, but `user` is not: All users in given channel will be impacted.      		
+            - `channel` and `user` are set, but `command` is not: User will be impacted by cooldown for all commands in given channel.      		
+            - `channel` is set, but `command` and `user` are not: All users in given channel will be impacted for all commands.
+            - ... etc.      		
+	- `{Object} [meta]` Deprecated, used to contain cooldown metadata.
 
-return value possibilities:
-	undefined/null/false - bot will not send any message at all. if such behaviour is required, use null for best readability
-	
-	any other primitives: unsupported, results in undefined behaviour
-	
-	{
-		{boolean} success Determines whether the command was invoked successfully.
-		{string} reply If success is true, this is the command's reply as it will enter the chat; it is also further pipable. If success is false, this is the "error message" the user will receive; it is NOT further pipable.
-		{number|Object} cooldown Dynamic cooldown.
-			If it's a number, the specified cooldown will be applied to user/command/channel combination.
-			If it's an object, more options are available. 
-			If null, no cooldown be set at all (!)
-			If not set, the default cooldown will be applied to user/command/channel combination.
-		{number} cooldown.length cooldown length
-		{number} [cooldown.command]
-		{number} [cooldown.channel]
-		{number} [cooldown.user]
-		
-		{string} reason If command result is a failure, this is a symbolic description of what caused the failure. Mostly used in $pipe only.
-		{Object} meta Deprecated, used to contain cooldown data
-	}
-
-#### List
-Current command list can be found on:
+#### Current command list
+The active command list can be found on:
 - [supinic.com](https://supinic.com/bot/command/list) as a list. More info is available by clicking on the ID identifier.
 - [GitHub](https://github.com/Supinic/supibot-sql) as a regularly updated repository of SQL update scripts.
 Each command consists of its full description.
