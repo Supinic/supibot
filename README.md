@@ -17,7 +17,7 @@ As Supibot is currently run as a single instance that joins multiple channel, it
 | Platform | Directions |
 | :---: |:---|
 | **Twitch channel** | Follow the guide in the panels of the bot's [Twitch profile](https://twitch.tv/supibot). |
-| **Discord server** | The admin of said server contact should PM me on Discord. See [Contact](https://supinic.com/contact). | 
+| **Discord server** | The **admin** of said server contact should PM me on Discord (you don't have to send a friend request first). See [Contact](https://supinic.com/contact). | 
 | **Cytube room**    | Not currently implemented. Please contact me for implementation details. |
 | **Mixer channel**  | Follow the guide in the description of the bot's [Mixer profile](https://mixer.com/supibot). |
 
