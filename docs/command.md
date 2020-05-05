@@ -4,6 +4,13 @@ Commands are the essential part of Supibot.
 They create an interface for the chat user to interact with.
 Any communication with the bot, external APIs or other bots is done via commands.
 
+## List
+The active command list can be found on:
+- [supinic.com](https://supinic.com/bot/command/list) as a list. More info is available by clicking on the ID identifier.
+- [GitHub](https://github.com/Supinic/supibot-sql) as a regularly updated repository of SQL update scripts.
+Each command consists of its full description.
+This means all flags, cooldowns, static data, aliases and dynamic descriptions are all available along with its JavaScript code.
+
 ## Prefix
 Supibot currently uses the character `$` (Unicode: `DOLLAR SIGN U+0024`) as its current command prefix.
 On Twitch, this prefix can optionally be padded with a space in order to permit several emote-based commands with the emote showing up in chat as the image as well.
@@ -142,13 +149,6 @@ Types of supported return values:
             - `channel` is set, but `command` and `user` are not: All users in given channel will be impacted for all commands.
             - ... etc.      		
 	- `{Object} [meta]` Deprecated, used to contain cooldown metadata.
-
-### Command list
-The active command list can be found on:
-- [supinic.com](https://supinic.com/bot/command/list) as a list. More info is available by clicking on the ID identifier.
-- [GitHub](https://github.com/Supinic/supibot-sql) as a regularly updated repository of SQL update scripts.
-Each command consists of its full description.
-This means all flags, cooldowns, static data, aliases and dynamic descriptions are all available along with its JavaScript code.
 
 #### Examples
 

@@ -22,5 +22,6 @@ As Supibot is currently run as a single instance that joins multiple channel, it
 | **Mixer channel**  | Follow the guide in the description of the bot's [Mixer profile](https://mixer.com/supibot). |
 
 ## Further reading
-- [API](docs/api.md)
-- [Feature overview](docs/features.md)
+- [Bot feature overview](docs/features.md)
+- [Command docs + how to make your own](docs/api.md)
+- [Website API with bot data](docs/api.md)
