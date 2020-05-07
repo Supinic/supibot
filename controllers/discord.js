@@ -179,7 +179,7 @@ module.exports = class Discord extends require("./template.js") {
 		if (channelObject.guild) {
 			const wordList = message.split(/\W+/).filter(Boolean);
 			for (const word of wordList) {
-				const emote = channelObject.guild.emojis.find(i => i.name === word);
+				const emote = channelObject.guild.emojis.cache.find(i => i.name === word);
 				if (emote) {
 					// This regex makes sure all emotes to be replaces are not preceded or followed by a ":" (colon) character
 					// All emotes on Discord are wrapped at least by colons
