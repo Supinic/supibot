@@ -31,7 +31,7 @@ module.exports = class Discord extends require("./template.js") {
 		const client = this.client;
 
 		client.on("ready", async () => {
-			const active = client.channels.filter(i => i.type === "text");
+			const active = client.channels.cache.filter(i => i.type === "text");
 			const joinable = sb.Channel.getJoinableForPlatform("discord");
 
 			for (const channel of joinable) {
@@ -170,7 +170,7 @@ module.exports = class Discord extends require("./template.js") {
 	 */
 	async send (message, channel) {
 		const channelData = sb.Channel.get(channel).Name;
-		const channelObject = this.client.channels.get(channelData);
+		const channelObject = this.client.channels.cache.get(channelData);
 		if (!channelObject) {
 			console.warn("No channel available!", channel);
 			return;
@@ -217,7 +217,7 @@ module.exports = class Discord extends require("./template.js") {
 			});
 		}
 
-		const discordUser = await this.client.fetchUser(userData.Discord_ID);
+		const discordUser = await this.client.users.fetch(userData.Discord_ID);
 		discordUser.send(msg);
 	}
 
@@ -228,7 +228,7 @@ module.exports = class Discord extends require("./template.js") {
 	 * @returns {Promise<void>}
 	 */
 	async directPm (userID, msg) {
-		const discordUser = await this.client.fetchUser(userID);
+		const discordUser = await this.client.users.fetch(userID);
 		discordUser.send(msg);
 	}
 
