@@ -581,6 +581,14 @@ module.exports = (function () {
 			Command.data = null;
 		}
 
+		static get prefix () {
+			return Command.getPrefix();
+		}
+
+		static set prefix (value) {
+			return Command.setPrefix(value);
+		}
+
 		static getPrefix () {
 			return sb.Config.get("COMMAND_PREFIX", false) ?? null;
 		}
