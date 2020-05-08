@@ -118,8 +118,11 @@ module.exports = (function () {
 				data.Code = eval(data.Code);
 			}
 			catch (e) {
-				console.warn(`Command ${this.ID} has invalid code definition!`, e);
-				data.Code = async () => ({ reply: "Command has invalid code definition!" });
+				console.error(`Command ${this.ID} has invalid code definition!`, e);
+				data.Code = async () => ({
+					success: false,
+					reply: "Command has invalid code definition! Please make sure to let @supinic know about this!"
+				});
 			}
 
 			/**
