@@ -69,6 +69,9 @@ module.exports = class Discord extends require("./template.js") {
 					if (nameCheckData.Data.discordChallengeNotificationSent) {
 						return;
 					}
+					else if (!this.platform.Data.sendVerificationChallenge) {
+						return;
+					}
 
 					const { challenge } = await Discord.createAccountChallenge(nameCheckData, discordID);
 					nameCheckData.Data.discordChallengeNotificationSent = true;
