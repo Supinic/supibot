@@ -57,7 +57,7 @@ module.exports = (function () {
 			 * A string identifier to recognize a platform for mirroring.
 			 * @type {string}
 			 */
-			this.Mirror_Identifier = data.Mirror_Identifier ?? "";
+			this.Mirror_Identifier = data.Mirror_Identifier ?? null;
 
 			/**
 			 * Settings related to logging permissions and levels.
@@ -76,19 +76,45 @@ module.exports = (function () {
 			}
 
 			/**
+			 * Default platform-specific data.
+			 * This can be customised in the Data column.
+			 * The object is frozen, and thus cannot be modified.
+			 * @type {Object}
+			 */
+			this.Defaults = Object.freeze({});
+
+			if (data.Defaults) {
+				try {
+					this.Defaults = Object.freeze(JSON.parse(data.Logging));
+				}
+				catch (e) {
+					this.Defaults = Object.freeze({});
+					console.warn(`Platform ${this.Name} has incorrect default settings definition`, e);
+				}
+			}
+
+			/**
 			 * Custom platform-specific data, parsed from JSON format.
+			 * It is merged with defaults on startup.
 			 * @type {Object}
 			 */
 			this.Data = {};
 
 			if (data.Data) {
 				try {
-					this.Data = JSON.parse(data.Data);
+					// Merge together custom data with defaults - custom data has priority over defaults.
+					this.Data = {
+						...this.Defaults,
+						...JSON.parse(data.Data)
+					};
 				}
 				catch (e) {
-					this.Data = {};
+					this.Data = { ...this.Defaults };
 					console.warn(`Platform ${this.Name} has incorrect data definition`, e);
 				}
+			}
+			else {
+				this.Data = { ...this.Defaults };
 			}
 		}
 
