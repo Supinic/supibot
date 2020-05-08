@@ -166,7 +166,7 @@ module.exports = (function (Module) {
 
 				this.commandCollector = new Set();
 				this.commandCron = new CronJob(sb.Config.get("COMMAND_LOG_CRON_CONFIG"), async () => {
-					if (!sb.Config.get("COMMAND_LOGGING_ENABLED") || !this.commandBatch.ready) {
+					if (!sb.Config.get("COMMAND_LOGGING_ENABLED") || !this.commandBatch?.ready) {
 						return;
 					}
 
