@@ -606,14 +606,6 @@ module.exports = class Twitch extends require("./template.js") {
 		return (channelData.Specific_ID === userData.Twitch_ID);
 	}
 
-	mirror (message, userData, channelData, commandUsed = false) {
-		const fixedMessage = (commandUsed)
-			? `${this.platform.Mirror_Identifier} ${message}`
-			: `${this.platform.Mirror_Identifier} ${userData.Name}: ${message}`;
-
-		sb.Master.mirror(fixedMessage, userData, channelData.Mirror);
-	}
-
 	destroy () {
 		this.client.disconnect();
 

@@ -268,15 +268,6 @@ module.exports = class Discord extends require("./template.js") {
 		}
 	}
 
-	mirror (message, userData, channelData, commandUsed = false) {
-		const preparedMessage = Discord.removeEmoteTags(message);
-		const fixedMessage = (commandUsed)
-			? `${this.platform.Mirror_Identifier} ${preparedMessage}`
-			: `${this.platform.Mirror_Identifier} ${userData.Name}: ${preparedMessage}`;
-
-		sb.Master.mirror(fixedMessage, userData, channelData.Mirror);
-	}
-
 	destroy () {
 		this.client && this.client.destroy();
 		this.client = null;

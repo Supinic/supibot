@@ -10,7 +10,18 @@ module.exports = class Controller {
 
 	async handleCommand () { }
 
-	mirror () { }
+	mirror (message, userData, channelData, commandUsed = false) {
+		const symbol = this.platform.Mirror_Identifier;
+		if (symbol === null) {
+			return;
+		}
+
+		const fixedMessage = (commandUsed)
+			? `${symbol} ${message}`
+			: `${symbol} ${userData.Name}: ${message}`;
+
+		sb.Master.mirror(fixedMessage, userData, channelData.Mirror);
+	}
 
 	restart () { }
 

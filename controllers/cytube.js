@@ -342,12 +342,8 @@ module.exports = class Cytube extends require("./template.js") {
 		if (userData.Name === "[server]") {
 			return;
 		}
-		
-		const fixedMessage = (commandUsed)
-			? `${this.platform.Mirror_Identifier} ${message}`
-			: `${this.platform.Mirror_Identifier} ${userData.Name}: ${message}`;
 
-		sb.Master.mirror(fixedMessage, userData, this.channelData.Mirror);
+		super.mirror(messsage, userData, this.channelData.Mirror, commandUsed);
 	}
 
 	/**
