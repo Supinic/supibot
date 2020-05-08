@@ -85,7 +85,7 @@ module.exports = (function () {
 
 			if (data.Defaults) {
 				try {
-					this.Defaults = Object.freeze(JSON.parse(data.Logging));
+					this.Defaults = Object.freeze(JSON.parse(data.Defaults));
 				}
 				catch (e) {
 					this.Defaults = Object.freeze({});
