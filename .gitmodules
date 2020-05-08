@@ -1,9 +1,0 @@
-[submodule "custom_modules/cytube-connector"]
-	path = custom_modules/cytube-connector
-	url = https://github.com/Supinic/cytube-connector
-[submodule "custom_modules/message-scheduler"]
-	path = custom_modules/message-scheduler
-	url = https://github.com/Supinic/message-scheduler
-[submodule "custom_modules/supi-core"]
-	path = custom_modules/supi-core
-	url = https://github.com/Supinic/supi-core
