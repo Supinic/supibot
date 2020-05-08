@@ -27,7 +27,7 @@ module.exports = class Twitch extends require("./template.js") {
 		this.client = new DankTwitch.ChatClient({
 			username: this.platform.Self_Name,
 			password: sb.Config.get("TWITCH_OAUTH"),
-			rateLimits: this.platform.Data.rateLimits ?? "default"
+			rateLimits: this.platform.Data.rateLimits
 		});
 
 		this.queues = {};
@@ -55,9 +55,9 @@ module.exports = class Twitch extends require("./template.js") {
 
 		client.on("JOIN", ({ channelName, joinedUsername }) => {
 			// @todo: Could this possibly be a part of channelData? So that it is platform-independent...
-			if (this.platform.Data.reconnectAnnouncement && joinedUsername === this.platform.Self_Name.toLowerCase()) {
+			if (joinedUsername === this.platform.Self_Name.toLowerCase()) {
 				const { channels, string } = this.platform.Data.reconnectAnnouncement;
-				if (channels.includes(channelName)) {
+				if (channels && string && channels.includes(channelName)) {
 					client.say(channelName, string);
 				}
 			}
@@ -134,7 +134,7 @@ module.exports = class Twitch extends require("./template.js") {
 
 		client.on("USERNOTICE", async (messageObject) => {
 			const {messageText, messageTypeID, senderUsername, channelName} = messageObject;
-			if (this.platform.Data.ignoredUserNotices.includes?.(messageTypeID)) {
+			if (this.platform.Data.ignoredUserNotices.includes(messageTypeID)) {
 				return; // ignore these events
 			}
 
@@ -220,12 +220,12 @@ module.exports = class Twitch extends require("./template.js") {
 				this.queues[channelName] = null;
 			}
 
-			const { defaultGlobalCooldown, defaultQueueSize, modes } = this.platform.Data;
+			const { modes } = this.platform.Data;
 			const scheduler = new MessageScheduler({
 				mode: channelData.Mode,
 				channelID: channelData.ID,
-				timeout: modes?.[channelData.Mode]?.cooldown ?? defaultGlobalCooldown,
-				maxSize: modes?.[channelData.Mode]?.queueSize ?? defaultQueueSize
+				timeout: modes[channelData.Mode].cooldown,
+				maxSize: modes[channelData.Mode].queueSize
 			});
 
 			scheduler.on("message", (msg) => {
@@ -237,7 +237,7 @@ module.exports = class Twitch extends require("./template.js") {
 
 		// Check if the bot is about the send an identical message to the last one
 		if (this.evasion[channelName] === message) {
-			const char = this.platform.Data.sameMessageEvasionCharacter;
+			const { sameMessageEvasionCharacter: char } = this.platform.Data;
 			if (message.includes(char)) {
 				const regex = new RegExp(char + "$");
 				message = message.replace(regex, "");
