@@ -76,7 +76,7 @@ module.exports = (function () {
 			this.Flags = {};
 
 			if (data.Flags !== null) {
-				for (const flag of data.Flags.split(",")) {
+				for (const flag of data.Flags) {
 					const camelFlag = sb.Utils.convertCase(flag, "kebab", "camel");
 					this.Flags[camelFlag] = true;
 				}
