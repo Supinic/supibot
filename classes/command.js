@@ -71,6 +71,7 @@ module.exports = (function () {
 
 			/**
 			 * Holds all flags of a command, all of which are booleans.
+			 * This object is frozen after initialization, so that the flags can only be modified outside of runtime.
 			 * @type {CommandFlagsObject}
 			 */
 			this.Flags = {};
@@ -81,6 +82,8 @@ module.exports = (function () {
 					this.Flags[camelFlag] = true;
 				}
 			}
+
+			Object.freeze(this.Flags);
 
 			/**
 			 * If not null, specified the response for a whitelisted command when invoked outside of the whitelist.
