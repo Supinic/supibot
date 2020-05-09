@@ -414,7 +414,7 @@ module.exports = (function () {
 			}
 
 			// Read-only commands never reply with anything - banphrases, pings and cooldowns are not checked
-			if (command.flags.readOnly) {
+			if (command.Flags.readOnly) {
 				return {success: !!execution.success};
 			}
 
