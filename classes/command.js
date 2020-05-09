@@ -51,68 +51,42 @@ module.exports = (function () {
 			this.Cooldown = data.Cooldown;
 
 			/**
-			 * Determines if command is rollbackable.
-			 * If true, all sensitive database operations will be handled in a transaction - provided in options object
-			 * @type {boolean}
+			 * @typedef {Object} CommandFlagsObject
+			 * @property {boolean} rollback Determines if command is rollbackable.
+			 * If true, all sensitive database operations will be handled in a transaction - provided in options object.
+			 * @property {boolean} optOut If true, any user can "opt-out" from being the target of the command.
+			 * If done, nobody will be able to use their username as the command parameter.
+			 * @property {boolean} skipBanphrases If true, command result will not be checked for banphrases.
+			 * Mostly used for system or simple commands with little or no chance to trigger banphrases.
+			 * @property {boolean} block If true, any user can "block" another user from targetting them with this command.
+			 * If done, the specified user will not be able to use their username as the command parameter.
+			 * Similar to optOut, but not global, and only applies to one user.
+			 * @property {boolean} ownerOverride If true, the command's cooldown will be vastly reduced when a user invokes it in their own channel.
+			 * @property {boolean} readOnly If true, command is guaranteed to not reply, and as such, no banphrases, cooldowns or pings are checked.
+			 * @property {boolean} whitelist If true, command is only accessible to certain users or channels, or their combination.
+			 * @property {boolean} pipe If true, the command can be used as a part of the "pipe" command.
+			 * @property {boolean} ping If true, command will attempt to "ping" - notify - its invoker.
+			 * This also requires the channel to have this option enabled.
 			 */
-			this.Rollbackable = data.Rollbackable;
 
 			/**
-			 * If true, command result will not be checked for banphrases.
-			 * Mostly used for system or simple commands.
-			 * @type {boolean}
+			 * Holds all flags of a command, all of which are booleans.
+			 * @type {CommandFlagsObject}
 			 */
-			this.Skip_Banphrases = data.Skip_Banphrases;
+			this.Flags = {};
 
-			/**
-			 * If true, command is only accessible to certain users or channels, or their combination.
-			 * @type {boolean}
-			 */
-			this.Whitelisted = data.Whitelisted;
+			if (data.Flags !== null) {
+				for (const flag of data.Flags.split(",")) {
+					const camelFlag = sb.Utils.convertCase(flag, "kebab", "camel");
+					this.Flags[camelFlag] = true;
+				}
+			}
 
 			/**
 			 * If not null, specified the response for a whitelisted command when invoked outside of the whitelist.
 			 * @type {boolean}
 			 */
 			this.Whitelist_Response = data.Whitelist_Response;
-
-			/**
-			 * If true, command is guaranteed to not reply, and as such, no banphrases, cooldowns or pings are checked.
-			 * @type {boolean}
-			 */
-			this.Read_Only = data.Read_Only;
-
-			/**
-			 * If true, any user can "opt-out" from being the target of the command.
-			 * @example A user can opt-out from command randomline, and nobody will be able to use it with them as the parameter.
-			 * @type {boolean}
-			 */
-			this.Opt_Outable = data.Opt_Outable;
-
-			/**
-			 * If true, any user can "block" another user from targetting them with this command.
-			 * @example A user can opt-out from command remind for user XYZ. User XYZ will no longer be able to remind the user.
-			 * @type {boolean}
-			 */
-			this.Blockable = data.Blockable;
-
-			/**
-			 * If true, the command's cooldown can be vastly reduced when a user invokes it in their own channel.
-			 * @type {boolean}
-			 */
-			this.Owner_Override = data.Owner_Override;
-
-			/**
-			 * If true, the command can be used as a part of the "pipe" command.
-			 * @type {boolean}
-			 */
-			this.Pipeable = data.Pipeable;
-
-			/**
-			 * If true, command will attempt to ping its invoker. This also requires the channel to have this option enabled.
-			 * @type {boolean}
-			 */
-			this.Ping = data.Ping;
 
 			try {
 				data.Code = eval(data.Code);
@@ -367,7 +341,7 @@ module.exports = (function () {
 
 			// If the command is rollbackable, set up a transaction.
 			// The command must use the connection in transaction - that's why it is passed to data
-			if (command.Rollbackable) {
+			if (command.Flags.rollback) {
 				data.transaction = await sb.Query.getTransaction();
 			}
 
@@ -437,7 +411,7 @@ module.exports = (function () {
 			}
 
 			// Read-only commands never reply with anything - banphrases, pings and cooldowns are not checked
-			if (command.Read_Only) {
+			if (command.flags.readOnly) {
 				return {success: !!execution.success};
 			}
 
@@ -484,7 +458,7 @@ module.exports = (function () {
 					execution.reply = execution.reply.replace(sb.Config.get("WHITESPACE_REGEX"), "");
 				}
 
-				if (command.Ping && channelData?.Ping) {
+				if (command.Flags.ping && channelData?.Ping) {
 					// @todo maybe {passed, string} is better in case the name is too bad? We'll see later on
 					const {string} = await sb.Banphrase.execute(
 						userData.Name,
@@ -496,7 +470,7 @@ module.exports = (function () {
 				}
 
 				const metaSkip = Boolean(options.skipBanphrases || execution?.meta?.skipBanphrases);
-				if (!command.Skip_Banphrases && !metaSkip) {
+				if (!command.Flags.skipBanphrases && !metaSkip) {
 					const { passed, privateMessage, string } = await sb.Banphrase.execute(execution.reply.slice(0, 1000), channelData);
 					execution.reply = string;
 
@@ -507,7 +481,7 @@ module.exports = (function () {
 						execution.replyWithPrivateMessage = privateMessage;
 					}
 
-					if (command.Rollbackable) {
+					if (command.Flags.rollback) {
 						if (passed) {
 							data.transaction.commit();
 						}
@@ -516,7 +490,7 @@ module.exports = (function () {
 						}
 					}
 				}
-				else if (command.Rollbackable) {
+				else if (command.Flags.rollback) {
 					data.transaction.commit();
 				}
 
@@ -540,7 +514,7 @@ module.exports = (function () {
 			// Take care of private messages, where channel === null
 			const channelID = channelData?.ID ?? PRIVATE_MESSAGE_CHANNEL_ID;
 
-			if (commandData.Owner_Override && channelData?.isUserChannelOwner(userData)) {
+			if (commandData.Flags.ownerOverride && channelData?.isUserChannelOwner(userData)) {
 				// Set a very small, only technical cooldown
 				sb.CooldownManager.set(channelID, userData.ID, commandData.ID, 500);
 			}

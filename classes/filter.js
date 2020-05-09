@@ -174,7 +174,7 @@ module.exports =  (function () {
 				&& (row.Platform === (platform?.ID ?? null) || row.Platform === null)
 			));
 
-			if (command.Whitelisted) {
+			if (command.Flags.whitelist) {
 				const whitelist = localFilters.find((
 					i => i.Type === "Whitelist"
 					&& (i.User_Alias === user.ID || i.User_Alias === null)
@@ -190,11 +190,11 @@ module.exports =  (function () {
 				}
 			}
 
-			if ((command.Opt_Outable || command.Blockable) && targetUser) {
+			if ((command.Flags.optOut || command.Flags.block) && targetUser) {
 				userTo = await sb.User.get(targetUser);
 			}
 
-			if (command.Opt_Outable && userTo) {
+			if (command.Flags.optOut && userTo) {
 				const optout = localFilters.find(i => (
 					i.Type === "Opt-out"
 					&& i.User_Alias === userTo.ID
@@ -213,7 +213,7 @@ module.exports =  (function () {
 					};
 				}
 			}
-			if (command.Blockable && userTo) {
+			if (command.Flags.block && userTo) {
 				const userFrom = user;
 				const block = localFilters.find(i => (
 					i.Type === "Block"
