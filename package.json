@@ -3,11 +3,11 @@
   "version": "2.2.0",
   "dependencies": {
     "@mixer/client-node": "^3.4.0",
+    "cytube-connector": "github:Supinic/cytube-connector",
     "dank-twitch-irc": "^2.5.2",
     "discord.js": "^12.2.0",
-    "cytube-connector": "github:Supinic/cytube-connector",
-    "supi-core": "github:Supinic/supi-core",
-    "message-scheduler": "github:Supinic/message-scheduler"
+    "message-scheduler": "github:Supinic/message-scheduler",
+    "supi-core": "github:Supinic/supi-core"
   },
   "engines": {
     "node": ">= 13.2"
