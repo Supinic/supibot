@@ -16,8 +16,8 @@
     "start": "node ./master.js --harmony-nullish --harmony-optional-chaining"
   },
   "main": "master.js",
-  "devDependencies": {},
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  "author": "Supinic <supinic@protonmail.com>",
+  "repository": "github:Supinic/supibot",
+  "license": "AGPL-3.0",
+  "description": "Multiplatform, utility & novelty chat bot."
 }
