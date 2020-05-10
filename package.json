@@ -17,6 +17,6 @@
   },
   "main": "master.js",
   "author": "Supinic <supinic@protonmail.com>",
-  "license": "ISC",
+  "license": "AGPL-3.0",
   "description": ""
 }
