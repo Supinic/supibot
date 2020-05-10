@@ -1,0 +1,15 @@
+/**
+ * Do not edit and commit this file!
+ * Create a copy, name it "db-access.js" and fill your credentials there.
+ * This file only serves as a template. db-access.js should be kept private.
+ */
+ 
+(function () {
+	process.env.MARIA_USER = ""; // Database username
+	process.env.MARIA_PASSWORD = ""; // Database password
+	
+	process.env.MARIA_HOST = ""; // If using hosts, fill this and remove socket
+	process.env.MARIA_SOCKET_PATH = ""; // If using sockets, fill this and remove host
+	
+	process.env.MARIA_CONNECTION_LIMIT = 0; // Explicit database connection limit
+})();
