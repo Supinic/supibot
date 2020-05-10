@@ -16,7 +16,6 @@
     "start": "node ./master.js --harmony-nullish --harmony-optional-chaining"
   },
   "main": "master.js",
-  "devDependencies": {},
   "author": "",
   "license": "ISC",
   "description": ""
