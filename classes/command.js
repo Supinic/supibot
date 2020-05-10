@@ -161,7 +161,7 @@ module.exports = (function () {
 			const data = await sb.Query.getRecordset(rs => rs
 				.select("*")
 				.from("chat_data", "Command")
-				.where("Archived = %b", false)
+				.where("Flags NOT LIKE %*like*", "archived")
 			);
 
 			Command.data = data.map(record => new Command(record));
