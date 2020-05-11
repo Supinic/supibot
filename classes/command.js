@@ -197,7 +197,7 @@ module.exports = (function () {
 				.select("*")
 				.from("chat_data", "Command")
 				.where("ID IN %n+", reloadingCommands.map(i => i.ID))
-				.where("Archived = %b", false)
+				.where("Flags NOT %*like* OR Flags IS NULL", "archived")
 			);
 
 			for (const record of data) {
