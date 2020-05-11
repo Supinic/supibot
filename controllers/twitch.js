@@ -23,7 +23,7 @@ module.exports = class Twitch extends require("./template.js") {
 				message: "Twitch oauth token (Config/TWITCH_OAUTH) has not been configured"
 			});
 		}
-		else if (!this.platform.Data.updateAvailableBotEmotes && !sb.Config.has("TWITCH_CLIENT_ID", true)) {
+		else if (this.platform.Data.updateAvailableBotEmotes && !sb.Config.has("TWITCH_CLIENT_ID", true)) {
 			throw new sb.Error({
 				message: "Emote updates are set to true, but Twitch client id (Config/TWITCH_CLIENT_ID) has not been configured"
 			});
