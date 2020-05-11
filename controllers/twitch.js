@@ -13,6 +13,11 @@ module.exports = class Twitch extends require("./template.js") {
 				message: "Twitch platform has not been created"
 			});
 		}
+		else if (!this.platform.Self_Name) {
+			throw new sb.Error({
+				message: "Twitch platform does not have the bot's name configured"
+			});
+		}
 		else if (!sb.Config.has("TWITCH_OAUTH", true)) {
 			throw new sb.Error({
 				message: "Twitch oauth token (Config/TWITCH_OAUTH) has not been configured"
