@@ -1020,7 +1020,7 @@ node-fetch@2.6.0, node-fetch@^2.6.0:
 
 "node-vlc-http@github:supinic/node-vlc-http":
   version "1.0.1"
-  resolved "https://codeload.github.com/supinic/node-vlc-http/tar.gz/219242573caf7e07496c94bad800cb4ef6bf92af"
+  resolved "https://codeload.github.com/supinic/node-vlc-http/tar.gz/d19dd3a3988a74f0915f58568ddb1624cc4bb0e5"
   dependencies:
     simple-deep-equal "github:Supinic/simple-deep-equal"
 
