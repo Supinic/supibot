@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS `data`.`Got_Instance` (
+  `ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Name` VARCHAR(50) NOT NULL,
+  `Options_Type` ENUM('JSON','function') NOT NULL DEFAULT 'JSON',
+  `Options` TEXT NOT NULL,
+  `Parent` INT(10) UNSIGNED DEFAULT NULL,
+  `Description` TEXT DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK_Got_Instance_Got_Instance` (`Parent`),
+  CONSTRAINT `FK_Got_Instance_Got_Instance` FOREIGN KEY (`Parent`) REFERENCES `Got_Instance` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -1,0 +1,37 @@
+INSERT INTO `chat_data`.`Platform` 
+(`Name`, `Message_Limit`, `Self_Name`, `Logging`, `Defaults`)
+VALUES
+('Twitch',500,NULL,'{
+	"bans": false,
+	"bits": false,
+	"clearchat": false,
+	"giftSubs": false,	
+	"messages": false,
+	"subs": false,
+	"whispers": false
+}','{
+	"modes": {
+		"Moderator": {
+			"queueSize": 1e6,
+			"cooldown": 50
+		},
+		"VIP": {
+			"queueSize": 50,
+			"cooldown": 150
+		},
+		"Write": {
+			"queueSize": 5,
+			"cooldown": 1250
+		}
+	},
+	"updateAvailableBotEmotes": false,
+	"ignoredUserNotices": [],
+	"sameMessageEvasionCharacter": "󠀀",
+	"rateLimits": "default",
+	"reconnectAnnouncement": {}
+}'),
+('Discord',2000,NULL,NULL,NULL),
+('Cytube',600,NULL,NULL,NULL),
+('Mixer',500,NULL,NULL,NULL)
+
+ON DUPLICATE KEY UPDATE ID = ID;

@@ -13,7 +13,8 @@
     "node": ">= 13.2"
   },
   "scripts": {
-    "start": "node ./master.js --harmony-nullish --harmony-optional-chaining"
+    "start": "node ./master.js --harmony-nullish --harmony-optional-chaining",
+	"init-database": "node ./init/script.js --harmony-nullish --harmony-optional-chaining"
   },
   "main": "master.js",
   "author": "Supinic <supinic@protonmail.com>",
