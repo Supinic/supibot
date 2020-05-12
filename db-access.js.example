@@ -2,6 +2,8 @@
  * Do not edit and commit this file!
  * Create a copy, name it "db-access.js" and fill your credentials there.
  * This file only serves as a template. db-access.js should be kept private.
+ *
+ * Required privileges: SELECT, CREATE, INSERT, TRIGGER, UPDATE, DELETE
  */
  
 (function () {

@@ -15,7 +15,7 @@
   "scripts": {
     "start": "node ./master.js --harmony-nullish --harmony-optional-chaining",
     "debug": "node --inspect=localhost:10001 ./master.js --harmony-nullish --harmony-optional-chaining",
-	"init-database": "node ./init/script.js --harmony-nullish --harmony-optional-chaining",
+    "init-database": "node ./init/script.js --harmony-nullish --harmony-optional-chaining",
     "update": "git pull origin master && yarn upgrade supi-core"
   },
   "main": "master.js",
