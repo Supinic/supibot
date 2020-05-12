@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS `chat_data`.`AFK` (
   `ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `User_Alias` INT(10) UNSIGNED NOT NULL COMMENT 'The user who''s AFK status is being tracked',
-  `Started` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  `Ended` TIMESTAMP(3) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(3),
+  `User_Alias` INT(10) UNSIGNED NOT NULL COMMENT 'The user who\'s AFK status is being tracked',
+  `Started` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `Ended` DATETIME(3) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(3),
   `Text` VARCHAR(2000) DEFAULT NULL,
   `Status` enum('afk','poop','gn','brb','shower','lurk','food','work','ppPoof','study') DEFAULT NULL COMMENT 'So-called "status" of the AFK. Can be tied to multiple actions',
   `Active` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Whether ot not is the AFK status still active',

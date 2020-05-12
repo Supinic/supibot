@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `chat_data`.`Log` (
   `Description` TEXT DEFAULT NULL,
   `Channel` INT(10) UNSIGNED DEFAULT NULL,
   `User_Alias` INT(10) UNSIGNED DEFAULT NULL,
-  `Timestamp` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `Timestamp` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   PRIMARY KEY (`ID`),
   KEY `FK_Log_Channel` (`Channel`),
   KEY `FK_Log_User_Alias` (`User_Alias`),
