@@ -24,6 +24,7 @@ VALUES
 			"cooldown": 1250
 		}
 	},
+	"recentBanThreshold": null,
 	"updateAvailableBotEmotes": false,
 	"ignoredUserNotices": [],
 	"sameMessageEvasionCharacter": "󠀀",

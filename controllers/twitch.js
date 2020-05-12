@@ -513,7 +513,8 @@ module.exports = class Twitch extends require("./template.js") {
 				channelData.sessionData.recentBans = 0;
 			}
 
-			if (!channelData.sessionData.parted && channelData.sessionData.recentBans > sb.Config.get("TWITCH_RECENT_BANS_THRESHOLD")) {
+			const limit = this.platform.Data.recentBanThreshold ?? Infinity;
+			if (!channelData.sessionData.parted && channelData.sessionData.recentBans > limit) {
 				console.debug(`Parting channel ${channelData.Name} because ban threshold has been exceeded!`);
 
 				channelData.sessionData.parted = true;
