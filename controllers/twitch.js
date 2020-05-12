@@ -57,7 +57,7 @@ module.exports = class Twitch extends require("./template.js") {
 				const channelData = sb.Channel.get(error.failedChannelName);
 				const defaultReply = "That message violates this channel's moderation settings.";
 
-				if (defaultReply.toLowerCase().includes(rest.messageText.toLowerCase())) {
+				if (defaultReply.toLowerCase().includes(error.messageText.toLowerCase())) {
 					this.pm(channelData.Name, "Real funny banphrase you got there");
 				}
 				else {
