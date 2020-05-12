@@ -49,12 +49,20 @@ module.exports = class Twitch extends require("./template.js") {
 	initListeners () {
 		const client = this.client;
 
-		client.on("error", error => {
+		client.on("error", (error) => {
 			if (error instanceof DankTwitch.JoinError && error.failedChannelName) {
 				this.failedJoinChannels.add(error.failedChannelName);
 			}
-			else if (error.cause instanceof DankTwitch.SayError && error.message.includes("2000")) {
-				console.debug(error.message);
+			else if (error instanceof DankTwitch.SayError && error.message.includes("Bad response message")) {
+				const channelData = sb.Channel.get(error.failedChannelName);
+				const defaultReply = "That message violates this channel's moderation settings.";
+
+				if (defaultReply.toLowerCase().includes(rest.messageText.toLowerCase())) {
+					this.pm(channelData.Name, "Real funny banphrase you got there");
+				}
+				else {
+					this.send(defaultReply, channelData);
+				}
 			}
 		});
 
@@ -117,15 +125,7 @@ module.exports = class Twitch extends require("./template.js") {
 			switch (messageID) {
 				case "msg_rejected":
 				case "msg_rejected_mandatory": {
-					const defaultReply = "That message violates this channel's moderation settings.";
-
-					if (defaultReply.toLowerCase().includes(rest.messageText.toLowerCase())) {
-						this.pm(channelName, "Real funny banphrase you got there");
-					}
-					else {
-						this.send(defaultReply, channelData);
-					}
-
+					console.warn("Rejected message", { channelName, messageID, rest });
 					break;
 				}
 
