@@ -75,7 +75,6 @@ module.exports = (function () {
 
             if (typeof value !== "undefined") {
                 this[property] = value;
-
             }
             else {
                 value = this[property];

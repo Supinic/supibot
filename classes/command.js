@@ -249,8 +249,7 @@ module.exports = (function () {
 				return {success: false, reason: "no-identifier"};
 			}
 
-			const prefixRegex = new RegExp("^\\" + Command.prefix);
-			identifier = identifier.replace(prefixRegex, "");
+			identifier = identifier.replace(Command.prefixRegex, "");
 
 			if (!Array.isArray(argumentArray)) {
 				throw new sb.Error({
@@ -559,6 +558,20 @@ module.exports = (function () {
 		 */
 		static destroy () {
 			Command.data = null;
+		}
+
+		static get prefixRegex () {
+			const prefix = Command.prefix;
+			if (!prefix) {
+				return null;
+			}
+
+			const body = [...prefix].map(char => (/\w/.test(char))
+				? char
+				: `\\${char}`
+			).join("");
+
+			return new RegExp("^" + body);
 		}
 
 		static get prefix () {
