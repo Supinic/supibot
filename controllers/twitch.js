@@ -117,7 +117,15 @@ module.exports = class Twitch extends require("./template.js") {
 			switch (messageID) {
 				case "msg_rejected":
 				case "msg_rejected_mandatory": {
-					sb.Master.send("That message violates this channel's moderation settings.", channelData);
+					const defaultReply = "That message violates this channel's moderation settings.";
+
+					if (defaultReply.toLowerCase().includes(rest.messageText.toLowerCase())) {
+						this.pm(channelName, "Real funny banphrase you got there");
+					}
+					else {
+						this.send(defaultReply, channelData);
+					}
+
 					break;
 				}
 
