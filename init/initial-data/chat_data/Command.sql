@@ -1,17 +1,17 @@
 INSERT INTO `chat_data`.`Command` 
-(`Name`,`Aliases`,`Flags`,`Description`,`Cooldown`,`Code`)
+(`Name`,`Aliases`,`Flags`,`Description`,`Cooldown`,`Code`,`Whitelist_Response`)
 VALUES
-('ping',NULL,NULL,'Ping!',5000,'(async function () {
+('ping',NULL,NULL,'Pong!',5000,'(async function ping () {
 	return {
 		reply: "Pong!"
 	};
-})'),
+})',NULL),
 ('debug',NULL,'system,whitelist','Debug command. Whitelisted by default, make sure to add a Filter object for yourself in order to be able to use this command.',0,'(async function debug (context, ...args) {
 	const vm = require("vm");
 	let script = null;	
 
 	try {
-		script = new vm.Script("(async () => {\n" + args.join(" ") + "\n})()");
+		script = new vm.Script("(async () => {\\n" + args.join(" ") + "\\n})()");
 	}
 	catch (e) {
 		return {
@@ -44,7 +44,7 @@ VALUES
 			reply: "Execute: " + e.toString()
 		};
 	}		
-})'),
+})','You are not permitted to run this command!'),
 ('help','["commands"]',NULL,'Posts a description of a specific command, or a list of all commands.',5000,'(async function help (context, commandString) {
 	const { prefix } = sb.Command;
 
@@ -56,7 +56,7 @@ VALUES
 	}
 	// Print specific command description
 	else {
-		const cmdStr = commandString.toLowerCase().replace(new RegExp("^\\" + prefix), "");
+		const cmdStr = commandString.toLowerCase().replace(new RegExp("^\\\\" + prefix), "");
 		if (cmdStr === "me") {
 			return { reply: "I can\'t directly help you, but maybe if you use one of my commands, you\'ll feel better? :)" };
 		}
@@ -66,7 +66,7 @@ VALUES
 			return { reply: "That command does not exist!" };
 		}
 
-		const filteredResponse = (command.Flags?.includes("whitelist"))
+		const filteredResponse = (command.Flags.whitelist)
 			? "(whitelisted)"
 			: "";
 		const aliases = (command.Aliases.length === 0) ? "" : (" (" + command.Aliases.map(i => prefix + i).join(", ") + ")");
@@ -79,6 +79,6 @@ VALUES
 
 		return { reply: reply.join(" ") };
 	}
-})')
+})', NULL)
 
 ON DUPLICATE KEY UPDATE ID = ID;
