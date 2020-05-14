@@ -75,7 +75,7 @@
 		packageManager = packageManager.toLowerCase();
 	} while (packageManager !== "npm" && packageManager !== "yarn");
 
-	console.log("Setting up database structure...")
+	console.log("Setting up database structure...");
 	try {
 		await shell(packageManager + " run init-database");
 	}
