@@ -157,7 +157,7 @@ module.exports = class Mixer extends require("./template.js") {
 
 		// Check and execute command if necessary
 		if (message.startsWith(sb.Command.prefix)) {
-			const [command, ...args] = message.replace(/^\$\s*/, "$").split(" ");
+			const [command, ...args] = message.replace(sb.Command.prefix, "").split(" ").filter(Boolean);
 			this.handleCommand(
 				command,
 				userData,
