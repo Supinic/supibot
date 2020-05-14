@@ -2,7 +2,10 @@
 Main repository for the multi-platform, novelty and utility chat bot Supibot.
 
 ## Usage
-Supibot is not (yet) designed to be run as separate instances! Any changes to the code are welcome, but the bot was never designed to be run separately from its master instance. As such, all code changes will be reviewed on the master instance. I understand that this is not ideal for feature implementation, and separate instances will hopefully be supported soon.
+~~Supibot is not (yet) designed to be run as separate instances! Any changes to the code are welcome, but the bot was never designed to be run separately from its master instance. As such, all code changes will be reviewed on the master instance. I understand that this is not ideal for feature implementation, and separate instances will hopefully be supported soon.~~
+
+You can now (relatively) easily clone/fork Supibot and run a local instance! 
+Follow the [guide](docs/setup.md) if you are interested, and contact me if you have any questions or notes.  
 
 ## Platforms
 Supibot can and is currently run on four distinct platforms:
