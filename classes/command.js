@@ -414,7 +414,9 @@ module.exports = (function () {
 
 			// Read-only commands never reply with anything - banphrases, pings and cooldowns are not checked
 			if (command.Flags.readOnly) {
-				return {success: !!execution.success};
+				return {
+					success: execution?.success ?? true
+				};
 			}
 
 			// This should be removed once all deprecated calls are refactored
