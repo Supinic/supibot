@@ -20,13 +20,23 @@ module.exports = class Cytube extends require("./template.js") {
 			});
 		}
 
+		const eligibleChannels = sb.Channel.getJoinableForPlatform(this.platform);
+		if (eligibleChannels.length > 1) {
+			throw new sb.Error({
+				message: "Too many Cytube rooms are set to be joined - current limit is 1"
+			});
+		}
+
+		// @todo change this
+		this.channelData = eligibleChannels[0];
+
 		this.client = new CytubeConnector({
 			host: "cytu.be",
 			port: 443,
 			secure: true,
 			user: this.platform.Self_Name,
 			auth: sb.Config.get("CYTUBE_BOT_PASSWORD"),
-			chan: "forsenoffline" // @todo change this to be flexible
+			chan: this.channelData.Name
 		});
 
 		this.restartInterval = null;
@@ -35,7 +45,6 @@ module.exports = class Cytube extends require("./template.js") {
 
 		// @todo assign each channel to a separate "room"
 		this.channels = [];
-		this.channelData = sb.Channel.get("forsenoffline"); // @todo change this
 
 		this.userMap = new Map();
 		this.playlistData = [];
