@@ -24,6 +24,12 @@ VALUES
 			"cooldown": 1250
 		}
 	},
+	"subscriptionPlans": {
+	    "1000": "$5",
+	    "2000": "$10",
+	    "3000": "$25",
+	    "Prime": "Prime"
+	},
 	"recentBanThreshold": null,
 	"updateAvailableBotEmotes": false,
 	"ignoredUserNotices": [],

@@ -550,7 +550,7 @@ module.exports = class Twitch extends require("./template.js") {
 	async handleSubscription (username, channel, plan, message, months)  {
 		const userData = await sb.User.get(username, false);
 		const channelData = sb.Channel.get(channel);
-		const plans = sb.Config.get("TWITCH_SUBSCRIPTION_PLANS");
+		const plans = this.platform.Data.subscriptionPlans;
 
 		if (channelData && channelData.Custom_Code) {
 			channelData.Custom_Code({
