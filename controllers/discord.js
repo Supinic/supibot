@@ -145,7 +145,7 @@ module.exports = class Discord extends require("./template.js") {
 			// Starts with correct prefix - handle command
 			const commandPrefix = sb.Command.prefix;
 			if (msg.startsWith(commandPrefix)) {
-				const command = msg.replace(commandPrefix, "").split(" ")[0];
+				const [command] = msg.replace(commandPrefix, "").split(" ").filter(Boolean);
 				this.handleCommand(
 					command,
 					commandArguments.slice(1).map(i => Discord.removeEmoteTags(i)),
