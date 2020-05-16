@@ -120,8 +120,7 @@ module.exports = class Cytube extends require("./template.js") {
 				client.getUserList();
 				return;
 			}
-			else if (platformUserData.rank === 0) {
-				console.warn("Cytube: user rank too low", { data, platformUserData });
+			else if (platformUserData.rank === 0) { // Ignore "grey" name users - rank too low
 				return;
 			}
 
