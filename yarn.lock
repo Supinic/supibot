@@ -60,6 +60,11 @@
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
   integrity sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==
 
+"@types/debug@^4.1.5":
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/@types/debug/-/debug-4.1.5.tgz#b14efa8852b7768d898906613c23f688713e02cd"
+  integrity sha512-Q1y515GcOdTHgagaVFhHnIFQ38ygs/kmxdNpvpou+raI9UO3YZcHDngBSYKQklcKlvA7iuQlmIKbzvmxcOE9CQ==
+
 "@types/duplexify@^3.6.0":
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/@types/duplexify/-/duplexify-3.6.0.tgz#dfc82b64bd3a2168f5bd26444af165bf0237dcd8"
@@ -85,14 +90,14 @@
     "@types/node" "*"
 
 "@types/node@*", "@types/node@>=8.0.0":
-  version "13.13.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.5.tgz#96ec3b0afafd64a4ccea9107b75bf8489f0e5765"
-  integrity sha512-3ySmiBYJPqgjiHA7oEaIo2Rzz0HrOZ7yrNO5HWyaE5q0lQ3BppDZ3N53Miz8bw2I7gh1/zir2MGVZBvpb1zq9g==
+  version "14.0.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.1.tgz#5d93e0a099cd0acd5ef3d5bde3c086e1f49ff68c"
+  integrity sha512-FAYBGwC+W6F9+huFIDtn43cpy7+SzG+atzRiTfdp3inUKL2hXnd4rG8hylJLIh4+hqrQy1P17kvJByE/z825hA==
 
-"@types/node@^12.7.2":
-  version "12.12.38"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.38.tgz#58841a382f231ad005dbb935c36d44aa1118a26b"
-  integrity sha512-75eLjX0pFuTcUXnnWmALMzzkYorjND0ezNEycaKesbUBg9eGZp4GHPuDmkRc4mQQvIpe29zrzATNRA6hkYqwmA==
+"@types/node@^13.7.4":
+  version "13.13.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.6.tgz#caa6756b64d30547a2082235531fa0dd8cba1b6e"
+  integrity sha512-zqRj8ugfROCjXCNbmPBe2mmQ0fJWP9lQaN519hwunOgpHgVykme4G6FW95++dyNFDvJUk4rtExkVkL0eciu5NA==
 
 "@types/responselike@*", "@types/responselike@^1.0.0":
   version "1.0.0"
@@ -377,26 +382,26 @@ css-what@2.1:
     got "^10.6.0"
     socket.io-client "^2.2.0"
 
-dank-twitch-irc@^2.5.2:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/dank-twitch-irc/-/dank-twitch-irc-2.6.0.tgz#c57afb24f5c7775fd2fe277a83268b127c4e83e1"
-  integrity sha512-EB48htLnqxKtzEspTpYbYMxqA/kENUXeGoJk5KzTDJLqzWTb8xHKi6Jkf3AD/11zsa0Egywfig8mFhptjyO7hg==
+dank-twitch-irc@^3.1.0:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/dank-twitch-irc/-/dank-twitch-irc-3.1.2.tgz#208c153e973189e4bf0622d512eb75fe00819136"
+  integrity sha512-AjfGo4zgA+tAUg6SYSGNr7r63xo9o8756T9nMHDKus7sDSyP3fqrDahGYQO9LAsoCTc0hJnLUd0y8wJ49FXyrg==
   dependencies:
+    "@types/debug" "^4.1.5"
     "@types/duplexify" "^3.6.0"
-    "@types/node" "^12.7.2"
+    "@types/node" "^13.7.4"
     debug-logger "^0.4.1"
     duplexify "^4.1.1"
     eventemitter3 "^4.0.0"
     lodash.camelcase "^4.3.0"
     lodash.pickby "^4.6.0"
-    lodash.sortby "^4.7.0"
-    make-error-cause "^2.2.1"
+    make-error-cause "^2.3.0"
     ms "^2.1.2"
     randomstring "^1.1.5"
     semaphore-async-await "^1.5.1"
-    simple-websocket "^8.0.0"
+    simple-websocket "^8.1.1"
     split2 "^3.1.1"
-    ts-toolbelt "^3.8.42"
+    ts-toolbelt "^6.3.1"
 
 dashdash@^1.12.0:
   version "1.14.1"
@@ -910,11 +915,6 @@ lodash.pickby@^4.6.0:
   resolved "https://registry.yarnpkg.com/lodash.pickby/-/lodash.pickby-4.6.0.tgz#7dea21d8c18d7703a27c704c15d3b84a67e33aff"
   integrity sha1-feoh2MGNdwOifHBMFdO4SmfjOv8=
 
-lodash.sortby@^4.7.0:
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
-  integrity sha1-7dFMgk4sycHgsKG0K7UhBRakJDg=
-
 lodash@^4.15.0:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
@@ -934,7 +934,7 @@ lowercase-keys@^2.0.0:
   resolved "https://registry.yarnpkg.com/lowercase-keys/-/lowercase-keys-2.0.0.tgz#2603e78b7b4b0006cbca2fbcc8a3202558ac9479"
   integrity sha512-tqNXrS78oMOE73NMxK4EMLQsQowWf8jKooH9g7xPavRT706R6bkQJ6DY2Te7QukaZsulxa30wQ7bk0pm4XiHmA==
 
-make-error-cause@^2.2.1:
+make-error-cause@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/make-error-cause/-/make-error-cause-2.3.0.tgz#ecd11875971e506d510e93d37796e5b83f46d6f9"
   integrity sha512-etgt+n4LlOkGSJbBTV9VROHA5R7ekIPS4vfh+bCAoJgRrJWdqJCBbpS3osRJ/HrT7R68MzMiY3L3sDJ/Fd8aBg==
@@ -1321,7 +1321,7 @@ setimmediate@^1.0.5:
   version "1.0.0"
   resolved "https://codeload.github.com/Supinic/simple-deep-equal/tar.gz/b601b52a427d47e92ddb9fa50122f1d021dd9d48"
 
-simple-websocket@^8.0.0:
+simple-websocket@^8.1.1:
   version "8.1.1"
   resolved "https://registry.yarnpkg.com/simple-websocket/-/simple-websocket-8.1.1.tgz#4fd68cb1301c1253b2607cfe0950a8be37e6116a"
   integrity sha512-06I3cwOD5Q3LdVd6qfyDGp1U9eau9x9qniSL3b/aDgM5bsJX4nZfCuii2UCFcTfrDq0jCXF4NQ/38qeC8CJZTg==
@@ -1420,7 +1420,7 @@ strip-ansi@^6.0.0:
 
 "supi-core@github:Supinic/supi-core":
   version "2.0.2"
-  resolved "https://codeload.github.com/Supinic/supi-core/tar.gz/2f999d8db59071ce554f0f5efa085ea20f6e64c1"
+  resolved "https://codeload.github.com/Supinic/supi-core/tar.gz/6a7ed29e5844d2dbd9caa00f89e9c9bc8b18d2e7"
   dependencies:
     async-markov "github:supinic/async-markov"
     cheerio latest
@@ -1436,7 +1436,7 @@ strip-ansi@^6.0.0:
     rss-parser latest
     track-link-parser "github:supinic/track-link-parser"
     transliteration latest
-    twitter-lite "^0.11.0"
+    twitter latest
 
 "through@>=2.2.7 <3":
   version "2.3.8"
@@ -1475,10 +1475,10 @@ transliteration@latest:
   dependencies:
     yargs "^15.3.1"
 
-ts-toolbelt@^3.8.42:
-  version "3.14.0"
-  resolved "https://registry.yarnpkg.com/ts-toolbelt/-/ts-toolbelt-3.14.0.tgz#f4c4984cf4e988915a0175fd6a8ded00bd1d23b0"
-  integrity sha512-DYjD8tL7M1kBogRd9UKg3bUP5yh69WWcMSaA3By8ATiJU9fgYudSYIe8tWD5cpPkrGCdGGnKXQHG+5IrjJ5uhQ==
+ts-toolbelt@^6.3.1:
+  version "6.7.7"
+  resolved "https://registry.yarnpkg.com/ts-toolbelt/-/ts-toolbelt-6.7.7.tgz#4d7f34cafd519bf0f1d6da5a4b07889db6ba0184"
+  integrity sha512-GrgXML3KOnYymiyFNEohhizPtO+ZgTwEN9oIR+SvP6EPP5cj4qH1Xi5CU4iobgMUNYMEVhXqnBLY1tSonXwE+g==
 
 tunnel-agent@^0.6.0:
   version "0.6.0"

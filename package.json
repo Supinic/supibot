@@ -4,7 +4,7 @@
   "dependencies": {
     "@mixer/client-node": "^3.4.0",
     "cytube-connector": "github:Supinic/cytube-connector",
-    "dank-twitch-irc": "^2.5.2",
+    "dank-twitch-irc": "^3.1.0",
     "discord.js": "^12.2.0",
     "message-scheduler": "github:Supinic/message-scheduler",
     "supi-core": "github:Supinic/supi-core"
