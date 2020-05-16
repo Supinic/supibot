@@ -44,7 +44,9 @@ module.exports = (function () {
 			 * Name of the bot's account in given platform.
 			 * @type {string}
 			 */
-			this.Self_Name = data.Self_Name;
+			this.Self_Name = (data.Self_Name === null)
+				? null
+				: data.Self_Name.toLowerCase();
 
 			/**
 			 * Specific ID of the bot's account in given platform.
