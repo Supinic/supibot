@@ -31,7 +31,7 @@ module.exports = (function () {
 	return class VideoLANConnector {
 		static singleton () {
 			if (!VideoLANConnector.module) {
-				if (!sb.Config.has("LOCAL_VLC_BASE_URL", false)) {
+				if (!sb.Config.has("LOCAL_VLC_BASE_URL", true)) {
 					VideoLANConnector.module = {};
 				}
 				else {
