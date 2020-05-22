@@ -249,8 +249,6 @@ module.exports = (function () {
 				return {success: false, reason: "no-identifier"};
 			}
 
-			identifier = identifier.replace(Command.prefixRegex, "");
-
 			if (!Array.isArray(argumentArray)) {
 				throw new sb.Error({
 					message: "Command arguments must be provided as an array"
