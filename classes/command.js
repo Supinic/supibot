@@ -172,6 +172,17 @@ module.exports = (function () {
 			if (Command.prefix === null) {
 				console.warn("No command prefix configured - bot will not respond to any command queries");
 			}
+
+			const names = sb.Command.data.map(i => [i.Name, ...i.Aliases]).flat();
+			const duplicates = names.filter((i, ind, arr) => arr.indexOf(i) !== ind);
+			for (const dupe of duplicates) {
+				const affected = sb.Command.data.filter(i => i.Aliases.includes(dupe));
+				for (const command of affected) {
+					const index = command.Aliases.indexOf(dupe);
+					command.Aliases.splice(index, 1);
+					console.warn(`Removed duplicate command name "${dupe}" from command ${command.Name}'s aliases`);
+				}
+			}
 		}
 
 		static async reloadData () {
