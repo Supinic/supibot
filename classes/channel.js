@@ -132,12 +132,12 @@ module.exports = (function () {
                     data.Data = JSON.parse(data.Data);
                     if (data.Data && data.Data.constructor !== Object) {
                         console.warn(`Channel ${this.Name} (ID ${this.ID}) does not result in an Object`);
-                        data.Data = null;
+                        data.Data = {};
                     }
                 }
                 catch (e) {
                     console.warn(`Channel ${this.Name} (ID ${this.ID}) has incorrect data definition`, e);
-                    data.Data = null;
+                    data.Data = {};
                 }
             }
 
@@ -145,7 +145,7 @@ module.exports = (function () {
              * Optional channel data.
              * @type {Object}
              */
-            this.Data = data.Data || {};
+            this.Data = data.Data ?? {};
 
             /**
              * Session-specific data for a channel. Dyanamically updated at runtime.
