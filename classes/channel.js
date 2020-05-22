@@ -234,10 +234,24 @@ module.exports = (function () {
             return Boolean(this.Data.ambassadors?.includes(userData.ID))
         }
 
+        async toggleAmbassador (userData) {
+            this.Data.ambassadors = this.Data.ambassadors ?? [];
+
+            if (this.Data.ambassadors.includes(userData.ID)) {
+                const index = this.Data.ambassadors.indexOf(userData.ID);
+                this.Data.ambassadors.splice(index, 1);
+            }
+            else {
+                this.Data.ambassadors.push(userData.ID);
+            }
+
+            await this.saveProperty("Data");
+        }
+
         /**
          * Pushes a property change to the dataabse.
          * @param {string} property
-         * @param {*} value
+         * @param {*} [value]
          * @returns {Promise<void>}
          */
         async saveProperty (property, value) {
