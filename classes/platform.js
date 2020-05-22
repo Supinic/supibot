@@ -126,16 +126,16 @@ module.exports = (function () {
 
 		/**
 		 * Determines if a user is an "owner" of a given channel in the platform.
-		 * @param channel
-		 * @param user
+		 * @param {Channel} channelData
+		 * @param {User} userData
 		 * @returns {null|boolean}
 		 */
-		isUserChannelOwner (channel, user) {
+		isUserChannelOwner (channelData, userData) {
 			if (typeof this.#controller.isUserChannelOwner !== "function") {
 				return null;
 			}
 
-			return this.#controller.isUserChannelOwner(channel, user);
+			return this.#controller.isUserChannelOwner(channelData, userData);
 		}
 
 		destroy () {

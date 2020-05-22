@@ -218,11 +218,11 @@ module.exports = (function () {
 
         /**
          * Determines if a user is the owner of the channel the instances represents.
-         * @param user
+         * @param {User} userData
          * @returns {Promise<null|boolean>}
          */
-        isUserChannelOwner (user) {
-            return this.Platform.isUserChannelOwner(this, user);
+        isUserChannelOwner (userData) {
+            return this.Platform.isUserChannelOwner(this, userData);
         }
 
         /**
