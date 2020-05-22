@@ -226,6 +226,15 @@ module.exports = (function () {
         }
 
         /**
+         * Checks if a provided user is an ambassador of the channel instance
+         * @param {User} userData
+         * @returns {boolean}
+         */
+        isUserAmbassador (userData) {
+            return Boolean(this.Data.ambassadors?.includes(userData.ID))
+        }
+
+        /**
          * Pushes a property change to the dataabse.
          * @param {string} property
          * @param {*} value
