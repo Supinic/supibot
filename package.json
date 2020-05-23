@@ -2,7 +2,7 @@
   "name": "supibot",
   "version": "2.2.0",
   "dependencies": {
-    "@mixer/client-node": "^3.4.0",
+    "@mixer/client-node": "github:caglapickaxe/client-node#dank",
     "cytube-connector": "github:Supinic/cytube-connector",
     "dank-twitch-irc": "^3.1.0",
     "discord.js": "^12.2.0",
