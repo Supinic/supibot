@@ -593,12 +593,27 @@ module.exports = (function () {
 			return Command.setPrefix(value);
 		}
 
+		/**
+		 * Fetches the command prefix by fetching the config.
+		 * @returns {string|null}
+		 */
 		static getPrefix () {
 			return sb.Config.get("COMMAND_PREFIX", false) ?? null;
 		}
 
+		/**
+		 * Sets a command prefix by changing the config value.
+		 * @param {string} value
+		 * @returns {Promise<void>}
+		 */
 		static setPrefix (value) {
-			return sb.Config.set("COMMAND_PREFIX", value);
+			if (typeof value !== "string") {
+				throw new sb.Error({
+					message: "Command prefix must be a string!"
+				});
+			}
+
+			return sb.Config.set("COMMAND_PREFIX", value.trim());
 		}
 	};
 })();
