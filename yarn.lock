@@ -103,11 +103,6 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.5.tgz#3d03acd3b3414cf67faf999aed11682ed121f22b"
   integrity sha512-90hiq6/VqtQgX8Sp0EzeIsv3r+ellbGj4URKj5j30tLlZvRUpnAe9YbYnjl3pJM93GyXU0tghHhvXHq+5rnCKA==
 
-"@types/node@^13.7.4":
-  version "13.13.6"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.6.tgz#caa6756b64d30547a2082235531fa0dd8cba1b6e"
-  integrity sha512-zqRj8ugfROCjXCNbmPBe2mmQ0fJWP9lQaN519hwunOgpHgVykme4G6FW95++dyNFDvJUk4rtExkVkL0eciu5NA==
-
 "@types/responselike@*", "@types/responselike@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@types/responselike/-/responselike-1.0.0.tgz#251f4fe7d154d2bad125abe1b429b23afd262e29"
@@ -361,26 +356,25 @@ css-what@2.1:
     got "^10.6.0"
     socket.io-client "^2.2.0"
 
-dank-twitch-irc@^3.1.0:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/dank-twitch-irc/-/dank-twitch-irc-3.1.2.tgz#208c153e973189e4bf0622d512eb75fe00819136"
-  integrity sha512-AjfGo4zgA+tAUg6SYSGNr7r63xo9o8756T9nMHDKus7sDSyP3fqrDahGYQO9LAsoCTc0hJnLUd0y8wJ49FXyrg==
+dank-twitch-irc@3.2.4:
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/dank-twitch-irc/-/dank-twitch-irc-3.2.4.tgz#21e80d64630489a0daa66dd3a529cd05a4423fce"
+  integrity sha512-MQ+842T17YKNwxUBcTj06y+mgeQ2q1jxpM6NmPhexGQkmOcQSl4qxZ4CnppYOpEdHi6ZylwPK5qkqFprvDZfkg==
   dependencies:
     "@types/debug" "^4.1.5"
     "@types/duplexify" "^3.6.0"
-    "@types/node" "^13.7.4"
     debug-logger "^0.4.1"
     duplexify "^4.1.1"
-    eventemitter3 "^4.0.0"
+    eventemitter3 "^4.0.4"
     lodash.camelcase "^4.3.0"
     lodash.pickby "^4.6.0"
     make-error-cause "^2.3.0"
     ms "^2.1.2"
     randomstring "^1.1.5"
     semaphore-async-await "^1.5.1"
-    simple-websocket "^8.1.1"
+    simple-websocket "^9.0.0"
     split2 "^3.1.1"
-    ts-toolbelt "^6.3.1"
+    ts-toolbelt "^6.9.0"
 
 dayjs@^1.8.19:
   version "1.8.27"
@@ -598,10 +592,10 @@ event-target-shim@^5.0.0:
   resolved "https://registry.yarnpkg.com/event-target-shim/-/event-target-shim-5.0.1.tgz#5d4d3ebdf9583d63a5333ce2deb7480ab2b05789"
   integrity sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
 
-eventemitter3@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.0.tgz#d65176163887ee59f386d64c82610b696a4a74eb"
-  integrity sha512-qerSRB0p+UDEssxTtm6EDKcE7W4OaoisfIMl4CngyEhjpYglocpNg6UEqCvemdGhosAsg4sO2dXJOdyBifPGCg==
+eventemitter3@^4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.4.tgz#b5463ace635a083d018bdc7c917b4c5f10a85384"
+  integrity sha512-rlaVLnVxtxvoyLsQQFBx53YmXHDxRIzzTLbdfxqi4yocpSjAxXwkU0cScM5JgSKMqEhrZpnvQ2D9gjylR0AimQ==
 
 fast-xml-parser@latest:
   version "3.17.2"
@@ -1143,10 +1137,10 @@ setimmediate@^1.0.5:
   version "1.0.0"
   resolved "https://codeload.github.com/Supinic/simple-deep-equal/tar.gz/b601b52a427d47e92ddb9fa50122f1d021dd9d48"
 
-simple-websocket@^8.1.1:
-  version "8.1.1"
-  resolved "https://registry.yarnpkg.com/simple-websocket/-/simple-websocket-8.1.1.tgz#4fd68cb1301c1253b2607cfe0950a8be37e6116a"
-  integrity sha512-06I3cwOD5Q3LdVd6qfyDGp1U9eau9x9qniSL3b/aDgM5bsJX4nZfCuii2UCFcTfrDq0jCXF4NQ/38qeC8CJZTg==
+simple-websocket@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/simple-websocket/-/simple-websocket-9.0.0.tgz#fda93b9cdeb106e57e5fcc436ee0d1d8eb8836fc"
+  integrity sha512-Q+u1BJ06/FR30xS1Sf6zDuL+vAdAA7VFqZ0TdKpmQKB2uNTAPKWQFFhUDV4YD7TDi7gSRJXoxv21WprNPR0ykQ==
   dependencies:
     debug "^4.1.1"
     queue-microtask "^1.1.0"
@@ -1275,10 +1269,10 @@ transliteration@latest:
   dependencies:
     yargs "^15.3.1"
 
-ts-toolbelt@^6.3.1:
-  version "6.7.7"
-  resolved "https://registry.yarnpkg.com/ts-toolbelt/-/ts-toolbelt-6.7.7.tgz#4d7f34cafd519bf0f1d6da5a4b07889db6ba0184"
-  integrity sha512-GrgXML3KOnYymiyFNEohhizPtO+ZgTwEN9oIR+SvP6EPP5cj4qH1Xi5CU4iobgMUNYMEVhXqnBLY1tSonXwE+g==
+ts-toolbelt@^6.9.0:
+  version "6.9.0"
+  resolved "https://registry.yarnpkg.com/ts-toolbelt/-/ts-toolbelt-6.9.0.tgz#49b0f9a398f3140830a5c68650544def828eb304"
+  integrity sha512-mFadvi7O2t/MMGh44mFUm3s0QyMrfIs7W7We06Lo6e1oD4PyXcfYQykoWjhXDwS7+7rOwg3VPnGBowIugZTY3g==
 
 tweetnacl@^1.0.3:
   version "1.0.3"
