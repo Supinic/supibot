@@ -41,6 +41,7 @@ module.exports = (function () {
 						port: 8080,
 						username: "",
 						password: "supinic",
+						running: (sb.Config.get("SONG_REQUESTS_STATE", false) === "vlc")
 					});
 				}
 			}
@@ -60,7 +61,7 @@ module.exports = (function () {
 				password: options.password,
 				autoUpdate: true,
 				changeEvents: true,
-				tickLengthMs: 250,
+				tickLengthMs: 250
 			});
 
 			this.baseURL = options.baseURL;
