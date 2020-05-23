@@ -37,7 +37,7 @@ module.exports = class Mixer extends require("./template.js") {
 		this.channels = sb.Channel.getJoinableForPlatform(this.platform);
 
 		// Gets the user that the Access Token we provided above belongs to.
-		this.userInfo = (await this.client.request("GET", "/users/current")).body;
+		this.userInfo = (await this.client.request("GET", "users/current")).body;
 
 		this.channelsData = await Promise.all(this.channels.map(async (channelData) => {
 			const { id: channelID } = await sb.Got.instances.Mixer({
