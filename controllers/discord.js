@@ -66,10 +66,11 @@ module.exports = class Discord extends require("./template.js") {
 				// If it is, skip entirely - the name must be matched precisely to the Discord ID, and this is an anomaly
 				// Needs to be fixed or flagged manually
 				if (nameCheckData && nameCheckData.Discord_ID === null && nameCheckData.Twitch_ID !== null) {
-					if (nameCheckData.Data.discordChallengeNotificationSent) {
-						return;
-					}
-					else if (!this.platform.Data.sendVerificationChallenge) {
+					if (
+						(nameCheckData.Data.discordChallengeNotificationSent)
+						|| (!this.platform.Data.sendVerificationChallenge)
+						|| (!msg.startsWith(sb.Command.prefix))
+					) {
 						return;
 					}
 
