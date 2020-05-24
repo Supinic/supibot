@@ -1,4 +1,3 @@
-/* global sb */
 (async function () {
 	"use strict";
 
@@ -210,6 +209,7 @@
 			}
 		}
 
+		// eslint-disable-next-line no-unused-vars
 		async globalMessageListener (platform, channel, user, message) {
 			// @todo
 		}

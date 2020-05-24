@@ -1,4 +1,3 @@
-/* global sb */
 module.exports = class Discord extends require("./template.js") {
 	constructor () {
 		super();
@@ -6,7 +5,7 @@ module.exports = class Discord extends require("./template.js") {
 		this.platform = sb.Platform.get("discord");
 		if (!this.platform) {
 			throw new sb.Error({
-			    message: "Discord platform has not been created"
+				message: "Discord platform has not been created"
 			});
 		}
 		else if (!this.platform.Self_ID) {
@@ -106,8 +105,8 @@ module.exports = class Discord extends require("./template.js") {
 				// If a message comes from a channel set as "Inactive", this means it is active again.
 				// Change its mode back to active.
 				if (channelData.Mode === "Inactive") {
-					channel.Mode = "Write";
-					await channel.saveProperty("Mode", channel.Mode);
+					channelData.Mode = "Write";
+					await channelData.saveProperty("Mode", channelData.Mode);
 				}
 
 				const channelDescription = guild.name + " - #" + messageObject.channel.name;

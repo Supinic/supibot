@@ -1,5 +1,3 @@
-/* global sb */
-
 const MixerClient = require("@mixer/client-node");
 const ws = require("ws");
 
@@ -102,6 +100,7 @@ module.exports = class Mixer extends require("./template.js") {
 	 * @throws {sb.Error} If the provided user does not exist
 	 * @throws {sb.Error} If the provided user has no Discord ID connected.
 	 */
+	// eslint-disable-next-line no-unused-vars
 	async pm (user, msg) {
 		throw new sb.errors.NotImplemented();
 	}

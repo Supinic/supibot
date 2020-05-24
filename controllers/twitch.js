@@ -1,5 +1,3 @@
-/* global sb */
-
 const MessageScheduler = require("message-scheduler");
 const DankTwitch = require("dank-twitch-irc");
 
@@ -222,6 +220,7 @@ module.exports = class Twitch extends require("./template.js") {
 	 * @param {Channel|string} channel
 	 * @param {Object} [options]
 	 */
+	// eslint-disable-next-line no-unused-vars
 	async send (message, channel, options = {}) {
 		const channelData = sb.Channel.get(channel);
 		const channelName = channelData.Name;
@@ -524,7 +523,7 @@ module.exports = class Twitch extends require("./template.js") {
 					console.debug(`Re-joining channel ${channelData.Name}!`);
 
 					channelData.sessionData.parted = false;
-					this.client.join(channelData.Name)
+					this.client.join(channelData.Name);
 				}, 60_000);
 			}
 

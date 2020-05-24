@@ -166,6 +166,8 @@
 					.single()
 					.flat("ID")
 				);
+
+				// eslint-disable-next-line no-empty
 				if (channelExists) {
 					
 				}
@@ -188,7 +190,7 @@
 		await configRow.load("COMMAND_PREFIX");	
 		configRow.values.Value = commandPrefix;
 		await configRow.save();		
-		console.log(`Command prefix set.`);
+		console.log("Command prefix set.");
 	}
 	else {
 		console.log("Command prefix setup skipped!");
