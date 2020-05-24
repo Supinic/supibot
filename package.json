@@ -23,5 +23,8 @@
   "author": "Supinic <supinic@protonmail.com>",
   "repository": "github:Supinic/supibot",
   "license": "AGPL-3.0",
-  "description": "Multiplatform, utility & novelty chat bot."
+  "description": "Multiplatform, utility & novelty chat bot.",
+  "devDependencies": {
+    "eslint": "^7.1.0"
+  }
 }
