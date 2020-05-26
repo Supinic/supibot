@@ -59,7 +59,7 @@ module.exports = (function (Module) {
 				this.messageCron.start();
 			}
 
-			if (sb.Config.get("LOG_MESSAGE_META_CRON", false)) {
+			if (sb.Config.get("LOG_MESSAGE_META_ENABLED", false)) {
 				sb.Query.getBatch(
 					"chat_data",
 					"Message_Meta_Channel",
