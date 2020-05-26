@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS `chat_data`.`Command` (
   `Static_Data` MEDIUMTEXT DEFAULT NULL COMMENT 'Persistent data stored as a Javascript object or function which returns an object.',
   `Code` TEXT NOT NULL COMMENT 'Javascript command code. Must be a function, ideally async function if async operations are expected. First argument is context, the rest is rest-arguments from the user, split by space.',
   `Dynamic_Description` TEXT DEFAULT NULL COMMENT 'Javascript function that returns command\'s description on website. Usually async function. First argument = command prefix (string).',
+  `Source` VARCHAR(300) NOT NULL COLLATE 'utf8mb4_general_ci',
   PRIMARY KEY (`ID`),
   UNIQUE KEY `Name` (`Name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
