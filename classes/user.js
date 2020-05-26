@@ -100,7 +100,7 @@ module.exports = (function () {
                 ["Name", "Discord_ID", "Mixer_ID", "Twitch_ID"]
             );
             User.insertCron = new CronJob(
-                sb.Config.get("USER_INSERT_CRON_CONFIG"),
+                sb.Config.get("LOG_USER_CRON"),
                 async () => {
                     await User.insertBatch.insert({ ignore: true });
                     User.pendingNewUsers.clear();

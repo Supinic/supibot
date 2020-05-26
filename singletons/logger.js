@@ -3,6 +3,10 @@ module.exports = (function (Module) {
 	"use strict";
 	const CronJob = require("cron").CronJob;
 
+	const notified = {
+		lastSeen: false
+	};
+
 	/**
 	 * Logging module that handles all possible chat message and video logging.
 	 * Accesses the database so that nothing needs to be exposed in chat clients.
@@ -22,12 +26,12 @@ module.exports = (function (Module) {
 
 			this.videoTypes = null;
 
-			if (sb.Config.get("CRON_MESSAGE_CONFIG", false)) {
+			if (sb.Config.get("LOG_MESSAGE_CRON", false)) {
 				this.channels = [];
 				this.batches = {};
 
-				this.messageCron = new CronJob(sb.Config.get("CRON_MESSAGE_CONFIG"), async () => {
-					if (!sb.Config.get("MESSAGE_LOGGING_ENABLED", false)) {
+				this.messageCron = new CronJob(sb.Config.get("LOG_MESSAGE_CRON"), async () => {
+					if (!sb.Config.get("LOG_MESSAGE_ENABLED", false)) {
 						return;
 					}
 
@@ -55,7 +59,7 @@ module.exports = (function (Module) {
 				this.messageCron.start();
 			}
 
-			if (sb.Config.get("CRON_META_MESSAGE_CONFIG", false)) {
+			if (sb.Config.get("LOG_MESSAGE_META_CRON", false)) {
 				sb.Query.getBatch(
 					"chat_data",
 					"Message_Meta_Channel",
@@ -75,7 +79,7 @@ module.exports = (function (Module) {
 				).then(batch => this.banBatch = batch);
 
 				this.meta = {};
-				this.metaCron = new CronJob(sb.Config.get("CRON_META_MESSAGE_CONFIG"), async () => {
+				this.metaCron = new CronJob(sb.Config.get("LOG_MESSAGE_META_CRON"), async () => {
 					if (!this.metaBatch?.ready || !this.countMetaBatch?.ready) {
 						return;
 					}
@@ -118,7 +122,7 @@ module.exports = (function (Module) {
 				this.metaCron.start();
 
 				this.banCollector = new Map();
-				this.banCron = new CronJob(sb.Config.get("CRON_META_MESSAGE_CONFIG"), async () => {
+				this.banCron = new CronJob(sb.Config.get("LOG_MESSAGE_META_CRON"), async () => {
 					if (!this.banBatch?.ready) {
 						return;
 					}
@@ -146,7 +150,7 @@ module.exports = (function (Module) {
 				this.banCron.start();
 			}
 
-			if (sb.Config.get("COMMAND_LOG_CRON_CONFIG", false)) {
+			if (sb.Config.get("LOG_COMMAND_CRON", false)) {
 				sb.Query.getBatch(
 					"chat_data",
 					"Command_Execution",
@@ -165,8 +169,8 @@ module.exports = (function (Module) {
 				).then(batch => this.commandBatch = batch);
 
 				this.commandCollector = new Set();
-				this.commandCron = new CronJob(sb.Config.get("COMMAND_LOG_CRON_CONFIG"), async () => {
-					if (!sb.Config.get("COMMAND_LOGGING_ENABLED") || !this.commandBatch?.ready) {
+				this.commandCron = new CronJob(sb.Config.get("LOG_COMMAND_CRON"), async () => {
+					if (!sb.Config.get("LOG_COMMAND_ENABLED") || !this.commandBatch?.ready) {
 						return;
 					}
 
@@ -177,12 +181,12 @@ module.exports = (function (Module) {
 				this.commandCron.start();
 			}
 
-			if (sb.Config.get("CRON_CONFIG_USER_LAST_SEEN", false)) {
+			if (sb.Config.get("LOG_LAST_SEEN_CRON", false)) {
 				this.lastSeen = new Map();
 				this.lastSeenRunning = false;
 
-				this.lastSeenCron = new CronJob(sb.Config.get("CRON_CONFIG_USER_LAST_SEEN"), async () => {
-					if (!sb.Config.get("MESSAGE_META_LOGGING_ENABLED", false) || this.lastSeenRunning) {
+				this.lastSeenCron = new CronJob(sb.Config.get("LOG_LAST_SEEN_CRON"), async () => {
+					if (!sb.Config.get("LOG_MESSAGE_META_ENABLED", false) || this.lastSeenRunning) {
 						return;
 					}
 
@@ -232,7 +236,7 @@ module.exports = (function (Module) {
 		 * @returns {Promise<void>}
 		 */
 		async push (message, userData, channelData) {
-			if (!sb.Config.get("MESSAGE_LOGGING_ENABLED", false)) {
+			if (!sb.Config.get("LOG_MESSAGE_ENABLED", false)) {
 				return;
 			}
 
@@ -336,7 +340,7 @@ module.exports = (function (Module) {
 		 * @param options
 		 */
 		logCommandExecution (options) {
-			if (!sb.Config.get("COMMAND_LOGGING_ENABLED", false)) {
+			if (!sb.Config.get("LOG_COMMAND_ENABLED", false)) {
 				return;
 			}
 
@@ -349,7 +353,11 @@ module.exports = (function (Module) {
 		}
 
 		async updateLastSeen (options) {
-			if (sb.Config.get("LAST_SEEN_LOGGING_ENABLED", false)) {
+			if (sb.Config.get("LOG_LAST_SEEN_ENABLED", false)) {
+				if (!notified.lastSeen) {
+					console.warn("Requested last-seen update, but it is not enabled", options);
+					notified.lastSeen = true;
+				}
 				return;
 			}
 
