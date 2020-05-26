@@ -1,5 +1,3 @@
-/* global sb */
-
 const MixerClient = require("@mixer/client-node");
 const ws = require("ws");
 
@@ -96,13 +94,11 @@ module.exports = class Mixer extends require("./template.js") {
 	/**
 	 * Sends a private message.
 	 * The user in question must have their Discord ID filled out, otherwise the method fails.
-	 * @param {User|string|number} user
-	 * @param {string} msg
 	 * @returns {Promise<void>}
 	 * @throws {sb.Error} If the provided user does not exist
 	 * @throws {sb.Error} If the provided user has no Discord ID connected.
 	 */
-	async pm (user, msg) {
+	async pm () {
 		throw new sb.errors.NotImplemented();
 	}
 

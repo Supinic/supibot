@@ -1,7 +1,7 @@
 (async function () {
 	const { readFile } = require("fs/promises");
 	try {
-		require(`../db-access.js`);
+		require("../db-access.js");
 	}
 	catch {
 		console.warn("Missing or invalid database access definition!");

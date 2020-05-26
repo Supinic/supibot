@@ -1,4 +1,3 @@
-/* global sb */
 // @todo refactor Master and Cytube so that Cytube handles multiple channels, instead of Master managing that
 // @todo after this is done, create a common Client class all sub-clients extend
 
@@ -221,10 +220,6 @@ module.exports = class Cytube extends require("./template.js") {
 			this.currentlyPlaying = this.playlistData.shift() ?? null;
 		});
 
-		client.on("queue", (data) => {
-			// console.log("Cytube queued video", data);
-		});
-
 		client.on("error", (err) => {
 			console.error("Cytube error", err);
 
@@ -240,22 +235,6 @@ module.exports = class Cytube extends require("./template.js") {
 			// }
 			//
 			// this._restarting = true;
-		});
-
-		/**
-		 * @param {Object} data Emote data
-		 * @param {string} data.name Emote name
-		 * @param {string} data.image Emote URL
-		 * @param {string} data.source Regex to replace text with emote in chat
-		 */
-		client.on("updateEmote", (data) => {
-			// @todo fix this to use something thats not request thanks
-
-			// const request = require("request");
-			// const fs = require("fs");
-			// const filename = data.name + "-" + data.image.replace(/\//g, "-");
-			//
-			// request(data.image).pipe(fs.createWriteStream("/code/emotes/" + filename));
 		});
 	}
 
@@ -355,7 +334,7 @@ module.exports = class Cytube extends require("./template.js") {
 			return;
 		}
 
-		super.mirror(messsage, userData, this.channelData.Mirror, commandUsed);
+		super.mirror(message, userData, this.channelData.Mirror, commandUsed);
 	}
 
 	/**

@@ -158,18 +158,6 @@
 					continue;
 				}
 				
-				const channelExists = await sb.Query.getRecordset(rs => rs
-					.select("ID")
-					.from("chat_data", "Channel")
-					.where("Name = %s", channelName)
-					.where("Platform = %n", platformList[platform].ID)
-					.single()
-					.flat("ID")
-				);
-				if (channelExists) {
-					
-				}
-				
 				const channelRow = await sb.Query.getRow("chat_data", "Channel");
 				channelRow.setValues({
 					Name: channelName,
@@ -188,7 +176,7 @@
 		await configRow.load("COMMAND_PREFIX");	
 		configRow.values.Value = commandPrefix;
 		await configRow.save();		
-		console.log(`Command prefix set.`);
+		console.log("Command prefix set.");
 	}
 	else {
 		console.log("Command prefix setup skipped!");

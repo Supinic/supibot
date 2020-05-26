@@ -1,4 +1,3 @@
-/* global sb */
 (async function () {
 	"use strict";
 
@@ -210,7 +209,7 @@
 			}
 		}
 
-		async globalMessageListener (platform, channel, user, message) {
+		async globalMessageListener () {
 			// @todo
 		}
 	}
