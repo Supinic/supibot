@@ -38,7 +38,9 @@ VALUES
 	"reconnectAnnouncement": {}
 }'),
 ('Discord',2000,NULL,NULL,NULL),
-('Cytube',600,NULL,NULL,NULL),
+('Cytube',600,NULL,'{
+    "videoRequests": false
+}',NULL),
 ('Mixer',500,NULL,NULL,NULL)
 
 ON DUPLICATE KEY UPDATE ID = ID;
