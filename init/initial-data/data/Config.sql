@@ -9,7 +9,7 @@ VALUES
 ('DEFAULT_BANPHRASE_API_RESPONSE', '[Banphrased]',NULL,0,1,"If a banphrase API rejects a message, and no Banphrase object exists to react to that, this message will be printed instead.")
 ('DEFAULT_USER_AGENT','Custom fork of Supibot: github.com/supinic/supibot','string',NULL,0,0,NULL),
 ('LINK_REGEX','/(https?:\\/\\/)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&\\/\\/=]*)/gi','regex',NULL,0,1,'Determines if a message contains a website link.'),
-('LOG_COMMAND_ENABLED','0','boolean',NULL,0,1,'If true, every successful command execution will be logged into chat_data.Command_Execution.'),
+('LOG_COMMAND_ENABLED','1','boolean',NULL,0,1,'If true, every successful command execution will be logged into chat_data.Command_Execution.'),
 ('LOG_COMMAND_CRON','*/10 * * * * *','string',NULL,0,0,'Determines how often the executions will be logged, if enabled by COMMAND_LOGGING_ENABLED.'),
 ('LOG_ERROR_ENABLED','1','boolean',NULL,0,1,'If enabled, any errors will be saved to the Error table, along with their stack.'),
 ('LOG_LAST_SEEN_CRON','0 */30 * * * *','string',NULL,0,0,'Determines how often channels in the "Last seen" mode will add their data to message meta table.'),
@@ -17,7 +17,7 @@ VALUES
 ('LOG_MESSAGE_CRON','*/10 * * * * *','string',NULL,0,0,'Determines how often logged messages save to their chat_line tables.'),
 ('LOG_MESSAGE_ENABLED','0','boolean',NULL,0,1,'Determines if message logging is enabled'),
 ('LOG_MESSAGE_META_CRON','0 * * * * *','string',NULL,0,0,'Determines how often "metadata" about messages saves to the Message_Meta tables.'),
-('LOG_MESSAGE_META_ENABLED','0 * * * * *','string',NULL,0,0,'Determines how often "metadata" about messages saves to the Message_Meta tables.'),
+('LOG_MESSAGE_META_ENABLED','0','boolean',NULL,0,0,'Determines how often "metadata" about messages saves to the Message_Meta tables.'),
 ('LOG_USER_CRON','*/10 * * * * *','string',NULL,0,0,'Determines how often newly detected users should be added in a batch.'),
 ('MAX_ACTIVE_INCOMING_REMINDERS','5','number',NULL,0,1,'Maximum amount of reminders someone can have pending for them at once.'),
 ('MAX_ACTIVE_OUTGOING_REMINDERS','8','number',NULL,0,1,'Maximum amount of reminders someone can have pending for others at the same time.'),
