@@ -1,4 +1,4 @@
-INSERT IGNORE INTO `data`.`Config` 
+INSERT IGNORE INTO `data`.`Config`
 (`Name`,`Value`,`Type`,`Unit`,`Secret`,`Editable`,`Notes`)
 VALUES
 ('COMMAND_PREFIX',NULL,'string',NULL,0,1,NULL),
@@ -8,4 +8,6 @@ VALUES
 ('MIXER_OAUTH',NULL,'string',NULL,1,0,NULL),
 ('TWITCH_OAUTH',NULL,'string',NULL,1,0,NULL),
 ('USER_INSERT_CRON_CONFIG','*/10 * * * * *','string',NULL,0,0,NULL),
-('WHITESPACE_REGEX','/[\\u034f\\u2800\\u{E0000}\\u180e\\ufeff\\u2000-\\u200d\\u206D]/gu','regex',NULL,0,0,NULL);
+('WHITESPACE_REGEX','/[\\u034f\\u2800\\u{E0000}\\u180e\\ufeff\\u2000-\\u200d\\u206D]/gu','regex',NULL,0,0,NULL),
+('COMMAND_ERROR_DEVELOPER','(errorID, error) => `Error ID ${errorID} - ${error.message}`','function',NULL,0,1,NULL),
+('COMMAND_ERROR_GENERIC','(errorID, error) => `An error occured while executing the command!`','function',NULL,0,1,NULL);
