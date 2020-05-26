@@ -220,11 +220,6 @@ module.exports = class Cytube extends require("./template.js") {
 			this.currentlyPlaying = this.playlistData.shift() ?? null;
 		});
 
-		// eslint-disable-next-line no-unused-vars
-		client.on("queue", (data) => {
-			// console.log("Cytube queued video", data);
-		});
-
 		client.on("error", (err) => {
 			console.error("Cytube error", err);
 
@@ -240,23 +235,6 @@ module.exports = class Cytube extends require("./template.js") {
 			// }
 			//
 			// this._restarting = true;
-		});
-
-		/**
-		 * @param {Object} data Emote data
-		 * @param {string} data.name Emote name
-		 * @param {string} data.image Emote URL
-		 * @param {string} data.source Regex to replace text with emote in chat
-		 */
-		// eslint-disable-next-line no-unused-vars
-		client.on("updateEmote", (data) => {
-			// @todo fix this to use something thats not request thanks
-
-			// const request = require("request");
-			// const fs = require("fs");
-			// const filename = data.name + "-" + data.image.replace(/\//g, "-");
-			//
-			// request(data.image).pipe(fs.createWriteStream("/code/emotes/" + filename));
 		});
 	}
 

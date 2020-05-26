@@ -218,10 +218,8 @@ module.exports = class Twitch extends require("./template.js") {
 	 * Sends a message, respecting each channel's current setup and limits
 	 * @param {string} message
 	 * @param {Channel|string} channel
-	 * @param {Object} [options]
 	 */
-	// eslint-disable-next-line no-unused-vars
-	async send (message, channel, options = {}) {
+	async send (message, channel) {
 		const channelData = sb.Channel.get(channel);
 		const channelName = channelData.Name;
 		if (channelData.Mode === "Inactive" || channelData.Mode === "Read") {

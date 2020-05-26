@@ -94,14 +94,11 @@ module.exports = class Mixer extends require("./template.js") {
 	/**
 	 * Sends a private message.
 	 * The user in question must have their Discord ID filled out, otherwise the method fails.
-	 * @param {User|string|number} user
-	 * @param {string} msg
 	 * @returns {Promise<void>}
 	 * @throws {sb.Error} If the provided user does not exist
 	 * @throws {sb.Error} If the provided user has no Discord ID connected.
 	 */
-	// eslint-disable-next-line no-unused-vars
-	async pm (user, msg) {
+	async pm () {
 		throw new sb.errors.NotImplemented();
 	}
 
