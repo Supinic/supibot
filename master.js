@@ -205,7 +205,7 @@
 
 			message = await this.prepareMessage(message, targetChannel);
 			if (message) {
-				setTimeout(() => this.send(message, targetChannel), sb.Config.get("MIRROR_DELAY"));
+				this.send(message, targetChannel);
 			}
 		}
 
