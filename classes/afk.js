@@ -17,6 +17,12 @@ module.exports = (function () {
 		 */
 		constructor (data) {
 			/**
+			 * Unique AFK status identifier
+			 * @type {number}
+			 */
+			this.ID = data.ID;
+
+			/**
 			 * Unique numeric user identifier
 			 * @type {User.ID}
 			 */
