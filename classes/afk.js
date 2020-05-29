@@ -141,6 +141,7 @@ module.exports = (function () {
 			row.setValues(data);
 			await row.save();
 
+			data.ID = row.values.ID;
 			AwayFromKeyboard.data.push(new AwayFromKeyboard(data));
 		}
 
