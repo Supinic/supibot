@@ -89,11 +89,12 @@ module.exports = (function () {
 			await sb.Query.getRecordUpdater(rs => rs
 				.update("chat_data", "AFK")
 				.set("Active", false)
-				.where("Active = %b", true)
-				.where("User_Alias = %n", userData.ID)
+				.where("ID = %n", data.ID)
 			);
 
-			const status = sb.Utils.randArray(sb.Config.get("AFK_RESPONSES")[data.Status]);
+			const afkCommand = sb.Command.get("afk");
+			const status = sb.Utils.randArray(afkCommand.staticData.responses[data.Status]);
+
 			if (!data.Silent) {
 				const message = `${userData.Name} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
 				if (channelData.Mirror) {
@@ -106,7 +107,6 @@ module.exports = (function () {
 					"(" + sb.Utils.timeDelta(data.Started) + ")"
 				])).join(" ");
 
-				const afkCommand = sb.Command.get("afk");
 				fixedMessage = await sb.Filter.applyUnping(afkCommand, fixedMessage);
 
 				sb.Master.send(fixedMessage, channelData);
