@@ -94,7 +94,7 @@ module.exports = (function () {
 					if (this.seekValues.start !== null && Object.keys(status.information.category).length > 1) {
 						// Since the VLC API does not support seeking to milliseconds parts when using ISO8601 or seconds,
 						// a percentage needs to be calculated, since that (for whatever reason) works using decimals.
-						const percentage = sb.Utils.round(this.seekValues.start / status.length, 5);
+						const percentage = sb.Utils.round(this.seekValues.start / status.length, 5) * 100;
 						await client.seek(`${percentage}%`);
 
 						this.seekValues.start = null;
