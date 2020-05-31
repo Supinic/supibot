@@ -88,7 +88,7 @@ module.exports = (function () {
 		initListeners () {
 			const client = this.client;
 
-			client.on("update", async (playlist, status) => {
+			client.on("update", async (status) => {
 				const item = this.currentPlaylistItem;
 				if (item !== null) {
 					if (this.seekValues.start !== null && status.time !== -1) {
