@@ -67,6 +67,10 @@ module.exports = (function () {
 			this.baseURL = options.baseURL;
 			this.videoQueue = [];
 			this.requestsID = {};
+			this.seekValues = {
+				start: null,
+				end: null
+			};
 
 			this._actions = {};
 			for (const action of actions) {
@@ -85,8 +89,9 @@ module.exports = (function () {
 			const client = this.client;
 
 			client.on("update", async () => {
+				const { end } = this.seekValues;
 				const item = this.currentPlaylistItem;
-				if (item !== null && item.endTime && item.time >= item.endTime) {
+				if (item !== null && end !== null && item.time >= end) {
 					const queue = this.currentPlaylist.length;
 					if (queue === 0) {
 						await client.stop();
@@ -108,6 +113,9 @@ module.exports = (function () {
 			});
 
 			client.on("videochange", async (previousID, nextID, playlist) => {
+				this.seekValues.start = null;
+				this.seekValues.end = null;
+
 				const previousTrack = this.matchParent(playlist, previousID);
 				const nextTrack = this.matchParent(playlist, nextID);
 				if (previousTrack === nextTrack) {
@@ -128,7 +136,6 @@ module.exports = (function () {
 					await client.playlistDelete(ID);
 				}
 				if (nextTrack) {
-					const item = this.currentPlaylistItem;
 					const ID = await sb.Query.getRecordset(rs => rs
 					    .select("ID")
 					    .from("chat_data", "Song_Request")
@@ -146,17 +153,17 @@ module.exports = (function () {
 						Started: new sb.Date()
 					});
 
-					item.startTime = row.values.Start_Time ?? null;
-					item.endTime = row.values.End_Time ?? null;
+					this.seekValues.start = row.values.Start_Time ?? null;
+					this.seekValues.end = row.values.End_Time ?? null;
 
-					// Assign the started to the next video, because it just started playing.
+					// Assign the status and started timestamp to the video, because it just started playing.
 					await row.save();
 
-					if (item.startTime) {
+					if (this.seekValues.start) {
 						// Since the VLC API does not support seeking to milliseconds parts when using ISO8601 or seconds,
 						// a percentage needs to be calculated, since that (for whatever reason) works using decimals.
-						const percentage = sb.Utils.round((item.startTime / 1000) / row.values.Length, 5);
-						await this.actions.seek(`${percentage}%`);
+						const percentage = sb.Utils.round((this.seekValues.start / 1000) / row.values.Length, 5);
+						await client.seek(`${percentage}%`);
 					}
 				}
 			});
