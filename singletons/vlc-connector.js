@@ -84,6 +84,19 @@ module.exports = (function () {
 		initListeners () {
 			const client = this.client;
 
+			client.on("update", async () => {
+				const item = this.currentPlaylistItem;
+				if (item !== null && item.endTime && item.time >= item.endTime) {
+					const queue = this.currentPlaylist.length;
+					if (queue === 0) {
+						await client.stop();
+					}
+					else {
+						await client.playlistNext();
+					}
+				}
+			});
+
 			client.on("statuschange", async (before, after) => {
 				const previous = before.currentplid;
 				const next = after.currentplid;
@@ -112,17 +125,37 @@ module.exports = (function () {
 						.where("VLC_ID = %n", ID)
 					);
 
-					await sb.VideoLANConnector.client.playlistDelete(ID);
+					await client.playlistDelete(ID);
 				}
 				if (nextTrack) {
-					// Assign the started to the next video, because it just started playing.
-					await sb.Query.getRecordUpdater(rs => rs
-						.update("chat_data", "Song_Request")
-						.set("Status", "Current")
-						.set("Started", new sb.Date())
+					const item = this.currentPlaylistItem;
+					const ID = await sb.Query.getRecordset(rs => rs
+					    .select("ID")
+					    .from("chat_data", "Song_Request")
 						.where("VLC_ID = %n", Number(nextTrack.id))
 						.where("Status = %s", "Queued")
 					);
+
+					const row = await sb.Query.getRow("chat_data", "Song_Request");
+					await row.load(ID);
+
+					row.setValues({
+						Status: "Current",
+						Started: new sb.Date()
+					});
+
+					item.startTime = row.values.Start_Time ?? null;
+					item.endTime = row.values.End_Time ?? null;
+
+					// Assign the started to the next video, because it just started playing.
+					await row.save();
+
+					if (item.startTime) {
+						// Since the VLC API does not support seeking to milliseconds parts when using ISO8601 or seconds,
+						// a percentage needs to be calculated, since that (for whatever reason) works using decimals.
+						const percentage = sb.Utils.round((item.startTime / 1000) / row.values.Length, 5);
+						await this.actions.seek(`${percentage}%`);
+					}
 				}
 			});
 
