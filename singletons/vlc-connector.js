@@ -131,9 +131,6 @@ module.exports = (function () {
 					return;
 				}
 
-				this.seekValues.start = null;
-				this.seekValues.end = null;
-
 				if (previousTrack) {
 					// Finalize the previous video, if it exists (might not exist because of playlist being started)
 					const ID = Number(previousTrack.id);
@@ -156,6 +153,12 @@ module.exports = (function () {
 						.single()
 						.flat("ID")
 					);
+
+					// This happens when no video is in queue, and the addition happens earlier than the song request
+					// object being inserted in the database (from the song request command)
+					if (!ID) {
+						return;
+					}
 
 					const row = await sb.Query.getRow("chat_data", "Song_Request");
 					await row.load(ID);
