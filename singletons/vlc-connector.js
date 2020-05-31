@@ -134,6 +134,8 @@ module.exports = (function () {
 					    .from("chat_data", "Song_Request")
 						.where("VLC_ID = %n", Number(nextTrack.id))
 						.where("Status = %s", "Queued")
+						.single()
+						.flat("ID")
 					);
 
 					const row = await sb.Query.getRow("chat_data", "Song_Request");
