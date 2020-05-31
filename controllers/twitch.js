@@ -387,7 +387,7 @@ module.exports = class Twitch extends require("./template.js") {
 		sb.Master.globalMessageListener(this.platform, channelData, userData, message);
 
 		// Check and execute command if necessary
-		if (message.startsWith(sb.Command.prefix)) {
+		if (sb.Command.is(message)) {
 			let userState = {};
 			if (messageType === "message") {
 				userState = messageObject.extractUserState();

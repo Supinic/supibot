@@ -152,7 +152,7 @@ module.exports = class Mixer extends require("./template.js") {
 		sb.Master.globalMessageListener(this.platform, channelData, userData, message);
 
 		// Check and execute command if necessary
-		if (message.startsWith(sb.Command.prefix)) {
+		if (sb.Command.is(message)) {
 			const [command, ...args] = message.replace(sb.Command.prefix, "").split(" ").filter(Boolean);
 			this.handleCommand(
 				command,

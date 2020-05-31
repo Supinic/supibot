@@ -143,9 +143,10 @@ module.exports = class Discord extends require("./template.js") {
 			sb.Master.globalMessageListener(this.platform, channelData, userData, msg);
 
 			// Starts with correct prefix - handle command
-			const commandPrefix = sb.Command.prefix;
-			if (msg.startsWith(commandPrefix)) {
+			if (sb.Command.is(msg)) {
+				const commandPrefix = sb.Command.prefix;
 				const [command] = msg.replace(commandPrefix, "").split(" ").filter(Boolean);
+
 				this.handleCommand(
 					command,
 					commandArguments.slice(1).map(i => Discord.removeEmoteTags(i)),
