@@ -113,14 +113,14 @@ module.exports = (function () {
 			});
 
 			client.on("videochange", async (previousID, nextID, playlist) => {
-				this.seekValues.start = null;
-				this.seekValues.end = null;
-
 				const previousTrack = this.matchParent(playlist, previousID);
 				const nextTrack = this.matchParent(playlist, nextID);
 				if (previousTrack === nextTrack) {
 					return;
 				}
+
+				this.seekValues.start = null;
+				this.seekValues.end = null;
 
 				if (previousTrack) {
 					// Finalize the previous video, if it exists (might not exist because of playlist being started)
