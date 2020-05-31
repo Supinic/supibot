@@ -165,8 +165,14 @@ module.exports = (function () {
 						Started: new sb.Date()
 					});
 
-					this.seekValues.start = row.values.Start_Time ?? null;
-					this.seekValues.end = row.values.End_Time ?? null;
+					// Transform the millisecond value into seconds
+					this.seekValues.start = (row.values.Start_Time !== null)
+						? (row.values.Start_Time / 1000)
+						: null;
+
+					this.seekValues.end = (row.values.End_Time !== null)
+						? (row.values.End_Time / 1000)
+						: null;
 
 					// Assign the status and started timestamp to the video, because it just started playing.
 					await row.save();
@@ -249,34 +255,27 @@ module.exports = (function () {
 		/**
 		 * Adds a video to the playlist queue.
 		 * @param {string} link
-		 * @param {number} user
-		 * @param {YoutubeDataObject} data
+		 * @param {Object} options={}
+		 * @param {number} [options.startTime] Automatic seek to a given position after start, if queued to a empty playlist
+		 * @param {number} [options.endTime] Automatic seek to a given position while run ning, if queued to a empty playlist
 		 * @returns {Promise<number>}
 		 */
-		async add (link, user, data) {
+		async add (link, options = {}) {
 			const status = await this.status();
 			if (status.currentplid === -1) {
 				await this.getStatus("in_play", {input: link});
+				if (options.startTime) {
+					this.seekValues.start = options.startTime;
+				}
+				if (options.endTime) {
+					this.seekValues.end = options.endTime;
+				}
 			}
 			else {
 				await this.getStatus("in_enqueue", {input: link});
 			}
 
-			const newID = Math.max(...(await this.getPlaylist()).children.map(i => i.id));
-
-			this.requestsID[user] = this.requestsID[user] || [];
-			this.requestsID[user].push(newID);
-
-			this.videoQueue.push({
-				vlcID: newID,
-				user: user,
-				link: link,
-				length: data.duration || data.length,
-				name: data.name,
-				requested: new sb.Date()
-			});
-
-			return newID;
+			return Math.max(...(await this.getPlaylist()).children.map(i => i.id));
 		}
 		
 		async currentlyPlaying () {
