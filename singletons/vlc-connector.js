@@ -88,19 +88,19 @@ module.exports = (function () {
 		initListeners () {
 			const client = this.client;
 
-			client.on("update", async () => {
+			client.on("update", async (playlist, status) => {
 				const item = this.currentPlaylistItem;
 				if (item !== null) {
-					if (this.seekValues.start !== null && item.time !== -1) {
+					if (this.seekValues.start !== null && status.time !== -1) {
 						// Since the VLC API does not support seeking to milliseconds parts when using ISO8601 or seconds,
 						// a percentage needs to be calculated, since that (for whatever reason) works using decimals.
-						const percentage = sb.Utils.round((this.seekValues.start / 1000) / row.values.Length, 5);
+						const percentage = sb.Utils.round((this.seekValues.start / 1000) / status.length, 5);
 						await client.seek(`${percentage}%`);
 
 						this.seekValues.start = null;
 					}
 
-					else if (this.seekValues.end !== null && item.time >= this.seekValues.end) {
+					else if (this.seekValues.end !== null && status.time >= this.seekValues.end) {
 						const queue = this.currentPlaylist.length;
 						if (queue === 0) {
 							await client.stop();
