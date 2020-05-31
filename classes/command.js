@@ -565,6 +565,20 @@ module.exports = (function () {
 			Command.data = null;
 		}
 
+		/**
+		 * Checks if the given string counts as a proper command execution.
+		 * @param {string} string
+		 * @returns {boolean}
+		 */
+		static is (string) {
+			const prefix = Command.getPrefix();
+			if (prefix === null) {
+				return false;
+			}
+
+			return string.startsWith(prefix);
+		}
+
 		static get prefixRegex () {
 			const prefix = Command.prefix;
 			if (!prefix) {
