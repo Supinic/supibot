@@ -190,11 +190,6 @@
 		 * @returns {Promise<void>}
 		 */
 		async mirror (message, userData, mirrorID) {
-			// Do not mirror own messages
-			if (userData.Name === sb.Config.get("SELF")) {
-				return;
-			}
-
 			const targetChannel = sb.Channel.get(mirrorID);
 			if (!targetChannel) {
 				throw new sb.Error({
@@ -202,10 +197,15 @@
 					args: mirrorID
 				});
 			}
+			else if (userData.Name === targetChannel.Platform.Self_Name) {
+				// Do not mirror own messages
+				return;
+			}
 
-			message = await this.prepareMessage(message, targetChannel);
-			if (message) {
-				this.send(message, targetChannel);
+			const finalMessage = await this.prepareMessage(message, targetChannel);
+
+			if (finalMessage) {
+				this.send(finalMessage, targetChannel);
 			}
 		}
 
