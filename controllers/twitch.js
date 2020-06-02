@@ -525,6 +525,13 @@ module.exports = class Twitch extends require("./template.js") {
 				}, 60_000);
 			}
 
+			if (!channelData.sessionData.clearRecentBansTimeout) {
+				channelData.sessionData.clearRecentBansTimeout = setTimeout(
+					() => channelData.sessionData.recentBans = 0,
+					this.platform.Data.clearRecentBansTimer
+				);
+			}
+
 			channelData.sessionData.recentBans++;
 
 			if (this.platform.Logging.bans) {

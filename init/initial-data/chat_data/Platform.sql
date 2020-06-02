@@ -30,6 +30,7 @@ VALUES
 	    "3000": "$25",
 	    "Prime": "Prime"
 	},
+	"clearRecentBansTimer": 60000,
 	"recentBanThreshold": null,
 	"updateAvailableBotEmotes": false,
 	"ignoredUserNotices": [],
