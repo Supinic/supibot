@@ -77,12 +77,6 @@ module.exports = class Cytube extends require("./template.js") {
 			}
 		});
 
-		// Disconnect event fired - restart and reconnect
-		client.on("disconnect", (...args) => {
-			console.warn("Cytube disconnect", ...args);
-			this.restart();
-		});
-
 		// Handle chat message, log it if needed, handle command if needed
 		// { username: 'KUNszg',
 		//   msg: '$wiki tunguska event',
@@ -218,6 +212,18 @@ module.exports = class Cytube extends require("./template.js") {
 		// Video finished playing
 		client.on("changeMedia", () => {
 			this.currentlyPlaying = this.playlistData.shift() ?? null;
+		});
+
+		// Disconnect event fired - restart and reconnect
+		client.on("disconnect", (...args) => {
+			console.warn("Cytube disconnect", ...args);
+
+			if (this.restarting) {
+				return;
+			}
+
+			this.restarting = true;
+			this.restartInterval = setTimeout(() => this.restart(), this.restartDelay);
 		});
 
 		client.on("error", (err) => {
