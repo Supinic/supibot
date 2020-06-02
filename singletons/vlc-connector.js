@@ -357,6 +357,23 @@ module.exports = (function () {
 			});
 		}
 
+		static getNormalizedPlaylist () {
+			return sb.Query.getRecordset(rs => rs
+				.select("ID", "Name", "Status", "VLC_ID", "User_Alias")
+				.select(`
+					(CASE 
+						WHEN (Start_Time IS NOT NULL AND End_Time IS NOT NULL) THEN (End_Time - Start_Time)
+						WHEN (Start_Time IS NOT NULL AND End_Time IS NULL) THEN (Length - Start_Time)
+						WHEN (Start_Time IS NULL AND End_Time IS NOT NULL) THEN (End_Time)
+						ELSE Length
+						END
+					) AS Duration
+				`)
+				.from("chat_data", "Song_Request")
+				.where("Status <> %s", "Inactive")
+			);
+		}
+
 		matchParent (list, targetID) {
 			for (const track of list) {
 				const ID = Number(track.id);
