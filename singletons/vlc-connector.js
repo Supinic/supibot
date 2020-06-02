@@ -359,7 +359,7 @@ module.exports = (function () {
 
 		static getNormalizedPlaylist () {
 			return sb.Query.getRecordset(rs => rs
-				.select("ID", "Name", "Status", "VLC_ID", "User_Alias")
+				.select("ID", "Name", "Status", "Video_Type", "VLC_ID", "User_Alias")
 				.select(`
 					(CASE 
 						WHEN (Start_Time IS NOT NULL AND End_Time IS NOT NULL) THEN (End_Time - Start_Time)
