@@ -168,14 +168,8 @@ module.exports = (function () {
 						Started: new sb.Date()
 					});
 
-					// Transform the millisecond value into seconds
-					this.seekValues.start = (row.values.Start_Time !== null)
-						? (row.values.Start_Time / 1000)
-						: null;
-
-					this.seekValues.end = (row.values.End_Time !== null)
-						? (row.values.End_Time / 1000)
-						: null;
+					this.seekValues.start = row.values.Start_Time ?? null;
+					this.seekValues.end = row.values.End_Time ?? null;
 
 					// Assign the status and started timestamp to the video, because it just started playing.
 					await row.save();
