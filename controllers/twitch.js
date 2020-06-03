@@ -499,13 +499,23 @@ module.exports = class Twitch extends require("./template.js") {
 	 * Reacts to user timeouts and bans alike
 	 * @param {string} user
 	 * @param {string} channel
-	 * @param {string} [reason]
-	 * @param {number} [length]
+	 * @param {string|null} reason=null
+	 * @param {number|null} length=null
 	 * @returns {Promise<void>}
 	 */
 	async handleBan (user, channel, reason = null, length = null) {
 		const channelData = sb.Channel.get(channel);
 		if (channelData) {
+			if (user === this.platform.Self_Name && length === null && this.platform.Data.partChannelsOnPermaban) {
+				await Promise.all([
+					channelData.saveProperty("Mode", "Inactive"),
+					this.client.part(channelData.Name)
+				]);
+
+				const timestamp = new sb.Date().format("Y-m-d H:i:s");
+				console.warn(`[${timestamp}] Bot has been permabanned in Twitch channel ${channel} (reason: ${reason}). Setting mode to Inactive, and parting. `);
+			}
+
 			if (typeof channelData.sessionData.recentBans === "undefined") {
 				channelData.sessionData.recentBans = 0;
 			}

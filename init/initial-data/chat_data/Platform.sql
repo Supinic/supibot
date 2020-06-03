@@ -30,6 +30,7 @@ VALUES
 	    "3000": "$25",
 	    "Prime": "Prime"
 	},
+	"partChannelsOnPermaban": false,
 	"clearRecentBansTimer": 60000,
 	"recentBanThreshold": null,
 	"updateAvailableBotEmotes": false,
