@@ -537,7 +537,10 @@ module.exports = class Twitch extends require("./template.js") {
 
 			if (!channelData.sessionData.clearRecentBansTimeout) {
 				channelData.sessionData.clearRecentBansTimeout = setTimeout(
-					() => channelData.sessionData.recentBans = 0,
+					() => {
+						channelData.sessionData.recentBans = 0;
+						channelData.sessionData.clearRecentBansTimeout = null;
+					},
 					this.platform.Data.clearRecentBansTimer
 				);
 			}
