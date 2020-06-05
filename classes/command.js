@@ -142,16 +142,21 @@ module.exports = (function () {
 
 		/**
 		 * Serializes the command into its string representation
+		 * @param {Object} options = {}
+		 * @param {"minified"|"pretty"} [options.style] Determines the format of result JSON, minified or prettified.
 		 * @returns {Promise<string>}
 		 */
-		async serialize () {
+		async serialize (options = {}) {
 			const row = await sb.Query.getRow("chat_data", "Command");
 			await row.load(this.ID);
 
 			const definition = { ...row.values };
 			delete definition.ID;
 
-			return JSON.stringify(definition);
+			const format = options.style ?? "minified";
+			return (format === "minified")
+				? JSON.stringify(definition)
+				: JSON.stringify(definition, null, 4);
 		}
 
 		/** @override */
@@ -564,7 +569,8 @@ module.exports = (function () {
 		/**
 		 * Installs a command from a given string definition.
 		 * @param {string} definition
-		 * @param {Object} options={}
+		 * @param {Object} options
+		 * @param {boolean} [options.override] If true, existing commands will be updated; if false, installation will not continue.		 *
 		 * @returns {Promise<{success: boolean, result: ?string}>}
 		 */
 		static async install (definition, options = {}) {
