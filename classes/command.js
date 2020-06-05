@@ -10,71 +10,77 @@ module.exports = (function () {
 	 * @type Command
 	 */
 	return class Command {
-		/** @alias {Command} */
+		/**
+		 * Unique numeric ID.
+		 * @type {number}
+		 */
+		ID;
+
+		/**
+		 * Unique command name.
+		 * @type {string}
+		 */
+		Name;
+
+		/**
+		 * Array of string aliases. Can be empty if none are provided.
+		 * @type {string[]}
+		 */
+		Aliases = [];
+
+		/**
+		 * Command description. Also used for the help meta command.
+		 * @type {string|null}
+		 */
+		Description = null;
+
+		/**
+		 * Command cooldown, in milliseconds.
+		 * @type {number}
+		 */
+		Cooldown;
+
+		/**
+		 * Holds all flags of a command, all of which are booleans.
+		 * This object is frozen after initialization, so that the flags can only be modified outside of runtime.
+		 * @type {CommandFlagsObject}
+		 */
+		Flags = {};
+
+		/**
+		 * If not null, specified the response for a whitelisted command when invoked outside of the whitelist.
+		 * @type {string|null}
+		 */
+		Whitelist_Response = null;
+
+		/**
+		 * Session-specific data for the command that can be modified at runtime.
+		 * @type {Object}
+		 */
+		data = {};
+
+		/**
+		 * Data specific for the command. Usually hosts utils methods, or constants.
+		 * The object is deeply frozen, preventing any changes.
+		 * @type {Object}
+		 */
+		staticData = {};
+
 		constructor (data) {
-			/**
-			 * Unique numeric ID.
-			 * @type {number}
-			 */
 			this.ID = data.ID;
 
-			/**
-			 * Unique command name.
-			 * @type {string}
-			 */
 			this.Name = data.Name;
 
 			try {
-				data.Aliases = eval(data.Aliases) || [];
+				this.Aliases = eval(data.Aliases) || [];
 			}
 			catch (e) {
 				console.warn(`Command ${this.Name} (${this.ID}) has invalid aliases definition: ${e}`);
-				data.Aliases = [];
 			}
 
-			/**
-			 * Array of string aliases. Can be empty if none are provided.
-			 * @type {string[]}
-			 */
-			this.Aliases = data.Aliases;
-
-			/**
-			 * Command description. Also used for the help command.
-			 * @type {string}
-			 */
 			this.Description = data.Description;
 
-			/**
-			 * Command cooldown, in milliseconds.
-			 * @type {number}
-			 */
 			this.Cooldown = data.Cooldown;
-
-			/**
-			 * @typedef {Object} CommandFlagsObject
-			 * @property {boolean} rollback Determines if command is rollbackable.
-			 * If true, all sensitive database operations will be handled in a transaction - provided in options object.
-			 * @property {boolean} optOut If true, any user can "opt-out" from being the target of the command.
-			 * If done, nobody will be able to use their username as the command parameter.
-			 * @property {boolean} skipBanphrases If true, command result will not be checked for banphrases.
-			 * Mostly used for system or simple commands with little or no chance to trigger banphrases.
-			 * @property {boolean} block If true, any user can "block" another user from targetting them with this command.
-			 * If done, the specified user will not be able to use their username as the command parameter.
-			 * Similar to optOut, but not global, and only applies to one user.
-			 * @property {boolean} ownerOverride If true, the command's cooldown will be vastly reduced when a user invokes it in their own channel.
-			 * @property {boolean} readOnly If true, command is guaranteed to not reply, and as such, no banphrases, cooldowns or pings are checked.
-			 * @property {boolean} whitelist If true, command is only accessible to certain users or channels, or their combination.
-			 * @property {boolean} pipe If true, the command can be used as a part of the "pipe" command.
-			 * @property {boolean} ping If true, command will attempt to "ping" - notify - its invoker.
-			 * This also requires the channel to have this option enabled.
-			 */
-
-			/**
-			 * Holds all flags of a command, all of which are booleans.
-			 * This object is frozen after initialization, so that the flags can only be modified outside of runtime.
-			 * @type {CommandFlagsObject}
-			 */
-			this.Flags = {};
 
 			if (data.Flags !== null) {
 				for (const flag of data.Flags) {
@@ -85,50 +91,33 @@ module.exports = (function () {
 
 			Object.freeze(this.Flags);
 
-			/**
-			 * If not null, specified the response for a whitelisted command when invoked outside of the whitelist.
-			 * @type {boolean}
-			 */
 			this.Whitelist_Response = data.Whitelist_Response;
 
 			try {
-				data.Code = eval(data.Code);
+				this.Code = eval(data.Code);
 			}
 			catch (e) {
 				console.error(`Command ${this.ID} has invalid code definition!`, e);
-				data.Code = async () => ({
+				this.Code = async () => ({
 					success: false,
 					reply: "Command has invalid code definition! Please make sure to let @supinic know about this!"
 				});
 			}
 
-			/**
-			 * Command code.
-			 * @type {Function}
-			 */
-			this.Code = data.Code;
-
-			/**
-			 * Session-specific data for the command that can be modified at runtime.
-			 * @type {Object}
-			 */
-			this.data = {};
-
-			/**
-			 * Data specific for the command. Usually hosts utils methods, or constants.
-			 * The object is deeply frozen, preventing any changes.
-			 * @type {Object}
-			 */
-			this.staticData = {};
 			if (data.Static_Data) {
 				try {
-					this.staticData = sb.Utils.deepFreeze(eval(data.Static_Data));
+					this.staticData = eval(data.Static_Data);
 				}
 				catch (e) {
 					console.warn(`Command ${this.ID} has invalid static data definition!`, e);
-					data.Code = async () => ({ reply: "Command has invalid static data definition!" });
+					this.Code = async () => ({
+						success: false,
+						reply: "Command has invalid code definition! Please make sure to let @supinic know about this!"
+					});
 				}
 			}
+
+			sb.Utils.deepFreeze(this.staticData);
 		}
 
 		/**
@@ -136,10 +125,10 @@ module.exports = (function () {
 		 */
 		destroy () {
 			this.Code = null;
+			this.Flags = null;
 			this.data = null;
+			this.staticData = null;
 			this.Aliases = null;
-
-			this._destroyed = true;
 		}
 
 		/**
@@ -562,6 +551,10 @@ module.exports = (function () {
 		 * Cleans up.
 		 */
 		static destroy () {
+			for (const command of Command.data) {
+				command.destroy();
+			}
+
 			Command.data = null;
 		}
 
@@ -644,4 +637,23 @@ module.exports = (function () {
  * @property {Object} append = {} other platform-specific options
  * @property {?} [transaction] For rollbackable commands, a transaction is set up and later committed/rollbacked.
  * Commands must use this.data.transaction for whatever sbase access should be safeguarded.
+ */
+
+/**
+ * @typedef {Object} CommandFlagsObject
+ * @property {boolean} rollback Determines if command is rollbackable.
+ * If true, all sensitive database operations will be handled in a transaction - provided in options object.
+ * @property {boolean} optOut If true, any user can "opt-out" from being the target of the command.
+ * If done, nobody will be able to use their username as the command parameter.
+ * @property {boolean} skipBanphrases If true, command result will not be checked for banphrases.
+ * Mostly used for system or simple commands with little or no chance to trigger banphrases.
+ * @property {boolean} block If true, any user can "block" another user from targetting them with this command.
+ * If done, the specified user will not be able to use their username as the command parameter.
+ * Similar to optOut, but not global, and only applies to one user.
+ * @property {boolean} ownerOverride If true, the command's cooldown will be vastly reduced when a user invokes it in their own channel.
+ * @property {boolean} readOnly If true, command is guaranteed to not reply, and as such, no banphrases, cooldowns or pings are checked.
+ * @property {boolean} whitelist If true, command is only accessible to certain users or channels, or their combination.
+ * @property {boolean} pipe If true, the command can be used as a part of the "pipe" command.
+ * @property {boolean} ping If true, command will attempt to "ping" - notify - its invoker.
+ * This also requires the channel to have this option enabled.
  */
