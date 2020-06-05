@@ -140,6 +140,20 @@ module.exports = (function () {
 			return this.Code(...args);
 		}
 
+		/**
+		 * Serializes the command into its string representation
+		 * @returns {Promise<string>}
+		 */
+		async serialize () {
+			const row = await sb.Query.getRow("chat_data", "Command");
+			await row.load(this.ID);
+
+			const definition = { ...row.values };
+			delete definition.ID;
+
+			return JSON.stringify(row.valuesObject);
+		}
+
 		/** @override */
 		static async initialize () {
 			await Command.loadData();
@@ -548,14 +562,63 @@ module.exports = (function () {
 		}
 
 		/**
-		 * Cleans up.
+		 * Installs a command from a given string definition.
+		 * @param {string} definition
+		 * @param {Object} options={}
+		 * @returns {Promise<{success: boolean, result: ?string}>}
 		 */
-		static destroy () {
-			for (const command of Command.data) {
-				command.destroy();
+		static async install (definition, options = {}) {
+			const data = JSON.parse(definition);
+			const conflictingAliases = Command.data.filter(i => i.Aliases.includes(data.Name));
+			if (conflictingAliases.length > 0) {
+				return {
+					success: false,
+					result: "conflicting-alias"
+				};
 			}
 
-			Command.data = null;
+			let result = "";
+			const conflictIndex = Command.data.findIndex(i => i.Name === data.Name);
+			if (conflictIndex !== -1) {
+				if (options.override) {
+					const previous = Command.data[conflictIndex];
+					Command.data[conflictIndex] = new Command({
+						ID: previous.ID,
+						...data
+					});
+
+					const row = await sb.Query.getRow("chat_data", "Command");
+					await row.load(previous.ID);
+					row.setValues(data);
+					await row.save();
+
+					previous.destroy();
+					result = "updated";
+				}
+				else {
+					return {
+						success: false,
+						reason: "conflicting-name"
+					};
+				}
+			}
+			else {
+				const row = await sb.Query.getRow("chat_data", "Command");
+				row.setValues(data);
+				await row.save();
+
+				Command.data.push(new Command({
+					ID: row.values.ID,
+					...data
+				}));
+
+				result = "added";
+			}
+
+			return {
+				success: true,
+				result
+			}
 		}
 
 		/**
@@ -570,6 +633,17 @@ module.exports = (function () {
 			}
 
 			return string.startsWith(prefix);
+		}
+
+		/**
+		 * Cleans up.
+		 */
+		static destroy () {
+			for (const command of Command.data) {
+				command.destroy();
+			}
+
+			Command.data = null;
 		}
 
 		static get prefixRegex () {
