@@ -151,7 +151,7 @@ module.exports = (function () {
 			const definition = { ...row.values };
 			delete definition.ID;
 
-			return JSON.stringify(row.valuesObject);
+			return JSON.stringify(definition);
 		}
 
 		/** @override */
