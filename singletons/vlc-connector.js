@@ -357,7 +357,7 @@ module.exports = (function () {
 			});
 		}
 
-		static getNormalizedPlaylist () {
+		getNormalizedPlaylist () {
 			return sb.Query.getRecordset(rs => rs
 				.select("*")
 				.select(`
