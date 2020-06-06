@@ -489,7 +489,7 @@ module.exports = (function () {
 				}
 
 				const metaSkip = Boolean(options.skipBanphrases || execution?.meta?.skipBanphrases);
-				if (!command.Flags.skipBanphrases && !metaSkip) {
+				if (!command.Flags.skipBanphrase && !metaSkip) {
 					const { passed, privateMessage, string } = await sb.Banphrase.execute(execution.reply.slice(0, 1000), channelData);
 					execution.reply = string;
 
@@ -729,7 +729,7 @@ module.exports = (function () {
  * If true, all sensitive database operations will be handled in a transaction - provided in options object.
  * @property {boolean} optOut If true, any user can "opt-out" from being the target of the command.
  * If done, nobody will be able to use their username as the command parameter.
- * @property {boolean} skipBanphrases If true, command result will not be checked for banphrases.
+ * @property {boolean} skipBanphrase If true, command result will not be checked for banphrases.
  * Mostly used for system or simple commands with little or no chance to trigger banphrases.
  * @property {boolean} block If true, any user can "block" another user from targetting them with this command.
  * If done, the specified user will not be able to use their username as the command parameter.
