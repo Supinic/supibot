@@ -274,8 +274,14 @@ module.exports = (function () {
             await row.save();
         }
 
+        destroy () {
+            this.Data = null;
+            this.sessionData = null;
+        }
+
         /** @override */
         static async initialize () {
+            Channel.data = [];
             await Channel.loadData();
             return Channel;
         }
@@ -283,11 +289,17 @@ module.exports = (function () {
         static async loadData () {
             /** @type Channel[] */
             const data = await sb.Query.getRecordset(rs => rs
-                .select("Channel.*")
+                .select("*")
                 .from("chat_data", "Channel")
             );
 
+            const previous = Channel.data;
             Channel.data = data.map(record => new Channel(record));
+            if (Array.isArray(previous)) {
+                for (const channel of previous) {
+                    channel.destroy();
+                }
+            }
 
             if (Channel.data.length === 0) {
                 console.warn("No channels initialized - bot will not attempt to join any channels");
@@ -295,7 +307,6 @@ module.exports = (function () {
         }
 
         static async reloadData () {
-            Channel.data = [];
             await Channel.loadData();
         }
 
