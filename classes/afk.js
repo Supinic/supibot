@@ -114,8 +114,7 @@ module.exports = (function () {
 				])).join(" ");
 
 				fixedMessage = await sb.Filter.applyUnping(afkCommand, fixedMessage);
-
-				sb.Master.send(fixedMessage, channelData);
+				await channelData.send(fixedMessage);
 			}
 		}
 

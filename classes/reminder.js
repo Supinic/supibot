@@ -357,9 +357,8 @@ module.exports = (function () {
                         );
                     }
                     else {
-                        sb.Master.send(
-                            `@${fromUserData.Name}, ${targetUserData.Name} just typed in channel ${channelName}`,
-                            reminder.Channel
+                        await sb.Channel.get(reminder.Channel).send(
+                            `@${fromUserData.Name}, ${targetUserData.Name} just typed in channel ${channelName}`
                         );
                     }
 
@@ -392,7 +391,7 @@ module.exports = (function () {
                     const messageArray = message.match(splitRegex).filter(Boolean);
 
                     for (const splitMessage of messageArray) {
-                        sb.Master.send(splitMessage, channelData);
+                        await channelData.send(splitMessage);
 
 	                    // Make sure to mirror the reminder if the target channel is set up to be mirrored
 	                    if (channelData.Mirror) {
@@ -401,9 +400,8 @@ module.exports = (function () {
                     }
                 }
                 else {
-                    sb.Master.send(
-                        targetUserData.Name + ", banphrase timed out, but you can check reminders on the website or with the check command. IDs: " + reminders.map(i => i.ID).join(", "),
-                        channelData
+                    await channelData.send(
+                        targetUserData.Name + ", banphrase timed out, but you can check reminders on the website or with the check command. IDs: " + reminders.map(i => i.ID).join(", ")
                     );
                 }
             }
@@ -415,7 +413,8 @@ module.exports = (function () {
                 }
 
                 const publicMessage = `Hey ${targetUserData.Name} - I just whispered you ${privateReply.length} private reminder(s) - make sure to check them out!`;
-                sb.Master.send(publicMessage, channelData);
+                await channelData.send(publicMessage);
+
                 if (channelData.Mirror) {
                     sb.Master.mirror(publicMessage, targetUserData, channelData.Mirror);
                 }
