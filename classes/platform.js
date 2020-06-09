@@ -120,10 +120,6 @@ module.exports = (function () {
 			}
 		}
 
-		get capital () {
-			return sb.Utils.capitalize(this.Name);
-		}
-
 		/**
 		 * Determines if a user is an "owner" of a given channel in the platform.
 		 * @param {Channel} channelData
@@ -138,8 +134,32 @@ module.exports = (function () {
 			return this.#controller.isUserChannelOwner(channelData, userData);
 		}
 
+		/**
+		 * Sends a message into a given channel.
+		 * @param message
+		 * @param channel
+		 * @returns {Promise<void>}
+		 */
+		send (message, channel) {
+			return this.#controller.send(message, channel);
+		}
+
+		/**
+		 * Sends a private message to a given user.
+		 * @param message
+		 * @param user
+		 * @returns {Promise<void>}
+		 */
+		pm (message, user) {
+			return this.#controller.pm(message, user);
+		}
+
 		destroy () {
 			this.#controller = null;
+		}
+
+		get capital () {
+			return sb.Utils.capitalize(this.Name);
 		}
 
 		/**

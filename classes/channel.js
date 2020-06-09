@@ -234,6 +234,15 @@ module.exports = (function () {
             return Boolean(this.Data.ambassadors?.includes(userData.ID))
         }
 
+        /**
+         * Sends a message into the current channel.
+         * @param message
+         * @returns {Promise<void>}
+         */
+        send (message) {
+            return this.Platform.send(message, this);
+        }
+
         async toggleAmbassador (userData) {
             this.Data.ambassadors = this.Data.ambassadors ?? [];
 
