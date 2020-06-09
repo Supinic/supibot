@@ -7,7 +7,8 @@
     "dank-twitch-irc": "3.2.6",
     "discord.js": "^12.2.0",
     "message-scheduler": "github:Supinic/message-scheduler",
-    "supi-core": "github:Supinic/supi-core"
+    "supi-core": "github:Supinic/supi-core",
+    "ws": "^7.3.0"
   },
   "engines": {
     "node": ">= 13.2"
