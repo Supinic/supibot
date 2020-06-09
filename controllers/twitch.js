@@ -128,7 +128,7 @@ module.exports = class Twitch extends require("./template.js") {
 				}
 
 				case "no_permission": {
-					sb.Master.send("I don't have permission to do that FeelsBadMan", channelData);
+					channelData.send("I don't have permission to do that FeelsBadMan");
 					break;
 				}
 
