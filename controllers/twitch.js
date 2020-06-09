@@ -56,7 +56,7 @@ module.exports = class Twitch extends require("./template.js") {
 				const defaultReply = "That message violates this channel's moderation settings.";
 
 				if (defaultReply.toLowerCase().includes(error.messageText.toLowerCase())) {
-					this.pm(channelData.Name, "Real funny banphrase you got there");
+					this.pm("Real funny banphrase you got there", channelData.Name);
 				}
 				else {
 					this.send(defaultReply, channelData);
@@ -271,12 +271,12 @@ module.exports = class Twitch extends require("./template.js") {
 
 	/**
 	 * Sends a private message to given user.
-	 * @param {string} user
 	 * @param {string} message
+	 * @param {string} user
 	 */
-	async pm (user, message) {
+	async pm (message, user) {
 		const userData = await sb.User.get(user);
-		this.client.whisper(userData.Name, message);
+		await this.client.whisper(userData.Name, message);
 	}
 
 	async handleMessage (messageObject) {
@@ -413,15 +413,15 @@ module.exports = class Twitch extends require("./template.js") {
 
 			if ((!result || !result.success) && messageType === "whisper") {
 				if (!result?.reply && result?.reason === "filter") {
-					this.pm(userData.Name, sb.Config.get("PRIVATE_MESSAGE_COMMAND_FILTERED"));
+					this.pm(sb.Config.get("PRIVATE_MESSAGE_COMMAND_FILTERED"), userData.Name);
 				}
 				else if (result?.reason === "no-command") {
-					this.pm(userData.Name, sb.Config.get("PRIVATE_MESSAGE_NO_COMMAND"));
+					this.pm(sb.Config.get("PRIVATE_MESSAGE_NO_COMMAND"), userData.Name);
 				}
 			}
 		}
 		else if (messageType === "whisper") {
-			this.pm(userData.Name, sb.Config.get("PRIVATE_MESSAGE_UNRELATED"));
+			this.pm(sb.Config.get("PRIVATE_MESSAGE_UNRELATED"), userData.Name);
 		}
 	}
 
@@ -479,7 +479,7 @@ module.exports = class Twitch extends require("./template.js") {
 				extraLength: ("/w " + userData.Name + " ").length
 			});
 
-			this.pm(userData.Name, message);
+			this.pm(message, userData.Name);
 		}
 		else {
 			if (channelData?.Mirror) {

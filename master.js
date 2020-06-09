@@ -108,7 +108,7 @@
 		async pm (user, message, platform) {
 			const platformData = sb.Platform.get(platform);
 			const client = this.controllers[platformData.Name];
-			return await client.pm(user, message);
+			return client.pm(user, message);
 		}
 
 		/**

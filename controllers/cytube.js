@@ -251,7 +251,7 @@ module.exports = class Cytube extends require("./template.js") {
 	 * @param {string} message
 	 * @param {Channel} channelData
 	 */
-	send (message, channelData) {
+	async send (message, channelData) {
 		if (channelData && this.channels.length > 0) {
 			// @todo separate room handling for multiple channels
 		}
@@ -281,15 +281,14 @@ module.exports = class Cytube extends require("./template.js") {
 
 	/**
 	 * Sends a private message in the context of current channel bound to this instance
-	 * @param {string} user User the private message will be sent to
 	 * @param {string} message Private message
-	 * @param {Object} [meta] Meta info
+	 * @param {string} user User the private message will be sent to
 	 */
-	pm (user, message, meta = {}) {
+	async pm (message, user) {
+		const userData = await sb.User.get(user);
 		this.client.pm({
 			msg: message,
-			to: user,
-			meta: meta
+			to: userData.Name
 		});
 	}
 
@@ -315,7 +314,7 @@ module.exports = class Cytube extends require("./template.js") {
 		}
 
 		if (execution.replyWithPrivateMessage || replyIntoPM) {
-			this.pm(userData.Name, execution.reply);
+			this.pm(execution.reply, userData.Name);
 		}
 		else {
 			if (this.channelData.Mirror) {

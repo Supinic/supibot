@@ -88,7 +88,7 @@ module.exports = class Mixer extends require("./template.js") {
 			});
 		}
 
-		socketData.socket.call("msg", [message]);
+		await socketData.socket.call("msg", [message]);
 	}
 
 	/**

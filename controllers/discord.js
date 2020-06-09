@@ -207,13 +207,13 @@ module.exports = class Discord extends require("./template.js") {
 	/**
 	 * Sends a private message.
 	 * The user in question must have their Discord ID filled out, otherwise the method fails.
+	 * @param {string} message
 	 * @param {User|string|number} user
-	 * @param {string} msg
 	 * @returns {Promise<void>}
 	 * @throws {sb.Error} If the provided user does not exist
 	 * @throws {sb.Error} If the provided user has no Discord ID connected.
 	 */
-	async pm (user, msg) {
+	async pm (message, user) {
 		const userData = await sb.User.get(user, true);
 		if (!userData.Discord_ID) {
 			throw new sb.Error({
@@ -222,7 +222,7 @@ module.exports = class Discord extends require("./template.js") {
 		}
 
 		const discordUser = await this.client.users.fetch(userData.Discord_ID);
-		discordUser.send(msg);
+		await discordUser.send(message);
 	}
 
 	/**
@@ -233,7 +233,7 @@ module.exports = class Discord extends require("./template.js") {
 	 */
 	async directPm (userID, msg) {
 		const discordUser = await this.client.users.fetch(userID);
-		discordUser.send(msg);
+		await discordUser.send(msg);
 	}
 
 	/**
@@ -264,7 +264,7 @@ module.exports = class Discord extends require("./template.js") {
 				platform: this.platform
 			});
 
-			this.pm(userData, message);
+			this.pm(message, userData);
 		}
 		else {
 			const message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });

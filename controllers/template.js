@@ -5,9 +5,9 @@
 module.exports = class Controller {
 	initListeners () { }
 
-	send (message, channelData) { }
+	async send (message, channel) { }
 
-	pm (user, message) { }
+	async pm (message, user) { }
 
 	async handleCommand () { }
 
