@@ -139,7 +139,7 @@ module.exports = class Twitch extends require("./template.js") {
 				}
 
 				default:
-					console.debug("incoming notice:", channelData.Name, messageID, rest);
+					console.debug("incoming notice:", channelData, messageID, rest);
 			}
 		});
 
