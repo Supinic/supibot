@@ -133,7 +133,7 @@ module.exports = (function () {
                 if (message) {
                     if (this.Private_Message) {
                         const platform = channelData?.Platform ?? this.Platform;
-                        await sb.Master.pm(toUserData, message, platform);
+                        await platform.pm(message, toUserData);
                     }
                     else {
                         if (channelData === null) {
@@ -147,7 +147,7 @@ module.exports = (function () {
                         }
 
                         message = await sb.Master.prepareMessage(message, channelData);
-                        sb.Master.send(message, channelData);
+                        await channelData.send(message);
                     }
                 }
 
@@ -351,10 +351,9 @@ module.exports = (function () {
                             platform = sb.Platform.get(reminder.Platform);
                         }
 
-                        sb.Master.pm(
-                            fromUserData.Name,
+                        await platform.pm(
                             `@${fromUserData.Name}, ${targetUserData.Name} just typed in channel ${channelName}`,
-                            platform
+                            fromUserData
                         );
                     }
                     else {
@@ -412,7 +411,7 @@ module.exports = (function () {
             // Handle private reminders
             if (privateReply.length !== 0) {
                 for (const privateReminder of privateReply) {
-                    sb.Master.pm(targetUserData, "Private reminder: " + privateReminder, channelData.Platform);
+                    await channelData.Platform.send("Private reminder: " + privateReminder, targetUserData);
                 }
 
                 const publicMessage = `Hey ${targetUserData.Name} - I just whispered you ${privateReply.length} private reminder(s) - make sure to check them out!`;
