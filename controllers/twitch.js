@@ -299,7 +299,10 @@ module.exports = class Twitch extends require("./template.js") {
 				console.error("Cannot find channel " + channelName);
 				return;
 			}
-			else if (channelData.Mode === "Last seen") {
+
+			this.resolveUserMessage(channelData, userData, message);
+
+			if (channelData.Mode === "Last seen") {
 				sb.Logger.updateLastSeen({ userData, channelData, message });
 				return;
 			}
@@ -351,7 +354,7 @@ module.exports = class Twitch extends require("./template.js") {
 				sb.SystemLogger.send("Twitch.Other", "whisper: " + message, null, userData);
 			}
 
-			console.debug("Whisper received: Twitch", userData.Name, message);
+			this.resolveUserMessage(null, userData, message);
 		}
 
 		// Own message - check the regular/vip/mod/broadcaster status, and skip

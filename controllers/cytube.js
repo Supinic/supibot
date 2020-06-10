@@ -124,7 +124,8 @@ module.exports = class Cytube extends require("./template.js") {
 				if (originalUsername === this.platform.Self_Name && identifiers.includes(Array.from(msg)[0])) {
 					return;
 				}
-				
+
+				this.resolveUserMessage(this.channelData, userData, msg);
 				sb.Logger.push(msg, userData, this.channelData);
 				sb.AwayFromKeyboard.checkActive(userData, this.channelData);
 				sb.Reminder.checkActive(userData, this.channelData);
@@ -134,6 +135,8 @@ module.exports = class Cytube extends require("./template.js") {
 				}
 			}
 			else {
+				this.resolveUserMessage(null, userData, msg);
+
 				if (this.platform.Logging.whispers) {
 					sb.SystemLogger.send("Cytube.Other", "PM: " + msg, this.channelData, userData);
 				}

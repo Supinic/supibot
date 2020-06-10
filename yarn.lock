@@ -191,14 +191,14 @@
     "@types/node" "*"
 
 "@types/node@*", "@types/node@^14.0.5":
-  version "14.0.12"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.12.tgz#9c1d8ffb8084e8936603a6122a7649e40e68e04b"
-  integrity sha512-/sjzehvjkkpvLpYtN6/2dv5kg41otMGuHQUt9T2aiAuIfleCQRQHXXzF1eAw/qkZTj5Kcf4JSTf7EIizHocy6Q==
+  version "14.0.13"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.13.tgz#ee1128e881b874c371374c1f72201893616417c9"
+  integrity sha512-rouEWBImiRaSJsVA+ITTFM6ZxibuAlTuNOCyxVbwreu6k6+ujs7DfnU9o+PShFhET78pMBl3eH+AGSI5eOTkPA==
 
 "@types/node@^13.9.8":
-  version "13.13.11"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.11.tgz#f8d2acb51f793bd5f4b07d9926bb5ce1dfb7a23e"
-  integrity sha512-FX7mIFKfnGCfq10DGWNhfCNxhACEeqH5uulT6wRRA1KEt7zgLe0HdrAd9/QQkObDqp2Z0KEV3OAmNgs0lTx5tQ==
+  version "13.13.12"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.12.tgz#9c72e865380a7dc99999ea0ef20fc9635b503d20"
+  integrity sha512-zWz/8NEPxoXNT9YyF2osqyA9WjssZukYpgI4UYZpOjcyqwIUqWGkcCionaEb9Ki+FULyPyvNFpg/329Kd2/pbw==
 
 "@types/responselike@*", "@types/responselike@^1.0.0":
   version "1.0.0"
@@ -602,9 +602,9 @@ css-what@2.1:
 
 "cytube-connector@github:Supinic/cytube-connector":
   version "2.0.0"
-  resolved "https://codeload.github.com/Supinic/cytube-connector/tar.gz/6ad87eaae4d5b2d493d7b76beb288277e47e915b"
+  resolved "https://codeload.github.com/Supinic/cytube-connector/tar.gz/324456a8510cdf79634df703493104e574b880eb"
   dependencies:
-    got "^10.6.0"
+    got "^11.3.0"
     socket.io-client "^2.2.0"
 
 dank-twitch-irc@3.2.6:
@@ -1102,7 +1102,7 @@ globals@^12.1.0:
   dependencies:
     type-fest "^0.8.1"
 
-got@^10.6.0, got@^10.7.0:
+got@^10.7.0:
   version "10.7.0"
   resolved "https://registry.yarnpkg.com/got/-/got-10.7.0.tgz#62889dbcd6cca32cd6a154cc2d0c6895121d091f"
   integrity sha512-aWTDeNw9g+XqEZNcTjMMZSy7B7yE9toWOFYip7ofFTLleJhvZwUxxTxkTpKvF+p1SAA4VHmuEy7PiHTHyq8tJg==
@@ -1123,7 +1123,7 @@ got@^10.6.0, got@^10.7.0:
     to-readable-stream "^2.0.0"
     type-fest "^0.10.0"
 
-got@^11.1.4, got@latest:
+got@^11.1.4, got@^11.3.0, got@latest:
   version "11.3.0"
   resolved "https://registry.yarnpkg.com/got/-/got-11.3.0.tgz#25e8da8b0125b3b984613a6b719e678dd2e20406"
   integrity sha512-yi/kiZY2tNMtt5IfbfX8UL3hAZWb2gZruxYZ72AY28pU5p0TZjZdl0uRsuaFbnC0JopdUi3I+Mh1F3dPQ9Dh0Q==
@@ -2021,7 +2021,7 @@ strip-json-comments@^3.1.0:
 
 "supi-core@github:Supinic/supi-core":
   version "2.0.2"
-  resolved "https://codeload.github.com/Supinic/supi-core/tar.gz/f9b10bed7b9545133bcb4f3ebc00986817125953"
+  resolved "https://codeload.github.com/Supinic/supi-core/tar.gz/e9b0dc47267bd114470603c245f585a0fc08311e"
   dependencies:
     async-markov "github:supinic/async-markov"
     cheerio latest

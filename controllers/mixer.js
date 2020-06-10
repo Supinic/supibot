@@ -136,6 +136,7 @@ module.exports = class Mixer extends require("./template.js") {
 			});
 		}
 
+		this.resolveUserMessage(channelData, userData, message);
 		sb.AwayFromKeyboard.checkActive(userData, channelData);
 		sb.Reminder.checkActive(userData, channelData);
 

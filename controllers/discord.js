@@ -118,6 +118,7 @@ module.exports = class Discord extends require("./template.js") {
 					await channelData.saveProperty("NSFW", messageObject.channel.nsfw);
 				}
 
+				this.resolveUserMessage(channelData, userData, msg);
 				sb.Logger.push(msg, userData, channelData);
 
 				if (channelData.Mode !== "Read") {
@@ -129,6 +130,9 @@ module.exports = class Discord extends require("./template.js") {
 				if (channelData.Mirror) {
 					this.mirror(msg, userData, channelData);
 				}
+			}
+			else {
+				this.resolveUserMessage(null, userData, msg);
 			}
 
 			if (channelData && channelData.Mode === "Read") {
