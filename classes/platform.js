@@ -174,7 +174,11 @@ module.exports = (function () {
 				});
 			}
 
-			const timeout = setTimeout(() => promise.resolve(null), delay);
+			const timeout = setTimeout(() => {
+				promise.resolve(null);
+				this.#userMessagePromises.get(channelData).delete(userData);
+			}, delay);
+
 			this.#userMessagePromises.get(channelData).set(userData, { promise, timeout });
 
 			return promise;
