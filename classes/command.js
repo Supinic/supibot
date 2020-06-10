@@ -265,6 +265,7 @@ module.exports = (function () {
 		 * @param {Channel|null} channelData
 		 * @param {User} userData
 		 * @param {Object} options = {} any extra options that will be passed to the command as extra.append
+		 * @param {boolean} [options.skipPing] If true, all other ping options will be disregarded and no ping will be applied.
 		 * @returns {CommandResult}
 		 */
 		static async checkAndExecute (identifier, argumentArray, channelData, userData, options = {}) {
@@ -477,7 +478,7 @@ module.exports = (function () {
 					execution.reply = execution.reply.replace(sb.Config.get("WHITESPACE_REGEX"), "");
 				}
 
-				if (command.Flags.ping && channelData?.Ping) {
+				if (!options.skipPing && command.Flags.ping && channelData?.Ping) {
 					// @todo maybe {passed, string} is better in case the name is too bad? We'll see later on
 					const {string} = await sb.Banphrase.execute(
 						userData.Name,
