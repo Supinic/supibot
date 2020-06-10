@@ -189,6 +189,10 @@ module.exports = (function () {
             ].join(" "));
         }
 
+        awaitUserInput (userData, options) {
+            return this.Platform.awaitUserInput(this, userData, options);
+        }
+
         /**
          * Returns the database name for the logging table of a given channel.
          * Non-Twitch channels have their platform as lowercase prefix.
