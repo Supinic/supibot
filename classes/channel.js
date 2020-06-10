@@ -189,8 +189,8 @@ module.exports = (function () {
             ].join(" "));
         }
 
-        awaitUserInput (userData, options) {
-            return this.Platform.awaitUserInput(this, userData, options);
+        waitForUserMessage (userData, options) {
+            return this.Platform.waitForUserMessage(this, userData, options);
         }
 
         /**

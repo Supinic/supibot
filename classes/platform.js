@@ -14,7 +14,7 @@ module.exports = (function () {
 		 */
 		#controller = null;
 
-		#userInputPromises = new Map();
+		#userMessagePromises = new Map();
 
 		/**
 		 * @param {Object} data
@@ -160,28 +160,28 @@ module.exports = (function () {
 			this.#controller = null;
 		}
 
-		awaitUserInput (channelData, userData, options = {}) {
+		waitForUserMessage (channelData, userData, options = {}) {
 			const delay = options.timeout ?? 10_000;
 			const promise = new sb.Promise();
 
-			if (!this.#userInputPromises.has(channelData)) {
-				this.#userInputPromises.set(channelData, new Map());
+			if (!this.#userMessagePromises.has(channelData)) {
+				this.#userMessagePromises.set(channelData, new Map());
 			}
 
-			if (this.#userInputPromises.get(channelData).get(userData)) {
+			if (this.#userMessagePromises.get(channelData).get(userData)) {
 				throw new sb.Error({
 					message: "User already has a pending promise in the provided channel!"
 				});
 			}
 
 			const timeout = setTimeout(() => promise.resolve(null), delay);
-			this.#userInputPromises.get(channelData).set(userData, { promise, timeout });
+			this.#userMessagePromises.get(channelData).set(userData, { promise, timeout });
 
 			return promise;
 		}
 
-		get userInputPromises () {
-			return this.#userInputPromises;
+		get userMessagePromises () {
+			return this.#userMessagePromises;
 		}
 
 		get capital () {
