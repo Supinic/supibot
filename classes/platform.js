@@ -164,7 +164,7 @@ module.exports = (function () {
 			const delay = options.timeout ?? 10_000;
 			const promise = new sb.Promise();
 
-			if (this.#userInputPromises.has(channelData)) {
+			if (!this.#userInputPromises.has(channelData)) {
 				this.#userInputPromises.set(channelData, new Map());
 			}
 
