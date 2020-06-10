@@ -409,7 +409,7 @@ module.exports = (function () {
             // Handle private reminders
             if (privateReply.length !== 0) {
                 for (const privateReminder of privateReply) {
-                    await channelData.Platform.send("Private reminder: " + privateReminder, targetUserData);
+                    await channelData.Platform.pm("Private reminder: " + privateReminder, targetUserData);
                 }
 
                 const publicMessage = `Hey ${targetUserData.Name} - I just whispered you ${privateReply.length} private reminder(s) - make sure to check them out!`;
