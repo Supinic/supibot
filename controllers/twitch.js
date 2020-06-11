@@ -531,8 +531,11 @@ module.exports = class Twitch extends require("./template.js") {
 				this.client.part(channelData.Name);
 
 				setTimeout(() => {
-					console.debug(`Re-joining channel ${channelData.Name}!`);
+					if (!channelData?.sessionData) {
+						return;
+					}
 
+					console.debug(`Re-joining channel ${channelData.Name}!`);
 					channelData.sessionData.parted = false;
 					this.client.join(channelData.Name);
 				}, 60_000);
@@ -541,6 +544,10 @@ module.exports = class Twitch extends require("./template.js") {
 			if (!channelData.sessionData.clearRecentBansTimeout) {
 				channelData.sessionData.clearRecentBansTimeout = setTimeout(
 					() => {
+						if (!channelData?.sessionData) {
+							return;
+						}
+
 						channelData.sessionData.recentBans = 0;
 						channelData.sessionData.clearRecentBansTimeout = null;
 					},
