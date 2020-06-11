@@ -264,8 +264,6 @@ module.exports = class Twitch extends require("./template.js") {
 		message = message.replace(/\s+/g, " ");
 
 		this.evasion[channelName] = message;
-
-		// sb.Logger.push(message, this.selfUserData, channelData);
 		this.queues[channelName].schedule(message);
 	}
 
@@ -653,9 +651,7 @@ module.exports = class Twitch extends require("./template.js") {
 
 	destroy () {
 		this.client.disconnect();
-
 		this.client = null;
-		this.selfUserData = null;
 	}
 
 	restart (hard) {
