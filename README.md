@@ -17,7 +17,7 @@ Supibot can and is currently run on four distinct platforms:
 - [Mixer](https://mixer.com/)
 
 ## I want to use Supibot!
-As Supibot is currently run as a single instance that joins multiple channel, it is required to follow one of these steps: 
+As Supibot is currently run as a single instance that joins multiple channels, it is required to follow one of these steps: 
 
 | Platform | Directions |
 | :---: |:---|
