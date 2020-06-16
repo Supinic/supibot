@@ -208,7 +208,7 @@ module.exports = (function (Module) {
 					}
 
 					await sb.Query.batchUpdate(data, {
-						batchSize: 500,
+						batchSize: 200,
 						staggerDelay: 5000,
 						callback: (ru, row) => ru
 							.update("chat_data", "Message_Meta_User_Alias")
