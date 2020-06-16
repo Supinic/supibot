@@ -207,19 +207,21 @@ module.exports = (function (Module) {
 						userMap.clear();
 					}
 
-					await sb.Query.batchUpdate(data, (ru, row) => ru
-						.update("chat_data", "Message_Meta_User_Alias")
-						.set("Message_Count", {
-							useField: true,
-							value: `Message_Count + ${row.count}`
-						})
-						.set("Last_Message_Posted", row.date)
-						.set("Last_Message_Text", row.message)
-						.where("User_Alias = %n", row.user)
-						.where("Channel = %n", row.channel)
-						.priority("low")
-						.ignoreDuplicates()
-					);
+					await sb.Query.batchUpdate(data, {
+						batchSize: 500,
+						staggerDelay: 5000,
+						callback: (ru, row) => ru
+							.update("chat_data", "Message_Meta_User_Alias")
+							.set("Message_Count", {
+								useField: true, value: `Message_Count + ${row.count}`
+							})
+							.set("Last_Message_Posted", row.date)
+							.set("Last_Message_Text", row.message)
+							.where("User_Alias = %n", row.user)
+							.where("Channel = %n", row.channel)
+							.priority("low")
+							.ignoreDuplicates()
+					});
 
 					this.lastSeenRunning = false;
 				});
