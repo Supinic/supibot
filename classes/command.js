@@ -726,6 +726,8 @@ module.exports = (function () {
 
 /**
  * @typedef {Object} CommandFlagsObject
+ * @property {boolean} developer If true, the command will be hidden from the command list, unless the person is marked as a developer.
+ * @property {boolean} system If true, the command will be hidden (even from developers) and only shown to admins.
  * @property {boolean} rollback Determines if command is rollbackable.
  * If true, all sensitive database operations will be handled in a transaction - provided in options object.
  * @property {boolean} optOut If true, any user can "opt-out" from being the target of the command.
