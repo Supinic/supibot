@@ -190,6 +190,11 @@ module.exports = (function () {
 					);
 				}
 			});
+
+			client.on("error", (err) => {
+				console.error(err);
+				client.stopRunning();
+			});
 		}
 
 		get actions () { return this._actions; }
