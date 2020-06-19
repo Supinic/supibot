@@ -402,10 +402,19 @@ module.exports = (function () {
 		}
 
 		get currentPlaylistItem () {
-			return this.currentPlaylist.find(i => (
-				i.current === "current"
-				|| Array.isArray(i.children) && i.children.some(j => j.current === "current")
-			)) ?? null;
+			const list = this.currentPlaylist.slice();
+			while (list.length > 0) {
+				const item = list.shift();
+				if (item.current === "current") {
+					return item;
+				}
+
+				if (Array.isArray(item.children)) {
+					list.unshift(...item.children);
+				}
+			}
+
+			return null;
 		}
 
 		get modulePath () { return "vlc-connector"; }
