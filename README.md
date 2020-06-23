@@ -14,7 +14,7 @@ Supibot can and is currently run on four distinct platforms:
 - [Twitch](https://twitch.tv/)
 - [Discord](https://discordapp.com/)
 - [Cytube](https://cytu.be/)
-- [Mixer](https://mixer.com/)
+- Mixer* ([Until 2020-07-22](https://blog.mixer.com/2020/06/22/the-next-step-for-mixer/))
 
 ## I want to use Supibot!
 As Supibot is currently run as a single instance that joins multiple channels, it is required to follow one of these steps: 
@@ -24,7 +24,7 @@ As Supibot is currently run as a single instance that joins multiple channels, i
 | **Twitch channel** | Follow the guide in the panels of the bot's [Twitch profile](https://twitch.tv/supibot). |
 | **Discord server** | The **admin** of said server contact should PM me on Discord (you don't have to send a friend request first). See [Contact](https://supinic.com/contact). | 
 | **Cytube room**    | Not currently implemented. Please contact me for implementation details. |
-| **Mixer channel**  | Follow the guide in the description of the bot's [Mixer profile](https://mixer.com/supibot). |
+| ~~Mixer channel~~  | No more Mixer channels will be added. |
 
 ## Further reading
 - [Bot feature overview](docs/features.md)
