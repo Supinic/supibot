@@ -352,7 +352,7 @@ module.exports = (function () {
 			}
 
 			/** @type ExtraCommandData */
-			let data = {
+			const context = {
 				platform: options.platform,
 				invocation: identifier,
 				user: userData,
@@ -364,9 +364,9 @@ module.exports = (function () {
 			};
 
 			// If the command is rollbackable, set up a transaction.
-			// The command must use the connection in transaction - that's why it is passed to data
+			// The command must use the connection in transaction - that's why it is passed to context
 			if (command.Flags.rollback) {
-				data.transaction = await sb.Query.getTransaction();
+				context.transaction = await sb.Query.getTransaction();
 			}
 
 			/** @type CommandResult */
@@ -377,7 +377,7 @@ module.exports = (function () {
 
 			try {
 				const start = process.hrtime.bigint();
-				execution = await command.Code(data, ...args);
+				execution = await command.Code(context, ...args);
 				const end = process.hrtime.bigint();
 
 				let result = null;
@@ -415,7 +415,7 @@ module.exports = (function () {
 				}
 				else {
 					console.error(e);
-					const errorID = await sb.SystemLogger.sendError("Command", e, [identifier, ...args]);
+					const errorID = await sb.SystemLogger.sendError("Command", e, [context, identifier, ...args]);
 					const prettify = (channelData?.Data.developer)
 						? sb.Config.get("COMMAND_ERROR_DEVELOPER")
 						: sb.Config.get("COMMAND_ERROR_GENERIC");
@@ -469,7 +469,7 @@ module.exports = (function () {
 				}
 
 				if (typeof execution.reply !== "string") {
-					console.warn(`Execution of command ${command.ID} did not result with execution.reply of type string`, {command, execution, data});
+					console.warn(`Execution of command ${command.ID} did not result with execution.reply of type string`, {command, execution, data: context});
 				}
 
 				execution.reply = sb.Utils.fixHTML(String(execution.reply));
@@ -503,15 +503,15 @@ module.exports = (function () {
 
 					if (command.Flags.rollback) {
 						if (passed) {
-							data.transaction.commit();
+							context.transaction.commit();
 						}
 						else {
-							data.transaction.rollback();
+							context.transaction.rollback();
 						}
 					}
 				}
 				else if (command.Flags.rollback) {
-					data.transaction.commit();
+					context.transaction.commit();
 				}
 
 				// Apply all unpings to the result, if it is still a string (aka the response should be sent)
