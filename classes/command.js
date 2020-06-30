@@ -415,7 +415,15 @@ module.exports = (function () {
 				}
 				else {
 					console.error(e);
-					const errorID = await sb.SystemLogger.sendError("Command", e, [context, identifier, ...args]);
+					const loggingContext = {
+						channel: channelData.ID,
+						user: userData.ID,
+						platform: options.platform.ID,
+						isPrivateMessage,
+						append
+					};
+
+					const errorID = await sb.SystemLogger.sendError("Command", e, [loggingContext, identifier, ...args]);
 					const prettify = (channelData?.Data.developer)
 						? sb.Config.get("COMMAND_ERROR_DEVELOPER")
 						: sb.Config.get("COMMAND_ERROR_GENERIC");
