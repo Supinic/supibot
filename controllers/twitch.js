@@ -408,6 +408,7 @@ module.exports = class Twitch extends require("./template.js") {
 					privateMessage: (messageType === "whisper"),
 					messageID: ircTags.id,
 					emotes: ircTags.emotes,
+					flags: ircTags.flags,
 					customRewardID: ircTags["custom-reward-id"] ?? null
 				}
 			);
