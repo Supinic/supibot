@@ -420,7 +420,7 @@ module.exports = (function () {
 						user: userData.ID,
 						platform: options.platform.ID,
 						isPrivateMessage,
-						append
+						append: appendOptions
 					};
 
 					const errorID = await sb.SystemLogger.sendError("Command", e, [loggingContext, identifier, ...args]);
