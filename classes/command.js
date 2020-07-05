@@ -54,6 +54,12 @@ module.exports = (function () {
 		Whitelist_Response = null;
 
 		/**
+		 * Determines the GitHub(?) source of the command. Used for updates and further command downloads.
+		 * @type {string}
+		 */
+		#Source;
+
+		/**
 		 * Session-specific data for the command that can be modified at runtime.
 		 * @type {Object}
 		 */
@@ -92,6 +98,8 @@ module.exports = (function () {
 			Object.freeze(this.Flags);
 
 			this.Whitelist_Response = data.Whitelist_Response;
+
+			this.#Source = data.Source;
 
 			try {
 				this.Code = eval(data.Code);
@@ -158,6 +166,8 @@ module.exports = (function () {
 				? JSON.stringify(definition)
 				: JSON.stringify(definition, null, 4);
 		}
+
+		get Source () { return this.#Source; }
 
 		/** @override */
 		static async initialize () {
@@ -664,7 +674,6 @@ module.exports = (function () {
 
 			Command.data = null;
 		}
-
 		static get prefixRegex () {
 			const prefix = Command.prefix;
 			if (!prefix) {
