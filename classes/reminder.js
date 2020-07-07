@@ -316,6 +316,9 @@ module.exports = (function () {
             };
 
             for (const reminder of reminders) {
+                const platformData = sb.Platform.get(reminder.Platform);
+                const fromUserData = await sb.User.get(reminder.User_From);
+
                 if (reminder.User_From === targetUserData.ID) {
                     await sorter(
                         reminder.Private_Message,
@@ -323,7 +326,7 @@ module.exports = (function () {
                         channelData
                     );
                 }
-                else if (reminder.User_From === sb.Config.get("SELF_ID")) {
+                else if (fromUserData.Name === platformData.Self_Name) {
                     await sorter(
                         reminder.Private_Message,
                         "System reminder - " + reminder.Text + " (" + sb.Utils.timeDelta(reminder.Created) + ")",
