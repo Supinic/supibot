@@ -115,11 +115,21 @@ module.exports = (function () {
 			});
 
 			client.on("statuschange", async (before, after) => {
+				if (sb.Config.has("SONG_REQUESTS_VLC_PAUSED", false)) {
+					const currentPauseStatus = sb.Config.get("SONG_REQUESTS_VLC_PAUSED");
+					if (currentPauseStatus && after.status === "playing") {
+						await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", false);
+					}
+					else if (!currentPauseStatus && after.status === "paused") {
+						await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", true);
+					}
+				}
+
 				const previous = before.currentplid;
 				const next = after.currentplid;
 
 				if (previous !== next) {
-					const { children }  = await this.playlist();
+					const { children } = await this.playlist();
 					client.emit("videochange", previous, next, children);
 				}
 			});
