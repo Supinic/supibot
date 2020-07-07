@@ -117,11 +117,11 @@ module.exports = (function () {
 			client.on("statuschange", async (before, after) => {
 				if (sb.Config.has("SONG_REQUESTS_VLC_PAUSED", false)) {
 					const currentPauseStatus = sb.Config.get("SONG_REQUESTS_VLC_PAUSED");
-					if (currentPauseStatus && after.status === "playing") {
-						await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", false);
+					if (currentPauseStatus && after.state === "playing") {
+						await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", "0");
 					}
-					else if (!currentPauseStatus && after.status === "paused") {
-						await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", true);
+					else if (!currentPauseStatus && after.state === "paused") {
+						await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", "1");
 					}
 				}
 
