@@ -334,12 +334,10 @@ module.exports = (function () {
                     );
                 }
                 else if (reminder.Text !== null) {
-                    const fromUserData = await sb.User.get(reminder.User_From, false);
-                    await sorter(
-                        reminder.Private_Message,
-                        fromUserData.Name + " - " + reminder.Text + " (" + sb.Utils.timeDelta(reminder.Created) + ")",
-                        channelData
-                    );
+                    const { string } = await sb.Banphrase.execute(fromUserData.Name, channelData);
+                    const delta = sb.Utils.timeDelta(reminder.Created);
+
+                    await sorter(reminder.Private_Message, `${string} - ${reminder.Text} (${delta})`, channelData);
                 }
                 else {
                     const fromUserData = await sb.User.get(reminder.User_From, false);
