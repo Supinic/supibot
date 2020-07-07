@@ -119,8 +119,6 @@ module.exports = (function () {
 		 * @returns {Promise<BanphraseCheckResult>}
 		 */
 		static async execute (message, channelData, options = {}) {
-			message = message.replace(sb.Config.get("WHITESPACE_REGEX"), "");
-
 			const banphraseList = Banphrase.data.filter(banphrase => (
 				(banphrase.Type !== "API response") && (
 					(banphrase.Channel === (channelData?.ID ?? null))
