@@ -273,6 +273,11 @@ module.exports = (function () {
                 }
             }
 
+            if (!data.Platform) {
+                console.warn("Creating reminder without platform!");
+                data.Platform = 1;
+            }
+
             const row = await sb.Query.getRow("chat_data", "Reminder");
             row.setValues(data);
             await row.save();
