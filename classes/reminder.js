@@ -117,11 +117,12 @@ module.exports = (function () {
                 }
 
                 const statusAFK = sb.AwayFromKeyboard.data.find(i => i.User_Alias === toUserData.ID);
-                if (statusAFK) {
+                if (statusAFK && channelData) {
                     await sb.Reminder.create({
                         User_From: sb.Config.get("SELF_ID"),
                         User_To: toUserData.ID,
-                        Channel: this.Channel,
+                        Platform: channelData.Platform.ID,
+                        Channel: channelData.ID,
                         Created: new sb.Date(),
                         Active: true,
                         Schedule: null,
