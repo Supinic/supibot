@@ -118,10 +118,10 @@ module.exports = (function () {
 				if (sb.Config.has("SONG_REQUESTS_VLC_PAUSED", false)) {
 					const currentPauseStatus = sb.Config.get("SONG_REQUESTS_VLC_PAUSED");
 					if (currentPauseStatus && after.state === "playing") {
-						await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", "0");
+						await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", false);
 					}
 					else if (!currentPauseStatus && after.state === "paused") {
-						await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", "1");
+						await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", true);
 					}
 				}
 
