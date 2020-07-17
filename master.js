@@ -28,6 +28,11 @@
 
 			this.controllers = {};
 			for (const platform of initialPlatforms) {
+				if (platform === "mixer") {
+					continue;
+					// PepeLaugh eShrug
+				}
+
 				/** @type Controller */
 				let Controller = null;
 				try {
