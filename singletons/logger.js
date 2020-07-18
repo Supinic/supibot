@@ -68,36 +68,20 @@ module.exports = (function (Module) {
 
 				sb.Query.getBatch(
 					"chat_data",
-					"Message_Meta_Count",
-					["Timestamp", "Channel", "Amount", "Length", "User_Alias"]
-				).then(batch => this.countMetaBatch = batch);
-
-				sb.Query.getBatch(
-					"chat_data",
 					"Twitch_Ban",
 					["User_Alias", "Channel", "Length", "Issued"]
 				).then(batch => this.banBatch = batch);
 
 				this.meta = {};
 				this.metaCron = new CronJob(sb.Config.get("LOG_MESSAGE_META_CRON"), async () => {
-					if (!this.metaBatch?.ready || !this.countMetaBatch?.ready) {
+					if (!this.metaBatch?.ready) {
 						return;
 					}
 
 					const now = new sb.Date().discardTimeUnits("s", "ms");
-					for (const [channelID, { amount, length, users }] of Object.entries(this.meta)) {
+					for (const [channelID, { amount, length }] of Object.entries(this.meta)) {
 						if (amount === 0 && length === 0) {
 							continue;
-						}
-
-						for (const [userID, { amount, length }] of Object.entries(users)) {
-							this.countMetaBatch.add({
-								Timestamp: now,
-								Channel: channelID,
-								User_Alias: userID,
-								Amount: amount,
-								Length: length
-							});
 						}
 
 						this.metaBatch.add({
@@ -109,15 +93,11 @@ module.exports = (function (Module) {
 
 						this.meta[channelID] = {
 							amount: 0,
-							length: 0,
-							users: {}
+							length: 0
 						};
 					}
 
-					await Promise.all([
-						this.metaBatch.insert({ ignore: true }),
-						this.countMetaBatch.insert({ ignore: true })
-					]);
+					await this.metaBatch.insert({ ignore: true });
 				});
 				this.metaCron.start();
 
@@ -247,7 +227,7 @@ module.exports = (function (Module) {
 				const name = channelData.getDatabaseName();
 
 				this.batches[chan] = await sb.Query.getBatch("chat_line", name, ["User_Alias", "Text", "Posted"]);
-				this.meta[chan] = { amount: 0, length: 0, users: {} };
+				this.meta[chan] = { amount: 0, length: 0 };
 				this.channels.push(chan);
 			}
 
@@ -260,13 +240,6 @@ module.exports = (function (Module) {
 				Text: message,
 				Posted: new sb.Date()
 			});
-
-			if (!this.meta[chan].users[userData.ID]) {
-				this.meta[chan].users[userData.ID] = { amount: 0, length: 0 };
-			}
-
-			this.meta[chan].users[userData.ID].amount += 1;
-			this.meta[chan].users[userData.ID].length += message.length;
 
 			this.meta[chan].amount += 1;
 			this.meta[chan].length += message.length;
@@ -393,10 +366,8 @@ module.exports = (function (Module) {
 			this.metaCron?.stop();
 
 			this.banBatch?.destroy();
-			this.countMetaBatch?.destroy();
 			this.metaBatch?.destroy();
 			this.banBatch = null;
-			this.countMetaBatch = null;
 			this.metaBatch = null;
 
 			if (this.channels) {
