@@ -461,7 +461,7 @@ module.exports = class Twitch extends require("./template.js") {
 	 * @param {string} channel
 	 * @param {string[]} [args]
 	 * @param {Object} options = {}
-	 * @returns {boolean} Whether or not a command has been executed.
+	 * @returns {Promise<boolean>} Whether or not a command has been executed.
 	 */
 	async handleCommand (command, user, channel, args = [], options = {}) {
 		const userData = await sb.User.get(user, false);
