@@ -56,17 +56,16 @@ module.exports = class Minecraft extends require("./template.js") {
 		for (const [channelData, client] of this.channelMap) {
 			client.on("chat", async (packet) => {
 				const messageData = JSON.parse(packet.message);
-				if (!messageEvents.includes(messageData.translate)) {
+				const { ignore, message, username } = Minecraft.parseMessage(channelData.Data.type, messageData);
+				if (ignore) {
 					return;
 				}
 
-				const username = messageData.with[0].text.toLowerCase();
 				const userData = await sb.User.get(username, false);
 				if (!userData) {
 					return;
 				}
 
-				const message = messageData.with[1];
 				this.resolveUserMessage(channelData, userData, message);
 
 				if (channelData.Mode === "Last seen") {
@@ -182,6 +181,37 @@ module.exports = class Minecraft extends require("./template.js") {
 			if (message) {
 				this.send(message, channelData);
 			}
+		}
+	}
+
+	static parseMessage (type, data) {
+		if (type === "vanilla") {
+			if (!messageEvents.includes(data.translate)) {
+				return { ignore: true };
+			}
+
+			const username = data.with[0].text.toLowerCase();
+			const message = data.with[1].toLowerCase();
+			return {
+				ignore: false,
+				message,
+				username
+			};
+		}
+		else if (type === "forge") {
+			const messageData = data.extra ?? [];
+			const nameObject = messageData[0]?.extra ?? null;
+			if (!nameObject) {
+				return { ignore: true };
+			}
+
+			const message = messageData[1].text ?? "";
+			const username = Object.values(nameObject).map(i => i.insertion).filter(Boolean).join("").toLowerCase();
+			return {
+				ignore: false,
+				message,
+				username
+			};
 		}
 	}
 
