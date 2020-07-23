@@ -29,13 +29,19 @@ module.exports = class Minecraft extends require("./template.js") {
 
 		for (const channelData of this.channels) {
 			const data = channelData.Data;
-			const client = MC.createClient({
+			const options = {
 				host: channelData.Specific_ID,
 				port: data.port ?? null,
-				username: sb.Config.get("MINECRAFT_BOT_EMAIL"),
-				password: sb.Config.get("MINECRAFT_BOT_PASSWORD")
-			});
+				username: data.specificUsername ?? sb.Config.get("MINECRAFT_BOT_EMAIL")
+			};
 
+			if (data.skipPassword !== true) {
+				options.password = (data.passwordConfig)
+					? sb.Config.get(data.passwordConfig)
+					: sb.Config.get("MINECRAFT_BOT_PASSWORD");
+			}
+
+			const client = MC.createClient(options);
 			if (data.type === "forge") {
 				autoVersionForge(client);
 			}
@@ -47,7 +53,7 @@ module.exports = class Minecraft extends require("./template.js") {
 	}
 
 	initListeners () {
-		for (const [channelData, client] of Object.entries(this.channelMap)) {
+		for (const [channelData, client] of this.channelMap) {
 			client.on("chat", async (packet) => {
 				const messageData = JSON.parse(packet.message);
 				if (!messageEvents.includes(messageData.translate)) {
@@ -112,6 +118,10 @@ module.exports = class Minecraft extends require("./template.js") {
 					const [command, ...args] = message.replace(sb.Command.prefix, "").split(" ").filter(Boolean);
 					await this.handleCommand(command, userData, channelData, args, {});
 				}
+			});
+
+			client.on("error", (err) => {
+				console.warn("Minecraft error", { channelData, err });
 			});
 		}
 	}
