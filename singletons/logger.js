@@ -102,31 +102,37 @@ module.exports = (function (Module) {
 				this.metaCron.start();
 
 				this.banCollector = new Map();
-				this.banCron = new CronJob(sb.Config.get("LOG_MESSAGE_META_CRON"), async () => {
-					if (!this.banBatch?.ready) {
-						return;
-					}
-
-					const bannedUsers = await sb.User.getMultiple([...this.banCollector.keys()]);
-					for (const userData of bannedUsers) {
-						const linkedUser = this.banCollector.get(userData.Name);
-						if (linkedUser) {
-							linkedUser.User_Alias = userData.ID;
-							this.banBatch.add(linkedUser);
+				this.banCron = new sb.Cron({
+					Name: "ban-cron",
+					Expression: sb.Config.get("LOG_MESSAGE_META_CRON"),
+					Defer: { end: 10000 },
+					Code: async () => {
+						if (!this.banBatch?.ready) {
+							return;
 						}
+
+						const bannedUsers = await sb.User.getMultiple([...this.banCollector.keys()]);
+						for (const userData of bannedUsers) {
+							const linkedUser = this.banCollector.get(userData.Name);
+							if (linkedUser) {
+								linkedUser.User_Alias = userData.ID;
+								this.banBatch.add(linkedUser);
+							}
+						}
+
+						const channelList = Array.from(this.banCollector.values())
+							.map(record => sb.Channel.get(record.Channel))
+							.filter((i, ind, arr) => i && arr.indexOf(i) === ind);
+
+						for (const channelData of channelList) {
+							channelData.sessionData.recentBans = 0;
+						}
+
+						this.banCollector.clear();
+						await this.banBatch.insert();
 					}
-
-					const channelList = Array.from(this.banCollector.values())
-						.map(record => sb.Channel.get(record.Channel))
-						.filter((i, ind, arr) => i && arr.indexOf(i) === ind);
-
-					for (const channelData of channelList) {
-						channelData.sessionData.recentBans = 0;
-					}
-
-					this.banCollector.clear();
-					await this.banBatch.insert();
 				});
+
 				this.banCron.start();
 			}
 
