@@ -120,6 +120,10 @@ module.exports = class Minecraft extends require("./template.js") {
 			});
 
 			client.on("error", (err) => {
+				if (err.message?.includes("undefined")) {
+					return;
+				}
+
 				console.warn("Minecraft error", { channelData, err });
 			});
 		}
