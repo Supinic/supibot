@@ -43,7 +43,6 @@ VALUES
 ('Cytube',600,NULL,'{
     "videoRequests": false,
     "whispers": false
-}',NULL),
-('Mixer',500,NULL,NULL,NULL)
+}',NULL)
 
 ON DUPLICATE KEY UPDATE ID = ID;

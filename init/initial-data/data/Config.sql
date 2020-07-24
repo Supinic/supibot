@@ -21,7 +21,6 @@ VALUES
 ('LOG_USER_CRON','*/10 * * * * *','string',NULL,0,0,'Determines how often newly detected users should be added in a batch.'),
 ('MAX_ACTIVE_INCOMING_REMINDERS','5','number',NULL,0,1,'Maximum amount of reminders someone can have pending for them at once.'),
 ('MAX_ACTIVE_OUTGOING_REMINDERS','8','number',NULL,0,1,'Maximum amount of reminders someone can have pending for others at the same time.'),
-('MIXER_OAUTH',NULL,'string',NULL,1,0,NULL),
 ('PAJBOT_API_TIMEOUT',2500,'number','ms',0,1,NULL),
 ('PRIVATE_MESSAGE_COMMAND_FILTERED','That command is not available via private messages.','string',NULL,0,1,'Printed when a command not available in private messages is used there.'),
 ('PRIVATE_MESSAGE_NO_COMMAND','That command does not exist. Please use the "commands" command to get a list.','string',NULL,0,1,'Printed when a private message has the right command prefix but a command has not been found.'),

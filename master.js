@@ -28,11 +28,6 @@
 
 			this.controllers = {};
 			for (const platform of initialPlatforms) {
-				if (platform === "mixer") {
-					continue;
-					// PepeLaugh eShrug
-				}
-
 				/** @type Controller */
 				let Controller = null;
 				try {
@@ -69,8 +64,7 @@
 			switch (client) {
 				case "cytube":
 				case "twitch":
-				case "discord":
-				case "mixer": {
+				case "discord": {
 					const ClientConstructor = this.controllers[client].constructor;
 
 					this.controllers[client] = null;

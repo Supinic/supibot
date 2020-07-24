@@ -106,8 +106,7 @@
 	const platformList = {
 		twitch: { auth: "TWITCH_OAUTH", ID: 1 },
 		discord: { auth: "DISCORD_BOT_TOKEN", ID: 2 },
-		cytube: { auth: "CYTUBE_BOT_PASSWORD", ID: 3 },
-		mixer: { auth: "MIXER_OAUTH", ID: 4 }
+		cytube: { auth: "CYTUBE_BOT_PASSWORD", ID: 3 }
 	};
 
 	const prettyList = Object.keys(platformList).join(", ") + ", or keep line empty to finish";

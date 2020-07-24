@@ -2,7 +2,6 @@
   "name": "supibot",
   "version": "2.2.0",
   "dependencies": {
-    "@mixer/client-node": "github:caglapickaxe/client-node#dank",
     "cytube-connector": "github:Supinic/cytube-connector",
     "dank-twitch-irc": "3.2.6",
     "discord.js": "^12.2.0",
@@ -17,7 +16,7 @@
   },
   "scripts": {
     "start": "node ./master.js --harmony-nullish --harmony-optional-chaining",
-    "debug": "node --inspect=localhost:10001 ./master.js --harmony-nullish --harmony-optional-chaining",
+    "debug": "node --inspect=localhost:10001 ./master.js --harmony-top-level-await --harmony-nullish --harmony-optional-chaining",
     "init-database": "node ./init/script.js --harmony-nullish --harmony-optional-chaining",
     "setup": "node ./init/setup.js --harmony-nullish --harmony-optional-chaining",
     "update": "git pull origin master && yarn upgrade supi-core",

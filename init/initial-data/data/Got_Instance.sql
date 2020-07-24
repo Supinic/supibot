@@ -29,11 +29,7 @@ VALUES
 	},
 	mutableDefaults: true
 }))',1,'Twitch/V5 instance'),
-(4,'Mixer','JSON','{
-	"prefixUrl": "https://mixer.com/api/v1",
-	"responseType": "json"
-}',NULL,'Mixer instance'),
-(5,'Pastebin','JSON','{
+(4,'Pastebin','JSON','{
 	"prefixUrl": "https://pastebin.com/",
 	"headers": {
 		"Content-Type": "application/x-www-form-urlencoded"
