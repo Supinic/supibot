@@ -2,8 +2,6 @@
 module.exports = (function () {
     "use strict";
 
-    const CronJob = require("cron").CronJob;
-
     /**
      * Represents a chat user.
      * Since there can be hundreds of thousands of users loaded, a class is used to simplify the prototype, and potentially save some memory and/or processing power with V8.
@@ -99,13 +97,15 @@ module.exports = (function () {
                 "User_Alias",
                 ["Name", "Discord_ID", "Mixer_ID", "Twitch_ID"]
             );
-            User.insertCron = new CronJob(
-                sb.Config.get("LOG_USER_CRON"),
-                async () => {
+
+            User.insertCron = new sb.Cron({
+                Name: "log-user-cron",
+                Expression: sb.Config.get("LOG_USER_CRON"),
+                Code: async () => {
                     await User.insertBatch.insert({ ignore: true });
                     User.pendingNewUsers.clear();
                 }
-            );
+            });
             User.insertCron.start();
 
             await User.loadData();
@@ -320,6 +320,7 @@ module.exports = (function () {
          * Cleans up.
          */
         static destroy () {
+            User.insertCron.destroy();
             User.data.clear();
         }
     };

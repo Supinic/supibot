@@ -1,7 +1,6 @@
 /* global sb */
 module.exports = (function (Module) {
 	"use strict";
-	const CronJob = require("cron").CronJob;
 
 	const notified = {
 		lastSeen: false
@@ -14,6 +13,8 @@ module.exports = (function (Module) {
 	 * @type Logger()
 	 */
 	return class Logger extends Module {
+		#crons = [];
+
 		static singleton () {
 			if (!Logger.module) {
 				Logger.module = new Logger();
@@ -30,33 +31,42 @@ module.exports = (function (Module) {
 				this.channels = [];
 				this.batches = {};
 
-				this.messageCron = new CronJob(sb.Config.get("LOG_MESSAGE_CRON"), async () => {
-					if (!sb.Config.get("LOG_MESSAGE_ENABLED", false)) {
-						return;
-					}
-
-					const keys = Object.keys(this.batches);
-					const promises = Array(keys.length);
-
-					let msgs = 0;
-					const start = sb.Date.now();
-					for (let i = 0; i < keys.length; i++) {
-						const key = keys[i];
-						if (this.batches[key].records?.length > 0) {
-							msgs += this.batches[key].records.length;
-							promises[i] = this.batches[key].insert();
+				this.messageCron = new sb.Cron({
+					Name: "message-cron",
+					Expression: sb.Config.get("LOG_MESSAGE_CRON"),
+					Defer: {
+						start: 2500,
+						end: 5000
+					},
+					Code: async () => {
+						if (!sb.Config.get("LOG_MESSAGE_ENABLED", false)) {
+							return;
 						}
-					}
 
-					await Promise.all(promises);
+						const keys = Object.keys(this.batches);
+						const promises = Array(keys.length);
 
-					const delta = sb.Date.now() - start;
-					if (delta > 1500) {
-						// If the addition took more than 1 second, log it as a warning - might be dangerous.
-						console.warn(new sb.Date().format("Y-m-d H:i:s"), `cron - messages: ${msgs}; time: ${delta} ms`);
+						let msgs = 0;
+						const start = sb.Date.now();
+						for (let i = 0; i < keys.length; i++) {
+							const key = keys[i];
+							if (this.batches[key].records?.length > 0) {
+								msgs += this.batches[key].records.length;
+								promises[i] = this.batches[key].insert();
+							}
+						}
+
+						await Promise.all(promises);
+
+						const delta = sb.Date.now() - start;
+						if (delta > 1500) {
+							// If the addition took more than 1 second, log it as a warning - might be dangerous.
+							console.warn(new sb.Date().format("Y-m-d H:i:s"), `cron - messages: ${msgs}; time: ${delta} ms`);
+						}
 					}
 				});
 				this.messageCron.start();
+				this.#crons.push(this.messageCron);
 			}
 
 			if (sb.Config.get("LOG_MESSAGE_META_ENABLED", false)) {
@@ -73,39 +83,48 @@ module.exports = (function (Module) {
 				).then(batch => this.banBatch = batch);
 
 				this.meta = {};
-				this.metaCron = new CronJob(sb.Config.get("LOG_MESSAGE_META_CRON"), async () => {
-					if (!this.metaBatch?.ready) {
-						return;
-					}
-
-					const now = new sb.Date().discardTimeUnits("s", "ms");
-					for (const [channelID, { amount, length }] of Object.entries(this.meta)) {
-						if (amount === 0 && length === 0) {
-							continue;
+				this.metaCron = new sb.Cron({
+					Name: "message-meta-cron",
+					Expression: sb.Config.get("LOG_MESSAGE_META_CRON"),
+					Defer: {
+						start: 2500,
+						end: 7500
+					},
+					Code: async () => {
+						if (!this.metaBatch?.ready) {
+							return;
 						}
 
-						this.metaBatch.add({
-							Timestamp: now,
-							Channel: channelID,
-							Amount: amount,
-							Length: length
-						});
+						const now = new sb.Date().discardTimeUnits("s", "ms");
+						for (const [channelID, { amount, length }] of Object.entries(this.meta)) {
+							if (amount === 0 && length === 0) {
+								continue;
+							}
 
-						this.meta[channelID] = {
-							amount: 0,
-							length: 0
-						};
+							this.metaBatch.add({
+								Timestamp: now,
+								Channel: channelID,
+								Amount: amount,
+								Length: length
+							});
+
+							this.meta[channelID] = {
+								amount: 0,
+								length: 0
+							};
+						}
+
+						await this.metaBatch.insert({ ignore: true });
 					}
-
-					await this.metaBatch.insert({ ignore: true });
 				});
 				this.metaCron.start();
+				this.#crons.push(this.metaCron);
 
 				this.banCollector = new Map();
 				this.banCron = new sb.Cron({
 					Name: "ban-cron",
 					Expression: sb.Config.get("LOG_MESSAGE_META_CRON"),
-					Defer: { end: 10000 },
+					Defer: { end: 2500 },
 					Code: async () => {
 						if (!this.banBatch?.ready) {
 							return;
@@ -132,8 +151,8 @@ module.exports = (function (Module) {
 						await this.banBatch.insert();
 					}
 				});
-
 				this.banCron.start();
+				this.#crons.push(this.banCron);
 			}
 
 			if (sb.Config.get("LOG_COMMAND_CRON", false)) {
@@ -155,63 +174,76 @@ module.exports = (function (Module) {
 				).then(batch => this.commandBatch = batch);
 
 				this.commandCollector = new Set();
-				this.commandCron = new CronJob(sb.Config.get("LOG_COMMAND_CRON"), async () => {
-					if (!sb.Config.get("LOG_COMMAND_ENABLED") || !this.commandBatch?.ready) {
-						return;
+				this.commandCron = new sb.Cron({
+					Name: "command-cron",
+					Expression: sb.Config.get("LOG_COMMAND_CRON"),
+					Code: async () => {
+						if (!sb.Config.get("LOG_COMMAND_ENABLED") || !this.commandBatch?.ready) {
+							return;
+						}
+
+						await this.commandBatch.insert({ ignore: true });
+
+						this.commandCollector.clear();
 					}
-
-					await this.commandBatch.insert({ ignore: true });
-
-					this.commandCollector.clear();
 				});
 				this.commandCron.start();
+				this.#crons.push(this.commandCron);
 			}
 
 			if (sb.Config.get("LOG_LAST_SEEN_CRON", false)) {
 				this.lastSeen = new Map();
 				this.lastSeenRunning = false;
 
-				this.lastSeenCron = new CronJob(sb.Config.get("LOG_LAST_SEEN_CRON"), async () => {
-					if (!sb.Config.get("LOG_MESSAGE_META_ENABLED", false) || this.lastSeenRunning) {
-						return;
-					}
-
-					this.lastSeenRunning = true;
-
-					const data = [];
-					for (const [channelData, userMap] of this.lastSeen) {
-						for (const [userData, { count, date, message }] of userMap) {
-							data.push({
-								count,
-								channel: channelData.ID,
-								date,
-								message,
-								user: userData.ID,
-							});
+				this.lastSeenCron = new sb.Cron({
+					Name: "last-seen-cron",
+					Expression: sb.Config.get("LOG_LAST_SEEN_CRON"),
+					Defer: {
+						start: 5000,
+						end: 60000
+					},
+					Code: async () => {
+						if (!sb.Config.get("LOG_MESSAGE_META_ENABLED", false) || this.lastSeenRunning) {
+							return;
 						}
 
-						userMap.clear();
+						this.lastSeenRunning = true;
+
+						const data = [];
+						for (const [channelData, userMap] of this.lastSeen) {
+							for (const [userData, { count, date, message }] of userMap) {
+								data.push({
+									count,
+									channel: channelData.ID,
+									date,
+									message,
+									user: userData.ID,
+								});
+							}
+
+							userMap.clear();
+						}
+
+						await sb.Query.batchUpdate(data, {
+							batchSize: 200,
+							staggerDelay: 5000,
+							callback: (ru, row) => ru
+								.update("chat_data", "Message_Meta_User_Alias")
+								.set("Message_Count", {
+									useField: true, value: `Message_Count + ${row.count}`
+								})
+								.set("Last_Message_Posted", row.date)
+								.set("Last_Message_Text", row.message)
+								.where("User_Alias = %n", row.user)
+								.where("Channel = %n", row.channel)
+								.priority("low")
+								.ignoreDuplicates()
+						});
+						this.lastSeenRunning = false;
 					}
-
-					await sb.Query.batchUpdate(data, {
-						batchSize: 200,
-						staggerDelay: 5000,
-						callback: (ru, row) => ru
-							.update("chat_data", "Message_Meta_User_Alias")
-							.set("Message_Count", {
-								useField: true, value: `Message_Count + ${row.count}`
-							})
-							.set("Last_Message_Posted", row.date)
-							.set("Last_Message_Text", row.message)
-							.where("User_Alias = %n", row.user)
-							.where("Channel = %n", row.channel)
-							.priority("low")
-							.ignoreDuplicates()
-					});
-
-					this.lastSeenRunning = false;
 				});
 				this.lastSeenCron.start();
+				this.#crons.push(this.lastSeenCron);
 			}
 		}
 
@@ -365,11 +397,10 @@ module.exports = (function (Module) {
 		 * Cleans up and destroys the logger instance
 		 */
 		destroy () {
-			this.banCron?.stop();
-			this.commandCron?.stop();
-			this.lastSeenCron?.stop();
-			this.messageCron?.stop();
-			this.metaCron?.stop();
+			for (const cron of this.#crons) {
+				cron.destroy();
+			}
+			this.#crons = null;
 
 			this.banBatch?.destroy();
 			this.metaBatch?.destroy();
