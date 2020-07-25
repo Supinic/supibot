@@ -157,7 +157,7 @@ module.exports =  (function () {
 		/**
 		 * Executes all possible filters for the incoming combination of parameters
 		 * @param options
-		 * @returns {Promise<{filter: {Reason: string}, reason: string, success: boolean, reply: *}|{filter: T, reason: string, success: boolean, reply: *}|{filter: T, reason: string, success: boolean, reply: string}|{success: boolean}>}
+		 * @returns {Promise<Object>}
 		 */
 		static async execute (options) {
 			const { command, platform, user, targetUser } = options;
@@ -317,6 +317,22 @@ module.exports =  (function () {
 			Filter.data.push(filter);
 
 			return filter;
+		}
+
+		static async getMentionedStatus (options) {
+			const { command, platform } = options;
+			const channel = options.channel ?? Symbol("private-message");
+
+			const filters = Filter.data.filter(row => (
+				row.Active
+				&& row.Type === "Unmention"
+				&& (row.User_Alias === (user?.ID ?? null) || row.User_Alias === null)
+				&& (row.Channel === (channel?.ID ?? null) || row.Channel === null)
+				&& (row.Command === (command?.ID ?? null) || row.Command === null)
+				&& (row.Platform === (platform?.ID ?? null) || row.Platform === null)
+			));
+
+			return (filters.length === 0);
 		}
 
 		/**

@@ -496,9 +496,20 @@ module.exports = (function () {
 					execution.reply = execution.reply.replace(sb.Config.get("WHITESPACE_REGEX"), "");
 				}
 
-				if (!options.skipPing && command.Flags.ping && channelData?.Ping) {
-					// @todo maybe {passed, string} is better in case the name is too bad? We'll see later on
-					const {string} = await sb.Banphrase.execute(
+				const mentionUser = Boolean(
+					!options.skipPing
+					&& command.Flags.ping
+					&& channelData?.ping
+					&& await sb.Filter.getMentionedStatus({
+						user: userData,
+						command: command,
+						channel: channelData ?? null,
+						platform: channelData?.Platform ?? null
+					})
+				);
+
+				if (mentionUser) {
+					const { string } = await sb.Banphrase.execute(
 						userData.Name,
 						channelData,
 						{ skipBanphraseAPI: true }
