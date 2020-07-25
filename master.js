@@ -34,19 +34,19 @@
 					Controller = require("./controllers/" + platform);
 				}
 				catch (e) {
-					throw new sb.Error({
-						message: "Require of " + platform + " controller module failed"
-					}, e);
+					console.error("Require of " + platform + " controller module failed", e);
+					continue;
 				}
 
 				try {
 					this.controllers[platform] = new Controller();
 				}
 				catch (e) {
-					throw new sb.Error({
-						message: "Initialization of " + platform + " controller module failed"
-					}, e);
+					console.error("Initialization of " + platform + " controller module failed", e);
+					continue;
 				}
+
+				console.debug(`Platform ${platform} loaded successfully.`);
 			}
 
 			this.started = new sb.Date();
