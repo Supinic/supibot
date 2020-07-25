@@ -345,11 +345,15 @@ module.exports =  (function () {
 		 */
 		static async applyUnping (commandIdentifier, string) {
 			const { ID: commandID } = sb.Command.get(commandIdentifier);
-			const unpingUsers = await sb.User.getMultiple(Filter.data
-				.filter(i => i.Active && i.Command === commandID && i.Type === "Unping")
-				.map(i => i.User_Alias)
-			);
+			const filters = Filter.data.filter(row => (
+				row.Active
+				&& row.Type === "Unping"
+				&& (row.Command === commandID || row.Command === null)
+				&& (row.Channel === (channel?.ID ?? null) || row.Channel === null)
+				&& (row.Platform === (platform?.ID ?? null) || row.Platform === null)
+			));
 
+			const unpingUsers = await sb.User.getMultiple(filters.map(i => i.User_Alias));
 			for (const user of unpingUsers) {
 				const fixedName = user.Name[0] + `\u{E0000}` + user.Name.slice(1);
 				const regex = new RegExp(user.Name, "gi");
