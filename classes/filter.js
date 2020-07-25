@@ -320,7 +320,7 @@ module.exports =  (function () {
 		}
 
 		static async getMentionedStatus (options) {
-			const { command, platform } = options;
+			const { command, platform, user } = options;
 			const channel = options.channel ?? Symbol("private-message");
 
 			const filters = Filter.data.filter(row => (
