@@ -499,7 +499,7 @@ module.exports = (function () {
 				const mentionUser = Boolean(
 					!options.skipPing
 					&& command.Flags.ping
-					&& channelData?.ping
+					&& channelData?.Ping
 					&& await sb.Filter.getMentionedStatus({
 						user: userData,
 						command: command,
