@@ -275,7 +275,7 @@ module.exports = (function () {
 		 * @param {Channel|null} channelData
 		 * @param {User} userData
 		 * @param {Object} options = {} any extra options that will be passed to the command as extra.append
-		 * @param {boolean} [options.skipPing] If true, all other ping options will be disregarded and no ping will be applied.
+		 * @param {boolean} [options.skipMention] If true, no mention will be added to the command string, regardless of other options.
 		 * @returns {CommandResult}
 		 */
 		static async checkAndExecute (identifier, argumentArray, channelData, userData, options = {}) {
@@ -446,7 +446,7 @@ module.exports = (function () {
 				}
 			}
 
-			// Read-only commands never reply with anything - banphrases, pings and cooldowns are not checked
+			// Read-only commands never reply with anything - banphrases, mentions and cooldowns are not checked
 			if (command.Flags.readOnly) {
 				return {
 					success: execution?.success ?? true
@@ -497,10 +497,10 @@ module.exports = (function () {
 				}
 
 				const mentionUser = Boolean(
-					!options.skipPing
-					&& command.Flags.ping
-					&& channelData?.Ping
-					&& await sb.Filter.getMentionedStatus({
+					!options.skipMention
+					&& command.Flags.mention
+					&& channelData?.Mention
+					&& await sb.Filter.getMentionStatus({
 						user: userData,
 						command: command,
 						channel: channelData ?? null,
@@ -769,6 +769,6 @@ module.exports = (function () {
  * @property {boolean} readOnly If true, command is guaranteed to not reply, and as such, no banphrases, cooldowns or pings are checked.
  * @property {boolean} whitelist If true, command is only accessible to certain users or channels, or their combination.
  * @property {boolean} pipe If true, the command can be used as a part of the "pipe" command.
- * @property {boolean} ping If true, command will attempt to "ping" - notify - its invoker.
+ * @property {boolean} mention If true, command will attempt to mention its invokers by adding their username at the start.
  * This also requires the channel to have this option enabled.
  */

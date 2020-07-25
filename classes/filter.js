@@ -319,7 +319,7 @@ module.exports =  (function () {
 			return filter;
 		}
 
-		static async getMentionedStatus (options) {
+		static async getMentionStatus (options) {
 			const { command, platform, user } = options;
 			const channel = options.channel ?? Symbol("private-message");
 

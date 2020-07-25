@@ -46,11 +46,11 @@ module.exports = (function () {
             this.Mode = data.Mode;
 
             /**
-             * If true, commands that are configured to ping the invoking user will do so.
-             * If false, all pings will be discarded.
+             * If true, commands that are configured to mention the invoking user will do so.
+             * If false, no mentions will be added.
              * @type {boolean}
              */
-            this.Ping = data.Ping;
+            this.Mention = data.Mention;
 
             /**
              * If true, all links that would otherwise be sent will be replaced with a placeholder string.
