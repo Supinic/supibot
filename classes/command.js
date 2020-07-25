@@ -496,28 +496,6 @@ module.exports = (function () {
 					execution.reply = execution.reply.replace(sb.Config.get("WHITESPACE_REGEX"), "");
 				}
 
-				const mentionUser = Boolean(
-					!options.skipMention
-					&& command.Flags.mention
-					&& channelData?.Mention
-					&& await sb.Filter.getMentionStatus({
-						user: userData,
-						command: command,
-						channel: channelData ?? null,
-						platform: channelData?.Platform ?? null
-					})
-				);
-
-				if (mentionUser) {
-					const { string } = await sb.Banphrase.execute(
-						userData.Name,
-						channelData,
-						{ skipBanphraseAPI: true }
-					);
-
-					execution.reply = string + ", " + execution.reply;
-				}
-
 				const metaSkip = Boolean(options.skipBanphrases || execution?.meta?.skipBanphrases);
 				if (!command.Flags.skipBanphrase && !metaSkip) {
 					const { passed, privateMessage, string } = await sb.Banphrase.execute(execution.reply.slice(0, 1000), channelData);
@@ -546,6 +524,28 @@ module.exports = (function () {
 				// Apply all unpings to the result, if it is still a string (aka the response should be sent)
 				if (typeof execution.reply === "string") {
 					execution.reply = await sb.Filter.applyUnping(command, execution.reply);
+				}
+
+				const mentionUser = Boolean(
+					!options.skipMention
+					&& command.Flags.mention
+					&& channelData?.Mention
+					&& await sb.Filter.getMentionStatus({
+						user: userData,
+						command: command,
+						channel: channelData ?? null,
+						platform: channelData?.Platform ?? null
+					})
+				);
+
+				if (mentionUser) {
+					const { string } = await sb.Banphrase.execute(
+						userData.Name,
+						channelData,
+						{ skipBanphraseAPI: true }
+					);
+
+					execution.reply = string + ", " + execution.reply;
 				}
 			}
 
