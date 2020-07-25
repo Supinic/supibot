@@ -8,7 +8,7 @@ Some of the features implemented commands provide include:
 - various API commands, such as ones related to stream info, weather, time, cat/dog pictures, fun facts, and many more...
 - *opting-out* of specific commands, which makes all users unable to use that command with that user's name as a parameter
 - *blocking* specific people from specific commands, which makes specific users unable to use a specific command on that user
-- *ping opt-out*, which makes a specific command not *ping* (notify) that user 
+- *mention opt-out*, which makes a specific command or set of commands not *mention* that user 
 - so-called "piping", which is executed through the _pipe_ command
     - this allows to daisy-chain commands together, the first result being appended at the end of another command as extra arguments, and so on
     - example: `$pipe news DE | translate` will look up German news, and translate them to (default) English

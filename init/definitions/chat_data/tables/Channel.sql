@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS `chat_data`.`Channel` (
   `Platform` INT(10) UNSIGNED NOT NULL,
   `Specific_ID` VARCHAR(16) DEFAULT NULL COMMENT 'Platform-specific ID of the channel',
   `Mode` ENUM('Inactive','Last seen','Read','Write','VIP','Moderator') DEFAULT 'Write' COMMENT 'On Twitch, the modes are updated automatically.\r\nModerator = full access, almost no message buffering\r\nVIP = high access, very small message buffering timeout\r\nWrite = behaves as a regular chatter, enforces global slow-mode and spam limiters\r\nRead = read-only access, but will join channel and log it. does not reply or send any messages in channel\r\nInactive = like Read, but will not join channel at all',
-  `Ping` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'If true, will attempt to "ping" people who use commands in this channel',
+  `Mention` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'If true, will attempt to "mention" users who use commands in this channel',
   `Links_Allowed` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'If false, any links in responses will be replaced by placeholder text',
   `NSFW` TINYINT(1) DEFAULT NULL COMMENT 'Flag that determines whether or not NSFW content can be posted in said channel.\r\nCurrently only sets TRUE for Discord channels with nsfw FLAG set to true.',
   `Banphrase_API_Type` ENUM('Pajbot') DEFAULT NULL COMMENT 'If a channel should use an external banphrase API, this should be its type. Currently only supports "Pajbot".',

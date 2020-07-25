@@ -1,7 +1,7 @@
 INSERT INTO `chat_data`.`Command` 
 (`Name`,`Aliases`,`Flags`,`Description`,`Cooldown`,`Code`,`Whitelist_Response`)
 VALUES
-('ping',NULL,NULL,'Pong!',5000,'(async function ping () {
+('mention',NULL,NULL,'Pong!',5000,'(async function ping () {
 	return {
 		reply: "Pong!"
 	};
@@ -128,7 +128,7 @@ VALUES
         reply: "Reloaded successfully."
     };
 })', 'This command is whitelisted! Make sure to add a Filter object for yourself in order to be able to use this command.'),
-('pipe',NULL,'ping,system','Pipes the result of one command to another, and so forth. Each command will be used as if used separately, so each will be checked for cooldowns and banphrases. Use the character "|" or ">" to separate each command.',5000,'(async function pipe (context, ...args) {
+('pipe',NULL,'mention,system','Pipes the result of one command to another, and so forth. Each command will be used as if used separately, so each will be checked for cooldowns and banphrases. Use the character "|" or ">" to separate each command.',5000,'(async function pipe (context, ...args) {
      const invocations = args.join(" ").split(/[|>]/).map(i => i.trim());
      if (!context.externalPipe && invocations.length < 2) {
          return { reply: "At least two commands must be piped together!" };
@@ -143,7 +143,7 @@ VALUES
          tempData.Data = JSON.stringify(tempData.Data);
 
          fakeChannel = new sb.Channel(tempData);
-         fakeChannel.Ping = false;
+         fakeChannel.Mention = false;
      }
 
      let currentArgs = [];
