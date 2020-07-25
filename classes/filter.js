@@ -340,19 +340,21 @@ module.exports =  (function () {
 		 * For each user that has decided to "unping" from a given command, their name will be replaced by a string
 		 * where on the second position a zero-width character is inserted. This makes sure that they won't be so-called
 		 * "pinged", aka notified based on a regex.
-		 * @param {Command|number|string} commandIdentifier
-		 * @param {string} string
+		 * @param {Object} options
 		 */
-		static async applyUnping (commandIdentifier, string) {
-			const { ID: commandID } = sb.Command.get(commandIdentifier);
+		static async applyUnping (options) {
+			const { channel, command, platform } = options;
+
 			const filters = Filter.data.filter(row => (
 				row.Active
 				&& row.Type === "Unping"
-				&& (row.Command === commandID || row.Command === null)
+				&& row.User_Alias !== null
+				&& (row.Command === (command?.ID ?? null) || row.Command === null)
 				&& (row.Channel === (channel?.ID ?? null) || row.Channel === null)
 				&& (row.Platform === (platform?.ID ?? null) || row.Platform === null)
 			));
 
+			let { string } = options;
 			const unpingUsers = await sb.User.getMultiple(filters.map(i => i.User_Alias));
 			for (const user of unpingUsers) {
 				const fixedName = user.Name[0] + `\u{E0000}` + user.Name.slice(1);

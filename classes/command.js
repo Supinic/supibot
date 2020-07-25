@@ -523,7 +523,12 @@ module.exports = (function () {
 
 				// Apply all unpings to the result, if it is still a string (aka the response should be sent)
 				if (typeof execution.reply === "string") {
-					execution.reply = await sb.Filter.applyUnping(command, execution.reply);
+					execution.reply = await sb.Filter.applyUnping({
+						command: command,
+						channel: channelData ?? null,
+						platform: channelData?.Platform ?? null,
+						string: execution.reply
+					});
 				}
 
 				const mentionUser = Boolean(
