@@ -113,7 +113,13 @@ module.exports = (function () {
 					"(" + sb.Utils.timeDelta(data.Started) + ")"
 				])).join(" ");
 
-				fixedMessage = await sb.Filter.applyUnping(afkCommand, fixedMessage);
+				fixedMessage = await sb.Filter.applyUnping({
+					command: afkCommand,
+					channel: channelData ?? null,
+					platform: channelData?.Platform ?? null,
+					string: fixedMessage
+				});
+
 				await channelData.send(fixedMessage);
 			}
 		}
