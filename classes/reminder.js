@@ -385,7 +385,7 @@ module.exports = (function () {
                 });
 
                 // Apply unpings, governed by the reminder command itself
-                message = sb.Filter.applyUnping({
+                message = await sb.Filter.applyUnping({
                     command: sb.Command.get("remind"),
                     channel: channelData ?? null,
                     platform: channelData?.Platform ?? null,
