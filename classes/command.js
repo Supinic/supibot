@@ -546,8 +546,7 @@ module.exports = (function () {
 				if (mentionUser) {
 					const { string } = await sb.Banphrase.execute(
 						userData.Name,
-						channelData,
-						{ skipBanphraseAPI: true }
+						channelData
 					);
 
 					execution.reply = string + ", " + execution.reply;
