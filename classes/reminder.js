@@ -384,15 +384,15 @@ module.exports = (function () {
                     skipLengthCheck: true
                 });
 
-                // Apply unpings, governed by the reminder command itself
-                message = await sb.Filter.applyUnping({
-                    command: sb.Command.get("remind"),
-                    channel: channelData ?? null,
-                    platform: channelData?.Platform ?? null,
-                    string: message
-                });
+                if (typeof message === "string") {
+                    // Apply unpings, governed by the reminder command itself
+                    message = await sb.Filter.applyUnping({
+                        command: sb.Command.get("remind"),
+                        channel: channelData ?? null,
+                        platform: channelData?.Platform ?? null,
+                        string: message
+                    });
 
-                if (message) {
                     const limit = channelData.Message_Limit ?? channelData.Platform.Message_Limit;
 
                     // If the result message would be longer than twice the channel limit, post a list of reminder IDs
