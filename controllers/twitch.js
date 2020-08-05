@@ -41,65 +41,73 @@ module.exports = class Twitch extends require("./template.js") {
 		this.initListeners();
 
 		this.client.connect();
-		const joinPromise = this.client.joinAll(sb.Channel.getJoinableForPlatform(this.platform).map(i => i.Name));
+		this.client.joinAll(sb.Channel.getJoinableForPlatform(this.platform).map(i => i.Name));
 
-		joinPromise.then(() => {
-			this.data.crons.push(
-				new sb.Cron({
-					Name: "rejoin-channels",
-					Expression: "0 0 * * * *",
-					Description: "Attempts to reconnect channels on Twitch that the bot has been unable to join - most likely because of a ban.",
-					Code: async () => {
-						const promises = [];
-						for (const channel of this.failedJoinChannels) {
-							promises.push(async () => this.client.join(channel));
-						}
-
-						await Promise.allSettled(promises);
-						this.failedJoinChannels.clear();
+		this.data.crons = [
+			new sb.Cron({
+				Name: "rejoin-channels",
+				Expression: "0 0 * * * *",
+				Description: "Attempts to reconnect channels on Twitch that the bot has been unable to join - most likely because of a ban.",
+				Code: async () => {
+					const promises = [];
+					for (const channel of this.failedJoinChannels) {
+						promises.push(async () => this.client.join(channel));
 					}
-				}).start(),
-				new sb.Cron({
-					Name: "channels-live-status",
-					Expression: "0 */2 * * * *",
-					Description: "Fetches the online status of all active Twitch channels. Basically, just caches the current status so that further API calls are not necessary.",
-					Defer: {
-						start: 10000,
-						end: 45000
-					},
-					Code: async () => {
-						const channelList = sb.Channel.getJoinableForPlatform("twitch").filter(i => i.Mode !== "Read");
-						const data = await sb.Got.instances.Twitch.Kraken({
-							url: "streams",
-							searchParams: "channel=" + channelList.map(i => i.Specific_ID).filter(Boolean).join(",")
-						}).json();
 
-						for (const channel of channelList) {
+					await Promise.allSettled(promises);
+					this.failedJoinChannels.clear();
+				}
+			}),
+			new sb.Cron({
+				Name: "channels-live-status",
+				Expression: "0 */2 * * * *",
+				Description: "Fetches the online status of all active Twitch channels. Basically, just caches the current status so that further API calls are not necessary.",
+				Defer: {
+					start: 0,
+					end: 60000
+				},
+				Code: async () => {
+					const channelList = sb.Channel.getJoinableForPlatform("twitch").filter(i => i.Mode !== "Read" && i.Specific_ID);
+					const { streams } = await sb.Got.instances.Twitch.Kraken({
+						url: "streams",
+						searchParams: "channel=" + channelList.map(i => i.Specific_ID).filter(Boolean).join(",")
+					}).json();
+
+					for (const channel of channelList) {
+						const stream = streams.find(i => channel.Specific_ID === i.channel._id);
+						if (!stream) {
 							channel.sessionData.live = false;
 							channel.sessionData.stream = {};
-						}
-
-						for (const stream of data.streams) {
-							const channelData = sb.Channel.get(stream.channel.name, this.platform);
-							if (!channelData) {
-								continue;
+							if (channel.sessionData.live) {
+								channel.events.emit("offline");
 							}
 
-							channelData.sessionData.live = true;
-							channelData.sessionData.stream = {
-								game: stream.game,
-								since: new sb.Date(stream.created_at),
-								status: stream.channel.status,
-								viewers: stream.viewers,
-								quality: stream.video_height + "p",
-								fps: stream.average_fps,
-								delay: stream.delay
-							};
+							continue;
+						}
+
+						channel.sessionData.live = true;
+						channel.sessionData.stream = {
+							game: stream.game,
+							since: new sb.Date(stream.created_at),
+							status: stream.channel.status,
+							viewers: stream.viewers,
+							quality: stream.video_height + "p",
+							fps: stream.average_fps,
+							delay: stream.delay
+						};
+
+						if (!channel.sessionData.live) {
+							channel.events.emit("online");
 						}
 					}
-				}).start()
-			);
-		});
+				}
+			})
+		];
+
+		this.data.crons[0].start();
+		if (this.platform.Data.trackChannelsLiveStatus) {
+			this.data.crons[1].start();
+		}
 	}
 
 	initListeners () {
