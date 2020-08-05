@@ -226,7 +226,7 @@ module.exports = (function (Module) {
 		Defer: {
 			end: 15000
 		},
-		Code: () => CooldownManager.prune()
+		Code: () => sb.CooldownManager.prune()
 	}).start();
 
 	return CooldownManager;
