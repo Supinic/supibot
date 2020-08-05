@@ -69,6 +69,15 @@ module.exports = (function (Module) {
 		get description () { return this.#description; }
 	}
 
+	const pruneCron = new sb.Cron({
+		Name: "cooldown-prune",
+		Expression: "0 * * * * *",
+		Defer: {
+			end: 15000
+		},
+		Code: () => CooldownManager.prune()
+	}).start();
+
 	/**
 	 * Manages the cooldowns between each message sent to channels.
 	 * @name sb.CooldownManager
@@ -205,6 +214,8 @@ module.exports = (function (Module) {
 		}
 
 		get modulePath () { return "cooldown-manager"; }
+
+		static get pruneCron () { return pruneCron; }
 
 		// Exporting the classes, just in case they're needed externally
 		static get Cooldown () { return Cooldown; }
