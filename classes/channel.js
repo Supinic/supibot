@@ -2,6 +2,8 @@
 module.exports = (function () {
     "use strict";
 
+    const EventEmitter = require("events");
+
     /**
      * Represents a chat channel.
      * @memberof sb
@@ -153,6 +155,12 @@ module.exports = (function () {
              * @type {Object}
              */
             this.sessionData = {};
+
+            /**
+             * Experimental support for external channel events.
+             * @type {EventEmitter}
+             */
+            this.events = new EventEmitter();
         }
 
         /**
