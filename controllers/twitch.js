@@ -74,7 +74,7 @@ module.exports = class Twitch extends require("./template.js") {
 					}).json();
 
 					for (const channel of channelList) {
-						const stream = streams.find(i => channel.Specific_ID === i.channel._id);
+						const stream = streams.find(i => channel.Specific_ID === String(i.channel._id));
 						if (!stream) {
 							channel.sessionData.live = false;
 							channel.sessionData.stream = {};
