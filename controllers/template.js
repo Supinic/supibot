@@ -3,6 +3,10 @@
  * @name {Controller}
 */
 module.exports = class Controller {
+	data = {
+		crons: []
+	};
+
 	initListeners () { }
 
 	async send (message, channel) { }
