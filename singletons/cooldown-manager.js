@@ -69,21 +69,12 @@ module.exports = (function (Module) {
 		get description () { return this.#description; }
 	}
 
-	const pruneCron = new sb.Cron({
-		Name: "cooldown-prune",
-		Expression: "0 * * * * *",
-		Defer: {
-			end: 15000
-		},
-		Code: () => CooldownManager.prune()
-	}).start();
-
 	/**
 	 * Manages the cooldowns between each message sent to channels.
 	 * @name sb.CooldownManager
 	 * @type CooldownManager()
 	 */
-	return class CooldownManager extends Module {
+	class CooldownManager extends Module {
 		/**
 		 * @inheritDoc
 		 * @returns {CooldownManager}
@@ -227,5 +218,16 @@ module.exports = (function (Module) {
 		destroy () {
 			this.data = null;
 		}
-	};
+	}
+
+	const pruneCron = new sb.Cron({
+		Name: "cooldown-prune",
+		Expression: "0 * * * * *",
+		Defer: {
+			end: 15000
+		},
+		Code: () => CooldownManager.prune()
+	}).start();
+
+	return CooldownManager;
 });
