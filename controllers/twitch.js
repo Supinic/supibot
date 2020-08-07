@@ -38,6 +38,9 @@ module.exports = class Twitch extends require("./template.js") {
 		this.userIDTimeout = 0;
 		this.failedJoinChannels = new Set();
 
+		this.availableEmotes = {};
+		this.availableEmoteSets = [];
+
 		this.initListeners();
 
 		this.client.connect();
