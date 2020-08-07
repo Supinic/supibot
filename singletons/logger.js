@@ -34,27 +34,24 @@ module.exports = (function (Module) {
 				this.messageCron = new sb.Cron({
 					Name: "message-cron",
 					Expression: sb.Config.get("LOG_MESSAGE_CRON"),
-					Defer: {
-						start: 2500,
-						end: 5000
-					},
 					Code: async () => {
 						if (!sb.Config.get("LOG_MESSAGE_ENABLED", false)) {
 							return;
 						}
 
 						const keys = Object.keys(this.batches);
-						const promises = Array(keys.length);
 						for (let i = 0; i < keys.length; i++) {
 							const key = keys[i];
 							if (this.batches[key].records?.length > 0) {
-								promises[i] = this.batches[key].insert();
+								setTimeout(
+									() => this.batches[key].insert(),
+									i * 250
+								);
 							}
 						}
-
-						await Promise.all(promises);
 					}
 				});
+
 				this.messageCron.start();
 				this.#crons.push(this.messageCron);
 			}
