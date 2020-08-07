@@ -45,24 +45,14 @@ module.exports = (function (Module) {
 
 						const keys = Object.keys(this.batches);
 						const promises = Array(keys.length);
-
-						let msgs = 0;
-						const start = sb.Date.now();
 						for (let i = 0; i < keys.length; i++) {
 							const key = keys[i];
 							if (this.batches[key].records?.length > 0) {
-								msgs += this.batches[key].records.length;
 								promises[i] = this.batches[key].insert();
 							}
 						}
 
 						await Promise.all(promises);
-
-						const delta = sb.Date.now() - start;
-						if (delta > 1500) {
-							// If the addition took more than 1 second, log it as a warning - might be dangerous.
-							console.warn(new sb.Date().format("Y-m-d H:i:s"), `cron - messages: ${msgs}; time: ${delta} ms`);
-						}
 					}
 				});
 				this.messageCron.start();
