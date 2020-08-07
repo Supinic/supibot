@@ -460,97 +460,99 @@ module.exports = (function () {
 
 			Command.handleCooldown(channelData, userData, command, execution?.cooldown);
 
-			if (execution && (execution.reply || execution.partialReplies)) {
-				if (Array.isArray(execution.partialReplies) && execution.partialReplies.every(i => i && i.constructor === Object)) {
-					const partResult = [];
-					for (const {message, bancheck} of execution.partialReplies) {
-						if (bancheck === true) {
-							const {string} = await sb.Banphrase.execute(
-								message,
-								channelData,
-								{ skipBanphraseAPI: true }
-							);
+			if (!execution?.reply && !execution?.partialReplies) {
+				return execution;
+			}
 
-							partResult.push(string);
-						}
-						else {
-							partResult.push(message);
-						}
-					}
-
-					execution.reply = partResult.join(" ");
-				}
-				else if (execution.partialReplies) {
+			if (Array.isArray(execution.partialReplies)){
+				if (execution.partialReplies.some(i => i && i.constructor !== Object)) {
 					throw new sb.Error({
 						message: "If set, partialReplies must be an Array of Objects"
 					});
 				}
 
-				if (typeof execution.reply !== "string") {
-					console.warn(`Execution of command ${command.ID} did not result with execution.reply of type string`, {command, execution, data: context});
-				}
+				const partResult = [];
+				for (const {message, bancheck} of execution.partialReplies) {
+					if (bancheck === true) {
+						const {string} = await sb.Banphrase.execute(
+							message,
+							channelData
+						);
 
-				execution.reply = sb.Utils.fixHTML(String(execution.reply));
-
-				if (!execution.meta?.skipWhitespaceCheck) {
-					execution.reply = execution.reply.replace(sb.Config.get("WHITESPACE_REGEX"), "");
-				}
-
-				const metaSkip = Boolean(options.skipBanphrases || execution?.meta?.skipBanphrases);
-				if (!command.Flags.skipBanphrase && !metaSkip) {
-					const { passed, privateMessage, string } = await sb.Banphrase.execute(execution.reply.slice(0, 1000), channelData);
-					execution.reply = string;
-
-					if (
-						(typeof execution.replyWithPrivateMessage !== "boolean" )
-						&& (typeof privateMessage == "boolean")
-					) {
-						execution.replyWithPrivateMessage = privateMessage;
+						partResult.push(string);
 					}
-
-					if (command.Flags.rollback) {
-						if (passed) {
-							context.transaction.commit();
-						}
-						else {
-							context.transaction.rollback();
-						}
+					else {
+						partResult.push(message);
 					}
 				}
-				else if (command.Flags.rollback) {
-					context.transaction.commit();
+
+				execution.reply = partResult.join(" ");
+			}
+
+			if (typeof execution.reply !== "string") {
+				console.warn(`Execution of command ${command.ID} did not result with execution.reply of type string`, {command, execution, data: context});
+			}
+
+			execution.reply = sb.Utils.fixHTML(String(execution.reply));
+
+			if (!execution.meta?.skipWhitespaceCheck) {
+				execution.reply = execution.reply.replace(sb.Config.get("WHITESPACE_REGEX"), "");
+			}
+
+			const metaSkip = Boolean(!execution.partialReplies && (options.skipBanphrases || execution?.meta?.skipBanphrases));
+			if (!command.Flags.skipBanphrase && !metaSkip) {
+				const { passed, privateMessage, string } = await sb.Banphrase.execute(execution.reply.slice(0, 2000), channelData);
+				execution.reply = string;
+
+				if (
+					(typeof execution.replyWithPrivateMessage !== "boolean" )
+					&& (typeof privateMessage === "boolean")
+				) {
+					execution.replyWithPrivateMessage = privateMessage;
 				}
 
-				// Apply all unpings to the result, if it is still a string (aka the response should be sent)
-				if (typeof execution.reply === "string") {
-					execution.reply = await sb.Filter.applyUnping({
-						command: command,
-						channel: channelData ?? null,
-						platform: channelData?.Platform ?? null,
-						string: execution.reply
-					});
+				if (command.Flags.rollback) {
+					if (passed) {
+						context.transaction.commit();
+					}
+					else {
+						context.transaction.rollback();
+					}
 				}
+			}
+			else if (command.Flags.rollback) {
+				context.transaction.commit();
+			}
 
-				const mentionUser = Boolean(
-					!options.skipMention
-					&& command.Flags.mention
-					&& channelData?.Mention
-					&& await sb.Filter.getMentionStatus({
-						user: userData,
-						command: command,
-						channel: channelData ?? null,
-						platform: channelData?.Platform ?? null
-					})
+			// Apply all unpings to the result, if it is still a string (aka the response should be sent)
+			if (typeof execution.reply === "string") {
+				execution.reply = await sb.Filter.applyUnping({
+					command: command,
+					channel: channelData ?? null,
+					platform: channelData?.Platform ?? null,
+					string: execution.reply
+				});
+			}
+
+			const mentionUser = Boolean(
+				!options.skipMention
+				&& command.Flags.mention
+				&& channelData?.Mention
+				&& await sb.Filter.getMentionStatus({
+					user: userData,
+					command: command,
+					channel: channelData ?? null,
+					platform: channelData?.Platform ?? null
+				})
+			);
+
+			if (mentionUser) {
+				const { string } = await sb.Banphrase.execute(
+					userData.Name,
+					channelData
 				);
 
-				if (mentionUser) {
-					const { string } = await sb.Banphrase.execute(
-						userData.Name,
-						channelData
-					);
-
-					execution.reply = string + ", " + execution.reply;
-				}
+				execution.reply = string + ", " + execution.reply;
 			}
 
 			return execution;
