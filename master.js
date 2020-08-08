@@ -207,10 +207,6 @@
 				this.send(finalMessage, targetChannel);
 			}
 		}
-
-		async globalMessageListener () {
-			// @todo
-		}
 	}
 
 	process.on("uncaughtException", (err) => {

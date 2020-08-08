@@ -95,16 +95,6 @@ module.exports = class Minecraft extends require("./template.js") {
 					channel: channelData
 				});
 
-				const globalCustomCode = sb.Config.get("GLOBAL_CUSTOM_CHANNEL_CODE", false);
-				if (globalCustomCode) {
-					await globalCustomCode({
-						type: "message",
-						message: message,
-						user: userData,
-						channel: channelData
-					});
-				}
-
 				sb.AwayFromKeyboard.checkActive(userData, channelData);
 				sb.Reminder.checkActive(userData, channelData);
 
@@ -115,9 +105,6 @@ module.exports = class Minecraft extends require("./template.js") {
 				if (username === this.platform.Self_Name) {
 					return;
 				}
-
-				sb.Master.globalMessageListener(this.platform, channelData, userData, message);
-
 
 				// Check and execute command if necessary
 				if (sb.Command.is(message)) {

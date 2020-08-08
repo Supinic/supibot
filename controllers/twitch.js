@@ -405,16 +405,6 @@ module.exports = class Twitch extends require("./template.js") {
 				});
 			}
 
-			const globalCustomCode = sb.Config.get("GLOBAL_CUSTOM_CHANNEL_CODE", false);
-			if (globalCustomCode) {
-				await globalCustomCode({
-					type: "message",
-					message: message,
-					user: userData,
-					channel: channelData
-				});
-			}
-
 			sb.AwayFromKeyboard.checkActive(userData, channelData);
 			sb.Reminder.checkActive(userData, channelData);
 
@@ -460,8 +450,6 @@ module.exports = class Twitch extends require("./template.js") {
 		if (this.platform.Logging.bits && typeof bits !== "undefined" && bits !== null) {
 			sb.SystemLogger.send("Twitch.Other", bits + " bits", channelData, userData);
 		}
-
-		sb.Master.globalMessageListener(this.platform, channelData, userData, message);
 
 		// Check and execute command if necessary
 		if (sb.Command.is(message)) {
