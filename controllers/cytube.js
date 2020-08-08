@@ -143,6 +143,7 @@ module.exports = class Cytube extends require("./template.js") {
 			}
 
 			this.channelData.events.emit("message", {
+				type: "message",
 				message: msg,
 				user: userData,
 				channel: this.channelData

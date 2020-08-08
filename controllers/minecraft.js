@@ -89,6 +89,7 @@ module.exports = class Minecraft extends require("./template.js") {
 				}
 
 				this.channelData.events.emit("message", {
+					type: "message",
 					message,
 					user: userData,
 					channel: channelData

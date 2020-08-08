@@ -145,6 +145,7 @@ module.exports = class Discord extends require("./template.js") {
 			}
 
 			this.channelData.events.emit("message", {
+				type: "message",
 				message: msg,
 				user: userData,
 				channel: channelData
