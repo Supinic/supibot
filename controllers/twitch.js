@@ -387,6 +387,12 @@ module.exports = class Twitch extends require("./template.js") {
 				return;
 			}
 
+			channelData.events.emit("message", {
+				message,
+				user: userData,
+				channel: channelData,
+			});
+
 			if (channelData.Custom_Code) {
 				channelData.Custom_Code({
 					type: "message",

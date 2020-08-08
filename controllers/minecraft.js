@@ -88,6 +88,12 @@ module.exports = class Minecraft extends require("./template.js") {
 					});
 				}
 
+				this.channelData.events.emit("message", {
+					message,
+					user: userData,
+					channel: channelData
+				});
+
 				const globalCustomCode = sb.Config.get("GLOBAL_CUSTOM_CHANNEL_CODE", false);
 				if (globalCustomCode) {
 					await globalCustomCode({

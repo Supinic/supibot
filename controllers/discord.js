@@ -144,7 +144,11 @@ module.exports = class Discord extends require("./template.js") {
 				return;
 			}
 
-			sb.Master.globalMessageListener(this.platform, channelData, userData, msg);
+			this.channelData.events.emit("message", {
+				message: msg,
+				user: userData,
+				channel: channelData
+			});
 
 			// Starts with correct prefix - handle command
 			if (sb.Command.is(msg)) {

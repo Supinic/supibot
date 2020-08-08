@@ -142,12 +142,11 @@ module.exports = class Cytube extends require("./template.js") {
 				}
 			}
 
-			sb.Master.globalMessageListener(
-				this.platform,
-				(data.meta.private) ? null : this.channelData,
-				userData,
-				msg
-			);
+			this.channelData.events.emit("message", {
+				message: msg,
+				user: userData,
+				channel: this.channelData
+			});
 
 			// Handle commands if the message starts with the command prefix
 			if (sb.Command.is(msg)) {
