@@ -135,6 +135,8 @@ module.exports = (function () {
 						channel: row.Channel.map(i => sb.Channel.get(i.ID)).filter(Boolean)
 					});
 				}
+
+				ChatModule.data.push(chatModule);
 			}
 		}
 
