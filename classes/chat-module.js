@@ -113,6 +113,7 @@ module.exports = (function () {
 				.from("chat_data", "Chat_Module")
 				.where("Active = %b", true)
 				.reference({
+					left: true,
 					sourceTable: "Chat_Module",
 					targetTable: "Channel",
 					referenceTable: "Channel_Chat_Module",
