@@ -137,9 +137,10 @@ module.exports = (function () {
 					}
 				}
 
-				if (row.Channel.length > 0) {
+				const channels = row.Channel.filter(Boolean);
+				if (channels.length > 0) {
 					chatModule.attach({
-						channel: row.Channel.map(i => sb.Channel.get(i.ID)).filter(Boolean)
+						channel: channels.map(i => sb.Channel.get(i.ID)).filter(Boolean)
 					});
 				}
 
