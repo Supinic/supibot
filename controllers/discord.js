@@ -124,11 +124,18 @@ module.exports = class Discord extends require("./template.js") {
 				if (channelData.Mode !== "Read") {
 					sb.AwayFromKeyboard.checkActive(userData, channelData);
 					sb.Reminder.checkActive(userData, channelData);
-				}
 
-				// Mirroring is set up - mirror the message to the target channel
-				if (channelData.Mirror) {
-					this.mirror(msg, userData, channelData);
+					channelData.events.emit("message", {
+						type: "message",
+						message: msg,
+						user: userData,
+						channel: channelData
+					});
+
+					// Mirroring is set up - mirror the message to the target channel
+					if (channelData.Mirror) {
+						this.mirror(msg, userData, channelData);
+					}
 				}
 			}
 			else {
@@ -143,13 +150,6 @@ module.exports = class Discord extends require("./template.js") {
 			if (discordID === this.platform.Self_ID) {
 				return;
 			}
-
-			this.channelData.events.emit("message", {
-				type: "message",
-				message: msg,
-				user: userData,
-				channel: channelData
-			});
 
 			// Starts with correct prefix - handle command
 			if (sb.Command.is(msg)) {
