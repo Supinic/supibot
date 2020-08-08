@@ -137,7 +137,7 @@ module.exports = (function () {
 					}
 				}
 
-				const channels = row.Channel.filter(Boolean);
+				const channels = row.Channel.filter(i => i.ID);
 				if (channels.length > 0) {
 					chatModule.attach({
 						channel: channels.map(i => sb.Channel.get(i.ID)).filter(Boolean)
