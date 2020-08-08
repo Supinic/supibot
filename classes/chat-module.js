@@ -8,6 +8,9 @@ module.exports = (function () {
 		Active = true;
 		Code;
 		attachedTo = [];
+		data = {};
+
+		static data = [];
 
 		constructor (data) {
 			this.ID = (typeof data.ID === "number")
