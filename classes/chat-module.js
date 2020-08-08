@@ -32,13 +32,16 @@ module.exports = (function () {
 				this.Active = data.Active;
 			}
 
+			let fn = null;
 			try {
-				this.Code = eval(data.Code);
+				fn = eval(data.Code);
 			}
 			catch (e) {
 				console.warn("Chat module - code parse failed", e);
-				this.Code = () => undefined;
+				fn = () => undefined;
 			}
+
+			this.Code = fn.bind(this);
 		}
 
 		attach (options) {
@@ -141,7 +144,10 @@ module.exports = (function () {
 		}
 
 		static async reloadData () {
-			ChatModule.data = [];
+			for (const chatModule of ChatModule.data) {
+				chatModule.detachAll();
+			}
+
 			await ChatModule.loadData();
 		}
 
@@ -150,10 +156,10 @@ module.exports = (function () {
 		 */
 		static destroy () {
 			for (const chatModule of ChatModule.data) {
-				chatModule.destroy();
+				chatModule.detachAll();
 			}
 
-			ChatModule.data = null;
+			ChatModule.data = [];
 		}
 	};
 })();
