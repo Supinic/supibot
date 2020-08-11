@@ -181,6 +181,7 @@ module.exports = (function () {
 				chatModule.detachAll();
 			}
 
+			ChatModule.data = [];
 			await ChatModule.loadData();
 		}
 
