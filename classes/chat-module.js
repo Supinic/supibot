@@ -81,7 +81,7 @@ module.exports = (function () {
 		detachAll () {
 			for (const target of this.attachmentReferences) {
 				this.detach({
-					channel: target
+					channel: target.ID
 				});
 			}
 		}
