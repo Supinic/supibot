@@ -161,6 +161,11 @@ module.exports = (function () {
 						}
 					}
 
+					if (!Array.isArray(channelItem.Args)) {
+						console.warn("Chat module has non-Array args for channel", { moduleID: row.ID, channelItem });
+						continue;
+					}
+
 					chatModule.attach({
 						args,
 						channel: sb.Channel.get(channelItem.ID)
