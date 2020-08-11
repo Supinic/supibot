@@ -48,6 +48,10 @@ module.exports = (function () {
 		}
 
 		attach (options) {
+			if (!options.args) {
+				options.args = [];
+			}
+
 			for (const event of this.Events) {
 				for (const channelData of ChatModule.getTargets(options)) {
 					const listener = (context) => this.Code(context, ...options.args);
