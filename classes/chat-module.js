@@ -133,7 +133,6 @@ module.exports = (function () {
 				})
 			);
 
-
 			for (const row of data) {
 				const chatModule = new ChatModule(row);
 				if (row.Global) {
@@ -149,22 +148,22 @@ module.exports = (function () {
 					}
 				}
 
-				const rows = row.Channel.filter(i => i.ID);
-				for (const row of rows) {
+				const channelItems = row.Channel.filter(i => i.ID);
+				for (const channelItem of channelItems) {
 					let args = [];
-					if (row.Args !== null) {
+					if (channelItem.Args !== null) {
 						try {
-							args = JSON.parse(row.Args);
+							args = JSON.parse(channelItem.Args);
 						}
 						catch (e) {
-							console.warn("Chat module has invalid args for channel", { chatModule, row });
+							console.warn("Chat module has invalid args for channel", { moduleID: row.ID, channelItem });
 							continue;
 						}
 					}
 
 					chatModule.attach({
 						args,
-						channel: sb.Channel.get(row.Channel_ID)
+						channel: sb.Channel.get(channelItem.ID)
 					});
 				}
 
