@@ -149,22 +149,22 @@ module.exports = (function () {
 					}
 				}
 
-				const channels = row.Channel.filter(i => i.ID);
-				for (const channel of channels) {
+				const rows = row.Channel.filter(i => i.ID);
+				for (const row of rows) {
 					let args = [];
-					if (channel.Args !== null) {
+					if (row.Args !== null) {
 						try {
-							args = JSON.parse(channel.Args);
+							args = JSON.parse(row.Args);
 						}
 						catch (e) {
-							console.warn("Chat module has invalid args for channel", chatModule, channel);
+							console.warn("Chat module has invalid args for channel", { chatModule, row });
 							continue;
 						}
 					}
 
 					chatModule.attach({
 						args,
-						channel: sb.Channel.get(channel)
+						channel: sb.Channel.get(row.Channel)
 					});
 				}
 
