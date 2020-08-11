@@ -164,7 +164,7 @@ module.exports = (function () {
 
 					chatModule.attach({
 						args,
-						channel: sb.Channel.get(row.Channel)
+						channel: sb.Channel.get(row.Channel_ID)
 					});
 				}
 
