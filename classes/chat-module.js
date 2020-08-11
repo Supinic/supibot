@@ -7,7 +7,7 @@ module.exports = (function () {
 		Events;
 		Active = true;
 		Code;
-		attachedTo = [];
+		attachmentReferences = [];
 		data = {};
 
 		static data = [];
@@ -49,27 +49,33 @@ module.exports = (function () {
 
 		attach (options) {
 			for (const event of this.Events) {
-				for (const target of ChatModule.getTargets(options)) {
-					target.events.on(event, this.Code);
-					this.attachedTo.push(target);
+				for (const channelData of ChatModule.getTargets(options)) {
+					const listener = (context) => this.Code(context, ...options.args);
+					channelData.events.on(event, listener);
+
+					this.attachmentReferences.push({
+						channelID: channelData.ID,
+						listener
+					});
 				}
 			}
 		}
 
 		detach (options) {
 			for (const event of this.Events) {
-				for (const target of ChatModule.getTargets(options)) {
-					target.events.off(event, this.Code);
-					const index = this.attachedTo.findIndex(i => i === target);
-					if (index !== -1) {
-						this.attachedTo.splice(index, 1);
+				for (const channelData of ChatModule.getTargets(options)) {
+					const reference = this.attachmentReferences.find(i => i.channelID === channelData.ID);
+					if (!reference) {
+						continue;
 					}
+
+					channelData.events.off(event, reference.listener);
 				}
 			}
 		}
 
 		detachAll () {
-			for (const target of this.attachedTo) {
+			for (const target of this.attachmentReferences) {
 				this.detach({
 					channel: target
 				});
@@ -110,6 +116,7 @@ module.exports = (function () {
 				.select("Chat_Module.ID AS Module_ID")
 				.select("Chat_Module.*")
 				.select("Channel.ID AS Channel_ID")
+				.select("Channel_Chat_Module.Specific_Arguments AS Args")
 				.from("chat_data", "Chat_Module")
 				.where("Active = %b", true)
 				.reference({
@@ -118,9 +125,10 @@ module.exports = (function () {
 					targetTable: "Channel",
 					referenceTable: "Channel_Chat_Module",
 					collapseOn: "Module_ID",
-					fields: ["Channel_ID"]
+					fields: ["Channel_ID", "Args"]
 				})
 			);
+
 
 			for (const row of data) {
 				const chatModule = new ChatModule(row);
@@ -138,9 +146,21 @@ module.exports = (function () {
 				}
 
 				const channels = row.Channel.filter(i => i.ID);
-				if (channels.length > 0) {
+				for (const channel of channels) {
+					let args = [];
+					if (channel.Args !== null) {
+						try {
+							args = JSON.parse(channel.Args);
+						}
+						catch (e) {
+							console.warn("Chat module has invalid args for channel", chatModule, channel);
+							continue;
+						}
+					}
+
 					chatModule.attach({
-						channel: channels.map(i => sb.Channel.get(i.ID)).filter(Boolean)
+						args,
+						channel: sb.Channel.get(channel)
 					});
 				}
 
