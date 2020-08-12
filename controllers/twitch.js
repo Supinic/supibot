@@ -82,7 +82,10 @@ module.exports = class Twitch extends require("./template.js") {
 							channel.sessionData.live = false;
 							channel.sessionData.stream = {};
 							if (channel.sessionData.live) {
-								channel.events.emit("offline");
+								channel.events.emit("offline", {
+									event: "offline",
+									channel
+								});
 							}
 
 							continue;
@@ -100,7 +103,10 @@ module.exports = class Twitch extends require("./template.js") {
 						};
 
 						if (!channel.sessionData.live) {
-							channel.events.emit("online");
+							channel.events.emit("online", {
+								event: "online",
+								channel
+							});
 						}
 					}
 				}
@@ -360,7 +366,7 @@ module.exports = class Twitch extends require("./template.js") {
 			}
 
 			channelData.events.emit("message", {
-				type: "message",
+				event: "message",
 				message,
 				user: userData,
 				channel: channelData,
