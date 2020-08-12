@@ -148,38 +148,10 @@ module.exports = class Twitch extends require("./template.js") {
 				return;
 			}
 
-			const { emoteSets } = messageObject;
-			const strings = [
-				emoteSets.sort().join(","),
-				(this.availableEmoteSets)
-					? this.availableEmoteSets.sort().join(",")
-					: null
-			];
-
-			if (strings[0] !== strings[1]) {
-				this.availableEmoteSets = emoteSets;
-
-				// Reference: https://github.com/twitchdev/issues/issues/50
-				// The emote set "0" breaks the following API call, therefore it has to be removed in order for at least
-				// some emotes to be loaded. The global emotes are then fetched from TwitchEmotes API...
-				const safeEmoteSets = emoteSets.slice(0);
-				const breakingEmoteSetIndex = emoteSets.findIndex(i => i === "0");
-				safeEmoteSets.splice(breakingEmoteSetIndex, 1);
-
-				const [emoteData, globalEmoteData] = await Promise.all([
-					sb.Got.instances.Twitch.Kraken({
-						url: "chat/emoticon_images",
-						searchParams: "emotesets=" + safeEmoteSets.join(",")
-					}),
-					sb.Got({
-						url: "https://api.twitchemotes.com/api/v4/channels/0"
-					}).json()
-				]);
-
-				this.availableEmotes = {
-					0: globalEmoteData.emotes.map(i => ({ code: i.code, id: i.id })),
-					...emoteData.emoticon_sets,
-				};
+			const incomingEmoteSets = messageObject.emoteSets;
+			if (incomingEmoteSets.sort().join(",") !== this.availableEmoteSets.sort().join(",")) {
+				this.availableEmoteSets = incomingEmoteSets;
+				this.availableEmotes = await Twitch.fetchEmotes(this.availableEmoteSets);
 			}
 		});
 
@@ -714,6 +686,34 @@ module.exports = class Twitch extends require("./template.js") {
 		return (channelData.Specific_ID === userData.Twitch_ID);
 	}
 
+	/**
+	 * Fetches a list of emote data for a given list of emote sets.
+	 * @param {string[]} sets
+	 * @returns {Promise<EmoteSetDataObject[]>}
+	 */
+	static async fetchEmotes (sets) {
+		const emotesData = [];
+		const promises = sets.map(async (emoteSet) => {
+			const data = await sb.Got.instances.Leppunen("twitch/emoteset/" + emoteSet).json();
+			emotesData.push({
+				setID: emoteSet,
+				channel: {
+					name: data.channel,
+					login: data.channellogin,
+					ID: data.channelid
+				},
+				tier: data.tier,
+				emotes: (data.emotes ?? []).map(i => ({
+					ID: i.id,
+					token: i.token
+				}))
+			});
+		});
+
+		await Promise.all(promises);
+		return emotesData;
+	}
+
 	destroy () {
 		this.client.disconnect();
 		this.client = null;
@@ -724,3 +724,20 @@ module.exports = class Twitch extends require("./template.js") {
 		this.destroy();
 	}
 };
+
+/**
+ * @typedef {Object} EmoteSetDataObject Describes a Twitch emote set.
+ * @property {string} setID
+ * @property {Object} channel
+ * @property {string} channel.name Channel display name
+ * @property {string} channel.login Channel login name (as it appears e.g. in URLs)
+ * @property {string} channel.ID Internal Twitch channel ID
+ * @property {"1"|"2"|"3"|"Custom"|null} tier Determines the subscription tier of an emote
+ * @property {EmoteDataObject[]} emotes List of emotes
+ */
+
+/**
+ * @typedef {Object} EmoteDataObject
+ * @property {string} ID Internal Twitch emote ID
+ * @property {string} token Emote name
+ */
