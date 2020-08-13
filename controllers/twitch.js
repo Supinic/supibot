@@ -702,7 +702,7 @@ module.exports = class Twitch extends require("./template.js") {
 		const promises = sets.map(async (emoteSet) => {
 			const data = await sb.Got.instances.Leppunen("twitch/emoteset/" + emoteSet).json();
 			emotesData.push({
-				setID: emoteSet,
+				ID: emoteSet,
 				channel: {
 					name: data.channel,
 					login: data.channellogin,
