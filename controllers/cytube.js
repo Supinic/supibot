@@ -172,14 +172,15 @@ module.exports = class Cytube extends require("./template.js") {
 		// { item: { media: { id, title, seconds, duration, type, meta: {} }, uid, temp, queueby }, after }
 		client.on("queue", async (data) => {
 			const who = data.item.queueby.toLowerCase();
-			const media = data.item.media;
-			if (who === this.platform.Self_Name) {
+			const { media } = data.item;
+
+			const userData = await sb.User.get(who, false);
+			if (!userData) {
 				return;
 			}
 
-			const userData = await sb.User.get(who, false);
 			if (this.platform.Logging.videoRequests) {
-				sb.Logger.logVideoRequest(media.id, media.type, media.seconds, userData, this.channelData);
+				await sb.Logger.logVideoRequest(media.id, media.type, media.seconds, userData, this.channelData);
 			}
 
 			this.playlistData.push({
@@ -343,6 +344,17 @@ module.exports = class Cytube extends require("./template.js") {
 		}
 
 		super.mirror(message, userData, this.channelData.Mirror, commandUsed);
+	}
+
+	async queue (type, videoID) {
+		this.client.socket.emit("queue", {
+			id: videoID,
+			type: type,
+			pos: "end",
+			temp: true,
+			duration: undefined,
+			title: undefined
+		});
 	}
 
 	/**
