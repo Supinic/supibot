@@ -2,6 +2,9 @@
 module.exports = (function () {
 	"use strict";
 
+	const inactiveSymbol = Symbol("banphrase-inactive");
+	const availableTypes = ["API response", "Custom response", "Denial", "Inactive", "Replacement"];
+
 	class ExternalBanphraseAPI {
 		static async pajbot (message, URL) {
 			const options = {
@@ -26,53 +29,76 @@ module.exports = (function () {
 	 * @type Banphrase
 	 */
 	return class Banphrase {
-		constructor (data) {
-			/**
-			 * Unique numeric ID.
-			 * @type {number}
-			 */
-			this.ID = data.ID;
+		/**
+		 * Unique numeric ID.
+		 * @type {number|symbol}
+		 */
+		ID;
 
-			try {
-				data.Code = eval(data.Code);
-			}
-			catch (e) {
+		/**
+		 * Banphrase code.
+		 * @type {Function}
+		 */
+		Code;
+
+		/**
+		 * Type of banphrase.
+		 * Inactive: Banphrase is not active, will not be loaded or triggered.
+		 * Denial: If the result is not undefined, there will be no reply at all.
+		 * Replacement: Runs the message through String.prototype.replace and returns the result.
+		 * Custom response: If the result is not undefined, the reply will be completely replaced with the result of the function.
+		 * API response: Not technically a banphrase, simply returns custom text based on what a banphrase API returned.
+		 * @type {("Denial","API response","Custom response","Replacement","Inactive")}
+		 */
+		Type;
+
+		/**
+		 * Platform of banphrase.
+		 * @type {number|null}
+		 */
+		Platform = null;
+
+		/**
+		 * Channel of banphrase.
+		 * If null, then the banphrase applies to the entire {@link module.Platform}.
+		 * @type {number|null}
+		 */
+		Channel = null;
+
+		/**
+		 * @type {boolean}
+		 * Determines if a banphrase is to be executed.
+		 */
+		Active;
+
+		/**
+		 * Wrapper for the instance's custom data.
+		 * @type {Object}
+		 */
+		data = {};
+
+		constructor (data) {
+			this.ID = data.ID ?? Symbol();
+
+			this.Code = eval(data.Code);
+			if (typeof this.Code !== "function") {
 				throw new sb.Error({
-					message: "Banphrase " + data.ID + " has invalid code definition: " + e.toString()
+					message: `Banphrase ID ${this.ID} code must be a function`
 				});
 			}
 
-			/**
-			 * Banphrase code.
-			 * @type {Function}
-			 */
-			this.Code = data.Code;
-
-			/**
-			 * Type of banphrase.
-			 * Inactive: Banphrase is not active, will not be loaded or triggered.
-			 * Denial: If the result is not undefined, there will be no reply at all.
-			 * Replacement: Runs the message through String.prototype.replace and returns the result.
-			 * Custom response: If the result is not undefined, the reply will be completely replaced with the result of the function.
-			 * API response: Not technically a banphrase, simply returns custom text based on what a banphrase API returned.
-			 * @type {("Denial","API response","Custom response","Replacement","Inactive")}
-			 */
 			this.Type = data.Type;
+			if (!availableTypes.includes(this.Type)) {
+				throw new sb.Error({
+					message: `Banphrase ID ${this.ID} type must be one of the supported types`
+				});
+			}
 
-			/**
-			 * Platform of banphrase.
-			 * @type {Platform}
-			 */
-			this.Platform = (data.Platform)
-				? sb.Platform.get(data.Platform)
-				: null;
+			this.Platform = data.Platform;
 
-			/**
-			 * Channel of banphrase.
-			 * If null, then the banphrase applies to the entire {@link module.Platform}.
-			 * @type {number|null}
-			 */
 			this.Channel = data.Channel;
+
+			this.Active = data.Active ?? true;
 		}
 
 		/**
@@ -81,12 +107,27 @@ module.exports = (function () {
 		 * @returns {string|undefined}
 		 */
 		execute (message) {
+			if (!this.Active) {
+				return inactiveSymbol;
+			}
+
 			try {
 				return this.Code(message);
 			}
 			catch (e) {
 				console.warn("banphrase failed", message, this, e);
 				return message;
+			}
+		}
+
+		async toggle () {
+			this.Active = !this.Active;
+			if (typeof this.ID === "number") {
+				await sb.Query.getRecordUpdater(ru => ru
+				    .update("chat_date", "Banphrase")
+				    .set("Active", this.Active)
+				    .where("ID = %n", this.ID)
+				);
 			}
 		}
 
@@ -110,6 +151,25 @@ module.exports = (function () {
 			await Banphrase.loadData();
 		}
 
+		static get (identifier) {
+			if (identifier instanceof Banphrase) {
+				return identifier;
+			}
+			else if (typeof identifier === "number" || typeof identifier === "symbol") {
+				const result = Banphrase.data.find(i => i.ID === identifier);
+				return result ?? null;
+			}
+			else {
+				throw new sb.Error({
+					message: "Invalid banphrase identifier type",
+					args: {
+						id: identifier,
+						type: typeof identifier
+					}
+				});
+			}
+		}
+
 		/**
 		 * Checks all banphrases associated with given channel and platform. Global ones are checked as well.
 		 * If a channel is configured to use an external API, that is chcked too.
@@ -129,6 +189,10 @@ module.exports = (function () {
 
 			for (const banphrase of banphraseList) {
 				const result = await banphrase.execute(message);
+				if (result === inactiveSymbol) {
+					continue;
+				}
+
 				if (typeof result !== "undefined") {
 					// Return immediately if the message was deemed to be ignored, or responded to with a custom response
 					if (banphrase.Type !== "Replacement") {
