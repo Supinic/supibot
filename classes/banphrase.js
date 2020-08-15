@@ -124,7 +124,7 @@ module.exports = (function () {
 			this.Active = !this.Active;
 			if (typeof this.ID === "number") {
 				await sb.Query.getRecordUpdater(ru => ru
-				    .update("chat_date", "Banphrase")
+				    .update("chat_data", "Banphrase")
 				    .set("Active", this.Active)
 				    .where("ID = %n", this.ID)
 				);
