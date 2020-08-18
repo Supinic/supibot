@@ -402,9 +402,7 @@ module.exports = (function () {
                     	message = `${notifySymbol}${targetUserData.Name} you have reminders, but they're too long to be posted here. Check these IDs: ${listID} here: https://supinic.com/bot/reminder/list`;
                     }
 
-                    const splitRegex = new RegExp(".{1," + limit + "}", "g");
-                    const messageArray = message.match(splitRegex).filter(Boolean);
-
+                    const messageArray = sb.Utils.partitionString(message, limit, 2);
                     for (const splitMessage of messageArray) {
                         await channelData.send(splitMessage);
 
