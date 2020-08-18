@@ -61,7 +61,7 @@ module.exports = (function (Module) {
 		#description;
 
 		constructor (data) {
-			data.expires = Infinity;
+			data.expires = data.expires ?? Infinity;
 			super(data);
 			this.#description = data.description ?? "N/A";
 		}
@@ -92,6 +92,7 @@ module.exports = (function (Module) {
 		constructor () {
 			super();
 			this.data = [];
+			this.pendingCooldownExpiration = 3_600_000;
 		}
 
 		/**
@@ -138,7 +139,11 @@ module.exports = (function (Module) {
 		 * @param {string} [description]
 		 */
 		setPending (user, description) {
-			this.data.push(new Pending({ user, description }));
+			this.data.push(new Pending({
+				user,
+				description,
+				expires: this.pendingCooldownExpiration
+			}));
 		}
 
 		/**
@@ -206,11 +211,11 @@ module.exports = (function (Module) {
 
 		get modulePath () { return "cooldown-manager"; }
 
-		static get pruneCron () { return pruneCron; }
+		get pruneCron () { return pruneCron; }
 
 		// Exporting the classes, just in case they're needed externally
-		static get Cooldown () { return Cooldown; }
-		static get Pending () { return Pending; }
+		get Cooldown () { return Cooldown; }
+		get Pending () { return Pending; }
 
 		/**
 		 * Cleans up.
