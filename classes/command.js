@@ -678,7 +678,7 @@ module.exports = (function () {
 				return false;
 			}
 
-			return string.startsWith(prefix);
+			return (string.startsWith(prefix) && string.trim().length > prefix.length)
 		}
 
 		/**
