@@ -182,7 +182,7 @@ module.exports = (function () {
 			const banphraseList = Banphrase.data.filter(banphrase => (
 				(banphrase.Type !== "API response") && (
 					(banphrase.Channel === (channelData?.ID ?? null))
-					|| (banphrase.Channel === null && banphrase.Platform === channelData?.Platform)
+					|| (banphrase.Channel === null && banphrase.Platform === channelData?.Platform.ID)
 					|| (banphrase.Platform === null)
 				)
             ));
