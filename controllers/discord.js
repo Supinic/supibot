@@ -155,10 +155,13 @@ module.exports = class Discord extends require("./template.js") {
 			if (sb.Command.is(msg)) {
 				const commandPrefix = sb.Command.prefix;
 				const [command] = msg.replace(commandPrefix, "").split(" ").filter(Boolean);
+				const args = (commandArguments[0] === commandPrefix)
+					? commandArguments.slice(2)
+					: commandArguments.slice(1);
 
 				this.handleCommand(
 					command,
-					commandArguments.slice(1).map(i => Discord.removeEmoteTags(i)),
+					args.map(i => Discord.removeEmoteTags(i)),
 					channelData,
 					userData,
 					{
