@@ -426,11 +426,12 @@ module.exports = (function () {
 				else {
 					console.error(e);
 					const loggingContext = {
-						channel: channelData.ID,
 						user: userData.ID,
+						command: command.ID,
+						invocation: identifier,
+						channel: channelData?.ID ?? null,
 						platform: options.platform.ID,
-						isPrivateMessage,
-						append: appendOptions
+						isPrivateMessage
 					};
 
 					const errorID = await sb.SystemLogger.sendError("Command", e, [loggingContext, identifier, ...args]);
