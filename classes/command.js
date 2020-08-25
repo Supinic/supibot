@@ -478,8 +478,8 @@ module.exports = (function () {
 			}
 
 			// Check if a link-only flagged command returns a proper link to be used, if the command didn't fail
-			if (execution.success !== false && command.Flags.linkOnly) {
-				if (typeof execution.link !== "string") {
+			if (command.Flags.linkOnly) {
+				if (execution.success !== false && typeof execution.link !== "string") {
 					throw new sb.Error({
 						message: "A successful command with linkOnly flag must always return a possible link",
 						args: {
@@ -489,7 +489,14 @@ module.exports = (function () {
 				}
 
 				if (context.params.linkOnly === true) {
-					execution.reply = execution.link;
+					if (execution.link === null) {
+						execution.success = false;
+						execution.reply = "No link is present in command result!";
+					}
+					else {
+						execution.reply = execution.link;
+					}
+
 					delete execution.link;
 				}
 			}
