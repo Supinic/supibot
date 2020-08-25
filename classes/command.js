@@ -370,8 +370,13 @@ module.exports = (function () {
 				command: command,
 				transaction: null,
 				privateMessage: isPrivateMessage,
-				append: appendOptions
+				append: appendOptions,
+				params: {}
 			};
+
+			const args = argumentArray
+				.map(i => i.replace(sb.Config.get("WHITESPACE_REGEX"), ""))
+				.filter(Boolean);
 
 			// If the command is rollbackable, set up a transaction.
 			// The command must use the connection in transaction - that's why it is passed to context
@@ -379,12 +384,21 @@ module.exports = (function () {
 				context.transaction = await sb.Query.getTransaction();
 			}
 
+			if (command.Flags.linkOnly) {
+				for (let i = args.length - 1; i >= 0; i--) {
+					const [param, value] = args[i].split(/(?:\w):(?:\w)/);
+					if (param === "linkOnly" && value === "true") {
+						context.params.linkOnly = true;
+						args.splice(i, 1);
+					}
+					else if (param && value) {
+						context.params[param] = value;
+					}
+				}
+			}
+
 			/** @type CommandResult */
 			let execution;
-			const args = argumentArray
-				.map(i => i.replace(sb.Config.get("WHITESPACE_REGEX"), ""))
-				.filter(Boolean);
-
 			try {
 				const start = process.hrtime.bigint();
 				execution = await command.Code(context, ...args);
@@ -457,6 +471,23 @@ module.exports = (function () {
 			// This should be removed once all deprecated calls are refactored
 			if (channelData && execution?.meta?.skipCooldown === true) {
 				console.warn("Deprecated return value - skipCooldown (use cooldown: null instead)", command.ID);
+			}
+
+			// Check if a link-only flagged command returns a proper link to be used, if the command didn't fail
+			if (execution.success !== false && command.Flags.linkOnly) {
+				if (typeof execution.link !== "string") {
+					throw new sb.Error({
+						message: "A successful command with linkOnly flag must always return a possible link",
+						args: {
+							command: command.ID
+						}
+					});
+				}
+
+				if (context.params.linkOnly === true) {
+					execution.reply = execution.link;
+					delete execution.link;
+				}
 			}
 
 			Command.handleCooldown(channelData, userData, command, execution?.cooldown);
@@ -778,4 +809,5 @@ module.exports = (function () {
  * @property {boolean} pipe If true, the command can be used as a part of the "pipe" command.
  * @property {boolean} mention If true, command will attempt to mention its invokers by adding their username at the start.
  * This also requires the channel to have this option enabled.
+ * @property {boolean} linkOnly If true, the command will accept "linkOnly:true" as one of its arguments, and if possible, returns just a link, with no text included.
  */
