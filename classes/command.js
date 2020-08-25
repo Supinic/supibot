@@ -386,7 +386,11 @@ module.exports = (function () {
 
 			if (command.Flags.linkOnly) {
 				for (let i = args.length - 1; i >= 0; i--) {
-					const [param, value] = args[i].split(/(?:\w):(?:\w)/);
+					if (!/^\w+:\w+$/.test(args[i])) {
+						continue;
+					}
+
+					const [total, param, value] = args[i].split(/^(\w+):(\w+)$/);
 					if (param === "linkOnly" && value === "true") {
 						context.params.linkOnly = true;
 						args.splice(i, 1);
