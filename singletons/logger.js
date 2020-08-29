@@ -14,6 +14,7 @@ module.exports = (function (Module) {
 	 */
 	return class Logger extends Module {
 		#crons = [];
+		#presentTables = null;
 
 		static singleton () {
 			if (!Logger.module) {
@@ -30,6 +31,13 @@ module.exports = (function (Module) {
 			if (sb.Config.get("LOG_MESSAGE_CRON", false)) {
 				this.channels = [];
 				this.batches = {};
+
+				sb.Query.getRecordset(rs => rs
+					.select("TABLE_NAME")
+					.from("INFORMATION_SCHEMA", "TABLES")
+					.where("TABLE_SCHEMA = %s", "chat_line")
+					.flat("TABLE_NAME")
+				).then(data => this.#presentTables = data);
 
 				this.messageCron = new sb.Cron({
 					Name: "message-cron",
@@ -250,6 +258,12 @@ module.exports = (function (Module) {
 			const chan = channelData.ID;
 			if (!this.channels.includes(chan)) {
 				const name = channelData.getDatabaseName();
+				if (this.#presentTables !== null && !this.#presentTables.includes(name)) {
+					const exists = sb.Query.isTablePresent("chat_line", name);
+					if (!exists) {
+						await channelData.setup();
+					}
+				}
 
 				this.batches[chan] = await sb.Query.getBatch("chat_line", name, ["User_Alias", "Text", "Posted"]);
 				this.meta[chan] = { amount: 0, length: 0 };
