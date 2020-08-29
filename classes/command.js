@@ -478,7 +478,7 @@ module.exports = (function () {
 			}
 
 			// Check if a link-only flagged command returns a proper link to be used, if the command didn't fail
-			if (execution && command.Flags.linkOnly) {
+			if (execution && execution.success !== false && command.Flags.linkOnly) {
 				if (typeof execution.link !== "string" && execution.link !== null) {
 					throw new sb.Error({
 						message: "Commands supporting link-only mode must always return a possible link as string or null",
