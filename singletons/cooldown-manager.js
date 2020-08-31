@@ -59,6 +59,7 @@ module.exports = (function (Module) {
 
 	class Pending extends Cooldown {
 		#description;
+		#user = null;
 
 		constructor (data) {
 			data.expires = data.expires ?? Infinity;
