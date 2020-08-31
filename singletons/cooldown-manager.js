@@ -57,24 +57,26 @@ module.exports = (function (Module) {
 		get expires () { return this.#expires; }
 	}
 
-	class Pending extends Cooldown {
+	class Pending {
 		#description;
 		#user = null;
 		#expires = null;
 
 		constructor (data) {
-			data.expires = data.expires ?? Infinity;
-			super(data);
+			this.#user = data.user ?? null;
 			this.#description = data.description ?? "N/A";
+			this.#expires = data.expires;
 		}
 
-		check (channel, user, command) {
+		check (user) {
 			return (
 				(user === this.#user)
 				&& (Date.now() <= this.#expires)
 			);
 		}
 
+		get user () { return this.#user; }
+		get expires () { return this.#expires; }
 		get description () { return this.#description; }
 	}
 
@@ -115,8 +117,16 @@ module.exports = (function (Module) {
 		check (channel, user, command, skipPending) {
 			const length = this.data.length;
 			for (let i = 0; i < length; i++) {
-				const cooldown = this.data[i];
-				if ((!skipPending || cooldown.constructor === Cooldown) && cooldown.check(channel, user, command)) {
+				const inhibitor = this.data[i];
+				if (skipPending && inhibitor instanceof Pending) {
+					continue;
+				}
+
+				const isActive = (inhibitor instanceof Cooldown)
+					? inhibitor.check(channel, user, command)
+					: inhibitor.check(user);
+
+				if (isActive) {
 					return false;
 				}
 			}
