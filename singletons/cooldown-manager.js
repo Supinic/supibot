@@ -66,6 +66,13 @@ module.exports = (function (Module) {
 			this.#description = data.description ?? "N/A";
 		}
 
+		check (channel, user, command) {
+			return (
+				(user === this.#user)
+				&& (Date.now() <= this.#expires)
+			);
+		}
+
 		get description () { return this.#description; }
 	}
 
