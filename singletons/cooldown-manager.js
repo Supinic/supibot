@@ -75,6 +75,10 @@ module.exports = (function (Module) {
 			);
 		}
 
+		revoke () {
+			this.#expires = 0;
+		}
+
 		get user () { return this.#user; }
 		get expires () { return this.#expires; }
 		get description () { return this.#description; }
