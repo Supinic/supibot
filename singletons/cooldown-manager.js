@@ -151,7 +151,7 @@ module.exports = (function (Module) {
 			this.data.push(new Pending({
 				user,
 				description,
-				expires: this.pendingCooldownExpiration
+				expires: Date.now() + this.pendingCooldownExpiration
 			}));
 		}
 
