@@ -11,6 +11,7 @@ module.exports = (function () {
 		Flags: { type: "array" },
 		Whitelist_Response: { type: "string" },
 		Static_Data: { type: "descriptor" },
+		Source: { type: "string" },
 		Code: { type: "descriptor" }
 	};
 
