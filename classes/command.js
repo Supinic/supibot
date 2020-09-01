@@ -103,7 +103,7 @@ module.exports = (function () {
 				if (typeof flags === "string") {
 					flags = flags.split(",");
 				}
-				else if (typeof flags === "object") {
+				else if (flags.constructor === Object) {
 					flags = Object.keys(flags);
 				}
 
