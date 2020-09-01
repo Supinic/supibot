@@ -89,7 +89,15 @@ module.exports = (function () {
 			this.Cooldown = data.Cooldown;
 
 			if (data.Flags !== null) {
-				for (const flag of data.Flags) {
+				let flags = data.Flags;
+				if (typeof flags === "string") {
+					flags = flags.split(",");
+				}
+				else if (typeof flags === "object") {
+					flags = Object.keys(flags);
+				}
+
+				for (const flag of flags) {
 					const camelFlag = sb.Utils.convertCase(flag, "kebab", "camel");
 					this.Flags[camelFlag] = true;
 				}
