@@ -22,7 +22,8 @@ module.exports = (function () {
 	return class Command {
 		/**
 		 * Unique numeric ID.
-		 * @type {number}
+		 * If the command is anonymous, a Symbol() takes its place.
+		 * @type {number|symbol}
 		 */
 		ID;
 
@@ -83,7 +84,7 @@ module.exports = (function () {
 		staticData = {};
 
 		constructor (data) {
-			this.ID = data.ID;
+			this.ID = data.ID ?? Symbol();
 
 			this.Name = data.Name;
 
@@ -316,7 +317,7 @@ module.exports = (function () {
 		/**
 		 * Searches for a command, based on its ID, Name or Alias.
 		 * Returns immediately if identifier is already a Command.
-		 * @param {Command|number|string} identifier
+		 * @param {Command|number|string|symbol} identifier
 		 * @returns {Command|null}
 		 * @throws {sb.Error} If identifier is unrecognized
 		 */
@@ -324,7 +325,7 @@ module.exports = (function () {
 			if (identifier instanceof Command) {
 				return identifier;
 			}
-			else if (typeof identifier === "number") {
+			else if (typeof identifier === "number" || typeof identifier === "symbol") {
 				return Command.data.find(command => command.ID === identifier);
 			}
 			else if (typeof identifier === "string") {
@@ -490,18 +491,21 @@ module.exports = (function () {
 				}
 
 				sb.Runtime.incrementCommandsCounter();
-				sb.Logger.logCommandExecution({
-					User_Alias: userData.ID,
-					Command: command.ID,
-					Platform: options.platform.ID,
-					Executed: new sb.Date(),
-					Channel: channelData?.ID ?? null,
-					Success: true,
-					Invocation: identifier,
-					Arguments: JSON.stringify(args),
-					Result: result,
-					Execution_Time: sb.Utils.round(Number(end - start) / 1.0e6, 3)
-				});
+
+				if (typeof command.ID === "number") {
+					sb.Logger.logCommandExecution({
+						User_Alias: userData.ID,
+						Command: command.ID,
+						Platform: options.platform.ID,
+						Executed: new sb.Date(),
+						Channel: channelData?.ID ?? null,
+						Success: true,
+						Invocation: identifier,
+						Arguments: JSON.stringify(args),
+						Result: result,
+						Execution_Time: sb.Utils.round(Number(end - start) / 1.0e6, 3)
+					});
+				}
 			}
 			catch (e) {
 				if (e instanceof sb.errors.APIError) {
@@ -516,25 +520,33 @@ module.exports = (function () {
 				}
 				else {
 					console.error(e);
-					const loggingContext = {
-						user: userData.ID,
-						command: command.ID,
-						invocation: identifier,
-						channel: channelData?.ID ?? null,
-						platform: options.platform.ID,
-						isPrivateMessage
-					};
+					if (typeof command.ID === "number") {
+						const loggingContext = {
+							user: userData.ID,
+							command: command.ID,
+							invocation: identifier,
+							channel: channelData?.ID ?? null,
+							platform: options.platform.ID,
+							isPrivateMessage
+						};
+						const errorID = await sb.SystemLogger.sendError("Command", e, [loggingContext, identifier, ...args]);
+						const prettify = (channelData?.Data.developer)
+							? sb.Config.get("COMMAND_ERROR_DEVELOPER")
+							: sb.Config.get("COMMAND_ERROR_GENERIC");
 
-					const errorID = await sb.SystemLogger.sendError("Command", e, [loggingContext, identifier, ...args]);
-					const prettify = (channelData?.Data.developer)
-						? sb.Config.get("COMMAND_ERROR_DEVELOPER")
-						: sb.Config.get("COMMAND_ERROR_GENERIC");
-
-					execution = {
-						success: false,
-						reason: "error",
-						reply: prettify(errorID, e)
-					};
+						execution = {
+							success: false,
+							reason: "error",
+							reply: prettify(errorID, e)
+						};
+					}
+					else {
+						execution = {
+							success: false,
+							reason: "error",
+							reply: "Anonymous command failed!"
+						};
+					}
 				}
 			}
 
