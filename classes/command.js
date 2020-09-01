@@ -113,11 +113,27 @@ module.exports = (function () {
 			}
 
 			if (data.Static_Data) {
+				let tempData = null;
 				try {
-					this.staticData = eval(data.Static_Data);
+					tempData = eval(data.Static_Data);
 				}
 				catch (e) {
 					console.warn(`Command ${this.ID} has invalid static data definition!`, e);
+					this.Code = async () => ({
+						success: false,
+						reply: "Command has invalid code definition! Please make sure to let @supinic know about this!"
+					});
+				}
+
+				if (typeof tempData === "function") {
+					tempData = tempData();
+				}
+
+				if (tempData && typeof tempData === "object") {
+					this.staticData = tempData;
+				}
+				else {
+					console.warn(`Command ${this.ID} has invalid static data type!`, e);
 					this.Code = async () => ({
 						success: false,
 						reply: "Command has invalid code definition! Please make sure to let @supinic know about this!"
