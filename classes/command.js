@@ -1,8 +1,18 @@
 /* global sb */
 module.exports = (function () {
 	"use strict";
-	
+
 	const PRIVATE_MESSAGE_CHANNEL_ID = Symbol("private-message-channel");
+	const serializeProperties = {
+		Name: { type: "string" },
+		Aliases: { type: "descriptor" },
+		Cooldown: { type: "descriptor" },
+		Description: { type: "string" },
+		Flags: { type: "array" },
+		Whitelist_Response: { type: "string" },
+		Static_Data: { type: "descriptor" },
+		Code: { type: "descriptor" }
+	};
 
 	/**
 	 * Represents a bot command.
@@ -172,23 +182,62 @@ module.exports = (function () {
 			return this.Code(...args);
 		}
 
-		/**
-		 * Serializes the command into its string representation
-		 * @param {Object} options = {}
-		 * @param {"minified"|"pretty"} [options.style] Determines the format of result JSON, minified or prettified.
-		 * @returns {Promise<string>}
-		 */
 		async serialize (options = {}) {
+			if (!this.ID) {
+				throw new sb.Error({
+					message: "Can't serialize a command without an ID"
+				});
+			}
+
 			const row = await sb.Query.getRow("chat_data", "Command");
 			await row.load(this.ID);
 
-			const definition = { ...row.values };
-			delete definition.ID;
+			const result = Object.entries(serializeProperties).map(([key, params]) => {
+				const prop = row.values[key];
+				if (prop === null) {
+					return `\t${key}: ${prop}`;
+				}
 
-			const format = options.style ?? "minified";
-			return (format === "minified")
-				? JSON.stringify(definition)
-				: JSON.stringify(definition, null, 4);
+				let value = prop;
+				if (params.type === "array") {
+					value = JSON.stringify(prop);
+				}
+				else if (typeof prop === "string") {
+					value = prop.split(/\r?\n/).map((j, ind) => (ind === 0) ? j : `\t${j}`).join("\n");
+				}
+
+				if (value !== null && params.type === "string") {
+					return `\t${key}: "${value}"`;
+				}
+				else {
+					return `\t${key}: ${value}`;
+				}
+			}).join(",\n");
+
+			const string = `module.exports = {\n${result}\n};`;
+			if (options.filePath) {
+				const fs = require("fs").promises;
+				if (!options.overwrite) {
+					let exists;
+					try {
+						await fs.access(options.filePath);
+						exists = true;
+					}
+					catch {
+						exists = false;
+					}
+
+					if (exists) {
+						throw new sb.Error({
+							message: "Cannot overwrite an existing file without the options.overwrite flag set"
+						});
+					}
+				}
+
+				await fs.writeFile(options.filePath, string);
+			}
+
+			return string;
 		}
 
 		get Source () { return this.#Source; }
@@ -673,15 +722,18 @@ module.exports = (function () {
 			sb.CooldownManager.unsetPending(userData.ID);
 		}
 
-		/**
-		 * Installs a command from a given string definition.
-		 * @param {string} definition
-		 * @param {Object} options
-		 * @param {boolean} [options.override] If true, existing commands will be updated; if false, installation will not continue.		 *
-		 * @returns {Promise<{success: boolean, result: ?string}>}
-		 */
-		static async install (definition, options = {}) {
-			const data = JSON.parse(definition);
+		static async install (options = {}) {
+			let data = null;
+			if (options.filePath) {
+				data = require(options.filePath);
+			}
+			else {
+				const Module = require("module");
+				const mod = new Module();
+				mod._compile(options.data, "");
+				data = mod.exports;
+			}
+
 			const conflictingAliases = Command.data.filter(i => i.Aliases.includes(data.Name));
 			if (conflictingAliases.length > 0) {
 				return {
@@ -731,7 +783,7 @@ module.exports = (function () {
 			return {
 				success: true,
 				result
-			}
+			};
 		}
 
 		/**
