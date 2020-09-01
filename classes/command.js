@@ -88,6 +88,10 @@ module.exports = (function () {
 			this.ID = data.ID ?? Symbol();
 
 			this.Name = data.Name;
+			if (typeof this.Name !== "string" || this.Name.length === 0) {
+				console.error(`Command ID ${this.ID} has an unusuable name`, data.Name);
+				this.Name = ""; // just a precaution so that the command never gets found out
+			}
 
 			try {
 				this.Aliases = eval(data.Aliases) || [];
