@@ -10,8 +10,8 @@ module.exports = (function () {
 		Description: { type: "string" },
 		Flags: { type: "array" },
 		Whitelist_Response: { type: "string" },
-		Static_Data: { type: "descriptor" },
 		Source: { type: "string" },
+		Static_Data: { type: "descriptor" },
 		Code: { type: "descriptor" }
 	};
 
