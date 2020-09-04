@@ -6,23 +6,29 @@ You can now (relatively) easily clone/fork Supibot and run a local instance!
 
 Follow [the guide](docs/setup.md) if you are interested, and contact me if you have any questions or notes.
 
-~~Supibot is not (yet) designed to be run as separate instances! Any changes to the code are welcome, but the bot was never designed to be run separately from its master instance. As such, all code changes will be reviewed on the master instance. I understand that this is not ideal for feature implementation, and separate instances will hopefully be supported soon.~~
-
 ## Platforms
-Supibot can and is currently run on three distinct platforms:
+Supibot can and is currently run on four distinct platforms:
 - [Twitch](https://twitch.tv/)
 - [Discord](https://discordapp.com/)
 - [Cytube](https://cytu.be/)
 - ~~Mixer~~ (until 2020-07-22)
+- [Minecraft](https://www.minecraft.net/)
 
 ## I want to use Supibot!
-As Supibot is currently run as a single instance that joins multiple channels, it is required to follow one of these steps: 
+Pick your platform, and follow these steps: 
 
 | Platform | Directions |
 | :---: |:---|
-| **Twitch channel** | Follow the guide in the panels of the bot's [Twitch profile](https://twitch.tv/supibot). |
-| **Discord server** | The **admin** of said server contact should PM me on Discord (you don't have to send a friend request first). See [Contact](https://supinic.com/contact). | 
-| **Cytube room**    | Not currently implemented. Please contact me for implementation details. |
+| **Twitch channel**  | Fill out [this form](https://supinic.com/bot/request-bot/form). |
+| **Discord server**  | The **admin** of said server PMs me on Discord (friend request is not required).  | 
+| **Cytube room**     | Support for joining multiple rooms on Cytube is not currently implemented - but can be, requested.  |
+| **Minecraft server**| The owner of given Vanilla/Forge-modded Minecraft server needs to contact me, as this process is not trivial. |
+
+To contact me, see [Contact](https://supinic.com/contact) on my website.
+
+## DankChat integration
+The [DankChat](https://github.com/flex3r/DankChat) mobile application for Twitch chat uses Supibot's API in order to hint its commands in any channel Supibot is actively in!
+It's a really good app to use on the go, and I endorse it.
 
 ## Further reading
 - [Bot feature overview](docs/features.md)
