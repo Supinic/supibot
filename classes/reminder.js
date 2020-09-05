@@ -297,7 +297,7 @@ module.exports = (function () {
 
         /**
          * @param {User} targetUserData The user ID to check for
-         * @param {Channel} channelData The channel ID the reminder was fired in.
+         * @param {Channel} channelData The channel where the reminder was fired
          */
         static async checkActive (targetUserData, channelData) {
             /** @typeof {Reminder[]} */
@@ -322,9 +322,8 @@ module.exports = (function () {
             };
 
             for (const reminder of reminders) {
-                const platformData = sb.Platform.get(reminder.Platform);
+                const platformData = channelData.Platform;
                 const fromUserData = await sb.User.get(reminder.User_From);
-
                 if (reminder.User_From === targetUserData.ID) {
                     await sorter(
                         reminder.Private_Message,
