@@ -167,7 +167,8 @@ module.exports = class Discord extends require("./template.js") {
 					{
 						mentions,
 						guild,
-						privateMessage
+						privateMessage,
+						member: messageObject.member
 					}
 				);
 			}
