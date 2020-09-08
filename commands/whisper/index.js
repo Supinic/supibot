@@ -1,0 +1,25 @@
+module.exports = {
+	Name: "whisper",
+	Aliases: ["/w", "pm"],
+	Author: "supinic",
+	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Cooldown: 1000,
+	Description: "Usable in pipe only - turns the response into a whisper.",
+	Flags: ["pipe"],
+	Whitelist_Response: null,
+	Static_Data: null,
+	Code: (async function whisper (context, ...args) {
+		if (!context.append.pipe) {
+			return {
+				reply: "This command is only usable in pipes!",
+				cooldown: 5000
+			};
+		}
+	
+		return {
+			reply: "Result of your pipe: " + args.join(" "),
+			replyWithPrivateMessage: true
+		}
+	}),
+	Dynamic_Description: null
+};
