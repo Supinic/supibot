@@ -226,7 +226,7 @@ module.exports = (function () {
 				}
 
 				if (value !== null && params.type === "string") {
-					return `\t${key}: "${value}"`;
+					return `\t${key}: ${JSON.stringify(value)}`;
 				}
 				else {
 					return `\t${key}: ${value}`;
