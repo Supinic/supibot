@@ -12,8 +12,9 @@ module.exports = (function () {
 		Description: { type: "string" },
 		Flags: { type: "json" },
 		Whitelist_Response: { type: "string" },
-		Source: { type: "string" },
-		Code: { type: "descriptor" }
+		Static_Data: { type: "descriptor" },
+		Code: { type: "descriptor" },
+		Dynamic_Description: { type: "descriptor" }
 	};
 
 	/**
@@ -259,6 +260,7 @@ module.exports = (function () {
 		}
 
 		get Author () { return this.#Author; }
+		get Last_Edit () { return this.#Last_Edit; }
 
 		/** @override */
 		static async initialize () {
