@@ -2,65 +2,77 @@ module.exports = {
 	Name: "bot",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-08T19:34:36.000Z",
 	Cooldown: 2500,
 	Description: "Allows broadcasters to set various parameters for the bot in their own channel. Usable anywhere, but only applies to their own channel.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function bot (context, command, user) {
+	Code: (async function bot (context, command, channel, ...args) {
 		if (!command) {
 			return {
-				reply: "No command provided! Use enable/disable, or read the extended help!"
+				success: false,
+				reply: "No sub-command provided! Check the command's extended help for more info."
 			};
 		}
 	
-		user = (user) 
-			? await sb.User.get(user, true)
-			: context.user;
+		const channelData = (channel)
+			? sb.Channel.get(channel)
+			: context.channel;
 	
-		if (!user) {
+		if (!channelData) {
 			return {
-				reply: "Invalid user provided!"
+				success: false,
+				reply: "Invalid or no channel provided!"
 			};
 		}
 	
-		if (!context.user.Data.bypassOptOuts && (user !== context.user || !sb.Channel.get(user.Name))) {
+		const hasAccess = (
+			context.user.Data.administrator
+			|| channelData.isUserChannelOwner(context.user)
+			|| channelData.isUserAmbassador(context.user)
+		);
+	
+		if (!hasAccess) {
 			return {
-				reply: "Combination of user and channel is invalid!"
+				success: false,
+				reply: "You're not authorized to do that!"
 			};
 		}
 	
-		const channel = sb.Channel.get(user.Name);
-		const prefix = sb.Config.get("COMMAND_PREFIX");
 		command = command.toLowerCase();
-	
 		switch (command) {
 			case "disable":
-				if (channel.Mode === "Read") {
+				if (channelData.Mode === "Read") {
 					return {
-						reply: "Channel is already set to read-only!"
+						success: false,
+						reply: "That channel is already set to read-only mode!"
 					};
 				}
 	
-				setTimeout(() => channel.Mode = "Read", 5000);
+				setTimeout(() => channelData.Mode = "Read", 5000);
 				return {
-					reply: `Channel set to read-only mode in 5 seconds. Use "${prefix}${this.Name}" enable in a different channel to re-enable.`
+					reply: sb.Utils.tag.trim `
+						I will go to read-only mode in #${channelData.Name} in 5 seconds.
+						Use the "${sb.Command.prefix}${this.Name} enable ${channelData.Name}" command in private messages to re-enable me.
+					`
 				};
 	
 			case "enable":
-				if (channel.Mode !== "Read") {
+				if (channelData.Mode !== "Read") {
 					return {
-						reply: "Channel is already set to write!"
+						success: false,
+						reply: "I'm already active in that channel!"
 					};
 				}
 	
-				channel.Mode = "Write";
+				channelData.Mode = "Write";
 				return {
-					reply: "Channel mode reset back to write."
+					reply: "I successfully disabled read-only mode and will respond to messages again."
 				};
 	
 			default: return {
+				success: false,
 				reply: "Invalid command provided!"
 			}
 		}
