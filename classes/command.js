@@ -6,12 +6,13 @@ module.exports = (function () {
 	const serializeProperties = {
 		Name: { type: "string" },
 		Aliases: { type: "descriptor" },
+		Author: { type: "string" },
+		Last_Edit: { type: "json" },
 		Cooldown: { type: "descriptor" },
 		Description: { type: "string" },
-		Flags: { type: "array" },
+		Flags: { type: "json" },
 		Whitelist_Response: { type: "string" },
 		Source: { type: "string" },
-		Static_Data: { type: "descriptor" },
 		Code: { type: "descriptor" }
 	};
 
@@ -66,10 +67,18 @@ module.exports = (function () {
 		Whitelist_Response = null;
 
 		/**
-		 * Determines the GitHub(?) source of the command. Used for updates and further command downloads.
+		 * Determines the author of the command. Used for updates and further command downloads.
+		 * If null, the command is considered created anonymously.
 		 * @type {string}
 		 */
-		#Source;
+		#Author = null;
+
+		/**
+		 * Determines the last edit of the command, whether in filesystem or database.
+		 * Cannot be modified from within runtime.
+		 * @type {sb.Date}
+		 */
+		#Last_Edit;
 
 		/**
 		 * Session-specific data for the command that can be modified at runtime.
@@ -94,9 +103,10 @@ module.exports = (function () {
 			}
 
 			try {
-				this.Aliases = eval(data.Aliases) || [];
+				this.Aliases = JSON.parse(data.Aliases) || [];
 			}
 			catch (e) {
+				this.Aliases = [];
 				console.warn(`Command ${this.Name} (${this.ID}) has invalid aliases definition: ${e}`);
 			}
 
@@ -123,7 +133,9 @@ module.exports = (function () {
 
 			this.Whitelist_Response = data.Whitelist_Response;
 
-			this.#Source = data.Source;
+			this.#Author = data.Author ?? null;
+
+			this.#Last_Edit = data.Last_Edit;
 
 			try {
 				this.Code = eval(data.Code);
@@ -205,7 +217,7 @@ module.exports = (function () {
 				}
 
 				let value = prop;
-				if (params.type === "array") {
+				if (params.type === "json") {
 					value = JSON.stringify(prop);
 				}
 				else if (typeof prop === "string") {
@@ -246,7 +258,7 @@ module.exports = (function () {
 			return string;
 		}
 
-		get Source () { return this.#Source; }
+		get Author () { return this.#Author; }
 
 		/** @override */
 		static async initialize () {
