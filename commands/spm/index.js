@@ -2,11 +2,11 @@ module.exports = {
 	Name: "spm",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T18:08:08.000Z",
+	Last_Edit: "2020-09-08T19:44:34.000Z",
 	Cooldown: 0,
 	Description: "Various utility subcommands related to supibot-package-manager.",
 	Flags: ["developer","mention","whitelist"],
-	Whitelist_Response: null,
+	Whitelist_Response: "Only Supi can use this command, but you can check the repository here: https://github.com/supinic/supibot-package-manager peepoHackies\n\t",
 	Static_Data: ({
 		exists: require("util").promisify(require("fs").exists)
 	}),
