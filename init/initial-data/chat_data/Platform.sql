@@ -5,9 +5,10 @@ VALUES
 	"bans": false,
 	"bits": false,
 	"clearchat": false,
-	"giftSubs": false,	
+	"giftSubs": false,
 	"messages": false,
 	"subs": false,
+	"timeouts": false,
 	"whispers": false
 }','{
 	"modes": {

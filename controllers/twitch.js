@@ -553,8 +553,12 @@ module.exports = class Twitch extends require("./template.js") {
 					this.client.part(channelData.Name)
 				]);
 
-				const timestamp = new sb.Date().format("Y-m-d H:i:s");
-				console.warn(`[${timestamp}] Bot has been permabanned in Twitch channel ${channel} (reason: ${reason}). Setting mode to Inactive, and parting. `);
+				console.warn("Bot banned", {
+					timestamp: new sb.Date().format("Y-m-d H:i:s"),
+					channel,
+					reason,
+					length
+				});
 			}
 
 			if (typeof channelData.sessionData.recentBans === "undefined") {
@@ -563,10 +567,7 @@ module.exports = class Twitch extends require("./template.js") {
 
 			const limit = this.platform.Data.recentBanThreshold ?? Infinity;
 			if (!channelData.sessionData.parted && channelData.sessionData.recentBans > limit) {
-				console.debug(`Parting channel ${channelData.Name} because ban threshold has been exceeded!`);
-
 				channelData.sessionData.parted = true;
-				this.client.part(channelData.Name);
 
 				setTimeout(() => {
 					if (!channelData?.sessionData) {
@@ -577,6 +578,8 @@ module.exports = class Twitch extends require("./template.js") {
 					channelData.sessionData.parted = false;
 					this.client.join(channelData.Name);
 				}, 60_000);
+
+				await this.client.part(channelData.Name);
 			}
 
 			if (!channelData.sessionData.clearRecentBansTimeout) {
@@ -595,7 +598,10 @@ module.exports = class Twitch extends require("./template.js") {
 
 			channelData.sessionData.recentBans++;
 
-			if (this.platform.Logging.bans) {
+			if (
+				(length === null && this.platform.Logging.bans)
+				|| (length !== null && this.platform.Logging.timeouts)
+			) {
 				sb.Logger.logBan(user, channelData, length, new sb.Date(), reason);
 			}
 		}
