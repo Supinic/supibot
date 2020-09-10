@@ -172,18 +172,16 @@ module.exports = class Twitch extends require("./template.js") {
 				}
 
 				case "no_permission": {
-					channelData.send("I don't have permission to do that FeelsBadMan");
+					channelData.send("I don't have permission to do that.");
 					break;
 				}
 
 				case "host_on":
+				case "host_off":
 				case "host_target_went_offline": {
 					// ignore these messages
 					break;
 				}
-
-				default:
-					console.debug("incoming notice:", channelData, messageID, rest);
 			}
 		});
 
