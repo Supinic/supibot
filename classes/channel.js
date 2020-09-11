@@ -325,6 +325,11 @@ module.exports = (function () {
             if (Channel.data.length === 0) {
                 console.warn("No channels initialized - bot will not attempt to join any channels");
             }
+
+            // Whenever channels are reloaded, chat modules also need to be reloaded and reattached.
+            if (sb.ChatModule) {
+                await sb.ChatModule.reloadData();
+            }
         }
 
         static async reloadData () {
