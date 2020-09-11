@@ -478,12 +478,14 @@ module.exports = (function () {
 			}
 
 			if (command.Flags.linkOnly || command.Flags.useParams) {
+				const paramRegex = /^([^\s:]+):([^\s:]+)$/;
+
 				for (let i = args.length - 1; i >= 0; i--) {
-					if (!/^\w+:\w+$/.test(args[i])) {
+					if (!paramRegex.test(args[i])) {
 						continue;
 					}
 
-					const [total, param, value] = args[i].split(/^(\w+):(\w+)$/);
+					const [total, param, value] = args[i].split(paramRegex);
 					if (param === "linkOnly" && value === "true") {
 						context.params.linkOnly = true;
 						args.splice(i, 1);
