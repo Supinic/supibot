@@ -477,7 +477,7 @@ module.exports = (function () {
 				context.transaction = await sb.Query.getTransaction();
 			}
 
-			if (command.Flags.linkOnly) {
+			if (command.Flags.linkOnly || command.Flags.useParams) {
 				for (let i = args.length - 1; i >= 0; i--) {
 					if (!/^\w+:\w+$/.test(args[i])) {
 						continue;
@@ -928,4 +928,5 @@ module.exports = (function () {
  * @property {boolean} mention If true, command will attempt to mention its invokers by adding their username at the start.
  * This also requires the channel to have this option enabled.
  * @property {boolean} linkOnly If true, the command will accept "linkOnly:true" as one of its arguments, and if possible, returns just a link, with no text included.
+ * @property {boolean} useParams If true, all arguments in form of key:value will be parsed into an object
  */
