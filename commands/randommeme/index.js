@@ -2,7 +2,7 @@ module.exports = {
 	Name: "randommeme",
 	Aliases: ["rm"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T18:40:15.000Z",
+	Last_Edit: "2020-09-11T18:11:28.000Z",
 	Cooldown: 15000,
 	Description: "If no parameters are provided, posts a random reddit meme. If you provide a subreddit, a post will be chosen randomly. NSFW subreddits and posts are only available on NSFW Discord channels!",
 	Flags: ["link-only","mention","pipe"],
@@ -97,6 +97,7 @@ module.exports = {
 		}
 	
 		return {
+			repeats: 10,
 			expiration,
 			RedditPost,
 			Subreddit,
@@ -189,7 +190,7 @@ module.exports = {
 			// Add the currently used post ID at the beginning of the array
 			repeatedPosts.unshift(post.id);
 			// And then splice off everything over the length of 3.
-			repeatedPosts.splice(3);
+			repeatedPosts.splice(this.staticData.repeats);
 	
 			const symbol = (forum.quarantine) ? "⚠" : "";
 			return {
