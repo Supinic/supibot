@@ -2,7 +2,7 @@ module.exports = {
 	Name: "top",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-12T18:17:55.000Z",
 	Cooldown: 60000,
 	Description: "Posts the top X (implicitly 10) users by chat lines sent in the context of current channel.",
 	Flags: ["pipe","whitelist"],
@@ -33,7 +33,7 @@ module.exports = {
 	
 		const chatters = top.map((i, ind) => {
 			const name = i.Name[0] + `\u{E0000}` + i.Name.slice(1);
-			return `#${ind + 1}: ${name} (${i.Total})`;
+			return `#${ind + 1}: ${name} (${sb.Utils.groupDigits(i.Total)})`;
 		}).join(", ");
 	
 		return {

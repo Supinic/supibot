@@ -2,7 +2,7 @@ module.exports = {
 	Name: "countlinechannel",
 	Aliases: ["clc"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-12T18:17:02.000Z",
 	Cooldown: 60000,
 	Description: "Fetches the amount of chat lines in the current channel.",
 	Flags: ["mention","pipe","skip-banphrase"],
@@ -49,7 +49,7 @@ module.exports = {
 			));
 	
 			return {
-				reply: `Currently logging ${amount} messages in this channel.`
+				reply: `Currently logging ${sb.Utils.groupDigits(amount)} messages in this channel.`
 			};
 		}
 	}),

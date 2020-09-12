@@ -2,7 +2,7 @@ module.exports = {
 	Name: "atop",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-12T18:16:28.000Z",
 	Cooldown: 0,
 	Description: "Fetches the top 10 users by total amount of chat lines across all channels. This is a very heavy operation on SQL, so please use it sparingly.",
 	Flags: ["mention","pipe","system","whitelist"],
@@ -20,7 +20,7 @@ module.exports = {
 		const users = await sb.User.getMultiple(top.map(i => i.User_Alias));
 		const string = top.map((stats, index) => {
 			const user = users.find(i => stats.User_Alias === i.ID);
-			return `#${index + 1}: ${user.Name} (${stats.Total})`;
+			return `#${index + 1}: ${user.Name} (${sb.Utils.groupDigits(stats.Total)})`;
 		}).join("; ");
 	
 		return { 

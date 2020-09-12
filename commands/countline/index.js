@@ -2,7 +2,7 @@ module.exports = {
 	Name: "countline",
 	Aliases: ["cl"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-12T18:16:41.000Z",
 	Cooldown: 15000,
 	Description: "Fetches the amount of chat line you (or a specified user) have in the current channel.",
 	Flags: ["mention","opt-out","pipe"],
@@ -46,7 +46,7 @@ module.exports = {
 	
 		const who = (user.ID === context.user.ID) ? "You have" : "That user has";
 		return {
-			reply: `${who} sent ${lines.Total} chat lines in this channel so far.`
+			reply: `${who} sent ${sb.Utils.groupDigits(lines.Total)} chat lines in this channel so far.`
 		};
 	}),
 	Dynamic_Description: null

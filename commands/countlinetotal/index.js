@@ -2,7 +2,7 @@ module.exports = {
 	Name: "countlinetotal",
 	Aliases: ["clt"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-12T18:19:43.000Z",
 	Cooldown: 0,
 	Description: "Fetches the amount of data lines from ALL the log tables, including the total size.",
 	Flags: ["mention","pipe","skip-banphrase","system","whitelist"],
@@ -52,10 +52,10 @@ module.exports = {
 	
 		return {
 			reply: sb.Utils.tag.trim `
-				Currently logging ${preciseLines} lines in total across all channels,
+				Currently logging ${sb.Utils.groupDigits(preciseLines)} lines in total across all channels,
 				taking up ~${currentSize} GB of space.
 				Lines are added at a rate of ~${megabytesPerHour} MB/hr.
-				Supibot's hard drive will run out of space approximately on ${fillDate.format("Y-m-d")}.
+				At this rate, Supibot's hard drive will run out of space approximately on ${fillDate.format("Y-m-d")}.
 			`
 		};
 	}),

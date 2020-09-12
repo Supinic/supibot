@@ -2,7 +2,7 @@ module.exports = {
 	Name: "totalcountline",
 	Aliases: ["acl", "tcl"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-12T18:17:25.000Z",
 	Cooldown: 30000,
 	Description: "Fetches the total amount of a user's (or yours, if nobody was specified) chat lines in all tracked channels summed together.",
 	Flags: ["mention","pipe","skip-banphrase"],
@@ -35,7 +35,7 @@ module.exports = {
 	
 		const who = (context.user.ID === userData.ID) ? "You have" : "That user has";
 		return { 
-			reply: `${who} sent ${data.Total} chat lines across all tracked channels so far.`
+			reply: `${who} sent ${sb.Utils.groupDigits(data.Total)} chat lines across all tracked channels so far.`
 		};
 	}),
 	Dynamic_Description: null
