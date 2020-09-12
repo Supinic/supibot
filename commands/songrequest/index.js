@@ -2,7 +2,7 @@ module.exports = {
 	Name: "songrequest",
 	Aliases: ["sr"],
 	Author: "supinic",
-	Last_Edit: "2020-09-11T17:45:38.000Z",
+	Last_Edit: "2020-09-12T18:03:10.000Z",
 	Cooldown: 5000,
 	Description: "Requests a song to play on Supinic's stream. You can use \"start:\" and \"end:\" to request parts of a song using seconds or a time syntax. \"start:100\" or \"end:05:30\", for example.",
 	Flags: ["mention","pipe","whitelist"],
@@ -364,7 +364,7 @@ module.exports = {
 			}
 			else if (type === "youtube") {
 				const data = await sb.Utils.searchYoutube(
-					args.join(" ").replace(/-/g, ""),
+					args.join(" "),
 					sb.Config.get("API_GOOGLE_YOUTUBE")
 				);
 	
