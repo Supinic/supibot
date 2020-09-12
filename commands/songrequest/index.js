@@ -2,7 +2,7 @@ module.exports = {
 	Name: "songrequest",
 	Aliases: ["sr"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-11T17:45:38.000Z",
 	Cooldown: 5000,
 	Description: "Requests a song to play on Supinic's stream. You can use \"start:\" and \"end:\" to request parts of a song using seconds or a time syntax. \"start:100\" or \"end:05:30\", for example.",
 	Flags: ["mention","pipe","whitelist"],
@@ -470,7 +470,13 @@ module.exports = {
 	
 			started = null;
 			videoStatus = "Queued";
-			when = sb.Utils.timeDelta(playingDate);
+			
+			if (playingDate <= sb.Date.now()) {
+				when = "right now!";
+			}
+			else {
+				when = sb.Utils.timeDelta(playingDate);
+			}
 		}
 	
 		const videoType = data.videoType ?? await sb.Query.getRecordset(rs => rs
