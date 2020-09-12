@@ -2,15 +2,14 @@ module.exports = {
 	Name: "randomhistoricevent",
 	Aliases: ["rhe"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-11T17:34:01.000Z",
 	Cooldown: 10000,
-	Description: null,
+	Description: "For a given day, posts a random historic event that happened on that day. If not provided, uses the today's date.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
 	Static_Data: ({
 		formatter: new Intl.DateTimeFormat("en-GB", {
-			month: "long",
-			day: "numeric"
+			month: "long"
 		})
 	}),
 	Code: (async function randomHistoricEvent (context, ...args) {
@@ -36,8 +35,9 @@ module.exports = {
 			.single()
 		);
 	
+		const fullMonth = this.staticData.formatter.format(date);
 		return {
-			reply: `Year ${event.Year}: ${event.Text}`
+			reply: `${fullMonth} ${day}, ${event.Year}: ${event.Text}`
 		};
 	}),
 	Dynamic_Description: null
