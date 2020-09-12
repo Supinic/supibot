@@ -2,7 +2,7 @@ module.exports = {
 	Name: "ocr",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-11T17:43:08.000Z",
 	Cooldown: 10000,
 	Description: "Takes your image link and attempts to find the text in it by using OCR.",
 	Flags: ["mention","pipe"],
@@ -11,8 +11,7 @@ module.exports = {
 		languages: {
 			ara: "Arabic",
 			bul: "Bulgarian",
-			chs: "Chinese (Simplified)",
-			cht: "Chinese (Traditional)",
+			chs: "Chinese",
 			hrv: "Croatian",
 			cze: "Czech",
 			dan: "Danish",
@@ -56,7 +55,7 @@ module.exports = {
 			language = "chs"; // thanks for using standard codes everyone
 		}
 	
-		if (!Object.keys(this.staticData.languages).includes(language)) {
+		if (!this.staticData.languages[language]) {
 			return {
 				success: false,
 				reply: "Language not supported, use one from the list in the help description",
@@ -109,7 +108,7 @@ module.exports = {
 	}),
 	Dynamic_Description: async (prefix, values) => {
 		const { languages } = values.getStaticData();
-		const list = Object.entries(languages).map(([code, name]) => `<li>${name} - <code>${code}</code></li>`).join("");
+		const list = Object.values(languages).map(name => `<li>${name}</li>`).join("");
 	
 		return [
 			"Attempts to read a provided image with OCR, and posts the found text in chat.",
