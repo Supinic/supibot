@@ -2,7 +2,7 @@ module.exports = {
 	Name: "check",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-11T17:47:06.000Z",
 	Cooldown: 10000,
 	Description: "Checks certain user or system variables. For a list of types, check the command's extended help.",
 	Flags: ["mention","pipe"],
@@ -458,6 +458,7 @@ module.exports = {
 						status ${status}
 						(posted ${sb.Utils.timeDelta(date)}${updated}):
 						${text}
+						Detail: https://supinic.com/data/suggestion/${ID}
 					`
 					};
 				}
