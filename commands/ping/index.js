@@ -2,7 +2,7 @@ module.exports = {
 	Name: "ping",
 	Aliases: ["pang","peng","pong","pung","pyng"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-11T18:07:52.000Z",
 	Cooldown: 5000,
 	Description: "Ping!",
 	Flags: ["pipe","skip-banphrase"],
@@ -44,6 +44,12 @@ module.exports = {
 			Swap: sb.Utils.formatByteSize(swapUsed, 0) + "/" + sb.Utils.formatByteSize(swapTotal, 0),
 			"Commands used": sb.Runtime.commandsUsed
 		};
+	
+		if (sb.Cache) {
+			data.Redis = (sb.Cache.active)
+				? String(await sb.Cache.server.dbsize()) + " keys"
+				: "not online"
+		}
 	
 		if (context.channel) {
 			const type = context.channel.Banphrase_API_Type;
