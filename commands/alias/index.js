@@ -2,7 +2,7 @@ module.exports = {
 	Name: "alias",
 	Aliases: ["$"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-11T17:17:12.000Z",
 	Cooldown: 2500,
 	Description: "This command lets you create your own aliases (shorthands) for any other combination of commands and arguments. Check the extended help for step-by-step info.",
 	Flags: ["mention","pipe"],
@@ -77,10 +77,10 @@ module.exports = {
 				else if (keywordRegex.test(arg)) {
 					const type = arg.match(keywordRegex)[1];
 					if (type === "channel") {
-						resultArguments.push(context.channel?.Name ?? "[whispers]");
+						resultArguments.push(arg.replace(keywordRegex, context.channel?.Name ?? "[whispers]"));
 					}
 					else if (type === "executor") {
-						resultArguments.push(context.user.Name);
+						resultArguments.push(arg.replace(keywordRegex, context.user.Name));
 					}
 					else {
 						return {
