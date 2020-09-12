@@ -2,7 +2,7 @@ module.exports = {
 	Name: "emotecheck",
 	Aliases: ["ec"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-11T16:54:45.000Z",
 	Cooldown: 15000,
 	Description: "Posts the list of each of Twitch's amazing \"global\" emote sets.",
 	Flags: ["mention","pipe"],
@@ -347,9 +347,28 @@ module.exports = {
 					"HypeUnicorn5",
 					"HypeUnicorn6",
 				]
-			}
+			},
+			{
+				name: "dankpeepo",
+				aliases: [],
+				description: "A list of dank peepo emotes.",
+				emotes: [
+					"peepoGladDank",
+					"peepoGreedDank",
+					"peepoHmmDank",
+					"peepoLagDank",
+					"peepoMadDank",
+					"peepoNerdDank",
+					"peepoSadDank",
+					"peepoSadSip",
+					"peepoSpookDank",
+					"peepoWeirdDank",
+					"supiniOkay",
+					"supiniThink"
+				]
+			},
 		]
-	}),
+	});,
 	Code: (async function emoteCheck (context, name) {
 		if (!name) {
 			return {
