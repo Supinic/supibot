@@ -2,7 +2,7 @@ module.exports = {
 	Name: "wiki",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-11T17:12:14.000Z",
 	Cooldown: 15000,
 	Description: "Fetches the headline of the first article found according to user query. Watch out, articles might be case sensitive.",
 	Flags: ["mention","pipe"],
@@ -64,9 +64,15 @@ module.exports = {
 	Dynamic_Description: async (prefix) => {
 		return [
 			"Finds the summary of a given Wikipedia article.",
-			"Arguments are the name of the article you want to find.",
+			"Watch out - the topic is case sensitive, unfortunately, that's how Wikipedia works, apparently.",
 			"",
-			prefix + "wiki uncanny valley => In aesthetics, the uncanny valley is a hypothesized relationship between the degree...",
+	
+			`<code>${prefix}wiki (topic)</code>`,
+			"Posts a link and summary for given wiki topic for English Wikipedia."
+			"",
+	
+			`<code>${prefix}wiki lang:(language) (topic)</code>`,
+			"Posts a link and summary for given wiki topic - but this time, in that language's Wikipedia."
 			"..."
 		];
 	}
