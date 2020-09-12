@@ -2,7 +2,7 @@ module.exports = {
 	Name: "weather",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-11T18:02:49.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the current weather in a given location. You can specify parameters to check forecast, or mention a user to get their location, if they set it up. Check all possibilities in e xtended help. Weather data powered by Darksky.",
 	Flags: ["mention","pipe"],
@@ -28,9 +28,10 @@ module.exports = {
 		let number = null;
 		let type = "currently";
 		const weatherRegex = /\b(hour|day|week)(\+?(\d+))?$/;
+		const historyRegex = /-\s*\d/;
 	
 		if (args.length > 0) {
-			if (args[args.length - 1].includes("-")) {
+			if (historyRegex.test(args[args.length - 1])) {
 				return { reply: "Checking for weather history is not currently implemented" };
 			}
 			else if (args && weatherRegex.test(args[args.length - 1])) {
@@ -49,7 +50,7 @@ module.exports = {
 				}
 			}
 		}
-		
+	
 		let skipLocation = false;
 		let coords = null;
 		let formattedAddress = null;
