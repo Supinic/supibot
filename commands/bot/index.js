@@ -2,13 +2,37 @@ module.exports = {
 	Name: "bot",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T19:34:36.000Z",
+	Last_Edit: "2020-09-11T16:48:47.000Z",
 	Cooldown: 2500,
 	Description: "Allows broadcasters to set various parameters for the bot in their own channel. Usable anywhere, but only applies to their own channel.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","pipe","skip-banphrase","use-params"],
 	Whitelist_Response: null,
-	Static_Data: null,
-	Code: (async function bot (context, command, channel, ...args) {
+	Static_Data: ({
+		allowedModes: [
+			{
+				name: "Ignore",
+				description: "Will send the message as if there was no API configured."
+			},
+			{
+				name: "Notify", 
+				description: "Will send the message regardless, but adds a little warning emoji ⚠",
+			},
+			{
+				name: "Nothing", 
+				description: "Will not reply at all.",
+			},
+			{
+				name: "Refuse",
+				description: "Will reply with a message warning that the API did not respond."
+			},
+			{
+				name: "Whisper",
+				description: "Won't reply in the main channel at all, but the response will be whispered to target user."
+			}
+		]
+	}),
+	Code: (async function bot (context, command, ...args) {
+		const { params } = context;
 		if (!command) {
 			return {
 				success: false,
@@ -16,8 +40,8 @@ module.exports = {
 			};
 		}
 	
-		const channelData = (channel)
-			? sb.Channel.get(channel)
+		const channelData = (params.channel)
+			? sb.Channel.get(params.channel)
 			: context.channel;
 	
 		if (!channelData) {
@@ -71,6 +95,59 @@ module.exports = {
 					reply: "I successfully disabled read-only mode and will respond to messages again."
 				};
 	
+			case "api": {
+				const result = [];
+				if (params.url) {
+					if (params.url === "none") {
+						channelData.saveProperty("Banphrase_API_URL", null);
+						channelData.saveProperty("Banphrase_API_Type", null);
+						result.push("Banphrase API URL has been unset.");
+					}
+					else {
+						try {
+							await sb.Banphrase.executeExternalAPI("test", "Pajbot", params.url);
+						}
+						catch {
+							return {
+								success: false,
+								reply: "Banphrase API URL is not valid - no response received!"
+							}
+						}
+	
+						channelData.saveProperty("Banphrase_API_URL", params.url);
+						channelData.saveProperty("Banphrase_API_Type", "Pajbot");
+						result.push(`Banphrase API URL has been set to ${params.url}.`);
+					}
+				}
+	
+				if (params.mode) {
+					params.mode = sb.Utils.capitalize(params.mode.toLowerCase());
+					const found = this.staticData.allowedModes.find(i => i.name === params.mode);
+	
+					if (!found) {
+						return {
+							success: false,
+							reply: "Banphrase API mode is not allowed! Use one of: " + this.staticData.allowedModes.join(", ")
+						};
+					}
+	
+					channelData.saveProperty("Banphrase_API_URL", (params.url === "none") ? null : params.url);
+					result.push(`Banphrase API mode has been set to ${params.mode}.`);
+				}
+	
+				if (result.length === 0) {
+					return {
+						success: false,
+						reply: "No changes have been made!"
+					};
+				}
+				else {
+					return {
+						reply: result.join(" ")
+					};
+				}
+			}
+	
 			default: return {
 				success: false,
 				reply: "Invalid command provided!"
@@ -78,19 +155,38 @@ module.exports = {
 		}
 	})
 	,
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: async (prefix, values) => {
+		const { allowedModes } = values.getStaticData();
+		const list = allowedModes.map(i => `<li><code>${i.name}</code><br>${i.description}</li><br>`).join("");
 	
 		return [
-			"Currently, you can enable or disable the bot in your channel.",
-			"After disabling, you can enable it again in a different channel. I recommend @supibot - that one is always active.",
+			"Various bot configuration related commands.",
+			"For a given channel, only its owner or ambassadors can use this command.",
+			`All sub-commands listed accept the "channel:(name)" parameter, if you want to configure a channel outside of the channel itself.`,
 			"",
 	
 			`<code>${prefix}bot disable</code>`,
-			"Disables the bot in your channel indefinitely",
+			`<code>${prefix}bot disable channel:(name)</code>`,
+			"After a 5 second timeout, disables the bot given channel until enabled again.",
+			"If no channel is provided, the current is used.",
 			"",
 	
 			`<code>${prefix}bot enable supinic</code>`,
-			"Re-enables the bot in channel <u>supinic</u>",
+			`<code>${prefix}bot enable channel:(name)</code>`,
+			"If the bot has been disabled in the given channel, this will re-enable it.",
+			"",
+			
+			`<code>${prefix}bot api url:(link) mode:(mode)</code>`,
+			`<code>${prefix}bot api channel:(channel) url:(link) mode:(mode)</code>`,
+			"Configures the channel's Pajbot banphrase API.",
+			"You can change the URL, but it has to reply properly to a test message.",
+			`You can unset the URL by using "url:none".`,
+			"",
+	
+			"You can also change the mode of Supibot's behaviour when the API times out.",
+			"Modes:",
+			"",
+			list		
 		];
 	}
 };
