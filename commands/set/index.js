@@ -2,7 +2,7 @@ module.exports = {
 	Name: "set",
 	Aliases: ["unset"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-15T16:42:32.000Z",
 	Cooldown: 5000,
 	Description: "Sets/unsets certain variables within Supibot. Check the extended help for full info.",
 	Flags: ["mention","owner-override"],
@@ -57,7 +57,23 @@ module.exports = {
 					Have fun and stay responsible 🙂
 				`;
 	
-				await context.platform.pm(message, userData.Name);
+				try {
+					await context.platform.pm(message, userData.Name);
+				}
+				catch {
+					const selfBotUserData = await sb.User.get(context.platform.Self_Name);
+					await sb.Reminder.create({
+						User_From: selfBotUserData.ID,
+						User_To: userData.ID,
+						Platform: context.platform.ID,
+						Channel: context.channel.ID,
+						Created: new sb.Date(),
+						Active: true,
+						Schedule: null,
+						Text: message,
+						Private_Message: false
+					}, true);
+				}
 			}
 	
 			const string = (type === "set") ? "now" : "no longer";
@@ -375,7 +391,7 @@ module.exports = {
 							string: birthdayFormatter.format(date)
 						};
 						await context.user.saveProperty("Data", context.user.Data);
-						
+	
 						return {
 							reply: `Successfully set your birthday to ${context.user.Data.birthday.string}.`
 						};
@@ -390,7 +406,7 @@ module.exports = {
 	
 						context.user.Data.birthday = null;
 						await context.user.saveProperty("Data", context.user.Data);
-						
+	
 						return {
 							reply: "Your birthday date has been unset successfully!"
 						};
