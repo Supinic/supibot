@@ -2,7 +2,7 @@ module.exports = {
 	Name: "wiki",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-11T17:12:14.000Z",
+	Last_Edit: "2020-09-15T17:19:31.000Z",
 	Cooldown: 15000,
 	Description: "Fetches the headline of the first article found according to user query. Watch out, articles might be case sensitive.",
 	Flags: ["mention","pipe"],
@@ -68,11 +68,11 @@ module.exports = {
 			"",
 	
 			`<code>${prefix}wiki (topic)</code>`,
-			"Posts a link and summary for given wiki topic for English Wikipedia."
+			"Posts a link and summary for given wiki topic for English Wikipedia.",
 			"",
 	
 			`<code>${prefix}wiki lang:(language) (topic)</code>`,
-			"Posts a link and summary for given wiki topic - but this time, in that language's Wikipedia."
+			"Posts a link and summary for given wiki topic - but this time, in that language's Wikipedia.",
 			"..."
 		];
 	}
