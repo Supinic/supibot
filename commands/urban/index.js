@@ -2,7 +2,7 @@ module.exports = {
 	Name: "urban",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-15T16:30:05.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the top definition of a given term from UrbanDictionary. You can append \"index:#\" at the end to access definitions that aren't first in the search",
 	Flags: ["mention","pipe"],
@@ -61,7 +61,10 @@ module.exports = {
 			};
 		}
 	
-		const items = data.list.filter(i => i.word.toLowerCase() === args.join(" ").toLowerCase());
+		const items = data.list
+			.filter(i => i.word.toLowerCase() === args.join(" ").toLowerCase())
+			.sort((a, b) => b.thumbs_up - a.thumbs_up);
+	
 		const item = items[index ?? 0];
 		if (!item) {
 			return {
