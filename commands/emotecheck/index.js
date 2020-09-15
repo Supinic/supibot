@@ -2,7 +2,7 @@ module.exports = {
 	Name: "emotecheck",
 	Aliases: ["ec"],
 	Author: "supinic",
-	Last_Edit: "2020-09-12T17:27:48.000Z",
+	Last_Edit: "2020-09-15T17:14:43.000Z",
 	Cooldown: 15000,
 	Description: "Posts the list of each of Twitch's amazing \"global\" emote sets.",
 	Flags: ["mention","pipe"],
@@ -369,7 +369,7 @@ module.exports = {
 				]
 			},
 		]
-	});,
+	}),
 	Code: (async function emoteCheck (context, name) {
 		if (!name) {
 			return {
