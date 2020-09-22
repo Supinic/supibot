@@ -2,7 +2,7 @@ module.exports = {
 	Name: "stalk",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-22T17:42:49.000Z",
 	Cooldown: 5000,
 	Description: "For a given user, attempts to find the message they last sent in chat, plus the channel and time when they posted it.",
 	Flags: ["block","mention","opt-out","pipe"],
@@ -10,7 +10,7 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function stalk (context, user) {
 		if (!user) {
-			return { 
+			return {
 				success: false,
 				reply: "👀 I'm watching you... (no user provided!)"
 			};
@@ -32,7 +32,7 @@ module.exports = {
 		else if (targetUser.Name === context.platform.Self_Name) {
 			return {
 				success: false,
-				reply: "🤖 I'm right here 🤖" 
+				reply: "🤖 I'm right here 🤖"
 			};
 		}
 	
@@ -54,7 +54,10 @@ module.exports = {
 	
 		if (!stalk) {
 			return {
-				reply: "I have seen that user before, but they haven't posted any chat lines yet." 
+				reply: sb.Utils.tag.trim`
+					That user is in the database, but never showed up in chat.
+					They were first spotted ${sb.Utils.timeDelta(targetUser.Started_Using)}.
+				`
 			};
 		}
 	

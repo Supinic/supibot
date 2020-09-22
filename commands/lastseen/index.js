@@ -2,7 +2,7 @@ module.exports = {
 	Name: "lastseen",
 	Aliases: ["ls"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-22T17:41:15.000Z",
 	Cooldown: 5000,
 	Description: "Posts the target user's last chat line in all chats combined (!) and the date they sent it.",
 	Flags: ["block","mention","opt-out","pipe"],
@@ -48,7 +48,10 @@ module.exports = {
 	
 		if (!date) {
 			return {
-				reply: "That user is in the database, but never showed up in chat."
+				reply: sb.Utils.tag.trim `
+					That user is in the database, but never showed up in chat.
+					They were first spotted ${sb.Utils.timeDelta(targetUser.Started_Using)}.
+				`
 			};
 		}
 	
