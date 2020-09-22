@@ -2,7 +2,7 @@ module.exports = {
 	Name: "gachisearch",
 	Aliases: ["gs"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-16T16:06:01.000Z",
 	Cooldown: 15000,
 	Description: "Searches for a given track in the gachi list, and attempts to post a link.",
 	Flags: ["link-only","mention","pipe"],
@@ -19,10 +19,17 @@ module.exports = {
 	
 		const escaped = sb.Query.escapeLikeString(query);
 		const data = await sb.Query.raw(sb.Utils.tag.trim `
-			SELECT ID, Name
+			SELECT
+				ID,
+				Name,
+				EXISTS (SELECT 1 FROM music.Track_Tag WHERE Track_Tag.Track = Track.ID AND Track_Tag.Tag = 20) AS Is_Todo
 			FROM music.Track
 			WHERE
-				Track.ID IN ( SELECT Track FROM music.Track_Tag WHERE Tag = 6 )
+				Track.ID IN (
+					SELECT Track
+					FROM music.Track_Tag
+					WHERE (Tag = 6 OR Tag = 20)
+				)
 				AND
 				(
 					Name LIKE '%${escaped}%'
@@ -54,13 +61,15 @@ module.exports = {
 			};
 		}
 	
+		const emoji = (obj) => obj.Is_Todo ? "🚧" : "";
+	
 		const [first, ...rest] = data;
 		const others = (rest.length === 0)
 			? ""
-			: "More results: " + rest.map(i => `"${i.Name}" (ID ${i.ID})`).join("; ");
+			: "More results: " + rest.map(i => `"${i.Name}" (ID ${i.ID}) ${emoji(i)}`).join("; ");
 	
 		return {
-			reply: `"${first.Name}" - https://supinic.com/track/detail/${first.ID} ${others}`,
+			reply: `"${first.Name}" - ${emoji(first)} https://supinic.com/track/detail/${first.ID} ${others}`,
 			link: `https://supinic.com/track/detail/${first.ID}`
 		};
 	}),
