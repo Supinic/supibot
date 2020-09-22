@@ -2,7 +2,7 @@ module.exports = {
 	Name: "twitchlotto",
 	Aliases: ["tl"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-22T17:19:13.000Z",
 	Cooldown: 10000,
 	Description: "Fetches a random Imgur image from a Twitch channel (based off Twitchlotto) and checks it for NSFW stuff via an AI. The \"nudity score\" is posted along with the link.",
 	Flags: ["mention","whitelist"],
@@ -147,7 +147,7 @@ module.exports = {
 					image: `https://i.imgur.com/${image.Link}`
 				}
 			});
-			
+	
 			if (statusCode !== 200) {
 				console.log({ statusCode, resultData });
 				return {
@@ -172,10 +172,9 @@ module.exports = {
 		const detectionsString = [];
 		const { detections } = JSON.parse(image.Data);
 		for (const { replacement, string} of this.staticData.detections) {
-			const count = detections.filter(i => i.name === string).length;
-			if (count !== 0) {
-				detectionsString.push(`${replacement}: ${count}x`);
-			}
+			const elements = detections.filter(i => i.name === string);
+			const strings = elements.map(i => `${replacement} (${Math.round(i.confidence * 100)}%)`);
+			detectionsString.push(...strings);
 		}
 	
 		return {
