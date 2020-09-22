@@ -2,7 +2,7 @@ module.exports = {
 	Name: "set",
 	Aliases: ["unset"],
 	Author: "supinic",
-	Last_Edit: "2020-09-15T16:42:32.000Z",
+	Last_Edit: "2020-09-22T16:53:36.000Z",
 	Cooldown: 5000,
 	Description: "Sets/unsets certain variables within Supibot. Check the extended help for full info.",
 	Flags: ["mention","owner-override"],
@@ -12,6 +12,20 @@ module.exports = {
 		const birthdayFormatter = new Intl.DateTimeFormat("en-us", {
 			day: "numeric",
 			month: "long"
+		});
+	
+		let availableFlags = null;
+		sb.Query.getRecordset(rs => rs
+			.select("COLUMN_TYPE AS Columns")
+			.from("information_schema", "COLUMNS")
+			.where("TABLE_SCHEMA = %s", "data")
+			.where("TABLE_NAME = %s", "Twitch_Lotto")
+			.where("COLUMN_NAME = %s", "Adult_Flags")
+			.limit(1)
+			.flat("Columns")
+			.single()
+		).then(columnDefinition => {
+			availableFlags = [...columnDefinition.matchAll(/'(\w+)'/g)].map(i => i[1]);
 		});
 	
 		const handleAmbassadors = async (type, context, ...args) => {
@@ -81,6 +95,7 @@ module.exports = {
 				reply: `${userData.Name} is ${string} a Supibot Ambassador in #${channelData.Name}.`
 			};
 		};
+	
 		return {
 			variables: [
 				{
@@ -409,6 +424,73 @@ module.exports = {
 	
 						return {
 							reply: "Your birthday date has been unset successfully!"
+						};
+					}
+				},
+				{
+					names: ["tl", "twitchlotto"],
+					parameter: "arguments",
+					description: "If you have been nominated as a TwitchLotto-trusted user, you can then set flags to TL links.",
+					set: async (context, link, ...flags) => {
+						if (!availableFlags) {
+							return {
+								success: false,
+								reply: `Link flags have not been loaded yet, please try again in a moment!`
+							};
+						}
+						else if (!context.user.Data.trustedTwitchLottoFlagger) {			
+							return {
+								success: false,
+								reply: `You don't have access to flag TwitchLotto images!`
+							};
+						}
+						else if (!link) {
+							return {
+								success: false,
+								reply: `No link provided!`
+							};
+						}
+	
+						flags = flags.filter(i => availableFlags.includes(sb.Utils.capitalize(i)));
+						if (flags.length === 0) {
+							return {
+								success: false,
+								reply: `No suitable flags provided!`
+							};
+						}
+	
+						const regex = /(https:\/\/)?(www\.)?(imgur\.com\/)?([\d\w]{5,7}\.\w{3})/;
+						const match = link.match(regex);
+						if (!match) {
+							return {
+								success: false,
+								reply: `Invalid link format!`
+							};
+						}
+	
+						const exists = await sb.Query.getRecordset(rs => rs
+						    .select("Link")
+						    .from("data", "Twitch_Lotto")
+							.where("Link = %s", match[4])
+							.limit(1)
+							.single()
+							.flat("Link")
+						);
+						if (!exists) {
+							return {
+								success: false,
+								reply: `Link does not exist in the TwitchLotto database!`
+							};
+						}
+	
+						await sb.Query.getRecordUpdater(ru => ru
+							.update("data", "Twitch_Lotto")
+							.set("Adult_Flags", flags.sort())
+							.where("Link = %s", match[4])
+						);
+	
+						return {
+							reply: `Link ${link} successfully updated with flags ${flags.sort().join(", ")}.`
 						};
 					}
 				}
