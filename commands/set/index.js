@@ -2,7 +2,7 @@ module.exports = {
 	Name: "set",
 	Aliases: ["unset"],
 	Author: "supinic",
-	Last_Edit: "2020-09-22T16:53:36.000Z",
+	Last_Edit: "2020-09-23T15:23:07.000Z",
 	Cooldown: 5000,
 	Description: "Sets/unsets certain variables within Supibot. Check the extended help for full info.",
 	Flags: ["mention","owner-override"],
@@ -14,20 +14,7 @@ module.exports = {
 			month: "long"
 		});
 	
-		let availableFlags = null;
-		sb.Query.getRecordset(rs => rs
-			.select("COLUMN_TYPE AS Columns")
-			.from("information_schema", "COLUMNS")
-			.where("TABLE_SCHEMA = %s", "data")
-			.where("TABLE_NAME = %s", "Twitch_Lotto")
-			.where("COLUMN_NAME = %s", "Adult_Flags")
-			.limit(1)
-			.flat("Columns")
-			.single()
-		).then(columnDefinition => {
-			availableFlags = [...columnDefinition.matchAll(/'(\w+)'/g)].map(i => i[1]);
-		});
-	
+		const availableFlags = ["Anime", "Animal", "Disfigured", "Drawn", "Furry", "Gore", "Hentai", "Human", "Language", "None", "Porn", "Scat", "Softcore"];
 		const handleAmbassadors = async (type, context, ...args) => {
 			const [user, channel = context.channel?.Name] = args;
 			if (!user || !channel) {
@@ -430,15 +417,9 @@ module.exports = {
 				{
 					names: ["tl", "twitchlotto"],
 					parameter: "arguments",
-					description: "If you have been nominated as a TwitchLotto-trusted user, you can then set flags to TL links.",
+					description: `If you have been nominated as a TwitchLotto-trusted user, you can then set flags to TL links. Available flags: <code>${availableFlags.join(", ")}</code>`,
 					set: async (context, link, ...flags) => {
-						if (!availableFlags) {
-							return {
-								success: false,
-								reply: `Link flags have not been loaded yet, please try again in a moment!`
-							};
-						}
-						else if (!context.user.Data.trustedTwitchLottoFlagger) {			
+						if (!context.user.Data.trustedTwitchLottoFlagger) {			
 							return {
 								success: false,
 								reply: `You don't have access to flag TwitchLotto images!`
