@@ -2,6 +2,8 @@
 module.exports = (function () {
 	"use strict";
 
+	const apiDataSymbol = Symbol.for("banphrase-api-data");
+	const apiResultSymbol = Symbol("banphrase-api-result");
 	const inactiveSymbol = Symbol("banphrase-inactive");
 	const availableTypes = ["API response", "Custom response", "Denial", "Inactive", "Replacement"];
 
@@ -19,7 +21,11 @@ module.exports = (function () {
 				timeout: sb.Config.get("PAJBOT_API_TIMEOUT")
 			};
 
-			return await sb.Got(options).json();
+			const data = await sb.Got(options).json();
+			data[apiResultSymbol] = Boolean(reply.banned ? reply.banphrase_data.phrase : false);
+			data[apiDataSymbol] = data.banphrase_data;
+
+			return data;
 		}
 	}
 
@@ -211,11 +217,26 @@ module.exports = (function () {
 			if (!options.skipBanphraseAPI && channelData?.Banphrase_API_Type) {
 				let response = null;
 				try {
-					response = await Banphrase.executeExternalAPI(
+					const responseData = await Banphrase.executeExternalAPI(
 						message.slice(0, 1000),
 						channelData.Banphrase_API_Type,
-						channelData.Banphrase_API_URL
+						channelData.Banphrase_API_URL,
+						{ fullResponse: true }
 					);
+
+					response = responseData[apiResultSymbol];
+					if (response !== false) { // @todo platform-specific logging flag
+						const row = await sb.Query.getRow("chat_data", "Banphrase_API_Denial_Log");
+						row.setValues({
+							API: channelData.Banphrase_API_URL,
+							Channel: channelData.ID,
+							Platform: channelData.Platform.ID,
+							Message: message,
+							Response: JSON.stringify(responseData[apiDataSymbol])
+						});
+
+						await row.save();
+					}
 				}
 				catch (e) {
 					const { code } = e;
@@ -279,12 +300,6 @@ module.exports = (function () {
 							return result;
 						}
 					}
-
-					console.warn("No custom reply for API banphrase", {
-						channel: channelData.Name,
-						message: message,
-						response: response
-					});
 
 					return {
 						string: sb.Config.get("DEFAULT_BANPHRASE_API_RESPONSE"),
