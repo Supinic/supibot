@@ -2,7 +2,7 @@ module.exports = {
 	Name: "externalbot",
 	Aliases: ["ebot"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-25T15:28:38.000Z",
 	Cooldown: 0,
 	Description: "Makes supibot execute a command of a different bot, and then the result will be that bot's command response. As such, this command can only be used in a pipe.",
 	Flags: ["mention","pipe","whitelist"],
@@ -33,7 +33,7 @@ module.exports = {
 	
 		let botData = null;
 		const message = rest.join(" ");
-		for (const {Prefix: prefix, Bot_Alias: botID} of this.data.prefixes) {
+		for (const { Prefix: prefix, Bot_Alias: botID } of this.data.prefixes) {
 			if (message.startsWith(prefix)) {
 				botData = await sb.User.get(botID);
 				break;
@@ -42,8 +42,16 @@ module.exports = {
 	
 		if (!botData) {
 			return {
+				success: false,
 				reason: "bad_invocation",
 				reply: "No bot with that prefix has been found!"
+			};
+		}
+		else if (botData.Name === context.platform.Self_Name) {
+			return {
+				success: false,
+				reason: "bad_invocation",
+				reply: "I'm not an external bot! 😠"
 			};
 		}
 	
