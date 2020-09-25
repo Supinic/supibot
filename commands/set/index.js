@@ -2,7 +2,7 @@ module.exports = {
 	Name: "set",
 	Aliases: ["unset"],
 	Author: "supinic",
-	Last_Edit: "2020-09-23T15:23:07.000Z",
+	Last_Edit: "2020-09-25T15:21:32.000Z",
 	Cooldown: 5000,
 	Description: "Sets/unsets certain variables within Supibot. Check the extended help for full info.",
 	Flags: ["mention","owner-override"],
@@ -14,7 +14,7 @@ module.exports = {
 			month: "long"
 		});
 	
-		const availableFlags = ["Anime", "Animal", "Disfigured", "Drawn", "Furry", "Gore", "Hentai", "Human", "Language", "None", "Porn", "Scat", "Softcore"];
+		const availableFlags = ["Anime", "Animal", "Disfigured", "Disturbing", "Drawn", "Furry", "Gore", "Hentai", "Human", "Language", "None", "Porn", "Scat", "Softcore"];
 		const handleAmbassadors = async (type, context, ...args) => {
 			const [user, channel = context.channel?.Name] = args;
 			if (!user || !channel) {
