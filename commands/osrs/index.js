@@ -2,7 +2,7 @@ module.exports = {
 	Name: "osrs",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-25T06:29:14.000Z",
+	Last_Edit: "2020-09-25T16:34:10.000Z",
 	Cooldown: 5000,
 	Description: "Aggregate command for whatever regarding Old School Runescape.",
 	Flags: ["mention"],
@@ -47,8 +47,8 @@ module.exports = {
 			case "price": {
 				const query = args.join(" ");
 				const data = await sb.Query.getRecordset(rs => rs
-				    .select("Game_ID", "Name")
-				    .from("osrs", "Item")
+					.select("Game_ID", "Name")
+					.from("osrs", "Item")
 					.where("Name %*like*", query)
 				);
 	
@@ -69,7 +69,7 @@ module.exports = {
 						.set("item", itemID)
 						.toString()
 				});
-				
+	
 				if (statusCode !== 200) {
 					return {
 						success: false,
@@ -103,20 +103,24 @@ module.exports = {
 				const strings = [];
 				for (const { emoji, name } of this.staticData.skills) {
 					const found = data.skills.find(i => i.name.toLowerCase() === name.toLowerCase());
-					if (!found) {
-						strings.push(`${emoji} N/A`);
-					}
-					else {
+					if (found && found.level !== null) {
 						strings.push(`${emoji} ${found.level}`);
 					}
 				}
 	
-				return {
-					reply: sb.Utils.tag.trim `
-						Stats for user ${user}:
-						${strings.join(" ")}
-					`
-				};
+				if (strings.length === 0) {
+					return {
+						reply: `User ${user} does exist, but none of their stats are being tracked.`
+					};
+				}		
+				else {
+					return {
+						reply: sb.Utils.tag.trim `
+							Stats for user ${user}:
+							${strings.join(" ")}
+						`
+					};
+				}
 			}
 	
 			default:
