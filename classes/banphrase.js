@@ -22,7 +22,7 @@ module.exports = (function () {
 			};
 
 			const data = await sb.Got(options).json();
-			data[apiResultSymbol] = Boolean(reply.banned ? reply.banphrase_data.phrase : false);
+			data[apiResultSymbol] = Boolean(data.banned ? data.banphrase_data.phrase : false);
 			data[apiDataSymbol] = data.banphrase_data;
 
 			return data;
