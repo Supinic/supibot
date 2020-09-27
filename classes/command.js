@@ -492,6 +492,7 @@ module.exports = (function () {
 					}
 					else if (param && value) {
 						context.params[param] = value;
+						args.splice(i, 1);
 					}
 				}
 			}
