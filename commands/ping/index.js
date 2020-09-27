@@ -2,7 +2,7 @@ module.exports = {
 	Name: "ping",
 	Aliases: ["pang","peng","pong","pung","pyng"],
 	Author: "supinic",
-	Last_Edit: "2020-09-11T18:07:52.000Z",
+	Last_Edit: "2020-09-27T18:41:52.000Z",
 	Cooldown: 5000,
 	Description: "Ping!",
 	Flags: ["pipe","skip-banphrase"],
@@ -26,22 +26,30 @@ module.exports = {
 		const exec = promisify(require("child_process").exec);
 		const chars = {a: "e", e: "i", i: "o", o: "u", u: "y", y: "a"};
 	
-		const [temperature, memory] = await Promise.all([
+		const [temperature, memory, cpuLoad] = await Promise.all([
 			exec("/opt/vc/bin/vcgencmd measure_temp"),
-			readFile("/proc/meminfo")
+			readFile("/proc/meminfo"),
+			exec("cat /proc/loadavg")
 		]);
 	
 		const memoryData = String(memory).split("\n").filter(Boolean).map(i => Number(i.split(/:\s+/)[1].replace(/kB/, "")) * 1000);
 		const pong = "P" + chars[context.invocation[1]] + "ng!";
 	
-		const [swapTotal, swapFree] = memoryData.slice(14, 16);
-		const swapUsed = (swapTotal - swapFree);
+		// const [swapTotal, swapFree] = memoryData.slice(14, 16);
+		// const swapUsed = (swapTotal - swapFree);
+	
+		const [min1, min5] = cpuLoad.stdout.split(" ").map(Number);
+		const loadRatio = (min1 / min5);
+		const loadDelta = Math.abs(1 - loadRatio);
+		const loadDirection = (loadRatio > 1) ? "rising" : (loadRatio < 1) ? "falling" : "steady";
+		const loadChange = (loadDelta > 0.10) ? " sharply" : (loadDelta > 0) ? " steadily" : "";
 	
 		const data = {
 			Uptime: sb.Utils.timeDelta(sb.Master.started).replace("ago", "").trim(),
 			Temperature: temperature.stdout.match(/([\d\.]+)/)[1] + "°C",
 			"Free memory": sb.Utils.formatByteSize(memoryData[2], 0) + "/" + sb.Utils.formatByteSize(memoryData[0], 0),
-			Swap: sb.Utils.formatByteSize(swapUsed, 0) + "/" + sb.Utils.formatByteSize(swapTotal, 0),
+			"CPU usage": `${loadDirection}${loadChange}`,
+			// Swap: sb.Utils.formatByteSize(swapUsed, 0) + "/" + sb.Utils.formatByteSize(swapTotal, 0),
 			"Commands used": sb.Runtime.commandsUsed
 		};
 	
@@ -68,8 +76,8 @@ module.exports = {
 			}
 			else {
 				data["Banphrase API"] = "Not connected";
-			}		
-		}	
+			}
+		}
 	
 		if (context.platform.Name === "twitch") {
 			const ping = await this.staticData.checkLatency(
