@@ -2,10 +2,10 @@ module.exports = {
 	Name: "osrs",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-25T16:34:10.000Z",
+	Last_Edit: "2020-09-27T17:48:18.000Z",
 	Cooldown: 5000,
 	Description: "Aggregate command for whatever regarding Old School Runescape.",
-	Flags: ["mention"],
+	Flags: ["mention","use-params"],
 	Whitelist_Response: null,
 	Static_Data: ({
 		skills: [
@@ -92,11 +92,45 @@ module.exports = {
 					};
 				}
 	
-				const { data } = await sb.Got.instances.Supinic("osrs/lookup/" + user).json();
+				let data = await sb.Cache.getByPrefix("command-osrs-stats", {
+					keys: { user }
+				});
+				
 				if (!data) {
+					const apiData = await sb.Got.instances.Supinic("osrs/lookup/" + user).json();
+					if (!apiData.data) {
+						return {
+							success: false,
+							reply: `No data found for given player name!`
+						};
+					}
+	
+					data = apiData.data;
+					await sb.Cache.setByPrefix("command-osrs-stats", data, {
+						keys: { user },
+						expiry: 600_000
+					});
+				}
+	
+				if (context.params.skill) {
+					const skillName = context.params.skill.toLowerCase();
+					const skill = data.skills.find(i => i.name.toLowerCase() === skillName);
+					if (!skill) {
+						return {
+							success: false,
+							reply: `That skill does not exist!`
+						};
+					}
+					else if (skill.level === null) {
+						return {
+							success: false,
+							reply: `That user's ${context.params.skill.toLowerCase()} is not high enough level to appear on the highscores!`
+						};
+					}
+	
+					const { emoji } = this.staticData.skills.find(i => i.name.toLowerCase() === skillName);
 					return {
-						success: false,
-						reply: `No data found for given player name!`
+						reply: `${emoji} ${skill.level} (XP: ${sb.Utils.groupDigits(skill.experience)})`
 					};
 				}
 	
@@ -112,7 +146,7 @@ module.exports = {
 					return {
 						reply: `User ${user} does exist, but none of their stats are being tracked.`
 					};
-				}		
+				}
 				else {
 					return {
 						reply: sb.Utils.tag.trim `
