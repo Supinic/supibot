@@ -575,7 +575,7 @@ module.exports = class Twitch extends require("./template.js") {
 					console.debug(`Re-joining channel ${channelData.Name}!`);
 					channelData.sessionData.parted = false;
 					this.client.join(channelData.Name);
-				}, 60_000);
+				}, this.platform.Data.recentBanPartTimeout);
 
 				await this.client.part(channelData.Name);
 			}
