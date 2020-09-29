@@ -116,6 +116,20 @@ module.exports = (function () {
 		}
 
 		static async loadData () {
+			const presentTables = await Promise.all([
+				sb.Query.isTablePresent("chat_data", "Chat_Module"),
+				sb.Query.isTablePresent("chat_data", "Channel_Chat_Module")
+			]);
+
+			if (presentTables.some(i => i === false)) {
+				console.warn("Cannot load Chat_Module", {
+					reason: "missing-tables",
+					tables: ["Chat_Module", "Channel_Chat_Module"].filter((i, ind) => !presentTables[ind])
+				});
+
+				return;
+			}
+
 			const data = await sb.Query.getRecordset(rs => rs
 				.select("Chat_Module.ID AS Module_ID")
 				.select("Chat_Module.*")
