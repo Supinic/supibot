@@ -2,7 +2,7 @@ module.exports = {
 	Name: "youtubesearch",
 	Aliases: ["ys"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-29T17:51:10.000Z",
 	Cooldown: 15000,
 	Description: "Searches Youtube for video(s) with your query. Respects safe search for each platform.",
 	Flags: ["mention","pipe"],
@@ -27,24 +27,25 @@ module.exports = {
 			}
 		}
 	
-		const list = await sb.Utils.searchYoutube(
+		const track = await sb.Utils.searchYoutube(
 			query,
 			sb.Config.get("API_GOOGLE_YOUTUBE"),
 			{ 
-				safeSearch
+				maxResults: 1,
+				single: true,
+				safeSearch // not actually used right now
 			}
 		);
 		
-		if (list.length === 0) {
+		if (!track) {
 			return {
 				success: false,
 				reply: "No videos found for that query!"
 			};
 		}
 		else {
-			const [video] = list;
 			return {
-				reply: `https://youtu.be/${video.ID}`
+				reply: `https://youtu.be/${track.ID}`
 			};
 		}
 	}),
