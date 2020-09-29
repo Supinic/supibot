@@ -298,7 +298,7 @@ module.exports = class Discord extends require("./template.js") {
 	parseMessage (messageObject) {
 		const args = messageObject.content.split(" ");
 		for (let i = 0; i < args.length; i++) {
-			const match = args[i].match(/<@!(\d+)>/);
+			const match = args[i].match(/<@!?(\d+)>/);
 			if (match) {
 				const user = messageObject.mentions.users.get(match[1]);
 				if (user) {
