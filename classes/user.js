@@ -184,6 +184,7 @@ module.exports = (function () {
                     .from("chat_data", "User_Alias")
                     .where("ID = %n", identifier)
                     .single()
+                    .flat("Name")
                 );
                 if (!name) {
                     return null;
