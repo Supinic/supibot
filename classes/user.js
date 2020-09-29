@@ -1,7 +1,6 @@
 /* global sb */
 module.exports = (function () {
     "use strict";
-
     /**
      * Represents a chat user.
      * Since there can be hundreds of thousands of users loaded, a class is used to simplify the prototype, and potentially save some memory and/or processing power with V8.
@@ -9,8 +8,9 @@ module.exports = (function () {
      * @type User
      */
     const User = class User {
-        mapCacheExpiration = 300_000;
-        redisCacheExpiration = 3_600_000;
+        static mapCacheExpiration = 300_000;
+        static redisCacheExpiration = 3_600_000;
+        static mapExpirationInterval = setInterval(() => User.data.clear(), User.mapCacheExpiration);
 
         /** @alias {User} */
         constructor (data) {
