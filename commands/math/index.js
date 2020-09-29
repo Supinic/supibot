@@ -2,7 +2,7 @@ module.exports = {
 	Name: "math",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-09-28T23:55:03.000Z",
 	Cooldown: 5000,
 	Description: "Does math. For more info, check the documentation for math.js",
 	Flags: ["mention","pipe"],
@@ -16,24 +16,30 @@ module.exports = {
 			};
 		}
 	
-		const { response, status } = await sb.Got.instances.Leppunen({
+		const { statusCode, body: data } = await sb.Got.instances.Leppunen({
 			url: "math",
+			throwHttpErrors: false,
 			searchParams: new sb.URLParams()
 				.set("expr", args.join(" "))
 				.toString()
-		}).json();
-		
-		if (status === 200 || status === 503) {
-			const string = response.replace(/\bNaN\b/g, "NaM").replace(/\btrue\b/g, "TRUE LULW");
+		});
+	
+		if (statusCode === 200 || statusCode === 503) {
 			return {
 				reply: (context.platform.Name === "discord")
-					? `\`${string}\``
-					: string
+					? `\`${data.response}\``
+					: data.response
 			};
 		}
 		else {
+			await sb.Platform.get("twitch").pm(
+				`Math command failed - server error ${statusCode} at ${sb.Date.now()}! monkaS`,
+				"leppunen"
+			);
+	
 			return {
-				reply: "@Leppunen $math failed monkaS"
+				success: false,
+				reply: `Math command failed due to server error ${statusCode}!`
 			};
 		}
 	}),
