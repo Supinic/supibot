@@ -9,6 +9,9 @@ module.exports = (function () {
      * @type User
      */
     const User = class User {
+        mapCacheExpiration = 300_000;
+        redisCacheExpiration = 3_600_000;
+
         /** @alias {User} */
         constructor (data) {
             /**
@@ -86,6 +89,10 @@ module.exports = (function () {
             await row.save();
         }
 
+        getCacheKey () {
+            return `sb-user-${this.Name}`;
+        }
+
         /** @override */
         static async initialize () {
             User.bots = new Map();
@@ -155,58 +162,78 @@ module.exports = (function () {
                 return identifier;
             }
             else if (typeof identifier === "number") {
-                let user = User.getByProperty("ID", identifier);
-                if (!user) {
-                    const data = await sb.Query.getRecordset(rs => rs
-                        .select("*")
-                        .from("chat_data", "User_Alias")
-                        .where("ID = %n", identifier)
-                        .single()
-                    );
-
-                    if (data) {
-                        user = new User(data);
-                        User.data.set(data.Name, user);
-                    }
+                const mapCacheUser = User.getByProperty("ID", identifier);
+                if (mapCacheUser) {
+                    return mapCacheUser;
                 }
 
-                return user;
+                const name = await sb.Query.getRecordset(rs => rs
+                    .select("Name")
+                    .from("chat_data", "User_Alias")
+                    .where("ID = %n", identifier)
+                    .single()
+                );
+                if (!name) {
+                    return null;
+                }
+
+                return User.get(name, strict, options);
             }
             else if (typeof identifier === "string") {
                 identifier = identifier.replace(/^@/, "").toLowerCase();
-                let user = User.data.get(identifier);
 
-                if (!user) {
-                    const data = await sb.Query.getRecordset(rs => rs
-                        .select("*")
-                        .from("chat_data", "User_Alias")
-                        .where("Name = %s", identifier)
-                        .single()
-                    );
+                // 1. attempt to fetch the user from low-cache (sb.User.data)
+                const mapCacheUser = User.data.get(identifier);
+                if (mapCacheUser) {
+                    return mapCacheUser;
+                }
 
-                    if (data) {
-                        user = new User(data);
-                        User.data.set(data.Name, user);
-                    }
-                    else if (!strict) {
-                        if (!User.pendingNewUsers.has(identifier)) {
-                            User.pendingNewUsers.add(identifier);
-                            User.insertBatch.add({
-                                Name: identifier,
-                                Discord_ID: options.Discord_ID ?? null,
-                                Mixer_ID: options.Mixer_ID ?? null,
-                                Twitch_ID: options.Twitch_ID ?? null
-                            });
+                // 2. attempt to fetch the user from medium-cache (sb.Cache)
+                if (sb.Cache && sb.Cache.active) {
+                    const redisCacheUser = await User.createFromCache({ name: identifier });
+                    if (redisCacheUser) {
+                        if (!User.data.has(identifier)) {
+                            User.data.set(identifier, redisCacheUser);
                         }
+
+                        return redisCacheUser;
+                    }
+                }
+
+                // 3. attempt to get the user out of the database
+                const dbUserData = await sb.Query.getRecordset(rs => rs
+                    .select("*")
+                    .from("chat_data", "User_Alias")
+                    .where("Name = %s", identifier)
+                    .single()
+                );
+
+                if (dbUserData) {
+                    const user = new User(dbUserData);
+                    await User.populateCaches(user);
+
+                    return user;
+                }
+                else {
+                    // 4. Create the user, if strict mode is off
+                    if (!strict && !User.pendingNewUsers.has(identifier)) {
+                        User.pendingNewUsers.add(identifier);
+                        User.insertBatch.add({
+                            Name: identifier,
+                            Discord_ID: options.Discord_ID ?? null,
+                            Mixer_ID: options.Mixer_ID ?? null,
+                            Twitch_ID: options.Twitch_ID ?? null
+                        });
 
                         // Returns null, which should usually abort working with user's message.
                         // We lose a couple of messages from a brand new user, but this is an acceptable measure
                         // in order to reduce the amount of user-insert db connections.
                         return null;
                     }
-                }
 
-                return user;
+                    // No cache hits, user does not exist - return null
+                    return null;
+                }
             }
             else {
                 throw new sb.Error({
@@ -230,7 +257,25 @@ module.exports = (function () {
                 if (identifier instanceof User) {
                     result.push(identifier);
                 }
-                else if (typeof identifier === "string" || typeof identifier === "number") {
+                else if (typeof identifier === "number") {
+                    toFetch.push(identifier);
+                }
+                else if (typeof identifier === "string") {
+                    const mapCacheUser = User.data.get(identifier);
+                    if (mapCacheUser) {
+                        result.push(mapCacheUser);
+                        continue;
+                    }
+
+                    if (sb.Cache && sb.Cache.active) {
+                        const redisCacheUser = await sb.Cache.getByPrefix(User.createFromCache({ name: identifier }));
+                        if (redisCacheUser) {
+                            User.data.set(identifier, redisCacheUser);
+                            result.push(redisCacheUser);
+                            continue;
+                        }
+                    }
+
                     toFetch.push(identifier);
                 }
                 else {
@@ -256,11 +301,14 @@ module.exports = (function () {
                     }
                 });
 
+                const cachePromises = [];
                 for (const rawUserData of fetched) {
                     const userData = new User(rawUserData);
                     result.push(userData);
-                    User.data.set(rawUserData.Name, userData);
+                    cachePromises.push(User.populateCaches(userData));
                 }
+
+                await Promise.all(cachePromises);
             }
 
             return result;
@@ -312,8 +360,49 @@ module.exports = (function () {
 			await row.save();
 
             const user = new User(row.valuesObject);
-            User.data.set(user.Name, user);
+            await User.populateCaches(user);
+
             return user;
+        }
+
+        static async populateCaches (user) {
+            if (!User.data.has(user.Name)) {
+                User.data.set(user.Name, user);
+            }
+
+            if (sb.Cache && sb.Cache.active) {
+                await sb.Cache.setByPrefix(user.getCacheKey(), {
+                    expiry: User.redisCacheExpiration
+                });
+            }
+        }
+
+        static async createFromCache (options) {
+            if (!sb.Cache) {
+                throw new sb.Error({
+                    message: "Cache module is unavailable"
+                });
+            }
+
+            const key = User.createCacheKey(options);
+            const cacheData = await sb.Cache.getByPrefix(key);
+            if (!cacheData) {
+                return null;
+            }
+
+            return new User(cacheData);
+        }
+
+        static createCacheKey (options = {}) {
+            const name = options.name ?? options.Name;
+            if (typeof name !== "string") {
+                throw new sb.Error({
+                    message: "User name for Cache must be a string",
+                    args: options
+                });
+            }
+
+            return `sb-user-${name}`;
         }
 
         /**
