@@ -281,7 +281,7 @@ module.exports = (function () {
                     }
 
                     if (sb.Cache && sb.Cache.active) {
-                        const redisCacheUser = await sb.Cache.getByPrefix(User.createFromCache({ name: identifier }));
+                        const redisCacheUser = await User.createFromCache({ name: identifier });
                         if (redisCacheUser) {
                             User.data.set(identifier, redisCacheUser);
                             result.push(redisCacheUser);
