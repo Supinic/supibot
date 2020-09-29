@@ -55,11 +55,23 @@ module.exports = (function () {
              * Extra data given to each user.
              * @type {Object}
              */
-            try {
-                this.Data = (data.Data) ? JSON.parse(data.Data) : {};
+            if (!data.Data) {
+                this.Data = {};
             }
-            catch (e) {
-                console.warn("User data parse error for user ID " + this.ID, e);
+            else if (typeof data.Data === "string") {
+                try {
+                    this.Data = JSON.parse(data.Data);
+                }
+                catch (e) {
+                    console.warn("User.Data parse error", { error: e, user: this, data});
+                    this.Data = {};
+                }
+            }
+            else if (typeof data.Data === "object") {
+                this.Data = { ...data.Data };
+            }
+            else {
+                console.warn("User.Data invalid type", { user: this, data});
                 this.Data = {};
             }
         }
