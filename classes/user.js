@@ -371,7 +371,7 @@ module.exports = (function () {
             }
 
             if (sb.Cache && sb.Cache.active) {
-                await sb.Cache.setByPrefix(user.getCacheKey(), {
+                await sb.Cache.setByPrefix(user.getCacheKey(), user, {
                     expiry: User.redisCacheExpiration
                 });
             }
