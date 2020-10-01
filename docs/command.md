@@ -28,7 +28,7 @@ Supibot's prefix was chosen in the following manner:
 
 Supibot is rather unique in the fact that it stores its commands inside of a database table.
 This allows for extremely easy reloading and testing without interrupting the bot runtime.
-As such, version control is non-existant, but the project uses the [supibot-sql](https://github.com/Supinic/supibot-sql) repository along with a set of scripts to control versioning. 
+As such, version control is non-existent, but the project uses the [supibot-sql](https://github.com/Supinic/supibot-sql) repository along with a set of scripts to control versioning. 
 
 ### Table structure
 
