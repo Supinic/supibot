@@ -24,7 +24,7 @@ Unlike AFK statuses, reminders are not public and so only reminders created by y
   
 ### Other endpoints
 - [List channels](https://supinic.com/api/#api-Bot-GetChannelList)
-- [Check optouts](https://supinic.com/api/#api-Bot-CheckFilterStatus)
+- [Check opt-outs](https://supinic.com/api/#api-Bot-CheckFilterStatus)
 - [List all commands](https://supinic.com/api/#api-Bot-GetCommandList)
 - [Fortune cookie stats for a user](https://supinic.com/api/#api-Bot-GetCookieStatus)
 - [Fortune cookie stats globally](https://supinic.com/api/#api-Bot-ListCookieStats)
