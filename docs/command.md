@@ -32,7 +32,7 @@ As such, version control is non-existant, but the project uses the [supibot-sql]
 
 ### Table structure
 
-- `Name
+- Name
     - This is the main name of the command. It will be used in any external reference to it (like, sql update file).
 - Aliases
     - If not `NULL`, this is a JSON array of strings, where each string represents an alias. This means the same command can be executed with multiple so-called *invocations*.
