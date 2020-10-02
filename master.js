@@ -182,35 +182,6 @@
 
 			return message;
 		}
-
-		/**
-		 * Mirrors a message from one channel to another
-		 * Mirrored messages should not be prepared in the origin channel, they are checked against the target channel.
-		 * Double checking would lead to inconsistent behaviour.
-		 * @param {string} message
-		 * @param {User} userData
-		 * @param {Channel.ID} mirrorID Channel ID to mirror message to
-		 * @returns {Promise<void>}
-		 */
-		async mirror (message, userData, mirrorID) {
-			const targetChannel = sb.Channel.get(mirrorID);
-			if (!targetChannel) {
-				throw new sb.Error({
-					message: "Target mirror channel does not exist",
-					args: mirrorID
-				});
-			}
-			else if (userData.Name === targetChannel.Platform.Self_Name) {
-				// Do not mirror own messages
-				return;
-			}
-
-			const finalMessage = await this.prepareMessage(message, targetChannel);
-
-			if (finalMessage) {
-				this.send(finalMessage, targetChannel);
-			}
-		}
 	}
 
 	process.on("uncaughtException", (err) => {

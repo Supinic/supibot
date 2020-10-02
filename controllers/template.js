@@ -30,9 +30,24 @@ module.exports = class Controller {
 		}
 	}
 
-	mirror (message, userData, channelData, commandUsed = false) {
+	/**
+	 * Mirrors a message from one channel to another
+	 * Mirrored messages should not be prepared in the origin channel, they are checked against the target channel.
+	 * Double checking would lead to inconsistent behaviour.
+	 * @param {string} message
+	 * @param {User} userData
+	 * @param {Channel} channelData Channel to mirror the given message to
+	 * @param {boolean} commandUsed = false If a command was used, do not include the user name of who issued the command.
+	 * @returns {Promise<void>}
+	 */
+	async mirror (message, userData, channelData, commandUsed = false) {
 		const symbol = this.platform.Mirror_Identifier;
 		if (symbol === null) {
+			return;
+		}
+
+		// Do not mirror own messages
+		if (userData.Name === channelData.Platform.Self_Name) {
 			return;
 		}
 
@@ -40,7 +55,10 @@ module.exports = class Controller {
 			? `${symbol} ${message}`
 			: `${symbol} ${userData.Name}: ${message}`;
 
-		sb.Master.mirror(fixedMessage, userData, channelData.Mirror);
+		const finalMessage = await sb.Master.prepareMessage(fixedMessage, channelData);
+		if (finalMessage) {
+			await channelData.send(finalMessage);
+		}
 	}
 
 	restart () { }
