@@ -86,6 +86,8 @@
 		 * @param {Channel|Channel.ID|Channel.Name} channel
 		 */
 		send (message, channel) {
+			console.warn("sb.Master.send is deprecated! use sb.Channel.prototype.send instead");
+
 			const channelData = sb.Channel.get(channel);
 			const platform = channelData.Platform.Name;
 			const client = this.controllers[platform];
@@ -105,6 +107,8 @@
 		 * @returns {Promise<void>}
 		 */
 		async pm (user, message, platform) {
+			console.warn("sb.Master.pm is deprecated! use sb.Platform.prototype.pm instead");
+
 			const platformData = sb.Platform.get(platform);
 			const client = this.controllers[platformData.Name];
 			return client.pm(user, message);
