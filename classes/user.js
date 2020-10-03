@@ -49,7 +49,9 @@ module.exports = (function () {
              * Date of first sighting.
              * @type {sb.Date}
              */
-            this.Started_Using = data.Started_Using;
+            this.Started_Using = (data.Started_Using instanceof sb.Date)
+                ? data.Started_Using
+                : new sb.Date(data.Started_Using);
 
             /**
              * Extra data given to each user.
