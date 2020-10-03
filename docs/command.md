@@ -28,11 +28,11 @@ Supibot's prefix was chosen in the following manner:
 
 Supibot is rather unique in the fact that it stores its commands inside of a database table.
 This allows for extremely easy reloading and testing without interrupting the bot runtime.
-As such, version control is non-existant, but the project uses the [supibot-sql](https://github.com/Supinic/supibot-sql) repository along with a set of scripts to control versioning. 
+As such, version control is non-existent, but the project uses the [supibot-sql](https://github.com/Supinic/supibot-sql) repository along with a set of scripts to control versioning. 
 
 ### Table structure
 
-- `Name
+- Name
     - This is the main name of the command. It will be used in any external reference to it (like, sql update file).
 - Aliases
     - If not `NULL`, this is a JSON array of strings, where each string represents an alias. This means the same command can be executed with multiple so-called *invocations*.
@@ -60,7 +60,7 @@ As such, version control is non-existant, but the project uses the [supibot-sql]
         - an `Object` containing any unchanging custom data (e.g. strings, helpers functions)
         - an [IIFE](https://developer.mozilla.org/en-US/docs/Glossary/IIFE) that returns an `Object`.
         In its code, it can already access `this.data` of the command, as it has been initialized to empty object at that point.
-        Keep in mind that this function must return an object to proceeed normally.
+        Keep in mind that this function must return an object to proceed normally.
 - Dynamic description
     - text containing a function that returns an `Array` of strings.
     - this is used as a extended description.

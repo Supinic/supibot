@@ -16,7 +16,7 @@ Otherwise, it is possible to check others' AFK status, in bulk as well.
 ### Reminder
 Setting an unsetting a reminder is also possible via the API. 
 It is still subject to regular limits for incoming and outgoing reminders, private and public alike.
-Unlike AFK statuses, reminders are not public and so only reminders created by you or targetted at you are able to be inspected.
+Unlike AFK statuses, reminders are not public and so only reminders created by you or targeted at you are able to be inspected.
 
  - [Create a new reminder](https://supinic.com/api/#api-Bot-CreateReminder)
  - [List all your reminders](https://supinic.com/api/#api-Bot-ListReminders)
@@ -24,7 +24,7 @@ Unlike AFK statuses, reminders are not public and so only reminders created by y
   
 ### Other endpoints
 - [List channels](https://supinic.com/api/#api-Bot-GetChannelList)
-- [Check optouts](https://supinic.com/api/#api-Bot-CheckFilterStatus)
+- [Check opt-outs](https://supinic.com/api/#api-Bot-CheckFilterStatus)
 - [List all commands](https://supinic.com/api/#api-Bot-GetCommandList)
 - [Fortune cookie stats for a user](https://supinic.com/api/#api-Bot-GetCookieStatus)
 - [Fortune cookie stats globally](https://supinic.com/api/#api-Bot-ListCookieStats)
