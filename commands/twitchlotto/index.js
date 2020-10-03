@@ -2,7 +2,7 @@ module.exports = {
 	Name: "twitchlotto",
 	Aliases: ["tl"],
 	Author: "supinic",
-	Last_Edit: "2020-09-22T17:19:13.000Z",
+	Last_Edit: "2020-10-02T15:41:47.000Z",
 	Cooldown: 10000,
 	Description: "Fetches a random Imgur image from a Twitch channel (based off Twitchlotto) and checks it for NSFW stuff via an AI. The \"nudity score\" is posted along with the link.",
 	Flags: ["mention","whitelist"],
@@ -41,21 +41,25 @@ module.exports = {
 	Code: (async function lotto (context, channel) {
 		if (!this.data.channels) {
 			this.data.channels = await sb.Query.getRecordset(rs => rs
-				.select("Name")
+				.select("LOWER(Name) AS Name")
 				.from("data", "Twitch_Lotto_Channel")
 				.flat("Name")
 			);
 		}
-		if (channel && !this.data.channels.includes(channel)) {
-			return {
-				success: false,
-				reply: "The channel you provided has no images saved!"
-			};
+		
+		if (channel) {
+			channel = channel.toLowerCase();
+			
+			if (!this.data.channels.includes(channel)) {
+				return {
+					success: false,
+					reply: "The channel you provided has no images saved!"
+				};
+			}
 		}
 	
 		let image = null;
 		if (channel) {
-			channel = channel.toLowerCase();
 			if (!this.data.counts[channel]) {
 				this.data.counts[channel] = await sb.Query.getRecordset(rs => rs
 					.select("Amount")
