@@ -2,7 +2,7 @@ module.exports = {
 	Name: "github",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-02T16:50:58.000Z",
 	Cooldown: 5000,
 	Description: "Posts GitHub repository links for Supibot and the website. If you add anything afterwards, a search will be executed for your query on the bot repository.",
 	Flags: ["developer","mention","pipe"],
@@ -16,7 +16,7 @@ module.exports = {
 					Supibot: https://github.com/Supinic/supibot 
 					// Website: https://github.com/Supinic/supinic.com
 					// Modules: https://github.com/Supinic/supi-core
-					// SQL: https://github.com/Supinic/supibot-sql
+					// SPM: https://github.com/Supinic/supibot-package-manager
 				`
 			};
 		}
