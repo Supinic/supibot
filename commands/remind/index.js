@@ -2,7 +2,7 @@ module.exports = {
 	Name: "remind",
 	Aliases: ["notify", "reminder", "remindme", "notifyme", "remindprivate", "notifyprivate"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-03T17:34:35.000Z",
 	Cooldown: 10000,
 	Description: "Sets a notify for a given user. Can also set a time to ping that user (or yourself) in given amount of time, but in that case you must use the word \"in\" and then a number specifying the amount days, hours, minutes, etc.",
 	Flags: ["block","mention","opt-out","pipe"],
@@ -191,7 +191,7 @@ module.exports = {
 				cooldown: this.Cooldown / 2
 			};
 		}
-		else if (delta > sb.Config.get("SQL_DATETIME_LIMIT")) {
+		else if ((sb.Date.now() + delta) > sb.Config.get("SQL_DATETIME_LIMIT")) {
 			const description = (Number.isFinite(comparison.valueOf()))
 				? comparison.format("Y-m-d")
 				: `${Math.trunc(delta / 31_536_000_000)} years in the future`;
