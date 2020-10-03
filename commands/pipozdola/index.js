@@ -8,8 +8,10 @@ module.exports = {
 	Flags: ["mention","pipe","skip-banphrase","system","whitelist"],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: async () => ({
-		reply: "https://pastebin.com/PzSHPzH0"
+	Code: (async function pipozdola () {
+		return {
+			reply: "https://pastebin.com/PzSHPzH0"
+		}
 	}),
 	Dynamic_Description: null
 };

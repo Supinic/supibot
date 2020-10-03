@@ -8,7 +8,7 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function () { 
+	Code: (async function randomDoctorDisrepsect () {
 		return {
 			reply: "This command is not currently available - underoging maintenance."
 		};

@@ -70,9 +70,7 @@ module.exports = {
 			{ name: "Woodcutting", emoji: "🌳" },
 			{ name: "Farming", emoji: "‍🌽" },
 		]
-	})
-	
-	,
+	}),
 	Code: (async function osrs (context, command, ...args) {
 		if (!command) {
 			return {

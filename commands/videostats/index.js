@@ -8,7 +8,7 @@ module.exports = {
 	Flags: ["mention","pipe","whitelist"],
 	Whitelist_Response: "Video statistics are only available in Cytube rooms.",
 	Static_Data: null,
-	Code: async (extra, link) => {
+	Code: (async function videoStats (context, link) {
 		if (!link) {
 			return { reply: "No link provided!", meta: { skipCooldown: true } };
 		}
@@ -19,7 +19,7 @@ module.exports = {
 			.from("cytube", "Video_Request")
 			.join("chat_data", "User_Alias")
 			.where("Link = %s", link)
-			.where("Channel = %n", extra.channel.ID)
+			.where("Channel = %n", context.channel.ID)
 			.orderBy("COUNT(*) DESC")
 			.groupBy("User_Alias")
 		);
@@ -34,7 +34,7 @@ module.exports = {
 			.from("cytube", "Video_Request")
 			.join("chat_data", "User_Alias")
 			.where("Link = %s", link)
-			.where("Channel = %n", extra.channel.ID)
+			.where("Channel = %n", context.channel.ID)
 			.orderBy("Video_Request.ID DESC")
 			.limit(1)
 			.single()
@@ -54,6 +54,6 @@ module.exports = {
 		return {
 			reply: `That video was queued ${total} times before (mostly by: ${top5.join("; ")}). Last time it was queued ${sb.Utils.timeDelta(lastPlayedData.Posted)}, by ${lastPlayedData.Name}`
 		};
-	},
+	}),
 	Dynamic_Description: null
 };

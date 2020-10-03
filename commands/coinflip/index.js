@@ -8,7 +8,7 @@ module.exports = {
 	Flags: ["mention","pipe","skip-banphrase"],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: async () => {
+	Code: (async function coinflip () {
 		// According to Murray & Teare (1993), the probability of an American silver nickel landing on its edge is around 1 in 6000 tosses	
 		const number =  sb.Utils.random(1, 6000);
 		const flipResult = (number === 3000) ? null : Boolean(number < 3000);
@@ -17,6 +17,6 @@ module.exports = {
 		return {
 			reply: replyMap[flipResult]
 		};
-	},
+	}),
 	Dynamic_Description: null
 };

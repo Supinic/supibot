@@ -8,7 +8,7 @@ module.exports = {
 	Flags: ["pipe","skip-banphrase","system","whitelist"],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: async () => {
+	Code: (async function checkDeadChannels () {
 		const promises = [];
 		const regex = /^[^:]+$/;
 		const channels = sb.Channel.data.filter(channel => (
@@ -44,6 +44,6 @@ module.exports = {
 		return { 
 			reply: await sb.Pastebin.post(JSON.stringify(results, null, 4))
 		};
-	},
+	}),
 	Dynamic_Description: null
 };
