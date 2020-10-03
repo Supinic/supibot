@@ -2,7 +2,7 @@ module.exports = {
 	Name: "statistics",
 	Aliases: ["stat", "stats"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-03T19:19:13.000Z",
 	Cooldown: 10000,
 	Description: "Posts various statistics regarding you, e.g. total afk time.",
 	Flags: ["mention","pipe"],
@@ -233,9 +233,9 @@ module.exports = {
 	Dynamic_Description: async (prefix, values) => {
 		const { types } = values.getStaticData();
 		const list = types.map(i => {
-			const names = i.names.sort().map(j => `<code>${j}</code>`).join("<br>");
+			const names = i.names.sort().map(j => `<code>${j}</code>`).join(" | ");
 			return `${names}<br>${i.description}`;
-		}).join("");
+		}).join("<br>");
 	
 		return [
 			"Checks various statistics bound to you, found around supibot's data.",
