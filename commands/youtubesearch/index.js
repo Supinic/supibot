@@ -2,11 +2,11 @@ module.exports = {
 	Name: "youtubesearch",
 	Aliases: ["ys"],
 	Author: "supinic",
-	Last_Edit: "2020-09-29T17:51:10.000Z",
+	Last_Edit: "2020-10-01T15:32:02.000Z",
 	Cooldown: 15000,
 	Description: "Searches Youtube for video(s) with your query. Respects safe search for each platform.",
-	Flags: ["mention","pipe"],
-	Whitelist_Response: null,
+	Flags: ["mention","pipe","whitelist"],
+	Whitelist_Response: "Temporarily disabled",
 	Static_Data: null,
 	Code: (async function youtubeSearch (context, ...args) {
 		const query = args.join(" ");
@@ -30,11 +30,7 @@ module.exports = {
 		const track = await sb.Utils.searchYoutube(
 			query,
 			sb.Config.get("API_GOOGLE_YOUTUBE"),
-			{ 
-				maxResults: 1,
-				single: true,
-				safeSearch // not actually used right now
-			}
+			{ single: true }
 		);
 		
 		if (!track) {
