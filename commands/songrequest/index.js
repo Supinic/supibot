@@ -2,7 +2,7 @@ module.exports = {
 	Name: "songrequest",
 	Aliases: ["sr"],
 	Author: "supinic",
-	Last_Edit: "2020-09-12T18:03:10.000Z",
+	Last_Edit: "2020-10-02T15:43:36.000Z",
 	Cooldown: 5000,
 	Description: "Requests a song to play on Supinic's stream. You can use \"start:\" and \"end:\" to request parts of a song using seconds or a time syntax. \"start:100\" or \"end:05:30\", for example.",
 	Flags: ["mention","pipe","whitelist"],
@@ -165,6 +165,10 @@ module.exports = {
 		};
 	}),
 	Code: (async function songRequest (context, ...args) {
+		if (args.length === 0) {
+			return { reply: "You must search for a link or a video description!" };
+		}
+	
 		const state = sb.Config.get("SONG_REQUESTS_STATE");
 		if (state === "off") {
 			return { reply: "Song requests are currently turned off." };
@@ -185,9 +189,6 @@ module.exports = {
 			}
 	
 			return await this.staticData.cytubeIntegration.queue(args.join(" "));
-		}
-		else if (args.length === 0) {
-			return { reply: "You must search for a link or a video description!" };
 		}
 	
 		const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
