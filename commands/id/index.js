@@ -2,7 +2,7 @@ module.exports = {
 	Name: "id",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-03T17:42:06.000Z",
 	Cooldown: 10000,
 	Description: "Checks your (or someone else's) ID in the database of users - the lower the number, the earlier the user was first spotted",
 	Flags: ["mention","pipe","skip-banphrase"],
@@ -11,18 +11,19 @@ module.exports = {
 		threshold: 1127
 	}),
 	Code: (async function id (context, user) {
-		let targetUser = context.user;
-		if (user) {
-			targetUser = await sb.Utils.getDiscordUserDataFromMentions(user, context.append) || await sb.User.get(user, true);
-		}
+		const targetUser = (user)
+			? await sb.User.get(user)
+			: context.user;
 	
 		if (!targetUser) {
-			return { reply: "No data for given user name!" };
+			return {
+				success: false,
+				reply: "No data for given user name!" 
+			};
 		}
-		
+	
 		let idString = "That person's ID is";
 		let pronoun = "they were";
-		
 		if (sb.User.bots.has(targetUser.ID)) {
 			idString = "That bot's ID is";
 			pronoun = "it was";
