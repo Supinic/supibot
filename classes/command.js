@@ -136,7 +136,9 @@ module.exports = (function () {
 
 			this.#Author = data.Author ?? null;
 
-			this.#Last_Edit = data.Last_Edit;
+			this.#Last_Edit = (data.Last_Edit instanceof sb.Date)
+				? data.Last_Edit
+				: new sb.Date(data.Last_Edit);
 
 			try {
 				this.Code = eval(data.Code);
