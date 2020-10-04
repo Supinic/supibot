@@ -343,7 +343,7 @@ module.exports = class Cytube extends require("./template.js") {
 			return;
 		}
 
-		super.mirror(message, userData, this.channelData.Mirror, commandUsed);
+		super.mirror(message, userData, this.channelData, commandUsed);
 	}
 
 	async queue (type, videoID) {

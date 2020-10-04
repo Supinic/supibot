@@ -36,11 +36,18 @@ module.exports = class Controller {
 	 * Double checking would lead to inconsistent behaviour.
 	 * @param {string} message
 	 * @param {User} userData
-	 * @param {Channel} channelData Channel to mirror the given message to
+	 * @param {Channel} channelData The channel where the message is coming from
 	 * @param {boolean} commandUsed = false If a command was used, do not include the user name of who issued the command.
 	 * @returns {Promise<void>}
 	 */
 	async mirror (message, userData, channelData, commandUsed = false) {
+		const mirrorChannelData = sb.Channel.get(channelData.Mirror);
+		if (!mirrorChannelData) {
+			console.warn("Provided channel does not have any mirror channel set up", { channelData });
+			return;
+		}
+
+		// Do not mirror if no identifier has been configured
 		const symbol = this.platform.Mirror_Identifier;
 		if (symbol === null) {
 			return;
@@ -55,9 +62,9 @@ module.exports = class Controller {
 			? `${symbol} ${message}`
 			: `${symbol} ${userData.Name}: ${message}`;
 
-		const finalMessage = await sb.Master.prepareMessage(fixedMessage, channelData);
+		const finalMessage = await sb.Master.prepareMessage(fixedMessage, mirrorChannelData);
 		if (finalMessage) {
-			await channelData.send(finalMessage);
+			await mirrorChannelData.send(finalMessage);
 		}
 	}
 
