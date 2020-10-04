@@ -403,12 +403,10 @@ module.exports = (function () {
 
                     const messageArray = sb.Utils.partitionString(message, limit, 2);
                     for (const splitMessage of messageArray) {
-                        await channelData.send(splitMessage);
-
-	                    // Make sure to mirror the reminder if the target channel is set up to be mirrored
-	                    if (channelData.Mirror) {
-		                    sb.Master.mirror(splitMessage, targetUserData, channelData.Mirror);
-	                    }
+                        await Promise.all([
+                            channelData.send(splitMessage),
+                            channelData.mirror(splitMessage, targetUserData, false)
+                        ]);
                     }
                 }
                 else {
@@ -425,11 +423,10 @@ module.exports = (function () {
                 }
 
                 const publicMessage = `Hey ${targetUserData.Name} - I just whispered you ${privateReply.length} private reminder(s) - make sure to check them out!`;
-                await channelData.send(publicMessage);
-
-                if (channelData.Mirror) {
-                    sb.Master.mirror(publicMessage, targetUserData, channelData.Mirror);
-                }
+                await Promise.all([
+                    channelData.send(publicMessage),
+                    channelData.mirror(publicMessage, targetUserData, false)
+                ]);
             }
         }
 

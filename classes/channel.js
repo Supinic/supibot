@@ -295,6 +295,29 @@ module.exports = (function () {
             await row.save();
         }
 
+        /**
+         * Mirrors the message to the given mirror channel, if this instance has been configured to do so.
+         * @param {string} message
+         * @param {User} userData
+         * @param {boolean} commandUsed = false
+         * @returns {Promise<void>}
+         */
+        async mirror (message, userData, commandUsed = false) {
+            if (this.Mirror === null) {
+                return;
+            }
+
+            const targetChannel = Channel.get(this.Mirror);
+            if (!targetChannel) {
+                throw new sb.Error({
+                    message: "Invalid channel mirror configuration",
+                    args: { sourceChannel: this }
+                });
+            }
+
+            return await this.Platform.controller.mirror(message, userData, commandUsed);
+        }
+
         destroy () {
             this.Data = null;
             this.sessionData = null;
