@@ -2,7 +2,7 @@ module.exports = {
 	Name: "randomgachi",
 	Aliases: ["rg"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T08:51:30.000Z",
 	Cooldown: 5000,
 	Description: "Fetches a random gachi track from the gachi list, excluding Bilibili and Nicovideo videos with no Youtube reuploads",
 	Flags: ["link-only","mention","pipe"],
@@ -89,7 +89,7 @@ module.exports = {
 			reply: `Here's your random gachi: "${data.TrackName}" by ${authors} - ${supiLink} gachiGASM`
 		};
 	}),
-	Dynamic_Description: async (prefix) => {https://supinic.com
+	Dynamic_Description: async (prefix) => {
 		return [
 			`Returns a random gachimuchi track from the <a href="/track/gachi/list">track list</a>.`,
 			"",
