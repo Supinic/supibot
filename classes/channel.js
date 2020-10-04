@@ -315,7 +315,7 @@ module.exports = (function () {
                 });
             }
 
-            return await this.Platform.controller.mirror(message, userData, commandUsed);
+            return await this.Platform.controller.mirror(message, userData, this, commandUsed);
         }
 
         destroy () {

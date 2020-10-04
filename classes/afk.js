@@ -103,9 +103,6 @@ module.exports = (function () {
 
 			if (!data.Silent) {
 				const message = `${userData.Name} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
-				if (channelData.Mirror) {
-					await channelData.mirror(message, userData, false);
-				}
 
 				let fixedMessage = (await Promise.all([
 					sb.Master.prepareMessage(userData.Name + " " + status + ":", channelData),
@@ -120,7 +117,10 @@ module.exports = (function () {
 					string: fixedMessage
 				});
 
-				await channelData.send(fixedMessage);
+				await Promise.all([
+					channelData.send(fixedMessage),
+					channelData.mirror(message, userData, false)
+				]);
 			}
 		}
 
