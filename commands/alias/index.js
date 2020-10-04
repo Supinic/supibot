@@ -2,12 +2,12 @@ module.exports = {
 	Name: "alias",
 	Aliases: ["$"],
 	Author: "supinic",
-	Last_Edit: "2020-09-11T17:17:12.000Z",
+	Last_Edit: "2020-10-04T22:46:10.000Z",
 	Cooldown: 2500,
 	Description: "This command lets you create your own aliases (shorthands) for any other combination of commands and arguments. Check the extended help for step-by-step info.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		aliasLimit: 10,
 		nameCheck: {
 			regex: /^[-\w\u00a9\u00ae\u2000-\u3300\ud83c\ud000-\udfff\ud83d\ud000-\udfff\ud83e\ud000-\udfff]{2,25}$/,
@@ -99,7 +99,7 @@ module.exports = {
 				resultArguments
 			};
 		}
-	}),
+	})),
 	Code: (async function alias (context, type, ...args) {
 		if (context.invocation === "$") {
 			args = [type, ...args]; // This the command name
@@ -112,6 +112,8 @@ module.exports = {
 					This command lets you create your own command aliases.
 					Check the extended help here:
 					https://supinic.com/bot/command/${this.ID}
+					If you created some, check your list here:
+					https://supinic.com/user/alias/list
 				`
 			};
 		}
@@ -443,6 +445,7 @@ module.exports = {
 	
 			`<code>${prefix}alias list</code>`,
 			"Lists all your currently active aliases.",
+			`You can also check them in <a href="/user/alias/list">this list</a> - after you log in.`,
 			"",
 			
 			`<code>${prefix}alias remove (name)</code>`,
