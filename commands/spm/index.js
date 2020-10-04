@@ -2,14 +2,14 @@ module.exports = {
 	Name: "spm",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T19:44:34.000Z",
+	Last_Edit: "2020-10-04T22:34:27.000Z",
 	Cooldown: 0,
 	Description: "Various utility subcommands related to supibot-package-manager.",
 	Flags: ["developer","mention","whitelist"],
 	Whitelist_Response: "Only Supi can use this command, but you can check the repository here: https://github.com/supinic/supibot-package-manager peepoHackies\n\t",
-	Static_Data: ({
+	Static_Data: (() => ({
 		exists: require("util").promisify(require("fs").exists)
-	}),
+	})),
 	Code: (async function spm (context, ...args) {
 		const operation = args.shift()?.toLowerCase();
 		if (!operation) {

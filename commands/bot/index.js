@@ -2,12 +2,12 @@ module.exports = {
 	Name: "bot",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-11T16:48:47.000Z",
+	Last_Edit: "2020-10-04T23:02:29.000Z",
 	Cooldown: 2500,
 	Description: "Allows broadcasters to set various parameters for the bot in their own channel. Usable anywhere, but only applies to their own channel.",
 	Flags: ["mention","pipe","skip-banphrase","use-params"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		allowedModes: [
 			{
 				name: "Ignore",
@@ -30,7 +30,7 @@ module.exports = {
 				description: "Won't reply in the main channel at all, but the response will be whispered to target user."
 			}
 		]
-	}),
+	})),
 	Code: (async function bot (context, command, ...args) {
 		const { params } = context;
 		if (!command) {

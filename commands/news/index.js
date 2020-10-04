@@ -2,12 +2,12 @@ module.exports = {
 	Name: "news",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T23:04:05.000Z",
 	Cooldown: 10000,
 	Description: "Fetches short articles. You can use a 2 character ISO code to get country specific news, or any other word as a search query.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		extra: {
 			exists: async (code) => {
 				code = code.toLowerCase();
@@ -58,7 +58,7 @@ module.exports = {
 				};
 			}
 		}
-	}),
+	})),
 	Code: (async function news (context, ...rest) {
 		const params = new sb.URLParams().set("language", "en");
 		if (rest[0] && await this.staticData.extra.exists(rest[0])) {

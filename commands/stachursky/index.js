@@ -2,12 +2,12 @@ module.exports = {
 	Name: "stachursky",
 	Aliases: ["FeelsStachurskyMan"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T22:48:10.000Z",
 	Cooldown: 10000,
 	Description: "Posts a random excerpt from a Stachursky song.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		quotes: [
 			"W ogóle, centralnie, kamieniem go bez kitu.",
 			"Jestem sobie pravdą, fałszem i zagadką teź.",
@@ -64,7 +64,7 @@ module.exports = {
 			"Nie jeden twardy wymiękł przy tobie, lecz ja napewno dam radę sobie.",
 			"Kurwa, jazda, amok, chłosta, dopał, rwanie, faza i zgon!"
 		]
-	}),
+	})),
 	Code: (async function stachursky () {
 		return {
 			reply: sb.Utils.randArray(this.staticData.quotes)

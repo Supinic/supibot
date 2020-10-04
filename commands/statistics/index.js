@@ -2,12 +2,12 @@ module.exports = {
 	Name: "statistics",
 	Aliases: ["stat", "stats"],
 	Author: "supinic",
-	Last_Edit: "2020-10-03T19:19:13.000Z",
+	Last_Edit: "2020-10-04T23:02:19.000Z",
 	Cooldown: 10000,
 	Description: "Posts various statistics regarding you, e.g. total afk time.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		types: [
 			{
 				names: ["aliases"],
@@ -67,11 +67,11 @@ module.exports = {
 	
 						return {
 							reply: sb.Utils.tag.trim `
-								You have been AFK with status "${target}"
-								${data.Amount} times,
-								for a total of ~${delta}.
-								This averages to ~${average} spent AFK per invocation.
-							`
+									You have been AFK with status "${target}"
+									${data.Amount} times,
+									for a total of ~${delta}.
+									This averages to ~${average} spent AFK per invocation.
+								`
 						};
 					}
 				}
@@ -144,9 +144,9 @@ module.exports = {
 						const total = sb.Utils.timeDelta(sb.Date.now() + totalLength * 1000, true);
 						return {
 							reply: sb.Utils.tag.trim `
-								Videos requested: ${requests.length}, for a total runtime of ${total}.
-								The most requested video is ${mostRequested} - queued ${currentMax} times.
-							`
+									Videos requested: ${requests.length}, for a total runtime of ${total}.
+									The most requested video is ${mostRequested} - queued ${currentMax} times.
+								`
 						};
 					},
 					fetchVideoStats: async function (videoID) {
@@ -170,9 +170,9 @@ module.exports = {
 						const lastDelta = sb.Utils.timeDelta(requests[0].Added);
 						return {
 							reply: sb.Utils.tag.trim `
-								This video has been requested ${requests.length} times.
-								It was last requested ${lastDelta}.
-							`
+									This video has been requested ${requests.length} times.
+									It was last requested ${lastDelta}.
+								`
 						};
 					},
 				}
@@ -185,14 +185,14 @@ module.exports = {
 						.select("Name", "Use_Count")
 						.from("data", "Playsound")
 					);
-					
+	
 					if (name === "all" || name === "total") {
 						const total = data.reduce((acc, cur) => acc += cur.Use_Count, 0);
 						return {
 							reply: `Playsounds have been used a total of ${total} times.`
 						};
 					}
-									
+	
 					const target = data.find(i => i.Name === name);
 					if (target) {
 						return {
@@ -214,14 +214,14 @@ module.exports = {
 					if (context.platform.Name === "discord" && user && user.includes("@")) {
 						user = await sb.Utils.getDiscordUserDataFromMentions(user, context.append) || context.user;
 					}
-				
+	
 					if (user === "total" || context.invocation === "tcc") {
 						const cookies = await sb.Query.getRecordset(rs => rs
 							.select("SUM(Cookies_Total) AS Total", "SUM(Cookie_Gifts_Sent) AS Gifts")
 							.from("chat_data", "Extra_User_Data")
 							.single()
 						);
-				
+	
 						return {
 							reply: cookies.Total + " cookies have been eaten so far, out of which " + cookies.Gifts + " were gifted :)"
 						};
@@ -231,15 +231,15 @@ module.exports = {
 							reply: "Check the cookie statistics here: https://supinic.com/bot/cookie/list"
 						};
 					}
-				
+	
 					const targetUser = await sb.User.get(user || context.user, true);
 					if (!targetUser) {
 						return { reply: "Target user does not exist in the database!" };
 					}
 					else if (targetUser.Name === context.platform.Self_Name) {
 						return { reply: "I don't eat cookies, sugar is bad for my circuits!" };
-					}	
-				
+					}
+	
 					const cookies = await sb.Query.getRecordset(rs => rs
 						.select("Cookie_Today AS Today", "Cookies_Total AS Daily")
 						.select("Cookie_Gifts_Sent AS Sent", "Cookie_Gifts_Received AS Received")
@@ -247,11 +247,11 @@ module.exports = {
 						.where("User_Alias = %n", targetUser.ID)
 						.single()
 					);
-				
+	
 					const [who, target] = (context.user.ID === targetUser.ID)
 						? ["You have", "you"]
 						: ["That user has", "them"];
-				
+	
 					if (!cookies || cookies.Daily === 0) {
 						return { reply: who + " never eaten a single cookie!" };
 					}
@@ -260,12 +260,12 @@ module.exports = {
 						// Daily = amount of eaten daily cookies
 						// Received = amount of received cookies, independent of Daily
 						// Sent = amount of sent cookies, which is subtracted from Daily
-				
+	
 						const total = cookies.Daily + cookies.Received - cookies.Sent + cookies.Today;
 						const giftedString = (cookies.Sent === 0)
 							? `${who} never given out a single cookie`
 							: `${who} gifted away ${cookies.Sent} cookie(s)`;
-				
+	
 						let reaction = "";
 						const percentage = sb.Utils.round((cookies.Sent / total) * 100, 0);
 						if (percentage <= 0) {
@@ -286,12 +286,12 @@ module.exports = {
 						else {
 							reaction = "😳 an absolutely selfless saint 😇";
 						}
-				
+	
 						let voidString = "";
 						if (total < cookies.Received) {
 							voidString = ` (the difference of ${cookies.Received - total} has been lost to the Void)`;
 						}
-				
+	
 						return {
 							reply: `${who} eaten ${total} cookies so far. Out of those, ${cookies.Received} were gifted to ${target}${voidString}. ${giftedString} ${reaction}`
 						};
@@ -299,7 +299,7 @@ module.exports = {
 				}
 			},
 		]
-	}),
+	})),
 	Code: (async function statistics (context, type, ...args) {
 		if (!type) {
 			return {
@@ -322,22 +322,22 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: async (prefix, values) => {
-		const { types } = values.getStaticData();
-		const list = types.map(i => {
-			const names = i.names.sort().map(j => `<code>${j}</code>`).join(" | ");
-			return `${names}<br>${i.description}`;
-		}).join("<br>");
-	
-		return [
-			"Checks various statistics bound to you, found around supibot's data.",
-			"",
-	
-			`<code>${prefix}stats (type)</code>`,
-			"Statistics based on the type used",
-			"",
-	
-			"Types:",
-			`<ul>${list}</ul>`
-		];	
-	}
+			const { types } = values.getStaticData();
+			const list = types.map(i => {
+				const names = i.names.sort().map(j => `<code>${j}</code>`).join(" | ");
+				return `${names}<br>${i.description}`;
+			}).join("<br>");
+		
+			return [
+				"Checks various statistics bound to you, found around supibot's data.",
+				"",
+		
+				`<code>${prefix}stats (type)</code>`,
+				"Statistics based on the type used",
+				"",
+		
+				"Types:",
+				`<ul>${list}</ul>`
+			];	
+		}
 };

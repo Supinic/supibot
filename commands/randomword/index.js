@@ -2,14 +2,14 @@ module.exports = {
 	Name: "randomword",
 	Aliases: ["rw"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T23:03:19.000Z",
 	Cooldown: 5000,
 	Description: "Fetches a random word. If a number is provided, rolls that many words.",
 	Flags: ["pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		limit: 10
-	}),
+	})),
 	Code: (async function randomWord (context, number = 1) {
 		const repeats = Number(number);
 		if (!repeats || repeats > this.staticData.limit || repeats < 1 || Math.trunc(repeats) !== repeats) {

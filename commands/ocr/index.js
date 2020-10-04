@@ -2,12 +2,12 @@ module.exports = {
 	Name: "ocr",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-11T17:43:08.000Z",
+	Last_Edit: "2020-10-04T22:46:29.000Z",
 	Cooldown: 10000,
 	Description: "Takes your image link and attempts to find the text in it by using OCR.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		languages: {
 			ara: "Arabic",
 			bul: "Bulgarian",
@@ -33,7 +33,7 @@ module.exports = {
 			swe: "Swedish",
 			tur: "Turkish"
 		}
-	}),
+	})),
 	Code: (async function ocr (context, ...args) {
 		let language = "eng";
 		for (let i = 0; i < args.length; i++) {

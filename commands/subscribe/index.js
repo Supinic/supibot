@@ -2,12 +2,12 @@ module.exports = {
 	Name: "subscribe",
 	Aliases: ["unsubscribe"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T23:03:25.000Z",
 	Cooldown: 5000,
 	Description: "Subscribe or unscribe to a database changing event. Check the extended help for detailed info on each subscription event.",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		types: [
 			{
 				name: "Suggestion",
@@ -37,7 +37,7 @@ module.exports = {
 				}
 			}
 		]
-	}),
+	})),
 	Code: (async function subscribe (context, type) {	
 		if (!type) {
 			return {

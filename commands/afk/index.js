@@ -2,12 +2,12 @@ module.exports = {
 	Name: "afk",
 	Aliases: ["gn", "brb", "shower", "food", "lurk", "poop", "💩", "ppPoof", "work", "study"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T23:04:38.000Z",
 	Cooldown: 10000,
 	Description: "Flags you as AFK. Supports a custom AFK message.",
 	Flags: ["pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		responses: {
 			"afk": ["is no longer AFK"],
 			"poop": ["is done taking a dump", "finished pooping", "forgot to flush", "washed hands", "didn't wash hands"],
@@ -25,7 +25,7 @@ module.exports = {
 			"🥙", "🍳", "🥘", "🍲", "🥣", "🥗", "🍿", "🥫", "🍱", "🍘", "🍙", "🍚", "🍛", "🍜", "🍝", "🍠", "🍢", "🍣", "🍤",
 			"🍥", "🍡", "🥟", "🥠", "🥡", "🍦", "🍧", "🍨", "🍩", "🍪", "🎂", "🍰", "🥧", "🍫", "🍬", "🍭", "🍮", "🍯"
 		]
-	}),
+	})),
 	Code: (async function afk (context, ...args) {
 		if (context.privateMessage && sb.AwayFromKeyboard.data.find(i => i.User_Alias === context.user.ID)) {
 			return {

@@ -2,12 +2,12 @@ module.exports = {
 	Name: "horoscope",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T22:45:58.000Z",
 	Cooldown: 30000,
 	Description: "Checks your horoscope, if you have set your birthday within supibot.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		zodiac: [
 			{ 
 				name: "Aries",
@@ -70,7 +70,7 @@ module.exports = {
 				end: [3, 20]
 			}
 		]
-	}),
+	})),
 	Code: (async function horoscope (context) {
 		if (!context.user.Data.birthday) {
 			return {

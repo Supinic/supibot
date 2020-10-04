@@ -2,12 +2,12 @@ module.exports = {
 	Name: "osrs",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-03T17:21:25.000Z",
+	Last_Edit: "2020-10-04T22:34:18.000Z",
 	Cooldown: 5000,
 	Description: "Aggregate command for whatever regarding Old School Runescape.",
 	Flags: ["mention","use-params"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		fetch: async (user) => {
 			let data = await sb.Cache.getByPrefix("command-osrs-stats", {
 				keys: { user }
@@ -70,7 +70,7 @@ module.exports = {
 			{ name: "Woodcutting", emoji: "🌳" },
 			{ name: "Farming", emoji: "‍🌽" },
 		]
-	}),
+	})),
 	Code: (async function osrs (context, command, ...args) {
 		if (!command) {
 			return {

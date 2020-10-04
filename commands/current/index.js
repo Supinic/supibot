@@ -2,14 +2,14 @@ module.exports = {
 	Name: "current",
 	Aliases: ["song"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T18:35:46.000Z",
+	Last_Edit: "2020-10-04T23:03:31.000Z",
 	Cooldown: 5000,
 	Description: "Fetches the current song playing on stream.",
 	Flags: ["link-only","mention","pipe","whitelist"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		types: ["current", "previous"]
-	}),
+	})),
 	Code: (async function current (context, ...args) {
 		const linkSymbol = sb.Config.get("VIDEO_TYPE_REPLACE_PREFIX");
 		const state = sb.Config.get("SONG_REQUESTS_STATE");

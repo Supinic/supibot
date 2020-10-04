@@ -2,14 +2,14 @@ module.exports = {
 	Name: "id",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-03T17:42:06.000Z",
+	Last_Edit: "2020-10-04T23:04:31.000Z",
 	Cooldown: 10000,
 	Description: "Checks your (or someone else's) ID in the database of users - the lower the number, the earlier the user was first spotted",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		threshold: 1127
-	}),
+	})),
 	Code: (async function id (context, user) {
 		const targetUser = (user)
 			? await sb.User.get(user)

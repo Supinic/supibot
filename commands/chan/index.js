@@ -2,12 +2,12 @@ module.exports = {
 	Name: "chan",
 	Aliases: ["4chan", "textchan", "filechan", "imagechan"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T22:46:52.000Z",
 	Cooldown: 10000,
 	Description: "Pulls a random post from a random board, or a specified one, if you provide it.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		replacements: [
 			{
 				regex: /desu/ig,
@@ -27,7 +27,7 @@ module.exports = {
 			},
 	
 		]
-	}),
+	})),
 	Code: (async function chan (context, identifier, ...rest) {
 		if (!identifier) {
 			return {

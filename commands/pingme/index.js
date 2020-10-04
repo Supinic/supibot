@@ -2,19 +2,19 @@ module.exports = {
 	Name: "pingme",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T23:03:15.000Z",
 	Cooldown: 15000,
 	Description: "Sets a self-notification in the current channel when the target user is spotted in a different channel.",
 	Flags: ["mention","opt-out","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		strings: {
 			"public-incoming": "That person has too many public reminders pending!",
 			"public-outgoing":  "You have too many public reminders pending!",
 			"private-incoming": "That person has too many private reminders pending!",
 			"private-outgoing": "You have too many private reminders pending!"
 		}
-	}),
+	})),
 	Code: (async function pingMe (context, user) {
 		if (!user) {
 			return { reply: "No user provided!" };

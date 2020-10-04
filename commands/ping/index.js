@@ -2,12 +2,12 @@ module.exports = {
 	Name: "ping",
 	Aliases: ["pang","peng","pong","pung","pyng"],
 	Author: "supinic",
-	Last_Edit: "2020-09-27T18:41:52.000Z",
+	Last_Edit: "2020-10-04T23:04:41.000Z",
 	Cooldown: 5000,
 	Description: "Ping!",
 	Flags: ["pipe","skip-banphrase"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		checkLatency: async (callback, ...args) => {
 			try {
 				const start = process.hrtime.bigint();
@@ -19,7 +19,7 @@ module.exports = {
 				return null;
 			}
 		}
-	}),
+	})),
 	Code: (async function ping (context) {
 		const promisify = require("util").promisify;
 		const readFile = require("fs").promises.readFile;

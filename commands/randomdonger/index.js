@@ -2,12 +2,12 @@ module.exports = {
 	Name: "randomdonger",
 	Aliases: ["rd"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T23:02:56.000Z",
 	Cooldown: 10000,
 	Description: "Raise your dongers.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		dongers: [
 			"(⨶ ͜つ⨶)",
 			"ʕóヘòʔ",
@@ -110,7 +110,7 @@ module.exports = {
 			"⸮$◡$?",
 			"(╯૦ઁѠ૦ઁ）╯︵ ┻━┻"
 		]
-	}),
+	})),
 	Code: (async function randomDonger () {
 		return {
 			reply: sb.Utils.randArray(this.staticData.dongers)

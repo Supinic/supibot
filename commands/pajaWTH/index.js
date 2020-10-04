@@ -2,12 +2,12 @@ module.exports = {
 	Name: "pajaWTH",
 	Aliases: ["obamaWTF"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T23:03:51.000Z",
 	Cooldown: 5000,
 	Description: "Posts a random Anthony \"Obama Chavez\" Stone quote, mostly from Knaked Knights and the snippets from IWF 2017.",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		quotes: [
 			"When the Lord rises, even the mighty are terrified (Hirata 8:10)",
 			"And he will love thee, and he will bless the fruit of thy womb (Reeves 364:364)",
@@ -31,7 +31,7 @@ module.exports = {
 			"I'm gone now but it's okay...",
 			"You're going to have to keep on living..."
 		]
-	}),
+	})),
 	Code: (async function pajaWTH () {
 		return {
 			reply: sb.Utils.randArray(this.staticData.quotes)

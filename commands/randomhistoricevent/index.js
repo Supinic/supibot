@@ -2,16 +2,16 @@ module.exports = {
 	Name: "randomhistoricevent",
 	Aliases: ["rhe"],
 	Author: "supinic",
-	Last_Edit: "2020-09-11T17:34:01.000Z",
+	Last_Edit: "2020-10-04T22:46:04.000Z",
 	Cooldown: 10000,
 	Description: "For a given day, posts a random historic event that happened on that day. If not provided, uses the today's date.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		formatter: new Intl.DateTimeFormat("en-GB", {
 			month: "long"
 		})
-	}),
+	})),
 	Code: (async function randomHistoricEvent (context, ...args) {
 		const date = (args.length > 0)
 			? new sb.Date(args.join(" "))

@@ -2,12 +2,12 @@ module.exports = {
 	Name: "epal",
 	Aliases: ["ForeverAlone"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T22:46:47.000Z",
 	Cooldown: 10000,
 	Description: "Fetches a random person from epal.gg - post their description. If used on supinic's channel with TTS on, and if they have an audio introduction, it will be played on stream.",
 	Flags: ["mention"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		fetchGamesData: async () => {
 			const data = await sb.Got.instances.FakeAgent({
 				method: "POST",
@@ -228,7 +228,7 @@ module.exports = {
 				"gameID": 166
 			}
 		]
-	}),
+	})),
 	Code: (async function epal (context, ...args) {
 		let game = sb.Utils.randArray(this.staticData.games);
 		let selectedSex = "1";

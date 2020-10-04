@@ -2,15 +2,15 @@ module.exports = {
 	Name: "supibotupdates",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T22:45:51.000Z",
 	Cooldown: 5000,
 	Description: "Toggles your role on Supinic's discord which determines if you get pinged by the #supibot-updates announcements.",
 	Flags: ["ping"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		updatesRoleID: "748957148439904336",
 		supinicGuildID: "633342787869212683"
-	}),
+	})),
 	Code: (async function supibotUpdate (context) {
 		if (context.platform.Name !== "discord") {
 			return {

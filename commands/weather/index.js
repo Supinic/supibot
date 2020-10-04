@@ -2,12 +2,12 @@ module.exports = {
 	Name: "weather",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-11T18:02:49.000Z",
+	Last_Edit: "2020-10-04T23:03:59.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the current weather in a given location. You can specify parameters to check forecast, or mention a user to get their location, if they set it up. Check all possibilities in e xtended help. Weather data powered by Darksky.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		icons: {
 			"clear-day": "🌞",
 			"clear-night": "🌚",
@@ -23,7 +23,7 @@ module.exports = {
 			"tornado": "🌪️",
 			"wind": "💨"
 		}
-	}),
+	})),
 	Code: (async function weather (context, ...args) {
 		let number = null;
 		let type = "currently";

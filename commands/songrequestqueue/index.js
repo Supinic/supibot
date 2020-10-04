@@ -2,14 +2,14 @@ module.exports = {
 	Name: "songrequestqueue",
 	Aliases: ["srq", "queue"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T23:02:37.000Z",
 	Cooldown: 30000,
 	Description: "Posts the summary of song request queue. EXPERIMENTAL monkaS",
 	Flags: ["mention","pipe","whitelist"],
 	Whitelist_Response: "Only available in supinic's channel.",
-	Static_Data: ({
+	Static_Data: (() => ({
 		isCustom: (string) => (string.endsWith(".mp3") || string.endsWith(".ogg") || string.endsWith(".mp4"))
-	}),
+	})),
 	Code: (async function songRequestQueue (context) {
 		const state = sb.Config.get("SONG_REQUESTS_STATE");
 		if (state === "off") {

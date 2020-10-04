@@ -2,14 +2,14 @@ module.exports = {
 	Name: "gachicheck",
 	Aliases: ["gc"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T23:03:55.000Z",
 	Cooldown: 2500,
 	Description: "Checks if a given gachi link exists in the database, if not, adds it to the todo list to be processed later.",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		limit: 100
-	}),
+	})),
 	Code: (async function gachiCheck (context, ...args) {
 		if (args.length === 0) {
 			return {

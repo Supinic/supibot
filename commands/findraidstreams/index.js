@@ -2,15 +2,15 @@ module.exports = {
 	Name: "findraidstreams",
 	Aliases: ["frs"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T23:02:49.000Z",
 	Cooldown: 0,
 	Description: "Iterates over eligible Twitch channel, finds online streams and posts a summary to Pastebin. Used to find a good raid after a stream is finished.",
 	Flags: ["developer","pipe","whitelist"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		viewerThreshold: 100,
 		ignoredChannels: [ 42 ]
-	}),
+	})),
 	Code: (async function findRaidStreams () {
 		const raidable = sb.Channel.data
 			.filter(i => (

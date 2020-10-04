@@ -2,12 +2,12 @@ module.exports = {
 	Name: "emotecheck",
 	Aliases: ["ec"],
 	Author: "supinic",
-	Last_Edit: "2020-09-15T17:14:43.000Z",
+	Last_Edit: "2020-10-04T23:02:43.000Z",
 	Cooldown: 15000,
 	Description: "Posts the list of each of Twitch's amazing \"global\" emote sets.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		sets: [
 			{
 				name: "hyperscape",
@@ -369,7 +369,7 @@ module.exports = {
 				]
 			},
 		]
-	}),
+	})),
 	Code: (async function emoteCheck (context, name) {
 		if (!name) {
 			return {

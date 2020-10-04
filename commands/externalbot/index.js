@@ -2,14 +2,14 @@ module.exports = {
 	Name: "externalbot",
 	Aliases: ["ebot"],
 	Author: "supinic",
-	Last_Edit: "2020-09-25T15:28:38.000Z",
+	Last_Edit: "2020-10-04T22:47:03.000Z",
 	Cooldown: 0,
 	Description: "Makes supibot execute a command of a different bot, and then the result will be that bot's command response. As such, this command can only be used in a pipe.",
 	Flags: ["mention","pipe","whitelist"],
 	Whitelist_Response: "Currently being tested, and only available to trusted developers",
-	Static_Data: ({
+	Static_Data: (() => ({
 		responseTimeout: 10_000
-	}),
+	})),
 	Code: (async function externalBot (context, ...rest) {
 		if (!context.channel) {
 			return {

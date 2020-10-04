@@ -2,12 +2,12 @@ module.exports = {
 	Name: "check",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-11T17:47:06.000Z",
+	Last_Edit: "2020-10-04T23:03:46.000Z",
 	Cooldown: 10000,
 	Description: "Checks certain user or system variables. For a list of types, check the command's extended help.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		variables: [
 			{
 				name: "afk",
@@ -464,7 +464,7 @@ module.exports = {
 				}
 			}
 		]
-	}),
+	})),
 	Code: (async function check (context, type, identifier) {
 		if (!type) {
 			return {

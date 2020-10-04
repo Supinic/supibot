@@ -2,12 +2,12 @@ module.exports = {
 	Name: "randomlineextra",
 	Aliases: ["rlx"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T23:03:41.000Z",
 	Cooldown: 7500,
 	Description: "Posts a random message from a special set of channels on Twitch. You should be able to identify the channel by its emoji.",
 	Flags: ["block","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		channels: {
 			"amouranth": "💃🏼",
 			"athenelive": "🇫🇷🤖",
@@ -19,7 +19,7 @@ module.exports = {
 			"p4wnyhof": "🇩🇪🤖",
 			"pokimane": "😍"
 		}
-	}),
+	})),
 	Code: (async function randomLineExtra () {
 		const [channel, emoji] = sb.Utils.randArray(Object.entries(this.staticData.channels));
 		const max = (await sb.Query.getRecordset(rs => rs

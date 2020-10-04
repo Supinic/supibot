@@ -2,12 +2,12 @@ module.exports = {
 	Name: "randomname",
 	Aliases: ["rn"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T22:46:41.000Z",
 	Cooldown: 10000,
 	Description: "Fetches a random name.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		types: [
 			"Human Male",
 			"Human Female",
@@ -29,7 +29,7 @@ module.exports = {
 			"Celestial",
 			"Modron"
 		]
-	}),
+	})),
 	Code: (async function randomName (context, type) {
 		if (!type) {
 			type = sb.Utils.randArray(this.staticData.types);

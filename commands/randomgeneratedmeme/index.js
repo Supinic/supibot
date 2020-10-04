@@ -2,12 +2,12 @@ module.exports = {
 	Name: "randomgeneratedmeme",
 	Aliases: ["rgm"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
+	Last_Edit: "2020-10-04T22:46:37.000Z",
 	Cooldown: 10000,
 	Description: "Posts the text of a randomly generated meme.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: ({
+	Static_Data: (() => ({
 		memes: [
 			{
 				"ID": 112126428,
@@ -250,7 +250,7 @@ module.exports = {
 				"sfw": true
 			}
 		]
-	}),
+	})),
 	Code: (async function randomGeneratedMeme () {
 		if (!this.data.token || !this.data.cookie) {
 			const { body, headers } = await sb.Got.instances.FakeAgent({
