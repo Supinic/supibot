@@ -173,8 +173,8 @@ module.exports = (function () {
 					tempData = eval(data.Static_Data);
 				}
 				catch (e) {
-					console.warn(`Command ${this.ID} has invalid static data definition!`, e);
-					this.Code = async () => ({
+					console.warn(`Command has invalid static data definition!`, { data, error: e });
+					this.Code = () => ({
 						success: false,
 						reply: "Command has invalid code definition! Please make sure to let @supinic know about this!"
 					});
