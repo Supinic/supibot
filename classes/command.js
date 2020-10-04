@@ -103,12 +103,28 @@ module.exports = (function () {
 				this.Name = ""; // just a precaution so that the command never gets found out
 			}
 
-			try {
-				this.Aliases = JSON.parse(data.Aliases) || [];
-			}
-			catch (e) {
+			if (data.Aliases === null) {
 				this.Aliases = [];
-				console.warn(`Command ${this.Name} (${this.ID}) has invalid aliases definition: ${e}`);
+			}
+			else if (typeof data.Aliases === "string") {
+				try {
+					this.Aliases = JSON.parse(data.Aliases);
+				}
+				catch (e) {
+					this.Aliases = [];
+					console.warn(`Command has invalid JSON aliases definition`, {
+						command: this,
+						error: e,
+						data
+					});
+				}
+			}
+			else if (Array.isArray(data.Aliases) && data.Aliases.every(i => typeof i === "string")) {
+				this.Aliases = [...data.Aliases];
+			}
+			else {
+				this.Aliases = [];
+				console.warn(`Command has invalid aliases type`, { data });
 			}
 
 			this.Description = data.Description;
