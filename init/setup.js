@@ -1,5 +1,5 @@
 (async () => {
-	const fs = require("fs/promises");
+	const fs = require("fs").promises;
 	const util = require("util");
 	const { exec } = require("child_process");
 	const readline = require("readline");
