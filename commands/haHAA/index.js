@@ -1,8 +1,8 @@
 module.exports = {
 	Name: "haHAA",
-	Aliases: ["4Head", "4HEad", "$HEad"],
+	Aliases: ["4Head", "4HEad", "HEad"],
 	Author: "supinic",
-	Last_Edit: "2020-10-03T17:49:26.000Z",
+	Last_Edit: "2020-10-04T08:21:55.000Z",
 	Cooldown: 5000,
 	Description: "Posts a random, hilarious joke, 100% guaranteed.",
 	Flags: ["mention","pipe"],
