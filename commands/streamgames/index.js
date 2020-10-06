@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "streamgames",
-	Aliases: ["games", "sg"],
+	Aliases: ["games","sg"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:46:16.000Z",
 	Cooldown: 5000,
 	Description: "Posts the link to supinic's stream game list on Gist.",
 	Flags: ["developer","mention","pipe","system","whitelist"],

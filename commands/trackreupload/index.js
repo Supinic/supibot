@@ -2,7 +2,6 @@ module.exports = {
 	Name: "trackreupload",
 	Aliases: ["tr"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Sets a track ID in the list already to have the next track as a reupload. The next track can be an existing ID (if it's not a reupload already) or a new link, in which case it gets added to list.",
 	Flags: ["mention","pipe","whitelist"],

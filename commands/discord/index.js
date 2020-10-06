@@ -2,7 +2,6 @@ module.exports = {
 	Name: "discord",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 15000,
 	Description: "Posts the link to the current channel's Discord(?)",
 	Flags: ["mention","pipe"],

@@ -2,7 +2,6 @@ module.exports = {
 	Name: "block",
 	Aliases: ["unblock"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "Blocks, or unblocks a specified user from using a specified command with you as the target. You can also set a channel, or platform for the block to be active on.",
 	Flags: ["mention"],

@@ -2,7 +2,6 @@ module.exports = {
 	Name: "thesaurus",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 30000,
 	Description: "Attempts to re-created your sentence using random synonyms for each word. EXPERIMENTAL",
 	Flags: ["mention","pipe"],

@@ -2,7 +2,6 @@ module.exports = {
 	Name: "github",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-02T16:50:58.000Z",
 	Cooldown: 5000,
 	Description: "Posts GitHub repository links for Supibot and the website. If you add anything afterwards, a search will be executed for your query on the bot repository.",
 	Flags: ["developer","mention","pipe"],
@@ -39,7 +38,7 @@ module.exports = {
 			reply: `${file.name} - check here: ${link}`
 		};
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		return [
 			"If nothing is specified, posts GitHub repo links; otherwise, will execute a search on Supibot's repositories.",
 			"",
@@ -51,5 +50,5 @@ module.exports = {
 			`<code>${prefix}github (search query)</code>`,
 			"Searches supibot's repositories for that query",
 		];
-	}
+	})
 };

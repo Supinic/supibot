@@ -2,7 +2,6 @@ module.exports = {
 	Name: "nutrients",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Posts basic nutrients for a specified food query",
 	Flags: ["mention","pipe"],

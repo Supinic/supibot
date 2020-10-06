@@ -2,7 +2,6 @@ module.exports = {
 	Name: "sort",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "Sorts the message provided alphabetically.",
 	Flags: ["pipe"],

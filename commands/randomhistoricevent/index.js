@@ -2,7 +2,6 @@ module.exports = {
 	Name: "randomhistoricevent",
 	Aliases: ["rhe"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:46:04.000Z",
 	Cooldown: 10000,
 	Description: "For a given day, posts a random historic event that happened on that day. If not provided, uses the today's date.",
 	Flags: ["mention","pipe"],

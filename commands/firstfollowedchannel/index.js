@@ -2,7 +2,6 @@ module.exports = {
 	Name: "firstfollowedchannel",
 	Aliases: ["ffc"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the first channel you or someone else have ever followed on Twitch.",
 	Flags: ["mention","opt-out","pipe"],
@@ -42,8 +41,6 @@ module.exports = {
 				reply: `${who} oldest still followed channel is ${follow.channel.display_name}, since ${delta}.`
 			};
 		}
-	})
-	
-	,
+	}),
 	Dynamic_Description: null
 };

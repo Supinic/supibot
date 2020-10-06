@@ -2,7 +2,6 @@ module.exports = {
 	Name: "supibotupdates",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:45:51.000Z",
 	Cooldown: 5000,
 	Description: "Toggles your role on Supinic's discord which determines if you get pinged by the #supibot-updates announcements.",
 	Flags: ["ping"],

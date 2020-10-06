@@ -2,7 +2,6 @@ module.exports = {
 	Name: "weather",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:03:59.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the current weather in a given location. You can specify parameters to check forecast, or mention a user to get their location, if they set it up. Check all possibilities in e xtended help. Weather data powered by Darksky.",
 	Flags: ["mention","pipe"],
@@ -202,7 +201,7 @@ module.exports = {
 			reply: `${place} ${plusTime}: ${message}`
 		};
 	}),
-	Dynamic_Description: (prefix) => [
+	Dynamic_Description: ((prefix) => [
 		"Checks for current weather, or for hourly/daily/weekly forecast in a given location.",
 		"If you, or a given user have set their location with the <code>set</code> command, this command supports that.",
 		"",
@@ -236,5 +235,5 @@ module.exports = {
 	
 		`<code>${prefix}weather @User <b>(hour+X/day+X/week)</b></code>`,
 		"Similar to above, shows the user's weather, but uses the hour/day/week specifier.",
-	]
+	])
 };

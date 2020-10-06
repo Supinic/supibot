@@ -2,7 +2,6 @@ module.exports = {
 	Name: "gachicheck",
 	Aliases: ["gc"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:03:55.000Z",
 	Cooldown: 2500,
 	Description: "Checks if a given gachi link exists in the database, if not, adds it to the todo list to be processed later.",
 	Flags: ["mention","pipe","skip-banphrase"],
@@ -231,7 +230,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: async (prefix, values) => {
+	Dynamic_Description: (async (prefix, values) => {
 		const { limit } = values.getStaticData();
 	
 		return [
@@ -253,5 +252,5 @@ module.exports = {
 			`Does not check playlists that have more than <b>${limit}</b> videos.`,
 			"As with multiple videos, availability will also not be checked."
 		];
-	}
+	})
 };

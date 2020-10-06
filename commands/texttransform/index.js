@@ -2,7 +2,6 @@ module.exports = {
 	Name: "texttransform",
 	Aliases: ["tt"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Transforms provided text into one of provided types, such as \"vaporwave\", for example.",
 	Flags: ["pipe"],
@@ -287,7 +286,7 @@ module.exports = {
 			}
 		};
 	}),
-	Dynamic_Description: async (prefix, values) => {
+	Dynamic_Description: (async (prefix, values) => {
 		const lorem = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
 		const { types, convert } = values.getStaticData();
 		const examples = types.sort((a, b) => a.name.localeCompare(b.name)).map(transform => {
@@ -312,5 +311,5 @@ module.exports = {
 	
 			"<ul>" + examples.join("<br>") + "</ul>"
 		];
-	}
+	})
 };

@@ -2,7 +2,6 @@ module.exports = {
 	Name: "fill",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 20000,
 	Description: "Takes the input and scrambles it around randomly.",
 	Flags: ["mention","pipe"],

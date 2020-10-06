@@ -2,7 +2,6 @@ module.exports = {
 	Name: "bancheck",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Checks if a given message would be banphrased in a given channel. Checks the API banphrase (if it exists for given channel) and then the bot's banphrases as well.",
 	Flags: ["mention","pipe"],

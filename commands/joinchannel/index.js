@@ -2,7 +2,6 @@ module.exports = {
 	Name: "joinchannel",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 0,
 	Description: "Adds a new channel to database, sets its tables and events, and joins it. Only applicable for Twitch channels (for now, at least).",
 	Flags: ["mention","pipe","system","whitelist"],

@@ -2,7 +2,6 @@ module.exports = {
 	Name: "8ball",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:06:19.000Z",
 	Cooldown: 30000,
 	Description: "Checks your question against the fortune-telling 8-ball.",
 	Flags: ["mention","pipe"],
@@ -36,7 +35,7 @@ module.exports = {
 			reply: sb.Utils.randArray(this.staticData.responses)
 		};
 	}),
-	Dynamic_Description: async (prefix, values) => {
+	Dynamic_Description: (async (prefix, values) => {
 		const { responses } = values.getStaticData();
 		const list = responses.map(i => `<li>${i}</li>`).join("");
 	
@@ -51,6 +50,5 @@ module.exports = {
 			"List of responses:",
 			`<ul>${list}</ul>`
 		];
-	}
-	
+	})
 };

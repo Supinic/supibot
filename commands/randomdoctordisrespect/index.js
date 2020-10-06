@@ -2,7 +2,6 @@ module.exports = {
 	Name: "randomdoctordisrespect",
 	Aliases: ["rdd"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T18:36:45.000Z",
 	Cooldown: 10000,
 	Description: "Posts a Markov chain-generated tweet from Dr. Disrespect.",
 	Flags: ["mention","pipe"],

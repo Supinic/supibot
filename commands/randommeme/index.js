@@ -2,7 +2,6 @@ module.exports = {
 	Name: "randommeme",
 	Aliases: ["rm"],
 	Author: "supinic",
-	Last_Edit: "2020-09-11T18:11:28.000Z",
 	Cooldown: 15000,
 	Description: "If no parameters are provided, posts a random reddit meme. If you provide a subreddit, a post will be chosen randomly. NSFW subreddits and posts are only available on NSFW Discord channels!",
 	Flags: ["link-only","mention","pipe"],

@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "randomline",
-	Aliases: ["rl", "rq"],
+	Aliases: ["rl","rq"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 7500,
 	Description: "Fetches a random line from the current channel. If a user is specified, fetches a random line from that user only",
 	Flags: ["block","opt-out","pipe"],
@@ -205,7 +204,7 @@ module.exports = {
 			]
 		};
 	}),
-	Dynamic_Description: async (prefix) => [
+	Dynamic_Description: (async (prefix) => [
 		"Fetches a random chat line from the current channel.",
 		"If you specify a user, the line will be from that user only.",
 		"",
@@ -221,5 +220,5 @@ module.exports = {
 		`<code>${prefix}rq</code>`,
 		"Random message from yourself only",
 		""
-	]
+	])
 };

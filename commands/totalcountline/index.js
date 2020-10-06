@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "totalcountline",
-	Aliases: ["acl", "tcl"],
+	Aliases: ["acl","tcl"],
 	Author: "supinic",
-	Last_Edit: "2020-09-12T18:17:25.000Z",
 	Cooldown: 30000,
 	Description: "Fetches the total amount of a user's (or yours, if nobody was specified) chat lines in all tracked channels summed together.",
 	Flags: ["mention","pipe","skip-banphrase"],

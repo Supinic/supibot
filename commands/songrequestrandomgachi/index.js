@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "songrequestrandomgachi",
-	Aliases: ["gsr", "srg", "srrg"],
+	Aliases: ["gsr","srg","srrg"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:02:33.000Z",
 	Cooldown: 60000,
 	Description: "Posts a random gachi in the format \"!sr <link>\" to use on other bots' song request systems (such as StreamElements).",
 	Flags: ["skip-banphrase","whitelist"],

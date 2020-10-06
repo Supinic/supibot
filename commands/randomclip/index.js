@@ -2,7 +2,6 @@ module.exports = {
 	Name: "randomclip",
 	Aliases: ["rc"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 30000,
 	Description: "Posts a random clip from either the current channel or the specified channel. You can specify a parameter period, with options day/week/month/all, for example: perdiod:week",
 	Flags: ["mention","pipe"],

@@ -2,7 +2,6 @@ module.exports = {
 	Name: "speedrun",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the current world record speedrun of a given name in the default category. Check extended help for more info.",
 	Flags: ["mention"],
@@ -89,7 +88,7 @@ module.exports = {
 			reply: `Current WR for ${game.names.international}, ${category.name}: ${time} by ${runnerData.names.international}, run ${delta}.`
 		};
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		return [
 			`Searches <a href="//speedrun.com">speedrun.com</a> for the world record run of a given game.`,
 			`You can also specify categories. If you don't, the "default" one will be used.`,
@@ -106,5 +105,5 @@ module.exports = {
 			`<code>${prefix}speedrun Doom II categories</code>`,
 			"Posts a list of all tracked categories for Doom II.",
 		];
-	}
+	})
 };

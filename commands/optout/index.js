@@ -2,7 +2,6 @@ module.exports = {
 	Name: "optout",
 	Aliases: ["unoptout"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "Makes it so you cannot be the target of a command - the command will not be executed at all. For detailed usage, please check the extended help.",
 	Flags: ["mention","skip-banphrase"],
@@ -156,7 +155,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		return [
 			"Opts you out of a specific command.",
 			"While opted out from command, nobody can use it with you as the parameter.",
@@ -191,5 +190,5 @@ module.exports = {
 				</li>
 			</ul>`,
 		];
-	}
+	})
 };

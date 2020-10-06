@@ -2,7 +2,6 @@ module.exports = {
 	Name: "funfact",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 60000,
 	Description: "Fetches a random fun fact. Absolutely not guaranteed to be fun or fact. Want to help out? Send us your own fun fact via the $suggest command!",
 	Flags: ["mention","pipe"],

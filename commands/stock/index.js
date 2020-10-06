@@ -2,7 +2,6 @@ module.exports = {
 	Name: "stock",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the latest price and daily change for a stock.",
 	Flags: ["mention","pipe"],

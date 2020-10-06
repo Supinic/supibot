@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "remind",
-	Aliases: ["notify", "reminder", "remindme", "notifyme", "remindprivate", "notifyprivate"],
+	Aliases: ["notify","reminder","remindme","notifyme","remindprivate","notifyprivate"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:04:11.000Z",
 	Cooldown: 10000,
 	Description: "Sets a notify for a given user. Can also set a time to ping that user (or yourself) in given amount of time, but in that case you must use the word \"in\" and then a number specifying the amount days, hours, minutes, etc.",
 	Flags: ["block","mention","opt-out","pipe"],

@@ -2,7 +2,6 @@ module.exports = {
 	Name: "atop",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-12T18:16:28.000Z",
 	Cooldown: 0,
 	Description: "Fetches the top 10 users by total amount of chat lines across all channels. This is a very heavy operation on SQL, so please use it sparingly.",
 	Flags: ["mention","pipe","system","whitelist"],

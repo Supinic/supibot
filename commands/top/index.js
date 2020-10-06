@@ -2,7 +2,6 @@ module.exports = {
 	Name: "top",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-12T18:17:55.000Z",
 	Cooldown: 60000,
 	Description: "Posts the top X (implicitly 10) users by chat lines sent in the context of current channel.",
 	Flags: ["pipe","whitelist"],

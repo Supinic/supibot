@@ -2,7 +2,6 @@ module.exports = {
 	Name: "firstline",
 	Aliases: ["fl"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "Posts the target user's first chat line in the context of the current channel, and the date they sent it.",
 	Flags: ["mention","opt-out","pipe"],

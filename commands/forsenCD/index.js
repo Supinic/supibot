@@ -2,7 +2,6 @@ module.exports = {
 	Name: "forsenCD",
 	Aliases: ["pajaCD"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "A random quote from the two time! 1993, 1994 back to back blockbuster video game champion!",
 	Flags: ["pipe"],

@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "cookiecount",
-	Aliases: ["cc", "tcc"],
+	Aliases: ["cc","tcc"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T18:35:23.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the amount of cookies you (or someone else) have eaten so far. If you use \"total\", then you will see the total amount of cookies eaten.",
 	Flags: ["mention","opt-out","pipe","skip-banphrase"],
@@ -95,7 +94,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: async (prefix) =>  [
+	Dynamic_Description: (async (prefix) =>  [
 		`Checks the amount of cookies a given person (or yourself) have eaten so far.`,
 		`You can use <code>${prefix}cc total</code> or <code>${prefix}tcc</code> to get total statistics.`,
 		``,
@@ -115,5 +114,5 @@ module.exports = {
 		`<code>${prefix}cc list</code>`,
 		`<a href='/bot/cookie/list'>https://supinic.com/bot/cookie/list</a>`,
 		``
-	]
+	])
 };

@@ -2,7 +2,6 @@ module.exports = {
 	Name: "osrs",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-06T16:04:06.000Z",
 	Cooldown: 5000,
 	Description: "Aggregate command for whatever regarding Old School Runescape.",
 	Flags: ["mention","use-params"],

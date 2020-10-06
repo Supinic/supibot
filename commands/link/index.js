@@ -2,7 +2,6 @@ module.exports = {
 	Name: "link",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "Verifies your account linking challenge across platforms. You should only ever use this command if you are prompted to.",
 	Flags: ["mention","system"],

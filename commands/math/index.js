@@ -2,7 +2,6 @@ module.exports = {
 	Name: "math",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-28T23:55:03.000Z",
 	Cooldown: 5000,
 	Description: "Does math. For more info, check the documentation for math.js",
 	Flags: ["mention","pipe"],
@@ -43,7 +42,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		return [
 			"Calculates advanced maths. You can use functions, derivatives, integrals, methods, ...",
 			`Look here for more info: <a href="https://mathjs.org/">mathjs documentation</a>`,
@@ -61,5 +60,5 @@ module.exports = {
 			"25.4 cm",
 			""
 		];
-	}
+	})
 };

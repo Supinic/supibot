@@ -2,7 +2,6 @@ module.exports = {
 	Name: "currentmessagerates",
 	Aliases: ["cmr"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the current messages/minute stats in the current channel.",
 	Flags: ["mention","pipe"],

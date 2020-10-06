@@ -2,7 +2,6 @@ module.exports = {
 	Name: "lastreminder",
 	Aliases: ["lr"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the last (already used) reminder a target user has set for you.",
 	Flags: ["mention","pipe"],

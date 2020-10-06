@@ -2,7 +2,6 @@ module.exports = {
 	Name: "downloadclip",
 	Aliases: ["dlclip"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 30000,
 	Description: "Takes a Twitch clip name, and sends a download link to it into whispers.",
 	Flags: ["mention","pipe"],

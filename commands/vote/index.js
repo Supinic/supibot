@@ -2,7 +2,6 @@ module.exports = {
 	Name: "vote",
 	Aliases: ["poll"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "If there is poll running, you can vote \"yes\" or \"no\", if you don't post either you will get the currently running poll (or nothing if there's none)",
 	Flags: ["mention","pipe"],

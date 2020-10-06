@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "randomcocktail",
-	Aliases: ["cock", "drinks", "tail"],
+	Aliases: ["cock","drinks","tail"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Searches for a cocktail recipe by its name, or fetches a random one, if no search query was provided.",
 	Flags: ["mention","pipe"],

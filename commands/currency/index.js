@@ -2,7 +2,6 @@ module.exports = {
 	Name: "currency",
 	Aliases: ["money"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T18:35:41.000Z",
 	Cooldown: 10000,
 	Description: "Attempts to convert a specified amount of one currency to another. Only supports 3-letter ISO codes. Example: 100 USD to EUR.",
 	Flags: ["mention","pipe","skip-banphrase"],
@@ -108,7 +107,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: async (prefix) =>  [
+	Dynamic_Description: (async (prefix) =>  [
 		`Converts an amount of currency (or 1, if not specified) to another currency`,
 		``,
 	
@@ -118,5 +117,5 @@ module.exports = {
 	
 		`<code>${prefix}currency EUR to VND</code>`,
 		`1 EUR = (amount) VND`
-	]
+	])
 };

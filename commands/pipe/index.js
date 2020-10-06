@@ -2,7 +2,6 @@ module.exports = {
 	Name: "pipe",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "Pipes the result of one command to another, and so forth. Each command will be used as if used separately, so each will be checked for cooldowns and banphrases. Use the character \"|\" or \">\" to separate each command.",
 	Flags: ["mention","pipe","system"],
@@ -99,7 +98,7 @@ module.exports = {
 			reply: currentArgs.join(" ")
 		};
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		return [
 			"Pipes multiple commands together, where each command's result will become the input of another.",
 			"Separate the commands with <code>|</code> or <code>&gt;</code> characters.",
@@ -113,5 +112,5 @@ module.exports = {
 			"Fetches a random joke, translates it to German, and reminds the target user with the text.",
 			""		
 		];
-	}
+	})
 };

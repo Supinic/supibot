@@ -2,7 +2,6 @@ module.exports = {
 	Name: "subscribe",
 	Aliases: ["unsubscribe"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:03:25.000Z",
 	Cooldown: 5000,
 	Description: "Subscribe or unscribe to a database changing event. Check the extended help for detailed info on each subscription event.",
 	Flags: ["mention","pipe","skip-banphrase"],
@@ -110,7 +109,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: async (prefix, values) => {
+	Dynamic_Description: (async (prefix, values) => {
 		const { types } = values.getStaticData();
 		const typesList = types.map(i => sb.Utils.tag.trim `
 			<li>
@@ -136,5 +135,5 @@ module.exports = {
 			"List of available events:",
 			`<ul>${typesList}</ul>`
 		];
-	}
+	})
 };

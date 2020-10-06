@@ -2,7 +2,6 @@ module.exports = {
 	Name: "gift",
 	Aliases: ["give"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "Gifts a certain something to someone else. Right now, supported parameters are: \"cookie\" - gifts your cooldown for a cookie to someone else!",
 	Flags: ["mention","pipe"],

@@ -2,7 +2,6 @@ module.exports = {
 	Name: "randommeal",
 	Aliases: ["rmeal"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Searches for a meal recipe by its name, or fetches a random one, if no search query was provided.",
 	Flags: ["mention","pipe"],

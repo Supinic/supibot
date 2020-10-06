@@ -2,7 +2,6 @@ module.exports = {
 	Name: "randomname",
 	Aliases: ["rn"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:46:41.000Z",
 	Cooldown: 10000,
 	Description: "Fetches a random name.",
 	Flags: ["mention","pipe"],

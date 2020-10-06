@@ -2,7 +2,6 @@ module.exports = {
 	Name: "debug",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 0,
 	Description: "supiniHack ",
 	Flags: ["developer","pipe","skip-banphrase","system","whitelist"],
@@ -46,25 +45,6 @@ module.exports = {
 				reply: "Execute: " + e.toString()
 			};
 		}		
-	})
-	
-	
-	/*
-	async (extra, ...args) => {
-		try {
-			const result = await eval("(async () => {\n" + args.join(" ") + "\n})()");
-			if (typeof result !== "undefined") {
-				return { reply: String(result) };
-			}
-			else {
-				return { reply: "Done" };
-			}
-		}
-		catch (e) {
-			console.log(e);
-			return { reply: "Error: " + e.toString() };
-		}
-	}
-	*/,
+	}),
 	Dynamic_Description: null
 };

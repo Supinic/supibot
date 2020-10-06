@@ -2,7 +2,6 @@ module.exports = {
 	Name: "chatneighbour",
 	Aliases: ["cn"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 7500,
 	Description: "Finds your chat neighbour(s). When you take the chatter list in a channel and sort by the alphabet, your chat neighbours are users that come before and after you in the list. Use this to find new friends! 😃",
 	Flags: ["block","opt-out","pipe"],

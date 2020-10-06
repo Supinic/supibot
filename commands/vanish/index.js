@@ -2,7 +2,6 @@ module.exports = {
 	Name: "vanish",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 60000,
 	Description: "Times out the user for 1 second. Only works if Supibot is a Twitch moderator.",
 	Flags: ["skip-banphrase"],

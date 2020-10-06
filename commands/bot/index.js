@@ -2,7 +2,6 @@ module.exports = {
 	Name: "bot",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:02:29.000Z",
 	Cooldown: 2500,
 	Description: "Allows broadcasters to set various parameters for the bot in their own channel. Usable anywhere, but only applies to their own channel.",
 	Flags: ["mention","pipe","skip-banphrase","use-params"],
@@ -153,9 +152,8 @@ module.exports = {
 				reply: "Invalid command provided!"
 			}
 		}
-	})
-	,
-	Dynamic_Description: async (prefix, values) => {
+	}),
+	Dynamic_Description: (async (prefix, values) => {
 		const { allowedModes } = values.getStaticData();
 		const list = allowedModes.map(i => `<li><code>${i.name}</code><br>${i.description}</li><br>`).join("");
 	
@@ -188,5 +186,5 @@ module.exports = {
 			"",
 			list		
 		];
-	}
+	})
 };

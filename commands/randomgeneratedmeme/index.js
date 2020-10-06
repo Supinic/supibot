@@ -2,7 +2,6 @@ module.exports = {
 	Name: "randomgeneratedmeme",
 	Aliases: ["rgm"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:46:37.000Z",
 	Cooldown: 10000,
 	Description: "Posts the text of a randomly generated meme.",
 	Flags: ["mention","pipe"],

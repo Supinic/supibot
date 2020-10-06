@@ -2,7 +2,6 @@ module.exports = {
 	Name: "countline",
 	Aliases: ["cl"],
 	Author: "supinic",
-	Last_Edit: "2020-09-13T09:17:02.000Z",
 	Cooldown: 15000,
 	Description: "Fetches the amount of chat lines a specified user (or you, if nothing is provided) have sent in the current channel.",
 	Flags: ["mention","opt-out","pipe"],

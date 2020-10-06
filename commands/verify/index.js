@@ -2,7 +2,6 @@ module.exports = {
 	Name: "verify",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 0,
 	Description: "Verifies a user to be able to use a specific command based on some requirement.",
 	Flags: ["mention","pipe","system","whitelist"],

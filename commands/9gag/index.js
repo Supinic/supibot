@@ -2,7 +2,6 @@ module.exports = {
 	Name: "9gag",
 	Aliases: ["gag"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Searches 9gag for posts that fit your search text, or a random featured one if you don't provide anything.",
 	Flags: ["mention","pipe"],

@@ -2,7 +2,6 @@ module.exports = {
 	Name: "knowyourmeme",
 	Aliases: ["kym"],
 	Author: "supinic",
-	Last_Edit: "2020-09-11T17:59:50.000Z",
 	Cooldown: 30000,
 	Description: "Gets a smol description of a meme from KnowYourMeme, it's just the summary.",
 	Flags: ["mention","pipe"],

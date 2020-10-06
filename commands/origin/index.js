@@ -2,7 +2,6 @@ module.exports = {
 	Name: "origin",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the origin of a given emote",
 	Flags: ["mention","pipe"],

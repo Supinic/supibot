@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "resumeafk",
-	Aliases: ["rafk", "cafk", "continueafk"],
+	Aliases: ["rafk","cafk","continueafk"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 120000,
 	Description: "Resumes your AFK status, if used within 5 minutes of coming back from AFK.",
 	Flags: ["mention","pipe"],

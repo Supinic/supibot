@@ -2,7 +2,6 @@ module.exports = {
 	Name: "kiss",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:03:06.000Z",
 	Cooldown: 10000,
 	Description: "Kisses target user.",
 	Flags: ["opt-out","pipe"],

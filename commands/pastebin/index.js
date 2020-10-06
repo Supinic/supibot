@@ -2,7 +2,6 @@ module.exports = {
 	Name: "pastebin",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 20000,
 	Description: "Takes the result of a different command (pipe-only) and posts a Pastebin paste with it.",
 	Flags: ["mention","pipe"],

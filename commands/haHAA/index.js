@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "haHAA",
-	Aliases: ["4Head", "4HEad", "HEad"],
+	Aliases: ["4Head","4HEad","HEad"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T08:21:55.000Z",
 	Cooldown: 5000,
 	Description: "Posts a random, hilarious joke, 100% guaranteed.",
 	Flags: ["mention","pipe"],
@@ -14,7 +13,7 @@ module.exports = {
 			reply: data.joke + " " + context.invocation
 		};
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		return [
 			"Posts a random, 100% hilarious dad joke.",
 			"Guaranteed to make you grimace",
@@ -23,5 +22,5 @@ module.exports = {
 			`<code>${prefix}4Head</code>`,
 			"(random joke)"
 		];
-	}
+	})
 };

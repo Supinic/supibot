@@ -2,7 +2,6 @@ module.exports = {
 	Name: "ping",
 	Aliases: ["pang","peng","pong","pung","pyng"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:04:41.000Z",
 	Cooldown: 5000,
 	Description: "Ping!",
 	Flags: ["pipe","skip-banphrase"],
@@ -93,7 +92,7 @@ module.exports = {
 			reply: pong + " " + Object.entries(data).map(([name, value]) => name + ": " + value).join("; ")
 		};
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		return [
 			"Pings the bot, checking if it's alive, and a bunch of other data, like latency and commands used this session",
 			"",
@@ -101,5 +100,5 @@ module.exports = {
 			`<code>${prefix}ping</code>`,
 			"Pong! Latency: ..., Commands used: ..."
 		];
-	}
+	})
 };

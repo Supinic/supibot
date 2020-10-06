@@ -2,7 +2,6 @@ module.exports = {
 	Name: "slots",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 20000,
 	Description: "Once at least three unique emotes (or words) have been provided, rolls a pseudo slot machine to see if you get a flush.",
 	Flags: ["mention","pipe"],
@@ -117,7 +116,7 @@ module.exports = {
 			reply: `[ ${rolledItems.join(" ")} ]`
 		};
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		const patterns = (await sb.Query.getRecordset(rs => rs
 			.select("Name", "Notes")
 			.from("data", "Slots_Pattern")
@@ -140,5 +139,5 @@ module.exports = {
 			"Supported patterns:",
 			`<ul>${patterns}</ul>`
 		];
-	}
+	})
 };

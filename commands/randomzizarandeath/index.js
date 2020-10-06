@@ -2,7 +2,6 @@ module.exports = {
 	Name: "randomzizarandeath",
 	Aliases: ["rzd"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:47:09.000Z",
 	Cooldown: 30000,
 	Description: "Posts a random video with Zizaran dying in Path of Exile.",
 	Flags: ["mention","pipe"],

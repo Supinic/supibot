@@ -2,7 +2,6 @@ module.exports = {
 	Name: "restart",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T18:36:40.000Z",
 	Cooldown: 0,
 	Description: "Restarts the bot by killing the process and letting PM2 restart it.",
 	Flags: ["read-only","system","whitelist"],

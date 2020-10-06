@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "songrequestqueue",
-	Aliases: ["srq", "queue"],
+	Aliases: ["srq","queue"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:02:37.000Z",
 	Cooldown: 30000,
 	Description: "Posts the summary of song request queue. EXPERIMENTAL monkaS",
 	Flags: ["mention","pipe","whitelist"],

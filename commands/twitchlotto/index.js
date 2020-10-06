@@ -2,7 +2,6 @@ module.exports = {
 	Name: "twitchlotto",
 	Aliases: ["tl"],
 	Author: "supinic",
-	Last_Edit: "2020-10-02T15:41:47.000Z",
 	Cooldown: 10000,
 	Description: "Fetches a random Imgur image from a Twitch channel (based off Twitchlotto) and checks it for NSFW stuff via an AI. The \"nudity score\" is posted along with the link.",
 	Flags: ["mention","whitelist"],
@@ -58,7 +57,7 @@ module.exports = {
 				};
 			}
 		}
-
+	
 		// Preparation work that does not need to run more than once, so it is placed before the loop below.
 		if (channel) {
 			if (!this.data.counts[channel]) {
@@ -81,7 +80,7 @@ module.exports = {
 				);
 			}
 		}
-
+	
 		// Now try to find an image that is available.
 		let image = null;
 		let failedTries = 0;
@@ -108,7 +107,7 @@ module.exports = {
 					.single()
 					.flat("Link")
 				);
-
+	
 				image = await sb.Query.getRecordset(rs => rs
 					.select("*")
 					.from("data", "Twitch_Lotto")
@@ -116,7 +115,7 @@ module.exports = {
 					.single()
 				);
 			}
-
+	
 			if (image.Available === false) {
 				// discard this image. Loop will continue.
 				failedTries++;
@@ -129,20 +128,20 @@ module.exports = {
 					followRedirect: false,
 					url: `https://i.imgur.com/${image.Link}`
 				});
-
+	
 				if (statusCode !== 200) {
 					await sb.Query.getRecordUpdater(ru => ru
 						.update("data", "Twitch_Lotto")
 						.set("Available", false)
 						.where("Link = %s", image.Link)
 					);
-
+	
 					// discard this image. Loop will continue.
 					failedTries++;
 					image = null;
 				}
 			}
-
+	
 			if (failedTries > this.staticData.maxRetries) {
 				// Was not able to find an image that existed.
 				return {
@@ -205,7 +204,7 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: async (prefix, values) => {
+	Dynamic_Description: (async (prefix, values) => {
 		const rawChannels = await sb.Query.getRecordset(rs => rs
 			.select("Name")
 			.from("data", "Twitch_Lotto_Channel")
@@ -231,5 +230,5 @@ module.exports = {
 			"Supported channels:",
 			`<ul>${channels}</ul>`
 		];
-	}
+	})
 };

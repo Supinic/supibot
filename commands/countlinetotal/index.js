@@ -2,7 +2,6 @@ module.exports = {
 	Name: "countlinetotal",
 	Aliases: ["clt"],
 	Author: "supinic",
-	Last_Edit: "2020-09-12T18:19:43.000Z",
 	Cooldown: 0,
 	Description: "Fetches the amount of data lines from ALL the log tables, including the total size.",
 	Flags: ["mention","pipe","skip-banphrase","system","whitelist"],

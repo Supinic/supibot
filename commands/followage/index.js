@@ -2,7 +2,6 @@ module.exports = {
 	Name: "followage",
 	Aliases: ["fa"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the followage <user> <channel>. If no channel provided, checks the current one. If no user provided either, checks yourself.",
 	Flags: ["mention","pipe"],

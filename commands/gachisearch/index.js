@@ -2,7 +2,6 @@ module.exports = {
 	Name: "gachisearch",
 	Aliases: ["gs"],
 	Author: "supinic",
-	Last_Edit: "2020-09-16T16:06:01.000Z",
 	Cooldown: 15000,
 	Description: "Searches for a given track in the gachi list, and attempts to post a link.",
 	Flags: ["link-only","mention","pipe"],

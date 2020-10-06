@@ -2,7 +2,6 @@ module.exports = {
 	Name: "checkdeadchannels",
 	Aliases: ["cdc"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 0,
 	Description: "Iterates over active channels, takes the last posted message in each, and prints the dates + messages into a Pastebin paste. This is useful to determine if and which channels could potentially be removed from the bot because of prolonged inactivity.",
 	Flags: ["pipe","skip-banphrase","system","whitelist"],

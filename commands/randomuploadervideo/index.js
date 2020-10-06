@@ -2,7 +2,6 @@ module.exports = {
 	Name: "randomuploadervideo",
 	Aliases: ["ruv"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 20000,
 	Description: "On supinic's stream, takes the currently playing video (if there is any) and fetches another random video from the same Youtube uploader.",
 	Flags: ["link-only","mention","pipe"],

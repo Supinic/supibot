@@ -2,7 +2,6 @@ module.exports = {
 	Name: "emotecheck",
 	Aliases: ["ec"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:02:43.000Z",
 	Cooldown: 15000,
 	Description: "Posts the list of each of Twitch's amazing \"global\" emote sets.",
 	Flags: ["mention","pipe"],

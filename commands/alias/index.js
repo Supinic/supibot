@@ -2,7 +2,6 @@ module.exports = {
 	Name: "alias",
 	Aliases: ["$"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:46:10.000Z",
 	Cooldown: 2500,
 	Description: "This command lets you create your own aliases (shorthands) for any other combination of commands and arguments. Check the extended help for step-by-step info.",
 	Flags: ["mention","pipe"],
@@ -403,7 +402,7 @@ module.exports = {
 	
 		return { reply };
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		return [
 			"Meta-command that lets you create aliases (or shorthands) for existing commands or their combinations.",
 			"You have to first create an alias, and then run it. You can manage your aliases by listing, checking, removing and adding.",
@@ -514,5 +513,5 @@ module.exports = {
 				</li>
 			</ul>`
 		];
-	}
+	})
 };

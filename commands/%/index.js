@@ -2,7 +2,6 @@ module.exports = {
 	Name: "%",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "Rolls a random percentage between 0 and 100%",
 	Flags: ["mention","pipe","skip-banphrase"],
@@ -12,11 +11,11 @@ module.exports = {
 		const number = (sb.Utils.random(0, 10000) / 100);
 		return { reply: number + "%" };
 	}),
-	Dynamic_Description: async (prefix) => [
+	Dynamic_Description: (async (prefix) => [
 		"Rolls a random percentage number between 0% and 100%.",
 		"",
 	
 		`<code>${prefix}%</code>`,
 		(sb.Utils.random(0, 10000) / 100) + "%"
-	]	
+	])
 };

@@ -2,7 +2,6 @@ module.exports = {
 	Name: "reset",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 30000,
 	Description: "Tracks your last \"\"\"reset\"\"\".",
 	Flags: ["mention","pipe","system"],

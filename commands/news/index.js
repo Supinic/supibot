@@ -2,7 +2,6 @@ module.exports = {
 	Name: "news",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:04:05.000Z",
 	Cooldown: 10000,
 	Description: "Fetches short articles. You can use a 2 character ISO code to get country specific news, or any other word as a search query.",
 	Flags: ["mention","pipe"],
@@ -132,7 +131,7 @@ module.exports = {
 			reply: sb.Utils.removeHTML(`${title} ${description ?? ""} ${delta}`)
 		};
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		const { sources } = await sb.Got({
 			url: "https://newsapi.org/v2/sources",
 			headers: {
@@ -184,5 +183,5 @@ module.exports = {
 			"List of usable sources:",
 			"<ul>" + sources.map(i => `<li><a href="${i.url}">${i.id}</a></li>`).join("") + "</ul>"
 		];
-	}
+	})
 };

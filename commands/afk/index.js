@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "afk",
-	Aliases: ["gn", "brb", "shower", "food", "lurk", "poop", "💩", "ppPoof", "work", "study"],
+	Aliases: ["gn","brb","shower","food","lurk","poop","💩","ppPoof","work","study"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:04:38.000Z",
 	Cooldown: 10000,
 	Description: "Flags you as AFK. Supports a custom AFK message.",
 	Flags: ["pipe"],
@@ -90,7 +89,7 @@ module.exports = {
 			]
 		};
 	}),
-	Dynamic_Description: async (prefix) => [
+	Dynamic_Description: (async (prefix) => [
 			"Flags you as AFK (away from keyboard).",
 			"While you are AFK, others can check if you are AFK.",
 			"On your first message while AFK, the status ends and the bot will announce you coming back.",
@@ -110,5 +109,5 @@ module.exports = {
 			``,
 	
 			`and more - check the aliases`
-	]	
+	])
 };

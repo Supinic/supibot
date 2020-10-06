@@ -2,7 +2,6 @@ module.exports = {
 	Name: "pingall",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 0,
 	Description: "Attempts to check all channel bots by using their ping commands.",
 	Flags: ["developer","pipe","skip-banphrase","whitelist"],

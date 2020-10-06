@@ -2,7 +2,6 @@ module.exports = {
 	Name: "randomdonger",
 	Aliases: ["rd"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:02:56.000Z",
 	Cooldown: 10000,
 	Description: "Raise your dongers.",
 	Flags: ["mention","pipe"],

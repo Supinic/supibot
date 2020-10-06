@@ -2,7 +2,6 @@ module.exports = {
 	Name: "stalk",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-22T17:42:49.000Z",
 	Cooldown: 5000,
 	Description: "For a given user, attempts to find the message they last sent in chat, plus the channel and time when they posted it.",
 	Flags: ["block","mention","opt-out","pipe"],

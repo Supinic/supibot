@@ -2,7 +2,6 @@ module.exports = {
 	Name: "whatemoteisit",
 	Aliases: ["weit"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "What emote is it? Posts specifics about a given Twitch subscriber emote.",
 	Flags: ["mention","pipe"],

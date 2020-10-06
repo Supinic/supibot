@@ -2,7 +2,6 @@ module.exports = {
 	Name: "copypasta",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 15000,
 	Description: "Fetches a random Twitch-related copypasta. The date of creation usually ranges from 2014-2015.",
 	Flags: ["mention","pipe"],

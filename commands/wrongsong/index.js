@@ -2,7 +2,6 @@ module.exports = {
 	Name: "wrongsong",
 	Aliases: ["ws"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "If you have at least one song playing or in the queue, this command will skip the first one. You can also add an ID to skip a specific song.",
 	Flags: ["mention","pipe","whitelist"],
@@ -64,7 +63,7 @@ module.exports = {
 			reply: `Your request "${userRequest.Name}" (ID ${userRequest.VLC_ID}) has been successfully ${action}.`
 		};
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		return [
 			"Skips your current or queued song.",
 			"Can add an ID to skip/delete a specific song in the queue, queued by you only.",
@@ -77,5 +76,5 @@ module.exports = {
 			`<code>${prefix}ws (ID)</code>`,
 			"Skips your request with given ID. Fails if it's not your request.",
 		];
-	}
+	})
 };

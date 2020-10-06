@@ -2,7 +2,6 @@ module.exports = {
 	Name: "poe",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T18:38:46.000Z",
 	Cooldown: 7500,
 	Description: "A collection of various Path of Exile related commands. Check the extended help on website for more info.",
 	Flags: ["mention","pipe"],
@@ -267,7 +266,7 @@ module.exports = {
 	
 		return await target.execute(context, ...args);
 	}),
-	Dynamic_Description: async (prefix, values) => {
+	Dynamic_Description: (async (prefix, values) => {
 		const { commands } = values.getStaticData();
 	
 		return [
@@ -280,5 +279,5 @@ module.exports = {
 				""
 			])
 		];
-	}
+	})
 };

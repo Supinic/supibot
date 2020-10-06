@@ -2,7 +2,6 @@ module.exports = {
 	Name: "predictlines",
 	Aliases: ["pl"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Predicts the amount of lines a given user will have in some amount of time.",
 	Flags: ["mention","pipe"],

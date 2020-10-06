@@ -2,7 +2,6 @@ module.exports = {
 	Name: "uname",
 	Aliases: ["version"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Posts the current supibot version, along with the latest \"patch notes\"",
 	Flags: ["developer","mention","pipe"],

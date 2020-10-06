@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "randomanimalpicture",
-	Aliases: ["rap", "rbp", "rcp", "rdp", "rfp"],
+	Aliases: ["rap","rbp","rcp","rdp","rfp"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Posts a random picture for a given animal type.",
 	Flags: ["mention","pipe"],

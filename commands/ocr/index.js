@@ -2,7 +2,6 @@ module.exports = {
 	Name: "ocr",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:46:29.000Z",
 	Cooldown: 10000,
 	Description: "Takes your image link and attempts to find the text in it by using OCR.",
 	Flags: ["mention","pipe"],
@@ -106,7 +105,7 @@ module.exports = {
 				: result
 		};
 	}),
-	Dynamic_Description: async (prefix, values) => {
+	Dynamic_Description: (async (prefix, values) => {
 		const { languages } = values.getStaticData();
 		const list = Object.values(languages).map(name => `<li>${name}</li>`).join("");
 	
@@ -127,5 +126,5 @@ module.exports = {
 			"List of supported languages:",
 			list
 		];
-	}
+	})
 };

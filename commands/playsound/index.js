@@ -2,7 +2,6 @@ module.exports = {
 	Name: "playsound",
 	Aliases: ["ps"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Plays a sound on supinic stream, if enabled. Use \"list\" as an argument to see the list of available playsounds.",
 	Flags: ["mention","pipe","whitelist"],

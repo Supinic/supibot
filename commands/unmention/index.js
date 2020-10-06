@@ -2,7 +2,6 @@ module.exports = {
 	Name: "unmention",
 	Aliases: ["remention"],
 	Author: "supinic",
-	Last_Edit: "2020-09-09T16:46:44.000Z",
 	Cooldown: 5000,
 	Description: "Makes a specific command (or, in advanced mode, a combination of command/channel/platform, or global) not mention you by removing the \"username,\" part at the beginning.",
 	Flags: ["mention"],
@@ -150,7 +149,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		return [
 			`Removes, or adds back, the "mention" of a specific command.`,
 			`A mention is basically the "user," part at the start of the command response.`,
@@ -192,5 +191,5 @@ module.exports = {
 				</li>
 			</ul>`,
 		];
-	}
+	})
 };

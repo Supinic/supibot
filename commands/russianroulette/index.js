@@ -2,7 +2,6 @@ module.exports = {
 	Name: "russianroulette",
 	Aliases: ["rr"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 15000,
 	Description: "Play the roulette. If you win, nothing happens; if you lose, you get timed out. You can add a number 1-600 (default: 1) which says how long you will be timed out, should you lose. Only works in channels where Supibot is moderator.",
 	Flags: ["mention","pipe"],

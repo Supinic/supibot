@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "statistics",
-	Aliases: ["stat", "stats"],
+	Aliases: ["stat","stats"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:02:19.000Z",
 	Cooldown: 10000,
 	Description: "Posts various statistics regarding you, e.g. total afk time.",
 	Flags: ["mention","pipe"],
@@ -321,7 +320,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: async (prefix, values) => {
+	Dynamic_Description: (async (prefix, values) => {
 			const { types } = values.getStaticData();
 			const list = types.map(i => {
 				const names = i.names.sort().map(j => `<code>${j}</code>`).join(" | ");
@@ -339,5 +338,5 @@ module.exports = {
 				"Types:",
 				`<ul>${list}</ul>`
 			];	
-		}
+		})
 };

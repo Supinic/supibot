@@ -2,7 +2,6 @@ module.exports = {
 	Name: "freebobby",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-22T15:42:24.000Z",
 	Cooldown: 15000,
 	Description: "When is Bobby Shmurda going to be freed? TriHard",
 	Flags: ["mention","pipe"],

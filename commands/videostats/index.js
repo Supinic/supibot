@@ -2,7 +2,6 @@ module.exports = {
 	Name: "videostats",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Post the statistics about a given bare video link (means, just the ID and not the entire link) in a given Cytube room.",
 	Flags: ["mention","pipe","whitelist"],

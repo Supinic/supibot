@@ -2,7 +2,6 @@ module.exports = {
 	Name: "stachursky",
 	Aliases: ["FeelsStachurskyMan"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:48:10.000Z",
 	Cooldown: 10000,
 	Description: "Posts a random excerpt from a Stachursky song.",
 	Flags: ["mention","pipe"],

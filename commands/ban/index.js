@@ -2,7 +2,6 @@ module.exports = {
 	Name: "ban",
 	Aliases: ["unban"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "Bans/unbans any combination of channel, user, and command from being executed. Only usable by administrators, or Twitch channel owners.",
 	Flags: ["mention","system"],
@@ -175,7 +174,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		return [
 			"Bans or unbans any combination of user/channel/command.",
 			"Only usable by admins or Twitch channel owners. Channel owners can only ban combinations in their channel.",
@@ -208,5 +207,5 @@ module.exports = {
 			`<code>${prefix}unban user:test</code>`,
 			"If banned before, user <u>test</u> will be unbanned from executing <u>any</u> commands in the current channel."
 		];
-	}
+	})
 };

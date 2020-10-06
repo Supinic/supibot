@@ -2,7 +2,6 @@ module.exports = {
 	Name: "simplesql",
 	Aliases: ["ssql"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 0,
 	Description: "Executes a quick SQL query, and returns its (simple) result.",
 	Flags: ["mention","pipe","system","whitelist"],

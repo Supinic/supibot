@@ -2,7 +2,6 @@ module.exports = {
 	Name: "youtubesearch",
 	Aliases: ["ys"],
 	Author: "supinic",
-	Last_Edit: "2020-10-01T15:32:02.000Z",
 	Cooldown: 15000,
 	Description: "Searches Youtube for video(s) with your query. Respects safe search for each platform.",
 	Flags: ["mention","pipe","whitelist"],

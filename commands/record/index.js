@@ -2,7 +2,6 @@ module.exports = {
 	Name: "record",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Checks for various max/min records of various sources.",
 	Flags: ["mention","pipe"],

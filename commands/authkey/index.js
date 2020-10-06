@@ -2,7 +2,6 @@ module.exports = {
 	Name: "authkey",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Works with an authentication string used to access supinic.com APIs that require a login; outside of Twitch login.",
 	Flags: ["developer","mention","pipe"],

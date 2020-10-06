@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "streaminfo",
-	Aliases: ["si", "uptime"],
+	Aliases: ["si","uptime"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Posts stream info about a Twitch channel.",
 	Flags: ["mention","pipe"],

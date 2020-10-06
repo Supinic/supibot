@@ -2,7 +2,6 @@ module.exports = {
 	Name: "about",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 60000,
 	Description: "Posts a summary of what supibot does, and what it is.",
 	Flags: ["mention","pipe"],

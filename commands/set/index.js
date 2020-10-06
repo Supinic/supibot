@@ -2,7 +2,6 @@ module.exports = {
 	Name: "set",
 	Aliases: ["unset"],
 	Author: "supinic",
-	Last_Edit: "2020-09-25T15:21:32.000Z",
 	Cooldown: 5000,
 	Description: "Sets/unsets certain variables within Supibot. Check the extended help for full info.",
 	Flags: ["mention","owner-override"],
@@ -546,7 +545,7 @@ module.exports = {
 			return await target[invocation](context, ID);
 		}
 	}),
-	Dynamic_Description: async (prefix, values) => {
+	Dynamic_Description: (async (prefix, values) => {
 		const { variables } = values.getStaticData();
 		const list = variables.map(i => {
 			let names = i.names[0];
@@ -573,5 +572,5 @@ module.exports = {
 			"List of variables:",
 			`<ul>${list}</ul>`		
 		];	
-	}
+	})
 };

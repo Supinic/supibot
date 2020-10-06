@@ -2,7 +2,6 @@ module.exports = {
 	Name: "check",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:03:46.000Z",
 	Cooldown: 10000,
 	Description: "Checks certain user or system variables. For a list of types, check the command's extended help.",
 	Flags: ["mention","pipe"],
@@ -483,7 +482,7 @@ module.exports = {
 	
 		return await item.execute(context, identifier);
 	}),
-	Dynamic_Description: async (prefix, values) => {
+	Dynamic_Description: (async (prefix, values) => {
 		const { variables } = values.getStaticData();
 		const list = variables.map(i => {
 			const aliases = (i.aliases && i.aliases.length > 0)
@@ -505,5 +504,5 @@ module.exports = {
 			"<ul>" + list.join("") + "</ul>"
 		];
 	
-	}
+	})
 };

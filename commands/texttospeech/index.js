@@ -2,7 +2,6 @@ module.exports = {
 	Name: "texttospeech",
 	Aliases: ["tts"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Plays TTS on stream, if enabled. You can specify the language by using \"language:<language>\" anywhere in your message.",
 	Flags: ["mention","pipe","skip-banphrase"],

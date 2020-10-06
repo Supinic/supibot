@@ -2,7 +2,6 @@ module.exports = {
 	Name: "time",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:04:19.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the current time and timezone for a given location",
 	Flags: ["mention","pipe"],

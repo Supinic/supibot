@@ -2,7 +2,6 @@ module.exports = {
 	Name: "urban",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:04:15.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the top definition of a given term from UrbanDictionary. You can append \"index:#\" at the end to access definitions that aren't first in the search",
 	Flags: ["mention","pipe"],

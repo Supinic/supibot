@@ -2,7 +2,6 @@ module.exports = {
 	Name: "current",
 	Aliases: ["song"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:03:31.000Z",
 	Cooldown: 5000,
 	Description: "Fetches the current song playing on stream.",
 	Flags: ["link-only","mention","pipe","whitelist"],
@@ -144,7 +143,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: async (prefix) => [
+	Dynamic_Description: (async (prefix) => [
 		`Checks the currently playinyg song on Supinic's channel/stream`,
 		``,
 	
@@ -159,5 +158,5 @@ module.exports = {
 		`<code>${prefix}song previous</code>`,
 		`Last played song: (link)`,
 		``,
-	]
+	])
 };

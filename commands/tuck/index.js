@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "tuck",
-	Aliases: ["gnkiss", "headpat"],
+	Aliases: ["gnkiss","headpat"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 20000,
 	Description: "Tucks target user to bed",
 	Flags: ["opt-out","pipe"],

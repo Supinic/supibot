@@ -2,7 +2,6 @@ module.exports = {
 	Name: "horoscope",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:45:58.000Z",
 	Cooldown: 30000,
 	Description: "Checks your horoscope, if you have set your birthday within supibot.",
 	Flags: ["mention","pipe"],

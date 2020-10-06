@@ -2,7 +2,6 @@ module.exports = {
 	Name: "externalbot",
 	Aliases: ["ebot"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:47:03.000Z",
 	Cooldown: 0,
 	Description: "Makes supibot execute a command of a different bot, and then the result will be that bot's command response. As such, this command can only be used in a pipe.",
 	Flags: ["mention","pipe","whitelist"],

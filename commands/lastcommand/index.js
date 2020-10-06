@@ -2,7 +2,6 @@ module.exports = {
 	Name: "lastcommand",
 	Aliases: ["_"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "Posts your last command executed in the current channel. Only goes back up to 1 minute.",
 	Flags: ["pipe"],

@@ -2,7 +2,6 @@ module.exports = {
 	Name: "countlinerecord",
 	Aliases: ["clr"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 30000,
 	Description: "Posts the two records of each channel: The amount, and the total length of messages posted within each one minute.",
 	Flags: ["mention","pipe"],

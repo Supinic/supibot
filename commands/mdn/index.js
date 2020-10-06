@@ -2,7 +2,6 @@ module.exports = {
 	Name: "mdn",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Searches the MDN website for a given term, then returns the article link.",
 	Flags: ["developer","mention","pipe"],
@@ -34,12 +33,12 @@ module.exports = {
 			reply: `${title}: https://developer.mozilla.org/en-US/docs/${slug}`
 		};
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		const url = "https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_operator";
 		
 		return [
 			`<code>${prefix}mdn Nullish coalescing</code>`,
 			`Nullish coalescing operator <a target="_blank" href="${url}">${url}</a>`
 		];
-	}
+	})
 };

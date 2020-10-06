@@ -2,7 +2,6 @@ module.exports = {
 	Name: "randomword",
 	Aliases: ["rw"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:03:19.000Z",
 	Cooldown: 5000,
 	Description: "Fetches a random word. If a number is provided, rolls that many words.",
 	Flags: ["pipe"],
@@ -20,7 +19,7 @@ module.exports = {
 			reply: [...Array(repeats)].map(() => sb.Utils.randArray(sb.Config.get("WORD_LIST"))).join(" ")
 		};
 	}),
-	Dynamic_Description: async (prefix, values) => {
+	Dynamic_Description: (async (prefix, values) => {
 		const { limit } = values.getStaticData();
 		const list = sb.Config.get("WORD_LIST");
 	
@@ -40,5 +39,5 @@ module.exports = {
 	
 			"Word list: <br>" + list.join("<br>")
 		];
-	}
+	})
 };

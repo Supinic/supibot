@@ -2,7 +2,6 @@ module.exports = {
 	Name: "suggest",
 	Aliases: ["suggestions"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 60000,
 	Description: "Suggest a feature for Supinic, regarding Supibot, Discord/Cytube, or the website. Posts links to a suggestion list if you don't provide any text.",
 	Flags: ["mention","skip-banphrase"],

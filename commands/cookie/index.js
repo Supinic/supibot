@@ -2,7 +2,6 @@ module.exports = {
 	Name: "cookie",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Open a random fortune cookie wisdom. Watch out - only one allowed per day, and no refunds! Daily reset occurs at midnight UTC.",
 	Flags: ["mention","pipe","rollback"],
@@ -56,7 +55,7 @@ module.exports = {
 			reply: cookie.Text
 		};
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		return [
 			"Fetch a daily fortune cookie and read its wisdom!",
 			"Only available once per day, and resets at midnight UTC.",
@@ -64,5 +63,5 @@ module.exports = {
 			"",
 			prefix + "cookie => <Random wisdom!>"
 		];
-	}
+	})
 };

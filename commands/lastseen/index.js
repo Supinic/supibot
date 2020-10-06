@@ -2,7 +2,6 @@ module.exports = {
 	Name: "lastseen",
 	Aliases: ["ls"],
 	Author: "supinic",
-	Last_Edit: "2020-09-25T16:37:16.000Z",
 	Cooldown: 5000,
 	Description: "For a given user, this command tells you when they were last seen - based on their chat activity.",
 	Flags: ["block","mention","opt-out","pipe"],

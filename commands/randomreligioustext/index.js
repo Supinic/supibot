@@ -2,7 +2,6 @@ module.exports = {
 	Name: "randomreligioustext",
 	Aliases: ["rrt"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:22:09.000Z",
 	Cooldown: 10000,
 	Description: null,
 	Flags: ["mention","pipe"],

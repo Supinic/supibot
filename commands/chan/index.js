@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "chan",
-	Aliases: ["4chan", "textchan", "filechan", "imagechan"],
+	Aliases: ["4chan","textchan","filechan","imagechan"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:46:52.000Z",
 	Cooldown: 10000,
 	Description: "Pulls a random post from a random board, or a specified one, if you provide it.",
 	Flags: ["mention","pipe"],

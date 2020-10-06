@@ -2,7 +2,6 @@ module.exports = {
 	Name: "randomlineextra",
 	Aliases: ["rlx"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:03:41.000Z",
 	Cooldown: 7500,
 	Description: "Posts a random message from a special set of channels on Twitch. You should be able to identify the channel by its emoji.",
 	Flags: ["block","pipe"],

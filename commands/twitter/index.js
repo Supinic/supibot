@@ -2,7 +2,6 @@ module.exports = {
 	Name: "twitter",
 	Aliases: ["tweet"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Fetches the last tweet from a given user. No retweets or replies, just plain standalone tweets.",
 	Flags: ["mention","pipe"],

@@ -2,7 +2,6 @@ module.exports = {
 	Name: "when",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 15000,
 	Description: "Tells you when your command is going to be played next, approximately.",
 	Flags: ["mention","pipe","whitelist"],

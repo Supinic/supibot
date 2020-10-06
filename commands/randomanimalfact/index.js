@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "randomanimalfact",
-	Aliases: ["raf", "rbf", "rcf", "rdf", "rff"],
+	Aliases: ["raf","rbf","rcf","rdf","rff"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 10000,
 	Description: "Posts a random fact about a selected animal type.",
 	Flags: ["mention","pipe"],

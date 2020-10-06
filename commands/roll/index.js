@@ -2,7 +2,6 @@ module.exports = {
 	Name: "roll",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "Rolls a random number. If nothing is specified, rolls 1-100. You can also specify <number X>d<number Y> for X amount of dice rolls with Y sides each.",
 	Flags: ["mention","pipe","skip-banphrase"],

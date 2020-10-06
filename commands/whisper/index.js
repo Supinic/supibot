@@ -1,8 +1,7 @@
 module.exports = {
 	Name: "whisper",
-	Aliases: ["/w", "pm"],
+	Aliases: ["/w","pm"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 1000,
 	Description: "Usable in pipe only - turns the response into a whisper.",
 	Flags: ["pipe"],

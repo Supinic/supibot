@@ -2,7 +2,6 @@ module.exports = {
 	Name: "pajaWTH",
 	Aliases: ["obamaWTF"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T23:03:51.000Z",
 	Cooldown: 5000,
 	Description: "Posts a random Anthony \"Obama Chavez\" Stone quote, mostly from Knaked Knights and the snippets from IWF 2017.",
 	Flags: ["mention","pipe","skip-banphrase"],

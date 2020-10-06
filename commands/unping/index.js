@@ -2,7 +2,6 @@ module.exports = {
 	Name: "unping",
 	Aliases: ["reping"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 5000,
 	Description: "Sets/unsets a command pinging you when it's being invoked.",
 	Flags: ["mention"],

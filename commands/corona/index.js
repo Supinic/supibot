@@ -2,7 +2,6 @@ module.exports = {
 	Name: "corona",
 	Aliases: ["covid"],
 	Author: "supinic",
-	Last_Edit: "2020-09-08T17:25:36.000Z",
 	Cooldown: 7500,
 	Description: "Checks the current amount of infected/deceased people from the Corona Virus spread started in October-December 2019.",
 	Flags: ["mention","pipe"],
@@ -305,7 +304,7 @@ module.exports = {
 			}`
 		};
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: (async (prefix) => {
 		const row = await sb.Query.getRow("chat_data", "Command");
 		await row.load(200);
 	
@@ -343,5 +342,5 @@ module.exports = {
 			`<code>${prefix}corona @User</code>`,
 			"If a given user has set their default location (and it is public), this will check their country's corona stats."
 		];
-	}
+	})
 };
