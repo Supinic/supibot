@@ -2,7 +2,6 @@ module.exports = {
 	Name: "spm",
 	Aliases: null,
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:34:27.000Z",
 	Cooldown: 0,
 	Description: "Various utility subcommands related to supibot-package-manager.",
 	Flags: ["developer","mention","whitelist"],
@@ -25,11 +24,13 @@ module.exports = {
 			});
 		}
 	
+		const fs = require("fs").promises;
+		const shell = require("util").promisify(require("child_process").exec);
+	
 		if (operation === "dump") {
-			const fs = require("fs").promises;
 			switch (type) {
 				case "commands": {
-					let updated = 0;
+					const updated = [];
 					const promises = sb.Command.data.map(async (command) => {
 						const dir = `/code/spm/commands/${command.Name}`;
 						if (!await this.staticData.exists(dir)) {
@@ -39,8 +40,18 @@ module.exports = {
 						let save = false;
 						try {
 							// Only allow the overwrite of an existing command when the database definition changed more recently than the file
-							const stats = await fs.stat(`${dir}/index.js`);
-							if (command.Last_Edit > stats.mtime) {
+							const [stats, lastEdit] = await Promise.all([
+								fs.stat(`${dir}/index.js`),
+								sb.Query.getRecordset(rs => rs
+									.select("Last_Edit")
+									.from("chat_data", "Command")
+									.where("ID = %n", command.ID)
+									.single()
+									.flat("Last_Edit")
+								)
+							]);
+	
+							if (lastEdit > stats.mtime) {
 								save = true;
 							}
 						}
@@ -54,7 +65,7 @@ module.exports = {
 						}
 	
 						if (save) {
-							updated++;
+							updated.push(dir);
 							await command.serialize({
 								overwrite: true,
 								filePath: `${dir}/index.js`
@@ -64,11 +75,12 @@ module.exports = {
 	
 					await Promise.all(promises);
 	
-					const suffix = (updated === 1) ? "" : "s";				
+					updated.sort();
+					const suffix = (updated.length === 0) ? "" : "s";
 					return {
-						reply: (updated === 0)
-							? `No changes detected, nothing was saved peepoNerdDank`
-							: `Saved ${updated} command${suffix} into supibot-package-manager/commands peepoHackies`
+						reply: (updated.length === 0)
+							? `No changes detected, nothing was saved peepoNerdDank 👆`
+							: `Saved ${updated.length} command${suffix} (${updated.join(", ")}) into spm/commands peepoHackies`
 					};
 				}
 	
@@ -77,12 +89,102 @@ module.exports = {
 						message: "Unsupported dump operation"
 					});
 			}
-	
 		}
 		else if (operation === "load") {
-			throw new sb.Error({
-				message: "Not implemented"
-			});
+			switch (type) {
+				case "command":
+				case "commands": {
+					const updated = [];
+					const commandDirs = (args.length > 0)
+						? args.map(i => sb.Command.get(i)?.Name ?? i)
+						: await fs.readdir("/code/spm/commands");
+	
+					const promises = commandDirs.map(async (command) => {
+						const commandFile = `/code/spm/commands/${command}/index.js`;
+						if (!await this.staticData.exists(commandFile)) {
+							console.warn(`index.js file for command ${command} does not exist!`);
+							return;
+						}
+	
+						// Fetch the latest commit for a given file
+						const commitHash = (await shell(sb.Utils.tag.trim `
+							git
+							-C /code/spm
+							log -n 1
+							--pretty=format:%H
+							-- commands/${command}/index.js
+						`)).stdout;
+	
+						// Command file has no git history, skip
+						if (!commitHash)   {
+							console.log(`Command ${command}: no Git history`);
+							return;
+						}
+	
+						const currentCommand = sb.Command.get(command);
+						if (!currentCommand) { // New command - save
+							console.warn("New command detected - functionality not yet implemented");
+							return;
+						}
+	
+						const row = await sb.Query.getRow("chat_data", "Command");
+						await row.load(currentCommand.ID);
+						if (row.values.Latest_Commit === commitHash) {
+							console.log(`Command ${command}: no change`);
+							return;
+						}
+	
+						delete require.cache[require.resolve(commandFile)];
+						const definition = require(commandFile);
+	
+						const jsonify = ["Aliases"];
+						const functionStringify = ["Static_Data", "Code", "Dynamic_Description"];
+						for (const [key, value] of Object.entries(definition)) {
+							if (value === null) {
+								row.values[key] = null;
+							}
+							else if (jsonify.includes(key)) {
+								row.values[key] = JSON.stringify(value);
+							}
+							else if (functionStringify.includes(key)) {
+								const lines = `(${value})`.split("\n");
+								for (let i = 0; i < lines.length; i++) {
+									if (lines[i].startsWith("\t")) {
+										lines[i] = lines[i].slice(1);
+									}
+								}
+	
+								row.values[key] = lines.join("\n");
+							}
+							else {
+								row.values[key] = value;
+							}
+						}
+	
+						row.values.Latest_Commit = commitHash;					
+						await row.save();
+						updated.push(currentCommand.Name);
+					});
+	
+					await Promise.all(promises);
+					if (updated.length > 0) {
+						await sb.Command.reloadSpecific(...updated);
+					}
+	
+					updated.sort();
+					const suffix = (updated.length === 1) ? "" : "s";
+					return {
+						reply: (updated.length === 0)
+							? `No changes detected, no commands were loaded peepoNerdDank 👆`
+							: `Loaded ${updated.length} command${suffix} (${updated.join(", ")}) from spm/commands peepoHackies`
+					};
+				}
+	
+				default:
+					throw new sb.Error({
+						message: "Unsupported load operation"
+					});
+			}
 		}
 		else {
 			throw new sb.Error({
