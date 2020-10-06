@@ -328,7 +328,7 @@ module.exports = {
 			reply: `${userName} ${type} plays ${game.name} for $${price / 100}: ${introductionText} ${language} ${revenue}`
 		};
 	}),
-	Dynamic_Description: async (prefix, values) => {
+	Dynamic_Description: (async (prefix, values) => {
 		const row = await sb.Query.getRow("chat_data", "Command");
 		await row.load(208);
 		
@@ -354,5 +354,5 @@ module.exports = {
 			"Random user, selected game only. Only uses the first word of the game you provide.",
 			`List of games: <ul>${games}</ul>`
 		];
-	}
+	})
 };
