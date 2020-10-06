@@ -5,7 +5,7 @@ module.exports = {
 	Cooldown: 0,
 	Description: "Various utility subcommands related to supibot-package-manager.",
 	Flags: ["developer","mention","whitelist"],
-	Whitelist_Response: "Only Supi can use this command, but you can check the repository here: https://github.com/supinic/supibot-package-manager peepoHackies\n\t",
+	Whitelist_Response: "Only Supi can use this command, but you can check the repository here: https://github.com/supinic/supibot-package-manager peepoHackies",
 	Static_Data: (() => ({
 		exists: require("util").promisify(require("fs").exists)
 	})),
@@ -30,6 +30,7 @@ module.exports = {
 		if (operation === "dump") {
 			switch (type) {
 				case "commands": {
+					const now = new sb.Date();
 					const updated = [];
 					const promises = sb.Command.data.map(async (command) => {
 						const dir = `/code/spm/commands/${command.Name}`;
@@ -37,21 +38,18 @@ module.exports = {
 							await fs.mkdir(dir);
 						}
 	
+						let row = await sb.Query.getRow("chat_data", "Command");
 						let save = false;
+	
 						try {
-							// Only allow the overwrite of an existing command when the database definition changed more recently than the file
-							const [stats, lastEdit] = await Promise.all([
+							// Only allow the overwrite of an existing command when
+							// the database definition changed more recently than the file
+							const [stats] = await Promise.all([
 								fs.stat(`${dir}/index.js`),
-								sb.Query.getRecordset(rs => rs
-									.select("Last_Edit")
-									.from("chat_data", "Command")
-									.where("ID = %n", command.ID)
-									.single()
-									.flat("Last_Edit")
-								)
+								row.load(command.ID)
 							]);
 	
-							if (lastEdit > stats.mtime) {
+							if (row.values.Last_Edit > stats.mtime) {
 								save = true;
 							}
 						}
@@ -65,11 +63,16 @@ module.exports = {
 						}
 	
 						if (save) {
-							updated.push(dir);
-							await command.serialize({
-								overwrite: true,
-								filePath: `${dir}/index.js`
-							});
+							updated.push(command.Name);
+							row.values.Last_Edit = now;
+	
+							await Promise.all([
+								row.save(),
+								command.serialize({
+									overwrite: true,
+									filePath: `${dir}/index.js`
+								})
+							]);
 						}
 					});
 	
@@ -80,7 +83,7 @@ module.exports = {
 					return {
 						reply: (updated.length === 0)
 							? `No changes detected, nothing was saved peepoNerdDank 👆`
-							: `Saved ${updated.length} command${suffix} (${updated.join(", ")}) into spm/commands peepoHackies`
+							: `Saved ${updated.length} command${suffix} into spm/commands peepoHackies`
 					};
 				}
 	
@@ -161,7 +164,7 @@ module.exports = {
 							}
 						}
 	
-						row.values.Latest_Commit = commitHash;					
+						row.values.Latest_Commit = commitHash;
 						await row.save();
 						updated.push(currentCommand.Name);
 					});
