@@ -50,7 +50,7 @@ module.exports = {
 				end: [11, 22]
 			},
 			{ 
-				name: "Sagitarius",
+				name: "Sagittarius",
 				start: [11, 23],
 				end: [12, 21]
 			},
