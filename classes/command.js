@@ -7,7 +7,6 @@ module.exports = (function () {
 		Name: { type: "string" },
 		Aliases: { type: "descriptor" },
 		Author: { type: "string" },
-		Last_Edit: { type: "json" },
 		Cooldown: { type: "descriptor" },
 		Description: { type: "string" },
 		Flags: { type: "json" },
@@ -73,13 +72,6 @@ module.exports = (function () {
 		 * @type {string}
 		 */
 		#Author = null;
-
-		/**
-		 * Determines the last edit of the command, whether in filesystem or database.
-		 * Cannot be modified from within runtime.
-		 * @type {sb.Date}
-		 */
-		#Last_Edit;
 
 		/**
 		 * Session-specific data for the command that can be modified at runtime.
@@ -151,10 +143,6 @@ module.exports = (function () {
 			this.Whitelist_Response = data.Whitelist_Response;
 
 			this.#Author = data.Author ?? null;
-
-			this.#Last_Edit = (data.Last_Edit instanceof sb.Date)
-				? data.Last_Edit
-				: new sb.Date(data.Last_Edit);
 
 			try {
 				this.Code = eval(data.Code);
@@ -278,7 +266,6 @@ module.exports = (function () {
 		}
 
 		get Author () { return this.#Author; }
-		get Last_Edit () { return this.#Last_Edit; }
 
 		/** @override */
 		static async initialize () {
