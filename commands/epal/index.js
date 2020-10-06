@@ -2,7 +2,6 @@ module.exports = {
 	Name: "epal",
 	Aliases: ["ForeverAlone"],
 	Author: "supinic",
-	Last_Edit: "2020-10-04T22:46:47.000Z",
 	Cooldown: 10000,
 	Description: "Fetches a random person from epal.gg - post their description. If used on supinic's channel with TTS on, and if they have an audio introduction, it will be played on stream.",
 	Flags: ["mention"],
@@ -329,11 +328,11 @@ module.exports = {
 			reply: `${userName} ${type} plays ${game.name} for $${price / 100}: ${introductionText} ${language} ${revenue}`
 		};
 	}),
-	Dynamic_Description: async (prefix) => {
+	Dynamic_Description: async (prefix, values) => {
 		const row = await sb.Query.getRow("chat_data", "Command");
 		await row.load(208);
 		
-		const games = eval(row.values.Static_Data).games
+		const games = values.getStaticData().games
 			.map(i => `<li><code>${i.name}</code></li>`)
 			.sort()
 			.join("");
