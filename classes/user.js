@@ -100,7 +100,11 @@ module.exports = (function () {
             }
 
             row.values[property] = value;
-            await row.save();
+
+            await Promise.all([
+                row.save(),
+                User.populateCaches(this)
+            ]);
         }
 
         getCacheKey () {
