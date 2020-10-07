@@ -183,6 +183,18 @@ module.exports = {
 	
 					await Promise.all(promises);
 					if (updated.length > 0) {
+						// If the spm command is tasked with reloading itself, don't call reloadSpecific immediately,
+						// as this destroys the command before it finishes executing.
+						if (updated.includes("spm")) {
+							setTimeout(async () => {
+								await sb.Command.reloadSpecific("spm");
+								await context.channel.send("spm command reloaded peepoHackies");
+							}, 2500);
+
+							await context.channel.send(`The spm command was tasked to reload itself! monkaStare I will reload it in 2.5 seconds instead of right now.`);
+							updated.splice(updated.indexOf("spm"), 1);
+						}
+
 						await sb.Command.reloadSpecific(...updated);
 					}
 	
