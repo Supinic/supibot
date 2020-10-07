@@ -209,7 +209,7 @@ module.exports = {
 			{
 				names: ["cc", "tcc"],
 				description: "Fetches the amount of cookies you (or someone else) have eaten so far. If you use \"total\", then you will see the total amount of cookies eaten.",
-				execute: async function cookieCount (context, user) {
+				execute: async function cookieCount (context, type, user) {
 					if (context.platform.Name === "discord" && user && user.includes("@")) {
 						user = await sb.Utils.getDiscordUserDataFromMentions(user, context.append) || context.user;
 					}
