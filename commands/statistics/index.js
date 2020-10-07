@@ -214,7 +214,7 @@ module.exports = {
 						user = await sb.Utils.getDiscordUserDataFromMentions(user, context.append) || context.user;
 					}
 	
-					if (user === "total" || context.invocation === "tcc") {
+					if (user === "total" || type === "tcc") {
 						const cookies = await sb.Query.getRecordset(rs => rs
 							.select("SUM(Cookies_Total) AS Total", "SUM(Cookie_Gifts_Sent) AS Gifts")
 							.from("chat_data", "Extra_User_Data")
@@ -231,7 +231,7 @@ module.exports = {
 						};
 					}
 	
-					const targetUser = await sb.User.get(user || context.user, true);
+					const targetUser = await sb.User.get(user ?? context.user, true);
 					if (!targetUser) {
 						return { reply: "Target user does not exist in the database!" };
 					}
