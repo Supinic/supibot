@@ -45,7 +45,18 @@ module.exports = {
 							this.data.labyrinth.date = new sb.Date().setTimezoneOffset(0);
 							this.data.details = {};
 	
-							const html = await sb.Got.instances.FakeAgent("https://poelab.com").text();
+							const { statusCode, statusMessage, body: html } = await sb.Got.instances.FakeAgent({
+								url: "https://poelab.com",
+								throwHttpErrors: false
+							});
+
+							if (statusCode === 503) {
+								return {
+									success: false,
+									reply: `Poelab website returned error ${statusCode} - ${statusMessage}! Can't access labyrinth images.`
+								};
+							}
+
 							const $ = sb.Utils.cheerio(html);
 							const links = Array.from($(".redLink").slice(0, 4).map((_, i) => i.attribs.href));
 	
