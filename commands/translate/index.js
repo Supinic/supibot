@@ -15,14 +15,14 @@ module.exports = {
 			const token = args[i];
 			if (/^(from|to):/.test(token)) {
 				const [option, lang] = args[i].split(":");
-				const newLang = sb.Utils.languageISO.getCode(lang);
-	
-				if (!newLang) {
+				const newLang = sb.Utils.languageISO.get(lang) ?? {};
+				const code = newLang.iso6391 ?? newLang.iso6392 ?? null;
+				if (!code) {
 					fail[option] = lang;
 					continue;
 				}
 	
-				options[option] = newLang.toLowerCase();
+				options[option] = code.toLowerCase();
 				fail[option] = false;
 				args.splice(i, 1);
 			}
