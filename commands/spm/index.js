@@ -96,7 +96,7 @@ module.exports = {
 		else if (operation === "load") {
 			try {
 				const result = await shell("git -C /code/spm pull origin master");
-				await context.channel.send(result.stdout);
+				await context.channel.send(`git pull PepoG ${result.stdout}`);
 			}
 			catch (e) {
 				console.error("git pull error", e);
