@@ -94,6 +94,18 @@ module.exports = {
 			}
 		}
 		else if (operation === "load") {
+			try {
+				const result = await shell("git -C /code/spm pull origin master");
+				await context.channel.send(result.stdout);
+			}
+			catch (e) {
+				console.error("git pull error", e);
+				return {
+					success: false,
+					reply: `git pull failed monkaStare error is console`
+				};
+			}
+
 			switch (type) {
 				case "command":
 				case "commands": {
