@@ -58,7 +58,7 @@ module.exports = {
 			action = "deleted from the playlist";
 			await sb.VideoLANConnector.client.playlistDelete(userRequest.VLC_ID);
 		}
-	;
+
 		return {
 			reply: `Your request "${userRequest.Name}" (ID ${userRequest.VLC_ID}) has been successfully ${action}.`
 		};
