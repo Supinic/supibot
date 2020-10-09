@@ -44,7 +44,7 @@ module.exports = {
 				: data.nextStream.title;
 	
 			let target = `${channelName}'s`;
-			if (channelName === context.user.Name) {
+			if (channelName.toLowerCase() === context.user.Name) {
 				target = "Your";
 				extra += " (shouldn't you know when you're supposed to stream? 😉)";
 			}
