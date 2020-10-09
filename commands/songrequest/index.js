@@ -165,7 +165,8 @@ module.exports = {
 	}),
 	Code: (async function songRequest (context, ...args) {
 		if (args.length === 0) {
-			return { reply: "You must search for a link or a video description!" };
+            // If nothing is currently playing, redirect to $current
+			return (await sb.Command.get("current").execute(context)).reply;
 		}
 	
 		const state = sb.Config.get("SONG_REQUESTS_STATE");
