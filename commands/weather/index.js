@@ -108,13 +108,22 @@ module.exports = {
 				};
 			}
 	
-			const geoData = await sb.Got({
+			const { statusCode, body: geoData } = await sb.Got({
 				url: "https://maps.googleapis.com/maps/api/geocode/json",
+				responseType: "json",
+				throwHttpErrors: false,
 				searchParams: new sb.URLParams()
 					.set("key", sb.Config.get("API_GOOGLE_GEOCODING"))
 					.set("address", args.join(" "))
 					.toString()
-			}).json();
+			});
+
+			if (statusCode !== 200) {
+				throw new sb.errors.APIError({
+					statusCode,
+					apiName: "GoogleGeoAPI"
+				});
+			}
 	
 			if (!geoData.results[0]) {
 				return {
@@ -129,14 +138,23 @@ module.exports = {
 		const excluded = ["currently", "minutely", "hourly", "daily", "alerts"].filter(i => i !== type);
 		const key = sb.Config.get("API_DARKSKY");
 	
-		const topData = await sb.Got({
+		const { statusCode, body: topData } = await sb.Got({
 			url: `https://api.darksky.net/forecast/${key}/${coords.lat},${coords.lng}`,
+			responseType: "json",
+			throwHttpErrors: false,
 			searchParams: new sb.URLParams()
 				.set("units", "si")
 				.set("exclude", excluded.join(","))
 				.toString()
-		}).json();
-	
+		});
+
+		if (statusCode !== 200) {
+			throw new sb.errors.APIError({
+				statusCode,
+				apiName: "DarkskyWeatherAPI"
+			});
+		}
+
 		let data = null;
 		let message = null;
 		if (number === null && type !== "currently") {
