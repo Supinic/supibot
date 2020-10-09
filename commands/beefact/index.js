@@ -17,7 +17,9 @@ module.exports = {
 			.single()
 		);
 	
-		return { reply: fact.Text };
+		return {
+			reply: `🐝 ${fact.Text}`
+		};
 	}),
 	Dynamic_Description: null
 };
