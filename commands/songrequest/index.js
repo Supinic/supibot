@@ -165,8 +165,8 @@ module.exports = {
 	}),
 	Code: (async function songRequest (context, ...args) {
 		if (args.length === 0) {
-            // If nothing is currently playing, redirect to $current
-			return (await sb.Command.get("current").execute(context)).reply;
+            // If we got no args, just redirect to $current 4HEad
+			return await sb.Command.get("current").execute(context);
 		}
 	
 		const state = sb.Config.get("SONG_REQUESTS_STATE");
