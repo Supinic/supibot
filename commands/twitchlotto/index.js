@@ -38,7 +38,7 @@ module.exports = {
 			maxRetries: 3
 		};
 	}),
-	Code: (async function lotto (context, channel) {
+	Code: (async function twitchLotto (context, channel) {
 		if (!this.data.channels) {
 			this.data.channels = await sb.Query.getRecordset(rs => rs
 				.select("LOWER(Name) AS Name")
