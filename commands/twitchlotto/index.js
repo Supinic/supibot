@@ -195,16 +195,21 @@ module.exports = {
 			const strings = elements.map(i => `${replacement} (${Math.round(i.confidence * 100)}%)`);
 			detectionsString.push(...strings);
 		}
+
+		const flagsString = (image.Adult_Flags)
+			? `Manual NSFW flags: ${image.Adult_Flags.join(", ")}`
+			: "";
 	
 		return {
 			reply: sb.Utils.tag.trim `
 				NSFW score: ${sb.Utils.round(image.Score * 100, 2)}%
 				Detections: ${detectionsString.length === 0 ? "N/A" : detectionsString.join(", ")}
+				${flagsString}
 				https://i.imgur.com/${image.Link}
 			`
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
+	Dynamic_Description: (async (prefix) => {
 		const rawChannels = await sb.Query.getRecordset(rs => rs
 			.select("Name")
 			.from("data", "Twitch_Lotto_Channel")
