@@ -6,9 +6,108 @@ module.exports = {
 	Description: "Transforms a suggestion that you have created into a Github issue, thus \"elevating\" its status. Only usable by people who have linked their Github account via the supinic.com website.",
 	Flags: ["developer","mention"],
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: (() => ({
+		repositoryMap: {
+			"Backend": "supibot",
+			"Chat module": "supibot-package-manager",
+			"Command - delete": "supibot-package-manager",
+			"Command - fix": "supibot-package-manager",
+			"Command - new": "supibot-package-manager",
+			"Command - refactor": "supibot-package-manager",
+			"Website": "supinic.com",
+			"Website - API": "supinic.com",
+			"Website - Frontend": "supinic.com",
+		}
+	})),
 	Code: (async function elevate (context, ID) {
-	
+		if (!context.user.Data.github) {
+			return {
+				success: false,
+				reply: "Only users with a linked Github account can use this command! Head to supinic.com - log in, and select Github link in your username dropdown."
+			};
+		}
+		else if (!ID) {
+			return {
+				success: false,
+				reply: "No suggestion ID provided!"
+			};
+		}
+
+		const suggestionID = Number(ID);
+		if (!sb.Utils.isValidInteger(suggestionID)) {
+			return {
+				success: false,
+				reply: "Invalid suggestion ID provided!"
+			};
+		}
+
+		const row = await sb.Query.getRow("data", "Suggestion");
+		await row.load(ID, true);
+
+		if (!row.loaded) {
+			return {
+				success: false,
+				reply: "There is no suggestion with that ID!"
+			};
+		}
+		else if (!context.user.Data.administrator && context.user.ID !== row.values.User_Alias) {
+			return {
+				success: false,
+				reply: "You are not the author of the suggestion, so you can't elevate it!"
+			};
+		}
+		else if (row.values.Category === "Uncategorized") {
+			return {
+				success: false,
+				reply: "You cannot elevate uncategorized suggestions!"
+			};
+		}
+		else if (row.values.Status !== "Approved") {
+			return {
+				success: false,
+				reply: "You can't elevate suggestions with a status different than \"Approved\"!"
+			};
+		}
+
+		const repo = this.staticData.repositoryMap[row.values.Category];
+		if (!repo) {
+			return {
+				success: false,
+				reply: `Suggestions with category ${row.values.Category} cannot be elevated!`
+			};
+		}
+
+		const issueBody = `<a href="//supinic.com/data/suggestion/${ID}">S#{ID}</a> by *${context.user.Name}*\n${row.values.Text}`;
+		const { statusCode, body: data } = await sb.Got.instances.GitHub({
+			method: "POST",
+			responseType: "json",
+			throwHttpErros: false,
+			url: `repos/Supinic/${repo}/issues`,
+			searchParams: new sb.URLParams()
+				.set("title", `S#${ID} - elevated`)
+				.set("body", issueBody)
+				.toString(),
+			headers: {
+				Authorization: "token " + sb.Config.get("SUPIBOT_GITHUB_TOKEN")
+			}
+		});
+
+		if (statusCode !== 201) {
+			console.error("Github issue failed", { statusCode, data });
+			return {
+				success: false,
+				reply: "Github issue creation failed!"
+			};
+		}
+
+		row.values.Github_Link = `//github.com/Supinic/${repo}/issues${data.number}`;
+		row.values.Status = "Moved to Github";
+		row.values.Priority = 100;
+		await row.save();
+
+		return {
+			reply: `Success! Suggestion was marked as "Moved to Github" and an issue was created: https:${row.values.Github_Link}`
+		};
 	}),
 	Dynamic_Description: null
 };
