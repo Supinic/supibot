@@ -12,16 +12,18 @@ module.exports = {
 	Code: (async function spm (context, ...args) {
 		const operation = args.shift()?.toLowerCase();
 		if (!operation) {
-			throw new sb.Error({
-				message: "No spm operation provided"
-			});
+			return {
+				success: false,
+				reply: "No spm operation provided"
+			};
 		}
 	
 		const type = args.shift()?.toLowerCase();
 		if (!type) {
-			throw new sb.Error({
-				message: "No operation type provided"
-			});
+			return {
+				success: false,
+				reply: "No operation type provided"
+			};
 		}
 	
 		const fs = require("fs").promises;
@@ -98,10 +100,10 @@ module.exports = {
 					};
 				}
 	
-				default:
-					throw new sb.Error({
-						message: "Unsupported dump operation"
-					});
+				default: return {
+					success: false,
+					reply: "Unsupported spm dump operation provided!"
+				};
 			}
 		}
 		else if (operation === "load") {
@@ -218,16 +220,17 @@ module.exports = {
 					};
 				}
 	
-				default:
-					throw new sb.Error({
-						message: "Unsupported load operation"
-					});
+				default: return {
+					success: false,
+					reply: "Unsupported spm load operation provided!"
+				};
 			}
 		}
 		else {
-			throw new sb.Error({
-				message: "Invalid operation"
-			});
+			return {
+				success: false,
+				reply: "Invalid spm operation provided!"
+			};
 		}
 	}),
 	Dynamic_Description: null
