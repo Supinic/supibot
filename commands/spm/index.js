@@ -32,7 +32,18 @@ module.exports = {
 				case "commands": {
 					const now = new sb.Date();
 					const updated = [];
-					const promises = sb.Command.data.map(async (command) => {
+					const commands = (args.length > 0)
+						? args.map(i => sb.Command.get(i)).filter(Boolean)
+						: sb.Command.data;
+
+					if (commands.length === 0) {
+						return {
+							success: false,
+							reply: "No valid commands provided!"
+						};
+					}
+
+					const promises = commands.map(async (command) => {
 						const dir = `/code/spm/commands/${command.Name}`;
 						if (!await this.staticData.exists(dir)) {
 							await fs.mkdir(dir);
