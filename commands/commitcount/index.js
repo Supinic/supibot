@@ -8,7 +8,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function commitCount (context, username) {
-		username = username ?? context.user.Name;
+		username = username ?? context.user.Data.github?.login ?? context.user.Name;
 	
 		const escaped = encodeURIComponent(username);
 		const { body: data, statusCode} = await sb.Got.instances.GitHub(`users/${escaped}/events`);
@@ -24,7 +24,7 @@ module.exports = {
 		const commitCount = pushEvents.reduce((acc, cur) => acc += cur.payload.commits.length, 0);
 	
 		const suffix = (commitCount === 1) ? "": "s";
-		const who = (username === context.user.Name) 
+		const who = (username === context.user.Name || username === context.user.Data.github?.login)
 			? "You have"
 			: `GitHub user ${username} has`;
 	
