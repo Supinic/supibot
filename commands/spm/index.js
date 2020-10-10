@@ -31,6 +31,7 @@ module.exports = {
 	
 		if (operation === "dump") {
 			switch (type) {
+				case "command":
 				case "commands": {
 					const now = new sb.Date();
 					const updated = [];
