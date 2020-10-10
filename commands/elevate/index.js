@@ -77,16 +77,16 @@ module.exports = {
 			};
 		}
 
-		const issueBody = `<a href="//supinic.com/data/suggestion/${ID}">S#{ID}</a> by *${context.user.Name}*\n${row.values.Text}`;
+		const issueBody = `<a href="//supinic.com/data/suggestion/${ID}">S#${ID}</a> by *${context.user.Name}*\n\n${row.values.Text}`;
 		const { statusCode, body: data } = await sb.Got.instances.GitHub({
 			method: "POST",
 			responseType: "json",
 			throwHttpErros: false,
 			url: `repos/Supinic/${repo}/issues`,
-			searchParams: new sb.URLParams()
-				.set("title", `S#${ID} - elevated`)
-				.set("body", issueBody)
-				.toString(),
+			json: {
+				title: `S#${ID} - elevated`,
+				body: issueBody
+			},
 			headers: {
 				Authorization: "token " + sb.Config.get("SUPIBOT_GITHUB_TOKEN")
 			}
@@ -100,7 +100,7 @@ module.exports = {
 			};
 		}
 
-		row.values.Github_Link = `//github.com/Supinic/${repo}/issues${data.number}`;
+		row.values.Github_Link = `//github.com/Supinic/${repo}/issues/${data.number}`;
 		row.values.Status = "Moved to Github";
 		row.values.Priority = 100;
 		await row.save();
