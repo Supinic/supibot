@@ -412,6 +412,25 @@ module.exports = (function () {
             return new User(cacheData);
         }
 
+        static async invalidateUserCache (identifier) {
+            if (identifier instanceof User) {
+                User.data.delete(identifier.Name);
+                await sb.Cache.delete(identifier);
+            }
+            else if (typeof identifier === "string") {
+                User.data.delete(identifier);
+
+                const cacheKey = User.createCacheKey({ name: identifier });
+                await sb.Cache.delete(cacheKey);
+            }
+            else {
+                throw new sb.Error({
+                    message: "Invalid user identifier provided",
+                    args: { identifier }
+                });
+            }
+        }
+
         static createCacheKey (options = {}) {
             const name = options.name ?? options.Name;
             if (typeof name !== "string") {
