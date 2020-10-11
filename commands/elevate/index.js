@@ -16,7 +16,7 @@ module.exports = {
 			"Command - refactor": "supibot-package-manager",
 			"Website": "supinic.com",
 			"Website - API": "supinic.com",
-			"Website - Frontend": "supinic.com",
+			"Website - frontend": "supinic.com",
 		}
 	})),
 	Code: (async function elevate (context, ID) {
