@@ -304,12 +304,9 @@ module.exports = {
 			}`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
-		const row = await sb.Query.getRow("chat_data", "Command");
-		await row.load(200);
-	
-		const data = eval(row.values.Static_Data);
-		const regions = data.regions.map(i => `<li><code>${i}</code></li>`).join("");
+	Dynamic_Description: (async (prefix, values) => {
+		const { regions } = await values.getStaticData();
+		const regionList = regions.map(i => `<li><code>${i}</code></li>`).join("");
 	
 		const subregions = (await sb.Query.getRecordset(rs => rs
 			.select("DISTINCT Parent")
@@ -327,7 +324,7 @@ module.exports = {
 	
 			`<code>${prefix}corona (global region)</code>`,
 			`Posts a given global region's cumulative stats.`,
-			`Supported global regions: <ul>${regions}</ul>`,
+			`Supported global regions: <ul>${regionList}</ul>`,
 	
 			`<code>${prefix}corona (country/region)</code>`,
 			`Posts a given country's <b>OR</b> region's data. Countries take precedence. I.e. "Georgia" will post the country, not the USA state.`,
