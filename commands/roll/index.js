@@ -18,6 +18,7 @@ module.exports = {
 			}
 		}
 
+		let [first, second] = args;
 		if (Number(first) && Number(second)) {
 			first = Number(first);
 			second = Number(second);
