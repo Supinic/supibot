@@ -9,6 +9,8 @@ module.exports = {
 	Static_Data: (() => ({
 		repositoryMap: {
 			"Backend": "supibot",
+			"Backend - bot": "supibot",
+			"Backend - modules": "supi-core",
 			"Chat module": "supibot-package-manager",
 			"Command - delete": "supibot-package-manager",
 			"Command - fix": "supibot-package-manager",
