@@ -4,36 +4,25 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Fetches a random gachi track from the gachi list, excluding Bilibili and Nicovideo videos with no Youtube reuploads",
-	Flags: ["link-only","mention","pipe"],
+	Flags: ["link-only","mention","pipe","use-params"],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function randomGachi (context, ...args) {
+	Code: (async function randomGachi (context) {
 		const prefixRow = await sb.Query.getRow("data", "Video_Type");
 		await prefixRow.load(1);
 	
-		let userFavourites = null;
-		const favRegex = /^fav(ou?rite)?/;
-	
-		for (let i = args.length - 1; i >= 0; i--) {
-			const token = args[i];
-			if (favRegex.test(token)) {
-				const name = token.split(":")[1];
-				if (name) {
-					userFavourites = await sb.User.get(name);
-					if (!userFavourites) {
-						return {
-							success: false,
-							link: null,
-							reply: `User doesn't exist!`
-						};
-					}
-				}
-				else {
-					userFavourites = context.user;
-				}
-			}
+		const targetUserFavourite = context.params.favourite ?? context.params.favorite ?? context.params.fav ?? null;
+		const userFavourites = (targetUserFavourite)
+			? await sb.User.get(targetUserFavourite)
+			: context.user;
+
+		if (!userFavourites) {
+			return {
+				success: false,
+				reply: "No such user exists!"
+			};
 		}
-	
+
 		const data = await sb.Query.getRecordset(rs => {
 			rs.select("Track.ID AS TrackID, Track.Name AS TrackName, Track.Link AS TrackLink")
 				.select("GROUP_CONCAT(Author.Name SEPARATOR ',') AS Authors")
