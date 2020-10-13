@@ -9,7 +9,7 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function randomDoctorDisrepsect () {
 		return {
-			reply: "This command is not currently available - underoging maintenance."
+			reply: "This command is not currently available - undergoing maintenance."
 		};
 	
 	/*
