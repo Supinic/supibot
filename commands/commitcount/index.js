@@ -7,15 +7,27 @@ module.exports = {
 	Flags: ["developer","mention","pipe","skip-banphrase"],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function commitCount (context, username) {
-		username = username ?? context.user.Data.github?.login ?? context.user.Name;
+	Code: (async function commitCount (context, user) {
+		let username;
+		if (user) {
+			const userData = await sb.User.get(user);
+			if (userData) {
+				username = userData.Data.github?.login ?? userData.Name;
+			}
+			else {
+				username = user;
+			}
+		}
+		else {
+			username = context.user.Data.github?.login ?? context.user.Name;
+		}
 	
 		const escaped = encodeURIComponent(username);
 		const { body: data, statusCode} = await sb.Got.instances.GitHub(`users/${escaped}/events`);
 		if (statusCode !== 200) {
 			return {
 				success: false,
-				reply: `Error ${statusCode}: ${data.message}`
+				reply: `${data.message}`
 			};
 		}
 	
@@ -24,7 +36,7 @@ module.exports = {
 		const commitCount = pushEvents.reduce((acc, cur) => acc += cur.payload.commits.length, 0);
 	
 		const suffix = (commitCount === 1) ? "": "s";
-		const who = (username === context.user.Name || username === context.user.Data.github?.login)
+		const who = (user === context.user.Name || user === context.user.Data.github?.login)
 			? "You have"
 			: `GitHub user ${username} has`;
 	
