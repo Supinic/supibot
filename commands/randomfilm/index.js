@@ -13,8 +13,8 @@ module.exports = {
 		}).text();
 	
 		const $ = sb.Utils.cheerio(html);
-		const movies = $(".list-unstyled.content li").map((ind, i) => {
-			const name = $($(i).children()[0]);
+		const movies = $(".content .list-unstyled li").map((ind, i) => {
+			const name = $($(i).children()[1]);
 			return name.text().replace(/\s+/g, " ");		
 		});
 	
