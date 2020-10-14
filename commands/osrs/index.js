@@ -104,13 +104,14 @@ module.exports = {
 				}
 	
 				const bestMatch = sb.Utils.selectClosestString(query, data.map(i => i.Name), { ignoreCase: true });
-				const itemID = data.find(i => i.Name.toLowerCase() === bestMatch.toLowerCase()).Game_ID;			
+				const item = data.find(i => i.Name.toLowerCase() === bestMatch.toLowerCase());
+
 				const { statusCode, body: detail } = await sb.Got({
 					url: "https://secure.runescape.com/m=itemdb_oldschool/api/catalogue/detail.json",
 					throwHttpErrors: false,
 					responseType: "json",
 					searchParams: new sb.URLParams()
-						.set("item", itemID)
+						.set("item", item.Game_ID)
 						.toString()
 				});
 	
@@ -120,10 +121,15 @@ module.exports = {
 						reply: `Item not found!`
 					};
 				}
-	
+
 				const { current, today } = detail.item;
+				const wiki = "https://osrs.wiki/" + item.Name.replace(/\s+/g, "_");
 				return {
-					reply: `Current price of ${detail.item.name}: ${current.price}, current trend: ${today.trend} (${today.price})`
+					reply: sb.Utils.tag.trim `
+						Current price of ${detail.item.name}: ${current.price},
+						current trend: ${today.trend} (${today.price})
+						${wiki}
+					`
 				};
 			}
 	
