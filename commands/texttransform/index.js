@@ -247,11 +247,13 @@ module.exports = {
 	Code: (async function textTransform (context, name, ...args) {
 		if (!name) {
 			return {
+				success: false,
 				reply: "No type provided! Check the command's help for more info."
 			};
 		}
 		else if (args.length === 0) {
 			return {
+				success: false,
 				reply: "No message provided!"
 			};
 		}
@@ -263,6 +265,7 @@ module.exports = {
 	
 		if (!transformation) {
 			return {
+				success: false,
 				reply: "Invalid type provided!"
 			}
 		}
@@ -272,6 +275,7 @@ module.exports = {
 	
 		if (!result) {
 			return {
+				success: false,
 				reply: "No result has been created?!"
 			};
 		}
