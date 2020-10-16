@@ -1,9 +1,8 @@
 /**
- *
- * @module CooldownManager
+ * Manages cooldowns for specification combinations of channel/user/command/platform.
+ * @type CooldownManager
  */
-/* global sb */
-module.exports = (function (Module) {
+module.exports = (function () {
 	"use strict";
 
 	class Cooldown {
@@ -89,7 +88,7 @@ module.exports = (function (Module) {
 	 * @name sb.CooldownManager
 	 * @type CooldownManager()
 	 */
-	class CooldownManager extends Module {
+	class CooldownManager extends require("./template.js") {
 		/**
 		 * @inheritDoc
 		 * @returns {CooldownManager}
@@ -258,4 +257,4 @@ module.exports = (function (Module) {
 	}).start();
 
 	return CooldownManager;
-});
+})();

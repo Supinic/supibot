@@ -1,5 +1,5 @@
 /* global sb */
-module.exports = (function (Module) {
+module.exports = (function () {
 	"use strict";
 
 	const notified = {
@@ -12,7 +12,7 @@ module.exports = (function (Module) {
 	 * @name sb.Logger
 	 * @type Logger()
 	 */
-	return class Logger extends Module {
+	return class Logger extends require("./template.js") {
 		#crons = [];
 		#presentTables = null;
 
@@ -421,4 +421,4 @@ module.exports = (function (Module) {
 
 		get modulePath () { return "logger"; }
 	};
-});
+})();

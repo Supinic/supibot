@@ -1,5 +1,3 @@
-/* global sb */
-
 let loginConfigMissingNotified = false;
 const loginConfigs = [
 	"API_PASTEBIN",
@@ -7,7 +5,7 @@ const loginConfigs = [
 	"PASTEBIN_PASSWORD"
 ];
 
-module.exports = (function (Module) {
+module.exports = (function () {
 	"use strict";
 
 	const allowedPrivacyOptions = ["public", "unlisted", "private"];
@@ -28,7 +26,7 @@ module.exports = (function (Module) {
 	 * @name sb.Pastebin
 	 * @type Pastebin()
 	 */
-	return class Pastebin extends Module {
+	return class Pastebin extends require("./template.js") {
 		#authData = null;
 		#authenticationPending = false;
 
@@ -180,4 +178,4 @@ module.exports = (function (Module) {
 		/** @inheritDoc */
 		destroy () {}
 	};
-});
+})();

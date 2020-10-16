@@ -28,7 +28,7 @@ module.exports = (function () {
 		"seekToChapter"
 	];
 
-	return class VideoLANConnector {
+	return class VideoLANConnector extends require("./template.js") {
 		static singleton () {
 			if (!VideoLANConnector.module) {
 				if (!sb.Config.has("LOCAL_VLC_BASE_URL", true)) {
@@ -54,6 +54,8 @@ module.exports = (function () {
 		 * @type VideoLANConnector()
 		 */
 		constructor (options = {}) {
+			super();
+
 			this.client = new VLC({
 				host: options.url,
 				port: options.port,
@@ -429,6 +431,11 @@ module.exports = (function () {
 
 		get modulePath () { return "vlc-connector"; }
 
+		destroy () {
+			this.client.removeAllListeners();
+			this.client = null;
+		}
+
 		/*
 		async playlistLength (id) {
 			const status = await VLC.status();
@@ -469,4 +476,4 @@ module.exports = (function () {
 		}
 		*/
 	};
-});
+})();
