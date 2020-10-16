@@ -224,7 +224,7 @@ module.exports = {
 	
 						if (args.length === 0) {
 							const { location } = context.user.Data;
-							if (location) {
+							if (location && visibilityType !== null) {
 								if (location.hidden === hidden) {
 									return {
 										success: false,
