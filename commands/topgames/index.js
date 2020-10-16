@@ -2,7 +2,7 @@ module.exports = {
 	Name: "topgames",
 	Aliases: null,
 	Author: "supinic",
-	Cooldown: 60000,
+	Cooldown: 30000,
 	Description: "Fetches the top 10 most popular games on twitch, based on current viewer count.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
@@ -11,7 +11,8 @@ module.exports = {
 		const data = await sb.Got.instances.Twitch.Kraken("games/top").json();
 		if (!Array.isArray(data.top)) {
 			return {
-				reply: "No data retrieved..."
+				success: false,
+				reply: "Twitch API returned no data..."
 			};
 		}
 	
@@ -20,7 +21,7 @@ module.exports = {
 		));
 		
 		return {
-			reply: "Most popular games on Twitch by viewers right now: " + games.join(", ")
+			reply: "Top categories on Twitch (sorted by viewers): " + games.join(", ")
 		};
 	}),
 	Dynamic_Description: null
