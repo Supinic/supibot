@@ -1,273 +1,264 @@
-/* global sb */
-module.exports = (function () {
-	"use strict";
+/**
+ * Represents a user's AFK status
+ * @memberof sb
+ * @type Platform
+ */
+module.exports = class Platform extends require("./template.js") {
+	/**
+	 * Platform controller
+	 * @type {Controller}
+	 */
+	#controller = null;
+	#userMessagePromises = new Map();
 
 	/**
-	 * Represents a user's AFK status
-	 * @memberof sb
-	 * @type Platform
+	 * @param {Object} data
+	 * @param {number} data.User_Alias
+	 * @param {sb.Date} data.Started
+	 * @param {string} data.Text
+	 * @param {boolean} data.Silent
 	 */
-	return class Platform {
+	constructor (data) {
+		super();
+		
 		/**
-		 * Platform controller
-		 * @type {Controller}
+		 * Unique numeric platform identifier.
+		 * @type {User.ID}
 		 */
-		#controller = null;
-
-		#userMessagePromises = new Map();
+		this.ID = data.ID;
 
 		/**
-		 * @param {Object} data
-		 * @param {number} data.User_Alias
-		 * @param {sb.Date} data.Started
-		 * @param {string} data.Text
-		 * @param {boolean} data.Silent
+		 * Unique platform name.
+		 * @type {string}
 		 */
-		constructor (data) {
-			/**
-			 * Unique numeric platform identifier.
-			 * @type {User.ID}
-			 */
-			this.ID = data.ID;
+		this.Name = data.Name.toLowerCase();
 
-			/**
-			 * Unique platform name.
-			 * @type {string}
-			 */
-			this.Name = data.Name.toLowerCase();
+		/**
+		 * Fallback message limit.
+		 * @type {number}
+		 */
+		this.Message_Limit = data.Message_Limit;
 
-			/**
-			 * Fallback message limit.
-			 * @type {number}
-			 */
-			this.Message_Limit = data.Message_Limit;
+		/**
+		 * Name of the bot's account in given platform.
+		 * @type {string}
+		 */
+		this.Self_Name = (data.Self_Name === null)
+			? null
+			: data.Self_Name.toLowerCase();
 
-			/**
-			 * Name of the bot's account in given platform.
-			 * @type {string}
-			 */
-			this.Self_Name = (data.Self_Name === null)
-				? null
-				: data.Self_Name.toLowerCase();
+		/**
+		 * Specific ID of the bot's account in given platform.
+		 * Can be null if the platform does not support UIDs.
+		 * @type {string|null}
+		 */
+		this.Self_ID = data.Self_ID;
 
-			/**
-			 * Specific ID of the bot's account in given platform.
-			 * Can be null if the platform does not support UIDs.
-			 * @type {string|null}
-			 */
-			this.Self_ID = data.Self_ID;
+		/**
+		 * A string identifier to recognize a platform for mirroring.
+		 * @type {string}
+		 */
+		this.Mirror_Identifier = data.Mirror_Identifier ?? null;
 
-			/**
-			 * A string identifier to recognize a platform for mirroring.
-			 * @type {string}
-			 */
-			this.Mirror_Identifier = data.Mirror_Identifier ?? null;
+		/**
+		 * Settings related to logging permissions and levels.
+		 * @type {Object}
+		 */
+		this.Logging = {};
 
-			/**
-			 * Settings related to logging permissions and levels.
-			 * @type {Object}
-			 */
-			this.Logging = {};
-
-			if (data.Logging) {
-				try {
-					this.Logging = JSON.parse(data.Logging);
-				}
-				catch (e) {
-					this.Logging = {};
-					console.warn(`Platform ${this.Name} has incorrect logging settings definition`, e);
-				}
+		if (data.Logging) {
+			try {
+				this.Logging = JSON.parse(data.Logging);
 			}
-
-			/**
-			 * Default platform-specific data.
-			 * This can be customised in the Data column.
-			 * The object is frozen, and thus cannot be modified.
-			 * @type {Object}
-			 */
-			this.Defaults = Object.freeze({});
-
-			if (data.Defaults) {
-				try {
-					this.Defaults = Object.freeze(JSON.parse(data.Defaults));
-				}
-				catch (e) {
-					this.Defaults = Object.freeze({});
-					console.warn(`Platform ${this.Name} has incorrect default settings definition`, e);
-				}
+			catch (e) {
+				this.Logging = {};
+				console.warn(`Platform ${this.Name} has incorrect logging settings definition`, e);
 			}
+		}
 
-			/**
-			 * Custom platform-specific data, parsed from JSON format.
-			 * It is merged with defaults on startup.
-			 * @type {Object}
-			 */
-			this.Data = {};
+		/**
+		 * Default platform-specific data.
+		 * This can be customised in the Data column.
+		 * The object is frozen, and thus cannot be modified.
+		 * @type {Object}
+		 */
+		this.Defaults = Object.freeze({});
 
-			if (data.Data) {
-				try {
-					// Merge together custom data with defaults - custom data has priority over defaults.
-					this.Data = {
-						...this.Defaults,
-						...JSON.parse(data.Data)
-					};
-				}
-				catch (e) {
-					this.Data = { ...this.Defaults };
-					console.warn(`Platform ${this.Name} has incorrect data definition`, e);
-				}
+		if (data.Defaults) {
+			try {
+				this.Defaults = Object.freeze(JSON.parse(data.Defaults));
 			}
-			else {
+			catch (e) {
+				this.Defaults = Object.freeze({});
+				console.warn(`Platform ${this.Name} has incorrect default settings definition`, e);
+			}
+		}
+
+		/**
+		 * Custom platform-specific data, parsed from JSON format.
+		 * It is merged with defaults on startup.
+		 * @type {Object}
+		 */
+		this.Data = {};
+
+		if (data.Data) {
+			try {
+				// Merge together custom data with defaults - custom data has priority over defaults.
+				this.Data = {
+					...this.Defaults,
+					...JSON.parse(data.Data)
+				};
+			}
+			catch (e) {
 				this.Data = { ...this.Defaults };
+				console.warn(`Platform ${this.Name} has incorrect data definition`, e);
 			}
 		}
+		else {
+			this.Data = { ...this.Defaults };
+		}
+	}
 
-		/**
-		 * Determines if a user is an "owner" of a given channel in the platform.
-		 * @param {Channel} channelData
-		 * @param {User} userData
-		 * @returns {null|boolean}
-		 */
-		isUserChannelOwner (channelData, userData) {
-			if (typeof this.#controller.isUserChannelOwner !== "function") {
-				return null;
-			}
-
-			return this.#controller.isUserChannelOwner(channelData, userData);
+	/**
+	 * Determines if a user is an "owner" of a given channel in the platform.
+	 * @param {Channel} channelData
+	 * @param {User} userData
+	 * @returns {null|boolean}
+	 */
+	isUserChannelOwner (channelData, userData) {
+		if (typeof this.#controller.isUserChannelOwner !== "function") {
+			return null;
 		}
 
-		/**
-		 * Sends a message into a given channel.
-		 * @param message
-		 * @param channel
-		 * @returns {Promise<void>}
-		 */
-		send (message, channel) {
-			return this.#controller.send(message, channel);
+		return this.#controller.isUserChannelOwner(channelData, userData);
+	}
+
+	/**
+	 * Sends a message into a given channel.
+	 * @param message
+	 * @param channel
+	 * @returns {Promise<void>}
+	 */
+	send (message, channel) {
+		return this.#controller.send(message, channel);
+	}
+
+	/**
+	 * Sends a private message to a given user.
+	 * @param message
+	 * @param user
+	 * @returns {Promise<void>}
+	 */
+	pm (message, user) {
+		return this.#controller.pm(message, user);
+	}
+
+	destroy () {
+		this.#controller = null;
+	}
+
+	waitForUserMessage (channelData, userData, options = {}) {
+		const delay = options.timeout ?? 10_000;
+		const promise = new sb.Promise();
+
+		if (!this.#userMessagePromises.has(channelData)) {
+			this.#userMessagePromises.set(channelData, new Map());
 		}
 
-		/**
-		 * Sends a private message to a given user.
-		 * @param message
-		 * @param user
-		 * @returns {Promise<void>}
-		 */
-		pm (message, user) {
-			return this.#controller.pm(message, user);
+		if (this.#userMessagePromises.get(channelData).get(userData)) {
+			throw new sb.Error({
+				message: "User already has a pending promise in the provided channel!"
+			});
 		}
 
-		destroy () {
-			this.#controller = null;
+		const timeout = setTimeout(() => {
+			promise.resolve(null);
+			this.#userMessagePromises.get(channelData).delete(userData);
+		}, delay);
+
+		this.#userMessagePromises.get(channelData).set(userData, { promise, timeout });
+
+		return promise;
+	}
+	
+	async serialize () {
+		throw new sb.Error({
+			message: "Module Platform cannot be serialized"
+		});
+	}
+
+	get userMessagePromises () {
+		return this.#userMessagePromises;
+	}
+
+	get capital () {
+		return sb.Utils.capitalize(this.Name);
+	}
+
+	/**
+	 * Platform controller
+	 * @type {Controller}
+	 */
+	get controller () {
+		return this.#controller;
+	}
+
+	get client () {
+		return this.#controller?.client ?? null;
+	}
+	
+	static async loadData () {
+		const data = await sb.Query.getRecordset(rs => rs
+			.select("*")
+			.from("chat_data", "Platform")
+		);
+
+		Platform.data = data.map(record => new Platform(record));
+
+		if (Platform.data.length === 0) {
+			console.warn("No platforms initialized - bot will not attempt to log in to any services");
 		}
+	}
 
-		waitForUserMessage (channelData, userData, options = {}) {
-			const delay = options.timeout ?? 10_000;
-			const promise = new sb.Promise();
-
-			if (!this.#userMessagePromises.has(channelData)) {
-				this.#userMessagePromises.set(channelData, new Map());
-			}
-
-			if (this.#userMessagePromises.get(channelData).get(userData)) {
-				throw new sb.Error({
-					message: "User already has a pending promise in the provided channel!"
-				});
-			}
-
-			const timeout = setTimeout(() => {
-				promise.resolve(null);
-				this.#userMessagePromises.get(channelData).delete(userData);
-			}, delay);
-
-			this.#userMessagePromises.get(channelData).set(userData, { promise, timeout });
-
-			return promise;
-		}
-
-		get userMessagePromises () {
-			return this.#userMessagePromises;
-		}
-
-		get capital () {
-			return sb.Utils.capitalize(this.Name);
-		}
-
-		/**
-		 * Platform controller
-		 * @type {Controller}
-		 */
-		get controller () {
-			return this.#controller;
-		}
-
-		get client () {
-			return this.#controller?.client ?? null;
-		}
-
-		/** @override */
-		static async initialize () {
-			await Platform.loadData();
-			return Platform;
-		}
-
-		static async loadData () {
-			const data = await sb.Query.getRecordset(rs => rs
-				.select("*")
-				.from("chat_data", "Platform")
-			);
-
-			Platform.data = data.map(record => new Platform(record));
-
-			if (Platform.data.length === 0) {
-				console.warn("No platforms initialized - bot will not attempt to log in to any services");
-			}
-		}
-
-		static async reloadData () {
-			Platform.data = [];
-			await Platform.loadData();
-		}
-
-		/**
-		 * Assigns controllers to each platform after they have been prepared.
-		 * @param {Object<string, Controller>}controllers
-		 */
-		static assignControllers (controllers) {
-			for (const [name, controller] of Object.entries(controllers)) {
-				const platform = Platform.get(name);
-				if (platform) {
-					platform.#controller = controller;
-				}
+	/**
+	 * Assigns controllers to each platform after they have been prepared.
+	 * @param {Object<string, Controller>}controllers
+	 */
+	static assignControllers (controllers) {
+		for (const [name, controller] of Object.entries(controllers)) {
+			const platform = Platform.get(name);
+			if (platform) {
+				platform.#controller = controller;
 			}
 		}
+	}
 
-		static get (identifier) {
-			if (identifier instanceof Platform) {
-				return identifier;
-			}
-			else if (typeof identifier === "number") {
-				return Platform.data.find(i => i.ID === identifier);
-			}
-			else if (typeof identifier === "string") {
-				return Platform.data.find(i => i.Name === identifier);
-			}
-			else {
-				throw new sb.Error({
-					message: "Unrecognized platform identifier type",
-					args: typeof identifier
-				});
-			}
+	static get (identifier) {
+		if (identifier instanceof Platform) {
+			return identifier;
+		}
+		else if (typeof identifier === "number") {
+			return Platform.data.find(i => i.ID === identifier);
+		}
+		else if (typeof identifier === "string") {
+			return Platform.data.find(i => i.Name === identifier);
+		}
+		else {
+			throw new sb.Error({
+				message: "Unrecognized platform identifier type",
+				args: typeof identifier
+			});
+		}
+	}
+
+	/**
+	 * Cleans up.
+	 */
+	static destroy () {
+		for (const platform of Platform.data) {
+			platform.destroy();
 		}
 
-		/**
-		 * Cleans up.
-		 */
-		static destroy () {
-			for (const platform of Platform.data) {
-				platform.destroy();
-			}
-
-			Platform.data = null;
-		}
-	};
-})();
+		super.destroy();
+	}
+};

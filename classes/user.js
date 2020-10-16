@@ -1,258 +1,306 @@
-/* global sb */
-module.exports = (function () {
-    "use strict";
-    /**
-     * Represents a chat user.
-     * Since there can be hundreds of thousands of users loaded, a class is used to simplify the prototype, and potentially save some memory and/or processing power with V8.
-     * @memberof sb
-     * @type User
-     */
-    const User = class User {
-        static mapCacheExpiration = 300_000;
-        static redisCacheExpiration = 3_600_000;
-        static mapExpirationInterval = setInterval(() => User.data.clear(), User.mapCacheExpiration);
+/**
+ * Represents a chat user.
+ * Since there can be hundreds of thousands of users loaded, a class is used to simplify the prototype, and potentially save some memory and/or processing power with V8.
+ * @memberof sb
+ * @type User
+ */
+module.exports = class User extends require("./template.js") {
+    static mapCacheExpiration = 300_000;
+    static redisCacheExpiration = 3_600_000;
+    static mapExpirationInterval = setInterval(() => User.data.clear(), User.mapCacheExpiration);
 
-        /** @alias {User} */
-        constructor (data) {
-            /**
-             * Unique numeric ID.
-             * @type {number}
-             */
-            this.ID = data.ID;
-
-            /**
-             * Unique Discord identifier.
-             * Only verified users (non-null Discord ID value) can use the bot on Discord.
-             * @type {number}
-             */
-            this.Discord_ID = data.Discord_ID;
-
-            /**
-             * Unique Mixer identifier.
-             * @type {number}
-             */
-            this.Mixer_ID = data.Mixer_ID;
-
-            /**
-             * Unique Twitch identifier.
-             * @type {number}
-             */
-            this.Twitch_ID = data.Twitch_ID;
-
-            /**
-             * Unique name.
-             * @type {string}
-             */
-            this.Name = data.Name;
-
-            /**
-             * Date of first sighting.
-             * @type {sb.Date}
-             */
-            this.Started_Using = (data.Started_Using instanceof sb.Date)
-                ? data.Started_Using
-                : new sb.Date(data.Started_Using);
-
-            /**
-             * Extra data given to each user.
-             * @type {Object}
-             */
-            if (!data.Data) {
-                this.Data = {};
-            }
-            else if (typeof data.Data === "string") {
-                try {
-                    this.Data = JSON.parse(data.Data);
-                }
-                catch (e) {
-                    console.warn("User.Data parse error", { error: e, user: this, data});
-                    this.Data = {};
-                }
-            }
-            else if (typeof data.Data === "object") {
-                this.Data = { ...data.Data };
-            }
-            else {
-                console.warn("User.Data invalid type", { user: this, data});
-                this.Data = {};
-            }
-        }
+    /** @alias {User} */
+    constructor (data) {
+        super();
 
         /**
-         * Pushes a property change to the dataabse.
-         * @param {string} property
-         * @param {*} value
-         * @returns {Promise<void>}
+         * Unique numeric ID.
+         * @type {number}
          */
-        async saveProperty (property, value) {
-            const row = await sb.Query.getRow("chat_data", "User_Alias");
-            await row.load(this.ID);
+        this.ID = data.ID;
 
-            if (typeof value !== "undefined") {
-                this[property] = value;
+        /**
+         * Unique Discord identifier.
+         * Only verified users (non-null Discord ID value) can use the bot on Discord.
+         * @type {number}
+         */
+        this.Discord_ID = data.Discord_ID;
+
+        /**
+         * Unique Mixer identifier.
+         * @type {number}
+         */
+        this.Mixer_ID = data.Mixer_ID;
+
+        /**
+         * Unique Twitch identifier.
+         * @type {number}
+         */
+        this.Twitch_ID = data.Twitch_ID;
+
+        /**
+         * Unique name.
+         * @type {string}
+         */
+        this.Name = data.Name;
+
+        /**
+         * Date of first sighting.
+         * @type {sb.Date}
+         */
+        this.Started_Using = (data.Started_Using instanceof sb.Date)
+            ? data.Started_Using
+            : new sb.Date(data.Started_Using);
+
+        /**
+         * Extra data given to each user.
+         * @type {Object}
+         */
+        if (!data.Data) {
+            this.Data = {};
+        }
+        else if (typeof data.Data === "string") {
+            try {
+                this.Data = JSON.parse(data.Data);
             }
-            else {
-                value = this[property];
+            catch (e) {
+                console.warn("User.Data parse error", { error: e, user: this, data});
+                this.Data = {};
             }
+        }
+        else if (typeof data.Data === "object") {
+            this.Data = { ...data.Data };
+        }
+        else {
+            console.warn("User.Data invalid type", { user: this, data});
+            this.Data = {};
+        }
+    }
 
-            if (value?.constructor === Object) {
-                value = JSON.stringify(value, null, 4);
-            }
+    getCacheKey () {
+        return `sb-user-${this.Name}`;
+    }
 
-            row.values[property] = value;
+    /**
+     * Pushes a property change to the dataabse.
+     * @param {string} property
+     * @param {*} value
+     * @returns {Promise<void>}
+     */
+    async saveProperty (property, value) {
+        const row = await sb.Query.getRow("chat_data", "User_Alias");
+        await row.load(this.ID);
 
-            await Promise.all([
-                row.save(),
-                User.populateCaches(this)
-            ]);
+        if (typeof value !== "undefined") {
+            this[property] = value;
+        }
+        else {
+            value = this[property];
         }
 
-        getCacheKey () {
-            return `sb-user-${this.Name}`;
+        if (value?.constructor === Object) {
+            value = JSON.stringify(value, null, 4);
         }
 
-        /** @override */
-        static async initialize () {
-            User.bots = new Map();
-            User.data = new Map();
-            User.pendingNewUsers = new Set();
+        row.values[property] = value;
 
-            User.insertBatch = await sb.Query.getBatch(
-                "chat_data",
-                "User_Alias",
-                ["Name", "Discord_ID", "Mixer_ID", "Twitch_ID"]
+        await Promise.all([
+            row.save(),
+            User.populateCaches(this)
+        ]);
+    }
+
+    async serialize () {
+        throw new sb.Error({
+            message: "Module User cannot be serialized"
+        });
+    }
+
+    /** @override */
+    static async initialize () {
+        User.bots = new Map();
+        User.data = new Map();
+        User.pendingNewUsers = new Set();
+
+        User.insertBatch = await sb.Query.getBatch(
+            "chat_data",
+            "User_Alias",
+            ["Name", "Discord_ID", "Mixer_ID", "Twitch_ID"]
+        );
+
+        User.insertCron = new sb.Cron({
+            Name: "log-user-cron",
+            Expression: sb.Config.get("LOG_USER_CRON"),
+            Code: async () => {
+                await User.insertBatch.insert({ ignore: true });
+                User.pendingNewUsers.clear();
+            }
+        });
+        User.insertCron.start();
+
+        await User.loadData();
+        return User;
+    }
+
+    static async loadData () {
+        /** @type {Map<string, User>} */
+        User.data = User.data || new Map();
+
+        const botDataExist = await sb.Query.isTablePresent("bot_data", "Bot");
+        if (botDataExist) {
+            const botData = await sb.Query.getRecordset(rs => rs
+                .select("Prefix", "Last_Verified", "Author", "Language")
+                .select("User_Alias.ID AS ID", "User_Alias.Name AS Name")
+                .from("bot_data", "Bot")
+                .join({
+                    toDatabase: "chat_data",
+                    toTable: "User_Alias",
+                    on: "Bot.Bot_Alias = User_Alias.ID"
+                })
             );
 
-            User.insertCron = new sb.Cron({
-                Name: "log-user-cron",
-                Expression: sb.Config.get("LOG_USER_CRON"),
-                Code: async () => {
-                    await User.insertBatch.insert({ ignore: true });
-                    User.pendingNewUsers.clear();
-                }
-            });
-            User.insertCron.start();
-
-            await User.loadData();
-            return User;
-        }
-
-        static async loadData () {
-            /** @type {Map<string, User>} */
-            User.data = User.data || new Map();
-
-            const botDataExist = await sb.Query.isTablePresent("bot_data", "Bot");
-            if (botDataExist) {
-                const botData = await sb.Query.getRecordset(rs => rs
-                    .select("Prefix", "Last_Verified", "Author", "Language")
-                    .select("User_Alias.ID AS ID", "User_Alias.Name AS Name")
-                    .from("bot_data", "Bot")
-                    .join({
-                        toDatabase: "chat_data",
-                        toTable: "User_Alias",
-                        on: "Bot.Bot_Alias = User_Alias.ID"
-                    })
-                );
-
-                for (const bot of botData) {
-                    User.bots.set(bot.ID, bot);
-                }
+            for (const bot of botData) {
+                User.bots.set(bot.ID, bot);
             }
         }
+    }
 
-        static async reloadData () {
-            User.bots.clear();
-            User.data.clear();
-            await User.loadData();
+    static async reloadData () {
+        User.bots.clear();
+        User.data.clear();
+        await User.loadData();
+    }
+
+    /**
+     * Searches for a user, based on their ID, or Name.
+     * Returns immediately if identifier is already a User.
+     * @param {User|number|string} identifier
+     * @param {boolean} strict If false and searching for user via string, and it is not found, creates a new User.
+     * @param {Object} [options]
+     * @returns {User|void}
+     * @throws {sb.Error} If the type of identifier is unrecognized
+     */
+    static async get (identifier, strict = true, options = {}) {
+        if (identifier instanceof User) {
+            return identifier;
         }
-
-        /**
-         * Searches for a user, based on their ID, or Name.
-         * Returns immediately if identifier is already a User.
-         * @param {User|number|string} identifier
-         * @param {boolean} strict If false and searching for user via string, and it is not found, creates a new User.
-         * @param {Object} [options]
-         * @returns {User|void}
-         * @throws {sb.Error} If the type of identifier is unrecognized
-         */
-        static async get (identifier, strict = true, options = {}) {
-            if (identifier instanceof User) {
-                return identifier;
+        else if (typeof identifier === "number") {
+            const mapCacheUser = User.getByProperty("ID", identifier);
+            if (mapCacheUser) {
+                return mapCacheUser;
             }
-            else if (typeof identifier === "number") {
-                const mapCacheUser = User.getByProperty("ID", identifier);
-                if (mapCacheUser) {
-                    return mapCacheUser;
-                }
 
-                const name = await sb.Query.getRecordset(rs => rs
-                    .select("Name")
-                    .from("chat_data", "User_Alias")
-                    .where("ID = %n", identifier)
-                    .single()
-                    .flat("Name")
-                );
-                if (!name) {
+            const name = await sb.Query.getRecordset(rs => rs
+                .select("Name")
+                .from("chat_data", "User_Alias")
+                .where("ID = %n", identifier)
+                .single()
+                .flat("Name")
+            );
+            if (!name) {
+                return null;
+            }
+
+            return User.get(name, strict, options);
+        }
+        else if (typeof identifier === "string") {
+            identifier = identifier.replace(/^@/, "").toLowerCase();
+
+            // 1. attempt to fetch the user from low-cache (sb.User.data)
+            const mapCacheUser = User.data.get(identifier);
+            if (mapCacheUser) {
+                return mapCacheUser;
+            }
+
+            // 2. attempt to fetch the user from medium-cache (sb.Cache)
+            if (sb.Cache && sb.Cache.active) {
+                const redisCacheUser = await User.createFromCache({ name: identifier });
+                if (redisCacheUser) {
+                    if (!User.data.has(identifier)) {
+                        User.data.set(identifier, redisCacheUser);
+                    }
+
+                    return redisCacheUser;
+                }
+            }
+
+            // 3. attempt to get the user out of the database
+            const dbUserData = await sb.Query.getRecordset(rs => rs
+                .select("*")
+                .from("chat_data", "User_Alias")
+                .where("Name = %s", identifier)
+                .single()
+            );
+
+            if (dbUserData) {
+                const user = new User(dbUserData);
+                await User.populateCaches(user);
+
+                return user;
+            }
+            else {
+                // 4. Create the user, if strict mode is off
+                if (!strict && !User.pendingNewUsers.has(identifier)) {
+                    User.pendingNewUsers.add(identifier);
+                    User.insertBatch.add({
+                        Name: identifier,
+                        Discord_ID: options.Discord_ID ?? null,
+                        Mixer_ID: options.Mixer_ID ?? null,
+                        Twitch_ID: options.Twitch_ID ?? null
+                    });
+
+                    // Returns null, which should usually abort working with user's message.
+                    // We lose a couple of messages from a brand new user, but this is an acceptable measure
+                    // in order to reduce the amount of user-insert db connections.
                     return null;
                 }
 
-                return User.get(name, strict, options);
+                // No cache hits, user does not exist - return null
+                return null;
+            }
+        }
+        else {
+            throw new sb.Error({
+                message: "Invalid user identifier type",
+                args: { id: identifier, type: typeof identifier }
+            });
+        }
+    }
+
+    /**
+     * Fetches a batch of users together.
+     * Takes existing records from cache, the rest is pulled from dataase.
+     * Does not support creating new records like `get()` does.
+     * @param {Array<User|string|number>} identifiers
+     * @returns {Promise<User[]>}
+     */
+    static async getMultiple (identifiers) {
+        const result = [];
+        const toFetch = [];
+        for (const identifier of identifiers) {
+            if (identifier instanceof User) {
+                result.push(identifier);
+            }
+            else if (typeof identifier === "number") {
+                toFetch.push(identifier);
             }
             else if (typeof identifier === "string") {
-                identifier = identifier.replace(/^@/, "").toLowerCase();
-
-                // 1. attempt to fetch the user from low-cache (sb.User.data)
                 const mapCacheUser = User.data.get(identifier);
                 if (mapCacheUser) {
-                    return mapCacheUser;
+                    result.push(mapCacheUser);
+                    continue;
                 }
 
-                // 2. attempt to fetch the user from medium-cache (sb.Cache)
                 if (sb.Cache && sb.Cache.active) {
                     const redisCacheUser = await User.createFromCache({ name: identifier });
                     if (redisCacheUser) {
-                        if (!User.data.has(identifier)) {
-                            User.data.set(identifier, redisCacheUser);
-                        }
-
-                        return redisCacheUser;
+                        User.data.set(identifier, redisCacheUser);
+                        result.push(redisCacheUser);
+                        continue;
                     }
                 }
 
-                // 3. attempt to get the user out of the database
-                const dbUserData = await sb.Query.getRecordset(rs => rs
-                    .select("*")
-                    .from("chat_data", "User_Alias")
-                    .where("Name = %s", identifier)
-                    .single()
-                );
-
-                if (dbUserData) {
-                    const user = new User(dbUserData);
-                    await User.populateCaches(user);
-
-                    return user;
-                }
-                else {
-                    // 4. Create the user, if strict mode is off
-                    if (!strict && !User.pendingNewUsers.has(identifier)) {
-                        User.pendingNewUsers.add(identifier);
-                        User.insertBatch.add({
-                            Name: identifier,
-                            Discord_ID: options.Discord_ID ?? null,
-                            Mixer_ID: options.Mixer_ID ?? null,
-                            Twitch_ID: options.Twitch_ID ?? null
-                        });
-
-                        // Returns null, which should usually abort working with user's message.
-                        // We lose a couple of messages from a brand new user, but this is an acceptable measure
-                        // in order to reduce the amount of user-insert db connections.
-                        return null;
-                    }
-
-                    // No cache hits, user does not exist - return null
-                    return null;
-                }
+                toFetch.push(identifier);
             }
             else {
                 throw new sb.Error({
@@ -262,195 +310,149 @@ module.exports = (function () {
             }
         }
 
-        /**
-         * Fetches a batch of users together.
-         * Takes existing records from cache, the rest is pulled from dataase.
-         * Does not support creating new records like `get()` does.
-         * @param {Array<User|string|number>} identifiers
-         * @returns {Promise<User[]>}
-         */
-        static async getMultiple (identifiers) {
-            const result = [];
-            const toFetch = [];
-            for (const identifier of identifiers) {
-                if (identifier instanceof User) {
-                    result.push(identifier);
+        if (toFetch.length > 0) {
+            const [strings, numbers] = sb.Utils.splitByCondition(toFetch, i => typeof i === "string");
+            const fetched = await sb.Query.getRecordset(rs => {
+                rs.select("*").from("chat_data", "User_Alias");
+                if (strings.length > 0 && numbers.length > 0) {
+                    rs.where("Name IN %s+ OR ID IN %n+", strings, numbers);
                 }
-                else if (typeof identifier === "number") {
-                    toFetch.push(identifier);
+                else if (strings.length > 0) {
+                    rs.where("Name IN %s+", strings);
                 }
-                else if (typeof identifier === "string") {
-                    const mapCacheUser = User.data.get(identifier);
-                    if (mapCacheUser) {
-                        result.push(mapCacheUser);
-                        continue;
-                    }
-
-                    if (sb.Cache && sb.Cache.active) {
-                        const redisCacheUser = await User.createFromCache({ name: identifier });
-                        if (redisCacheUser) {
-                            User.data.set(identifier, redisCacheUser);
-                            result.push(redisCacheUser);
-                            continue;
-                        }
-                    }
-
-                    toFetch.push(identifier);
+                else if (numbers.length > 0) {
+                    rs.where("ID IN %n+", numbers);
                 }
-                else {
-                    throw new sb.Error({
-                        message: "Invalid user identifier type",
-                        args: { id: identifier, type: typeof identifier }
-                    });
-                }
+            });
+
+            const cachePromises = [];
+            for (const rawUserData of fetched) {
+                const userData = new User(rawUserData);
+                result.push(userData);
+                cachePromises.push(User.populateCaches(userData));
             }
 
-            if (toFetch.length > 0) {
-                const [strings, numbers] = sb.Utils.splitByCondition(toFetch, i => typeof i === "string");
-                const fetched = await sb.Query.getRecordset(rs => {
-                    rs.select("*").from("chat_data", "User_Alias");
-                    if (strings.length > 0 && numbers.length > 0) {
-                        rs.where("Name IN %s+ OR ID IN %n+", strings, numbers);
-                    }
-                    else if (strings.length > 0) {
-                        rs.where("Name IN %s+", strings);
-                    }
-                    else if (numbers.length > 0) {
-                        rs.where("ID IN %n+", numbers);
-                    }
-                });
-
-                const cachePromises = [];
-                for (const rawUserData of fetched) {
-                    const userData = new User(rawUserData);
-                    result.push(userData);
-                    cachePromises.push(User.populateCaches(userData));
-                }
-
-                await Promise.all(cachePromises);
-            }
-
-            return result;
+            await Promise.all(cachePromises);
         }
 
-        /**
-         * Synchronously fetches a user based on their numeric ID.
-         * No other types of ID are supported.
-         * @param {string} property
-         * @param {number} identifier
-         * @returns {User|void}
-         */
-        static getByProperty (property, identifier) {
-            const iterator = User.data.values();
-            let user = undefined;
-            let value = iterator.next().value;
+        return result;
+    }
 
-            while (!user && value) {
-                if (value[property] === identifier) {
-                    user = value;
-                }
-                value = iterator.next().value;
+    /**
+     * Synchronously fetches a user based on their numeric ID.
+     * No other types of ID are supported.
+     * @param {string} property
+     * @param {number} identifier
+     * @returns {User|void}
+     */
+    static getByProperty (property, identifier) {
+        const iterator = User.data.values();
+        let user = undefined;
+        let value = iterator.next().value;
+
+        while (!user && value) {
+            if (value[property] === identifier) {
+                user = value;
             }
-
-            return user;
+            value = iterator.next().value;
         }
 
-        /**
-         * Adds a new user to the database.
-         * @param {string} name
-         * @returns {Promise<User>}
-         */
-        static async add (name) {			
-			const preparedName = name.toLowerCase().replace(/\s+/g, "_");
-			const exists = await sb.Query.getRecordset(rs => rs
-                .select("Name")
-                .from("chat_data", "User_Alias")
-                .where("Name = %s", preparedName)
-                .limit(1)
-                .single()
-            );
+        return user;
+    }
 
-			if (exists) {
-                return await User.get(exists.Name);
-            }
+    /**
+     * Adds a new user to the database.
+     * @param {string} name
+     * @returns {Promise<User>}
+     */
+    static async add (name) {
+        const preparedName = name.toLowerCase().replace(/\s+/g, "_");
+        const exists = await sb.Query.getRecordset(rs => rs
+            .select("Name")
+            .from("chat_data", "User_Alias")
+            .where("Name = %s", preparedName)
+            .limit(1)
+            .single()
+        );
 
-            const row = await sb.Query.getRow("chat_data", "User_Alias");
-			row.values.Name = preparedName;
-			await row.save();
-
-            const user = new User(row.valuesObject);
-            await User.populateCaches(user);
-
-            return user;
+        if (exists) {
+            return await User.get(exists.Name);
         }
 
-        static async populateCaches (user) {
-            if (!User.data.has(user.Name)) {
-                User.data.set(user.Name, user);
-            }
+        const row = await sb.Query.getRow("chat_data", "User_Alias");
+        row.values.Name = preparedName;
+        await row.save();
 
-            if (sb.Cache && sb.Cache.active) {
-                await sb.Cache.setByPrefix(user.getCacheKey(), user, {
-                    expiry: User.redisCacheExpiration
-                });
-            }
+        const user = new User(row.valuesObject);
+        await User.populateCaches(user);
+
+        return user;
+    }
+
+    static async populateCaches (user) {
+        if (!User.data.has(user.Name)) {
+            User.data.set(user.Name, user);
         }
 
-        static async createFromCache (options) {
-            if (!sb.Cache) {
-                throw new sb.Error({
-                    message: "Cache module is unavailable"
-                });
-            }
+        if (sb.Cache && sb.Cache.active) {
+            await sb.Cache.setByPrefix(user.getCacheKey(), user, {
+                expiry: User.redisCacheExpiration
+            });
+        }
+    }
 
-            const key = User.createCacheKey(options);
-            const cacheData = await sb.Cache.getByPrefix(key);
-            if (!cacheData) {
-                return null;
-            }
-
-            return new User(cacheData);
+    static async createFromCache (options) {
+        if (!sb.Cache) {
+            throw new sb.Error({
+                message: "Cache module is unavailable"
+            });
         }
 
-        static async invalidateUserCache (identifier) {
-            if (identifier instanceof User) {
-                User.data.delete(identifier.Name);
-                await sb.Cache.delete(identifier);
-            }
-            else if (typeof identifier === "string") {
-                User.data.delete(identifier);
-
-                const cacheKey = User.createCacheKey({ name: identifier });
-                await sb.Cache.delete(cacheKey);
-            }
-            else {
-                throw new sb.Error({
-                    message: "Invalid user identifier provided",
-                    args: { identifier }
-                });
-            }
+        const key = User.createCacheKey(options);
+        const cacheData = await sb.Cache.getByPrefix(key);
+        if (!cacheData) {
+            return null;
         }
 
-        static createCacheKey (options = {}) {
-            const name = options.name ?? options.Name;
-            if (typeof name !== "string") {
-                throw new sb.Error({
-                    message: "User name for Cache must be a string",
-                    args: options
-                });
-            }
+        return new User(cacheData);
+    }
 
-            return `sb-user-${name}`;
+    static async invalidateUserCache (identifier) {
+        if (identifier instanceof User) {
+            User.data.delete(identifier.Name);
+            await sb.Cache.delete(identifier);
+        }
+        else if (typeof identifier === "string") {
+            User.data.delete(identifier);
+
+            const cacheKey = User.createCacheKey({ name: identifier });
+            await sb.Cache.delete(cacheKey);
+        }
+        else {
+            throw new sb.Error({
+                message: "Invalid user identifier provided",
+                args: { identifier }
+            });
+        }
+    }
+
+    static createCacheKey (options = {}) {
+        const name = options.name ?? options.Name;
+        if (typeof name !== "string") {
+            throw new sb.Error({
+                message: "User name for Cache must be a string",
+                args: options
+            });
         }
 
-        /**
-         * Cleans up.
-         */
-        static destroy () {
-            User.insertCron.destroy();
-            User.data.clear();
-        }
-    };
+        return `sb-user-${name}`;
+    }
 
-    return User;
-})();
+    /**
+     * Cleans up.
+     */
+    static destroy () {
+        User.insertCron.destroy();
+        User.data.clear();
+    }
+};

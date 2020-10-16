@@ -1,4 +1,3 @@
-/* global sb */
 module.exports = (function () {
 	"use strict";
 
@@ -30,11 +29,13 @@ module.exports = (function () {
 	}
 
 	/**
-	 * Represents a banphrase, as a mirror of the database table Banphrase.
+	 * Represents a chat banphrase, used to filter the bot's responses when invoking commands
+	 * or otherwise posting messages into a channel.
+	 * Note: this does NOT represent a banphrase that the bot then uses to moderate a channel!
 	 * @memberof sb
 	 * @type Banphrase
 	 */
-	return class Banphrase {
+	return class Banphrase extends require("./template.js") {
 		/**
 		 * Unique numeric ID.
 		 * @type {number|symbol}
@@ -84,6 +85,8 @@ module.exports = (function () {
 		data = {};
 
 		constructor (data) {
+			super();
+
 			this.ID = data.ID ?? Symbol();
 
 			this.Code = eval(data.Code);
@@ -136,25 +139,22 @@ module.exports = (function () {
 				);
 			}
 		}
-
-		/** @override */
-		static async initialize () {
-			await Banphrase.loadData();
-			return Banphrase;
+		
+		async serialize () {
+			throw new sb.Error({
+				message: "Module Banphrase cannot be serialized"
+			});
 		}
 
 		static async loadData () {
-			Banphrase.data = (await sb.Query.getRecordset(rs => rs
+			const data = await sb.Query.getRecordset(rs => rs
 				.select("Banphrase.*")
 				.from("chat_data", "Banphrase")
 				.where("Type <> %s", "Inactive")
 				.orderBy("Priority DESC")
-			)).map(record => new Banphrase(record));
-		}
+			);
 
-		static async reloadData () {
-			Banphrase.data = [];
-			await Banphrase.loadData();
+			Banphrase.data = data.map(record => new Banphrase(record));
 		}
 
 		static get (identifier) {
@@ -331,10 +331,6 @@ module.exports = (function () {
 					? reply.banphrase_data.phrase
 					: false;
 			}
-		}
-
-		static destroy () {
-			Banphrase.data = null;
 		}
 	};
 })();
