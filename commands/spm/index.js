@@ -250,14 +250,14 @@ module.exports = {
 				},
 				load: async (context, fs, shell, ...args) => {
 					const updated = [];
-					const commandDirs = (args.length > 0)
-						? args.map(i => sb.Command.get(i)?.Name ?? i)
+					const moduleDirs = (args.length > 0)
+						? args.map(i => sb.ChatModule.get(i)?.Name ?? i)
 						: await fs.readdir("/code/spm/chat-modules");
 
-					const promises = commandDirs.map(async (command) => {
-						const commandFile = `/code/spm/commands/${command}/index.js`;
-						if (!await this.staticData.exists(commandFile)) {
-							console.warn(`index.js file for command ${command} does not exist!`);
+					const promises = moduleDirs.map(async (chatModule) => {
+						const chatModuleFile = `/code/spm/chat-modules/${chatModule}/index.js`;
+						if (!await this.staticData.exists(chatModuleFile)) {
+							console.warn(`index.js file for chat module ${chatModule} does not exist!`);
 							return;
 						}
 
@@ -267,33 +267,33 @@ module.exports = {
 							-C /code/spm
 							log -n 1
 							--pretty=format:%H
-							-- commands/${command}/index.js
+							-- chat-modules/${chatModule}/index.js
 						`)).stdout;
 
-						// Command file has no git history, skip
-						if (!commitHash)   {
-							console.log(`Command ${command}: no Git history`);
+						// Chat module file has no git history, skip
+						if (!commitHash) {
+							console.log(`Chat module ${chatModule}: no Git history`);
 							return;
 						}
 
-						const currentCommand = sb.Command.get(command);
-						if (!currentCommand) { // New command - save
-							console.warn("New command detected - functionality not yet implemented");
+						const currentModule = sb.ChatModule.get(chatModule);
+						if (!currentModule) { // New chat module - save
+							console.warn("New chat module detected - functionality not yet implemented");
 							return;
 						}
 
-						const row = await sb.Query.getRow("chat_data", "Command");
-						await row.load(currentCommand.ID);
+						const row = await sb.Query.getRow("chat_data", "ChatModule");
+						await row.load(currentModule.ID);
 						if (row.values.Latest_Commit === commitHash) {
-							console.log(`Command ${command}: no change`);
+							console.log(`Chat module ${chatModule}: no change`);
 							return;
 						}
 
-						delete require.cache[require.resolve(commandFile)];
-						const definition = require(commandFile);
+						delete require.cache[require.resolve(chatModuleFile)];
+						const definition = require(chatModuleFile);
 
-						const jsonify = ["Aliases"];
-						const functionStringify = ["Static_Data", "Code", "Dynamic_Description"];
+						const jsonify = ["Events"];
+						const functionStringify = ["Code"];
 						for (const [key, value] of Object.entries(definition)) {
 							if (value === null) {
 								row.values[key] = null;
@@ -318,7 +318,162 @@ module.exports = {
 
 						row.values.Latest_Commit = commitHash;
 						await row.save();
-						updated.push(currentCommand.Name);
+						updated.push(currentModule.Name);
+					});
+
+					await Promise.all(promises);
+
+					if (updated.length > 0) {
+						await sb.ChatModule.reloadData();
+					}
+
+					updated.sort();
+					const suffix = (updated.length === 1) ? "" : "s";
+					return {
+						reply: (updated.length === 0)
+							? `No changes detected, no chat modules were loaded peepoNerdDank 👆`
+							: `Loaded ${updated.length} chat module${suffix} (${updated.join(", ")}) from spm/chat-modules peepoHackies`
+					};
+				}
+			},
+			{
+				name: "cron",
+				aliases: ["crons"],
+				dump: async (context, fs, shell, ...args) => {
+					const now = new sb.Date();
+					const updated = [];
+					const modules = (args.length > 0)
+						? args.map(i => sb.Cron.get(i)).filter(Boolean)
+						: sb.Cron.data;
+
+					if (modules.length === 0) {
+						return {
+							success: false,
+							reply: "No valid crons provided!"
+						};
+					}
+
+					const promises = modules.map(async (module) => {
+						const dir = `/code/spm/crons/${module.Name}`;
+						if (!await this.staticData.exists(dir)) {
+							await fs.mkdir(dir);
+						}
+
+						let row = await sb.Query.getRow("chat_data", "Cron");
+						let save = false;
+
+						try {
+							await row.load(module.ID);
+							const stats = await fs.stat(`${dir}/index.js`);
+
+							if (row.values.Last_Edit > stats.mtime) {
+								save = true;
+							}
+						}
+						catch (e) {
+							if (e.message.includes("ENOENT")) {
+								save = true;
+							}
+							else {
+								throw e;
+							}
+						}
+
+						if (save) {
+							updated.push(module.Name);
+							row.values.Last_Edit = now;
+
+							await Promise.all([
+								row.save(),
+								module.serialize({
+									overwrite: true,
+									filePath: `${dir}/index.js`
+								})
+							]);
+						}
+					});
+
+					await Promise.all(promises);
+
+					updated.sort();
+					const suffix = (updated.length === 0) ? "" : "s";
+					return {
+						reply: (updated.length === 0)
+							? `No changes detected, nothing was saved peepoNerdDank 👆`
+							: `Saved ${updated.length} chat-module${suffix} into spm/chat-modules peepoHackies`
+					};
+				},
+				load: async (context, fs, shell, ...args) => {
+					const updated = [];
+					const cronDirs = (args.length > 0)
+						? args.map(i => sb.Cron.get(i)?.Name ?? i)
+						: await fs.readdir("/code/spm/crons");
+
+					const promises = cronDirs.map(async (cron) => {
+						const cronFile = `/code/spm/crons/${cron}/index.js`;
+						if (!await this.staticData.exists(cronFile)) {
+							console.warn(`index.js file for cron ${cron} does not exist!`);
+							return;
+						}
+
+						// Fetch the latest commit for a given file
+						const commitHash = (await shell(sb.Utils.tag.trim `
+							git
+							-C /code/spm
+							log -n 1
+							--pretty=format:%H
+							-- crons/${cron}/index.js
+						`)).stdout;
+
+						// Cron file has no git history, skip
+						if (!commitHash)   {
+							console.log(`Crons ${cron}: no Git history`);
+							return;
+						}
+
+						const currentCron = sb.Cron.get(cron);
+						if (!currentCron) { // New cron - save
+							console.warn("New cron detected - functionality not yet implemented");
+							return;
+						}
+
+						const row = await sb.Query.getRow("chat_data", "Cron");
+						await row.load(currentCron.ID);
+						if (row.values.Latest_Commit === commitHash) {
+							console.log(`Cron ${cron}: no change`);
+							return;
+						}
+
+						delete require.cache[require.resolve(cronFile)];
+						const definition = require(cronFile);
+
+						const jsonify = ["Defer"];
+						const functionStringify = ["Code"];
+						for (const [key, value] of Object.entries(definition)) {
+							if (value === null) {
+								row.values[key] = null;
+							}
+							else if (jsonify.includes(key)) {
+								row.values[key] = JSON.stringify(value);
+							}
+							else if (functionStringify.includes(key)) {
+								const lines = `(${value})`.split("\n");
+								for (let i = 0; i < lines.length; i++) {
+									if (lines[i].startsWith("\t")) {
+										lines[i] = lines[i].slice(1);
+									}
+								}
+
+								row.values[key] = lines.join("\n");
+							}
+							else {
+								row.values[key] = value;
+							}
+						}
+
+						row.values.Latest_Commit = commitHash;
+						await row.save();
+						updated.push(currentCron.Name);
 					});
 
 					await Promise.all(promises);
