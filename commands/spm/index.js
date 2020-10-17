@@ -38,12 +38,11 @@ module.exports = {
 						let save = false;
 
 						try {
+							await row.load(command.ID);
+
 							// Only allow the overwrite of an existing command when
 							// the database definition changed more recently than the file
-							const [stats] = await Promise.all([
-								fs.stat(`${dir}/index.js`),
-								row.load(command.ID)
-							]);
+							const [stats] = await fs.stat(`${dir}/index.js`);
 
 							if (row.values.Last_Edit > stats.mtime) {
 								save = true;
@@ -195,7 +194,7 @@ module.exports = {
 					if (modules.length === 0) {
 						return {
 							success: false,
-							reply: "No valid commands provided!"
+							reply: "No valid chat modules provided!"
 						};
 					}
 
@@ -209,12 +208,8 @@ module.exports = {
 						let save = false;
 
 						try {
-							// Only allow the overwrite of an existing command when
-							// the database definition changed more recently than the file
-							const [stats] = await Promise.all([
-								fs.stat(`${dir}/index.js`),
-								row.load(module.ID)
-							]);
+							await row.load(module.ID);
+							const [stats] = await fs.stat(`${dir}/index.js`);
 
 							if (row.values.Last_Edit > stats.mtime) {
 								save = true;
