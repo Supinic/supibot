@@ -352,7 +352,7 @@ module.exports = {
 				reply: "No spm operation provided"
 			};
 		}
-		else if (!this.staticData.operations.incudes(operation)) {
+		else if (!this.staticData.operations.includes(operation)) {
 			return {
 				success: false,
 				reply: "Invalid spm operation provided"
