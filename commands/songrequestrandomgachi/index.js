@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 60000,
 	Description: "Posts a random gachi in the format \"!sr <link>\" to use on other bots' song request systems (such as StreamElements).",
-	Flags: ["skip-banphrase","whitelist"],
+	Flags: ["skip-banphrase","use-params","whitelist"],
 	Whitelist_Response: "Only available in specific whitelisted channels (for instance, those that have a song request bot that replies to \"!sr\").",
 	Static_Data: (() => ({
 		repeatLimit: 5
@@ -13,9 +13,16 @@ module.exports = {
 		let link = null;
 		let counter = 0;
 		const rg = sb.Command.get("rg");
-	
+		const passedContext = {
+			params: {
+				linkOnly: true,
+				...context.params
+			},
+			...context
+		}
+
 		while (!link && counter < this.staticData.repeatLimit) {
-			const execution = await rg.execute({}, "linkOnly:true", ...args);
+			const execution = await rg.execute(passedContext, "linkOnly:true", ...args);
 			const data = await sb.Utils.linkParser.fetchData(execution.link);
 	
 			if (data === null) {
