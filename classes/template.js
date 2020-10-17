@@ -1,23 +1,4 @@
 module.exports = class ClassTemplate {
-	static async initialize () {
-		await this.loadData();
-		return this;
-	}
-
-	static async loadData () {
-		throw new sb.Error({
-			message: "loadData method must be implemented in module",
-			args: {
-				name: this.name
-			}
-		});
-	}
-
-	static async reloadData () {
-		this.data = [];
-		await this.loadData();
-	}
-
 	async serialize (row, properties, options) {
 		const result = Object.entries(properties).map(([key, params]) => {
 			const prop = row.values[key];
@@ -71,6 +52,31 @@ module.exports = class ClassTemplate {
 		}
 
 		return { string };
+	}
+
+	static async initialize () {
+		await this.loadData();
+		return this;
+	}
+
+	static async loadData () {
+		throw new sb.Error({
+			message: "loadData method must be implemented in module",
+			args: {
+				name: this.name
+			}
+		});
+	}
+
+	static async reloadData () {
+		this.data = [];
+		await this.loadData();
+	}
+
+	static async get () {
+		throw new sb.Error({
+			message: "get method must be implemented in module"
+		});
 	}
 
 	/**
