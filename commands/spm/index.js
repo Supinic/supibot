@@ -14,8 +14,7 @@ module.exports = {
 			{
 				name: "command",
 				aliases: ["commands"],
-				description: "",
-				dump: async function (fs, shell, ...args) {
+				dump: async (fs, shell, ...args) => {
 					const now = new sb.Date();
 					const updated = [];
 					const commands = (args.length > 0)
@@ -83,7 +82,7 @@ module.exports = {
 							: `Saved ${updated.length} command${suffix} into spm/commands peepoHackies`
 					};
 				},
-				load: async function (fs, shell, ...args) {
+				load: async (fs, shell, ...args) => {
 					const updated = [];
 					const commandDirs = (args.length > 0)
 						? args.map(i => sb.Command.get(i)?.Name ?? i)
@@ -186,7 +185,7 @@ module.exports = {
 			{
 				name: "chat-module",
 				aliases: ["chatmodule", "chatmodules", "chat-modules"],
-				dump: async function (fs, shell, ...args) {
+				dump: async (fs, shell, ...args) => {
 					const now = new sb.Date();
 					const updated = [];
 					const modules = (args.length > 0)
@@ -254,7 +253,7 @@ module.exports = {
 							: `Saved ${updated.length} chat-module${suffix} into spm/chat-modules peepoHackies`
 					};
 				},
-				load: async function (fs, shell, ...args) {
+				load: async (fs, shell, ...args) => {
 					const updated = [];
 					const commandDirs = (args.length > 0)
 						? args.map(i => sb.Command.get(i)?.Name ?? i)
