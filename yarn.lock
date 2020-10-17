@@ -184,15 +184,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/node@*":
-  version "14.11.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.11.2.tgz#2de1ed6670439387da1c9f549a2ade2b0a799256"
-  integrity sha512-jiE3QIxJ8JLNcb1Ps6rDbysDhN4xa8DJJvuC9prr6w+1tIh+QAbYyNF3tyiZNLDBIuBCf4KEcV2UvQm/V60xfA==
-
-"@types/node@^13.9.8":
-  version "13.13.21"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.21.tgz#e48d3c2e266253405cf404c8654d1bcf0d333e5c"
-  integrity sha512-tlFWakSzBITITJSxHV4hg4KvrhR/7h3xbJdSFbYJBVzKubrASbnnIFuSgolUh7qKGo/ZeJPKUfbZ0WS6Jp14DQ==
+"@types/node@*", "@types/node@^14.11.2":
+  version "14.11.8"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.11.8.tgz#fe2012f2355e4ce08bca44aeb3abbb21cf88d33f"
+  integrity sha512-KPcKqKm5UKDkaYPTuXSx8wEP7vE9GnuaXIZKijwRYcePpZFDVuy2a57LarFKiORbHOuTOOwYzxVxcUzsh2P2Pw==
 
 "@types/responselike@*", "@types/responselike@^1.0.0":
   version "1.0.0"
@@ -273,7 +268,14 @@ ansi-styles@^3.2.0, ansi-styles@^3.2.1:
   dependencies:
     color-convert "^1.9.0"
 
-ansi-styles@^4.0.0, ansi-styles@^4.1.0:
+ansi-styles@^4.0.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-4.3.0.tgz#edd803628ae71c04c85ae7a0906edad34b648937"
+  integrity sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==
+  dependencies:
+    color-convert "^2.0.1"
+
+ansi-styles@^4.1.0:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-4.2.1.tgz#90ae75c424d008d2624c5bf29ead3177ebfcf359"
   integrity sha512-9VGjrMsG1vePxcSweQsN20KY/c4zN0h9fLjqAbwbPfahM3t+NL+M9HC8xeXG2I8pX5NoamTGNuomEUFI7fcUjA==
@@ -678,7 +680,7 @@ css-what@2.1:
   version "2.0.0"
   resolved "https://codeload.github.com/Supinic/cytube-connector/tar.gz/324456a8510cdf79634df703493104e574b880eb"
   dependencies:
-    got "^11.3.0"
+    got "^10.6.0"
     socket.io-client "^2.2.0"
 
 dank-twitch-irc@3.2.6:
@@ -702,9 +704,9 @@ dank-twitch-irc@3.2.6:
     ts-toolbelt "^6.9.0"
 
 dayjs@^1.8.19:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.9.0.tgz#ec6197d974143f5563913d08af71b3f21e008d5d"
-  integrity sha512-Ym40L4ZN+LUMCbsYXWDh/RxEntfaWChc/M+iD5/tat8jylbwE1sa+7eoHxsZ+NB8al6D8VYBmP6eV6GsZ8i01A==
+  version "1.9.3"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.9.3.tgz#b7f94b22ad2a136a4ca02a01ab68ae893fe1a268"
+  integrity sha512-V+1SyIvkS+HmNbN1G7A9+ERbFTV9KTXu6Oor98v2xHmzzpp52OIJhQuJSTywWuBY5pyAEmlwbCi1Me87n/SLOw==
 
 debug-logger@^0.4.1:
   version "0.4.1"
@@ -793,6 +795,10 @@ denque@^1.1.0, denque@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/denque/-/denque-1.4.1.tgz#6744ff7641c148c3f8a69c307e51235c1f4a37cf"
   integrity sha512-OfzPuSZKGcgr96rf1oODnfjqBFmr1DVoc/TrItj3Ohe0Ah1C5WX5Baquw/9U9KovnQ88EqmJbD66rKYUQYN1tQ==
+
+"dice-roll-eval@github:jprochazk/dice-roll-eval":
+  version "1.1.0"
+  resolved "https://codeload.github.com/jprochazk/dice-roll-eval/tar.gz/c990e80c5db79cc23e36b4ee837c138114a1bdb4"
 
 diff@4.0.2:
   version "4.0.2"
@@ -1302,7 +1308,7 @@ globals@^12.1.0:
   dependencies:
     type-fest "^0.8.1"
 
-got@^10.7.0:
+got@^10.6.0, got@^10.7.0:
   version "10.7.0"
   resolved "https://registry.yarnpkg.com/got/-/got-10.7.0.tgz#62889dbcd6cca32cd6a154cc2d0c6895121d091f"
   integrity sha512-aWTDeNw9g+XqEZNcTjMMZSy7B7yE9toWOFYip7ofFTLleJhvZwUxxTxkTpKvF+p1SAA4VHmuEy7PiHTHyq8tJg==
@@ -1323,7 +1329,7 @@ got@^10.7.0:
     to-readable-stream "^2.0.0"
     type-fest "^0.10.0"
 
-got@^11.3.0, got@latest:
+got@latest:
   version "11.7.0"
   resolved "https://registry.yarnpkg.com/got/-/got-11.7.0.tgz#a386360305571a74548872e674932b4ef70d3b24"
   integrity sha512-7en2XwH2MEqOsrK0xaKhbWibBoZqy+f1RSUoIeF1BLcnf+pyQdDsljWMfmOh+QKJwuvDIiKx38GtPh5wFdGGjg==
@@ -1409,12 +1415,12 @@ http2-wrapper@^1.0.0-beta.5.2:
     quick-lru "^5.1.1"
     resolve-alpn "^1.0.0"
 
-iconv-lite@^0.5.1:
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.5.2.tgz#af6d628dccfb463b7364d97f715e4b74b8c8c2b8"
-  integrity sha512-kERHXvpSaB4aU3eANwidg79K8FlrN77m8G9V+0vOR3HYaRifrlwMEpT7ZBJqLSEIHnEgJTHcWK82wwLwwKwtag==
+iconv-lite@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.6.2.tgz#ce13d1875b0c3a674bd6a04b7f76b01b1b6ded01"
+  integrity sha512-2y91h5OpQlolefMPmUlivelittSWy0rP+oYVpn6A7GwVHNE8AWzoYOBNmlwks3LobaJxgHCYZAnyNo2GgpNRNQ==
   dependencies:
-    safer-buffer ">= 2.1.2 < 3"
+    safer-buffer ">= 2.1.2 < 3.0.0"
 
 ieee754@^1.1.4:
   version "1.1.13"
@@ -1839,14 +1845,14 @@ make-error@^1.3.5:
   integrity sha512-s8UhlNe7vPKomQhC1qFelMokr/Sc3AgNbso3n74mVPA5LTZwkB9NlXf4XPamLxJE8h0gh73rM94xvwRT2CVInw==
 
 mariadb@latest:
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/mariadb/-/mariadb-2.4.2.tgz#8d1d5e3211515ff44becad52a975888880df5bdd"
-  integrity sha512-ybK520CO/8Z74MNJ77dEwXjRMhxMbQdpPia+/uJakJWiZoLEmuwSHqs51qWr4FE5WcgHQfL5KCmOiHErR/LpTg==
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/mariadb/-/mariadb-2.5.0.tgz#b9473e91ca07907cd4d3106a975240a82a5b0a4c"
+  integrity sha512-hrCv/xy12LYzGe6BzcK7awP1SN1bdMf7IBCHwmcMhpY7f6yyv/578sE7+fHbV7YiTxDcNGkgtXNI8tGuM9HCIQ==
   dependencies:
     "@types/geojson" "^7946.0.7"
-    "@types/node" "^13.9.8"
+    "@types/node" "^14.11.2"
     denque "^1.4.1"
-    iconv-lite "^0.5.1"
+    iconv-lite "^0.6.2"
     long "^4.0.0"
     moment-timezone "^0.5.31"
     please-upgrade-node "^3.2.0"
@@ -1973,9 +1979,9 @@ moment-timezone@^0.5.31, moment-timezone@^0.5.x:
     moment ">= 2.9.0"
 
 "moment@>= 2.9.0":
-  version "2.29.0"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.0.tgz#fcbef955844d91deb55438613ddcec56e86a3425"
-  integrity sha512-z6IJ5HXYiuxvFTI6eiQ9dm77uE0gyy1yXNApVHqTcnIKfY9tIwEjlzsZ6u1LQXvVgKeTnv9Xm7NDvJ7lso3MtA==
+  version "2.29.1"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
+  integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
 
 ms@2.0.0:
   version "2.0.0"
@@ -2431,7 +2437,7 @@ safe-buffer@^5.1.0, safe-buffer@~5.2.0:
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.2.1.tgz#1eaf9fa9bdb1fdd4ec75f58f9cdb4e6b7827eec6"
   integrity sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==
 
-"safer-buffer@>= 2.1.2 < 3":
+"safer-buffer@>= 2.1.2 < 3.0.0":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
@@ -2652,12 +2658,13 @@ strip-json-comments@^3.1.0, strip-json-comments@^3.1.1:
 
 "supi-core@github:Supinic/supi-core":
   version "2.1.0"
-  resolved "https://codeload.github.com/Supinic/supi-core/tar.gz/f0a3bcca67d2e346f88a1e8dd5ab06bc76b4cf19"
+  resolved "https://codeload.github.com/Supinic/supi-core/tar.gz/3799393703fc05a6f7793ea0be32d3e6d92303f4"
   dependencies:
     async-markov "github:supinic/async-markov"
     cheerio latest
     chrono-node "^1.4.6"
     cron latest
+    dice-roll-eval "github:jprochazk/dice-roll-eval"
     duration-parser "github:supinic/duration-parser"
     ffprobe "^1.1.0"
     form-data "^3.0.0"
