@@ -29,7 +29,7 @@ module.exports = {
 		const data = body.users[0];
 		const now = new sb.Date();
 		const created = new sb.Date(data.created_at);
-		const delta = sb.Utils.timeDelta(created);
+		const delta = sb.Utils.timeDelta(created, false, true);
 		const pronoun = (user.toLowerCase() === context.user.Name)
 			? "Your"
 			: "That";
