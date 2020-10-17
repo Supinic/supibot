@@ -209,7 +209,7 @@ module.exports = {
 
 						try {
 							await row.load(module.ID);
-							const [stats] = await fs.stat(`${dir}/index.js`);
+							const stats = await fs.stat(`${dir}/index.js`);
 
 							if (row.values.Last_Edit > stats.mtime) {
 								save = true;
