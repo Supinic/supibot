@@ -14,9 +14,9 @@ module.exports = {
 		const targetUserFavourite = context.params.favourite ?? context.params.favorite ?? context.params.fav ?? null;
 		const userFavourites = (targetUserFavourite)
 			? await sb.User.get(targetUserFavourite)
-			: context.user;
+			: null;
 
-		if (!userFavourites) {
+		if (targetUserFavourite && !userFavourites) {
 			return {
 				success: false,
 				reply: "No such user exists!"
