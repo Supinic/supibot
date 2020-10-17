@@ -14,7 +14,7 @@ module.exports = {
 			{
 				name: "command",
 				aliases: ["commands"],
-				dump: async (fs, shell, ...args) => {
+				dump: async (context, fs, shell, ...args) => {
 					const now = new sb.Date();
 					const updated = [];
 					const commands = (args.length > 0)
@@ -81,7 +81,7 @@ module.exports = {
 							: `Saved ${updated.length} command${suffix} into spm/commands peepoHackies`
 					};
 				},
-				load: async (fs, shell, ...args) => {
+				load: async (context, fs, shell, ...args) => {
 					const updated = [];
 					const commandDirs = (args.length > 0)
 						? args.map(i => sb.Command.get(i)?.Name ?? i)
@@ -184,7 +184,7 @@ module.exports = {
 			{
 				name: "chat-module",
 				aliases: ["chatmodule", "chatmodules", "chat-modules"],
-				dump: async (fs, shell, ...args) => {
+				dump: async (context, fs, shell, ...args) => {
 					const now = new sb.Date();
 					const updated = [];
 					const modules = (args.length > 0)
@@ -248,7 +248,7 @@ module.exports = {
 							: `Saved ${updated.length} chat-module${suffix} into spm/chat-modules peepoHackies`
 					};
 				},
-				load: async (fs, shell, ...args) => {
+				load: async (context, fs, shell, ...args) => {
 					const updated = [];
 					const commandDirs = (args.length > 0)
 						? args.map(i => sb.Command.get(i)?.Name ?? i)
@@ -384,7 +384,7 @@ module.exports = {
 			}
 		}
 
-		return await definition[operation](fs, shell, ...args);
+		return await definition[operation](context, fs, shell, ...args);
 	}),
 	Dynamic_Description: null
 };
