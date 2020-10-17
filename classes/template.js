@@ -18,7 +18,7 @@ module.exports = class ClassTemplate {
 		await this.loadData();
 	}
 
-	async serialize (row, properties) {
+	async serialize (row, properties, options) {
 		const result = Object.entries(properties).map(([key, params]) => {
 			const prop = row.values[key];
 			if (typeof prop === "undefined") {

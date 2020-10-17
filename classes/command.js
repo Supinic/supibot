@@ -216,7 +216,7 @@ module.exports = class Command extends require("./template.js") {
 		const row = await sb.Query.getRow("chat_data", "Command");
 		await row.load(this.ID);
 
-		return await super.serialize(row, Command.#serializableProperties);
+		return await super.serialize(row, Command.#serializableProperties, options);
 	}
 
 	get Author () { return this.#Author; }
@@ -433,7 +433,8 @@ module.exports = class Command extends require("./template.js") {
 					continue;
 				}
 
-				const [total, param, value] = args[i].split(paramRegex);
+				/* eslint-disable */
+				const [param, value] = args[i].split(paramRegex).slice(1);
 				if (param === "linkOnly" && value === "true") {
 					context.params.linkOnly = true;
 					args.splice(i, 1);
