@@ -14,6 +14,13 @@ module.exports = class ChatModule extends require("./template.js") {
 	data = {};
 
 	static data = [];
+	static #serializableProperties = {
+		Name: { type: "string" },
+		Events: { type: "descriptor" },
+		Description: { type: "string" },
+		Code: { type: "descriptor" },
+		Author: { type: "string" }
+	};
 
 	constructor (data) {
 		super();
@@ -91,10 +98,21 @@ module.exports = class ChatModule extends require("./template.js") {
 		}
 	}
 	
-	async serialize () {
-		throw new sb.Error({
-			message: "Not yet implemented"
-		});
+	async serialize (options = {}) {
+		if (typeof this.ID !== "number") {
+			throw new sb.Error({
+				message: "Cannot serialize an anonymous ChatModule",
+				args: {
+					ID: this.ID,
+					Name: this.Name
+				}
+			});
+		}
+
+		const row = await sb.Query.getRow("chat_data", "Chat_Module");
+		await row.load(this.ID);
+
+		return await super.serialize(row, ChatModule.#serializableProperties, options);
 	}
 
 	static getTargets (options) {
