@@ -5,6 +5,8 @@
  * @type {ChatModule}
  */
 module.exports = class ChatModule extends require("./template.js") {
+	//<editor-fold defaultstate="collapsed" desc="=== INSTANCE PROPERTIES ===">
+
 	ID;
 	Name;
 	Events;
@@ -12,6 +14,8 @@ module.exports = class ChatModule extends require("./template.js") {
 	Code;
 	attachmentReferences = [];
 	data = {};
+
+	//</editor-fold>
 
 	static data = [];
 	static #serializableProperties = {

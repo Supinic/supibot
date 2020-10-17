@@ -4,19 +4,7 @@
  * @type Command
  */
 module.exports = class Command extends require("./template.js") {
-	static #privateMessageChannelID = Symbol("private-message-channel");
-	static #serializableProperties = {
-		Name: { type: "string" },
-		Aliases: { type: "descriptor" },
-		Author: { type: "string" },
-		Cooldown: { type: "descriptor" },
-		Description: { type: "string" },
-		Flags: { type: "json" },
-		Whitelist_Response: { type: "string" },
-		Static_Data: { type: "descriptor" },
-		Code: { type: "descriptor" },
-		Dynamic_Description: { type: "descriptor" }
-	};
+	//<editor-fold defaultstate="collapsed" desc="=== INSTANCE PROPERTIES ===">
 
 	/**
 	 * Unique numeric ID.
@@ -81,6 +69,22 @@ module.exports = class Command extends require("./template.js") {
 	 * @type {Object}
 	 */
 	staticData = {};
+
+	// </editor-fold>
+
+	static #privateMessageChannelID = Symbol("private-message-channel");
+	static #serializableProperties = {
+		Name: { type: "string" },
+		Aliases: { type: "descriptor" },
+		Author: { type: "string" },
+		Cooldown: { type: "descriptor" },
+		Description: { type: "string" },
+		Flags: { type: "json" },
+		Whitelist_Response: { type: "string" },
+		Static_Data: { type: "descriptor" },
+		Code: { type: "descriptor" },
+		Dynamic_Description: { type: "descriptor" }
+	};
 
 	constructor (data) {
 		super();
@@ -206,10 +210,13 @@ module.exports = class Command extends require("./template.js") {
 	}
 
 	async serialize (options = {}) {
-		if (!this.ID) {
+		if (typeof this.ID !== "number") {
 			throw new sb.Error({
-				message: "Command without a proper numeric ID cannot be serialized",
-				args: { name: this.Name }
+				message: "Cannot serialize an anonymous Command",
+				args: {
+					ID: this.ID,
+					Name: this.Name
+				}
 			});
 		}
 
