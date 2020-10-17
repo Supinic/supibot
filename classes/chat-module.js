@@ -138,6 +138,26 @@ module.exports = class ChatModule extends require("./template.js") {
 		return result;
 	}
 
+	static get (identifier) {
+		if (identifier instanceof ChatModule) {
+			return identifier;
+		}
+		else if (typeof identifier === "number" || typeof identifier === "symbol") {
+			const target = ChatModule.data.find(i => i.ID === identifier);
+			return target ?? null;
+		}
+		else if (typeof identifier === "string") {
+			const target = ChatModule.data.find(i => i.Name === identifier);
+			return target ?? null;
+		}
+		else {
+			throw new sb.Error({
+				message: "Invalid chat module identifier type",
+				args: { id: identifier, type: typeof identifier }
+			});
+		}
+	}
+
 	static async loadData () {
 		const presentTables = await Promise.all([
 			sb.Query.isTablePresent("chat_data", "Chat_Module"),
