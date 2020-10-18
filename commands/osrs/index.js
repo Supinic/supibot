@@ -245,7 +245,25 @@ module.exports = {
 						: `${name}: ${value} - rank #${rank}.`
 				};
 			}
-	
+
+			case "itemid": {
+				const data = await sb.Query.getRecordset(rs => {
+					rs.select("Game_ID", "Name")
+						.from("osrs", "Item")
+						.limit(5);
+
+					for (const word of args) {
+						rs.where("Name %*like*", word);
+					}
+
+					return rs;
+				});
+
+				return {
+					reply: data.map(i => `${i.Name}: ${i.Game_ID}`).join("; ")
+				};
+			}
+
 			default:
 				return {
 					success: false,
