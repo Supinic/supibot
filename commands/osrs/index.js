@@ -88,13 +88,17 @@ module.exports = {
 					.limit(1)
 					.flat("Name")
 				);
-							
-				const query = (alias ?? args.join(" ")).toLowerCase();			
-				const data = await sb.Query.getRecordset(rs => rs
-					.select("Game_ID", "Name")
-					.from("osrs", "Item")
-					.where("Name %*like*", query)
-				);
+
+				const query = (alias ?? args.join(" ")).toLowerCase();
+				const data = await sb.Query.getRecordset(rs => {
+					rs.select("Game_ID", "Name").from("osrs", "Item");
+
+					for (const word of query.split(" ")) {
+						rs.where("Name %*like*", word);
+					}
+
+					return rs;
+				});
 	
 				if (data.length === 0) {
 					return {
@@ -104,7 +108,16 @@ module.exports = {
 				}
 	
 				const bestMatch = sb.Utils.selectClosestString(query, data.map(i => i.Name), { ignoreCase: true });
-				const item = data.find(i => i.Name.toLowerCase() === bestMatch.toLowerCase());
+				const item = (bestMatch !== null)
+					? data.find(i => i.Name.toLowerCase() === bestMatch.toLowerCase())
+					: data[0];
+
+				if (!item) {
+					return {
+						success: false,
+						reply: "Could not match item!"
+					};
+				}
 
 				const { statusCode, body: detail } = await sb.Got({
 					url: "https://secure.runescape.com/m=itemdb_oldschool/api/catalogue/detail.json",
