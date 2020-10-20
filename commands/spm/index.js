@@ -58,7 +58,7 @@ module.exports = {
 			}),
 			load: (async (item, options) => {
 				const itemFile = `/code/spm/${options.dir}/${item}/index.js`;
-				if (!await this.staticData.exists(dir)) {
+				if (!await this.staticData.exists(itemFile)) {
 					console.warn(`index.js file for ${options.name} ${item} does not exist`);
 					return;
 				}
