@@ -290,21 +290,19 @@ module.exports = {
 			reply: sb.Utils.removeHTML(`${title} ${description ?? ""} ${delta}`)
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async (prefix, values) => {
 		const { sources } = await sb.Got({
 			url: "https://newsapi.org/v2/sources",
 			headers: {
 				Authorization: "Bearer " + sb.Config.get("API_NEWSAPI_ORG")
 			}
 		}).json();
-	
-		const extraNews = (await sb.Query.getRecordset(rs => rs
-			.select(code, "Language", "URL", "Helpers")
-			.from("data", "Extra_News")
-			.orderBy("Code ASC")
-		)).map(i => {
-			const helpers = i.Helpers ? JSON.parse(i.Helpers).join(", ") : "N/A";
-			return `<tr><td>${i.Code.toUpperCase()}</td><td>${sb.Utils.capitalize(i.Language)}</td><td>${helpers}</td></tr>`;
+
+		const { definitions } = values.getStaticData();
+
+		const extraNews = definitions.map(i => {
+			const helpers = (i.helpers.length > 0) ? i.helpers.join(", ") : "N/A";
+			return `<tr><td>${i.code.toUpperCase()}</td><td>${sb.Utils.capitalize(i.language)}</td><td>${helpers}</td></tr>`;
 		}).join("");
 		
 		return [
