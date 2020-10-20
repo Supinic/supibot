@@ -7,14 +7,129 @@ module.exports = {
 	Flags: ["developer","mention","whitelist"],
 	Whitelist_Response: "Only Supi can use this command, but you can check the repository here: https://github.com/supinic/supibot-package-manager peepoHackies",
 	Static_Data: (() => ({
-		exists: require("util").promisify(require("fs").exists),
 		operations: ["dump", "load"],
-		helpers: {},
+		helpers: {
+			fs: require("fs").promises,
+			exists: require("util").promisify(require("fs").exists),
+			shell: require("util").promisify(require("child_process").exec),
+			save: (async (item, options) => {
+				const fs = require("fs").promises;
+				const dir = `/code/spm/${options.dir}/${item.Name}`;
+				if (!await this.staticData.exists(dir)) {
+					await fs.mkdir(dir);
+				}
+
+				let row = await sb.Query.getRow("chat_data", options.table);
+				let save = false;
+				try {
+					await row.load(item.ID);
+
+					// Only allow the overwriting of an existing item when
+					// the database definition changed more recently than the file
+					const [stats] = await fs.stat(`${dir}/index.js`);
+					if (row.values.Last_Edit > stats.mtime) {
+						save = true;
+					}
+				}
+				catch (e) {
+					if (e.message.includes("ENOENT")) {
+						save = true;
+					}
+					else {
+						throw e;
+					}
+				}
+
+				let updated = false;
+				if (save) {
+					updated = true;
+					row.values.Last_Edit = options.now ?? new sb.Date();
+
+					await Promise.all([
+						row.save(),
+						item.serialize({
+							overwrite: true,
+							filePath: `${dir}/index.js`
+						})
+					]);
+				}
+
+				return { updated };
+			}),
+			load: (async (item, options) => {
+				const itemFile = `/code/spm/${options.dir}/${item}/index.js`;
+				if (!await this.staticData.exists(dir)) {
+					console.warn(`index.js file for ${options.name} ${item} does not exist`);
+					return;
+				}
+
+				// Fetch the latest commit for a given file
+				const shellResult = await this.staticData.helpers.shell(sb.Utils.tag.trim `
+					git
+					-C /code/spm
+					log -n 1
+					--pretty=format:%H
+					-- ${options.dir}/${item}/index.js
+				`);
+
+				// Command file has no git history, skip
+				const commitHash = shellResult.stdout;
+				if (!commitHash) {
+					console.log(`No Git history for ${options.name} ${item}`);
+					return { updated: false };
+				}
+
+				const liveItem = options.module.get(item);
+				const row = await sb.Query.getRow("chat_data", options.table);
+				if (liveItem) {
+					await row.load(liveItem.ID);
+				}
+
+				if (row.values.Latest_Commit === commitHash) {
+					console.log(`No change for ${options.name} ${item}`);
+					return { updated: false };
+				}
+
+				delete require.cache[require.resolve(itemFile)];
+
+				const definition = require(itemFile);
+				for (const [key, value] of Object.entries(definition)) {
+					if (value === null) {
+						row.values[key] = null;
+					}
+					else if (options.jsonify.includes(key)) {
+						row.values[key] = JSON.stringify(value);
+					}
+					else if (options.functionify.includes(key)) {
+						const lines = `(${value})`.split("\n");
+						for (let i = 0; i < lines.length; i++) {
+							if (lines[i].startsWith("\t")) {
+								lines[i] = lines[i].slice(1);
+							}
+						}
+
+						row.values[key] = lines.join("\n");
+					}
+					else {
+						row.values[key] = value;
+					}
+				}
+
+				row.values.Latest_Commit = commitHash;
+				await row.save();
+
+				return {
+					name: liveItem.Name,
+					updated: Boolean(liveItem),
+					added: !Boolean(liveItem)
+				};
+			})
+		},
 		commands: [
 			{
 				name: "command",
 				aliases: ["commands"],
-				dump: async (context, fs, shell, ...args) => {
+				dump: async (context, helpers, ...args) => {
 					const now = new sb.Date();
 					const updated = [];
 					const commands = (args.length > 0)
@@ -29,45 +144,14 @@ module.exports = {
 					}
 
 					const promises = commands.map(async (command) => {
-						const dir = `/code/spm/commands/${command.Name}`;
-						if (!await this.staticData.exists(dir)) {
-							await fs.mkdir(dir);
-						}
+						const result = await helpers.save(command, {
+							dir: "commands",
+							table: "Command",
+							now
+						});
 
-						let row = await sb.Query.getRow("chat_data", "Command");
-						let save = false;
-
-						try {
-							await row.load(command.ID);
-
-							// Only allow the overwrite of an existing command when
-							// the database definition changed more recently than the file
-							const [stats] = await fs.stat(`${dir}/index.js`);
-
-							if (row.values.Last_Edit > stats.mtime) {
-								save = true;
-							}
-						}
-						catch (e) {
-							if (e.message.includes("ENOENT")) {
-								save = true;
-							}
-							else {
-								throw e;
-							}
-						}
-
-						if (save) {
+						if (result.updated) {
 							updated.push(command.Name);
-							row.values.Last_Edit = now;
-
-							await Promise.all([
-								row.save(),
-								command.serialize({
-									overwrite: true,
-									filePath: `${dir}/index.js`
-								})
-							]);
 						}
 					});
 
@@ -81,77 +165,29 @@ module.exports = {
 							: `Saved ${updated.length} command${suffix} into spm/commands peepoHackies`
 					};
 				},
-				load: async (context, fs, shell, ...args) => {
+				load: async (context, helpers, ...args) => {
 					const updated = [];
+					const added = [];
 					const commandDirs = (args.length > 0)
 						? args.map(i => sb.Command.get(i)?.Name ?? i)
-						: await fs.readdir("/code/spm/commands");
+						: await helpers.fs.readdir("/code/spm/commands");
 
 					const promises = commandDirs.map(async (command) => {
-						const commandFile = `/code/spm/commands/${command}/index.js`;
-						if (!await this.staticData.exists(commandFile)) {
-							console.warn(`index.js file for command ${command} does not exist!`);
-							return;
+						const result = await helpers.load(command, {
+							dir: "commands",
+							table: "Command",
+							name: "command",
+							module: sb.Command,
+							jsonify: ["Aliases"],
+							functionify: ["Static_Data", "Code", "Dynamic_Description"]
+						});
+
+						if (result.updated) {
+							updated.push(result.name);
 						}
-
-						// Fetch the latest commit for a given file
-						const commitHash = (await shell(sb.Utils.tag.trim `
-							git
-							-C /code/spm
-							log -n 1
-							--pretty=format:%H
-							-- commands/${command}/index.js
-						`)).stdout;
-
-						// Command file has no git history, skip
-						if (!commitHash)   {
-							console.log(`Command ${command}: no Git history`);
-							return;
+						else if (result.added) {
+							added.push(result.name);
 						}
-
-						const currentCommand = sb.Command.get(command);
-						if (!currentCommand) { // New command - save
-							console.warn("New command detected - functionality not yet implemented");
-							return;
-						}
-
-						const row = await sb.Query.getRow("chat_data", "Command");
-						await row.load(currentCommand.ID);
-						if (row.values.Latest_Commit === commitHash) {
-							console.log(`Command ${command}: no change`);
-							return;
-						}
-
-						delete require.cache[require.resolve(commandFile)];
-						const definition = require(commandFile);
-
-						const jsonify = ["Aliases"];
-						const functionStringify = ["Static_Data", "Code", "Dynamic_Description"];
-						for (const [key, value] of Object.entries(definition)) {
-							if (value === null) {
-								row.values[key] = null;
-							}
-							else if (jsonify.includes(key)) {
-								row.values[key] = JSON.stringify(value);
-							}
-							else if (functionStringify.includes(key)) {
-								const lines = `(${value})`.split("\n");
-								for (let i = 0; i < lines.length; i++) {
-									if (lines[i].startsWith("\t")) {
-										lines[i] = lines[i].slice(1);
-									}
-								}
-
-								row.values[key] = lines.join("\n");
-							}
-							else {
-								row.values[key] = value;
-							}
-						}
-
-						row.values.Latest_Commit = commitHash;
-						await row.save();
-						updated.push(currentCommand.Name);
 					});
 
 					await Promise.all(promises);
@@ -168,23 +204,24 @@ module.exports = {
 						updated.splice(updated.indexOf("spm"), 1);
 					}
 
-					if (updated.length > 0) {
+					if (added.length > 0) {
+						await sb.Command.reloadData();
+					}
+					else if (updated.length > 0) {
 						await sb.Command.reloadSpecific(...updated);
 					}
 
-					updated.sort();
-					const suffix = (updated.length === 1) ? "" : "s";
 					return {
 						reply: (updated.length === 0)
 							? `No changes detected, no commands were loaded peepoNerdDank 👆`
-							: `Loaded ${updated.length} command${suffix} (${updated.join(", ")}) from spm/commands peepoHackies`
+							: `Loaded ${updated.length} and added ${added.length} commands from spm peepoHackies`
 					};
 				}
 			},
 			{
 				name: "chat-module",
 				aliases: ["chatmodule", "chatmodules", "chat-modules"],
-				dump: async (context, fs, shell, ...args) => {
+				dump: async (context, helpers, ...args) => {
 					const now = new sb.Date();
 					const updated = [];
 					const modules = (args.length > 0)
@@ -198,43 +235,15 @@ module.exports = {
 						};
 					}
 
-					const promises = modules.map(async (module) => {
-						const dir = `/code/spm/chat-modules/${module.Name}`;
-						if (!await this.staticData.exists(dir)) {
-							await fs.mkdir(dir);
-						}
+					const promises = modules.map(async (chatModule) => {
+						const result = await helpers.save(chatModule, {
+							dir: "chat-modules",
+							table: "Chat_Module",
+							now
+						});
 
-						let row = await sb.Query.getRow("chat_data", "Chat_Module");
-						let save = false;
-
-						try {
-							await row.load(module.ID);
-							const stats = await fs.stat(`${dir}/index.js`);
-
-							if (row.values.Last_Edit > stats.mtime) {
-								save = true;
-							}
-						}
-						catch (e) {
-							if (e.message.includes("ENOENT")) {
-								save = true;
-							}
-							else {
-								throw e;
-							}
-						}
-
-						if (save) {
-							updated.push(module.Name);
-							row.values.Last_Edit = now;
-
-							await Promise.all([
-								row.save(),
-								module.serialize({
-									overwrite: true,
-									filePath: `${dir}/index.js`
-								})
-							]);
+						if (result.updated) {
+							updated.push(chatModule.Name);
 						}
 					});
 
@@ -248,86 +257,28 @@ module.exports = {
 							: `Saved ${updated.length} chat-module${suffix} into spm/chat-modules peepoHackies`
 					};
 				},
-				load: async (context, fs, shell, ...args) => {
+				load: async (context, helpers, ...args) => {
 					const updated = [];
 					const added = [];
-
 					const moduleDirs = (args.length > 0)
 						? args.map(i => sb.ChatModule.get(i)?.Name ?? i)
-						: await fs.readdir("/code/spm/chat-modules");
+						: await helpers.fs.readdir("/code/spm/chat-modules");
 
 					const promises = moduleDirs.map(async (chatModule) => {
-						const chatModuleFile = `/code/spm/chat-modules/${chatModule}/index.js`;
-						if (!await this.staticData.exists(chatModuleFile)) {
-							console.warn(`index.js file for chat module ${chatModule} does not exist!`);
-							return;
+						const result = await helpers.load(chatModule, {
+							dir: "chat-modules",
+							table: "Chat_Module",
+							name: "chat module",
+							module: sb.ChatModule,
+							jsonify: ["Events"],
+							functionify: ["Code"]
+						});
+
+						if (result.updated) {
+							updated.push(result.name);
 						}
-
-						// Fetch the latest commit for a given file
-						const commitHash = (await shell(sb.Utils.tag.trim `
-							git
-							-C /code/spm
-							log -n 1
-							--pretty=format:%H
-							-- chat-modules/${chatModule}/index.js
-						`)).stdout;
-
-						// Chat module file has no git history, skip
-						if (!commitHash) {
-							console.log(`Chat module ${chatModule}: no Git history`);
-							return;
-						}
-
-						const currentModule = sb.ChatModule.get(chatModule);
-						const row = await sb.Query.getRow("chat_data", "ChatModule");
-
-						// Load the module into the row, if it exists.
-						// Otherwise, it will be saved as a new one.
-						if (currentModule) {
-							await row.load(currentModule.ID);
-						}
-
-						if (row.values.Latest_Commit === commitHash) {
-							console.log(`Chat module ${chatModule}: no change`);
-							return;
-						}
-
-						delete require.cache[require.resolve(chatModuleFile)];
-						const definition = require(chatModuleFile);
-
-						const jsonify = ["Events"];
-						const functionStringify = ["Code"];
-						for (const [key, value] of Object.entries(definition)) {
-							if (value === null) {
-								row.values[key] = null;
-							}
-							else if (jsonify.includes(key)) {
-								row.values[key] = JSON.stringify(value);
-							}
-							else if (functionStringify.includes(key)) {
-								const lines = `(${value})`.split("\n");
-								for (let i = 0; i < lines.length; i++) {
-									if (lines[i].startsWith("\t")) {
-										lines[i] = lines[i].slice(1);
-									}
-								}
-
-								row.values[key] = lines.join("\n");
-							}
-							else {
-								row.values[key] = value;
-							}
-						}
-
-						row.values.Latest_Commit = commitHash;
-						await row.save();
-
-						// Keep track of newly added or updated modules
-						if (!currentModule) {
-							added.push(row.values.Name);
-						}
-						else {
-							updated.push(row.values.Name);
+						else if (result.added) {
+							added.push(result.name);
 						}
 					});
 
@@ -340,64 +291,36 @@ module.exports = {
 					return {
 						reply: (updated.length === 0)
 							? `No changes detected, nothing was added or updated peepoNerdDank 👆`
-							: `Loaded ${updated.length} and added ${added.length} chat modules from spm/chat-modules peepoHackies`
+							: `Loaded ${updated.length} and added ${added.length} chat modules from spm peepoHackies`
 					};
 				}
 			},
 			{
 				name: "cron",
 				aliases: ["crons"],
-				dump: async (context, fs, shell, ...args) => {
+				dump: async (context, helpers, ...args) => {
 					const now = new sb.Date();
 					const updated = [];
-					const modules = (args.length > 0)
+					const crons = (args.length > 0)
 						? args.map(i => sb.Cron.get(i)).filter(Boolean)
 						: sb.Cron.data;
 
-					if (modules.length === 0) {
+					if (crons.length === 0) {
 						return {
 							success: false,
 							reply: "No valid crons provided!"
 						};
 					}
 
-					const promises = modules.map(async (module) => {
-						const dir = `/code/spm/crons/${module.Name}`;
-						if (!await this.staticData.exists(dir)) {
-							await fs.mkdir(dir);
-						}
+					const promises = crons.map(async (cron) => {
+						const result = await helpers.save(cron, {
+							dir: "crons",
+							table: "Cron",
+							now
+						});
 
-						let row = await sb.Query.getRow("chat_data", "Cron");
-						let save = false;
-
-						try {
-							await row.load(module.ID);
-							const stats = await fs.stat(`${dir}/index.js`);
-
-							if (row.values.Last_Edit > stats.mtime) {
-								save = true;
-							}
-						}
-						catch (e) {
-							if (e.message.includes("ENOENT")) {
-								save = true;
-							}
-							else {
-								throw e;
-							}
-						}
-
-						if (save) {
-							updated.push(module.Name);
-							row.values.Last_Edit = now;
-
-							await Promise.all([
-								row.save(),
-								module.serialize({
-									overwrite: true,
-									filePath: `${dir}/index.js`
-								})
-							]);
+						if (result.updated) {
+							updated.push(cron.Name);
 						}
 					});
 
@@ -408,100 +331,51 @@ module.exports = {
 					return {
 						reply: (updated.length === 0)
 							? `No changes detected, nothing was saved peepoNerdDank 👆`
-							: `Saved ${updated.length} chat-module${suffix} into spm/chat-modules peepoHackies`
+							: `Saved ${updated.length} cron${suffix} into spm/crons peepoHackies`
 					};
 				},
-				load: async (context, fs, shell, ...args) => {
+				load: async (context, helpers, ...args) => {
 					const updated = [];
+					const added = [];
 					const cronDirs = (args.length > 0)
 						? args.map(i => sb.Cron.get(i)?.Name ?? i)
-						: await fs.readdir("/code/spm/crons");
+						: await helpers.fs.readdir("/code/spm/crons");
 
 					const promises = cronDirs.map(async (cron) => {
-						const cronFile = `/code/spm/crons/${cron}/index.js`;
-						if (!await this.staticData.exists(cronFile)) {
-							console.warn(`index.js file for cron ${cron} does not exist!`);
-							return;
+						const result = await helpers.load(cron, {
+							dir: "crons",
+							table: "Cron",
+							name: "cron",
+							module: sb.Cron,
+							jsonify: ["Defer"],
+							functionify: ["Code"]
+						});
+
+						if (result.updated) {
+							updated.push(result.name);
 						}
-
-						// Fetch the latest commit for a given file
-						const commitHash = (await shell(sb.Utils.tag.trim `
-							git
-							-C /code/spm
-							log -n 1
-							--pretty=format:%H
-							-- crons/${cron}/index.js
-						`)).stdout;
-
-						// Cron file has no git history, skip
-						if (!commitHash)   {
-							console.log(`Crons ${cron}: no Git history`);
-							return;
+						else if (result.added) {
+							added.push(result.name);
 						}
-
-						const currentCron = sb.Cron.get(cron);
-						if (!currentCron) { // New cron - save
-							console.warn("New cron detected - functionality not yet implemented");
-							return;
-						}
-
-						const row = await sb.Query.getRow("chat_data", "Cron");
-						await row.load(currentCron.ID);
-						if (row.values.Latest_Commit === commitHash) {
-							console.log(`Cron ${cron}: no change`);
-							return;
-						}
-
-						delete require.cache[require.resolve(cronFile)];
-						const definition = require(cronFile);
-
-						const jsonify = ["Defer"];
-						const functionStringify = ["Code"];
-						for (const [key, value] of Object.entries(definition)) {
-							if (value === null) {
-								row.values[key] = null;
-							}
-							else if (jsonify.includes(key)) {
-								row.values[key] = JSON.stringify(value);
-							}
-							else if (functionStringify.includes(key)) {
-								const lines = `(${value})`.split("\n");
-								for (let i = 0; i < lines.length; i++) {
-									if (lines[i].startsWith("\t")) {
-										lines[i] = lines[i].slice(1);
-									}
-								}
-
-								row.values[key] = lines.join("\n");
-							}
-							else {
-								row.values[key] = value;
-							}
-						}
-
-						row.values.Latest_Commit = commitHash;
-						await row.save();
-						updated.push(currentCron.Name);
 					});
 
 					await Promise.all(promises);
 
-					if (updated.length > 0) {
-						await sb.ChatModule.reloadData();
+					if (added.length > 0 || updated.length > 0) {
+						await sb.Cron.reloadData();
 					}
 
-					updated.sort();
-					const suffix = (updated.length === 1) ? "" : "s";
 					return {
 						reply: (updated.length === 0)
-							? `No changes detected, no chat modules were loaded peepoNerdDank 👆`
-							: `Loaded ${updated.length} chat module${suffix} (${updated.join(", ")}) from spm/chat-modules peepoHackies`
+							? `No changes detected, no crons were loaded peepoNerdDank 👆`
+							: `Loaded ${updated.length} and added ${added.length} crons from spm peepoHackies`
 					};
 				}
 			}
 		]
 	})),
 	Code: (async function spm (context, ...args) {
+		const { commands, helpers, operations } = this.staticData;
 		const operation = args.shift()?.toLowerCase();
 		if (!operation) {
 			return {
@@ -509,7 +383,7 @@ module.exports = {
 				reply: "No spm operation provided"
 			};
 		}
-		else if (!this.staticData.operations.includes(operation)) {
+		else if (!operations.includes(operation)) {
 			return {
 				success: false,
 				reply: "Invalid spm operation provided"
@@ -517,7 +391,7 @@ module.exports = {
 		}
 	
 		const type = args.shift()?.toLowerCase();
-		const definition = this.staticData.commands.find(i => i.name === type || i.aliases.includes(type));
+		const definition = commands.find(i => i.name === type || i.aliases.includes(type));
 		if (!type) {
 			return {
 				success: false,
@@ -530,12 +404,10 @@ module.exports = {
 				reply: `spm ${type} does not have functionality for the "${operation}" operation`
 			};
 		}
-	
-		const fs = require("fs").promises;
-		const shell = require("util").promisify(require("child_process").exec);
+
 		if (operation === "load") {
 			try {
-				const result = await shell("git -C /code/spm pull origin master");
+				const result = await helpers.shell("git -C /code/spm pull origin master");
 				await context.channel.send(`git pull PepoG ${result.stdout}`);
 			}
 			catch (e) {
@@ -547,7 +419,7 @@ module.exports = {
 			}
 		}
 
-		return await definition[operation](context, fs, shell, ...args);
+		return await definition[operation](context, helpers, ...args);
 	}),
 	Dynamic_Description: null
 };
