@@ -347,8 +347,8 @@ module.exports = {
 							table: "Cron",
 							name: "cron",
 							module: sb.Cron,
-							jsonify: ["Defer"],
-							functionify: ["Code"]
+							jsonify: [],
+							functionify: ["Code", "Defer"]
 						});
 
 						if (result.updated) {
