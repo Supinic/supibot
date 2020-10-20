@@ -9,22 +9,33 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function gift (context, type, target) {
 		if (!type) {
-			return { reply: "No type provided!" };
+			return {
+				success: false,
+				reply: "No type provided!"
+			};
 		}
 		else if (!target) {
-			return { reply: "No user target provided!" };
+			return {
+				success: false,
+				reply: "No user target provided!"
+			};
 		}
 	
 		const targetUserData = await sb.User.get(target, true);
 		if (!targetUserData) {
-			return { reply: "Provided user has not been found!" };
+			return {
+				success: false,
+				reply: "Provided user has not been found!"
+			};
 		}
 	
 		type = type.toLowerCase();
 		switch (type) {
 			case "cookie": {
 				if (targetUserData.Name === context.platform.Self_Name) {
-					return { reply: "I appreciate the gesture, but thanks, I don't eat sweets :)" };
+					return {
+						reply: "I appreciate the gesture, but thanks, I don't eat sweets :)"
+					};
 				}
 	
 				const [sourceUser, targetUser] = await Promise.all([
@@ -50,16 +61,19 @@ module.exports = {
 	
 				if (sourceUser.values.Cookie_Today) {
 					return {
+						success: false,
 						reply: "You already ate or gifted away your cookie today, so you can't gift it to someone else!"
 					};
 				}
 				else if (sourceUser.values.Cookie_Is_Gifted) {
 					return {
+						success: false,
 						reply: "That cookie was gifted to you! Eat it, don't give it away!"
 					};
 				}
 				else if (!targetUser.values.Cookie_Today) {
 					return {
+						success: false,
 						reply: "That user hasn't eaten their cookie today, so you would be wasting your gift! Get them to eat it!"
 					};
 				}
@@ -87,7 +101,10 @@ module.exports = {
 				};
 			}
 	
-			default: return { reply: "Target type cannot be gifted (yet, at least)." };
+			default: return {
+				success: false,
+				reply: "Target type cannot be gifted (yet, at least)."
+			};
 		}
 	}),
 	Dynamic_Description: null
