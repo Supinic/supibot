@@ -15,7 +15,7 @@ module.exports = {
 			save: (async (item, options) => {
 				const fs = require("fs").promises;
 				const dir = `/code/spm/${options.dir}/${item.Name}`;
-				if (!await this.staticData.exists(dir)) {
+				if (!await this.staticData.helpers.exists(dir)) {
 					await fs.mkdir(dir);
 				}
 
@@ -58,7 +58,7 @@ module.exports = {
 			}),
 			load: (async (item, options) => {
 				const itemFile = `/code/spm/${options.dir}/${item}/index.js`;
-				if (!await this.staticData.exists(itemFile)) {
+				if (!await this.staticData.helpers.exists(itemFile)) {
 					console.warn(`index.js file for ${options.name} ${item} does not exist`);
 					return;
 				}
