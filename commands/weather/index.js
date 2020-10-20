@@ -196,7 +196,7 @@ module.exports = {
 	
 		let plusTime = "";
 		if (typeof number === "number") {
-			const time = new sb.Date(topData[type].data[number].time * 1000).setTimezoneOffset(topData.offset * 60).addDays(-1);
+			const time = new sb.Date(topData[type].data[number].time * 1000).setTimezoneOffset(topData.offset * 60);
 			if (type === "hourly") {
 				plusTime = " (" + time.format("H:00") + " local time)";
 			}
