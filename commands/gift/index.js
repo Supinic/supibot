@@ -83,7 +83,7 @@ module.exports = {
 				sb.CooldownManager.unset(null, targetUser.ID, sb.Command.get("cookie").ID);
 	
 				return {
-					reply: "Successfully given your cookie for today to " + targetUserData.Name + " :)"
+					reply: `Successfully given your cookie for today to ${targetUserData.Name} 🙂`
 				};
 			}
 	
