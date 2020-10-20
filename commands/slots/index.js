@@ -272,11 +272,11 @@ module.exports = {
 			reply: `[ ${rolledItems.join(" ")} ]`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
-		const patterns = (await sb.Query.getRecordset(rs => rs
-			.select("Name", "Notes")
-			.from("data", "Slots_Pattern")
-			.orderBy("Name ASC"))).map(i => `<li><code>${i.Name}</code><br>${i.Notes}</li>`)
+	Dynamic_Description: (async (prefix, values) => {
+		const { patterns } = values.getStaticData();
+		const patternList = patterns
+			.sort((a, b) => a.name.localeCompare(b.name))
+			.map(i => `<li><code>${i.name}</code><br>${i.notes}</li>`)
 			.join("");
 
 		return [
@@ -293,7 +293,7 @@ module.exports = {
 			"",
 
 			"Supported patterns:",
-			`<ul>${patterns}</ul>`
+			`<ul>${patternList}</ul>`
 		];
 	})
 };
