@@ -250,6 +250,8 @@ module.exports = {
 				},
 				load: async (context, fs, shell, ...args) => {
 					const updated = [];
+					const added = [];
+
 					const moduleDirs = (args.length > 0)
 						? args.map(i => sb.ChatModule.get(i)?.Name ?? i)
 						: await fs.readdir("/code/spm/chat-modules");
@@ -277,13 +279,14 @@ module.exports = {
 						}
 
 						const currentModule = sb.ChatModule.get(chatModule);
-						if (!currentModule) { // New chat module - save
-							console.warn("New chat module detected - functionality not yet implemented");
-							return;
+						const row = await sb.Query.getRow("chat_data", "ChatModule");
+
+						// Load the module into the row, if it exists.
+						// Otherwise, it will be saved as a new one.
+						if (currentModule) {
+							await row.load(currentModule.ID);
 						}
 
-						const row = await sb.Query.getRow("chat_data", "ChatModule");
-						await row.load(currentModule.ID);
 						if (row.values.Latest_Commit === commitHash) {
 							console.log(`Chat module ${chatModule}: no change`);
 							return;
@@ -318,21 +321,26 @@ module.exports = {
 
 						row.values.Latest_Commit = commitHash;
 						await row.save();
-						updated.push(currentModule.Name);
+
+						// Keep track of newly added or updated modules
+						if (!currentModule) {
+							added.push(row.values.Name);
+						}
+						else {
+							updated.push(row.values.Name);
+						}
 					});
 
 					await Promise.all(promises);
 
-					if (updated.length > 0) {
+					if (added.length > 0 || updated.length > 0) {
 						await sb.ChatModule.reloadData();
 					}
 
-					updated.sort();
-					const suffix = (updated.length === 1) ? "" : "s";
 					return {
 						reply: (updated.length === 0)
-							? `No changes detected, no chat modules were loaded peepoNerdDank 👆`
-							: `Loaded ${updated.length} chat module${suffix} (${updated.join(", ")}) from spm/chat-modules peepoHackies`
+							? `No changes detected, nothing was added or updated peepoNerdDank 👆`
+							: `Loaded ${updated.length} and added ${added.length} chat modules from spm/chat-modules peepoHackies`
 					};
 				}
 			},
