@@ -27,7 +27,7 @@ module.exports = class Channel extends require("./template.js") {
         this.Platform = sb.Platform.get(data.Platform);
 
         /**
-         * Platform-specific ID. Used in Mixer and Twitch, for example.
+         * Platform-specific ID. Used in Discord and Twitch, for example.
          * @type {string|null}
          */
         this.Specific_ID = data.Specific_ID || null;
