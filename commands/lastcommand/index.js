@@ -7,12 +7,23 @@ module.exports = {
 	Flags: ["pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function lastCommand (context) {
+	Code: (async function lastCommand (context, user) {
+		const targetUser = (user)
+			? await sb.User.get(user)
+			: context.user;
+
+		if (!targetUser) {
+			return {
+				success: false,
+				reply: `Provided user does not exist!`
+			};
+		}
+
 		const data = await sb.Query.getRecordset(rs => {
 			rs.select("Result")
 				.from("chat_data", "Command_Execution")
 				.where("Command <> %n", this.ID)
-				.where("User_Alias = %n", context.user.ID)
+				.where("User_Alias = %n", targetUser.ID)
 				.where("Executed > DATE_ADD(NOW(), INTERVAL -1 MINUTE)")
 				.where("Result IS NOT NULL")
 				.orderBy("Executed DESC")
