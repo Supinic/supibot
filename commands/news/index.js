@@ -7,33 +7,192 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		extra: {
-			exists: async (code) => {
-				code = code.toLowerCase();
-	
-				return Boolean(await sb.Query.getRecordset(rs => rs
-					.select("1")
-					.from("data", "Extra_News")
-					.where("Code = %s", code)
-					.single()
-				));
+		definitions: [
+			{
+				code: "fi",
+				language: "finnish",
+				url: "https://high.fi/kotimaa/",
+				endpoints: [
+					"rss"
+				],
+				type: "RSS",
+				helpers: ["kalastelija01", "leppunen"]
 			},
+			{
+				code: "vn",
+				language: "vietnamese",
+				url: "https://vietnamnet.vn/rss/",
+				endpoints: [
+					"thoi-su.rss",
+					"tuanvietnam.rss"
+				],
+				type: "RSS",
+				helpers: ["supinic"]
+			},
+			{
+				code: "ug",
+				language: "swahili",
+				url: "https://www.bukedde.co.ug/feed/rss/category/",
+				endpoints: [
+					"ssanyu"
+				],
+				type: "RSS",
+				helpers: ["supinic"]
+			},
+			{
+				code: "es",
+				language: "spanish",
+				url: "https://www.abc.es/rss/feeds/abc",
+				endpoints: [
+					"_Economia.xml",
+					"_opinioncompleto.xml",
+					"_Cultura.xml",
+					"_EspanaEspana.xml",
+					"Portada.xml"
+				],
+				type: "RSS",
+				helpers: ["(unknown guy from nymns chat)"]
+			},
+			{
+				code: "cl",
+				language: "spanish",
+				url: "https://www.cooperativa.cl/noticias/site/tax/port/",
+				endpoints: [
+					"all/rss____1.xml"
+				],
+				type: "RSS",
+				helpers: ["namtheweebs"]
+			},
+			{
+				code: "is",
+				language: "icelandic",
+				url: "https://www.ruv.is/rss/",
+				endpoints: [
+					"frettir",
+					"innlent",
+					"erlent"
+				],
+				type: "RSS",
+				helpers: ["kawaqa"]
+			},
+			{
+				code: "rs",
+				language: "serbian",
+				url: "http://rs.n1info.com/rss/",
+				endpoints: [
+					"249/Naslovna"
+				],
+				type: "RSS",
+				helpers: ["supinic", "infinitegachi"]
+			},
+			{
+				code: "dk",
+				language: "danish",
+				url: "https://ekstrabladet.dk/rssfeed/",
+				endpoints: [
+					"all",
+					"nyheder"
+				],
+				type: "RSS",
+				helpers: ["gubbyfish"]
+			},
+			{
+				code: "et",
+				language: "estonian",
+				url: "https://www.postimees.ee/",
+				endpoints: [
+					"rss"
+				],
+				type: "RSS",
+				helpers: ["slordniir"]
+			},
+			{
+				code: "mt",
+				language: "maltese",
+				url: "https://www.tvm.com.mt/mt/",
+				endpoints: [
+					"feed"
+				],
+				type: "RSS",
+				helpers: ["trollpotat0"]
+			},
+			{
+				code: "by",
+				language: "belarusian",
+				url: "https://charter97.org/be/rss/",
+				endpoints: [
+					"all"
+				],
+				type: "RSS",
+				helpers: ["karylul", "gw_ua"]
+			},
+			{
+				code: "hr",
+				language: "croatian",
+				url: "https://www.index.hr/rss/",
+				endpoints: [
+					"vijesti",
+					"vijesti-hrvatska"
+				],
+				type: "RSS",
+				helpers: ["lordborne"]
+			},
+			{
+				code: "onion",
+				language: "english",
+				url: "https://www.theonion.com/",
+				endpoints: [
+					"rss"
+				],
+				type: "RSS",
+				helpers: ["supinic"]
+			},
+			{
+				code: "vz",
+				language: "spanish",
+				url: "https://www.voanoticias.com/api/",
+				endpoints: [
+					"zvirqoeojrqi"
+				],
+				type: "RSS",
+				helpers: []
+			},
+			{
+				code: "vice",
+				language: "english",
+				url: "https://www.vice.com/en_ca/",
+				endpoints: [
+					"rss"
+				],
+				type: "RSS",
+				helpers: ["supinic"]
+			},
+			{
+				code: "ch",
+				language: "german",
+				url: "https://www.nzz.ch/",
+				endpoints: [
+					"recent.rss",
+					"international.rss",
+					"schweiz.rss"
+				],
+				type: "RSS",
+				helpers: ["avulsed_"]
+			}
+		],
+
+		extra: {
+			exists: (code) => (
+				Boolean(this.staticData.definitions.find(i => i.code === code.toLowerCase()))
+			),
 	
 			fetch: async (code, query) => {
-				code = code.toLowerCase();
-	
-				const row = await sb.Query.getRecordset(rs => rs
-					.select("*")
-					.from("data", "Extra_News")
-					.where("Code = %s", code)
-					.single()
-				);
-	
-				if (!row) {
+				const news = this.staticData.definitions.find(i => i.code === code.toLowerCase());
+				if (!news) {
 					throw new sb.Error({ message: "Extra news code does not exist!" });
 				}
 	
-				const url = row.URL + sb.Utils.randArray(JSON.parse(row.Endpoints));
+				const url = news.url + sb.Utils.randArray(news.endpoints);
 				const feed = await sb.Utils.parseRSS(url);
 	
 				if (query) {
@@ -140,7 +299,7 @@ module.exports = {
 		}).json();
 	
 		const extraNews = (await sb.Query.getRecordset(rs => rs
-			.select("Code", "Language", "URL", "Helpers")
+			.select(code, "Language", "URL", "Helpers")
 			.from("data", "Extra_News")
 			.orderBy("Code ASC")
 		)).map(i => {
