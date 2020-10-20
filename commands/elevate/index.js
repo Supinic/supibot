@@ -16,6 +16,7 @@ module.exports = {
 			"Command - fix": "supibot-package-manager",
 			"Command - new": "supibot-package-manager",
 			"Command - refactor": "supibot-package-manager",
+			"SPM": "supibot-package-manager",
 			"Website": "supinic.com",
 			"Website - API": "supinic.com",
 			"Website - frontend": "supinic.com",
