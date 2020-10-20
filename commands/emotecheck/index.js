@@ -367,6 +367,24 @@ module.exports = {
 					"supiniThink"
 				]
 			},
+			{
+				name: "kpop",
+				aliases: [],
+				description: "KPop themed emotes received by cheering, subscribing or gifting subs. Handed out between 2020-10-19 and 2020-10-30.",
+				notes: "https://help.twitch.tv/s/article/celebrate-kpop",
+				emotes: [
+					"KPOPdance",
+					"KPOPfan",
+					"KPOPglow",
+					"KPOPheart",
+					"KPOPcheer",
+					"KPOPTT",
+					"KPOPlove",
+					"KPOPmerch",
+					"KPOPselfie",
+					"KPOPvictory"
+				]
+			},
 		]
 	})),
 	Code: (async function emoteCheck (context, name) {
