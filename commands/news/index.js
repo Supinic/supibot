@@ -291,15 +291,32 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async (prefix, values) => {
-		const { sources } = await sb.Got({
-			url: "https://newsapi.org/v2/sources",
-			headers: {
-				Authorization: "Bearer " + sb.Config.get("API_NEWSAPI_ORG")
+		let data = await sb.Cache.getByPrefix("api-news-sources");
+		if (!data) {
+			const { statusCode, body: sourcesData } = await sb.Got({
+				url: "https://newsapi.org/v2/sources",
+				responseType: "json",
+				throwHttpErrors: false,
+				headers: {
+					Authorization: "Bearer " + sb.Config.get("API_NEWSAPI_ORG")
+				}
+			});
+
+			if (statusCode === 200) {
+				const { sources } = sourcesData;
+				data = sources;
+
+				await sb.Cache.setByPrefix("api-news-sources", sources, {
+					expiry: 24 * 3_600_000
+				});
 			}
-		}).json();
+		}
+
+		const sources = (data)
+			? "<ul>" + data.map(i => `<li><a href="${i.url}">${i.id}</a></li>`).join("") + "</ul>"
+			: "Data sources are not currently available";
 
 		const { definitions } = values.getStaticData();
-
 		const extraNews = definitions.map(i => {
 			const helpers = (i.helpers.length > 0) ? i.helpers.join(", ") : "N/A";
 			return `<tr><td>${i.code.toUpperCase()}</td><td>${sb.Utils.capitalize(i.language)}</td><td>${helpers}</td></tr>`;
@@ -338,7 +355,7 @@ module.exports = {
 			"",
 	
 			"List of usable sources:",
-			"<ul>" + sources.map(i => `<li><a href="${i.url}">${i.id}</a></li>`).join("") + "</ul>"
+			sources
 		];
 	})
 };
