@@ -67,6 +67,7 @@ module.exports = {
 					const channels = args.map(i => sb.Channel.get(i.toLowerCase())).filter(Boolean);
 					if (channels.length === 0) {
 						if (invocation === "unsubscribe") {
+							subscription.values.Active = false;
 							subscription.values.Data = null;
 							await subscription.save();
 
@@ -99,6 +100,7 @@ module.exports = {
 							: "You did not unsubscribe from any channels.";
 					}
 
+					subscription.values.Active = (data.channels.length !== 0);
 					subscription.values.Data = JSON.stringify(data, null, 4);
 					await subscription.save();
 
