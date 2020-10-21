@@ -64,7 +64,8 @@ module.exports = {
 					const data = JSON.parse(subscription.values.Data ?? {});
 					data.channels = data.channels ?? [];
 
-					const channels = args.map(i => sb.Channel.get(i.toLowerCase())).filter(Boolean).map(i => i.ID);
+					const twitch = sb.Platform.get("twitch");
+					const channels = args.map(i => sb.Channel.get(i.toLowerCase(), twitch)).filter(Boolean).map(i => i.ID);
 					if (channels.length === 0) {
 						if (invocation === "unsubscribe") {
 							subscription.values.Active = false;
@@ -75,11 +76,13 @@ module.exports = {
 								reply: "Successfully unsubscribed from all channels going live."
 							};
 						}
-
-						return {
-							success: false,
-							reply: "No channels provided, cannot continue!"
-						};
+						else {
+							return {
+								reply: (data.channels.length === 0)
+									? "You're not subscribed to any channels."
+									: `You're subscribed to these ${data.channels.length} channels: ${data.channels.map(i => sb.Channel.get(i).Name).join(", ")}`
+							};
+						}
 					}
 
 					let response;
