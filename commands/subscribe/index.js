@@ -143,7 +143,9 @@ module.exports = {
 
 		if (typeof event.handler === "function") {
 			const subscription = await sb.Query.getRow("chat_data", "Event_Subscription");
-			await subscription.load(subData.ID);
+			if (subData?.ID) {
+				await subscription.load(subData.ID);
+			}
 
 			return event.handler(context, subscription, ...args);
 		}
