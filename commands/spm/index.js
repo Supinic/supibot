@@ -119,7 +119,7 @@ module.exports = {
 				await row.save();
 
 				return {
-					name: liveItem.Name,
+					name: row.values.Name,
 					updated: Boolean(liveItem),
 					added: !Boolean(liveItem)
 				};
