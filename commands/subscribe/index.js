@@ -52,6 +52,8 @@ module.exports = {
 								Data: "{}",
 								Active: true
 							});
+
+							await subscription.save();
 						}
 						else if (invocation === "unsubscribe") {
 							return {
