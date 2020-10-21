@@ -34,10 +34,82 @@ module.exports = {
 					added: "You will now be pinged whenever GGG staff posts.",
 					removed: "You will no longer be pinged when GGG staff posts."
 				}
+			},
+			{
+				name: "Channel live",
+				aliases: ["live", "online"],
+				notes: "Every time a channel with Supibot in their chat goes live, users with this subscription for the specific channel will be notified of this via PMs.",
+				handler: async function (context, subscription, ...args) {
+					const { invocation } = context;
+					if (!subscription) {
+						if (invocation === "subscribe") {
+							subscription = await sb.Query.getRow("chat_data", "Event_Subscription");
+							subscription.setValues({
+								User_Alias: context.user.ID,
+								Channel: null,
+								Platform: context.platform.ID,
+								Type: "Channel live",
+								Data: "{}",
+								Active: true
+							});
+						}
+						else if (invocation === "unsubscribe") {
+							return {
+								success: false,
+								reply: "You're not subscribed yet, and can't unsubscribe!"
+							};
+						}
+					}
+
+					const data = JSON.parse(subscription.values.Data ?? {});
+					data.channels = data.channels ?? [];
+
+					const channels = args.map(i => sb.Channel.get(i.toLowerCase())).filter(Boolean);
+					if (channels.length === 0) {
+						if (invocation === "unsubscribe") {
+							subscription.values.Data = null;
+							await subscription.save();
+
+							return {
+								reply: "Successfully unsubscribed from all channels going live."
+							};
+						}
+
+						return {
+							success: false,
+							reply: "No channels provided, cannot continue!"
+						};
+					}
+
+					let response;
+					const lengthBefore = data.channels.length;
+					if (invocation === "subscribe") {
+						data.channels.push(...channels.map(i => i.ID));
+						data.channels = data.channels.filter((i, ind, arr) => arr.indexOf(i) === ind);
+
+						response = (data.channels.length > lengthBefore)
+							? `Successfully subscribed to ${data.channels.length - lengthBefore} channels going live.`
+							: "You did not subscribe to any new channels.";
+					}
+					else if (invocation === "unsubscribe") {
+						data.channels = data.channels.filter(i => !channels.includes(i));
+
+						response = (data.channels.length < lengthBefore)
+							? `Successfully unsubscribed from ${lengthBefore - data.channels.length} channels going live.`
+							: "You did not unsubscribe from any channels.";
+					}
+
+					subscription.values.Data = JSON.stringify(data, null, 4);
+					await subscription.save();
+
+					return {
+						reply: response
+					};
+				}
 			}
 		]
 	})),
-	Code: (async function subscribe (context, type) {	
+	Code: (async function subscribe (context, type, ...args) {
 		if (!type) {
 			return {
 				success: false,
@@ -63,7 +135,11 @@ module.exports = {
 			.limit(1)
 			.single()
 		);
-	
+
+		if (typeof event.handler === "function") {
+			return event.handler(context, subscription, ...args);
+		}
+
 		const response = (invocation === "subscribe") ? event.response.added : event.response.removed;
 		if (subscription) {
 			if (
