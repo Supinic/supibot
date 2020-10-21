@@ -41,9 +41,8 @@ module.exports = {
 				notes: "Every time a channel with Supibot in their chat goes live, users with this subscription for the specific channel will be notified of this via PMs.",
 				handler: async function (context, subscription, ...args) {
 					const { invocation } = context;
-					if (!subscription) {
+					if (!subscription.loaded) {
 						if (invocation === "subscribe") {
-							subscription = await sb.Query.getRow("chat_data", "Event_Subscription");
 							subscription.setValues({
 								User_Alias: context.user.ID,
 								Channel: null,
