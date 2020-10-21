@@ -64,7 +64,7 @@ module.exports = {
 					const data = JSON.parse(subscription.values.Data ?? {});
 					data.channels = data.channels ?? [];
 
-					const channels = args.map(i => sb.Channel.get(i.toLowerCase())).filter(Boolean);
+					const channels = args.map(i => sb.Channel.get(i.toLowerCase())).filter(Boolean).map(i => i.ID);
 					if (channels.length === 0) {
 						if (invocation === "unsubscribe") {
 							subscription.values.Active = false;
@@ -85,7 +85,7 @@ module.exports = {
 					let response;
 					const lengthBefore = data.channels.length;
 					if (invocation === "subscribe") {
-						data.channels.push(...channels.map(i => i.ID));
+						data.channels.push(...channels);
 						data.channels = data.channels.filter((i, ind, arr) => arr.indexOf(i) === ind);
 
 						response = (data.channels.length > lengthBefore)
