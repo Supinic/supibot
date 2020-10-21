@@ -129,7 +129,7 @@ module.exports = {
 		}
 	
 		const { invocation } = context;
-		const subscription = await sb.Query.getRecordset(rs => rs
+		const subData = await sb.Query.getRecordset(rs => rs
 			.select("ID", "Active")
 			.from("chat_data", "Event_Subscription")
 			.where("User_Alias = %n", context.user.ID)
@@ -139,14 +139,17 @@ module.exports = {
 		);
 
 		if (typeof event.handler === "function") {
+			const subscription = await sb.Query.getRow("chat_data", "Event_Subscription");
+			await subscription.load(subData.ID);
+
 			return event.handler(context, subscription, ...args);
 		}
 
 		const response = (invocation === "subscribe") ? event.response.added : event.response.removed;
-		if (subscription) {
+		if (subData) {
 			if (
-				(invocation === "subscribe" && subscription.Active)
-				|| (invocation === "unsubscribe" && !subscription.Active)
+				(invocation === "subscribe" && subData.Active)
+				|| (invocation === "unsubscribe" && !subData.Active)
 			) {
 				const preposition = (invocation === "subscribe") ? "to" : "from";
 				return {
@@ -157,8 +160,8 @@ module.exports = {
 	
 			await sb.Query.getRecordUpdater(rs => rs
 				.update("chat_data", "Event_Subscription")
-				.set("Active", !subscription.Active)
-				.where("ID = %n", subscription.ID)
+				.set("Active", !subData.Active)
+				.where("ID = %n", subData.ID)
 			);
 	
 			return {
