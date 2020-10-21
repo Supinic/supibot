@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 0,
-	Description: "Restarts the bot by killing the process and letting PM2 restart it.",
+	Description: "Restarts the bot/website process via pm2, optionally also git-pulls changes and/or upgrades the supi-core module.",
 	Flags: ["read-only","system","whitelist"],
 	Whitelist_Response: "Only available to adminstrators!",
 	Static_Data: (() => ({
