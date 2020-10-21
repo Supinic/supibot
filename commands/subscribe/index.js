@@ -61,7 +61,7 @@ module.exports = {
 						}
 					}
 
-					const data = JSON.parse(subscription.values.Data ?? {});
+					const data = JSON.parse(subscription.values.Data ?? "{}");
 					data.channels = data.channels ?? [];
 
 					const twitch = sb.Platform.get("twitch");
