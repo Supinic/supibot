@@ -31,7 +31,7 @@ module.exports = {
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("User_Alias = %n", targetUser.ID)
 			.where(
-				"Channel %n+",
+				"Channel IN %n+",
 				[7, 8, 46].includes(context.channel.ID)
 					? [7, 8, 46]
 					: [context.channel.ID]
