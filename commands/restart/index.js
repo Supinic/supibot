@@ -9,7 +9,7 @@ module.exports = {
 	Static_Data: (() => ({
 		dir: {
 			bot: "/code/supibot",
-			web: "/code/website"
+			web: "/code/web"
 		},
 		pm2: {
 			bot: "pm2 restart supibot",
