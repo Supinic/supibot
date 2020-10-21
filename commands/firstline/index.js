@@ -90,15 +90,11 @@ module.exports = {
 			partialReplies: [
 				{
 					bancheck: false,
-					message: `${prefix} first message in this channel was:`
+					message: `${prefix} first message in this channel was (${sb.Utils.timeDelta(line.Posted)}):`
 				},
 				{
 					bancheck: true,
 					message: line.Text
-				},
-				{
-					bancheck: false,
-					message: `(${sb.Utils.timeDelta(line.Posted)})`
 				}
 			]
 		};
