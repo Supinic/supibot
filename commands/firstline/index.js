@@ -10,82 +10,88 @@ module.exports = {
 	Code: (async function firstLine (context, user) {
 		if (!context.channel) {
 			return {
-				reply: "Not available in private messages!"
+				success: false,
+				reply: "This command is not available in private messages!"
 			};
 		}
-		
-		let targetUser = null;
-		if (!user) {
-			targetUser = context.user;
-		}
-		else if (context.platform.Name === "discord") {
-			targetUser = await sb.Utils.getDiscordUserDataFromMentions(user, context.append);
-		}
-	
-		targetUser = await sb.User.get(targetUser || user, true);
-	
+
+		const targetUser = (user)
+			? await sb.User.get(user)
+			: context.user;
+
 		if (!targetUser) {
-			return { reply: "User not found in the database!" };
+			return {
+				success: false,
+				reply: "Provided user not found in the database!"
+			};
 		}
-	
-		let check = null;
-		if ([7, 8, 46].includes(context.channel.ID)) {
-			check = (await sb.Query.getRecordset(rs => rs
-				.select("1")
-				.from("chat_data", "Message_Meta_User_Alias")
-				.where("User_Alias = %n", targetUser.ID)
-				.where("Channel IN (7, 8, 46)")
-			))[0];
-		}
-		else {
-			check = (await sb.Query.getRecordset(rs => rs
-				.select("1")
-				.from("chat_data", "Message_Meta_User_Alias")
-				.where("User_Alias = %n", targetUser.ID)
-				.where("Channel = %n", context.channel.ID)
-			))[0];
-		}
+
+		const check = await sb.Query.getRecordset(rs => rs
+			.select("User_Alias")
+			.from("chat_data", "Message_Meta_User_Alias")
+			.where("User_Alias = %n", targetUser.ID)
+			.where(
+				"Channel %n+",
+				[7, 8, 46].includes(context.channel.ID)
+					? [7, 8, 46]
+					: [context.channel.ID]
+			)
+			.limit(1)
+			.flat("User_Alias")
+			.single()
+		);
+
 		if (!check) {
-			return { reply: "That user has not said anything in this channel!" };
+			return {
+				success: false,
+				reply: "That user has not said anything in this channel!"
+			};
 		}
 	
-		let line = null;
+		let line;
 		if ([7, 8, 46].includes(context.channel.ID)) {
-			const channels = [7, 8, 46].map(i => sb.Channel.get(i));
-			line = (await Promise.all(channels.map(async channel => sb.Query.getRecordset(rs => rs
-				.select("Text", "Posted")
-				.from("chat_line", channel.getDatabaseName())
-				.where("User_Alias = %n", targetUser.ID)
-				.orderBy("ID ASC")
-				.limit(1)
-			)))).filter(i => Boolean(i[0]));
-			
-			line.sort((a, b) => {
-				a = (a[0] && a[0].Posted) || 0;
-				b = (b[0] && b[0].Posted) || 0;
-				return (a - b);
-			})[0];
-	
-			if (!line) {
-				return { reply: "No chat lines found?!" };
+			const promises = [7, 8, 46].map(async ID => {
+				const channelData = sb.Channel.get(ID);
+				return await sb.Query.getRecordset(rs => rs
+				    .select("Text", "Posted")
+					.from("chat_line", channelData.getDatabaseName())
+					.where("User_Alias = %n", targetUser.ID)
+					.orderBy("ID ASC")
+					.limit(1)
+					.single()
+				);
+			})
+
+			const lineData = (await Promise.all(promises)).filter(Boolean);
+			if (!lineData) {
+				return {
+					success: false,
+					reply: "No chat lines found?!"
+				};
 			}
-			line = line[0][0];
+
+			lineData.sort((a, b) => a.Posted - b.Posted);
+			line = lineData[0];
 		}
 		else {
-			line = (await sb.Query.getRecordset(rs => rs
-				.select("Text", "Posted")
+			line = await sb.Query.getRecordset(rs => rs
+			    .select("Text", "Posted")
 				.from("chat_line", context.channel.getDatabaseName())
 				.where("User_Alias = %n", targetUser.ID)
 				.orderBy("ID ASC")
 				.limit(1)
-			))[0];
+				.single()
+			);
 		}
 	
 		if (!line) {
-			return { reply: "No chat lines found?!" };
+			return {
+				success: false,
+				reply: "No chat lines found?!"
+			};
 		}
+
 		const prefix = (targetUser.ID === context.user.ID) ? "Your" : "That user's";
-	
 		return {
 			partialReplies: [
 				{
