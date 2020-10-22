@@ -19,7 +19,7 @@ module.exports = {
 	Code: (async function restart (context, ...types) {
 		const { promisify } = require("util");
 		const shell = promisify(require("child_process").exec);
-		const processType = (types.includes("web") || types.includes("site") || types.include("website"))
+		const processType = (types.includes("web") || types.includes("site") || types.includes("website"))
 			? "web"
 			: "bot";
 	
