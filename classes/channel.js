@@ -4,6 +4,8 @@
  * @type Channel
  */
 module.exports = class Channel extends require("./template.js") {
+    static redisPrefix = "sb-channel";
+
     /** @alias {Channel} */
     constructor (data) {
         super();
@@ -317,6 +319,18 @@ module.exports = class Channel extends require("./template.js") {
     async serialize () {
         throw new sb.Error({
             message: "Module Channel cannot be serialized"
+        });
+    }
+
+    get cacheData () {
+        return sb.Cache.getByPrefix(Channel.redisPrefix, {
+            keys: { ID: this.ID }
+        });
+    }
+
+    async setCacheData (value) {
+        return sb.Cache.getByPrefix(Channel.redisPrefix, value, {
+            keys: { ID: this.ID }
         });
     }
 
