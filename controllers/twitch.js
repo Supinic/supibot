@@ -73,7 +73,10 @@ module.exports = class Twitch extends require("./template.js") {
 					const channelList = sb.Channel.getJoinableForPlatform("twitch").filter(i => i.Mode !== "Read" && i.Specific_ID);
 					const { streams } = await sb.Got.instances.Twitch.Kraken({
 						url: "streams",
-						searchParams: "channel=" + channelList.map(i => i.Specific_ID).filter(Boolean).join(",")
+						searchParams: new sb.URLParams()
+							.set("channel", channelList.map(i => i.Specific_ID).filter(Boolean).join(","))
+							.set("limit", "100")
+							.toString()
 					}).json();
 
 					for (const channel of channelList) {
