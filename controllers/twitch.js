@@ -114,7 +114,6 @@ module.exports = class Twitch extends require("./template.js") {
 							continue;
 						}
 
-						channel.sessionData.live = true;
 						channel.sessionData.stream = {
 							game: stream.game,
 							since: new sb.Date(stream.created_at),
@@ -126,8 +125,10 @@ module.exports = class Twitch extends require("./template.js") {
 						};
 
 						if (!channel.sessionData.live) {
+							channel.sessionData.live = true;
 							channel.events.emit("online", {
 								event: "online",
+								stream: channel.sessionData.stream,
 								channel
 							});
 						}
