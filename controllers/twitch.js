@@ -101,14 +101,15 @@ module.exports = class Twitch extends require("./template.js") {
 					for (const channel of channelList) {
 						const stream = streams.find(i => channel.Specific_ID === String(i.channel._id));
 						if (!stream) {
-							channel.sessionData.live = false;
-							channel.sessionData.stream = {};
-							if (channel.sessionData.live) {
+							if (channel.sessionData.live === true) {
 								channel.events.emit("offline", {
 									event: "offline",
 									channel
 								});
 							}
+
+							channel.sessionData.live = false;
+							channel.sessionData.stream = {};
 
 							continue;
 						}
