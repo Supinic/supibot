@@ -59,7 +59,8 @@ module.exports = {
 			#id;
 			#title;
 			#url;
-	
+
+			#crosspostOrigin = null;
 			#isTextPost = false;
 			#nsfw = false;
 			#stickied = false;
@@ -67,6 +68,11 @@ module.exports = {
 			#score = 0;
 	
 			constructor (data) {
+				if (data.crosspost_parent_list) {
+					data = data.crosspost_parent_list.pop();
+					this.#crosspostOrigin = data.subreddit_name_prefixed
+				}
+
 				this.#author = data.author;
 				this.#created = new sb.Date(data.created_utc * 1000);
 				this.#id = data.id;
@@ -91,7 +97,11 @@ module.exports = {
 			}
 	
 			toString () {
-				return `${this.#title} ${this.#url} (Score: ${this.#score}, posted ${this.posted})`;
+				const xpost = (this.#crosspostOrigin)
+					? `, x-posted from ${this.#crosspostOrigin}`
+					: "";
+
+				return `${this.#title} ${this.#url} (Score: ${this.#score}, posted ${this.posted}${xpost})`;
 			}
 		}
 	
