@@ -79,6 +79,25 @@ module.exports = class Twitch extends require("./template.js") {
 							.toString()
 					}).json();
 
+					if (streams.length === 100) {
+						let offset = 100;
+						let finished = false;
+						while (!finished) {
+							const data = await sb.Got.instances.Twitch.Kraken({
+								url: "streams",
+								searchParams: new sb.URLParams()
+									.set("channel", channelList.map(i => i.Specific_ID).filter(Boolean).join(","))
+									.set("limit", "100")
+									.set("offset", String(offset))
+									.toString()
+							}).json();
+
+							streams.push(...data.streams);
+							offset += 100;
+							finished = (data.streams.length < 100);
+						}
+					}
+
 					for (const channel of channelList) {
 						const stream = streams.find(i => channel.Specific_ID === String(i.channel._id));
 						if (!stream) {
