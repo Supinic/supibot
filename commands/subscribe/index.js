@@ -66,7 +66,11 @@ module.exports = {
 					data.channels = data.channels ?? [];
 
 					const twitch = sb.Platform.get("twitch");
-					const channels = args.map(i => sb.Channel.get(i.toLowerCase(), twitch)).filter(Boolean).map(i => i.ID);
+					const channels = args
+						.map(i => sb.Channel.get(i.toLowerCase(), twitch))
+						.filter(i => i !== null && i.Type !== "Inactive")
+						.map(i => i.ID);
+
 					if (channels.length === 0) {
 						if (invocation === "unsubscribe") {
 							subscription.values.Active = false;
@@ -78,11 +82,19 @@ module.exports = {
 							};
 						}
 						else {
-							return {
-								reply: (data.channels.length === 0)
-									? "You're not subscribed to any channels."
-									: `You're subscribed to these ${data.channels.length} channels: ${data.channels.map(i => sb.Channel.get(i).Name).join(", ")}`
-							};
+							if (args.length === 0) {
+								return {
+									reply: (data.channels.length === 0)
+										? "You're not subscribed to any channels."
+										: `You're subscribed to these ${data.channels.length} channels: ${data.channels.map(i => sb.Channel.get(i).Name).join(", ")}`
+								};
+							}
+							else {
+								return {
+									success: false,
+									reply: "No proper channels provided! You can only subscribe to channels with Supibot."
+								};
+							}
 						}
 					}
 
