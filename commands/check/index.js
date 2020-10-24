@@ -117,7 +117,7 @@ module.exports = {
 							.from("chat_data", "Command_Execution")
 							.where("User_Alias = %n", context.user.ID)
 							.where("Platform = %n", context.platform.ID)
-							.orderBy("ID DESC")
+							.orderBy("Executed DESC")
 							.limit(1)
 							.single();
 
