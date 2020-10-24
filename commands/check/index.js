@@ -113,7 +113,7 @@ module.exports = {
 				description: "Checks the command execution ID for the current channel.",
 				execute: async (context) => {
 					const data = await sb.Query.getRecordset(rs => {
-						rs.select("ID", "Invocation", "Execution_Time")
+						rs.select("Executed", "Execution_Time", "Invocation")
 							.from("chat_data", "Command_Execution")
 							.where("User_Alias = %n", context.user.ID)
 							.where("Platform = %n", context.platform.ID)
@@ -139,7 +139,7 @@ module.exports = {
 					}
 					else {
 						return {
-							reply: `Last used command: ${sb.Command.prefix}${data.Invocation} - ID: ${data.ID} - Execution time: ${data.Execution_Time}ms`
+							reply: `Last used command: ${sb.Command.prefix}${data.Invocation} - Identifier: ${data.Executed.valueOf()} - Execution time: ${data.Execution_Time}ms`
 						};
 					}
 				}
