@@ -125,7 +125,7 @@ module.exports = {
 							rs.where("Channel IS NULL");
 						}
 						else {
-							rs.where("Channel = %n", context.user.ID);
+							rs.where("Channel = %n", context.channel.ID);
 						}
 
 						return rs;
