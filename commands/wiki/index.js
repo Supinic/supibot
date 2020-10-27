@@ -51,6 +51,8 @@ module.exports = {
 				.set("action", "query")
 				.set("prop", "extracts")
 				.set("redirects", "1")
+				.set("exintro", "1")
+				.set("explaintext", "1")
 				.set("titles", searchData[1])
 				.toString()
 		}).json();
@@ -71,7 +73,7 @@ module.exports = {
 
 			const { extract, title } = data[key];
 			return {
-				reply: `${link} ${title}: ${sb.Utils.removeHTML(extract)}`
+				reply: `${link} ${title}: ${extract}`
 			};
 		}
 	}),
