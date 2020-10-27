@@ -78,6 +78,12 @@ module.exports = class Reminder extends require("./template.js") {
         this.Platform = (data.Platform)
             ? sb.Platform.get(data.Platform)
             : null;
+
+        /**
+         * If the reminder is a timed one, a timeout will be active that holds the info about the activation.
+         * @type {LongTimeout|null}
+         */
+        this.timeout = null;
     }
 
     /**
@@ -183,6 +189,13 @@ module.exports = class Reminder extends require("./template.js") {
         return this;
     }
 
+    destroy () {
+        if (this.timeout) {
+            this.timeout.clear();
+            this.timeout = null;
+        }
+    }
+
     async serialize () {
         throw new sb.Error({
             message: "Module Reminder cannot be serialized"
@@ -204,7 +217,15 @@ module.exports = class Reminder extends require("./template.js") {
             reminder.activateTimeout();
         }
     }
-    
+
+    static async reloadData () {
+        for (const reminder of Reminder.data) {
+            reminder.destroy();
+        }
+
+        return await super.reloadData();
+    }
+
     static get (identifier) {
         if (identifier instanceof Reminder) {
             return identifier;
