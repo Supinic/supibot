@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["unsubscribe"],
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Subscribe or unscribe to a database changing event. Check the extended help for detailed info on each subscription event.",
+	Description: "Subscribe or unsubcribe to plethora of events, such as a channel going live, or a suggestion you made being updated. Check the extended help for detailed info on each event.",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
