@@ -68,7 +68,7 @@ module.exports = {
 		else {
 			let link = "";
 			if (!context.channel || context.channel.Links_Allowed === true) {
-				link = `https://${language}.wikipedia.org/?curid=${key}`;
+				link = `https://${languageCode}.wikipedia.org/?curid=${key}`;
 			}
 
 			const { extract, title } = data[key];
