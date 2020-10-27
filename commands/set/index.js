@@ -523,7 +523,14 @@ module.exports = {
 			return await target[invocation](context, ...args);
 		}
 		else if (target.parameter === "ID") {
-			let ID = Number(args[0]);
+			if (args.length === 0) {
+				return {
+					success: false,
+					reply: "At least one item must be provided!"
+				};
+			}
+
+			let IDs = args.map(i => Number(i)).filter(Boolean);
 			if (args[0] === "last") {
 				if (typeof target.getLastID !== "function") {
 					return {
@@ -531,18 +538,50 @@ module.exports = {
 						reply: `You cannot use the keyword "last" while ${invocation}ting a ${type}!`
 					};
 				}
-	
-				ID = await target.getLastID(context);
+
+				const lastID = await target.getLastID(context);
+				IDs = [lastID];
 			}
-	
-			if (!sb.Utils.isValidInteger(ID)) {
+
+			if (IDs.length > 1 && invocation === "set") {
 				return {
 					success: false,
-					reply: `Provided ID is not a valid number!`
+					reply: "Cannot set more than one item at a time!"
 				};
 			}
-	
-			return await target[invocation](context, ID);
+
+			const results = [];
+			for (const ID of IDs) {
+				if (!sb.Utils.isValidInteger(ID)) {
+					results.push({
+						ID,
+						success: false,
+						reply: `Provided ID is not a valid number!`
+					});
+
+					continue;
+				}
+
+				const subResult = await target[invocation](context, ID);
+				results.push({ ID, ...subResult });
+			}
+
+			if (results.length === 1) {
+				return results[0];
+			}
+			else {
+				const [success, fail] = sb.Utils.splitByCondition(results, i => (i.success !== false));
+				const successString = (success.length > 0)
+					? `IDs ${success.map(i => i.ID).join(", ")} succeeded.`
+					: "";
+				const failString = (fail.length > 0)
+					? `IDs ${fail.map(i => i.ID).join(", ")} failed.`
+					: "";
+
+				return {
+					reply: [successString, failString].filter(Boolean).join(" ")
+				};
+			}
 		}
 	}),
 	Dynamic_Description: (async (prefix, values) => {
