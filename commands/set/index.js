@@ -540,6 +540,13 @@ module.exports = {
 				}
 
 				const lastID = await target.getLastID(context);
+				if (typeof lastID !== "number") {
+					return {
+						success: false,
+						reply: `You don't have any active ${type}s to be ${invocation}!`
+					};
+				}
+
 				IDs = [lastID];
 			}
 
@@ -567,7 +574,10 @@ module.exports = {
 			}
 
 			if (results.length === 1) {
-				return results[0];
+				return {
+					success: results[0].success,
+					reply: result[0].reply
+				};
 			}
 			else {
 				const [success, fail] = sb.Utils.splitByCondition(results, i => (i.success !== false));
