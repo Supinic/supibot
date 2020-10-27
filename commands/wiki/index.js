@@ -4,59 +4,74 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Fetches the headline of the first article found according to user query. Watch out, articles might be case sensitive.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","pipe","use-params"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function wiki (context, ...args) {
 		if (args.length === 0) {
 			return {
+				success: false,
 				reply: "No article specified!",
 				cooldown: { length: 2500 }
 			};
 		}
-	
-		let language = "en";
-		for (let i = args.length - 1; i >= 0; i--) {
-			const token = args[i];
-			if (/lang:\w+/.test(token)) {
-				language = sb.Utils.languageISO.getCode(token.split(":")[1]);
-				if (language === null) {
-					return {
-						reply: "Invalid language provided!",
-						cooldown: { length: 1000 }
-					};
-				}
-	
-				language = language.toLowerCase();
-				args.splice(i, 1);
-			}
+
+		const language = context.params.lang ?? context.params.language ?? "english";
+		const languageCode = sb.Utils.languageISO.getCode(language)?.toLowerCase();
+		if (languageCode === null) {
+			return {
+				success: false,
+				reply: "Invalid language provided!",
+				cooldown: { length: 2500 }
+			};
 		}
-	
-		const query = args.join(" ").split(/(?:(\W))/).filter(Boolean).map(i => i[0].toUpperCase() + i.slice(1)).join("");
+
+		const searchData = await sb.Got({
+			url: `https://${languageCode}.wikipedia.org/w/api.php`,
+			searchParams: new sb.URLParams()
+				.set("format", "json")
+				.set("action", "opensearch")
+				.set("limit", "1")
+				.set("profile", "fuzzy")
+				.set("search", args.join(" "))
+				.toString()
+		}).json();
+
+		if (searchData[1].length === 0) {
+			return {
+				success: false,
+				reply: "No Wiki articles found for your query!"
+			};
+		}
+
 		const rawData = await sb.Got({
-			url: `https://${language}.wikipedia.org/w/api.php`,
+			url: `https://${languageCode}.wikipedia.org/w/api.php`,
 			searchParams: new sb.URLParams()
 				.set("format", "json")
 				.set("action", "query")
 				.set("prop", "extracts")
 				.set("redirects", "1")
-				.set("titles", query)
+				.set("titles", searchData[1])
 				.toString()
 		}).json();
 	
 		const data = rawData.query.pages;
 		const key = Object.keys(data)[0];
 		if (key === "-1") {
-			return { reply: "No results found!" };
+			return {
+				success: false,
+				reply: "No results found?!"
+			};
 		}
 		else {
 			let link = "";
 			if (!context.channel || context.channel.Links_Allowed === true) {
 				link = `https://${language}.wikipedia.org/?curid=${key}`;
 			}
-	
+
+			const { extract, title } = data[key];
 			return {
-				reply: link + " " + data[key].title + ": " + sb.Utils.removeHTML(data[key].extract)
+				reply: `${link} ${title}: ${sb.Utils.removeHTML(extract)}`
 			};
 		}
 	}),
