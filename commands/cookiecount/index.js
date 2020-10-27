@@ -63,7 +63,7 @@ module.exports = {
 				? `${who} never given out a single cookie`
 				: `${who} gifted away ${cookies.Sent} cookie(s)`;
 	
-			let reaction = "";
+			let reaction;
 			const percentage = sb.Utils.round((cookies.Sent / total) * 100, 0);
 			if (percentage <= 0) {
 				reaction = "😧 what a scrooge 😒";
