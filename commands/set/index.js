@@ -575,7 +575,7 @@ module.exports = {
 					? `Success: ${invocation}ting IDs ${success.map(i => i.ID).join(", ")}.`
 					: "";
 				const failString = (fail.length > 0)
-					? `Fail: ${invocation}ting IDs ${fail.map(i => i.ID).join(", ")} failed.`
+					? `Fail: ${invocation}ting IDs ${fail.map(i => i.ID).join(", ")}.`
 					: "";
 
 				return {
