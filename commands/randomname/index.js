@@ -35,15 +35,13 @@ module.exports = {
 			type = sb.Utils.randArray(this.staticData.types);
 		}
 		else {
-			const bestMatch = sb.Utils.selectClosestString(type, this.staticData.types, { ignoreCase: true });
-			if (!bestMatch) {
+			type = sb.Utils.selectClosestString(type, this.staticData.types, { ignoreCase: true });
+			if (!type) {
 				return {
 					success: false,
 					reply: "No matching type found!"
 				};
 			}
-
-			type = bestMatch.split(" ").map(i => sb.Utils.capitalize(i)).join(" ");
 		}
 	
 		const name = await sb.Got({
