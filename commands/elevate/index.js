@@ -81,7 +81,11 @@ module.exports = {
 		}
 
 		const creatorUserData = await sb.User.get(row.values.User_Alias);
-		const issueBody = `<a href="//supinic.com/data/suggestion/${ID}">S#${ID}</a> by *${creatorUserData.Name}*\n\n${row.values.Text}`;
+		const authorString = (creatorUserData.Data.github?.login)
+			? `@${creatorUserData.Data.github?.login}`
+			: creatorUserData.Name;
+
+		const issueBody = `<a href="//supinic.com/data/suggestion/${ID}">S#${ID}</a> by *${authorString}*\n\n${row.values.Text}`;
 		const { statusCode, body: data } = await sb.Got.instances.GitHub({
 			method: "POST",
 			responseType: "json",
