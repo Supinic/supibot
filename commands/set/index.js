@@ -572,10 +572,10 @@ module.exports = {
 			else {
 				const [success, fail] = sb.Utils.splitByCondition(results, i => (i.success !== false));
 				const successString = (success.length > 0)
-					? `IDs ${success.map(i => i.ID).join(", ")} succeeded.`
+					? `Success: ${invocation}ting IDs ${success.map(i => i.ID).join(", ")}.`
 					: "";
 				const failString = (fail.length > 0)
-					? `IDs ${fail.map(i => i.ID).join(", ")} failed.`
+					? `Fail: ${invocation}ting IDs ${fail.map(i => i.ID).join(", ")} failed.`
 					: "";
 
 				return {
