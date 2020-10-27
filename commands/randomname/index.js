@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["rn"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Fetches a random name.",
+	Description: "Fetches a random fantasy name. You can specify its type from a list of fantasy races.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
@@ -29,9 +29,21 @@ module.exports = {
 			"Modron"
 		]
 	})),
-	Code: (async function randomName (context, type) {
+	Code: (async function randomName (context, ...args) {
+		let type = args.slice(0, 2).join(" ");
 		if (!type) {
 			type = sb.Utils.randArray(this.staticData.types);
+		}
+		else {
+			const bestMatch = sb.Utils.selectClosestString(type, this.staticData.types, { ignoreCase: true });
+			if (!bestMatch) {
+				return {
+					success: false,
+					reply: "No matching type found!"
+				};
+			}
+
+			type = bestMatch.split(" ").map(i => sb.Utils.capitalize(i)).join(" ");
 		}
 	
 		const name = await sb.Got({
