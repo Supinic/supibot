@@ -18,7 +18,7 @@ module.exports = {
 
 		const language = context.params.lang ?? context.params.language ?? "english";
 		const languageCode = sb.Utils.languageISO.getCode(language)?.toLowerCase();
-		if (languageCode === null) {
+		if (!languageCode) {
 			return {
 				success: false,
 				reply: "Invalid language provided!",
