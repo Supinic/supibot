@@ -74,7 +74,8 @@ module.exports = {
 		if (!context.user.Data.birthday) {
 			return {
 				success: false,
-				reply: `You don't have a birthday set up! Use the "${sb.Command.prefix}set birthday" command first.`
+				reply: `You don't have a birthday set up! Use the "${sb.Command.prefix}set birthday" command first.`,
+				cooldown: { length: 2500 }
 			};
 		}
 	
