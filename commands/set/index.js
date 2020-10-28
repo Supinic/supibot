@@ -576,7 +576,7 @@ module.exports = {
 			if (results.length === 1) {
 				return {
 					success: results[0].success,
-					reply: result[0].reply
+					reply: results[0].reply
 				};
 			}
 			else {
