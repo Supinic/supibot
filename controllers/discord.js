@@ -55,7 +55,7 @@ module.exports = class Discord extends require("./template.js") {
 				user
 			} = this.parseMessage(messageObject);
 
-			if (user.length > 32) {
+			if (Array.from(user).length > 32) {
 				console.warn("Invalid Discord username! user.length > 32, skipping", {
 					chan, discordID, guild, msg, user, userLength: user.length
 				});
