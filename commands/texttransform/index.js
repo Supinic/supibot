@@ -237,6 +237,18 @@ module.exports = {
 					return arr.join("");
 				}
 			},
+			{
+				name: "spongebob",
+				type: "method",
+				aliases: ["mocking", "spongemock"],
+				data: (message) => Array.from(message).map(char => {
+					if (/[a-zA-Z]/.test(char)) {
+						return sb.Utils.random(0, 1) ? char.toUpperCase() : char.toLowerCase();
+					} else {
+						return char;
+					}
+				}).join("");
+			},
 		];
 	
 		return {
