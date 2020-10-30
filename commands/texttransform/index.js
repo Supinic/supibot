@@ -247,7 +247,7 @@ module.exports = {
 					} else {
 						return char;
 					}
-				}).join("");
+				}).join("")
 			},
 		];
 	
