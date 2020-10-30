@@ -44,10 +44,10 @@ module.exports = {
 		}
 	
 		let result = "";
-		const videoID = sb.Utils.randArray(this.data.videos); 
+		const videoID = sb.Utils.randArray(this.data.videos);
+		const link = "https://youtu.be/" + videoID;
 		
 		if (state === "vlc") {
-			const link = "https://youtu.be/" + videoID;
 			const self = await sb.User.get("supibot");
 			const sr = sb.Command.get("sr");
 	
@@ -56,7 +56,7 @@ module.exports = {
 		}
 		else if (state === "cytube") {
 			await cytube.controller.queue("yt", videoID);
-			result = "Silence prevention! Successfully added to Cytube (probably)";
+			result = `Silence prevention! Successfully added ${link} to Cytube (hopefully).`;
 		}
 		
 		await channelData.send(result);
