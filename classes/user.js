@@ -27,12 +27,6 @@ module.exports = class User extends require("./template.js") {
         this.Discord_ID = data.Discord_ID;
 
         /**
-         * Unique Mixer identifier.
-         * @type {number}
-         */
-        this.Mixer_ID = data.Mixer_ID;
-
-        /**
          * Unique Twitch identifier.
          * @type {number}
          */
@@ -125,7 +119,7 @@ module.exports = class User extends require("./template.js") {
         User.insertBatch = await sb.Query.getBatch(
             "chat_data",
             "User_Alias",
-            ["Name", "Discord_ID", "Mixer_ID", "Twitch_ID"]
+            ["Name", "Discord_ID", "Twitch_ID"]
         );
 
         User.insertCron = new sb.Cron({
@@ -245,7 +239,6 @@ module.exports = class User extends require("./template.js") {
                     User.insertBatch.add({
                         Name: identifier,
                         Discord_ID: options.Discord_ID ?? null,
-                        Mixer_ID: options.Mixer_ID ?? null,
                         Twitch_ID: options.Twitch_ID ?? null
                     });
 
