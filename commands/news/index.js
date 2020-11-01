@@ -317,7 +317,7 @@ module.exports = {
 			};
 		}
 	
-		const { description, published, title } = sb.Utils.randArray(data.articles);
+		const { description, published, title } = sb.Utils.randArray(news);
 		const delta = (published)
 			? "(published " + sb.Utils.timeDelta(new sb.Date(published)) + ")"
 			: "";
