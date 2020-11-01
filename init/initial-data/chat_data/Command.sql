@@ -1,7 +1,7 @@
 INSERT INTO `chat_data`.`Command` 
 (`Name`,`Aliases`,`Flags`,`Description`,`Cooldown`,`Code`,`Whitelist_Response`)
 VALUES
-('mention',NULL,NULL,'Pong!',5000,'(async function ping () {
+('ping',NULL,NULL,'Pong!',5000,'(async function ping () {
 	return {
 		reply: "Pong!"
 	};

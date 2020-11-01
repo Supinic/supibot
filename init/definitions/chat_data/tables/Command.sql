@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS `chat_data`.`Command` (
 	`Static_Data` MEDIUMTEXT NULL DEFAULT NULL COMMENT 'Persistent data stored as a Javascript object.' COLLATE 'utf8mb4_general_ci',
 	`Code` TEXT(65535) NOT NULL COMMENT 'Javascript command code. Must be a function, ideally async function if async operations are expected. First argument is context, the rest is rest-arguments from the user, split by space.' COLLATE 'utf8mb4_general_ci',
 	`Dynamic_Description` TEXT(65535) NULL DEFAULT NULL COMMENT 'Javascript function that returns command\'s description on website. Usually async function. First argument = command prefix (string).' COLLATE 'utf8mb4_general_ci',
-	`Source` VARCHAR(300) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`Author` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`Last_Edit` DATETIME NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
 	`Latest_Commit` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
