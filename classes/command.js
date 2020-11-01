@@ -433,7 +433,7 @@ module.exports = class Command extends require("./template.js") {
 		}
 
 		if (command.Flags.linkOnly || command.Flags.useParams) {
-			const paramRegex = /^([^\s:]+):([^\s:]+)$/;
+			const paramRegex = /^([\w-]+):([\w-]+)$/;
 
 			for (let i = args.length - 1; i >= 0; i--) {
 				if (!paramRegex.test(args[i])) {
@@ -561,6 +561,7 @@ module.exports = class Command extends require("./template.js") {
 				}
 
 				delete execution.link;
+
 			}
 		}
 
