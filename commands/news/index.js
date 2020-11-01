@@ -7,7 +7,7 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		codeRegex: /[a-z]{2}/i,
+		codeRegex: /^[a-z]{2}$/i,
 
 		definitions: [
 			{
