@@ -7,6 +7,8 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
+		codeRegex: /[a-z]{2}/i,
+
 		definitions: [
 			{
 				code: "fi",
@@ -218,7 +220,7 @@ module.exports = {
 		}
 	})),
 	Code: (async function news (context, ...rest) {
-		const { extra } = this.staticData;
+		const { codeRegex, extra } = this.staticData;
 		if (rest[0] && extra.exists(rest[0])) {
 			const code = rest.shift();
 			const article = await extra.fetch(code, rest.join(" ") || null);
@@ -257,7 +259,7 @@ module.exports = {
 		}
 
 		const params = new sb.URLParams();
-		if (rest[0].test(/[a-z]{2}/i)) {
+		if (rest[0] && codeRegex.test(rest[0])) {
 			const languageDescriptor = sb.Utils.languageISO.get(rest[0]);
 			if (!languageDescriptor) {
 				return {
