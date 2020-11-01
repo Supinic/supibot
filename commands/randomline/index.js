@@ -10,7 +10,7 @@ module.exports = {
 	Code: (async function randomLine (context, user) {
 		if (context.channel === null) {
 			return {
-				reply: "This command cannot be used outside of channels!"
+				reply: "This command cannot be used in private messages!"
 			};
 		}
 	
@@ -21,13 +21,9 @@ module.exports = {
 		if (context.invocation === "rq") {
 			user = context.user.Name;
 		}
-		else if (user) {
-			user = user.toLowerCase();
-			user = await sb.Utils.getDiscordUserDataFromMentions(user, context.append) || user;
-		}
 	
 		if (user) {
-			const targetUser = await sb.User.get(user, true);
+			const targetUser = await sb.User.get(user);
 			if (!targetUser) {
 				return {
 					reply: "User not found in the database!"
@@ -81,18 +77,20 @@ module.exports = {
 				result = await sb.Query.getRecordset(rs => rs
 					.select("Text", "Posted", `"${targetUser.Name}" AS Name`)
 					.from("chat_line", targetChannel.getDatabaseName())
-					.where("ID = %n", data.ID)
+					.where("ID >= %n", data.ID)
+					.orderBy("ID ASC")
+					.limit(1)
 					.single()
 				);
 			}
 			else {
-				const data = (await sb.Query.getRecordset(rs => rs
+				const data = await sb.Query.getRecordset(rs => rs
 					.select("Message_Count AS Count")
 					.from("chat_data", "Message_Meta_User_Alias")
 					.where("User_Alias = %n", targetUser.ID)
 					.where("Channel = %n", channelID)
 					.single()
-				));
+				);
 	
 				if (!data) {
 					return {
@@ -123,7 +121,9 @@ module.exports = {
 				result = await sb.Query.getRecordset(rs => rs
 					.select("Text", "Posted", `"${targetUser.Name}" AS Name`)
 					.from("chat_line", channelName)
-					.where("ID = %n", random.ID)
+					.where("ID >= %n", random.ID)
+					.orderBy("ID ASC")
+					.limit(1)
 					.single()
 				);
 			}
@@ -177,13 +177,15 @@ module.exports = {
 					};
 				}
 	
-				result = (await sb.Query.getRecordset(rs => rs
+				result = await sb.Query.getRecordset(rs => rs
 					.select("Text", "Posted", "Name")
 					.from("chat_line", channelName)
 					.join("chat_data", "User_Alias")
-					.where("`" + channelName + "`.ID = %n", sb.Utils.random(1, data.Total))
+					.where("`" + channelName + "`.ID >= %n", sb.Utils.random(1, data.Total))
+					.order("`" + channelName + "`.ID ASC")
+					.limit(1)
 					.single()
-				));
+				);
 			}
 		}
 	
