@@ -182,7 +182,7 @@ module.exports = {
 					.from("chat_line", channelName)
 					.join("chat_data", "User_Alias")
 					.where("`" + channelName + "`.ID >= %n", sb.Utils.random(1, data.Total))
-					.order("`" + channelName + "`.ID ASC")
+					.orderBy("`" + channelName + "`.ID ASC")
 					.limit(1)
 					.single()
 				);
