@@ -351,7 +351,7 @@ module.exports = {
 		}).join("");
 		
 		return [
-			"Fetches short news articles.",
+			`Fetches short news articles. Powered by <a href="https://currentsapi.services/en">CurrentsAPI</a>`,
 			"",
 	
 			`<code>${prefix}news</code>`,
