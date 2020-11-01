@@ -38,7 +38,8 @@ module.exports = {
 			if (!subscription) {
 				continue;
 			}
-	
+
+			const supinicLink = `https://supinic.com/data/suggestion/${newRow.ID}`;
 			const githubLink = (oldRow.Github_Link === newRow.Github_Link)
 				? ""
 				: (oldRow.values.Github_Link === null)
@@ -50,7 +51,7 @@ module.exports = {
 				Platform: subscription.Platform,
 				User_From: sb.Config.get("SELF_ID"),
 				User_To: oldRow.User_Alias,
-				Text: `[EVENT] Suggestion ${oldRow.ID} changed: ${oldRow.Status} => ${newRow.Status} ${githubLink}`,
+				Text: `[EVENT] Suggestion ${oldRow.ID} changed: ${oldRow.Status} => ${newRow.Status} ${githubLink} Check details: ${supinicLink}`,
 				Schedule: null,
 				Created: new sb.Date(),
 				Private_Message: true
