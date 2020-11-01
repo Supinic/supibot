@@ -243,7 +243,7 @@ module.exports = {
 		let availableLanguages = await sb.Cache.getByPrefix(this);
 		if (!availableLanguages) {
 			const { languages } = await sb.Got({
-				url: "https://api.currentsapi.services/available/languages",
+				url: "https://api.currentsapi.services/v1/available/languages",
 				headers: {
 					Authorization: sb.Config.get("API_CURRENTSAPI_TOKEN")
 				},
