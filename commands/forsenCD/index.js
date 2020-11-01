@@ -62,7 +62,16 @@ module.exports = {
 				"#Warzone is non stop fighting to the end. Winning a game feels very rewarding. On another note, my Lambo has 850hp. 12% increase with some modifications. It's fast.",
 				"Today was incredible.... I'm in incredible. Tomorrow, even more incredible and let me tell you why. I'm going to be the most watched stream on any platform. Why you ask? Cmon.... it's FARTNITE SEASON 2 CHAPTER 2 EPISODE 2 2nd EDITION TIME!",
 				"Listen, Champions Club. I know you just wanna relax and watch the greatest streamer ever dominate the gaming world in front of millions like usual. But this week we're changing up some things. No sub mode only..... Bring in these goofy loose gut fucks.",
-				"This is such a fluffy tweet. I'm spammin my emotes on your channel now.  Hell, I throw in a ForsenCD here and there"
+				"This is such a fluffy tweet. I'm spammin my emotes on your channel now. Hell, I throw in a ForsenCD here and there",
+				"We pepega cd clap these punk putos",
+				"What happened to my parking garage? What happened to Alex my Director? I want answers.... tomorrow. Pronto. Punk Puto.",
+				"PUBG reinstalled for the 783rd time. Tomorrow, lets bring the blood.",
+				"Nothin like being stream sniped by a bunch of blonde banged, chubby cheeked, inward kneed, desperation for attention, purple brace face, unathletic, D- grades, Cheeto bags constantly emptied wannabe gamers... ...during a charity tournament.",
+				"They always peek one more time. I guarantee it.",
+				"I’m moving my La Casa to Costa Rica into a jungle with a water fall.",
+				"I’m getting so sick and tired of little @NICKMERCS and @timthetatman flappin their ugly lookin gums. Anybody else?",
+				"Here’s the plan tonight: -Plug in the PS4. -Download 20gb system update -Spend 15 minutes signing in -Download 5gb system update -Download 25gb Cold War alpha -Spend 20 minutes figuring out how to turn off notifications -Turn off the PS4",
+				"Just got off the flip phone. I'm pushing today's stream to tomorrow.... and I'll be expecting millions waiting in line."
 			]
 		};
 	}),
