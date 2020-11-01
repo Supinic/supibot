@@ -287,16 +287,33 @@ module.exports = {
 			params.set("keywords", rest.join(" "));
 		}
 
-		const { statusCode, body: data } = await sb.Got({
-			url: "https://api.currentsapi.services/v1/search",
-			searchParams: params.toString(),
-			headers: {
-				Authorization: sb.Config.get("API_CURRENTSAPI_TOKEN")
-			},
-			throwHttpErros: false,
-			responseType: "json"
-		});
+		let response;
+		try {
+			response = await sb.Got({
+				url: "https://api.currentsapi.services/v1/search",
+				searchParams: params.toString(),
+				headers: {
+					Authorization: sb.Config.get("API_CURRENTSAPI_TOKEN")
+				},
+				throwHttpErros: false,
+				responseType: "json",
+				retry: 0,
+				timeout: 5000,
+			});
+		}
+		catch (e) {
+			if (e instanceof sb.Got.TimeoutError) {
+				return {
+					success: false,
+					reply: "Response timed out - no valid keywords used!"
+				};
+			}
+			else {
+				throw e;
+			}
+		}
 
+		const { statusCode, body: data } = response;
 		if (statusCode !== 200) {
 			throw new sb.errors.APIError({
 				statusCode,
