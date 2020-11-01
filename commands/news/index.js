@@ -218,10 +218,10 @@ module.exports = {
 		}
 	})),
 	Code: (async function news (context, ...rest) {
-		const params = new sb.URLParams().set("language", "en");
-		if (rest[0] && await this.staticData.extra.exists(rest[0])) {
+		const { extra } = this.staticData;
+		if (rest[0] && extra.exists(rest[0])) {
 			const code = rest.shift();
-			const article = await this.staticData.extra.fetch(code, rest.join(" ") || null);
+			const article = await extra.fetch(code, rest.join(" ") || null);
 	
 			if (!article) {
 				return {
@@ -239,51 +239,85 @@ module.exports = {
 				reply: sb.Utils.removeHTML(`${title} ${content ?? ""} ${delta}`)
 			};
 		}
-		else if (/^[A-Z]{2}$/i.test(rest[0])) {
-			params.unset("language").set("country", rest.shift().toLowerCase());
+
+		let availableLanguages = await sb.Cache.getByPrefix(this);
+		if (!availableLanguages) {
+			const { languages } = await sb.Got({
+				url: "https://api.currentsapi.services/available/languages",
+				headers: {
+					Authorization: sb.Config.get("API_CURRENTSAPI_TOKEN")
+				},
+				responseType: "json"
+			}).json();
+
+			availableLanguages = Object.keys(languages).map(i => i.toLowerCase());
+			await sb.Cache.setByPrefix(this, availableLanguages, {
+				expiry: 7 * 864e5
+			});
 		}
-		else if (/source:\w+/i.test(rest[0])) {
-			params.unset("language").set("sources", rest.shift().split(":")[1]);
-		}
-	
-		if (rest.length !== 0) {
-			params.set("q", rest.join(" "));
-		}
-		else if (!params.has("country") && !params.has("sources")) {
-			params.set("country", "US");
-		}
-	
-		const { statusCode, body: data } = await sb.Got({
-			url: "https://newsapi.org/v2/top-headlines",
-			searchParams: params.toString(),
-			throwHttpErrors: false,
-			responseType: "json",
-			headers: {
-				Authorization: "Bearer " + sb.Config.get("API_NEWSAPI_ORG")
+
+		const params = new sb.URLParams();
+		if (rest[0].test(/[a-z]{2}/i)) {
+			const languageDescriptor = sb.Utils.languageISO.get(rest[0]);
+			if (!languageDescriptor) {
+				return {
+					success: false,
+					reply: "Provided language does not exist!"
+				};
 			}
+
+			const languageName = languageDescriptor.names[0];
+			if (!availableLanguages.includes(languageName)) {
+				return {
+					success: false,
+					reply: "Provided language is not supported!"
+				};
+			}
+
+			rest.splice(0, 1);
+			params.set("language", languageDescriptor.iso6391);
+		}
+		else {
+			params.set("language", "en");
+		}
+
+		if (rest.length > 0) {
+			params.set("keywords", rest.join(" "));
+		}
+
+		const { statusCode, body: data } = await sb.Got({
+			url: "https://api.currentsapi.services/v1/search",
+			searchParams: params.toString(),
+			headers: {
+				Authorization: sb.Config.get("API_CURRENTSAPI_TOKEN")
+			},
+			throwHttpErros: false,
+			responseType: "json"
 		});
-	
+
 		if (statusCode !== 200) {
 			throw new sb.errors.APIError({
 				statusCode,
 				reason: data?.message ?? null,
-				apiName: "NewsAPI"
+				apiName: "CurrentsAPI"
 			}); 
 		}
-		else if (!data.articles) {
+
+		const { news } = data;
+		if (!news) {
 			return {
 				reply: "No news data returned!"
 			};
 		}
-		else if (data.articles.length === 0) {
+		else if (news.length === 0) {
 			return {
 				reply: "No relevant articles found!"
 			};
 		}
 	
-		const { description, publishedAt, title } = sb.Utils.randArray(data.articles);
-		const delta = (publishedAt)
-			? "(published " + sb.Utils.timeDelta(new sb.Date(publishedAt)) + ")"
+		const { description, published, title } = sb.Utils.randArray(data.articles);
+		const delta = (published)
+			? "(published " + sb.Utils.timeDelta(new sb.Date(published)) + ")"
 			: "";
 	
 		return {
@@ -291,31 +325,6 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async (prefix, values) => {
-		let data = await sb.Cache.getByPrefix("api-news-sources");
-		if (!data) {
-			const { statusCode, body: sourcesData } = await sb.Got({
-				url: "https://newsapi.org/v2/sources",
-				responseType: "json",
-				throwHttpErrors: false,
-				headers: {
-					Authorization: "Bearer " + sb.Config.get("API_NEWSAPI_ORG")
-				}
-			});
-
-			if (statusCode === 200) {
-				const { sources } = sourcesData;
-				data = sources;
-
-				await sb.Cache.setByPrefix("api-news-sources", sources, {
-					expiry: 24 * 3_600_000
-				});
-			}
-		}
-
-		const sources = (data)
-			? "<ul>" + data.map(i => `<li><a href="${i.url}">${i.id}</a></li>`).join("") + "</ul>"
-			: "Data sources are not currently available";
-
 		const { definitions } = values.getStaticData();
 		const extraNews = definitions.map(i => {
 			const helpers = (i.helpers.length > 0) ? i.helpers.join(", ") : "N/A";
@@ -338,10 +347,6 @@ module.exports = {
 			"(country-specific news)",
 			"",
 	
-			`<code>${prefix}news source:(source)</code>`,
-			"news from your selected news source. check the list of sources below.",
-			"",
-	
 			`<code>${prefix}news (two-letter country code) (text to search for)</code>`,
 			"(country-specific news that contain the text you searched for)",
 			"",
@@ -352,10 +357,7 @@ module.exports = {
 	
 			"The following are special codes. Those were often 'helped' by people.",
 			"<table><thead><th>Code</th><th>Language</th><th>Helpers</th></thead>" + extraNews + "</table>",
-			"",
-	
-			"List of usable sources:",
-			sources
+			""
 		];
 	})
 };
