@@ -226,6 +226,10 @@ module.exports = class Command extends require("./template.js") {
 		return await super.serialize(row, Command.#serializableProperties, options);
 	}
 
+	getCacheKey () {
+		return `sb-command-${this.ID}`;
+	}
+
 	get Author () { return this.#Author; }
 
 	static async loadData () {
