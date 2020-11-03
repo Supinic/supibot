@@ -86,12 +86,8 @@ module.exports = {
 			"No arguments - any random track",
 			"",
 	
-			`<code>${prefix}rg favourite</code>`,
-			"If you have marked any tracks as your favourites on the website, this will make the command choose only from your favourites.",
-			"",
-	
 			`<code>${prefix}rg favourite:(user)</code>`,
-			"Same as above, but for any other user you choose",
+			"If a provided user (including you) has marked any tracks as their favourites on the website, this will make the command choose only from those favourites.",
 			"",
 	
 			`<code>${prefix}rg linkOnly:true</code>`,
