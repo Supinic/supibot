@@ -180,6 +180,16 @@ module.exports = {
 				],
 				type: "RSS",
 				helpers: ["avulsed_"]
+			},
+			{
+				code: "tr",
+				language: "turkish",
+				url: "https://www.hurriyet.com.tr/rss/",
+				endpoints: [
+					"anasayfa"
+				],
+				type: "RSS",
+				helpers: ["caglapickaxe", "cgpx"]
 			}
 		],
 
