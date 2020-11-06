@@ -379,15 +379,23 @@ module.exports = class Reminder extends require("./template.js") {
         // Handle non-private reminders
         if (reply.length !== 0) {
             const notifySymbol = (channelData.Platform.Name === "discord") ? "@" : "";
-            let message = notifySymbol + targetUserData.Name + ", reminders from: " + reply.join("; ");
+            const checkedUsername = `${notifySymbol}${targetUserData.Name},`;
+            const checkResult = await sb.Master.prepareMessage(checkedUsername, channelData, {
+                returnBooleanOnFail: true,
+                skipLengthCheck: true
+            })
+            const username = (checkResult === false) ? "[Banphrased username]," : checkResult;
 
             // Check banphrases and do not check length limits, because it is later split manually
+            let message = "reminders from: " + reply.join("; ");
             message = await sb.Master.prepareMessage(message, channelData, {
                 returnBooleanOnFail: true,
                 skipLengthCheck: true
             });
 
             if (typeof message === "string") {
+                message = `${username} ${message}`;
+
                 // Apply unpings, governed by the reminder command itself
                 message = await sb.Filter.applyUnping({
                     command: sb.Command.get("remind"),
@@ -415,7 +423,7 @@ module.exports = class Reminder extends require("./template.js") {
             }
             else {
                 await channelData.send(
-                    targetUserData.Name + ", banphrase timed out, but you can check reminders on the website or with the check command. IDs: " + reminders.map(i => i.ID).join(", ")
+                    "Banphrase timed out, but you can check reminders on the website or with the check command. IDs: " + reminders.map(i => i.ID).join(", ")
                 );
             }
         }
