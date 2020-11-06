@@ -316,29 +316,33 @@ module.exports = class Reminder extends require("./template.js") {
 
         const reply = [];
         const privateReply = [];
-        const sorter = async (flag, message, channelData) => {
+        const sorter = async (flag, username, message, channelData) => {
             if (flag) {
-                privateReply.push(message);
+                privateReply.push(`${username} - ${message}`);
             }
             else {
-                reply.push(await sb.Master.prepareMessage(message, channelData));
+                const checkedMessage = await sb.Master.prepareMessage(message, channelData);
+                reply.push(`${username} - ${checkedMessage}`);
             }
         };
 
         for (const reminder of reminders) {
             const platformData = channelData.Platform;
             const fromUserData = await sb.User.get(reminder.User_From);
+
             if (reminder.User_From === targetUserData.ID) {
                 await sorter(
                     reminder.Private_Message,
-                    "yourself - " + reminder.Text + " (" + sb.Utils.timeDelta(reminder.Created) + ")",
+                    "yourself",
+                    reminder.Text + " (" + sb.Utils.timeDelta(reminder.Created) + ")",
                     channelData
                 );
             }
             else if (fromUserData.Name === platformData.Self_Name) {
                 await sorter(
                     reminder.Private_Message,
-                    "System reminder - " + reminder.Text + " (" + sb.Utils.timeDelta(reminder.Created) + ")",
+                    "system reminder",
+                    reminder.Text + " (" + sb.Utils.timeDelta(reminder.Created) + ")",
                     channelData
                 );
             }
@@ -346,7 +350,12 @@ module.exports = class Reminder extends require("./template.js") {
                 const { string } = await sb.Banphrase.execute(fromUserData.Name, channelData);
                 const delta = sb.Utils.timeDelta(reminder.Created);
 
-                await sorter(reminder.Private_Message, `${string} - ${reminder.Text} (${delta})`, channelData);
+                await sorter(
+                    reminder.Private_Message,
+                    string,
+                    `${reminder.Text} (${delta})`,
+                    channelData
+                );
             }
             else {
                 const fromUserData = await sb.User.get(reminder.User_From, false);
@@ -384,10 +393,11 @@ module.exports = class Reminder extends require("./template.js") {
                 returnBooleanOnFail: true,
                 skipLengthCheck: true
             })
+
             const username = (checkResult === false) ? "[Banphrased username]," : checkResult;
+            let message = "reminders from: " + reply.join("; ");
 
             // Check banphrases and do not check length limits, because it is later split manually
-            let message = "reminders from: " + reply.join("; ");
             message = await sb.Master.prepareMessage(message, channelData, {
                 returnBooleanOnFail: true,
                 skipLengthCheck: true
