@@ -38,8 +38,7 @@ VALUES
 	"ignoredUserNotices": [],
 	"sameMessageEvasionCharacter": "󠀀",
 	"rateLimits": "default",
-	"reconnectAnnouncement": {},
-	"emitLiveEventsOnlyForFlaggedChannels": false
+	"reconnectAnnouncement": {}
 }'),
 ('Discord',2000,NULL,NULL,NULL),
 ('Cytube',600,NULL,'{
