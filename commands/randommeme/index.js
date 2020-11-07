@@ -182,7 +182,7 @@ module.exports = {
 			}
 	
 			forum.setExpiration();
-			forum.posts = response.children.map(i => new this.staticData.RedditPost(i.data));
+			forum.posts = response.data.children.map(i => new this.staticData.RedditPost(i.data));
 		}
 	
 		const { posts, repeatedPosts } = forum;
