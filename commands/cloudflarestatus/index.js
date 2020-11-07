@@ -30,7 +30,7 @@ module.exports = {
 				Cloudflare status: ${status.description};
 				Incidents: ${incidents.length};
 				Scheduled maintenances: ${maintenances.length}
-				(${update})
+				(last updated ${update})
 			`
 		};
 	}),
