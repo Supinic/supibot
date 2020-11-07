@@ -46,6 +46,7 @@ module.exports = class Twitch extends require("./template.js") {
 		this.client.connect();
 		this.client.joinAll(sb.Channel.getJoinableForPlatform(this.platform).map(i => i.Name));
 
+		const twitchPlatform = this;
 		this.data.crons = [
 			new sb.Cron({
 				Name: "rejoin-channels",
@@ -70,7 +71,15 @@ module.exports = class Twitch extends require("./template.js") {
 					end: 60000
 				},
 				Code: async () => {
-					const channelList = sb.Channel.getJoinableForPlatform("twitch").filter(i => i.Mode !== "Read" && i.Specific_ID);
+					const channelList = sb.Channel.getJoinableForPlatform("twitch").filter(i => {
+						if (twitchPlatform.Data.emitLiveEventsOnlyForFlaggedChannels) {
+							return (i.Data.emitLiveEvents === true);
+						}
+						else {
+							return (i.Mode !== "Read" && i.Specific_ID);
+						}
+					});
+
 					const { streams } = await sb.Got.instances.Twitch.Kraken({
 						url: "streams",
 						searchParams: new sb.URLParams()
