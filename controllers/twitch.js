@@ -71,14 +71,13 @@ module.exports = class Twitch extends require("./template.js") {
 					end: 60000
 				},
 				Code: async () => {
-					const channelList = sb.Channel.getJoinableForPlatform("twitch").filter(i => {
-						if (twitchPlatform.Data.emitLiveEventsOnlyForFlaggedChannels) {
-							return (i.Data.emitLiveEvents === true);
-						}
-						else {
-							return (i.Mode !== "Read" && i.Specific_ID);
-						}
-					});
+					let channelList = sb.Channel.getJoinableForPlatform("twitch");
+					if (twitchPlatform.Data.emitLiveEventsOnlyForFlaggedChannels) {
+						channelList = channelList.filter(i => i.Data.emitLiveEvents === true);
+					}
+					else {
+						channelList = channelList.filter(i => i.Mode !== "Read" && i.Specific_ID);
+					}
 
 					const { streams } = await sb.Got.instances.Twitch.Kraken({
 						url: "streams",
