@@ -149,7 +149,7 @@ module.exports = {
 				})
 			}
 
-			this.data.subreddits[subreddit] = new this.staticData.Subreddit(response.data);
+			this.data.subreddits[subreddit] = new this.staticData.Subreddit(response);
 		}
 	
 		const forum = this.data.subreddits[subreddit];
@@ -182,7 +182,7 @@ module.exports = {
 			}
 	
 			forum.setExpiration();
-			forum.posts = response.data.children.map(i => new this.staticData.RedditPost(i.data));
+			forum.posts = response.children.map(i => new this.staticData.RedditPost(i.data));
 		}
 	
 		const { posts, repeatedPosts } = forum;
