@@ -141,7 +141,14 @@ module.exports = {
 	
 		const subreddit = (args.shift() ?? sb.Utils.randArray(this.staticData.defaultMemeSubreddits)).toLowerCase();
 		if (!this.data.subreddits[subreddit]) {
-			const data = await sb.Got.instances.Reddit(subreddit + "/about.json").json();
+			const { statusCode, body: data } = await sb.Got.instances.Reddit(subreddit + "/about.json");
+			if (statusCode !== 200) {
+				throw new sb.errors.APIError({
+					statusCode,
+					apiName: "RedditAPI"
+				})
+			}
+
 			this.data.subreddits[subreddit] = new this.staticData.Subreddit(data);
 		}
 	
@@ -166,7 +173,13 @@ module.exports = {
 		}
 	
 		if (forum.posts.length === 0 || sb.Date.now() > forum.expiration) {
-			const { data } = await sb.Got.instances.Reddit(subreddit + "/hot.json").json();
+			const { statusCode, body: data } = await sb.Got.instances.Reddit(subreddit + "/hot.json");
+			if (statusCode !== 200) {
+				throw new sb.errors.APIError({
+					statusCode,
+					apiName: "RedditAPI"
+				})
+			}
 	
 			forum.setExpiration();
 			forum.posts = data.children.map(i => new this.staticData.RedditPost(i.data));
