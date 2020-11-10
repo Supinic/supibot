@@ -16,7 +16,8 @@ module.exports = {
 				sources: [
 					{
 						name: "High",
-						url: "https://high.fi/kotimaa/",
+						url: "https://high.fi",
+						path: "kotimaa",
 						endpoints: ["rss"],
 						helpers: ["kalastelija01", "leppunen"]
 					}
@@ -28,7 +29,8 @@ module.exports = {
 				sources: [
 					{
 						name: "VietNamNet",
-						url: "https://vietnamnet.vn/rss/",
+						url: "https://vietnamnet.vn",
+						path: "rss",
 						endpoints: ["thoi-su.rss", "tuanvietnam.rss" ],
 						helpers: ["supinic"]
 					}
@@ -40,7 +42,8 @@ module.exports = {
 				sources: [
 					{
 						name: "Bukedde Online",
-						url: "https://www.bukedde.co.ug/feed/rss/category/",
+						url: "https://www.bukedde.co.ug",
+						path: "feed/rss/category",
 						endpoints: ["ssanyou"],
 						helpers: ["supinic"]
 					}
@@ -51,10 +54,11 @@ module.exports = {
 				language: "spanish",
 				sources: [
 					{
-						news: "ABC",
-						url: "https://www.abc.es/rss/feeds/abc",
+						name: "ABC",
+						url: "https://www.abc.es",
+						path: "rss/feeds/abc",
 						endpoints: ["_Economia.xml", "_opinioncompleto.xml", "_Cultura.xml", "_EspanaEspana.xml", "Portada.xml"],
-						helpers: ["(unknown guy from nymns chat)"]
+						helpers: []
 					}
 				]
 			},
@@ -64,7 +68,8 @@ module.exports = {
 				sources: [
 					{
 						name: "Copperativa",
-						url: "https://www.cooperativa.cl/noticias/site/tax/port/",
+						url: "https://www.cooperativa.cl",
+						path: "noticias/site/tax/port",
 						endpoints: ["all/rss____1.xml"],
 						helpers: ["namtheweebs"]
 					}
@@ -76,7 +81,8 @@ module.exports = {
 				sources: [
 					{
 						name: "RÚV",
-						url: "https://www.ruv.is/rss/",
+						url: "https://www.ruv.is",
+						path: "rss",
 						endpoints: ["frettir", "innlent", "erlent"],
 						helpers: ["kawaqa"]
 					}
@@ -88,7 +94,8 @@ module.exports = {
 				sources: [
 					{
 						name: "N1 Info",
-						url: "http://rs.n1info.com/rss/",
+						url: "http://rs.n1info.com",
+						path: "rss",
 						endpoints: ["249/Naslovna"],
 						helpers: ["supinic", "infinitegachi"]
 					}
@@ -100,7 +107,8 @@ module.exports = {
 				sources: [
 					{
 						name: "Ekstra Bladet",
-						url: "https://ekstrabladet.dk/rssfeed/",
+						url: "https://ekstrabladet.dk",
+						path: "rssfeed",
 						endpoints: ["all", "nyheder"],
 						helpers: ["gubbyfish"]
 					}
@@ -112,7 +120,8 @@ module.exports = {
 				sources: [
 					{
 						name: "Postimees",
-						url: "https://www.postimees.ee/",
+						url: "https://www.postimees.ee",
+						path: null,
 						endpoints: ["rss"],
 						helpers: ["slordniir"]
 					}
@@ -124,7 +133,8 @@ module.exports = {
 				sources: [
 					{
 						name: "TVM",
-						url: "https://www.tvm.com.mt/mt/",
+						url: "https://www.tvm.com.mt/mt",
+						path: null,
 						endpoints: ["feed"],
 						helpers: ["trollpotat0"]
 					}
@@ -136,7 +146,8 @@ module.exports = {
 				sources: [
 					{
 						name: "Charter 97",
-						url: "https://charter97.org/be/rss/",
+						url: "https://charter97.org/be",
+						path: "rss",
 						endpoints: ["all"],
 						helpers: ["karylul", "gw_ua"]
 					}
@@ -148,7 +159,8 @@ module.exports = {
 				sources: [
 					{
 						name: "Index.hr",
-						url: "https://www.index.hr/rss/",
+						url: "https://www.index.hr",
+						path: "rss",
 						endpoints: ["vijesti", "vijesti-hrvatska"],
 						helpers: ["lordborne"]
 					}
@@ -160,7 +172,8 @@ module.exports = {
 				sources: [
 					{
 						name: "Onion",
-						url: "https://www.theonion.com/",
+						url: "https://www.theonion.com",
+						path: null,
 						endpoints: ["rss"],
 						helpers: ["supinic"]
 					}
@@ -172,7 +185,8 @@ module.exports = {
 				sources: [
 					{
 						name: "Voz de América",
-						url: "https://www.voanoticias.com/api/",
+						url: "https://www.voanoticias.com",
+						path: "api",
 						endpoints: ["zvirqoeojrqi"],
 						helpers: []
 					}
@@ -184,7 +198,8 @@ module.exports = {
 				sources: [
 					{
 						name: "Vice",
-						url: "https://www.vice.com/en_ca/",
+						url: "https://www.vice.com",
+						path: "en_ca",
 						endpoints: ["rss"],
 						helpers: []
 					}
@@ -196,7 +211,8 @@ module.exports = {
 				sources: [
 					{
 						name: "NZZ",
-						url: "https://www.nzz.ch/",
+						url: "https://www.nzz.ch",
+						path: null,
 						endpoints: ["recent.rss", "international.rss", "schweiz.rss"],
 						helpers: ["avulsed_"]
 					}
@@ -208,7 +224,8 @@ module.exports = {
 				sources: [
 					{
 						name: "TRT Haber",
-						url: "https://www.trthaber.com/",
+						url: "https://www.trthaber.com",
+						path: null,
 						endpoints: ["sondakika.rss"],
 						helpers: ["caglapickaxe", "cgpx"]
 					}
@@ -227,12 +244,13 @@ module.exports = {
 
 				const source = sb.Utils.randArray(news.sources);
 				const cacheKey = `${news.code}-${source.name}`;
-				const cache = await sb.Cache.getByPrefix(this, { keys: { cacheKey } });
+				const cache = await sb.Cache.getByPrefix(this.getCacheKey(), { keys: { cacheKey } });
 				if (cache) {
 					return sb.Utils.randArray(cache);
 				}
 
-				const url = source.url + sb.Utils.randArray(source.endpoints);
+				const endpoint = sb.Utils.randArray(source.endpoints);
+				const url = [source.url, source.path, endpoint].filter(Boolean).join("/");
 				const feed = await sb.Utils.parseRSS(url);
 	
 				if (query) {
@@ -250,7 +268,7 @@ module.exports = {
 					published: new sb.Date(i.pubDate)
 				}));
 
-				await sb.Cache.setByPrefix(this, articles, {
+				await sb.Cache.setByPrefix(this.getCacheKey(), articles, {
 					keys: { cacheKey },
 					expiry: 36e5
 				});
