@@ -438,7 +438,7 @@ module.exports = {
 				helpers.push(...source.helpers);
 			}
 
-			const uniqueHelpers = (helpers.size > 0)
+			const uniqueHelpers = (helpers.length > 0)
 				? [...new Set(helpers)].join(", ")
 				: "N/A";
 
