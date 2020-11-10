@@ -184,9 +184,9 @@ module.exports = {
 			{
 				code: "tr",
 				language: "turkish",
-				url: "https://www.hurriyet.com.tr/rss/",
+				url: "https://www.trthaber.com/",
 				endpoints: [
-					"anasayfa"
+					"sondakika.rss"
 				],
 				type: "RSS",
 				helpers: ["caglapickaxe", "cgpx"]
