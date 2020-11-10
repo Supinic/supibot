@@ -5,7 +5,6 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function announceActivePoll () {
-		const now = new sb.Date();
 		const poll = await sb.Query.getRecordset(rs => rs
 			.select("ID", "Text")
 			.from("chat_data", "Poll")
