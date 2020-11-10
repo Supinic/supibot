@@ -163,10 +163,16 @@ module.exports = class Channel extends require("./template.js") {
 
     /**
      * Sets up the logging table and triggers for a newly created channel.
+     * @returns {boolean} True if new tables and triggeres were created, false if channel already has them set up
      */
     async setup () {
         const prefix = (this.Platform.Name === "twitch") ? "" : (this.Platform.Name + "_");
         const name = prefix + this.Name.toLowerCase();
+        const alreadySetup = await sb.Query.isTablePresent("chat_line", name);
+        if (alreadySetup) {
+            return false;
+        }
+
         const limit = this.Message_Limit ?? this.Platform.Message_Limit;
 
         // Set up logging table
@@ -193,6 +199,8 @@ module.exports = class Channel extends require("./template.js") {
             "Last_Message_Text = NEW.Text,",
             "Last_Message_Posted = NEW.Posted;"
         ].join(" "));
+
+        return true;
     }
 
     waitForUserMessage (userData, options) {
