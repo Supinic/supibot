@@ -45,13 +45,13 @@ module.exports = {
 			]
 		};
 	}),
-	Code: (async function forsenE (context) {
+	Code: (async function forsenE () {
 		const post = sb.Utils.randArray(this.staticData.forsenE.filter(i => !this.data.previousPosts.includes(i)));
 		this.data.previousPosts.unshift(post);
 		this.data.previousPosts.splice(this.staticData.repeats);
 	
 		return {
-			reply: post + " forsenE"
+			reply: `${post} forsenE`
 		};
 	}),
 	Dynamic_Description: null
