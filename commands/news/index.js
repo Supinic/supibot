@@ -265,7 +265,7 @@ module.exports = {
 					title: i.title,
 					content: i.content,
 					link: i.link || i.url,
-					published: new sb.Date(i.pubDate)
+					published: new sb.Date(i.pubDate).valueOf()
 				}));
 
 				await sb.Cache.setByPrefix(this.getCacheKey(), articles, {
@@ -290,10 +290,9 @@ module.exports = {
 			}
 	
 			const { content = "", title, published } = article;
-			let delta = "";
-			if (published.valueOf()) {
-				delta = "(published " + sb.Utils.timeDelta(published) + ")";
-			}
+			const delta = (published)
+				? `(published ${sb.Utils.timeDelta(new sb.Date(published))})`
+				: "";
 	
 			return {
 				reply: sb.Utils.removeHTML(`${title} ${content ?? ""} ${delta}`)
