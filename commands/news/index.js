@@ -13,198 +13,226 @@ module.exports = {
 			{
 				code: "fi",
 				language: "finnish",
-				url: "https://high.fi/kotimaa/",
-				endpoints: [
-					"rss"
+				sources: [
+					{
+						name: "High",
+						url: "https://high.fi/kotimaa/",
+						endpoints: ["rss"],
+						helpers: ["kalastelija01", "leppunen"]
+					}
 				],
-				type: "RSS",
-				helpers: ["kalastelija01", "leppunen"]
 			},
 			{
 				code: "vn",
 				language: "vietnamese",
-				url: "https://vietnamnet.vn/rss/",
-				endpoints: [
-					"thoi-su.rss",
-					"tuanvietnam.rss"
-				],
-				type: "RSS",
-				helpers: ["supinic"]
+				sources: [
+					{
+						name: "VietNamNet",
+						url: "https://vietnamnet.vn/rss/",
+						endpoints: ["thoi-su.rss", "tuanvietnam.rss" ],
+						helpers: ["supinic"]
+					}
+				]
 			},
 			{
 				code: "ug",
 				language: "swahili",
-				url: "https://www.bukedde.co.ug/feed/rss/category/",
-				endpoints: [
-					"ssanyu"
-				],
-				type: "RSS",
-				helpers: ["supinic"]
+				sources: [
+					{
+						name: "Bukedde Online",
+						url: "https://www.bukedde.co.ug/feed/rss/category/",
+						endpoints: ["ssanyou"],
+						helpers: ["supinic"]
+					}
+				]
 			},
 			{
 				code: "es",
 				language: "spanish",
-				url: "https://www.abc.es/rss/feeds/abc",
-				endpoints: [
-					"_Economia.xml",
-					"_opinioncompleto.xml",
-					"_Cultura.xml",
-					"_EspanaEspana.xml",
-					"Portada.xml"
-				],
-				type: "RSS",
-				helpers: ["(unknown guy from nymns chat)"]
+				sources: [
+					{
+						news: "ABC",
+						url: "https://www.abc.es/rss/feeds/abc",
+						endpoints: ["_Economia.xml", "_opinioncompleto.xml", "_Cultura.xml", "_EspanaEspana.xml", "Portada.xml"],
+						helpers: ["(unknown guy from nymns chat)"]
+					}
+				]
 			},
 			{
 				code: "cl",
 				language: "spanish",
-				url: "https://www.cooperativa.cl/noticias/site/tax/port/",
-				endpoints: [
-					"all/rss____1.xml"
-				],
-				type: "RSS",
-				helpers: ["namtheweebs"]
+				sources: [
+					{
+						name: "Copperativa",
+						url: "https://www.cooperativa.cl/noticias/site/tax/port/",
+						endpoints: ["all/rss____1.xml"],
+						helpers: ["namtheweebs"]
+					}
+				]
 			},
 			{
 				code: "is",
 				language: "icelandic",
-				url: "https://www.ruv.is/rss/",
-				endpoints: [
-					"frettir",
-					"innlent",
-					"erlent"
-				],
-				type: "RSS",
-				helpers: ["kawaqa"]
+				sources: [
+					{
+						name: "RÚV",
+						url: "https://www.ruv.is/rss/",
+						endpoints: ["frettir", "innlent", "erlent"],
+						helpers: ["kawaqa"]
+					}
+				]
 			},
 			{
 				code: "rs",
 				language: "serbian",
-				url: "http://rs.n1info.com/rss/",
-				endpoints: [
-					"249/Naslovna"
-				],
-				type: "RSS",
-				helpers: ["supinic", "infinitegachi"]
+				sources: [
+					{
+						name: "N1 Info",
+						url: "http://rs.n1info.com/rss/",
+						endpoints: ["249/Naslovna"],
+						helpers: ["supinic", "infinitegachi"]
+					}
+				]
 			},
 			{
 				code: "dk",
 				language: "danish",
-				url: "https://ekstrabladet.dk/rssfeed/",
-				endpoints: [
-					"all",
-					"nyheder"
-				],
-				type: "RSS",
-				helpers: ["gubbyfish"]
+				sources: [
+					{
+						name: "Ekstra Bladet",
+						url: "https://ekstrabladet.dk/rssfeed/",
+						endpoints: ["all", "nyheder"],
+						helpers: ["gubbyfish"]
+					}
+				]
 			},
 			{
 				code: "et",
 				language: "estonian",
-				url: "https://www.postimees.ee/",
-				endpoints: [
-					"rss"
-				],
-				type: "RSS",
-				helpers: ["slordniir"]
+				sources: [
+					{
+						name: "Postimees",
+						url: "https://www.postimees.ee/",
+						endpoints: ["rss"],
+						helpers: ["slordniir"]
+					}
+				]
 			},
 			{
 				code: "mt",
 				language: "maltese",
-				url: "https://www.tvm.com.mt/mt/",
-				endpoints: [
-					"feed"
-				],
-				type: "RSS",
-				helpers: ["trollpotat0"]
+				sources: [
+					{
+						name: "TVM",
+						url: "https://www.tvm.com.mt/mt/",
+						endpoints: ["feed"],
+						helpers: ["trollpotat0"]
+					}
+				]
 			},
 			{
 				code: "by",
 				language: "belarusian",
-				url: "https://charter97.org/be/rss/",
-				endpoints: [
-					"all"
-				],
-				type: "RSS",
-				helpers: ["karylul", "gw_ua"]
+				sources: [
+					{
+						name: "Charter 97",
+						url: "https://charter97.org/be/rss/",
+						endpoints: ["all"],
+						helpers: ["karylul", "gw_ua"]
+					}
+				]
 			},
 			{
 				code: "hr",
 				language: "croatian",
-				url: "https://www.index.hr/rss/",
-				endpoints: [
-					"vijesti",
-					"vijesti-hrvatska"
-				],
-				type: "RSS",
-				helpers: ["lordborne"]
+				sources: [
+					{
+						name: "Index.hr",
+						url: "https://www.index.hr/rss/",
+						endpoints: ["vijesti", "vijesti-hrvatska"],
+						helpers: ["lordborne"]
+					}
+				]
 			},
 			{
 				code: "onion",
 				language: "english",
-				url: "https://www.theonion.com/",
-				endpoints: [
-					"rss"
-				],
-				type: "RSS",
-				helpers: ["supinic"]
+				sources: [
+					{
+						name: "Onion",
+						url: "https://www.theonion.com/",
+						endpoints: ["rss"],
+						helpers: ["supinic"]
+					}
+				]
 			},
 			{
 				code: "vz",
 				language: "spanish",
-				url: "https://www.voanoticias.com/api/",
-				endpoints: [
-					"zvirqoeojrqi"
-				],
-				type: "RSS",
-				helpers: []
+				sources: [
+					{
+						name: "Voz de América",
+						url: "https://www.voanoticias.com/api/",
+						endpoints: ["zvirqoeojrqi"],
+						helpers: []
+					}
+				]
 			},
 			{
 				code: "vice",
 				language: "english",
-				url: "https://www.vice.com/en_ca/",
-				endpoints: [
-					"rss"
-				],
-				type: "RSS",
-				helpers: ["supinic"]
+				sources: [
+					{
+						name: "Vice",
+						url: "https://www.vice.com/en_ca/",
+						endpoints: ["rss"],
+						helpers: []
+					}
+				]
 			},
 			{
 				code: "ch",
 				language: "german",
-				url: "https://www.nzz.ch/",
-				endpoints: [
-					"recent.rss",
-					"international.rss",
-					"schweiz.rss"
-				],
-				type: "RSS",
-				helpers: ["avulsed_"]
+				sources: [
+					{
+						name: "NZZ",
+						url: "https://www.nzz.ch/",
+						endpoints: ["recent.rss", "international.rss", "schweiz.rss"],
+						helpers: ["avulsed_"]
+					}
+				]
 			},
 			{
 				code: "tr",
 				language: "turkish",
-				url: "https://www.trthaber.com/",
-				endpoints: [
-					"sondakika.rss"
-				],
-				type: "RSS",
-				helpers: ["caglapickaxe", "cgpx"]
+				sources: [
+					{
+						name: "TRT Haber",
+						url: "https://www.trthaber.com/",
+						endpoints: ["sondakika.rss"],
+						helpers: ["caglapickaxe", "cgpx"]
+					}
+				]
 			}
 		],
 
 		extra: {
-			exists: (code) => (
-				Boolean(this.staticData.definitions.find(i => i.code === code.toLowerCase()))
-			),
+			exists: (code) => Boolean(this.staticData.definitions.find(i => i.code === code.toLowerCase())),
 	
 			fetch: async (code, query) => {
 				const news = this.staticData.definitions.find(i => i.code === code.toLowerCase());
 				if (!news) {
 					throw new sb.Error({ message: "Extra news code does not exist!" });
 				}
-	
-				const url = news.url + sb.Utils.randArray(news.endpoints);
+
+				const source = sb.Utils.randArray(news.sources);
+				const cacheKey = `${news.code}-${source.name}`;
+				const cache = await sb.Cache.getByPrefix(this, { keys: { cacheKey } });
+				if (cache) {
+					return sb.Utils.randArray(cache);
+				}
+
+				const url = source.url + sb.Utils.randArray(source.endpoints);
 				const feed = await sb.Utils.parseRSS(url);
 	
 				if (query) {
@@ -214,18 +242,20 @@ module.exports = {
 						|| (i.content?.toLowerCase().includes(query))
 					));
 				}
-	
-				const article = sb.Utils.randArray(feed.items);
-				if (!article) {
-					return null;
-				}
-	
-				return {
-					title: article.title,
-					content: article.content,
-					link: article.link || article.url,
-					published: new sb.Date(article.pubDate)
-				};
+
+				const articles = feed.items.map(i => ({
+					title: i.title,
+					content: i.content,
+					link: i.link || i.url,
+					published: new sb.Date(i.pubDate)
+				}));
+
+				await sb.Cache.setByPrefix(this, articles, {
+					keys: { cacheKey },
+					expiry: 36e5
+				});
+
+				return sb.Utils.randArray(articles);
 			}
 		}
 	})),
@@ -355,9 +385,24 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { definitions } = values.getStaticData();
-		const extraNews = definitions.map(i => {
-			const helpers = (i.helpers.length > 0) ? i.helpers.join(", ") : "N/A";
-			return `<tr><td>${i.code.toUpperCase()}</td><td>${sb.Utils.capitalize(i.language)}</td><td>${helpers}</td></tr>`;
+		const extraNews = definitions.sort((a, b) => a.code.localeCompare(b.code)).map(def => {
+			const { code, language, sources } = def;
+			const helpers = [];
+			const links = [];
+
+			for (const source of sources) {
+				links.push(`<a href="${source.url}">${source.name}</a>`);
+				helpers.push(...source.helpers);
+			}
+
+			return sb.Utils.tag.trim `
+				<tr>
+					<td>${code.toUpperCase()}</td>
+					<td>${sb.Utils.capitalize(language)}</td>
+					<td>${links.join(" ")}
+					<td>${helpers.join(", ") || "N/A"}</td>
+				</tr>
+			`;
 		}).join("");
 		
 		return [
@@ -385,7 +430,7 @@ module.exports = {
 			"",
 	
 			"The following are special codes. Those were often 'helped' by people.",
-			"<table><thead><th>Code</th><th>Language</th><th>Helpers</th></thead>" + extraNews + "</table>",
+			"<table><thead><th>Code</th><th>Language</th><th>Sources</th><th>Helpers</th></thead>" + extraNews + "</table>",
 			""
 		];
 	})
