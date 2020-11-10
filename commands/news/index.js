@@ -430,20 +430,24 @@ module.exports = {
 		const { definitions } = values.getStaticData();
 		const extraNews = definitions.sort((a, b) => a.code.localeCompare(b.code)).map(def => {
 			const { code, language, sources } = def;
-			const helpers = [];
-			const links = [];
 
+			const links = [];
+			const helpers = [];
 			for (const source of sources) {
 				links.push(`<a href="${source.url}">${source.name}</a>`);
 				helpers.push(...source.helpers);
 			}
+
+			const uniqueHelpers = (helpers.size > 0)
+				? [...new Set(helpers)].join(", ")
+				: "N/A";
 
 			return sb.Utils.tag.trim `
 				<tr>
 					<td>${code.toUpperCase()}</td>
 					<td>${sb.Utils.capitalize(language)}</td>
 					<td>${links.join(" ")}
-					<td>${helpers.join(", ") || "N/A"}</td>
+					<td>${uniqueHelpers}</td>
 				</tr>
 			`;
 		}).join("");
