@@ -56,8 +56,14 @@ module.exports = {
 					{
 						name: "ABC",
 						url: "https://www.abc.es",
-						path: "rss/feeds/abc",
-						endpoints: ["_Economia.xml", "_opinioncompleto.xml", "_Cultura.xml", "_EspanaEspana.xml", "Portada.xml"],
+						path: "rss/feeds",
+						endpoints: [
+							"abc_Economia.xml",
+							"abc_opinioncompleto.xml",
+							"abc_Cultura.xml",
+							"abc_EspanaEspana.xml",
+							"abcPortada.xml"
+						],
 						helpers: []
 					}
 				]
