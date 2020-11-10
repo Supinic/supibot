@@ -121,7 +121,7 @@ module.exports = {
 				]
 			},
 			{
-				code: "et",
+				code: "ee",
 				language: "estonian",
 				sources: [
 					{
