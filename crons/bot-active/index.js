@@ -1,6 +1,7 @@
 module.exports = {
 	Name: "bot-active",
 	Expression: "0 */10 * * * *",
+	Description: "Pings the bot active API to make sure supibot is being registered as online",
 	Defer: null,
 	Type: "Bot",
 	Code: (async function verifyBotAcitivity () {

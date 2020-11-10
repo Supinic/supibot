@@ -1,6 +1,7 @@
 module.exports = {
 	Name: "refresh-twitch-app-access-token",
 	Expression: "0 0 12 * * *",
+	Description: "Refreshes the bot's Twitch app access token.",
 	Defer: null,
 	Type: "Bot",
 	Code: (async function refreshTwitchAppAccessToken () {

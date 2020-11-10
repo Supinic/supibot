@@ -1,6 +1,7 @@
 module.exports = {
 	Name: "posture-check",
 	Expression: "0 50 * * * *",
+	Description: "Check your posture!",
 	Defer: null,
 	Type: "Bot",
 	Code: (async function announceStayHydrated () {

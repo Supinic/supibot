@@ -1,6 +1,7 @@
 module.exports = {
 	Name: "active-chatters-log",
 	Expression: "0 */5 * * * *",
+	Description: "Logs the amount of currently active chatters.",
 	Defer: null,
 	Type: "Bot",
 	Code: (async function activeChattersLog () {

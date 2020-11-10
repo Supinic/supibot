@@ -1,6 +1,7 @@
 module.exports = {
 	Name: "active-poll",
 	Expression: "0 15,45 * * * *",
+	Description: "If a poll is running, announce it in chat every couple of minutes.",
 	Defer: null,
 	Type: "Bot",
 	Code: (async function announceActivePoll () {

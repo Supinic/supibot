@@ -1,6 +1,7 @@
 module.exports = {
 	Name: "charity-cookie",
 	Expression: "0 55 1 * * *",
+	Description: "Charity cookie - gives away a random cookie to random person who has the Extra_User_Data record, but has not eaten their cookie today - 5 minutes before the reset",
 	Defer: null,
 	Type: "Bot",
 	Code: (async function giveOutCharityCookie () {

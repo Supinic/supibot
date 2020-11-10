@@ -1,6 +1,7 @@
 module.exports = {
 	Name: "suggestion-notification-system",
 	Expression: "0 * * * * *",
+	Description: "Manages sending notifications about suggestions being changed. This is to notify users (via private system reminders) that their suggestion's status has changed.",
 	Defer: null,
 	Type: "Bot",
 	Code: (async function notifyOnSuggestionChange () {

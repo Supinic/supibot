@@ -1,6 +1,7 @@
 module.exports = {
 	Name: "stay-hydrated",
 	Expression: "0 20 * * * *",
+	Description: "Stay hydrated!",
 	Defer: null,
 	Type: "Bot",
 	Code: (async function announceStayHydrated () {

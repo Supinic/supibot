@@ -1,6 +1,7 @@
 module.exports = {
 	Name: "nodejs",
 	Expression: "0 0 */1 * * *",
+	Description: "Checks new releases of nodejs, and if one is detected, then posts it in chat.",
 	Defer: null,
 	Type: "Bot",
 	Code: (async function checkLastNodeVersion () {
