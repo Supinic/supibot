@@ -236,6 +236,26 @@ module.exports = {
 						helpers: ["caglapickaxe", "cgpx"]
 					}
 				]
+			},
+			{
+				code: "hu",
+				language: "hungarian",
+				sources: [
+					{
+						name: "Origo",
+						url: "https://www.origo.hu",
+						path: "contentpartner/rss/itthon",
+						endpoints: ["origo.xml"],
+						helpers: ["noiredayz"]
+					},
+					{
+						name: "Index.hu",
+						url: "https://index.hu",
+						path: "24ora",
+						endpoints: ["rss"],
+						helpers: ["noiredayz"]
+					}
+				]
 			}
 		],
 
