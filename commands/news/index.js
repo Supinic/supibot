@@ -446,7 +446,7 @@ module.exports = {
 				<tr>
 					<td>${code.toUpperCase()}</td>
 					<td>${sb.Utils.capitalize(language)}</td>
-					<td>${links.join(" ")}
+					<td>${links.join("<br>")}
 					<td>${uniqueHelpers}</td>
 				</tr>
 			`;
