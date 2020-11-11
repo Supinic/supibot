@@ -3,15 +3,13 @@ module.exports = {
 	Aliases: ["games","sg"],
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Posts the link to supinic's stream game list on Gist.",
+	Description: "Posts the link to supinic's stream game list on the website.",
 	Flags: ["developer","mention","pipe","system","whitelist"],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		gistID: "80356bcd26fe15010ffbe211e5131228"
-	})),
+	Static_Data: null,
 	Code: (async function streamGames () {
 		return {
-			reply: `https://gist.github.com/Supinic/${this.staticData.gistID}`
+			reply: `Check out supi's stream game list here! https://supinic.com/stream/game/list`
 		};
 	}),
 	Dynamic_Description: null
