@@ -132,12 +132,14 @@ module.exports = {
 				name: "monkaOMEGA",
 				type: "method",
 				aliases: [],
+				description: "Replaces every \"o\" and \"0\" with the monkaOMEGA emote",
 				data: (message) => message.replace(/[oOｏＯоО]/g, " monkaOMEGA ")
 			},
 			{
 				name: "OMEGALUL",
 				type: "method",
 				aliases: [],
+				description: "Replaces every \"o\" and \"0\" with the OMEGALUL emote",
 				data: (message) => message.replace(/[oOｏＯоО]/g, " OMEGALUL ")
 			},
 			{
@@ -166,6 +168,7 @@ module.exports = {
 				name: "random",
 				type: "method",
 				aliases: [],
+				description: "Picks a random different text transform and applies it",
 				data: (message) => {
 					const random = sb.Utils.randArray(types.filter(i => i.name !== "random"));
 					return convert[random.type](message, random.data);
@@ -175,6 +178,7 @@ module.exports = {
 				name: "antiping",
 				type: "method",
 				aliases: [],
+				description: "Every word will have an invisible character added, so that it does not mention users in e.g. Chatterino.",
 				data: (message) => {
 					return message.split(" ").map(word => {
 						if (/^\w+$/.test(word)) {
@@ -190,6 +194,7 @@ module.exports = {
 				name: "trim",
 				type: "method",
 				aliases: [],
+				description: "Removes all whitespace from the message - spaces, tabs, newlines, ...",
 				data: (message) => message.replace(/\s+/g, "")
 			},
 			{
@@ -220,6 +225,7 @@ module.exports = {
 				name: "box",
 				type: "method",
 				aliases: ["boxes"],
+				description: "Attempts to wrap letters in a box-like thing. Might not work with all fonts.",
 				data: (message) => {
 					const arr = [];
 					const combine = String.fromCharCode(0xFE0F);
@@ -241,6 +247,7 @@ module.exports = {
 				name: "spongebob",
 				type: "method",
 				aliases: ["mock", "mocking", "spongemock"],
+				description: "Randomly capitalizes and lowercases character in the message to make it look as if mocking someone.",
 				data: (message) => Array.from(message).map(char => {
 					if (/[a-zA-Z]/.test(char)) {
 						return sb.Utils.random(0, 1) ? char.toUpperCase() : char.toLowerCase();
@@ -340,7 +347,7 @@ module.exports = {
 				? ""
 				: ` (${transform.aliases.join(", ")})`;
 	
-			return `<li><code>${transform.name}${aliases}</code><br>${description}<br>${message}</li>`;
+			return `<li><code>${transform.name}${aliases}</code><br>${description}<br><code>${message}</code></li>`;
 		});
 	
 		return [
