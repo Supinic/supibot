@@ -347,7 +347,14 @@ module.exports = {
 				? ""
 				: ` (${transform.aliases.join(", ")})`;
 	
-			return `<li><code>${transform.name}${aliases}</code><br>${description}<br><code>${message}</code></li>`;
+			return sb.Utils.tag.trim `
+				<li>
+					<code>${transform.name}${aliases}</code>
+					<ul>
+						<li>${description}</li>
+						<li>${message}</li>
+				</li>
+			`;
 		});
 	
 		return [
