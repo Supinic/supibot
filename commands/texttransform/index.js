@@ -340,7 +340,7 @@ module.exports = {
 				? ""
 				: ` (${transform.aliases.join(", ")})`;
 	
-			return `<li><code>${transform.name}${aliases}</code><br${description}<br>${message}</li>`;
+			return `<li><code>${transform.name}${aliases}</code><br>${description}<br>${message}</li>`;
 		});
 	
 		return [
