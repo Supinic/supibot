@@ -53,7 +53,26 @@ module.exports = class ClassTemplate {
 
 		return { string };
 	}
+	
+	async getCacheData (key) {
+		return sb.Cache.getByPrefix(this.getCacheKey(), {
+			keys: { ...key }
+		});
+	}
 
+	async setCacheData (key, value, options = {}) {
+		if (typeof value === "undefined") {
+			throw new sb.Error({
+				message: "Value must be passed to cache"
+			});
+		}
+		
+		return sb.Cache.setByPrefix(this.getCacheKey(), value, {
+			keys: { ...key },
+			...options
+		});
+	}
+	
 	static async initialize () {
 		await this.loadData();
 		return this;
