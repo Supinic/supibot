@@ -194,7 +194,7 @@ module.exports = {
 				name: "trim",
 				type: "method",
 				aliases: [],
-				description: "Removes all whitespace from the message - spaces, tabs, newlines, ...",
+				description: "Removes all whitespace from the message - spaces, tabs, newlines and so on.",
 				data: (message) => message.replace(/\s+/g, "")
 			},
 			{
@@ -247,7 +247,7 @@ module.exports = {
 				name: "spongebob",
 				type: "method",
 				aliases: ["mock", "mocking", "spongemock"],
-				description: "Randomly capitalizes and lowercases character in the message to make it look as if mocking someone.",
+				description: "Randomly capitalizes and lowercases characters in the message to make it look as if mocking someone.",
 				data: (message) => Array.from(message).map(char => {
 					if (/[a-zA-Z]/.test(char)) {
 						return sb.Utils.random(0, 1) ? char.toUpperCase() : char.toLowerCase();
