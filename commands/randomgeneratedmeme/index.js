@@ -263,7 +263,7 @@ module.exports = {
 		}
 	
 		const { ID, name } = sb.Utils.randArray(this.staticData.memes);
-		const { texts } = await sb.Got.instances.FakeAgent({
+		const { statusCode, body: data } = await sb.Got.instances.FakeAgent({
 			method: "POST",
 			url: "https://imgflip.com/ajax_ai_meme",
 			headers: {
@@ -276,10 +276,19 @@ module.exports = {
 				.set("__cookie_enabled", "1")
 				.set("__tok", this.data.token)
 				.toString()
-		}).json();
+		});
+
+		if (!Array.isArray(data.texts)) {
+			console.warn("rgm no text", { statusCode, data });
+
+			return {
+				success: false,
+				reply: "Could not fetch any text from this meme!"
+			};
+		}
 	
 		return {
-			reply: `${name}: ${texts.join(" - ")}`
+			reply: `${name}: ${data.texts.join(" - ")}`
 		};	
 	}),
 	Dynamic_Description: null
