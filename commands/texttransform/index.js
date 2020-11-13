@@ -353,6 +353,7 @@ module.exports = {
 					<ul>
 						<li>${description}</li>
 						<li>${message}</li>
+					</ul>
 				</li>
 			`;
 		});
