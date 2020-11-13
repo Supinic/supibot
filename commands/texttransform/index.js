@@ -249,6 +249,34 @@ module.exports = {
 					}
 				}).join("")
 			},
+			{
+				name: "typoglycemia",
+				type: "method",
+				aliases: ["tg", "jumble"],
+				description: "Shuffles a message to make it typoglycemic. This means that every word with 4+ characters will have all of its letters shuffled, except the first and last one.",
+				data: (message) => {
+					const result = [];
+					for (const word of message.split(/\b/)) {
+						const stripped = sb.Utils.removeAccents(word);
+						if (/[^a-z]/i.test(stripped)) {
+							result.push(word);
+							continue;
+						}
+
+						const scrambled = [];
+						const chars = word.slice(1, -1).split("");
+						while (chars.length > 0) {
+							const randomIndex = sb.Utils.random(0, chars.length - 1);
+							scrambled.push(chars[randomIndex]);
+							chars.splice(randomIndex, 1);
+						}
+
+						result.push(`${word[0]}${scrambled.join("")}${word[word.length - 1]}`);
+					}
+
+					return result.join("");
+				}
+			}
 		];
 	
 		return {
@@ -306,12 +334,13 @@ module.exports = {
 		const lorem = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
 		const { types, convert } = values.getStaticData();
 		const examples = types.sort((a, b) => a.name.localeCompare(b.name)).map(transform => {
+			const description = transform.description ?? "(no description)";
 			const message = convert[transform.type](lorem, transform.data ?? null);
 			const aliases = (transform.aliases.length === 0)
 				? ""
 				: ` (${transform.aliases.join(", ")})`;
 	
-			return `<li><code>${transform.name}${aliases}</code><br>${message}</li>`;
+			return `<li><code>${transform.name}${aliases}</code><br${description}<br>${message}</li>`;
 		});
 	
 		return [
