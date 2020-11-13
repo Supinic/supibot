@@ -265,6 +265,7 @@ module.exports = {
 		const { ID, name } = sb.Utils.randArray(this.staticData.memes);
 		const { statusCode, body: data } = await sb.Got.instances.FakeAgent({
 			method: "POST",
+			responseType: "json",
 			url: "https://imgflip.com/ajax_ai_meme",
 			headers: {
 				"content-type": "application/x-www-form-urlencoded; charset=UTF-8",
