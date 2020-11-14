@@ -170,5 +170,39 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => {
+		return [
+			"Blocks a specified user from using the specified command with you as the parameter",
+			"",
+
+			`<code><u>Simple mode</u></code>`,
+			`<code>${prefix}block Kappa rl</code>`,
+			`Blocks the user <code>Kappa from using the command rl on you. They can't do <code>$rl (you)</code>`,
+			"",
+
+			`<code><u>Total mode</u></code>`,
+			`<code>${prefix}block Kappa all</code>`,
+			`Blocks user Kappa from all current and future commands that support blocking people.`,
+			"",
+
+			`<code><u>Advanced mode</u></code>`,
+			`<code>${prefix}block user:(usr) channel:(chn) command:(cmd) platform:(p)</code>`,
+			`Will opt you out from a specified combination of channel/command/platform.`,
+			"E.g.:",
+			`<ul>
+				<li> 
+					<code>${prefix}block command:rl user:Kappa channel:supibot</code>
+					Blocks user Kappa from command rl only in channel "supibot".
+				</li>
+				<li> 
+					<code>${prefix}block command:rl user:Kappa platform:twitch</code>
+					Blocks user Kappa from command rl, but only on Twitch.
+				</li>
+				<li> 
+					<code>${prefix}block user:Kappa channel:supibot</code>
+					Blocks Kappa from all block-able commands, but only in channel "supibot".
+				</li>
+			</ul>`,
+		];
+	})
 };
