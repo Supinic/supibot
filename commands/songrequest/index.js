@@ -37,7 +37,9 @@ module.exports = {
 					"02ip.ru",
 					"ezstat.ru"
 				],
-				tracks: [],
+				tracks: [
+					"LVCIU5x_zIk"
+				],
 				authors: [
 					"UCeM9xfry6R09FxPZgRV1XcA"
 				]
@@ -81,7 +83,7 @@ module.exports = {
 						};
 					}
 	
-					const { Self_Name: botName, client, controller } = sb.Platform.get("cytube");
+					const { Self_Name: botName, controller } = sb.Platform.get("cytube");
 					const playlist = [
 						controller.currentlyPlaying,
 						...controller.playlistData
