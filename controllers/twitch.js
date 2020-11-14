@@ -67,35 +67,36 @@ module.exports = class Twitch extends require("./template.js") {
 				Description: "Fetches the online status of all active Twitch channels. Basically, just caches the current status so that further API calls are not necessary.",
 				Defer: {
 					start: 0,
-					end: 60000
+					end: 30000
 				},
 				Code: async () => {
-					const channelList = sb.Channel.getJoinableForPlatform("twitch").filter(i => i.Data.emitLiveEvents === true);
-					const { streams } = await sb.Got.instances.Twitch.Kraken({
-						url: "streams",
-						searchParams: new sb.URLParams()
-							.set("channel", channelList.map(i => i.Specific_ID).filter(Boolean).join(","))
-							.set("limit", "100")
-							.toString()
-					}).json();
+					const channelList = sb.Channel.getJoinableForPlatform("twitch")
+						.filter(i => i.Specific_ID)
+						.map(i => i.Specific_ID);
 
-					if (streams.length === 100) {
-						let offset = 100;
-						let finished = false;
-						while (!finished) {
-							const data = await sb.Got.instances.Twitch.Kraken({
+					let counter = 0;
+					const batchSize = 250;
+					const promises = [];
+					while (counter < channelList.length) {
+						const slice = channelList.slice(counter, counter + batchSize);
+						promises.push(
+							sb.Got.instances.Twitch.Kraken({
 								url: "streams",
+								responseType: "json",
 								searchParams: new sb.URLParams()
-									.set("channel", channelList.map(i => i.Specific_ID).filter(Boolean).join(","))
+									.set("channel", slice.join(","))
 									.set("limit", "100")
-									.set("offset", String(offset))
 									.toString()
-							}).json();
+							})
+						);
 
-							streams.push(...data.streams);
-							offset += 100;
-							finished = (data.streams.length < 100);
-						}
+						counter += batchSize;
+					}
+
+					const streams = [];
+					const results = await Promise.all(promises);
+					for (const partialResult of results) {
+						streams.push(...partialResult.body.streams);
 					}
 
 					for (const channel of channelList) {
