@@ -177,7 +177,7 @@ module.exports = {
 
 			`<code><u>Simple mode</u></code>`,
 			`<code>${prefix}block Kappa rl</code>`,
-			`Blocks the user <code>Kappa from using the command rl on you. They can't do <code>$rl (you)</code>`,
+			`Blocks the user Kappa from using the command rl on you. They can't do <code>$rl (you)</code>`,
 			"",
 
 			`<code><u>Total mode</u></code>`,
