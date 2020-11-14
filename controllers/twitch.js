@@ -70,15 +70,13 @@ module.exports = class Twitch extends require("./template.js") {
 					end: 30000
 				},
 				Code: async () => {
-					const channelList = sb.Channel.getJoinableForPlatform("twitch")
-						.filter(i => i.Specific_ID)
-						.map(i => i.Specific_ID);
-
 					let counter = 0;
-					const batchSize = 250;
 					const promises = [];
+					const batchSize = 250;
+					const channelList = sb.Channel.getJoinableForPlatform("twitch").filter(i => i.Specific_ID);
+
 					while (counter < channelList.length) {
-						const slice = channelList.slice(counter, counter + batchSize);
+						const slice = channelList.slice(counter, counter + batchSize).map(i => i.Specific_ID);
 						promises.push(
 							sb.Got.instances.Twitch.Kraken({
 								url: "streams",
