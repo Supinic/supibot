@@ -19,7 +19,7 @@ module.exports = {
 					await fs.mkdir(dir);
 				}
 
-				let row = await sb.Query.getRow("chat_data", options.table);
+				let row = await sb.Query.getRow(options.database, options.table);
 				let save = false;
 				try {
 					await row.load(item.ID);
@@ -80,7 +80,7 @@ module.exports = {
 				}
 
 				const liveItem = options.module.get(item);
-				const row = await sb.Query.getRow("chat_data", options.table);
+				const row = await sb.Query.getRow(options.database, options.table);
 				if (liveItem) {
 					await row.load(liveItem.ID);
 				}
@@ -146,6 +146,7 @@ module.exports = {
 					const promises = commands.map(async (command) => {
 						const result = await helpers.save(command, {
 							dir: "commands",
+							database: "chat_data",
 							table: "Command",
 							now
 						});
@@ -175,6 +176,7 @@ module.exports = {
 					const promises = commandDirs.map(async (command) => {
 						const result = await helpers.load(command, {
 							dir: "commands",
+							database: "chat_data",
 							table: "Command",
 							name: "command",
 							module: sb.Command,
@@ -238,6 +240,7 @@ module.exports = {
 					const promises = modules.map(async (chatModule) => {
 						const result = await helpers.save(chatModule, {
 							dir: "chat-modules",
+							database: "chat_data",
 							table: "Chat_Module",
 							now
 						});
@@ -267,6 +270,7 @@ module.exports = {
 					const promises = moduleDirs.map(async (chatModule) => {
 						const result = await helpers.load(chatModule, {
 							dir: "chat-modules",
+							database: "chat_data",
 							table: "Chat_Module",
 							name: "chat module",
 							module: sb.ChatModule,
@@ -315,6 +319,7 @@ module.exports = {
 					const promises = crons.map(async (cron) => {
 						const result = await helpers.save(cron, {
 							dir: "crons",
+							database: "chat_data",
 							table: "Cron",
 							now
 						});
@@ -344,6 +349,86 @@ module.exports = {
 					const promises = cronDirs.map(async (cron) => {
 						const result = await helpers.load(cron, {
 							dir: "crons",
+							database: "chat_data",
+							table: "Cron",
+							name: "cron",
+							module: sb.Cron,
+							jsonify: [],
+							functionify: ["Code", "Defer"]
+						});
+
+						if (result.updated) {
+							updated.push(result.name);
+						}
+						else if (result.added) {
+							added.push(result.name);
+						}
+					});
+
+					await Promise.all(promises);
+
+					if (added.length > 0 || updated.length > 0) {
+						await sb.Cron.reloadData();
+					}
+
+					return {
+						reply: (updated.length === 0)
+							? `No changes detected, no crons were loaded peepoNerdDank 👆`
+							: `Loaded ${updated.length} and added ${added.length} crons from spm peepoHackies`
+					};
+				}
+			},
+			{
+				name: "got",
+				aliases: ["gots", "got-instance"],
+				dump: async (context, helpers, ...args) => {
+					const now = new sb.Date();
+					const updated = [];
+					const crons = (args.length > 0)
+						? args.map(i => sb.Cron.get(i)).filter(Boolean)
+						: sb.Cron.data;
+
+					if (crons.length === 0) {
+						return {
+							success: false,
+							reply: "No valid crons provided!"
+						};
+					}
+
+					const promises = crons.map(async (cron) => {
+						const result = await helpers.save(cron, {
+							dir: "crons",
+							database: "chat_data",
+							table: "Cron",
+							now
+						});
+
+						if (result.updated) {
+							updated.push(cron.Name);
+						}
+					});
+
+					await Promise.all(promises);
+
+					updated.sort();
+					const suffix = (updated.length === 0) ? "" : "s";
+					return {
+						reply: (updated.length === 0)
+							? `No changes detected, nothing was saved peepoNerdDank 👆`
+							: `Saved ${updated.length} cron${suffix} into spm/crons peepoHackies`
+					};
+				},
+				load: async (context, helpers, ...args) => {
+					const updated = [];
+					const added = [];
+					const cronDirs = (args.length > 0)
+						? args.map(i => sb.Cron.get(i)?.Name ?? i)
+						: await helpers.fs.readdir("/code/spm/crons");
+
+					const promises = cronDirs.map(async (cron) => {
+						const result = await helpers.load(cron, {
+							dir: "crons",
+							database: "chat_data",
 							table: "Cron",
 							name: "cron",
 							module: sb.Cron,
