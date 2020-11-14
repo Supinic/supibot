@@ -192,14 +192,17 @@ module.exports = {
 			`<ul>
 				<li> 
 					<code>${prefix}block command:rl user:Kappa channel:supibot</code>
+					<br>
 					Blocks user Kappa from command rl only in channel "supibot".
 				</li>
 				<li> 
 					<code>${prefix}block command:rl user:Kappa platform:twitch</code>
+					<br>
 					Blocks user Kappa from command rl, but only on Twitch.
 				</li>
 				<li> 
 					<code>${prefix}block user:Kappa channel:supibot</code>
+					<br>
 					Blocks Kappa from all block-able commands, but only in channel "supibot".
 				</li>
 			</ul>`,
