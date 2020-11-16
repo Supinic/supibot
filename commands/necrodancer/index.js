@@ -6,30 +6,57 @@ module.exports = {
 	Description: "Download an audio file to play with Crypt of the Necrodancer.",
 	Flags: ["mention","pipe","whitelist"],
 	Whitelist_Response: null,
-	Static_Data: null,
-	Code: (async function necrodancer (context, link) {
+	Static_Data: (() => ({
+		zones: [
+			"lobby",
+			"1-1", "1-2", "1-3",
+			"2-1", "2-2", "2-3",
+			"3-1", "3-2", "3-3",
+			"4-1", "4-2", "4-3",
+			"5-1", "5-2", "5-3",
+			"conga", "chess", "bass", "metal", "mole"
+		]
+	})),
+	Code: (async function necrodancer (context, link, zone) {
+		if (context.channel?.ID !== 38) {
+			return {
+				success: false,
+				reply: "This shouldn't happen, but the command cannot be used here!"
+			};
+		}
+
+		const { zones } = this.staticData;
 		if (!link) {
 			return {
-				reply: "Guidelines for Necrodancer songs here: https://pastebin.com/K4n151xz",
+				reply: "Check the basic guidelines for Necrodancer songs here: https://pastebin.com/K4n151xz TL;DR - not too fast, not too slow, not too short." ,
 				cooldown: 2500
 			};
 		}
-	
-		let data = null;
-		try {
-			data = await sb.Utils.linkParser.fetchData(link);
+		else if (!zone) {
+			return {
+				success: false,
+				reply: "No game zone provided! Use one of: " + zones.join(", "),
+				cooldown: 2500
+			};
 		}
-		catch {
-			return { reply: "Link is not parsable!" };
+
+		zone = zone.toLowerCase();
+		if (!zones.includes(zone)) {
+			return {
+				success: false,
+				reply: "Invalid zone provided! Use one of: " + zones.join(", ")
+			};
 		}
-	
-		const name = encodeURIComponent(data.name + " by " + context.user.Name);
-		const url = `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}?necrodancer=${data.link}&name=${name}`;
+
+		const data = JSON.stringify({ link, zone });
+		const url = `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}?necrodancer=${data}`;
 		
-		await context.channel.send("Downloading has started! Please wait...");
+		await context.channel.send("Download + beat mapping + saving started! Please wait...");
 		await sb.Got(url);
 	
-		return { reply: "Downloaded successfully :)" };
+		return {
+			reply: "Downloaded + beat mapped successfully! AlienPls"
+		};
 	}),
 	Dynamic_Description: null
 };
