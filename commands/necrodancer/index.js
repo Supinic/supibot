@@ -2,7 +2,7 @@ module.exports = {
 	Name: "necrodancer",
 	Aliases: null,
 	Author: "supinic",
-	Cooldown: 60000,
+	Cooldown: 10000,
 	Description: "Download an audio file to play with Crypt of the Necrodancer.",
 	Flags: ["mention","pipe","whitelist"],
 	Whitelist_Response: null,
