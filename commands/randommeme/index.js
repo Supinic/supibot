@@ -142,11 +142,18 @@ module.exports = {
 		const subreddit = (args.shift() ?? sb.Utils.randArray(this.staticData.defaultMemeSubreddits)).toLowerCase();
 		if (!this.data.subreddits[subreddit]) {
 			const { statusCode, body: response } = await sb.Got.instances.Reddit(subreddit + "/about.json");
-			if (statusCode !== 200) {
+			if (statusCode === 404) {
+				this.data.subreddits[subreddit] = new this.staticData.Subreddit({});
+				return {
+					success: false,
+					reply: `That subreddit does not exist!`
+				};
+			}
+			else if (statusCode !== 200) {
 				throw new sb.errors.APIError({
 					statusCode,
 					apiName: "RedditAPI"
-				})
+				});
 			}
 
 			this.data.subreddits[subreddit] = new this.staticData.Subreddit(response);
