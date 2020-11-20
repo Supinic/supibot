@@ -302,15 +302,16 @@ module.exports = {
 				
 				${(ratios.apm)
 					? `This is ${group(ratios.apm)} active cases, `
-					: `This is `
+					: ""
 				}
 
 				${(ratios.cpm)
-				? (ratios.tpm)
-					? ` ${group(ratios.cpm)} cases, ${group(ratios.dpm)} deaths, and ${group(ratios.tpm)} tests per million.`
-					: ` ${group(ratios.cpm)} cases, and ${group(ratios.dpm)} deaths per million.`
-				: ""
-			}`
+					? (ratios.tpm)
+						? ` ${group(ratios.cpm)} cases, ${group(ratios.dpm)} deaths, and ${group(ratios.tpm)} tests per million.`
+						: ` ${group(ratios.cpm)} cases, and ${group(ratios.dpm)} deaths per million.`
+					: ""
+				}
+			`
 		};
 	}),
 	Dynamic_Description: (async (prefix, values) => {
