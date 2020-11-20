@@ -483,7 +483,7 @@ module.exports = {
 				reply: "Invalid operation target provided"
 			};
 		}
-		else if (!definition[operation]) {
+		else if (!definition?.[operation]) {
 			return {
 				success: false,
 				reply: `spm ${type} does not have functionality for the "${operation}" operation`
