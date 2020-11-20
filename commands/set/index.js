@@ -481,6 +481,76 @@ module.exports = {
 							reply: `Link ${link} successfully updated with flags ${flags.sort().join(", ")}.`
 						};
 					}
+				},
+				{
+					names: "tlbl",
+					aliases: ["twitchlottoblacklist"],
+					parameter: "arguments",
+					description: `If you are the channel ambassador/owner, you can decide what flags should be blacklisted. Each usage removes the previous ones, so always use a full list.`,
+					set: async (context, ...flags) => {
+						if (!context.channel) {
+							return {
+								success: false,
+								reply: "You cannot use the command here!"
+							};
+						}
+
+						// const flagger = Boolean(context.user.Data.trustedTwitchLottoFlagger); // skipped for now
+						const ambassador = context.channel.isUserAmbassador(context.user);
+						const owner = context.channel.isUserChannelOwner(context.user);
+						if (!ambassador && !owner) {
+							return {
+								success: false,
+								reply: `You cannot do that here!`
+							};
+						}
+						else if (flags.length === 0) {
+							return {
+								success: false,
+								reply: `If you want to remove all flags, use $unset instead!`
+							};
+						}
+
+						const suitableFlags = flags.filter(i => availableFlags.includes(sb.Utils.capitalize(i)));
+						if (suitableFlags.length === 0) {
+							return {
+								success: false,
+								reply: `No suitable flags provided!`
+							};
+						}
+
+						context.channel.Data.twitchLottoBlacklistedFlags = suitableFlags;
+						await context.channel.saveProperty("Data");
+
+						return {
+							reply: `Blacklisted flags successfully updated for this channel.`
+						};
+					},
+					unset: async (context) => {
+						if (!context.channel) {
+							return {
+								success: false,
+								reply: "You cannot use the command here!"
+							};
+						}
+
+						// const flagger = Boolean(context.user.Data.trustedTwitchLottoFlagger); // skipped for now
+						const ambassador = context.channel.isUserAmbassador(context.user);
+						const owner = context.channel.isUserChannelOwner(context.user);
+						if (!ambassador && !owner) {
+							return {
+								success: false,
+								reply: `You cannot do that here!`
+							};
+						}
+
+						context.channel.Data.twitchLottoBlacklistedFlags = [];
+						await context.channel.saveProperty("Data");
+
+						return {
+							reply: `Blacklisted flags successfully removed.`
+						};
+					}
 				}
 			]
 		};
