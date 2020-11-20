@@ -219,7 +219,7 @@ module.exports = {
 			targetData = this.staticData.sumObjectArray(targetData);
 		}
 	
-		let intro = null;
+		let intro;
 		if (region && !country) {
 			intro = prettyRegion;
 		}
