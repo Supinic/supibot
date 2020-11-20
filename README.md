@@ -32,5 +32,5 @@ It's a really good app to use on the go, and I endorse it.
 
 ## Further reading
 - [Bot feature overview](docs/features.md)
-- [Command docs + how to make your own](docs/command.md)
+- [Command docs + how to make your own](https://github.com/Supinic/supibot-package-manager/blob/master/docs/commands.md)
 - [Website API with bot data](docs/api.md)
