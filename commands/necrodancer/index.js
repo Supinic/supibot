@@ -71,5 +71,5 @@ module.exports = {
 			"Zone list:",
 			"<ul>" + zones.map(i => `<li>${i}</li>`) + "</ul>"
 		];
-	})()
+	})
 };
