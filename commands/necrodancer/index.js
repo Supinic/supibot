@@ -69,7 +69,7 @@ module.exports = {
 			"",
 
 			"Zone list:",
-			"<ul>" + zones.map(i => `<li>${i}</li>`) + "</ul>"
+			"<ul>" + zones.map(i => `<li>${i}</li>`).join("") + "</ul>"
 		];
 	})
 };
