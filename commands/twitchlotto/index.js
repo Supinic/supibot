@@ -196,6 +196,15 @@ module.exports = {
 			detectionsString.push(...strings);
 		}
 
+		const blacklistedFlags = context.channel.Data.twitchLottoBlacklistedFlags ?? [];
+		const illegalFlags = image.Adult_Flags.map(i => i.toLowerCase()).filter(i => blacklistedFlags.includes(i));
+		if (illegalFlags.length > 0) {
+			return {
+				success: false,
+				reply: "Cannot post image! These flags are blacklisted: " + illegalFlags.join(", ")
+			};
+		}
+
 		const flagsString = (image.Adult_Flags)
 			? `Manual NSFW flags: ${image.Adult_Flags.join(", ")}`
 			: "";
