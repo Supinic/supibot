@@ -500,6 +500,16 @@ module.exports = class Command extends require("./template.js") {
 					reply: `${statusCode}: Couldn't execute command because ${apiName} failed! This is not my fault :)`
 				};
 			}
+			else if (e instanceof sb.errors.GenericRequestError) {
+				const { hostname, message, statusCode, statusMessage } = e;
+				console.warn("Command request error", { hostname, message, statusCode, statusMessage });
+
+				execution = {
+					success: false,
+					reason: "generic-request-error",
+					reply: `Third party ${hostname} failed: ${message ?? "(no message)"}`
+				};
+			}
 			else {
 				console.error(e);
 				if (typeof command.ID === "number") {
