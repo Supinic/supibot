@@ -13,7 +13,7 @@ module.exports = {
 			month: "long"
 		});
 	
-		const availableFlags = ["Anime", "Animal", "Disfigured", "Disturbing", "Drawn", "Furry", "Gore", "Hentai", "Human", "Language", "None", "Porn", "Scat", "Softcore"];
+		const availableFlags = ["anime", "animal", "disfigured", "disturbing", "drawn", "furry", "gore", "hentai", "human", "language", "none", "porn", "scat", "softcore"];
 		const handleAmbassadors = async (type, context, ...args) => {
 			const [user, channel = context.channel?.Name] = args;
 			if (!user || !channel) {
@@ -83,6 +83,7 @@ module.exports = {
 		};
 	
 		return {
+			availableFlags,
 			variables: [
 				{
 					names: "ambassador",
@@ -438,8 +439,8 @@ module.exports = {
 								reply: `No link provided!`
 							};
 						}
-	
-						flags = flags.filter(i => availableFlags.includes(sb.Utils.capitalize(i)));
+
+						flags = flags.filter(i => availableFlags.includes(i.toLowerCase()));
 						if (flags.length === 0) {
 							return {
 								success: false,
@@ -511,7 +512,7 @@ module.exports = {
 							};
 						}
 
-						const suitableFlags = flags.filter(i => availableFlags.includes(sb.Utils.capitalize(i)));
+						const suitableFlags = flags.filter(i => availableFlags.includes(i.toLowerCase()));
 						if (suitableFlags.length === 0) {
 							return {
 								success: false,
@@ -519,7 +520,7 @@ module.exports = {
 							};
 						}
 
-						context.channel.Data.twitchLottoBlacklistedFlags = suitableFlags;
+						context.channel.Data.twitchLottoBlacklistedFlags = suitableFlags.map(i => i.toLowerCase());
 						await context.channel.saveProperty("Data");
 
 						return {
