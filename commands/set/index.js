@@ -421,7 +421,7 @@ module.exports = {
 					}
 				},
 				{
-					names: ["twitchlotto"],
+					names: "twitchlotto",
 					aliases: ["tl"],
 					parameter: "arguments",
 					description: `If you have been nominated as a TwitchLotto-trusted user, you can then set flags to TL links. Available flags: <code>${availableFlags.join(", ")}</code>`,
