@@ -85,7 +85,8 @@ module.exports = {
 		return {
 			variables: [
 				{
-					names: ["ambassador"],
+					names: "ambassador",
+					aliases: [],
 					adminOnly: true,
 					parameter: "arguments",
 					description: `Designates a user as an "Ambassador" in a specific channel, which grants them elevated access to some Supibot commands.`,
@@ -93,7 +94,8 @@ module.exports = {
 					unset: (context, ...args) => handleAmbassadors("unset", context, ...args)
 				},
 				{
-					names: ["notify", "reminder"],
+					names: "reminder",
+					aliases: ["notify", "reminders", "notification", "notifications"],
 					parameter: "ID",
 					description: "Unsets an active reminder either set by you, or for you.",
 					getLastID: (context) => sb.Query.getRecordset(rs => rs
@@ -153,7 +155,8 @@ module.exports = {
 					}
 				},
 				{
-					names: ["suggest", "suggestion"],
+					names: "suggestion",
+					aliases: ["suggest", "suggestions"],
 					parameter: "ID",
 					description: "Marks an active suggestion created by you to be \"Dismissed by author\", therefore removing it from the list of active suggestions.",
 					getLastID: (context) => sb.Query.getRecordset(rs => rs
@@ -207,7 +210,8 @@ module.exports = {
 					}
 				},
 				{
-					names: ["location"],
+					names: "location",
+					aliases: [],
 					parameter: "arguments",
 					description: `Sets/unsets your IRL location. If you add the keyword "private", it's going to be hidden. This location is used in commands such as weather, time, and others.`,
 					set: async (context, ...args) => {
@@ -292,7 +296,8 @@ module.exports = {
 					}
 				},
 				{
-					names: ["gc"],
+					names: "gc",
+					aliases: [],
 					parameter: "ID",
 					description: "If you made a mistake with the gc command, you can use this to remove a track from the todo list.",
 					unset: async (context, ID) => {
@@ -338,7 +343,8 @@ module.exports = {
 					}
 				},
 				{
-					names: ["discord"],
+					names: "discord",
+					aliases: [],
 					elevatedChannelAccess: true,
 					parameter: "arguments",
 					description: "If you're the channel owner or a channel ambassador, you can use this to set the response of the discord command.",
@@ -360,7 +366,8 @@ module.exports = {
 					}
 				},
 				{
-					names: ["birthday", "bday"],
+					names: "birthday",
+					aliases: ["bday"],
 					parameter: "arguments",
 					description: "Lets you set your birthday (only day and month!) for use in other commands, like $horoscope.",
 					set: async (context, ...args) => {
@@ -414,7 +421,8 @@ module.exports = {
 					}
 				},
 				{
-					names: ["tl", "twitchlotto"],
+					names: ["twitchlotto"],
+					aliases: ["tl"],
 					parameter: "arguments",
 					description: `If you have been nominated as a TwitchLotto-trusted user, you can then set flags to TL links. Available flags: <code>${availableFlags.join(", ")}</code>`,
 					set: async (context, link, ...flags) => {
@@ -488,7 +496,7 @@ module.exports = {
 		const { invocation } = context;
 		type = type.toLowerCase();
 	
-		const target = this.staticData.variables.find(i => i.names.includes(type));
+		const target = this.staticData.variables.find(i => type === i.name || i.aliases.includes(type));
 		if (!target) {
 			return {
 				success: false,
@@ -597,9 +605,9 @@ module.exports = {
 	Dynamic_Description: (async (prefix, values) => {
 		const { variables } = values.getStaticData();
 		const list = variables.map(i => {
-			let names = i.names[0];
-			if (i.names.lenght > 1) {
-				names += `(${i.names.slice(1).join(", ")})`;
+			let names = i.name;
+			if (i.aliases.length > 0) {
+				names += `(${i.aliases.join(", ")})`;
 			}
 	
 			const types = [
