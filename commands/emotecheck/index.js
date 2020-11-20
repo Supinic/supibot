@@ -398,6 +398,46 @@ module.exports = {
 					"Samurai2077",
 					"TwitchGlitch"
 				]
+			},
+			{
+				name: "hype2020",
+				aliases: [],
+				description: "Another set of Hype train emotes, this time, available since November 2020",
+				notes: "No blogpost provided, emotes sourced from: https://sikorsky.rosuav.com/checklist",
+				emotes: [
+					"HypeBard",
+					"HypeBook",
+					"HypeCash",
+					"HypeCoin",
+					"HypeFighter",
+					"HypeGG",
+					"HypeGems",
+					"HypeHeart",
+					"HypeHit",
+					"HypeJuggle",
+					"HypeKick",
+					"HypeLol",
+					"HypeLol",
+					"HypeMage",
+					"HypeMiss",
+					"HypePotion",
+					"HypeRIP",
+					"HypeRanger",
+					"HypeRock",
+					"HypeRock",
+					"HypeRogue",
+					"HypeRun",
+					"HypeShield",
+					"HypeSmoke",
+					"HypeSneak",
+					"HypeSwipe",
+					"HypeTarget",
+					"HypeTune",
+					"HypeWho",
+					"HypeWink",
+					"HypeWut",
+					"HypeZzz"
+				]
 			}
 		]
 	})),
