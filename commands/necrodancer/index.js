@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Download an audio file to play with Crypt of the Necrodancer.",
+	Description: "Download, beatmap and assign any (supported by youtube-dl) song link into Crypt of the Necrodancer directly. Use (link) and then (zone) - for more info, check extended help.",
 	Flags: ["mention","pipe","whitelist"],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
@@ -58,5 +58,18 @@ module.exports = {
 			reply: "Downloaded + beat mapped successfully! AlienPls"
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: ((prefix, values) => {
+		const { zones } = values.getStaticData();
+		return [
+			"Downloads, beatmaps and inserts a song from a link into the Crypt of the Necrodancer game.",
+			"",
+
+			`<code>${prefix}necrodancer (link) (zone)</code>`,
+			"From a given link, extracts the song, beatmaps it automatically and inserts it as the song to play in game in the provided zone",
+			"",
+
+			"Zone list:",
+			"<ul>" + zones.map(i => `<li>${i}</li>`) + "</ul>"
+		];
+	})()
 };
