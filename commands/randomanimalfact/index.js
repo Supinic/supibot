@@ -33,28 +33,44 @@ module.exports = {
 				reply: `Only people who have verified that they have a ${type} can use this command! Verify by $suggest-ing a picture of your ${type}(s), along with your name and mention that you want the command access.`
 			};
 		}
-	
-		let result = null;
+
+		let apiName;
+		let gotPromise = null;
+		let extractor;
+
 		switch (type) {
 			case "bird":
-				result = (await sb.Got.instances.SRA("facts/bird").json()).fact;
+				apiName = "SRA/birdfact";
+				extractor = (data) => data.fact;
+				gotPromise = sb.Got.instances.SRA("facts/bird");
+
 				break;
 	
 			case "cat":
-				result = (await sb.Got("https://catfact.ninja/fact").json()).fact;
+				apiName = "CatFactNinjaAPI";
+				extractor = (data) => data.fact;
+				gotPromise = sb.Got.instances.GenericAPI("https://catfact.ninja/fact");
+
 				break;
 	
 			case "dog":
-				result = (await sb.Got("https://dog-api.kinduff.com/api/facts").json()).facts[0];
+				apiName = "KinduffAPI";
+				extractor = (data) => data.facts[0];
+				gotPromise = sb.Got.instances.GenericAPI("https://dog-api.kinduff.com/api/facts");
+
 				break;
 	
 			case "fox":
-				result = (await sb.Got.instances.SRA("facts/fox").json()).fact;
+				apiName = "SRA/foxfact";
+				extractor = (data) => data.fact;
+				gotPromise = sb.Got.instances.SRA("facts/fox");
+
 				break;
 		}
-	
+
+		const { body: data } = await gotPromise;
 		return {
-			reply: result
+			reply: extractor(data)
 		};
 	}),
 	Dynamic_Description: null
