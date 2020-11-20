@@ -34,34 +34,28 @@ module.exports = {
 			};
 		}
 
-		let apiName;
-		let gotPromise = null;
+		let gotPromise;
 		let extractor;
-
 		switch (type) {
 			case "bird":
-				apiName = "SRA/birdfact";
 				extractor = (data) => data.fact;
 				gotPromise = sb.Got.instances.SRA("facts/bird");
 
 				break;
 	
 			case "cat":
-				apiName = "CatFactNinjaAPI";
 				extractor = (data) => data.fact;
 				gotPromise = sb.Got.instances.GenericAPI("https://catfact.ninja/fact");
 
 				break;
 	
 			case "dog":
-				apiName = "KinduffAPI";
 				extractor = (data) => data.facts[0];
 				gotPromise = sb.Got.instances.GenericAPI("https://dog-api.kinduff.com/api/facts");
 
 				break;
 	
 			case "fox":
-				apiName = "SRA/foxfact";
 				extractor = (data) => data.fact;
 				gotPromise = sb.Got.instances.SRA("facts/fox");
 
