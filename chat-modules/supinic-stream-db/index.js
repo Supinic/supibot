@@ -12,7 +12,7 @@ module.exports = {
 		}).json();
 
 		if (stream) {
-			const start = new sb.Date(stream.created_at);
+			const start = new sb.Date(stream.started_at);
 			const exists = await sb.Query.getRecordset(rs => rs
 			    .select("Video_ID")
 			    .from("stream", "Stream")
