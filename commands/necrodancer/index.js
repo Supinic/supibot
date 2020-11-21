@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "necrodancer",
-	Aliases: null,
+	Aliases: ["nd", "ndr", "necrodancerreset"],
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Download, beatmap and assign any (supported by youtube-dl) song link into Crypt of the Necrodancer directly. Use (link) and then (zone) - for more info, check extended help.",
@@ -17,10 +17,14 @@ module.exports = {
 				"5-1", "5-2", "5-3",
 				"conga", "chess", "bass", "metal", "mole"
 			],
-			zoneCooldown: 300_000
+			zoneCooldown: 300_000,
+			createURL: (data) => {
+				const json = JSON.stringify(data);
+				return `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}?necrodancer=${json}`;
+			}
 		};
 	}),
-	Code: (async function necrodancer (context, link, zone) {
+	Code: (async function necrodancer (context, ...args) {
 		if (!context.channel) {
 			return {
 				success: false,
@@ -28,7 +32,41 @@ module.exports = {
 			};
 		}
 
-		const { zones } = this.staticData;
+		const { invocation } = context;
+		const { createURL, zones } = this.staticData;
+		if (invocation === "ndr" || invocation === "necrodancerreset") {
+			if (!context.user.Data.administrator) {
+				return {
+					success: false,
+					reply: "You can't do that!"
+				};
+			}
+
+			const result = await sb.Got({
+				url: createURL({
+					command: "reset",
+					zone: args
+				}),
+				throwHttpErrors: false,
+				timeout: 30_000,
+				retry: 0,
+			}).text();
+
+			if (result === "OK") {
+				return {
+					reply: "Zones reset successfully."
+				};
+			}
+			else {
+				console.warn({ result });
+				return {
+					success: false,
+					reply: "Something went wrong trying to reset the zones!"
+				};
+			}
+		}
+
+		let [link, zone] = args;
 		if (!link) {
 			return {
 				reply: "Check the basic guidelines for Necrodancer songs here: https://pastebin.com/K4n151xz TL;DR - not too fast, not too slow, not too short." ,
@@ -63,15 +101,17 @@ module.exports = {
 		}
 		this.data.cooldowns[zone] = now + this.staticData.zoneCooldown;
 		// be sure that the HTTP request is done after the cooldown to avoid a race condition
-
-		const data = JSON.stringify({ link, zone });
-		const url = `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}?necrodancer=${data}`;
 		
 		await context.channel.send("Download + beat mapping + saving started! Please wait...");
 
 		let result;
 		try {
-			result = await sb.Got(url, {
+			result = await sb.Got({
+				url: createURL({
+					link,
+					zone,
+					command: "request"
+				}),
 				throwHttpErrors: false,
 				timeout: 30_000,
 				retry: 0,
