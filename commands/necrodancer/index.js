@@ -5,7 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Download, beatmap and assign any (supported by youtube-dl) song link into Crypt of the Necrodancer directly. Use (link) and then (zone) - for more info, check extended help.",
 	Flags: ["mention","pipe","whitelist"],
-	Whitelist_Response: null,
+	Whitelist_Response: "Only available in supinic's channel!",
 	Static_Data: (() => {
 		this.data.cooldowns = {};
 		return {
@@ -22,10 +22,10 @@ module.exports = {
 		};
 	}),
 	Code: (async function necrodancer (context, link, zone) {
-		if (context.channel?.ID !== 38) {
+		if (!context.channel) {
 			return {
 				success: false,
-				reply: "This shouldn't happen, but the command cannot be used here!"
+				reply: "This command cannot be used in PMs!"
 			};
 		}
 
