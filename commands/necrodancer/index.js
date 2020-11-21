@@ -52,11 +52,40 @@ module.exports = {
 		const url = `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}?necrodancer=${data}`;
 		
 		await context.channel.send("Download + beat mapping + saving started! Please wait...");
-		await sb.Got(url);
-	
-		return {
-			reply: "Downloaded + beat mapped successfully! AlienPls"
-		};
+
+
+		let result;
+		try {
+			result = await sb.Got(url, {
+				throwHttpErrors: false,
+				timeout: 30_000,
+				retry: 0,
+			}).text();
+		}
+		catch (e) {
+			if (e instanceof sb.Got.TimeoutError) {
+				return {
+					success: false,
+					reply: "Request timed out - desktop listener is probably turned off!"
+				};
+			}
+			else {
+				throw e;
+			}
+		}
+
+		if (result === "OK") {
+			return {
+				reply: "Downloaded + beat mapped successfully! AlienPls"
+			};
+		}
+		else {
+			console.warn({ result });
+			return {
+				success: false,
+				reply: "There was an error while downloading/beatmapping your link!"
+			};
+		}
 	}),
 	Dynamic_Description: ((prefix, values) => {
 		const { zones } = values.getStaticData();
