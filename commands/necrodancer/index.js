@@ -53,7 +53,6 @@ module.exports = {
 		
 		await context.channel.send("Download + beat mapping + saving started! Please wait...");
 
-
 		let result;
 		try {
 			result = await sb.Got(url, {
