@@ -18,7 +18,7 @@ module.exports = {
 				"5-1", "5-2", "5-3",
 				"conga", "chess", "bass", "metal", "mole"
 			],
-			zoneCooldown: 15000
+			zoneCooldown: 300_000
 		};
 	}),
 	Code: (async function necrodancer (context, link, zone) {
@@ -48,7 +48,8 @@ module.exports = {
 		if (!zones.includes(zone)) {
 			return {
 				success: false,
-				reply: "Invalid zone provided! Use one of: " + zones.join(", ")
+				reply: "Invalid zone provided! Use one of: " + zones.join(", "),
+				cooldown: 2500
 			};
 		}
 
@@ -56,9 +57,9 @@ module.exports = {
 
 		const now = sb.Date.now();
 		if (this.data.cooldowns[zone] >= now) {
-			const delta = sb.Utils.timeDelta(this.data.cooldowns[zone]);
+			const delta = sb.Utils.timeDelta(this.data.cooldowns[zone], false, false, 0);
 			return {
-				reply: `The cooldown for that zone has not passed yet. Try again in ${delta}.`
+				reply: `The cooldown for zone ${zone} has not passed yet. Try again in ${delta}.`
 			};
 		}
 		this.data.cooldowns[zone] = now + this.staticData.zoneCooldown;
@@ -78,6 +79,8 @@ module.exports = {
 			}).text();
 		}
 		catch (e) {
+			this.data.cooldowns[zone] = 0;
+
 			if (e instanceof sb.Got.TimeoutError) {
 				return {
 					success: false,
@@ -96,6 +99,8 @@ module.exports = {
 		}
 		else {
 			console.warn({ result });
+			this.data.cooldowns[zone] = 0;
+
 			return {
 				success: false,
 				reply: "There was an error while downloading/beatmapping your link!"
