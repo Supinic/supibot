@@ -16,8 +16,7 @@ module.exports = {
 				cooldown: { length: 2500 }
 			};
 		}
-	
-		let updateExisting = true;
+
 		const links = [];
 		if (args[0] === "playlist") {
 			args.shift();
@@ -53,7 +52,6 @@ module.exports = {
 				}
 			}
 			else {
-				updateExisting = false;
 				const items = result.map(i => ({
 					link: i.ID,
 					type: "youtube"
@@ -97,6 +95,17 @@ module.exports = {
 		const results = [];
 		for (const { link, type } of links) {
 			const videoData = await sb.Utils.linkParser.fetchData(link, type);
+			if (!videoData) {
+				results.push({
+					link,
+					existing: false,
+					ID: null,
+					formatted: `Video not available - it is deleted or private.`
+				});
+
+				continue;
+			}
+
 			const check = await sb.Query.getRecordset(rs => rs
 				.select("ID")
 				.from("music", "Track")
@@ -118,32 +127,16 @@ module.exports = {
 				const tags = tagData.join(", ");
 				const row = await sb.Query.getRow("music", "Track");
 				await row.load(check.ID);
-	
-				let addendum = "";
-				if (updateExisting) {
-	
-					if (row.values.Available && videoData === null) {
-						row.values.Available = false;
-					}
-					else if (row.values.Available && videoData !== null) {
-						row.values.Available = true;
-					}
-	
-					if (row.values.Available !== row.originalValues.Available) {
-						addendum = `Track updated: ${row.values.Available ? "now" : "no longer"} available!`;
-						await row.save();
-					}
-				}
-	
+
 				results.push({
 					link,
 					existing: true,
 					ID: check.ID,
-					formatted: sb.Utils.tag.trim`
+					formatted: sb.Utils.tag.trim `
 						Link is in the list already:
 						${trackToLink(check.ID)}
 						with tags: ${tags}.
-						${addendum}`
+					`
 				});
 			}
 			else {
