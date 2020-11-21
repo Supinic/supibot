@@ -56,7 +56,7 @@ module.exports = {
 
 		const now = sb.Date.now();
 		if (this.data.cooldowns[zone] >= now) {
-			const delta = sb.Utils.timeDelta(this.data.cooldowns[zone], false, false, 0);
+			const delta = sb.Utils.timeDelta(this.data.cooldowns[zone]);
 			return {
 				reply: `The cooldown for zone ${zone} has not passed yet. Try again in ${delta}.`
 			};
