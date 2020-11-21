@@ -86,7 +86,7 @@ module.exports = {
 			availableFlags,
 			variables: [
 				{
-					names: "ambassador",
+					name: "ambassador",
 					aliases: [],
 					adminOnly: true,
 					parameter: "arguments",
@@ -95,7 +95,7 @@ module.exports = {
 					unset: (context, ...args) => handleAmbassadors("unset", context, ...args)
 				},
 				{
-					names: "reminder",
+					name: "reminder",
 					aliases: ["notify", "reminders", "notification", "notifications"],
 					parameter: "ID",
 					description: "Unsets an active reminder either set by you, or for you.",
@@ -156,7 +156,7 @@ module.exports = {
 					}
 				},
 				{
-					names: "suggestion",
+					name: "suggestion",
 					aliases: ["suggest", "suggestions"],
 					parameter: "ID",
 					description: "Marks an active suggestion created by you to be \"Dismissed by author\", therefore removing it from the list of active suggestions.",
@@ -211,7 +211,7 @@ module.exports = {
 					}
 				},
 				{
-					names: "location",
+					name: "location",
 					aliases: [],
 					parameter: "arguments",
 					description: `Sets/unsets your IRL location. If you add the keyword "private", it's going to be hidden. This location is used in commands such as weather, time, and others.`,
@@ -297,7 +297,7 @@ module.exports = {
 					}
 				},
 				{
-					names: "gc",
+					name: "gc",
 					aliases: [],
 					parameter: "ID",
 					description: "If you made a mistake with the gc command, you can use this to remove a track from the todo list.",
@@ -344,7 +344,7 @@ module.exports = {
 					}
 				},
 				{
-					names: "discord",
+					name: "discord",
 					aliases: [],
 					elevatedChannelAccess: true,
 					parameter: "arguments",
@@ -367,7 +367,7 @@ module.exports = {
 					}
 				},
 				{
-					names: "birthday",
+					name: "birthday",
 					aliases: ["bday"],
 					parameter: "arguments",
 					description: "Lets you set your birthday (only day and month!) for use in other commands, like $horoscope.",
@@ -422,7 +422,7 @@ module.exports = {
 					}
 				},
 				{
-					names: "twitchlotto",
+					name: "twitchlotto",
 					aliases: ["tl"],
 					parameter: "arguments",
 					description: `If you have been nominated as a TwitchLotto-trusted user, you can then set flags to TL links. Available flags: <code>${availableFlags.join(", ")}</code>`,
@@ -484,7 +484,7 @@ module.exports = {
 					}
 				},
 				{
-					names: "tlbl",
+					name: "tlbl",
 					aliases: ["twitchlottoblacklist"],
 					parameter: "arguments",
 					description: `If you are the channel ambassador/owner, you can decide what flags should be blacklisted. Each usage removes the previous ones, so always use a full list.`,
