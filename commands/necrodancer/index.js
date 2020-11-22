@@ -19,7 +19,7 @@ module.exports = {
 			],
 			zoneCooldown: 300_000,
 			createURL: (data) => {
-				const json = JSON.stringify(data);
+				const json = encodeURIComponent(JSON.stringify(data));
 				return `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}?necrodancer=${json}`;
 			}
 		};
