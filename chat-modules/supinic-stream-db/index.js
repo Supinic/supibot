@@ -13,6 +13,8 @@ module.exports = {
 
 		if (stream) {
 			const start = new sb.Date(stream.started_at);
+			const date = start.clone().discardTimeUnits("h", "m", "s", "ms");
+
 			const exists = await sb.Query.getRecordset(rs => rs
 			    .select("Video_ID")
 			    .from("stream", "Stream")
@@ -26,7 +28,7 @@ module.exports = {
 				const row = await sb.Query.getRow("stream", "Stream");
 				row.setValues({
 					Video_ID: stream.id,
-					Date: start.discardTimeUnits("h", "m", "s", "ms"),
+					Date: date,
 					Start: start
 				});
 
