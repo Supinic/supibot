@@ -50,18 +50,18 @@ module.exports = {
 				throwHttpErrors: false,
 				timeout: 30_000,
 				retry: 0,
-			}).text();
+			}).json();
 
-			if (result === "OK") {
+			if (result.success) {
 				return {
-					reply: "Zones reset successfully."
+					reply: "Zone(s) reset successfully."
 				};
 			}
 			else {
 				console.warn({ result });
 				return {
 					success: false,
-					reply: "Something went wrong trying to reset the zones!"
+					reply: "Something went wrong trying to reset the zone(s)!"
 				};
 			}
 		}
@@ -115,7 +115,7 @@ module.exports = {
 				throwHttpErrors: false,
 				timeout: 30_000,
 				retry: 0,
-			}).text();
+			}).json();
 		}
 		catch (e) {
 			this.data.cooldowns[zone] = 0;
@@ -131,7 +131,7 @@ module.exports = {
 			}
 		}
 
-		if (result === "OK") {
+		if (result.success) {
 			return {
 				reply: "Downloaded + beat mapped successfully! AlienPls"
 			};
