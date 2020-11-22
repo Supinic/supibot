@@ -132,8 +132,9 @@ module.exports = {
 		}
 
 		if (result.success) {
+			const bpm = 60 / (result.length / result.beats);
 			return {
-				reply: "Downloaded + beat mapped successfully! AlienPls"
+				reply: `Song added to zone ${zone}. Song length: ${result.length}, beats: ${result.beats}, bpm: ${bpm} AlienPls`
 			};
 		}
 		else {
