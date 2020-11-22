@@ -132,9 +132,10 @@ module.exports = {
 		}
 
 		if (result.success) {
-			const bpm = 60 / (result.length / result.beats);
+			const length = sb.Utils.formatTime(sb.Utils.round(result.length), true);
+			const bpm = sb.Utils.round(60 / (result.length / result.beats));
 			return {
-				reply: `Song added to zone ${zone}. Song length: ${result.length}, beats: ${result.beats}, bpm: ${bpm} AlienPls`
+				reply: `Song added to zone ${zone}. Song length: ${length} - beats: ${result.beats} - bpm: ${bpm} AlienPls`
 			};
 		}
 		else {
