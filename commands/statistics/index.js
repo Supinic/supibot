@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["stat","stats"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Posts various statistics regarding you, e.g. total afk time.",
+	Description: "Posts various statistics regarding you or other users, e.g. total afk time.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
@@ -339,7 +339,7 @@ module.exports = {
 			}).join("<br>");
 		
 			return [
-				"Checks various statistics bound to you, found around supibot's data.",
+				"Checks various statistics found around supibot's data, regarding you or a provided user - depending on the type used.",
 				"",
 		
 				`<code>${prefix}stats (type)</code>`,
