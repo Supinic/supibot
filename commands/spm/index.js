@@ -123,6 +123,14 @@ module.exports = {
 					updated: Boolean(liveItem),
 					added: !Boolean(liveItem)
 				};
+			}),
+			message: (async (context, message) => {
+				if (context.channel) {
+					await context.channel.send(message);
+				}
+				else {
+					await context.platform.pm(message, context.user);
+				}
 			})
 		},
 		commands: [
@@ -202,7 +210,11 @@ module.exports = {
 							await context.channel.send("spm command reloaded peepoHackies");
 						}, 2500);
 
-						await context.channel.send(`The spm command was tasked to reload itself! monkaStare I will reload it in 2.5 seconds instead of right now.`);
+						await helpers.message(
+							context,
+							`The spm command was tasked to reload itself! monkaS I will reload it in 2.5 seconds instead of right now.`
+						);
+
 						updated.splice(updated.indexOf("spm"), 1);
 					}
 
@@ -493,7 +505,7 @@ module.exports = {
 		if (operation === "load") {
 			try {
 				const result = await helpers.shell("git -C /code/spm pull origin master");
-				await context.channel.send(`git pull PepoG ${result.stdout}`);
+				await helpers.message(context, `git pull PepoG ${result.stdout}`);
 			}
 			catch (e) {
 				console.error("git pull error", e);
