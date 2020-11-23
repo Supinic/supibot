@@ -207,7 +207,7 @@ module.exports = {
 					if (updated.includes("spm")) {
 						setTimeout(async () => {
 							await sb.Command.reloadSpecific("spm");
-							await context.channel.send("spm command reloaded peepoHackies");
+							await helpers.message("spm command reloaded peepoHackies");
 						}, 2500);
 
 						await helpers.message(
