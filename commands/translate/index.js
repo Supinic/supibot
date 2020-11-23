@@ -78,7 +78,7 @@ module.exports = {
 		if (options.direction) {
 			const languageID = response[2].replace(/-.*/, "");
 			const fromLanguageName = sb.Utils.languageISO.getName(languageID);
-			if (!languageName) {
+			if (!fromLanguageName) {
 				console.warn("$translate - could not get language name", { response, reply, options, languageID });
 				return {
 					success: false,
