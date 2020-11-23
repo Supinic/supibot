@@ -128,7 +128,7 @@ module.exports = {
 				if (context.channel) {
 					await context.channel.send(message);
 				}
-				else {
+				else if (context.platform) {
 					await context.platform.pm(message, context.user);
 				}
 			})
