@@ -339,7 +339,9 @@ module.exports = class Twitch extends require("./template.js") {
 	 */
 	async pm (message, user) {
 		const userData = await sb.User.get(user);
-		await this.client.whisper(userData.Name, message);
+		const trimmedMessage = message.replace(/[\r\n]/g, " ").trim();
+
+		await this.client.whisper(userData.Name, trimmedMessage);
 	}
 
 	async handleMessage (messageObject) {
