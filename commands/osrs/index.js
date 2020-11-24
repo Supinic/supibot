@@ -6,14 +6,25 @@ module.exports = {
 	Description: "Aggregate command for whatever regarding Old School Runescape.",
 	Flags: ["mention","use-params"],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		fetch: async (user) => {
-			let data = await sb.Cache.getByPrefix("command-osrs-stats", {
-				keys: { user }
-			});
-	
+	Static_Data: ((command) => ({
+		fetch: async (user, options = {}) => {
+			const key = (options.seasonal)
+				? { user, seasonal: true }
+				: { user };
+
+			let data = await command.getCacheData(key);
 			if (!data) {
-				const apiData = await sb.Got.instances.Supinic("osrs/lookup/" + user).json();
+				let apiData;
+				if (options.seasonal) {
+					apiData = await sb.Got.instances.Supinic("osrs/lookup/" + user).json();
+				}
+				else {
+					apiData = await sb.Got.instances.Supinic({
+						url: "osrs/lookup/" + user,
+						searchParams: new sb.URLParams().set("seasonal", "1").toString()
+					}).json();
+				}
+
 				if (!apiData.data) {
 					return {
 						success: false,
@@ -22,8 +33,7 @@ module.exports = {
 				}
 	
 				data = apiData.data;
-				await sb.Cache.setByPrefix("command-osrs-stats", data, {
-					keys: { user },
+				await command.setCacheData(key, data, {
 					expiry: 600_000
 				});
 			}
@@ -127,7 +137,7 @@ module.exports = {
 			command = "stats";
 		}
 	
-		switch (command.toLowerCase()) {
+		switch (command) {
 			case "price": {
 				const alias = await sb.Query.getRecordset(rs => rs
 					.select("Name")
@@ -194,8 +204,9 @@ module.exports = {
 					`
 				};
 			}
-	
-			case "stats": {
+
+			case "stats":
+			case "seasonal-stats": {
 				const user = args.join(" ");
 				if (!user) {
 					return {
@@ -203,13 +214,19 @@ module.exports = {
 						reply: `No player name provided!`
 					};
 				}
-	
-				const data = await this.staticData.fetch(user);
+
+				const data = (command.includes("seasonal"))
+					? await this.staticData.fetch(user, { seasonal: true })
+					: await this.staticData.fetch(user);
+
 				if (data.success === false) {
 					return data;
 				}
 
-				const ironman = this.staticData.getIronman(data);
+				const accountType = (command.includes("seasonal"))
+					? "seasonal user"
+					: this.staticData.getIronman(data);
+
 				if (context.params.skill) {
 					const skillName = context.params.skill.toLowerCase();
 					const skill = data.skills.find(i => i.name.toLowerCase() === skillName);
@@ -223,13 +240,13 @@ module.exports = {
 					else if (skill.level === null) {
 						return {
 							success: false,
-							reply: `That ${ironman}'s ${context.params.skill.toLowerCase()} is not high enough level to appear on the highscores!`
+							reply: `That ${accountType}'s ${context.params.skill.toLowerCase()} is not high enough level to appear on the highscores!`
 						};
 					}
 	
 					const { emoji } = this.staticData.skills.find(i => i.name.toLowerCase() === skillName);
 					return {
-						reply: `${sb.Utils.capitalize(ironman)} ${user} ${emoji} ${skill.level} (XP: ${sb.Utils.groupDigits(skill.experience)})`
+						reply: `${sb.Utils.capitalize(accountType)} ${user} ${emoji} ${skill.level} (XP: ${sb.Utils.groupDigits(skill.experience)})`
 					};
 				}
 	
@@ -243,20 +260,21 @@ module.exports = {
 	
 				if (strings.length === 0) {
 					return {
-						reply: `${sb.Utils.capitalize(ironman)} ${user} exists, but none of their stats are being tracked.`
+						reply: `${sb.Utils.capitalize(accountType)} ${user} exists, but none of their stats are being tracked.`
 					};
 				}
 				else {
 					return {
 						reply: sb.Utils.tag.trim `
-							Stats for ${ironman} ${user}:
+							Stats for ${accountType} ${user}:
 							${strings.join(" ")}
 						`
 					};
 				}
 			}
 
-			case "kc": {
+			case "kc":
+			case "seasonal-kc": {
 				const input = { username: null, activity: null };
 				const [first, second] = args.join(" ").toLowerCase().split(",").map(i => i.trim());
 
@@ -283,7 +301,10 @@ module.exports = {
 					};
 				}
 
-				const data = await this.staticData.fetch(input.username);
+				const data = (command.includes("seasonal"))
+					? await this.staticData.fetch(input.username, { seasonal: true })
+					: await this.staticData.fetch(input.username);
+
 				if (data.success === false) {
 					return data;
 				}
@@ -297,8 +318,11 @@ module.exports = {
 					};
 				}
 
-				const ironman = sb.Utils.capitalize(this.staticData.getIronman(data));
 				const { name, rank, value } = data.activities.find(i => i.name.toLowerCase() === bestMatch.toLowerCase());
+				const ironman = (command.includes("seasonal"))
+					? "Seasonal user"
+					: sb.Utils.capitalize(this.staticData.getIronman(data));
+
 				return {
 					reply: (rank === null)
 						? `${ironman} ${input.username} is not ranked for ${name}.`
