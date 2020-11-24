@@ -15,7 +15,7 @@ module.exports = {
 			let data = await command.getCacheData(key);
 			if (!data) {
 				let apiData;
-				if (options.seasonal) {
+				if (!options.seasonal) {
 					apiData = await sb.Got.instances.Supinic("osrs/lookup/" + user).json();
 				}
 				else {
