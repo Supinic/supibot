@@ -356,6 +356,51 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async (prefix, values) => {
+		const { activities, activityAliases } = await values.getStaticData();
+		const list = [...activities, ...Object.keys(activityAliases)].map(i => `<li>${i}</li>`).join("");
 
+		return [
+			"Various utility commands all related to Old School Runescape.",
+			"",
+
+			"<h6>Skill level overview</h6>",
+			`<code>${prefix}osrs (username)</code>`,
+			`<code>${prefix}osrs stats (username)</code>`,
+			`<code>${prefix}osrs seasonal-stats (username)</code>`,
+			"Posts a full list of skill levels for provided user. Does not include experience or rankings.",
+			`If used with "seasonal-stats", the command will attempt to use that user's seasonal profile.`,
+			"",
+
+			"<h6>Skill level detail</h6>",
+			`<code>${prefix}osrs (username) skill:(skill)</code>`,
+			`<code>${prefix}osrs stats (username) skill:(skill)</code>`,
+			`<code>${prefix}osrs seasonal-stats (username) skill:(skill)</code>`,
+			"For given user, posts the skill's level, experience, and ranking.",
+			`If used with "seasonal-stats", the command will attempt to use that user's seasonal profile.`,
+			"",
+
+			"<h6>Kill-count</h6>",
+			`<code>${prefix}osrs kc (activity), (username)</code>`,
+			`<code>${prefix}osrs kc (username), (activity)</code>`,
+			`<code>${prefix}osrs seasonal-kc (username), (activity)</code>`,
+			`<code>${prefix}osrs seasonal-kc (activity), (username)</code>`,
+			"For given user and activity, prints their kill-count and ranking.",
+			`If used with "seasonal-kc", the command will attempt to use that user's seasonal profile.`,
+			"<b>Important</b>: the name and activity (regardless of order) MUST be separated by a comma!",
+			"",
+
+			"<h6>Item prices</h6>",
+			`<code>${prefix}osrs price (item)</code>`,
+			`Posts the item's current GE price, along with trends. The most popular items also respond to aliases.`,
+			"",
+
+			"<h6>Item IDs</h6>",
+			`<code>${prefix}osrs itemid (item)</code>`,
+			`Posts the item's ingame ID. Shows up to 5 best matching results.`,
+			"",
+
+			"<h6>Supported activities</h6>",
+			`<ul>${list}<ul>`
+		]
 	})
 };
