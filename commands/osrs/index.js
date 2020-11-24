@@ -297,7 +297,7 @@ module.exports = {
 				else {
 					return {
 						success: false,
-						reply: `Could not match any activity! Check the list of activities here: https://supinic.com/bot/command/${this.ID}`
+						reply: `Could not match any activity! Check the list here: https://supinic.com/bot/command/${this.ID}`
 					};
 				}
 
@@ -314,7 +314,7 @@ module.exports = {
 				if (!bestMatch) {
 					return {
 						success: false,
-						reply: `Activity was not found! Check the command's help for a list.`
+						reply: `Activity was not found! Check the list here: https://supinic.com/bot/command/${this.ID}`
 					};
 				}
 
@@ -351,7 +351,7 @@ module.exports = {
 			default:
 				return {
 					success: false,
-					reply: `Invalid subcommand provided! Check this command's extended help for more info.`
+					reply: `Invalid subcommand provided! Check the help here: https://supinic.com/bot/command/${this.ID}`
 				};
 		}
 	}),
