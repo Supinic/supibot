@@ -13,7 +13,7 @@ module.exports = {
 		const state = sb.Config.get("SONG_REQUESTS_STATE");
 		if (state === "off") {
 			return {
-				reply: "Song requests are currently turned off."
+				reply: "Song requests are currently turned off. Check out the history up to 14 days back: https://supinic.com/stream/song-request/history"
 			};
 		}
 		else if (state === "dubtrack") {
