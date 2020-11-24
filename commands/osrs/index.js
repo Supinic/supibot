@@ -76,7 +76,7 @@ module.exports = {
 			"armadyl": "kree'arra",
 			"gauntlet": "the gauntlet",
 			"corrupted gauntlet": "the corrupted gauntlet",
-			"tob": "theatere of bloo",
+			"tob": "theatre of blood",
 			"thermy": "thermonuclear smoke devil",
 			"zuk": "tzkal-zuk",
 			"inferno": "tzkal-zuk",
