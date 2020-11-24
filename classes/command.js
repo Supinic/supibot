@@ -171,7 +171,7 @@ module.exports = class Command extends require("./template.js") {
 			}
 
 			if (typeof tempData === "function") {
-				tempData = tempData();
+				tempData = tempData(this);
 			}
 
 			if (tempData && typeof tempData === "object") {
