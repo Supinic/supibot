@@ -16,29 +16,31 @@ module.exports = {
 			console.log("New nodejs version!", sb.Config.get("LATEST_NODE_JS_VERSION"), latest.tag_name);
 			sb.Config.set("LATEST_NODE_JS_VERSION", latest.tag_name);
 			
-			const userNames = await sb.Query.getRecordset(rs => rs
+			const users = await sb.Query.getRecordset(rs => rs
 				.select("User_Alias.Name AS Username")
+				.select("Event_Subscription.User_Alias AS User_ID")
+				.select("MAX(Meta.Last_Message_Posted) AS Last_Seen")
 				.from("chat_data", "Event_Subscription")
 				.join("chat_data", "User_Alias")
+				.join({
+					toTable: "Message_Meta_User_Alias",
+					alias: "Meta",
+					on: "Event_Subscription.User_Alias = Meta.User_Alias"
+				})
+				.groupBy("Meta.User_Alias")
 				.where("Type = %s", "Node.js updates")
 				.where("Active = %b", true)
-				.flat("Username")
 			);
 
-			const uncachedUsers = await Promise.all(userNames.map(async (name) => {
-				const key = sb.User.createCacheKey({ name });
-				const cache = await sb.Cache.getByPrefix(key);
-				return (cache === null)
-					? await sb.User.get(name)
-					: null
-			}));
+			const now = sb.Date.now();
+			const [pingedUsers, remindedUsers] = sb.Utils.splitByCondition(users, i => now - i.Last_Seen < 36e5);
 
-			await Promise.all(uncachedUsers.map(userData => (
+			await Promise.all(remindedUsers.map(user => (
 				sb.Reminder.create({
 					Channel: null,
 					User_From: 1127,
-					User_To: userData.ID,
-					Text: `${nodeString} (You were not around when it was announced)`,
+					User_To: user.ID,
+					Text: `${nodeString} (you were not around when it was announced)`,
 					Schedule: null,
 					Created: new sb.Date(),
 					Private_Message: true,
@@ -46,8 +48,8 @@ module.exports = {
 				}, true)
 			)));
 
-			const pingedUsers = userNames.map(i => `@${i}`).join(" ");
-			await sb.Channel.get(38).send(`${pingedUsers} ${nodeString}`);
+			const chatPing = pingedUsers.map(i => `@${i.Username}`).join(" ");
+			await sb.Channel.get(38).send(`${chatPing} ${nodeString}`);
 		}
 	})
 };
