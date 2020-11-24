@@ -422,7 +422,7 @@ module.exports = {
 					}
 				},
 				{
-					name: "twitchlotto",
+					name: "tltwitchlotto",
 					aliases: ["tl"],
 					parameter: "arguments",
 					description: `If you have been nominated as a TwitchLotto-trusted user, you can then set flags to TL links. Available flags: <code>${availableFlags.join(", ")}</code>`,
@@ -444,7 +444,7 @@ module.exports = {
 						if (flags.length === 0) {
 							return {
 								success: false,
-								reply: `No suitable flags provided!`
+								reply: `No suitable flags provided! Here's the list: ${availableFlags.join(", ")}`
 							};
 						}
 	
@@ -484,8 +484,8 @@ module.exports = {
 					}
 				},
 				{
-					name: "tlbl",
-					aliases: ["twitchlottoblacklist"],
+					name: "twitchlottoblacklist",
+					aliases: ["tlbl"],
 					parameter: "arguments",
 					description: `If you are the channel ambassador/owner, you can decide what flags should be blacklisted. Each usage removes the previous ones, so always use a full list.`,
 					set: async (context, ...flags) => {
@@ -516,7 +516,7 @@ module.exports = {
 						if (suitableFlags.length === 0) {
 							return {
 								success: false,
-								reply: `No suitable flags provided!`
+								reply: `No suitable flags provided! Here's the list: ${availableFlags.join(", ")}`
 							};
 						}
 
