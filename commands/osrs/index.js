@@ -56,7 +56,7 @@ module.exports = {
 			return ironman;
 		},
 
-		subcommands: ["itemid", "kc", "price", "stats"],
+		subcommands: ["itemid", "kc", "price", "seasonal-kc", "seasonal-stats", "stats"],
 
 		activities: [
 			"abyssal sire", "alchemical hydra", "barrows chests", "bounty hunter - hunter", "bounty hunter - rogue",
