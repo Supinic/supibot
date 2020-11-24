@@ -192,8 +192,8 @@ module.exports = {
 		}
 		else if ((sb.Date.now() + delta) > sb.Config.get("SQL_DATETIME_LIMIT")) {
 			const description = (Number.isFinite(comparison.valueOf()))
-				? comparison.format("Y-m-d")
-				: `${Math.trunc(delta / 31_536_000_000)} years in the future`;
+				? `the date ${comparison.format("Y-m-d")}`
+				: `${sb.Utils.groupDigits(Math.trunc(delta / 31_536_000_000))} years in the future`;
 	
 			return {
 				reply: `Your reminder was set to approximately ${description}, but the limit is 31st December 9999.`,
