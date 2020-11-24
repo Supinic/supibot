@@ -59,6 +59,30 @@ module.exports = {
 			"scorpia", "skotizo", "the corrupted gauntlet", "the gauntlet", "theatre of blood", "thermonuclear smoke devil",
 			"tzkal-zuk", "tztok-jad", "venenatis", "vet'ion", "vorkath", "wintertodt", "zalcano", "zulrah"
 		],
+
+		activityAliases: {
+			"sire": "abyssal sire",
+			"hydra": "alchemical hydra",
+			"barrows": "barrows chests",
+			"cox": "chambers of xeric",
+			"sara": "commander zilyana",
+			"saradomin": "commander zilyana",
+			"corp": "corporeal beast",
+			"bandos": "general graardor",
+			"mole": "giant mole",
+			"zammy": "k'ril tsutsaroth",
+			"kq": "kalphite queen",
+			"kbd": "king black dragon",
+			"armadyl": "kree'arra",
+			"gauntlet": "the gauntlet",
+			"corrupted gauntlet": "the corrupted gauntlet",
+			"tob": "theatere of bloo",
+			"thermy": "thermonuclear smoke devil",
+			"zuk": "tzkal-zuk",
+			"inferno": "tzkal-zuk",
+			"jad": "tztok-jad",
+			"vetion": "vet'ion",
+		},
 		
 		skills: [
 			{ name: "Overall", emoji: "🏆" },
@@ -240,9 +264,17 @@ module.exports = {
 					input.activity = first;
 					input.username = second;
 				}
+				else if (this.staticData.activityAliases[first]) {
+					input.activity = this.staticData.activityAliases[first];
+					input.username = second;
+				}
 				else if (this.staticData.activities.includes(second)) {
 					input.username = first;
 					input.activity = second;
+				}
+				else if (this.staticData.activityAliases[second]) {
+					input.username = first;
+					input.activity = this.staticData.activityAliases[second];
 				}
 				else {
 					return {
@@ -299,5 +331,7 @@ module.exports = {
 				};
 		}
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix, values) => {
+
+	})
 };
