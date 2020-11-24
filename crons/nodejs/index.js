@@ -17,8 +17,8 @@ module.exports = {
 			sb.Config.set("LATEST_NODE_JS_VERSION", latest.tag_name);
 			
 			const users = await sb.Query.getRecordset(rs => rs
+				.select("Event_Subscription.User_Alias AS ID")
 				.select("User_Alias.Name AS Username")
-				.select("Event_Subscription.User_Alias AS User_ID")
 				.select("MAX(Meta.Last_Message_Posted) AS Last_Seen")
 				.from("chat_data", "Event_Subscription")
 				.join("chat_data", "User_Alias")
