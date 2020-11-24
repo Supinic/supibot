@@ -32,15 +32,15 @@ module.exports = {
 		},
 
 		getIronman: (data) => {
-			let ironman = "";
+			let ironman = "user";
 			if (data.ironman.regular) {
-				ironman = "(IM)";
+				ironman = "ironman";
 			}
 			else if (data.ironman.hardcore) {
-				ironman = "(HCIM)";
+				ironman = "hardcore ironman";
 			}
 			else if (data.ironman.ultimate) {
-				ironman = "(UIM)";
+				ironman = "ultimate ironman";
 			}
 
 			return ironman;
@@ -189,6 +189,7 @@ module.exports = {
 				if (context.params.skill) {
 					const skillName = context.params.skill.toLowerCase();
 					const skill = data.skills.find(i => i.name.toLowerCase() === skillName);
+
 					if (!skill) {
 						return {
 							success: false,
@@ -198,13 +199,13 @@ module.exports = {
 					else if (skill.level === null) {
 						return {
 							success: false,
-							reply: `That user's ${context.params.skill.toLowerCase()} is not high enough level to appear on the highscores!`
+							reply: `That ${ironman}'s ${context.params.skill.toLowerCase()} is not high enough level to appear on the highscores!`
 						};
 					}
 	
 					const { emoji } = this.staticData.skills.find(i => i.name.toLowerCase() === skillName);
 					return {
-						reply: `${ironman} ${emoji} ${skill.level} (XP: ${sb.Utils.groupDigits(skill.experience)})`
+						reply: `${sb.Utils.capitalize(ironman)} ${user} ${emoji} ${skill.level} (XP: ${sb.Utils.groupDigits(skill.experience)})`
 					};
 				}
 	
@@ -218,13 +219,13 @@ module.exports = {
 	
 				if (strings.length === 0) {
 					return {
-						reply: `User ${user} does exist, but none of their stats are being tracked.`
+						reply: `${sb.Utils.capitalize(ironman)} ${user} exists, but none of their stats are being tracked.`
 					};
 				}
 				else {
 					return {
 						reply: sb.Utils.tag.trim `
-							Stats for user ${user}${ironman}:
+							Stats for ${ironman} ${user}:
 							${strings.join(" ")}
 						`
 					};
@@ -264,12 +265,12 @@ module.exports = {
 					};
 				}
 
-				const ironman = this.staticData.getIronman(data);
+				const ironman = sb.Utils.capitalize(this.staticData.getIronman(data));
 				const { name, rank, value } = data.activities.find(i => i.name.toLowerCase() === bestMatch.toLowerCase());
 				return {
 					reply: (rank === null)
-						? `Player is not ranked for ${name}.`
-						: `${ironman} ${input.username} KC for ${name}: ${value} - rank #${rank}.`
+						? `${ironman} ${input.username} is not ranked for ${name}.`
+						: `${ironman} ${input.username}'s KC for ${name}: ${value} - rank #${rank}.`
 				};
 			}
 
