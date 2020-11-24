@@ -30,7 +30,24 @@ module.exports = {
 	
 			return data;
 		},
-	
+
+		getIronman: (data) => {
+			let ironman = "";
+			if (data.ironman.regular) {
+				ironman = "(IM)";
+			}
+			else if (data.ironman.hardcore) {
+				ironman = "(HCIM)";
+			}
+			else if (data.ironman.ultimate) {
+				ironman = "(UIM)";
+			}
+
+			return ironman;
+		},
+
+		subcommands: ["itemid", "kc", "price", "stats"],
+
 		activities: [
 			"abyssal sire", "alchemical hydra", "barrows chests", "bounty hunter - hunter", "bounty hunter - rogue",
 			"bryophyta", "callisto", "cerberus", "chambers of xeric", "chambers of xeric: challenge mode", "chaos elemental",
@@ -70,12 +87,20 @@ module.exports = {
 			{ name: "Farming", emoji: "‍🌽" },
 		]
 	})),
-	Code: (async function osrs (context, command, ...args) {
-		if (!command) {
+	Code: (async function osrs (context, ...args) {
+		const firstCheck = args.splice(0, 1);
+		if (!firstCheck) {
 			return {
 				success: false,
-				reply: `No command provided!`
+				reply: `Not enough arguments provided! Check the command help here: https://supinic.com/bot/command/${this.ID}`
 			};
+		}
+
+		const first = firstCheck[0];
+		let command = first.toLowerCase();
+		if (!this.staticData.subcommands.includes(command)) {
+			args.unshift(first);
+			command = "stats";
 		}
 	
 		switch (command.toLowerCase()) {
@@ -159,7 +184,8 @@ module.exports = {
 				if (data.success === false) {
 					return data;
 				}
-	
+
+				const ironman = this.staticData.getIronman(data);
 				if (context.params.skill) {
 					const skillName = context.params.skill.toLowerCase();
 					const skill = data.skills.find(i => i.name.toLowerCase() === skillName);
@@ -178,7 +204,7 @@ module.exports = {
 	
 					const { emoji } = this.staticData.skills.find(i => i.name.toLowerCase() === skillName);
 					return {
-						reply: `${emoji} ${skill.level} (XP: ${sb.Utils.groupDigits(skill.experience)})`
+						reply: `${ironman} ${emoji} ${skill.level} (XP: ${sb.Utils.groupDigits(skill.experience)})`
 					};
 				}
 	
@@ -198,51 +224,52 @@ module.exports = {
 				else {
 					return {
 						reply: sb.Utils.tag.trim `
-							Stats for user ${user}:
+							Stats for user ${user}${ironman}:
 							${strings.join(" ")}
 						`
 					};
 				}
 			}
-	
-			case "activity":
-			case "kc":
-			case "killcount": {
-				const activity = (context.params.kc ?? context.params.killcount ?? context.params.activity);
-				if (!activity) {
+
+			case "kc": {
+				const input = { username: null, activity: null };
+				const [first, second] = args.join(" ").toLowerCase().split(",").map(i => i.trim());
+
+				if (this.staticData.activities.includes(first)) {
+					input.activity = first;
+					input.username = second;
+				}
+				else if (this.staticData.activities.includes(second)) {
+					input.username = first;
+					input.activity = second;
+				}
+				else {
 					return {
 						success: false,
-						reply: `No activity provided! Use activity:(name)`
+						reply: `Could not match any activity! Check the list of activities here: https://supinic.com/bot/command/${this.ID}`
 					};
 				}
-	
-				const user = args.join(" ");
-				if (!user) {
-					return {
-						success: false,
-						reply: `No player name provided!`
-					};
-				}
-	
-				const data = await this.staticData.fetch(user);
+
+				const data = await this.staticData.fetch(input.username);
 				if (data.success === false) {
 					return data;
 				}
 	
 				const activities = data.activities.map(i => i.name.toLowerCase());
-				const bestMatch = sb.Utils.selectClosestString(activity, activities, { ignoreCase: true });
+				const bestMatch = sb.Utils.selectClosestString(input.activity, activities, { ignoreCase: true });
 				if (!bestMatch) {
 					return {
 						success: false,
 						reply: `Activity was not found! Check the command's help for a list.`
 					};
 				}
-	
-				const { name, rank, value } = data.activities.find(i=> i.name.toLowerCase() === bestMatch.toLowerCase());
+
+				const ironman = this.staticData.getIronman(data);
+				const { name, rank, value } = data.activities.find(i => i.name.toLowerCase() === bestMatch.toLowerCase());
 				return {
 					reply: (rank === null)
 						? `Player is not ranked for ${name}.`
-						: `${name}: ${value} - rank #${rank}.`
+						: `${ironman} ${input.username} KC for ${name}: ${value} - rank #${rank}.`
 				};
 			}
 
