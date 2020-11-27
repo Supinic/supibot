@@ -23,7 +23,7 @@ module.exports = {
 			message.splice(randomIndex, 1);
 		}
 	
-		const reply = result.join(" ");
+		const reply = result.join("");
 		return { 
 			reply: reply,
 			cooldown: {
