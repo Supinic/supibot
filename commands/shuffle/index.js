@@ -7,15 +7,19 @@ module.exports = {
 	Flags: ["pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function shuffle (context, ...message) {
-		if (message.length === 0) {
-			return { reply: "No input provided!" };
+	Code: (async function shuffle (context, ...args) {
+		if (args.length === 0) {
+			return {
+				success: false,
+				reply: "No input provided!"
+			};
 		}
 	
 		const result = [];
+		const message = args.join(" ").split(/\b/).filter(Boolean);
 		while (message.length > 0) {
 			const randomIndex = sb.Utils.random(0, message.length - 1);
-			result.push(message[randomIndex].replace(/[\[\]{}()]/g, ""));
+			result.push(message[randomIndex]);
 			message.splice(randomIndex, 1);
 		}
 	
