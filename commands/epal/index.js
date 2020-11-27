@@ -82,7 +82,7 @@ module.exports = {
 				level: i.userLevel,
 				name: i.userName,
 				gameLevel: i.levelName,
-				languages: i.languageName.split(","),
+				languages: (i.languageName) ? i.languageName.split(",") : [],
 				description: i.introductionText,
 				audioFile: i.introductionSpeech,
 				revenue: (i.serveNum)
@@ -155,7 +155,7 @@ module.exports = {
 			? `Total revenue: $${revenue}`
 			: "";
 
-		const languageString = (languages)
+		const languageString = (languages.length > 0)
 			? `${pronoun} speak${suffix} ${languages.join(", ")}.`
 			: "";
 
