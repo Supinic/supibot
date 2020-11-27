@@ -128,6 +128,15 @@ module.exports = {
 				const row = await sb.Query.getRow("music", "Track");
 				await row.load(check.ID);
 
+				const added = { name: "(unknown)", date: "(unknown time ago)" };
+				if (row.values.Added_By) {
+					const userData = await sb.User.get(row.values.Added_By);
+					added.name = userData.Name;
+				}
+				if (row.values.Added_On) {
+					added.date = sb.Utils.timeDelta(row.values.Added_On);
+				}
+
 				results.push({
 					link,
 					existing: true,
@@ -136,6 +145,7 @@ module.exports = {
 						Link is in the list already:
 						${trackToLink(check.ID)}
 						with tags: ${tags}.
+						This link was added by ${added.name} ${added.date}.						
 					`
 				});
 			}
