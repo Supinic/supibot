@@ -7,7 +7,7 @@ module.exports = {
 	Flags: ["mention"],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function countLineTotal () {
+	Code: (async function countLineTotal (context) {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("(SUM(DATA_LENGTH) + SUM(INDEX_LENGTH)) AS Bytes")
 			.select("SUM(AUTO_INCREMENT) AS Chat_Lines")
@@ -33,11 +33,18 @@ module.exports = {
 		const rate = sb.Utils.round((currentSize - originalSize) / days, 3);
 		const fillDate = new sb.Date().addDays((220 - currentSize) / rate); // 238 GB minus an estimate of ~18GB of other stuff
 		const megabytesPerHour = sb.Utils.round(rate * 1024 / 24, 3);
-	
+
+		const cooldown = {};
+		if (context.channel) {
+			cooldown.length = this.Cooldown;
+			cooldown.channel = context.channel;
+		}
+		else {
+			cooldown.length = this.Cooldown * 2;
+		}
+
 		return {
-			cooldown: {
-				channel: this.Cooldown
-			},
+			cooldown,
 			reply: sb.Utils.tag.trim `
 				Currently logging ${sb.Utils.groupDigits(data.Chat_Lines)} lines in total across all channels,
 				taking up ~${currentSize} GB of space.
