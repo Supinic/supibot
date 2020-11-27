@@ -4,328 +4,168 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches a random person from epal.gg - post their description. If used on supinic's channel with TTS on, and if they have an audio introduction, it will be played on stream.",
-	Flags: ["mention"],
+	Flags: ["mention","use-params"],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		fetchGamesData: async () => {
-			const data = await sb.Got.instances.FakeAgent({
+	Static_Data: null,
+	Code: (async function epal (context) {
+		let games = await this.getCacheData({ type: "games" });
+		if (!games) {
+			const response = await sb.Got.instances.GenericAPI({
 				method: "POST",
-				url: "https://www.egirl.gg/api/web/product-type/list-by-game?"
-			}).json();
-	
-			return JSON.stringify(data.content.map(i => ({
+				responseType: "json",
+				url: "https://play.epal.gg/web/product-type/list-by-user-online-games"
+			});
+
+			games = response.body.content.map(i => ({
 				ID: i.id,
-				name: i.nameEn,
+				name: i.name,
 				gameID: i.gameNum
-			})).sort((a, b) => a.ID - b.ID), null, 4);
-		},
-	
-		games: [
-			{
-				"ID": 1,
-				"name": "CS:GO",
-				"gameID": 2102
-			},
-			{
-				"ID": 2,
-				"name": "Dota 2",
-				"gameID": 295
-			},
-			{
-				"ID": 3,
-				"name": "PUBG",
-				"gameID": 139
-			},
-			{
-				"ID": 4,
-				"name": "League of Legends",
-				"gameID": 9855
-			},
-			{
-				"ID": 5,
-				"name": "Fortnite",
-				"gameID": 1909
-			},
-			{
-				"ID": 6,
-				"name": "Minecraft",
-				"gameID": 2345
-			},
-			{
-				"ID": 7,
-				"name": "Overwatch",
-				"gameID": 2467
-			},
-			{
-				"ID": 8,
-				"name": "Hearthstone",
-				"gameID": 153
-			},
-			{
-				"ID": 9,
-				"name": "Gwent",
-				"gameID": 16
-			},
-			{
-				"ID": 10,
-				"name": "Heroes of the Storm",
-				"gameID": 125
-			},
-			{
-				"ID": 11,
-				"name": "World of Warcraft",
-				"gameID": 499
-			},
-			{
-				"ID": 12,
-				"name": "Apex Legends",
-				"gameID": 905
-			},
-			{
-				"ID": 13,
-				"name": "VR Chat",
-				"gameID": 543
-			},
-			{
-				"ID": 14,
-				"name": "Dead by Daylight",
-				"gameID": 621
-			},
-			{
-				"ID": 15,
-				"name": "Rocket League",
-				"gameID": 372
-			},
-			{
-				"ID": 16,
-				"name": "Super Smash bros",
-				"gameID": 272
-			},
-			{
-				"ID": 17,
-				"name": "Roblox",
-				"gameID": 509
-			},
-			{
-				"ID": 18,
-				"name": "Call of Duty",
-				"gameID": 1210
-			},
-			{
-				"ID": 19,
-				"name": "Animal Crossing: New Horizons",
-				"gameID": 668
-			},
-			{
-				"ID": 20,
-				"name": "Rainbow Six",
-				"gameID": 681
-			},
-			{
-				"ID": 21,
-				"name": "Grand Theft Auto V",
-				"gameID": 148
-			},
-			{
-				"ID": 22,
-				"name": "Osu!",
-				"gameID": 449
-			},
-			{
-				"ID": 23,
-				"name": "Destiny 2",
-				"gameID": 170
-			},
-			{
-				"ID": 24,
-				"name": "Pokémon Sword/Shield",
-				"gameID": 65
-			},
-			{
-				"ID": 25,
-				"name": "Monster Hunter World",
-				"gameID": 179
-			},
-			{
-				"ID": 26,
-				"name": "Final Fantasy XIV Online",
-				"gameID": 142
-			},
-			{
-				"ID": 27,
-				"name": "Borderlands 3",
-				"gameID": 82
-			},
-			{
-				"ID": 28,
-				"name": "Black Desert Online",
-				"gameID": 100
-			},
-			{
-				"ID": 29,
-				"name": "Legends of Runeterra",
-				"gameID": 40
-			},
-			{
-				"ID": 30,
-				"name": "Escape From Tarkov",
-				"gameID": 145
-			},
-			{
-				"ID": 31,
-				"name": "Slither io",
-				"gameID": 190
-			},
-			{
-				"ID": 33,
-				"name": "PUBG: Mobile",
-				"gameID": 32
-			},
-			{
-				"ID": 34,
-				"name": "Call of Duty®: Mobile - Garena",
-				"gameID": 57
-			},
-			{
-				"ID": 35,
-				"name": "Arena of Valor",
-				"gameID": 8
-			},
-			{
-				"ID": 36,
-				"name": "Minecraft: Mobile",
-				"gameID": 19
-			},
-			{
-				"ID": 37,
-				"name": "Fortnite: Mobile",
-				"gameID": 18
-			},
-			{
-				"ID": 38,
-				"name": "Roblox: Mobile",
-				"gameID": 22
-			},
-			{
-				"ID": 40,
-				"name": "Teamfight Tactics",
-				"gameID": 102
-			},
-			{
-				"ID": 41,
-				"name": "E-Chat",
-				"gameID": 193
-			},
-			{
-				"ID": 42,
-				"name": "Smite",
-				"gameID": 26
-			},
-			{
-				"ID": 43,
-				"name": "Valorant",
-				"gameID": 166
-			}
-		]
-	})),
-	Code: (async function epal (context, ...args) {
-		let game = sb.Utils.randArray(this.staticData.games);
-		let selectedSex = "1";
-	
-		for (const token of args) {
-			if (token.includes("game:")) {
-				const name = token.replace("game:", "").toLowerCase();
-				game = this.staticData.games.find(i => i.name.toLowerCase().includes(name));
-	
-				if (!game) {
-					return {
-						reply: "Could not match your provided game!"
-					};
-				}
-			}
-			else if (token.includes("gender:") || token.includes("sex:")) {
-				const gender = token.replace("gender:", "").replace("sex:", "").toLowerCase();
-				if (gender === "male") {
-					selectedSex = "0";
-				}
-				else if (gender === "female") {
-					selectedSex = "1";
-				}
-				else {
-					return {
-						reply: "Could not match your provided gender!"
-					};
-				}
-			}
-		}
-	
-		const { statusCode, body: data } = await sb.Got.instances.FakeAgent({
-			method: "POST",
-			throwHttpErrors: false,
-			responseType: "json",
-			url: "https://play.epal.gg/web/home/might_like",
-			json: {
-				ps: 1,
-				productTypeId: String(game.ID),
-				sex: selectedSex
-			}
-		});
-	
-		if (statusCode !== 200) {
-			throw new sb.errors.APIError({
-				apiName: "EgirlAPI",
-				statusCode
+			}));
+
+			await this.setCacheData({ type: games }, games, {
+				expiry: 7 * 864e5 // 1 day
 			});
 		}
-	
-		if (!data.content || data.content.length === 0) {
+
+		let gameData = sb.Utils.randArray(games);
+		if (context.params.game) {
+			const gameNameList = games.map(i => i.name);
+			const [bestMatch] = sb.Utils.selectClosestString(context.params.game, gameNameList, {
+				fullResult: true,
+				ignoreCase: true
+			});
+
+			if (bestMatch.score === 0) {
+				return {
+					success: false,
+					reply: "No matching game could be found!"
+				};
+			}
+
+			gameData = games.find(i => i.name === bestMatch.original);
+		}
+
+		let selectedSex = "1";
+		if (context.params.gender || context.params.sex) {
+			const gender = (context.params.gender ?? context.params.sex).toLowerCase();
+			if (gender === "male") {
+				selectedSex = "0";
+			}
+			else if (gender === "female") {
+				selectedSex = "1";
+			}
+			else {
+				return {
+					success: false,
+					reply: "No matching gender could be found!"
+				};
+			}
+		}
+
+		const profileKey = { gameID: gameData.ID, sex: selectedSex };
+		let profilesData = await this.getCacheData(profileKey);
+		if (!profilesData) {
+			const response = await sb.Got.instances.GenericAPI({
+				method: "POST",
+				responseType: "json",
+				url: "https://play.epal.gg/web/home/most-services-top",
+				json: {
+					pn: 1,
+					ps: 100,
+					sex: String(selectedSex),
+					productType: gameData.ID
+				}
+			});
+
+			profilesData = response.body.content.map(i => ({
+				ID: i.userId,
+				level: i.userLevel,
+				name: i.userName,
+				gameLevel: i.levelName,
+				languages: i.languageName.split(","),
+				description: i.introductionText,
+				audioFile: i.introductionSpeech,
+				revenue: (i.serveNum)
+					? (i.serveNum * i.price / 100)
+					: null,
+				price: {
+					regular: (i.price / 100),
+					unit: i.priceUnitDesc ?? "hour",
+					discount: (i.discountPrice) ? (i.discountPrice / 100) : null,
+					discountAmount: (i.discountAmount) ? ((1 - i.discountAmount) * 100 + "%") : null
+				}
+			}));
+
+			await this.setCacheData(profileKey, profilesData, { expiry: 864e5 });
+		}
+
+		if (profilesData.length === 0) {
 			return {
 				success: false,
-				reply: "No eligible profiles found!"
+				reply: "Game/gender combination has no active profiles!"
 			};
 		}
 	
 		const ttsData = sb.Command.get("tts").data;
 		const {
-			serveNum,
-			recommendNum,
-			userName,
-			sex,
-			languageName,
-			introductionText,
-			introductionSpeech,
+			audioFile,
+			description,
+			languages,
+			level,
+			name,
+			revenue,
 			price
-		} = data.content[0];
+		} = sb.Utils.randArray(profilesData);
 	
 		if (context.channel?.ID === 38 && sb.Config.get("TTS_ENABLED") && !ttsData.pending) {
 			ttsData.pending = true;
 	
 			await sb.LocalRequest.playSpecialAudio({
-				url: introductionSpeech,
+				url: audioFile,
 				volume: sb.Config.get("TTS_VOLUME"),
 				limit: 20_000
 			});
 	
 			ttsData.pending = false;
 		}
-	
-		let type = "(unspecified)";
+
+		let suffix = "";
+		let pronoun = "They";
+		let type = "(other)";
 		if (sex === 0) {
-			type =  "(M)";
+			suffix = "s";
+			pronoun = "He";
+			type = "(M)";
 		}
 		else if (sex === 1) {
-			type =  "(F)";
+			suffix = "s";
+			pronoun = "She";
+			type = "(F)";
 		}
-		
-		const revenue = (serveNum > 0)
-			? `Total revenue: $${(serveNum * price) / 100}`
+
+		const levelString = (level)
+			? `at level ${level}`
 			: "";
-		const language = (languageName)
-			? `They speak ${languageName}.`
+
+		const priceString = (price.discount)
+			? `$${price.discount} (${price.discountAmount}% discount!) per ${price.unit}`
+			: `$${price.regular} per ${price.unit}`;
+
+		const revenueString = (serveNum > 0)
+			? `Total revenue: $${revenue}`
+			: "";
+
+		const languageString = (languages)
+			? `${pronoun} speak${suffix} ${languages.join(", ")}.`
 			: "";
 	
 		return {
-			reply: `${userName} ${type} plays ${game.name} for $${price / 100}: ${introductionText} ${language} ${revenue}`
+			reply: sb.Utils.tag.trim `
+				${name} ${type} plays ${gameData.name} ${levelString} for ${priceString}:
+				${description}
+				${languageString}
+				${revenueString}
+			`
 		};
 	}),
 	Dynamic_Description: (async (prefix, values) => {
