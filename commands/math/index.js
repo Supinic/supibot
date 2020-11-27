@@ -53,11 +53,11 @@ module.exports = {
 			"",
 	
 			`<code>${prefix}math e^(i*pi)</code>`,
-			"0",
+			"-1 + 1.2246467991473532e-16i",
 			"",
 	
 			`<code>${prefix}math 100 inches to cm</code>`,
-			"25.4 cm",
+			"254 cm",
 			""
 		];
 	})
