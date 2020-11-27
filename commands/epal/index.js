@@ -22,7 +22,7 @@ module.exports = {
 				gameID: i.gameNum
 			}));
 
-			await this.setCacheData({ type: games }, games, {
+			await this.setCacheData({ type: "games" }, games, {
 				expiry: 7 * 864e5 // 1 day
 			});
 		}
