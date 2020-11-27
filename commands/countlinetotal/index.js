@@ -8,24 +8,9 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function countLineTotal () {
-		let preciseLines = 0;
-		for (const channel of sb.Channel.data.filter(i => i.Type !== "Inactive")) {
-			const rs = await sb.Query.getRecordset(rs => rs
-				.select("MAX(ID) AS Total")
-				.from("chat_line", channel.getDatabaseName())
-				.single()
-			);
-	
-			if (!rs) {
-				console.warn("countlinetotal: No ID found", channel.Name);
-				continue;
-			}
-	
-			preciseLines += rs.Total;
-		}
-	
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("(SUM(DATA_LENGTH) + SUM(INDEX_LENGTH)) AS Bytes")
+			.select("SUM(AUTO_INCREMENT) AS Chat_Lines")
 			.from("INFORMATION_SCHEMA", "TABLES")
 			.where("TABLE_SCHEMA = %s", "chat_line")
 			.single()
@@ -51,7 +36,7 @@ module.exports = {
 	
 		return {
 			reply: sb.Utils.tag.trim `
-				Currently logging ${sb.Utils.groupDigits(preciseLines)} lines in total across all channels,
+				Currently logging ${sb.Utils.groupDigits(data.Chat_Lines)} lines in total across all channels,
 				taking up ~${currentSize} GB of space.
 				Lines are added at a rate of ~${megabytesPerHour} MB/hr.
 				At this rate, Supibot's hard drive will run out of space approximately on ${fillDate.format("Y-m-d")}.
