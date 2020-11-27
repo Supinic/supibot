@@ -110,8 +110,8 @@ module.exports = {
 		const {
 			audioFile,
 			description,
+			gameLevel,
 			languages,
-			level,
 			name,
 			revenue,
 			price
@@ -143,8 +143,8 @@ module.exports = {
 			type = "(F)";
 		}
 
-		const levelString = (level)
-			? `at level ${level}`
+		const levelString = (gameLevel)
+			? `at level ${gameLevel}`
 			: "";
 
 		const priceString = (price.discount)
