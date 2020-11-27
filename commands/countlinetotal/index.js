@@ -36,10 +36,13 @@ module.exports = {
 
 		const cooldown = {};
 		if (context.channel) {
+			cooldown.user = null;
+			cooldown.channel = context.channel.ID;
 			cooldown.length = this.Cooldown;
-			cooldown.channel = context.channel;
 		}
 		else {
+			cooldown.user = context.user.ID;
+			cooldown.channel - null;
 			cooldown.length = this.Cooldown * 2;
 		}
 
