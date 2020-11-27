@@ -105,7 +105,7 @@ module.exports = {
 				reply: "Game/gender combination has no active profiles!"
 			};
 		}
-	
+
 		const ttsData = sb.Command.get("tts").data;
 		const {
 			audioFile,
@@ -116,28 +116,28 @@ module.exports = {
 			revenue,
 			price
 		} = sb.Utils.randArray(profilesData);
-	
+
 		if (context.channel?.ID === 38 && sb.Config.get("TTS_ENABLED") && !ttsData.pending) {
 			ttsData.pending = true;
-	
+
 			await sb.LocalRequest.playSpecialAudio({
 				url: audioFile,
 				volume: sb.Config.get("TTS_VOLUME"),
 				limit: 20_000
 			});
-	
+
 			ttsData.pending = false;
 		}
 
 		let suffix = "";
 		let pronoun = "They";
 		let type = "(other)";
-		if (sex === 0) {
+		if (selectedSex === "0") {
 			suffix = "s";
 			pronoun = "He";
 			type = "(M)";
 		}
-		else if (sex === 1) {
+		else if (selectedSex === "1") {
 			suffix = "s";
 			pronoun = "She";
 			type = "(F)";
@@ -151,14 +151,14 @@ module.exports = {
 			? `$${price.discount} (${price.discountAmount}% discount!) per ${price.unit}`
 			: `$${price.regular} per ${price.unit}`;
 
-		const revenueString = (serveNum > 0)
+		const revenueString = (revenue !== null && revenue > 0)
 			? `Total revenue: $${revenue}`
 			: "";
 
 		const languageString = (languages)
 			? `${pronoun} speak${suffix} ${languages.join(", ")}.`
 			: "";
-	
+
 		return {
 			reply: sb.Utils.tag.trim `
 				${name} ${type} plays ${gameData.name} ${levelString} for ${priceString}:
@@ -171,11 +171,13 @@ module.exports = {
 	Dynamic_Description: (async (prefix, values) => {
 		const row = await sb.Query.getRow("chat_data", "Command");
 		await row.load(208);
-		
-		const games = values.getStaticData().games
-			.map(i => `<li><code>${i.name}</code></li>`)
-			.sort()
-			.join("");
+
+		const gameData = await values.getCacheData({ key: "games" });
+		const games = (gameData)
+			? gameData.map(i => `<li><code>${i.name}</code></li>`)
+				.sort()
+				.join("")
+			: "<li>No game data available - use the command to populate the list!</li>"
 	
 		return [
 			`Fetches a random description of a user profile from <a target="_blank" href="egirl.gg">egirl.gg</a>.`,
