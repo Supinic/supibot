@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 7500,
 	Description: "Fetches a random line from the current channel. If a user is specified, fetches a random line from that user only",
-	Flags: ["block","opt-out","pipe"],
+	Flags: ["block","opt-out","pipe","use-params"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomLine (context, user) {
@@ -188,22 +188,28 @@ module.exports = {
 				);
 			}
 		}
-	
-		return {
-			partialReplies: [
+
+		const partialReplies = [{
+			bancheck: true,
+			message: result.Text
+		}];
+
+		// Only add the "(time ago) name:" part if it was not requested to skip it
+		if (!context.params.textOnly) {
+			partialReplies.unshift(
 				{
 					bancheck: false,
 					message: `(${sb.Utils.timeDelta(result.Posted)})`
 				},
 				{
 					bancheck: true,
-					message: `${result.Name}:`				
-				},
-				{
-					bancheck: true,
-					message: `${result.Text}`
-				}			
-			]
+					message: `${result.Name}:`
+				}
+			);
+		}
+
+		return {
+			partialReplies
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
@@ -212,7 +218,7 @@ module.exports = {
 		"",
 	
 		`<code>${prefix}rl</code>`,
-		"Random message from anyone",
+		`Random message from anyone, in the format "(time ago) (username): (message)"`,
 		"",
 	
 		`<code>${prefix}rl (user)</code>`,
@@ -221,6 +227,10 @@ module.exports = {
 	
 		`<code>${prefix}rq</code>`,
 		"Random message from yourself only",
-		""
+		"",
+
+		`<code>${prefix}rl (user) textOnly:true</code>`,
+		`Will only reply with the message, ignoring the "(time ago) (name):" part`,
+		"",
 	])
 };
