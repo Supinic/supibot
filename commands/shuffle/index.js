@@ -23,9 +23,9 @@ module.exports = {
 			message.splice(randomIndex, 1);
 		}
 	
-		const reply = result.join("");
+		const reply = result.join(" ").replace(/\s+/g, " ");
 		return { 
-			reply: reply,
+			reply,
 			cooldown: {
 				length: (context.append.pipe) ? null : this.Cooldown
 			}
