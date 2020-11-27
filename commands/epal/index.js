@@ -148,7 +148,7 @@ module.exports = {
 			: "";
 
 		const priceString = (price.discount)
-			? `$${price.discount} (${price.discountAmount}% discount!) per ${price.unit}`
+			? `$${price.discount} (${price.discountAmount} discount!) per ${price.unit}`
 			: `$${price.regular} per ${price.unit}`;
 
 		const revenueString = (revenue !== null && revenue > 0)
@@ -172,11 +172,9 @@ module.exports = {
 		const row = await sb.Query.getRow("chat_data", "Command");
 		await row.load(208);
 
-		const gameData = await values.getCacheData({ key: "games" });
+		const gameData = await values.getCacheData({ type: "games" });
 		const games = (gameData)
-			? gameData.map(i => `<li><code>${i.name}</code></li>`)
-				.sort()
-				.join("")
+			? gameData.map(i => `<li><code>${i.name}</code></li>`).sort().join("")
 			: "<li>No game data available - use the command to populate the list!</li>"
 	
 		return [
