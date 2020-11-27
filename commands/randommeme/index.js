@@ -110,7 +110,10 @@ module.exports = {
 			expiration,
 			RedditPost,
 			Subreddit,
-	
+
+			uncached: [
+				"random"
+			],
 			banned: [
 				"bigpenis",
 				"cockcourt",
@@ -140,7 +143,9 @@ module.exports = {
 		}
 	
 		const subreddit = (args.shift() ?? sb.Utils.randArray(this.staticData.defaultMemeSubreddits)).toLowerCase();
-		if (!this.data.subreddits[subreddit]) {
+
+		let forum = this.data.subreddits[subreddit];
+		if (!forum) {
 			const { statusCode, body: response } = await sb.Got.instances.Reddit(subreddit + "/about.json");
 
 			if (statusCode !== 200 && statusCode !== 403 && statusCode !== 404) {
@@ -150,10 +155,12 @@ module.exports = {
 				});
 			}
 
-			this.data.subreddits[subreddit] = new this.staticData.Subreddit(response);
+			forum = new this.staticData.Subreddit(response);
+			if (!this.staticData.uncached.includes(subreddit)) {
+				this.data.subreddits[subreddit] = forum;
+			}
 		}
-	
-		const forum = this.data.subreddits[subreddit];
+
 		if (forum.error) {
 			return {
 				success: false,
