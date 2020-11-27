@@ -2,9 +2,9 @@ module.exports = {
 	Name: "countlinetotal",
 	Aliases: ["clt"],
 	Author: "supinic",
-	Cooldown: 0,
-	Description: "Fetches the amount of data lines from ALL the log tables, including the total size.",
-	Flags: ["mention","pipe","skip-banphrase","system","whitelist"],
+	Cooldown: 30000,
+	Description: "Fetches the amount of data lines from ALL the log tables Supibot uses, including the total size and a prediction of when the storage will run out.",
+	Flags: ["mention"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function countLineTotal () {
@@ -35,6 +35,9 @@ module.exports = {
 		const megabytesPerHour = sb.Utils.round(rate * 1024 / 24, 3);
 	
 		return {
+			cooldown: {
+				channel: this.Cooldown
+			},
 			reply: sb.Utils.tag.trim `
 				Currently logging ${sb.Utils.groupDigits(data.Chat_Lines)} lines in total across all channels,
 				taking up ~${currentSize} GB of space.
