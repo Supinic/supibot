@@ -439,7 +439,7 @@ module.exports = {
 			if (data.type === "bilibili" || data.type === "nicovideo") {
 				const { promisify } = require("util");
 				const shell = promisify(require("child_process").exec);
-				const result = await shell(`/code/node_modules/youtube-dl/bin/youtube-dl --get-url ${data.link}`);
+				const result = await shell(`youtube-dl --get-url ${data.link}`);
 	
 				vlcLink = result.stdout;
 			}
