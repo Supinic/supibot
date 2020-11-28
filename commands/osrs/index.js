@@ -28,7 +28,7 @@ module.exports = {
 				if (!apiData.data) {
 					return {
 						success: false,
-						reply: `No data found for given player name!`
+						reply: `No data found for player name "${user}"!`
 					};
 				}
 	
