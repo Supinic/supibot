@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS `data`.`Got_Instance` (
   `Description` TEXT DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `FK_Got_Instance_Got_Instance` (`Parent`),
+  UNIQUE INDEX `Name` (`Name`) USING BTREE,
   CONSTRAINT `FK_Got_Instance_Got_Instance` FOREIGN KEY (`Parent`) REFERENCES `Got_Instance` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
