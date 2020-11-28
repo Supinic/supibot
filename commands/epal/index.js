@@ -91,7 +91,7 @@ module.exports = {
 				price: {
 					regular: (i.price / 100),
 					unit: i.priceUnitDesc ?? "hour",
-					discount: (i.discountPrice) ? (i.discountPrice / 100) : null,
+					discount: (i.discountPrice) ? sb.Utils.round(i.discountPrice / 100) : null,
 					discountAmount: (i.discountAmount) ? ((1 - i.discountAmount) * 100 + "%") : null
 				}
 			}));
