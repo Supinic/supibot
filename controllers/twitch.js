@@ -94,7 +94,7 @@ module.exports = class Twitch extends require("./template.js") {
 					const streams = [];
 					const results = await Promise.all(promises);
 					for (const partialResult of results) {
-						streams.push(...partialResult.streams);
+						streams.push(...partialResult.body.streams);
 					}
 
 					for (const channel of channelList) {
