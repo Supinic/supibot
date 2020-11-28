@@ -78,7 +78,7 @@ module.exports = class Twitch extends require("./template.js") {
 					while (counter < channelList.length) {
 						const slice = channelList.slice(counter, counter + batchSize).map(i => i.Specific_ID);
 						promises.push(
-							sb.Got.instances.Twitch.Kraken({
+							sb.Got("Kraken").get({
 								url: "streams",
 								responseType: "json",
 								searchParams: new sb.URLParams()
@@ -726,7 +726,7 @@ module.exports = class Twitch extends require("./template.js") {
 	static async fetchEmotes (sets) {
 		const emotesData = [];
 		const promises = sets.map(async (emoteSet) => {
-			const data = await sb.Got.instances.Leppunen("twitch/emoteset/" + emoteSet).json();
+			const data = await sb.Got("Leppunen").get("twitch/emoteset/" + emoteSet).json();
 			emotesData.push({
 				ID: emoteSet,
 				channel: {
