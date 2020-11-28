@@ -19,6 +19,13 @@ module.exports = {
 			};
 		}
 
+		if (targetUser !== context.user && !context.channel) {
+			return {
+				success: false,
+				reply: "Cannot check other users' last command here!"
+			};
+		}
+
 		const data = await sb.Query.getRecordset(rs => {
 			rs.select("Result")
 				.from("chat_data", "Command_Execution")
