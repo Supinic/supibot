@@ -62,7 +62,7 @@ module.exports = {
 			};
 		}
 	
-		const data = await sb.Got.instances.Twitch.Kraken({
+		const { body: data } = await sb.Got.instances.Twitch.Kraken({
 			url: `users/${userID}/follows/channels/${channelID}`,
 			throwHttpErrors: false
 		});
