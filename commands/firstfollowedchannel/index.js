@@ -24,21 +24,21 @@ module.exports = {
 				.set("sortby", "created_at")
 				.toString()
 		}).json();
-	
+
+		const who = (!target || context.user.Name === target.toLowerCase())
+			? "you"
+			: "they";
+
 		if (follows.length === 0) {
 			return {
-				reply: "That user does not follow anyone."
+				reply: `${sb.Utils.capitalize(who)} don't follow anyone.`
 			};
 		}
 		else {
 			const follow = follows[0];
 			const delta = sb.Utils.timeDelta(new sb.Date(follow.created_at));
-			const who = (!target || context.user.Name === target.toLowerCase()) 
-				? "Your"
-				: "Their";
-	
 			return {
-				reply: `${who} oldest still followed channel is ${follow.channel.display_name}, since ${delta}.`
+				reply: `The oldest channel ${who} still follow is ${follow.channel.display_name}, since ${delta}.`
 			};
 		}
 	}),
