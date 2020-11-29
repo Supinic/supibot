@@ -35,8 +35,8 @@ module.exports = {
 				reply: "This channel already exists in the database, with mode = " + existing.Mode + "!"
 			};
 		}
-	
-		const channelID = await sb.Utils.getTwitchID(channel);
+		const { controller } = sb.Platform.get("twitch");
+		const channelID = await controller.getUserID(channel);
 		if (!channelID) {
 			return {
 				success: false,

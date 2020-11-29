@@ -8,8 +8,9 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function firstFollowedChannel (context, target) {
-		const ID = await sb.Utils.getTwitchID(target || context.user.Name);
-		if (!ID) {
+		const { controller } = sb.Platform.get("twitch");
+		const channelID = await controller.getUserID(target ?? context.user.Name);
+		if (!channelID) {
 			return {
 				success: false,
 				reply: "Could not match user to a Twitch user ID!"
@@ -17,7 +18,7 @@ module.exports = {
 		}
 	
 		const { follows } = await sb.Got("Kraken", {
-			url: `users/${ID}/follows/channels`,
+			url: `users/${channelID}/follows/channels`,
 			searchParams: new sb.URLParams()
 				.set("limit", "10") // If the limit is 1, and the followed channel is banned, then no response will be used...
 				.set("direction", "asc")

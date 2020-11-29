@@ -50,10 +50,12 @@ module.exports = {
 				return { reply: "You can't follow yourself!" };
 			}
 		}
-	
+
+
+		const { controller } = sb.Platform.get("twitch");
 		const [userID, channelID] = await Promise.all([
-			sb.Utils.getTwitchID(user),
-			sb.Utils.getTwitchID(channel)
+			controller.getUserID(user),
+			controller.getUserID(channel)
 		]);
 	
 		if (!userID || !channelID) {

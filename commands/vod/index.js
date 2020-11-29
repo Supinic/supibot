@@ -24,8 +24,9 @@ module.exports = {
 				};
 			}
 		}
-	
-		const channelID = await sb.Utils.getTwitchID(target);
+
+		const { controller } = sb.Platform.get("twitch");
+		const channelID = await controller.getUserID(target);
 		if (!channelID) {
 			return {
 				reply: "Invalid channel provided!"

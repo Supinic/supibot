@@ -22,7 +22,7 @@ module.exports = {
 					setType = "status";
 				}
 	
-				const channelID = await sb.Utils.getTwitchID("supinic");
+				const channelID = await sb.Platform.get("twitch").controller.getUserID("supinic");
 				const { body, statusCode } = await sb.Got("Kraken", {
 					method: "PUT",
 					url: "channels/" + channelID,
