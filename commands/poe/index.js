@@ -45,7 +45,7 @@ module.exports = {
 							this.data.labyrinth.date = new sb.Date().setTimezoneOffset(0);
 							this.data.details = {};
 	
-							const { statusCode, statusMessage, body: html } = await sb.Got.instances.FakeAgent({
+							const { statusCode, statusMessage, body: html } = await sb.Got("FakeAgent", {
 								url: "https://poelab.com",
 								throwHttpErrors: false
 							});
@@ -72,7 +72,7 @@ module.exports = {
 	
 						const detail = this.data.details[labType];
 						if (detail.imageLink === null) {
-							const html = await sb.Got.instances.FakeAgent(detail.link).text();
+							const html = await sb.Got("FakeAgent", detail.link).text();
 							const $ = sb.Utils.cheerio(html);
 	
 							detail.imageLink = $("#notesImg")[0].attribs.src;

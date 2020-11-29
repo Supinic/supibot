@@ -8,7 +8,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function topGames () {
-		const data = await sb.Got.instances.Twitch.Kraken("games/top").json();
+		const data = await sb.Got("Kraken", "games/top").json();
 		if (!Array.isArray(data.top)) {
 			return {
 				success: false,

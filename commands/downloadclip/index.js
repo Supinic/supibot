@@ -20,7 +20,7 @@ module.exports = {
 			};
 		}
 
-		const data = await sb.Got.instances.Leppunen(`twitch/clip/${slug}`).json();	
+		const data = await sb.Got("Leppunen", `twitch/clip/${slug}`).json();
 		if (data.status === 404) {
 			return {
 				reply: "No data found for given slug!"

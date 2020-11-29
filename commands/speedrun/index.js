@@ -30,7 +30,7 @@ module.exports = {
 			};
 		}
 	
-		const { data: gameData } = await sb.Got.instances.Speedrun({
+		const { data: gameData } = await sb.Got("Speedrun", {
 			url: "games",
 			searchParams: new sb.URLParams()
 				.set("name", gameName)
@@ -45,7 +45,7 @@ module.exports = {
 		}
 	
 		const [game] = gameData;
-		const { data: categoryData } = await sb.Got.instances.Speedrun(`games/${game.id}/categories`).json();
+		const { data: categoryData } = await sb.Got("Speedrun", `games/${game.id}/categories`).json();
 	
 		if (fetchCategories) {
 			return {
@@ -68,7 +68,7 @@ module.exports = {
 			};
 		}
 	
-		const { data: runsData } = await sb.Got.instances.Speedrun({
+		const { data: runsData } = await sb.Got("Speedrun", {
 			url: `leaderboards/${game.id}/category/${category.id}`,
 			searchParam: "top=1"
 		}).json();
@@ -80,7 +80,7 @@ module.exports = {
 		}
 	
 		const { run } = runsData.runs[0];
-		const { data: runnerData } = await sb.Got.instances.Speedrun(`users/${run.players[0].id}`).json();
+		const { data: runnerData } = await sb.Got("Speedrun", `users/${run.players[0].id}`).json();
 	
 		const delta = sb.Utils.timeDelta(new sb.Date(run.date));
 		const time = sb.Utils.formatTime(run.times.primary_t, true);

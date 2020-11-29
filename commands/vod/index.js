@@ -32,7 +32,7 @@ module.exports = {
 			};
 		}
 	
-		const vod = await sb.Got.instances.Twitch.Helix({
+		const vod = await sb.Got("Helix", {
 			url: "videos",
 			searchParams: "user_id=" + channelID
 		}).json();

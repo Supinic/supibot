@@ -12,7 +12,7 @@ module.exports = {
 			user = context.user.Name;
 		}
 	
-		const { statusCode, body } = await sb.Got.instances.Twitch.V5({
+		const { statusCode, body } = await sb.Got("V5", {
 			url: "users",
 			throwHttpErrors: false,
 			searchParams: new sb.URLParams()

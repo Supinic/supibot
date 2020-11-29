@@ -23,7 +23,7 @@ module.exports = {
 		}
 	
 		const escaped = encodeURIComponent(username);
-		const { body: data, statusCode} = await sb.Got.instances.GitHub(`users/${escaped}/events`);
+		const { body: data, statusCode} = await sb.Got("GitHub", `users/${escaped}/events`);
 		if (statusCode !== 200) {
 			return {
 				success: false,

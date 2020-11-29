@@ -8,7 +8,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function whatEmoteIsIt (context, emote) {
-		const data = await sb.Got.instances.Leppunen("twitch/emotes/" + emote).json();
+		const data = await sb.Got("Leppunen", "twitch/emotes/" + emote).json();
 		const {error, channel, channelid, emoteid, emotecode, tier} = data;
 		if (error) {
 			return { reply: error + "!" };

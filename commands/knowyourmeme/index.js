@@ -14,7 +14,7 @@ module.exports = {
 			};
 		}
 	
-		const searchHTML = await sb.Got.instances.FakeAgent({
+		const searchHTML = await sb.Got("FakeAgent", {
 			url: "https://knowyourmeme.com/search",
 			searchParams: new sb.URLParams().set("q", args.join(" ")).toString()
 		}).text();
@@ -27,7 +27,7 @@ module.exports = {
 			};
 		}
 		
-		const detailHTML = await sb.Got.instances.FakeAgent({
+		const detailHTML = await sb.Got("FakeAgent", {
 			prefixUrl: "https://knowyourmeme.com",
 			url: firstLink,
 		}).text();

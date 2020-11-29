@@ -252,7 +252,7 @@ module.exports = {
 	})),
 	Code: (async function randomGeneratedMeme () {
 		if (!this.data.token || !this.data.cookie) {
-			const { body, headers } = await sb.Got.instances.FakeAgent({
+			const { body, headers } = await sb.Got("FakeAgent", {
 				method: "GET",
 				url: "https://imgflip.com/ajax_get_le_data",
 				responseType: "json"
@@ -263,7 +263,7 @@ module.exports = {
 		}
 	
 		const { ID, name } = sb.Utils.randArray(this.staticData.memes);
-		const { statusCode, body: data } = await sb.Got.instances.FakeAgent({
+		const { statusCode, body: data } = await sb.Got("FakeAgent", {
 			method: "POST",
 			responseType: "json",
 			url: "https://imgflip.com/ajax_ai_meme",

@@ -343,7 +343,7 @@ module.exports = {
 		if (!data) {
 			let lookup = null;
 			if (type === "vimeo") {
-				const { body, statusCode } = await sb.Got.instances.Vimeo({
+				const { body, statusCode } = await sb.Got("Vimeo", {
 					url: "videos",
 					throwHttpErrors: false,
 					searchParams: new sb.URLParams()

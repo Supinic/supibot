@@ -23,7 +23,7 @@ module.exports = {
 				}
 	
 				const channelID = await sb.Utils.getTwitchID("supinic");
-				const { body, statusCode } = await sb.Got.instances.Twitch.Kraken({
+				const { body, statusCode } = await sb.Got("Kraken", {
 					method: "PUT",
 					url: "channels/" + channelID,
 					headers: {

@@ -5,7 +5,7 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function checkLastNodeVersion () {
-		const rawData = await sb.Got.instances.GitHub({
+		const rawData = await sb.Got("GitHub", {
 			url: "repos/nodejs/node/releases",
 		}).json();
 

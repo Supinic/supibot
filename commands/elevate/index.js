@@ -87,7 +87,7 @@ module.exports = {
 
 		const issueText = sb.Utils.escapeHTML(row.values.Text);
 		const issueBody = `<a href="//supinic.com/data/suggestion/${ID}">S#${ID}</a> by *${authorString}*\n\n${issueText}`;
-		const { statusCode, body: data } = await sb.Got.instances.GitHub({
+		const { statusCode, body: data } = await sb.Got("GitHub", {
 			method: "POST",
 			responseType: "json",
 			throwHttpErros: false,

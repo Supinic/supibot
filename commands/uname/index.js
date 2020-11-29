@@ -8,7 +8,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function uname () {
-		const data = await sb.Got.instances.GitHub("repos/supinic/supibot/commits").json();
+		const data = await sb.Got("GitHub", "repos/supinic/supibot/commits").json();
 		const commits = data.sort((a, b) => new sb.Date(b.commit.author.date) - new sb.Date(a.commit.author.date));
 	
 		const {sha, commit} = commits[0];

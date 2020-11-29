@@ -10,7 +10,7 @@ module.exports = {
 	Code: (async function epal (context) {
 		let games = await this.getCacheData({ type: "games" });
 		if (!games) {
-			const response = await sb.Got.instances.GenericAPI({
+			const response = await sb.Got("GenericAPI", {
 				method: "POST",
 				responseType: "json",
 				url: "https://play.epal.gg/web/product-type/list-by-user-online-games"
@@ -65,7 +65,7 @@ module.exports = {
 		const profileKey = { gameID: gameData.ID, sex: selectedSex };
 		let profilesData = await this.getCacheData(profileKey);
 		if (!profilesData) {
-			const response = await sb.Got.instances.GenericAPI({
+			const response = await sb.Got("GenericAPI", {
 				method: "POST",
 				responseType: "json",
 				url: "https://play.epal.gg/web/home/most-services-top",

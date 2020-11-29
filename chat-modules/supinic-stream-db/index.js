@@ -3,7 +3,7 @@ module.exports = {
 	Events: ["online", "offline"],
 	Description: "Creates and updates database rows of Streams on Supinic's channel as he goes on/offline.",
 	Code: (async function (context) {
-		const { data: [stream] } = await sb.Got.instances.Twitch.Helix({
+		const { data: [stream] } = await sb.Got("Helix", {
 			url: "streams",
 			searchParams:  new sb.URLParams()
 				.set("user_id", "31400525")

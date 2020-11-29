@@ -22,9 +22,9 @@ module.exports = {
 			};
 		}
 	
-		const data = await sb.Got.instances.Twitch.Kraken("streams/" + channelID).json();
+		const data = await sb.Got("Kraken", "streams/" + channelID).json();
 		if (data === null || data.stream === null) {
-			const { data } = await sb.Got.instances.Twitch.Helix({
+			const { data } = await sb.Got("Helix", {
 				url: "videos",
 				searchParams: "user_id=" + channelID
 			}).json();

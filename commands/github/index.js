@@ -20,7 +20,7 @@ module.exports = {
 			};
 		}
 	
-		const { items } = await sb.Got.instances.GitHub({
+		const { items } = await sb.Got("GitHub", {
 			url: `search/code?q=${query}+in:file+repo:supinic/supi-core+repo:supinic/supibot`
 		}).json();
 	

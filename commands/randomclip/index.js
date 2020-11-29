@@ -30,7 +30,7 @@ module.exports = {
 		}
 	
 		try {
-			const data = await sb.Got.instances.Twitch.Kraken({
+			const data = await sb.Got("Kraken", {
 				url: "clips/top",
 				searchParams: new sb.URLParams()
 					.set("period", period)

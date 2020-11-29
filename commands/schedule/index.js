@@ -23,7 +23,7 @@ module.exports = {
 			};
 		}
 	
-		const data = await sb.Got.instances.Leppunen(`twitch/streamschedule/${channelName}`).json();
+		const data = await sb.Got("Leppunen", `twitch/streamschedule/${channelName}`).json();
 		if (data.status === 200 && data.nextStream) {
 			let extra = "";
 			if (data.interruption) {

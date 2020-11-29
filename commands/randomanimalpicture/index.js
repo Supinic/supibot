@@ -37,7 +37,7 @@ module.exports = {
 		let result = null;
 		switch (type) {
 			case "bird":
-				result = (await sb.Got.instances.SRA("img/birb").json()).link;
+				result = (await sb.Got("SRA", "img/birb").json()).link;
 				break;
 	
 			case "cat":
@@ -49,7 +49,7 @@ module.exports = {
 				break;
 	
 			case "fox":
-				result = (await sb.Got.instances.SRA("img/fox").json()).link;
+				result = (await sb.Got("SRA", "img/fox").json()).link;
 				break;
 		}
 	

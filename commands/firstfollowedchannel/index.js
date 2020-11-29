@@ -16,7 +16,7 @@ module.exports = {
 			};
 		}
 	
-		const { follows } = await sb.Got.instances.Twitch.Kraken({
+		const { follows } = await sb.Got("Kraken", {
 			url: `users/${ID}/follows/channels`,
 			searchParams: new sb.URLParams()
 				.set("limit", "10") // If the limit is 1, and the followed channel is banned, then no response will be used...

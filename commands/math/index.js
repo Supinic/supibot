@@ -15,7 +15,7 @@ module.exports = {
 			};
 		}
 	
-		const { statusCode, body: data } = await sb.Got.instances.Leppunen({
+		const { statusCode, body: data } = await sb.Got("Leppunen", {
 			url: "math",
 			throwHttpErrors: false,
 			searchParams: new sb.URLParams()

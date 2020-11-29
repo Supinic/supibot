@@ -13,7 +13,7 @@ module.exports = {
 			params.set("game", args.join(" "));
 		}
 		
-		const data = await sb.Got.instances.Twitch.Kraken({
+		const data = await sb.Got("Kraken", {
 			url: "streams",
 			searchParams: params.toString() 
 		}).json();

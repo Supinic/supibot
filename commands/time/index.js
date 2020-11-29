@@ -94,7 +94,7 @@ module.exports = {
 		}
 	
 		if (coordinates === null) {
-			const { results: [geoData] } = await sb.Got.instances.Google({
+			const { results: [geoData] } = await sb.Got("Google", {
 				url: "geocode/json",
 				searchParams: new sb.URLParams()
 					.set("address", place)
@@ -113,7 +113,7 @@ module.exports = {
 			}
 		}
 	
-		const timeData = await sb.Got.instances.Google({
+		const timeData = await sb.Got("Google", {
 			url: "timezone/json",
 			searchParams: new sb.URLParams()
 				.set("timestamp", Math.trunc(sb.Date.now() / 1000).toString())

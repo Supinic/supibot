@@ -39,25 +39,25 @@ module.exports = {
 		switch (type) {
 			case "bird":
 				extractor = (data) => data.fact;
-				gotPromise = sb.Got.instances.SRA("facts/bird");
+				gotPromise = sb.Got("SRA", "facts/bird");
 
 				break;
 	
 			case "cat":
 				extractor = (data) => data.fact;
-				gotPromise = sb.Got.instances.GenericAPI("https://catfact.ninja/fact");
+				gotPromise = sb.Got("GenericAPI", "https://catfact.ninja/fact");
 
 				break;
 	
 			case "dog":
 				extractor = (data) => data.facts[0];
-				gotPromise = sb.Got.instances.GenericAPI("https://dog-api.kinduff.com/api/facts");
+				gotPromise = sb.Got("GenericAPI", "https://dog-api.kinduff.com/api/facts");
 
 				break;
 	
 			case "fox":
 				extractor = (data) => data.fact;
-				gotPromise = sb.Got.instances.SRA("facts/fox");
+				gotPromise = sb.Got("SRA", "facts/fox");
 
 				break;
 		}

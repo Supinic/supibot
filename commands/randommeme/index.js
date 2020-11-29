@@ -146,7 +146,7 @@ module.exports = {
 
 		let forum = this.data.subreddits[subreddit];
 		if (!forum) {
-			const { statusCode, body: response } = await sb.Got.instances.Reddit(subreddit + "/about.json");
+			const { statusCode, body: response } = await sb.Got("Reddit", subreddit + "/about.json");
 
 			if (statusCode !== 200 && statusCode !== 403 && statusCode !== 404) {
 				throw new sb.errors.APIError({
@@ -181,7 +181,7 @@ module.exports = {
 		}
 	
 		if (forum.posts.length === 0 || sb.Date.now() > forum.expiration) {
-			const { statusCode, body: response } = await sb.Got.instances.Reddit(subreddit + "/hot.json");
+			const { statusCode, body: response } = await sb.Got("Reddit", subreddit + "/hot.json");
 			if (statusCode !== 200) {
 				throw new sb.errors.APIError({
 					statusCode,
