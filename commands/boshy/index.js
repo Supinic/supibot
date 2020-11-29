@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 15000,
-	Description: "Oh no no PepeLaugh",
+	Description: "Posts a summary of Forsen dying to various bosses in I want to be the Boshy. Oh no no PepeLaugh",
 	Flags: ["mention","pipe","whitelist"],
 	Whitelist_Response: null,
 	Static_Data: null,
