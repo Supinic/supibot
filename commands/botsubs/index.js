@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Checks the channels supibot is currently subscribed to on Twitch.",
+	Description: "Posts the channels supibot is currently subscribed to on Twitch, along with a sample sub emote to each.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
