@@ -196,7 +196,7 @@ module.exports = {
 			detectionsString.push(...strings);
 		}
 
-		const blacklistedFlags = context.channel.Data.twitchLottoBlacklistedFlags ?? [];
+		const blacklistedFlags = context.channel?.Data.twitchLottoBlacklistedFlags ?? [];
 		const imageFlags = image.Adult_Flags ?? [];
 
 		const illegalFlags = imageFlags.map(i => i.toLowerCase()).filter(i => blacklistedFlags.includes(i));
