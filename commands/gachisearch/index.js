@@ -18,7 +18,7 @@ module.exports = {
 
 		const { invocation } = context;
 		const escaped = sb.Query.escapeLikeString(query);
-		if (invocation === "gas" || invocation === "gachiauthorseach") {
+		if (invocation === "gsa" || invocation === "gachiauthorseach") {
 			const data = await sb.Query.raw(sb.Utils.tag.trim `
 				SELECT ID, Name
 				FROM music.Author
