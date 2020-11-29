@@ -718,6 +718,35 @@ module.exports = class Twitch extends require("./template.js") {
 		return (channelData.Specific_ID === userData.Twitch_ID);
 	}
 
+	async getUserID (user) {
+		let userData = await sb.User.get(user, true);
+		if (userData?.Twitch_ID) {
+			return userData.Twitch_ID;
+		}
+
+		const channelInfo = await sb.Got("Helix", {
+			url: "users",
+			throwHttpErrors: false,
+			searchParams: new sb.URLParams()
+				.set("login", user)
+				.toString()
+		}).json();
+
+		if (!channelInfo.error && channelInfo.data.length !== 0) {
+			const { id, display_name: name } = channelInfo.data[0];
+			if (!userData) {
+				userData = await sb.User.get(name, false);
+			}
+			if (userData) {
+				await userData.saveProperty("Twitch_ID", id);
+			}
+
+			return id;
+		}
+
+		return null;
+	}
+
 	/**
 	 * Fetches a list of emote data for a given list of emote sets.
 	 * @param {string[]} sets
