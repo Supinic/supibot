@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "gachisearch",
-	Aliases: ["gs"],
+	Aliases: ["gs", "gas", "gachiauthorsearch"],
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Searches for a given track in the gachi list, and attempts to post a link.",
@@ -15,8 +15,45 @@ module.exports = {
 				reply: "No search query provided!"
 			};
 		}
-	
+
+		const { invocation } = context;
 		const escaped = sb.Query.escapeLikeString(query);
+		if (invocation === "gas" || invocation === "gachiauthorseach") {
+			const data = await sb.Query.raw(sb.Utils.tag.trim `
+				SELECT ID, Name
+				FROM music.Author
+				WHERE 
+					Name LIKE '%${escaped}%' 
+					OR Normalized_Name LIKE '%${escaped}%' 
+					OR EXISTS(
+						SELECT 1
+						FROM music.Alias
+						WHERE
+							Alias.Name LIKE '%${escaped}%' 
+				            AND Alias.Target_Table = "Author"
+				            AND Alias.Target_ID = Author.ID
+		            )
+            `);
+
+			const [author, ...rest] = data;
+			if (!author) {
+				return {
+					success: false,
+					reply: "No authors matching that query have been found!"
+				};
+			}
+
+			const others = (rest.length === 0)
+				? ""
+				: "More results: " + rest.map(i => `${i.Name} (ID ${i.ID})`).join("; ");
+
+			const link = `https://supinic.com/track/author/${author.ID}`;
+			return {
+				reply: `"${author.Name}" - ${link} ${others}`,
+				link
+			};
+		}
+
 		const data = await sb.Query.raw(sb.Utils.tag.trim `
 			SELECT
 				ID,
@@ -52,7 +89,6 @@ module.exports = {
 					)
 				)
 		`);
-	
 		if (data.length === 0) {
 			return {
 				success: false,
