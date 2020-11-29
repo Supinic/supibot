@@ -1,12 +1,9 @@
 CREATE TABLE IF NOT EXISTS `data`.`Got_Instance` (
-  `ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `Name` VARCHAR(50) NOT NULL,
+  `Name` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
   `Options_Type` ENUM('JSON','function') NOT NULL DEFAULT 'JSON',
   `Options` TEXT NOT NULL,
-  `Parent` INT(10) UNSIGNED DEFAULT NULL,
-  `Description` TEXT DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `FK_Got_Instance_Got_Instance` (`Parent`),
-  UNIQUE INDEX `Name` (`Name`) USING BTREE,
-  CONSTRAINT `FK_Got_Instance_Got_Instance` FOREIGN KEY (`Parent`) REFERENCES `Got_Instance` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `Parent` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
+  `Description` TEXT DEFAULT NULL,PRIMARY KEY (`Name`) USING BTREE,
+  INDEX `FK_Got_Instance_Got_Instance` (`Parent`) USING BTREE,
+  CONSTRAINT `FK_Got_Instance_Got_Instance` FOREIGN KEY (`Parent`) REFERENCES `data`.`Got_Instance` (`Name`) ON UPDATE CASCADE ON DELETE CASCADE
+) COLLATE='utf8mb4_general_ci' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
