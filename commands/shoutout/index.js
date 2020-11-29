@@ -1,4 +1,4 @@
-amodule.exports = {
+module.exports = {
 	Name: "shoutout",
 	Aliases: ["so"],
 	Author: "supinic",
