@@ -29,6 +29,13 @@ module.exports = (function () {
 	return class Pastebin extends require("./template.js") {
 		#authData = null;
 		#authenticationPending = false;
+		#got = sb.Got.extend({
+			prefixUrl: "https://pastebin.com/",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				"User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
+			}
+		});
 
 		/**
 		 * @inheritDoc
@@ -60,7 +67,7 @@ module.exports = (function () {
 
 			this.#authenticationPending = true;
 
-			const { body, statusCode } = await sb.Got.instances.Pastebin({
+			const { body, statusCode } = await this.#got({
 				method: "POST",
 				url: "api/api_login.php",
 				timeout: 5000,
@@ -87,7 +94,7 @@ module.exports = (function () {
 		 * @returns {Promise<void>}
 		 */
 		async get (pasteID) {
-			const { body, statusCode } = await sb.Got.instances.Pastebin("raw/" + pasteID);
+			const { body, statusCode } = await this.#got("raw/" + pasteID);
 			return (statusCode === 200)
 				? body
 				: null;
@@ -124,7 +131,7 @@ module.exports = (function () {
 				params.set("api_paste_format", options.format);
 			}
 
-			return await sb.Got.instances.Pastebin({
+			return await this.#got({
 				method: "POST",
 				url: "api/api_post.php",
 				body: params.toString(),
@@ -132,7 +139,7 @@ module.exports = (function () {
 			}).text();
 		}
 
-		async delete (pasteID) {
+		async delete () {
 			throw new sb.Error({
 				message: "Not implemented yet."
 			})
