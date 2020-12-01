@@ -313,6 +313,16 @@ module.exports = {
 					}
 				}
 			},
+			{
+				name: "supibot",
+				aliases: ["bot"],
+				description: "Posts the link to Supibot's stats",
+				execute: async function cookieCount () {
+					return {
+						reply: "Check Supibot's statistics here: https://supinic.com/bot/stats"
+					}
+				}
+			},
 		]
 	})),
 	Code: (async function statistics (context, type, ...args) {
