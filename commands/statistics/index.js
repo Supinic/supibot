@@ -9,7 +9,8 @@ module.exports = {
 	Static_Data: (() => ({
 		types: [
 			{
-				names: ["aliases"],
+				name: "aliases",
+				aliases: [],
 				description: "Checks the global data for user-created supibot command aliases.",
 				execute: async () => {
 					const users = await sb.Query.getRecordset(rs => rs
@@ -30,7 +31,8 @@ module.exports = {
 				}
 			},
 			{
-				names: ["total-afk", "afk", "gn", "brb", "food", "shower", "lurk", "poop", "work", "study"],
+				name: "afk",
+				aliases: ["total-afk", "gn", "brb", "food", "shower", "lurk", "poop", "work", "study"],
 				description: "Checks the total time you (or another user) have been afk for. Each status type is separate - you can use total-afk to check all of them combined.",
 				execute: async (context, type, user) => {
 					const targetUser = (user)
@@ -87,7 +89,8 @@ module.exports = {
 				}
 			},
 			{
-				names: ["sr"],
+				name: "sr",
+				aliases: [],
 				description: "Checks various sr statistics on supinic's channel.",
 				execute: async function execute (context, type, ...args) {
 					let branch;
@@ -188,7 +191,8 @@ module.exports = {
 				}
 			},
 			{
-				names: ["playsound", "ps"],
+				name: "playsound",
+				aliases: ["ps"],
 				description: "Checks the amount of times a given playsound has been used.",
 				execute: async (context, type, name) => {
 					const data = await sb.Query.getRecordset(rs => rs
@@ -218,7 +222,8 @@ module.exports = {
 				}
 			},
 			{
-				names: ["cc", "tcc"],
+				name: "cookiecount",
+				aliases: ["cc", "tcc"],
 				description: "Fetches the amount of cookies you (or someone else) have eaten so far. If you use \"total\", then you will see the total amount of cookies eaten.",
 				execute: async function cookieCount (context, type, user) {
 					if (context.platform.Name === "discord" && user && user.includes("@")) {
@@ -319,7 +324,7 @@ module.exports = {
 		}
 		
 		type = type.toLowerCase();
-		const target = this.staticData.types.find(i => i.names.includes(type));
+		const target = this.staticData.types.find(i => i.name === type || i.aliases.includes(type));
 	
 		if (target) {
 			return await target.execute(context, type, ...args);
@@ -334,7 +339,7 @@ module.exports = {
 	Dynamic_Description: (async (prefix, values) => {
 			const { types } = values.getStaticData();
 			const list = types.map(i => {
-				const names = i.names.sort().map(j => `<code>${j}</code>`).join(" | ");
+				const names = [i.name, ...i.aliases].sort().map(j => `<code>${j}</code>`).join(" | ");
 				return `${names}<br>${i.description}`;
 			}).join("<br>");
 		
