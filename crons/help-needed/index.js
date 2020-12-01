@@ -4,7 +4,7 @@ module.exports = {
 	Description: "Posts some text to spread awareness and encourage chatters to check something out. It depends..",
 	Defer: null,
 	Type: "Bot",
-	Code: (async function announceDiscordLink () {
+	Code: (async function announceHelpNeeded () {
 		const channelData = sb.Channel.get("supinic", "twitch");
 		await channelData.send(sb.Utils.tag.trim `
 			Supi is currently looking for ideas to put together a FAQ section about Supibot!
