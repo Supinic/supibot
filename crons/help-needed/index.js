@@ -1,5 +1,5 @@
 module.exports = {
-	Name: "discord",
+	Name: "help-needed",
 	Expression: "0 30 */2 * * *",
 	Description: "Posts some text to spread awareness and encourage chatters to check something out. It depends..",
 	Defer: null,
