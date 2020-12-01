@@ -225,7 +225,7 @@ module.exports = {
 				name: "cookiecount",
 				aliases: ["cc", "tcc"],
 				description: "Fetches the amount of cookies you (or someone else) have eaten so far. If you use \"total\", then you will see the total amount of cookies eaten.",
-				execute: async function cookieCount (context, type, user) {
+				execute: async (context, type, user) => {
 					if (context.platform.Name === "discord" && user && user.includes("@")) {
 						user = await sb.Utils.getDiscordUserDataFromMentions(user, context.append) || context.user;
 					}
@@ -317,11 +317,9 @@ module.exports = {
 				name: "supibot",
 				aliases: ["bot"],
 				description: "Posts the link to Supibot's stats",
-				execute: async function cookieCount () {
-					return {
-						reply: "Check Supibot's statistics here: https://supinic.com/bot/stats"
-					}
-				}
+				execute: () => ({
+					reply: "Check Supibot's statistics here: https://supinic.com/bot/stats"
+				})
 			},
 		]
 	})),
