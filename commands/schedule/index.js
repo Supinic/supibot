@@ -48,10 +48,16 @@ module.exports = {
 				target = "Your";
 				extra += " (shouldn't you know when you're supposed to stream? 😉)";
 			}
-	
+
+			const isLive = !(await sb.Command.get("si").execute({}, channelName)).includes("offline");
+			const nextStream = new sb.Date(data.nextStream.startsAt);
+			const lateString = (!isLive && sb.Date.now() > nextStream)
+				? "The stream seems to be late FeelsWeirdMan"
+				: "";
+
 			const time = sb.Utils.timeDelta(new sb.Date(data.nextStream.startsAt));
 			return {
-				reply: `${target} next stream: ${game} - ${title}, starting ${time}. ${extra}`
+				reply: `${target} next stream: ${game} - ${title}, starting ${time}. ${lateString} ${extra}`
 			};
 		}
 		else if (data.error) {
