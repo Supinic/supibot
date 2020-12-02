@@ -438,6 +438,25 @@ module.exports = {
 					"HypeWut",
 					"HypeZzz"
 				]
+			},
+			{
+				name: "hindsight",
+				aliases: ["hind", "holiday2020"],
+				description: "Holiday emotes for 2020 holiday season. Called Hindsight, because 20-20 is the year and the hindsight. Awarded between 2020-12-02 to 2021-01-04, whenever someone subs, gifts or cheers.",
+				notes: "https://help.twitch.tv/s/article/hindsight-2020",
+				emotes: [
+					"2020Delivery",
+					"2020Gift",
+					"2020HomeWork",
+					"2020Pajamas",
+					"2020Party",
+					"2020Rivalry",
+					"2020Selfie",
+					"2020SpeakUp",
+					"2020Surprise",
+					"2020Suspicious",
+					"2020Unroll"
+				]
 			}
 		]
 	})),
