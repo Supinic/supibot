@@ -396,7 +396,7 @@ module.exports = class Command extends require("./template.js") {
 		if (!filterData.success) {
 			sb.CooldownManager.unsetPending(userData.ID);
 			sb.CooldownManager.set(channelID, userData.ID, command.ID, command.Cooldown);
-			sb.Runtime.incrementRejectedCommands();
+			await sb.Runtime.incrementRejectedCommands();
 
 			if (filterData.filter.Response === "Reason" && typeof filterData.reply === "string") {
 				const { string } = await sb.Banphrase.execute(filterData.reply, channelData);
@@ -472,7 +472,7 @@ module.exports = class Command extends require("./template.js") {
 				result = execution.partialReplies.map(i => i.message).join(" ").slice(0, 300);
 			}
 
-			sb.Runtime.incrementCommandsCounter();
+			await sb.Runtime.incrementCommandsCounter();
 
 			if (typeof command.ID === "number") {
 				sb.Logger.logCommandExecution({

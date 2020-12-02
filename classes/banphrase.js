@@ -240,7 +240,7 @@ module.exports = (function () {
 				}
 				catch (e) {
 					const { code } = e;
-					sb.Runtime.incrementBanphraseTimeouts(channelData.Name);
+					await sb.Runtime.incrementBanphraseTimeouts(channelData.Name);
 
 					switch (channelData.Banphrase_API_Downtime) {
 						case "Ignore":
