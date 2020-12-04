@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the last tweet from a given user. No retweets or replies, just plain standalone tweets.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function twitter (context, user) {

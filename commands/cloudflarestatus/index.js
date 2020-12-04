@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Checks current Cloudflare status as a short summary.",
-	Flags: ["pipe","developer"],
+	Flags: ["pipe","non-nullable","developer"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function cloudflareStatus () {

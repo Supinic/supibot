@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Transliterates non-latin text into Latin. Should support most of the languages not using Latin (like Japanese, Chinese, Russian, ...)",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function transliterate (context, ...args) {

@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches a random fantasy name. You can specify its type from a list of fantasy races.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		types: [

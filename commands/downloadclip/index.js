@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Takes a Twitch clip name, and sends a download link to it into whispers.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function downloadClip (context, rawSlug) {

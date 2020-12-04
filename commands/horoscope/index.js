@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Checks your horoscope, if you have set your birthday within supibot.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		zodiac: [

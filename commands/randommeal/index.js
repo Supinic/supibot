@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Searches for a meal recipe by its name, or fetches a random one, if no search query was provided.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomMeal (context, ...args) {

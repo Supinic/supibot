@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 20000,
 	Description: "On supinic's stream, takes the currently playing video (if there is any) and fetches another random video from the same Youtube uploader.",
-	Flags: ["link-only","mention","pipe"],
+	Flags: ["link-only","mention","non-nullable","pipe"],
 	Whitelist_Response: "Only usable in Supinic's channel.",
 	Static_Data: null,
 	Code: (async function randomUploaderVideo (context, ...args) {

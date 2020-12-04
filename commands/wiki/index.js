@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Fetches the headline of the first article found according to user query. Watch out, articles might be case sensitive.",
-	Flags: ["mention","pipe","use-params"],
+	Flags: ["mention","non-nullable","pipe","use-params"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function wiki (context, ...args) {

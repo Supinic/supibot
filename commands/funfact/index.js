@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 60000,
 	Description: "Fetches a random fun fact. Absolutely not guaranteed to be fun or fact. Want to help out? Send us your own fun fact via the $suggest command!",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function funFact () {

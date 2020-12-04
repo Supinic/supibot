@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Checks the top 5 streams on twitch - if you add a game, will look for top 5 streams playing that game. Game must be provided verbatim",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function topStreams (context, ...args) {

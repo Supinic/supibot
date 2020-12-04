@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Aggregate command for whatever regarding Old School Runescape.",
-	Flags: ["mention","use-params"],
+	Flags: ["pipe","mention","non-nullable","use-params"],
 	Whitelist_Response: null,
 	Static_Data: ((command) => ({
 		fetch: async (user, options = {}) => {

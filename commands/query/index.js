@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 60000,
 	Description: "Wolfram Alpha query",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function query (context, ...args) {

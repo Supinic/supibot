@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Fetches the top 10 most popular games on twitch, based on current viewer count.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function topGames () {

@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Implicitly translates from auto-recognized language to English. Supports parameters 'from' and 'to'. Example: from:german to:french Guten Tag\",",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function translate (context, ...args) {

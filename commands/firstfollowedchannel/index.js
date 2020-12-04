@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the first channel you or someone else have ever followed on Twitch.",
-	Flags: ["mention","opt-out","pipe"],
+	Flags: ["mention","non-nullable","opt-out","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function firstFollowedChannel (context, target) {

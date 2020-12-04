@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Fetches the Twitch account age of a given account. If none is given, checks yours.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function accountAge (context, user) {

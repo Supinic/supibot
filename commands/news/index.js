@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches short articles. You can use a 2 character ISO code to get country specific news, or any other word as a search query.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		codeRegex: /^[a-z]{2}$/i,

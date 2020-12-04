@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Posts a random, hilarious joke, 100% guaranteed.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function _4head (context) {

@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 20000,
 	Description: "Posts a random gondola video, based on the Gondola Stravers API.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomGondola () {

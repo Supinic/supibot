@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Uses supinic's API to fetch general info about a link, which is then posted to a Pastebin post.",
-	Flags: ["developer","mention","pipe"],
+	Flags: ["developer","mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function getVideoData (context, link) {

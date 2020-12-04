@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Posts the channel's stream schedule.",
-	Flags: ["mention","opt-out","pipe"],
+	Flags: ["mention","non-nullable","opt-out","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function schedule (context, channel) {

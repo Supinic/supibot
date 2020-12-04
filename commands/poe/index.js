@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 7500,
 	Description: "A collection of various Path of Exile related commands. Check the extended help on website for more info.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		this.data.labyrinth = {

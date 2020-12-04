@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Searches the MDN website for a given term, then returns the article link.",
-	Flags: ["developer","mention","pipe"],
+	Flags: ["developer","mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function mdn (context, ...args) {
