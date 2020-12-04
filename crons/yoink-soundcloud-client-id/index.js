@@ -17,7 +17,6 @@ module.exports = {
 			return;
 		}
 
-
 		const mainPage = await sb.Got("https://soundcloud.com").text();
 		const $ = sb.Utils.cheerio(mainPage);
 
@@ -48,7 +47,7 @@ module.exports = {
 		}
 
 		if (finalClientID) {
-			console.
+			console.log("Successfully updated soundcloud client-id", { finalClientID });
 			sb.Utils.linkParser.reloadParser("soundcloud", { key: finalClientID });
 		}
 		else {
