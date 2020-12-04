@@ -47,8 +47,7 @@ module.exports = {
 	
 			default: return { reply: "Unrecognized module!" };
 		}
-	
-		sb.Runtime.incrementScriptHotloaded();
+
 		sb.Master.reloaded = new sb.Date();
 	
 		return {
