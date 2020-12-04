@@ -7,6 +7,7 @@ module.exports = {
 	Code: (async function yoinkSoundcloudClientID () {
 		const { statusCode } = await sb.Got({
 			url: "https://api-v2.soundcloud.com/resolve",
+			throwHttpErrors: false,
 			searchParams: new sb.URLParams()
 				.set("client_id", sb.Config.get("SOUNDCLOUD_CLIENT_ID"))
 				.set("url", "https://soundcloud.com/terribleterrio/mararinha")
@@ -33,6 +34,7 @@ module.exports = {
 			const clientID = match[1];
 			const { statusCode } = await sb.Got({
 				url: "https://api-v2.soundcloud.com/resolve",
+				throwHttpErrors: false,
 				searchParams: new sb.URLParams()
 					.set("client_id", clientID)
 					.set("url", "https://soundcloud.com/terribleterrio/mararinha")
