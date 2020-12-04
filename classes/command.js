@@ -903,5 +903,5 @@ module.exports = class Command extends require("./template.js") {
  * This also requires the channel to have this option enabled.
  * @property {boolean} linkOnly If true, the command will accept "linkOnly:true" as one of its arguments, and if possible, returns just a link, with no text included.
  * @property {boolean} useParams If true, all arguments in form of key:value will be parsed into an object
- * @property {boolean} nullable If true, all arguments in form of key:value will be parsed into an object
+ * @property {boolean} nonNullable If true, the command cannot be directly piped into the null command
  */
