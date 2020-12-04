@@ -21,13 +21,13 @@ module.exports = {
 			if (!command) {
 				return {
 					success: false,
-					reply: `Command "${commandString} does not exist!`
+					reply: `Command "${commandString}" does not exist!`
 				};
 			}
 			else if (!command.Flags.pipe) {
 				return {
 					success: false,
-					reply: `Command "${commandString} cannot be used in a pipe!`
+					reply: `Command "${commandString}" cannot be used in a pipe!`
 				};
 			}
 			else if (nullCommand && command.Flags.nonNullable && invocations[i + 1]) {
@@ -36,7 +36,7 @@ module.exports = {
 				if (nextCommand.Name === nullCommand.Name) {
 					return {
 						success: false,
-						reply: `The output of command ${commandString} cannot be directly piped into null!`
+						reply: `The output of command "${commandString}" cannot be directly piped into null!`
 					};
 				}
 			}
