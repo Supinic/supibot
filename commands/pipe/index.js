@@ -15,7 +15,7 @@ module.exports = {
 
 		const nullCommand = sb.Command.get("null");
 		for (let i = 0; i < invocations.length; i++) {
-			const [commandString] = invocation[i].split(" ");
+			const [commandString] = invocations[i].split(" ");
 			const command = sb.Command.get(commandString.replace(sb.Command.prefixRegex, ""));
 
 			if (!command) {
