@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Sorts the message provided alphabetically.",
-	Flags: ["pipe"],
+	Flags: ["non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function sort (context, ...args) {

@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Shuffles the provided message, word by word.",
-	Flags: ["pipe"],
+	Flags: ["non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function shuffle (context, ...args) {
