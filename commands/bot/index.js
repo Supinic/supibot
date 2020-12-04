@@ -30,7 +30,7 @@ module.exports = {
 			}
 		]
 	})),
-	Code: (async function bot (context, command, ...args) {
+	Code: (async function bot (context, command) {
 		const { params } = context;
 		if (!command) {
 			return {
@@ -122,7 +122,6 @@ module.exports = {
 				if (params.mode) {
 					params.mode = sb.Utils.capitalize(params.mode.toLowerCase());
 					const found = this.staticData.allowedModes.find(i => i.name === params.mode);
-	
 					if (!found) {
 						return {
 							success: false,
@@ -130,7 +129,7 @@ module.exports = {
 						};
 					}
 	
-					channelData.saveProperty("Banphrase_API_URL", (params.url === "none") ? null : params.url);
+					channelData.saveProperty("Banphrase_API_Mode", params.mode);
 					result.push(`Banphrase API mode has been set to ${params.mode}.`);
 				}
 	
