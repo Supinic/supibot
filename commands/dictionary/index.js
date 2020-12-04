@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the dictionary definition of a word. You can use \"lang:\" to specifiy a language, and if there are multiple definitions, you can add \"index:#\" with a number to access specific definition indexes.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention","non-nullable","pipe","use-params"],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		languages: [
@@ -30,28 +30,23 @@ module.exports = {
 				reply: "No word provided!"
 			};
 		}
-	
-		let index = 0;
-		let language = "en";
-		for (let i = args.length - 1; i >= 0; i--) {
-			const token = args[i];
-			if (token.includes("lang:") || token.includes("language:")) {
-				const identifier = token.split(":")[1];
-				if (identifier.length <= 5) {
-					language = identifier;
-				}
-				else {
-					language = sb.Utils.languageISO.getCode(identifier);
-				}
-	
-				args.splice(i, 1);
-			}
-			else if (token.includes("index:")) {
-				index = Number(token.split(":")[1]);
-				args.splice(i, 1);
-			}
+
+		const index = (typeof context.params.index !== "undefined")
+			? Number(context.params.index)
+			: 0;
+
+		if (!sb.Utils.isValidInteger(index) || index > 100) {
+			return {
+				success: false,
+				reply: "Invalid index number provided!"
+			};
 		}
-	
+
+		const languageIdentifier = context.params.lang ?? context.params.language ?? "en";
+		const language = (languageIdentifier.length < 5)
+			? languageIdentifier
+			: sb.Utils.languageISO.getCode(identifier);
+
 		if (!language) {
 			return {
 				success: false,
