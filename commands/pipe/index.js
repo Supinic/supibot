@@ -31,7 +31,7 @@ module.exports = {
 				};
 			}
 			else if (nullCommand && command.Flags.nonNullable && invocations[i + 1]) {
-				const [nextCommandString] = invocation[i + 1].split(" ");
+				const [nextCommandString] = invocations[i + 1].split(" ");
 				const nextCommand = sb.Command.get(nextCommandString.replace(sb.Command.prefixRegex, ""));
 				if (nextCommand.Name === nullCommand.Name) {
 					return {
