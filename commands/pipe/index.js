@@ -12,7 +12,36 @@ module.exports = {
 		if (!context.externalPipe && invocations.length < 2) {
 			return { reply: "At least two commands must be piped together!" };
 		}
-	
+
+		const nullCommand = sb.Command.get("null");
+		for (let i = 0; i < invocations.length; i++) {
+			const [commandString] = invocation[i].split(" ");
+			const command = sb.Command.get(commandString.replace(sb.Command.prefixRegex, ""));
+
+			if (!command) {
+				return {
+					success: false,
+					reply: `Command "${commandString} does not exist!`
+				};
+			}
+			else if (!command.Flags.pipe) {
+				return {
+					success: false,
+					reply: `Command "${commandString} cannot be used in a pipe!`
+				};
+			}
+			else if (nullCommand && command.Flags.nonNullable && invocations[i + 1]) {
+				const [nextCommandString] = invocation[i + 1].split(" ");
+				const nextCommand = sb.Command.get(nextCommandString.replace(sb.Command.prefixRegex, ""));
+				if (nextCommand.Name === nullCommand.Name) {
+					return {
+						success: false,
+						reply: `The output of command ${commandString} cannot be directly piped into null!`
+					};
+				}
+			}
+		}
+
 		const resultsInPastebin = args[args.length - 1] === "pastebin";
 		let finalResult = null;
 		let currentArgs = [];
@@ -23,10 +52,6 @@ module.exports = {
 	
 			const check = sb.Command.get(cmd.replace(sb.Command.prefix, ""));
 			if (check) {
-				if (!check.Flags.pipe) {
-					return { reply: "Command " + cmd + " cannot be used in a pipe!" };
-				}
-	
 				if (["randomgachi", "current"].includes(check.Name)) {
 					cmdArgs.push("linkOnly:true");
 				}
