@@ -49,7 +49,7 @@ module.exports = {
 			"Free memory": sb.Utils.formatByteSize(memoryData[2], 0) + "/" + sb.Utils.formatByteSize(memoryData[0], 0),
 			"CPU usage": `${loadDirection}${loadChange}`,
 			// Swap: sb.Utils.formatByteSize(swapUsed, 0) + "/" + sb.Utils.formatByteSize(swapTotal, 0),
-			"Commands used": sb.Runtime.commandsUsed
+			"Commands used": await sb.Runtime.commands
 		};
 	
 		if (sb.Cache) {
