@@ -68,6 +68,19 @@ module.exports = class Discord extends require("./template.js") {
 
 			// If no user with the given Discord ID exists, check and see if the name is already being used
 			if (!userData) {
+				channelData = sb.Channel.get(chan);
+				if (channelData) {
+					channelData.events.emit("message", {
+						event: "message",
+						message: msg,
+						user: null,
+						channel: channelData,
+						raw: {
+							user
+						}
+					});
+				}
+
 				const nameCheckData = await sb.User.get(user, true);
 
 				// If it is, skip entirely - the name must be matched precisely to the Discord ID, and this is an anomaly

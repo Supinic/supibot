@@ -63,6 +63,18 @@ module.exports = class Minecraft extends require("./template.js") {
 
 				const userData = await sb.User.get(username, false);
 				if (!userData) {
+					if (channelData) {
+						channelData.events.emit("message", {
+							event: "message",
+							message,
+							user: null,
+							channel: channelData,
+							raw: {
+								user: username
+							}
+						});
+					}
+
 					return;
 				}
 

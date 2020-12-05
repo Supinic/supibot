@@ -107,6 +107,16 @@ module.exports = class Cytube extends require("./template.js") {
 				: this.userMap.get(data.username);
 
 			if (!userData) {
+				this.channelData.events.emit("message", {
+					event: "message",
+					message: msg,
+					user: null,
+					channel: this.channelData,
+					raw: {
+						user: data.username
+					}
+				});
+
 				return;
 			}
 			else if (!platformUserData) {

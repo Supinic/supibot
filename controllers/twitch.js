@@ -353,6 +353,19 @@ module.exports = class Twitch extends require("./template.js") {
 		let channelData = null;
 		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserID });
 		if (!userData) {
+			const channelData = sb.Channel.get(channelName);
+			if (channelData) {
+				channelData.events.emit("message", {
+					event: "message",
+					message,
+					user: null,
+					channel: channelData,
+					raw: {
+						user: senderUsername
+					}
+				});
+			}
+
 			return;
 		}
 
