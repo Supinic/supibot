@@ -46,8 +46,12 @@ module.exports = {
 		}
 
 		const { game, name, url } = data;
+		const gameString = (game !== null)
+			? `They last streamed in game/category ${game}.`
+			: "";
+
 		return {
-			reply: `Shout out to ${name}! They last played ${game}, check them out here: ${url}`
+			reply: sb.Utils.tag.trim `Shout out to ${name}! ${gameString} Check them out here: ${url}`
 		};
 	}),
 	Dynamic_Description: null
