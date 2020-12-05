@@ -338,7 +338,7 @@ module.exports = {
 						reply: sb.Utils.tag.trim `
 							So far, you have created ${data.Unscheduled} direct reminders
 							and ${data.Scheduled} timed reminders,
-							for a total of ${data.Unscheduled + $data.Scheduled}.
+							for a total of ${data.Unscheduled + data.Scheduled}.
 						`
 					};
 				}
