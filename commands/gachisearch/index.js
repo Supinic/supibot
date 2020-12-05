@@ -64,7 +64,7 @@ module.exports = {
 				Track.ID IN (
 					SELECT Track
 					FROM music.Track_Tag
-					WHERE (Tag = 6 OR Tag = 20)
+					WHERE Tag IN (6, 20, 25)
 				)
 				AND
 				(
@@ -83,7 +83,7 @@ module.exports = {
 						JOIN music.Track_Relationship ON Track_From = Right_Version.ID
 						JOIN music.Track AS Left_Version ON Track_To = Left_Version.ID
 						WHERE
-							Relationship = "Based on"
+							(Relationship = "Based on" OR Relationship = "Reupload of")
 							AND Left_Version.Name LIKE '%${escaped}%'
 							AND Right_Version.ID = Track.ID
 					)
