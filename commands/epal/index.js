@@ -86,13 +86,17 @@ module.exports = {
 				description: i.introductionText,
 				audioFile: i.introductionSpeech,
 				revenue: (i.serveNum)
-					? (i.serveNum * i.price / 100)
+					? sb.Utils.round(i.serveNum * i.price / 100, 2)
 					: null,
 				price: {
 					regular: (i.price / 100),
 					unit: i.priceUnitDesc ?? "hour",
-					discount: (i.discountPrice) ? sb.Utils.round(i.discountPrice / 100) : null,
-					discountAmount: (i.discountAmount) ? ((1 - i.discountAmount) * 100 + "%") : null
+					discount: (i.discountPrice)
+						? sb.Utils.round(i.discountPrice / 100)
+						: null,
+					discountAmount: (i.discountAmount)
+						? sb.Utils.round((1 - i.discountAmount) * 100) + "%"
+						: null
 				}
 			}));
 
@@ -102,7 +106,7 @@ module.exports = {
 		if (profilesData.length === 0) {
 			return {
 				success: false,
-				reply: "Game/gender combination has no active profiles!"
+				reply: "This game/gender combination has no active profiles!"
 			};
 		}
 
