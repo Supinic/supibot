@@ -15,7 +15,7 @@ module.exports = {
 			return;
 		}
 		
-		const messsageCount = await sb.Query.getRecordset(rs => rs
+		const messageCount = await sb.Query.getRecordset(rs => rs
 		    .select("Message_Count")
 		    .from("chat_data", "Message_Meta_User_Alias")
 			.where("Channel = %n", context.channel.ID)
@@ -24,7 +24,7 @@ module.exports = {
 			.flat("Message_Count")
 		);
 
-		if (typeof messsageCount === "undefined" || messageCount <= 1) {
+		if (typeof messageCount === "undefined" || messageCount <= 1) {
 			context.platform.client.privmsg(context.channel.Name, `/ban ${context.user.Name}`);
 			await channelData.send("NOIDONTTHINKSO");
 		}
