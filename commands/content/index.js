@@ -9,17 +9,43 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function content () {
 		const data = await sb.Query.getRecordset(rs => rs
-			.select("ID", "Category", "Status")
+			.select("Category", "Status", "User_Alias")
 			.from("data", "Suggestion")
+			.where("Status IN %s+", ["New", "Approved"])
 		);
-	
+
 		const count = {
-			new: data.filter(i => i.Category === "Uncategorized" && i.Status === "New").length,
-			approved: data.filter(i => i.Status === "Approved").length
-		};	
-	
+			approved: 0,
+			bot: 0,
+			new: 0,
+			self: 0
+		};
+
+		for (const item of data) {
+			if (item.Category === "Uncategorized" && item.Status === "New") {
+				count.new++
+			}
+			else if (item.Category === "Bot addition" && item.Status === "Approved") {
+				count.bot++;
+			}
+			else {
+				if (item.User_Alias === 1) {
+					count.self++;
+				}
+				else {
+					count.approved++;
+				}
+			}
+		}
+
 		return {
-			reply: `Content status: ${count.new} new suggestions, ${count.approved} are approved and waiting!`
+			reply: sb.Utils.tag.trim `
+				Content status: 
+				${count.bot} bot requests,
+				${count.new} new suggestions,				
+				and ${count.self + count.approved} (out of which ${count.self} are from supi)
+				by are approved and waiting!
+			`
 		};
 	}),
 	Dynamic_Description: null
