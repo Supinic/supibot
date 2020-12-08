@@ -316,12 +316,13 @@ module.exports = {
 			}
 	
 			const { content = "", title, published } = article;
+			const separator = (title && content) ? " - " : "";
 			const delta = (published)
 				? `(published ${sb.Utils.timeDelta(new sb.Date(published))})`
 				: "";
 	
 			return {
-				reply: sb.Utils.removeHTML(`${title} ${content ?? ""} ${delta}`)
+				reply: sb.Utils.removeHTML(`${title}${separator}${content} ${delta}`)
 			};
 		}
 
@@ -417,13 +418,14 @@ module.exports = {
 			};
 		}
 	
-		const { description, published, title } = sb.Utils.randArray(news);
+		const { description = "", published, title } = sb.Utils.randArray(news);
+		const separator = (title && description) ? " - " : "";
 		const delta = (published)
 			? "(published " + sb.Utils.timeDelta(new sb.Date(published)) + ")"
 			: "";
 	
 		return {
-			reply: sb.Utils.removeHTML(`${title} ${description ?? ""} ${delta}`)
+			reply: sb.Utils.removeHTML(`${title}${separator}${description} ${delta}`)
 		};
 	}),
 	Dynamic_Description: (async (prefix, values) => {
