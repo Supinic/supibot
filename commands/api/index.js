@@ -10,7 +10,7 @@ module.exports = {
 	Code: (async function api () {
 		return {
 			reply: "https://supinic.com/api"
-		}
+		};
 	}),
 	Dynamic_Description: null
 };
