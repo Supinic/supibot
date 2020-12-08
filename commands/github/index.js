@@ -21,7 +21,7 @@ module.exports = {
 		}
 	
 		const { items } = await sb.Got("GitHub", {
-			url: `search/code?q=${query}+in:file+repo:supinic/supi-core+repo:supinic/supibot`
+			url: `search/code?q=${query}+in:file+repo:supinic/supi-core+repo:supinic/supibot+repo:supinic/supibot-package-manager`
 		}).json();
 	
 		const filtered = items.filter(i => i.name.endsWith(".js"));
