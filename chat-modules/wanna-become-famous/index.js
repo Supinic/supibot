@@ -4,7 +4,7 @@ module.exports = {
 	Description: "Bans bots that spam the follower site promotion",
 	Code: (async function (context) {
 		const msg = sb.Utils.removeAccents(context.message).toLowerCase();
-		if (!msg.includes("wanna become famous?") && !msg.includes("bigfollows")) {
+		if (!msg.includes("wanna become famous?") || !msg.includes("bigfollows")) {
 			return;
 		}
 
