@@ -263,8 +263,11 @@ module.exports = {
 			amount: (allRecoveries) ? group(allRecoveries) : "unknown amount of",
 			word: (allRecoveries === 1) ? "recovery" : "recoveries"
 		};
-	
-		const active = (allCases - (allDeaths ?? 0) - (allRecoveries ?? 0));		
+
+		const active = (allCases - (allDeaths ?? 0) - (allRecoveries ?? 0));
+		const approximateSymbol = (allDeaths === null || allRecoveries === null)
+			? "~"
+			: "";
 
 		const ratios = {};
 		if (population !== null) {
@@ -282,7 +285,7 @@ module.exports = {
 			reply: sb.Utils.tag.trim `
 				${intro}
 				has 
-				${group(active)} active cases,
+				${approximateSymbol}${group(active)} active cases,
 				${cases.amount} total ${cases.word}${(cases.plusAmount === null)
 					? ""
 					: ` (${cases.plusPrefix}${cases.plusAmount})`
