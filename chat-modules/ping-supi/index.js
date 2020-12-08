@@ -11,10 +11,12 @@ module.exports = {
 		}
 		
 		const now = sb.Date.now();
-		if (now > this.data.timeout && regex.test(message) && !user.Data.skipGlobalPing) {
+		if (now > this.data.timeout && regex.test(message) && !user?.Data.skipGlobalPing) {
+			const userName = user?.Name ?? `❓${context.raw.user}`;
+
 			this.data.timeout = now + 1000;
 	
-			const pingMessage = `[#${channel.Description ?? channel.Name}] ${user.Name}: ${message}`;
+			const pingMessage = `[#${channel.Description ?? channel.Name}] ${userName}: ${message}`;
 			await sb.Platform.get("twitch").pm(pingMessage, await sb.User.get("supinic"));
 		}
 	}),
