@@ -43,8 +43,8 @@ module.exports = {
 					{
 						name: "Bukedde Online",
 						url: "https://www.bukedde.co.ug",
-						path: "feed/rss/category",
-						endpoints: ["ssanyou"],
+						path: "feed",
+						endpoints: ["rss"],
 						helpers: ["supinic"]
 					}
 				]
