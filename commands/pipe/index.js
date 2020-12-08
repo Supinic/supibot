@@ -33,7 +33,7 @@ module.exports = {
 			else if (nullCommand && command.Flags.nonNullable && invocations[i + 1]) {
 				const [nextCommandString] = invocations[i + 1].split(" ");
 				const nextCommand = sb.Command.get(nextCommandString.replace(sb.Command.prefixRegex, ""));
-				if (nextCommand.Name === nullCommand.Name) {
+				if (nextCommand && nextCommand.Name === nullCommand.Name) {
 					return {
 						success: false,
 						reply: `The output of command "${commandString}" cannot be directly piped into null!`
