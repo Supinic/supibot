@@ -30,7 +30,7 @@ module.exports = {
 			return { reply: "I cannot time Twitch administrators out! monkaS" };
 		}
 	
-		context.platform.client.privmsg(context.channel.Name, "/timeout " + context.user.Name + " 1 vanished");
+		context.platform.client.privmsg(context.channel.Name, "/timeout " + context.user.Name + " 1 Vanished");
 	}),
 	Dynamic_Description: null
 };
