@@ -55,16 +55,12 @@ module.exports = {
 
 		// @todo: Resolve a possible race-condition with multiple command invocations at the same time
 		if (cacheRecordExists) {
-			await this.setCacheData({
-				keys: "remaining-uses",
-				value: remainingUsesToday,
+			await this.setCacheData("remaining-uses", remainingUsesToday, {
 				keepTTL: true
-			})
+			});
 		}
 		else {
-			await this.setCacheData({
-				keys: "remaining-uses",
-				value: remainingUsesToday,
+			await this.setCacheData("remaining-uses", remainingUsesToday, {
 				expiresAt: getClosestPacificMidnight()
 			});
 		}
