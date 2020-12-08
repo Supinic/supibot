@@ -20,8 +20,15 @@ module.exports = {
 			};
 		}
 	
-		const { chatters } = await sb.Got(`http://tmi.twitch.tv/group/user/${context.channel.Name}/chatters`).json();
-		const list = Object.values(chatters).flat().sort();
+		const { chatters } = await sb.Got(`https://tmi.twitch.tv/group/user/${context.channel.Name}/chatters`).json();
+		const list = Object.values(chatters).flat();
+
+		if (!list.includes(context.user.Name)) {
+			list.push(context.user.Name);
+		}
+
+		list.sort();
+
 		if (list.length < 2) {
 			return {
 				reply: "There don't seem to be enough people here."
