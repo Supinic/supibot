@@ -49,13 +49,14 @@ module.exports = {
 			await row.save();
 			subscribed = "You will now receive reminders when your suggestions get updated - you can use the $unsubscribe command to remove this. "
 		}
-	
+
+		const link = `https://supinic.com/data/suggestion/${row.values.ID}`;
 		const emote = (context.platform.Name === "twitch")
 			? "BroBalt"
 			: "👍";
 	
 		return {
-			reply: `Suggestion saved, and will eventually be processed (ID ${row.values.ID}) ${emote} ${subscribed}`
+			reply: `Suggestion saved, and will eventually be processed (ID ${row.values.ID}) ${link} ${emote} ${subscribed}`
 		};
 	}),
 	Dynamic_Description: null
