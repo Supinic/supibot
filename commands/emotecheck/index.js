@@ -388,7 +388,7 @@ module.exports = {
 			{
 				name: "glitchcon",
 				aliases: [],
-				description: "Emotes related to GlitchCon 2020 - a replacement for TwitchCon because of Covid. Awarded for being in the stream on 2020-11-14 and 20202-11-15.",
+				description: "Emotes related to GlitchCon 2020 - a replacement for TwitchCon because of Covid. Awarded for being in the stream on 2020-11-14 and 2020-11-15.",
 				notes: "https://blog.twitch.tv/en/glitchcon",
 				emotes: [
 					"AppaK",
