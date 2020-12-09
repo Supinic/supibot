@@ -149,12 +149,28 @@ module.exports = class Twitch extends require("./template.js") {
 			if (error instanceof DankTwitch.JoinError && error.failedChannelName) {
 				this.failedJoinChannels.add(error.failedChannelName);
 			}
-			else if (error instanceof DankTwitch.SayError && error.message.includes("Bad response message")) {
-				const channelData = sb.Channel.get(error.failedChannelName);
-				const defaultReply = "That message violates this channel's moderation settings.";
+			else if (error instanceof DankTwitch.SayError && error.cause instanceof DankTwitch.TimeoutError) {
+				if (error.message.startsWith("Bad response message")) {
+					const channelData = sb.Channel.get(error.failedChannelName);
+					const defaultReply = "That message violates this channel's moderation settings.";
 
-				if (!defaultReply.toLowerCase().includes(error.messageText.toLowerCase())) {
-					this.send(defaultReply, channelData);
+					if (!defaultReply.toLowerCase().includes(error.messageText.toLowerCase())) {
+						this.send(defaultReply, channelData);
+					}
+				}
+				else if (error.message.startsWith("Failed to say")) {
+					console.debug("Failed to say message", { error });
+				}
+				else {
+					console.debug("Unknown Say/TimeoutError", { error });
+				}
+			}
+			else if (error instanceof DankTwitch.SayError && error.cause instanceof DankTwitch.MessageError) {
+				if (error.message.includes("has been suspended")) {
+					console.warn("Attempting to send a message in banned channel", { error });
+				}
+				else {
+					console.debug("Unknown Say/MessageError", { error });
 				}
 			}
 		});
