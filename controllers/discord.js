@@ -64,39 +64,20 @@ module.exports = class Discord extends require("./template.js") {
 			}
 
 			let channelData = null;
-			let userData = await sb.User.getByProperty("Discord_ID", discordID);
-
-			// If no user with the given Discord ID exists, check and see if the name is already being used
-			if (!userData) {
-				channelData = sb.Channel.get(chan);
-				if (channelData) {
-					channelData.events.emit("message", {
-						event: "message",
-						message: msg,
-						user: null,
-						channel: channelData,
-						raw: {
-							user
-						}
-					});
-				}
-
-				const nameCheckData = await sb.User.get(user, true);
-
-				// If it is, skip entirely - the name must be matched precisely to the Discord ID, and this is an anomaly
-				// Needs to be fixed or flagged manually
-				if (nameCheckData && nameCheckData.Discord_ID === null && nameCheckData.Twitch_ID !== null) {
+			let userData = await sb.User.get(user, true);
+			if (userData) {
+				if (userData.Discord_ID === null && userData.Twitch_ID !== null) {
 					if (
-						(nameCheckData.Data.discordChallengeNotificationSent)
+						(userData.Data.discordChallengeNotificationSent)
 						|| (!this.platform.Data.sendVerificationChallenge)
 						|| (!msg.startsWith(sb.Command.prefix))
 					) {
 						return;
 					}
 
-					const { challenge } = await Discord.createAccountChallenge(nameCheckData, discordID);
-					nameCheckData.Data.discordChallengeNotificationSent = true;
-					await nameCheckData.saveProperty("Data");
+					const { challenge } = await Discord.createAccountChallenge(userData, discordID);
+					userData.Data.discordChallengeNotificationSent = true;
+					await userData.saveProperty("Data");
 
 					await this.directPm(
 						discordID,
@@ -109,11 +90,32 @@ module.exports = class Discord extends require("./template.js") {
 
 					return;
 				}
-				// Otherwise, set up the user with their Discord ID
-				else {
+				else if (userData.Discord_ID === null && userData.Twitch_ID === null) {
 					userData = await sb.User.add(user);
 					await userData.saveProperty("Discord_ID", discordID);
 				}
+				else if (userData.Discord_ID !== discordID) {
+					// Mismatch between discordID and userData.Discord_ID means someone renamed into a different
+					// user's username, or that there is a different mishap happening. This case is unfortunately exceptional
+					// for the current user-database structure and the event handler must be aborted.
+					return;
+				}
+			}
+			else {
+				// No user data available at this point usually means that the object is being fetched from cache.
+				// Still, fire a "raw user" message event
+				const channelData = sb.Channel.get(chan);
+				if (channelData) {
+					channelData.events.emit("message", {
+						event: "message",
+						message: msg,
+						user: null,
+						channel: channelData,
+						raw: { user }
+					});
+				}
+
+				return;
 			}
 
 			if (!privateMessage) {
