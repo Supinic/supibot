@@ -37,16 +37,19 @@ module.exports = {
 						reply: "I appreciate the gesture, but thanks, I don't eat sweets :)"
 					};
 				}
-				else if (targetUserData === context.user) {
-					return {
-						reply: `Okay, so you gave the cookie to yourself...`
-					};
-				}
 
 				const sourceUser = await sb.Query.getRow("chat_data", "Extra_User_Data");
 				await sourceUser.load(context.user.ID, true);
 				if (!sourceUser.loaded) {
 					await sourceUser.save();
+				}
+
+				if (targetUserData === context.user) {
+					return {
+						reply: (sourceUser.values.Cookie_Today)
+							? "You already ate or gifted away your cookie today, so you can't gift it, not even to yourself!"
+							: "Okay, so you pass the cookie from one hand to the other... Now what?"
+					};
 				}
 
 				const targetUser = await sb.Query.getRow("chat_data", "Extra_User_Data");
