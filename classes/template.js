@@ -55,6 +55,10 @@ module.exports = class ClassTemplate {
 	}
 	
 	async getCacheData (key) {
+		if (typeof key === "string") {
+			key = { type: key };
+		}
+
 		return sb.Cache.getByPrefix(this.getCacheKey(), {
 			keys: { ...key }
 		});
@@ -65,6 +69,10 @@ module.exports = class ClassTemplate {
 			throw new sb.Error({
 				message: "Value must be passed to cache"
 			});
+		}
+
+		if (typeof key === "string") {
+			key = { type: key };
 		}
 		
 		return sb.Cache.setByPrefix(this.getCacheKey(), value, {
