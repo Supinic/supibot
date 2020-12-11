@@ -37,28 +37,24 @@ module.exports = {
 						reply: "I appreciate the gesture, but thanks, I don't eat sweets :)"
 					};
 				}
-	
-				const [sourceUser, targetUser] = await Promise.all([
-					(async function getSourceRow () {
-						const row = await sb.Query.getRow("chat_data", "Extra_User_Data");
-						await row.load(context.user.ID, true);
-						if (!row.loaded) {
-							await row.save();
-						}
-	
-						return row;
-					})(),
-					(async function getTargetRow () {
-						const row = await sb.Query.getRow("chat_data", "Extra_User_Data");
-						await row.load(targetUserData.ID, true);
-						if (!row.loaded) {
-							await row.save();
-						}
-	
-						return row;
-					})()
-				]);
-	
+				else if (targetUserData === context.user) {
+					return {
+						reply: `Okay, so you gave the cookie to yourself...`
+					};
+				}
+
+				const sourceUser = await sb.Query.getRow("chat_data", "Extra_User_Data");
+				await sourceUser.load(context.user.ID, true);
+				if (!sourceUser.loaded) {
+					await sourceUser.save();
+				}
+
+				const targetUser = await sb.Query.getRow("chat_data", "Extra_User_Data");
+				await targetUser.load(targetUserData.ID, true);
+				if (!targetUser.loaded) {
+					await targetUser.save();
+				}
+		
 				if (sourceUser.values.Cookie_Today) {
 					return {
 						success: false,
