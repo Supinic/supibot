@@ -2,7 +2,7 @@ module.exports = {
 	Name: "wanna-become-famous",
 	Events: ["message"],
 	Description: "Bans bots that spam the follower site promotion",
-	Code: (async function (context) {
+	Code: (async function wannaBecomeFamous (context) {
 		const msg = sb.Utils.removeAccents(context.message).toLowerCase();
 		if (!msg.includes("wanna become famous?") || !msg.includes("bigfollows")) {
 			return;

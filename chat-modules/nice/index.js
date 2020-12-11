@@ -2,7 +2,7 @@ module.exports = {
 	Name: "nice",
 	Events: ["message"],
 	Description: "Nice",
-	Code: (async function (context) {
+	Code: (async function chatModuleNice (context) {
 		if (!context.user) {
 			return;
 		}

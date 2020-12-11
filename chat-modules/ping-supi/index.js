@@ -2,7 +2,7 @@ module.exports = {
 	Name: "ping-supi",
 	Events: ["message"],
 	Description: "This module notifies Supinic whenever he is mentioned (in any channel, across platforms) via Twitch whispers.",
-	Code: (async function (context) {
+	Code: (async function pingSupi (context) {
 		const { message, channel, user } = context;
 		const regex = /supi\b|supinic|bupi/i;
 	

@@ -2,7 +2,7 @@ module.exports = {
 	Name: "same",
 	Events: ["message"],
 	Description: "Same",
-	Code: (async function (context) {
+	Code: (async function chatModuleSame (context) {
 		if (!context.user) {
 			return;
 		}

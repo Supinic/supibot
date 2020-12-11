@@ -2,7 +2,7 @@ module.exports = {
 	Name: "supinic-stream-db",
 	Events: ["online", "offline"],
 	Description: "Creates and updates database rows of Streams on Supinic's channel as he goes on/offline.",
-	Code: (async function (context) {
+	Code: (async function supinicStreamDB (context) {
 		const { data: [stream] } = await sb.Got("Helix", {
 			url: "streams",
 			searchParams:  new sb.URLParams()

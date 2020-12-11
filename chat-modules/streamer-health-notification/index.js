@@ -2,7 +2,7 @@ module.exports = {
 	Name: "streamer-health-notification",
 	Events: ["online", "offline"],
 	Description: "Sets up a periodic \"health notification\" when the channel goes live, and removes it when going offline.",
-	Code: (async (context, options = {}) => {
+	Code: (async function streamerHealthPrevention (context, options = {}) {
 		if (typeof this.data.intervals === "undefined") {
 			this.data.intervals = {};
 		}
