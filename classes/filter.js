@@ -239,7 +239,7 @@ module.exports = class Filter extends require("./template.js") {
 			if (blacklist.Response === "Reason") {
 				reply = blacklist.Response;
 			}
-			else if (blacklist.Response === "None") {
+			else if (blacklist.Response === "Auto") {
 				if (blacklist.Channel && blacklist.Command && blacklist.User_Alias) {
 					reply = "You cannot execute that command in this channel.";
 				}
