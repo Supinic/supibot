@@ -10,7 +10,7 @@ module.exports = {
 	Code: (async function copypasta () {
 		const html = await sb.Got("https://www.twitchquotes.com/random").text();
 		const $ = sb.Utils.cheerio(html);
-		const copypasta = $("#quote_display_content_0").text();
+		const copypasta = $(`div[id^="clipboard_copy_content"]`).text();
 	
 		return {
 			reply: (copypasta)
