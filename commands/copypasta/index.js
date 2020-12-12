@@ -13,9 +13,10 @@ module.exports = {
 		const copypasta = $(`div[id^="clipboard_copy_content"]`).text();
 	
 		return {
+			success: Boolean(copypasta),
 			reply: (copypasta)
 				? sb.Utils.removeHTML(copypasta).trim()
-				: "No copypasta found."
+				: "No copypasta found!"
 		};
 	}),
 	Dynamic_Description: null
