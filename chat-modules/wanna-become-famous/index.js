@@ -3,15 +3,21 @@ module.exports = {
 	Events: ["message"],
 	Description: "Bans bots that spam the follower site promotion",
 	Code: (async function wannaBecomeFamous (context) {
+		if (context.channel.Platform.Name !== "twitch") {
+			return; // cannot timeout when not on twitch
+		}
+
 		const msg = sb.Utils.removeAccents(context.message).toLowerCase();
 		if (!msg.includes("wanna become famous?") || !msg.includes("bigfollows")) {
 			return;
 		}
 
+		const { client } = context.channel.Platform;
 		if (!context.user && context.raw?.user) {
 			const name = context.raw.user;
-			context.platform.client.privmsg(context.channel.Name, `/ban ${name}`);
+			await client.privmsg(context.channel.Name, `/ban ${name}`);
 			await channelData.send("NOIDONTTHINKSO I don't wanna become famous");
+
 			return;
 		}
 		
@@ -25,7 +31,7 @@ module.exports = {
 		);
 
 		if (typeof messageCount === "undefined" || messageCount <= 1) {
-			context.platform.client.privmsg(context.channel.Name, `/ban ${context.user.Name}`);
+			await client.privmsg(context.channel.Name, `/ban ${context.user.Name}`);
 			await channelData.send("NOIDONTTHINKSO");
 		}
 	}),
