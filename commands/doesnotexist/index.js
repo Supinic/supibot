@@ -31,12 +31,22 @@ module.exports = {
             };
         }
 
+        const now = sb.Date.now();
+        if (this.data.rateLimitedReset && now < this.data.rateLimitedReset) {
+            const delta = sb.Utils.timeDelta(this.data.rateLimitedReset);
+            return {
+                success: false,
+                reply: `Can't upload more stuff to imgur right now, please try again ${delta}`
+            };
+        }
+
         const form = new sb.Got.FormData();
         form.append("image", buildURL(type));
 
-        const { body: uploadData } = await sb.Got("GenericAPI", {
+        const { statusCode, headers, body: uploadData } = await sb.Got("GenericAPI", {
             method: "POST",
             responseType: "json",
+            throwHttpErrors: false,
             url: "https://api.imgur.com/3/image",
             headers: {
                 ...form.getHeaders(),
@@ -46,6 +56,17 @@ module.exports = {
             retry: 0,
             timeout: 10000
         });
+
+        if (statusCode === 400 && uploadData.data.error?.code === 429) {
+            const resetSeconds = Number(headers["x-post-rate-limit-reset"])
+            this.data.rateLimitedReset = new sb.Date().addSeconds(resetSeconds);
+
+            const delta = sb.Utils.timeDelta(this.data.rateLimitedReset);
+            return {
+                success: false,
+                reply: `Can't upload more stuff to imgur right now, please try again ${delta}`
+            };
+        }
 
         const link = `https://i.imgur.com/${uploadData.data.id}.jpg`;
         return {
