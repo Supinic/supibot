@@ -664,7 +664,10 @@ module.exports = {
 				results.push({ ID, ...subResult });
 			}
 
-			if (results.length === 1) {
+			if (results.length === 0) {
+				return await target[invocation](context);
+			}
+			else if (results.length === 1) {
 				return {
 					success: results[0].success,
 					reply: results[0].reply
