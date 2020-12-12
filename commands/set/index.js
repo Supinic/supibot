@@ -109,6 +109,10 @@ module.exports = {
 						.single()
 						.flat("ID")
 					),
+					set: async () => ({
+						success: false,
+						reply: `Use the ${sb.Command.prefix}remind command instead!`
+					}),
 					unset: async (context, ID) => {
 						const row = await sb.Query.getRow("chat_data", "Reminder");
 						try {
@@ -169,6 +173,10 @@ module.exports = {
 						.single()
 						.flat("ID")
 					),
+					set: async () => ({
+						success: false,
+						reply: `Use the ${sb.Command.prefix}suggest command instead!`
+					}),
 					unset: async (context, ID, ...args) => {
 						const row = await sb.Query.getRow("data", "Suggestion");
 						try {
