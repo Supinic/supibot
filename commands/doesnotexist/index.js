@@ -7,7 +7,14 @@ module.exports = {
     Flags: ["mention","non-nullable","pipe"],
     Whitelist_Response: null,
     Static_Data: (() => ({
-        buildURL: (type) => `https://this${type}doesnotexist.com/image`,
+        buildURL: (type) => {
+            if (type === "person") {
+                return `https://this${type}doesnotexist.com/image`;
+            }
+            else {
+                return `https://this${type}doesnotexist.com`;
+            }
+        },
         types: ["artwork", "cat", "horse", "person"]
     })),
     Code: (async function doesnotexist (context, type) {
@@ -29,7 +36,6 @@ module.exports = {
 
         const { body: uploadData } = await sb.Got("GenericAPI", {
             method: "POST",
-            throwHttpErrors: false,
             responseType: "json",
             url: "https://api.imgur.com/3/image",
             headers: {
