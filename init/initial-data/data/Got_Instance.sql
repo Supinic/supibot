@@ -1,7 +1,7 @@
 INSERT INTO `data`.`Got_Instance` 
 (`ID`,`Name`,`Options_Type`,`Options`,`Parent`,`Description`)
 VALUES
-(1,'Twitch','function','(() => ({
+('Twitch','function','(() => ({
 	prefixUrl: "https://twitch.tv",
 	responseType: "json",
 	headers: {
@@ -9,7 +9,7 @@ VALUES
 		"User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
 	}
 }))',NULL,'Catch-all Got instance for all Twitch API endpoints'),
-(2,'Helix','function','(() => ({
+('Helix','function','(() => ({
 	prefixUrl: "https://api.twitch.tv/helix",
 	responseType: "json",
 	headers: {
@@ -18,7 +18,7 @@ VALUES
 		"User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
 	}
 }))',1,'Twitch/Helix instance'),
-(3,'Kraken','function','(() => ({
+('Kraken','function','(() => ({
 	prefixUrl: "https://api.twitch.tv/kraken",
 	responseType: "json",
 	resolveBodyOnly: true,
@@ -29,7 +29,7 @@ VALUES
 	},
 	mutableDefaults: true
 }))',1,'Twitch/V5 instance'),
-(4,'Pastebin','JSON','{
+('Pastebin','JSON','{
 	"prefixUrl": "https://pastebin.com/",
 	"headers": {
 		"Content-Type": "application/x-www-form-urlencoded"
