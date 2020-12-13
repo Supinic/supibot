@@ -28,12 +28,6 @@ VALUES
 		"User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
 	},
 	mutableDefaults: true
-}))',1,'Twitch/V5 instance'),
-('Pastebin','JSON','{
-	"prefixUrl": "https://pastebin.com/",
-	"headers": {
-		"Content-Type": "application/x-www-form-urlencoded"
-	}
-}',NULL,'Pastebin instance')
+}))',1,'Twitch/V5 instance')
 
 ON DUPLICATE KEY UPDATE ID = ID;
