@@ -1,5 +1,6 @@
 (async function () {
-	const { readFile } = require("fs/promises");
+	const { promisify } = require("util");
+	const readFile = promisify(require("fs").readFile);
 	try {
 		require("../db-access.js");
 	}
@@ -20,10 +21,8 @@
 
 	const [{ version }] = await sb.Query.raw("SELECT VERSION() AS version");
 	const major = Number(version.split(".")[0]);
-	console.log("MariaDB version", {version, major});
-
 	if (Number.isNaN(major) || major < 10) {
-		throw new Error(`Your version of MariaDB is too old! User at least 10.0 or newer. Your version: ${version}`);
+		throw new Error(`Your version of MariaDB is too old! Use at least 10.0 or newer. Your version: ${version}`);
 	}
 
 	let counter = 0;
