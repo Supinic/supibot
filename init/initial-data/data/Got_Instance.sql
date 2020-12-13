@@ -17,7 +17,7 @@ VALUES
 		Authorization: `Bearer ${sb.Config.get("TWITCH_APP_ACCESS_TOKEN", false)}`,
 		"User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
 	}
-}))',1,'Twitch/Helix instance'),
+}))',NULL,'Twitch/Helix instance'),
 ('Kraken','function','(() => ({
 	prefixUrl: "https://api.twitch.tv/kraken",
 	responseType: "json",
@@ -28,6 +28,4 @@ VALUES
 		"User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
 	},
 	mutableDefaults: true
-}))',1,'Twitch/V5 instance')
-
-ON DUPLICATE KEY UPDATE ID = ID;
+}))',NULL,'Twitch/V5 instance');
