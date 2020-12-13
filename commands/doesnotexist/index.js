@@ -31,47 +31,37 @@ module.exports = {
             };
         }
 
-        const now = sb.Date.now();
-        if (this.data.rateLimitedReset && now < this.data.rateLimitedReset) {
-            const delta = sb.Utils.timeDelta(this.data.rateLimitedReset);
-            return {
-                success: false,
-                reply: `Can't upload more stuff to imgur right now, please try again ${delta}`
-            };
-        }
+        const imageData = await sb.Got({
+            url: buildURL(type),
+            responseType: "buffer"
+        });
 
         const form = new sb.Got.FormData();
-        form.append("image", buildURL(type));
+        form.append("attachment", imageData.rawBody ?? imageData.body, "file.jpg");
 
-        const { statusCode, headers, body: uploadData } = await sb.Got("GenericAPI", {
+        const uploadData = await sb.Got({
             method: "POST",
-            responseType: "json",
             throwHttpErrors: false,
-            url: "https://api.imgur.com/3/image",
+            url: "https://i.nuuls.com/upload",
             headers: {
-                ...form.getHeaders(),
-                Authorization: "Client-ID " + sb.Config.get("IMGUR_PUBLIC_CLIENT_ID")
+                ...form.getHeaders()
             },
             body: form.getBuffer(),
             retry: 0,
             timeout: 10000
         });
 
-        if (statusCode === 400 && uploadData.data.error?.code === 429) {
-            const resetSeconds = Number(headers["x-post-rate-limit-reset"])
-            this.data.rateLimitedReset = new sb.Date().addSeconds(resetSeconds);
-
-            const delta = sb.Utils.timeDelta(this.data.rateLimitedReset);
+        if (uploadData.statusCode !== 200) {
+            console.warn("dne upload failed", uploadData);
             return {
                 success: false,
-                reply: `Can't upload more stuff to imgur right now, please try again ${delta}`
+                reply: `Upload to nuuls.com failed monkaS Data is in console`
             };
         }
 
-        const link = `https://i.imgur.com/${uploadData.data.id}.jpg`;
         return {
-            link,
-            reply: `This ${type} does not exist: ${link}`
+            link: uploadData.body,
+            reply: `This ${type} does not exist: ${uploadData.body}`
         };
     }),
     Dynamic_Description: null
