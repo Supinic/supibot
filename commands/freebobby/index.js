@@ -8,15 +8,16 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function freeBobby () {
-		const probably = new sb.Date("2020-12-11");
+		const now = sb.Date.now();
+		const start = new sb.Date("2014-12-20");
 		const free = new sb.Date("2021-12-11");
-	
+		const percent = sb.Utils.round(100 * (now - start) / (free - start), 2);
+
 		return { 
 			reply: sb.Utils.tag.trim `
-				Our boy might be free ${sb.Utils.timeDelta(probably)},
-				but his parole seems to have been denied on 2020-09-21,
-				and he will most likely serve the rest of his sentence,
-				getting out ${sb.Utils.timeDelta(free)}
+				Our boy should have been set free in December 2020, but his parole has been denied.
+				He will most likely serve the rest of his sentence, getting out ${sb.Utils.timeDelta(free)}.
+				Overall, he has served ${percent}% of the sentence.
 				TriHard
 			`
 		};
