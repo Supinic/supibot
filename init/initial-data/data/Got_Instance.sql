@@ -1,5 +1,5 @@
 INSERT INTO `data`.`Got_Instance` 
-(`ID`,`Name`,`Options_Type`,`Options`,`Parent`,`Description`)
+(`Name`,`Options_Type`,`Options`,`Parent`,`Description`)
 VALUES
 ('Twitch','function','(() => ({
 	prefixUrl: "https://twitch.tv",
