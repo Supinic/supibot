@@ -52,12 +52,11 @@ module.exports = class Twitch extends require("./template.js") {
 				Expression: "0 0 * * * *",
 				Description: "Attempts to reconnect channels on Twitch that the bot has been unable to join - most likely because of a ban.",
 				Code: async () => {
-					const promises = [];
+					console.debug("Re-joining channels that failed a join earlier", [...this.failedJoinChannels]);
 					for (const channel of this.failedJoinChannels) {
-						promises.push(async () => this.client.join(channel));
+						this.client.join(channel);
 					}
 
-					await Promise.allSettled(promises);
 					this.failedJoinChannels.clear();
 				}
 			}),
