@@ -52,12 +52,17 @@ module.exports = class Twitch extends require("./template.js") {
 				Expression: "0 0 * * * *",
 				Description: "Attempts to reconnect channels on Twitch that the bot has been unable to join - most likely because of a ban.",
 				Code: async () => {
-					console.debug("Re-joining channels that failed a join earlier", [...this.failedJoinChannels]);
-					for (const channel of this.failedJoinChannels) {
-						this.client.join(channel);
-					}
+					const results = await Promise.allSettled(
+						[...this.failedJoinChannels].map(i => this.client.join(i))
+					);
 
 					this.failedJoinChannels.clear();
+
+					for (const { reason, status } of results) {
+						if (status === "rejected" && reason instanceof DankTwitch.JoinError && reason.failedChannelName) {
+							this.failedJoinChannels.add(reason.failedChannelName);
+						}
+					}
 				}
 			}),
 			new sb.Cron({
