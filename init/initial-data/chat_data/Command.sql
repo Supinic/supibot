@@ -121,9 +121,6 @@ VALUES
         default: return { reply: "Unrecognized module!" };
     }
 
-    sb.Runtime.incrementScriptHotloaded();
-    sb.Master.reloaded = new sb.Date();
-
     return {
         reply: "Reloaded successfully."
     };
