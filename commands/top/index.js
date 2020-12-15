@@ -4,20 +4,40 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 60000,
 	Description: "Posts the top X (implicitly 10) users by chat lines sent in the context of current channel.",
-	Flags: ["pipe","whitelist"],
+	Flags: ["mention"],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function top (extra, limit) {
-		if (!Number.isFinite(Number(limit))) {
-			limit = 3;
+	Code: (async function top (context, rawLimit) {
+		if (
+			!context.user.Data.administrator
+			&& !context.channel.isUserChannelOwner(context.user)
+			&& !context.channel.isUserAmbassador(context.user)
+		) {
+			return {
+				success: false,
+				reply: `You're not allowed to use this command here! Only administrators, channel owners and channel ambassadors can.`
+			};
 		}
-		if (limit > 10) {
-			return { reply: "Limit set too high!" };
+
+		const limit = Number(rawLimit);
+		if (!sb.Utils.isValidInteger(limit)) {
+			return {
+				success: false,
+				reply: "The limit must be provided as a number!",
+				cooldown: 5000
+			};
+		}
+		else if (limit > 10) {
+			return {
+				success: false,
+				reply: "Limit set too high! Use a value between 1 and 10!",
+				cooldown: 5000
+			};
 		}
 	
-		const channels = (extra.channel.ID === 7 || extra.channel.ID === 8)
+		const channels = (context.channel.ID === 7 || context.channel.ID === 8)
 			? [7, 8, 46]
-			: [extra.channel.ID];
+			: [context.channel.ID];
 	
 		const top = await sb.Query.getRecordset(rs => rs
 			.select("SUM(Message_Count) AS Total")
@@ -36,6 +56,9 @@ module.exports = {
 		}).join(", ");
 	
 		return {
+			meta: {
+				skipWhitespaceCheck: true
+			},
 			reply: `Top ${limit} chatters: ${chatters}`
 		};
 	}),
