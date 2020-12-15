@@ -66,7 +66,7 @@ module.exports = {
     }),
     Dynamic_Description: (async (prefix, values) => {
         const { buildURL, types } = values.getStaticData();
-        const list = types.map(i => `<li><a href="${buildURL(i)}">This ${i} does not exist</a></li>`).join("");
+        const list = types.map(i => `<li><code>${i}</code> - <a href="${buildURL(i)}">This ${i} does not exist</a></li>`).join("");
 
         return [
             `Posts a random picture from the set of "this X does not exist" websites.`,
