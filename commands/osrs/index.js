@@ -16,12 +16,16 @@ module.exports = {
 			if (!data) {
 				let apiData;
 				if (!options.seasonal) {
-					apiData = await sb.Got("Supinic", "osrs/lookup/" + user).json();
+					apiData = await sb.Got("Supinic", {
+						url: "osrs/lookup/" + user,
+						timeout: 10000
+					}).json();
 				}
 				else {
 					apiData = await sb.Got("Supinic", {
 						url: "osrs/lookup/" + user,
-						searchParams: new sb.URLParams().set("seasonal", "1").toString()
+						searchParams: new sb.URLParams().set("seasonal", "1").toString(),
+						timeout: 10000,
 					}).json();
 				}
 
