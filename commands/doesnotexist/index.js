@@ -33,8 +33,17 @@ module.exports = {
 
         const imageData = await sb.Got({
             url: buildURL(type),
-            responseType: "buffer"
+            responseType: "buffer",
+            throwHttpErrors: false
         });
+
+        if (imageData.statusCode !== 200) {
+            console.warn("dne download failed", imageData);
+            return {
+                success: false,
+                reply: `Fetching image data failed monkaS`
+            };
+        }
 
         const form = new sb.Got.FormData();
         form.append("attachment", imageData.rawBody ?? imageData.body, "file.jpg");
@@ -55,7 +64,7 @@ module.exports = {
             console.warn("dne upload failed", uploadData);
             return {
                 success: false,
-                reply: `Upload to nuuls.com failed monkaS error log is in the console`
+                reply: `Upload to nuuls.com failed monkaS`
             };
         }
 
