@@ -452,6 +452,22 @@ module.exports = {
 							};
 						}
 
+						if (link.toLowerCase() === "last") {
+							const tl = sb.Command.get("tl");
+							const key = tl.staticData.createRecentUseCacheKey(context);
+
+							const cacheData = await tl.getCacheData(key);
+							if (!cacheData) {
+								return {
+									success: false,
+									reply: "You haven't rolled for any images in this channel recently!"
+								};
+							}
+							else {
+								link = cacheData;
+							}
+						}
+
 						flags = flags.filter(i => availableFlags.includes(i.toLowerCase()));
 						if (flags.length === 0) {
 							return {

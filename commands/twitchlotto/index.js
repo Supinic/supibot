@@ -35,7 +35,14 @@ module.exports = {
 					replacement: "ass"
 				}
 			],
-			maxRetries: 3
+			maxRetries: 3,
+			createRecentUseCacheKey: (context) => {
+				return {
+					type: "recent-use",
+					user: context.user.ID,
+					channel: context.channel?.ID ?? null
+				};
+			}
 		};
 	}),
 	Code: (async function twitchLotto (context, channel) {
@@ -206,6 +213,10 @@ module.exports = {
 				reply: "Cannot post image! These flags are blacklisted: " + illegalFlags.join(", ")
 			};
 		}
+
+		await this.setCacheData(this.staticData.createRecentUseCacheKey(context), image.Link, {
+			expiry: 600_000
+		});
 
 		const flagsString = (image.Adult_Flags)
 			? `Manual NSFW flags: ${image.Adult_Flags.join(", ")}`
