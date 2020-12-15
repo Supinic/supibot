@@ -111,6 +111,7 @@ module.exports = class Discord extends require("./template.js") {
 						message: msg,
 						user: null,
 						channel: channelData,
+						platform: this.platform,
 						raw: { user }
 					});
 				}
@@ -152,7 +153,8 @@ module.exports = class Discord extends require("./template.js") {
 						type: "message",
 						message: msg,
 						user: userData,
-						channel: channelData
+						channel: channelData,
+						platform: this.platform
 					});
 
 					// Mirroring is set up - mirror the message to the target channel

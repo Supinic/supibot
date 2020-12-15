@@ -380,6 +380,7 @@ module.exports = class Twitch extends require("./template.js") {
 					message,
 					user: null,
 					channel: channelData,
+					platform: this.platform,
 					raw: {
 						user: senderUsername
 					}
@@ -423,6 +424,7 @@ module.exports = class Twitch extends require("./template.js") {
 				message,
 				user: userData,
 				channel: channelData,
+				platform: this.platform
 			});
 
 			if (channelData.Custom_Code) {

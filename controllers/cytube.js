@@ -112,6 +112,7 @@ module.exports = class Cytube extends require("./template.js") {
 					message: msg,
 					user: null,
 					channel: this.channelData,
+					platform: this.platform,
 					raw: {
 						user: data.username
 					}
@@ -156,7 +157,8 @@ module.exports = class Cytube extends require("./template.js") {
 				type: "message",
 				message: msg,
 				user: userData,
-				channel: this.channelData
+				channel: this.channelData,
+				platform: this.platform
 			});
 
 			// Handle commands if the message starts with the command prefix

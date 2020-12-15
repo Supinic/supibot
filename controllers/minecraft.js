@@ -69,6 +69,7 @@ module.exports = class Minecraft extends require("./template.js") {
 							message,
 							user: null,
 							channel: channelData,
+							platform: this.platform,
 							raw: {
 								user: username
 							}
@@ -104,7 +105,8 @@ module.exports = class Minecraft extends require("./template.js") {
 					type: "message",
 					message,
 					user: userData,
-					channel: channelData
+					channel: channelData,
+					platform: this.platform
 				});
 
 				sb.AwayFromKeyboard.checkActive(userData, channelData);
