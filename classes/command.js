@@ -614,7 +614,7 @@ module.exports = class Command extends require("./template.js") {
 			console.warn(`Execution of command ${command.ID} did not result with execution.reply of type string`, {command, execution, data: context});
 		}
 
-		execution.reply = sb.Utils.fixHTML(String(execution.reply));
+		execution.reply = String(execution.reply);
 
 		const metaSkip = Boolean(!execution.partialReplies && (options.skipBanphrases || execution?.meta?.skipBanphrases));
 		if (!command.Flags.skipBanphrase && !metaSkip) {
