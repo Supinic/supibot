@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["rc"],
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Posts a random clip from either the current channel or the specified channel. You can specify a parameter period, with options day/week/month/all, for example: perdiod:week",
+	Description: "Posts a random clip from either the current channel or the specified channel. You can specify a parameter period, with options day/week/month/all, for example: period:week",
 	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: null,
