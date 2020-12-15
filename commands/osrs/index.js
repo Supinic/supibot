@@ -122,15 +122,14 @@ module.exports = {
 		]
 	})),
 	Code: (async function osrs (context, ...args) {
-		const firstCheck = args.splice(0, 1);
-		if (!firstCheck) {
+		const [first] = args.splice(0, 1);
+		if (!first) {
 			return {
 				success: false,
 				reply: `Not enough arguments provided! Check the command help here: https://supinic.com/bot/command/${this.ID}`
 			};
 		}
 
-		const first = firstCheck[0];
 		let command = first.toLowerCase();
 		if (!this.staticData.subcommands.includes(command)) {
 			args.unshift(first);
