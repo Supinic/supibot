@@ -616,10 +616,6 @@ module.exports = class Command extends require("./template.js") {
 
 		execution.reply = sb.Utils.fixHTML(String(execution.reply));
 
-		if (!execution.meta?.skipWhitespaceCheck) {
-			execution.reply = execution.reply.replace(sb.Config.get("WHITESPACE_REGEX"), "");
-		}
-
 		const metaSkip = Boolean(!execution.partialReplies && (options.skipBanphrases || execution?.meta?.skipBanphrases));
 		if (!command.Flags.skipBanphrase && !metaSkip) {
 			const { passed, privateMessage, string } = await sb.Banphrase.execute(execution.reply.slice(0, 2000), channelData);
