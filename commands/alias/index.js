@@ -128,7 +128,8 @@ module.exports = {
 	
 		type = type.toLowerCase();
 		switch (type) {
-			case "add": {
+			case "add":
+			case "create": {
 				const [name, command, ...rest] = args;
 				if (!name || !command) {
 					return {
@@ -233,7 +234,8 @@ module.exports = {
 						: `Your aliases: ${list}.`
 				};
 			}
-	
+
+			case "delete":
 			case "remove": {
 				const [name] = args;
 				if (!name) {
@@ -416,6 +418,7 @@ module.exports = {
 			
 			`<h5>Usage</h5>`,
 			`<code>${prefix}alias add (name) (definition)</code>`,
+			`<code>${prefix}alias create (name) (definition)</code>`,
 			`Creates your command alias, e.g.:`,
 			`<code>${prefix}alias add <u>hello</u> translate to:german Hello!</code>`,
 			"",
@@ -447,6 +450,7 @@ module.exports = {
 			`You can also check them in <a href="/user/alias/list">this list</a> - after you log in.`,
 			"",
 			
+			`<code>${prefix}alias delete (name)</code>`,
 			`<code>${prefix}alias remove (name)</code>`,
 			"Removes your command alias with the given name.",
 			"",
