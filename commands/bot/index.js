@@ -129,7 +129,7 @@ module.exports = {
 						};
 					}
 	
-					channelData.saveProperty("Banphrase_API_Mode", params.mode);
+					channelData.saveProperty("Banphrase_API_Downtime", params.mode);
 					result.push(`Banphrase API mode has been set to ${params.mode}.`);
 				}
 	
