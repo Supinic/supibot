@@ -9,7 +9,7 @@ module.exports = {
 		if (!channel) {
 			return;
 		}
-		else if (user.Name === channel.Platform.Self_Name) {
+		else if (!user || user.Name === channel.Platform.Self_Name) {
 			return;
 		}
 	

@@ -4,7 +4,7 @@ module.exports = {
 	Description: "Attempts to auto-unscramble thepositivebot's unscramble minigame.",
 	Code: (async function automaticUnscramble (context) {
 		const { channel, message, user } = context;
-		if (user.Name !== "thepositivebot") {
+		if (!user || user.Name !== "thepositivebot") {
 			return;
 		}
 	
