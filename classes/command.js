@@ -485,7 +485,8 @@ module.exports = class Command extends require("./template.js") {
 					Invocation: identifier,
 					Arguments: JSON.stringify(args),
 					Result: result,
-					Execution_Time: sb.Utils.round(Number(end - start) / 1.0e6, 3)
+					Execution_Time: sb.Utils.round(Number(end - start) / 1.0e6, 3),
+					Command_Name: command.Name
 				});
 			}
 		}
