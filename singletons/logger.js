@@ -164,7 +164,8 @@ module.exports = (function () {
 						"Invocation",
 						"Arguments",
 						"Result",
-						"Execution_Time"
+						"Execution_Time",
+						"Command_Name"
 					]
 				).then(batch => this.commandBatch = batch);
 
