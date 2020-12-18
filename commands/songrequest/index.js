@@ -439,8 +439,15 @@ module.exports = {
 			if (data.type === "bilibili" || data.type === "nicovideo") {
 				const { promisify } = require("util");
 				const shell = promisify(require("child_process").exec);
-				const result = await shell(`youtube-dl --get-url ${data.link}`);
-	
+				const ytdlPath = sb.Config.get("YOUTUBEDL_PATH", false);
+				if (!ytdlPath) {
+					return {
+						success: false,
+						reply: "No youtube-dl path configured, cannot get-url for this video!"
+					};
+				}
+
+				const result = await shell(`${ytdlPath} --get-url ${data.link}`);
 				vlcLink = result.stdout;
 			}
 	
