@@ -225,7 +225,7 @@ module.exports = {
 			const symbol = (forum.quarantine) ? "⚠" : "";
 			return {
 				link: post.url,
-				reply: `${symbol} ${post}`
+				reply: sb.Utils.fixHTML(`${symbol} ${post}`)
 			}
 		}
 	}),
