@@ -136,6 +136,11 @@ module.exports = class Cytube extends require("./template.js") {
 					return;
 				}
 
+				this.channelData.sessionData.lastActivity = {
+					user: userData.ID,
+					date: new sb.Date().valueOf()
+				};
+
 				this.resolveUserMessage(this.channelData, userData, msg);
 				sb.Logger.push(msg, userData, this.channelData);
 				sb.AwayFromKeyboard.checkActive(userData, this.channelData);
