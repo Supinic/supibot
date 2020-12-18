@@ -330,18 +330,6 @@ module.exports = class Channel extends require("./template.js") {
         });
     }
 
-    get cacheData () {
-        return sb.Cache.getByPrefix(Channel.redisPrefix, {
-            keys: { ID: this.ID }
-        });
-    }
-
-    async setCacheData (value) {
-        return sb.Cache.getByPrefix(Channel.redisPrefix, value, {
-            keys: { ID: this.ID }
-        });
-    }
-
     destroy () {
         this.Data = null;
         this.sessionData = null;
