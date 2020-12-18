@@ -330,6 +330,10 @@ module.exports = class Channel extends require("./template.js") {
         });
     }
 
+    getCacheKey () {
+        return `sb-channel-${this.ID}`;
+    }
+
     destroy () {
         this.Data = null;
         this.sessionData = null;
