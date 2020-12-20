@@ -141,8 +141,9 @@ module.exports = {
 		else if (!context.channel?.NSFW && !context.privateMessage) {
 			safeSpace = true;
 		}
-	
-		const subreddit = (args.shift() ?? sb.Utils.randArray(this.staticData.defaultMemeSubreddits)).toLowerCase();
+
+		const input = (args.shift() ?? sb.Utils.randArray(this.staticData.defaultMemeSubreddits));
+		const subreddit = encodeURIComponent(input.toLowerCase());
 
 		let forum = this.data.subreddits[subreddit];
 		if (!forum) {
