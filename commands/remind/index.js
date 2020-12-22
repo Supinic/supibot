@@ -65,7 +65,7 @@ module.exports = {
 			};
 		}
 	
-		let reminderText = args.join(" ");
+		let reminderText = args.join(" ").replace(/\s+/g, " ").trim();
 	
 		// const timedRegex = /\b(in|on|at)\b/i;
 		const timedRegex = /\b(in|at)\b/i;
@@ -109,16 +109,16 @@ module.exports = {
 	*/
 	
 			if (timeData.ranges.length > 0) {
-				const continueRegex = /^(and|[\s\W]+)$/;
-	
+				const continueRegex = /^((\s*and\s*)|[\s\W]+)$/;
 				let continues = false;
+
 				for (let i = 0; i < timeData.ranges.length; i++) {
 					// If the preceding text doesn't contain the word "in" right before the time range, skip it.
 					const precedingText = reminderText.slice(0, timeData.ranges[i].start);
 					if (!continues && !precedingText.match(/\bin\b\s*$/)) {
 						continue;
 					}
-	
+
 					continues = false;
 					const current = timeData.ranges[i];
 					const next = timeData.ranges[i + 1];
@@ -131,7 +131,13 @@ module.exports = {
 					const between = (next)
 						? reminderText.slice(current.end, next.start)
 						: "";
-	
+
+					// Remove the possible preceding "in" keyword, regardless of which range it is used in
+					const keywordIndex = reminderText.slice(0, current.start).lastIndexOf("in");
+					if (current.start - keywordIndex === 3) {
+						reminderText = reminderText.slice(0, keywordIndex) + "\x00".repeat(3) + reminderText.slice(current.start);
+					}
+
 					// and only continue if it matches a "time word separator", such as the word "and", space, comma, ...
 					if (!continueRegex.test(between)) {
 						reminderText = reminderText.slice(0, current.start) + reminderText.slice(current.end);
@@ -141,14 +147,6 @@ module.exports = {
 						const amount = next.start - current.start;
 						reminderText = reminderText.slice(0, current.start) + "\x00".repeat(amount) + reminderText.slice(next.start);
 						continues = true;
-					}
-				}
-	
-				if (timeData.ranges[0]?.start) {
-					const end = timeData.ranges[0].start;
-					const preceder = reminderText.slice(end - 3, end);
-					if (timedRegex.test(preceder)) {
-						reminderText = reminderText.slice(0, end - 3) + "\x00".repeat(3) + reminderText.slice(end);
 					}
 				}
 	
