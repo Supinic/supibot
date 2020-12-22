@@ -64,7 +64,7 @@ module.exports = class Discord extends require("./template.js") {
 			}
 
 			let channelData = null;
-			let userData = await sb.User.get(user, true);
+			const userData = await sb.User.get(user, false, { Discord_ID: discordID });
 			if (userData) {
 				if (userData.Discord_ID === null && userData.Twitch_ID !== null) {
 					if (
@@ -91,7 +91,6 @@ module.exports = class Discord extends require("./template.js") {
 					return;
 				}
 				else if (userData.Discord_ID === null && userData.Twitch_ID === null) {
-					userData = await sb.User.add(user);
 					await userData.saveProperty("Discord_ID", discordID);
 				}
 				else if (userData.Discord_ID !== discordID) {
