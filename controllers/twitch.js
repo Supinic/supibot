@@ -250,8 +250,8 @@ module.exports = class Twitch extends require("./template.js") {
 				);
 			}
 			else if (messageObject.messageID === "anonsubgift" || messageObject.isSubgift()) {
-				const { months, recipientUserName } = messageObject.eventParams;
-				const recipientData = await sb.User.get(recipientUserName);
+				const { months, recipientUsername } = messageObject.eventParams;
+				const recipientData = await sb.User.get(recipientUsername);
 
 				this.handleGiftedSubscription(channelName, senderUsername || null, {
 					months,
