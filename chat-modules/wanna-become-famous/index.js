@@ -16,7 +16,7 @@ module.exports = {
 		if (!context.user && context.raw?.user) {
 			const name = context.raw.user;
 			await client.privmsg(context.channel.Name, `/ban ${name}`);
-			await channelData.send("NOIDONTTHINKSO I don't wanna become famous");
+			await context.channel.send("NOIDONTTHINKSO FBBlock become famous");
 
 			return;
 		}
@@ -32,7 +32,7 @@ module.exports = {
 
 		if (typeof messageCount === "undefined" || messageCount <= 1) {
 			await client.privmsg(context.channel.Name, `/ban ${context.user.Name}`);
-			await channelData.send("NOIDONTTHINKSO");
+			await context.channel.send("NOIDONTTHINKSO");
 		}
 	}),
 	Author: "supinic"
