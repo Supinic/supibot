@@ -285,20 +285,7 @@ module.exports = class Channel extends require("./template.js") {
         const row = await sb.Query.getRow("chat_data", "Channel");
         await row.load(this.ID);
 
-        if (typeof value !== "undefined") {
-            this[property] = value;
-
-        }
-        else {
-            value = this[property];
-        }
-
-        if (value?.constructor === Object) {
-            value = JSON.stringify(value, null, 4);
-        }
-
-        row.values[property] = value;
-        await row.save();
+        await super.saveRowProperty(row, property, value, this);
     }
 
     /**

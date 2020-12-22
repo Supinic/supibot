@@ -80,7 +80,46 @@ module.exports = class ClassTemplate {
 			...options
 		});
 	}
-	
+
+	async saveRowProperty (row, property, value, self) {
+		if (!sb.Query.isRow(row)) {
+			throw new sb.Error({
+				message: "First argument must be an instance of Row",
+				args: {
+					type: row?.constructor?.name ?? typeof row
+				}
+			});
+		}
+		else if (!row.hasProperty(property)) {
+			throw new sb.Error({
+				message: "Row does not have provided property",
+				args: {
+					property,
+					properties: Object.keys(row.valuesObject)
+				}
+			});
+		}
+		else if (!row.loaded) {
+			throw new sb.Error({
+				message: "Row must be loaded before any properties can be saved"
+			});
+		}
+
+		if (typeof value !== "undefined") {
+			self[property] = value;
+		}
+		else {
+			value = self[property];
+		}
+
+		if (value?.constructor === Object) {
+			value = JSON.stringify(value);
+		}
+
+		row.values[property] = value;
+		await row.save();
+	}
+
 	static async initialize () {
 		await this.loadData();
 		return this;

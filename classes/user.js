@@ -85,23 +85,9 @@ module.exports = class User extends require("./template.js") {
         const row = await sb.Query.getRow("chat_data", "User_Alias");
         await row.load(this.ID);
 
-        if (typeof value !== "undefined") {
-            this[property] = value;
-        }
-        else {
-            value = this[property];
-        }
+        await super.saveRowProperty(row, property, value, this);
 
-        if (value?.constructor === Object) {
-            value = JSON.stringify(value, null, 4);
-        }
-
-        row.values[property] = value;
-
-        await Promise.all([
-            row.save(),
-            User.populateCaches(this)
-        ]);
+        await User.populateCaches(this);
     }
 
     async serialize () {
