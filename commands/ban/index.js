@@ -134,7 +134,8 @@ module.exports = {
 		}
 	
 		const existing = sb.Filter.data.find(i =>
-			i.Channel === options.Channel
+			i.Type === "Blacklist"
+			&& i.Channel === options.Channel
 			&& i.Command === options.Command
 			&& i.User_Alias === options.User_Alias
 		);
