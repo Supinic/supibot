@@ -126,7 +126,17 @@ module.exports = {
 			}
 	
 			if (!geoData.results[0]) {
+				const userCheck = await sb.User.get(args.join("_"));
+				if (userCheck?.Data.location) {
+					return {
+						success: false,
+						reply: `That place was not found! However, you probably meant to check that user's location - make sure to add the @ symbol before their name.`,
+						cooldown: 5000
+					};
+				}
+
 				return {
+					success: false,
 					reply: "That place was not found! FeelsBadMan"
 				};
 			}
