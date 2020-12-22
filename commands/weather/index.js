@@ -69,7 +69,7 @@ module.exports = {
 		}
 		else if (args[0].toLowerCase().replace(/^@/, "") === "supibot") {
 			const exec = require("child_process").execSync;
-			const temperature = exec("/opt/vc/bin/vcgencmd measure_temp").toString().match(/([\d\.]+)/)[1] + "°C";
+			const temperature = exec("/opt/vc/bin/vcgencmd measure_temp").toString().match(/([\d.]+)/)[1] + "°C";
 	
 			return {
 				reply: "Supibot, Supinic's table, Raspberry Pi 3B: " + temperature + ". No wind detected. No precipitation expected."
@@ -166,7 +166,7 @@ module.exports = {
 		}
 
 		let data = null;
-		let message = null;
+		let message;
 		if (number === null && type !== "currently") {
 			message = topData[type].summary;
 		}
@@ -204,7 +204,7 @@ module.exports = {
 			`;
 		}
 	
-		let plusTime = "";
+		let plusTime;
 		if (typeof number === "number") {
 			const time = new sb.Date(topData[type].data[number].time * 1000).setTimezoneOffset(topData.offset * 60);
 			if (type === "hourly") {
