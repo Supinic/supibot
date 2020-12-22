@@ -71,7 +71,8 @@ module.exports = {
 				"I’m moving my La Casa to Costa Rica into a jungle with a water fall.",
 				"I’m getting so sick and tired of little @NICKMERCS and @timthetatman flappin their ugly lookin gums. Anybody else?",
 				"Here’s the plan tonight: -Plug in the PS4. -Download 20gb system update -Spend 15 minutes signing in -Download 5gb system update -Download 25gb Cold War alpha -Spend 20 minutes figuring out how to turn off notifications -Turn off the PS4",
-				"Just got off the flip phone. I'm pushing today's stream to tomorrow.... and I'll be expecting millions waiting in line."
+				"Just got off the flip phone. I'm pushing today's stream to tomorrow.... and I'll be expecting millions waiting in line.",
+				"Just think about it Cloak, these dumb dumb simp virgin wannabe gamers deserve to be reminded.  And to be able to say that during combat... oh baby baby baby."
 			]
 		};
 	}),
