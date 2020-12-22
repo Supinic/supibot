@@ -136,6 +136,10 @@ module.exports = class Cytube extends require("./template.js") {
 					return;
 				}
 
+				if (!this.channelData.sessionData) {
+					this.channelData.sessionData = {};
+				}
+
 				this.channelData.sessionData.lastActivity = {
 					user: userData.ID,
 					date: new sb.Date().valueOf()
