@@ -87,6 +87,7 @@ module.exports = class User extends require("./template.js") {
 
         await super.saveRowProperty(row, property, value, this);
 
+        await User.invalidateUserCache(this);
         await User.populateCaches(this);
     }
 
