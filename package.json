@@ -3,7 +3,7 @@
   "version": "2.2.0",
   "dependencies": {
     "cytube-connector": "github:Supinic/cytube-connector",
-    "dank-twitch-irc": "3.2.6",
+    "dank-twitch-irc": "^4.3.0",
     "discord.js": "^12.2.0",
     "message-scheduler": "github:Supinic/message-scheduler",
     "minecraft-protocol": "^1.13.0",
