@@ -15,8 +15,8 @@ module.exports = {
 		const { client } = context.channel.Platform;
 		if (!context.user && context.raw?.user) {
 			const name = context.raw.user;
-			await client.privmsg(context.channel.Name, `/ban ${name}`);
-			await context.channel.send("NOIDONTTHINKSO FBBlock become famous");
+			await client.ban(context.channel.Name, name, "trying to become famous");
+			await context.channel.send("NOIDONTTHINKSO FBBlock becoming famous");
 
 			return;
 		}
@@ -31,8 +31,8 @@ module.exports = {
 		);
 
 		if (typeof messageCount === "undefined" || messageCount <= 1) {
-			await client.privmsg(context.channel.Name, `/ban ${context.user.Name}`);
-			await context.channel.send("NOIDONTTHINKSO");
+			await client.ban(context.channel.Name, name, "trying to become famous again");
+			await context.channel.send("NOIDONTTHINKSO FBBlock becoming famous again");
 		}
 	}),
 	Author: "supinic"
