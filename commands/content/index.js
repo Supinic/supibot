@@ -44,7 +44,7 @@ module.exports = {
 				${count.bot} bot requests,
 				${count.new} new suggestions,				
 				and ${count.self + count.approved} (out of which ${count.self} are from supi)
-				by are approved and waiting!
+				are approved and waiting!
 			`
 		};
 	}),
