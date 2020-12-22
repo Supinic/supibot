@@ -51,11 +51,11 @@ module.exports = {
 			"For a given message, shuffles the words around.",
 			"",
 
-			`<code>${prefix}shuffle this is a random message`
+			`<code>${prefix}shuffle this is a random message`,
 			`a random is message this`,
 			"",
 
-			`<code>${prefix}shuffle fancy:true (this) isn't a random! message`
+			`<code>${prefix}shuffle fancy:true (this) isn't a random! message`,
 			`) isn a ' ! random this ( message`,
 		];
 	})
