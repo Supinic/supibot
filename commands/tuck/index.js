@@ -9,15 +9,17 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function tuck (context, user, ...args) {
 		const emote = args.pop() ?? null;
-		user = user?.toLowerCase().replace(/^@/, "") ?? null;
+
+		user = user.replace(/^@/, "");
+		const checkUser = user?.toLowerCase() ?? null;
 	
 		if (context.invocation === "tuck") {
-			if (!user || user === context.user.Name) {
+			if (!checkUser || checkUser === context.user.Name) {
 				return { 
 					reply: "You had nobody to tuck you in, so you tucked yourself in PepeHands" 
 				};
 			}
-			else if (user === context.platform.Self_Name) {
+			else if (checkUser === context.platform.Self_Name) {
 				return { 
 					reply: "Thanks for the kind gesture, but I gotta stay up :)" 
 				};
@@ -29,12 +31,12 @@ module.exports = {
 			}
 		}
 		else if (context.invocation === "gnkiss") {
-			if (!user || user === context.user.Name) {
+			if (!checkUser || checkUser === context.user.Name) {
 				return { 
 					reply: "You had nobody to kiss you good night, so you cry yourself to sleep PepeHands" 
 				};
 			}
-			else if (user === context.platform.Self_Name) {
+			else if (checkUser === context.platform.Self_Name) {
 				return { 
 					reply: "Thanks for the kiss, but I gotta stay up :)"
 				};
@@ -50,12 +52,12 @@ module.exports = {
 			}
 		}
 		else if (context.invocation === "headpat") {
-			if (!user || user === context.user.Name) {
+			if (!checkUser || checkUser === context.user.Name) {
 				return { 
 					reply: "You pat yourself on the head... okay?" 
 				};
 			}
-			else if (user === context.platform.Self_Name) {
+			else if (checkUser === context.platform.Self_Name) {
 				return { 
 					reply: "Thank you 😳"
 				};
