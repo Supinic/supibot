@@ -67,28 +67,30 @@ module.exports = class Discord extends require("./template.js") {
 			const userData = await sb.User.get(user, false, { Discord_ID: discordID });
 			if (userData) {
 				if (userData.Discord_ID === null && userData.Twitch_ID !== null) {
-					if (
-						(userData.Data.discordChallengeNotificationSent)
-						|| (!this.platform.Data.sendVerificationChallenge)
-						|| (!msg.startsWith(sb.Command.prefix))
-					) {
+					if (!this.platform.Data.sendVerificationChallenge) {
+						// No verification challenge - just assume it's correct
+						await userData.saveProperty("Discord_ID", discordID);
+					}
+					else {
+						if (userData.Data.discordChallengeNotificationSent || !msg.startsWith(sb.Command.prefix)) {
+							return;
+						}
+
+						const { challenge } = await Discord.createAccountChallenge(userData, discordID);
+						userData.Data.discordChallengeNotificationSent = true;
+						await userData.saveProperty("Data");
+
+						await this.directPm(
+							discordID,
+							sb.Utils.tag.trim `
+								You were found to be likely to own a Twitch account with the same name as your current Discord account.
+								If you want to use my commands on Discord, whisper me the following command on Twitch:
+								${sb.Command.prefix}link ${challenge}
+							 `
+						);
+
 						return;
 					}
-
-					const { challenge } = await Discord.createAccountChallenge(userData, discordID);
-					userData.Data.discordChallengeNotificationSent = true;
-					await userData.saveProperty("Data");
-
-					await this.directPm(
-						discordID,
-						sb.Utils.tag.trim `
-							You were found to be likely to own a Twitch account with the same name as your current Discord account.
-							If you want to use my commands on Discord, whisper me the following command on Twitch:
-							${sb.Command.prefix}link ${challenge}
-						 `
-					);
-
-					return;
 				}
 				else if (userData.Discord_ID === null && userData.Twitch_ID === null) {
 					await userData.saveProperty("Discord_ID", discordID);
