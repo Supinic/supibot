@@ -10,7 +10,7 @@ module.exports = class Discord extends require("./template.js") {
 		}
 		else if (!this.platform.Self_ID) {
 			throw new sb.Error({
-				message: "Discord user ID has not been configured"
+				message: "Discord user ID (Platform/Self_ID) has not been configured"
 			});
 		}
 		else if (!sb.Config.has("DISCORD_BOT_TOKEN", true)) {
