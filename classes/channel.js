@@ -166,6 +166,10 @@ module.exports = class Channel extends require("./template.js") {
      * @returns {boolean} True if new tables and triggeres were created, false if channel already has them set up
      */
     async setup () {
+        if (!this.Platform.logging || !this.Platform.logging.messages) {
+            return false;
+        }
+
         const prefix = (this.Platform.Name === "twitch") ? "" : (this.Platform.Name + "_");
         const name = prefix + this.Name.toLowerCase();
         const alreadySetup = await sb.Query.isTablePresent("chat_line", name);
