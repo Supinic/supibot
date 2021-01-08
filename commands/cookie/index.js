@@ -29,10 +29,10 @@ module.exports = {
 		);
 	
 		if (data?.Cookie_Today) {
-			const next = new sb.Date().addDays(1);
-			const midnight = new sb.Date(sb.Date.UTC(next.year, next.getUTCMonth(), next.getUTCDate()));
-	
-			const delta = sb.Utils.timeDelta(midnight);
+			const tomorrow = new sb.Date().addDays(1);
+			const nextMidnight = new sb.Date(sb.Date.UTC(tomorrow.getUTCFullYear(), tomorrow.getUTCMonth(), tomorrow.getUTCDate()));
+			const delta = sb.Utils.timeDelta(nextMidnight);
+
 			return {
 				reply: `You already opened or gifted a fortune cookie today. You can get another one at midnight UTC, which is ${delta}.`
 			};
