@@ -477,7 +477,12 @@ module.exports = {
 			
 			`<code>${prefix}$ <u>hello</u></code> => Hallo!`,
 			`<code>${prefix}alias run <u>hello</u></code> => Hallo!`,
-			"",		
+			"",
+
+			`<code>${prefix}alias copy (username) (alias)</code>`,
+			"Takes someone else's alias, and attempts to copy it with the same name for you. Behaves like <code>add</code>, so if you have an alias with the same name, the copying will fail",
+			`<code>${prefix}alias copy supinic lol</code>`,
+			"",
 			
 			`<code>${prefix}alias check (name)</code>`,
 			"Posts the definition of given alias to chat, e.g.:",
