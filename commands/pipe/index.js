@@ -13,6 +13,7 @@ module.exports = {
 			return { reply: "At least two commands must be piped together!" };
 		}
 
+		let aliased = false;
 		const nullCommand = sb.Command.get("null");
 		for (let i = 0; i < invocations.length; i++) {
 			const [commandString] = invocations[i].split(" ");
@@ -39,6 +40,9 @@ module.exports = {
 						reply: `The output of command "${commandString}" cannot be directly piped into null!`
 					};
 				}
+			}
+			else if (command.Name === "alias") {
+				aliased = true;
 			}
 		}
 
@@ -119,6 +123,7 @@ module.exports = {
 		}
 	
 		return {
+			aliased,
 			replyWithPrivateMessage: Boolean(finalResult?.replyWithPrivateMessage),
 			reply: currentArgs.join(" ")
 		};
