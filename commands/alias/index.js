@@ -191,6 +191,53 @@ module.exports = {
 					reply: `Your alias "${name}" has this definition: ${invocation} ${commandArgs.join(" ")}`
 				};
 			}
+
+			case "copy": {
+				const [targetUser, targetAlias] = args;
+				if (!targetUser) {
+					return {
+						success: false,
+						reply: "No target username provided!"
+					};
+				}
+				else if (!targetAlias) {
+					return {
+						success: false,
+						reply: "No target alias provided!"
+					};
+				}
+
+				const target = await sb.User.get(targetUser);
+				if (!target) {
+					return {
+						success: false,
+						reply: "Invalid user provided!"
+					};
+				}
+
+				const aliases = target.Data.aliasedCommands;
+				if (!aliases || Object.keys(aliases).length === 0) {
+					return {
+						success: false,
+						reply: "They currently don't have any aliases!"
+					};
+				}
+				else if (!aliases[targetAlias]) {
+					return {
+						success: false,
+						reply: "They don't have an alias with that name!"
+					};
+				}
+
+				const alias = aliases[targetAlias];
+				return await this.execute(
+					context,
+					"add",
+					targetAlias,
+					alias.invocation,
+					...alias.args
+				);
+			}
 	
 			case "edit": {
 				const [name, command, ...rest] = args;
