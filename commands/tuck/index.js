@@ -8,13 +8,16 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function tuck (context, user, ...args) {
-		const emote = args.pop() ?? null;
+		if (!user) {
+			user = context.user.Name;
+		}
 
+		const emote = args.pop() ?? null;
 		user = user.replace(/^@/, "");
-		const checkUser = user?.toLowerCase() ?? null;
+		const checkUser = user.toLowerCase() ?? null;
 	
 		if (context.invocation === "tuck") {
-			if (!checkUser || checkUser === context.user.Name) {
+			if (checkUser === context.user.Name) {
 				return { 
 					reply: "You had nobody to tuck you in, so you tucked yourself in PepeHands" 
 				};
@@ -31,7 +34,7 @@ module.exports = {
 			}
 		}
 		else if (context.invocation === "gnkiss") {
-			if (!checkUser || checkUser === context.user.Name) {
+			if (checkUser === context.user.Name) {
 				return { 
 					reply: "You had nobody to kiss you good night, so you cry yourself to sleep PepeHands" 
 				};
@@ -52,7 +55,7 @@ module.exports = {
 			}
 		}
 		else if (context.invocation === "headpat") {
-			if (!checkUser || checkUser === context.user.Name) {
+			if (checkUser === context.user.Name) {
 				return { 
 					reply: "You pat yourself on the head... okay?" 
 				};
