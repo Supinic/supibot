@@ -19,6 +19,10 @@ module.exports = {
 					replacement: "penis"
 				},
 				{
+					string: "Male Genitalia - Covered",
+					replacement: "covered penis"
+				},
+				{
 					string: "Female Genitalia - Exposed",
 					replacement: "vagina"
 				},
