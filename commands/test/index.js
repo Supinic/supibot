@@ -7,8 +7,14 @@ module.exports = {
 	Flags: ["developer","pipe","skip-banphrase","system"],
 	Whitelist_Response: "For debugging purposes only :)",
 	Static_Data: null,
-	Code: (async function test (context, ...args) {
-		if (!context.append.flags) {
+	Code: (async function test (context) {
+		if (context.privateMessage) {
+			return {
+				success: false,
+				reply: "Can't check for toxicity in whispers!"
+			};
+		}
+		else if (!context.append.flags) {
 			return {
 				reply: "No toxicity detected :)"
 			};
@@ -20,8 +26,6 @@ module.exports = {
 			I: "Identity",
 			A: "Aggressive"
 		};
-	
-		// console.log(context.append.flags);
 	
 		const counter = {};
 		const words = context.append.flags.split(",");
