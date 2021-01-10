@@ -676,6 +676,10 @@ module.exports = class Command extends require("./template.js") {
 			execution.reply = string + ", " + execution.reply;
 		}
 
+		if (!options.partialExecute && execution.aliased) {
+			execution.reply = "👥" + execution.reply;
+		}
+
 		return execution;
 	}
 
