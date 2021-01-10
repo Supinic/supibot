@@ -52,12 +52,13 @@ module.exports = {
 	
 		const stream = data.stream;
 		const started = sb.Utils.timeDelta(new sb.Date(stream.created_at));
+		const viewersSuffix = (stream.viewers === 1) ? "" : "s";
 		const broadcast = (stream.game) 
 			? `playing ${stream.game}`
 			: `streaming under no category`; 
 			
 		return {
-			reply: `${target} is ${broadcast}, since ${started} for ${stream.viewers} viewers at ${stream.video_height}p. Title: ${stream.channel.status} https://twitch.tv/${target.toLowerCase()}`
+			reply: `${target} is ${broadcast}, since ${started} for ${stream.viewers} viewer${viewersSuffix} at ${stream.video_height}p. Title: ${stream.channel.status} https://twitch.tv/${target.toLowerCase()}`
 		};
 	}),
 	Dynamic_Description: null
