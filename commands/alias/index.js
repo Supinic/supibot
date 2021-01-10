@@ -381,7 +381,8 @@ module.exports = {
 						aliasCount,
 						platform: context.platform,
 						skipPending: true,
-						skipMention: true
+						skipMention: true,
+						partialExecute: true
 					}
 				);
 	

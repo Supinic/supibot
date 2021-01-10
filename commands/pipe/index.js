@@ -75,7 +75,8 @@ module.exports = {
 					pipe: true,
 					skipBanphrases: true,
 					skipPending: true,
-					skipMention: true
+					skipMention: true,
+					partialExecute: true
 				}
 			);
 	
