@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "For a given GitHub user, this command gives you the amount of push events they have done in the last 24 hours. If nothing is provided, your username is used instead.",
-	Flags: ["developer","mention","pipe","skip-banphrase"],
+	Flags: ["developer","mention","non-nullable","pipe","skip-banphrase"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function commitCount (context, user) {

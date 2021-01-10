@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Attempts to convert a specified amount of one currency to another. Only supports 3-letter ISO codes. Example: 100 USD to EUR.",
-	Flags: ["mention","pipe","skip-banphrase"],
+	Flags: ["mention","non-nullable","pipe","skip-banphrase"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function currency (context, amount, first, separator, second)  {

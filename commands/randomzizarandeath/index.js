@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Posts a random video with Zizaran dying in Path of Exile.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		playlist: "PLbpExg9_Xax24tS9rNt8IP49VFFaDghAG"
