@@ -34,7 +34,10 @@ module.exports = {
 				"People malding over rerun streamers. Meanwhile I wake up thinking about playing a game for the first time in a long time. Stop obsessing over twitch and viewcounts and just play the game.",
 				`Banned for 2 weeks for saying retarded russians instead of retarded "people who cant participate in voice comms in valorant due to legal reasons". I guess I have some more time to beat up my half russian siblings now. nice`,
 				`Getting a new TV, any netflix and chillers out there know what to get? OS and shit thats useful in 2020. inb4 "tv in 2020 OMEGALUL"`,
-				"random blue screen during world record run. unlucky"
+				"random blue screen during world record run. unlucky",
+				"I'm currently banned for the horse gif. The ban is indefinite which means undetermined ban duration. Unlucky.",
+				"So apparently I’m unbanned! I’ll cu guys tomorrow at 7pm cet. Thats all.",
+				"Happy new years boys and girls. You know 2021 is gonna be EZ clap for the god gamer."
 			],
 			notes: [
 				`Source for the "b." tweet: https://twitter.com/Forsen/status/1057549668253659136`,
