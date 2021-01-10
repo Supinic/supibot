@@ -31,7 +31,7 @@ module.exports = {
 
 		if (types.includes("all") || types.includes("pull")) {
 			queue.push(async () => {
-				await context.channel.send("PogChamp 👉 git pull origin master");
+				await context.channel.send("VisLaud 👉 git pull origin master");
 
 				await shell(`git -C ${dir} checkout -- yarn.lock package.json`);
 				const result = await shell(`git -C ${dir} pull origin master`);
@@ -40,7 +40,7 @@ module.exports = {
 		}
 		if (types.includes("all") || types.includes("yarn") || types.includes("upgrade")) {
 			queue.push(async () => {
-				await context.channel.send("PogChamp 👉 yarn upgrade supi-core");
+				await context.channel.send("VisLaud 👉 yarn upgrade supi-core");
 
 				const result = await shell(`yarn --cwd ${dir} upgrade supi-core`);
 				console.log("upgrade result", { stdout: result.stdout, stderr: result.stderr });
@@ -48,7 +48,7 @@ module.exports = {
 		}
 	
 		queue.push(async () => {
-			await context.channel.send("PogChamp 👉 Restarting process");
+			await context.channel.send("VisLaud 👉 Restarting process");
 			setTimeout(() => shell(pm2), 1000);
 		});
 
