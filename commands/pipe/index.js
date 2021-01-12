@@ -84,13 +84,21 @@ module.exports = {
 				currentArgs = [];
 			}
 			else if (typeof result !== "object") { // Banphrase result: Reply with message
-				return { reply: result };
+				return {
+					reply: result
+				};
 			}
 			else if (result.reason === "bad_invocation" && result.reply) {
-				return { reply: `Command "${cmd}" failed: ${result.reply}` };
+				return {
+					success: false,
+					reply: `Command "${cmd}" failed: ${result.reply}`
+				};
 			}
 			else if (result.reason === "error" && result.reply) {
-				return { reply: result.reply };
+				return {
+					success: false,
+					reply: result.reply
+				};
 			}
 			else if (result.success === false) { // Command result: Failed (cooldown, no command, ...)
 				let reply = "";
@@ -107,11 +115,15 @@ module.exports = {
 				}
 	
 				return {
+					success: false,
 					reply: `Pipe will not continue, because command ${cmd} failed: ${reply}`
 				};
 			}
 			else if (!result.reply) { // Command result: Failed (ban)
-				return { reply: "The final result of pipe is banphrased." };
+				return {
+					success: false,
+					reply: "The final result of pipe is banphrased."
+				};
 			}
 			else if (resultsInPastebin) {
 				currentArgs = result.reply.split(" ");
