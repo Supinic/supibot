@@ -33,15 +33,15 @@ module.exports = {
 	
 		const item = data.items[0];
 		return {
-			reply: [
-				item.title,
-				"(score: " + item.score + ", answers: " + item.answer_count + ")",
-				"asked by " + item.owner.display_name,
-				sb.Utils.timeDelta(new sb.Date(item.creation_date * 1000)),
-				"and last active",
-				sb.Utils.timeDelta(new sb.Date(item.last_activity_date * 1000)) + ".",
-				"https://stackoverflow.com/questions/" + item.question_id
-			].join(" ")
+			reply: sb.Utils.tag.trim `
+				${sb.Utils.fixHTML(item.title)},
+				(score: ${item.score}, answers: ${item.answer_count})
+				asked by ${item.owner.display_name}
+				${sb.Utils.timeDelta(new sb.Date(item.creation_date * 1000))}
+				and last active
+				${sb.Utils.timeDelta(new sb.Date(item.last_activity_date * 1000))}.
+				https://stackoverflow.com/questions/${item.question_id}
+			`
 		};
 	}),
 	Dynamic_Description: null
