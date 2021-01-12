@@ -387,8 +387,8 @@ module.exports = {
 				);
 	
 				return {
-					aliased: true,
-					...result
+					...result,
+					aliased: true
 				};
 			}
 	
