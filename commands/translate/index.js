@@ -4,43 +4,40 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Implicitly translates from auto-recognized language to English. Supports parameters 'from' and 'to'. Example: from:german to:french Guten Tag\",",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention","non-nullable","pipe","use-params"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function translate (context, ...args) {
-		const options = { from: "auto", to: "en", direction: true, confidence: true };
-		let fail = { from: null, to: null };
-	
-		for (let i = args.length - 1; i >= 0; i--) {
-			const token = args[i];
-			if (/^(from|to):/.test(token)) {
-				const [option, lang] = args[i].split(":");
-				const newLang = sb.Utils.languageISO.get(lang) ?? {};
-				const code = newLang.iso6391 ?? newLang.iso6392 ?? null;
-				if (!code) {
-					fail[option] = lang;
-					continue;
-				}
-	
-				options[option] = code.toLowerCase();
-				fail[option] = false;
-				args.splice(i, 1);
+		const fail = { from: null, to: null };
+		const options = {
+			from: "auto",
+			to: "en",
+			direction: (context.params.direction !== "false"),
+			confidence: (context.params.confidence !== "false")
+		};
+
+		for (const option of ["from", "to"]) {
+			const lang = context.params[option];
+			const newLang = sb.Utils.languageISO.get(lang) ?? {};
+			const code = newLang.iso6391 ?? newLang.iso6392 ?? null;
+			if (!code) {
+				fail[option] = lang;
+				continue;
 			}
-			else if (token === "direction:false") {
-				options.direction = false;
-				args.splice(i, 1);
-			}
-			else if (token === "confidence:false") {
-				options.confidence = false;
-				args.splice(i, 1);
-			}
+
+			options[option] = code.toLowerCase();
+			fail[option] = false;
 		}
 	
 		if (fail.from || fail.to) {
-			return { reply: `Language "${fail.from || fail.to}" was not recognized!` };
+			return {
+				success: false,
+				reply: `Language "${fail.from || fail.to}" was not recognized!`
+			};
 		}
 		else if (args.length === 0) {
 			return {
+				success: false,
 				reply: "No text for translation provided!",
 				cooldown: 2500
 			};
@@ -82,7 +79,7 @@ module.exports = {
 				console.warn("$translate - could not get language name", { response, reply, options, languageID });
 				return {
 					success: false,
-					reply: `Language code could not be translated into a name! Please let @Supinic know about this :)`
+					reply: "Language code could not be translated into a name! Please let @Supinic know about this :)"
 				};
 			}
 
@@ -96,7 +93,7 @@ module.exports = {
 			reply = array.join(" ") + ": " + reply;
 		}
 	
-		return { reply: reply };
+		return { reply };
 	}),
 	Dynamic_Description: null
 };
