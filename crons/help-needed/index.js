@@ -5,6 +5,8 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function announceHelpNeeded () {
+		return;
+
 		const threshold = new sb.Date().addMinutes(-60);
 		const eligibleChannels = sb.Channel.data.filter(i => (
 			i.Platform.Name === "twitch"
