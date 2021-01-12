@@ -25,6 +25,7 @@ module.exports = {
 	
 			if (first > Number.MAX_SAFE_INTEGER || second > Number.MAX_SAFE_INTEGER) {
 				return {
+					success: false,
 					reply: "That's too much."
 				};
 			}
@@ -38,26 +39,31 @@ module.exports = {
 			}
 		}
 
-		try {
-			const result = sb.Utils.evalDiceRoll(args.join(""), 1.0e6);
+		const [fixedInput] = args.join(" ").split(/[a-ce-zA-Z]/)
+		const result = sb.Utils.evalDiceRoll(fixedInput, 1_000_000);
 
-			if (result === Infinity) {
-				return { reply: "WAYTOODANK" };
-			} 
-			else if (context.append.pipe) {
-				return { reply: String(result) };
-			} 
-			else {
-				return { reply: `Your roll is ${result}` };
-			}
-		} catch (error) {
-			if (context.append.pipe) {
-				return { reply: String(error.message), success: false };
-			} 
-			else {
-				return { reply: `WAYTOODANK ${error.message}` };
-			}
+		if (result === null) {
+			return {
+				success: false,
+				reply: "Cannot make this roll work! 🙁"
+			};
 		}
+		else if (result === Infinity) {
+			return {
+				reply: "INFINITY WAYTOODANK"
+			};
+		}
+		else if (context.append.pipe) {
+			return {
+				reply: String(result)
+			};
+		}
+		else {
+			return {
+				reply: `Your roll is ${result}.`
+			};
+		}
+
 	}),
 	Dynamic_Description: null
 };
