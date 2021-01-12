@@ -166,7 +166,7 @@ module.exports = class Channel extends require("./template.js") {
      * @returns {boolean} True if new tables and triggeres were created, false if channel already has them set up
      */
     async setup () {
-        if (!this.Platform.logging || !this.Platform.logging.messages) {
+        if (!this.Platform.Logging || !this.Platform.Logging.messages) {
             return false;
         }
 
