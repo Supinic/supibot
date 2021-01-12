@@ -32,7 +32,7 @@ module.exports = {
 	
 			const number = sb.Utils.random(first, second);
 			if (context.append.pipe) {
-				return { reply: String(number ) };
+				return { reply: String(number) };
 			}
 			else {
 				return { reply: `Your specific roll (no dice) is ${number}.` };
