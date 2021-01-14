@@ -16,7 +16,7 @@ module.exports = {
 		}
 	})),
 	Code: (async function randomAnimalFact (context, input) {
-		const { invocations, types } = ["cat", "dog", "bird", "fox"];
+		const { invocations, types } = this.staticData;
 		const type = invocations[context.invocation] ?? input?.toLowerCase() ?? null;
 
 		if (type === null) {
@@ -82,7 +82,7 @@ module.exports = {
 
 		return [
 			"If you have verified that you own a given animal type, you can use this command to get a random fact about a selected animal type.",
-			`To verify, <code>${prefix}suggest a picture of your animal and mention that you want to get verified.`,
+			`To verify, <code>${prefix}suggest</code> a picture of your animal and mention that you want to get verified.`,
 			"",
 
 			`<code>${prefix}randomanimalfact ${types.join("/")}</code>`,
