@@ -6,26 +6,27 @@ module.exports = {
 	Description: "Posts a random picture for a given animal type.",
 	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
-	Static_Data: null,
-	Code: (async function randomAnimalPicture (context, type) {
-		const types = ["cat", "dog", "bird", "fox"];
-		switch (context.invocation) {
-			case "rcp": type = "cat"; break;
-			case "rdp": type = "dog"; break;
-			case "rbp": type = "bird"; break;
-			case "rfp": type = "fox"; break;
-	
-			default: type = (typeof type === "string") ? type.toLowerCase() : null;
+	Static_Data: (() => ({
+		types: ["cat", "dog", "bird", "fox"],
+		invocations: {
+			rbf: "bird",
+			rcf: "cat",
+			rdf: "dog",
+			rff: "fox"
 		}
+	})),
+	Code: (async function randomAnimalPicture (context, input) {
+		const { invocations, types } = this.staticData;
+		const type = invocations[context.invocation] ?? input?.toLowerCase() ?? null;
 	
 		if (type === null) {
 			return {
-				reply: "No type provided!"
+				reply: "No type provided!" + types.join(", ")
 			};
 		}
 		else if (!types.includes(type)) {
 			return {
-				reply: "That type is not supported!"
+				reply: "That type is not supported!" + types.join(", ")
 			};
 		}
 		else if (!context.user.Data.animals?.[type]) {
@@ -57,5 +58,28 @@ module.exports = {
 			reply: result
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix, values) => {
+		const { invocations, types } = values.getStaticData();
+		const list = [];
+
+		for (const [short, type] of Object.entries(invocations)) {
+			list.push([
+				`<code>${prefix}${short}</code>`,
+				`Posts a random ${type} picture.`,
+				""
+			]);
+		}
+
+		return [
+			"If you have verified that you own a given animal type, you can use this command to get a random picture of a selected animal type.",
+			`To verify, <code>${prefix}suggest</code> a picture of your animal and mention that you want to get verified.`,
+			"",
+
+			`<code>${prefix}randomanimalfact ${types.join("/")}</code>`,
+			"Posts a random picture of a given animal",
+			"",
+
+			...list.flat()
+		];
+	})
 };
