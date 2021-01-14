@@ -185,20 +185,20 @@ module.exports = class User extends require("./template.js") {
             return User.get(name, strict, options);
         }
         else if (typeof identifier === "string") {
-            identifier = identifier.replace(/^@/, "").toLowerCase();
+            const username = User.normalizeUsername(identifier);
 
             // 1. attempt to fetch the user from low-cache (sb.User.data)
-            const mapCacheUser = User.data.get(identifier);
+            const mapCacheUser = User.data.get(username);
             if (mapCacheUser) {
                 return mapCacheUser;
             }
 
             // 2. attempt to fetch the user from medium-cache (sb.Cache)
             if (sb.Cache && sb.Cache.active) {
-                const redisCacheUser = await User.createFromCache({ name: identifier });
+                const redisCacheUser = await User.createFromCache({ name: username });
                 if (redisCacheUser) {
-                    if (!User.data.has(identifier)) {
-                        User.data.set(identifier, redisCacheUser);
+                    if (!User.data.has(username)) {
+                        User.data.set(username, redisCacheUser);
                     }
 
                     return redisCacheUser;
@@ -209,7 +209,7 @@ module.exports = class User extends require("./template.js") {
             const dbUserData = await sb.Query.getRecordset(rs => rs
                 .select("*")
                 .from("chat_data", "User_Alias")
-                .where("Name = %s", identifier)
+                .where("Name = %s", username)
                 .single()
             );
 
@@ -221,10 +221,10 @@ module.exports = class User extends require("./template.js") {
             }
             else {
                 // 4. Create the user, if strict mode is off
-                if (!strict && !User.pendingNewUsers.has(identifier)) {
-                    User.pendingNewUsers.add(identifier);
+                if (!strict && !User.pendingNewUsers.has(username)) {
+                    User.pendingNewUsers.add(username);
                     User.insertBatch.add({
-                        Name: identifier,
+                        Name: username,
                         Discord_ID: options.Discord_ID ?? null,
                         Twitch_ID: options.Twitch_ID ?? null
                     });
@@ -265,22 +265,23 @@ module.exports = class User extends require("./template.js") {
                 toFetch.push(identifier);
             }
             else if (typeof identifier === "string") {
-                const mapCacheUser = User.data.get(identifier);
+                const username = User.normalizeUsername(identifier);
+                const mapCacheUser = User.data.get(username);
                 if (mapCacheUser) {
                     result.push(mapCacheUser);
                     continue;
                 }
 
                 if (sb.Cache && sb.Cache.active) {
-                    const redisCacheUser = await User.createFromCache({ name: identifier });
+                    const redisCacheUser = await User.createFromCache({ name: username });
                     if (redisCacheUser) {
-                        User.data.set(identifier, redisCacheUser);
+                        User.data.set(username, redisCacheUser);
                         result.push(redisCacheUser);
                         continue;
                     }
                 }
 
-                toFetch.push(identifier);
+                toFetch.push(username);
             }
             else {
                 throw new sb.Error({
@@ -340,13 +341,20 @@ module.exports = class User extends require("./template.js") {
         return user;
     }
 
+    static normalizeUsername (username) {
+        return username
+            .toLowerCase()
+            .replace(/^@/, "")
+            .replace(/\s+/g, "_");
+    }
+
     /**
      * Adds a new user to the database.
      * @param {string} name
      * @returns {Promise<User>}
      */
     static async add (name) {
-        const preparedName = name.toLowerCase().replace(/\s+/g, "_");
+        const preparedName = User.normalizeUsername(name);
         const exists = await sb.Query.getRecordset(rs => rs
             .select("Name")
             .from("chat_data", "User_Alias")
