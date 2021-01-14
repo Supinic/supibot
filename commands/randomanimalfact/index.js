@@ -72,7 +72,7 @@ module.exports = {
 		const { invocations, types } = values.getStaticData();
 		const list = [];
 
-		for (const { short, type } of Object.entries(invocations)) {
+		for (const [short, type] of Object.entries(invocations)) {
 			list.push([
 				`<code>${prefix}${short}</code>`,
 				`Posts a random ${type} fact.`,
