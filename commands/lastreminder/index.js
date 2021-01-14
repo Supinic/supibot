@@ -12,7 +12,7 @@ module.exports = {
 			return { reply: "No user provided!" };
 		}
 	
-		const targetUserData = await sb.Utils.getDiscordUserDataFromMentions(user, context.append) || await sb.User.get(user, true);
+		const targetUserData = await sb.User.get(user, true);
 		if (!targetUserData) {
 			return { reply: "That user does not exist!" };
 		}

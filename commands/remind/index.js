@@ -24,7 +24,7 @@ module.exports = {
 			};
 		}
 	
-		let targetUser = await sb.Utils.getDiscordUserDataFromMentions(args[0].toLowerCase(), context.append) || await sb.User.get(args[0], true);
+		let targetUser = await sb.User.get(args[0], true);
 		if (context.invocation.includes("me") || args[0] === "me" || (targetUser && targetUser.ID === context.user.ID)) {
 			targetUser = context.user;
 	

@@ -8,10 +8,6 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function cookieCount (context, user) {
-		if (context.platform.Name === "discord" && user && user.includes("@")) {
-			user = await sb.Utils.getDiscordUserDataFromMentions(user, context.append) || context.user;
-		}
-	
 		if (user === "total" || context.invocation === "tcc") {
 			const cookies = await sb.Query.getRecordset(rs => rs
 				.select("SUM(Cookies_Total) AS Total", "SUM(Cookie_Gifts_Sent) AS Gifts")

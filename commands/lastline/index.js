@@ -15,7 +15,7 @@ module.exports = {
 			return { reply: "This command is not available in PMs!" };
 		}
 	
-		const targetUser = await sb.Utils.getDiscordUserDataFromMentions(user, context.append) || (await sb.User.get(user, true));
+		const targetUser = await sb.User.get(user, true);
 		if (!targetUser) {		
 			return { reply: "User not found in the database!" };
 		}

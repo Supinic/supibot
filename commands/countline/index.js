@@ -9,7 +9,7 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function countLine (context, user) {
 		if (user) {
-			user = await sb.Utils.getDiscordUserDataFromMentions(user, context.append) || await sb.User.get(user, true);
+			user = await sb.User.get(user, true);
 			if (!user) {
 				return { 
 					reply: "No such user exists in the database!"
