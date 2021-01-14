@@ -316,7 +316,7 @@ module.exports = {
 						|| (i.content?.toLowerCase().includes(query))
 					));
 
-					sb.Utils.randArray(filteredArticles);
+					return sb.Utils.randArray(filteredArticles);
 				}
 				else {
 					return sb.Utils.randArray(articles);
