@@ -283,36 +283,44 @@ module.exports = {
 
 				const source = sb.Utils.randArray(news.sources);
 				const cacheKey = `${news.code}-${source.name}`;
-				const cache = await sb.Cache.getByPrefix(this.getCacheKey(), { keys: { cacheKey } });
-				if (cache) {
-					return sb.Utils.randArray(cache);
+
+				let cacheExists = true;
+				let articles = await sb.Cache.getByPrefix(this.getCacheKey(), { keys: { cacheKey } });
+				if (!articles) {
+					cacheExists = false;
+
+					const endpoint = sb.Utils.randArray(source.endpoints);
+					const url = [source.url, source.path, endpoint].filter(Boolean).join("/");
+					const feed = await sb.Utils.parseRSS(url);
+
+					articles = feed.items.map(i => ({
+						title: i.title,
+						content: i.content,
+						link: i.link || i.url,
+						published: new sb.Date(i.pubDate).valueOf()
+					}));
 				}
 
-				const endpoint = sb.Utils.randArray(source.endpoints);
-				const url = [source.url, source.path, endpoint].filter(Boolean).join("/");
-				const feed = await sb.Utils.parseRSS(url);
-	
+				if (!cacheExists) {
+					await sb.Cache.setByPrefix(this.getCacheKey(), articles, {
+						keys: { cacheKey },
+						expiry: 36e5
+					});
+				}
+
 				if (query) {
 					query = query.toLowerCase();
-					feed.items = feed.items.filter(i => (
+
+					const filteredArticles = articles.filter(i => (
 						(i.title?.toLowerCase().includes(query))
 						|| (i.content?.toLowerCase().includes(query))
 					));
+
+					sb.Utils.randArray(filteredArticles);
 				}
-
-				const articles = feed.items.map(i => ({
-					title: i.title,
-					content: i.content,
-					link: i.link || i.url,
-					published: new sb.Date(i.pubDate).valueOf()
-				}));
-
-				await sb.Cache.setByPrefix(this.getCacheKey(), articles, {
-					keys: { cacheKey },
-					expiry: 36e5
-				});
-
-				return sb.Utils.randArray(articles);
+				else {
+					return sb.Utils.randArray(articles);
+				}
 			}
 		}
 	})),
