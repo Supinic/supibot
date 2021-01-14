@@ -6,26 +6,27 @@ module.exports = {
 	Description: "Posts a random fact about a selected animal type.",
 	Flags: ["mention","non-nullable","pipe"],
 	Whitelist_Response: null,
-	Static_Data: null,
-	Code: (async function randomAnimalFact (context, type) {
-		const types = ["cat", "dog", "bird", "fox"];
-		switch (context.invocation) {
-			case "rcf": type = "cat"; break;
-			case "rdf": type = "dog"; break;
-			case "rbf": type = "bird"; break;
-			case "rff": type = "fox"; break;
-	
-			default: type = (typeof type === "string") ? type.toLowerCase() : null;
+	Static_Data: (() => ({
+		types: ["cat", "dog", "bird", "fox"],
+		invocations: {
+			rbf: "bird",
+			rcf: "cat",
+			rdf: "dog",
+			rff: "fox"
 		}
-	
+	})),
+	Code: (async function randomAnimalFact (context, input) {
+		const { invocations, types } = ["cat", "dog", "bird", "fox"];
+		const type = invocations[context.invocation] ?? input?.toLowerCase() ?? null;
+
 		if (type === null) {
 			return {
-				reply: "No type provided!"
+				reply: "No type provided! Use one of: " + types.join(", ")
 			};
 		}
 		else if (!types.includes(type)) {
 			return {
-				reply: "That type is not supported!"
+				reply: "That type is not supported! Use on of: " + types.join(", ")
 			};
 		}
 		else if (!context.user.Data.animals?.[type]) {
@@ -67,5 +68,28 @@ module.exports = {
 			reply: extractor(data)
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix, values) => {
+		const { invocations, types } = values.getStaticData();
+		const list = [];
+
+		for (const { short, type } of Object.entries(invocations)) {
+			list.push([
+				`<code>${prefix}${short}</code>`,
+				`Posts a random ${type} fact.`,
+				""
+			]);
+		}
+
+		return [
+			"If you have verified that you own a given animal type, you can use this command to get a random fact about a selected animal type.",
+			`To verify, <code>${prefix}suggest a picture of your animal and mention that you want to get verified.`,
+			"",
+
+			`<code>${prefix}randomanimalfact ${types.join("/")}</code>`,
+			"Posts a random fact for a given animal",
+			"",
+
+			...list.flat()
+		];
+	})
 };
