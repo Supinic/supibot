@@ -75,7 +75,7 @@ module.exports = {
 			`To verify, <code>${prefix}suggest</code> a picture of your animal and mention that you want to get verified.`,
 			"",
 
-			`<code>${prefix}randomanimalfact ${types.join("/")}</code>`,
+			`<code>${prefix}randomanimalpicture ${types.join("/")}</code>`,
 			"Posts a random picture of a given animal",
 			"",
 
