@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the amount of cookies you (or someone else) have eaten so far. If you use \"total\", then you will see the total amount of cookies eaten.",
-	Flags: ["mention","opt-out","pipe","skip-banphrase"],
+	Flags: ["archived","mention","opt-out","pipe","skip-banphrase"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function cookieCount (context, user) {
