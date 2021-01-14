@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "randomcocktail",
-	Aliases: ["cock","drinks","tail"],
+	Aliases: ["cock","drinks","tail","cocktail"],
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Searches for a cocktail recipe by its name, or fetches a random one, if no search query was provided.",
@@ -8,7 +8,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomCocktail (context, ...args) {
-		let data = null;
+		let data;
 		if (args.length === 0) {
 			data = await sb.Got("https://www.thecocktaildb.com/api/json/v1/1/random.php").json();
 		}
