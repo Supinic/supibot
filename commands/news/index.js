@@ -256,7 +256,20 @@ module.exports = {
 						helpers: ["noiredayz"]
 					}
 				]
-			}
+			},
+			{
+				code: "nl",
+				language: "dutch",
+				sources: [
+					{
+						name: "NU",
+						url: "https://nu.nl",
+						path: "",
+						endpoints: ["rss"],
+						helpers: ["cbdg"]
+					}
+				],
+			},
 		],
 
 		extra: {
