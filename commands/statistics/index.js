@@ -223,7 +223,7 @@ module.exports = {
 			},
 			{
 				name: "cookiecount",
-				aliases: ["cc", "tcc"],
+				aliases: ["cc", "tcc", "cookie", "cookies"],
 				description: "Fetches the amount of cookies you (or someone else) have eaten so far. If you use \"total\", then you will see the total amount of cookies eaten.",
 				execute: async (context, type, user) => {
 					if (user === "total" || type === "tcc") {
