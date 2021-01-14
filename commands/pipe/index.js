@@ -25,10 +25,10 @@ module.exports = {
 					reply: `Command "${commandString}" does not exist!`
 				};
 			}
-			else if (!command.Flags.pipe) {
+			else if (!command.Flags.pipe && invocations[i + 1]) {
 				return {
 					success: false,
-					reply: `Command "${commandString}" cannot be used in a pipe!`
+					reply: `Output of command "${commandString}" cannot be piped!`
 				};
 			}
 			else if (nullCommand && command.Flags.nonNullable && invocations[i + 1]) {
