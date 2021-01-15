@@ -9,10 +9,10 @@ module.exports = {
 	Static_Data: (() => ({
 		types: ["cat", "dog", "bird", "fox"],
 		invocations: {
-			rbf: "bird",
-			rcf: "cat",
-			rdf: "dog",
-			rff: "fox"
+			rbp: "bird",
+			rcp: "cat",
+			rdp: "dog",
+			rfp: "fox"
 		}
 	})),
 	Code: (async function randomAnimalPicture (context, input) {
@@ -21,12 +21,12 @@ module.exports = {
 	
 		if (type === null) {
 			return {
-				reply: "No type provided!" + types.join(", ")
+				reply: "No type provided! Use one of: " + types.join(", ")
 			};
 		}
 		else if (!types.includes(type)) {
 			return {
-				reply: "That type is not supported!" + types.join(", ")
+				reply: "That type is not supported! Use one of: " + types.join(", ")
 			};
 		}
 		else if (!context.user.Data.animals?.[type]) {
