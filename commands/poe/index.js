@@ -251,11 +251,11 @@ module.exports = {
 	}),
 	Code: (async function poe (context, type, ...args) {
 		if (!type) {
-			const heist = new sb.Date("2020-09-18 22:00");
+			const ritual = new sb.Date("2021-01-15 20:00");
 			return {
-				reply: (heist > Date.now())
-					? `The Heist league launches ${sb.Utils.timeDelta(heist)}.`
-					: "The Heist league has launched! Go and play!"
+				reply: (ritual > Date.now())
+					? `The Ritual league launches ${sb.Utils.timeDelta(ritual)}.`
+					: "The Ritual league has launched! Go and play!"
 			};
 	
 		/*
