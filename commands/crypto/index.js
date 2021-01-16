@@ -23,9 +23,17 @@ module.exports = {
 				reply: data.Message
 			};
 		}
-		else {
+		else if (!data.USD && !data.EUR) {
 			return {
-				reply: `Current price of ${symbol}: $${data.USD}, €${data.EUR}`
+				reply: `No known prices found for that currency.`
+			};
+		}		
+		else {
+			const usd = (data.USD) ? `$${data.USD}` : "";
+			const eur = (data.EUR) ? `€${data.EUR}` : "";
+
+			return {
+				reply: `Current price of ${symbol}: ${usd} €${eur}`
 			};
 		}
 	}),
