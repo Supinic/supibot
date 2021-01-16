@@ -33,7 +33,7 @@ module.exports = {
 			const eur = (data.EUR) ? `€${data.EUR}` : "";
 
 			return {
-				reply: `Current price of ${symbol}: ${usd} €${eur}`
+				reply: `Current price of ${symbol}: ${usd} ${eur}`
 			};
 		}
 	}),
