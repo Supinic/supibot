@@ -527,6 +527,26 @@ module.exports = {
 						reply: `Your timer "${identifier}" ${verb} ${delta}.`
 					};
 				}
+			},
+			{
+				name: "twitchlottoblacklist",
+				aliases: ["tlbl"],
+				description: "If the current channel has a TwitchLotto blacklist setup, this will post it.",
+				execute: async (context) => {
+					if (!context.channel) {
+						return {
+							success: false,
+							reply: `There are no flags to be found here!`
+						};
+					}
+
+					const { twitchLottoBlacklistedFlags: flags } = context.channel;
+					return {
+						reply: (!flags || flags.length === 0)
+							? `There are currently no blacklisted TL flags in this channel.`
+							: `Currently blacklisted flags in this channel: ${flags.join(", ")}`
+					};
+				}
 			}
 		]
 	})),
