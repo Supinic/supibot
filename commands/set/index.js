@@ -12,7 +12,8 @@ module.exports = {
 			day: "numeric",
 			month: "long"
 		});
-	
+		const timersLimit = 5;
+
 		const availableFlags = ["anime", "animal", "disfigured", "disturbing", "drawn", "furry", "gore", "hentai", "human", "language", "none", "porn", "scat", "softcore"];
 		const handleAmbassadors = async (type, context, ...args) => {
 			const [user, channel = context.channel?.Name] = args;
@@ -578,6 +579,70 @@ module.exports = {
 
 						return {
 							reply: `Blacklisted flags successfully removed.`
+						};
+					}
+				},
+				{
+					name: "timer",
+					aliases: [],
+					parameter: "arguments",
+					description: `Sets/unsets a timer with a given name + date, which you can then check on later.`,
+					set: async (context, ...args) => {
+						if (!context.user.Data.timers) {
+							context.user.Data.timers = {};
+						}
+
+						const { timers } = context.user.Data;
+						const name = args[0];
+						const date = new sb.Date(args.slice(1, 2).filter(Boolean).join(" "));
+
+						let timersCount = Object.keys(timers).length;
+						if (!timers[name]) {
+							timersCount += 1;
+						}
+
+						if (timersCount > timersLimit) {
+							return {
+								success: false,
+								reply: `You have too many timers set up! Unset one first.`
+							};
+						}
+
+						if (Number.isNaN(date.valueOf())) {
+							return {
+								success: false,
+								reply: `Invalid date and/or time!`
+							};
+						}
+
+						timers[name] = {
+							date: date.valueOf()
+						};
+
+						await context.user.saveProperty("Data");
+						return {
+							reply: `Successfully added your timer "${name}".`
+						};
+					},
+					unset: async (context, name) => {
+						const { timers } = context.user.Data;
+						if (!timers) {
+							return {
+								success: false,
+								reply: `You don't have any timers set up!`
+							};
+						}
+						else if (!timers[name]) {
+							return {
+								success: false,
+								reply: `You don't have this timer set up!`
+							};
+						}
+
+						delete timers[name];
+						await context.user.saveProperty("Data");
+						return {
+							reply: `Successfully removed your timer "${name}".`
 						};
 					}
 				}

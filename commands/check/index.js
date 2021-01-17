@@ -498,6 +498,35 @@ module.exports = {
 					`
 					};
 				}
+			},
+			{
+				name: "timer",
+				aliases: [],
+				description: "If you have set a timer, this will show its name and date.",
+				execute: async (context, identifier) => {
+					const { timers } = context.user.Data;
+					if (!timers) {
+						return {
+							success: false,
+							reply: `You don't have any timers set up!`
+						};
+					}
+					else if (!timers[identifier]) {
+						return {
+							success: false,
+							reply: `You don't have this timer set up!`
+						};
+					}
+
+					const now = sb.Date.now();
+					const date = new sb.Date(timers[identifier].date);
+					const delta = sb.Utils.timeDelta(date);
+					const verb = (now > date) ? "occured" : "occurs";
+
+					return {
+						reply: `Your timer "${identifier}" ${verb} ${delta}.`
+					};
+				}
 			}
 		]
 	})),
