@@ -4,26 +4,34 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Checks if a given message would be banphrased in a given channel. Checks the API banphrase (if it exists for given channel) and then the bot's banphrases as well.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["mention","non-nullable"],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function banCheck (context, channel, ...rest) {
 		if (!channel) {
-			return { reply: "No channel provided!" };
+			return {
+				success: false,
+				reply: "No channel provided!"
+			};
 		}
 		else if (rest.length === 0) {
-			return { reply: "No message provided!" };
+			return {
+				success: false,
+				reply: "No message provided!"
+			};
 		}
 	
 		const message = rest.join(" ");
 		const targetChannel = sb.Channel.get(channel.replace(/^#/, ""));
 		if (!targetChannel) {
 			return {
+				success: false,
 				reply: "Invalid channel provided!"
 			};
 		}
 		else if (context.channel?.ID === targetChannel.ID)  {
 			return {
+				success: false,
 				reply: "Don't you think it's a bit silly to bancheck the channel you're in? PepeLaugh"
 			};
 		}
@@ -50,6 +58,7 @@ module.exports = {
 			catch (e) {
 				console.warn(e);
 				return {
+					success: false,
 					reply: "Banphrase API did not respond in time!"
 				};
 			}
