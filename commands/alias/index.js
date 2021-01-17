@@ -238,7 +238,7 @@ module.exports = {
 					...alias.args
 				);
 			}
-	
+
 			case "edit": {
 				const [name, command, ...rest] = args;
 				if (!name || !command) {
@@ -274,7 +274,20 @@ module.exports = {
 			}
 	
 			case "list": {
-				const list = [...wrapper.keys()].map(i => `"${i}"`).sort().join(", ");
+				const aliasCount = [...wrapper.keys()].length;
+				const list = [...wrapper.keys()].sort().join(" ");
+				const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
+
+				if (list.length > limit) {
+					return {
+						reply: sb.Utils.tag.trim `
+							The list of your ${aliasCount} aliases wouldn't fit in a single message. 
+							Check them all here (requires login): 
+							https://supinic.com/user/alias/list
+						`
+					};
+				}
+
 				return {
 					reply: (list.length === 0)
 						? "You currently don't have any aliases."
