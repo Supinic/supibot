@@ -55,8 +55,6 @@ module.exports = {
 			}
 	
 			if (data.banned) {
-				console.warn("bancheck command", { targetChannel, data });
-				
 				const { id, name, phrase, length, permanent, operator, case_sensitive: sensitive } = data.banphrase_data;
 				const punishment = (permanent)
 					? "permanent ban"
