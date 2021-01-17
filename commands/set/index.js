@@ -12,7 +12,9 @@ module.exports = {
 			day: "numeric",
 			month: "long"
 		});
+
 		const timersLimit = 5;
+		const timerNameRegex = /^[-\w\u00a9\u00ae\u2000-\u3300\ud83c\ud000-\udfff\ud83d\ud000-\udfff\ud83e\ud000-\udfff]{2,25}$/;
 
 		const availableFlags = ["anime", "animal", "disfigured", "disturbing", "drawn", "furry", "gore", "hentai", "human", "language", "none", "porn", "scat", "softcore"];
 		const handleAmbassadors = async (type, context, ...args) => {
@@ -595,6 +597,12 @@ module.exports = {
 						const { timers } = context.user.Data;
 						const name = args[0];
 						const date = new sb.Date(args.slice(1, 2).filter(Boolean).join(" "));
+						if (!timerNameRegex.test(name)) {
+							return {
+								success: false,
+								reply: `Your timer name is not valid! Your timer name should only contain letters, numbers and be 2-25 characters long.`
+							};
+						}
 
 						let timersCount = Object.keys(timers).length;
 						if (!timers[name]) {
