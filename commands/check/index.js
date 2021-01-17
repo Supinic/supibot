@@ -174,7 +174,7 @@ module.exports = {
 						.single()
 					);
 	
-					let string = null;
+					let string;
 					if (!check) {
 						string = pronoun + " have never eaten a cookie before.";
 					}
