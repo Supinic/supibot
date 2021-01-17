@@ -540,7 +540,7 @@ module.exports = {
 						};
 					}
 
-					const { twitchLottoBlacklistedFlags: flags } = context.channel;
+					const { twitchLottoBlacklistedFlags: flags } = context.channel.Data;
 					return {
 						reply: (!flags || flags.length === 0)
 							? `There are currently no blacklisted TL flags in this channel.`
