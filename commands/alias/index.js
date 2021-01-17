@@ -278,7 +278,7 @@ module.exports = {
 				const list = [...wrapper.keys()].sort().join(" ");
 				const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
 
-				if (list.length > limit) {
+				if (("Your aliases: ".length + list.length) > limit) {
 					return {
 						reply: sb.Utils.tag.trim `
 							The list of your ${aliasCount} aliases wouldn't fit in a single message. 
@@ -291,7 +291,7 @@ module.exports = {
 				return {
 					reply: (list.length === 0)
 						? "You currently don't have any aliases."
-						: `Your aliases: ${list}.`
+						: `Your aliases: ${list}`
 				};
 			}
 
