@@ -34,13 +34,15 @@ module.exports = {
 		}
 		else if (!targetUser) {
 			return {
+				success: false,
 				reply: "An invalid user was provided!",
 				cooldown: this.Cooldown / 2
 			};
 		}
 		else if (targetUser.Name === context.platform.Self_Name) {
 			return {
-				reply: "I'm always here, so you don't have to " + context.invocation + " me :)",
+				success: false,
+				reply: "I'm always here, so you don't have to " + context.invocation + " me! :)",
 				cooldown: this.Cooldown / 2
 			};
 		}
@@ -60,7 +62,8 @@ module.exports = {
 	
 		if (isPrivate && context.channel !== null) {
 			return {
-				reply: "You should create private reminders in private messages!",
+				success: false,
+				reply: "You must create private reminders in private messages only!",
 				cooldown: this.Cooldown / 2
 			};
 		}
@@ -174,16 +177,21 @@ module.exports = {
 		else if (delta === 0) {
 			if (targetUser === context.user) {
 				return {
-					reply: `To remind yourself, your text must have the word "in" - such as "check in 5 minutes"`,
+					success: false,
+					reply: `To remind yourself, you must use the word "in"! Such as "in 5 minutes"`,
 					cooldown: 2500
 				};
 			}
 		}
 		else if (now > comparison) {
-			return { reply: "Timed reminders set in the past are only available for people that posess a time machine!" };
+			return {
+				success: false,
+				reply: "Timed reminders set in the past are only available for people that posess a time machine!"
+			};
 		}
 		else if (Math.abs(now - comparison) < 30.0e3) {
 			return {
+				success: false,
 				reply: "You cannot set a timed reminder in less than 30 seconds!",
 				cooldown: this.Cooldown / 2
 			};
@@ -194,6 +202,7 @@ module.exports = {
 				: `${sb.Utils.groupDigits(Math.trunc(delta / 31_536_000_000))} years in the future`;
 	
 			return {
+				success: false,
 				reply: `Your reminder was set to approximately ${description}, but the limit is 31st December 9999.`,
 				cooldown: this.Cooldown / 2
 			};
@@ -207,6 +216,7 @@ module.exports = {
 			}
 			else {
 				return {
+					success: false,
 					reply: "You cannot create a private timed reminder for someone else!"
 				};
 			}
@@ -232,6 +242,7 @@ module.exports = {
 		}
 		else {
 			return {
+				success: false,
 				reply: this.staticData.strings[result.cause] ?? `Reminder not created - result is ${result.cause}.`
 			};
 		}
