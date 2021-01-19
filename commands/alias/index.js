@@ -336,6 +336,7 @@ module.exports = {
 				changed = true;
 				wrapper.set(newName, wrapper.get(oldName));
 				wrapper.get(newName).lastEdit = new sb.Date().toJSON();
+				wrapper.get(newName).name = newName;
 				wrapper.delete(oldName);
 	
 				reply = `Your alias "${oldName}" has been succesfully renamed to "${newName}".`;
