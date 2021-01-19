@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["tts"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Plays TTS on stream, if enabled. You can specify the language by using \"language:<language>\" anywhere in your message.",
+	Description: "Plays TTS on Supinic's stream, if enabled. You can specify the language by using \"language:<language>\" anywhere in your message.",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Whitelist_Response: null,
 	Static_Data: (() => {
