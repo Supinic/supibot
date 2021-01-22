@@ -28,7 +28,7 @@ module.exports = {
                     reply: `No message ID available! FeelsBadMan`
                 };
             }
-            
+
             messageNumber = BigInt("0x" + context.append.messageID.replace(/-/g, ""));
         }
         else if (context.platform.Name === "discord") {
@@ -58,21 +58,31 @@ module.exports = {
             currentDigit = list.pop();
         }
 
+        const cooldown = {
+            length: this.Cooldown,
+            user: context.user.ID,
+            channel: null,
+            platform: null
+        };
+
         if (repeatsAmount === 1) {
             return {
-                reply: String(messageNumber)
+                reply: String(messageNumber),
+                cooldown
             };
         }
 
         const checkEmName = this.staticData.checks[repeatsAmount];
         if (!checkEmName) {
             return {
-                reply: `${messageNumber} - you got more than 10 repeating digits?! Big gratz!`
+                reply: `${messageNumber} - you got more than 10 repeating digits?! Big gratz!`,
+                cooldown
             };
         }
 
         return {
-            reply: `${messageNumber} - VisLaud Clap Congratulations on the ${checkEmName}!`
+            reply: `${messageNumber} - VisLaud Clap Congratulations on the ${checkEmName}!`,
+            cooldown
         };
     }),
     Dynamic_Description: null
