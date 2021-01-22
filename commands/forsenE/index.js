@@ -37,14 +37,16 @@ module.exports = {
 				"random blue screen during world record run. unlucky",
 				"I'm currently banned for the horse gif. The ban is indefinite which means undetermined ban duration. Unlucky.",
 				"So apparently I’m unbanned! I’ll cu guys tomorrow at 7pm cet. Thats all.",
-				"Happy new years boys and girls. You know 2021 is gonna be EZ clap for the god gamer."
-			],
+				"Happy new years boys and girls. You know 2021 is gonna be EZ clap for the god gamer.",
+				"What do i use the left click for? Oh... farming blocks..."
+	],
 			notes: [
 				`Source for the "b." tweet: https://twitter.com/Forsen/status/1057549668253659136`,
 				`Source for the Cyborgmatt tweet (tweeted at DotA guy for access to league autochess) https://i.imgur.com/sILIqzj.png`,
 				`Source for the GFMB quote: https://i.nuuls.com/umDfs.png`,
 				"Source for the ban tweet: https://twitter.com/Forsen/status/1259936964272422917",
-				"Source for the BSOD unlucky tweet: https://twitter.com/Forsen/status/1325185547220914176"
+				"Source for the BSOD unlucky tweet: https://twitter.com/Forsen/status/1325185547220914176",
+				"Source for the left click quote: https://clips.twitch.tv/FilthyCovertEmuCclamChamp"
 			]
 		};
 	}),
