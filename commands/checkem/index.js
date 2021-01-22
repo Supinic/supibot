@@ -68,7 +68,7 @@ module.exports = {
 
         if (repeatsAmount === 1) {
             return {
-                reply: String(messageNumber),
+                reply: croppedNumber,
                 cooldown
             };
         }
