@@ -274,24 +274,8 @@ module.exports = {
 			}
 	
 			case "list": {
-				const aliasCount = [...wrapper.keys()].length;
-				const list = [...wrapper.keys()].sort().join(" ");
-				const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
-
-				if (("Your aliases: ".length + list.length) > limit) {
-					return {
-						reply: sb.Utils.tag.trim `
-							The list of your ${aliasCount} aliases wouldn't fit in a single message. 
-							Check them all here (requires login): 
-							https://supinic.com/user/alias/list
-						`
-					};
-				}
-
 				return {
-					reply: (list.length === 0)
-						? "You currently don't have any aliases."
-						: `Your aliases: ${list}`
+					reply: `Check your aliases here: https://supinic.com/bot/user/${context.user.Name}/alias/list`
 				};
 			}
 
@@ -407,11 +391,11 @@ module.exports = {
 			}
 	
 			case "spy": {
-				const [targetUser, targetAlias] = args;
+				const [targetUser] = args;
 				if (!targetUser) {
 					return {
 						success: false,
-						reply: "No target username provided!"
+						reply: "No target user provided!"
 					};
 				}
 	
@@ -422,30 +406,9 @@ module.exports = {
 						reply: "Invalid user provided!"
 					};
 				}
-	
-				const aliases = target.Data.aliasedCommands;
-				if (!aliases || Object.keys(aliases).length === 0) {
-					return {
-						success: false,
-						reply: "They currently don't have any aliases!"
-					};
-				}			
-				else if (!targetAlias) {
-					const list = Object.keys(aliases).map(i => `"${i}"`).sort().join(", ");
-					return {
-						reply: `Their aliases: ${list}.`
-					};
-				}
-				else if (!aliases[targetAlias]) {
-					return {
-						success: false,
-						reply: "They don't have an alias with that name!"
-					};
-				}
-	
-				const { invocation, args: commandArgs } = aliases[targetAlias];
+
 				return {
-					reply: `Their alias "${targetAlias}" has this definition: ${invocation} ${commandArgs.join(" ")}`
+					reply: `Check their aliases here: https://supinic.com/bot/user/${target.Name}/alias/list`
 				};
 			}
 	
