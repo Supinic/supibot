@@ -48,7 +48,8 @@ module.exports = {
             };
         }
 
-        const list = String(messageNumber).slice(-12).split("");
+        const croppedNumber = String(messageNumber).slice(-12);
+        const list = croppedNumber.split("");
         const repeatedDigit = list.pop();
 
         let repeatsAmount = 1;
@@ -79,13 +80,13 @@ module.exports = {
 
         if (!checkEmName) {
             return {
-                reply: `${messageNumber} - you got more than 10 repeating digits?! Big gratz!`,
+                reply: `${croppedNumber} - you got more than 10 repeating digits?! Big gratz!`,
                 cooldown
             };
         }
 
         return {
-            reply: `${messageNumber} - VisLaud Clap Congratulations on the ${checkEmName}!`,
+            reply: `${croppedNumber} - VisLaud Clap Congratulations on the ${checkEmName}!`,
             cooldown
         };
     }),
