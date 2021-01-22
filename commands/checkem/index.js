@@ -48,7 +48,7 @@ module.exports = {
             };
         }
 
-        const list = String(messageNumber).split("");
+        const list = String(messageNumber).slice(-12).split("");
         const repeatedDigit = list.pop();
 
         let repeatsAmount = 1;
