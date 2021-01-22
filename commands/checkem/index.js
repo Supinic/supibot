@@ -3,7 +3,7 @@ module.exports = {
     Aliases: ["check'em"],
     Author: "supinic",
     Cooldown: 30000,
-    Description: "",
+    Description: "Similar to 4chan, posts the ID of your message as a number. Then, it checks it for dubs and higher.",
     Flags: ["mention", "pipe","skip-banphrase"],
     Whitelist_Response: null,
     Static_Data: (() => ({
