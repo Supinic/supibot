@@ -73,6 +73,10 @@ module.exports = {
         }
 
         const checkEmName = this.staticData.checks[repeatsAmount];
+        if (repeatsAmount > 2) {
+            console.log(`${checkName}!`, new sb.Date(), context.channel.Name, context.user.Name);
+        }
+
         if (!checkEmName) {
             return {
                 reply: `${messageNumber} - you got more than 10 repeating digits?! Big gratz!`,
