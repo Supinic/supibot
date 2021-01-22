@@ -8,7 +8,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function suggest (context, ...args) {
-		if (args.length === 0 || context.invcation === "suggestions") {
+		if (args.length === 0 || context.invocation === "suggestions") {
 			return {
 				reply: sb.Utils.tag.trim `
 					No suggestion text provided!
