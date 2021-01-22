@@ -245,7 +245,18 @@ module.exports = {
 							reply: `${skill} ${ascendancy}`
 						};
 					}
-				}
+				},
+				{
+					name: "heist",
+					aliases: [],
+					description: "Posts a cheatsheet picture with a neat summary of Heist jobs + rewards.",
+					execute: async () => {
+						return {
+							reply: `Heist cheatsheet: https://i.imgur.com/iN05OsU.png`
+						};
+					}
+				},
+
 			]
 		};
 	}),
