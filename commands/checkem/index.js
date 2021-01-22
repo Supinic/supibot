@@ -75,7 +75,7 @@ module.exports = {
 
         const checkEmName = this.staticData.checks[repeatsAmount];
         if (repeatsAmount > 2) {
-            console.log(`${checkName}!`, new sb.Date(), context.channel.Name, context.user.Name);
+            console.log(`${checkEmName}!`, new sb.Date(), context.channel.Name, context.user.Name);
         }
 
         if (!checkEmName) {
