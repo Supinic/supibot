@@ -26,6 +26,16 @@ module.exports = {
 		else if (!playsound || playsound === "list") {
 			return { reply: "Currently available playsounds: https://supinic.com/stream/playsound/list"};
 		}
+		else if (playsound === "random") {
+			playsound = await sb.Query.getRecordset(rs => rs
+			    .select("Name")
+			    .from("data", "Playsound")
+				.orderBy("RAND()")
+				.limit(1)
+				.single()
+				.flat("Name")
+			);
+		}
 	
 		const data = await this.staticData.fetch(playsound);
 		if (!data) {
