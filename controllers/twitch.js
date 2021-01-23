@@ -488,6 +488,10 @@ module.exports = class Twitch extends require("./template.js") {
 			sb.SystemLogger.send("Twitch.Other", bits + " bits", channelData, userData);
 		}
 
+		if (!sb.Command.prefix) {
+			return;
+		}
+
 		// Check and execute command if necessary
 		if (sb.Command.is(message)) {
 			let userState = {};
