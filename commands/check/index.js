@@ -239,7 +239,8 @@ module.exports = {
 				execute: async (context, identifier) => {
 					if (identifier && !Number(identifier)) {
 						return {
-							reply: "Invalid ID provided!"
+							success: false,
+							reply: "Invalid ID provided! Check all polls here: https://supinic.com/bot/poll/list"
 						};
 					}
 	
@@ -260,7 +261,7 @@ module.exports = {
 	
 					if (!poll) {
 						return {
-							reply: "No polls match the ID provided!"
+							reply: "No polls match the ID provided! Check all polls here: https://supinic.com/bot/poll/list"
 						};
 					}
 					else if (poll.Status === "Cancelled" || poll.Status === "Active") {
