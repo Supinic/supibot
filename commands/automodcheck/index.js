@@ -38,8 +38,8 @@ module.exports = {
         const counter = {};
         const words = context.append.flags.split(",");
         for (const word of words) {
-            const [positions, rest] = word.split(":")[1];
-            if (rest.length === 0) {
+            const [positions, rest] = word.split(":");
+            if (!rest) {
                 return {
                     reply: `AutoMod detected something at positions ${positions}, but sent no category score.`
                 };
