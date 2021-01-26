@@ -37,7 +37,7 @@ module.exports = {
 			// Stream just went offline + row already exists => mark the Stream as completed by setting its End property
 			else if (exists && context.event === "offline") {
 				const row = await sb.Query.getRow("stream", "Stream");
-				await row.load(stream.XYZ)
+				await row.load(stream.id);
 
 				const vodDuration = stream.duration.split(/\D/)
 					.filter(Boolean)
