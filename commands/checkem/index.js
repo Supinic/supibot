@@ -1,6 +1,6 @@
 module.exports = {
     Name: "checkem",
-    Aliases: ["check'em"],
+    Aliases: ["CheckEm", "check'em"],
     Author: "supinic",
     Cooldown: 30000,
     Description: "Similar to 4chan, posts the ID of your message as a number. Then, it checks it for dubs and higher.",
