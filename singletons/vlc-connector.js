@@ -28,16 +28,23 @@ module.exports = (function () {
 		"seekToChapter"
 	];
 
+	const mandatoryConfigs = [
+		"LOCAL_VLC_IP",
+		"LOCAL_VLC_BASE_URL"
+	];
+
 	return class VideoLANConnector extends require("./template.js") {
 		static singleton () {
 			if (!VideoLANConnector.module) {
-				if (!sb.Config.has("LOCAL_VLC_BASE_URL", true)) {
-					VideoLANConnector.module = {};
+				const missingConfigs = mandatoryConfigs.filter(key => !sb.Config.has(key));
+				if (missingConfigs.length !== 0) {
+					console.debug("Missing VLC config(s), module creation skipped", { missingConfigs });
+					baseURL.module = {};
 				}
 				else {
 					VideoLANConnector.module = new VideoLANConnector({
 						baseURL: sb.Config.get("LOCAL_VLC_BASE_URL", true),
-						url: "192.168.0.100",
+						url: sb.Config.get("LOCAL_VLC_IP", true),
 						port: 8080,
 						username: "",
 						password: "supinic",
