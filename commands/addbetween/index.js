@@ -10,6 +10,7 @@ module.exports = {
 	Code: (async function addBetween (context, word, ...args) {
 		if (!word || args.length === 0) {
 			return {
+				success: false,
 				reply: "Both the word and the message must be provided!"
 			};
 		}
