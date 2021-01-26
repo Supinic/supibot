@@ -27,12 +27,13 @@ module.exports = {
         }
 
         const mapper = {
-            S: "Sexual",
-            P: "Profanity",
-            I: "Identity",
-            A: "Aggressive"
+            A: "aggressive",
+            I: "identity",
+            P: "profanity",
+            S: "sexual"
         };
 
+        let total = 0;
         const counter = {};
         const words = context.append.flags.split(",");
         for (const word of words) {
@@ -50,12 +51,13 @@ module.exports = {
                 }
 
                 counter[type] += Number(value);
+                total += Number(value);
             }
         }
 
         const arr = Object.entries(counter).map(([key, value]) => `${mapper[key]}: ${value}`);
         return {
-            reply: `Automod score: ${arr.join(", ")}`
+            reply: `Automod score: ${total}. Categories: ${arr.join(", ")}`
         }
     }),
     Dynamic_Description: null
