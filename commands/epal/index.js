@@ -165,10 +165,10 @@ module.exports = {
 
 		return {
 			reply: sb.Utils.tag.trim `
-				${name} ${type} plays ${gameData.name} ${levelString} for ${priceString}:
-				${description}
-				${languageString}
+				${name} ${type} plays ${gameData.name} ${levelString} for ${priceString}.
 				${revenueString}
+				${languageString}
+				${description}
 			`
 		};
 	}),
