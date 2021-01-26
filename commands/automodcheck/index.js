@@ -5,7 +5,7 @@ module.exports = {
     Cooldown: 2500,
     Description: "For a Twitch message outside of whispers, this command will show you how AutoMod sees it - posting how offensive it is in several categories.",
     Flags: ["mention","pipe"],
-    Whitelist_Response: "For debugging purposes only :)",
+    Whitelist_Response: null,
     Static_Data: null,
     Code: (async function test (context) {
         if (context.platform.Name !== "twitch") {
@@ -30,16 +30,22 @@ module.exports = {
             A: "aggressive",
             I: "identity",
             P: "profanity",
-            S: "sexual"
+            S: "sexual",
+            unknown: "unknown"
         };
 
         let total = 0;
         const counter = {};
         const words = context.append.flags.split(",");
         for (const word of words) {
-            const rest = word.split(":")[1];
-            const scores = rest.split("/");
+            const [positions, rest] = word.split(":")[1];
+            if (rest.length === 0) {
+                return {
+                    reply: `AutoMod detected something at positions ${positions}, but sent no category score.`
+                };
+            }
 
+            const scores = rest.split("/");
             for (const score of scores) {
                 const [type, value] = score.split(".");
                 if (!type || !value) {
@@ -57,7 +63,7 @@ module.exports = {
 
         const arr = Object.entries(counter).map(([key, value]) => `${mapper[key]}: ${value}`);
         return {
-            reply: `Automod score: ${total}. Categories: ${arr.join(", ")}`
+            reply: `AutoMod score: ${total}. Categories: ${arr.join(", ")}`
         }
     }),
     Dynamic_Description: null
