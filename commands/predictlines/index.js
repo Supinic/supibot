@@ -31,25 +31,33 @@ module.exports = {
 		}
 	
 		if (!userData) {
-			return { reply: "Provided user does not exist!" };
+			return {
+				success: false,
+				reply: "Provided user does not exist!"
+			};
 		}
 	
 		if (!time || time < 0) {
-			return { reply: "Provided time must be valid and it must refer to future!" };
+			return {
+				success: false,
+				reply: "Provided time must be valid and it must be in the future!"
+			};
 		}
 	
-		const total = (await sb.Query.getRecordset(rs => rs
+		const total = await sb.Query.getRecordset(rs => rs
 			.select("SUM(Message_Count) AS Total")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("User_Alias = %n", userData.ID)
 			.single()
-		)).Total;
+			.flat("Total")
+		);
 	
 		const ratio = total / (sb.Date.now() - userData.Started_Using);
 		const messages = sb.Utils.round(time * ratio, 0);
 		if (messages > Number.MAX_SAFE_INTEGER) {
 			return {
-				reply: "There's too many lines to be precise! Try a smaller time interval."
+				success: false,
+				reply: "There are too many lines to be precise! Try a smaller time interval instead."
 			};
 		}
 	
@@ -60,7 +68,7 @@ module.exports = {
 			: "too far in the future WAYTOODANK";
 	
 		return {
-			reply: `I predict that ${who} will have sent ${messages} messages ${whenString}, on average.`
+			reply: `I predict that ${who} will have sent ${messages} messages ${whenString} on average.`
 		};
 	}),
 	Dynamic_Description: null
