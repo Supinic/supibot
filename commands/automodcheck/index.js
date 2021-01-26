@@ -8,7 +8,7 @@ module.exports = {
     Whitelist_Response: "For debugging purposes only :)",
     Static_Data: null,
     Code: (async function test (context) {
-        if (context.platform.name !== "twitch") {
+        if (context.platform.Name !== "twitch") {
             return {
                 success: false,
                 reply: "Can't check for AutoMod outside of Twitch!"
