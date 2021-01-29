@@ -88,7 +88,7 @@ module.exports = {
 	Dynamic_Description: (async (prefix, values) => {
 		const { types } = values.getStaticData();
 		const list = types.map(i => {
-			const aliases = (i.alises.length > 0)
+			const aliases = (i.aliases.length > 0)
 				? `(${i.aliases.join(", ")})`
 				: "";
 
