@@ -6,18 +6,33 @@ module.exports = {
 	Description: "Checks for various max/min records of various sources.",
 	Flags: ["mention","pipe"],
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: (() => ({
+		types: [
+			{
+				name: "afk",
+				aliases: [],
+				description: "Posts the longest time you were AFK for."
+			},
+			{
+				name: "cookie",
+				aliases: [],
+				description: "Posts stats for whoever ate the most fortune cookies."
+			}
+		]
+	})),
 	Code: (async function record (context, type, target) {
+		const types = this.staticData.types.map(i => i.name);
 		if (!type) {
 			return {
-				reply: "No type provided!"
+				success: false,
+				reply: `No type provided! Use one of these: ${types.join(", ")}`
 			};
 		}
 	
 		type = type.toLowerCase();
 		target = target || context.user;
 		const userData = await sb.User.get(target);
-	
+
 		switch (type) {
 			case "afk":
 				if (userData.ID !== context.user.ID) {
@@ -60,12 +75,35 @@ module.exports = {
 				
 				const userData = await sb.User.get(user, true);			
 				return {
-					reply: `Currently, the most consistent cookie consumer is ${userData.Name} with ${cookies} daily cookies eaten` 
+					reply: `Currently, the most consistent cookie consumer is ${userData.Name} with ${cookies} daily cookies eaten.`
 				};
 			}
-	
-			default: return { reply: "Invalid type provided!" };
-		};
+
+			default: return {
+				success: false,
+				reply: `Invalid type provided! Use one of these: ${types.join(", ")}`
+			};
+		}
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix, values) => {
+		const { types } = values.getStaticData();
+		const list = types.map(i => {
+			const aliases = (i.alises.length > 0)
+				? `(${i.aliases.join(", ")})`
+				: "";
+
+			return `<li><code>${i.type}${aliases}</code><br>${i.description}</li>`
+		});
+
+		return [
+			"Checks for various max/min records of various sources within Supibot.",
+			"",
+
+			`<code>${prefix}record (type)</code>`,
+			"For a given type, checks that specific record at the moment of command use.",
+
+			"Types:",
+			"<ul>" + list.join("") + "</ul>"
+		];
+	})
 };
