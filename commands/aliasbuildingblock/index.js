@@ -12,7 +12,9 @@ module.exports = {
                 name: "say",
                 aliases: ["echo"],
                 description: "Simply outputs the input, with no changes.",
-                execute: (context, ...args) => args.join(" ")
+                execute: (context, ...args) => ({
+                    reply: args.join(" ")
+                })
             },
             {
                 name: "chatter",
