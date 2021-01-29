@@ -60,24 +60,31 @@ module.exports = {
 				}
 			},
 			{
-	
 				name: "ambassador",
 				aliases: ["ambassadors"],
 				description: "Check who is the Supibot ambassador of a channel (or the current one, if none provided).",
 				execute: async (context, identifier) => {
+					if (!context.channel) {
+						return {
+							success: false,
+							reply: `This command can't be used in whispers!`
+						};
+					}
+
 					const channelData = (identifier)
 						? sb.Channel.get(identifier)
 						: context.channel;
-	
+
 					if (!channelData) {
 						return {
 							success: false,
-							reply: "Target channel does not exist!"
+							reply: "Provided channel does not exist!"
 						};
 					}
 					else if (!channelData.Data.ambassadors || channelData.Data.ambassadors.length === 0) {
+						const prefix = (context.channel === channelData) ? "This" : "Target";
 						return {
-							reply: "Target channel has no ambassadors."
+							reply: `${prefix} channel has no ambassadors.`
 						};
 					}
 	
