@@ -92,7 +92,7 @@ module.exports = {
 				? `(${i.aliases.join(", ")})`
 				: "";
 
-			return `<li><code>${i.type}${aliases}</code><br>${i.description}</li>`
+			return `<li><code>${i.name}${aliases}</code><br>${i.description}</li>`
 		});
 
 		return [
