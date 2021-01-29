@@ -376,6 +376,7 @@ module.exports = {
 					context.user,
 					{
 						...context.append,
+						alias: true,
 						aliasCount,
 						platform: context.platform,
 						skipPending: true,
