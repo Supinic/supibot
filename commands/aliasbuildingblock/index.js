@@ -9,20 +9,30 @@ module.exports = {
     Static_Data: (() => ({
         blocks: [
             {
-                name: "say",
-                aliases: ["echo"],
-                description: "Simply outputs the input, with no changes.",
-                execute: (context, ...args) => ({
-                    reply: args.join(" ")
-                })
-            },
-            {
-                name: "explode",
-                aliases: [],
-                description: "Adds a space between all characters of the provided input - then, each one can be used as a specific argument.",
-                execute: (context, ...args) => ({
-                    reply: args.join(" ").split("").join(" ").replace(/\s+/g, " ")
-                })
+                name: "argumentsCheck",
+                aliases: ["ac", "argCheck"],
+                description: "Takes a number - expected amount of arguments as first argument. If the amount of actualy arguments is the same, simply returns output; if not, returns an error.",
+                execute: (context, inputAmount, ...args) => {
+                    const amount = Number(inputAmount);
+                    if (!sb.Utils.isValidInteger(amount)) {
+                        return {
+                            success: false,
+                            reply: "Provided amount of arguments is not a valid integer!"
+                        };
+                    }
+
+                    if (amount === args.length) {
+                        return {
+                            reply: args.join(" ")
+                        };
+                    }
+                    else {
+                        return {
+                            success: false,
+                            reply: `Expected ${amount} arguments, got ${args.length} instead!`
+                        };
+                    }
+                }
             },
             {
                 name: "chatter",
@@ -46,6 +56,22 @@ module.exports = {
                     const users = await context.channel.getUsers();
                     return sb.Utils.randArray(users);
                 }
+            },
+            {
+                name: "explode",
+                aliases: [],
+                description: "Adds a space between all characters of the provided input - then, each one can be used as a specific argument.",
+                execute: (context, ...args) => ({
+                    reply: args.join(" ").split("").join(" ").replace(/\s+/g, " ")
+                })
+            },
+            {
+                name: "say",
+                aliases: ["echo"],
+                description: "Simply outputs the input, with no changes.",
+                execute: (context, ...args) => ({
+                    reply: args.join(" ")
+                })
             }
         ]
     })),
