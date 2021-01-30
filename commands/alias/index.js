@@ -391,7 +391,7 @@ module.exports = {
 			}
 	
 			case "spy": {
-				const [targetUser] = args;
+				const [targetUser, targetAlias] = args;
 				if (!targetUser) {
 					return {
 						success: false,
@@ -407,8 +407,12 @@ module.exports = {
 					};
 				}
 
+				const suffix = (targetAlias)
+					? `?columnName=${targetAlias}`
+					: "";
+
 				return {
-					reply: `Check their aliases here: https://supinic.com/bot/user/${target.Name}/alias/list`
+					reply: `Check their aliases here: https://supinic.com/bot/user/${target.Name}/alias/list${suffix}`
 				};
 			}
 	
