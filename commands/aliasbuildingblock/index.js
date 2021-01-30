@@ -17,6 +17,14 @@ module.exports = {
                 })
             },
             {
+                name: "explode",
+                aliases: [],
+                description: "Adds a space between all characters of the provided input - then, each one can be used as a specific argument.",
+                execute: (context, ...args) => ({
+                    reply: args.join(" ").split("").join(" ").replace(/\s+/g, " ")
+                })
+            },
+            {
                 name: "chatter",
                 aliases: [],
                 description: "Selects a random chatter within the channel, and outputs their name. Not applicable in PMs.",
