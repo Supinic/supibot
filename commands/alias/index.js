@@ -175,8 +175,7 @@ module.exports = {
 				const [name] = args;
 				if (!name) {
 					return {
-						success: false,
-						reply: `No alias name provided!`
+						reply: `Check all your aliases here: https://supinic.com/bot/user/${context.user.Name}/alias/list`
 					};
 				}
 				else if (!wrapper.has(name)) {
