@@ -15,7 +15,7 @@ module.exports = {
 
 		applyParameters: (context, aliasArguments, commandArguments) => {
 			const resultArguments = [];
-			const numberRegex = /\${(?<order>\d+)(-(?<range>\d+))?(?<rest>\+?)?}/g;
+			const numberRegex = /\${(?<order>\d+)(-(?<range>\d+))?(?<rest>\+?)?}/;
 			const keywordRegex = /\${(channel|executor)}/g;
 
 			for (const arg of aliasArguments) {
@@ -75,11 +75,13 @@ module.exports = {
 				}
 				else if (keywordRegex.test(arg)) {
 					const type = arg.match(keywordRegex)[1];
+					const replacerRegex = new RegExp(keywordRegex, "g");
+
 					if (type === "channel") {
-						resultArguments.push(arg.replace(keywordRegex, context.channel?.Name ?? "[whispers]"));
+						resultArguments.push(arg.replace(replacerRegex, context.channel?.Name ?? "[whispers]"));
 					}
 					else if (type === "executor") {
-						resultArguments.push(arg.replace(keywordRegex, context.user.Name));
+						resultArguments.push(arg.replace(replacerRegex, context.user.Name));
 					}
 					else {
 						return {
