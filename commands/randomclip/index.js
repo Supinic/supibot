@@ -46,7 +46,8 @@ module.exports = {
 		}
 		else if (data.clips.length === 0) {
 			return {
-				reply: "No clips found!"
+				reply: "No clips found!",
+				link: null
 			};
 		}
 
