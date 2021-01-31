@@ -16,7 +16,7 @@ module.exports = {
 		applyParameters: (context, aliasArguments, commandArguments) => {
 			const resultArguments = [];
 			const numberRegex = /\${(?<order>\d+)(-(?<range>\d+))?(?<rest>\+?)?}/;
-			const keywordRegex = /\${(channel|executor)}/g;
+			const keywordRegex = /\${(channel|executor)}/;
 
 			for (const arg of aliasArguments) {
 				if (numberRegex.test(arg)) {
