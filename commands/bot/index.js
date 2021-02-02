@@ -123,9 +123,10 @@ module.exports = {
 					params.mode = sb.Utils.capitalize(params.mode.toLowerCase());
 					const found = this.staticData.allowedModes.find(i => i.name === params.mode);
 					if (!found) {
+						const allowedTypes = this.staticData.allowedModes.map(i => i.name).join(", ");
 						return {
 							success: false,
-							reply: "Banphrase API mode is not allowed! Use one of: " + this.staticData.allowedModes.join(", ")
+							reply: "Banphrase API mode is not allowed! Use one of: " + allowedTypes
 						};
 					}
 	
