@@ -189,7 +189,7 @@ module.exports = {
 							table: "Command",
 							name: "command",
 							module: sb.Command,
-							jsonify: ["Aliases"],
+							jsonify: ["Aliases", "Params"],
 							functionify: ["Static_Data", "Code", "Dynamic_Description"]
 						});
 	
