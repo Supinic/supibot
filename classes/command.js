@@ -45,6 +45,12 @@ module.exports = class Command extends require("./template.js") {
 	Flags = {};
 
 	/**
+	 * Contains info about the command's parameters - these are formatted as (name):(value)
+	 * @type {CommandParameterDefinition[]|null}
+	 */
+	Params = null;
+
+	/**
 	 * If not null, specified the response for a whitelisted command when invoked outside of the whitelist.
 	 * @type {string|null}
 	 */
@@ -80,6 +86,7 @@ module.exports = class Command extends require("./template.js") {
 		Cooldown: { type: "descriptor" },
 		Description: { type: "string" },
 		Flags: { type: "json" },
+		Params: { type: "json" },
 		Whitelist_Response: { type: "string" },
 		Static_Data: { type: "descriptor" },
 		Code: { type: "descriptor" },
@@ -137,6 +144,40 @@ module.exports = class Command extends require("./template.js") {
 			for (const flag of flags) {
 				const camelFlag = sb.Utils.convertCase(flag, "kebab", "camel");
 				this.Flags[camelFlag] = true;
+			}
+		}
+
+		if (data.Params !== null) {
+			let params = data.Params;
+			if (typeof params === "string") {
+				try {
+					params = JSON.parse(params);
+				}
+				catch (e) {
+					this.Params = null;
+					console.warn(`Command has invalid JSON params definition`, {
+						command: this,
+						error: e,
+						data
+					});
+				}
+			}
+
+			this.Params = params;
+
+			if (this.Flags.linkOnly) {
+				const param = this.Params.find(i => i.name === "linkOnly");
+				if (!param) {
+					console.warn("Command has linkOnly flag, but no linkOnly param.", { data, command: this });
+					this.Params.push({
+						name: "linkOnly",
+						type: "boolean"
+					});
+				}
+				else if (param.type !== "boolean") {
+					console.warn("Command has linkOnly flag, but the linkOnly param is not boolean.", { data, command: this });
+					param.type = "boolean";
+				}
 			}
 		}
 
@@ -436,22 +477,28 @@ module.exports = class Command extends require("./template.js") {
 			context.transaction = await sb.Query.getTransaction();
 		}
 
-		if (command.Flags.linkOnly || command.Flags.useParams) {
-			const paramRegex = /^([\w.-]+):([\w.-]+)$/;
+		if (command.Params.length > 0) {
+			const paramNames = command.Params.map(i => i.name);
+			const paramRegex = new RegExp(`^(?<name>${paramNames.join("|")}):(?<value>.+)$`);
 
 			for (let i = args.length - 1; i >= 0; i--) {
 				if (!paramRegex.test(args[i])) {
 					continue;
 				}
 
-				/* eslint-disable */
-				const [param, value] = args[i].split(paramRegex).slice(1);
-				if (param === "linkOnly" && value === "true") {
-					context.params.linkOnly = true;
-					args.splice(i, 1);
-				}
-				else if (param && value) {
-					context.params[param] = value;
+				const { name, value } = args[i].match(paramRegex).groups;
+				const { type } = command.Params.find(i => i.name === name);
+
+				if (name && value) {
+					const parsedValue = Command.parseParameter(value, type);
+					if (parsedValue === null) {
+						return {
+							success: false,
+							reply: `Cannot parse parameter "${name}"!`
+						};
+					}
+
+					context.params[name] = parsedValue;
 					args.splice(i, 1);
 				}
 			}
@@ -795,6 +842,24 @@ module.exports = class Command extends require("./template.js") {
 		};
 	}
 
+	static parseParameter (value, type) {
+		if (type === "string") {
+			return String(value);
+		}
+		else if (type === "number") {
+			return Number(value);
+		}
+		else if (type === "boolean") {
+			return Boolean(value);
+		}
+		else if (type === "date") {
+			return new sb.Date(value);
+		}
+		else {
+			return null;
+		}
+	}
+
 	/**
 	 * Checks if the given string counts as a proper command execution.
 	 * @param {string} string
@@ -905,4 +970,10 @@ module.exports = class Command extends require("./template.js") {
  * @property {boolean} linkOnly If true, the command will accept "linkOnly:true" as one of its arguments, and if possible, returns just a link, with no text included.
  * @property {boolean} useParams If true, all arguments in form of key:value will be parsed into an object
  * @property {boolean} nonNullable If true, the command cannot be directly piped into the null command
+ */
+
+/**
+ * @typedef {Object} CommandParameterDefinition
+ * @property {string} name Parameter name, as it will be used in execution
+ * @property {"string"|"number"|"boolean"|"date"} type Parameter type - string value will be parsed into this type
  */
