@@ -86,14 +86,31 @@ module.exports = {
         ]
     })),
     Code: (async function aliasBuildingBlock(context, type, ...args) {
+        const { blocks } = this.staticData;
         if (!context.append.alias) {
-            return {
-                success: false,
-                reply: "This command can only be used within aliases!"
-            };
+            if (!type) {
+                return {
+                    success: false,
+                    reply: `This command can only be used within aliases! Check help here: https//supinic.com/bot/command/${this.ID}`
+                };
+            }
+
+            type = type.toLowerCase();
+            const block = blocks.find(i => i.name === type || i.aliases.includes(type));
+            if (!block) {
+                return {
+                    success: false,
+                    reply: `This command can only be used within aliases! Check help here: https//supinic.com/bot/command/${this.ID}`
+                };
+            }
+            else {
+                return {
+                    success: false,
+                    reply: `This command can only be used within aliases! Block description: ${block.description}`
+                };
+            }
         }
 
-        const { blocks } = this.staticData;
         if (!type) {
             return {
                 success: false,
@@ -110,7 +127,18 @@ module.exports = {
             };
         }
 
-        return await block.execute(context, ...args);
+        if (!context.append.alias) {
+            return {
+                success: false,
+                reply: "This command can only be used within aliases!"
+            };
+        }
+
+        const result = await block.execute(context, ...args);
+        return {
+            cooldown: null,
+            ...result
+        }
     }),
     Dynamic_Description: (async (prefix, values) => {
         const { blocks } = values.getStaticData();
