@@ -48,7 +48,7 @@ module.exports = class Command extends require("./template.js") {
 	 * Contains info about the command's parameters - these are formatted as (name):(value)
 	 * @type {CommandParameterDefinition[]|null}
 	 */
-	Params = null;
+	Params = [];
 
 	/**
 	 * If not null, specified the response for a whitelisted command when invoked outside of the whitelist.
