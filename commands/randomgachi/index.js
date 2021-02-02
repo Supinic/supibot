@@ -5,7 +5,11 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Fetches a random gachi track from the gachi list, excluding Bilibili and Nicovideo videos with no Youtube reuploads",
 	Flags: ["link-only","mention","non-nullable","pipe","use-params"],
-	Params: null,
+	Params: [
+		{ name: "fav", type: "string" },
+		{ name: "favorite", type: "string" },
+		{ name: "favourite", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomGachi (context) {

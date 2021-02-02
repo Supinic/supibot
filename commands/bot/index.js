@@ -5,7 +5,11 @@ module.exports = {
 	Cooldown: 2500,
 	Description: "Allows broadcasters to set various parameters for the bot in their own channel. Usable anywhere, but only applies to their own channel.",
 	Flags: ["mention","pipe","skip-banphrase","use-params"],
-	Params: null,
+	Params: [
+		{ name: "channel", type: "string" },
+		{ name: "mode", type: "string" },
+		{ name: "url", type: "string" },
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		allowedModes: [
@@ -95,7 +99,9 @@ module.exports = {
 					reply: "I successfully disabled read-only mode and will respond to messages again."
 				};
 	
-			case "api": {
+			case "api":
+			case "banphrase":
+			case "banphrase-api": {
 				const result = [];
 				if (params.url) {
 					if (params.url === "none") {
@@ -104,8 +110,10 @@ module.exports = {
 						result.push("Banphrase API URL has been unset.");
 					}
 					else {
+						const url = require("url");
+						const fixedURL = url.parse(params.url).hostname ?? params.url;
 						try {
-							await sb.Banphrase.executeExternalAPI("test", "Pajbot", params.url);
+							await sb.Banphrase.executeExternalAPI("test", "Pajbot", fixedURL);
 						}
 						catch {
 							return {
@@ -114,9 +122,9 @@ module.exports = {
 							}
 						}
 	
-						channelData.saveProperty("Banphrase_API_URL", params.url);
+						channelData.saveProperty("Banphrase_API_URL", fixedURL);
 						channelData.saveProperty("Banphrase_API_Type", "Pajbot");
-						result.push(`Banphrase API URL has been set to ${params.url}.`);
+						result.push(`Banphrase API URL has been set to ${fixedURL}.`);
 					}
 				}
 	
@@ -177,7 +185,7 @@ module.exports = {
 			
 			`<code>${prefix}bot api url:(link) mode:(mode)</code>`,
 			`<code>${prefix}bot api channel:(channel) url:(link) mode:(mode)</code>`,
-			"Configures the channel's Pajbot banphrase API.",
+			`Configures the channel's Pajbot banphrase API. You can use one of: "api", "banphrase", "banphrase-api" for the sub-command.`,
 			"You can change the URL, but it has to reply properly to a test message.",
 			`You can unset the URL by using "url:none".`,
 			"",

@@ -5,7 +5,10 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Implicitly translates from auto-recognized language to English. Supports parameters 'from' and 'to'. Example: from:german to:french Guten Tag\",",
 	Flags: ["mention","non-nullable","pipe","use-params"],
-	Params: null,
+	Params: [
+		{ name: "confidence", type: "boolean" },
+		{ name: "direction", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function translate (context, ...args) {
@@ -13,8 +16,8 @@ module.exports = {
 		const options = {
 			from: "auto",
 			to: "en",
-			direction: (context.params.direction !== "false"),
-			confidence: (context.params.confidence !== "false")
+			direction: (!context.params.direction),
+			confidence: (!context.params.confidence)
 		};
 	
 		for (const option of ["from", "to"]) {

@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 30000,
 	Description: "Posts a random clip from either the current channel or the specified channel. You can specify a parameter period, with options day/week/month/all, for example: period:week",
 	Flags: ["link-only","mention","non-nullable","pipe","use-params"],
-	Params: null,
+	Params: [
+		{ name: "period", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomClip (context, ...args) {

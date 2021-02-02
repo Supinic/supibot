@@ -5,7 +5,11 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches a random person from epal.gg - post their description. If used on supinic's channel with TTS on, and if they have an audio introduction, it will be played on stream.",
 	Flags: ["mention","use-params"],
-	Params: null,
+	Params: [
+		{ name: "game", type: "string" },
+		{ name: "gender", type: "string" },
+		{ name: "sex", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function epal (context) {

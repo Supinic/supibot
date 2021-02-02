@@ -5,7 +5,11 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches the dictionary definition of a word. You can use \"lang:\" to specifiy a language, and if there are multiple definitions, you can add \"index:#\" with a number to access specific definition indexes.",
 	Flags: ["mention","non-nullable","pipe","use-params"],
-	Params: null,
+	Params: [
+		{ name: "index", type: "string" },
+		{ name: "lang", type: "string" },
+		{ name: "language", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		languages: [

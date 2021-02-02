@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 7500,
 	Description: "Fetches a random line from the current channel. If a user is specified, fetches a random line from that user only",
 	Flags: ["block","opt-out","pipe","use-params"],
-	Params: null,
+	Params: [
+		{ name: "textOnly", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomLine (context, user) {

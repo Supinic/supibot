@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Shuffles the provided message, word by word.",
 	Flags: ["non-nullable","pipe","use-params"],
-	Params: null,
+	Params: [
+		{ name: "fancy", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function shuffle (context, ...args) {
@@ -17,7 +19,7 @@ module.exports = {
 		}
 	
 		let reply;
-		if (context.params.fancy === "true") {
+		if (context.params.fancy) {
 			const result = [];
 			const message = args.join(" ").split(/\b|(?:(\s))/).filter(Boolean);
 			while (message.length > 0) {
