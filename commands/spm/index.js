@@ -26,7 +26,7 @@ module.exports = {
 
 					// Only allow the overwriting of an existing item when
 					// the database definition changed more recently than the file
-					const [stats] = await fs.stat(`${dir}/index.js`);
+					const stats = await fs.stat(`${dir}/index.js`);
 					if (row.values.Last_Edit > stats.mtime) {
 						save = true;
 					}
