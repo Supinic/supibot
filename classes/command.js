@@ -164,8 +164,17 @@ module.exports = class Command extends require("./template.js") {
 			}
 
 			this.Params = params;
+		}
 
-			if (this.Flags.linkOnly) {
+		if (this.Flags.linkOnly) {
+			if (!this.Params) {
+				console.warn("Command has linkOnly flag, but no params are defined.", { data, command: this });
+				this.Params.push({
+					name: "linkOnly",
+					type: "boolean"
+				});
+			}
+			else {
 				const param = this.Params.find(i => i.name === "linkOnly");
 				if (!param) {
 					console.warn("Command has linkOnly flag, but no linkOnly param.", { data, command: this });
