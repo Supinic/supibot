@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 60000,
 	Description: "Fetches the amount of chat lines in the current channel.",
 	Flags: ["mention","pipe","skip-banphrase"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function countLineChannel (context) {

@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Checks certain user or system variables. For a list of types, check the command's extended help.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		variables: [
@@ -70,11 +71,11 @@ module.exports = {
 							reply: `This command can't be used in whispers!`
 						};
 					}
-
+	
 					const channelData = (identifier)
 						? sb.Channel.get(identifier)
 						: context.channel;
-
+	
 					if (!channelData) {
 						return {
 							success: false,
@@ -107,17 +108,17 @@ module.exports = {
 							.orderBy("Executed DESC")
 							.limit(1)
 							.single();
-
+	
 						if (context.channel === null) {
 							rs.where("Channel IS NULL");
 						}
 						else {
 							rs.where("Channel = %n", context.channel.ID);
 						}
-
+	
 						return rs;
 					});
-
+	
 					if (!data) {
 						return {
 							success: false,
@@ -505,12 +506,12 @@ module.exports = {
 							reply: `You don't have this timer set up!`
 						};
 					}
-
+	
 					const now = sb.Date.now();
 					const date = new sb.Date(timers[identifier].date);
 					const delta = sb.Utils.timeDelta(date);
 					const verb = (now > date) ? "occured" : "occurs";
-
+	
 					return {
 						reply: `Your timer "${identifier}" ${verb} ${delta}.`
 					};
@@ -527,7 +528,7 @@ module.exports = {
 							reply: `There are no flags to be found here!`
 						};
 					}
-
+	
 					const { twitchLottoBlacklistedFlags: flags } = context.channel.Data;
 					return {
 						reply: (!flags || flags.length === 0)

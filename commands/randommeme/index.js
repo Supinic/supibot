@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "If no parameters are provided, posts a random reddit meme. If you provide a subreddit, a post will be chosen randomly. NSFW subreddits and posts are only available on NSFW Discord channels!",
 	Flags: ["link-only","mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		const expiration = 3_600_000; // 1 hour
@@ -59,7 +60,7 @@ module.exports = {
 			#id;
 			#title;
 			#url;
-
+	
 			#crosspostOrigin = null;
 			#isTextPost = false;
 			#nsfw = false;
@@ -72,7 +73,7 @@ module.exports = {
 					data = data.crosspost_parent_list.pop();
 					this.#crosspostOrigin = data.subreddit_name_prefixed
 				}
-
+	
 				this.#author = data.author;
 				this.#created = new sb.Date(data.created_utc * 1000);
 				this.#id = data.id;
@@ -100,7 +101,7 @@ module.exports = {
 				const xpost = (this.#crosspostOrigin)
 					? `, x-posted from ${this.#crosspostOrigin}`
 					: "";
-
+	
 				return `${this.#title} ${this.#url} (Score: ${this.#score}, posted ${this.posted}${xpost})`;
 			}
 		}
@@ -110,7 +111,7 @@ module.exports = {
 			expiration,
 			RedditPost,
 			Subreddit,
-
+	
 			uncached: [
 				"random"
 			],
@@ -141,27 +142,27 @@ module.exports = {
 		else if (!context.channel?.NSFW && !context.privateMessage) {
 			safeSpace = true;
 		}
-
+	
 		const input = (args.shift() ?? sb.Utils.randArray(this.staticData.defaultMemeSubreddits));
 		const subreddit = encodeURIComponent(input.toLowerCase());
-
+	
 		let forum = this.data.subreddits[subreddit];
 		if (!forum) {
 			const { statusCode, body: response } = await sb.Got("Reddit", subreddit + "/about.json");
-
+	
 			if (statusCode !== 200 && statusCode !== 403 && statusCode !== 404) {
 				throw new sb.errors.APIError({
 					statusCode,
 					apiName: "RedditAPI"
 				});
 			}
-
+	
 			forum = new this.staticData.Subreddit(response);
 			if (!this.staticData.uncached.includes(subreddit)) {
 				this.data.subreddits[subreddit] = forum;
 			}
 		}
-
+	
 		if (forum.error) {
 			return {
 				success: false,

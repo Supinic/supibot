@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 0,
 	Description: "supiniHack ",
 	Flags: ["developer","pipe","skip-banphrase","system","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function debug (context, ...args) {

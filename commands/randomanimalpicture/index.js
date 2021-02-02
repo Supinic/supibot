@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Posts a random picture for a given animal type.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		types: ["cat", "dog", "bird", "fox"],
@@ -61,7 +62,7 @@ module.exports = {
 	Dynamic_Description: (async (prefix, values) => {
 		const { invocations, types } = values.getStaticData();
 		const list = [];
-
+	
 		for (const [short, type] of Object.entries(invocations)) {
 			list.push([
 				`<code>${prefix}${short}</code>`,
@@ -69,16 +70,16 @@ module.exports = {
 				""
 			]);
 		}
-
+	
 		return [
 			"If you have verified that you own a given animal type, you can use this command to get a random picture of a selected animal type.",
 			`To verify, <code>${prefix}suggest</code> a picture of your animal and mention that you want to get verified.`,
 			"",
-
+	
 			`<code>${prefix}randomanimalpicture ${types.join("/")}</code>`,
 			"Posts a random picture of a given animal",
 			"",
-
+	
 			...list.flat()
 		];
 	})

@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Transforms provided text into one of provided types, such as \"vaporwave\", for example.",
 	Flags: ["non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		const morse = {"0":"-----","1":".----","2":"..---","3":"...--","4":"....-","5":".....","6":"-....","7":"--...","8":"---..","9":"----.","a":".-","b":"-...","c":"-.-.","d":"-..","e":".","f":"..-.","g":"--.","h":"....","i":"..","j":".---","k":"-.-","l":".-..","m":"--","n":"-.","o":"---","p":".--.","q":"--.-","r":".-.","s":"...","t":"-","u":"..-","v":"...-","w":".--","x":"-..-","y":"-.--","z":"--..",".":".-.-.-",",":"--..--","?":"..--..","!":"-.-.--","-":"-....-","/":"-..-.","@":".--.-.","(":"-.--.",")":"-.--.-"};
@@ -42,12 +43,12 @@ module.exports = {
 				return string;
 			}
 		};
-
+	
 		const officialCharactersMap = {
 			A: "𝐀", B: "𝐁", C: "𝐂", D: "𝐃", E: "𝐄", F: "𝐅", G: "𝐆", H: "𝐇", I: "𝐈", J: "𝐉",
 			K: "𝐊", L: "𝐋", M: "𝐌", N: "𝐍", O: "𝐎", P: "𝐏", Q: "𝐐", R: "𝐑", S: "𝐒", T: "𝐓",
 			U: "𝐔", V: "𝐕", W: "𝐖", X: "𝐗", Y: "𝐘", Z: "𝐙",
-
+	
 			a: "𝐚", b: "𝐛",	c: "𝐜",	d: "𝐝",	e: "𝐞",	f: "𝐟",	g: "𝐠", h: "𝐡", i: "𝐢", j: "𝐣",
 			k: "𝐤", l: "𝐥", m: "𝐦", n: "𝐧", o: "𝐨", p: "𝐩", q: "𝐪", r: "𝐫", s: "𝐬", t: "𝐭",
 			u: "𝐮", v: "𝐯", w: "𝐰", x: "𝐱", y: "𝐲", z: "𝐳"
@@ -279,7 +280,7 @@ module.exports = {
 							result.push(word);
 							continue;
 						}
-
+	
 						const scrambled = [];
 						const chars = word.slice(1, -1).split("");
 						while (chars.length > 0) {
@@ -287,10 +288,10 @@ module.exports = {
 							scrambled.push(chars[randomIndex]);
 							chars.splice(randomIndex, 1);
 						}
-
+	
 						result.push(`${word[0]}${scrambled.join("")}${word[word.length - 1]}`);
 					}
-
+	
 					return result.join("");
 				}
 			},

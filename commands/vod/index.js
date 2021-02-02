@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Posts the last VOD of a specified channel. If you use the keyword \"current\", you'll get a timestamp as well.",
 	Flags: ["mention"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function vod (context, target, type) {
@@ -24,7 +25,7 @@ module.exports = {
 				};
 			}
 		}
-
+	
 		const { controller } = sb.Platform.get("twitch");
 		const channelID = await controller.getUserID(target);
 		if (!channelID) {

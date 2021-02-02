@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 30000,
 	Description: "Fetches the total amount of a user's (or yours, if nobody was specified) chat lines in all tracked channels summed together.",
 	Flags: ["mention","pipe","skip-banphrase"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function totalCountLines (context, target) {

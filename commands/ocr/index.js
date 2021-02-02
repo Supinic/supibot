@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Takes your image link and attempts to find the text in it by using OCR.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		languages: {

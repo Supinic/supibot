@@ -5,27 +5,28 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Posts your last command executed in the current channel. Only goes back up to 1 minute.",
 	Flags: ["pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function lastCommand (context, user) {
 		const targetUser = (user)
 			? await sb.User.get(user)
 			: context.user;
-
+	
 		if (!targetUser) {
 			return {
 				success: false,
 				reply: `Provided user does not exist!`
 			};
 		}
-
+	
 		if (targetUser !== context.user && !context.channel) {
 			return {
 				success: false,
 				reply: "Cannot check other users' last command here!"
 			};
 		}
-
+	
 		const data = await sb.Query.getRecordset(rs => {
 			rs.select("Result")
 				.from("chat_data", "Command_Execution")

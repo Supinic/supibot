@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 0,
 	Description: "Restarts the bot/website process via pm2, optionally also git-pulls changes and/or upgrades the supi-core module.",
 	Flags: ["read-only","system","whitelist"],
+	Params: null,
 	Whitelist_Response: "Only available to adminstrators!",
 	Static_Data: (() => ({
 		dir: {
@@ -24,15 +25,15 @@ module.exports = {
 			: "bot";
 	
 		types = types.map(i => i.toLowerCase());
-
+	
 		const queue = [];
 		const dir = this.staticData.dir[processType];
 		const pm2 = this.staticData.pm2[processType];
-
+	
 		if (types.includes("all") || types.includes("pull")) {
 			queue.push(async () => {
 				await context.channel.send("VisLaud 👉 git pull origin master");
-
+	
 				await shell(`git -C ${dir} checkout -- yarn.lock package.json`);
 				const result = await shell(`git -C ${dir} pull origin master`);
 				console.log("pull result", { stdout: result.stdout, stderr: result.stderr });
@@ -41,7 +42,7 @@ module.exports = {
 		if (types.includes("all") || types.includes("yarn") || types.includes("upgrade")) {
 			queue.push(async () => {
 				await context.channel.send("VisLaud 👉 yarn upgrade supi-core");
-
+	
 				const result = await shell(`yarn --cwd ${dir} upgrade supi-core`);
 				console.log("upgrade result", { stdout: result.stdout, stderr: result.stderr });
 			});
@@ -51,7 +52,7 @@ module.exports = {
 			await context.channel.send("VisLaud 👉 Restarting process");
 			setTimeout(() => shell(pm2), 1000);
 		});
-
+	
 		for (const fn of queue) {
 			await fn();
 		}

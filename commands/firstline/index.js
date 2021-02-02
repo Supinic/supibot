@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Posts the target user's first chat line in the context of the current channel, and the date they sent it.",
 	Flags: ["mention","opt-out","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function firstLine (context, user) {
@@ -14,18 +15,18 @@ module.exports = {
 				reply: "This command is not available in private messages!"
 			};
 		}
-
+	
 		const targetUser = (user)
 			? await sb.User.get(user)
 			: context.user;
-
+	
 		if (!targetUser) {
 			return {
 				success: false,
 				reply: "Provided user not found in the database!"
 			};
 		}
-
+	
 		const check = await sb.Query.getRecordset(rs => rs
 			.select("User_Alias")
 			.from("chat_data", "Message_Meta_User_Alias")
@@ -40,7 +41,7 @@ module.exports = {
 			.flat("User_Alias")
 			.single()
 		);
-
+	
 		if (!check) {
 			return {
 				success: false,
@@ -61,7 +62,7 @@ module.exports = {
 					.single()
 				);
 			})
-
+	
 			const lineData = (await Promise.all(promises)).filter(Boolean);
 			if (!lineData) {
 				return {
@@ -69,7 +70,7 @@ module.exports = {
 					reply: "No chat lines found?!"
 				};
 			}
-
+	
 			lineData.sort((a, b) => a.Posted - b.Posted);
 			line = lineData[0];
 		}
@@ -90,7 +91,7 @@ module.exports = {
 				reply: "No chat lines found?!"
 			};
 		}
-
+	
 		const prefix = (targetUser.ID === context.user.ID) ? "Your" : "That user's";
 		return {
 			partialReplies: [

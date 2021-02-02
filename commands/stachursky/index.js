@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Posts a random excerpt from a Stachursky song.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		quotes: [

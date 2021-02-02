@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Predicts the amount of lines a given user will have in some amount of time.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function predictLines (context, ...args) {

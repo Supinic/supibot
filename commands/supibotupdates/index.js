@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Toggles your role on Supinic's discord which determines if you get pinged by the #supibot-updates announcements.",
 	Flags: ["ping"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		updatesRoleID: "748957148439904336",

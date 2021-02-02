@@ -1,10 +1,11 @@
 module.exports = {
 	Name: "gachisearch",
-	Aliases: ["gs", "gsa", "gachiauthorsearch"],
+	Aliases: ["gs","gsa","gachiauthorsearch"],
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Searches for a given track in the gachi list, and attempts to post a link.",
 	Flags: ["link-only","mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function gachiSearch (context, ...args) {
@@ -15,7 +16,7 @@ module.exports = {
 				reply: "No search query provided!"
 			};
 		}
-
+	
 		const { invocation } = context;
 		const escaped = sb.Query.escapeLikeString(query);
 		if (invocation === "gsa" || invocation === "gachiauthorseach") {
@@ -33,8 +34,8 @@ module.exports = {
 				            AND Alias.Target_Table = "Author"
 				            AND Alias.Target_ID = Author.ID
 		            )
-            `);
-
+	            `);
+	
 			const [author, ...rest] = data;
 			if (!author) {
 				return {
@@ -42,18 +43,18 @@ module.exports = {
 					reply: "No authors matching that query have been found!"
 				};
 			}
-
+	
 			const others = (rest.length === 0)
 				? ""
 				: "More results: " + rest.map(i => `${i.Name} (ID ${i.ID})`).join("; ");
-
+	
 			const link = `https://supinic.com/track/author/${author.ID}`;
 			return {
 				reply: `"${author.Name}" - ${link} ${others}`,
 				link
 			};
 		}
-
+	
 		const data = await sb.Query.raw(sb.Utils.tag.trim `
 			SELECT
 				ID,

@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Fetches the headline of the first article found according to user query. Watch out, articles might be case sensitive.",
 	Flags: ["mention","non-nullable","pipe","use-params"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function wiki (context, ...args) {
@@ -15,7 +16,7 @@ module.exports = {
 				cooldown: { length: 2500 }
 			};
 		}
-
+	
 		const language = context.params.lang ?? context.params.language ?? "english";
 		const languageCode = sb.Utils.languageISO.getCode(language)?.toLowerCase();
 		if (!languageCode) {
@@ -25,7 +26,7 @@ module.exports = {
 				cooldown: { length: 2500 }
 			};
 		}
-
+	
 		const searchData = await sb.Got({
 			url: `https://${languageCode}.wikipedia.org/w/api.php`,
 			searchParams: new sb.URLParams()
@@ -36,14 +37,14 @@ module.exports = {
 				.set("search", args.join(" "))
 				.toString()
 		}).json();
-
+	
 		if (searchData[1].length === 0) {
 			return {
 				success: false,
 				reply: "No Wiki articles found for your query!"
 			};
 		}
-
+	
 		const rawData = await sb.Got({
 			url: `https://${languageCode}.wikipedia.org/w/api.php`,
 			searchParams: new sb.URLParams()
@@ -70,7 +71,7 @@ module.exports = {
 			if (!context.channel || context.channel.Links_Allowed === true) {
 				link = `https://${languageCode}.wikipedia.org/?curid=${key}`;
 			}
-
+	
 			const { extract, title } = data[key];
 			return {
 				reply: `${link} ${title}: ${extract}`

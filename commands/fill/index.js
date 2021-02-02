@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 20000,
 	Description: "Takes the input and scrambles it around randomly.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function fill (context, ...words) {

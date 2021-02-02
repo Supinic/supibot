@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 1000,
 	Description: "Usable in pipe only - turns the response into a whisper.",
 	Flags: ["pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function whisper (context, ...args) {

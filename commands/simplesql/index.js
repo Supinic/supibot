@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 0,
 	Description: "Executes a quick SQL query, and returns its (simple) result.",
 	Flags: ["mention","pipe","system","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function simpleSQL (context, ...args) {

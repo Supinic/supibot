@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Search for the last level change (default, staff, admin, ...) of a given Twitch user.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function levelChange () {

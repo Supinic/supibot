@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Implicitly translates from auto-recognized language to English. Supports parameters 'from' and 'to'. Example: from:german to:french Guten Tag\",",
 	Flags: ["mention","non-nullable","pipe","use-params"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function translate (context, ...args) {
@@ -15,7 +16,7 @@ module.exports = {
 			direction: (context.params.direction !== "false"),
 			confidence: (context.params.confidence !== "false")
 		};
-
+	
 		for (const option of ["from", "to"]) {
 			const lang = context.params[option];
 			const newLang = sb.Utils.languageISO.get(lang) ?? {};
@@ -24,7 +25,7 @@ module.exports = {
 				fail[option] = lang;
 				continue;
 			}
-
+	
 			options[option] = code.toLowerCase();
 			fail[option] = false;
 		}
@@ -82,7 +83,7 @@ module.exports = {
 					reply: "Language code could not be translated into a name! Please let @Supinic know about this :)"
 				};
 			}
-
+	
 			const array = [sb.Utils.capitalize(fromLanguageName)];
 			if (options.confidence && response[6] && response[6] !== 1) {
 				const confidence = sb.Utils.round(response[6] * 100, 0) + "%";

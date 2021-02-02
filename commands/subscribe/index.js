@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Subscribe or unsubcribe to plethora of events, such as a channel going live, or a suggestion you made being updated. Check the extended help for detailed info on each event.",
 	Flags: ["mention","pipe","skip-banphrase"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		types: [
@@ -51,7 +52,7 @@ module.exports = {
 								Data: "{}",
 								Active: true
 							});
-
+	
 							await subscription.save();
 						}
 						else if (invocation === "unsubscribe") {
@@ -61,22 +62,22 @@ module.exports = {
 							};
 						}
 					}
-
+	
 					const data = JSON.parse(subscription.values.Data ?? "{}");
 					data.channels = data.channels ?? [];
-
+	
 					const twitch = sb.Platform.get("twitch");
 					const channels = args
 						.map(i => sb.Channel.get(i.toLowerCase(), twitch))
 						.filter(i => i !== null && i.Type !== "Inactive")
 						.map(i => i.ID);
-
+	
 					if (channels.length === 0) {
 						if (invocation === "unsubscribe") {
 							subscription.values.Active = false;
 							subscription.values.Data = null;
 							await subscription.save();
-
+	
 							return {
 								reply: "Successfully unsubscribed from all channels going live."
 							};
@@ -97,29 +98,29 @@ module.exports = {
 							}
 						}
 					}
-
+	
 					let response;
 					const lengthBefore = data.channels.length;
 					if (invocation === "subscribe") {
 						data.channels.push(...channels);
 						data.channels = data.channels.filter((i, ind, arr) => arr.indexOf(i) === ind);
-
+	
 						response = (data.channels.length > lengthBefore)
 							? `Successfully subscribed to ${data.channels.length - lengthBefore} channels going live.`
 							: "You did not subscribe to any new channels.";
 					}
 					else if (invocation === "unsubscribe") {
 						data.channels = data.channels.filter(i => !channels.includes(i));
-
+	
 						response = (data.channels.length < lengthBefore)
 							? `Successfully unsubscribed from ${lengthBefore - data.channels.length} channels going live.`
 							: "You did not unsubscribe from any channels.";
 					}
-
+	
 					subscription.values.Active = (data.channels.length !== 0);
 					subscription.values.Data = JSON.stringify(data, null, 4);
 					await subscription.save();
-
+	
 					return {
 						reply: response
 					};
@@ -153,16 +154,16 @@ module.exports = {
 			.limit(1)
 			.single()
 		);
-
+	
 		if (typeof event.handler === "function") {
 			const subscription = await sb.Query.getRow("chat_data", "Event_Subscription");
 			if (subData?.ID) {
 				await subscription.load(subData.ID);
 			}
-
+	
 			return event.handler(context, subscription, ...args);
 		}
-
+	
 		const response = (invocation === "subscribe") ? event.response.added : event.response.removed;
 		if (subData) {
 			if (

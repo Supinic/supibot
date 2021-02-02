@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fucks target user to bed.",
 	Flags: ["mention","opt-out","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function fuck (context, user, emote) {

@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 30000,
 	Description: "Posts the channel's stream schedule.",
 	Flags: ["mention","non-nullable","opt-out","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function schedule (context, channel) {
@@ -48,13 +49,13 @@ module.exports = {
 				target = "Your";
 				extra += " (shouldn't you know when you're supposed to stream? 😉)";
 			}
-
+	
 			const isLive = !(await sb.Command.get("si").execute({}, channelName)).reply.includes("offline");
 			const nextStream = new sb.Date(data.nextStream.startsAt);
 			const lateString = (!isLive && sb.Date.now() > nextStream)
 				? "The stream seems to be late FeelsWeirdMan"
 				: "";
-
+	
 			const time = sb.Utils.timeDelta(new sb.Date(data.nextStream.startsAt));
 			return {
 				reply: `${target} next stream: ${game} - ${title}, starting ${time}. ${lateString} ${extra}`

@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 7500,
 	Description: "Checks the current amount of infected/deceased people from the Corona Virus spread started in October-December 2019.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		const special = {
@@ -263,12 +264,12 @@ module.exports = {
 			amount: (allRecoveries) ? group(allRecoveries) : "unknown amount of",
 			word: (allRecoveries === 1) ? "recovery" : "recoveries"
 		};
-
+	
 		const active = (allCases - (allDeaths ?? 0) - (allRecoveries ?? 0));
 		const approximateSymbol = (allDeaths === null || allRecoveries === null)
 			? "~"
 			: "";
-
+	
 		const ratios = {};
 		if (population !== null) {
 			ratios.cpm = sb.Utils.round((allCases / population) * 1e6, 2);
@@ -307,7 +308,7 @@ module.exports = {
 					? `This is ${group(ratios.apm)} active cases, `
 					: ""
 				}
-
+	
 				${(ratios.cpm)
 					? (ratios.tpm)
 						? ` ${group(ratios.cpm)} cases, ${group(ratios.dpm)} deaths, and ${group(ratios.tpm)} tests per million.`

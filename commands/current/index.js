@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Fetches the current song playing on stream.",
 	Flags: ["link-only","mention","pipe","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		types: ["current", "previous"]

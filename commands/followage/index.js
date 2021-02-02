@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches the followage <user> <channel>. If no channel provided, checks the current one. If no user provided either, checks yourself.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function followAge (context, user, channel) {
@@ -50,8 +51,8 @@ module.exports = {
 				return { reply: "You can't follow yourself!" };
 			}
 		}
-
-
+	
+	
 		const { controller } = sb.Platform.get("twitch");
 		const [userID, channelID] = await Promise.all([
 			controller.getUserID(user),

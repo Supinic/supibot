@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Posts a link to the supinic website showing the current channel activity.",
 	Flags: ["mention","pipe","skip-banphrase","whitelist"],
+	Params: null,
 	Whitelist_Response: "Only available on Twitch (for now)!",
 	Static_Data: null,
 	Code: (async function activity (context, target) {

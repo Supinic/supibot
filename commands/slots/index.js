@@ -4,7 +4,8 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 20000,
 	Description: "Once at least three unique emotes (or words) have been provided, rolls a pseudo slot machine to see if you get a flush.",
-	Flags: ["mention", "pipe"],
+	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		patterns: [
@@ -46,7 +47,7 @@ module.exports = {
 					if ((controller?.availableEmotes ?? []).length === 0) {
 						return "Twitch messed up, no emotes available...";
 					}
-
+	
 					return controller.availableEmotes
 						.filter(emoteSet => emoteSet.tier === null)
 						.flatMap(emoteSet => emoteSet.emotes.map(emote => emote.token));
@@ -60,7 +61,7 @@ module.exports = {
 					if ((controller?.availableEmotes ?? []).length === 0) {
 						return "Twitch messed up, no emotes available...";
 					}
-
+	
 					return controller.availableEmotes
 						.filter(emoteSet => ["1", "2", "3"].includes(emoteSet.tier))
 						.flatMap(emoteSet => emoteSet.emotes.map(emote => emote.token));
@@ -74,11 +75,11 @@ module.exports = {
 						throwHttpErrors: false,
 						url: "https://api.betterttv.net/2/channels/" + context.channel.Name
 					}).json();
-
+	
 					if (data.status === 404 || !data.emotes || data.emotes.length === 0) {
 						return "Well, yeah, but BTTV is like a 3rd party thing, and I don't know...";
 					}
-
+	
 					return data.emotes.map(i => i.code);
 				}),
 				notes: "Rolls from BTTV emotes in the current channel."
@@ -91,19 +92,19 @@ module.exports = {
 						throwHttpErrors: false,
 						url: "https://api.frankerfacez.com/v1/room/" + context.channel.Name
 					});
-
+	
 					if (statusCode === 404) {
 						return { reply: "This channel doesn't exist within FFZ database!" };
 					}
 					else if (!data.sets) {
 						return { reply: "No FFZ emotes found!" };
 					}
-
+	
 					const set = Object.keys(data.sets)[0];
 					if (data.sets[set].emoticons.length === 0) {
 						return { reply: "This channel has no FFZ emotes enabled." };
 					}
-
+	
 					return data.sets[set].emoticons.map(i => i.name);
 				}),
 				notes: "Rolls from FFZ emotes in the current channel."
@@ -117,7 +118,7 @@ module.exports = {
 							if (raw.status === 404 || raw.emotes.length === 0) {
 								return [];
 							}
-
+	
 							return raw.emotes.map(i => i.code);
 						})(),
 						(async () => {
@@ -126,11 +127,11 @@ module.exports = {
 							if (raw.sets[set].emoticons.length === 0) {
 								return [];
 							}
-
+	
 							return raw.sets[set].emoticons.map(i => i.name);
 						})()
 					])).flat();
-
+	
 					const filtered = fullEmotesList.filter(i => i.toLowerCase().includes("pepe"));
 					return (filtered.length >= 3)
 						? filtered
@@ -153,7 +154,7 @@ module.exports = {
 					if (!target || target > Number.MAX_SAFE_INTEGER || target < 1 || Math.trunc(target) !== target) {
 						return "The number must be an integer between 2 and " + Number.MAX_SAFE_INTEGER;
 					}
-
+	
 					return {
 						roll: () => sb.Utils.random(1, target),
 						uniqueItems: target
@@ -176,20 +177,20 @@ module.exports = {
 				cooldown: 5000
 			};
 		}
-
+	
 		const check = this.staticData.patterns.find(i => i.name === emotes[0]);
 		let limit = 3;
 		let type = "array";
 		let uniqueItems = null;
 		const rolledItems = [];
-
+	
 		if (check) {
 			if (Array.isArray(check.pattern)) {
 				emotes = check.pattern;
 			}
 			else if (typeof check.pattern === "function") {
 				const result = await check.pattern(context, ...emotes);
-
+	
 				if (typeof result === "string") {
 					// This basically means something went wrong somehow (like no emotes found in that channel)
 					// Reply with that response instead of rolling for emotes.
@@ -206,7 +207,7 @@ module.exports = {
 						limit = result.limit || limit;
 						uniqueItems = result.uniqueItems;
 						type = "function";
-
+	
 						for (let i = 0; i < limit; i++) {
 							rolledItems.push(result.roll());
 						}
@@ -218,7 +219,7 @@ module.exports = {
 				}
 			}
 		}
-
+	
 		if (type === "array") {
 			if (emotes.length < limit) {
 				return {
@@ -226,21 +227,21 @@ module.exports = {
 					cooldown: this.Cooldown / 2
 				};
 			}
-
+	
 			for (let i = 0; i < limit; i++) {
 				rolledItems.push(sb.Utils.randArray(emotes));
 			}
-
+	
 			uniqueItems = emotes.filter((i, ind, arr) => arr.indexOf(i) === ind).length;
 		}
-
+	
 		if (rolledItems.every(i => rolledItems[0] === i)) {
 			if (uniqueItems === 1) {
 				return {
 					reply: `[ ${rolledItems.join(" ")} ] -- FeelsDankMan You won and beat the odds of 100%.`
 				};
 			}
-
+	
 			let chance = null;
 			if (type === "array") {
 				const winningItems = emotes.filter(i => i === rolledItems[0]);
@@ -251,7 +252,7 @@ module.exports = {
 			else if (type === "function") {
 				chance = (1 / uniqueItems) ** (limit - 1);
 			}
-
+	
 			const reverseChance = sb.Utils.round((1 / chance), 3);
 			const row = await sb.Query.getRow("data", "Slots_Winner");
 			row.setValues({
@@ -261,13 +262,13 @@ module.exports = {
 				Channel: context.channel?.ID ?? null,
 				Odds: reverseChance
 			});
-
+	
 			await row.save();
 			return {
 				reply: `[ ${rolledItems.join(" ")} ] -- PagChomp A flush! Congratulations, you beat the odds of ${sb.Utils.round(chance * 100, 3)}% (that is 1 in ${reverseChance})`
 			};
 		}
-
+	
 		return {
 			reply: `[ ${rolledItems.join(" ")} ]`
 		};
@@ -278,20 +279,20 @@ module.exports = {
 			.sort((a, b) => a.name.localeCompare(b.name))
 			.map(i => `<li><code>${i.name}</code><br>${i.notes}</li>`)
 			.join("");
-
+	
 		return [
 			"Rolls three random words out of the given list of words. If you get a flush, you win!",
 			`Every winner is listed in <a href="https://supinic.com/bot/slots-winner/list">this neat table</a>.`,
 			"",
-
+	
 			`<code>${prefix}slots (list of words)</code>`,
 			"Three rolls will be chose randomly. Get the same one three times for a win.",
 			"",
-
+	
 			`<code>${prefix}slots #(pattern)</code>`,
 			"Uses a pre-determined or dynamic pattern as your list of words.",
 			"",
-
+	
 			"Supported patterns:",
 			`<ul>${patternList}</ul>`
 		];

@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Rolls a random number. If nothing is specified, rolls 1-100. You can specify min and max values, or some expression using standard dice notation.",
 	Flags: ["mention","pipe","skip-banphrase"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function roll (context, ...args) {
@@ -17,7 +18,7 @@ module.exports = {
 				return { reply: `Your roll is ${result}.` };
 			}
 		}
-
+	
 		let [first, second] = args;
 		if (Number(first) && Number(second)) {
 			first = Number(first);
@@ -38,10 +39,10 @@ module.exports = {
 				return { reply: `Your specific roll (no dice) is ${number}.` };
 			}
 		}
-
+	
 		const [fixedInput] = args.join(" ").split(/[a-ce-zA-Z]/)
 		const result = sb.Utils.evalDiceRoll(fixedInput, 1_000_000);
-
+	
 		if (result === null) {
 			return {
 				success: false,
@@ -63,7 +64,7 @@ module.exports = {
 				reply: `Your roll is ${result}.`
 			};
 		}
-
+	
 	}),
 	Dynamic_Description: null
 };

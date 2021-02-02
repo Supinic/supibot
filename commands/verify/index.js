@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 0,
 	Description: "Verifies a user to be able to use a specific command based on some requirement.",
 	Flags: ["mention","pipe","system","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function verify (context, type, user, ...rest) {

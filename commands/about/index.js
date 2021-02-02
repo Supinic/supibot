@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 60000,
 	Description: "Posts a summary of what supibot does, and what it is.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function about () {

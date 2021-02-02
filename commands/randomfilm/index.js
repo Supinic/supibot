@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Fetches a random movie.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomFilm () {

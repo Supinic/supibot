@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Pipes the result of one command to another, and so forth. Each command will be used as if used separately, so each will be checked for cooldowns and banphrases. Use the character \"|\" or \">\" to separate each command.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function pipe (context, ...args) {
@@ -12,13 +13,13 @@ module.exports = {
 		if (!context.externalPipe && invocations.length < 2) {
 			return { reply: "At least two commands must be piped together!" };
 		}
-
+	
 		let aliased = false;
 		const nullCommand = sb.Command.get("null");
 		for (let i = 0; i < invocations.length; i++) {
 			const [commandString] = invocations[i].split(" ");
 			const command = sb.Command.get(commandString.replace(sb.Command.prefixRegex, ""));
-
+	
 			if (!command) {
 				return {
 					success: false,
@@ -45,7 +46,7 @@ module.exports = {
 				aliased = true;
 			}
 		}
-
+	
 		const resultsInPastebin = args[args.length - 1] === "pastebin";
 		let finalResult = null;
 		let currentArgs = [];

@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Requests a song to play on Supinic's stream. You can use \"start:\" and \"end:\" to request parts of a song using seconds or a time syntax. \"start:100\" or \"end:05:30\", for example.",
 	Flags: ["mention","pipe","whitelist"],
+	Params: null,
 	Whitelist_Response: "Only available in supinic's channel.",
 	Static_Data: (() => {
 		const limits = {
@@ -167,7 +168,7 @@ module.exports = {
 	}),
 	Code: (async function songRequest (context, ...args) {
 		if (args.length === 0) {
-            // If we got no args, just redirect to $current 4HEad
+	            // If we got no args, just redirect to $current 4HEad
 			return await sb.Command.get("current").execute(context);
 		}
 	
@@ -446,7 +447,7 @@ module.exports = {
 						reply: "No youtube-dl path configured, cannot get-url for this video!"
 					};
 				}
-
+	
 				const result = await shell(`${ytdlPath} --get-url ${data.link}`);
 				vlcLink = result.stdout;
 			}

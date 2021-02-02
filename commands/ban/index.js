@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Bans/unbans any combination of channel, user, and command from being executed. Only usable by administrators, or Twitch channel owners.",
 	Flags: ["mention","system"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function ban (context, ...args) {

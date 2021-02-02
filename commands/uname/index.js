@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Posts the current supibot version, along with the latest \"patch notes\"",
 	Flags: ["developer","mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function uname () {

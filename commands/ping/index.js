@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Ping!",
 	Flags: ["pipe","skip-banphrase"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		checkLatency: async (callback, ...args) => {

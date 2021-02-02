@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 7500,
 	Description: "Finds your chat neighbour(s). When you take the chatter list in a channel and sort by the alphabet, your chat neighbours are users that come before and after you in the list. Use this to find new friends! 😃",
 	Flags: ["block","opt-out","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function (context, targetUser) {
@@ -22,13 +23,13 @@ module.exports = {
 	
 		const { chatters } = await sb.Got(`https://tmi.twitch.tv/group/user/${context.channel.Name}/chatters`).json();
 		const list = Object.values(chatters).flat();
-
+	
 		if (!list.includes(context.user.Name)) {
 			list.push(context.user.Name);
 		}
-
+	
 		list.sort();
-
+	
 		if (list.length < 2) {
 			return {
 				reply: "There don't seem to be enough people here."

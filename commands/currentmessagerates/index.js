@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches the current messages/minute stats in the current channel.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function currentMessageRates (context) {

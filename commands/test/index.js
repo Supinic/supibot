@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "?",
 	Flags: ["developer","pipe","skip-banphrase","system"],
+	Params: null,
 	Whitelist_Response: "For debugging purposes only :)",
 	Static_Data: null,
 	Code: (async function test () {

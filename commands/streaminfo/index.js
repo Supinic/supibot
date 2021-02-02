@@ -5,13 +5,14 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Posts stream info about a Twitch channel.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function streamInfo (context, ...args) {
 		const target = (args.length === 0)
 			? context.channel.Name
 			: args[0];
-
+	
 		const { controller } = sb.Platform.get("twitch");
 		const targetData = await sb.User.get(target);
 		const channelID = targetData?.Twitch_ID ?? await controller.getUserID(target);

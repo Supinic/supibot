@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "If you have at least one song playing or in the queue, this command will skip the first one. You can also add an ID to skip a specific song.",
 	Flags: ["mention","pipe","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function wrongSong (context, target) {
@@ -58,7 +59,7 @@ module.exports = {
 			action = "deleted from the playlist";
 			await sb.VideoLANConnector.client.playlistDelete(userRequest.VLC_ID);
 		}
-
+	
 		return {
 			reply: `Your request "${userRequest.Name}" (ID ${userRequest.VLC_ID}) has been successfully ${action}.`
 		};

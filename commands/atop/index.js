@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 0,
 	Description: "Fetches the top 10 users by total amount of chat lines across all channels. This is a very heavy operation on SQL, so please use it sparingly.",
 	Flags: ["mention","pipe","system","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function atop () {

@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Shuffles the provided message, word by word.",
 	Flags: ["non-nullable","pipe","use-params"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function shuffle (context, ...args) {
@@ -14,7 +15,7 @@ module.exports = {
 				reply: "No input provided!"
 			};
 		}
-
+	
 		let reply;
 		if (context.params.fancy === "true") {
 			const result = [];
@@ -24,7 +25,7 @@ module.exports = {
 				result.push(message[randomIndex]);
 				message.splice(randomIndex, 1);
 			}
-
+	
 			reply = result.join(" ").replace(/\s+/g, " ");
 		}
 		else {
@@ -35,10 +36,10 @@ module.exports = {
 				result.push(message[randomIndex]);
 				message.splice(randomIndex, 1);
 			}
-
+	
 			reply = result.join(" ");
 		}
-
+	
 		return { 
 			reply,
 			cooldown: {
@@ -50,11 +51,11 @@ module.exports = {
 		return [
 			"For a given message, shuffles the words around.",
 			"",
-
+	
 			`<code>${prefix}shuffle this is a random message</code>`,
 			`a random is message this`,
 			"",
-
+	
 			`<code>${prefix}shuffle fancy:true (this) isn't a random! message</code>`,
 			`) isn a ' ! random this ( message`,
 		];

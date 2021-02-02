@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "A random quote from the two time! 1993, 1994 back to back blockbuster video game champion!",
 	Flags: ["pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		this.data.previousPosts = [];	

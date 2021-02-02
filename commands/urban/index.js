@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches the top definition of a given term from UrbanDictionary. You can append \"index:#\" at the end to access definitions that aren't first in the search",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		timeout: 10000

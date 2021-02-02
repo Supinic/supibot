@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Does math. For more info, check the documentation for math.js",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function math (context, ...args) {

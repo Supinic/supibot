@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 30000,
 	Description: "Posts a random clip from either the current channel or the specified channel. You can specify a parameter period, with options day/week/month/all, for example: period:week",
 	Flags: ["link-only","mention","non-nullable","pipe","use-params"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomClip (context, ...args) {
@@ -27,7 +28,7 @@ module.exports = {
 				reply: `Invalid clip creation period! Use one of: day, week, month, all`
 			};
 		}
-
+	
 		const { statusCode, body: data } = await sb.Got("Kraken", {
 			url: "clips/top",
 			searchParams: new sb.URLParams()
@@ -37,7 +38,7 @@ module.exports = {
 				.toString(),
 			throwHttpErrors: false
 		});
-
+	
 		if (statusCode === 404) {
 			return {
 				success: false,
@@ -50,7 +51,7 @@ module.exports = {
 				link: null
 			};
 		}
-
+	
 		const clip = sb.Utils.randArray(data.clips);
 		const delta = sb.Utils.timeDelta(new sb.Date(clip.created_at));
 		const link = "https://clips.twitch.tv/" + clip.slug;

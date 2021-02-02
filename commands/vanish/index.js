@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 60000,
 	Description: "Times out the user for 1 second. Only works if Supibot is a Twitch moderator.",
 	Flags: ["skip-banphrase"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function vanish (context) {

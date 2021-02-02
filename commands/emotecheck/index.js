@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Posts the list of each of Twitch's amazing \"global\" emote sets.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		sets: [

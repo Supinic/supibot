@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 30000,
 	Description: "Takes a Twitch clip name, and sends a download link to it into whispers.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function downloadClip (context, rawSlug) {
@@ -19,7 +20,7 @@ module.exports = {
 				reply: "Invalid clip slug provided! Only letters are allowed."
 			};
 		}
-
+	
 		const data = await sb.Got("Leppunen", `twitch/clip/${slug}`).json();
 		if (data.status === 404) {
 			return {

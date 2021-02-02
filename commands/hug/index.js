@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Hugs target user :)",
 	Flags: ["opt-out","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function hug (context, target) {

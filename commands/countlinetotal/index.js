@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 30000,
 	Description: "Fetches the amount of data lines from ALL the log tables Supibot uses, including the total size and a prediction of when the storage will run out.",
 	Flags: ["mention"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function countLineTotal (context) {
@@ -33,7 +34,7 @@ module.exports = {
 		const rate = sb.Utils.round((currentSize - originalSize) / days, 3);
 		const fillDate = new sb.Date().addDays((220 - currentSize) / rate); // 238 GB minus an estimate of ~18GB of other stuff
 		const megabytesPerHour = sb.Utils.round(rate * 1024 / 24, 3);
-
+	
 		const cooldown = {};
 		if (context.channel) {
 			cooldown.user = null;
@@ -45,7 +46,7 @@ module.exports = {
 			cooldown.channel - null;
 			cooldown.length = this.Cooldown * 2;
 		}
-
+	
 		return {
 			cooldown,
 			reply: sb.Utils.tag.trim `

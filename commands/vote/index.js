@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "If there is poll running, you can vote \"yes\" or \"no\", if you don't post either you will get the currently running poll (or nothing if there's none)",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function vote (context, vote) {

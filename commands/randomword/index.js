@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Fetches a random word. If a number is provided, rolls that many words.",
 	Flags: ["pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		limit: 10

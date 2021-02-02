@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Posts the link to supinic's stream game list on the website.",
 	Flags: ["developer","mention","pipe","system","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function streamGames () {

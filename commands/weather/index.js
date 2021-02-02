@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches the current weather in a given location. You can specify parameters to check forecast, or mention a user to get their location, if they set it up. Check all possibilities in e xtended help. Weather data powered by Darksky.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		icons: {
@@ -117,7 +118,7 @@ module.exports = {
 					.set("address", args.join(" "))
 					.toString()
 			});
-
+	
 			if (statusCode !== 200) {
 				throw new sb.errors.APIError({
 					statusCode,
@@ -134,7 +135,7 @@ module.exports = {
 						cooldown: 5000
 					};
 				}
-
+	
 				return {
 					success: false,
 					reply: "That place was not found! FeelsBadMan"
@@ -157,14 +158,14 @@ module.exports = {
 				.set("exclude", excluded.join(","))
 				.toString()
 		});
-
+	
 		if (statusCode !== 200) {
 			throw new sb.errors.APIError({
 				statusCode,
 				apiName: "DarkskyWeatherAPI"
 			});
 		}
-
+	
 		let data = null;
 		let message;
 		if (number === null && type !== "currently") {

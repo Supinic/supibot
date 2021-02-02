@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 2500,
 	Description: "Checks if a given gachi link exists in the database, if not, adds it to the todo list to be processed later.",
 	Flags: ["mention","pipe","skip-banphrase"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		limit: 100
@@ -16,7 +17,7 @@ module.exports = {
 				cooldown: { length: 2500 }
 			};
 		}
-
+	
 		const links = [];
 		if (args[0] === "playlist") {
 			args.shift();
@@ -102,10 +103,10 @@ module.exports = {
 					ID: null,
 					formatted: `Video not available - it is deleted or private.`
 				});
-
+	
 				continue;
 			}
-
+	
 			const check = await sb.Query.getRecordset(rs => rs
 				.select("ID")
 				.from("music", "Track")
@@ -127,7 +128,7 @@ module.exports = {
 				const tags = tagData.join(", ");
 				const row = await sb.Query.getRow("music", "Track");
 				await row.load(check.ID);
-
+	
 				const added = { name: "(unknown)", date: "(unknown time ago)" };
 				if (row.values.Added_By) {
 					const userData = await sb.User.get(row.values.Added_By);
@@ -136,7 +137,7 @@ module.exports = {
 				if (row.values.Added_On) {
 					added.date = sb.Utils.timeDelta(row.values.Added_On);
 				}
-
+	
 				results.push({
 					link,
 					existing: true,

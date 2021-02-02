@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Fetches a random Twitch-related copypasta. The date of creation usually ranges from 2014-2015.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function copypasta () {

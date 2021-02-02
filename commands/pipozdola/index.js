@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "PIP OMEGALUL ZD OMEGALUL LA",
 	Flags: ["mention","pipe","skip-banphrase","system","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function pipozdola () {

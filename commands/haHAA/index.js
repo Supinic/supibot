@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Posts a random, hilarious joke, 100% guaranteed.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function _4head (context) {

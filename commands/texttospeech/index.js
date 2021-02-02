@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Plays TTS on Supinic's stream, if enabled. You can specify the language by using \"language:<language>\" anywhere in your message.",
 	Flags: ["mention","pipe","skip-banphrase"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		const limit = 30_000;

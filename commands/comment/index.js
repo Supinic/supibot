@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Fetches a random comment from a set of 10 thousand randomly generated Youtube videos.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function comment () {

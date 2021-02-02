@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "For a given user, attempts to find the message they last sent in chat, plus the channel and time when they posted it.",
 	Flags: ["block","mention","opt-out","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function stalk (context, user) {

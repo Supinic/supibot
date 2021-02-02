@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Raise your dongers.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		dongers: [

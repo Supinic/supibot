@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 7500,
 	Description: "A collection of various Path of Exile related commands. Check the extended help on website for more info.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		this.data.labyrinth = {
@@ -49,14 +50,14 @@ module.exports = {
 								url: "https://poelab.com",
 								throwHttpErrors: false
 							});
-
+	
 							if (statusCode === 503) {
 								return {
 									success: false,
 									reply: `Poelab website returned error ${statusCode} - ${statusMessage}! Can't access labyrinth images.`
 								};
 							}
-
+	
 							const $ = sb.Utils.cheerio(html);
 							const links = Array.from($(".redLink").slice(0, 4).map((_, i) => i.attribs.href));
 	
@@ -256,7 +257,7 @@ module.exports = {
 						};
 					}
 				},
-
+	
 			]
 		};
 	}),

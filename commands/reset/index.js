@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 30000,
 	Description: "Tracks your last \"\"\"reset\"\"\".",
 	Flags: ["mention","pipe","system"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function reset (context, ...args) { 

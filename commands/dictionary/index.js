@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches the dictionary definition of a word. You can use \"lang:\" to specifiy a language, and if there are multiple definitions, you can add \"index:#\" with a number to access specific definition indexes.",
 	Flags: ["mention","non-nullable","pipe","use-params"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		languages: [
@@ -30,23 +31,23 @@ module.exports = {
 				reply: "No word provided!"
 			};
 		}
-
+	
 		const index = (typeof context.params.index !== "undefined")
 			? Number(context.params.index)
 			: 0;
-
+	
 		if (!sb.Utils.isValidInteger(index) || index > 100) {
 			return {
 				success: false,
 				reply: "Invalid index number provided!"
 			};
 		}
-
+	
 		const languageIdentifier = context.params.lang ?? context.params.language ?? "en";
 		const language = (languageIdentifier.length < 5)
 			? languageIdentifier
 			: sb.Utils.languageISO.getCode(languageIdentifier);
-
+	
 		if (!language) {
 			return {
 				success: false,

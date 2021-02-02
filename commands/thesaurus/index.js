@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 30000,
 	Description: "Attempts to re-created your sentence using random synonyms for each word. EXPERIMENTAL",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function thesaurus (context, ...words) {

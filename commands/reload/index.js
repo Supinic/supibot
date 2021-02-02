@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 0,
 	Description: "Reloads a database definition or hotloads an updated script",
 	Flags: ["pipe","skip-banphrase","system","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function reload (context, target, ...rest) {
@@ -47,7 +48,7 @@ module.exports = {
 	
 			default: return { reply: "Unrecognized module!" };
 		}
-
+	
 		sb.Master.reloaded = new sb.Date();
 	
 		return {

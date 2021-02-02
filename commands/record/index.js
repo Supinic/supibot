@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Checks for various max/min records of various sources.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		types: [
@@ -32,7 +33,7 @@ module.exports = {
 		type = type.toLowerCase();
 		target = target || context.user;
 		const userData = await sb.User.get(target);
-
+	
 		switch (type) {
 			case "afk":
 				if (userData.ID !== context.user.ID) {
@@ -78,7 +79,7 @@ module.exports = {
 					reply: `Currently, the most consistent cookie consumer is ${userData.Name} with ${cookies} daily cookies eaten.`
 				};
 			}
-
+	
 			default: return {
 				success: false,
 				reply: `Invalid type provided! Use one of these: ${types.join(", ")}`
@@ -91,17 +92,17 @@ module.exports = {
 			const aliases = (i.aliases.length > 0)
 				? `(${i.aliases.join(", ")})`
 				: "";
-
+	
 			return `<li><code>${i.name}${aliases}</code><br>${i.description}</li>`
 		});
-
+	
 		return [
 			"Checks for various max/min records of various sources within Supibot.",
 			"",
-
+	
 			`<code>${prefix}record (type)</code>`,
 			"For a given type, checks that specific record at the moment of command use.",
-
+	
 			"Types:",
 			"<ul>" + list.join("") + "</ul>"
 		];

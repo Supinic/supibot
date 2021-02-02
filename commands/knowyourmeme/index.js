@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 30000,
 	Description: "Gets a smol description of a meme from KnowYourMeme, it's just the summary.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function knowYourMeme (context, ...args) {

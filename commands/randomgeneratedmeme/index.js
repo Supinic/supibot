@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Posts the text of a randomly generated meme.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		memes: [
@@ -278,10 +279,10 @@ module.exports = {
 				.set("__tok", this.data.token)
 				.toString()
 		});
-
+	
 		if (!Array.isArray(data.texts)) {
 			console.warn("rgm no text", { statusCode, data });
-
+	
 			return {
 				success: false,
 				reply: "Could not fetch any text from this meme!"

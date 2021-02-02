@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Looks up an npm package with your given query, and posts a short description + link.",
 	Flags: ["developer","mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function npm (context, ...args) {

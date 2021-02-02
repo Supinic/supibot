@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Checks if a given message would be banphrased in a given channel. Checks the API banphrase (if it exists for given channel) and then the bot's banphrases as well.",
 	Flags: ["mention","non-nullable"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function banCheck (context, channel, ...rest) {

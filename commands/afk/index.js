@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Flags you as AFK. Supports a custom AFK message.",
 	Flags: ["pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		responses: {

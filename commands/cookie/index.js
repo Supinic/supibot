@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Open a random fortune cookie wisdom. Watch out - only one allowed per day, and no refunds! Daily reset occurs at midnight UTC.",
 	Flags: ["mention","pipe","rollback"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function cookie (context, check) {
@@ -32,7 +33,7 @@ module.exports = {
 			const tomorrow = new sb.Date().addDays(1);
 			const nextMidnight = new sb.Date(sb.Date.UTC(tomorrow.getUTCFullYear(), tomorrow.getUTCMonth(), tomorrow.getUTCDate()));
 			const delta = sb.Utils.timeDelta(nextMidnight);
-
+	
 			return {
 				reply: `You already opened or gifted a fortune cookie today. You can get another one at midnight UTC, which is ${delta}.`
 			};

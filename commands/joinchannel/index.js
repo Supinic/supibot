@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 0,
 	Description: "Adds a new channel to database, sets its tables and events, and joins it. Only applicable for Twitch channels (for now, at least).",
 	Flags: ["mention","pipe","system","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function joinChannel (context, channel, mode) {

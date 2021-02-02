@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Posts various statistics regarding you or other users, e.g. total afk time.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		types: [
@@ -38,14 +39,14 @@ module.exports = {
 					const targetUser = (user)
 						? await sb.User.get(user)
 						: context.user;
-
+	
 					if (!targetUser) {
 						return {
 							success: false,
 							reply: "Provided user does not exist!"
 						};
 					}
-
+	
 					const data = await sb.Query.getRecordset(rs => {
 						rs.select("COUNT(*) AS Amount")
 							.select("SUM(UNIX_TIMESTAMP(Ended) - UNIX_TIMESTAMP(Started)) AS Delta")
@@ -65,7 +66,7 @@ module.exports = {
 	
 						return rs;
 					});
-
+	
 					const who = (targetUser === context.user) ? "You have" : "That user has";
 					const target = (type === "total-afk") ? "(all combined)" : type;
 					if (!data?.Delta) {
@@ -329,7 +330,7 @@ module.exports = {
 						.where("User_From = %n", context.user.ID)
 						.single()
 					);
-
+	
 					return {
 						reply: sb.Utils.tag.trim `
 							So far, you have created ${data.Unscheduled} direct reminders

@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Posts a random Anthony \"Obama Chavez\" Stone quote, mostly from Knaked Knights and the snippets from IWF 2017.",
 	Flags: ["mention","pipe","skip-banphrase"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		quotes: [

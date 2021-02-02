@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Trucks the target user into bed. KKona",
 	Flags: ["opt-out","pipe","skip-banphrase"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function truck (context, target) {

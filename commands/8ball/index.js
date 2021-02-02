@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 30000,
 	Description: "Checks your question against the fortune-telling 8-ball.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		responses: [

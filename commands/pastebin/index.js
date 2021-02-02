@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 20000,
 	Description: "Takes the result of a different command (pipe-only) and posts a Pastebin paste with it.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function pastebin (context, ...args) {

@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Sets a notify for a given user. Can also set a time to ping that user (or yourself) in given amount of time, but in that case you must use the word \"in\" and then a number specifying the amount days, hours, minutes, etc.",
 	Flags: ["block","mention","opt-out","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		strings: {
@@ -114,14 +115,14 @@ module.exports = {
 			if (timeData.ranges.length > 0) {
 				const continueRegex = /^((\s*and\s*)|[\s\W]+)$/;
 				let continues = false;
-
+	
 				for (let i = 0; i < timeData.ranges.length; i++) {
 					// If the preceding text doesn't contain the word "in" right before the time range, skip it.
 					const precedingText = reminderText.slice(0, timeData.ranges[i].start);
 					if (!continues && !precedingText.match(/\bin\b\s*$/)) {
 						continue;
 					}
-
+	
 					continues = false;
 					const current = timeData.ranges[i];
 					const next = timeData.ranges[i + 1];
@@ -134,13 +135,13 @@ module.exports = {
 					const between = (next)
 						? reminderText.slice(current.end, next.start)
 						: "";
-
+	
 					// Remove the possible preceding "in" keyword, regardless of which range it is used in
 					const keywordIndex = reminderText.slice(0, current.start).lastIndexOf("in");
 					if (current.start - keywordIndex === 3) {
 						reminderText = reminderText.slice(0, keywordIndex) + "\x00".repeat(3) + reminderText.slice(current.start);
 					}
-
+	
 					// and only continue if it matches a "time word separator", such as the word "and", space, comma, ...
 					if (!continueRegex.test(between)) {
 						reminderText = reminderText.slice(0, current.start) + reminderText.slice(current.end);

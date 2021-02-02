@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Blocks, or unblocks a specified user from using a specified command with you as the target. You can also set a channel, or platform for the block to be active on.",
 	Flags: ["mention"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function block (context, ...args) {
@@ -174,17 +175,17 @@ module.exports = {
 		return [
 			"Blocks a specified user from using the specified command with you as the parameter",
 			"",
-
+	
 			`<code><u>Simple mode</u></code>`,
 			`<code>${prefix}block Kappa rl</code>`,
 			`Blocks the user Kappa from using the command rl on you. They can't do <code>$rl (you)</code>`,
 			"",
-
+	
 			`<code><u>Total mode</u></code>`,
 			`<code>${prefix}block Kappa all</code>`,
 			`Blocks user Kappa from all current and future commands that support blocking people.`,
 			"",
-
+	
 			`<code><u>Advanced mode</u></code>`,
 			`<code>${prefix}block user:(usr) channel:(chn) command:(cmd) platform:(p)</code>`,
 			`Will opt you out from a specified combination of channel/command/platform.`,

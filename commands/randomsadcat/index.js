@@ -4,7 +4,8 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Posts a random sad cat image SadCat",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		this.data.previousPosts = [];

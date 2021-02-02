@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "For a given user, this command tells you when they were last seen - based on their chat activity.",
 	Flags: ["block","mention","opt-out","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function lastSeen (context, user) {

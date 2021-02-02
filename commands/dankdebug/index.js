@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Debug command for public use, which means it's quite limited because of security.",
 	Flags: ["mention","pipe","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function dankDebug (context, ...args) {

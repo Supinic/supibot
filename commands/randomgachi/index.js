@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Fetches a random gachi track from the gachi list, excluding Bilibili and Nicovideo videos with no Youtube reuploads",
 	Flags: ["link-only","mention","non-nullable","pipe","use-params"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomGachi (context) {
@@ -15,14 +16,14 @@ module.exports = {
 		const userFavourites = (targetUserFavourite)
 			? await sb.User.get(targetUserFavourite)
 			: null;
-
+	
 		if (targetUserFavourite && !userFavourites) {
 			return {
 				success: false,
 				reply: "No such user exists!"
 			};
 		}
-
+	
 		const data = await sb.Query.getRecordset(rs => {
 			rs.select("Track.ID AS TrackID, Track.Name AS TrackName, Track.Link AS TrackLink")
 				.select("GROUP_CONCAT(Author.Name SEPARATOR ',') AS Authors")

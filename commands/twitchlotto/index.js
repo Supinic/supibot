@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches a random Imgur image from a Twitch channel (based off Twitchlotto) and checks it for NSFW stuff via an AI. The \"nudity score\" is posted along with the link.",
 	Flags: ["mention","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		this.data.counts = {};
@@ -206,10 +207,10 @@ module.exports = {
 			const strings = elements.map(i => `${replacement} (${Math.round(i.confidence * 100)}%)`);
 			detectionsString.push(...strings);
 		}
-
+	
 		const blacklistedFlags = context.channel?.Data.twitchLottoBlacklistedFlags ?? [];
 		const imageFlags = image.Adult_Flags ?? [];
-
+	
 		const illegalFlags = imageFlags.map(i => i.toLowerCase()).filter(i => blacklistedFlags.includes(i));
 		if (illegalFlags.length > 0) {
 			return {
@@ -217,11 +218,11 @@ module.exports = {
 				reply: "Cannot post image! These flags are blacklisted: " + illegalFlags.join(", ")
 			};
 		}
-
+	
 		await this.setCacheData(this.staticData.createRecentUseCacheKey(context), image.Link, {
 			expiry: 600_000
 		});
-
+	
 		const flagsString = (image.Adult_Flags)
 			? `Manual NSFW flags: ${image.Adult_Flags.join(", ")}`
 			: "";

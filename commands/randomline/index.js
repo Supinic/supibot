@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 7500,
 	Description: "Fetches a random line from the current channel. If a user is specified, fetches a random line from that user only",
 	Flags: ["block","opt-out","pipe","use-params"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomLine (context, user) {
@@ -188,12 +189,12 @@ module.exports = {
 				);
 			}
 		}
-
+	
 		const partialReplies = [{
 			bancheck: true,
 			message: result.Text
 		}];
-
+	
 		// Only add the "(time ago) name:" part if it was not requested to skip it
 		if (context.params.textOnly !== "true") {
 			partialReplies.unshift(
@@ -207,7 +208,7 @@ module.exports = {
 				}
 			);
 		}
-
+	
 		return {
 			partialReplies
 		};
@@ -228,7 +229,7 @@ module.exports = {
 		`<code>${prefix}rq</code>`,
 		"Random message from yourself only",
 		"",
-
+	
 		`<code>${prefix}rl (user) textOnly:true</code>`,
 		`Will only reply with the message, ignoring the "(time ago) (name):" part`,
 		"",

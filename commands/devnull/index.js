@@ -4,7 +4,8 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 0,
 	Description: "Discards all output. Only usable in pipes.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention","non-nullable","opt-out","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function devnull (context) {

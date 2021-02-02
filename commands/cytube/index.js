@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Posts the link to channel's cytube",
 	Flags: ["mention","pipe","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function cytube () {

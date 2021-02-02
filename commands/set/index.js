@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Sets/unsets certain variables within Supibot. Check the extended help for full info.",
 	Flags: ["mention","owner-override"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		const birthdayRegex = /(\d+)[.\-/\s]+(\w{3})/i;
@@ -12,10 +13,10 @@ module.exports = {
 			day: "numeric",
 			month: "long"
 		});
-
+	
 		const timersLimit = 5;
 		const timerNameRegex = /^[-\w\u00a9\u00ae\u2000-\u3300\ud83c\ud000-\udfff\ud83d\ud000-\udfff\ud83e\ud000-\udfff]{2,25}$/;
-
+	
 		const availableFlags = ["anime", "animal", "disfigured", "disturbing", "drawn", "furry", "gore", "hentai", "human", "language", "none", "porn", "scat", "softcore"];
 		const handleAmbassadors = async (type, context, ...args) => {
 			const [user, channel = context.channel?.Name] = args;
@@ -454,11 +455,11 @@ module.exports = {
 								reply: `No link provided!`
 							};
 						}
-
+	
 						if (link.toLowerCase() === "last") {
 							const tl = sb.Command.get("tl");
 							const key = tl.staticData.createRecentUseCacheKey(context);
-
+	
 							const cacheData = await tl.getCacheData(key);
 							if (!cacheData) {
 								return {
@@ -470,7 +471,7 @@ module.exports = {
 								link = cacheData;
 							}
 						}
-
+	
 						flags = flags.filter(i => availableFlags.includes(i.toLowerCase()));
 						if (flags.length === 0) {
 							return {
@@ -526,7 +527,7 @@ module.exports = {
 								reply: "You cannot use the command here!"
 							};
 						}
-
+	
 						// const flagger = Boolean(context.user.Data.trustedTwitchLottoFlagger); // skipped for now
 						const ambassador = context.channel.isUserAmbassador(context.user);
 						const owner = context.channel.isUserChannelOwner(context.user);
@@ -542,7 +543,7 @@ module.exports = {
 								reply: `If you want to remove all flags, use $unset instead!`
 							};
 						}
-
+	
 						const suitableFlags = flags.filter(i => availableFlags.includes(i.toLowerCase()));
 						if (suitableFlags.length === 0) {
 							return {
@@ -550,10 +551,10 @@ module.exports = {
 								reply: `No suitable flags provided! Here's the list: ${availableFlags.join(", ")}`
 							};
 						}
-
+	
 						context.channel.Data.twitchLottoBlacklistedFlags = suitableFlags.map(i => i.toLowerCase());
 						await context.channel.saveProperty("Data");
-
+	
 						return {
 							reply: `Blacklisted flags successfully updated for this channel.`
 						};
@@ -565,7 +566,7 @@ module.exports = {
 								reply: "You cannot use the command here!"
 							};
 						}
-
+	
 						// const flagger = Boolean(context.user.Data.trustedTwitchLottoFlagger); // skipped for now
 						const ambassador = context.channel.isUserAmbassador(context.user);
 						const owner = context.channel.isUserChannelOwner(context.user);
@@ -575,10 +576,10 @@ module.exports = {
 								reply: `You cannot do that here!`
 							};
 						}
-
+	
 						context.channel.Data.twitchLottoBlacklistedFlags = [];
 						await context.channel.saveProperty("Data");
-
+	
 						return {
 							reply: `Blacklisted flags successfully removed.`
 						};
@@ -593,7 +594,7 @@ module.exports = {
 						if (!context.user.Data.timers) {
 							context.user.Data.timers = {};
 						}
-
+	
 						const { timers } = context.user.Data;
 						const name = args[0];
 						const date = new sb.Date(args.slice(1, 2).filter(Boolean).join(" "));
@@ -603,30 +604,30 @@ module.exports = {
 								reply: `Your timer name is not valid! Your timer name should only contain letters, numbers and be 2-25 characters long.`
 							};
 						}
-
+	
 						let timersCount = Object.keys(timers).length;
 						if (!timers[name]) {
 							timersCount += 1;
 						}
-
+	
 						if (timersCount > timersLimit) {
 							return {
 								success: false,
 								reply: `You have too many timers set up! Unset one first.`
 							};
 						}
-
+	
 						if (Number.isNaN(date.valueOf())) {
 							return {
 								success: false,
 								reply: `Invalid date and/or time!`
 							};
 						}
-
+	
 						timers[name] = {
 							date: date.valueOf()
 						};
-
+	
 						await context.user.saveProperty("Data");
 						return {
 							reply: `Successfully added your timer "${name}".`
@@ -646,7 +647,7 @@ module.exports = {
 								reply: `You don't have this timer set up!`
 							};
 						}
-
+	
 						delete timers[name];
 						await context.user.saveProperty("Data");
 						return {
@@ -709,7 +710,7 @@ module.exports = {
 					reply: "At least one item must be provided!"
 				};
 			}
-
+	
 			let IDs = args.map(i => Number(i)).filter(Boolean);
 			if (args[0] === "last") {
 				if (typeof target.getLastID !== "function") {
@@ -718,7 +719,7 @@ module.exports = {
 						reply: `You cannot use the keyword "last" while ${invocation}ting a ${type}!`
 					};
 				}
-
+	
 				const lastID = await target.getLastID(context);
 				if (typeof lastID !== "number") {
 					return {
@@ -726,17 +727,17 @@ module.exports = {
 						reply: `You don't have any active ${type}s to be ${invocation}!`
 					};
 				}
-
+	
 				IDs = [lastID];
 			}
-
+	
 			if (IDs.length > 1 && invocation === "set") {
 				return {
 					success: false,
 					reply: "Cannot set more than one item at a time!"
 				};
 			}
-
+	
 			const results = [];
 			for (const ID of IDs) {
 				if (!sb.Utils.isValidInteger(ID)) {
@@ -745,14 +746,14 @@ module.exports = {
 						success: false,
 						reply: `Provided ID is not a valid number!`
 					});
-
+	
 					continue;
 				}
-
+	
 				const subResult = await target[invocation](context, ID);
 				results.push({ ID, ...subResult });
 			}
-
+	
 			if (results.length === 0) {
 				return await target[invocation](context);
 			}
@@ -770,7 +771,7 @@ module.exports = {
 				const failString = (fail.length > 0)
 					? `Fail: ${invocation}ting IDs ${fail.map(i => i.ID).join(", ")}.`
 					: "";
-
+	
 				return {
 					reply: [successString, failString].filter(Boolean).join(" ")
 				};

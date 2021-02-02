@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Posts GitHub repository links for Supibot and the website. If you add anything afterwards, a search will be executed for your query on the bot repository.",
 	Flags: ["developer","mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function github (context, ...args) { 

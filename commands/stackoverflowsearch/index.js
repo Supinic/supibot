@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Searches SO for relevant questions and answers.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function stackOverflowSearch (context, ...args) {

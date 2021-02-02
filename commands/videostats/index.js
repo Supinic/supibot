@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Post the statistics about a given bare video link (means, just the ID and not the entire link) in a given Cytube room.",
 	Flags: ["mention","non-nullable","pipe","whitelist"],
+	Params: null,
 	Whitelist_Response: "Video statistics are only available in Cytube rooms.",
 	Static_Data: null,
 	Code: (async function videoStats (context, link) {

@@ -5,13 +5,14 @@ module.exports = {
 	Cooldown: 20000,
 	Description: "Tucks target user to bed",
 	Flags: ["opt-out","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function tuck (context, user, ...args) {
 		if (!user) {
 			user = context.user.Name;
 		}
-
+	
 		const emote = args.pop() ?? null;
 		user = user.replace(/^@/, "");
 		const checkUser = user.toLowerCase() ?? null;

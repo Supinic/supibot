@@ -5,10 +5,11 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches short articles. You can use a 2 character ISO code to get country specific news, or any other word as a search query.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		codeRegex: /^[a-z]{2}$/i,
-
+	
 		definitions: [
 			{
 				code: "fi",
@@ -271,7 +272,7 @@ module.exports = {
 				],
 			},
 		],
-
+	
 		extra: {
 			exists: (code) => Boolean(this.staticData.definitions.find(i => i.code === code.toLowerCase())),
 	
@@ -280,19 +281,19 @@ module.exports = {
 				if (!news) {
 					throw new sb.Error({ message: "Extra news code does not exist!" });
 				}
-
+	
 				const source = sb.Utils.randArray(news.sources);
 				const cacheKey = `${news.code}-${source.name}`;
-
+	
 				let cacheExists = true;
 				let articles = await sb.Cache.getByPrefix(this.getCacheKey(), { keys: { cacheKey } });
 				if (!articles) {
 					cacheExists = false;
-
+	
 					const endpoint = sb.Utils.randArray(source.endpoints);
 					const url = [source.url, source.path, endpoint].filter(Boolean).join("/");
 					const feed = await sb.Utils.parseRSS(url);
-
+	
 					articles = feed.items.map(i => ({
 						title: i.title,
 						content: i.content,
@@ -300,22 +301,22 @@ module.exports = {
 						published: new sb.Date(i.pubDate).valueOf()
 					}));
 				}
-
+	
 				if (!cacheExists) {
 					await sb.Cache.setByPrefix(this.getCacheKey(), articles, {
 						keys: { cacheKey },
 						expiry: 36e5
 					});
 				}
-
+	
 				if (query) {
 					query = query.toLowerCase();
-
+	
 					const filteredArticles = articles.filter(i => (
 						(i.title?.toLowerCase().includes(query))
 						|| (i.content?.toLowerCase().includes(query))
 					));
-
+	
 					return sb.Utils.randArray(filteredArticles);
 				}
 				else {
@@ -346,7 +347,7 @@ module.exports = {
 				reply: sb.Utils.removeHTML(`${title}${separator}${content} ${delta}`)
 			};
 		}
-
+	
 		let availableLanguages = await sb.Cache.getByPrefix(this);
 		if (!availableLanguages) {
 			const { languages } = await sb.Got({
@@ -356,13 +357,13 @@ module.exports = {
 				},
 				responseType: "json"
 			}).json();
-
+	
 			availableLanguages = Object.keys(languages).map(i => i.toLowerCase());
 			await sb.Cache.setByPrefix(this, availableLanguages, {
 				expiry: 7 * 864e5
 			});
 		}
-
+	
 		const params = new sb.URLParams();
 		if (rest[0] && codeRegex.test(rest[0])) {
 			const languageDescriptor = sb.Utils.languageISO.get(rest[0]);
@@ -372,7 +373,7 @@ module.exports = {
 					reply: "Provided language does not exist!"
 				};
 			}
-
+	
 			const languageName = languageDescriptor.names[0];
 			if (!availableLanguages.includes(languageName)) {
 				return {
@@ -380,18 +381,18 @@ module.exports = {
 					reply: "Provided language is not supported!"
 				};
 			}
-
+	
 			rest.splice(0, 1);
 			params.set("language", languageDescriptor.iso6391);
 		}
 		else {
 			params.set("language", "en");
 		}
-
+	
 		if (rest.length > 0) {
 			params.set("keywords", rest.join(" "));
 		}
-
+	
 		let response;
 		try {
 			response = await sb.Got({
@@ -417,7 +418,7 @@ module.exports = {
 				throw e;
 			}
 		}
-
+	
 		const { statusCode, body: data } = response;
 		if (statusCode !== 200) {
 			throw new sb.errors.APIError({
@@ -426,7 +427,7 @@ module.exports = {
 				apiName: "CurrentsAPI"
 			}); 
 		}
-
+	
 		const { news } = data;
 		if (!news) {
 			return {
@@ -453,18 +454,18 @@ module.exports = {
 		const { definitions } = values.getStaticData();
 		const extraNews = definitions.sort((a, b) => a.code.localeCompare(b.code)).map(def => {
 			const { code, language, sources } = def;
-
+	
 			const links = [];
 			const helpers = [];
 			for (const source of sources) {
 				links.push(`<a href="${source.url}">${source.name}</a>`);
 				helpers.push(...source.helpers);
 			}
-
+	
 			const uniqueHelpers = (helpers.length > 0)
 				? [...new Set(helpers)].join(", ")
 				: "N/A";
-
+	
 			return sb.Utils.tag.trim `
 				<tr>
 					<td>${code.toUpperCase()}</td>

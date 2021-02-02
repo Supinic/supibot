@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Randomly creates fake news headlines from existing presets. These are not real, and are supposed to be light-hearted and just a joke. Don't take them seriously.",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		this.data.previousHeadlines = [];

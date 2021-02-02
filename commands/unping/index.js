@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Sets/unsets a command pinging you when it's being invoked.",
 	Flags: ["mention"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function unping (context, ...args) {

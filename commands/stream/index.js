@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 0,
 	Description: "Multiple configurations regarding the stream. Mostly used for #supinic, and nobody else.",
 	Flags: ["mention","pipe","system","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function stream (context, type, ...rest) {

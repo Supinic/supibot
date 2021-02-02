@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches the first channel you or someone else have ever followed on Twitch.",
 	Flags: ["mention","non-nullable","opt-out","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function firstFollowedChannel (context, target) {
@@ -25,11 +26,11 @@ module.exports = {
 				.set("sortby", "created_at")
 				.toString()
 		}).json();
-
+	
 		const who = (!target || context.user.Name === target.toLowerCase())
 			? "you"
 			: "they";
-
+	
 		if (follows.length === 0) {
 			return {
 				reply: `${sb.Utils.capitalize(who)} don't follow anyone.`

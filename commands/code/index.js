@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Posts a link to a specific command's code definition on supinic.com website.",
 	Flags: ["developer","mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function code (context, commandString) {

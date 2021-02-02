@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Pulls a random post from a random board, or a specified one, if you provide it.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		replacements: [

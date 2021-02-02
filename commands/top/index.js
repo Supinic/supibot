@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 60000,
 	Description: "Posts the top X (implicitly 10) users by chat lines sent in the context of current channel.",
 	Flags: ["mention"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function top (context, rawLimit) {
@@ -18,7 +19,7 @@ module.exports = {
 				reply: `You're not allowed to use this command here! Only administrators, channel owners and channel ambassadors can.`
 			};
 		}
-
+	
 		const limit = Number(rawLimit);
 		if (!sb.Utils.isValidInteger(limit)) {
 			return {

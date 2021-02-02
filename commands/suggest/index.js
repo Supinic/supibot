@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 60000,
 	Description: "Suggest something for Supinic. When you post your first suggestion, you will automatically receive reminders when your suggestions get updated. Posts links to a suggestion list if you don't provide any text. To remove, check the $unset command.",
 	Flags: ["mention","skip-banphrase"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function suggest (context, ...args) {
@@ -49,7 +50,7 @@ module.exports = {
 			await row.save();
 			subscribed = "You will now receive reminders when your suggestions get updated - you can use the $unsubscribe command to remove this. "
 		}
-
+	
 		const link = `https://supinic.com/data/suggestion/${row.values.ID}`;
 		const emote = (context.platform.Name === "twitch")
 			? "BroBalt"

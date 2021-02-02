@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Searches for a meal recipe by its name, or fetches a random one, if no search query was provided.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomMeal (context, ...args) {

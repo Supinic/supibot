@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Tells you when your command is going to be played next, approximately.",
 	Flags: ["mention","pipe","whitelist"],
+	Params: null,
 	Whitelist_Response: "Only available in channels with VLC API configured!",
 	Static_Data: null,
 	Code: (async function when (context) {

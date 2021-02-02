@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Kisses target user.",
 	Flags: ["opt-out","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		emojis: ["👩‍❤️‍💋‍👨", "💋", "😗", "👩‍❤️‍💋‍👨", "😙", "😚", "😽", "💋😳", "👨‍❤️‍💋‍👨"]

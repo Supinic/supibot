@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Posts the target user's last chat line in the context of the current channel, and the date they sent it.",
 	Flags: ["mention","opt-out","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function lastLine (context, user) {

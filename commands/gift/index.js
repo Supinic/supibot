@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Gifts a certain something to someone else. Right now, supported parameters are: \"cookie\" - gifts your cooldown for a cookie to someone else!",
 	Flags: ["mention","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function gift (context, type, target) {
@@ -37,13 +38,13 @@ module.exports = {
 						reply: "I appreciate the gesture, but thanks, I don't eat sweets :)"
 					};
 				}
-
+	
 				const sourceUser = await sb.Query.getRow("chat_data", "Extra_User_Data");
 				await sourceUser.load(context.user.ID, true);
 				if (!sourceUser.loaded) {
 					await sourceUser.save();
 				}
-
+	
 				if (targetUserData === context.user) {
 					return {
 						reply: (sourceUser.values.Cookie_Today)
@@ -51,7 +52,7 @@ module.exports = {
 							: "Okay, so you pass the cookie from one hand to the other... Now what?"
 					};
 				}
-
+	
 				const targetUser = await sb.Query.getRow("chat_data", "Extra_User_Data");
 				await targetUser.load(targetUserData.ID, true);
 				if (!targetUser.loaded) {

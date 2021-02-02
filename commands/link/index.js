@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Verifies your account linking challenge across platforms. You should only ever use this command if you are prompted to.",
 	Flags: ["mention","system"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function link (context, challengeString) {

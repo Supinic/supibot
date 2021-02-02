@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Makes it so you cannot be the target of a command - the command will not be executed at all. For detailed usage, please check the extended help.",
 	Flags: ["mention","skip-banphrase"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function optOut (context, ...args) {

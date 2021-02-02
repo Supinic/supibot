@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Posts a random album.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		// Borrowed from https://codepen.io/bobhami/pen/gwAJNp
@@ -15,7 +16,7 @@ module.exports = {
 	})),
 	Code: (async function randomAlbum () {
 		const { accessToken, minID, maxID, maxRetries } = this.staticData;
-
+	
 		let data;
 		let retries = 0;
 		while (!data && retries < maxRetries) {
@@ -28,26 +29,26 @@ module.exports = {
 					.set("access_token", accessToken)
 					.toString()
 			});
-
+	
 			retries++;
 			if (statusCode === 200) {
 				data = albumData;
 			}
 		}
-
+	
 		if (retries >= maxRetries) {
 			return {
 				success: false,
 				reply: "Maximum amount of retries exceeded!"
 			};
 		}
-
+	
 		const { album } = data.response;
 		const { artist, url } = album;
 		const releaseYear = (album.release_date)
 			? new sb.Date(album.release_date).year
 			: "(unknown)";
-
+	
 		return {
 			reply: `Your random album: ${album.name} by ${artist.name}, released in ${releaseYear}. More info here: ${url}`
 		};

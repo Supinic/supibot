@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 60000,
 	Description: "Creates a pyramid in chat. Only usable in chats where Supibot is a VIP or a Moderator.",
 	Flags: ["whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function pyramid (context, emote, size) {

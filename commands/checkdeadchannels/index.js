@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 0,
 	Description: "Iterates over active channels, takes the last posted message in each, and prints the dates + messages into a Pastebin paste. This is useful to determine if and which channels could potentially be removed from the bot because of prolonged inactivity.",
 	Flags: ["pipe","skip-banphrase","system","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function checkDeadChannels () {

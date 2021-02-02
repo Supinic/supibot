@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches the latest price of a cryptocurrency.",
 	Flags: ["mention","non-nullable","pipe"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function crypto (context, symbol = "BTC") {
@@ -31,7 +32,7 @@ module.exports = {
 		else {
 			const usd = (data.USD) ? `$${data.USD}` : "";
 			const eur = (data.EUR) ? `€${data.EUR}` : "";
-
+	
 			return {
 				reply: `Current price of ${symbol}: ${usd} ${eur}`
 			};

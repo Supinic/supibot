@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 0,
 	Description: "Iterates over eligible Twitch channel, finds online streams and posts a summary to Pastebin. Used to find a good raid after a stream is finished.",
 	Flags: ["developer","pipe","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		viewerThreshold: 100,

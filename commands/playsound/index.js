@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Plays a sound on supinic stream, if enabled. Use \"list\" as an argument to see the list of available playsounds.",
 	Flags: ["mention","pipe","whitelist"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		this.data.cooldowns = {};	

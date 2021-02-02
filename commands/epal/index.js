@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches a random person from epal.gg - post their description. If used on supinic's channel with TTS on, and if they have an audio introduction, it will be played on stream.",
 	Flags: ["mention","use-params"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function epal (context) {
@@ -15,18 +16,18 @@ module.exports = {
 				responseType: "json",
 				url: "https://play.epal.gg/web/product-type/list-by-user-online-games"
 			});
-
+	
 			games = response.body.content.map(i => ({
 				ID: i.id,
 				name: i.name,
 				gameID: i.gameNum
 			}));
-
+	
 			await this.setCacheData({ type: "games" }, games, {
 				expiry: 7 * 864e5 // 1 day
 			});
 		}
-
+	
 		let gameData = sb.Utils.randArray(games);
 		if (context.params.game) {
 			const gameNameList = games.map(i => i.name);
@@ -34,17 +35,17 @@ module.exports = {
 				fullResult: true,
 				ignoreCase: true
 			});
-
+	
 			if (bestMatch.score === 0) {
 				return {
 					success: false,
 					reply: "No matching game could be found!"
 				};
 			}
-
+	
 			gameData = games.find(i => i.name === bestMatch.original);
 		}
-
+	
 		let selectedSex = "1";
 		if (context.params.gender || context.params.sex) {
 			const gender = (context.params.gender ?? context.params.sex).toLowerCase();
@@ -61,7 +62,7 @@ module.exports = {
 				};
 			}
 		}
-
+	
 		const profileKey = { gameID: gameData.ID, sex: selectedSex };
 		let profilesData = await this.getCacheData(profileKey);
 		if (!profilesData) {
@@ -76,7 +77,7 @@ module.exports = {
 					productType: gameData.ID
 				}
 			});
-
+	
 			profilesData = response.body.content.map(i => ({
 				ID: i.userId,
 				level: i.userLevel,
@@ -99,17 +100,17 @@ module.exports = {
 						: null
 				}
 			}));
-
+	
 			await this.setCacheData(profileKey, profilesData, { expiry: 864e5 });
 		}
-
+	
 		if (profilesData.length === 0) {
 			return {
 				success: false,
 				reply: "This game/gender combination has no active profiles!"
 			};
 		}
-
+	
 		const ttsData = sb.Command.get("tts").data;
 		const {
 			audioFile,
@@ -120,19 +121,19 @@ module.exports = {
 			revenue,
 			price
 		} = sb.Utils.randArray(profilesData);
-
+	
 		if (context.channel?.ID === 38 && sb.Config.get("TTS_ENABLED") && !ttsData.pending) {
 			ttsData.pending = true;
-
+	
 			await sb.LocalRequest.playSpecialAudio({
 				url: audioFile,
 				volume: sb.Config.get("TTS_VOLUME"),
 				limit: 20_000
 			});
-
+	
 			ttsData.pending = false;
 		}
-
+	
 		let suffix = "";
 		let pronoun = "They";
 		let type = "(other)";
@@ -146,23 +147,23 @@ module.exports = {
 			pronoun = "She";
 			type = "(F)";
 		}
-
+	
 		const levelString = (gameLevel)
 			? `at level ${gameLevel}`
 			: "";
-
+	
 		const priceString = (price.discount)
 			? `$${price.discount} (${price.discountAmount} discount!) per ${price.unit}`
 			: `$${price.regular} per ${price.unit}`;
-
+	
 		const revenueString = (revenue !== null && revenue > 0)
 			? `Total revenue: $${revenue}`
 			: "";
-
+	
 		const languageString = (languages.length > 0)
 			? `${pronoun} speak${suffix} ${languages.join(", ")}.`
 			: "";
-
+	
 		return {
 			reply: sb.Utils.tag.trim `
 				${name} ${type} plays ${gameData.name} ${levelString} for ${priceString}.
@@ -175,7 +176,7 @@ module.exports = {
 	Dynamic_Description: (async (prefix, values) => {
 		const row = await sb.Query.getRow("chat_data", "Command");
 		await row.load(208);
-
+	
 		const gameData = await values.getCacheData({ type: "games" });
 		const games = (gameData)
 			? gameData.map(i => `<li><code>${i.name}</code></li>`).sort().join("")

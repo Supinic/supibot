@@ -5,6 +5,7 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Makes a specific command (or, in advanced mode, a combination of command/channel/platform, or global) not mention you by removing the \"username,\" part at the beginning.",
 	Flags: ["mention"],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function unmention (context, ...args) {
