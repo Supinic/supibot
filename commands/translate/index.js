@@ -7,7 +7,9 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "confidence", type: "boolean" },
-		{ name: "direction", type: "boolean" }
+		{ name: "direction", type: "boolean" },
+		{ name: "from", type: "string" },
+		{ name: "to", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
