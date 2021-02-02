@@ -850,7 +850,12 @@ module.exports = class Command extends require("./template.js") {
 			return Number(value);
 		}
 		else if (type === "boolean") {
-			return Boolean(value);
+			if (value === "true") {
+				return true;
+			}
+			else if (value === "false") {
+				return false;
+			}
 		}
 		else if (type === "date") {
 			return new sb.Date(value);
