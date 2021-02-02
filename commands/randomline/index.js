@@ -198,7 +198,7 @@ module.exports = {
 		}];
 	
 		// Only add the "(time ago) name:" part if it was not requested to skip it
-		if (context.params.textOnly !== "true") {
+		if (context.params.textOnly) {
 			partialReplies.unshift(
 				{
 					bancheck: false,
