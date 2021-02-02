@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "stock",
-	Aliases: ["stocks"],
+	Aliases: ["stocks", "stonks"],
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the latest price and daily change for a stock.",
