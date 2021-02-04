@@ -141,7 +141,10 @@ module.exports = class Reminder extends require("./template.js") {
                 else {
                     if (channelData === null) {
                         throw new sb.Error({
-                            message: "Cannot post a non-private reminder in an unspecified channel!"
+                            message: "Cannot post a non-private reminder in an unspecified channel!",
+                            args: {
+                                reminderID: this.ID
+                            }
                         })
                     }
 
