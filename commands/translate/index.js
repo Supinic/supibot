@@ -18,8 +18,8 @@ module.exports = {
 		const options = {
 			from: "auto",
 			to: "en",
-			direction: (!context.params.direction),
-			confidence: (!context.params.confidence)
+			direction: context.params.direction ?? true,
+			confidence: context.params.confidence ?? true
 		};
 	
 		for (const option of ["from", "to"]) {
