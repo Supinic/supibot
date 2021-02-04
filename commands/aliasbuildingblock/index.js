@@ -127,7 +127,7 @@ module.exports = {
             if (!type) {
                 return {
                     success: false,
-                    reply: `This command can only be used within aliases! Check help here: https//supinic.com/bot/command/${this.ID}`
+                    reply: `This command can only be used within aliases! Check help here: https://supinic.com/bot/command/${this.ID}`
                 };
             }
 
@@ -136,7 +136,7 @@ module.exports = {
             if (!block) {
                 return {
                     success: false,
-                    reply: `This command can only be used within aliases! Check help here: https//supinic.com/bot/command/${this.ID}`
+                    reply: `This command can only be used within aliases! Check help here: https://supinic.com/bot/command/${this.ID}`
                 };
             }
             else {
@@ -150,7 +150,7 @@ module.exports = {
         if (!type) {
             return {
                 success: false,
-                reply: `No block type provided! Check help here: https//supinic.com/bot/command/${this.ID}`
+                reply: `No block type provided! Check help here: https://supinic.com/bot/command/${this.ID}`
             };
         }
 
@@ -159,7 +159,7 @@ module.exports = {
         if (!block) {
             return {
                 success: false,
-                reply: `Incorrect block type provided! Check help here: https//supinic.com/bot/command/${this.ID}`
+                reply: `Incorrect block type provided! Check help here: https://supinic.com/bot/command/${this.ID}`
             };
         }
 
