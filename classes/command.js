@@ -476,7 +476,7 @@ module.exports = class Command extends require("./template.js") {
 			params: {}
 		};
 
-		const args = argumentArray
+		let args = argumentArray
 			.map(i => i.replace(sb.Config.get("WHITESPACE_REGEX"), ""))
 			.filter(Boolean);
 
@@ -488,14 +488,39 @@ module.exports = class Command extends require("./template.js") {
 
 		if (command.Params.length > 0) {
 			const paramNames = command.Params.map(i => i.name);
-			const paramRegex = new RegExp(`^(?<name>${paramNames.join("|")}):(?<value>.+)$`);
 
-			for (let i = args.length - 1; i >= 0; i--) {
-				if (!paramRegex.test(args[i])) {
+			let argsString = args.join(" ");
+			const quotesRegex = new RegExp(`(?<name>${paramNames.join("|")}):(?<!\\\\)"(?<value>.+?)(?<!\\\\)"`, "g");
+			const quoteMatches = [...argsString.matchAll(quotesRegex)];
+
+			for (const match of quoteMatches.reverse()) {
+				argsString = argsString.slice(0, match.index) + argsString.slice(match.index + match[0].length + 1);
+
+				const { name, value } = match.groups;
+				const { type } = command.Params.find(i => i.name === name);
+
+				if (name && value) {
+					const cleanValue = value.replace(/^"|"$/g, "").replace(/\\"/g, "\"");
+					const parsedValue = Command.parseParameter(cleanValue, type);
+					if (parsedValue === null) {
+						return {
+							success: false,
+							reply: `Cannot parse parameter "${name}"!`
+						};
+					}
+
+					context.params[name] = parsedValue;
+				}
+			}
+
+			const remainingArgs = argsString.split(" ");
+			const paramRegex = new RegExp(`^(?<name>${paramNames.join("|")}):(?<value>.+)$`);
+			for (let i = remainingArgs.length - 1; i >= 0; i--) {
+				if (!paramRegex.test(remainingArgs[i])) {
 					continue;
 				}
 
-				const { name, value } = args[i].match(paramRegex).groups;
+				const { name, value } = remainingArgs[i].match(paramRegex).groups;
 				const { type } = command.Params.find(i => i.name === name);
 
 				if (name && value) {
@@ -508,9 +533,11 @@ module.exports = class Command extends require("./template.js") {
 					}
 
 					context.params[name] = parsedValue;
-					args.splice(i, 1);
+					remainingArgs.splice(i, 1);
 				}
 			}
+
+			args = remainingArgs.filter(Boolean)
 		}
 
 		/** @type CommandResult */
