@@ -32,14 +32,16 @@ module.exports = {
 			};
 		}
 		else {
-			await sb.Platform.get("twitch").pm(
-				`Math command failed - server error ${statusCode} at ${sb.Date.now()}! monkaS`,
-				"leppunen"
-			);
+			if (statusCode >= 500) {
+				await sb.Platform.get("twitch").pm(
+					`Math command failed - server error ${statusCode} at ${sb.Date.now()}! monkaS`,
+					"leppunen"
+				);
+			}
 	
 			return {
 				success: false,
-				reply: `Math command failed due to server error ${statusCode}!`
+				reply: `Math command failed due to request error ${statusCode}!`
 			};
 		}
 	}),
