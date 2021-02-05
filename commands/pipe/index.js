@@ -117,7 +117,7 @@ module.exports = {
 	
 				return {
 					success: false,
-					reply: `Pipe will not continue, because command ${cmd} failed: ${reply}`
+					reply: `Pipe command ${cmd} failed: ${reply}`
 				};
 			}
 			else if (!result.reply) {
