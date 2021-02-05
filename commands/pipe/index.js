@@ -120,10 +120,10 @@ module.exports = {
 					reply: `Pipe will not continue, because command ${cmd} failed: ${reply}`
 				};
 			}
-			else if (!result.reply) { // Command result: Failed (ban)
+			else if (!result.reply) {
 				return {
 					success: false,
-					reply: "The final result of pipe is banphrased."
+					reply: "Empty pipe result!"
 				};
 			}
 			else if (resultsInPastebin) {
