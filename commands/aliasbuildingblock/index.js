@@ -91,7 +91,7 @@ module.exports = {
                     
                     let regex;
                     try {
-                        const string = "/h\\/i/g".replace(/^\/|\/$/g, "");
+                        const string = context.params.regex.replace(/^\/|\/$/g, "");
                         const lastSlashIndex = string.lastIndexOf("/");
 
                         const regexBody = (lastSlashIndex !== -1) ? string.slice(0, lastSlashIndex) : string;
