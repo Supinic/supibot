@@ -7,7 +7,9 @@ module.exports = {
     Flags: ["pipe","skip-banphrase"],
     Params: [
         { name: "em", type: "string" },
-        { name: "errorMessage", type: "string" }
+        { name: "errorMessage", type: "string" },
+        { name: "regex", type: "string" },
+        { name: "replacement", type: "string" },
     ],
     Whitelist_Response: null,
     Static_Data: (() => ({
@@ -74,6 +76,40 @@ module.exports = {
                 execute: (context, ...args) => ({
                     reply: args.join(" ").split("").join(" ").replace(/\s+/g, " ")
                 })
+            },
+            {
+                name: "replace",
+                aliases: [],
+                description: "Takes two params: regex, replacement. For the given regex, replaces all matches with the provided value.",
+                execute: (context, ...args) => {
+                    if (!context.params.regex || !context.params.replacement) {
+                        return {
+                            success: false,
+                            reply: `Missing parameter(s)! regex, replacement`
+                        };
+                    }
+                    
+                    let regex;
+                    try {
+                        const string = "/h\\/i/g".replace(/^\/|\/$/g, "");
+                        const lastSlashIndex = string.lastIndexOf("/");
+
+                        const regexBody = (lastSlashIndex !== -1) ? string.slice(0, lastSlashIndex) : string;
+                        const flags = (lastSlashIndex !== -1) ? string.slice(lastSlashIndex + 1) : "";
+
+                        regex = new RegExp(regexBody, flags);
+                    }
+                    catch (e) {
+                        return {
+                            success: false,
+                            reply: `Could not create regex! ${e.message}`
+                        };
+                    }
+
+                    return {
+                        reply: args.join(" ").replace(regex, context.params.replacement)
+                    };
+                }
             },
             {
                 name: "say",
