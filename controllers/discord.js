@@ -19,7 +19,14 @@ module.exports = class Discord extends require("./template.js") {
 			});
 		}
 
-		this.client = new (require("discord.js")).Client({ disableMentions: "everyone" });
+		const { Client, Intents } = require("discord.js");
+		const intents = new Intents();
+		intents.add("GUILD_MEMBERS");
+
+		this.client = new Client({
+			intents,
+			disableMentions: "everyone"
+		});
 
 		this.initListeners();
 
