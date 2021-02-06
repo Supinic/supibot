@@ -791,9 +791,15 @@ module.exports = class Twitch extends require("./template.js") {
 	}
 
 	async fetchUserList (channelIdentifier) {
-		const data = await sb.Got({
-			url: `https://tmi.twitch.tv/group/user/${channelIdentifier}/chatters`
+		const { statusCode, body: data } = await sb.Got({
+			url: `https://tmi.twitch.tv/group/user/${channelIdentifier}/chatters`,
+			responseType: "json",
+			throwHttpErrors: false
 		});
+
+		if (statusCode !== 200) {
+			return [];
+		}
 
 		return Object.values(data.chatters).flat();
 	}
