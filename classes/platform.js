@@ -193,7 +193,7 @@ module.exports = class Platform extends require("./template.js") {
 			return cacheData;
 		}
 
-		const userList = await this.client.fetchUserList(channelIdentifier);
+		const userList = await this.controller.fetchUserList(channelIdentifier);
 		await this.setCacheData(
 			{ channel: channelIdentifier },
 			userList,
