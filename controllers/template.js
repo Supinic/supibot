@@ -68,6 +68,12 @@ module.exports = class Controller {
 		}
 	}
 
+	fetchUserList () {
+		throw new sb.Error({
+			message: "Method not implemented"
+		});
+	}
+	
 	restart () { }
 
 	destroy () { }

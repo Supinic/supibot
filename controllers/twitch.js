@@ -790,6 +790,14 @@ module.exports = class Twitch extends require("./template.js") {
 		return null;
 	}
 
+	async fetchUserList (channelIdentifier) {
+		const data = await sb.Got({
+			url: `https://tmi.twitch.tv/group/user/${channelIdentifier}/chatters`
+		});
+
+		return Object.values(data.chatters).flat();
+	}
+
 	/**
 	 * Fetches a list of emote data for a given list of emote sets.
 	 * @param {string[]} sets

@@ -367,6 +367,13 @@ module.exports = class Discord extends require("./template.js") {
 		};
 	}
 
+	async fetchUserList (channelIdentifier) {
+		const channel = this.client.channels.cache.get(channelIdentifier);
+		await channel.guild.members.fetch();
+
+		return [...channel.members.values()].map(i => i.user.username);
+	}
+
 	static removeEmoteTags (message) {
 		return message.replace(/<a?:(.*?):(\d*)>/g, (total, emote) => emote + " ").trim();
 	}

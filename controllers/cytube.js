@@ -378,6 +378,10 @@ module.exports = class Cytube extends require("./template.js") {
 		});
 	}
 
+	async fetchUserList (channelIdentifier) {
+		return [...this.userMap.keys()];
+	}
+
 	/**
 	 * Closes the connection and sets up to create a new one
 	 */
