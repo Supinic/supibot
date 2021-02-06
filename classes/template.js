@@ -1,4 +1,6 @@
 module.exports = class ClassTemplate {
+	destroy () {}
+
 	async serialize (row, properties, options) {
 		const result = Object.entries(properties).map(([key, params]) => {
 			const prop = row.values[key];
