@@ -203,6 +203,10 @@ module.exports = class Platform extends require("./template.js") {
 		return userList;
 	}
 
+	getCacheKey () {
+		return `sb-platform-${this.Name}`;
+	}
+
 	get userMessagePromises () {
 		return this.#userMessagePromises;
 	}
