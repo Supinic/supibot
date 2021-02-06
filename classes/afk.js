@@ -71,6 +71,10 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			AwayFromKeyboard.data.splice(existingIndex, 1);
 		}
 
+		if (!row.values.Active) {
+			return;
+		}
+
 		const afk = new AwayFromKeyboard(row.valuesObject);
 		AwayFromKeyboard.data.push(afk);
 	}

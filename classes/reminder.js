@@ -239,6 +239,10 @@ module.exports = class Reminder extends require("./template.js") {
             Reminder.data.splice(existingIndex, 1);
         }
 
+        if (!row.values.Active) {
+            return;
+        }
+
         const reminder = new Reminder(row.valuesObject);
         reminder.activateTimeout();
         Reminder.data.push(reminder);
