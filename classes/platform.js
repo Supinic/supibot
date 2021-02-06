@@ -187,6 +187,22 @@ module.exports = class Platform extends require("./template.js") {
 		});
 	}
 
+	async fetchChannelUserList (channelIdentifier) {
+		const cacheData = await this.getCacheData({ channel: channelIdentifier });
+		if (cacheData) {
+			return cacheData;
+		}
+
+		const userList = await this.client.fetchUserList(channelIdentifier);
+		await this.setCacheData(
+			{ channel: channelIdentifier },
+			userList,
+			{ expiry: 5 * 60e3 } // 5min
+		);
+
+		return userList;
+	}
+
 	get userMessagePromises () {
 		return this.#userMessagePromises;
 	}

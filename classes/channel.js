@@ -321,6 +321,10 @@ module.exports = class Channel extends require("./template.js") {
         });
     }
 
+    async fetchUserList () {
+        return await this.platform.fetchUserList(this.Name);
+    }
+
     getCacheKey () {
         return `sb-channel-${this.ID}`;
     }
