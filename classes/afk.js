@@ -61,6 +61,20 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		AwayFromKeyboard.data = data.map(record => new AwayFromKeyboard(record));
 	}
 
+	static async reloadSpecific (ID) {
+		const row = await sb.Query.getRow("chat_data", "AFK");
+		await row.load(ID);
+
+		const existingIndex = AwayFromKeyboard.data.findIndex(i => i.ID === ID);
+		if (existingIndex !== -1) {
+			AwayFromKeyboard.data[existingIndex].destroy();
+			AwayFromKeyboard.data.splice(existingIndex, 1);
+		}
+
+		const afk = new AwayFromKeyboard(row.valuesObject);
+		AwayFromKeyboard.data.push(afk);
+	}
+
 	/**
 	 * Checks if an user is AFK.
 	 * If they are, returns their AFK data and unsets the AFK status.

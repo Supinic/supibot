@@ -229,6 +229,21 @@ module.exports = class Reminder extends require("./template.js") {
         return await super.reloadData();
     }
 
+    static async reloadSpecific (ID) {
+        const row = await sb.Query.getRow("chat_data", "Reminder");
+        await row.load(ID);
+
+        const existingIndex = Reminder.data.findIndex(i => i.ID === ID);
+        if (existingIndex !== -1) {
+            Reminder.data[existingIndex].destroy();
+            Reminder.data.splice(existingIndex, 1);
+        }
+
+        const reminder = new Reminder(row.valuesObject);
+        reminder.activateTimeout();
+        Reminder.data.push(reminder);
+    }
+
     static get (identifier) {
         if (identifier instanceof Reminder) {
             return identifier;
