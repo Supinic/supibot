@@ -24,7 +24,7 @@ module.exports = class Discord extends require("./template.js") {
 		intents.add("GUILD_MEMBERS");
 
 		this.client = new Client({
-			intents,
+			ws: { intents },
 			disableMentions: "everyone"
 		});
 
