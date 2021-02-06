@@ -368,8 +368,13 @@ module.exports = class Discord extends require("./template.js") {
 	}
 
 	async fetchUserList (channelIdentifier) {
-		const channel = this.client.channels.cache.get(channelIdentifier);
-		await channel.guild.members.fetch();
+		const channel = await this.client.channels.fetch(channelIdentifier);
+		const guild = await channel.guild.fetch();
+
+		await Promise.all([
+			guild.members.fetch(),
+			guild.roles.fetch()
+		]);
 
 		return [...channel.members.values()].map(i => i.user.username);
 	}
