@@ -21,7 +21,7 @@ module.exports = class Discord extends require("./template.js") {
 
 		const { Client, Intents } = require("discord.js");
 		const intents = new Intents();
-		intents.add("GUILD_MEMBERS");
+		intents.add(Intents.NON_PRIVILEGED, "GUILD_MEMBERS");
 
 		this.client = new Client({
 			ws: { intents },
