@@ -327,7 +327,12 @@ module.exports = class Twitch extends require("./template.js") {
 			});
 
 			scheduler.on("message", (msg) => {
-				this.client.say(channelName, msg);
+				try {
+					this.client.say(channelName, msg);
+				}
+				catch (e) {
+					console.debug("Twitch send error", e);
+				}
 			});
 
 			this.queues[channelName] = scheduler;
