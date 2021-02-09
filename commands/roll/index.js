@@ -5,21 +5,18 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Rolls a random number. If nothing is specified, rolls 1-100. You can specify min and max values, or some expression using standard dice notation.",
 	Flags: ["mention","pipe","skip-banphrase"],
-	Params: null,
+	Params: [
+		{ name: "textOnly", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function roll (context, ...args) {
-		if (args.length === 0) {
-			const result = sb.Utils.random(1, 100);
-			if (context.append.pipe) {
-				return { reply: String(result) };
-			} 
-			else {
-				return { reply: `Your roll is ${result}.` };
-			}
-		}
-	
 		let [first, second] = args;
+		if (args.length < 2) {
+			first = 1;
+			second = 100;
+		}
+
 		if (Number(first) && Number(second)) {
 			first = Number(first);
 			second = Number(second);
@@ -32,11 +29,15 @@ module.exports = {
 			}
 	
 			const number = sb.Utils.random(first, second);
-			if (context.append.pipe) {
-				return { reply: String(number) };
+			if (context.params.textOnly) {
+				return {
+					reply: String(number)
+				};
 			}
 			else {
-				return { reply: `Your specific roll (no dice) is ${number}.` };
+				return {
+					reply: `Your specific roll (no dice) is ${number}.`
+				};
 			}
 		}
 	
@@ -54,7 +55,7 @@ module.exports = {
 				reply: "INFINITY WAYTOODANK"
 			};
 		}
-		else if (context.append.pipe) {
+		else if (context.params.textOnly) {
 			return {
 				reply: String(result)
 			};
