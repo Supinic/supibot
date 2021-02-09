@@ -22,7 +22,7 @@ class CytubeClient {
 			host: "cytu.be",
 			port: 443,
 			secure: true,
-			user: this.platform.Self_Name,
+			user: this.controller.platform.Self_Name,
 			auth: sb.Config.get("CYTUBE_BOT_PASSWORD"),
 			chan: channelData.Name
 		});
@@ -253,7 +253,7 @@ class CytubeClient {
 		const channelData = this.channelData;
 		const userData = await sb.User.get(user, false);
 		const options = {
-			platform: this.platform,
+			platform: this.controller.platform,
 			privateMessage: Boolean(replyIntoPM)
 		};
 
