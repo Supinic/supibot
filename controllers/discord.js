@@ -1,4 +1,4 @@
-module.exports = class Discord extends require("./template.js") {
+module.exports = class DiscordController extends require("./template.js") {
 	constructor () {
 		super();
 
@@ -83,7 +83,7 @@ module.exports = class Discord extends require("./template.js") {
 							return;
 						}
 
-						const { challenge } = await Discord.createAccountChallenge(userData, discordID);
+						const { challenge } = await DiscordController.createAccountChallenge(userData, discordID);
 						userData.Data.discordChallengeNotificationSent = true;
 						await userData.saveProperty("Data");
 
@@ -199,7 +199,7 @@ module.exports = class Discord extends require("./template.js") {
 
 				this.handleCommand(
 					command,
-					args.map(i => Discord.removeEmoteTags(i)),
+					args.map(i => DiscordController.removeEmoteTags(i)),
 					channelData,
 					userData,
 					{
@@ -243,7 +243,7 @@ module.exports = class Discord extends require("./template.js") {
 				}
 			}
 
-			const mentionedUsers = await Discord.getMentionsInMessage(message);
+			const mentionedUsers = await DiscordController.getMentionsInMessage(message);
 			for (const user of mentionedUsers) {
 				if (user.Discord_ID) {
 					const regex = new RegExp("@" + user.Name, "gi");
@@ -354,7 +354,7 @@ module.exports = class Discord extends require("./template.js") {
 		}
 
 		return {
-			msg: Discord.removeEmoteTags(targetMessage.replace(/\s+/g, " ")),
+			msg: DiscordController.removeEmoteTags(targetMessage.replace(/\s+/g, " ")),
 			user: messageObject.author.username.toLowerCase().replace(/\s/g, "_"),
 			chan: messageObject.channel.id,
 			channelType: messageObject.channel.type,

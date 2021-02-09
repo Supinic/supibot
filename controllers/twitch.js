@@ -1,7 +1,7 @@
 const MessageScheduler = require("message-scheduler");
 const DankTwitch = require("dank-twitch-irc");
 
-module.exports = class Twitch extends require("./template.js") {
+module.exports = class TwitchController extends require("./template.js") {
 	constructor () {
 		super();
 
@@ -196,7 +196,7 @@ module.exports = class Twitch extends require("./template.js") {
 			const incomingEmoteSets = messageObject.emoteSets;
 			if (incomingEmoteSets.sort().join(",") !== this.availableEmoteSets.sort().join(",")) {
 				this.availableEmoteSets = incomingEmoteSets;
-				this.availableEmotes = await Twitch.fetchEmotes(this.availableEmoteSets);
+				this.availableEmotes = await TwitchController.fetchEmotes(this.availableEmoteSets);
 			}
 		});
 
