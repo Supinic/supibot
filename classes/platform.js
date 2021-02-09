@@ -145,12 +145,13 @@ module.exports = class Platform extends require("./template.js") {
 
 	/**
 	 * Sends a private message to a given user.
-	 * @param message
-	 * @param user
+	 * @param {string} message
+	 * @param {string} user
+	 * @param {string} [channel]
 	 * @returns {Promise<void>}
 	 */
-	pm (message, user) {
-		return this.#controller.pm(message, user);
+	pm (message, user, channel) {
+		return this.#controller.pm(message, user, channel);
 	}
 
 	destroy () {
