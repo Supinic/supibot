@@ -18,6 +18,11 @@ module.exports = {
                 name: "argumentsCheck",
                 aliases: ["ac", "argCheck"],
                 description: "Takes a number - expected amount of arguments as first argument. If the amount of actualy arguments is the same, simply returns output; if not, returns an error. You can specify a custom error message with the parameter em/errorMessage, where your underscores will be replaced by spaces.",
+                examples: [
+                    ["$abb argCheck 3 a b c", "a b c"],
+                    ["$abb argCheck 2 foo", "Error! Expected 2 arguments got 1"],
+                    ["$abb ac errorMessage:\"No I don't think so\" 2 foo", "Error! No I don't think so"],
+                ],
                 execute: (context, inputAmount, ...args) => {
                     const amount = Number(inputAmount);
                     if (!sb.Utils.isValidInteger(amount)) {
@@ -50,6 +55,9 @@ module.exports = {
                 name: "chatter",
                 aliases: [],
                 description: "Selects a random chatter within the channel, and outputs their name. Not applicable in PMs.",
+                examples: [
+                    ["$abb chatter", "supibot"]
+                ],
                 execute: async (context) => {
                     if (context.privateMessage) {
                         return {
@@ -73,6 +81,9 @@ module.exports = {
                 name: "explode",
                 aliases: [],
                 description: "Adds a space between all characters of the provided input - then, each one can be used as a specific argument.",
+                examples: [
+                    ["$abb explode this is a test", "t h i s i s a t e s t"]
+                ],
                 execute: (context, ...args) => ({
                     reply: args.join(" ").split("").join(" ").replace(/\s+/g, " ")
                 })
@@ -81,6 +92,10 @@ module.exports = {
                 name: "replace",
                 aliases: [],
                 description: "Takes two params: regex, replacement. For the given regex, replaces all matches with the provided value.",
+                examples: [
+                    ["$abb replace regex:/a+b/ replacement:lol aaaaaabbb", "lolbb"],
+                    ["$abb replace regex:/foo/ replacement:NaM Damn foo spam", "Damn NaM spam"],
+                ],
                 execute: (context, ...args) => {
                     if (!context.params.regex || !context.params.replacement) {
                         return {
@@ -115,6 +130,9 @@ module.exports = {
                 name: "say",
                 aliases: ["echo"],
                 description: "Simply outputs the input, with no changes.",
+                examples: [
+                    ["$abb say hello", "hello"],
+                ],
                 execute: (context, ...args) => ({
                     reply: args.join(" ")
                 })
@@ -183,9 +201,12 @@ module.exports = {
                 ? `(${i.aliases.join(", ")})`
                 : "";
 
-            return `<li><code>${i.name}${aliases}</code><br>${i.description}</li>`
-        });
+            const examples = (i.aliases.length > 0)
+                ? "<br><ul>" + i.aliases.map(j => `<li><code>${j[0]}</code> ➡ <code>${j[1]}<li>`).join("") + "</ul>"
+                : "";
 
+            return `<li><code>${i.name}${aliases}</code><br>${i.description}${examples}</li>`
+        });
 
         return [
             "This is a collection of smaller, simpler commands that are only usable within user-made aliases.",
