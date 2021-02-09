@@ -17,7 +17,9 @@ class CytubeClient {
 	 * @param {CytubeController} controller
 	 */
 	constructor (channelData, controller) {
+		this.channelData = channelData;
 		this.controller = controller;
+
 		this.client = new CytubeConnector({
 			host: "cytu.be",
 			port: 443,
