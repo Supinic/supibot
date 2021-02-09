@@ -1,58 +1,36 @@
-// @todo refactor Master and Cytube so that Cytube handles multiple channels, instead of Master managing that
-// @todo after this is done, create a common Client class all sub-clients extend
-
 const CytubeConnector = require("cytube-connector");
 
-module.exports = class Cytube extends require("./template.js") {
-	constructor () {
-		super();
+class CytubeClient {
+	client = null;
+	controller = null;
+	channelData = null;
+	playlistData = [];
+	currentlyPlaying = null;
+	restarting = false;
+	restartInterval = null;
 
-		this.platform = sb.Platform.get("cytube");
-		if (!this.platform) {
-			throw new sb.Error({
-				message: "Cytube platform has not been created"
-			});
-		}
-		else if (!sb.Config.has("CYTUBE_BOT_PASSWORD", true)) {
-			throw new sb.Error({
-				message: "Cytube password has not been configured"
-			});
-		}
+	/** @type {Map<string, CytubeUserPresence>} */
+	userMap = new Map();
 
-		const eligibleChannels = sb.Channel.getJoinableForPlatform(this.platform);
-		if (eligibleChannels.length > 1) {
-			throw new sb.Error({
-				message: "Too many Cytube rooms are set to be joined - current limit is 1"
-			});
-		}
-
-		// @todo change this
-		this.channelData = eligibleChannels[0];
-
+	/**
+	 * @param {Channel} channelData
+	 * @param {CytubeController} controller
+	 */
+	constructor (channelData, controller) {
+		this.controller = controller;
 		this.client = new CytubeConnector({
 			host: "cytu.be",
 			port: 443,
 			secure: true,
 			user: this.platform.Self_Name,
 			auth: sb.Config.get("CYTUBE_BOT_PASSWORD"),
-			chan: this.channelData.Name
+			chan: channelData.Name
 		});
 
-		this.restartInterval = null;
-		this.restartDelay = 60000;
-		this.restarting = false;
-
-		// @todo assign each channel to a separate "room"
-		this.channels = [];
-
-		this.userMap = new Map();
-		this.playlistData = [];
-		this.currentlyPlaying = null;
-
-		this.initListeners();
+		this.initClientListeners();
 	}
 
-	initListeners () {
+	initClientListeners () {
 		const client = this.client;
 
 		client.on("clientready", () => {
@@ -112,7 +90,7 @@ module.exports = class Cytube extends require("./template.js") {
 					message: msg,
 					user: null,
 					channel: this.channelData,
-					platform: this.platform,
+					platform: this.controller.platform,
 					raw: {
 						user: data.username
 					}
@@ -132,7 +110,7 @@ module.exports = class Cytube extends require("./template.js") {
 			if (!data.meta.private) {
 				// Do not process mirrored messages
 				const identifiers = sb.Platform.data.map(i => i.Mirror_Identifier);
-				if (originalUsername === this.platform.Self_Name && identifiers.includes(Array.from(msg)[0])) {
+				if (originalUsername === this.controller.platform.Self_Name && identifiers.includes(Array.from(msg)[0])) {
 					return;
 				}
 
@@ -145,19 +123,20 @@ module.exports = class Cytube extends require("./template.js") {
 					date: new sb.Date().valueOf()
 				};
 
-				this.resolveUserMessage(this.channelData, userData, msg);
+				this.controller.resolveUserMessage(this.channelData, userData, msg);
+
 				sb.Logger.push(msg, userData, this.channelData);
 				sb.AwayFromKeyboard.checkActive(userData, this.channelData);
 				sb.Reminder.checkActive(userData, this.channelData);
 
 				if (this.channelData.Mirror) {
-					this.mirror(msg, userData, false);
+					this.controller.mirror(msg, userData, this.channelData, false);
 				}
 			}
 			else {
-				this.resolveUserMessage(null, userData, msg);
+				this.controller.resolveUserMessage(null, userData, msg);
 
-				if (this.platform.Logging.whispers) {
+				if (this.controller.platform.Logging.whispers) {
 					sb.SystemLogger.send("Cytube.Other", "PM: " + msg, this.channelData, userData);
 				}
 			}
@@ -167,7 +146,7 @@ module.exports = class Cytube extends require("./template.js") {
 				message: msg,
 				user: userData,
 				channel: this.channelData,
-				platform: this.platform
+				platform: this.controller.platform
 			});
 
 			// Handle commands if the message starts with the command prefix
@@ -180,7 +159,7 @@ module.exports = class Cytube extends require("./template.js") {
 					.split(" ")
 					.filter(Boolean);
 
-				this.handleCommand(command, userData, arg, data.meta.private);
+				await this.handleCommand(command, userData, arg, data.meta.private);
 			}
 		});
 
@@ -200,7 +179,7 @@ module.exports = class Cytube extends require("./template.js") {
 				return;
 			}
 
-			if (this.platform.Logging.videoRequests) {
+			if (this.controller.platform.Logging.videoRequests) {
 				await sb.Logger.logVideoRequest(media.id, media.type, media.seconds, userData, this.channelData);
 			}
 
@@ -241,32 +220,61 @@ module.exports = class Cytube extends require("./template.js") {
 
 		// Disconnect event fired - restart and reconnect
 		client.on("disconnect", (...args) => {
-			console.warn("Cytube disconnect", ...args);
+			console.warn("Cytube disconnect", {
+				args,
+				channel: this.channelData.Name
+			});
 
 			if (this.restarting) {
 				return;
 			}
 
 			this.restarting = true;
-			this.restartInterval = setTimeout(() => this.restart(), this.restartDelay);
+			this.restartInterval = setTimeout(() => this.restart(), this.controller.restartDelay);
 		});
 
 		client.on("error", (err) => {
-			console.error("Cytube error", err);
+			console.error("Cytube error", {
+				err,
+				channel: this.channelData.Name
+			});
+		});
+	}
 
-			if (this.restarting) {
-				return;
+	/**
+	 * Handles the execution of a command and the reply should it be successful.
+	 * @param {string} command Command name - will be parsed
+	 * @param {string} user User who executed the command
+	 * @param {string[]} [args] Possible arguments for the command
+	 * @param {boolean} [replyIntoPM] If true, the command result will be sent via PM
+	 * @returns {Promise<void>}
+	 */
+	async handleCommand (command, user, args = [], replyIntoPM) {
+		const channelData = this.channelData;
+		const userData = await sb.User.get(user, false);
+		const options = {
+			platform: this.platform,
+			privateMessage: Boolean(replyIntoPM)
+		};
+
+		const execution = await sb.Command.checkAndExecute(command, args, this.channelData, userData, options);
+		if (!execution || !execution.reply) {
+			return;
+		}
+
+		if (execution.replyWithPrivateMessage || replyIntoPM) {
+			this.pm(execution.reply, userData.Name);
+		}
+		else {
+			if (this.channelData.Mirror) {
+				this.mirror(execution.reply, userData, true);
 			}
 
-			this.restarting = true;
-			this.restartInterval = setTimeout(() => this.restart(), this.restartDelay);
-
-			// if (!this._restarting) {
-			// 	setTimeout(() => this.restart(), 20e3);
-			// }
-			//
-			// this._restarting = true;
-		});
+			const message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
+			if (message) {
+				this.send(message);
+			}
+		}
 	}
 
 	/**
@@ -274,14 +282,9 @@ module.exports = class Cytube extends require("./template.js") {
 	 * Works by splitting the message into 200 character chunks and sending them repeatedly in order.
 	 * This is done because (for whatever reason) Cytube implements a tiny character limit, at least compared to other clients.
 	 * @param {string} message
-	 * @param {Channel} channelData
 	 */
-	async send (message, channelData) {
-		if (channelData && this.channels.length > 0) {
-			// @todo separate room handling for multiple channels
-		}
-
-		const messageLimit = this.platform.Message_Limit;
+	async send (message) {
+		const messageLimit = this.controller.platform.Message_Limit;
 		const lengthRegex = new RegExp(".{1," + messageLimit + "}", "g");
 		let arr = message
 			.replace(/(\r?\n)/g, " ")
@@ -318,55 +321,11 @@ module.exports = class Cytube extends require("./template.js") {
 	}
 
 	/**
-	 * Handles the execution of a command and the reply should it be successful.
-	 * @param {string} command Command name - will be parsed
-	 * @param {string} user User who executed the command
-	 * @param {Array} [args] Possible arguments for the command
-	 * @param {boolean} [replyIntoPM] If true, the command result will be sent via PM
+	 * Queues a video.
+	 * @param {string} type
+	 * @param {string} videoID
 	 * @returns {Promise<void>}
 	 */
-	async handleCommand (command, user, args = [], replyIntoPM) {
-		const channelData = this.channelData;
-		const userData = await sb.User.get(user, false);
-		const options = {
-			platform: this.platform,
-			privateMessage: Boolean(replyIntoPM)
-		};
-
-		const execution = await sb.Command.checkAndExecute(command, args, this.channelData, userData, options);
-		if (!execution || !execution.reply) {
-			return;
-		}
-
-		if (execution.replyWithPrivateMessage || replyIntoPM) {
-			this.pm(execution.reply, userData.Name);
-		}
-		else {
-			if (this.channelData.Mirror) {
-				this.mirror(execution.reply, userData, true);
-			}
-
-			const message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
-			if (message) {
-				this.send(message);
-			}
-		}
-	}
-
-	/**
-	 * Sets the message to be mirrored to a mirror channel.
-	 * @param {string} message
-	 * @param {User} userData.
-	 * @param {boolean} commandUsed
-	 */
-	mirror (message, userData, commandUsed = false) {
-		if (userData.Name === "[server]") {
-			return;
-		}
-
-		super.mirror(message, userData, this.channelData, commandUsed);
-	}
-
 	async queue (type, videoID) {
 		this.client.socket.emit("queue", {
 			id: videoID,
@@ -378,70 +337,155 @@ module.exports = class Cytube extends require("./template.js") {
 		});
 	}
 
-	async fetchUserList (channelIdentifier) {
+	/**
+	 * Returns a list of currently present chatters/viewers.
+	 * @returns {string[]}
+	 */
+	fetchUserList () {
 		return [...this.userMap.keys()];
 	}
 
-	/**
-	 * Closes the connection and sets up to create a new one
-	 */
 	restart () {
-		// @todo: only restart one cytube client, not all of them (different hosts possible?)
-		sb.Master.reloadClientModule(this.platform);
-		this.destroy();
+		// @todo
+		console.warn("Not yet implemented");
+	}
+
+	destroy () {
+		this.client.destroy();
+		this.client = null;
+
+		this.userMap.clear();
+		this.playlistData = null;
+
+		this.controller = null;
+	}
+
+	/**
+	 * @typedef {Object} CytubeUserPresence
+	 * @property {string} name User name
+	 * @property {Object} meta
+	 * @property {boolean} meta.afk
+	 * @property {string[]} meta.aliases Any additional user name aliases
+	 * @property {boolean} meta.muted Mute flag
+	 * @property {boolean} meta.smuted Shadowmute flag
+	 * @property {Object} profile
+	 * @property {string} profile.image Link to user profile picture
+	 * @property {string} profile.text Any additional user profile description
+	 */
+}
+
+module.exports = class CytubeController extends require("./template.js") {
+	/** @type {Map<Channel, CytubeClient>} */
+	clients = new Map();
+	restartDelay = 10000;
+
+	constructor () {
+		super();
+
+		this.platform = sb.Platform.get("cytube");
+		if (!this.platform) {
+			throw new sb.Error({
+				message: "Cytube platform has not been created"
+			});
+		}
+		else if (!sb.Config.has("CYTUBE_BOT_PASSWORD", true)) {
+			throw new sb.Error({
+				message: "Cytube password has not been configured"
+			});
+		}
+
+		const eligibleChannels = sb.Channel.getJoinableForPlatform(this.platform);
+		for (const channelData of eligibleChannels) {
+			const client = new CytubeClient(channelData, this);
+			this.clients.set(channelData, client);
+		}
+	}
+
+	/**
+	 * Sends a message through a client specified by provided channel data.
+	 * @param {string} message
+	 * @param {Channel} channelData
+	 */
+	async send (message, channelData) {
+		const client = this.clients.get(channelData);
+		if (!client) {
+			throw new sb.Error({
+				message: "No client found for Cytube channel",
+				args: {
+					channelID: channelData.ID,
+					channelName: channelData.Name
+				}
+			});
+		}
+
+		return await client.send(message);
+	}
+
+	/**
+	 * Sends a private message through a client specified by provided channel data.
+	 * @param {string} message Private message
+	 * @param {string} user User the private message will be sent to
+	 * @param {Channel} channelData
+	 */
+	async pm (message, user, channelData) {
+		const client = this.clients.get(channelData);
+		if (!client) {
+			throw new sb.Error({
+				message: "No client found for Cytube channel",
+				args: {
+					channelID: channelData.ID,
+					channelName: channelData.Name
+				}
+			});
+		}
+
+		return await client.pm(message, user);
+	}
+
+	/**
+	 * Sets the message to be mirrored to a mirror channel.
+	 * @param {string} message
+	 * @param {User} userData
+	 * @param {Channel} channelData
+	 * @param {boolean} commandUsed = false
+	 */
+	mirror (message, userData, channelData, commandUsed = false) {
+		if (userData.Name === "[server]") {
+			return;
+		}
+
+		return super.mirror(message, userData, channelData, commandUsed);
+	}
+
+	/**
+	 * Fetches the userlist for a given cytube client.
+	 * @param {string} channelIdentifier
+	 * @returns {string[]}
+	 */
+	fetchUserList (channelIdentifier) {
+		const channelData = sb.Channel.get(channelIdentifier);
+		const client = this.clients.get(channelData);
+		if (!client) {
+			throw new sb.Error({
+				message: "No client found for Cytube channel",
+				args: {
+					channelID: channelData.ID,
+					channelName: channelData.Name
+				}
+			});
+		}
+
+		return client.fetchUserList();
 	}
 
 	/**
 	 * Destroys and cleans up the instance
 	 */
 	destroy () {
-		this.client = null;
+		for (const client of this.clients.values()) {
+			client.destroy();
+		}
+
+		this.clients.clear();
 	}
 };
-
-/**
- * @typedef {string} Event
- * @value ("clientready")
- */
-
-/* Unused handlers (for now)
-// this.on("rank", (rank) => { this.handleRank(rank) }); // This is self rank
-// this.on("usercount", (count) => { this.handleUserCount(count) });
-
-// this.on("userlist", (list) => { this.handleUserList(list) });
-// this.on("addUser", (user) => { this.handleUserAdd(user) });
-// this.on("setAFK", (user) => { this.handleUserAFK(user) });
-// this.on("setLeader", (user) => { this.handleUserLeader(user) });
-// this.on("setUserMeta", (user) => { this.handleUserMeta(user) });
-// this.on("setUserProfile", (user) => { this.handleUserProfile(user) });
-// this.on("setUserRank", (user) => { this.handleUserRank(user) });
-// this.on("userLeave", (user) => { this.handleUserRemove(user) });
-
-// this.on("emoteList", (list) => { this.handleEmoteList(list) });
-// this.on("updateEmote", (emote) => { this.handleEmoteUpdate(emote) });
-// this.on("removeEmote", (emote) => { this.handleEmoteRemove(emote) });
-// this.on("renameEmote", (emote) => { this.handleEmoteRename(emote) });
-
-// this.on("playlist", (list) => { this.handlePlaylist(list) });
-// this.on("setPlaylistLocked", (data) => { this.handlePlaylistLocked(data) });
-// this.on("setPlaylistMeta", (data) => { this.handlePlaylistMeta(data) });
-// this.on("listPlaylists", (data) => { this.handleListPlaylists(data) });
-// this.on("delete", (data) => { this.handleVideoDelete(data) });
-// this.on("changeMedia", (data) => { this.handleVideoChange(data) });
-// this.on("mediaUpdate", (data) => { this.handleVideoUpdate(data) });
-// this.on("moveVideo", (data) => { this.handleVideoMove(data) });
-// this.on("queue", (data) => { this.handleVideoQueue(data) });
-// this.on("queueFail", (data) => { this.handleVideoQueueFail(data) });
-// this.on("queueWarn", (data) => { this.handleVideoQueueWarn(data) });
-// this.on("setCurrent", (data) => { this.handleVideoCurrent(data) });
-// this.on("setTemp", (data) => { this.handleVideoTemp(data) });
-
-// this.on("banlist", (list) => { this.handleBanList(list) });
-// this.on("banlistRemove", (ban) => { this.handleBanRemove(ban) });
-// this.on("setPermissions", (chanperms) => { this.handleChanPerms(chanperms) });
-// this.on("channelOpts", (chanopts) => { this.handleChanOpts(chanopts) });
-// this.on("clearchat", (who) => { this.handleClearChat(who) });
-// this.on("drinkCount", (count) => { this.handleDrinkCount(count) });
-// this.on("setMotd", (banner) => { this.handleBanner(banner) });
-
-*/
