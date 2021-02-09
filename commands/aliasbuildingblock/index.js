@@ -201,8 +201,8 @@ module.exports = {
                 ? `(${i.aliases.join(", ")})`
                 : "";
 
-            const examples = (i.aliases.length > 0)
-                ? "<br><ul>" + i.aliases.map(j => `<li><code>${j[0]}</code> ➡ <code>${j[1]}<li>`).join("") + "</ul>"
+            const examples = (i.examples.length > 0)
+                ? "<br><ul>" + i.examples.map(j => `<li><code>${j[0]}</code> ➡ <code>${j[1]}</code></li>`).join("") + "</ul>"
                 : "";
 
             return `<li><code>${i.name}${aliases}</code><br>${i.description}${examples}</li>`
