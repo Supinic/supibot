@@ -11,12 +11,21 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function roll (context, ...args) {
-		let [first, second] = args;
-		if (args.length < 2) {
-			first = 1;
-			second = 100;
+		if (args.length === 0) {
+			const result = sb.Utils.random(1, 100);
+			if (context.params.textOnly) {
+				return {
+					reply: String(result)
+				};
+			}
+			else {
+				return {
+					reply: `Your roll is ${result}.`
+				};
+			}
 		}
 
+		let [first, second] = args;
 		if (Number(first) && Number(second)) {
 			first = Number(first);
 			second = Number(second);
