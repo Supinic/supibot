@@ -841,11 +841,6 @@ module.exports = class TwitchController extends require("./template.js") {
 		this.client.disconnect();
 		this.client = null;
 	}
-
-	restart (hard) {
-		setTimeout(() => sb.Master.reloadClientModule(this.platform, hard), 10.0e3);
-		this.destroy();
-	}
 };
 
 /**

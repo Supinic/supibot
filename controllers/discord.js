@@ -328,11 +328,6 @@ module.exports = class DiscordController extends require("./template.js") {
 		this.client = null;
 	}
 
-	restart () {
-		sb.Master.reloadClientModule(this.platform, false);
-		this.destroy();
-	}
-
 	parseMessage (messageObject) {
 		const args = messageObject.content.split(" ");
 		for (let i = 0; i < args.length; i++) {
@@ -425,5 +420,4 @@ module.exports = class DiscordController extends require("./template.js") {
 				.map(user => sb.User.get(user))
 		)).filter(Boolean);
 	}
-
 };

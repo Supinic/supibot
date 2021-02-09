@@ -54,67 +54,6 @@
 		}
 
 		/**
-		 * Reload a given client module - used to hotload edited scripts in runtime with no downtime
-		 * @param {Platform} platform Module to reload
-		 * @throws {sb.Error} If input module has not been recognized
-		 */
-		reloadClientModule (platform) {
-			const client = sb.Platform.get(platform).Name;
-
-			switch (client) {
-				case "cytube":
-				case "twitch":
-				case "discord": {
-					const ClientConstructor = this.controllers[client].constructor;
-
-					this.controllers[client] = null;
-					this.controllers[client] = new ClientConstructor();
-					break;
-				}
-
-				default:
-					throw new sb.Error({
-						message: "Unrecognized module name",
-						args: client
-					});
-			}
-		}
-
-		/**
-		 * Sends a message to a channel. Does not check any banphrases or character limits
-		 * @param {string} message
-		 * @param {Channel|Channel.ID|Channel.Name} channel
-		 */
-		send (message, channel) {
-			console.warn("sb.Master.send is deprecated! use sb.Channel.prototype.send instead");
-
-			const channelData = sb.Channel.get(channel);
-			const platform = channelData.Platform.Name;
-			const client = this.controllers[platform];
-
-			if (!client) {
-				return;
-			}
-
-			client.send(message, channelData);
-		}
-
-		/**
-		 * Private messages a user on a given platform.
-		 * @param {string} user
-		 * @param {string} message
-		 * @param {Platform|number|string} platform
-		 * @returns {Promise<void>}
-		 */
-		async pm (user, message, platform) {
-			console.warn("sb.Master.pm is deprecated! use sb.Platform.prototype.pm instead");
-
-			const platformData = sb.Platform.get(platform);
-			const client = this.controllers[platformData.Name];
-			return client.pm(user, message);
-		}
-
-		/**
 		 * Prepares a message to be sent in the provided channel.
 		 * Checks banphrases, respects length limits.
 		 * Ignores if channel is inactive or read-only
