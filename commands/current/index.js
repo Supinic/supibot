@@ -8,7 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		types: ["current", "previous"]
+		types: ["current", "previous", "next"]
 	})),
 	Code: (async function current (context, ...args) {
 		const linkSymbol = sb.Config.get("VIDEO_TYPE_REPLACE_PREFIX");
@@ -107,6 +107,11 @@ module.exports = {
 				introductionString = "Currently playing:";
 				rs.where("Status = %s", "Current");
 			}
+			else if (type === "next") {
+				introductionString = "Playing next:";
+				rs.where("Status = %s", "Queued");
+				rs.orderBy("Song_Request.ID ASC");
+			}
 	
 			return rs;
 		});
@@ -137,10 +142,11 @@ module.exports = {
 			};
 		}
 		else {
+			const string = (type === "next") ? "queued up" : "currently being played";
 			return {
 				success: false,
 				link: null,
-				reply: "No video is currently being played."
+				reply: `No video is ${string}.`
 			};
 		}
 	}),
@@ -158,6 +164,10 @@ module.exports = {
 	
 		`<code>${prefix}song previous</code>`,
 		`Last played song: (link)`,
+		``,
+
+		`<code>${prefix}song next</code>`,
+		`Playing next: (link)`,
 		``,
 	])
 };
