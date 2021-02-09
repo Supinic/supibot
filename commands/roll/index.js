@@ -92,9 +92,9 @@ module.exports = {
 			"Rolls between (low) and (high) numbers, inclusively.",
 			"",
 
-			`<code>${prefix}roll 1d100<code>`,
-			`<code>${prefix}roll 5d25<code>`,
-			`<code>${prefix}roll (1d5)d(25d100)<code>`,
+			`<code>${prefix}roll 1d100</code>`,
+			`<code>${prefix}roll 5d25</code>`,
+			`<code>${prefix}roll (1d5)d(25d100)</code>`,
 			"Rolls using DnD dice format.",
 		];
 	})
