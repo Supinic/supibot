@@ -69,7 +69,7 @@ module.exports = {
 			#score = 0;
 	
 			constructor (data) {
-				if (data.crosspost_parent_list) {
+				if (data.crosspost_parent_list && data.crosspost_parent_list.length > 0) {
 					data = data.crosspost_parent_list.pop();
 					this.#crosspostOrigin = data.subreddit_name_prefixed
 				}
