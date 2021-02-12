@@ -4,8 +4,12 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Sets a notify for a given user. Can also set a time to ping that user (or yourself) in given amount of time, but in that case you must use the word \"in\" and then a number specifying the amount days, hours, minutes, etc.",
-	Flags: ["block","mention","opt-out","pipe"],
-	Params: null,
+	Flags: ["block","mention","opt-out","pipe","use-params"],
+	Params: [
+		{ name: "at", type: "string" },
+		{ name: "on", type: "string" },
+		{ name: "private", type: "boolean" },
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		strings: {
@@ -51,16 +55,7 @@ module.exports = {
 			args.shift();
 		}
 	
-		let isPrivate = context.invocation.includes("private");
-		for (let i = 0; i < args.length; i++) {
-			const token = args[i];
-	
-			if (token === "private:true") {
-				isPrivate = true;
-				args.splice(i, 1);
-			}
-		}
-	
+		let isPrivate = context.invocation.includes("private") || context.params.private;
 		if (isPrivate && context.channel !== null) {
 			return {
 				success: false,
@@ -78,40 +73,43 @@ module.exports = {
 		let delta = 0;
 	
 		const now = new sb.Date();
-		if (timedRegex.test(reminderText)) {
-			reminderText = reminderText.replace(/\bhr\b/g, "hour");
-	
-			// const chronoRegex = /\bon\b/;
-			// const chronoData = sb.Utils.parseChrono(reminderText, null, { forwardDate: true });
-			const timeData = sb.Utils.parseDuration(reminderText, { returnData: true });
-	
-	/*
-			if (chronoRegex.test(chronoData?.text ?? "")) {
-				const isRelative = (Object.keys(chronoData.component.knownValues).length === 0);
-				if (targetUser?.Data.location && !isRelative) {
-					const location = targetUser.Data.location;
-					if (!location.timezone) {
-						const time = sb.Command.get("time");
-						await time.execute(context, "@" + targetUser.Name);
-					}
-	
-					const { offset } = location.timezone;
-					chronoData.component.assign("timezoneOffset", offset / 60);
-					targetReminderDate = new sb.Date(chronoData.component.date());
-				}
-				else {
-					targetReminderDate = new sb.Date(chronoData.date);
-				}
-	
-				if (chronoData.text) {
-					reminderText = reminderText.replace(chronoData.text, "");
-				}
-	
-				targetReminderDate.milliseconds = now.milliseconds;
-				delta = sb.Utils.round(targetReminderDate - sb.Date.now(), -3);
+		if (context.params.at || context.params.on) {
+			const chronoDefinition = context.params.at ?? context.params.on;
+			const chronoData = sb.Utils.parseChrono(chronoDefinition, null, { forwardDate: true });
+			if (!chronoData) {
+				return {
+					success: false,
+					reply: "Invalid time provided!"
+				};
 			}
-	*/
-	
+
+			const isRelative = (Object.keys(chronoData.component.knownValues).length === 0);
+			if (context.user.Data.location && !isRelative) {
+				const location = context.user.Data.location;
+				const timeCommand = sb.Command.get("time");
+				const timeData = await timeCommand.staticData.fetchTimeData(location.coordinates);
+
+				if (timeData.status === "ZERO_RESULTS") {
+					return {
+						success: false,
+						reply: `Could not process your timezone!`
+					};
+				}
+
+				chronoData.component.assign("timezoneOffset", secondsOffset / 60);
+				targetReminderDate = new sb.Date(chronoData.component.date());
+			}
+			else {
+				targetReminderDate = new sb.Date(chronoData.date);
+			}
+
+			targetReminderDate.milliseconds = now.milliseconds;
+			delta = sb.Utils.round(targetReminderDate - sb.Date.now(), -3);
+		}
+		else if (timedRegex.test(reminderText)) {
+			reminderText = reminderText.replace(/\bhr\b/g, "hour");
+			const timeData = sb.Utils.parseDuration(reminderText, { returnData: true });
+
 			if (timeData.ranges.length > 0) {
 				const continueRegex = /^((\s*and\s*)|[\s\W]+)$/;
 				let continues = false;
@@ -156,15 +154,15 @@ module.exports = {
 	
 				reminderText = reminderText.replace(/\x00/g, "");
 			}
-			
-			if (delta > 0) {
-				if (typeof targetReminderDate === "number") {
-					targetReminderDate = new sb.Date(targetReminderDate);
-					targetReminderDelta = sb.Utils.timeDelta(targetReminderDate);
-				}
-				else {
-					targetReminderDelta = sb.Utils.timeDelta(sb.Date.now() + targetReminderDate.valueOf());
-				}
+		}
+
+		if (delta > 0) {
+			if (typeof targetReminderDate === "number") {
+				targetReminderDate = new sb.Date(targetReminderDate);
+				targetReminderDelta = sb.Utils.timeDelta(targetReminderDate);
+			}
+			else {
+				targetReminderDelta = sb.Utils.timeDelta(sb.Date.now() + targetReminderDate.valueOf());
 			}
 		}
 	
