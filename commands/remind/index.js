@@ -105,7 +105,7 @@ module.exports = {
 			}
 
 			targetReminderDate.milliseconds = now.milliseconds;
-			delta = sb.Utils.round(targetReminderDate - sb.Date.now(), -3);
+			delta = sb.Utils.round(targetReminderDate - now, -3);
 		}
 		else if (timedRegex.test(reminderText)) {
 			reminderText = reminderText.replace(/\bhr\b/g, "hour");
@@ -152,7 +152,8 @@ module.exports = {
 						continues = true;
 					}
 				}
-	
+
+				targetReminderDate = targetReminderDate.valueOf();
 				reminderText = reminderText.replace(/\x00/g, "");
 			}
 		}
@@ -163,7 +164,7 @@ module.exports = {
 				targetReminderDelta = sb.Utils.timeDelta(targetReminderDate);
 			}
 			else {
-				targetReminderDelta = sb.Utils.timeDelta(sb.Date.now() + targetReminderDate.valueOf());
+				targetReminderDelta = sb.Utils.timeDelta(targetReminderDate);
 			}
 		}
 	
