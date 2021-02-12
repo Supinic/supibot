@@ -35,7 +35,15 @@ module.exports = {
 				abbr: timezone.Abbreviation,
 				name: timezone.Name,
 			};
-		}
+		},
+		fetchTimeData: async (coordinates) => await sb.Got("Google", {
+			url: "timezone/json",
+			searchParams: new sb.URLParams()
+				.set("timestamp", Math.trunc(sb.Date.now() / 1000).toString())
+				.set("location", coordinates.lat + "," + coordinates.lng)
+				.set("key", sb.Config.get("API_GOOGLE_TIMEZONE"))
+				.toString()
+		}).json()
 	})),
 	Code: (async function time (context, ...args) {
 		const zone = await this.staticData.detectTimezone(...args);
@@ -114,15 +122,7 @@ module.exports = {
 			}
 		}
 	
-		const timeData = await sb.Got("Google", {
-			url: "timezone/json",
-			searchParams: new sb.URLParams()
-				.set("timestamp", Math.trunc(sb.Date.now() / 1000).toString())
-				.set("location", coordinates.lat + "," + coordinates.lng)
-				.set("key", sb.Config.get("API_GOOGLE_TIMEZONE"))
-				.toString()
-		}).json();
-	
+		const timeData = await this.staticData.fetchTimeData(coordinates);
 		if (timeData.status === "ZERO_RESULTS") {
 			return {
 				success: false,
@@ -141,6 +141,7 @@ module.exports = {
 	
 		if (user && user.Data.location && !user.Data.location.timezone) {
 			user.Data.location.timezone = {
+				dstOffset: 1111,
 				stringOffset: offset,
 				offset: totalOffset,
 				name: timeData.timeZoneName
