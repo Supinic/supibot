@@ -8,6 +8,7 @@ module.exports = {
     Params: [
         { name: "em", type: "string" },
         { name: "errorMessage", type: "string" },
+        { name: "excludeSelf", type: "boolean" },
         { name: "regex", type: "string" },
         { name: "replacement", type: "string" },
     ],
@@ -74,6 +75,13 @@ module.exports = {
                     }
 
                     const users = await context.channel.fetchUserList();
+                    if (context.params.excludeSelf) {
+                        const index = users.findIndex(i => i.toLowerCase() === context.user.Name);
+                        if (index !== -1) {
+                            users.splice(index, 1);
+                        }
+                    }
+
                     return sb.Utils.randArray(users);
                 }
             },
