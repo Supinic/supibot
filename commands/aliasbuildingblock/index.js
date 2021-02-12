@@ -82,7 +82,9 @@ module.exports = {
                         }
                     }
 
-                    return sb.Utils.randArray(users);
+                    return {
+                        reply: sb.Utils.randArray(users)
+                    };
                 }
             },
             {
