@@ -66,14 +66,14 @@ module.exports = {
                         };
                     }
 
-                    if (typeof context.channel.getUsers !== "function") {
+                    if (typeof context.channel.fetchUserList !== "function") {
                         return {
                             success: false,
                             reply: "This has not been implemented yet 4Head"
                         };
                     }
 
-                    const users = await context.channel.getUsers();
+                    const users = await context.channel.fetchUserList();
                     return sb.Utils.randArray(users);
                 }
             },
