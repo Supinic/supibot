@@ -156,7 +156,7 @@ module.exports = {
 			}
 		}
 
-		if (delta > 0) {
+		if (delta > 0 && targetReminderDate) {
 			if (typeof targetReminderDate === "number") {
 				targetReminderDate = new sb.Date(targetReminderDate);
 				targetReminderDelta = sb.Utils.timeDelta(targetReminderDate);
