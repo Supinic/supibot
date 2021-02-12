@@ -55,7 +55,7 @@ module.exports = {
 			args.shift();
 		}
 	
-		let isPrivate = context.invocation.includes("private") || context.params.private;
+		let isPrivate = Boolean(context.invocation.includes("private") || context.params.private);
 		if (isPrivate && context.channel !== null) {
 			return {
 				success: false,
