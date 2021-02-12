@@ -36,10 +36,10 @@ module.exports = {
 				name: timezone.Name,
 			};
 		},
-		fetchTimeData: async (coordinates) => await sb.Got("Google", {
+		fetchTimeData: async (coordinates, timestamp = sb.Date.now()) => await sb.Got("Google", {
 			url: "timezone/json",
 			searchParams: new sb.URLParams()
-				.set("timestamp", Math.trunc(sb.Date.now() / 1000).toString())
+				.set("timestamp", Math.trunc(timestamp / 1000).toString())
 				.set("location", coordinates.lat + "," + coordinates.lng)
 				.set("key", sb.Config.get("API_GOOGLE_TIMEZONE"))
 				.toString()

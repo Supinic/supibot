@@ -87,8 +87,9 @@ module.exports = {
 			if (context.user.Data.location && !isRelative) {
 				const location = context.user.Data.location;
 				const timeCommand = sb.Command.get("time");
-				const timeData = await timeCommand.staticData.fetchTimeData(location.coordinates);
 
+				const timestamp = chronoData.component.date().valueOf();
+				const timeData = await timeCommand.staticData.fetchTimeData(location.coordinates, timestamp);
 				if (timeData.status === "ZERO_RESULTS") {
 					return {
 						success: false,
