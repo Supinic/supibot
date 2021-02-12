@@ -457,11 +457,7 @@ module.exports = class Command extends require("./template.js") {
 		}
 
 		const appendOptions = Object.assign({}, options);
-		const isPrivateMessage = Boolean(appendOptions.privateMessage);
-		if (typeof appendOptions.privateMessage !== "undefined") {
-			// @todo check if Object.fromEntries(Object.entries.map) is faster than delete
-			delete appendOptions.privateMessage;
-		}
+		const isPrivateMessage = (!channelData);
 
 		/** @type ExtraCommandData */
 		const context = {
