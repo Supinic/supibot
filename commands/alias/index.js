@@ -381,8 +381,9 @@ module.exports = {
 						alias: true,
 						aliasCount,
 						platform: context.platform,
-						skipPending: true,
+						skipBanphrases: true,
 						skipMention: true,
+						skipPending: true,
 						partialExecute: true
 					}
 				);
