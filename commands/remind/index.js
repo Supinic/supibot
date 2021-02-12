@@ -21,7 +21,8 @@ module.exports = {
 		}
 	})),
 	Code: (async function remind (context, ...args) {
-		if (args.length === 0) {
+		const hasChrono = Boolean(context.params.at ?? context.params.on);
+		if (!hasChrono && args.length === 0) {
 			return {
 				success: false,
 				reply: `Incorrect syntax! Use "remind (person) (text)"`,
@@ -73,7 +74,7 @@ module.exports = {
 		let delta = 0;
 	
 		const now = new sb.Date();
-		if (context.params.at || context.params.on) {
+		if (hasChrono) {
 			const chronoDefinition = context.params.at ?? context.params.on;
 			const chronoData = sb.Utils.parseChrono(chronoDefinition, null, { forwardDate: true });
 			if (!chronoData) {
