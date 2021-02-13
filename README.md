@@ -12,23 +12,23 @@ Supibot can and is currently run on four distinct platforms:
 - [Discord](https://discordapp.com/)
 - [Cytube](https://cytu.be/)
 - ~~Mixer~~ (until 2020-07-22)
-- [Minecraft](https://www.minecraft.net/)
+- [Minecraft](https://www.minecraft.net/) (not currently active)
 
 ## I want to use Supibot!
 Pick your platform, and follow these steps: 
 
 | Platform | Directions |
 | :---: |:---|
-| **Twitch channel**  | Fill out [this form](https://supinic.com/bot/request-bot/form). |
-| **Discord server**  | The **admin** of said server PMs me on Discord (friend request is not required).  | 
-| **Cytube room**     | Support for joining multiple rooms on Cytube is not currently implemented - but can be, requested.  |
-| **Minecraft server**| The owner of given Vanilla/Forge-modded Minecraft server needs to contact me, as this process is not trivial. |
+| **Twitch channel**   | Fill out [this form](https://supinic.com/bot/request-bot/form). |
+| **Discord server**   | The **admin** of said server PMs me on Discord (friend request is not required).  | 
+| **Cytube room**      | Fill out [this form](https://supinic.com/bot/request-bot/form). |
+| **Minecraft server** | The owner of given Vanilla/Forge-modded Minecraft server needs to contact me, as this process is not trivial. |
 
 To contact me, see [Contact](https://supinic.com/contact) on my website.
 
 ## DankChat integration
 The [DankChat](https://github.com/flex3r/DankChat) mobile application for Twitch chat uses Supibot's API in order to hint its commands in any channel Supibot is actively in!
-It's a really good app to use on the go, and I endorse it.
+It's a wonderful app to use on the go, and I endorse it.
 
 ## Further reading
 - [Bot feature overview](docs/features.md)
