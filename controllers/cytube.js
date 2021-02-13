@@ -398,8 +398,7 @@ module.exports = class CytubeController extends require("./template.js") {
 
 		const eligibleChannels = sb.Channel.getJoinableForPlatform(this.platform);
 		for (const channelData of eligibleChannels) {
-			const client = new CytubeClient(channelData, this);
-			this.clients.set(channelData, client);
+			this.joinChannel(channelData);
 		}
 	}
 
@@ -457,6 +456,17 @@ module.exports = class CytubeController extends require("./template.js") {
 		}
 
 		return super.mirror(message, userData, channelData, commandUsed);
+	}
+
+	joinChannel (channelData) {
+		if (this.clients.has(channelData)) {
+			return false;
+		}
+
+		const client = new CytubeClient(channelData, this);
+		this.clients.set(channelData, client);
+
+		return true;
 	}
 
 	/**
