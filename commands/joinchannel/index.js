@@ -5,20 +5,16 @@ module.exports = {
 	Cooldown: 0,
 	Description: "Adds a new channel to database, sets its tables and events, and joins it. Only applicable for Twitch channels (for now, at least).",
 	Flags: ["mention","pipe","system","whitelist"],
-	Params: null,
+	Params: [
+		{ name: "platform", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function joinChannel (context, channel, mode) {
-		if (context.platform.Name !== "twitch") {
+		if (!channel.includes("#")) {
 			return {
 				success: false,
-				reply: "This command is not available outside of Twitch!"
-			};
-		}
-		else if (!channel.includes("#")) {
-			return { 
-				success: false,
-				reply: "Channels must be denominated with #, as a safety measure!" 
+				reply: "Channels must be denominated with #, as a safety measure!"
 			};
 		}
 		else if (mode && mode !== "Read") {
@@ -36,19 +32,37 @@ module.exports = {
 				reply: "This channel already exists in the database, with mode = " + existing.Mode + "!"
 			};
 		}
-		const { controller } = sb.Platform.get("twitch");
-		const channelID = await controller.getUserID(channel);
-		if (!channelID) {
+
+		const platformName = context.params.platform ?? "twitch";
+		if (platformName === "twitch") {
+			const { controller } = sb.Platform.get("twitch");
+			const channelID = await controller.getUserID(channel);
+			if (!channelID) {
+				return {
+					success: false,
+					reply: "Provided channel does not exist on Twitch!"
+				};
+			}
+
+			await sb.Channel.add(channel, context.platform, mode ?? "Write", channelID);
+			await context.platform.client.join(channel);
+		}
+		else if (platformName === "cytube") {
+			const platformData = sb.Platform.get("cytube");
+
+			const channelData = await sb.Channel.add(channel, platformData, mode ?? "Write");
+			await platformData.controller.join(channelData);
+		}
+		else {
 			return {
 				success: false,
-				reply: "Could not find provided channel on Twitch!"
+				reply: "Invalid or unsupported platform provided!"
 			};
 		}
 	
-		const newChannel = await sb.Channel.add(channel, context.platform, mode ?? "Write", channelID);
-		await context.platform.client.join(channel);
-	
-		return { reply: "Success." };
+		return {
+			reply: "Success."
+		};
 	}),
 	Dynamic_Description: null
 };
