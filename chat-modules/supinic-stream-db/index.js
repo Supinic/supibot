@@ -23,6 +23,8 @@ module.exports = {
 				.flat("Video_ID")
 			);
 
+			console.log("stream-db", { stream, exists });
+
 			// Stream just went online + no row exists => create a new Stream row
 			if (!exists && context.event === "online") {
 				const row = await sb.Query.getRow("stream", "Stream");
@@ -39,17 +41,20 @@ module.exports = {
 				const row = await sb.Query.getRow("stream", "Stream");
 				await row.load(stream.id);
 
-				const vodDuration = stream.duration.split(/\D/)
-					.filter(Boolean)
-					.map(Number)
-					.reverse()
-					.reduce((acc, cur) => {
-						acc += cur * mult;
-						mult *= 60;
-						return acc;
-					}, 0);
+				if (stream.duration) {
+					const vodDuration = stream.duration.split(/\D/)
+						.filter(Boolean)
+						.map(Number)
+						.reverse()
+						.reduce((acc, cur) => {
+							acc += cur * mult;
+							mult *= 60;
+							return acc;
+						}, 0);
 
-				row.values.End = start.clone().addSeconds(vodDuration);
+					row.values.End = start.clone().addSeconds(vodDuration);
+				}
+
 				await row.save();
 			}
 		}
