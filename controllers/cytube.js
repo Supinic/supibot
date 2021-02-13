@@ -458,6 +458,11 @@ module.exports = class CytubeController extends require("./template.js") {
 		return super.mirror(message, userData, channelData, commandUsed);
 	}
 
+	/**
+	 * Joins a Cytube room.
+	 * @param {Channel} channelData
+	 * @returns {boolean} True if the channel was joined, false if it was joined before.
+	 */
 	joinChannel (channelData) {
 		if (this.clients.has(channelData)) {
 			return false;
