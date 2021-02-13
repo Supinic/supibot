@@ -51,7 +51,7 @@ module.exports = {
 			const platformData = sb.Platform.get("cytube");
 
 			const channelData = await sb.Channel.add(channel, platformData, mode ?? "Write");
-			await platformData.controller.join(channelData);
+			await platformData.controller.joinChannel(channelData);
 		}
 		else {
 			return {
