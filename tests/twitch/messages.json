@@ -1,0 +1,200 @@
+[
+  {
+    "rawSource": "@badge-info=;badges=;client-nonce=7450f5c80d6024dcc05904379f58d3ec;color=;display-name=mickeyZzZz;emotes=;flags=;id=a3a61650-fea4-4c54-acec-8bc85770c050;mod=0;room-id=22484632;subscriber=0;tmi-sent-ts=1613242238768;turbo=0;user-id=161967202;user-type= :mickeyzzzz!mickeyzzzz@mickeyzzzz.tmi.twitch.tv PRIVMSG #forsen :Pog PagMan",
+    "ircPrefixRaw": "mickeyzzzz!mickeyzzzz@mickeyzzzz.tmi.twitch.tv",
+    "ircPrefix": {
+      "nickname": "mickeyzzzz",
+      "username": "mickeyzzzz",
+      "hostname": "mickeyzzzz.tmi.twitch.tv"
+    },
+    "ircCommand": "PRIVMSG",
+    "ircParameters": [
+      "#forsen",
+      "Pog PagMan"
+    ],
+    "ircTags": {
+      "badge-info": "",
+      "badges": "",
+      "client-nonce": "7450f5c80d6024dcc05904379f58d3ec",
+      "color": "",
+      "display-name": "mickeyZzZz",
+      "emotes": "",
+      "flags": "",
+      "id": "a3a61650-fea4-4c54-acec-8bc85770c050",
+      "mod": "0",
+      "room-id": "22484632",
+      "subscriber": "0",
+      "tmi-sent-ts": "1613242238768",
+      "turbo": "0",
+      "user-id": "161967202",
+      "user-type": ""
+    },
+    "channelName": "forsen",
+    "messageText": "Pog PagMan",
+    "isAction": false,
+    "senderUsername": "mickeyzzzz",
+    "channelID": "22484632",
+    "senderUserID": "161967202",
+    "badgeInfo": [],
+    "badgeInfoRaw": "",
+    "badges": [],
+    "badgesRaw": "",
+    "colorRaw": "",
+    "displayName": "mickeyZzZz",
+    "emotes": [],
+    "emotesRaw": "",
+    "flags": [],
+    "flagsRaw": "",
+    "messageID": "a3a61650-fea4-4c54-acec-8bc85770c050",
+    "isMod": false,
+    "isModRaw": "0",
+    "serverTimestamp": "2021-02-13T18:50:38.768Z",
+    "serverTimestampRaw": "1613242238768"
+  },
+  {
+    "rawSource": "@badge-info=subscriber/34;badges=broadcaster/1,subscriber/3012,twitchconAmsterdam2020/1;color=#FF0000;display-name=Supinic;emotes=1:13-14;flags=;id=af50b884-9a49-4920-b650-18ab50abbfdf;mod=0;room-id=31400525;subscriber=1;tmi-sent-ts=1613242404579;turbo=0;user-id=31400525;user-type= :supinic!supinic@supinic.tmi.twitch.tv PRIVMSG #supinic :$test 123",
+    "ircPrefixRaw": "supinic!supinic@supinic.tmi.twitch.tv",
+    "ircPrefix": {
+      "nickname": "supinic",
+      "username": "supinic",
+      "hostname": "supinic.tmi.twitch.tv"
+    },
+    "ircCommand": "PRIVMSG",
+    "ircParameters": [
+      "#supinic",
+      "$test 123"
+    ],
+    "ircTags": {
+      "badge-info": "subscriber/34",
+      "badges": "broadcaster/1,subscriber/3012,twitchconAmsterdam2020/1",
+      "color": "#FF0000",
+      "display-name": "Supinic",
+      "emotes": "1:13-14",
+      "flags": "",
+      "id": "af50b884-9a49-4920-b650-18ab50abbfdf",
+      "mod": "0",
+      "room-id": "31400525",
+      "subscriber": "1",
+      "tmi-sent-ts": "1613242404579",
+      "turbo": "0",
+      "user-id": "31400525",
+      "user-type": ""
+    },
+    "channelName": "supinic",
+    "messageText": "$test 123",
+    "isAction": false,
+    "senderUsername": "supinic",
+    "channelID": "31400525",
+    "senderUserID": "31400525",
+    "badgeInfo": [
+      {
+        "name": "subscriber",
+        "version": "34"
+      }
+    ],
+    "badgeInfoRaw": "subscriber/34",
+    "badges": [
+      {
+        "name": "broadcaster",
+        "version": "1"
+      },
+      {
+        "name": "subscriber",
+        "version": "3012"
+      },
+      {
+        "name": "twitchconAmsterdam2020",
+        "version": "1"
+      }
+    ],
+    "badgesRaw": "broadcaster/1,subscriber/3012,twitchconAmsterdam2020/1",
+    "color": {
+      "r": 255,
+      "g": 0,
+      "b": 0
+    },
+    "colorRaw": "#FF0000",
+    "displayName": "Supinic",
+    "emotes": [
+      {
+        "id": "1",
+        "startIndex": 13,
+        "endIndex": 15,
+        "code": ":)"
+      }
+    ],
+    "emotesRaw": "",
+    "flags": [],
+    "flagsRaw": "",
+    "messageID": "af50b884-9a49-4920-b650-18ab50abbfdf",
+    "isMod": false,
+    "isModRaw": "0",
+    "serverTimestamp": "2021-02-13T18:53:24.579Z",
+    "serverTimestampRaw": "1613242404579"
+  },
+  {
+    "rawSource": "@badge-info=;badges=vip/1,glhf-pledge/1;color=#DAA520;display-name=Mm2PL;emotes=;flags=;id=53242a94-d738-4c03-b540-3a02023ad228;mod=0;room-id=31400525;subscriber=0;tmi-sent-ts=1613242406210;turbo=0;user-id=117691339;user-type= :mm2pl!mm2pl@mm2pl.tmi.twitch.tv PRIVMSG #supinic :here's your test message PepeLaugh TeaTime",
+    "ircPrefixRaw": "mm2pl!mm2pl@mm2pl.tmi.twitch.tv",
+    "ircPrefix": {
+      "nickname": "mm2pl",
+      "username": "mm2pl",
+      "hostname": "mm2pl.tmi.twitch.tv"
+    },
+    "ircCommand": "PRIVMSG",
+    "ircParameters": [
+      "#supinic",
+      "here's your test message PepeLaugh TeaTime"
+    ],
+    "ircTags": {
+      "badge-info": "",
+      "badges": "vip/1,glhf-pledge/1",
+      "color": "#DAA520",
+      "display-name": "Mm2PL",
+      "emotes": "",
+      "flags": "",
+      "id": "53242a94-d738-4c03-b540-3a02023ad228",
+      "mod": "0",
+      "room-id": "31400525",
+      "subscriber": "0",
+      "tmi-sent-ts": "1613242406210",
+      "turbo": "0",
+      "user-id": "117691339",
+      "user-type": ""
+    },
+    "channelName": "supinic",
+    "messageText": "here's your test message PepeLaugh TeaTime",
+    "isAction": false,
+    "senderUsername": "mm2pl",
+    "channelID": "31400525",
+    "senderUserID": "117691339",
+    "badgeInfo": [],
+    "badgeInfoRaw": "",
+    "badges": [
+      {
+        "name": "vip",
+        "version": "1"
+      },
+      {
+        "name": "glhf-pledge",
+        "version": "1"
+      }
+    ],
+    "badgesRaw": "vip/1,glhf-pledge/1",
+    "color": {
+      "r": 218,
+      "g": 165,
+      "b": 32
+    },
+    "colorRaw": "#DAA520",
+    "displayName": "Mm2PL",
+    "emotes": [],
+    "emotesRaw": "",
+    "flags": [],
+    "flagsRaw": "",
+    "messageID": "53242a94-d738-4c03-b540-3a02023ad228",
+    "isMod": false,
+    "isModRaw": "0",
+    "serverTimestamp": "2021-02-13T18:53:26.210Z",
+    "serverTimestampRaw": "1613242406210"
+  }
+]

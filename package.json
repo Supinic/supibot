@@ -19,7 +19,8 @@
     "setup": "node ./init/setup.js --harmony-nullish --harmony-optional-chaining",
     "update": "git pull origin master && yarn upgrade supi-core",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test": "mocha tests/twitch"
   },
   "main": "master.js",
   "author": "Supinic <supinic@protonmail.com>",
@@ -29,6 +30,6 @@
   "devDependencies": {
     "babel-eslint": "^10.1.0",
     "eslint": "^7.1.0",
-    "mocha": "^8.1.0"
+    "mocha": "^8.3.0"
   }
 }
