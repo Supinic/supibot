@@ -13,7 +13,7 @@ module.exports = {
 			return {
 				reply: sb.Utils.tag.trim `
 					No suggestion text provided!
-					Your suggestions here: https://supinic.com/data/suggestion/list?columnAuthor=${context.user.Name}
+					Your suggestions here: https://supinic.com/data/suggestion/list?userName=${context.user.Name}
 				`,
 				cooldown: 5000
 			};

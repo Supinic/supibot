@@ -431,7 +431,7 @@ module.exports = {
 							https://supinic.com/data/suggestion/list
 							||
 							Your suggestions:
-							https://supinic.com/data/suggestion/list?columnAuthor=${context.user.Name}
+							https://supinic.com/data/suggestion/list?userName=${context.user.Name}
 						`
 						};
 					}
