@@ -39,7 +39,7 @@ module.exports = (function () {
 				const missingConfigs = mandatoryConfigs.filter(key => !sb.Config.has(key));
 				if (missingConfigs.length !== 0) {
 					console.debug("Missing VLC config(s), module creation skipped", { missingConfigs });
-					baseURL.module = {};
+					VideoLANConnector.module = {};
 				}
 				else {
 					VideoLANConnector.module = new VideoLANConnector({
