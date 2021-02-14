@@ -89,7 +89,7 @@ module.exports = {
                 ...formData.getHeaders(),
                 Authorization: "Client-ID c898c0bb848ca39"
             },
-            body: form.getBuffer(),
+            body: formData.getBuffer(),
             retry: 0,
             timeout: 10000
         });
