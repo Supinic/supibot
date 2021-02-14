@@ -56,10 +56,10 @@ module.exports = {
         const shell = promisify(require("child_process").exec);
         const fs = require("fs");
 
-        await shell(`wget https://i.imgur.com/${link} -P /tmp`);
+        // await shell(`wget https://i.imgur.com/${link} -P /tmp`);
 
         const downloadStream = sb.Got.stream(`https://i.imgur.com/${link}`);
-        const writeStream = fs.createWriteStream(link);
+        const writeStream = fs.createWriteStream(`/tmp/${link}`);
         await pipeline(downloadStream, writeStream);
 
         const colours = ["#0F0", "#F00", "#00F", "#FF0", "#0FF", "#F0F"];
