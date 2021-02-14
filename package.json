@@ -20,7 +20,7 @@
     "update": "git pull origin master && yarn upgrade supi-core",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "mocha tests/twitch"
+    "test": "nyc mocha tests/twitch"
   },
   "main": "master.js",
   "author": "Supinic <supinic@protonmail.com>",
@@ -30,6 +30,7 @@
   "devDependencies": {
     "babel-eslint": "^10.1.0",
     "eslint": "^7.1.0",
-    "mocha": "^8.3.0"
+    "mocha": "^8.3.0",
+    "nyc": "^15.1.0"
   }
 }

@@ -1,15 +1,8 @@
-const { strictEqual: equal } = require("assert");
+const assert = require("assert");
 
 require("dank-twitch-irc");
 const MockClient = require("./mock-client.js");
 require.cache[require.resolve("dank-twitch-irc")].exports = MockClient;
-
-const _debug = console.debug;
-console.stuff = [];
-console.debug = (...args) => {
-	console.stuff.push(...args);
-	_debug(...args);
-};
 
 const initialize = (async () => {
 	await require("supi-core")("sb", {
@@ -90,13 +83,13 @@ const initialize = (async () => {
 	]);
 
 	const userCheck = await sb.User.get("supinic");
-	equal(userCheck instanceof sb.User, true);
+	assert.strictEqual(userCheck instanceof sb.User, true);
 
 	const channelCheck = sb.Channel.get("supinic");
-	equal(channelCheck instanceof sb.Channel, true);
+	assert.strictEqual(channelCheck instanceof sb.Channel, true);
 
-	equal(sb.Command.prefix, "$");
-	equal(sb.Command.is("$test"), true);
+	assert.strictEqual(sb.Command.prefix, "$");
+	assert.strictEqual(sb.Command.is("$test"), true);
 });
 
 describe("twitch controller",  function () {
@@ -133,9 +126,9 @@ describe("twitch controller",  function () {
 
 		const invoked = {};
 		controller.send = (reply) => {
-			equal(invoked.message, true);
-			equal(invoked.command, true);
-			equal(reply, expected.reply);
+			assert.strictEqual(invoked.message, true);
+			assert.strictEqual(invoked.command, true);
+			assert.strictEqual(reply, expected.reply);
 
 			done();
 		};
@@ -171,6 +164,6 @@ describe("twitch controller",  function () {
 
 		controller.client.emit("error", error);
 
-		equal(controller.failedJoinChannels.size, 1);
+		assert.strictEqual(controller.failedJoinChannels.size, 1);
 	});
 });
