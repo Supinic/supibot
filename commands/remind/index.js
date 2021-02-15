@@ -155,7 +155,6 @@ module.exports = {
 					}
 				}
 
-				targetReminderDate = targetReminderDate.valueOf();
 				reminderText = reminderText.replace(/\x00/g, "");
 			}
 		}
