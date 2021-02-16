@@ -156,9 +156,8 @@ module.exports = class Command extends require("./template.js") {
 				catch (e) {
 					this.Params = null;
 					console.warn(`Command has invalid JSON params definition`, {
-						command: this,
-						error: e,
-						data
+						commandName: this.Name,
+						error: e
 					});
 				}
 			}
@@ -168,7 +167,7 @@ module.exports = class Command extends require("./template.js") {
 
 		if (this.Flags.linkOnly) {
 			if (!this.Params) {
-				console.warn("Command has linkOnly flag, but no params are defined.", { data, command: this });
+				console.warn("Command has linkOnly flag, but no params are defined.", { commandName: this.Name });
 				this.Params.push({
 					name: "linkOnly",
 					type: "boolean"
@@ -177,7 +176,7 @@ module.exports = class Command extends require("./template.js") {
 			else {
 				const param = this.Params.find(i => i.name === "linkOnly");
 				if (!param) {
-					console.warn("Command has linkOnly flag, but no linkOnly param.", { data, command: this });
+					console.warn("Command has linkOnly flag, but no linkOnly param.", { commandName: this.Name });
 					this.Params.push({
 						name: "linkOnly",
 						type: "boolean"
@@ -213,7 +212,7 @@ module.exports = class Command extends require("./template.js") {
 				tempData = eval(data.Static_Data);
 			}
 			catch (e) {
-				console.warn(`Command has invalid static data definition!`, { data, error: e });
+				console.warn(`Command has invalid static data definition!`, { commandName: this.Name, error: e });
 				this.Code = () => ({
 					success: false,
 					reply: "Command has invalid code definition! Please make sure to let @supinic know about this!"
@@ -691,7 +690,7 @@ module.exports = class Command extends require("./template.js") {
 		}
 
 		if (typeof execution.reply !== "string") {
-			console.warn(`Execution of command ${command.ID} did not result with execution.reply of type string`, {command, execution, data: context});
+			console.warn(`Execution of command "${command.Name}" did not result with execution.reply of type string`);
 		}
 
 		execution.reply = String(execution.reply);
