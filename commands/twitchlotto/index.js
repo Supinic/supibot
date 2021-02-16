@@ -230,7 +230,7 @@ module.exports = {
 			const channels = await sb.Query.getRecordset(rs => rs
 			    .select("Channel")
 			    .from("data", "Twitch_Lotto")
-				.where("Link = %s", link)
+				.where("Link = %s", image.Link)
 				.flat("Channel")
 			);
 
