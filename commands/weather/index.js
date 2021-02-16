@@ -63,7 +63,7 @@ module.exports = {
 			}
 			else {
 				return {
-					reply: `No place provided, and you don't have a default location set! Check the ${sb.Command.prefix}set command's help on how to set your location.`,
+					reply: `No place provided, and you don't have a default location set! You can use $set location (location) to set it, or add "private" to make it private 🙂`,
 					cooldown: 2500
 				};
 			}
