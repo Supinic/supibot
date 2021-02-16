@@ -65,7 +65,7 @@ module.exports = {
                             context.params.em
                             ?? context.params.errorMessage
                             ?? `Expected ${limit} arguments, got ${args.length} instead!`
-                        ).replace(/_/g, " ");
+                        );
 
                         return {
                             success: false,
