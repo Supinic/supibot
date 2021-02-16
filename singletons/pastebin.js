@@ -131,12 +131,22 @@ module.exports = (function () {
 				params.set("api_paste_format", options.format);
 			}
 
-			return await this.#got({
+			const { statusCode, body } = await this.#got({
 				method: "POST",
 				url: "api/api_post.php",
 				body: params.toString(),
 				timeout: 5000
-			}).text();
+			});
+
+			if (statusCode === 200) {
+				return body;
+			}
+			else if (statusCode === 422) {
+				return "This paste was rejected by Pastebin's SMART filters!";
+			}
+			else {
+				return "An error occured while posting the paste!";
+			}
 		}
 
 		async delete () {
