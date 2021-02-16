@@ -79,7 +79,7 @@ module.exports = {
                 aliases: [],
                 description: "Selects a random chatter within the channel, and outputs their name. Not applicable in PMs.",
                 examples: [
-                    ["$abb chatter", "supibot"]
+                    ["$abb chatter", "supinic"]
                 ],
                 execute: async (context) => {
                     if (context.privateMessage) {
@@ -92,11 +92,16 @@ module.exports = {
                     if (typeof context.channel.fetchUserList !== "function") {
                         return {
                             success: false,
-                            reply: "This has not been implemented yet 4Head"
+                            reply: "This has not been implemented here... yet! 4Head"
                         };
                     }
 
                     const users = await context.channel.fetchUserList();
+                    const botIndex = users.findIndex(i => i.toLowerCase() === context.platform.Self_Name);
+                    if (botIndex !== -1) {
+                        users.splice(botIndex, 1);
+                    }
+
                     if (context.params.excludeSelf) {
                         const index = users.findIndex(i => i.toLowerCase() === context.user.Name);
                         if (index !== -1) {
