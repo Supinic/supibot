@@ -480,7 +480,7 @@ module.exports = {
 							};
 						}
 	
-						const regex = /(https:\/\/)?(www\.)?(imgur\.com\/)?([\d\w]{5,7}\.\w{3})/;
+						const regex = /(https:\/\/)?(www\.)?(imgur\.com\/)?([\d\w]{5,8}\.\w{3})/;
 						const match = link.match(regex);
 						if (!match) {
 							return {
