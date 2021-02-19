@@ -5,9 +5,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches a random Imgur image from a Twitch channel (based off Twitchlotto) and checks it for NSFW stuff via an AI. The \"nudity score\" is posted along with the link.",
 	Flags: ["mention","whitelist"],
-	Params: [
-		{ name: "includeChannel", type: "boolean" }
-	],
+	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		this.data.counts = {};
@@ -226,7 +224,7 @@ module.exports = {
 		});
 
 		let channelString = "";
-		if (context.params.includeChannel && !channel) {
+		if (!channel) {
 			const channels = await sb.Query.getRecordset(rs => rs
 			    .select("Channel")
 			    .from("data", "Twitch_Lotto")
