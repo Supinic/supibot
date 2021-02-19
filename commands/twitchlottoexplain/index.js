@@ -8,11 +8,19 @@ module.exports = {
     Params: null,
     Whitelist_Response: null,
     Static_Data: null,
-    Code: (async function twitchLotto (context, link) {
-        if (!link) {
+    Code: (async function twitchLotto (context, inputLink) {
+        if (!inputLink) {
             return {
                 success: false,
                 reply: `No image link provided!`
+            };
+        }
+
+        const link = sb.Utils.getPathFromURL(inputLink);
+        if (!link) {
+            return {
+                success: false,
+                reply: `Invalid image link provided!`
             };
         }
 
