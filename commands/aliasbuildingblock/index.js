@@ -110,6 +110,12 @@ module.exports = {
                     }
 
                     return {
+                        cooldown: {
+                            user: context.user.ID,
+                            channel: null,
+                            command: this.ID,
+                            length: 60_000
+                        },
                         reply: sb.Utils.randArray(users)
                     };
                 }
