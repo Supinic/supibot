@@ -101,7 +101,7 @@ module.exports = {
                     rs.where("Owner = %n", identifier);
                 }
                 else if (typeof identifier === "string") {
-                    rs.where("ID = %n", identifier);
+                    rs.where("ID = %s", identifier);
                 }
                 else {
                     throw new sb.Error({
