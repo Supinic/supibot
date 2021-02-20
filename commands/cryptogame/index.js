@@ -275,7 +275,7 @@ module.exports = {
         };
 
         return {
-            availableCommands: ["buy", "register", "sell", "send"],
+            availableCommands: ["buy", "check", "register", "sell", "send"],
             baseAsset,
             getPortfolioData,
             parseArguments,
