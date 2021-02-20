@@ -152,24 +152,19 @@ module.exports = class TwitchController extends require("./template.js") {
 			if (error instanceof DankTwitch.JoinError && error.failedChannelName) {
 				this.failedJoinChannels.add(error.failedChannelName);
 			}
-			else if (error instanceof DankTwitch.SayError && error.cause instanceof DankTwitch.TimeoutError) {
+			else if (error instanceof DankTwitch.SayError && error.cause instanceof DankTwitch.MessageError) {
 				if (error.message.startsWith("Bad response message")) {
 					const channelData = sb.Channel.get(error.failedChannelName);
 					const defaultReply = "That message violates this channel's moderation settings.";
 
-					if (!defaultReply.toLowerCase().includes(error.messageText.toLowerCase())) {
+					if (!error.message.includes(defaultReply)) {
 						this.send(defaultReply, channelData);
 					}
 				}
 				else if (error.message.startsWith("Failed to say")) {
 					console.debug("Failed to say message", { error });
 				}
-				else {
-					console.debug("Unknown Say/TimeoutError", { error });
-				}
-			}
-			else if (error instanceof DankTwitch.SayError && error.cause instanceof DankTwitch.MessageError) {
-				if (error.message.includes("has been suspended")) {
+				else if (error.message.includes("has been suspended")) {
 					console.warn("Attempting to send a message in banned channel", { error });
 				}
 				else {
