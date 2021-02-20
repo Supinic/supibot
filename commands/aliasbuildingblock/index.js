@@ -233,7 +233,7 @@ module.exports = {
 
         const result = await block.execute(context, ...args);
         return {
-            cooldown: null,
+            cooldown: result.cooldown ?? null,
             ...result
         }
     }),
