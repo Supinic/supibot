@@ -289,7 +289,7 @@ module.exports = {
             availableCommands,
             baseAsset,
             checkPortfolioAsset,
-            createTransferTransaction,
+            createConvertTransaction,
             getPortfolioData,
             parseArguments,
             updatePortfolioAsset
