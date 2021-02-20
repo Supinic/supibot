@@ -133,6 +133,13 @@ module.exports = {
             const result = {};
             for (const [key, value] of Object.entries(input)) {
                 if (key === "user") {
+                    if (!value) {
+                        return {
+                            success: false,
+                            reply: "No user provided!"
+                        };
+                    }
+
                     const userData = await sb.User.get(value);
                     if (!userData) {
                         return {
@@ -144,6 +151,13 @@ module.exports = {
                     result.user = userData;
                 }
                 else if (key === "asset") {
+                    if (!value) {
+                        return {
+                            success: false,
+                            reply: "No asset provided!"
+                        };
+                    }
+
                     const assetData = await getAssetData(value);
                     if (!assetData) {
                         return {
@@ -155,6 +169,13 @@ module.exports = {
                     result.asset = assetData;
                 }
                 else if (key === "amount") {
+                    if (!value) {
+                        return {
+                            success: false,
+                            reply: "No amount provided!"
+                        };
+                    }
+
                     const amount = Number(value);
                     if (!Number.isFinite(amount) || amount <= 0) {
                         return {
