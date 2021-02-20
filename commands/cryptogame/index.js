@@ -123,15 +123,10 @@ module.exports = {
                 .where("Portfolio = %s", portfolioID)
             );
 
-            if (data.length === 0) {
-                return null;
-            }
-            else {
-                return {
-                    ID: portfolioID,
-                    assets: data
-                }
-            }
+            return {
+                ID: portfolioID,
+                assets: data
+            };
         };
 
         const parseArguments = async (input) => {
