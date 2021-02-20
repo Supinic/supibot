@@ -88,16 +88,30 @@ module.exports = {
             return data ?? null;
         };
 
-        const getPortfolioData = async (userID) => {
-            const portfolioID = await sb.Query.getRecordset(rs => rs
-                .select("ID")
-                .from("crypto_game", "Portfolio")
-                .where("Owner = %n", userID)
-                .where("Active = %b", true)
-                .limit(1)
-                .single()
-                .flat("ID")
-            );
+        const getPortfolioData = async (identifier) => {
+            const portfolioID = await sb.Query.getRecordset(rs => {
+                rs.select("ID")
+                    .from("crypto_game", "Portfolio")
+                    .where("Active = %b", true)
+                    .limit(1)
+                    .single()
+                    .flat("ID");
+
+                if (typeof identifier === "number") {
+                    rs.where("Owner = %n", identifier);
+                }
+                else if (typeof identifier === "string") {
+                    rs.where("ID = %n", identifier);
+                }
+                else {
+                    throw new sb.Error({
+                        message: "Invalid portfolio identifier provided",
+                        args: { identifier }
+                    });
+                }
+
+                return rs;
+            });
 
             if (!portfolioID) {
                 return null;
