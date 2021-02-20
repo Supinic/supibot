@@ -263,8 +263,8 @@ module.exports = {
 
             await Promise.all([
                 row.save(),
-                updatePortfolioAsset(portfolioData, parsedData.asset, -amount),
-                updatePortfolioAsset(targetPortfolioData, parsedData.asset, amount)
+                updatePortfolioAsset(sourcePortfolio, parsedData.asset, -amount),
+                updatePortfolioAsset(targetPortfolio, parsedData.asset, amount)
             ]);
         };
 
