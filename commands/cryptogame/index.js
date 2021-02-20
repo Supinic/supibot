@@ -291,6 +291,7 @@ module.exports = {
             checkPortfolioAsset,
             createTransferTransaction,
             getPortfolioData,
+            parseArguments,
             updatePortfolioAsset
         } = this.staticData;
 
