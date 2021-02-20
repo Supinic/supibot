@@ -281,7 +281,8 @@ module.exports = {
             parseArguments,
             checkPortfolioAsset,
             updatePortfolioAsset,
-            createConvertTransaction
+            createConvertTransaction,
+            createTransferTransaction
         };
     }),
     Code: (async function cryptoGame (context, command, ...args) {
@@ -290,6 +291,7 @@ module.exports = {
             baseAsset,
             checkPortfolioAsset,
             createConvertTransaction,
+            createTransferTransaction,
             getPortfolioData,
             parseArguments,
             updatePortfolioAsset
