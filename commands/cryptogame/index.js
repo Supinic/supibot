@@ -62,7 +62,11 @@ module.exports = {
                         row.values.Code = code;
                     }
 
-                    row.values.Price_EUR = sb.Utils.round(1 / value, 9, { direction: "floor" });
+                    const adjustedValue = (code === "XAU" || code === "XAG")
+                        ? value
+                        : (1 / value);
+
+                    row.values.Price_EUR = sb.Utils.round(adjustedValue, 9, { direction: "floor" });
                     row.values.Updated = now;
                     await row.save();
                 });
