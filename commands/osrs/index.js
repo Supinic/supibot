@@ -53,6 +53,9 @@ module.exports = {
 			if (data.ironman.regular) {
 				ironman = "ironman";
 			}
+			else if (data.ironman.deadHardcore) {
+				ironman = "ex-hardcore ironman";
+			}
 			else if (data.ironman.hardcore) {
 				ironman = "hardcore ironman";
 			}
