@@ -4,7 +4,7 @@ module.exports = {
     Author: "supinic",
     Cooldown: 10000,
     Description: "For a given processed TwitchLotto link, creates a version where the detections are marked with boxes.",
-    Flags: ["mention","whitelist"],
+    Flags: ["mention"],
     Params: null,
     Whitelist_Response: null,
     Static_Data: null,
