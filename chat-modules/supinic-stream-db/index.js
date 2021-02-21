@@ -40,6 +40,7 @@ module.exports = {
 				const row = await sb.Query.getRow("stream", "Stream");
 				await row.load(stream.id);
 
+				let mult = 1;
 				if (stream.duration) {
 					const vodDuration = stream.duration.split(/\D/)
 						.filter(Boolean)
