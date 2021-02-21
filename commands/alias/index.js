@@ -18,95 +18,92 @@ module.exports = {
 			const resultArguments = [];
 			const numberRegex = /\${(?<order>\d+)(-(?<range>\d+))?(?<rest>\+?)?}/;
 			const keywordRegex = /\${(channel|executor)}/;
+			const argRegex = /(?:(\${.+?}))/g;
 
-			// If there are multiple arguments in one "word" (not separated by spaces), use the first one, and
-			// spread the separated words back into aliasArguments. They will be processed one by one in the
-			// parameter parsing loop proper.
-			for (let i = aliasArguments.length - 1; i >= 0; i--) {
-				const arg = aliasArguments[i];
-				const match = arg.match(/\${.+?}/g);
-				if (match && match.length > 1) {
-					aliasArguments.splice(i, 1, ...match);
-				}
-			}
+			for (const topArg of aliasArguments) {
+				const tempResult = [];
+				const subMatch = topArg.split(argRegex);
 
-			for (const arg of aliasArguments) {
-				if (numberRegex.test(arg)) {
-					let result = arg;
-					const iteratorRegex = new RegExp(numberRegex, "g");
-					const iterator = arg.matchAll(iteratorRegex);
-	
-					for (const match of iterator) {
-						const { groups } = match;
-						const item = match[0];
-	
-						const order = Number(groups.order);
-						if (!sb.Utils.isValidInteger(order)) {
-							return {
-								success: false,
-								reply: `Invalid parameter order for argument "${arg}"!`
-							};
-						}
-	
-						if (groups.rest && groups.range) {
-							return {
-								success: false,
-								reply: `Can't combine range and rest parameters in argument "${arg}"!`
-							};
-						}
-	
-						let replacement = null;
-						if (groups.rest) {
-							replacement = commandArguments.slice(order).join(" ");
-						}
-						else if (groups.range) {
-							const range = Number(groups.range);
-							if (!sb.Utils.isValidInteger(range)) {
+				for (const arg of subMatch) {
+					if (numberRegex.test(arg)) {
+						let result = arg;
+						const iteratorRegex = new RegExp(numberRegex, "g");
+						const iterator = arg.matchAll(iteratorRegex);
+
+						for (const match of iterator) {
+							const { groups } = match;
+							const item = match[0];
+
+							const order = Number(groups.order);
+							if (!sb.Utils.isValidInteger(order)) {
 								return {
 									success: false,
-									reply: `Invalid range parameter for argument "${arg}"!`
+									reply: `Invalid parameter order for argument "${arg}"!`
 								};
 							}
-							else if (order >= range) {
+
+							if (groups.rest && groups.range) {
 								return {
 									success: false,
-									reply: `The end of a range must be greater than the start of it in argument "${arg}"!`
+									reply: `Can't combine range and rest parameters in argument "${arg}"!`
 								};
 							}
-	
-							replacement = commandArguments.slice(order, range + 1).join(" ");
+
+							let replacement = null;
+							if (groups.rest) {
+								replacement = commandArguments.slice(order).join(" ");
+							}
+							else if (groups.range) {
+								const range = Number(groups.range);
+								if (!sb.Utils.isValidInteger(range)) {
+									return {
+										success: false,
+										reply: `Invalid range parameter for argument "${arg}"!`
+									};
+								}
+								else if (order >= range) {
+									return {
+										success: false,
+										reply: `The end of a range must be greater than the start of it in argument "${arg}"!`
+									};
+								}
+
+								replacement = commandArguments.slice(order, range + 1).join(" ");
+							}
+							else {
+								replacement = commandArguments[order] ?? "";
+							}
+
+							result = result.replace(item, replacement);
+						}
+
+						tempResult.push(...result.split(" "));
+					}
+					else if (keywordRegex.test(arg)) {
+						const type = arg.match(keywordRegex)[1];
+						const replacerRegex = new RegExp(keywordRegex, "g");
+
+						if (type === "channel") {
+							tempResult.push(arg.replace(replacerRegex, context.channel?.Name ?? "[whispers]"));
+						}
+						else if (type === "executor") {
+							tempResult.push(arg.replace(replacerRegex, context.user.Name));
 						}
 						else {
-							replacement = commandArguments[order] ?? "";
+							return {
+								success: false,
+								reply: `This shouldn't happen :)`
+							};
 						}
-	
-						result = result.replace(item, replacement);
-					}
-	
-					resultArguments.push(...result.split(" "));
-				}
-				else if (keywordRegex.test(arg)) {
-					const type = arg.match(keywordRegex)[1];
-					const replacerRegex = new RegExp(keywordRegex, "g");
-	
-					if (type === "channel") {
-						resultArguments.push(arg.replace(replacerRegex, context.channel?.Name ?? "[whispers]"));
-					}
-					else if (type === "executor") {
-						resultArguments.push(arg.replace(replacerRegex, context.user.Name));
 					}
 					else {
-						return {
-							success: false,
-							reply: `This shouldn't happen :)`
-						};
+						tempResult.push(arg);
 					}
 				}
-				else {
-					resultArguments.push(arg);
-				}
+
+				resultArguments.push(tempResult.join(""));
 			}
-	
+
 			return {
 				success: true,
 				resultArguments
