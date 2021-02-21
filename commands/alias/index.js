@@ -77,7 +77,7 @@ module.exports = {
 							result = result.replace(item, replacement);
 						}
 
-						tempResult.push(...result.split(" "));
+						tempResult.push(...result.split(" ").map(i => `${i} `));
 					}
 					else if (keywordRegex.test(arg)) {
 						const type = arg.match(keywordRegex)[1];
