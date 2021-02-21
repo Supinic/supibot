@@ -366,9 +366,12 @@ module.exports = {
 
         switch (command) {
             case "check": {
-                const account = portfolioData.assets.map(i => `${i.Code}: ${i.Amount}`).join("; ");
+                const accountString = portfolioData.assets
+                    .filter(i => i.Amount > 0)
+                    .map(i => `${i.Code}: ${i.Amount}`).join("; ");
+
                 return {
-                    reply: `Your portfolio: ${account}`
+                    reply: `Your portfolio: ${accountString}`
                 };
             }
 
