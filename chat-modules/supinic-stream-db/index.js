@@ -4,17 +4,16 @@ module.exports = {
 	Description: "Creates and updates database rows of Streams on Supinic's channel as he goes on/offline.",
 	Code: (async function supinicStreamDB (context) {
 		const { data: [stream] } = await sb.Got("Helix", {
-			url: "streams",
+			url: "videos",
 			searchParams:  new sb.URLParams()
 				.set("user_id", "31400525")
 				.set("first", "1")
-				.set("period", "day")
+				.toString()
 		}).json();
 
 		if (stream) {
-			const start = new sb.Date(stream.started_at);
+			const start = new sb.Date(stream.created_at);
 			const date = start.clone().discardTimeUnits("h", "m", "s", "ms");
-
 			const exists = await sb.Query.getRecordset(rs => rs
 			    .select("Video_ID")
 			    .from("stream", "Stream")
