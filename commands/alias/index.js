@@ -18,7 +18,18 @@ module.exports = {
 			const resultArguments = [];
 			const numberRegex = /\${(?<order>\d+)(-(?<range>\d+))?(?<rest>\+?)?}/;
 			const keywordRegex = /\${(channel|executor)}/;
-	
+
+			// If there are multiple arguments in one "word" (not separated by spaces), use the first one, and
+			// spread the separated words back into aliasArguments. They will be processed one by one in the
+			// parameter parsing loop proper.
+			for (let i = aliasArguments.length - 1; i >= 0; i--) {
+				const arg = aliasArguments[i];
+				const match = arg.match(/\${.+?}/g);
+				if (match && match.length > 1) {
+					aliasArguments.splice(i, 1, ...match);
+				}
+			}
+
 			for (const arg of aliasArguments) {
 				if (numberRegex.test(arg)) {
 					let result = arg;
