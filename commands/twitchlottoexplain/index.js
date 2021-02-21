@@ -9,6 +9,21 @@ module.exports = {
     Whitelist_Response: null,
     Static_Data: null,
     Code: (async function twitchLotto (context, inputLink) {
+        const filtered = await sb.Filter.execute({
+            user: context.user,
+            command: sb.Command.get("tl"),
+            channel: context.channel,
+            platform: context.platform,
+            targetUser: null
+        });
+        
+        if (!filtered.success) {
+            return {
+                success: false,
+                reply: `You can't use this command here! That's because the $tl command is not available here either.`
+            };
+        }
+
         if (!inputLink) {
             return {
                 success: false,
