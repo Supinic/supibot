@@ -77,17 +77,17 @@ module.exports = {
 							result = result.replace(item, replacement);
 						}
 
-						tempResult.push(...result.split(" "));
+						tempResult.push(...result.split(" ").map(i => `${i} `));
 					}
 					else if (keywordRegex.test(arg)) {
 						const type = arg.match(keywordRegex)[1];
 						const replacerRegex = new RegExp(keywordRegex, "g");
 
 						if (type === "channel") {
-							tempResult.push(arg.replace(replacerRegex, context.channel?.Name ?? "[whispers]"));
+							tempResult.push(arg.replace(replacerRegex, context.channel?.Name ?? "[whispers]" + " "));
 						}
 						else if (type === "executor") {
-							tempResult.push(arg.replace(replacerRegex, context.user.Name));
+							tempResult.push(arg.replace(replacerRegex, context.user.Name) + " ");
 						}
 						else {
 							return {
@@ -97,7 +97,7 @@ module.exports = {
 						}
 					}
 					else {
-						tempResult.push(arg);
+						tempResult.push(arg + " ");
 					}
 				}
 
