@@ -9,16 +9,14 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function freeBobby () {
-		const now = sb.Date.now();
-		const start = new sb.Date("2014-12-20");
-		const free = new sb.Date("2021-12-11");
-		const percent = sb.Utils.round(100 * (now - start) / (free - start), 2);
-	
-		return { 
+		const conditional = new sb.Date("2021-02-23 19:00"); // date = static, time = estimated
+		return {
 			reply: sb.Utils.tag.trim `
 				Our boy should have been set free in December 2020, but his parole has been denied.
-				He will most likely serve the rest of his sentence, getting out ${sb.Utils.timeDelta(free)}.
-				Overall, he has served ${percent}% of the sentence.
+				However, after a review by the Department of Corrections in February 2021, 
+				his credit for good institutional behavior qualified him for a conditional release 
+				${sb.Utils.timeDelta(conditional)},
+				given the rest of his sentence is to be served on parole (up until 2026).
 				TriHard
 			`
 		};
