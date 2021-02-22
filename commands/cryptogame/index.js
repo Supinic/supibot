@@ -67,7 +67,7 @@ module.exports = {
                         : (1 / value);
 
                     row.values.Price_EUR = sb.Utils.round(adjustedValue, 9, { direction: "floor" });
-                    row.values.Updated = now;
+                    row.values.Last_Update = now;
                     await row.save();
                 });
 
