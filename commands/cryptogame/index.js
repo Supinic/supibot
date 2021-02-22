@@ -74,6 +74,7 @@ module.exports = {
                 await Promise.all(promises);
             })
         });
+        this.data.updateCron.start();
 
         const baseAsset = {
             Code: "EUR",
