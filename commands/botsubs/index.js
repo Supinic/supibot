@@ -12,7 +12,7 @@ module.exports = {
 		const { availableEmotes } = sb.Platform.get("twitch").controller;
 		const subEmoteSets = availableEmotes
 			.filter(i => ["1", "2", "3"].includes(i.tier) && i.emotes.length > 0)
-			.sort((a, b) => Number(a.tier) - Number(b.tier));
+			.sort((a, b) => Number(b.tier) - Number(a.tier));
 
 		const result = [];
 		const encountered = new Set();
