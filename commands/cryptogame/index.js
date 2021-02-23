@@ -66,7 +66,7 @@ module.exports = {
                         ? value
                         : (1 / value);
 
-                    row.values.Price_EUR = sb.Utils.round(adjustedValue, 9, { direction: "floor" });
+                    row.values.Price = sb.Utils.round(adjustedValue, 9, { direction: "floor" });
                     row.values.Last_Update = now;
                     await row.save();
                 });
@@ -78,12 +78,12 @@ module.exports = {
 
         const baseAsset = {
             Code: "EUR",
-            Price_EUR: 1
+            Price: 1
         };
 
         const getAssetData = async (code) => {
             const data = await sb.Query.getRecordset(rs => rs
-                .select("Code", "Price_EUR")
+                .select("Code", "Price")
                 .from("crypto_game", "Asset")
                 .where("Code = %s", code.toUpperCase())
                 .single()
@@ -274,7 +274,7 @@ module.exports = {
         };
 
         const createConvertTransaction = async (portfolioData, sourceAsset, targetAsset, sourceAmount) => {
-            const exchangeRate = sb.Utils.round(targetAsset.Price_EUR / sourceAsset.Price_EUR, 9, { direction: "floor" });
+            const exchangeRate = sb.Utils.round(targetAsset.Price / sourceAsset.Price, 9, { direction: "floor" });
             const targetAmount = sb.Utils.round(sourceAmount / exchangeRate, 9, { direction: "floor" });
 
             const row = await sb.Query.getRow("crypto_game", "Transaction");
@@ -426,7 +426,7 @@ module.exports = {
 
                 let sourceAsset = baseAsset;
                 let targetAsset = data.asset;
-                let sourceAmount = data.amount * targetAsset.Price_EUR;
+                let sourceAmount = data.amount * targetAsset.Price;
                 if (command === "sell") {
                     sourceAsset = data.asset;
                     targetAsset = baseAsset;
