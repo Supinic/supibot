@@ -106,7 +106,7 @@ module.exports = {
 
 			return {
 				success: true,
-				resultArguments
+				resultArguments: resultArguments.join("").split(" ")
 			};
 		}
 	})),
