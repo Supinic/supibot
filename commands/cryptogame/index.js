@@ -301,7 +301,7 @@ module.exports = {
         };
 
         return {
-            availableCommands: ["buy", "check", "register", "sell", "send"],
+            availableCommands: ["assets", "buy", "check", "register", "prices", "sell", "send"],
             baseAsset,
             getPortfolioData,
             parseArguments,
@@ -358,6 +358,11 @@ module.exports = {
             await updatePortfolioAsset(portfolioID, baseAsset, 1000);
             return {
                 reply: `Your portfolio was established. You now have the equivalent of 1000 EUR at your disposal to invest.`
+            };
+        }
+        else if (command === "assets" && command === "prices") {
+            return {
+                reply: `Check the available assets and their prices here: https://supinic.com/crypto-game/asset/list`
             };
         }
 
