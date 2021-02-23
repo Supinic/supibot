@@ -271,6 +271,19 @@ module.exports = {
 					}
 				],
 			},
+			{
+				code: "hacker",
+				language: "english",
+				sources: [
+					{
+						name: "HackerNews",
+						url: "https://hnrss.org",
+						path: "",
+						endpoints: ["frontpage"],
+						helpers: []
+					}
+				]
+			},
 		],
 	
 		extra: {
