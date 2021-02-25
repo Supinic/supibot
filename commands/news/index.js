@@ -284,6 +284,26 @@ module.exports = {
 					}
 				]
 			},
+			{
+				code: "lt",
+				language: "lithuanian",
+				sources: [
+					{
+						name: "15min",
+						url: "https://15min.lt",
+						path: "",
+						endpoints: ["rss"],
+						helpers: ["danolifer"]
+					},
+					{
+						name: "Lrytas.lt",
+						url: "https://lrytas.lt",
+						path: "",
+						endpoints: ["rss"],
+						helpers: ["danolifer"]
+					}
+				]
+			},
 		],
 	
 		extra: {
