@@ -302,7 +302,7 @@ module.exports = {
         };
 
         return {
-            availableCommands: ["assets", "buy", "check", "register", "prices", "sell", "send"],
+            availableCommands: ["assets", "buy", "check", "register", "prices", "sell", "send", "total"],
             baseAsset,
             getPortfolioData,
             parseArguments,
@@ -460,6 +460,17 @@ module.exports = {
 
                 return {
                     reply: `You successfully traded ${sourceAmount} ${sourceAsset.Code} for ${result.targetAmount} ${targetAsset.Code}.`
+                };
+            }
+            
+            case "total": {
+                const escaped = sb.Query.escapeString(portfolioData.ID);
+                const [data] = await sb.Query.raw(
+                    `SELECT GET_PORTFOLIO_TOTAL_PRICE(${escaped}) AS Total`
+                );
+
+                return {
+                    reply: `Your current total: € ${data.Total}`
                 };
             }
         }
