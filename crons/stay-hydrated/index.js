@@ -7,7 +7,7 @@ module.exports = {
 	Code: (async function announceStayHydrated () {
 		const channelData = sb.Channel.get("supinic", "twitch");
 		if (channelData.sessionData.live) {
-			await channelData.send("OMGScoots TeaTime Don't forget to stay hydrated!");
+			await channelData.send("OMGScoods TeaTime Don't forget to stay hydrated!");
 		}
 	})
 };
