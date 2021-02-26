@@ -298,7 +298,7 @@ module.exports = {
 
 					return {
 						name: country.location.toLowerCase(),
-						amount: accines,
+						amount: vaccines,
 						percent: (!vaccines)
 							? null
 							: (sb.Utils.round(vaccines / country.population, 3) * 100 + "%")
