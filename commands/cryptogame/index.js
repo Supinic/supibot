@@ -273,7 +273,8 @@ module.exports = {
             ]);
         };
 
-        const createConvertTransaction = async (portfolioData, sourceAsset, targetAsset, sourceAmount) => {
+        const createConvertTransaction = async (portfolioData, sourceAsset, targetAsset, rawSourceAmount) => {
+            const sourceAmount = sb.Utils.round(rawSourceAmount, 9, { direction: "floor" });
             const exchangeRate = sb.Utils.round(targetAsset.Price / sourceAsset.Price, 9, { direction: "floor" });
             const targetAmount = sb.Utils.round(sourceAmount / exchangeRate, 9, { direction: "floor" });
 
