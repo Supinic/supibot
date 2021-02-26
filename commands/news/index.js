@@ -362,7 +362,18 @@ module.exports = {
 		const { codeRegex, extra } = this.staticData;
 		if (rest[0] && extra.exists(rest[0])) {
 			const code = rest.shift();
-			const article = await extra.fetch(code, rest.join(" ") || null);
+
+			let article;
+			try {
+				article = await extra.fetch(code, rest.join(" ") || null);
+			}
+			catch (e) {
+				console.warn(e);
+				return {
+					success: false,
+					reply: `Could not fetch any articles due to a source website error!`
+				};
+			}
 	
 			if (!article) {
 				return {
