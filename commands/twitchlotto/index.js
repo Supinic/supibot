@@ -70,7 +70,7 @@ module.exports = {
 					reply: "The channel you provided has no images saved!"
 				};
 			}
-			else if (context.params.excludeChannel``) {
+			else if (context.params.excludeChannel) {
 				return {
 					success: false,
 					reply: "Cannot combine the excludeChannel parameter with a specified channel!"
