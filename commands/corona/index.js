@@ -298,8 +298,8 @@ module.exports = {
 
 					return {
 						name: country.location.toLowerCase(),
-						amount: vaccines,
-						percent: (vaccines)
+						amount: accines,
+						percent: (!vaccines)
 							? null
 							: (sb.Utils.round(vaccines / country.population, 3) * 100 + "%")
 					};
@@ -345,7 +345,7 @@ module.exports = {
 					: ""
 				}
 				
-				Vacccine status: ${vaccines?.amount ?? "unknown amount"} people have been vaccinated so far,
+				Vacccine status: ${vaccines?.amount ? sb.Utils.groupDigits(vaccines.amount) : "unknown amount"} people have been vaccinated so far,
 				which is ${vaccines.percent ?? "unknown percent"} of the population.				
 			`
 		};
