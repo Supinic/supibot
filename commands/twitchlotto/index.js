@@ -128,7 +128,7 @@ module.exports = {
 						.flat("Link");
 
 					if (context.params.excludeChannel) {
-						rs.where("Channel NOT IN %[]s", context.params.excludeChannel.split(/\b/));
+						rs.where("Channel NOT IN %s+", context.params.excludeChannel.split(/\b/));
 					}
 
 					return rs;
