@@ -301,7 +301,7 @@ module.exports = {
 						amount: vaccines,
 						percent: (!vaccines)
 							? null
-							: (sb.Utils.round(vaccines / country.population, 3) * 100 + "%")
+							: (sb.Utils.round(vaccines / country.population * 100, 1) + "%")
 					};
 				});
 
