@@ -117,7 +117,14 @@ module.exports = {
 				);
 			}
 			else {
-				const roll = sb.Utils.random(1, this.data.counts.total);
+				const excluded = (context.params.excludeChannel) ? context.params.excludeChannel.split(/\W/) : null;
+				let roll = sb.Utils.random(1, this.data.counts.total);
+				if (excluded) {
+					for (const channel of excluded) {
+						roll -= this.data.counts[channel] ?? 0;
+					}
+				}
+
 				const link = await sb.Query.getRecordset(rs => {
 					rs.select("Link")
 						.from("data", "Twitch_Lotto")
@@ -127,8 +134,8 @@ module.exports = {
 						.single()
 						.flat("Link");
 
-					if (context.params.excludeChannel) {
-						rs.where("Channel NOT IN %s+", context.params.excludeChannel.split(/\W/));
+					if (excluded) {
+						rs.where("Channel NOT IN %s+", excluded);
 					}
 
 					return rs;
