@@ -281,7 +281,36 @@ module.exports = {
 				ratios.tpm = sb.Utils.round((tests / population) * 1e6, 2);
 			}
 		}
-	
+
+		let vaccines;
+		if (country) {
+			let vaccineData = await this.getCacheData("vaccines");
+			if (!vaccineData) {
+				const rawData = await sb.Got({
+					url: "https://covid.ourworldindata.org/data/owid-covid-data.json"
+				}).json();
+
+				vaccineData = Object.values(rawData).map(country => {
+					const hasVaccines = country.data.filter(i => i.total_vaccinations);
+					const vaccines = (hasVaccines.length === 0)
+						? null
+						: Math.max(...hasVaccines.map(i => i.total_vaccinations));
+
+					return {
+						name: country.location.toLowerCase(),
+						amount: vaccines,
+						percent: (vaccines)
+							? null
+							: (sb.Utils.round(vaccines / country.population, 3) * 100 + "%")
+					};
+				});
+
+				await this.setCacheData("vaccines", vaccineData, { expiry: 864e5 });
+			}
+
+			vaccines = vaccineData.find(i => i.name === country.toLowerCase());
+		}
+
 		return {
 			reply: sb.Utils.tag.trim `
 				${intro}
@@ -315,6 +344,9 @@ module.exports = {
 						: ` ${group(ratios.cpm)} cases, and ${group(ratios.dpm)} deaths per million.`
 					: ""
 				}
+				
+				Vacccine status: ${vaccines?.amount ?? "unknown amount"} people have been vaccinated so far,
+				which is ${vaccines.percent ?? "unknown percent"} of the population.				
 			`
 		};
 	}),
