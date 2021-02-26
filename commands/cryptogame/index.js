@@ -466,7 +466,7 @@ module.exports = {
             case "total": {
                 const escaped = sb.Query.escapeString(portfolioData.ID);
                 const [data] = await sb.Query.raw(
-                    `SELECT GET_PORTFOLIO_TOTAL_PRICE(${escaped}) AS Total`
+                    `SELECT crypto_game.GET_PORTFOLIO_TOTAL_PRICE(${escaped}) AS Total`
                 );
 
                 return {
