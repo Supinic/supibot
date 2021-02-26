@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches a random Imgur image from a Twitch channel (based off Twitchlotto) and checks it for NSFW stuff via an AI. The \"nudity score\" is posted along with the link.",
 	Flags: ["mention","whitelist"],
-	Params: null,
+	Params: [
+		{ name: "excludeChannel", type: "string" }
+	],
 	Whitelist_Response: "This command can't be executed here!",
 	Static_Data: (() => {
 		this.data.counts = {};
@@ -68,6 +70,12 @@ module.exports = {
 					reply: "The channel you provided has no images saved!"
 				};
 			}
+			else if (context.params.excludeChannel``) {
+				return {
+					success: false,
+					reply: "Cannot combine the excludeChannel parameter with a specified channel!"
+				};
+			}
 		}
 	
 		// Preparation work that does not need to run more than once, so it is placed before the loop below.
@@ -110,15 +118,21 @@ module.exports = {
 			}
 			else {
 				const roll = sb.Utils.random(1, this.data.counts.total);
-				const link = await sb.Query.getRecordset(rs => rs
-					.select("Link")
-					.from("data", "Twitch_Lotto")
-					.orderBy("Link ASC")
-					.limit(1)
-					.offset(roll)
-					.single()
-					.flat("Link")
-				);
+				const link = await sb.Query.getRecordset(rs => {
+					rs.select("Link")
+						.from("data", "Twitch_Lotto")
+						.orderBy("Link ASC")
+						.limit(1)
+						.offset(roll)
+						.single()
+						.flat("Link");
+
+					if (context.params.excludeChannel) {
+						rs.where("Channel NOT IN %[]s", context.params.excludeChannel.split(/\b/));
+					}
+
+					return rs;
+				});
 	
 				image = await sb.Query.getRecordset(rs => rs
 					.select("*")
@@ -270,6 +284,14 @@ module.exports = {
 			
 			`<code>${prefix}twitchlotto (channel)</code>`,
 			"Fetches a random image from the specified channel",
+			"",
+
+			`<code>${prefix}twitchlotto excludeChannel:forsen</code>`,
+			"Fetches a random image from any but the specified excluded channel",
+			"",
+
+			`<code>${prefix}twitchlotto excludeChannel:"forsen,nymn,pajlada"</code>`,
+			"Fetches a random image from any but the specified excluded channels, separated by spaces or commas",
 			"",
 	
 			"Supported channels:",
