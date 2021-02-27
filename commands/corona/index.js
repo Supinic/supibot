@@ -346,7 +346,7 @@ module.exports = {
 				}
 				
 				Vacccine status: ${vaccines?.amount ? sb.Utils.groupDigits(vaccines.amount) : "unknown amount"} people have been vaccinated so far,
-				which is ${vaccines.percent ?? "unknown percent"} of the population.				
+				which is ${vaccines?.percent ?? "unknown percent"} of the population.				
 			`
 		};
 	}),
