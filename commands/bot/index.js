@@ -155,6 +155,67 @@ module.exports = {
 					};
 				}
 			}
+
+			case "offline-only": {
+				const moduleData = sb.ChatModule.get("offline-only-mode");
+				const check = await sb.Query.getRecordset(rs => rs
+				    .select("ID")
+				    .from("chat_data", "Channel_Chat_Module")
+					.where("Channel = %n", channelData.ID)
+					.where("Chat_Module = %n", moduleData.ID)
+					.single()
+					.flat("ID")
+				);
+				
+				if (check) {
+					return {
+						success: false,
+						reply: `The offline-only mode has already been activated in this channel!`
+					};
+				}
+
+				const row = await sb.Query.getRow("chat_data", "Channel_Chat_Module");
+				row.setValues({
+					Channel: channelData.ID,
+					Chat_Module: moduleData.ID
+				});
+				await row.save();
+
+				await sb.Channel.reloadSpecific(channelData);
+				return {
+					reply: `Channel ${channelData.Name} is now in offline-only mode.`
+				};
+			}
+			case "disable-offline-only": {
+				const moduleData = sb.ChatModule.get("offline-only-mode");
+				const check = await sb.Query.getRecordset(rs => rs
+					.select("ID")
+					.from("chat_data", "Channel_Chat_Module")
+					.where("Channel = %n", channelData.ID)
+					.where("Chat_Module = %n", moduleData.ID)
+					.single()
+					.flat("ID")
+				);
+
+				if (!check) {
+					return {
+						success: false,
+						reply: `The offline-only mode has not been activated in this channel before!`
+					};
+				}
+
+				await sb.Query.getRecordDeleter(rd => rd
+					.delete()
+					.from("chat_data", "Channel_Chat_Module")
+					.where("Channel = %n", channelData.ID)
+					.where("Chat_Module = %n", moduleData.ID)
+				);
+
+				await sb.Channel.reloadSpecific(channelData);
+				return {
+					reply: `Channel ${channelData.Name} is now no longer in offline-only mode.`
+				};
+			}
 	
 			default: return {
 				success: false,
@@ -181,6 +242,14 @@ module.exports = {
 			`<code>${prefix}bot enable supinic</code>`,
 			`<code>${prefix}bot enable channel:(name)</code>`,
 			"If the bot has been disabled in the given channel, this will re-enable it.",
+			"",
+
+			`<code>${prefix}bot offline-only</code>`,
+			`<code>${prefix}bot disable-offline-only</code>`,
+			`<code>${prefix}bot offline-only channel:(name)</code>`,
+			"Activates (or deactives, if used with disable-) the offline-only mode, which will make Supibot unresponsive in the channel when the streamer goes live.",
+			"After the stream ends, Supibot will automatically reactivate. There might be delay up to 2 minutes for both online/offline events.",
+			"Note: The stream must go online/offline for this mode to activate. If it is already live, Supibot won't deactivate until it goes live again in the future.",
 			"",
 			
 			`<code>${prefix}bot api url:(link) mode:(mode)</code>`,
