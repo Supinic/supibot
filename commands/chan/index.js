@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Pulls a random post from a random board, or a specified one, if you provide it.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [
+		{ name: "textOnly", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		replacements: [
@@ -192,13 +194,17 @@ module.exports = {
 	
 		if (resultType === "file") {
 			return {
-				reply: `${post.ID} (posted ${delta}): ${post.file} ${post.content}`
+				reply: (context.params.textOnly)
+					? `${post.file} ${post.content}`
+					: `${post.ID} (posted ${delta}): ${post.file} ${post.content}`
 			};
 		}
 		else if (resultType === "content") {
 			return {
-				reply: `${post.ID} (posted ${delta}): ${post.content}`
-			};
+				reply: (context.params.textOnly)
+					? `${post.content}`
+					: `${post.ID} (posted ${delta}): ${post.content}`
+			}
 		}
 	}),
 	Dynamic_Description: null
