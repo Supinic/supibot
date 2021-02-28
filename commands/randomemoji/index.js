@@ -18,14 +18,14 @@ module.exports = {
 			};
 		}
 
-		const emojis = sb.Config.get("EMOJI_LIST").split(" ");
+		const emojis = sb.Config.get("EMOJI_LIST");
 		return {
 			reply: [...Array(repeats)].map(() => sb.Utils.randArray(emojis)).join(" ")
 		};
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { limit } = values.getStaticData();
-		const list = sb.Config.get("EMOJI_LIST").split(" ");
+		const list = sb.Config.get("EMOJI_LIST");
 	
 		return [
 			"Returns a random word from a list of " + list.length + " pre-determined emojis.",
