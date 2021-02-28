@@ -28,7 +28,7 @@ module.exports = {
 		}
 
 		const threshold = new sb.Date().addHours(-24).toISOString();
-		const data = await sb.Got.gql({
+		const response = await sb.Got.gql({
 			url: "https://api.github.com/graphql",
 			token: sb.Config.get("GITHUB_PUBLIC_REPO_GQL_TOKEN"),
 			query: `{
@@ -40,14 +40,14 @@ module.exports = {
 			}`
 		}).json();
 
-		if (data.errors) {
+		if (response.errors) {
 			return {
 				success: false,
-				reply: data.errors.map(i => i.message).join("; ")
+				reply: response.errors.map(i => i.message).join("; ")
 			};
 		}
 
-		const commitCount = data.user.contributionsCollection.totalCommitContributions;
+		const commitCount = response.data.user.contributionsCollection.totalCommitContributions;
 		const suffix = (commitCount === 1) ? "": "s";
 		const who = (self) ? "You have" : `GitHub user ${username} has`;
 	
