@@ -40,7 +40,7 @@ module.exports = {
 			"(ten random emojis)",
 			"",
 	
-			"Emoji list: <br>" + list.join("<br>")
+			"Emoji list: <br>" + list.join("")
 		];
 	})
 };
