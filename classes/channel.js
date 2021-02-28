@@ -330,6 +330,10 @@ module.exports = class Channel extends require("./template.js") {
     }
 
     destroy () {
+        if (sb.ChatModule) {
+            sb.ChatModule.detachChannelModules(this.ID);
+        }
+
         this.Data = null;
         this.sessionData = null;
     }
