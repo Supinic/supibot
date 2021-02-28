@@ -12,7 +12,7 @@ module.exports = {
 	Static_Data: (() => ({
 		fixMissingCode: (baseEmoteSet, ID) => {
 			const emote = baseEmoteSet.emotes.find(i => i.ID === ID);
-			return emote.token ?? null;
+			return emote?.token ?? null;
 		}
 	})),
 	Code: (async function topEmotesToday (context) {
