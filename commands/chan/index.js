@@ -26,8 +26,7 @@ module.exports = {
 			{
 				regex: /kek/ig,
 				string: "cuck"
-			},
-	
+			}
 		]
 	})),
 	Code: (async function chan (context, identifier, ...rest) {
