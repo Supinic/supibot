@@ -46,12 +46,12 @@ module.exports = {
 		const reply = data
 			.sort((a, b) => b.count - a.count)
 			.map((i, ind) => {
-				const count = sb.Utils.formatSI(i.count, "", 2);
+				const count = sb.Utils.groupDigits(i.count);
 				const code = this.staticData.fixMissingCode(globalEmotes, String(i.id))
 					?? i.code
 					?? "(unknown)";
 
-				return `${ind + 1}): ${code} ${count}`;
+				return `${ind + 1}) ${code} ${count}`;
 			})
 			.join("; ")
 
