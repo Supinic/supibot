@@ -61,22 +61,26 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		AwayFromKeyboard.data = data.map(record => new AwayFromKeyboard(record));
 	}
 
-	static async reloadSpecific (ID) {
-		const row = await sb.Query.getRow("chat_data", "AFK");
-		await row.load(ID);
+	static async reloadSpecific (...list) {
+		const promises = list.map(async (ID) => {
+			const row = await sb.Query.getRow("chat_data", "AFK");
+			await row.load(ID);
 
-		const existingIndex = AwayFromKeyboard.data.findIndex(i => i.ID === ID);
-		if (existingIndex !== -1) {
-			AwayFromKeyboard.data[existingIndex].destroy();
-			AwayFromKeyboard.data.splice(existingIndex, 1);
-		}
+			const existingIndex = AwayFromKeyboard.data.findIndex(i => i.ID === ID);
+			if (existingIndex !== -1) {
+				AwayFromKeyboard.data[existingIndex].destroy();
+				AwayFromKeyboard.data.splice(existingIndex, 1);
+			}
 
-		if (!row.values.Active) {
-			return;
-		}
+			if (!row.values.Active) {
+				return;
+			}
 
-		const afk = new AwayFromKeyboard(row.valuesObject);
-		AwayFromKeyboard.data.push(afk);
+			const afk = new AwayFromKeyboard(row.valuesObject);
+			AwayFromKeyboard.data.push(afk);
+		});
+
+		await Promise.all(promises);
 	}
 
 	/**
