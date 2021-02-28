@@ -82,7 +82,7 @@ module.exports = {
 				this.#id = data.id;
 				this.#title = data.title;
 				this.#url = data.url;
-				this.#commentsUrl = `r/${data.sbureddit}/comments/${data.id}`;
+				this.#commentsUrl = `r/${data.subreddit}/comments/${data.id}`;
 
 				this.#isTextPost = Boolean(data.selftext && data.selftext_html);
 				this.#nsfw = Boolean(data.over_18);
@@ -229,7 +229,10 @@ module.exports = {
 			// And then splice off everything over the length of 3.
 			repeatedPosts.splice(this.staticData.repeats);
 
-			const commentsUrl = (context.params.comments) ? post.commentsUrl : "";
+			const commentsUrl = (context.params.comments)
+				? `Thread: https://reddit.com/${post.commentsUrl}`
+				: "";
+
 			const symbol = (forum.quarantine) ? "⚠" : "";
 			return {
 				link: post.url,
