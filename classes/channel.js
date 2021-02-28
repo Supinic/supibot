@@ -455,7 +455,7 @@ module.exports = class Channel extends require("./template.js") {
         );
 
         for (const channelData of channelsData) {
-            const index = Channel.data(i => i === channelData);
+            const index = Channel.data.findIndex(i => i === channelData);
             if (index === -1) {
                 throw new sb.Error({
                     message: "Unexpected channel ID mismatch during reload"
