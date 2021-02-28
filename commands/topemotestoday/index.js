@@ -9,7 +9,12 @@ module.exports = {
 		{ name: "date", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: (() => ({
+		fixMissingCode: (baseEmoteSet, ID) => {
+			const emote = baseEmoteSet.emotes.find(i => i.ID === ID);
+			return emote.token ?? null;
+		}
+	})),
 	Code: (async function topEmotesToday (context) {
 		const date = (context.params.date)
 			? new sb.Date(context.params.date)
@@ -36,12 +41,21 @@ module.exports = {
 				reply: "That day has no top-emotes data available!"
 			};
 		}
-		return {
-			reply: data
-				.sort((a, b) => b.count - a.count)
-				.map((i, ind) => `#${ind + 1}: ${i.code} - ${sb.Utils.formatSI(i.count, "", 2)}`)
-				.join("; ")
-		};
+
+		const globalEmotes = sb.Platform.get("twitch").controller.availableEmotes.find(i => i.ID === "0");
+		const reply = data
+			.sort((a, b) => b.count - a.count)
+			.map((i, ind) => {
+				const count = sb.Utils.formatSI(i.count, "", 2);
+				const code = this.staticData.fixMissingCode(globalEmotes, String(i.id))
+					?? i.code
+					?? "(unknown)";
+
+				return `#${ind + 1}: ${code} ${count}`;
+			})
+			.join("; ")
+
+		return { reply };
 	}),
 	Dynamic_Description: null
 };
