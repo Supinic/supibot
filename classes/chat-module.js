@@ -278,6 +278,16 @@ module.exports = class ChatModule extends require("./template.js") {
 		}
 	}
 
+	static attachChannelModules (channel) {
+		const channelData = sb.Channel.get(channel);
+		const detachedModules = ChatModule.getChannelModules(channelData);
+		for (const module of detachedModules) {
+			module.attach({
+				channel: channelData
+			});
+		}
+	}
+
 	static destroy () {
 		for (const chatModule of ChatModule.data) {
 			chatModule.detachAll();
