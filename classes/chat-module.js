@@ -70,13 +70,21 @@ module.exports = class ChatModule extends require("./template.js") {
 
 		for (const event of this.Events) {
 			for (const channelData of ChatModule.getTargets(options)) {
-				const listener = (context) => this.Code(context, ...options.args);
-				channelData.events.on(event, listener);
+				const reference = this.attachmentReferences.find(i => i.channelID === channelData.ID);
+				if (reference) {
+					channelData.events.on(event, reference.listener);
+					reference.active = true;
+				}
+				else {
+					const listener = (context) => this.Code(context, ...options.args);
+					channelData.events.on(event, listener);
 
-				this.attachmentReferences.push({
-					channelID: channelData.ID,
-					listener
-				});
+					this.attachmentReferences.push({
+						channelID: channelData.ID,
+						active: true,
+						listener
+					});
+				}
 			}
 		}
 	}
@@ -89,6 +97,7 @@ module.exports = class ChatModule extends require("./template.js") {
 					continue;
 				}
 
+				reference.active = false;
 				channelData.events.off(event, reference.listener);
 			}
 		}
