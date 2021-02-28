@@ -445,6 +445,36 @@ module.exports = class Channel extends require("./template.js") {
         Channel.data.push(channel);
         return channel;
     }
+
+    static async reloadSpecific (...list) {
+        const channelsData = list.map(i => Channel.get(i)).filter(Boolean);
+        const data = await sb.Query.getRecordset(rs => rs
+            .select("*")
+            .from("chat_data", "Channel")
+            .where("ID IN %n+", channelsData.map(i => i.ID))
+        );
+
+        for (const channelData of channelsData) {
+            const index = Channel.data(i => i === channelData);
+            if (index === -1) {
+                throw new sb.Error({
+                    message: "Unexpected channel ID mismatch during reload"
+                });
+            }
+
+            Channel.data.splice(index, 1);
+            channelData.destroy();
+        }
+
+        for (const row of data) {
+            const newChannelData = new Channel(row);
+            if (sb.ChatModule) {
+                sb.ChatModule.attachChannelModules(newChannelData);
+            }
+
+            Channel.data.push(newChannelData);
+        }
+    }
 };
 
 /**
