@@ -21,7 +21,7 @@ module.exports = {
 			const asciiRegex = sb.Config.get("ASCII_ART_REGEX");
 			const brailleRegex = /[█▄▀░▒▓\u2802-\u28ff]/g;
 
-			return brailleRegex.test(string) && asciiRegex.test(string);
+			return brailleRegex.test(string) || asciiRegex.test(string);
 		}
 	})),
 	Code: (async function copypasta (context) {
