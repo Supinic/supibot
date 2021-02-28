@@ -598,6 +598,7 @@ module.exports = class Command extends require("./template.js") {
 						invocation: identifier,
 						channel: channelData?.ID ?? null,
 						platform: options.platform.ID,
+						params: context.params ?? {},
 						isPrivateMessage
 					};
 					const errorID = await sb.SystemLogger.sendError("Command", e, [loggingContext, identifier, ...args]);
