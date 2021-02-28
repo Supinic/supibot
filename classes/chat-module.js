@@ -89,16 +89,30 @@ module.exports = class ChatModule extends require("./template.js") {
 		}
 	}
 
+	/**
+	 * Detaches the module instance from all channels determined by options.
+	 * @param {Object} options
+	 * @param {boolean} [options.remove] If true, the module reference will be removed instead of deactivated.
+	 * @param {Platform} [options.platform] Specified attachment platform
+	 * @param {Channel|Channel[]} [options.channel] Specified attachment channels	 * 
+	 */
 	detach (options) {
 		for (const event of this.Events) {
 			for (const channelData of ChatModule.getTargets(options)) {
-				const reference = this.attachmentReferences.find(i => i.channelID === channelData.ID);
-				if (!reference) {
+				const index = this.attachmentReferences.findIndex(i => i.channelID === channelData.ID);
+				if (index === -1) {
 					continue;
 				}
-
-				reference.active = false;
-				channelData.events.off(event, reference.listener);
+				
+				const reference = this.attachmentReferences[index];				
+				channelData.events.off(event, reference.listener);		
+				
+				if (options.remove) {
+					this.attachmentReferences.splice(index, 1);
+				}
+				else {
+					reference.active = false;					
+				}
 			}
 		}
 	}
