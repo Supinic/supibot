@@ -154,7 +154,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 			else if (error instanceof DankTwitch.SayError && error.cause instanceof DankTwitch.MessageError) {
 				if (error.message.includes("Bad response message")) {
-					const channelData = sb.Channel.get(error.failedChannelName);
+					const channelData = sb.Channel.get(error.failedChannelName, this.platform);
 					const defaultReply = "That message violates this channel's moderation settings.";
 
 					if (!error.message.includes(defaultReply)) {
@@ -200,7 +200,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				return;
 			}
 
-			const channelData = sb.Channel.get(channelName);
+			const channelData = sb.Channel.get(channelName, this.platform);
 			switch (messageID) {
 				case "msg_rejected":
 				case "msg_rejected_mandatory": {
@@ -264,7 +264,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 			else if (messageObject.isRitual()) {
 				const userData = await sb.User.get(senderUsername, false);
-				const channelData = sb.Channel.get(channelName);
+				const channelData = sb.Channel.get(channelName, this.platform);
 
 				if (this.platform.Logging.rituals) {
 					sb.SystemLogger.send("Twitch.Ritual", messageObject.systemMessage + " " + messageText, channelData, userData);
@@ -286,7 +286,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 			else if (messageObject.wasChatCleared()) {
 				if (this.platform.Logging.clearChats) {
-					const channelData = sb.Channel.get(channelName);
+					const channelData = sb.Channel.get(channelName, this.platform);
 					sb.SystemLogger.send("Twitch.Clearchat", null, channelData);
 				}
 			}
@@ -299,7 +299,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @param {Channel|string} channel
 	 */
 	async send (message, channel) {
-		const channelData = sb.Channel.get(channel);
+		const channelData = sb.Channel.get(channel, this.platform);
 		const channelName = channelData.Name;
 		if (channelData.Mode === "Inactive" || channelData.Mode === "Read") {
 			return;
@@ -372,7 +372,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		let channelData = null;
 		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserID });
 		if (!userData) {
-			const channelData = sb.Channel.get(channelName);
+			const channelData = sb.Channel.get(channelName, this.platform);
 			if (channelData) {
 				channelData.events.emit("message", {
 					event: "message",
@@ -391,7 +391,7 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		// Only check channels,
 		if (messageType !== "whisper") {
-			channelData = sb.Channel.get(channelName);
+			channelData = sb.Channel.get(channelName, this.platform);
 
 			if (!channelData) {
 				console.error("Cannot find channel " + channelName);
@@ -533,8 +533,8 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	async handleHost (type, to, from, viewers) {
-		const hostedChannelData = sb.Channel.get(from);
-		const hostingChannelData = sb.Channel.get(to);
+		const hostedChannelData = sb.Channel.get(from, this.platform);
+		const hostingChannelData = sb.Channel.get(to, this.platform);
 
 		if (hostedChannelData && typeof hostedChannelData.Custom_Code === "function") {
 			const hosterData = await sb.User.get(to, false);
@@ -570,7 +570,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 */
 	async handleCommand (command, user, channel, args = [], options = {}) {
 		const userData = await sb.User.get(user, false);
-		const channelData = (channel === null) ? null : sb.Channel.get(channel);
+		const channelData = (channel === null) ? null : sb.Channel.get(channel, this.platform);
 		const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
 			platform: this.platform,
 			...options
@@ -611,7 +611,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @returns {Promise<void>}
 	 */
 	async handleBan (user, channel, reason = null, length = null) {
-		const channelData = sb.Channel.get(channel);
+		const channelData = sb.Channel.get(channel, this.platform);
 		if (channelData) {
 			if (user === this.platform.Self_Name && length === null && this.platform.Data.partChannelsOnPermaban) {
 				await Promise.all([
@@ -686,7 +686,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 */
 	async handleSubscription (username, channel, plan, message, months)  {
 		const userData = await sb.User.get(username, false);
-		const channelData = sb.Channel.get(channel);
+		const channelData = sb.Channel.get(channel, this.platform);
 		const plans = this.platform.Data.subscriptionPlans;
 
 		if (channelData && channelData.Custom_Code) {
@@ -716,7 +716,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @param {number} data.months = null Cumulative months of the gift sub, null if there were multiple gifted subs.
 	 */
 	async handleGiftedSubscription (channel, gifter, data) {
-		const channelData = sb.Channel.get(channel);
+		const channelData = sb.Channel.get(channel, this.platform);
 		// This is a change from usual behaviour - ignore Inactive channels, but do log Read-only channels
 		if (channelData.Mode === "Inactive") {
 			return;

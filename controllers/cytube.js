@@ -480,7 +480,7 @@ module.exports = class CytubeController extends require("./template.js") {
 	 * @returns {string[]}
 	 */
 	fetchUserList (channelIdentifier) {
-		const channelData = sb.Channel.get(channelIdentifier);
+		const channelData = sb.Channel.get(channelIdentifier, this.platform);
 		const client = this.clients.get(channelData);
 		if (!client) {
 			throw new sb.Error({

@@ -112,7 +112,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			else {
 				// No user data available at this point usually means that the object is being fetched from cache.
 				// Still, fire a "raw user" message event
-				const channelData = sb.Channel.get(chan);
+				const channelData = sb.Channel.get(chan, this.platform);
 				if (channelData) {
 					channelData.events.emit("message", {
 						event: "message",
@@ -128,7 +128,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			}
 
 			if (!privateMessage) {
-				channelData = sb.Channel.get(chan);
+				channelData = sb.Channel.get(chan, this.platform);
 				if (!channelData) {
 					channelData = await sb.Channel.add(chan, this.platform);
 					await channelData.setup();
@@ -224,7 +224,7 @@ module.exports = class DiscordController extends require("./template.js") {
 	 * @param channel
 	 */
 	async send (message, channel) {
-		const channelData = sb.Channel.get(channel).Name;
+		const channelData = sb.Channel.get(channel, this.platform).Name;
 		const channelObject = this.client.channels.cache.get(channelData);
 		if (!channelObject) {
 			console.warn("No channel available!", channel);
