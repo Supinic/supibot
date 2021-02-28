@@ -245,6 +245,30 @@ module.exports = class ChatModule extends require("./template.js") {
 		super.reloadData();
 	}
 
+	static getChannelModules (channel) {
+		const channelData = sb.Channel.get(channel);
+		const modules = [];
+
+		for (const module of ChatModule.data) {
+			const hasChannel = module.attachmentReferences.filter(i => i.channelID === channelData.ID);
+			if (hasChannel) {
+				modules.push(module);
+			}
+		}
+
+		return modules;
+	}
+
+	static detachChannelModules (channel) {
+		const channelData = sb.Channel.get(channel);
+		const detachedModules = ChatModule.getChannelModules(channelData);
+		for (const module of detachedModules) {
+			module.detach({
+				channel: channelData
+			});
+		}
+	}
+
 	static destroy () {
 		for (const chatModule of ChatModule.data) {
 			chatModule.detachAll();
