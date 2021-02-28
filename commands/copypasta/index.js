@@ -18,10 +18,10 @@ module.exports = {
 			return $(`div[id^="clipboard_copy_content"]`).text();
 		},
 		hasAsciiArt: (string) => {
-			const brailleRegex = /[█▄▀░▒▓\u2802-\u28ff]/g;
 			const asciiRegex = sb.Config.get("ASCII_ART_REGEX");
+			const brailleRegex = /[█▄▀░▒▓\u2802-\u28ff]/g;
 
-			return string.test(brailleRegex) && string.test(asciiRegex);
+			return brailleRegex.test(string) && asciiRegex.test(string);
 		}
 	})),
 	Code: (async function copypasta (context) {
