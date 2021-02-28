@@ -259,7 +259,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					"raid",
 					channelName,
 					senderUsername,
-					messageObject.eventParams.viewerCount
+					Number(messageObject.eventParams.viewercount)
 				);
 			}
 			else if (messageObject.isRitual()) {
@@ -541,7 +541,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			hostedChannelData.Custom_Code({
 				type: type + "ed",
 				hostedBy: hosterData,
-				viewers: viewers
+				viewers
 			});
 		}
 
@@ -550,7 +550,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			hostingChannelData.Custom_Code({
 				type: type + "ing",
 				hosting: targetData,
-				viewers: viewers
+				viewers
 			});
 		}
 
