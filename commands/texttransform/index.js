@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "texttransform",
-	Aliases: ["tt","rtt"],
+	Aliases: ["tt","reversetexttransform","rtt"],
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Transforms provided text into one of provided types, such as \"vaporwave\", for example.",
@@ -18,7 +18,7 @@ module.exports = {
 				for (const [key, value] of Object.entries(map)) {
 					reverseMap[value] = key;
 				}
-				return this.map(string, reverseMap);
+				return convert.map(string, reverseMap);
 			},
 			translate: (string, dictionary) => {
 				for (const [from, to] of dictionary.phrasesWords) {
@@ -346,7 +346,7 @@ module.exports = {
 		}
 	
 		let { type } = transformation;
-		if (context.invocation === "untt") {
+		if (context.invocation === "rtt") {
 			if (type !== "map") {
 				return {
 					success: false,
