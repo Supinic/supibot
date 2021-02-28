@@ -282,22 +282,13 @@ module.exports = class ChatModule extends require("./template.js") {
 		return modules;
 	}
 
-	static detachChannelModules (channel) {
+	static detachChannelModules (channel, options = {}) {
 		const channelData = sb.Channel.get(channel);
 		const detachedModules = ChatModule.getChannelModules(channelData);
 		for (const module of detachedModules) {
 			module.detach({
-				channel: channelData
-			});
-		}
-	}
-
-	static attachChannelModules (channel) {
-		const channelData = sb.Channel.get(channel);
-		const detachedModules = ChatModule.getChannelModules(channelData);
-		for (const module of detachedModules) {
-			module.attach({
-				channel: channelData
+				channel: channelData,
+				remove: Boolean(options.remove)
 			});
 		}
 	}
