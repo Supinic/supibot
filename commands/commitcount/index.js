@@ -10,9 +10,12 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function commitCount (context, user) {
 		let username;
+		let self = false;
+
 		if (user) {
 			const userData = await sb.User.get(user);
 			if (userData) {
+				self = (userData === context.user);
 				username = userData.Data.github?.login ?? userData.Name;
 			}
 			else {
@@ -21,6 +24,7 @@ module.exports = {
 		}
 		else {
 			username = context.user.Data.github?.login ?? context.user.Name;
+			self = true;
 		}
 	
 		const escaped = encodeURIComponent(username);
@@ -37,9 +41,7 @@ module.exports = {
 		const commitCount = pushEvents.reduce((acc, cur) => acc += cur.payload.commits.length, 0);
 	
 		const suffix = (commitCount === 1) ? "": "s";
-		const who = (user === context.user.Name || user === context.user.Data.github?.login)
-			? "You have"
-			: `GitHub user ${username} has`;
+		const who = (self) ? "You have" : `GitHub user ${username} has`;
 	
 		return {
 			reply: `${who} created ${commitCount} commit${suffix} in the past 24 hours.`
