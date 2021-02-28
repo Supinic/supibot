@@ -193,7 +193,7 @@ module.exports = {
 			"You can also change the mode of Supibot's behaviour when the API times out.",
 			"Modes:",
 			"",
-			list		
+			`<ul>${list}</ul>`
 		];
 	})
 };
