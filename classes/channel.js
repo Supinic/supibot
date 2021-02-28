@@ -462,8 +462,8 @@ module.exports = class Channel extends require("./template.js") {
                 });
             }
 
-            Channel.data.splice(index, 1);
             channelData.destroy();
+            Channel.data.splice(index, 1);
         }
 
         for (const row of data) {
