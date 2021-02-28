@@ -118,13 +118,15 @@ module.exports = {
 			}
 			else {
 				const excluded = (context.params.excludeChannel) ? context.params.excludeChannel.split(/\W/) : null;
-				let roll = sb.Utils.random(1, this.data.counts.total);
+
+				let rollLimit = this.data.counts.total;
 				if (excluded) {
 					for (const channel of excluded) {
-						roll -= this.data.counts[channel] ?? 0;
+						rollLimit -= this.data.counts[channel] ?? 0;
 					}
 				}
 
+				const roll = sb.Utils.random(1, rollLimit);
 				const link = await sb.Query.getRecordset(rs => {
 					rs.select("Link")
 						.from("data", "Twitch_Lotto")
