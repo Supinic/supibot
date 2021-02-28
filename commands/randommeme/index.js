@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "If no parameters are provided, posts a random reddit meme. If you provide a subreddit, a post will be chosen randomly. NSFW subreddits and posts are only available on NSFW Discord channels!",
 	Flags: ["link-only","mention","non-nullable","pipe"],
-	Params: null,
+	Params: [
+		{ name: "comments", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		const expiration = 3_600_000; // 1 hour
@@ -60,6 +62,7 @@ module.exports = {
 			#id;
 			#title;
 			#url;
+			#commentsUrl;
 	
 			#crosspostOrigin = null;
 			#isTextPost = false;
@@ -79,7 +82,8 @@ module.exports = {
 				this.#id = data.id;
 				this.#title = data.title;
 				this.#url = data.url;
-	
+				this.#commentsUrl = `r/${data.sbureddit}/comments/${data.id}`;
+
 				this.#isTextPost = Boolean(data.selftext && data.selftext_html);
 				this.#nsfw = Boolean(data.over_18);
 				this.#stickied = Boolean(data.stickied);
@@ -92,6 +96,7 @@ module.exports = {
 			get stickied () { return this.#stickied; }
 			get isTextPost () { return this.#isTextPost; }
 			get url () { return this.#url; }
+			get commentsUrl () { return this.#commentsUrl; }
 	
 			get posted () {
 				return sb.Utils.timeDelta(this.#created);
@@ -223,12 +228,13 @@ module.exports = {
 			repeatedPosts.unshift(post.id);
 			// And then splice off everything over the length of 3.
 			repeatedPosts.splice(this.staticData.repeats);
-	
+
+			const commentsUrl = (context.params.comments) ? post.commentsUrl : "";
 			const symbol = (forum.quarantine) ? "⚠" : "";
 			return {
 				link: post.url,
-				reply: sb.Utils.fixHTML(`${symbol} ${post}`)
-			}
+				reply: sb.Utils.fixHTML(`${symbol} ${post.toString()} ${commentsUrl}`)
+			};
 		}
 	}),
 	Dynamic_Description: null
