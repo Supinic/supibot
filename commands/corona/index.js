@@ -282,7 +282,7 @@ module.exports = {
 			}
 		}
 
-		let vaccines;
+		let vaccines = "";
 		if (country) {
 			let vaccineData = await this.getCacheData("vaccines");
 			if (!vaccineData) {
@@ -291,10 +291,10 @@ module.exports = {
 				}).json();
 
 				vaccineData = Object.values(rawData).map(country => {
-					const hasVaccines = country.data.filter(i => i.total_vaccinations);
+					const hasVaccines = country.data.filter(i => i.people_fully_vaccinated);
 					const vaccines = (hasVaccines.length === 0)
 						? null
-						: Math.max(...hasVaccines.map(i => i.total_vaccinations));
+						: Math.max(...hasVaccines.map(i => i.people_fully_vaccinated));
 
 					return {
 						name: country.location.toLowerCase(),
@@ -308,7 +308,17 @@ module.exports = {
 				await this.setCacheData("vaccines", vaccineData, { expiry: 864e5 });
 			}
 
-			vaccines = vaccineData.find(i => i.name === country.toLowerCase());
+			const countryVaccines = vaccineData.find(i => i.name === country.toLowerCase());
+			if (countryVaccines) {
+				vaccines = sb.Utils.tag.trim `
+					Vacccine status:
+					${vaccines?.amount ? sb.Utils.groupDigits(vaccines.amount) : "unknown amount"}
+					people have been fully vaccinated so far,
+					which is
+					${vaccines?.percent ?? "unknown percent"} 
+					of the population.
+				`;
+			}
 		}
 
 		return {
@@ -345,8 +355,7 @@ module.exports = {
 					: ""
 				}
 				
-				Vacccine status: ${vaccines?.amount ? sb.Utils.groupDigits(vaccines.amount) : "unknown amount"} people have been vaccinated so far,
-				which is ${vaccines?.percent ?? "unknown percent"} of the population.				
+				${vaccines}
 			`
 		};
 	}),
