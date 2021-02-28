@@ -308,14 +308,14 @@ module.exports = {
 				await this.setCacheData("vaccines", vaccineData, { expiry: 864e5 });
 			}
 
-			const countryVaccines = vaccineData.find(i => i.name === country.toLowerCase());
-			if (countryVaccines) {
+			const vacData = vaccineData.find(i => i.name === country.toLowerCase());
+			if (vacData) {
 				vaccines = sb.Utils.tag.trim `
 					Vacccine status:
-					${vaccines?.amount ? sb.Utils.groupDigits(vaccines.amount) : "unknown amount"}
+					${vacData?.amount ? sb.Utils.groupDigits(vacData.amount) : "unknown amount"}
 					people have been fully vaccinated so far,
 					which is
-					${vaccines?.percent ?? "unknown percent"} 
+					${vacData?.percent ?? "unknown percent"} 
 					of the population.
 				`;
 			}
