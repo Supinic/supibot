@@ -26,20 +26,28 @@ module.exports = {
 			username = context.user.Data.github?.login ?? context.user.Name;
 			self = true;
 		}
-	
-		const escaped = encodeURIComponent(username);
-		const { body: data, statusCode} = await sb.Got("GitHub", `users/${escaped}/events`);
-		if (statusCode !== 200) {
+
+		const threshold = new sb.Date().addHours(-24).toISOString();
+		const data = await sb.Got.gql({
+			url: "https://api.github.com/graphql",
+			token: sb.Config.get("GITHUB_PUBLIC_REPO_GQL_TOKEN"),
+			query: `{
+				user(login: "${username}") {
+					contributionsCollection(from: "${threshold}") {
+						totalCommitContributions
+					}
+				}
+			}`
+		}).json();
+
+		if (data.errors) {
 			return {
 				success: false,
-				reply: `${data.message}`
+				reply: data.errors.map(i => i.message).join("; ")
 			};
 		}
-	
-		const threshold = new sb.Date().addHours(-24);
-		const pushEvents = data.filter(i => new sb.Date(i.created_at) >= threshold && i.type === "PushEvent");
-		const commitCount = pushEvents.reduce((acc, cur) => acc += cur.payload.commits.length, 0);
-	
+
+		const commitCount = data.user.contributionsCollection.totalCommitContributions;
 		const suffix = (commitCount === 1) ? "": "s";
 		const who = (self) ? "You have" : `GitHub user ${username} has`;
 	
