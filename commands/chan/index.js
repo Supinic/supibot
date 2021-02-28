@@ -134,7 +134,7 @@ module.exports = {
 			board.threadsExpiration = new sb.Date().addHours(1).valueOf();
 		}
 	
-		let thread = null;
+		let thread;
 		if (rest.length > 0) {
 			const query = rest.join(" ").toLowerCase();
 			thread = sb.Utils.randArray(board.threads.filter(i => !i.dead && i.content.toLowerCase().includes(query)));
