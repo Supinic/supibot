@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "texttransform",
-	Aliases: ["tt"],
+	Aliases: ["tt","rtt"],
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Transforms provided text into one of provided types, such as \"vaporwave\", for example.",
@@ -13,6 +13,13 @@ module.exports = {
 		const convert = {
 			method: (string, fn) => fn(string),
 			map: (string, map) => [...string].map(i => map[i] || i).join(""),
+			unmap: (string, map) => {
+				const reverseMap = {};
+				for (const [key, value] of Object.entries(map)) {
+					reverseMap[value] = key;
+				}
+				return this.map(string, reverseMap);
+			},
 			translate: (string, dictionary) => {
 				for (const [from, to] of dictionary.phrasesWords) {
 					const r = new RegExp("\\b" + from + "\\b", "gi");
@@ -338,9 +345,19 @@ module.exports = {
 			}
 		}
 	
-		const { data, type } = transformation;
-		const result = this.staticData.convert[type](message, data);
-	
+		let { type } = transformation;
+		if (context.invocation === "untt") {
+			if (type !== "map") {
+				return {
+					success: false,
+					reply: `This transformation type cannot be reversed!`
+				};
+			}
+
+			type = "unmap";
+		}
+
+		const result = this.staticData.convert[type](message, transformation.data);
 		if (!result) {
 			return {
 				success: false,
@@ -372,6 +389,7 @@ module.exports = {
 				<li>
 					<code>${transform.name}${aliases}</code>
 					<ul>
+						<li>Reversible: ${transform.type === "map" ? "Yes" : "No"}</li>
 						<li>${description}</li>
 						<li>${message}</li>
 					</ul>
