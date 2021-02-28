@@ -51,7 +51,7 @@ module.exports = {
 					?? i.code
 					?? "(unknown)";
 
-				return `#${ind + 1}: ${code} ${count}`;
+				return `${ind + 1}): ${code} ${count}`;
 			})
 			.join("; ")
 
