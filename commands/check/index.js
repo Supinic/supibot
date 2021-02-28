@@ -275,7 +275,7 @@ module.exports = {
 					else if (poll.Status === "Cancelled" || poll.Status === "Active") {
 						const delta = (poll.End < sb.Date.now())
 							? "already ended."
-							: `ends in ${sb.Utils.timeDelta(poll.End)}.`;
+							: `ends ${sb.Utils.timeDelta(poll.End)}.`;
 	
 						return {
 							reply: `Poll ID ${poll.ID} ${delta} (${poll.Status}) - ${poll.Text}`
