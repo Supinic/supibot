@@ -234,19 +234,12 @@ module.exports = class ChatModule extends require("./template.js") {
 
 			const channelItems = row.Channel.filter(i => i.ID);
 			for (const channelItem of channelItems) {
-				let args = [];
-				if (channelItem.Args !== null) {
-					try {
-						args = JSON.parse(channelItem.Args);
-					}
-					catch (e) {
-						console.warn("Chat module has invalid args for channel", { moduleID: row.ID, channelItem });
-						continue;
-					}
-				}
-
-				if (!Array.isArray(args)) {
-					console.warn("Chat module has non-Array args for channel", { moduleID: row.ID, channelItem });
+				const args = ChatModule.parseModuleArgs(channelItem.Args);
+				if (!args) {
+					console.warn("Reattaching module failed", {
+						module: chatModule.ID,
+						channel: channelItem.ID
+					});
 					continue;
 				}
 
@@ -291,6 +284,71 @@ module.exports = class ChatModule extends require("./template.js") {
 				remove: Boolean(options.remove)
 			});
 		}
+	}
+
+	static attachChannelModules (channel) {
+		const channelData = sb.Channel.get(channel);
+		const detachedModules = ChatModule.getChannelModules(channelData);
+		for (const module of detachedModules) {
+			module.attach({
+				channel: channelData
+			});
+		}
+	}
+
+	static async reloadChannelModules (channel) {
+		const channelData = sb.Channel.get(channel);
+		ChatModule.detachChannelModules(channelData, { remove: true });
+
+		const attachmentData = await sb.Query.getRecordset(rs => rs
+		    .select("Chat_Module", "Specific_Arguments AS Args")
+		    .from("chat_data", "Channel_Chat_Module")
+			.where("Channel = %n", channelData.ID)
+		);
+
+		for (const attachment of attachmentData) {
+			const module = ChatModule.get(attachment.Chat_Module);
+			if (!module) {
+				throw new sb.Error({
+					message: "New module detected - cannot reload channel modules",
+					args: { module: attachment.Chat_Module }
+				});
+			}
+
+			const args = ChatModule.parseModuleArgs(attachment.Args);
+			if (!args) {
+				console.warn("Reattaching module failed", {
+					module: module.ID,
+					channel: channelData.ID
+				});
+				continue;
+			}
+
+			module.attach({
+				args,
+				channel: channelData
+			});
+		}
+	}
+
+	static parseModuleArgs (rawArgs) {
+		let args = [];
+		if (rawArgs !== null) {
+			try {
+				args = JSON.parse(channelItem.Args);
+			}
+			catch (e) {
+				console.warn(e);
+				return null;
+			}
+		}
+
+		if (!Array.isArray(args)) {
+			console.warn("Invalid chat module arguments type", args);
+			return null;
+		}
+
+		return args;
 	}
 
 	static destroy () {
