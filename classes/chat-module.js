@@ -335,7 +335,7 @@ module.exports = class ChatModule extends require("./template.js") {
 		let args = [];
 		if (rawArgs !== null) {
 			try {
-				args = JSON.parse(channelItem.Args);
+				args = JSON.parse(rawArgs);
 			}
 			catch (e) {
 				console.warn(e);
