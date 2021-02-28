@@ -5,13 +5,41 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Fetches a random Twitch-related copypasta. The date of creation usually ranges from 2014-2015.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [
+		{ name: "textOnly", type: "boolean" }
+	],
 	Whitelist_Response: null,
-	Static_Data: null,
-	Code: (async function copypasta () {
-		const html = await sb.Got("https://www.twitchquotes.com/random").text();
-		const $ = sb.Utils.cheerio(html);
-		const copypasta = $(`div[id^="clipboard_copy_content"]`).text();
+	Static_Data: (() => ({
+		repeatLimit: 5,
+		fetch: async () => {
+			const html = await sb.Got("https://www.twitchquotes.com/random").text();
+			const $ = sb.Utils.cheerio(html);
+
+			return $(`div[id^="clipboard_copy_content"]`).text();
+		},
+		hasAsciiArt: (string) => {
+			const brailleRegex = /[█▄▀░▒▓\u2802-\u28ff]/g;
+			const asciiRegex = sb.Config.get("ASCII_ART_REGEX");
+
+			return string.test(brailleRegex) && string.test(asciiRegex);
+		}
+	})),
+	Code: (async function copypasta (context) {
+		const { fetch, hasAsciiArt, repeatLimit } = this.staticData;
+
+		let copypasta;
+		let repeats = 0;
+		do {
+			copypasta = await fetch();
+			repeats++;			
+		} while (context.params.textOnly && hasAsciiArt(copypasta) && repeats < repeatLimit);
+		
+		if (repeats >= repeatLimit) {
+			return {
+				success: false,
+				reply: `Could not find a fitting copypasta within ${repeats} attempts!`
+			};
+		}
 	
 		return {
 			success: Boolean(copypasta),
