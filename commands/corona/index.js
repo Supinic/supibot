@@ -309,7 +309,7 @@ module.exports = {
 			}
 
 			const vacData = vaccineData.find(i => i.name === country.toLowerCase());
-			if (vacData) {
+			if (vacData && vacData.amount !== null) {
 				vaccines = sb.Utils.tag.trim `
 					Vacccine status:
 					${vacData?.amount ? sb.Utils.groupDigits(vacData.amount) : "unknown amount"}
