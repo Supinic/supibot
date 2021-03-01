@@ -272,21 +272,22 @@ module.exports = {
 							reply: "No polls match the ID provided! Check all polls here: https://supinic.com/bot/poll/list"
 						};
 					}
-					else if (poll.Status === "Cancelled" || poll.Status === "Active") {
-						const delta = (poll.End < sb.Date.now())
-							? "already ended."
-							: `ends ${sb.Utils.timeDelta(poll.End)}.`;
-	
-						return {
-							reply: `Poll ID ${poll.ID} ${delta} (${poll.Status}) - ${poll.Text}`
-						};
-					}
-	
+
 					const votes = await sb.Query.getRecordset(rs => rs
 						.select("Vote")
 						.from("chat_data", "Poll_Vote")
 						.where("Poll = %n", poll.ID)
 					);
+
+					if (poll.Status === "Cancelled" || poll.Status === "Active") {
+						const delta = (poll.End < sb.Date.now())
+							? "already ended."
+							: `ends ${sb.Utils.timeDelta(poll.End)}.`;
+	
+						return {
+							reply: `Poll ID ${poll.ID} ${delta} (${poll.Status}) - ${poll.Text} - Votes: ${votes.length}`
+						};
+					}
 	
 					const [yes, no] = sb.Utils.splitByCondition(votes, i => i.Vote === "Yes");
 					return {
