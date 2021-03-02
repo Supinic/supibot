@@ -15,7 +15,12 @@ module.exports = {
 			let bestScore = -Infinity;
 			let index = -1;
 			for (let i = 0; i < symbolData.length; i++) {
-				const score = sb.Utils.jaroWinklerSimilarity(from, symbolData[i][1]);
+				const currentName = symbolData[i][1];
+				if (!currentName.include(from)) {
+					continue;
+				}
+
+				const score = sb.Utils.jaroWinklerSimilarity(from, currentName);
 				if (score > 0 && score > bestScore) {
 					bestScore = score;
 					index = i;
