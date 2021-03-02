@@ -40,6 +40,7 @@ module.exports = {
 		};
 	}),
 	Code: (async function stock (context, ...args) {
+		const { findSymbol } = this.staticData;
 		const input = args.join(" ");
 		if (!input) {
 			return {
@@ -48,8 +49,11 @@ module.exports = {
 			};
 		}
 
-		const { findSymbol } = this.staticData;
-		const symbol = findSymbol(input) ?? args[0];
+		// If the input is a single argument consisting of capital characters only, we can (somewhat) safely assume
+		// that it's a stock symbol and not a name.
+		const symbol = (args.length === 1 && args[0].match(/^[A-Z]+$/))
+			? args[0]
+			: findSymbol(input) ?? args[0];
 
 		const { "Global Quote": rawData } = await sb.Got({
 			retry: 0,
