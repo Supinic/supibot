@@ -20,6 +20,8 @@ module.exports = {
 			? new sb.Date(context.params.date)
 			: new sb.Date();
 
+		date.setTimezoneOffset(0);
+
 		if (!date) {
 			return {
 				success: false,
