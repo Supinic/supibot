@@ -445,8 +445,13 @@ module.exports = class Reminder extends require("./template.js") {
                 // If the result message would be longer than twice the channel limit, post a list of reminder IDs
                 // instead along with a link to the website, where the user can check them out.
                 if (message.length > (limit * 2)) {
-                    const listID = reminders.filter(i => !i.Private_Message).map(i => i.ID).join(" ");
-                    message = `${notifySymbol}${targetUserData.Name} you have reminders, but they're too long to be posted here. Check these IDs: ${listID} here: https://supinic.com/bot/reminder/list`;
+                    const listID = reminders.filter(i => !i.Private_Message).map(i => i.ID).join(",");
+                    message = sb.Utils.tag.trim `
+                        Hey ${notifySymbol}${targetUserData.Name},
+                        you have reminders, but they're too long to be posted here. 
+                        Check them out here:
+                        https://supinic.com/bot/reminder/lookup?IDs=${listID}
+                    `;
                 }
 
                 const messageArray = sb.Utils.partitionString(message, limit, 2);
@@ -458,9 +463,15 @@ module.exports = class Reminder extends require("./template.js") {
                 }
             }
             else {
-                await channelData.send(
-                    "Banphrase timed out, but you can check reminders on the website or with the check command. IDs: " + reminders.map(i => i.ID).join(", ")
-                );
+                const listID = reminders.map(i => i.ID).join(", ");
+                const message = sb.Utils.tag.trim `
+                    Hey ${notifySymbol}${targetUserData.Name},
+                    the banphrase check for your reminders failed.
+                    Check them out here:
+                    https://supinic.com/bot/reminder/lookup?IDs=${listID}
+                `;
+
+                await channelData.send(message);
             }
         }
 
