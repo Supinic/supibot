@@ -16,7 +16,7 @@ module.exports = {
 			let index = -1;
 			for (let i = 0; i < symbolData.length; i++) {
 				const currentName = symbolData[i][1];
-				if (!currentName.include(from)) {
+				if (!currentName.includes(from)) {
 					continue;
 				}
 
