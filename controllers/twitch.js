@@ -195,7 +195,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 		});
 
-		client.on("NOTICE", ({channelName, messageID, ...rest}) => {
+		client.on("NOTICE", async ({channelName, messageID, ...rest}) => {
 			if (!messageID) {
 				return;
 			}
@@ -205,6 +205,16 @@ module.exports = class TwitchController extends require("./template.js") {
 				case "msg_rejected":
 				case "msg_rejected_mandatory": {
 					console.warn("Rejected message", { channelName, messageID, rest });
+					break;
+				}
+
+				case "msg_banned": {
+					await Promise.all([
+						channelData.saveProperty("Mode", "Inactive"),
+						this.client.part(channelData.Name)
+					]);
+
+					await sb.SystemLogger.send("Twitch.Ban", `Bot banned in channel ${channelData.Name}`);
 					break;
 				}
 
@@ -619,12 +629,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					this.client.part(channelData.Name)
 				]);
 
-				console.warn("Bot banned", {
-					timestamp: new sb.Date().format("Y-m-d H:i:s"),
-					channel,
-					reason,
-					length
-				});
+				await sb.SystemLogger.send("Twitch.Ban", `Bot banned in channel ${channelData.Name}`);
 			}
 
 			if (typeof channelData.sessionData.recentBans === "undefined") {
