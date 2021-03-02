@@ -7,19 +7,52 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
-	Code: (async function stock (context, stockSymbol) {
-		if (!stockSymbol) {
-			return { reply: "A stock symbol must be provided!" };
+	Static_Data: (() => {
+		const symbolData = sb.Config.get("STOCK_SYMBOLS_LIST");
+		const findSymbol = (from) => {
+			from = from.toLowerCase();
+
+			let bestScore = -Infinity;
+			let index = -1;
+			for (let i = 0; i < symbolData.length; i++) {
+				const score = sb.Utils.jaroWinklerSimilarity(from, symbolData[i][1]);
+				if (score > 0 && score > bestScore) {
+					bestScore = score;
+					index = i;
+				}
+			}
+
+			if (bestScore === -Infinity) {
+				return null;
+			}
+			else {
+				return symbolData[index][0];
+			}
 		}
-	
+
+		return {
+			findSymbol
+		};
+	}),
+	Code: (async function stock (context, ...args) {
+		const input = args.join(" ");
+		if (!input) {
+			return {
+				success: false,
+				reply: "A stock symbol must be provided!"
+			};
+		}
+
+		const { findSymbol } = this.staticData;
+		const symbol = findSymbol(input) ?? args[0];
+
 		const { "Global Quote": rawData } = await sb.Got({
 			retry: 0,
 			throwHttpErrors: false,
 			url: "https://www.alphavantage.co/query",
 			searchParams: new sb.URLParams()
 				.set("function", "GLOBAL_QUOTE")
-				.set("symbol", stockSymbol)
+				.set("symbol", symbol)
 				.set("apikey", sb.Config.get("API_ALPHA_AVANTAGE"))
 				.toString()
 		}).json();
