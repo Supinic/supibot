@@ -266,7 +266,7 @@ module.exports = class ChatModule extends require("./template.js") {
 		const modules = [];
 
 		for (const module of ChatModule.data) {
-			const hasChannel = module.attachmentReferences.filter(i => i.channelID === channelData.ID);
+			const hasChannel = module.attachmentReferences.find(i => i.channelID === channelData.ID);
 			if (hasChannel) {
 				modules.push(module);
 			}
