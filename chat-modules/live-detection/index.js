@@ -7,6 +7,7 @@ module.exports = {
 		const subscriptions = await sb.Query.getRecordset(rs => rs
 		    .select("User_Alias", "Platform")
 		    .from("chat_data", "Event_Subscription")
+			.where("Active = %b", true)
 			.where("JSON_CONTAINS(Data, %n, %s) = %n", channel.ID, "$.channels", 1)
 		);
 
