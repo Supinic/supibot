@@ -439,11 +439,15 @@ module.exports = class Channel extends require("./template.js") {
         });
         await row.save();
 
-        const channel = new Channel({...row.valuesObject});
-        await channel.setup();
+        const channelData = new Channel({...row.valuesObject});
+        await channelData.setup();
 
-        Channel.data.push(channel);
-        return channel;
+        Channel.data.push(channelData);
+        if (sb.ChatModule) {
+            sb.ChatModule.attachChannelModules(newChannelData);
+        }
+
+        return channelData;
     }
 
     static async reloadSpecific (...list) {
