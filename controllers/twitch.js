@@ -551,7 +551,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 	}
 
-	async handleHost (type, to, from, viewers) {
+	async handleHost (type, from, to, viewers) {
 		const hostedChannelData = sb.Channel.get(from, this.platform);
 		const hostingChannelData = sb.Channel.get(to, this.platform);
 
