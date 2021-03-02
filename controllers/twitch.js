@@ -209,12 +209,17 @@ module.exports = class TwitchController extends require("./template.js") {
 				}
 
 				case "msg_banned": {
+					if (channelData.Mode === "Inactive") {
+						break;
+					}
+
+					const previousMode = channelData.Mode;
 					await Promise.all([
 						channelData.saveProperty("Mode", "Inactive"),
+						sb.SystemLogger.send("Twitch.Ban", `Bot banned in channel ${channelData.Name}. Previous mode: ${previousMode}`),
 						this.client.part(channelData.Name)
 					]);
 
-					await sb.SystemLogger.send("Twitch.Ban", `Bot banned in channel ${channelData.Name}`);
 					break;
 				}
 
