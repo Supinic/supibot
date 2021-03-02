@@ -216,7 +216,11 @@ module.exports = class TwitchController extends require("./template.js") {
 					const previousMode = channelData.Mode;
 					await Promise.all([
 						channelData.saveProperty("Mode", "Inactive"),
-						sb.SystemLogger.send("Twitch.Ban", `Bot banned in channel ${channelData.Name}. Previous mode: ${previousMode}`),
+						sb.SystemLogger.send(
+							"Twitch.Ban",
+							`Bot banned in channel ${channelData.Name}. Previous mode: ${previousMode}`,
+							channelData
+						),
 						this.client.part(channelData.Name)
 					]);
 
@@ -629,12 +633,16 @@ module.exports = class TwitchController extends require("./template.js") {
 		const channelData = sb.Channel.get(channel, this.platform);
 		if (channelData) {
 			if (user === this.platform.Self_Name && length === null && this.platform.Data.partChannelsOnPermaban) {
+				const previousMode = channelData.Mode;
 				await Promise.all([
 					channelData.saveProperty("Mode", "Inactive"),
+					sb.SystemLogger.send(
+						"Twitch.Ban",
+						`Bot banned in channel ${channelData.Name}. Previous mode: ${previousMode}`,
+						channelData
+					),
 					this.client.part(channelData.Name)
 				]);
-
-				await sb.SystemLogger.send("Twitch.Ban", `Bot banned in channel ${channelData.Name}`);
 			}
 
 			if (typeof channelData.sessionData.recentBans === "undefined") {
