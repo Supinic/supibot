@@ -10,7 +10,6 @@ module.exports = {
 	],
 	Whitelist_Response: "This command can't be executed here!",
 	Static_Data: (() => {
-		this.data.counts = {};
 		return {
 			detections: [
 				{
@@ -79,26 +78,20 @@ module.exports = {
 		}
 	
 		// Preparation work that does not need to run more than once, so it is placed before the loop below.
-		if (channel) {
-			if (!this.data.counts[channel]) {
-				this.data.counts[channel] = await sb.Query.getRecordset(rs => rs
-					.select("Amount")
-					.from("data", "Twitch_Lotto_Channel")
-					.where("Name = %s", channel)
-					.single()
-					.flat("Amount")
-				);
+		if (!this.data.counts) {
+			let total = 0;
+			const countData = await sb.Query.getRecordset(rs => rs
+				.select("Name", "Amount")
+				.from("data", "Twitch_Lotto_Channel")
+			);
+
+			this.data.counts = {};
+			for (const row of countData) {
+				total += row.Amount;
+				this.data.counts[row.Name] = row.Amount;
 			}
-		}
-		else {
-			if (!this.data.counts.total) {
-				this.data.counts.total = await sb.Query.getRecordset(rs => rs
-					.select("SUM(Amount) AS Amount")
-					.from("data", "Twitch_Lotto_Channel")
-					.single()
-					.flat("Amount")
-				);
-			}
+
+			this.data.counts.total = total;
 		}
 	
 		// Now try to find an image that is available.
@@ -117,13 +110,10 @@ module.exports = {
 				);
 			}
 			else {
-				const excluded = (context.params.excludeChannel) ? context.params.excludeChannel.split(/\W/) : null;
-
 				let rollLimit = this.data.counts.total;
-				if (excluded) {
-					for (const channel of excluded) {
-						rollLimit -= this.data.counts[channel] ?? 0;
-					}
+				const excluded = (context.params.excludeChannel) ? context.params.excludeChannel.split(/\W/) : [];
+				for (const channel of excluded) {
+					rollLimit -= this.data.counts[channel] ?? 0;
 				}
 
 				const roll = sb.Utils.random(1, rollLimit);
@@ -136,7 +126,7 @@ module.exports = {
 						.single()
 						.flat("Link");
 
-					if (excluded) {
+					if (excluded.length > 0) {
 						rs.where("Channel NOT IN %s+", excluded);
 					}
 
