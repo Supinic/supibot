@@ -325,6 +325,41 @@ module.exports = class Channel extends require("./template.js") {
         return await this.Platform.fetchChannelUserList(this.Name);
     }
 
+    async fetchEmotes () {
+        const cacheData = await this.getCacheData("emotes");
+        if (cacheData) {
+            return cacheData;
+        }
+
+        const [globalEmotes, channelEmotes] = await Promise.all([
+            this.platform.fetchGlobalEmotes(),
+            this.platform.fetchChannelEmotes(this)
+        ]);
+
+        const data = [...globalEmotes, ...channelEmotes];
+        await this.setCacheData("emotes", data, { expiry: 864e5 });
+
+        return data;
+    }
+
+    /**
+     * Fetches the best fitting emote for the current channel instance.
+     * @param {string[]} emotes
+     * @param {string} fallbackEmote
+     * @returns {Promise<void>}
+     */
+    async getBestAvailableEmote (emotes, fallbackEmote) {
+        const availableEmotes = await this.fetchEmotes();
+        for (const emote of emotes) {
+            const available = availableEmotes.find(i => i.name === emote);
+            if (available) {
+                return available;
+            }
+        }
+
+        return fallbackEmote;
+    }
+
     getCacheKey () {
         return `sb-channel-${this.ID}`;
     }
@@ -483,4 +518,4 @@ module.exports = class Channel extends require("./template.js") {
 
 /**
  * @typedef {'Twitch'|'Cytube'|'Discord'|'Minecraft'} PlatformIdentifier
-  */
+ */
