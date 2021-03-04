@@ -332,8 +332,8 @@ module.exports = class Channel extends require("./template.js") {
         }
 
         const [globalEmotes, channelEmotes] = await Promise.all([
-            this.platform.fetchGlobalEmotes(),
-            this.platform.fetchChannelEmotes(this)
+            this.Platform.fetchGlobalEmotes(),
+            this.Platform.fetchChannelEmotes(this)
         ]);
 
         const data = [...globalEmotes, ...channelEmotes];
