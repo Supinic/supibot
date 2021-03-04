@@ -887,8 +887,13 @@ module.exports = class TwitchController extends require("./template.js") {
 			console.warn("BTTV emote fetch failed", { statusCode, data });
 			return [];
 		}
-		
-		return data.channelEmotes.map(i => ({
+
+		const emotes = [
+			...(data.channelEmotes ?? []),
+			...(data.sharedEmotes ?? [])
+		];
+
+		return emotes.map(i => ({
 			id: i.id,
 			name: i.code,
 			type: "bttv",
