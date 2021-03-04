@@ -204,6 +204,24 @@ module.exports = class Platform extends require("./template.js") {
 		return userList;
 	}
 
+	async fetchGlobalEmotes () {
+		const cacheData = await this.getCacheData("global-emotes");
+		if (cacheData) {
+			return cacheData;
+		}
+
+		const data = await this.controller.fetchGlobalEmotes();
+		await this.setCacheData("global-emotes", data, {
+			expiry: 864e5
+		});
+
+		return data;
+	}
+
+	async fetchChannelEmotes (channelData) {
+		return await this.controller.fetchChannelEmotes(channelData);
+	}
+
 	getCacheKey () {
 		return `sb-platform-${this.Name}`;
 	}
