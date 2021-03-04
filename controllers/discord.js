@@ -242,8 +242,8 @@ module.exports = class DiscordController extends require("./template.js") {
 					// If there are multiple, try to find it in the current guild's emojis cache and use it
 					emote = channelObject.guild.emojis.cache.find(i => i.name === word);
 
-					// If not found, just try and use the first one found in the list
-					emote = emote ?? globalEmotes[0];
+					// If not found, simply pick a random emote out of the global list
+					emote = emote ?? sb.Utils.randArray(globalEmotes);
 				}
 
 				if (emote) {
@@ -383,6 +383,19 @@ module.exports = class DiscordController extends require("./template.js") {
 		]);
 
 		return [...channel.members.values()].map(i => i.user.username);
+	}
+
+	async fetchChannelEmotes (channelData) {
+		const discordChannel = await this.client.channels.fetch(channelData.Name);
+		const guild = await this.client.guilds.fetch(discordChannel.guild.id);
+
+		const emojis = guild.emojis.cache.array();
+		return emojis.map(i => ({
+			ID: i.id,
+			name: i.name,
+			type: "discord-guild",
+			animated: i.animated
+		}));
 	}
 
 	static removeEmoteTags (message) {
