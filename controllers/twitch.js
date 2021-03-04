@@ -191,7 +191,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			const incomingEmoteSets = messageObject.emoteSets;
 			if (incomingEmoteSets.sort().join(",") !== this.availableEmoteSets.sort().join(",")) {
 				this.availableEmoteSets = incomingEmoteSets;
-				this.availableEmotes = await TwitchController.fetchEmotes(this.availableEmoteSets);
+				this.availableEmotes = await TwitchController.fetchTwitchEmotes(this.availableEmoteSets);
 			}
 		});
 
@@ -840,7 +840,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @param {string[]} sets
 	 * @returns {Promise<EmoteSetDataObject[]>}
 	 */
-	static async fetchEmotes (sets) {
+	static async fetchTwitchEmotes (sets) {
 		const emotesData = [];
 		const promises = sets.map(async (emoteSet) => {
 			const data = await sb.Got("Leppunen", `twitch/emoteset/${emoteSet}`).json();
