@@ -929,7 +929,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * Ideally cached for a rather long time.
 	 * @returns {Promise<TypedEmote[]>}
 	 */
-	static async fetchGlobalEmotes () {
+	async fetchGlobalEmotes () {
 		const [bttv, ffz] = await Promise.allSettled([
 			sb.Got({
 				url: "https://api.betterttv.net/3/cached/emotes/global",
@@ -977,11 +977,10 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	/**
-	 * @override
 	 * @param {Channel} channelData
 	 * @returns {Promise<void>}
 	 */
-	static async fetchChannelEmotes (channelData) {
+	async fetchChannelEmotes (channelData) {
 		const [bttv, ffz] = await Promise.all([
 			TwitchController.fetchChannelBTTVEmotes(channelData),
 			TwitchController.fetchChannelFFZEmotes(channelData)
