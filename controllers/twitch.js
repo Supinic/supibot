@@ -890,7 +890,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		
 		return data.channelEmotes.map(i => ({
 			id: i.id,
-			code: i.code,
+			name: i.code,
 			type: "bttv",
 			global: false,
 			animated: (i.imageType === "gif")
@@ -917,7 +917,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		const emotes = Object.values(data.sets).flatMap(i => i.emoticons);
 		return emotes.map(i => ({
 			id: i.id,
-			code: i.name,
+			name: i.name,
 			type: "ffz",
 			global: false,
 			animated: false
