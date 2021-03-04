@@ -234,7 +234,19 @@ module.exports = class DiscordController extends require("./template.js") {
 		if (channelObject.guild) {
 			const wordList = message.split(/\W+/).filter(Boolean);
 			for (const word of wordList) {
-				const emote = channelObject.guild.emojis.cache.find(i => i.name === word);
+				let emote;
+
+				// First, attempt to find a unique global emoji available to the bot
+				const globalEmotes = this.client.emojis.find(i => i.name === word);
+				if (globalEmotes.length === 1) {
+					// If there is exactly one global emoji fitting the search, use it
+					emote = globalEmotes[0];
+				}
+				else if (globalEmotes.length > 1) {
+					// If there are multiple, try to find it in the current guild's emojis cache and use it
+					emote = channelObject.guild.emojis.cache.find(i => i.name === word);
+				}
+
 				if (emote) {
 					// This regex makes sure all emotes to be replaces are not preceded or followed by a ":" (colon) character
 					// All emotes on Discord are wrapped at least by colons
