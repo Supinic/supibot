@@ -851,6 +851,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	destroy () {
+		this.client.removeAllListeners();
 		this.client.disconnect();
 		this.client = null;
 	}
