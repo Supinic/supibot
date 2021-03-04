@@ -838,7 +838,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	/**
 	 * Fetches a list of emote data for a given list of emote sets.
 	 * @param {string[]} sets
-	 * @returns {Promise<EmoteSetDataObject[]>}
+	 * @returns {Promise<TwitchEmoteSetDataObject[]>}
 	 */
 	static async fetchTwitchEmotes (sets) {
 		const emotesData = [];
@@ -863,6 +863,133 @@ module.exports = class TwitchController extends require("./template.js") {
 		return emotesData;
 	}
 
+	/**
+	 * Fetches a list of BTTV emote data for a given channel name
+	 * @param {Channel} channelData
+	 * @returns {Promise<TypedEmote[]>}
+	 */
+	static async fetchChannelBTTVEmotes (channelData) {
+		const channelID = channelData.Specific_ID ?? await TwitchController.getUserID(channelData.Name);
+		if (!channelID) {
+			throw new sb.Error({
+				message: "No available ID for channel",
+				args: { channel: channelData.Name }
+			});
+		}
+		
+		const { statusCode, body: data } = await sb.Got({
+			url: "https://api.betterttv.net/3/cached/users/twitch/" + channelID,
+			responseType: "json",
+			throwHttpErrors: false
+		});
+
+		if (statusCode !== 200) {
+			console.warn("BTTV emote fetch failed", { statusCode, data });
+			return [];
+		}
+		
+		return data.channelEmotes.map(i => ({
+			id: i.id,
+			code: i.code,
+			type: "bttv",
+			global: false,
+			animated: (i.imageType === "gif")
+		}));
+	}
+
+	/**
+	 * Fetches a list of emote data for a given list of emote sets.
+	 * @param {Channel} channelData
+	 * @returns {Promise<TypedEmote[]>}
+	 */
+	static async fetchChannelFFZEmotes (channelData) {
+		const { statusCode, body: data } = await sb.Got({
+			url: "https://api.frankerfacez.com/v1/room/" + channelData.Name,
+			responseType: "json",
+			throwHttpErrors: false
+		});
+
+		if (statusCode !== 200) {
+			console.warn("FFZ emote fetch failed", { statusCode, data });
+			return [];
+		}
+
+		const emotes = Object.values(data.sets).flatMap(i => i.emoticons);
+		return emotes.map(i => ({
+			id: i.id,
+			code: i.name,
+			type: "ffz",
+			global: false,
+			animated: false
+		}));
+	}
+
+	/**
+	 * Fetches all global emotes for any context.
+	 * Ideally cached for a rather long time.
+	 * @returns {Promise<TypedEmote[]>}
+	 */
+	static async fetchGlobalEmotes () {
+		const [bttv, ffz] = await Promise.allSettled([
+			sb.Got({
+				url: "https://api.betterttv.net/3/cached/emotes/global",
+				responseType: "json",
+				throwHttpErrors: false
+			}),
+			sb.Got({
+				url: "https://api.frankerfacez.com/v1/set/global",
+				responseType: "json",
+				throwHttpErrors: false
+			})
+		]);
+
+		return [
+			...this.availableEmotes
+				.filter(i => !["1","2","3"].includes(i.tier))
+				.flatMap(i => i.emotes)
+				.map(i => ({
+					ID: i.ID,
+					name: i.token,
+					type: "twitch",
+					global: true,
+					animated: false
+				})),
+
+			...Object.values(ffz.value?.body.sets ?? {})
+				.flatMap(i => i.emoticons)
+				.map(i => ({
+					ID: i.id,
+					name: i.name,
+					type: "ffz",
+					global: true ,
+					animated: false
+				})),
+
+			...Object.values(bttv.value?.body ?? [])
+				.map(i => ({
+					ID: i.id,
+					name: i.code,
+					type: "bttv",
+					global: true,
+					animated: (i.imageType === "gif")
+				}))
+		];
+	}
+
+	/**
+	 * @override
+	 * @param {Channel} channelData
+	 * @returns {Promise<void>}
+	 */
+	static async fetchChannelEmotes (channelData) {
+		const [bttv, ffz] = await Promise.all([
+			TwitchController.fetchChannelBTTVEmotes(channelData),
+			TwitchController.fetchChannelFFZEmotes(channelData)
+		]);
+
+		return [...bttv, ...ffz];
+	}
+
 	destroy () {
 		this.client.removeAllListeners();
 		this.client.disconnect();
@@ -871,7 +998,7 @@ module.exports = class TwitchController extends require("./template.js") {
 };
 
 /**
- * @typedef {Object} EmoteSetDataObject Describes a Twitch emote set.
+ * @typedef {Object} TwitchEmoteSetDataObject Describes a Twitch emote set.
  * @property {string} setID
  * @property {Object} channel
  * @property {string} channel.name Channel display name

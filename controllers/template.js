@@ -73,8 +73,30 @@ module.exports = class Controller {
 			message: "Method not implemented"
 		});
 	}
-	
+
+	/**
+	 * Returns a list of usable emotes in the scope of the provided channel.
+	 * @param {Channel} channelData
+	 * @returns {Promise<TypedEmote[]>}
+	 */
+	async fetchChannelEmotes (channelData) { return []; }
+
+	/**
+	 * Returns a list of usable emotes in the scope of entire platform.
+	 * @returns {Promise<TypedEmote[]>}
+	 */
+	async fetchGlobalEmotes () { return []; }
+
 	restart () { }
 
 	destroy () { }
 };
+
+/**
+ * @typedef {Object} TypedEmote Describes any emote
+ * @property {string} code
+ * @property {string} [ID]
+ * @property {string} type
+ * @property {boolean} global
+ * @property {boolean} animated
+ */
