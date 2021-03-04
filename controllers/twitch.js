@@ -382,6 +382,11 @@ module.exports = class TwitchController extends require("./template.js") {
 		await this.client.whisper(userData.Name, trimmedMessage);
 	}
 
+	/**
+	 * Handles incoming messages.
+	 * @param {DankTwitch.PrivmsgMessage|DankTwitch.WhisperMessage} messageObject
+	 * @returns {Promise<void>}
+	 */
 	async handleMessage (messageObject) {
 		const {ircTags, badges, bits, channelName, messageText: message, senderUserID, senderUsername} = messageObject;
 		const messageType = (messageObject instanceof DankTwitch.WhisperMessage)
@@ -551,6 +556,14 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 	}
 
+	/**
+	 * Handles incoming hosts.
+	 * @param {"raid"|"host"} type
+	 * @param {string} from Source channel
+	 * @param {string} to Target channel
+	 * @param {number} viewers
+	 * @returns {Promise<void>}
+	 */
 	async handleHost (type, from, to, viewers) {
 		const hostedChannelData = sb.Channel.get(from, this.platform);
 		const hostingChannelData = sb.Channel.get(to, this.platform);
