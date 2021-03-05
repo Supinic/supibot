@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Search for the last level change (default, staff, admin, ...) of a given Twitch user.",
-	Flags: ["mention","pipe"],
+	Flags: ["archived","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
