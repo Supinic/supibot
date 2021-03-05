@@ -31,6 +31,7 @@ module.exports = (function () {
 			if (sb.Config.get("LOG_MESSAGE_CRON", false)) {
 				this.channels = [];
 				this.batches = {};
+				this.loggingWarnLimit = sb.Config.get("LOGGING_WARN_LIMIT", false) ?? 2500;
 
 				sb.Query.getRecordset(rs => rs
 					.select("TABLE_NAME")
@@ -51,6 +52,15 @@ module.exports = (function () {
 						for (let i = 0; i < keys.length; i++) {
 							const key = keys[i];
 							if (this.batches[key].records?.length > 0) {
+								if (this.batches[key].records.length > this.loggingWarnLimit) {
+									// Think about dropping these messages if limit is exceeded
+									console.warn("Logging limit exceeded", {
+										key,
+										limit: this.loggingWarnLimit,
+										messages: this.batches[key].records.length
+									});
+								}
+
 								setTimeout(
 									() => this.batches[key].insert(),
 									i * 250
