@@ -6,7 +6,8 @@ module.exports = {
 	Description: "Fetches a random Imgur image from a Twitch channel (based off Twitchlotto) and checks it for NSFW stuff via an AI. The \"nudity score\" is posted along with the link.",
 	Flags: ["mention","whitelist"],
 	Params: [
-		{ name: "excludeChannel", type: "string" }
+		{ name: "excludeChannel", type: "string" },
+		{ name: "excludeChannels", type: "string" }
 	],
 	Whitelist_Response: "This command can't be executed here!",
 	Static_Data: (() => {
