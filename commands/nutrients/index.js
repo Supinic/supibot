@@ -17,7 +17,7 @@ module.exports = {
 		}
 
 		let query = args.join(" ");
-		if (!query.test(/\d/)) {
+		if (!/\d/.test(query)) {
 			query = `100g of ${query}`;
 		}
 
