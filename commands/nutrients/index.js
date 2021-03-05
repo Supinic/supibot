@@ -39,20 +39,13 @@ module.exports = {
 				reply: data.message
 			};
 		}
-		else if (data.foods.length > 1) {
-			return {
-				success: false,
-				reply: "Only one food is supported at a time (for now)"
-			};
-		}
 
-		const food = data.foods[0];
-		const specificWeight = (food.serving_qty === 100 && food.serving_unit === "g")
-			? ""
-			: `(${food.serving_weight_grams}g)`;
+		const reply = data.foods.map(food => {
+			const specificWeight = (food.serving_qty === 100 && food.serving_unit === "g")
+				? ""
+				: `(${food.serving_weight_grams}g)`;
 
-		return {
-			reply: sb.Utils.tag.trim `
+			return sb.Utils.tag.trim `
 				${food.serving_qty}${food.serving_unit} of ${food.food_name}
 				${specificWeight}
 				contains
@@ -60,8 +53,10 @@ module.exports = {
 				${food.nf_total_fat}g of fat (${food.nf_saturated_fat ?? 0}g saturated),
 				${food.nf_total_carbohydrate}g of carbohydrates (${food.nf_sugars ?? 0}g sugar),
 				${food.nf_protein}g protein
-			`
-		};
+			`;
+		}).join("; ");
+
+		return { reply };
 	}),
 	Dynamic_Description: null
 };
