@@ -30,7 +30,10 @@ module.exports = {
 			};
 		}
 	
-		let targetUser = await sb.User.get(args[0], true);
+		let targetUser = (args[0])
+			? await sb.User.get(args[0], true)
+			: null;
+
 		if (context.invocation.includes("me") || args[0] === "me" || (targetUser && targetUser.ID === context.user.ID)) {
 			targetUser = context.user;
 	
