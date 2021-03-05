@@ -59,5 +59,18 @@ module.exports = {
 
 		return { reply };
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => {
+		return [
+			"Fetches the top 10 Twitch emotes used today, or in a specific day, if provided correctly.",
+			"",
+
+			`<code>${prefix}tet</code>`,
+			"Fetches the top list for today",
+			"",
+
+			`<code>${prefix}tet date:2021-01-01</code>`,
+			"Fetches the top list for the specified date.",
+			"If your date format doesn't work, try YYYY-MM-DD instead, that should be fine."
+		];
+	})
 };
