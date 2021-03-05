@@ -450,7 +450,7 @@ module.exports = class Reminder extends require("./template.js") {
                         Hey ${notifySymbol}${targetUserData.Name},
                         you have reminders, but they're too long to be posted here. 
                         Check them out here:
-                        https://supinic.com/bot/reminder/lookup?IDs=${listID}
+                        https://supinic.com/bot/reminder/lookup?IDs=${encodeURIComponent(listID)}
                     `;
                 }
 
@@ -468,7 +468,7 @@ module.exports = class Reminder extends require("./template.js") {
                     Hey ${notifySymbol}${targetUserData.Name},
                     the banphrase check for your reminders failed.
                     Check them out here:
-                    https://supinic.com/bot/reminder/lookup?IDs=${listID}
+                    https://supinic.com/bot/reminder/lookup?IDs=${encodeURIComponent(listID)}
                 `;
 
                 await channelData.send(message);
