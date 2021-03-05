@@ -236,7 +236,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			for (const word of wordList) {
 				// First, attempt to find a unique global emoji available to the bot
 				let emote;
-				const globalEmotes = this.client.emojis.cache.filter(i => i.name === word);
+				const globalEmotes = this.client.emojis.cache.array().filter(i => i.name === word);
 
 				if (globalEmotes.length > 0) {
 					// If there are multiple, try to find it in the current guild's emojis cache and use it
