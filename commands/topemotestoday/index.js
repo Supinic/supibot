@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["tet"],
 	Author: "supinic",
 	Cooldown: 20000,
-	Description: "Posts the top 10 used emotes on Twitch for a given day.",
+	Description: "Posts the top 10 used emotes on Twitch for today, or a given day.",
 	Flags: ["mention","non-nullable"],
 	Params: [
 		{ name: "date", type: "string" }
