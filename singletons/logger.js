@@ -271,10 +271,6 @@ module.exports = (function () {
 				this.channels.push(chan);
 			}
 
-			if (sb.Master && sb.Master.ACTIVITY_LOG === true) {
-				console.log("[" + channelData.Name + "] <" + userData.Name + "> " + message);
-			}
-
 			this.batches[chan].add({
 				User_Alias: userData.ID,
 				Text: message,
