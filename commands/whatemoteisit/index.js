@@ -27,6 +27,7 @@ module.exports = {
 			};
 		}
 		else if (statusCode !== 200) {
+			const { error } = response;
 			return {
 				success: false,
 				reply: error
