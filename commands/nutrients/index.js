@@ -47,10 +47,14 @@ module.exports = {
 		}
 
 		const food = data.foods[0];
+		const specificWeight = (food.serving_qty === 100 && food.serving_unit === "g")
+			? ""
+			: `(${food.serving_weight_grams}g)`;
+
 		return {
 			reply: sb.Utils.tag.trim `
-				${food.serving_qty} ${food.serving_unit} ${food.food_name}
-				(${food.serving_weight_grams}g)
+				${food.serving_qty}${food.serving_unit} of ${food.food_name}
+				${specificWeight}
 				contains
 				${food.nf_calories} kcal,
 				${food.nf_total_fat}g of fat (${food.nf_saturated_fat ?? 0}g saturated),
