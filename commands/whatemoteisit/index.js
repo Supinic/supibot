@@ -33,6 +33,7 @@ module.exports = {
 			};
 		}
 
+		const { channel, emotecode, emoteid } = response;
 		const originID = await sb.Query.getRecordset(rs => rs
 		    .select("ID")
 		    .from("data", "Origin")
