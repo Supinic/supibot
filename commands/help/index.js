@@ -20,7 +20,7 @@ module.exports = {
 					: "For the command and FAQ list, check out the Supibot tab on supinic dot com."
 			};
 		}
-		else if (context.invocation === "ehelp") {
+		else if (context.invocation === "helpgrep") {
 			const query = args.join(" ");
 			const eligible = sb.Command.data.filter(command =>
 				command.Name.includes(query)
