@@ -10,9 +10,12 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function whatEmoteIsIt (context, emote) {
 		const data = await sb.Got("Leppunen", "twitch/emotes/" + emote).json();
-		const {error, channel, channelid, emoteid, emotecode, tier} = data;
+		const { channel, emotecode, emoteid, error, status, tier } = data;
 		if (error) {
-			return { reply: error + "!" };
+			return {
+				success: false,
+				reply: `Leppunen API failed with error ${status}: ${error}!`
+			};
 		}
 	
 		const originID = await sb.Query.getRecordset(rs => rs
