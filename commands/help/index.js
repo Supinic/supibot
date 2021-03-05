@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "help",
-	Aliases: ["commands"],
+	Aliases: ["commands","helpgrep"],
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Posts either: a short list of all commands, or a description of a specific command if you specify it.",
@@ -8,15 +8,31 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function help (context, commandString) {
+	Code: (async function help (context, ...args) {
 		const prefix = sb.Config.get("COMMAND_PREFIX");
-	
+		const [commandString] = args;
+
 		// No specified command - print all available commands in given channel for given user
 		if (!commandString || context.invocation === "commands") {
 			return {
 				reply: (!context.channel || context.channel.Links_Allowed)
 					? "Commands available here: https://supinic.com/bot/command/list - Also check the FAQ here: https://supinic.com/data/faq/list"
 					: "For the command and FAQ list, check out the Supibot tab on supinic dot com."
+			};
+		}
+		else if (context.invocation === "ehelp") {
+			const query = args.join(" ");
+			const eligible = sb.Command.data.filter(command =>
+				command.Name.includes(query)
+				|| command.Aliases.some(i => i.includes(query))
+				|| command.Description?.includes(query)
+			);
+
+			return {
+				success: (eligible.length !== 0),
+				reply: (eligible.length === 0)
+					? "No matching commands found!"
+					: "Matching commands: " + eligible.map(i => i.Name).join(", ")
 			};
 		}
 		// Print specific command description
