@@ -11,14 +11,26 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function dankDebug (context, ...args) {
-		const scriptArgs = context.params.arguments ?? "";
-		const script = `((...args) => {\n${args.join(" ")}\n})(${scriptArgs})`;
+		let scriptArgs;
+		if (context.params.arguments) {
+			try {
+				scriptArgs = JSON.parse(context.params.arguments);
+			}
+			catch (e) {
+				console.warn(e);
+				return {
+					success: false,
+					reply: `Command arguments cannot be parsed! ${e.message}`
+				};
+			}
+		}
 
 		let result;
+		const script = `(() => {\n${args.join(" ")}\n})()`;
 		try {
 			result = sb.Sandbox.run(script, {
 				sandbox: {
-					rawArguments: scriptArgs
+					args: scriptArgs ?? null
 				}
 			});
 		}
