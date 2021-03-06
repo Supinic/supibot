@@ -4,12 +4,15 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Debug command for public use, which means it's quite limited because of security.",
-	Flags: ["mention","pipe","whitelist"],
-	Params: null,
+	Flags: ["developer","pipe","use-params"],
+	Params: [
+		{ name: "arguments", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function dankDebug (context, ...args) {
-		const script = `(() => {\n${args.join(" ")}\n})()`;
+		const scriptArgs = context.params.arguments ?? "";
+		const script = `((...args) => {\n${args.join(" ")}\n})(${scriptArgs})`;
 
 		let result;
 		try {
