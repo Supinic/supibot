@@ -45,7 +45,7 @@ module.exports = {
 	
 		const emoteLink = "https://twitchemotes.com/emotes/" + emoteid;
 		const tierString = (tier)
-			? `tier ${tier} sub emote to channel #${channel.toLowerrCase()}`
+			? `tier ${tier} sub emote to channel #${channel.toLowerCase()}`
 			: `special ${channel} emote`;
 		const originString = (originID)
 			? `This emote has origin info - use the ${sb.Command.prefix}origin command.`
