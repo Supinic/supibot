@@ -18,10 +18,17 @@ module.exports = {
 			});
 		}
 		catch (e) {
-			console.warn(e);
+			const { name } = e.constructor;
+			if (name === "EvalError") {
+				return {
+					success: false,
+					reply: "Your dank debug cannot contain any asynchronous code!"
+				};
+			}
+
 			return {
 				success: false,
-				reply: "Your dank debug ended with an error!"
+				reply: e.toString()
 			};
 		}
 
