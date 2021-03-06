@@ -30,7 +30,8 @@ module.exports = {
 		try {
 			result = sb.Sandbox.run(script, {
 				sandbox: {
-					args: scriptArgs ?? null
+					args: scriptArgs ?? null,
+					console: undefined
 				}
 			});
 		}
