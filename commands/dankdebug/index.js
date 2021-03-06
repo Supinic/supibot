@@ -9,43 +9,25 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function dankDebug (context, ...args) {
-		const vm = require("vm");
-		const scriptCode = args.join(" ");
-	
-		if (scriptCode.includes("this")) {
-			return {
-				reply: "FeelsDankMan You are trying outdank me, can't allow that!"
-			};
-		}
-	
-		let script;
+		const script = `(() => {\n${args.join(" ")}\n})()`;
+
+		let result;
 		try {
-			script = new vm.Script(`(async function debugee () {\n${args.join(" ")}\n})()`);
+			result = sb.Sandbox.run(script, {
+				sandbox: null
+			});
 		}
 		catch (e) {
+			console.warn(e);
 			return {
-				reply: "FeelsDankMan Your code is not dank enough! " + e.toString()
+				success: false,
+				reply: "Your dank debug ended with an error!"
 			};
 		}
-	
-		try {
-			const result = await script.runInNewContext({}, {timeout: 1000});
-			if (typeof result === "undefined") {
-				return {
-					reply: "FeelsDankMan Your code is dank, but returned nothing..."
-				};
-			}
-			else {
-				return {
-					reply: "FeelsDankMan " + String(result)
-				};
-			}
-		}
-		catch (e) {
-			return {
-				reply: "FeelsDankMan Your code is too dank! " + e.toString()
-			};
-		}
+
+		return {
+			reply: `Result: ${result}`
+		};
 	}),
 	Dynamic_Description: null
 };
