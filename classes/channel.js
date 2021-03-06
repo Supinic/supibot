@@ -484,7 +484,7 @@ module.exports = class Channel extends require("./template.js") {
 
         Channel.data.push(channelData);
         if (sb.ChatModule) {
-            sb.ChatModule.attachChannelModules(newChannelData);
+            sb.ChatModule.attachChannelModules(channelData);
         }
 
         return channelData;
