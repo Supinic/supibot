@@ -17,7 +17,9 @@ module.exports = {
 		let result;
 		try {
 			result = sb.Sandbox.run(script, {
-				sandbox: null
+				sandbox: {
+					rawArguments: scriptArgs
+				}
 			});
 		}
 		catch (e) {
