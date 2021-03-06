@@ -47,6 +47,8 @@ module.exports = class Sandbox extends require("./template.js") {
 		return vm.run(script);
 	}
 
+	get VM () { return this.#VM; }
+	get NodeVM () { return this.#NodeVM; }
 	get modulePath () { return "sandbox"; }
 
 	destroy () {
