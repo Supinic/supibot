@@ -60,7 +60,12 @@ module.exports = {
 				.flat("Name")
 			);
 		}
-		
+
+		const excludedInput = context.params.excludeChannel ?? context.params.excludeChannels;
+		const excludedChannels = (excludedInput)
+			? excludedInput.split(/\W/).filter(i => this.data.channels.includes(i))
+			: [];
+
 		if (channel) {
 			channel = channel.toLowerCase();
 			
@@ -70,10 +75,10 @@ module.exports = {
 					reply: "The channel you provided has no images saved!"
 				};
 			}
-			else if (context.params.excludeChannel) {
+			else if (excludedInput) {
 				return {
 					success: false,
-					reply: "Cannot combine the excludeChannel parameter with a specified channel!"
+					reply: "Cannot combine channels exclusion with a specified channel!"
 				};
 			}
 		}
@@ -112,8 +117,7 @@ module.exports = {
 			}
 			else {
 				let rollLimit = this.data.counts.total;
-				const excluded = (context.params.excludeChannel) ? context.params.excludeChannel.split(/\W/) : [];
-				for (const channel of excluded) {
+				for (const channel of excludedChannels) {
 					rollLimit -= this.data.counts[channel] ?? 0;
 				}
 
@@ -127,8 +131,8 @@ module.exports = {
 						.single()
 						.flat("Link");
 
-					if (excluded.length > 0) {
-						rs.where("Channel NOT IN %s+", excluded);
+					if (excludedChannels.length > 0) {
+						rs.where("Channel NOT IN %s+", excludedChannels);
 					}
 
 					return rs;
