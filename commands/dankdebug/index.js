@@ -49,8 +49,11 @@ module.exports = {
 			};
 		}
 
+		const { inspect } = require("util");
 		return {
-			reply: `Result: ${result}`
+			reply: (result && typeof result === "object")
+				? `Result: ${inspect(result)}`
+				: `Result: ${result}`
 		};
 	}),
 	Dynamic_Description: null
