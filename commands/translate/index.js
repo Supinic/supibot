@@ -31,6 +31,10 @@ module.exports = {
 	
 		for (const option of ["from", "to"]) {
 			const lang = context.params[option];
+			if (!lang) {
+				continue;
+			}
+
 			const newLang = sb.Utils.languageISO.get(lang);
 			const code = newLang?.iso6391 ?? newLang?.iso6392 ?? null;
 			if (!code) {
