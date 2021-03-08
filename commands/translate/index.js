@@ -14,7 +14,14 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function translate (context, ...args) {
-		const fail = { from: null, to: null };
+		if (args.length === 0) {
+			return {
+				success: false,
+				reply: "No text for translation provided!",
+				cooldown: 2500
+			};
+		}
+
 		const options = {
 			from: "auto",
 			to: "en",
@@ -24,60 +31,35 @@ module.exports = {
 	
 		for (const option of ["from", "to"]) {
 			const lang = context.params[option];
-			const newLang = sb.Utils.languageISO.get(lang) ?? {};
-			const code = newLang.iso6391 ?? newLang.iso6392 ?? null;
+			const newLang = sb.Utils.languageISO.get(lang);
+			const code = newLang?.iso6391 ?? newLang?.iso6392 ?? null;
 			if (!code) {
-				fail[option] = lang;
-				continue;
+				return {
+					success: false,
+					reply: `Language "${lang}" was not recognized!`
+				};
 			}
 	
 			options[option] = code.toLowerCase();
-			fail[option] = false;
 		}
 	
-		if (fail.from || fail.to) {
-			return {
-				success: false,
-				reply: `Language "${fail.from || fail.to}" was not recognized!`
-			};
-		}
-		else if (args.length === 0) {
-			return {
-				success: false,
-				reply: "No text for translation provided!",
-				cooldown: 2500
-			};
-		}
-	
-		const { body: response, statusCode } = await sb.Got({
-			responseType: "json",
+		const response = await sb.Got("GenericAPI", {
 			url: "https://translate.googleapis.com/translate_a/single",
-			throwHttpErrors: false,
-			searchParams: new sb.URLParams()
-				.set("client", "gtx")
-				.set("dt", "t")
-				.set("sl", options.from)
-				.set("tl", options.to)
-				.set("ie", "UTF-8")
-				.set("oe", "UTF-8")
-				.set("q", args.join(" "))
-				.toString()
+			searchParams: {
+				client: "gtx",
+				dt: "t",
+				ie: "UTF-8",
+				oe: "UTF-8",
+				sl: options.from,
+				tl: options.to,
+				q: args.join(" ")
+			},
+			headers: {
+				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36"
+			}
 		});
 	
-		if (statusCode === 400) {
-			return { 
-				success: false,
-				reply: "Language not supported" 
-			};
-		}
-		else if (statusCode !== 200) {
-			throw new sb.errors.APIError({
-				statusCode,
-				apiName: "GoogleTranslateAPI"
-			});
-		}
-	
-		let reply = response[0].map(i => i[0]).join(" ");
+		let reply = response.body[0].map(i => i[0]).join(" ");
 		if (options.direction) {
 			const languageID = response[2].replace(/-.*/, "");
 			const fromLanguageName = sb.Utils.languageISO.getName(languageID);
