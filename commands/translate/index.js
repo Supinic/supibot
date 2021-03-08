@@ -47,7 +47,7 @@ module.exports = {
 			options[option] = code.toLowerCase();
 		}
 	
-		const response = await sb.Got("GenericAPI", {
+		const { body: data } = await sb.Got("GenericAPI", {
 			url: "https://translate.googleapis.com/translate_a/single",
 			searchParams: {
 				client: "gtx",
@@ -63,12 +63,12 @@ module.exports = {
 			}
 		});
 	
-		let reply = response.body[0].map(i => i[0]).join(" ");
+		let reply = data[0].map(i => i[0]).join(" ");
 		if (options.direction) {
-			const languageID = response[2].replace(/-.*/, "");
+			const languageID = data[2].replace(/-.*/, "");
 			const fromLanguageName = sb.Utils.languageISO.getName(languageID);
 			if (!fromLanguageName) {
-				console.warn("$translate - could not get language name", { response, reply, options, languageID });
+				console.warn("$translate - could not get language name", { data, reply, options, languageID });
 				return {
 					success: false,
 					reply: "Language code could not be translated into a name! Please let @Supinic know about this :)"
@@ -76,8 +76,8 @@ module.exports = {
 			}
 	
 			const array = [sb.Utils.capitalize(fromLanguageName)];
-			if (options.confidence && response[6] && response[6] !== 1) {
-				const confidence = sb.Utils.round(response[6] * 100, 0) + "%";
+			if (options.confidence && data[6] && data[6] !== 1) {
+				const confidence = sb.Utils.round(data[6] * 100, 0) + "%";
 				array.push("(" +  confidence + ")");
 			}
 	
