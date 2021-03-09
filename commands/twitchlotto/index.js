@@ -183,7 +183,7 @@ module.exports = {
 		}
 	
 		if (image.Score === null) {
-			const { statusCode, detections, score } = await sb.Utils.checkPictureNSFW(`https://i.imgur.com/${image.Link}`);
+			const { statusCode, data } = await sb.Utils.checkPictureNSFW(`https://i.imgur.com/${image.Link}`);
 			if (statusCode !== 200) {
 				return {
 					success: false,
@@ -191,17 +191,17 @@ module.exports = {
 				};
 			}
 	
-			const json = JSON.stringify({ detections, nsfw_score: score });
+			const json = JSON.stringify({ detections: data.detections, nsfw_score: data.score });
 			await sb.Query.getRecordUpdater(ru => ru
 				.update("data", "Twitch_Lotto")
-				.set("Score", score)
+				.set("Score", data.score)
 				.set("Data", json)
 				.where("Link = %s", image.Link)
 				.where("Channel = %s", image.Channel)
 			);
 	
 			image.Data = json;
-			image.Score = sb.Utils.round(score, 4);
+			image.Score = sb.Utils.round(data.score, 4);
 		}
 	
 		const detectionsString = [];
