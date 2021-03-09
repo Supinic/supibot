@@ -50,7 +50,7 @@ module.exports = {
 	        if (statusCode !== 200) {
 	            return {
 	                success: false,
-	                reply: `Could not upload the image to nuuls.com! Error: ${statusCode}`
+	                reply: `Could not upload the image! Error: ${statusCode}`
 	            };
 	        }
 	
