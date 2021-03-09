@@ -248,11 +248,13 @@ module.exports = {
 			"",
 
 			`<code>${prefix}rm</code>`,
+			`<code>${prefix}randommeme</code>`,
 			"Posts a random post from one of the default meme subreddits.",
 			`<code>${defaultMemeSubreddits.join(" ")}</code>`,
 			"",
 
 			`<code>${prefix}rm (subreddit)</code>`,
+			`<code>${prefix}randommeme (subreddit)</code>`,
 			"Posts a random post from the specified subreddit.",
 			"NSFW-marked subreddits are not available outside of channels marked for that content.",
 			"NSFW-marked posts will be filtered out in channels not marked for that content.",
