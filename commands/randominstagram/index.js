@@ -67,7 +67,7 @@ module.exports = {
 				Random post from ${post.owner.username}:
 				${description}
 				(${commentCount} comments, ${likeCount} likes)
-				${post.display_url}
+				https://www.instagram.com/p/${post.shortcode}
 			`
 		};
 	}),
