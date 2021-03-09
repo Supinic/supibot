@@ -224,6 +224,7 @@ module.exports = class DiscordController extends require("./template.js") {
 	 * @param channel
 	 */
 	async send (message, channel) {
+		const globalEmoteRegex = /[A-Z]/;
 		const channelData = sb.Channel.get(channel, this.platform).Name;
 		const channelObject = this.client.channels.cache.get(channelData);
 		if (!channelObject) {
@@ -245,8 +246,10 @@ module.exports = class DiscordController extends require("./template.js") {
 					// If there are multiple, try to find it in the current guild's emojis cache and use it
 					emote = guildEmotesMap.find(i => i.name === word);
 
-					// If not found, simply pick a random emote out of the global list
-					emote = emote ?? sb.Utils.randArray([...globalEmotes.values()]);
+					// If not found and the word is not overly common, simply pick a random emote out of the global list
+					if (!emote && globalEmoteRegex.test(word)) {
+						emote = sb.Utils.randArray([...globalEmotes.values()]);
+					}
 				}
 
 				if (emote) {
