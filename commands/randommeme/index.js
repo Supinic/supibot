@@ -240,5 +240,26 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix, values) => {
+		const { defaultMemeSubreddits } = values.getStaticData();
+
+		return [
+			"Posts a random Reddit meme. If a subreddit is provided, posts a random non-text post from there.",
+			"",
+
+			`<code>${prefix}rm</code>`,
+			"Posts a random post from one of the default meme subreddits.",
+			`<code>${defaultMemeSubreddits.join(" ")}</code>`,
+
+			`<code>${prefix}rm (subreddit)</code>`,
+			"Posts a random post from the specified subreddit.",
+			"NSFW-marked subreddits are not available outside of channels marked for that content.",
+			"NSFW-marked posts will be filtered out in channels not marked for that content.",
+			"",
+
+			`<code>${prefix}rm linkOnly:true</code>`,
+			`<code>${prefix}rm (subreddit)linkOnly:true</code>`,
+			"Posts a random post from the default, or specified subreddit, posting just the link without any other text.",
+		];
+	})
 };
