@@ -183,19 +183,7 @@ module.exports = {
 		}
 	
 		if (image.Score === null) {
-			const { statusCode, body: resultData } = await sb.Got({
-				method: "POST",
-				responseType: "json",
-				throwHttpErrors: false,
-				url: "https://api.deepai.org/api/nsfw-detector",
-				headers: {
-					"Api-Key": sb.Config.get("API_DEEP_AI")
-				},
-				form: {
-					image: `https://i.imgur.com/${image.Link}`
-				}
-			});
-	
+			const { statusCode, detections, score } = await sb.Utils(image.Link);
 			if (statusCode !== 200) {
 				console.log({ statusCode, resultData });
 				return {
@@ -204,17 +192,17 @@ module.exports = {
 				};
 			}
 	
-			const json = JSON.stringify(resultData.output);
+			const json = JSON.stringify({ detections, nsfw_score: score });
 			await sb.Query.getRecordUpdater(ru => ru
 				.update("data", "Twitch_Lotto")
-				.set("Score", resultData.output.nsfw_score)
+				.set("Score", score)
 				.set("Data", json)
 				.where("Link = %s", image.Link)
 				.where("Channel = %s", image.Channel)
 			);
 	
 			image.Data = json;
-			image.Score = sb.Utils.round(resultData.output.nsfw_score, 4);
+			image.Score = sb.Utils.round(score, 4);
 		}
 	
 		const detectionsString = [];
