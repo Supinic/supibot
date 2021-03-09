@@ -183,9 +183,8 @@ module.exports = {
 		}
 	
 		if (image.Score === null) {
-			const { statusCode, detections, score } = await sb.Utils.checkPictureNSFW(image.Link);
+			const { statusCode, detections, score } = await sb.Utils.checkPictureNSFW(`https://imgur.com/${image.Link}`);
 			if (statusCode !== 200) {
-				console.log({ statusCode, resultData });
 				return {
 					success: false,
 					reply: `Fetching image data failed! Status code ${statusCode}`
