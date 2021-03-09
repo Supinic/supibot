@@ -25,7 +25,9 @@ module.exports = {
 		}
 		
 		channel = channel.replace("#", "").toLowerCase();
-		const existing = sb.Channel.get(channel);
+
+		const platformName = context.params.platform ?? "twitch";
+		const existing = sb.Channel.get(channel, platformName);
 		if (existing) {
 			return {
 				success: false,
@@ -33,7 +35,6 @@ module.exports = {
 			};
 		}
 
-		const platformName = context.params.platform ?? "twitch";
 		if (platformName === "twitch") {
 			const { controller } = sb.Platform.get("twitch");
 			const channelID = await controller.getUserID(channel);
