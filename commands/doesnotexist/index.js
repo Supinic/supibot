@@ -45,33 +45,18 @@ module.exports = {
 	                reply: `Fetching image data failed monkaS`
 	            };
 	        }
-	
-	        const form = new sb.Got.FormData();
-	        form.append("attachment", imageData.rawBody ?? imageData.body, "file.jpg");
-	
-	        const uploadData = await sb.Got({
-	            method: "POST",
-	            throwHttpErrors: false,
-	            url: "https://i.nuuls.com/upload",
-	            headers: {
-	                ...form.getHeaders()
-	            },
-	            body: form.getBuffer(),
-	            retry: 0,
-	            timeout: 10000
-	        });
-	
-	        if (uploadData.statusCode !== 200) {
-	            console.warn("dne upload failed", uploadData);
+
+	        const { statusCode, link } = await sb.Utils.uploadToNuuls(imageData.rawBody ?? imageData.body);
+	        if (statusCode !== 200) {
 	            return {
 	                success: false,
-	                reply: `Upload to nuuls.com failed monkaS`
+	                reply: `Could not upload the image to nuuls.com! Error: ${statusCode}`
 	            };
 	        }
 	
 	        return {
-	            link: uploadData.body,
-	            reply: `This ${type} does not exist: ${uploadData.body}`
+	            link,
+	            reply: `This ${type} does not exist: ${link}`
 	        };
 	    }),
 	Dynamic_Description: (async (prefix, values) => {
