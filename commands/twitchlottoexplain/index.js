@@ -116,22 +116,7 @@ module.exports = {
         await fs.promises.unlink(`/tmp/${link}`);
 
         const outputFile = await fs.promises.readFile(`/tmp/out_${link}`);
-        const formData = new sb.Got.FormData();
-
-        formData.append("image", outputFile, link); // !!! FILE NAME MUST BE SET, OR THE API NEVER RESPONDS !!!
-        const { statusCode, body } = await sb.Got({
-            url: "https://api.imgur.com/3/image",
-            responseType: "json",
-            method: "POST",
-            throwHttpErrors: false,
-            headers: {
-                ...formData.getHeaders(),
-                Authorization: "Client-ID c898c0bb848ca39"
-            },
-            body: formData.getBuffer(),
-            retry: 0,
-            timeout: 10000
-        });
+        const { statusCode, link: outputLink } = await sb.Utils.uploadToImgur(outputFile, link);
 
         await fs.promises.unlink(`/tmp/out_${link}`);
 
@@ -142,7 +127,7 @@ module.exports = {
             };
         }
 
-        data.explainLink = body.data.link;
+        data.explainLink = outputLink;
         await sb.Query.getRecordUpdater(ru => ru
             .update("data", "Twitch_Lotto")
             .set("Data", JSON.stringify(data))
@@ -150,7 +135,7 @@ module.exports = {
         );
 
         return {
-            reply: body.data.link
+            reply: outputLink
         };
     }),
     Dynamic_Description: null
