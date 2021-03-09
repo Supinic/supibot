@@ -46,7 +46,7 @@ module.exports = {
 		const commentCount = post.edge_media_to_comment.count ?? 0;
 		const likeCount = post.edge_liked_by.count ?? 0;
 
-		const { statusCode: nsfwStatusCode, data: nsfwData } = await sb.Utils.checkPictureNSFW(`https://i.imgur.com/${image.Link}`);
+		const { statusCode: nsfwStatusCode, data: nsfwData } = await sb.Utils.checkPictureNSFW(post.display_url);
 		if (nsfwStatusCode !== 200) {
 			return {
 				success: false,
