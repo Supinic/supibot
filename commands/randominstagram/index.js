@@ -56,9 +56,14 @@ module.exports = {
 
 		const relevantDetections = nsfwData.detections.filter(i => !i.name.includes("Covered"));
 		if (nsfwCheck && nsfwData.score > 0.25 || relevantDetections.length > 0) {
+			const score = nsfwData.score * 100
 			return {
 				success: false,
-				reply: `That post was deemed to be too NSFW for this channel!`
+				reply: sb.Utils.tag.trim `
+					That post was deemed to be too NSFW for this channel!
+					NSFW score: ${score}%,
+					detections: ${relevantDetections.length}
+				`
 			};
 		}
 
