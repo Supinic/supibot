@@ -250,6 +250,7 @@ module.exports = {
 			`<code>${prefix}rm</code>`,
 			"Posts a random post from one of the default meme subreddits.",
 			`<code>${defaultMemeSubreddits.join(" ")}</code>`,
+			"",
 
 			`<code>${prefix}rm (subreddit)</code>`,
 			"Posts a random post from the specified subreddit.",
