@@ -62,9 +62,25 @@ module.exports = {
 		}
 
 		const excludedInput = context.params.excludeChannel ?? context.params.excludeChannels;
-		const excludedChannels = (excludedInput)
-			? excludedInput.split(/\W/).filter(i => this.data.channels.includes(i))
-			: [];
+		if (excludedInput) {
+			if (channel) {
+				return {
+					success: false,
+					reply: "Cannot combine channels exclusion with a specified channel!"
+				};
+			}
+
+			const excludedChannels = excludedInput.split(/\W/).filter(i => this.data.channels.includes(i));
+			const availableChannels = this.data.channels.filter(i => !i.includes(excludedChannels));
+			if (availableChannels.length === 0) {
+				return {
+					success: false,
+					reply: "There are no channels left to pick any images from!"
+				};
+			}
+
+			channel = sb.Utils.randArray(availableChannels);
+		}
 
 		if (channel) {
 			channel = channel.toLowerCase();
@@ -73,12 +89,6 @@ module.exports = {
 				return {
 					success: false,
 					reply: "The channel you provided has no images saved!"
-				};
-			}
-			else if (excludedInput) {
-				return {
-					success: false,
-					reply: "Cannot combine channels exclusion with a specified channel!"
 				};
 			}
 		}
@@ -116,28 +126,17 @@ module.exports = {
 				);
 			}
 			else {
-				let rollLimit = this.data.counts.total;
-				for (const channel of excludedChannels) {
-					rollLimit -= this.data.counts[channel] ?? 0;
-				}
+				const roll = sb.Utils.random(1, this.data.counts.total);
+				const link = await sb.Query.getRecordset(rs => rs
+					.select("Link")
+					.from("data", "Twitch_Lotto")
+					.orderBy("Link ASC")
+					.limit(1)
+					.offset(roll)
+					.single()
+					.flat("Link")
+				);
 
-				const roll = sb.Utils.random(1, rollLimit);
-				const link = await sb.Query.getRecordset(rs => {
-					rs.select("Link")
-						.from("data", "Twitch_Lotto")
-						.orderBy("Link ASC")
-						.limit(1)
-						.offset(roll)
-						.single()
-						.flat("Link");
-
-					if (excludedChannels.length > 0) {
-						rs.where("Channel NOT IN %s+", excludedChannels);
-					}
-
-					return rs;
-				});
-	
 				image = await sb.Query.getRecordset(rs => rs
 					.select("*")
 					.from("data", "Twitch_Lotto")
