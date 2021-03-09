@@ -4,8 +4,11 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches a random Instagram user's post, from their most recently posted ones.",
-	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Flags: ["mention","non-nullable","use-params"],
+	Params: [
+		{ name: "rawLinkOnly", type: "boolean" },
+		{ name: "postLinkOnly", type: "boolean" },
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomInstagram (context, user) {
@@ -67,14 +70,45 @@ module.exports = {
 			};
 		}
 
-		return {
-			reply: `
-				Random post from ${post.owner.username}:
-				${description}
-				(${commentCount} comments, ${likeCount} likes)
-				https://www.instagram.com/p/${post.shortcode}
-			`
-		};
+		if (context.params.rawLinkOnly) {
+			return {
+				reply: post.display_url
+			}
+		}
+		else if (context.params.postLinkOnly) {
+			return {
+				reply: `https://www.instagram.com/p/${post.shortcode}`
+			}
+		}
+		else {
+			return {
+				reply: `
+					Random post from ${post.owner.username}:
+					${description}
+					(${commentCount} comments, ${likeCount} likes)
+					https://www.instagram.com/p/${post.shortcode}
+				`
+			};
+		}
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => {
+		return [
+			"For a given Instagram user, this command fetches one of their recent 12 posts.",
+			"Video posts are skipped, for the moment being.",
+			"If this command isn't invoked in an NSFW-compliant channel, the command will only post pictures if they pass the NSFW check.",
+			"",
+
+			`<code>${prefix}randominstagram lotteandmolly</code>`,
+			"Posts a random picture post from the provided user.",
+			"",
+
+			`<code>${prefix}rig lotteandmolly rawLinkOnly:true</code>`,
+			"Posts a random picture post URL - the actual image URL Instagram uses, without the description.",
+			"",
+
+			`<code>${prefix}rig lotteandmolly postLinkOnly:true</code>`,
+			"Posts a random picture post URL - without the description, and other fluff.",
+			"",
+		];
+	})
 };
