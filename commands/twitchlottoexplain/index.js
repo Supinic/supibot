@@ -118,7 +118,7 @@ module.exports = {
         const outputFile = await fs.promises.readFile(`/tmp/out_${link}`);
         const formData = new sb.Got.FormData();
 
-        formData.append("image", outputFile, link); // !!! FILE NAME MUST BE SET, OR THE API DIES !!!
+        formData.append("image", outputFile, link); // !!! FILE NAME MUST BE SET, OR THE API NEVER RESPONDS !!!
         const { statusCode, body } = await sb.Got({
             url: "https://api.imgur.com/3/image",
             responseType: "json",
