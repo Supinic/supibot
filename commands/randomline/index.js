@@ -2,7 +2,7 @@ module.exports = {
 	Name: "randomline",
 	Aliases: ["rl","rq"],
 	Author: "supinic",
-	Cooldown: 7500,
+	Cooldown: 15000,
 	Description: "Fetches a random line from the current channel. If a user is specified, fetches a random line from that user only",
 	Flags: ["block","opt-out","pipe","use-params"],
 	Params: [
