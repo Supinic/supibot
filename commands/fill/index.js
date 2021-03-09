@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 20000,
 	Description: "Takes the input and scrambles it around randomly.",
-	Flags: ["mention","pipe"],
+	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -17,9 +17,7 @@ module.exports = {
 	
 		let length = 0;
 		const result = [];
-		const platform = context.platform.Name.toUpperCase();
-	
-		let limit = (context.channel?.Message_Limit ?? context.platform.Message_Limit) - context.user.Name.length - 3;
+		let limit = (context.channel?.Message_Limit ?? context.platform.Message_Limit);
 		if (context.channel && context.channel.sessionData.live) {
 			limit = Math.trunc(limit / 2);
 		}
@@ -30,7 +28,7 @@ module.exports = {
 			length += randomWord.length + 1;
 		}
 	
-		let cooldown = {};
+		let cooldown;
 		if (context.channel === null) {
 			cooldown = { length: 10000 };
 		}
