@@ -77,7 +77,7 @@
 				}
 
 				limit = options.platform.Message_Limit;
-				if (options.platform === "twitch") {
+				if (options.platform.Name === "twitch") {
 					limit -= options.extraLength;
 				}
 			}
