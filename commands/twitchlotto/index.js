@@ -241,7 +241,7 @@ module.exports = {
 		});
 
 		let channelString = "";
-		if (!channel && !excludedInput) {
+		if (!channel || excludedInput) {
 			const channels = await sb.Query.getRecordset(rs => rs
 			    .select("Channel")
 			    .from("data", "Twitch_Lotto")
