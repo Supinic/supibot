@@ -183,7 +183,7 @@ module.exports = {
 		}
 	
 		if (image.Score === null) {
-			const { statusCode, detections, score } = await sb.Utils(image.Link);
+			const { statusCode, detections, score } = await sb.Utils.checkPictureNSFW(image.Link);
 			if (statusCode !== 200) {
 				console.log({ statusCode, resultData });
 				return {
