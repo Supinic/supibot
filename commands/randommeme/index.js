@@ -259,7 +259,7 @@ module.exports = {
 			"",
 
 			`<code>${prefix}rm linkOnly:true</code>`,
-			`<code>${prefix}rm (subreddit)linkOnly:true</code>`,
+			`<code>${prefix}rm (subreddit) linkOnly:true</code>`,
 			"Posts a random post from the default, or specified subreddit, posting just the link without any other text.",
 		];
 	})
