@@ -4,8 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the last tweet from a given user. No retweets or replies, just plain standalone tweets.",
-	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Flags: ["mention","non-nullable","pipe","use-params"],
+	Params: [
+		{ name: "textOnly", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function twitter (context, user) {
@@ -46,7 +48,9 @@ module.exports = {
 		const delta = sb.Utils.timeDelta(new sb.Date(tweet.created_at));
 		const fixedText = sb.Utils.fixHTML(tweet.text);
 		return {
-			reply: `${fixedText} (posted ${delta})`
+			reply: (context.params.textOnly)
+				? fixedText
+				: `${fixedText} (posted ${delta})`
 		};
 	}),
 	Dynamic_Description: null
