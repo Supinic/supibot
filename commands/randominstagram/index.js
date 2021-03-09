@@ -59,7 +59,7 @@ module.exports = {
 
 		const relevantDetections = nsfwData.detections.filter(i => !i.name.includes("Covered"));
 		if (nsfwCheck && nsfwData.score > 0.25 || relevantDetections.length > 0) {
-			const score = nsfwData.score * 100
+			const score = sb.Utils.round(nsfwData.score * 100, 2);
 			return {
 				success: false,
 				reply: sb.Utils.tag.trim `
