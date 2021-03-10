@@ -110,7 +110,7 @@ module.exports = {
 			};
 		}
 		else {
-			const params = rest.map(i => `ID=${i.ID}`).join("&");
+			const params = data.map(i => `ID=${i.ID}`).join("&");
 			const link = `https://supinic.com/track/lookup?${params}`;
 			return {
 				link,
