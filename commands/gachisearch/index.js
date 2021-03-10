@@ -102,7 +102,7 @@ module.exports = {
 		const [first, ...rest] = data;
 		let others = "";
 		if (rest.length > 0) {
-			const params = rest.map(i => `ID=${i}`).join("&");
+			const params = rest.map(i => `ID=${i.ID}`).join("&");
 			others = `More results: https://supinic.com/track/lookup?${params}`;
 		}
 	
