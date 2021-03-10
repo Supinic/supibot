@@ -102,20 +102,21 @@ module.exports = {
 				reply: "No tracks matching that query have been found!"
 			};
 		}
-	
-		const emoji = (obj) => obj.Is_Todo ? "🚧" : "";
-	
-		const [first, ...rest] = data;
-		let others = "";
-		if (rest.length > 0) {
-			const params = rest.map(i => `ID=${i.ID}`).join("&");
-			others = `More results: https://supinic.com/track/lookup?${params}`;
+		else if (data.length === 1) {
+			const [first] = data;
+			return {
+				reply: `"${first.Name}" - ${first.Is_Todo ? "🚧" : ""} https://supinic.com/track/detail/${first.ID}`,
+				link: `https://supinic.com/track/detail/${first.ID}`
+			};
 		}
-	
-		return {
-			reply: `"${first.Name}" - ${emoji(first)} https://supinic.com/track/detail/${first.ID} ${others}`,
-			link: `https://supinic.com/track/detail/${first.ID}`
-		};
+		else {
+			const params = rest.map(i => `ID=${i.ID}`).join("&");
+			const link = `https://supinic.com/track/lookup?${params}`;
+			return {
+				link,
+				reply: "Multiple results found - check the search result here: " + link,
+			};
+		}
 	}),
 	Dynamic_Description: null
 };
