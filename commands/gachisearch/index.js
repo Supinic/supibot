@@ -16,6 +16,12 @@ module.exports = {
 				reply: "No search query provided!"
 			};
 		}
+		else if (query.length < 3) {
+			return {
+				success: false,
+				reply: "Your search query is too short - use at least 3 characters!"
+			};
+		}
 	
 		const { invocation } = context;
 		const escaped = sb.Query.escapeLikeString(query);
