@@ -100,9 +100,11 @@ module.exports = {
 		const emoji = (obj) => obj.Is_Todo ? "🚧" : "";
 	
 		const [first, ...rest] = data;
-		const others = (rest.length === 0)
-			? ""
-			: "More results: " + rest.map(i => `"${i.Name}" (ID ${i.ID}) ${emoji(i)}`).join("; ");
+		let others = "";
+		if (rest.length > 0) {
+			const params = rest.map(i => `ID=${i}`).join("&");
+			others = `More results: https://supinic.com/track/lookup?${params}`;
+		}
 	
 		return {
 			reply: `"${first.Name}" - ${emoji(first)} https://supinic.com/track/detail/${first.ID} ${others}`,
