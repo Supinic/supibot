@@ -114,7 +114,7 @@ module.exports = {
 			const link = `https://supinic.com/track/lookup?${params}`;
 			return {
 				link,
-				reply: "Multiple results found - check the search result here: " + link,
+				reply: "Search result: " + link,
 			};
 		}
 	}),
