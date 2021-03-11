@@ -615,7 +615,8 @@ module.exports = class TwitchController extends require("./template.js") {
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
 			const message = await sb.Master.prepareMessage(execution.reply, null, {
 				platform: this.platform,
-				extraLength: ("/w " + userData.Name + " ").length
+				extraLength: ("/w " + userData.Name + " ").length,
+				skipBanphrases: true
 			});
 
 			this.pm(message, userData.Name);
