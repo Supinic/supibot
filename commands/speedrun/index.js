@@ -123,7 +123,7 @@ module.exports = {
 			return true;
 		});
 
-		const { run } = filteredRuns[0];
+		const [run] = filteredRuns;
 		if (!runner) {
 			const { statusCode, body: runnerData } = await sb.Got("Speedrun", {
 				url: `users/${run.players[0].id}`,
