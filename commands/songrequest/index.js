@@ -5,7 +5,11 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Requests a song to play on Supinic's stream. You can use \"start:\" and \"end:\" to request parts of a song using seconds or a time syntax. \"start:100\" or \"end:05:30\", for example.",
 	Flags: ["mention","pipe","whitelist"],
-	Params: null,
+	Params: [
+		{ name: "start", type: "string" },
+		{ name: "end", type: "string" },
+		{ name: "type", type: "string" },
+	],
 	Whitelist_Response: "Only available in supinic's channel.",
 	Static_Data: (() => {
 		const limits = {
@@ -201,43 +205,26 @@ module.exports = {
 				reply: limits.reason
 			};
 		}
-	
-		let startTime = null;
-		let endTime = null;
-		let type = "youtube";
-		for (let i = args.length - 1; i >= 0; i--) {
-			const token = args[i];
-			if (token.includes("type:")) {
-				type = token.split(":")[1];
-				args.splice(i, 1);
-			}
-			else if (token.includes("start:")) {
-				const string = token.split(":").slice(1).join(":");
-				startTime = sb.Utils.parseVideoDuration(string);
-				args.splice(i, 1);
-	
-				if (!Number.isFinite(startTime) || startTime <= 0 || startTime > Math.pow(2, 32)) {
-					return {
-						success: false,
-						reply: "Invalid start time!"
-					};
-				}
-			}
-			else if (token.includes("end:")) {
-				const string = token.split(":").slice(1).join(":");
-				endTime = sb.Utils.parseVideoDuration(string);
-				args.splice(i, 1);
-	
-				if (!Number.isFinite(endTime) || endTime <= 0 || endTime > Math.pow(2, 32)) {
-					return {
-						success: false,
-						reply: "Invalid end time!"
-					};
-				}
-			}
+
+
+		let startTime = context.params.start ? Number(context.params.start) : null;
+		if (startTime && (!Number.isFinite(startTime) || startTime > Math.pow(2, 32))) {
+			return {
+				success: false,
+				reply: "Invalid start time!"
+			};
 		}
-	
+
+		let endTime = context.params.start ? Number(context.params.end) : null;
+		if (endTime && (!Number.isFinite(endTime) || endTime > Math.pow(2, 32))) {
+			return {
+				success: false,
+				reply: "Invalid start time!"
+			};
+		}
+
 		let url = args.join(" ");
+		const type = context.params.type ?? "youtube";
 		const potentialTimestamp = this.staticData.parseTimestamp(url);
 		if (potentialTimestamp && startTime === null) {
 			startTime = potentialTimestamp;
@@ -422,8 +409,14 @@ module.exports = {
 	
 		const authorString = (data.author) ? ` by ${data.author}` : "";
 		const length = data.duration ?? data.length ?? null;
+		if (startTime < 0) {
+			startTime = length + startTime;
+		}
+		if (endTime < 0) {
+			endTime = length + endTime;
+		}
+
 		const segmentLength = (endTime ?? length) - (startTime ?? 0);
-	
 		if ((limits.totalTime + segmentLength) > limits.time) {
 			const excess = (limits.totalTime + segmentLength) - limits.time;
 			return {
