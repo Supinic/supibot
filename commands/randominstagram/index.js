@@ -15,7 +15,7 @@ module.exports = {
 		if (!user) {
 			return {
 				success: false,
-				reply: `Pepega`
+				reply: "You must input a valid profile name!"
 			};
 		}
 
