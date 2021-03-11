@@ -504,7 +504,22 @@ module.exports = class Command extends require("./template.js") {
 						};
 					}
 
-					context.params[name] = parsedValue;
+					if (type === "object") {
+						if (typeof context.params[name] === "undefined") {
+							context.params[name] = {};
+						}
+						else if (typeof context.params[name][parsedValue.key]) {
+							return {
+								success: false,
+								reply: `Cannot use multiple values for parameter "${name}", key ${parsedValue.key}!`
+							};
+						}
+
+						context.params[name][parsedValue.key] = parsedValue.value;
+					}
+					else {
+						context.params[name] = parsedValue;
+					}
 				}
 			}
 
@@ -891,6 +906,10 @@ module.exports = class Command extends require("./template.js") {
 		}
 		else if (type === "date") {
 			return new sb.Date(value);
+		}
+		else if (type === "object") {
+			const [key, outputValue] = value.split("=");
+			return { key, value: outputValue };
 		}
 		else {
 			return null;
