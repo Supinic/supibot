@@ -102,7 +102,7 @@ module.exports = {
 			}
 
 			const string = (flag) ? "set" : "unset";
-			const currentFlag = context.params.channelNSFW;
+			const currentFlag = context.params.instagramNSFW;
 			if ((typeof currentFlag === "undefined" && !flag) || currentFlag === flag) {
 				return {
 					success: false,
