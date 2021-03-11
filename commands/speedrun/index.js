@@ -74,7 +74,7 @@ module.exports = {
 			url: `categories/${category.id}/variables`
 		}).json();
 		const defaultFilters = Object.fromEntries(
-			Object.values(filtersData).map(filter => {
+			Object.values(filtersData.data).map(filter => {
 				if (filter.values.default) {
 					return [filter.id, filter.values.default];
 				}
@@ -164,7 +164,7 @@ module.exports = {
 		const time = sb.Utils.formatTime(run.times.primary_t);
 		return {
 			reply: sb.Utils.tag.trim `
-				Run #{${position} by ${runner.names.international}: ${time}.
+				Run #${position} by ${runner.names.international}: ${time}.
 			    Executed: ${date}.
 			    Game info: ${game.names.international} (${category.name}):
 			    ${link}
