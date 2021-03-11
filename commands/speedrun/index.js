@@ -110,6 +110,10 @@ module.exports = {
 			}
 
 			if (runner) {
+				if (!runData.players) {
+					return false;
+				}
+
 				const runnerFound = runData.players.find(i => i.id === runner.id);
 				if (!runnerFound) {
 					return false;
