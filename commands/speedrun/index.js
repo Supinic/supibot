@@ -158,7 +158,7 @@ module.exports = {
 			runner = runnerData.data;
 		}
 
-		const position = filteredRuns.findIndex(i => run.id === i.id);
+		const position = filteredRuns.findIndex(i => run.id === i.id) + 1;
 		const link = run.videos?.links[0]?.uri ?? run.weblink;
 		const date = new sb.Date(run.date).format("Y-m-d");
 		const time = sb.Utils.formatTime(run.times.primary_t);
