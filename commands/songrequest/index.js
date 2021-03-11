@@ -206,7 +206,6 @@ module.exports = {
 			};
 		}
 
-
 		let startTime = context.params.start ? Number(context.params.start) : null;
 		if (startTime && (!Number.isFinite(startTime) || startTime > Math.pow(2, 32))) {
 			return {
@@ -386,7 +385,15 @@ module.exports = {
 				reply: `Track/author has been blacklisted!`
 			};
 		}
-	
+
+		const length = data.duration ?? data.length;
+		if (startTime < 0) {
+			startTime = length + startTime;
+		}
+		if (endTime < 0) {
+			endTime = length + endTime;
+		}
+
 		const exists = queue.find(i => (
 			i.Link === data.ID
 			&& i.Start_Time === startTime
@@ -408,14 +415,6 @@ module.exports = {
 		}
 	
 		const authorString = (data.author) ? ` by ${data.author}` : "";
-		const length = data.duration ?? data.length ?? null;
-		if (startTime < 0) {
-			startTime = length + startTime;
-		}
-		if (endTime < 0) {
-			endTime = length + endTime;
-		}
-
 		const segmentLength = (endTime ?? length) - (startTime ?? 0);
 		if ((limits.totalTime + segmentLength) > limits.time) {
 			const excess = (limits.totalTime + segmentLength) - limits.time;
