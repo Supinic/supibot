@@ -214,7 +214,7 @@ module.exports = {
 			};
 		}
 
-		let endTime = context.params.start ? Number(context.params.end) : null;
+		let endTime = context.params.end ? Number(context.params.end) : null;
 		if (endTime && (!Number.isFinite(endTime) || endTime > Math.pow(2, 32))) {
 			return {
 				success: false,
