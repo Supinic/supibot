@@ -4,30 +4,21 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the current world record speedrun of a given name in the default category. Check extended help for more info.",
-	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Flags: ["mention","non-nullable","pipe","use-params"],
+	Params: [
+		{ name: "c", type: "string" },
+		{ name: "showCategories", type: "boolean" },
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function speedrun (context, ...args) {
-		let fetchCategories = false;
-		let categoryName = null;
-		for (let i = 0; i < args.length; i++) {
-			const token = args[i];
-			if (token.includes("category:")) {
-				categoryName = token.split(":")[1]?.toLowerCase() ?? null;
-				args.splice(i, 1);
-			}
-			else if (token.includes("categories")) {
-				fetchCategories = true;
-				args.splice(i, 1);
-			}
-		}
-	
+		const showCategories = (context.params.showCategories === true);
+		const categoryName = context.params.categoryName ?? null;
 		const gameName = args.join(" ");
 		if (!gameName) {
 			return {
 				success: false,
-				reply: `No input provided!`
+				reply: `No game name provided!`
 			};
 		}
 	
@@ -37,7 +28,6 @@ module.exports = {
 				.set("name", gameName)
 				.toString()
 		}).json();
-	
 		if (gameData.length === 0) {
 			return {
 				success: false,
@@ -47,19 +37,21 @@ module.exports = {
 	
 		const [game] = gameData;
 		const { data: categoryData } = await sb.Got("Speedrun", `games/${game.id}/categories`).json();
-	
-		if (fetchCategories) {
+		if (showCategories) {
 			return {
 				reply: `Available categories for ${game.names.international}: ${categoryData.map(i => i.name).join(", ")}.`
 			};
 		}
 	
-		let category = null;
+		let category;
 		if (categoryName === null) {
 			category = categoryData[0];
 		}
 		else {
-			category = categoryData.find(i => i.name.toLowerCase().includes(categoryName));
+			const categories = categoryData.map(i => i.name);
+			const categoryMatch = sb.Utils.selectClosestString(categoryName, categories, { descriptor: true });
+
+			category = (categoryMatch) ? categoryData[categoryMatch.index] : null;
 		}
 	
 		if (!category) {
@@ -76,7 +68,7 @@ module.exports = {
 	
 		if (runsData.runs.length === 0) {
 			return {
-				reply: `${game.names.international} - ${category.name} has no runs.`
+				reply: `${game.names.international} (${category.name}) has no runs.`
 			};
 		}
 	
