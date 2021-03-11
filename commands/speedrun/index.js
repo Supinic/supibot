@@ -116,6 +116,10 @@ module.exports = {
 				}
 			}
 
+			return true;
+		});
+
+		const runnerRuns = filteredRuns.filter(runData => {
 			if (runner) {
 				if (!runData.players) {
 					return false;
@@ -126,18 +130,19 @@ module.exports = {
 					return false;
 				}
 			}
+			else {
+				return true;
+			}
+		})
 
-			return true;
-		});
-
-		if (filteredRuns.length === 0) {
+		if (runnerRuns.length === 0) {
 			return {
 				success: false,
 				reply: `No matching speedruns found!`
 			};
 		}
 		
-		const [run] = filteredRuns;
+		const [run] = runnerRuns;
 		if (!runner) {
 			const { statusCode, body: runnerData } = await sb.Got("Speedrun", {
 				url: `users/${run.players[0].id}`,
@@ -154,15 +159,15 @@ module.exports = {
 			runner = runnerData.data;
 		}
 
+		const position = runnerRuns.findIndex(i => run.id === i.id);
 		const link = run.videos?.links[0]?.uri ?? run.weblink;
 		const date = new sb.Date(run.date).format("Y-m-d");
 		const time = sb.Utils.formatTime(run.times.primary_t);
 		return {
 			reply: sb.Utils.tag.trim `
-				Current WR for ${game.names.international}, ${category.name}: 
-				${time}.
-			    Ran by ${runner.names.international},
-			    from ${date}.
+				Run #{${position} by ${runner.names.international}: ${time}.
+			    Executed: ${date}.
+			    Game info: ${game.names.international} (${category.name}):
 			    ${link}
 			`
 		};
