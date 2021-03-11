@@ -7,43 +7,11 @@ module.exports = {
 	Flags: ["mention","non-nullable","use-params"],
 	Params: [
 		{ name: "rawLinkOnly", type: "boolean" },
-		{ name: "postLinkOnly", type: "boolean" },
-		{ name: "channelNSFW", type: "boolean" }
+		{ name: "postLinkOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomInstagram (context, user) {
-		if (typeof context.params.channelNSFW === "boolean") {
-			const { channel, user } = context;
-			if (!channel) {
-				return {
-					success: false,
-					reply: "You can't set any settings without being in a channel!"
-				};
-			}
-			else if (!user.Data.administrator && !channel.isUserOwner(user) && !channel.isUserAmbassador(user)) {
-				return {
-					success: false,
-					reply: "You don't have access to this channel's settings! Only administrators, channel owners and ambassadors can."
-				};
-			}
-
-			const state = context.params.channelNSFW;
-			if (channel.Data.instagramNSFW === state) {
-				return {
-					success: false,
-					reply: "This channel's Instagram NSFW flag is already set to " + state
-				};
-			}
-
-			channel.Data.instagramNSFW = state;
-			await channel.saveProperty("Data");
-
-			return {
-				reply: `Successfully set this channel's Instagram NSFW flag to ${state}.`
-			};
-		}
-
 		if (!user) {
 			return {
 				success: false,

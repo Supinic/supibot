@@ -85,7 +85,39 @@ module.exports = {
 				reply: `${userData.Name} is ${string} a Supibot Ambassador in #${channelData.Name}.`
 			};
 		};
-	
+
+		const setInstagramFlags = async (context, flag) => {
+			const { channel, user } = context;
+			if (!channel) {
+				return {
+					success: false,
+					reply: "You can't set any settings without being in a channel!"
+				};
+			}
+			else if (!user.Data.administrator && !channel.isUserOwner(user) && !channel.isUserAmbassador(user)) {
+				return {
+					success: false,
+					reply: "You don't have access to this channel's settings! Only administrators, channel owners and ambassadors can."
+				};
+			}
+
+			const string = (flag) ? "set" : "unset";
+			const currentFlag = context.params.channelNSFW;
+			if ((typeof currentFlag === "undefined" && !flag) || currentFlag === flag) {
+				return {
+					success: false,
+					reply: `This channel's Instagram NSFW flag is already ${string}!`
+				};
+			}
+
+			channel.Data.instagramNSFW = flag;
+			await channel.saveProperty("Data");
+
+			return {
+				reply: `Successfully ${string} this channel's Instagram NSFW.`
+			};
+		}
+
 		return {
 			availableFlags,
 			variables: [
@@ -583,6 +615,18 @@ module.exports = {
 						return {
 							reply: `Blacklisted flags successfully removed.`
 						};
+					}
+				},
+				{
+					name: "instagram-nsfw",
+					aliases: ["rig-nsfw"],
+					parameter: "arguments",
+					description: `If you are the channel ambassador/owner, you can decide if your channel will filter out NSFW Instagram links in the random Instagram command.`,
+					set: async (context) => {
+						return await setInstagramFlags(context, true);
+					},
+					unset: async (context) => {
+						return await setInstagramFlags(context, false);
 					}
 				},
 				{
