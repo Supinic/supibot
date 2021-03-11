@@ -101,7 +101,7 @@ module.exports = {
 			runner = runnerData.data[0];
 		}
 
-		const filteredRuns = runsData.runs.filter(runData => {
+		const filteredRuns = runsData.runs.map(i => i.run).filter(runData => {
 			for (const [key, value] of Object.entries(defaultFilters)) {
 				if (runData.values[key] !== value) {
 					return false;
