@@ -63,7 +63,7 @@ module.exports = {
 		}
 
 		const filtersData = await sb.Got("Speedrun", {
-			url: `categories/${category.id}/variable`
+			url: `categories/${category.id}/variables`
 		}).json();
 		const defaultFilters = Object.fromEntries(
 			Object.values(filtersData).map(filter => {
