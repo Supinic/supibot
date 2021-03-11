@@ -81,9 +81,23 @@ module.exports = {
 			}).filter(Boolean)
 		);
 
-		const { data: runsData } = await sb.Got("Speedrun", {
-			url: `leaderboards/${game.id}/category/${category.id}`
-		}).json();
+		let runsData;
+		const cacheKey = { category: category.id, game: game.id };
+		const cachedRunsData = await this.getCacheData(cacheKey);
+		if (cachedRunsData) {
+			runsData = cachedRunsData;
+		}
+		else {
+			const freshRunsData = await sb.Got("Speedrun", {
+				url: `leaderboards/${game.id}/category/${category.id}`
+			}).json();
+
+			runsData = freshRunsData.data;
+			await this.setCacheData(cacheKey, runsData, {
+				expiry: 36e5
+			});
+		}
+
 		if (runsData.runs.length === 0) {
 			return {
 				reply: `${game.names.international} (${category.name}) has no runs.`
@@ -158,13 +172,12 @@ module.exports = {
 			runner = runnerData.data;
 		}
 
-		const position = filteredRuns.findIndex(i => run.id === i.id) + 1;
 		const link = run.videos?.links[0]?.uri ?? run.weblink;
 		const date = new sb.Date(run.date).format("Y-m-d");
 		const time = sb.Utils.formatTime(run.times.primary_t);
 		return {
 			reply: sb.Utils.tag.trim `
-				Run #${position} by ${runner.names.international}: ${time}.
+				Speedrun by ${runner.names.international}: ${time}.
 			    Executed: ${date}.
 			    Game info: ${game.names.international} (${category.name}):
 			    ${link}
