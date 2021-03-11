@@ -74,8 +74,7 @@ module.exports = {
 		);
 
 		const { data: runsData } = await sb.Got("Speedrun", {
-			url: `leaderboards/${game.id}/category/${category.id}`,
-			searchParams: "top=1"
+			url: `leaderboards/${game.id}/category/${category.id}`
 		}).json();
 		if (runsData.runs.length === 0) {
 			return {
@@ -123,6 +122,13 @@ module.exports = {
 			return true;
 		});
 
+		if (filteredRuns.length === 0) {
+			return {
+				success: false,
+				reply: `No matching speedruns found!`
+			};
+		}
+		
 		const [run] = filteredRuns;
 		if (!runner) {
 			const { statusCode, body: runnerData } = await sb.Got("Speedrun", {
