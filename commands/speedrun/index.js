@@ -103,7 +103,7 @@ module.exports = {
 		}
 
 		const filteredRuns = runsData.runs.filter(runData => {
-			for (const [key, value] of defaultFilters) {
+			for (const [key, value] of Object.entries(defaultFilters)) {
 				if (runData.values[key] !== value) {
 					return false;
 				}
