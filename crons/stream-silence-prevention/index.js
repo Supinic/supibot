@@ -53,8 +53,9 @@ module.exports = {
 		if (state === "vlc") {
 			const self = await sb.User.get("supibot");
 			const sr = sb.Command.get("sr");
-	
-			const commandResult = await sr.execute({ user: self, channel: channelData, platform: twitch }, link);
+
+			const fakeContext = { params: {}, user: self, channel: channelData, platform: twitch };
+			const commandResult = await sr.execute(fakeContext, link);
 			result = commandResult.reply;
 		}
 		else if (state === "cytube") {
