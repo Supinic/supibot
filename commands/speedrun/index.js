@@ -8,26 +8,34 @@ module.exports = {
 	Params: [
 		{ name: "category", type: "string" },
 		{ name: "showCategories", type: "boolean" },
-		{ name: "runner", type: "string" }
+		{ name: "abbreviation", type: "string" },
+		{ name: "abbr", type: "string" },
+		{ name: "runner", type: "string" },
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function speedrun (context, ...args) {
 		const showCategories = (context.params.showCategories === true);
 		const categoryName = context.params.categoryName ?? null;
-		const gameName = args.join(" ");
-		if (!gameName) {
+
+		const searchParams = {};
+		if (args.length > 0) {
+			searchParams.name = args.join(" ");
+		}
+		else if (context.params.abbreviation || context.params.abbr) {
+			searchParams.abbreviation = context.params.abbreviation ?? context.params.abbr;
+		}
+
+		if (Object.keys(searchParams).length === 0) {
 			return {
 				success: false,
-				reply: `No game name provided!`
+				reply: "You did not provide anything to search for a game! Use abbreviation or the full game name."
 			};
 		}
 
 		const { data: gameData } = await sb.Got("Speedrun", {
 			url: "games",
-			searchParams: new sb.URLParams()
-				.set("name", gameName)
-				.toString()
+			searchParams
 		}).json();
 		if (gameData.length === 0) {
 			return {
@@ -173,8 +181,18 @@ module.exports = {
 			"Searches for the world record run of Doom II's UV Speed category.",
 			"",
 
-			`<code>${prefix}speedrun Doom II categories</code>`,
+			`<code>${prefix}speedrun Doom II showCategories:true</code>`,
 			"Posts a list of all tracked categories for Doom II.",
+			"",
+
+			`<code>${prefix}speedrun Larry Love for Sail runner:supinic</code>`,
+			"Posts the best attempt of a given speedrunner for a given game.",
+			"",
+
+			`<code>${prefix}speedrun abbr:mc</code>`,
+			`<code>${prefix}speedrun abbreviation:mc</code>`,
+			"Searches for the world record run of Minecraft: Java Edition.",
+			`The abbreviation is the tag "mc" - as seen on the site: <a href="https://www.speedrun.com/mc">speedrun.com/mc</a>`
 		];
 	})
 };
