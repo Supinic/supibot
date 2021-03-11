@@ -121,7 +121,14 @@ module.exports = {
 
 		const { run } = filteredRuns[0];
 		if (!runner) {
-			const runnerData = await sb.Got("Speedrun", `users/${run.players[0].id}`).json();
+			const { statusCode, body: runnerData } = await sb.Got("Speedrun", `users/${run.players[0].id}`);
+			if (statusCode === 404) {
+				return {
+					success: false,
+					reply: "Runner not found!"
+				};
+			}
+
 			runner = runnerData.data;
 		}
 
