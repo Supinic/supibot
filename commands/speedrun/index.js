@@ -8,6 +8,7 @@ module.exports = {
 	Params: [
 		{ name: "category", type: "string" },
 		{ name: "showCategories", type: "boolean" },
+		{ name: "runner", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -60,25 +61,81 @@ module.exports = {
 				reply: `No such category found! Try one of thise: ${categoryData.map(i => i.name).join(", ")}`
 			};
 		}
-	
+
+		const filtersData = await sb.Got("Speedrun", {
+			url: `categories/${category.id}/variable`
+		}).json();
+		const defaultFilters = Object.fromEntries(
+			Object.values(filtersData).map(filter => {
+				if (filter.values.default) {
+					return [filter.id, filter.values.default];
+				}
+			}).filter(Boolean)
+		);
+
 		const { data: runsData } = await sb.Got("Speedrun", {
 			url: `leaderboards/${game.id}/category/${category.id}`,
-			searchParam: "top=1"
+			searchParams: "top=1"
 		}).json();
-	
 		if (runsData.runs.length === 0) {
 			return {
 				reply: `${game.names.international} (${category.name}) has no runs.`
 			};
 		}
-	
-		const { run } = runsData.runs[0];
-		const { data: runnerData } = await sb.Got("Speedrun", `users/${run.players[0].id}`).json();
-	
-		const delta = sb.Utils.timeDelta(new sb.Date(run.date));
-		const time = sb.Utils.formatTime(run.times.primary_t, true);
+
+		let runner;
+		if (context.params.runner) {
+			const runnerData = await sb.Got("Speedrun", {
+				url: "users",
+				searchParams: {
+					lookup: context.params.runner
+				}
+			}).json();
+
+			if (runnerData.data.length === 0) {
+				return {
+					success: false,
+					reply: `No such runner found!`
+				};
+			}
+
+			runner = runnerData.data[0];
+		}
+
+		const filteredRuns = runsData.runs.filter(runData => {
+			for (const [key, value] of defaultFilters) {
+				if (runData.values[key] !== value) {
+					return false;
+				}
+			}
+
+			if (runnerID) {
+				const runnerFound = runData.players.find(i => i.id === runner.id);
+				if (!runnerFound) {
+					return false;
+				}
+			}
+
+			return true;
+		});
+
+		const { run } = filteredRuns[0];
+		if (!runner) {
+			const runnerData = await sb.Got("Speedrun", `users/${run.players[0].id}`).json();
+			runner = runnerData.data;
+		}
+
+		const link = run.videos?.links[0] ?? run.weblink;
+		const date = new sb.Date(run.date).format("Y-m-d");
+		const time = sb.Utils.formatTime(run.times.primary_t);
 		return {
-			reply: `Current WR for ${game.names.international}, ${category.name}: ${time} by ${runnerData.names.international}, run ${delta}.`
+			reply: sb.Utils.tag.trim `
+				Current WR for ${game.names.international}, ${category.name}: 
+				${time}.
+			    Ran by ${runner.names.international},
+			    from ${date}.
+			    ${link}
+			`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => {
