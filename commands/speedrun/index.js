@@ -22,7 +22,7 @@ module.exports = {
 				reply: `No game name provided!`
 			};
 		}
-	
+
 		const { data: gameData } = await sb.Got("Speedrun", {
 			url: "games",
 			searchParams: new sb.URLParams()
@@ -35,7 +35,7 @@ module.exports = {
 				reply: `No such game found!`
 			};
 		}
-	
+
 		const [game] = gameData;
 		const { data: categoryData } = await sb.Got("Speedrun", `games/${game.id}/categories`).json();
 		if (showCategories) {
@@ -43,7 +43,7 @@ module.exports = {
 				reply: `Available categories for ${game.names.international}: ${categoryData.map(i => i.name).join(", ")}.`
 			};
 		}
-	
+
 		let category;
 		if (categoryName === null) {
 			category = categoryData[0];
@@ -54,7 +54,7 @@ module.exports = {
 
 			category = (categoryMatch) ? categoryData[categoryMatch.index] : null;
 		}
-	
+
 		if (!category) {
 			return {
 				success: false,
@@ -109,7 +109,7 @@ module.exports = {
 				}
 			}
 
-			if (runnerID) {
+			if (runner) {
 				const runnerFound = runData.players.find(i => i.id === runner.id);
 				if (!runnerFound) {
 					return false;
@@ -154,15 +154,15 @@ module.exports = {
 			`Searches <a href="//speedrun.com">speedrun.com</a> for the world record run of a given game.`,
 			`You can also specify categories. If you don't, the "default" one will be used.`,
 			"",
-	
+
 			`<code>${prefix}speedrun Doom II</code>`,
 			"Searches for the world record run of Doom II's default category (Hell on Earth).",
 			"",
-	
+
 			`<code>${prefix}speedrun Doom II category:UV</code>`,
 			"Searches for the world record run of Doom II's UV Speed category.",
 			"",
-	
+
 			`<code>${prefix}speedrun Doom II categories</code>`,
 			"Posts a list of all tracked categories for Doom II.",
 		];
