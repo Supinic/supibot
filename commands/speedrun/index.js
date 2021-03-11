@@ -6,7 +6,7 @@ module.exports = {
 	Description: "Fetches the current world record speedrun of a given name in the default category. Check extended help for more info.",
 	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
-		{ name: "c", type: "string" },
+		{ name: "category", type: "string" },
 		{ name: "showCategories", type: "boolean" },
 	],
 	Whitelist_Response: null,
