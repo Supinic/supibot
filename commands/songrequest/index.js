@@ -507,10 +507,10 @@ module.exports = {
 	
 		const seek = [];
 		if (startTime !== null) {
-			seek.push(`starting at ${startTime} seconds`);
+			seek.push(`starting at ${sb.Utils.formatTime(startTime, true)}`);
 		}
 		if (endTime !== null) {
-			seek.push(`ending at ${endTime} seconds`);
+			seek.push(`ending at ${sb.Utils.formatTime(endTime, true)}`);
 		}
 	
 		const pauseString = (sb.Config.get("SONG_REQUESTS_VLC_PAUSED"))
