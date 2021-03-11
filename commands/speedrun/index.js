@@ -146,7 +146,7 @@ module.exports = {
 			runner = runnerData.data;
 		}
 
-		const link = run.videos?.links[0] ?? run.weblink;
+		const link = run.videos?.links[0]?.uri ?? run.weblink;
 		const date = new sb.Date(run.date).format("Y-m-d");
 		const time = sb.Utils.formatTime(run.times.primary_t);
 		return {
