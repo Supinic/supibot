@@ -121,7 +121,11 @@ module.exports = {
 
 		const { run } = filteredRuns[0];
 		if (!runner) {
-			const { statusCode, body: runnerData } = await sb.Got("Speedrun", `users/${run.players[0].id}`);
+			const { statusCode, body: runnerData } = await sb.Got("Speedrun", {
+				url: `users/${run.players[0].id}`,
+				throwHttpErrors: false
+			});
+
 			if (statusCode === 404) {
 				return {
 					success: false,
