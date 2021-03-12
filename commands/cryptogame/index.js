@@ -348,53 +348,54 @@ module.exports = {
             };
         }
 
-        // Special case for register - it is the only command that works without any portfolioData
-        if (command === "register") {
-            const portfolios = await getPortfolioData(context.user.ID);
-            if (portfolios) {
+        const portfolioData = await getPortfolioData(context.user.ID);
+        switch (command) {
+            case "register": {
+                const portfolios = await getPortfolioData(context.user.ID);
+                if (portfolios) {
+                    return {
+                        success: false,
+                        reply: "You already registered for a portfolio!"
+                    };
+                }
+
+                const portfolioRow = await sb.Query.getRow("crypto_game", "Portfolio");
+                portfolioRow.values.Owner = context.user.ID;
+                await portfolioRow.save();
+
+                const portfolioID = await sb.Query.getRecordset(rs => rs
+                    .select("ID")
+                    .from("crypto_game", "Portfolio")
+                    .where("Owner = %n", context.user.ID)
+                    .where("Active = %b", true)
+                    .limit(1)
+                    .single()
+                    .flat("ID")
+                );
+
+                await updatePortfolioAsset(portfolioID, baseAsset, 1000);
                 return {
-                    success: false,
-                    reply: "You already registered for a portfolio!"
+                    reply: `Your portfolio was established. You now have the equivalent of 1000 EUR at your disposal to invest.`
+                }
+            }
+
+            case "assets":
+            case "prices": {
+                return {
+                    reply: `Check the available assets and their prices here: https://supinic.com/crypto-game/asset/list`
                 };
             }
 
-            const portfolioRow = await sb.Query.getRow("crypto_game", "Portfolio");
-            portfolioRow.values.Owner = context.user.ID;
-            await portfolioRow.save();
-
-            const portfolioID = await sb.Query.getRecordset(rs => rs
-                .select("ID")
-                .from("crypto_game", "Portfolio")
-                .where("Owner = %n", context.user.ID)
-                .where("Active = %b", true)
-                .limit(1)
-                .single()
-                .flat("ID")
-            );
-
-            await updatePortfolioAsset(portfolioID, baseAsset, 1000);
-            return {
-                reply: `Your portfolio was established. You now have the equivalent of 1000 EUR at your disposal to invest.`
-            };
-        }
-        else if (command === "assets" || command === "prices") {
-            return {
-                reply: `Check the available assets and their prices here: https://supinic.com/crypto-game/asset/list`
-            };
-        }
-
-        const portfolioData = await getPortfolioData(context.user.ID);
-        if (!portfolioData) {
-            return {
-                success: false,
-                reply: `You don't have a portfolio set up! Use $cg register to create one.`
-            };
-        }
-
-        switch (command) {
             case "check": {
                 const [target] = args;
                 if (!target) {
+                    if (!portfolioData) {
+                        return {
+                            success: false,
+                            reply: `You don't have a portfolio set up! Use $cg register to create one.`
+                        };
+                    }
+
                     const accountString = portfolioData.assets
                         .filter(i => i.Amount > 0)
                         .map(i => `${i.Code}: ${i.Amount}`).join("; ");
@@ -432,6 +433,13 @@ module.exports = {
 
             case "buy":
             case "sell": {
+                if (!portfolioData) {
+                    return {
+                        success: false,
+                        reply: `You don't have a portfolio set up! Use $cg register to create one.`
+                    };
+                }
+
                 const [amount, asset] = args;
                 const data = await parseArguments({ amount, asset });
                 if (data.success === false) {
@@ -483,6 +491,13 @@ module.exports = {
 
                 let data;
                 if (!target) {
+                    if (!portfolioData) {
+                        return {
+                            success: false,
+                            reply: `You don't have a portfolio set up! Use $cg register to create one.`
+                        };
+                    }
+
                     const escaped = sb.Query.escapeString(portfolioData.ID);
                     data = await sb.Query.raw(
                         `SELECT crypto_game.GET_PORTFOLIO_TOTAL_PRICE('${escaped}') AS Total`
