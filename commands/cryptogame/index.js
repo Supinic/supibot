@@ -285,7 +285,12 @@ module.exports = {
             // const sourceAmount = precisionRound(rawSourceAmount, 9, "round");
             const exchangeRate = targetAsset.Price / sourceAsset.Price;
             const targetAmount = precisionRound(rawSourceAmount / exchangeRate, 6, "round");
-            const sourceAmount = precisionRound(targetAmount * exchangeRate, 6, "round");
+            let sourceAmount = precisionRound(targetAmount * exchangeRate, 6, "round");
+
+            const checkAmount = portfolioData.assets.find(i => i.Code === sourceAsset.Code)?.Amount ?? 0;
+            if (sourceAmount > checkAmount) {
+                sourceAmount = checkAMount;
+            }
 
             const row = await sb.Query.getRow("crypto_game", "Transaction");
             row.setValues({
