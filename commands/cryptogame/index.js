@@ -412,7 +412,7 @@ module.exports = {
                         };
                     }
 
-                    const targetPortfolioData = await getPortfolioData(context.user.ID);
+                    const targetPortfolioData = await getPortfolioData(targetUserData.ID);
                     if (!targetPortfolioData) {
                         return {
                             success: false,
