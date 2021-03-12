@@ -479,13 +479,41 @@ module.exports = {
             }
             
             case "total": {
-                const escaped = sb.Query.escapeString(portfolioData.ID);
-                const [data] = await sb.Query.raw(
-                    `SELECT crypto_game.GET_PORTFOLIO_TOTAL_PRICE('${escaped}') AS Total`
-                );
+                const [target] = args;
 
+                let data;
+                if (!target) {
+                    const escaped = sb.Query.escapeString(portfolioData.ID);
+                    data = await sb.Query.raw(
+                        `SELECT crypto_game.GET_PORTFOLIO_TOTAL_PRICE('${escaped}') AS Total`
+                    );
+                }
+                else {
+                    const targetUserData = await sb.User.get(target);
+                    if (!targetUserData) {
+                        return {
+                            success: false,
+                            reply: `Provided user does not exist!`
+                        };
+                    }
+
+                    const targetPortfolioData = await getPortfolioData(targetUserData.ID);
+                    if (!targetPortfolioData) {
+                        return {
+                            success: false,
+                            reply: `Provided user does not have an active portfolio!`
+                        };
+                    }
+
+                    const escaped = sb.Query.escapeString(targetPortfolioData.ID);
+                    data = await sb.Query.raw(
+                        `SELECT crypto_game.GET_PORTFOLIO_TOTAL_PRICE('${escaped}') AS Total`
+                    );
+                }
+
+                const prefix = (target) ? "Their" : "Your";
                 return {
-                    reply: `Your current total: € ${data.Total}`
+                    reply: `${prefix} current portfolio totals: € ${data.Total}`
                 };
             }
         }
