@@ -210,7 +210,7 @@ module.exports = {
 		if (startTime !== null && (!Number.isFinite(startTime) || startTime > Math.pow(2, 32))) {
 			return {
 				success: false,
-				reply: "Invalid start time!"
+				reply: "Invalid start time provided!"
 			};
 		}
 
@@ -218,7 +218,7 @@ module.exports = {
 		if (endTime !== null && (!Number.isFinite(endTime) || endTime > Math.pow(2, 32))) {
 			return {
 				success: false,
-				reply: "Invalid end time!"
+				reply: "Invalid end time provided!"
 			};
 		}
 
