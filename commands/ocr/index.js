@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Takes your image link and attempts to find the text in it by using OCR.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [
+		{ name: "force", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		languages: {
@@ -80,9 +82,11 @@ module.exports = {
 		let data;
 		let statusCode;
 		const key = { language, link };
-		const cacheData = await this.getCacheData(key);
+
+		// If force is true, don't even bother fetching the cache data
+		const cacheData = (context.params.force) ? null : await this.getCacheData(key);
 		if (cacheData) {
-			data = cacehData.data;
+			data = cacheData.data;
 			statusCode = cacheData.statusCode;
 		}
 		else {
