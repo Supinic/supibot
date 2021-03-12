@@ -289,7 +289,7 @@ module.exports = {
 
             const checkAmount = portfolioData.assets.find(i => i.Code === sourceAsset.Code)?.Amount ?? 0;
             if (sourceAmount > checkAmount) {
-                sourceAmount = checkAMount;
+                sourceAmount = checkAmount;
             }
 
             const row = await sb.Query.getRow("crypto_game", "Transaction");
