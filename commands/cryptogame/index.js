@@ -11,7 +11,7 @@ module.exports = {
         this.data.updateCron = new sb.Cron({
             Name: "crypto-game-price-updater",
             Description: "Regularly updates the prices used in the crypto-game command.",
-            Expression: "0 0 */12 * * *",
+            Expression: "0 0 * * * *",
             Code: (async function cryptoGamePriceUpdate () {
                 const totalData = {};
                 const [cryptoData, currencyData, goldData, silverData] = await Promise.all([
