@@ -224,9 +224,6 @@ module.exports = {
             }
 
             const targetAsset = portfolioData.assets.find(i => i.Code === assetData.Code);
-
-            console.log("updating portfolio", { portfolioData, assetData, amount});
-
             if (!targetAsset) {
                 if (amount <= 0) {
                     throw new sb.Error({
@@ -451,21 +448,28 @@ module.exports = {
 
                 let sourceAsset = baseAsset;
                 let targetAsset = data.asset;
-                let sourceAmount = data.amount * targetAsset.Price;
+                let sourceAmount = data.amount * targetAsset.Price;                
                 if (command === "sell") {
                     sourceAsset = data.asset;
                     targetAsset = baseAsset;
                     sourceAmount = data.amount;
                 }
-
+                
+                if (amount === "all") {
+                    sourceAmount = portfolioData.assets.find(i => i.Code === sourceAsset.Code)?.Amount ?? 0;
+                }
                 if (sourceAsset.Code === targetAsset.Code) {
                     return {
                         success: false,
                         reply: `You can't trade from and to the same currency!`
                     };
                 }
-
-                console.log({ portfolioData, sourceAsset, targetAsset, sourceAmount, data });
+                if (sourceAmount === 0) {
+                    return {
+                        success: false,
+                        reply: `You can't ${command} 0 of any asset!`
+                    };
+                }
 
                 const assetCheck = await checkPortfolioAsset(portfolioData, sourceAsset, sourceAmount);
                 if (assetCheck !== true) {
