@@ -528,7 +528,7 @@ module.exports = {
 
                 const prefix = (target) ? "Their" : "Your";
                 return {
-                    reply: `${prefix} current portfolio totals: € ${data.Total}`
+                    reply: `${prefix} current portfolio totals: € ${data[0].Total}`
                 };
             }
         }
