@@ -71,24 +71,40 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-	
-		const { statusCode, body: data } = await sb.Got({
-			method: "GET",
-			responseType: "json",
-			throwHttpErrors: false,
-			url: "https://api.ocr.space/parse/imageurl",
-			headers: {
-				apikey: sb.Config.get("API_OCR_SPACE")
-			},
-			searchParams: new sb.URLParams()
-				.set("url", link)
-				.set("language", language)
-				.set("scale", "true")
-				.set("isTable", "true")
-				.set("OCREngine", "1")
-				.set("isOverlayRequired", "false")
-				.toString()
-		});
+
+		let data;
+		let statusCode;
+		const key = { language, link };
+		const cacheData = await this.getCacheData(key);
+		if (cacheData) {
+			data = cacehData.data;
+			statusCode = cacheData.statusCode;
+		}
+		else {
+			const response = await sb.Got({
+				method: "GET",
+				responseType: "json",
+				throwHttpErrors: false,
+				url: "https://api.ocr.space/parse/imageurl",
+				headers: {
+					apikey: sb.Config.get("API_OCR_SPACE")
+				},
+				searchParams: new sb.URLParams()
+					.set("url", link)
+					.set("language", language)
+					.set("scale", "true")
+					.set("isTable", "true")
+					.set("OCREngine", "1")
+					.set("isOverlayRequired", "false")
+					.toString()
+			});
+
+			statusCode = response.statusCode;
+			data = response.body;
+
+			// no expiration
+			await this.setCacheData(key, { data, statusCode });
+		}
 	
 		if (statusCode !== 200 || data?.OCRExitCode !== 1) {
 			return {
