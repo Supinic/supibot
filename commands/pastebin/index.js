@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 20000,
 	Description: "Takes the result of a different command (pipe-only) and posts a Pastebin paste with it.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [
+		{ name: "force", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function pastebin (context, command, ...rest) {
@@ -45,8 +47,23 @@ module.exports = {
 		}
 		else if (type === "get") {
 			const path = sb.Utils.getPathFromURL(args[0]);
+			if (!path) {
+				return {
+					success: false,
+					reply: `Invalid Pastebin link provided! `
+				};
+			}
 
-			let data = await sb.Pastebin.get(path);
+			let data;
+			const cacheData = (context.params.force) ? null : await this.getCacheData(path);
+			if (cacheData) {
+				data = cacheData;
+			}
+			else {
+				data = await sb.Pastebin.get(path);
+				await this.setCacheData(path, data); // no expiry
+			}
+
 			if (!data) {
 				return {
 					success: false,
