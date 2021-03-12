@@ -302,7 +302,7 @@ module.exports = {
         };
 
         return {
-            availableCommands: ["assets", "buy", "check", "register", "prices", "sell", "send", "total"],
+            availableCommands: ["assets", "buy", "check", "register", "prices", "sell", "total"],
             baseAsset,
             getPortfolioData,
             parseArguments,
@@ -318,7 +318,6 @@ module.exports = {
             baseAsset,
             checkPortfolioAsset,
             createConvertTransaction,
-            createTransferTransaction,
             getPortfolioData,
             parseArguments,
             updatePortfolioAsset
@@ -383,39 +382,6 @@ module.exports = {
 
                 return {
                     reply: `Your portfolio: ${accountString}`
-                };
-            }
-
-            case "send": {
-                const [user, amount, asset] = args;
-                const data = await parseArguments({ user, amount, asset });
-                if (data.success === false) {
-                    return {
-                        success: false,
-                        reply: data.reply + " Use $cg send (user) (amount) (asset)"
-                    };
-                }
-
-                const targetPortfolioData = await getPortfolioData(data.user.ID);
-                if (!targetPortfolioData) {
-                    return {
-                        success: false,
-                        reply: `That user has not registered yet! First, they must use $cg register.`
-                    };
-                }
-
-                const assetCheck = await checkPortfolioAsset(portfolioData, data.asset, amount);
-                if (assetCheck !== true) {
-                    return {
-                        success: false,
-                        reply: assetCheck
-                    };
-                }
-
-                await createTransferTransaction(portfolioData, targetPortfolioData, data.asset, amount);
-
-                return {
-                    reply: `Successfully sent ${amount} ${data.asset.Code} to ${data.user.Name}.`
                 };
             }
 
