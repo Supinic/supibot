@@ -310,21 +310,23 @@ module.exports = {
             };
         };
 
+        const destroy = () => {
+            if (this.data.updateCron) {
+                this.data.updateCron.destroy();
+            }
+        };
+
         return {
             availableCommands: ["assets", "buy", "check", "register", "prices", "sell", "total"],
+            destroy,
+
             baseAsset,
             getPortfolioData,
             parseArguments,
             checkPortfolioAsset,
             updatePortfolioAsset,
             createConvertTransaction,
-            createTransferTransaction,
-
-            destroy: () => {
-                if (this.data.updateCron) {
-                    this.data.updateCron.destroy();
-                }
-            }
+            createTransferTransaction
         };
     }),
     Code: (async function cryptoGame (context, command, ...args) {
