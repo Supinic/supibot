@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches a random Instagram user's post, from their most recently posted ones.",
-	Flags: ["mention","non-nullable","use-params"],
+	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "rawLinkOnly", type: "boolean" },
 		{ name: "postLinkOnly", type: "boolean" }
@@ -35,7 +35,7 @@ module.exports = {
 			};
 		}
 
-		const nsfwCheck = (!context.channel || !context.channel.NSFW);
+		const nsfwCheck = (!context.channel || (!context.channel.NSFW && !context.channel.data.instagramNSFW));
 		const posts = (data.graphql.user.edge_owner_to_timeline_media?.edges ?? []).filter(i => !i.node.is_video);
 		if (posts.length === 0) {
 			return {
@@ -49,7 +49,7 @@ module.exports = {
 		const commentCount = post.edge_media_to_comment.count ?? 0;
 		const likeCount = post.edge_liked_by.count ?? 0;
 
-		if (!context.channel && !context.channel.Data.channelNSFW) {
+		if (nsfwCheck) {
 			const { statusCode: nsfwStatusCode, data: nsfwData } = await sb.Utils.checkPictureNSFW(post.display_url);
 			if (nsfwStatusCode !== 200) {
 				return {
@@ -59,17 +59,23 @@ module.exports = {
 			}
 
 			const relevantDetections = nsfwData.detections.filter(i => !i.name.includes("Covered"));
-			if (nsfwCheck && nsfwData.score > 0.25 || relevantDetections.length > 0) {
+			if (nsfwData.score > 0.25 || relevantDetections.length > 0) {
 				const score = sb.Utils.round(nsfwData.score * 100, 2);
 				return {
 					success: false,
 					reply: sb.Utils.tag.trim `
-					That post was deemed to be too NSFW for this channel!
-					NSFW score: ${score}%,
-					detections: ${relevantDetections.length}
-				`
+						That post was deemed to be too NSFW for this channel!
+						NSFW score: ${score}%,
+						detections: ${relevantDetections.length}
+					`
 				};
 			}
+		}
+		if (!nsfwCheck && context.append.pipe) {
+			return {
+				success: false,
+				reason: "pipe-nsfw"
+			};
 		}
 
 		if (context.params.rawLinkOnly) {
