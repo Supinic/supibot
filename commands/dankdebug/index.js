@@ -30,7 +30,13 @@ module.exports = {
 			result = sb.Sandbox.run(script, {
 				sandbox: {
 					args: scriptArgs ?? null,
-					console: undefined
+					console: undefined,
+					utils: {
+						random: (...args) => sb.Utils.random(...args),
+						capitalize: (...args) => sb.Utils.capitalize(...args),
+						timeDelta: (...args) => sb.Utils.timeDelta(...args),
+						Date: sb.Date
+					}
 				}
 			});
 		}
