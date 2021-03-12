@@ -147,8 +147,12 @@ module.exports = {
 			"HELLO WORLD LOL NAM",
 			"",
 			
-			`<code>${prefix}ocr lang:jpn <a href="https://i.imgur.com/4iK4ZHy.png">https://i.imgur.com/4iK4ZHy.png</a></code>`,
+			`<code>${prefix}ocr lang:japanese <a href="https://i.imgur.com/4iK4ZHy.png">https://i.imgur.com/4iK4ZHy.png</a></code>`,
 			"ロ明寝マンRetweeted 蜜柑すい@mikansul・May11 ティフアに壁ドンされるだけ",
+			"",
+
+			`<code>${prefix}ocr (link) force:true`,
+			"Since the results of ocr results are cached, use force:true to forcibly run another detection.",
 			"",
 	
 			"List of supported languages:",
