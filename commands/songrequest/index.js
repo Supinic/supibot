@@ -207,7 +207,7 @@ module.exports = {
 		}
 
 		let startTime = context.params.start ? Number(context.params.start) : null;
-		if (startTime && (!Number.isFinite(startTime) || startTime > Math.pow(2, 32))) {
+		if (startTime !== null && (!Number.isFinite(startTime) || startTime > Math.pow(2, 32))) {
 			return {
 				success: false,
 				reply: "Invalid start time!"
@@ -215,10 +215,10 @@ module.exports = {
 		}
 
 		let endTime = context.params.end ? Number(context.params.end) : null;
-		if (endTime && (!Number.isFinite(endTime) || endTime > Math.pow(2, 32))) {
+		if (endTime !== null && (!Number.isFinite(endTime) || endTime > Math.pow(2, 32))) {
 			return {
 				success: false,
-				reply: "Invalid start time!"
+				reply: "Invalid end time!"
 			};
 		}
 
