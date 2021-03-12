@@ -245,8 +245,13 @@ module.exports = class Command extends require("./template.js") {
 		this.Code = null;
 		this.Flags = null;
 		this.data = null;
-		this.staticData = null;
 		this.Aliases = null;
+
+		if (typeof this.staticData.destroy === "function") {
+			this.staticData.destroy();
+		}
+
+		this.staticData = null;
 	}
 
 	/**
