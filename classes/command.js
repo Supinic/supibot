@@ -248,7 +248,12 @@ module.exports = class Command extends require("./template.js") {
 		this.Aliases = null;
 
 		if (typeof this.staticData.destroy === "function") {
-			this.staticData.destroy();
+			try {
+				this.staticData.destroy();
+			}
+			catch (e) {
+				console.warn("command destroy failed", { command: this.Name, error: e });
+			}
 		}
 
 		this.staticData = null;
