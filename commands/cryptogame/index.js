@@ -393,13 +393,41 @@ module.exports = {
 
         switch (command) {
             case "check": {
-                const accountString = portfolioData.assets
-                    .filter(i => i.Amount > 0)
-                    .map(i => `${i.Code}: ${i.Amount}`).join("; ");
+                const [target] = args;
+                if (!target) {
+                    const accountString = portfolioData.assets
+                        .filter(i => i.Amount > 0)
+                        .map(i => `${i.Code}: ${i.Amount}`).join("; ");
 
-                return {
-                    reply: `Your portfolio: ${accountString}`
-                };
+                    return {
+                        reply: `Your portfolio: ${accountString}`
+                    };
+                }
+                else {
+                    const targetUserData = await sb.User.get(target);
+                    if (!targetUserData) {
+                        return {
+                            success: false,
+                            reply: `Provided user does not exist!`
+                        };
+                    }
+
+                    const targetPortfolioData = await getPortfolioData(context.user.ID);
+                    if (!targetPortfolioData) {
+                        return {
+                            success: false,
+                            reply: `Provided user does not have an active portfolio!`
+                        };
+                    }
+
+                    const accountString = targetPortfolioData.assets
+                        .filter(i => i.Amount > 0)
+                        .map(i => `${i.Code}: ${i.Amount}`).join("; ");
+
+                    return {
+                        reply: `Their portfolio: ${accountString}`
+                    };
+                }
             }
 
             case "buy":
