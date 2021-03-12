@@ -63,14 +63,19 @@ module.exports = {
 			};
 		}
 	
-		const link = args.shift();
-		if (!link) {
+		const rawLink = args.shift();
+		if (!rawLink) {
 			return {
 				success: false,
 				reply: "No link provided!",
 				cooldown: 2500
 			};
 		}
+
+		const linkData = require("url").parse(rawLink);
+		const link = (linkData.protocol && linkData.host)
+			? `${linkData.host}${linkData.path}`
+			: linkData.path;
 
 		let data;
 		let statusCode;
