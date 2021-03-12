@@ -76,8 +76,8 @@ module.exports = {
 
 		const linkData = require("url").parse(rawLink);
 		const link = (linkData.protocol && linkData.host)
-			? `${linkData.host}${linkData.path}`
-			: linkData.path;
+			? `https://${linkData.host}${linkData.path}`
+			: `https://${linkData.path}`
 
 		let data;
 		let statusCode;
