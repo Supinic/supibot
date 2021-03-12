@@ -82,8 +82,27 @@ module.exports = {
 				reply: data
 			};
 		}
-
-
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => {
+		return [
+			"Gets a paste from Pastebin, or creates a new one with your text.",
+			"",
+
+			`<code>${prefix}pastebin get (link)`,
+			`<code>${prefix}pbg (link)`,
+			"For a specified link or a paste ID, fetches the contents of it.",
+			"The output must not be longer than 50 000 characters, for performance reasons. If it is, the paste won't be fetched.",
+			"",
+
+			`<code>${prefix}pastebin post (...text)`,
+			`<code>${prefix}pbp (...text)`,
+			"Creates a new temporary paste for you to see.",
+			"The paste is set to only be available for 10 minutes from posting, then it is deleted.",
+			"",
+
+			`<code>${prefix}pastebin get (link) force:true`,
+			`<code>${prefix}pbg (link) force:true`,
+			"Since the results of fetching pastes are cached, use force:true to forcibly fetch the current status of the paste."
+		];
+	})
 };
