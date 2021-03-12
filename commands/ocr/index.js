@@ -94,14 +94,14 @@ module.exports = {
 				headers: {
 					apikey: sb.Config.get("API_OCR_SPACE")
 				},
-				searchParams: new sb.URLParams()
-					.set("url", link)
-					.set("language", language)
-					.set("scale", "true")
-					.set("isTable", "true")
-					.set("OCREngine", "1")
-					.set("isOverlayRequired", "false")
-					.toString()
+				searchParams: {
+					url: link,
+					language,
+					scale: "true",
+					isTable: "true",
+					OCREngine: "1",
+					isOverlayRequired: "false"
+				}
 			});
 
 			statusCode = response.statusCode;
