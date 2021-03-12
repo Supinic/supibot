@@ -300,6 +300,7 @@ module.exports = {
 
             return {
                 exchangeRate,
+                sourceAmount,
                 targetAmount
             };
         };
@@ -426,9 +427,13 @@ module.exports = {
                 }
 
                 const result = await createConvertTransaction(portfolioData, sourceAsset, targetAsset, sourceAmount);
-
                 return {
-                    reply: `You successfully traded ${sourceAmount} ${sourceAsset.Code} for ${result.targetAmount} ${targetAsset.Code}.`
+                    reply: sb.Utils.tag.trim `
+                        You successfully traded 
+                        ${result.sourceAmount} ${sourceAsset.Code} 
+                        for 
+                        ${result.targetAmount} ${targetAsset.Code}.
+                    `
                 };
             }
             
