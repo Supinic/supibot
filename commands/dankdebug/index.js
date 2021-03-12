@@ -40,7 +40,7 @@ module.exports = {
 			if (name === "EvalError") {
 				return {
 					success: false,
-					reply: "Your dank debug cannot contain any asynchronous code!"
+					reply: "Your dank debug contains code that isn't allowed!"
 				};
 			}
 
@@ -50,12 +50,25 @@ module.exports = {
 			};
 		}
 
-		const { inspect } = require("util");
-		return {
-			reply: (result && typeof result === "object")
-				? `Result: ${inspect(result)}`
-				: `Result: ${result}`
-		};
+		if (result && typeof result === "object") {
+			try {
+				return {
+					reply: "Result: " + require("util").inspect(result)
+				};
+			}
+			catch (e) {
+				console.warn(e);
+				return {
+					success: false,
+					reply: "Your dank debug's return value cannot be serialized!"
+				};
+			}
+		}
+		else {
+			return {
+				reply: `Result: ${result}`
+			};
+		}
 	}),
 	Dynamic_Description: null
 };
