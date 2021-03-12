@@ -242,11 +242,6 @@ module.exports = class Command extends require("./template.js") {
 	 * Destroys the command instance.
 	 */
 	destroy () {
-		this.Code = null;
-		this.Flags = null;
-		this.data = null;
-		this.Aliases = null;
-
 		if (typeof this.staticData.destroy === "function") {
 			try {
 				this.staticData.destroy();
@@ -256,6 +251,10 @@ module.exports = class Command extends require("./template.js") {
 			}
 		}
 
+		this.Code = null;
+		this.Flags = null;
+		this.Aliases = null;
+		this.data = null;
 		this.staticData = null;
 	}
 
