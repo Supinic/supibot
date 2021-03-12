@@ -174,7 +174,7 @@ module.exports = {
                     if (!assetData) {
                         return {
                             success: false,
-                            reply: "Invalid asset provided!"
+                            reply: "Invalid asset provided! Check list: https://supinic.com/crypto-game/asset/list"
                         };
                     }
 
