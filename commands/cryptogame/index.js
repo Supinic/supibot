@@ -130,7 +130,10 @@ module.exports = {
 
             return {
                 ID: portfolioID,
-                assets: data
+                assets: data.map(i => ({
+                    Code: i.Code,
+                    Amount: sb.Utils.round(i.Amount, 6, { direction: "floor" })
+                }))
             };
         };
 
