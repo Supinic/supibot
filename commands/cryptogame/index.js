@@ -277,9 +277,9 @@ module.exports = {
         };
 
         const createConvertTransaction = async (portfolioData, sourceAsset, targetAsset, rawSourceAmount) => {
-            const sourceAmount = sb.Utils.round(rawSourceAmount, 6, { direction: "floor" });
+            const sourceAmount = sb.Utils.round(rawSourceAmount, 6, { direction: "round" });
             const exchangeRate = sb.Utils.round(targetAsset.Price / sourceAsset.Price, 6, { direction: "floor" });
-            const targetAmount = sb.Utils.round(sourceAmount / exchangeRate, 6, { direction: "floor" });
+            const targetAmount = sb.Utils.round(sourceAmount / exchangeRate, 6, { direction: "round" });
 
             const row = await sb.Query.getRow("crypto_game", "Transaction");
             row.setValues({
