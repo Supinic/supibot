@@ -94,7 +94,7 @@ module.exports = {
 					reply: "You can't set any settings without being in a channel!"
 				};
 			}
-			else if (!user.Data.administrator && !channel.isUserOwner(user) && !channel.isUserAmbassador(user)) {
+			else if (!user.Data.administrator && !channel.isUserChannelOwner(user) && !channel.isUserAmbassador(user)) {
 				return {
 					success: false,
 					reply: "You don't have access to this channel's settings! Only administrators, channel owners and ambassadors can."
