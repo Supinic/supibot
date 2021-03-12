@@ -406,7 +406,7 @@ module.exports = {
 
                 let sourceAsset = baseAsset;
                 let targetAsset = data.asset;
-                let sourceAmount = sb.Utils.round(data.amount * targetAsset.Price, 6, { direction: "floor" });
+                let sourceAmount = data.amount * targetAsset.Price;
                 if (command === "sell") {
                     sourceAsset = data.asset;
                     targetAsset = baseAsset;
