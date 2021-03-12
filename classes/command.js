@@ -244,7 +244,7 @@ module.exports = class Command extends require("./template.js") {
 	destroy () {
 		if (typeof this.staticData.destroy === "function") {
 			try {
-				this.staticData.destroy();
+				this.staticData.destroy(this);
 			}
 			catch (e) {
 				console.warn("command destroy failed", { command: this.Name, error: e });
