@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "pastebin",
-	Aliases: ["pbf", "pbp"],
+	Aliases: ["pbg", "pbp"],
 	Author: "supinic",
 	Cooldown: 20000,
 	Description: "Takes the result of a different command (pipe-only) and posts a Pastebin paste with it.",
@@ -11,9 +11,9 @@ module.exports = {
 	Code: (async function pastebin (context, command, ...rest) {
 		let type;
 		const args = [...rest];
-		if (command === "fetch" || context.invocation === "pbf") {
+		if (command === "get" || context.invocation === "pbg") {
 			type = "get";
-			if (command !== "fetch") {
+			if (command !== "get") {
 				args.unshift(command);
 			}
 		}
@@ -43,7 +43,7 @@ module.exports = {
 				reply: await sb.Pastebin.post(args.join(" "))
 			};
 		}
-		else if (type === "fetch") {
+		else if (type === "get") {
 			const path = sb.Utils.getPathFromURL(args[0]);
 
 			let data = await sb.Pastebin.get(path);
