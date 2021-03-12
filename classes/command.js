@@ -919,7 +919,12 @@ module.exports = class Command extends require("./template.js") {
 			return String(value);
 		}
 		else if (type === "number") {
-			return Number(value);
+			const output = Number(value);
+			if (!Number.isFinite(output)) {
+				return null;
+			}
+
+			return output;
 		}
 		else if (type === "boolean") {
 			if (value === "true") {
