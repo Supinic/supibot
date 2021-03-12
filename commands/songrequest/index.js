@@ -389,9 +389,21 @@ module.exports = {
 		const length = data.duration ?? data.length;
 		if (startTime < 0) {
 			startTime = length + startTime;
+			if (startTime < 0) {
+				return {
+					success: false,
+					reply: `Invalid start time!`
+				};
+			}
 		}
 		if (endTime < 0) {
 			endTime = length + endTime;
+			if (endTime < 0) {
+				return {
+					success: false,
+					reply: `Invalid end time!`
+				};
+			}
 		}
 
 		const exists = queue.find(i => (
