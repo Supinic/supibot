@@ -16,8 +16,7 @@ module.exports = {
 			try {
 				scriptArgs = JSON.parse(context.params.arguments);
 			}
-			catch (e) {
-				console.warn(e);
+			catch {
 				return {
 					success: false,
 					reply: `Command arguments cannot be parsed! ${e.message}`
