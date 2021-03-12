@@ -111,8 +111,10 @@ module.exports = {
 			statusCode = response.statusCode;
 			data = response.body;
 
-			// no expiration
-			await this.setCacheData(key, { data, statusCode });
+			// set cache with no expiration - only if request didn't time out
+			if (!data.ErrorMessage && !data.ErrorMessage.includes("Timed out")) {
+				await this.setCacheData(key, { data, statusCode });
+			}
 		}
 	
 		if (statusCode !== 200 || data?.OCRExitCode !== 1) {
