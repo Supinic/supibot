@@ -82,7 +82,7 @@ module.exports = {
         };
 
         const precisionRound = (num, precision, direction) => (
-            Number(sb.Utils.round(num, precision, { direction }).toPrecision(precision))
+            Number(sb.Utils.round(num, precision, { direction }).toPrecision(precision + 1))
         );
 
         const getAssetData = async (code) => {
@@ -282,7 +282,7 @@ module.exports = {
 
         const createConvertTransaction = async (portfolioData, sourceAsset, targetAsset, rawSourceAmount) => {
             const sourceAmount = precisionRound(rawSourceAmount, 6, "round");
-            const exchangeRate = sb.Utils.round(targetAsset.Price / sourceAsset.Price, 9, { direction: "floor" });
+            const exchangeRate = targetAsset.Price / sourceAsset.Price;
             const targetAmount = precisionRound(sourceAmount / exchangeRate, 6, "round");
 
             const row = await sb.Query.getRow("crypto_game", "Transaction");
