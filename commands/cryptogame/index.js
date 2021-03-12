@@ -316,9 +316,9 @@ module.exports = {
             };
         };
 
-        const destroy = () => {
-            if (this.data.updateCron) {
-                this.data.updateCron.destroy();
+        const destroy = (command) => {
+            if (command.data.updateCron) {
+                command.data.updateCron.destroy();
             }
         };
 
