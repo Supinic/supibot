@@ -187,16 +187,20 @@ module.exports = {
                             reply: "No amount provided!"
                         };
                     }
-
-                    const amount = Number(value);
-                    if (!Number.isFinite(amount) || amount <= 0) {
-                        return {
-                            success: false,
-                            reply: `Invalid amount provided!`
-                        };
+                    else if (value === "all") {
+                        result.amount = "all";
                     }
+                    else {
+                        const amount = Number(value);
+                        if (!Number.isFinite(amount) || amount <= 0) {
+                            return {
+                                success: false,
+                                reply: `Invalid amount provided!`
+                            };
+                        }
 
-                    result.amount = amount;
+                        result.amount = amount;
+                    }
                 }
             }
 
@@ -455,7 +459,7 @@ module.exports = {
                     sourceAmount = data.amount;
                 }
                 
-                if (amount === "all") {
+                if (data.amount === "all") {
                     sourceAmount = portfolioData.assets.find(i => i.Code === sourceAsset.Code)?.Amount ?? 0;
                 }
                 if (sourceAsset.Code === targetAsset.Code) {
