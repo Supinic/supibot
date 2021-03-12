@@ -318,7 +318,13 @@ module.exports = {
             checkPortfolioAsset,
             updatePortfolioAsset,
             createConvertTransaction,
-            createTransferTransaction
+            createTransferTransaction,
+
+            destroy: () => {
+                if (this.data.updateCron) {
+                    this.data.updateCron.destroy();
+                }
+            }
         };
     }),
     Code: (async function cryptoGame (context, command, ...args) {
