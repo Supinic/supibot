@@ -9,7 +9,18 @@ module.exports = {
 		{ name: "arguments", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: (() => ({
+		allowedUtilsMethods: [
+			"capitalize",
+			"randArray",
+			"random",
+			"randomString",
+			"removeAccents",
+			"timeDelta",
+			"wrapString",
+			"zf"
+		]
+	})),
 	Code: (async function dankDebug (context, ...args) {
 		let scriptArgs;
 		if (context.params.arguments) {
@@ -27,18 +38,21 @@ module.exports = {
 		let result;
 		const script = `(() => {\n${args.join(" ")}\n})()`;
 		try {
-			result = sb.Sandbox.run(script, {
+			const scriptContext = {
 				sandbox: {
 					args: scriptArgs ?? null,
 					console: undefined,
 					utils: {
-						random: (...args) => sb.Utils.random(...args),
-						capitalize: (...args) => sb.Utils.capitalize(...args),
-						timeDelta: (...args) => sb.Utils.timeDelta(...args),
 						Date: sb.Date
 					}
 				}
-			});
+			};
+
+			for (const method of this.staticData.allowedUtilsMethods) {
+				scriptContext.sandbox.utils[method] = (...args) => sb.Utils[method](...args);
+			}
+
+			result = sb.Sandbox.run(script, scriptContext);
 		}
 		catch (e) {
 			const { name } = e.constructor;
