@@ -230,8 +230,7 @@ module.exports = class ChatModule extends require("./template.js") {
 	}
 
 	static async reloadSpecific (...list) {
-		const modules = list.map(i => ChatModule.get(i));
-		const IDs = modules.map(i => i.ID);
+		const modules = list.map(i => ChatModule.get(i)).filter(Boolean);
 		for (const item of modules) {
 			const previousIndex = ChatModule.data.findIndex(i => i === item);
 
@@ -242,7 +241,7 @@ module.exports = class ChatModule extends require("./template.js") {
 			}
 		}
 
-		const data = await ChatModule.#fetch(IDs);
+		const data = await ChatModule.#fetch(list);
 		for (const row of data) {
 			const chatModule = ChatModule.#create(row);
 			ChatModule.data.push(chatModule);
@@ -339,7 +338,7 @@ module.exports = class ChatModule extends require("./template.js") {
 		return args;
 	}
 
-	static async #fetch (specificIDs) {
+	static async #fetch (specificNames) {
 		return await sb.Query.getRecordset(rs => {
 			rs.select("Chat_Module.ID AS Module_ID")
 				.select("Chat_Module.*")
@@ -356,11 +355,11 @@ module.exports = class ChatModule extends require("./template.js") {
 					fields: ["Channel_ID", "Args"]
 				});
 
-			if (typeof specificIDs === "number") {
-				rs.where("Chat_Module.ID = %n", specificIDs);
+			if (typeof specificNames === "string") {
+				rs.where("Chat_Module.Name = %s", specificNames);
 			}
-			else if (Array.isArray(specificIDs)) {
-				rs.where("Chat_Module.ID IN %n+", specificIDs);
+			else if (Array.isArray(specificNames)) {
+				rs.where("Chat_Module.Name IN %s+", specificNames);
 			}
 
 			return rs;
