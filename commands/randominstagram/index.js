@@ -104,6 +104,7 @@ module.exports = {
 			"For a given Instagram user, this command fetches one of their recent 12 posts.",
 			"Video posts are skipped, for the moment being.",
 			"If this command isn't invoked in an NSFW-compliant channel, the command will only post pictures if they pass the NSFW check.",
+			`If you would like to the disable this filter (at your own risk!), channel owners and ambassadors can use the <code>${prefix}set/unset rig-nsfw</code> command. For more info, check that command's description.`,
 			"",
 
 			`<code>${prefix}randominstagram lotteandmolly</code>`,
