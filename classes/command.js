@@ -329,24 +329,27 @@ module.exports = class Command extends require("./template.js") {
 	 * @throws {sb.Error} If the list contains 0 valid commands
 	 */
 	static async reloadSpecific (...list) {
-		const reloadingCommands = list.map(i => Command.get(i)).filter(Boolean);
-		if (reloadingCommands.length === 0) {
-			throw new sb.Error({
-				message: "No valid commands provided"
-			});
+		const existingCommands = list.map(i => Command.get(i)).filter(Boolean);
+		for (const command of existingCommands) {
+			const index = Command.data.findIndex(i => i.ID === command.ID);
+
+			command.destroy();
+
+			if (index !== -1) {
+				Command.data.splice(index, 1);
+			}
 		}
 
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("*")
 			.from("chat_data", "Command")
-			.where("ID IN %n+", reloadingCommands.map(i => i.ID))
+			.where("Name IN %s+", list)
 			.where("Flags NOT %*like* OR Flags IS NULL", "archived")
 		);
 
 		for (const record of data) {
-			const existingIndex = Command.data.findIndex(i => i.ID === record.ID);
-			Command.data[existingIndex].destroy();
-			Command.data[existingIndex] = new Command(record);
+			const command = new Command(record);
+			Command.data.push(command);
 		}
 	}
 
