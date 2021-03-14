@@ -84,7 +84,7 @@ module.exports = {
 
 				let immunity = "";
 				if (typeof subImmunity === "boolean") {
-					immunity = `applied to subs: ${(removeAccents) ? "no" : "yes"};`;
+					immunity = `applied to subs: ${(subImmunity) ? "no" : "yes"};`;
 				}
 
 				const punishment = (permanent)
@@ -98,7 +98,7 @@ module.exports = {
 						punishment: ${punishment};
 						${accents}
 						${immunity}
-						case sensitive: ${sensitive ? "yes" : "no"};
+						case sensitive: ${sensitive ? "yes" : "no"}
 					`
 				};
 			}
