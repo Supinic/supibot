@@ -211,55 +211,9 @@ module.exports = class ChatModule extends require("./template.js") {
 			return;
 		}
 
-		const data = await sb.Query.getRecordset(rs => rs
-			.select("Chat_Module.ID AS Module_ID")
-			.select("Chat_Module.*")
-			.select("Channel.ID AS Channel_ID")
-			.select("Channel_Chat_Module.Specific_Arguments AS Args")
-			.from("chat_data", "Chat_Module")
-			.where("Active = %b", true)
-			.reference({
-				left: true,
-				sourceTable: "Chat_Module",
-				targetTable: "Channel",
-				referenceTable: "Channel_Chat_Module",
-				collapseOn: "Module_ID",
-				fields: ["Channel_ID", "Args"]
-			})
-		);
-
+		const data = ChatModule.#fetch();
 		for (const row of data) {
-			const chatModule = new ChatModule(row);
-			if (row.Global) {
-				if (row.Platform) {
-					chatModule.attach({
-						platform: row.Platform
-					});
-				}
-				else {
-					chatModule.attach({
-						platform: sb.Platform.data
-					});
-				}
-			}
-
-			const channelItems = row.Channel.filter(i => i.ID);
-			for (const channelItem of channelItems) {
-				const args = ChatModule.parseModuleArgs(channelItem.Args);
-				if (!args) {
-					console.warn("Reattaching module failed", {
-						module: chatModule.ID,
-						channel: channelItem.ID
-					});
-					continue;
-				}
-
-				chatModule.attach({
-					args,
-					channel: sb.Channel.get(channelItem.ID)
-				});
-			}
-
+			const chatModule = ChatModule.#create(row);
 			ChatModule.data.push(chatModule);
 		}
 	}
@@ -270,6 +224,26 @@ module.exports = class ChatModule extends require("./template.js") {
 		}
 
 		super.reloadData();
+	}
+
+	static async reloadSpecific (...list) {
+		const modules = list.map(i => ChatModule.get(i));
+		const IDs = modules.map(i => i.ID);
+		for (const item of modules) {
+			const previousIndex = ChatModule.data.findIndex(i => i === item);
+
+			item.destroy();
+
+			if (previousIndex !== -1) {
+				ChatModule.data.splice(previousIndex, 1);
+			}
+		}
+
+		const data = await ChatModule.#fetch(IDs);
+		for (const row of data) {
+			const chatModule = ChatModule.#create(row);
+			ChatModule.data.push(chatModule);
+		}
 	}
 
 	static getChannelModules (channel) {
@@ -360,6 +334,69 @@ module.exports = class ChatModule extends require("./template.js") {
 		}
 
 		return args;
+	}
+
+	static async #fetch (specificIDs) {
+		return await sb.Query.getRecordset(rs => {
+			rs.select("Chat_Module.ID AS Module_ID")
+				.select("Chat_Module.*")
+				.select("Channel.ID AS Channel_ID")
+				.select("Channel_Chat_Module.Specific_Arguments AS Args")
+				.from("chat_data", "Chat_Module")
+				.where("Active = %b", true)
+				.reference({
+					left: true,
+					sourceTable: "Chat_Module",
+					targetTable: "Channel",
+					referenceTable: "Channel_Chat_Module",
+					collapseOn: "Module_ID",
+					fields: ["Channel_ID", "Args"]
+				});
+
+			if (typeof specificIDs === "number") {
+				rs.where("Chat_Module.ID = %n", specificIDs);
+			}
+			else if (Array.isArray(specificIDs)) {
+				rs.where("Chat_Module.ID IN %n+", specificIDs);
+			}
+
+			return rs;
+		});
+	}
+
+	static #create (row) {
+		const chatModule = new ChatModule(row);
+		if (row.Global) {
+			if (row.Platform) {
+				chatModule.attach({
+					platform: row.Platform
+				});
+			}
+			else {
+				chatModule.attach({
+					platform: sb.Platform.data
+				});
+			}
+		}
+
+		const channelItems = row.Channel.filter(i => i.ID);
+		for (const channelItem of channelItems) {
+			const args = ChatModule.parseModuleArgs(channelItem.Args);
+			if (!args) {
+				console.warn("Reattaching module failed", {
+					module: chatModule.ID,
+					channel: channelItem.ID
+				});
+				continue;
+			}
+
+			chatModule.attach({
+				args,
+				channel: sb.Channel.get(channelItem.ID)
+			});
+		}
+
+		return chatModule;
 	}
 
 	static destroy () {
