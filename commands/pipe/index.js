@@ -6,8 +6,8 @@ module.exports = {
 	Description: "Pipes the result of one command to another, and so forth. Each command will be used as if used separately, so each will be checked for cooldowns and banphrases. Use the character \"|\" or \">\" to separate each command.",
 	Flags: ["mention","pipe","use-params"],
 	Params: [
-		{ name: "pipePos", type: "number" },
-		{ name: "pipeArgPos", type: "object" }
+		{ name: "_pos", type: "number" },
+		{ name: "_apos", type: "object" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -58,7 +58,14 @@ module.exports = {
 			const inv = invocations[i];
 			const [cmd, ...restArgs] = inv.split(" ");
 
-			const argumentStartPosition = context.params.pipePos ?? context.params.pipeArgPos?.[i] ?? 0;
+			const argumentStartPosition = Number(context.params._pos ?? context.params._apos?.[i] ?? 0);
+			if (!sb.Utils.isValidInteger(argumentStartPosition)) {
+				return {
+					success: false,
+					reply: "Invalid argument position provided!"
+				};
+			}
+
 			const cmdArgs = [...currentArgs];
 			cmdArgs.splice(argumentStartPosition, 0, ...restArgs);
 	
