@@ -4,8 +4,11 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Pipes the result of one command to another, and so forth. Each command will be used as if used separately, so each will be checked for cooldowns and banphrases. Use the character \"|\" or \">\" to separate each command.",
-	Flags: ["mention","pipe"],
-	Params: null,
+	Flags: ["mention","pipe","use-params"],
+	Params: [
+		{ name: "pos", type: "number" },
+		{ name: "argPos", type: "object" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function pipe (context, ...args) {
@@ -51,9 +54,13 @@ module.exports = {
 		let finalResult = null;
 		let currentArgs = [];
 	
-		for (const inv of invocations) {
-			let [cmd, ...cmdArgs] = inv.split(" ");
-			cmdArgs = cmdArgs.concat(currentArgs);
+		for (let i = 0; i < invocations.length; i++) {
+			const inv = invocations[i];
+			const [cmd, ...restArgs] = inv.split(" ");
+
+			const argumentStartPosition = context.params.pos ?? context.params.argPos?.[i] ?? 0;
+			const cmdArgs = [...currentArgs];
+			cmdArgs.splice(argumentStartPosition, 0, ...restArgs);
 	
 			const check = sb.Command.get(cmd.replace(sb.Command.prefix, ""));
 			if (check) {
