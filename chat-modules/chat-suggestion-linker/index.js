@@ -31,7 +31,7 @@ module.exports = {
 
         const siteLink = `https://supinic.com/data/suggestion/${ID}`;
         const githubLink = (data.Github_Link)
-            ? `https://${data.Github_Link}`
+            ? `https:${data.Github_Link}`
             : "";
 
         await channel.send(`S#${ID}: ${siteLink} ${githubLink}`);
