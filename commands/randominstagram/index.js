@@ -107,15 +107,15 @@ module.exports = {
 			`If you would like to the disable this filter (at your own risk!), channel owners and ambassadors can use the <code>${prefix}set/unset rig-nsfw</code> command. For more info, check that command's description.`,
 			"",
 
-			`<code>${prefix}randominstagram lotteandmolly</code>`,
+			`<code>${prefix}randominstagram (user)</code>`,
 			"Posts a random picture post from the provided user.",
 			"",
 
-			`<code>${prefix}rig lotteandmolly rawLinkOnly:true</code>`,
+			`<code>${prefix}rig (user) rawLinkOnly:true</code>`,
 			"Posts a random picture post URL - the actual image URL Instagram uses, without the description.",
 			"",
 
-			`<code>${prefix}rig lotteandmolly postLinkOnly:true</code>`,
+			`<code>${prefix}rig (user) postLinkOnly:true</code>`,
 			"Posts a random picture post URL - without the description, and other fluff.",
 			"",
 		];
