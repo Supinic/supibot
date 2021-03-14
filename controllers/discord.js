@@ -225,8 +225,8 @@ module.exports = class DiscordController extends require("./template.js") {
 	 */
 	async send (message, channel) {
 		const globalEmoteRegex = /[A-Z]/;
-		const channelData = sb.Channel.get(channel, this.platform).Name;
-		const channelObject = this.client.channels.cache.get(channelData);
+		const channelData = sb.Channel.get(channel, this.platform);
+		const channelObject = this.client.channels.cache.get(channelData.Name);
 		if (!channelObject) {
 			console.warn("No channel available!", channel);
 			return;
