@@ -211,7 +211,7 @@ module.exports = class ChatModule extends require("./template.js") {
 			return;
 		}
 
-		const data = ChatModule.#fetch();
+		const data = await ChatModule.#fetch();
 		for (const row of data) {
 			const chatModule = ChatModule.#create(row);
 			ChatModule.data.push(chatModule);
