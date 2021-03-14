@@ -119,9 +119,10 @@ module.exports = class ChatModule extends require("./template.js") {
 	}
 
 	detachAll (hard) {
-		for (const target of this.attachmentReferences) {
+		const targets = this.attachmentReferences.map(i => i.channelID);
+		for (const channelID of targets) {
 			this.detach({
-				channel: sb.Channel.get(target.channelID),
+				channel: sb.Channel.get(channelID),
 				remove: Boolean(hard)
 			});
 		}
