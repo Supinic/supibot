@@ -302,7 +302,7 @@ module.exports = {
 					await Promise.all(promises);
 	
 					if (added.length > 0 || updated.length > 0) {
-						await sb.ChatModule.reloadData();
+						await sb.ChatModule.reloadSpecific([...added, ...updated]);
 					}
 	
 					return {
