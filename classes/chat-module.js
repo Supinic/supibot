@@ -220,7 +220,7 @@ module.exports = class ChatModule extends require("./template.js") {
 
 	static async reloadData () {
 		for (const chatModule of ChatModule.data) {
-			chatModule.detachAll();
+			chatModule.destroy();
 		}
 
 		super.reloadData();
