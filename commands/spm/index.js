@@ -220,7 +220,7 @@ module.exports = {
 					}
 	
 					if (added.length > 0 || updated.length > 0) {
-						await sb.Command.reloadSpecific([...added, ...updated]);
+						await sb.Command.reloadSpecific(...added, ...updated);
 					}
 	
 					return {
@@ -299,7 +299,7 @@ module.exports = {
 					await Promise.all(promises);
 	
 					if (added.length > 0 || updated.length > 0) {
-						await sb.ChatModule.reloadSpecific([...added, ...updated]);
+						await sb.ChatModule.reloadSpecific(...added, ...updated);
 					}
 	
 					return {
