@@ -108,6 +108,7 @@ module.exports = class ChatModule extends require("./template.js") {
 				channelData.events.off(event, reference.listener);		
 				
 				if (options.remove) {
+					reference.listener = null;
 					this.attachmentReferences.splice(index, 1);
 				}
 				else {
@@ -117,16 +118,17 @@ module.exports = class ChatModule extends require("./template.js") {
 		}
 	}
 
-	detachAll () {
+	detachAll (hard) {
 		for (const target of this.attachmentReferences) {
 			this.detach({
-				channel: target.ID
+				channel: target.ID,
+				remove: Boolean(hard)
 			});
 		}
 	}
 
 	destroy () {
-		this.detachAll();
+		this.detachAll(true);
 
 		this.data = null;
 		this.attachmentReferences = null;
