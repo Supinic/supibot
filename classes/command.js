@@ -340,12 +340,17 @@ module.exports = class Command extends require("./template.js") {
 			}
 		}
 
-		const data = await sb.Query.getRecordset(rs => rs
-			.select("*")
-			.from("chat_data", "Command")
-			.where("Name IN %s+", list)
-			.where("Flags NOT %*like* OR Flags IS NULL", "archived")
-		);
+		const data = await sb.Query.getRecordset(rs => {
+			rs.select("*")
+				.from("chat_data", "Command")
+				.where("Flags NOT %*like* OR Flags IS NULL", "archived");
+
+			for (const name of list) {
+				rs.where("Name = %s OR JSON_CONTAINS(Aliases, JSON_QUOTE(%s))", name, name);
+			}
+
+			return rs;
+		});
 
 		for (const record of data) {
 			const command = new Command(record);
