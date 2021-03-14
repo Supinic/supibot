@@ -128,6 +128,9 @@ module.exports = class ChatModule extends require("./template.js") {
 	destroy () {
 		this.detachAll();
 
+		this.data = null;
+		this.attachmentReferences = null;
+
 		this.Events = null;
 		this.ID = null;
 		this.Code = null;
