@@ -2,9 +2,8 @@ module.exports = {
 	Name: "message-react",
 	Events: ["message"],
 	Description: "According to arguments, reacts to a specific message(s) with a determined response.",
-	Code: (async function chatModuleNice (context, options = {}) {
-		const { ignoreCase, reaction } = options;
-		if (!reaction) {
+	Code: (async function chatModuleNice (context, ...args) {
+		if (args.length === 0) {
 			return;
 		}
 
@@ -17,7 +16,7 @@ module.exports = {
 		}
 
 		const { message } = context;
-		for (const item of reaction) {
+		for (const item of args) {
 			let adjustedMessage = message;
 			let check = item.check;
 			if (item.ignoreCase) {
