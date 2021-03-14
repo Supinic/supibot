@@ -124,6 +124,14 @@ module.exports = class ChatModule extends require("./template.js") {
 			});
 		}
 	}
+
+	destroy () {
+		this.detachAll();
+
+		this.Events = null;
+		this.ID = null;
+		this.Code = null;
+	}
 	
 	async serialize (options = {}) {
 		if (typeof this.ID !== "number") {
@@ -353,7 +361,7 @@ module.exports = class ChatModule extends require("./template.js") {
 
 	static destroy () {
 		for (const chatModule of ChatModule.data) {
-			chatModule.detachAll();
+			chatModule.destroy();
 		}
 
 		super.destroy();
