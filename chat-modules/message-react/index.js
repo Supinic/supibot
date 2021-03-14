@@ -3,8 +3,8 @@ module.exports = {
 	Events: ["message"],
 	Description: "According to arguments, reacts to a specific message(s) with a determined response.",
 	Code: (async function chatModuleNice (context, options = {}) {
-		const { check, ignoreCase, response } = options;
-		if (!check || !response) {
+		const { ignoreCase, reaction } = options;
+		if (!reaction) {
 			return;
 		}
 
@@ -16,13 +16,18 @@ module.exports = {
 			return;
 		}
 
-		let { message } = context;
-		if (ignoreCase) {
-			message = message.toLowerCase();
-		}
+		const { message } = context;
+		for (const item of reaction) {
+			let adjustedMessage = message;
+			let check = item.check;
+			if (item.ignoreCase) {
+				check = check.toLowerCase();
+				adjustedMessage = adjustedMessage.toLowerCase();
+			}
 
-		if ((typeof check === "string" && message === check ) || (Array.isArray(check) && check.includes(message))) {
-			await channel.send(response);
+			if (adjustedMessage === check) {
+				await channel.send(item.response);
+			}
 		}
 	}),
 	Author: "supinic"
