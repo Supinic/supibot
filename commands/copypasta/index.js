@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 15000,
-	Description: "Fetches a random Twitch-related copypasta. The date of creation usually ranges from 2014-2015.",
+	Description: "Fetches a random Twitch-related copypasta.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "textOnly", type: "boolean" }
@@ -48,5 +48,17 @@ module.exports = {
 				: "No copypasta found!"
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => {
+		return [
+			`Fetches a random Twitch copypasta from <a href="//twitchquotes.com">twitchquotes.com</a>.`,
+			"",
+
+			`<code>${prefix}copypasta</code>`,
+			"(random copypasta)",
+			"",
+
+			`<code>${prefix}copypasta textOnly:true</code>`,
+			"(random copypasta) - excludes ASCII art pastas. Retries up to 5 times, if one isn't found, then fails."
+		];
+	})
 };
