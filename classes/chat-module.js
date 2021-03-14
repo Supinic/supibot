@@ -231,13 +231,13 @@ module.exports = class ChatModule extends require("./template.js") {
 
 	static async reloadSpecific (...list) {
 		const existingModules = list.map(i => ChatModule.get(i)).filter(Boolean);
-		for (const item of existingModules) {
-			const previousIndex = ChatModule.data.findIndex(i => i === item);
+		for (const chatModule of existingModules) {
+			const index = ChatModule.data.findIndex(i => i === chatModule);
 
-			item.destroy();
+			chatModule.destroy();
 
-			if (previousIndex !== -1) {
-				ChatModule.data.splice(previousIndex, 1);
+			if (index !== -1) {
+				ChatModule.data.splice(index, 1);
 			}
 		}
 
