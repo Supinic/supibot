@@ -219,11 +219,8 @@ module.exports = {
 						updated.splice(updated.indexOf("spm"), 1);
 					}
 	
-					if (added.length > 0) {
-						await sb.Command.reloadData();
-					}
-					else if (updated.length > 0) {
-						await sb.Command.reloadSpecific(...updated);
+					if (added.length > 0 || updated.length > 0) {
+						await sb.Command.reloadSpecific([...added, ...updated]);
 					}
 	
 					return {
