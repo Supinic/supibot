@@ -65,13 +65,41 @@ module.exports = {
 			}
 	
 			if (data.banned) {
-				const { id, name, phrase, length, permanent, operator, case_sensitive: sensitive } = data.banphrase_data;
+				const {
+					id,
+					name,
+					phrase,
+					length,
+					permanent,
+					operator,
+					case_sensitive: sensitive,
+					remove_accents: removeAccents,
+					sub_immunity: subImmunity
+				} = data.banphrase_data;
+
+				let accents = "";
+				if (typeof removeAccents === "boolean") {
+					accents = `ignores accents: ${(removeAccents) ? "yes" : "no"};`;
+				}
+
+				let immunity = "";
+				if (typeof subImmunity === "boolean") {
+					immunity = `applied to subs: ${(removeAccents) ? "no" : "yes"};`;
+				}
+
 				const punishment = (permanent)
 					? "permanent ban"
 					: `${sb.Utils.formatTime(length)} seconds timeout`;
 	
 				return {
-					reply: `Banphrase ID ${id} - ${name}. ${operator}: "${phrase}"; punishment: ${punishment}. Case sensitive: ${sensitive ? "yes" : "no"}.`
+					reply: sb.Utils.tag.trim `
+						Banphrase ID ${id} - ${name}
+						${operator}: "${phrase}";
+						punishment: ${punishment};
+						${accents}
+						${immunity}
+						case sensitive: ${sensitive ? "yes" : "no"};
+					`
 				};
 			}
 		}
