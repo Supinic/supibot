@@ -71,7 +71,7 @@ module.exports = {
 						const html = await sb.Got("https://www.thisworddoesnotexist.com/").text();
 						const $ = sb.Utils.cheerio(html);
 
-						const wordClass = $("div#definition-pos").text().replace(/\./g, "");
+						const wordClass = $("div#definition-pos").text().replace(/\./g, "").trim();
 						const word = $("div#definition-word").text();
 						const definition = $("div#definition-definition").text().trim();
 						const example = $("div#definition-example").text();
