@@ -57,8 +57,8 @@ module.exports = {
 		return {
 			reply: sb.Utils.tag.trim `
 				Best match for your picture:
-				${name}, 
-				${descriptor.join("")},
+				${name}
+				${descriptor.join("")}
 				around ${time}.
 				Similarity score: ${similarity}% 
 			`
