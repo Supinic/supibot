@@ -44,7 +44,7 @@ module.exports = {
 		const [show] = docs;
 		const name = show.title_english ?? show.title_romaji ?? show.title_native;
 		const time = sb.Utils.formatTime(Math.trunc(show.at), true);
-		const similarity = sb.Utils.format(show.similarity * 100, 2);
+		const similarity = sb.Utils.round(show.similarity * 100, 2);
 
 		const descriptor = [];
 		if (show.season) {
