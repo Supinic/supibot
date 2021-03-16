@@ -61,7 +61,7 @@ module.exports = {
 				const itemFile = `/code/spm/${options.dir}/${item}/index.js`;
 				if (!await this.staticData.helpers.exists(itemFile)) {
 					console.warn(`index.js file for ${options.name} ${item} does not exist`);
-					return;
+					return { updated: false };
 				}
 	
 				// Fetch the latest commit for a given file
