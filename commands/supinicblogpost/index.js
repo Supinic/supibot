@@ -10,7 +10,7 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		channel: "820010774575054949"
+		channel: "748955843415900280"
 	})),
 	Code: (async function supinicBlogPost (context) {
 		const client = sb.Platform.get("discord").client;
