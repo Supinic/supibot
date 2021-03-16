@@ -62,7 +62,7 @@ module.exports = {
 					types: ["waifu"],
 					descriptions: [`<code>waifu</code> - <a href="https://www.thiswaifudoesnotexist.net/">This waifu does not exist</a>`],
 					execute: async (context, type) => {
-						const number = sb.Utils.random(1, 1e6);
+						const number = sb.Utils.random(1, 1e5);
 						const link = `https://www.thiswaifudoesnotexist.net/example-${number}.jpg`;
 						return {
 							link,
