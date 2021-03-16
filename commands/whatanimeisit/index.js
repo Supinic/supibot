@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "whatanimeisit",
-	Aliases: ["tracemoe","wait"],
+	Aliases: ["tracemoe"],
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "What anime is it? For a given screenshot of an anime show, this command will attempt to recognize the show's name, episode and timestamp.",
