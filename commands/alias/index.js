@@ -38,7 +38,7 @@ module.exports = {
 
 			return {
 				success: true,
-				resultArguments: resultArguments.join(" ")
+				resultArguments
 			};
 		}
 	})),
