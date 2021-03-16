@@ -71,15 +71,12 @@ module.exports = {
 			}
 		}
 	
-		const type = (context.invocation === "current")
+		let type = (context.invocation === "current")
 			? "current"
 			: (args.shift() ?? "current");
 	
 		if (!this.staticData.types.includes(type)) {
-			return {
-				success: false,
-				reply: "Invalid type provided! Supported types: " + this.staticData.types.join(", ")
-			};
+			type = "current";
 		}
 	
 		let includePosition = false;
