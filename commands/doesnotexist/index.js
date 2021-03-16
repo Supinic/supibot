@@ -7,23 +7,95 @@ module.exports = {
 	Flags: ["link-only","mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-	        buildURL: (type) => {
-	            if (type === "person") {
-	                return `https://this${type}doesnotexist.com/image`;
-	            }
-	            else {
-	                return `https://this${type}doesnotexist.com`;
-	            }
-	        },
-	        types: ["artwork", "cat", "horse", "person"]
-	    })),
+	Static_Data: (() => {
+		const buildURL = (type) => {
+			if (type === "person") {
+				return `https://this${type}doesnotexist.com/image`;
+			}
+			else {
+				return `https://this${type}doesnotexist.com`;
+			}
+		};
+
+		return {
+			types: ["artwork", "cat", "horse", "person", "waifu", "word"],
+			fetch: [
+				{
+					description: "reuploading a provided random image",
+					types: ["artwork", "cat", "horse", "person"],
+					execute: async (type) => {
+						const imageData = await sb.Got({
+							url: buildURL(type),
+							responseType: "buffer",
+							throwHttpErrors: false
+						});
+
+						if (imageData.statusCode !== 200) {
+							console.warn("dne download failed", imageData);
+							return {
+								success: false,
+								reply: `Fetching image data failed monkaS`
+							};
+						}
+
+						const { statusCode, link } = await sb.Utils.uploadToNuuls(imageData.rawBody ?? imageData.body);
+						if (statusCode !== 200) {
+							return {
+								success: false,
+								reply: `Could not upload the image! Error: ${statusCode}`
+							};
+						}
+
+						return {
+							link,
+							reply: `This ${type} does not exist: ${link}`
+						};
+					}
+				},
+				{
+					description: "rolls a random number for a static link",
+					types: ["waifu"],
+					execute: async (type) => {
+						const number = sb.Utils.random(1, 1e6);
+						const link = `https://www.thiswaifudoesnotexist.net/example-${number}.jpg`;
+						return {
+							link,
+							reply: `This ${type} does not exist: ${link}`
+						};
+					}
+				},
+				{
+					description: "scraping for random word",
+					types: ["word"],
+					execute: async (type) => {
+						const html = await sb.Got("https://www.thisworddoesnotexist.com/").text();
+						const $ = sb.Utils.cheerio(html);
+
+						const wordClass = $("div#definition-pos").text().replace(/\./g, "");
+						const word = $("div#word").text();
+						const definition = $("div#definition-definition").text().trim();
+						const example = $("div#definition-example").text();
+
+						return {
+							link: "No link available!",
+							reply: sb.Utils.tag.trim `
+								This ${type} does not exist:
+								${word} (${wordClass}) -
+								${definition}.
+								Example: ${example ?? "N/A"}
+							`
+						};
+					}
+				},
+			]
+		};
+	}),
 	Code: (async function doesnotexist (context, type) {
-	        const { buildURL, types } = this.staticData;
+	        const { fetch, types } = this.staticData;
 	        if (!type) {
 	            type = "person";
 	        }
-	
+
 	        type = type.toLowerCase();
 	        if (!types.includes(type)) {
 	            return {
@@ -31,33 +103,9 @@ module.exports = {
 	                reply: `Invalid type provided! Use one of: ${types.join(", ")}`
 	            };
 	        }
-	
-	        const imageData = await sb.Got({
-	            url: buildURL(type),
-	            responseType: "buffer",
-	            throwHttpErrors: false
-	        });
-	
-	        if (imageData.statusCode !== 200) {
-	            console.warn("dne download failed", imageData);
-	            return {
-	                success: false,
-	                reply: `Fetching image data failed monkaS`
-	            };
-	        }
 
-	        const { statusCode, link } = await sb.Utils.uploadToNuuls(imageData.rawBody ?? imageData.body);
-	        if (statusCode !== 200) {
-	            return {
-	                success: false,
-	                reply: `Could not upload the image! Error: ${statusCode}`
-	            };
-	        }
-	
-	        return {
-	            link,
-	            reply: `This ${type} does not exist: ${link}`
-	        };
+	        const { execute } = fetch.find(i => i.types.includes(type));
+	        return await execute(type);
 	    }),
 	Dynamic_Description: (async (prefix, values) => {
 	        const { buildURL, types } = values.getStaticData();
