@@ -16,11 +16,31 @@ module.exports = {
 	
 		applyParameters: (context, aliasArguments, commandArguments) => {
 			const resultArguments = [];
+			const numberRegex = /(?<order>\d+)(-(?<range>\d+))?(?<rest>\+?)/;
+
 			for (let i = 0; i < aliasArguments.length; i++) {
 				const parsed = aliasArguments[i].replace(/\${(.+?)}/g, (total, match) => {
-					const order = Number(match);
-					if (sb.Utils.isValidInteger(order)) {
-						return commandArguments[order] ?? "";
+					const numberMatch = match.match(numberRegex);
+					if (numberMatch) {
+						const order = Number(numberMatch.groups.order);
+						const useRest = (numberMatch.groups.rest === "+");
+						const range = (numberMatch.groups.range) ? Number(numberMatch.groups.range) : null;
+
+						if (useRest && range) {
+							return {
+								success: false,
+								reply: `Cannot combine both the "range" and "rest" argument identifiers!`
+							};
+						}
+						else if (useRest) {
+							return commandArguments.slice(order).join(" ");
+						}
+						else if (range) {
+							return commandArguments.slice(order, range).join(" ");
+						}
+						else {
+							return commandArguments[order] ?? "";
+						}
 					}
 					else if (match === "executor") {
 						return context.user.Name;
