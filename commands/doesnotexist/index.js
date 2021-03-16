@@ -23,7 +23,10 @@ module.exports = {
 			types: ["artwork", "cat", "horse", "person", "waifu", "word"],
 			fetch: [
 				{
-					description: "reuploading a provided random image",
+					method: "reuploading a provided random image",
+					descriptions: ["artwork", "cat", "horse", "person"].map(i => (
+						`<code>${i}</code> - <a href="${buildURL(i)}">This ${i} does not exist</a>`
+					)),
 					types: ["artwork", "cat", "horse", "person"],
 					execute: async (context, type) => {
 						const imageData = await sb.Got({
@@ -55,8 +58,9 @@ module.exports = {
 					}
 				},
 				{
-					description: "rolls a random number for a static link",
+					method: "rolls a random number for a static link",
 					types: ["waifu"],
+					descriptions: [`<code>waifu</code> - <a href="https://www.thiswaifudoesnotexist.net/">This waifu does not exist</a>`],
 					execute: async (context, type) => {
 						const number = sb.Utils.random(1, 1e6);
 						const link = `https://www.thiswaifudoesnotexist.net/example-${number}.jpg`;
@@ -67,8 +71,9 @@ module.exports = {
 					}
 				},
 				{
-					description: "scraping for random word",
+					method: "scraping for random word",
 					types: ["word"],
+					descriptions: [`<code>word</code> - <a href="https://www.thisworddoesnotexist.com/">This word does not exist</a>`],
 					execute: async (context, type) => {
 						const html = await sb.Got("https://www.thisworddoesnotexist.com/").text();
 						const $ = sb.Utils.cheerio(html);
@@ -95,7 +100,7 @@ module.exports = {
 							`
 						};
 					}
-				},
+				}
 			]
 		};
 	}),
@@ -117,8 +122,8 @@ module.exports = {
 	        return await execute(context, type);
 	    }),
 	Dynamic_Description: (async (prefix, values) => {
-	        const { buildURL, types } = values.getStaticData();
-	        const list = types.map(i => `<li><code>${i}</code> - <a href="${buildURL(i)}">This ${i} does not exist</a></li>`).join("");
+	        const { fetch } = values.getStaticData();
+	        const list = fetch.flatMap(i => i.descriptions).map(i => `<li>${i.description}</li>`).join("");
 	
 	        return [
 	            `Posts a random picture from the set of "this X does not exist" websites.`,
