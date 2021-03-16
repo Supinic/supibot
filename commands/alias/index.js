@@ -17,7 +17,7 @@ module.exports = {
 		applyParameters: (context, aliasArguments, commandArguments) => {
 			const resultArguments = [];
 			for (let i = 0; i < aliasArguments.length; i++) {
-				const parsed = aliasArguments[i].replace(/\${(\w+)}/g, (total, match) => {
+				const parsed = aliasArguments[i].replace(/\${(.+?)}/g, (total, match) => {
 					const order = Number(match);
 					if (sb.Utils.isValidInteger(order)) {
 						return commandArguments[order] ?? "";
