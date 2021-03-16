@@ -26,8 +26,10 @@ module.exports = {
 		const messageData = await channel.messages.fetch(messageID);
 		const date = new sb.Date(messageData.createdTimestamp);
 		if (context.params.fullResponse) {
-			const paste = await sb.Pastebin.post(messageData.content, {
-				name: "Supibot update post " + date.format("Y-m-d")
+			const text = messageData.content.replace(/<@&\d+>\s*/g, "");
+			const paste = await sb.Pastebin.post(text, {
+				name: "Supibot update post " + date.format("Y-m-d"),
+				format: "markdown"
 			});
 
 			return {
