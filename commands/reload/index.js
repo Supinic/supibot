@@ -18,22 +18,16 @@ module.exports = {
 			case "banphrases": await sb.Banphrase.reloadData(); break;
 	
 			case "channels": await sb.Channel.reloadData(); break;
-	
+			case "channel": await sb.Channel.reloadSpecific(...rest); break;
+
+			case "chat-modules":
+			case "chatmodules": await sb.ChatModule.reloadData(); break;
+			case "chat-module":
+			case "chatmodule": await sb.ChatModule.reloadSpecific(...rest); break;
+
 			case "commands": await sb.Command.reloadData(); break;
-			case "command": {
-				try {
-					await sb.Command.reloadSpecific(target, ...rest);
-				}
-				catch {
-					return {
-						success: false,
-						reply: "No valid commands provided!"
-					};
-				}
-	
-				break;
-			}
-	
+			case "command": await sb.Command.reloadSpecific(...rest); break;
+
 			case "config": await sb.Config.reloadData(); break;
 	
 			case "cron": await sb.Cron.reloadData(); break;
