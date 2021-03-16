@@ -72,7 +72,7 @@ module.exports = {
 						const $ = sb.Utils.cheerio(html);
 
 						const wordClass = $("div#definition-pos").text().replace(/\./g, "");
-						const word = $("div#word").text();
+						const word = $("div#definition-word").text();
 						const definition = $("div#definition-definition").text().trim();
 						const example = $("div#definition-example").text();
 
