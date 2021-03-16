@@ -25,7 +25,21 @@ module.exports = {
 				"__a": "1"
 			},
 			throwHttpErrors: false,
-			responseType: "json"
+			responseType: "json",
+			hooks: {
+				beforeRedirect: [
+					(options, res) => {
+						if (300 <= res.statusCode && res.statusCode <= 399) {
+							throw new sb.errors.GenericRequestError({
+								statusCode: 403,
+								statusMessage: "Forbidden",
+								hostname: "instagram.com",
+								message: "Temporarily blocked - try again later"
+							});
+						}
+					}
+				]
+			}
 		});
 
 		if (statusCode === 404) {
