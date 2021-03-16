@@ -23,7 +23,7 @@ module.exports = {
 			};
 		}
 
-		const messageData = await client.messages.fetch(messageID);
+		const messageData = await channel.messages.fetch(messageID);
 		const date = new sb.Date(messageData.createdTimestamp);
 		if (context.params.fullResponse) {
 			const paste = await sb.Pastebin.post(messageData.content, {
