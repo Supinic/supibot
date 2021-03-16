@@ -136,6 +136,10 @@ module.exports = {
 	            `<code>${prefix}dne (type)</code>`,
 	            "Posts a random (type) that does not exist",
 	            "",
+
+				`<code>${prefix}dne word wordOnly:true</code>`,
+				"Posts a random word, without the word class, definition or examples",
+				"",
 	
 	            "Available types:",
 	            `<ul>${list}</ul>`
