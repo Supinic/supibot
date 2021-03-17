@@ -613,8 +613,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
-			const message = await sb.Master.prepareMessage(execution.reply, null, {
-				platform: this.platform,
+			const message = await this.prepareMessage(execution.reply, null, {
 				extraLength: ("/w " + userData.Name + " ").length,
 				skipBanphrases: true
 			});
@@ -626,7 +625,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				this.mirror(execution.reply, userData, channelData, true);
 			}
 
-			const message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
+			const message = await this.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
 			if (message) {
 				this.send(message, channelData);
 			}

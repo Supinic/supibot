@@ -272,7 +272,7 @@ class CytubeClient {
 				this.mirror(execution.reply, userData, true);
 			}
 
-			const message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
+			const message = await this.controller.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
 			if (message) {
 				this.send(message);
 			}

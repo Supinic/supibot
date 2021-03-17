@@ -328,14 +328,12 @@ module.exports = class DiscordController extends require("./template.js") {
 		}
 
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
-			const message = await sb.Master.prepareMessage(execution.reply, null, {
-				platform: this.platform
-			});
+			const message = await this.prepareMessage(execution.reply, null);
 
 			this.pm(message, userData);
 		}
 		else {
-			const message = await sb.Master.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
+			const message = await this.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
 			this.send(message, channelData);
 		}
 	}
