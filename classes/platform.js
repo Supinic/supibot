@@ -222,6 +222,13 @@ module.exports = class Platform extends require("./template.js") {
 		return await this.controller.fetchChannelEmotes(channelData);
 	}
 
+	async prepareMessage (message, channel, options = {}) {
+		return this.controller(message, channel, {
+			...options,
+			platform: options.platform ?? this
+		});
+	}
+
 	getCacheKey () {
 		return `sb-platform-${this.Name}`;
 	}

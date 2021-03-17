@@ -365,6 +365,10 @@ module.exports = class Channel extends require("./template.js") {
         return fallbackEmote;
     }
 
+    async prepareMessage (message, options = {}) {
+        return await this.Platform.prepareMessage(message, this, options);
+    }
+
     getCacheKey () {
         return `sb-channel-${this.ID}`;
     }
