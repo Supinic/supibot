@@ -67,6 +67,8 @@
 		 */
 		async prepareMessage (message, channel, options = {}) {
 			console.warn("Master.prepareMessage is depreacted");
+			options.platform = options.platform ?? sb.Channel.get(channel).Platform ?? null;
+
 			return await options.platform.controller.prepareMessage(message, channel, options);
 		}
 	}
