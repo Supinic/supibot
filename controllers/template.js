@@ -87,6 +87,51 @@ module.exports = class Controller {
 	 */
 	async fetchGlobalEmotes () { return []; }
 
+	async prepareMessage (message, channel, options = {}) {
+		let channelData = null;
+		let limit = Infinity;
+
+		if (channel !== null) {
+			channelData = sb.Channel.get(channel);
+
+			// Read-only/Inactive/Nonexistent - do not send anything
+			if (!channelData || channelData.Mode === "Read" || channelData.Mode === "Inactive") {
+				return false;
+			}
+
+			// Remove all links, if the channel requires it
+			if (!channelData.Links_Allowed) {
+				// replace all links with a placeholder
+				message = message.replace(sb.Config.get("LINK_REGEX"), "[LINK]");
+			}
+
+			if (!options.skipLengthCheck) {
+				limit = channelData.Message_Limit ?? channelData.Platform.Message_Limit;
+			}
+		}
+
+		message = sb.Utils.wrapString(message, limit);
+
+		// Execute all eligible banphrases, if necessary
+		if (!options.skipBanphrases && sb.Banphrase) {
+			const { passed, string } = await sb.Banphrase.execute(message, channelData);
+			if (!passed) {
+				if (options.returnBooleanOnFail) {
+					return passed;
+				}
+			}
+
+			message = string;
+		}
+
+		// If the result is not string, do not reply at all.
+		if (typeof message !== "string") {
+			return false;
+		}
+
+		return message;
+	}
+
 	restart () { }
 
 	destroy () { }
