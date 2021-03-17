@@ -44,7 +44,7 @@ module.exports = {
 		const loadDirection = (loadRatio > 1) ? "rising" : (loadRatio < 1) ? "falling" : "steady";
 		const loadChange = (loadDelta > 0.10) ? " sharply" : (loadDelta > 0) ? " steadily" : "";
 
-		const uptime = sb.Runtime?.started ?? new sb.Date().addSecond(-process.uptime());
+		const uptime = sb.Runtime?.started ?? new sb.Date().addSeconds(-process.uptime());
 		const data = {
 			Uptime: sb.Utils.timeDelta(uptime).replace("ago", "").trim(),
 			Temperature: temperature.stdout.match(/([\d.]+)/)[1] + "°C",
