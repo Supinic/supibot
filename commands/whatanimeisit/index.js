@@ -60,6 +60,7 @@ module.exports = {
 				Best match for your picture:
 				${name}
 				${descriptor.join("")}
+				-
 				around ${time}.
 				Similarity score: ${similarity}% 
 			`
