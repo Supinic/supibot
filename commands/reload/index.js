@@ -43,8 +43,6 @@ module.exports = {
 			default: return { reply: "Unrecognized module!" };
 		}
 	
-		sb.Master.reloaded = new sb.Date();
-	
 		return {
 			reply: "Reloaded successfully."
 		};
