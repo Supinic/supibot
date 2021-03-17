@@ -43,10 +43,11 @@ module.exports = {
 		const loadDelta = Math.abs(1 - loadRatio);
 		const loadDirection = (loadRatio > 1) ? "rising" : (loadRatio < 1) ? "falling" : "steady";
 		const loadChange = (loadDelta > 0.10) ? " sharply" : (loadDelta > 0) ? " steadily" : "";
-	
+
+		const uptime = sb.Runtime?.started ?? new sb.Date().addSecond(-process.uptime());
 		const data = {
-			Uptime: sb.Utils.timeDelta(sb.Master.started).replace("ago", "").trim(),
-			Temperature: temperature.stdout.match(/([\d\.]+)/)[1] + "°C",
+			Uptime: sb.Utils.timeDelta(uptime).replace("ago", "").trim(),
+			Temperature: temperature.stdout.match(/([\d.]+)/)[1] + "°C",
 			"Free memory": sb.Utils.formatByteSize(memoryData[2], 0) + "/" + sb.Utils.formatByteSize(memoryData[0], 0),
 			"CPU usage": (min5 === 0)
 				? "No stats available"
