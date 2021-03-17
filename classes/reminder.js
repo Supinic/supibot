@@ -152,7 +152,7 @@ module.exports = class Reminder extends require("./template.js") {
                         channelData.Platform.controller.mirror(message, toUserData, channelData, false);
                     }
 
-                    message = await sb.Master.prepareMessage(message, channelData);
+                    message = await channelData.prepareMessage(message);
                     await channelData.send(message);
                 }
             }
@@ -347,7 +347,7 @@ module.exports = class Reminder extends require("./template.js") {
                 privateReply.push(`${username} - ${message}`);
             }
             else {
-                const checkedMessage = await sb.Master.prepareMessage(message, channelData);
+                const checkedMessage = await channelData.prepareMessage(message);
                 reply.push(`${username} - ${checkedMessage}`);
             }
         };
@@ -415,7 +415,7 @@ module.exports = class Reminder extends require("./template.js") {
         if (reply.length !== 0) {
             const notifySymbol = (channelData.Platform.Name === "discord") ? "@" : "";
             const checkedUsername = `${notifySymbol}${targetUserData.Name},`;
-            const checkResult = await sb.Master.prepareMessage(checkedUsername, channelData, {
+            const checkResult = await channelData.prepareMessage(checkedUsername, {
                 returnBooleanOnFail: true,
                 skipLengthCheck: true
             })
@@ -424,7 +424,7 @@ module.exports = class Reminder extends require("./template.js") {
             let message = "reminders from: " + reply.join("; ");
 
             // Check banphrases and do not check length limits, because it is later split manually
-            message = await sb.Master.prepareMessage(message, channelData, {
+            message = await channelData.prepareMessage(message, {
                 returnBooleanOnFail: true,
                 skipLengthCheck: true
             });

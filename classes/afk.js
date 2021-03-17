@@ -115,8 +115,8 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			const message = `${userData.Name} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
 
 			let fixedMessage = (await Promise.all([
-				sb.Master.prepareMessage(userData.Name + " " + status + ":", channelData),
-				sb.Master.prepareMessage(data.Text || "(no message)", channelData),
+				channelData.prepareMessage(`${userData.Name} ${status}: `),
+				channelData.prepareMessage(data.Text ?? "(no message)"),
 				"(" + sb.Utils.timeDelta(data.Started) + ")"
 			])).join(" ");
 

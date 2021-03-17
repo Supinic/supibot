@@ -223,9 +223,9 @@ module.exports = class Platform extends require("./template.js") {
 	}
 
 	async prepareMessage (message, channel, options = {}) {
-		return this.controller(message, channel, {
+		return await this.controller.prepareMessage(message, channel, {
 			...options,
-			platform: options.platform ?? this
+			platform: options.platform ?? this // deprecated - should be removed
 		});
 	}
 
