@@ -12,7 +12,8 @@ module.exports = {
 		if (!link) {
 			return {
 				success: false,
-				reply: `No link provided!`
+				reply: `No link provided!`,
+				cooldown: 2500
 			};
 		}
 
