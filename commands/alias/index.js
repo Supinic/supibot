@@ -49,7 +49,7 @@ module.exports = {
 						return context.channel?.Description ?? context.channel?.Name ?? "[whispers]";
 					}
 					else {
-						return match;
+						return total;
 					}
 				});
 
