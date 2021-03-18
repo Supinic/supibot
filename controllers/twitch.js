@@ -839,7 +839,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		let preparedMessage = await super.prepareMessage(message, channel, options);
 
 		if (channel === null) {
-			const limit = this.platform.Message_Limit -= options.extraLength;
+			const limit = this.platform.Message_Limit - options.extraLength;
 			preparedMessage = sb.Utils.wrapString(preparedMessage, limit);
 		}
 
