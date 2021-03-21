@@ -243,7 +243,11 @@ module.exports = {
 									row.values.Notes = `Testing updated by author: ${args.join(" ")}\n\n${row.values.Notes}`;
 								}
 							}
-	
+
+							if (!row.values.Category) {
+								row.values.Category = "Void";
+							}
+
 							await row.save();
 	
 							return {
