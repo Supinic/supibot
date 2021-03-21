@@ -479,13 +479,13 @@ module.exports = {
 					const userData = await sb.User.get(user, true);
 					return {
 						reply: sb.Utils.tag.trim `
-						Suggestion ID ${ID}
-						from ${userData.Name}:
-						status ${status}
-						(posted ${sb.Utils.timeDelta(date)}${updated}):
-						${text}
-						Detail: https://supinic.com/data/suggestion/${ID}
-					`
+							Suggestion ID ${ID}
+							from ${userData.Name}:
+							status ${status ?? "Pending review"}
+							(posted ${sb.Utils.timeDelta(date)}${updated}):
+							${text}
+							Detail: https://supinic.com/data/suggestion/${ID}
+						`
 					};
 				}
 			},
