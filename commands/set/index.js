@@ -232,8 +232,8 @@ module.exports = {
 								reply: "That suggestion was not created by you!"
 							};
 						}
-						else if (row.values.Status === "New" || row.values.Status === "Needs testing") {
-							if (row.values.Status === "New") {
+						else if (!row.values.Status || row.values.Status === "New" || row.values.Status === "Needs testing") {
+							if (!row.values.Status || row.values.Status === "New") {
 								row.values.Status = "Dismissed by author";
 								row.values.Priority = null;
 							}
