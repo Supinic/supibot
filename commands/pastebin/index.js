@@ -61,7 +61,9 @@ module.exports = {
 			}
 			else {
 				data = await sb.Pastebin.get(path);
-				await this.setCacheData(path, data); // no expiry
+				await this.setCacheData(path, data, {
+					expiry: 30 * 864e5
+				});
 			}
 
 			if (!data) {

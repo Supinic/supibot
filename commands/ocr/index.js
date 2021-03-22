@@ -113,7 +113,9 @@ module.exports = {
 
 			// set cache with no expiration - only if request didn't time out
 			if (!data.ErrorMessage || !data.ErrorMessage.some(i => i.includes("Timed out"))) {
-				await this.setCacheData(key, { data, statusCode });
+				await this.setCacheData(key, { data, statusCode }, {
+					expiry: 30 * 864e5
+				});
 			}
 		}
 	
