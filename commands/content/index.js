@@ -12,22 +12,22 @@ module.exports = {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("Category", "Status", "User_Alias")
 			.from("data", "Suggestion")
-			.where("Status IN %s+", ["New", "Approved"])
+			.where("Status IS NULL OR Status = %s", "Approved")
 		);
 	
 		const count = {
 			approved: 0,
-			bot: 0,
+			botRequest: 0,
 			new: 0,
 			self: 0
 		};
 	
 		for (const item of data) {
-			if (item.Category === "Uncategorized" && item.Status === "New") {
+			if (item.Category === null && item.Status === null) {
 				count.new++
 			}
 			else if (item.Category === "Bot addition" && item.Status === "Approved") {
-				count.bot++;
+				count.botRequest++;
 			}
 			else {
 				if (item.User_Alias === 1) {
@@ -42,7 +42,7 @@ module.exports = {
 		return {
 			reply: sb.Utils.tag.trim `
 				Content status: 
-				${count.bot} bot requests,
+				${count.botRequest} bot requests,
 				${count.new} new suggestions,				
 				and ${count.self + count.approved} (out of which ${count.self} are from supi)
 				are approved and waiting!
