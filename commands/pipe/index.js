@@ -14,7 +14,10 @@ module.exports = {
 	Code: (async function pipe (context, ...args) {
 		const invocations = args.join(" ").split(/[|>]/).map(i => i.trim());
 		if (!context.externalPipe && invocations.length < 2) {
-			return { reply: "At least two commands must be piped together!" };
+			return {
+				success: false,
+				reply: "At least two commands must be piped together!"
+			};
 		}
 	
 		let aliased = false;
