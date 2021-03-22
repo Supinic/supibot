@@ -18,8 +18,7 @@ module.exports = {
 		const count = {
 			approved: 0,
 			botRequest: 0,
-			new: 0,
-			self: 0
+			new: 0
 		};
 	
 		for (const item of data) {
@@ -30,22 +29,17 @@ module.exports = {
 				count.botRequest++;
 			}
 			else {
-				if (item.User_Alias === 1) {
-					count.self++;
-				}
-				else {
-					count.approved++;
-				}
+				count.approved++;
 			}
 		}
 	
 		return {
 			reply: sb.Utils.tag.trim `
 				Content status: 
-				${count.botRequest} bot requests,
 				${count.new} new suggestions,				
-				and ${count.self + count.approved} (out of which ${count.self} are from supi)
-				are approved and waiting!
+				${count.approved} approved suggestions,
+				${count.new + count.approved} total.				
+				${count.botRequest} bot requests.
 			`
 		};
 	}),
