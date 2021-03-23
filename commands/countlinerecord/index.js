@@ -28,6 +28,13 @@ module.exports = {
 				.single()
 			)
 		]);
+		
+		if (!amountData || !lengthData) {
+			return {
+				success: false,
+				reply: `This channel doesn't have enough data saved just yet!`
+			};
+		}
 	
 		return {
 			reply: [
