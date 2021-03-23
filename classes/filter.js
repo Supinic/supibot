@@ -207,12 +207,13 @@ module.exports = class Filter extends require("./template.js") {
 				};
 			}
 		}
+
 		if (command.Flags.block && userTo) {
 			const userFrom = user;
 			const block = localFilters.find(i => (
 				i.Type === "Block"
 				&& i.User_Alias === userTo.ID
-				&& i.Blocked_User === userFrom.ID
+				&& (i.Blocked_User === userFrom.ID || i.Blocked_User === null)
 			));
 
 			if (block) {
