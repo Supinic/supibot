@@ -857,7 +857,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			searchParams: {
 				set_id: sets.join(",")
 			}
-		}).json();
+		});
 
 		if (statusCode !== 200) {
 			console.warn("Fetching Twitch emotes failed", body);
