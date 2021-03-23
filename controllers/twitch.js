@@ -852,22 +852,27 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @returns {Promise<TwitchEmoteSetDataObject[]>}
 	 */
 	static async fetchTwitchEmotes (sets) {
-		const data = await sb.Got("Leppunen", {
+		const { statusCode, body } = await sb.Got("Leppunen", {
 			url: "twitch/emoteset",
 			searchParams: {
 				set_id: sets.join(",")
 			}
-		});
+		}).json();
 
-		return data.map(set => ({
+		if (statusCode !== 200) {
+			console.warn("Fetching Twitch emotes failed", body);
+			return [];
+		}
+
+		return body.map(set => ({
 			ID: set.setID,
 			channel: {
 				name: set.channelName,
 				login: set.channelLogin,
-				ID: data.channelID
+				ID: set.channelID
 			},
 			tier: set.tier,
-			emotes: (data.emotes ?? []).map(i => ({
+			emotes: (set.emotes ?? []).map(i => ({
 				ID: i.id,
 				token: i.token
 			}))
