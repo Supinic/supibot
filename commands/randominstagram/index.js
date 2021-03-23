@@ -19,33 +19,51 @@ module.exports = {
 			};
 		}
 
-		const { statusCode, body: data } = await sb.Got("FakeAgent", {
-			url: `https://www.instagram.com/${user}/`,
-			searchParams: {
-				"__a": "1"
-			},
-			throwHttpErrors: false,
-			responseType: "json",
-			hooks: {
-				beforeRedirect: [
-					(options, res) => {
-						if (300 <= res.statusCode && res.statusCode <= 399) {
-							throw new sb.errors.GenericRequestError({
-								statusCode: 403,
-								statusMessage: "Forbidden",
-								hostname: "instagram.com",
-								message: "Temporarily blocked - try again later"
-							});
+		user = user.toLowerCase();
+
+		let statusCode;
+		let data;
+		const profileCacheData = await this.getCacheData({ user });
+		if (profileCacheData) {
+			statusCode = profileCacheData.statusCode;
+			data = profileCacheData.data;
+		}
+		else {
+			const response = await sb.Got("FakeAgent", {
+				url: `https://www.instagram.com/${user}/`,
+				searchParams: {
+					"__a": "1"
+				},
+				throwHttpErrors: false,
+				responseType: "json",
+				hooks: {
+					beforeRedirect: [
+						(options, res) => {
+							if (300 <= res.statusCode && res.statusCode <= 399) {
+								throw new sb.errors.GenericRequestError({
+									statusCode: 403,
+									statusMessage: "Forbidden",
+									hostname: "instagram.com",
+									message: "Temporarily blocked - try again later"
+								});
+							}
 						}
-					}
-				]
-			}
-		});
+					]
+				}
+			});
+
+			statusCode = response.statusCode;
+			data = response.body;
+
+			await this.setCacheData({ user }, { statusCode, data }, {
+				expiry: 36e5
+			});
+		}
 
 		if (statusCode === 404) {
 			return {
 				success: false,
-				reply: `No such user found!`
+				reply: "No such user found!"
 			};
 		}
 
@@ -64,12 +82,20 @@ module.exports = {
 		const likeCount = post.edge_liked_by.count ?? 0;
 
 		if (nsfwCheck) {
-			const { statusCode: nsfwStatusCode, data: nsfwData } = await sb.Utils.checkPictureNSFW(post.display_url);
-			if (nsfwStatusCode !== 200) {
-				return {
-					success: false,
-					reply: `Fetching image data failed! Error: ${nsfwStatusCode}`
-				};
+			const nsfwCacheKey = { post: post.shortcode };
+			let nsfwData = await this.getCacheData(nsfwCacheKey);
+			if (!nsfwData) {
+				const { statusCode: nsfwStatusCode, data } = await sb.Utils.checkPictureNSFW(post.display_url);
+				if (nsfwStatusCode !== 200) {
+					return {
+						success: false,
+						reply: `Fetching image data failed! Error: ${nsfwStatusCode}`
+					};
+				}
+
+				await this.getCacheData(nsfwCacheKey, { data }, {
+					expiry: 30 * 864e5 // 1 month
+				});
 			}
 
 			const relevantDetections = nsfwData.detections.filter(i => !i.name.includes("Covered"));
