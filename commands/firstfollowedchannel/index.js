@@ -21,7 +21,10 @@ module.exports = {
 		const { follows } = await sb.Got("Kraken", {
 			url: `users/${channelID}/follows/channels`,
 			searchParams: new sb.URLParams()
-				.set("limit", "10") // If the limit is 1, and the followed channel is banned, then no response will be used...
+				// If the limit is 1, and the followed channel is banned, then no response will be used...
+				// UPDATE: apparently this can mess up the entire response if enough channels are N/A,
+				// so just skip the limit altogether...
+				// .set("limit", "10")
 				.set("direction", "asc")
 				.set("sortby", "created_at")
 				.toString()
