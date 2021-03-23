@@ -72,9 +72,11 @@ module.exports = {
 			#score = 0;
 	
 			constructor (data) {
+				let crossPostNSFW = false;
 				if (data.crosspost_parent_list && data.crosspost_parent_list.length > 0) {
+					crossPostNSFW = crossPostNSFW || data.over_18;
 					data = data.crosspost_parent_list.pop();
-					this.#crosspostOrigin = data.subreddit_name_prefixed
+					this.#crosspostOrigin = data.subreddit_name_prefixed;
 				}
 	
 				this.#author = data.author;
@@ -85,7 +87,7 @@ module.exports = {
 				this.#commentsUrl = `r/${data.subreddit}/comments/${data.id}`;
 
 				this.#isTextPost = Boolean(data.selftext && data.selftext_html);
-				this.#nsfw = Boolean(data.over_18);
+				this.#nsfw = Boolean(data.over_18) || crossPostNSFW;
 				this.#stickied = Boolean(data.stickied);
 	
 				this.#score = data.ups ?? 0;
