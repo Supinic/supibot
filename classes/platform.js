@@ -222,6 +222,24 @@ module.exports = class Platform extends require("./template.js") {
 		return await this.controller.fetchChannelEmotes(channelData);
 	}
 
+	async getBestAvailableEmote (channelData, emotes, fallbackEmote, options = {}) {
+		if (channelData) {
+			return channelData.getBestAvailableEmote(emotes, fallbackEmote, options);
+		}
+
+		const availableEmotes = await this.fetchGlobalEmotes();
+		for (const emote of emotes) {
+			const available = availableEmotes.find(i => i.name === emote);
+			if (available && (typeof options.filter !== "function" || options.filter(available))) {
+				return (options.returnEmoteObject)
+					? available
+					: available.name;
+			}
+		}
+
+		return fallbackEmote;
+	}
+
 	async prepareMessage (message, channel, options = {}) {
 		return await this.controller.prepareMessage(message, channel, {
 			...options,
