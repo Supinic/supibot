@@ -304,6 +304,19 @@ module.exports = {
 					}
 				]
 			},
+			{
+				code: "at",
+				language: "german",
+				sources: [
+					{
+						name: "ORF.at",
+						url: "https://rss.orf.at",
+						path: "",
+						endpoints: ["news.xml", "oesterreich.xml", "wien.xml"],
+						helpers: ["kalifail_disbang"]
+					}
+				]
+			},
 		],
 	
 		extra: {
