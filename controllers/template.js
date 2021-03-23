@@ -87,6 +87,18 @@ module.exports = class Controller {
 	 */
 	async fetchGlobalEmotes () { return []; }
 
+	/**
+	 * Prepares a message to be sent in the provided channel.
+	 * Checks banphrases, respects length limits.
+	 * Ignores if channel is inactive or read-only
+	 * @param {string} message
+	 * @param {Channel} channel
+	 * @param {Object} options = {}
+	 * @param {Platform} [options.platform] Platform object, if necessary. Usually used for PMs.
+	 * @param {boolean} [options.skipBanphrases] If true, no banphrases will be checked
+	 * @param {boolean} [options.skipLengthCheck] If true, length will not be checked
+	 * @returns {Promise<String|Boolean>} Returns prepared message, or false if nothing is to be sent (result is ignored)
+	 */
 	async prepareMessage (message, channel, options = {}) {
 		let channelData = null;
 		let limit = Infinity;
