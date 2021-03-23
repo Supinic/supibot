@@ -30,10 +30,15 @@ module.exports = {
 				reply: "Invalid channel provided!"
 			};
 		}
-		else if (context.channel?.ID === targetChannel.ID)  {
+		else if (context.channel && context.channel.ID === targetChannel.ID)  {
+			const emote = await context.channel.getBestAvailableEmote(
+				["PepeLaugh", "pepeLaugh", "LULW", "LuL", "LUL", "4HEad", "4Head"],
+				"😀"
+			);
+
 			return {
 				success: false,
-				reply: "Don't you think it's a bit silly to bancheck the channel you're in? PepeLaugh"
+				reply: `Don't you think it's a bit silly to bancheck the channel you're in? ${emote}`
 			};
 		}
 	
