@@ -72,7 +72,6 @@ module.exports = {
 			}
 		}
 	
-	
 		const { controller } = sb.Platform.get("twitch");
 		const [userID, channelID] = await Promise.all([
 			controller.getUserID(user),
