@@ -33,9 +33,12 @@ module.exports = {
 			const tomorrow = new sb.Date().addDays(1);
 			const nextMidnight = new sb.Date(sb.Date.UTC(tomorrow.getUTCFullYear(), tomorrow.getUTCMonth(), tomorrow.getUTCDate()));
 			const delta = sb.Utils.timeDelta(nextMidnight);
-	
+
+			const rudeRoll = sb.Utils.random(1, 100);
 			return {
-				reply: `You already opened or gifted a fortune cookie today. You can get another one at midnight UTC, which is ${delta}.`
+				reply: (rudeRoll === 99)
+					? `Stop stuffing your face so often! What are you doing, do you want to get fat? Get another cookie ${delta}.`
+					: `You already opened or gifted a fortune cookie today. You can get another one at midnight UTC, which is ${delta}.`
 			};
 		}
 	
