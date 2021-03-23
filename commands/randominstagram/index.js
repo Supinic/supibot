@@ -85,15 +85,16 @@ module.exports = {
 			const nsfwCacheKey = { post: post.shortcode };
 			let nsfwData = await this.getCacheData(nsfwCacheKey);
 			if (!nsfwData) {
-				const { statusCode: nsfwStatusCode, data } = await sb.Utils.checkPictureNSFW(post.display_url);
-				if (nsfwStatusCode !== 200) {
+				const response = await sb.Utils.checkPictureNSFW(post.display_url);
+				if (response.statusCode !== 200) {
 					return {
 						success: false,
 						reply: `Fetching image data failed! Error: ${nsfwStatusCode}`
 					};
 				}
 
-				await this.getCacheData(nsfwCacheKey, { data }, {
+				nsfwData = response.data;
+				await this.getCacheData(nsfwCacheKey, response.data, {
 					expiry: 30 * 864e5 // 1 month
 				});
 			}
