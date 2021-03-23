@@ -17,6 +17,7 @@ module.exports = {
 		if (!channel) {
 			if (!context.channel) {
 				return {
+					success: false,
 					reply: "There is no channel to use here!"
 				};
 			}
@@ -34,6 +35,7 @@ module.exports = {
 	
 			if (!channel) {
 				return {
+					success: false,
 					reply: "Could not find any associated Twitch channels! Please specify one."
 				};
 			}
@@ -45,10 +47,28 @@ module.exports = {
 	
 		if (user === channel.toLowerCase()) {
 			if (user === context.user.Name) {
-				return { reply: "Good luck following yourself! PepeLaugh" };
+				const emote = await context.platform.getBestAvailableEmote(
+					context.channel,
+					["PepeLaugh", "pepeLaugh", "LULW", "LuL", "LUL", "4HEad", "4Head"],
+					"😀"
+				);
+
+				return {
+					success: false,
+					reply: `Good luck following yourself! ${emote}`
+				};
 			}
 			else {
-				return { reply: "You can't follow yourself!" };
+				const emote = await context.platform.getBestAvailableEmote(
+					context.channel,
+					["FeelsDankMan", "FailFish"],
+					"🙄"
+				);
+
+				return {
+					success: false,
+					reply: `You can't follow yourself! ${emote}`
+				};
 			}
 		}
 	
@@ -61,6 +81,7 @@ module.exports = {
 	
 		if (!userID || !channelID) {
 			return {
+				success: false,
 				reply: "One or both users were not found!"
 			};
 		}
