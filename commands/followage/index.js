@@ -67,7 +67,7 @@ module.exports = {
 
 				return {
 					success: false,
-					reply: `You can't follow yourself! ${emote}`
+					reply: `People can't follow themselves! ${emote}`
 				};
 			}
 		}
