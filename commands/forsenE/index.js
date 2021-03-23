@@ -40,7 +40,7 @@ module.exports = {
 				"So apparently I’m unbanned! I’ll cu guys tomorrow at 7pm cet. Thats all.",
 				"Happy new years boys and girls. You know 2021 is gonna be EZ clap for the god gamer.",
 				"What do i use the left click for? Oh... farming blocks..."
-	],
+			],
 			notes: [
 				`Source for the "b." tweet: https://twitter.com/Forsen/status/1057549668253659136`,
 				`Source for the Cyborgmatt tweet (tweeted at DotA guy for access to league autochess) https://i.imgur.com/sILIqzj.png`,
