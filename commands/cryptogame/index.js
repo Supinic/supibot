@@ -13,6 +13,7 @@ module.exports = {
             Description: "Regularly updates the prices used in the crypto-game command.",
             Expression: "0 0 * * * *",
             Code: (async function cryptoGamePriceUpdate () {
+                const ignoredAssets = ["VEF"];
                 const totalData = {};
                 const [cryptoData, currencyData, goldData, silverData] = await Promise.all([
                     sb.Got({
@@ -53,6 +54,9 @@ module.exports = {
                 const uppercaseOnly = /^[A-Z]+$/;
                 const promises = Object.entries(totalData).map(async ([code, value]) => {
                     if (!uppercaseOnly.test(code)) {
+                        return;
+                    }
+                    else if  (ignoredAssets.includes(code)) {
                         return;
                     }
 
