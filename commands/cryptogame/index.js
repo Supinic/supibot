@@ -555,10 +555,18 @@ module.exports = {
     }),
     Dynamic_Description: (async (prefix) => {
         return [
-            `<b>The Crypto Game</b> presented by Supinic`,
-            "Receive €1000 as your starting value and invest it to various currencies and assets to profit, or crash!",
+            `<h4>The Crypto Game</h4>`,
+            "Register your portfolio, receive some fake cash, invest it to various currencies and assets!",
+            "Who will be the one to profit, or crash the most?",
             "Guaranteed - zero connection to real world, so you're not at risk of losing anything (besides your dignity).",
-            "<b>Important note:</b> The game uses euro (EUR, €) as the base currency. All transactions must use it as the base.",
+            "",
+
+            "Playing this game does not entitle you to any currency in real life.",
+            "Therefore, using this command is not gambling. You do not \"earn\" anything.",
+            "",
+
+            "This crypto-game uses euro (EUR, €) as the base currency.",
+            "All transactions and commands use euro as the base.",
             "",
 
             "<h5>Main sub-commands</h5>",
@@ -577,8 +585,8 @@ module.exports = {
             "Exchanges an equivalent amount of whatever asset you selected back to euros.",
             "",
 
-            `<code>${prefix}cg buy all (amount)</code>`,
-            `<code>${prefix}cg sell all (amount)</code>`,
+            `<code>${prefix}cg buy all (asset)</code>`,
+            `<code>${prefix}cg sell all (asset)</code>`,
             "You can use the key word \"all\" to exchange all of the asset you have, instead of specifying an amount.",
             "",
 
@@ -596,12 +604,14 @@ module.exports = {
 
             `<code>${prefix}cg assets</code>`,
             `<code>${prefix}cg prices</code>`,
-            `Posts a link to the list of assets and their current prices. You can check it here: <a href="/crypto-game/asset/list">List</a>`,
+            "Posts a link to the list of assets and their current prices.",
+            `You can check it here: <a href="/crypto-game/asset/list">List</a>`,
             "",
 
             `<code>${prefix}cg portfolios</code>`,
             `<code>${prefix}cg leaderboard</code>`,
-            `Posts a link to the list of portfolios, their owners, and the converted total prices. You can check it here: <a href="/crypto-game/portfolios/list">List</a>`,
+            "Posts a link to the list of portfolios, their owners, and the converted total prices.",
+            `You can check it here: <a href="/crypto-game/portfolios/list">List</a>`,
             "",
         ]
     })
