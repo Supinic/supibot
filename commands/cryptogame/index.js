@@ -3,7 +3,7 @@ module.exports = {
     Aliases: ["cg"],
     Author: "supinic",
     Cooldown: 5000,
-    Description: "Crypto game command! Receive the equivalent of €1000 on your \"portfolio\" and invest them into various currencies and assets to see how well you can increase your worth. Who shall become the best investor Supibot has ever known?",
+    Description: "Crypto game command! Receive the equivalent of €1000 on your \"portfolio\" and invest them into various currencies and assets to see how well you can increase your worth. Who shall become the best investor Supibot-land has ever known?",
     Flags: ["mention","non-nullable","pipe"],
     Params: null,
     Whitelist_Response: null,
@@ -546,5 +546,51 @@ module.exports = {
             }
         }
     }),
-    Dynamic_Description: null
+    Dynamic_Description: (async (prefix) => {
+        return [
+            `<b>The Crypto Game</b> presented by Supinic`,
+            "Receive €1000 as your starting value and invest it to various currencies and assets to profit, or crash!",
+            "Guaranteed - zero connection to real world, so you're not at risk of losing anything (besides your dignity).",
+            "<b>Important note:</b> The game uses euro (EUR, €) as the base currency. All transactions must use it as the base.",
+            "",
+
+            "<h5>Main sub-commands</h5>",
+
+            `<code>${prefix}cg register</code>`,
+            "Registers you for the game, establishing your portfolio with 1000 EUR.",
+            "",
+
+            `<code>${prefix}cg buy (amount) (asset)</code>`,
+            `<code>${prefix}cg buy 1 BTC</code>`,
+            "Exchanges an equivalent amount of euros for however many of another asset you selected.",
+            "",
+
+            `<code>${prefix}cg sell (amount) (asset)</code>`,
+            `<code>${prefix}cg sell 100 DOGE</code>`,
+            "Exchanges an equivalent amount of whatever asset you selected back to euros.",
+            "",
+
+            `<code>${prefix}cg buy all (amount)</code>`,
+            `<code>${prefix}cg sell all (amount)</code>`,
+            "You can use the key word \"all\" to exchange all of the asset you have, instead of specifying an amount.",
+            "",
+
+            "<h5>Supplementary sub-commands</h5>",
+
+            `<code>${prefix}cg check</code>`,
+            `<code>${prefix}cg check (user)</code>`,
+            `Shows how much of each asset you (or a different user) have in your current portfolio.`,
+            "",
+
+            `<code>${prefix}cg total</code>`,
+            `<code>${prefix}cg total (user)</code>`,
+            `Shows the total converted cost of your (or a different users's) portfolio in euros.`,
+            "",
+
+            `<code>${prefix}cg assets</code>`,
+            `<code>${prefix}cg prices</code>`,
+            `Posts a link to the list of assets and their current prices. You can check it here: <a href="/crypto-game/asset/list">List</a>`,
+            "",
+        ]
+    })
 };
