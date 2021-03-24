@@ -228,16 +228,16 @@ module.exports = class DiscordController extends require("./template.js") {
 		const channelData = sb.Channel.get(channel, this.platform);
 		const channelObject = this.client.channels.cache.get(channelData.Name);
 		if (!channelObject) {
-			console.warn("No channel available!", channel);
+			console.warn("No Discord channel available!", channel);
 			return;
 		}
 
 		if (channelObject.guild) {
-			const wordList = message.split(/\W+/).filter(Boolean);
+			const wordSet = new Set(message.split(/\W+/).filter(Boolean));
 			const globalEmotesMap = this.client.emojis.cache;
 			const guildEmotesMap = channelObject.guild.emojis.cache;
 
-			for (const word of wordList) {
+			for (const word of wordSet) {
 				// First, attempt to find a unique global emoji available to the bot
 				let emote;
 				const globalEmotes = globalEmotesMap.filter(i => i.name === word);
