@@ -56,7 +56,7 @@ module.exports = {
                     if (!uppercaseOnly.test(code)) {
                         return;
                     }
-                    else if  (ignoredAssets.includes(code)) {
+                    else if (ignoredAssets.includes(code)) {
                         return;
                     }
 
