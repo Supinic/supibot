@@ -29,10 +29,13 @@ module.exports = {
 		const queue = [];
 		const dir = this.staticData.dir[processType];
 		const pm2 = this.staticData.pm2[processType];
+		const respond = (context.channel)
+			? (string) => context.channel.send(string)
+			: (string) => context.platform.pm(context.user.Name, string);
 	
 		if (types.includes("all") || types.includes("pull")) {
 			queue.push(async () => {
-				await context.channel.send("VisLaud 👉 git pull origin master");
+				await respond("VisLaud 👉 git pull origin master");
 	
 				await shell(`git -C ${dir} checkout -- yarn.lock package.json`);
 				const result = await shell(`git -C ${dir} pull origin master`);
@@ -41,7 +44,7 @@ module.exports = {
 		}
 		if (types.includes("all") || types.includes("yarn") || types.includes("upgrade")) {
 			queue.push(async () => {
-				await context.channel.send("VisLaud 👉 yarn upgrade supi-core");
+				await respond("VisLaud 👉 yarn upgrade supi-core");
 	
 				const result = await shell(`yarn --cwd ${dir} upgrade supi-core`);
 				console.log("upgrade result", { stdout: result.stdout, stderr: result.stderr });
@@ -49,7 +52,7 @@ module.exports = {
 		}
 	
 		queue.push(async () => {
-			await context.channel.send("VisLaud 👉 Restarting process");
+			await respond("VisLaud 👉 Restarting process");
 			setTimeout(() => shell(pm2), 1000);
 		});
 	
