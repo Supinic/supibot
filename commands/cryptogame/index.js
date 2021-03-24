@@ -323,7 +323,7 @@ module.exports = {
         };
 
         return {
-            availableCommands: ["assets", "buy", "check", "register", "prices", "sell", "total"],
+            availableCommands: ["assets", "buy", "check", "leaderboard", "register", "portfolios", "prices", "sell", "total"],
             destroy,
 
             baseAsset,
@@ -389,6 +389,13 @@ module.exports = {
             case "prices": {
                 return {
                     reply: `Check the available assets and their prices here: https://supinic.com/crypto-game/asset/list`
+                };
+            }
+
+            case "leaderboard":
+            case "portfolios": {
+                return {
+                    reply: `Check the portfolio leaderboard here: https://supinic.com/crypto-game/portfolio/list`
                 };
             }
 
@@ -590,6 +597,11 @@ module.exports = {
             `<code>${prefix}cg assets</code>`,
             `<code>${prefix}cg prices</code>`,
             `Posts a link to the list of assets and their current prices. You can check it here: <a href="/crypto-game/asset/list">List</a>`,
+            "",
+
+            `<code>${prefix}cg portfolios</code>`,
+            `<code>${prefix}cg leaderboard</code>`,
+            `Posts a link to the list of portfolios, their owners, and the converted total prices. You can check it here: <a href="/crypto-game/portfolios/list">List</a>`,
             "",
         ]
     })
