@@ -31,7 +31,7 @@ module.exports = {
 		const pm2 = this.staticData.pm2[processType];
 		const respond = (context.channel)
 			? (string) => context.channel.send(string)
-			: (string) => context.platform.pm(context.user.Name, string);
+			: (string) => context.platform.pm(string, context.user.Name);
 	
 		if (types.includes("all") || types.includes("pull")) {
 			queue.push(async () => {
