@@ -4,8 +4,11 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Posts the channels supibot is currently subscribed to on Twitch, along with a sample sub emote to each.",
-	Flags: ["pipe"],
-	Params: null,
+	Flags: ["use-params"],
+	Params: [
+		{ name: "emoteOnly", type: "boolean" },
+		{ name: "emotesOnly", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function botSubs (context) {
@@ -33,8 +36,15 @@ module.exports = {
 	
 		result.sort((a, b) => a.channel.localeCompare(b.channel));
 
-		const channels = result.map(i => i.channel).join(", ");
 		const emotes = result.map(i => i.emote).join(" ");
+		if (context.params.emoteOnly || context.params.emotesOnly) {
+			return {
+				success: false,
+				reply: emotes
+			};
+		}
+
+		const channels = result.map(i => i.channel).join(", ");
 		let message = `Supibot is currently subbed to: ${channels} -- ${emotes}`;
 
 		const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
