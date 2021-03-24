@@ -3,7 +3,7 @@ module.exports = {
     Aliases: ["cg"],
     Author: "supinic",
     Cooldown: 5000,
-    Description: "Beta test of the fabled SupiCryptoGame™. Feel free to test, but your portfolios will probably get reset on full release! ",
+    Description: "Crypto game command! Receive the equivalent of €1000 on your \"portfolio\" and invest them into various currencies and assets to see how well you can increase your worth. Who shall become the best investor Supibot has ever known?",
     Flags: ["mention","non-nullable","pipe"],
     Params: null,
     Whitelist_Response: null,
