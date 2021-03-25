@@ -27,12 +27,6 @@ module.exports = {
 				reply: "Moderators can't be timed out, cheaters!"
 			};
 		}
-		else if (context.append.userBadges.hasGlobalMod) {
-			return {
-				success: false,
-				reply: "Global moderators can't be timed out, cheaters!"
-			};
-		}
 		else if (context.append.userBadges.hasBroadcaster) {
 			return {
 				success: false,
