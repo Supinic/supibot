@@ -152,9 +152,11 @@ module.exports = {
 	
 			finalResult = result;
 		}
-	
+
+		const lastCommand = sb.Command.get(invocations[invocations.length - 1]);
 		return {
 			aliased,
+			skipAliasPrefix: Boolean(lastCommand.Flags.skipBanphrase),
 			replyWithPrivateMessage: Boolean(finalResult?.replyWithPrivateMessage),
 			reply: currentArgs.join(" ")
 		};
