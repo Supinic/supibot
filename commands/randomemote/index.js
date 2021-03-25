@@ -59,7 +59,7 @@ module.exports = {
 		});
 
 		return {
-			reply: [...Array(repeats)].map(() => sb.Utils.randArray(emotes)).join(" ")
+			reply: [...Array(repeats)].map(() => sb.Utils.randArray(emotes).token).join(" ")
 		};
 	}),
 	Dynamic_Description: (async (prefix, values) => {
