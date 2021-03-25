@@ -15,7 +15,7 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		limit: 10
+		limit: 50
 	})),
 	Code: (async function randomEmote (context, number = 1) {
 		const repeats = Number(number);
