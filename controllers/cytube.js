@@ -221,9 +221,43 @@ class CytubeClient {
 			this.currentlyPlaying = this.playlistData.shift() ?? null;
 		});
 
-		client.on("emoteList", (emoteList, ...args) => {
-			console.log(this.channelData.Name, emoteList, args);
-			this.emotes = emoteList;
+		// This listener assumes that the emote list is only ever passed post-login.
+		client.on("emoteList", (emoteList) => {
+			if (!emoteList) {
+				console.warn("emoteList event received no emotes", {
+					channelID: this.channelData.ID,
+					channelName: this.channelData.Name
+				});
+
+				return;
+			}
+
+			this.emotes = emoteList.map(CytubeClient.parseEmote);
+		});
+
+		client.on("updateEmote", (emote) => {
+			const exists = this.emotes.find(i => i.name === emote.name);
+			if (!exists) {
+				const emoteData = CytubeClient.parseEmote(emote);
+				this.emotes.push(emoteData);
+			}
+			else {
+				exists.animated = Boolean(emote.image && emote.image.includes(".gif"));
+			}
+		});
+
+		client.on("renameEmote", (emote) => {
+			const exists = this.emotes.find(i => i.name === emote.old);
+			if (exists) {
+				exists.name = emote.name;
+			}
+		});
+
+		client.on("removeEmote", (emote) => {
+			const index = this.emotes.findIndex(i => i.name === emote.namw);
+			if (index !== -1) {
+				this.emotes.splice(index, 1);
+			}
 		});
 
 		// Disconnect event fired - restart and reconnect
@@ -368,6 +402,15 @@ class CytubeClient {
 		this.controller = null;
 	}
 
+	static parseEmote (emote) {
+		return {
+			ID: null,
+			name: emote.name,
+			type: "cytube",
+			global: false,
+			animated: Boolean(emote.image && emote.image.includes(".gif"))
+		};
+	}
 	/**
 	 * @typedef {Object} CytubeUserPresence
 	 * @property {string} name User name
