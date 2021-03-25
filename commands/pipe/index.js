@@ -151,7 +151,7 @@ module.exports = {
 				currentArgs = sb.Utils.wrapString(result.reply, 2000).split(" ");
 			}
 
-			lastCommand = command;
+			lastCommand = check;
 			finalResult = result;
 		}
 
