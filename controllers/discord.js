@@ -397,8 +397,19 @@ module.exports = class DiscordController extends require("./template.js") {
 		return emojis.map(i => ({
 			ID: i.id,
 			name: i.name,
-			type: "discord-guild",
-			animated: i.animated
+			type: "discord",
+			global: false,
+			animated: (i.animated)
+		}));
+	}
+
+	async fetchGlobalEmotes () {
+		return this.client.emojis.cache.array().map(i => ({
+			ID: i.id,
+			name: i.name,
+			type: "discord",
+			global: true,
+			animated: (i.animated)
 		}));
 	}
 
