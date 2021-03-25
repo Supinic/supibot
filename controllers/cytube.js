@@ -4,6 +4,7 @@ class CytubeClient {
 	client = null;
 	controller = null;
 	channelData = null;
+	emotes = [];
 	playlistData = [];
 	currentlyPlaying = null;
 	restarting = false;
@@ -218,6 +219,11 @@ class CytubeClient {
 		// Video finished playing
 		client.on("changeMedia", () => {
 			this.currentlyPlaying = this.playlistData.shift() ?? null;
+		});
+
+		client.on("emoteList", (emoteList, ...args) => {
+			console.log(this.channelData.Name, emoteList, args);
+			this.emotes = emoteList;
 		});
 
 		// Disconnect event fired - restart and reconnect
@@ -493,6 +499,21 @@ module.exports = class CytubeController extends require("./template.js") {
 		}
 
 		return client.fetchUserList();
+	}
+
+	async fetchChannelEmotes (channelData) {
+		const client = this.clients.get(channelData);
+		if (!client) {
+			throw new sb.Error({
+				message: "No client found for Cytube channel",
+				args: {
+					channelID: channelData.ID,
+					channelName: channelData.Name
+				}
+			});
+		}
+
+		return client.emotes;
 	}
 
 	/**
