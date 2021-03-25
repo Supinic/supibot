@@ -88,6 +88,10 @@ module.exports = {
 
 		if (channel) {
 			channel = channel.toLowerCase();
+
+			if (channel === "random") {
+				channel = sb.Utils.randArray(this.data.channels);
+			}
 			
 			if (!this.data.channels.includes(channel)) {
 				return {
