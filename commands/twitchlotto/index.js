@@ -254,13 +254,13 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async (prefix) => {
-		const rawChannels = await sb.Query.getRecordset(rs => rs
-			.select("Name")
+		const countData = await sb.Query.getRecordset(rs => rs
+			.select("Name", "Amount")
 			.from("data", "Twitch_Lotto_Channel")
-			.flat("Name")
+			.orderBy("Amount DESC")
 		);
-	
-		const channels = rawChannels.map(i => `<li>${i}</li>`).join("");
+
+		const channels = countData.map(i => `<li>${i.Name} - ${sb.Utils.groupDigits(i.Amount)}</li>`).join("");
 		return [
 			"Rolls a random picture sourced from Twitch channels. The data is from the Twitchlotto website",
 			"You can specify a channel from the list below to get links only from there.",
