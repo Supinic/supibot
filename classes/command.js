@@ -803,7 +803,7 @@ module.exports = class Command extends require("./template.js") {
 			execution.reply = string + ", " + execution.reply;
 		}
 
-		if (!options.partialExecute && execution.success !== false && execution.aliased) {
+		if (!options.partialExecute && execution.success !== false && execution.aliased && !execution.skipAliasPrefix) {
 			execution.reply = "👥 " + execution.reply;
 		}
 
