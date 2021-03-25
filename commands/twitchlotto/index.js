@@ -61,6 +61,10 @@ module.exports = {
 			);
 		}
 
+		if (channel && channel.toLowerCase() === "random") {
+			channel = sb.Utils.randArray(availableChannels);
+		}
+
 		const excludedInput = context.params.excludeChannel ?? context.params.excludeChannels;
 		if (excludedInput) {
 			if (channel) {
@@ -268,19 +272,24 @@ module.exports = {
 			`You will get an approximation of "NSFW score" by an AI, so keep an eye out for that.`,
 			"",
 	
+			`<code>${prefix}tl</code>`,
 			`<code>${prefix}twitchlotto</code>`,
-			"Fetches a random image from any channel",
+			"Fetches a random image from any channel - channels with more images have a bigger chance to be picked",
+			"",
+
+			`<code>${prefix}tl random</code>`,
+			"Fetches a random image from any channel - all channels have the same chance to be picked",
 			"",
 			
-			`<code>${prefix}twitchlotto (channel)</code>`,
+			`<code>${prefix}tl (channel)</code>`,
 			"Fetches a random image from the specified channel",
 			"",
 
-			`<code>${prefix}twitchlotto excludeChannel:forsen</code>`,
+			`<code>${prefix}tl excludeChannel:forsen</code>`,
 			"Fetches a random image from any but the specified excluded channel",
 			"",
 
-			`<code>${prefix}twitchlotto excludeChannel:"forsen,nymn,pajlada"</code>`,
+			`<code>${prefix}tl excludeChannel:"forsen,nymn,pajlada"</code>`,
 			"Fetches a random image from any but the specified excluded channels, separated by spaces or commas",
 			"",
 	
