@@ -14,6 +14,7 @@ module.exports = {
 		const repeats = Number(number);
 		if (!repeats || repeats > this.staticData.limit || repeats < 1 || Math.trunc(repeats) !== repeats) {
 			return {
+				success: false,
 				reply: "Invalid or too high amount of emojis!"
 			};
 		}
