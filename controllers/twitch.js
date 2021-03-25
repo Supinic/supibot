@@ -966,15 +966,15 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		return [
 			...this.availableEmotes
-				.filter(i => !["1","2","3"].includes(i.tier))
-				.flatMap(i => i.emotes)
-				.map(i => ({
+				.flatMap(set => set.emotes.map(i => ({
 					ID: i.ID,
 					name: i.token,
-					type: "twitch",
+					type: (set.tier === "1" || set.tier === "2" || set.tier === "3")
+						? "twitch-subscriber"
+						: "twitch-global",
 					global: true,
 					animated: false
-				})),
+				}))),
 
 			...Object.values(ffz.value?.body.sets ?? {})
 				.flatMap(i => i.emoticons)
