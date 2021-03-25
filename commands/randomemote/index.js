@@ -65,8 +65,12 @@ module.exports = {
 			};
 		}
 
+		const string = [...Array(repeats)].map(() => sb.Utils.randArray(emotes).name).join(" ");
+		const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
+
+		const [partition] = sb.Utils.partitionString(string, limit, 1);
 		return {
-			reply: [...Array(repeats)].map(() => sb.Utils.randArray(emotes).name).join(" ")
+			reply: partition
 		};
 	}),
 	Dynamic_Description: (async (prefix, values) => {
