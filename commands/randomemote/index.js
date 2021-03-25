@@ -22,7 +22,7 @@ module.exports = {
 		if (!sb.Utils.isValidInteger(repeats, 1) || repeats > this.staticData.limit) {
 			return {
 				success: false,
-				reply: "Invalid or too high amount of emojis!"
+				reply: "Invalid or too high amount of emotes!"
 			};
 		}
 
