@@ -56,7 +56,8 @@ module.exports = {
 		const resultsInPastebin = args[args.length - 1] === "pastebin";
 		let finalResult = null;
 		let currentArgs = [];
-	
+
+		let lastCommand;
 		for (let i = 0; i < invocations.length; i++) {
 			const inv = invocations[i];
 			const [cmd, ...restArgs] = inv.split(" ");
@@ -149,11 +150,11 @@ module.exports = {
 			else {
 				currentArgs = sb.Utils.wrapString(result.reply, 2000).split(" ");
 			}
-	
+
+			lastCommand = command;
 			finalResult = result;
 		}
 
-		const lastCommand = sb.Command.get(invocations[invocations.length - 1]);
 		return {
 			aliased,
 			skipAliasPrefix: Boolean(lastCommand.Flags.skipBanphrase),
