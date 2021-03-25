@@ -61,6 +61,7 @@ module.exports = {
 			);
 		}
 
+		let randomRoll = false;
 		const excludedInput = context.params.excludeChannel ?? context.params.excludeChannels;
 		if (excludedInput) {
 			if (channel) {
@@ -86,6 +87,7 @@ module.exports = {
 			channel = channel.toLowerCase();
 
 			if (channel === "random") {
+				randomRoll = true;
 				channel = sb.Utils.randArray(this.data.channels);
 			}
 			
@@ -232,7 +234,7 @@ module.exports = {
 		});
 
 		let channelString = "";
-		if (!channel || channel === "random" || excludedInput) {
+		if (!channel || randomRoll || excludedInput) {
 			const channels = await sb.Query.getRecordset(rs => rs
 			    .select("Channel")
 			    .from("data", "Twitch_Lotto")
