@@ -61,10 +61,6 @@ module.exports = {
 			);
 		}
 
-		if (channel && channel.toLowerCase() === "random") {
-			channel = sb.Utils.randArray(availableChannels);
-		}
-
 		const excludedInput = context.params.excludeChannel ?? context.params.excludeChannels;
 		if (excludedInput) {
 			if (channel) {
