@@ -58,6 +58,13 @@ module.exports = {
 			return true;
 		});
 
+		if (emotes.length === 0) {
+			return {
+				success: false,
+				reply: "No emotes available for this combination of filters!"
+			};
+		}
+
 		return {
 			reply: [...Array(repeats)].map(() => sb.Utils.randArray(emotes).name).join(" ")
 		};
