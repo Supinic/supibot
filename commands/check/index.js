@@ -227,7 +227,7 @@ module.exports = {
 						if (result.success !== true) {
 							return {
 								success: false,
-								reply: result.reason ?? result.error ?? result.body
+								reply: result.error ?? result.body
 							};
 						}
 

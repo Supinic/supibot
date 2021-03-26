@@ -44,7 +44,7 @@ module.exports = {
 			const result = await sb.Pastebin.post(args.join(" "));
 			return {
 				success: Boolean(result.success),
-				reply: result.reason ?? result.error ?? result.body
+				reply: result.error ?? result.body
 			};
 		}
 		else if (type === "get") {
@@ -66,7 +66,7 @@ module.exports = {
 				if (result.success !== true) {
 					return {
 						success: false,
-						reply: result.reason ?? result.error ?? result.body
+						reply: result.error ?? result.body
 					};
 				}
 

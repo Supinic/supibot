@@ -39,7 +39,7 @@ module.exports = {
 		if (paste.success !== true) {
 			return {
 				success: false,
-				reply: paste.reason ?? paste.error ?? paste.body
+				reply: paste.error ?? paste.body
 			};
 		}
 
