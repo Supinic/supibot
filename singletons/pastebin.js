@@ -167,8 +167,8 @@ module.exports = (function () {
 			}
 			else {
 				const reason = (statusCode === 422)
-					? "This paste was rejected by Pastebin's SMART filters"
-					: "An error occured while posting the paste";
+					? "This paste was rejected by Pastebin's SMART filters!"
+					: "An error occured while posting the paste!";
 
 				return {
 					success: false,
