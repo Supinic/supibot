@@ -10,6 +10,7 @@ module.exports = {
 		{ name: "bttv", type: "boolean" },
 		{ name: "ffz", type: "boolean" },
 		{ name: "global", type: "boolean" },
+		{ name: "repeat", type: "boolean" },
 		{ name: "sub", type: "boolean" },
 		{ name: "twitch", type: "boolean" },
 	],
@@ -65,7 +66,21 @@ module.exports = {
 			};
 		}
 
-		const string = [...Array(repeats)].map(() => sb.Utils.randArray(emotes).name).join(" ");
+		const result = [];
+		for (let i = 0; i < repeats; i++) {
+			if (emotes.length === 0) {
+				break;
+			}
+
+			const index = sb.Utils.random(0, emotes.length);
+			result.push(emotes[index].name);
+
+			if (context.params.repeat === false) {
+				emotes.splice(index, 1);
+			}
+		}
+
+		const string = result.join(" ");
 		const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
 
 		const [partition] = sb.Utils.partitionString(string, limit, 1);
@@ -84,6 +99,10 @@ module.exports = {
 			`<code>${prefix}rem</code>`,
 			`<code>${prefix}randomemote</code>`,
 			"Posts any emote.",
+			"",
+
+			`<code>${prefix}rem repeat:false</code>`,
+			"If provided like this, then only unique emotes will be posted - no repeats.",
 			"",
 
 			`<code>${prefix}rem animated:true</code>`,
