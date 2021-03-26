@@ -29,7 +29,7 @@ module.exports = {
 			const prefix = sb.Command.prefix;
 			return {
 				success: false,
-				reply: `No valid type provided! Use ${prefix}pastebin (fetch/post) or ${prefix}pbf/pbp instead`
+				reply: `No valid type provided! Use ${prefix}pastebin (get/post) or ${prefix}pbg/pbp instead`
 			};
 		}
 
