@@ -15,13 +15,13 @@ module.exports = {
 		const args = [...rest];
 		if (command === "get" || context.invocation === "pbg") {
 			type = "get";
-			if (command !== "get") {
+			if (command && command !== "get") {
 				args.unshift(command);
 			}
 		}
 		else if (command === "post" || context.invocation === "pbp") {
 			type = "post";
-			if (command !== "post") {
+			if (command && command !== "post") {
 				args.unshift(command);
 			}
 		}
@@ -52,7 +52,7 @@ module.exports = {
 			if (!path) {
 				return {
 					success: false,
-					reply: `Invalid Pastebin link provided! `
+					reply: `Invalid Pastebin link provided!`
 				};
 			}
 
