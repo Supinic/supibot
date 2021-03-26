@@ -41,8 +41,10 @@ module.exports = {
 		}
 
 		if (type === "post") {
+			const result = await sb.Pastebin.post(args.join(" "));
 			return {
-				reply: await sb.Pastebin.post(args.join(" "))
+				success: Boolean(result.success),
+				reply: result.reason ?? result.error ?? result.body
 			};
 		}
 		else if (type === "get") {
@@ -60,7 +62,15 @@ module.exports = {
 				data = cacheData;
 			}
 			else {
-				data = await sb.Pastebin.get(path);
+				const result = await sb.Pastebin.get(path);
+				if (result.success !== true) {
+					return {
+						success: false,
+						reply: result.reason ?? result.error ?? result.body
+					};
+				}
+
+				data = result.body;
 				await this.setCacheData(path, data, {
 					expiry: 30 * 864e5
 				});

@@ -38,13 +38,19 @@ module.exports = {
 				format: "markdown",
 				expiration: "2 weeks"
 			});
+			if (paste.success !== true) {
+				return {
+					success: false,
+					reply: paste.reason ?? paste.error ?? paste.body
+				};
+			}
 
 			await this.setCacheData(key, paste, {
 				expiration: 14 * 864e5
-			})
+			});
 
 			return {
-				reply: paste
+				reply: paste.body
 			};
 		}
 		

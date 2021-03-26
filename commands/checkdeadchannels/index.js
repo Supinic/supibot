@@ -17,7 +17,7 @@ module.exports = {
 	
 		for (const channel of channels) {
 			const dbName = channel.getDatabaseName();
-			promises.push((async () => {;
+			promises.push((async () => {
 				const data = await sb.Query.getRecordset(rs => rs
 					.select("User_Alias.Name AS Name", "Posted", "Text")
 					.from("chat_line", dbName)
@@ -41,8 +41,16 @@ module.exports = {
 		}
 	
 		const results = (await Promise.all(promises)).filter(Boolean).sort((a, b) => a.Posted - b.Posted);
+		const paste = await sb.Pastebin.post(JSON.stringify(results, null, 4));
+		if (paste.success !== true) {
+			return {
+				success: false,
+				reply: paste.reason ?? paste.error ?? paste.body
+			};
+		}
+
 		return { 
-			reply: await sb.Pastebin.post(JSON.stringify(results, null, 4))
+			reply: paste.body
 		};
 	}),
 	Dynamic_Description: null

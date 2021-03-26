@@ -29,12 +29,22 @@ module.exports = {
 			})
 			.filter(i => i.viewers < this.staticData.viewerThreshold)
 			.sort((a, b) => b.viewers - a.viewers);
-	
+
+		const data = JSON.stringify(raidable, null, 4);
+		const paste = await sb.Pastebin.post(data, {
+			name: "Raid targets " + new sb.Date().format("Y-m-d H:i:s"),
+			format: "json"
+		});
+
+		if (paste.success !== true) {
+			return {
+				success: false,
+				reply: paste.reason ?? paste.error ?? paste.body
+			};
+		}
+
 		return {
-			reply: await sb.Pastebin.post(JSON.stringify(raidable, null, 4), {
-				name: "Raid targets " + new sb.Date().format("Y-m-d H:i:s"),
-				format: "json"
-			})
+			reply: paste.body
 		};
 	}),
 	Dynamic_Description: null

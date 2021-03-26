@@ -21,12 +21,22 @@ module.exports = {
 			return { reply: "Link has been deleted or is otherwise not available." };
 		}
 		else {
-			const link = await sb.Pastebin.post(JSON.stringify(data, null, 4), {
-				name: data.name + ", requested by " + context.user.Name,
+			const string = JSON.stringify(data, null, 4);
+			const paste = await sb.Pastebin.post(string, {
+				name: `${data.name}, requested by ${context.user.Name}`,
 				format: "json"
 			});
+
+			if (paste.success !== true) {
+				return {
+					success: false,
+					reply: paste.reason ?? paste.error ?? paste.body
+				};
+			}
 	
-			return { reply: link };
+			return {
+				reply: paste.body
+			};
 		}
 	}),
 	Dynamic_Description: null

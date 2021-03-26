@@ -216,18 +216,25 @@ module.exports = {
 	
 					const { ID, Stack: stack } = row.values;
 	
-					if (!this.data.cache) {
-						this.data.cache = {};
-					}
-					if (!this.data.cache[ID] || this.data.cache[ID].expiration < sb.Date.now()) {
-						this.data.cache[ID] = {
-							createdAt: sb.Date.now(),
-							expiration: new sb.Date().addHours(1).valueOf(),
-							link: await sb.Pastebin.post(stack, {
-								name: "Stack of Supibot error ID " + ID,
-								expiration: "1H"
-							})
-						};
+					const key = { type: "error-paste", ID };
+					let link = await this.getCacheData(key);
+					if (!link) {
+						const result = await sb.Pastebin.post(stack, {
+							name: "Stack of Supibot error ID " + ID,
+							expiration: "1H"
+						});
+						
+						if (result.success !== true) {
+							return {
+								success: false,
+								reply: result.reason ?? result.error ?? result.body
+							};
+						}
+
+						link = result.body;
+						await this.setCacheData(key, link, {
+							expiry: 36e5
+						});
 					}
 	
 					if (context.channel) {
@@ -235,7 +242,7 @@ module.exports = {
 					}
 	
 					return {
-						reply: this.data.cache[ID].link,
+						reply: link,
 						replyWithPrivateMessage: true
 					}
 				}

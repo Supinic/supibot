@@ -227,10 +227,16 @@ module.exports = {
 		}
 		else {
 			const summary = results.map(i => `${i.link}\n${i.formatted}`).join("\n\n");
-			const pastebinLink = await sb.Pastebin.post(summary);
-	
+			const paste = await sb.Pastebin.post(summary);
+			if (paste.success !== true) {
+				return {
+					success: false,
+					reply: paste.reason ?? paste.error ?? paste.body
+				};
+			}
+
 			return {
-				reply: `${results.length} videos processed. Summary: ${pastebinLink}`
+				reply: `${results.length} videos processed. Summary: ${paste.body}`
 			};
 		}
 	}),
