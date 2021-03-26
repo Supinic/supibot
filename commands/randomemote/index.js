@@ -72,7 +72,7 @@ module.exports = {
 				break;
 			}
 
-			const index = sb.Utils.random(0, emotes.length);
+			const index = sb.Utils.random(0, emotes.length - 1);
 			result.push(emotes[index].name);
 
 			if (context.params.repeat === false) {
