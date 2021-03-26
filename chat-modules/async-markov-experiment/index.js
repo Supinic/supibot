@@ -19,6 +19,10 @@ module.exports = {
 		}
 
 		const { message } = context;
+		if (message.includes("http:") || message.includes("https:")) {
+			return;
+		}
+
 		this.data.markov.add(message);
 	}),
 	Author: "supinic"
