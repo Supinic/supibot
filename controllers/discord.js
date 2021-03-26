@@ -197,6 +197,15 @@ module.exports = class DiscordController extends require("./template.js") {
 					? commandArguments.slice(2)
 					: commandArguments.slice(1);
 
+				if (messageObject.reference) {
+					const { channelID, messageID } = messageObject.reference;
+					const referenceChannel = await this.client.channels.fetch(channelID);
+					const referenceMessageObject = await referenceChannel.messages.fetch(messageID);
+					const { msg } = this.parseMessage(referenceMessageObject);
+
+					args.push(...msg.split(" ").filter(Boolean));
+				}
+
 				this.handleCommand(
 					command,
 					args.map(i => DiscordController.removeEmoteTags(i)),
