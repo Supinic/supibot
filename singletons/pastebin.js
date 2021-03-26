@@ -30,6 +30,7 @@ module.exports = (function () {
 		#authData = null;
 		#authenticationPending = false;
 		#got = sb.Got.extend({
+			throwHttpErrors: false,
 			prefixUrl: "https://pastebin.com/",
 			headers: {
 				"Content-Type": "application/x-www-form-urlencoded",
@@ -89,15 +90,33 @@ module.exports = (function () {
 		}
 
 		/**
+		 * @typedef {Object} PastebinResponse
+		 * @property {boolean} success
+		 * @property {string|null} body
+		 * @property {string|null} error
+		 * @property {string} [reason]
+		 */
+		/**
 		 * Fetches a Pastebin paste, and returns the raw content.
 		 * @param pasteID
-		 * @returns {Promise<void>}
+		 * @returns {Promise<PastebinResponse>}
 		 */
 		async get (pasteID) {
 			const { body, statusCode } = await this.#got("raw/" + pasteID);
-			return (statusCode === 200)
-				? body
-				: null;
+			if (statusCode === 200) {
+				return {
+					success: true,
+					body,
+					error: null
+				};
+			}
+			else {
+				return {
+					success: false,
+					body: null,
+					error: body,
+				};
+			}
 		}
 
 		/**
@@ -108,7 +127,7 @@ module.exports = (function () {
 		 * @param {number|string} [options.privacy]
 		 * @param {string} [options.expiration]
 		 * @param {string} [options.format]
-		 * @returns {Promise<string>}
+		 * @returns {Promise<PastebinResponse>}
 		 */
 		async post (text, options = {}) {
 			if (!this.#authData) {
@@ -133,19 +152,30 @@ module.exports = (function () {
 
 			const { statusCode, body } = await this.#got({
 				method: "POST",
+				throwHttpErrors: false,
 				url: "api/api_post.php",
 				body: params.toString(),
 				timeout: 5000
 			});
 
 			if (statusCode === 200) {
-				return body;
-			}
-			else if (statusCode === 422) {
-				return "This paste was rejected by Pastebin's SMART filters!";
+				return {
+					success: true,
+					body,
+					error: null
+				};
 			}
 			else {
-				return "An error occured while posting the paste!";
+				const reason = (statusCode === 422)
+					? "This paste was rejected by Pastebin's SMART filters"
+					: "An error occured while posting the paste";
+
+				return {
+					success: false,
+					body: null,
+					error: body,
+					reason
+				};
 			}
 		}
 
