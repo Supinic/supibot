@@ -56,6 +56,13 @@ module.exports = {
 			};
 		}
 
+		if (typeof seed === "string" && !markov.has(seed)) {
+			return {
+				success: false,
+				reply: "That word is not available as seed for random generation!"
+			};
+		}
+
 		return {
 			reply: markov.generateWords(wordCount, seed)
 		};
