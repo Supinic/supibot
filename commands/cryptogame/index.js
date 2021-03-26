@@ -615,7 +615,7 @@ module.exports = {
             `<code>${prefix}cg portfolios</code>`,
             `<code>${prefix}cg leaderboard</code>`,
             "Posts a link to the list of portfolios, their owners, and the converted total prices.",
-            `You can check it here: <a href="/crypto-game/portfolios/list">List</a>`,
+            `You can check it here: <a href="/crypto-game/portfolio/list">List</a>`,
             "",
         ]
     })
