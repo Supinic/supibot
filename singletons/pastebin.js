@@ -8,6 +8,17 @@ const loginConfigs = [
 module.exports = (function () {
 	"use strict";
 
+	const errorStrings = {
+		get: {
+			403: "This is a private paste or it is pending moderation!",
+			default: "Error while getting the paste!"
+		},
+		post: {
+			422: "This paste was rejected by Pastebin's SMART filters!",
+			default: "Error while posting the paste!"
+		}
+	};
+
 	const allowedPrivacyOptions = ["public", "unlisted", "private"];
 	const allowedExpirationOptions = {
 		"never": "N",
@@ -94,7 +105,6 @@ module.exports = (function () {
 		 * @property {boolean} success
 		 * @property {string|null} body
 		 * @property {string|null} error
-		 * @property {string} [reason]
 		 */
 		/**
 		 * Fetches a Pastebin paste, and returns the raw content.
@@ -114,7 +124,7 @@ module.exports = (function () {
 				return {
 					success: false,
 					body: null,
-					error: body,
+					error: errorStrings.get[statusCode] ?? errorStrings.get.default
 				};
 			}
 		}
@@ -166,15 +176,10 @@ module.exports = (function () {
 				};
 			}
 			else {
-				const reason = (statusCode === 422)
-					? "This paste was rejected by Pastebin's SMART filters!"
-					: "An error occured while posting the paste!";
-
 				return {
 					success: false,
 					body: null,
-					error: body,
-					reason
+					error: errorStrings.post[statusCode] ?? errorStrings.post.default
 				};
 			}
 		}
