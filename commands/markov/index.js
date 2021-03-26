@@ -63,8 +63,9 @@ module.exports = {
 			};
 		}
 
+		const string = markov.generateWords(wordCount, seed);
 		return {
-			reply: markov.generateWords(wordCount, seed)
+			reply: string
 		};
 
 	}),
