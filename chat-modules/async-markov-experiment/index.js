@@ -6,10 +6,14 @@ module.exports = {
 		if (this.data.skipped) {
 			return;
 		}
-		else if (!this.data.markov) {
+
+		if (!this.data.markovs) {
+			this.data.markovs = new Map();
+		}
+		if (!this.data.markovs.has(context.channel)) {
 			try {
 				const Markov = require("async-markov");
-				this.data.markov = new Markov();
+				this.data.markovs.set(context.channel, new Markov());
 			}
 			catch (e) {
 				console.warn("async markov experiment failed", { error: e });
@@ -31,7 +35,8 @@ module.exports = {
 			return;
 		}
 
-		this.data.markov.add(fixedMessage);
+		const markov = this.data.markovs.get(context.channel);
+		markov.add(fixedMessage);
 	}),
 	Author: "supinic"
 };
