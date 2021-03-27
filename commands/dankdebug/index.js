@@ -6,7 +6,8 @@ module.exports = {
 	Description: "Debug command for public use, which means it's quite limited because of security.",
 	Flags: ["developer","pipe","use-params"],
 	Params: [
-		{ name: "arguments", type: "string" }
+		{ name: "arguments", type: "string" },
+		{ name: "function", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
@@ -24,6 +25,13 @@ module.exports = {
 	Code: (async function dankDebug (context, ...args) {
 		let scriptArgs;
 		if (context.params.arguments) {
+			if (context.params.function) {
+				return {
+					success: false,
+					reply: `Cannot combine arguments and function params together!`
+				};
+			}
+			
 			try {
 				scriptArgs = JSON.parse(context.params.arguments);
 			}
@@ -36,7 +44,15 @@ module.exports = {
 		}
 
 		let result;
-		const script = `(() => {\n${args.join(" ")}\n})()`;
+		let script;
+		if (context.params.function) {
+			script = context.params.function;
+			scriptArgs = args;
+		}
+		else {
+			script = `(() => {\n${args.join(" ")}\n})()`;			
+		}
+		
 		try {
 			const scriptContext = {
 				sandbox: {
