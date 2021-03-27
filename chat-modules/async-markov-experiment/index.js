@@ -25,11 +25,13 @@ module.exports = {
 		else if (!user.Name || user.Name.includes("bot")) {
 			return;
 		}
-		else if (!/^(\p{Emoji}|[\w\d.-/:?!])+$/iu.test(message)) {
+
+		const fixedMessage = message.replace(/\u{E0000}/gu, "");
+		if (!/^(\p{Emoji}|[\w\s\d.-/:?!])+$/iu.test(fixedMessage)) {
 			return;
 		}
 
-		this.data.markov.add(message);
+		this.data.markov.add(fixedMessage);
 	}),
 	Author: "supinic"
 };
