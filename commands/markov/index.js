@@ -54,7 +54,7 @@ module.exports = {
 		if (!markov || markov.size < threshold) {
 			return {
 				success: false,
-				reply: `Markov-chain module does not have enough data avilable! (${markov?.size ?? 0}/${threshold} required)`
+				reply: `Markov-chain module does not have enough data available! (${markov?.size ?? 0}/${threshold} required)`
 			};
 		}
 
