@@ -18,8 +18,14 @@ module.exports = {
 			}
 		}
 
-		const { message } = context;
+		const { message, user } = context;
 		if (message.includes("http:") || message.includes("https:")) {
+			return;
+		}
+		else if (!user.Name || user.Name.includes("bot")) {
+			return;
+		}
+		else if (!/^(\p{Emoji}|[\w\d.-/:?!])+$/iu.test(message)) {
 			return;
 		}
 
