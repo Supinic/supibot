@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Creates a random sequence of words based on a Markov-chain module from Twitch chat.",
 	Flags: ["non-nullable","use-params"],
-	Params: null,
+	Params: [
+		{ name: "stop", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		limit: 20,
@@ -63,7 +65,10 @@ module.exports = {
 			};
 		}
 
-		const string = markov.generateWords(wordCount, seed);
+		const string = markov.generateWords(wordCount, seed, {
+			stop: Boolean(context.params.stop)
+		});
+
 		return {
 			reply: string
 		};
