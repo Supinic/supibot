@@ -11,7 +11,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		limit: 20,
-		threshold: 500
+		threshold: 250
 	})),
 	Code: (async function markov (context, input) {
 		const { limit, threshold } = this.staticData;
@@ -50,7 +50,7 @@ module.exports = {
 			};
 		}
 
-		const { markov } = module.data;
+		const markov = module.data.markovs.get(sb.Channel.get("forsen"));
 		if (!markov || markov.size < threshold) {
 			return {
 				success: false,
