@@ -28,6 +28,13 @@ module.exports = {
                     ["$abb ac errorMessage:\"No I don't think so\" 2 foo", "Error! No I don't think so"],
                 ],
                 execute: (context, limit, ...args) => {
+                    if (!limit) {
+                        return {
+                            success: false,
+                            reply: `No argument limit provided!`
+                        };
+                    }
+                    
                     const range = limit.split("..").map(i => i === "" ? null : Number(i));
                     if (range.length === 0) { // ".." - interpreted as "any"
                         return {
