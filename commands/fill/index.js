@@ -38,7 +38,7 @@ module.exports = {
 				channel: context.channel.ID,
 				length: (context.channel.sessionData?.live && !context.append.pipe)
 					? 60.0e3 // 1 minute
-					: context.command.Cooldown
+					: this.Cooldown
 			};
 		}
 	
