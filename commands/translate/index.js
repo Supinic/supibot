@@ -47,8 +47,10 @@ module.exports = {
 			options[option] = code.toLowerCase();
 		}
 	
-		const { body: data } = await sb.Got("GenericAPI", {
+		const response = await sb.Got({
 			url: "https://translate.googleapis.com/translate_a/single",
+			responseType: "json",
+			throwHttpErrors: false,
 			searchParams: {
 				client: "gtx",
 				dt: "t",
@@ -62,7 +64,27 @@ module.exports = {
 				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36"
 			}
 		});
-	
+
+		if (response.statusCode === 400) {
+			const targets = [options.from, options.to].filter(i => i !== "en" && i !== "auto");
+			const languages = targets.map(i => sb.Utils.languageISO.getName(i));
+
+			return {
+				success: false,
+				reply: `One or both languages are not supported! (${languages.join(", ")})`
+			};
+		}
+		else if (response.statusCode !== 200) {
+			throw new sb.errors.GenericRequestError({
+				statusCode,
+				statusMessage: response.statusMessage,
+				hostname: "TranslateAPI",
+				message: response.statusMessage,
+				stack: null
+			});
+		}
+
+		const data = response.body;
 		let reply = data[0].map(i => i[0]).join(" ");
 		if (options.direction) {
 			const languageID = data[2].replace(/-.*/, "");
