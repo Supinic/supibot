@@ -67,8 +67,7 @@ module.exports = {
 
 		if (response.statusCode === 400) {
 			const targets = [options.from, options.to].filter(i => i !== "en" && i !== "auto");
-			const languages = targets.map(i => sb.Utils.languageISO.getName(i));
-
+			const languages = targets.map(i => `${i}: ${sb.Utils.languageISO.getName(i)}`);
 			return {
 				success: false,
 				reply: `One or both languages are not supported! (${languages.join(", ")})`
