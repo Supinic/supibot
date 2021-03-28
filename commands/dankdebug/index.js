@@ -101,7 +101,7 @@ module.exports = {
 		}
 		else {
 			return {
-				reply: String(resullt)
+				reply: String(result)
 			};
 		}
 	}),
