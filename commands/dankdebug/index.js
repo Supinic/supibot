@@ -88,7 +88,7 @@ module.exports = {
 		if (result && typeof result === "object") {
 			try {
 				return {
-					reply: "Result: " + require("util").inspect(result)
+					reply: require("util").inspect(result)
 				};
 			}
 			catch (e) {
