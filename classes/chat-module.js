@@ -77,7 +77,16 @@ module.exports = class ChatModule extends require("./template.js") {
 					reference.active = true;
 				}
 				else {
-					const listener = (context) => this.Code(context, ...options.args);
+					const listener = (function chatModuleBinding (context) {
+						if (typeof this.Code !== "function") {
+							console.warn("Attempting to run a destroyed chat module event", { context, chatModule: this.Name });
+							this.detachAll(true);
+							return;
+						}
+
+						this.Code(context, ...options.args);
+					}).bind(this);
+
 					channelData.events.on(event, listener);
 
 					this.attachmentReferences.push({
