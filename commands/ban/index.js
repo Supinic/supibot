@@ -9,12 +9,12 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function ban (context, ...args) {
-		if (context.platform.Name !== "twitch") {
-			return {
-				success: false,
-				reply: "Not available outside of Twitch!"
-			};
-		}
+		// if (context.platform.Name !== "twitch") {
+		// 	return {
+		// 		success: false,
+		// 		reply: "Not available outside of Twitch!"
+		// 	};
+		// }
 	
 		const { invocation } = context;
 		const options = {
