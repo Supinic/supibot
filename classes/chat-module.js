@@ -17,6 +17,7 @@ module.exports = class ChatModule extends require("./template.js") {
 
 	//</editor-fold>
 
+	/** @type {ChatModule[]} */
 	static data = [];
 	static #serializableProperties = {
 		Name: { type: "string" },
