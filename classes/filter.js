@@ -299,7 +299,7 @@ module.exports = class Filter extends require("./template.js") {
 			&& (!type || type === row.Type)
 			&& (row.Channel === (options.channel?.ID ?? null) || row.Channel === null)
 			&& (row.Command === (options.command?.ID ?? null) || row.Command === null)
-			&& (row.Invocation === (options.invocation ?? null) || row.invocation === null)
+			&& (row.Invocation === (options.invocation ?? null) || row.Invocation === null)
 			&& (row.Platform === (options.platform?.ID ?? null) || row.Platform === null)
 		));
 	}
