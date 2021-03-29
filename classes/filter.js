@@ -4,6 +4,8 @@
  * @type Filter
  */
 module.exports = class Filter extends require("./template.js") {
+	#filterData = null;
+
 	constructor (data) {
 		super();
 
@@ -53,6 +55,83 @@ module.exports = class Filter extends require("./template.js") {
 		this.Type = data.Type;
 
 		/**
+		 * Specific filter data, usually only applicable to Cooldown and Arguments filter types.
+		 * @type {SpecificFilterData}
+		 */
+		this.Data = null;
+		if (data.Data) {
+			if (typeof data.Data === "string") {
+				try {
+					this.Data = JSON.parse(data.Data);
+				}
+				catch (e) {
+					console.warn("Could not parse filter data", {
+						error: e,
+						filter: this.ID
+					});
+					this.Data = {};
+				}
+			}
+			else if (typeof data.Data === "object") {
+				this.Data = { ...data.Data };
+			}
+			else {
+				console.warn("Unexpected filter data type", {
+					data: data.Data,
+					type: typeof data.Data,
+					filter: this.ID
+				});
+				this.Data = {};
+			}
+		}
+
+		if (this.Data) {
+			if (this.Type === "Args" && !parsedData.args) {
+				console.warn("Invalid filter data - missing Args data", { filter: this.ID, data: this.Data });
+			}
+			else if (this.Type === "Cooldown" && !parsedData.cooldown) {
+				console.warn("Invalid filter data - missing Cooldown data", { filter: this.ID, data: this.Data });
+			}
+			else if (this.Type === "Args") {
+				this.#filterData = [];
+
+				for (const arg of this.Data.args) {
+					const obj = {};
+					if (i.type === "regex") {
+						obj.regex = new RegExp(i.value[0], i.value[1] ?? "");
+					}
+					else if (i.type === "string") {
+						obj.string = i.value;
+					}
+					else {
+						console.warn("Invalid filter Args item - type", { arg, filter: this.ID });
+						continue;
+					}
+
+					if (typeof i.index === "number") {
+						obj.index = i.index;
+						obj.range = [];
+					}
+					else if (Array.isArray(i.range === "number")) {
+						obj.range = [...i.range].slice(0, 2);
+					}
+					else if (typeof i.range === "string") {
+						obj.range = i.range.split("..").map(Number).slice(0, 2);
+					}
+					else {
+						console.warn("Invalid filter Args item - index", { arg, filter: this.ID });
+						continue;
+					}
+
+					this.#filterData.push(obj);
+				}
+			}
+			else if (this.Type === "Cooldown") {
+				console.warn("Not yet implemented", { filter: this });
+			}
+		}
+
+		/**
 		 * Response type to respond with if a filter is found.
 		 * @type {"None"|"Auto"|"Reason"}
 		 */
@@ -81,6 +160,32 @@ module.exports = class Filter extends require("./template.js") {
 		 * @type {User.ID|null}
 		 */
 		this.Issued_By = data.Issued_By;
+	}
+
+	/**
+	 * For custom-data-related Filters, this method applies filter data to the provided data object.
+	 * @param {FilterType} type
+	 * @param {Object} data
+	 * @returns {boolean} True if the filter does apply to the provided data; false otherwise
+	 */
+	applyDataFilter (type, data) {
+		if (type !== this.Type) {
+			return false;
+		}
+		else if (Array.isArray(data.args)) {
+			for (const item of this.#filterData) {
+				const { index, range, regex, string } = item;
+				for (let i = 0; i < data.args.length; i++) {
+					const positionCheck = (i === index || (range[0] <= index && index <= range[1]));
+					const valueCheck = ((string && data.args[i] === string) || (regex && data.args[i].test(regex)));
+					if (positionCheck && valueCheck) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 	async toggle () {
@@ -167,26 +272,31 @@ module.exports = class Filter extends require("./template.js") {
 		}
 	}
 
+	static getLocals (type, options) {
+		return Filter.data.filter(row => (
+			row.Active
+			&& (!type || type === row.Type)
+			&& (row.Channel === (options.channel?.ID ?? null) || row.Channel === null)
+			&& (row.Command === (options.command?.ID ?? null) || row.Command === null)
+			&& (row.Invocation === (options.invocation ?? null) || row.invocation === null)
+			&& (row.Platform === (options.platform?.ID ?? null) || row.Platform === null)
+		));
+	}
+
 	/**
 	 * Executes all possible filters for the incoming combination of parameters
 	 * @param options
 	 * @returns {Promise<Object>}
 	 */
 	static async execute (options) {
-		const { command, invocation, platform, targetUser, user } = options;
+		const { command, targetUser, user } = options;
 		if (user.Data?.administrator) {
 			return { success: true };
 		}
 
 		let userTo = null;
 		const channel = options.channel ?? Symbol("private-message");
-		const localFilters = Filter.data.filter(row => (
-			row.Active
-			&& (row.Channel === (channel?.ID ?? null) || row.Channel === null)
-			&& (row.Command === (command?.ID ?? null) || row.Command === null)
-			&& (row.Invocation === (invocation ?? null) || invocation === null)
-			&& (row.Platform === (platform?.ID ?? null) || row.Platform === null)
-		));
+		const localFilters = Filter.getLocals(null, options);
 
 		if (command.Flags.whitelist) {
 			const whitelist = localFilters.find((
@@ -297,17 +407,60 @@ module.exports = class Filter extends require("./template.js") {
 			}
 		}
 
+		let channelLive = null;
+		if (channel instanceof sb.Channel) {
+			if (typeof channelData.isLive === "function") {
+				channelLive = await channelData.isLive();
+			}
+			else {
+				channelLive = channel.sessionData?.live ?? null;
+			}
+		}
+
+		const offlineOnly = localFilters.find(i => i.type === "Offline-only");
+		if (offlineOnly && channelLive === true) {
+			return {
+				success: false,
+				reason: "offline-only",
+				filter: offlineOnly,
+				reply: (offlineOnly.Response === "Auto")
+					? "🚫 This command is only available when the channel is offline!"
+					: (offlineOnly.Response === "Reason")
+						? offlineOnly.Reason
+						: null
+			};
+		}
+
+		const onlineOnly = localFilters.find(i => i.type === "Online-only");
+		if (onlineOnly && channelLive === false) {
+			return {
+				success: false,
+				reason: "online-only",
+				filter: onlineOnly,
+				reply: (onlineOnly.Response === "Auto")
+					? "🚫 This command is only available when the channel is online!"
+					: (onlineOnly.Response === "Reason")
+						? onlineOnly.Reason
+						: null
+			};
+		}
+
 		return { success: true };
 	}
 
 	/**
 	 * Creates a new filter record.
 	 * @param {Object} options
+	 * @param {number} [options.Platform]
 	 * @param {number} [options.Channel]
 	 * @param {number} [options.Command]
 	 * @param {number} [options.User_Alias]
-	 * @param {"Blacklist"|"Whitelist"|"Opt-out"} [options.Type]
 	 * @param {string} [options.Reason]
+	 * @param {string} [options.Invocation]
+	 * @param {Object} [options.Data]
+	 * @param {FilterType} [options.Type]
+	 * @param {number} [options.Blocked_User]
+	 * @param {number} [options.Issued_By]
 	 */
 	static async create (options) {
 		const data = {
@@ -316,6 +469,8 @@ module.exports = class Filter extends require("./template.js") {
 			Command: options.Command ?? null,
 			User_Alias: options.User_Alias ?? null,
 			Reason: options.Reason ?? null,
+			Invocation: options.Invocation ?? null,
+			Data: options.Data ?? null,
 			Type: options.Type ?? "Blacklist",
 			Response: "Auto",
 			Blocked_User: options.Blocked_User ?? null,
@@ -335,17 +490,10 @@ module.exports = class Filter extends require("./template.js") {
 	}
 
 	static async getMentionStatus (options) {
-		const { command, platform, user } = options;
-		const channel = options.channel ?? Symbol("private-message");
-
-		const filters = Filter.data.filter(row => (
-			row.Active
-			&& row.Type === "Unmention"
-			&& (row.User_Alias === (user?.ID ?? null) || row.User_Alias === null)
-			&& (row.Channel === (channel?.ID ?? null) || row.Channel === null)
-			&& (row.Command === (command?.ID ?? null) || row.Command === null)
-			&& (row.Platform === (platform?.ID ?? null) || row.Platform === null)
-		));
+		const filters = Filter.getLocals("Unmention", {
+			...options,
+			channel: options.channel ?? Symbol("private-message")
+		})
 
 		return (filters.length === 0);
 	}
@@ -358,16 +506,7 @@ module.exports = class Filter extends require("./template.js") {
 	 * @param {Object} options
 	 */
 	static async applyUnping (options) {
-		const { channel, command, platform } = options;
-
-		const filters = Filter.data.filter(row => (
-			row.Active
-			&& row.Type === "Unping"
-			&& row.User_Alias !== null
-			&& (row.Command === (command?.ID ?? null) || row.Command === null)
-			&& (row.Channel === (channel?.ID ?? null) || row.Channel === null)
-			&& (row.Platform === (platform?.ID ?? null) || row.Platform === null)
-		));
+		const filters = Filter.getLocals("Unping",  options);
 
 		let { string } = options;
 		const unpingUsers = await sb.User.getMultiple(filters.map(i => i.User_Alias));
@@ -380,15 +519,26 @@ module.exports = class Filter extends require("./template.js") {
 
 		return string;
 	}
+
+	static async getCooldownOverrides (options) {
+		return Filter.getLocals("Cooldown", options).sort((a, b) => b.priority - a.priority);
+	}
+
+	static async getFlags (options) {
+		return Filter.getLocals("Flags", options);
+	}
 };
 
 /**
- * @typedef FilterCheckOptions
- * @property {sb.User.ID|null} userID
- * @property {sb.Channel.ID|null} channelD
- * @property {sb.Command.ID|null} commandID
+ * @typedef {Object} SpecificFilterData
+ * @property {Array} [cooldowns]
+ * @property {Array} [args]
  */
 
 /**
- * @typedef {"Blacklist","Whitelist","Opt-out","Block","Unping","Unmention","Cooldown","Flags","Offline-only","Online-only"} FilterType
+ * @typedef {
+ *   "Blacklist","Whitelist","Opt-out","Block",
+ *   "Unping","Unmention","Cooldown","Flags",
+ *   "Offline-only","Online-only","Args"
+ * } FilterType
  */
