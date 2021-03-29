@@ -438,7 +438,7 @@ module.exports = class Filter extends require("./template.js") {
 			}
 		}
 
-		const offlineOnly = localFilters.find(i => i.type === "Offline-only");
+		const offlineOnly = localFilters.find(i => i.Type === "Offline-only");
 		if (offlineOnly && channelLive === true) {
 			return {
 				success: false,
@@ -452,7 +452,7 @@ module.exports = class Filter extends require("./template.js") {
 			};
 		}
 
-		const onlineOnly = localFilters.find(i => i.type === "Online-only");
+		const onlineOnly = localFilters.find(i => i.Type === "Online-only");
 		if (onlineOnly && channelLive === false) {
 			return {
 				success: false,
