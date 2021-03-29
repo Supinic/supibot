@@ -42,7 +42,7 @@ module.exports = class Filter extends require("./template.js") {
 		 * Blacklist disallows the usage for given combination of User_Alias/Channel/Command.
 		 * Whitelist disallows the usage of a command everywhere BUT the given combination of User_Alias/Channel.
 		 * Opt-out disallows the usage of given user as the parameter for given command.
-		 * @type {"Blacklist"|"Whitelist"|"Opt-out"}
+		 * @type {FilterType}
 		 */
 		this.Type = data.Type;
 
@@ -367,4 +367,8 @@ module.exports = class Filter extends require("./template.js") {
  * @property {sb.User.ID|null} userID
  * @property {sb.Channel.ID|null} channelD
  * @property {sb.Command.ID|null} commandID
+ */
+
+/**
+ * @typedef {"Blacklist","Whitelist","Opt-out","Block","Unping","Unmention","Cooldown","Flags","Offline-only","Online-only"} FilterType
  */
