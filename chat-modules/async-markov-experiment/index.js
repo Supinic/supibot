@@ -21,6 +21,10 @@ module.exports = {
 				return;
 			}
 		}
+		const markov = this.data.markovs.get(context.channel);
+		if (markov.size > 2000) {
+			return;
+		}
 
 		const { message, user } = context;
 		if (message.includes("http:") || message.includes("https:")) {
@@ -35,7 +39,6 @@ module.exports = {
 			return;
 		}
 
-		const markov = this.data.markovs.get(context.channel);
 		markov.add(fixedMessage);
 	}),
 	Author: "supinic"
