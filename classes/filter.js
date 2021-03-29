@@ -38,6 +38,12 @@ module.exports = class Filter extends require("./template.js") {
 		this.Platform = data.Platform;
 
 		/**
+		 * Specific command identifier - a possible command alias
+		 * @type {string|null}
+		 */
+		this.Invocation = data.Invocation;
+
+		/**
 		 * Filter type.
 		 * Blacklist disallows the usage for given combination of User_Alias/Channel/Command.
 		 * Whitelist disallows the usage of a command everywhere BUT the given combination of User_Alias/Channel.
@@ -167,7 +173,7 @@ module.exports = class Filter extends require("./template.js") {
 	 * @returns {Promise<Object>}
 	 */
 	static async execute (options) {
-		const { command, platform, user, targetUser } = options;
+		const { command, invocation, platform, targetUser, user } = options;
 		if (user.Data?.administrator) {
 			return { success: true };
 		}
@@ -178,6 +184,7 @@ module.exports = class Filter extends require("./template.js") {
 			row.Active
 			&& (row.Channel === (channel?.ID ?? null) || row.Channel === null)
 			&& (row.Command === (command?.ID ?? null) || row.Command === null)
+			&& (row.Invocation === (invocation ?? null) || invocation === null)
 			&& (row.Platform === (platform?.ID ?? null) || row.Platform === null)
 		));
 
