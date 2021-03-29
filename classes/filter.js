@@ -124,6 +124,19 @@ module.exports = class Filter extends require("./template.js") {
 		});
 	}
 
+	/**
+	 * Pushes a property change to the dataabse.
+	 * @param {string} property
+	 * @param {*} [value]
+	 * @returns {Promise<void>}
+	 */
+	async saveProperty (property, value) {
+		const row = await sb.Query.getRow("chat_data", "Filter");
+		await row.load(this.ID);
+
+		await super.saveRowProperty(row, property, value, this);
+	}
+
 	static async loadData () {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("*")
