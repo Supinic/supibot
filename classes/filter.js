@@ -188,6 +188,27 @@ module.exports = class Filter extends require("./template.js") {
 		return false;
 	}
 
+	get priority () {
+		let priority = 0;
+		if (this.Platform) {
+			priority |= 0b0000_0001;
+		}
+		if (this.Channel) {
+			priority |= 0b0000_0010;
+		}
+		if (this.Command) {
+			priority |= 0b0000_0100;
+		}
+		if (this.Invocation) {
+			priority |= 0b0000_1000;
+		}
+		if (this.User_Alias) {
+			priority |= 0b0001_0000;
+		}
+
+		return priority;
+	}
+
 	async toggle () {
 		this.Active = !this.Active;
 		const row = await sb.Query.getRow("chat_data", "Filter");
