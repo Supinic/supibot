@@ -90,11 +90,15 @@ module.exports = {
 				threadsExpiration: 0
 			}));
 		}
-	
-		let board = null;
-		identifier = identifier.toLowerCase().replace(/\//g, "");
-		board = this.data.boards.find(i => i.name === identifier);
-	
+
+		if (!/^[a-z]+$/.test(identifier)) {
+			return {
+				success: false,
+				reply: "Use only lowercase characters for board names! (E.g. no slashes)"
+			};
+		}
+
+		const board = this.data.boards.find(i => i.name === identifier);
 		if (!board) {
 			return {
 				reply: "Couldn't match your board! Use their abbreviations only."
