@@ -94,7 +94,7 @@ module.exports = {
 		if (!/^[a-z]+$/.test(identifier)) {
 			return {
 				success: false,
-				reply: "Use only lowercase characters for board names! (E.g. no slashes)"
+				reply: "Use only lowercase characters for board names! (e.g. no slashes)"
 			};
 		}
 
