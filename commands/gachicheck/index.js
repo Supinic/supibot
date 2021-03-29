@@ -219,7 +219,13 @@ module.exports = {
 				});
 			}
 		}
-	
+
+		console.log(`${results.length} gachi tracks just got processed`, {
+			user: context.user.Name,
+			channel: context.channel?.Name ?? `${context.platform.Name} DM`,
+			results
+		});
+
 		if (results.length === 1) {
 			return {
 				reply: results[0].formatted
