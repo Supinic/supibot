@@ -475,7 +475,7 @@ module.exports = class Command extends require("./template.js") {
 		const appendOptions = Object.assign({}, options);
 		const isPrivateMessage = (!channelData);
 
-		/** @type ExtraCommandData */
+		/** @type CommandContext */
 		const context = {
 			platform: options.platform,
 			invocation: identifier,
@@ -955,6 +955,25 @@ module.exports = class Command extends require("./template.js") {
 	}
 
 	/**
+	 * Creates a functioning command context, with data filled in based on what data is passed
+	 * @param {Command} commandData
+	 * @param {Object|CommandContext} [contextData]
+	 * @returns {CommandContext}
+	 */
+	static createFakeContext (commandData, contextData = {}) {
+		return {
+			invocation: commandData.Name,
+			user: contextData.user ?? null,
+			channel: contextData.channel ?? null,
+			platform: contextData.platform ?? null,
+			transaction: contextData.transaction ?? null,
+			privateMessage: contextData.isPrivateMessage ?? false,
+			append: contextData.append ?? {},
+			params: contextData.params ?? {}
+		};
+	}
+
+	/**
 	 * Checks if the given string counts as a proper command execution.
 	 * @param {string} string
 	 * @returns {boolean}
@@ -1032,7 +1051,7 @@ module.exports = class Command extends require("./template.js") {
  */
 
 /**
- * @typedef {Object} ExtraCommandData
+ * @typedef {Object} CommandContext
  * @property {string} invocation Exact command name used for invocation - name or alias
  * @property {User} user Data about the user who invoked the command
  * @property {Channel} channel Data about the channel where the command was invoked
