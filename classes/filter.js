@@ -430,8 +430,8 @@ module.exports = class Filter extends require("./template.js") {
 
 		let channelLive = null;
 		if (channel instanceof sb.Channel) {
-			if (typeof channelData.isLive === "function") {
-				channelLive = await channelData.isLive();
+			if (typeof channel.isLive === "function") {
+				channelLive = await channel.isLive();
 			}
 			else {
 				channelLive = channel.sessionData?.live ?? null;
