@@ -454,9 +454,11 @@ module.exports = class Command extends require("./template.js") {
 		const filterData = await sb.Filter.execute({
 			user: userData,
 			command: command,
+			invocation: identifier,
 			channel: channelData ?? null,
 			platform: channelData?.Platform ?? null,
-			targetUser: argumentArray[0] ?? null
+			targetUser: argumentArray[0] ?? null,
+			args: argumentArray ?? []
 		});
 
 		if (!filterData.success) {
