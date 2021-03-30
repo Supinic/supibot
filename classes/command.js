@@ -60,6 +60,30 @@ class Context {
 		}
 	}
 
+	/**
+	 * Fetches the best available emote for given context - based on platform/channel availability
+	 * @param {string[]} emotes
+	 * @param {string} fallback
+	 * @param {Object} options
+	 * @param {Channel} [options.channel]
+	 * @param {Platform} [options.platform]
+	 * @param {boolean} [options.returnEmoteObject]
+	 * @param {Function} [options.filter]
+	 * @returns {Promise<string>}
+	 */
+	async getBestAvailableEmote (emotes, fallback, options = {}) {
+		const channelData = options.channel ?? this.#channel;
+		const platformData = options.platform ?? this.#platform;
+		if (channelData) {
+			return await channelData.getBestAvailableEmote(emotes, fallback, options);
+		}
+		else if (platformData) {
+			return await platformData.getBestAvailableEmote(null, emotes, fallback, options);
+		}
+
+		return "(no emote found)";
+	}
+
 	get invocation () { return this.#invocation; }
 	get user () { return this.#user; }
 	get channel () { return this.#channel; }
