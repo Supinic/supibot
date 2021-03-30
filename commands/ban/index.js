@@ -9,8 +9,7 @@ module.exports = {
         { name: "channel", type: "string" },
         { name: "command", type: "string" },
         { name: "invocation", type: "string" },
-        { name: "user", type: "string" },
-
+        { name: "user", type: "string" }
     ],
 	Whitelist_Response: null,
 	Static_Data: null,
