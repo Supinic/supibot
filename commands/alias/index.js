@@ -152,7 +152,7 @@ module.exports = {
 				else if (!wrapper.has(name)) {
 					return {
 						success: false,
-						reply: "You don't have an alias with that name!"
+						reply: `Alias "${name}" is not available to you!`
 					};
 				}
 	
@@ -196,7 +196,7 @@ module.exports = {
 				else if (!aliases[targetAlias]) {
 					return {
 						success: false,
-						reply: "They don't have an alias with that name!"
+						reply: `Alias "${targetAlias}" is not available to them!`
 					};
 				}
 	
@@ -223,7 +223,7 @@ module.exports = {
 				else if (!wrapper.has(name)) {
 					return {
 						success: false,
-						reply: `You don't have an alias with this name!`
+						reply: `Alias "${name}" is not available to you!`
 					};
 				}
 	
@@ -264,7 +264,7 @@ module.exports = {
 				else if (!wrapper.has(name)) {
 					return {
 						success: false,
-						reply: "You don't have an alias with that name!"
+						reply: `Alias "${name}" is not available to you!`
 					};
 				}
 	
@@ -286,7 +286,7 @@ module.exports = {
 				else if (!wrapper.has(oldName)) {
 					return {
 						success: false,
-						reply: "Can't rename - you don't have an alias with that name!"
+						reply: `Alias "${oldName}" is not available to you!`
 					};
 				}
 	
@@ -312,7 +312,7 @@ module.exports = {
 				else if (!wrapper.has(name)) {
 					return {
 						success: false,
-						reply: "You don't have an alias with that name!"
+						reply: `Alias "${name}" is not available to you!`
 					};
 				}
 	
