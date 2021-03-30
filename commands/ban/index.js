@@ -15,13 +15,6 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function ban (context) {
-		// if (context.platform.Name !== "twitch") {
-		// 	return {
-		// 		success: false,
-		// 		reply: "Not available outside of Twitch!"
-		// 	};
-		// }
-
 		const { invocation } = context;
 		const options = {
 			Channel: null,
@@ -54,7 +47,7 @@ module.exports = {
                 };
             }
             else if (commandData === this) {
-                const emote = await context.platform.getBestAvailableEmote(context.channel, ["PepeLaugh", "pepeLaugh", "4Head"], "😅");
+                const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "4Head"], "😅");
                 return {
                     success: false,
                     reply: `You can't ${invocation} the ${commandData.Name} command! ${emote}`
@@ -72,7 +65,7 @@ module.exports = {
                 };
             }
             else if (commandData === this) {
-                const emote = await context.platform.getBestAvailableEmote(context.channel, ["PepeLaugh", "pepeLaugh", "4Head"], "😅");
+				const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "4Head"], "😅");
                 return {
                     success: false,
                     reply: `You can't ${invocation} the ${commandData.Name} command's invocation! ${emote}`
@@ -109,59 +102,40 @@ module.exports = {
             options.User_Alias = userData.ID;
         }
 
-		let level = null;
-		if (context.user.Data.administrator) {
-			level = "administrator";
-		}
-		else if (
-			context.channel
-			&& (await context.channel.isUserChannelOwner(context.user) || context.channel.isUserAmbassador(context.user))
-		) {
-			level = "channel-owner";
+        if (!options.Channel) {
+			options.Channel = context.channel.ID;
 		}
 
-		if (!options.Channel) {
-			if (level === "administrator") {
-				// OK.
-			}
-			else if (level === "channel-owner") {
-				options.Channel = context.channel.ID;
-			}
-			else {
-				return {
-					success: false,
-					reply: "Can't do that in this channel!"
-				};
-			}
-		}
-		else {
-			const channelData = sb.Channel.get(options.Channel);
-			if (level === "administrator") {
-				// OK.
-			}
-			else if (await channelData.isUserChannelOwner(context.user) || channelData.isUserAmbassador(context.user)) {
-				level = "channel-owner";
-			}
-			else {
-				return { success: false, reply: "Can't do that for provided channel" }
-			}
-		}
+        const channelData = sb.Channel.get(options.Channel);
+        const permissions = await context.getUserPermissions("array", ["admin", "owner", "ambassador"], {
+        	channel: channelData,
+			platform: channelData.Platform,
+		});
 
-		// if a channel owner doesn't provide a user or a command, then fail
-		// if an admin doesn't provide user, command or a channel, then fail
-		if (
-			(!options.User_Alias && !options.Command)
-			&& (level === "channel-owner" || (level === "administrator" && !options.Channel))
-		) {
+        if (permissions.every(i => !i)) {
 			return {
 				success: false,
-				reply: "Not enough data provided to create a ban!"
+				reply: "Can't do that in this channel!"
 			};
 		}
 
-		if (level === "channel-owner") {
+		const channelPermissions = permissions[1] || permissions[2];
+        if (!options.User_Alias && !options.Command && channelPermissions) {
+			return {
+				success: false,
+				reply: "Not enough data provided to create a ban! You are missing user and/or command"
+			};
+		}
+		if (!options.User_Alias && !options.Command && !options.Channel && permissions[0]) {
+			return {
+				success: false,
+				reply: "Not enough data provided to create a ban! You are missing user/command/channel"
+			};
+		}
+
+		if (channelPermissions) {
 			options.Response = "Reason";
-			options.Reason = "Banned by channel owner.";
+			options.Reason = "Banned in this channel.";
 		}
 
 		const existing = sb.Filter.data.find(i =>
@@ -173,7 +147,7 @@ module.exports = {
 		);
 
 		if (existing) {
-			if (existing.Issued_By !== context.user.ID && level !== "administrator") {
+			if (existing.Issued_By !== context.user.ID && !permission[0]) {
 				return {
 					success: false,
 					reply: "This ban has not been created by you, so you cannot modify it!"
