@@ -117,8 +117,16 @@ module.exports = {
 			const link = playing.Prefix.replace(linkSymbol, playing.Link);
 			const userData = await sb.User.get(playing.User);
 			const { length, time } = await sb.VideoLANConnector.status();
+
+			let currentPosition = length;
+			let segmentLength = time;
+			if (playing.Start_Time || playing.End_Time) {
+				currentPosition = time - (playing.Start_Time ?? 0);
+				segmentLength = (playing.End_Time ?? length) - (playing.Start_Time ?? 0);
+			}
+
 			const position = (includePosition)
-				? `Current position: ${time}/${length}s.`
+				? `Current position: ${currentPosition}/${segmentLength}s.`
 				: "";
 			const pauseString = (sb.Config.get("SONG_REQUESTS_VLC_PAUSED"))
 				? "The song request is paused at the moment."
