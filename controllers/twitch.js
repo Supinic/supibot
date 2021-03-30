@@ -784,7 +784,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @param {User} userData
 	 * @returns {boolean}
 	 */
-	isUserChannelOwner (channelData, userData) {
+	async isUserChannelOwner (channelData, userData) {
 		if (userData === null || channelData === null) {
 			return false;
 		}

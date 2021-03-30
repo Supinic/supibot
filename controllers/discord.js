@@ -386,6 +386,19 @@ module.exports = class DiscordController extends require("./template.js") {
 		};
 	}
 
+	async isUserChannelOwner (channelData, userData) {
+		if (userData === null || channelData === null) {
+			return false;
+		}
+
+		const guild = await this.client.channels.get(channelData.Name);
+		if (!guild) {
+			return false;
+		}
+
+		return (guild.owner === userData.Discord_ID);
+	}
+
 	async fetchUserList (channelIdentifier) {
 		const channel = await this.client.channels.fetch(channelIdentifier);
 		const guild = await channel.guild.fetch();
