@@ -35,8 +35,9 @@ module.exports = {
 	
 		let text = args.join(" ").trim();
 		let status = "now AFK";
+		let { invocation } = context;
 	
-		switch (context.invocation) {
+		switch (invocation) {
 			case "afk": [status, text] = ["now AFK", text || "(no message)"]; break;
 			case "gn": [status, text] = ["now sleeping", (text ? (text + " 💤") : " 🛏💤")]; break;
 			case "brb": [status, text] = ["going to be right back", text || "ppHop"]; break;
@@ -44,7 +45,7 @@ module.exports = {
 			
 			case "💩":			
 			case "poop": 
-				context.invocation = "poop";
+				invocation = "poop";
 				[status, text] = ["now pooping", (text ?  (text + " 🚽") : "💩")]; 
 				break;
 	
@@ -72,7 +73,7 @@ module.exports = {
 			}
 		}
 		
-		await sb.AwayFromKeyboard.set(context.user, text, context.invocation, false);
+		await sb.AwayFromKeyboard.set(context.user, text, invocation, false);
 		return {
 			partialReplies: [
 				{
