@@ -121,8 +121,8 @@ module.exports = {
 			let currentPosition = length;
 			let segmentLength = time;
 			if (playing.Start_Time || playing.End_Time) {
-				currentPosition = (playing.End_Time ?? length) - (playing.Start_Time ?? 0);
-				segmentLength = time - (playing.Start_Time ?? 0);
+				currentPosition = time - (playing.Start_Time ?? 0);
+				segmentLength = (playing.End_Time ?? length) - (playing.Start_Time ?? 0);
 			}
 
 			const position = (includePosition)
