@@ -54,8 +54,8 @@ module.exports = {
 
 		return {
 			reply: (channel)
-				? `${emotecode} (ID ${emoteid}) - ${tierString}. ${emoteLink} ${originString} ${cdnLink}`
-				: `${emotecode} (ID ${emoteid}) - global Twitch emote. ${emoteLink} ${originString} ${cdnLink}`
+				? `${emotecode} (ID ${emoteid}) - ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
+				: `${emotecode} (ID ${emoteid}) - global Twitch emote. ${emoteLink} ${cdnLink} ${originString}`
 		};
 	
 	}),
