@@ -83,7 +83,7 @@ module.exports = {
 		let introductionString = null;
 	
 		const playing = await sb.Query.getRecordset(rs => {
-			rs.select("Name", "VLC_ID", "Link", "User_Alias AS User")
+			rs.select("Name", "VLC_ID", "Link", "User_Alias AS User", "Start_Time", "End_Time")
 				.select("Video_Type.Link_Prefix AS Prefix")
 				.from("chat_data", "Song_Request")
 				.join({
@@ -121,8 +121,8 @@ module.exports = {
 			let currentPosition = length;
 			let segmentLength = time;
 			if (playing.Start_Time || playing.End_Time) {
-				currentPosition = time - (playing.Start_Time ?? 0);
-				segmentLength = (playing.End_Time ?? length) - (playing.Start_Time ?? 0);
+				currentPosition = (playing.End_Time ?? length) - (playing.Start_Time ?? 0);
+				segmentLength = time - (playing.Start_Time ?? 0);
 			}
 
 			const position = (includePosition)
