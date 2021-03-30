@@ -44,17 +44,18 @@ module.exports = {
 		);
 	
 		const emoteLink = "https://twitchemotes.com/emotes/" + emoteid;
+		const cdnLink = `https://static-cdn.jtvnw.net/emoticons/v1/${emoteid}/3.0`;
 		const tierString = (tier)
 			? `tier ${tier} sub emote to channel #${channel.toLowerCase()}`
 			: `special ${channel} emote`;
 		const originString = (originID)
 			? `This emote has origin info - use the ${sb.Command.prefix}origin command.`
 			: "";
-	
+
 		return {
 			reply: (channel)
-				? `${emotecode} (ID ${emoteid}) - ${tierString}. ${emoteLink} ${originString}`
-				: `${emotecode} (ID ${emoteid}) - global Twitch emote. ${emoteLink} ${originString}`
+				? `${emotecode} (ID ${emoteid}) - ${tierString}. ${emoteLink} ${originString} ${cdnLink}`
+				: `${emotecode} (ID ${emoteid}) - global Twitch emote. ${emoteLink} ${originString} ${cdnLink}`
 		};
 	
 	}),
