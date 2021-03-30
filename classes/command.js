@@ -1,9 +1,76 @@
-/**
- * Represents a bot command.
- * @memberof sb
- * @type Command
- */
-module.exports = class Command extends require("./template.js") {
+class Context {
+	#invocation;
+	#user;
+	#channel;
+	#platform;
+	#transaction = null;
+	#privateMessage = false;
+	#append = {};
+	#params = {};
+
+	constructor (data = {}) {
+		this.#invocation = data.invocation ?? null;
+		this.#user = data.user ?? null;
+		this.#channel = data.channel ?? null;
+		this.#platform = data.platform ?? null;
+		this.#transaction = data.transaction ?? null;
+		this.#privateMessage = data.privateMessage ?? false;
+		this.#append = data.append ?? {};
+		this.#params = data.params ?? {};
+	}
+
+	/**
+	 * Fetches the proper permissions for a provided user/channel/platform combo, substituting those that are not
+	 * provided with the context's own options.
+	 * @param {"any"|"all"|"array"} type Determines the result "shape" - `any` returns true if at least one flag is set,
+	 * `all` returns true if all are set, and `array` returns the boolean array as is
+	 * @param {UserPermissionLevel[]} levels The permission levels to check
+	 * @param {Object} options
+	 * @param {User} [options.user]
+	 * @param {Channel} [options.channel]
+	 * @param {Platform} [options.platform]
+	 * @returns {Promise<boolean[]|boolean>}
+	 */
+	async getUserPermissions (type, levels, options = {}) {
+		const userData = options.user ?? this.#user;
+		const channelData = options.channel ?? this.#channel;
+		const platformData = options.platform ?? this.#platform;
+
+		const promises = levels.map(async (level) => {
+			if (level === "admin") {
+				return Boolean(userData?.Data.administrator);
+			}
+			else if (level === "owner") {
+				return Boolean(await platformData?.isUserChannelOwner(channelData, userData));
+			}
+			else if (level === "ambassador") {
+				return Boolean(channelData?.isUserAmbassador(userData));
+			}
+		});
+
+		const result = await Promise.all(promises);
+		if (type === "any") {
+			return result.some(Boolean);
+		}
+		else if (type === "all") {
+			return result.every(Boolean);
+		}
+		else if (type === "array") {
+			return result;
+		}
+	}
+
+	get invocation () { return this.#invocation; }
+	get user () { return this.#user; }
+	get channel () { return this.#channel; }
+	get platform () { return this.#platform; }
+	get transaction () { return this.#transaction; }
+	get privateMessage () { return this.#privateMessage; }
+	get append () { return this.#append; }
+	get params () { return this.#params; }
+}
+
+class Command extends require("./template.js") {
 	//<editor-fold defaultstate="collapsed" desc="=== INSTANCE PROPERTIES ===">
 
 	/**
@@ -478,7 +545,7 @@ module.exports = class Command extends require("./template.js") {
 		const isPrivateMessage = (!channelData);
 
 		/** @type CommandContext */
-		const context = {
+		const contextOptions = {
 			platform: options.platform,
 			invocation: identifier,
 			user: userData,
@@ -497,7 +564,7 @@ module.exports = class Command extends require("./template.js") {
 		// If the command is rollbackable, set up a transaction.
 		// The command must use the connection in transaction - that's why it is passed to context
 		if (command.Flags.rollback) {
-			context.transaction = await sb.Query.getTransaction();
+			contextOptions.transaction = await sb.Query.getTransaction();
 		}
 
 		if (command.Params.length > 0) {
@@ -524,20 +591,20 @@ module.exports = class Command extends require("./template.js") {
 					}
 
 					if (type === "object") {
-						if (typeof context.params[name] === "undefined") {
-							context.params[name] = {};
+						if (typeof contextOptions.params[name] === "undefined") {
+							contextOptions.params[name] = {};
 						}
-						if (typeof context.params[name][parsedValue.key] !== "undefined") {
+						if (typeof contextOptions.params[name][parsedValue.key] !== "undefined") {
 							return {
 								success: false,
 								reply: `Cannot use multiple values for parameter "${name}", key ${parsedValue.key}!`
 							};
 						}
 
-						context.params[name][parsedValue.key] = parsedValue.value;
+						contextOptions.params[name][parsedValue.key] = parsedValue.value;
 					}
 					else {
-						context.params[name] = parsedValue;
+						contextOptions.params[name] = parsedValue;
 					}
 				}
 			}
@@ -562,20 +629,20 @@ module.exports = class Command extends require("./template.js") {
 					}
 
 					if (type === "object") {
-						if (typeof context.params[name] === "undefined") {
-							context.params[name] = {};
+						if (typeof contextOptions.params[name] === "undefined") {
+							contextOptions.params[name] = {};
 						}
-						if (typeof context.params[name][parsedValue.key] !== "undefined") {
+						if (typeof contextOptions.params[name][parsedValue.key] !== "undefined") {
 							return {
 								success: false,
 								reply: `Cannot use multiple values for parameter "${name}", key ${parsedValue.key}!`
 							};
 						}
 
-						context.params[name][parsedValue.key] = parsedValue.value;
+						contextOptions.params[name][parsedValue.key] = parsedValue.value;
 					}
 					else {
-						context.params[name] = parsedValue;
+						contextOptions.params[name] = parsedValue;
 					}
 
 					remainingArgs.splice(i, 1);
@@ -587,6 +654,8 @@ module.exports = class Command extends require("./template.js") {
 
 		/** @type CommandResult */
 		let execution;
+		const context = new Context(contextOptions);
+
 		try {
 			const start = process.hrtime.bigint();
 			execution = await command.Code(context, ...args);
@@ -963,7 +1032,7 @@ module.exports = class Command extends require("./template.js") {
 	 * @returns {CommandContext}
 	 */
 	static createFakeContext (commandData, contextData = {}) {
-		return {
+		return new Context({
 			invocation: commandData.Name,
 			user: contextData.user ?? null,
 			channel: contextData.channel ?? null,
@@ -972,7 +1041,7 @@ module.exports = class Command extends require("./template.js") {
 			privateMessage: contextData.isPrivateMessage ?? false,
 			append: contextData.append ?? {},
 			params: contextData.params ?? {}
-		};
+		});
 	}
 
 	/**
@@ -1041,7 +1110,9 @@ module.exports = class Command extends require("./template.js") {
 
 		return sb.Config.set("COMMAND_PREFIX", value.trim());
 	}
-};
+}
+
+module.exports = Command;
 
 /**
  * @typedef {Object} CommandResult
@@ -1091,4 +1162,8 @@ module.exports = class Command extends require("./template.js") {
  * @typedef {Object} CommandParameterDefinition
  * @property {string} name Parameter name, as it will be used in execution
  * @property {"string"|"number"|"boolean"|"date"} type Parameter type - string value will be parsed into this type
+ */
+
+/**
+ * @typedef {"admin"|"owner"|"ambassador"} UserPermissionLevel
  */
