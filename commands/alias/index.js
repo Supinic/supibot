@@ -92,7 +92,9 @@ module.exports = {
 		type = type.toLowerCase();
 		switch (type) {
 			case "add":
-			case "create": {
+			case "addedit":
+			case "create":
+			case "upsert": {
 				const [name, command, ...rest] = args;
 				if (!name || !command) {
 					return {
@@ -100,7 +102,7 @@ module.exports = {
 						reply: `You didn't provide a name, or a command! Use: alias add (name) (command) (...arguments)"`
 					};
 				}
-				else if (wrapper.has(name)) {
+				else if (wrapper.has(name) && type !== "addedit" && type !== "upsert") {
 					return {
 						success: false,
 						reply: `Cannot add alias "${name}" - you already have one! You can either _edit_ its definion, _rename_ it or _remove_ it.`
@@ -129,8 +131,14 @@ module.exports = {
 					created: new sb.Date().toJSON(),
 					lastEdit: null
 				});
-	
-				reply = `Your alias "${name}" has been created successfully.`;
+
+				if (type === "add" || type === "create") {
+					reply = `Your alias "${name}" has been created successfully.`;
+				}
+				else {
+					reply = `Your alias "${name}" has been replaced successfully.`;
+				}
+
 				break;
 			}
 	
@@ -153,8 +161,9 @@ module.exports = {
 					reply: `Your alias "${name}" has this definition: ${invocation} ${commandArgs.join(" ")}`
 				};
 			}
-	
-			case "copy": {
+
+			case "copy":
+			case "copyplace": {
 				const [targetUser, targetAlias] = args;
 				if (!targetUser) {
 					return {
@@ -192,9 +201,11 @@ module.exports = {
 				}
 	
 				const alias = aliases[targetAlias];
+				const operation = (type === "copy") ? "add" : "upsert";
+
 				return await this.execute(
 					context,
-					"add",
+					operation,
 					targetAlias,
 					alias.invocation,
 					...alias.args
@@ -425,8 +436,10 @@ module.exports = {
 			"",
 	
 			`<code>${prefix}alias copy (username) (alias)</code>`,
-			"Takes someone else's alias, and attempts to copy it with the same name for you. Behaves like <code>add</code>, so if you have an alias with the same name, the copying will fail",
-			`<code>${prefix}alias copy supinic lol</code>`,
+			`<code>${prefix}alias copyplace (username) (alias)</code>`,
+			"Takes someone else's alias, and attempts to copy it with the same name for you.`," +
+			"If you use <code>copy</code>, it will only create an alias if you don't already have one with that name.",
+			"If you use <code>copyplace</code>, it will replace whatever alias you have with that name without asking.",
 			"",
 	
 			`<code>${prefix}alias check (name)</code>`,
@@ -437,6 +450,11 @@ module.exports = {
 			`<code>${prefix}alias edit (name)</code>`,
 			"Edits an existing alias, without the need of removing and re-adding it.",
 			`<code>${prefix}alias edit <u>hello</u></code> => "translate to:italian Hello!"`,
+			"",
+
+			`<code>${prefix}alias addedit (name) (definition)</code>`,
+			`<code>${prefix}alias upsert (name) (definition)</code>`,
+			`Creates a new alias, or updates an existing alias of your own. If you replace an existing one, you will lose its definition`,
 			"",
 	
 			`<code>${prefix}alias rename (old-name) (new-name)</code>`,
