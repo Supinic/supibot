@@ -4,23 +4,35 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Bans/unbans any combination of channel, user, and command from being executed. Only usable by administrators, or Twitch channel owners.",
-	Flags: ["mention","system","use-params"],
+	Flags: ["mention","use-params"],
 	Params: [
         { name: "channel", type: "string" },
         { name: "command", type: "string" },
         { name: "invocation", type: "string" },
+        { name: "type", type: "string" },
         { name: "user", type: "string" }
     ],
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: (() => ({
+		availableTypes: ["blacklist", "online-only", "offline-only"]
+	})),
 	Code: (async function ban (context) {
 		const { invocation } = context;
+		const { availableTypes } = this.staticData;
+		const type = sb.Utils.capitalize(context.params.type ?? "Blacklist");
+		if (!availableTypes.includes(type)) {
+			return {
+				success: false,
+				reply: "Invalid ban filter type provided! Use one of " + availableTypes.join(", ")
+			};
+		}
+
 		const options = {
 			Channel: null,
 			User_Alias: null,
 			Command: null,
 			Invocation: null,
-			Type: "Blacklist",
+			Type: type,
 			Response: "None",
 			Reason: null,
 			Issued_By: context.user.ID
@@ -138,7 +150,7 @@ module.exports = {
 		}
 
 		const existing = sb.Filter.data.find(i =>
-			i.Type === "Blacklist"
+			i.Type === type
 			&& i.Channel === options.Channel
 			&& i.Command === options.Command
 			&& i.Invocation === options.Invocation
