@@ -94,7 +94,7 @@ module.exports = {
 					reply: "You can't set any settings without being in a channel!"
 				};
 			}
-			else if (!user.Data.administrator && !channel.isUserChannelOwner(user) && !channel.isUserAmbassador(user)) {
+			else if (!user.Data.administrator && !await channel.isUserChannelOwner(user) && !channel.isUserAmbassador(user)) {
 				return {
 					success: false,
 					reply: "You don't have access to this channel's settings! Only administrators, channel owners and ambassadors can."
@@ -566,7 +566,7 @@ module.exports = {
 	
 						// const flagger = Boolean(context.user.Data.trustedTwitchLottoFlagger); // skipped for now
 						const ambassador = context.channel.isUserAmbassador(context.user);
-						const owner = context.channel.isUserChannelOwner(context.user);
+						const owner = await context.channel.isUserChannelOwner(context.user);
 						if (!ambassador && !owner) {
 							return {
 								success: false,
@@ -605,7 +605,7 @@ module.exports = {
 	
 						// const flagger = Boolean(context.user.Data.trustedTwitchLottoFlagger); // skipped for now
 						const ambassador = context.channel.isUserAmbassador(context.user);
-						const owner = context.channel.isUserChannelOwner(context.user);
+						const owner = await context.channel.isUserChannelOwner(context.user);
 						if (!ambassador && !owner) {
 							return {
 								success: false,
@@ -739,7 +739,7 @@ module.exports = {
 		}
 		else if (
 			target.elevatedChannelAccess
-			&& !context.channel.isUserChannelOwner(context.user)
+			&& !await context.channel.isUserChannelOwner(context.user)
 			&& !context.channel.isUserAmbassador(context.user)
 		) {
 			return {

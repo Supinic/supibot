@@ -115,7 +115,7 @@ module.exports = {
 		}
 		else if (
 			context.channel
-			&& (context.channel.isUserChannelOwner(context.user) || context.channel.isUserAmbassador(context.user))
+			&& (await context.channel.isUserChannelOwner(context.user) || context.channel.isUserAmbassador(context.user))
 		) {
 			level = "channel-owner";
 		}
@@ -139,7 +139,7 @@ module.exports = {
 			if (level === "administrator") {
 				// OK.
 			}
-			else if (channelData.isUserChannelOwner(context.user) || channelData.isUserAmbassador(context.user)) {
+			else if (await channelData.isUserChannelOwner(context.user) || channelData.isUserAmbassador(context.user)) {
 				level = "channel-owner";
 			}
 			else {

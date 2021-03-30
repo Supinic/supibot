@@ -11,7 +11,7 @@ module.exports = {
 	Code: (async function top (context, rawLimit) {
 		if (
 			!context.user.Data.administrator
-			&& !context.channel.isUserChannelOwner(context.user)
+			&& !await context.channel.isUserChannelOwner(context.user)
 			&& !context.channel.isUserAmbassador(context.user)
 		) {
 			return {

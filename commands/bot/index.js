@@ -57,7 +57,7 @@ module.exports = {
 	
 		const hasAccess = (
 			context.user.Data.administrator
-			|| channelData.isUserChannelOwner(context.user)
+			|| await channelData.isUserChannelOwner(context.user)
 			|| channelData.isUserAmbassador(context.user)
 		);
 	
