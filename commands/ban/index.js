@@ -223,8 +223,8 @@ module.exports = {
 			"",
 
 			`<code>${prefix}ban type:offline-only (...)</code>`,
-			"For any previously mentioned combination, the result will be that the command will only be available while the channel is live.",
-			"You can still use any combination of invocation/command/user/channel to be specific.",
+			"For any previously mentioned combination, the combination will only be available when the channel is offline.",
+			"You can still specify any combination of invocation/command/user/channel to be more or less specific.",
 			"",
 
 			`<code>${prefix}ban type:online-only (...)</code>`,
