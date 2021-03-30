@@ -2,7 +2,7 @@ module.exports = {
 	Name: "pastebin",
 	Aliases: ["pbg", "pbp"],
 	Author: "supinic",
-	Cooldown: 20000,
+	Cooldown: 30000,
 	Description: "Takes the result of a different command (pipe-only) and posts a Pastebin paste with it.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
@@ -57,9 +57,11 @@ module.exports = {
 			}
 
 			let data;
+			let cooldown = this.Cooldown;
 			const cacheData = (context.params.force) ? null : await this.getCacheData(path);
 			if (cacheData) {
 				data = cacheData;
+				cooldown = 5000;
 			}
 			else {
 				const result = await sb.Pastebin.get(path);
@@ -91,6 +93,7 @@ module.exports = {
 			}
 
 			return {
+				cooldown,
 				reply: data
 			};
 		}
