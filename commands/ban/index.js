@@ -14,7 +14,7 @@ module.exports = {
     ],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		availableTypes: ["blacklist", "online-only", "offline-only"]
+		availableTypes: ["Blacklist", "Online-only", "Offline-only"]
 	})),
 	Code: (async function ban (context) {
 		const { invocation } = context;
