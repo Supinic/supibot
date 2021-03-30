@@ -21,8 +21,12 @@ module.exports = {
 				return;
 			}
 		}
+		if (typeof this.data.threshold !== "number") {
+			this.data.threshold = 2000;
+		}
+
 		const markov = this.data.markovs.get(context.channel);
-		if (markov.size > 2000) {
+		if (markov.size > this.data.threshold) {
 			return;
 		}
 
