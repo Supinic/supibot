@@ -104,7 +104,7 @@
 
 	console.log("Setting up platform access...");
 	const platformList = {
-		twitch: { auth: "TWITCH_OAUTH", ID: 1 },
+		twitch: { auth: "TWITCH_OAUTH", extra: "TWITCH_CLIENT_ID", extraName: "Client ID", ID: 1 },
 		discord: { auth: "DISCORD_BOT_TOKEN", ID: 2 },
 		cytube: { auth: "CYTUBE_BOT_PASSWORD", ID: 3 }
 	};
@@ -135,7 +135,20 @@
 			configRow.values.Value = pass;
 			await configRow.save();		
 			console.log(`Authentication key for ${platform} set up successfully.`);
-			
+
+			if (platformList[platform].extra) {
+				const pass = await ask(`Enter ${platformList[platform].extraName} for platform "${platform}":\n`);
+				if (!pass) {
+					console.log(`Skipped setting up ${platform}!`);
+					continue;
+				}
+
+				const extraRow = await sb.Query.getRow("data", "Config");
+				await extraRow.load(platformList[platform].extra);
+				extraRow.values.Value = pass;
+				await extraRow.save();
+			}
+
 			const botName = await ask(`Enter bot's account name for platform "${platform}":\n`);
 			if (!botName) {
 				console.log(`Skipped setting up ${platform}!`);
