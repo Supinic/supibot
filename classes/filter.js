@@ -346,12 +346,13 @@ module.exports = class Filter extends require("./template.js") {
 			));
 
 			if (optout) {
+				const targetType = (optout.Invocation) ? "command invocation" : "command";
 				return {
 					success: false,
 					reason: "opt-out",
 					filter: optout,
 					reply: (optout.Response === "Auto")
-						? "🚫 That user has opted out from being the command target!"
+						? `🚫 That user has opted out from being the target of your ${targetType}!`
 						: (optout.Response === "Reason")
 							? optout.Reason
 							: null
@@ -368,12 +369,13 @@ module.exports = class Filter extends require("./template.js") {
 			));
 
 			if (block) {
+				const targetType = (optout.Invocation) ? "command invocation" : "command";
 				return {
 					success: false,
 					reason: "block",
 					filter: block,
 					reply: (block.Response === "Auto")
-						? "🚫 That user has opted out from being the target of your command!"
+						? `🚫 That user has opted out from being the target of your ${targetType}!`
 						: (block.Response === "Reason")
 							? block.Reason
 							: null
@@ -392,8 +394,11 @@ module.exports = class Filter extends require("./template.js") {
 				reply = blacklist.Response;
 			}
 			else if (blacklist.Response === "Auto") {
-				if (blacklist.Channel && blacklist.Command && blacklist.User_Alias) {
-					reply = "You cannot execute that command in this channel.";
+				if (blacklist.Channel && blacklist.User_Alias && blacklist.Command && blacklist.Invocation) {
+					reply = "You cannot execute this command invocation in this channel.";
+				}
+				else if (blacklist.Channel && blacklist.User_Alias && blacklist.Command) {
+					reply = "You cannot execute this command in this channel.";
 				}
 				else if (blacklist.Channel && blacklist.Command) {
 					reply = "This command cannot be executed in this channel.";
@@ -401,11 +406,17 @@ module.exports = class Filter extends require("./template.js") {
 				else if (blacklist.Channel && blacklist.User_Alias) {
 					reply = "You cannot execute any commands in this channel.";
 				}
+				else if (blacklist.User_Alias && blacklist.Command && blacklist.Invocation) {
+					reply = "You cannot execute this command invocation in any channel.";
+				}
 				else if (blacklist.User_Alias && blacklist.Command) {
 					reply = "You cannot execute this command in any channel.";
 				}
 				else if (blacklist.User_Alias) {
 					reply = "You cannot execute any commands in any channel.";
+				}
+				else if (blacklist.Command && blacklist.Invocation) {
+					reply = "This command invocation cannot be executed anywhere.";
 				}
 				else if (blacklist.Command) {
 					reply = "This command cannot be executed anywhere.";
@@ -440,12 +451,13 @@ module.exports = class Filter extends require("./template.js") {
 
 		const offlineOnly = localFilters.find(i => i.Type === "Offline-only");
 		if (offlineOnly && channelLive === true) {
+			const targetType = (optout.Invocation) ? "command invocation" : "command";
 			return {
 				success: false,
 				reason: "offline-only",
 				filter: offlineOnly,
 				reply: (offlineOnly.Response === "Auto")
-					? "🚫 This command is only available when the channel is offline!"
+					? `🚫 This ${targetType} is only available when the channel is offline!`
 					: (offlineOnly.Response === "Reason")
 						? offlineOnly.Reason
 						: null
@@ -459,7 +471,7 @@ module.exports = class Filter extends require("./template.js") {
 				reason: "online-only",
 				filter: onlineOnly,
 				reply: (onlineOnly.Response === "Auto")
-					? "🚫 This command is only available when the channel is online!"
+					? `🚫 This ${targetType} is only available when the channel is online!`
 					: (onlineOnly.Response === "Reason")
 						? onlineOnly.Reason
 						: null
