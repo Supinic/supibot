@@ -56,7 +56,7 @@ module.exports = {
 		}
 	
 		return {
-			reply: `That user was last seen ${sb.Utils.timeDelta(date)}.`
+			reply: `That user was last seen in chat ${sb.Utils.timeDelta(date)}.`
 		};
 	}),
 	Dynamic_Description: null
