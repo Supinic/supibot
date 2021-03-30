@@ -118,8 +118,8 @@ module.exports = {
 			const userData = await sb.User.get(playing.User);
 			const { length, time } = await sb.VideoLANConnector.status();
 
-			let currentPosition = length;
-			let segmentLength = time;
+			let currentPosition = time;
+			let segmentLength = length;
 			if (playing.Start_Time || playing.End_Time) {
 				currentPosition = time - (playing.Start_Time ?? 0);
 				segmentLength = (playing.End_Time ?? length) - (playing.Start_Time ?? 0);
