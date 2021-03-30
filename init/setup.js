@@ -24,6 +24,7 @@
 		["username", "MARIA_USER", "your_username"],
 		["password", "MARIA_PASSWORD", "your_password"],
 		["host", "MARIA_HOST", "your_host"],
+		["port", "MARIA_PORT", "your_port"],
 		["socket", "MARIA_SOCKET_PATH", "your_socket"],
 	];
 
@@ -53,7 +54,7 @@
 			console.log(`Database ${name} is already set up - skipping...`);
 		}
 		else {
-			const result = await ask(`Set up database ${name} - type a new value (or nothing to keep empty)\n`);
+			const result = await ask(`Set up database ${name} - type a new value (or nothing to ${name === 'port' ? 'use 3306' : 'keep empty'})\n`);
 			
 			if (!result) {
 				accessFileString = accessFileString.replace(implicit, "");
