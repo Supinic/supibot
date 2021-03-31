@@ -48,7 +48,7 @@ module.exports = {
 					on: "Author.ID = Track_Author.Author"
 				})
 				.where("Available = %b", true)
-				// .where("Track.Video_Type = %n", 1)
+				.where("Track.Video_Type = %n", 1)
 				.where("Track_Tag.Tag IN %n+", [6, 22])
 				.groupBy("Track.ID")
 				.orderBy("RAND() DESC")
