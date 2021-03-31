@@ -107,7 +107,7 @@ module.exports = {
 		}
 
 		let wordCount = 15;
-		let seed = null;
+		const seed = input;
 
 		if (context.params.words) {
 			const { words } = context.params;
