@@ -117,7 +117,7 @@ module.exports = {
 					reply: "Invalid number of words provided!"
 				};
 			}
-			else if (input > limit) {
+			else if (words > limit) {
 				return {
 					success: false,
 					reply: `Too many words! Current maximum: ${limit}`
