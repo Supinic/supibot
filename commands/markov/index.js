@@ -7,6 +7,7 @@ module.exports = {
 	Flags: ["non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "stop", type: "boolean" },
+		{ name: "words", type: "number" },
 		{ name: "debug", type: "string" }
 	],
 	Whitelist_Response: null,
@@ -108,28 +109,22 @@ module.exports = {
 		let wordCount = 15;
 		let seed = null;
 
-		if (input) {
-			if (Number(input)) {
-				const words = Number(input);
-
-				if (!sb.Utils.isValidInteger(words, 1)) {
-					return {
-						success: false,
-						reply: "Invalid number of words provided!"
-					};
-				}
-				else if (input > limit) {
-					return {
-						success: false,
-						reply: `Too many words! Current maximum: ${limit}`
-					};
-				}
-
-				wordCount = words;
+		if (context.params.words) {
+			const { words } = context.params;
+			if (!sb.Utils.isValidInteger(words, 1)) {
+				return {
+					success: false,
+					reply: "Invalid number of words provided!"
+				};
 			}
-			else {
-				seed = input;
+			else if (input > limit) {
+				return {
+					success: false,
+					reply: `Too many words! Current maximum: ${limit}`
+				};
 			}
+
+			wordCount = words;
 		}
 		if (typeof seed === "string" && !markov.has(seed)) {
 			return {
