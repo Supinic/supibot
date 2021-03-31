@@ -10,10 +10,40 @@ module.exports = {
 		{ name: "debug", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		limit: 20,
-		threshold: 250
-	})),
+	Static_Data: (() => {
+		this.data.updateCron = new sb.Cron({
+			Name: "markov-word-list-updater",
+			Description: "Regularly updates the available words in $markov.",
+			Expression: "0 * * * * *",
+			Code: (async function markovUpdater () {
+				const module = sb.ChatModule.get("async-markov-experiment");
+				if (!module) {
+					return;
+				}
+
+				const markov = module.data.markovs.get(sb.Channel.get("forsen"));
+				if (!markov) {
+					return;
+				}
+
+				const keys = markov.keys.sort();
+				await sb.Cache.setByPrefix("markov-word-list", keys, {
+					expiry: 864e5
+				});
+			})
+		});
+		this.data.updateCron.start();
+
+		return {
+			limit: 20,
+			threshold: 250,
+			destroy: (command) => {
+				if (command.data.updateCron) {
+					command.data.updateCron.destroy();
+				}
+			}
+		};
+	}),
 	Code: (async function markov (context, input) {
 		const { limit, threshold } = this.staticData;
 		const module = sb.ChatModule.get("async-markov-experiment");
@@ -75,7 +105,7 @@ module.exports = {
 			}
 		}
 
-		let wordCount = 10;
+		let wordCount = 15;
 		let seed = null;
 
 		if (input) {
