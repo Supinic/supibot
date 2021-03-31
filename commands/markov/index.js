@@ -129,7 +129,7 @@ module.exports = {
 		if (typeof seed === "string" && !markov.has(seed)) {
 			return {
 				success: false,
-				reply: "That word is not available as seed for random generation!"
+				reply: "That word is not available as seed for random generation! Check a list here: https://supinic.com/data/other/markov/words"
 			};
 		}
 
