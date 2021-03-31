@@ -391,12 +391,12 @@ module.exports = class DiscordController extends require("./template.js") {
 			return false;
 		}
 
-		const guild = await this.client.channels.get(channelData.Name);
-		if (!guild) {
+		const channel = await this.client.channels.fetch(channelData.Name);
+		if (!channel || !channel.guild) {
 			return false;
 		}
 
-		return (guild.owner === userData.Discord_ID);
+		return (channel.guild.owner === userData.Discord_ID);
 	}
 
 	async fetchUserList (channelIdentifier) {
