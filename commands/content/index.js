@@ -25,7 +25,7 @@ module.exports = {
 			if (item.Category === null && item.Status === null) {
 				count.new++
 			}
-			else if (item.Category === "Bot addition" && item.Status === "Approved") {
+			else if (item.Category === "Bot addition") {
 				count.botRequest++;
 			}
 			else {
