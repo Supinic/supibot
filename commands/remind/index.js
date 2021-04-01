@@ -18,7 +18,8 @@ module.exports = {
 			"public-outgoing":  "You have too many public reminders pending!",
 			"private-incoming": "That person has too many private reminders pending!",
 			"private-outgoing": "You have too many private reminders pending!"
-		}
+		},
+		sqlDateLimit: new sb.Date(253402297199999) // SQL DATETIME limit - 9999-12-31 23:59:59.999
 	})),
 	Code: (async function remind (context, ...args) {
 		const hasChrono = Boolean(context.params.at ?? context.params.on);
@@ -201,7 +202,7 @@ module.exports = {
 				cooldown: this.Cooldown / 2
 			};
 		}
-		else if ((sb.Date.now() + delta) > sb.Config.get("SQL_DATETIME_LIMIT")) {
+		else if ((sb.Date.now() + delta) > this.staticData.sqlDateLimit) {
 			const description = (Number.isFinite(comparison.valueOf()))
 				? `the date ${comparison.format("Y-m-d")}`
 				: `${sb.Utils.groupDigits(Math.trunc(delta / 31_536_000_000))} years in the future`;
