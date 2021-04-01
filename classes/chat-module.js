@@ -241,6 +241,10 @@ module.exports = class ChatModule extends require("./template.js") {
 	}
 
 	static async reloadSpecific (...list) {
+		if (list.length === 0) {
+			return false;
+		}
+
 		const existingModules = list.map(i => ChatModule.get(i)).filter(Boolean);
 		for (const chatModule of existingModules) {
 			const index = ChatModule.data.findIndex(i => i === chatModule);
@@ -257,6 +261,8 @@ module.exports = class ChatModule extends require("./template.js") {
 			const chatModule = ChatModule.#create(row);
 			ChatModule.data.push(chatModule);
 		}
+
+		return true;
 	}
 
 	static getChannelModules (channel) {

@@ -420,6 +420,10 @@ class Command extends require("./template.js") {
 	 * @throws {sb.Error} If the list contains 0 valid commands
 	 */
 	static async reloadSpecific (...list) {
+		if (list.length === 0) {
+			return false;
+		}
+
 		const existingCommands = list.map(i => Command.get(i)).filter(Boolean);
 		for (const command of existingCommands) {
 			const index = Command.data.findIndex(i => i.ID === command.ID);
@@ -447,6 +451,8 @@ class Command extends require("./template.js") {
 			const command = new Command(record);
 			Command.data.push(command);
 		}
+
+		return true;
 	}
 
 	/**

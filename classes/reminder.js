@@ -230,6 +230,10 @@ module.exports = class Reminder extends require("./template.js") {
     }
 
     static async reloadSpecific (...list) {
+        if (list.length === 0) {
+            return false;
+        }
+
         const promises = list.map(async (ID) => {
             const row = await sb.Query.getRow("chat_data", "Reminder");
             await row.load(ID);
@@ -250,6 +254,7 @@ module.exports = class Reminder extends require("./template.js") {
         });
 
         await Promise.all(promises);
+        return true;
     }
 
     static get (identifier) {

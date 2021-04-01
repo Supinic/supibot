@@ -3,7 +3,8 @@
  * @memberof sb
  * @type Channel
  */
-module.exports = class Channel extends require("./template.js") {
+const Template = require("./template.js");
+module.exports = class Channel extends Template {
     static redisPrefix = "sb-channel";
 
     /** @alias {Channel} */
@@ -496,6 +497,10 @@ module.exports = class Channel extends require("./template.js") {
 
     static async reloadSpecific (...list) {
         const channelsData = list.map(i => Channel.get(i)).filter(Boolean);
+        if (channelsData.length === 0) {
+            return false;
+        }
+
         const data = await sb.Query.getRecordset(rs => rs
             .select("*")
             .from("chat_data", "Channel")
@@ -522,6 +527,8 @@ module.exports = class Channel extends require("./template.js") {
 
             Channel.data.push(newChannelData);
         }
+
+        return true;
     }
 };
 
