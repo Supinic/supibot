@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `chat_data`.`Banphrase_API_Denial_Log` (
-	`ID` INT(11) NOT NULL AUTO_INCREMENT,
+	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`Message` MEDIUMTEXT NOT NULL COLLATE 'utf8mb4_general_ci',
 	`Response` MEDIUMTEXT NOT NULL COLLATE 'utf8mb4_general_ci',
 	`Channel` INT(10) UNSIGNED NOT NULL,
