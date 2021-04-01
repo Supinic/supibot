@@ -16,8 +16,12 @@ module.exports = {
 		if (!redemption) {
 			return;
 		}
+		else if (typeof redemption.reply !== "string") {
+			console.warn("Redemption has no/invalid message configured", { channel: channel.ID });
+			return;
+		}
 
-		await channel.send(redemption.message);
+		await channel.send(redemption.reply);
 	}),
 	Author: "supinic"
 };
