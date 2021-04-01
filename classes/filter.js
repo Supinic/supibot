@@ -560,6 +560,33 @@ module.exports = class Filter extends require("./template.js") {
 	static async getFlags (options) {
 		return Filter.getLocals("Flags", options);
 	}
+
+	static async reloadSpecific (...list) {
+		if (list.length === 0) {
+			return false;
+		}
+
+		const promises = list.map(async (ID) => {
+			const row = await sb.Query.getRow("chat_data", "Filter");
+			await row.load(ID);
+
+			const existingIndex = Filter.data.findIndex(i => i.ID === ID);
+			if (existingIndex !== -1) {
+				Filter.data[existingIndex].destroy();
+				Filter.data.splice(existingIndex, 1);
+			}
+
+			if (!row.values.Active) {
+				return;
+			}
+
+			const banphrase = new Filter(row.valuesObject);
+			Filter.data.push(banphrase);
+		});
+
+		await Promise.all(promises);
+		return true;
+	}
 };
 
 /**
