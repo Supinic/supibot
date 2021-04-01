@@ -181,7 +181,7 @@ module.exports = (function () {
 				}
 
 				const banphrase = new Banphrase(row.valuesObject);
-				Reminder.data.push(banphrase);
+				Banphrase.data.push(banphrase);
 			});
 
 			await Promise.all(promises);
