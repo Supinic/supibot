@@ -53,7 +53,7 @@ module.exports = {
 					}
 				});
 
-				resultArguments.push(parsed);
+				resultArguments.push(...parsed.split(" "));
 			}
 
 			return {
