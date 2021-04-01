@@ -408,7 +408,7 @@ module.exports = {
 				execute: async (context) => {
 					const types = await sb.Query.getRecordset(rs => rs
 						.select("Type")
-						.from("chat_data", "Event_Subscription")
+						.from("data", "Event_Subscription")
 						.where("User_Alias = %n", context.user.ID)
 						.where("Active = %b", true)
 						.orderBy("Type")

@@ -7,7 +7,7 @@ module.exports = {
 	Code: (async function notifyOnSuggestionChange () {
 		const subscriptions = await sb.Query.getRecordset(rs => rs
 			.select("User_Alias", "Platform")
-			.from("chat_data", "Event_Subscription")
+			.from("data", "Event_Subscription")
 			.where("Active = %b", true)
 			.where("Type = %s", "Suggestion")
 		);

@@ -148,7 +148,7 @@ module.exports = {
 		const { invocation } = context;
 		const subData = await sb.Query.getRecordset(rs => rs
 			.select("ID", "Active")
-			.from("chat_data", "Event_Subscription")
+			.from("data", "Event_Subscription")
 			.where("User_Alias = %n", context.user.ID)
 			.where("Type = %s", event.name)
 			.limit(1)
@@ -156,7 +156,7 @@ module.exports = {
 		);
 	
 		if (typeof event.handler === "function") {
-			const subscription = await sb.Query.getRow("chat_data", "Event_Subscription");
+			const subscription = await sb.Query.getRow("data", "Event_Subscription");
 			if (subData?.ID) {
 				await subscription.load(subData.ID);
 			}
@@ -178,7 +178,7 @@ module.exports = {
 			}
 	
 			await sb.Query.getRecordUpdater(rs => rs
-				.update("chat_data", "Event_Subscription")
+				.update("data", "Event_Subscription")
 				.set("Active", !subData.Active)
 				.where("ID = %n", subData.ID)
 			);
@@ -195,7 +195,7 @@ module.exports = {
 				};
 			}
 	
-			const row = await sb.Query.getRow("chat_data", "Event_Subscription");
+			const row = await sb.Query.getRow("data", "Event_Subscription");
 			row.setValues({
 				User_Alias: context.user.ID,
 				Platform: context.platform.ID,

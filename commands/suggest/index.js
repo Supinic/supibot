@@ -30,7 +30,7 @@ module.exports = {
 	
 		const isSubscribed = await sb.Query.getRecordset(rs => rs
 			.select("ID")
-			.from("chat_data", "Event_Subscription")
+			.from("data", "Event_Subscription")
 			.where("User_Alias = %n", context.user.ID)
 			.where("Type = %s", "Suggestion")
 			.flat("ID")
@@ -39,7 +39,7 @@ module.exports = {
 	
 		let subscribed = "";
 		if (!isSubscribed) {
-			const row = await sb.Query.getRow("chat_data", "Event_Subscription");
+			const row = await sb.Query.getRow("data", "Event_Subscription");
 			row.setValues({
 				Active: true,
 				Platform: context.platform.ID,

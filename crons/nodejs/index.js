@@ -20,9 +20,10 @@ module.exports = {
 				.select("Event_Subscription.User_Alias AS ID")
 				.select("User_Alias.Name AS Username")
 				.select("MAX(Meta.Last_Message_Posted) AS Last_Seen")
-				.from("chat_data", "Event_Subscription")
+				.from("data", "Event_Subscription")
 				.join("chat_data", "User_Alias")
 				.join({
+					toDatabase: "chat_data",
 					toTable: "Message_Meta_User_Alias",
 					alias: "Meta",
 					on: "Event_Subscription.User_Alias = Meta.User_Alias"
