@@ -449,7 +449,7 @@ module.exports = {
 	
 			`<code>${prefix}alias edit (name)</code>`,
 			"Edits an existing alias, without the need of removing and re-adding it.",
-			`<code>${prefix}alias edit <u>hello</u></code> => "translate to:italian Hello!"`,
+			`<code>${prefix}alias edit <u>hello</u> translate to:italian Hello!</code>`,
 			"",
 
 			`<code>${prefix}alias addedit (name) (definition)</code>`,
