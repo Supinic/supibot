@@ -6,7 +6,7 @@ module.exports = {
 		if (this.data.config === null) {
 			return;
 		}
-		else if (typeof this.data.config !== "undefined") {
+		else if (typeof this.data.config === "undefined") {
 			try {
 				this.data.config = require("./config.js");
 			}
