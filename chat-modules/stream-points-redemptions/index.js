@@ -7,14 +7,16 @@ module.exports = {
 			return;
 		}
 		else if (typeof this.data.config === "undefined") {
-			try {
-				this.data.config = require("./config.js");
-			}
-			catch (e) {
-				console.warn("redemption chat module fail", e);
-				this.data.config = null;
-				return;
-			}
+			this.data.config = [
+				{
+					name: "Javascript rant",
+					redemption: "44df442f-3fe8-4417-a377-112ff9c3708a",
+					channel: 38,
+					callback: (context) => {
+						context.channel.send("@Supinic, time to rant about JS FeelsJavascriptMan");
+					}
+				}
+			];
 		}
 
 		const { messageData } = context;
