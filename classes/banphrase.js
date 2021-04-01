@@ -129,6 +129,10 @@ module.exports = (function () {
 			}
 		}
 
+		destroy () {
+			this.data = null;
+		}
+
 		async toggle () {
 			this.Active = !this.Active;
 			if (typeof this.ID === "number") {
@@ -155,6 +159,33 @@ module.exports = (function () {
 			);
 
 			Banphrase.data = data.map(record => new Banphrase(record));
+		}
+
+		static async reloadSpecific (...list) {
+			if (list.length === 0) {
+				return false;
+			}
+
+			const promises = list.map(async (ID) => {
+				const row = await sb.Query.getRow("chat_data", "Banphrase");
+				await row.load(ID);
+
+				const existingIndex = Banphrase.data.findIndex(i => i.ID === ID);
+				if (existingIndex !== -1) {
+					Banphrase.data[existingIndex].destroy();
+					Banphrase.data.splice(existingIndex, 1);
+				}
+
+				if (!row.values.Active) {
+					return;
+				}
+
+				const banphrase = new Banphrase(row.valuesObject);
+				Reminder.data.push(banphrase);
+			});
+
+			await Promise.all(promises);
+			return true;
 		}
 
 		static get (identifier) {
