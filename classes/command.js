@@ -440,9 +440,12 @@ class Command extends require("./template.js") {
 				.from("chat_data", "Command")
 				.where("Flags NOT %*like* OR Flags IS NULL", "archived");
 
-			for (const name of list) {
-				rs.where("Name = %s OR JSON_CONTAINS(Aliases, JSON_QUOTE(%s))", name, name);
-			}
+			const nameConditions = list.map(i => {
+				const name = sb.Query.escapeString(i);
+				return `(Name = '${name}' OR JSON_CONTAINS(Aliases, JSON_QUOTE('${name}')))`;
+			});
+
+			rs.where(nameConditions.join(" OR "));
 
 			return rs;
 		});
