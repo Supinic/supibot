@@ -394,6 +394,23 @@ module.exports = class TwitchController extends require("./template.js") {
 			: "message";
 
 		let channelData = null;
+		let userState = {};
+		if (messageType === "message") {
+			userState = messageObject.extractUserState();
+		}
+
+		const messageData = {
+			userBadges: userState.badges,
+			userBadgeInfo: userState.badgeInfo,
+			color: userState.color,
+			colorRaw: userState.colorRaw,
+			privateMessage: (messageType === "whisper"),
+			messageID: ircTags.id,
+			emotes: ircTags.emotes,
+			flags: ircTags.flags,
+			customRewardID: ircTags["custom-reward-id"] ?? null
+		};
+
 		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserID });
 		if (!userData) {
 			const channelData = sb.Channel.get(channelName, this.platform);
@@ -406,7 +423,8 @@ module.exports = class TwitchController extends require("./template.js") {
 					platform: this.platform,
 					raw: {
 						user: senderUsername
-					}
+					},
+					messageData
 				});
 			}
 
@@ -452,7 +470,8 @@ module.exports = class TwitchController extends require("./template.js") {
 				message,
 				user: userData,
 				channel: channelData,
-				platform: this.platform
+				platform: this.platform,
+				messageData
 			});
 
 			if (channelData.Custom_Code) {
@@ -518,28 +537,13 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		// Check and execute command if necessary
 		if (sb.Command.is(message)) {
-			let userState = {};
-			if (messageType === "message") {
-				userState = messageObject.extractUserState();
-			}
-
 			const [command, ...args] = message.replace(sb.Command.prefix, "").split(" ").filter(Boolean);
 			const result = await this.handleCommand(
 				command,
 				userData,
 				channelData,
 				args,
-				{
-					userBadges: userState.badges,
-					userBadgeInfo: userState.badgeInfo,
-					color: userState.color,
-					colorRaw: userState.colorRaw,
-					privateMessage: (messageType === "whisper"),
-					messageID: ircTags.id,
-					emotes: ircTags.emotes,
-					flags: ircTags.flags,
-					customRewardID: ircTags["custom-reward-id"] ?? null
-				}
+				messageData
 			);
 
 			if ((!result || !result.success) && messageType === "whisper") {
