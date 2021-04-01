@@ -40,7 +40,7 @@ module.exports = {
 		}
 
 		const { types } = this.staticData;
-		const allowedTypes = (context.params.type) ? context.type.split(/\W/) : ["youtube"];
+		const allowedTypes = (context.params.type) ? context.param.type.split(/\W/) : ["youtube"];
 		const typeIDs = allowedTypes.map(i => types[i] ?? null).filter(Boolean);
 
 		const data = await sb.Query.getRecordset(rs => {
