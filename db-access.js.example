@@ -11,6 +11,7 @@
 	process.env.MARIA_PASSWORD = "your_password"; // Database password
 	
 	process.env.MARIA_HOST = "your_host"; // If using hosts, fill this and remove socket
+	process.env.MARIA_PORT = "your_port"; // If using hosts with custom port, otherwise port 3306 is used
 	process.env.MARIA_SOCKET_PATH = "your_socket"; // If using sockets, fill this and remove host
 	
 	process.env.MARIA_CONNECTION_LIMIT = 100; // Explicit database connection limit
