@@ -9,6 +9,7 @@ module.exports = class ChatModule extends require("./template.js") {
 
 	ID;
 	Name;
+	/** @type {ChatModuleEvent[]} */
 	Events;
 	Active = true;
 	Code;
@@ -339,7 +340,7 @@ module.exports = class ChatModule extends require("./template.js") {
 		let args = [];
 		if (rawArgs !== null) {
 			try {
-				args = JSON.parse(rawArgs);
+				args = eval(rawArgs);
 			}
 			catch (e) {
 				console.warn(e);
@@ -426,3 +427,7 @@ module.exports = class ChatModule extends require("./template.js") {
 		super.destroy();
 	}
 };
+
+/**
+ * @typedef {"message"|"online"|"offline"|"raid"|"subscription"} ChatModuleEvent
+ */
