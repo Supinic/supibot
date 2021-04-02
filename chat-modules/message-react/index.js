@@ -25,7 +25,12 @@ module.exports = {
 			}
 
 			if (adjustedMessage === check) {
-				await channel.send(item.response);
+				if (typeof item.response === "string") {
+					await channel.send(item.response);
+				}
+				else if (typeof item.callback === "function") {
+					await item.callback(context, item);
+				}
 			}
 		}
 	}),
