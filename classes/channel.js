@@ -98,24 +98,6 @@ module.exports = class Channel extends Template {
         this.NSFW = data.NSFW;
 
         /**
-         * If not null, every message will be run through this code. Used for moderation, or other functionalities.
-         * Callback arguments:
-         * {Object} options
-         * {"message"|"data"} type Message if setting the message, Data if checking other platform data
-         * {User} [user] User data (only if type === "message")
-         * {string} [command] Data ommand name (only if type === "data")
-         * {string} [string] Data ommand string (only if type === "data")
-         * @type {Function|null}
-         */
-        try {
-            this.Custom_Code = data.Custom_Code ? eval(data.Custom_Code) : null;
-        }
-        catch (e) {
-            console.warn("Incorrect channel custom code definition!", this.ID, e);
-            this.Custom_Code = null;
-        }
-
-        /**
          * If not null, every message sent to this channel will also be mirrored to the channel with this ID.
          * Only 1-to-1 or one-way mirroring is supported.
          * @type {Channel.ID|null}
