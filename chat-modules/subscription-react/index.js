@@ -2,7 +2,7 @@ module.exports = {
 	Name: "subscription-react",
 	Events: ["subscription"],
 	Description: "According to arguments, reacts to a subscription in a Twitch channel.",
-	Code: (async function chatModuleNice (context, definition) {
+	Code: (async function chatModuleSubscriptionReact (context, definition) {
 		if (context.platform.Name !== "twitch") {
 			return;
 		}

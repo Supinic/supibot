@@ -2,7 +2,7 @@ module.exports = {
 	Name: "message-react",
 	Events: ["message"],
 	Description: "According to arguments, reacts to a specific message(s) with a determined response.",
-	Code: (async function chatModuleNice (context, ...args) {
+	Code: (async function chatModuleMessageReact (context, ...args) {
 		if (args.length === 0) {
 			return;
 		}
