@@ -7,12 +7,12 @@ module.exports = {
 			return;
 		}
 
-		const { channel, messageData } = context;
-		if (!messageData?.customRewardID) {
+		const { channel, data } = context;
+		if (!data?.customRewardID) {
 			return;
 		}
 
-		const redemption = args.find(i => i.redemption === messageData.customRewardID);
+		const redemption = args.find(i => i.redemption === data.customRewardID);
 		if (!redemption) {
 			return;
 		}
