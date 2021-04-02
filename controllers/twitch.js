@@ -637,7 +637,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		if (messageObject.isSub() || messageObject.isResub()) {
 			const { cumulativeMonths, streakMonths, subPlanName } = messageObject.eventParams;
 			if (!eventSkipModes.includes(channelData.Mode)) {
-				channelData.events.emit({
+				channelData.events.emit("subscription", {
 					event: "subscription",
 					message: messageText,
 					user: userData,
@@ -672,7 +672,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 
 			if (!eventSkipModes.includes(channelData.Mode)) {
-				channelData.events.emit({
+				channelData.events.emit("subscription", {
 					event: "subscription",
 					message: messageText,
 					user: userData,
