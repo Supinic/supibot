@@ -245,54 +245,7 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		client.on("WHISPER", (message) => this.handleMessage(message));
 
-		client.on("USERNOTICE", async (messageObject) => {
-			const {messageText, messageTypeID, senderUsername, channelName} = messageObject;
-			if (this.platform.Data.ignoredUserNotices.includes(messageTypeID)) {
-				return; // ignore these events
-			}
-
-			if (messageObject.isSub() || messageObject.isResub()) {
-				this.handleSubscription(
-					senderUsername,
-					channelName,
-					messageObject.eventParams.subPlanName,
-					messageText,
-					{
-						total: messageObject.eventParams.cumulativeMonths,
-						streak: messageObject.eventParams.streakMonths || 1
-					}
-				);
-			}
-			else if (messageObject.messageID === "anonsubgift" || messageObject.isSubgift()) {
-				const { months, recipientUsername } = messageObject.eventParams;
-				const recipientData = await sb.User.get(recipientUsername);
-
-				this.handleGiftedSubscription(channelName, senderUsername || null, {
-					months,
-					gifted: 1,
-					recipient: recipientData
-				});
-			}
-			else if (messageObject.isRaid()) {
-				this.handleHost(
-					"raid",
-					channelName,
-					senderUsername,
-					Number(messageObject.eventParams.viewercount)
-				);
-			}
-			else if (messageObject.isRitual()) {
-				const userData = await sb.User.get(senderUsername, false);
-				const channelData = sb.Channel.get(channelName, this.platform);
-
-				if (this.platform.Logging.rituals) {
-					sb.SystemLogger.send("Twitch.Ritual", messageObject.systemMessage + " " + messageText, channelData, userData);
-				}
-			}
-			else {
-				console.warn("Uncaught USERNOTICE event", messageObject);
-			}
-		});
+		client.on("USERNOTICE", (message) => this.handleUserNotice(message));
 
 		client.on("CLEARCHAT", (messageObject) => {
 			const {targetUsername: username, channelName, reason = null} = messageObject;
@@ -400,6 +353,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 
 		const messageData = {
+			bits,
 			userBadges: userState.badges,
 			userBadgeInfo: userState.badgeInfo,
 			color: userState.color,
@@ -471,19 +425,8 @@ module.exports = class TwitchController extends require("./template.js") {
 				user: userData,
 				channel: channelData,
 				platform: this.platform,
-				messageData
+				data: messageData
 			});
-
-			if (channelData.Custom_Code) {
-				channelData.Custom_Code({
-					type: "message",
-					message: message,
-					user: userData,
-					channel: channelData,
-					bits: bits,
-					customRewardID: ircTags["custom-reward-id"] ?? null
-				});
-			}
 
 			sb.AwayFromKeyboard.checkActive(userData, channelData);
 			sb.Reminder.checkActive(userData, channelData);
@@ -557,41 +500,6 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 		else if (messageType === "whisper") {
 			this.pm(sb.Config.get("PRIVATE_MESSAGE_UNRELATED"), userData.Name);
-		}
-	}
-
-	/**
-	 * Handles incoming hosts.
-	 * @param {"raid"|"host"} type
-	 * @param {string} from Source channel
-	 * @param {string} to Target channel
-	 * @param {number} viewers
-	 * @returns {Promise<void>}
-	 */
-	async handleHost (type, from, to, viewers) {
-		const hostedChannelData = sb.Channel.get(from, this.platform);
-		const hostingChannelData = sb.Channel.get(to, this.platform);
-
-		if (hostedChannelData && typeof hostedChannelData.Custom_Code === "function") {
-			const hosterData = await sb.User.get(to, false);
-			hostedChannelData.Custom_Code({
-				type: type + "ed",
-				hostedBy: hosterData,
-				viewers
-			});
-		}
-
-		if (hostingChannelData && typeof hostingChannelData.Custom_Code === "function") {
-			const targetData = await sb.User.get(from, false);
-			hostingChannelData.Custom_Code({
-				type: type + "ing",
-				hosting: targetData,
-				viewers
-			});
-		}
-
-		if (this.platform.Logging.hosts) {
-			sb.SystemLogger.send("Twitch.Host", `${type}: ${from} => ${to} for ${viewers} viewers`);
 		}
 	}
 
@@ -708,77 +616,116 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 	}
 
-	/**
-	 * Reacts to users subscribing to a given channel.
-	 * @param {string} username
-	 * @param {string} channel
-	 * @param {string} plan
-	 * @param {string} [message]
-	 * @param {Object} months
-	 * @param {number} months.total Total amount of months susbscribed.
-	 * @param {number} months.streak Total amount of months susbscribed in a row.
-	 * @returns {Promise<void>}
-	 */
-	async handleSubscription (username, channel, plan, message, months)  {
-		const userData = await sb.User.get(username, false);
-		const channelData = sb.Channel.get(channel, this.platform);
+	async handleUserNotice (messageObject) {
+		const { messageText, messageTypeID, senderUsername, channelName } = messageObject;
+
+		// ignore these events
+		if (this.platform.Data.ignoredUserNotices.includes(messageTypeID)) {
+			return;
+		}
+
+		const userData = await sb.User.get(senderUsername);
+		const channelData = sb.Channel.get(channelName, this.platform);
+		if (!channelData) {
+			return;
+		}
+
+		const eventSkipModes = ["Read", "Last seen", "Inactive"];
+		const logSkipModes = ["Inactive", "Last seen"];
 		const plans = this.platform.Data.subscriptionPlans;
 
-		if (channelData && channelData.Custom_Code) {
-			channelData.Custom_Code({
-				type: "subscribe",
-				user: userData,
-				months: months.total,
-				streak: months.streak,
-				message: message,
-				plan: plans[plan]
-			});
+		if (messageObject.isSub() || messageObject.isResub()) {
+			const { cumulativeMonths, streakMonths, subPlanName } = messageObject.eventParams;
+			if (!eventSkipModes.includes(channelData.Mode)) {
+				channelData.events.emit({
+					event: "subscription",
+					message: messageText,
+					user: userData,
+					channel: channelData,
+					platform: this.platform,
+					data: {
+						amount: 1,
+						gifted: false,
+						recipient: userData,
+						months: cumulativeMonths,
+						streak: streakMonths ?? 1,
+						plan: plans[subPlanName]
+					}
+				});
+			}
+
+			if (this.platform.Logging.subs && !logSkipModes.includes(channelData.Mode))  {
+				sb.SystemLogger.send("Twitch.Sub", plans[subPlanName], channelData, userData);
+			}
 		}
+		else if (messageObject.messageID === "anonsubgift" || messageObject.isSubgift()) {
+			const {
+				cumulativeMonths,
+				recipientUsername,
+				streakMonths,
+				subPlanName
+			} = messageObject.eventParams;
 
-		if (this.platform.Logging.subs) {
-			sb.SystemLogger.send("Twitch.Sub", plans[plan], channelData, userData);
+			const recipientData = await sb.User.get(recipientUsername);
+			if (!recipientData) {
+				return;
+			}
+
+			if (!eventSkipModes.includes(channelData.Mode)) {
+				channelData.events.emit({
+					event: "subscription",
+					message: messageText,
+					user: userData,
+					channel: channelData,
+					platform: this.platform,
+					data: {
+						amount: 1,
+						gifted: true,
+						recipient: recipientData,
+						months: cumulativeMonths,
+						streak: streakMonths ?? 1,
+						plan: plans[subPlanName]
+					}
+				});
+			}
+
+			if (this.platform.Logging.giftSubs && !logSkipModes.includes(channelData.Mode))  {
+				const name = userData?.Name ?? "(anonymous)";
+				const logMessage = `${name} gifted a subscription to ${recipientData.Name}`;
+
+				sb.SystemLogger.send("Twitch.Giftsub", logMessage, channelData, userData);
+			}
+
 		}
-	}
+		else if (messageObject.isRaid()) {
+			const viewers = Number(messageObject.eventParams.viewercount);
+			if (!eventSkipModes.includes(channelData.Mode)) {
+				channelData.events.emit({
+					event: "raid",
+					message: messageText ?? null,
+					channel: channelData,
+					user: userData,
+					platform: this.platform,
+					data: {
+						viewers
+					}
+				});
+			}
 
-	/**
-	 * Reacts to a gifted subscription event.
-	 * @param {string} channel The channel, where the subs were gifted.
-	 * @param {string} gifter The username of subs gifter.
-	 * @param {Object} data
-	 * @param {number} data.gifted The amount of subs gifted in a specific batch.
-	 * @param {number} data.totalCount Total amount of gifts sent in the channel by the gifter.
-	 * @param {User} data.recipient = null Recipient of the gift, null if there were multiple gifted subs.
-	 * @param {number} data.months = null Cumulative months of the gift sub, null if there were multiple gifted subs.
-	 */
-	async handleGiftedSubscription (channel, gifter, data) {
-		const channelData = sb.Channel.get(channel, this.platform);
-		// This is a change from usual behaviour - ignore Inactive channels, but do log Read-only channels
-		if (channelData.Mode === "Inactive") {
-			return;
+			if (this.platform.Logging.hosts && !logSkipModes.includes(channelData.Mode)) {
+				sb.SystemLogger.send("Twitch.Host", `Raid: ${userData?.Name ?? null} => ${channelData.Name} for ${viewers} viewers`);
+			}
 		}
+		else if (messageObject.isRitual()) {
+			if (this.platform.Logging.rituals && !logSkipModes.includes(channelData.Mode)) {
+				const userData = await sb.User.get(senderUsername, false);
+				const channelData = sb.Channel.get(channelName, this.platform);
 
-		const gifterData = await sb.User.get(gifter, true);
-		if (channelData && typeof channelData.Custom_Code === "function") {
-			channelData.Custom_Code({
-				type: "subgift",
-				subsGifted: data.gifted,
-				gifter: gifterData,
-				recipient: data.recipient || null,
-				months: data.months || null,
-				plan: null // @todo - find in event sub/resub.methods
-			});
+				sb.SystemLogger.send("Twitch.Ritual", messageObject.systemMessage + " " + messageText, channelData, userData);
+			}
 		}
-
-		if (!gifterData) {
-			return;
-		}
-
-		if (this.platform.Logging.giftSubs) {
-			const logMessage = (data.recipient)
-				? (gifterData.Name + " gifted a subscription to " + data.recipient.Name)
-				: (gifterData.Name + " gifted " + data.gifted + " subs");
-
-			sb.SystemLogger.send("Twitch.Giftsub", logMessage, channelData, data.recipient || null);
+		else {
+			console.warn("Uncaught USERNOTICE event", messageObject);
 		}
 	}
 
