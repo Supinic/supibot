@@ -6,7 +6,7 @@ module.exports = {
 		if (context.platform.Name !== "twitch") {
 			return;
 		}
-		else if (args.length === 0) {
+		else if (!definition) {
 			return;
 		}
 
@@ -14,7 +14,7 @@ module.exports = {
 		if (!user) {
 			return;
 		}
-		else if (user.Name === platform.Self_Name) {
+		else if (user?.Name === platform.Self_Name) {
 			return;
 		}
 
@@ -23,7 +23,7 @@ module.exports = {
 			await channel.send(response);
 		}
 		else if (typeof callback === "function") {
-			await callback(context, item);
+			await callback(context, definition);
 		}
 		else {
 			console.warn("Incorrect chat-module response type", {
