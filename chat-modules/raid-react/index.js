@@ -18,15 +18,15 @@ module.exports = {
 			return;
 		}
 
-		const { message, listener } = definition;
-		if (typeof listener === "function") {
-			await listener(context, definition);
+		const { response, callback } = definition;
+		if (typeof response === "string") {
+			await channel.send(response);
 		}
-		else if (typeof message === "string") {
-			await channel.send(message);
+		else if (typeof callback === "function") {
+			await callback(context, item);
 		}
 		else {
-			console.warn("Incorrect chat-module params definition", {
+			console.warn("Incorrect raid chat-module response type", {
 				chatModule: this.Name,
 				channel: channel.ID,
 				definition
