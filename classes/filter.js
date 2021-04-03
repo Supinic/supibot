@@ -369,7 +369,7 @@ module.exports = class Filter extends require("./template.js") {
 			));
 
 			if (block) {
-				const targetType = (optout.Invocation) ? "command invocation" : "command";
+				const targetType = (block.Invocation) ? "command invocation" : "command";
 				return {
 					success: false,
 					reason: "block",
@@ -451,7 +451,7 @@ module.exports = class Filter extends require("./template.js") {
 
 		const offlineOnly = localFilters.find(i => i.Type === "Offline-only");
 		if (offlineOnly && channelLive === true) {
-			const targetType = (optout.Invocation) ? "command invocation" : "command";
+			const targetType = (offlineOnly.Invocation) ? "command invocation" : "command";
 			return {
 				success: false,
 				reason: "offline-only",
@@ -466,6 +466,7 @@ module.exports = class Filter extends require("./template.js") {
 
 		const onlineOnly = localFilters.find(i => i.Type === "Online-only");
 		if (onlineOnly && channelLive === false) {
+			const targetType = (onlineOnly.Invocation) ? "command invocation" : "command";
 			return {
 				success: false,
 				reason: "online-only",
