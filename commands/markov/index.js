@@ -56,10 +56,10 @@ module.exports = {
 		}
 
 		const markov = module.data.markovs.get(sb.Channel.get("forsen"));
-		if (!markov || markov.size < threshold) {
+		if (!markov) {
 			return {
 				success: false,
-				reply: `Markov-chain module does not have enough data available! (${markov?.size ?? 0}/${threshold} required)`
+				reply: "This channel does not have a markov-chain module configured!"
 			};
 		}
 
@@ -112,6 +112,13 @@ module.exports = {
 					reply: `Unknown debug command provided!`
 				};
 			}
+		}
+
+		if (markov.size < threshold) {
+			return {
+				success: false,
+				reply: `Markov-chain module does not have enough data available! (${markov?.size ?? 0}/${threshold} required)`
+			};
 		}
 
 		let wordCount = 15;
