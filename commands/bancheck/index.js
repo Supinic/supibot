@@ -23,7 +23,7 @@ module.exports = {
 		}
 	
 		const message = rest.join(" ");
-		const targetChannel = sb.Channel.get(channel.replace(/^#/, ""));
+		const targetChannel = sb.Channel.get(channel.replace(/^#/, "").toLowerCase());
 		if (!targetChannel) {
 			return {
 				success: false,
