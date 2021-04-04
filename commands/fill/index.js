@@ -17,11 +17,14 @@ module.exports = {
 	
 		let length = 0;
 		const result = [];
+
+		let live = false;
 		let limit = (context.channel?.Message_Limit ?? context.platform.Message_Limit);
 		if (context.channel)  {
 			const streamData = await context.channel.getStreamData();
 			if (streamData.live) {
 				limit = Math.trunc(limit / 2);
+				live = true;
 			}
 		}
 	
@@ -39,7 +42,7 @@ module.exports = {
 			cooldown = {
 				user: null,
 				channel: context.channel.ID,
-				length: (context.channel.sessionData?.live && !context.append.pipe)
+				length: (live && !context.append.pipe)
 					? 60.0e3 // 1 minute
 					: this.Cooldown
 			};
