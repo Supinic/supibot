@@ -451,11 +451,12 @@ module.exports = class Reminder extends require("./template.js") {
                 // instead along with a link to the website, where the user can check them out.
                 if (message.length > (limit * 2)) {
                     const listID = reminders.filter(i => !i.Private_Message).map(i => `ID=${i.ID}`).join("&");
+                    const link = await Reminder.createRelayLink("lookup", listID);
+
                     message = sb.Utils.tag.trim `
                         Hey ${notifySymbol}${targetUserData.Name},
                         you have reminders, but they're too long to be posted here. 
-                        Check them out here:
-                        https://supinic.com/bot/reminder/lookup?${listID}
+                        Check them out here: ${link}
                     `;
                 }
 
@@ -469,11 +470,12 @@ module.exports = class Reminder extends require("./template.js") {
             }
             else {
                 const listID = reminders.map(i => `ID=${i.ID}`).join("&");
+                const link = await Reminder.createRelayLink("lookup", listID);
+
                 const message = sb.Utils.tag.trim `
                     Hey ${notifySymbol}${targetUserData.Name},
                     the banphrase check for your reminders failed.
-                    Check them out here:
-                    https://supinic.com/bot/reminder/lookup?${listID}
+                    Check them out here: ${link}
                 `;
 
                 await channelData.send(message);
@@ -575,6 +577,28 @@ module.exports = class Reminder extends require("./template.js") {
         return {
             success: true
         };
+    }
+
+    static async createRelayLink (endpoint, params) {
+        const relay = await sb.Got("Supinic", {
+            method: "POST",
+            url: "relay",
+            throwHttpErrors: false,
+            json: {
+                url: `bot/reminder/${endpoint}?${params}`
+            }
+        });
+
+        let link;
+        if (relay.statusCode === 200) {
+            link = relay.body.data.link;
+        }
+        else {
+            console.warn("Relay creation failed", { relay, params });
+            link = `https://supinic.com/bot/reminder/${endpoint}?${params}`;
+        }
+
+        return link;
     }
 };
 
