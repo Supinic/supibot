@@ -22,7 +22,7 @@ module.exports = {
 			.where({ condition: Boolean(targetID) }, "Song_Request.VLC_ID = %n", targetID)
 			.where("User_Alias = %n", context.user.ID)
 			.where("Status IN %s+", ["Current", "Queued"])
-			.orderBy("Song_Request.ID ASC")
+			.orderBy("Song_Request.ID DESC")
 			.limit(1)
 			.single()
 		);
