@@ -112,7 +112,7 @@ module.exports = {
 		}
 		else {
 			const params = data.map(i => `ID=${i.ID}`).join("&");
-			const listLink = `track/lookup?${params}`;
+			const listLink = `/track/lookup?${params}`;
 			const relay = await sb.Got("Supinic", {
 				method: "POST",
 				json: { url: listLink }
