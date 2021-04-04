@@ -66,7 +66,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}),
 			new sb.Cron({
 				Name: "channels-live-status",
-				Expression: "0 */2 * * * *",
+				Expression: "0 */1 * * * *",
 				Description: "Fetches the online status of all active Twitch channels. Basically, just caches the current status so that further API calls are not necessary.",
 				Defer: {
 					start: 0,
@@ -100,41 +100,47 @@ module.exports = class TwitchController extends require("./template.js") {
 						streams.push(...partialResult.body.streams);
 					}
 
-					for (const channel of channelList) {
-						const stream = streams.find(i => channel.Specific_ID === String(i.channel._id));
+					const channelPromises = channelList.map(async (channelData) => {
+						const stream = streams.find(i => channelData.Specific_ID === String(i.channelData._id));
+						const streamData = await channelData.getCacheData("stream-data");
 						if (!stream) {
-							if (channel.sessionData.live === true) {
-								channel.events.emit("offline", {
+							if (streamData.live === true) {
+								channelData.events.emit("offline", {
 									event: "offline",
-									channel
+									channel: channelData
 								});
 							}
 
-							channel.sessionData.live = false;
-							channel.sessionData.stream = {};
+							streamData.live = false;
+							streamData.stream = {};
+						}
+						else {
+							const currentStreamData = {
+								game: stream.game,
+								since: new sb.Date(stream.created_at),
+								status: stream.channelData.status,
+								viewers: stream.viewers,
+								quality: stream.video_height + "p",
+								fps: stream.average_fps,
+								delay: stream.delay
+							};
 
-							continue;
+							if (!streamData.live) {
+								channelData.events.emit("online", {
+									event: "online",
+									stream: currentStreamData.stream,
+									channel: channelData
+								});
+							}
+
+							streamData.live = true;
+							streamData.stream = currentStreamData;
 						}
 
-						channel.sessionData.stream = {
-							game: stream.game,
-							since: new sb.Date(stream.created_at),
-							status: stream.channel.status,
-							viewers: stream.viewers,
-							quality: stream.video_height + "p",
-							fps: stream.average_fps,
-							delay: stream.delay
-						};
+						await channelData.setCacheData("stream-data", streamData, { expiry: 3_600_000 });
+					});
 
-						if (!channel.sessionData.live) {
-							channel.sessionData.live = true;
-							channel.events.emit("online", {
-								event: "online",
-								stream: channel.sessionData.stream,
-								channel
-							});
-						}
-					}
+					await Promise.all(channelPromises);
 				}
 			})
 		];
