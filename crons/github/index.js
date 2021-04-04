@@ -6,7 +6,9 @@ module.exports = {
 	Type: "Bot",
 	Code: (async function announceGithub () {
 		const channelData = sb.Channel.get("supinic", "twitch");
-		if (!channelData.sessionData.live) {
+		const streamData = await channelData.getStreamData();
+
+		if (!streamData.live) {
 			await channelData.send("Node.JS developers peepoHackies check the Supibot repository miniDank 👉 https://github.com/Supinic/supibot");
 		}
 	})
