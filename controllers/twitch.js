@@ -101,8 +101,9 @@ module.exports = class TwitchController extends require("./template.js") {
 					}
 
 					const channelPromises = channelList.map(async (channelData) => {
-						const stream = streams.find(i => channelData.Specific_ID === String(i.channelData._id));
-						const streamData = await channelData.getCacheData("stream-data");
+						const stream = streams.find(i => channelData.Specific_ID === String(i._id));
+						const streamData = await channelData.getStreamData();
+
 						if (!stream) {
 							if (streamData.live === true) {
 								channelData.events.emit("offline", {
@@ -137,7 +138,7 @@ module.exports = class TwitchController extends require("./template.js") {
 							streamData.stream = currentStreamData;
 						}
 
-						await channelData.setCacheData("stream-data", streamData, { expiry: 3_600_000 });
+						await channelData.setStreamData(streamData);
 					});
 
 					await Promise.all(channelPromises);
