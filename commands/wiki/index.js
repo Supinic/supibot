@@ -77,7 +77,7 @@ module.exports = {
 	
 			const { extract, title } = data[key];
 			return {
-				reply: `${link} ${title}: ${extract}`
+				reply: `${link} ${title}: ${sb.Utils.wrapString(extract, 1000)}`
 			};
 		}
 	}),
