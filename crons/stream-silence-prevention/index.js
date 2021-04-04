@@ -46,11 +46,20 @@ module.exports = {
 	
 			this.data.videos = result.map(i => i.ID);
 		}
+
+		let link;
+		if (sb.Utils.random(1, 2) === 1) {
+			const videoID = sb.Utils.randArray(this.data.videos);
+			link = "https://youtu.be/" + videoID;
+		}
+		else {
+			const rg = sb.Command.get("rg");
+			const context = sb.Command.createFakeContext(rg);
+			const randomResult = await rg.execute(context, "fav:supinic linkOnly:true");
+			link = randomResult.link;
+		}
 	
 		let result = "";
-		const videoID = sb.Utils.randArray(this.data.videos);
-		const link = "https://youtu.be/" + videoID;
-		
 		if (state === "vlc") {
 			const self = await sb.User.get("supibot");
 			const sr = sb.Command.get("sr");
