@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "What emote is it? Posts specifics about a given Twitch subscriber emote.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [
+		{ name: "linkOnly", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function whatEmoteIsIt (context, emote) {
@@ -45,6 +47,12 @@ module.exports = {
 	
 		const emoteLink = "https://twitchemotes.com/emotes/" + emoteid;
 		const cdnLink = `https://static-cdn.jtvnw.net/emoticons/v1/${emoteid}/3.0`;
+		if (context.params.linkOnly) {
+			return {
+				reply: cdnLink
+			};
+		}
+
 		const tierString = (tier)
 			? `tier ${tier} sub emote to channel #${channel.toLowerCase()}`
 			: `special ${channel} emote`;
