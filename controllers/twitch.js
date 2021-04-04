@@ -101,7 +101,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					}
 
 					const channelPromises = channelList.map(async (channelData) => {
-						const stream = streams.find(i => channelData.Specific_ID === String(i._id));
+						const stream = streams.find(i => channelData.Specific_ID === String(i.channel._id));
 						const streamData = await channelData.getStreamData();
 
 						if (!stream) {
