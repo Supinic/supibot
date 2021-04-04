@@ -12,7 +12,8 @@ module.exports = {
 		const twitch = sb.Platform.get("twitch");
 		const cytube = sb.Platform.get("cytube");
 		const channelData = sb.Channel.get("supinic", "twitch");
-		if (!channelData.sessionData.live) {
+		const streamData = await channelData.getStreamData();
+		if (!streamData.live) {
 			return;
 		}
 	
