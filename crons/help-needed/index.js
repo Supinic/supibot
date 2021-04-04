@@ -7,14 +7,19 @@ module.exports = {
 	Code: (async function announceHelpNeeded () {
 		return;
 
-		const threshold = new sb.Date().addMinutes(-60);
-		const eligibleChannels = sb.Channel.data.filter(i => (
-			i.Platform.Name === "twitch"
-			&& ["VIP", "Moderator"].includes(i.Mode)
-			&& i.sessionData
-			&& i.sessionData.live === false
-			&& i.sessionData.lastActivity
-			&& i.sessionData.lastActivity.date >= threshold
+		const threshold = new sb.Date().addMinutes(-60)
+		const channels = sb.Channel.getJoinableForPlatform("twitch");
+		const channelStreamData = await Promise.all(channels.map(async (channel) => {
+			const data = await channel.getStreamData();
+			return { channel, data };
+		}));
+
+		const eligibleChannels = channelStreamData.filter(i => (
+			i.channel.Platform.Name === "twitch"
+			&& ["VIP", "Moderator"].includes(i.channel.Mode)
+			&& !i.data.live
+			&& i.channel.sessionData.lastActivity
+			&& i.channel.sessionData.lastActivity.date >= threshold
 		));
 
 		let channelData;
