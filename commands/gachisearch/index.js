@@ -96,6 +96,7 @@ module.exports = {
 					)
 				)
 		`);
+
 		if (data.length === 0) {
 			return {
 				success: false,
@@ -111,7 +112,13 @@ module.exports = {
 		}
 		else {
 			const params = data.map(i => `ID=${i.ID}`).join("&");
-			const link = `https://supinic.com/track/lookup?${params}`;
+			const listLink = `track/lookup?${params}`;
+			const relay = await sb.Got("Supinic", {
+				method: "POST",
+				json: { url: listLink }
+			});
+
+			const { link } = relay.body.data;
 			return {
 				link,
 				reply: "Search result: " + link,
