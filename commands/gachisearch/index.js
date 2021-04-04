@@ -115,6 +115,7 @@ module.exports = {
 			const listLink = `/track/lookup?${params}`;
 			const relay = await sb.Got("Supinic", {
 				method: "POST",
+				url: "relay",
 				json: { url: listLink }
 			});
 
