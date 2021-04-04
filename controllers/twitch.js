@@ -119,7 +119,7 @@ module.exports = class TwitchController extends require("./template.js") {
 							const currentStreamData = {
 								game: stream.game,
 								since: new sb.Date(stream.created_at),
-								status: stream.channelData.status,
+								status: stream.channel.status,
 								viewers: stream.viewers,
 								quality: stream.video_height + "p",
 								fps: stream.average_fps,
