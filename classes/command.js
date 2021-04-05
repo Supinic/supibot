@@ -696,10 +696,10 @@ class Command extends require("./template.js") {
 
 			let result = null;
 			if (execution?.reply) {
-				result = execution.reply.slice(0, 300);
+				result = execution.reply.trim().slice(0, 300);
 			}
 			else if (execution?.partialReplies) {
-				result = execution.partialReplies.map(i => i.message).join(" ").slice(0, 300);
+				result = execution.partialReplies.map(i => i.message).join(" ").trim().slice(0, 300);
 			}
 
 			await sb.Runtime.incrementCommandsCounter();
@@ -841,7 +841,7 @@ class Command extends require("./template.js") {
 			console.warn(`Execution of command "${command.Name}" did not result with execution.reply of type string`);
 		}
 
-		execution.reply = String(execution.reply);
+		execution.reply = String(execution.reply).trim();
 
 		const metaSkip = Boolean(!execution.partialReplies && (options.skipBanphrases || execution?.meta?.skipBanphrases));
 		if (!command.Flags.skipBanphrase && !metaSkip) {
