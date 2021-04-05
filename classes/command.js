@@ -781,11 +781,6 @@ class Command extends require("./template.js") {
 			};
 		}
 
-		// This should be removed once all deprecated calls are refactored
-		if (channelData && execution?.meta?.skipCooldown === true) {
-			console.warn("Deprecated return value - skipCooldown (use cooldown: null instead)", command.ID);
-		}
-
 		// Check if a link-only flagged command returns a proper link to be used, if the command didn't fail
 		if (execution && execution.success !== false && command.Flags.linkOnly) {
 			if (typeof execution.link !== "string" && execution.link !== null) {
