@@ -569,6 +569,7 @@ module.exports = {
 
 			`<code>${prefix}alias describe (alias) (...description)</code>`,
 			"Gives your command a description, which can then be checked by you or others.",
+			`If you don't provide a description, or use the word "none" exactly, the description will be reset.`,
 			"",
 
 			`<code>${prefix}alias inspect (alias)</code>`,
