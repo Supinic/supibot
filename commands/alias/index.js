@@ -247,7 +247,7 @@ module.exports = {
 					verb = "updated";
 				}
 
-				reply = `The description of your alias ${name}" has been ${verb} successfully.`;
+				reply = `The description of your alias "${name}" has been ${verb} successfully.`;
 				changed = true;
 				obj.lastEdit = new sb.Date().toJSON();
 
