@@ -104,7 +104,7 @@ module.exports = {
 				}
 
 				data = file.content;
-				await this.setCacheData(path, data, {
+				await this.setCacheData(ID, data, {
 					expiry: 30 * 864e5
 				});
 			}
