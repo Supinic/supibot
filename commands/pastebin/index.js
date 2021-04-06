@@ -1,9 +1,9 @@
 module.exports = {
 	Name: "pastebin",
-	Aliases: ["pbg", "pbp"],
+	Aliases: ["pbg", "pbp", "gist"],
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Takes the result of a different command (pipe-only) and posts a Pastebin paste with it.",
+	Description: "Returns the contents of a Pastebin paste, or from a GitHub gist; or posts your input into a new paste.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "force", type: "boolean" }
@@ -25,6 +25,9 @@ module.exports = {
 				args.unshift(command);
 			}
 		}
+		else if (context.invocation === "gist") {
+			type = "gist";
+		}
 		else {
 			const prefix = sb.Command.prefix;
 			return {
@@ -45,6 +48,67 @@ module.exports = {
 			return {
 				success: Boolean(result.success),
 				reply: result.error ?? result.body
+			};
+		}
+		else if (type === "gist") {
+			const [ID] = args;
+			if (!ID) {
+				return {
+					success: false,
+					reply: `No Gist ID provided!`
+				};
+			}
+
+			let data;
+			let cooldown = this.Cooldown;
+			const cacheData = (context.params.force) ? null : await this.getCacheData(ID);
+			if (cacheData) {
+				data = cacheData;
+				cooldown = 5000;
+			}
+			else {
+				const response = await sb.Got("GitHub", {
+					url: `gists/${ID}`
+				});
+
+				if (response.statusCode !== 200) {
+					return {
+						success: false,
+						reply: result.body.message
+					};
+				}
+
+				const { files } = response.body;
+				if (Object.keys(files).length === 0) {
+					return {
+						success: false,
+						reply: `There are no files in this Gist!`
+					};
+				}
+				else if (Object.keys(files).length > 1) {
+					return {
+						success: false,
+						reply: `There are too many files in this Gist! This command only supports single-file Gists.`
+					};
+				}
+
+				const [file] = Object.values(files);
+				if (file.type !== "text/plain") {
+					return {
+						success: false,
+						reply: `Invalid Gist file type! This command only supports text/plain.`
+					};
+				}
+
+				data = file.content;
+				await this.setCacheData(path, data, {
+					expiry: 30 * 864e5
+				});
+			}
+
+			return {
+				cooldown,
+				reply: data
 			};
 		}
 		else if (type === "get") {
@@ -73,23 +137,23 @@ module.exports = {
 				}
 
 				data = result.body;
+				if (!data) {
+					return {
+						success: false,
+						reply: `Could not fetch any data from your paste!`
+					};
+				}
+				else if (data.length >= 50000) {
+					data = null;
+					return {
+						success: false,
+						reply: `Paste character limit exceeded! (50 000 characters)`
+					};
+				}
+
 				await this.setCacheData(path, data, {
 					expiry: 30 * 864e5
 				});
-			}
-
-			if (!data) {
-				return {
-					success: false,
-					reply: `Could not fetch any data from your paste!`
-				};
-			}
-			else if (data.length >= 50000) {
-				data = null;
-				return {
-					success: false,
-					reply: `Paste character limit exceeded! (50 000 characters)`
-				};
 			}
 
 			return {
@@ -107,6 +171,12 @@ module.exports = {
 			`<code>${prefix}pbg (link)</code>`,
 			"For a specified link or a paste ID, fetches the contents of it.",
 			"The output must not be longer than 50 000 characters, for performance reasons. If it is, the paste won't be fetched.",
+			"",
+
+			`<code>${prefix}gist (gist ID)</code>`,
+			"For a specified Gist ID, fetches its contents.",
+			"The Gist must only contain a single text/plain file.",
+			"The output must not be longer than 50 000 characters, for performance reasons. If it is, the Gist won't be fetched.",
 			"",
 
 			`<code>${prefix}pastebin post (...text)</code>`,
