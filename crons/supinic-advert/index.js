@@ -2,10 +2,10 @@ module.exports = {
 	Name: "supinic-advert",
 	Expression: "0 30 * * * *",
 	Description: "Posts a reminder how to use titlechange_bot in #supinic",
-	Defer: {
+	Defer: (() => ({
 		"start": 0,
 		"end": 600000
-	},
+	})),
 	Type: "Bot",
 	Code: (async function announceSupinicAdvertisement () {
 		const channelData = sb.Channel.get("supinic", "twitch");
