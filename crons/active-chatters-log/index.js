@@ -5,15 +5,9 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function activeChattersLog () {
-		if (!sb.Cache) {
-			return;
-		}
-	
-		const data = await sb.Cache.server.keys("active-chatter*");
 		const row = await sb.Query.getRow("data", "Active_Chatter_Log");
-	
 		row.setValues({
-			Amount: data.length,
+			Amount: sb.User.data.size,
 			Timestamp: new sb.Date().discardTimeUnits("s", "ms")
 		});
 	
