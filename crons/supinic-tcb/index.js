@@ -1,5 +1,5 @@
 module.exports = {
-	Name: "supinic-advert",
+	Name: "supinic-tcb",
 	Expression: "0 0 * * * *",
 	Description: "Posts discovery links for #supinic",
 	Defer: {
@@ -7,7 +7,7 @@ module.exports = {
 		"end": 600000
 	},
 	Type: "Bot",
-	Code: (async function announceDiscordLink () {
+	Code: (async function announceSupinicTCB () {
 		const channelData = sb.Channel.get("supinic", "twitch");
 		await channelData.send(sb.Utils.tag.trim `
 			To stay up to date with all the things regarding Supibot & co.,

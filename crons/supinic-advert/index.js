@@ -7,7 +7,7 @@ module.exports = {
 		"end": 600000
 	},
 	Type: "Bot",
-	Code: (async function announceDiscordLink () {
+	Code: (async function announceSupinicAdvertisement () {
 		const channelData = sb.Channel.get("supinic", "twitch");
 		const streamData = await channelData.getStreamData();
 		if (!streamData.live) {
