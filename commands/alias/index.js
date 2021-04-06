@@ -9,6 +9,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		aliasLimit: 10,
+		descriptionLimit: 250,
 		nameCheck: {
 			regex: /^[-\w\u00a9\u00ae\u2000-\u3300\ud83c\ud000-\udfff\ud83d\ud000-\udfff\ud83e\ud000-\udfff]{2,30}$/,
 			response: "Your alias should only contain letters, numbers and be 2-30 characters long."
@@ -211,7 +212,40 @@ module.exports = {
 					...alias.args
 				);
 			}
-	
+
+			case "describe": {
+				const [name, ...rest] = args;
+				if (!name) {
+					return {
+						success: false,
+						reply: `You didn't provide a name, or a command! Use: alias add (name) (command) (...arguments)"`
+					};
+				}
+				else if (!wrapper.has(name)) {
+					return {
+						success: false,
+						reply: `You don't have the "${name}" alias!`
+					};
+				}
+
+				const description = rest.join(" ").trim();
+				if (description.length > this.staticData.descriptionLimit) {
+					return {
+						success: false,
+						reply: `Your description exceeds the limit of ${this.staticData.descriptionLimit} characters!`
+					};
+				}
+
+				const obj = wrapper.get(name);
+				obj.desc = rest.join(" ").trim();
+				obj.lastEdit = new sb.Date().toJSON();
+
+				changed = true;
+				reply = `Your alias "${name}" has been successfully edited with a description.`;
+
+				break;
+			}
+
 			case "edit": {
 				const [name, command, ...rest] = args;
 				if (!name || !command) {
@@ -245,7 +279,61 @@ module.exports = {
 	
 				break;
 			}
-	
+
+			case "inspect": {
+				let user;
+				let aliasName;
+				let prefix;
+
+				const [firstName, secondName] = args;
+				if (!firstName && !secondName) {
+					return {
+						success: false,
+						reply: `You didn't provide an alias or user name! Use: "$alias inspect (your alias)" or "$alias inspect (username) (alias)"`
+					};
+				}
+				else if (firstName && !secondName) {
+					user = context.user;
+					aliasName = firstName;
+					prefix = "You";
+				}
+				else {
+					user = await sb.User.get(firstName);
+					if (!user) {
+						return {
+							success: false,
+							reply: "Provided user does not exist!"
+						};
+					}
+
+					aliasName = secondName;
+					prefix = (context.user === user) ? "You" : "They";
+				}
+
+				const aliases = user.Data.aliasedCommands;
+				if (!aliases) {
+					return {
+						success: false,
+						reply: `${prefix} don't have any aliases!`
+					};
+				}
+
+				const alias = aliases[aliasName];
+				if (!alias) {
+					return {
+						success: false,
+						reply: `${prefix} don't have the "${aliasName}" alias!`
+					};
+				}
+
+				const description = alias.desc;
+				return {
+					reply: (description)
+						? `${aliasName}: ${description}`
+						: `Alias "${aliasName}" has no description.`
+				};
+			}
+
 			case "list": {
 				return {
 					reply: `Check your aliases here: https://supinic.com/bot/user/${context.user.Name}/alias/list`
@@ -470,7 +558,16 @@ module.exports = {
 			`<code>${prefix}alias remove (name)</code>`,
 			"Removes your command alias with the given name.",
 			"",
-	
+
+			`<code>${prefix}alias describe (alias) (...description)</code>`,
+			"Gives your command a description, which can then be checked by you or others.",
+			"",
+
+			`<code>${prefix}alias inspect (alias)</code>`,
+			`<code>${prefix}alias inspect (username) (alias)</code>`,
+			"If your or someone else's alias has a description, this command will print it to chat.",
+			"",
+
 			`<code>${prefix}alias spy (user)</code>`,
 			"Lists all active aliases the target person currently has.",
 			"",
