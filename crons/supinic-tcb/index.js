@@ -1,7 +1,7 @@
 module.exports = {
 	Name: "supinic-tcb",
 	Expression: "0 0 * * * *",
-	Description: "Posts discovery links for #supinic",
+	Description: "Posts a small help for titlechange_bot in #supinic",
 	Defer: {
 		"start": 0,
 		"end": 600000
