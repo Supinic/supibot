@@ -236,12 +236,20 @@ module.exports = {
 					};
 				}
 
+				let verb;
 				const obj = wrapper.get(name);
-				obj.desc = rest.join(" ").trim();
-				obj.lastEdit = new sb.Date().toJSON();
+				if (description.length === 0 || description === "none") {
+					obj.desc = "";
+					verb = "reset";
+				}
+				else {
+					obj.desc = description;
+					verb = "updated";
+				}
 
+				reply = `The description of your alias ${name}" has been ${verb} successfully.`;
 				changed = true;
-				reply = `Your alias "${name}" has been successfully edited with a description.`;
+				obj.lastEdit = new sb.Date().toJSON();
 
 				break;
 			}
