@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "roll",
-	Aliases: null,
+	Aliases: ["dice"],
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Rolls a random number. If nothing is specified, rolls 1-100. You can specify min and max values, or some expression using standard dice notation.",
