@@ -27,6 +27,9 @@ module.exports = {
 		}
 		else if (context.invocation === "gist") {
 			type = "gist";
+			if (command && command !== "get") {
+				args.unshift(command);
+			}
 		}
 		else {
 			const prefix = sb.Command.prefix;
