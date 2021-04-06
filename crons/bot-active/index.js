@@ -5,7 +5,14 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function verifyBotAcitivity () {
-		const userData = await sb.User.get(sb.Config.get("SELF_ID"));
+		const platform = sb.Platform.get(1);
+		const userData = await sb.User.get(platform.Self_Name);
+		if (!userData || !userData.Data.authKey) {
+			console.warn("Bot-activity refresh cron is missing bot data or auth key");
+			this.stop();
+			return;
+		}
+
 		await sb.Got("Supinic", {
 			method: "PUT",
 			url: "bot-program/bot/active",
