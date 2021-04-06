@@ -585,7 +585,7 @@ module.exports = class Reminder extends require("./template.js") {
             url: "relay",
             throwHttpErrors: false,
             json: {
-                url: `bot/reminder/${endpoint}?${params}`
+                url: `/bot/reminder/${endpoint}?${params}`
             }
         });
 
