@@ -173,7 +173,7 @@ module.exports = {
 		if (forum.error) {
 			return {
 				success: false,
-				reply: `That subreddit is ${forum.reason}!`
+				reply: `That subreddit is ${forum.reason ?? "not available"}!`
 			};
 		}
 		else if (!forum.exists) {
