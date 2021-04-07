@@ -21,6 +21,10 @@ module.exports = {
 				return;
 			}
 		}
+		if (!this.data.regex) {
+			// only allows messages consisting of just emojis, or ACSII 32-126 characters (0x20-0x7E)
+			this.data.regex = /^[\p{Emoji}\x20-\x7e]+$/ui;
+		}
 		if (typeof this.data.threshold !== "number") {
 			this.data.threshold = 2000;
 		}
@@ -39,7 +43,7 @@ module.exports = {
 		}
 
 		const fixedMessage = message.replace(/\u{E0000}/gu, "");
-		if (!/^(\p{Emoji}|[\w\s\d.-/:?!])+$/iu.test(fixedMessage)) {
+		if (!this.data.regex.test(fixedMessage)) {
 			return;
 		}
 
