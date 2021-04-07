@@ -149,13 +149,6 @@ VALUES
          let [cmd, ...cmdArgs] = inv.replace(/^\$\s*/, "$").split(" ");
          cmdArgs = cmdArgs.concat(currentArgs);
 
-         if (cmd.includes("translate")) {
-             cmdArgs.push("direction:false", "confidence:false");
-         }
-         else if (cmd.includes("rg")) {
-             cmdArgs.push("linkOnly:true");
-         }
-
          const check = sb.Command.get(cmd.replace(sb.Command.prefix, ""));
          if (check) {
              if (!check.Flags.pipe) {
