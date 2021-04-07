@@ -18,13 +18,13 @@ module.exports = {
 		let link = null;
 		let counter = 0;
 		const rg = sb.Command.get("rg");
-		const passedContext = {
+		const passedContext = sb.Command.createFakeContext({
+			...context,
 			params: {
-				linkOnly: true,
-				...context.params
-			},
-			...context
-		}
+				...context.params,
+				linkOnly: true
+			}
+		});
 	
 		while (!link && counter < this.staticData.repeatLimit) {
 			const execution = await rg.execute(passedContext, "linkOnly:true", ...args);
