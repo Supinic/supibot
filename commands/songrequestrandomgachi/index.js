@@ -16,7 +16,7 @@ module.exports = {
 		let link = null;
 		let counter = 0;
 		const rg = sb.Command.get("rg");
-		const passedContext = sb.Command.createFakeContext({
+		const passedContext = sb.Command.createFakeContext(rg, {
 			...context,
 			params: {
 				...context.params,
