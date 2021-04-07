@@ -256,30 +256,6 @@ class Command extends require("./template.js") {
 			this.Params = params;
 		}
 
-		if (this.Flags.linkOnly) {
-			if (!this.Params) {
-				console.warn("Command has linkOnly flag, but no params are defined.", { commandName: this.Name });
-				this.Params.push({
-					name: "linkOnly",
-					type: "boolean"
-				});
-			}
-			else {
-				const param = this.Params.find(i => i.name === "linkOnly");
-				if (!param) {
-					console.warn("Command has linkOnly flag, but no linkOnly param.", { commandName: this.Name });
-					this.Params.push({
-						name: "linkOnly",
-						type: "boolean"
-					});
-				}
-				else if (param.type !== "boolean") {
-					console.warn("Command has linkOnly flag, but the linkOnly param is not boolean.", { data, command: this });
-					param.type = "boolean";
-				}
-			}
-		}
-
 		Object.freeze(this.Flags);
 
 		this.Whitelist_Response = data.Whitelist_Response;
@@ -781,31 +757,6 @@ class Command extends require("./template.js") {
 			};
 		}
 
-		// Check if a link-only flagged command returns a proper link to be used, if the command didn't fail
-		if (execution && execution.success !== false && command.Flags.linkOnly) {
-			if (typeof execution.link !== "string" && execution.link !== null) {
-				throw new sb.Error({
-					message: "Commands supporting link-only mode must always return a possible link as string or null",
-					args: {
-						command: command.ID
-					}
-				});
-			}
-
-			if (context.params.linkOnly === true) {
-				if (execution.link === null) {
-					execution.success = false;
-					execution.reply = "No link is present in command result!";
-				}
-				else {
-					execution.reply = execution.link;
-				}
-
-				delete execution.link;
-
-			}
-		}
-
 		Command.handleCooldown(channelData, userData, command, execution?.cooldown);
 
 		if (!execution?.reply && !execution?.partialReplies) {
@@ -1181,7 +1132,6 @@ module.exports = Command;
  * @property {boolean} pipe If true, the command can be used as a part of the "pipe" command.
  * @property {boolean} mention If true, command will attempt to mention its invokers by adding their username at the start.
  * This also requires the channel to have this option enabled.
- * @property {boolean} linkOnly If true, the command will accept "linkOnly:true" as one of its arguments, and if possible, returns just a link, with no text included.
  * @property {boolean} useParams If true, all arguments in form of key:value will be parsed into an object
  * @property {boolean} nonNullable If true, the command cannot be directly piped into the null command
  */
