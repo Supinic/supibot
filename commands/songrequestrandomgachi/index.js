@@ -7,8 +7,6 @@ module.exports = {
 	Flags: ["skip-banphrase","use-params","whitelist"],
 	Params: [
 		{ name: "fav", type: "string" },
-		{ name: "favorite", type: "string" },
-		{ name: "favourite", type: "string" }
 	],
 	Whitelist_Response: "Only available in specific whitelisted channels (for instance, those that have a song request bot that replies to \"!sr\").",
 	Static_Data: (() => ({
