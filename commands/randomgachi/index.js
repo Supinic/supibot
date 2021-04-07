@@ -117,7 +117,6 @@ module.exports = {
 	
 			`<code>${prefix}rg linkOnly:true</code>`,
 			"Will only input the link, with no other text. Useful for piping.",
-			"<b>Note:</b>When you pipe this command, <code>linkOnly</code> is used by default.",
 			"",
 
 			`<code>${prefix}rg type:(list of types)</code>`,
