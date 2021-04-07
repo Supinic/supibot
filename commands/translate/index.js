@@ -25,8 +25,9 @@ module.exports = {
 		const options = {
 			from: "auto",
 			to: "en",
-			direction: context.params.direction ?? true,
-			confidence: context.params.confidence ?? true
+			// default: true if normal execution, false if inside of pipe
+			direction: context.params.direction ?? (!context.append.pipe),
+			confidence: context.params.confidence ?? (!context.append.pipe),
 		};
 	
 		for (const option of ["from", "to"]) {
