@@ -72,17 +72,7 @@ module.exports = {
 
 			const cmdArgs = [...currentArgs];
 			cmdArgs.splice(argumentStartPosition, 0, ...restArgs);
-	
-			const check = sb.Command.get(cmd.replace(sb.Command.prefix, ""));
-			if (check) {
-				if (["randomgachi", "current"].includes(check.Name)) {
-					cmdArgs.push("linkOnly:true");
-				}
-				else if (check.Name === "translate") {
-					cmdArgs.push("direction:false", "confidence:false");
-				}
-			}
-	
+
 			const result = await sb.Command.checkAndExecute(
 				cmd,
 				cmdArgs,
@@ -151,7 +141,7 @@ module.exports = {
 				currentArgs = sb.Utils.wrapString(result.reply, 2000).split(" ");
 			}
 
-			lastCommand = check;
+			lastCommand = sb.Command.get(cmd.replace(sb.Command.prefix, ""));
 			finalResult = result;
 		}
 
