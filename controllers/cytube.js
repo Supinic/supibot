@@ -396,6 +396,7 @@ class CytubeClient {
 			return;
 		}
 
+		this.restarting = true;
 		if (this.client) {
 			this.client.removeAllListeners();
 			this.client.destroy();
