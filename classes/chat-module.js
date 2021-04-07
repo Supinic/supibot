@@ -80,8 +80,8 @@ module.exports = class ChatModule extends require("./template.js") {
 				else {
 					const listener = (function chatModuleBinding (context) {
 						if (typeof this.Code !== "function") {
-							console.warn("Attempting to run a destroyed chat module event", { context, chatModule: this.Name });
-							this.detachAll(true);
+							console.warn("Destroyed chat module's code invoked! Module was automatically detached", { context, chatModule: this });
+							channelData.events.off(event, listener);
 							return;
 						}
 
