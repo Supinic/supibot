@@ -4,9 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "If no parameters are provided, posts a random reddit meme. If you provide a subreddit, a post will be chosen randomly. NSFW subreddits and posts are only available on NSFW Discord channels!",
-	Flags: ["link-only","mention","non-nullable","pipe"],
+	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
-		{ name: "comments", type: "boolean" }
+		{ name: "comments", type: "boolean" },
+		{ name: "linkOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => {
@@ -231,13 +232,18 @@ module.exports = {
 			// And then splice off everything over the length of 3.
 			repeatedPosts.splice(this.staticData.repeats);
 
+			if (context.params.linkOnly) {
+				return {
+					reply: post.url
+				};
+			}
+
 			const commentsUrl = (context.params.comments)
 				? `Thread: https://reddit.com/${post.commentsUrl}`
 				: "";
 
 			const symbol = (forum.quarantine) ? "⚠" : "";
 			return {
-				link: post.url,
 				reply: sb.Utils.fixHTML(`${symbol} ${post.toString()} ${commentsUrl}`)
 			};
 		}

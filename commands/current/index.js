@@ -4,8 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Fetches the current song playing on stream.",
-	Flags: ["link-only","mention","pipe","whitelist"],
-	Params: null,
+	Flags: ["mention","pipe","use-params","whitelist"],
+	Params: [
+		{ name: "linkOnly", type: "boolean" }
+	],
 	Whitelist_Response: "This command is only available in @Supinic channel on Twitch!",
 	Static_Data: (() => ({
 		types: ["current", "previous", "next"]
@@ -16,7 +18,6 @@ module.exports = {
 	
 		if (state === "off") {
 			return {
-				link: null,
 				reply: "Song requests are currently turned off."
 			};
 		}
@@ -24,7 +25,6 @@ module.exports = {
 			const item = sb.VideoLANConnector.currentPlaylistItem;
 			if (!item) {
 				return {
-					link: null,
 					reply: "Nothing is currently playing."
 				};
 			}
@@ -35,7 +35,6 @@ module.exports = {
 			}
 	
 			return {
-				link: null,
 				reply: `Currently playing: ${leaf.name}`
 			};
 		}
@@ -45,7 +44,6 @@ module.exports = {
 	
 			if (!playing) {
 				return {
-					link: null,
 					reply: "Nothing is currently playing on Cytube."
 				};
 			}
@@ -60,10 +58,15 @@ module.exports = {
 				.flat("Link_Prefix")
 			);
 	
-			const requester = playing.user ?? playing.queueby ?? "(unknown)";
 			const link = prefix.replace(linkSymbol, media.id);
+			if (context.params.linkOnly) {
+				return {
+					reply: link
+				};
+			}
+
+			const requester = playing.user ?? playing.queueby ?? "(unknown)";
 			return {
-				link,
 				reply: `Currently playing on Cytube: ${media.title} ${link} (${media.duration}), queued by ${requester}`
 			}
 		}
@@ -112,6 +115,12 @@ module.exports = {
 	
 		if (playing) {
 			const link = playing.Prefix.replace(linkSymbol, playing.Link);
+			if (context.params.linkOnly) {
+				return {
+					reply: link
+				};
+			}
+
 			const userData = await sb.User.get(playing.User);
 			const { length, time } = await sb.VideoLANConnector.status();
 
@@ -130,13 +139,10 @@ module.exports = {
 				: "";
 	
 			return {
-				link,
 				reply: sb.Utils.tag.trim `
 					${introductionString}
 					${playing.Name}
-					(ID ${playing.VLC_ID})
-					-
-					requested by ${userData.Name}.
+					(ID ${playing.VLC_ID}) - requested by ${userData.Name}.
 					${position}
 					${link}
 					${pauseString}
@@ -147,7 +153,6 @@ module.exports = {
 			const string = (type === "next") ? "queued up" : "currently being played";
 			return {
 				success: false,
-				link: null,
 				reply: `No video is ${string}.`
 			};
 		}

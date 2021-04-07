@@ -4,8 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 20000,
 	Description: "On supinic's stream, takes the currently playing video (if there is any) and fetches another random video from the same Youtube uploader.",
-	Flags: ["link-only","mention","non-nullable","pipe"],
-	Params: null,
+	Flags: ["mention","non-nullable","pipe","use-params"],
+	Params: [
+		{ name: "linkOnly", type: "boolean" }
+	],
 	Whitelist_Response: "Only usable in Supinic's channel.",
 	Static_Data: null,
 	Code: (async function randomUploaderVideo (context, ...args) {
@@ -13,7 +15,6 @@ module.exports = {
 		if (!link) {
 			return {
 				success: false,
-				link: null,
 				reply: `No link provided!`
 			};
 		}
@@ -22,14 +23,12 @@ module.exports = {
 		if (type === null) {
 			return {
 				success: false,
-				link: null,
 				reply: `Provided link was not recognized!`
 			};
 		}
 		else if (type !== "youtube") {
 			return {
 				success: false,
-				link: null,
 				reply: `Provided link is not located on YouTube - cannot continue!`
 			};
 		}
@@ -38,7 +37,6 @@ module.exports = {
 		if (!linkData) {
 			return {
 				success: false,
-				link: null,
 				reply: `Provided video is not available!`
 			};
 		}
@@ -58,7 +56,6 @@ module.exports = {
 		if (!playlistID) {
 			return {
 				success: false,
-				link: null,
 				reply: `No uploads playlist found!`
 			};
 		}
@@ -75,16 +72,19 @@ module.exports = {
 		if (playlistData.length === 0) {
 			return {
 				success: false,
-				link: null,
 				reply: `There are no other videos from this uploader!`
 			};
 		}
 	
-		const authorName = authorData?.items?.[0]?.snippet?.title ?? "(unknown)";
 		const { ID } = sb.Utils.randArray(playlistData);
-	
+		if (context.params.linkOnly) {
+			return {
+				reply: `https://youtu.be/${ID}`,
+			};
+		}
+
+		const authorName = authorData?.items?.[0]?.snippet?.title ?? "(unknown)";
 		return {
-			link: `https://youtu.be/${ID}`,
 			reply: `Random video from ${authorName}: https://youtu.be/${ID}`
 		};
 	}),

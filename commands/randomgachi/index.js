@@ -4,9 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Fetches a random gachi track from the gachi list, excluding Bilibili and Nicovideo videos with no Youtube reuploads",
-	Flags: ["link-only","mention","non-nullable","pipe","use-params"],
+	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "fav", type: "string" },
+		{ name: "linkOnly", type: "boolean" },
 		{ name: "type", type: "string" }
 	],
 	Whitelist_Response: null,
@@ -85,17 +86,20 @@ module.exports = {
 		if (!data) {
 			return {
 				success: false,
-				link: null,
 				reply: `No available YouTube tracks found for given combination of parameters!`
+			};
+		}
+
+		if (context.params.linkOnly) {
+			return {
+				reply: `https://youtu.be/${data.TrackLink}`
 			};
 		}
 	
 		const authorList = (data.Authors || "(unknown)").split(",");
 		const authors = (authorList.length === 1) ? authorList[0] : "(various)";
 		const supiLink = "https://supinic.com/track/detail/" + data.TrackID;
-	
 		return {
-			link: `https://youtu.be/${data.TrackLink}`,
 			reply: `Here's your random gachi: "${data.TrackName}" by ${authors} - ${supiLink} gachiGASM`
 		};
 	}),

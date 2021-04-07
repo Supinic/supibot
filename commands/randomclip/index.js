@@ -4,8 +4,9 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Posts a random clip from either the current channel or the specified channel. You can specify a parameter period, with options day/week/month/all, for example: period:week",
-	Flags: ["link-only","mention","non-nullable","pipe","use-params"],
+	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
+		{ name: "linkOnly", type: "boolean" },
 		{ name: "period", type: "string" }
 	],
 	Whitelist_Response: null,
@@ -49,17 +50,22 @@ module.exports = {
 		}
 		else if (data.clips.length === 0) {
 			return {
-				reply: "No clips found!",
-				link: null
+				success: false,
+				reply: "No clips found!"
 			};
 		}
 	
 		const clip = sb.Utils.randArray(data.clips);
-		const delta = sb.Utils.timeDelta(new sb.Date(clip.created_at));
 		const link = "https://clips.twitch.tv/" + clip.slug;
+		if (context.params.linkOnly) {
+			return {
+				reply: link
+			};
+		}
+
+		const delta = sb.Utils.timeDelta(new sb.Date(clip.created_at));
 		return {
 			reply: `${clip.title} - ${clip.duration} sec, clipped by ${clip.curator.name}, ${delta}: ${link}`,
-			link
 		};
 	}),
 	Dynamic_Description: null

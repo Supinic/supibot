@@ -4,8 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Searches for a given track in the gachi list, and attempts to post a link.",
-	Flags: ["link-only","mention","pipe"],
-	Params: null,
+	Flags: ["mention","pipe","use-params"],
+	Params: [
+		{ name: "linkOnly", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function gachiSearch (context, ...args) {
@@ -49,15 +51,20 @@ module.exports = {
 					reply: "No authors matching that query have been found!"
 				};
 			}
-	
+
+			const link = `https://supinic.com/track/author/${author.ID}`;
+			if (context.params.linkOnly) {
+				return {
+					reply: link
+				};
+			}
+
 			const others = (rest.length === 0)
 				? ""
 				: "More results: " + rest.map(i => `${i.Name} (ID ${i.ID})`).join("; ");
-	
-			const link = `https://supinic.com/track/author/${author.ID}`;
+
 			return {
 				reply: `"${author.Name}" - ${link} ${others}`,
-				link
 			};
 		}
 	
@@ -96,19 +103,19 @@ module.exports = {
 					)
 				)
 		`);
-
 		if (data.length === 0) {
 			return {
 				success: false,
 				reply: "No tracks matching that query have been found!"
 			};
 		}
-		else if (data.length === 1) {
+
+		let reply;
+		let link;
+		if (data.length === 1) {
 			const [first] = data;
-			return {
-				reply: `"${first.Name}" - ${first.Is_Todo ? "🚧" : ""} https://supinic.com/track/detail/${first.ID}`,
-				link: `https://supinic.com/track/detail/${first.ID}`
-			};
+			reply = `"${first.Name}" - ${first.Is_Todo ? "🚧" : ""} https://supinic.com/track/detail/${first.ID}`;
+			link = `https://supinic.com/track/detail/${first.ID}`;
 		}
 		else {
 			const params = data.map(i => `ID=${i.ID}`).join("&");
@@ -119,12 +126,13 @@ module.exports = {
 				json: { url: listLink }
 			});
 
-			const { link } = relay.body.data;
-			return {
-				link,
-				reply: "Search result: " + link,
-			};
+			link = relay.body.data;
+			reply = "Search result: " + link;
 		}
+
+		return {
+			reply: (context.params.linkOnly) ? link : reply
+		};
 	}),
 	Dynamic_Description: null
 };
