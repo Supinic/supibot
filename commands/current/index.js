@@ -6,7 +6,7 @@ module.exports = {
 	Description: "Fetches the current song playing on stream.",
 	Flags: ["link-only","mention","pipe","whitelist"],
 	Params: null,
-	Whitelist_Response: null,
+	Whitelist_Response: "This command is only available in @Supinic channel on Twitch!",
 	Static_Data: (() => ({
 		types: ["current", "previous", "next"]
 	})),
