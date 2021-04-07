@@ -39,9 +39,6 @@ module.exports = {
 				reply: `Currently playing: ${leaf.name}`
 			};
 		}
-		else if (state === "dubtrack") {
-			return { reply: "We are on Dubtrack, check ?song for the currently playing song :)" };
-		}
 		else if (state === "cytube") {
 			const { controller } = sb.Platform.get("cytube");
 			const playing = controller.currentlyPlaying ?? controller.playlistData[0];
