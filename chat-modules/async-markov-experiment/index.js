@@ -22,7 +22,7 @@ module.exports = {
 			}
 		}
 		if (!this.data.regex) {
-			// only allows messages consisting of just emojis, or ACSII 32-126 characters (0x20-0x7E)
+			// only allows messages consisting of just emojis, or ASCII 32-126 characters (0x20-0x7E)
 			this.data.regex = /^[\p{Emoji}\x20-\x7e]+$/ui;
 		}
 		if (typeof this.data.threshold !== "number") {
