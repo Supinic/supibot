@@ -7,8 +7,9 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "comments", type: "boolean" },
-		{ name: "linkOnly", type: "boolean" },
 		{ name: "flair", type: "string" },
+		{ name: "linkOnly", type: "boolean" },
+		{ name: "showFlairs", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => {
@@ -24,7 +25,7 @@ module.exports = {
 			#quarantine = null;
 			#nsfw = null;
 			#expiration = -Infinity;
-			posts = [];
+			#posts = [];
 			repeatedPosts = [];
 	
 			constructor (meta) {
@@ -48,7 +49,16 @@ module.exports = {
 			setExpiration () {
 				this.#expiration = new sb.Date().addMilliseconds(expiration);
 			}
-	
+
+			addPosts (data) {
+				this.#posts = data.map(i => new RedditPost(i.data));
+			}
+
+			get availableFlairs () {
+				return new Set(this.#posts.map(i => i.flairs));
+			}
+
+			get posts () { return this.#posts; }
 			get expiration () { return this.#expiration; }
 			get error () { return this.#error; }
 			get exists () { return this.#exists; }
@@ -103,6 +113,7 @@ module.exports = {
 			get isTextPost () { return this.#isTextPost; }
 			get url () { return this.#url; }
 			get commentsUrl () { return this.#commentsUrl; }
+			get flairs () { return this.#flairs; }
 	
 			get posted () {
 				return sb.Utils.timeDelta(this.#created);
@@ -171,7 +182,8 @@ module.exports = {
 	
 		const input = (args.shift() ?? sb.Utils.randArray(this.staticData.defaultMemeSubreddits));
 		const subreddit = encodeURIComponent(input.toLowerCase());
-	
+
+		/** @type {Subreddit} */
 		let forum = this.data.subreddits[subreddit];
 		if (!forum) {
 			const { statusCode, body: response } = await sb.Got("Reddit", subreddit + "/about.json");
@@ -218,7 +230,16 @@ module.exports = {
 			}
 	
 			forum.setExpiration();
-			forum.posts = response.data.children.map(i => new this.staticData.RedditPost(i.data));
+			forum.addPosts(response.data.children);
+		}
+
+		if (context.params.showFlairs) {
+			const flairs = forum.availableFlairs;
+			return {
+				reply: (flairs.size === 0)
+					? "There are no flairs available in this subreddit."
+					: "Available flairs for this subreddit: " + [...flairs].join(", ")
+			};
 		}
 	
 		const { posts, repeatedPosts } = forum;
@@ -289,6 +310,10 @@ module.exports = {
 
 			`<code>${prefix}rm (subreddit) flair:(flair)</code>`,
 			"If a flair is provided, only the posts that contain such flair will be used (case-insensitive).",
+			"",
+
+			`<code>${prefix}rm (subreddit) showFlairs:true</code>`,
+			"Posts a list of available flairs for given subreddit.",
 			"",
 
 			`<code>${prefix}rm linkOnly:true</code>`,
