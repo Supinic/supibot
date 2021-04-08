@@ -7,7 +7,8 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "comments", type: "boolean" },
-		{ name: "linkOnly", type: "boolean" }
+		{ name: "linkOnly", type: "boolean" },
+		{ name: "flair", type: "string" },
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => {
@@ -64,7 +65,8 @@ module.exports = {
 			#title;
 			#url;
 			#commentsUrl;
-	
+
+			#flairs = [];
 			#crosspostOrigin = null;
 			#isTextPost = false;
 			#nsfw = false;
@@ -87,6 +89,7 @@ module.exports = {
 				this.#url = data.url;
 				this.#commentsUrl = `r/${data.subreddit}/comments/${data.id}`;
 
+				this.#flairs = data.link_flair_richtext.filter(i => i.e === "text").map(i => i.t);
 				this.#isTextPost = Boolean(data.selftext && data.selftext_html);
 				this.#nsfw = Boolean(data.over_18) || crossPostNSFW;
 				this.#stickied = Boolean(data.stickied);
@@ -104,7 +107,22 @@ module.exports = {
 			get posted () {
 				return sb.Utils.timeDelta(this.#created);
 			}
-	
+
+			hasFlair (flair, caseSensitive = false) {
+				if (caseSensitive) {
+					flair = flair.toLowerCase();
+				}
+
+				return this.#flairs.some(i => {
+					if (caseSensitive) {
+						return (i.toLowerCase() === flair);
+					}
+					else {
+						return (i === flair);
+					}
+				})
+			}
+
 			toString () {
 				const xpost = (this.#crosspostOrigin)
 					? `, x-posted from ${this.#crosspostOrigin}`
@@ -210,6 +228,7 @@ module.exports = {
 			&& !i.isSelftext
 			&& !i.isTextPost
 			&& !repeatedPosts.includes(i.id)
+			&& (!context.params.flair || i.hasFlair(context.params.flair, false))
 		));
 	
 		const post = sb.Utils.randArray(validPosts);
@@ -266,6 +285,10 @@ module.exports = {
 			"Posts a random post from the specified subreddit.",
 			"NSFW-marked subreddits are not available outside of channels marked for that content.",
 			"NSFW-marked posts will be filtered out in channels not marked for that content.",
+			"",
+
+			`<code>${prefix}rm (subreddit) flair:(flair)</code>`,
+			"If a flair is provided, only the posts that contain such flair will be used (case-insensitive).",
 			"",
 
 			`<code>${prefix}rm linkOnly:true</code>`,
