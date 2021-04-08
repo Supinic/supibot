@@ -254,6 +254,40 @@ module.exports = {
 				break;
 			}
 
+			case "duplicate": {
+				const [oldAlias, newAlias] = args;
+				if (!oldAlias || !newAlias) {
+					return {
+						reply: `To duplicate an alias, you must provide both existing and new alias names!`
+					};
+				}
+				else if (!wrapper.has(oldAlias)) {
+					return {
+						success: false,
+						reply: `You don't have the "${oldAlias}" alias!`
+					};
+				}
+				else if (wrapper.has(newAlias)) {
+					return {
+						success: false,
+						reply: `You already have the "${newAlias}" alias!`
+					};
+				}
+
+				const previous = wrapper.get(oldAlias);
+				wrapper.set(newAlias, {
+					name: newAlias,
+					invocation: previous.invocation,
+					args: previous.args,
+					desc: previous.desc ?? "",
+					created: new sb.Date().toJSON(),
+					lastEdit: null
+				});
+
+				changed = true;
+				break;
+			}
+
 			case "edit": {
 				const [name, command, ...rest] = args;
 				if (!name || !command) {
@@ -555,6 +589,10 @@ module.exports = {
 	
 			`<code>${prefix}alias rename (old-name) (new-name)</code>`,
 			"Renames your command alias from old-name to new-name.",
+			"",
+
+			`<code>${prefix}alias duplicate (old-name) (new-name)</code>`,
+			"Creates a new alias (new-name) with the definition of an existing alias (old-name).",
 			"",
 	
 			`<code>${prefix}alias list</code>`,
