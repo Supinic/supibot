@@ -284,6 +284,7 @@ module.exports = {
 					lastEdit: null
 				});
 
+				reply = `Successfully duplicated "${oldAlias}" as "${newAlias}"!`;
 				changed = true;
 				break;
 			}
