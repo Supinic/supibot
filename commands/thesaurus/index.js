@@ -20,7 +20,7 @@ module.exports = {
 		const thesaurus = Object.fromEntries(
 			(await sb.Query.getRecordset(rs => rs
 				.select("Word", "Result")
-				.from("cache", "Thesaurus")
+				.from("data", "Thesaurus")
 				.where("Word IN %s+", words)
 			)).map(record => [ record.Word, JSON.parse(record.Result) ])
 		);
