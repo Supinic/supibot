@@ -3,9 +3,11 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Attempts to re-created your sentence using random synonyms for each word. EXPERIMENTAL",
-	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Description: "Attempts to re-creates your sentence using random synonyms for each word.",
+	Flags: ["mention","non-nullable","pipe","use-params"],
+	Params: [
+		{ name: "singleWord", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function thesaurus (context, ...words) {
@@ -22,6 +24,21 @@ module.exports = {
 				.where("Word IN %s+", words)
 			)).map(record => [ record.Word, JSON.parse(record.Result) ])
 		);
+
+		if (context.params.singleWord) {
+			const synonyms = thesaurus[words[0]];
+			if (synonyms && synonyms.length !== 0) {
+				return {
+					reply: synonyms.sort().join(", ")
+				};
+			}
+			else {
+				return {
+					success: false,
+					reply: "No synonyms found for this word!"
+				};
+			}
+		}
 	
 		const result = [];
 		for (const rawWord of words) {
@@ -41,5 +58,21 @@ module.exports = {
 			reply: result.join(" ")
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => {
+		return [
+			"Re-creates your sentence using random synonyms for each word, if available.",
+			"By default, has a 66% chance to replace a word with a random synonym - if that exists.",
+			"",
+
+			`<code>${prefix}thesaurus hello my name is John and I am doing well</code>`,
+			"greeting my kinsfolk is room and I amplitude modulation doing well "
+
+			`<code>${prefix}thesaurus (word) singleWord:true</code>`,
+			"Replies with a list of possible synonyms for the word you provided.",
+			"",
+
+			`<code>${prefix}thesaurus population singleWord:true</code>`,
+			"accumulation, aggregation, assemblage, collection, colonisation, colonization, group, grouping, integer, people, settlement, universe, whole number"
+		];
+	})
 };
