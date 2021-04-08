@@ -109,12 +109,12 @@ module.exports = {
 			}
 
 			hasFlair (flair, caseSensitive = false) {
-				if (caseSensitive) {
+				if (!caseSensitive) {
 					flair = flair.toLowerCase();
 				}
 
 				return this.#flairs.some(i => {
-					if (caseSensitive) {
+					if (!caseSensitive) {
 						return (i.toLowerCase() === flair);
 					}
 					else {
