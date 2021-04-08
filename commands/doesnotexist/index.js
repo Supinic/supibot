@@ -44,12 +44,17 @@ module.exports = {
 							};
 						}
 
-						const { statusCode, link } = await sb.Utils.uploadToNuuls(imageData.rawBody ?? imageData.body);
+						let { statusCode, link } = await sb.Utils.uploadToNuuls(imageData.rawBody ?? imageData.body);
 						if (statusCode !== 200) {
-							return {
-								success: false,
-								reply: `Could not upload the image! Error: ${statusCode}`
-							};
+							const result = await sb.Utils.uploadToImgur(imageData.rawBody ?? imageData.body);
+							if (result.statusCode !== 200) {
+								return {
+									success: false,
+									reply: `Could not upload the image to either Nuuls or Imgur! Errors: ${statusCode}, ${result.statusCode}`
+								};
+							}
+
+							link = result.link;
 						}
 
 						return {
