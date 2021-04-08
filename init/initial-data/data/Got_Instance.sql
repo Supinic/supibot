@@ -28,4 +28,12 @@ VALUES
 		"User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
 	},
 	mutableDefaults: true
-}))',NULL,'Twitch/V5 instance');
+}))',NULL,'Twitch/V5 instance'),
+('Leppunen','function','(() => ({
+    responseType: "json",
+    prefixUrl: "https://api.ivr.fi",
+    headers: {
+        "User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
+    },
+    throwHttpErrors: false
+}))',NULL,'Leppunen\'s API instance');
