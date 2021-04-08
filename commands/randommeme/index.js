@@ -99,7 +99,7 @@ module.exports = {
 				this.#url = data.url;
 				this.#commentsUrl = `r/${data.subreddit}/comments/${data.id}`;
 
-				this.#flairs = data.link_flair_richtext.filter(i => i.e === "text").map(i => i.t);
+				this.#flairs = data.link_flair_richtext.filter(i => i.t && i.e === "text").map(i => i.t.trim());
 				this.#isTextPost = Boolean(data.selftext && data.selftext_html);
 				this.#nsfw = Boolean(data.over_18) || crossPostNSFW;
 				this.#stickied = Boolean(data.stickied);
