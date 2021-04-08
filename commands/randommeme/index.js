@@ -238,7 +238,7 @@ module.exports = {
 			return {
 				reply: (flairs.size === 0)
 					? "There are no flairs available in this subreddit."
-					: "Available flairs for this subreddit: " + [...flairs].join(", ")
+					: "Available flairs for this subreddit: " + [...flairs].sort().join(", ")
 			};
 		}
 	
