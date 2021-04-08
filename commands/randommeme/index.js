@@ -55,7 +55,7 @@ module.exports = {
 			}
 
 			get availableFlairs () {
-				return new Set(this.#posts.map(i => i.flairs));
+				return new Set(this.#posts.flatMap(i => i.flairs));
 			}
 
 			get posts () { return this.#posts; }
