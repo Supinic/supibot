@@ -297,7 +297,7 @@ module.exports = class Filter extends require("./template.js") {
 		return Filter.data.filter(row => (
 			row.Active
 			&& (!type || type === row.Type)
-			&& (row.User_Alias === (options.user?.ID ?? null) || row.User_Alias === null)
+			&& (!options.skipUserCheck || (row.User_Alias === (options.user?.ID ?? null) || row.User_Alias === null))
 			&& (row.Channel === (options.channel?.ID ?? null) || row.Channel === null)
 			&& (row.Command === (options.command?.ID ?? null) || row.Command === null)
 			&& (row.Invocation === (options.invocation ?? null) || row.Invocation === null)
@@ -537,7 +537,10 @@ module.exports = class Filter extends require("./template.js") {
 	 * @param {Object} options
 	 */
 	static async applyUnping (options) {
-		const filters = Filter.getLocals("Unping",  options);
+		const filters = Filter.getLocals("Unping",  {
+			...options,
+			skipUserCheck: true
+		});
 
 		let { string } = options;
 		const unpingUsers = await sb.User.getMultiple(filters.map(i => i.User_Alias));
