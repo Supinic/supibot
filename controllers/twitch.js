@@ -54,7 +54,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					// If a channel has already been re-joined in the meantime, don't attempt to join it again.
 					// This could result in a double connection
 					for (const channel of this.failedJoinChannels) {
-						if (channel.sessionData.joined) {
+						if (channel.sessionData?.joined) {
 							console.warn("Prevented channel from double-joining", { channel });
 							this.failedJoinChannels.delete(channel);
 						}
