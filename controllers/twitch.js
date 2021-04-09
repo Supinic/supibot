@@ -51,6 +51,15 @@ module.exports = class TwitchController extends require("./template.js") {
 				Expression: "0 0 * * * *",
 				Description: "Attempts to reconnect channels on Twitch that the bot has been unable to join - most likely because of a ban.",
 				Code: async () => {
+					// If a channel has already been re-joined in the meantime, don't attempt to join it again.
+					// This could result in a double connection
+					for (const channel of this.failedJoinChannels) {
+						if (channel.sessionData.joined) {
+							console.warn("Prevented channel from double-joining", { channel });
+							this.failedJoinChannels.delete(channel);
+						}
+					}
+
 					const results = await Promise.allSettled(
 						[...this.failedJoinChannels].map(i => this.client.join(i))
 					);
@@ -181,25 +190,27 @@ module.exports = class TwitchController extends require("./template.js") {
 		});
 
 		client.on("JOIN", async ({ channelName, joinedUsername }) => {
-			// @todo: Could this possibly be a part of channelData? So that it is platform-independent...
-			if (joinedUsername === this.platform.Self_Name.toLowerCase()) {
-				const { channels, string } = this.platform.Data.reconnectAnnouncement;
-				if (channels && string && channels.includes(channelName)) {
-					await client.say(channelName, string);
-				}
+			if (joinedUsername !== this.platform.Self_Name.toLowerCase()) {
+				return;
 			}
 
 			const channelData = sb.Channel.get(channelName);
-			if (this.platform.Logging.channelJoins && channelData) {
-				const row = await sb.Query.getRow("chat_data", "Log");
-				row.setValues({
-					Tag: "Twitch",
-					Subtag: "Join",
-					Channel: channelData.ID,
-				});
+			channelData.sessionData.joined = true;
 
-				await row.save();
+			// @todo: Could this possibly be a part of channelData? So that it is platform-independent...
+			const { channels, string } = this.platform.Data.reconnectAnnouncement;
+			if (channels && string && channels.includes(channelName)) {
+				await client.say(channelName, string);
 			}
+		});
+
+		client.on("PART", ({ channelName, joinedUsername }) => {
+			if (joinedUsername !== this.platform.Self_Name.toLowerCase()) {
+				return;
+			}
+
+			const channelData = sb.Channel.get(channelName);
+			channelData.sessionData.joined = false;
 		});
 
 		client.on("USERSTATE", async (messageObject) => {
