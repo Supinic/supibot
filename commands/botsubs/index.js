@@ -50,7 +50,7 @@ module.exports = {
 			};
 		}
 
-		let message = `Supibot is currently subbed to: ${channels} - ${emotes}`;
+		let message = `Supibot is currently subscribed to: ${channels} - ${emotes}`;
 		const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
 
 		if (message.length > limit) {
