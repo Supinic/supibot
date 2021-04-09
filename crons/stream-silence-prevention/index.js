@@ -56,7 +56,12 @@ module.exports = {
 			const rg = sb.Command.get("rg");
 			const context = sb.Command.createFakeContext(rg);
 			const randomResult = await rg.execute(context, "fav:supinic linkOnly:true");
-			link = randomResult.link;
+			if (randomResult.success === false) {
+				await channelData.send("Could not fetch song data! :(");
+				return;
+			}
+
+			link = randomResult.reply;
 		}
 	
 		let result = "";
