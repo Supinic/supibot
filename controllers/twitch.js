@@ -180,13 +180,25 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 		});
 
-		client.on("JOIN", ({ channelName, joinedUsername }) => {
+		client.on("JOIN", async ({ channelName, joinedUsername }) => {
 			// @todo: Could this possibly be a part of channelData? So that it is platform-independent...
 			if (joinedUsername === this.platform.Self_Name.toLowerCase()) {
 				const { channels, string } = this.platform.Data.reconnectAnnouncement;
 				if (channels && string && channels.includes(channelName)) {
-					client.say(channelName, string);
+					await client.say(channelName, string);
 				}
+			}
+
+			const channelData = sb.Channel.get(channelName);
+			if (this.platform.Logging.channelJoins && channelData) {
+				const row = await sb.Query.getRow("chat_data", "Log");
+				row.setValues({
+					Tag: "Twitch",
+					Subtag: "Join",
+					Channel: channelData.ID,
+				});
+
+				await row.save();
 			}
 		});
 

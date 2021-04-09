@@ -4,6 +4,7 @@ VALUES
 ('Twitch',500,NULL,'{
 	"bans": false,
 	"bits": false,
+	"channelJoins": false,
 	"clearchat": false,
 	"giftSubs": false,
 	"messages": false,
