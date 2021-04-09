@@ -17,6 +17,10 @@ module.exports = {
 			Description: "Regularly updates the available words in $markov.",
 			Expression: "0 * * * * *",
 			Code: (async function markovUpdater () {
+				if (!sb.ChatModule) {
+					return;
+				}
+
 				const module = sb.ChatModule.get("async-markov-experiment");
 				if (!module) {
 					return;
