@@ -26,12 +26,15 @@ module.exports = {
 	
 		while (!link && counter < this.staticData.repeatLimit) {
 			const execution = await rg.execute(passedContext, "linkOnly:true", ...args);
-			const data = await sb.Utils.linkParser.fetchData(execution.link);
-	
+			if (execution.success === false) {
+				return execution;
+			}
+
+			const data = await sb.Utils.linkParser.fetchData(execution.reply);
 			if (data === null) {
 				counter++;
 	
-				const videoID = sb.Utils.linkParser.parseLink(execution.link);
+				const videoID = sb.Utils.linkParser.parseLink(execution.reply);
 				await sb.Query.getRecordUpdater(ru => ru
 					.update("music", "Track")
 					.set("Available", false)
@@ -39,7 +42,7 @@ module.exports = {
 				);
 			}
 			else {
-				link = execution.link
+				link = execution.reply;
 			}
 		}
 	
