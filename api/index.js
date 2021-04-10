@@ -8,7 +8,9 @@ module.exports = (function () {
 	const baseURL = `${protocol}://localhost:${port}`;
 
 	const definition = {};
-	const subroutes = [];
+	const subroutes = [
+		["channel", "channel.js"]
+	];
 	for (const [route, file] of subroutes) {
 		definition[route] = require("./" + file);
 	}
@@ -25,10 +27,12 @@ module.exports = (function () {
 		if (!target) {
 			res.writeHead(404, { "Content-Type": "application/json" });
 			res.end(JSON.stringify({
+				statusCode: 404,
 				data: null,
 				error: {
 					message: "Endpoint not found"
-				}
+				},
+				timestamp: Date.now()
 			}));
 
 			return;
@@ -37,12 +41,20 @@ module.exports = (function () {
 			throw new Error("Internal API error - invalid definition for path " + path.join("/"));
 		}
 
-		const { body = {}, headers = {}, statusCode = 200 } = await target(req, res, url);
+		const { error = null, data = null, headers = {}, statusCode = 200 } = await target(req, res, url);
 		res.writeHead(statusCode, headers);
-		res.end(body);
+		res.end(JSON.stringify({
+			statusCode,
+			data,
+			error,
+			timestamp: Date.now()
+		}));
 	});
 
 	server.listen(port);
 
-	return server;
+	return {
+		server,
+		definition
+	};
 })();
