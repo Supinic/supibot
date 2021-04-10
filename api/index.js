@@ -15,7 +15,7 @@ module.exports = (function () {
 
 	const server = httpInterface.createServer(async (req, res) => {
 		const url = new URL(req.url, baseURL);
-		const path = url.pathName.split("/").filter(Boolean);
+		const path = url.pathname.split("/").filter(Boolean);
 
 		let target = definition[path[0]];
 		for (let i = 1; i < path.length; i++) {
