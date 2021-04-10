@@ -40,7 +40,7 @@ VALUES
 ('Supibot','function','(() => {
     const secure = sb.Config.get("SUPIBOT_API_SECURE", false) ?? false;
     const protocol = (secure) ? "https" : "http";
-    const port = sb.Config.get("SUPIBOT_API_URL", false) ?? 80;
+    const port = sb.Config.get("SUPIBOT_API_PORT", false) ?? 80;
 
     return {
         responseType: "json",
