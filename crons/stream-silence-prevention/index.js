@@ -12,6 +12,9 @@ module.exports = {
 		const twitch = sb.Platform.get("twitch");
 		const cytube = sb.Platform.get("cytube");
 		const channelData = sb.Channel.get("supinic", "twitch");
+		const cytubeChannelData = sb.Channel.get(49);
+
+
 		const streamData = await channelData.getStreamData();
 		if (!streamData.live) {
 			return;
@@ -28,7 +31,7 @@ module.exports = {
 			isQueueEmpty = (queue.length === 0);
 		}
 		else if (state === "cytube") {
-			isQueueEmpty = (cytube.controller.playlistData.length === 0);
+			isQueueEmpty = (cytube.controller.clients.get(cytubeChannelData).playlistData.length === 0);
 		}
 	
 		if (!isQueueEmpty) {
@@ -80,8 +83,7 @@ module.exports = {
 			result = commandResult.reply;
 		}
 		else if (state === "cytube") {
-			const channelData = sb.Channel.get(49);
-			const client = cytube.controller.clients.get(channelData);
+			const client = cytube.controller.clients.get(cytubeChannelData);
 
 			client.queue("yt", videoID);
 			result = `Silence prevention! Successfully added ${link} to Cytube (hopefully).`;
