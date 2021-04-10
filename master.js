@@ -37,5 +37,7 @@
 		console.debug(`Platform ${platform} loaded successfully.`);
 	}
 
+	sb.API = require("./api");
+
 	sb.Platform.assignControllers(controllers);
 })();

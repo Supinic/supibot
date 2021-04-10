@@ -36,4 +36,18 @@ VALUES
         "User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
     },
     throwHttpErrors: false
-}))',NULL,'Leppunen\'s API instance');
+}))',NULL,'Leppunen\'s API instance'),
+('Supibot','function','(() => {
+    const secure = sb.Config.get("SUPIBOT_API_SECURE", false) ?? false;
+    const protocol = (secure) ? "https" : "http";
+    const port = sb.Config.get("SUPIBOT_API_URL", false) ?? 80;
+
+    return {
+        responseType: "json",
+        prefixUrl: `${protocol}://localhost:${port}`,
+        headers: {
+            "User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
+        },
+        throwHttpErrors: false
+    };
+})',NULL,'Supibot internal API instance');
