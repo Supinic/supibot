@@ -89,9 +89,12 @@ module.exports = {
 					}
 	
 					const { Self_Name: botName, controller } = sb.Platform.get("cytube");
+					const channelData = sb.Channel.get(49);
+					const client = controller.clients.get(channelData);
+
 					const playlist = [
-						controller.currentlyPlaying,
-						...controller.playlistData
+						client.currentlyPlaying,
+						...client.playlistData
 					].filter(i => i && i.queueby?.toLowerCase() === botName.toLowerCase());
 	
 					if (playlist.length > this.limits.total) {
@@ -115,8 +118,8 @@ module.exports = {
 							reply: "Link cannot be played on Cytube!"
 						};
 					}
-	
-					controller.queue(cytubeType, linkData.ID);
+
+					client.queue(cytubeType, linkData.ID);
 					return {
 						reply: `Video ${linkData.link} "${linkData.name}" added to Cytube successfully.`
 					};
