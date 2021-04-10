@@ -80,7 +80,10 @@ module.exports = {
 			result = commandResult.reply;
 		}
 		else if (state === "cytube") {
-			await cytube.controller.queue("yt", videoID);
+			const channelData = sb.Channel.get(49);
+			const client = cytube.controller.clients.get(channelData);
+
+			client.queue("yt", videoID);
 			result = `Silence prevention! Successfully added ${link} to Cytube (hopefully).`;
 		}
 		
