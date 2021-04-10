@@ -13,8 +13,8 @@
     "node": ">= 13.2"
   },
   "scripts": {
-    "start": "node ./master.js --harmony-nullish --harmony-optional-chaining",
-    "debug": "node --inspect=localhost:10001 ./master.js --harmony-top-level-await --harmony-nullish --harmony-optional-chaining",
+    "start": "node ./master.js",
+    "debug": "node --inspect=localhost:10001 --unhandled-rejections=warn ./master.js",
     "init-database": "node ./init/script.js --harmony-nullish --harmony-optional-chaining",
     "setup": "node ./init/setup.js --harmony-nullish --harmony-optional-chaining",
     "update": "git pull origin master && yarn upgrade supi-core",
