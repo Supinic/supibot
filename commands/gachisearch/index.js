@@ -24,7 +24,7 @@ module.exports = {
 				reply: "Your search query is too short - use at least 3 characters!"
 			};
 		}
-	
+
 		const { invocation } = context;
 		const escaped = sb.Query.escapeLikeString(query);
 		if (invocation === "gsa" || invocation === "gachiauthorseach") {
@@ -43,7 +43,7 @@ module.exports = {
 				            AND Alias.Target_ID = Author.ID
 		            )
 	            `);
-	
+
 			const [author, ...rest] = data;
 			if (!author) {
 				return {
@@ -67,7 +67,7 @@ module.exports = {
 				reply: `"${author.Name}" - ${link} ${others}`,
 			};
 		}
-	
+
 		const data = await sb.Query.raw(sb.Utils.tag.trim `
 			SELECT
 				ID,
@@ -126,7 +126,7 @@ module.exports = {
 				json: { url: listLink }
 			});
 
-			link = relay.body.data;
+			link = relay.body.data.link;
 			reply = "Search result: " + link;
 		}
 
