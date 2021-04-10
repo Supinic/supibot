@@ -189,13 +189,15 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 		});
 
-		client.on("JOIN", async ({ channelName, joinedUsername }) => {
-			if (joinedUsername !== this.platform.Self_Name.toLowerCase()) {
+		client.on("JOIN", async (message) => {
+			if (message.joinedUsername !== this.platform.Self_Name.toLowerCase()) {
 				return;
 			}
 
+			const { channelName } = message;
 			const channelData = sb.Channel.get(channelName);
 			channelData.sessionData.joined = true;
+			channelData.sessionData.parted = false;
 
 			// @todo: Could this possibly be a part of channelData? So that it is platform-independent...
 			const { channels, string } = this.platform.Data.reconnectAnnouncement;
@@ -204,13 +206,14 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 		});
 
-		client.on("PART", ({ channelName, joinedUsername }) => {
-			if (joinedUsername !== this.platform.Self_Name.toLowerCase()) {
+		client.on("PART", (message) => {
+			if (message.partedUsername !== this.platform.Self_Name.toLowerCase()) {
 				return;
 			}
 
-			const channelData = sb.Channel.get(channelName);
+			const channelData = sb.Channel.get(message.channelName);
 			channelData.sessionData.joined = false;
+			channelData.sessionData.parted = true;
 		});
 
 		client.on("USERSTATE", async (messageObject) => {
