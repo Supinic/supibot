@@ -3,6 +3,10 @@ module.exports = (function () {
 	const httpInterface = (secure) ? require("https") : require("http");
 	const { URL } = require("url");
 
+	const port = sb.Config?.get("SUPIBOT_API_PORT", false) ?? 80;
+	const protocol = (secure) ? "https" : "http";
+	const baseURL = `${protocol}://localhost:${port}`;
+
 	const definition = {};
 	const subroutes = [];
 	for (const [route, file] of subroutes) {
@@ -10,7 +14,7 @@ module.exports = (function () {
 	}
 
 	const server = httpInterface.createServer(async (req, res) => {
-		const url = new URL(req.url);
+		const url = new URL(req.url, baseURL);
 		const path = url.pathName.split("/").filter(Boolean);
 
 		let target = definition[path[0]];
@@ -38,7 +42,6 @@ module.exports = (function () {
 		res.end(body);
 	});
 
-	const port = sb.Config?.get("SUPIBOT_API_PORT", false) ?? 80;
 	server.listen(port);
 
 	return server;
