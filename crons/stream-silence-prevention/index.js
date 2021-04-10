@@ -83,6 +83,7 @@ module.exports = {
 			result = commandResult.reply;
 		}
 		else if (state === "cytube") {
+			const videoID = sb.Utils.linkParser.parseLink(link);
 			const client = cytube.controller.clients.get(cytubeChannelData);
 
 			client.queue("yt", videoID);
