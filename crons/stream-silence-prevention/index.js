@@ -31,7 +31,7 @@ module.exports = {
 			isQueueEmpty = (queue.length === 0);
 		}
 		else if (state === "cytube") {
-			isQueueEmpty = (cytube.controller.clients.get(cytubeChannelData).playlistData.length === 0);
+			isQueueEmpty = (cytube.controller.clients.get(cytubeChannelData.ID).playlistData.length === 0);
 		}
 	
 		if (!isQueueEmpty) {
@@ -84,7 +84,7 @@ module.exports = {
 		}
 		else if (state === "cytube") {
 			const videoID = sb.Utils.linkParser.parseLink(link);
-			const client = cytube.controller.clients.get(cytubeChannelData);
+			const client = cytube.controller.clients.get(cytubeChannelData.ID);
 
 			client.queue("yt", videoID);
 			result = `Silence prevention! Successfully added ${link} to Cytube (hopefully).`;

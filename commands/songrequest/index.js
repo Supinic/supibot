@@ -90,7 +90,7 @@ module.exports = {
 	
 					const { Self_Name: botName, controller } = sb.Platform.get("cytube");
 					const channelData = sb.Channel.get(49);
-					const client = controller.clients.get(channelData);
+					const client = controller.clients.get(channelData.ID);
 
 					const playlist = [
 						client.currentlyPlaying,
