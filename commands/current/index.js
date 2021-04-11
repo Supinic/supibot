@@ -40,7 +40,10 @@ module.exports = {
 		}
 		else if (state === "cytube") {
 			const { controller } = sb.Platform.get("cytube");
-			const playing = controller.currentlyPlaying ?? controller.playlistData[0];
+			const channelData = sb.Channel.get(49);
+
+			const client = controller.clients.get(channelData.ID);
+			const playing = client.currentlyPlaying ?? client.playlistData[0];
 	
 			if (!playing) {
 				return {
