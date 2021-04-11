@@ -19,7 +19,7 @@ module.exports = {
 		}
 	
 		const { follows } = await sb.Got("Kraken", {
-			url: `users/${channelID}/follows/channels`,
+			url: `channels/${channelID}/follows`,
 			searchParams: new sb.URLParams()
 				.set("direction", "asc")
 				.toString()
