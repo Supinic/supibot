@@ -471,7 +471,7 @@ module.exports = class CytubeController extends require("./template.js") {
 	 * @param {Channel} channelData
 	 */
 	async send (message, channelData) {
-		const client = this.clients.get(channelData);
+		const client = this.clients.get(channelData.ID);
 		if (!client) {
 			throw new sb.Error({
 				message: "No client found for Cytube channel",
@@ -492,7 +492,7 @@ module.exports = class CytubeController extends require("./template.js") {
 	 * @param {Channel} channelData
 	 */
 	async pm (message, user, channelData) {
-		const client = this.clients.get(channelData);
+		const client = this.clients.get(channelData.ID);
 		if (!client) {
 			throw new sb.Error({
 				message: "No client found for Cytube channel",
@@ -532,7 +532,7 @@ module.exports = class CytubeController extends require("./template.js") {
 		}
 
 		const client = new CytubeClient(channelData, this);
-		this.clients.set(channelData, client);
+		this.clients.set(channelData.ID, client);
 
 		return true;
 	}
@@ -544,7 +544,7 @@ module.exports = class CytubeController extends require("./template.js") {
 	 */
 	fetchUserList (channelIdentifier) {
 		const channelData = sb.Channel.get(channelIdentifier, this.platform);
-		const client = this.clients.get(channelData);
+		const client = this.clients.get(channelData.ID);
 		if (!client) {
 			throw new sb.Error({
 				message: "No client found for Cytube channel",
@@ -559,7 +559,7 @@ module.exports = class CytubeController extends require("./template.js") {
 	}
 
 	async fetchChannelEmotes (channelData) {
-		const client = this.clients.get(channelData);
+		const client = this.clients.get(channelData.ID);
 		if (!client) {
 			throw new sb.Error({
 				message: "No client found for Cytube channel",
