@@ -310,7 +310,11 @@ module.exports = {
 					const ID = Number(identifier);
 					if (!ID) {
 						return {
-							reply: "Check all of your reminders here (requires login): https://supinic.com/bot/reminder/list"
+							reply: sb.Utils.tag.trim `
+								Check all of your reminders here (requires login):
+							 	Active - https://supinic.com/bot/reminder/list
+							 	History - https://supinic.com/bot/reminder/history
+							`
 						};
 					}
 	
