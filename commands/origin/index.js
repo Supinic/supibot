@@ -19,7 +19,7 @@ module.exports = {
 		}
 	
 		const emoteData = await sb.Query.getRecordset(rs => rs
-			.select("Text", "Tier", "Type", "Todo", "Approved", "Emote_Added", "Author")
+			.select("ID", "Text", "Tier", "Type", "Todo", "Approved", "Emote_Added", "Author")
 			.from("data", "Origin")
 			.where("Name COLLATE utf8mb4_bin LIKE %s", emote)
 		);
@@ -63,10 +63,11 @@ module.exports = {
 				addedString = `Added on ${data.Emote_Added.format("Y-m-d")}.`;
 			}
 
+			const link = `https://supinic.com/data/origin/detail/${data.ID}`;
 			const type = (data.Tier) ? `T${data.Tier}` : "";
 			return {
 				reply: sb.Utils.tag.trim `
-					${data.Todo ? "(needs more info)" : ""}
+					${link}					
 					${type} ${data.Type} emote:
 					${data.Text}
 					${addedString}
