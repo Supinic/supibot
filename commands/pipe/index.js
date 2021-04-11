@@ -10,7 +10,9 @@ module.exports = {
 		{ name: "_apos", type: "object" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: (() => ({
+		resultCharacterLimit: 50_000
+	})),
 	Code: (async function pipe (context, ...args) {
 		const invocations = args.join(" ").split(/[|>]/).map(i => i.trim());
 		if (!context.externalPipe && invocations.length < 2) {
@@ -138,7 +140,7 @@ module.exports = {
 				currentArgs = result.reply.split(" ");
 			}
 			else {
-				currentArgs = sb.Utils.wrapString(result.reply, 2000).split(" ");
+				currentArgs = sb.Utils.wrapString(result.reply, this.staticData.resultCharacterLimit).split(" ");
 			}
 
 			lastCommand = sb.Command.get(cmd.replace(sb.Command.prefix, ""));
