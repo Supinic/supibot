@@ -65,7 +65,7 @@ module.exports = {
 			"",
 
 			`<code>${prefix}thesaurus hello my name is John and I am doing well</code>`,
-			"greeting my kinsfolk is room and I amplitude modulation doing well "
+			"greeting my kinsfolk is room and I amplitude modulation doing well",
 
 			`<code>${prefix}thesaurus (word) singleWord:true</code>`,
 			"Replies with a list of possible synonyms for the word you provided.",
