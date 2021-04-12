@@ -1,22 +1,30 @@
 module.exports = {
 	Name: "wanna-become-famous",
 	Events: ["message"],
-	Description: "Bans bots that spam the follower site promotion",
+	Description: "Bans various spam or follow bots.",
 	Code: (async function wannaBecomeFamous (context) {
 		if (context.channel.Platform.Name !== "twitch") {
 			return; // cannot timeout when not on twitch
 		}
 
+		let type = "";
 		const msg = sb.Utils.removeAccents(context.message).toLowerCase();
-		if (!msg.includes("wanna become famous?") || !msg.includes("bigfollows")) {
+		if (msg.includes("wanna become famous?") && !msg.includes("bigfollows")) {
+			type = "becoming famous";
+		}
+		else if (msg.includes("get raided")) {
+			type = "getting raided";
+		}
+		else {
 			return;
 		}
 
 		const { client } = context.channel.Platform;
+		const emote = await context.channel.etBestAvailableEmote(["NOIDONTTHINKSO", "forsenSmug", "RarePepe"], "😅");
 		if (!context.user && context.raw?.user) {
 			const name = context.raw.user;
-			await client.ban(context.channel.Name, name, "trying to become famous");
-			await context.channel.send("NOIDONTTHINKSO FBBlock becoming famous");
+			await client.ban(context.channel.Name, name, type);
+			await context.channel.send(`${emote} ${type}`);
 
 			return;
 		}
@@ -31,8 +39,8 @@ module.exports = {
 		);
 
 		if (typeof messageCount === "undefined" || messageCount <= 1) {
-			await client.ban(context.channel.Name, name, "trying to become famous again");
-			await context.channel.send("NOIDONTTHINKSO FBBlock becoming famous again");
+			await client.ban(context.channel.Name, context.user.Name, type);
+			await context.channel.send(`${emote} ${type} again`);
 		}
 	}),
 	Author: "supinic"
