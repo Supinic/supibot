@@ -578,10 +578,13 @@ module.exports = {
 						};
 					}
 					else {
+						// 65k = limit of TEXT (current User_Alias.Data type)
+						const percent = sb.Utils.round((length / 65335) * 100, 2);
 						const prefix = (context.user === userData) ? "Your" : "Their";
 						const size = sb.Utils.formatByteSize(length);
+
 						return {
-							reply: `${prefix} user data currently occupies ${size} in Supibot's database.`
+							reply: `${prefix} user data currently occupies ${size} (${percent}% of maximum) in Supibot's database.`
 						};
 					}
 				}
