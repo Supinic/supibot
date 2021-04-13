@@ -492,6 +492,7 @@ module.exports = {
 	
 				return {
 					...result,
+					cooldown: (context.append.pipe) ? null : this.Cooldown,
 					aliased: true
 				};
 			}
