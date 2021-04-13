@@ -63,7 +63,7 @@ module.exports = {
 		if (statusCode === 404) {
 			return {
 				success: false,
-				reply: "No such user found!"
+				reply: `User "${user}" not found on Instagram!`
 			};
 		}
 
@@ -72,7 +72,7 @@ module.exports = {
 		if (posts.length === 0) {
 			return {
 				success: false,
-				reply: `No relevant picture posts were found!`
+				reply: `User "${user}" does not have any picture posts available!`
 			};
 		}
 
@@ -105,7 +105,7 @@ module.exports = {
 				return {
 					success: false,
 					reply: sb.Utils.tag.trim `
-						That post was deemed to be too NSFW for this channel!
+						This post from "${post.owner.username}" was deemed to be too NSFW for this channel!
 						NSFW score: ${score}%,
 						detections: ${relevantDetections.length}
 					`
@@ -126,7 +126,7 @@ module.exports = {
 		else {
 			return {
 				reply: `
-					Random post from ${post.owner.username}:
+					Random post from "${post.owner.username}":
 					${description}
 					(${commentCount} comments, ${likeCount} likes)
 					https://www.instagram.com/p/${post.shortcode}
