@@ -555,6 +555,7 @@ module.exports = {
                     sb.Query.getRecordset(rs => rs
                         .select("COUNT(*) AS Rank")
                         .from("crypto_game", "Portfolio")
+                        .where("Active = %b", true)
                         .where("crypto_game.GET_PORTFOLIO_TOTAL_PRICE(ID) > %n", data.Total)
                         .single()
                         .flat("Rank")
@@ -562,6 +563,7 @@ module.exports = {
                     sb.Query.getRecordset(rs => rs
                         .select("COUNT(*) AS Total")
                         .from("crypto_game", "Portfolio")
+                        .where("Active = %b", true)
                         .single()
                         .flat("Total")
                     )
