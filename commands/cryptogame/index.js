@@ -553,7 +553,7 @@ module.exports = {
 
                 const [rank, total] = await Promise.all([
                     sb.Query.getRecordset(rs => rs
-                        .select("COUNT(*) AS Rank")
+                        .select("(COUNT(*) + 1) AS Rank")
                         .from("crypto_game", "Portfolio")
                         .where("Active = %b", true)
                         .where("crypto_game.GET_PORTFOLIO_TOTAL_PRICE(ID) > %n", data.Total)
@@ -561,7 +561,7 @@ module.exports = {
                         .flat("Rank")
                     ),
                     sb.Query.getRecordset(rs => rs
-                        .select("COUNT(*) AS Total")
+                        .select("(COUNT(*) + 1) AS Total")
                         .from("crypto_game", "Portfolio")
                         .where("Active = %b", true)
                         .single()
