@@ -26,15 +26,22 @@ module.exports = {
 			.limit(1)
 			.single()
 		);
-	
-		const days = (sb.Date.now() - history.Executed) / 864.0e5;
-		const originalSize = Number(history.Result.match(/([\d.]+) GB of space/)[1]);
+
+		let historyText = "";
 		const currentSize = sb.Utils.round(data.Bytes / (10 ** 9), 3);
-	
-		const rate = sb.Utils.round((currentSize - originalSize) / days, 3);
-		const fillDate = new sb.Date().addDays((220 - currentSize) / rate); // 238 GB minus an estimate of ~18GB of other stuff
-		const megabytesPerHour = sb.Utils.round(rate * 1024 / 24, 3);
-	
+		
+		if (history) {
+			const days = (sb.Date.now() - history.Executed) / 864.0e5;
+			const originalSize = Number(history.Result.match(/([\d.]+) GB of space/)[1]);
+			const rate = sb.Utils.round((currentSize - originalSize) / days, 3);
+			const megabytesPerHour = sb.Utils.round(rate * 1024 / 24, 3);
+			const fillDate = new sb.Date().addDays((220 - currentSize) / rate); // 238 GB minus an estimate of ~18GB of other stuff
+			history = `Lines are added at a rate of ~${megabytesPerHour} MB/hr. `
+			historyText += (megabytesPerHour === 0)
+				? `At this rate, its impossible to calculate when Supibot's hard drive will fill.`
+				: `At this rate, Supibot's hard drive will run out of space approximately on ${fillDate.format("Y-m-d")}.`
+		}
+
 		const cooldown = {};
 		if (context.channel) {
 			cooldown.user = null;
@@ -46,14 +53,13 @@ module.exports = {
 			cooldown.channel - null;
 			cooldown.length = this.Cooldown * 2;
 		}
-	
+
 		return {
 			cooldown,
 			reply: sb.Utils.tag.trim `
 				Currently logging ${sb.Utils.groupDigits(data.Chat_Lines)} lines in total across all channels,
 				taking up ~${currentSize} GB of space.
-				Lines are added at a rate of ~${megabytesPerHour} MB/hr.
-				At this rate, Supibot's hard drive will run out of space approximately on ${fillDate.format("Y-m-d")}.
+				${historyText}
 			`
 		};
 	}),
