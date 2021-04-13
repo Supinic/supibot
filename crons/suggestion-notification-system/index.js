@@ -16,7 +16,7 @@ module.exports = {
 		const suggestions = await sb.Query.getRecordset(rs => rs
 			.select("ID", "User_Alias", "Status")
 			.from("data", "Suggestion")
-			.where("Status NOT IN %s+", ["Dismissed by author", "Quarantined"])
+			.where("Status IS NULL OR Status NOT IN %s+", ["Dismissed by author", "Quarantined"])
 			.where("User_Alias IN %n+", users)
 			.orderBy("ID DESC")
 		);
