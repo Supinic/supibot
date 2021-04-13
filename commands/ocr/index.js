@@ -153,7 +153,7 @@ module.exports = {
 			"ロ明寝マンRetweeted 蜜柑すい@mikansul・May11 ティフアに壁ドンされるだけ",
 			"",
 
-			`<code>${prefix}ocr (link) force:true`,
+			`<code>${prefix}ocr (link) force:true</code>`,
 			"Since the results of ocr results are cached, use force:true to forcibly run another detection.",
 			"",
 	
