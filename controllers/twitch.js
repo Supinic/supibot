@@ -524,15 +524,15 @@ module.exports = class TwitchController extends require("./template.js") {
 
 			if ((!result || !result.success) && messageType === "whisper") {
 				if (!result?.reply && result?.reason === "filter") {
-					this.pm(sb.Config.get("PRIVATE_MESSAGE_COMMAND_FILTERED"), userData.Name);
+					await this.pm(sb.Config.get("PRIVATE_MESSAGE_COMMAND_FILTERED"), userData.Name);
 				}
 				else if (result?.reason === "no-command") {
-					this.pm(sb.Config.get("PRIVATE_MESSAGE_NO_COMMAND"), userData.Name);
+					await this.pm(sb.Config.get("PRIVATE_MESSAGE_NO_COMMAND"), userData.Name);
 				}
 			}
 		}
 		else if (messageType === "whisper") {
-			this.pm(sb.Config.get("PRIVATE_MESSAGE_UNRELATED"), userData.Name);
+			await this.pm(sb.Config.get("PRIVATE_MESSAGE_UNRELATED"), userData.Name);
 		}
 	}
 
