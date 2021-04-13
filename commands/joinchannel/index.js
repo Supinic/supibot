@@ -35,6 +35,7 @@ module.exports = {
 			};
 		}
 
+		let channelData;
 		if (platformName === "twitch") {
 			const { controller } = sb.Platform.get("twitch");
 			const channelID = await controller.getUserID(channel);
@@ -47,11 +48,13 @@ module.exports = {
 
 			await sb.Channel.add(channel, context.platform, mode ?? "Write", channelID);
 			await context.platform.client.join(channel);
+
+			channelData = sb.Channel.get(channel);
 		}
 		else if (platformName === "cytube") {
 			const platformData = sb.Platform.get("cytube");
 
-			const channelData = await sb.Channel.add(channel, platformData, mode ?? "Write");
+			channelData = await sb.Channel.add(channel, platformData, mode ?? "Write");
 			await platformData.controller.joinChannel(channelData);
 		}
 		else {
@@ -60,7 +63,12 @@ module.exports = {
 				reply: "Invalid or unsupported platform provided!"
 			};
 		}
-	
+
+		if (channelData) {
+			const emote = channelData.getBestAvailableEmote(["MrDestructoid"], "🤖");
+			await channelData.send(`${emote} 👍 Successfully joined!`);
+		}
+
 		return {
 			reply: "Success."
 		};
