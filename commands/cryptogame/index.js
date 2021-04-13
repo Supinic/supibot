@@ -509,7 +509,8 @@ module.exports = {
                     `
                 };
             }
-            
+
+            case "rank":
             case "total": {
                 const [target] = args;
 
@@ -523,7 +524,7 @@ module.exports = {
                     }
 
                     const escaped = sb.Query.escapeString(portfolioData.ID);
-                    data = await sb.Query.raw(
+                    [data] = await sb.Query.raw(
                         `SELECT crypto_game.GET_PORTFOLIO_TOTAL_PRICE('${escaped}') AS Total`
                     );
                 }
@@ -545,14 +546,30 @@ module.exports = {
                     }
 
                     const escaped = sb.Query.escapeString(targetPortfolioData.ID);
-                    data = await sb.Query.raw(
+                    [data] = await sb.Query.raw(
                         `SELECT crypto_game.GET_PORTFOLIO_TOTAL_PRICE('${escaped}') AS Total`
                     );
                 }
 
+                const [rank, total] = await Promise.all([
+                    sb.Query.getRecordset(rs => rs
+                        .select("COUNT(*) AS Rank")
+                        .from("crypto_game", "Portfolio")
+                        .where("crypto_game.GET_PORTFOLIO_TOTAL_PRICE(ID) > %n", data.Total)
+                        .single()
+                        .flat("Rank")
+                    ),
+                    sb.Query.getRecordset(rs => rs
+                        .select("COUNT(*) AS Total")
+                        .from("crypto_game", "Portfolio")
+                        .single()
+                        .flat("Total")
+                    )
+                ]);
+                
                 const prefix = (target) ? "Their" : "Your";
                 return {
-                    reply: `${prefix} current portfolio totals: € ${data[0].Total}`
+                    reply: `${prefix} current portfolio totals: € ${data.Total} - rank ${rank}/${total}.`
                 };
             }
         }
@@ -603,7 +620,9 @@ module.exports = {
 
             `<code>${prefix}cg total</code>`,
             `<code>${prefix}cg total (user)</code>`,
-            `Shows the total converted cost of your (or a different users's) portfolio in euros.`,
+            `<code>${prefix}cg rank</code>`,
+            `<code>${prefix}cg rank (user)</code>`,
+            `Shows the total converted cost of your (or a different users's) portfolio in euros plus your/their rank.`,
             "",
 
             `<code>${prefix}cg assets</code>`,
