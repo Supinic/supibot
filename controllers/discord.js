@@ -353,7 +353,12 @@ module.exports = class DiscordController extends require("./template.js") {
 	}
 
 	parseMessage (messageObject) {
-		const args = messageObject.content.split(" ");
+		const links = messageObject.attachments.map(i => i.proxyURL);
+		const args = [
+			...messageObject.content.split(" "),
+			...links
+		];
+
 		for (let i = 0; i < args.length; i++) {
 			const match = args[i].match(/<@!?(\d+)>/);
 			if (match) {
@@ -365,7 +370,6 @@ module.exports = class DiscordController extends require("./template.js") {
 		}
 
 		let index = 0;
-		const links = messageObject.attachments.map(i => i.proxyURL);
 		let targetMessage = messageObject.cleanContent.replace(/\n/g, " ");
 		while (targetMessage.length < this.platform.Message_Limit && index < links.length) {
 			targetMessage += " " + links[index];
