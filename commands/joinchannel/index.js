@@ -65,7 +65,7 @@ module.exports = {
 		}
 
 		if (channelData) {
-			const emote = channelData.getBestAvailableEmote(["MrDestructoid"], "🤖");
+			const emote = await channelData.getBestAvailableEmote(["MrDestructoid"], "🤖");
 			await channelData.send(`${emote} 👍 Successfully joined!`);
 		}
 
