@@ -14,9 +14,11 @@ module.exports = {
 				reply: "No input provided!"
 			}
 		}
-	
+
+		// normalize input - there might be arguments with other or multiple whitespace inside of them
+		const prepared = words.join(" ").split(/\s+/).filter(Boolean);
 		return {
-			reply: sb.Utils.randArray(words),
+			reply: sb.Utils.randArray(prepared),
 			cooldown: (context.append.pipe)
 				? 0
 				: this.Cooldown
