@@ -164,7 +164,7 @@ module.exports = {
 					.where("Channel = %n", channelData.ID)
 					.where("Chat_Module = %n", moduleData.ID)
 					.single()
-					.flat("ID")
+					.flat("1")
 				);
 				
 				if (check) {
@@ -194,7 +194,7 @@ module.exports = {
 					.where("Channel = %n", channelData.ID)
 					.where("Chat_Module = %n", moduleData.ID)
 					.single()
-					.flat("ID")
+					.flat("1")
 				);
 
 				if (!check) {
