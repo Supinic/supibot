@@ -504,8 +504,8 @@ class Command extends require("./template.js") {
 		if (Command.privilegedCommandCharacters.length > 0) {
 			for (const char of Command.privilegedCommandCharacters) {
 				if (identifier.startsWith(char)) {
-					identifier = char;
 					argumentArray.unshift(identifier.replace(char, ""));
+					identifier = char;
 					break;
 				}
 			}
