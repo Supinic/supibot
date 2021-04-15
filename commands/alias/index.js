@@ -513,13 +513,14 @@ module.exports = {
 						reply: "Invalid user provided!"
 					};
 				}
-	
-				const suffix = (targetAlias)
-					? `?columnName=${encodeURIComponent(targetAlias)}`
-					: "";
-	
+
+				const word = (targetAlias) ? "alias" : "aliases";
+				const linkSuffix = (targetAlias)
+					? encodeURIComponent(targetAlias)
+					: "list"
+
 				return {
-					reply: `Check their aliases here: https://supinic.com/bot/user/${encodeURIComponent(target.Name)}/alias/list${suffix}`
+					reply: `Check their ${word} here: https://supinic.com/bot/user/${encodeURIComponent(target.Name)}/alias/${linkSuffix}`
 				};
 			}
 	
