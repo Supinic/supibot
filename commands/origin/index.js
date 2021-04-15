@@ -19,7 +19,7 @@ module.exports = {
 		}
 	
 		const emoteData = await sb.Query.getRecordset(rs => rs
-			.select("ID", "Text", "Tier", "Type", "Todo", "Approved", "Emote_Added", "Author")
+			.select("ID", "Text", "Tier", "Type", "Todo", "Emote_Added", "Author")
 			.from("data", "Origin")
 			.where("Name COLLATE utf8mb4_bin LIKE %s", emote)
 		);
@@ -43,12 +43,6 @@ module.exports = {
 			return {
 				success: false,
 				reply: "No emote definition exists for this index!"
-			};
-		}
-		else if (!data.Approved) {
-			return {
-				success: false,
-				reply: "A definition exists, but has not been approved yet!"
 			};
 		}
 		else {
