@@ -9,6 +9,13 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function top (context, rawLimit) {
+		if (!context.channel) {
+			return {
+				success: false,
+				reply: `This command is not available here!`
+			};
+		}
+
 		if (
 			!context.user.Data.administrator
 			&& !await context.channel.isUserChannelOwner(context.user)
