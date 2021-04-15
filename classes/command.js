@@ -184,6 +184,18 @@ class Command extends require("./template.js") {
 		Dynamic_Description: { type: "descriptor" }
 	};
 
+	/**
+	 * Privileged command characters are such characters, that when a command is invoked, there does not have to be any
+	 * whitespace separating the character and the first argument.
+	 * Consider the bot's prefix to be "!", and the test command string to be `!$foo bar`.
+	 * @example If "$" is not privileged:
+	 * prefix = "!"; command = "$foo"; arguments = ["bar"];
+	 * @example If "$" is privileged:
+	 * prefix = "!"; command = "$"; arguments = ["foo", "bar"];
+	 * @type {[string]}
+	 */
+	static privilegedCommandCharacters = ["$"];
+
 	constructor (data) {
 		super();
 
@@ -485,6 +497,18 @@ class Command extends require("./template.js") {
 
 		if (channelData?.Mode === "Inactive" || channelData?.Mode === "Read") {
 			return {success: false, reason: "channel-" + channelData.Mode.toLowerCase()};
+		}
+
+		// Special parsing of privileged characters - they can be joined with other characters, and still be usable
+		// as a separate command.
+		if (Command.privilegedCommandCharacters.length > 0) {
+			for (const char of Command.privilegedCommandCharacters) {
+				if (identifier.startsWith(char)) {
+					identifier = char;
+					argumentArray.unshift(identifier.replace(char, ""));
+					break;
+				}
+			}
 		}
 
 		const command = Command.get(identifier);
