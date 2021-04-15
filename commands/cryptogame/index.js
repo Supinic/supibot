@@ -327,7 +327,7 @@ module.exports = {
         };
 
         return {
-            availableCommands: ["assets", "buy", "check", "leaderboard", "register", "portfolios", "prices", "sell", "total"],
+            availableCommands: ["assets", "buy", "check", "leaderboard", "register", "portfolios", "prices", "rank", "sell", "total"],
             destroy,
 
             baseAsset,
