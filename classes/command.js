@@ -203,7 +203,7 @@ class Command extends require("./template.js") {
 
 		this.Name = data.Name;
 		if (typeof this.Name !== "string" || this.Name.length === 0) {
-			console.error(`Command ID ${this.ID} has an unusuable name`, data.Name);
+			console.error(`Command ID ${this.ID} has an unusable name`, data.Name);
 			this.Name = ""; // just a precaution so that the command never gets found out
 		}
 
@@ -1123,7 +1123,7 @@ module.exports = Command;
  * @property {string} [reply] Command result as a string to reply. If not provided, no message should be sent
  * @property {Object} [cooldown] Dynamic cooldown settings
  * @property {string} [reason] Symbolic description of why command execution failed - used internally
- * @property {Object} [meta] Any other information passed back from the commend execution
+ * @property {Object} [meta] Any other information passed back from the command execution
  */
 
 /**
