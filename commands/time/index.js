@@ -112,7 +112,8 @@ module.exports = {
 			}).json();
 
 			if (!geoData) {
-				if (user?.Data.location) {
+				const userData = await sb.User.get(args[0]);
+				if (userData && userData.Data.location) {
 					return {
 						success: false,
 						reply: `That place was not found! However, you probably meant to check that user's location - make sure to add the @ symbol before their name.`,
