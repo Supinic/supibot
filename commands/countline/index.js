@@ -9,6 +9,13 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function countLine (context, user) {
+		if (!context.channel) {
+			return {
+				success: false,
+				reply: `This command is not available here!`
+			};
+		}
+		
 		if (user) {
 			user = await sb.User.get(user, true);
 			if (!user) {
@@ -21,7 +28,7 @@ module.exports = {
 			user = context.user;
 		}
 	
-		let lines = null;
+		let lines;
 		if ([7, 8, 46].includes(context.channel.ID)) {
 			lines = (await sb.Query.getRecordset(rs => rs
 				.select("SUM(Message_Count) AS Total")
