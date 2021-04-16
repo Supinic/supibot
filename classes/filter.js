@@ -537,7 +537,7 @@ module.exports = class Filter extends require("./template.js") {
 		return filter;
 	}
 
-	static async getMentionStatus (options) {
+	static getMentionStatus (options) {
 		const filters = Filter.getLocals("Unmention", {
 			...options,
 			channel: options.channel ?? Symbol("private-message")
@@ -571,7 +571,7 @@ module.exports = class Filter extends require("./template.js") {
 		return string;
 	}
 
-	static async getCooldownAdjustments (options) {
+	static getCooldownAdjustments (options) {
 		const filters = Filter.getLocals("Cooldown", options).sort((a, b) => b.priority - a.priority);
 		return filters[0] ?? null;
 	}
