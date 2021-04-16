@@ -563,7 +563,24 @@ class Command extends require("./template.js") {
 
 		if (!filterData.success) {
 			sb.CooldownManager.unsetPending(userData.ID);
-			sb.CooldownManager.set(channelID, userData.ID, command.ID, command.Cooldown);
+
+			let length = command.Cooldown;
+			if (!ignoreCooldownFilters) {
+				const cooldownFilter = sb.Filter.getCooldownAdjustments({
+					platform: channelData?.Platform ?? null,
+					channel: channelData,
+					command: commandData,
+					invocation: identifier,
+					user: userData
+				});
+
+				if (cooldownFilter) {
+					length = cooldownFilter.applyData(length);
+				}
+			}
+
+			sb.CooldownManager.set(channelID, userData.ID, command.ID, length);
+
 			await sb.Runtime.incrementRejectedCommands();
 
 			if (filterData.filter.Response === "Reason" && typeof filterData.reply === "string") {
