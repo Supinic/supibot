@@ -519,15 +519,14 @@ class Command extends require("./template.js") {
 		// Check for cooldowns, return if it did not pass yet.
 		// If skipPending flag is set, do not check for pending status.
 		const channelID = (channelData?.ID ?? Command.#privateMessageChannelID);
-		if (
-			!userData.Data.cooldownImmunity
-			&& !sb.CooldownManager.check(
-				channelID,
-				userData.ID,
-				command.ID,
-				Boolean(options.skipPending)
-			)
-		) {
+		const cooldownCheck = sb.CooldownManager.check(
+			channelID,
+			userData.ID,
+			command.ID,
+			Boolean(options.skipPending)
+		);
+
+		if (!cooldownCheck) {
 			if (!options.skipPending) {
 				const pending = sb.CooldownManager.fetchPending(userData.ID);
 				if (pending) {
