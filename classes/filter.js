@@ -571,7 +571,7 @@ module.exports = class Filter extends require("./template.js") {
 		return string;
 	}
 
-	static getCooldownAdjustments (options) {
+	static getCooldownModifiers (options) {
 		const filters = Filter.getLocals("Cooldown", options).sort((a, b) => b.priority - a.priority);
 		return filters[0] ?? null;
 	}

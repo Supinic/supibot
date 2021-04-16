@@ -566,7 +566,7 @@ class Command extends require("./template.js") {
 
 			let length = command.Cooldown;
 			if (!ignoreCooldownFilters) {
-				const cooldownFilter = sb.Filter.getCooldownAdjustments({
+				const cooldownFilter = sb.Filter.getCooldownModifiers({
 					platform: channelData?.Platform ?? null,
 					channel: channelData,
 					command: commandData,
@@ -937,7 +937,7 @@ class Command extends require("./template.js") {
 					} = cooldown;
 
 					if (!ignoreCooldownFilters) {
-						const cooldownFilter = sb.Filter.getCooldownAdjustments({
+						const cooldownFilter = sb.Filter.getCooldownModifiers({
 							platform: channelData?.Platform ?? null,
 							channel: channelData,
 							command: commandData,
@@ -959,7 +959,7 @@ class Command extends require("./template.js") {
 		}
 		else {
 			let length = commandData.Cooldown ?? 0;
-			const cooldownFilter = sb.Filter.getCooldownAdjustments({
+			const cooldownFilter = sb.Filter.getCooldownModifiers({
 				platform: channelData?.Platform ?? null,
 				channel: channelData,
 				command: commandData,
