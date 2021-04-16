@@ -37,7 +37,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		this.evasion = {};
 		this.failedJoinChannels = new Set();
 
-		this.availableEmotes = {};
+		this.availableEmotes = [];
 		this.availableEmoteSets = [];
 
 		this.initListeners();
