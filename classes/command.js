@@ -567,7 +567,7 @@ class Command extends require("./template.js") {
 			const cooldownFilter = sb.Filter.getCooldownModifiers({
 				platform: channelData?.Platform ?? null,
 				channel: channelData,
-				command: commandData,
+				command: command,
 				invocation: identifier,
 				user: userData
 			});
