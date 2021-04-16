@@ -56,7 +56,7 @@ module.exports = class Filter extends require("./template.js") {
 
 		/**
 		 * Specific filter data, usually only applicable to Cooldown and Arguments filter types.
-		 * @type {SpecificFilterData}
+		 * @type {CooldownFilterData|ArgumentsFilterData}
 		 */
 		this.Data = null;
 		if (data.Data) {
@@ -86,48 +86,59 @@ module.exports = class Filter extends require("./template.js") {
 		}
 
 		if (this.Data) {
-			if (this.Type === "Args" && !parsedData.args) {
-				console.warn("Invalid filter data - missing Args data", { filter: this.ID, data: this.Data });
-			}
-			else if (this.Type === "Cooldown" && !parsedData.cooldown) {
-				console.warn("Invalid filter data - missing Cooldown data", { filter: this.ID, data: this.Data });
-			}
-			else if (this.Type === "Args") {
-				this.#filterData = [];
+			if (this.Type === "Args") {
+				if (!this.Data.args) {
+					console.warn("Invalid Args filter - missing args object");
+				}
+				else {
+					this.#filterData = [];
 
-				for (const arg of this.Data.args) {
-					const obj = {};
-					if (i.type === "regex") {
-						obj.regex = new RegExp(i.value[0], i.value[1] ?? "");
-					}
-					else if (i.type === "string") {
-						obj.string = i.value;
-					}
-					else {
-						console.warn("Invalid filter Args item - type", { arg, filter: this.ID });
-						continue;
-					}
+					for (const arg of this.Data.args) {
+						const obj = {};
+						if (i.type === "regex") {
+							obj.regex = new RegExp(i.value[0], i.value[1] ?? "");
+						}
+						else if (i.type === "string") {
+							obj.string = i.value;
+						}
+						else {
+							console.warn("Invalid filter Args item - type", { arg, filter: this.ID });
+							continue;
+						}
 
-					if (typeof i.index === "number") {
-						obj.index = i.index;
-						obj.range = [];
-					}
-					else if (Array.isArray(i.range === "number")) {
-						obj.range = [...i.range].slice(0, 2);
-					}
-					else if (typeof i.range === "string") {
-						obj.range = i.range.split("..").map(Number).slice(0, 2);
-					}
-					else {
-						console.warn("Invalid filter Args item - index", { arg, filter: this.ID });
-						continue;
-					}
+						if (typeof i.index === "number") {
+							obj.index = i.index;
+							obj.range = [];
+						}
+						else if (Array.isArray(i.range === "number")) {
+							obj.range = [...i.range].slice(0, 2);
+						}
+						else if (typeof i.range === "string") {
+							obj.range = i.range.split("..").map(Number).slice(0, 2);
+						}
+						else {
+							console.warn("Invalid filter Args item - index", { arg, filter: this.ID });
+							continue;
+						}
 
-					this.#filterData.push(obj);
+						this.#filterData.push(obj);
+
+
+						console.warn("Invalid filter data - missing Args data", { filter: this.ID, data: this.Data });
+					}
 				}
 			}
 			else if (this.Type === "Cooldown") {
-				console.warn("Not yet implemented", { filter: this });
+				const { multiplier, override } = this.Data;
+				if (typeof multiplier !== "number" && typeof override !== "number") {
+					console.warn("Invalid Cooldown filter - missing multiplier/override");
+				}
+				else if (typeof multiplier === "number" && typeof override === "number") {
+					console.warn("Invalid Cooldown filter - using both multiplier and override");
+				}
+				else {
+					this.#filterData = { ...this.Data };
+				}
 			}
 		}
 
@@ -164,28 +175,34 @@ module.exports = class Filter extends require("./template.js") {
 
 	/**
 	 * For custom-data-related Filters, this method applies filter data to the provided data object.
-	 * @param {FilterType} type
-	 * @param {Object} data
-	 * @returns {boolean} True if the filter does apply to the provided data; false otherwise
+	 * @param {Array|number} data
+	 * @returns {*} Returned type depends on filter type - Args {boolean} or Cooldown {number}
 	 */
-	applyDataFilter (type, data) {
-		if (type !== this.Type) {
-			return false;
-		}
-		else if (Array.isArray(data.args)) {
+	applyData (data) {
+		if (this.Type === "Args" && Array.isArray(data)) {
 			for (const item of this.#filterData) {
 				const { index, range, regex, string } = item;
-				for (let i = 0; i < data.args.length; i++) {
+				for (let i = 0; i < data.length; i++) {
 					const positionCheck = (i === index || (range[0] <= index && index <= range[1]));
-					const valueCheck = ((string && data.args[i] === string) || (regex && data.args[i].test(regex)));
+					const valueCheck = ((string && data[i] === string) || (regex && data[i].test(regex)));
 					if (positionCheck && valueCheck) {
 						return true;
 					}
 				}
 			}
 		}
+		else if (this.Type === "Cooldown" && typeof data === "number") {
+			if (typeof this.#filterData.override === "number") {
+				return this.#filterData.override;
+			}
+			else if (typeof this.#filterData.multiplier === "number") {
+				return Math.round(data * this.#filterData.multiplier);
+			}
+		}
 
-		return false;
+		throw new sb.Error({
+			message: "Invalid combination of input data and filter type"
+		});
 	}
 
 	get priority () {
@@ -554,8 +571,9 @@ module.exports = class Filter extends require("./template.js") {
 		return string;
 	}
 
-	static async getCooldownOverrides (options) {
-		return Filter.getLocals("Cooldown", options).sort((a, b) => b.priority - a.priority);
+	static async getCooldownAdjustments (options) {
+		const filters = Filter.getLocals("Cooldown", options).sort((a, b) => b.priority - a.priority);
+		return filters[0] ?? null;
 	}
 
 	static async getFlags (options) {
@@ -591,9 +609,14 @@ module.exports = class Filter extends require("./template.js") {
 };
 
 /**
- * @typedef {Object} SpecificFilterData
- * @property {Array} [cooldowns]
- * @property {Array} [args]
+ * @typedef {Object} CooldownFilterData
+ * @property {number} multiplier - mutually exclusive with `override`
+ * @property {number} override - mutually exclusive with `multiplier`
+ */
+
+/**
+ * @typedef {Object} ArgumentsFilterData
+ * @todo
  */
 
 /**

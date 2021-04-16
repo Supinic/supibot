@@ -910,13 +910,28 @@ class Command extends require("./template.js") {
 						cooldown = { length: cooldown };
 					}
 
+					let { length } = cooldown;
 					const {
 						channel = channelID,
 						user = userData.ID,
 						command = commandData.ID,
-						length,
+						ignoreCooldownFilters = false,
 						options = {}
 					} = cooldown;
+
+					if (!ignoreCooldownFilters) {
+						const cooldownFilter = sb.Filter.getCooldownOverrides({
+							platform: channelData?.Platform ?? null,
+							channel: channelData,
+							command: commandData,
+							invocation: null, // @todo
+							user: userData
+						});
+
+						if (cooldownFilter) {
+							length = cooldownFilter.applyData(length);
+						}
+					}
 
 					sb.CooldownManager.set(channel, user, command, length, options);
 				}
@@ -926,7 +941,20 @@ class Command extends require("./template.js") {
 			}
 		}
 		else {
-			sb.CooldownManager.set(channelID, userData.ID, commandData.ID, commandData.Cooldown);
+			let length = commandData.Cooldown ?? 0;
+			const cooldownFilter = sb.Filter.getCooldownOverrides({
+				platform: channelData?.Platform ?? null,
+				channel: channelData,
+				command: commandData,
+				invocation: null, // @todo
+				user: userData
+			});
+
+			if (cooldownFilter) {
+				length = cooldownFilter.applyData(length);
+			}
+
+			sb.CooldownManager.set(channelID, userData.ID, commandData.ID, length);
 		}
 
 		sb.CooldownManager.unsetPending(userData.ID);
