@@ -314,7 +314,7 @@ module.exports = class Filter extends require("./template.js") {
 		return Filter.data.filter(row => (
 			row.Active
 			&& (!type || type === row.Type)
-			&& (!options.skipUserCheck || (row.User_Alias === (options.user?.ID ?? null) || row.User_Alias === null))
+			&& (options.skipUserCheck || (row.User_Alias === (options.user?.ID ?? null) || row.User_Alias === null))
 			&& (row.Channel === (options.channel?.ID ?? null) || row.Channel === null)
 			&& (row.Command === (options.command?.ID ?? null) || row.Command === null)
 			&& (row.Invocation === (options.invocation ?? null) || row.Invocation === null)
