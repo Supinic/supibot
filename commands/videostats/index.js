@@ -10,7 +10,11 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function videoStats (context, link) {
 		if (!link) {
-			return { reply: "No link provided!", meta: { skipCooldown: true } };
+			return {
+				success: false,
+				reply: "No link provided!",
+				cooldown: 2500
+			};
 		}
 			
 		const playedByData = await sb.Query.getRecordset(rs => rs
@@ -24,7 +28,9 @@ module.exports = {
 			.groupBy("User_Alias")
 		);
 		if (playedByData.length === 0) {
-			return { reply: "Provided link has no data associated with it!" };
+			return {
+				reply: "Provided link has no data associated with it!"
+			};
 		}
 		
 		const total = playedByData.reduce((acc, cur) => acc += cur.Count, 0);
@@ -50,9 +56,13 @@ module.exports = {
 			}
 		}
 			
-			
 		return {
-			reply: `That video was queued ${total} times before (mostly by: ${top5.join("; ")}). Last time it was queued ${sb.Utils.timeDelta(lastPlayedData.Posted)}, by ${lastPlayedData.Name}`
+			reply: sb.Utils.tag.trim `
+				That video was queued ${total} times before.
+				Mostly by: ${top5.join("; ")}.
+				Last time it was queued ${sb.Utils.timeDelta(lastPlayedData.Posted)},
+				by ${lastPlayedData.Name}
+			`
 		};
 	}),
 	Dynamic_Description: null
