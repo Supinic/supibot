@@ -13,8 +13,7 @@ module.exports = {
 	Code: (async function origin (context, emote) {
 		if (!emote) {
 			return {
-				success: false,
-				reply: "No emote provided!"
+				reply: "Check the emote origin list here: https://supinic.com/data/origin/list"
 			};
 		}
 	
