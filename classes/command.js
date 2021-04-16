@@ -564,18 +564,16 @@ class Command extends require("./template.js") {
 			sb.CooldownManager.unsetPending(userData.ID);
 
 			let length = command.Cooldown;
-			if (!ignoreCooldownFilters) {
-				const cooldownFilter = sb.Filter.getCooldownModifiers({
-					platform: channelData?.Platform ?? null,
-					channel: channelData,
-					command: commandData,
-					invocation: identifier,
-					user: userData
-				});
+			const cooldownFilter = sb.Filter.getCooldownModifiers({
+				platform: channelData?.Platform ?? null,
+				channel: channelData,
+				command: commandData,
+				invocation: identifier,
+				user: userData
+			});
 
-				if (cooldownFilter) {
-					length = cooldownFilter.applyData(length);
-				}
+			if (cooldownFilter) {
+				length = cooldownFilter.applyData(length);
 			}
 
 			sb.CooldownManager.set(channelID, userData.ID, command.ID, length);
