@@ -920,7 +920,7 @@ class Command extends require("./template.js") {
 					} = cooldown;
 
 					if (!ignoreCooldownFilters) {
-						const cooldownFilter = sb.Filter.getCooldownOverrides({
+						const cooldownFilter = sb.Filter.getCooldownAdjustments({
 							platform: channelData?.Platform ?? null,
 							channel: channelData,
 							command: commandData,
@@ -942,7 +942,7 @@ class Command extends require("./template.js") {
 		}
 		else {
 			let length = commandData.Cooldown ?? 0;
-			const cooldownFilter = sb.Filter.getCooldownOverrides({
+			const cooldownFilter = sb.Filter.getCooldownAdjustments({
 				platform: channelData?.Platform ?? null,
 				channel: channelData,
 				command: commandData,
