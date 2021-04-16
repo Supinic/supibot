@@ -26,7 +26,7 @@ module.exports = {
 			this.data.regex = /^[\p{Emoji}\x20-\x7e]+$/ui;
 		}
 		if (typeof this.data.threshold !== "number") {
-			this.data.threshold = 5000;
+			this.data.threshold = 10_000;
 		}
 
 		const markov = this.data.markovs.get(context.channel);
