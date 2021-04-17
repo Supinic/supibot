@@ -35,6 +35,7 @@ module.exports = {
 				user(login: "${username}") {
 					contributionsCollection(from: "${threshold}") {
 						totalCommitContributions
+						restrictedContributionsCount
 					}
 				}
 			}`
@@ -47,10 +48,11 @@ module.exports = {
 			};
 		}
 
-		const commitCount = response.data.user.contributionsCollection.totalCommitContributions;
+		const collection = response.data.user.contributionsCollection;
+		const commitCount = collection.totalCommitContributions + collection.restrictedContributionsCount;
+
 		const suffix = (commitCount === 1) ? "": "s";
 		const who = (self) ? "You have" : `GitHub user ${username} has`;
-	
 		return {
 			reply: `${who} created ${commitCount} commit${suffix} in the past 24 hours.`
 		};
