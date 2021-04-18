@@ -335,7 +335,10 @@ module.exports = class Filter extends require("./template.js") {
 
 		let userTo = null;
 		const channel = options.channel ?? Symbol("private-message");
-		const localFilters = Filter.getLocals(null, options);
+		const localFilters = Filter.getLocals(null, {
+			...options,
+			skipUserCheck: true
+		});
 
 		if (command.Flags.whitelist) {
 			const whitelist = localFilters.find((
@@ -358,7 +361,11 @@ module.exports = class Filter extends require("./template.js") {
 		}
 
 		if (command.Flags.optOut && userTo) {
-			const optout = localFilters.find(i => i.Type === "Opt-out");
+			const optout = localFilters.find(i =>
+				i.Type === "Opt-out"
+				&& i.User_Alias === userTo.ID
+			);
+
 			if (optout) {
 				const targetType = (optout.Invocation) ? "command invocation" : "command";
 				const targetAmount = (optout.Command) ? "this" : "all";
