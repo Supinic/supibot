@@ -361,12 +361,14 @@ module.exports = class Filter extends require("./template.js") {
 			const optout = localFilters.find(i => i.Type === "Opt-out");
 			if (optout) {
 				const targetType = (optout.Invocation) ? "command invocation" : "command";
+				const targetAmount = (optout.Command) ? "this" : "all";
+
 				return {
 					success: false,
 					reason: "opt-out",
 					filter: optout,
 					reply: (optout.Response === "Auto")
-						? `🚫 That user has opted out from being the target of your ${targetType}!`
+						? `🚫 That user has opted out from being the target of ${targetAmount} ${targetType}!`
 						: (optout.Response === "Reason")
 							? optout.Reason
 							: null
@@ -384,12 +386,14 @@ module.exports = class Filter extends require("./template.js") {
 
 			if (block) {
 				const targetType = (block.Invocation) ? "command invocation" : "command";
+				const targetAmount = (optout.Command) ? "this" : "all";
+
 				return {
 					success: false,
 					reason: "block",
 					filter: block,
 					reply: (block.Response === "Auto")
-						? `🚫 That user has opted out from being the target of your ${targetType}!`
+						? `⛔ That user has blocked you from being the target of ${targetAmount} ${targetType}!`
 						: (block.Response === "Reason")
 							? block.Reason
 							: null
