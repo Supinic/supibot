@@ -117,17 +117,19 @@ module.exports = {
 			options.Channel = context.channel.ID;
 		}
 
-        const channelData = sb.Channel.get(options.Channel);
-        const permissions = await context.getUserPermissions("array", ["admin", "owner", "ambassador"], {
-        	channel: channelData,
-			platform: channelData.Platform,
-		});
+        if (options.Channel && !context.user.Data.administrator) {
+			const channelData = sb.Channel.get(options.Channel);
+			const permissions = await context.getUserPermissions("array", ["admin", "owner", "ambassador"], {
+				channel: channelData,
+				platform: channelData?.Platform,
+			});
 
-        if (permissions.every(i => !i)) {
-			return {
-				success: false,
-				reply: "Can't do that in this channel!"
-			};
+			if (permissions.every(i => !i)) {
+				return {
+					success: false,
+					reply: "Can't do that in this channel!"
+				};
+			}
 		}
 
 		const channelPermissions = permissions[1] || permissions[2];
