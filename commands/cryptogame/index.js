@@ -561,7 +561,7 @@ module.exports = {
                         .flat("Rank")
                     ),
                     sb.Query.getRecordset(rs => rs
-                        .select("(COUNT(*) + 1) AS Total")
+                        .select("COUNT(*) AS Total")
                         .from("crypto_game", "Portfolio")
                         .where("Active = %b", true)
                         .single()
