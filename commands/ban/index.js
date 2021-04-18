@@ -113,7 +113,7 @@ module.exports = {
             options.User_Alias = userData.ID;
         }
 
-        if (!options.Channel) {
+        if (!options.Channel && !context.user.Data.administrator) {
 			options.Channel = context.channel.ID;
 		}
 
