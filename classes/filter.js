@@ -358,11 +358,7 @@ module.exports = class Filter extends require("./template.js") {
 		}
 
 		if (command.Flags.optOut && userTo) {
-			const optout = localFilters.find(i => (
-				i.Type === "Opt-out"
-				&& i.User_Alias === userTo.ID
-			));
-
+			const optout = localFilters.find(i => i.Type === "Opt-out");
 			if (optout) {
 				const targetType = (optout.Invocation) ? "command invocation" : "command";
 				return {
