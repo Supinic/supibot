@@ -113,11 +113,12 @@ module.exports = {
             options.User_Alias = userData.ID;
         }
 
-        if (!options.Channel && !context.user.Data.administrator) {
+        const isAdmin = Boolean(context.user.Data.administrator);
+        if (!options.Channel && !isAdmin) {
 			options.Channel = context.channel.ID;
 		}
 
-        if (options.Channel && !context.user.Data.administrator) {
+        if (options.Channel && !isAdmin) {
 			const channelData = sb.Channel.get(options.Channel);
 			const permissions = await context.getUserPermissions("array", ["admin", "owner", "ambassador"], {
 				channel: channelData,
@@ -130,25 +131,26 @@ module.exports = {
 					reply: "Can't do that in this channel!"
 				};
 			}
+
+			const channelPermissions = permissions[1] || permissions[2];
+			if (!options.User_Alias && !options.Command && channelPermissions) {
+				return {
+					success: false,
+					reply: "Not enough data provided to create a ban! You are missing user and/or command"
+				};
+			}
+
+			if (channelPermissions) {
+				options.Response = "Reason";
+				options.Reason = "Banned in this channel.";
+			}
 		}
 
-		const channelPermissions = permissions[1] || permissions[2];
-        if (!options.User_Alias && !options.Command && channelPermissions) {
+		if (!options.User_Alias && !options.Command && !options.Channel && isAdmin) {
 			return {
 				success: false,
-				reply: "Not enough data provided to create a ban! You are missing user and/or command"
+				reply: "Not enough data provided to create a ban! You are missing all idenitifiers."
 			};
-		}
-		if (!options.User_Alias && !options.Command && !options.Channel && permissions[0]) {
-			return {
-				success: false,
-				reply: "Not enough data provided to create a ban! You are missing user/command/channel"
-			};
-		}
-
-		if (channelPermissions) {
-			options.Response = "Reason";
-			options.Reason = "Banned in this channel.";
 		}
 
 		const existing = sb.Filter.data.find(i =>
