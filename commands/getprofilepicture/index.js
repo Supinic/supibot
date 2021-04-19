@@ -1,5 +1,5 @@
 module.exports = {
-	Name: "profilepicture",
+	Name: "getprofilepicture",
 	Aliases: ["pfp"],
 	Author: "supinic",
 	Cooldown: 10000,
@@ -9,7 +9,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function profilePicture (context, username) {
-		const { body } = await sb.Got("Helix", {
+		const { statusCode, body } = await sb.Got("Helix", {
 			url: "users",
 			searchParams: {
 				login: (username ?? context.user.Name)
@@ -17,7 +17,13 @@ module.exports = {
 			throwHttpErrors: false
 		});
 
-		if (body.data.length === 0) {
+		if (statusCode !== 200) {
+			return {
+				success: false,
+				reply: `Could not fetch profile picture! ${body.data.message}`
+			};
+		}
+		else if (body.data.length === 0) {
 			return {
 				success: false,
 				reply: `No such user found on Twitch!`
