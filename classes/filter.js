@@ -393,7 +393,7 @@ module.exports = class Filter extends require("./template.js") {
 
 			if (block) {
 				const targetType = (block.Invocation) ? "command invocation" : "command";
-				const targetAmount = (optout.Command) ? "this" : "all";
+				const targetAmount = (block.Command) ? "this" : "all";
 
 				return {
 					success: false,
