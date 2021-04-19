@@ -20,7 +20,7 @@ module.exports = {
 		if (statusCode !== 200) {
 			return {
 				success: false,
-				reply: `Could not fetch profile picture! ${body.data.message}`
+				reply: `Could not fetch profile picture! ${body.message}`
 			};
 		}
 		else if (body.data.length === 0) {
