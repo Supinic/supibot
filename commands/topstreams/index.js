@@ -37,7 +37,7 @@ module.exports = {
 	
 			const streamers = data.streams.map(stream => {
 				const specificGame = (!searchParams.game)
-					? `(${stream.game})`
+					? `- ${stream.game}`
 					: "";
 
 				return `@${stream.channel.name} ${specificGame} (${stream.viewers})`;
