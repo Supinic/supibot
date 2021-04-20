@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "getprofilepicture",
-	Aliases: ["pfp"],
+	Aliases: ["avatar", "pfp"],
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "For a given Twitch user, this command will fetch their profile picture.",
