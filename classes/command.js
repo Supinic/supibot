@@ -542,8 +542,9 @@ class Command extends require("./template.js") {
 
 		// If skipPending flag is set, do not set the pending status at all.
 		// Used in pipe command, for instance.
-		if (!options.skipPending) {
-			const sourceName = channelData?.Name ?? "private messages";
+		// Administrators are not affected by Pending - this is expected to be used for debugging.
+		if (!options.skipPending && !userData.Data.administrator) {
+			const sourceName = channelData?.Name ?? `${options.platform.Name} PMs`;
 			sb.CooldownManager.setPending(
 				userData.ID,
 				`You have a pending command: "${identifier}" used in "${sourceName}" at ${new sb.Date().sqlDateTime()}`
