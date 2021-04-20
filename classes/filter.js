@@ -416,7 +416,7 @@ module.exports = class Filter extends require("./template.js") {
 		if (blacklist) {
 			let reply = null;
 			if (blacklist.Response === "Reason") {
-				reply = blacklist.Response;
+				reply = blacklist.Reason;
 			}
 			else if (blacklist.Response === "Auto") {
 				if (blacklist.Channel && blacklist.User_Alias && blacklist.Command && blacklist.Invocation) {
