@@ -4,8 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "For a given Twitch user, this command will fetch their profile picture.",
-	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Flags: ["mention","non-nullable","pipe","use-params"],
+	Params: [
+		{ name: "linkOnly", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function profilePicture (context, username) {
@@ -32,7 +34,9 @@ module.exports = {
 
 		const [user] = body.data;
 		return {
-			reply: `Profile picture for ${user.display_name}: ${user.profile_image_url}`
+			reply: (context.params.linkOnly)
+				? user.profile_image_url
+				: `Profile picture for ${user.display_name}: ${user.profile_image_url}`
 		};
 	}),
 	Dynamic_Description: null
