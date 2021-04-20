@@ -788,6 +788,10 @@ class Command extends require("./template.js") {
 			}
 		}
 
+		// unset pending cooldown, before anything else - even read-only commands should unset it (despite not
+		// having any cooldown themselves)
+		sb.CooldownManager.unsetPending(userData.ID);
+
 		// Read-only commands never reply with anything - banphrases, mentions and cooldowns are not checked
 		if (command.Flags.readOnly) {
 			return {
@@ -970,8 +974,6 @@ class Command extends require("./template.js") {
 
 			sb.CooldownManager.set(channelID, userData.ID, commandData.ID, length);
 		}
-
-		sb.CooldownManager.unsetPending(userData.ID);
 	}
 
 	static async install (options = {}) {
