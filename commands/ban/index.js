@@ -162,7 +162,7 @@ module.exports = {
 		);
 
 		if (existing) {
-			if (existing.Issued_By !== context.user.ID && !permissions[0]) {
+			if (existing.Issued_By !== context.user.ID && !isAdmin) {
 				return {
 					success: false,
 					reply: "This ban has not been created by you, so you cannot modify it!"
