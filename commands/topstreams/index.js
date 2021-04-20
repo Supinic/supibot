@@ -9,33 +9,43 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function topStreams (context, ...args) {
-		const params = new sb.URLParams("%20").set("limit", 10);
+		const searchParams = { limit: "10" };
 		if (args.length > 0) {
-			params.set("game", args.join(" "));
+			searchParams.game = args.join(" ");
 		}
-		
+
 		const data = await sb.Got("Kraken", {
 			url: "streams",
-			searchParams: params.toString() 
+			searchParams
 		}).json();
 	
 		if (data._total === 0) {
-			return { reply: "Nobody is playing that game right now!" };
+			return {
+				reply: (searchParams.game)
+					? "Nobody is playing that game right now."
+					: "Nobody is playing anything on Twitch right now. (?!)"
+			};
 		}
 		else {
-			const gameString = (args.length > 0)
-				? `are playing ${args.join(" ")}: `
-				: "are live: ";
+			let gameString;
+			if (searchParams.game) {
+				gameString = "are playing " + data.streams[0].game;
+			}
+			else {
+				gameString = "are live";
+			}
 	
 			const streamers = data.streams.map(stream => {
-				const playing = (gameString)
-					? ""
-					: `${stream.game}`;
-	
-				return stream.channel.display_name + " " + playing + " (" + stream.viewers + ")";
+				const specificGame = (!searchParams.game)
+					? `(${stream.game})`
+					: "";
+
+				return `@${stream.channel.name} ${specificGame} (${stream.viewers})`;
 			});
 	
-			return { reply: "These streamers " + gameString + streamers.join("; ") };
+			return {
+				reply: `These streamers ${gameString}: ${streamers.join("; ")}`
+			};
 		}
 	}),
 	Dynamic_Description: null
