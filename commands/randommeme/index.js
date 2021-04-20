@@ -9,7 +9,8 @@ module.exports = {
 		{ name: "comments", type: "boolean" },
 		{ name: "flair", type: "string" },
 		{ name: "linkOnly", type: "boolean" },
-		{ name: "showFlairs", type: "boolean" }
+		{ name: "showFlairs", type: "boolean" },
+		{ name: "skipGalleries", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => {
@@ -134,6 +135,10 @@ module.exports = {
 				})
 			}
 
+			hasGallery () {
+				return this.#url.includes("gallery");
+			}
+
 			toString () {
 				const xpost = (this.#crosspostOrigin)
 					? `, x-posted from ${this.#crosspostOrigin}`
@@ -250,6 +255,7 @@ module.exports = {
 			&& !i.isTextPost
 			&& !repeatedPosts.includes(i.id)
 			&& (!context.params.flair || i.hasFlair(context.params.flair, false))
+			&& (!context.params.skipGalleries || !i.hasGallery())
 		));
 	
 		const post = sb.Utils.randArray(validPosts);
@@ -319,6 +325,10 @@ module.exports = {
 			`<code>${prefix}rm linkOnly:true</code>`,
 			`<code>${prefix}rm (subreddit) linkOnly:true</code>`,
 			"Posts a random post from the default, or specified subreddit, posting just the link without any other text.",
+			"",
+
+			`<code>${prefix}rm skipGalleries:true</code>`,
+			"As before, but all links that are a Reddit gallery will be skipped and not posted."
 		];
 	})
 };
