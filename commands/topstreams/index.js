@@ -19,7 +19,7 @@ module.exports = {
 			searchParams
 		}).json();
 	
-		if (data._total === 0) {
+		if (data.streams.length === 0) {
 			return {
 				reply: (searchParams.game)
 					? "Nobody is playing that game right now."
