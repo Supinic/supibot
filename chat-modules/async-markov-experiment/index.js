@@ -38,7 +38,7 @@ module.exports = {
 		if (message.includes("http:") || message.includes("https:")) {
 			return;
 		}
-		else if (!user || user.Name.includes("bot")) {
+		else if (!user || user.Name.includes("bot") || sb.User.bots.has(user.ID)) {
 			return;
 		}
 
