@@ -579,7 +579,7 @@ module.exports = {
 					}
 					else {
 						// 65k = limit of TEXT (current User_Alias.Data type)
-						const percent = sb.Utils.round((length / 65335) * 100, 2);
+						const percent = sb.Utils.round((length / 65535) * 100, 2);
 						const prefix = (context.user === userData) ? "Your" : "Their";
 						const size = sb.Utils.formatByteSize(length);
 
