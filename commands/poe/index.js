@@ -201,7 +201,7 @@ module.exports = {
 					aliases: [],
 					description: "If a user has requested to have their unique stash tab available on supibot, you can get its link by invoking this sub-command.",
 					execute: async (context, ...args) => {
-						let [user, type] = args;
+						let [user] = args;
 						if (!user) {
 							if (!context.channel) {
 								return {
@@ -263,11 +263,11 @@ module.exports = {
 	}),
 	Code: (async function poe (context, type, ...args) {
 		if (!type) {
-			const ritual = new sb.Date("2021-01-15 20:00");
+			const ritual = new sb.Date("2021-04-16 22:00");
 			return {
 				reply: (ritual > Date.now())
-					? `The Ritual league launches ${sb.Utils.timeDelta(ritual)}.`
-					: "The Ritual league has launched! Go and play!"
+					? `The Ultimatum league launches ${sb.Utils.timeDelta(ritual)}.`
+					: "The Ultimatum league has launched! Go and play!"
 			};
 	
 		/*
