@@ -420,6 +420,12 @@ module.exports = {
 						reply: `You don't have the "${oldName}" alias!`
 					};
 				}
+				else if (!this.staticData.nameCheck.regex.test(newName)) {
+					return {
+						success: false,
+						reply: `Your new alias name is not valid! ${this.staticData.nameCheck.response}`
+					};
+				}
 	
 				changed = true;
 				wrapper.set(newName, wrapper.get(oldName));
