@@ -4,8 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Posts the target user's last chat line in the context of the current channel, and the date they sent it.",
-	Flags: ["mention","opt-out","pipe"],
-	Params: null,
+	Flags: ["mention","opt-out","pipe","use-params"],
+	Params: [
+		{ name: "textOnly", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function lastLine (context, user) {
@@ -48,29 +50,27 @@ module.exports = {
 		if (!data) {
 			return { reply: "That user has not said anything in this channel!" };
 		}
-		else {
+
+		if (context.params.textOnly) {
 			return {
-				cooldown: {
-					user: null,
-					channel: context.channel.ID,
-					length: 5000,
-				},
-				partialReplies: [
-					{
-						bancheck: false,
-						message: "That user's last message in this channel was:"
-					},
-					{
-						bancheck: true,
-						message: data.Message
-					},
-					{
-						bancheck: false,
-						message: "(" + sb.Utils.timeDelta(data.Posted) + ")"
-					}
-				]
+				success: false,
+				reply: data.Message
 			};
 		}
+
+		const prefix = (targetUser.ID === context.user.ID) ? "Your" : "That user's";
+		return {
+			partialReplies: [
+				{
+					bancheck: false,
+					message: `${prefix} last message in this channel was (${sb.Utils.timeDelta(data.Posted)}):`
+				},
+				{
+					bancheck: true,
+					message: data.Message
+				}
+			]
+		};
 	}),
 	Dynamic_Description: null
 };

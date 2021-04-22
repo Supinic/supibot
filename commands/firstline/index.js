@@ -4,8 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Posts the target user's first chat line in the context of the current channel, and the date they sent it.",
-	Flags: ["mention","opt-out","pipe"],
-	Params: null,
+	Flags: ["mention","opt-out","pipe","use-params"],
+	Params: [
+		{ name: "textOnly", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function firstLine (context, user) {
@@ -89,6 +91,12 @@ module.exports = {
 			return {
 				success: false,
 				reply: "No chat lines found?!"
+			};
+		}
+
+		if (context.params.textOnly) {
+			return {
+				reply: line.Text
 			};
 		}
 	
