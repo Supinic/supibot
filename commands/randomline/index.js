@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["rl","rq"],
 	Author: "supinic",
 	Cooldown: 15000,
-	Description: "Fetches a random line from the current channel. If a user is specified, fetches a random line from that user only",
+	Description: "Fetches a random line from the current channel. If a user is specified, fetches a random line from that user only. \"rq\" only chooses from your own lines.",
 	Flags: ["block","opt-out","pipe","use-params"],
 	Params: [
 		{ name: "textOnly", type: "boolean" }
