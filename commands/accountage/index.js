@@ -9,35 +9,27 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function accountAge (context, user) {
-		if (!user) {
-			user = context.user.Name;
-		}
-	
-		const { statusCode, body } = await sb.Got("V5", {
+		const login = (user ?? context.user.Name).toLowerCase();
+		const { statusCode, body } = await sb.Got("Helix", {
 			url: "users",
-			throwHttpErrors: false,
-			searchParams: new sb.URLParams()
-				.set("login", user)
-				.toString()
+			searchParams: { login }
 		});
 	
-		if (statusCode !== 200 || body.users.length === 0) {
+		if (statusCode !== 200 || body.data.length === 0) {
 			return {
 				reply: "That Twitch account has no data associated with them."
 			};
 		}
-	
-		const data = body.users[0];
+
 		const now = new sb.Date();
-		const created = new sb.Date(data.created_at);
+		const created = new sb.Date(body.users[0].created_at);
 		const delta = sb.Utils.timeDelta(created, false, true);
-		const pronoun = (user.toLowerCase() === context.user.Name)
-			? "Your"
-			: "That";
+		const pronoun = (login.toLowerCase() === context.user.Name) ? "Your" : "That";
 	
 		let anniversary = "";
 		if (now.year > created.year && now.month === created.month && now.day === created.day) {
-			const who = (user.Name === context.platform.Self_Name) ? "my" : "your";
+			const who = (login === context.platform.Self_Name) ? "my" : pronoun.toLowerCase();
+
 			anniversary = `It's ${who} ${now.year - created.year}. Twitch anniversary! FeelsBirthdayMan Clap`;
 		}
 	
