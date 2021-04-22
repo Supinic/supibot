@@ -53,7 +53,6 @@ module.exports = {
 
 		if (context.params.textOnly) {
 			return {
-				success: false,
 				reply: data.Message
 			};
 		}
