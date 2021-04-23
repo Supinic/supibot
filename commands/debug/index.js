@@ -23,7 +23,6 @@ module.exports = {
 	
 		try {
 			const scriptContext = vm.createContext({version: process.version, context, sb});
-			const ForeignObject = vm.runInContext("Object", scriptContext);
 			let result = await script.runInNewContext(scriptContext, { timeout: 2500 });
 			if (typeof result !== "undefined") {
 				if (result?.constructor?.name === "Object") {
