@@ -900,7 +900,7 @@ class Command extends require("./template.js") {
 			execution.reply = string + ", " + execution.reply;
 		}
 
-		if (!options.partialExecute && execution.success !== false && execution.aliased && !execution.skipAliasPrefix) {
+		if (!options.partialExecute && execution.success !== false && execution.hasExternalInput && !execution.skipExternalPrefix) {
 			execution.reply = "👥 " + execution.reply;
 		}
 
