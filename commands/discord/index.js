@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Posts the link to the current channel's Discord(?)",
-	Flags: ["mention","pipe"],
+	Flags: ["external-input","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,

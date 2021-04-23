@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "If no parameters are provided, posts a random reddit meme. If you provide a subreddit, a post will be chosen randomly. NSFW subreddits and posts are only available on NSFW Discord channels!",
-	Flags: ["mention","non-nullable","pipe","use-params"],
+	Flags: ["external-input","mention","non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "comments", type: "boolean" },
 		{ name: "flair", type: "string" },

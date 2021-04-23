@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 0,
 	Description: "supiniHack ",
-	Flags: ["developer","pipe","skip-banphrase","system","whitelist"],
+	Flags: ["external-input","developer","pipe","skip-banphrase","system","whitelist"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,

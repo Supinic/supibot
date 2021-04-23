@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Searches 9gag for posts that fit your search text, or a random featured one if you don't provide anything.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,

@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Posts stream info about a Twitch channel.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,

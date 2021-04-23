@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Implicitly translates from auto-recognized language to English. Supports parameters 'from' and 'to'. Example: from:german to:french Guten Tag\",",
-	Flags: ["mention","non-nullable","pipe","use-params"],
+	Flags: ["external-input","mention","non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "confidence", type: "boolean" },
 		{ name: "direction", type: "boolean" },

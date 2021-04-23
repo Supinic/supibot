@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Fills the message provided with the word (usually an emote) provided as the first argument.",
-	Flags: ["mention","pipe"],
+	Flags: ["external-input","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,

@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Posts the channel's stream schedule.",
-	Flags: ["mention","non-nullable","opt-out","pipe"],
+	Flags: ["external-input","mention","non-nullable","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,

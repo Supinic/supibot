@@ -4,7 +4,7 @@ module.exports = {
     Author: "supinic",
     Cooldown: 5000,
     Description: "A collection of smaller commands, only usable within aliases - and not as standalone commands. Consider these \"building blocks\" for more complex aliases, without needing to make them yourself.",
-    Flags: ["pipe","skip-banphrase"],
+    Flags: ["external-input","pipe","skip-banphrase"],
     Params: [
         { name: "em", type: "string" },
         { name: "errorMessage", type: "string" },

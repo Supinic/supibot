@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Pulls a random post from a random board, or a specified one, if you provide it.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
 		{ name: "textOnly", type: "string" }
 	],

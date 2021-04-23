@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Returns the contents of a Pastebin paste, or from a GitHub gist; or posts your input into a new paste.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
 		{ name: "force", type: "boolean" }
 	],

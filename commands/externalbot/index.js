@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 0,
 	Description: "Makes supibot execute a command of a different bot, and then the result will be that bot's command response. As such, this command can only be used in a pipe.",
-	Flags: ["mention","pipe","whitelist"],
+	Flags: ["external-input","mention","pipe","whitelist"],
 	Params: null,
 	Whitelist_Response: "Currently being tested, and only available to trusted developers",
 	Static_Data: (() => ({
