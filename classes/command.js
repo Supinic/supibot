@@ -706,7 +706,7 @@ class Command extends require("./template.js") {
 
 		/** @type CommandResult */
 		let execution;
-		const context = new Context(contextOptions);
+		const context = options.context ?? new Context(contextOptions);
 
 		try {
 			const start = process.hrtime.bigint();
@@ -1085,7 +1085,7 @@ class Command extends require("./template.js") {
 	 */
 	static createFakeContext (commandData, contextData = {}) {
 		return new Context({
-			invocation: commandData.Name,
+			invocation: contextData.invocation ?? commandData.Name,
 			user: contextData.user ?? null,
 			channel: contextData.channel ?? null,
 			platform: contextData.platform ?? null,
