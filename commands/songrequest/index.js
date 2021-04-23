@@ -444,7 +444,7 @@ module.exports = {
 		let id = null;
 		try {
 			let vlcLink = data.link;
-			if (data.type === "bilibili" || data.type === "nicovideo") {
+			if (data.type === "bilibili") {
 				const { promisify } = require("util");
 				const shell = promisify(require("child_process").exec);
 				const ytdlPath = sb.Config.get("YOUTUBEDL_PATH", false);
