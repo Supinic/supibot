@@ -22,7 +22,7 @@ module.exports = {
 			};
 		}
 	
-		let aliased = false;
+		let hasExternalInput = false;
 		const nullCommand = sb.Command.get("null");
 		for (let i = 0; i < invocations.length; i++) {
 			const [commandString] = invocations[i].split(" ");
@@ -50,8 +50,8 @@ module.exports = {
 					};
 				}
 			}
-			else if (command.Name === "alias") {
-				aliased = true;
+			else if (command.Flags.externalInput) {
+				hasExternalInput = true;
 			}
 		}
 	
@@ -148,8 +148,8 @@ module.exports = {
 		}
 
 		return {
-			aliased,
-			skipAliasPrefix: Boolean(lastCommand.Flags.skipBanphrase),
+			hasExternalInput,
+			skipExternalPrefix: Boolean(lastCommand.Flags.skipBanphrase),
 			replyWithPrivateMessage: Boolean(finalResult?.replyWithPrivateMessage),
 			reply: currentArgs.join(" ")
 		};
