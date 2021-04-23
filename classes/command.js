@@ -7,6 +7,7 @@ class Context {
 	#privateMessage = false;
 	#append = {};
 	#params = {};
+	#meta = new Map();
 
 	constructor (data = {}) {
 		this.#invocation = data.invocation ?? null;
@@ -18,6 +19,9 @@ class Context {
 		this.#append = data.append ?? {};
 		this.#params = data.params ?? {};
 	}
+
+	getMeta (name) { return this.#meta.get(name); }
+	setMeta (name, value) { this.#meta.set(name, value); }
 
 	/**
 	 * Fetches the proper permissions for a provided user/channel/platform combo, substituting those that are not
