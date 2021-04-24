@@ -48,7 +48,7 @@ module.exports = {
 	
 							const { statusCode, statusMessage, body: html } = await sb.Got("FakeAgent", {
 								url: "https://poelab.com",
-								throwHttpErrors: false
+								responseType: "text"
 							});
 	
 							if (statusCode === 503) {
