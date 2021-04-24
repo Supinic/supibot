@@ -73,7 +73,11 @@ module.exports = {
 	
 						const detail = this.data.details[labType];
 						if (detail.imageLink === null) {
-							const html = await sb.Got("FakeAgent", detail.link).text();
+							const html = await sb.Got("FakeAgent", {
+								url: detail.link,
+								responseType: "text"
+							}).text();
+
 							const $ = sb.Utils.cheerio(html);
 	
 							detail.imageLink = $("#notesImg")[0].attribs.src;
