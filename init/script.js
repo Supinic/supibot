@@ -116,7 +116,14 @@
 			console.warn(`An error occured while reading ${target}.sql! Skipping...`, e);
 			continue;
 		}
-		
+
+		const [database, table] = target.split("/");
+		const rows = await sb.Query.raw(`SELECT COUNT(*) AS Count FROM \`${database}\`.\`${table}\``);
+		if (rows.Count > 0) {
+			console.log(`Skipped initializing ${database}.${table} - table is not empty`);
+			continue;
+		}
+
 		let status = null;
 		try {
 			const operationResult = await sb.Query.raw(content);
@@ -126,8 +133,7 @@
 			console.warn(`An error occured while executing ${target}.sql! Skipping...`, e);
 			continue;
 		}
-		
-		const [database, table] = target.split("/");
+
 		if (status === 0) {
 			counter++;
 			console.log(`${database}.${table} initial data inserted successfully`);
