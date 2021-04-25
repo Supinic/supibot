@@ -48,7 +48,7 @@ VALUES
     'function',
     '(() => {
      	if (!sb.Config.has("TWITCH_CLIENT_ID")) {
-     		throw new Error("Helix sb.Got instance cannot initialize - missing client-id");
+     		throw new Error("Kraken sb.Got instance cannot initialize - missing client-id");
      	}
 
      	return {
