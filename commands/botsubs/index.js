@@ -33,7 +33,7 @@ module.exports = {
 				.map(i => "T" + i.tier + ": " + i.emotes.map(j => j.token).join(" "));
 
 			return {
-				reply: strings.join(" - ")
+				reply: strings.join(" ")
 			};
 		}
 
