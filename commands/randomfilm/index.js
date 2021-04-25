@@ -10,7 +10,8 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function randomFilm () {
 		const html = await sb.Got("FakeAgent", {
-			url: "https://www.bestrandoms.com/random-movie-generator"
+			url: "https://www.bestrandoms.com/random-movie-generator",
+			responseType: "text"
 		}).text();
 	
 		const $ = sb.Utils.cheerio(html);

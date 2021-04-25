@@ -17,7 +17,8 @@ module.exports = {
 	
 		const searchHTML = await sb.Got("FakeAgent", {
 			url: "https://knowyourmeme.com/search",
-			searchParams: new sb.URLParams().set("q", args.join(" ")).toString()
+			searchParams: new sb.URLParams().set("q", args.join(" ")).toString(),
+			responseType: "text"
 		}).text();
 	
 		const $search = sb.Utils.cheerio(searchHTML);	
@@ -31,6 +32,7 @@ module.exports = {
 		const detailHTML = await sb.Got("FakeAgent", {
 			prefixUrl: "https://knowyourmeme.com",
 			url: firstLink,
+			responseType: "text"
 		}).text();
 	
 		const $detail = sb.Utils.cheerio(detailHTML);
