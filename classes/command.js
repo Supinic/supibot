@@ -1072,6 +1072,23 @@ class Command extends require("./template.js") {
 			const [key, outputValue] = value.split("=");
 			return { key, value: outputValue };
 		}
+		else if (type === "regex") {
+			const string = value.replace(/^\/|\/$/g, "");
+			const lastSlashIndex = string.lastIndexOf("/");
+
+			const regexBody = (lastSlashIndex !== -1) ? string.slice(0, lastSlashIndex) : string;
+			const flags = (lastSlashIndex !== -1) ? string.slice(lastSlashIndex + 1) : "";
+
+			let regex;
+			try {
+				regex = new RegExp(regexBody, flags);
+			}
+			catch (e) {
+				return null;
+			}
+
+			return regex;
+		}
 
 		return null;
 	}
@@ -1212,7 +1229,7 @@ module.exports = Command;
 /**
  * @typedef {Object} CommandParameterDefinition
  * @property {string} name Parameter name, as it will be used in execution
- * @property {"string"|"number"|"boolean"|"date"} type Parameter type - string value will be parsed into this type
+ * @property {"string"|"number"|"boolean"|"date"|"object"|"regex"} type Parameter type - string value will be parsed into this type
  */
 
 /**
