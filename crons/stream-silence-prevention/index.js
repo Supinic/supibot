@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "stream-silence-prevention",
-	Expression: "*/20 * * * * *",
+	Expression: "*/5 * * * * *",
 	Description: "Makes sure that there is not a prolonged period of song request silence on Supinic's stream while live.",
 	Defer: null,
 	Type: "Bot",
