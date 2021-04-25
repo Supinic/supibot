@@ -14,7 +14,6 @@ module.exports = {
 		const channelData = sb.Channel.get("supinic", "twitch");
 		const cytubeChannelData = sb.Channel.get(49);
 
-
 		const streamData = await channelData.getStreamData();
 		if (!streamData.live) {
 			return;
@@ -66,7 +65,7 @@ module.exports = {
 
 			const randomResult = await rg.execute(context);
 			if (randomResult.success === false) {
-				await channelData.send("Could not fetch song data! :(");
+				console.warn("Could not fetch link data", { link });
 				return;
 			}
 
