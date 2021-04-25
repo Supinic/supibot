@@ -9,7 +9,7 @@ module.exports = {
         { name: "em", type: "string" },
         { name: "errorMessage", type: "string" },
         { name: "excludeSelf", type: "boolean" },
-        { name: "regex", type: "string" },
+        { name: "regex", type: "regex" },
         { name: "replacement", type: "string" },
     ],
     Whitelist_Response: null,
@@ -147,26 +147,9 @@ module.exports = {
                             reply: `Missing parameter(s)! regex, replacement`
                         };
                     }
-                    
-                    let regex;
-                    try {
-                        const string = context.params.regex.replace(/^\/|\/$/g, "");
-                        const lastSlashIndex = string.lastIndexOf("/");
-
-                        const regexBody = (lastSlashIndex !== -1) ? string.slice(0, lastSlashIndex) : string;
-                        const flags = (lastSlashIndex !== -1) ? string.slice(lastSlashIndex + 1) : "";
-
-                        regex = new RegExp(regexBody, flags);
-                    }
-                    catch (e) {
-                        return {
-                            success: false,
-                            reply: `Could not create regex! ${e.message}`
-                        };
-                    }
 
                     return {
-                        reply: args.join(" ").replace(regex, context.params.replacement)
+                        reply: args.join(" ").replace(context.params.regex, context.params.replacement)
                     };
                 }
             },

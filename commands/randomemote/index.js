@@ -11,7 +11,7 @@ module.exports = {
 		{ name: "ffz", type: "boolean" },
 		{ name: "global", type: "boolean" },
 		{ name: "repeat", type: "boolean" },
-		{ name: "regex", type: "string" },
+		{ name: "regex", type: "regex" },
 		{ name: "sub", type: "boolean" },
 		{ name: "twitch", type: "boolean" },
 	],
@@ -37,18 +37,6 @@ module.exports = {
 		}
 
 		const { animated, bttv, ffz, global: globalEmotes, sub, twitch } = context.params;
-
-		let regex;
-		if (context.params.regex) {
-			const string = context.params.regex.replace(/^\/|\/$/g, "");
-			const lastSlashIndex = string.lastIndexOf("/");
-
-			const regexBody = (lastSlashIndex !== -1) ? string.slice(0, lastSlashIndex) : string;
-			const flags = (lastSlashIndex !== -1) ? string.slice(lastSlashIndex + 1) : "";
-
-			regex = new RegExp(regexBody, flags);
-		}
-
 		emotes = emotes.filter(i => {
 			if (animated === true && !i.animated || animated === false && i.animated) {
 				return false;
@@ -68,7 +56,7 @@ module.exports = {
 			if (twitch === true && i.type !== "twitch-global" || bttv === false && i.type === "twitch-global") {
 				return false;
 			}
-			if (regex && !regex.test(i.name)) {
+			if (context.params.regex && !context.params.regex.test(i.name)) {
 				return false;
 			}
 
