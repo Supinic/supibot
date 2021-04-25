@@ -68,7 +68,7 @@ module.exports = {
 			if (twitch === true && i.type !== "twitch-global" || bttv === false && i.type === "twitch-global") {
 				return false;
 			}
-			if (regex && !regex.test(i.token)) {
+			if (regex && !regex.test(i.name)) {
 				return false;
 			}
 
