@@ -1072,9 +1072,8 @@ class Command extends require("./template.js") {
 			const [key, outputValue] = value.split("=");
 			return { key, value: outputValue };
 		}
-		else {
-			return null;
-		}
+
+		return null;
 	}
 
 	/**
