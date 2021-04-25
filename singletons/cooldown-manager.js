@@ -106,7 +106,7 @@ module.exports = (function () {
 		constructor () {
 			super();
 			this.data = [];
-			this.pendingCooldownExpiration = 3_600_000;
+			this.pendingCooldownExpiration = sb.Config.get("DEFAULT_PENDING_TIMEOUT", false) ?? 300_000;
 		}
 
 		/**
