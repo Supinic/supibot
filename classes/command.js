@@ -636,6 +636,7 @@ class Command extends require("./template.js") {
 					const cleanValue = value.replace(/^"|"$/g, "").replace(/\\"/g, "\"");
 					const parsedValue = Command.parseParameter(cleanValue, type);
 					if (parsedValue === null) {
+						sb.CooldownManager.unsetPending(userData.ID);
 						return {
 							success: false,
 							reply: `Cannot parse parameter "${name}"!`
@@ -647,6 +648,7 @@ class Command extends require("./template.js") {
 							contextOptions.params[name] = {};
 						}
 						if (typeof contextOptions.params[name][parsedValue.key] !== "undefined") {
+							sb.CooldownManager.unsetPending(userData.ID);
 							return {
 								success: false,
 								reply: `Cannot use multiple values for parameter "${name}", key ${parsedValue.key}!`
@@ -674,6 +676,7 @@ class Command extends require("./template.js") {
 				if (name && value) {
 					const parsedValue = Command.parseParameter(value, type);
 					if (parsedValue === null) {
+						sb.CooldownManager.unsetPending(userData.ID);
 						return {
 							success: false,
 							reply: `Cannot parse parameter "${name}"!`
@@ -685,6 +688,7 @@ class Command extends require("./template.js") {
 							contextOptions.params[name] = {};
 						}
 						if (typeof contextOptions.params[name][parsedValue.key] !== "undefined") {
+							sb.CooldownManager.unsetPending(userData.ID);
 							return {
 								success: false,
 								reply: `Cannot use multiple values for parameter "${name}", key ${parsedValue.key}!`
