@@ -1,4 +1,4 @@
-INSERT INTO `data`.`Got_Instance` 
+INSERT IGNORE INTO `data`.`Got_Instance`
 (`Name`,`Parent`,`Description`,`Options_Type`,`Options`)
 VALUES
 (
