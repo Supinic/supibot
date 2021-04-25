@@ -8,6 +8,12 @@ module.exports = {
 		if (this.data.stopped) {
 			return;
 		}
+		if (!this.data.repeats) {
+			this.data.repeats = [];
+		}
+		if (!this.data.repeatsAmount) {
+			this.data.repeatsAmount = 25;
+		}
 	
 		const twitch = sb.Platform.get("twitch");
 		const cytube = sb.Platform.get("cytube");
@@ -49,30 +55,40 @@ module.exports = {
 			this.data.videos = result.map(i => i.ID);
 		}
 
-		let link;
+		let videoID;
 		if (sb.Utils.random(1, 2) === 1) {
-			const videoID = sb.Utils.randArray(this.data.videos);
-			link = "https://youtu.be/" + videoID;
+			const filtered = this.data.videos.filter(i => !this.data.repeats.includes(i));
+			videoID = sb.Utils.randArray(filtered);
 		}
 		else {
-			const rg = sb.Command.get("rg");
-			const context = sb.Command.createFakeContext(rg, {
-				params: {
-					fav: "supinic",
-					linkOnly: true
-				}
-			});
+			const links = await sb.Query.getRecordset(rs => rs
+			    .select("Track.Link AS Link")
+			    .from("music", "User_Favourite")
+				.where("User_Alias = %n", 1)
+				.where("Video_Type = %n", 1)
+				.where(
+					{ condition: this.data.repeats.length > 0 },
+					"Track.Link NOT IN %s+",
+					this.data.repeats
+				)
+				.join("music", "Track")
+				.flat("Link")
+			);
 
-			const randomResult = await rg.execute(context);
-			if (randomResult.success === false) {
-				console.warn("Could not fetch link data", { link });
-				return;
-			}
-
-			link = randomResult.reply;
+			videoID = sb.Utils.randArray(links);
 		}
-	
-		// let result = "";
+
+		// If there are no applicable video IDs, this means we ran out of possible videos.
+		// Clear and abort this invocation
+		if (!videoID) {
+			this.data.repeats = [];
+			return;
+		}
+
+		this.data.repeats.push(videoID);
+		this.data.repeats.splice(0, this.data.repeats - this.data.repeatsAmount);
+
+		const link = "https://youtu.be/" + videoID;
 		if (state === "vlc") {
 			const self = await sb.User.get("supibot");
 			const sr = sb.Command.get("sr");
