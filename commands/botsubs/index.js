@@ -6,6 +6,7 @@ module.exports = {
 	Description: "Posts the channels supibot is currently subscribed to on Twitch, along with a sample sub emote to each.",
 	Flags: ["use-params"],
 	Params: [
+		{ name: "channel", type: "string" },
 		{ name: "channelsOnly", type: "boolean" },
 		{ name: "emotesOnly", type: "boolean" }
 	],
@@ -16,6 +17,22 @@ module.exports = {
 		const subEmoteSets = availableEmotes
 			.filter(i => ["1", "2", "3"].includes(i.tier) && i.emotes.length > 0)
 			.sort((a, b) => Number(b.tier) - Number(a.tier));
+
+		if (context.params.channel) {
+			const channel = context.params.channel.toLowerCase();
+			const sets = subEmoteSets.filter(i => i.channel.login === channel);
+			if (sets.length === 0) {
+				return {
+					success: false,
+					reply: `Supibot is not subscribed to #${channel}!`
+				};
+			}
+
+			const strings = sets.map(i => "T" + i.tier + ": " + i.emotes.map(j => j.token).join(" "));
+			return {
+				reply: strings.join(" - ")
+			};
+		}
 
 		const result = [];
 		const encountered = new Set();
