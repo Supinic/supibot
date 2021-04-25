@@ -105,6 +105,12 @@ module.exports = {
 			"Posts any emote.",
 			"",
 
+			`<code>${prefix}rem regex:(regular expression)/code>`,
+			`<code>${prefix}rem regex:pepe</code>`,
+			`<code>${prefix}rem regex:/^paja[HW]/</code>`,
+			"Filters emotes by a provided regular expression. You can also just use plain text to filter as \"contains\".",
+			"",
+
 			`<code>${prefix}rem repeat:false</code>`,
 			"If provided like this, then only unique emotes will be posted - no repeats.",
 			"",
