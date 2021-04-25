@@ -7,6 +7,7 @@ VALUES
 ('CYTUBE_BOT_PASSWORD',NULL,'string',NULL,1,0,NULL),
 ('DISCORD_BOT_TOKEN',NULL,'string',NULL,1,0,NULL),
 ('DEFAULT_BANPHRASE_API_RESPONSE','[Banphrased]','string',NULL,0,1,'If a banphrase API rejects a message, and no Banphrase object exists to react to that, this message will be printed instead.'),
+('DEFAULT_PENDING_TIMEOUT',300000,'number',NULL,0,0,NULL),
 ('DEFAULT_USER_AGENT','Custom fork of Supibot: github.com/supinic/supibot','string',NULL,0,0,NULL),
 ('LINK_REGEX','/(https?:\\/\\/)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&\\/\\/=]*)/gi','regex',NULL,0,1,'Determines if a message contains a website link.'),
 ('LOG_COMMAND_ENABLED','1','boolean',NULL,0,1,'If true, every successful command execution will be logged into chat_data.Command_Execution.'),
