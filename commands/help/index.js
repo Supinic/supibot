@@ -42,26 +42,49 @@ module.exports = {
 				: commandString;
 	
 			if (identifier.toLowerCase() === "me") {
-				return { reply: "I can't directly help you, but maybe if you use one of my commands, you'll feel better? :)" };
+				return {
+					reply: "I can't directly help you, but maybe if you use one of my commands, you'll feel better? :)"
+				};
 			}
 	
 			const command = sb.Command.get(identifier);
 			if (!command) {
-				return { reply: "That command does not exist!" };
+				return {
+					reply: "That command does not exist!"
+				};
 			}
 	
 			const filteredResponse = (command.Flags.whitelist) ? "(whitelisted)" : "";
 			const aliases = (command.Aliases.length === 0) ? "" : (" (" + command.Aliases.map(i => prefix + i).join(", ") + ")");
-	
-			const reply = [
-				prefix + command.Name + aliases + ":",
-				command.Description || "(no description)",
-				"- " + sb.Utils.round(command.Cooldown / 1000, 1) + " seconds cooldown.",
-				filteredResponse,
-				"https://supinic.com/bot/command/" + command.ID
-			];
-	
-			return { reply: reply.join(" ") };
+
+			const cooldownString = sb.Utils.round(command.Cooldown / 1_000, 1) + " seconds cooldown.";
+			const cooldownModifier = sb.Filter.getCooldownModifiers({
+				command,
+				invocation: context.invocation,
+				platform: context.platform,
+				channel: context.channel ?? null,
+				user: context.user
+			});
+
+			let modifierString = "";
+			if (cooldownModifier) {
+				const type = (cooldownModifier.Data.multiplier) ? "multiplier" : "override";
+				const modified = sb.Utils.round(cooldownModifier.applyData(command.Cooldown) / 1000, 1);
+
+				modifierString = `(you have a cooldown ${type} active - ${modified} seconds cooldown)`;
+			}
+
+			return {
+				reply: sb.Utils.tag.trim `
+					${prefix}${command.Name}${aliases}:
+					${command.Description ?? "(no description)"}
+					-
+					${cooldownString}
+					${modifierString}
+					${filteredResponse}
+					https://supinic.com/bot/command/${command.ID}
+				`
+			};
 		}
 	}),
 	Dynamic_Description: null
