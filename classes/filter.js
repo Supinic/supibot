@@ -191,12 +191,24 @@ module.exports = class Filter extends require("./template.js") {
 				}
 			}
 		}
-		else if (this.Type === "Cooldown" && typeof data === "number") {
-			if (typeof this.#filterData.override === "number") {
-				return this.#filterData.override;
+		else if (this.Type === "Cooldown" && (data === null || typeof data === "number")) {
+			const value = data ?? 0; // `null` cooldowns are treated as zero
+			const { multiplier, override, respect } = this.#filterData;
+
+			if (typeof override === "number") {
+				if (respect === false) {
+					return override;
+				}
+				else {
+					return (override > value) ? data : override;
+				}
 			}
-			else if (typeof this.#filterData.multiplier === "number") {
-				return Math.round(data * this.#filterData.multiplier);
+			else if (typeof multiplier === "number") {
+				if (data === null) {
+					return data;
+				}
+
+				return Math.round(value * multiplier);
 			}
 		}
 
