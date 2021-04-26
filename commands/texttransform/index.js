@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Transforms provided text into one of provided types, such as \"vaporwave\", for example.",
-	Flags: ["non-nullable","pipe"],
+	Flags: ["external-input","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
