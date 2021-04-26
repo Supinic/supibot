@@ -244,9 +244,9 @@
 				
 				console.log(`Bot will now join ${platform} in channel ${channelName}.`);
 				
-				// Assume the user only wants to set up one platform when setting up automatically
 			} while (!done);
 		}	
+		// Assume the user only wants to set up one platform when setting up automatically
 		if (automatic) {
 			done = true;
 		}
