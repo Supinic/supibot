@@ -71,10 +71,18 @@
 	console.log("Database credentials setup successfully.");
 
 	let packageManager = null;
-	do {
-		packageManager = await ask("Do you use npm or yarn as your package manager?\n");
-		packageManager = packageManager.toLowerCase();
-	} while (packageManager !== "npm" && packageManager !== "yarn");
+	
+	const env = process.env["DEFAULT_PACKAGEMANAGER"];
+
+	if (env) {
+		packageManager = env;
+	}
+	else {
+		do {
+			packageManager = await ask("Do you use npm or yarn as your package manager?\n");
+			packageManager = packageManager.toLowerCase();
+		} while (packageManager !== "npm" && packageManager !== "yarn");
+	}
 
 	console.log("Setting up database structure...");
 	try {
@@ -113,8 +121,19 @@
 	const prettyList = Object.keys(platformList).join(", ") + ", or keep line empty to finish";
 	let platform = null;
 	let done = false;
+	let automatic = false;
 	do {
-		platform = await ask(`Which platform would you like to set up? (${prettyList})\n`);
+		const env = process.env["INITIAL_PLATFORM"];
+
+		if (env) {
+			platform = env;
+			console.log(`Attempting automatic setup for platform ${platform}`);
+			automatic = true;
+		}
+		else {
+			platform = await ask(`Which platform would you like to set up? (${prettyList})\n`);
+		}
+
 		platform = platform.toLowerCase();
 		
 		if (!platform) {
@@ -125,7 +144,20 @@
 			console.log("Platform not recognized, try again.");		
 		}
 		else {
-			const pass = await ask(`Enter authentication key for platform "${platform}":\n`);
+			let pass = null;
+	
+			if (platform == "twitch") {
+				const env = process.env["TWITCH_APP_ACCESS_TOKEN"]
+				
+				if (env) {
+					pass = env;
+				}
+			}
+			
+			if (pass == null) {
+				pass = await ask(`Enter authentication key for platform "${platform}":\n`);
+			}
+
 			if (!pass) {
 				console.log(`Skipped setting up ${platform}!`);
 				continue;
@@ -138,7 +170,16 @@
 			console.log(`Authentication key for ${platform} set up successfully.`);
 
 			if (platformList[platform].extra) {
-				const pass = await ask(`Enter ${platformList[platform].extraName} for platform "${platform}":\n`);
+				let pass = null;
+
+				const env = process.env[platformList[platform].extra];
+
+				if (env) {
+					pass = env;
+				}
+				else {
+					pass = await ask(`Enter ${platformList[platform].extraName} for platform "${platform}":\n`);
+				}
 				if (!pass) {
 					console.log(`Skipped setting up ${platform}!`);
 					continue;
@@ -150,7 +191,16 @@
 				await extraRow.save();
 			}
 
-			const botName = await ask(`Enter bot's account name for platform "${platform}":\n`);
+			let botName = null;
+
+			const env = process.env["INITIAL_BOT_NAME"];
+
+			if (env) {
+				botName = env;
+			}
+			else {
+				botName = await ask(`Enter bot's account name for platform "${platform}":\n`);
+			}
 			if (!botName) {
 				console.log(`Skipped setting up ${platform}!`);
 				continue;
@@ -164,7 +214,18 @@
 
 			let done = false;
 			do {
-				const channelName = await ask(`Enter a channel name the bot should join for platform "${platform}", or leave empty to finish:\n`);
+				let channelName = null;
+
+				const env = process.env["INITIAL_CHANNEL"];
+
+				if (env) {
+					channelName = env;
+					// Assume the user only wants to join one channel when setting up automatically
+					done = true;
+				}
+				else {
+					channelName = await ask(`Enter a channel name the bot should join for platform "${platform}", or leave empty to finish:\n`);
+				}
 				if (!channelName) {
 					console.log(`Finished setting up ${platform}.`);
 					done = true;
@@ -172,18 +233,30 @@
 				}
 				
 				const channelRow = await sb.Query.getRow("chat_data", "Channel");
+
 				channelRow.setValues({
 					Name: channelName,
 					Platform: platformList[platform].ID
 				});
-				await channelRow.save();
+				await channelRow.save({ 
+					ignore: true
+				});
 				
 				console.log(`Bot will now join ${platform} in channel ${channelName}.`);
+				
+				// Assume the user only wants to set up one platform when setting up automatically
 			} while (!done);
 		}	
+		if (automatic) {
+			done = true;
+		}
 	} while (!done);
 
-	const commandPrefix = await ask("Finally, select a command prefix:");
+	let commandPrefix = null;
+
+	if (!process.env["COMMAND_PREFIX"]) {
+		commandPrefix = await ask("Finally, select a command prefix:");
+	}
 	if (commandPrefix) {
 		const configRow = await sb.Query.getRow("data", "Config");
 		await configRow.load("COMMAND_PREFIX");	
