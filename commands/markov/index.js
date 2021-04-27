@@ -174,7 +174,7 @@ module.exports = {
 			}
 		}
 
-		const string = markov.generateWords(wordCount, seed, {
+		const string = markov.generateWords(wordCount, input, {
 			stop: Boolean(context.params.stop)
 		});
 
