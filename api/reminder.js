@@ -7,7 +7,7 @@ module.exports = {
 			data: { message: "OK" }
 		};
 	},
-	reloadSpecific: async (url) => {
+	reloadSpecific: async (req, res, url) => {
 		const IDs = url.searchParams.getAll("ID").map(Number).filter(Boolean);
 		const result = await sb.Reminder.reloadSpecific(...IDs);
 
