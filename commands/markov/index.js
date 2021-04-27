@@ -6,9 +6,10 @@ module.exports = {
 	Description: "Creates a random sequence of words based on a Markov-chain module from Twitch chat.",
 	Flags: ["non-nullable","pipe","use-params"],
 	Params: [
+		{ name: "debug", type: "string" },
+		{ name: "exact", type: "boolean" },
 		{ name: "stop", type: "boolean" },
-		{ name: "words", type: "number" },
-		{ name: "debug", type: "string" }
+		{ name: "words", type: "number" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => {
@@ -126,8 +127,6 @@ module.exports = {
 		}
 
 		let wordCount = 15;
-		const seed = input;
-
 		if (context.params.words) {
 			const { words } = context.params;
 			if (!sb.Utils.isValidInteger(words, 1)) {
@@ -145,11 +144,34 @@ module.exports = {
 
 			wordCount = words;
 		}
-		if (typeof seed === "string" && !markov.has(seed)) {
-			return {
-				success: false,
-				reply: "That word is not available as seed for random generation! Check a list here: https://supinic.com/data/other/markov/words"
-			};
+
+		if (typeof input === "string" && !markov.has(input)) {
+			const exact = context.params.exact ?? false;
+			if (exact) {
+				return {
+					success: false,
+					reply: "That exact word is not available as seed for random generation! Check the list here: https://supinic.com/data/other/markov/words"
+				};
+			}
+
+			// Try a case-insensitive search on the model's keys
+			const keys = markov.keys;
+			const lower = input.toLowerCase();
+			for (let i = 0; i < keys.length; i++) {
+				const word = keys[i];
+				if (word.toLowerCase() === lower) {
+					input = word;
+					break;
+				}
+			}
+
+			// Still not found despite case-insensitive search
+			if (!markov.has(input)) {
+				return {
+					success: false,
+					reply: `That word is not available as seed for random generation! Check the list here: https://supinic.com/data/other/markov/words`
+				};
+			}
 		}
 
 		const string = markov.generateWords(wordCount, seed, {
@@ -161,5 +183,29 @@ module.exports = {
 		};
 
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix, values) => {
+		const { threshold, limit } = values.getStaticData();
+		return [
+			`Uses a <a href="//en.wikipedia.org/wiki/Markov_model">Markov model</a> to generate "real-looking" sentences based on Twitch chat.`,
+			`Currently only supports <a href="//twitch.tv/forsen">Forsen's channel</a>.`,
+			`The model is not available until ${threshold} unique words have been added to it!`,
+			`The list of currently available words is here (only updated once a minute!): <a href="/data/other/markov/words">Markov word list</a>`,
+
+			`<code>${prefix}markov</code>`,
+			"Generates 15 words, with the first one being chosen randomly.",
+			"",
+
+			`<code>${prefix}markov (word)</code>`,
+			`Generates 15 words, with your chosen word being the "seed" - the first word in the sequence.`,
+			"If your word isn't matched exactly, other, case-insensitive variants will be attempted.",
+			"",
+
+			`<code>${prefix}markov words:(number)</code>`,
+			`Generates between 1-${limit} words, based on your choice.`,
+			"",
+
+			`<code>${prefix}markov exact:true</code>`,
+			"If you want your seed word to be specific, use <code>exact:true to force to use just that case-sensitive version."
+		];
+	})
 };
