@@ -581,7 +581,7 @@ module.exports = class Filter extends require("./template.js") {
 		let { string } = options;
 		const unpingUsers = await sb.User.getMultiple(filters.map(i => i.User_Alias));
 		for (const user of unpingUsers) {
-			const regex = new RegExp(String.raw `(^|[,:;\s]+)(${user.Name})([,:;\s]|$)`, "gi");
+			const regex = new RegExp(String.raw `(^|[@#,:;\s]+)(${user.Name})([,:;\s]|$)`, "gi");
 			string = string.replace(regex, (match, prefix, name, suffix) => (
 				`${prefix}${name[0]}\u{E0000}${name.slice(1)}${suffix}`
 			));
