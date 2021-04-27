@@ -30,7 +30,7 @@ module.exports = {
 
 			const strings = sets
 				.sort((a, b) => Number(a.tier) - Number(b.tier))
-				.map(i => "T" + i.tier + ": " + i.emotes.map(j => j.token).join(" "));
+				.map(i => "T" + i.tier + ": " + i.emotes.map(j => j.token).sort().join(" "));
 
 			return {
 				reply: strings.join(" ")
