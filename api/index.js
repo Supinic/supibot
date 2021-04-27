@@ -9,7 +9,8 @@ module.exports = (function () {
 
 	const definition = {};
 	const subroutes = [
-		["channel", "channel.js"]
+		["channel", "channel.js"],
+		["reminder", "reminder.js"],
 	];
 	for (const [route, file] of subroutes) {
 		definition[route] = require("./" + file);
