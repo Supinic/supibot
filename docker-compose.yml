@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+    db:
+      image: supidb
+      restart: unless-stopped
+      environment:
+        - MYSQL_RANDOM_ROOT_PASSWORD=1
+        - MYSQL_PASSWORD=supibot
+        - MYSQL_USER=supibot
+    redis:
+      image: redis
+      restart: unless-stopped
+    supibot:
+      links:
+        - db
+        - redis
+      image: supibot
+      environment:
+        - "MARIA_HOST=db"
+        - "MARIA_USER=supibot"
+        - "MARIA_PASSWORD=supibot"
+        - "REDIS_CONFIGURATION=redis"
+        - "COMMAND_PREFIX=|"
+        - "INITIAL_BOT_NAME=supibot"
+        - "INITIAL_PLATFORM=twitch"
+        - "TWITCH_CLIENT_ID=<your_client_id>"
+        - "TWITCH_OAUTH=<your_oauth>"
+        - "INITIAL_CHANNEL=supinic"
