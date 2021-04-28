@@ -28,8 +28,13 @@ module.exports = {
 			};
 		}
 		else {
+			const defaultEmote = await context.getBestAvailableEmote(
+				["gachiHYPER", "gachiBASS", "gachiGASM", "gachiPRIDE"],
+				"🔞"
+			);
+
 			return {
-				reply: `You ${randomString} fucked ${user}'s brains out ${emote || "gachiGASM"}`
+				reply: `You ${randomString} fucked ${user}'s brains out ${emote ?? defaultEmote}`
 			};
 		}
 	}),
