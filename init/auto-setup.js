@@ -17,6 +17,10 @@
 
 	console.log("Setting up initial database state...");
 	try {
+		const util = require("util");
+		const { exec } = require("child_process");
+		const shell = util.promisify(exec);
+
 		await shell(packageManager + " run init-database");
 	}
 	catch (e) {
