@@ -20,7 +20,7 @@ module.exports = {
                         url: "https://min-api.cryptocompare.com/data/price",
                         searchParams: new sb.URLParams()
                             .set("fsym", "EUR")
-                            .set("tsyms", "BTC,XRP,DOGE,ETH,BCH,LTC,EOS,XLM,BNB,USDT,DOT,ADA,LINK")
+                            .set("tsyms", "BTC,XRP,DOGE,ETH,BCH,LTC,EOS,XLM,BNB,USDT,DOT,ADA,LINK,XMR")
                             .toString(),
                         headers: {
                             Authorization: "Apikey " + sb.Config.get("API_CRYPTO_COMPARE")
