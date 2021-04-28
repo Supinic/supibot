@@ -8,8 +8,9 @@ class Context {
 	#append = {};
 	#params = {};
 	#meta = new Map();
+	#userFlags = {};
 
-	constructor (data = {}) {
+	constructor (command, data = {}) {
 		this.#invocation = data.invocation ?? null;
 		this.#user = data.user ?? null;
 		this.#channel = data.channel ?? null;
@@ -18,6 +19,14 @@ class Context {
 		this.#privateMessage = data.privateMessage ?? false;
 		this.#append = data.append ?? {};
 		this.#params = data.params ?? {};
+
+		this.#userFlags = sb.Filter.getFlags({
+			command,
+			invocation: this.#invocation,
+			platform: this.#platform,
+			channel: this.#channel,
+			user: this.#user,
+		});
 	}
 
 	getMeta (name) { return this.#meta.get(name); }
@@ -96,6 +105,7 @@ class Context {
 	get privateMessage () { return this.#privateMessage; }
 	get append () { return this.#append; }
 	get params () { return this.#params; }
+	get userFlags () { return this.#userFlags; }
 }
 
 class Command extends require("./template.js") {
@@ -710,7 +720,7 @@ class Command extends require("./template.js") {
 
 		/** @type CommandResult */
 		let execution;
-		const context = options.context ?? new Context(contextOptions);
+		const context = options.context ?? new Context(command, contextOptions);
 
 		try {
 			const start = process.hrtime.bigint();
@@ -1104,7 +1114,7 @@ class Command extends require("./template.js") {
 	 * @returns {CommandContext}
 	 */
 	static createFakeContext (commandData, contextData = {}) {
-		return new Context({
+		return new Context(commandData, {
 			invocation: contextData.invocation ?? commandData.Name,
 			user: contextData.user ?? null,
 			channel: contextData.channel ?? null,
