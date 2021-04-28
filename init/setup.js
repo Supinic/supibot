@@ -70,11 +70,13 @@
 	}
 	console.log("Database credentials setup successfully.");
 
-	let packageManager = null;
-	do {
-		packageManager = await ask("Do you use npm or yarn as your package manager?\n");
-		packageManager = packageManager.toLowerCase();
-	} while (packageManager !== "npm" && packageManager !== "yarn");
+	let packageManager = process.env.DEFAULT_PACKAGEMANAGER;
+	if (!packageManager) {
+		do {
+			packageManager = await ask("Do you use npm or yarn as your package manager?\n");
+			packageManager = packageManager.toLowerCase();
+		} while (packageManager !== "npm" && packageManager !== "yarn");
+	}
 
 	console.log("Setting up database structure...");
 	try {
@@ -113,8 +115,18 @@
 	const prettyList = Object.keys(platformList).join(", ") + ", or keep line empty to finish";
 	let platform = null;
 	let done = false;
+	let automatic = false;
 	do {
-		platform = await ask(`Which platform would you like to set up? (${prettyList})\n`);
+		const initialPlatform = process.env.INITIAL_PLATFORM;
+		if (initialPlatform) {
+			platform = initialPlatform;
+			console.log(`Attempting automatic setup for platform ${platform}`);
+			automatic = true;
+		}
+		else {
+			platform = await ask(`Which platform would you like to set up? (${prettyList})\n`);
+		}
+
 		platform = platform.toLowerCase();
 		
 		if (!platform) {
@@ -125,7 +137,19 @@
 			console.log("Platform not recognized, try again.");		
 		}
 		else {
-			const pass = await ask(`Enter authentication key for platform "${platform}":\n`);
+			let pass = null;
+	
+			if (platform === "twitch") {
+				const accessToken = process.env.TWITCH_APP_ACCESS_TOKEN;
+				if (accessToken) {
+					pass = accessToken;
+				}
+			}
+			
+			if (pass === null) {
+				pass = await ask(`Enter authentication key for platform "${platform}":\n`);
+			}
+
 			if (!pass) {
 				console.log(`Skipped setting up ${platform}!`);
 				continue;
@@ -138,7 +162,15 @@
 			console.log(`Authentication key for ${platform} set up successfully.`);
 
 			if (platformList[platform].extra) {
-				const pass = await ask(`Enter ${platformList[platform].extraName} for platform "${platform}":\n`);
+				let pass = null;
+				const extraEnv = process.env[platformList[platform].extra];
+
+				if (extraEnv) {
+					pass = extraEnv;
+				}
+				else {
+					pass = await ask(`Enter ${platformList[platform].extraName} for platform "${platform}":\n`);
+				}
 				if (!pass) {
 					console.log(`Skipped setting up ${platform}!`);
 					continue;
@@ -150,10 +182,14 @@
 				await extraRow.save();
 			}
 
-			const botName = await ask(`Enter bot's account name for platform "${platform}":\n`);
+			let botName = process.env.INITIAL_BOT_NAME;
 			if (!botName) {
-				console.log(`Skipped setting up ${platform}!`);
-				continue;
+				botName = await ask(`Enter bot's account name for platform "${platform}":\n`);
+
+				if (!botName) {
+					console.log(`Skipped setting up ${platform}!`);
+					continue;
+				}
 			}
 			
 			const platformRow = await sb.Query.getRow("chat_data", "Platform");
@@ -164,7 +200,18 @@
 
 			let done = false;
 			do {
-				const channelName = await ask(`Enter a channel name the bot should join for platform "${platform}", or leave empty to finish:\n`);
+				let channelName = null;
+				const initialChannel = process.env.INITIAL_CHANNEL;
+
+				if (initialChannel) {
+					// Assume the user only wants to join one channel when setting up automatically
+					channelName = initialChannel;
+					done = true;
+				}
+				else {
+					channelName = await ask(`Enter a channel name the bot should join for platform "${platform}", or leave empty to finish:\n`);
+				}
+
 				if (!channelName) {
 					console.log(`Finished setting up ${platform}.`);
 					done = true;
@@ -176,23 +223,35 @@
 					Name: channelName,
 					Platform: platformList[platform].ID
 				});
-				await channelRow.save();
+
+				await channelRow.save({ 
+					ignore: true
+				});
 				
 				console.log(`Bot will now join ${platform} in channel ${channelName}.`);
+				
 			} while (!done);
 		}	
+		// Assume the user only wants to set up one platform when setting up automatically
+		if (automatic) {
+			done = true;
+		}
 	} while (!done);
 
-	const commandPrefix = await ask("Finally, select a command prefix:");
-	if (commandPrefix) {
-		const configRow = await sb.Query.getRow("data", "Config");
-		await configRow.load("COMMAND_PREFIX");	
-		configRow.values.Value = commandPrefix;
-		await configRow.save();		
-		console.log("Command prefix set.");
-	}
-	else {
-		console.log("Command prefix setup skipped!");
+	const envCommandPrefix = process.env.COMMAND_PREFIX;
+	if (!envCommandPrefix) {
+		const commandPrefix = await ask("Finally, select a command prefix:");
+
+		if (commandPrefix) {
+			const configRow = await sb.Query.getRow("data", "Config");
+			await configRow.load("COMMAND_PREFIX");
+			configRow.values.Value = commandPrefix;
+			await configRow.save();
+			console.log(`Command prefix set to "${commandPrefix}".`);
+		}
+		else {
+			console.log("Command prefix setup skipped!");
+		}
 	}
 
 	console.log("All done! Setup will now exit.");
