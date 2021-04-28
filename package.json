@@ -17,6 +17,7 @@
     "debug": "node --inspect=localhost:10001 --unhandled-rejections=warn ./master.js",
     "init-database": "node ./init/script.js --harmony-nullish --harmony-optional-chaining",
     "setup": "node ./init/setup.js --harmony-nullish --harmony-optional-chaining",
+    "auto-setup": "node ./init/auto-setup.js --harmony-nullish --harmony-optional-chaining",
     "update": "git pull origin master && yarn upgrade supi-core",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
