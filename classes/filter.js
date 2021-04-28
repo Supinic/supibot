@@ -596,7 +596,14 @@ module.exports = class Filter extends require("./template.js") {
 	}
 
 	static getFlags (options) {
-		return Filter.getLocals("Flags", options);
+		const flags = {};
+		const flagData = Filter.getLocals("Flags", options).sort((a, b) => a.priority - b.priority);
+
+		for (const flag of flagData) {
+			Object.assign(flags, flag.Data);
+		}
+
+		return flags;
 	}
 
 	static async reloadSpecific (...list) {
