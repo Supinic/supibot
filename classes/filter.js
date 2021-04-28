@@ -595,7 +595,7 @@ module.exports = class Filter extends require("./template.js") {
 		return filters[0] ?? null;
 	}
 
-	static async getFlags (options) {
+	static getFlags (options) {
 		return Filter.getLocals("Flags", options);
 	}
 
