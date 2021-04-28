@@ -222,7 +222,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 
 			const incomingEmoteSets = messageObject.emoteSets;
-			if (incomingEmoteSets.sort().join(",") !== this.availableEmoteSets.sort().join(",")) {
+			if (this.availableEmotes.length === 0 || incomingEmoteSets.sort().join(",") !== this.availableEmoteSets.sort().join(",")) {
 				this.availableEmoteSets = incomingEmoteSets;
 				this.availableEmotes = await TwitchController.fetchTwitchEmotes(this.availableEmoteSets);
 			}
