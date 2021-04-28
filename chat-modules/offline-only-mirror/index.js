@@ -11,7 +11,7 @@ module.exports = {
 			await channel.saveProperty("Data");
 			await channel.saveProperty("Mirror", null);
 		}
-		else if (event === "offline" && this.data.mirrors.has(channel) && channel.Data.offlineOnlyMirror) {
+		else if (event === "offline" && channel.Mirror === null && channel.Data.offlineOnlyMirror) {
 			const mirror = channel.Data.offlineOnlyMirror;
 			delete channel.Data.offlineOnlyMirror;
 
