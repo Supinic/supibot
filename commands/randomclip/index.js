@@ -48,7 +48,11 @@ module.exports = {
 				reply: "That user does not exist!"
 			};
 		}
-		else if (data.clips.length === 0) {
+		else if (!data.clips || data.clips.length === 0) {
+			if (!data.clips) {
+				console.warn("Unexpected Twitch API response", { statusCode, data, args, context });
+			}
+
 			return {
 				success: false,
 				reply: "No clips found!"
