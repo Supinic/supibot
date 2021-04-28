@@ -499,7 +499,7 @@ module.exports = {
 				return {
 					...result,
 					cooldown: (context.append.pipe) ? null : this.Cooldown,
-					hasExternalInput: Boolean(result.hasExternalInput ?? commandData.Flags.externalInput)
+					hasExternalInput: Boolean(result?.hasExternalInput ?? commandData.Flags.externalInput)
 				};
 			}
 	
