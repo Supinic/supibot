@@ -70,14 +70,8 @@
 	}
 	console.log("Database credentials setup successfully.");
 
-	let packageManager = null;
-	
-	const env = process.env["DEFAULT_PACKAGEMANAGER"];
-
-	if (env) {
-		packageManager = env;
-	}
-	else {
+	let packageManager = process.env.DEFAULT_PACKAGEMANAGER;
+	if (!packageManager) {
 		do {
 			packageManager = await ask("Do you use npm or yarn as your package manager?\n");
 			packageManager = packageManager.toLowerCase();
@@ -123,10 +117,9 @@
 	let done = false;
 	let automatic = false;
 	do {
-		const env = process.env["INITIAL_PLATFORM"];
-
-		if (env) {
-			platform = env;
+		const initialPlatform = process.env.INITIAL_PLATFORM;
+		if (initialPlatform) {
+			platform = initialPlatform;
 			console.log(`Attempting automatic setup for platform ${platform}`);
 			automatic = true;
 		}
@@ -146,15 +139,14 @@
 		else {
 			let pass = null;
 	
-			if (platform == "twitch") {
-				const env = process.env["TWITCH_APP_ACCESS_TOKEN"]
-				
-				if (env) {
-					pass = env;
+			if (platform === "twitch") {
+				const accessToken = process.env.TWITCH_APP_ACCESS_TOKEN;
+				if (accessToken) {
+					pass = accessToken;
 				}
 			}
 			
-			if (pass == null) {
+			if (pass === null) {
 				pass = await ask(`Enter authentication key for platform "${platform}":\n`);
 			}
 
@@ -171,11 +163,10 @@
 
 			if (platformList[platform].extra) {
 				let pass = null;
+				const extraEnv = process.env[platformList[platform].extra];
 
-				const env = process.env[platformList[platform].extra];
-
-				if (env) {
-					pass = env;
+				if (extraEnv) {
+					pass = extraEnv;
 				}
 				else {
 					pass = await ask(`Enter ${platformList[platform].extraName} for platform "${platform}":\n`);
@@ -191,19 +182,14 @@
 				await extraRow.save();
 			}
 
-			let botName = null;
-
-			const env = process.env["INITIAL_BOT_NAME"];
-
-			if (env) {
-				botName = env;
-			}
-			else {
-				botName = await ask(`Enter bot's account name for platform "${platform}":\n`);
-			}
+			let botName = process.env.INITIAL_BOT_NAME;
 			if (!botName) {
-				console.log(`Skipped setting up ${platform}!`);
-				continue;
+				botName = await ask(`Enter bot's account name for platform "${platform}":\n`);
+
+				if (!botName) {
+					console.log(`Skipped setting up ${platform}!`);
+					continue;
+				}
 			}
 			
 			const platformRow = await sb.Query.getRow("chat_data", "Platform");
@@ -215,17 +201,17 @@
 			let done = false;
 			do {
 				let channelName = null;
+				const initialChannel = process.env.INITIAL_CHANNEL;
 
-				const env = process.env["INITIAL_CHANNEL"];
-
-				if (env) {
-					channelName = env;
+				if (initialChannel) {
 					// Assume the user only wants to join one channel when setting up automatically
+					channelName = initialChannel;
 					done = true;
 				}
 				else {
 					channelName = await ask(`Enter a channel name the bot should join for platform "${platform}", or leave empty to finish:\n`);
 				}
+
 				if (!channelName) {
 					console.log(`Finished setting up ${platform}.`);
 					done = true;
@@ -233,11 +219,11 @@
 				}
 				
 				const channelRow = await sb.Query.getRow("chat_data", "Channel");
-
 				channelRow.setValues({
 					Name: channelName,
 					Platform: platformList[platform].ID
 				});
+
 				await channelRow.save({ 
 					ignore: true
 				});
@@ -252,20 +238,20 @@
 		}
 	} while (!done);
 
-	let commandPrefix = null;
+	const envCommandPrefix = process.env.COMMAND_PREFIX;
+	if (!envCommandPrefix) {
+		const commandPrefix = await ask("Finally, select a command prefix:");
 
-	if (!process.env["COMMAND_PREFIX"]) {
-		commandPrefix = await ask("Finally, select a command prefix:");
-	}
-	if (commandPrefix) {
-		const configRow = await sb.Query.getRow("data", "Config");
-		await configRow.load("COMMAND_PREFIX");	
-		configRow.values.Value = commandPrefix;
-		await configRow.save();		
-		console.log("Command prefix set.");
-	}
-	else {
-		console.log("Command prefix setup skipped!");
+		if (commandPrefix) {
+			const configRow = await sb.Query.getRow("data", "Config");
+			await configRow.load("COMMAND_PREFIX");
+			configRow.values.Value = commandPrefix;
+			await configRow.save();
+			console.log(`Command prefix set to "${commandPrefix}".`);
+		}
+		else {
+			console.log("Command prefix setup skipped!");
+		}
 	}
 
 	console.log("All done! Setup will now exit.");
