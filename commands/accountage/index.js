@@ -14,7 +14,7 @@ module.exports = {
 			url: "users",
 			searchParams: { login }
 		});
-	
+
 		if (statusCode !== 200 || body.data.length === 0) {
 			return {
 				reply: "That Twitch account has no data associated with them."
@@ -24,15 +24,15 @@ module.exports = {
 		const now = new sb.Date();
 		const created = new sb.Date(body.data[0].created_at);
 		const delta = sb.Utils.timeDelta(created, false, true);
-		const pronoun = (login.toLowerCase() === context.user.Name) ? "Your" : "That";
-	
+		const pronoun = (login.toLowerCase() === context.user.Name) ? "Your" : "Their";
+
 		let anniversary = "";
 		if (now.year > created.year && now.month === created.month && now.day === created.day) {
 			const who = (login === context.platform.Self_Name) ? "my" : pronoun.toLowerCase();
 
 			anniversary = `It's ${who} ${now.year - created.year}. Twitch anniversary! FeelsBirthdayMan Clap`;
 		}
-	
+
 		return {
 			reply: `${pronoun} Twitch account was created ${delta}. ${anniversary}`
 		};
