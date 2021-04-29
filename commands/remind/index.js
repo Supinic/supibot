@@ -229,7 +229,10 @@ module.exports = {
 			}
 		}
 
-		const message = sb.Utils.wrapString(reminderText ?? "(no message)", this.staticData.limit);
+		const message = (reminderText)
+			? sb.Utils.wrapString(reminderText, this.staticData.limit)
+			: "(no message)";
+
 		const result = await sb.Reminder.create({
 			Channel: context?.channel?.ID ?? null,
 			Platform: context.platform.ID,
