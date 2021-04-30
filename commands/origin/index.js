@@ -21,6 +21,7 @@ module.exports = {
 			.select("ID", "Text", "Tier", "Type", "Todo", "Emote_Added", "Author")
 			.from("data", "Origin")
 			.where("Name COLLATE utf8mb4_bin LIKE %s", emote)
+			.where("Replaced = %b", false)
 		);
 
 		const customIndex = context.params.index ?? null;
