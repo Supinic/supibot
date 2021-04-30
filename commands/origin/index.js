@@ -57,13 +57,15 @@ module.exports = {
 				addedString = `Added on ${data.Emote_Added.format("Y-m-d")}.`;
 			}
 
+			const text = data.Text.replace(/\[(.+?)]\(\d+\)/g, "$1");
 			const link = `https://supinic.com/data/origin/detail/${data.ID}`;
 			const type = (data.Tier) ? `T${data.Tier}` : "";
+
 			return {
 				reply: sb.Utils.tag.trim `
 					${link}					
 					${type} ${data.Type} emote:
-					${data.Text}
+					${text}
 					${addedString}
 					${authorString}
 				`
