@@ -122,7 +122,7 @@ module.exports = {
 					case "opt-out": reply = "That user has opted out from this command!"; break;
 					case "pipe-nsfw": reply = "You cannot pipe NSFW results!"; break;
 	
-					default: reply = result.reason ?? result.reply;
+					default: reply = result.reply ?? result.reason;
 				}
 	
 				return {
