@@ -10,7 +10,7 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function faq () {
 	        return {
-	            reply: `https://supinic.com/data/faq/list`
+	            reply: `FAQ list here: https://supinic.com/data/faq/list For discussions, check https://github.com/Supinic/supibot/discussions/ or make a suggestion with the $suggest command.`
 	        };
 	    }),
 	Dynamic_Description: null
