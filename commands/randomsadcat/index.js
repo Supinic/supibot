@@ -86,7 +86,8 @@ module.exports = {
 				"https://i.imgur.com/mHEzlpb.png",
 				"https://i.imgur.com/RK0utUO.png",
 				"https://i.imgur.com/KbxyatG.jpg",
-				"https://i.imgur.com/t92rgqv.png"
+				"https://i.imgur.com/t92rgqv.png",
+				"https://i.imgur.com/6jAd7Ef.mp4"
 			]
 		};
 	}),
