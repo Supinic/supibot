@@ -19,20 +19,26 @@ module.exports = {
 	Code: (async function randomAnimalPicture (context, input) {
 		const { invocations, types } = this.staticData;
 		const type = invocations[context.invocation] ?? input?.toLowerCase() ?? null;
-	
-		if (type === null) {
+
+		if (!context.user.Data.animals) {
+			return {
+				reply: `You must verify that you have any type of animal as a pet first! Verify by $suggest-ing a picture of your pet(s), along with your name and mention that you want the command access.`
+			};
+		}
+		else if (type === null) {
 			return {
 				reply: "No type provided! Use one of: " + types.join(", ")
 			};
 		}
 		else if (!types.includes(type)) {
 			return {
-				reply: "That type is not supported! Use one of: " + types.join(", ")
+				reply: "That type is not supported! Use on of: " + types.join(", ")
 			};
 		}
-		else if (!context.user.Data.animals?.[type]) {
+		else if (!context.user.Data.animals[type]) {
+			const available = Object.keys(context.user.Data.animals[type]);
 			return {
-				reply: `Only people who have verified that they have a ${type} can use this command! Verify by $suggest-ing a picture of your ${type}(s), along with your name and mention that you want the command access.`
+				reply: `You can only use this command for ${available.join(", ")}! If you want to use it for ${type}s, you need to $suggest a picture of it, like before.`
 			};
 		}
 	
