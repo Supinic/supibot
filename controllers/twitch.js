@@ -40,6 +40,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		this.availableEmotes = [];
 		this.availableEmoteSets = [];
 		this.emoteFetchPromise = null;
+		this.emoteFetchTimeout = 0;
 
 		this.initListeners();
 
@@ -221,7 +222,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			if (!this.platform.Data.updateAvailableBotEmotes) {
 				return;
 			}
-			else if (this.emoteFetchPromise) {
+			else if (this.emoteFetchPromise || this.emoteFetchTimeout > sb.Date.now()) {
 				return;
 			}
 
@@ -232,6 +233,8 @@ module.exports = class TwitchController extends require("./template.js") {
 				this.emoteFetchPromise = TwitchController.fetchTwitchEmotes(this.availableEmoteSets);
 				this.availableEmotes = await this.emoteFetchPromise;
 				this.emoteFetchPromise = null;
+
+				this.emoteFetchTimeout = sb.Date.now() + (this.platform.Data.emoteFetchTimeout ?? 10_000);
 			}
 		});
 
