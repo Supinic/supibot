@@ -54,7 +54,7 @@ module.exports = {
 	
 		const status = await sb.VideoLANConnector.status();
 		const current = queue.find(i => i.Status === "Current");
-		if (status) {
+		if (status && current) {
 			const endTime = current.End_Time ?? status.time;
 			timeRemaining -= endTime;
 		}
