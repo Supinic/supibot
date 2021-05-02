@@ -465,7 +465,7 @@ module.exports = {
                 if (data.success === false) {
                     return {
                         success: false,
-                        reply: `${data.reply} Use $cg ${command} (amount) (asset) - check the asset list here: https://supinic.com/crypto-game/asset/list`
+                        reply: `${data.reply} -- Use $cg ${command} (amount) (asset)`
                     };
                 }
 
