@@ -65,7 +65,7 @@ module.exports = {
 
 		if (hasSongRequestsAvailable) {
 			const srContext = sb.Command.createFakeContext(sr, context, { params: {} });
-			await sr.execute(srContext, link);
+			return await sr.execute(srContext, link);
 		}
 		else {
 			return {
