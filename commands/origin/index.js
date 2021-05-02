@@ -23,6 +23,7 @@ module.exports = {
 			.from("data", "Origin")
 			.where("Name COLLATE utf8mb4_bin LIKE %s", emote)
 			.where("Replaced = %b", false)
+			.orderBy(`CASE WHEN Emote_ID = '${sb.Query.escapeString(contextEmote.id ?? "")}' THEN -1 ELSE 1 END`)
 		);
 
 		const customIndex = context.params.index ?? null;
