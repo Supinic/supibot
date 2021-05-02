@@ -156,7 +156,7 @@ module.exports = class DiscordController extends require("./template.js") {
 				};
 
 				this.resolveUserMessage(channelData, userData, msg);
-				sb.Logger.push(msg, userData, channelData);
+				sb.Logger.push(sb.Utils.wrapString(msg, this.platform.Message_Limit), userData, channelData);
 
 				if (channelData.Mode !== "Read") {
 					sb.AwayFromKeyboard.checkActive(userData, channelData);
