@@ -36,7 +36,7 @@ module.exports = {
 		}
 
 		// Attempt to use the emote available in current channel (context) first, if no index is provided
-		const implicitEmote = emoteData.find(i => i.Emote_ID === contextEmote.id);
+		const implicitEmote = emoteData.find(i => i.Emote_ID === contextEmoteID);
 		if (emoteData.length > 1 && customIndex === null && !implicitEmote) {
 			return {
 				reply: `Multiple emotes found for this name! Use "index:0" through "index:${emoteData.length - 1}" to access each one.`,
