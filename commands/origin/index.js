@@ -17,7 +17,7 @@ module.exports = {
 			};
 		}
 
-		const contextEmote = context.getBestAvailableEmote([emote], null, { returnEmoteObject: true });
+		const contextEmote = await context.getBestAvailableEmote([emote], null, { returnEmoteObject: true });
 		const emoteData = await sb.Query.getRecordset(rs => rs
 			.select("ID", "Emote_ID", "Text", "Tier", "Type", "Todo", "Emote_Added", "Author")
 			.from("data", "Origin")
@@ -41,7 +41,7 @@ module.exports = {
 				cooldown: { length: 2500 }
 			};
 		}
-	
+
 		const data = (emoteData.length > 1 && customIndex === null)
 			? implicitEmote
 			: emoteData[customIndex ?? 0];
