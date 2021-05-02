@@ -45,12 +45,17 @@ module.exports = {
 
 		let result;
 		let script;
+		const string = args.join(" ");
+
 		if (context.params.function) {
 			script = context.params.function;
 			scriptArgs = args;
 		}
+		else if (!string.includes("return")) {
+			script = string;
+		}
 		else {
-			script = `(() => {\n${args.join(" ")}\n})()`;			
+			script = `(() => {\n${string}\n})()`;
 		}
 		
 		try {
