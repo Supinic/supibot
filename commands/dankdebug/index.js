@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "dankdebug",
-	Aliases: null,
+	Aliases: ["js"],
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Debug command for public use, which means it's quite limited because of security.",
