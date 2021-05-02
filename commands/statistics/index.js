@@ -373,16 +373,25 @@ module.exports = {
 			},
 			{
 				name: "suggestion",
-				aliases: ["suggestions"],
+				aliases: ["suggest", "suggestions"],
 				description: "Returns quick stats about a markov module in a given channel.",
-				execute: async (context) => {
-					const { data } = await sb.Got("Supinic", "/data/suggestion/stats/user/" + context.user.Name).json();
-					const percent = sb.Utils.round(data.userTotal / data.globalTotal, 4) * 100;
+				execute: async (context, user) => {
+					const userData = (user) ? await sb.User.get(user) : context.user;
+					if (!userData) {
+						return {
+							success: false,
+							reply: `Provided user does not exist!`
+						};
+					}
+
+					const { data } = await sb.Got("Supinic", "/data/suggestion/stats/user/" + userData.Name).json();
+					const percent = sb.Utils.round(data.userTotal / data.globalTotal * 100, 2);
+					const who = (userData === context.user) ? "You" : "They";
 
 					return {
 						reply: sb.Utils.tag.trim `
-							Your have made ${data.userTotal} suggestions, out of ${data.globalTotal} (${percent}%)							
-							More info: https://supinic.com/data/suggestion/stats/user/${context.user.Name}
+							${who} have made ${data.userTotal} suggestions, out of ${data.globalTotal} (${percent}%)							
+							More info: https://supinic.com/data/suggestion/stats/user/${userData.Name}
 							--
 							Global suggestion stats: https://supinic.com/data/suggestion/stats
 						`
