@@ -1110,11 +1110,12 @@ class Command extends require("./template.js") {
 	/**
 	 * Creates a functioning command context, with data filled in based on what data is passed
 	 * @param {Command} commandData
-	 * @param {Object|CommandContext} [contextData]
-	 * @returns {CommandContext}
+	 * @param {Object|Context} [contextData]
+	 * @param {Object} [extraData]
+	 * @returns {Context}
 	 */
-	static createFakeContext (commandData, contextData = {}) {
-		return new Context(commandData, {
+	static createFakeContext (commandData, contextData = {}, extraData = {}) {
+		const data = Object.assign({}, {
 			invocation: contextData.invocation ?? commandData.Name,
 			user: contextData.user ?? null,
 			channel: contextData.channel ?? null,
@@ -1123,7 +1124,9 @@ class Command extends require("./template.js") {
 			privateMessage: contextData.isPrivateMessage ?? false,
 			append: contextData.append ?? {},
 			params: contextData.params ?? {}
-		});
+		}, extraData);
+
+		return new Context(commandData, data);
 	}
 
 	/**
