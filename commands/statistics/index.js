@@ -375,8 +375,11 @@ module.exports = {
 				name: "suggestion",
 				aliases: ["suggest", "suggestions"],
 				description: "Returns quick stats about a markov module in a given channel.",
-				execute: async (context, user) => {
-					const userData = (user) ? await sb.User.get(user) : context.user;
+				execute: async (context, type, user) => {
+					const userData = (user)
+						? await sb.User.get(user)
+						: context.user;
+
 					if (!userData) {
 						return {
 							success: false,
