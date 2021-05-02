@@ -27,8 +27,7 @@ module.exports = {
 		let link = null;
 		let counter = 0;
 		const rg = sb.Command.get("rg");
-		const passedContext = sb.Command.createFakeContext(rg, {
-			...context,
+		const passedContext = sb.Command.createFakeContext(rg, context, {
 			params: {
 				...context.params,
 				linkOnly: true
@@ -65,7 +64,7 @@ module.exports = {
 		}
 
 		if (hasSongRequestsAvailable) {
-			const srContext = sb.Command.createFakeContext(rg, { ...context });
+			const srContext = sb.Command.createFakeContext(sr, context, { params: {} });
 			await sr.execute(srContext, link);
 		}
 		else {
