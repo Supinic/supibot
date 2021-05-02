@@ -18,12 +18,13 @@ module.exports = {
 		}
 
 		const contextEmote = await context.getBestAvailableEmote([emote], null, { returnEmoteObject: true });
+		const contextEmoteID = (contextEmote?.id) ? String(contextEmote.id) : "";
 		const emoteData = await sb.Query.getRecordset(rs => rs
 			.select("ID", "Emote_ID", "Text", "Tier", "Type", "Todo", "Emote_Added", "Author")
 			.from("data", "Origin")
 			.where("Name COLLATE utf8mb4_bin LIKE %s", emote)
 			.where("Replaced = %b", false)
-			.orderBy(`CASE WHEN Emote_ID = '${sb.Query.escapeString(contextEmote.id ?? "")}' THEN -1 ELSE 1 END`)
+			.orderBy(`CASE WHEN Emote_ID = '${sb.Query.escapeString(contextEmoteID)}' THEN -1 ELSE 1 END`)
 		);
 
 		const customIndex = context.params.index ?? null;
