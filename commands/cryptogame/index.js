@@ -194,6 +194,9 @@ module.exports = {
                     else if (value === "all") {
                         result.amount = "all";
                     }
+                    else if (value.endsWith("%")) {
+                        result.amount = value.trim();
+                    }
                     else {
                         const amount = Number(value);
                         if (!Number.isFinite(amount) || amount <= 0) {
@@ -478,6 +481,21 @@ module.exports = {
                 if (data.amount === "all") {
                     sourceAmount = portfolioData.assets.find(i => i.Code === sourceAsset.Code)?.Amount ?? 0;
                 }
+                else if (typeof data.amount === "string" && data.amount.includes("%")) {
+                    const percent = Number(data.amount.replace("%", ""));
+                    if (!Number.isFinite(percent)) {
+                        return {
+                            success: false,
+                            reply: `Invalid percentage provided!`
+                        };
+                    }
+
+                    const asset = portfolioData.assets.find(i => i.Code === sourceAsset.Code)
+                    const multiplier = sb.Utils.round(percent * 0.01, 4);
+
+                    sourceAmount = ((asset.Amount ?? 0) * multiplier);
+                }
+
                 if (sourceAsset.Code === targetAsset.Code) {
                     return {
                         success: false,
@@ -611,6 +629,11 @@ module.exports = {
             `<code>${prefix}cg buy all (asset)</code>`,
             `<code>${prefix}cg sell all (asset)</code>`,
             "You can use the key word \"all\" to exchange all of the asset you have, instead of specifying an amount.",
+            "",
+
+            `<code>${prefix}cg buy 50% (asset)</code>`,
+            `<code>${prefix}cg sell 12.5% (asset)</code>`,
+            "You can use the percent symbol to buy/sell a relative amount of a given asset, instead of specifying an amount.",
             "",
 
             "<h5>Supplementary sub-commands</h5>",
