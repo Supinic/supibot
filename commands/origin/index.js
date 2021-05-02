@@ -54,6 +54,11 @@ module.exports = {
 			};
 		}
 		else {
+			let extras = "";
+			if (emoteData.length > 1 && customIndex === null) {
+				extras = `(${emoteData.length - 1} extras) `;
+			}
+
 			let authorString = "";
 			if (data.Author) {
 				const authorUserData = await sb.User.get(data.Author);
@@ -71,6 +76,7 @@ module.exports = {
 
 			return {
 				reply: sb.Utils.tag.trim `
+					${extras}
 					${link}					
 					${type} ${data.Type} emote:
 					${text}
