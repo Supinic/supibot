@@ -202,14 +202,14 @@ module.exports = {
 				}
 	
 				const alias = aliases[targetAlias];
-				const operation = (type === "copy") ? "add" : "upsert";
-				if (wrapper.has(targetAlias) && operation !== "copyplace") {
+				if (wrapper.has(targetAlias) && type !== "copyplace") {
 					return {
 						success: false,
 						reply: `Cannot copy alias "${targetAlias} - you already have it! If you want to copy + replace, use "alias copyplace".`
 					};
 				}
 
+				const operation = (type === "copy") ? "add" : "upsert";
 				return await this.execute(
 					context,
 					operation,
