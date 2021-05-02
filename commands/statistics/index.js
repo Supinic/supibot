@@ -371,6 +371,24 @@ module.exports = {
 					};
 				}
 			},
+			{
+				name: "suggestion",
+				aliases: ["suggestions"],
+				description: "Returns quick stats about a markov module in a given channel.",
+				execute: async (context) => {
+					const { data } = await sb.Got("Supinic", "/data/suggestion/stats/user/" + context.user.Name).json();
+					const percent = sb.Utils.round(data.userTotal / data.globalTotal, 4) * 100;
+
+					return {
+						reply: sb.Utils.tag.trim `
+							Your have made ${data.userTotal} suggestions, out of ${data.globalTotal} (${percent}%)							
+							More info: https://supinic.com/data/suggestion/stats/user/${context.user.Name}
+							--
+							Global suggestion stats: https://supinic.com/data/suggestion/stats
+						`
+					};
+				}
+			},
 		]
 	})),
 	Code: (async function statistics (context, type, ...args) {
