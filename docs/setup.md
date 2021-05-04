@@ -8,7 +8,7 @@ version: "3"
 
 services:
     db:
-      image: supidb
+      image: supinic/supidb
       restart: unless-stopped
       environment:
         - MYSQL_RANDOM_ROOT_PASSWORD=1
@@ -21,7 +21,7 @@ services:
       links:
         - db
         - redis
-      image: supibot
+      image: supinic/supibot
       restart: unless-stopped
       environment:
         - "MARIA_HOST=db"
