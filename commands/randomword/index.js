@@ -22,6 +22,8 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { limit } = values.getStaticData();
+		const list = sb.Config.get("WORD_LIST");
+
 		return [
 			"Returns a random word from a list of " + list.length + " pre-determined words.",
 			"Highly recommended for its usage in pipe, for example into urban or translate...",
