@@ -22,7 +22,7 @@ Pick your platform, and follow these steps:
 To contact me, see [Contact](https://supinic.com/contact) on my website.
 
 ## Running own instance
-It's possible to host your own instance of supibot. The easiest way to do so is to use Docker.
+It's possible to host your own instance of supibot. You can either set it up as a node app manually, or use the docker image.
 
 Follow [the guide](docs/setup.md) if you are interested, and contact me if you have any questions or notes.
 
