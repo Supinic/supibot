@@ -1,11 +1,6 @@
 # Supibot
 Main repository for the multi-platform, novelty and utility chat bot Supibot.
 
-## Usage
-You can now (relatively) easily clone/fork Supibot and run a local instance! 
-
-Follow [the guide](docs/setup.md) if you are interested, and contact me if you have any questions or notes.
-
 ## Platforms
 Supibot can and is currently run on four distinct platforms:
 - [Twitch](https://twitch.tv/)
@@ -25,6 +20,11 @@ Pick your platform, and follow these steps:
 | **Minecraft server** | The owner of given Vanilla/Forge-modded Minecraft server needs to contact me, as this process is not trivial. |
 
 To contact me, see [Contact](https://supinic.com/contact) on my website.
+
+## Running own instance
+It's possible to host your own instance of supibot. The easiest way to do so is to use Docker.
+
+Follow [the guide](docs/setup.md) if you are interested, and contact me if you have any questions or notes.
 
 ## DankChat integration
 The [DankChat](https://github.com/flex3r/DankChat) mobile application for Twitch chat uses Supibot's API in order to hint its commands in any channel Supibot is actively in!
