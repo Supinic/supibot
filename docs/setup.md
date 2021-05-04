@@ -28,11 +28,13 @@ services:
         - "MARIA_USER=supibot"
         - "MARIA_PASSWORD=supibot"
         - "REDIS_CONFIGURATION=redis"
-        - "COMMAND_PREFIX=|"
-        - "INITIAL_BOT_NAME=supibot"
+        - "COMMAND_PREFIX=<command_prefix>"
+        - "INITIAL_BOT_NAME=<bot_name>"
         - "INITIAL_PLATFORM=twitch"
-        - "INITIAL_CHANNEL=supinic"
+        #- "INITIAL_PLATFORM=discord"
+        - "INITIAL_CHANNEL=<initial_channel>"
         - "TWITCH_CLIENT_ID=<your_client_id>"
+        #- "DISCORD_BOT_TOKEN=<discord_token>"
         - "TWITCH_OAUTH=<your_oauth>"
 ```
 
