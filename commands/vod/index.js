@@ -16,12 +16,19 @@ module.exports = {
 	
 		if (!target) {
 			if (context.platform.Name === "twitch") {
+				if (!context.channel) {
+					return {
+						success: false,
+						reply: "No channel provided - there is no default channel in whispers!"
+					};
+				}
+
 				target = context.channel.Name;
 			}
 			else {
 				return {
 					success: false,
-					reply: "You must provide a channel, no default is available outside of Twitch!"
+					reply: "No channel provided - there is no default channel outside of Twitch!"
 				};
 			}
 		}
