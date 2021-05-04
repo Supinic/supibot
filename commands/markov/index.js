@@ -179,7 +179,7 @@ module.exports = {
 		});
 
 		return {
-			reply: string
+			reply: `🔮 ${string}`
 		};
 
 	}),
