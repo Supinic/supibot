@@ -45,10 +45,11 @@ Setting Supibot up locally requires several steps, and is much easier if done wi
 #### Interactive
 
 1) Set up `MariaDB` of at least version `10.2.0` and credentials. Ideally, create a user separate for Supibot that has permissions on `data` and `chat_data` databases.
-2) `git clone` or `fork` the repository
-3) Run `npm/yarn install`, depending on which package manager you use
-4) Run `npm/yarn run setup` and walk through the interactive setup script, making sure to set up at least one platform, one channel and the command prefix
-5) Run `npm/yarn start`, or `npm run debug / yarn debug` for debug access
+2) Set up `Redis`
+3) `git clone` or `fork` the repository
+4) Run `npm/yarn install`, depending on which package manager you use
+5) Run `npm/yarn run setup` and walk through the interactive setup script, making sure to set up at least one platform, one channel and the command prefix
+6) Run `npm/yarn start`, or `npm run debug / yarn debug` for debug access
 
 #### Manual
 
