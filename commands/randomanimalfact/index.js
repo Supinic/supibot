@@ -36,7 +36,7 @@ module.exports = {
 			};
 		}
 		else if (!context.user.Data.animals[type]) {
-			const available = Object.keys(context.user.Data.animals[type]);
+			const available = Object.keys(context.user.Data.animals);
 			return {
 				reply: `You can only use this command for ${available.join(", ")}! If you want to use it for ${type}s, you need to $suggest a picture of it, like before.`
 			};
