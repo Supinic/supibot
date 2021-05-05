@@ -143,24 +143,87 @@ module.exports = {
 				break;
 			}
 	
-			case "check": {
-				const [name] = args;
-				if (!name) {
+			case "check":
+			case "list":
+			case "spy": {
+				let user;
+				let aliasName;
+				let prefix;
+
+				const [firstName, secondName] = args;
+				if (type === "list" || (!firstName && !secondName)) {
+					const username = encodeURIComponent(targetUser.Name);
 					return {
-						reply: `Check all your aliases here: https://supinic.com/bot/user/${context.user.Name}/alias/list`
+						reply: `List of your aliases: https://supinic.com/bot/user/${username}/alias/list`
 					};
 				}
-				else if (!wrapper.has(name)) {
+				else if (firstName && !secondName) {
+					const targetUser = await sb.User.get(firstName);
+
+					// Not a username nor current user's alias name - error out
+					if (!targetUser && !wrapper.has(firstName)) {
+						return {
+							success: false,
+							reply: `Could not match your input to username or any of your aliases!`
+						};
+					}
+					// Not a username, but current user has an alias with the provided name
+					else if (!targetUser && wrapper.has(firstName)) {
+						user = context.user;
+						aliasName = firstName;
+						prefix = "Your";						
+					}
+					// Not current user's alias, but a username exists
+					else if (targetUser && !wrapper.has(firstName)) { // Is a username
+						const who = (targetUser === context.user) ? "your" : "their";
+						const username = encodeURIComponent(targetUser.Name);
+						return {
+							reply: `List of ${who} aliases: https://supinic.com/bot/user/${username}/alias/list`
+						};
+					}
+					// Both current user's alias, and a username exists - print out special case with both links
+					else {
+						const username = encodeURIComponent(context.user.Name);
+						const escapedString = encodeURIComponent(firstName);
+						return {
+							reply: sb.Utils.tag.trim `
+								Special case! 
+								Your alias "${firstName}": https://supinic.com/bot/user/${username}/alias/detail/${escapedString}
+								--
+								List of ${firstName}'s aliases: https://supinic.com/bot/user/${escapedString}/alias/list
+							`
+						};
+					}
+				}
+				else {
+					user = await sb.User.get(firstName);
+					if (!user) {
+						return {
+							success: false,
+							reply: "Provided user does not exist!"
+						};
+					}
+
+					aliasName = secondName;
+					prefix = (context.user === user) ? "Your" : "Their";
+				}
+
+				const alias = user.Data.aliasedCommands[aliasName];
+				const message = `${prefix} alias "${aliasName}" has this definition: ${alias.invocation} ${alias.args.join(" ")}`;
+
+				const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
+				if (message.length >= limit) {
+					const escapedAliasName = encodeURIComponent(aliasName);
+					const escapedUsername = encodeURIComponent(user.Name);
 					return {
-						success: false,
-						reply: `You don't have the "${name}" alias!`
+						reply: `${prefix} alias "${firstName}" details: https://supinic.com/bot/user/${escapedUsername}/alias/detail/${escapedAliasName}`
 					};
 				}
-	
-				const { invocation, args: commandArgs } = wrapper.get(name);
-				return {
-					reply: `Your alias "${name}" has this definition: ${invocation} ${commandArgs.join(" ")}`
-				};
+				else {
+					return {
+						reply: message
+					};
+				}
 			}
 
 			case "copy":
@@ -382,12 +445,6 @@ module.exports = {
 						: `Alias "${aliasName}" has no description.`
 				};
 			}
-
-			case "list": {
-				return {
-					reply: `Check your aliases here: https://supinic.com/bot/user/${context.user.Name}/alias/list`
-				};
-			}
 	
 			case "delete":
 			case "remove": {
@@ -509,34 +566,6 @@ module.exports = {
 				};
 			}
 	
-			case "spy": {
-				const [targetUser, targetAlias] = args;
-				if (!targetUser) {
-					return {
-						success: false,
-						reply: "No target user provided!"
-					};
-				}
-	
-				const target = await sb.User.get(targetUser);
-				if (!target) {
-					return {
-						success: false,
-						reply: "Invalid user provided!"
-					};
-				}
-
-				const encodedName = encodeURIComponent(target.Name);
-				const url = (targetAlias)
-					? `https://supinic.com/bot/user/${encodedName}/alias/detail/${encodeURIComponent(targetAlias)}`
-					: `https://supinic.com/bot/user/${encodedName}/alias/list`
-
-				const word = (targetAlias) ? "alias" : "aliases";
-				return {
-					reply: `Check their ${word} here: ${url}`
-				};
-			}
-	
 			default: return {
 				success: false,
 				reply: sb.Utils.tag.trim `
@@ -576,7 +605,6 @@ module.exports = {
 			`<code>${prefix}$ (name)</code>`,
 			`<code>${prefix}alias run (name)</code>`,
 			"Runs your command alias!, e.g.:",
-	
 			`<code>${prefix}$ <u>hello</u></code> => Hallo!`,
 			`<code>${prefix}alias run <u>hello</u></code> => Hallo!`,
 			"",
@@ -588,9 +616,16 @@ module.exports = {
 			"If you use <code>copyplace</code>, it will replace whatever alias you have with that name without asking.",
 			"",
 	
-			`<code>${prefix}alias check (name)</code>`,
-			"Posts the definition of given alias to chat, e.g.:",
-			`<code>${prefix}alias check <u>hello</u></code> => "translate to:german Hello!"`,
+			`<code>${prefix}alias check</code>`,
+			`<code>${prefix}alias spy</code>`,
+			`<code>${prefix}alias check (alias)</code>`,
+			`<code>${prefix}alias check (user)</code>`,
+			`<code>${prefix}alias check (user) (alias)</code>`,
+			"Checks your or someone else's aliases You can use <code>alias spy</code> instead of <code>check</code>.",
+			"No params - gives you the link with the list of your aliases.",
+			"One param - your alias - gives you the definition of your alias with that name.",
+			"One param - user name - gives you the link with the list of that user's aliases.",
+			"Two param - user name + alias name - gives you the definition of that user's alias.",
 			"",
 	
 			`<code>${prefix}alias edit (name)</code>`,
@@ -629,14 +664,6 @@ module.exports = {
 			`<code>${prefix}alias inspect (alias)</code>`,
 			`<code>${prefix}alias inspect (username) (alias)</code>`,
 			"If your or someone else's alias has a description, this command will print it to chat.",
-			"",
-
-			`<code>${prefix}alias spy (user)</code>`,
-			"Lists all active aliases the target person currently has.",
-			"",
-	
-			`<code>${prefix}alias spy (user) (name)</code>`,
-			"Posts the definition of the alias with given name, that belongs to given person.",
 			"",
 	
 			"<h5>Replacements</h5>",
