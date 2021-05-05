@@ -526,13 +526,14 @@ module.exports = {
 					};
 				}
 
-				const word = (targetAlias) ? "alias" : "aliases";
-				const linkSuffix = (targetAlias)
-					? encodeURIComponent(targetAlias)
-					: "list"
+				const encodedName = encodeURIComponent(target.Name);
+				const url = (targetAlias)
+					? `https://supinic.com/bot/user/${encodedName}/alias/detail/${encodeURIComponent(targetAlias)}`
+					: `https://supinic.com/bot/user/${encodedName}/alias/list`
 
+				const word = (targetAlias) ? "alias" : "aliases";
 				return {
-					reply: `Check their ${word} here: https://supinic.com/bot/user/${encodeURIComponent(target.Name)}/alias/${linkSuffix}`
+					reply: `Check their ${word} here: ${url}`
 				};
 			}
 	
