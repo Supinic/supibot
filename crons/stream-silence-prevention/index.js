@@ -14,6 +14,11 @@ module.exports = {
 		if (!this.data.repeatsAmount) {
 			this.data.repeatsAmount = 25;
 		}
+
+		// early return - avoid errors during modules loading
+		if (!sb.Channel || !sb.Platform || !sb.VideoLANConnector) {
+			return;
+		}
 	
 		const twitch = sb.Platform.get("twitch");
 		const cytube = sb.Platform.get("cytube");
