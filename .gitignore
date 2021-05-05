@@ -1,3 +1,5 @@
 .idea
 node_modules
 db-access.js
+.nyc_output
+yarn-error.log
