@@ -823,7 +823,7 @@ css-what@^5.0.0:
 
 "cytube-connector@github:Supinic/cytube-connector":
   version "2.1.0"
-  resolved "https://codeload.github.com/Supinic/cytube-connector/tar.gz/bb404b8f868a3fd60e6c7e696c14e0918947b016"
+  resolved "https://codeload.github.com/Supinic/cytube-connector/tar.gz/b44e201f33c7499a6caae8830e4a153d4b2a878a"
   dependencies:
     got "^11.3.0"
     socket.io-client "^2.4.0"
