@@ -158,11 +158,25 @@ module.exports = {
 	
 			await user.saveProperty("Data");
 		}
-	
-		const replyPlace = (skipLocation) ? "(location hidden)" : place;
-		return {
-			reply: `${replyPlace} is currently observing ${timeData.timeZoneName}, which is UTC${offset}, and it's ${time.format("H:i (Y-m-d)")} there right now.`
-		};
+
+		const locationDateTime = time.format("H:i (Y-m-d)");
+		if (skipLocation) {
+			return {
+				reply: sb.Utils.tag.trim `
+					(location hidden) is using UTC${offset},
+					and it's ${locationDateTime} there right now.
+				 `
+			};
+		}
+		else {
+			return {
+				reply: sb.Utils.tag.trim `
+					${place} is currently observing ${timeData.timeZoneName}, 
+					which is UTC${offset},
+					and it's ${locationDateTime} there right now.
+				 `
+			};
+		}
 	}),
 	Dynamic_Description: null
 };
