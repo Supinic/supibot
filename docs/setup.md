@@ -10,6 +10,8 @@ services:
     db:
       image: supinic/supidb
       restart: unless-stopped
+      volumes:
+        - <path_to_store_db>:/var/lib/mysql
       environment:
         - MYSQL_RANDOM_ROOT_PASSWORD=1
         - MYSQL_PASSWORD=supibot
