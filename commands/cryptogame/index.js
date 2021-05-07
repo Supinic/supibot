@@ -72,7 +72,7 @@ module.exports = {
 
                     row.values.Price = sb.Utils.round(adjustedValue, 9, { direction: "round" });
                     row.values.Last_Update = now;
-                    await row.save();
+                    await row.save({ skipLoad: true });
                 });
 
                 await Promise.all(promises);
@@ -248,7 +248,7 @@ module.exports = {
                     Asset: assetData.Code,
                     Amount: amount
                 });
-                await row.save();
+                await row.save({ skipLoad: true });
             }
             else {
                 if ((targetAsset.Amount + amount) < 0) {
@@ -282,7 +282,7 @@ module.exports = {
             });
 
             await Promise.all([
-                row.save(),
+                row.save({ skipLoad: true }),
                 updatePortfolioAsset(sourcePortfolio, assetData, -amount),
                 updatePortfolioAsset(targetPortfolio, assetData, amount)
             ]);
@@ -311,7 +311,7 @@ module.exports = {
             });
 
             await Promise.all([
-                row.save(),
+                row.save({ skipLoad: true }),
                 updatePortfolioAsset(portfolioData, sourceAsset, -sourceAmount),
                 updatePortfolioAsset(portfolioData, targetAsset, targetAmount)
             ]);
@@ -364,8 +364,7 @@ module.exports = {
         const portfolioData = await getPortfolioData(context.user.ID);
         switch (command) {
             case "register": {
-                const portfolios = await getPortfolioData(context.user.ID);
-                if (portfolios) {
+                if (portfolioData) {
                     return {
                         success: false,
                         reply: "You already registered for a portfolio!"
@@ -374,7 +373,10 @@ module.exports = {
 
                 const portfolioRow = await sb.Query.getRow("crypto_game", "Portfolio");
                 portfolioRow.values.Owner = context.user.ID;
-                await portfolioRow.save();
+
+                // @todo with proper row-loading in Query.Row with MariaDB 10.5+ - remove skipLoad,
+                // and then re-fetch of new Portfolio ID
+                await portfolioRow.save({ skipLoad: true });
 
                 const portfolioID = await sb.Query.getRecordset(rs => rs
                     .select("ID")
