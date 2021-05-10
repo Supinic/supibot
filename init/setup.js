@@ -54,7 +54,7 @@
 			console.log(`Database ${name} is already set up - skipping...`);
 		}
 		else {
-			const result = await ask(`Set up database ${name} - type a new value (or nothing to ${name === 'port' ? 'use 3306' : 'keep empty'})\n`);
+			const result = await ask(`Set up database ${name} - type a new value (or nothing to ${name === "port" ? "use 3306" : "keep empty"})\n`);
 			
 			if (!result) {
 				accessFileString = accessFileString.replace(implicit, "");

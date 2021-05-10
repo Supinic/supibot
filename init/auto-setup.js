@@ -96,8 +96,8 @@
 	else {
 		const channelRow = await sb.Query.getRow("chat_data", "Channel");
 		const exists = await sb.Query.getRecordset(rs => rs
-		    .select("1")
-		    .from("chat_data", "Channel")
+			.select("1")
+			.from("chat_data", "Channel")
 			.where("Name = %s", channelName)
 			.where("Platform = %n", platformData.ID)
 			.flat("1")

@@ -1,3 +1,5 @@
+/* global it, describe, beforeEach, afterEach */
+
 const assert = require("assert");
 
 require("dank-twitch-irc");
