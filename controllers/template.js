@@ -2,6 +2,7 @@
 /**
  * @name {Controller}
 */
+const LINK_REGEX = /(https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&/=]*)/gi;
 module.exports = class Controller {
 	data = {
 		crons: []
@@ -111,10 +112,14 @@ module.exports = class Controller {
 				return false;
 			}
 
-			// Remove all links, if the channel requires it
-			if (!channelData.Links_Allowed) {
-				// replace all links with a placeholder
-				message = message.replace(sb.Config.get("LINK_REGEX"), "[LINK]");
+			// Remove all links, if the channel requires it - replace all links with a placeholder
+			if (channelData.Links_Allowed === false) {
+				let regex = LINK_REGEX;
+				if (sb.Config && sb.Config.has("LINK_REGEX", true)) {
+					regex = sb.Config.get("LINK_REGEX");
+				}
+
+				message = message.replace(regex, "[LINK]");
 			}
 
 			if (!options.skipLengthCheck) {
