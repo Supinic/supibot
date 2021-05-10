@@ -1,10 +1,9 @@
 /* global it, describe, beforeEach, afterEach */
-
 const assert = require("assert");
 
 require("dank-twitch-irc");
-const MockClient = require("./mock-client.js");
-require.cache[require.resolve("dank-twitch-irc")].exports = MockClient;
+const MockTwitchClient = require("./mock-client.js");
+require.cache[require.resolve("dank-twitch-irc")].exports = MockTwitchClient;
 
 const initialize = (async () => {
 	await require("supi-core")("sb", {
@@ -28,9 +27,8 @@ const initialize = (async () => {
 		]
 	});
 
-	sb.Mock = {};
 	sb.Utils = {
-		deepFreeze: obj => obj
+		wrapString: string => string
 	};
 
 	sb.User.data = new Map([
@@ -61,11 +59,6 @@ const initialize = (async () => {
 	];
 
 	sb.Command.data = [];
-
-	sb.Master = {
-		prepareMessage: (message) => message
-	};
-
 	sb.Config.data = new Map([
 		["TWITCH_OAUTH", new sb.Config({
 			Name: "TWITCH_OAUTH",
@@ -161,7 +154,7 @@ describe("twitch controller",  function () {
 	});
 
 	it("adds a channel to join later when a JoinError is encountered", function () {
-		const error = new MockClient.JoinError("Failed to say message: 123");
+		const error = new MockTwitchClient.JoinError("Failed to say message: 123");
 		error.failedChannelName = "twitch";
 
 		controller.client.emit("error", error);
