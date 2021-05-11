@@ -142,7 +142,8 @@ module.exports = {
 
 				break;
 			}
-	
+
+			case "code":
 			case "check":
 			case "list":
 			case "spy": {
@@ -224,15 +225,26 @@ module.exports = {
 					}
 				}
 
+				let message;
 				const alias = user.Data.aliasedCommands[aliasName];
-				const message = `${prefix} alias "${aliasName}" has this definition: ${alias.invocation} ${alias.args.join(" ")}`;
+				if (type === "code") {
+					message = `${alias.invocation} ${alias.args.join(" ")}`;
+				}
+				else {
+					message = `${prefix} alias "${aliasName}" has this definition: ${alias.invocation} ${alias.args.join(" ")}`;
+				}
 
 				const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
 				if (message.length >= limit) {
 					const escapedAliasName = encodeURIComponent(aliasName);
 					const escapedUsername = encodeURIComponent(user.Name);
+					let prefix = "";
+					if (type !== "code") {
+						prefix = `${prefix} alias "${firstName}" details: `;
+					}
+
 					return {
-						reply: `${prefix} alias "${firstName}" details: https://supinic.com/bot/user/${escapedUsername}/alias/detail/${escapedAliasName}`
+						reply: `${prefix}https://supinic.com/bot/user/${escapedUsername}/alias/detail/${escapedAliasName}`
 					};
 				}
 				else {
@@ -634,10 +646,13 @@ module.exports = {
 	
 			`<code>${prefix}alias check</code>`,
 			`<code>${prefix}alias spy</code>`,
+			`<code>${prefix}alias code</code>`,
 			`<code>${prefix}alias check (alias)</code>`,
 			`<code>${prefix}alias check (user)</code>`,
 			`<code>${prefix}alias check (user) (alias)</code>`,
-			"Checks your or someone else's aliases You can use <code>alias spy</code> instead of <code>check</code>.",
+			"Checks your or someone else's aliases.",
+			"You can use <code>alias spy</code> instead of <code>check</code>.",
+			"You can use <code>alias code</code> instead of <code>check</code> - this will post the invocation directly, without fluff.",
 			"No params - gives you the link with the list of your aliases.",
 			"One param - your alias - gives you the definition of your alias with that name.",
 			"One param - user name - gives you the link with the list of that user's aliases.",
