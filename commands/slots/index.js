@@ -22,7 +22,10 @@ module.exports = {
 			},
 			{
 				name: "#gachi",
-				pattern: (context, emotes) => emotes.filter(i => i.name.test(/^[gG]achi/)),
+				pattern: (context, emotes) => {
+					const regex = /^[gG]achi/;
+					return emotes.filter(i => regex.test(i.name));
+				},
 				notes: "Selects all gachimuchi-related emotes."
 			},
 			{
