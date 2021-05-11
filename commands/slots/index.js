@@ -249,8 +249,8 @@ module.exports = {
 			"Three rolls will be chose randomly. Get the same one three times for a win.",
 			"",
 	
-			`<code>${prefix}slots #(pattern)</code>`,
-			"Uses a pre-determined or dynamic pattern as your list of words.",
+			`<code>${prefix}slots pattern:(pattern name)</code>`,
+			"Uses a pre-determined or dynamic pattern as your list of words. See below.",
 			"",
 	
 			"Supported patterns:",
