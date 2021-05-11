@@ -9,6 +9,7 @@ module.exports = (function () {
 
 	const definition = {};
 	const subroutes = [
+		["afk", "afk.js"],
 		["channel", "channel.js"],
 		["reminder", "reminder.js"],
 	];
