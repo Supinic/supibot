@@ -183,16 +183,23 @@ module.exports = {
 					}
 					// Both current user's alias, and a username exists - print out special case with both links
 					else {
-						const username = encodeURIComponent(context.user.Name);
-						const escapedString = encodeURIComponent(firstName);
-						return {
-							reply: sb.Utils.tag.trim `
-								Special case! 
-								Your alias "${firstName}": https://supinic.com/bot/user/${username}/alias/detail/${escapedString}
-								--
-								List of ${firstName}'s aliases: https://supinic.com/bot/user/${escapedString}/alias/list
-							`
-						};
+						const targetAliases = Object.keys(targetUser.Data.aliasedCommands ?? {});
+						if (targetAliases.length !== 0) {
+							const username = encodeURIComponent(context.user.Name);
+							const escapedString = encodeURIComponent(firstName);
+							return {
+								reply: sb.Utils.tag.trim `
+									Special case! 
+									Your alias "${firstName}": https://supinic.com/bot/user/${username}/alias/detail/${escapedString}
+									List of ${firstName}'s aliases: https://supinic.com/bot/user/${escapedString}/alias/list
+								`
+							};
+						}
+						else {
+							user = context.user;
+							aliasName = firstName;
+							prefix = "Your";
+						}
 					}
 				}
 				else {
