@@ -213,6 +213,15 @@ module.exports = {
 
 					aliasName = secondName;
 					prefix = (context.user === user) ? "Your" : "Their";
+
+					const userAliases = Object.keys(user.Data.aliasedCommands ?? {});
+					if (!userAliases.incldues(aliasName)) {
+						const who = (context.user === user) ? "You" : "They";
+						return {
+							success: false,
+							reply: `${who} don't have the "${aliasName}" alias!`
+						};
+					}
 				}
 
 				const alias = user.Data.aliasedCommands[aliasName];
