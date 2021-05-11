@@ -42,7 +42,8 @@ module.exports = {
 				const sourceUser = await sb.Query.getRow("chat_data", "Extra_User_Data");
 				await sourceUser.load(context.user.ID, true);
 				if (!sourceUser.loaded) {
-					await sourceUser.save();
+					sourceUser.values.User_Alias = context.user.ID;
+					await sourceUser.save({});
 				}
 	
 				if (targetUserData === context.user) {
@@ -56,6 +57,7 @@ module.exports = {
 				const targetUser = await sb.Query.getRow("chat_data", "Extra_User_Data");
 				await targetUser.load(targetUserData.ID, true);
 				if (!targetUser.loaded) {
+					targetUser.values.User_Alias = targetUserData.ID;
 					await targetUser.save();
 				}
 		
