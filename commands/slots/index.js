@@ -177,6 +177,13 @@ module.exports = {
 				cooldown: 5000
 			};
 		}
+
+		if (!context.channel) {
+			return {
+				success: false,
+				reply: `This command cannot be used in private messages!`
+			};
+		}
 	
 		const check = this.staticData.patterns.find(i => i.name === emotes[0]);
 		let limit = 3;
