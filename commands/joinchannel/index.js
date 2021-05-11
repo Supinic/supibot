@@ -37,8 +37,8 @@ module.exports = {
 
 		let channelData;
 		if (platformName === "twitch") {
-			const { controller } = sb.Platform.get("twitch");
-			const channelID = await controller.getUserID(channel);
+			const platformData = sb.Platform.get("twitch");
+			const channelID = await platformData.controller.getUserID(channel);
 			if (!channelID) {
 				return {
 					success: false,
@@ -46,8 +46,8 @@ module.exports = {
 				};
 			}
 
-			await sb.Channel.add(channel, context.platform, mode ?? "Write", channelID);
-			await context.platform.client.join(channel);
+			await sb.Channel.add(channel, platformData, mode ?? "Write", channelID);
+			await platformData.client.join(channel);
 
 			channelData = sb.Channel.get(channel);
 		}
