@@ -22,12 +22,8 @@ module.exports = {
 			},
 			{
 				name: "#gachi",
-				pattern: [
-					"gachiCOOL", "gachiJAM", "gachiHop", "gachiANGEL", "gachiBOP",
-					"gachiBASS", "gachiHYPER", "GachiPls", "gachiVICTORY", "gachiOnFIRE",
-					"gachiGold", "gachiPRIDE"
-				],
-				notes: "Contains most gachi emotes. Based on pajlada's selection in his channel."
+				pattern: (context, emotes) => emotes.filter(i => i.name.test(/^[gG]achi/)),
+				notes: "Selects all gachimuchi-related emotes."
 			},
 			{
 				name: "#blob",
@@ -196,7 +192,8 @@ module.exports = {
 				emotes = check.pattern;
 			}
 			else if (typeof check.pattern === "function") {
-				const result = await check.pattern(context, ...emotes);
+				const channelEmotes = await context.channel.fetchEmotes();
+				const result = await check.pattern(context, channelEmotes);
 	
 				if (typeof result === "string") {
 					// This basically means something went wrong somehow (like no emotes found in that channel)
