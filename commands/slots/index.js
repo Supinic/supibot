@@ -24,7 +24,7 @@ module.exports = {
 				name: "#gachi",
 				pattern: (context, emotes) => {
 					const regex = /^[gG]achi/;
-					return emotes.filter(i => regex.test(i.name));
+					return emotes.filter(i => regex.test(i.name)).map(i => i.name);
 				},
 				notes: "Selects all gachimuchi-related emotes."
 			},
@@ -41,102 +41,28 @@ module.exports = {
 			},
 			{
 				name: "#twitch",
-				pattern: () => {
-					const { controller } = sb.Platform.get("twitch");
-					if ((controller?.availableEmotes ?? []).length === 0) {
-						return "Twitch messed up, no emotes available...";
-					}
-	
-					return controller.availableEmotes
-						.filter(emoteSet => emoteSet.tier === null)
-						.flatMap(emoteSet => emoteSet.emotes.map(emote => emote.token));
-				},
+				pattern: (context, emotes) => emotes.filter(i => i.type === "twitch-global").map(i => i.name),
 				notes: "All Twitch global emotes."
 			},
 			{
 				name: "#sub",
-				pattern: () => {
-					const { controller } = sb.Platform.get("twitch");
-					if ((controller?.availableEmotes ?? []).length === 0) {
-						return "Twitch messed up, no emotes available...";
-					}
-	
-					return controller.availableEmotes
-						.filter(emoteSet => ["1", "2", "3"].includes(emoteSet.tier))
-						.flatMap(emoteSet => emoteSet.emotes.map(emote => emote.token));
-				},
-				notes: "Rolls random emotes from supibot's current subscriber emote list."
+				pattern: (context, emotes) => emotes.filter(i => i.type === "twitch-subscriber").map(i => i.name),
+				notes: "Rolls random emotes from Supibot's current subscriber emote list."
 			},
 			{
 				name: "#bttv",
-				pattern: (async function slotsPattern_bttv (context) {
-					const data = await sb.Got({
-						throwHttpErrors: false,
-						url: "https://api.betterttv.net/2/channels/" + context.channel.Name
-					}).json();
-	
-					if (data.status === 404 || !data.emotes || data.emotes.length === 0) {
-						return "Well, yeah, but BTTV is like a 3rd party thing, and I don't know...";
-					}
-	
-					return data.emotes.map(i => i.code);
-				}),
+				pattern: (context, emotes) => emotes.filter(i => i.type === "bttv").map(i => i.name),
 				notes: "Rolls from BTTV emotes in the current channel."
 			},
 			{
 				name: "#ffz",
-				pattern: (async function slotsPattern_ffz (context) {
-					const { statusCode, body: data } = await sb.Got({
-						responseType: "json",
-						throwHttpErrors: false,
-						url: "https://api.frankerfacez.com/v1/room/" + context.channel.Name
-					});
-	
-					if (statusCode === 404) {
-						return { reply: "This channel doesn't exist within FFZ database!" };
-					}
-					else if (!data.sets) {
-						return { reply: "No FFZ emotes found!" };
-					}
-	
-					const set = Object.keys(data.sets)[0];
-					if (data.sets[set].emoticons.length === 0) {
-						return { reply: "This channel has no FFZ emotes enabled." };
-					}
-	
-					return data.sets[set].emoticons.map(i => i.name);
-				}),
+				pattern: (context, emotes) => emotes.filter(i => i.type === "ffz").map(i => i.name),
 				notes: "Rolls from FFZ emotes in the current channel."
 			},
 			{
 				name: "#pepe",
-				pattern: (async function slotsPattern_pepe (context) {
-					const fullEmotesList = (await Promise.all([
-						(async () => {
-							const raw = await sb.Got("https://api.betterttv.net/2/channels/" + context.channel.Name).json();
-							if (raw.status === 404 || raw.emotes.length === 0) {
-								return [];
-							}
-	
-							return raw.emotes.map(i => i.code);
-						})(),
-						(async () => {
-							const raw = await sb.Got("https://api.frankerfacez.com/v1/room/" + context.channel.Name).json();
-							const set = Object.keys(raw.sets)[0];
-							if (raw.sets[set].emoticons.length === 0) {
-								return [];
-							}
-	
-							return raw.sets[set].emoticons.map(i => i.name);
-						})()
-					])).flat();
-	
-					const filtered = fullEmotesList.filter(i => i.toLowerCase().includes("pepe"));
-					return (filtered.length >= 3)
-						? filtered
-						: "Not enough pepe- emotes are active in this channel supiniL";
-				}),
-				notes: "Rolls from all emotes in the current channel that contain the string \"pepe"
+				pattern: (context, emotes) => emotes.filter(i => i.name.toLowerCase().startsWith("pepe")).map(i => i.name),
+				notes: "Rolls from all Pepe-related emotes in the current channel."
 			},
 			{
 				name: "#lotto",
