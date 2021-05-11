@@ -19,16 +19,14 @@ module.exports = {
 			if (!data) {
 				let apiData;
 				if (!options.seasonal) {
-					apiData = await sb.Got("Supinic", {
-						url: "osrs/lookup/" + user,
-						timeout: 10000
-					}).json();
+					apiData = await sb.Got("Supinic", `osrs/lookup/${user}`).json();
 				}
 				else {
 					apiData = await sb.Got("Supinic", {
 						url: "osrs/lookup/" + user,
-						searchParams: new sb.URLParams().set("seasonal", "1").toString(),
-						timeout: 10000,
+						searchParams: {
+							seasonal: "1"
+						}
 					}).json();
 				}
 	
@@ -74,7 +72,7 @@ module.exports = {
 			"chaos fanatic", "clue scrolls (all)", "clue scrolls (beginner)", "clue scrolls (easy)", "clue scrolls (elite)",
 			"clue scrolls (hard)", "clue scrolls (master)", "clue scrolls (medium)", "commander zilyana", "corporeal beast", 
 			"crazy archaeologist", "dagannoth prime", "dagannoth rex", "dagannoth supreme", "deranged archaeologist",
-			"general graardor", "giant mole", "grotesque guardians", "hespori", "k'ril tsutsaroth", "kalphite queen", 
+			"general graardor", "giant mole", "grotesque guardians", "hespori", "k'ril tsutsaroth", "kalphite queen",
 			"king black dragon", "kraken", "kree'arra", "league points", "lms - rank", "mimic", "nightmare", "obor", "sarachnis",
 			"scorpia", "skotizo", "tempoross", "the corrupted gauntlet", "the gauntlet", "theatre of blood", "thermonuclear smoke devil",
 			"tzkal-zuk", "tztok-jad", "venenatis", "vet'ion", "vorkath", "wintertodt", "zalcano", "zulrah"
