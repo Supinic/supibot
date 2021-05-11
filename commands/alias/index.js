@@ -215,7 +215,7 @@ module.exports = {
 					prefix = (context.user === user) ? "Your" : "Their";
 
 					const userAliases = Object.keys(user.Data.aliasedCommands ?? {});
-					if (!userAliases.incldues(aliasName)) {
+					if (!userAliases.includes(aliasName)) {
 						const who = (context.user === user) ? "You" : "They";
 						return {
 							success: false,
