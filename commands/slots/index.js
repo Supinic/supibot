@@ -212,7 +212,7 @@ module.exports = {
 			});
 
 			// Discard the row save result - not needed anywhere
-			const [, pogEmote] = Promise.all([
+			const [, pogEmote] = await Promise.all([
 				row.save(),
 				context.getBestAvailableEmote(["PagChomp", "Pog", "PogChamp"], "🎉")
 			]);
