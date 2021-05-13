@@ -50,10 +50,10 @@ module.exports = {
 			if (globalEmotes === true && !i.global || globalEmotes === false && i.global) {
 				return false;
 			}
-			if (sub === true && i.type !== "twitch-subscriber" || bttv === false && i.type === "twitch-subscriber") {
+			if (sub === true && i.type !== "twitch-subscriber" || sub === false && i.type === "twitch-subscriber") {
 				return false;
 			}
-			if (twitch === true && i.type !== "twitch-global" || bttv === false && i.type === "twitch-global") {
+			if (twitch === true && i.type !== "twitch-global" || twitch === false && i.type === "twitch-global") {
 				return false;
 			}
 			if (context.params.regex && !context.params.regex.test(i.name)) {
