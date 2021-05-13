@@ -141,7 +141,7 @@ module.exports = {
                     ["$abb replace regex:/foo/ replacement:NaM Damn foo spam", "Damn NaM spam"],
                 ],
                 execute: (context, ...args) => {
-                    if (!context.params.regex || !context.params.replacement) {
+                    if (context.params.regex || typeof context.params.replacement !== "string") {
                         return {
                             success: false,
                             reply: `Missing parameter(s)! regex, replacement`
