@@ -639,10 +639,10 @@ class Command extends require("./template.js") {
 			for (const match of quoteMatches.reverse()) {
 				argsString = argsString.slice(0, match.index) + argsString.slice(match.index + match[0].length + 1);
 
-				const { name, value } = match.groups;
+				const { name = null, value = null } = match.groups;
 				const { type } = command.Params.find(i => i.name === name);
 
-				if (name && value) {
+				if (name !== null && value !== null) {
 					const cleanValue = value.replace(/^"|"$/g, "").replace(/\\"/g, "\"");
 					const parsedValue = Command.parseParameter(cleanValue, type);
 					if (parsedValue === null) {
@@ -680,10 +680,10 @@ class Command extends require("./template.js") {
 					continue;
 				}
 
-				const { name, value } = remainingArgs[i].match(paramRegex).groups;
+				const { name = null, value = null } = remainingArgs[i].match(paramRegex).groups;
 				const { type } = command.Params.find(i => i.name === name);
 
-				if (name && value) {
+				if (name !== null && value !== null) {
 					const parsedValue = Command.parseParameter(value, type);
 					if (parsedValue === null) {
 						sb.CooldownManager.unsetPending(userData.ID);
