@@ -161,7 +161,7 @@ class CytubeClient {
 				platform: this.controller.platform
 			});
 
-			if (data.username === this.controller.platform.Data.Self_Name) {
+			if (data.username === this.controller.platform.Self_Name) {
 				return;
 			}
 
