@@ -10,12 +10,16 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function faq (context, ...args) {
 		if (args.length > 0) {
-			const query = args.join(" ").toLowerCase()
-			const data = await sb.Query.getRecordset(rs => rs
-			    .select("Question", "Answer")
-			    .from("data", "FAQ")
-				.where("LOWER(Question) %*like*", query)
-			);
+			const data = await sb.Query.getRecordset(rs => {
+				rs.select("Question", "Answer");
+				rs.from("data", "FAQ");
+
+				for (const word of args) {
+					rs.where("LOWER(Question) %*like*", word.toLowerCase());
+				}
+
+				return rs;
+			});
 
 			if (data.length === 1) {
 				const row = data[0];
