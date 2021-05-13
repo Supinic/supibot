@@ -161,6 +161,10 @@ class CytubeClient {
 				platform: this.controller.platform
 			});
 
+			if (data.username === this.controller.platform.Data.Self_Name) {
+				return;
+			}
+
 			// Handle commands if the message starts with the command prefix
 			if (sb.Command.is(msg)) {
 				const commandPrefix = sb.Command.prefix;
