@@ -37,6 +37,7 @@ module.exports = {
 			url: "games",
 			searchParams
 		}).json();
+
 		if (gameData.length === 0) {
 			return {
 				success: false,
