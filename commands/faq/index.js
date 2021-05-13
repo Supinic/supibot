@@ -19,8 +19,11 @@ module.exports = {
 
 			if (data.length === 1) {
 				const row = data[0];
+				const answer = sb.Utils.removeHTML(row.Answer);
+				const question = sb.Utils.removeHTML(row.Question);
+
 				return {
-					reply: `Q: ${row.Question} A: ${row.Answer}`
+					reply: `Q: ${question} A: ${answer}`
 				};
 			}
 		}
