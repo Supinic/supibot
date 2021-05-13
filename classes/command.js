@@ -633,7 +633,7 @@ class Command extends require("./template.js") {
 			const paramNames = command.Params.map(i => i.name);
 
 			let argsString = args.join(" ");
-			const quotesRegex = new RegExp(`(?<name>${paramNames.join("|")}):(?<!\\\\)"(?<value>.+?)(?<!\\\\)"`, "g");
+			const quotesRegex = new RegExp(`(?<name>${paramNames.join("|")}):(?<!\\\\)"(?<value>.*?)(?<!\\\\)"`, "g");
 			const quoteMatches = [...argsString.matchAll(quotesRegex)];
 
 			for (const match of quoteMatches.reverse()) {
@@ -674,7 +674,7 @@ class Command extends require("./template.js") {
 			}
 
 			const remainingArgs = argsString.split(" ");
-			const paramRegex = new RegExp(`^(?<name>${paramNames.join("|")}):(?<value>.+)$`);
+			const paramRegex = new RegExp(`^(?<name>${paramNames.join("|")}):(?<value>.*)$`);
 			for (let i = remainingArgs.length - 1; i >= 0; i--) {
 				if (!paramRegex.test(remainingArgs[i])) {
 					continue;
