@@ -5,6 +5,8 @@ module.exports = class TwitchController extends require("./template.js") {
 	constructor () {
 		super();
 
+		this.dynamicChannelAddition = true;
+
 		this.platform = sb.Platform.get("twitch");
 		if (!this.platform) {
 			throw new sb.Error({
