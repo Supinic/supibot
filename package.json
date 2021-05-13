@@ -37,6 +37,9 @@
   },
   "nyc": {
     "all": false,
-    "reporter": ["text", "html"]
+    "reporter": [
+      "text",
+      "html"
+    ]
   }
 }
