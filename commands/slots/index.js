@@ -179,7 +179,13 @@ module.exports = {
 				}
 			}
 		}
-	
+		else if (context.params.pattern) { // pattern provided as a param, but no match found - error
+			return {
+				success: false,
+				reply: `Provided slots preset does not exist!`
+			};
+		}
+		
 		if (type === "array") {
 			if (emotes === null || emotes.length < limit) {
 				return {
