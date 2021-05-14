@@ -110,7 +110,7 @@ module.exports = class Filter extends require("./template.js") {
 								const flags = (lastSlashIndex !== -1) ? string.slice(lastSlashIndex + 1) : "";
 
 								try {
-									arg.regex = new RegExp(regexBody, flags);
+									obj.regex = new RegExp(regexBody, flags);
 								}
 								catch (e) {
 									console.warn("Invalid string regex representation", e);
@@ -201,7 +201,7 @@ module.exports = class Filter extends require("./template.js") {
 				const { index, range, regex, string } = item;
 				for (let i = 0; i < data.length; i++) {
 					const positionCheck = (i === index || (range[0] <= index && index <= range[1]));
-					const valueCheck = ((string && data[i] === string) || (regex && data[i].test(regex)));
+					const valueCheck = ((string && data[i] === string) || (regex && regex.test(data[i])));
 					if (positionCheck && valueCheck) {
 						return true;
 					}
