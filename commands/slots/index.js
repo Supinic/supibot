@@ -134,10 +134,11 @@ module.exports = {
 		const rolledItems = [];
 
 		let deprecationWarning = "";
-		let patternName = context.params.pattern ?? args[0] ?? "";
-		if (patternName.startsWith("#")) {
-			patternName = patternName.slice(1);
+		let patternName = context.params.pattern ?? null;
+		if (args[0] && args[0].startsWith("#")) {
+			patternName = args[0].slice(1);
 			deprecationWarning = `Patterns with # are deprecated, use pattern:${patternName} instead.`;
+			args.splice(0, 1);
 		}
 
 		let emotes = [];
