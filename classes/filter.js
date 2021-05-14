@@ -396,8 +396,8 @@ module.exports = class Filter extends require("./template.js") {
 
 		const argumentFilter = localFilters.find(i => i.Type === "Arguments" && i.applyData(options.args));
 		if (argumentFilter) {
-			const targetType = (optout.Invocation) ? "command invocation" : "command";
-			const targetAmount = (optout.Command) ? "this" : "any";
+			const targetType = (argumentFilter.Invocation) ? "command invocation" : "command";
+			const targetAmount = (argumentFilter.Command) ? "this" : "any";
 
 			return {
 				success: false,
