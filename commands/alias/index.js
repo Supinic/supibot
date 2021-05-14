@@ -160,22 +160,23 @@ module.exports = {
 				}
 				else if (firstName && !secondName) {
 					const targetUser = await sb.User.get(firstName);
+					const targetAliases = Object.keys(targetUser.Data.aliasedCommands ?? {});
 
 					// Not a username nor current user's alias name - error out
-					if (!targetUser && !wrapper.has(firstName)) {
+					if (targetAliases.length === 0 && !wrapper.has(firstName)) {
 						return {
 							success: false,
 							reply: `Could not match your input to username or any of your aliases!`
 						};
 					}
 					// Not a username, but current user has an alias with the provided name
-					else if (!targetUser && wrapper.has(firstName)) {
+					else if (targetAliases.length === 0 && wrapper.has(firstName)) {
 						user = context.user;
 						aliasName = firstName;
 						prefix = "Your";						
 					}
 					// Not current user's alias, but a username exists
-					else if (targetUser && !wrapper.has(firstName)) { // Is a username
+					else if (targetAliases.length > 0 && !wrapper.has(firstName)) { // Is a username
 						const who = (targetUser === context.user) ? "your" : "their";
 						const username = encodeURIComponent(targetUser.Name);
 						return {
@@ -184,23 +185,15 @@ module.exports = {
 					}
 					// Both current user's alias, and a username exists - print out special case with both links
 					else {
-						const targetAliases = Object.keys(targetUser.Data.aliasedCommands ?? {});
-						if (targetAliases.length !== 0) {
-							const username = encodeURIComponent(context.user.Name);
-							const escapedString = encodeURIComponent(firstName);
-							return {
-								reply: sb.Utils.tag.trim `
-									Special case! 
-									Your alias "${firstName}": https://supinic.com/bot/user/${username}/alias/detail/${escapedString}
-									List of ${firstName}'s aliases: https://supinic.com/bot/user/${escapedString}/alias/list
-								`
-							};
-						}
-						else {
-							user = context.user;
-							aliasName = firstName;
-							prefix = "Your";
-						}
+						const username = encodeURIComponent(context.user.Name);
+						const escapedString = encodeURIComponent(firstName);
+						return {
+							reply: sb.Utils.tag.trim `
+								Special case! 
+								Your alias "${firstName}": https://supinic.com/bot/user/${username}/alias/detail/${escapedString}
+								List of ${firstName}'s aliases: https://supinic.com/bot/user/${escapedString}/alias/list
+							`
+						};
 					}
 				}
 				else {
