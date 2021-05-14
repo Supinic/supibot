@@ -401,10 +401,10 @@ module.exports = class Filter extends require("./template.js") {
 
 			return {
 				success: false,
-				reason: "args-block",
+				reason: "arguments",
 				filter: argumentFilter,
 				reply: (argumentFilter.Response === "Auto")
-					? `You cannot use this argument for ${targetAmount} ${targetType}!`
+					? `You cannot use this argument on this position for ${targetAmount} ${targetType}!`
 					: (argumentFilter.Response === "Reason")
 						? argumentFilter.Reason
 						: null
