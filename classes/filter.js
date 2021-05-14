@@ -394,6 +394,23 @@ module.exports = class Filter extends require("./template.js") {
 			}
 		}
 
+		const argumentFilter = localFilters.find(i => i.Type === "Args" && i.applyData(options.args));
+		if (argumentFilter) {
+			const targetType = (optout.Invocation) ? "command invocation" : "command";
+			const targetAmount = (optout.Command) ? "this" : "any";
+
+			return {
+				success: false,
+				reason: "args-block",
+				filter: argumentFilter,
+				reply: (argumentFilter.Response === "Auto")
+					? `You cannot use this argument for ${targetAmount} ${targetType}!`
+					: (argumentFilter.Response === "Reason")
+						? argumentFilter.Reason
+						: null
+			};
+		}
+
 		if ((command.Flags.optOut || command.Flags.block) && targetUser) {
 			userTo = await sb.User.get(targetUser);
 		}
