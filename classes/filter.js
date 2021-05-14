@@ -99,7 +99,7 @@ module.exports = class Filter extends require("./template.js") {
 							if (arg.regex instanceof RegExp) {
 								obj.regex = arg.regex;
 							}
-							else if (Array.isArray(arg.regex)) {
+							else if (Array.isArray(arg.regex) && arg.regex.every(i => typeof i === "string")) {
 								obj.regex = new RegExp(arg.regex[0], arg.regex[1] ?? "");
 							}
 							else if (typeof arg.regex === "string") {
@@ -130,7 +130,7 @@ module.exports = class Filter extends require("./template.js") {
 							obj.index = arg.index;
 							obj.range = [];
 						}
-						else if (Array.isArray(arg.range === "number")) {
+						else if (Array.isArray(arg.range) && arg.range.every(i => typeof i === "number")) {
 							obj.range = [...arg.range].slice(0, 2);
 						}
 						else if (typeof arg.range === "string") {
