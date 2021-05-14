@@ -141,6 +141,13 @@ module.exports = class Filter extends require("./template.js") {
 							continue;
 						}
 
+						// Infinity is allowed specifically because it matches the <x, ..> range identifier
+						const allowed = obj.range.every(i => sb.Utils.isValidInteger(i) || i === Infinity);
+						if (!allowed) {
+							console.warn("Invalid numbers provided for filter Args range", { arg, filter: this.ID });
+							continue;
+						}
+
 						this.#filterData.push(obj);
 					}
 				}
