@@ -140,7 +140,7 @@ module.exports = {
 			deprecationWarning = `Patterns with # are deprecated, use pattern:${patternName} instead.`;
 		}
 
-		let emotes;
+		let emotes = [];
 		const preset = this.staticData.patterns.find(i => i.name === patternName );
 		if (preset) {
 			if (Array.isArray(preset.pattern)) {
@@ -181,7 +181,7 @@ module.exports = {
 		}
 	
 		if (type === "array") {
-			if (emotes.length < limit) {
+			if (emotes === null || emotes.length < limit) {
 				return {
 					reply: "You must provide at least " + limit + " emotes/words to roll the slots!",
 					cooldown: 2500
