@@ -95,26 +95,46 @@ module.exports = class Filter extends require("./template.js") {
 
 					for (const arg of this.Data.args) {
 						const obj = {};
-						if (i.type === "regex") {
-							obj.regex = new RegExp(i.value[0], i.value[1] ?? "");
+						if (arg.regex) {
+							if (arg.regex instanceof RegExp) {
+								obj.regex = arg.regex;
+							}
+							else if (Array.isArray(arg.regex)) {
+								obj.regex = new RegExp(arg.regex[0], arg.regex[1] ?? "");
+							}
+							else if (typeof arg.regex === "string") {
+								const string = arg.regex.replace(/^\/|\/$/g, "");
+								const lastSlashIndex = string.lastIndexOf("/");
+
+								const regexBody = (lastSlashIndex !== -1) ? string.slice(0, lastSlashIndex) : string;
+								const flags = (lastSlashIndex !== -1) ? string.slice(lastSlashIndex + 1) : "";
+
+								try {
+									arg.regex = new RegExp(regexBody, flags);
+								}
+								catch (e) {
+									console.warn("Invalid string regex representation", e);
+									continue;
+								}
+							}
 						}
-						else if (i.type === "string") {
-							obj.string = i.value;
+						else if (arg.string) {
+							obj.string = arg.string;
 						}
 						else {
 							console.warn("Invalid filter Args item - type", { arg, filter: this.ID });
 							continue;
 						}
 
-						if (typeof i.index === "number") {
-							obj.index = i.index;
+						if (typeof arg.index === "number") {
+							obj.index = arg.index;
 							obj.range = [];
 						}
-						else if (Array.isArray(i.range === "number")) {
-							obj.range = [...i.range].slice(0, 2);
+						else if (Array.isArray(arg.range === "number")) {
+							obj.range = [...arg.range].slice(0, 2);
 						}
-						else if (typeof i.range === "string") {
-							obj.range = i.range.split("..").map(Number).slice(0, 2);
+						else if (typeof arg.range === "string") {
+							obj.range = arg.range.split("..").map(Number).slice(0, 2);
 						}
 						else {
 							console.warn("Invalid filter Args item - index", { arg, filter: this.ID });
@@ -122,9 +142,6 @@ module.exports = class Filter extends require("./template.js") {
 						}
 
 						this.#filterData.push(obj);
-
-
-						console.warn("Invalid filter data - missing Args data", { filter: this.ID, data: this.Data });
 					}
 				}
 			}
@@ -190,6 +207,8 @@ module.exports = class Filter extends require("./template.js") {
 					}
 				}
 			}
+
+			return false;
 		}
 		else if (this.Type === "Cooldown" && (data === null || typeof data === "number")) {
 			const value = data ?? 0; // `null` cooldowns are treated as zero
