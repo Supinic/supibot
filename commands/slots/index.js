@@ -24,9 +24,10 @@ module.exports = {
 			},
 			{
 				name: "gachi",
-				pattern: (context, emotes) => {
+				emotesRequired: true,
+				pattern: (context, data) => {
 					const regex = /^[gG]achi/;
-					return emotes.filter(i => regex.test(i.name)).map(i => i.name);
+					return data.emotes.filter(i => regex.test(i.name)).map(i => i.name);
 				},
 				notes: "Selects all gachimuchi-related emotes."
 			},
@@ -43,27 +44,32 @@ module.exports = {
 			},
 			{
 				name: "twitch",
-				pattern: (context, emotes) => emotes.filter(i => i.type === "twitch-global").map(i => i.name),
+				emotesRequired: true,
+				pattern: (context, data) => data.emotes.filter(i => i.type === "twitch-global").map(i => i.name),
 				notes: "All Twitch global emotes."
 			},
 			{
 				name: "sub",
-				pattern: (context, emotes) => emotes.filter(i => i.type === "twitch-subscriber").map(i => i.name),
+				emotesRequired: true,
+				pattern: (context, data) => data.emotes.filter(i => i.type === "twitch-subscriber").map(i => i.name),
 				notes: "Rolls random emotes from Supibot's current subscriber emote list."
 			},
 			{
 				name: "bttv",
-				pattern: (context, emotes) => emotes.filter(i => i.type === "bttv").map(i => i.name),
+				emotesRequired: true,
+				pattern: (context, data) => data.emotes.filter(i => i.type === "bttv").map(i => i.name),
 				notes: "Rolls from BTTV emotes in the current channel."
 			},
 			{
 				name: "ffz",
-				pattern: (context, emotes) => emotes.filter(i => i.type === "ffz").map(i => i.name),
+				emotesRequired: true,
+				pattern: (context, data) => data.emotes.filter(i => i.type === "ffz").map(i => i.name),
 				notes: "Rolls from FFZ emotes in the current channel."
 			},
 			{
 				name: "pepe",
-				pattern: (context, emotes) => emotes.filter(i => i.name.toLowerCase().startsWith("pepe")).map(i => i.name),
+				emotesRequired: true,
+				pattern: (context, data) => data.emotes.filter(i => i.name.toLowerCase().startsWith("pepe")).map(i => i.name),
 				notes: "Rolls from all Pepe-related emotes in the current channel."
 			},
 			{
@@ -76,15 +82,21 @@ module.exports = {
 			},
 			{
 				name: "numbers",
-				pattern: (extra, type, number) => {
-					const target = Number(number);
-					if (!target || target > Number.MAX_SAFE_INTEGER || target < 1 || Math.trunc(target) !== target) {
+				pattern: (context, data) => {
+					const target = Number(data.args[0]);
+					if (!sb.Utils.isValidInteger(target)) {
 						return {
 							success: false,
-							reply: "The number must be an integer between 2 and " + Number.MAX_SAFE_INTEGER
+							reply: "You must provide a proper number to roll the number slots!"
 						};
 					}
-	
+					else if (target > Number.MAX_SAFE_INTEGER) {
+						return {
+							success: false,
+							reply: `The number must be an integer in the <2..${Number.MAX_SAFE_INTEGER}> range!`
+						};
+					}
+					
 					return {
 						roll: () => sb.Utils.random(1, target),
 						uniqueItems: target
@@ -96,12 +108,13 @@ module.exports = {
 				name: "jebaited",
 				pattern: [
 					"You", "lost", "lol"
-				], "Type": "Array", notes: "Jebaited"
+				],
+				notes: "Jebaited"
 			}
 		]
 	})),
-	Code: (async function slots (context, ...emotes) {
-		if (emotes[0] === "leader" || emotes[0] === "leaders") {
+	Code: (async function slots (context, ...args) {
+		if (args[0] === "leader" || args[0] === "leaders") {
 			return {
 				reply: "Check out all the previous slots winners here! https://supinic.com/bot/slots-winner/list",
 				cooldown: 5000
@@ -121,20 +134,25 @@ module.exports = {
 		const rolledItems = [];
 
 		let deprecationWarning = "";
-		let patternName = context.params.pattern ?? emotes[0] ?? "";
+		let patternName = context.params.pattern ?? args[0] ?? "";
 		if (patternName.startsWith("#")) {
 			patternName = patternName.slice(1);
 			deprecationWarning = `Patterns with # are deprecated, use pattern:${patternName} instead.`;
 		}
 
+		let emotes;
 		const preset = this.staticData.patterns.find(i => i.name === patternName );
 		if (preset) {
 			if (Array.isArray(preset.pattern)) {
 				emotes = preset.pattern;
 			}
 			else if (typeof preset.pattern === "function") {
-				const channelEmotes = await context.channel.fetchEmotes();
-				const result = await preset.pattern(context, channelEmotes);
+				const presetData = { args };
+				if (preset.emotesRequired) {
+					presetData.emotes = await context.channel.fetchEmotes();
+				}
+
+				const result = await preset.pattern(context, presetData);
 				if (result.success === false) {
 					return {
 						...result,
