@@ -86,7 +86,7 @@ module.exports = class Filter extends require("./template.js") {
 		}
 
 		if (this.Data) {
-			if (this.Type === "Args") {
+			if (this.Type === "Arguments") {
 				if (!this.Data.args) {
 					console.warn("Invalid Args filter - missing args object");
 				}
@@ -203,7 +203,7 @@ module.exports = class Filter extends require("./template.js") {
 	 * @returns {*} Returned type depends on filter type - Args {boolean} or Cooldown {number}
 	 */
 	applyData (data) {
-		if (this.Type === "Args" && Array.isArray(data)) {
+		if (this.Type === "Arguments" && Array.isArray(data)) {
 			for (const item of this.#filterData) {
 				const { index, range, regex, string } = item;
 				for (let i = 0; i < data.length; i++) {
@@ -394,7 +394,7 @@ module.exports = class Filter extends require("./template.js") {
 			}
 		}
 
-		const argumentFilter = localFilters.find(i => i.Type === "Args" && i.applyData(options.args));
+		const argumentFilter = localFilters.find(i => i.Type === "Arguments" && i.applyData(options.args));
 		if (argumentFilter) {
 			const targetType = (optout.Invocation) ? "command invocation" : "command";
 			const targetAmount = (optout.Command) ? "this" : "any";
@@ -692,6 +692,6 @@ module.exports = class Filter extends require("./template.js") {
  * @typedef {
  *   "Blacklist","Whitelist","Opt-out","Block",
  *   "Unping","Unmention","Cooldown","Flags",
- *   "Offline-only","Online-only","Args"
+ *   "Offline-only","Online-only","Arguments"
  * } FilterType
  */
