@@ -90,22 +90,20 @@ module.exports = {
 			throwHttpErrors: false
 		});
 	
-		const prefix = (user.toLowerCase() === context.user.Name)
-			? "You are"
-			: `${user} is`;
-		const suffix = (channel.toLowerCase() === context.user.Name)
-			? "you"
-			: channel;
-	
+		const prefix = (user.toLowerCase() === context.user.Name) ? "You" : user;
+		const suffix = (channel.toLowerCase() === context.user.Name) ? "you" : channel;
+
 		if (data.error && data.status === 404) {
+			const verb = (user.toLowerCase() === context.user.Name) ? "are" : "is";
 			return {
-				reply: `${prefix} not following ${suffix}.`
+				reply: `${prefix} ${verb} not following ${suffix}.`
 			};
 		}
 		else {
+			const verb = (user.toLowerCase() === context.user.Name) ? "have" : "has";
 			const delta = sb.Utils.timeDelta(new sb.Date(data.created_at), true);
 			return {
-				reply: `${prefix} following ${suffix} for ${delta}.`
+				reply: `${prefix} ${verb} been following ${suffix} for ${delta}.`
 			};
 		}
 	}),
