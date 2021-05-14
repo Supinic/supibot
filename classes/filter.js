@@ -87,12 +87,12 @@ module.exports = class Filter extends require("./template.js") {
 
 		if (this.Data) {
 			if (this.Type === "Arguments") {
+				this.#filterData = [];
+
 				if (!this.Data.args) {
 					console.warn("Invalid Args filter - missing args object");
 				}
 				else {
-					this.#filterData = [];
-
 					for (const arg of this.Data.args) {
 						const obj = {};
 						if (arg.regex) {
