@@ -268,8 +268,8 @@ module.exports = {
 				]
 			},
 			{
-				name: "hype",
-				aliases: ["hypetrain"],
+				name: "hypetrain",
+				aliases: [],
 				description: "Hype Train emotes - obtainable when you participate in a so-called hype train in a channel.",
 				emotes: [
 					"HypeChimp",
@@ -473,7 +473,45 @@ module.exports = {
 					"2020Victory",
 					"2020Unity",
 					"2020Wish"
-				]
+				],
+			},
+			{
+				name: "hype2021",
+				aliases: ["hype"],
+				description: "Holiday emotes for 2020 holiday season. Called Hindsight, because 20-20 is the year and the hindsight. First set awarded between 2020-12-02 and 2020-12-16, the second from 2020-12-16 to 2021-01-04; whenever someone subs, gifts or cheers.",
+				notes: "https://twitter.com/TwitchSupport/status/1390743421208387592",
+				emotes: [
+					"HypeAttack",
+					"HypeBeard",
+					"HypeCozy",
+					"HypeCreep",
+					"HypeDerp",
+					"HypeDisguise",
+					"HypeDoh",
+					"HypeEars",
+					"HypeEyes",
+					"HypeHay",
+					"HypeHeh",
+					"HypeHeyFriends",
+					"HypeHide",
+					"HypeJudge",
+					"HypeMine",
+					"HypeOoh",
+					"HypePurr",
+					"HypeScream",
+					"HypeShame",
+					"HypeShy",
+					"HypeSquawk",
+					"HypeStahp",
+					"HypeSus",
+					"HypeTongue",
+					"HypeWant",
+					"HypeWow",
+					"HypeYas",
+					"HypeYawn",
+					"HypeYesPlease",
+					"HypeYum"
+				],
 			}
 		]
 	})),
