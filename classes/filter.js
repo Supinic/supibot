@@ -200,7 +200,7 @@ module.exports = class Filter extends require("./template.js") {
 			for (const item of this.#filterData) {
 				const { index, range, regex, string } = item;
 				for (let i = 0; i < data.length; i++) {
-					const positionCheck = (i === index || (range[0] <= index && index <= range[1]));
+					const positionCheck = (i === index || (range[0] <= i && i <= range[1]));
 					const valueCheck = ((string && data[i] === string) || (regex && regex.test(data[i])));
 					if (positionCheck && valueCheck) {
 						return true;
