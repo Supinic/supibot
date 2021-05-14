@@ -160,7 +160,9 @@ module.exports = {
 				}
 				else if (firstName && !secondName) {
 					const targetUser = await sb.User.get(firstName);
-					const targetAliases = Object.keys(targetUser.Data.aliasedCommands ?? {});
+					const targetAliases = (targetUser)
+						? Object.keys(targetUser.Data.aliasedCommands ?? {})
+						: [];
 
 					// Not a username nor current user's alias name - error out
 					if (targetAliases.length === 0 && !wrapper.has(firstName)) {
