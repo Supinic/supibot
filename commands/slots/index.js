@@ -141,7 +141,7 @@ module.exports = {
 			args.splice(0, 1);
 		}
 
-		let emotes = [];
+		let emotes = [...args];
 		const preset = this.staticData.patterns.find(i => i.name === patternName );
 		if (preset) {
 			if (Array.isArray(preset.pattern)) {
