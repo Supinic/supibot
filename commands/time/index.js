@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Fetches the current time and timezone for a given location",
+	Description: "Fetches the current time and timezone for a given location, or a user, if they have set their location.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
@@ -181,7 +181,7 @@ module.exports = {
 	Dynamic_Description: (async (prefix) => {
 		return [
 			"For a provided location, returns the current time, timezone and date it is observing.",
-			"Supports custom locations of users",
+			`Supports custom locations of users - this can be set with the <a href="/bot/command/207"><code>${prefix}set location</code></a> command.`,
 			"",
 
 			`<code>${prefix}time (location)</code>`,
