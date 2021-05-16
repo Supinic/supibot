@@ -33,10 +33,10 @@ module.exports = {
 
 		for (const item of data) {
 			const embed = new EmbedConstructor()
-				.setTitle(`Changelog entry - ${item.Type}`)
+				.setTitle(`${item.Type} - ${item.Title}`)
 				.setURL(`https://supinic.com/data/changelog/detail/${item.ID}`)
 				.setDescription(item.Description ?? "(none)")
-				.setFooter(`<@${discordUpdatesRole}>`);
+				.setFooter(`<@&${discordUpdatesRole}>`);
 
 			await discordChannel.send(embed);
 		}
