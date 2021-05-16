@@ -17,7 +17,7 @@ module.exports = {
 		}
 
 		const data = await sb.Query.getRecordset(rs => rs
-			.select("ID", "Title", "Type")
+			.select("ID", "Title", "Type", "Description")
 			.from("data", "Changelog")
 			.where("ID > %n", this.data.latestID)
 		);
@@ -28,10 +28,16 @@ module.exports = {
 
 		const discordUpdatesRole = "748957148439904336";
 		const discordChannel = sb.Channel.get("748955843415900280");
-		for (const item of data) {
-			const message = `<@${discordUpdatesRole}>\n**${item.Type}** - ${item.Title}`;
+		const EmbedConstructor = sb.Platform.get("discord").controller.data.Embed ?? require("discord.js").MessageEmbed;
 
-			await discordChannel.send(message);
+		for (const item of data) {
+			const embed = new EmbedConstructor()
+				.setTitle(`Changelog entry - ${item.Type}`)
+				.setURL(`https://supinic.com/data/changelog/detail/${item.ID}`)
+				.setDescription(item.Description ?? "(none)")
+				.setFooter(`<@${discordUpdatesRole}>`);
+
+			await discordChannel.send(embed);
 		}
 
 		this.data.latestID = Math.max(...data.map(i => i.ID));
