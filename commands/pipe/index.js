@@ -200,7 +200,7 @@ module.exports = {
 			"Similar to <code>_pos</code>, but _apos specifies the start position for each command.",
 			" <code>_apos:0=3</code> => Command #0 uses start position 3.",
 			"Reverts to the end of the command if invalid value is provided.",
-			""
+			"",
 
 			`<code>${prefix}pipe _force:true translate to:made-up-language foobar | remind (user)</code>`,
 			"If used with <code>_force:true</code>, this invocation will actually pipe the failure response of the <code>translate</code> command into <code>remind</code>.",
