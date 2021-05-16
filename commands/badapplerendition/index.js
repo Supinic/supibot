@@ -31,7 +31,7 @@ module.exports = {
 				reply: `No command provided! Use one of these: ${commands.join(", ")}`
 			};
 		}
-		
+
 		command = command.toLowerCase();
 		switch (command) {
 			case "check": {
@@ -65,7 +65,7 @@ module.exports = {
 					};
 				}
 				else {
-					const data = sb.Utils.linkParser.fetchData(input);
+					const data = await sb.Utils.linkParser.fetchData(input);
 					const row = await sb.Query.getRow("data", "Bad_Apple");
 					row.setValues({
 						Link: link,
@@ -75,14 +75,14 @@ module.exports = {
 						Published: data.created,
 						Notes: `Added to the list by ${context.user.Name}`,
 					});
-					
+
 					const { insertId } = await row.save();
 					return {
 						reply: `Link added to the rendition list, pending approval: https://supinic.com/data/bad-apple/${insertId}`
 					};
 				}
-			} 
-			
+			}
+
 			case "list": {
 				return {
 					reply: `🍎 https://supinic.com/data/bad-apple/list`
