@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `data`.`Bad_Apple` (
 	`Timestamp` INT(10) UNSIGNED NULL DEFAULT NULL,
 	`Reuploads` MEDIUMTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`Notes` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
+	`Added_On` DATETIME(3) NULL DEFAULT current_timestamp(3),
 	PRIMARY KEY (`ID`) USING BTREE,
 	UNIQUE INDEX `Link` (`Link`) USING BTREE
 )
