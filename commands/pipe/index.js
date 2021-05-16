@@ -22,13 +22,13 @@ module.exports = {
 				reply: "At least two commands must be piped together!"
 			};
 		}
-	
+
 		let hasExternalInput = false;
 		const nullCommand = sb.Command.get("null");
 		for (let i = 0; i < invocations.length; i++) {
 			const [commandString] = invocations[i].split(" ");
 			const command = sb.Command.get(commandString.replace(sb.Command.prefixRegex, ""));
-	
+
 			if (!command) {
 				return {
 					success: false,
@@ -55,7 +55,7 @@ module.exports = {
 				hasExternalInput = true;
 			}
 		}
-	
+
 		const resultsInPastebin = args[args.length - 1] === "pastebin";
 		let finalResult = null;
 		let currentArgs = [];
@@ -65,7 +65,14 @@ module.exports = {
 			const inv = invocations[i];
 			const [cmd, ...restArgs] = inv.split(" ");
 
-			const argumentStartPosition = Number(context.params._pos ?? context.params._apos?.[i] ?? null);
+			let argumentStartPosition = null;
+			if (typeof context.params._apos?.[i] !== "undefined") {
+				argumentStartPosition = Number(context.params._apos?.[i]);
+			}
+			else if (typeof context.params._pos !== "undefined") {
+				argumentStartPosition = Number(context.params._pos);
+			}
+
 			if (argumentStartPosition !== null && !sb.Utils.isValidInteger(argumentStartPosition)) {
 				return {
 					success: false,
@@ -96,7 +103,7 @@ module.exports = {
 					partialExecute: true
 				}
 			);
-	
+
 			if (!result) { // Banphrase result: Do not reply
 				currentArgs = [];
 			}
@@ -170,18 +177,27 @@ module.exports = {
 			"Pipes multiple commands together, where each command's result will become the input of another.",
 			"Separate the commands with <code>|</code> or <code>&gt;</code> characters.",
 			"",
-			
+
 			`<code>${prefix}pipe news RU | translate</code>`,
 			"Fetches russian news, and immediately translates them to English (by default).",
 			"",
-	
+
 			`<code>${prefix}pipe 4Head | translate to:german | notify (user)</code>`,
 			"Fetches a random joke, translates it to German, and reminds the target user with the text.",
 			"",
 
 			`<code>${prefix}pipe _apos:(index) (...)</code>`,
 			"When the <code>_apos</code> parameter is used, every command in the pipe will have its result added to that index.",
-			"$pipe _apos:2 shuffle a b c | tt fancy 1 2 3",
+			"",
+
+			"Example 1:",
+			"<code>$pipe _pos:2 shuffle a b c | tt fancy 1 2 3</code> => <code>1 2 𝓫 𝓪 𝓬 3</code>",
+			"the <code>a, b, c</code> parameters are added to <code>tt fancy</code>  at position 2, so it becomes <code>tt fancy 1 a b c 2 3</code>",
+			"",
+
+			"Example 2:",
+			"<code>$pipe _apos:1=1 _apos:2=3 shuffle a b c | tt fancy A B C | tt fancy 1 2 3 </code>",
+			"the <code>a, b, c</code> parameters are added to <code>tt fancy</code>  at position 2, so it becomes <code>tt fancy 1 a b c 2 3</code>",
 			""
 
 			`<code>${prefix}pipe _force:true translate to:made-up-language foobar | remind (user)</code>`,
