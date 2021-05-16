@@ -85,13 +85,13 @@ module.exports = {
 				.setTitle(`Change - ${item.Type}`)
 				.setURL(`https://supinic.com/data/changelog/detail/${item.ID}`)
 				.setTimestamp(new sb.Date(item.Created))
-				.addField("Title", item.Title)
-				.addField("Role", `<@&${discordUpdatesRole}>`);
+				.addField("Title", item.Title);
 
 			if (item.Description) {
 				embed.addField("Description", item.Description)
 			}
 
+			embed.addField("Role", `<@&${discordUpdatesRole}>`);
 			await discordChannel.send(embed);
 		}
 
