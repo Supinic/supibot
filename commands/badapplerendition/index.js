@@ -73,7 +73,7 @@ module.exports = {
 						Status: "Pending approval",
 						Type: null,
 						Published: data.created,
-						Notes: `Added to the list by ${context.user.Name}`,
+						Notes: `Added to the list by ${context.user.Name}\n---\n${data.description ?? "No description"}`,
 					});
 
 					const { insertId } = await row.save();
