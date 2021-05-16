@@ -6,8 +6,9 @@ module.exports = {
 	Description: "Pipes the result of one command to another, and so forth. Each command will be used as if used separately, so each will be checked for cooldowns and banphrases. Use the character \"|\" or \">\" to separate each command.",
 	Flags: ["mention","pipe","use-params"],
 	Params: [
+		{ name: "_apos", type: "object" },
+		{ name: "_force", type: "boolean" },
 		{ name: "_pos", type: "number" },
-		{ name: "_apos", type: "object" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
@@ -112,23 +113,28 @@ module.exports = {
 				};
 			}
 			else if (result.success === false) { // Command result: Failed (cooldown, no command, ...)
-				let reply = "";
-				switch (result.reason) {
-					case "no-command": reply = "Not a command!"; break;
-					case "pending": reply = "Another command still being executed!"; break;
-					case "cooldown": reply = "Still on cooldown!"; break;
-					case "filter": reply = "You can't use this command here!"; break;
-					case "block": reply = "That user has blocked you from this command!"; break;
-					case "opt-out": reply = "That user has opted out from this command!"; break;
-					case "pipe-nsfw": reply = "You cannot pipe NSFW results!"; break;
-	
-					default: reply = result.reply ?? result.reason;
+				if (context.params._force) {
+					currentArgs = sb.Utils.wrapString(result.reply, this.staticData.resultCharacterLimit).split(" ");
 				}
-	
-				return {
-					success: false,
-					reply: `Pipe command ${cmd} failed: ${reply}`
-				};
+				else {
+					let reply = "";
+					switch (result.reason) {
+						case "no-command": reply = "Not a command!"; break;
+						case "pending": reply = "Another command still being executed!"; break;
+						case "cooldown": reply = "Still on cooldown!"; break;
+						case "filter": reply = "You can't use this command here!"; break;
+						case "block": reply = "That user has blocked you from this command!"; break;
+						case "opt-out": reply = "That user has opted out from this command!"; break;
+						case "pipe-nsfw": reply = "You cannot pipe NSFW results!"; break;
+
+						default: reply = result.reply ?? result.reason;
+					}
+
+					return {
+						success: false,
+						reply: `Pipe command ${cmd} failed: ${reply}`
+					};
+				}
 			}
 			else if (!result.reply) {
 				return {
@@ -166,7 +172,11 @@ module.exports = {
 	
 			`<code>${prefix}pipe 4Head | translate to:german | notify (user)</code>`,
 			"Fetches a random joke, translates it to German, and reminds the target user with the text.",
-			""		
+			"",
+
+			`<code>${prefix}pipe _force:true translate to:made-up-language foobar | remind (user)</code>`,
+			"If used with <code>_force:true</code>, this invocation will actually pipe the failure response of the <code>translate</code> command into <code>remind</code>.",
+			""
 		];
 	})
 };
