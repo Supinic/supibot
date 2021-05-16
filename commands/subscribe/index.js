@@ -30,7 +30,7 @@ module.exports = {
 			{
 				name: "GGG tracker",
 				aliases: ["ggg", "poe"],
-				notes: "Every minute, supibot checks for new posts by GGG staff on their forums and Reddit. If you are subscribed, a new post like this will ping you in #supinic.",
+				notes: "Every minute, Supibot checks for new posts by GGG staff on their forums and Reddit. If you are subscribed, a new post like this will ping you in #supinic.",
 				response: {
 					added: "You will now be pinged whenever GGG staff posts.",
 					removed: "You will no longer be pinged when GGG staff posts."
@@ -125,7 +125,16 @@ module.exports = {
 						reply: response
 					};
 				}
-			}
+			},
+			{
+				name: "Changelog",
+				aliases: ["changelog"],
+				notes: "Every minute, Supibot checks for new changelogs. If you are subscribed, you will receive a private system reminder from Supibot.",
+				response: {
+					added: "You will now receive a reminder whenever a new changelog is posted.",
+					removed: "You will no longer receive changelog reminders."
+				}
+			},
 		]
 	})),
 	Code: (async function subscribe (context, type, ...args) {
