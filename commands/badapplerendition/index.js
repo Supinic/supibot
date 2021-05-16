@@ -93,6 +93,7 @@ module.exports = {
 				const random = await sb.Query.getRecordset(rs => rs
 					.select("ID", "Device", "Link")
 					.from("data", "Bad_Apple")
+					.where("Status = %s", "Approved")
 					.orderBy("RAND() DESC")
 					.limit(1)
 					.single()
