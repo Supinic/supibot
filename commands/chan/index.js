@@ -91,10 +91,10 @@ module.exports = {
 			}));
 		}
 
-		if (!/^[a-z]+$/.test(identifier)) {
+		if (!/^[a-z0-9]+$/.test(identifier)) {
 			return {
 				success: false,
-				reply: "Use only lowercase characters for board names! (e.g. no slashes)"
+				reply: "Use only lowercase characters + letters for board names! (e.g. no slashes)"
 			};
 		}
 
