@@ -192,12 +192,14 @@ module.exports = {
 
 			"Example 1:",
 			"<code>$pipe _pos:2 shuffle a b c | tt fancy 1 2 3</code> => <code>1 2 𝓫 𝓪 𝓬 3</code>",
-			"the <code>a, b, c</code> parameters are added to <code>tt fancy</code>  at position 2, so it becomes <code>tt fancy 1 a b c 2 3</code>",
+			"the <code>a, b, c</code> parameters are added to <code>tt fancy</code> at position 2, so it becomes <code>tt fancy 1 a b c 2 3</code>",
 			"",
 
 			"Example 2:",
-			"<code>$pipe _apos:1=1 _apos:2=3 shuffle a b c | tt fancy A B C | tt fancy 1 2 3 </code>",
-			"the <code>a, b, c</code> parameters are added to <code>tt fancy</code>  at position 2, so it becomes <code>tt fancy 1 a b c 2 3</code>",
+			"<code>$pipe _apos:0=2 _apos:1=3 shuffle a b c | tt fancy A B C | tt fancy 1 2 3</code> => <code>1 2 3 𝓐 𝓑 𝓬 𝓪 𝓫 𝓒 </code>",
+			"Similar to <code>_pos</code>, but _apos specifies the start position for each command.",
+			" <code>_apos:0=3</code> => Command #0 uses start position 3.",
+			"Reverts to the end of the command if invalid value is provided.",
 			""
 
 			`<code>${prefix}pipe _force:true translate to:made-up-language foobar | remind (user)</code>`,
