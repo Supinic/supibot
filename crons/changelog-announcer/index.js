@@ -82,7 +82,7 @@ module.exports = {
 
 		for (const item of data) {
 			const embed = new EmbedConstructor()
-				.setTitle(`Change - ${item.Type}`)
+				.setTitle(item.Type)
 				.setURL(`https://supinic.com/data/changelog/detail/${item.ID}`)
 				.setTimestamp(new sb.Date(item.Created))
 				.addField("Title", item.Title);
