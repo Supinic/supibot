@@ -65,7 +65,7 @@ module.exports = {
 					};
 				}
 				else {
-					const row = await sb.Query.getRow("data", "Bad_Apple");
+					const row = await sb.Query.getRow("data", "Suggestion");
 					row.setValues({
 						User_Alias: context.user.ID,
 						Text: `Bad Apple!! rendition: https://youtu.be/${link}`,
