@@ -91,8 +91,7 @@ module.exports = {
 				embed.addField("Description", item.Description)
 			}
 
-			embed.addField("Role", `<@&${discordUpdatesRole}>`);
-			await discordChannel.send(embed);
+			await discordChannel.send(`<@&${discordUpdatesRole}>`, { embed });
 		}
 
 		this.data.latestID = Math.max(...data.map(i => i.ID));
