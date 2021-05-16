@@ -73,8 +73,8 @@ module.exports = {
 				};
 			}
 
-			const cmdArgs = [...currentArgs];
-			cmdArgs.splice(argumentStartPosition, 0, ...restArgs);
+			const cmdArgs = [...restArgs];
+			cmdArgs.splice(argumentStartPosition, 0, ...currentArgs);
 
 			const result = await sb.Command.checkAndExecute(
 				cmd,
@@ -173,6 +173,11 @@ module.exports = {
 			`<code>${prefix}pipe 4Head | translate to:german | notify (user)</code>`,
 			"Fetches a random joke, translates it to German, and reminds the target user with the text.",
 			"",
+
+			`<code>${prefix}pipe _apos:(index) (...)</code>`,
+			"When the <code>_apos</code> parameter is used, every command in the pipe will have its result added to that index.",
+			"$pipe _apos:2 shuffle a b c | tt fancy 1 2 3",
+			""
 
 			`<code>${prefix}pipe _force:true translate to:made-up-language foobar | remind (user)</code>`,
 			"If used with <code>_force:true</code>, this invocation will actually pipe the failure response of the <code>translate</code> command into <code>remind</code>.",
