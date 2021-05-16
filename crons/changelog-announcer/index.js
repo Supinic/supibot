@@ -26,9 +26,10 @@ module.exports = {
 			return;
 		}
 
+		const discord = sb.Platform.get("discord");
 		const discordUpdatesRole = "748957148439904336";
-		const discordChannel = sb.Channel.get("748955843415900280");
-		const EmbedConstructor = sb.Platform.get("discord").controller.data.Embed ?? require("discord.js").MessageEmbed;
+		const discordChannel = await discord.client.channels.fetch("748955843415900280");
+		const EmbedConstructor = discord.controller.data.Embed ?? require("discord.js").MessageEmbed;
 
 		for (const item of data) {
 			const embed = new EmbedConstructor()
