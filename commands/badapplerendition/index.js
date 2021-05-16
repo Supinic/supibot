@@ -71,7 +71,7 @@ module.exports = {
 						Text: `Bad Apple!! rendition: https://youtu.be/${link}`,
 						Category: "Data",
 						Status: null,
-						Priority: null,
+						Priority: 254,
 						Notes: "Added through the Bad Apple Supibot command"
 					});
 					
