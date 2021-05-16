@@ -17,7 +17,7 @@ module.exports = {
 		}
 
 		const data = await sb.Query.getRecordset(rs => rs
-			.select("ID", "Title", "Type", "Description")
+			.select("ID", "Created", "Title", "Type", "Description")
 			.from("data", "Changelog")
 			.where("ID > %n", this.data.latestID)
 		);
