@@ -209,7 +209,7 @@ module.exports = {
 			};
 		}
 
-		let startTime = context.params.start ? Number(context.params.start) : null;
+		let startTime = context.params.start ? sb.Utils.parseVideoDuration(context.params.start) : null;
 		if (startTime !== null && (!Number.isFinite(startTime) || startTime > Math.pow(2, 32))) {
 			return {
 				success: false,
@@ -217,7 +217,7 @@ module.exports = {
 			};
 		}
 
-		let endTime = context.params.end ? Number(context.params.end) : null;
+		let endTime = context.params.end ? sb.Utils.parseVideoDuration(context.params.end) : null;
 		if (endTime !== null && (!Number.isFinite(endTime) || endTime > Math.pow(2, 32))) {
 			return {
 				success: false,
