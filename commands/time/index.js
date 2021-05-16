@@ -178,5 +178,23 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => {
+		return [
+			"For a provided location, returns the current time, timezone and date it is observing.",
+			"Supports custom locations of users",
+			"",
+
+			`<code>${prefix}time (location)</code>`,
+			"Shows the location's time data.",
+			"",
+
+			`<code>${prefix}time</code>`,
+			`If you have set your custom location with the <code>${prefix}set</code> command (see above), this command will return your location's time data.`,
+			"",
+
+			`<code>${prefix}time @(user)</code>`,
+			`Similar to your own custom location, but for a different user. Make sure to include the <code>@</code> symbol!`,
+			"",
+		]
+	})
 };
