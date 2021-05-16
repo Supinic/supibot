@@ -14,15 +14,20 @@ module.exports = {
 		}
 	})),
 	Code: (async function topEmotesToday (context, ...args) {
-		const date = (args.length > 0)
-			? sb.Utils.parseChrono(args.join(" "))
-			: new sb.Date();
+		let date;
+		if (args.length > 0) {
+			const chronoData = sb.Utils.parseChrono(args.join(" "));
+			if (!chronoData) {
+				return {
+					success: false,
+					reply: `Could not parse your input!`
+				};
+			}
 
-		if (!date) {
-			return {
-				success: false,
-				reply: `Could not parse your input!`
-			};
+			date = new sb.Date(chronoData.date);
+		}
+		else {
+			date = new sb.Date();
 		}
 
 		date.setTimezoneOffset(0);
