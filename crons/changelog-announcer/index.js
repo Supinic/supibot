@@ -36,7 +36,7 @@ module.exports = {
 				.setTitle(`${item.Type} - ${item.Title}`)
 				.setURL(`https://supinic.com/data/changelog/detail/${item.ID}`)
 				.setDescription(item.Description ?? "(none)")
-				.setFooter(`<@&${discordUpdatesRole}>`);
+				.addField("Role", `<@&${discordUpdatesRole}>`);
 
 			await discordChannel.send(embed);
 		}
