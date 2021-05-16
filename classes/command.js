@@ -490,7 +490,7 @@ class Command extends require("./template.js") {
 
 	/**
 	 * Checks if a command exists, and executes it if needed.
-	 * @param {Command|number|string} identifier
+	 * @param {Command|string} identifier
 	 * @param {string[]} argumentArray
 	 * @param {Channel|null} channelData
 	 * @param {User} userData
@@ -515,7 +515,7 @@ class Command extends require("./template.js") {
 
 		// Special parsing of privileged characters - they can be joined with other characters, and still be usable
 		// as a separate command.
-		if (Command.privilegedCommandCharacters.length > 0) {
+		if (typeof identifier === "string" && Command.privilegedCommandCharacters.length > 0) {
 			for (const char of Command.privilegedCommandCharacters) {
 				if (identifier.startsWith(char)) {
 					argumentArray.unshift(identifier.replace(char, ""));
