@@ -65,8 +65,8 @@ module.exports = {
 			const inv = invocations[i];
 			const [cmd, ...restArgs] = inv.split(" ");
 
-			const argumentStartPosition = Number(context.params._pos ?? context.params._apos?.[i] ?? 0);
-			if (!sb.Utils.isValidInteger(argumentStartPosition)) {
+			const argumentStartPosition = Number(context.params._pos ?? context.params._apos?.[i] ?? null);
+			if (argumentStartPosition !== null && !sb.Utils.isValidInteger(argumentStartPosition)) {
 				return {
 					success: false,
 					reply: "Invalid argument position provided!"
@@ -74,7 +74,12 @@ module.exports = {
 			}
 
 			const cmdArgs = [...restArgs];
-			cmdArgs.splice(argumentStartPosition, 0, ...currentArgs);
+			if (argumentStartPosition === null) {
+				cmdArgs.push(...currentArgs);
+			}
+			else {
+				cmdArgs.splice(argumentStartPosition, 0, ...currentArgs);
+			}
 
 			const result = await sb.Command.checkAndExecute(
 				cmd,
