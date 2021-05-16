@@ -65,19 +65,20 @@ module.exports = {
 					};
 				}
 				else {
-					const row = await sb.Query.getRow("data", "Suggestion");
+					const data = sb.Utils.linkParser.fetchData(input);
+					const row = await sb.Query.getRow("data", "Bad_Apple");
 					row.setValues({
-						User_Alias: context.user.ID,
-						Text: `Bad Apple!! rendition: https://youtu.be/${link}`,
-						Category: "Data",
-						Status: null,
-						Priority: 254,
-						Notes: "Added through the Bad Apple Supibot command"
+						Link: link,
+						Device: data.name,
+						Status: "Pending approval",
+						Type: null,
+						Published: data.created,
+						Notes: `Added to the list by ${context.user.Name}`,
 					});
 					
 					const { insertId } = await row.save();
 					return {
-						reply: `Link added to the suggestions list: https://supinic.com/data/suggestion/${insertId}`
+						reply: `Link added to the rendition list, pending approval: https://supinic.com/data/bad-apple/${insertId}`
 					};
 				}
 			} 
