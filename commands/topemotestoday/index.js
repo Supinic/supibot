@@ -47,7 +47,7 @@ module.exports = {
 		}
 
 		const globalEmotes = sb.Platform.get("twitch").controller.availableEmotes.find(i => i.ID === "0");
-		const reply = data
+		const string = data
 			.sort((a, b) => b.count - a.count)
 			.map((i, ind) => {
 				const count = sb.Utils.groupDigits(i.count);
@@ -59,7 +59,9 @@ module.exports = {
 			})
 			.join("; ")
 
-		return { reply };
+		return {
+			reply: `Top 10 emotes for ${date.format("Y-m-d")}: ${string}`
+		};
 	}),
 	Dynamic_Description: (async (prefix) => {
 		return [
