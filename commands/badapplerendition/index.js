@@ -78,7 +78,7 @@ module.exports = {
 
 					const { insertId } = await row.save();
 					return {
-						reply: `Link added to the rendition list, pending approval: https://supinic.com/data/bad-apple/${insertId}`
+						reply: `Link added to the rendition list, pending approval: https://supinic.com/data/bad-apple/detail/${insertId}`
 					};
 				}
 			}
