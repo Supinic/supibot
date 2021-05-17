@@ -186,6 +186,9 @@ module.exports = {
 			"Fetches a random joke, translates it to German, and reminds the target user with the text.",
 			"",
 
+			"<h5>Advanced pipe parameters</h5>",
+			"",
+
 			`<code>${prefix}pipe _apos:(index) (...)</code>`,
 			"When the <code>_apos</code> parameter is used, every command in the pipe will have its result added to that index.",
 			"",
