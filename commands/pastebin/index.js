@@ -96,7 +96,7 @@ module.exports = {
 				}
 
 				const [file] = Object.values(files);
-				if (file.type !== "text/plain" && file.type === "application/javascript") {
+				if (file.type !== "text/plain" || file.type !== "application/javascript") {
 					return {
 						success: false,
 						reply: `Invalid Gist file type! This command only supports text/plain and application/javascript.`
