@@ -34,7 +34,7 @@ module.exports = {
 			if (!context.channel || context.channel.Links_Allowed) {
 				const response = await sb.Got("Global", {
 					method: "HEAD",
-					url: `https://www.coindesk.com/price/${symbol}`,
+					url: `https://www.coindesk.com/price/${symbol.toLowerCase()}`,
 					throwHttpErrors: false,
 					timeout: 2500,
 					retry: 0
@@ -44,7 +44,7 @@ module.exports = {
 			}
 
 			const link = (status === 200)
-				? `Check recent history here: https://www.coindesk.com/price/${symbol}`
+				? `Check recent history here: https://www.coindesk.com/price/${symbol.toLowerCase()}`
 				: "";
 
 			const usd = (data.USD) ? `$${data.USD}` : "";
