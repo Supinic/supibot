@@ -75,10 +75,15 @@ module.exports = {
 					.select("New_Deaths")
 					.select("Population")
 					.select("Tests")
+					.select("Vaccine_Status.People_Fully AS Full_Vaccine")
 					.from("corona", "Status")
 					.join({
 						toTable: "Place",
 						on: "Place.ID = Status.Place"
+					})
+					.leftJoin({
+						toTable: "Vaccine_Status",
+						on: "Place.ID = Vaccine_Status.Place"
 					})
 					.where("Latest = %b", true)
 					.where({ condition: direct === false }, "Place.Name %*like*", country)
@@ -242,7 +247,8 @@ module.exports = {
 			New_Cases: newCases,
 			New_Deaths: newDeaths,
 			Population: population,
-			Tests: tests
+			Tests: tests,
+			Full_Vaccine: fullyVaccinated
 		} = targetData;
 	
 		const group = sb.Utils.groupDigits;
@@ -283,42 +289,13 @@ module.exports = {
 		}
 
 		let vaccines = "";
-		if (country) {
-			let vaccineData = await this.getCacheData("vaccines");
-			if (!vaccineData) {
-				const rawData = await sb.Got({
-					url: "https://covid.ourworldindata.org/data/owid-covid-data.json"
-				}).json();
-
-				vaccineData = Object.values(rawData).map(country => {
-					const hasVaccines = country.data.filter(i => i.people_fully_vaccinated);
-					const vaccines = (hasVaccines.length === 0)
-						? null
-						: Math.max(...hasVaccines.map(i => i.people_fully_vaccinated));
-
-					return {
-						name: country.location.toLowerCase(),
-						amount: vaccines,
-						percent: (!vaccines)
-							? null
-							: (sb.Utils.round(vaccines / country.population * 100, 1) + "%")
-					};
-				});
-
-				await this.setCacheData("vaccines", vaccineData, { expiry: 864e5 });
-			}
-
-			const vacData = vaccineData.find(i => i.name === country.toLowerCase());
-			if (vacData && vacData.amount !== null) {
-				vaccines = sb.Utils.tag.trim `
-					Vaccine status:
-					${vacData?.amount ? sb.Utils.groupDigits(vacData.amount) : "unknown amount"}
-					people have been fully vaccinated so far,
-					which is
-					${vacData?.percent ?? "unknown percent"} 
-					of the population.
-				`;
-			}
+		if (fullyVaccinated) {
+			const percent = sb.Utils.round(fullyVaccinated / population * 100, 2)
+			vaccines = sb.Utils.tag.trim `
+				Vaccine status: 
+				${group(fullyVaccinated)} people have been fully vaccinated so far,
+				which is ${percent}% of the population.
+			`;
 		}
 
 		return {
