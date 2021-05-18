@@ -10,7 +10,7 @@ module.exports = {
 	],
 	Whitelist_Response: "For debugging purposes only :)",
 	Static_Data: null,
-	Code: (async function test () {
+	Code: (async function test (context) {
 		return {
 			reply: `param: ${context.params.string ?? "(none)"}`
 		};
