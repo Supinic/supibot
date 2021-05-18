@@ -1115,6 +1115,16 @@ class Command extends require("./template.js") {
 	 * @returns {Context}
 	 */
 	static createFakeContext (commandData, contextData = {}, extraData = {}) {
+		if (!(commandData instanceof Command)) {
+			throw new sb.Error({
+				message: "First provided argument must be an instance of Command",
+				args: {
+					type: typeof commandData,
+					name: commandData?.constructor?.name ?? "(none)"
+				}
+			});
+		}
+
 		const data = Object.assign({}, {
 			invocation: contextData.invocation ?? commandData.Name,
 			user: contextData.user ?? null,
