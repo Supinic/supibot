@@ -80,7 +80,7 @@ module.exports = {
 	
 				let locale = locales.find(i => i.locale === param);
 				if (!locale) {
-					const code = sb.Utils.languageISO.getCode(param);
+					const code = sb.Utils.modules.languageISO.getCode(param);
 					if (!code) {
 						this.data.pending = false;
 						return {

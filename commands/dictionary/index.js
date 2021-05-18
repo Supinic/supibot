@@ -50,7 +50,7 @@ module.exports = {
 		const languageIdentifier = context.params.lang ?? context.params.language ?? "en";
 		const language = (languageIdentifier.length < 5)
 			? languageIdentifier
-			: sb.Utils.languageISO.getCode(languageIdentifier);
+			: sb.Utils.modules.languageISO.getCode(languageIdentifier);
 	
 		if (!language) {
 			return {

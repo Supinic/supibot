@@ -41,7 +41,7 @@ module.exports = {
 		for (let i = 0; i < args.length; i++) {
 			const token = args[i];
 			if (token.includes("lang:")) {
-				language = sb.Utils.languageISO.getCode(token.split(":")[1], "iso6393");
+				language = sb.Utils.modules.languageISO.getCode(token.split(":")[1], "iso6393");
 				if (!language) {
 					return {
 						success: false,

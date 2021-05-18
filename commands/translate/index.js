@@ -22,6 +22,7 @@ module.exports = {
 			};
 		}
 
+		const { languageISO } = sb.Utils.modules;
 		const options = {
 			from: "auto",
 			to: "en",
@@ -36,7 +37,7 @@ module.exports = {
 				continue;
 			}
 
-			const newLang = sb.Utils.languageISO.get(lang);
+			const newLang = languageISO.get(lang);
 			const code = newLang?.iso6391 ?? newLang?.iso6392 ?? null;
 			if (!code) {
 				return {
@@ -68,7 +69,7 @@ module.exports = {
 
 		if (response.statusCode === 400) {
 			const targets = [options.from, options.to].filter(i => i !== "en" && i !== "auto");
-			const languages = targets.map(i => `${i}: ${sb.Utils.languageISO.getName(i)}`);
+			const languages = targets.map(i => `${i}: ${languageISO.getName(i)}`);
 			return {
 				success: false,
 				reply: `One or both languages are not supported! (${languages.join(", ")})`
@@ -88,7 +89,7 @@ module.exports = {
 		let reply = data[0].map(i => i[0]).join(" ");
 		if (options.direction) {
 			const languageID = data[2].replace(/-.*/, "");
-			const fromLanguageName = sb.Utils.languageISO.getName(languageID);
+			const fromLanguageName = languageISO.getName(languageID);
 			if (!fromLanguageName) {
 				console.warn("$translate - could not get language name", { data, reply, options, languageID });
 				return {
@@ -103,7 +104,7 @@ module.exports = {
 				array.push("(" +  confidence + ")");
 			}
 	
-			array.push("->", sb.Utils.capitalize(sb.Utils.languageISO.getName(options.to)));
+			array.push("->", sb.Utils.capitalize(languageISO.getName(options.to)));
 			reply = array.join(" ") + ": " + reply;
 		}
 	

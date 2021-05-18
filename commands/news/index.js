@@ -423,7 +423,7 @@ module.exports = {
 	
 		const params = new sb.URLParams();
 		if (rest[0] && codeRegex.test(rest[0])) {
-			const languageDescriptor = sb.Utils.languageISO.get(rest[0]);
+			const languageDescriptor = sb.Utils.modules.languageISO.get(rest[0]);
 			if (!languageDescriptor) {
 				return {
 					success: false,
