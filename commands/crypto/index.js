@@ -30,11 +30,28 @@ module.exports = {
 			};
 		}		
 		else {
+			let status = null;
+			if (!context.channel || context.channel.Links_Allowed) {
+				const response = await sb.Got("Global", {
+					method: "HEAD",
+					url: `https://www.coindesk.com/price/${symbol}`,
+					throwHttpErrors: false,
+					timeout: 2500,
+					retry: 0
+				});
+
+				status = response.statusCode;
+			}
+
+			const link = (status === 200)
+				? `Check recent history here: https://www.coindesk.com/price/${symbol}`
+				: "";
+
 			const usd = (data.USD) ? `$${data.USD}` : "";
 			const eur = (data.EUR) ? `€${data.EUR}` : "";
 	
 			return {
-				reply: `Current price of ${symbol}: ${usd} ${eur}`
+				reply: `Current price of ${symbol}: ${usd} ${eur} ${link}`
 			};
 		}
 	}),
