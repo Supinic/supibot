@@ -66,6 +66,7 @@ module.exports = {
 					.orderBy("Status.Date DESC")
 				),
 				countryData: (region, country, direct = false) => sb.Query.getRecordset(rs => rs
+					.select("Place.ID AS Place_ID")
 					.select("Place.Name")
 					.select("Place.Parent")
 					.select("All_Cases")
@@ -75,15 +76,10 @@ module.exports = {
 					.select("New_Deaths")
 					.select("Population")
 					.select("Tests")
-					.select("Vaccine_Status.People_Fully AS Full_Vaccine")
 					.from("corona", "Status")
 					.join({
 						toTable: "Place",
 						on: "Place.ID = Status.Place"
-					})
-					.leftJoin({
-						toTable: "Vaccine_Status",
-						on: "Place.ID = Vaccine_Status.Place"
 					})
 					.where("Latest = %b", true)
 					.where({ condition: direct === false }, "Place.Name %*like*", country)
@@ -247,8 +243,7 @@ module.exports = {
 			New_Cases: newCases,
 			New_Deaths: newDeaths,
 			Population: population,
-			Tests: tests,
-			Full_Vaccine: fullyVaccinated
+			Tests: tests
 		} = targetData;
 	
 		const group = sb.Utils.groupDigits;
@@ -289,7 +284,17 @@ module.exports = {
 		}
 
 		let vaccines = "";
-		if (fullyVaccinated) {
+		const vaccineData = await sb.Query.getRecordset(rs => rs
+		    .select("People_Fully")
+		    .from("corona", "Vaccine_Status")
+			.where("Place = %n", targetData.Place_ID)
+			.orderBy("Date DESC")
+			.limit(1)
+			.single()
+		);
+
+		if (vaccineData) {
+			const fullyVaccinated = vaccineData.People_Fully;
 			const percent = sb.Utils.round(fullyVaccinated / population * 100, 2)
 			vaccines = sb.Utils.tag.trim `
 				Vaccine status: 
