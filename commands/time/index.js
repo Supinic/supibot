@@ -83,8 +83,9 @@ module.exports = {
 				};
 			}
 			else if (targetUser.Name === context.platform.Self_Name) {
+				const robotEmote = await context.getBestAvailableEmote(["MrDestructoid"], "🤖");
 				return {
-					reply: `My current time is ${sb.Date.now()} 🤖`
+					reply: `My current time is ${sb.Date.now()} ${robotEmote}`
 				};
 			}
 			else if (!targetUser.Data.location) {
@@ -121,9 +122,10 @@ module.exports = {
 					};
 				}
 
+				const sadEmote = await context.getBestAvailableEmote(["peepoSadDank", "FeelsBadMan"], "😟");
 				return {
 					success: false,
-					reply: "That place was not found! FeelsBadMan"
+					reply: `That place was not found! ${sadEmote}`
 				};
 			}
 			else {
