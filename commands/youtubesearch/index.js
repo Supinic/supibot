@@ -2,13 +2,13 @@ module.exports = {
 	Name: "youtubesearch",
 	Aliases: ["ys"],
 	Author: "supinic",
-	Cooldown: 60000,
+	Cooldown: 10000,
 	Description: "Searches Youtube for video(s) with your query. Only a certain amount of uses are available daily.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
-	Whitelist_Response: "Temporarily disabled",
+	Whitelist_Response: null,
 	Static_Data: (() => ({
-		maxUses: 50,
+		threshold: 2000,
 		getClosestPacificMidnight: () => {
 			const now = new sb.Date().discardTimeUnits("m", "s", "ms");
 			const result = now.clone().discardTimeUnits("h").addHours(9);
@@ -21,7 +21,9 @@ module.exports = {
 		}
 	})),
 	Code: (async function youtubeSearch (context, ...args) {
+		const { getClosestPacificMidnight, threshold } = this.staticData;
 		const query = args.join(" ");
+
 		if (!query) {
 			return {
 				success: false,
@@ -29,20 +31,21 @@ module.exports = {
 				cooldown: 5000
 			};
 		}
-	
-		const { getClosestPacificMidnight, maxUses } = this.staticData;
-		let remainingUsesToday = await this.getCacheData("remaining-uses");
+
+		let searchAmountToday = await this.getCacheData("search-amount-today");
 		let cacheRecordExists = true;
-		if (remainingUsesToday === null) {
-			remainingUsesToday = maxUses;
+		if (!searchAmountToday) {
 			cacheRecordExists = false;
+			searchAmountToday = 0;
 		}
-	
-		if (remainingUsesToday <= 0) {
+
+		searchAmountToday++;
+
+		if (searchAmountToday >= threshold) {
 			const when = sb.Utils.timeDelta(getClosestPacificMidnight());
 			return {
 				success: false,
-				reply: `No more Youtube searches available today! Reset happens at midnight PT, which is ${when}.`
+				reply: `No more YouTube searches available today! Reset happens at midnight Pacific Time, which is ${when}.`
 			};
 		}
 	
@@ -51,17 +54,14 @@ module.exports = {
 			sb.Config.get("API_GOOGLE_YOUTUBE"),
 			{ single: true }
 		);
-	
-		remainingUsesToday--;
-	
-		// @todo: Resolve a possible race-condition with multiple command invocations at the same time
+
 		if (cacheRecordExists) {
-			await this.setCacheData("remaining-uses", remainingUsesToday, {
+			await this.setCacheData("search-amount-today", searchAmountToday, {
 				keepTTL: true
 			});
 		}
 		else {
-			await this.setCacheData("remaining-uses", remainingUsesToday, {
+			await this.setCacheData("search-amount-today", searchAmountToday, {
 				expiresAt: getClosestPacificMidnight()
 			});
 		}
