@@ -11,13 +11,14 @@ module.exports = {
 	Code: (async function crypto (context, symbol = "BTC") {
 		symbol = symbol.toUpperCase();
 	
-		const data = await sb.Got({
+		const { body: data } = await sb.Got("GenericAPI", {
 			url: "https://min-api.cryptocompare.com/data/price",
 			searchParams: new sb.URLParams().set("fsym", symbol).set("tsyms", "USD,EUR").toString(),
+			timeout: 10000,
 			headers: {
 				Authorization: "Apikey " + sb.Config.get("API_CRYPTO_COMPARE")
 			}
-		}).json();
+		});
 	
 		if (data.Response === "Error") {
 			return {
