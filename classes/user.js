@@ -9,6 +9,10 @@ module.exports = class User extends require("./template.js") {
     static redisCacheExpiration = 3_600_000;
     static mapExpirationInterval = setInterval(() => User.data.clear(), User.mapCacheExpiration);
 
+    static pendingNewUsers = new Set();
+    static data = new Map();
+    static bots = new Map();
+
     /** @alias {User} */
     constructor (data) {
         super();

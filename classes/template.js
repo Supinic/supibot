@@ -122,6 +122,8 @@ module.exports = class ClassTemplate {
 		await row.save();
 	}
 
+	static data = [];
+
 	static async initialize () {
 		await this.loadData();
 		return this;
