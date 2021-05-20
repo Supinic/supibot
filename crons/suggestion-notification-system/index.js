@@ -52,7 +52,7 @@ module.exports = {
 				Platform: subscription.Platform,
 				User_From: sb.Config.get("SELF_ID"),
 				User_To: oldRow.User_Alias,
-				Text: `[EVENT] Suggestion ${oldRow.ID} changed: ${oldRow.Status} => ${newRow.Status} ${githubLink} Check details: ${supinicLink}`,
+				Text: `[EVENT] Suggestion ${oldRow.ID} changed: ${oldRow.Status ?? "(pending)"} => ${newRow.Status ?? "(pending)"} ${githubLink} Check details: ${supinicLink}`,
 				Schedule: null,
 				Created: new sb.Date(),
 				Private_Message: true
