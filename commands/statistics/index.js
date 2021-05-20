@@ -354,7 +354,7 @@ module.exports = {
 					}
 
 					const channelData = sb.Channel.get(channelName ?? "forsen");
-					const markov = module.data.markovs.get(channelData);
+					const markov = module.data.markovs.get(channelData.ID);
 					if (!markov) {
 						return {
 							success: false,
