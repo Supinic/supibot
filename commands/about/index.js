@@ -8,9 +8,31 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function about () {
+	Code: (async function about (context) {
+		let presentSince = "";
+		if (context.channel) {
+			const date = await sb.Query.getRecordset(rs => rs
+			    .select("Posted")
+			    .from("chat_line", context.channel.getDatabaseName())
+				.orderBy("ID ASC")
+				.limit(1)
+				.flat("Posted")
+				.single()
+			);
+
+			if (date) {
+				presentSince = `I am present in this channel since ${date.format("Y-m-d")} (${sb.Utils.timeDelta(date)})`	;
+			}
+		}
+
+
 		return {	
-			reply: "Supibot is a smol variety and utility bot supiniL running on a smol Raspberry Pi 3B supiniL not primarily designed for moderation supiniHack running on Node.js since Feb 2018."
+			reply: sb.Utils.tag.trim `
+				I am a smol variety and utility bot supiniL
+				Running on a smol Raspberry Pi 3B supiniL
+				Powered by Node.js supiniHack running since February 2018.
+				${presentSince}
+			`
 		};
 	}),
 	Dynamic_Description: null
