@@ -3,7 +3,10 @@ module.exports = {
 	Events: ["message"],
 	Description: "Bans various spam or follow bots.",
 	Code: (async function wannaBecomeFamous (context) {
-		if (context.channel.Platform.Name !== "twitch") {
+		if (context.channel.mode === "Read") {
+			return;
+		}
+		else if (context.channel.Platform.Name !== "twitch") {
 			return; // cannot timeout when not on twitch
 		}
 

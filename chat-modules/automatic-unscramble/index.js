@@ -4,7 +4,10 @@ module.exports = {
 	Description: "Attempts to auto-unscramble thepositivebot's unscramble minigame.",
 	Code: (async function automaticUnscramble (context) {
 		const { channel, message, user } = context;
-		if (!user || user.Name !== "thepositivebot") {
+		if (channel.mode === "Read") {
+			return;
+		}
+		else if (!user || user.Name !== "thepositivebot") {
 			return;
 		}
 	

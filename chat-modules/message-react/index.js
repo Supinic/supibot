@@ -14,6 +14,9 @@ module.exports = {
 		else if (user.Name === platform.Self_Name) {
 			return;
 		}
+		else if (channel.mode === "Read") {
+			return;
+		}
 
 		const { message } = context;
 		for (const item of args) {

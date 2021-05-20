@@ -3,10 +3,13 @@ module.exports = {
 	Events: ["message"],
 	Description: "Detects \"pyramids\" in chat. Congratulates the persons who finishes one and demeans the persons who break one.",
 	Code: (async function pyramidDetection (context, options = {}) {
-		const { channel, data, message, user } = context;
-		const { threshold = 3 } = options;	
-		
+		const { channel, message, user } = context;
+		const { threshold = 3 } = options;
+
 		if (!channel) {
+			return;
+		}
+		else if (channel.mode === "Read") {
 			return;
 		}
 		else if (!user || user.Name === channel.Platform.Self_Name) {

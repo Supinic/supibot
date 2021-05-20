@@ -6,6 +6,9 @@ module.exports = {
 		if (context.platform.Name !== "twitch") {
 			return;
 		}
+		else if (channel.mode === "Read") {
+			return;
+		}
 		else if (!definition) {
 			return;
 		}
