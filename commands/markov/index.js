@@ -7,6 +7,7 @@ module.exports = {
 	Flags: ["non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "debug", type: "string" },
+		{ name: "channel", type: "string" },
 		{ name: "exact", type: "boolean" },
 		{ name: "stop", type: "boolean" },
 		{ name: "words", type: "number" }
@@ -61,7 +62,15 @@ module.exports = {
 			};
 		}
 
-		const markov = module.data.markovs.get(sb.Channel.get("forsen"));
+		const targetChannel = sb.Channel.get(context.params.channel ?? "forsen");
+		if (!targetChannel) {
+			return {
+				success: false,
+				reply: `No such channel exists!`
+			};
+		}
+		
+		const markov = module.data.markovs.get(targetChannel);
 		if (!markov) {
 			return {
 				success: false,
