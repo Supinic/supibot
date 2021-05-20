@@ -3,15 +3,14 @@ module.exports = {
 	Events: ["message"],
 	Description: "Reacts to redemptions",
 	Code: (async function streamPointsRedemption (context, ...args) {
+		const { channel, data } = context;
 		if (channel.mode === "Read") {
 			return;
 		}
 		else if (args.length === 0) {
 			return;
 		}
-
-		const { channel, data } = context;
-		if (!data?.customRewardID) {
+		else if (!data || !data.customRewardID) {
 			return;
 		}
 
