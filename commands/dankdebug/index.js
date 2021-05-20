@@ -81,6 +81,13 @@ module.exports = {
 			result = await sb.Sandbox.run(script, scriptContext);
 		}
 		catch (e) {
+			if (!(e instanceof Error)) {
+				return {
+					success: false,
+					reply: `Your dank debug threw or rejected with a non-Error value!`
+				};
+			}
+
 			const { name } = e.constructor;
 			if (name === "EvalError") {
 				return {
