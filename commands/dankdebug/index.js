@@ -55,7 +55,7 @@ module.exports = {
 			script = string;
 		}
 		else {
-			script = `(() => {\n${string}\n})()`;
+			script = `await (async () => {\n${string}\n})()`;
 		}
 		
 		try {
