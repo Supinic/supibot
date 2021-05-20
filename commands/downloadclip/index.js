@@ -10,10 +10,13 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function downloadClip (context, rawSlug) {
 		if (!rawSlug) {
-			return { reply: "No clip slug provided!" };
+			return {
+				success: false,
+				reply: "No clip slug provided!"
+			};
 		}
-	
-		const slug = rawSlug.match(/^[a-zA-z]+$/)?.[0];
+
+		const slug = rawSlug.match(/^[a-zA-z]+(-[\-a-zA-Z0-9]{16})?$/)?.[0];
 		if (!slug) {
 			return {
 				success: false,
@@ -24,14 +27,15 @@ module.exports = {
 		const data = await sb.Got("Leppunen", `twitch/clip/${slug}`).json();
 		if (data.status === 404) {
 			return {
+				success: false,
 				reply: "No data found for given slug!"
 			};
 		}
-	
-		const source = Object.entries(data.response.videoQualities).sort((a, b) => Number(a.quality) - Number(b.quality))[0][1].sourceURL;
+
+		const [source] = Object.values(data.response.videoQualities).sort((a, b) => Number(a.quality) - Number(b.quality));
 		return {
 			replyWithPrivateMessage: true,
-			reply: source
+			reply: source.sourceURL
 		};
 	}),
 	Dynamic_Description: null
