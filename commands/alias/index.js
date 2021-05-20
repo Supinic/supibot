@@ -30,7 +30,7 @@ module.exports = {
 
 						let range = (numberMatch.groups.range) ? Number(numberMatch.groups.range) : null;
 						if (typeof range === "number" && range < 0) {
-							range = commandArguments.length + range;
+							range = commandArguments.length + range + 1;
 						}
 
 						if (range < order) {
@@ -50,7 +50,7 @@ module.exports = {
 							return commandArguments.slice(order).join(" ");
 						}
 						else if (range) {
-							return commandArguments.slice(order, range + 1).join(" ");
+							return commandArguments.slice(order, range).join(" ");
 						}
 						else {
 							return commandArguments[order] ?? "";
