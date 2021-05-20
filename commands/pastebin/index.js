@@ -9,7 +9,9 @@ module.exports = {
 		{ name: "force", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: (() => ({
+		allowedGistTypes: ["text/plain", "application/javascript"]
+	})),
 	Code: (async function pastebin (context, command, ...rest) {
 		let type;
 		const args = [...rest];
@@ -88,22 +90,29 @@ module.exports = {
 						reply: `There are no files in this Gist!`
 					};
 				}
-				else if (Object.keys(files).length > 1) {
+
+				const { allowedGistTypes } = this.staticData;
+				const eligibleFiles = Object.values(files).filter(i => allowedGistTypes.includes(i.type));
+				if (eligibleFiles.length === 0) {
 					return {
 						success: false,
-						reply: `There are too many files in this Gist! This command only supports single-file Gists.`
+						reply: sb.Utils.tag.trim `
+							No eligible files found in this Gist!
+							Use exactly one file of one of these types: ${allowedGistTypes.join(", ")}
+						 `
+					};
+				}
+				else if (eligibleFiles.length > 1) {
+					return {
+						success: false,
+						reply: sb.Utils.tag.trim `
+							Too many eligible files found in this Gist!
+							Use exactly one file of one of these types: ${allowedGistTypes.join(", ")}
+						`
 					};
 				}
 
-				const [file] = Object.values(files);
-				if (file.type !== "text/plain" && file.type !== "application/javascript") {
-					return {
-						success: false,
-						reply: `Unsupported Gist file type "${file.type}"! This command only supports "text/plain" and "application/javascript".`
-					};
-				}
-
-				data = file.content;
+				data = eligibleFiles[0].content;
 				await this.setCacheData(ID, data, {
 					expiry: 30 * 864e5
 				});
