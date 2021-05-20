@@ -88,7 +88,7 @@ module.exports = {
 
 			const { debug } = context.params;
 			const fs = require("fs").promises;
-			const fileName = `markov-dump-${new sb.Date().format("Y-m-d")}.json`
+			const fileName = `markov-dump-${new sb.Date().format("Y-m-d")}-channel-${targetChannel.ID}.json`
 			if (debug === "save") {
 				await fs.writeFile(`/code/markovs/${fileName}`, JSON.stringify(markov));
 				return {
