@@ -17,7 +17,7 @@ module.exports = {
 	
 		applyParameters: (context, aliasArguments, commandArguments) => {
 			const resultArguments = [];
-			const numberRegex = /(?<order>\d+)(-(?<range>\d+))?(?<rest>\+?)/;
+			const numberRegex = /(?<order>-?\d+)(\.\.(?<range>-?\d+))?(?<rest>\+?)/;
 
 			for (let i = 0; i < aliasArguments.length; i++) {
 				const parsed = aliasArguments[i].replace(/\${(.+?)}/g, (total, match) => {
@@ -40,7 +40,13 @@ module.exports = {
 							return commandArguments.slice(order, range).join(" ");
 						}
 						else {
-							return commandArguments[order] ?? "";
+							// @todo: When/if the `.at()` Array method comes out, use that instead here
+							if (order >= 0) {
+								return commandArguments[order] ?? "";
+							}
+							else {
+								return commandArguments[commandArguments.length + order] ?? "";
+							}
 						}
 					}
 					else if (match === "executor") {
@@ -716,11 +722,11 @@ module.exports = {
 				</li>
 				<br>
 				<li>
-					<code>\${#-#}</code> (e.g. \${0-1}, \${1-10}, ...)
+					<code>\${#-#}</code> (e.g. \${0..1}, \${1..10}, ...)
 					<br>
 					Replaced by argument number #1 and all the following arguments until #2, inclusive.
 					<br>
-					<code>${prefix}alias add test translate to:german hello, \${0-2}!</code>
+					<code>${prefix}alias add test translate to:german hello, \${0..2}!</code>
 					<br>
 					<code>${prefix}alias run test spanish hello there again - my friends!</code> => <code>${prefix}translate to:german hello there again</code>
 				</li>
