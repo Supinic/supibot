@@ -138,6 +138,22 @@ class CytubeClient {
 				this.controller.resolveUserMessage(this.channelData, userData, msg);
 
 				sb.Logger.push(msg, userData, this.channelData);
+
+				this.channelData.events.emit("message", {
+					type: "message",
+					message: msg,
+					user: userData,
+					channel: this.channelData,
+					platform: this.controller.platform
+				});
+
+				if (this.channelData.Mode === "Read") {
+					return;
+				}
+				else if (data.username === this.controller.platform.Self_Name) {
+					return;
+				}
+
 				sb.AwayFromKeyboard.checkActive(userData, this.channelData);
 				sb.Reminder.checkActive(userData, this.channelData);
 
@@ -151,18 +167,6 @@ class CytubeClient {
 				if (this.controller.platform.Logging.whispers) {
 					sb.SystemLogger.send("Cytube.Other", "PM: " + msg, this.channelData, userData);
 				}
-			}
-
-			this.channelData.events.emit("message", {
-				type: "message",
-				message: msg,
-				user: userData,
-				channel: this.channelData,
-				platform: this.controller.platform
-			});
-
-			if (data.username === this.controller.platform.Self_Name) {
-				return;
 			}
 
 			// Handle commands if the message starts with the command prefix

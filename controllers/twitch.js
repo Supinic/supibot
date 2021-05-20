@@ -458,12 +458,6 @@ module.exports = class TwitchController extends require("./template.js") {
 				sb.Logger.push(message, userData, channelData);
 			}
 
-			// If channel is read-only, do not proceed with any processing
-			// Such as custom codes, un-AFK, reminders, commands (...)
-			if (channelData.Mode === "Read") {
-				return;
-			}
-
 			channelData.events.emit("message", {
 				event: "message",
 				message,
@@ -472,6 +466,12 @@ module.exports = class TwitchController extends require("./template.js") {
 				platform: this.platform,
 				data: messageData
 			});
+
+			// If channel is read-only, do not proceed with any processing
+			// Such as un-AFK message, reminders, commands, ...
+			if (channelData.Mode === "Read") {
+				return;
+			}
 
 			sb.AwayFromKeyboard.checkActive(userData, channelData);
 			sb.Reminder.checkActive(userData, channelData);

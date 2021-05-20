@@ -158,17 +158,17 @@ module.exports = class DiscordController extends require("./template.js") {
 				this.resolveUserMessage(channelData, userData, msg);
 				sb.Logger.push(sb.Utils.wrapString(msg, this.platform.Message_Limit), userData, channelData);
 
+				channelData.events.emit("message", {
+					type: "message",
+					message: msg,
+					user: userData,
+					channel: channelData,
+					platform: this.platform
+				});
+
 				if (channelData.Mode !== "Read") {
 					sb.AwayFromKeyboard.checkActive(userData, channelData);
 					sb.Reminder.checkActive(userData, channelData);
-
-					channelData.events.emit("message", {
-						type: "message",
-						message: msg,
-						user: userData,
-						channel: channelData,
-						platform: this.platform
-					});
 
 					// Mirroring is set up - mirror the message to the target channel
 					if (channelData.Mirror) {
