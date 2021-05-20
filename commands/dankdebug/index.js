@@ -60,10 +60,15 @@ module.exports = {
 		
 		try {
 			const scriptContext = {
+				fixAsync: false,
 				sandbox: {
 					args: scriptArgs ?? null,
+					executor: context.user.Name,
+					channel: context.channel?.Name ?? "(none)",
+					platform: context.platform.Name,
 					console: undefined,
 					utils: {
+						getEmote: (array, fallback) => context.getBestAvailableEmote(array, fallback),
 						Date: sb.Date
 					}
 				}
