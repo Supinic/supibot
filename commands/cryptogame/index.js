@@ -330,7 +330,7 @@ module.exports = {
         };
 
         return {
-            availableCommands: ["assets", "buy", "check", "leaderboard", "register", "portfolios", "prices", "rank", "sell", "total"],
+            availableCommands: ["assets", "average", "buy", "check", "leaderboard", "register", "portfolios", "prices", "rank", "sell", "total"],
             destroy,
 
             baseAsset,
@@ -392,6 +392,20 @@ module.exports = {
                 return {
                     reply: `Your portfolio was established. You now have the equivalent of 1000 EUR at your disposal to invest.`
                 }
+            }
+
+            case "average": {
+                const average = await sb.Query.getRecordset(rs => rs
+                    .select("AVG(crypto_game.GET_PORTFOLIO_TOTAL_PRICE(Portfolio.ID)) AS Average")
+                    .from("crypto_game", "Portfolio")
+                    .where("Active = %b", true)
+                    .single()
+                    .flat("Average")
+                );
+
+                return {
+                    reply: `The current average portfolio value is €${sb.Utils.round(average, 3)}`
+                };
             }
 
             case "assets":
@@ -639,6 +653,10 @@ module.exports = {
             "",
 
             "<h5>Supplementary sub-commands</h5>",
+
+            `<code>${prefix}cg average</code>`,
+            `Fetches the average portfolio value.`,
+            "",
 
             `<code>${prefix}cg check</code>`,
             `<code>${prefix}cg check (user)</code>`,
