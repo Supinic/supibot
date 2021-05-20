@@ -50,7 +50,7 @@ module.exports = {
 							return commandArguments.slice(order).join(" ");
 						}
 						else if (range) {
-							return commandArguments.slice(order, range).join(" ");
+							return commandArguments.slice(order, range + 1).join(" ");
 						}
 						else {
 							return commandArguments[order] ?? "";
