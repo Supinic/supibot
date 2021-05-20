@@ -23,10 +23,23 @@ module.exports = {
 				const parsed = aliasArguments[i].replace(/\${(.+?)}/g, (total, match) => {
 					const numberMatch = match.match(numberRegex);
 					if (numberMatch) {
-						const order = Number(numberMatch.groups.order);
-						const useRest = (numberMatch.groups.rest === "+");
-						const range = (numberMatch.groups.range) ? Number(numberMatch.groups.range) : null;
+						let order = Number(numberMatch.groups.order);
+						if (order < 0) {
+							order = commandArguments.length + order;
+						}
 
+						let range = (numberMatch.groups.range) ? Number(numberMatch.groups.range) : null;
+						if (typeof range === "number" && range < 0) {
+							range = commandArguments.length + range;
+
+							if (range < order) {
+								const temp = range;
+								range = order;
+								order = temp;
+							}
+						}
+
+						const useRest = (numberMatch.groups.rest === "+");
 						if (useRest && range) {
 							return {
 								success: false,
@@ -40,13 +53,7 @@ module.exports = {
 							return commandArguments.slice(order, range).join(" ");
 						}
 						else {
-							// @todo: When/if the `.at()` Array method comes out, use that instead here
-							if (order >= 0) {
-								return commandArguments[order] ?? "";
-							}
-							else {
-								return commandArguments[commandArguments.length + order] ?? "";
-							}
+							return commandArguments[order] ?? "";
 						}
 					}
 					else if (match === "executor") {
