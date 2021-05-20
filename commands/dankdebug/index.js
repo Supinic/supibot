@@ -55,7 +55,7 @@ module.exports = {
 			script = string;
 		}
 		else {
-			script = `await (async () => {\n${string}\n})()`;
+			script = `(async () => {\n${string}\n})()`;
 		}
 		
 		try {
@@ -78,7 +78,7 @@ module.exports = {
 				scriptContext.sandbox.utils[method] = (...args) => sb.Utils[method](...args);
 			}
 
-			result = sb.Sandbox.run(script, scriptContext);
+			result = await sb.Sandbox.run(script, scriptContext);
 		}
 		catch (e) {
 			const { name } = e.constructor;
