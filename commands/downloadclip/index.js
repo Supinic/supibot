@@ -16,7 +16,7 @@ module.exports = {
 			};
 		}
 
-		const slug = rawSlug.match(/^[a-zA-z]+(-[\-a-zA-Z0-9]{16})?$/)?.[0];
+		const slug = rawSlug.match(/^[a-zA-z]+(-[\_\-a-zA-Z0-9]{16})?$/)?.[0];
 		if (!slug) {
 			return {
 				success: false,
