@@ -6,14 +6,17 @@ module.exports = {
 		if (this.data.skipped) {
 			return;
 		}
+		else if (!context.channel) {
+			return;
+		}
 
 		if (!this.data.markovs) {
 			this.data.markovs = new Map();
 		}
-		if (!this.data.markovs.has(context.channel)) {
+		if (!this.data.markovs.has(context.channel.ID)) {
 			try {
 				const Markov = require("async-markov");
-				this.data.markovs.set(context.channel, new Markov());
+				this.data.markovs.set(context.channel.ID, new Markov());
 			}
 			catch (e) {
 				console.warn("async markov experiment failed", { error: e });
@@ -29,7 +32,7 @@ module.exports = {
 			this.data.threshold = 25_000;
 		}
 
-		const markov = this.data.markovs.get(context.channel);
+		const markov = this.data.markovs.get(context.channel.ID);
 		if (markov.size > this.data.threshold) {
 			return;
 		}
