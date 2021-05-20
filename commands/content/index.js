@@ -12,11 +12,12 @@ module.exports = {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("Category", "Status", "User_Alias")
 			.from("data", "Suggestion")
-			.where("Status IS NULL OR Status = %s", "Approved")
+			.where("Status IS NULL OR Status IN %s+", ["Approved", "Blocked"])
 		);
 	
 		const count = {
 			approved: 0,
+			blocked: 0,
 			botRequest: 0,
 			new: 0
 		};
@@ -28,6 +29,9 @@ module.exports = {
 			else if (item.Category === "Bot addition") {
 				count.botRequest++;
 			}
+			else if (item.Status === "Blocked") {
+				count.blocked++;
+			}
 			else {
 				count.approved++;
 			}
@@ -38,7 +42,8 @@ module.exports = {
 				Content status: 
 				${count.new} new suggestions,				
 				${count.approved} approved suggestions,
-				${count.new + count.approved} total.				
+				${count.blocked} are blocked from being worked on,
+				${count.new + count.blocked + count.approved} total.				
 				${count.botRequest} bot requests.
 			`
 		};
