@@ -29,14 +29,16 @@ module.exports = {
 						}
 
 						let range = (numberMatch.groups.range) ? Number(numberMatch.groups.range) : null;
-						if (typeof range === "number" && range < 0) {
-							range = commandArguments.length + range + 1;
-						}
+						if (typeof range === "number") {
+							if (range < 0) {
+								range = commandArguments.length + range + 1;
+							}
 
-						if (range < order) {
-							const temp = range;
-							range = order;
-							order = temp;
+							if (range < order) {
+								const temp = range;
+								range = order;
+								order = temp;
+							}
 						}
 
 						const useRest = (numberMatch.groups.rest === "+");
