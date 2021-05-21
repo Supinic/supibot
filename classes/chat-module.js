@@ -2,7 +2,6 @@
  * Represents a custom hook-like function that gets invoked every time a specified event
  * is emitted in a given channel.
  * @memberof sb
- * @type {ChatModule}
  */
 module.exports = class ChatModule extends require("./template.js") {
 	//<editor-fold defaultstate="collapsed" desc="=== INSTANCE PROPERTIES ===">

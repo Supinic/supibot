@@ -1,3 +1,6 @@
+/**
+ * Represents the context a command is being executed in
+ */
 class Context {
 	#invocation;
 	#user;
@@ -108,6 +111,10 @@ class Context {
 	get userFlags () { return this.#userFlags; }
 }
 
+/**
+ * Represents a single bot command.
+ * @memberof sb
+ */
 class Command extends require("./template.js") {
 	//<editor-fold defaultstate="collapsed" desc="=== INSTANCE PROPERTIES ===">
 

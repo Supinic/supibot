@@ -1,3 +1,7 @@
+/**
+ * Represents a single output modifier that will change the output of the bot in specified channel/platform.
+ * @memberof sb
+ */
 module.exports = (function () {
 	"use strict";
 

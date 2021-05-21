@@ -2,7 +2,6 @@
  * Represents a pending reminder from (usually) one user to another.
  * An active reminder will be printed into the chat once the target user is spotted.
  * @memberof sb
- * @type Reminder
  */
 module.exports = class Reminder extends require("./template.js") {
     static LongTimeout = require("long-timeout");

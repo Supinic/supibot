@@ -1,7 +1,6 @@
 /**
  * Represents a user's AFK status
  * @memberof sb
- * @type AwayFromKeyboard
  */
 module.exports = class AwayFromKeyboard extends require("./template.js") {
 	constructor (data) {

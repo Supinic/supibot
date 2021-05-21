@@ -2,7 +2,6 @@
  * Represents a chat user.
  * Since there can be hundreds of thousands of users loaded, a class is used to simplify the prototype, and potentially save some memory and/or processing power with V8.
  * @memberof sb
- * @type User
  */
 module.exports = class User extends require("./template.js") {
     static mapCacheExpiration = 300_000;
@@ -13,7 +12,6 @@ module.exports = class User extends require("./template.js") {
     static data = new Map();
     static bots = new Map();
 
-    /** @alias {User} */
     constructor (data) {
         super();
 

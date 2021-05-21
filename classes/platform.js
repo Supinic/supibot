@@ -1,7 +1,6 @@
 /**
  * Represents a user's AFK status
  * @memberof sb
- * @type Platform
  */
 module.exports = class Platform extends require("./template.js") {
 	/**

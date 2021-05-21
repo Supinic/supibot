@@ -3,8 +3,7 @@
  * @memberof sb
  * @type Channel
  */
-const Template = require("./template.js");
-module.exports = class Channel extends Template {
+module.exports = class Channel extends require("./template.js") {
     static redisPrefix = "sb-channel";
 
     /** @alias {Channel} */
