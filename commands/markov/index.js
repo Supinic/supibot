@@ -29,15 +29,18 @@ module.exports = {
 					return;
 				}
 
-				const markov = module.data.markovs.get(sb.Channel.get("forsen"));
-				if (!markov) {
-					return;
+				const promises = [];
+				for (const [channelID, markov] of module.data.markovs.entries()) {
+					const words = markov.keys.sort();
+					const key = {
+						channelID,
+						type: "markov-word-list"
+					};
+
+					promises.push(sb.Cache.setByPrefix(key, words, { expiry: 864e5 }));
 				}
 
-				const keys = markov.keys.sort();
-				await sb.Cache.setByPrefix("markov-word-list", keys, {
-					expiry: 864e5
-				});
+				await Promise.all(promises);
 			})
 		});
 		this.data.updateCron.start();
@@ -179,7 +182,11 @@ module.exports = {
 			if (!markov.has(input)) {
 				return {
 					success: false,
-					reply: `That word is not available as seed for random generation! Check the list here: https://supinic.com/data/other/markov/words`
+					reply: sb.Utils.tag.trim `
+						That word is not available as seed for random generation!
+						Check the list here:
+						https://supinic.com/data/other/markov/${targetChannel.ID}/words
+					`
 				};
 			}
 		}
