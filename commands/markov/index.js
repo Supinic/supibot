@@ -32,12 +32,11 @@ module.exports = {
 				const promises = [];
 				for (const [channelID, markov] of module.data.markovs.entries()) {
 					const words = markov.keys.sort();
-					const key = {
-						channelID,
-						type: "markov-word-list"
-					};
-
-					promises.push(sb.Cache.setByPrefix(key, words, { expiry: 864e5 }));
+					
+					promises.push(sb.Cache.setByPrefix("markov-word-list", words, {
+						keys: { channelID },
+						expiry: 864e5
+					}));
 				}
 
 				await Promise.all(promises);
