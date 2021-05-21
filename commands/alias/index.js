@@ -245,6 +245,8 @@ module.exports = {
 				}
 
 				const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
+				const cooldown = (context.append.pipe) ? null : this.Cooldown;
+
 				if (message.length >= limit) {
 					const escapedAliasName = encodeURIComponent(aliasName);
 					const escapedUsername = encodeURIComponent(user.Name);
@@ -254,11 +256,13 @@ module.exports = {
 					}
 
 					return {
+						cooldown,
 						reply: `${prefix}https://supinic.com/bot/user/${escapedUsername}/alias/detail/${escapedAliasName}`
 					};
 				}
 				else {
 					return {
+						cooldown,
 						reply: message
 					};
 				}
@@ -478,6 +482,7 @@ module.exports = {
 
 				const description = alias.desc;
 				return {
+					cooldown: (context.append.pipe) ? null : this.Cooldown,
 					reply: (description)
 						? `${aliasName}: ${description}`
 						: `Alias "${aliasName}" has no description.`
