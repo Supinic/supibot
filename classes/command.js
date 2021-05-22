@@ -738,7 +738,9 @@ class Command extends require("./template.js") {
 				result = execution.reply.trim().slice(0, 300);
 			}
 			else if (execution?.partialReplies) {
-				result = execution.partialReplies.map(i => i.message).join(" ").trim()
+				result = execution.partialReplies
+					.map(i => i.message)
+					.join(" ").trim()
 					.slice(0, 300);
 			}
 
@@ -1132,7 +1134,8 @@ class Command extends require("./template.js") {
 			});
 		}
 
-		const data = { invocation: contextData.invocation ?? commandData.Name,
+		const data = {
+			invocation: contextData.invocation ?? commandData.Name,
 			user: contextData.user ?? null,
 			channel: contextData.channel ?? null,
 			platform: contextData.platform ?? null,
@@ -1140,7 +1143,8 @@ class Command extends require("./template.js") {
 			privateMessage: contextData.isPrivateMessage ?? false,
 			append: contextData.append ?? {},
 			params: contextData.params ?? {},
-			...extraData };
+			...extraData
+		};
 
 		return new Context(commandData, data);
 	}
