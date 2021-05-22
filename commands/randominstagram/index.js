@@ -89,7 +89,7 @@ module.exports = {
 				if (response.statusCode !== 200) {
 					return {
 						success: false,
-						reply: `Fetching image data failed! Error: ${nsfwStatusCode}`
+						reply: `Fetching image data failed! Error: ${response.statusCode}`
 					};
 				}
 
