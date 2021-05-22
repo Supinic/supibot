@@ -77,8 +77,8 @@ module.exports = {
 						reply: "That channel is already set to read-only mode!"
 					};
 				}
-	
-				setTimeout(() => channelData.Mode = "Read", 5000);
+
+				setTimeout(() => (channelData.Mode = "Read"), 5000);
 				return {
 					reply: sb.Utils.tag.trim `
 						I will go to read-only mode in #${channelData.Name} in 5 seconds.
