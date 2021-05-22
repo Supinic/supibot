@@ -2,7 +2,9 @@
 module.exports = (function () {
 	"use strict";
 
-	const { VLC } = require("node-vlc-http");
+	const NodeVLC = require("node-vlc-http");
+
+	const VideoLAN = NodeVLC.VLC;
 	const actions = [
 		"addToQueue",
 		"addToQueueAndPlay",
@@ -67,7 +69,8 @@ module.exports = (function () {
 		constructor (options = {}) {
 			super();
 
-			this.client = new VLC({
+			// @ts-nocheck
+			this.client = new VideoLAN({
 				host: options.url,
 				port: options.port,
 				username: options.username,
@@ -302,7 +305,7 @@ module.exports = (function () {
 
 			return Math.max(...(await this.getPlaylist()).children.map(i => i.id));
 		}
-		
+
 		async currentlyPlaying () {
 			const status = await this.status();
 			if (!status.information) {
