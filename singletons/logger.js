@@ -9,8 +9,7 @@ module.exports = (function () {
 	/**
 	 * Logging module that handles all possible chat message and video logging.
 	 * Accesses the database so that nothing needs to be exposed in chat clients.
-	 * @name sb.Logger
-	 * @type Logger()
+	 * @memberof sb
 	 */
 	return class Logger extends require("./template.js") {
 		#crons = [];

@@ -1,3 +1,7 @@
+/**
+ * Sandbox module, created with the aim of running custom user input as safely as possible.
+ * @memberof sb
+ */
 module.exports = class Sandbox extends require("./template.js") {
 	#VM;
 	#NodeVM;

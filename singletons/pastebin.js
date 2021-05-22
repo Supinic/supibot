@@ -34,8 +34,7 @@ module.exports = (function () {
 
 	/**
 	 * Pastebin module: allows easy get/post methods with potential authentication, if so desired.
-	 * @name sb.Pastebin
-	 * @type Pastebin()
+	 * @memberof sb
 	 */
 	return class Pastebin extends require("./template.js") {
 		#authData = null;

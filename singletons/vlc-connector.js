@@ -33,6 +33,10 @@ module.exports = (function () {
 		"LOCAL_VLC_BASE_URL"
 	];
 
+	/**
+	 * VideoLANConnector (VLC) handler module - handles a VLC instance's playlist and methods.
+	 * @memberof sb
+	 */
 	return class VideoLANConnector extends require("./template.js") {
 		static singleton () {
 			if (!VideoLANConnector.module) {
