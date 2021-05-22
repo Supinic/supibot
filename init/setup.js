@@ -11,12 +11,8 @@
 	});
 	
 	// Prepare readline.question for promisification
-	rl.question[util.promisify.custom] = (question) => {
-		return new Promise((resolve) => {
-			rl.question(question, resolve);
-		});
-	};
-	
+	rl.question[util.promisify.custom] = (question) => new Promise((resolve) => rl.question(question, resolve));
+
 	const ask = util.promisify(rl.question);
 	const shell = util.promisify(exec);
 
