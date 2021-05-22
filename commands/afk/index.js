@@ -20,12 +20,13 @@ module.exports = {
 			"ppPoof": ["ppFoop materialized back", "ppFoop re-appeared", "ppFoop fooped back"],
 			"study": ["is full of knowledge", "finished studying", "is now ready for the exam", "is fed up with studying", "is now smarter than most of the people in chat"]
 		},
-		/* eslint-disable-next-line array-element-newline */
+		/* eslint-disable array-element-newline */
 		foodEmojis: [
 			"🍋", "🍞", "🥐", "🥖", "🥨", "🥯", "🥞", "🧀", "🍖", "🍗", "🥩", "🥓", "🍔", "🍟", "🍕", "🌭", "🥪", "🌮", "🌯",
 			"🥙", "🍳", "🥘", "🍲", "🥣", "🥗", "🍿", "🥫", "🍱", "🍘", "🍙", "🍚", "🍛", "🍜", "🍝", "🍠", "🍢", "🍣", "🍤",
 			"🍥", "🍡", "🥟", "🥠", "🥡", "🍦", "🍧", "🍨", "🍩", "🍪", "🎂", "🍰", "🥧", "🍫", "🍬", "🍭", "🍮", "🍯"
 		]
+		/* eslint-enable array-element-newline */
 	})),
 	Code: (async function afk (context, ...args) {
 		if (context.privateMessage && sb.AwayFromKeyboard.data.find(i => i.User_Alias === context.user.ID)) {
