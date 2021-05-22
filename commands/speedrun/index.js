@@ -179,9 +179,9 @@ module.exports = {
 		return {
 			reply: sb.Utils.tag.trim `
 				Speedrun by ${runner.names.international}: ${time}.
-			    Executed: ${date}.
-			    Category: ${game.names.international} (${category.name})
-			    ${link}
+				Executed: ${date}.
+				Category: ${game.names.international} (${category.name})
+				${link}
 			`
 		};
 	}),

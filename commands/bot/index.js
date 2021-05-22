@@ -159,8 +159,8 @@ module.exports = {
 			case "offline-only": {
 				const moduleData = sb.ChatModule.get("offline-only-mode");
 				const check = await sb.Query.getRecordset(rs => rs
-				    .select("1")
-				    .from("chat_data", "Channel_Chat_Module")
+					.select("1")
+					.from("chat_data", "Channel_Chat_Module")
 					.where("Channel = %n", channelData.ID)
 					.where("Chat_Module = %n", moduleData.ID)
 					.single()

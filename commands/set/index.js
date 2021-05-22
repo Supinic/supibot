@@ -526,8 +526,8 @@ module.exports = {
 						}
 	
 						const exists = await sb.Query.getRecordset(rs => rs
-						    .select("Link")
-						    .from("data", "Twitch_Lotto")
+							.select("Link")
+							.from("data", "Twitch_Lotto")
 							.where("Link = %s", match[4])
 							.limit(1)
 							.single()

@@ -67,8 +67,8 @@ module.exports = {
 		}
 		else {
 			const links = await sb.Query.getRecordset(rs => rs
-			    .select("Track.Link AS Link")
-			    .from("music", "User_Favourite")
+				.select("Track.Link AS Link")
+				.from("music", "User_Favourite")
 				.where("User_Alias = %n", 1)
 				.where("Video_Type = %n", 1)
 				.where(

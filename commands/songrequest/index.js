@@ -175,7 +175,7 @@ module.exports = {
 	}),
 	Code: (async function songRequest (context, ...args) {
 		if (args.length === 0) {
-	            // If we got no args, just redirect to $current 4HEad
+				// If we got no args, just redirect to $current 4HEad
 			return await sb.Command.get("current").execute(context);
 		}
 	

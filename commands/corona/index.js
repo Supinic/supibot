@@ -351,7 +351,7 @@ module.exports = {
 		const subregions = (await sb.Query.getRecordset(rs => rs
 			.select("DISTINCT Parent")
 			.from("corona", "Place")
-	       		.where("Parent IS NOT NULL")
+		   		.where("Parent IS NOT NULL")
 		)).map(i => `<li><code>${i.Parent}</code></li>`).sort().join("");		
 	
 		return [

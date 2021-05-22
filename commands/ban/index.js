@@ -6,12 +6,12 @@ module.exports = {
 	Description: "Bans/unbans any combination of channel, user, and command from being executed. Only usable by administrators, or Twitch channel owners.",
 	Flags: ["mention","use-params"],
 	Params: [
-        { name: "channel", type: "string" },
-        { name: "command", type: "string" },
-        { name: "invocation", type: "string" },
-        { name: "type", type: "string" },
-        { name: "user", type: "string" }
-    ],
+		{ name: "channel", type: "string" },
+		{ name: "command", type: "string" },
+		{ name: "invocation", type: "string" },
+		{ name: "type", type: "string" },
+		{ name: "user", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		availableTypes: ["Blacklist", "Online-only", "Offline-only"]
@@ -39,86 +39,86 @@ module.exports = {
 		};
 
 		if (context.params.channel) {
-            const channelData = sb.Channel.get(context.params.channel);
-            if (!channelData) {
-                return {
-                    success: false,
-                    reply: "Channel was not found!"
-                };
-            }
+			const channelData = sb.Channel.get(context.params.channel);
+			if (!channelData) {
+				return {
+					success: false,
+					reply: "Channel was not found!"
+				};
+			}
 
-            options.Channel = channelData.ID;
-        }
-        if (context.params.command) {
-            const commandData = sb.Command.get(context.params.command);
-            if (!commandData) {
-                return {
-                    success: false,
-                    reply: "Command does not exist!"
-                };
-            }
-            else if (commandData === this) {
-                const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "4Head"], "😅");
-                return {
-                    success: false,
-                    reply: `You can't ${invocation} the ${commandData.Name} command! ${emote}`
-                };
-            }
-
-            options.Command = commandData.ID;
-        }
-        if (context.params.invocation) {
-            const commandData = sb.Command.get(context.params.invocation);
-            if (!commandData) {
-                return {
-                    success: false,
-                    reply: "No command found for given invocation!"
-                };
-            }
-            else if (commandData === this) {
+			options.Channel = channelData.ID;
+		}
+		if (context.params.command) {
+			const commandData = sb.Command.get(context.params.command);
+			if (!commandData) {
+				return {
+					success: false,
+					reply: "Command does not exist!"
+				};
+			}
+			else if (commandData === this) {
 				const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "4Head"], "😅");
-                return {
-                    success: false,
-                    reply: `You can't ${invocation} the ${commandData.Name} command's invocation! ${emote}`
-                };
-            }
+				return {
+					success: false,
+					reply: `You can't ${invocation} the ${commandData.Name} command! ${emote}`
+				};
+			}
 
-            if (!options.Command) {
-                options.Command = commandData.ID;
-            }
-            else if (options.Command !== commandData.ID) {
-                return {
-                    success: false,
-                    reply: "Invalid command + invocation provided! Either keep command: empty, or use the command that belongs to the provided invocation"
-                };
-            }
+			options.Command = commandData.ID;
+		}
+		if (context.params.invocation) {
+			const commandData = sb.Command.get(context.params.invocation);
+			if (!commandData) {
+				return {
+					success: false,
+					reply: "No command found for given invocation!"
+				};
+			}
+			else if (commandData === this) {
+				const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "4Head"], "😅");
+				return {
+					success: false,
+					reply: `You can't ${invocation} the ${commandData.Name} command's invocation! ${emote}`
+				};
+			}
 
-            options.Invocation = context.params.invocation;
-        }
-        if (context.params.user) {
-            const userData = await sb.User.get(context.params.user);
-            if (!userData) {
-                return {
-                    success: false,
-                    reply: "User was not found!"
-                };
-            }
-            else if (userData === context.user) {
-                return {
-                    success: false,
-                    reply: `You can't ${invocation} yourself!`
-                };
-            }
+			if (!options.Command) {
+				options.Command = commandData.ID;
+			}
+			else if (options.Command !== commandData.ID) {
+				return {
+					success: false,
+					reply: "Invalid command + invocation provided! Either keep command: empty, or use the command that belongs to the provided invocation"
+				};
+			}
 
-            options.User_Alias = userData.ID;
-        }
+			options.Invocation = context.params.invocation;
+		}
+		if (context.params.user) {
+			const userData = await sb.User.get(context.params.user);
+			if (!userData) {
+				return {
+					success: false,
+					reply: "User was not found!"
+				};
+			}
+			else if (userData === context.user) {
+				return {
+					success: false,
+					reply: `You can't ${invocation} yourself!`
+				};
+			}
 
-        const isAdmin = Boolean(context.user.Data.administrator);
-        if (!options.Channel && !isAdmin) {
+			options.User_Alias = userData.ID;
+		}
+
+		const isAdmin = Boolean(context.user.Data.administrator);
+		if (!options.Channel && !isAdmin) {
 			options.Channel = context.channel.ID;
 		}
 
-        if (options.Channel && !isAdmin) {
+		if (options.Channel && !isAdmin) {
 			const channelData = sb.Channel.get(options.Channel);
 			const permissions = await context.getUserPermissions("array", ["admin", "owner", "ambassador"], {
 				channel: channelData,

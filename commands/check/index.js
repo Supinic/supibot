@@ -563,8 +563,8 @@ module.exports = {
 					}
 
 					const length = await sb.Query.getRecordset(rs => rs
-					    .select("LENGTH(IFNULL(Data, '')) AS Size")
-					    .from("chat_data", "User_Alias")
+						.select("LENGTH(IFNULL(Data, '')) AS Size")
+						.from("chat_data", "User_Alias")
 						.where("ID = %n", userData.ID)
 						.limit(1)
 						.single()

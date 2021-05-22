@@ -111,63 +111,63 @@ module.exports = {
 		};
 	}),
 	Code: (async function doesnotexist (context, type) {
-	        const { fetch, types } = this.staticData;
-	        if (!type) {
-	            type = "person";
-	        }
+			const { fetch, types } = this.staticData;
+			if (!type) {
+				type = "person";
+			}
 
-	        type = type.toLowerCase();
-	        if (type === "list") {
+			type = type.toLowerCase();
+			if (type === "list") {
 				return {
 					reply: `Available types: ${types.join(", ")}`
 				};
 			}
-	        else if (!types.includes(type)) {
-	            return {
-	                success: false,
-	                reply: `Invalid type provided! Use one of: ${types.join(", ")}`
-	            };
-	        }
+			else if (!types.includes(type)) {
+				return {
+					success: false,
+					reply: `Invalid type provided! Use one of: ${types.join(", ")}`
+				};
+			}
 
-	        const { execute } = fetch.find(i => i.types.includes(type));
-	        const result = await execute(context, type);
+			const { execute } = fetch.find(i => i.types.includes(type));
+			const result = await execute(context, type);
 
-	        if (context.params.linkOnly && result.link) {
+			if (context.params.linkOnly && result.link) {
 				return {
 					success: result.success ?? true,
 					reply: result.link
 				};
 			}
-	        else {
-	        	return result;
+			else {
+				return result;
 			}
-	    }),
+		}),
 	Dynamic_Description: (async (prefix, values) => {
-	        const { fetch } = values.getStaticData();
-	        const list = fetch.flatMap(i => i.descriptions).map(i => `<li>${i}</li>`).join("");
+			const { fetch } = values.getStaticData();
+			const list = fetch.flatMap(i => i.descriptions).map(i => `<li>${i}</li>`).join("");
 	
-	        return [
-	            `Posts a random picture from the set of "this X does not exist" websites.`,
-	            "",
+			return [
+				`Posts a random picture from the set of "this X does not exist" websites.`,
+				"",
 
 				`<code>${prefix}dne list</code>`,
 				"Posts a list of available types of stuff that does not exist",
 				"",
 	
-	            `<code>${prefix}dne</code>`,
-	            "Posts a random person that does not exist",
-	            "",
+				`<code>${prefix}dne</code>`,
+				"Posts a random person that does not exist",
+				"",
 	
-	            `<code>${prefix}dne (type)</code>`,
-	            "Posts a random (type) that does not exist",
-	            "",
+				`<code>${prefix}dne (type)</code>`,
+				"Posts a random (type) that does not exist",
+				"",
 
 				`<code>${prefix}dne word wordOnly:true</code>`,
 				"Posts a random word, without the word class, definition or examples",
 				"",
 	
-	            "Available types:",
-	            `<ul>${list}</ul>`
-	        ];
-	    })
+				"Available types:",
+				`<ul>${list}</ul>`
+			];
+		})
 };

@@ -12,8 +12,8 @@ module.exports = {
 		let presentSince = "";
 		if (context.channel) {
 			const date = await sb.Query.getRecordset(rs => rs
-			    .select("Posted")
-			    .from("chat_line", context.channel.getDatabaseName())
+				.select("Posted")
+				.from("chat_line", context.channel.getDatabaseName())
 				.orderBy("ID ASC")
 				.limit(1)
 				.flat("Posted")

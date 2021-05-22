@@ -15,8 +15,8 @@ module.exports = {
 			const start = new sb.Date(stream.created_at);
 			const date = start.clone().discardTimeUnits("h", "m", "s", "ms");
 			const exists = await sb.Query.getRecordset(rs => rs
-			    .select("Video_ID")
-			    .from("stream", "Stream")
+				.select("Video_ID")
+				.from("stream", "Stream")
 				.where("Video_ID = %s", stream.id)
 				.single()
 				.flat("Video_ID")

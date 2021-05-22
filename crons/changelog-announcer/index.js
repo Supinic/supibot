@@ -27,8 +27,8 @@ module.exports = {
 		}
 
 		const subscriptions = await sb.Query.getRecordset(rs => rs
-		    .select("User_Alias", "Platform")
-		    .from("data", "Event_Subscription")
+			.select("User_Alias", "Platform")
+			.from("data", "Event_Subscription")
 			.where("Type = %s", "Changelog")
 			.where("Active = %b", true)
 		);

@@ -37,8 +37,8 @@ module.exports = {
 
 		const { channel, emotecode, emoteid, tier } = response;
 		const originID = await sb.Query.getRecordset(rs => rs
-		    .select("ID")
-		    .from("data", "Origin")
+			.select("ID")
+			.from("data", "Origin")
 			.where("Emote_ID = %s", emoteid)
 			.limit(1)
 			.single()

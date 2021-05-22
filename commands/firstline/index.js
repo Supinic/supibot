@@ -56,7 +56,7 @@ module.exports = {
 			const promises = [7, 8, 46].map(async ID => {
 				const channelData = sb.Channel.get(ID);
 				return await sb.Query.getRecordset(rs => rs
-				    .select("Text", "Posted")
+					.select("Text", "Posted")
 					.from("chat_line", channelData.getDatabaseName())
 					.where("User_Alias = %n", targetUser.ID)
 					.orderBy("ID ASC")
@@ -78,7 +78,7 @@ module.exports = {
 		}
 		else {
 			line = await sb.Query.getRecordset(rs => rs
-			    .select("Text", "Posted")
+				.select("Text", "Posted")
 				.from("chat_line", context.channel.getDatabaseName())
 				.where("User_Alias = %n", targetUser.ID)
 				.orderBy("ID ASC")

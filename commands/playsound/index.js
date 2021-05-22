@@ -29,8 +29,8 @@ module.exports = {
 		}
 		else if (playsound === "random") {
 			playsound = await sb.Query.getRecordset(rs => rs
-			    .select("Name")
-			    .from("data", "Playsound")
+				.select("Name")
+				.from("data", "Playsound")
 				.orderBy("RAND()")
 				.limit(1)
 				.single()

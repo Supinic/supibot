@@ -236,8 +236,8 @@ module.exports = {
 		let channelString = "";
 		if (!channel || randomRoll || excludedInput) {
 			const channels = await sb.Query.getRecordset(rs => rs
-			    .select("Channel")
-			    .from("data", "Twitch_Lotto")
+				.select("Channel")
+				.from("data", "Twitch_Lotto")
 				.where("Link = %s", image.Link)
 				.flat("Channel")
 			);

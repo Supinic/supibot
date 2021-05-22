@@ -33,8 +33,8 @@ module.exports = {
 		}
 		
 		const messageCount = await sb.Query.getRecordset(rs => rs
-		    .select("Message_Count")
-		    .from("chat_data", "Message_Meta_User_Alias")
+			.select("Message_Count")
+			.from("chat_data", "Message_Meta_User_Alias")
 			.where("Channel = %n", context.channel.ID)
 			.where("User_Alias = %n", context.user.ID)
 			.single()

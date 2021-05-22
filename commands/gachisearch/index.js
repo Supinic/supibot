@@ -39,10 +39,10 @@ module.exports = {
 						FROM music.Alias
 						WHERE
 							Alias.Name LIKE '%${escaped}%' 
-				            AND Alias.Target_Table = "Author"
-				            AND Alias.Target_ID = Author.ID
-		            )
-	            `);
+							AND Alias.Target_Table = "Author"
+							AND Alias.Target_ID = Author.ID
+					)
+				`);
 
 			const [author, ...rest] = data;
 			if (!author) {

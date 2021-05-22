@@ -46,8 +46,8 @@ module.exports = {
 
 				const link = sb.Utils.linkParser.parseLink(input);
 				const existing = await sb.Query.getRecordset(rs => rs
-				    .select("ID", "Device", "Link")
-				    .from("data", "Bad_Apple")
+					.select("ID", "Device", "Link")
+					.from("data", "Bad_Apple")
 					.where(`Link = %s OR JSON_SEARCH(Reuploads, "one", %s) IS NOT NULL`, link, link)
 					.limit(1)
 					.single()
