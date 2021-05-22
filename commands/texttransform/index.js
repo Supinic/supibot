@@ -8,8 +8,9 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
+		/* eslint-disable-next-line quote-props, key-spacing */
 		const morse = {"0":"-----","1":".----","2":"..---","3":"...--","4":"....-","5":".....","6":"-....","7":"--...","8":"---..","9":"----.","a":".-","b":"-...","c":"-.-.","d":"-..","e":".","f":"..-.","g":"--.","h":"....","i":"..","j":".---","k":"-.-","l":".-..","m":"--","n":"-.","o":"---","p":".--.","q":"--.-","r":".-.","s":"...","t":"-","u":"..-","v":"...-","w":".--","x":"-..-","y":"-.--","z":"--..",".":".-.-.-",",":"--..--","?":"..--..","!":"-.-.--","-":"-....-","/":"-..-.","@":".--.-.","(":"-.--.",")":"-.--.-"};
-	
+
 		const convert = {
 			method: (string, fn) => fn(string),
 			map: (string, map) => [...string].map(i => map[i] || i).join(""),
@@ -25,42 +26,43 @@ module.exports = {
 					const r = new RegExp("\\b" + from + "\\b", "gi");
 					string = string.replace(r, "_" + to + "_");
 				}
-	
+
 				for (const [from, to] of dictionary.prefixes) {
 					const r = new RegExp("\\b" + from, "gi");
 					string = string.replace(r, to);
 				}
-	
+
 				for (const [from, to] of dictionary.suffixes) {
 					const r = new RegExp(from + "\\b", "gi");
 					string = string.replace(r, to);
 				}
-	
+
 				for (const [from, to] of dictionary.intrawords) {
 					const r = new RegExp(from, "gi");
 					string = string.replace(r, to);
 				}
-	
+
 				string = string.trim().replace(/_/g, "");
-	
+
 				if (dictionary.endings && /[).?!]$/.test(string)) {
 					string += " " + sb.Utils.randArray(dictionary.endings);
 				}
-	
+
 				return string;
 			}
 		};
-	
+
+		/* eslint-disable quote-props, key-spacing, object-property-newline */
 		const officialCharactersMap = {
 			A: "𝐀", B: "𝐁", C: "𝐂", D: "𝐃", E: "𝐄", F: "𝐅", G: "𝐆", H: "𝐇", I: "𝐈", J: "𝐉",
 			K: "𝐊", L: "𝐋", M: "𝐌", N: "𝐍", O: "𝐎", P: "𝐏", Q: "𝐐", R: "𝐑", S: "𝐒", T: "𝐓",
 			U: "𝐔", V: "𝐕", W: "𝐖", X: "𝐗", Y: "𝐘", Z: "𝐙",
-	
+
 			a: "𝐚", b: "𝐛",	c: "𝐜",	d: "𝐝",	e: "𝐞",	f: "𝐟",	g: "𝐠", h: "𝐡", i: "𝐢", j: "𝐣",
 			k: "𝐤", l: "𝐥", m: "𝐦", n: "𝐧", o: "𝐨", p: "𝐩", q: "𝐪", r: "𝐫", s: "𝐬", t: "𝐭",
 			u: "𝐮", v: "𝐯", w: "𝐰", x: "𝐱", y: "𝐲", z: "𝐳"
 		};
-	
+
 		const types = [
 			{
 				name: "bubble",
@@ -173,7 +175,7 @@ module.exports = {
 					.replace(/[!?]+/g, " " + sb.Utils.randArray(["(・`ω´・)", ";;w;;", "owo", "UwU", ">w<", "^w^"]) + " ")
 			},
 			{
-	
+
 				name: "reverse",
 				type: "method",
 				aliases: [],
@@ -235,7 +237,7 @@ module.exports = {
 							arr.push(morse[character]);
 						}
 					}
-	
+
 					return arr.join(" ");
 				}
 			},
@@ -248,7 +250,7 @@ module.exports = {
 					const arr = [];
 					const combine = String.fromCharCode(0xFE0F);
 					const box = String.fromCharCode(0x20E3);
-	
+
 					for (const character of message) {
 						if (character === " ") {
 							arr.push(character);
@@ -257,7 +259,7 @@ module.exports = {
 							arr.push(character, box, combine);
 						}
 					}
-	
+
 					return arr.join("");
 				}
 			},
@@ -287,7 +289,7 @@ module.exports = {
 							result.push(word);
 							continue;
 						}
-	
+
 						const scrambled = [];
 						const chars = word.slice(1, -1).split("");
 						while (chars.length > 0) {
@@ -295,10 +297,10 @@ module.exports = {
 							scrambled.push(chars[randomIndex]);
 							chars.splice(randomIndex, 1);
 						}
-	
+
 						result.push(`${word[0]}${scrambled.join("")}${word[word.length - 1]}`);
 					}
-	
+
 					return result.join("");
 				}
 			},
@@ -313,7 +315,8 @@ module.exports = {
 				}
 			},
 		];
-	
+		/* eslint-enable quote-props, key-spacing, object-property-newline */
+
 		return {
 			convert,
 			types
@@ -332,19 +335,19 @@ module.exports = {
 				reply: "No message provided!"
 			};
 		}
-	
+
 		const message = args.join(" ");
 		const transformation = this.staticData.types.find(i => (
 			i.name === name || (i.aliases && i.aliases.includes(name))
 		));
-	
+
 		if (!transformation) {
 			return {
 				success: false,
 				reply: "Invalid type provided!"
 			}
 		}
-	
+
 		let { type } = transformation;
 		if (context.invocation === "rtt") {
 			if (type !== "map") {
@@ -364,7 +367,7 @@ module.exports = {
 				reply: "No result has been created?!"
 			};
 		}
-	
+
 		return {
 			meta: {
 				skipWhitespaceCheck: true
@@ -384,7 +387,7 @@ module.exports = {
 			const aliases = (transform.aliases.length === 0)
 				? ""
 				: ` (${transform.aliases.join(", ")})`;
-	
+
 			return sb.Utils.tag.trim `
 				<li>
 					<code>${transform.name}${aliases}</code>
@@ -396,18 +399,18 @@ module.exports = {
 				</li>
 			`;
 		});
-	
+
 		return [
 			"Transforms some given text to different styles, according to the transform type provided.",
 			"Each type, and their aliases listed below, along with an example.",
 			"",
-			
+
 			`Note: if used within the <a href="/bot/command/104">pipe command</a>, this command has no cooldown, and you can use it multiple times within the same pipe!`,
 			"",
-	
+
 			"Example text: " + lorem,
 			"",
-	
+
 			"<ul>" + examples.join("<br>") + "</ul>"
 		];
 	})
