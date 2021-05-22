@@ -80,8 +80,8 @@ module.exports = {
 		}
 		
 		const records = data.flatMap(i => Object.entries(i.meaning));
-		const items = records.flatMap(([type, value]) => value.map(item => ({ type, definition: item.definition })))
-		if (items.length === 0) {		
+		const items = records.flatMap(([type, value]) => value.map(item => ({ type, definition: item.definition })));
+		if (items.length === 0) {
 			return {
 				reply: `${data[0].word} (${data[0].phonetic ?? "N/A"}) - no word meaning has been found!`
 			};
@@ -113,8 +113,8 @@ module.exports = {
 			"Will fetch the word's definition in the English language.",
 			"",
 	
-			`<code>${prefix}dictionary lang:fr (word)</code>`,	
-			`<code>${prefix}dictionary language:French (word)</code>`,	
+			`<code>${prefix}dictionary lang:fr (word)</code>`,
+			`<code>${prefix}dictionary language:French (word)</code>`,
 			"Both of these will fetch the word's definition in the French language.",
 			"",
 	

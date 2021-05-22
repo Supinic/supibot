@@ -45,23 +45,21 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			"Calculates advanced maths. You can use functions, derivatives, integrals, methods, ...",
-			`Look here for more info: <a href="https://mathjs.org/">mathjs documentation</a>`,
-			"",
+	Dynamic_Description: (async (prefix) => [
+		"Calculates advanced maths. You can use functions, derivatives, integrals, methods, ...",
+		`Look here for more info: <a href="https://mathjs.org/">mathjs documentation</a>`,
+		"",
 			
-			`<code>${prefix}math 1+1</code>`,
-			"2",
-			"",
+		`<code>${prefix}math 1+1</code>`,
+		"2",
+		"",
 	
-			`<code>${prefix}math e^(i*pi)</code>`,
-			"-1 + 1.2246467991473532e-16i",
-			"",
+		`<code>${prefix}math e^(i*pi)</code>`,
+		"-1 + 1.2246467991473532e-16i",
+		"",
 	
-			`<code>${prefix}math 100 inches to cm</code>`,
-			"254 cm",
-			""
-		];
-	})
+		`<code>${prefix}math 100 inches to cm</code>`,
+		"254 cm",
+		""
+	])
 };

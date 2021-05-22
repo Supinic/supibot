@@ -14,11 +14,49 @@ module.exports = {
 			{
 				name: "nam",
 				pattern: [
-					"aniki", "black", "bridge", "bruceu", "champ", "cheat", "cock", "cringe", "cum", "dab",
-					"doc", "emote", "forsen", "fuck", "gay", "incest", "is", "it", "like", "lol",
-					"mods", "nam", "nammers", "nymn", "okay", "or", "pewds", "poggers", "racist", "redneck",
-					"rip", "run", "say", "sing", "smile", "spammers", "sucking", "uganda", "van", "weebs",
-					"weird", "wife", "will"
+					"aniki",
+					"black",
+					"bridge",
+					"bruceu",
+					"champ",
+					"cheat",
+					"cock",
+					"cringe",
+					"cum",
+					"dab",
+					"doc",
+					"emote",
+					"forsen",
+					"fuck",
+					"gay",
+					"incest",
+					"is",
+					"it",
+					"like",
+					"lol",
+					"mods",
+					"nam",
+					"nammers",
+					"nymn",
+					"okay",
+					"or",
+					"pewds",
+					"poggers",
+					"racist",
+					"redneck",
+					"rip",
+					"run",
+					"say",
+					"sing",
+					"smile",
+					"spammers",
+					"sucking",
+					"uganda",
+					"van",
+					"weebs",
+					"weird",
+					"wife",
+					"will"
 				],
 				notes: "Used mainly in nymn's chat for random shit. Contains a selection of words."
 			},
@@ -34,11 +72,53 @@ module.exports = {
 			{
 				name: "blob",
 				pattern: [
-					"a", "about", "anyway", "away", "bad", "be", "blob", "breakfast", "cook", "cow",
-					"do", "dont", "ever", "for", "fuckin", "fucking", "get", "hire", "in", "it",
-					"its", "job", "lazy", "like", "me", "mind", "mothers", "my", "need",
-					"no", "one", "quick", "right", "school", "smart", "thats", "their", "to",
-					"too", "up", "what", "wheres", "while", "with", "would", "you", "your"
+					"a",
+					"about",
+					"anyway",
+					"away",
+					"bad",
+					"be",
+					"blob",
+					"breakfast",
+					"cook",
+					"cow",
+					"do",
+					"dont",
+					"ever",
+					"for",
+					"fuckin",
+					"fucking",
+					"get",
+					"hire",
+					"in",
+					"it",
+					"its",
+					"job",
+					"lazy",
+					"like",
+					"me",
+					"mind",
+					"mothers",
+					"my",
+					"need",
+					"no",
+					"one",
+					"quick",
+					"right",
+					"school",
+					"smart",
+					"thats",
+					"their",
+					"to",
+					"too",
+					"up",
+					"what",
+					"wheres",
+					"while",
+					"with",
+					"would",
+					"you",
+					"your"
 				],
 				notes: "Contains quotes related to Anthony \"Obama Chavez\" Stone. pajaWTH"
 			},
@@ -142,7 +222,7 @@ module.exports = {
 		}
 
 		let emotes = [...args];
-		const preset = this.staticData.patterns.find(i => i.name === patternName );
+		const preset = this.staticData.patterns.find(i => i.name === patternName);
 		if (preset) {
 			if (Array.isArray(preset.pattern)) {
 				emotes = preset.pattern;
@@ -190,7 +270,7 @@ module.exports = {
 		if (type === "array") {
 			if (emotes === null || emotes.length < limit) {
 				return {
-					reply: "You must provide at least " + limit + " emotes/words to roll the slots!",
+					reply: `You must provide at least ${limit} emotes/words to roll the slots!`,
 					cooldown: 2500
 				};
 			}
@@ -230,7 +310,7 @@ module.exports = {
 			const row = await sb.Query.getRow("data", "Slots_Winner");
 			row.setValues({
 				User_Alias: context.user.ID,
-				Source: (Array.isArray(emotes)) ? emotes.join(" ") : ("Number roll: 1 to " + uniqueItems),
+				Source: (Array.isArray(emotes)) ? emotes.join(" ") : (`Number roll: 1 to ${uniqueItems}`),
 				Result: rolledItems.join(" "),
 				Channel: context.channel?.ID ?? null,
 				Odds: reverseChance

@@ -23,8 +23,8 @@ module.exports = {
 			return `#${index + 1}: ${user.Name} (${sb.Utils.groupDigits(stats.Total)})`;
 		}).join("; ");
 	
-		return { 
-			reply: "Top users by total chat lines across all channels: " + string
+		return {
+			reply: `Top users by total chat lines across all channels: ${string}`
 		};
 	}),
 	Dynamic_Description: null

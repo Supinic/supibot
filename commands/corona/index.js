@@ -9,12 +9,12 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		const special = {
-			"AU": "Australia",
-			"CAR": "Central African Republic",
-			"DRC": "Democratic Republic of the Congo",
-			"UAE": "United Arab Emirates",
-			"UK": "United Kingdom",
-			"USA": "United States of America"
+			AU: "Australia",
+			CAR: "Central African Republic",
+			DRC: "Democratic Republic of the Congo",
+			UAE: "United Arab Emirates",
+			UK: "United Kingdom",
+			USA: "United States of America"
 		};
 		const regions = [
 			"Africa",
@@ -26,7 +26,7 @@ module.exports = {
 			"Oceania",
 			"South America"
 		].map(i => i.toLowerCase());
-	
+
 		return {
 			special,
 			regions,
@@ -98,14 +98,14 @@ module.exports = {
 						}
 					}
 				}
-	
+
 				return result;
 			},
 			getEmoji: async (country) => {
 				if (country === null) {
 					return sb.Utils.randArray(["🌏", "🌎", "🌍"]);
 				}
-	
+
 				const fixedCountryName = special[country.toUpperCase()] ?? country;
 				const countryData = await sb.Query.getRecordset(rs => rs
 					.select("Code_Alpha_2 AS Code")
@@ -114,7 +114,7 @@ module.exports = {
 					.limit(1)
 					.single()
 				);
-	
+
 				if (countryData?.Code) {
 					return String.fromCodePoint(...countryData.Code.split("").map(i => i.charCodeAt(0) + 127397));
 				}
@@ -129,7 +129,7 @@ module.exports = {
 		let region = null;
 		let country = null;
 		let targetData = null;
-	
+
 		if (input.startsWith("@")) {
 			const userData = await sb.User.get(input);
 			if (!userData) {
@@ -156,7 +156,7 @@ module.exports = {
 					reply: "That user does not have their country location set!"
 				};
 			}
-	
+
 			country = userData.Data.location.components.country;
 		}
 		else if (input === "stats" || input === "dump") {
@@ -168,9 +168,9 @@ module.exports = {
 			const result = (await this.staticData.fetch.topData(10))
 				.map((i, ind) => `#${ind + 1}: ${i.Country} (${Math.trunc(i.All_Cases / 1e3)}k)`)
 				.join("; ");
-	
+
 			return {
-				reply: "Top 10 countries by cases: " + result
+				reply: `Top 10 countries by cases: ${result}`
 			};
 		}
 		else if (input.includes(":")) {
@@ -179,7 +179,7 @@ module.exports = {
 		else if (input.length > 0) {
 			country = input;
 		}
-	
+
 		if (this.staticData.regions.includes(input)) {
 			region = input;
 			targetData = await this.staticData.fetch.regionalData(region);
@@ -189,13 +189,13 @@ module.exports = {
 				this.staticData.fetch.countryData(region, country, false),
 				this.staticData.fetch.countryData(region, country, true)
 			]);
-	
+
 			const result = sb.Utils.selectClosestString(
 				country,
 				[loose[0]?.Name, strict[0]?.Name].filter(Boolean),
 				{ ignoreCase: true }
 			);
-	
+
 			if (result) {
 				targetData = [loose, strict].find(i => i[0]?.Name && i[0].Name.toLowerCase() === result.toLowerCase());
 			}
@@ -206,13 +206,13 @@ module.exports = {
 		else {
 			targetData = await this.staticData.fetch.regionalData(null);
 		}
-	
+
 		if (!targetData || targetData.length === 0) {
 			return {
 				reply: "That country has no Corona virus data available!"
 			};
 		}
-	
+
 		const { Region: prettyRegion } = targetData[0];
 		if (targetData.length === 1) {
 			targetData = targetData[0];
@@ -220,7 +220,7 @@ module.exports = {
 		else if (targetData.length > 1) {
 			targetData = this.staticData.sumObjectArray(targetData);
 		}
-	
+
 		let intro;
 		if (region && !country) {
 			intro = prettyRegion;
@@ -235,7 +235,7 @@ module.exports = {
 			const emoji = await this.staticData.getEmoji(targetData.Parent);
 			intro = `${targetData.Name} (${emoji})`;
 		}
-	
+
 		const {
 			All_Cases: allCases,
 			All_Deaths: allDeaths,
@@ -245,19 +245,19 @@ module.exports = {
 			Population: population,
 			Tests: tests
 		} = targetData;
-	
+
 		const group = sb.Utils.groupDigits;
 		const cases = {
 			amount: group(allCases),
 			word: (allCases === 1) ? "case" : "cases",
-			plusPrefix: (newCases > 0) ? "+" : (newCases < 0) ? "-" : "±",
+			plusPrefix: (newCases > 0) ? "+" : ((newCases < 0) ? "-" : "±"),
 			plusWord: (newCases === 1) ? "case" : "cases",
 			plusAmount: (newCases) ? group(newCases) : null
 		};
 		const deaths = {
 			amount: (allDeaths) ? group(allDeaths) : "unknown amount of",
 			word: (allDeaths === 1) ? "death" : "deaths",
-			plusPrefix: (newDeaths > 0) ? "+" : (newDeaths < 0) ? "-" : "±",
+			plusPrefix: (newDeaths > 0) ? "+" : ((newDeaths < 0) ? "-" : "±"),
 			plusWord: (newDeaths === 1) ? "death" : "deaths",
 			plusAmount: (newDeaths) ? group(newDeaths) : null
 		};
@@ -265,17 +265,17 @@ module.exports = {
 			amount: (allRecoveries) ? group(allRecoveries) : "unknown amount of",
 			word: (allRecoveries === 1) ? "recovery" : "recoveries"
 		};
-	
+
 		const active = (allCases - (allDeaths ?? 0) - (allRecoveries ?? 0));
 		const approximateSymbol = (allDeaths === null || allRecoveries === null)
 			? "~"
 			: "";
-	
+
 		const ratios = {};
 		if (population !== null) {
 			ratios.cpm = sb.Utils.round((allCases / population) * 1e6, 2);
 			ratios.dpm = sb.Utils.round((allDeaths / population) * 1e6, 2);
-			if (active !== null){
+			if (active !== null) {
 				ratios.apm = sb.Utils.round((active / population) * 1e6, 2);
 			}
 			if (tests !== null) {
@@ -298,7 +298,7 @@ module.exports = {
 				const fullyVaccinated = vaccineData.People_Fully;
 				const percent = sb.Utils.round(fullyVaccinated / population * 100, 2);
 
-				vaccines = sb.Utils.tag.trim`
+				vaccines = sb.Utils.tag.trim `
 					Vaccine status: 
 					${group(fullyVaccinated)} people have been fully vaccinated so far,
 					which is ${percent}% of the population.
@@ -312,33 +312,33 @@ module.exports = {
 				has 
 				${approximateSymbol}${group(active)} active cases,
 				${cases.amount} total ${cases.word}${(cases.plusAmount === null)
-					? ""
-					: ` (${cases.plusPrefix}${cases.plusAmount})`
-				},
+			? ""
+			: ` (${cases.plusPrefix}${cases.plusAmount})`
+		},
 	
 				${deaths.amount} ${deaths.word}${(deaths.plusAmount === null)
-					? ""
-					: ` (${deaths.plusPrefix}${deaths.plusAmount})`
-				}
+			? ""
+			: ` (${deaths.plusPrefix}${deaths.plusAmount})`
+		}
 	
 				and ${recoveries.amount} ${recoveries.word}.		
 	
 				${(tests)
-					? `${group(tests)} tests have been performed so far.`
-					: ""
-				}
+			? `${group(tests)} tests have been performed so far.`
+			: ""
+		}
 				
 				${(ratios.apm)
-					? `This is ${group(ratios.apm)} active cases, `
-					: ""
-				}
+			? `This is ${group(ratios.apm)} active cases, `
+			: ""
+		}
 	
 				${(ratios.cpm)
-					? (ratios.tpm)
-						? ` ${group(ratios.cpm)} cases, ${group(ratios.dpm)} deaths, and ${group(ratios.tpm)} tests per million.`
-						: ` ${group(ratios.cpm)} cases, and ${group(ratios.dpm)} deaths per million.`
-					: ""
-				}
+			? ((ratios.tpm)
+				? ` ${group(ratios.cpm)} cases, ${group(ratios.dpm)} deaths, and ${group(ratios.tpm)} tests per million.`
+				: ` ${group(ratios.cpm)} cases, and ${group(ratios.dpm)} deaths per million.`)
+			: ""
+		}
 				
 				${vaccines}
 			`
@@ -347,35 +347,35 @@ module.exports = {
 	Dynamic_Description: (async (prefix, values) => {
 		const { regions } = await values.getStaticData();
 		const regionList = regions.map(i => `<li><code>${i}</code></li>`).join("");
-	
+
 		const subregions = (await sb.Query.getRecordset(rs => rs
 			.select("DISTINCT Parent")
 			.from("corona", "Place")
-		   		.where("Parent IS NOT NULL")
-		)).map(i => `<li><code>${i.Parent}</code></li>`).sort().join("");		
-	
+			.where("Parent IS NOT NULL")
+		)).map(i => `<li><code>${i.Parent}</code></li>`).sort().join("");
+
 		return [
 			`Checks the latest data on the Corona COVID-19 virus's spread, either globally or in a region/country.`,
 			`The code for scraper can be found on GitHub: <a target="_blank" href="https://github.com/Supinic/supi-corona">supi-corona</a>.`,
-	
+
 			`<code>${prefix}corona</code>`,
 			"Posts the current global stats.",
 			"",
-	
+
 			`<code>${prefix}corona (global region)</code>`,
 			`Posts a given global region's cumulative stats.`,
 			`Supported global regions: <ul>${regionList}</ul>`,
-	
+
 			`<code>${prefix}corona (country/region)</code>`,
 			`Posts a given country's <b>OR</b> region's data. Countries take precedence. I.e. "Georgia" will post the country, not the USA state.`,
 			"",
-	
+
 			`<code>${prefix}corona (region):(country)</code>`,
 			`E.g.: <code>${prefix}corona USA:Georgia</code>`,
 			`Posts a given country region's data. Use when you need to specify an ambiguous region.`,
 			`Keep in mind the region names are local. E.g. <code>Lombardia</code> and not <code>Lombardy</code>`,
 			`Supported countries with regions: <ul>${subregions}</ul>`,
-	
+
 			`<code>${prefix}corona @User</code>`,
 			"If a given user has set their default location (and it is public), this will check their country's corona stats."
 		];

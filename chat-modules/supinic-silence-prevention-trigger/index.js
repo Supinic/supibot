@@ -7,7 +7,8 @@ module.exports = {
 		if (!cron) {
 			return;
 		}
-		else if (context.event === "offline" && cron.started) {
+
+		if (context.event === "offline" && cron.started) {
 			cron.stop();
 		}
 		else if (context.event === "online" && !cron.started) {

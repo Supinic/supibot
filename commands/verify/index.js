@@ -33,7 +33,7 @@ module.exports = {
 		if (userData.Data.animals[type]) {
 			return {
 				reply: `That user is already verified for ${type}(s). If you want to add more pictures, do it manually please :)`
-			}
+			};
 		}
 	
 		userData.Data.animals[type] = {

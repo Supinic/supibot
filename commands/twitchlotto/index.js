@@ -10,48 +10,44 @@ module.exports = {
 		{ name: "excludeChannels", type: "string" }
 	],
 	Whitelist_Response: "This command can't be executed here!",
-	Static_Data: (() => {
-		return {
-			detections: [
-				{
-					string: "Male Breast - Exposed",
-					replacement: "male breast"
-				},
-				{
-					string: "Male Genitalia - Exposed",
-					replacement: "penis"
-				},
-				{
-					string: "Male Genitalia - Covered",
-					replacement: "covered penis"
-				},
-				{
-					string: "Female Genitalia - Exposed",
-					replacement: "vagina"
-				},
-				{
-					string: "Female Breast - Exposed",
-					replacement: "breast"
-				},
-				{
-					string: "Female Breast - Covered",
-					replacement: "covered breast"
-				},
-				{
-					string: "Buttocks - Exposed",
-					replacement: "ass"
-				}
-			],
-			maxRetries: 3,
-			createRecentUseCacheKey: (context) => {
-				return {
-					type: "recent-use",
-					user: context.user.ID,
-					channel: context.channel?.ID ?? null
-				};
+	Static_Data: (() => ({
+		detections: [
+			{
+				string: "Male Breast - Exposed",
+				replacement: "male breast"
+			},
+			{
+				string: "Male Genitalia - Exposed",
+				replacement: "penis"
+			},
+			{
+				string: "Male Genitalia - Covered",
+				replacement: "covered penis"
+			},
+			{
+				string: "Female Genitalia - Exposed",
+				replacement: "vagina"
+			},
+			{
+				string: "Female Breast - Exposed",
+				replacement: "breast"
+			},
+			{
+				string: "Female Breast - Covered",
+				replacement: "covered breast"
+			},
+			{
+				string: "Buttocks - Exposed",
+				replacement: "ass"
 			}
-		};
-	}),
+		],
+		maxRetries: 3,
+		createRecentUseCacheKey: (context) => ({
+			type: "recent-use",
+			user: context.user.ID,
+			channel: context.channel?.ID ?? null
+		})
+	})),
 	Code: (async function twitchLotto (context, channel) {
 		if (!this.data.channels) {
 			this.data.channels = await sb.Query.getRecordset(rs => rs
@@ -212,7 +208,7 @@ module.exports = {
 	
 		const detectionsString = [];
 		const { detections } = JSON.parse(image.Data);
-		for (const { replacement, string} of this.staticData.detections) {
+		for (const { replacement, string } of this.staticData.detections) {
 			const elements = detections.filter(i => i.name === string);
 			const strings = elements.map(i => `${replacement} (${Math.round(i.confidence * 100)}%)`);
 			detectionsString.push(...strings);
@@ -225,7 +221,7 @@ module.exports = {
 		if (illegalFlags.length > 0) {
 			return {
 				success: false,
-				reply: "Cannot post image! These flags are blacklisted: " + illegalFlags.join(", ")
+				reply: `Cannot post image! These flags are blacklisted: ${illegalFlags.join(", ")}`
 			};
 		}
 	
@@ -242,7 +238,7 @@ module.exports = {
 				.flat("Channel")
 			);
 
-			channelString = "Posted in channel(s): " + channels.join(", ");
+			channelString = `Posted in channel(s): ${channels.join(", ")}`;
 		}
 
 		const flagsString = (image.Adult_Flags)

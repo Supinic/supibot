@@ -14,35 +14,39 @@ module.exports = {
 				reply: "No search term provided!"
 			};
 		}
-	
+
 		const searchHTML = await sb.Got("FakeAgent", {
 			url: "https://knowyourmeme.com/search",
 			searchParams: new sb.URLParams().set("q", args.join(" ")).toString(),
 			responseType: "text"
 		}).text();
-	
-		const $search = sb.Utils.cheerio(searchHTML);	
+
+		const $search = sb.Utils.cheerio(searchHTML);
 		const firstLink = $search(".entry_list a").first().attr("href");
 		if (!firstLink) {
 			return {
 				reply: "No result found for given search term!"
 			};
 		}
-		
+
 		const detailHTML = await sb.Got("FakeAgent", {
 			prefixUrl: "https://knowyourmeme.com",
 			url: firstLink,
 			responseType: "text"
 		}).text();
-	
+
 		const $detail = sb.Utils.cheerio(detailHTML);
-		const summary = $detail("#entry_body h2#about").first().next().text();
+		const summary = $detail("#entry_body h2#about")
+			.first()
+			.next()
+			.text();
+
 		if (!summary) {
 			return {
 				reply: "No summary found for given meme!"
 			};
 		}
-	
+
 		const link = `https://knowyourmeme.com${firstLink}`;
 		return {
 			reply: `${link} ${summary}`

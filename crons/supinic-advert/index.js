@@ -3,8 +3,8 @@ module.exports = {
 	Expression: "0 30 * * * *",
 	Description: "Posts a reminder how to use titlechange_bot in #supinic",
 	Defer: (() => ({
-		"start": 0,
-		"end": 600000
+		start: 0,
+		end: 600000
 	})),
 	Type: "Bot",
 	Code: (async function announceSupinicAdvertisement () {

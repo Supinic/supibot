@@ -59,7 +59,7 @@ module.exports = {
 		);
 	
 		const chatters = top.map((i, ind) => {
-			const name = i.Name[0] + `\u{E0000}` + i.Name.slice(1);
+			const name = `${i.Name[0]}\u{E0000}${i.Name.slice(1)}`;
 			return `#${ind + 1}: ${name} (${sb.Utils.groupDigits(i.Total)})`;
 		}).join(", ");
 	

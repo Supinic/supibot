@@ -48,7 +48,7 @@ module.exports = {
 			});
 	
 			await row.save();
-			subscribed = "You will now receive reminders when your suggestions get updated - you can use the $unsubscribe command to remove this. "
+			subscribed = "You will now receive reminders when your suggestions get updated - you can use the $unsubscribe command to remove this. ";
 		}
 	
 		const link = `https://supinic.com/data/suggestion/${row.values.ID}`;

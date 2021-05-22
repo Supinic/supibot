@@ -8,7 +8,7 @@ module.exports = {
 	Params: [
 		{ name: "channel", type: "string" },
 		{ name: "mode", type: "string" },
-		{ name: "url", type: "string" },
+		{ name: "url", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
@@ -18,12 +18,12 @@ module.exports = {
 				description: "Will send the message as if there was no API configured."
 			},
 			{
-				name: "Notify", 
-				description: "Will send the message regardless, but adds a little warning emoji ⚠",
+				name: "Notify",
+				description: "Will send the message regardless, but adds a little warning emoji ⚠"
 			},
 			{
-				name: "Nothing", 
-				description: "Will not reply at all.",
+				name: "Nothing",
+				description: "Will not reply at all."
 			},
 			{
 				name: "Refuse",
@@ -119,7 +119,7 @@ module.exports = {
 							return {
 								success: false,
 								reply: "Banphrase API URL is not valid - no response received!"
-							}
+							};
 						}
 	
 						channelData.saveProperty("Banphrase_API_URL", fixedURL);
@@ -135,7 +135,7 @@ module.exports = {
 						const allowedTypes = this.staticData.allowedModes.map(i => i.name).join(", ");
 						return {
 							success: false,
-							reply: "Banphrase API mode is not allowed! Use one of: " + allowedTypes
+							reply: `Banphrase API mode is not allowed! Use one of: ${allowedTypes}`
 						};
 					}
 	
@@ -220,7 +220,7 @@ module.exports = {
 			default: return {
 				success: false,
 				reply: "Invalid command provided!"
-			}
+			};
 		}
 	}),
 	Dynamic_Description: (async (prefix, values) => {

@@ -54,7 +54,7 @@ module.exports = {
 	
 		if (!stalk) {
 			return {
-				reply: sb.Utils.tag.trim`
+				reply: sb.Utils.tag.trim `
 					That user is in the database, but never showed up in chat.
 					They were first spotted ${sb.Utils.timeDelta(targetUser.Started_Using)}.
 				`

@@ -22,7 +22,7 @@ module.exports = {
 					.select("User_Alias.Name AS Name", "Posted", "Text")
 					.from("chat_line", dbName)
 					.join("chat_data", "User_Alias")
-					.orderBy(dbName + ".ID DESC")
+					.orderBy(`${dbName}.ID DESC`)
 					.limit(1)
 					.single()
 				);
@@ -49,7 +49,7 @@ module.exports = {
 			};
 		}
 
-		return { 
+		return {
 			reply: paste.body
 		};
 	}),

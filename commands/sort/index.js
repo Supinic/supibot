@@ -18,7 +18,7 @@ module.exports = {
 	
 		const reply = args.sort().join(" ");
 		return {
-			reply: reply,
+			reply,
 			cooldown: (context.append.pipe)
 				? null // skip cooldown in pipe
 				: this.Cooldown // apply regular cooldown inside of pipe

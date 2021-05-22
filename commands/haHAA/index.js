@@ -11,17 +11,15 @@ module.exports = {
 	Code: (async function _4head (context) {
 		const data = await sb.Got("https://icanhazdadjoke.com/").json();
 		return {
-			reply: data.joke + " " + context.invocation
+			reply: `${data.joke} ${context.invocation}`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			"Posts a random, 100% hilarious dad joke.",
-			"Guaranteed to make you grimace",
-			"",
+	Dynamic_Description: (async (prefix) => [
+		"Posts a random, 100% hilarious dad joke.",
+		"Guaranteed to make you grimace",
+		"",
 	
-			`<code>${prefix}4Head</code>`,
-			"(random joke)"
-		];
-	})
+		`<code>${prefix}4Head</code>`,
+		"(random joke)"
+	])
 };

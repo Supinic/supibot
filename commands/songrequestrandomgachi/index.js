@@ -6,7 +6,7 @@ module.exports = {
 	Description: "Posts a random gachi in the format \"!sr <link>\" to use on other bots' song request systems (such as StreamElements).",
 	Flags: ["skip-banphrase","use-params","whitelist"],
 	Params: [
-		{ name: "fav", type: "string" },
+		{ name: "fav", type: "string" }
 	],
 	Whitelist_Response: "Only available in specific whitelisted channels (for instance, those that have a song request bot that replies to \"!sr\").",
 	Static_Data: (() => ({

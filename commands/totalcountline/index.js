@@ -14,11 +14,11 @@ module.exports = {
 		}
 	
 		const userData = await sb.User.get(target);
-		if (!userData)  {
-			return { 
+		if (!userData) {
+			return {
 				reply: `That user was not found in the database!`
 			};
-		}	
+		}
 	
 		const data = (await sb.Query.getRecordset(rs => rs
 			.select("SUM(Message_Count) AS Total")
@@ -28,13 +28,13 @@ module.exports = {
 		));
 		
 		if (data.Total === null) {
-			return { 
+			return {
 				reply: `That user is being tracked, but they have not said any lines in the channels I watch.`
 			};
 		}
 	
 		const who = (context.user.ID === userData.ID) ? "You have" : "That user has";
-		return { 
+		return {
 			reply: `${who} sent ${sb.Utils.groupDigits(data.Total)} chat lines across all tracked channels so far.`
 		};
 	}),

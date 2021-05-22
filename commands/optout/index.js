@@ -112,7 +112,7 @@ module.exports = {
 	
 			return {
 				reply: `Succesfully ${invocation}ed${suffix}!`
-			}
+			};
 		}
 		else {
 			if (invocation === "unoptout") {
@@ -156,27 +156,26 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			"Opts you out of a specific command.",
-			"While opted out from command, nobody can use it with you as the parameter.",
-			"",
+	Dynamic_Description: (async (prefix) => [
+		"Opts you out of a specific command.",
+		"While opted out from command, nobody can use it with you as the parameter.",
+		"",
 		
-			`<code><u>Simple mode</u></code>`,
-			`<code>${prefix}optout (command)</code>`,
-			`Will opt you out from a given command`,
-			"",
+		`<code><u>Simple mode</u></code>`,
+		`<code>${prefix}optout (command)</code>`,
+		`Will opt you out from a given command`,
+		"",
 	
-			`<code><u>Total mode</u></code>`,
-			`<code>${prefix}optout all</code>`,
-			`Will opt you out from all current and future opt-outable commands, everywhere.`,
-			"",
+		`<code><u>Total mode</u></code>`,
+		`<code>${prefix}optout all</code>`,
+		`Will opt you out from all current and future opt-outable commands, everywhere.`,
+		"",
 	
-			`<code><u>Advanced mode</u></code>`,
-			`<code>${prefix}optout channel:(chn) command:(cmd) platform:(p)</code>`,
-			`Will opt you out from a specified combination of channel/command/platform.`,
-			"E.g.:",
-			`<ul>
+		`<code><u>Advanced mode</u></code>`,
+		`<code>${prefix}optout channel:(chn) command:(cmd) platform:(p)</code>`,
+		`Will opt you out from a specified combination of channel/command/platform.`,
+		"E.g.:",
+		`<ul>
 				<li> 
 					<code>${prefix}optout command:rl channel:supibot</code>
 					Will opt you out from command rl only in channel "supibot".
@@ -189,7 +188,6 @@ module.exports = {
 					<code>${prefix}optout channel:supibot</code>
 					Will opt you out from all opt-outable commands, only in channel "supibot".
 				</li>
-			</ul>`,
-		];
-	})
+			</ul>`
+	])
 };

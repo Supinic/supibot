@@ -8,7 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
-		this.data.previousPosts = [];	
+		this.data.previousPosts = [];
 		return {
 			repeats: 5,
 			forsenCD: [
@@ -86,7 +86,7 @@ module.exports = {
 		this.data.previousPosts.splice(this.staticData.repeats);
 	
 		return {
-			reply: post + " " + context.invocation
+			reply: `${post} ${context.invocation}`
 		};
 	}),
 	Dynamic_Description: null

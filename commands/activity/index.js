@@ -13,7 +13,7 @@ module.exports = {
 		if (!channel) {
 			return {
 				success: false,
-				reply: "Channel does not exist or has no activity available!" 
+				reply: "Channel does not exist or has no activity available!"
 			};
 		}
 	

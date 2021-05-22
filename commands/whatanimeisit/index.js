@@ -49,10 +49,10 @@ module.exports = {
 
 		const descriptor = [];
 		if (show.season) {
-			descriptor.push("S" + sb.Utils.zf(show.season, 2));
+			descriptor.push(`S${sb.Utils.zf(show.season, 2)}`);
 		}
 		if (show.episode) {
-			descriptor.push("E" + sb.Utils.zf(show.episode, 2));
+			descriptor.push(`E${sb.Utils.zf(show.episode, 2)}`);
 		}
 
 		return {

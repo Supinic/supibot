@@ -82,20 +82,18 @@ module.exports = {
 								reply: "Successfully unsubscribed from all channels going live."
 							};
 						}
+						else if (args.length === 0) {
+							return {
+								reply: (data.channels.length === 0)
+									? "You're not subscribed to any channels."
+									: `You're subscribed to these ${data.channels.length} channels: ${data.channels.map(i => sb.Channel.get(i).Name).join(", ")}`
+							};
+						}
 						else {
-							if (args.length === 0) {
-								return {
-									reply: (data.channels.length === 0)
-										? "You're not subscribed to any channels."
-										: `You're subscribed to these ${data.channels.length} channels: ${data.channels.map(i => sb.Channel.get(i).Name).join(", ")}`
-								};
-							}
-							else {
-								return {
-									success: false,
-									reply: "No proper channels provided! You can only subscribe to channels with Supibot."
-								};
-							}
+							return {
+								success: false,
+								reply: "No proper channels provided! You can only subscribe to channels with Supibot."
+							};
 						}
 					}
 	
@@ -134,7 +132,7 @@ module.exports = {
 					added: "You will now receive a reminder whenever a new changelog is posted.",
 					removed: "You will no longer receive changelog reminders."
 				}
-			},
+			}
 		]
 	})),
 	Code: (async function subscribe (context, type, ...args) {

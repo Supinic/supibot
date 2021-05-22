@@ -8,11 +8,20 @@ module.exports = {
 	Params: [
 		{ name: "_apos", type: "object" },
 		{ name: "_force", type: "boolean" },
-		{ name: "_pos", type: "number" },
+		{ name: "_pos", type: "number" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		resultCharacterLimit: 50_000
+		resultCharacterLimit: 50_000,
+		reasons: {
+			block: "That user has blocked you from this command!",
+			cooldown: "Still on cooldown!",
+			filter: "You can't use this command here!",
+			"no-command": "Not a command!",
+			"opt-out": "That user has opted out from this command!",
+			pending: "Another command still being executed!",
+			"pipe-nsfw": "You cannot pipe NSFW results!"
+		}
 	})),
 	Code: (async function pipe (context, ...args) {
 		const invocations = args.join(" ").split(/[|>]/).map(i => i.trim());
@@ -26,7 +35,7 @@ module.exports = {
 		let hasExternalInput = false;
 		const nullCommand = sb.Command.get("null");
 		for (let i = 0; i < invocations.length; i++) {
-			let [commandString] = invocations[i].split(" ");
+			const [commandString] = invocations[i].split(" ");
 			const command = sb.Command.get(commandString);
 
 			if (!command) {
@@ -129,19 +138,7 @@ module.exports = {
 					currentArgs = sb.Utils.wrapString(result.reply, this.staticData.resultCharacterLimit).split(" ");
 				}
 				else {
-					let reply = "";
-					switch (result.reason) {
-						case "no-command": reply = "Not a command!"; break;
-						case "pending": reply = "Another command still being executed!"; break;
-						case "cooldown": reply = "Still on cooldown!"; break;
-						case "filter": reply = "You can't use this command here!"; break;
-						case "block": reply = "That user has blocked you from this command!"; break;
-						case "opt-out": reply = "That user has opted out from this command!"; break;
-						case "pipe-nsfw": reply = "You cannot pipe NSFW results!"; break;
-
-						default: reply = result.reply ?? result.reason;
-					}
-
+					const reply = this.staticData.reasons[result.reason] ?? result.reply ?? result.reason;
 					return {
 						success: false,
 						reply: `Pipe command ${cmd} failed: ${reply}`
@@ -172,42 +169,40 @@ module.exports = {
 			reply: currentArgs.join(" ")
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			"Pipes multiple commands together, where each command's result will become the input of another.",
-			"Separate the commands with <code>|</code> or <code>&gt;</code> characters.",
-			"",
+	Dynamic_Description: (async (prefix) => [
+		"Pipes multiple commands together, where each command's result will become the input of another.",
+		"Separate the commands with <code>|</code> or <code>&gt;</code> characters.",
+		"",
 
-			`<code>${prefix}pipe news RU | translate</code>`,
-			"Fetches russian news, and immediately translates them to English (by default).",
-			"",
+		`<code>${prefix}pipe news RU | translate</code>`,
+		"Fetches russian news, and immediately translates them to English (by default).",
+		"",
 
-			`<code>${prefix}pipe 4Head | translate to:german | notify (user)</code>`,
-			"Fetches a random joke, translates it to German, and reminds the target user with the text.",
-			"",
+		`<code>${prefix}pipe 4Head | translate to:german | notify (user)</code>`,
+		"Fetches a random joke, translates it to German, and reminds the target user with the text.",
+		"",
 
-			"<h5>Advanced pipe parameters</h5>",
-			"",
+		"<h5>Advanced pipe parameters</h5>",
+		"",
 
-			`<code>${prefix}pipe _apos:(index) (...)</code>`,
-			"When the <code>_apos</code> parameter is used, every command in the pipe will have its result added to that index.",
-			"",
+		`<code>${prefix}pipe _apos:(index) (...)</code>`,
+		"When the <code>_apos</code> parameter is used, every command in the pipe will have its result added to that index.",
+		"",
 
-			"Example 1:",
-			"<code>$pipe _pos:2 shuffle a b c | tt fancy 1 2 3</code> => <code>1 2 𝓫 𝓪 𝓬 3</code>",
-			"the <code>a, b, c</code> parameters are added to <code>tt fancy</code> at position 2, so it becomes <code>tt fancy 1 a b c 2 3</code>",
-			"",
+		"Example 1:",
+		"<code>$pipe _pos:2 shuffle a b c | tt fancy 1 2 3</code> => <code>1 2 𝓫 𝓪 𝓬 3</code>",
+		"the <code>a, b, c</code> parameters are added to <code>tt fancy</code> at position 2, so it becomes <code>tt fancy 1 a b c 2 3</code>",
+		"",
 
-			"Example 2:",
-			"<code>$pipe _apos:0=2 _apos:1=3 shuffle a b c | tt fancy A B C | tt fancy 1 2 3</code> => <code>1 2 3 𝓐 𝓑 𝓬 𝓪 𝓫 𝓒 </code>",
-			"Similar to <code>_pos</code>, but _apos specifies the start position for each command.",
-			" <code>_apos:0=3</code> => Command #0 uses start position 3.",
-			"Reverts to the end of the command if invalid value is provided.",
-			"",
+		"Example 2:",
+		"<code>$pipe _apos:0=2 _apos:1=3 shuffle a b c | tt fancy A B C | tt fancy 1 2 3</code> => <code>1 2 3 𝓐 𝓑 𝓬 𝓪 𝓫 𝓒 </code>",
+		"Similar to <code>_pos</code>, but _apos specifies the start position for each command.",
+		" <code>_apos:0=3</code> => Command #0 uses start position 3.",
+		"Reverts to the end of the command if invalid value is provided.",
+		"",
 
-			`<code>${prefix}pipe _force:true translate to:made-up-language foobar | remind (user)</code>`,
-			"If used with <code>_force:true</code>, this invocation will actually pipe the failure response of the <code>translate</code> command into <code>remind</code>.",
-			""
-		];
-	})
+		`<code>${prefix}pipe _force:true translate to:made-up-language foobar | remind (user)</code>`,
+		"If used with <code>_force:true</code>, this invocation will actually pipe the failure response of the <code>translate</code> command into <code>remind</code>.",
+		""
+	])
 };

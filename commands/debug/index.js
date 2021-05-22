@@ -10,19 +10,19 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function debug (context, ...args) {
 		const vm = require("vm");
-		let script = null;	
+		let script = null;
 	
 		try {
 			script = new vm.Script(`(async () => {\n"use strict";\n${args.join(" ")}\n})()`);
 		}
 		catch (e) {
 			return {
-				reply: "Parse: " + e.toString()
+				reply: `Parse: ${e.toString()}`
 			};
 		}
 	
 		try {
-			const scriptContext = vm.createContext({version: process.version, context, sb});
+			const scriptContext = vm.createContext({ version: process.version, context, sb });
 			let result = await script.runInNewContext(scriptContext, { timeout: 2500 });
 			if (typeof result !== "undefined") {
 				if (result?.constructor?.name === "Object") {
@@ -34,17 +34,17 @@ module.exports = {
 				};
 			}
 			else {
-				return { 
+				return {
 					reply: "Done"
 				};
 			}
 		}
 		catch (e) {
 			console.log(e);
-			return { 
-				reply: "Execute: " + e.toString()
+			return {
+				reply: `Execute: ${e.toString()}`
 			};
-		}		
+		}
 	}),
 	Dynamic_Description: null
 };

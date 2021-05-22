@@ -10,16 +10,19 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function crypto (context, symbol = "BTC") {
 		symbol = symbol.toUpperCase();
-	
+
 		const { body: data } = await sb.Got("GenericAPI", {
 			url: "https://min-api.cryptocompare.com/data/price",
-			searchParams: new sb.URLParams().set("fsym", symbol).set("tsyms", "USD,EUR").toString(),
+			searchParams: {
+				fsym: symbol,
+				tsyms: "USD,EUR"
+			},
 			timeout: 10000,
 			headers: {
-				Authorization: "Apikey " + sb.Config.get("API_CRYPTO_COMPARE")
+				Authorization: `Apikey ${sb.Config.get("API_CRYPTO_COMPARE")}`
 			}
 		});
-	
+
 		if (data.Response === "Error") {
 			return {
 				reply: data.Message
@@ -29,7 +32,7 @@ module.exports = {
 			return {
 				reply: `No known prices found for that currency.`
 			};
-		}		
+		}
 		else {
 			let status = null;
 			if (!context.channel || context.channel.Links_Allowed) {
@@ -50,7 +53,7 @@ module.exports = {
 
 			const usd = (data.USD) ? `$${data.USD}` : "";
 			const eur = (data.EUR) ? `€${data.EUR}` : "";
-	
+
 			return {
 				reply: `Current price of ${symbol}: ${usd} ${eur} ${link}`
 			};

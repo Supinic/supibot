@@ -12,7 +12,7 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function whatEmoteIsIt (context, emote) {
 		const { statusCode, body: response } = await sb.Got("Leppunen", {
-			url: "twitch/emotes/" + emote,
+			url: `twitch/emotes/${emote}`,
 			throwHttpErrors: false
 		});
 
@@ -45,7 +45,7 @@ module.exports = {
 			.flat("ID")
 		);
 	
-		const emoteLink = "https://twitchemotes.com/emotes/" + emoteid;
+		const emoteLink = `https://twitchemotes.com/emotes/${emoteid}`;
 		const cdnLink = `https://static-cdn.jtvnw.net/emoticons/v1/${emoteid}/3.0`;
 		if (context.params.linkOnly) {
 			return {
@@ -65,7 +65,6 @@ module.exports = {
 				? `${emotecode} (ID ${emoteid}) - ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
 				: `${emotecode} (ID ${emoteid}) - global Twitch emote. ${emoteLink} ${cdnLink} ${originString}`
 		};
-	
 	}),
 	Dynamic_Description: null
 };

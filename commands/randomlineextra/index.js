@@ -9,15 +9,15 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		channels: {
-			"amouranth": "💃🏼",
-			"athenelive": "🇫🇷🤖",
-			"drdisrespect": "💿",
-			"drdisrespectlive": "💿",
-			"ninja": "👤",
-			"stpeach": "🍑",
-			"alinity": "🍝👩💰",
-			"p4wnyhof": "🇩🇪🤖",
-			"pokimane": "😍"
+			amouranth: "💃🏼",
+			athenelive: "🇫🇷🤖",
+			drdisrespect: "💿",
+			drdisrespectlive: "💿",
+			ninja: "👤",
+			stpeach: "🍑",
+			alinity: "🍝👩💰",
+			p4wnyhof: "🇩🇪🤖",
+			pokimane: "😍"
 		}
 	})),
 	Code: (async function randomLineExtra () {

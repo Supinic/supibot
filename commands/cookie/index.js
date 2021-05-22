@@ -51,21 +51,19 @@ module.exports = {
 	
 		await context.transaction.query([
 			"INSERT INTO chat_data.Extra_User_Data (User_Alias, Cookie_Today)",
-			"VALUES (" + context.user.ID + ", 1)",
+			`VALUES (${context.user.ID}, 1)`,
 			"ON DUPLICATE KEY UPDATE Cookie_Today = 1"
 		].join(" "));
 	
-		return { 
+		return {
 			reply: cookie.Text
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			"Fetch a daily fortune cookie and read its wisdom!",
-			"Only available once per day, and resets at midnight UTC.",
-			"No arguments",
-			"",
-			prefix + "cookie => <Random wisdom!>"
-		];
-	})
+	Dynamic_Description: (async (prefix) => [
+		"Fetch a daily fortune cookie and read its wisdom!",
+		"Only available once per day, and resets at midnight UTC.",
+		"No arguments",
+		"",
+		`${prefix}cookie => <Random wisdom!>`
+	])
 };

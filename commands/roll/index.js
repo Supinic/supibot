@@ -50,7 +50,7 @@ module.exports = {
 			}
 		}
 	
-		const [fixedInput] = args.join(" ").split(/[a-ce-zA-Z]/)
+		const [fixedInput] = args.join(" ").split(/[a-ce-zA-Z]/);
 		const result = sb.Utils.evalDiceRoll(fixedInput, 1_000_000);
 	
 		if (result === null) {
@@ -74,28 +74,25 @@ module.exports = {
 				reply: `Your roll is ${result}.`
 			};
 		}
-	
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			"Rolls a random number.",
-			"You can use multiple ways to determine the limits of your rolls.",
-			"If you add the <code>textOnly:true</code> parameter, only the roll will be the output, without the surrounding text.",
-			"",
+	Dynamic_Description: (async (prefix) => [
+		"Rolls a random number.",
+		"You can use multiple ways to determine the limits of your rolls.",
+		"If you add the <code>textOnly:true</code> parameter, only the roll will be the output, without the surrounding text.",
+		"",
 
-			`<code>${prefix}roll</code>`,
-			"Rolls between 1 and 100.",
-			"",
+		`<code>${prefix}roll</code>`,
+		"Rolls between 1 and 100.",
+		"",
 
-			`<code>${prefix}roll (low) (high)</code>`,
-			`<code>${prefix}roll 153 344</code>`,
-			"Rolls between (low) and (high) numbers, inclusively.",
-			"",
+		`<code>${prefix}roll (low) (high)</code>`,
+		`<code>${prefix}roll 153 344</code>`,
+		"Rolls between (low) and (high) numbers, inclusively.",
+		"",
 
-			`<code>${prefix}roll 1d100</code>`,
-			`<code>${prefix}roll 5d25</code>`,
-			`<code>${prefix}roll (1d5)d(25d100)</code>`,
-			"Rolls using DnD dice format.",
-		];
-	})
+		`<code>${prefix}roll 1d100</code>`,
+		`<code>${prefix}roll 5d25</code>`,
+		`<code>${prefix}roll (1d5)d(25d100)</code>`,
+		"Rolls using DnD dice format."
+	])
 };

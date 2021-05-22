@@ -18,11 +18,11 @@ module.exports = {
 		}
 	
 		const games = data.top.map(i => (
-			i.game.name + " (" + sb.Utils.round(i.viewers / 1000, 1) + "k)"
+			`${i.game.name} (${sb.Utils.round(i.viewers / 1000, 1)}k)`
 		));
 		
 		return {
-			reply: "Top categories on Twitch (sorted by viewers): " + games.join(", ")
+			reply: `Top categories on Twitch (sorted by viewers): ${games.join(", ")}`
 		};
 	}),
 	Dynamic_Description: null

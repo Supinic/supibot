@@ -47,7 +47,7 @@ module.exports = {
 		const sourcePlatform = sb.Platform.get(row.values.Platform_From);
 		const targetPlatform = sb.Platform.get(row.values.Platform_To);
 		
-		const idColumnName = sourcePlatform.capital + "_ID";
+		const idColumnName = `${sourcePlatform.capital}_ID`;
 		await context.user.saveProperty(idColumnName, row.values.Specific_ID);
 		
 		row.values.Status = "Completed";

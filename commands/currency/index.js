@@ -8,7 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function currency (context, amount, first, separator, second)  {
+	Code: (async function currency (context, amount, first, separator, second) {
 		if (!second && !separator) {
 			second = first;
 			first = amount;
@@ -85,14 +85,14 @@ module.exports = {
 			this.data.cache = {
 				rates: data.rates,
 				expiry: new sb.Date().addHours(1).valueOf()
-			}
+			};
 		}
 	
 		const { rates } = this.data.cache;
 		if (!rates[first] || !rates[second]) {
 			return {
 				success: false,
-				reply: "Unrecognized currency code(s)! " + [first, second].filter(i => !rates[i]).join(", ")
+				reply: `Unrecognized currency code(s)! ${[first, second].filter(i => !rates[i]).join(", ")}`
 			};
 		}
 	
@@ -108,7 +108,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) =>  [
+	Dynamic_Description: (async (prefix) => [
 		`Converts an amount of currency (or 1, if not specified) to another currency`,
 		``,
 	

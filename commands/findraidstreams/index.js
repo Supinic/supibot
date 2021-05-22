@@ -34,7 +34,7 @@ module.exports = {
 
 		const data = JSON.stringify(raidable, null, 4);
 		const paste = await sb.Pastebin.post(data, {
-			name: "Raid targets " + new sb.Date().format("Y-m-d H:i:s"),
+			name: `Raid targets ${new sb.Date().format("Y-m-d H:i:s")}`,
 			format: "json"
 		});
 

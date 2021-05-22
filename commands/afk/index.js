@@ -9,24 +9,92 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		responses: {
-			"afk": ["is no longer AFK"],
-			"poop": ["is done taking a dump", "finished pooping", "forgot to flush", "washed hands", "didn't wash hands"],
-			"brb": ["just got back", "hopped back", "- welcome back"],
-			"food": ["finished eating", "is no longer stuffing their face", "is now full", "is done eating OpieOP describe taste"],
-			"shower": ["is now squeaky clean", "finished showering"],
-			"lurk": ["stopped lurking", "turned off the lurk mode"],
-			"gn": ["just woke up", "finished their beauty sleep", "just got up"],
-			"work": ["finished their work", "is taking a break from work", "finished working hard Kappa //"],
-			"ppPoof": ["ppFoop materialized back", "ppFoop re-appeared", "ppFoop fooped back"],
-			"study": ["is full of knowledge", "finished studying", "is now ready for the exam", "is fed up with studying", "is now smarter than most of the people in chat"]
+			afk: ["is no longer AFK"],
+			poop: ["is done taking a dump", "finished pooping", "forgot to flush", "washed hands", "didn't wash hands"],
+			brb: ["just got back", "hopped back", "- welcome back"],
+			food: ["finished eating", "is no longer stuffing their face", "is now full", "is done eating OpieOP describe taste"],
+			shower: ["is now squeaky clean", "finished showering"],
+			lurk: ["stopped lurking", "turned off the lurk mode"],
+			gn: ["just woke up", "finished their beauty sleep", "just got up"],
+			work: ["finished their work", "is taking a break from work", "finished working hard Kappa //"],
+			ppPoof: ["ppFoop materialized back", "ppFoop re-appeared", "ppFoop fooped back"],
+			study: ["is full of knowledge", "finished studying", "is now ready for the exam", "is fed up with studying", "is now smarter than most of the people in chat"]
 		},
 		/* eslint-disable array-element-newline */
 		foodEmojis: [
 			"🍋", "🍞", "🥐", "🥖", "🥨", "🥯", "🥞", "🧀", "🍖", "🍗", "🥩", "🥓", "🍔", "🍟", "🍕", "🌭", "🥪", "🌮", "🌯",
 			"🥙", "🍳", "🥘", "🍲", "🥣", "🥗", "🍿", "🥫", "🍱", "🍘", "🍙", "🍚", "🍛", "🍜", "🍝", "🍠", "🍢", "🍣", "🍤",
 			"🍥", "🍡", "🥟", "🥠", "🥡", "🍦", "🍧", "🍨", "🍩", "🍪", "🎂", "🍰", "🥧", "🍫", "🍬", "🍭", "🍮", "🍯"
-		]
+		],
 		/* eslint-enable array-element-newline */
+
+		invocations: [
+			{
+				name: "afk",
+				status: "now AFK",
+				text: (context, text) => text ?? "(no message)"
+			},
+			{
+				name: "gn",
+				status: "now sleeping",
+				text: (context, text) => (text) ? `${text} 💤` : " 🛏💤"
+			},
+			{
+				name: "brb",
+				status: "going to be right back",
+				text: async (context, text) => text ?? await context.getBestAvailableEmote(["ppHop", "ppSlide"], "⌛")
+			},
+			{
+				name: "shower",
+				status: "now taking a shower",
+				text: (context, text) => (text) ? `${text} 🚿` : " "
+			},
+			{
+				name: "poop",
+				aliases: ["💩"],
+				status: "now pooping",
+				text: async (context, text) => (text) ? `${text} 🚽` : await context.getBestAvailableEmote(["peepoPooPoo"], "💩")
+			},
+			{
+				name: "lurk",
+				status: "now lurking",
+				text: (context, text) => (text) ? `${text} 👥` : "👥"
+			},
+			{
+				name: "work",
+				status: "working",
+				text: (context, text) => (text) ? `${text} 💼` : " 👷"
+			},
+			{
+				name: "ppPoof",
+				status: "now poofing away",
+				text: (context, text) => `${text ?? ""} 💨`
+			},
+			{
+				name: "study",
+				status: "now studying",
+				text: (context, text) => `${text ?? "🤓"}📚`
+			},
+			{
+				name: "food",
+				status: "now eating",
+				text: async (context, text) => {
+					let useAutoEmoji = true;
+					for (const emoji of this.staticData.foodEmojis) {
+						if (text.includes(emoji)) {
+							useAutoEmoji = false;
+						}
+					}
+
+					const emote = await context.getBestAvailablEmoji(["OpieOP"], "😋");
+					const appendText = (useAutoEmoji)
+						? sb.Utils.randArray(this.staticData.foodEmojis)
+						: "";
+
+					return (text) ? `${text} ${appendText}` : `${emote} ${appendText}`;
+				}
+			}
+		]
 	})),
 	Code: (async function afk (context, ...args) {
 		if (context.privateMessage && sb.AwayFromKeyboard.data.find(i => i.User_Alias === context.user.ID)) {
@@ -35,47 +103,11 @@ module.exports = {
 			};
 		}
 
-		let text = args.join(" ").trim();
-		let status = "now AFK";
-		let { invocation } = context;
+		const type = this.staticData.invocations.find(i => i.name === context.invocation);
+		const status = type.status;
+		const text = await type.text(context, args.join(" ").trim());
 
-		switch (invocation) {
-			case "afk": [status, text] = ["now AFK", text || "(no message)"]; break;
-			case "gn": [status, text] = ["now sleeping", (text ? (text + " 💤") : " 🛏💤")]; break;
-			case "brb": [status, text] = ["going to be right back", text || "ppHop"]; break;
-			case "shower": [status, text] = ["now taking a shower", (text ? (text + " 🚿") : " 🚿")]; break;
-
-			case "💩":
-			case "poop":
-				invocation = "poop";
-				[status, text] = ["now pooping", (text ?  (text + " 🚽") : "💩")];
-				break;
-
-			case "lurk": [status, text] = ["now lurking", (text ?  (text + " 👥") : " 👥")]; break;
-			case "work": [status, text] = ["working", (text ?  (text + " 💼") : " 👷")]; break;
-			case "ppPoof": [status, text] = ["ppPoof poofing away...", (text || "") + " 💨"]; break;
-			case "study": [status, text] = ["now studying", (text || "🤓") + " 📚"]; break;
-			case "food": {
-				let useAutoEmoji = true;
-				for (const emoji of this.staticData.foodEmojis) {
-					if (text.includes(emoji)) {
-						useAutoEmoji = false;
-					}
-				}
-
-				const appendText = (useAutoEmoji)
-					? sb.Utils.randArray(this.staticData.foodEmojis)
-					: "";
-
-				status = "now eating";
-				text = (text)
-					? text + " " + appendText
-					: "OpieOP " + appendText;
-				break;
-			}
-		}
-
-		await sb.AwayFromKeyboard.set(context.user, text, invocation, false);
+		await sb.AwayFromKeyboard.set(context.user, text, context.invocation, false);
 		return {
 			partialReplies: [
 				{
@@ -84,7 +116,7 @@ module.exports = {
 				},
 				{
 					bancheck: false,
-					message: `is ${status}:`
+					message: `is ${status}: `
 				},
 				{
 					bancheck: true,
@@ -94,24 +126,24 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
-			"Flags you as AFK (away from keyboard).",
-			"While you are AFK, others can check if you are AFK.",
-			"On your first message while AFK, the status ends and the bot will announce you coming back.",
-			"Several aliases exist in order to make going AFK for different situations easier.",
-			"",
+		"Flags you as AFK (away from keyboard).",
+		"While you are AFK, others can check if you are AFK.",
+		"On your first message while AFK, the status ends and the bot will announce you coming back.",
+		"Several aliases exist in order to make going AFK for different situations easier.",
+		"",
 
-			`<code>${prefix}afk (status)</code>`,
-			`You are now AFK with the provided status`,
-			``,
+		`<code>${prefix}afk (status)</code>`,
+		`You are now AFK with the provided status`,
+		``,
 
-			`<code>${prefix}poop (status)</code>`,
-			`You are now pooping.`,
-			``,
+		`<code>${prefix}poop (status)</code>`,
+		`You are now pooping.`,
+		``,
 
-			`<code>${prefix}brb (status)</code>`,
-			`You will be right back.`,
-			``,
+		`<code>${prefix}brb (status)</code>`,
+		`You will be right back.`,
+		``,
 
-			`and more - check the aliases`
+		`and more - check the aliases`
 	])
 };

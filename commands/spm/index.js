@@ -20,7 +20,7 @@ module.exports = {
 					await fs.mkdir(dir);
 				}
 	
-				let row = await sb.Query.getRow(options.database, options.table);
+				const row = await sb.Query.getRow(options.database, options.table);
 				let save = false;
 				try {
 					await row.load(item.ID);
@@ -122,7 +122,7 @@ module.exports = {
 				return {
 					name: row.values.Name,
 					updated: Boolean(liveItem),
-					added: !Boolean(liveItem)
+					added: !liveItem
 				};
 			}),
 			message: (async (context, message) => {

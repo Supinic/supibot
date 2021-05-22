@@ -20,7 +20,7 @@ module.exports = {
 
 		if (context.params.channel) {
 			const channel = context.params.channel.toLowerCase();
-			const sets = subEmoteSets.filter(i => i.channel.login === channel)
+			const sets = subEmoteSets.filter(i => i.channel.login === channel);
 			if (sets.length === 0) {
 				return {
 					success: false,
@@ -30,7 +30,7 @@ module.exports = {
 
 			const strings = sets
 				.sort((a, b) => Number(a.tier) - Number(b.tier))
-				.map(i => "T" + i.tier + ": " + i.emotes.map(j => j.token).sort().join(" "));
+				.map(i => `T${i.tier}: ${i.emotes.map(j => j.token).sort().join(" ")}`);
 
 			return {
 				reply: strings.join(" ")

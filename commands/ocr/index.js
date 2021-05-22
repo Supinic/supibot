@@ -77,7 +77,7 @@ module.exports = {
 		const linkData = require("url").parse(rawLink);
 		const link = (linkData.protocol && linkData.host)
 			? `https://${linkData.host}${linkData.path}`
-			: `https://${linkData.path}`
+			: `https://${linkData.path}`;
 
 		let data;
 		let statusCode;
@@ -122,7 +122,7 @@ module.exports = {
 		if (statusCode !== 200 || data?.OCRExitCode !== 1) {
 			return {
 				success: false,
-				reply: (data?.ErrorMessage) 
+				reply: (data?.ErrorMessage)
 					? data.ErrorMessage.join(" ")
 					: data
 			};

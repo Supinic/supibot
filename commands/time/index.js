@@ -23,9 +23,9 @@ module.exports = {
 			}
 	
 			const extraOffset = (Math.trunc(timezone.Offset) - timezone.Offset) * 60;
-			let offset = ("00" + String(Math.trunc(timezone.Offset))).slice(-2) + ":" + ("00" + extraOffset).slice(-2);
+			let offset = `${(`00${String(Math.trunc(timezone.Offset))}`).slice(-2)}:${(`00${extraOffset}`).slice(-2)}`;
 			if (offset[0] !== "-") {
-				offset = "+" + offset;
+				offset = `+${offset}`;
 			}
 	
 			const date = new sb.Date().setTimezoneOffset(timezone.Offset * 60).format("H:i (Y-m-d)");
@@ -33,14 +33,14 @@ module.exports = {
 				date,
 				offset,
 				abbr: timezone.Abbreviation,
-				name: timezone.Name,
+				name: timezone.Name
 			};
 		},
 		fetchTimeData: async (coordinates, timestamp = sb.Date.now()) => await sb.Got("Google", {
 			url: "timezone/json",
 			searchParams: new sb.URLParams()
 				.set("timestamp", Math.trunc(timestamp / 1000).toString())
-				.set("location", coordinates.lat + "," + coordinates.lng)
+				.set("location", `${coordinates.lat},${coordinates.lng}`)
 				.set("key", sb.Config.get("API_GOOGLE_TIMEZONE"))
 				.toString()
 		}).json()
@@ -180,23 +180,21 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			"For a provided location, returns the current time, timezone and date it is observing.",
-			`Supports custom locations of users - this can be set with the <a href="/bot/command/207"><code>${prefix}set location</code></a> command.`,
-			"",
+	Dynamic_Description: (async (prefix) => [
+		"For a provided location, returns the current time, timezone and date it is observing.",
+		`Supports custom locations of users - this can be set with the <a href="/bot/command/207"><code>${prefix}set location</code></a> command.`,
+		"",
 
-			`<code>${prefix}time (location)</code>`,
-			"Shows the location's time data.",
-			"",
+		`<code>${prefix}time (location)</code>`,
+		"Shows the location's time data.",
+		"",
 
-			`<code>${prefix}time</code>`,
-			`If you have set your custom location with the <code>${prefix}set</code> command (see above), this command will return your location's time data.`,
-			"",
+		`<code>${prefix}time</code>`,
+		`If you have set your custom location with the <code>${prefix}set</code> command (see above), this command will return your location's time data.`,
+		"",
 
-			`<code>${prefix}time @(user)</code>`,
-			`Similar to your own custom location, but for a different user. Make sure to include the <code>@</code> symbol!`,
-			"",
-		]
-	})
+		`<code>${prefix}time @(user)</code>`,
+		`Similar to your own custom location, but for a different user. Make sure to include the <code>@</code> symbol!`,
+		""
+	])
 };

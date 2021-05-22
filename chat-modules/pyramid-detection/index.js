@@ -20,7 +20,7 @@ module.exports = {
 			this.data.pyramids = {};
 		}
 	
-		const normalMessage = message.trim().replace(/\s+/g, " ") + " ";
+		const normalMessage = `${message.trim().replace(/\s+/g, " ")} `;
 		if (!this.data.pyramids[channel.ID]) {
 			this.data.pyramids[channel.ID] = {
 				base: normalMessage,

@@ -9,7 +9,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		this.data.previousHeadlines = [];
-	
+
 		return {
 			repeats: 5,
 			construct: {
@@ -52,7 +52,7 @@ module.exports = {
 					"LOW T"
 				],
 				adjB: [
-					"BRAVE", 
+					"BRAVE",
 					"HONEST",
 					"INNOCENT",
 					"UNBIASED"
@@ -243,7 +243,7 @@ module.exports = {
 					"NEIL DRUCKMANN",
 					"POLYGON",
 					"RIAN JOHNSON",
-					"ZOE QUINN",
+					"ZOE QUINN"
 				],
 				peopleB: [
 					"ADOLF HITLER",
@@ -288,20 +288,20 @@ module.exports = {
 			}
 		};
 	}),
-	Code: (async function fakeNews (context) {
+	Code: (async function fakeNews () {
 		const eligibleHeadlines = this.staticData.construct.headlines.filter(i => !this.data.previousHeadlines.includes(i));
 		let headline = sb.Utils.randArray(eligibleHeadlines);
-	
+
 		this.data.previousHeadlines.push(headline);
 		this.data.previousHeadlines.splice(this.staticData.repeats);
-	
+
 		while (headline.includes("[")) {
-			headline = headline.replace(/\[(\w+)\]/g, (total, type) => sb.Utils.randArray(this.staticData.construct[type]));
+			headline = headline.replace(/\[(\w+)]/g, (total, type) => sb.Utils.randArray(this.staticData.construct[type]));
 		}
-	
+
 		return {
 			reply: headline
-		}
+		};
 	}),
 	Dynamic_Description: null
 };

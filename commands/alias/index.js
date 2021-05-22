@@ -14,7 +14,7 @@ module.exports = {
 			regex: /^[-\w\u00a9\u00ae\u2000-\u3300\ud83c\ud000-\udfff\ud83d\ud000-\udfff\ud83e\ud000-\udfff]{2,30}$/,
 			response: "Your alias should only contain letters, numbers and be 2-30 characters long."
 		},
-	
+
 		applyParameters: (context, aliasArguments, commandArguments) => {
 			const resultArguments = [];
 			const numberRegex = /(?<order>-?\d+)(\.\.(?<range>-?\d+))?(?<rest>\+?)/;
@@ -83,7 +83,7 @@ module.exports = {
 			args = [type, ...args]; // This the command name
 			type = "run"; // This is the implicit subcommand
 		}
-	
+
 		if (!type) {
 			return {
 				reply: sb.Utils.tag.trim `
@@ -95,16 +95,16 @@ module.exports = {
 				`
 			};
 		}
-	
+
 		if (!context.user.Data.aliasedCommands) {
 			context.user.Data.aliasedCommands = {};
 			await context.user.saveProperty("Data");
 		}
-	
+
 		let changed = false;
 		let reply = "Unexpected reply! Contact @Supinic about this.";
 		const wrapper = new Map(Object.entries(context.user.Data.aliasedCommands));
-	
+
 		type = type.toLowerCase();
 		switch (type) {
 			case "add":
@@ -130,7 +130,7 @@ module.exports = {
 						reply: `Your alias name is not valid! ${this.staticData.nameCheck.response}`
 					};
 				}
-	
+
 				const commandCheck = sb.Command.get(command);
 				if (!commandCheck) {
 					return {
@@ -138,7 +138,7 @@ module.exports = {
 						reply: `Cannot create alias! The command "${command}" does not exist.`
 					};
 				}
-	
+
 				changed = true;
 				wrapper.set(name, {
 					name,
@@ -190,7 +190,7 @@ module.exports = {
 					else if (targetAliases.length === 0 && wrapper.has(firstName)) {
 						user = context.user;
 						aliasName = firstName;
-						prefix = "Your";						
+						prefix = "Your";
 					}
 					// Not current user's alias, but a username exists
 					else if (targetAliases.length > 0 && !wrapper.has(firstName)) { // Is a username
@@ -283,7 +283,7 @@ module.exports = {
 						reply: "No target alias provided!"
 					};
 				}
-	
+
 				const target = await sb.User.get(targetUser);
 				if (!target) {
 					return {
@@ -291,7 +291,7 @@ module.exports = {
 						reply: "Invalid user provided!"
 					};
 				}
-	
+
 				const aliases = target.Data.aliasedCommands;
 				if (!aliases || Object.keys(aliases).length === 0) {
 					return {
@@ -305,7 +305,7 @@ module.exports = {
 						reply: `They don't have the "${targetAlias}" alias!`
 					};
 				}
-	
+
 				const alias = aliases[targetAlias];
 				if (wrapper.has(targetAlias) && type !== "copyplace") {
 					return {
@@ -414,7 +414,7 @@ module.exports = {
 						reply: `You don't have the "${name}" alias!`
 					};
 				}
-	
+
 				const commandCheck = sb.Command.get(command);
 				if (!commandCheck) {
 					return {
@@ -422,15 +422,15 @@ module.exports = {
 						reply: `Cannot edit alias! The command "${command}" does not exist.`
 					};
 				}
-	
+
 				const obj = wrapper.get(name);
 				obj.invocation = command;
 				obj.args = rest;
 				obj.lastEdit = new sb.Date().toJSON();
-	
+
 				changed = true;
 				reply = `Your alias "${name}" has been successfully edited.`;
-	
+
 				break;
 			}
 
@@ -488,7 +488,7 @@ module.exports = {
 						: `Alias "${aliasName}" has no description.`
 				};
 			}
-	
+
 			case "delete":
 			case "remove": {
 				const [name] = args;
@@ -504,14 +504,14 @@ module.exports = {
 						reply: `You don't have the "${name}" alias!`
 					};
 				}
-	
+
 				changed = true;
 				wrapper.delete(name);
 				reply = `Your alias "${name}" has been succesfully removed.`;
-	
+
 				break;
 			}
-	
+
 			case "rename": {
 				const [oldName, newName] = args;
 				if (!oldName || !newName) {
@@ -532,18 +532,18 @@ module.exports = {
 						reply: `Your new alias name is not valid! ${this.staticData.nameCheck.response}`
 					};
 				}
-	
+
 				changed = true;
 				wrapper.set(newName, wrapper.get(oldName));
 				wrapper.get(newName).lastEdit = new sb.Date().toJSON();
 				wrapper.get(newName).name = newName;
 				wrapper.delete(oldName);
-	
+
 				reply = `Your alias "${oldName}" has been succesfully renamed to "${newName}".`;
-	
+
 				break;
 			}
-	
+
 			case "run": {
 				const [name] = args;
 				if (!name) {
@@ -558,13 +558,13 @@ module.exports = {
 						reply: `You don't have the "${name}" alias!`
 					};
 				}
-	
+
 				const { invocation, args: aliasArguments } = wrapper.get(name);
 				const { success, reply, resultArguments } = this.staticData.applyParameters(context, aliasArguments, args.slice(1));
 				if (!success) {
 					return { success, reply };
 				}
-	
+
 				const commandData = sb.Command.get(invocation);
 				if (context.append.pipe && !commandData.Flags.pipe) {
 					return {
@@ -572,7 +572,7 @@ module.exports = {
 						reply: `Cannot use command ${invocation} inside of a pipe, despite being wrapped in an alias!`
 					};
 				}
-	
+
 				const aliasCount = (context.append.aliasCount ?? 0) + 1;
 				if (aliasCount > this.staticData.aliasLimit) {
 					return {
@@ -584,7 +584,7 @@ module.exports = {
 						`
 					};
 				}
-	
+
 				const result = await sb.Command.checkAndExecute(
 					invocation,
 					resultArguments,
@@ -601,14 +601,14 @@ module.exports = {
 						partialExecute: true
 					}
 				);
-	
+
 				return {
 					...result,
 					cooldown: (context.append.pipe) ? null : this.Cooldown,
 					hasExternalInput: Boolean(result?.hasExternalInput ?? commandData.Flags.externalInput)
 				};
 			}
-	
+
 			default: return {
 				success: false,
 				reply: sb.Utils.tag.trim `
@@ -616,105 +616,104 @@ module.exports = {
 					Check the extended help here:
 				   	https://supinic.com/bot/command/${this.ID}
 				`
-			}
+			};
 		}
-	
+
 		if (changed) {
 			context.user.Data.aliasedCommands = Object.fromEntries(wrapper);
 			await context.user.saveProperty("Data");
 		}
-	
+
 		return { reply };
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			"Meta-command that lets you create aliases (or shorthands) for existing commands or their combinations.",
-			"You have to first create an alias, and then run it. You can manage your aliases by listing, checking, removing and adding.",
-			"",
-	
-			`<h5>What's an alias?</h5>`,
-			`An alias is a word that lets you quickly use a command without typing the entirity of it.`,
-			`E.g.: You don't want to type <code>${prefix}weather New York, USA</code> every time, so you create an alias called <code>ny</code>.`,
-			`Then, you can simply use the alias like so: <code>${prefix}$ ny</code>`,
-			"",
-	
-			`<h5>Usage</h5>`,
-			`<code>${prefix}alias add (name) (definition)</code>`,
-			`<code>${prefix}alias create (name) (definition)</code>`,
-			`Creates your command alias, e.g.:`,
-			`<code>${prefix}alias add <u>hello</u> translate to:german Hello!</code>`,
-			"",
-	
-			`<code>${prefix}$ (name)</code>`,
-			`<code>${prefix}alias run (name)</code>`,
-			"Runs your command alias!, e.g.:",
-			`<code>${prefix}$ <u>hello</u></code> => Hallo!`,
-			`<code>${prefix}alias run <u>hello</u></code> => Hallo!`,
-			"",
-	
-			`<code>${prefix}alias copy (username) (alias)</code>`,
-			`<code>${prefix}alias copyplace (username) (alias)</code>`,
-			"Takes someone else's alias, and attempts to copy it with the same name for you.",
-			"If you use <code>copy</code>, it will only create an alias if you don't already have one with that name.",
-			"If you use <code>copyplace</code>, it will replace whatever alias you have with that name without asking.",
-			"",
-	
-			`<code>${prefix}alias check</code>`,
-			`<code>${prefix}alias spy</code>`,
-			`<code>${prefix}alias code</code>`,
-			`<code>${prefix}alias check (alias)</code>`,
-			`<code>${prefix}alias check (user)</code>`,
-			`<code>${prefix}alias check (user) (alias)</code>`,
-			"Checks your or someone else's aliases.",
-			"You can use <code>alias spy</code> instead of <code>check</code>.",
-			"You can use <code>alias code</code> instead of <code>check</code> - this will post the invocation directly, without fluff.",
-			"No params - gives you the link with the list of your aliases.",
-			"One param - your alias - gives you the definition of your alias with that name.",
-			"One param - user name - gives you the link with the list of that user's aliases.",
-			"Two param - user name + alias name - gives you the definition of that user's alias.",
-			"",
-	
-			`<code>${prefix}alias edit (name)</code>`,
-			"Edits an existing alias, without the need of removing and re-adding it.",
-			`<code>${prefix}alias edit <u>hello</u> translate to:italian Hello!</code>`,
-			"",
+	Dynamic_Description: (async (prefix) => [
+		"Meta-command that lets you create aliases (or shorthands) for existing commands or their combinations.",
+		"You have to first create an alias, and then run it. You can manage your aliases by listing, checking, removing and adding.",
+		"",
 
-			`<code>${prefix}alias addedit (name) (definition)</code>`,
-			`<code>${prefix}alias upsert (name) (definition)</code>`,
-			`Creates a new alias, or updates an existing alias of your own. If you replace an existing one, you will lose its definition`,
-			"",
-	
-			`<code>${prefix}alias rename (old-name) (new-name)</code>`,
-			"Renames your command alias from old-name to new-name.",
-			"",
+		`<h5>What's an alias?</h5>`,
+		`An alias is a word that lets you quickly use a command without typing the entirity of it.`,
+		`E.g.: You don't want to type <code>${prefix}weather New York, USA</code> every time, so you create an alias called <code>ny</code>.`,
+		`Then, you can simply use the alias like so: <code>${prefix}$ ny</code>`,
+		"",
 
-			`<code>${prefix}alias duplicate (old-name) (new-name)</code>`,
-			"Creates a new alias (new-name) with the definition of an existing alias (old-name).",
-			"",
-	
-			`<code>${prefix}alias list</code>`,
-			"Lists all your currently active aliases.",
-			`You can also check them in <a href="/user/alias/list">this list</a> - after you log in.`,
-			"",
-	
-			`<code>${prefix}alias delete (name)</code>`,
-			`<code>${prefix}alias remove (name)</code>`,
-			"Removes your command alias with the given name.",
-			"",
+		`<h5>Usage</h5>`,
+		`<code>${prefix}alias add (name) (definition)</code>`,
+		`<code>${prefix}alias create (name) (definition)</code>`,
+		`Creates your command alias, e.g.:`,
+		`<code>${prefix}alias add <u>hello</u> translate to:german Hello!</code>`,
+		"",
 
-			`<code>${prefix}alias describe (alias) (...description)</code>`,
-			"Gives your command a description, which can then be checked by you or others.",
-			`If you don't provide a description, or use the word "none" exactly, the description will be reset.`,
-			"",
+		`<code>${prefix}$ (name)</code>`,
+		`<code>${prefix}alias run (name)</code>`,
+		"Runs your command alias!, e.g.:",
+		`<code>${prefix}$ <u>hello</u></code> => Hallo!`,
+		`<code>${prefix}alias run <u>hello</u></code> => Hallo!`,
+		"",
 
-			`<code>${prefix}alias inspect (alias)</code>`,
-			`<code>${prefix}alias inspect (username) (alias)</code>`,
-			"If your or someone else's alias has a description, this command will print it to chat.",
-			"",
-	
-			"<h5>Replacements</h5>",
-			"Replaces a symbol in your alias with a value depending on its name.",
-			`<ul>
+		`<code>${prefix}alias copy (username) (alias)</code>`,
+		`<code>${prefix}alias copyplace (username) (alias)</code>`,
+		"Takes someone else's alias, and attempts to copy it with the same name for you.",
+		"If you use <code>copy</code>, it will only create an alias if you don't already have one with that name.",
+		"If you use <code>copyplace</code>, it will replace whatever alias you have with that name without asking.",
+		"",
+
+		`<code>${prefix}alias check</code>`,
+		`<code>${prefix}alias spy</code>`,
+		`<code>${prefix}alias code</code>`,
+		`<code>${prefix}alias check (alias)</code>`,
+		`<code>${prefix}alias check (user)</code>`,
+		`<code>${prefix}alias check (user) (alias)</code>`,
+		"Checks your or someone else's aliases.",
+		"You can use <code>alias spy</code> instead of <code>check</code>.",
+		"You can use <code>alias code</code> instead of <code>check</code> - this will post the invocation directly, without fluff.",
+		"No params - gives you the link with the list of your aliases.",
+		"One param - your alias - gives you the definition of your alias with that name.",
+		"One param - user name - gives you the link with the list of that user's aliases.",
+		"Two param - user name + alias name - gives you the definition of that user's alias.",
+		"",
+
+		`<code>${prefix}alias edit (name)</code>`,
+		"Edits an existing alias, without the need of removing and re-adding it.",
+		`<code>${prefix}alias edit <u>hello</u> translate to:italian Hello!</code>`,
+		"",
+
+		`<code>${prefix}alias addedit (name) (definition)</code>`,
+		`<code>${prefix}alias upsert (name) (definition)</code>`,
+		`Creates a new alias, or updates an existing alias of your own. If you replace an existing one, you will lose its definition`,
+		"",
+
+		`<code>${prefix}alias rename (old-name) (new-name)</code>`,
+		"Renames your command alias from old-name to new-name.",
+		"",
+
+		`<code>${prefix}alias duplicate (old-name) (new-name)</code>`,
+		"Creates a new alias (new-name) with the definition of an existing alias (old-name).",
+		"",
+
+		`<code>${prefix}alias list</code>`,
+		"Lists all your currently active aliases.",
+		`You can also check them in <a href="/user/alias/list">this list</a> - after you log in.`,
+		"",
+
+		`<code>${prefix}alias delete (name)</code>`,
+		`<code>${prefix}alias remove (name)</code>`,
+		"Removes your command alias with the given name.",
+		"",
+
+		`<code>${prefix}alias describe (alias) (...description)</code>`,
+		"Gives your command a description, which can then be checked by you or others.",
+		`If you don't provide a description, or use the word "none" exactly, the description will be reset.`,
+		"",
+
+		`<code>${prefix}alias inspect (alias)</code>`,
+		`<code>${prefix}alias inspect (username) (alias)</code>`,
+		"If your or someone else's alias has a description, this command will print it to chat.",
+		"",
+
+		"<h5>Replacements</h5>",
+		"Replaces a symbol in your alias with a value depending on its name.",
+		`<ul>
 				<li>
 					<code>\${#}</code> (e.g. \${0}, \${1}, ...)
 					<br>
@@ -765,6 +764,5 @@ module.exports = {
 					<code>${prefix}alias run test</code> => <code>${prefix}remind person hello from (you)!</code>
 				</li>
 			</ul>`
-		];
-	})
+	])
 };

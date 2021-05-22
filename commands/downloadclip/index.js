@@ -16,14 +16,14 @@ module.exports = {
 			};
 		}
 
-		const slug = rawSlug.match(/^[a-zA-z]+(-[\_\-a-zA-Z0-9]{16})?$/)?.[0];
+		const slug = rawSlug.match(/^[a-zA-z]+(-[_\-a-zA-Z0-9]{16})?$/)?.[0];
 		if (!slug) {
 			return {
 				success: false,
 				reply: "Invalid clip slug provided! Only letters are allowed."
 			};
 		}
-	
+
 		const data = await sb.Got("Leppunen", `twitch/clip/${slug}`).json();
 		if (data.status === 404) {
 			return {

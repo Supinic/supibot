@@ -11,7 +11,7 @@ module.exports = {
 	Code: (async function cerebot (context, ...args) {
 		let message = args.join(" ").trim();
 		if (!message.startsWith("!")) {
-			message = "!" + message;
+			message = `!${message}`;
 		}
 	
 		await sb.Channel.get(7).send(message);

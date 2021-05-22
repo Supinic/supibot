@@ -16,7 +16,7 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-			
+
 		const playedByData = await sb.Query.getRecordset(rs => rs
 			.select("COUNT(*) AS Count")
 			.select("User_Alias.Name AS Name")
@@ -32,8 +32,8 @@ module.exports = {
 				reply: "Provided link has no data associated with it!"
 			};
 		}
-		
-		const total = playedByData.reduce((acc, cur) => acc += cur.Count, 0);
+
+		const total = playedByData.reduce((acc, cur) => (acc += cur.Count), 0);
 		const lastPlayedData = await sb.Query.getRecordset(rs => rs
 			.select("User_Alias.Name AS Name")
 			.select("Posted")
@@ -45,17 +45,17 @@ module.exports = {
 			.limit(1)
 			.single()
 		);
-			
+
 		const top5 = [];
 		for (let i = 0; i < 5; i++) {
 			if (playedByData[i]) {
-				top5.push(playedByData[i].Name + ": " + playedByData[i].Count + "x");
+				top5.push(`${playedByData[i].Name}: ${playedByData[i].Count}x`);
 			}
 			else {
 				break;
 			}
 		}
-			
+
 		return {
 			reply: sb.Utils.tag.trim `
 				That video was queued ${total} times before.

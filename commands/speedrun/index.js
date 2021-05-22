@@ -10,7 +10,7 @@ module.exports = {
 		{ name: "showCategories", type: "boolean" },
 		{ name: "abbreviation", type: "string" },
 		{ name: "abbr", type: "string" },
-		{ name: "runner", type: "string" },
+		{ name: "runner", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -147,7 +147,7 @@ module.exports = {
 			}
 
 			return true;
-		})
+		});
 
 		if (runnerRuns.length === 0) {
 			return {
@@ -185,32 +185,30 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			`Searches <a href="//speedrun.com">speedrun.com</a> for the world record run of a given game.`,
-			`You can also specify categories. If you don't, the "default" one will be used.`,
-			"",
+	Dynamic_Description: (async (prefix) => [
+		`Searches <a href="//speedrun.com">speedrun.com</a> for the world record run of a given game.`,
+		`You can also specify categories. If you don't, the "default" one will be used.`,
+		"",
 
-			`<code>${prefix}speedrun Doom II</code>`,
-			"Searches for the world record run of Doom II's default category (Hell on Earth).",
-			"",
+		`<code>${prefix}speedrun Doom II</code>`,
+		"Searches for the world record run of Doom II's default category (Hell on Earth).",
+		"",
 
-			`<code>${prefix}speedrun Doom II category:UV</code>`,
-			"Searches for the world record run of Doom II's UV Speed category.",
-			"",
+		`<code>${prefix}speedrun Doom II category:UV</code>`,
+		"Searches for the world record run of Doom II's UV Speed category.",
+		"",
 
-			`<code>${prefix}speedrun Doom II showCategories:true</code>`,
-			"Posts a list of all tracked categories for Doom II.",
-			"",
+		`<code>${prefix}speedrun Doom II showCategories:true</code>`,
+		"Posts a list of all tracked categories for Doom II.",
+		"",
 
-			`<code>${prefix}speedrun Larry Love for Sail runner:supinic</code>`,
-			"Posts the best attempt of a given speedrunner for a given game.",
-			"",
+		`<code>${prefix}speedrun Larry Love for Sail runner:supinic</code>`,
+		"Posts the best attempt of a given speedrunner for a given game.",
+		"",
 
-			`<code>${prefix}speedrun abbr:mc</code>`,
-			`<code>${prefix}speedrun abbreviation:mc</code>`,
-			"Searches for the world record run of Minecraft: Java Edition.",
-			`The abbreviation is the tag "mc" - as seen on the site: <a href="https://www.speedrun.com/mc">speedrun.com/mc</a>`
-		];
-	})
+		`<code>${prefix}speedrun abbr:mc</code>`,
+		`<code>${prefix}speedrun abbreviation:mc</code>`,
+		"Searches for the world record run of Minecraft: Java Edition.",
+		`The abbreviation is the tag "mc" - as seen on the site: <a href="https://www.speedrun.com/mc">speedrun.com/mc</a>`
+	])
 };

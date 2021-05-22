@@ -17,9 +17,9 @@ module.exports = {
 		}
 	
 		return {
-			reply: "Result of your pipe: " + args.join(" "),
+			reply: `Result of your pipe: ${args.join(" ")}`,
 			replyWithPrivateMessage: true
-		}
+		};
 	}),
 	Dynamic_Description: null
 };

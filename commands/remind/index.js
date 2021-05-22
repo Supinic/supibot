@@ -8,7 +8,7 @@ module.exports = {
 	Params: [
 		{ name: "at", type: "string" },
 		{ name: "on", type: "string" },
-		{ name: "private", type: "boolean" },
+		{ name: "private", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
@@ -16,7 +16,7 @@ module.exports = {
 		strings: {
 			"scheduled-incoming": "That person has too many timed reminders pending for them on that day!",
 			"public-incoming": "That person has too many public reminders pending!",
-			"public-outgoing":  "You have too many public reminders pending!",
+			"public-outgoing": "You have too many public reminders pending!",
 			"private-incoming": "That person has too many private reminders pending!",
 			"private-outgoing": "You have too many private reminders pending!"
 		},
@@ -53,7 +53,7 @@ module.exports = {
 		else if (targetUser.Name === context.platform.Self_Name) {
 			return {
 				success: false,
-				reply: "I'm always here, so you don't have to " + context.invocation + " me! :)",
+				reply: `I'm always here, so you don't have to ${context.invocation} me! :)`,
 				cooldown: this.Cooldown / 2
 			};
 		}
@@ -178,7 +178,7 @@ module.exports = {
 		if (delta < 0) {
 			return {
 				success: false,
-				reply: "Past reminders are only available to people who possess a time machine!",
+				reply: "Past reminders are only available to people who possess a time machine!"
 			};
 		}
 		else if (delta === 0) {
@@ -258,45 +258,43 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			"Reminds a given person.",
-			"There are multiple ways to remind, either whenever they type, or a timed reminder.",
-			"",
+	Dynamic_Description: (async (prefix) => [
+		"Reminds a given person.",
+		"There are multiple ways to remind, either whenever they type, or a timed reminder.",
+		"",
 
-			`<code>${prefix}remind (person) hello :)</code>`,
-			`<code>${prefix}notify (person) hello :)</code>`,
-			"Reminds target person whenever they next type in a chat that has Supibot.",
-			"There is no difference between <code>remind</code> and <code>notify</code>.",
-			"",
+		`<code>${prefix}remind (person) hello :)</code>`,
+		`<code>${prefix}notify (person) hello :)</code>`,
+		"Reminds target person whenever they next type in a chat that has Supibot.",
+		"There is no difference between <code>remind</code> and <code>notify</code>.",
+		"",
 
-			`<code>${prefix}remindprivate (person) hello :)</code>`,
-			`<code>${prefix}remind private:true (person) hello :)</code>`,
-			"Privately reminds target person (via whispers/PMs) when they next type in chat with Supibot.",
-			"",
+		`<code>${prefix}remindprivate (person) hello :)</code>`,
+		`<code>${prefix}remind private:true (person) hello :)</code>`,
+		"Privately reminds target person (via whispers/PMs) when they next type in chat with Supibot.",
+		"",
 
-			`<code>${prefix}remind (person) hello :) in (time)</code>`,
-			`<code>${prefix}remind supinic hello, how's it going? in 5 minutes</code>`,
-			`<code>${prefix}remind supinic in 1 year, 3 months and 5 days hi to the future!</code>`,
-			"Creates a timed remind for target person that's going to fire in whatever time you provide, in the channel you used the command in.",
-			"You <b>must</b> use the keyword <code>in</code> followed by the time specification for this to work.",
-			"The position of the time specification does not matter.",
-			"",
+		`<code>${prefix}remind (person) hello :) in (time)</code>`,
+		`<code>${prefix}remind supinic hello, how's it going? in 5 minutes</code>`,
+		`<code>${prefix}remind supinic in 1 year, 3 months and 5 days hi to the future!</code>`,
+		"Creates a timed remind for target person that's going to fire in whatever time you provide, in the channel you used the command in.",
+		"You <b>must</b> use the keyword <code>in</code> followed by the time specification for this to work.",
+		"The position of the time specification does not matter.",
+		"",
 
-			`<code>${prefix}remindme test (time)</code>`,
-			`<code>${prefix}remind me check pasta in 5 minutes</code>`,
-			"Creates a timed reminder for yourself, much like a regular timed reminder.",
-			"",
+		`<code>${prefix}remindme test (time)</code>`,
+		`<code>${prefix}remind me check pasta in 5 minutes</code>`,
+		"Creates a timed reminder for yourself, much like a regular timed reminder.",
+		"",
 
-			`<code>${prefix}remind (person) test on:8pm</code>`,
-			`<code>${prefix}remindme fireworks at:"July 4th 2021, 8pm"</code>`,
-			`<code>${prefix}remind (person) test on:"tomorrow 10am"</code>`,
-			`<code>${prefix}remind (person) test on:"today evening"</code>`,
-			"Creates a timed reminder just like normal, but using a specific date + time to time it.",
-			"Will use your timezone, if you have it set up via the <code>$set location</code> command.",
-			"If you don't, the command will use Supibot's timezone - CET/CEST (UTC+1/+2)",
-			"There are plenty of words that you can use - like morning, evening, noon, midnight, ... and more",
-			""
-		];
-	})
+		`<code>${prefix}remind (person) test on:8pm</code>`,
+		`<code>${prefix}remindme fireworks at:"July 4th 2021, 8pm"</code>`,
+		`<code>${prefix}remind (person) test on:"tomorrow 10am"</code>`,
+		`<code>${prefix}remind (person) test on:"today evening"</code>`,
+		"Creates a timed reminder just like normal, but using a specific date + time to time it.",
+		"Will use your timezone, if you have it set up via the <code>$set location</code> command.",
+		"If you don't, the command will use Supibot's timezone - CET/CEST (UTC+1/+2)",
+		"There are plenty of words that you can use - like morning, evening, noon, midnight, ... and more",
+		""
+	])
 };

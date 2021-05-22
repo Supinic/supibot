@@ -30,7 +30,7 @@ module.exports = {
 				reply: "Invalid channel provided!"
 			};
 		}
-		else if (context.channel && context.channel.ID === targetChannel.ID)  {
+		else if (context.channel && context.channel.ID === targetChannel.ID) {
 			const emote = await context.channel.getBestAvailableEmote(
 				["PepeLaugh", "pepeLaugh", "LULW", "LuL", "LUL", "4HEad", "4Head"],
 				"😀"
@@ -52,7 +52,7 @@ module.exports = {
 		}
 	
 		if (targetChannel.Banphrase_API_Type === "Pajbot") {
-			let data = null
+			let data = null;
 			try {
 				data = await sb.Banphrase.executeExternalAPI(
 					message,

@@ -8,7 +8,7 @@ module.exports = {
 	Params: [
 		{ name: "start", type: "string" },
 		{ name: "end", type: "string" },
-		{ name: "type", type: "string" },
+		{ name: "type", type: "string" }
 	],
 	Whitelist_Response: "Only available in supinic's channel.",
 	Static_Data: (() => {
@@ -66,7 +66,7 @@ module.exports = {
 						
 						if (!bestResult) {
 							return {
-								success: false, 
+								success: false,
 								reply: `No video has been found!`
 							};
 						}
@@ -150,7 +150,7 @@ module.exports = {
 	
 				return {
 					canRequest: true,
-					totalTime: totalTime,
+					totalTime,
 					requests: userRequests.length,
 					reason: null,
 					time: limits.time,
@@ -175,7 +175,7 @@ module.exports = {
 	}),
 	Code: (async function songRequest (context, ...args) {
 		if (args.length === 0) {
-				// If we got no args, just redirect to $current 4HEad
+			// If we got no args, just redirect to $current 4HEad
 			return await sb.Command.get("current").execute(context);
 		}
 	
@@ -188,13 +188,13 @@ module.exports = {
 		}
 		else if (state === "dubtrack") {
 			const dubtrack = (await sb.Command.get("dubtrack").execute(context)).reply;
-			return { reply: "Song requests are currently using dubtrack. Join here: " + dubtrack + " :)" };
+			return { reply: `Song requests are currently using dubtrack. Join here: ${dubtrack} :)` };
 		}
 		else if (state === "cytube") {
 			if (!sb.Config.get("EXTERNAL_CYTUBE_SR_ENABLED", false)) {
 				const cytube = (await sb.Command.get("cytube").execute(context)).reply;
 				return {
-					reply: "Song requests are currently using Cytube. Join here: " + cytube + " :)"
+					reply: `Song requests are currently using Cytube. Join here: ${cytube} :)`
 				};
 			}
 	
@@ -210,7 +210,7 @@ module.exports = {
 		}
 
 		let startTime = context.params.start ? sb.Utils.parseVideoDuration(context.params.start) : null;
-		if (startTime !== null && (!Number.isFinite(startTime) || startTime > Math.pow(2, 32))) {
+		if (startTime !== null && (!Number.isFinite(startTime) || startTime > 2 ** 32)) {
 			return {
 				success: false,
 				reply: "Invalid start time provided!"
@@ -218,7 +218,7 @@ module.exports = {
 		}
 
 		let endTime = context.params.end ? sb.Utils.parseVideoDuration(context.params.end) : null;
-		if (endTime !== null && (!Number.isFinite(endTime) || endTime > Math.pow(2, 32))) {
+		if (endTime !== null && (!Number.isFinite(endTime) || endTime > 2 ** 32)) {
 			return {
 				success: false,
 				reply: "Invalid end time provided!"
@@ -300,7 +300,6 @@ module.exports = {
 					.limit(1)
 					.single()
 				);
-	
 			}
 	
 			if (songData) {
@@ -369,7 +368,7 @@ module.exports = {
 				return {
 					success: false,
 					reply: "Incorrect video search type provided!"
-				}
+				};
 			}
 	
 			if (!lookup) {

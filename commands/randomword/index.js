@@ -25,16 +25,16 @@ module.exports = {
 		const list = sb.Config.get("WORD_LIST");
 
 		return [
-			"Returns a random word from a list of " + list.length + " pre-determined words.",
+			`Returns a random word from a list of ${list.length} pre-determined words.`,
 			"Highly recommended for its usage in pipe, for example into urban or translate...",
 			`Maximum amount of words: ${limit}`,
 			"",
 			
-			`<code>${prefix}rw</code>`,	
+			`<code>${prefix}rw</code>`,
 			"(one random word)",
 			"",
 	
-			`<code>${prefix}rw 10</code>`,	
+			`<code>${prefix}rw 10</code>`,
 			"(ten random words)",
 			"",
 	

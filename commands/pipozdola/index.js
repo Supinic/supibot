@@ -11,7 +11,7 @@ module.exports = {
 	Code: (async function pipozdola () {
 		return {
 			reply: "https://pastebin.com/PzSHPzH0"
-		}
+		};
 	}),
 	Dynamic_Description: null
 };

@@ -16,9 +16,9 @@ module.exports = {
 			uber: null
 		};
 	
-		const ascendancies = ["Slayer", "Gladiator", "Champion", "Assassin", "Saboteur", "Trickster", "Juggernaut", "Berserker", "Chieftain", "Necromancer", "Elementalist", "Occultist", "Deadeye", "Raider", "Pathfinder", "Inquisitor", "Hierophant", "Guardian", "Ascendant"];		
-		const additionalGems = ["Ancestral Cry","Anger","Arcane Cloak","Arctic Armour","Assassin's Mark","Berserk","Blood and Sand","Bone Offering","Clarity","Conductivity","Convocation","Dash","Decoy Totem","Desecrate","Despair","Determination","Devouring Totem","Discipline","Dread Banner","Elemental Weakness","Enduring Cry","Enfeeble","Ensnaring Arrow","Flammability","Flesh Offering","Flesh and Stone","Frost Wall","General's Cry","Grace","Haste","Hatred","Herald of Ash","Herald of Ice","Herald of Thunder","Immortal Call","Intimidating Cry","Malevolence","Arcanist Brand","Phase Run","Plague Bearer","Poacher's Mark","Precision","Pride","Projectile Weakness","Punishment","Purity of Elements","Purity of Fire","Purity of Ice","Purity of Lightning","Rallying Cry","Reckoning","Rejuvenation Totem","Riposte","Seismic Cry","Smoke Mine","Spellslinger","Spirit Offering","Steelskin","Temporal Chains","Vaal Clarity","Vaal Discipline","Vaal Grace","Vaal Haste","Vaal Impurity of Fire","Vaal Impurity of Ice","Vaal Impurity of Lightning","Vengeance","Vitality","Vulnerability","War Banner","Warlord's Mark","Wither","Withering Step","Wrath","Zealotry"];		
-		const skillGems = ["Ancestral Protector","Ancestral Warchief","Animate Guardian","Arc","Armageddon Brand","Artillery Ballista","Ball Lightning","Bane","Barrage","Bear Trap","Blade Blast","Blade Flurry","Blade Vortex","Bladefall","Bladestorm","Blast Rain","Blight","Blink Arrow","Blood Rage","Bodyswap","Burning Arrow","Caustic Arrow","Chain Hook","Charged Dash","Cleave","Cobra Lash","Cold Snap","Consecrated Path","Contagion","Conversion Trap","Creeping Frost","Cremation","Cyclone","Dark Pact","Detonate Dead","Discharge","Divine Ire","Dominating Blow","Double Strike","Dual Strike","Earthquake","Earthshatter","Elemental Hit","Essence Drain","Ethereal Knives","Explosive Arrow","Explosive Trap","Exsanguinate","Fire Trap","Fireball","Firestorm","Flame Dash","Flame Surge","Flameblast","Flamethrower Trap","Flicker Strike","Freezing Pulse","Frenzy","Frost Blades","Frost Bomb","Frostbite","Frostblink","Frostbolt","Galvanic Arrow","Glacial Cascade","Glacial Hammer","Ground Slam","Heavy Strike","Herald of Agony","Herald of Purity","Holy Flame Totem","Ice Crash","Ice Nova","Ice Shot","Ice Spear","Ice Trap","Icicle Mine","Incinerate","Infernal Blow","Infernal Cry","Kinetic Blast","Kinetic Bolt","Lacerate","Lancing Steel","Leap Slam","Lightning Arrow","Lightning Spire Trap","Lightning Strike","Lightning Tendrils","Lightning Trap","Lightning Warp","Magma Orb","Mirror Arrow","Molten Shell","Molten Strike","Orb of Storms","Penance Brand","Perforate","Pestilent Strike","Power Siphon","Puncture","Purifying Flame","Pyroclast Mine","Rain of Arrows","Raise Spectre","Raise Zombie","Reap","Reave","Righteous Fire","Scorching Ray","Scourge Arrow","Searing Bond","Seismic Trap","Shattering Steel","Shield Charge","Shock Nova","Shockwave Totem","Shrapnel Ballista","Siege Ballista","Siphoning Trap","Smite","Soulrend","Spark","Spectral Shield Throw","Spectral Throw","Split Arrow","Static Strike","Storm Brand","Storm Burst","Storm Call","Stormbind","Stormblast Mine","Summon Carrion Golem","Summon Chaos Golem","Summon Flame Golem","Summon Holy Relic","Summon Ice Golem","Summon Lightning Golem","Summon Raging Spirit","Summon Skeletons","Summon Skitterbots","Summon Stone Golem","Sunder","Sweep","Tectonic Slam","Tempest Shield","Tornado Shot","Toxic Rain","Unearth","Vaal Ancestral Warchief","Vaal Arc","Vaal Blade Vortex","Vaal Blight","Vaal Burning Arrow","Vaal Cold Snap","Vaal Cyclone","Vaal Detonate Dead","Vaal Double Strike","Vaal Earthquake","Vaal Fireball","Vaal Flameblast","Vaal Glacial Hammer","Vaal Ground Slam","Vaal Ice Nova","Vaal Lightning Strike","Vaal Lightning Trap","Vaal Molten Shell","Vaal Power Siphon","Vaal Rain of Arrows","Vaal Reave","Vaal Righteous Fire","Vaal Spark","Vaal Spectral Throw","Vaal Storm Call","Vaal Summon Skeletons","Venom Gyre","Vigilant Strike","Viper Strike","Volatile Dead","Vortex","Wave of Conviction","Whirling Blades","Wild Strike","Winter Orb","Wintertide Brand"]
+		const ascendancies = ["Slayer", "Gladiator", "Champion", "Assassin", "Saboteur", "Trickster", "Juggernaut", "Berserker", "Chieftain", "Necromancer", "Elementalist", "Occultist", "Deadeye", "Raider", "Pathfinder", "Inquisitor", "Hierophant", "Guardian", "Ascendant"];
+		const additionalGems = ["Ancestral Cry","Anger","Arcane Cloak","Arctic Armour","Assassin's Mark","Berserk","Blood and Sand","Bone Offering","Clarity","Conductivity","Convocation","Dash","Decoy Totem","Desecrate","Despair","Determination","Devouring Totem","Discipline","Dread Banner","Elemental Weakness","Enduring Cry","Enfeeble","Ensnaring Arrow","Flammability","Flesh Offering","Flesh and Stone","Frost Wall","General's Cry","Grace","Haste","Hatred","Herald of Ash","Herald of Ice","Herald of Thunder","Immortal Call","Intimidating Cry","Malevolence","Arcanist Brand","Phase Run","Plague Bearer","Poacher's Mark","Precision","Pride","Projectile Weakness","Punishment","Purity of Elements","Purity of Fire","Purity of Ice","Purity of Lightning","Rallying Cry","Reckoning","Rejuvenation Totem","Riposte","Seismic Cry","Smoke Mine","Spellslinger","Spirit Offering","Steelskin","Temporal Chains","Vaal Clarity","Vaal Discipline","Vaal Grace","Vaal Haste","Vaal Impurity of Fire","Vaal Impurity of Ice","Vaal Impurity of Lightning","Vengeance","Vitality","Vulnerability","War Banner","Warlord's Mark","Wither","Withering Step","Wrath","Zealotry"];
+		const skillGems = ["Ancestral Protector","Ancestral Warchief","Animate Guardian","Arc","Armageddon Brand","Artillery Ballista","Ball Lightning","Bane","Barrage","Bear Trap","Blade Blast","Blade Flurry","Blade Vortex","Bladefall","Bladestorm","Blast Rain","Blight","Blink Arrow","Blood Rage","Bodyswap","Burning Arrow","Caustic Arrow","Chain Hook","Charged Dash","Cleave","Cobra Lash","Cold Snap","Consecrated Path","Contagion","Conversion Trap","Creeping Frost","Cremation","Cyclone","Dark Pact","Detonate Dead","Discharge","Divine Ire","Dominating Blow","Double Strike","Dual Strike","Earthquake","Earthshatter","Elemental Hit","Essence Drain","Ethereal Knives","Explosive Arrow","Explosive Trap","Exsanguinate","Fire Trap","Fireball","Firestorm","Flame Dash","Flame Surge","Flameblast","Flamethrower Trap","Flicker Strike","Freezing Pulse","Frenzy","Frost Blades","Frost Bomb","Frostbite","Frostblink","Frostbolt","Galvanic Arrow","Glacial Cascade","Glacial Hammer","Ground Slam","Heavy Strike","Herald of Agony","Herald of Purity","Holy Flame Totem","Ice Crash","Ice Nova","Ice Shot","Ice Spear","Ice Trap","Icicle Mine","Incinerate","Infernal Blow","Infernal Cry","Kinetic Blast","Kinetic Bolt","Lacerate","Lancing Steel","Leap Slam","Lightning Arrow","Lightning Spire Trap","Lightning Strike","Lightning Tendrils","Lightning Trap","Lightning Warp","Magma Orb","Mirror Arrow","Molten Shell","Molten Strike","Orb of Storms","Penance Brand","Perforate","Pestilent Strike","Power Siphon","Puncture","Purifying Flame","Pyroclast Mine","Rain of Arrows","Raise Spectre","Raise Zombie","Reap","Reave","Righteous Fire","Scorching Ray","Scourge Arrow","Searing Bond","Seismic Trap","Shattering Steel","Shield Charge","Shock Nova","Shockwave Totem","Shrapnel Ballista","Siege Ballista","Siphoning Trap","Smite","Soulrend","Spark","Spectral Shield Throw","Spectral Throw","Split Arrow","Static Strike","Storm Brand","Storm Burst","Storm Call","Stormbind","Stormblast Mine","Summon Carrion Golem","Summon Chaos Golem","Summon Flame Golem","Summon Holy Relic","Summon Ice Golem","Summon Lightning Golem","Summon Raging Spirit","Summon Skeletons","Summon Skitterbots","Summon Stone Golem","Sunder","Sweep","Tectonic Slam","Tempest Shield","Tornado Shot","Toxic Rain","Unearth","Vaal Ancestral Warchief","Vaal Arc","Vaal Blade Vortex","Vaal Blight","Vaal Burning Arrow","Vaal Cold Snap","Vaal Cyclone","Vaal Detonate Dead","Vaal Double Strike","Vaal Earthquake","Vaal Fireball","Vaal Flameblast","Vaal Glacial Hammer","Vaal Ground Slam","Vaal Ice Nova","Vaal Lightning Strike","Vaal Lightning Trap","Vaal Molten Shell","Vaal Power Siphon","Vaal Rain of Arrows","Vaal Reave","Vaal Righteous Fire","Vaal Spark","Vaal Spectral Throw","Vaal Storm Call","Vaal Summon Skeletons","Venom Gyre","Vigilant Strike","Viper Strike","Volatile Dead","Vortex","Wave of Conviction","Whirling Blades","Wild Strike","Winter Orb","Wintertide Brand"];
 	
 		const trials = {
 			normal: "A1: Lower Prison; A2: Crypt lvl 1, Chamber of Sins lvl 2; A3: Crematorium, Catacombs, Imperial Gardens",
@@ -39,7 +39,7 @@ module.exports = {
 						const types = ["uber", "merciless", "cruel", "normal"];
 						if (!types.includes(labType)) {
 							return {
-								reply: "Invalid labyrinth type provided! Supported types: " + types.join(", ")
+								reply: `Invalid labyrinth type provided! Supported types: ${types.join(", ")}`
 							};
 						}
 	
@@ -212,7 +212,7 @@ module.exports = {
 								return {
 									success: false,
 									reply: "Must provide a user name - no channel is available!"
-								}
+								};
 							}
 	
 							user = context.channel.Name;
@@ -223,7 +223,7 @@ module.exports = {
 							return {
 								success: false,
 								reply: "Provided user does not exist!"
-							}
+							};
 						}
 	
 						const link = userData.Data?.pathOfExile?.uniqueTabs ?? null;
@@ -257,12 +257,10 @@ module.exports = {
 					name: "heist",
 					aliases: [],
 					description: "Posts a cheatsheet picture with a neat summary of Heist jobs + rewards.",
-					execute: async () => {
-						return {
-							reply: `Heist cheatsheet: https://i.imgur.com/iN05OsU.png`
-						};
-					}
-				},
+					execute: async () => ({
+						reply: `Heist cheatsheet: https://i.imgur.com/iN05OsU.png`
+					})
+				}
 	
 			]
 		};

@@ -28,7 +28,7 @@ module.exports = {
 			to: "en",
 			// default: true if normal execution, false if inside of pipe
 			direction: context.params.direction ?? (!context.append.pipe),
-			confidence: context.params.confidence ?? (!context.append.pipe),
+			confidence: context.params.confidence ?? (!context.append.pipe)
 		};
 	
 		for (const option of ["from", "to"]) {
@@ -100,12 +100,12 @@ module.exports = {
 	
 			const array = [sb.Utils.capitalize(fromLanguageName)];
 			if (options.confidence && data[6] && data[6] !== 1) {
-				const confidence = sb.Utils.round(data[6] * 100, 0) + "%";
-				array.push("(" +  confidence + ")");
+				const confidence = `${sb.Utils.round(data[6] * 100, 0)}%`;
+				array.push(`(${confidence})`);
 			}
 	
 			array.push("->", sb.Utils.capitalize(languageISO.getName(options.to)));
-			reply = array.join(" ") + ": " + reply;
+			reply = `${array.join(" ")}: ${reply}`;
 		}
 	
 		return { reply };

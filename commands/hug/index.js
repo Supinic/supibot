@@ -16,7 +16,7 @@ module.exports = {
 			return { reply: "Thanks for the hug 🙂 <3" };
 		}
 		else {
-			return { reply: context.user.Name + " hugs " + target + " 🤗" };
+			return { reply: `${context.user.Name} hugs ${target} 🤗` };
 		}
 	}),
 	Dynamic_Description: null

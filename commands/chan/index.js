@@ -74,7 +74,7 @@ module.exports = {
 			if (!enabled.file.sfw && !enabled.file.nsfw) {
 				return {
 					reply: "You cannot query for images here!"
-				}
+				};
 			}
 	
 			resultType = "file";
@@ -207,7 +207,7 @@ module.exports = {
 				reply: (context.params.textOnly)
 					? `${post.content}`
 					: `${post.ID} (posted ${delta}): ${post.content}`
-			}
+			};
 		}
 	}),
 	Dynamic_Description: null

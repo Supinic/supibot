@@ -93,7 +93,7 @@ module.exports = {
 		this.data.repeats.push(videoID);
 		this.data.repeats.splice(0, this.data.repeats - this.data.repeatsAmount);
 
-		const link = "https://youtu.be/" + videoID;
+		const link = `https://youtu.be/${videoID}`;
 		if (state === "vlc") {
 			const self = await sb.User.get("supibot");
 			const sr = sb.Command.get("sr");

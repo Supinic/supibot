@@ -116,7 +116,7 @@ module.exports = {
 			return {
 				reply: `Successfully ${string} this channel's Instagram NSFW.`
 			};
-		}
+		};
 
 		return {
 			availableFlags,
@@ -145,12 +145,10 @@ module.exports = {
 						.single()
 						.flat("ID")
 					),
-					set: () => {
-						return {
-							success: false,
-							reply: `Use the ${sb.Command.prefix}remind command instead!`
-						};
-					},
+					set: () => ({
+						success: false,
+						reply: `Use the ${sb.Command.prefix}remind command instead!`
+					}),
 					unset: async (context, ID) => {
 						const row = await sb.Query.getRow("chat_data", "Reminder");
 						try {
@@ -163,7 +161,7 @@ module.exports = {
 							};
 						}
 	
-						if (row.values.User_From !== context.user.ID && row.values.User_To !== context.user.ID ) {
+						if (row.values.User_From !== context.user.ID && row.values.User_To !== context.user.ID) {
 							return {
 								success: false,
 								reply: "That reminder was not created by you or set for you!"
@@ -211,12 +209,10 @@ module.exports = {
 						.single()
 						.flat("ID")
 					),
-					set: () => {
-						return {
-							success: false,
-							reply: `Use the ${sb.Command.prefix}suggest command instead!`
-						};
-					},
+					set: () => ({
+						success: false,
+						reply: `Use the ${sb.Command.prefix}suggest command instead!`
+					}),
 					unset: async (context, ID, ...args) => {
 						const row = await sb.Query.getRow("data", "Suggestion");
 						try {
@@ -479,7 +475,7 @@ module.exports = {
 					parameter: "arguments",
 					description: `If you have been nominated as a TwitchLotto-trusted user, you can then set flags to TL links. Available flags: <code>${availableFlags.join(", ")}</code>`,
 					set: async (context, link, ...flags) => {
-						if (!context.user.Data.trustedTwitchLottoFlagger) {			
+						if (!context.user.Data.trustedTwitchLottoFlagger) {
 							return {
 								success: false,
 								reply: `You don't have access to flag TwitchLotto images!`
@@ -626,12 +622,8 @@ module.exports = {
 					aliases: ["rig-nsfw"],
 					parameter: "arguments",
 					description: `If you are the channel ambassador/owner, you can decide if your channel will filter out NSFW Instagram links in the random Instagram command.`,
-					set: async (context) => {
-						return await setInstagramFlags(context, true);
-					},
-					unset: async (context) => {
-						return await setInstagramFlags(context, false);
-					}
+					set: async (context) => await setInstagramFlags(context, true),
+					unset: async (context) => await setInstagramFlags(context, false)
 				},
 				{
 					name: "timer",
@@ -851,7 +843,7 @@ module.exports = {
 			"",
 			
 			"List of variables:",
-			`<ul>${list}</ul>`		
-		];	
+			`<ul>${list}</ul>`
+		];
 	})
 };

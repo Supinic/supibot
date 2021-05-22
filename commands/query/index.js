@@ -26,7 +26,7 @@ module.exports = {
 		}).text();
 	
 		const data = sb.Config.get("WOLFRAM_QUERY_CENSOR_FN")(rawData);
-		return { 
+		return {
 			reply: (context.platform.Name === "discord")
 				? `\`${data}\``
 				: data

@@ -12,12 +12,25 @@ module.exports = {
 		return {
 			// conga removed due to the fact the fight is dependent on the 8th missing beat
 			zones: [
-				"1-1", "1-2", "1-3",
-				"2-1", "2-2", "2-3",
-				"3-1", "3-2", "3-3",
-				"4-1", "4-2", "4-3",
-				"5-1", "5-2", "5-3",
-				"chess", "coral", "metal", "mole"
+				"1-1",
+				"1-2",
+				"1-3",
+				"2-1",
+				"2-2",
+				"2-3",
+				"3-1",
+				"3-2",
+				"3-3",
+				"4-1",
+				"4-2",
+				"4-3",
+				"5-1",
+				"5-2",
+				"5-3",
+				"chess",
+				"coral",
+				"metal",
+				"mole"
 			],
 			zoneCooldown: 300_000,
 			createURL: (data) => {
@@ -51,7 +64,7 @@ module.exports = {
 				}),
 				throwHttpErrors: false,
 				timeout: 30_000,
-				retry: 0,
+				retry: 0
 			}).json();
 	
 			if (result.success) {
@@ -78,7 +91,7 @@ module.exports = {
 		else if (!zone) {
 			return {
 				success: false,
-				reply: "No game zone provided! Use one of: " + zones.join(", "),
+				reply: `No game zone provided! Use one of: ${zones.join(", ")}`,
 				cooldown: 2500
 			};
 		}
@@ -87,7 +100,7 @@ module.exports = {
 		if (!zones.includes(zone)) {
 			return {
 				success: false,
-				reply: "Invalid zone provided! Use one of: " + zones.join(", "),
+				reply: `Invalid zone provided! Use one of: ${zones.join(", ")}`,
 				cooldown: 2500
 			};
 		}
@@ -116,7 +129,7 @@ module.exports = {
 				}),
 				throwHttpErrors: false,
 				timeout: 30_000,
-				retry: 0,
+				retry: 0
 			}).json();
 		}
 		catch (e) {
@@ -161,7 +174,7 @@ module.exports = {
 			"",
 	
 			"Zone list:",
-			"<ul>" + zones.map(i => `<li><code>${i}</code></li>`).join("") + "</ul>"
+			`<ul>${zones.map(i => `<li><code>${i}</code></li>`).join("")}</ul>`
 		];
 	})
 };

@@ -13,7 +13,7 @@ module.exports = {
 		{ name: "repeat", type: "boolean" },
 		{ name: "regex", type: "regex" },
 		{ name: "sub", type: "boolean" },
-		{ name: "twitch", type: "boolean" },
+		{ name: "twitch", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({

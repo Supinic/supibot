@@ -8,7 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function reset (context, ...args) { 
+	Code: (async function reset (context, ...args) {
 		const message = args.join(" ") || null;
 		const existing = await sb.Query.getRecordset(rs => rs
 			.select("Timestamp")
@@ -30,7 +30,7 @@ module.exports = {
 		if (existing) {
 			const delta = sb.Utils.timeDelta(existing.Timestamp);
 			return {
-				reply: "Successfully noted. Your last reset was " + delta
+				reply: `Successfully noted. Your last reset was ${delta}`
 			};
 		}
 		else {

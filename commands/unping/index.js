@@ -99,7 +99,7 @@ module.exports = {
 	
 			return {
 				reply: `Succesfully ${invocation}ed${suffix}!`
-			}
+			};
 		}
 		else {
 			if (invocation === "reping") {

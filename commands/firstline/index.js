@@ -63,7 +63,7 @@ module.exports = {
 					.limit(1)
 					.single()
 				);
-			})
+			});
 	
 			const lineData = (await Promise.all(promises)).filter(Boolean);
 			if (!lineData) {

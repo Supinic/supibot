@@ -66,7 +66,7 @@ module.exports = {
 					});
 				}
 	
-				speed = newSpeed;		
+				speed = newSpeed;
 				currentText = [];
 			}
 			else if (token.includes("lang:") || token.includes("language:")) {
@@ -97,7 +97,7 @@ module.exports = {
 					}
 				}
 	
-				if (locale !== currentLocale)  {
+				if (locale !== currentLocale) {
 					if (currentText.length > 0) {
 						ttsData.push({
 							locale: currentLocale.locale,
@@ -179,9 +179,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { partsLimit, locales } = values.getStaticData();
-		const list = locales.map(i => {
-			return `<li><code>${i.locale}</code> - ${i.language}</li>`;
-		}).join("");
+		const list = locales.map(i => `<li><code>${i.locale}</code> - ${i.language}</li>`).join("");
 	
 		return [
 			"Plays your messages as TTS on supinic's stream, if enabled.",
@@ -221,7 +219,7 @@ module.exports = {
 			"",
 	
 			"Available locales:",
-			`<ul>${list}</ul>`		
+			`<ul>${list}</ul>`
 		];
 	})
 };

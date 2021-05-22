@@ -19,7 +19,7 @@ module.exports = {
 		}
 	
 		const targetUser = await sb.User.get(user, true);
-		if (!targetUser) {		
+		if (!targetUser) {
 			return { reply: "User not found in the database!" };
 		}
 	

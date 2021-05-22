@@ -22,7 +22,7 @@ module.exports = {
 						endpoints: ["rss"],
 						helpers: ["kalastelija01", "leppunen"]
 					}
-				],
+				]
 			},
 			{
 				code: "vn",
@@ -32,7 +32,7 @@ module.exports = {
 						name: "VietNamNet",
 						url: "https://vietnamnet.vn",
 						path: "rss",
-						endpoints: ["thoi-su.rss", "tuanvietnam.rss" ],
+						endpoints: ["thoi-su.rss", "tuanvietnam.rss"],
 						helpers: ["supinic"]
 					}
 				]
@@ -269,7 +269,7 @@ module.exports = {
 						endpoints: ["rss"],
 						helpers: ["cbdg"]
 					}
-				],
+				]
 			},
 			{
 				code: "hacker",
@@ -316,7 +316,7 @@ module.exports = {
 						helpers: ["kalifail_disbang"]
 					}
 				]
-			},
+			}
 		],
 	
 		extra: {
@@ -463,7 +463,7 @@ module.exports = {
 				throwHttpErros: false,
 				responseType: "json",
 				retry: 0,
-				timeout: 5000,
+				timeout: 5000
 			});
 		}
 		catch (e) {
@@ -484,7 +484,7 @@ module.exports = {
 				statusCode,
 				reason: data?.message ?? null,
 				apiName: "CurrentsAPI"
-			}); 
+			});
 		}
 	
 		const { news } = data;
@@ -502,7 +502,7 @@ module.exports = {
 		const { description = "", published, title } = sb.Utils.randArray(news);
 		const separator = (title && description) ? " - " : "";
 		const delta = (published)
-			? "(published " + sb.Utils.timeDelta(new sb.Date(published)) + ")"
+			? `(published ${sb.Utils.timeDelta(new sb.Date(published))})`
 			: "";
 	
 		return {
@@ -560,7 +560,7 @@ module.exports = {
 			"",
 	
 			"The following are special codes. Those were often 'helped' by people.",
-			"<table><thead><th>Code</th><th>Language</th><th>Sources</th><th>Helpers</th></thead>" + extraNews + "</table>",
+			`<table><thead><th>Code</th><th>Language</th><th>Sources</th><th>Helpers</th></thead>${extraNews}</table>`,
 			""
 		];
 	})

@@ -23,11 +23,11 @@ module.exports = {
 		}
 		else {
 			const string = (emote)
-				? emote + " 💋"
+				? `${emote} 💋`
 				: sb.Utils.randArray(this.staticData.emojis);
 	
-			return { 
-				reply: `${context.user.Name} kisses ${user} ${string}` 
+			return {
+				reply: `${context.user.Name} kisses ${user} ${string}`
 			};
 		}
 	}),

@@ -12,7 +12,7 @@ module.exports = {
 		if (words.length === 0) {
 			return {
 				reply: "No input provided!"
-			}
+			};
 		}
 
 		// normalize input - there might be arguments with other or multiple whitespace inside of them
@@ -22,7 +22,7 @@ module.exports = {
 			cooldown: (context.append.pipe)
 				? 0
 				: this.Cooldown
-		}
+		};
 	}),
 	Dynamic_Description: null
 };

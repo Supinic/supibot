@@ -81,19 +81,17 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			"Finds the summary of a given Wikipedia article.",
-			"Watch out - the topic is case sensitive, unfortunately, that's how Wikipedia works, apparently.",
-			"",
+	Dynamic_Description: (async (prefix) => [
+		"Finds the summary of a given Wikipedia article.",
+		"Watch out - the topic is case sensitive, unfortunately, that's how Wikipedia works, apparently.",
+		"",
 	
-			`<code>${prefix}wiki (topic)</code>`,
-			"Posts a link and summary for given wiki topic for English Wikipedia.",
-			"",
+		`<code>${prefix}wiki (topic)</code>`,
+		"Posts a link and summary for given wiki topic for English Wikipedia.",
+		"",
 	
-			`<code>${prefix}wiki lang:(language) (topic)</code>`,
-			"Posts a link and summary for given wiki topic - but this time, in that language's Wikipedia.",
-			"..."
-		];
-	})
+		`<code>${prefix}wiki lang:(language) (topic)</code>`,
+		"Posts a link and summary for given wiki topic - but this time, in that language's Wikipedia.",
+		"..."
+	])
 };

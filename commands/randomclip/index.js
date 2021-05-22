@@ -25,7 +25,7 @@ module.exports = {
 		}
 	
 		const period = context.params.period ?? "all";
-		if (!["day", "week", "month", "all"].includes(period))  {
+		if (!["day", "week", "month", "all"].includes(period)) {
 			return {
 				success: false,
 				reply: `Invalid clip creation period! Use one of: day, week, month, all`
@@ -60,7 +60,7 @@ module.exports = {
 		}
 	
 		const clip = sb.Utils.randArray(data.clips);
-		const link = "https://clips.twitch.tv/" + clip.slug;
+		const link = `https://clips.twitch.tv/${clip.slug}`;
 		if (context.params.linkOnly) {
 			return {
 				reply: link
@@ -69,7 +69,7 @@ module.exports = {
 
 		const delta = sb.Utils.timeDelta(new sb.Date(clip.created_at));
 		return {
-			reply: `${clip.title} - ${clip.duration} sec, clipped by ${clip.curator.name}, ${delta}: ${link}`,
+			reply: `${clip.title} - ${clip.duration} sec, clipped by ${clip.curator.name}, ${delta}: ${link}`
 		};
 	}),
 	Dynamic_Description: null

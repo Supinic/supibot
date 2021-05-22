@@ -23,7 +23,7 @@ module.exports = {
 		if (!availableTypes.includes(type)) {
 			return {
 				success: false,
-				reply: "Invalid ban filter type provided! Use one of " + availableTypes.join(", ")
+				reply: `Invalid ban filter type provided! Use one of ${availableTypes.join(", ")}`
 			};
 		}
 
@@ -122,7 +122,7 @@ module.exports = {
 			const channelData = sb.Channel.get(options.Channel);
 			const permissions = await context.getUserPermissions("array", ["admin", "owner", "ambassador"], {
 				channel: channelData,
-				platform: channelData?.Platform,
+				platform: channelData?.Platform
 			});
 
 			if (permissions.every(i => !i)) {
@@ -153,8 +153,7 @@ module.exports = {
 			};
 		}
 
-		const existing = sb.Filter.data.find(i =>
-			i.Type === type
+		const existing = sb.Filter.data.find(i => i.Type === type
 			&& i.Channel === options.Channel
 			&& i.Command === options.Command
 			&& i.Invocation === options.Invocation
@@ -205,7 +204,7 @@ module.exports = {
 			"All following examples assume the command is executed by a channel owner.",
 			"",
 
-			"Available types: <code>" + availableTypes.join(" ") + "</code>",
+			`Available types: <code>${availableTypes.join(" ")}</code>`,
 			`You can change the type. The default type is <code>Blacklist</code>.`,
 			"",
 

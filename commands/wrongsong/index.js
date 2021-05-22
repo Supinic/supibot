@@ -32,7 +32,7 @@ module.exports = {
 				reply: (target)
 					? "Target video ID was not found, or it wasn't requested by you!"
 					: "You don't currently have any videos in the playlist!"
-			}
+			};
 		}
 	
 		let action = "";
@@ -40,7 +40,7 @@ module.exports = {
 			const requestsAhead = await sb.Query.getRecordset(rs => rs
 				.select("COUNT(*) AS Amount")
 				.from("chat_data", "Song_Request")
-				.where("Status = %s",  "Queued")
+				.where("Status = %s", "Queued")
 				.where("ID > %n", userRequest.ID)
 				.limit(1)
 				.single()
@@ -64,18 +64,16 @@ module.exports = {
 			reply: `Your request "${userRequest.Name}" (ID ${userRequest.VLC_ID}) has been successfully ${action}.`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			"Skips your current or queued song.",
-			"Can add an ID to skip/delete a specific song in the queue, queued by you only.",
-			"",
+	Dynamic_Description: (async (prefix) => [
+		"Skips your current or queued song.",
+		"Can add an ID to skip/delete a specific song in the queue, queued by you only.",
+		"",
 	
-			`<code>${prefix}ws</code>`,
-			"Skips the earliest request you have playing or in the queue.",
-			"",
+		`<code>${prefix}ws</code>`,
+		"Skips the earliest request you have playing or in the queue.",
+		"",
 	
-			`<code>${prefix}ws (ID)</code>`,
-			"Skips your request with given ID. Fails if it's not your request.",
-		];
-	})
+		`<code>${prefix}ws (ID)</code>`,
+		"Skips your request with given ID. Fails if it's not your request."
+	])
 };

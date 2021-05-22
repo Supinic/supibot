@@ -22,8 +22,7 @@ module.exports = {
 		}
 		else if (context.invocation === "helpgrep") {
 			const query = args.join(" ");
-			const eligible = sb.Command.data.filter(command =>
-				command.Name.includes(query)
+			const eligible = sb.Command.data.filter(command => command.Name.includes(query)
 				|| command.Aliases.some(i => i.includes(query))
 				|| command.Description?.includes(query)
 			);
@@ -32,7 +31,7 @@ module.exports = {
 				success: (eligible.length !== 0),
 				reply: (eligible.length === 0)
 					? "No matching commands found!"
-					: "Matching commands: " + eligible.map(i => i.Name).join(", ")
+					: `Matching commands: ${eligible.map(i => i.Name).join(", ")}`
 			};
 		}
 		// Print specific command description
@@ -55,9 +54,9 @@ module.exports = {
 			}
 	
 			const filteredResponse = (command.Flags.whitelist) ? "(whitelisted)" : "";
-			const aliases = (command.Aliases.length === 0) ? "" : (" (" + command.Aliases.map(i => prefix + i).join(", ") + ")");
+			const aliases = (command.Aliases.length === 0) ? "" : (` (${command.Aliases.map(i => prefix + i).join(", ")})`);
 
-			const cooldownString = sb.Utils.round(command.Cooldown / 1_000, 1) + " seconds cooldown.";
+			const cooldownString = `${sb.Utils.round(command.Cooldown / 1_000, 1)} seconds cooldown.`;
 			const cooldownModifier = sb.Filter.getCooldownModifiers({
 				command,
 				invocation: context.invocation,

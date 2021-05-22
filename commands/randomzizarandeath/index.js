@@ -14,9 +14,9 @@ module.exports = {
 		if (!this.data.videoList) {
 			const { result, reason, success } = await sb.Utils.fetchYoutubePlaylist({
 				key: sb.Config.get("API_GOOGLE_YOUTUBE"),
-	   			playlistID: this.staticData.playlist
+				playlistID: this.staticData.playlist
 			});
-	
+
 			if (!success) {
 				return {
 					success,
@@ -27,7 +27,7 @@ module.exports = {
 				this.data.videoList = result;
 			}
 		}
-	
+
 		const video = sb.Utils.randArray(this.data.videoList);
 		return {
 			reply: `PepeLaugh 👉 https://youtu.be/${video.ID}`

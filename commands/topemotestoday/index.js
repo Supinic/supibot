@@ -57,27 +57,25 @@ module.exports = {
 
 				return `${ind + 1}) ${code} ${count}`;
 			})
-			.join("; ")
+			.join("; ");
 
 		return {
 			reply: `Top 10 emotes for ${date.format("Y-m-d")}: ${string}`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			"Fetches the top 10 Twitch emotes used today, or in a specific day, if provided correctly.",
-			"",
+	Dynamic_Description: (async (prefix) => [
+		"Fetches the top 10 Twitch emotes used today, or in a specific day, if provided correctly.",
+		"",
 
-			`<code>${prefix}tet</code>`,
-			"Fetches the top list for today.",
-			"",
+		`<code>${prefix}tet</code>`,
+		"Fetches the top list for today.",
+		"",
 
-			`<code>${prefix}tet today</code>`,
-			`<code>${prefix}tet yesterday</code>`,
-			`<code>${prefix}tet last week</code>`,
-			`<code>${prefix}tet 2021-01-01</code>`,
-			"Fetches the top list for the specified date. You can use natural language.",
-			"If your date format doesn't work, try YYYY-MM-DD instead, that should be fine."
-		];
-	})
+		`<code>${prefix}tet today</code>`,
+		`<code>${prefix}tet yesterday</code>`,
+		`<code>${prefix}tet last week</code>`,
+		`<code>${prefix}tet 2021-01-01</code>`,
+		"Fetches the top list for the specified date. You can use natural language.",
+		"If your date format doesn't work, try YYYY-MM-DD instead, that should be fine."
+	])
 };

@@ -18,13 +18,13 @@ module.exports = {
 		else if (context.channel.Mode !== "Moderator" && context.channel.Mode !== "VIP") {
 			return {
 				success: false,
-				reply: "Cannot create pyramids in a non-VIP/Moderator chat!" 
+				reply: "Cannot create pyramids in a non-VIP/Moderator chat!"
 			};
 		}
 		else if (!emote) {
 			return {
 				success: false,
-				reply: "No emote provided!" 
+				reply: "No emote provided!"
 			};
 		}
 		
@@ -34,13 +34,13 @@ module.exports = {
 				success: false,
 				reply: `The size of the pyramid must be a positive integer!`
 			};
-		}	
+		}
 		
 		const limit = context.channel.Message_Limit ?? context.platform.Message_Limit;
 		if (emote.repeat(size) > limit || size > 20) {
 			return {
 				success: false,
-				reply: "Target pyramid is either too wide or too tall!" 
+				reply: "Target pyramid is either too wide or too tall!"
 			};
 		}
 	

@@ -29,7 +29,7 @@ module.exports = {
 		const list = sb.Config.get("EMOJI_LIST");
 	
 		return [
-			"Returns a random word from a list of " + list.length + " pre-determined emojis.",
+			`Returns a random word from a list of ${list.length} pre-determined emojis.`,
 			`Maximum amount of words: ${limit}`,
 			"",
 			
@@ -41,7 +41,7 @@ module.exports = {
 			"(ten random emojis)",
 			"",
 	
-			"Emoji list: <br>" + list.join(" ")
+			`Emoji list: <br>${list.join(" ")}`
 		];
 	})
 };

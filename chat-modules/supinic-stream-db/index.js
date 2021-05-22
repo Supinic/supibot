@@ -5,7 +5,7 @@ module.exports = {
 	Code: (async function supinicStreamDB (context) {
 		const { data: [stream] } = await sb.Got("Helix", {
 			url: "videos",
-			searchParams:  new sb.URLParams()
+			searchParams: new sb.URLParams()
 				.set("user_id", "31400525")
 				.set("first", "1")
 				.toString()
@@ -74,7 +74,7 @@ module.exports = {
 
 			if (activeVideoID) {
 				const row = await sb.Query.getRow("stream", "Stream");
-				await row.load(activeVideoID)
+				await row.load(activeVideoID);
 
 				row.values.End = new sb.Date().discardTimeUnits("s", "ms");
 				await row.save();

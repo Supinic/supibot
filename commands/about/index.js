@@ -21,12 +21,12 @@ module.exports = {
 			);
 
 			if (date) {
-				presentSince = `I am present in this channel since ${date.format("Y-m-d")} (${sb.Utils.timeDelta(date)})`	;
+				presentSince = `I am present in this channel since ${date.format("Y-m-d")} (${sb.Utils.timeDelta(date)})`;
 			}
 		}
 
 
-		return {	
+		return {
 			reply: sb.Utils.tag.trim `
 				I am a smol variety and utility bot supiniL
 				Running on a smol Raspberry Pi 3B supiniL

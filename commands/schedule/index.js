@@ -9,7 +9,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function schedule (context, channel) {
-		let channelName =  null;
+		let channelName = null;
 		if (channel) {
 			channelName = channel;
 		}

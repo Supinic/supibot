@@ -100,7 +100,7 @@ module.exports = {
 						? sb.Utils.round(i.discountPrice / 100)
 						: null,
 					discountAmount: (i.discountAmount)
-						? sb.Utils.round((1 - i.discountAmount) * 100) + "%"
+						? `${sb.Utils.round((1 - i.discountAmount) * 100)}%`
 						: null
 				}
 			}));
@@ -184,7 +184,7 @@ module.exports = {
 		const gameData = await values.getCacheData({ type: "games" });
 		const games = (gameData)
 			? gameData.map(i => `<li><code>${i.name}</code></li>`).sort().join("")
-			: "<li>No game data available - use the command to populate the list!</li>"
+			: "<li>No game data available - use the command to populate the list!</li>";
 	
 		return [
 			`Fetches a random description of a user profile from <a target="_blank" href="egirl.gg">egirl.gg</a>.`,

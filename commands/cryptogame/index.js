@@ -23,7 +23,7 @@ module.exports = {
 							.set("tsyms", "BTC,XRP,DOGE,ETH,BCH,LTC,EOS,XLM,BNB,USDT,DOT,ADA,LINK,XMR,ANAL")
 							.toString(),
 						headers: {
-							Authorization: "Apikey " + sb.Config.get("API_CRYPTO_COMPARE")
+							Authorization: `Apikey ${sb.Config.get("API_CRYPTO_COMPARE")}`
 						}
 					}).json(),
 
@@ -38,11 +38,11 @@ module.exports = {
 					}).json(),
 
 					sb.Got({
-						url: "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/EUR",
+						url: "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/EUR"
 					}).json(),
 
 					sb.Got({
-						url: "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAG/EUR",
+						url: "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAG/EUR"
 					}).json()
 				]);
 
@@ -219,13 +219,11 @@ module.exports = {
 			if (!asset) {
 				return `You don't have any ${assetData.Code}!`;
 			}
+			else if (asset.Amount < amount) {
+				return `You don't have enough ${assetData.Code}! You have ${asset.Amount}, and need ${amount}.`;
+			}
 			else {
-				if (asset.Amount < amount) {
-					return `You don't have enough ${assetData.Code}! You have ${asset.Amount}, and need ${amount}.`;
-				}
-				else {
-					return true;
-				}
+				return true;
 			}
 		};
 
@@ -278,7 +276,7 @@ module.exports = {
 				Exchange_Rate: null,
 				Target_Portfolio: targetPortfolio.ID,
 				Target_Asset: assetData.Code,
-				Target_Amount: amount,
+				Target_Amount: amount
 			});
 
 			await Promise.all([
@@ -307,7 +305,7 @@ module.exports = {
 				Exchange_Rate: exchangeRate,
 				Target_Portfolio: portfolioData.ID,
 				Target_Asset: targetAsset.Code,
-				Target_Amount: targetAmount,
+				Target_Amount: targetAmount
 			});
 
 			await Promise.all([
@@ -391,7 +389,7 @@ module.exports = {
 				await updatePortfolioAsset(portfolioID, baseAsset, 1000);
 				return {
 					reply: `Your portfolio was established. You now have the equivalent of 1000 EUR at your disposal to invest.`
-				}
+				};
 			}
 
 			case "average": {
@@ -487,7 +485,7 @@ module.exports = {
 
 				let sourceAsset = baseAsset;
 				let targetAsset = data.asset;
-				let sourceAmount = data.amount * targetAsset.Price;				
+				let sourceAmount = data.amount * targetAsset.Price;
 				if (command === "sell") {
 					sourceAsset = data.asset;
 					targetAsset = baseAsset;
@@ -506,7 +504,7 @@ module.exports = {
 						};
 					}
 
-					const asset = portfolioData.assets.find(i => i.Code === sourceAsset.Code)
+					const asset = portfolioData.assets.find(i => i.Code === sourceAsset.Code);
 					const multiplier = sb.Utils.round(percent * 0.01, 4);
 
 					sourceAmount = ((asset.Amount ?? 0) * multiplier);
@@ -610,77 +608,75 @@ module.exports = {
 			}
 		}
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			`<h4>The Crypto Game</h4>`,
-			"Register your portfolio, receive some fake cash, invest it to various currencies and assets!",
-			"Who will be the one to profit, or crash the most?",
-			"Guaranteed - zero connection to real world, so you're not at risk of losing anything (besides your dignity).",
-			"",
+	Dynamic_Description: (async (prefix) => [
+		`<h4>The Crypto Game</h4>`,
+		"Register your portfolio, receive some fake cash, invest it to various currencies and assets!",
+		"Who will be the one to profit, or crash the most?",
+		"Guaranteed - zero connection to real world, so you're not at risk of losing anything (besides your dignity).",
+		"",
 
-			"Playing this game does not entitle you to any currency in real life.",
-			"Therefore, using this command is not gambling. You do not \"earn\" anything.",
-			"",
+		"Playing this game does not entitle you to any currency in real life.",
+		"Therefore, using this command is not gambling. You do not \"earn\" anything.",
+		"",
 
-			"This crypto-game uses euro (EUR, €) as the base currency.",
-			"All transactions and commands use euro as the base.",
-			"",
+		"This crypto-game uses euro (EUR, €) as the base currency.",
+		"All transactions and commands use euro as the base.",
+		"",
 
-			"<h5>Main sub-commands</h5>",
+		"<h5>Main sub-commands</h5>",
 
-			`<code>${prefix}cg register</code>`,
-			"Registers you for the game, establishing your portfolio with 1000 EUR.",
-			"",
+		`<code>${prefix}cg register</code>`,
+		"Registers you for the game, establishing your portfolio with 1000 EUR.",
+		"",
 
-			`<code>${prefix}cg buy (amount) (asset)</code>`,
-			`<code>${prefix}cg buy 1 BTC</code>`,
-			"Exchanges an equivalent amount of euros for however many of another asset you selected.",
-			"",
+		`<code>${prefix}cg buy (amount) (asset)</code>`,
+		`<code>${prefix}cg buy 1 BTC</code>`,
+		"Exchanges an equivalent amount of euros for however many of another asset you selected.",
+		"",
 
-			`<code>${prefix}cg sell (amount) (asset)</code>`,
-			`<code>${prefix}cg sell 100 DOGE</code>`,
-			"Exchanges an equivalent amount of whatever asset you selected back to euros.",
-			"",
+		`<code>${prefix}cg sell (amount) (asset)</code>`,
+		`<code>${prefix}cg sell 100 DOGE</code>`,
+		"Exchanges an equivalent amount of whatever asset you selected back to euros.",
+		"",
 
-			`<code>${prefix}cg buy all (asset)</code>`,
-			`<code>${prefix}cg sell all (asset)</code>`,
-			"You can use the key word \"all\" to exchange all of the asset you have, instead of specifying an amount.",
-			"",
+		`<code>${prefix}cg buy all (asset)</code>`,
+		`<code>${prefix}cg sell all (asset)</code>`,
+		"You can use the key word \"all\" to exchange all of the asset you have, instead of specifying an amount.",
+		"",
 
-			`<code>${prefix}cg buy 50% (asset)</code>`,
-			`<code>${prefix}cg sell 12.5% (asset)</code>`,
-			"You can use the percent symbol to buy/sell a relative amount of a given asset, instead of specifying an amount.",
-			"",
+		`<code>${prefix}cg buy 50% (asset)</code>`,
+		`<code>${prefix}cg sell 12.5% (asset)</code>`,
+		"You can use the percent symbol to buy/sell a relative amount of a given asset, instead of specifying an amount.",
+		"",
 
-			"<h5>Supplementary sub-commands</h5>",
+		"<h5>Supplementary sub-commands</h5>",
 
-			`<code>${prefix}cg average</code>`,
-			`Fetches the average portfolio value.`,
-			"",
+		`<code>${prefix}cg average</code>`,
+		`Fetches the average portfolio value.`,
+		"",
 
-			`<code>${prefix}cg check</code>`,
-			`<code>${prefix}cg check (user)</code>`,
-			`Shows how much of each asset you (or a different user) have in your current portfolio.`,
-			"",
+		`<code>${prefix}cg check</code>`,
+		`<code>${prefix}cg check (user)</code>`,
+		`Shows how much of each asset you (or a different user) have in your current portfolio.`,
+		"",
 
-			`<code>${prefix}cg total</code>`,
-			`<code>${prefix}cg total (user)</code>`,
-			`<code>${prefix}cg rank</code>`,
-			`<code>${prefix}cg rank (user)</code>`,
-			`Shows the total converted cost of your (or a different users's) portfolio in euros plus your/their rank.`,
-			"",
+		`<code>${prefix}cg total</code>`,
+		`<code>${prefix}cg total (user)</code>`,
+		`<code>${prefix}cg rank</code>`,
+		`<code>${prefix}cg rank (user)</code>`,
+		`Shows the total converted cost of your (or a different users's) portfolio in euros plus your/their rank.`,
+		"",
 
-			`<code>${prefix}cg assets</code>`,
-			`<code>${prefix}cg prices</code>`,
-			"Posts a link to the list of assets and their current prices.",
-			`You can check it here: <a href="/crypto-game/asset/list">List</a>`,
-			"",
+		`<code>${prefix}cg assets</code>`,
+		`<code>${prefix}cg prices</code>`,
+		"Posts a link to the list of assets and their current prices.",
+		`You can check it here: <a href="/crypto-game/asset/list">List</a>`,
+		"",
 
-			`<code>${prefix}cg portfolios</code>`,
-			`<code>${prefix}cg leaderboard</code>`,
-			"Posts a link to the list of portfolios, their owners, and the converted total prices.",
-			`You can check it here: <a href="/crypto-game/portfolio/list">List</a>`,
-			"",
-		]
-	})
+		`<code>${prefix}cg portfolios</code>`,
+		`<code>${prefix}cg leaderboard</code>`,
+		"Posts a link to the list of portfolios, their owners, and the converted total prices.",
+		`You can check it here: <a href="/crypto-game/portfolio/list">List</a>`,
+		""
+	])
 };

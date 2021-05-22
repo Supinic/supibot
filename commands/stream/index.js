@@ -26,9 +26,9 @@ module.exports = {
 				const channelID = await sb.Platform.get("twitch").controller.getUserID("supinic");
 				const { body, statusCode } = await sb.Got("Kraken", {
 					method: "PUT",
-					url: "channels/" + channelID,
+					url: `channels/${channelID}`,
 					headers: {
-						"Authorization": "OAuth " + sb.Config.get("TWITCH_OAUTH_EDITOR")
+						Authorization: `OAuth ${sb.Config.get("TWITCH_OAUTH_EDITOR")}`
 					},
 					json: {
 						channel: {
@@ -47,14 +47,14 @@ module.exports = {
 				}
 	
 				return {
-					reply: sb.Utils.capitalize(setType) + " set successfully."
+					reply: `${sb.Utils.capitalize(setType)} set successfully.`
 				};
 			}
 	
 			case "tts": {
 				const value = (rest.shift() === "true");
 				sb.Config.set("TTS_ENABLED", value ? "1" : "0");
-				return { reply: "Text to speech is now set to " + value + "." };
+				return { reply: `Text to speech is now set to ${value}.` };
 			}
 	
 			case "ttslimit": {
@@ -66,7 +66,7 @@ module.exports = {
 				}
 	
 				sb.Config.set("TTS_TIME_LIMIT", limit);
-				return { reply: "Text to speech time limit is now set to " + limit + " milliseconds." };
+				return { reply: `Text to speech time limit is now set to ${limit} milliseconds.` };
 			}
 	
 			case "ttsvolume": {
@@ -78,14 +78,14 @@ module.exports = {
 				}
 	
 				sb.Config.set("TTS_VOLUME", volume);
-				return { reply: "Text to speech volume is now set to " + volume };
+				return { reply: `Text to speech volume is now set to ${volume}` };
 			}
 	
 			case "ttsmulti":
 			case "multitts": {
 				const value = (rest.shift() === "true");
 				sb.Config.set("TTS_MULTIPLE_ENABLED", value ? "1" : "0");
-				return { reply: "Concurrent text to speech is now set to " + value };
+				return { reply: `Concurrent text to speech is now set to ${value}` };
 			}
 	
 			case "ps":
@@ -93,7 +93,7 @@ module.exports = {
 			case "playsound": {
 				const value = (rest.shift() === "true");
 				sb.Config.set("PLAYSOUNDS_ENABLED", value ? "1" : "0");
-				return { reply: "Play sounds are now set to " + value };
+				return { reply: `Play sounds are now set to ${value}` };
 			}
 	
 			case "sr": {
@@ -110,7 +110,7 @@ module.exports = {
 				}
 	
 				sb.Config.set("SONG_REQUESTS_STATE", value);
-				return { reply: "Song requests are now set to " + value };
+				return { reply: `Song requests are now set to ${value}` };
 			}
 	
 			default: return { reply: "Unrecognized command." };

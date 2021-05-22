@@ -5,9 +5,10 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function announceHelpNeeded () {
+		/* eslint-disable no-unreachable */
 		return;
 
-		const threshold = new sb.Date().addMinutes(-60)
+		const threshold = new sb.Date().addMinutes(-60);
 		const channels = sb.Channel.getJoinableForPlatform("twitch");
 		const channelStreamData = await Promise.all(channels.map(async (channel) => {
 			const data = await channel.getStreamData();

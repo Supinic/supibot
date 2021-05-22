@@ -77,10 +77,10 @@ module.exports = {
 	
 		let extra = "";
 		if (items.length > 1 && index === null) {
-			extra = `(${items.length - 1} extra definitons)`
+			extra = `(${items.length - 1} extra definitons)`;
 		}
 	
-		const thumbs = "(+" + item.thumbs_up + "/-" + item.thumbs_down + ")";
+		const thumbs = `(+${item.thumbs_up}/-${item.thumbs_down})`;
 		const example = (item.example)
 			? ` - Example: ${item.example}`
 			: "";

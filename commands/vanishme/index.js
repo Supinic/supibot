@@ -8,7 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function vanishMe (context) {
+	Code: (async function vanishMe () {
 		return {
 			reply: "!vanish monkaS"
 		};

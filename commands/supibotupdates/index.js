@@ -18,15 +18,15 @@ module.exports = {
 				reply: "This command can only be invoked on Discord!"
 			};
 		}
-	
+
 		const { guild, member } = context.append;
-		if (!guild || guild.id !== this.staticData.supinicGuildID) {		
+		if (!guild || guild.id !== this.staticData.supinicGuildID) {
 			return {
 				success: false,
 				reply: "This command can only be invoked in Supinic's discord server!"
 			};
 		}
-	
+
 		const role = guild.roles.cache.get(this.staticData.updatesRoleID);
 		if (!role) {
 			return {
@@ -34,7 +34,7 @@ module.exports = {
 				reply: "Supinic has deleted this role PepeLaugh"
 			};
 		}
-	
+
 		const hasRole = member.roles.cache.has(role.id);
 		if (hasRole) {
 			member.roles.remove(role, `Bot unassigned role on ${sb.Date.now()} in channel ${context.channel?.ID ?? null}.`);
@@ -42,11 +42,11 @@ module.exports = {
 		else {
 			member.roles.add(role, `Bot assigned the role on ${sb.Date.now()} in channel ${context.channel?.ID ?? null}.`);
 		}
-	
+
 		const [string, emoji] = (hasRole) ? ["no longer", "😊"] : ["", "☹"];
 		return {
-			reply: `You now ${string} have the role that mentions you for Supibot updates 😃`
-		}
+			reply: `You now ${string} have the role that mentions you for Supibot updates ${emoji}`
+		};
 	}),
 	Dynamic_Description: null
 };

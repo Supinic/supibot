@@ -18,7 +18,7 @@ module.exports = {
 		if (!targetUser) {
 			return {
 				success: false,
-				reply: "No data for given user name!" 
+				reply: "No data for given user name!"
 			};
 		}
 	
@@ -35,9 +35,9 @@ module.exports = {
 	
 		const temporalReply = (targetUser.Name === context.platform.Self_Name)
 			? "first brought to life as an mIRC bot"
-			: (targetUser.ID < this.staticData.botID)
+			: ((targetUser.ID < this.staticData.botID)
 				? "first mentioned in logs (predating Supibot)"
-				: "first seen";
+				: "first seen");
 	
 		const delta = sb.Utils.timeDelta(targetUser.Started_Using);
 		const now = new sb.Date();

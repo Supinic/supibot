@@ -17,7 +17,7 @@ module.exports = {
 		const $ = sb.Utils.cheerio(html);
 		const movies = $(".content .list-unstyled li").map((ind, i) => {
 			const name = $($(i).children()[1]);
-			return name.text().replace(/\s+/g, " ");		
+			return name.text().replace(/\s+/g, " ");
 		});
 	
 		return {

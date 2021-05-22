@@ -12,7 +12,7 @@ module.exports = {
 
 			await channel.saveProperty("Data");
 			await channel.saveProperty("Mode", "Read");
-		}	
+		}
 		else if (event === "offline" && channel.Mode === "Read" && channel.Data.offlineOnlyBot) {
 			delete channel.Data.offlineOnlyBot;
 

@@ -33,7 +33,7 @@ module.exports = {
 			else {
 				return symbolData[index][0];
 			}
-		}
+		};
 
 		return {
 			findSymbol

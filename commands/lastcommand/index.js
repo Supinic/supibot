@@ -39,7 +39,7 @@ module.exports = {
 				.single();
 	
 			if (context.channel) {
-				rs.where("Channel = %n", context.channel.ID)
+				rs.where("Channel = %n", context.channel.ID);
 			}
 			else {
 				rs.where("Channel IS NULL").where("Platform = %n", context.platform.ID);

@@ -97,7 +97,7 @@ module.exports = {
 		this.data.previousPosts.splice(this.staticData.repeats);
 		
 		return {
-			reply: "SadCat " + post
+			reply: `SadCat ${post}`
 		};
 	}),
 	Dynamic_Description: null

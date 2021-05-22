@@ -25,7 +25,7 @@ module.exports = {
 		const surahText = surahData.data.translation.en.replace(/\[.*?]/g, "").split(/\W/).filter(Boolean);
 	
 		const shuffle = sb.Command.get("shuffle");
-		const result = await shuffle.execute(context, ...[...bibleText, ...surahText]);	
+		const result = await shuffle.execute(context, ...[...bibleText, ...surahText]);
 		// for (let i = 0; i < bibleText.length; i++) {
 		// 	result.push(bibleText[i]);
 		//

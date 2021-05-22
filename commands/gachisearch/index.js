@@ -61,10 +61,10 @@ module.exports = {
 
 			const others = (rest.length === 0)
 				? ""
-				: "More results: " + rest.map(i => `${i.Name} (ID ${i.ID})`).join("; ");
+				: `More results: ${rest.map(i => `${i.Name} (ID ${i.ID})`).join("; ")}`;
 
 			return {
-				reply: `"${author.Name}" - ${link} ${others}`,
+				reply: `"${author.Name}" - ${link} ${others}`
 			};
 		}
 
@@ -127,7 +127,7 @@ module.exports = {
 			});
 
 			link = relay.body.data.link;
-			reply = "Search result: " + link;
+			reply = `Search result: ${link}`;
 		}
 
 		return {

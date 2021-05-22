@@ -71,7 +71,7 @@ module.exports = {
 			const requester = playing.user ?? playing.queueby ?? "(unknown)";
 			return {
 				reply: `Currently playing on Cytube: ${media.title} ${link} (${media.duration}), queued by ${requester}`
-			}
+			};
 		}
 	
 		let type = (context.invocation === "current")
@@ -178,6 +178,6 @@ module.exports = {
 
 		`<code>${prefix}song next</code>`,
 		`Playing next: (link)`,
-		``,
+		``
 	])
 };

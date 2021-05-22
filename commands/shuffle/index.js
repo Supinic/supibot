@@ -42,24 +42,22 @@ module.exports = {
 			reply = result.join(" ");
 		}
 	
-		return { 
+		return {
 			reply,
 			cooldown: {
 				length: (context.append.pipe) ? null : this.Cooldown
 			}
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			"For a given message, shuffles the words around.",
-			"",
+	Dynamic_Description: (async (prefix) => [
+		"For a given message, shuffles the words around.",
+		"",
 	
-			`<code>${prefix}shuffle this is a random message</code>`,
-			`a random is message this`,
-			"",
+		`<code>${prefix}shuffle this is a random message</code>`,
+		`a random is message this`,
+		"",
 	
-			`<code>${prefix}shuffle fancy:true (this) isn't a random! message</code>`,
-			`) isn a ' ! random this ( message`,
-		];
-	})
+		`<code>${prefix}shuffle fancy:true (this) isn't a random! message</code>`,
+		`) isn a ' ! random this ( message`
+	])
 };

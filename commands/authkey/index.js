@@ -25,7 +25,7 @@ module.exports = {
 				if (!context.privateMessage) {
 					return { reply: "You can only generate a new key via private messages!" };
 				}
-				else if (context.user.Data.authKey) {				
+				else if (context.user.Data.authKey) {
 					return { reply: "You already have an authentication key set up! Invalidate it first and then generate a new one." };
 				}
 				
@@ -35,12 +35,12 @@ module.exports = {
 					.update(context.user.ID.toString())
 					.update(new sb.Date().valueOf().toString())
 					.update(crypto.randomBytes(256).toString())
-					.digest("hex");				
+					.digest("hex");
 					
 				context.user.Data.authKey = hashString;
 				await context.user.saveProperty("Data", context.user.Data);
 					
-				return { reply: "Your authentication key is: " + hashString };
+				return { reply: `Your authentication key is: ${hashString}` };
 			}
 		
 			default: return { reply: "You must supply a mode, one of: \"generate\", \"invalidate\"" };

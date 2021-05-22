@@ -22,7 +22,7 @@ module.exports = {
 
 		const emote = await context.channel.getBestAvailableEmote(["KKoooona", "KKonaW", "KKona"], "🤠");
 		if (target?.toLowerCase() === context.platform.Self_Name) {
-			return { 
+			return {
 				reply: `${emote} I'M DRIVING THE TRUCK ${emote} GET OUT OF THE WAY ${emote}`
 			};
 		}
@@ -32,7 +32,7 @@ module.exports = {
 			};
 		}
 		else {
-			return { 
+			return {
 				reply: `The truck ran you over ${emote}`
 			};
 		}

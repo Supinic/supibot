@@ -8,8 +8,6 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function setTrackFavourite (context, link) {
-	
-	}),
+	Code: (async function setTrackFavourite () {}),
 	Dynamic_Description: null
 };

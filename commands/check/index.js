@@ -53,12 +53,10 @@ module.exports = {
 				name: "alias",
 				aliases: ["aliases"],
 				description: "This sub-command is deprecated, check the alias command instead.",
-				execute: async () => {
-					return {
-						success: false,
-						reply: `Use the ${sb.Command.prefix}alias list command instead! Alternatively, check its help, too.`
-					};
-				}
+				execute: async () => ({
+					success: false,
+					reply: `Use the ${sb.Command.prefix}alias list command instead! Alternatively, check its help, too.`
+				})
 			},
 			{
 				name: "ambassador",
@@ -164,12 +162,12 @@ module.exports = {
 	
 					let string;
 					if (!check) {
-						string = pronoun + " have never eaten a cookie before.";
+						string = `${pronoun} have never eaten a cookie before.`;
 					}
 					else if (check.Cookie_Today) {
 						string = (check.Cookie_Is_Gifted)
-							? pronoun + " have already eaten the daily and gifted cookie today."
-							: pronoun + " have already eaten/gifted the daily cookie today.";
+							? `${pronoun} have already eaten the daily and gifted cookie today.`
+							: `${pronoun} have already eaten/gifted the daily cookie today.`;
 	
 						const date = new sb.Date().addDays(1);
 						date.setUTCHours(0, 0, 0, 0);
@@ -178,8 +176,8 @@ module.exports = {
 					}
 					else {
 						string = (check.Cookie_Is_Gifted)
-							? pronoun + " have a gifted cookie waiting."
-							: pronoun + " have an unused cookie waiting.";
+							? `${pronoun} have a gifted cookie waiting.`
+							: `${pronoun} have an unused cookie waiting.`;
 					}
 	
 					return {
@@ -220,7 +218,7 @@ module.exports = {
 					let link = await this.getCacheData(key);
 					if (!link) {
 						const result = await sb.Pastebin.post(stack, {
-							name: "Stack of Supibot error ID " + ID,
+							name: `Stack of Supibot error ID ${ID}`,
 							expiration: "1H"
 						});
 						
@@ -244,7 +242,7 @@ module.exports = {
 					return {
 						reply: link,
 						replyWithPrivateMessage: true
-					}
+					};
 				}
 			},
 			{
@@ -299,7 +297,7 @@ module.exports = {
 					const [yes, no] = sb.Utils.splitByCondition(votes, i => i.Vote === "Yes");
 					return {
 						reply: `Poll ID ${poll.ID} (${poll.Status}) - ${poll.Text} - Votes: ${yes.length}:${no.length}`
-					}
+					};
 				}
 			},
 			{
@@ -342,8 +340,8 @@ module.exports = {
 						: await sb.User.get(reminder.User_From, true);
 	
 					const [owner, target] = (context.user.ID === reminder.User_From)
-						? ["Your reminder", "to " + reminderUser.Name]
-						: ["Reminder", "by " + reminderUser.Name + " to you"];
+						? ["Your reminder", `to ${reminderUser.Name}`]
+						: ["Reminder", `by ${reminderUser.Name} to you`];
 	
 					const delta = (reminder.Schedule)
 						? ` (${sb.Utils.timeDelta(reminder.Schedule)})`
@@ -351,7 +349,7 @@ module.exports = {
 	
 					return {
 						reply: `${owner} ID ${ID} ${target}${delta}: ${reminder.Text} ${alreadyFired}`
-					}
+					};
 				}
 			},
 			{
@@ -372,7 +370,7 @@ module.exports = {
 						reply: (last)
 							? `Your last "reset" was ${sb.Utils.timeDelta(last.Timestamp)}.`
 							: `You have never noted down a "reset" before.`
-					}
+					};
 				}
 			},
 			{
@@ -426,7 +424,7 @@ module.exports = {
 					}
 					else {
 						return {
-							reply: "You're currently subscribed to these events: " + types.join(", ")
+							reply: `You're currently subscribed to these events: ${types.join(", ")}`
 						};
 					}
 				}
@@ -628,8 +626,7 @@ module.exports = {
 			"",
 	
 			"Supported types:",
-			"<ul>" + list.join("") + "</ul>"
+			`<ul>${list.join("")}</ul>`
 		];
-	
 	})
 };

@@ -18,7 +18,7 @@ module.exports = {
 	
 		return {
 			reply: (context.channel.Data.discord) ?? "This channel has no Discord description set up."
-		}
+		};
 	}),
 	Dynamic_Description: null
 };

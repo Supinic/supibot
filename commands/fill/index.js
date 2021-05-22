@@ -20,7 +20,7 @@ module.exports = {
 
 		let live = false;
 		let limit = (context.channel?.Message_Limit ?? context.platform.Message_Limit);
-		if (context.channel)  {
+		if (context.channel) {
 			const streamData = await context.channel.getStreamData();
 			if (streamData.live) {
 				limit = Math.trunc(limit / 2);

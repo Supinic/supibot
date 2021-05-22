@@ -17,14 +17,14 @@ module.exports = {
 			"Elvish Female",
 			"Halfling Male",
 			"Halfling Female",
-	
+
 			"Draconic Male",
 			"Draconic Female",
 			"Drow Male",
 			"Drow Female",
 			"Orcish Male",
 			"Orcish Female",
-	
+
 			"Fiendish",
 			"Celestial",
 			"Modron"
@@ -44,15 +44,15 @@ module.exports = {
 				};
 			}
 		}
-	
+
 		const name = await sb.Got({
-		  	url: "https://donjon.bin.sh/name/rpc-name.fcgi",
+			url: "https://donjon.bin.sh/name/rpc-name.fcgi",
 			searchParams: new sb.URLParams()
 				.set("type", type)
 				.set("n", "1")
 				.toString()
 		}).text();
-	
+
 		return {
 			reply: `Your random ${type} name is: ${name}`
 		};

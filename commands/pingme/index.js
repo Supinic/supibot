@@ -10,7 +10,7 @@ module.exports = {
 	Static_Data: (() => ({
 		strings: {
 			"public-incoming": "That person has too many public reminders pending!",
-			"public-outgoing":  "You have too many public reminders pending!",
+			"public-outgoing": "You have too many public reminders pending!",
 			"private-incoming": "That person has too many private reminders pending!",
 			"private-outgoing": "You have too many private reminders pending!"
 		}
@@ -44,7 +44,7 @@ module.exports = {
 	
 		if (success && !cause) {
 			return {
-				reply: "I will ping you when they type in chat (ID " + ID + ")"
+				reply: `I will ping you when they type in chat (ID ${ID})`
 			};
 		}
 		else {

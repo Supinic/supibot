@@ -76,7 +76,7 @@ module.exports = {
 			};
 		}
 	
-		const selfRegex = new RegExp("^@?" + context.platform.Self_Name + ",?", "i");
+		const selfRegex = new RegExp(`^@?${context.platform.Self_Name},?`, "i");
 		return {
 			reply: result.message.replace(selfRegex, "")
 		};

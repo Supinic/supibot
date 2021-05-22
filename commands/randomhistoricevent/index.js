@@ -25,7 +25,7 @@ module.exports = {
 		}
 	
 		const { day, month } = date;
-		let event = await sb.Query.getRecordset(rs => rs
+		const event = await sb.Query.getRecordset(rs => rs
 			.select("Year", "Text")
 			.from("data", "Historic_Event")
 			.where("Day = %n", day)

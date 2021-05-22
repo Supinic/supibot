@@ -27,12 +27,12 @@ module.exports = {
 		}
 		else if (type === null) {
 			return {
-				reply: "No type provided! Use one of: " + types.join(", ")
+				reply: `No type provided! Use one of: ${types.join(", ")}`
 			};
 		}
 		else if (!types.includes(type)) {
 			return {
-				reply: "That type is not supported! Use on of: " + types.join(", ")
+				reply: `That type is not supported! Use on of: ${types.join(", ")}`
 			};
 		}
 		else if (!context.user.Data.animals[type]) {

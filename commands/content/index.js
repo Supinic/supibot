@@ -24,7 +24,7 @@ module.exports = {
 	
 		for (const item of data) {
 			if (item.Category === null && item.Status === null) {
-				count.new++
+				count.new++;
 			}
 			else if (item.Category === "Bot addition") {
 				count.botRequest++;

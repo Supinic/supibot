@@ -23,7 +23,7 @@ module.exports = {
 				}
 				else {
 					apiData = await sb.Got("Supinic", {
-						url: "osrs/lookup/" + user,
+						url: `osrs/lookup/${user}`,
 						searchParams: {
 							seasonal: "1"
 						}
@@ -71,7 +71,7 @@ module.exports = {
 			"abyssal sire", "alchemical hydra", "barrows chests", "bounty hunter - hunter", "bounty hunter - rogue",
 			"bryophyta", "callisto", "cerberus", "chambers of xeric", "chambers of xeric: challenge mode", "chaos elemental",
 			"chaos fanatic", "clue scrolls (all)", "clue scrolls (beginner)", "clue scrolls (easy)", "clue scrolls (elite)",
-			"clue scrolls (hard)", "clue scrolls (master)", "clue scrolls (medium)", "commander zilyana", "corporeal beast", 
+			"clue scrolls (hard)", "clue scrolls (master)", "clue scrolls (medium)", "commander zilyana", "corporeal beast",
 			"crazy archaeologist", "dagannoth prime", "dagannoth rex", "dagannoth supreme", "deranged archaeologist",
 			"general graardor", "giant mole", "grotesque guardians", "hespori", "k'ril tsutsaroth", "kalphite queen",
 			"king black dragon", "kraken", "kree'arra", "league points", "lms - rank", "mimic", "nightmare", "obor", "sarachnis",
@@ -81,27 +81,27 @@ module.exports = {
 		/* eslint-enable array-element-newline */
 
 		activityAliases: {
-			"sire": "abyssal sire",
-			"hydra": "alchemical hydra",
-			"barrows": "barrows chests",
-			"cox": "chambers of xeric",
-			"sara": "commander zilyana",
-			"saradomin": "commander zilyana",
-			"corp": "corporeal beast",
-			"bandos": "general graardor",
-			"mole": "giant mole",
-			"zammy": "k'ril tsutsaroth",
-			"kq": "kalphite queen",
-			"kbd": "king black dragon",
-			"armadyl": "kree'arra",
-			"gauntlet": "the gauntlet",
+			sire: "abyssal sire",
+			hydra: "alchemical hydra",
+			barrows: "barrows chests",
+			cox: "chambers of xeric",
+			sara: "commander zilyana",
+			saradomin: "commander zilyana",
+			corp: "corporeal beast",
+			bandos: "general graardor",
+			mole: "giant mole",
+			zammy: "k'ril tsutsaroth",
+			kq: "kalphite queen",
+			kbd: "king black dragon",
+			armadyl: "kree'arra",
+			gauntlet: "the gauntlet",
 			"corrupted gauntlet": "the corrupted gauntlet",
-			"tob": "theatre of blood",
-			"thermy": "thermonuclear smoke devil",
-			"zuk": "tzkal-zuk",
-			"inferno": "tzkal-zuk",
-			"jad": "tztok-jad",
-			"vetion": "vet'ion",
+			tob: "theatre of blood",
+			thermy: "thermonuclear smoke devil",
+			zuk: "tzkal-zuk",
+			inferno: "tzkal-zuk",
+			jad: "tztok-jad",
+			vetion: "vet'ion"
 		},
 		
 		skills: [
@@ -128,7 +128,7 @@ module.exports = {
 			{ name: "Cooking", emoji: "🍲" },
 			{ name: "Firemaking", emoji: "🔥" },
 			{ name: "Woodcutting", emoji: "🌳" },
-			{ name: "Farming", emoji: "‍🌽" },
+			{ name: "Farming", emoji: "‍🌽" }
 		]
 	})),
 	Code: (async function osrs (context, ...args) {
@@ -204,7 +204,7 @@ module.exports = {
 				}
 	
 				const { current, today } = detail.item;
-				const wiki = "https://osrs.wiki/" + item.Name.replace(/\s+/g, "_");
+				const wiki = `https://osrs.wiki/${item.Name.replace(/\s+/g, "_")}`;
 				return {
 					reply: sb.Utils.tag.trim `
 						Current price of ${detail.item.name}: ${current.price},
@@ -285,7 +285,8 @@ module.exports = {
 			case "kc":
 			case "seasonal-kc": {
 				const input = { username: null, activity: null };
-				const [first, second] = args.join(" ").toLowerCase().split(",").map(i => i.trim());
+				const [first, second] = args.join(" ").toLowerCase().split(",")
+					.map(i => i.trim());
 	
 				if (this.staticData.activities.includes(first)) {
 					input.activity = first;
@@ -413,6 +414,6 @@ module.exports = {
 	
 			"<h6>Supported activities</h6>",
 			`<ul>${list}<ul>`
-		]
+		];
 	})
 };

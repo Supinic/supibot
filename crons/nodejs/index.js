@@ -6,7 +6,7 @@ module.exports = {
 	Type: "Bot",
 	Code: (async function checkLastNodeVersion () {
 		const rawData = await sb.Got("GitHub", {
-			url: "repos/nodejs/node/releases",
+			url: "repos/nodejs/node/releases"
 		}).json();
 
 		const latest = rawData.sort((a, b) => new sb.Date(b.created_at) - new sb.Date(a.created_at)).shift();

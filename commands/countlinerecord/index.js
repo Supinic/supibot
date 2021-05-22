@@ -20,7 +20,7 @@ module.exports = {
 			),
 	
 			sb.Query.getRecordset(rs => rs
-				.select("Length", "Timestamp")		
+				.select("Length", "Timestamp")
 				.from("chat_data", "Message_Meta_Channel")
 				.where("Channel = %n", context.channel.ID)
 				.orderBy("Length DESC")
@@ -39,13 +39,13 @@ module.exports = {
 		return {
 			reply: [
 				"This channel's records are",
-				amountData.Amount + " messages/min",
-				"(" + amountData.Timestamp.format("Y-m-d H:i") + ");",
+				`${amountData.Amount} messages/min`,
+				`(${amountData.Timestamp.format("Y-m-d H:i")});`,
 				"and",
-				sb.Utils.round(lengthData.Length / 1000, 2) + " kB/min",
-				"(" + lengthData.Timestamp.format("Y-m-d H:i") + ")"
+				`${sb.Utils.round(lengthData.Length / 1000, 2)} kB/min`,
+				`(${lengthData.Timestamp.format("Y-m-d H:i")})`
 			].join(" ")
-		};		
+		};
 	}),
 	Dynamic_Description: null
 };

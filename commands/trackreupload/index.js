@@ -45,8 +45,8 @@ module.exports = {
 				.toString()
 		}).json();
 		
-		return { 
-			reply: "Result: " + result.data.message + "."
+		return {
+			reply: `Result: ${result.data.message}.`
 		};
 	}),
 	Dynamic_Description: null

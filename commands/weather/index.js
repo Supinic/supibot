@@ -11,17 +11,17 @@ module.exports = {
 		icons: {
 			"clear-day": "🌞",
 			"clear-night": "🌚",
-			"rain": "🌧️",
-			"snow": "🌨️",
-			"sleet": "🌧️🌨️",
-			"fog": "🌫️",
-			"cloudy": "☁️",
+			rain: "🌧️",
+			snow: "🌨️",
+			sleet: "🌧️🌨️",
+			fog: "🌫️",
+			cloudy: "☁️",
 			"partly-cloudy-day": "⛅",
 			"partly-cloudy-night": "☁️",
-			"hail": "☄️",
-			"thunderstorm": "🌩️",
-			"tornado": "🌪️",
-			"wind": "💨"
+			hail: "☄️",
+			thunderstorm: "🌩️",
+			tornado: "🌪️",
+			wind: "💨"
 		}
 	})),
 	Code: (async function weather (context, ...args) {
@@ -39,14 +39,14 @@ module.exports = {
 	
 				if (match[2]) { // +<number> = shift by X, used in daily/hourly
 					number = Number(match[3]);
-					type = (match[1] === "day") ? "daily" : (match[1] === "hour") ? "hourly" : null;
+					type = (match[1] === "day") ? "daily" : ((match[1] === "hour") ? "hourly" : null);
 	
 					if (!type || (type === "daily" && number > 7) || (type === "hourly" && number > 48)) {
 						return { reply: "Invalid combination of parameters!" };
 					}
 				}
 				else { // summary
-					type = (match[1] === "day") ? "hourly" : (match[1] === "hour") ? "minutely" : "daily";
+					type = (match[1] === "day") ? "hourly" : ((match[1] === "hour") ? "minutely" : "daily");
 				}
 			}
 		}
@@ -70,10 +70,10 @@ module.exports = {
 		}
 		else if (args[0].toLowerCase().replace(/^@/, "") === "supibot") {
 			const exec = require("child_process").execSync;
-			const temperature = exec("/opt/vc/bin/vcgencmd measure_temp").toString().match(/([\d.]+)/)[1] + "°C";
+			const temperature = `${exec("/opt/vc/bin/vcgencmd measure_temp").toString().match(/([\d.]+)/)[1]}°C`;
 	
 			return {
-				reply: "Supibot, Supinic's table, Raspberry Pi 3B: " + temperature + ". No wind detected. No precipitation expected."
+				reply: `Supibot, Supinic's table, Raspberry Pi 3B: ${temperature}. No wind detected. No precipitation expected.`
 			};
 		}
 		else if (args[0].startsWith("@")) {
@@ -179,14 +179,14 @@ module.exports = {
 			const icon = this.staticData.icons[data.icon];
 			const precip = (data.precipProbability === 0)
 				? "No precipitation expected."
-				: (sb.Utils.round(data.precipProbability * 100) + "% chance of " + sb.Utils.round(data.precipIntensity, 2) + " mm " + data.precipType + ".");
+				: (`${sb.Utils.round(data.precipProbability * 100)}% chance of ${sb.Utils.round(data.precipIntensity, 2)} mm ${data.precipType}.`);
 			const temp = (type !== "daily")
-				? (sb.Utils.round(data.temperature, 2) + "°C.")
-				: ("Temperatures: " + sb.Utils.round(data.temperatureMin) + "°C to " + sb.Utils.round(data.temperatureMax) + "°C.");
+				? (`${sb.Utils.round(data.temperature, 2)}°C.`)
+				: (`Temperatures: ${sb.Utils.round(data.temperatureMin)}°C to ${sb.Utils.round(data.temperatureMax)}°C.`);
 			const storm = (type === "currently")
-				? (typeof data.nearestStormDistance !== "undefined")
-					? ("Nearest storm is " + data.nearestStormDistance + " km away. ")
-					: ("No storms nearby. ")
+				? ((typeof data.nearestStormDistance !== "undefined")
+					? (`Nearest storm is ${data.nearestStormDistance} km away. `)
+					: ("No storms nearby. "))
 				: "";
 			const feels = (type === "currently")
 				? `Feels like ${sb.Utils.round(data.apparentTemperature)}°C.`
@@ -209,17 +209,17 @@ module.exports = {
 		if (typeof number === "number") {
 			const time = new sb.Date(topData[type].data[number].time * 1000).setTimezoneOffset(topData.offset * 60);
 			if (type === "hourly") {
-				plusTime = " (" + time.format("H:00") + " local time)";
+				plusTime = ` (${time.format("H:00")} local time)`;
 			}
 			else {
-				plusTime = " (" + time.format("j.n.") + " local date)";
+				plusTime = ` (${time.format("j.n.")} local date)`;
 			}
 		}
 		else if (type === "currently") {
 			plusTime = " (now)";
 		}
 		else {
-			plusTime = " (" + type + " summary)";
+			plusTime = ` (${type} summary)`;
 		}
 	
 		const place = (skipLocation)
@@ -260,9 +260,9 @@ module.exports = {
 	
 		`<code>${prefix}weather @User</code>`,
 		"If that user has set their own weather location, show its weather. The <code>@</code> symbol is mandatory.",
-		"",	
+		"",
 	
 		`<code>${prefix}weather @User <b>(hour+X/day+X/week)</b></code>`,
-		"Similar to above, shows the user's weather, but uses the hour/day/week specifier.",
+		"Similar to above, shows the user's weather, but uses the hour/day/week specifier."
 	])
 };

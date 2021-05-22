@@ -10,7 +10,7 @@ module.exports = {
 		{ name: "errorMessage", type: "string" },
 		{ name: "excludeSelf", type: "boolean" },
 		{ name: "regex", type: "regex" },
-		{ name: "replacement", type: "string" },
+		{ name: "replacement", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
@@ -25,7 +25,7 @@ module.exports = {
 					["$abb ac ..2 a b c", "Error! ..2 arguments expected, got 3"],
 					["$abb ac 5.. a", "Error! 5.. arguments expected, got 1"],
 					["$abb ac 2 foo", "Error! Expected 2 arguments, got 1"],
-					["$abb ac errorMessage:\"No I don't think so\" 2 foo", "Error! No I don't think so"],
+					["$abb ac errorMessage:\"No I don't think so\" 2 foo", "Error! No I don't think so"]
 				],
 				execute: (context, limit, ...args) => {
 					if (!limit) {
@@ -61,7 +61,7 @@ module.exports = {
 							success: false,
 							reply: `Lower argument range bound must not be greater than the upper one!`
 						};
-					}					
+					}
 					else if (range[0] <= args.length && args.length <= range[1]) {
 						return {
 							reply: args.join(" ")
@@ -129,7 +129,8 @@ module.exports = {
 					["$abb explode this is a test", "t h i s i s a t e s t"]
 				],
 				execute: (context, ...args) => ({
-					reply: args.join(" ").split("").join(" ").replace(/\s+/g, " ")
+					reply: args.join(" ").split("").join(" ")
+						.replace(/\s+/g, " ")
 				})
 			},
 			{
@@ -138,7 +139,7 @@ module.exports = {
 				description: "Takes two params: regex, replacement. For the given regex, replaces all matches with the provided value.",
 				examples: [
 					["$abb replace regex:/a+b/ replacement:lol aaaaaabbb", "lolbb"],
-					["$abb replace regex:/foo/ replacement:NaM Damn foo spam", "Damn NaM spam"],
+					["$abb replace regex:/foo/ replacement:NaM Damn foo spam", "Damn NaM spam"]
 				],
 				execute: (context, ...args) => {
 					if (!context.params.regex || typeof context.params.replacement !== "string") {
@@ -158,7 +159,7 @@ module.exports = {
 				aliases: ["echo"],
 				description: "Simply outputs the input, with no changes.",
 				examples: [
-					["$abb say hello", "hello"],
+					["$abb say hello", "hello"]
 				],
 				execute: (context, ...args) => ({
 					reply: args.join(" ")
@@ -166,7 +167,7 @@ module.exports = {
 			}
 		]
 	})),
-	Code: (async function aliasBuildingBlock(context, type, ...args) {
+	Code: (async function aliasBuildingBlock (context, type, ...args) {
 		const { blocks } = this.staticData;
 		if (!context.append.alias) {
 			if (!type) {
@@ -219,7 +220,7 @@ module.exports = {
 		return {
 			cooldown: result.cooldown ?? null,
 			...result
-		}
+		};
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { blocks } = values.getStaticData();
@@ -229,10 +230,10 @@ module.exports = {
 				: "";
 
 			const examples = (i.examples.length > 0)
-				? "<br><ul>" + i.examples.map(j => `<li><code>${j[0]}</code> ➡ <code>${j[1]}</code></li>`).join("") + "</ul>"
+				? `<br><ul>${i.examples.map(j => `<li><code>${j[0]}</code> ➡ <code>${j[1]}</code></li>`).join("")}</ul>`
 				: "";
 
-			return `<li><code>${i.name}${aliases}</code><br>${i.description}${examples}</li>`
+			return `<li><code>${i.name}${aliases}</code><br>${i.description}${examples}</li>`;
 		});
 
 		return [
@@ -245,7 +246,7 @@ module.exports = {
 			"For a given block type, executes a small command to be used in the alias.",
 
 			"Blocks:",
-			"<ul>" + list.join("") + "</ul>"
+			`<ul>${list.join("")}</ul>`
 		];
 	})
 };

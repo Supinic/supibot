@@ -17,7 +17,7 @@ module.exports = {
 			method: "PUT",
 			url: "bot-program/bot/active",
 			headers: {
-				Authorization: `Basic ${userData.ID}:${userData.Data.authKey}`,
+				Authorization: `Basic ${userData.ID}:${userData.Data.authKey}`
 			}
 		});
 	})

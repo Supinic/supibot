@@ -17,10 +17,10 @@ module.exports = {
 	
 		const channelID = context.channel.ID;
 		if (channelID === 7 || channelID === 8) {
-			const [{cerebot}, {discord}, {refuge}] = await Promise.all([
+			const [{ cerebot }, { discord }, { refuge }] = await Promise.all([
 				sb.Query.getRecordset(rs => rs.select("MAX(ID) AS cerebot").from("chat_line", "cerebot").single()),
 				sb.Query.getRecordset(rs => rs.select("MAX(ID) AS discord").from("chat_line", "discord_150782269382983689").single()),
-				sb.Query.getRecordset(rs => rs.select("MAX(ID) AS refuge").from("chat_line", "_trump_nonsub_refuge").single()),
+				sb.Query.getRecordset(rs => rs.select("MAX(ID) AS refuge").from("chat_line", "_trump_nonsub_refuge").single())
 			]);
 	
 			const total = cerebot + discord + refuge;
@@ -29,10 +29,10 @@ module.exports = {
 			};
 		}
 		else if (channelID === 82) {
-			const [{nasabot}, {discord}, {offlineChat}] = await Promise.all([
+			const [{ nasabot }, { discord }, { offlineChat }] = await Promise.all([
 				sb.Query.getRecordset(rs => rs.select("MAX(ID) AS nasabot").from("chat_line", "nasabot").single()),
 				sb.Query.getRecordset(rs => rs.select("MAX(ID) AS discord").from("chat_line", "discord_240523866026278913").single()),
-				sb.Query.getRecordset(rs => rs.select("MAX(ID) AS offlineChat").from("chat_line", "_core54_1464148741723").single()),
+				sb.Query.getRecordset(rs => rs.select("MAX(ID) AS offlineChat").from("chat_line", "_core54_1464148741723").single())
 			]);
 	
 			const total = nasabot + discord + offlineChat;
@@ -42,7 +42,7 @@ module.exports = {
 		}
 		else {
 			const channelName = context.channel.getDatabaseName();
-			const {Amount: amount} = (await sb.Query.getRecordset(rs => rs
+			const { Amount: amount } = (await sb.Query.getRecordset(rs => rs
 				.select("MAX(ID) AS Amount")
 				.from("chat_line", channelName)
 				.single()

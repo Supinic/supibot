@@ -82,7 +82,7 @@ module.exports = {
 			return {
 				reply: `https://youtu.be/${track.ID}`,
 				cooldown: {
-				length: this.Cooldown,
+					length: this.Cooldown,
 					user: context.user.ID,
 					channel: null,
 					platform: null

@@ -23,12 +23,12 @@ module.exports = {
 						})
 						.flat("ID")
 					);
-	
+
 					const usersData = (await sb.User.getMultiple(users)).filter(i => i.Data.aliasedCommands);
 					const aliases = usersData.flatMap(i => Object.values(i.Data.aliasedCommands ?? {}));
 					return {
 						reply: `There are currently ${aliases.length} active command aliases, used by ${usersData.length} users.`
-					}
+					};
 				}
 			},
 			{
@@ -39,21 +39,21 @@ module.exports = {
 					const targetUser = (user)
 						? await sb.User.get(user)
 						: context.user;
-	
+
 					if (!targetUser) {
 						return {
 							success: false,
 							reply: "Provided user does not exist!"
 						};
 					}
-	
+
 					const data = await sb.Query.getRecordset(rs => {
 						rs.select("COUNT(*) AS Amount")
 							.select("SUM(UNIX_TIMESTAMP(Ended) - UNIX_TIMESTAMP(Started)) AS Delta")
 							.from("chat_data", "AFK")
 							.where("User_Alias = %n", targetUser.ID)
 							.single();
-	
+
 						if (type === "total-afk") {
 							// Do not add a condition - counts totals
 						}
@@ -63,10 +63,10 @@ module.exports = {
 						else {
 							rs.where("Status = %s", type);
 						}
-	
+
 						return rs;
 					});
-	
+
 					const who = (targetUser === context.user) ? "You have" : "That user has";
 					const target = (type === "total-afk") ? "(all combined)" : type;
 					if (!data?.Delta) {
@@ -77,7 +77,7 @@ module.exports = {
 					else {
 						const delta = sb.Utils.timeDelta(sb.Date.now() + data.Delta * 1000, true);
 						const average = sb.Utils.timeDelta(sb.Date.now() + (data.Delta * 1000 / data.Amount), true);
-	
+
 						return {
 							reply: sb.Utils.tag.trim `
 								${who} been AFK with status "${target}"
@@ -97,7 +97,7 @@ module.exports = {
 					let branch;
 					let targetUser = null;
 					let videoID = null;
-	
+
 					if (args.length === 0) {
 						branch = "user";
 						targetUser = context.user;
@@ -114,7 +114,7 @@ module.exports = {
 							videoID = target;
 						}
 					}
-	
+
 					if (branch === "user") {
 						return await this.helpers.fetchUserStats(targetUser);
 					}
@@ -122,7 +122,7 @@ module.exports = {
 						return await this.helpers.fetchVideoStats(videoID);
 					}
 				},
-	
+
 				helpers: {
 					fetchUserStats: async function (targetUser) {
 						const requests = await sb.Query.getRecordset(rs => rs
@@ -130,23 +130,23 @@ module.exports = {
 							.from("chat_data", "Song_Request")
 							.where("User_Alias = %n", targetUser.ID)
 						);
-	
+
 						if (requests.length === 0) {
 							return {
 								reply: `No requested videos found.`
 							};
 						}
-	
+
 						const counter = {};
 						let totalLength = 0;
 						let mostRequested = null;
 						let currentMax = 0;
-	
+
 						for (const video of requests) {
 							if (typeof counter[video.Link] === "undefined") {
 								counter[video.Link] = 0;
 							}
-	
+
 							counter[video.Link]++;
 							totalLength += (video.End_Time ?? video.Length) - (video.Start_Time ?? 0);
 							if (currentMax < counter[video.Link]) {
@@ -154,7 +154,7 @@ module.exports = {
 								currentMax = counter[video.Link];
 							}
 						}
-	
+
 						const total = sb.Utils.timeDelta(sb.Date.now() + totalLength * 1000, true);
 						return {
 							reply: sb.Utils.tag.trim `
@@ -167,20 +167,20 @@ module.exports = {
 						if (sb.Utils.linkParser.autoRecognize(videoID)) {
 							videoID = sb.Utils.linkParser.parseLink(videoID);
 						}
-	
+
 						const requests = await sb.Query.getRecordset(rs => rs
 							.select("Added")
 							.from("chat_data", "Song_Request")
 							.where("Link = %s", videoID)
 							.orderBy("ID DESC")
 						);
-	
+
 						if (requests.length === 0) {
 							return {
 								reply: `No videos found by given ID.`
 							};
 						}
-	
+
 						const lastDelta = sb.Utils.timeDelta(requests[0].Added);
 						return {
 							reply: sb.Utils.tag.trim `
@@ -188,7 +188,7 @@ module.exports = {
 									It was last requested ${lastDelta}.
 								`
 						};
-					},
+					}
 				}
 			},
 			{
@@ -200,14 +200,14 @@ module.exports = {
 						.select("Name", "Use_Count")
 						.from("data", "Playsound")
 					);
-	
+
 					if (name === "all" || name === "total") {
-						const total = data.reduce((acc, cur) => acc += cur.Use_Count, 0);
+						const total = data.reduce((acc, cur) => (acc += cur.Use_Count), 0);
 						return {
 							reply: `Playsounds have been used a total of ${total} times.`
 						};
 					}
-	
+
 					const target = data.find(i => i.Name === name);
 					if (target) {
 						return {
@@ -233,9 +233,9 @@ module.exports = {
 							.from("chat_data", "Extra_User_Data")
 							.single()
 						);
-	
+
 						return {
-							reply: cookies.Total + " cookies have been eaten so far, out of which " + cookies.Gifts + " were gifted :)"
+							reply: `${cookies.Total} cookies have been eaten so far, out of which ${cookies.Gifts} were gifted :)`
 						};
 					}
 					else if (user === "list") {
@@ -243,7 +243,7 @@ module.exports = {
 							reply: "Check the cookie statistics here: https://supinic.com/bot/cookie/list"
 						};
 					}
-	
+
 					const targetUser = await sb.User.get(user ?? context.user, true);
 					if (!targetUser) {
 						return { reply: "Target user does not exist in the database!" };
@@ -251,7 +251,7 @@ module.exports = {
 					else if (targetUser.Name === context.platform.Self_Name) {
 						return { reply: "I don't eat cookies, sugar is bad for my circuits!" };
 					}
-	
+
 					const cookies = await sb.Query.getRecordset(rs => rs
 						.select("Cookie_Today AS Today", "Cookies_Total AS Daily")
 						.select("Cookie_Gifts_Sent AS Sent", "Cookie_Gifts_Received AS Received")
@@ -259,25 +259,25 @@ module.exports = {
 						.where("User_Alias = %n", targetUser.ID)
 						.single()
 					);
-	
+
 					const [who, target] = (context.user.ID === targetUser.ID)
 						? ["You have", "you"]
 						: ["That user has", "them"];
-	
+
 					if (!cookies || cookies.Daily === 0) {
-						return { reply: who + " never eaten a single cookie!" };
+						return { reply: `${who} never eaten a single cookie!` };
 					}
 					else {
 						// Today = has a cookie available today
 						// Daily = amount of eaten daily cookies
 						// Received = amount of received cookies, independent of Daily
 						// Sent = amount of sent cookies, which is subtracted from Daily
-	
+
 						const total = cookies.Daily + cookies.Received - cookies.Sent + cookies.Today;
 						const giftedString = (cookies.Sent === 0)
 							? `${who} never given out a single cookie`
 							: `${who} gifted away ${cookies.Sent} cookie(s)`;
-	
+
 						let reaction;
 						const percentage = sb.Utils.round((cookies.Sent / total) * 100, 0);
 						if (percentage <= 0) {
@@ -298,12 +298,12 @@ module.exports = {
 						else {
 							reaction = "😳 an absolutely selfless saint 😇";
 						}
-	
+
 						let voidString = "";
 						if (total < cookies.Received) {
 							voidString = ` (the difference of ${cookies.Received - total} has been lost to the Void)`;
 						}
-	
+
 						return {
 							reply: `${who} eaten ${total} cookies so far. Out of those, ${cookies.Received} were gifted to ${target}${voidString}. ${giftedString} ${reaction}`
 						};
@@ -330,7 +330,7 @@ module.exports = {
 						.where("User_From = %n", context.user.ID)
 						.single()
 					);
-	
+
 					return {
 						reply: sb.Utils.tag.trim `
 							So far, you have created ${data.Unscheduled} direct reminders
@@ -387,7 +387,7 @@ module.exports = {
 						};
 					}
 
-					const { data } = await sb.Got("Supinic", "/data/suggestion/stats/user/" + userData.Name).json();
+					const { data } = await sb.Got("Supinic", `/data/suggestion/stats/user/${userData.Name}`).json();
 					const percent = sb.Utils.round(data.userTotal / data.globalTotal * 100, 2);
 					const who = (userData === context.user) ? "You" : "They";
 
@@ -400,7 +400,7 @@ module.exports = {
 						`
 					};
 				}
-			},
+			}
 		]
 	})),
 	Code: (async function statistics (context, type, ...args) {
@@ -408,12 +408,12 @@ module.exports = {
 			return {
 				reply: "No statistic type provided!",
 				cooldown: { length: 1000 }
-			}
+			};
 		}
-		
+
 		type = type.toLowerCase();
 		const target = this.staticData.types.find(i => i.name === type || i.aliases.includes(type));
-	
+
 		if (target) {
 			return await target.execute(context, type, ...args);
 		}
@@ -425,22 +425,22 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async (prefix, values) => {
-			const { types } = values.getStaticData();
-			const list = types.map(i => {
-				const names = [i.name, ...i.aliases].sort().map(j => `<code>${j}</code>`).join(" | ");
-				return `${names}<br>${i.description}`;
-			}).join("<br>");
-		
-			return [
-				"Checks various statistics found around supibot's data, regarding you or a provided user - depending on the type used.",
-				"",
-		
-				`<code>${prefix}stats (type)</code>`,
-				"Statistics based on the type used",
-				"",
-		
-				"Types:",
-				`<ul>${list}</ul>`
-			];	
-		})
+		const { types } = values.getStaticData();
+		const list = types.map(i => {
+			const names = [i.name, ...i.aliases].sort().map(j => `<code>${j}</code>`).join(" | ");
+			return `${names}<br>${i.description}`;
+		}).join("<br>");
+
+		return [
+			"Checks various statistics found around supibot's data, regarding you or a provided user - depending on the type used.",
+			"",
+
+			`<code>${prefix}stats (type)</code>`,
+			"Statistics based on the type used",
+			"",
+
+			"Types:",
+			`<ul>${list}</ul>`
+		];
+	})
 };

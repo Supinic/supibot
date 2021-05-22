@@ -98,7 +98,7 @@ module.exports = {
 	
 		const authorList = (data.Authors || "(unknown)").split(",");
 		const authors = (authorList.length === 1) ? authorList[0] : "(various)";
-		const supiLink = "https://supinic.com/track/detail/" + data.TrackID;
+		const supiLink = `https://supinic.com/track/detail/${data.TrackID}`;
 		return {
 			reply: `Here's your random gachi: "${data.TrackName}" by ${authors} - ${supiLink} gachiGASM`
 		};
@@ -132,6 +132,6 @@ module.exports = {
 
 			"List of supported types:",
 			`<ul>${list}</ul>`
-		]
+		];
 	})
 };

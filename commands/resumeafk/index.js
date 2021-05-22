@@ -73,7 +73,7 @@ module.exports = {
 				channel: null,
 				length: this.Cooldown
 			}
-		}
+		};
 	}),
 	Dynamic_Description: null
 };

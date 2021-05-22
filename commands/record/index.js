@@ -29,19 +29,19 @@ module.exports = {
 				reply: `No type provided! Use one of these: ${types.join(", ")}`
 			};
 		}
-	
+
 		type = type.toLowerCase();
 		target = target || context.user;
 		const userData = await sb.User.get(target);
-	
+
 		switch (type) {
-			case "afk":
+			case "afk": {
 				if (userData.ID !== context.user.ID) {
 					return {
 						reply: "Cannot be checked on people other than you!"
 					};
 				}
-	
+
 				const data = await sb.Query.getRecordset(rs => rs
 					.select("Ended")
 					.select("(UNIX_TIMESTAMP(Ended) - UNIX_TIMESTAMP(Started)) AS Seconds")
@@ -52,19 +52,20 @@ module.exports = {
 					.limit(1)
 					.single()
 				);
-	
+
 				if (!data) {
 					return {
 						reply: "No AFK status found!"
 					};
 				}
-	
+
 				const formatted = sb.Utils.formatTime(sb.Utils.round(data.Seconds, 0), false);
 				const delta = sb.Utils.timeDelta(data.Ended);
 				return {
 					reply: `Your longest AFK period lasted for ${formatted} - this was ${delta}.`
 				};
-	
+			}
+
 			case "cookie": {
 				const { Cookies_Total: cookies, User_Alias: user } = await sb.Query.getRecordset(rs => rs
 					.select("Cookies_Total", "User_Alias")
@@ -73,13 +74,13 @@ module.exports = {
 					.limit(1)
 					.single()
 				);
-				
-				const userData = await sb.User.get(user, true);			
+
+				const userData = await sb.User.get(user, true);
 				return {
 					reply: `Currently, the most consistent cookie consumer is ${userData.Name} with ${cookies} daily cookies eaten.`
 				};
 			}
-	
+
 			default: return {
 				success: false,
 				reply: `Invalid type provided! Use one of these: ${types.join(", ")}`
@@ -92,19 +93,19 @@ module.exports = {
 			const aliases = (i.aliases.length > 0)
 				? `(${i.aliases.join(", ")})`
 				: "";
-	
-			return `<li><code>${i.name}${aliases}</code><br>${i.description}</li>`
+
+			return `<li><code>${i.name}${aliases}</code><br>${i.description}</li>`;
 		});
-	
+
 		return [
 			"Checks for various max/min records of various sources within Supibot.",
 			"",
-	
+
 			`<code>${prefix}record (type)</code>`,
 			"For a given type, checks that specific record at the moment of command use.",
-	
+
 			"Types:",
-			"<ul>" + list.join("") + "</ul>"
+			`<ul>${list.join("")}</ul>`
 		];
 	})
 };

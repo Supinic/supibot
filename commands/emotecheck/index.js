@@ -346,7 +346,7 @@ module.exports = {
 					"HypeUnicorn3",
 					"HypeUnicorn4",
 					"HypeUnicorn5",
-					"HypeUnicorn6",
+					"HypeUnicorn6"
 				]
 			},
 			{
@@ -473,7 +473,7 @@ module.exports = {
 					"2020Victory",
 					"2020Unity",
 					"2020Wish"
-				],
+				]
 			},
 			{
 				name: "hype2021",
@@ -511,7 +511,7 @@ module.exports = {
 					"HypeYawn",
 					"HypeYesPlease",
 					"HypeYum"
-				],
+				]
 			}
 		]
 	})),

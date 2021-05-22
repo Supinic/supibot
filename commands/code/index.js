@@ -28,7 +28,7 @@ module.exports = {
 	
 		return {
 			reply: `Website: https://supinic.com/bot/command/${command.ID}/code`
-		};	
+		};
 	}),
 	Dynamic_Description: null
 };

@@ -79,7 +79,7 @@ module.exports = {
 		const { ID } = sb.Utils.randArray(playlistData);
 		if (context.params.linkOnly) {
 			return {
-				reply: `https://youtu.be/${ID}`,
+				reply: `https://youtu.be/${ID}`
 			};
 		}
 

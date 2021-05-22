@@ -18,7 +18,7 @@ module.exports = {
 			};
 		}
 		else if (mode && mode !== "Read") {
-			return { 
+			return {
 				success: false,
 				reply: `Only additional mode available is "Read"!`
 			};
@@ -31,7 +31,7 @@ module.exports = {
 		if (existing) {
 			return {
 				success: false,
-				reply: "This channel already exists in the database, with mode = " + existing.Mode + "!"
+				reply: `This channel already exists in the database, with mode = ${existing.Mode}!`
 			};
 		}
 

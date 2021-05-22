@@ -132,7 +132,7 @@ module.exports = {
 					else {
 						return (i === flair);
 					}
-				})
+				});
 			}
 
 			hasGallery () {
@@ -191,7 +191,7 @@ module.exports = {
 		/** @type {Subreddit} */
 		let forum = this.data.subreddits[subreddit];
 		if (!forum) {
-			const { statusCode, body: response } = await sb.Got("Reddit", subreddit + "/about.json");
+			const { statusCode, body: response } = await sb.Got("Reddit", `${subreddit}/about.json`);
 	
 			if (statusCode !== 200 && statusCode !== 403 && statusCode !== 404) {
 				throw new sb.errors.APIError({
@@ -226,12 +226,12 @@ module.exports = {
 		}
 	
 		if (forum.posts.length === 0 || sb.Date.now() > forum.expiration) {
-			const { statusCode, body: response } = await sb.Got("Reddit", subreddit + "/hot.json");
+			const { statusCode, body: response } = await sb.Got("Reddit", `${subreddit}/hot.json`);
 			if (statusCode !== 200) {
 				throw new sb.errors.APIError({
 					statusCode,
 					apiName: "RedditAPI"
-				})
+				});
 			}
 	
 			forum.setExpiration();
@@ -243,7 +243,7 @@ module.exports = {
 			return {
 				reply: (flairs.size === 0)
 					? "There are no flairs available in this subreddit."
-					: "Available flairs for this subreddit: " + [...flairs].sort().join(", ")
+					: `Available flairs for this subreddit: ${[...flairs].sort().join(", ")}`
 			};
 		}
 	
@@ -263,7 +263,7 @@ module.exports = {
 			return {
 				success: false,
 				reply: "No suitable posts found!"
-			}
+			};
 		}
 		else {
 			if ((this.staticData.banned.includes(forum.name) || post.nsfw) && context.append.pipe) {

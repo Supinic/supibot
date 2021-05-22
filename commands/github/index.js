@@ -8,7 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function github (context, ...args) { 
+	Code: (async function github (context, ...args) {
 		const query = args.join("");
 		if (!query) {
 			return {
@@ -39,17 +39,15 @@ module.exports = {
 			reply: `${file.name} - check here: ${link}`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			"If nothing is specified, posts GitHub repo links; otherwise, will execute a search on Supibot's repositories.",
-			"",
+	Dynamic_Description: (async (prefix) => [
+		"If nothing is specified, posts GitHub repo links; otherwise, will execute a search on Supibot's repositories.",
+		"",
 	
-			`<code>${prefix}github</code>`,
-			"Supibot: https://github.com/Supinic/supibot - Website: https://github.com/Supinic/supinic.com",
-			"",
+		`<code>${prefix}github</code>`,
+		"Supibot: https://github.com/Supinic/supibot - Website: https://github.com/Supinic/supinic.com",
+		"",
 	
-			`<code>${prefix}github (search query)</code>`,
-			"Searches supibot's repositories for that query",
-		];
-	})
+		`<code>${prefix}github (search query)</code>`,
+		"Searches supibot's repositories for that query"
+	])
 };

@@ -90,7 +90,7 @@ module.exports = {
 
 			const { debug } = context.params;
 			const fs = require("fs").promises;
-			const fileName = `markov-dump-${new sb.Date().format("Y-m-d")}-channel-${targetChannel.ID}.json`
+			const fileName = `markov-dump-${new sb.Date().format("Y-m-d")}-channel-${targetChannel.ID}.json`;
 			if (debug === "save") {
 				await fs.writeFile(`/code/markovs/${fileName}`, JSON.stringify(markov));
 				return {
@@ -197,7 +197,6 @@ module.exports = {
 		return {
 			reply: `🔮 ${string}`
 		};
-
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { threshold, limit } = values.getStaticData();

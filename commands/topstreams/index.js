@@ -29,7 +29,7 @@ module.exports = {
 		else {
 			let gameString;
 			if (searchParams.game) {
-				gameString = "are playing " + data.streams[0].game;
+				gameString = `are playing ${data.streams[0].game}`;
 			}
 			else {
 				gameString = "are live";

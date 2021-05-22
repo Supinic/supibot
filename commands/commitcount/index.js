@@ -51,7 +51,7 @@ module.exports = {
 		const collection = response.data.user.contributionsCollection;
 		const commitCount = collection.totalCommitContributions + collection.restrictedContributionsCount;
 
-		const suffix = (commitCount === 1) ? "": "s";
+		const suffix = (commitCount === 1) ? "" : "s";
 		const who = (self) ? "You have" : `GitHub user ${username} has`;
 		return {
 			reply: `${who} created ${commitCount} commit${suffix} in the past 24 hours.`

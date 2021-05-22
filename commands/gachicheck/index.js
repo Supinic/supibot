@@ -36,7 +36,7 @@ module.exports = {
 				limitAction: "return"
 			});
 	
-			console.log( { amount, limit, reason, result, success } );
+			console.log({ amount, limit, reason, result, success });
 	
 			if (!success) {
 				if (reason === "limit-exceeded") {

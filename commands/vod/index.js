@@ -43,7 +43,7 @@ module.exports = {
 	
 		const vod = await sb.Got("Helix", {
 			url: "videos",
-			searchParams: "user_id=" + channelID
+			searchParams: `user_id=${channelID}`
 		}).json();
 	
 		if (vod.data.length === 0) {
@@ -63,7 +63,7 @@ module.exports = {
 		const prettyDuration = data.duration.match(/\d+[hm]/g).join(", ");
 	
 		if (type === "current" || type === "exact") {
-			if (!liveString) {			
+			if (!liveString) {
 				return {
 					reply: `Channel is not currently live, no current/exact timestamp supported.`
 				};

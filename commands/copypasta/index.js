@@ -31,7 +31,7 @@ module.exports = {
 		let repeats = 0;
 		do {
 			copypasta = await fetch();
-			repeats++;			
+			repeats++;
 		} while (context.params.textOnly && hasAsciiArt(copypasta) && repeats < repeatLimit);
 		
 		if (repeats >= repeatLimit) {
@@ -48,17 +48,15 @@ module.exports = {
 				: "No copypasta found!"
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
-		return [
-			`Fetches a random Twitch copypasta from <a href="//twitchquotes.com">twitchquotes.com</a>.`,
-			"",
+	Dynamic_Description: (async (prefix) => [
+		`Fetches a random Twitch copypasta from <a href="//twitchquotes.com">twitchquotes.com</a>.`,
+		"",
 
-			`<code>${prefix}copypasta</code>`,
-			"(random copypasta)",
-			"",
+		`<code>${prefix}copypasta</code>`,
+		"(random copypasta)",
+		"",
 
-			`<code>${prefix}copypasta textOnly:true</code>`,
-			"(random copypasta) - excludes ASCII art pastas. Retries up to 5 times, if one isn't found, then fails."
-		];
-	})
+		`<code>${prefix}copypasta textOnly:true</code>`,
+		"(random copypasta) - excludes ASCII art pastas. Retries up to 5 times, if one isn't found, then fails."
+	])
 };

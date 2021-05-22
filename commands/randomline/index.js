@@ -16,15 +16,15 @@ module.exports = {
 				reply: "This command cannot be used in private messages!"
 			};
 		}
-	
+
 		const channelName = context.channel.getDatabaseName();
 		const channelID = context.channel.ID;
 		let result = null;
-	
+
 		if (context.invocation === "rq") {
 			user = context.user.Name;
 		}
-	
+
 		if (user) {
 			const targetUser = await sb.User.get(user);
 			if (!targetUser) {
@@ -32,7 +32,7 @@ module.exports = {
 					reply: "User not found in the database!"
 				};
 			}
-	
+
 			if (channelID === 7 || channelID === 8 || channelID === 82) {
 				const channels = ((channelID === 82) ? [27, 45, 82] : [7, 8, 46]).map(i => sb.Channel.get(i));
 				const counts = (await Promise.all(
@@ -44,11 +44,11 @@ module.exports = {
 						.single()
 					))
 				)).map(i => i?.Messages ?? 0);
-	
-				const randomID = sb.Utils.random(1, counts.reduce((prev, cur) => prev += cur, 0));
+
+				const randomID = sb.Utils.random(1, counts.reduce((prev, cur) => (prev += cur), 0));
 				let targetID = null;
 				let targetChannel = null;
-	
+
 				if (randomID < counts[0]) {
 					targetID = randomID;
 					targetChannel = channels[0];
@@ -61,7 +61,7 @@ module.exports = {
 					targetID = randomID - counts[0] - counts[1];
 					targetChannel = channels[2];
 				}
-	
+
 				const data = await sb.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("chat_line", targetChannel.getDatabaseName())
@@ -70,13 +70,13 @@ module.exports = {
 					.offset(targetID)
 					.single()
 				);
-	
+
 				if (!data) {
 					return {
 						reply: "That user did not post any lines in any of the relevant channels here!"
 					};
 				}
-	
+
 				result = await sb.Query.getRecordset(rs => rs
 					.select("Text", "Posted", `"${targetUser.Name}" AS Name`)
 					.from("chat_line", targetChannel.getDatabaseName())
@@ -94,7 +94,7 @@ module.exports = {
 					.where("Channel = %n", channelID)
 					.single()
 				);
-	
+
 				if (!data) {
 					return {
 						reply: "That user has not posted any messages in this channel!"
@@ -105,7 +105,7 @@ module.exports = {
 						reply: "That user has no metadata associated with them!"
 					};
 				}
-	
+
 				const random = await sb.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("chat_line", channelName)
@@ -114,13 +114,13 @@ module.exports = {
 					.offset(sb.Utils.random(1, data.Count) - 1)
 					.single()
 				);
-	
+
 				if (!random) {
 					return {
 						reply: "No messages could be fetched!"
 					};
 				}
-	
+
 				result = await sb.Query.getRecordset(rs => rs
 					.select("Text", "Posted", `"${targetUser.Name}" AS Name`)
 					.from("chat_line", channelName)
@@ -131,72 +131,69 @@ module.exports = {
 				);
 			}
 		}
-		else {
-			if (channelID === 7 || channelID === 8 || channelID === 82) {
-				const channels = ((channelID === 82) ? [27, 45, 82] : [7, 8, 46]).map(i => sb.Channel.get(i).getDatabaseName());
-				const counts = (await Promise.all(channels.map(channel =>
-					sb.Query.getRecordset(rs => rs
-						.select("MAX(ID) AS Total")
-						.from("chat_line", channel)
-						.single()
-					)
-				))).map(i => i.Total);
-	
-				const ID = sb.Utils.random(1, counts.reduce((acc, cur) => acc += cur, 0));
-				let targetID = null;
-				let targetChannel = null;
-	
-				if (ID < counts[0]) {
-					targetID = ID;
-					targetChannel = channels[0];
-				}
-				else if (ID < (counts[0] + counts[1])) {
-					targetID = ID - counts[0];
-					targetChannel = channels[1];
-				}
-				else {
-					targetID = ID - counts[0] - counts[1];
-					targetChannel = channels[2];
-				}
-	
-				result = await sb.Query.getRecordset(rs => rs
-					.select("Text", "Posted", "Name")
-					.from("chat_line", targetChannel)
-					.join("chat_data", "User_Alias")
-					.where(targetChannel + ".ID = %n", targetID)
-					.single()
-				);
+		else if (channelID === 7 || channelID === 8 || channelID === 82) {
+			const channels = ((channelID === 82) ? [27, 45, 82] : [7, 8, 46]).map(i => sb.Channel.get(i).getDatabaseName());
+			const counts = (await Promise.all(channels.map(channel => sb.Query.getRecordset(rs => rs
+				.select("MAX(ID) AS Total")
+				.from("chat_line", channel)
+				.single()
+			)
+			))).map(i => i.Total);
+
+			const ID = sb.Utils.random(1, counts.reduce((acc, cur) => (acc += cur), 0));
+			let targetID = null;
+			let targetChannel = null;
+
+			if (ID < counts[0]) {
+				targetID = ID;
+				targetChannel = channels[0];
+			}
+			else if (ID < (counts[0] + counts[1])) {
+				targetID = ID - counts[0];
+				targetChannel = channels[1];
 			}
 			else {
-				const data = await sb.Query.getRecordset(rs => rs
-					.select("MAX(ID) AS Total")
-					.from("chat_line", channelName)
-					.single()
-				);
-	
-				if (!data || !data.Total) {
-					return {
-						reply: "This channel doesn't have enough chat lines saved yet!"
-					};
-				}
-	
-				result = await sb.Query.getRecordset(rs => rs
-					.select("Text", "Posted", "Name")
-					.from("chat_line", channelName)
-					.join("chat_data", "User_Alias")
-					.where("`" + channelName + "`.ID >= %n", sb.Utils.random(1, data.Total))
-					.orderBy("`" + channelName + "`.ID ASC")
-					.limit(1)
-					.single()
-				);
+				targetID = ID - counts[0] - counts[1];
+				targetChannel = channels[2];
 			}
+
+			result = await sb.Query.getRecordset(rs => rs
+				.select("Text", "Posted", "Name")
+				.from("chat_line", targetChannel)
+				.join("chat_data", "User_Alias")
+				.where(`${targetChannel}.ID = %n`, targetID)
+				.single()
+			);
 		}
-	
+		else {
+			const data = await sb.Query.getRecordset(rs => rs
+				.select("MAX(ID) AS Total")
+				.from("chat_line", channelName)
+				.single()
+			);
+
+			if (!data || !data.Total) {
+				return {
+					reply: "This channel doesn't have enough chat lines saved yet!"
+				};
+			}
+
+			result = await sb.Query.getRecordset(rs => rs
+				.select("Text", "Posted", "Name")
+				.from("chat_line", channelName)
+				.join("chat_data", "User_Alias")
+				.where(`\`${channelName}\`.ID >= %n`, sb.Utils.random(1, data.Total))
+				.orderBy(`\`${channelName}\`.ID ASC`)
+				.limit(1)
+				.single()
+			);
+		}
+
 		const partialReplies = [{
 			bancheck: true,
 			message: result.Text
 		}];
-	
+
 		// Only add the "(time ago) name:" part if it was not requested to skip it
 		if (!context.params.textOnly) {
 			partialReplies.unshift(
@@ -210,7 +207,7 @@ module.exports = {
 				}
 			);
 		}
-	
+
 		return {
 			partialReplies
 		};
@@ -219,21 +216,21 @@ module.exports = {
 		"Fetches a random chat line from the current channel.",
 		"If you specify a user, the line will be from that user only.",
 		"",
-	
+
 		`<code>${prefix}rl</code>`,
 		`Random message from anyone, in the format "(time ago) (username): (message)"`,
 		"",
-	
+
 		`<code>${prefix}rl (user)</code>`,
 		"Random message from specified user only",
 		"",
-	
+
 		`<code>${prefix}rq</code>`,
 		"Random message from yourself only",
 		"",
-	
+
 		`<code>${prefix}rl (user) textOnly:true</code>`,
 		`Will only reply with the message, ignoring the "(time ago) (name):" part`,
-		"",
+		""
 	])
 };

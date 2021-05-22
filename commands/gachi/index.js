@@ -8,7 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function gachiList () { 
+	Code: (async function gachiList () {
 		return {
 			reply: "https://supinic.com/track/gachi/list"
 		};
