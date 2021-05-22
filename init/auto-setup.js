@@ -34,7 +34,7 @@
 			whitelist: [
 				"objects/date",
 				"objects/error",
-				"singletons/query",
+				"singletons/query"
 			]
 		});
 	}
@@ -50,11 +50,11 @@
 		},
 		discord: {
 			ID: 2,
-			envs: ["DISCORD_BOT_TOKEN"],
+			envs: ["DISCORD_BOT_TOKEN"]
 		},
 		cytube: {
 			ID: 3,
-			envs: ["CYTUBE_BOT_PASSWORD"],
+			envs: ["CYTUBE_BOT_PASSWORD"]
 		}
 	};
 	const platforms = Object.keys(platformsData);

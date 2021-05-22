@@ -1,4 +1,5 @@
 /* global it, describe, beforeEach, afterEach */
+/* eslint-disable prefer-arrow-callback */
 const assert = require("assert");
 
 require("dank-twitch-irc");
@@ -15,7 +16,7 @@ const initialize = (async () => {
 			"classes/config",
 			"classes/cron",
 			"classes/platform",
-			"classes/user",
+			"classes/user"
 		],
 		skipData: [
 			"classes/channel",
@@ -23,7 +24,7 @@ const initialize = (async () => {
 			"classes/config",
 			"classes/cron",
 			"classes/platform",
-			"classes/user",
+			"classes/user"
 		]
 	});
 
@@ -74,7 +75,7 @@ const initialize = (async () => {
 			Name: "COMMAND_PREFIX",
 			Value: "$",
 			Type: "string"
-		})],
+		})]
 	]);
 
 	const userCheck = await sb.User.get("supinic");
@@ -87,7 +88,7 @@ const initialize = (async () => {
 	assert.strictEqual(sb.Command.is("$test"), true);
 });
 
-describe("twitch controller",  function () {
+describe("twitch controller", function () {
 	let TwitchController;
 	let controller;
 

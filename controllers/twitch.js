@@ -240,7 +240,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 		});
 
-		client.on("NOTICE", async ({channelName, messageID, ...rest}) => {
+		client.on("NOTICE", async ({ channelName, messageID, ...rest }) => {
 			if (!messageID) {
 				return;
 			}
@@ -293,7 +293,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		client.on("USERNOTICE", (message) => this.handleUserNotice(message));
 
 		client.on("CLEARCHAT", (messageObject) => {
-			const {targetUsername: username, channelName, reason = null} = messageObject;
+			const { targetUsername: username, channelName, reason = null } = messageObject;
 
 			if (messageObject.isPermaban()) {
 				this.handleBan(username, channelName, reason, null);
@@ -386,7 +386,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @returns {Promise<void>}
 	 */
 	async handleMessage (messageObject) {
-		const {ircTags, badges, bits, channelName, messageText: message, senderUserID, senderUsername} = messageObject;
+		const { ircTags, badges, bits, channelName, messageText: message, senderUserID, senderUsername } = messageObject;
 		const messageType = (messageObject instanceof DankTwitch.WhisperMessage)
 			? "whisper"
 			: "message";
@@ -699,7 +699,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				});
 			}
 
-			if (this.platform.Logging.subs && !logSkipModes.includes(channelData.Mode))  {
+			if (this.platform.Logging.subs && !logSkipModes.includes(channelData.Mode)) {
 				sb.SystemLogger.send("Twitch.Sub", plans[subPlanName], channelData, userData);
 			}
 		}
@@ -734,13 +734,12 @@ module.exports = class TwitchController extends require("./template.js") {
 				});
 			}
 
-			if (this.platform.Logging.giftSubs && !logSkipModes.includes(channelData.Mode))  {
+			if (this.platform.Logging.giftSubs && !logSkipModes.includes(channelData.Mode)) {
 				const name = userData?.Name ?? "(anonymous)";
 				const logMessage = `${name} gifted a subscription to ${recipientData.Name}`;
 
 				sb.SystemLogger.send("Twitch.Giftsub", logMessage, channelData, userData);
 			}
-
 		}
 		else if (messageObject.isRaid()) {
 			const viewers = Number(messageObject.eventParams.viewercount);

@@ -14,7 +14,7 @@
 		whitelist: [
 			"objects/date",
 			"objects/error",
-			"singletons/query",
+			"singletons/query"
 		]
 	});
 	console.log("Utils loaded");
@@ -50,7 +50,7 @@
 
 		"data/database",
 		"data/tables/Config",
-		"data/tables/Got_Instance",
+		"data/tables/Got_Instance"
 	];
 
 	console.log("=====\nStarting table definition script");

@@ -204,7 +204,7 @@ class CytubeClient {
 			}
 
 			this.playlistData.push({
-				media: media,
+				media,
 				user: who,
 				uid: data.item.uid,
 				after: data.after
@@ -347,7 +347,7 @@ class CytubeClient {
 
 		if (arr.length > 3) {
 			arr = arr.slice(0, 3);
-			arr[2] = arr[2].slice(0, messageLimit - 3) +  "...";
+			arr[2] = arr[2].slice(0, messageLimit - 3) + "...";
 		}
 
 		let index = 0;
@@ -383,7 +383,7 @@ class CytubeClient {
 	async queue (type, videoID) {
 		this.client.socket.emit("queue", {
 			id: videoID,
-			type: type,
+			type,
 			pos: "end",
 			temp: true,
 			duration: undefined,
