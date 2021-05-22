@@ -77,7 +77,7 @@ module.exports = {
 		}
 		else if (response.statusCode !== 200) {
 			throw new sb.errors.GenericRequestError({
-				statusCode,
+				statusCode: response.statusCode,
 				statusMessage: response.statusMessage,
 				hostname: "TranslateAPI",
 				message: response.statusMessage,
