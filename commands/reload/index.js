@@ -7,59 +7,107 @@ module.exports = {
 	Flags: ["pipe","skip-banphrase","system","whitelist"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
-	Code: (async function reload (context, target, ...rest) {
-		let result = null;
+	Static_Data: (() => ({
+		types: [
+			{
+				target: "AwayFromKeyboard",
+				names: ["afk", "afks"]
+			},
+			{
+				target: "Banphrase",
+				names: ["banphrase", "banphrases"]
+			},
+			{
+				target: "Channel",
+				names: ["channel", "channels"]
+			},
+			{
+				target: "ChatModule",
+				names: ["chatmodule", "chatmodules", "chat-module", "chat-modules"]
+			},
+			{
+				target: "Command",
+				names: ["command", "commands"]
+			},
+			{
+				target: "Config",
+				names: ["config", "configs"]
+			},
+			{
+				target: "Cron",
+				names: ["cron", "crons"]
+			},
+			{
+				target: "Got",
+				names: ["got"]
+			},
+			{
+				target: "Reminder",
+				names: ["reminder", "reminders"]
+			},
+			{
+				target: "User",
+				names: ["user", "users"],
+				execution: async (invocation, ...names) => {
+					if (invocation === "user") {
+						await Promise.all(names.map(name => sb.User.invalidateUserCache(name)));
+						await sb.User.getMultiple(names);
 
-		switch (target) {
-			case "afks": await sb.AwayFromKeyboard.reloadData(); break;
-			case "afk": result  = await sb.AwayFromKeyboard.reloadData(); break;
-
-			case "filters": await sb.Filter.reloadData(); break;
-			case "filter": result = await sb.Filter.reloadSpecific(...rest); break;
-
-			case "banphrases": await sb.Banphrase.reloadData(); break;
-			case "banphrase": result = await sb.Banphrase.reloadSpecific(...rest); break;
-
-			case "channels": await sb.Channel.reloadData(); break;
-			case "channel": result = await sb.Channel.reloadSpecific(...rest); break;
-
-			case "chat-modules":
-			case "chatmodules": await sb.ChatModule.reloadData(); break;
-			case "chat-module":
-			case "chatmodule": result = await sb.ChatModule.reloadSpecific(...rest); break;
-
-			case "commands": await sb.Command.reloadData(); break;
-			case "command": result = await sb.Command.reloadSpecific(...rest); break;
-
-			case "config": await sb.Config.reloadData(); break;
-	
-			case "crons": await sb.Cron.reloadData(); break;
-			case "cron": result = await sb.Cron.reloadSpecific(...rest); break;
-	
-			case "got": await sb.Got.reloadData(); break;
-	
-			case "reminders": await sb.Reminder.reloadData(); break;
-			case "reminder": result = await sb.Reminder.reloadSpecific(...rest); break;
-	
-			case "users": await sb.User.reloadData(); break;
-	
-			default: return {
-				success: false,
-				reply: "Unrecognized module!"
-			};
-		}
-
-		if (result === false) {
+						return {
+							reply: `${names.length} user(s) reload successfully.`
+						};
+					}
+					else {
+						await sb.User.reloadData();
+						return {
+							reply: `All users reload successfully.`
+						};
+					}
+				}
+			}
+		]
+	})),
+	Code: (async function reload (context, command, ...rest) {
+		const { types } = this.staticData;
+		const item = types.find(i => i.names.includes(command));
+		if (!item) {
 			return {
 				success: false,
-				reply: `No ${target}s reloaded!`
+				reply: `Provided type cannot be reloaded!`
 			};
 		}
 
-		return {
-			reply: `Successfully reloaded ${target}.`
-		};
+		if (typeof item.execution === "function") {
+			return await item.execution(command, ...rest);
+		}
+
+		const module = sb[item.target];
+		if (command.endsWith("s")) {
+			await module.reloadData();
+			return {
+				reply: `Reloaded sb.${item.target} completely.`
+			};
+		}
+		else {
+			if (typeof module.reloadSpecific !== "function") {
+				return {
+					success: false,
+					reply: `This module does not support reloading a specific item!`
+				};
+			}
+
+			const result = await module.reloadSpecific(...rest);
+			if (result === false) {
+				return {
+					success: false,
+					reply: `No ${item.target}s reloaded!`
+				};
+			}
+
+			return {
+				reply: `Reloaded ${rest.length} specific sb.${item.target}(s) successfully.`
+			};
+		}
 	}),
 	Dynamic_Description: null
 };
