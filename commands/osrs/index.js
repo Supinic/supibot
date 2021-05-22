@@ -65,7 +65,8 @@ module.exports = {
 		},
 	
 		subcommands: ["itemid", "kc", "price", "seasonal-kc", "seasonal-stats", "stats"],
-	
+
+		/* eslint-disable array-element-newline */
 		activities: [
 			"abyssal sire", "alchemical hydra", "barrows chests", "bounty hunter - hunter", "bounty hunter - rogue",
 			"bryophyta", "callisto", "cerberus", "chambers of xeric", "chambers of xeric: challenge mode", "chaos elemental",
@@ -77,7 +78,8 @@ module.exports = {
 			"scorpia", "skotizo", "tempoross", "the corrupted gauntlet", "the gauntlet", "theatre of blood", "thermonuclear smoke devil",
 			"tzkal-zuk", "tztok-jad", "venenatis", "vet'ion", "vorkath", "wintertodt", "zalcano", "zulrah"
 		],
-	
+		/* eslint-enable array-element-newline */
+
 		activityAliases: {
 			"sire": "abyssal sire",
 			"hydra": "alchemical hydra",
