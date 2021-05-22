@@ -30,8 +30,15 @@ module.exports = {
 		}
 		
 		const drink = sb.Utils.randArray(data.drinks);
-		const ingredients = Object.entries(drink).filter(([key, value]) => /ingredient\d+/i.test(key)).map(([key, value]) => value).filter(Boolean);
-	
+		const ingredients = [];
+		for (const [key, value] of Object.entries(drink)) {
+			if (!/ingredient\d+/i.test(key)) {
+				continue;
+			}
+
+			ingredients.push(value);
+		}
+
 		return {
 			reply: `${drink.strDrink} (${ingredients.join(", ")}): ${drink.strInstructions}`
 		};
