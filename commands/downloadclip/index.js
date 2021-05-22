@@ -17,8 +17,8 @@ module.exports = {
 		}
 
 		const rawSlug = sb.Utils.parseURL(input).path;
-		const legacyClipRegex = /[a-z]+/i;
-		const modernClipRegex = /[a-z]+-[-\w]{16}/i;
+		const legacyClipRegex = /[a-z0-9]+/i;
+		const modernClipRegex = /[a-z0-9]+-[-\w]{16}/i;
 
 		const match = rawSlug.match(modernClipRegex) ?? rawSlug.match(legacyClipRegex);
 		if (!match) {
