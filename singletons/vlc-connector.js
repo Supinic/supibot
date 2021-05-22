@@ -172,8 +172,8 @@ module.exports = (function () {
 				}
 				if (nextTrack) {
 					const ID = await sb.Query.getRecordset(rs => rs
-					    .select("ID")
-					    .from("chat_data", "Song_Request")
+						.select("ID")
+						.from("chat_data", "Song_Request")
 						.where("VLC_ID = %n", Number(nextTrack.id))
 						.where("Status = %s", "Queued")
 						.single()

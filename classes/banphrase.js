@@ -141,9 +141,9 @@ module.exports = (function () {
 			this.Active = !this.Active;
 			if (typeof this.ID === "number") {
 				await sb.Query.getRecordUpdater(ru => ru
-				    .update("chat_data", "Banphrase")
-				    .set("Active", this.Active)
-				    .where("ID = %n", this.ID)
+					.update("chat_data", "Banphrase")
+					.set("Active", this.Active)
+					.where("ID = %n", this.ID)
 				);
 			}
 		}
@@ -226,7 +226,7 @@ module.exports = (function () {
 					|| (banphrase.Channel === null && banphrase.Platform === channelData?.Platform.ID)
 					|| (banphrase.Platform === null)
 				)
-            ));
+			));
 
 			for (const banphrase of banphraseList) {
 				const result = await banphrase.execute(message);

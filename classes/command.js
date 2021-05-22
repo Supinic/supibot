@@ -327,7 +327,7 @@ class Command extends require("./template.js") {
 				this.staticData = tempData;
 			}
 			else {
-				console.warn(`Command ${this.ID} has invalid static data type!`, e);
+				console.warn(`Command ${this.ID} has invalid static data type!`);
 				this.Code = async () => ({
 					success: false,
 					reply: "Command has invalid code definition! Please make sure to let @supinic know about this!"

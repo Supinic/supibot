@@ -39,12 +39,12 @@ module.exports = class ChatModule extends require("./template.js") {
 		try {
 			this.Events = JSON.parse(data.Events);
 			if (!Array.isArray(this.Events)) {
-				console.warn("Chat module - events are not Array", e);
+				console.warn("Chat module has invalid events - not Array");
 				this.Events = [];
 			}
 		}
 		catch (e) {
-			console.warn("Chat module - events parse failed", e);
+			console.warn("Chat module events parse failed", e);
 			this.Events = [];
 		}
 
@@ -57,7 +57,7 @@ module.exports = class ChatModule extends require("./template.js") {
 			fn = eval(data.Code);
 		}
 		catch (e) {
-			console.warn("Chat module - code parse failed", e);
+			console.warn("Chat module code parse failed", e);
 			fn = () => undefined;
 		}
 
@@ -104,7 +104,7 @@ module.exports = class ChatModule extends require("./template.js") {
 	 * @param {Object} options
 	 * @param {boolean} [options.remove] If true, the module reference will be removed instead of deactivated.
 	 * @param {Platform} [options.platform] Specified attachment platform
-	 * @param {Channel|Channel[]} [options.channel] Specified attachment channels	 * 
+	 * @param {Channel|Channel[]} [options.channel] Specified attachment channels	 *
 	 */
 	detach (options) {
 		for (const event of this.Events) {
@@ -113,16 +113,16 @@ module.exports = class ChatModule extends require("./template.js") {
 				if (index === -1) {
 					continue;
 				}
-				
-				const reference = this.attachmentReferences[index];				
-				channelData.events.off(event, reference.listener);		
-				
+
+				const reference = this.attachmentReferences[index];
+				channelData.events.off(event, reference.listener);
+
 				if (options.remove) {
 					reference.listener = null;
 					this.attachmentReferences.splice(index, 1);
 				}
 				else {
-					reference.active = false;					
+					reference.active = false;
 				}
 			}
 		}
@@ -149,7 +149,7 @@ module.exports = class ChatModule extends require("./template.js") {
 		this.ID = null;
 		this.Code = null;
 	}
-	
+
 	async serialize (options = {}) {
 		if (typeof this.ID !== "number") {
 			throw new sb.Error({
@@ -305,8 +305,8 @@ module.exports = class ChatModule extends require("./template.js") {
 		ChatModule.detachChannelModules(channelData, { remove: true });
 
 		const attachmentData = await sb.Query.getRecordset(rs => rs
-		    .select("Chat_Module", "Specific_Arguments AS Args")
-		    .from("chat_data", "Channel_Chat_Module")
+			.select("Chat_Module", "Specific_Arguments AS Args")
+			.from("chat_data", "Channel_Chat_Module")
 			.where("Channel = %n", channelData.ID)
 		);
 
