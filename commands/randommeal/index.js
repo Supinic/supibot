@@ -30,8 +30,15 @@ module.exports = {
 		}
 		
 		const meal = sb.Utils.randArray(data.meals);
-		const ingredients = Object.entries(meal).filter(([key, value]) => /ingredient\d+/i.test(key)).map(([key, value]) => value).filter(Boolean);
-	
+		const ingredients = [];
+		for (const [key, value] of Object.entries(meal)) {
+			if (!/ingredient\d+/i.test(key)) {
+				continue;
+			}
+
+			ingredients.push(value);
+		}
+
 		return {
 			reply: `${meal.strMeal} - Ingredients: ${ingredients.join(", ")} ${meal.strYoutube}`
 		};
