@@ -79,7 +79,7 @@ module.exports = {
 				if (response.statusCode !== 200) {
 					return {
 						success: false,
-						reply: result.body.message
+						reply: response.body.message
 					};
 				}
 
