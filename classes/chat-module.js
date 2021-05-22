@@ -4,7 +4,7 @@
  * @memberof sb
  */
 module.exports = class ChatModule extends require("./template.js") {
-	//<editor-fold defaultstate="collapsed" desc="=== INSTANCE PROPERTIES ===">
+	// <editor-fold defaultstate="collapsed" desc="=== INSTANCE PROPERTIES ===">
 
 	ID;
 	Name;
@@ -15,7 +15,7 @@ module.exports = class ChatModule extends require("./template.js") {
 	attachmentReferences = [];
 	data = {};
 
-	//</editor-fold>
+	// </editor-fold>
 
 	/** @type {ChatModule[]} */
 	static data = [];

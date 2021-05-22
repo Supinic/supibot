@@ -60,7 +60,7 @@ module.exports = class User extends require("./template.js") {
 				this.Data = JSON.parse(data.Data);
 			}
 			catch (e) {
-				console.warn("User.Data parse error", { error: e, user: this, data});
+				console.warn("User.Data parse error", { error: e, user: this, data });
 				this.Data = {};
 			}
 		}
@@ -68,7 +68,7 @@ module.exports = class User extends require("./template.js") {
 			this.Data = { ...data.Data };
 		}
 		else {
-			console.warn("User.Data invalid type", { user: this, data});
+			console.warn("User.Data invalid type", { user: this, data });
 			this.Data = {};
 		}
 	}

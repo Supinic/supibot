@@ -21,7 +21,7 @@ module.exports = (function () {
 
 	const allowedPrivacyOptions = ["public", "unlisted", "private"];
 	const allowedExpirationOptions = {
-		"never": "N",
+		never: "N",
 		"10 minutes": "10M",
 		"1 hour": "1H",
 		"1 day": "1D",
@@ -53,7 +53,7 @@ module.exports = (function () {
 		 * @returns {Pastebin}
 		 */
 		static async singleton () {
-			if (!Pastebin.module){
+			if (!Pastebin.module) {
 				Pastebin.module = new Pastebin();
 			}
 			return Pastebin.module;
@@ -186,7 +186,7 @@ module.exports = (function () {
 		async delete () {
 			throw new sb.Error({
 				message: "Not implemented yet."
-			})
+			});
 		}
 
 		/**
@@ -204,8 +204,8 @@ module.exports = (function () {
 			else {
 				throw new sb.Error({
 					message: "Pastebin: Invalid privacy option",
-					args: arguments
-				})
+					args: { mode }
+				});
 			}
 		}
 
@@ -219,7 +219,7 @@ module.exports = (function () {
 			else {
 				throw new sb.Error({
 					message: "Pastebin: Invalid expiration option",
-					args: arguments
+					args: { string }
 				});
 			}
 		}

@@ -325,8 +325,8 @@ module.exports = (function () {
 				// If not found, return a default one.
 				if (response !== false) {
 					const apiResponses = Banphrase.data.filter(banphrase => (
-						(banphrase.Type === "API response") &&
-						(banphrase.Channel === channelData.ID || banphrase.Channel === null)
+						(banphrase.Type === "API response")
+						&& (banphrase.Channel === channelData.ID || banphrase.Channel === null)
 					));
 
 					for (const response of apiResponses) {

@@ -1,4 +1,3 @@
-/* global sb */
 module.exports = (function () {
 	"use strict";
 
@@ -37,7 +36,7 @@ module.exports = (function () {
 					.from("INFORMATION_SCHEMA", "TABLES")
 					.where("TABLE_SCHEMA = %s", "chat_line")
 					.flat("TABLE_NAME")
-				).then(data => this.#presentTables = data);
+				).then(data => (this.#presentTables = data));
 
 				this.messageCron = new sb.Cron({
 					Name: "message-cron",
@@ -78,13 +77,13 @@ module.exports = (function () {
 					"chat_data",
 					"Message_Meta_Channel",
 					["Timestamp", "Channel", "Amount", "Length"]
-				).then(batch => this.metaBatch = batch);
+				).then(batch => (this.metaBatch = batch));
 
 				sb.Query.getBatch(
 					"chat_data",
 					"Twitch_Ban",
 					["User_Alias", "Channel", "Length", "Issued"]
-				).then(batch => this.banBatch = batch);
+				).then(batch => (this.banBatch = batch));
 
 				this.meta = {};
 				this.metaCron = new sb.Cron({
@@ -176,7 +175,7 @@ module.exports = (function () {
 						"Execution_Time",
 						"Command_Name"
 					]
-				).then(batch => this.commandBatch = batch);
+				).then(batch => (this.commandBatch = batch));
 
 				this.commandCollector = new Set();
 				this.commandCron = new sb.Cron({
@@ -222,7 +221,7 @@ module.exports = (function () {
 									channel: channelData.ID,
 									date,
 									message,
-									user: userData.ID,
+									user: userData.ID
 								});
 							}
 

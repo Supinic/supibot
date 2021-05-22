@@ -28,7 +28,7 @@ class Context {
 			invocation: this.#invocation,
 			platform: this.#platform,
 			channel: this.#channel,
-			user: this.#user,
+			user: this.#user
 		});
 	}
 
@@ -116,7 +116,7 @@ class Context {
  * @memberof sb
  */
 class Command extends require("./template.js") {
-	//<editor-fold defaultstate="collapsed" desc="=== INSTANCE PROPERTIES ===">
+	// <editor-fold defaultstate="collapsed" desc="=== INSTANCE PROPERTIES ===">
 
 	/**
 	 * Unique numeric ID.
@@ -482,9 +482,8 @@ class Command extends require("./template.js") {
 			return Command.data.find(command => command.ID === identifier);
 		}
 		else if (typeof identifier === "string") {
-			return Command.data.find(command =>
-				command.Name === identifier ||
-				command.Aliases.includes(identifier)
+			return Command.data.find(command => command.Name === identifier
+				|| command.Aliases.includes(identifier)
 			);
 		}
 		else {
@@ -507,7 +506,7 @@ class Command extends require("./template.js") {
 	 */
 	static async checkAndExecute (identifier, argumentArray, channelData, userData, options = {}) {
 		if (!identifier) {
-			return {success: false, reason: "no-identifier"};
+			return { success: false, reason: "no-identifier" };
 		}
 
 		if (!Array.isArray(argumentArray)) {
@@ -517,7 +516,7 @@ class Command extends require("./template.js") {
 		}
 
 		if (channelData?.Mode === "Inactive" || channelData?.Mode === "Read") {
-			return {success: false, reason: "channel-" + channelData.Mode.toLowerCase()};
+			return { success: false, reason: "channel-" + channelData.Mode.toLowerCase() };
 		}
 
 		// Special parsing of privileged characters - they can be joined with other characters, and still be usable
@@ -534,7 +533,7 @@ class Command extends require("./template.js") {
 
 		const command = Command.get(identifier);
 		if (!command) {
-			return {success: false, reason: "no-command"};
+			return { success: false, reason: "no-command" };
 		}
 
 		// Check for cooldowns, return if it did not pass yet.
@@ -554,7 +553,7 @@ class Command extends require("./template.js") {
 					return {
 						reply: (options.privateMessage) ? pending.description : null,
 						reason: "pending"
-					}
+					};
 				}
 			}
 
@@ -574,7 +573,7 @@ class Command extends require("./template.js") {
 
 		const filterData = await sb.Filter.execute({
 			user: userData,
-			command: command,
+			command,
 			invocation: identifier,
 			channel: channelData ?? null,
 			platform: channelData?.Platform ?? null,
@@ -589,7 +588,7 @@ class Command extends require("./template.js") {
 			const cooldownFilter = sb.Filter.getCooldownModifiers({
 				platform: channelData?.Platform ?? null,
 				channel: channelData,
-				command: command,
+				command,
 				invocation: identifier,
 				user: userData
 			});
@@ -610,7 +609,7 @@ class Command extends require("./template.js") {
 			return filterData;
 		}
 
-		const appendOptions = Object.assign({}, options);
+		const appendOptions = { ...options };
 		const isPrivateMessage = (!channelData);
 
 		/** @type CommandContext */
@@ -619,7 +618,7 @@ class Command extends require("./template.js") {
 			invocation: identifier,
 			user: userData,
 			channel: channelData,
-			command: command,
+			command,
 			transaction: null,
 			privateMessage: isPrivateMessage,
 			append: appendOptions,
@@ -722,7 +721,7 @@ class Command extends require("./template.js") {
 				}
 			}
 
-			args = remainingArgs.filter(Boolean)
+			args = remainingArgs.filter(Boolean);
 		}
 
 		/** @type CommandResult */
@@ -739,7 +738,8 @@ class Command extends require("./template.js") {
 				result = execution.reply.trim().slice(0, 300);
 			}
 			else if (execution?.partialReplies) {
-				result = execution.partialReplies.map(i => i.message).join(" ").trim().slice(0, 300);
+				result = execution.partialReplies.map(i => i.message).join(" ").trim()
+					.slice(0, 300);
 			}
 
 			await sb.Runtime.incrementCommandsCounter();
@@ -831,7 +831,7 @@ class Command extends require("./template.js") {
 			return execution;
 		}
 
-		if (Array.isArray(execution.partialReplies)){
+		if (Array.isArray(execution.partialReplies)) {
 			if (execution.partialReplies.some(i => i && i.constructor !== Object)) {
 				throw new sb.Error({
 					message: "If set, partialReplies must be an Array of Objects"
@@ -839,9 +839,9 @@ class Command extends require("./template.js") {
 			}
 
 			const partResult = [];
-			for (const {message, bancheck} of execution.partialReplies) {
+			for (const { message, bancheck } of execution.partialReplies) {
 				if (bancheck === true) {
-					const {string} = await sb.Banphrase.execute(
+					const { string } = await sb.Banphrase.execute(
 						message,
 						channelData
 					);
@@ -868,7 +868,7 @@ class Command extends require("./template.js") {
 			execution.reply = string;
 
 			if (
-				(typeof execution.replyWithPrivateMessage !== "boolean" )
+				(typeof execution.replyWithPrivateMessage !== "boolean")
 				&& (typeof privateMessage === "boolean")
 			) {
 				execution.replyWithPrivateMessage = privateMessage;
@@ -893,7 +893,7 @@ class Command extends require("./template.js") {
 		// Apply all unpings to the result, if it is still a string (aka the response should be sent)
 		if (typeof execution.reply === "string") {
 			execution.reply = await sb.Filter.applyUnping({
-				command: command,
+				command,
 				channel: channelData ?? null,
 				platform: channelData?.Platform ?? null,
 				string: execution.reply
@@ -906,7 +906,7 @@ class Command extends require("./template.js") {
 			&& channelData?.Mention
 			&& await sb.Filter.getMentionStatus({
 				user: userData,
-				command: command,
+				command,
 				channel: channelData ?? null,
 				platform: channelData?.Platform ?? null
 			})
@@ -1132,16 +1132,15 @@ class Command extends require("./template.js") {
 			});
 		}
 
-		const data = Object.assign({}, {
-			invocation: contextData.invocation ?? commandData.Name,
+		const data = { invocation: contextData.invocation ?? commandData.Name,
 			user: contextData.user ?? null,
 			channel: contextData.channel ?? null,
 			platform: contextData.platform ?? null,
 			transaction: contextData.transaction ?? null,
 			privateMessage: contextData.isPrivateMessage ?? false,
 			append: contextData.append ?? {},
-			params: contextData.params ?? {}
-		}, extraData);
+			params: contextData.params ?? {},
+			...extraData };
 
 		return new Context(commandData, data);
 	}
@@ -1157,7 +1156,7 @@ class Command extends require("./template.js") {
 			return false;
 		}
 
-		return (string.startsWith(prefix) && string.trim().length > prefix.length)
+		return (string.startsWith(prefix) && string.trim().length > prefix.length);
 	}
 
 	static destroy () {
@@ -1187,7 +1186,7 @@ class Command extends require("./template.js") {
 	}
 
 	static set prefix (value) {
-		return Command.setPrefix(value);
+		Command.setPrefix(value);
 	}
 
 	/**

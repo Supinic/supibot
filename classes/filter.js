@@ -292,7 +292,7 @@ module.exports = class Filter extends require("./template.js") {
 				args: {
 					type: typeof reason
 				}
-			})
+			});
 		}
 
 		const row = await sb.Query.getRow("chat_data", "Filter");
@@ -387,7 +387,7 @@ module.exports = class Filter extends require("./template.js") {
 				return {
 					success: false,
 					reason: "whitelist",
-					filter:  { Reason: "Reply" },
+					filter: { Reason: "Reply" },
 					reply: command.Whitelist_Response ?? null
 				};
 			}
@@ -402,11 +402,11 @@ module.exports = class Filter extends require("./template.js") {
 				success: false,
 				reason: "arguments",
 				filter: argumentFilter,
-				reply: (argumentFilter.Response === "Auto")
-					? `You cannot use this argument on this position for ${targetAmount} ${targetType}!`
-					: (argumentFilter.Response === "Reason")
-						? argumentFilter.Reason
-						: null
+				reply: Filter.getReason({
+					reason: argumentFilter.reason,
+					response: argumentFilter.Response,
+					string: `You cannot use this argument on this position for ${targetAmount} ${targetType}!`
+				})
 			};
 		}
 
@@ -415,8 +415,7 @@ module.exports = class Filter extends require("./template.js") {
 		}
 
 		if (command.Flags.optOut && userTo) {
-			const optout = localFilters.find(i =>
-				i.Type === "Opt-out"
+			const optout = localFilters.find(i => i.Type === "Opt-out"
 				&& i.User_Alias === userTo.ID
 			);
 
@@ -428,11 +427,11 @@ module.exports = class Filter extends require("./template.js") {
 					success: false,
 					reason: "opt-out",
 					filter: optout,
-					reply: (optout.Response === "Auto")
-						? `🚫 That user has opted out from being the target of ${targetAmount} ${targetType}!`
-						: (optout.Response === "Reason")
-							? optout.Reason
-							: null
+					reply: Filter.getReason({
+						reason: optout.reason,
+						response: optout.Response,
+						string: `🚫 That user has opted out from being the target of ${targetAmount} ${targetType}!`
+					})
 				};
 			}
 		}
@@ -453,11 +452,11 @@ module.exports = class Filter extends require("./template.js") {
 					success: false,
 					reason: "block",
 					filter: block,
-					reply: (block.Response === "Auto")
-						? `⛔ That user has blocked you from being the target of ${targetAmount} ${targetType}!`
-						: (block.Response === "Reason")
-							? block.Reason
-							: null
+					reply: Filter.getReason({
+						reason: block.reason,
+						response: block.Response,
+						string: `🚫 That user has blocked you from being the target of ${targetAmount} ${targetType}!`
+					})
 				};
 			}
 		}
@@ -515,7 +514,7 @@ module.exports = class Filter extends require("./template.js") {
 				reason: "blacklist",
 				filter: blacklist,
 				reply
-			}
+			};
 		}
 
 		let channelLive = null;
@@ -531,11 +530,11 @@ module.exports = class Filter extends require("./template.js") {
 				success: false,
 				reason: "offline-only",
 				filter: offlineOnly,
-				reply: (offlineOnly.Response === "Auto")
-					? `🚫 This ${targetType} is only available when the channel is offline!`
-					: (offlineOnly.Response === "Reason")
-						? offlineOnly.Reason
-						: null
+				reply: Filter.getReason({
+					reason: offlineOnly.reason,
+					response: offlineOnly.Response,
+					string: `🚫 This ${targetType} is only available when the channel is offline!`
+				})
 			};
 		}
 
@@ -546,11 +545,11 @@ module.exports = class Filter extends require("./template.js") {
 				success: false,
 				reason: "online-only",
 				filter: onlineOnly,
-				reply: (onlineOnly.Response === "Auto")
-					? `🚫 This ${targetType} is only available when the channel is online!`
-					: (onlineOnly.Response === "Reason")
-						? onlineOnly.Reason
-						: null
+				reply: Filter.getReason({
+					reason: onlineOnly.reason,
+					response: onlineOnly.Response,
+					string: `🚫 This ${targetType} is only available when the channel is online!`
+				})
 			};
 		}
 
@@ -602,7 +601,7 @@ module.exports = class Filter extends require("./template.js") {
 		const filters = Filter.getLocals("Unmention", {
 			...options,
 			channel: options.channel ?? Symbol("private-message")
-		})
+		});
 
 		return (filters.length === 0);
 	}
@@ -615,7 +614,7 @@ module.exports = class Filter extends require("./template.js") {
 	 * @param {Object} options
 	 */
 	static async applyUnping (options) {
-		const filters = Filter.getLocals("Unping",  {
+		const filters = Filter.getLocals("Unping", {
 			...options,
 			skipUserCheck: true
 		});
@@ -646,6 +645,27 @@ module.exports = class Filter extends require("./template.js") {
 		}
 
 		return flags;
+	}
+
+	/**
+	 * Picks the correct response type, based on the type provided
+	 * @param {Object} options
+	 * @param {string} options.string
+	 * @param {Filter#Response} options.response
+	 * @param {string} [options.reason]
+	 * @returns {null|string}
+	 */
+	static getReason (options = {}) {
+		const { string, response, reason } = options;
+		if (response === "Auto") {
+			return string;
+		}
+		else if (response === "Reason") {
+			return reason ?? null;
+		}
+		else {
+			return null;
+		}
 	}
 
 	static async reloadSpecific (...list) {

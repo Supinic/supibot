@@ -235,7 +235,7 @@ module.exports = class Channel extends require("./template.js") {
 	 * @returns {boolean}
 	 */
 	isUserAmbassador (userData) {
-		return Boolean(this.Data.ambassadors?.includes(userData.ID))
+		return Boolean(this.Data.ambassadors?.includes(userData.ID));
 	}
 
 	/**
@@ -474,7 +474,7 @@ module.exports = class Channel extends require("./template.js") {
 		});
 		await row.save();
 
-		const channelData = new Channel({...row.valuesObject});
+		const channelData = new Channel({ ...row.valuesObject });
 		await channelData.setup();
 
 		Channel.data.push(channelData);

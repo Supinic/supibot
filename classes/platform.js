@@ -19,7 +19,7 @@ module.exports = class Platform extends require("./template.js") {
 	 */
 	constructor (data) {
 		super();
-		
+
 		/**
 		 * Unique numeric platform identifier.
 		 * @type {User.ID}
@@ -180,7 +180,7 @@ module.exports = class Platform extends require("./template.js") {
 
 		return promise;
 	}
-	
+
 	async serialize () {
 		throw new sb.Error({
 			message: "Module Platform cannot be serialized"
@@ -269,7 +269,7 @@ module.exports = class Platform extends require("./template.js") {
 	get client () {
 		return this.#controller?.client ?? null;
 	}
-	
+
 	static async loadData () {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("*")
@@ -285,7 +285,7 @@ module.exports = class Platform extends require("./template.js") {
 
 	/**
 	 * Assigns controllers to each platform after they have been prepared.
-	 * @param {Object<string, Controller>}controllers
+	 * @param {Object<string, Controller>} controllers
 	 */
 	static assignControllers (controllers) {
 		for (const [name, controller] of Object.entries(controllers)) {

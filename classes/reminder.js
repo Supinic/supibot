@@ -144,7 +144,7 @@ module.exports = class Reminder extends require("./template.js") {
 							args: {
 								reminderID: this.ID
 							}
-						})
+						});
 					}
 
 					if (channelData.Mirror) {
@@ -273,9 +273,9 @@ module.exports = class Reminder extends require("./template.js") {
 
 	static getByUser (options = {}) {
 		return Reminder.data.filter(i => (
-			(i.Active) &&
-			(!options.from || i.User_From === options.from) &&
-			(!options.to || i.User_To === options.to)
+			(i.Active)
+			&& (!options.from || i.User_From === options.from)
+			&& (!options.to || i.User_To === options.to)
 		));
 	}
 
@@ -289,7 +289,7 @@ module.exports = class Reminder extends require("./template.js") {
 		}
 		
 		super.destroy();
-	} 
+	}
 
 	/**
 	 * Creates a new Reminder, and saves it to database.
@@ -422,7 +422,7 @@ module.exports = class Reminder extends require("./template.js") {
 			const checkResult = await channelData.prepareMessage(checkedUsername, {
 				returnBooleanOnFail: true,
 				skipLengthCheck: true
-			})
+			});
 
 			const username = (checkResult === false) ? "[Banphrased username]," : checkResult;
 			let message = "reminders from: " + reply.join("; ");

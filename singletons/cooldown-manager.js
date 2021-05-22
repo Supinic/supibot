@@ -88,7 +88,7 @@ module.exports = (function () {
 		 * @inheritDoc
 		 * @returns {CooldownManager}
 		 */
-		static singleton() {
+		static singleton () {
 			if (!CooldownManager.module) {
 				CooldownManager.module = new CooldownManager();
 			}
@@ -210,7 +210,6 @@ module.exports = (function () {
 				&& (i.user === user)
 				&& (i.expires !== 0)
 			);
-
 		}
 
 		/**

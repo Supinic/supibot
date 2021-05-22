@@ -1,4 +1,3 @@
-/* global sb */
 module.exports = (function () {
 	"use strict";
 
@@ -278,7 +277,7 @@ module.exports = (function () {
 
 		async previous () { return await this.getStatus("pl_previous"); }
 		async next () { return await this.getStatus("pl_next"); }
-		async delete (id) { return await this.getStatus("pl_delete", { id: id }); }
+		async delete (id) { return await this.getStatus("pl_delete", { id }); }
 
 		/**
 		 * Adds a video to the playlist queue.
@@ -291,7 +290,7 @@ module.exports = (function () {
 		async add (link, options = {}) {
 			const status = await this.status();
 			if (status.currentplid === -1) {
-				await this.getStatus("in_play", {input: link});
+				await this.getStatus("in_play", { input: link });
 				if (options.startTime) {
 					this.seekValues.start = options.startTime;
 				}
@@ -300,7 +299,7 @@ module.exports = (function () {
 				}
 			}
 			else {
-				await this.getStatus("in_enqueue", {input: link});
+				await this.getStatus("in_enqueue", { input: link });
 			}
 
 			return Math.max(...(await this.getPlaylist()).children.map(i => i.id));
@@ -341,13 +340,12 @@ module.exports = (function () {
 			}
 
 			try {
-				const firstUserSong = userRequests
+				const [firstUserSong] = userRequests
 					.filter(i => i.vlcID >= playingData.vlcID)
-					.sort((a, b) => a.vlcID - b.vlcID)
-					[0];
+					.sort((a, b) => a.vlcID - b.vlcID);
 
 				const link = sb.Utils.linkParser.parseLink(firstUserSong.link);
-				const deletedSongData = await this.getDataByName(firstUserSong.name, link );
+				const deletedSongData = await this.getDataByName(firstUserSong.name, link);
 				await this.delete(deletedSongData.id);
 
 				return { success: true, song: deletedSongData };
@@ -423,6 +421,7 @@ module.exports = (function () {
 			const playlist = await this.playlist();
 			return playlist.children.find(i => i.name === name || i.name === link);
 		}
+
 		get currentPlaylist () {
 			return this.client._playlist?.children?.[0]?.children ?? [];
 		}
