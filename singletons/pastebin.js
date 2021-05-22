@@ -111,7 +111,7 @@ module.exports = (function () {
 		 * @returns {Promise<PastebinResponse>}
 		 */
 		async get (pasteID) {
-			const { body, statusCode } = await this.#got("raw/" + pasteID);
+			const { body, statusCode } = await this.#got(`raw/${pasteID}`);
 			if (statusCode === 200) {
 				return {
 					success: true,

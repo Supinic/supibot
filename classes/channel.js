@@ -152,7 +152,7 @@ module.exports = class Channel extends require("./template.js") {
 			return false;
 		}
 
-		const prefix = (this.Platform.Name === "twitch") ? "" : (this.Platform.Name + "_");
+		const prefix = (this.Platform.Name === "twitch") ? "" : (`${this.Platform.Name}_`);
 		const name = prefix + this.Name.toLowerCase();
 		const alreadySetup = await sb.Query.isTablePresent("chat_line", name);
 		if (alreadySetup) {
@@ -163,23 +163,23 @@ module.exports = class Channel extends require("./template.js") {
 
 		// Set up logging table
 		await sb.Query.raw([
-			"CREATE TABLE IF NOT EXISTS chat_line.`" + name + "` (",
+			`CREATE TABLE IF NOT EXISTS chat_line.\`${name}\` (`,
 			"`ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,",
 			"`User_Alias` INT(11) NOT NULL,",
-			"`Text` VARCHAR(" + limit + "),",
+			`\`Text\` VARCHAR(${limit}),`,
 			"`Posted` TIMESTAMP(3) NULL DEFAULT NULL,",
 			"PRIMARY KEY (`ID`),",
-			"INDEX `fk_user_alias_" + name + "` (`User_Alias`),",
-			"CONSTRAINT `fk_user_alias_" + name + "` FOREIGN KEY (`User_Alias`) REFERENCES `chat_data`.`User_Alias` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE)",
+			`INDEX \`fk_user_alias_${name}\` (\`User_Alias\`),`,
+			`CONSTRAINT \`fk_user_alias_${name}\` FOREIGN KEY (\`User_Alias\`) REFERENCES \`chat_data\`.\`User_Alias\` (\`ID\`) ON UPDATE CASCADE ON DELETE CASCADE)`,
 			"COLLATE=`utf8mb4_general_ci` ENGINE=InnoDB AUTO_INCREMENT=1;"
 		].join(" "));
 
 		// Set up user-specific meta logging trigger
 		await sb.Query.raw([
-			"CREATE TRIGGER IF NOT EXISTS chat_line.`" + name + "_after_insert`",
-			"AFTER INSERT ON chat_line.`" + name + "` FOR EACH ROW",
+			`CREATE TRIGGER IF NOT EXISTS chat_line.\`${name}_after_insert\``,
+			`AFTER INSERT ON chat_line.\`${name}\` FOR EACH ROW`,
 			"INSERT INTO chat_data.Message_Meta_User_Alias (User_Alias, Channel, Last_Message_Text, Last_Message_Posted)",
-			"VALUES (NEW.User_Alias, " + this.ID + ", NEW.Text, NEW.Posted)",
+			`VALUES (NEW.User_Alias, ${this.ID}, NEW.Text, NEW.Posted)`,
 			"ON DUPLICATE KEY UPDATE",
 			"Message_Count = Message_Count + 1,",
 			"Last_Message_Text = NEW.Text,",
@@ -204,7 +204,7 @@ module.exports = class Channel extends require("./template.js") {
 	getDatabaseName () {
 		return (this.Platform.Name === "twitch")
 			? this.Name
-			: this.Platform.Name + "_" + this.Name;
+			: `${this.Platform.Name}_${this.Name}`;
 	}
 
 	/**
@@ -213,7 +213,7 @@ module.exports = class Channel extends require("./template.js") {
 	 */
 	getPlatformName () {
 		if (this.Platform.Name === "twitch" || this.Platform.Name === "mixer") {
-			return this.Platform.capital + "-" + this.Name;
+			return `${this.Platform.capital}-${this.Name}`;
 		}
 		else {
 			return this.Platform.capital;

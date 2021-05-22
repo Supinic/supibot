@@ -121,7 +121,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			let fixedMessage = (await Promise.all([
 				channelData.prepareMessage(`${userData.Name} ${status}: `),
 				channelData.prepareMessage(data.Text ?? "(no message)"),
-				"(" + sb.Utils.timeDelta(data.Started) + ")"
+				`(${sb.Utils.timeDelta(data.Started)})`
 			])).join(" ");
 
 			fixedMessage = await sb.Filter.applyUnping({

@@ -14,7 +14,7 @@ module.exports = (function () {
 		static async pajbot (message, URL) {
 			const options = {
 				method: "POST",
-				url: "https://" + URL + "/api/v1/banphrases/test",
+				url: `https://${URL}/api/v1/banphrases/test`,
 				body: new sb.URLParams()
 					.set("message", message)
 					.toString(),

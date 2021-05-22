@@ -364,7 +364,7 @@ module.exports = class Reminder extends require("./template.js") {
 				await sorter(
 					reminder.Private_Message,
 					"yourself",
-					reminder.Text + " (" + sb.Utils.timeDelta(reminder.Created) + ")",
+					`${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`,
 					channelData
 				);
 			}
@@ -372,7 +372,7 @@ module.exports = class Reminder extends require("./template.js") {
 				await sorter(
 					reminder.Private_Message,
 					"system reminder",
-					reminder.Text + " (" + sb.Utils.timeDelta(reminder.Created) + ")",
+					`${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`,
 					channelData
 				);
 			}
@@ -425,7 +425,7 @@ module.exports = class Reminder extends require("./template.js") {
 			});
 
 			const username = (checkResult === false) ? "[Banphrased username]," : checkResult;
-			let message = "reminders from: " + reply.join("; ");
+			let message = `reminders from: ${reply.join("; ")}`;
 
 			// Check banphrases and do not check length limits, because it is later split manually
 			message = await channelData.prepareMessage(message, {
@@ -484,7 +484,7 @@ module.exports = class Reminder extends require("./template.js") {
 		// Handle private reminders
 		if (privateReply.length !== 0) {
 			for (const privateReminder of privateReply) {
-				await channelData.Platform.pm("Private reminder: " + privateReminder, targetUserData);
+				await channelData.Platform.pm(`Private reminder: ${privateReminder}`, targetUserData);
 			}
 
 			const publicMessage = `Hey ${targetUserData.Name} - I just whispered you ${privateReply.length} private reminder(s) - make sure to check them out!`;

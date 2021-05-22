@@ -516,7 +516,7 @@ class Command extends require("./template.js") {
 		}
 
 		if (channelData?.Mode === "Inactive" || channelData?.Mode === "Read") {
-			return { success: false, reason: "channel-" + channelData.Mode.toLowerCase() };
+			return { success: false, reason: `channel-${channelData.Mode.toLowerCase()}` };
 		}
 
 		// Special parsing of privileged characters - they can be joined with other characters, and still be usable
@@ -920,11 +920,11 @@ class Command extends require("./template.js") {
 				channelData
 			);
 
-			execution.reply = string + ", " + execution.reply;
+			execution.reply = `${string}, ${execution.reply}`;
 		}
 
 		if (!options.partialExecute && execution.success !== false && execution.hasExternalInput && !execution.skipExternalPrefix) {
-			execution.reply = "👥 " + execution.reply;
+			execution.reply = `👥 ${execution.reply}`;
 		}
 
 		return execution;
@@ -1182,7 +1182,7 @@ class Command extends require("./template.js") {
 			: `\\${char}`
 		).join("");
 
-		return new RegExp("^" + body);
+		return new RegExp(`^${body}`);
 	}
 
 	static get prefix () {
