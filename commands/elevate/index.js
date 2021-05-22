@@ -9,18 +9,10 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		repositoryMap: {
-			"Backend": "supibot",
-			"Backend - bot": "supibot",
-			"Backend - modules": "supi-core",
-			"Chat module": "supibot-package-manager",
-			"Command - delete": "supibot-package-manager",
-			"Command - fix": "supibot-package-manager",
-			"Command - new": "supibot-package-manager",
-			"Command - refactor": "supibot-package-manager",
-			"SPM": "supibot-package-manager",
-			"Website": "supinic.com",
-			"Website - API": "supinic.com",
-			"Website - frontend": "supinic.com",
+			Backend: "supibot",
+			SPM: "supibot-package-manager",
+			"Supi-core": "supi-core",
+			Website: "supinic.com"
 		}
 	})),
 	Code: (async function elevate (context, ID) {
