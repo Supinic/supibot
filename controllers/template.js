@@ -2,19 +2,19 @@
 /**
  * @name {Controller}
 */
-const LINK_REGEX = /(https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&/=]*)/gi;
+const LINK_REGEX = /((http|https):\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&/=]*)/gi;
 module.exports = class Controller {
 	data = {
 		crons: []
 	};
 
-	initListeners () { }
+	initListeners () {}
 
-	async send (message, channel) { }
+	async send (message, channel) {}
 
-	async pm (message, user) { }
+	async pm (message, user) {}
 
-	async handleCommand () { }
+	async handleCommand () {}
 
 	resolveUserMessage (channelData, userData, message) {
 		if (!this.platform?.userMessagePromises) {
@@ -132,10 +132,8 @@ module.exports = class Controller {
 		// Execute all eligible banphrases, if necessary
 		if (!options.skipBanphrases && sb.Banphrase) {
 			const { passed, string } = await sb.Banphrase.execute(message, channelData);
-			if (!passed) {
-				if (options.returnBooleanOnFail) {
-					return passed;
-				}
+			if (!passed && options.returnBooleanOnFail) {
+				return passed;
 			}
 
 			message = string;
@@ -149,9 +147,9 @@ module.exports = class Controller {
 		return message;
 	}
 
-	restart () { }
+	restart () {}
 
-	destroy () { }
+	destroy () {}
 };
 
 /**

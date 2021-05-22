@@ -301,11 +301,9 @@ module.exports = class TwitchController extends require("./template.js") {
 			else if (messageObject.isTimeout()) {
 				this.handleBan(username, channelName, reason, messageObject.banDuration);
 			}
-			else if (messageObject.wasChatCleared()) {
-				if (this.platform.Logging.clearChats) {
-					const channelData = sb.Channel.get(channelName, this.platform);
-					sb.SystemLogger.send("Twitch.Clearchat", null, channelData);
-				}
+			else if (messageObject.wasChatCleared() && this.platform.Logging.clearChats) {
+				const channelData = sb.Channel.get(channelName, this.platform);
+				sb.SystemLogger.send("Twitch.Clearchat", null, channelData);
 			}
 		});
 	}
@@ -897,7 +895,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				args: { channel: channelData.Name }
 			});
 		}
-		
+
 		const { statusCode, body: data } = await sb.Got({
 			url: `https://api.betterttv.net/3/cached/users/twitch/${channelID}`,
 			responseType: "json",
