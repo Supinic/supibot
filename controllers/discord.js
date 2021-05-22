@@ -141,7 +141,7 @@ module.exports = class DiscordController extends require("./template.js") {
 					await channelData.saveProperty("Mode", channelData.Mode);
 				}
 
-				const channelDescription = guild.name + " - #" + messageObject.channel.name;
+				const channelDescription = `${guild.name} - #${messageObject.channel.name}`;
 				if (channelData.Description !== channelDescription) {
 					await channelData.saveProperty("Description", channelDescription);
 				}
@@ -264,7 +264,7 @@ module.exports = class DiscordController extends require("./template.js") {
 				if (emote) {
 					// This regex makes sure all emotes to be replaces are not preceded or followed by a ":" (colon) character
 					// All emotes on Discord are wrapped at least by colons
-					const regex = new RegExp("(?<!(:))\\b" + emote.name + "\\b(?!(:))", "g");
+					const regex = new RegExp(`(?<!(:))\\b${emote.name}\\b(?!(:))`, "g");
 					message = message.replace(regex, emote.toString());
 				}
 			}
@@ -272,8 +272,8 @@ module.exports = class DiscordController extends require("./template.js") {
 			const mentionedUsers = await DiscordController.getMentionsInMessage(message);
 			for (const user of mentionedUsers) {
 				if (user.Discord_ID) {
-					const regex = new RegExp("@" + user.Name, "gi");
-					message = message.replace(regex, "<@" + user.Discord_ID + ">");
+					const regex = new RegExp(`@${user.Name}`, "gi");
+					message = message.replace(regex, `<@${user.Discord_ID}>`);
 				}
 			}
 		}
@@ -364,7 +364,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			if (match) {
 				const user = messageObject.mentions.users.get(match[1]);
 				if (user) {
-					args[i] = "@" + user.username;
+					args[i] = `@${user.username}`;
 				}
 			}
 		}
@@ -372,7 +372,7 @@ module.exports = class DiscordController extends require("./template.js") {
 		let index = 0;
 		let targetMessage = messageObject.cleanContent.replace(/\n/g, " ");
 		while (targetMessage.length < this.platform.Message_Limit && index < links.length) {
-			targetMessage += " " + links[index];
+			targetMessage += ` ${links[index]}`;
 			index++;
 		}
 
@@ -440,7 +440,7 @@ module.exports = class DiscordController extends require("./template.js") {
 	}
 
 	static removeEmoteTags (message) {
-		return message.replace(/<a?:(.*?):(\d*)>/g, (total, emote) => emote + " ").trim();
+		return message.replace(/<a?:(.*?):(\d*)>/g, (total, emote) => `${emote} `).trim();
 	}
 
 	static async createAccountChallenge (userData, discordID) {

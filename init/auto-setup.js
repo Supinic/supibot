@@ -21,7 +21,7 @@
 		const { exec } = require("child_process");
 		const shell = util.promisify(exec);
 
-		await shell(packageManager + " run init-database");
+		await shell(`${packageManager} run init-database`);
 	}
 	catch (e) {
 		console.error("Database structure setup failed, aborting...", e.message);

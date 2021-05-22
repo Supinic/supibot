@@ -76,7 +76,7 @@
 
 	console.log("Setting up database structure...");
 	try {
-		await shell(packageManager + " run init-database");
+		await shell(`${packageManager} run init-database`);
 	}
 	catch (e) {
 		console.error("Database structure setup failed, aborting...", e);
@@ -108,7 +108,7 @@
 		cytube: { auth: "CYTUBE_BOT_PASSWORD", ID: 3 }
 	};
 
-	const prettyList = Object.keys(platformList).join(", ") + ", or keep line empty to finish";
+	const prettyList = `${Object.keys(platformList).join(", ")}, or keep line empty to finish`;
 	let platform = null;
 	let done = false;
 	let automatic = false;

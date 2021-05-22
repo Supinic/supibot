@@ -134,7 +134,7 @@ module.exports = class TwitchController extends require("./template.js") {
 								since: new sb.Date(stream.created_at),
 								status: stream.channel.status,
 								viewers: stream.viewers,
-								quality: stream.video_height + "p",
+								quality: `${stream.video_height}p`,
 								fps: stream.average_fps,
 								delay: stream.delay
 							};
@@ -354,11 +354,11 @@ module.exports = class TwitchController extends require("./template.js") {
 		if (this.evasion[channelName] === message) {
 			const { sameMessageEvasionCharacter: char } = this.platform.Data;
 			if (message.includes(char)) {
-				const regex = new RegExp(char + "$");
+				const regex = new RegExp(`${char}$`);
 				message = message.replace(regex, "");
 			}
 			else {
-				message += " " + char;
+				message += ` ${char}`;
 			}
 		}
 
@@ -435,7 +435,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			channelData = sb.Channel.get(channelName, this.platform);
 
 			if (!channelData) {
-				console.error("Cannot find channel " + channelName);
+				console.error(`Cannot find channel ${channelName}`);
 				return;
 			}
 
@@ -483,7 +483,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 		else {
 			if (this.platform.Logging.whispers) {
-				sb.SystemLogger.send("Twitch.Other", "whisper: " + message, null, userData);
+				sb.SystemLogger.send("Twitch.Other", `whisper: ${message}`, null, userData);
 			}
 
 			this.resolveUserMessage(null, userData, message);
@@ -516,7 +516,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 
 		if (this.platform.Logging.bits && typeof bits !== "undefined" && bits !== null) {
-			sb.SystemLogger.send("Twitch.Other", bits + " bits", channelData, userData);
+			sb.SystemLogger.send("Twitch.Other", `${bits} bits`, channelData, userData);
 		}
 
 		if (!sb.Command.prefix) {
@@ -571,7 +571,7 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
 			const message = await this.prepareMessage(execution.reply, null, {
-				extraLength: ("/w " + userData.Name + " ").length,
+				extraLength: (`/w ${userData.Name} `).length,
 				skipBanphrases: true
 			});
 
@@ -765,7 +765,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				const userData = await sb.User.get(senderUsername, false);
 				const channelData = sb.Channel.get(channelName, this.platform);
 
-				sb.SystemLogger.send("Twitch.Ritual", messageObject.systemMessage + " " + messageText, channelData, userData);
+				sb.SystemLogger.send("Twitch.Ritual", `${messageObject.systemMessage} ${messageText}`, channelData, userData);
 			}
 		}
 		else {
@@ -899,7 +899,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 		
 		const { statusCode, body: data } = await sb.Got({
-			url: "https://api.betterttv.net/3/cached/users/twitch/" + channelID,
+			url: `https://api.betterttv.net/3/cached/users/twitch/${channelID}`,
 			responseType: "json",
 			throwHttpErrors: false
 		});
@@ -930,7 +930,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 */
 	static async fetchChannelFFZEmotes (channelData) {
 		const { statusCode, body: data } = await sb.Got({
-			url: "https://api.frankerfacez.com/v1/room/" + channelData.Name,
+			url: `https://api.frankerfacez.com/v1/room/${channelData.Name}`,
 			responseType: "json",
 			throwHttpErrors: false
 		});

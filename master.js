@@ -19,10 +19,10 @@
 	for (const platform of initialPlatforms) {
 		let Controller = null;
 		try {
-			Controller = require("./controllers/" + platform);
+			Controller = require(`./controllers/${platform}`);
 		}
 		catch (e) {
-			console.error("Require of " + platform + " controller module failed", e);
+			console.error(`Require of ${platform} controller module failed`, e);
 			continue;
 		}
 
@@ -30,7 +30,7 @@
 			controllers[platform] = new Controller();
 		}
 		catch (e) {
-			console.error("Initialization of " + platform + " controller module failed", e);
+			console.error(`Initialization of ${platform} controller module failed`, e);
 			continue;
 		}
 

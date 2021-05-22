@@ -140,7 +140,7 @@
         }],
         "prefer-numeric-literals": "warn",
         "prefer-rest-params": "error",
-        "prefer-template": "off", // @todo rethink this
+        "prefer-template": "warn",
         "rest-spread-spacing": ["warn", "never"],
         "symbol-description": "off",
         "template-curly-spacing": ["warn", "never"]

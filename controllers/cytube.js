@@ -165,7 +165,7 @@ class CytubeClient {
 				this.controller.resolveUserMessage(null, userData, msg);
 
 				if (this.controller.platform.Logging.whispers) {
-					sb.SystemLogger.send("Cytube.Other", "PM: " + msg, this.channelData, userData);
+					sb.SystemLogger.send("Cytube.Other", `PM: ${msg}`, this.channelData, userData);
 				}
 			}
 
@@ -339,7 +339,7 @@ class CytubeClient {
 	 */
 	async send (message) {
 		const messageLimit = this.controller.platform.Message_Limit;
-		const lengthRegex = new RegExp(".{1," + messageLimit + "}", "g");
+		const lengthRegex = new RegExp(`.{1,${messageLimit}}`, "g");
 		let arr = message
 			.replace(/(\r?\n)/g, " ")
 			.replace(/\s{2,}/g, " ")
@@ -347,7 +347,7 @@ class CytubeClient {
 
 		if (arr.length > 3) {
 			arr = arr.slice(0, 3);
-			arr[2] = arr[2].slice(0, messageLimit - 3) + "...";
+			arr[2] = `${arr[2].slice(0, messageLimit - 3)}...`;
 		}
 
 		let index = 0;

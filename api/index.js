@@ -15,7 +15,7 @@ module.exports = (function () {
 		["user", "user.js"]
 	];
 	for (const [route, file] of subroutes) {
-		definition[route] = require("./" + file);
+		definition[route] = require(`./${file}`);
 	}
 
 	const server = httpInterface.createServer(async (req, res) => {
@@ -41,7 +41,7 @@ module.exports = (function () {
 			return;
 		}
 		else if (typeof target !== "function") {
-			throw new Error("Internal API error - invalid definition for path " + path.join("/"));
+			throw new Error(`Internal API error - invalid definition for path ${path.join("/")}`);
 		}
 
 		const { error = null, data = null, headers = {}, statusCode = 200 } = await target(req, res, url);
