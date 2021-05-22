@@ -338,7 +338,9 @@ module.exports = {
 	
 					const endpoint = sb.Utils.randArray(source.endpoints);
 					const url = [source.url, source.path, endpoint].filter(Boolean).join("/");
-					const feed = await sb.Utils.parseRSS(url);
+
+					const xml = await sb.Got(url).text();
+					const feed = await sb.Utils.parseRSS(xml);
 	
 					articles = feed.items.map(i => ({
 						title: i.title,
@@ -384,7 +386,7 @@ module.exports = {
 				console.warn(e);
 				return {
 					success: false,
-					reply: `Could not fetch any articles due to a source website error!`
+					reply: `Could not fetch any articles due to website error!`
 				};
 			}
 	
