@@ -53,7 +53,10 @@
 			const result = await ask(`Set up database ${name} - type a new value (or nothing to ${name === "port" ? "use 3306" : "keep empty"})\n`);
 
 			if (!result) {
-				accessFileString = accessFileString.replace(implicit, "");
+				let value = name == "port"
+					? "3306"
+					: ""
+				accessFileString = accessFileString.replace(implicit, value);
 				await fs.writeFile(accessFile, accessFileString);
 				console.log(`Variable for ${name} is now empty.`);
 			}
