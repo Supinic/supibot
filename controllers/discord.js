@@ -192,7 +192,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			// Starts with correct prefix - handle command
 			if (sb.Command.is(msg)) {
 				const commandPrefix = sb.Command.prefix;
-				const [command] = msg.replace(commandPrefix, "").split(" ").filter(Boolean);
+				const command = msg.replace(commandPrefix, "").split(" ").find(Boolean);
 				const args = (commandArguments[0] === commandPrefix)
 					? commandArguments.slice(2)
 					: commandArguments.slice(1);
@@ -472,13 +472,14 @@ module.exports = class DiscordController extends require("./template.js") {
 				.flatMap(i => {
 					const names = [];
 					let name = "";
-					i.split("_").forEach(i => {
+
+					for (const item of i.split("_")) {
 						if (name) {
 							name += "_";
 						}
-						name += i;
+						name += item;
 						names.push(name);
-					});
+					}
 
 					return names;
 				})
