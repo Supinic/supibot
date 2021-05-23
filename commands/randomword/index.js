@@ -17,7 +17,7 @@ module.exports = {
 		}
 	
 		return {
-			reply: [...Array(repeats)].map(() => sb.Utils.randArray(sb.Config.get("WORD_LIST"))).join(" ")
+			reply: [...new Array(repeats)].map(() => sb.Utils.randArray(sb.Config.get("WORD_LIST"))).join(" ")
 		};
 	}),
 	Dynamic_Description: (async (prefix, values) => {

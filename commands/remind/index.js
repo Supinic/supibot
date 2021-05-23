@@ -125,7 +125,7 @@ module.exports = {
 				for (let i = 0; i < timeData.ranges.length; i++) {
 					// If the preceding text doesn't contain the word "in" right before the time range, skip it.
 					const precedingText = reminderText.slice(0, timeData.ranges[i].start);
-					if (!continues && !precedingText.match(/\bin\b\s*$/)) {
+					if (!continues && !/\bin\b\s*$/.test(precedingText)) {
 						continue;
 					}
 	

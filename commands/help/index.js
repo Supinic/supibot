@@ -39,24 +39,24 @@ module.exports = {
 			const identifier = (sb.Command.is(commandString))
 				? commandString.replace(sb.Command.prefix)
 				: commandString;
-	
+
 			if (identifier.toLowerCase() === "me") {
 				return {
 					reply: "I can't directly help you, but maybe if you use one of my commands, you'll feel better? :)"
 				};
 			}
-	
+
 			const command = sb.Command.get(identifier);
 			if (!command) {
 				return {
 					reply: "That command does not exist!"
 				};
 			}
-	
+
 			const filteredResponse = (command.Flags.whitelist) ? "(whitelisted)" : "";
 			const aliases = (command.Aliases.length === 0) ? "" : (` (${command.Aliases.map(i => prefix + i).join(", ")})`);
 
-			const cooldownString = `${sb.Utils.round(command.Cooldown / 1_000, 1)} seconds cooldown.`;
+			const cooldownString = `${sb.Utils.round(command.Cooldown / 1000, 1)} seconds cooldown.`;
 			const cooldownModifier = sb.Filter.getCooldownModifiers({
 				command,
 				invocation: context.invocation,

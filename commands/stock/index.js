@@ -51,7 +51,7 @@ module.exports = {
 
 		// If the input is a single argument consisting of capital characters only, we can (somewhat) safely assume
 		// that it's a stock symbol and not a name.
-		const symbol = (args.length === 1 && args[0].match(/^[A-Z]+$/))
+		const symbol = (args.length === 1 && /^[A-Z]+$/.test(args[0]))
 			? args[0]
 			: findSymbol(input) ?? args[0];
 

@@ -39,7 +39,7 @@ module.exports = {
 		const memoryData = (memoryResult.value)
 			? String(memoryResult.value).split("\n").filter(Boolean)
 				.map(i => Number(i.split(/:\s+/)[1].replace(/kB/, "")) * 1000)
-			: [...Array(3)].fill(0);
+			: [...new Array(3)].fill(0);
 
 		const pong = `P${chars[context.invocation[1]]}ng!`;
 

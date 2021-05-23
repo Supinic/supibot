@@ -22,8 +22,7 @@ module.exports = {
 	
 		const result = [];
 		for (const messageWord of args) {
-			result.push(word);
-			result.push(messageWord);
+			result.push(word, messageWord);
 		}
 	
 		result.push(word);
