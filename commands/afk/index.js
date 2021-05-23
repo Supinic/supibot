@@ -32,7 +32,7 @@ module.exports = {
 			{
 				name: "afk",
 				status: "now AFK",
-				text: (context, text) => text ?? "(no message)"
+				text: (context, text) => text || "(no message)"
 			},
 			{
 				name: "gn",
@@ -42,7 +42,7 @@ module.exports = {
 			{
 				name: "brb",
 				status: "going to be right back",
-				text: async (context, text) => text ?? await context.getBestAvailableEmote(["ppHop", "ppSlide"], "⌛")
+				text: async (context, text) => text || await context.getBestAvailableEmote(["ppHop", "ppSlide"], "⌛")
 			},
 			{
 				name: "shower",
