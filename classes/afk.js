@@ -49,7 +49,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			message: "Module AwayFromKeyboard cannot be serialized"
 		});
 	}
-	
+
 	static async loadData () {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("*")
@@ -60,6 +60,11 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		AwayFromKeyboard.data = data.map(record => new AwayFromKeyboard(record));
 	}
 
+	/**
+	 * @override
+	 * @param {number[]} list
+	 * @returns {Promise<boolean>}
+	 */
 	static async reloadSpecific (...list) {
 		if (list.length === 0) {
 			return false;
@@ -91,8 +96,8 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 	 * Checks if an user is AFK.
 	 * If they are, returns their AFK data and unsets the AFK status.
 	 * If the status is set as not silent, also emits an event to Master to send a message
-	 * @param {User} userData
-	 * @param {Channel} channelData
+	 * @param {sb.User} userData
+	 * @param {sb.Channel} channelData
 	 * @returns {Promise<void>}
 	 */
 	static async checkActive (userData, channelData) {
@@ -139,8 +144,8 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 	}
 
 	/**
-	 * Sets a user's AFK status.
-	 * @param {User} userData
+	 * Sets (and creates a database row) a user's AFK status.
+	 * @param {sb.User} userData
 	 * @param {string} text
 	 * @param {string} status
 	 * @param {boolean} [silent] If true, user coming back will not be broadcast.

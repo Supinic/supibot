@@ -24,6 +24,7 @@ module.exports = (function () {
 				timeout: sb.Config.get("PAJBOT_API_TIMEOUT")
 			};
 
+			/** @type {PajbotBanphraseAPIResponse} */
 			const data = await sb.Got(options).json();
 			data[apiResultSymbol] = Boolean(data.banned ? data.banphrase_data.phrase : false);
 			data[apiDataSymbol] = data.banphrase_data;
@@ -64,15 +65,15 @@ module.exports = (function () {
 		Type;
 
 		/**
-		 * Platform of banphrase.
-		 * @type {number|null}
+		 * Platform of the banphrase.
+		 * @type {sb.Channel#ID|null}
 		 */
 		Platform = null;
 
 		/**
-		 * Channel of banphrase.
-		 * If null, then the banphrase applies to the entire {@link module.Platform}.
-		 * @type {number|null}
+		 * Channel of the banphrase.
+		 * If null, then the banphrase applies to the entire {@link sb.Platform}.
+		 * @type {sb.Platform#ID|null}
 		 */
 		Channel = null;
 
@@ -137,6 +138,10 @@ module.exports = (function () {
 			this.data = null;
 		}
 
+		/**
+		 * Toggles the banphrase's activity flag.
+		 * @returns {Promise<void>}
+		 */
 		async toggle () {
 			this.Active = !this.Active;
 			if (typeof this.ID === "number") {
@@ -147,7 +152,7 @@ module.exports = (function () {
 				);
 			}
 		}
-		
+
 		async serialize () {
 			throw new sb.Error({
 				message: "Module Banphrase cannot be serialized"
@@ -165,6 +170,11 @@ module.exports = (function () {
 			Banphrase.data = data.map(record => new Banphrase(record));
 		}
 
+		/**
+		 * @override
+		 * @param {number[]} list
+		 * @returns {Promise<boolean>}
+		 */
 		static async reloadSpecific (...list) {
 			if (list.length === 0) {
 				return false;
@@ -192,6 +202,12 @@ module.exports = (function () {
 			return true;
 		}
 
+		/**
+		 * Fetches a banphrase, based on the identifier provided.
+		 * @param {number|symbol|sb.Banphrase} identifier
+		 * @returns {sb.Banphrase|null}
+		 * @throws {sb.Error} If invalid identifier type was provided
+		 */
 		static get (identifier) {
 			if (identifier instanceof Banphrase) {
 				return identifier;
@@ -215,7 +231,7 @@ module.exports = (function () {
 		 * Checks all banphrases associated with given channel and platform. Global ones are checked as well.
 		 * If a channel is configured to use an external API, that is chcked too.
 		 * @param {string} message
-		 * @param {Channel|null} channelData
+		 * @param {sb.Channel|null} channelData
 		 * @param {Object} options = {}
 		 * @returns {Promise<BanphraseCheckResult>}
 		 */
@@ -349,7 +365,7 @@ module.exports = (function () {
 		/**
 		 * Checks an external banphrase API.
 		 * @param {string} message
-		 * @param {("Pajbot")} type Type of banphrase API - required to build request URL and data parsing
+		 * @param {ExternalBanphraseAPIName} type Type of banphrase API - required to build request URL and data parsing
 		 * @param {string} URL Banphrase API URL
 		 * @param {Object} options = {} extra options
 		 * @param {boolean} [options.fullResponse] If true, returns the entire API response. Otherwise, returns
@@ -369,6 +385,26 @@ module.exports = (function () {
 		}
 	};
 })();
+
+/**
+ * @typedef {"Pajbot"} ExternalBanphraseAPIName
+ */
+
+/**
+ * @typedef {Object} PajbotBanphraseAPIResponse
+ * @property {boolean} banned
+ * @property {string} input_message
+ * @property {Object} banphrase_data
+ * @property {boolean} banphrase_data.case_sensitive
+ * @property {number} banphrase_data.id
+ * @property {number} banphrase_data.length
+ * @property {string} banphrase_data.name
+ * @property {string} banphrase_data.operator
+ * @property {boolean} banphrase_data.permanent
+ * @property {string} banphrase_data.phrase
+ * @property {boolean} banphrase_data.remove_accents
+ * @property {boolean} banphrase_data.sub_immunity
+ */
 
 /**
  * @typedef {Object} BanphraseCheckResult

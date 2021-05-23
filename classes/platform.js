@@ -1,5 +1,6 @@
 /**
- * Represents a user's AFK status
+ * Represents a platform - a location where the bot can be active and respond to messages.
+ * It is an API to manage communication between channels and the platform controller.
  * @memberof sb
  */
 module.exports = class Platform extends require("./template.js") {
@@ -8,39 +9,34 @@ module.exports = class Platform extends require("./template.js") {
 	 * @type {Controller}
 	 */
 	#controller = null;
+
+	/** @type {Map<sb.Channel, Map<sb.User, UserMessageResolutionWrapper>>} */
 	#userMessagePromises = new Map();
 
-	/**
-	 * @param {Object} data
-	 * @param {number} data.User_Alias
-	 * @param {sb.Date} data.Started
-	 * @param {string} data.Text
-	 * @param {boolean} data.Silent
-	 */
 	constructor (data) {
 		super();
 
 		/**
 		 * Unique numeric platform identifier.
-		 * @type {User.ID}
+		 * @type {number}
 		 */
 		this.ID = data.ID;
 
 		/**
-		 * Unique platform name.
+		 * Unique platform name. Always lowercased.
 		 * @type {string}
 		 */
 		this.Name = data.Name.toLowerCase();
 
 		/**
-		 * Fallback message limit.
+		 * Fallback message limit. Must be included.
 		 * @type {number}
 		 */
 		this.Message_Limit = data.Message_Limit;
 
 		/**
-		 * Name of the bot's account in given platform.
-		 * @type {string}
+		 * Name of the bot's account in the given platform. Always lowercased.
+		 * @type {string|null}
 		 */
 		this.Self_Name = (data.Self_Name === null)
 			? null
@@ -120,8 +116,8 @@ module.exports = class Platform extends require("./template.js") {
 
 	/**
 	 * Determines if a user is an "owner" of a given channel in the platform.
-	 * @param {Channel} channelData
-	 * @param {User} userData
+	 * @param {sb.Channel} channelData
+	 * @param {sb.User} userData
 	 * @returns {null|boolean}
 	 */
 	isUserChannelOwner (channelData, userData) {
@@ -134,7 +130,7 @@ module.exports = class Platform extends require("./template.js") {
 
 	/**
 	 * Sends a message into a given channel.
-	 * @param message
+	 * @param {string} message
 	 * @param channel
 	 * @returns {Promise<void>}
 	 */
@@ -146,7 +142,7 @@ module.exports = class Platform extends require("./template.js") {
 	 * Sends a private message to a given user.
 	 * @param {string} message
 	 * @param {string} user
-	 * @param {Channel} [channelData]
+	 * @param {sb.Channel} [channelData]
 	 * @returns {Promise<void>}
 	 */
 	pm (message, user, channelData) {
@@ -157,6 +153,16 @@ module.exports = class Platform extends require("./template.js") {
 		this.#controller = null;
 	}
 
+	/**
+	 * For a given combination of channel and user, creates and returns a promise that will be resolved when the
+	 * provided user sends a message in the provided channel. The promise will be rejected if the user does not post
+	 * a message within a timeout specified in options.
+	 * @param {sb.Channel} channelData
+	 * @param {sb.User} userData
+	 * @param {Object} options
+	 * @param {number} [options.timeout] Default: 10 seconds
+	 * @returns {sb.Promise<UserMessageResolution>}
+	 */
 	waitForUserMessage (channelData, userData, options = {}) {
 		const delay = options.timeout ?? 10_000;
 		const promise = new sb.Promise();
@@ -187,15 +193,25 @@ module.exports = class Platform extends require("./template.js") {
 		});
 	}
 
-	async fetchChannelUserList (channelIdentifier) {
-		const cacheData = await this.getCacheData({ channel: channelIdentifier });
+	/**
+	 * For a provided channel, fetches its current list using the platform's controller.
+	 * @param {sb.Channel} channelData
+	 * @returns {Promise<string[]>}
+	 */
+	async fetchChannelUserList (channelData) {
+		const key = {
+			type: "channel-user-list",
+			ID: channelData.ID
+		};
+
+		const cacheData = await this.getCacheData(key);
 		if (cacheData) {
 			return cacheData;
 		}
 
-		const userList = await this.controller.fetchUserList(channelIdentifier);
+		const userList = await this.controller.fetchUserList(channelData.Name);
 		await this.setCacheData(
-			{ channel: channelIdentifier },
+			key,
 			userList,
 			{ expiry: 5 * 60e3 } // 5min
 		);
@@ -296,15 +312,22 @@ module.exports = class Platform extends require("./template.js") {
 		}
 	}
 
+	/**
+	 * Returns a platform object for a specified identifier.
+	 * Returns `null` if no platform can be found.
+	 * @param {string|number|sb.Platform} identifier
+	 * @returns {sb.Platform|null}
+	 * @throws {sb.Error} If identifier type is not recognized
+	 */
 	static get (identifier) {
 		if (identifier instanceof Platform) {
 			return identifier;
 		}
 		else if (typeof identifier === "number") {
-			return Platform.data.find(i => i.ID === identifier);
+			return Platform.data.find(i => i.ID === identifier) ?? null;
 		}
 		else if (typeof identifier === "string") {
-			return Platform.data.find(i => i.Name === identifier);
+			return Platform.data.find(i => i.Name === identifier) ?? null;
 		}
 		else {
 			throw new sb.Error({
@@ -325,3 +348,19 @@ module.exports = class Platform extends require("./template.js") {
 		super.destroy();
 	}
 };
+
+
+/**
+ * @typedef {string|number|sb.Platform} PlatformLike
+ */
+
+/**
+ * @typedef {Object} UserMessageResolutionWrapper
+ * @property {number} timeout
+ * @property {sb.Promise<UserMessageResolution>} promise
+ */
+
+/**
+ * @typedef {Object} UserMessageResolution
+ * @property {string} message
+ */

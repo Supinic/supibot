@@ -1,8 +1,7 @@
 /**
  * Sandbox module, created with the aim of running custom user input as safely as possible.
- * @memberof sb
  */
-module.exports = class Sandbox extends require("./template.js") {
+module.exports = class SandboxSingleton extends require("./template.js") {
 	#VM;
 	#NodeVM;
 	#defaultVMOptions = {
@@ -14,20 +13,24 @@ module.exports = class Sandbox extends require("./template.js") {
 		timeout: 5000
 	};
 
+	/**
+	 * @inheritDoc
+	 * @returns {SandboxSingleton}
+	 */
 	static singleton () {
-		if (!Sandbox.module) {
+		if (!SandboxSingleton.module) {
 			let sandboxModule;
 			try {
 				sandboxModule = require("vm2");
-				Sandbox.module = new Sandbox(sandboxModule);
+				SandboxSingleton.module = new SandboxSingleton(sandboxModule);
 			}
 			catch {
 				console.warn("Could not load the vm2 module for sb.Sandbox - skipping");
-				Sandbox.module = {};
+				SandboxSingleton.module = {};
 			}
 		}
 
-		return Sandbox.module;
+		return SandboxSingleton.module;
 	}
 
 	constructor (sandboxModule) {

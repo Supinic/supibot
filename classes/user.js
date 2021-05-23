@@ -253,8 +253,8 @@ module.exports = class User extends require("./template.js") {
 	 * Fetches a batch of users together.
 	 * Takes existing records from cache, the rest is pulled from dataase.
 	 * Does not support creating new records like `get()` does.
-	 * @param {Array<User|string|number>} identifiers
-	 * @returns {Promise<User[]>}
+	 * @param {Array<sb.User|string|number>} identifiers
+	 * @returns {Promise<sb.User[]>}
 	 */
 	static async getMultiple (identifiers) {
 		const result = [];
@@ -324,9 +324,10 @@ module.exports = class User extends require("./template.js") {
 	/**
 	 * Synchronously fetches a user based on their numeric ID.
 	 * No other types of ID are supported.
+	 * @deprecated
 	 * @param {string} property
 	 * @param {number} identifier
-	 * @returns {User|void}
+	 * @returns {sb.User|void}
 	 */
 	static getByProperty (property, identifier) {
 		const iterator = User.data.values();
@@ -353,7 +354,7 @@ module.exports = class User extends require("./template.js") {
 	/**
 	 * Adds a new user to the database.
 	 * @param {string} name
-	 * @returns {Promise<User>}
+	 * @returns {Promise<sb.User>}
 	 */
 	static async add (name) {
 		const preparedName = User.normalizeUsername(name);

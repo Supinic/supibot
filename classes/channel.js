@@ -6,7 +6,6 @@
 module.exports = class Channel extends require("./template.js") {
 	static redisPrefix = "sb-channel";
 
-	/** @alias {Channel} */
 	constructor (data) {
 		super();
 
@@ -17,14 +16,14 @@ module.exports = class Channel extends require("./template.js") {
 		this.ID = data.ID;
 
 		/**
-		 * Channel name. Must be unique when combined with {@link Channel.Platform}.
+		 * Channel name. Must be unique in the scope of its {@link Channel.Platform}.
 		 * @type {string}
 		 */
 		this.Name = data.Name;
 
 		/**
-		 * Platform name. Must be unique when combined with {@link Channel.Name}.
-		 * @type {Platform}
+		 * Platform object the channel belongs to.
+		 * @type {sb.Platform}
 		 */
 		this.Platform = sb.Platform.get(data.Platform);
 
@@ -99,7 +98,7 @@ module.exports = class Channel extends require("./template.js") {
 		/**
 		 * If not null, every message sent to this channel will also be mirrored to the channel with this ID.
 		 * Only 1-to-1 or one-way mirroring is supported.
-		 * @type {Channel.ID|null}
+		 * @type {sb.Channel.ID|null}
 		 */
 		this.Mirror = data.Mirror;
 
@@ -222,7 +221,7 @@ module.exports = class Channel extends require("./template.js") {
 
 	/**
 	 * Determines if a user is the owner of the channel the instances represents.
-	 * @param {User} userData
+	 * @param {sb.User} userData
 	 * @returns {Promise<null|boolean>}
 	 */
 	isUserChannelOwner (userData) {
@@ -231,7 +230,7 @@ module.exports = class Channel extends require("./template.js") {
 
 	/**
 	 * Checks if a provided user is an ambassador of the channel instance
-	 * @param {User} userData
+	 * @param {sb.User} userData
 	 * @returns {boolean}
 	 */
 	isUserAmbassador (userData) {
@@ -247,15 +246,29 @@ module.exports = class Channel extends require("./template.js") {
 		return this.Platform.send(message, this);
 	}
 
+	/**
+	 * Returns the channel's stream-related data.
+	 * @returns {Promise<Object>}
+	 */
 	async getStreamData () {
 		const streamData = await this.getCacheData("stream-data");
 		return streamData ?? {};
 	}
 
+	/**
+	 * Sets the channel's stream-related data.
+	 * @param {object} data
+	 * @returns {Promise<any>}
+	 */
 	async setStreamData (data) {
 		return await this.setCacheData("stream-data", data, { expiry: 3_600_000 });
 	}
 
+	/**
+	 * Toggles a provided user's ambassador status in the current channel instance.
+	 * @param {sb.User} userData
+	 * @returns {Promise<void>}
+	 */
 	async toggleAmbassador (userData) {
 		this.Data.ambassadors = this.Data.ambassadors ?? [];
 
@@ -286,7 +299,7 @@ module.exports = class Channel extends require("./template.js") {
 	/**
 	 * Mirrors the message to the given mirror channel, if this instance has been configured to do so.
 	 * @param {string} message
-	 * @param {User} userData
+	 * @param {sb.User} userData
 	 * @param {boolean} commandUsed = false
 	 * @returns {Promise<void>}
 	 */
@@ -312,8 +325,12 @@ module.exports = class Channel extends require("./template.js") {
 		});
 	}
 
+	/**
+	 * Returns the current user list of the channel instance.
+	 * @returns {Promise<string[]>}
+	 */
 	async fetchUserList () {
-		return await this.Platform.fetchChannelUserList(this.Name);
+		return await this.Platform.fetchChannelUserList(this);
 	}
 
 	async fetchEmotes () {
@@ -404,9 +421,9 @@ module.exports = class Channel extends require("./template.js") {
 
 	/**
 	 * Returns a Channel object, based on the identifier provided, and a optional platform parameter
-	 * @param {Channel|number|string} identifier
-	 * @param {Platform|number|string} [platform]
-	 * @returns {Channel|null}
+	 * @param {ChannelLike} identifier
+	 * @param {PlatformLike} [platform]
+	 * @returns {sb.Channel|null}
 	 * @throws {sb.Error} If identifier type is not recognized
 	 */
 	static get (identifier, platform) {
@@ -443,8 +460,8 @@ module.exports = class Channel extends require("./template.js") {
 
 	/**
 	 * Fetches a list of joinable channels for a given platform.
-	 * @param {PlatformIdentifier} platform
-	 * @returns {Channel[]}
+	 * @param {PlatformLike} platform
+	 * @returns {sb.Channel[]}
 	 */
 	static getJoinableForPlatform (platform) {
 		const platformData = sb.Platform.get(platform);
@@ -456,7 +473,7 @@ module.exports = class Channel extends require("./template.js") {
 	/**
 	 * Creates a new channel and pushes its definition to the database
 	 * @param {string} name
-	 * @param {Platform} platformData
+	 * @param {sb.Platform} platformData
 	 * @param {string} mode
 	 * @param {string} [specificID]
 	 * @returns {Promise<Channel>}
@@ -485,6 +502,10 @@ module.exports = class Channel extends require("./template.js") {
 		return channelData;
 	}
 
+	/**
+	 * @param {ChannelLike[]} list
+	 * @returns {Promise<boolean>}
+	 */
 	static async reloadSpecific (...list) {
 		const channelsData = list.map(i => Channel.get(i)).filter(Boolean);
 		if (channelsData.length === 0) {
@@ -523,5 +544,5 @@ module.exports = class Channel extends require("./template.js") {
 };
 
 /**
- * @typedef {'Twitch'|'Cytube'|'Discord'|'Minecraft'} PlatformIdentifier
+ * @typedef {string|number|sb.Channel} ChannelLike
  */
