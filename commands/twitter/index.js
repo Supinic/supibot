@@ -47,10 +47,11 @@ module.exports = {
 			});
 		}
 
-		const response = await sb.Got({
+		const response = await sb.Got("GenericAPI", {
 			method: "GET",
 			url: "https://api.twitter.com/1.1/statuses/user_timeline.json",
 			responseType: "json",
+			throwHttpErrors: false,
 			headers: {
 				Authorization: `Bearer ${bearerToken}`
 			},
