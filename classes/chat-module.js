@@ -216,7 +216,7 @@ module.exports = class ChatModule extends require("./template.js") {
 			sb.Query.isTablePresent("chat_data", "Channel_Chat_Module")
 		]);
 
-		if (presentTables.some(i => i === false)) {
+		if (presentTables.includes(false)) {
 			console.warn("Cannot load Chat_Module", {
 				reason: "missing-tables",
 				tables: ["Chat_Module", "Channel_Chat_Module"].filter((i, ind) => !presentTables[ind])
@@ -247,7 +247,7 @@ module.exports = class ChatModule extends require("./template.js") {
 
 		const existingModules = list.map(i => ChatModule.get(i)).filter(Boolean);
 		for (const chatModule of existingModules) {
-			const index = ChatModule.data.findIndex(i => i === chatModule);
+			const index = ChatModule.data.indexOf(chatModule);
 
 			chatModule.destroy();
 
