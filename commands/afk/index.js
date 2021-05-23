@@ -86,7 +86,7 @@ module.exports = {
 						}
 					}
 
-					const emote = await context.getBestAvailableEmoji(["OpieOP"], "😋");
+					const emote = await context.getBestAvailableEmote(["OpieOP"], "😋");
 					const appendText = (useAutoEmoji)
 						? sb.Utils.randArray(this.staticData.foodEmojis)
 						: "";
