@@ -38,6 +38,10 @@ module.exports = {
 				names: ["cron", "crons"]
 			},
 			{
+				target: "Filter",
+				names: ["filter", "filters"]
+			},
+			{
 				target: "Got",
 				names: ["got"]
 			},
