@@ -52,6 +52,7 @@ module.exports = {
 			{
 				name: "poop",
 				aliases: ["💩"],
+				type: "poop",
 				status: "now pooping",
 				text: async (context, text) => (text) ? `${text} 🚽` : await context.getBestAvailableEmote(["peepoPooPoo"], "💩")
 			},
@@ -104,11 +105,11 @@ module.exports = {
 		}
 
 		const { invocation } = context;
-		const type = this.staticData.invocations.find(i => i.name === invocation || i.aliases?.includes(invocation));
-		const status = type.status;
-		const text = await type.text(context, args.join(" ").trim());
+		const target = this.staticData.invocations.find(i => i.name === invocation || i.aliases?.includes(invocation));
 
-		await sb.AwayFromKeyboard.set(context.user, text, context.invocation, false);
+		const text = await target.text(context, args.join(" ").trim());
+		await sb.AwayFromKeyboard.set(context.user, text, target.type ?? invocation, false);
+
 		return {
 			partialReplies: [
 				{
@@ -117,7 +118,7 @@ module.exports = {
 				},
 				{
 					bancheck: false,
-					message: `is ${status}: `
+					message: `is ${target.status}: `
 				},
 				{
 					bancheck: true,
