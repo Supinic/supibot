@@ -3,7 +3,8 @@ module.exports = {
 	Events: ["raid"],
 	Description: "According to arguments, reacts to a Twitch channel being raided.",
 	Code: (async function chatModuleRaidReact (context, definition) {
-		if (context.platform.Name !== "twitch") {
+		const { channel, platform, user } = context;
+		if (platform.Name !== "twitch") {
 			return;
 		}
 		else if (channel.mode === "Read") {
@@ -13,7 +14,6 @@ module.exports = {
 			return;
 		}
 
-		const { channel, user } = context;
 		if (!user) {
 			return;
 		}
