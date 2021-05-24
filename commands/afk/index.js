@@ -103,7 +103,8 @@ module.exports = {
 			};
 		}
 
-		const type = this.staticData.invocations.find(i => i.name === context.invocation);
+		const { invocation } = context;
+		const type = this.staticData.invocations.find(i => i.name === invocation || i.aliases?.includes(invocation));
 		const status = type.status;
 		const text = await type.text(context, args.join(" ").trim());
 
