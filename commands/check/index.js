@@ -17,7 +17,7 @@ module.exports = {
 					if (!identifier || identifier.toLowerCase() === context.user.Name) {
 						return { reply: "Using my advanced quantum processing, I have concluded that you are actually not AFK!" };
 					}
-	
+
 					const targetUser = await sb.User.get(identifier, true);
 					if (!targetUser) {
 						return { reply: "That user was not found!" };
@@ -25,7 +25,7 @@ module.exports = {
 					else if (targetUser.Name === context.platform.Self_Name) {
 						return { reply: "MrDestructoid I'm never AFK MrDestructoid I'm always watching MrDestructoid" };
 					}
-	
+
 					const afkData = await sb.Query.getRecordset(rs => rs
 						.select("Text", "Started", "Silent", "Status")
 						.from("chat_data", "AFK")
@@ -33,7 +33,7 @@ module.exports = {
 						.where("Active = %b", true)
 						.single()
 					);
-	
+
 					if (!afkData) {
 						return {
 							reply: "That user is not AFK."
@@ -69,11 +69,11 @@ module.exports = {
 							reply: `This command can't be used in whispers!`
 						};
 					}
-	
+
 					const channelData = (identifier)
 						? sb.Channel.get(identifier)
 						: context.channel;
-	
+
 					if (!channelData) {
 						return {
 							success: false,
@@ -86,12 +86,20 @@ module.exports = {
 							reply: `${prefix} channel has no ambassadors.`
 						};
 					}
-	
+
 					const ambassadors = await sb.User.getMultiple(channelData.Data.ambassadors);
 					return {
 						reply: `Active ambassadors: ${ambassadors.map(i => i.Name)}`
 					};
 				}
+			},
+			{
+				name: "changelog",
+				aliases: [],
+				description: "",
+				execute: async () => ({
+					reply: "Changelog: https://supinic.com/data/changelog/list Discord: https://discord.com/channels/633342787869212683/748955843415900280/"
+				})
 			},
 			{
 				name: "command-id",
@@ -106,17 +114,17 @@ module.exports = {
 							.orderBy("Executed DESC")
 							.limit(1)
 							.single();
-	
+
 						if (context.channel === null) {
 							rs.where("Channel IS NULL");
 						}
 						else {
 							rs.where("Channel = %n", context.channel.ID);
 						}
-	
+
 						return rs;
 					});
-	
+
 					if (!data) {
 						return {
 							success: false,
@@ -139,7 +147,7 @@ module.exports = {
 					if (identifier) {
 						targetUser = await sb.User.get(identifier, true);
 					}
-	
+
 					if (!targetUser) {
 						return {
 							success: false,
@@ -151,7 +159,7 @@ module.exports = {
 							reply: "No peeking! 🍪🤖🛡 👀"
 						};
 					}
-	
+
 					const pronoun = (context.user.ID === targetUser.ID) ? "You" : "They";
 					const check = await sb.Query.getRecordset(rs => rs
 						.select("Cookie_Today", "Cookie_Is_Gifted")
@@ -159,7 +167,7 @@ module.exports = {
 						.where("User_Alias = %n", targetUser.ID)
 						.single()
 					);
-	
+
 					let string;
 					if (!check) {
 						string = `${pronoun} have never eaten a cookie before.`;
@@ -168,10 +176,10 @@ module.exports = {
 						string = (check.Cookie_Is_Gifted)
 							? `${pronoun} have already eaten the daily and gifted cookie today.`
 							: `${pronoun} have already eaten/gifted the daily cookie today.`;
-	
+
 						const date = new sb.Date().addDays(1);
 						date.setUTCHours(0, 0, 0, 0);
-	
+
 						string += ` The next cookie will be available in ${sb.Utils.timeDelta(date)}.`;
 					}
 					else {
@@ -179,7 +187,7 @@ module.exports = {
 							? `${pronoun} have a gifted cookie waiting.`
 							: `${pronoun} have an unused cookie waiting.`;
 					}
-	
+
 					return {
 						reply: string
 					};
@@ -195,13 +203,13 @@ module.exports = {
 							reply: "Sorry, you can't inspect error stacks!"
 						};
 					}
-	
+
 					if (!Number(identifier)) {
 						return {
 							reply: "Invalid ID provided!"
 						};
 					}
-	
+
 					const row = await sb.Query.getRow("chat_data", "Error");
 					try {
 						await row.load(Number(identifier));
@@ -211,9 +219,9 @@ module.exports = {
 							reply: "No such error exists!"
 						};
 					}
-	
+
 					const { ID, Stack: stack } = row.values;
-	
+
 					const key = { type: "error-paste", ID };
 					let link = await this.getCacheData(key);
 					if (!link) {
@@ -221,7 +229,7 @@ module.exports = {
 							name: `Stack of Supibot error ID ${ID}`,
 							expiration: "1H"
 						});
-						
+
 						if (result.success !== true) {
 							return {
 								success: false,
@@ -234,11 +242,11 @@ module.exports = {
 							expiry: 36e5
 						});
 					}
-	
+
 					if (context.channel) {
 						await context.channel.send("The error stack Pastebin link has been whispered to you 💻");
 					}
-	
+
 					return {
 						reply: link,
 						replyWithPrivateMessage: true
@@ -256,22 +264,22 @@ module.exports = {
 							reply: "Invalid ID provided! Check all polls here: https://supinic.com/bot/poll/list"
 						};
 					}
-	
+
 					const poll = await sb.Query.getRecordset(rs => {
 						rs.select("Text", "Status", "End", "ID")
 							.from("chat_data", "Poll")
 							.single();
-	
+
 						if (identifier) {
 							rs.where("ID = %n", Number(identifier));
 						}
 						else {
 							rs.orderBy("ID DESC").limit(1);
 						}
-	
+
 						return rs;
 					});
-	
+
 					if (!poll) {
 						return {
 							reply: "No polls match the ID provided! Check all polls here: https://supinic.com/bot/poll/list"
@@ -288,12 +296,12 @@ module.exports = {
 						const delta = (poll.End < sb.Date.now())
 							? "already ended."
 							: `ends ${sb.Utils.timeDelta(poll.End)}.`;
-	
+
 						return {
 							reply: `Poll ID ${poll.ID} ${delta} (${poll.Status}) - ${poll.Text} - Votes: ${votes.length}`
 						};
 					}
-	
+
 					const [yes, no] = sb.Utils.splitByCondition(votes, i => i.Vote === "Yes");
 					return {
 						reply: `Poll ID ${poll.ID} (${poll.Status}) - ${poll.Text} - Votes: ${yes.length}:${no.length}`
@@ -315,14 +323,14 @@ module.exports = {
 							`
 						};
 					}
-	
+
 					const reminder = await sb.Query.getRecordset(rs => rs
 						.select("ID", "User_From", "User_To", "Text", "Active", "Schedule")
 						.from("chat_data", "Reminder")
 						.where("ID = %n", ID)
 						.single()
 					);
-	
+
 					if (!reminder) {
 						return {
 							reply: "That reminder doesn't exist!"
@@ -333,20 +341,20 @@ module.exports = {
 							reply: "That reminder was not created by you or for you. Stop peeking!"
 						};
 					}
-	
+
 					const alreadyFired = (reminder.Active) ? "" : "(inactive)";
 					const reminderUser = (context.user.ID === reminder.User_From)
 						? await sb.User.get(reminder.User_To, true)
 						: await sb.User.get(reminder.User_From, true);
-	
+
 					const [owner, target] = (context.user.ID === reminder.User_From)
 						? ["Your reminder", `to ${reminderUser.Name}`]
 						: ["Reminder", `by ${reminderUser.Name} to you`];
-	
+
 					const delta = (reminder.Schedule)
 						? ` (${sb.Utils.timeDelta(reminder.Schedule)})`
 						: "";
-	
+
 					return {
 						reply: `${owner} ID ${ID} ${target}${delta}: ${reminder.Text} ${alreadyFired}`
 					};
@@ -365,7 +373,7 @@ module.exports = {
 						.limit(1)
 						.single()
 					);
-	
+
 					return {
 						reply: (last)
 							? `Your last "reset" was ${sb.Utils.timeDelta(last.Timestamp)}.`
@@ -392,12 +400,12 @@ module.exports = {
 							reply: "Only usable in Supinic's Twitch channel!"
 						};
 					}
-	
+
 					const state = sb.Config.get("SONG_REQUESTS_STATE");
 					const pauseString = (state === "vlc" && sb.Config.get("SONG_REQUESTS_VLC_PAUSED"))
 						? "Song requests are paused at the moment."
 						: "";
-	
+
 					return {
 						reply: `Current song requests status: ${state}. ${pauseString}`
 					};
@@ -416,7 +424,7 @@ module.exports = {
 						.orderBy("Type")
 						.flat("Type")
 					);
-	
+
 					if (types.length === 0) {
 						return {
 							reply: "You're currently not subscribed to any Supibot event."
@@ -445,7 +453,7 @@ module.exports = {
 						`
 						};
 					}
-	
+
 					if (identifier === "last") {
 						identifier = await sb.Query.getRecordset(rs => rs
 							.select("ID")
@@ -457,7 +465,7 @@ module.exports = {
 							.flat("ID")
 						);
 					}
-	
+
 					const row = await sb.Query.getRow("data", "Suggestion");
 					try {
 						await row.load(Number(identifier));
@@ -465,7 +473,7 @@ module.exports = {
 					catch {
 						return { reply: "No such suggestion exists!" };
 					}
-	
+
 					const {
 						ID,
 						Date: date,
@@ -474,17 +482,17 @@ module.exports = {
 						Text: text,
 						User_Alias: user
 					} = row.values;
-	
+
 					if (status === "Quarantined") {
 						return {
 							reply: "This suggestion has been quarantined."
 						};
 					}
-	
+
 					const updated = (update)
 						? `, last updated ${sb.Utils.timeDelta(update)}`
 						: "";
-	
+
 					const userData = await sb.User.get(user, true);
 					return {
 						reply: sb.Utils.tag.trim `
@@ -516,12 +524,12 @@ module.exports = {
 							reply: `You don't have this timer set up!`
 						};
 					}
-	
+
 					const now = sb.Date.now();
 					const date = new sb.Date(timers[identifier].date);
 					const delta = sb.Utils.timeDelta(date);
 					const verb = (now > date) ? "occured" : "occurs";
-	
+
 					return {
 						reply: `Your timer "${identifier}" ${verb} ${delta}.`
 					};
@@ -538,7 +546,7 @@ module.exports = {
 							reply: `There are no flags to be found here!`
 						};
 					}
-	
+
 					const { twitchLottoBlacklistedFlags: flags } = context.channel.Data;
 					return {
 						reply: (!flags || flags.length === 0)
@@ -596,7 +604,7 @@ module.exports = {
 				reply: `No type provided! https://supinic.com/bot/command/${this.ID}`
 			};
 		}
-	
+
 		const item = this.staticData.variables.find(i => i.name === type || i.aliases.includes(type));
 		if (!item) {
 			return {
@@ -604,7 +612,7 @@ module.exports = {
 				reply: `Invalid type provided! https://supinic.com/bot/command/${this.ID}`
 			};
 		}
-	
+
 		return await item.execute(context, identifier);
 	}),
 	Dynamic_Description: (async (prefix, values) => {
@@ -613,18 +621,18 @@ module.exports = {
 			const aliases = (i.aliases && i.aliases.length > 0)
 				? ` (${i.aliases.join(", ")})`
 				: "";
-	
+
 			return `<li><code>${i.name}${aliases}</code> - ${i.description}</li>`;
 		});
-	
+
 		return [
 			"Checks variables that you have been set within Supibot",
 			"",
-	
+
 			`<code>${prefix}check (variable)</code>`,
 			"Checks the status of a given variable.",
 			"",
-	
+
 			"Supported types:",
 			`<ul>${list.join("")}</ul>`
 		];
