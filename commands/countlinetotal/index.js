@@ -41,7 +41,7 @@ module.exports = {
 			const megabytesPerHour = sb.Utils.round(rate * 1024 / 24, 3);
 			const fillDate = new sb.Date().addDays((220 - currentSize) / rate); // 238 GB minus an estimate of ~18GB of other stuff
 
-			historyText = `Lines are added at a rate of ~${megabytesPerHour} MB/hr and ${sb.Utils.groupDigits(linesPerHour, 3)} lines/hr. `;
+			historyText = `Lines are added at a rate of ~${megabytesPerHour} MB/hr and ${sb.Utils.groupDigits(linesPerHour)} lines/hr. `;
 			historyText += (megabytesPerHour === 0)
 				? `At this rate, its impossible to calculate when Supibot's hard drive will fill.`
 				: `At this rate, Supibot's hard drive will run out of space approximately on ${fillDate.format("Y-m-d")}.`;
