@@ -755,7 +755,7 @@ class Command extends require("./template.js") {
 					Channel: channelData?.ID ?? null,
 					Success: true,
 					Invocation: identifier,
-					Arguments: JSON.stringify(args),
+					Arguments: JSON.stringify(argumentArray.filter(Boolean)),
 					Result: result,
 					Execution_Time: sb.Utils.round(Number(end - start) / 1.0e6, 3),
 					Command_Name: command.Name
