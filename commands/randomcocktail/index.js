@@ -20,7 +20,7 @@ module.exports = {
 					.set("s", args.join(" "))
 					.toString()
 			}).json();
-	
+
 			if (!data?.drinks) {
 				return {
 					success: false,
@@ -28,11 +28,11 @@ module.exports = {
 				};
 			}
 		}
-		
+
 		const drink = sb.Utils.randArray(data.drinks);
 		const ingredients = [];
 		for (const [key, value] of Object.entries(drink)) {
-			if (!/ingredient\d+/i.test(key)) {
+			if (!/ingredient\d+/i.test(key) && value) {
 				continue;
 			}
 
