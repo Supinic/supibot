@@ -33,7 +33,7 @@ module.exports = {
 		if (threshold >= sb.Date.now()) {
 			return {
 				success: false,
-				reply: `(witty message about time here)`
+				reply: `Who knows how many commits you're capable of? (provided date is located in the future!)`
 			};
 		}
 
