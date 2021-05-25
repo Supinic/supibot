@@ -100,7 +100,7 @@ module.exports = {
 
 			if (context.params.errorInfo) {
 				const stack = e.stack.split(/\r?\n/);
-				const lastLine = stack.findIndex(i => i.include("Script.runInContext"));
+				const lastLine = stack.findIndex(i => i.includes("Script.runInContext"));
 				const text = JSON.stringify({
 					script,
 					stack: stack.slice(0, lastLine)
