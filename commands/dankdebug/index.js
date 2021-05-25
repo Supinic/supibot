@@ -112,7 +112,7 @@ module.exports = {
 					format: "json"
 				});
 
-				const link = (paste.success) ? paste.error : paste.body;
+				const link = (paste.success) ? paste.body : paste.error;
 				return {
 					reply: `${e.toString()} - More info: ${link}`
 				};
