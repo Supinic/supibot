@@ -7,7 +7,8 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "lang", type: "string" },
-		{ name: "language", type: "string" }
+		{ name: "language", type: "string" },
+		{ name: "linkOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -19,7 +20,7 @@ module.exports = {
 				cooldown: { length: 2500 }
 			};
 		}
-	
+
 		const language = context.params.lang ?? context.params.language ?? "english";
 		const languageCode = sb.Utils.modules.languageISO.getCode(language)?.toLowerCase();
 		if (!languageCode) {
@@ -29,7 +30,7 @@ module.exports = {
 				cooldown: { length: 2500 }
 			};
 		}
-	
+
 		const searchData = await sb.Got({
 			url: `https://${languageCode}.wikipedia.org/w/api.php`,
 			searchParams: new sb.URLParams()
@@ -40,14 +41,14 @@ module.exports = {
 				.set("search", args.join(" "))
 				.toString()
 		}).json();
-	
+
 		if (searchData[1].length === 0) {
 			return {
 				success: false,
 				reply: "No Wiki articles found for your query!"
 			};
 		}
-	
+
 		const rawData = await sb.Got({
 			url: `https://${languageCode}.wikipedia.org/w/api.php`,
 			searchParams: new sb.URLParams()
@@ -60,7 +61,7 @@ module.exports = {
 				.set("titles", searchData[1])
 				.toString()
 		}).json();
-	
+
 		const data = rawData.query.pages;
 		const key = Object.keys(data)[0];
 		if (key === "-1") {
@@ -70,11 +71,13 @@ module.exports = {
 			};
 		}
 		else {
-			let link = "";
-			if (!context.channel || context.channel.Links_Allowed === true) {
-				link = `https://${languageCode}.wikipedia.org/?curid=${key}`;
+			const link = `https://${languageCode}.wikipedia.org/?curid=${key}`;
+			if (context.params.linkOnly) {
+				return {
+					reply: link
+				};
 			}
-	
+
 			const { extract, title } = data[key];
 			return {
 				reply: `${link} ${title}: ${sb.Utils.wrapString(extract, 1000)}`
@@ -85,11 +88,11 @@ module.exports = {
 		"Finds the summary of a given Wikipedia article.",
 		"Watch out - the topic is case sensitive, unfortunately, that's how Wikipedia works, apparently.",
 		"",
-	
+
 		`<code>${prefix}wiki (topic)</code>`,
 		"Posts a link and summary for given wiki topic for English Wikipedia.",
 		"",
-	
+
 		`<code>${prefix}wiki lang:(language) (topic)</code>`,
 		"Posts a link and summary for given wiki topic - but this time, in that language's Wikipedia.",
 		"..."
