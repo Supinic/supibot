@@ -104,7 +104,7 @@ module.exports = {
 				const text = JSON.stringify({
 					script,
 					stack: stack.slice(0, lastLine)
-				});
+				}, null, 4);
 
 				const paste = await sb.Pastebin.post(text, {
 					name: "Full error info for $js",
