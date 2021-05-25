@@ -33,7 +33,7 @@ module.exports = {
 		if (history) {
 			const days = (sb.Date.now() - history.Executed) / 864.0e5;
 
-			const originalLines = Number(history.Result.match(/logging([\d ])+lines/));
+			const originalLines = Number(history.Result.match(/logging([\d ])+lines/)[1]);
 			const linesPerHour = sb.Utils.round((data.Chat_Lines - originalLines) / days, 3);
 
 			const originalSize = Number(history.Result.match(/([\d.]+) GB of space/)[1]);
