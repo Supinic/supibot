@@ -35,7 +35,7 @@ module.exports = {
 			};
 		}
 
-		const { channel, emotecode, emoteid, tier } = response;
+		const { channel, emotecode, emoteid, channellogin: login, tier } = response;
 		const originID = await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("data", "Origin")
@@ -44,7 +44,7 @@ module.exports = {
 			.single()
 			.flat("ID")
 		);
-	
+
 		const emoteLink = `https://twitchemotes.com/emotes/${emoteid}`;
 		const cdnLink = `https://static-cdn.jtvnw.net/emoticons/v1/${emoteid}/3.0`;
 		if (context.params.linkOnly) {
@@ -53,8 +53,13 @@ module.exports = {
 			};
 		}
 
+		let channelString = `@${channel}`;
+		if (channel.toLowerCase() !== login.toLowerCase()) {
+			channelString = `@${login} (${channel})`;
+		}
+
 		const tierString = (tier)
-			? `tier ${tier} sub emote to channel #${channel.toLowerCase()}`
+			? `tier ${tier} sub emote to channel ${channelString}`
 			: `special ${channel} emote`;
 		const originString = (originID)
 			? `This emote has origin info - use the ${sb.Command.prefix}origin command.`
