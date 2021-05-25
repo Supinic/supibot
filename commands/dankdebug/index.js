@@ -31,7 +31,7 @@ module.exports = {
 					reply: `Cannot combine arguments and function params together!`
 				};
 			}
-			
+
 			try {
 				scriptArgs = JSON.parse(context.params.arguments);
 			}
@@ -57,11 +57,12 @@ module.exports = {
 		else {
 			script = `(async () => {\n${string}\n})()`;
 		}
-		
+
 		try {
 			const scriptContext = {
 				fixAsync: false,
 				sandbox: {
+					aliasStack: context.append.aliasStack ?? [],
 					args: scriptArgs ?? null,
 					executor: context.user.Name,
 					channel: context.channel?.Name ?? "(none)",

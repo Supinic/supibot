@@ -594,6 +594,7 @@ module.exports = {
 						...context.append,
 						alias: true,
 						aliasCount,
+						aliasStack: [...(context.append.aliasStack ?? []), name],
 						platform: context.platform,
 						skipBanphrases: true,
 						skipMention: true,
