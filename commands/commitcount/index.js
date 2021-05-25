@@ -45,6 +45,7 @@ module.exports = {
 					contributionsCollection(from: "${threshold.toISOString()}") {
 						totalCommitContributions
 						restrictedContributionsCount
+						endedAt 
 					}
 				}
 			}`
@@ -58,10 +59,18 @@ module.exports = {
 		}
 
 		const collection = response.data.user.contributionsCollection;
+		const intervalEnd = new sb.Date(collection.endedAt);
 		const commitCount = collection.totalCommitContributions + collection.restrictedContributionsCount;
-		const since = (context.params.since)
-			? `since ${sb.Utils.timeDelta(context.params.since)}`
-			: "in the past 24 hours";
+
+		let since;
+		if (context.params.since) {
+			since = (intervalEnd >= new sb.Date())
+				? `since ${sb.Utils.timeDelta(context.params.since)}`
+				: `between ${context.params.since.format("Y-m-d")} and ${intervalEnd.format("Y-m-d")}`;
+		}
+		else {
+			since = "in the past 24 hours";
+		}
 
 		const suffix = (commitCount === 1) ? "" : "s";
 		const who = (self) ? "You have" : `GitHub user ${username} has`;
