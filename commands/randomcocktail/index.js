@@ -32,7 +32,7 @@ module.exports = {
 		const drink = sb.Utils.randArray(data.drinks);
 		const ingredients = [];
 		for (const [key, value] of Object.entries(drink)) {
-			if (!/ingredient\d+/i.test(key) && value) {
+			if (!/ingredient\d+/i.test(key) || !value) {
 				continue;
 			}
 
