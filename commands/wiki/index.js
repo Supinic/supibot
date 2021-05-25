@@ -95,6 +95,10 @@ module.exports = {
 
 		`<code>${prefix}wiki lang:(language) (topic)</code>`,
 		"Posts a link and summary for given wiki topic - but this time, in that language's Wikipedia.",
+		"...",
+
+		`<code>${prefix}wiki linkOnly:true (topic)</code>`,
+		"Only posts the link for the given wiki topic.",
 		"..."
 	])
 };
