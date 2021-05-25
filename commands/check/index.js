@@ -243,13 +243,14 @@ module.exports = {
 						});
 					}
 
-					if (context.channel) {
-						await context.channel.send("The error stack Pastebin link has been whispered to you 💻");
-					}
+					await context.platform.pm(
+						`Detail of Supibot error ID ${ID}: ${link}`,
+						context.user.Name,
+						context.channel ?? null
+					);
 
 					return {
-						reply: link,
-						replyWithPrivateMessage: true
+						reply: "The error stack Pastebin link has been whispered to you 💻"
 					};
 				}
 			},
