@@ -83,17 +83,17 @@ module.exports = {
 		`If you would like to connect your GitHub account to your "Supibot" (Twitch) account and save some time by not having to type your username, head to <a href="https://supinic.com/">supinic.com</a> - log in, and select <u>Github link</u>.`,
 		"",
 
-		`${prefix}commitcount`,
+		`<code>${prefix}commitcount</code>`,
 		"(amount of commits in the last 24 hours)",
 		"",
 
-		`${prefix}commitcount (user)`,
+		`<code>${prefix}commitcount (user)</code>`,
 		"(amount of commits of that given user in the last 24 hours)",
 		"",
 
-		`${prefix}commitcount since:(date)`,
-		`${prefix}commitcount since:2021-05-01`,
-		`${prefix}commitcount since:"2021-01-01 12:30"`,
+		`<code>${prefix}commitcount since:(date)</code>`,
+		`<code>${prefix}commitcount since:2021-05-01</code>`,
+		`<code>${prefix}commitcount since:"2021-01-01 12:30"</code>`,
 		"(amount of commits since the provided date)"
 	])
 };
