@@ -1089,7 +1089,12 @@ class Command extends require("./template.js") {
 			}
 		}
 		else if (type === "date") {
-			return new sb.Date(value);
+			const date = new sb.Date(value);
+			if (Number.isNaN(date.valueOf())) {
+				return null;
+			}
+
+			return date;
 		}
 		else if (type === "object") {
 			const [key, outputValue] = value.split("=");
