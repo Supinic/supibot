@@ -7,6 +7,7 @@ module.exports = {
 	Flags: ["external-input","developer","mention","pipe","use-params"],
 	Params: [
 		{ name: "arguments", type: "string" },
+		{ name: "errorInfo", type: "boolean" },
 		{ name: "function", type: "string" }
 	],
 	Whitelist_Response: null,
@@ -94,6 +95,25 @@ module.exports = {
 				return {
 					success: false,
 					reply: "Your dank debug contains code that isn't allowed!"
+				};
+			}
+
+			if (context.params.errorInfo) {
+				const stack = e.stack.split(/\r?\n/);
+				const lastLine = stack.findIndex(i => i.include("Script.runInContext"));
+				const text = JSON.stringify({
+					script,
+					stack: stack.slice(0, lastLine)
+				});
+
+				const paste = await sb.Pastebin.post(text, {
+					name: "Full error info for $js",
+					expiration: "1H",
+					format: "json"
+				});
+
+				return {
+					reply: `${e.toString()} - More info: ${paste}`
 				};
 			}
 
