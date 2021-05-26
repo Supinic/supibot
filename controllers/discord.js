@@ -235,7 +235,7 @@ module.exports = class DiscordController extends require("./template.js") {
 	async send (message, channel) {
 		const globalEmoteRegex = /[A-Z]/;
 		const channelData = sb.Channel.get(channel, this.platform);
-		const channelObject = this.client.channels.cache.get(channelData.Name);
+		const channelObject = await this.client.channels.fetch(channelData.Name);
 		if (!channelObject) {
 			console.warn("No Discord channel available!", channel);
 			return;
@@ -269,12 +269,15 @@ module.exports = class DiscordController extends require("./template.js") {
 				}
 			}
 
+			const guildUsers = await channelObject.guild.members.fetch();
 			const mentionedUsers = await DiscordController.getMentionsInMessage(message);
-			for (const user of mentionedUsers) {
-				if (user.Discord_ID) {
-					const regex = new RegExp(`@${user.Name}`, "gi");
-					message = message.replace(regex, `<@${user.Discord_ID}>`);
-				}
+			const sortedUsers = mentionedUsers
+				.filter(i => i.Discord_ID && guildUsers.has(i.Discord_ID))
+				.sort((a, b) => b.Name.length - a.Name.length);
+
+			for (const user of sortedUsers) {
+				const regex = new RegExp(`@${user.Name}`, "gi");
+				message = message.replace(regex, `<@${user.Discord_ID}>`);
 			}
 		}
 
