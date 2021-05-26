@@ -240,7 +240,7 @@ const pruneCron = new sb.Cron({
 	Defer: {
 		end: 15000
 	},
-	Code: () => sb.CooldownManagerSingleton.prune()
+	Code: () => sb.CooldownManager.prune()
 }).start();
 
 module.exports = CooldownManagerSingleton;
