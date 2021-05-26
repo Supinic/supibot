@@ -40,11 +40,11 @@ module.exports = {
 				return execution;
 			}
 
-			const data = await sb.Utils.linkParser.fetchData(execution.reply);
+			const data = await sb.Utils.modules.linkParser.fetchData(execution.reply);
 			if (data === null) {
 				counter++;
 	
-				const videoID = sb.Utils.linkParser.parseLink(execution.reply);
+				const videoID = sb.Utils.modules.linkParser.parseLink(execution.reply);
 				await sb.Query.getRecordUpdater(ru => ru
 					.update("music", "Track")
 					.set("Available", false)

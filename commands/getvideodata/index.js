@@ -11,7 +11,7 @@ module.exports = {
 	Code: (async function getVideoData (context, link) {
 		let data = null;
 		try {
-			data = await sb.Utils.linkParser.fetchData(link);
+			data = await sb.Utils.modules.linkParser.fetchData(link);
 		}
 		catch (e) {
 			return { reply: "Unable to parse link." };

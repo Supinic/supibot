@@ -63,11 +63,11 @@ module.exports = {
 		}
 		else {
 			for (const word of args) {
-				const type = sb.Utils.linkParser.autoRecognize(word);
+				const type = sb.Utils.modules.linkParser.autoRecognize(word);
 				if (type) {
 					links.push({
 						type,
-						link: sb.Utils.linkParser.parseLink(word)
+						link: sb.Utils.modules.linkParser.parseLink(word)
 					});
 				}
 			}
@@ -95,7 +95,7 @@ module.exports = {
 	
 		const results = [];
 		for (const { link, type } of links) {
-			const videoData = await sb.Utils.linkParser.fetchData(link, type);
+			const videoData = await sb.Utils.modules.linkParser.fetchData(link, type);
 			if (!videoData) {
 				results.push({
 					link,
@@ -152,7 +152,7 @@ module.exports = {
 			}
 			else {
 				const tag = { todo: 20 };
-				const videoData = await sb.Utils.linkParser.fetchData(link, type);
+				const videoData = await sb.Utils.modules.linkParser.fetchData(link, type);
 				const row = await sb.Query.getRow("music", "Track");
 	
 				row.setValues({

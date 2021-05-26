@@ -57,7 +57,7 @@ module.exports = {
 				},
 	
 				queue: async function (link) {
-					const properLink = sb.Utils.linkParser.autoRecognize(link);
+					const properLink = sb.Utils.modules.linkParser.autoRecognize(link);
 					if (!properLink) {
 						const [bestResult] = await sb.Utils.searchYoutube(
 							link.replace(/-/g, ""),
@@ -74,7 +74,7 @@ module.exports = {
 						link = `https://youtu.be/${bestResult.ID}`;
 					}
 	
-					const linkData = await sb.Utils.linkParser.fetchData(link);
+					const linkData = await sb.Utils.modules.linkParser.fetchData(link);
 					if (!linkData) {
 						return {
 							success: false,
@@ -159,7 +159,7 @@ module.exports = {
 			},
 	
 			parseTimestamp: (string) => {
-				const type = sb.Utils.linkParser.autoRecognize(string);
+				const type = sb.Utils.modules.linkParser.autoRecognize(string);
 				if (type === "youtube" && string.includes("t=")) {
 					const { parse } = require("url");
 					let { query } = parse(string);
@@ -310,8 +310,8 @@ module.exports = {
 			}
 		}
 	
-		if (sb.Utils.linkParser.autoRecognize(url)) {
-			data = await sb.Utils.linkParser.fetchData(url);
+		if (sb.Utils.modules.linkParser.autoRecognize(url)) {
+			data = await sb.Utils.modules.linkParser.fetchData(url);
 		}
 		else if (parsedURL.host) {
 			const meta = await sb.Utils.getMediaFileData(url);
@@ -377,7 +377,7 @@ module.exports = {
 				};
 			}
 			else {
-				data = await sb.Utils.linkParser.fetchData(lookup.link, type);
+				data = await sb.Utils.modules.linkParser.fetchData(lookup.link, type);
 			}
 		}
 	

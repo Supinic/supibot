@@ -164,8 +164,8 @@ module.exports = {
 						};
 					},
 					fetchVideoStats: async function (videoID) {
-						if (sb.Utils.linkParser.autoRecognize(videoID)) {
-							videoID = sb.Utils.linkParser.parseLink(videoID);
+						if (sb.Utils.modules.linkParser.autoRecognize(videoID)) {
+							videoID = sb.Utils.modules.linkParser.parseLink(videoID);
 						}
 
 						const requests = await sb.Query.getRecordset(rs => rs

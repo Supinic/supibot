@@ -36,7 +36,7 @@ module.exports = {
 		switch (command) {
 			case "check": {
 				const input = args[0];
-				const type = sb.Utils.linkParser.autoRecognize(input);
+				const type = sb.Utils.modules.linkParser.autoRecognize(input);
 				if (type !== "youtube") {
 					return {
 						success: false,
@@ -44,7 +44,7 @@ module.exports = {
 					};
 				}
 
-				const link = sb.Utils.linkParser.parseLink(input);
+				const link = sb.Utils.modules.linkParser.parseLink(input);
 				const existing = await sb.Query.getRecordset(rs => rs
 					.select("ID", "Device", "Link")
 					.from("data", "Bad_Apple")
@@ -65,7 +65,7 @@ module.exports = {
 					};
 				}
 				else {
-					const data = await sb.Utils.linkParser.fetchData(input);
+					const data = await sb.Utils.modules.linkParser.fetchData(input);
 					const row = await sb.Query.getRow("data", "Bad_Apple");
 					row.setValues({
 						Link: link,

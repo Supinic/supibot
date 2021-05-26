@@ -50,7 +50,7 @@ module.exports = {
 
 		if (finalClientID) {
 			console.log("Successfully updated soundcloud client-id", { finalClientID });
-			sb.Utils.linkParser.reloadParser("soundcloud", { key: finalClientID });
+			sb.Utils.modules.linkParser.reloadParser("soundcloud", { key: finalClientID });
 		}
 		else {
 			console.warn("Could not fetch Soundcloud client-id!");
