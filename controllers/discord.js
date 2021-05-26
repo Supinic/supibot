@@ -166,6 +166,14 @@ module.exports = class DiscordController extends require("./template.js") {
 					platform: this.platform
 				});
 
+				if (channelData.Mode !== "Inactive") {
+					sb.Logger.updateLastSeen({
+						channelData,
+						userData,
+						message: msg
+					});
+				}
+
 				if (channelData.Mode !== "Read") {
 					sb.AwayFromKeyboard.checkActive(userData, channelData);
 					sb.Reminder.checkActive(userData, channelData);
@@ -273,7 +281,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			const sortedUsers = guildUsers.array().sort((a, b) => b.user.username.length - a.user.username.length);
 			for (const member of sortedUsers) {
 				const name = sb.User.normalizeUsername(member.user.username);
-				const regex = new RegExp(`@${name}`, "gi");
+				const regex = new RegExp(`@${sb.Utils.escapeRegExp(name)}`, "gi");
 
 				message = message.replace(regex, `<@${member.user.id}>`);
 			}
