@@ -272,10 +272,10 @@ module.exports = class DiscordController extends require("./template.js") {
 			const guildUsers = await channelObject.guild.members.fetch();
 			const sortedUsers = guildUsers.array().sort((a, b) => b.user.username.length - a.user.username.length);
 			for (const member of sortedUsers) {
-				const { id, username } = member.user;
-				const regex = new RegExp(`@${username}`, "gi");
+				const name = sb.User.normalizeUsername(member.user.username);
+				const regex = new RegExp(`@${name}`, "gi");
 
-				message = message.replace(regex, `<@${id}>`);
+				message = message.replace(regex, `<@${member.user.id}>`);
 			}
 		}
 
