@@ -2876,7 +2876,7 @@ strip-json-comments@3.1.1, strip-json-comments@^3.1.0, strip-json-comments@^3.1.
 
 "supi-core@github:Supinic/supi-core":
   version "2.2.0"
-  resolved "https://codeload.github.com/Supinic/supi-core/tar.gz/e41ee1b272c535401f4d170f3d9f8eb7ccf09f57"
+  resolved "https://codeload.github.com/Supinic/supi-core/tar.gz/03531d29fdc159ad97e5c5368fb4bc6585c248e4"
   dependencies:
     async-markov "github:supinic/async-markov"
     cheerio "^1.0.0-rc.5"
@@ -2974,7 +2974,7 @@ to-regex-range@^5.0.1:
 
 "track-link-parser@github:supinic/track-link-parser":
   version "1.1.0"
-  resolved "https://codeload.github.com/supinic/track-link-parser/tar.gz/47ec56653abe59f9391b0bc3ec1a9a56158ff4fd"
+  resolved "https://codeload.github.com/supinic/track-link-parser/tar.gz/f19c944c203824032cf0609e0ed1c76be78dc4c0"
   dependencies:
     fast-xml-parser latest
     got latest
