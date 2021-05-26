@@ -270,14 +270,12 @@ module.exports = class DiscordController extends require("./template.js") {
 			}
 
 			const guildUsers = await channelObject.guild.members.fetch();
-			const mentionedUsers = await DiscordController.getMentionsInMessage(message);
-			const sortedUsers = mentionedUsers
-				.filter(i => i.Discord_ID && guildUsers.has(i.Discord_ID))
-				.sort((a, b) => b.Name.length - a.Name.length);
+			const sortedUsers = guildUsers.array().sort((a, b) => b.user.username.length - a.user.username.length);
+			for (const member of sortedUsers) {
+				const { id, username } = member.user;
+				const regex = new RegExp(`@${username}`, "gi");
 
-			for (const user of sortedUsers) {
-				const regex = new RegExp(`@${user.Name}`, "gi");
-				message = message.replace(regex, `<@${user.Discord_ID}>`);
+				message = message.replace(regex, `<@${id}>`);
 			}
 		}
 
@@ -462,31 +460,5 @@ module.exports = class DiscordController extends require("./template.js") {
 		return {
 			challenge
 		};
-	}
-
-	static async getMentionsInMessage (message) {
-		return (await Promise.all(
-			message.replace(/^.*?@/, "@")
-				.replace(/\s+/g, "_")
-				.split(/[^@\w]/)
-				.filter(i => i.startsWith("@") || i.startsWith("_@"))
-				.map(i => i.replace(/^_|_$/g, ""))
-				.filter(Boolean)
-				.flatMap(i => {
-					const names = [];
-					let name = "";
-
-					for (const item of i.split("_")) {
-						if (name) {
-							name += "_";
-						}
-						name += item;
-						names.push(name);
-					}
-
-					return names;
-				})
-				.map(user => sb.User.get(user))
-		)).filter(Boolean);
 	}
 };
