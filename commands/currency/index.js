@@ -26,7 +26,7 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-	
+
 		let multiplier = 1;
 		if (/k/i.test(amount)) {
 			multiplier = 1.0e3;
@@ -40,7 +40,7 @@ module.exports = {
 		else if (/t/i.test(amount)) {
 			multiplier = 1.0e12;
 		}
-	
+
 		amount = amount.replace(/[kmbt]/gi, "").replace(/,/g, ".");
 		if (!Number(amount)) {
 			return {
@@ -51,11 +51,11 @@ module.exports = {
 				}
 			};
 		}
-	
+
 		const symbolCheck = /^[A-Z]{3}$/;
 		first = first.toUpperCase();
 		second = second.toUpperCase();
-	
+
 		if (!symbolCheck.test(first) || !symbolCheck.test(second)) {
 			return {
 				success: false,
@@ -63,59 +63,37 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-	
-		if (!this.data.cache || this.data.cache.expiry > sb.Date.now()) {
-			const { statusCode, body: data } = await sb.Got({
-				prefixUrl: "http://data.fixer.io/api",
-				url: "latest",
-				throwHttpErrors: false,
-				responseType: "json",
-				searchParams: new sb.URLParams()
-					.set("access_key", sb.Config.get("API_FIXER_IO"))
-					.toString()
-			});
-	
-			if (statusCode !== 200) {
-				throw new sb.errors.APIError({
-					statusCode,
-					apiName: "ForexAPI"
-				});
+
+		const convertKey = `${first}_${second}`;
+		const response = await sb.Got("GenericAPI", {
+			url: "https://free.currconv.com/api/v7/convert",
+			searchParams: {
+				apiKey: sb.Config.get("API_FREE_CURRENCY_CONVERTER"),
+				q: convertKey,
+				compact: "y"
 			}
-	
-			this.data.cache = {
-				rates: data.rates,
-				expiry: new sb.Date().addHours(1).valueOf()
-			};
-		}
-	
-		const { rates } = this.data.cache;
-		if (!rates[first] || !rates[second]) {
+		});
+
+		if (!response.body[convertKey]) {
 			return {
 				success: false,
-				reply: `Unrecognized currency code(s)! ${[first, second].filter(i => !rates[i]).join(", ")}`
+				reply: "One or both currency codes were not recognized!"
 			};
 		}
-	
-		const ratio = rates[second] / rates[first];
-		if (typeof ratio === "number") {
-			return {
-				reply: `${amount * multiplier} ${first} = ${sb.Utils.round(amount * multiplier * ratio, 3)} ${second}`
-			};
-		}
-		else {
-			return {
-				reply: "One or both currencies were not recognized!"
-			};
-		}
+
+		const ratio = response.body[convertKey].val;
+		return {
+			reply: `${amount * multiplier} ${first} = ${sb.Utils.round(amount * multiplier * ratio, 3)} ${second}`
+		};
 	}),
 	Dynamic_Description: (async (prefix) => [
 		`Converts an amount of currency (or 1, if not specified) to another currency`,
 		``,
-	
+
 		`<code>${prefix}currency 100 EUR to USD</code>`,
 		`100 EUR = (amount) USD`,
 		``,
-	
+
 		`<code>${prefix}currency EUR to VND</code>`,
 		`1 EUR = (amount) VND`
 	])
