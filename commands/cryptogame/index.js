@@ -15,6 +15,23 @@ module.exports = {
 			Code: (async function cryptoGamePriceUpdate () {
 				const ignoredAssets = ["VEF"];
 				const totalData = {};
+
+				const conditionalFixerIo = (async () => {
+					if (new sb.Date().hours % 12 !== 0) {
+						return { rates: {} };
+					}
+
+					return sb.Got({
+						prefixUrl: "http://data.fixer.io/api",
+						url: "latest",
+						throwHttpErrors: false,
+						responseType: "json",
+						searchParams: new sb.URLParams()
+							.set("access_key", sb.Config.get("API_FIXER_IO"))
+							.toString()
+					}).json();
+				});
+
 				const [cryptoData, currencyData, goldData, silverData] = await Promise.all([
 					sb.Got({
 						url: "https://min-api.cryptocompare.com/data/price",
@@ -27,15 +44,7 @@ module.exports = {
 						}
 					}).json(),
 
-					sb.Got({
-						prefixUrl: "http://data.fixer.io/api",
-						url: "latest",
-						throwHttpErrors: false,
-						responseType: "json",
-						searchParams: new sb.URLParams()
-							.set("access_key", sb.Config.get("API_FIXER_IO"))
-							.toString()
-					}).json(),
+					conditionalFixerIo(),
 
 					sb.Got({
 						url: "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/EUR"
@@ -491,7 +500,7 @@ module.exports = {
 					targetAsset = baseAsset;
 					sourceAmount = data.amount;
 				}
-				
+
 				if (data.amount === "all") {
 					sourceAmount = portfolioData.assets.find(i => i.Code === sourceAsset.Code)?.Amount ?? 0;
 				}
@@ -600,7 +609,7 @@ module.exports = {
 						.flat("Total")
 					)
 				]);
-				
+
 				const prefix = (target) ? "Their" : "Your";
 				return {
 					reply: `${prefix} current portfolio totals: € ${data.Total} - rank ${rank}/${total}.`
