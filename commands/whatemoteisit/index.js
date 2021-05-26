@@ -53,14 +53,19 @@ module.exports = {
 			};
 		}
 
-		let channelString = `@${channel}`;
-		if (channel.toLowerCase() !== login.toLowerCase()) {
-			channelString = `@${login} (${channel})`;
+		let tierString;
+		if (tier && login) {
+			let channelString = `@${channel}`;
+			if (channel.toLowerCase() !== login.toLowerCase()) {
+				channelString = `@${login} (${channel})`;
+			}
+
+			tierString = `tier ${tier} sub emote to channel ${channelString}`;
+		}
+		else {
+			tierString = `special ${channel} emote`;
 		}
 
-		const tierString = (tier)
-			? `tier ${tier} sub emote to channel ${channelString}`
-			: `special ${channel} emote`;
 		const originString = (originID)
 			? `This emote has origin info - use the ${sb.Command.prefix}origin command.`
 			: "";
