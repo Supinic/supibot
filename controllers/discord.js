@@ -166,14 +166,6 @@ module.exports = class DiscordController extends require("./template.js") {
 					platform: this.platform
 				});
 
-				if (channelData.Mode !== "Inactive") {
-					sb.Logger.updateLastSeen({
-						channelData,
-						userData,
-						message: msg
-					});
-				}
-
 				if (channelData.Mode !== "Read") {
 					sb.AwayFromKeyboard.checkActive(userData, channelData);
 					sb.Reminder.checkActive(userData, channelData);
