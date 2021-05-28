@@ -547,5 +547,33 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"Request a song (video) to play on Supinic's stream.",
+		"Supports YouTube, Vimeo, Soundcloud links. Furthermore, all custom media (raw links) are supported as well.",
+		"",
+
+		`<code>${prefix}songrequest (link)</code>`,
+		`<code>${prefix}sr (link)`,
+		"Request the video, adding it to the end of the queue.",
+		"",
+
+		`<code>${prefix}sr start:10 (link)</code>`,
+		"Request the video, making it start any amount of seconds from the beginning. Here, it starts 10 seconds in.",
+		"",
+
+		`<code>${prefix}sr end:300 (link)</code>`,
+		"Request the video, making it end any amount of seconds from the beginning. Here, it starts 5 minutes (300s) in.",
+		"",
+
+		`<code>${prefix}sr start:50 end:55 (link)</code>`,
+		"<code>start</code> and <code>end</code> can be combined - here, the video will play from 50 to 55 seconds.",
+		"",
+
+		`<code>${prefix}sr start:-60 (link)</code>`,
+		`<code>${prefix}sr end:-10 (link)</code>`,
+		`<code>${prefix}sr start:-15 end:-10 (link)</code>`,
+		"If either <code>start</code> or <code>end</code> are negative numbers, they signify the length from the end of the video.",
+		"E.g.: if the video is 5 minutes long, <code>start:-10</code> will start the video 10 seconds from the end, at 04:50.",
+		"Any combination of negative and positive numbers between the parameters is accepted. It just has to make sense - so that the end is not earlier than the start."
+	])
 };
