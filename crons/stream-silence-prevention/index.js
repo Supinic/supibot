@@ -19,7 +19,7 @@ module.exports = {
 		if (!sb.Channel || !sb.Platform || !sb.VideoLANConnector) {
 			return;
 		}
-	
+
 		const twitch = sb.Platform.get("twitch");
 		const cytube = sb.Platform.get("cytube");
 		const channelData = sb.Channel.get("supinic", "twitch");
@@ -29,12 +29,12 @@ module.exports = {
 		if (!streamData.live) {
 			return;
 		}
-	
+
 		const state = sb.Config.get("SONG_REQUESTS_STATE");
 		if (state !== "vlc" && state !== "cytube") {
 			return;
 		}
-	
+
 		let isQueueEmpty = null;
 		if (state === "vlc") {
 			const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
@@ -43,20 +43,20 @@ module.exports = {
 		else if (state === "cytube") {
 			isQueueEmpty = (cytube.controller.clients.get(cytubeChannelData.ID).playlistData.length === 0);
 		}
-	
+
 		if (!isQueueEmpty) {
 			return;
 		}
-	
+
 		if (!this.data.videos) {
 			// const playlistID = "PL9TsqVDcBIdtyegewA00JC0mlSkoq-VnJ"; // supinic's "stream playlist"
-			// const playlistID = "PL9gZzeM4mz7aySWRb0Hsl7Xbp3YCPg88l"; // "TOS Gachi and Cancer music FeelsGoodMan" by TeoTheParty
-			const playlistID = "PL9gZzeM4mz7bUF3LXcPRAU-7RFPa6NYqa"; // "Rare Gachi and Cancer HandsUp" by TeoTheParty
+			const playlistID = "PL9gZzeM4mz7aySWRb0Hsl7Xbp3YCPg88l"; // "TOS Gachi and Cancer music FeelsGoodMan" by TeoTheParty
+			// const playlistID = "PL9gZzeM4mz7bUF3LXcPRAU-7RFPa6NYqa"; // "Rare Gachi and Cancer HandsUp" by TeoTheParty
 			const { result } = await sb.Utils.fetchYoutubePlaylist({
 				key: sb.Config.get("API_GOOGLE_YOUTUBE"),
 				playlistID
 			});
-	
+
 			this.data.videos = result.map(i => i.ID);
 		}
 
@@ -109,7 +109,7 @@ module.exports = {
 			client.queue("yt", videoID);
 			// result = `Silence prevention! Successfully added ${link} to Cytube (hopefully).`;
 		}
-		
+
 		// await channelData.send(result);
 	})
 };
