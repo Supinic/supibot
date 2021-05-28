@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Checks if a given message would be banphrased in a given channel. Checks the API banphrase (if it exists for given channel) and then the bot's banphrases as well.",
-	Flags: ["mention","non-nullable"],
+	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -21,7 +21,7 @@ module.exports = {
 				reply: "No message provided!"
 			};
 		}
-	
+
 		const message = rest.join(" ");
 		const targetChannel = sb.Channel.get(channel.replace(/^#/, "").toLowerCase());
 		if (!targetChannel) {
@@ -41,7 +41,7 @@ module.exports = {
 				reply: `Don't you think it's a bit silly to bancheck the channel you're in? ${emote}`
 			};
 		}
-	
+
 		if (!targetChannel.Links_Allowed) {
 			const linkCheck = message.replace(sb.Config.get("LINK_REGEX"), "");
 			if (linkCheck !== message) {
@@ -50,7 +50,7 @@ module.exports = {
 				};
 			}
 		}
-	
+
 		if (targetChannel.Banphrase_API_Type === "Pajbot") {
 			let data = null;
 			try {
@@ -68,7 +68,7 @@ module.exports = {
 					reply: "Banphrase API did not respond in time!"
 				};
 			}
-	
+
 			if (data.banned) {
 				const {
 					id,
@@ -95,7 +95,7 @@ module.exports = {
 				const punishment = (permanent)
 					? "permanent ban"
 					: `${sb.Utils.formatTime(length)} seconds timeout`;
-	
+
 				return {
 					reply: sb.Utils.tag.trim `
 						Banphrase ID ${id} - ${name}
@@ -108,7 +108,7 @@ module.exports = {
 				};
 			}
 		}
-	
+
 		const { string } = await sb.Banphrase.execute(message, targetChannel);
 		if (message === string) {
 			return {
