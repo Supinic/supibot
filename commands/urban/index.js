@@ -77,7 +77,7 @@ module.exports = {
 	
 		let extra = "";
 		if (items.length > 1 && index === null) {
-			extra = `(${items.length - 1} extra definitons)`;
+			extra = `(${items.length - 1} extra definitions)`;
 		}
 	
 		const thumbs = `(+${item.thumbs_up}/-${item.thumbs_down})`;
