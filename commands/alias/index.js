@@ -723,7 +723,8 @@ module.exports = {
 					<code>${prefix}alias add test translate to:\${0} hello!</code>
 					<br>
 					<code>${prefix}alias run test spanish</code> => <code>${prefix}translate to:spanish hello</code>
-				</li>				
+				</li>		
+				<br>		
 				<li>
 					<code>\${-#}</code> (e.g. \${-1}, \${-3}, ...)
 					<br>
