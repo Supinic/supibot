@@ -24,7 +24,7 @@ module.exports = {
 			const list = response.body.map(i => ({
 				key: i.key,
 				title: (i.title === "") ? null : i.title,
-				posted: sb.Date(i.date * 1000),
+				posted: new sb.Date(i.date * 1000),
 				expires: (i.expire === "0") ? null : new sb.Date(i.expire * 1000),
 				user: (i.user === "") ? null : i.user,
 				syntax: i.syntax,
