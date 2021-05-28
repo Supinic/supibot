@@ -207,14 +207,7 @@ module.exports = {
 						return word;
 					}
 				}).join(" "),
-				reverseData: (message) => message.split(" ").map(word => {
-					if (!/^.\u{E0000}/u.test(word)) {
-						return word;
-					}
-
-					const arr = Array.from(word);
-					return arr[0] + arr.slice(2).join("");
-				}).join(" ")
+				reverseData: (message) => message.split(" ").map(word => word.replace(/\u{E0000}/gu, "")).join(" ")
 			},
 			{
 				name: "trim",
