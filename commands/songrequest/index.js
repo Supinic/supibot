@@ -553,7 +553,7 @@ module.exports = {
 		"",
 
 		`<code>${prefix}songrequest (link)</code>`,
-		`<code>${prefix}sr (link)`,
+		`<code>${prefix}sr (link)</code>`,
 		"Request the video, adding it to the end of the queue.",
 		"",
 
