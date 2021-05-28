@@ -16,7 +16,7 @@ module.exports = {
 			time: 900,
 			amount: 10
 		};
-	
+
 		return {
 			limits,
 			blacklist: {
@@ -49,13 +49,13 @@ module.exports = {
 					"UCeM9xfry6R09FxPZgRV1XcA"
 				]
 			},
-	
+
 			cytubeIntegration: {
 				limits: {
 					total: 5,
 					time: 600
 				},
-	
+
 				queue: async function (link) {
 					const properLink = sb.Utils.modules.linkParser.autoRecognize(link);
 					if (!properLink) {
@@ -63,17 +63,17 @@ module.exports = {
 							link.replace(/-/g, ""),
 							sb.Config.get("API_GOOGLE_YOUTUBE")
 						);
-						
+
 						if (!bestResult) {
 							return {
 								success: false,
 								reply: `No video has been found!`
 							};
 						}
-						
+
 						link = `https://youtu.be/${bestResult.ID}`;
 					}
-	
+
 					const linkData = await sb.Utils.modules.linkParser.fetchData(link);
 					if (!linkData) {
 						return {
@@ -87,7 +87,7 @@ module.exports = {
 							reply: `Video too long! ${linkData.duration}sec / ${this.limits.time}sec`
 						};
 					}
-	
+
 					const { Self_Name: botName, controller } = sb.Platform.get("cytube");
 					const channelData = sb.Channel.get(49);
 					const client = controller.clients.get(channelData.ID);
@@ -96,14 +96,14 @@ module.exports = {
 						client.currentlyPlaying,
 						...client.playlistData
 					].filter(i => i && i.queueby?.toLowerCase() === botName.toLowerCase());
-	
+
 					if (playlist.length > this.limits.total) {
 						return {
 							success: false,
 							reply: "Too many videos queued from outside Cytube!"
 						};
 					}
-	
+
 					const cytubeType = await sb.Query.getRecordset(rs => rs
 						.select("Type")
 						.from("data", "Video_Type")
@@ -125,7 +125,7 @@ module.exports = {
 					};
 				}
 			},
-	
+
 			checkLimits: (userData, playlist) => {
 				const userRequests = playlist.filter(i => i.User_Alias === userData.ID);
 				if (userRequests.length >= limits.amount) {
@@ -134,12 +134,12 @@ module.exports = {
 						reason: `Maximum amount of videos queued! (${userRequests.length}/${limits.amount})`
 					};
 				}
-	
+
 				let totalTime = 0;
 				for (const request of userRequests) {
 					totalTime += (request.End_Time ?? request.Length) - (request.Start_Time ?? 0);
 				}
-	
+
 				totalTime = Math.ceil(totalTime);
 				if (totalTime >= limits.time) {
 					return {
@@ -147,7 +147,7 @@ module.exports = {
 						reason: `Maximum video time exceeded! (${totalTime}/${limits.time} seconds)`
 					};
 				}
-	
+
 				return {
 					canRequest: true,
 					totalTime,
@@ -157,17 +157,17 @@ module.exports = {
 					amount: limits.amount
 				};
 			},
-	
+
 			parseTimestamp: (string) => {
 				const type = sb.Utils.modules.linkParser.autoRecognize(string);
 				if (type === "youtube" && string.includes("t=")) {
 					const { parse } = require("url");
 					let { query } = parse(string);
-	
+
 					if (/t=\d+/.test(query)) {
 						query = query.replace(/(t=\d+\b)/, "$1sec");
 					}
-	
+
 					return sb.Utils.parseDuration(query, { target: "sec" });
 				}
 			}
@@ -178,7 +178,7 @@ module.exports = {
 			// If we got no args, just redirect to $current 4HEad
 			return await sb.Command.get("current").execute(context);
 		}
-	
+
 		const state = sb.Config.get("SONG_REQUESTS_STATE");
 		if (state === "off") {
 			return { reply: "Song requests are currently turned off." };
@@ -197,10 +197,10 @@ module.exports = {
 					reply: `Song requests are currently using Cytube. Join here: ${cytube} :)`
 				};
 			}
-	
+
 			return await this.staticData.cytubeIntegration.queue(args.join(" "));
 		}
-	
+
 		const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
 		const limits = this.staticData.checkLimits(context.user, queue);
 		if (!limits.canRequest) {
@@ -209,7 +209,8 @@ module.exports = {
 			};
 		}
 
-		let startTime = context.params.start ? sb.Utils.parseVideoDuration(context.params.start) : null;
+		/** @type {number|null} */
+		let startTime = (context.params.start) ? sb.Utils.parseVideoDuration(context.params.start) : null;
 		if (startTime !== null && (!Number.isFinite(startTime) || startTime > 2 ** 32)) {
 			return {
 				success: false,
@@ -217,7 +218,8 @@ module.exports = {
 			};
 		}
 
-		let endTime = context.params.end ? sb.Utils.parseVideoDuration(context.params.end) : null;
+		/** @type {number|null} */
+		let endTime = (context.params.end) ? sb.Utils.parseVideoDuration(context.params.end) : null;
 		if (endTime !== null && (!Number.isFinite(endTime) || endTime > 2 ** 32)) {
 			return {
 				success: false,
@@ -231,17 +233,10 @@ module.exports = {
 		if (potentialTimestamp && startTime === null) {
 			startTime = potentialTimestamp;
 		}
-	
-		if (startTime !== null && endTime !== null && startTime > endTime) {
-			return {
-				success: false,
-				reply: "Start time cannot be greater than the end time!"
-			};
-		}
-	
+
 		const parsedURL = require("url").parse(url);
 		let data = null;
-	
+
 		const { blacklist } = this.staticData;
 		if (blacklist.sites.includes(parsedURL.host)) {
 			return {
@@ -255,7 +250,7 @@ module.exports = {
 			if (!songID) {
 				return { reply: "Invalid link!" };
 			}
-	
+
 			let songData = await sb.Query.getRecordset(rs => rs
 				.select("Available", "Link", "Name", "Duration")
 				.select("Video_Type.Link_Prefix AS Prefix")
@@ -265,7 +260,7 @@ module.exports = {
 				.where("Available = %b", true)
 				.single()
 			);
-	
+
 			if (!songData) {
 				let targetID = null;
 				const main = await sb.Query.getRecordset(rs => rs
@@ -281,9 +276,9 @@ module.exports = {
 					.where("Track_From = %n", songID)
 					.single()
 				);
-	
+
 				targetID = main?.ID ?? songID;
-	
+
 				songData = await sb.Query.getRecordset(rs => rs
 					.select("Track.ID", "Available", "Link", "Name", "Duration")
 					.select("Video_Type.Link_Prefix AS Prefix")
@@ -301,7 +296,7 @@ module.exports = {
 					.single()
 				);
 			}
-	
+
 			if (songData) {
 				url = songData.Prefix.replace(videoTypePrefix, songData.Link);
 			}
@@ -309,7 +304,7 @@ module.exports = {
 				url = null;
 			}
 		}
-	
+
 		if (sb.Utils.modules.linkParser.autoRecognize(url)) {
 			data = await sb.Utils.modules.linkParser.fetchData(url);
 		}
@@ -327,7 +322,7 @@ module.exports = {
 				};
 			}
 		}
-	
+
 		// If no data have been extracted from a link, attempt a search query on Youtube/Vimeo
 		if (!data) {
 			let lookup = null;
@@ -342,7 +337,7 @@ module.exports = {
 						.set("direction", "desc")
 						.toString()
 				});
-	
+
 				if (statusCode !== 200 || body.error) {
 					return {
 						success: false,
@@ -359,7 +354,7 @@ module.exports = {
 					args.join(" "),
 					sb.Config.get("API_GOOGLE_YOUTUBE")
 				);
-	
+
 				lookup = (data[0])
 					? { link: data[0].ID }
 					: null;
@@ -370,7 +365,7 @@ module.exports = {
 					reply: "Incorrect video search type provided!"
 				};
 			}
-	
+
 			if (!lookup) {
 				return {
 					reply: "No video matching that query has been found."
@@ -380,7 +375,7 @@ module.exports = {
 				data = await sb.Utils.modules.linkParser.fetchData(lookup.link, type);
 			}
 		}
-	
+
 		if (blacklist.tracks.includes(data.ID) || blacklist.authors.includes(data.authorID)) {
 			return {
 				success: false,
@@ -408,12 +403,19 @@ module.exports = {
 			}
 		}
 
+		if (startTime !== null && endTime !== null && startTime > endTime) {
+			return {
+				success: false,
+				reply: "Start time cannot be greater than the end time!"
+			};
+		}
+
 		const exists = queue.find(i => (
 			i.Link === data.ID
 			&& i.Start_Time === startTime
 			&& i.End_Time === endTime
 		));
-	
+
 		let existsString = "";
 		if (exists) {
 			const string = `This video is already queued as ID ${exists.VLC_ID}!`;
@@ -427,7 +429,7 @@ module.exports = {
 				existsString = string;
 			}
 		}
-	
+
 		const authorString = (data.author) ? ` by ${data.author}` : "";
 		const segmentLength = (endTime ?? length) - (startTime ?? 0);
 		if ((limits.totalTime + segmentLength) > limits.time) {
@@ -439,7 +441,7 @@ module.exports = {
 				`
 			};
 		}
-	
+
 		let id = null;
 		try {
 			let vlcLink = data.link;
@@ -453,11 +455,11 @@ module.exports = {
 						reply: "No youtube-dl path configured, cannot get-url for this video!"
 					};
 				}
-	
+
 				const result = await shell(`${ytdlPath} --get-url ${data.link}`);
 				vlcLink = result.stdout;
 			}
-	
+
 			id = await sb.VideoLANConnector.add(vlcLink, { startTime, endTime });
 		}
 		catch (e) {
@@ -467,27 +469,27 @@ module.exports = {
 				reply: `The desktop listener is currently turned off. Turning song requests off.`
 			};
 		}
-	
+
 		let when = "right now!";
 		let videoStatus = "Current";
 		let started = new sb.Date();
 		const status = await sb.VideoLANConnector.status();
-	
+
 		if (queue.length > 0) {
 			const current = queue.find(i => i.Status === "Current");
 			const { time: currentVideoPosition, length } = status;
 			const endTime = current?.End_Time ?? length;
-	
+
 			const playingDate = new sb.Date().addSeconds(endTime - currentVideoPosition);
 			const inQueue = queue.filter(i => i.Status === "Queued");
-	
+
 			for (const { Duration: length } of inQueue) {
 				playingDate.addSeconds(length ?? 0);
 			}
-	
+
 			started = null;
 			videoStatus = "Queued";
-			
+
 			if (playingDate <= sb.Date.now()) {
 				when = "right now!";
 			}
@@ -495,7 +497,7 @@ module.exports = {
 				when = sb.Utils.timeDelta(playingDate);
 			}
 		}
-	
+
 		const videoType = data.videoType ?? await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("data", "Video_Type")
@@ -503,7 +505,7 @@ module.exports = {
 			.limit(1)
 			.single()
 		);
-	
+
 		const row = await sb.Query.getRow("chat_data", "Song_Request");
 		row.setValues({
 			VLC_ID: id,
@@ -518,7 +520,7 @@ module.exports = {
 			End_Time: endTime ?? null
 		});
 		await row.save();
-	
+
 		const seek = [];
 		if (startTime !== null) {
 			seek.push(`starting at ${sb.Utils.formatTime(startTime, true)}`);
@@ -526,14 +528,14 @@ module.exports = {
 		if (endTime !== null) {
 			seek.push(`ending at ${sb.Utils.formatTime(endTime, true)}`);
 		}
-	
+
 		const pauseString = (sb.Config.get("SONG_REQUESTS_VLC_PAUSED"))
 			? "Song requests are paused at the moment."
 			: "";
 		const seekString = (seek.length > 0)
 			? `Your video is ${seek.join(" and ")}.`
 			: "";
-	
+
 		return {
 			reply: sb.Utils.tag.trim `
 				Video "${data.name}"${authorString} successfully added to queue with ID ${id}!
