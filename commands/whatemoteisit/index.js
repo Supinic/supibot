@@ -35,7 +35,7 @@ module.exports = {
 			};
 		}
 
-		const { channel, emotecode, emoteid, channellogin: login, tier } = response;
+		const { channel, channelid: cid, emotecode, emoteid, channellogin: login, tier } = response;
 		const originID = await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("data", "Origin")
@@ -73,7 +73,7 @@ module.exports = {
 		return {
 			reply: (channel)
 				? `${emotecode} (ID ${emoteid}) - ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
-				: `${emotecode} (ID ${emoteid}) - global Twitch emote. ${emoteLink} ${cdnLink} ${originString}`
+				: `${emotecode} (ID ${emoteid}) - global Twitch emote. ${emoteLink} https://twitchemotes.com/channels/${cid} ${cdnLink} ${originString}`
 		};
 	}),
 	Dynamic_Description: null
