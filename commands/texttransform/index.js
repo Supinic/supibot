@@ -366,7 +366,6 @@ module.exports = {
 				type = "unmap";
 			}
 			else if (type === "method" && transformation.reverseData) {
-				type = "reverseData";
 				data = transformation.reverseData;
 			}
 			else {
