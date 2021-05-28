@@ -206,6 +206,14 @@ module.exports = {
 					else {
 						return word;
 					}
+				}).join(" "),
+				reverseData: (message) => message.split(" ").map(word => {
+					if (!/^.\u{E0000}/u.test(word)) {
+						return word;
+					}
+
+					const arr = Array.from(word);
+					return arr[0] + arr.slice(2).join("");
 				}).join(" ")
 			},
 			{
@@ -311,6 +319,10 @@ module.exports = {
 				data: (string) => {
 					const result = convert.map(string, officialCharactersMap);
 					return `ⓘ ${result}`;
+				},
+				reverseData: (string) => {
+					const output = string.replace(/ⓘ/g, "");
+					return convert.unmap(output, officialCharactersMap);
 				}
 			}
 		];
@@ -347,19 +359,25 @@ module.exports = {
 			};
 		}
 
-		let { type } = transformation;
+		let { type, data } = transformation;
+
 		if (context.invocation === "rtt") {
-			if (type !== "map") {
+			if (type === "map") {
+				type = "unmap";
+			}
+			else if (type === "method" && transformation.reverseData) {
+				type = "reverseData";
+				data = transformation.reverseData;
+			}
+			else {
 				return {
 					success: false,
 					reply: `This transformation type cannot be reversed!`
 				};
 			}
-
-			type = "unmap";
 		}
 
-		const result = this.staticData.convert[type](message, transformation.data);
+		const result = this.staticData.convert[type](message, data);
 		if (!result) {
 			return {
 				success: false,
