@@ -50,7 +50,7 @@ module.exports = {
 		}
 
 		const delta = sb.Utils.timeDelta(new sb.Date(paste.posted));
-		const expiryString = (paste.expires) ? `Expires ${sb.Utils.delta(new sb.Date(paste.expires))}.` : "";
+		const expiryString = (paste.expires) ? `Expires ${sb.Utils.timeDelta(new sb.Date(paste.expires))}.` : "";
 		return {
 			reply: sb.Utils.tag.trim `
 				Random ${paste.syntax} paste
