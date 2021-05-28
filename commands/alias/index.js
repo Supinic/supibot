@@ -723,12 +723,22 @@ module.exports = {
 					<code>${prefix}alias add test translate to:\${0} hello!</code>
 					<br>
 					<code>${prefix}alias run test spanish</code> => <code>${prefix}translate to:spanish hello</code>
+				</li>				
+				<li>
+					<code>\${-#}</code> (e.g. \${-1}, \${-3}, ...)
+					<br>
+					Replaced by argument on position #, from the end of the list. As in, -3 = third from the end.
+					<br>
+					<code>${prefix}alias add test translate to:\${-1} hello!</code>
+					<br>
+					<code>${prefix}alias run test hello 1 2 3 4 spanish</code> => <code>${prefix}translate to:spanish hello</code>
 				</li>
 				<br>
 				<li>
-					<code>\${#+}</code> (e.g. \${0+}, \${1+}, ...)
+					<code>\${#+}</code> (e.g. \${0+}, \${1+}, but also \${-2+}, \${-5+} ...)
 					<br>
 					Replaced by argument number # and all the following arguments in your alias execution.
+					If the number is negative, it determines the number as from the end of the list, then takes the rest until the end.
 					<br>
 					<code>${prefix}alias add test translate to:\${0} hello, \${1+}!</code>
 					<br>
@@ -736,7 +746,7 @@ module.exports = {
 				</li>
 				<br>
 				<li>
-					<code>\${#-#}</code> (e.g. \${0..1}, \${1..10}, ...)
+					<code>\${#-#}</code> (e.g. \${0..1}, \${1..10}, but also \${-3..-2}, \${1..-1}, ...)
 					<br>
 					Replaced by argument number #1 and all the following arguments until #2, inclusive.
 					<br>
