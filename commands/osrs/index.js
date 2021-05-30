@@ -61,6 +61,10 @@ module.exports = {
 				ironman = "ultimate ironman";
 			}
 
+			if (ironman !== "user" && data.ironman.abandoned) {
+				ironman = `de-ironed ${ironman}`;
+			}
+
 			return ironman;
 		},
 
