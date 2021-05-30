@@ -69,7 +69,7 @@ module.exports = {
 		let finalResult = null;
 		let currentArgs = [];
 
-		let lastCommand;
+		// let lastCommand;
 		for (let i = 0; i < invocations.length; i++) {
 			const inv = invocations[i];
 			const [cmd, ...restArgs] = inv.split(" ");
@@ -158,13 +158,13 @@ module.exports = {
 				currentArgs = sb.Utils.wrapString(result.reply, this.staticData.resultCharacterLimit).split(" ");
 			}
 
-			lastCommand = sb.Command.get(cmd.replace(sb.Command.prefix, ""));
+			// lastCommand = sb.Command.get(cmd.replace(sb.Command.prefix, ""));
 			finalResult = result;
 		}
 
 		return {
 			hasExternalInput,
-			skipExternalPrefix: Boolean(lastCommand.Flags.skipBanphrase),
+			// skipExternalPrefix: Boolean(lastCommand.Flags.skipBanphrase),
 			replyWithPrivateMessage: Boolean(finalResult?.replyWithPrivateMessage),
 			reply: currentArgs.join(" ")
 		};
