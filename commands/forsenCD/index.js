@@ -76,7 +76,9 @@ module.exports = {
 				"Just think about it Cloak, these dumb dumb simp virgin wannabe gamers deserve to be reminded.  And to be able to say that during combat... oh baby baby baby.",
 				"Guess I'm going to the Lambeau dealership and buying a Lambeau. HAHAHAHAHA get it? Lambeau? Like Lambeaughini? HAHAHA Hahaha ha",
 				"This whole game feels off. I noticed it before the game, Mahomes demeanor felt different. Something is up. Huge conspiracy. Probably Shungite related.",
-				"Hey @timthetatman aka Timmy Really Tough Tenders, have you ever solo que'd a video game in your life? You're doing Valorant placements with a squad? Come on. Weak and pathetic."
+				"Hey @timthetatman aka Timmy Really Tough Tenders, have you ever solo que'd a video game in your life? You're doing Valorant placements with a squad? Come on. Weak and pathetic.",
+				"I woke up this morning and faced a very difficult question. The black Lambo or the red one?",
+				"To this day, I still have no idea what League of Legends is about. Is it a trading card game?"
 			]
 		};
 	}),
@@ -84,7 +86,7 @@ module.exports = {
 		const post = sb.Utils.randArray(this.staticData.forsenCD.filter(i => !this.data.previousPosts.includes(i)));
 		this.data.previousPosts.unshift(post);
 		this.data.previousPosts.splice(this.staticData.repeats);
-	
+
 		return {
 			reply: `${post} ${context.invocation}`
 		};
