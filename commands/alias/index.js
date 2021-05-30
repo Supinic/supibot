@@ -106,6 +106,15 @@ module.exports = {
 		const wrapper = new Map(Object.entries(context.user.Data.aliasedCommands));
 
 		type = type.toLowerCase();
+
+		const allowed = ["run", "inspect", "code", "check", "list", "spy"];
+		if (!allowed.includes(type)) {
+			return {
+				success: false,
+				reply: `The ${type} operation is currently not available! Command aliases are being refactored for better performance. Stay tuned!`
+			};
+		}
+
 		switch (type) {
 			case "add":
 			case "addedit":
