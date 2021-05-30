@@ -252,6 +252,7 @@ module.exports = {
 				const alias = await sb.Query.getRecordset(rs => rs
 					.select("Invocation", "Arguments")
 					.from("data", "Custom_Command_Alias")
+					.where("User_Alias = %n", user.ID)
 					.where("Name = %s", aliasName)
 					.limit(1)
 					.single()
