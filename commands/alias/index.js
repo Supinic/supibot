@@ -122,7 +122,7 @@ module.exports = {
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NULL")
 					.where("User_Alias = %n", context.user.ID)
-					.where("Name = %s", name)
+					.where("Name COLLATE utf8mb4_bin = %s", name)
 					.single()
 					.limit(1)
 				);
@@ -253,7 +253,7 @@ module.exports = {
 					.select("Invocation", "Arguments")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", user.ID)
-					.where("Name = %s", aliasName)
+					.where("Name COLLATE utf8mb4_bin = %s", aliasName)
 					.limit(1)
 					.single()
 				);
@@ -328,7 +328,7 @@ module.exports = {
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NULL")
 					.where("User_Alias = %n", targetUser.ID)
-					.where("Name = %s", targetAliasName)
+					.where("Name COLLATE utf8mb4_bin = %s", targetAliasName)
 					.limit(1)
 					.single()
 				);
@@ -345,7 +345,7 @@ module.exports = {
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NULL")
 					.where("User_Alias = %n", context.user.ID)
-					.where("Name = %s", targetAliasName)
+					.where("Name COLLATE utf8mb4_bin = %s", targetAliasName)
 					.limit(1)
 					.single()
 				);
@@ -396,7 +396,7 @@ module.exports = {
 					.select("ID")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
-					.where("Name = %s", name)
+					.where("Name COLLATE utf8mb4_bin = %s", name)
 					.limit(1)
 					.single()
 				);
@@ -440,7 +440,7 @@ module.exports = {
 					.select("ID", "Command", "Invocation", "Arguments", "Description")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
-					.where("Name = %s", oldAliasName)
+					.where("Name COLLATE utf8mb4_bin = %s", oldAliasName)
 					.limit(1)
 					.single()
 				);
@@ -455,7 +455,7 @@ module.exports = {
 					.select("Command", "Invocation", "Arguments", "Description")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
-					.where("Name = %s", newAliasName)
+					.where("Name COLLATE utf8mb4_bin = %s", newAliasName)
 					.limit(1)
 					.single()
 				);
@@ -507,7 +507,7 @@ module.exports = {
 					.select("ID")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
-					.where("Name = %s", name)
+					.where("Name COLLATE utf8mb4_bin = %s", name)
 					.limit(1)
 					.single()
 				);
@@ -566,7 +566,7 @@ module.exports = {
 					.select("Description")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", user.ID)
-					.where("Name = %s", aliasName)
+					.where("Name COLLATE utf8mb4_bin = %s", aliasName)
 					.limit(1)
 					.single()
 				);
@@ -600,7 +600,7 @@ module.exports = {
 					.select("ID")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
-					.where("Name = %s", name)
+					.where("Name COLLATE utf8mb4_bin = %s", name)
 					.limit(1)
 					.single()
 				);
@@ -640,7 +640,7 @@ module.exports = {
 					.select("ID")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
-					.where("Name = %s", oldAliasName)
+					.where("Name COLLATE utf8mb4_bin = %s", oldAliasName)
 					.limit(1)
 					.single()
 				);
@@ -655,7 +655,7 @@ module.exports = {
 					.select("ID")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
-					.where("Name = %s", newAliasName)
+					.where("Name COLLATE utf8mb4_bin = %s", newAliasName)
 					.limit(1)
 					.single()
 				);
@@ -689,7 +689,7 @@ module.exports = {
 					.select("Invocation", "Arguments")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias = %n", context.user.ID)
-					.where("Name = %s", name)
+					.where("Name COLLATE utf8mb4_bin = %s", name)
 					.limit(1)
 					.single()
 				);
