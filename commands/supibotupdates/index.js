@@ -43,7 +43,7 @@ module.exports = {
 			member.roles.add(role, `Bot assigned the role on ${sb.Date.now()} in channel ${context.channel?.ID ?? null}.`);
 		}
 
-		const [string, emoji] = (hasRole) ? ["no longer", "😊"] : ["", "☹"];
+		const [string, emoji] = (hasRole) ? ["no longer", "☹"] : ["", "😊"];
 		return {
 			reply: `You now ${string} have the role that mentions you for Supibot updates ${emoji}`
 		};
