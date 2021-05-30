@@ -17,11 +17,11 @@ module.exports = {
 					const [alias, users] = await Promise.all([
 						sb.Query.getRecordset(rs => rs
 							.select("MAX(ID) AS Max")
-							.from("chat_data", "Custom_Command_Alias")
+							.from("data", "Custom_Command_Alias")
 						),
 						sb.Query.getRecordset(rs => rs
 							.select("COUNT(DISTINCT User_Alias) AS Count")
-							.from("chat_data", "Custom_Command_Alias")
+							.from("data", "Custom_Command_Alias")
 						)
 					]);
 
