@@ -14,20 +14,19 @@ module.exports = {
 				aliases: [],
 				description: "Checks the global data for user-created supibot command aliases.",
 				execute: async () => {
-					const users = await sb.Query.getRecordset(rs => rs
-						.select("ID")
-						.from("chat_data", "User_Alias")
-						.join({
-							toTable: "User_Alias_Data",
-							on: "User_Alias.ID = User_Alias_Data.User_Alias"
-						})
-						.flat("ID")
-					);
+					const [alias, users] = await Promise.all([
+						sb.Query.getRecordset(rs => rs
+							.select("MAX(ID) AS Max")
+							.from("chat_data", "Custom_Command_Alias")
+						),
+						sb.Query.getRecordset(rs => rs
+							.select("COUNT(DISTINCT User_Alias) AS Count")
+							.from("chat_data", "Custom_Command_Alias")
+						)
+					]);
 
-					const usersData = (await sb.User.getMultiple(users)).filter(i => i.Data.aliasedCommands);
-					const aliases = usersData.flatMap(i => Object.values(i.Data.aliasedCommands ?? {}));
 					return {
-						reply: `There are currently ${aliases.length} active command aliases, used by ${usersData.length} users.`
+						reply: `${alias.Max} command aliases have been created so far, used by ${users.Count} users in total.`
 					};
 				}
 			},

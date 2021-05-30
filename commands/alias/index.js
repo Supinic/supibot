@@ -96,24 +96,7 @@ module.exports = {
 			};
 		}
 
-		if (!context.user.Data.aliasedCommands) {
-			context.user.Data.aliasedCommands = {};
-			await context.user.saveProperty("Data");
-		}
-
-		let changed = false;
-		let reply = "Unexpected reply! Contact @Supinic about this.";
-		const wrapper = new Map(Object.entries(context.user.Data.aliasedCommands));
-
 		type = type.toLowerCase();
-
-		const allowed = ["run", "inspect", "code", "check", "list", "spy"];
-		if (!allowed.includes(type)) {
-			return {
-				success: false,
-				reply: `The ${type} operation is currently not available! Command aliases are being refactored for better performance. Stay tuned!`
-			};
-		}
 
 		switch (type) {
 			case "add":
@@ -124,19 +107,30 @@ module.exports = {
 				if (!name || !command) {
 					return {
 						success: false,
-						reply: `You didn't provide a name, or a command! Use: alias add (name) (command) (...arguments)"`
-					};
-				}
-				else if (wrapper.has(name) && type !== "addedit" && type !== "upsert") {
-					return {
-						success: false,
-						reply: `Cannot add alias "${name}" - you already have one! You can either _edit_ its definion, _rename_ it or _remove_ it.`
+						reply: `You didn't provide a name, or a command! Usage: alias add (name) (command) (...arguments)"`
 					};
 				}
 				else if (!this.staticData.nameCheck.regex.test(name)) {
 					return {
 						success: false,
 						reply: `Your alias name is not valid! ${this.staticData.nameCheck.response}`
+					};
+				}
+
+				const alias = await sb.Query.getRecordset(rs => rs
+					.select("ID", "Name", "Invocation", "Arguments")
+					.from("data", "Custom_Command_Alias")
+					.where("Channel IS NULL")
+					.where("User_Alias = %n", context.user.ID)
+					.where("Name = %s", name)
+					.single()
+					.limit(1)
+				);
+
+				if (alias && (type === "add" || type === "create")) {
+					return {
+						success: false,
+						reply: `Cannot ${type} alias "${name}" - you already have one! You can either "edit" its definion, "rename" it or "remove" it.`
 					};
 				}
 
@@ -148,23 +142,28 @@ module.exports = {
 					};
 				}
 
-				changed = true;
-				wrapper.set(name, {
-					name,
-					invocation: command,
-					args: rest,
-					created: new sb.Date().toJSON(),
-					lastEdit: null
+				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				if (alias) {
+					await row.load(alias.ID);
+				}
+
+				row.setValues({
+					User_Alias: context.user.ID,
+					Channel: null,
+					Name: name,
+					Command: commandCheck.Name,
+					Invocation: command,
+					Arguments: (rest.length > 0) ? JSON.stringify(rest) : null,
+					Created: new sb.Date(),
+					Edited: null
 				});
 
-				if (type === "add" || type === "create") {
-					reply = `Your alias "${name}" has been created successfully.`;
-				}
-				else {
-					reply = `Your alias "${name}" has been replaced successfully.`;
-				}
-
-				break;
+				await row.save({ skipLoad: true });
+				return {
+					reply: (type === "add" || type === "create")
+						? `Your alias "${name}" has been created successfully.`
+						: `Your alias "${name}" has been replaced successfully.`
+				};
 			}
 
 			case "code":
@@ -183,26 +182,41 @@ module.exports = {
 					};
 				}
 				else if (firstName && !secondName) {
+					const aliases = await sb.Query.getRecordset(rs => rs
+						.select("Name")
+						.from("data", "Custom_Command_Alias")
+						.where("Channel IS NULL")
+						.where("User_Alias = %n", context.user.ID)
+						.flat("Name")
+					);
+
+					let targetAliases = [];
 					const targetUser = await sb.User.get(firstName);
-					const targetAliases = (targetUser)
-						? Object.keys(targetUser.Data.aliasedCommands ?? {})
-						: [];
+					if (targetUser) {
+						targetAliases = await sb.Query.getRecordset(rs => rs
+							.select("Name")
+							.from("data", "Custom_Command_Alias")
+							.where("Channel IS NULL")
+							.where("User_Alias = %n",targetUser.ID)
+							.flat("Name")
+						);
+					}
 
 					// Not a username nor current user's alias name - error out
-					if (targetAliases.length === 0 && !wrapper.has(firstName)) {
+					if (targetAliases.length === 0 && !aliases.includes(firstName)) {
 						return {
 							success: false,
 							reply: `Could not match your input to username or any of your aliases!`
 						};
 					}
 					// Not a username, but current user has an alias with the provided name
-					else if (targetAliases.length === 0 && wrapper.has(firstName)) {
+					else if (targetAliases.length === 0 && aliases.includes(firstName)) {
 						user = context.user;
 						aliasName = firstName;
 						prefix = "Your";
 					}
 					// Not current user's alias, but a username exists
-					else if (targetAliases.length > 0 && !wrapper.has(firstName)) { // Is a username
+					else if (targetAliases.length > 0 && !aliases.includes(firstName)) { // Is a username
 						const who = (targetUser === context.user) ? "your" : "their";
 						const username = encodeURIComponent(targetUser.Name);
 						return {
@@ -233,24 +247,31 @@ module.exports = {
 
 					aliasName = secondName;
 					prefix = (context.user === user) ? "Your" : "Their";
+				}
 
-					const userAliases = Object.keys(user.Data.aliasedCommands ?? {});
-					if (!userAliases.includes(aliasName)) {
-						const who = (context.user === user) ? "You" : "They";
-						return {
-							success: false,
-							reply: `${who} don't have the "${aliasName}" alias!`
-						};
-					}
+				const alias = await sb.Query.getRecordset(rs => rs
+					.select("Invocation", "Arguments")
+					.from("data", "Custom_Command_Alias")
+					.where("Name = %s", aliasName)
+					.limit(1)
+					.single()
+				);
+
+				if (!alias) {
+					const who = (context.user === user) ? "You" : "They";
+					return {
+						success: false,
+						reply: `${who} don't have the "${aliasName}" alias!`
+					};
 				}
 
 				let message;
-				const alias = user.Data.aliasedCommands[aliasName];
+				const aliasArgs = (alias.Arguments) ? JSON.parse(alias.Arguments) : [];
 				if (type === "code") {
-					message = `${alias.invocation} ${alias.args.join(" ")}`;
+					message = `${alias.Invocation} ${aliasArgs.join(" ")}`;
 				}
 				else {
-					message = `${prefix} alias "${aliasName}" has this definition: ${alias.invocation} ${alias.args.join(" ")}`;
+					message = `${prefix} alias "${aliasName}" has this definition: ${alias.Invocation} ${aliasArgs.join(" ")}`;
 				}
 
 				const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
@@ -279,58 +300,86 @@ module.exports = {
 
 			case "copy":
 			case "copyplace": {
-				const [targetUser, targetAlias] = args;
-				if (!targetUser) {
+				const [targetUserName, targetAliasName] = args;
+				if (!targetUserName) {
 					return {
 						success: false,
 						reply: "No target username provided!"
 					};
 				}
-				else if (!targetAlias) {
+				else if (!targetAliasName) {
 					return {
 						success: false,
 						reply: "No target alias provided!"
 					};
 				}
 
-				const target = await sb.User.get(targetUser);
-				if (!target) {
+				const targetUser = await sb.User.get(targetUserName);
+				if (!targetUser) {
 					return {
 						success: false,
 						reply: "Invalid user provided!"
 					};
 				}
 
-				const aliases = target.Data.aliasedCommands;
-				if (!aliases || Object.keys(aliases).length === 0) {
-					return {
-						success: false,
-						reply: "They currently don't have any aliases!"
-					};
-				}
-				else if (!aliases[targetAlias]) {
-					return {
-						success: false,
-						reply: `They don't have the "${targetAlias}" alias!`
-					};
-				}
-
-				const alias = aliases[targetAlias];
-				if (wrapper.has(targetAlias) && type !== "copyplace") {
-					return {
-						success: false,
-						reply: `Cannot copy alias "${targetAlias} - you already have it! If you want to copy + replace, use "alias copyplace".`
-					};
-				}
-
-				const operation = (type === "copy") ? "add" : "upsert";
-				return await this.execute(
-					context,
-					operation,
-					targetAlias,
-					alias.invocation,
-					...alias.args
+				const targetAlias = await sb.Query.getRecordset(rs => rs
+					.select("ID", "Command", "Invocation", "Arguments")
+					.from("data", "Custom_Command_Alias")
+					.where("Channel IS NULL")
+					.where("User_Alias = %n", targetUser.ID)
+					.where("Name = %s", targetAliasName)
+					.limit(1)
+					.single()
 				);
+
+				if (!targetAlias) {
+					return {
+						success: false,
+						reply: `They don't have the "${targetAliasName}" alias!`
+					};
+				}
+
+				const currentAlias = await sb.Query.getRecordset(rs => rs
+					.select("ID", "Command", "Invocation", "Arguments")
+					.from("data", "Custom_Command_Alias")
+					.where("Channel IS NULL")
+					.where("User_Alias = %n", context.user.ID)
+					.where("Name = %s", targetAliasName)
+					.limit(1)
+					.single()
+				);
+
+				if (currentAlias && type !== "copyplace") {
+					return {
+						success: false,
+						reply: `Cannot copy alias "${targetAliasName} - you already have it! If you want to copy + replace, use "alias copyplace".`
+					};
+				}
+
+				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				if (currentAlias) {
+					await row.load(currentAlias.ID);
+				}
+
+				row.setValues({
+					User_Alias: context.user.ID,
+					Channel: null,
+					Name: targetAliasName,
+					Command: targetAlias.Command,
+					Invocation: targetAlias.Invocation,
+					Arguments: targetAlias.Arguments,
+					Description: null,
+					Parent: targetAlias.ID,
+					Created: new sb.Date(),
+					Edited: null
+				});
+
+				await row.save({ skipLoad: true });
+
+				const verb = (type === "copyplace") ? "copied and replaced" : "copied";
+				return {
+					reply: `Alias "${targetAliasName}" ${verb} successfully.`
+				};
 			}
 
 			case "describe": {
@@ -338,10 +387,20 @@ module.exports = {
 				if (!name) {
 					return {
 						success: false,
-						reply: `You didn't provide a name, or a command! Use: alias add (name) (command) (...arguments)"`
+						reply: `You didn't provide a name, or a command! Use: alias describe (name) (...description)"`
 					};
 				}
-				else if (!wrapper.has(name)) {
+
+				const alias = await sb.Query.getRecordset(rs => rs
+					.select("ID")
+					.from("data", "Custom_Command_Alias")
+					.where("User_Alias = %n", context.user.ID)
+					.where("Name = %s", name)
+					.limit(1)
+					.single()
+				);
+
+				if (!alias) {
 					return {
 						success: false,
 						reply: `You don't have the "${name}" alias!`
@@ -349,64 +408,81 @@ module.exports = {
 				}
 
 				const description = rest.join(" ").trim();
-				if (description.length > this.staticData.descriptionLimit) {
-					return {
-						success: false,
-						reply: `Your description exceeds the limit of ${this.staticData.descriptionLimit} characters!`
-					};
-				}
+				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				await row.load(alias.ID);
 
 				let verb;
-				const obj = wrapper.get(name);
 				if (description.length === 0 || description === "none") {
-					obj.desc = "";
+					row.values.Description = null;
 					verb = "reset";
 				}
 				else {
-					obj.desc = description;
+					row.values.Description = description;
 					verb = "updated";
 				}
 
-				reply = `The description of your alias "${name}" has been ${verb} successfully.`;
-				changed = true;
-				obj.lastEdit = new sb.Date().toJSON();
-
-				break;
+				await row.save({ skipLoad: true });
+				return {
+					reply: `The description of your alias "${name}" has been ${verb} successfully.`
+				};
 			}
 
 			case "duplicate": {
-				const [oldAlias, newAlias] = args;
-				if (!oldAlias || !newAlias) {
+				const [oldAliasName, newAliasName] = args;
+				if (!oldAliasName || !newAliasName) {
 					return {
 						reply: `To duplicate an alias, you must provide both existing and new alias names!`
 					};
 				}
-				else if (!wrapper.has(oldAlias)) {
+
+				const oldAlias = await sb.Query.getRecordset(rs => rs
+					.select("ID", "Command", "Invocation", "Arguments", "Description")
+					.from("data", "Custom_Command_Alias")
+					.where("User_Alias = %n", context.user.ID)
+					.where("Name = %s", oldAliasName)
+					.limit(1)
+					.single()
+				);
+				if (!oldAlias) {
 					return {
 						success: false,
-						reply: `You don't have the "${oldAlias}" alias!`
-					};
-				}
-				else if (wrapper.has(newAlias)) {
-					return {
-						success: false,
-						reply: `You already have the "${newAlias}" alias!`
+						reply: `You don't have the "${oldAliasName}" alias!`
 					};
 				}
 
-				const previous = wrapper.get(oldAlias);
-				wrapper.set(newAlias, {
-					name: newAlias,
-					invocation: previous.invocation,
-					args: previous.args,
-					desc: previous.desc ?? "",
-					created: new sb.Date().toJSON(),
-					lastEdit: null
+				const newAlias = await sb.Query.getRecordset(rs => rs
+					.select("Command", "Invocation", "Arguments", "Description")
+					.from("data", "Custom_Command_Alias")
+					.where("User_Alias = %n", context.user.ID)
+					.where("Name = %s", newAliasName)
+					.limit(1)
+					.single()
+				);
+				if (newAlias) {
+					return {
+						success: false,
+						reply: `You already have the "${newAliasName}" alias!`
+					};
+				}
+
+				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				row.setValues({
+					User_Alias: context.user.ID,
+					Channel: null,
+					Name: newAliasName,
+					Command: oldAlias.Command,
+					Invocation: oldAlias.Invocation,
+					Arguments: oldAlias.Arguments,
+					Description: null,
+					Parent: oldAlias.ID,
+					Created: new sb.Date(),
+					Edited: null
 				});
 
-				reply = `Successfully duplicated "${oldAlias}" as "${newAlias}"!`;
-				changed = true;
-				break;
+				await row.save();
+				return {
+					reply: `Successfully duplicated "${oldAliasName}" as "${newAliasName}"!`
+				};
 			}
 
 			case "edit": {
@@ -415,12 +491,6 @@ module.exports = {
 					return {
 						success: false,
 						reply: `No alias or command name provided!"`
-					};
-				}
-				else if (!wrapper.has(name)) {
-					return {
-						success: false,
-						reply: `You don't have the "${name}" alias!`
 					};
 				}
 
@@ -432,15 +502,33 @@ module.exports = {
 					};
 				}
 
-				const obj = wrapper.get(name);
-				obj.invocation = command;
-				obj.args = rest;
-				obj.lastEdit = new sb.Date().toJSON();
+				const alias = await sb.Query.getRecordset(rs => rs
+					.select("ID")
+					.from("data", "Custom_Command_Alias")
+					.where("User_Alias = %n", context.user.ID)
+					.where("Name = %s", name)
+					.limit(1)
+					.single()
+				);
+				if (!alias) {
+					return {
+						success: false,
+						reply: `You don't have the "${name}" alias!`
+					};
+				}
 
-				changed = true;
-				reply = `Your alias "${name}" has been successfully edited.`;
+				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				await row.load(alias.ID);
+				row.setValues({
+					Command: commandCheck.Name,
+					Invocation: command,
+					Arguments: (rest.length > 0) ? JSON.stringify(rest) : null
+				});
 
-				break;
+				await row.save({ skipLoad: true });
+				return {
+					reply: `Your alias "${name}" has been successfully edited.`
+				};
 			}
 
 			case "inspect": {
@@ -473,15 +561,15 @@ module.exports = {
 					prefix = (context.user === user) ? "You" : "They";
 				}
 
-				const aliases = user.Data.aliasedCommands;
-				if (!aliases) {
-					return {
-						success: false,
-						reply: `${prefix} don't have any aliases!`
-					};
-				}
+				const alias = await sb.Query.getRecordset(rs => rs
+					.select("Description")
+					.from("data", "Custom_Command_Alias")
+					.where("User_Alias = %n", user.ID)
+					.where("Name = %s", aliasName)
+					.limit(1)
+					.single()
+				);
 
-				const alias = aliases[aliasName];
 				if (!alias) {
 					return {
 						success: false,
@@ -489,11 +577,10 @@ module.exports = {
 					};
 				}
 
-				const description = alias.desc;
 				return {
 					cooldown: (context.append.pipe) ? null : this.Cooldown,
-					reply: (description)
-						? `${aliasName}: ${description}`
+					reply: (alias.Description)
+						? `${aliasName}: ${alias.Description}`
 						: `Alias "${aliasName}" has no description.`
 				};
 			}
@@ -507,50 +594,85 @@ module.exports = {
 						reply: `No alias name provided!`
 					};
 				}
-				else if (!wrapper.has(name)) {
+
+				const alias = await sb.Query.getRecordset(rs => rs
+					.select("ID")
+					.from("data", "Custom_Command_Alias")
+					.where("User_Alias = %n", context.user.ID)
+					.where("Name = %s", name)
+					.limit(1)
+					.single()
+				);
+				if (!alias) {
 					return {
 						success: false,
 						reply: `You don't have the "${name}" alias!`
 					};
 				}
 
-				changed = true;
-				wrapper.delete(name);
-				reply = `Your alias "${name}" has been succesfully removed.`;
+				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				await row.load(alias.ID);
 
-				break;
+				await row.delete();
+				return {
+					success: false,
+					reply: `Your alias "${name}" has been succesfully removed.`
+				};
 			}
 
 			case "rename": {
-				const [oldName, newName] = args;
-				if (!oldName || !newName) {
+				const [oldAliasName, newAliasName] = args;
+				if (!oldAliasName || !newAliasName) {
 					return {
 						success: false,
 						reply: "You must provide both the current alias name and the new one!"
 					};
 				}
-				else if (!wrapper.has(oldName)) {
-					return {
-						success: false,
-						reply: `You don't have the "${oldName}" alias!`
-					};
-				}
-				else if (!this.staticData.nameCheck.regex.test(newName)) {
+				else if (!this.staticData.nameCheck.regex.test(newAliasName)) {
 					return {
 						success: false,
 						reply: `Your new alias name is not valid! ${this.staticData.nameCheck.response}`
 					};
 				}
 
-				changed = true;
-				wrapper.set(newName, wrapper.get(oldName));
-				wrapper.get(newName).lastEdit = new sb.Date().toJSON();
-				wrapper.get(newName).name = newName;
-				wrapper.delete(oldName);
+				const oldAlias = await sb.Query.getRecordset(rs => rs
+					.select("ID")
+					.from("data", "Custom_Command_Alias")
+					.where("User_Alias = %n", context.user.ID)
+					.where("Name = %s", oldAliasName)
+					.limit(1)
+					.single()
+				);
+				if (!oldAlias) {
+					return {
+						success: false,
+						reply: `You don't have the "${oldAliasName}" alias!`
+					};
+				}
 
-				reply = `Your alias "${oldName}" has been succesfully renamed to "${newName}".`;
+				const newAlias = await sb.Query.getRecordset(rs => rs
+					.select("ID")
+					.from("data", "Custom_Command_Alias")
+					.where("User_Alias = %n", context.user.ID)
+					.where("Name = %s", newAliasName)
+					.limit(1)
+					.single()
+				);
+				if (newAlias) {
+					return {
+						success: false,
+						reply: `You already have the "${newAliasName}" alias!`
+					};
+				}
 
-				break;
+				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				await row.load(oldAlias.ID);
+				row.values.Name = newAliasName;
+
+				await row.save({ skipLoad: true });
+				return {
+					reply: `Your alias "${oldAliasName}" has been succesfully renamed to "${newAliasName}".`
+				};
 			}
 
 			case "run": {
@@ -561,14 +683,25 @@ module.exports = {
 						reply: "No alias name provided!"
 					};
 				}
-				else if (!wrapper.has(name)) {
+
+				const alias = await sb.Query.getRecordset(rs => rs
+					.select("Invocation", "Arguments")
+					.from("data", "Custom_Command_Alias")
+					.where("User_Alias = %n", context.user.ID)
+					.where("Name = %s", name)
+					.limit(1)
+					.single()
+				);
+				if (!alias) {
 					return {
 						success: false,
 						reply: `You don't have the "${name}" alias!`
 					};
 				}
 
-				const { invocation, args: aliasArguments } = wrapper.get(name);
+				const invocation = alias.Invocation;
+				const aliasArguments = (alias.Arguments) ? JSON.parse(alias.Arguments) : [];
+
 				const { success, reply, resultArguments } = this.staticData.applyParameters(context, aliasArguments, args.slice(1));
 				if (!success) {
 					return { success, reply };
@@ -578,7 +711,7 @@ module.exports = {
 				if (context.append.pipe && !commandData.Flags.pipe) {
 					return {
 						success: false,
-						reply: `Cannot use command ${invocation} inside of a pipe, despite being wrapped in an alias!`
+						reply: `Cannot use the ${invocation} command inside of a pipe, despite being wrapped in an alias!`
 					};
 				}
 
@@ -618,23 +751,16 @@ module.exports = {
 					hasExternalInput: Boolean(result?.hasExternalInput ?? commandData.Flags.externalInput)
 				};
 			}
-
-			default: return {
-				success: false,
-				reply: sb.Utils.tag.trim `
-					Invalid sub-command provided!
-					Check the extended help here:
-				   	https://supinic.com/bot/command/${this.ID}
-				`
-			};
 		}
 
-		if (changed) {
-			context.user.Data.aliasedCommands = Object.fromEntries(wrapper);
-			await context.user.saveProperty("Data");
-		}
-
-		return { reply };
+		return {
+			success: false,
+			reply: sb.Utils.tag.trim `
+				Invalid sub-command provided!
+				Check the extended help here:
+				https://supinic.com/bot/command/${this.ID}
+			`
+		};
 	}),
 	Dynamic_Description: (async (prefix) => [
 		"Meta-command that lets you create aliases (or shorthands) for existing commands or their combinations.",
