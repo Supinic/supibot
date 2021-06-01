@@ -12,6 +12,8 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
+		// matches | and > characters if and only if they're not preceded, nor followed by another | or >.
+		pipeRegex: /(?<![|>])[|>](?![|>])/,
 		resultCharacterLimit: 50_000,
 		reasons: {
 			block: "That user has blocked you from this command!",
@@ -24,7 +26,7 @@ module.exports = {
 		}
 	})),
 	Code: (async function pipe (context, ...args) {
-		const invocations = args.join(" ").split(/[|>]/).map(i => i.trim());
+		const invocations = args.join(" ").split(this.staticData.pipeRegex).map(i => i.trim());
 		if (!context.externalPipe && invocations.length < 2) {
 			return {
 				success: false,
