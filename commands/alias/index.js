@@ -692,7 +692,9 @@ module.exports = {
 			case "try": {
 				let name;
 				let user;
-				const [firstArg, secondArg] = args;
+
+				const runArgs = [...args];
+				const [firstArg, secondArg] = runArgs;
 				if (!firstArg) {
 					return {
 						success: false,
@@ -705,6 +707,7 @@ module.exports = {
 					user = context.user;
 				}
 				else if (type === "try") {
+					runArgs.splice(0, 1);
 					name = secondArg;
 					user = await sb.User.get(firstArg);
 					if (!user) {
@@ -734,7 +737,7 @@ module.exports = {
 				const invocation = alias.Invocation;
 				const aliasArguments = (alias.Arguments) ? JSON.parse(alias.Arguments) : [];
 
-				const { success, reply, resultArguments } = this.staticData.applyParameters(context, aliasArguments, args.slice(1));
+				const { success, reply, resultArguments } = this.staticData.applyParameters(context, aliasArguments, runArgs.slice(1));
 				if (!success) {
 					return { success, reply };
 				}
