@@ -688,27 +688,46 @@ module.exports = {
 				};
 			}
 
-			case "run": {
-				const [name] = args;
-				if (!name) {
+			case "run":
+			case "try": {
+				let name;
+				let user;
+				const [firstArg, secondArg] = args;
+				if (!firstArg) {
 					return {
 						success: false,
-						reply: "No alias name provided!"
+						reply: "No input provided!"
 					};
+				}
+
+				if (type === "run") {
+					name = firstArg;
+					user = context.user;
+				}
+				else if (type === "try") {
+					name = secondArg;
+					user = await sb.User.get(firstArg);
+					if (!user) {
+						return {
+							success: false,
+							reply: `Provided user does not exist!`
+						};
+					}
 				}
 
 				const alias = await sb.Query.getRecordset(rs => rs
 					.select("Invocation", "Arguments")
 					.from("data", "Custom_Command_Alias")
-					.where("User_Alias = %n", context.user.ID)
+					.where("User_Alias = %n", user.ID)
 					.where("Name COLLATE utf8mb4_bin = %s", name)
 					.limit(1)
 					.single()
 				);
 				if (!alias) {
+					const who = (user === context.user) ? "You" : "They";
 					return {
 						success: false,
-						reply: `You don't have the "${name}" alias!`
+						reply: `${who} don't have the "${name}" alias!`
 					};
 				}
 
