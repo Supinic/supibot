@@ -122,7 +122,7 @@ module.exports = {
 					}
 
 					return {
-						reply: `Changelog ID ${ID}: ${row.Title ?? "(no title)"} Read more here: https://supinic.com/data/changelog/detail/${ID}`
+						reply: `Changelog ID ${ID}: ${row.values.Title ?? "(no title)"} Read more here: https://supinic.com/data/changelog/detail/${ID}`
 					};
 				}
 			},
