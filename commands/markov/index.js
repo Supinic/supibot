@@ -25,14 +25,14 @@ module.exports = {
 				}
 
 				const module = sb.ChatModule.get("async-markov-experiment");
-				if (!module) {
+				if (!module || !module.data.markovs) {
 					return;
 				}
 
 				const promises = [];
 				for (const [channelID, markov] of module.data.markovs.entries()) {
 					const words = markov.keys.sort();
-					
+
 					promises.push(sb.Cache.setByPrefix("markov-word-list", words, {
 						keys: { channelID },
 						expiry: 864e5
@@ -71,7 +71,7 @@ module.exports = {
 				reply: `No such channel exists!`
 			};
 		}
-		
+
 		const markov = module.data.markovs.get(targetChannel.ID);
 		if (!markov) {
 			return {
