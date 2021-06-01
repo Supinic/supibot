@@ -220,7 +220,32 @@ module.exports = {
 				name: "binary",
 				type: "method",
 				aliases: ["bin"],
-				data: (message) => message.split("").map(i => ("0".repeat(8) + i.charCodeAt(0).toString(2)).slice(-8)).join(" ")
+				data: (message) => message.split("").map(i => ("0".repeat(8) + i.charCodeAt(0).toString(2)).slice(-8)).join(" "),
+				reverseData: (message) => {
+					const list = message.split("");
+					let word = "";
+					const result = [];
+
+					for (const char of list) {
+						if (char !== "0" && char !== "1" && !/\s/.test(char)) {
+							return {
+								success: false,
+								reply: `Cannot translate from binary - invalid character encountered!`
+							};
+						}
+
+						if (char === "0" || char === "1") {
+							word += char;
+						}
+
+						if (word.length === 8 || (/\s/.test(char) && word.length !== 0)) {
+							result.push(Number.parseInt(word, 2));
+							word = "";
+						}
+					}
+
+					return String.fromCharCode(...result);
+				}
 			},
 			{
 				name: "morse",
@@ -375,6 +400,9 @@ module.exports = {
 				success: false,
 				reply: "No result has been created?!"
 			};
+		}
+		else if (result.success === false) {
+			return result;
 		}
 
 		return {
