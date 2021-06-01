@@ -101,6 +101,10 @@ module.exports = {
 				this.#commentsUrl = `r/${data.subreddit}/comments/${data.id}`;
 
 				this.#flairs = data.link_flair_richtext.filter(i => i.t && i.e === "text").map(i => i.t.trim());
+				if (data.link_flair_text) {
+					this.#flairs.push(data.link_flair_text.toLowerCase().trim());
+				}
+
 				this.#isTextPost = Boolean(data.selftext && data.selftext_html);
 				this.#nsfw = Boolean(data.over_18) || crossPostNSFW;
 				this.#stickied = Boolean(data.stickied);
@@ -153,22 +157,6 @@ module.exports = {
 			expiration,
 			RedditPost,
 			Subreddit,
-
-			fetchFlairs: async (subreddit) => {
-				const cacheKey = { type: "cache", subreddit };
-				let flairData = await this.getCacheData(cacheKey);
-				if (!flairData) {
-					const response = await sb.Got("Reddit", `${subreddit}/api/link_flair.json`);
-
-					flairData = response.body.map(i => i.text.toLowerCase());
-
-					await this.setCacheData(cacheKey, flairData, {
-						expiry: expiration
-					});
-				}
-
-				return flairData;
-			},
 
 			uncached: [
 				"random"
@@ -255,7 +243,7 @@ module.exports = {
 		}
 
 		if (context.params.showFlairs) {
-			const flairs = await this.staticData.fetchFlairs(subreddit);
+			const flairs = forum.availableFlairs;
 			return {
 				reply: (flairs.size === 0)
 					? "There are no flairs available in this subreddit."
