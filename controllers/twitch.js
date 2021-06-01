@@ -934,7 +934,10 @@ module.exports = class TwitchController extends require("./template.js") {
 		});
 
 		if (statusCode !== 200) {
-			console.warn("FFZ emote fetch failed", { statusCode, data });
+			if (statusCode !== 404) {
+				console.warn("FFZ emote fetch failed", { statusCode, data });
+			}
+
 			return [];
 		}
 
