@@ -273,9 +273,9 @@ module.exports = class DiscordController extends require("./template.js") {
 			const sortedUsers = guildUsers.array().sort((a, b) => b.user.username.length - a.user.username.length);
 			for (const member of sortedUsers) {
 				const name = sb.User.normalizeUsername(member.user.username);
-				const regex = new RegExp(`@${sb.Utils.escapeRegExp(name)}`, "gi");
+				const regex = new RegExp(`(\\s|^)@${sb.Utils.escapeRegExp(name)}\\b`, "gi");
 
-				message = message.replace(regex, `<@${member.user.id}>`);
+				message = message.replace(regex, `$1<@${member.user.id}>`);
 			}
 		}
 
