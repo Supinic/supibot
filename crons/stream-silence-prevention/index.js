@@ -61,7 +61,7 @@ module.exports = {
 		}
 
 		let videoID;
-		if (sb.Utils.random(1, 2) === 1) {
+		if (sb.Utils.random(1, 3) === 1) {
 			const filtered = this.data.videos.filter(i => !this.data.repeats.includes(i));
 			videoID = sb.Utils.randArray(filtered);
 		}
