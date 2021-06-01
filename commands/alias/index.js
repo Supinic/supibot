@@ -314,6 +314,12 @@ module.exports = {
 						reply: "No target alias provided!"
 					};
 				}
+				else if (!this.staticData.nameCheck.regex.test(targetAliasName)) {
+					return {
+						success: false,
+						reply: "The copied alias's name is not valid and therefore can't be copied!"
+					};
+				}
 
 				const targetUser = await sb.User.get(targetUserName);
 				if (!targetUser) {
@@ -433,6 +439,12 @@ module.exports = {
 				if (!oldAliasName || !newAliasName) {
 					return {
 						reply: `To duplicate an alias, you must provide both existing and new alias names!`
+					};
+				}
+				else if (!this.staticData.nameCheck.regex.test(newAliasName)) {
+					return {
+						success: false,
+						reply: `Your alias name is not valid! ${this.staticData.nameCheck.response}`
 					};
 				}
 
