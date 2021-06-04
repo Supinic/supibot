@@ -269,7 +269,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 		if (!this.channels.includes(chan)) {
 			const name = channelData.getDatabaseName();
 			if (this.#presentTables !== null && !this.#presentTables.includes(name)) {
-				const exists = sb.Query.isTablePresent("chat_line", name);
+				const exists = await sb.Query.isTablePresent("chat_line", name);
 				if (!exists) {
 					await channelData.setup();
 				}
