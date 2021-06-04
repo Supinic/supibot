@@ -259,12 +259,24 @@ module.exports = class User extends require("./template.js") {
 	static async getMultiple (identifiers) {
 		const result = [];
 		const toFetch = [];
+		let userMapValues;
+
 		for (const identifier of identifiers) {
 			if (identifier instanceof User) {
 				result.push(identifier);
 			}
 			else if (typeof identifier === "number") {
-				toFetch.push(identifier);
+				if (!userMapValues) {
+					userMapValues = [...User.data.values()];
+				}
+
+				const mapCacheUser = userMapValues.find(i => i.ID === identifier);
+				if (mapCacheUser) {
+					result.push(mapCacheUser);
+				}
+				else {
+					toFetch.push(identifier);
+				}
 			}
 			else if (typeof identifier === "string") {
 				const username = User.normalizeUsername(identifier);
