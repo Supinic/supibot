@@ -13,7 +13,7 @@ module.exports = {
 				name: "aliases",
 				aliases: [],
 				description: "Checks the global (or-use data for user-created supibot command aliases.",
-				execute: async (context, user) => {
+				execute: async (context, type, user) => {
 					if (user) {
 						const userData = await sb.User.get(user);
 						if (!userData) {
