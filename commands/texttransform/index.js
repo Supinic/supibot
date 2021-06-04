@@ -342,6 +342,14 @@ module.exports = {
 					const output = string.replace(/ⓘ/g, "");
 					return convert.unmap(output, officialCharactersMap);
 				}
+			},
+			{
+				name: "base64",
+				type: "method",
+				aliases: ["b64"],
+				description: "Transforms your input into Base-64 encoding.",
+				data: (string) => Buffer.from(string, "utf8").toString("base64"),
+				reverseData: (string) => Buffer.from(string, "base64").toString("utf8")
 			}
 		];
 		/* eslint-enable quote-props, key-spacing, object-property-newline */
