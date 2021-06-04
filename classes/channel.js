@@ -156,6 +156,7 @@ a
 			return false;
 		}
 
+		const limit = this.Message_Limit ?? this.Platform.Message_Limit;
 		const prefix = (this.Platform.Name === "twitch") ? "" : (`${this.Platform.Name}_`);
 		const name = prefix + this.Name.toLowerCase();
 		const alreadySetup = await sb.Query.isTablePresent("chat_line", name);
@@ -163,15 +164,17 @@ a
 			return false;
 		}
 
-		const limit = this.Message_Limit ?? this.Platform.Message_Limit;
+		const userAliasDefinition = await sb.Query.getDefinition("chat_data", "User_Alias");
+		const idCol = userAliasDefinition.columns.find(i => i.name === "ID");
+		const sign = (idCol.unsigned) ? "UNSIGNED" : "";
 
 		// Set up logging table
 		await sb.Query.raw([
 			`CREATE TABLE IF NOT EXISTS chat_line.\`${name}\` (`,
 			"`ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,",
-			"`User_Alias` INT(11) NOT NULL,",
+			`\`User_Alias\` INT(${idCol.length}) ${sign} NOT NULL,`,
 			`\`Text\` VARCHAR(${limit}),`,
-			"`Posted` TIMESTAMP(3) NULL DEFAULT NULL,",
+			"`Posted` DATETIME(3) NULL DEFAULT NULL,",
 			"PRIMARY KEY (`ID`),",
 			`INDEX \`fk_user_alias_${name}\` (\`User_Alias\`),`,
 			`CONSTRAINT \`fk_user_alias_${name}\` FOREIGN KEY (\`User_Alias\`) REFERENCES \`chat_data\`.\`User_Alias\` (\`ID\`) ON UPDATE CASCADE ON DELETE CASCADE)`,
