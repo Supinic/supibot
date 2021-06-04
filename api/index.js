@@ -3,7 +3,7 @@ module.exports = (function () {
 	const httpInterface = (secure) ? require("https") : require("http");
 	const { URL } = require("url");
 
-	const port = sb.Config?.get("SUPIBOT_API_PORT", false) ?? 80;
+	const port = sb.Config?.get("SUPIBOT_API_PORT", false) ?? 31337;
 	const protocol = (secure) ? "https" : "http";
 	const baseURL = `${protocol}://localhost:${port}`;
 
@@ -58,6 +58,7 @@ module.exports = (function () {
 
 	return {
 		server,
-		definition
+		definition,
+		port
 	};
 })();
