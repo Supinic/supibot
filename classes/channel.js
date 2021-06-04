@@ -150,7 +150,7 @@ module.exports = class Channel extends require("./template.js") {
 		if (!this.Platform.Logging || !this.Platform.Logging.messages) {
 			return false;
 		}
-a
+
 		const databasePresent = await sb.Query.isDatabasePresent("chat_line");
 		if (!databasePresent) {
 			return false;
