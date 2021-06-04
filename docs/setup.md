@@ -38,6 +38,7 @@ services:
         - "TWITCH_CLIENT_ID=<your_client_id>"
         #- "DISCORD_BOT_TOKEN=<discord_token>"
         - "TWITCH_OAUTH=<your_oauth>"
+        - "SUPIBOT_API_PORT=<preferred_api_port>"
 ```
 
 Customize values such as `INITIAL_CHANNEL`, `COMMAND_PREFIX` and the authentication info as needed. You can use [this tool](https://twitchapps.com/tmi/) to get oauth keys for Twitch. Note: the database docker image currently doesn't accept any user names other than `supibot`.

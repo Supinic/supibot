@@ -238,7 +238,7 @@
 
 	const envCommandPrefix = process.env.COMMAND_PREFIX;
 	if (!envCommandPrefix) {
-		const commandPrefix = await ask("Finally, select a command prefix:");
+		const commandPrefix = await ask("Select a command prefix:");
 
 		if (commandPrefix) {
 			const configRow = await sb.Query.getRow("data", "Config");
@@ -249,6 +249,34 @@
 		}
 		else {
 			console.log("Command prefix setup skipped!");
+		}
+	}
+
+	const internalAPIPort = process.env.SUPIBOT_API_PORT;
+	if (!internalAPIPort) {
+		let port;
+		let skipped = false;
+
+		do {
+			port = await ask("Select a port for the bot internal API:");
+			skipped = Boolean(port);
+			port = Number(port);
+		} while (!skipped || !Number.isFinite(port) || port < 0 || port > 65535 || Math.trunc(port) !== port);
+
+		if (skipped) {
+			port = Math.trunc(Math.random() * 50000) + 10000;
+		}
+
+		const configRow = await sb.Query.getRow("data", "Config");
+		await configRow.load("SUPIBOT_API_PORT");
+		configRow.values.Value = port;
+		await configRow.save();
+
+		if (skipped) {
+			console.log(`Internal bot API port automatically set to ${port}`);
+		}
+		else {
+			console.log(`Internal bot API port set to ${port}`);
 		}
 	}
 

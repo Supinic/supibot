@@ -75,7 +75,7 @@ VALUES
     '(() => {
         const secure = sb.Config.get("SUPIBOT_API_SECURE", false) ?? false;
         const protocol = (secure) ? "https" : "http";
-        const port = sb.Config.get("SUPIBOT_API_PORT", false) ?? 80;
+        const port = sb.Config.get("SUPIBOT_API_PORT", false) ?? 31337;
 
         return {
             prefixUrl: `${protocol}://localhost:${port}`

@@ -26,7 +26,7 @@ VALUES
 ('PRIVATE_MESSAGE_COMMAND_FILTERED','That command is not available via private messages.','string',NULL,0,1,'Printed when a command not available in private messages is used there.'),
 ('PRIVATE_MESSAGE_NO_COMMAND','That command does not exist. Please use the "commands" command to get a list.','string',NULL,0,1,'Printed when a private message has the right command prefix but a command has not been found.'),
 ('PRIVATE_MESSAGE_UNRELATED','Invalid command prefix.','string',NULL,0,1,'Printed when a private message does not have the right comand prefix.'),
-('SUPIBOT_API_PORT','80','number',NULL,0,0,NULL),
+('SUPIBOT_API_PORT',NULL,'number',NULL,0,0,NULL),
 ('SUPIBOT_API_SECURE','0','boolean',NULL,0,0,NULL),
 ('TWITCH_CLIENT_ID',NULL,'string',NULL,1,0,NULL),
 ('TWITCH_OAUTH',NULL,'string',NULL,1,0,NULL),
