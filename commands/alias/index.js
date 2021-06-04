@@ -822,6 +822,11 @@ module.exports = {
 		`<code>${prefix}alias run <u>hello</u></code> => Hallo!`,
 		"",
 
+		`<code>${prefix}alias try (user) (alias)</code>`,
+		"Runs another user's alias, without needing to copy it from them first.",
+		`<code>${prefix}alias try supinic alias_name arg1 arg2`,
+		"",
+
 		`<code>${prefix}alias copy (username) (alias)</code>`,
 		`<code>${prefix}alias copyplace (username) (alias)</code>`,
 		"Takes someone else's alias, and attempts to copy it with the same name for you.",
