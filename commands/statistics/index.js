@@ -32,7 +32,7 @@ module.exports = {
 								.flat("Count")
 							),
 							sb.Query.getRecordset(rs => rs
-								.select("User_Alias")
+								.select("Copy.User_Alias AS Copier")
 								.from("data", "Custom_Command_Alias")
 								.where("Custom_Command_Alias.User_Alias = %n", userData.ID)
 								.join({
@@ -40,7 +40,7 @@ module.exports = {
 									toTable: "Custom_Command_Alias",
 									on: "Copy.Parent = Custom_Command_Alias.ID"
 								})
-								.flat("User_Alias")
+								.flat("Copier")
 							)
 						]);
 
