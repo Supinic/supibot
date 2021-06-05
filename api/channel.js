@@ -89,8 +89,8 @@ module.exports = {
 		const channelID = await platformData.controller.getUserID(channelName);
 		if (!channelID) {
 			return {
-				success: false,
-				reply: "Provided channel does not exist on the provided platform!"
+				statusCode: 400,
+				data: { message: "Provided platform cannot dynamically add new channels" }
 			};
 		}
 
