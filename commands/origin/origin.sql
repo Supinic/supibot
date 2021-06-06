@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS `data`.`Origin` (
 	`Name` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`Text` VARCHAR(500) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`Tier` ENUM('1','2','3') NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
-	`Type` ENUM('Twitch - Global','Twitch - Sub','Twitch - Bits','BTTV','FFZ','Discord','Other') NULL DEFAULT 'Twitch - Global' COLLATE 'utf8mb4_general_ci',
+	`Type` ENUM('7TV','Twitch - Global','Twitch - Sub','Twitch - Bits','BTTV','FFZ','Discord','Other') NULL DEFAULT 'Twitch - Global' COLLATE 'utf8mb4_general_ci',
 	`Raffle` DATE NULL DEFAULT NULL,
 	`Raffle_Winner` INT(11) NULL DEFAULT NULL,
 	`User_Alias` INT(11) NOT NULL DEFAULT '1',
