@@ -822,9 +822,8 @@ module.exports = {
 		`<code>${prefix}alias run <u>hello</u></code> => Hallo!`,
 		"",
 
-		`<code>${prefix}alias try (user) (alias)</code>`,
+		`<code>${prefix}alias try (user) (alias) (...arguments)</code>`,
 		"Runs another user's alias, without needing to copy it from them first.",
-		`<code>${prefix}alias try supinic alias_name arg1 arg2`,
 		"",
 
 		`<code>${prefix}alias copy (username) (alias)</code>`,
