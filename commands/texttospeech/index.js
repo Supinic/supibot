@@ -5,7 +5,11 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Plays TTS on Supinic's stream, if enabled. You can specify the language by using \"language:<language>\" anywhere in your message.",
 	Flags: ["mention","pipe","skip-banphrase","use-params"],
-	Params: null,
+	Params: [
+		{ name: "lang", type: "string" },
+		{ name: "language", type: "string" },
+		{ name: "speed", type: "number" }
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		const limit = 30_000;
@@ -293,7 +297,7 @@ module.exports = {
 			};
 		}
 
-		const input = context.params.language ?? context.params.lang ?? "en-uc";
+		const input = context.params.language ?? context.params.lang ?? "en-us";
 		const code = sb.Utils.modules.languageISO.getCode(input);
 
 		const { locales } = this.staticData;
