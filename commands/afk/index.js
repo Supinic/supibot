@@ -47,7 +47,18 @@ module.exports = {
 			{
 				name: "shower",
 				status: "now taking a shower",
-				text: (context, text) => (text) ? `${text} 🚿` : " "
+				text: (context, text) => {
+					if (text) {
+						return `${text} 🚿`;
+					}
+
+					if (sb.Utils.random(1, 100) === 1) {
+						return " 🐏🏡 🤠🚿";
+					}
+					else {
+						return " 😏🚿";
+					}
+				}
 			},
 			{
 				name: "poop",
