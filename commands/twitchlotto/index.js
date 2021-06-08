@@ -86,7 +86,7 @@ module.exports = {
 				randomRoll = true;
 				channel = sb.Utils.randArray(this.data.channels);
 			}
-			
+
 			if (!this.data.channels.includes(channel)) {
 				return {
 					success: false,
@@ -94,7 +94,7 @@ module.exports = {
 				};
 			}
 		}
-	
+
 		// Preparation work that does not need to run more than once, so it is placed before the loop below.
 		if (!this.data.counts) {
 			let total = 0;
@@ -111,7 +111,7 @@ module.exports = {
 
 			this.data.counts.total = total;
 		}
-	
+
 		// Now try to find an image that is available.
 		let image = null;
 		let failedTries = 0;
@@ -146,7 +146,7 @@ module.exports = {
 					.single()
 				);
 			}
-	
+
 			if (image.Available === false) {
 				// discard this image. Loop will continue.
 				failedTries++;
@@ -159,20 +159,20 @@ module.exports = {
 					followRedirect: false,
 					url: `https://i.imgur.com/${image.Link}`
 				});
-	
+
 				if (statusCode !== 200) {
 					await sb.Query.getRecordUpdater(ru => ru
 						.update("data", "Twitch_Lotto")
 						.set("Available", false)
 						.where("Link = %s", image.Link)
 					);
-	
+
 					// discard this image. Loop will continue.
 					failedTries++;
 					image = null;
 				}
 			}
-	
+
 			if (failedTries > this.staticData.maxRetries) {
 				// Was not able to find an image that existed.
 				return {
@@ -183,7 +183,7 @@ module.exports = {
 			}
 			// Success: image is not null, and loop will terminate.
 		}
-	
+
 		if (image.Score === null) {
 			const { statusCode, data } = await sb.Utils.checkPictureNSFW(`https://i.imgur.com/${image.Link}`);
 			if (statusCode !== 200) {
@@ -192,7 +192,7 @@ module.exports = {
 					reply: `Fetching image data failed! Status code ${statusCode}`
 				};
 			}
-	
+
 			const json = JSON.stringify({ detections: data.detections, nsfw_score: data.score });
 			await sb.Query.getRecordUpdater(ru => ru
 				.update("data", "Twitch_Lotto")
@@ -201,11 +201,27 @@ module.exports = {
 				.where("Link = %s", image.Link)
 				.where("Channel = %s", image.Channel)
 			);
-	
+
+			const channels = await sb.Query.getRecordset(rs => rs
+				.select("Channel")
+				.from("data", "Twitch_Lotto")
+				.where("Link = %s", image.Link)
+				.flat("Channel")
+			);
+
+			for (const channel of channels) {
+				const row = await sb.Query.getRow("data", "Twitch_Lotto_Channel");
+				await row.load(channel);
+				if (row.values.Scored !== null) {
+					row.values.Scored += 1;
+					await row.save({ skipLoad: true });
+				}
+			}
+
 			image.Data = json;
 			image.Score = sb.Utils.round(data.score, 4);
 		}
-	
+
 		const detectionsString = [];
 		const { detections } = JSON.parse(image.Data);
 		for (const { replacement, string } of this.staticData.detections) {
@@ -213,10 +229,10 @@ module.exports = {
 			const strings = elements.map(i => `${replacement} (${Math.round(i.confidence * 100)}%)`);
 			detectionsString.push(...strings);
 		}
-	
+
 		const blacklistedFlags = context.channel?.Data.twitchLottoBlacklistedFlags ?? [];
 		const imageFlags = image.Adult_Flags ?? [];
-	
+
 		const illegalFlags = imageFlags.map(i => i.toLowerCase()).filter(i => blacklistedFlags.includes(i));
 		if (illegalFlags.length > 0) {
 			return {
@@ -224,7 +240,7 @@ module.exports = {
 				reply: `Cannot post image! These flags are blacklisted: ${illegalFlags.join(", ")}`
 			};
 		}
-	
+
 		await this.setCacheData(this.staticData.createRecentUseCacheKey(context), image.Link, {
 			expiry: 600_000
 		});
@@ -244,7 +260,7 @@ module.exports = {
 		const flagsString = (image.Adult_Flags)
 			? `Manual NSFW flags: ${image.Adult_Flags.join(", ")}`
 			: "";
-	
+
 		return {
 			reply: sb.Utils.tag.trim `
 				NSFW score: ${sb.Utils.round(image.Score * 100, 2)}%
@@ -269,7 +285,7 @@ module.exports = {
 			"Caution! The images are not filtered by any means and can be NSFW.",
 			`You will get an approximation of "NSFW score" by an AI, so keep an eye out for that.`,
 			"",
-	
+
 			`<code>${prefix}tl</code>`,
 			`<code>${prefix}twitchlotto</code>`,
 			"Fetches a random image from any channel - channels with more images have a bigger chance to be picked",
@@ -278,7 +294,7 @@ module.exports = {
 			`<code>${prefix}tl random</code>`,
 			"Fetches a random image from any channel - all channels have the same chance to be picked",
 			"",
-			
+
 			`<code>${prefix}tl (channel)</code>`,
 			"Fetches a random image from the specified channel",
 			"",
@@ -290,7 +306,7 @@ module.exports = {
 			`<code>${prefix}tl excludeChannel:"forsen,nymn,pajlada"</code>`,
 			"Fetches a random image from any but the specified excluded channels, separated by spaces or commas",
 			"",
-	
+
 			"Supported channels:",
 			`<ul>${channels}</ul>`
 		];
