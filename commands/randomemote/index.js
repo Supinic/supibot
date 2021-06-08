@@ -6,6 +6,7 @@ module.exports = {
 	Description: "Fetches a random emote from the scope of current channel. Configurable with parameters.",
 	Flags: ["pipe","use-params"],
 	Params: [
+		{ name: "7tv", type: "boolean" },
 		{ name: "animated", type: "boolean" },
 		{ name: "bttv", type: "boolean" },
 		{ name: "ffz", type: "boolean" },
@@ -36,7 +37,16 @@ module.exports = {
 			emotes = await context.platform.fetchGlobalEmotes();
 		}
 
-		const { animated, bttv, ffz, global: globalEmotes, sub, twitch } = context.params;
+		const {
+			"7tv": sevenTv,
+			animated,
+			bttv,
+			ffz,
+			global: globalEmotes,
+			sub,
+			twitch
+		} = context.params;
+
 		emotes = emotes.filter(i => {
 			if (animated === true && !i.animated || animated === false && i.animated) {
 				return false;
@@ -45,6 +55,9 @@ module.exports = {
 				return false;
 			}
 			if (ffz === true && i.type !== "ffz" || ffz === false && i.type === "ffz") {
+				return false;
+			}
+			if (sevenTv === true && i.type !== "7tv" || sevenTv === false && i.type === "7tv") {
 				return false;
 			}
 			if (globalEmotes === true && !i.global || globalEmotes === false && i.global) {
