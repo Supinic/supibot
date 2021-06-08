@@ -7,7 +7,9 @@ module.exports = {
 	Flags: ["mention","whitelist"],
 	Params: [
 		{ name: "excludeChannel", type: "string" },
-		{ name: "excludeChannels", type: "string" }
+		{ name: "excludeChannels", type: "string" },
+		{ name: "forceUnscored", type: "boolean" },
+		{ name: "preferUnscored", type: "boolean" }
 	],
 	Whitelist_Response: "This command can't be executed here!",
 	Static_Data: (() => ({
@@ -41,7 +43,7 @@ module.exports = {
 				replacement: "ass"
 			}
 		],
-		maxRetries: 3,
+		maxRetries: 10,
 		createRecentUseCacheKey: (context) => ({
 			type: "recent-use",
 			user: context.user.ID,
@@ -55,6 +57,13 @@ module.exports = {
 				.from("data", "Twitch_Lotto_Channel")
 				.flat("Name")
 			);
+		}
+
+		if (context.params.forceUnscored && context.params.preferUnscored) {
+			return {
+				success: false,
+				reply: `Parameters forceUnscored and preferUnscored cannot be both set to true at the same time!`
+			};
 		}
 
 		let randomRoll = false;
@@ -116,7 +125,32 @@ module.exports = {
 		let image = null;
 		let failedTries = 0;
 		while (image === null) {
-			if (channel) {
+			if (context.params.forceUnscored) {
+				if (!channel) {
+					return {
+						success: false,
+						reply: `When using the forceUnscored parameter, a channel must be provided!`
+					};
+				}
+
+				image = await sb.Query.getRecordset(rs => rs
+					.select("*")
+					.from("data", "Twitch_Lotto")
+					.where("Channel = %s", channel)
+					.where("Score IS NOT NULL")
+					.orderBy("RAND()")
+					.limit(1)
+					.single()
+				);
+				
+				if (!image) {
+					return {
+						success: false,
+						reply: `All the images have been scored in this channel!`
+					};
+				}
+			}
+			else if (channel) {
 				const roll = sb.Utils.random(1, this.data.counts[channel]) - 1;
 				image = await sb.Query.getRecordset(rs => rs
 					.select("*")
@@ -171,6 +205,12 @@ module.exports = {
 					failedTries++;
 					image = null;
 				}
+			}
+			else if (context.param.preferUnscored && image.Score !== null && failedTries < this.staticData.maxRetries) {
+				// "soft" re-attempting. only attempt again if the limit hasn't been reached.
+				// if it has, continue ahead and use the last image rolled, regardless of if it has the Score value or not
+				failedTries++;
+				image = null;
 			}
 
 			if (failedTries > this.staticData.maxRetries) {
@@ -296,6 +336,16 @@ module.exports = {
 
 			`<code>${prefix}tl (channel)</code>`,
 			"Fetches a random image from the specified channel",
+			"",
+
+			`<code>${prefix}tl preferUnscored:true</code>`,
+			"If set to true, the command will prefer to roll images that have not been scored yet.",
+			"After several unsuccessful lookups however, the fetching is going to revert to an already scored image, if it wasn't able to find one.",
+			"",
+
+			`<code>${prefix}tl forceUnscored:true</code>`,
+			"If set to true, the command will forcefully roll an image that has no score set yet.",
+			"<b>WARNING:</b> Using the command with this parameter will result in a lot slower execution.",
 			"",
 
 			`<code>${prefix}tl excludeChannel:forsen</code>`,
