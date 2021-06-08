@@ -99,10 +99,14 @@ module.exports = {
 			"You can use parameters to force-include or exclude several of types of emotes.",
 			`Maximum amount of words: ${limit}`,
 			"",
-			
+
 			`<code>${prefix}rem</code>`,
 			`<code>${prefix}randomemote</code>`,
-			"Posts any emote.",
+			"Posts any single emote.",
+			"",
+
+			`<code>${prefix}rem (number)</code>`,
+			`Posts any number of emotes, in the limit from 1 to ${limit}.`,
 			"",
 
 			`<code>${prefix}rem regex:(regular expression)</code>`,
