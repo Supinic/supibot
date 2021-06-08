@@ -200,15 +200,34 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { threshold, limit } = values.getStaticData();
+		const channels = await sb.Query.getRecordset(rs => rs
+			.select("Channel.ID AS Channel_ID", "Name")
+			.from("chat_data", "Channel_Chat_Module")
+			.where("Chat_Module = %n", 20)
+			.where("Channel.Platform = %n", 1)
+			.join({
+				toTable: "Channel",
+				on: "Channel_Chat_Module.Channel = Channel.ID"
+			})
+		);
+
+		const channelList = channels.map(i => (
+			`<li><a href="//twitch.tv/${i.Name}">${i.Name}</a> -- <a href="/data/other/markov/${i.Channel_ID}/words">List of words</a>`
+		)).join("");
+
 		return [
 			`Uses a <a href="//en.wikipedia.org/wiki/Markov_model">Markov model</a> to generate "real-looking" sentences based on Twitch chat.`,
-			`Currently only supports <a href="//twitch.tv/forsen">Forsen's channel</a>.`,
+			"Multiple channels can be supported, the command currently uses @Forsen's channel by default if no channel is provided.",
 			`The model is not available until ${threshold} unique words have been added to it!`,
-			`The list of currently available words is here (only updated once a minute!): <a href="/data/other/markov/words">Markov word list</a>`,
+			"",
 
 			`<code>${prefix}markov</code>`,
 			"Generates 15 words, with the first one being chosen randomly.",
 			"",
+
+			`<code>${prefix}markov channel:(channel)</code>`,
+			"Generates words in the specified channel's context.",
+			`List of currently supported channels: <ul>${channelList}</ul>`,
 
 			`<code>${prefix}markov (word)</code>`,
 			`Generates 15 words, with your chosen word being the "seed" - the first word in the sequence.`,
