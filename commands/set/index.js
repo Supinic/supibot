@@ -522,18 +522,35 @@ module.exports = {
 						}
 
 						const exists = await sb.Query.getRecordset(rs => rs
-							.select("Link")
+							.select("Link", "Adult_Flags")
 							.from("data", "Twitch_Lotto")
 							.where("Link = %s", match[4])
 							.limit(1)
 							.single()
-							.flat("Link")
 						);
-						if (!exists) {
+						if (!exists || !exists.Link) {
 							return {
 								success: false,
 								reply: `Link does not exist in the TwitchLotto database!`
 							};
+						}
+
+						if (exists.Adult_Flags === null) {
+							const channels = await sb.Query.getRecordset(rs => rs
+								.select("Channel")
+								.from("data", "Twitch_Lotto")
+								.where("Link = %s", exists.Link)
+								.flat("Channel")
+							);
+
+							for (const channel of channels) {
+								const row = await sb.Query.getRow("data", "Twitch_Lotto_Channel");
+								await row.load(channel);
+								if (row.values.Scored !== null) {
+									row.values.Scored += 1;
+									await row.save({ skipLoad: true });
+								}
+							}
 						}
 
 						await sb.Query.getRecordUpdater(ru => ru
