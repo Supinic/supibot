@@ -145,6 +145,7 @@ module.exports = {
 			"E.g. <code>global:false</code> will random non-global emotes.",
 			"",
 
+			`<code>${prefix}rem 7tv:true</code>`,
 			`<code>${prefix}rem bttv:true</code>`,
 			`<code>${prefix}rem ffz:true</code>`,
 			`<code>${prefix}rem sub:true</code>`,
@@ -154,6 +155,7 @@ module.exports = {
 			"Combining these will just result in zero emotes, as they don't share their types.",
 			"",
 
+			`<code>${prefix}rem 7tv:false</code>`,
 			`<code>${prefix}rem animated:false</code>`,
 			`<code>${prefix}rem bttv:false</code>`,
 			`<code>${prefix}rem global:false</code>`,
