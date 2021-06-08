@@ -50,10 +50,12 @@ module.exports = {
 				extra += " (shouldn't you know when you're supposed to stream? 😉)";
 			}
 
-			const isLive = !(await sb.Command.get("si").execute({}, channelName)).reply.includes("offline");
-			const nextStream = new sb.Date(data.nextStream.startsAt);
+			const channelID = await sb.Utils.getTwitchID(channelName);
+			const liveData = await sb.Got("Kraken", `streams/${channelID}`).json();
+			const isLive = Boolean(liveData.stream);
 
 			let lateString = "";
+			const nextStream = new sb.Date(data.nextStream.startsAt);
 			if (!isLive && sb.Date.now() > nextStream) {
 				const emote = await context.getBestAvailableEmote(["Weirdga", "WeirdChamp", "FeelsWeirdMan"], "🤨");
 				lateString = `The stream seems to be late ${emote}`;
