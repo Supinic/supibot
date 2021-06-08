@@ -199,7 +199,6 @@ module.exports = {
 				.set("Score", data.score)
 				.set("Data", json)
 				.where("Link = %s", image.Link)
-				.where("Channel = %s", image.Channel)
 			);
 
 			const channels = await sb.Query.getRecordset(rs => rs
