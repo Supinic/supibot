@@ -992,7 +992,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					animated: false
 				})),
 
-			...Object.values(bttv.value?.body ?? [])
+			...Object.values(bttv.value?.body ?? {})
 				.map(i => ({
 					ID: i.id,
 					name: i.code,
