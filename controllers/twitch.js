@@ -883,7 +883,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	/**
-	 * Fetches a list of BTTV emote data for a given channel name
+	 * Fetches a list of BTTV emote data for a given channel
 	 * @param {Channel} channelData
 	 * @returns {Promise<TypedEmote[]>}
 	 */
@@ -922,7 +922,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	/**
-	 * Fetches a list of emote data for a given list of emote sets.
+	 * Fetches a list of FFZ emote data for a given channel
 	 * @param {Channel} channelData
 	 * @returns {Promise<TypedEmote[]>}
 	 */
@@ -952,12 +952,41 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	/**
+	 * Fetches a list of 7TV emote data for a given channel
+	 * @param {Channel} channelData
+	 * @returns {Promise<TypedEmote[]>}
+	 */
+	static async fetchChannelSevenTVEmotes (channelData) {
+		const { statusCode, body: data } = await sb.Got({
+			url: `https://api.7tv.app/v2/users/${channelData.Name}/emotes`,
+			responseType: "json",
+			throwHttpErrors: false
+		});
+
+		if (statusCode !== 200) {
+			if (statusCode !== 404) {
+				console.warn("7TV emote fetch failed", { statusCode, data });
+			}
+
+			return [];
+		}
+
+		return data.map(i => ({
+			id: i.id,
+			name: i.name,
+			type: "7tv",
+			global: false,
+			animated: (typeof i.animated === "boolean") ? i.animated : null
+		}));
+	}
+
+	/**
 	 * Fetches all global emotes for any context.
 	 * Ideally cached for a rather long time.
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	async fetchGlobalEmotes () {
-		const [bttv, ffz] = await Promise.allSettled([
+		const [bttv, ffz, sevenTv] = await Promise.allSettled([
 			sb.Got({
 				url: "https://api.betterttv.net/3/cached/emotes/global",
 				responseType: "json",
@@ -965,6 +994,11 @@ module.exports = class TwitchController extends require("./template.js") {
 			}),
 			sb.Got({
 				url: "https://api.frankerfacez.com/v1/set/global",
+				responseType: "json",
+				throwHttpErrors: false
+			}),
+			sb.Got({
+				url: "https://api.7tv.app/v2/emotes/global",
 				responseType: "json",
 				throwHttpErrors: false
 			})
@@ -999,21 +1033,30 @@ module.exports = class TwitchController extends require("./template.js") {
 					type: "bttv",
 					global: true,
 					animated: (i.imageType === "gif")
-				}))
+				})),
+
+			...sevenTv.value?.body.map(i => ({
+				id: i.id,
+				name: i.name,
+				type: "7tv",
+				global: true,
+				animated: (typeof i.animated === "boolean") ? i.animated : null
+			}))
 		];
 	}
 
 	/**
 	 * @param {Channel} channelData
-	 * @returns {Promise<void>}
+	 * @returns {Promise<TypedEmote[]>}
 	 */
 	async fetchChannelEmotes (channelData) {
-		const [bttv, ffz] = await Promise.all([
+		const [bttv, ffz, sevenTv] = await Promise.all([
 			TwitchController.fetchChannelBTTVEmotes(channelData),
-			TwitchController.fetchChannelFFZEmotes(channelData)
+			TwitchController.fetchChannelFFZEmotes(channelData),
+			TwitchController.fetchChannelSevenTVEmotes(channelData)
 		]);
 
-		return [...bttv, ...ffz];
+		return [...bttv, ...ffz, ...sevenTv];
 	}
 
 	destroy () {
