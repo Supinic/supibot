@@ -230,8 +230,10 @@ module.exports = {
 			`List of currently supported channels: <ul>${channelList}</ul>`,
 
 			`<code>${prefix}markov (word)</code>`,
-			`Generates 15 words, with your chosen word being the "seed" - the first word in the sequence.`,
+			`Generates words, with your chosen word being the "seed", which is the first word in the sequence.`,
+			"Only one word will be taken into account, because this is how the implementation works.",
 			"If your word isn't matched exactly, other, case-insensitive variants will be attempted.",
+			"Like, if <code>4HEad</code> isn't in the word list, <code>4Head</code> will be used instead.",
 			"",
 
 			`<code>${prefix}markov words:(number)</code>`,
@@ -239,7 +241,7 @@ module.exports = {
 			"",
 
 			`<code>${prefix}markov exact:true</code>`,
-			"If you want your seed word to be specific, use <code>exact:true to force to use just that case-sensitive version."
+			"If you want your seed word to be specific, use <code>exact:true</code> to force to use just that case-sensitive version."
 		];
 	})
 };
