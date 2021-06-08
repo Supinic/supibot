@@ -148,7 +148,7 @@ module.exports = {
 			{
 				name: "sr",
 				aliases: [],
-				description: "Checks various sr statistics on supinic's channel.",
+				description: "Checks various song requests statistics on supinic's channel.",
 				execute: async function execute (context, type, ...args) {
 					let branch;
 					let targetUser = null;
@@ -211,12 +211,13 @@ module.exports = {
 							}
 						}
 
+						const uniques = Object.keys(counter).length;
 						const total = sb.Utils.timeDelta(sb.Date.now() + totalLength * 1000, true);
 						return {
 							reply: sb.Utils.tag.trim `
-									Videos requested: ${requests.length}, for a total runtime of ${total}.
-									The most requested video is ${mostRequested} - queued ${currentMax} times.
-								`
+								Videos requested: ${requests.length} (${uniques} unique), for a total runtime of ${total}.
+								The most requested video is ${mostRequested} - queued ${currentMax} times.
+							`
 						};
 					},
 					fetchVideoStats: async function (videoID) {
@@ -240,9 +241,9 @@ module.exports = {
 						const lastDelta = sb.Utils.timeDelta(requests[0].Added);
 						return {
 							reply: sb.Utils.tag.trim `
-									This video has been requested ${requests.length} times.
-									It was last requested ${lastDelta}.
-								`
+								This video has been requested ${requests.length} times.
+								It was last requested ${lastDelta}.
+							`
 						};
 					}
 				}
