@@ -137,12 +137,12 @@ module.exports = {
 					.select("*")
 					.from("data", "Twitch_Lotto")
 					.where("Channel = %s", channel)
-					.where("Score IS NOT NULL")
+					.where("Score IS NULL")
 					.orderBy("RAND()")
 					.limit(1)
 					.single()
 				);
-				
+
 				if (!image) {
 					return {
 						success: false,
