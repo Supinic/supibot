@@ -138,6 +138,7 @@ module.exports = {
 					.from("data", "Twitch_Lotto")
 					.where("Channel = %s", channel)
 					.where("Score IS NULL")
+					.where("Available IS NULL OR Available = %b", true)
 					.orderBy("RAND()")
 					.limit(1)
 					.single()
