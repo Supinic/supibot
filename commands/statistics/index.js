@@ -182,7 +182,7 @@ module.exports = {
 				helpers: {
 					fetchUserStats: async function (targetUser) {
 						const requests = await sb.Query.getRecordset(rs => rs
-							.select("Link", "Length", "Start_Time", "End_Time")
+							.select("Link", "Length", "Start_Time", "End_Time", "Video_Type")
 							.from("chat_data", "Song_Request")
 							.where("User_Alias = %n", targetUser.ID)
 						);
@@ -206,17 +206,21 @@ module.exports = {
 							counter[video.Link]++;
 							totalLength += (video.End_Time ?? video.Length) - (video.Start_Time ?? 0);
 							if (currentMax < counter[video.Link]) {
-								mostRequested = video.Link;
+								mostRequested = video;
 								currentMax = counter[video.Link];
 							}
 						}
+
+						const videoType = await sb.Query.getRow("data", "Video_Type");
+						await videoType.load(mostRequested.Video_Type);
+						const link = videoType.values.Link_Prefix.replace("$", mostRequested.Link);
 
 						const uniques = Object.keys(counter).length;
 						const total = sb.Utils.timeDelta(sb.Date.now() + totalLength * 1000, true);
 						return {
 							reply: sb.Utils.tag.trim `
 								Videos requested: ${requests.length} (${uniques} unique), for a total runtime of ${total}.
-								The most requested video is ${mostRequested} - queued ${currentMax} times.
+								The most requested video is ${link} - queued ${currentMax} times.
 							`
 						};
 					},
