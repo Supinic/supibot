@@ -96,14 +96,14 @@ module.exports = {
 			{
 				name: "changelog",
 				aliases: [],
-				description: "",
+				description: "Posts a link to the Supibot changelog on Discord/website; or posts details about a single change, based on its ID.",
 				execute: async (context, identifier) => {
 					if (!identifier) {
 						return {
 							reply: `Changelog: https://supinic.com/data/changelog/list Discord: https://discord.com/channels/633342787869212683/748955843415900280/`
 						};
 					}
-					
+
 					const ID = Number(identifier);
 					if (!sb.Utils.isValidInteger(ID)) {
 						return {
@@ -111,7 +111,7 @@ module.exports = {
 							reply: `Invalid changelog ID provided!`
 						};
 					}
-					
+
 					const row = await sb.Query.getRow("data", "Changelog");
 					await row.load(ID, true);
 					if (!row.loaded) {
