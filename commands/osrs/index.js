@@ -191,27 +191,36 @@ module.exports = {
 					};
 				}
 
-				const { statusCode, body: detail } = await sb.Got({
+				// followRedirect: false and omitting `responseType` is necessary for when the API is offline
+				// Apparently, Jagex's API will redirect to https://runescape.com/offline with an HTML response
+				// and a 302 code - this must be caught manually, as Got will attempt to parse it as JSON and fail.
+				const response = await sb.Got({
 					url: "https://secure.runescape.com/m=itemdb_oldschool/api/catalogue/detail.json",
 					throwHttpErrors: false,
-					responseType: "json",
+					followRedirect: false,
 					searchParams: new sb.URLParams()
 						.set("item", item.Game_ID)
 						.toString()
 				});
 
-				if (statusCode !== 200) {
+				if (response.statusCode === 302) {
+					return {
+						success: false,
+						reply: `Old School Runescape API is currently unreachable! Please try again later, or check Twitter: https://twitter.com/oldschoolrs/`
+					};
+				}
+				else if (response.statusCode !== 200) {
 					return {
 						success: false,
 						reply: `Item not found!`
 					};
 				}
 
-				const { current, today } = detail.item;
+				const { current, name, today } = JSON.parse(response.body).item;
 				const wiki = `https://osrs.wiki/${item.Name.replace(/\s+/g, "_")}`;
 				return {
 					reply: sb.Utils.tag.trim `
-						Current price of ${detail.item.name}: ${current.price},
+						Current price of ${name}: ${current.price},
 						current trend: ${today.trend} (${today.price})
 						${wiki}
 					`
