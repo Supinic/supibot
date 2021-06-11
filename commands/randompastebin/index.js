@@ -103,7 +103,11 @@ module.exports = {
 		let listDescription;
 		if (data && data.length !== 0) {
 			const uniques = new Set(data.map(i => i.syntax));
-			list = [...uniques].map(i => `<li>${i}</li>`).join("");
+			list = [...uniques]
+				.filter()
+				.sort()
+				.map(i => `<li>${i}</li>`)
+				.join("");
 
 			listDescription = "Currently available languages:";
 		}
