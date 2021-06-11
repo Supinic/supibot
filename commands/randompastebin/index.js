@@ -45,7 +45,7 @@ module.exports = {
 		]
 	})),
 	Code: (async function randomPastebin (context) {
-		let data = await this.getCacheData("paste-list");
+		let data = await sb.Cache.getByPrefix("random-pastebin-paste-list");
 		if (!data) {
 			const response = await sb.Got("GenericAPI", {
 				url: "https://scrape.pastebin.com/api_scraping.php",
@@ -55,7 +55,7 @@ module.exports = {
 				}
 			});
 
-			const list = response.body.map(i => ({
+			data = response.body.map(i => ({
 				key: i.key,
 				title: (i.title === "") ? null : i.title,
 				posted: new sb.Date(i.date * 1000),
@@ -65,9 +65,8 @@ module.exports = {
 				size: Number(i.size)
 			}));
 
-			data = list;
-			await this.setCacheData("paste-list", list, {
-				expiry: 60_000
+			await sb.Cache.setByPrefix("random-pastebin-paste-list", data, {
+				expiry: 300_000
 			});
 		}
 
@@ -98,7 +97,20 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { languages } = values.getStaticData();
-		const list = languages.map(i => `<li>${i}</li>`).join("");
+		const data = await sb.Cache.getByPrefix("random-pastebin-paste-list");
+
+		let list;
+		let listDescription;
+		if (data && data.length !== 0) {
+			const uniques = new Set(data.map(i => i.syntax));
+			list = [...uniques].map(i => `<li>${i}</li>`).join("");
+
+			listDescription = "Currently available languages:";
+		}
+		else {
+			list = languages.map(i => `<li>${i}</li>`).join("");
+			listDescription = "Common language list (<a href=\"//pastebin.com/languages\">full list</a>):";
+		}
 
 		return [
 			"Fetches a random programming related paste, posted recently (up to ~1 hour old).",
@@ -114,7 +126,7 @@ module.exports = {
 			"Posts a summary of a paste, only using your provided programming language.",
 			"",
 
-			`Common language list (<a href="//pastebin.com/languages">full list</a>):`,
+			listDescription,
 			`<ul>${list}</ul>`
 		];
 	})
