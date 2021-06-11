@@ -756,11 +756,11 @@ module.exports = {
 				if (type === "try" && commandData === this) {
 					if (invocation === "$") {
 						invocation = "alias";
-						aliasArguments.unshift("try", user.Name);
+						resultArguments.unshift("try", user.Name);
 					}
-					else if (aliasArguments[0] === "run") {
-						aliasArguments[0] = "try";
-						aliasArguments.splice(1, 0, user.Name);
+					else if (resultArguments[0] === "run") {
+						resultArguments[0] = "try";
+						resultArguments.splice(1, 0, user.Name);
 					}
 				}
 
