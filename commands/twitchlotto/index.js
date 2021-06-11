@@ -324,7 +324,7 @@ module.exports = {
 				<td>${sb.Utils.groupDigits(i.Amount)}</td>
 				<td>${sb.Utils.groupDigits(i.Scored)}</td>
 				<td>${sb.Utils.groupDigits(i.Unavailable)}</td>
-				<td>${sb.Utils.round(i.Scored / (i.Amount - i.Unavailable), 2)}%</td>
+				<td>${sb.Utils.round(100 * i.Scored / (i.Amount - i.Unavailable), 2)}%</td>
 			</tr>
 		`).join("\n");
 
