@@ -4,19 +4,21 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Searches Youtube for video(s) with your query. Only a certain amount of uses are available daily.",
-	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Flags: ["mention","non-nullable","pipe","use-params"],
+	Params: [
+		{ name: "linkOnly", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		threshold: 2000,
 		getClosestPacificMidnight: () => {
 			const now = new sb.Date().discardTimeUnits("m", "s", "ms");
 			const result = now.clone().discardTimeUnits("h").addHours(9);
-	
+
 			if (now.hours >= 9) {
 				result.addDays(1);
 			}
-	
+
 			return result;
 		}
 	})),
@@ -48,7 +50,7 @@ module.exports = {
 				reply: `No more YouTube searches available today! Reset happens at midnight Pacific Time, which is ${when}.`
 			};
 		}
-	
+
 		const track = await sb.Utils.searchYoutube(
 			query,
 			sb.Config.get("API_GOOGLE_YOUTUBE"),
@@ -65,30 +67,34 @@ module.exports = {
 				expiresAt: getClosestPacificMidnight()
 			});
 		}
-		
+
 		if (!track) {
 			return {
 				success: false,
-				reply: "No videos found for that query!",
-				cooldown: {
-					length: this.Cooldown,
-					user: context.user.ID,
-					channel: null,
-					platform: null
-				}
+				reply: "No videos found for that query!"
 			};
 		}
-		else {
+
+		const link = `https://youtu.be/${track.ID}`;
+		if (context.params.linkOnly) {
 			return {
-				reply: `https://youtu.be/${track.ID}`,
-				cooldown: {
-					length: this.Cooldown,
-					user: context.user.ID,
-					channel: null,
-					platform: null
-				}
+				reply: link
 			};
 		}
+
+		const data = await sb.Utils.modules.linkParser.fetchData(link);
+		const published = new sb.Date(data.published).format("Y-m-d");
+		const duration = sb.Utils.formatTime(data.duration, true);
+		return {
+			reply: sb.Utils.tag.trim `
+				"${data.title}"
+				by ${data.author},
+				${data.views} views,
+				published on ${published},
+				duration: ${duration}
+				${link}
+			`
+		};
 	}),
 	Dynamic_Description: null
 };
