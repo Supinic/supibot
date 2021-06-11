@@ -44,7 +44,7 @@ module.exports = {
 			"yaml"
 		]
 	})),
-	Code: (async function randomPastebin (context) {
+	Code: (async function randomPastebin (context, syntax) {
 		let data = await sb.Cache.getByPrefix("random-pastebin-paste-list");
 		if (!data) {
 			const response = await sb.Got("GenericAPI", {
@@ -70,8 +70,9 @@ module.exports = {
 			});
 		}
 
-		if (context.params.syntax) {
-			data = data.filter(i => i.syntax.toLowerCase() === context.params.syntax);
+		if (syntax || context.params.syntax) {
+			const inputSyntax = context.params.syntax ?? syntax;
+			data = data.filter(i => i.syntax.toLowerCase() === inputSyntax.toLowerCase());
 		}
 
 		const paste = sb.Utils.randArray(data);
@@ -104,7 +105,7 @@ module.exports = {
 		if (data && data.length !== 0) {
 			const uniques = new Set(data.map(i => i.syntax));
 			list = [...uniques]
-				.filter()
+				.filter(Boolean)
 				.sort()
 				.map(i => `<li>${i}</li>`)
 				.join("");
@@ -126,6 +127,7 @@ module.exports = {
 			"Posts a summary of the paste.",
 			"",
 
+			`<code>${prefix}rpb (language)</code>`,
 			`<code>${prefix}rpb syntax:(language)</code>`,
 			"Posts a summary of a paste, only using your provided programming language.",
 			"",
