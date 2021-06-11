@@ -329,7 +329,7 @@ module.exports = {
 		`).join("\n");
 
 		return [
-			`<script>$("#twitch-lotto-meta").DataTable();</script>`,
+			`<script>window.addEventListener("load", () => $("#twitch-lotto-meta").DataTable());</script>`,
 
 			"Rolls a random picture sourced from Twitch channels. The data is from the Twitchlotto website",
 			"You can specify a channel from the list below to get links only from there.",
