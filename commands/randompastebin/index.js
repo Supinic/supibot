@@ -70,12 +70,13 @@ module.exports = {
 			});
 		}
 
+		let filteredData = data;
 		if (syntax || context.params.syntax) {
 			const inputSyntax = context.params.syntax ?? syntax;
-			data = data.filter(i => i.syntax.toLowerCase() === inputSyntax.toLowerCase());
+			filteredData = data.filter(i => i.syntax.toLowerCase() === inputSyntax.toLowerCase());
 		}
 
-		const paste = sb.Utils.randArray(data);
+		const paste = sb.Utils.randArray(filteredData);
 		if (!paste) {
 			const list = [...new Set(data.map(i => i.syntax))].sort();
 			return {
