@@ -77,9 +77,10 @@ module.exports = {
 
 		const paste = sb.Utils.randArray(data);
 		if (!paste) {
+			const list = [...new Set(data.map(i => i.syntax))].sort();
 			return {
 				success: false,
-				reply: `Could not find any pastes matching your search!`
+				reply: `Could not find any pastes matching your search! Currently available languages: ${list.join(", ")}`
 			};
 		}
 
