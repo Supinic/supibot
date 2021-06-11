@@ -101,9 +101,9 @@ module.exports = {
 				this.#commentsUrl = `r/${data.subreddit}/comments/${data.id}`;
 
 				this.#flairs = data.link_flair_richtext.filter(i => i.t && i.e === "text").map(i => i.t.trim());
-				if (data.link_flair_text) {
-					this.#flairs.push(data.link_flair_text.toLowerCase().trim());
-				}
+				// if (data.link_flair_text) {
+				// 	this.#flairs.push(data.link_flair_text.toLowerCase().trim());
+				// }
 
 				this.#isTextPost = Boolean(data.selftext && data.selftext_html);
 				this.#nsfw = Boolean(data.over_18) || crossPostNSFW;
@@ -124,17 +124,17 @@ module.exports = {
 				return sb.Utils.timeDelta(this.#created);
 			}
 
-			hasFlair (flair, caseSensitive = false) {
+			hasFlair (input, caseSensitive = false) {
 				if (!caseSensitive) {
-					flair = flair.toLowerCase();
+					input = input.toLowerCase();
 				}
 
-				return this.#flairs.some(i => {
+				return this.#flairs.some(flair => {
 					if (!caseSensitive) {
-						return (i.toLowerCase() === flair);
+						return (flair.toLowerCase().includes(input));
 					}
 					else {
-						return (i === flair);
+						return (flair.includes(input));
 					}
 				});
 			}
