@@ -734,7 +734,7 @@ module.exports = {
 					};
 				}
 
-				const invocation = alias.Invocation;
+				let invocation = alias.Invocation;
 				const aliasArguments = (alias.Arguments) ? JSON.parse(alias.Arguments) : [];
 
 				const { success, reply, resultArguments } = this.staticData.applyParameters(context, aliasArguments, runArgs.slice(1));
@@ -748,6 +748,20 @@ module.exports = {
 						success: false,
 						reply: `Cannot use the ${invocation} command inside of a pipe, despite being wrapped in an alias!`
 					};
+				}
+
+				// If the invocation is `$alias try (user) (alias)`, and the invoked alias contains another alias
+				// execution, replace the sub-alias from `$alias run` (or `$$`) to `$alias try`, so that the user
+				// who is trying the alias does not need to care about dependencies.
+				if (type === "try" && commandData === this) {
+					if (invocation === "$") {
+						invocation = "alias";
+						aliasArguments.unshift("try", user.Name);
+					}
+					else if (aliasArguments[0] === "run") {
+						aliasArguments[0] = "try";
+						aliasArguments.splice(1, 0, user.Name);
+					}
 				}
 
 				const aliasCount = (context.append.aliasCount ?? 0) + 1;
