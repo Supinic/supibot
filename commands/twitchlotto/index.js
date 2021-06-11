@@ -321,14 +321,16 @@ module.exports = {
 		const data = countData.map(i => sb.Utils.tag.trim `
 			<tr>
 				<td>${i.Name}</td>
-				<td>${sb.Utils.groupDigits(i.Amount)}</td>
-				<td>${sb.Utils.groupDigits(i.Scored)}</td>
-				<td>${sb.Utils.groupDigits(i.Unavailable)}</td>
+				<td data-order=${i.Amount}>${sb.Utils.groupDigits(i.Amount)}</td>
+				<td data-order=${i.Scored}>${sb.Utils.groupDigits(i.Scored)}</td>
+				<td data-order=${i.Unavailable}>${sb.Utils.groupDigits(i.Unavailable)}</td>
 				<td>${sb.Utils.round(100 * i.Scored / (i.Amount - i.Unavailable), 2)}%</td>
 			</tr>
 		`).join("\n");
 
 		return [
+			`<script>$("#twitch-lotto-meta").DataTable();</script>`,
+
 			"Rolls a random picture sourced from Twitch channels. The data is from the Twitchlotto website",
 			"You can specify a channel from the list below to get links only from there.",
 			"Caution! The images are not filtered by any means and can be NSFW.",
@@ -367,13 +369,15 @@ module.exports = {
 			"",
 
 			"Supported channels:",
-			`<table>
+			`<table id="twitch-lotto-meta">
 				<thead>
-					<td>Name</td>
-					<td>Total amount</td>
-					<td>Scored by API</td>
-					<td>Deleted from Imgur</td>
-					<td>Completion</td>
+					<tr>
+						<th><b>Name</b></tdh>
+						<th><b>Total amount</b></th>
+						<th><b>Scored by API</b></th>
+						<th><b>Deleted from Imgur</b></th>
+						<th><b>Completion</b></th>
+					</tr>
 				</thead>
 				<tbody>
 					${data}
