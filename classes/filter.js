@@ -403,7 +403,7 @@ module.exports = class Filter extends require("./template.js") {
 				reason: "arguments",
 				filter: argumentFilter,
 				reply: Filter.getReason({
-					reason: argumentFilter.reason,
+					reason: argumentFilter.Reason,
 					response: argumentFilter.Response,
 					string: `You cannot use this argument on this position for ${targetAmount} ${targetType}!`
 				})
@@ -428,7 +428,7 @@ module.exports = class Filter extends require("./template.js") {
 					reason: "opt-out",
 					filter: optout,
 					reply: Filter.getReason({
-						reason: optout.reason,
+						reason: optout.Reason,
 						response: optout.Response,
 						string: `🚫 That user has opted out from being the target of ${targetAmount} ${targetType}!`
 					})
@@ -453,7 +453,7 @@ module.exports = class Filter extends require("./template.js") {
 					reason: "block",
 					filter: block,
 					reply: Filter.getReason({
-						reason: block.reason,
+						reason: block.Reason,
 						response: block.Response,
 						string: `🚫 That user has blocked you from being the target of ${targetAmount} ${targetType}!`
 					})
@@ -531,7 +531,7 @@ module.exports = class Filter extends require("./template.js") {
 				reason: "offline-only",
 				filter: offlineOnly,
 				reply: Filter.getReason({
-					reason: offlineOnly.reason,
+					reason: offlineOnly.Reason,
 					response: offlineOnly.Response,
 					string: `🚫 This ${targetType} is only available when the channel is offline!`
 				})
@@ -546,7 +546,7 @@ module.exports = class Filter extends require("./template.js") {
 				reason: "online-only",
 				filter: onlineOnly,
 				reply: Filter.getReason({
-					reason: onlineOnly.reason,
+					reason: onlineOnly.Reason,
 					response: onlineOnly.Response,
 					string: `🚫 This ${targetType} is only available when the channel is online!`
 				})
