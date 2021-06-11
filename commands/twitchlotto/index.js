@@ -313,12 +313,20 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix) => {
 		const countData = await sb.Query.getRecordset(rs => rs
-			.select("Name", "Amount")
+			.select("Name", "Amount", "Scored", "Tagged", "Unavailable")
 			.from("data", "Twitch_Lotto_Channel")
 			.orderBy("Amount DESC")
 		);
 
-		const channels = countData.map(i => `<li>${i.Name} - ${sb.Utils.groupDigits(i.Amount)}</li>`).join("");
+		const data = countData.map(i => sb.Utils.tag.trim `
+			<tr>
+				<td>${i.Name}</td>
+				<td>${sb.Utils.groupDigits(i.Amount)}</td>
+				<td>${sb.Utils.groupDigits(i.Scored)}</td>
+				<td>${sb.Utils.groupDigits(i.Unavailable)}</td>
+			</tr>
+		`).join("\n");
+
 		return [
 			"Rolls a random picture sourced from Twitch channels. The data is from the Twitchlotto website",
 			"You can specify a channel from the list below to get links only from there.",
@@ -358,7 +366,17 @@ module.exports = {
 			"",
 
 			"Supported channels:",
-			`<ul>${channels}</ul>`
+			`<table>
+				<thead>
+					<td>Name</td>
+					<td>Total amount</td>
+					<td>Scored by API</td>
+					<td>Deleted from Imgur</td>
+				</thead>
+				<tbody>
+					${data}
+				</tbody>					
+			</table>`
 		];
 	})
 };
