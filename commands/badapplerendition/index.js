@@ -77,10 +77,10 @@ module.exports = {
 					});
 
 					const { insertId } = await row.save();
-					return {
+					results.push({
 						input,
 						reply: `Link added to the rendition list, pending approval: https://supinic.com/data/bad-apple/detail/${insertId}`
-					};
+					});
 				}
 
 				if (results.length === 0) {
