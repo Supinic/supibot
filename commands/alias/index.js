@@ -755,7 +755,7 @@ module.exports = {
 				// who is trying the alias does not need to care about dependencies.
 				const aliasTry = {};
 				if (type === "try") {
-					aliasTry.userName = user;
+					aliasTry.userName = user.Name;
 
 					if (invocation === "$" && commandData === this) {
 						invocation = "alias";
