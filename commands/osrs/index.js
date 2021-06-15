@@ -8,6 +8,7 @@ module.exports = {
 	Params: [
 		{ name: "activity", type: "string" },
 		{ name: "boss", type: "string" },
+		{ name: "rude", type: "boolean" },
 		{ name: "seasonal", type: "boolean" },
 		{ name: "skill", type: "string" }
 	],
@@ -49,10 +50,10 @@ module.exports = {
 			return data;
 		},
 
-		getIronman: (data) => {
+		getIronman: (data, rude) => {
 			let ironman = "user";
 			if (data.ironman.deadHardcore) {
-				ironman = "ex-hardcore ironman";
+				ironman = (rude) ? "ex-hardcore ironman" : "ironman";
 			}
 			else if (data.ironman.regular) {
 				ironman = "ironman";
@@ -262,7 +263,7 @@ module.exports = {
 
 				const accountType = (context.params.seasonal)
 					? "seasonal user"
-					: this.staticData.getIronman(data);
+					: this.staticData.getIronman(data, Boolean(context.params.rude));
 
 				if (context.params.skill) {
 					const skillName = context.params.skill.toLowerCase();
@@ -357,7 +358,7 @@ module.exports = {
 				const { name, rank, value } = data.activities.find(i => i.name.toLowerCase() === bestMatch.toLowerCase());
 				const ironman = (command.includes("seasonal"))
 					? "Seasonal user"
-					: sb.Utils.capitalize(this.staticData.getIronman(data));
+					: sb.Utils.capitalize(this.staticData.getIronman(data, Boolean(context.params.rude)));
 
 				return {
 					reply: (rank === null)
@@ -443,6 +444,13 @@ module.exports = {
 			`<code>${prefix}osrs kc <u>seasonal:true</u> activity:(activity) (username)</code>`,
 			`Works the same way as the respective commands, but uses the "seasonal" hiscores.`,
 			"This usually refers to Leagues, or the Deadman Mode.",
+			"",
+
+			`<u>"Rude mode"</u>`,
+			`<code>${prefix}osrs stats <u>rude:true</u> (username)</code>`,
+			`<code>${prefix}osrs kc <u>rude:true</u> activity:(activity) (username)</code>`,
+			`Works the same way as the respective command - but when used, the command will call out dead hardcore ironmen by calling them "ex-hardcore".`,
+			"If set to false, or not set at all, it will just refer to them as regular ironmen.",
 			"",
 
 			"<u>Item prices</u>",
