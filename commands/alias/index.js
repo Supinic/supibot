@@ -754,13 +754,14 @@ module.exports = {
 				// execution, replace the sub-alias from `$alias run` (or `$$`) to `$alias try`, so that the user
 				// who is trying the alias does not need to care about dependencies.
 				const aliasTry = {};
-				if (type === "try" && commandData === this) {
-					if (invocation === "$") {
-						aliasTry.userName = user;
+				if (type === "try") {
+					aliasTry.userName = user;
+
+					if (invocation === "$" && commandData === this) {
 						invocation = "alias";
 						resultArguments.unshift("try", user.Name);
 					}
-					else if (resultArguments[0] === "run") {
+					else if (resultArguments[0] === "run" && commandData === this) {
 						aliasTry.userName = user;
 						resultArguments[0] = "try";
 						resultArguments.splice(1, 0, user.Name);
