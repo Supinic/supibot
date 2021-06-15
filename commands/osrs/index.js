@@ -76,14 +76,16 @@ module.exports = {
 		/* eslint-disable array-element-newline */
 		activities: [
 			"abyssal sire", "alchemical hydra", "barrows chests", "bounty hunter - hunter", "bounty hunter - rogue",
-			"bryophyta", "callisto", "cerberus", "chambers of xeric", "chambers of xeric: challenge mode", "chaos elemental",
-			"chaos fanatic", "clue scrolls (all)", "clue scrolls (beginner)", "clue scrolls (easy)", "clue scrolls (elite)",
-			"clue scrolls (hard)", "clue scrolls (master)", "clue scrolls (medium)", "commander zilyana", "corporeal beast",
-			"crazy archaeologist", "dagannoth prime", "dagannoth rex", "dagannoth supreme", "deranged archaeologist",
-			"general graardor", "giant mole", "grotesque guardians", "hespori", "k'ril tsutsaroth", "kalphite queen",
-			"king black dragon", "kraken", "kree'arra", "league points", "lms - rank", "mimic", "nightmare", "obor", "sarachnis",
-			"scorpia", "skotizo", "tempoross", "the corrupted gauntlet", "the gauntlet", "theatre of blood", "thermonuclear smoke devil",
-			"tzkal-zuk", "tztok-jad", "venenatis", "vet'ion", "vorkath", "wintertodt", "zalcano", "zulrah"
+			"bryophyta", "callisto", "cerberus", "chambers of xeric", "chambers of xeric: challenge mode",
+			"chaos elemental", "chaos fanatic", "clue scrolls (all)", "clue scrolls (beginner)", "clue scrolls (easy)",
+			"clue scrolls (elite)", "clue scrolls (hard)", "clue scrolls (master)", "clue scrolls (medium)",
+			"commander zilyana", "corporeal beast", "crazy archaeologist", "dagannoth prime", "dagannoth rex",
+			"dagannoth supreme", "deranged archaeologist", "general graardor", "giant mole", "grotesque guardians",
+			"hespori", "k'ril tsutsaroth", "kalphite queen", "king black dragon", "kraken", "kree'arra",
+			"league points", "lms - rank", "mimic", "nightmare", "obor", "sarachnis", "scorpia", "skotizo", "tempoross",
+			"the corrupted gauntlet", "the gauntlet", "theatre of blood", "theatre of blood: hard mode",
+			"thermonuclear smoke devil", "tzkal-zuk", "tztok-jad", "venenatis", "vet'ion", "vorkath", "wintertodt",
+			"zalcano", "zulrah"
 		],
 		/* eslint-enable array-element-newline */
 
