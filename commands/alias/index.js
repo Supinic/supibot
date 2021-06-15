@@ -753,12 +753,15 @@ module.exports = {
 				// If the invocation is `$alias try (user) (alias)`, and the invoked alias contains another alias
 				// execution, replace the sub-alias from `$alias run` (or `$$`) to `$alias try`, so that the user
 				// who is trying the alias does not need to care about dependencies.
+				const aliasTry = {};
 				if (type === "try" && commandData === this) {
 					if (invocation === "$") {
+						aliasTry.userName = user;
 						invocation = "alias";
 						resultArguments.unshift("try", user.Name);
 					}
 					else if (resultArguments[0] === "run") {
+						aliasTry.userName = user;
 						resultArguments[0] = "try";
 						resultArguments.splice(1, 0, user.Name);
 					}
@@ -786,6 +789,7 @@ module.exports = {
 						alias: true,
 						aliasCount,
 						aliasStack: [...(context.append.aliasStack ?? []), name],
+						aliasTry,
 						platform: context.platform,
 						skipBanphrases: true,
 						skipMention: true,

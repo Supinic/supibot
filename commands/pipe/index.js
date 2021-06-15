@@ -37,22 +37,22 @@ module.exports = {
 		let hasExternalInput = false;
 		const nullCommand = sb.Command.get("null");
 		for (let i = 0; i < invocations.length; i++) {
-			const [commandString] = invocations[i].split(" ");
-			const command = sb.Command.get(commandString);
+			const [commandString, ...cmdArgs] = invocations[i].split(" ");
+			const commandData = sb.Command.get(commandString);
 
-			if (!command) {
+			if (!commandData) {
 				return {
 					success: false,
 					reply: `Command "${commandString}" does not exist!`
 				};
 			}
-			else if (!command.Flags.pipe && invocations[i + 1]) {
+			else if (!commandData.Flags.pipe && invocations[i + 1]) {
 				return {
 					success: false,
 					reply: `Output of command "${commandString}" cannot be piped!`
 				};
 			}
-			else if (nullCommand && command.Flags.nonNullable && invocations[i + 1]) {
+			else if (nullCommand && commandData.Flags.nonNullable && invocations[i + 1]) {
 				const [nextCommandString] = invocations[i + 1].split(" ");
 				const nextCommand = sb.Command.get(nextCommandString.replace(sb.Command.prefixRegex, ""));
 				if (nextCommand && nextCommand.Name === nullCommand.Name) {
@@ -62,8 +62,16 @@ module.exports = {
 					};
 				}
 			}
-			else if (command.Flags.externalInput) {
+			else if (commandData.Flags.externalInput) {
 				hasExternalInput = true;
+			}
+
+			const { aliasTry } = context.append;
+			if (commandData.Name === "alias" && cmdArgs[0] === "run" && aliasTry.userName) {
+				cmdArgs[0] = "try";
+				cmdArgs.splice(1, 0, aliasTry.userName);
+
+				invocations[i] = [commandString, ...cmdArgs].join(" ");
 			}
 		}
 
