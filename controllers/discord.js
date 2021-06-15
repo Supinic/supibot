@@ -401,7 +401,12 @@ module.exports = class DiscordController extends require("./template.js") {
 			return false;
 		}
 
-		return (channel.guild.owner === userData.Discord_ID);
+		const permissions = channel.permissionsFor(userData.Discord_ID);
+		return (
+			permissions.has("MANAGE_CHANNELS")
+			|| permissions.has("MANAGE_GUILD")
+			|| permissions.has("ADMINISTRATOR")
+		);
 	}
 
 	async fetchUserList (channelIdentifier) {
