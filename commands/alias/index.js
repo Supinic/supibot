@@ -762,7 +762,6 @@ module.exports = {
 						resultArguments.unshift("try", user.Name);
 					}
 					else if (resultArguments[0] === "run" && commandData === this) {
-						aliasTry.userName = user;
 						resultArguments[0] = "try";
 						resultArguments.splice(1, 0, user.Name);
 					}
