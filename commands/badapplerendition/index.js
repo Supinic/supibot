@@ -66,10 +66,14 @@ module.exports = {
 					}
 
 					const data = await sb.Utils.modules.linkParser.fetchData(input);
-					results.push({
-						input,
-						reply: `Video is not available!`
-					});
+					if (!data) {
+						results.push({
+							input,
+							reply: `Video is not available!`
+						});
+
+						continue;
+					}
 
 					const row = await sb.Query.getRow("data", "Bad_Apple");
 					row.setValues({
