@@ -30,7 +30,7 @@ module.exports = {
 
 		const [slug] = match;
 		const response = await sb.Got("Leppunen", `v2/twitch/getClip/${slug}`);
-		if (response.status === 404) {
+		if (response.statusCode === 404) {
 			return {
 				success: false,
 				reply: "No data found for given slug!"
