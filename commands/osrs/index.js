@@ -407,7 +407,7 @@ module.exports = {
 				let alias = "";
 				const specific = aliases.filter(i => activity === i.activity).map(i => i.alias);
 				if (specific.length !== 0) {
-					alias = ` (${specific.join(", ")})`;
+					alias = ` - aliases: ${specific.join(", ")}`;
 				}
 
 				return `<li>${activity}${alias}</li>`;
