@@ -393,24 +393,24 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { activities, activityAliases } = await values.getStaticData();
-		const aliases = {};
+		const aliases = [];
 		for (const [key, value] of Object.entries(activityAliases)) {
-			if (!aliases[key]) {
-				aliases[key] = [];
-			}
-
-			aliases[key].push(value);
+			aliases.push({
+				activity: value,
+				alias: key
+			});
 		}
 
 		const list = [...activities]
 			.sort()
-			.map(i => {
+			.map(activity => {
 				let alias = "";
-				if (aliases[i]) {
-					alias = ` (${aliases[i].join(", ")})`;
+				const specific = aliases.filter(i => activity === i.activity);
+				if (specific.length !== 0) {
+					alias = ` (${specific.join(", ")})`;
 				}
 
-				return `<li>${i}${alias}</li>`;
+				return `<li>${activity}${alias}</li>`;
 			})
 			.join("");
 
