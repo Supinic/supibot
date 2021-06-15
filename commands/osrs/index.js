@@ -90,6 +90,14 @@ module.exports = {
 		/* eslint-enable array-element-newline */
 
 		activityAliases: {
+			"all clues": "clue scrolls (all)",
+			"beginner clues": "clue scrolls (beginner)",
+			"easy clues": "clue scrolls (easy)",
+			"medium clues": "clue scrolls (medium)",
+			"hard clues": "clue scrolls (hard)",
+			"elite clues": "clue scrolls (elite)",
+			"master clues": "clue scrolls (master)",
+			cerb: "cerberus",
 			sire: "abyssal sire",
 			hydra: "alchemical hydra",
 			barrows: "barrows chests",
@@ -100,12 +108,15 @@ module.exports = {
 			bandos: "general graardor",
 			mole: "giant mole",
 			zammy: "k'ril tsutsaroth",
+			kril: "k'ril tsutsaroth",
+			"k'ril": "k'ril tsutsaroth",
 			kq: "kalphite queen",
 			kbd: "king black dragon",
 			armadyl: "kree'arra",
 			gauntlet: "the gauntlet",
 			"corrupted gauntlet": "the corrupted gauntlet",
 			tob: "theatre of blood",
+			"tob hard": "theatre of blood: hard mode",
 			thermy: "thermonuclear smoke devil",
 			zuk: "tzkal-zuk",
 			inferno: "tzkal-zuk",
@@ -382,9 +393,25 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { activities, activityAliases } = await values.getStaticData();
-		const list = [...activities, ...Object.keys(activityAliases)]
+		const aliases = {};
+		for (const [key, value] of Object.entries(activityAliases)) {
+			if (!aliases[key]) {
+				aliases[key] = [];
+			}
+
+			aliases[key].push(value);
+		}
+
+		const list = [...activities]
 			.sort()
-			.map(i => `<li>${i}</li>`)
+			.map(i => {
+				let alias = "";
+				if (aliases[i]) {
+					alias = ` (${aliases[i].join(", ")})`;
+				}
+
+				return `<li>${i}${alias}</li>`;
+			})
 			.join("");
 
 		return [
