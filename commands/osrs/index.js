@@ -6,6 +6,9 @@ module.exports = {
 	Description: "Aggregate command for whatever regarding Old School Runescape.",
 	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
+		{ name: "activity", type: "string" },
+		{ name: "boss", type: "string" },
+		{ name: "seasonal", type: "boolean" },
 		{ name: "skill", type: "string" }
 	],
 	Whitelist_Response: null,
@@ -227,8 +230,7 @@ module.exports = {
 				};
 			}
 
-			case "stats":
-			case "seasonal-stats": {
+			case "stats": {
 				const user = args.join(" ");
 				if (!user) {
 					return {
@@ -237,15 +239,15 @@ module.exports = {
 					};
 				}
 
-				const data = (command.includes("seasonal"))
-					? await this.staticData.fetch(user, { seasonal: true })
-					: await this.staticData.fetch(user);
+				const data = await this.staticData.fetch(user, {
+					seasonal: Boolean(context.params.seasonal)
+				});
 
 				if (data.success === false) {
 					return data;
 				}
 
-				const accountType = (command.includes("seasonal"))
+				const accountType = (context.params.seasonal)
 					? "seasonal user"
 					: this.staticData.getIronman(data);
 
@@ -268,7 +270,11 @@ module.exports = {
 
 					const { emoji } = this.staticData.skills.find(i => i.name.toLowerCase() === skillName);
 					return {
-						reply: `${sb.Utils.capitalize(accountType)} ${user} ${emoji} ${skill.level} (XP: ${sb.Utils.groupDigits(skill.experience)})`
+						reply: sb.Utils.tag.trim `
+							${sb.Utils.capitalize(accountType)} ${user}
+							${emoji} ${skill.level} 
+							(XP: ${sb.Utils.groupDigits(skill.experience)})
+						`
 					};
 				}
 
@@ -301,49 +307,37 @@ module.exports = {
 				}
 			}
 
-			case "kc":
-			case "seasonal-kc": {
-				const input = { username: null, activity: null };
-				const [first, second] = args.join(" ").toLowerCase().split(",")
-					.map(i => i.trim());
-
-				if (this.staticData.activities.includes(first)) {
-					input.activity = first;
-					input.username = second;
-				}
-				else if (this.staticData.activityAliases[first]) {
-					input.activity = this.staticData.activityAliases[first];
-					input.username = second;
-				}
-				else if (this.staticData.activities.includes(second)) {
-					input.username = first;
-					input.activity = second;
-				}
-				else if (this.staticData.activityAliases[second]) {
-					input.username = first;
-					input.activity = this.staticData.activityAliases[second];
-				}
-				else {
+			case "kc": {
+				const user = args.join(" ");
+				if (!user) {
 					return {
 						success: false,
-						reply: `Could not match any activity! Check the list here: https://supinic.com/bot/command/${this.ID}`
+						reply: `No user provided!`
 					};
 				}
 
-				const data = (command.includes("seasonal"))
-					? await this.staticData.fetch(input.username, { seasonal: true })
-					: await this.staticData.fetch(input.username);
+				const activity = context.params.activity ?? context.params.boss;
+				if (!activity) {
+					return {
+						success: false,
+						reply: `No activity provided! Use activity:"boss name" - for a list, check here: https://supinic.com/bot/command/${this.ID}`
+					};
+				}
+
+				const data = await this.staticData.fetch(user, {
+					seasonal: Boolean(context.params.seasonal)
+				});
 
 				if (data.success === false) {
 					return data;
 				}
 
 				const activities = data.activities.map(i => i.name.toLowerCase());
-				const bestMatch = sb.Utils.selectClosestString(input.activity, activities, { ignoreCase: true });
+				const bestMatch = sb.Utils.selectClosestString(activity.toLowerCase(), activities, { ignoreCase: true });
 				if (!bestMatch) {
 					return {
 						success: false,
-						reply: `Activity was not found! Check the list here: https://supinic.com/bot/command/${this.ID}`
+						reply: `Invalid activity was not found! Check the list here: https://supinic.com/bot/command/${this.ID}`
 					};
 				}
 
@@ -354,8 +348,8 @@ module.exports = {
 
 				return {
 					reply: (rank === null)
-						? `${ironman} ${input.username} is not ranked for ${name}.`
-						: `${ironman} ${input.username}'s KC for ${name}: ${value} - rank #${rank}.`
+						? `${ironman} ${user} is not ranked for ${name}.`
+						: `${ironman} ${user}'s KC for ${name}: ${value} - rank #${rank}.`
 				};
 			}
 
@@ -398,7 +392,6 @@ module.exports = {
 			"<u>Skill level overview</u>",
 			`<code>${prefix}osrs (username)</code>`,
 			`<code>${prefix}osrs stats (username)</code>`,
-			`<code>${prefix}osrs seasonal-stats (username)</code>`,
 			"Posts a full list of skill levels for provided user. Does not include experience or rankings.",
 			`If used with "seasonal-stats", the command will attempt to use that user's seasonal profile.`,
 			"",
@@ -406,19 +399,21 @@ module.exports = {
 			"<u>Skill level detail</u>",
 			`<code>${prefix}osrs (username) skill:(skill)</code>`,
 			`<code>${prefix}osrs stats (username) skill:(skill)</code>`,
-			`<code>${prefix}osrs seasonal-stats (username) skill:(skill)</code>`,
 			"For given user, posts the skill's level, experience, and ranking.",
 			`If used with "seasonal-stats", the command will attempt to use that user's seasonal profile.`,
 			"",
 
 			"<u>Kill-count</u>",
-			`<code>${prefix}osrs kc (activity), (username)</code>`,
-			`<code>${prefix}osrs kc (username), (activity)</code>`,
-			`<code>${prefix}osrs seasonal-kc (username), (activity)</code>`,
-			`<code>${prefix}osrs seasonal-kc (activity), (username)</code>`,
+			`<code>${prefix}osrs kc activity:"(activity name)" (username)</code>`,
+			`<code>${prefix}osrs kc boss:"(activity name)" (username)</code>`,
 			"For given user and activity, prints their kill-count and ranking.",
-			`If used with "seasonal-kc", the command will attempt to use that user's seasonal profile.`,
-			"<b>Important</b>: the name and activity (regardless of order) MUST be separated by a comma!",
+			"",
+
+			"<u>Seasonal stats</u>",
+			`<code>${prefix}osrs stats <u>seasonal:true</u> (username)</code>`,
+			`<code>${prefix}osrs kc <u>seasonal:true</u> activity:(activity) (username)</code>`,
+			`Works the same way as the respective commands, but uses the "seasonal" hiscores.`,
+			"This usually refers to Leagues, or the Deadman Mode.",
 			"",
 
 			"<u>Item prices</u>",
