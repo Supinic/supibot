@@ -55,6 +55,10 @@ module.exports = {
 			};
 		}
 
+		const channelString = (channelData === context.channel)
+			? "this channel"
+			: `channel "${channelData.Name}"`;
+
 		const hasAccess = (
 			context.user.Data.administrator
 			|| await channelData.isUserChannelOwner(context.user)
@@ -64,13 +68,13 @@ module.exports = {
 		if (!hasAccess) {
 			return {
 				success: false,
-				reply: "You're not authorized to do that!"
+				reply: `You're not authorized to do that in ${channelString}!`
 			};
 		}
 
 		command = command.toLowerCase();
 		switch (command) {
-			case "disable":
+			case "disable": {
 				if (channelData.Mode === "Read") {
 					return {
 						success: false,
@@ -81,16 +85,17 @@ module.exports = {
 				setTimeout(() => (channelData.Mode = "Read"), 5000);
 				return {
 					reply: sb.Utils.tag.trim `
-						I will go to read-only mode in #${channelData.Name} in 5 seconds.
+						I will go to read-only mode in ${channelString} after ~5 seconds.
 						Use the "${sb.Command.prefix}${this.Name} enable ${channelData.Name}" command in private messages to re-enable me.
 					`
 				};
+			}
 
-			case "enable":
+			case "enable": {
 				if (channelData.Mode !== "Read") {
 					return {
 						success: false,
-						reply: "I'm already active in that channel!"
+						reply: `I'm already active in ${channelString}!`
 					};
 				}
 
@@ -98,6 +103,7 @@ module.exports = {
 				return {
 					reply: "I successfully disabled read-only mode and will respond to messages again."
 				};
+			}
 
 			case "api":
 			case "banphrase":
@@ -170,7 +176,7 @@ module.exports = {
 				if (check) {
 					return {
 						success: false,
-						reply: `The offline-only mode has already been activated in this channel!`
+						reply: `The offline-only mode has already been activated in ${channelString}!`
 					};
 				}
 
@@ -200,7 +206,7 @@ module.exports = {
 				if (!check) {
 					return {
 						success: false,
-						reply: `The offline-only mode has not been activated in this channel before!`
+						reply: `The offline-only mode has not been activated in ${channelString} before!`
 					};
 				}
 
@@ -213,7 +219,7 @@ module.exports = {
 
 				await sb.Channel.reloadSpecific(channelData);
 				return {
-					reply: `Channel ${channelData.Name} is now no longer in offline-only mode.`
+					reply: `${sb.Utils.capitalize(channelString)} is now no longer in offline-only mode.`
 				};
 			}
 
