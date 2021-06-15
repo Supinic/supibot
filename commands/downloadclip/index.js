@@ -29,18 +29,25 @@ module.exports = {
 		}
 
 		const [slug] = match;
-		const data = await sb.Got("Leppunen", `twitch/clip/${slug}`).json();
-		if (data.status === 404) {
+		const response = await sb.Got("Leppunen", `v2/twitch/getClip/${slug}`).json();
+		if (response.status === 404) {
 			return {
 				success: false,
 				reply: "No data found for given slug!"
 			};
 		}
 
-		const [source] = Object.values(data.response.videoQualities).sort((a, b) => Number(a.quality) - Number(b.quality));
+		const { clip, clipKey = "" } = response.body;
+		const [source] = clip.videoQualities.sort((a, b) => Number(b.quality) - Number(a.quality));
+
+		await context.platform.pm(
+			`${source.sourceURL}${clipKey}`,
+			context.user.Name,
+			context.channel ?? null
+		);
+
 		return {
-			replyWithPrivateMessage: true,
-			reply: source.sourceURL
+			reply: "OK."
 		};
 	}),
 	Dynamic_Description: null
