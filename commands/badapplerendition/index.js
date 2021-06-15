@@ -35,36 +35,36 @@ module.exports = {
 		command = command.toLowerCase();
 		switch (command) {
 			case "check": {
-				const input = args[0];
-				const type = sb.Utils.modules.linkParser.autoRecognize(input);
-				if (type !== "youtube") {
-					return {
-						success: false,
-						reply: `Cannot parse your link for YouTube! Only YT links are allowed now. `
-					};
-				}
+				const results = [];
+				for (const input of args) {
+					const type = sb.Utils.modules.linkParser.autoRecognize(input);
+					if (type !== "youtube") {
+						continue;
+					}
 
-				const link = sb.Utils.modules.linkParser.parseLink(input);
-				const existing = await sb.Query.getRecordset(rs => rs
-					.select("ID", "Device", "Link")
-					.from("data", "Bad_Apple")
-					.where(`Link = %s OR JSON_SEARCH(Reuploads, "one", %s) IS NOT NULL`, link, link)
-					.limit(1)
-					.single()
-				);
+					const link = sb.Utils.modules.linkParser.parseLink(input);
+					const existing = await sb.Query.getRecordset(rs => rs
+						.select("ID", "Device", "Link")
+						.from("data", "Bad_Apple")
+						.where(`Link = %s OR JSON_SEARCH(Reuploads, "one", %s) IS NOT NULL`, link, link)
+						.limit(1)
+						.single()
+					);
 
-				if (existing) {
-					return {
-						reply: sb.Utils.tag.trim `
-							Link is in the list already:
-							https://supinic.com/data/bad-apple/detail/${existing.ID}
-							Bad Apple!! on ${existing.Device}
-							-
-							https://youtu.be/${existing.Link}	
-						`
-					};
-				}
-				else {
+					if (existing) {
+						results.push({
+							input,
+							reply: sb.Utils.tag.trim `
+								Link is in the list already:
+								https://supinic.com/data/bad-apple/detail/${existing.ID}
+								Bad Apple!! on ${existing.Device}
+								-
+								https://youtu.be/${existing.Link}	
+							`
+						});
+						continue;
+					}
+
 					const data = await sb.Utils.modules.linkParser.fetchData(input);
 					const row = await sb.Query.getRow("data", "Bad_Apple");
 					row.setValues({
@@ -78,7 +78,33 @@ module.exports = {
 
 					const { insertId } = await row.save();
 					return {
+						input,
 						reply: `Link added to the rendition list, pending approval: https://supinic.com/data/bad-apple/detail/${insertId}`
+					};
+				}
+
+				if (results.length === 0) {
+					return {
+						success: false,
+						reply: `No proper links provided!`
+					};
+				}
+				else if (results.length === 1) {
+					return {
+						reply: results[0].reply
+					};
+				}
+				else {
+					const summary = results.map(i => `${i.input}\n${i.reply}`).join("\n\n");
+					const paste = await sb.Pastebin.post(summary);
+					if (paste.success !== true) {
+						return {
+							reply: `${results.length} videos processed. No summary available - ${paste.error ?? paste.body}`
+						};
+					}
+
+					return {
+						reply: `${results.length} videos processed. Summary: ${paste.body}`
 					};
 				}
 			}
