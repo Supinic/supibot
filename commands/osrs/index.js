@@ -405,7 +405,7 @@ module.exports = {
 			.sort()
 			.map(activity => {
 				let alias = "";
-				const specific = aliases.filter(i => activity === i.activity);
+				const specific = aliases.filter(i => activity === i.activity).map(i => i.alias);
 				if (specific.length !== 0) {
 					alias = ` (${specific.join(", ")})`;
 				}
