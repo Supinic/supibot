@@ -30,6 +30,12 @@ module.exports = {
 
 		const [slug] = match;
 		const response = await sb.Got("Leppunen", `v2/twitch/getClip/${slug}`);
+		if (response.statusCode === 400) {
+			return {
+				success: false,
+				reply: "Invalid slug format provided!"
+			};
+		}
 		if (response.statusCode === 404) {
 			return {
 				success: false,
