@@ -415,6 +415,13 @@ module.exports = {
 					}
 
 					const channelData = sb.Channel.get(channelName ?? "forsen");
+					if (!channelData) {
+						return {
+							success: false,
+							reply: `Provided channel does not exist!`
+						};
+					}
+					
 					const markov = module.data.markovs.get(channelData.ID);
 					if (!markov) {
 						return {
