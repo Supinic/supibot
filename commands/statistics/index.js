@@ -413,6 +413,12 @@ module.exports = {
 							reply: `No Markov module is currently available!`
 						};
 					}
+					else if (!channelName) {
+						return {
+							success: false,
+							reply: `No channel provided!`
+						};
+					}
 
 					const channelData = sb.Channel.get(channelName ?? "forsen");
 					if (!channelData) {
