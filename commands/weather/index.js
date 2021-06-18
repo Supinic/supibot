@@ -298,13 +298,13 @@ module.exports = {
 				const tags = data.alerts.flatMap(i => i.tags ?? []);
 				if (tags.length > 0) {
 					const plural = (tags.length > 1) ? "s" : "";
-					weatherAlert = `⚠ Weather alert${plural}: ${tags.join(", ")}`;
+					weatherAlert = `⚠ Weather alert${plural}: ${tags.join(", ")}.`;
 				}
 			}
 			else {
 				const alert = data.alerts.find(i => i.sender_name && (i.event || i.tags.length !== 0));
 				if (alert) {
-					weatherAlert = `⚠ Weather alert from ${alert.sender_name}: ${alert.event || alert.tags[0]}`;
+					weatherAlert = `⚠ Weather alert from ${alert.sender_name}: ${alert.event || alert.tags[0]}.`;
 				}
 			}
 		}
@@ -313,7 +313,7 @@ module.exports = {
 
 		let plusTime;
 		if (typeof number === "number") {
-			const time = new sb.Date(target.dt).setTimezoneOffset(data.timezone_offset);
+			const time = new sb.Date(target.dt * 1000).setTimezoneOffset(data.timezone_offset);
 			if (type === "hourly") {
 				plusTime = ` (${time.format("H:00")} local time)`;
 			}
@@ -321,11 +321,8 @@ module.exports = {
 				plusTime = ` (${time.format("j.n.")} local date)`;
 			}
 		}
-		else if (type === "currently") {
+		else if (type === "current") {
 			plusTime = " (now)";
-		}
-		else {
-			plusTime = ` (${type} summary)`;
 		}
 
 		const place = (skipLocation) ? "(location hidden)" : formattedAddress;
