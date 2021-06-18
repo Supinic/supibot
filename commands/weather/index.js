@@ -283,7 +283,9 @@ module.exports = {
 		}
 
 		const cloudCover = `Cloud cover: ${target.clouds}%.`;
-		const windGusts = `Wind gusts: up to ${sb.Utils.round(target.wind_gust * 3.6)} km/h.`;
+		const windGusts = (target.wind_gust)
+			? `Wind gusts: up to ${sb.Utils.round(target.wind_gust * 3.6)} km/h.`
+			: "No wind gusts.";
 		const humidity = `Humidity: ${target.humidity}%.`;
 		const pressure = `Air pressure: ${target.pressure} hPa.`;
 
@@ -291,7 +293,7 @@ module.exports = {
 		if (data.alerts && data.alerts.length !== 0) {
 			if (skipLocation) {
 				const tags = data.alerts.flatMap(i => i.tags ?? []);
-				if (tags) {
+				if (tags.length > 0) {
 					const plural = (tags.length > 1) ? "s" : "";
 					weatherAlert = `⚠ Weather alert${plural}: ${tags.join(", ")}`;
 				}
