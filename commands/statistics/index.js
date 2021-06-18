@@ -88,6 +88,55 @@ module.exports = {
 				}
 			},
 			{
+				name: "alias-names",
+				aliases: ["aliasnames"],
+				description: "Checks statistics related to custom command alias names.",
+				execute: async (context, name) => {
+					if (name) {
+						const aliases = await sb.Query.getRecordset(rs => rs
+							.select("Parent")
+							.from("data", "Custom_Command_Alias")
+							.where("Name COLLATE utf8mb4_bin = %s", name)
+						);
+
+						if (aliases.length === 0) {
+							return {
+								reply: `Currently, nobody has the "${name}" alias.`
+							};
+						}
+
+						const copies = aliases.filter(i => i.Parent);
+						return {
+							reply: sb.Utils.tag.trim `
+								Currently, ${aliases.length} users have the "${name}" alias.
+								Out of those, ${copies.length} are copies of a different alias.
+							`
+						};
+					}
+					else {
+						const aliases = await sb.Query.getRecordset(rs => rs
+							.select("Name", "COUNT(*) AS Amount")
+							.from("data", "Custom_Command_Alias")
+							.groupBy("Name")
+							.orderBy("COUNT(*) DESC")
+						);
+
+						const top = aliases
+							.slice(0, 10)
+							.map((i, ind) => `#${ind + 1}: ${i}x`)
+							.join(",");
+
+						return {
+							reply: sb.Utils.tag.trim `
+								Currently, ${aliases.length} unique alias names are in use.
+								The 10 most used names are:
+								${top}
+							`
+						};
+					}
+				}
+			},
+			{
 				name: "afk",
 				aliases: ["total-afk", "gn", "brb", "food", "shower", "lurk", "poop", "work", "study"],
 				description: "Checks the total time you (or another user) have been afk for. Each status type is separate - you can use total-afk to check all of them combined.",
@@ -427,7 +476,7 @@ module.exports = {
 							reply: `Provided channel does not exist!`
 						};
 					}
-					
+
 					const markov = module.data.markovs.get(channelData.ID);
 					if (!markov) {
 						return {
