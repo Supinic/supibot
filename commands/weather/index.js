@@ -75,7 +75,7 @@ module.exports = {
 					};
 				}
 
-				number = Number(match[3]);
+				number = Number(match[2]);
 				if (match[1] === "day") {
 					type = "daily";
 				}
