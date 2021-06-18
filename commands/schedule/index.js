@@ -61,8 +61,8 @@ module.exports = {
 				return {
 					reply: sb.Utils.tag.trim `
 						Streaming schedule is interrupted.
-						Vacation ${verb} on ${start.format("Y-m-d")} 
-						and ends ${sb.Utils.timeDelta(end)}.
+						Vacation ${verb} on ${start.format("Y-m-d")}
+						and ends on ${end.format("Y-m-d")} (${sb.Utils.timeDelta(end)}).
 					`
 				};
 			}
