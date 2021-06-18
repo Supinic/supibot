@@ -279,29 +279,7 @@ module.exports = {
 			temperature = `${target.temp}°C, feels like ${target.feels_like}°C.`;
 		}
 		else if (type === "daily") {
-			let dayLow;
-			let dayHigh;
-			if (target.temp.day > target.temp.morning) {
-				dayLow = target.temp.morning;
-				dayHigh = target.temp.day;
-			}
-			else {
-				dayLow = target.temp.day;
-				dayHigh = target.temp.morning;
-			}
-
-			let nightLow;
-			let nightHigh;
-			if (target.temp.eve > target.temp.night) {
-				nightLow = target.temp.night;
-				nightHigh = target.temp.eve;
-			}
-			else {
-				nightLow = target.temp.eve;
-				nightHigh = target.temp.night;
-			}
-
-			temperature = `Daily temperatures: ${dayLow}°C to ${dayHigh}°C, night temperatures: ${nightLow}°C to ${nightHigh}°C`;
+			temperature = `${target.temp.min}°C to ${target.temp.max}°C.`;
 		}
 
 		const cloudCover = `Cloud cover: ${target.clouds}%.`;
