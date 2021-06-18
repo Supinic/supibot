@@ -259,8 +259,8 @@ module.exports = {
 			}
 			else {
 				const percent = `${sb.Utils.round(target.pop * 100, 0)}%`;
-				const rain = target.rain["1h"] ?? target.rain ?? null;
-				const snow = target.snow["1h"] ?? target.snow ?? null;
+				const rain = target.rain?.["1h"] ?? target.rain ?? null;
+				const snow = target.snow?.["1h"] ?? target.snow ?? null;
 
 				if (rain && snow) {
 					precip = `${percent} chance of combined rain (${rain}mm/hr) and snow (${snow}mm/h).`;
