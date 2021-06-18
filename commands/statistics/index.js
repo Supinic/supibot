@@ -123,7 +123,7 @@ module.exports = {
 
 						const top = aliases
 							.slice(0, 10)
-							.map((i, ind) => `#${ind + 1}: ${i}x`)
+							.map((i, ind) => `#${ind + 1}: ${i.Name} ${i.Amount}x`)
 							.join(",");
 
 						return {
