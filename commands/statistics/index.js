@@ -91,7 +91,7 @@ module.exports = {
 				name: "alias-names",
 				aliases: ["aliasnames"],
 				description: "Checks statistics related to custom command alias names.",
-				execute: async (context, name) => {
+				execute: async (context, type, name) => {
 					if (name) {
 						const aliases = await sb.Query.getRecordset(rs => rs
 							.select("Parent")
