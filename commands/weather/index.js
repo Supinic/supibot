@@ -215,17 +215,24 @@ module.exports = {
 			coords = geoData.coords;
 		}
 
-		const { body: data } = await sb.Got("GenericAPI", {
-			url: "https://api.openweathermap.org/data/2.5/onecall",
-			responseType: "json",
-			throwHttpErrors: false,
-			searchParams: {
-				lat: coords.lat,
-				lon: coords.lng,
-				units: "metric",
-				appid: sb.Config.get("API_OPEN_WEATHER_MAP")
-			}
-		});
+		const weatherKey = { type: "weather", coords };
+		let data = await this.getCacheData(weatherKey);
+		if (!data) {
+			const response = await sb.Got("GenericAPI", {
+				url: "https://api.openweathermap.org/data/2.5/onecall",
+				responseType: "json",
+				throwHttpErrors: false,
+				searchParams: {
+					lat: coords.lat,
+					lon: coords.lng,
+					units: "metric",
+					appid: sb.Config.get("API_OPEN_WEATHER_MAP")
+				}
+			});
+
+			data = response.body;
+			await this.setCacheData(weatherKey, data, { expiry: 900_000 }); // 15 minutes cache
+		}
 
 		let target;
 		if (type === "current") {
