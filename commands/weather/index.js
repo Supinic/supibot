@@ -281,24 +281,24 @@ module.exports = {
 		else if (type === "daily") {
 			let dayLow;
 			let dayHigh;
-			if (target.day > target.morning) {
-				dayLow = target.morning;
-				dayHigh = target.day;
+			if (target.temp.day > target.temp.morning) {
+				dayLow = target.temp.morning;
+				dayHigh = target.temp.day;
 			}
 			else {
-				dayLow = target.day;
-				dayHigh = target.morning;
+				dayLow = target.temp.day;
+				dayHigh = target.temp.morning;
 			}
 
 			let nightLow;
 			let nightHigh;
-			if (target.eve > target.night) {
-				nightLow = target.night;
-				nightHigh = target.eve;
+			if (target.temp.eve > target.temp.night) {
+				nightLow = target.temp.night;
+				nightHigh = target.temp.eve;
 			}
 			else {
-				nightLow = target.eve;
-				nightHigh = target.night;
+				nightLow = target.temp.eve;
+				nightHigh = target.temp.night;
 			}
 
 			temperature = `Daily temperatures: ${dayLow}°C to ${dayHigh}°C, night temperatures: ${nightLow}°C to ${nightHigh}°C`;
