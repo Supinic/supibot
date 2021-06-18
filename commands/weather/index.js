@@ -283,6 +283,9 @@ module.exports = {
 		}
 
 		const cloudCover = `Cloud cover: ${target.clouds}%.`;
+		const windSpeed = (target.wind_speed)
+			? `Wind speed: ${sb.Utils.round(target.wind_speed * 3.6)} km/h.`
+			: "No wind.";
 		const windGusts = (target.wind_gust)
 			? `Wind gusts: up to ${sb.Utils.round(target.wind_gust * 3.6)} km/h.`
 			: "No wind gusts.";
@@ -332,7 +335,7 @@ module.exports = {
 				${icon}
 				${temperature}
 				${cloudCover}
-				${windGusts}
+				${windSpeed} ${windGusts}
 				${humidity}
 				${precip}
 				${pressure}
