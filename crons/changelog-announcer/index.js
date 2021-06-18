@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "changelog-announcer",
-	Expression: "0 * * * * *",
+	Expression: "0 */30 * * * *",
 	Description: "Watches for new changelogs, and if found, posts them to the specified channel(s).",
 	Defer: null,
 	Type: "Bot",
