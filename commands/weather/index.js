@@ -240,14 +240,17 @@ module.exports = {
 
 		let precip;
 		if (type === "current") {
-			if (target.rain && target.snow) {
-				precip = `It is currently raining (${target.rain}mm/h) and snowing (${target.snow}mm/h).`;
+			const rain = target.rain?.["1h"] ?? target.rain ?? null;
+			const snow = target.snow?.["1h"] ?? target.snow ?? null;
+
+			if (rain && snow) {
+				precip = `It is currently raining (${rain}mm/h) and snowing (${snow}mm/h).`;
 			}
-			else if (target.rain) {
-				precip = `It is currently raining, ${target.rain}mm/h.`;
+			else if (rain) {
+				precip = `It is currently raining, ${rain}mm/h.`;
 			}
-			else if (target.snow) {
-				precip = `It is currently snowing, ${target.snow}mm/h.`;
+			else if (snow) {
+				precip = `It is currently snowing, ${snow}mm/h.`;
 			}
 			else {
 				precip = "No precipitation right now.";
