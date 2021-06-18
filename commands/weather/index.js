@@ -8,45 +8,89 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		icons: {
-			"clear-day": "🌞",
-			"clear-night": "🌚",
-			rain: "🌧️",
-			snow: "🌨️",
-			sleet: "🌧️🌨️",
-			fog: "🌫️",
-			cloudy: "☁️",
-			"partly-cloudy-day": "⛅",
-			"partly-cloudy-night": "☁️",
-			hail: "☄️",
-			thunderstorm: "🌩️",
-			tornado: "🌪️",
-			wind: "💨"
+		getIcon: (code) => {
+			const type = Math.trunc(code / 100);
+			const remainder = code % 100;
+
+			if (type === 2) {
+				return "⛈";
+			}
+			else if (type === 3) {
+				return "🌧";
+			}
+			else if (type === 5) {
+				return "🌧";
+			}
+			else if (type === 6) {
+				return "🌨";
+			}
+			else if (type === 7) {
+				if (remainder === 1 || remainder === 21 || remainder === 41) {
+					return "🌫";
+				}
+				else if (remainder === 11) {
+					return "🔥💨";
+				}
+				else if (remainder === 31 || remainder === 51 || remainder === 61) {
+					return "🏜💨";
+				}
+				else if (remainder === 62) {
+					return "🌋💨";
+				}
+				else if (remainder === 71 || remainder === 81) {
+					return "🌪";
+				}
+			}
+			else if (type === 8) {
+				if (remainder === 0) {
+					return "☀";
+				}
+				else {
+					return "☁";
+				}
+			}
+
+			return "";
 		}
 	})),
 	Code: (async function weather (context, ...args) {
 		let number = null;
-		let type = "currently";
-		const weatherRegex = /\b(hour|day|week)(\+?(\d+))?$/;
+		let type = "current";
+		const weatherRegex = /\b(hour|day)\+(\d+)$/;
 		const historyRegex = /-\s*\d/;
 
 		if (args.length > 0) {
 			if (historyRegex.test(args[args.length - 1])) {
-				return { reply: "Checking for weather history is not currently implemented" };
+				return {
+					success: false,
+					reply: "Checking for weather history is not currently implemented"
+				};
 			}
 			else if (args && weatherRegex.test(args[args.length - 1])) {
 				const match = args.pop().match(weatherRegex);
-
-				if (match[2]) { // +<number> = shift by X, used in daily/hourly
-					number = Number(match[3]);
-					type = (match[1] === "day") ? "daily" : ((match[1] === "hour") ? "hourly" : null);
-
-					if (!type || (type === "daily" && number > 7) || (type === "hourly" && number > 48)) {
-						return { reply: "Invalid combination of parameters!" };
-					}
+				if (!match[1] || !match[2]) {
+					return {
+						success: false,
+						reply: `Invalid syntax of hour/day parameters!`
+					};
 				}
-				else { // summary
-					type = (match[1] === "day") ? "hourly" : ((match[1] === "hour") ? "minutely" : "daily");
+
+				number = Number(match[3]);
+				if (match[1] === "day") {
+					type = "daily";
+				}
+				else if (match[1] === "hour") {
+					type = "hourly";
+				}
+				else {
+					type = null;
+				}
+
+				if (!type || (type === "daily" && number > 7) || (type === "hourly" && number > 48)) {
+					return {
+						success: false,
+						reply: "Invalid combination of parameters!"
+					};
 				}
 			}
 		}
@@ -63,6 +107,7 @@ module.exports = {
 			}
 			else {
 				return {
+					success: false,
 					reply: `No place provided, and you don't have a default location set! You can use $set location (location) to set it, or add "private" to make it private 🙂`,
 					cooldown: 2500
 				};
@@ -109,24 +154,47 @@ module.exports = {
 				};
 			}
 
-			const { statusCode, body: geoData } = await sb.Got({
-				url: "https://maps.googleapis.com/maps/api/geocode/json",
-				responseType: "json",
-				throwHttpErrors: false,
-				searchParams: new sb.URLParams()
-					.set("key", sb.Config.get("API_GOOGLE_GEOCODING"))
-					.set("address", args.join(" "))
-					.toString()
-			});
+			const location = args.join(" ");
+			const geoKey = {
+				type: "coordinates",
+				location
+			};
 
-			if (statusCode !== 200) {
-				throw new sb.errors.APIError({
-					statusCode,
-					apiName: "GoogleGeoAPI"
+			let geoData = await this.getCacheData(geoKey);
+			if (!geoData) {
+				const response = await sb.Got({
+					url: "https://maps.googleapis.com/maps/api/geocode/json",
+					responseType: "json",
+					throwHttpErrors: false,
+					searchParams: new sb.URLParams()
+						.set("key", sb.Config.get("API_GOOGLE_GEOCODING"))
+						.set("address", args.join(" "))
+						.toString()
 				});
+
+				if (response.statusCode !== 200) {
+					throw new sb.errors.APIError({
+						statusCode: response.statusCode,
+						apiName: "GoogleGeoAPI"
+					});
+				}
+
+				if (!response.body.results[0]) {
+					geoData = { empty: true };
+				}
+				else {
+					const [result] = response.body.results;
+					geoData = {
+						empty: false,
+						formattedAddress: result.formatted_address,
+						coords: result.geometry.location
+					};
+				}
+
+				await this.setCacheData(geoKey, geoData, { expiry: 7 * 864e5 });
 			}
 
-			if (!geoData.results[0]) {
+			if (geoData.empty) {
 				const userCheck = await sb.User.get(args.join("_"));
 				if (userCheck?.Data.location) {
 					return {
@@ -136,78 +204,127 @@ module.exports = {
 					};
 				}
 
+				const emote = await context.getBestAvailableEmote(["peepoSadDank", "PepeHands", "FeelsBadMan"], "🙁");
 				return {
 					success: false,
-					reply: "That place was not found! FeelsBadMan"
+					reply: `That place was not found! ${emote}`
 				};
 			}
 
-			formattedAddress = geoData.results[0].formatted_address;
-			coords = geoData.results[0].geometry.location;
+			formattedAddress = geoData.formattedAddress;
+			coords = geoData.coords;
 		}
 
-		const excluded = ["currently", "minutely", "hourly", "daily", "alerts"].filter(i => i !== type);
-		const key = sb.Config.get("API_DARKSKY");
-
-		const { statusCode, body: topData } = await sb.Got({
-			url: `https://api.darksky.net/forecast/${key}/${coords.lat},${coords.lng}`,
+		const { body: data } = await sb.Got("GenericAPI", {
+			url: "https://api.openweathermap.org/data/2.5/onecall",
 			responseType: "json",
 			throwHttpErrors: false,
-			searchParams: new sb.URLParams()
-				.set("units", "si")
-				.set("exclude", excluded.join(","))
-				.toString()
+			searchParams: {
+				lat: coords.lat,
+				lon: coords.lng,
+				units: "metric",
+				appid: sb.Config.get("API_OPEN_WEATHER_MAP")
+			}
 		});
 
-		if (statusCode !== 200) {
-			throw new sb.errors.APIError({
-				statusCode,
-				apiName: "DarkskyWeatherAPI"
-			});
+		let target;
+		if (type === "current") {
+			target = data.current;
+		}
+		else if (type === "hourly") {
+			target = data.hourly[number];
+		}
+		else if (type === "daily") {
+			target = data.daily[number];
 		}
 
-		let data = null;
-		let message;
-		if (number === null && type !== "currently") {
-			message = topData[type].summary;
+		let precip;
+		if (type === "current") {
+			if (target.rain && target.snow) {
+				precip = `It is currently raining (${target.rain}mm/h) and snowing (${target.snow}mm/h).`;
+			}
+			else if (target.rain) {
+				precip = `It is currently raining, ${target.rain}mm/h.`;
+			}
+			else if (target.snow) {
+				precip = `It is currently snowing, ${target.snow}mm/h.`;
+			}
+			else {
+				precip = "No precipitation right now.";
+			}
 		}
-		else {
-			data = (type === "currently")
-				? topData.currently
-				: topData[type].data[number];
+		else if (type === "hourly" || type === "daily") {
+			if (target.pop === 0) {
+				precip = "No precipitation expected.";
+			}
+			else {
+				const percent = `${sb.Utils.round(target.pop * 100, 0)}%`;
+				const rain = target.rain["1h"] ?? target.rain ?? null;
+				const snow = target.snow["1h"] ?? target.snow ?? null;
 
-			const icon = this.staticData.icons[data.icon];
-			const precip = (data.precipProbability === 0)
-				? "No precipitation expected."
-				: (`${sb.Utils.round(data.precipProbability * 100)}% chance of ${sb.Utils.round(data.precipIntensity, 2)} mm ${data.precipType}.`);
-			const temp = (type !== "daily")
-				? (`${sb.Utils.round(data.temperature, 2)}°C.`)
-				: (`Temperatures: ${sb.Utils.round(data.temperatureMin)}°C to ${sb.Utils.round(data.temperatureMax)}°C.`);
-			const storm = (type === "currently")
-				? ((typeof data.nearestStormDistance !== "undefined")
-					? (`Nearest storm is ${data.nearestStormDistance} km away. `)
-					: ("No storms nearby. "))
-				: "";
-			const feels = (type === "currently")
-				? `Feels like ${sb.Utils.round(data.apparentTemperature)}°C.`
-				: "";
-
-			message = sb.Utils.tag.trim `
-				${icon ?? data.icon}
-				${temp}
-				${feels}
-				${storm}
-				${sb.Utils.round(data.cloudCover * 100)}% cloudy.
-				Wind gusts up to ${sb.Utils.round(data.windGust * 3.6)} km/h.
-				${sb.Utils.round(data.humidity * 100)}% humidity.
-				${precip}
-				Air pressure: ~${data.pressure} hPa.
-			`;
+				if (rain && snow) {
+					precip = `${percent} chance of combined rain (${rain}mm/hr) and snow (${snow}mm/h).`;
+				}
+				else if (rain) {
+					precip = `${percent} chance of ${rain}mm/h rain.`;
+				}
+				else if (snow) {
+					precip = `${percent} chance of ${snow}mm/h snow.`;
+				}
+			}
 		}
+
+		let temperature;
+		if (type === "current" || type === "hourly") {
+			temperature = `${target.temp}°C, feels like ${target.feels_like}°C.`;
+		}
+		else if (type === "daily") {
+			let dayLow;
+			let dayHigh;
+			if (target.day > target.morning) {
+				dayLow = target.morning;
+				dayHigh = target.day;
+			}
+			else {
+				dayLow = target.day;
+				dayHigh = target.morning;
+			}
+
+			let nightLow;
+			let nightHigh;
+			if (target.eve > target.night) {
+				nightLow = target.night;
+				nightHigh = target.eve;
+			}
+			else {
+				nightLow = target.eve;
+				nightHigh = target.night;
+			}
+
+			temperature = `Daily temperatures: ${dayLow}°C to ${dayHigh}°C, night temperatures: ${nightLow}°C to ${nightHigh}°C`;
+		}
+
+		const cloudCover = `Cloud cover: ${target.cloud}%.`;
+		const windGusts = `Wind gusts: up to ${sb.Utils.round(target.wind_gust * 3.6)} km/h.`;
+		const humidity = `Humidity: ${sb.Utils.round(target.humidity * 100)}%.`;
+		const pressure = `Air pressure: ${target.pressure} hPa.`;
+
+		let weatherAlert = "";
+		if (data.alerts && data.alerts.length !== 0) {
+			if (data.alerts.length === 1) {
+				const [alert] = data.alerts;
+				weatherAlert = `⚠ Weather alert from ${alert.sender_name ?? "(unknown)"}: ${alert.event ?? alert.tags[0] ?? "(N/A)"}`;
+			}
+			else {
+				weatherAlert = `⚠ ${data.alerts.length} weather alerts issued for this location!`;
+			}
+		}
+
+		const icon = this.staticData.getIcon(target.weather[0].id);
 
 		let plusTime;
 		if (typeof number === "number") {
-			const time = new sb.Date(topData[type].data[number].time * 1000).setTimezoneOffset(topData.offset * 60);
+			const time = new sb.Date(target.dt).setTimezoneOffset(data.timezone_offset);
 			if (type === "hourly") {
 				plusTime = ` (${time.format("H:00")} local time)`;
 			}
@@ -222,16 +339,23 @@ module.exports = {
 			plusTime = ` (${type} summary)`;
 		}
 
-		const place = (skipLocation)
-			? "(location hidden)"
-			: formattedAddress;
-
+		const place = (skipLocation) ? "(location hidden)" : formattedAddress;
 		return {
-			reply: `${place} ${plusTime}: ${message}`
+			reply: sb.Utils.tag.trim `
+				${place} ${plusTime}:
+				${icon}
+				${temperature}
+				${cloudCover}
+				${windGusts}
+				${humidity}
+				${precip}
+				${pressure}
+				${weatherAlert}	
+			`
 		};
 	}),
 	Dynamic_Description: ((prefix) => [
-		"Checks for current weather, or for hourly/daily/weekly forecast in a given location.",
+		"Checks for current weather, or for hourly/daily forecast in a given location.",
 		"If you, or a given user have set their location with the <code>set</code> command, this command supports that.",
 		"",
 
@@ -247,9 +371,6 @@ module.exports = {
 		"weather forecast in X day(s) - accepts 1 through 7",
 		"",
 
-		`<code>${prefix}weather (place) <b>week</b></code>`,
-		"weather summary for the upcoming week",
-
 		"",
 		"=".repeat(20),
 		"",
@@ -262,7 +383,7 @@ module.exports = {
 		"If that user has set their own weather location, show its weather. The <code>@</code> symbol is mandatory.",
 		"",
 
-		`<code>${prefix}weather @User <b>(hour+X/day+X/week)</b></code>`,
-		"Similar to above, shows the user's weather, but uses the hour/day/week specifier."
+		`<code>${prefix}weather @User <b>(hour+X/day+X)</b></code>`,
+		"Similar to above, shows the user's weather, but uses the hour/day specifier."
 	])
 };
