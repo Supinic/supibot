@@ -215,7 +215,7 @@ module.exports = {
 			coords = geoData.coords;
 		}
 
-		const weatherKey = { type: "weather", coords };
+		const weatherKey = { type: "weather", coords: `${coords.lat}-${coords.lng}` };
 		let data = await this.getCacheData(weatherKey);
 		if (!data) {
 			const response = await sb.Got("GenericAPI", {
