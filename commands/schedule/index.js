@@ -50,15 +50,22 @@ module.exports = {
 		if (vacation !== null) {
 			const start = new sb.Date(vacation.start_time);
 			const end = new sb.Date(vacation.end_time);
-			const verb = (start < sb.Date.now()) ? "started" : "starts";
 
-			return {
-				reply: sb.Utils.tag.trim `
-					Streaming schedule is interrupted.
-					Vacation ${verb} on ${start.format("Y-m-d")} 
-					and ends ${sb.Utils.timeDelta(end)}.
-				`
-			};
+			const [firstSeg] = segments;
+			const firstSegStart = new sb.Date(firstSeg.start_time);
+			const firstSegEnd = new sb.Date(firstSeg.end_time);
+
+			// Only mention the vacation if it affects the first segment in the list, and only if it hasn't ended yet.
+			if (firstSegStart > start && firstSegEnd < end && end > sb.Date.now()) {
+				const verb = (start < sb.Date.now()) ? "started" : "starts";
+				return {
+					reply: sb.Utils.tag.trim `
+						Streaming schedule is interrupted.
+						Vacation ${verb} on ${start.format("Y-m-d")} 
+						and ends ${sb.Utils.timeDelta(end)}.
+					`
+				};
+			}
 		}
 
 		let segment;
