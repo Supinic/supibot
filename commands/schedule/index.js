@@ -67,7 +67,7 @@ module.exports = {
 			segment = segments[0];
 		}
 		else {
-			const firstSegmentStart = new sb.Date(segment[0].start_time);
+			const firstSegmentStart = new sb.Date(segments[0].start_time);
 			if (firstSegmentStart < sb.Date.now()) { // First stream segment should already be underway
 				const liveData = await sb.Got("Kraken", `streams/${channelID}`).json();
 				const isLive = Boolean(liveData.stream);
@@ -76,14 +76,14 @@ module.exports = {
 					const emote = await context.getBestAvailableEmote(["Weirdga", "WeirdChamp", "FeelsWeirdMan"], "🤨");
 					lateString = `The stream seems to be late ${emote}`;
 
-					segment = segment[0];
+					segment = segments[0];
 				}
 				else { // Stream is live - all good, show the schedule for the next segment
-					segment = segment[1];
+					segment = segments[1];
 				}
 			}
 			else { // No segment is underway, use the first one in the list
-				segment = segment[0];
+				segment = segments[0];
 			}
 		}
 
