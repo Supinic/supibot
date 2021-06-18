@@ -24,60 +24,89 @@ module.exports = {
 			};
 		}
 
-		const data = await sb.Got("Leppunen", `twitch/streamschedule/${channelName}`).json();
-		if (data.status === 200 && data.nextStream) {
-			let extra = "";
-			if (data.interruption) {
-				const { endAt, reason } = data.interruption;
-				const end = new sb.Date(endAt);
-
-				if (sb.Date.now() <= end) {
-					extra = `Stream schedule is interrupted - reason: ${reason}, will be back ${sb.Utils.timeDelta(end)}.`;
-				}
-			}
-
-			const game = (data.nextStream.game === "No game set")
-				? "(no category)"
-				: data.nextStream.game;
-
-			const title = (data.nextStream.title === "")
-				? "(no title)"
-				: data.nextStream.title;
-
-			let target = `${channelName}'s`;
-			if (channelName.toLowerCase() === context.user.Name) {
-				target = "Your";
-				extra += " (shouldn't you know when you're supposed to stream? 😉)";
-			}
-
-			const channelID = await sb.Utils.getTwitchID(channelName);
-			const liveData = await sb.Got("Kraken", `streams/${channelID}`).json();
-			const isLive = Boolean(liveData.stream);
-
-			let lateString = "";
-			const nextStream = new sb.Date(data.nextStream.startsAt);
-			if (!isLive && sb.Date.now() > nextStream) {
-				const emote = await context.getBestAvailableEmote(["Weirdga", "WeirdChamp", "FeelsWeirdMan"], "🤨");
-				lateString = `The stream seems to be late ${emote}`;
-			}
-
-			const time = sb.Utils.timeDelta(new sb.Date(data.nextStream.startsAt));
-			return {
-				reply: `${target} next stream: ${game} - ${title}, starting ${time}. ${lateString} ${extra}`
-			};
-		}
-		else if (data.error) {
-			return {
-				reply: `User has not set a stream schedule.`
-			};
-		}
-		else {
-			console.warn("Unespected schedule result", data);
+		const channelID = await sb.Utils.getTwitchID(channelName);
+		if (!channelID) {
 			return {
 				success: false,
-				reply: "Unexpected API result monkaS @leppunen @supinic"
+				reply: `Provided user does not exist on Twitch!`
 			};
 		}
+
+		const response = await sb.Got("Helix", {
+			url: "schedule",
+			searchParams: {
+				broadcaster_id: channelID
+			}
+		});
+
+		if (response.statusCode === 404) {
+			return {
+				success: false,
+				reply: `Provided user does not have any schedule set up!`
+			};
+		}
+
+		const { segments, vacation } = response.body.data;
+		if (vacation !== null) {
+			const start = new sb.Date(vacation.start_time);
+			const end = new sb.Date(vacation.end_time);
+			const verb = (start < sb.Date.now()) ? "started" : "starts";
+
+			return {
+				reply: sb.Utils.tag.trim `
+					Streaming schedule is interrupted.
+					Vacation ${verb} on ${start.format("Y-m-d")} 
+					and ends ${sb.Utils.timeDelta(end)}.
+				`
+			};
+		}
+
+		let segment;
+		let lateString = "";
+		if (segments.length === 1) {
+			segment = segments[0];
+		}
+		else {
+			const firstSegmentStart = new sb.Date(segment[0].start_time);
+			if (firstSegmentStart < sb.Date.now()) { // First stream segment should already be underway
+				const liveData = await sb.Got("Kraken", `streams/${channelID}`).json();
+				const isLive = Boolean(liveData.stream);
+
+				if (!isLive) { // Stream is not live - use the first segment (when it should have started), and mention that stream is late
+					const emote = await context.getBestAvailableEmote(["Weirdga", "WeirdChamp", "FeelsWeirdMan"], "🤨");
+					lateString = `The stream seems to be late ${emote}`;
+
+					segment = segment[0];
+				}
+				else { // Stream is live - all good, show the schedule for the next segment
+					segment = segment[1];
+				}
+			}
+			else { // No segment is underway, use the first one in the list
+				segment = segment[0];
+			}
+		}
+
+		const game = segment.category?.name ?? "(no category)";
+		const title = (segment.title !== "") ? segment.title : "(no title)";
+
+		let ownStreamString = "";
+		let target = `${channelName}'s`;
+		if (channelName.toLowerCase() === context.user.Name) {
+			target = "Your";
+			ownStreamString = "(shouldn't you know when you're supposed to stream? 😉)";
+		}
+
+		const time = sb.Utils.timeDelta(new sb.Date(segment.start_time));
+		return {
+			reply: sb.Utils.tag.trim `
+				${target} next stream:
+				${game} - ${title},
+				starting ${time}.
+				${lateString} 
+				${ownStreamString}
+			`
+		};
 	}),
 	Dynamic_Description: null
 };
