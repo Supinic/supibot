@@ -11,7 +11,7 @@ module.exports = {
 		types: [
 			{
 				name: "aliases",
-				aliases: [],
+				aliases: ["alias"],
 				description: "Checks the global (or-use data for user-created supibot command aliases.",
 				execute: async (context, type, user) => {
 					if (user) {
