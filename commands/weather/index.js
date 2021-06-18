@@ -304,9 +304,9 @@ module.exports = {
 			temperature = `Daily temperatures: ${dayLow}°C to ${dayHigh}°C, night temperatures: ${nightLow}°C to ${nightHigh}°C`;
 		}
 
-		const cloudCover = `Cloud cover: ${target.cloud}%.`;
+		const cloudCover = `Cloud cover: ${target.clouds}%.`;
 		const windGusts = `Wind gusts: up to ${sb.Utils.round(target.wind_gust * 3.6)} km/h.`;
-		const humidity = `Humidity: ${sb.Utils.round(target.humidity * 100)}%.`;
+		const humidity = `Humidity: ${target.humidity}%.`;
 		const pressure = `Air pressure: ${target.pressure} hPa.`;
 
 		let weatherAlert = "";
