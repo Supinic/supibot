@@ -289,12 +289,9 @@ module.exports = {
 
 		let weatherAlert = "";
 		if (data.alerts && data.alerts.length !== 0) {
-			if (data.alerts.length === 1) {
-				const [alert] = data.alerts;
-				weatherAlert = `⚠ Weather alert from ${alert.sender_name ?? "(unknown)"}: ${alert.event ?? alert.tags[0] ?? "(N/A)"}`;
-			}
-			else {
-				weatherAlert = `⚠ ${data.alerts.length} weather alerts issued for this location!`;
+			const alert = data.alerts.find(i => i.sender_name && (i.event || i.tags.length !== 0));
+			if (alert) {
+				weatherAlert = `⚠ Weather alert from ${alert.sender_name}: ${alert.event || alert.tags[0]}`;
 			}
 		}
 
