@@ -117,14 +117,14 @@ module.exports = {
 						const aliases = await sb.Query.getRecordset(rs => rs
 							.select("Name", "COUNT(*) AS Amount")
 							.from("data", "Custom_Command_Alias")
-							.groupBy("Name")
+							.groupBy("Name COLLATE utf8mb4_bin")
 							.orderBy("COUNT(*) DESC")
 						);
 
 						const top = aliases
 							.slice(0, 10)
 							.map((i, ind) => `#${ind + 1}: ${i.Name} ${i.Amount}x`)
-							.join(",");
+							.join(", ");
 
 						return {
 							reply: sb.Utils.tag.trim `
