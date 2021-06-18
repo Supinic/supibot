@@ -707,6 +707,13 @@ module.exports = {
 					user = context.user;
 				}
 				else if (type === "try") {
+					if (!secondArg) {
+						return {
+							success: false,
+							reply: `You didn't provide an alias to try!`
+						};
+					}
+					
 					runArgs.splice(0, 1);
 					name = secondArg;
 					user = await sb.User.get(firstArg);
