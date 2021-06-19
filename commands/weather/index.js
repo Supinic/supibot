@@ -304,18 +304,10 @@ module.exports = {
 
 		let weatherAlert = "";
 		if (data.alerts && data.alerts.length !== 0) {
-			if (skipLocation) {
-				const tags = data.alerts.flatMap(i => i.tags ?? []);
-				if (tags.length > 0) {
-					const plural = (tags.length > 1) ? "s" : "";
-					weatherAlert = `⚠ Weather alert${plural}: ${tags.join(", ")}.`;
-				}
-			}
-			else {
-				const alert = data.alerts.find(i => i.sender_name && (i.event || i.tags.length !== 0));
-				if (alert) {
-					weatherAlert = `⚠ Weather alert from ${alert.sender_name}: ${alert.event || alert.tags[0]}.`;
-				}
+			const tags = data.alerts.flatMap(i => i.tags ?? []);
+			if (tags.length > 0) {
+				const plural = (tags.length > 1) ? "s" : "";
+				weatherAlert = `⚠ Weather alert${plural}: ${tags.join(", ")}.`;
 			}
 		}
 
