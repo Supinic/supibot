@@ -89,7 +89,7 @@ module.exports = {
 			reply: sb.Utils.tag.trim `
 				"${data.name}"
 				by ${data.author},
-				${data.views} views,
+				${sb.Utils.groupDigits(data.views)} views,
 				published on ${published},
 				duration: ${duration}
 				${link}
