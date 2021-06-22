@@ -224,6 +224,7 @@ module.exports = {
 				url: "https://api.openweathermap.org/data/2.5/onecall",
 				responseType: "json",
 				throwHttpErrors: false,
+				timeout: 60_000,
 				searchParams: {
 					lat: coords.lat,
 					lon: coords.lng,
