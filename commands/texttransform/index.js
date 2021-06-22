@@ -197,7 +197,7 @@ module.exports = {
 			{
 				name: "antiping",
 				type: "method",
-				aliases: [],
+				aliases: ["unping"],
 				description: "Every word will have an invisible character added, so that it does not mention users in e.g. Chatterino.",
 				data: (message) => message.split(" ").map(word => {
 					if (/^\w+$/.test(word)) {
