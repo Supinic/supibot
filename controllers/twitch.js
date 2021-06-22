@@ -866,7 +866,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 */
 	static async fetchTwitchEmotes (sets) {
 		const data = [];
-		const sliceLength = 100;
+		const sliceLength = 50;
 		let index = 0;
 
 		while (index < sets.length) {
