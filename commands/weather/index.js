@@ -231,7 +231,7 @@ module.exports = {
 			});
 
 			data = response.body;
-			await this.setCacheData(weatherKey, data, { expiry: 900_000 }); // 15 minutes cache
+			await this.setCacheData(weatherKey, data, { expiry: 300_000 }); // 15 minutes cache
 		}
 
 		let target;
