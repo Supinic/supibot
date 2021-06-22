@@ -44,6 +44,8 @@ module.exports = class TwitchController extends require("./template.js") {
 		this.emoteFetchPromise = null;
 		this.emoteFetchTimeout = 0;
 
+		this.messageNonces = new Map();
+
 		this.initListeners();
 
 		this.client.connect();
@@ -312,8 +314,9 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * Sends a message, respecting each channel's current setup and limits
 	 * @param {string} message
 	 * @param {Channel|string} channel
+	 * @param {Object} options = {}
 	 */
-	async send (message, channel) {
+	async send (message, channel, options = {}) {
 		const channelData = sb.Channel.get(channel, this.platform);
 		const channelName = channelData.Name;
 		if (channelData.Mode === "Inactive" || channelData.Mode === "Read") {
@@ -336,14 +339,31 @@ module.exports = class TwitchController extends require("./template.js") {
 				maxSize: modes[channelData.Mode].queueSize
 			});
 
-			scheduler.on("message", (msg) => {
-				try {
-					this.client.say(channelName, msg);
+			const nonce = require("crypto").randomBytes(16).toString("hex");
+			scheduler.on("message", (msg) => (
+				this.client.sendRaw(`@client-nonce=${nonce} PRIVMSG #${channelName} :${msg}`)
+			));
+
+			const nonceTimeout = setTimeout(() => {
+				if (!this.messageNonces.has(nonce)) {
+					return;
 				}
-				catch (e) {
-					console.debug("Twitch send error", e);
+
+				const obj = this.messageNonces.get(nonce);
+				if (obj.pending) {
+					console.warn("Message dropped", { nonce, message, channelName });
 				}
-			});
+			}, 10_000);
+
+			const nonceObject = {
+				pending: true,
+				channel: channelName,
+				message,
+				timeout: nonceTimeout,
+				data: options
+			};
+
+			this.messageNonces.set(nonce, nonceObject);
 
 			this.queues[channelName] = scheduler;
 		}
