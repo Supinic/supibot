@@ -976,7 +976,7 @@ module.exports = {
 				</li>
 			</ul>`,
 
-		`For a list of neat small commands usable within aliases to ease up your work, check the <a href="/bot/command/255>${prefix}aliasbuildingblock</a> command.`,
+		`For a list of neat small commands usable within aliases to ease up your work, check the <a href="/bot/command/255">${prefix}aliasbuildingblock</a> command.`,
 		"This command lets you build up aliases without needing to create small aliases of your own for menial tasks.",
 		"A good example is <code>$abb say</code>, which simply returns its input - so you don't have to create an alias that does that for you."
 	])
