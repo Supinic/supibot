@@ -260,11 +260,19 @@ module.exports = {
 				precip = `It is currently snowing, ${snow}mm/h.`;
 			}
 			else {
-				for (let i = 0; i < data.minutely.length; i++) {
-					const { precipitation } = data.minutely[i];
+				const start = new sb.Date().discardTimeUnits("s", "ms");
+				for (const { dt, precipitation } of data.minutely) {
 					if (precipitation !== 0) {
-						const plural = (i === 1) ? "" : "s";
-						precip = `Precipitation expected in ~${i} minute${plural}.`;
+						const when = new sb.Date(dt * 1000).discardTimeUnits("s", "ms");
+						const minuteIndex = Math.trunc(when - start) / 60_000;
+						if (minuteIndex < 1) {
+							precip = "Precipitation expected in less than a minute!";
+						}
+						else {
+							const plural = (minuteIndex === 1) ? "" : "s";
+							precip = `Precipitation expected in ~${minuteIndex} minute${plural}.`;
+						}
+
 						break;
 					}
 				}
