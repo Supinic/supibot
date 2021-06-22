@@ -852,7 +852,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		while (index < sets.length) {
 			const slice = sets.slice(index, index + sliceLength);
 			const { statusCode, body } = await sb.Got("Leppunen", {
-				url: "twitch/emoteset",
+				url: "v2/twitch/getEmoteSet",
 				searchParams: {
 					set_id: slice.join(",")
 				}
@@ -875,9 +875,10 @@ module.exports = class TwitchController extends require("./template.js") {
 				ID: set.channelID
 			},
 			tier: set.tier,
-			emotes: (set.emotes ?? []).map(i => ({
+			emotes: (set.emoteList ?? []).map(i => ({
 				ID: i.id,
-				token: i.token
+				token: i.code,
+				animated: (i.type === "ANIMATED")
 			}))
 		}));
 	}
