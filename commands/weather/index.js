@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches the current weather in a given location. You can specify parameters to check forecast, or mention a user to get their location, if they set it up. Check all possibilities in extended help.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [
+		{ name: "alerts", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		getIcon: (code) => {
@@ -231,7 +233,55 @@ module.exports = {
 			});
 
 			data = response.body;
-			await this.setCacheData(weatherKey, data, { expiry: 300_000 }); // 15 minutes cache
+			await this.setCacheData(weatherKey, data, { expiry: 600_000 }); // 10 minutes cache
+		}
+
+		if (context.params.alerts) {
+			if (data.alerts.length === 0) {
+				return {
+					reply: sb.Utils.tag.trim `
+						Weather alert summary for
+						${(skipLocation) ? "(location hidden)" : formattedAddress}
+						-
+						no alerts.	 
+					 `
+				};
+			}
+
+			const pastebinKey = { type: "pastebin", coords: `${coords.lat}-${coords.lng}` };
+			let pastebinLink = await this.getCacheData(pastebinKey);
+			if (!pastebinLink) {
+				const text = data.alerts.map(i => {
+					const start = new sb.Date(i.start * 1000).setTimezoneOffset(data.timezone_offset / 60);
+					const end = new sb.Date(i.end * 1000).setTimezoneOffset(data.timezone_offset / 60);
+					const tags = (i.tags.length === 0) ? "" : `-- ${i.tags.sort().join(", ")}`;
+
+					return [
+						`Weather alert from ${i.sender_name ?? ("(unknown source)")} ${tags}`,
+						i.event ?? "(no event specified)",
+						`Active between: ${start.format("Y-m-d H:i")} and ${end.format("Y-m-d H:i")} local time`,
+						`${i.description ?? "(no description)"}`
+					].join("\n");
+				}).join("\n\n");
+
+				const response = await sb.Pastebin.post(text, {
+					expiration: "1H"
+				});
+
+				pastebinLink = response.body;
+				await this.setCacheData(pastebinKey, pastebinLink, { expiry: 3_600_000 });
+			}
+
+			return {
+				reply: sb.Utils.tag.trim `
+					Weather alert summary for
+					${(skipLocation) ? "(location hidden)" : formattedAddress}
+					- 
+					${data.alerts.length} alerts 
+					-
+					full info: ${pastebinLink}
+				`
+			};
 		}
 
 		let target;
