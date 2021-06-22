@@ -315,7 +315,7 @@ module.exports = {
 
 		let plusTime;
 		if (typeof number === "number") {
-			const time = new sb.Date(target.dt * 1000).setTimezoneOffset(data.timezone_offset);
+			const time = new sb.Date(target.dt * 1000).setTimezoneOffset(data.timezone_offset / 60);
 			if (type === "hourly") {
 				plusTime = ` (${time.format("H:00")} local time)`;
 			}
