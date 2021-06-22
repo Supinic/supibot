@@ -1036,7 +1036,7 @@ module.exports = class TwitchController extends require("./template.js") {
 						? "twitch-subscriber"
 						: "twitch-global",
 					global: true,
-					animated: false
+					animated: i.animated
 				}))),
 
 			...Object.values(ffz.value?.body.sets ?? {})
