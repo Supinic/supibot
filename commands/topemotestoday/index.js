@@ -31,14 +31,22 @@ module.exports = {
 		}
 
 		date.setTimezoneOffset(0);
-		const data = await sb.Got("GenericAPI", {
+		const response = await sb.Got("GenericAPI", {
 			url: "https://internal-api.twitchemotes.com/api/stats/top/by-date",
-			searchParams: new sb.URLParams()
-				.set("limit", "10")
-				.set("date", date.format("Y-m-d"))
-				.toString()
-		}).json();
+			searchParams: {
+				limit: "10",
+				date: date.format("Y-m-d")
+			}
+		});
 
+		if (response.statusCode !== 200) {
+			return {
+				success: false,
+				reply: `No data for top emotes is currently available!`
+			};
+		}
+
+		const data = response.body;
 		if (data.length === 0) {
 			return {
 				success: false,
