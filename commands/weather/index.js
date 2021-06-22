@@ -455,6 +455,10 @@ module.exports = {
 		"weather forecast in X day(s) - accepts 1 through 7",
 		"",
 
+		`<code>${prefix}weather (place) alerts:true</code>`,
+		"Posts a summary of all weather alerts for the provided location - for the next 7 days.",
+		"",
+
 		"",
 		"=".repeat(20),
 		"",
@@ -463,11 +467,19 @@ module.exports = {
 		"If you set your own weather location, show its weather.",
 		"",
 
+		`<code>${prefix}weather alerts:true</code>`,
+		"Posts a summary of all weather alerts for your location - for the next 7 days, if you have set it up.",
+		"",
+
 		`<code>${prefix}weather @User</code>`,
 		"If that user has set their own weather location, show its weather. The <code>@</code> symbol is mandatory.",
 		"",
 
 		`<code>${prefix}weather @User <b>(hour+X/day+X)</b></code>`,
-		"Similar to above, shows the user's weather, but uses the hour/day specifier."
+		"Similar to above, shows the user's weather, but uses the hour/day specifier.",
+
+		`<code>${prefix}weather @User alerts:true</code>`,
+		"Posts a summary of all weather alerts for the user's location - for the next 7 days.",
+		""
 	])
 };
