@@ -321,7 +321,22 @@ module.exports = {
 
 		let weatherAlert = "";
 		if (data.alerts && data.alerts.length !== 0) {
-			const tagList = data.alerts.flatMap(i => i.tags ?? []).sort();
+			const targetTime = new sb.Date();
+			if (type === "hourly") {
+				targetTime.addHours(number);
+			}
+			else if (type === "daily") {
+				targetTime.addDays(number);
+			}
+
+			const relevantAlerts = data.alerts.filter(i => {
+				const start = new sb.Date(i.start * 1000);
+				const end = new sb.Date(i.end * 1000);
+
+				return (start <= targetTime && end >= targetTime);
+			});
+
+			const tagList = relevantAlerts.flatMap(i => i.tags ?? []).sort();
 			const tags = [...new Set(tagList)];
 
 			if (tags.length > 0) {
