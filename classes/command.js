@@ -795,7 +795,8 @@ class Command extends require("./template.js") {
 						params: context.params ?? {},
 						isPrivateMessage
 					};
-					const errorID = await sb.SystemLogger.sendError("Command", e, [loggingContext, identifier, ...args]);
+
+					const errorID = await sb.Logger.logError("Command", e, [loggingContext, identifier, ...args]);
 					const prettify = (channelData?.Data.developer)
 						? sb.Config.get("COMMAND_ERROR_DEVELOPER")
 						: sb.Config.get("COMMAND_ERROR_GENERIC");
