@@ -254,7 +254,9 @@ module.exports = {
 				const text = data.alerts.map(i => {
 					const start = new sb.Date(i.start * 1000).setTimezoneOffset(data.timezone_offset / 60);
 					const end = new sb.Date(i.end * 1000).setTimezoneOffset(data.timezone_offset / 60);
-					const tags = (i.tags.length === 0) ? "" : `-- ${i.tags.sort().join(", ")}`;
+					const tags = (!i.tags || i.tags.length === 0)
+						? ""
+						: `-- ${i.tags.sort().join(", ")}`;
 
 					if (skipLocation) {
 						return [
