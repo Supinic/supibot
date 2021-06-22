@@ -237,7 +237,7 @@ module.exports = {
 		}
 
 		if (context.params.alerts) {
-			if (data.alerts.length === 0) {
+			if (!data.alerts || data.alerts.length === 0) {
 				return {
 					reply: sb.Utils.tag.trim `
 						Weather alert summary for
