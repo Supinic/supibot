@@ -243,7 +243,7 @@ module.exports = {
 						Weather alert summary for
 						${(skipLocation) ? "(location hidden)" : formattedAddress}
 						-
-						no alerts.	 
+						no alerts.
 					 `
 				};
 			}
