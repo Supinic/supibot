@@ -1032,7 +1032,9 @@ module.exports = class TwitchController extends require("./template.js") {
 				.flatMap(set => set.emotes.map(i => ({
 					ID: i.ID,
 					name: i.token,
-					type: (set.tier === "1" || set.tier === "2" || set.tier === "3")
+					// Massive hackfuck-workaround - animated emotes are present in their own emoteset without a tier,
+					// hence a special check must be added here. Otherwise, they will be considered as global.
+					type: (i.animated || set.tier === "1" || set.tier === "2" || set.tier === "3")
 						? "twitch-subscriber"
 						: "twitch-global",
 					global: true,
