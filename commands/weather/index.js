@@ -256,12 +256,21 @@ module.exports = {
 					const end = new sb.Date(i.end * 1000).setTimezoneOffset(data.timezone_offset / 60);
 					const tags = (i.tags.length === 0) ? "" : `-- ${i.tags.sort().join(", ")}`;
 
-					return [
-						`Weather alert from ${i.sender_name ?? ("(unknown source)")} ${tags}`,
-						i.event ?? "(no event specified)",
-						`Active between: ${start.format("Y-m-d H:i")} and ${end.format("Y-m-d H:i")} local time`,
-						`${i.description ?? "(no description)"}`
-					].join("\n");
+					if (skipLocation) {
+						return [
+							`Abridged - location hidden`,
+							`Weather alert ${tags}`,
+							`Active between: ${start.format("Y-m-d H:i")} and ${end.format("Y-m-d H:i")} local time`
+						].join("\n");
+					}
+					else {
+						return [
+							`Weather alert from ${i.sender_name ?? ("(unknown source)")} ${tags}`,
+							i.event ?? "(no event specified)",
+							`Active between: ${start.format("Y-m-d H:i")} and ${end.format("Y-m-d H:i")} local time`,
+							`${i.description ?? "(no description)"}`
+						].join("\n");
+					}
 				}).join("\n\n");
 
 				const response = await sb.Pastebin.post(text, {
