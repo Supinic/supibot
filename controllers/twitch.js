@@ -961,7 +961,8 @@ module.exports = class TwitchController extends require("./template.js") {
 		const { statusCode, body: data } = await sb.Got({
 			url: `https://api.7tv.app/v2/users/${channelData.Name}/emotes`,
 			responseType: "json",
-			throwHttpErrors: false
+			throwHttpErrors: false,
+			rejectUnauthorized: false // Remove this as soon as possible if not required!
 		});
 
 		if (statusCode !== 200) {
@@ -1001,7 +1002,8 @@ module.exports = class TwitchController extends require("./template.js") {
 			sb.Got({
 				url: "https://api.7tv.app/v2/emotes/global",
 				responseType: "json",
-				throwHttpErrors: false
+				throwHttpErrors: false,
+				rejectUnauthorized: false // Remove this as soon as possible if not required!
 			})
 		]);
 
