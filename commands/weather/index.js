@@ -304,7 +304,9 @@ module.exports = {
 
 		let weatherAlert = "";
 		if (data.alerts && data.alerts.length !== 0) {
-			const tags = data.alerts.flatMap(i => i.tags ?? []);
+			const tagList = data.alerts.flatMap(i => i.tags ?? []).sort();
+			const tags = [...new Set(tagList)];
+
 			if (tags.length > 0) {
 				const plural = (tags.length > 1) ? "s" : "";
 				weatherAlert = `⚠ Weather alert${plural}: ${tags.join(", ")}.`;
