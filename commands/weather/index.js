@@ -260,7 +260,15 @@ module.exports = {
 				precip = `It is currently snowing, ${snow}mm/h.`;
 			}
 			else {
-				precip = "No precipitation right now.";
+				for (const { dt, precipitation } of data.minutely) {
+					if (precipitation !== 0) {
+						const roundPrecip = sb.Utils.round(precipitation, 2);
+						const when = new sb.Date(dt * 1000);
+						precip = `Precipitation expected in ca. ${sb.Utils.timeDelta(when, true)}, ${roundPrecip} mm/h.`;
+					}
+				}
+
+				precip ??= "No precipitation right now.";
 			}
 		}
 		else if (type === "hourly" || type === "daily") {
@@ -340,7 +348,7 @@ module.exports = {
 				${humidity}
 				${precip}
 				${pressure}
-				${weatherAlert}	
+				${weatherAlert}
 			`
 		};
 	}),
