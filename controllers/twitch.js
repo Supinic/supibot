@@ -174,10 +174,30 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 			else if (error instanceof DankTwitch.SayError && error.cause instanceof DankTwitch.MessageError) {
 				if (error.message.includes("Bad response message")) {
+					const { messageText } = error;
 					const channelData = sb.Channel.get(error.failedChannelName, this.platform);
-					const defaultReply = "That message violates this channel's moderation settings.";
 
-					if (!error.message.includes(defaultReply)) {
+					let defaultReply;
+					if (messageText.includes("reminders from")) {
+						const recipient = messageText.match(/(.*), reminders from:/);
+						if (recipient) {
+							this.pm(`Couldn't post reminder: ${messageText}`, recipient);
+
+							defaultReply = sb.Utils.tag.trim `
+								@${recipient[1]},
+								a reminder you would have received violates this channel's moderation settings.
+								Check your whispers, or head over to https://supinic.com/bot/reminder/history 
+							`;
+						}
+						else {
+							defaultReply = "A reminder just violated this channel's moderation settings,";
+						}
+					}
+					else if (messageText.startsWith) {
+						defaultReply = "A message that was about be posted violates this channel's moderation settings.";
+					}
+
+					if (!messageText.includes(defaultReply)) {
 						this.send(defaultReply, channelData);
 					}
 				}
