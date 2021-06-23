@@ -4,13 +4,17 @@ module.exports = {
 		const { freemem, totalmem } = require("os");
 		const uptime = Math.trunc(process.uptime() * 1000);
 		const started = new sb.Date().addMilliseconds(-uptime);
+		const processMemory = process.memoryUsage();
 
 		return {
 			statusCode: 200,
 			data: {
 				memory: {
-					free: freemem(),
-					total: totalmem()
+					system: {
+						free: freemem(),
+						total: totalmem()
+					},
+					process: processMemory
 				},
 				uptime: {
 					time: uptime,
