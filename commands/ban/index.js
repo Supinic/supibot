@@ -298,7 +298,7 @@ module.exports = {
 			"Disables the use of a specific argument position for given text.",
 			`If you use <code>${prefix}ban type:arguments</code> again with the same combination of channel/command/user, then the arguments will stack. To remove or disable, see the help for <code>${prefix}unban type:arguments</code> below.`,
 			`Example: <code>${prefix}ban command:rm index:0 string:livestreamfail</code> will ban the use of <code>${prefix}rm livestreamfail</code>. This is because the first argument (index 0) is the subreddit name and it matches the text exactly.`,
-			`Example: <code>${prefix}ban command:remind index:1 string:hello/code> will ban the use of <code>${prefix}remind (anyone) hello</code>. This is because "hello" is the second argument (index 1) and it matches.`,
+			`Example: <code>${prefix}ban command:remind index:1 string:hello</code> will ban the use of <code>${prefix}remind (anyone) hello</code>. This is because "hello" is the second argument (index 1) and it matches.`,
 			"",
 
 			"---",
