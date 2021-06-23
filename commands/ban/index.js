@@ -210,6 +210,12 @@ module.exports = {
 						};
 					}
 				}
+				else {
+					return {
+						success: false,
+						reply: `Invalid combination of parameters for the Argument type provided!`
+					};
+				}
 			}
 			else {
 				await existing.toggle();
@@ -230,9 +236,17 @@ module.exports = {
 
 			if (type === "Arguments") {
 				const { index, string } = context.params;
-				options.Data = JSON.stringify({
-					args: [{ index, string }]
-				});
+				if (sb.Utils.isValidInteger(index) && typeof string === "string") {
+					options.Data = JSON.stringify({
+						args: [{ index, string }]
+					});
+				}
+				else {
+					return {
+						success: false,
+						reply: `Invalid combination of parameters for the Argument type! "index" and "string" must be provided.`
+					};
+				}
 			}
 
 			const ban = await sb.Filter.create(options);
@@ -283,8 +297,8 @@ module.exports = {
 			`<code>${prefix}ban type:arguments index:(number) string:(text)</code>`,
 			"Disables the use of a specific argument position for given text.",
 			`If you use <code>${prefix}ban type:arguments</code> again with the same combination of channel/command/user, then the arguments will stack. To remove or disable, see the help for <code>${prefix}unban type:arguments</code> below.`,
-			`Example: <code>${prefix}ban command:rm index:0 string:livestreamfail</code> will ban the use of <code>${prefix}rm livestreamfail<code>. This is because the first argument (index 0) is the subreddit name and it matches the text exactly.`,
-			`Example: <code>${prefix}ban command:remind index:1 string:hello/code> will ban the use of <code>${prefix}remind (anyone) hello<code>. This is because "hello" is the second argument (index 1) and it matches.`,
+			`Example: <code>${prefix}ban command:rm index:0 string:livestreamfail</code> will ban the use of <code>${prefix}rm livestreamfail</code>. This is because the first argument (index 0) is the subreddit name and it matches the text exactly.`,
+			`Example: <code>${prefix}ban command:remind index:1 string:hello/code> will ban the use of <code>${prefix}remind (anyone) hello</code>. This is because "hello" is the second argument (index 1) and it matches.`,
 			"",
 
 			"---",
