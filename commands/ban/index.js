@@ -230,9 +230,9 @@ module.exports = {
 
 			if (type === "Arguments") {
 				const { index, string } = context.params;
-				options.Data = {
+				options.Data = JSON.stringify({
 					args: [{ index, string }]
-				};
+				});
 			}
 
 			const ban = await sb.Filter.create(options);
