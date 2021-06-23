@@ -341,6 +341,10 @@ module.exports = {
 			"Make sure to use the correct type - <code>Blacklist</code> is again default.",
 			"",
 
+			`<code>${prefix}unban type:arguments index:(number) string:(string) (...)</code>`,
+			`Removes a single item from a previously added Arguments-type filter - if it exists.`,
+			"",
+
 			`<code>${prefix}unban type:arguments (...)</code>`,
 			`Disables the Arguments-type filter, leaving its items intact. You can re-enable it by simply using <code>${prefix}ban</code> with the same channel/command/user combination.`,
 			"",
