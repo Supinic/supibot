@@ -58,6 +58,107 @@ module.exports = class Filter extends require("./template.js") {
 		 * @type {CooldownFilterData|ArgumentsFilterData}
 		 */
 		this.Data = null;
+		this.createFilterData(data);
+
+		/**
+		 * Response type to respond with if a filter is found.
+		 * @type {"None"|"Auto"|"Reason"}
+		 */
+		this.Response = data.Response;
+
+		/**
+		 * The reason a filter was issued.
+		 * @type {string|null}
+		 */
+		this.Reason = data.Reason;
+
+		/**
+		 * If the filter is a block, this is the user who is being blocked from targetting someone with a command.
+		 * @type {User.ID|null}
+		 */
+		this.Blocked_User = data.Blocked_User;
+
+		/**
+		 * Whether or not the filter is currently being enforced.
+		 * @type {boolean}
+		 */
+		this.Active = data.Active;
+
+		/**
+		 * Unique numeric user identifier of the person who created the filter.
+		 * @type {User.ID|null}
+		 */
+		this.Issued_By = data.Issued_By;
+	}
+
+	/**
+	 * For custom-data-related Filters, this method applies filter data to the provided data object.
+	 * @param {Array|number} data
+	 * @returns {*} Returned type depends on filter type - Args {boolean} or Cooldown {number}
+	 */
+	applyData (data) {
+		if (this.Type === "Arguments" && Array.isArray(data)) {
+			for (const item of this.#filterData) {
+				const { index, range, regex, string } = item;
+				for (let i = 0; i < data.length; i++) {
+					const positionCheck = (i === index || (range[0] <= i && i <= range[1]));
+					const valueCheck = ((string && data[i] === string) || (regex && regex.test(data[i])));
+					if (positionCheck && valueCheck) {
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+		else if (this.Type === "Cooldown" && (data === null || typeof data === "number")) {
+			const value = data ?? 0; // `null` cooldowns are treated as zero
+			const { multiplier, override, respect } = this.#filterData;
+
+			if (typeof override === "number") {
+				if (respect === false) {
+					return override;
+				}
+				else {
+					return (override > value) ? data : override;
+				}
+			}
+			else if (typeof multiplier === "number") {
+				if (data === null) {
+					return data;
+				}
+
+				return Math.round(value * multiplier);
+			}
+		}
+
+		throw new sb.Error({
+			message: "Invalid combination of input data and filter type"
+		});
+	}
+
+	get priority () {
+		let priority = 0;
+		if (this.Platform) {
+			priority |= 0b0000_0001;
+		}
+		if (this.Channel) {
+			priority |= 0b0000_0010;
+		}
+		if (this.Command) {
+			priority |= 0b0000_0100;
+		}
+		if (this.Invocation) {
+			priority |= 0b0000_1000;
+		}
+		if (this.User_Alias) {
+			priority |= 0b0001_0000;
+		}
+
+		return priority;
+	}
+
+	createFilterData (data) {
 		if (data.Data) {
 			if (typeof data.Data === "string") {
 				try {
@@ -164,103 +265,6 @@ module.exports = class Filter extends require("./template.js") {
 				}
 			}
 		}
-
-		/**
-		 * Response type to respond with if a filter is found.
-		 * @type {"None"|"Auto"|"Reason"}
-		 */
-		this.Response = data.Response;
-
-		/**
-		 * The reason a filter was issued.
-		 * @type {string|null}
-		 */
-		this.Reason = data.Reason;
-
-		/**
-		 * If the filter is a block, this is the user who is being blocked from targetting someone with a command.
-		 * @type {User.ID|null}
-		 */
-		this.Blocked_User = data.Blocked_User;
-
-		/**
-		 * Whether or not the filter is currently being enforced.
-		 * @type {boolean}
-		 */
-		this.Active = data.Active;
-
-		/**
-		 * Unique numeric user identifier of the person who created the filter.
-		 * @type {User.ID|null}
-		 */
-		this.Issued_By = data.Issued_By;
-	}
-
-	/**
-	 * For custom-data-related Filters, this method applies filter data to the provided data object.
-	 * @param {Array|number} data
-	 * @returns {*} Returned type depends on filter type - Args {boolean} or Cooldown {number}
-	 */
-	applyData (data) {
-		if (this.Type === "Arguments" && Array.isArray(data)) {
-			for (const item of this.#filterData) {
-				const { index, range, regex, string } = item;
-				for (let i = 0; i < data.length; i++) {
-					const positionCheck = (i === index || (range[0] <= i && i <= range[1]));
-					const valueCheck = ((string && data[i] === string) || (regex && regex.test(data[i])));
-					if (positionCheck && valueCheck) {
-						return true;
-					}
-				}
-			}
-
-			return false;
-		}
-		else if (this.Type === "Cooldown" && (data === null || typeof data === "number")) {
-			const value = data ?? 0; // `null` cooldowns are treated as zero
-			const { multiplier, override, respect } = this.#filterData;
-
-			if (typeof override === "number") {
-				if (respect === false) {
-					return override;
-				}
-				else {
-					return (override > value) ? data : override;
-				}
-			}
-			else if (typeof multiplier === "number") {
-				if (data === null) {
-					return data;
-				}
-
-				return Math.round(value * multiplier);
-			}
-		}
-
-		throw new sb.Error({
-			message: "Invalid combination of input data and filter type"
-		});
-	}
-
-	get priority () {
-		let priority = 0;
-		if (this.Platform) {
-			priority |= 0b0000_0001;
-		}
-		if (this.Channel) {
-			priority |= 0b0000_0010;
-		}
-		if (this.Command) {
-			priority |= 0b0000_0100;
-		}
-		if (this.Invocation) {
-			priority |= 0b0000_1000;
-		}
-		if (this.User_Alias) {
-			priority |= 0b0001_0000;
-		}
-
-		return priority;
 	}
 
 	async toggle () {
@@ -321,6 +325,10 @@ module.exports = class Filter extends require("./template.js") {
 		await row.load(this.ID);
 
 		await super.saveRowProperty(row, property, value, this);
+
+		if (property === "Data") {
+			this.createFilterData(this.Data);
+		}
 	}
 
 	static async loadData () {
