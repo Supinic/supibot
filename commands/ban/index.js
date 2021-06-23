@@ -185,6 +185,15 @@ module.exports = {
 						await existing.toggle();
 					}
 
+					for (const item of existing.Data.args) {
+						if (item.index === index && item.string === string) {
+							return {
+								success: false,
+								reply: `This combination of index and string in an Arguments filter is already banned!`
+							};
+						}
+					}
+					
 					if (sb.Utils.isValidInteger(index) && typeof string === "string") {
 						existing.Data.args.push({ index, string });
 
