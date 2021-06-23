@@ -201,7 +201,25 @@ module.exports = {
 					};
 				}
 				else if (invocation === "unban") {
-					if (clear) {
+					if (sb.Utils.isValidInteger(index) && typeof string === "string") {
+						for (let i = 0; i < existing.Data.args.length; i++) {
+							const item = existing.Data.args[i];
+							if (item.index === index && item.string === string) {
+								existing.Data.args.splice(i, 1);
+								await existing.saveProperty("Data");
+
+								return {
+									reply: `Succesfully removed an item from the Arguments filter (ID ${existing.ID})`
+								};
+							}
+						}
+
+						return {
+							success: false,
+							reply: `No matching items found in the Arguments filter!`
+						};
+					}
+					else if (clear) {
 						existing.Data.args = [];
 						await existing.saveProperty("Data");
 
