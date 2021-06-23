@@ -233,6 +233,10 @@ module.exports = class Platform extends require("./template.js") {
 		return data;
 	}
 
+	async resetGlobalEmotes () {
+		return await this.setCacheData("global-emotes", null);
+	}
+
 	async fetchChannelEmotes (channelData) {
 		return await this.controller.fetchChannelEmotes(channelData);
 	}
