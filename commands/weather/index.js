@@ -323,7 +323,7 @@ module.exports = {
 			}
 			else {
 				const start = new sb.Date().discardTimeUnits("s", "ms");
-				for (const { dt, precipitation } of data.minutely) {
+				for (const { dt, precipitation } of (data.minutely ?? [])) {
 					if (precipitation !== 0) {
 						const when = new sb.Date(dt * 1000).discardTimeUnits("s", "ms");
 						const minuteIndex = Math.trunc(when - start) / 60_000;
