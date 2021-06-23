@@ -7,14 +7,17 @@ module.exports = {
 	Flags: ["mention","use-params"],
 	Params: [
 		{ name: "channel", type: "string" },
+		{ name: "clear", type: "boolean" },
 		{ name: "command", type: "string" },
+		{ name: "index", type: "number" },
 		{ name: "invocation", type: "string" },
 		{ name: "type", type: "string" },
+		{ name: "string", type: "string" },
 		{ name: "user", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		availableTypes: ["Blacklist", "Online-only", "Offline-only"]
+		availableTypes: ["Arguments", "Blacklist", "Online-only", "Offline-only"]
 	})),
 	Code: (async function ban (context) {
 		const { invocation } = context;
@@ -174,18 +177,61 @@ module.exports = {
 				};
 			}
 
-			await existing.toggle();
+			if (context.params.type === "Arguments") {
+				const { clear = false, index, string } = context.params;
 
-			const [prefix, suffix] = (existing.Active) ? ["", " again"] : ["un", ""];
-			return {
-				reply: `Succesfully ${prefix}banned${suffix}.`
-			};
+				if (invocation === "ban") {
+					if (!existing.Active) {
+						await existing.toggle();
+					}
+
+					if (sb.Utils.isValidInteger(index) && typeof string === "string") {
+						existing.Data.args.push({ index, string });
+
+						await existing.saveProperty("Data");
+						return {
+							reply: `Successfully added a new item to Arguments filter (ID ${existing.ID})`
+						};
+					}
+				}
+				else if (invocation === "unban") {
+					if (clear) {
+						existing.Data.args = [];
+						await existing.saveProperty("Data");
+
+						return {
+							reply: `Successfully cleared all items from the Arguments filter (ID ${existing.ID})`
+						};
+					}
+					else if (existing.Active) {
+						await existing.toggle();
+						return {
+							reply: `Succesfully disabled Arguments filter (ID ${existing.ID}). Its items are still available, it just isn't active.`
+						};
+					}
+				}
+			}
+			else {
+				await existing.toggle();
+
+				const [prefix, suffix] = (existing.Active) ? ["", " again"] : ["un", ""];
+				return {
+					reply: `Succesfully ${prefix}banned${suffix}.`
+				};
+			}
 		}
 		else {
 			if (invocation === "unban") {
 				return {
 					success: false,
 					reply: "This combination has not been banned yet, so it cannot be unbanned!"
+				};
+			}
+
+			if (context.params.type === "Arguments") {
+				const { index, string } = context.params;
+				options.Data = {
+					args: [{ index, string }]
 				};
 			}
 
@@ -234,6 +280,13 @@ module.exports = {
 			"Just like <code>offline-only</code>, but reverse - result will be available only in online channels.",
 			"",
 
+			`<code>${prefix}ban type:arguments index:(number) string:(text)</code>`,
+			"Disables the use of a specific argument position for given text.",
+			`If you use <code>${prefix}ban type:arguments</code> again with the same combination of channel/command/user, then the arguments will stack. To remove or disable, see the help for <code>${prefix}unban type:arguments</code> below.`,
+			`Example: <code>${prefix}ban command:rm index:0 string:livestreamfail</code> will ban the use of <code>${prefix}rm livestreamfail<code>. This is because the first argument (index 0) is the subreddit name and it matches the text exactly.`,
+			`Example: <code>${prefix}ban command:remind index:1 string:hello/code> will ban the use of <code>${prefix}remind (anyone) hello<code>. This is because "hello" is the second argument (index 1) and it matches.`,
+			"",
+
 			"---",
 			"",
 
@@ -242,7 +295,16 @@ module.exports = {
 			`<code>${prefix}unban type:offline-only (...)</code>`,
 			`<code>${prefix}unban type:online-only (...)</code>`,
 			"Unbans any previously mentioned combination.",
-			"Make sure to use the correct type - <code>Blacklist</code> is again default."
+			"Make sure to use the correct type - <code>Blacklist</code> is again default.",
+			"",
+
+			`<code>${prefix}unban type:arguments (...)</code>`,
+			`Disables the Arguments-type filter, leaving its items intact. You can re-enable it by simply using <code>${prefix}ban</code> with the same channel/command/user combination.`,
+			"",
+
+			`<code>${prefix}unban type:arguments clear:true (...)</code>`,
+			`Instead of disabling the Arguments filter, this will remove all of its items.`,
+			""
 		];
 	})
 };
