@@ -355,6 +355,10 @@ module.exports = class Channel extends require("./template.js") {
 		return [...globalEmotes, ...channelEmotes];
 	}
 
+	async invalidateEmotesCache () {
+		return await this.setCacheData("emotes", null);
+	}
+
 	/**
 	 * Fetches the best fitting emote for the current channel instance.
 	 * @param {string[]} emotes

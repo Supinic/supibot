@@ -233,7 +233,7 @@ module.exports = class Platform extends require("./template.js") {
 		return data;
 	}
 
-	async resetGlobalEmotes () {
+	async invalidateGlobalEmotesCache () {
 		return await this.setCacheData("global-emotes", null);
 	}
 
