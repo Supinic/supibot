@@ -257,6 +257,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				this.emoteFetchPromise = null;
 
 				this.emoteFetchTimeout = sb.Date.now() + (this.platform.Data.emoteFetchTimeout ?? 10_000);
+				await this.platform.invalidateGlobalEmotesCache();
 			}
 		});
 
