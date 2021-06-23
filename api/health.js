@@ -1,7 +1,8 @@
 // noinspection JSUnusedGlobalSymbols
+const { freemem, totalmem } = require("os");
+
 module.exports = {
 	summary: async () => {
-		const { freemem, totalmem } = require("os");
 		const uptime = Math.trunc(process.uptime() * 1000);
 		const started = new sb.Date().addMilliseconds(-uptime);
 		const processMemory = process.memoryUsage();
