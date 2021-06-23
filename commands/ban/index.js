@@ -170,16 +170,8 @@ module.exports = {
 					reply: "This ban has not been created by you, so you cannot modify it!"
 				};
 			}
-			else if ((existing.Active && invocation === "ban") || (!existing.Active && invocation === "unban")) {
-				return {
-					success: false,
-					reply: `That combination is already ${invocation}ned!`
-				};
-			}
-
-			if (type === "Arguments") {
+			else if (type === "Arguments") {
 				const { clear = false, index, string } = context.params;
-
 				if (invocation === "ban") {
 					if (!existing.Active) {
 						await existing.toggle();
@@ -193,7 +185,7 @@ module.exports = {
 							};
 						}
 					}
-					
+
 					if (sb.Utils.isValidInteger(index) && typeof string === "string") {
 						existing.Data.args.push({ index, string });
 
@@ -202,6 +194,11 @@ module.exports = {
 							reply: `Successfully added a new item to Arguments filter (ID ${existing.ID})`
 						};
 					}
+
+					return {
+						success: false,
+						reply: `Invalid combination of parameters for the Argument type provided!`
+					};
 				}
 				else if (invocation === "unban") {
 					if (clear) {
@@ -218,13 +215,18 @@ module.exports = {
 							reply: `Succesfully disabled Arguments filter (ID ${existing.ID}). Its items are still available, it just isn't active.`
 						};
 					}
-				}
-				else {
+
 					return {
 						success: false,
 						reply: `Invalid combination of parameters for the Argument type provided!`
 					};
 				}
+			}
+			else if ((existing.Active && invocation === "ban") || (!existing.Active && invocation === "unban")) {
+				return {
+					success: false,
+					reply: `That combination is already ${invocation}ned!`
+				};
 			}
 			else {
 				await existing.toggle();
