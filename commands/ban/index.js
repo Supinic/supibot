@@ -177,7 +177,7 @@ module.exports = {
 				};
 			}
 
-			if (context.params.type === "Arguments") {
+			if (type === "Arguments") {
 				const { clear = false, index, string } = context.params;
 
 				if (invocation === "ban") {
@@ -228,7 +228,7 @@ module.exports = {
 				};
 			}
 
-			if (context.params.type === "Arguments") {
+			if (type === "Arguments") {
 				const { index, string } = context.params;
 				options.Data = {
 					args: [{ index, string }]
