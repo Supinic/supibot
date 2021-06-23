@@ -342,20 +342,17 @@ module.exports = class Channel extends require("./template.js") {
 	}
 
 	async fetchEmotes () {
-		const cacheData = await this.getCacheData("emotes");
-		if (cacheData) {
-			return cacheData;
+		let channelEmotes = await this.getCacheData("emotes");
+		if (!channelEmotes) {
+			channelEmotes = await this.Platform.fetchChannelEmotes(this);
 		}
 
-		const [globalEmotes, channelEmotes] = await Promise.all([
-			this.Platform.fetchGlobalEmotes(),
-			this.Platform.fetchChannelEmotes(this)
-		]);
+		await this.setCacheData("emotes", channelEmotes, {
+			expiry: 3_600_000 // 1 hour channel emotes cache
+		});
 
-		const data = [...globalEmotes, ...channelEmotes];
-		await this.setCacheData("emotes", data, { expiry: 864e5 });
-
-		return data;
+		const globalEmotes = await this.Platform.fetchGlobalEmotes();
+		return [...globalEmotes, ...channelEmotes];
 	}
 
 	/**
