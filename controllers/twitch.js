@@ -899,7 +899,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			emotes: (set.emoteList ?? []).map(i => ({
 				ID: i.id,
 				token: i.code,
-				animated: (i.type === "ANIMATED")
+				animated: (i.assetType === "ANIMATED")
 			}))
 		}));
 	}
