@@ -47,6 +47,13 @@ module.exports = {
 		}
 
 		const { segments, vacation } = response.body.data;
+		if (!Array.isArray(segments) || segments.length === 0) {
+			return {
+				success: false,
+				reply: `No stream schedule segments have been found!`
+			};
+		}
+
 		if (vacation !== null) {
 			const start = new sb.Date(vacation.start_time);
 			const end = new sb.Date(vacation.end_time);
