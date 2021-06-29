@@ -27,12 +27,12 @@ module.exports = {
 	Code: (async function randomGachi (context) {
 		const prefixRow = await sb.Query.getRow("data", "Video_Type");
 		await prefixRow.load(1);
-	
+
 		const targetUserFavourite = context.params.fav ?? null;
 		const userFavourites = (targetUserFavourite)
 			? await sb.User.get(targetUserFavourite)
 			: null;
-	
+
 		if (targetUserFavourite && !userFavourites) {
 			return {
 				success: false,
@@ -80,7 +80,7 @@ module.exports = {
 						on: "User_Favourite.Track = Track.ID"
 					});
 			}
-	
+
 			return rs;
 		});
 		if (!data) {
@@ -95,12 +95,22 @@ module.exports = {
 				reply: `https://youtu.be/${data.TrackLink}`
 			};
 		}
-	
+
 		const authorList = (data.Authors || "(unknown)").split(",");
 		const authors = (authorList.length === 1) ? authorList[0] : "(various)";
 		const supiLink = `https://supinic.com/track/detail/${data.TrackID}`;
+		const emote = await context.getBestAvailableEmote(["gachiCOOL", "gachiHop", "gachiBASS", "gachiGASM", "pajaVan"], "🤼😩");
+
+		let favouriteString = "your random gachi";
+		if (targetUserFavourite === context.user) {
+			favouriteString = "random gachi from your favourite list";
+		}
+		else if (targetUserFavourite) {
+			favouriteString = "random gachi from their favourite list";
+		}
+
 		return {
-			reply: `Here's your random gachi: "${data.TrackName}" by ${authors} - ${supiLink} gachiGASM`
+			reply: `Here's ${favouriteString}: "${data.TrackName}" by ${authors} - ${supiLink} ${emote}`
 		};
 	}),
 	Dynamic_Description: (async (prefix, values) => {
@@ -110,15 +120,15 @@ module.exports = {
 		return [
 			`Returns a random gachimuchi track from the <a href="/track/gachi/list">track list</a> and the <a href="/track/todo/list">todo list</a>.`,
 			"",
-			
+
 			`<code>${prefix}rg</code>`,
 			"No arguments - any random track. Only returns YouTube links by default.",
 			"",
-	
+
 			`<code>${prefix}rg fav:(user)</code>`,
 			"If a provided user (including you) has marked any tracks as their favourites on the website, this will make the command choose only from those favourites.",
 			"",
-	
+
 			`<code>${prefix}rg linkOnly:true</code>`,
 			"Will only input the link, with no other text. Useful for piping.",
 			"",
