@@ -31,14 +31,14 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-	
+
 		let targetUser = (args[0])
 			? await sb.User.get(args[0], true)
 			: null;
 
 		if (context.invocation.includes("me") || args[0] === "me" || (targetUser && targetUser.ID === context.user.ID)) {
 			targetUser = context.user;
-	
+
 			if (!context.invocation.includes("me")) {
 				args.shift();
 			}
@@ -60,7 +60,7 @@ module.exports = {
 		else {
 			args.shift();
 		}
-	
+
 		let isPrivate = Boolean(context.invocation.includes("private") || context.params.private);
 		if (isPrivate && context.channel !== null) {
 			return {
@@ -69,15 +69,15 @@ module.exports = {
 				cooldown: this.Cooldown / 2
 			};
 		}
-	
+
 		let reminderText = args.join(" ").replace(/\s+/g, " ").trim();
-	
+
 		// const timedRegex = /\b(in|on|at)\b/i;
 		const timedRegex = /\b(in|at)\b/i;
 		let targetReminderDate = null;
 		let targetReminderDelta = "when they next type in chat";
 		let delta = 0;
-	
+
 		const now = new sb.Date();
 		if (hasChrono) {
 			const chronoDefinition = context.params.at ?? context.params.on;
@@ -121,33 +121,33 @@ module.exports = {
 			if (timeData.ranges.length > 0) {
 				const continueRegex = /^((\s*and\s*)|[\s\W]+)$/;
 				let continues = false;
-	
+
 				for (let i = 0; i < timeData.ranges.length; i++) {
 					// If the preceding text doesn't contain the word "in" right before the time range, skip it.
 					const precedingText = reminderText.slice(0, timeData.ranges[i].start);
 					if (!continues && !/\bin\b\s*$/.test(precedingText)) {
 						continue;
 					}
-	
+
 					continues = false;
 					const current = timeData.ranges[i];
 					const next = timeData.ranges[i + 1];
-	
+
 					delta += current.time;
 					targetReminderDate = targetReminderDate ?? sb.Date.now();
 					targetReminderDate += current.time;
-	
+
 					// Parse out the text between ranges, ...
 					const between = (next)
 						? reminderText.slice(current.end, next.start)
 						: "";
-	
+
 					// Remove the possible preceding "in" keyword, regardless of which range it is used in
 					const keywordIndex = reminderText.slice(0, current.start).lastIndexOf("in");
 					if (current.start - keywordIndex === 3) {
 						reminderText = reminderText.slice(0, keywordIndex) + "\x00".repeat(3) + reminderText.slice(current.start);
 					}
-	
+
 					// and only continue if it matches a "time word separator", such as the word "and", space, comma, ...
 					if (!continueRegex.test(between)) {
 						reminderText = reminderText.slice(0, current.start) + reminderText.slice(current.end);
@@ -173,7 +173,7 @@ module.exports = {
 				targetReminderDelta = sb.Utils.timeDelta(targetReminderDate);
 			}
 		}
-	
+
 		const comparison = new sb.Date(now.valueOf() + delta);
 		if (delta < 0) {
 			return {
@@ -207,14 +207,14 @@ module.exports = {
 			const description = (Number.isFinite(comparison.valueOf()))
 				? `the date ${comparison.format("Y-m-d")}`
 				: `${sb.Utils.groupDigits(Math.trunc(delta / 31_536_000_000))} years in the future`;
-	
+
 			return {
 				success: false,
 				reply: `Your reminder was set to approximately ${description}, but the limit is 31st December 9999.`,
 				cooldown: this.Cooldown / 2
 			};
 		}
-	
+
 		// If it is a timed reminder via PMs, only allow it if it a self reminder.
 		// Scheduled reminders for users via PMs violate the philosophy of reminders.
 		if (context.privateMessage && delta !== 0) {
@@ -243,11 +243,13 @@ module.exports = {
 			Created: new sb.Date(),
 			Private_Message: isPrivate
 		});
+
 		if (result.success) {
 			const who = (targetUser.ID === context.user.ID) ? "you" : targetUser.Name;
 			const method = (isPrivate) ? "privately " : "";
-	
+
 			return {
+				cooldown: (context.privateMessage) ? 2500 : this.Cooldown,
 				reply: `I will ${method}remind ${who} ${targetReminderDelta} (ID ${result.ID})`
 			};
 		}
