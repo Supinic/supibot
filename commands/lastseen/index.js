@@ -10,12 +10,13 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function lastSeen (context, user) {
 		if (!user) {
+			const emote = await context.getBestAvailableEmote(["FeelsDankMan"], "🙂");
 			return {
 				success: false,
-				reply: "🙂 You were last seen: right now!"
+				reply: `${emote} You were last seen: right now!`
 			};
 		}
-	
+
 		const targetUser = await sb.User.get(user);
 		if (!targetUser) {
 			return {
@@ -24,18 +25,20 @@ module.exports = {
 			};
 		}
 		else if (targetUser.ID === context.user.ID) {
+			const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "LULW", "LuL"], "😆");
 			return {
 				success: false,
-				reply: "Oh wow, look at that! You were last seen: Right now! 😆"
+				reply: `Oh wow, look at that! You were last seen: Right now! ${emote}`
 			};
 		}
 		else if (targetUser.Name === context.platform.Self_Name) {
+			const emote = await context.getBestAvailableEmote(["monkaStare", "MrDestructoid"], "🤖");
 			return {
 				success: false,
-				reply: "🤖 I'm always around!"
+				reply: `${emote} I'm always around!`
 			};
 		}
-	
+
 		const date = await sb.Query.getRecordset(rs => rs
 			.select("Last_Message_Posted AS Date")
 			.from("chat_data", "Message_Meta_User_Alias")
@@ -45,7 +48,7 @@ module.exports = {
 			.single()
 			.flat("Date")
 		);
-	
+
 		if (!date) {
 			return {
 				reply: sb.Utils.tag.trim `
@@ -54,7 +57,7 @@ module.exports = {
 				`
 			};
 		}
-	
+
 		return {
 			reply: `That user was last seen in chat ${sb.Utils.timeDelta(date)}.`
 		};
