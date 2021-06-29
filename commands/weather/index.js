@@ -282,7 +282,7 @@ module.exports = {
 
 			if (skipLocation) {
 				if (isOwnLocation) {
-					await this.platform.pm(
+					await context.platform.pm(
 						`Your location's weather alerts: ${pastebinLink}`,
 						context.user.Name,
 						context.channel
