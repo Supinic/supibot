@@ -18,7 +18,7 @@ module.exports = {
 			url: "streams",
 			searchParams
 		}).json();
-	
+
 		if (data.streams.length === 0) {
 			return {
 				reply: (searchParams.game)
@@ -34,15 +34,15 @@ module.exports = {
 			else {
 				gameString = "are live";
 			}
-	
+
 			const streamers = data.streams.map(stream => {
 				const specificGame = (!searchParams.game)
 					? `- ${stream.game}`
 					: "";
 
-				return `@${stream.channel.name} ${specificGame} (${stream.viewers})`;
+				return `@${stream.channel.name} ${specificGame} (${sb.Utils.groupDigits(stream.viewers)})`;
 			});
-	
+
 			return {
 				reply: `These streamers ${gameString}: ${streamers.join("; ")}`
 			};
