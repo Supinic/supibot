@@ -63,7 +63,14 @@ module.exports = {
 			: `streaming under no category`;
 
 		return {
-			reply: `${target} is ${broadcast}, since ${started} for ${stream.viewers} viewer${viewersSuffix} at ${stream.video_height}p. Title: ${stream.channel.status} https://twitch.tv/${target.toLowerCase()}`
+			reply: sb.Utils.tag.trim `
+				${target} is ${broadcast}, 
+				since ${started} 
+				for ${sb.Utils.groupDigits(stream.viewers)} viewer${viewersSuffix}
+				at ${stream.video_height}p.
+				Title: ${stream.channel.status} 
+				https://twitch.tv/${target.toLowerCase()}
+			`
 		};
 	}),
 	Dynamic_Description: null
