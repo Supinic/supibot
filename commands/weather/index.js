@@ -273,6 +273,9 @@ module.exports = {
 				}).join("\n\n");
 
 				const response = await sb.Pastebin.post(text, {
+					name: (skipLocation)
+						? `Weather alerts - private location`
+						: `Weather alerts - ${formattedAddress}`,
 					expiration: "1H"
 				});
 
