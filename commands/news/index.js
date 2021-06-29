@@ -316,6 +316,33 @@ module.exports = {
 						helpers: ["kalifail_disbang"]
 					}
 				]
+			},
+			{
+				code: "ua",
+				language: "ukrainian",
+				sources: [
+					{
+						name: "Pravda",
+						url: "https://www.pravda.com.ua/",
+						path: "",
+						endpoints: ["rss"],
+						helpers: ["boring_nick"]
+					},
+					{
+						name: "112UA",
+						url: "https://112ua.tv",
+						path: "rss",
+						endpoints: ["index.rss"],
+						helpers: ["boring_nick"]
+					},
+					{
+						name: "Censor.net",
+						url: "https://censor.net/includes/",
+						path: "",
+						endpoints: ["news_uk.xml"],
+						helpers: ["boring_nick"]
+					}
+				]
 			}
 		],
 
