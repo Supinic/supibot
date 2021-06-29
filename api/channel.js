@@ -1,7 +1,15 @@
-const partOrJoin = (type, url) => {
+const partOrJoin = async (type, url) => {
 	const platformData = sb.Platform.get(url.searchParams.get("platform") ?? "twitch");
 	const channels = url.searchParams.getAll("channel");
 	const channelsData = [];
+	const announcement = url.searchParams.get("announcement") ?? null;
+
+	if (announcement && channels.length > 1) {
+		return {
+			statusCode: 400,
+			error: { message: `Cannot use announcement when more than 1 channel is specified` }
+		};
+	}
 
 	for (const channel of channels) {
 		const channelData = sb.Channel.get(channel, platformData);
@@ -38,8 +46,10 @@ const partOrJoin = (type, url) => {
 	for (const channelData of channelsData) {
 		if (type === "join") {
 			platformData.client.join(channelData.Name);
+			setTimeout(() => channelData.send(announcement), 1000);
 		}
 		else if (type === "part") {
+			await channelData.send(announcement);
 			platformData.client.part(channelData.Name);
 		}
 	}
@@ -107,6 +117,6 @@ module.exports = {
 			data: { message: "Channel joined succesfully" }
 		};
 	},
-	join: async (req, res, url) => partOrJoin("join", url),
-	part: async (req, res, url) => partOrJoin("part", url)
+	join: async (req, res, url) => await partOrJoin("join", url),
+	part: async (req, res, url) => await partOrJoin("part", url)
 };
