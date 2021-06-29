@@ -433,11 +433,12 @@ module.exports = {
 				? ""
 				: ` (${transform.aliases.join(", ")})`;
 
+			const reversible = (transform.type === "map" || transform.reverseData) ? "Yes" : "No";
 			return sb.Utils.tag.trim `
 				<li>
 					<code>${transform.name}${aliases}</code>
 					<ul>
-						<li>Reversible: ${transform.type === "map" ? "Yes" : "No"}</li>
+						<li>Reversible: ${reversible}</li>
 						<li>${description}</li>
 						<li>${message}</li>
 					</ul>
