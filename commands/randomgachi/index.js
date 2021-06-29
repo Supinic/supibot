@@ -29,11 +29,11 @@ module.exports = {
 		await prefixRow.load(1);
 
 		const targetUserFavourite = context.params.fav ?? null;
-		const userFavourites = (targetUserFavourite)
+		const userDataFavourite = (targetUserFavourite)
 			? await sb.User.get(targetUserFavourite)
 			: null;
 
-		if (targetUserFavourite && !userFavourites) {
+		if (targetUserFavourite && !userDataFavourite) {
 			return {
 				success: false,
 				reply: "No such user exists!"
@@ -72,8 +72,8 @@ module.exports = {
 			if (typeIDs.length > 0) {
 				rs.where("Track.Video_Type IN %n+", typeIDs);
 			}
-			if (userFavourites) {
-				rs.where("User_Favourite.User_Alias = %n", userFavourites.ID)
+			if (userDataFavourite) {
+				rs.where("User_Favourite.User_Alias = %n", userDataFavourite.ID)
 					.where("User_Favourite.Active = %b", true)
 					.join({
 						toTable: "User_Favourite",
@@ -102,10 +102,10 @@ module.exports = {
 		const emote = await context.getBestAvailableEmote(["gachiCOOL", "gachiHop", "gachiBASS", "gachiGASM", "pajaVan"], "🤼😩");
 
 		let favouriteString = "your random gachi";
-		if (targetUserFavourite === context.user) {
+		if (userDataFavourite === context.user) {
 			favouriteString = "random gachi from your favourite list";
 		}
-		else if (targetUserFavourite) {
+		else if (userDataFavourite) {
 			favouriteString = "random gachi from their favourite list";
 		}
 
