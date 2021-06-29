@@ -100,8 +100,11 @@ module.exports = {
 		let skipLocation = false;
 		let coords = null;
 		let formattedAddress = null;
+		let isOwnLocation = null;
 
 		if (args.length === 0) {
+			isOwnLocation = true;
+
 			if (context.user.Data.location) {
 				skipLocation = context.user.Data.location.hidden;
 				coords = context.user.Data.location.coordinates;
@@ -125,6 +128,8 @@ module.exports = {
 		}
 		else if (args[0].startsWith("@")) {
 			const userData = await sb.User.get(args[0]);
+			isOwnLocation = (userData === context.user);
+
 			if (!userData) {
 				return {
 					reply: "Invalid user provided!",
@@ -259,21 +264,12 @@ module.exports = {
 						? ""
 						: `-- ${i.tags.sort().join(", ")}`;
 
-					if (skipLocation) {
-						return [
-							`Abridged - location hidden`,
-							`Weather alert ${tags}`,
-							`Active between: ${start.format("Y-m-d H:i")} and ${end.format("Y-m-d H:i")} local time`
-						].join("\n");
-					}
-					else {
-						return [
-							`Weather alert from ${i.sender_name ?? ("(unknown source)")} ${tags}`,
-							i.event ?? "(no event specified)",
-							`Active between: ${start.format("Y-m-d H:i")} and ${end.format("Y-m-d H:i")} local time`,
-							`${i.description ?? "(no description)"}`
-						].join("\n");
-					}
+					return [
+						`Weather alert from ${i.sender_name ?? ("(unknown source)")} ${tags}`,
+						i.event ?? "(no event specified)",
+						`Active between: ${start.format("Y-m-d H:i")} and ${end.format("Y-m-d H:i")} local time`,
+						`${i.description ?? "(no description)"}`
+					].join("\n");
 				}).join("\n\n");
 
 				const response = await sb.Pastebin.post(text, {
@@ -284,16 +280,39 @@ module.exports = {
 				await this.setCacheData(pastebinKey, pastebinLink, { expiry: 3_600_000 });
 			}
 
-			return {
-				reply: sb.Utils.tag.trim `
-					Weather alert summary for
-					${(skipLocation) ? "(location hidden)" : formattedAddress}
-					- 
-					${data.alerts.length} alerts 
-					-
-					full info: ${pastebinLink}
-				`
-			};
+			if (skipLocation) {
+				if (isOwnLocation) {
+					await this.platform.pm(
+						`Your location's weather alerts: ${pastebinLink}`,
+						context.user.Name,
+						context.channel
+					);
+
+					return {
+						reply: sb.Utils.tag.trim `
+							Weather alert summary for your hidden location: ${data.alerts.length} alerts.
+							A link with the complete, unabridged description has been whispered to you.
+						`
+					};
+				}
+				else {
+					return {
+						reply: `Weather alert summary for their hidden location: ${data.alerts.length} alerts.`
+					};
+				}
+			}
+			else {
+				return {
+					reply: sb.Utils.tag.trim `
+						Weather alert summary for
+						${(skipLocation) ? "(location hidden)" : formattedAddress}
+						- 
+						${data.alerts.length} alerts 
+						-
+						full info: ${pastebinLink}
+					`
+				};
+			}
 		}
 
 		let target;
