@@ -356,10 +356,20 @@ module.exports = class User extends require("./template.js") {
 		return user;
 	}
 
+	/**
+	 * Normalizes non-standard strings into standard usernames.
+	 * Turns input string into lowercase.
+	 * Removes leading `@`, leading `#`, and trailing `:` symbols.
+	 * Replaces all consecutive whitespace with a single `_` symbol.
+	 * @param {string} username
+	 * @returns {string}
+	 */
 	static normalizeUsername (username) {
 		return username
 			.toLowerCase()
 			.replace(/^@/, "")
+			.replace(/^#/, "")
+			.replace(/:$/g, "")
 			.replace(/\s+/g, "_");
 	}
 
