@@ -80,20 +80,20 @@ module.exports = {
 			resultType = "file";
 		}
 
-		let boardData = await this.getCacheData({ type: "board-list" });
-		if (!boardData) {
+		let boardList = await this.getCacheData({ type: "board-list" });
+		if (!boardList) {
 			const response = await sb.Got("GenericAPI", {
 				url: "https://api.4chan.org/boards.json",
 				responseType: "json"
 			});
 
-			boardData = response.body.boards.map(i => ({
+			boardList = response.body.boards.map(i => ({
 				name: i.board,
 				title: i.title,
 				nsfw: !i.ws_board
 			}));
 
-			await this.setCacheData({ type: "board-list" }, boardData, {
+			await this.setCacheData({ type: "board-list" }, boardList, {
 				expiry: 86_400_000 // 1 day
 			});
 		}
@@ -105,7 +105,7 @@ module.exports = {
 			};
 		}
 
-		const board = boardData.find(i => i.name === identifier);
+		const board = boardList.find(i => i.name === identifier);
 		if (!board) {
 			return {
 				success: false,
@@ -165,7 +165,7 @@ module.exports = {
 			threadID = thread.ID;
 		}
 		else {
-			const thread = sb.Utils.randArray(board.threads.filter(i => !i.dead));
+			const thread = sb.Utils.randArray(threadList);
 			threadID = thread.ID;
 		}
 
