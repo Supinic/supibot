@@ -6,10 +6,12 @@ module.exports = {
 	Description: "Fetches the current weather in a given location. You can specify parameters to check forecast, or mention a user to get their location, if they set it up. Check all possibilities in extended help.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
-		{ name: "alerts", type: "boolean" }
+		{ name: "alerts", type: "boolean" },
+		{ name: "format", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
+		allowedTypes: ["cloudCover", "humidity", "icon", "place", "precipitation", "pressure", "temperature", "windGusts", "windSpeed"],
 		getIcon: (code) => {
 			const type = Math.trunc(code / 100);
 			const remainder = code % 100;
@@ -329,19 +331,32 @@ module.exports = {
 			target = data.daily[number];
 		}
 
-		let precipitation;
+		const obj = {
+			place: (skipLocation) ? "(location hidden)" : formattedAddress,
+			icon: this.staticData.getIcon(target.weather[0].id),
+			cloudCover: `Cloud cover: ${target.clouds}%.`,
+			humidity: `Humidity: ${target.humidity}%.`,
+			pressure: `Air pressure: ${target.pressure} hPa.`,
+			windSpeed: (target.wind_speed)
+				? `Wind speed: ${sb.Utils.round(target.wind_speed * 3.6)} km/h.`
+				: "No wind.",
+			windGusts: (target.wind_gust)
+				? `Wind gusts: up to ${sb.Utils.round(target.wind_gust * 3.6)} km/h.`
+				: "No wind gusts."
+		};
+
 		if (type === "current") {
 			const rain = target.rain?.["1h"] ?? target.rain ?? null;
 			const snow = target.snow?.["1h"] ?? target.snow ?? null;
 
 			if (rain && snow) {
-				precipitation = `It is currently raining (${rain}mm/h) and snowing (${snow}mm/h).`;
+				obj.precipitation = `It is currently raining (${rain}mm/h) and snowing (${snow}mm/h).`;
 			}
 			else if (rain) {
-				precipitation = `It is currently raining, ${rain}mm/h.`;
+				obj.precipitation = `It is currently raining, ${rain}mm/h.`;
 			}
 			else if (snow) {
-				precipitation = `It is currently snowing, ${snow}mm/h.`;
+				obj.precipitation = `It is currently snowing, ${snow}mm/h.`;
 			}
 			else {
 				const start = new sb.Date().discardTimeUnits("s", "ms");
@@ -350,23 +365,23 @@ module.exports = {
 						const when = new sb.Date(dt * 1000).discardTimeUnits("s", "ms");
 						const minuteIndex = Math.trunc(when - start) / 60_000;
 						if (minuteIndex < 1) {
-							precipitation = "Precipitation expected in less than a minute!";
+							obj.precipitation = "Precipitation expected in less than a minute!";
 						}
 						else {
 							const plural = (minuteIndex === 1) ? "" : "s";
-							precipitation = `Precipitation expected in ~${minuteIndex} minute${plural}.`;
+							obj.precipitation = `Precipitation expected in ~${minuteIndex} minute${plural}.`;
 						}
 
 						break;
 					}
 				}
 
-				precipitation ??= "No precipitation right now.";
+				obj.precipitation ??= "No precipitation right now.";
 			}
 		}
 		else if (type === "hourly" || type === "daily") {
 			if (target.pop === 0) {
-				precipitation = "No precipitation expected.";
+				obj.precipitation = "No precipitation expected.";
 			}
 			else {
 				const percent = `${sb.Utils.round(target.pop * 100, 0)}%`;
@@ -374,34 +389,23 @@ module.exports = {
 				const snow = target.snow?.["1h"] ?? target.snow ?? null;
 
 				if (rain && snow) {
-					precipitation = `${percent} chance of combined rain (${rain}mm/hr) and snow (${snow}mm/h).`;
+					obj.precipitation = `${percent} chance of combined rain (${rain}mm/hr) and snow (${snow}mm/h).`;
 				}
 				else if (rain) {
-					precipitation = `${percent} chance of ${rain}mm/h rain.`;
+					obj.precipitation = `${percent} chance of ${rain}mm/h rain.`;
 				}
 				else if (snow) {
-					precipitation = `${percent} chance of ${snow}mm/h snow.`;
+					obj.precipitation = `${percent} chance of ${snow}mm/h snow.`;
 				}
 			}
 		}
 
-		let temperature;
 		if (type === "current" || type === "hourly") {
-			temperature = `${target.temp}°C, feels like ${target.feels_like}°C.`;
+			obj.temperature = `${target.temp}°C, feels like ${target.feels_like}°C.`;
 		}
 		else if (type === "daily") {
-			temperature = `${target.temp.min}°C to ${target.temp.max}°C.`;
+			obj.temperature = `${target.temp.min}°C to ${target.temp.max}°C.`;
 		}
-
-		const cloudCover = `Cloud cover: ${target.clouds}%.`;
-		const windSpeed = (target.wind_speed)
-			? `Wind speed: ${sb.Utils.round(target.wind_speed * 3.6)} km/h.`
-			: "No wind.";
-		const windGusts = (target.wind_gust)
-			? `Wind gusts: up to ${sb.Utils.round(target.wind_gust * 3.6)} km/h.`
-			: "No wind gusts.";
-		const humidity = `Humidity: ${target.humidity}%.`;
-		const pressure = `Air pressure: ${target.pressure} hPa.`;
 
 		let weatherAlert = "";
 		if (data.alerts && data.alerts.length !== 0) {
@@ -429,8 +433,6 @@ module.exports = {
 			}
 		}
 
-		const icon = this.staticData.getIcon(target.weather[0].id);
-
 		let plusTime;
 		if (typeof number === "number") {
 			const time = new sb.Date(target.dt * 1000).setTimezoneOffset(data.timezone_offset / 60);
@@ -445,63 +447,94 @@ module.exports = {
 			plusTime = " (now)";
 		}
 
-		const place = (skipLocation) ? "(location hidden)" : formattedAddress;
-		return {
-			reply: sb.Utils.tag.trim `
-				${place} ${plusTime}:
-				${icon}
-				${temperature}
-				${cloudCover}
-				${windSpeed} ${windGusts}
-				${humidity}
-				${precipitation}
-				${pressure}
-				${weatherAlert}
-			`
-		};
+		if (context.params.format) {
+			const format = new Set(context.params.format.split(/\W/).filter(Boolean));
+			const reply = [];
+
+			for (const element of format) {
+				if (typeof obj[element] === "undefined") {
+					return {
+						success: false,
+						reply: `Cannot create custom weather format with the "${element}" element!`
+					};
+				}
+
+				reply.push(obj[element]);
+			}
+
+			return {
+				reply: reply.join(" ")
+			};
+		}
+		else {
+			return {
+				reply: sb.Utils.tag.trim `
+					${obj.place} ${plusTime}:
+					${obj.icon}
+					${obj.temperature}
+					${obj.cloudCover}
+					${obj.windSpeed} ${obj.windGusts}
+					${obj.humidity}
+					${obj.precipitation}
+					${obj.pressure}
+					${weatherAlert}
+				`
+			};
+		}
 	}),
-	Dynamic_Description: ((prefix) => [
-		"Checks for current weather, or for hourly/daily forecast in a given location.",
-		"If you, or a given user have set their location with the <code>set</code> command, this command supports that.",
-		"",
+	Dynamic_Description: ((prefix, values) => {
+		const { allowedTypes } = values.getStaticData();
 
-		`<code>${prefix}weather (place)</code>`,
-		"current weather in given location",
-		"",
+		return [
+			"Checks for current weather, or for hourly/daily forecast in a given location.",
+			"If you, or a given user have set their location with the <code>set</code> command, this command supports that.",
+			"",
 
-		`<code>${prefix}weather (place) <b>hour+X</b></code>`,
-		"weather forecast in X hour(s) - accepts 1 through 48",
-		"",
+			`<code>${prefix}weather (place)</code>`,
+			"current weather in given location",
+			"",
 
-		`<code>${prefix}weather (place) <b>day+X</b></code>`,
-		"weather forecast in X day(s) - accepts 1 through 7",
-		"",
+			`<code>${prefix}weather (place) <b>hour+X</b></code>`,
+			"weather forecast in X hour(s) - accepts 1 through 48",
+			"",
 
-		`<code>${prefix}weather (place) alerts:true</code>`,
-		"Posts a summary of all weather alerts for the provided location - for the next 7 days.",
-		"",
+			`<code>${prefix}weather (place) <b>day+X</b></code>`,
+			"weather forecast in X day(s) - accepts 1 through 7",
+			"",
 
-		"",
-		"=".repeat(20),
-		"",
+			`<code>${prefix}weather (place) alerts:true</code>`,
+			"Posts a summary of all weather alerts for the provided location - for the next 7 days.",
+			"",
 
-		`<code>${prefix}weather</code>`,
-		"If you set your own weather location, show its weather.",
-		"",
+			`<code>${prefix}weather (place) format:(custom format)</code>`,
+			`<code>${prefix}weather (place) format:temperature</code>`,
+			`<code>${prefix}weather (place) format:temperature,humidity,pressure</code>`,
+			"Lets you choose specific weather elements to show in the result.",
+			`Supported elements: <code>${allowedTypes.join(", ")}</code>`,
+			"",
 
-		`<code>${prefix}weather alerts:true</code>`,
-		"Posts a summary of all weather alerts for your location - for the next 7 days, if you have set it up.",
-		"",
+			"",
+			"=".repeat(20),
+			"",
 
-		`<code>${prefix}weather @User</code>`,
-		"If that user has set their own weather location, show its weather. The <code>@</code> symbol is mandatory.",
-		"",
+			`<code>${prefix}weather</code>`,
+			"If you set your own weather location, show its weather.",
+			"",
 
-		`<code>${prefix}weather @User <b>(hour+X/day+X)</b></code>`,
-		"Similar to above, shows the user's weather, but uses the hour/day specifier.",
+			`<code>${prefix}weather alerts:true</code>`,
+			"Posts a summary of all weather alerts for your location - for the next 7 days, if you have set it up.",
+			"",
 
-		`<code>${prefix}weather @User alerts:true</code>`,
-		"Posts a summary of all weather alerts for the user's location - for the next 7 days.",
-		""
-	])
+			`<code>${prefix}weather @User</code>`,
+			"If that user has set their own weather location, show its weather. The <code>@</code> symbol is mandatory.",
+			"",
+
+			`<code>${prefix}weather @User <b>(hour+X/day+X)</b></code>`,
+			"Similar to above, shows the user's weather, but uses the hour/day specifier.",
+
+			`<code>${prefix}weather @User alerts:true</code>`,
+			"Posts a summary of all weather alerts for the user's location - for the next 7 days.",
+			""
+		];
+	})
 };
