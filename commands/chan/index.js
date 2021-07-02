@@ -80,15 +80,22 @@ module.exports = {
 			resultType = "file";
 		}
 
-		if (!this.data.boards) {
-			const data = await sb.Got("https://api.4chan.org/boards.json").json();
-			this.data.boards = data.boards.map(i => ({
+		let boardData = await this.getCacheData({ type: "board-list" });
+		if (!boardData) {
+			const response = await sb.Got("GenericAPI", {
+				url: "https://api.4chan.org/boards.json",
+				responseType: "json"
+			});
+
+			boardData = response.body.boards.map(i => ({
 				name: i.board,
 				title: i.title,
-				nsfw: !i.ws_board,
-				threads: [],
-				threadsExpiration: 0
+				nsfw: !i.ws_board
 			}));
+
+			await this.setCacheData({ type: "board-list" }, boardData, {
+				expiry: 86_400_000 // 1 day
+			});
 		}
 
 		if (!/^[a-z0-9]+$/.test(identifier)) {
@@ -98,9 +105,10 @@ module.exports = {
 			};
 		}
 
-		const board = this.data.boards.find(i => i.name === identifier);
+		const board = boardData.find(i => i.name === identifier);
 		if (!board) {
 			return {
+				success: false,
 				reply: "Couldn't match your board! Use their abbreviations only."
 			};
 		}
@@ -118,69 +126,89 @@ module.exports = {
 			};
 		}
 
-		const now = sb.Date.now();
-		if (board.threads.length === 0 || board.threadsExpiration < now) {
-			const data = await sb.Got(`https://api.4chan.org/${board.name}/catalog.json`).json();
-			board.threads = data
+		const threadKey = { type: "thread-list", board: identifier };
+		let threadList = await this.getCacheData(threadKey);
+		if (!threadList) {
+			const response = await sb.Got("GenericAPI", {
+				url: `https://api.4chan.org/${board.name}/catalog.json`,
+				responseType: "json"
+			});
+
+			threadList = response.body
 				.flatMap(i => i.threads)
 				.filter(i => !i.sticky && !i.closed && i.replies >= 5)
 				.map(i => ({
 					ID: i.no,
 					content: sb.Utils.fixHTML(sb.Utils.removeHTML(`${i.sub ?? ""}${i.com ?? ""}`)),
 					modified: new sb.Date(i.last_modified),
-					created: new sb.Date(i.tim),
-					posts: [],
-					postsExpiration: 0
+					created: new sb.Date(i.tim)
 				}));
 
-			board.threadsExpiration = new sb.Date().addHours(1).valueOf();
+			await this.setCacheData(threadKey, threadList, {
+				expiry: 60_000 // 10 minutes
+			});
 		}
 
-		let thread;
+		let threadID;
 		if (rest.length > 0) {
 			const query = rest.join(" ").toLowerCase();
-			thread = sb.Utils.randArray(board.threads.filter(i => !i.dead && i.content.toLowerCase().includes(query)));
+			const validThreads = threadList.filter(i => !i.dead && i.content.toLowerCase().includes(query));
 
+			const thread = sb.Utils.randArray(validThreads);
 			if (!thread) {
 				return {
+					success: false,
 					reply: "No threads found for your query!"
 				};
 			}
+
+			threadID = thread.ID;
 		}
 		else {
-			thread = sb.Utils.randArray(board.threads.filter(i => !i.dead));
+			const thread = sb.Utils.randArray(board.threads.filter(i => !i.dead));
+			threadID = thread.ID;
 		}
 
-		if (thread.posts.length === 0 || thread.postsExpiration < now) {
-			const { body: data, statusCode } = await sb.Got({
-				url: `https://a.4cdn.org/${board.name}/thread/${thread.ID}.json`,
+		const postKey = { type: "post-list", board: identifier, threadID };
+		let postList = await this.getCacheData(postKey);
+		if (!postList) {
+			const response = await sb.Got("GenericAPI", {
+				url: `https://a.4cdn.org/${board.name}/thread/${threadID}.json`,
 				throwHttpErrors: false,
 				responseType: "json"
 			});
 
-			if (statusCode === 404) {
-				thread.dead = true;
+			if (response.statusCode === 404) {
+				const index = threadList.findIndex(i => i.ID === threadID);
+				if (index !== -1) {
+					threadList.splice(index, 1);
+					await this.setCacheData(threadKey, threadList, { keepTTL: true });
+				}
 
 				return {
-					reply: "The thread has been pruned/archived! Please try again.",
-					cooldown: 5000
+					reply: "The thread you rolled has been pruned/archived! Please try again.",
+					cooldown: 2500
 				};
 			}
 
-			thread.posts = data.posts.map(i => ({
+			postList = response.body.posts.map(i => ({
 				ID: i.no,
 				author: i.name,
-				content: sb.Utils.fixHTML(sb.Utils.removeHTML(i.com ?? "")),
 				created: new sb.Date(i.time * 1000),
+				content: (i.com)
+					? sb.Utils.fixHTML(sb.Utils.removeHTML(i.com ?? ""))
+					: null,
 				file: (typeof i.filename !== "undefined")
 					? `https://i.4cdn.org/${board.name}/${i.tim}${i.ext}`
 					: null
 			}));
 
-			thread.postsExpiration = new sb.Date().addMinutes(10).valueOf();
+			await this.setCacheData(postKey, postList, {
+				expiry: 300_000 // 5 minutes
+			});
 		}
 
-		const eligiblePosts = thread.posts.filter(i => i[resultType]);
+		const eligiblePosts = postList.filter(i => i[resultType]);
 		const post = sb.Utils.randArray(eligiblePosts);
 		const delta = sb.Utils.timeDelta(post.created);
 
