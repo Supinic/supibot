@@ -71,7 +71,7 @@ module.exports = {
 
 		let emoteLink;
 		if (channel) {
-			emoteLink = `https://twitchemotes.com/channel/${channelID}/emotes/${emoteid}`;
+			emoteLink = `https://twitchemotes.com/channels/${channelID}/emotes/${emoteid}`;
 		}
 		else {
 			emoteLink = `https://twitchemotes.com/global/emotes/${emoteid}`;
@@ -79,7 +79,7 @@ module.exports = {
 
 		return {
 			reply: (channel)
-				? `${emotecode} (ID ${emoteid}) - ${tierString}. ${emoteLink} https://twitchemotes.com/channels/${channelID} ${cdnLink} ${originString}`
+				? `${emotecode} (ID ${emoteid}) - ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
 				: `${emotecode} (ID ${emoteid}) - global Twitch emote. ${emoteLink} ${cdnLink} ${originString}`
 		};
 	}),
