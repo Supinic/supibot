@@ -66,6 +66,12 @@ module.exports = {
 				reply: `User "${user}" not found on Instagram!`
 			};
 		}
+		else if (!data.graphql) {
+			return {
+				success: false,
+				reply: `No posts data received for user "${user}"!`
+			};
+		}
 
 		const nsfwCheck = (!context.channel || (!context.channel.NSFW && !context.channel.Data.instagramNSFW));
 		const posts = (data.graphql.user.edge_owner_to_timeline_media?.edges ?? []).filter(i => !i.node.is_video);
