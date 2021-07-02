@@ -176,7 +176,7 @@ module.exports = {
 							reply: `The number must be an integer in the <2..${Number.MAX_SAFE_INTEGER}> range!`
 						};
 					}
-					
+
 					return {
 						roll: () => sb.Utils.random(1, target),
 						uniqueItems: target
@@ -196,7 +196,7 @@ module.exports = {
 	Code: (async function slots (context, ...args) {
 		if (args[0] === "leader" || args[0] === "leaders") {
 			return {
-				reply: "Check out all the previous slots winners here! https://supinic.com/bot/slots-winner/list",
+				reply: "Check out all the previous slots winners here! https://supinic.com/data/slots-winner/list",
 				cooldown: 5000
 			};
 		}
@@ -248,7 +248,7 @@ module.exports = {
 						limit = result.limit || limit;
 						uniqueItems = result.uniqueItems;
 						type = "function";
-	
+
 						for (let i = 0; i < limit; i++) {
 							rolledItems.push(result.roll());
 						}
@@ -266,7 +266,7 @@ module.exports = {
 				reply: `Provided slots preset does not exist!`
 			};
 		}
-		
+
 		if (type === "array") {
 			if (emotes === null || emotes.length < limit) {
 				return {
@@ -274,14 +274,14 @@ module.exports = {
 					cooldown: 2500
 				};
 			}
-	
+
 			for (let i = 0; i < limit; i++) {
 				rolledItems.push(sb.Utils.randArray(emotes));
 			}
-	
+
 			uniqueItems = emotes.filter((i, ind, arr) => arr.indexOf(i) === ind).length;
 		}
-	
+
 		if (rolledItems.every(i => rolledItems[0] === i)) {
 			if (uniqueItems === 1) {
 				const dankEmote = await context.getBestAvailableEmote(["FeelsDankMan", "FeelsDonkMan"], "🤡");
@@ -294,7 +294,7 @@ module.exports = {
 					`
 				};
 			}
-	
+
 			let chance = null;
 			if (type === "array") {
 				const winningItems = emotes.filter(i => i === rolledItems[0]);
@@ -305,7 +305,7 @@ module.exports = {
 			else if (type === "function") {
 				chance = (1 / uniqueItems) ** (limit - 1);
 			}
-	
+
 			const reverseChance = sb.Utils.round((1 / chance), 3);
 			const row = await sb.Query.getRow("data", "Slots_Winner");
 			row.setValues({
@@ -333,7 +333,7 @@ module.exports = {
 				`
 			};
 		}
-	
+
 		return {
 			reply: `[ ${rolledItems.join(" ")} ] ${deprecationWarning}`
 		};
@@ -344,20 +344,20 @@ module.exports = {
 			.sort((a, b) => a.name.localeCompare(b.name))
 			.map(i => `<li><code>${i.name}</code><br>${i.notes}</li>`)
 			.join("");
-	
+
 		return [
 			"Rolls three random words out of the given list of words. If you get a flush, you win!",
-			`Every winner is listed in <a href="https://supinic.com/bot/slots-winner/list">this neat table</a>.`,
+			`Every winner is listed in <a href="https://supinic.com/data/slots-winner/list">this neat table</a>.`,
 			"",
-	
+
 			`<code>${prefix}slots (list of words)</code>`,
 			"Three rolls will be chose randomly. Get the same one three times for a win.",
 			"",
-	
+
 			`<code>${prefix}slots pattern:(pattern name)</code>`,
 			"Uses a pre-determined or dynamic pattern as your list of words. See below.",
 			"",
-	
+
 			"Supported patterns:",
 			`<ul>${patternList}</ul>`
 		];

@@ -412,7 +412,7 @@ module.exports = {
 				aliases: [],
 				description: "Posts the link to all winners for the slots command.",
 				execute: () => ({
-					reply: `Check all winners here: https://supinic.com/bot/slots-winner/list`
+					reply: `Check all winners here: https://supinic.com/data/slots-winner/list`
 				})
 			},
 			{
