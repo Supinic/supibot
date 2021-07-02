@@ -329,44 +329,44 @@ module.exports = {
 			target = data.daily[number];
 		}
 
-		let precip;
+		let precipitation;
 		if (type === "current") {
 			const rain = target.rain?.["1h"] ?? target.rain ?? null;
 			const snow = target.snow?.["1h"] ?? target.snow ?? null;
 
 			if (rain && snow) {
-				precip = `It is currently raining (${rain}mm/h) and snowing (${snow}mm/h).`;
+				precipitation = `It is currently raining (${rain}mm/h) and snowing (${snow}mm/h).`;
 			}
 			else if (rain) {
-				precip = `It is currently raining, ${rain}mm/h.`;
+				precipitation = `It is currently raining, ${rain}mm/h.`;
 			}
 			else if (snow) {
-				precip = `It is currently snowing, ${snow}mm/h.`;
+				precipitation = `It is currently snowing, ${snow}mm/h.`;
 			}
 			else {
 				const start = new sb.Date().discardTimeUnits("s", "ms");
-				for (const { dt, precipitation } of (data.minutely ?? [])) {
-					if (precipitation !== 0) {
+				for (const { dt, precipitation: pr } of (data.minutely ?? [])) {
+					if (pr !== 0) {
 						const when = new sb.Date(dt * 1000).discardTimeUnits("s", "ms");
 						const minuteIndex = Math.trunc(when - start) / 60_000;
 						if (minuteIndex < 1) {
-							precip = "Precipitation expected in less than a minute!";
+							precipitation = "Precipitation expected in less than a minute!";
 						}
 						else {
 							const plural = (minuteIndex === 1) ? "" : "s";
-							precip = `Precipitation expected in ~${minuteIndex} minute${plural}.`;
+							precipitation = `Precipitation expected in ~${minuteIndex} minute${plural}.`;
 						}
 
 						break;
 					}
 				}
 
-				precip ??= "No precipitation right now.";
+				precipitation ??= "No precipitation right now.";
 			}
 		}
 		else if (type === "hourly" || type === "daily") {
 			if (target.pop === 0) {
-				precip = "No precipitation expected.";
+				precipitation = "No precipitation expected.";
 			}
 			else {
 				const percent = `${sb.Utils.round(target.pop * 100, 0)}%`;
@@ -374,13 +374,13 @@ module.exports = {
 				const snow = target.snow?.["1h"] ?? target.snow ?? null;
 
 				if (rain && snow) {
-					precip = `${percent} chance of combined rain (${rain}mm/hr) and snow (${snow}mm/h).`;
+					precipitation = `${percent} chance of combined rain (${rain}mm/hr) and snow (${snow}mm/h).`;
 				}
 				else if (rain) {
-					precip = `${percent} chance of ${rain}mm/h rain.`;
+					precipitation = `${percent} chance of ${rain}mm/h rain.`;
 				}
 				else if (snow) {
-					precip = `${percent} chance of ${snow}mm/h snow.`;
+					precipitation = `${percent} chance of ${snow}mm/h snow.`;
 				}
 			}
 		}
@@ -454,7 +454,7 @@ module.exports = {
 				${cloudCover}
 				${windSpeed} ${windGusts}
 				${humidity}
-				${precip}
+				${precipitation}
 				${pressure}
 				${weatherAlert}
 			`
