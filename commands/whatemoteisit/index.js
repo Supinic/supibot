@@ -35,7 +35,7 @@ module.exports = {
 			};
 		}
 
-		const { channel, channelid: cid, emotecode, emoteid, channellogin: login, tier } = response;
+		const { channel, channelid: channelID, emotecode, emoteid, channellogin: login, tier } = response;
 		const originID = await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("data", "Origin")
@@ -45,7 +45,6 @@ module.exports = {
 			.flat("ID")
 		);
 
-		const emoteLink = `https://twitchemotes.com/emotes/${emoteid}`;
 		const cdnLink = `https://static-cdn.jtvnw.net/emoticons/v1/${emoteid}/3.0`;
 		if (context.params.linkOnly) {
 			return {
@@ -70,9 +69,17 @@ module.exports = {
 			? `This emote has origin info - use the ${sb.Command.prefix}origin command.`
 			: "";
 
+		let emoteLink;
+		if (channel) {
+			emoteLink = `https://twitchemotes.com/channel/${channelID}/emotes/${emoteid}`;
+		}
+		else {
+			emoteLink = `https://twitchemotes.com/global/emotes/${emoteid}`;
+		}
+
 		return {
 			reply: (channel)
-				? `${emotecode} (ID ${emoteid}) - ${tierString}. ${emoteLink} https://twitchemotes.com/channels/${cid} ${cdnLink} ${originString}`
+				? `${emotecode} (ID ${emoteid}) - ${tierString}. ${emoteLink} https://twitchemotes.com/channels/${channelID} ${cdnLink} ${originString}`
 				: `${emotecode} (ID ${emoteid}) - global Twitch emote. ${emoteLink} ${cdnLink} ${originString}`
 		};
 	}),
