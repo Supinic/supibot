@@ -145,7 +145,9 @@ module.exports = {
 			}
 			else if (result.success === false) { // Command result: Failed (cooldown, no command, ...)
 				if (context.params._force) {
-					currentArgs = sb.Utils.wrapString(result.reply, this.staticData.resultCharacterLimit).split(" ");
+					const reply = result.reply ?? "(no reply)";
+
+					currentArgs = sb.Utils.wrapString(reply, this.staticData.resultCharacterLimit).split(" ");
 				}
 				else {
 					const reply = this.staticData.reasons[result.reason] ?? result.reply ?? result.reason;
