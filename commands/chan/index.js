@@ -212,14 +212,16 @@ module.exports = {
 		const post = sb.Utils.randArray(eligiblePosts);
 		const delta = sb.Utils.timeDelta(post.created);
 
-		post.content = post.content.replace(/>>\d+/g, "");
+		if (post.content) {
+			post.content = post.content.replace(/>>\d+/g, "");
 
-		for (const { regex, string } of this.staticData.replacements) {
-			post.content = post.content.replace(regex, string);
-		}
+			for (const { regex, string } of this.staticData.replacements) {
+				post.content = post.content.replace(regex, string);
+			}
 
-		if (enabled.content.nsfw === false) {
-			post.content = post.content.replace(sb.Config.get("LINK_REGEX"), "[LINK]");
+			if (enabled.content.nsfw === false) {
+				post.content = post.content.replace(sb.Config.get("LINK_REGEX"), "[LINK]");
+			}
 		}
 
 		if (resultType === "file") {
