@@ -36,35 +36,86 @@ module.exports = {
 			};
 		}
 
-		const { docs } = data;
-		if (docs.length === 0) {
+		const [result] = data.result.filter(i => i.from !== 0).sort((a, b) => b.similarity - a.similarity);
+		if (!result) {
 			return {
 				success: false,
 				reply: "No matching show found for this picture!"
 			};
 		}
 
-		const [show] = docs;
-		const name = show.title_english ?? show.title_romaji ?? show.title_native;
-		const time = sb.Utils.formatTime(Math.trunc(show.at), true);
-		const similarity = sb.Utils.round(show.similarity * 100, 2);
+		const showResponse = await sb.Got({
+			method: "POST",
+			responseType: "json",
+			throwHttpErrors: false,
+			url: "https://trace.moe/anilist",
+			json: {
+				query: `query ($ids: [Int]) {
+                    Page (page: 1, perPage: 1) {
+                        media (id_in: $ids, type: ANIME) {
+                            title {
+                                english
+                                romaji
+                                native
+                            }
+                            isAdult
+                        }
+                    }
+                }`,
+				variables: {
+					ids: [result.anilist]
+				}
+			}
+		});
+
+		const [show] = showResponse.body.data.Page.media;
+		const name = show.title.english ?? show.title.romaji ?? show.title.native;
+		const adult = (show.isAdult) ? "(18+)" : "";
+
+		const time = sb.Utils.formatTime(Math.trunc(result.from), true);
+		const similarity = sb.Utils.round(result.similarity * 100, 2);
 
 		const descriptor = [];
-		if (show.season) {
-			descriptor.push(`S${sb.Utils.zf(show.season, 2)}`);
+		if (result.season) {
+			descriptor.push(`S${sb.Utils.zf(result.season, 2)}`);
 		}
-		if (show.episode) {
-			descriptor.push(`E${sb.Utils.zf(show.episode, 2)}`);
+		if (result.episode) {
+			descriptor.push(`E${sb.Utils.zf(result.episode, 2)}`);
+		}
+
+		const videoLinkKey = { type: "video-link", url: result.video };
+		let videoLink = await this.getCacheData(videoLinkKey);
+		if (!videoLink) {
+			const videoData = await sb.Got({
+				url: result.video,
+				responseType: "buffer",
+				throwHttpErrors: false
+			});
+
+			let result = await sb.Utils.uploadToNuuls(videoData.rawBody ?? videoData.body);
+			if (result.statusCode !== 200) {
+				result = await sb.Utils.uploadToImgur(videoData.rawBody ?? videoData.body);
+				if (result.statusCode !== 200) {
+					return {
+						success: false,
+						reply: `Could not upload the image to either Nuuls or Imgur! Errors: ${statusCode}, ${result.statusCode}`
+					};
+				}
+			}
+
+			videoLink = result.link;
+			await this.setCacheData(videoLinkKey, videoLink, { expiry: 30 * 864e5 }); // 30 days
 		}
 
 		return {
 			reply: sb.Utils.tag.trim `
 				Best match for your picture:
-				${name}
+				${name.trim()} ${adult}
 				${descriptor.join("")}
 				-
 				around ${time}.
 				Similarity score: ${similarity}% 
+				Video preview: ${videoLink}
 			`
 		};
 	}),
