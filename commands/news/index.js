@@ -327,13 +327,6 @@ module.exports = {
 						path: "",
 						endpoints: ["rss"],
 						helpers: ["boring_nick"]
-					},
-					{
-						name: "Censor.net",
-						url: "https://censor.net/includes/",
-						path: "",
-						endpoints: ["news_uk.xml"],
-						helpers: ["boring_nick"]
 					}
 				]
 			}
