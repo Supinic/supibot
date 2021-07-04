@@ -44,26 +44,32 @@ module.exports = {
 			};
 		}
 
-		const showResponse = await sb.Got.gql({
-			url: "https://trace.moe/anilist",
-			query: `query ($ids: [Int]) {
-				Page (page: 1, perPage: 1) {
-					media (id_in: $ids, type: ANIME) {
-						title {
-							english
-							romaji
-							native
+		const showKey = { type: "show", id: result.anilist };
+		let show = await this.getCacheData(showKey);
+		if (!show) {
+			const response = await sb.Got.gql({
+				url: "https://trace.moe/anilist",
+				query: `query ($ids: [Int]) {
+					Page (page: 1, perPage: 1) {
+						media (id_in: $ids, type: ANIME) {
+							title {
+								english
+								romaji
+								native
+							}
+							isAdult
 						}
-						isAdult
 					}
+				}`,
+				variables: {
+					ids: [result.anilist]
 				}
-			}`,
-			variables: {
-				ids: [result.anilist]
-			}
-		});
+			});
 
-		const [show] = showResponse.body.data.Page.media;
+			[show] = response.body.data.Page.media;
+			await this.setCacheData(showKey, show, { expiry: 30 * 864e5 }); // 30 days expiration
+		}
+
 		const name = show.title.english ?? show.title.romaji ?? show.title.native;
 		const adult = (show.isAdult) ? "(18+)" : "";
 
