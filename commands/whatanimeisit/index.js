@@ -92,18 +92,18 @@ module.exports = {
 				throwHttpErrors: false
 			});
 
-			let result = await sb.Utils.uploadToNuuls(videoData.rawBody ?? videoData.body);
-			if (result.statusCode !== 200) {
-				result = await sb.Utils.uploadToImgur(videoData.rawBody ?? videoData.body);
-				if (result.statusCode !== 200) {
+			let uploadResult = await sb.Utils.uploadToNuuls(videoData.rawBody ?? videoData.body);
+			if (uploadResult.statusCode !== 200) {
+				uploadResult = await sb.Utils.uploadToImgur(videoData.rawBody ?? videoData.body);
+				if (uploadResult.statusCode !== 200) {
 					return {
 						success: false,
-						reply: `Could not upload the image to either Nuuls or Imgur! Errors: ${statusCode}, ${result.statusCode}`
+						reply: `Could not upload the image to either Nuuls or Imgur! Errors: ${statusCode}, ${uploadResult.statusCode}`
 					};
 				}
 			}
 
-			videoLink = result.link;
+			videoLink = uploadResult.link;
 			await this.setCacheData(videoLinkKey, videoLink, { expiry: 30 * 864e5 }); // 30 days
 		}
 
