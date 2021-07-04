@@ -17,8 +17,10 @@ module.exports = {
 			};
 		}
 
+		// Possible future reference:
+		// POST method with FormData (name: "image") is also possible if working with files
 		const { statusCode, body: data } = await sb.Got({
-			url: "https://trace.moe/api/search",
+			url: "https://api.trace.moe/search",
 			searchParams: {
 				url: link
 			},
