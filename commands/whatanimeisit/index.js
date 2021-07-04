@@ -44,27 +44,22 @@ module.exports = {
 			};
 		}
 
-		const showResponse = await sb.Got({
-			method: "POST",
-			responseType: "json",
-			throwHttpErrors: false,
+		const showResponse = await sb.Got.gql({
 			url: "https://trace.moe/anilist",
-			json: {
-				query: `query ($ids: [Int]) {
-                    Page (page: 1, perPage: 1) {
-                        media (id_in: $ids, type: ANIME) {
-                            title {
-                                english
-                                romaji
-                                native
-                            }
-                            isAdult
-                        }
-                    }
-                }`,
-				variables: {
-					ids: [result.anilist]
+			query: `query ($ids: [Int]) {
+				Page (page: 1, perPage: 1) {
+					media (id_in: $ids, type: ANIME) {
+						title {
+							english
+							romaji
+							native
+						}
+						isAdult
+					}
 				}
+			}`,
+			variables: {
+				ids: [result.anilist]
 			}
 		});
 
@@ -92,9 +87,9 @@ module.exports = {
 				throwHttpErrors: false
 			});
 
-			let uploadResult = await sb.Utils.uploadToNuuls(videoData.rawBody ?? videoData.body);
+			let uploadResult = await sb.Utils.uploadToNuuls(videoData.rawBody ?? videoData.body, "file.mp4");
 			if (uploadResult.statusCode !== 200) {
-				uploadResult = await sb.Utils.uploadToImgur(videoData.rawBody ?? videoData.body);
+				uploadResult = await sb.Utils.uploadToImgur(videoData.rawBody ?? videoData.body, "file.mp4");
 				if (uploadResult.statusCode !== 200) {
 					return {
 						success: false,
