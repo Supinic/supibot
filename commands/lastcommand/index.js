@@ -34,7 +34,7 @@ module.exports = {
 				.from("chat_data", "Command_Execution")
 				.where("Command <> %n", this.ID)
 				.where("User_Alias = %n", targetUser.ID)
-				.where("Executed > DATE_ADD(NOW(), INTERVAL -1 MINUTE)")
+				.where("Executed > DATE_ADD(NOW(), INTERVAL -5 MINUTE)")
 				.where("Result IS NOT NULL")
 				.orderBy("Executed DESC")
 				.limit(1)
