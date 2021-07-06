@@ -75,6 +75,7 @@ module.exports = {
 			.select("First_Message_Posted AS Date")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("User_Alias = %n", userData.ID)
+			.where("First_Message_Posted IS NOT NULL")
 			.orderBy("First_Message_Posted ASC")
 			.limit(1)
 			.single()
