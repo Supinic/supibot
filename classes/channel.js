@@ -196,8 +196,14 @@ module.exports = class Channel extends require("./template.js") {
 		return true;
 	}
 
-	waitForUserMessage (userData, options) {
-		return this.Platform.waitForUserMessage(this, userData, options);
+	/**
+	 * Waits until the user sends a message. Resolves with their response, or rejects if timed out.
+	 * @param {number} userID
+	 * @param {Object} options
+	 * @returns {sb.Promise<UserMessageResolution>}
+	 */
+	waitForUserMessage (userID, options) {
+		return this.Platform.waitForUserMessage(this, userID, options);
 	}
 
 	/**
