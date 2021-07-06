@@ -322,10 +322,24 @@ module.exports = {
 				language: "ukrainian",
 				sources: [
 					{
-						name: "Pravda",
-						url: "https://www.pravda.com.ua/",
-						path: "",
-						endpoints: ["rss"],
+						name: "Radio Svoboda",
+						url: "https://www.radiosvoboda.org",
+						path: "api",
+						endpoints: ["zrqiteuuir", "zjmkrey$ko"],
+						helpers: ["boring_nick"]
+					},
+					{
+						name: "Obozrevatel",
+						url: "https://www.obozrevatel.com",
+						path: "ukr",
+						endpoints: ["rss.xml"],
+						helpers: ["boring_nick"]
+					},
+					{
+						name: "24TV",
+						url: "https://24tv.ua/rss",
+						path: "rss",
+						endpoints: ["all.xml"],
 						helpers: ["boring_nick"]
 					}
 				]
