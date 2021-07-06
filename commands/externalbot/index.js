@@ -21,7 +21,7 @@ module.exports = {
 				reply: "Can't use this command outside of pipe!"
 			};
 		}
-	
+
 		if (!this.data.prefixes) {
 			this.data.prefixes = await sb.Query.getRecordset(rs => rs
 				.select("Bot_Alias", "Prefix")
@@ -30,7 +30,7 @@ module.exports = {
 				.orderBy("LENGTH(Prefix) DESC")
 			);
 		}
-	
+
 		let botData = null;
 		const message = rest.join(" ");
 		for (const { Prefix: prefix, Bot_Alias: botID } of this.data.prefixes) {
@@ -39,7 +39,7 @@ module.exports = {
 				break;
 			}
 		}
-	
+
 		if (!botData) {
 			return {
 				success: false,
@@ -54,20 +54,20 @@ module.exports = {
 				reply: "I'm not an external bot! 😠"
 			};
 		}
-	
-		if (context.platform.userMessagePromises.get(context.channel)?.get(botData)) {
+
+		if (context.platform.userMessagePromises.get(context.channel.ID)?.get(botData.ID)) {
 			return {
 				success: false,
 				reply: `Already awaiting response from ${botData.Name} in this channel!`
 			};
 		}
-	
+
 		// Sends the actual external bot's command, and wait to see if it responds
 		const safeMessage = await context.platform.prepareMessage(message, context.channel);
-		const messagePromise = context.channel.waitForUserMessage(botData);
-	
+		const messagePromise = context.channel.waitForUserMessage(botData.ID);
+
 		await context.channel.send(safeMessage);
-	
+
 		const result = await messagePromise;
 		if (result === null) {
 			return {
@@ -75,7 +75,7 @@ module.exports = {
 				reply: `No response from external bot after ${this.staticData.responseTimeout / 1000} seconds!`
 			};
 		}
-	
+
 		const selfRegex = new RegExp(`^@?${context.platform.Self_Name},?`, "i");
 		return {
 			reply: result.message.replace(selfRegex, "")
