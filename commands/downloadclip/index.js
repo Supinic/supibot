@@ -29,7 +29,7 @@ module.exports = {
 		}
 
 		const [slug] = match;
-		const response = await sb.Got("Leppunen", `v2/twitch/getClip/${slug}`);
+		const response = await sb.Got("Leppunen", `v2/twitch/clip/${slug}`);
 		if (response.statusCode === 400) {
 			return {
 				success: false,
