@@ -1,0 +1,93 @@
+module.exports = {
+	Name: "firstseen",
+	Aliases: ["fs"],
+	Author: "supinic",
+	Cooldown: 10000,
+	Description: "For a given user, this command tells you when they were first seen, based on Supibot's chat logs.",
+	Flags: ["block","mention","opt-out","pipe"],
+	Params: null,
+	Whitelist_Response: null,
+	Static_Data: null,
+	Code: (async function firstSeen (context, user) {
+		const userData = (user) ? await sb.User.get(user) : context.user;
+		if (!userData) {
+			return {
+				success: false,
+				reply: `Provided user does not exist!`
+			};
+		}
+
+		const missingFirstLineChannels = await sb.Query.getRecordset(rs => rs
+			.select("Channel")
+			.from("chat_data", "Message_Meta_User_Alias")
+			.where("User_Alias = %n", userData.ID)
+			.where("First_Message_Posted IS NULL")
+			.flat("Channel")
+		);
+
+		if (missingFirstLineChannels.length > 0) {
+			const promises = [];
+			for (const channelID of missingFirstLineChannels) {
+				const channelData = sb.Channel.get(channelID);
+				if (!channelData) {
+					continue;
+				}
+
+				const promise = (async () => {
+					const message = await sb.Query.getRecordset(rs => rs
+						.select("Text", "Posted")
+						.from("chat_line", channelData.getDatabaseName())
+						.where("User_Alias = %n", userData.ID)
+						.orderBy("ID ASC")
+						.limit(1)
+						.single()
+					);
+
+					const row = await sb.Query.getRow("chat_data", "Message_Meta_User_Alias");
+					await row.load({
+						User_Alias: userData.ID,
+						Channel: channelData.ID
+					}, true);
+
+					row.setValues({
+						User_Alias: userData.ID,
+						Channel: channelData.ID,
+						First_Message_Text: message.Text,
+						First_Message_Posted: message.Posted
+					});
+
+					await row.save({ skipLoad: true });
+				})();
+
+				promises.push(promise);
+			}
+
+			await Promise.all(promises);
+		}
+
+		const date = await sb.Query.getRecordset(rs => rs
+			.select("First_Message_Posted AS Date")
+			.from("chat_data", "Message_Meta_User_Alias")
+			.where("User_Alias = %n", userData.ID)
+			.orderBy("First_Message_Posted ASC")
+			.limit(1)
+			.single()
+			.flat("Date")
+		);
+
+		if (!date) {
+			return {
+				reply: sb.Utils.tag.trim `
+					That user is in the database, but never showed up in chat.
+					They were first spotted ${sb.Utils.timeDelta(userData.Started_Using)}.
+				`
+			};
+		}
+
+		const who = (userData === context.user) ? "You were" : "That user was";
+		return {
+			reply: `${who} first seen in chat ${sb.Utils.timeDelta(date)}.`
+		};
+	}),
+	Dynamic_Description: null
+};
