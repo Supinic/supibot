@@ -167,11 +167,11 @@ module.exports = class Platform extends require("./template.js") {
 		const delay = options.timeout ?? 10_000;
 		const promise = new sb.Promise();
 
-		if (!this.#userMessagePromises.has(channelData)) {
-			this.#userMessagePromises.set(channelData, new Map());
+		if (!this.#userMessagePromises.has(channelData.ID)) {
+			this.#userMessagePromises.set(channelData.ID, new Map());
 		}
 
-		if (this.#userMessagePromises.get(channelData).get(userData)) {
+		if (this.#userMessagePromises.get(channelData.ID).get(userData.ID)) {
 			throw new sb.Error({
 				message: "User already has a pending promise in the provided channel!"
 			});
@@ -179,10 +179,10 @@ module.exports = class Platform extends require("./template.js") {
 
 		const timeout = setTimeout(() => {
 			promise.resolve(null);
-			this.#userMessagePromises.get(channelData).delete(userData);
+			this.#userMessagePromises.get(channelData.ID).delete(userData.ID);
 		}, delay);
 
-		this.#userMessagePromises.get(channelData).set(userData, { promise, timeout });
+		this.#userMessagePromises.get(channelData.ID).set(userData.ID, { promise, timeout });
 
 		return promise;
 	}
