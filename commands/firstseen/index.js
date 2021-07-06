@@ -92,12 +92,14 @@ module.exports = {
 
 		const channelData = sb.Channel.get(data.Channel);
 		const who = (userData === context.user) ? "You were" : "That user was";
+		const belongsTo = (userData === context.user) ? "your" : "their";
+
 		return {
 			reply: sb.Utils.tag.trim `
 				${who}
 				first seen in chat ${sb.Utils.timeDelta(data.Date)},
-				in channel ${channelData.Description ?? channelData.Name},
-				message: ${data.Message}
+				(channel ${channelData.Description ?? channelData.Name})
+				${belongsTo} message: ${data.Message}
 			`
 		};
 	}),
