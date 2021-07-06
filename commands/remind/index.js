@@ -172,45 +172,45 @@ module.exports = {
 			else {
 				targetReminderDelta = sb.Utils.timeDelta(targetReminderDate);
 			}
-		}
 
-		const comparison = new sb.Date(now.valueOf() + delta);
-		if (delta < 0) {
-			return {
-				success: false,
-				reply: "Past reminders are only available to people who possess a time machine!"
-			};
-		}
-		else if (delta === 0 && targetUser === context.user) {
-			return {
-				success: false,
-				reply: `To remind yourself, you must use the word "in"! Such as "in 5 minutes"`,
-				cooldown: 2500
-			};
-		}
-		else if (now > comparison) {
-			return {
-				success: false,
-				reply: "Timed reminders set in the past are only available for people that posess a time machine!"
-			};
-		}
-		else if (Math.abs(now - comparison) < 30.0e3) {
-			return {
-				success: false,
-				reply: "You cannot set a timed reminder in less than 30 seconds!",
-				cooldown: this.Cooldown / 2
-			};
-		}
-		else if ((sb.Date.now() + delta) > this.staticData.sqlDateLimit) {
-			const description = (Number.isFinite(comparison.valueOf()))
-				? `the date ${comparison.format("Y-m-d")}`
-				: `${sb.Utils.groupDigits(Math.trunc(delta / 31_536_000_000))} years in the future`;
+			const comparison = new sb.Date(now.valueOf() + delta);
+			if (delta < 0) {
+				return {
+					success: false,
+					reply: "Past reminders are only available to people who possess a time machine!"
+				};
+			}
+			else if (delta === 0 && targetUser === context.user) {
+				return {
+					success: false,
+					reply: `To remind yourself, you must use the word "in"! Such as "in 5 minutes"`,
+					cooldown: 2500
+				};
+			}
+			else if (now > comparison) {
+				return {
+					success: false,
+					reply: "Timed reminders set in the past are only available for people that posess a time machine!"
+				};
+			}
+			else if (Math.abs(now - comparison) < 30.0e3) {
+				return {
+					success: false,
+					reply: "You cannot set a timed reminder in less than 30 seconds!",
+					cooldown: this.Cooldown / 2
+				};
+			}
+			else if ((sb.Date.now() + delta) > this.staticData.sqlDateLimit) {
+				const description = (Number.isFinite(comparison.valueOf()))
+					? `the date ${comparison.format("Y-m-d")}`
+					: `${sb.Utils.groupDigits(Math.trunc(delta / 31_536_000_000))} years in the future`;
 
-			return {
-				success: false,
-				reply: `Your reminder was set to approximately ${description}, but the limit is 31st December 9999.`,
-				cooldown: this.Cooldown / 2
-			};
+				return {
+					success: false,
+					reply: `Your reminder was set to approximately ${description}, but the limit is 31st December 9999.`,
+					cooldown: this.Cooldown / 2
+				};
+			}
 		}
 
 		// If it is a timed reminder via PMs, only allow it if it a self reminder.
