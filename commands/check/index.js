@@ -342,7 +342,7 @@ module.exports = {
 					if (identifier === "last") {
 						identifier = await sb.Query.getRecordset(rs => rs
 							.select("ID")
-							.from("chat_Data", "Reminder")
+							.from("chat_data", "Reminder")
 							.where("User_From = %n", context.user.ID)
 							.orderBy("ID DESC")
 							.limit(1)
