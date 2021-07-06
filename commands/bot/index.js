@@ -305,6 +305,7 @@ module.exports = {
 			`<ul>${list}</ul>`,
 
 			`<code>${prefix}bot i-will-not-ban-supibot-again</code>`,
+			`<code>${prefix}bot i-will-not-ban-supibot-again channel:(channel)</code>`,
 			`If the bot has been banned in the channel, and unbanned rather quickly (not more than ~1 hour), you can use this command to attempt to have Supibot re-join.`,
 			"Should the ban last for too long, Supibot will be unable to join automatically.",
 			"It will then mention that you have to create a suggestion and describe what happened."
