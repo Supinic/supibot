@@ -408,7 +408,7 @@ module.exports = {
 			obj.temperature = `${target.temp.min}°C to ${target.temp.max}°C.`;
 		}
 
-		if (type === "current") {
+		if (type === "current" && !skipLocation) {
 			const nowSeconds = sb.Date.now() / 1000;
 			let verb;
 			let sunTime;
