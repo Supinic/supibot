@@ -436,8 +436,8 @@ module.exports = {
 
 				let time;
 				for (const day of data.daily) {
-					if (day.current[property]) {
-						time = day.current[property];
+					if (day[property]) {
+						time = day[property];
 						break;
 					}
 				}
