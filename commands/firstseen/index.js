@@ -43,6 +43,10 @@ module.exports = {
 						.single()
 					);
 
+					if (!message) {
+						return;
+					}
+
 					const row = await sb.Query.getRow("chat_data", "Message_Meta_User_Alias");
 					await row.load({
 						User_Alias: userData.ID,
