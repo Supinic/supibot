@@ -223,6 +223,40 @@ module.exports = {
 				};
 			}
 
+			case "i-will-not-ban-supibot-again": {
+				if (channelData.Platform.Name !== "twitch") {
+					return {
+						success: false,
+						reply: `Re-enabling the bot after a ban is currently available only in Twitch channels!`
+					};
+				}
+				else if (channelData.Mode === "Inactive") {
+					return {
+						success: false,
+						reply: sb.Utils.tag.trim `
+							The ban has already taken place for too long.
+							Create a suggestion with the "$suggest" command, describe what happened.
+							Also mention how you intend to make sure this doesn't happen again.
+						`
+					};
+				}
+
+				try {
+					await context.platform.client.part(channelData.Name);
+					await context.platform.client.join(channelData.Name);
+				}
+				catch (e) {
+					return {
+						success: false,
+						reply: `I am still banned in that channel!`
+					};
+				}
+
+				return {
+					reply: `Attempted to re-join ${channelString}.`
+				};
+			}
+
 			default: return {
 				success: false,
 				reply: "Invalid command provided!"
@@ -268,7 +302,13 @@ module.exports = {
 			"You can also change the mode of Supibot's behaviour when the API times out.",
 			"Modes:",
 			"",
-			`<ul>${list}</ul>`
+			`<ul>${list}</ul>`,
+			"",
+
+			`<code>${prefix}bot i-will-not-ban-supibot-again</code>`,
+			`If the bot has been banned in the channel, and unbanned rather quickly (not more than ~1 hour), you can use this command to attempt to have Supibot re-join.`,
+			"Should the ban last for too long, Supibot will be unable to join automatically.",
+			"It will then mention that you have to create a suggestion and describe what happened."
 		];
 	})
 };
