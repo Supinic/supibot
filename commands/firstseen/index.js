@@ -71,18 +71,17 @@ module.exports = {
 			await Promise.all(promises);
 		}
 
-		const date = await sb.Query.getRecordset(rs => rs
-			.select("First_Message_Posted AS Date")
+		const data = await sb.Query.getRecordset(rs => rs
+			.select("Channel", "First_Message_Posted AS Date", "First_Message_Text AS Message")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("User_Alias = %n", userData.ID)
 			.where("First_Message_Posted IS NOT NULL")
 			.orderBy("First_Message_Posted ASC")
 			.limit(1)
 			.single()
-			.flat("Date")
 		);
 
-		if (!date) {
+		if (!data) {
 			return {
 				reply: sb.Utils.tag.trim `
 					That user is in the database, but never showed up in chat.
@@ -91,9 +90,15 @@ module.exports = {
 			};
 		}
 
+		const channelData = sb.Channel.get(data.Channel);
 		const who = (userData === context.user) ? "You were" : "That user was";
 		return {
-			reply: `${who} first seen in chat ${sb.Utils.timeDelta(date)}.`
+			reply: sb.Utils.tag.trim `
+				${who}
+				first seen in chat ${sb.Utils.timeDelta(data.Date)},
+				in channel ${channelData.Description ?? channelData.Name},
+				message: ${data.Message}.
+			`
 		};
 	}),
 	Dynamic_Description: null
