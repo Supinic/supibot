@@ -429,51 +429,6 @@ module.exports = {
 				};
 			}
 
-			case "check": {
-				const [target] = args;
-				if (!target) {
-					if (!portfolioData) {
-						return {
-							success: false,
-							reply: `You don't have a portfolio set up! Use $cg register to create one.`
-						};
-					}
-
-					const accountString = portfolioData.assets
-						.filter(i => i.Amount > 0)
-						.map(i => `${i.Code}: ${i.Amount}`).join("; ");
-
-					return {
-						reply: `Your portfolio: ${accountString}`
-					};
-				}
-				else {
-					const targetUserData = await sb.User.get(target);
-					if (!targetUserData) {
-						return {
-							success: false,
-							reply: `Provided user does not exist!`
-						};
-					}
-
-					const targetPortfolioData = await getPortfolioData(targetUserData.ID);
-					if (!targetPortfolioData) {
-						return {
-							success: false,
-							reply: `Provided user does not have an active portfolio!`
-						};
-					}
-
-					const accountString = targetPortfolioData.assets
-						.filter(i => i.Amount > 0)
-						.map(i => `${i.Code}: ${i.Amount}`).join("; ");
-
-					return {
-						reply: `Their portfolio: ${accountString}`
-					};
-				}
-			}
-
 			case "buy":
 			case "sell": {
 				if (!portfolioData) {
@@ -551,11 +506,12 @@ module.exports = {
 				};
 			}
 
+			case "check":
 			case "rank":
 			case "total": {
 				const [target] = args;
 
-				let data;
+				let targetPortfolio;
 				if (!target) {
 					if (!portfolioData) {
 						return {
@@ -564,10 +520,7 @@ module.exports = {
 						};
 					}
 
-					const escaped = sb.Query.escapeString(portfolioData.ID);
-					[data] = await sb.Query.raw(
-						`SELECT crypto_game.GET_PORTFOLIO_TOTAL_PRICE('${escaped}') AS Total`
-					);
+					targetPortfolio = portfolioData;
 				}
 				else {
 					const targetUserData = await sb.User.get(target);
@@ -586,11 +539,17 @@ module.exports = {
 						};
 					}
 
-					const escaped = sb.Query.escapeString(targetPortfolioData.ID);
-					[data] = await sb.Query.raw(
-						`SELECT crypto_game.GET_PORTFOLIO_TOTAL_PRICE('${escaped}') AS Total`
-					);
+					targetPortfolio = targetPortfolioData;
 				}
+
+				const currencies = portfolioData.assets
+					.filter(i => i.Amount > 0)
+					.map(i => `${i.Code}: ${i.Amount}`).join("; ");
+
+				const escaped = sb.Query.escapeString(targetPortfolio.ID);
+				const [data] = await sb.Query.raw(
+					`SELECT crypto_game.GET_PORTFOLIO_TOTAL_PRICE('${escaped}') AS Total`
+				);
 
 				const [rank, total] = await Promise.all([
 					sb.Query.getRecordset(rs => rs
@@ -612,7 +571,7 @@ module.exports = {
 
 				const prefix = (target) ? "Their" : "Your";
 				return {
-					reply: `${prefix} current portfolio totals: € ${data.Total} - rank ${rank}/${total}.`
+					reply: `${prefix} portfolio: € ${data.Total} - rank ${rank}/${total}. Currencies: ${currencies}`
 				};
 			}
 		}
@@ -666,14 +625,11 @@ module.exports = {
 
 		`<code>${prefix}cg check</code>`,
 		`<code>${prefix}cg check (user)</code>`,
-		`Shows how much of each asset you (or a different user) have in your current portfolio.`,
-		"",
-
 		`<code>${prefix}cg total</code>`,
 		`<code>${prefix}cg total (user)</code>`,
 		`<code>${prefix}cg rank</code>`,
 		`<code>${prefix}cg rank (user)</code>`,
-		`Shows the total converted cost of your (or a different users's) portfolio in euros plus your/their rank.`,
+		`Shows the total converted cost of your (or a different users's) portfolio in euros, your/their rank and the list of their currencies.`,
 		"",
 
 		`<code>${prefix}cg assets</code>`,
