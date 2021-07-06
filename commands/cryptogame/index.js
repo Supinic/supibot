@@ -542,7 +542,7 @@ module.exports = {
 					targetPortfolio = targetPortfolioData;
 				}
 
-				const currencies = portfolioData.assets
+				const currencies = targetPortfolio.assets
 					.filter(i => i.Amount > 0)
 					.map(i => `${i.Code}: ${i.Amount}`).join("; ");
 
