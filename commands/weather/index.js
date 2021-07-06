@@ -409,15 +409,15 @@ module.exports = {
 		}
 
 		if (type === "current") {
-			const now = sb.Date.now();
+			const nowSeconds = sb.Date.now() / 1000;
 			let verb;
 			let sunTime;
 
-			if (now < data.current.sunrise) {
+			if (nowSeconds < data.current.sunrise) {
 				verb = "rise";
 				sunTime = data.current.sunrise;
 			}
-			else if (now < data.current.sunset) {
+			else if (nowSeconds < data.current.sunset) {
 				verb = "set";
 				sunTime = data.current.sunset;
 			}
@@ -426,7 +426,7 @@ module.exports = {
 				sunTime = data.daily[1].sunrise;
 			}
 
-			obj.sun = `Sun ${verb}s ${sb.Utils.timeDelta(sunTime)}`;
+			obj.sun = `Sun ${verb}s ${sb.Utils.timeDelta(sunTime * 1000)}.`;
 		}
 
 		let weatherAlert = "";
