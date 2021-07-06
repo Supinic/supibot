@@ -45,7 +45,7 @@ module.exports = {
 			.flat("ID")
 		);
 
-		const cdnLink = `https://static-cdn.jtvnw.net/emoticons/v1/${emoteid}/3.0`;
+		const cdnLink = `https://static-cdn.jtvnw.net/emoticons/v2/${emoteid}/default/dark/3.0`;
 		if (context.params.linkOnly) {
 			return {
 				reply: cdnLink
