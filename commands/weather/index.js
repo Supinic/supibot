@@ -11,7 +11,7 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		allowedTypes: ["cloudCover", "humidity", "icon", "place", "precipitation", "pressure", "temperature", "windGusts", "windSpeed"],
+		allowedTypes: ["cloudCover", "humidity", "icon", "place", "precipitation", "pressure", "sun", "temperature", "windGusts", "windSpeed"],
 		getIcon: (code) => {
 			const type = Math.trunc(code / 100);
 			const remainder = code % 100;
@@ -342,7 +342,8 @@ module.exports = {
 				: "No wind.",
 			windGusts: (target.wind_gust)
 				? `Wind gusts: up to ${sb.Utils.round(target.wind_gust * 3.6)} km/h.`
-				: "No wind gusts."
+				: "No wind gusts.",
+			sun: ""
 		};
 
 		if (type === "current") {
@@ -405,6 +406,27 @@ module.exports = {
 		}
 		else if (type === "daily") {
 			obj.temperature = `${target.temp.min}°C to ${target.temp.max}°C.`;
+		}
+
+		if (type === "current") {
+			const now = sb.Date.now();
+			let verb;
+			let sunTime;
+
+			if (now < data.current.sunrise) {
+				verb = "rise";
+				sunTime = data.current.sunrise;
+			}
+			else if (now < data.current.sunset) {
+				verb = "set";
+				sunTime = data.current.sunset;
+			}
+			else {
+				verb = "rise";
+				sunTime = data.daily[1].sunrise;
+			}
+
+			obj.sun = `Sun ${verb}s ${sb.Utils.timeDelta(sunTime)}`;
 		}
 
 		let weatherAlert = "";
@@ -477,6 +499,7 @@ module.exports = {
 					${obj.humidity}
 					${obj.precipitation}
 					${obj.pressure}
+					${obj.sun}
 					${weatherAlert}
 				`
 			};
