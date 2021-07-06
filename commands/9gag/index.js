@@ -15,11 +15,11 @@ module.exports = {
 		}
 		else {
 			options.url = "https://9gag.com/v1/search-posts";
-			options.searchParams = new sb.URLParams()
-				.set("query", args.join(" "))
-				.toString();
+			options.searchParams = {
+				query: args.join(" ")
+			};
 		}
-	
+
 		const { statusCode, body } = await sb.Got(options);
 		if (statusCode !== 200) {
 			return {
@@ -27,12 +27,12 @@ module.exports = {
 				reply: `9GAG API returned error ${statusCode}!`
 			};
 		}
-	
+
 		const nsfw = Boolean(context?.channel.NSFW);
 		const filtered = (nsfw)
 			? body.data.posts
 			: body.data.posts.filter(i => i.nsfw !== 1);
-	
+
 		const post = sb.Utils.randArray(filtered);
 		if (!post) {
 			return {
@@ -40,10 +40,10 @@ module.exports = {
 				reply: `No suitable posts found!`
 			};
 		}
-	
+
 		const delta = sb.Utils.timeDelta(new sb.Date(post.creationTs * 1000));
 		return {
-			reply: `${post.title} - ${post.url} - Score: ${post.upVoteCount}, posted ${delta}.`
+			reply: `${sb.Utils.fixHTML(post.title)} - ${post.url} - Score: ${post.upVoteCount}, posted ${delta}.`
 		};
 	}),
 	Dynamic_Description: null
