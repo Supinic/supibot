@@ -97,7 +97,7 @@ module.exports = {
 				${who}
 				first seen in chat ${sb.Utils.timeDelta(data.Date)},
 				in channel ${channelData.Description ?? channelData.Name},
-				message: ${data.Message}.
+				message: ${data.Message}
 			`
 		};
 	}),
