@@ -256,6 +256,23 @@ module.exports = {
 				};
 			}
 
+			case "enable-links":
+			case "disable-links": {
+				const verb = command.replace("-links", "");
+				const current = channelData.Links_Allowed;
+				if ((current && command === "enable-links") || (!current && command === "disable-links")) {
+					return {
+						success: false,
+						reply: `Links are already ${verb}d in ${channelString}!`
+					};
+				}
+
+				await channelData.saveProperty("Links_Allowed", !current);
+				return {
+					reply: `Links are now ${verb}d in ${channelString}.`
+				};
+			}
+
 			default: return {
 				success: false,
 				reply: "Invalid command provided!"
@@ -302,6 +319,14 @@ module.exports = {
 			"Modes:",
 			"",
 			`<ul>${list}</ul>`,
+
+			`<code>${prefix}bot enable-links</code>`,
+			`<code>${prefix}bot disable-links</code>`,
+			`<code>${prefix}bot enable-links channel:(channel)</code>`,
+			`<code>${prefix}bot disable-links channel:(channel)</code>`,
+			"Disables or enables automatic replacement of all links in a channel.",
+			`If enabled, all links will be replaced by "[LINK]" or a similar placeholder.`,
+			"",
 
 			`<code>${prefix}bot i-will-not-ban-supibot-again</code>`,
 			`<code>${prefix}bot i-will-not-ban-supibot-again channel:(channel)</code>`,
