@@ -181,14 +181,12 @@ module.exports = {
 				reply: "Past reminders are only available to people who possess a time machine!"
 			};
 		}
-		else if (delta === 0) {
-			if (targetUser === context.user) {
-				return {
-					success: false,
-					reply: `To remind yourself, you must use the word "in"! Such as "in 5 minutes"`,
-					cooldown: 2500
-				};
-			}
+		else if (delta === 0 && targetUser === context.user) {
+			return {
+				success: false,
+				reply: `To remind yourself, you must use the word "in"! Such as "in 5 minutes"`,
+				cooldown: 2500
+			};
 		}
 		else if (now > comparison) {
 			return {
