@@ -53,9 +53,11 @@ module.exports = {
 						Channel: channelData.ID
 					}, true);
 
+					if (!row.loaded) {
+						return;
+					}
+
 					row.setValues({
-						User_Alias: userData.ID,
-						Channel: channelData.ID,
 						First_Message_Text: message.Text,
 						First_Message_Posted: message.Posted
 					});
