@@ -191,17 +191,20 @@ module.exports = {
 				};
 			}
 
-			postList = response.body.posts.map(i => ({
-				ID: i.no,
-				author: i.name,
-				created: new sb.Date(i.time * 1000),
-				content: (i.com)
-					? sb.Utils.fixHTML(sb.Utils.removeHTML(i.com ?? ""))
-					: null,
-				file: (typeof i.filename !== "undefined")
-					? `https://i.4cdn.org/${board.name}/${i.tim}${i.ext}`
-					: null
-			}));
+			// If a post has the `replies` property, it is the first post of a thread, which should be filtered out.
+			postList = response.body.posts
+				.filter(i => typeof i.replies !== "number")
+				.map(i => ({
+					ID: i.no,
+					author: i.name,
+					created: new sb.Date(i.time * 1000),
+					content: (i.com)
+						? sb.Utils.fixHTML(sb.Utils.removeHTML(i.com ?? ""))
+						: null,
+					file: (typeof i.filename !== "undefined")
+						? `https://i.4cdn.org/${board.name}/${i.tim}${i.ext}`
+						: null
+				}));
 
 			await this.setCacheData(postKey, postList, {
 				expiry: 300_000 // 5 minutes
