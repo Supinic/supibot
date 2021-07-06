@@ -16,12 +16,19 @@ module.exports = class Controller {
 
 	async handleCommand () {}
 
+	/**
+	 * Resolves a registered awaiting message.
+	 * @param {Channel|null} channelData
+	 * @param {User} userData
+	 * @param {string} message
+	 */
 	resolveUserMessage (channelData, userData, message) {
 		if (!this.platform?.userMessagePromises) {
 			return;
 		}
 
-		const channelMap = this.platform.userMessagePromises.get(channelData.ID);
+		const channelIdentifier = channelData?.ID ?? null;
+		const channelMap = this.platform.userMessagePromises.get(channelIdentifier);
 		if (channelMap && channelMap.has(userData.ID)) {
 			const { promise, timeout } = channelMap.get(userData.ID);
 
