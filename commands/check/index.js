@@ -337,8 +337,20 @@ module.exports = {
 			{
 				name: "reminder",
 				aliases: ["reminders"],
-				description: "Check the status and info of a reminder created by you or for you.",
+				description: "Check the status and info of a reminder created by you or for you. You can use \"last\" instead of an ID to check the last one you made.",
 				execute: async (context, identifier) => {
+					if (identifier === "last") {
+						identifier = await sb.Query.getRecordset(rs => rs
+							.select("ID")
+							.from("chat_Data", "Reminder")
+							.where("User_From = %n", context.user.ID)
+							.orderBy("ID DESC")
+							.limit(1)
+							.single()
+							.flat("ID")
+						);
+					}
+
 					const ID = Number(identifier);
 					if (!ID) {
 						return {
@@ -466,7 +478,7 @@ module.exports = {
 			{
 				name: "suggest",
 				aliases: ["suggestion", "suggestions"],
-				description: "Checks the status and info of a suggestion that you made.",
+				description: "Checks the status and info of a suggestion that you made. You can use \"last\" instead of an ID to check the last one you made.",
 				execute: async (context, identifier) => {
 					if (!identifier) {
 						return {
