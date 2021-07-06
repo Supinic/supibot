@@ -337,7 +337,7 @@ module.exports = {
 					},
 					{
 						name: "24TV",
-						url: "https://24tv.ua/rss",
+						url: "https://24tv.ua",
 						path: "rss",
 						endpoints: ["all.xml"],
 						helpers: ["boring_nick"]
