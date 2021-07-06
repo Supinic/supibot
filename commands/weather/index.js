@@ -426,7 +426,29 @@ module.exports = {
 				sunTime = data.daily[1].sunrise;
 			}
 
-			obj.sun = `Sun ${verb}s ${sb.Utils.timeDelta(sunTime * 1000)}.`;
+			if (sunTime !== 0) {
+				obj.sun = `Sun ${verb}s ${sb.Utils.timeDelta(sunTime * 1000)}.`;
+			}
+			else {
+				// Determine if the Sun is down or up based on UV index
+				verb = (data.current.uvi === 0) ? "rise" : "set";
+				const property = `sun${verb}`;
+
+				let time;
+				for (const day of data.daily) {
+					if (day.current[property]) {
+						time = day.current[property];
+						break;
+					}
+				}
+
+				if (time) {
+					obj.sun = `Sun ${verb}s ${sb.Utils.timeDelta(time * 1000)}.`;
+				}
+				else {
+					obj.sun = `Sun does not ${verb} in the next 7 days.`;
+				}
+			}
 		}
 
 		let weatherAlert = "";
