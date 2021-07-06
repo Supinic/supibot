@@ -165,7 +165,7 @@ class CytubeClient {
 				this.controller.resolveUserMessage(null, userData, msg);
 
 				if (this.controller.platform.Logging.whispers) {
-					sb.SystemLogger.send("Cytube.Other", `PM: ${msg}`, this.channelData, userData);
+					sb.Logger.log("Cytube.Other", `PM: ${msg}`, this.channelData, userData);
 				}
 			}
 

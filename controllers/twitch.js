@@ -282,7 +282,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					const previousMode = channelData.Mode;
 					await Promise.all([
 						channelData.saveProperty("Mode", "Inactive"),
-						sb.SystemLogger.send(
+						sb.Logger.log(
 							"Twitch.Ban",
 							`Bot banned in channel ${channelData.Name}. Previous mode: ${previousMode}`,
 							channelData
@@ -324,7 +324,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 			else if (messageObject.wasChatCleared() && this.platform.Logging.clearChats) {
 				const channelData = sb.Channel.get(channelName, this.platform);
-				sb.SystemLogger.send("Twitch.Clearchat", null, channelData);
+				sb.Logger.log("Twitch.Clearchat", null, channelData);
 			}
 		});
 	}
@@ -502,7 +502,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 		else {
 			if (this.platform.Logging.whispers) {
-				sb.SystemLogger.send("Twitch.Other", `whisper: ${message}`, null, userData);
+				sb.Logger.log("Twitch.Other", `whisper: ${message}`, null, userData);
 			}
 
 			this.resolveUserMessage(null, userData, message);
@@ -535,7 +535,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 
 		if (this.platform.Logging.bits && typeof bits !== "undefined" && bits !== null) {
-			sb.SystemLogger.send("Twitch.Other", `${bits} bits`, channelData, userData);
+			sb.Logger.log("Twitch.Other", `${bits} bits`, channelData, userData);
 		}
 
 		if (!sb.Command.prefix) {
@@ -625,7 +625,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				const previousMode = channelData.Mode;
 				await Promise.all([
 					channelData.saveProperty("Mode", "Inactive"),
-					sb.SystemLogger.send(
+					sb.Logger.log(
 						"Twitch.Ban",
 						`Bot banned in channel ${channelData.Name}. Previous mode: ${previousMode}`,
 						channelData
@@ -719,7 +719,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 
 			if (this.platform.Logging.subs && !logSkipModes.includes(channelData.Mode)) {
-				sb.SystemLogger.send("Twitch.Sub", plans[subPlanName], channelData, userData);
+				sb.Logger.log("Twitch.Sub", plans[subPlanName], channelData, userData);
 			}
 		}
 		else if (messageObject.messageID === "anonsubgift" || messageObject.isSubgift()) {
@@ -757,7 +757,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				const name = userData?.Name ?? "(anonymous)";
 				const logMessage = `${name} gifted a subscription to ${recipientData.Name}`;
 
-				sb.SystemLogger.send("Twitch.Giftsub", logMessage, channelData, userData);
+				sb.Logger.log("Twitch.Giftsub", logMessage, channelData, userData);
 			}
 		}
 		else if (messageObject.isRaid()) {
@@ -776,7 +776,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 
 			if (this.platform.Logging.hosts && !logSkipModes.includes(channelData.Mode)) {
-				sb.SystemLogger.send("Twitch.Host", `Raid: ${userData?.Name ?? null} => ${channelData.Name} for ${viewers} viewers`);
+				sb.Logger.log("Twitch.Host", `Raid: ${userData?.Name ?? null} => ${channelData.Name} for ${viewers} viewers`);
 			}
 		}
 		else if (messageObject.isRitual()) {
@@ -784,7 +784,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				const userData = await sb.User.get(senderUsername, false);
 				const channelData = sb.Channel.get(channelName, this.platform);
 
-				sb.SystemLogger.send("Twitch.Ritual", `${messageObject.systemMessage} ${messageText}`, channelData, userData);
+				sb.Logger.log("Twitch.Ritual", `${messageObject.systemMessage} ${messageText}`, channelData, userData);
 			}
 		}
 		else {
