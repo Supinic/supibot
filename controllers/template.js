@@ -21,12 +21,12 @@ module.exports = class Controller {
 			return;
 		}
 
-		const channelMap = this.platform.userMessagePromises.get(channelData);
-		if (channelMap && channelMap.has(userData)) {
-			const { promise, timeout } = channelMap.get(userData);
+		const channelMap = this.platform.userMessagePromises.get(channelData.ID);
+		if (channelMap && channelMap.has(userData.ID)) {
+			const { promise, timeout } = channelMap.get(userData.ID);
 
 			clearTimeout(timeout);
-			channelMap.delete(userData);
+			channelMap.delete(userData.ID);
 			promise.resolve({ message });
 		}
 	}
