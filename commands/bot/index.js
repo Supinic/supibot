@@ -235,14 +235,13 @@ module.exports = {
 						success: false,
 						reply: sb.Utils.tag.trim `
 							The ban has already taken place for too long.
-							Create a suggestion with the "$suggest" command, describe what happened.
+							Create a suggestion with the "$suggest" command and describe what happened.
 							Also mention how you intend to make sure this doesn't happen again.
 						`
 					};
 				}
 
 				try {
-					await context.platform.client.part(channelData.Name);
 					await context.platform.client.join(channelData.Name);
 				}
 				catch (e) {
@@ -253,7 +252,7 @@ module.exports = {
 				}
 
 				return {
-					reply: `Attempted to re-join ${channelString}.`
+					reply: `Attempted to re-join ${channelString}. This will not work if the ban is still active.`
 				};
 			}
 
