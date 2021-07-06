@@ -873,7 +873,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		while (index < sets.length) {
 			const slice = sets.slice(index, index + sliceLength);
 			const { statusCode, body } = await sb.Got("Leppunen", {
-				url: "v2/twitch/getEmoteSet",
+				url: "v2/twitch/emotes/sets",
 				searchParams: {
 					set_id: slice.join(",")
 				}
