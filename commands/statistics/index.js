@@ -529,7 +529,7 @@ module.exports = {
 			{
 				name: "twitchlotto",
 				aliases: ["tl"],
-				description: "Posts stats for the $twitchlotto command - globally, or for a selected channel. You can use recalculate:true to force an update for the statistics in a specific channel.",
+				description: "Posts stats for the $twitchlotto command - globally, or for a selected channel. You can use <code>recalculate:true</code> to force an update for the statistics in a specific channel.",
 				execute: async (context, type, channel) => {
 					if (channel) {
 						const lottoData = await sb.Query.getRecordset(rs => rs
@@ -595,11 +595,14 @@ module.exports = {
 							obj.tagged = tagged;
 						}
 
+						const scorePercent = sb.Utils.round(obj.scored / obj.total * 100, 2);
+						const tagPercent = sb.Utils.round(obj.tagged / obj.total * 100, 2);
+
 						return {
 							reply: sb.Utils.tag.trim `
 								Channel "${channel}" has ${sb.Utils.groupDigits(obj.total)} TwitchLotto images in total.
-								${sb.Utils.groupDigits(obj.scored)} have been rated by the NSFW AI,
-								and out of those, ${sb.Utils.groupDigits(obj.tagged)} have been flagged by contributors.
+								${sb.Utils.groupDigits(obj.scored)} (${scorePercent}%) have been rated by the NSFW AI,
+								and out of those, ${sb.Utils.groupDigits(obj.tagged)} (${tagPercent}%) have been flagged by contributors.
 							`
 						};
 					}
@@ -610,11 +613,14 @@ module.exports = {
 							.single()
 						);
 
+						const scorePercent = sb.Utils.round(lottoData.Scored / lottoData.Amount * 100, 2);
+						const tagPercent = sb.Utils.round(lottoData.Tagged / lottoData.Amount * 100, 2);
+
 						return {
 							reply: sb.Utils.tag.trim `
 								The TwitchLotto database has ${sb.Utils.groupDigits(lottoData.Amount)} images in total.
-								${sb.Utils.groupDigits(lottoData.Scored)} have been rated by the NSFW AI,
-								and out of those, ${sb.Utils.groupDigits(lottoData.Tagged)} have been flagged by contributors.
+								${sb.Utils.groupDigits(lottoData.Scored)} (${scorePercent}%)  have been rated by the NSFW AI,
+								and out of those, ${sb.Utils.groupDigits(lottoData.Tagged)} (${tagPercent}%) have been flagged by contributors.
 							`
 						};
 					}
