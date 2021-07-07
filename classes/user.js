@@ -171,6 +171,13 @@ module.exports = class User extends require("./template.js") {
 			Property: property
 		}, true);
 
+		if (!row.loaded) {
+			row.setValues({
+				User_Alias: this.ID,
+				Property: property
+			});
+		}
+
 		row.values.Value = variable.value;
 		await row.save({ skipLoad: true });
 	}
