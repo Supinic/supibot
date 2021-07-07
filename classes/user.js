@@ -165,7 +165,7 @@ module.exports = class User extends require("./template.js") {
 			Type: type
 		});
 
-		const row = await sb.Query.getRow("chat_data", "User_Alias_Data_Property");
+		const row = await sb.Query.getRow("chat_data", "User_Alias_Data");
 		await row.load({
 			User_Alias: this.ID,
 			Property: property
