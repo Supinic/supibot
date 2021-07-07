@@ -242,7 +242,7 @@ module.exports = {
 				}
 
 				try {
-					await context.platform.client.join(channelData.Name);
+					await sb.Platform.get("twitch").client.join(channelData.Name);
 				}
 				catch (e) {
 					return {
