@@ -36,6 +36,7 @@
 		"chat_data/tables/Channel_Chat_Module",
 		"chat_data/tables/User_Alias",
 		"chat_data/tables/User_Alias_Data",
+		"chat_data/tables/User_Alias_Data_Property",
 		"chat_data/tables/Command",
 		"chat_data/tables/Command_Execution",
 		"chat_data/tables/AFK",
@@ -86,7 +87,7 @@
 			console.warn(`An error occured while executing ${target}.sql! Skipping...`, e);
 			continue;
 		}
-		
+
 		if (status === 0) {
 			counter++;
 			console.log(`${string} created successfully`);
