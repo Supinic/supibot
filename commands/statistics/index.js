@@ -553,7 +553,15 @@ module.exports = {
 						};
 
 						if (context.params.recalculate) {
-							const [scored, tagged, deleted] = await Promise.all([
+							const [total, scored, tagged, deleted] = await Promise.all([
+								sb.Query.getRecordset(rs => rs
+									.select("COUNT(*) AS Count")
+									.from("data", "Twitch_Lotto")
+									.where("Channel = %s", channel)
+									.where("Available = %b OR Available IS NULL", true)
+									.single()
+									.flat("Count")
+								),
 								sb.Query.getRecordset(rs => rs
 									.select("COUNT(*) AS Count")
 									.from("data", "Twitch_Lotto")
@@ -585,6 +593,7 @@ module.exports = {
 
 							await sb.Query.getRecordUpdater(ru => ru
 								.update("data", "Twitch_Lotto_Channel")
+								.set("Amount", total)
 								.set("Scored", scored)
 								.set("Tagged", tagged)
 								.set("Unavailable", deleted)
@@ -619,7 +628,7 @@ module.exports = {
 						return {
 							reply: sb.Utils.tag.trim `
 								The TwitchLotto database has ${sb.Utils.groupDigits(lottoData.Amount)} images in total.
-								${sb.Utils.groupDigits(lottoData.Scored)} (${scorePercent}%)  have been rated by the NSFW AI,
+								${sb.Utils.groupDigits(lottoData.Scored)} (${scorePercent}%) have been rated by the NSFW AI,
 								and out of those, ${sb.Utils.groupDigits(lottoData.Tagged)} (${tagPercent}%) have been flagged by contributors.
 							`
 						};
