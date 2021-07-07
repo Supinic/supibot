@@ -533,7 +533,7 @@ module.exports = {
 				execute: async (context, type, channel) => {
 					if (channel) {
 						const lottoData = await sb.Query.getRecordset(rs => rs
-							.select("Channel", "Amount", "Scored", "Tagged")
+							.select("Amount", "Scored", "Tagged")
 							.from("data", "Twitch_Lotto_Channel")
 							.where("Name = %s", channel)
 							.single()
