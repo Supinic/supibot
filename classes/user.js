@@ -78,7 +78,7 @@ module.exports = class User extends require("./template.js") {
 	}
 
 	/**
-	 * Pushes a property change to the dataabse.
+	 * Pushes a property change to the database.
 	 * @param {string} property
 	 * @param {*} value
 	 * @returns {Promise<void>}
@@ -91,6 +91,88 @@ module.exports = class User extends require("./template.js") {
 
 		await User.invalidateUserCache(this);
 		await User.populateCaches(this);
+	}
+
+	/**
+	 * Fetches a user data property from the database.
+	 * @param {string} property
+	 * @param {Object} options
+	 * @returns {Promise<undefined|null|*>}
+	 * - Returns `undefined` if property doesn't exist
+	 * - Returns `null` or any respective primitive/objec/function value as determined by the saved value
+	 */
+	async getDataProperty (property, options = {}) {
+		const data = await sb.Query.getRecordset(rs => rs
+			.select("Property", "Value")
+			.select("User_Alias_Data_Property.Type AS Type")
+			.from("chat_data", "User_Alias_Data")
+			.leftJoin({
+				toTable: "User_Alias_Data_Property",
+				on: "User_Alias_Data_Property.Name = User_Alias_Data.Property"
+			})
+			.where("User_Alias = %n", this.ID)
+			.where("Property = %s", property)
+			.limit(1)
+			.single()
+		);
+
+		if (!data) {
+			return undefined;
+		}
+		else if (!data.Type) {
+			throw new sb.Error({
+				message: "No type is associated with this variable",
+				args: { property }
+			});
+		}
+
+		const variable = new sb.Config({
+			Name: property,
+			Value: data.Value,
+			Type: data.Type
+		});
+
+		return variable.value;
+	}
+
+	/**
+	 * Saves a user data property into the database.
+	 * @param {string} property
+	 * @param {*} value
+	 * @param {Object} options
+	 * @returns {Promise<void>}
+	 */
+	async setDataProperty (property, value, options = {}) {
+		const type = await sb.Query.getRecordset(rs => rs
+			.select("Type")
+			.from("chat_data", "User_Alias_Data_Property")
+			.where("Name = %s", property)
+			.limit(1)
+			.single()
+			.flat("Type")
+		);
+
+		if (!type) {
+			throw new sb.Error({
+				message: "No type is associated with this variable",
+				args: { property }
+			});
+		}
+
+		const variable = new sb.Config({
+			Name: property,
+			Value: value,
+			Type: type
+		});
+
+		const row = await sb.Query.getRow("chat_data", "User_Alias_Data_Property");
+		await row.load({
+			User_Alias: this.ID,
+			Property: property
+		}, true);
+
+		row.values.Value = variable.value;
+		await row.save({ skipLoad: true });
 	}
 
 	async serialize () {
