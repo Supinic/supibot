@@ -557,7 +557,7 @@ module.exports = {
 								sb.Query.getRecordset(rs => rs
 									.select("COUNT(*) AS Count")
 									.from("data", "Twitch_Lotto")
-									.where("Name = %s", channel)
+									.where("Channel = %s", channel)
 									.where("Score IS NOT NULL")
 									.where("Available = %b OR Available IS NULL", true)
 									.single()
@@ -566,7 +566,7 @@ module.exports = {
 								sb.Query.getRecordset(rs => rs
 									.select("COUNT(*) AS Count")
 									.from("data", "Twitch_Lotto")
-									.where("Name = %s", channel)
+									.where("Channel = %s", channel)
 									.where("Score IS NOT NULL")
 									.where("Adult_Flags IS NOT NULL")
 									.where("Available = %b OR Available IS NULL", true)
@@ -576,7 +576,7 @@ module.exports = {
 								sb.Query.getRecordset(rs => rs
 									.select("COUNT(*) AS Count")
 									.from("data", "Twitch_Lotto")
-									.where("Name = %s", channel)
+									.where("Channel = %s", channel)
 									.where("Available = %b", false)
 									.single()
 									.flat("Count")
@@ -588,7 +588,7 @@ module.exports = {
 								.set("Scored", scored)
 								.set("Tagged", tagged)
 								.set("Unavailable", deleted)
-								.where("Channel = %s", channel)
+								.where("Name = %s", channel)
 							);
 
 							obj.scored = scored;
