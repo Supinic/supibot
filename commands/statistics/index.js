@@ -602,6 +602,7 @@ module.exports = {
 
 							obj.scored = scored;
 							obj.tagged = tagged;
+							obj.total = total;
 						}
 
 						const scorePercent = sb.Utils.round(obj.scored / obj.total * 100, 2);
