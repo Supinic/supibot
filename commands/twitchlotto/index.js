@@ -380,7 +380,6 @@ module.exports = {
 						<th><b>Name</b></tdh>
 						<th><b>Total amount</b></th>
 						<th><b>Scored by API</b></th>
-						<th><b>Deleted from Imgur</b></th>
 						<th><b>Completion</b></th>
 					</tr>
 				</thead>
