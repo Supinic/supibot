@@ -313,7 +313,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix) => {
 		const countData = await sb.Query.getRecordset(rs => rs
-			.select("Name", "Amount", "Scored", "Tagged", "Unavailable")
+			.select("Name", "Amount", "Scored")
 			.from("data", "Twitch_Lotto_Channel")
 			.orderBy("Amount DESC")
 		);
@@ -323,8 +323,7 @@ module.exports = {
 				<td>${i.Name}</td>
 				<td data-order=${i.Amount}>${sb.Utils.groupDigits(i.Amount)}</td>
 				<td data-order=${i.Scored}>${sb.Utils.groupDigits(i.Scored)}</td>
-				<td data-order=${i.Unavailable}>${sb.Utils.groupDigits(i.Unavailable)}</td>
-				<td>${sb.Utils.round(100 * i.Scored / (i.Amount - i.Unavailable), 2)}%</td>
+				<td>${sb.Utils.round(100 * i.Scored / i.Amount, 2)}%</td>
 			</tr>
 		`).join("\n");
 
