@@ -82,8 +82,32 @@ module.exports = {
 		}
 
 		const ratio = response.body[convertKey].val;
+		const firstAmount = sb.Utils.groupDigits(amount * multiplier);
+		const secondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, 3));
+
+		let message = `${firstAmount} ${first} = ${secondAmount} ${second}`;
+
+		// Special case for Iranian Rial - official exchange rates are frozen (as of 2021) and not relevant
+		if (first === "IRR" || second === "IRR") {
+			const otherCurrency = (first === "IRR") ? second : first;
+			const response = await sb.Got("GenericAPI", {
+				url: `https://raters.ir/exchange/api/currency/${otherCurrency}`
+			});
+
+			if (response.statusCode === 200) {
+				const [price] = response.body.data.prices;
+				let fixedRatio = Number(price.live.replace(",", ""));
+				if (first === "IRR") {
+					fixedRatio = 1 / fixedRatio;
+				}
+
+				const fixedSecondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * fixedRatio, 3));
+				message = `Official: ${message}; True: ${firstAmount} ${first} = ${fixedSecondAmount} ${second}`;
+			}
+		}
+
 		return {
-			reply: `${amount * multiplier} ${first} = ${sb.Utils.round(amount * multiplier * ratio, 3)} ${second}`
+			reply: message
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
