@@ -118,6 +118,13 @@ module.exports = {
 
 		const isAdmin = Boolean(context.user.Data.administrator);
 		if (!options.Channel && !isAdmin) {
+			if (context.privateMessage) {
+				return {
+					success: false,
+					reply: `When using this command in whispers, you must provide a channel with the "channel:(name)" parameter!`
+				};
+			}
+
 			options.Channel = context.channel.ID;
 		}
 
