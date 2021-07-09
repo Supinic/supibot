@@ -571,44 +571,6 @@ class Command extends require("./template.js") {
 			);
 		}
 
-		const filterData = await sb.Filter.execute({
-			user: userData,
-			command,
-			invocation: identifier,
-			channel: channelData ?? null,
-			platform: channelData?.Platform ?? null,
-			targetUser: argumentArray[0] ?? null,
-			args: argumentArray ?? []
-		});
-
-		if (!filterData.success) {
-			sb.CooldownManager.unsetPending(userData.ID);
-
-			let length = command.Cooldown;
-			const cooldownFilter = sb.Filter.getCooldownModifiers({
-				platform: channelData?.Platform ?? null,
-				channel: channelData,
-				command,
-				invocation: identifier,
-				user: userData
-			});
-
-			if (cooldownFilter) {
-				length = cooldownFilter.applyData(length);
-			}
-
-			sb.CooldownManager.set(channelID, userData.ID, command.ID, length);
-
-			await sb.Runtime.incrementRejectedCommands();
-
-			if (filterData.filter.Response === "Reason" && typeof filterData.reply === "string") {
-				const { string } = await sb.Banphrase.execute(filterData.reply, channelData);
-				filterData.reply = string;
-			}
-
-			return filterData;
-		}
-
 		const appendOptions = { ...options };
 		const isPrivateMessage = (!channelData);
 
@@ -722,6 +684,44 @@ class Command extends require("./template.js") {
 			}
 
 			args = remainingArgs.filter(Boolean);
+		}
+
+		const filterData = await sb.Filter.execute({
+			user: userData,
+			command,
+			invocation: identifier,
+			channel: channelData ?? null,
+			platform: channelData?.Platform ?? null,
+			targetUser: args[0] ?? null,
+			args: args ?? []
+		});
+
+		if (!filterData.success) {
+			sb.CooldownManager.unsetPending(userData.ID);
+
+			let length = command.Cooldown;
+			const cooldownFilter = sb.Filter.getCooldownModifiers({
+				platform: channelData?.Platform ?? null,
+				channel: channelData,
+				command,
+				invocation: identifier,
+				user: userData
+			});
+
+			if (cooldownFilter) {
+				length = cooldownFilter.applyData(length);
+			}
+
+			sb.CooldownManager.set(channelID, userData.ID, command.ID, length);
+
+			await sb.Runtime.incrementRejectedCommands();
+
+			if (filterData.filter.Response === "Reason" && typeof filterData.reply === "string") {
+				const { string } = await sb.Banphrase.execute(filterData.reply, channelData);
+				filterData.reply = string;
+			}
+
+			return filterData;
 		}
 
 		/** @type CommandResult */
