@@ -76,7 +76,7 @@ module.exports = {
 				},
 				{
 					method: "rolls a random number for a static link",
-					types: ["vessel", "waifu"],
+					types: ["fursona", "vessel", "waifu"],
 					descriptions: [
 						`<code>fursona</code> - <a href="https://thisfursonadoesnotexist.com/">This fursona does not exist</a>`,
 						`<code>vessel</code> - <a href="https://thisvesseldoesnotexist.com/#/fakes/">This vessel does not exist</a>`,
