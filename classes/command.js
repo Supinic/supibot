@@ -54,7 +54,8 @@ class Context {
 
 		const promises = levels.map(async (level) => {
 			if (level === "admin") {
-				return Boolean(userData?.Data.administrator);
+				const isAdmin = await userData.getDataProperty("administrator");
+				return (isAdmin === true);
 			}
 			else if (level === "owner") {
 				return Boolean(await platformData?.isUserChannelOwner(channelData, userData));
@@ -563,7 +564,9 @@ class Command extends require("./template.js") {
 		// If skipPending flag is set, do not set the pending status at all.
 		// Used in pipe command, for instance.
 		// Administrators are not affected by Pending - this is expected to be used for debugging.
-		if (!options.skipPending && !userData.Data.administrator) {
+		const isAdmin = await userData.getDataProperty("administrator");
+
+		if (!options.skipPending && isAdmin !== true) {
 			const sourceName = channelData?.Name ?? `${options.platform.Name} PMs`;
 			sb.CooldownManager.setPending(
 				userData.ID,
