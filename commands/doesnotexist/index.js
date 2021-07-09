@@ -154,13 +154,13 @@ module.exports = {
 					method: "scraping for an image link",
 					types: "fuckeduphomer",
 					descriptions: [`<code>fuckeduphomer</code> - <a href="https://www.thisfuckeduphomerdoesnotexist.com/">This fucked up Homer does not exist</a>`],
-					execute: async (context, type) => {
+					execute: async () => {
 						const html = await sb.Got("https://www.thisfuckeduphomerdoesnotexist.com/").text();
 						const $ = sb.Utils.cheerio(html);
 						const image = $("#image-payload").attr("src");
 
 						return {
-							reply: `This ${type} does not exist: ${image}`
+							reply: `This fucked up Homer does not exist: ${image}`
 						};
 					}
 				},
@@ -168,7 +168,7 @@ module.exports = {
 					method: "scraping for a list of image links + text, and caching",
 					types: "mp",
 					descriptions: [`<code>mp</code> - <a href="https://vole.wtf/this-mp-does-not-exist/"This MP does not exist</a>`],
-					execute: async (context, type) => {
+					execute: async () => {
 						let data = await this.getCacheData("mp-data");
 						if (!data) {
 							const html = await sb.Got("https://vole.wtf/this-mp-does-not-exist/").text();
@@ -191,7 +191,7 @@ module.exports = {
 						const link = `https://vole.wtf/this-mp-does-not-exist/mp/mp${id}.jpg`;
 
 						return {
-							reply: `This ${type} does not exist: ${link} - ${member.name} from ${member.location}`
+							reply: `This MP does not exist: ${link} - ${member.name} from ${member.location}`
 						};
 					}
 				}
