@@ -20,8 +20,19 @@ module.exports = {
 			}
 		};
 
+		const staticNumberedLinkMap = {
+			fursona: () => `https://thisfursonadoesnotexist.com/v2/jpgs-2x/seed${sb.Utils.random(1, 99999)}.jpg`,
+			vessel: () => {
+				const number = sb.Utils.random(1, 2e4);
+				const padded = sb.Utils.zf(number, 7);
+
+				return `https://thisvesseldoesnotexist.s3-us-west-2.amazonaws.com/public/v2/fakes/${padded}.jpg`;
+			},
+			waifu: () => `https://www.thiswaifudoesnotexist.net/example-${sb.Utils.random(1, 1e5)}.jpg`
+		};
+
 		return {
-			types: ["artwork", "automobile", "cat", "horse", "person", "waifu", "word"],
+			types: ["artwork", "automobile", "cat", "fuckeduphomer", "fursona", "horse", "mp", "person", "vessel", "waifu", "word"],
 			fetch: [
 				{
 					method: "reuploading a provided random image",
@@ -65,11 +76,14 @@ module.exports = {
 				},
 				{
 					method: "rolls a random number for a static link",
-					types: ["waifu"],
-					descriptions: [`<code>waifu</code> - <a href="https://www.thiswaifudoesnotexist.net/">This waifu does not exist</a>`],
+					types: ["vessel", "waifu"],
+					descriptions: [
+						`<code>fursona</code> - <a href="https://thisfursonadoesnotexist.com/">This fursona does not exist</a>`,
+						`<code>vessel</code> - <a href="https://thisvesseldoesnotexist.com/#/fakes/">This vessel does not exist</a>`,
+						`<code>waifu</code> - <a href="https://www.thiswaifudoesnotexist.net/">This waifu does not exist</a>`
+					],
 					execute: async (context, type) => {
-						const number = sb.Utils.random(1, 1e5);
-						const link = `https://www.thiswaifudoesnotexist.net/example-${number}.jpg`;
+						const link = staticNumberedLinkMap[type]();
 						return {
 							link,
 							reply: `This ${type} does not exist: ${link}`
@@ -113,7 +127,7 @@ module.exports = {
 				{
 					method: "scraping for a base64 encoded image, turning it into a buffer, then upload to nuuls/imgur",
 					types: "automobile",
-					descriptions: [],
+					descriptions: [`<code>automobile</code> - <a href="https://www.thisautomobiledoesnotexist.com/">This automobile does not exist</a>`],
 					execute: async (context, type) => {
 						const imageResponse = await sb.Got("https://www.thisautomobiledoesnotexist.com/");
 						const $ = sb.Utils.cheerio(imageResponse.body);
@@ -133,6 +147,51 @@ module.exports = {
 
 						return {
 							reply: `This ${type} does not exist: ${result.link}`
+						};
+					}
+				},
+				{
+					method: "scraping for an image link",
+					types: "fuckeduphomer",
+					descriptions: [`<code>fuckeduphomer</code> - <a href="https://www.thisfuckeduphomerdoesnotexist.com/">This fucked up Homer does not exist</a>`],
+					execute: async (context, type) => {
+						const html = await sb.Got("https://www.thisfuckeduphomerdoesnotexist.com/").text();
+						const $ = sb.Utils.cheerio(html);
+						const image = $("#image-payload").attr("src");
+
+						return {
+							reply: `This ${type} does not exist: ${image}`
+						};
+					}
+				},
+				{
+					method: "scraping for a list of image links + text, and caching",
+					types: "mp",
+					descriptions: [`<code>mp</code> - <a href="https://vole.wtf/this-mp-does-not-exist/"This MP does not exist</a>`],
+					execute: async (context, type) => {
+						let data = await this.getCacheData("mp-data");
+						if (!data) {
+							const html = await sb.Got("https://vole.wtf/this-mp-does-not-exist/").text();
+							const $ = sb.Utils.cheerio(html);
+							const list = $("section ul");
+
+							data = [...list.children()].map(item => {
+								const id = Number(item.attribs["data-id"]);
+								const name = item.children[0].firstChild.data.trim();
+								const location = item.children[2].firstChild.data.trim();
+
+								return { id, name, location };
+							});
+
+							await this.setCacheData("mp-data", data, { expiry: 30 * 864e5 }); // 30 days
+						}
+
+						const member = sb.Utils.randArray(data);
+						const id = sb.Utils.zf(member.id, 5);
+						const link = `https://vole.wtf/this-mp-does-not-exist/mp/mp${id}.jpg`;
+
+						return {
+							reply: `This ${type} does not exist: ${link} - ${member.name} from ${member.location}`
 						};
 					}
 				}
