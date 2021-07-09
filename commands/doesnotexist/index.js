@@ -167,7 +167,7 @@ module.exports = {
 				{
 					method: "scraping for a list of image links + text, and caching",
 					types: "mp",
-					descriptions: [`<code>mp</code> - <a href="https://vole.wtf/this-mp-does-not-exist/"This MP does not exist</a>`],
+					descriptions: [`<code>mp</code> - <a href="https://vole.wtf/this-mp-does-not-exist/">This MP does not exist</a>`],
 					execute: async () => {
 						let data = await this.getCacheData("mp-data");
 						if (!data) {
