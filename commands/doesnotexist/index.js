@@ -117,8 +117,8 @@ module.exports = {
 					execute: async (context, type) => {
 						const imageResponse = await sb.Got("https://www.thisautomobiledoesnotexist.com/");
 						const $ = sb.Utils.cheerio(imageResponse.body);
-						const imageSource = $("#vehicle").attr("src");
-						const imageBuffer = Buffer.from(imageSource, "base64").replace("data:image/png;base64,", "");
+						const imageSource = $("#vehicle").attr("src").replace("data:image/png;base64,", "");
+						const imageBuffer = Buffer.from(imageSource, "base64");
 
 						let result = await sb.Utils.uploadToNuuls(imageBuffer);
 						if (result.statusCode !== 200) {
