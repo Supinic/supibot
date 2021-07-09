@@ -232,7 +232,11 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { fetch } = values.getStaticData();
-		const list = fetch.flatMap(i => i.descriptions).map(i => `<li>${i}</li>`).join("");
+		const list = fetch
+			.flatMap(i => i.descriptions)
+			.sort()
+			.map(i => `<li>${i}</li>`)
+			.join("");
 
 		return [
 			`Posts a random picture from the set of "this X does not exist" websites.`,
