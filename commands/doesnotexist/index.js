@@ -21,7 +21,7 @@ module.exports = {
 		};
 
 		return {
-			types: ["artwork", "cat", "horse", "person", "waifu", "word"],
+			types: ["artwork", "automobile", "cat", "horse", "person", "waifu", "word"],
 			fetch: [
 				{
 					method: "reuploading a provided random image",
@@ -107,6 +107,32 @@ module.exports = {
 								${definition}.
 								Example: ${example ?? "N/A"}
 							`
+						};
+					}
+				},
+				{
+					method: "scraping for a base64 encoded image, turning it into a buffer, then upload to nuuls/imgur",
+					types: "automobile",
+					descriptions: [],
+					execute: async (context, type) => {
+						const imageResponse = await sb.Got("https://www.thisautomobiledoesnotexist.com/");
+						const $ = sb.Utils.cheerio(imageResponse.body);
+						const imageSource = $("#vehicle").attr("src");
+						const imageBuffer = Buffer.from(imageSource, "base64").replace("data:image/png;base64,", "");
+
+						let result = await sb.Utils.uploadToNuuls(imageBuffer);
+						if (result.statusCode !== 200) {
+							result = await sb.Utils.uploadToImgur(imageBuffer);
+							if (result.statusCode !== 200) {
+								return {
+									success: false,
+									reply: `Couldn't upload the picture to either Nuuls or Imgur!`
+								};
+							}
+						}
+
+						return {
+							reply: `This ${type} does not exist: ${result.link}`
 						};
 					}
 				}
