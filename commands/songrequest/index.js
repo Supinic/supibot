@@ -460,6 +460,14 @@ module.exports = {
 				vlcLink = result.stdout;
 			}
 
+			// Extreme hard-coded exception! Apparently, some YouTube videos do not play properly in VLC if and only
+			// if they are queued with HTTPS. This is a temporary solution and should be removed as soon as a proper
+			// fix exists. Probably upgrading to VLC 4.x will work.
+			// Reference: https://forum.videolan.org/viewtopic.php?t=111579
+			if (data.type === "youtube") {
+				vlcLink = vlcLink.replace("https://", "http://");
+			}
+
 			id = await sb.VideoLANConnector.add(vlcLink, { startTime, endTime });
 		}
 		catch (e) {
