@@ -212,6 +212,13 @@ module.exports = {
 		}
 
 		const eligiblePosts = postList.filter(i => i[resultType]);
+		if (eligiblePosts.length === 0) {
+			return {
+				success: false,
+				reply: `No valid posts found!`
+			};
+		}
+		
 		const post = sb.Utils.randArray(eligiblePosts);
 		const delta = sb.Utils.timeDelta(post.created);
 
