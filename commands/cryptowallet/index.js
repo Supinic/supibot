@@ -93,6 +93,7 @@ module.exports = {
 		`<code>${prefix}cryptowallet type:eth (address)</code>`,
 		`<code>${prefix}cryptowallet type:btc (address)</code>`,
 		`<code>${prefix}cryptowallet type:bitcoin (address)</code>`,
-		"Fetches the balance in the given cryptocurrency, USD and EUR. Default type is <code>BTC</code>, use the type param to change that."
+		"Fetches the balance in the given cryptocurrency, USD and EUR.",
+		"Default type is <code>BTC</code>, use the <code>type</code> parameter to change that."
 	])
 };
