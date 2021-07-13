@@ -5,11 +5,11 @@
  */
 module.exports = class Reminder extends require("./template.js") {
 	static LongTimeout = require("long-timeout");
-	
+
 	/** @type {Reminder} */
 	constructor (data) {
 		super();
-		
+
 		/**
 		 * Unique numeric ID.
 		 * @type {number}
@@ -203,7 +203,7 @@ module.exports = class Reminder extends require("./template.js") {
 			message: "Module Reminder cannot be serialized"
 		});
 	}
-	
+
 	static async loadData () {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("*")
@@ -287,7 +287,7 @@ module.exports = class Reminder extends require("./template.js") {
 				reminder.timeout = null;
 			}
 		}
-		
+
 		super.destroy();
 	}
 
@@ -427,13 +427,17 @@ module.exports = class Reminder extends require("./template.js") {
 			const username = (checkResult === false) ? "[Banphrased username]," : checkResult;
 			let message = `reminders from: ${reply.join("; ")}`;
 
+			if (channelData.Links_Allowed === false) {
+				message = sb.Utils.replaceLinks(message, "[LINK]");
+			}
+
 			// Check banphrases and do not check length limits, because it is later split manually
 			message = await channelData.prepareMessage(message, {
 				returnBooleanOnFail: true,
 				skipLengthCheck: true
 			});
 
-			if (typeof message === "string") {
+			if (typeof message === "string" && !message.includes("[LINK]")) {
 				message = `${username} ${message}`;
 
 				// Apply unpings, governed by the reminder command itself
@@ -473,8 +477,8 @@ module.exports = class Reminder extends require("./template.js") {
 
 				const message = sb.Utils.tag.trim `
 					Hey ${notifySymbol}${targetUserData.Name},
-					the banphrase check for your reminders failed.
-					Check them out here: ${link}
+					you just got reminders, but there's something banphrased in them,
+					so you should check them out here instead: ${link}
 				`;
 
 				await channelData.send(message);
