@@ -43,7 +43,7 @@ module.exports = {
 			},
 			{
 				target: "Got",
-				names: ["got"]
+				names: ["gots"]
 			},
 			{
 				target: "Reminder",
@@ -93,7 +93,7 @@ module.exports = {
 			};
 		}
 		else {
-			if (typeof module.reloadSpecific !== "function") {
+			if (!module.hasReloadSpecific()) {
 				return {
 					success: false,
 					reply: `This module does not support reloading a specific item!`
