@@ -55,7 +55,7 @@ module.exports = class ClassTemplate {
 
 		return { string };
 	}
-	
+
 	async getCacheData (key) {
 		if (typeof key === "string") {
 			key = { type: key };
@@ -76,7 +76,7 @@ module.exports = class ClassTemplate {
 		if (typeof key === "string") {
 			key = { type: key };
 		}
-		
+
 		return sb.Cache.setByPrefix(this.getCacheKey(), value, {
 			keys: { ...key },
 			...options
@@ -150,6 +150,14 @@ module.exports = class ClassTemplate {
 		throw new sb.Error({
 			message: "Module does not implement reloadSpecific"
 		});
+	}
+
+	/**
+	 * Determines whether a child class has its own implemenation of `reloadSpecific`
+	 * @returns {boolean}
+	 */
+	static hasReloadSpecific () {
+		return (this.reloadSpecific !== ClassTemplate.reloadSpecific);
 	}
 
 	static async get () {
