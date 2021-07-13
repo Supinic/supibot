@@ -146,8 +146,11 @@ module.exports = {
 			else if (result.success === false) { // Command result: Failed (cooldown, no command, ...)
 				if (context.params._force) {
 					const reply = result.reply ?? "(no reply)";
+					const string = sb.Utils.wrapString(reply, this.staticData.resultCharacterLimit, {
+						keepWhitespace: true
+					});
 
-					currentArgs = sb.Utils.wrapString(reply, this.staticData.resultCharacterLimit).split(" ");
+					currentArgs = string.split(" ");
 				}
 				else {
 					const reply = this.staticData.reasons[result.reason] ?? result.reply ?? result.reason;
@@ -167,7 +170,11 @@ module.exports = {
 				currentArgs = result.reply.split(" ");
 			}
 			else {
-				currentArgs = sb.Utils.wrapString(result.reply, this.staticData.resultCharacterLimit).split(" ");
+				const string = sb.Utils.wrapString(result.reply, this.staticData.resultCharacterLimit, {
+					keepWhitespace: true
+				});
+
+				currentArgs = string.split(" ");
 			}
 
 			// lastCommand = sb.Command.get(cmd.replace(sb.Command.prefix, ""));
