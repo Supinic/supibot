@@ -227,7 +227,7 @@ module.exports = {
 				if (channelData.Platform.Name !== "twitch") {
 					return {
 						success: false,
-						reply: `Re-enabling the bot after a ban is currently available only in Twitch channels!`
+						reply: `Re-enabling the bot after a ban is currently only available for Twitch channels!`
 					};
 				}
 				else if (channelData.Mode === "Inactive") {
@@ -241,18 +241,27 @@ module.exports = {
 					};
 				}
 
+				let partFailed = false;
+				let joinFailed = false;
+				const { client } = sb.Platform.get("twitch");
 				try {
-					await sb.Platform.get("twitch").client.join(channelData.Name);
+					await client.part(channelData.Name);
 				}
-				catch (e) {
-					return {
-						success: false,
-						reply: `I am still banned in that channel!`
-					};
+				catch {
+					partFailed = true;
+				}
+
+				try {
+					await client.join(channelData.Name);
+				}
+				catch {
+					joinFailed = true;
 				}
 
 				return {
-					reply: `Attempted to re-join ${channelString}. This will not work if the ban is still active.`
+					reply: (partFailed && joinFailed)
+						? `Attempted to re-join ${channelString} - but it was likely unsuccessful. The ban might still be active, make sure to check.`
+						: `Attempted to re-join ${channelString} - it was likely successful.`
 				};
 			}
 
