@@ -15,19 +15,19 @@ module.exports = {
 			merciless: null,
 			uber: null
 		};
-	
+
 		const ascendancies = ["Slayer", "Gladiator", "Champion", "Assassin", "Saboteur", "Trickster", "Juggernaut", "Berserker", "Chieftain", "Necromancer", "Elementalist", "Occultist", "Deadeye", "Raider", "Pathfinder", "Inquisitor", "Hierophant", "Guardian", "Ascendant"];
 		const additionalGems = ["Ancestral Cry","Anger","Arcane Cloak","Arctic Armour","Assassin's Mark","Berserk","Blood and Sand","Bone Offering","Clarity","Conductivity","Convocation","Dash","Decoy Totem","Desecrate","Despair","Determination","Devouring Totem","Discipline","Dread Banner","Elemental Weakness","Enduring Cry","Enfeeble","Ensnaring Arrow","Flammability","Flesh Offering","Flesh and Stone","Frost Wall","General's Cry","Grace","Haste","Hatred","Herald of Ash","Herald of Ice","Herald of Thunder","Immortal Call","Intimidating Cry","Malevolence","Arcanist Brand","Phase Run","Plague Bearer","Poacher's Mark","Precision","Pride","Projectile Weakness","Punishment","Purity of Elements","Purity of Fire","Purity of Ice","Purity of Lightning","Rallying Cry","Reckoning","Rejuvenation Totem","Riposte","Seismic Cry","Smoke Mine","Spellslinger","Spirit Offering","Steelskin","Temporal Chains","Vaal Clarity","Vaal Discipline","Vaal Grace","Vaal Haste","Vaal Impurity of Fire","Vaal Impurity of Ice","Vaal Impurity of Lightning","Vengeance","Vitality","Vulnerability","War Banner","Warlord's Mark","Wither","Withering Step","Wrath","Zealotry"];
 		const skillGems = ["Ancestral Protector","Ancestral Warchief","Animate Guardian","Arc","Armageddon Brand","Artillery Ballista","Ball Lightning","Bane","Barrage","Bear Trap","Blade Blast","Blade Flurry","Blade Vortex","Bladefall","Bladestorm","Blast Rain","Blight","Blink Arrow","Blood Rage","Bodyswap","Burning Arrow","Caustic Arrow","Chain Hook","Charged Dash","Cleave","Cobra Lash","Cold Snap","Consecrated Path","Contagion","Conversion Trap","Creeping Frost","Cremation","Cyclone","Dark Pact","Detonate Dead","Discharge","Divine Ire","Dominating Blow","Double Strike","Dual Strike","Earthquake","Earthshatter","Elemental Hit","Essence Drain","Ethereal Knives","Explosive Arrow","Explosive Trap","Exsanguinate","Fire Trap","Fireball","Firestorm","Flame Dash","Flame Surge","Flameblast","Flamethrower Trap","Flicker Strike","Freezing Pulse","Frenzy","Frost Blades","Frost Bomb","Frostbite","Frostblink","Frostbolt","Galvanic Arrow","Glacial Cascade","Glacial Hammer","Ground Slam","Heavy Strike","Herald of Agony","Herald of Purity","Holy Flame Totem","Ice Crash","Ice Nova","Ice Shot","Ice Spear","Ice Trap","Icicle Mine","Incinerate","Infernal Blow","Infernal Cry","Kinetic Blast","Kinetic Bolt","Lacerate","Lancing Steel","Leap Slam","Lightning Arrow","Lightning Spire Trap","Lightning Strike","Lightning Tendrils","Lightning Trap","Lightning Warp","Magma Orb","Mirror Arrow","Molten Shell","Molten Strike","Orb of Storms","Penance Brand","Perforate","Pestilent Strike","Power Siphon","Puncture","Purifying Flame","Pyroclast Mine","Rain of Arrows","Raise Spectre","Raise Zombie","Reap","Reave","Righteous Fire","Scorching Ray","Scourge Arrow","Searing Bond","Seismic Trap","Shattering Steel","Shield Charge","Shock Nova","Shockwave Totem","Shrapnel Ballista","Siege Ballista","Siphoning Trap","Smite","Soulrend","Spark","Spectral Shield Throw","Spectral Throw","Split Arrow","Static Strike","Storm Brand","Storm Burst","Storm Call","Stormbind","Stormblast Mine","Summon Carrion Golem","Summon Chaos Golem","Summon Flame Golem","Summon Holy Relic","Summon Ice Golem","Summon Lightning Golem","Summon Raging Spirit","Summon Skeletons","Summon Skitterbots","Summon Stone Golem","Sunder","Sweep","Tectonic Slam","Tempest Shield","Tornado Shot","Toxic Rain","Unearth","Vaal Ancestral Warchief","Vaal Arc","Vaal Blade Vortex","Vaal Blight","Vaal Burning Arrow","Vaal Cold Snap","Vaal Cyclone","Vaal Detonate Dead","Vaal Double Strike","Vaal Earthquake","Vaal Fireball","Vaal Flameblast","Vaal Glacial Hammer","Vaal Ground Slam","Vaal Ice Nova","Vaal Lightning Strike","Vaal Lightning Trap","Vaal Molten Shell","Vaal Power Siphon","Vaal Rain of Arrows","Vaal Reave","Vaal Righteous Fire","Vaal Spark","Vaal Spectral Throw","Vaal Storm Call","Vaal Summon Skeletons","Venom Gyre","Vigilant Strike","Viper Strike","Volatile Dead","Vortex","Wave of Conviction","Whirling Blades","Wild Strike","Winter Orb","Wintertide Brand"];
-	
+
 		const trials = {
 			normal: "A1: Lower Prison; A2: Crypt lvl 1, Chamber of Sins lvl 2; A3: Crematorium, Catacombs, Imperial Gardens",
 			cruel: "A6: Prison; A7: Crypt; A7: Chamber of Sins lvl 2",
 			merciless: "A8: Bath House; A9: Tunnel; A10: Ossuary"
 		};
-	
+
 		trials.all = Object.values(trials).join(" -- ");
-	
+
 		return {
 			commands: [
 				{
@@ -42,26 +42,26 @@ module.exports = {
 								reply: `Invalid labyrinth type provided! Supported types: ${types.join(", ")}`
 							};
 						}
-	
+
 						if (!this.data.labyrinth.date || this.data.labyrinth.date.day !== new sb.Date().day) {
 							this.data.labyrinth.date = new sb.Date().setTimezoneOffset(0);
 							this.data.details = {};
-	
+
 							const { statusCode, statusMessage, body: html } = await sb.Got("FakeAgent", {
 								url: "https://poelab.com",
 								responseType: "text"
 							});
-	
+
 							if (statusCode === 503) {
 								return {
 									success: false,
 									reply: `Poelab website returned error ${statusCode} - ${statusMessage}! Can't access labyrinth images.`
 								};
 							}
-	
+
 							const $ = sb.Utils.cheerio(html);
 							const links = Array.from($(".redLink").slice(0, 4).map((_, i) => i.attribs.href));
-	
+
 							for (let i = 0; i < links.length; i++) {
 								const type = types[i];
 								this.data.details[type] = {
@@ -71,7 +71,7 @@ module.exports = {
 								};
 							}
 						}
-	
+
 						const detail = this.data.details[labType];
 						if (detail.imageLink === null) {
 							const html = await sb.Got("FakeAgent", {
@@ -80,10 +80,10 @@ module.exports = {
 							}).text();
 
 							const $ = sb.Utils.cheerio(html);
-	
+
 							detail.imageLink = $("#notesImg")[0].attribs.src;
 						}
-	
+
 						return {
 							reply: `Today's ${labType} labyrinth map: ${detail.imageLink}`
 						};
@@ -102,7 +102,7 @@ module.exports = {
 								reply: `No league or item provided!`
 							};
 						}
-	
+
 						const [league, item] = await Promise.all([
 							sb.Query.getRecordset(rs => rs
 								.select("*")
@@ -111,7 +111,7 @@ module.exports = {
 								.where("Active = %b", true)
 								.single()
 							),
-	
+
 							sb.Query.getRecordset(rs => rs
 								.select("*")
 								.from("poe", "Item")
@@ -131,7 +131,7 @@ module.exports = {
 								reply: `Provided item does not exist or is not being tracked!`
 							};
 						}
-	
+
 						const price = await sb.Query.getRecordset(rs => rs
 							.select("Chaos_Equivalent AS Chaos")
 							.from("poe", "Price")
@@ -145,13 +145,13 @@ module.exports = {
 								reply: `No price found for that item!`
 							};
 						}
-	
+
 						let reply = `${itemName} is currently worth ${price.Chaos} chaos in ${league.Name}.`;
 						if (price.Chaos < 0.5) {
 							const flipped = sb.Utils.round(1 / price.Chaos, 2);
 							reply = `1 chaos can currently buy ${flipped} of ${item.Name} in ${league.Name}.`;
 						}
-	
+
 						return { reply };
 					}
 				},
@@ -166,7 +166,7 @@ module.exports = {
 								reply: "Check the Syndicate sheet here (⚠HTTP only!⚠): http://poesyn.xyz/syndicate or the picture here: https://i.nuuls.com/huXFC.png"
 							};
 						}
-	
+
 						const type = (args.shift()) ?? null;
 						const data = await sb.Query.getRecordset(rs => rs
 							.select("*")
@@ -175,14 +175,14 @@ module.exports = {
 							.limit(1)
 							.single()
 						);
-	
+
 						if (!data) {
 							return {
 								success: false,
 								reply: "Syndicate member or type does not exist!"
 							};
 						}
-	
+
 						return {
 							reply: (type === null)
 								? Object.entries(data).map(([key, value]) => `${key}: ${value}`).join("; ")
@@ -214,10 +214,10 @@ module.exports = {
 									reply: "Must provide a user name - no channel is available!"
 								};
 							}
-	
+
 							user = context.channel.Name;
 						}
-	
+
 						const userData = await sb.User.get(user);
 						if (!userData) {
 							return {
@@ -225,7 +225,7 @@ module.exports = {
 								reply: "Provided user does not exist!"
 							};
 						}
-	
+
 						const link = userData.Data?.pathOfExile?.uniqueTabs ?? null;
 						if (!link) {
 							return {
@@ -233,7 +233,7 @@ module.exports = {
 								reply: `Provided user has no unique stash tabs set up!`
 							};
 						}
-	
+
 						return {
 							reply: `${userData.Name}'s unique tab(s): ${link}`
 						};
@@ -247,7 +247,7 @@ module.exports = {
 						const additional = sb.Utils.randArray(additionalGems);
 						const skill = sb.Utils.randArray(skillGems);
 						const ascendancy = sb.Utils.randArray(ascendancies);
-	
+
 						return {
 							reply: `${skill} + ${additional} ${ascendancy}`
 						};
@@ -261,28 +261,28 @@ module.exports = {
 						reply: `Heist cheatsheet: https://i.imgur.com/iN05OsU.png`
 					})
 				}
-	
+
 			]
 		};
 	}),
 	Code: (async function poe (context, type, ...args) {
 		if (!type) {
-			const ritual = new sb.Date("2021-04-16 22:00");
+			const expedition = new sb.Date("2021-07-23 22:00");
 			return {
-				reply: (ritual > Date.now())
-					? `The Ultimatum league launches ${sb.Utils.timeDelta(ritual)}.`
-					: "The Ultimatum league has launched! Go and play!"
+				reply: (expedition > Date.now())
+					? `The Expedition league launches ${sb.Utils.timeDelta(expedition)}.`
+					: "The Expedition league has launched! Go and play!"
 			};
-	
+
 		/*
 			return {
 				reply: `No subcommand provided! Check the command's help: https://supinic.com/bot/command/${this.ID}`
 			};
 		*/
 		}
-	
+
 		type = type.toLowerCase();
-	
+
 		const target = this.staticData.commands.find(i => i.name === type || i.aliases.includes(type));
 		if (!target) {
 			return {
@@ -290,16 +290,16 @@ module.exports = {
 				reply: `Provided subcommand does not exist! Check the command's help: https://supinic.com/bot/command/${this.ID}`
 			};
 		}
-	
+
 		return await target.execute(context, ...args);
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { commands } = values.getStaticData();
-	
+
 		return [
 			"Multiple commands related to Path of Exile.",
 			"",
-	
+
 			...commands.flatMap(command => [
 				`<code>${prefix}poe ${command.name}</code>`,
 				command.description,
