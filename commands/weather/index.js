@@ -12,7 +12,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		allowedTypes: ["cloudCover", "humidity", "icon", "place", "precipitation", "pressure", "sun", "temperature", "windGusts", "windSpeed"],
-		getIcon: (code) => {
+		getIcon: (code, current) => {
 			const type = Math.trunc(code / 100);
 			const remainder = code % 100;
 
@@ -47,7 +47,7 @@ module.exports = {
 			}
 			else if (type === 8) {
 				if (remainder === 0) {
-					return "☀";
+					return (current.uvi === 0) ? "🌙" : "☀";
 				}
 				else {
 					return "☁";
@@ -333,7 +333,7 @@ module.exports = {
 
 		const obj = {
 			place: (skipLocation) ? "(location hidden)" : formattedAddress,
-			icon: this.staticData.getIcon(target.weather[0].id),
+			icon: this.staticData.getIcon(target.weather[0].id, data.current),
 			cloudCover: `Cloud cover: ${target.clouds}%.`,
 			humidity: `Humidity: ${target.humidity}%.`,
 			pressure: `Air pressure: ${target.pressure} hPa.`,
