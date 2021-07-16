@@ -347,7 +347,7 @@ module.exports = {
 			{
 				code: "cz",
 				language: "czech",
-				source: [
+				sources: [
 					{
 						name: "Idnes",
 						url: "https://servis.idnes.cz",
