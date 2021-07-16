@@ -343,6 +343,26 @@ module.exports = {
 						helpers: ["boring_nick"]
 					}
 				]
+			},
+			{
+				code: "cz",
+				language: "czech",
+				source: [
+					{
+						name: "Idnes",
+						url: "https://servis.idnes.cz",
+						path: null,
+						endpoints: ["rss.aspx?c=zpravodaj"],
+						helpers: ["supinic"]
+					},
+					{
+						name: "Aktualne.cz",
+						url: "https://zpravy.aktualne.cz/",
+						path: "rss",
+						endpoints: ["", "domaci", "regiony"],
+						helpers: ["supinic"]
+					}
+				]
 			}
 		],
 
