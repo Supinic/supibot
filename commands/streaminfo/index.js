@@ -9,13 +9,30 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function streamInfo (context, ...args) {
-		const target = (args.length === 0)
-			? context.channel.Name
-			: args[0];
+		let targetChannel;
+		if (args.length === 0) {
+			if (context.platform.Name !== "twitch") {
+				return {
+					success: false,
+					reply: `No Twitch channel provided!`
+				};
+			}
+			else if (context.privateMessage) {
+				return {
+					success: false,
+					reply: `No channel provided!`
+				};
+			}
+
+			targetChannel = context.channel.Name;
+		}
+		else {
+			targetChannel = args[0];
+		}
 
 		const { controller } = sb.Platform.get("twitch");
-		const targetData = await sb.User.get(target);
-		const channelID = targetData?.Twitch_ID ?? await controller.getUserID(target);
+		const targetData = await sb.User.get(targetChannel);
+		const channelID = targetData?.Twitch_ID ?? await controller.getUserID(targetChannel);
 		if (!channelID) {
 			return {
 				success: false,
@@ -25,7 +42,7 @@ module.exports = {
 
 		const data = await sb.Got("Kraken", `streams/${channelID}`).json();
 		if (data === null || data.stream === null) {
-			const broadcasterData = await sb.Got("Leppunen", `v2/twitch/user/${target}`);
+			const broadcasterData = await sb.Got("Leppunen", `v2/twitch/user/${targetChannel}`);
 			const { lastBroadcast } = broadcasterData.body;
 			if (lastBroadcast.startedAt === null) {
 				return {
@@ -51,12 +68,12 @@ module.exports = {
 
 		return {
 			reply: sb.Utils.tag.trim `
-				${target} is ${broadcast}, 
+				${targetChannel} is ${broadcast}, 
 				since ${started} 
 				for ${sb.Utils.groupDigits(stream.viewers)} viewer${viewersSuffix}
 				at ${stream.video_height}p.
 				Title: ${stream.channel.status} 
-				https://twitch.tv/${target.toLowerCase()}
+				https://twitch.tv/${targetChannel.toLowerCase()}
 			`
 		};
 	}),
