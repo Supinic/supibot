@@ -16,7 +16,6 @@ module.exports = {
 		const { controller } = sb.Platform.get("twitch");
 		const targetData = await sb.User.get(target);
 		const channelID = targetData?.Twitch_ID ?? await controller.getUserID(target);
-
 		if (!channelID) {
 			return {
 				success: false,
@@ -26,32 +25,20 @@ module.exports = {
 
 		const data = await sb.Got("Kraken", `streams/${channelID}`).json();
 		if (data === null || data.stream === null) {
-			const { data } = await sb.Got("Helix", {
-				url: "videos",
-				searchParams: {
-					user_id: channelID
-				}
-			}).json();
-
-			if (data.length === 0) {
+			const broadcasterData = await sb.Got("Leppunen", `twitch/user/${target}`);
+			const { lastBroadcast } = broadcasterData.body;
+			if (lastBroadcast.startedAt === null) {
 				return {
-					reply: `Channel is offline.`
+					reply: `Channel is offline - never streamed before.`
 				};
 			}
 
-			let mult = 1000;
-			const { created_at: created, duration } = data[0];
-			const vodDuration = duration.split(/\D/).filter(Boolean).map(Number)
-				.reverse()
-				.reduce((acc, cur) => {
-					acc += cur * mult;
-					mult *= 60;
-					return acc;
-				}, 0);
+			const start = new sb.Date(lastBroadcast.startedAt);
+			const title = lastBroadcast.title ?? "(no title)";
+			const delta = sb.Utils.timeDelta(start, true);
 
-			const delta = sb.Utils.timeDelta(new sb.Date(created).valueOf() + vodDuration, true);
 			return {
-				reply: `Channel has been offline for ${delta}.`
+				reply: `Channel is offline - last streamed ${delta}, title: ${title}`
 			};
 		}
 
