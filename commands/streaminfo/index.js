@@ -25,7 +25,7 @@ module.exports = {
 
 		const data = await sb.Got("Kraken", `streams/${channelID}`).json();
 		if (data === null || data.stream === null) {
-			const broadcasterData = await sb.Got("Leppunen", `twitch/user/${target}`);
+			const broadcasterData = await sb.Got("Leppunen", `v2/twitch/user/${target}`);
 			const { lastBroadcast } = broadcasterData.body;
 			if (lastBroadcast.startedAt === null) {
 				return {
