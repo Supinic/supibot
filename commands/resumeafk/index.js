@@ -35,7 +35,7 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-		else if (lastAFK.Ended <= sb.Date.addMinutes(-5).valueOf()) {
+		else if (lastAFK.Ended <= new sb.Date().addMinutes(-5).valueOf()) {
 			return {
 				reply: "You cannot resume your AFK status, because it ended more than 5 minutes ago!",
 				cooldown: 2500
