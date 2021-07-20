@@ -66,7 +66,7 @@ module.exports = {
 						reply: `Provided channel does not exist on Twitch!`
 					};
 				}
-				else if (response.body.emotePrefix) {
+				else if (!response.body.emotePrefix) {
 					return {
 						success: false,
 						reply: `Provided channel does not have a subscriber emote prefix!`
