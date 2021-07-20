@@ -11,31 +11,31 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function whatEmoteIsIt (context, emote) {
-		const { statusCode, body: response } = await sb.Got("Leppunen", {
+		const response = await sb.Got("Leppunen", {
 			url: `twitch/emotes/${emote}`,
 			throwHttpErrors: false
 		});
 
-		if (statusCode >= 500) {
-			const { error } = response;
+		if (response.statusCode >= 500) {
+			const { error } = response.body;
 			await sb.Platform.get("twitch").pm(
-				`twitch/emotes API failed for emote "${emote}" - server error ${statusCode}: ${error}`,
+				`twitch/emotes API failed for emote "${emote}" - server error ${response.statusCode}: ${error ?? "(unknown)"}`,
 				"leppunen"
 			);
 
 			return {
 				success: false,
-				reply: `API failed with error ${statusCode}: ${error}!`
+				reply: `API failed with error ${response.statusCode}: ${error}!`
 			};
 		}
-		else if (statusCode !== 200) {
+		else if (response.statusCode !== 200) {
 			return {
 				success: false,
 				reply: response.error
 			};
 		}
 
-		const { channel, channelid: channelID, emotecode, emoteid, channellogin: login, tier } = response;
+		const { channel, channelid: channelID, emotecode, emoteid, channellogin: login, tier } = response.body;
 		const originID = await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("data", "Origin")
