@@ -119,7 +119,12 @@ module.exports = {
 		const target = this.staticData.invocations.find(i => i.name === invocation || i.aliases?.includes(invocation));
 
 		const text = await target.text(context, args.join(" ").trim());
-		await sb.AwayFromKeyboard.set(context.user, text, target.type ?? invocation, false);
+		await sb.AwayFromKeyboard.set(context.user, {
+			Text: text,
+			Type: target.type ?? invocation,
+			Silent: false,
+			Interrupted_ID: null
+		});
 
 		return {
 			partialReplies: [
