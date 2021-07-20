@@ -867,6 +867,9 @@ class Command extends require("./template.js") {
 		}
 
 		execution.reply = String(execution.reply).trim();
+		if (execution.reply.length === 0) {
+			execution.reply = "(empty message)";
+		}
 
 		const metaSkip = Boolean(!execution.partialReplies && (options.skipBanphrases || execution?.meta?.skipBanphrases));
 		if (!command.Flags.skipBanphrase && !metaSkip) {
