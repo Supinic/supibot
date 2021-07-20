@@ -160,27 +160,31 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 	/**
 	 * Sets (and creates a database row) a user's AFK status.
 	 * @param {sb.User} userData
-	 * @param {string} text
-	 * @param {string} status
-	 * @param {boolean} [silent] If true, user coming back will not be broadcast.
+	 * @param {Object} [data]
+	 * @param {string} [data.Text]
+	 * @param {sb.Date} [data.Started]
+	 * @param {string} [data.Status]
+	 * @param {boolean} [data.Silent] If true, user coming back will not be broadcast.
+	 * @param {boolean} [data.Interrupted_ID] If true, user coming back will not be broadcast.
 	 * @returns {Promise<void>}
 	 */
-	static async set (userData, text, status, silent) {
+	static async set (userData, data = {}) {
 		const now = new sb.Date();
-		const data = {
+		const afkData = {
 			User_Alias: userData.ID,
-			Text: text || null,
-			Silent: !!silent,
-			Started: now,
-			Status: status || "afk"
+			Text: data.Text ?? null,
+			Silent: Boolean(data.Silent),
+			Started: data.Started ?? now,
+			Status: data.Status ?? "afk",
+			Interrupted_ID: data.Interrupted_ID ?? null
 		};
 
 		const row = await sb.Query.getRow("chat_data", "AFK");
-		row.setValues(data);
+		row.setValues(afkData);
 		await row.save();
-		data.ID = row.values.ID;
+		afkData.ID = row.values.ID;
 
-		const afk = new AwayFromKeyboard(data);
+		const afk = new AwayFromKeyboard(afkData);
 		AwayFromKeyboard.data.set(userData.ID, afk);
 	}
 };
