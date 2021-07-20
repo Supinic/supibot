@@ -166,7 +166,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 	 * @param {string} [data.Status]
 	 * @param {boolean} [data.Silent] If true, user coming back will not be broadcast.
 	 * @param {boolean} [data.Interrupted_ID] If true, user coming back will not be broadcast.
-	 * @returns {Promise<void>}
+	 * @returns {Promise<AwayFromKeyboard>}
 	 */
 	static async set (userData, data = {}) {
 		const now = new sb.Date();
@@ -186,5 +186,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 
 		const afk = new AwayFromKeyboard(afkData);
 		AwayFromKeyboard.data.set(userData.ID, afk);
+
+		return afk;
 	}
 };
