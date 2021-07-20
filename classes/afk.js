@@ -3,6 +3,11 @@
  * @memberof sb
  */
 module.exports = class AwayFromKeyboard extends require("./template.js") {
+	/**
+	 * @type {Map<number, AwayFromKeyboard>}
+	 */
+	static data = new Map();
+
 	constructor (data) {
 		super();
 
@@ -50,6 +55,11 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		});
 	}
 
+	static async reloadData () {
+		AwayFromKeyboard.data.clear();
+		return await this.loadData();
+	}
+
 	static async loadData () {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("*")
@@ -57,7 +67,10 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			.where("Active = %b", true)
 		);
 
-		AwayFromKeyboard.data = data.map(record => new AwayFromKeyboard(record));
+		for (const record of data) {
+			const afk = new AwayFromKeyboard(record);
+			AwayFromKeyboard.data.set(afk.User_Alias, afk);
+		}
 	}
 
 	/**
@@ -70,22 +83,23 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			return false;
 		}
 
+		const values = [...AwayFromKeyboard.data.values()];
+
 		const promises = list.map(async (ID) => {
 			const row = await sb.Query.getRow("chat_data", "AFK");
 			await row.load(ID);
 
-			const existingIndex = AwayFromKeyboard.data.findIndex(i => i.ID === ID);
-			if (existingIndex !== -1) {
-				AwayFromKeyboard.data[existingIndex].destroy();
-				AwayFromKeyboard.data.splice(existingIndex, 1);
+			const existing = values.find(i => i.ID === ID);
+			if (existing) {
+				AwayFromKeyboard.data.delete(existing.User_Alias);
 			}
 
 			if (!row.values.Active) {
 				return;
 			}
 
-			const afk = new AwayFromKeyboard(row.valuesObject);
-			AwayFromKeyboard.data.push(afk);
+			const created = new AwayFromKeyboard(row.valuesObject);
+			AwayFromKeyboard.data.set(created.User_Alias, created);
 		});
 
 		await Promise.all(promises);
@@ -101,14 +115,14 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 	 * @returns {Promise<void>}
 	 */
 	static async checkActive (userData, channelData) {
-		const index = AwayFromKeyboard.data.findIndex(i => i.User_Alias === userData.ID);
-		if (index === -1) {
+		if (!AwayFromKeyboard.data.has(userData.ID)) {
 			return;
 		}
 
 		// Extract the AFK data *FIRST*, before anything else is awaited!
 		// This makes sure that no more (possibly incorrect) messages are sent before the response is put together.
-		const [data] = AwayFromKeyboard.data.splice(index, 1);
+		const data = AwayFromKeyboard.data.get(userData.ID);
+		AwayFromKeyboard.data.delete(userData.ID);
 
 		// This should only ever update one row, if everything is working properly.
 		await sb.Query.getRecordUpdater(rs => rs
@@ -164,8 +178,9 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		const row = await sb.Query.getRow("chat_data", "AFK");
 		row.setValues(data);
 		await row.save();
-
 		data.ID = row.values.ID;
-		AwayFromKeyboard.data.push(new AwayFromKeyboard(data));
+
+		const afk = new AwayFromKeyboard(data);
+		AwayFromKeyboard.data.set(userData.ID, afk);
 	}
 };

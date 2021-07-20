@@ -6,6 +6,16 @@
 module.exports = class Reminder extends require("./template.js") {
 	static LongTimeout = require("long-timeout");
 
+	/**
+	 * Holds all currently active reminders in a Map, keyed by the target recipient user's IDs.
+	 * The list of
+	 * @type {Map<number, Reminder[]>}
+	 */
+	static data = new Map();
+
+	/* @type {Map<number, number>} */
+	static available = new Map();
+
 	/** @type {Reminder} */
 	constructor (data) {
 		super();
@@ -164,10 +174,10 @@ module.exports = class Reminder extends require("./template.js") {
 
 	/**
 	 * Deactivates a reminder. Also deactivates it in database if required.
-	 * @param {boolean} success If true, the reminder was completed, and can be removed in database.
+	 * @param {boolean} permanent If true, the reminder was completed, and can be removed in database.
 	 * @returns {Reminder}
 	 */
-	async deactivate (success) {
+	async deactivate (permanent) {
 		this.Active = false;
 
 		// Always deactivate timed reminder timeout
@@ -175,19 +185,8 @@ module.exports = class Reminder extends require("./template.js") {
 			this.timeout.clear();
 		}
 
-		const index = Reminder.data.findIndex(i => i.ID === this.ID);
-		if (index !== -1) {
-			// Always remove reminder from the data collection
-			Reminder.data.splice(index, 1);
+		await Reminder.#remove(this.ID, permanent);
 
-			// If required, set the reminder as inactive in database
-			if (success) {
-				const row = await sb.Query.getRow("chat_data", "Reminder");
-				await row.load(this.ID);
-				row.values.Active = false;
-				await row.save();
-			}
-		}
 		return this;
 	}
 
@@ -212,20 +211,15 @@ module.exports = class Reminder extends require("./template.js") {
 			.where("Schedule IS NULL OR Schedule < (NOW() + INTERVAL 1 YEAR)")
 		);
 
-		Reminder.data = data.map(record => new Reminder(record));
-
-		// This will deactivate expired reminders automatically, and skip over non-scheduled reminders.
-		for (const reminder of Reminder.data) {
-			reminder.activateTimeout();
+		for (const row of data) {
+			const reminder = new Reminder(row);
+			Reminder.#add(reminder);
 		}
 	}
 
 	static async reloadData () {
-		for (const reminder of Reminder.data) {
-			reminder.destroy();
-		}
-
-		return await super.reloadData();
+		this.clear();
+		return await this.loadData();
 	}
 
 	static async reloadSpecific (...list) {
@@ -237,19 +231,14 @@ module.exports = class Reminder extends require("./template.js") {
 			const row = await sb.Query.getRow("chat_data", "Reminder");
 			await row.load(ID);
 
-			const existingIndex = Reminder.data.findIndex(i => i.ID === ID);
-			if (existingIndex !== -1) {
-				Reminder.data[existingIndex].destroy();
-				Reminder.data.splice(existingIndex, 1);
-			}
+			await Reminder.#remove(ID, false);
 
 			if (!row.values.Active) {
 				return;
 			}
 
 			const reminder = new Reminder(row.valuesObject);
-			reminder.activateTimeout();
-			Reminder.data.push(reminder);
+			Reminder.#add(reminder);
 		});
 
 		await Promise.all(promises);
@@ -261,7 +250,17 @@ module.exports = class Reminder extends require("./template.js") {
 			return identifier;
 		}
 		else if (typeof identifier === "number") {
-			return Reminder.data.find(i => i.ID === identifier);
+			if (!Reminder.available.has(identifier)) {
+				return null;
+			}
+
+			const userID = Reminder.available.get(identifier);
+			const list = Reminder.data.get(userID);
+			if (!list) {
+				return null;
+			}
+
+			return list.find(i => i.ID === identifier) ?? null;
 		}
 		else {
 			throw new sb.Error({
@@ -271,23 +270,19 @@ module.exports = class Reminder extends require("./template.js") {
 		}
 	}
 
-	static getByUser (options = {}) {
-		return Reminder.data.filter(i => (
-			(i.Active)
-			&& (!options.from || i.User_From === options.from)
-			&& (!options.to || i.User_To === options.to)
-		));
-	}
-
-	static destroy () {
-		for (const reminder of Reminder.data) {
-			reminder.Active = false;
-			if (reminder.timeout) {
-				reminder.timeout.clear();
-				reminder.timeout = null;
+	static clear () {
+		for (const reminderList of Reminder.data.values()) {
+			for (const reminder of reminderList) {
+				reminder.destroy();
 			}
 		}
 
+		Reminder.available.clear();
+		Reminder.data.clear();
+	}
+
+	static destroy () {
+		this.clear();
 		super.destroy();
 	}
 
@@ -319,8 +314,7 @@ module.exports = class Reminder extends require("./template.js") {
 		data.ID = row.values.ID;
 
 		const reminder = new Reminder(data);
-		reminder.activateTimeout();
-		Reminder.data.push(reminder);
+		Reminder.#add(reminder);
 
 		return {
 			success: true,
@@ -334,14 +328,22 @@ module.exports = class Reminder extends require("./template.js") {
 	 * @param {Channel} channelData The channel where the reminder was fired
 	 */
 	static async checkActive (targetUserData, channelData) {
-		/** @typeof {Reminder[]} */
-		const reminders = Reminder.data.filter(i => !i.Schedule && i.User_To === targetUserData.ID);
+		if (!Reminder.data.has(targetUserData.ID)) {
+			return;
+		}
+
+		const list = Reminder.data.get(targetUserData.ID);
+		if (list.length === 0) {
+			return;
+		}
+
+		const reminders = list.filter(i => !i.Schedule);
 		if (reminders.length === 0) {
 			return;
 		}
 
 		for (const reminder of reminders) {
-			reminder.deactivate(true);
+			await reminder.deactivate(true);
 		}
 
 		const reply = [];
@@ -410,8 +412,6 @@ module.exports = class Reminder extends require("./template.js") {
 						`@${fromUserData.Name}, ${targetUserData.Name} just typed in channel ${channelName}`
 					);
 				}
-
-				reminder.deactivate(true);
 			}
 		}
 
@@ -497,6 +497,8 @@ module.exports = class Reminder extends require("./template.js") {
 				channelData.mirror(publicMessage, targetUserData, false)
 			]);
 		}
+
+		Reminder.data.delete(targetUserData.ID);
 	}
 
 	/**
@@ -603,6 +605,56 @@ module.exports = class Reminder extends require("./template.js") {
 
 		return link;
 	}
+
+	/**
+	 * @private
+	 * @param {sb.Reminder} reminder
+	 */
+	static #add (reminder) {
+		if (!Reminder.data.has(reminder.User_To)) {
+			Reminder.data.set(reminder.User_To, []);
+		}
+
+		Reminder.available.set(reminder.ID, reminder.User_To);
+		Reminder.data.get(reminder.User_To).push(reminder);
+
+		reminder.activateTimeout();
+	}
+
+	/**
+	 * @private
+	 * @param {number} ID
+	 * @param {boolean} permanent If `true`, the reminder will also be removed/deactivated in the database as well
+	 */
+	static async #remove (ID, permanent = false) {
+		if (permanent) {
+			const row = await sb.Query.getRow("chat_data", "Reminder");
+			await row.load(ID, true);
+
+			if (row.loaded) {
+				row.values.Active = false;
+				await row.save();
+			}
+		}
+
+		if (!Reminder.available.has(ID)) {
+			return false;
+		}
+
+		const targetUserID = Reminder.available.get(ID);
+		const list = Reminder.data.get(targetUserID);
+		const index = list.findIndex(i => i.ID === ID);
+		if (index === -1) {
+			return false;
+		}
+
+		const reminder = list[index];
+		reminder.destroy();
+		list.splice(index, 1);
+
+		Reminder.available.delete(ID);
+	}
+
 };
 
 /**
