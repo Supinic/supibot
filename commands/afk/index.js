@@ -109,7 +109,7 @@ module.exports = {
 		]
 	})),
 	Code: (async function afk (context, ...args) {
-		if (context.privateMessage && sb.AwayFromKeyboard.data.some(i => i.User_Alias === context.user.ID)) {
+		if (context.privateMessage && sb.AwayFromKeyboard.data.has(context.user.ID)) {
 			return {
 				reply: "You are already AFK!"
 			};
