@@ -9,6 +9,7 @@ module.exports = {
 		{ name: "7tv", type: "boolean" },
 		{ name: "animated", type: "boolean" },
 		{ name: "bttv", type: "boolean" },
+		{ name: "channel", type: "string" },
 		{ name: "ffz", type: "boolean" },
 		{ name: "global", type: "boolean" },
 		{ name: "repeat", type: "boolean" },
@@ -41,11 +42,45 @@ module.exports = {
 			"7tv": sevenTv,
 			animated,
 			bttv,
+			channel,
 			ffz,
 			global: globalEmotes,
 			sub,
 			twitch
 		} = context.params;
+
+		let channelPrefixRegex;
+		if (channel) {
+			let channelPrefix;
+			const channelData = sb.Channel.get(channel, sb.Platform.get("twitch"));
+
+			if (channelData) {
+				channelPrefix = await channelData.getCacheData("emote-prefix");
+			}
+
+			if (!channelPrefix) {
+				const response = await sb.Got("Leppunen", `v2/twitch/user/${channel}`);
+				if (response.statusCode === 404) {
+					return {
+						success: false,
+						reply: `Provided channel does not exist on Twitch!`
+					};
+				}
+				else if (response.body.emotePrefix) {
+					return {
+						success: false,
+						reply: `Provided channel does not have a subscriber emote prefix!`
+					};
+				}
+
+				channelPrefix = response.body.emotePrefix;
+				if (channelData) {
+					await channelData.setCacheData("emote-prefix", channelPrefix, { expiry: 30 * 864e5 }); // cache for 30 days
+				}
+			}
+
+			channelPrefixRegex = new RegExp(`^${channelPrefix}[A-Z0-9][A-Za-z0-9]*$`);
+		}
 
 		emotes = emotes.filter(i => {
 			if (animated === true && !i.animated || animated === false && i.animated) {
@@ -70,6 +105,9 @@ module.exports = {
 				return false;
 			}
 			if (context.params.regex && !context.params.regex.test(i.name)) {
+				return false;
+			}
+			if (channelPrefixRegex && !channelPrefixRegex.test(i.name)) {
 				return false;
 			}
 
@@ -130,6 +168,10 @@ module.exports = {
 
 			`<code>${prefix}rem repeat:false</code>`,
 			"If provided like this, then only unique emotes will be posted - no repeats.",
+			"",
+
+			`<code>${prefix}rem channel:(channel)</code>`,
+			"For a provided Twitch channel, this will attempt to use only its subscriber emotes that Supibot has available",
 			"",
 
 			`<code>${prefix}rem animated:true</code>`,
