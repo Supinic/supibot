@@ -833,7 +833,10 @@ class Command extends require("./template.js") {
 
 		Command.handleCooldown(channelData, userData, command, execution?.cooldown);
 
-		if (!execution?.reply && !execution?.partialReplies) {
+		if (!execution) {
+			return execution;
+		}
+		else if (typeof execution.reply !== "string" && !execution.partialReplies) {
 			return execution;
 		}
 
