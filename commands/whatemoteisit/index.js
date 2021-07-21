@@ -31,7 +31,7 @@ module.exports = {
 		else if (response.statusCode !== 200) {
 			return {
 				success: false,
-				reply: response.error
+				reply: response.body.error
 			};
 		}
 
