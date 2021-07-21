@@ -21,7 +21,12 @@ module.exports = {
 		};
 
 		const staticNumberedLinkMap = {
-			fursona: () => `https://thisfursonadoesnotexist.com/v2/jpgs-2x/seed${sb.Utils.random(1, 99999)}.jpg`,
+			fursona: () => {
+				const number = sb.Utils.random(1, 99999);
+				const padded = sb.Utils.zf(number, 5);
+
+				return `https://thisfursonadoesnotexist.com/v2/jpgs-2x/seed${padded}.jpg`;
+			},
 			vessel: () => {
 				const number = sb.Utils.random(1, 2e4);
 				const padded = sb.Utils.zf(number, 7);
