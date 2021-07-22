@@ -157,6 +157,25 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		}
 	}
 
+	static get (identifier) {
+		if (identifier instanceof AwayFromKeyboard) {
+			return identifier;
+		}
+		else if (identifier instanceof sb.User) {
+			return AwayFromKeyboard.data.get(identifier.ID);
+		}
+		else if (typeof identifier === "number") {
+			const values = [...AwayFromKeyboard.data.values()];
+			return values.find(i => i.ID === identifier) ?? null;
+		}
+		else {
+			throw new sb.Error({
+				message: "Unrecognized AFK identifier type",
+				args: typeof identifier
+			});
+		}
+	}
+
 	/**
 	 * Sets (and creates a database row) a user's AFK status.
 	 * @param {sb.User} userData
