@@ -14,8 +14,10 @@ module.exports = {
 				reply: "This command cannot be used outside of pipe!"
 			};
 		}
-	
-		return null;
+
+		return {
+			reply: null
+		};
 	}),
 	Dynamic_Description: null
 };
