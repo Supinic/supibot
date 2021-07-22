@@ -161,10 +161,17 @@ module.exports = {
 				}
 			}
 			else if (!result.reply) {
-				return {
-					success: false,
-					reply: "Empty pipe result!"
-				};
+				if (typeof result.reply === "string") {
+					return {
+						success: false,
+						reply: "Empty pipe result!"
+					};
+				}
+				else {
+					return {
+						reply: null
+					};
+				}
 			}
 			else if (resultsInPastebin) {
 				currentArgs = result.reply.split(" ");
