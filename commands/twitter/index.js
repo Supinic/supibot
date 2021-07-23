@@ -6,6 +6,7 @@ module.exports = {
 	Description: "Fetches the last tweet from a given user. No retweets or replies, just plain standalone tweets.",
 	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
+		{ name: "includeRetweets", type: "boolean" },
 		{ name: "textOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
@@ -57,7 +58,7 @@ module.exports = {
 			},
 			searchParams: {
 				screen_name: user,
-				count: "1",
+				count: "10",
 				exclude_replies: "true"
 			}
 		});
@@ -75,7 +76,19 @@ module.exports = {
 			};
 		}
 
-		const [tweet] = response.body;
+		let eligibleTweets = response.body;
+		if (!context.params.includeRetweets) {
+			eligibleTweets = eligibleTweets.filter(i => !i.retweeted_status);
+
+			if (eligibleTweets.length === 0) {
+				return {
+					success: false,
+					reply: `All fetched tweets of this account are retweets! Use includeRetweets:true to fetch those as well.`
+				};
+			}
+		}
+
+		const [tweet] = eligibleTweets;
 		if (!tweet) {
 			return {
 				reply: "That account has not tweeted so far."
@@ -94,5 +107,21 @@ module.exports = {
 			reply: `${fixedText} (posted ${delta})`
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: async (prefix) => [
+		"Fetches the last tweet of a provided account.",
+		"Excludes retweets by default - this can be changed with a parameter.",
+		"",
+
+		`<code>${prefix}tweet (account)</code>`,
+		`<code>${prefix}twitter (account)</code>`,
+		"Gets the last tweet.",
+		"",
+
+		`<code>${prefix}twitter includeRetweets:true (account)</code>`,
+		"Gets the last tweet, including retweets",
+		"",
+
+		`<code>${prefix}twitter textOnly:true (account)</code>`,
+		"Gets the last tweet only - without the date of posting and all other descriptions that come with the command"
+	]
 };
