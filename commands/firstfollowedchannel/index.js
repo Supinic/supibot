@@ -43,7 +43,7 @@ module.exports = {
 		}
 		else {
 			const follow = follows[0];
-			const delta = sb.Utils.timeDelta(new sb.Date(follow.created_at));
+			const delta = sb.Utils.timeDelta(new sb.Date(follow.created_at), false, true);
 			return {
 				reply: `The channel ${who} have followed the longest is ${follow.channel.name}, since ${delta}.`
 			};
