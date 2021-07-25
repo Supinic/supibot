@@ -290,8 +290,14 @@ module.exports = (function () {
 					}
 				}
 				catch (e) {
-					const { code } = e;
-					await sb.Runtime.incrementBanphraseTimeouts(channelData.Name);
+					const { code, message } = e;
+
+					await sb.Logger.log(
+						"System.Warning",
+						`Banphrase API fail - code: ${code}, message: ${message}`,
+						channelData,
+						null
+					);
 
 					switch (channelData.Banphrase_API_Downtime) {
 						case "Ignore":
@@ -316,9 +322,21 @@ module.exports = (function () {
 							};
 
 						case "Refuse": {
-							const string = (code === "ETIMEDOUT")
-								? `Banphrase API did not respond in time - cannot reply.`
-								: `Banphrase API failed (${code}) - cannot reply.`;
+							let string;
+							if (code === "ETIMEDOUT"){
+								string = `Cannot reply - banphrase API timed out.`
+							}
+							else if (code === "HTTPError") {
+								const match = message.match(/Response code (\d+)/);
+								const statusString = (match)
+									? `(status code ${match[1]})`
+									: "";
+
+								string = `Cannot reply - banphrase API is currently down. ${statusString}`
+							}
+							else {
+								string = `Cannot reply - banphrase API encountered an unexpected error.`
+							}
 
 							return {
 								string,
