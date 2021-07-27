@@ -58,7 +58,9 @@ module.exports = {
 			},
 			searchParams: {
 				screen_name: user,
-				count: "10",
+				count: "100", // necessary to fetch - deleted/suspended tweets take up space in the slice
+				trim_user: "true",
+				include_rts: "true",
 				exclude_replies: "true"
 			}
 		});
