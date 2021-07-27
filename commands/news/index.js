@@ -432,14 +432,14 @@ module.exports = {
 						name: "G4Media",
 						url: "https://www.g4media.ro",
 						path: null,
-						endpoints: ["rss"],
+						endpoints: ["feed"],
 						helpers: ["agenttud"]
 					},
 					{
 						name: "HotNews",
 						url: "https://www.hotnews.ro",
 						path: null,
-						endpoints: ["feed"],
+						endpoints: ["rss"],
 						helpers: ["agenttud"]
 					},
 					{
