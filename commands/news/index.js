@@ -363,6 +363,19 @@ module.exports = {
 						helpers: ["supinic"]
 					}
 				]
+			},
+			{
+				code: "se",
+				language: "swedish",
+				sources: [
+					{
+						name: "SVT",
+						url: "https://www.svt.se/",
+						path: "nyheter",
+						endpoints: ["rss.xml"],
+						helpers: []
+					}
+				]
 			}
 		],
 
