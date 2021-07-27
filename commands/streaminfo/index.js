@@ -40,13 +40,27 @@ module.exports = {
 			};
 		}
 
-		const data = await sb.Got("Kraken", `streams/${channelID}`).json();
-		if (data === null || data.stream === null) {
-			const broadcasterData = await sb.Got("Leppunen", `v2/twitch/user/${targetChannel}`);
-			const { lastBroadcast } = broadcasterData.body;
+		const streamResponse = await sb.Got("Helix", {
+			url: "streams",
+			searchParams: {
+				user_id: channelID
+			}
+		});
+
+		const [stream] = streamResponse.body.data;
+		if (!stream) {
+			const broadcasterData = await sb.Got("Leppunen", {
+				url: `v2/twitch/user/${channelID}`,
+				searchParams: {
+					id: "true"
+				}
+			});
+
+			const { banned, lastBroadcast } = broadcasterData.body;
+			const status = (banned) ? "banned" : "offline";
 			if (lastBroadcast.startedAt === null) {
 				return {
-					reply: `Channel is offline - never streamed before.`
+					reply: `Channel is ${status} - never streamed before.`
 				};
 			}
 
@@ -55,24 +69,22 @@ module.exports = {
 			const delta = sb.Utils.timeDelta(start, true);
 
 			return {
-				reply: `Channel is offline - last streamed ${delta}, title: ${title}`
+				reply: `Channel is ${status} - last streamed ${delta}, title: ${title}`
 			};
 		}
 
-		const stream = data.stream;
-		const started = sb.Utils.timeDelta(new sb.Date(stream.created_at));
-		const viewersSuffix = (stream.viewers === 1) ? "" : "s";
-		const broadcast = (stream.game)
-			? `playing ${stream.game}`
+		const started = sb.Utils.timeDelta(new sb.Date(stream.started_at));
+		const viewersSuffix = (stream.viewer_count === 1) ? "" : "s";
+		const broadcast = (stream.game_name)
+			? `playing ${stream.game_name}`
 			: `streaming under no category`;
 
 		return {
 			reply: sb.Utils.tag.trim `
 				${targetChannel} is ${broadcast}, 
 				since ${started} 
-				for ${sb.Utils.groupDigits(stream.viewers)} viewer${viewersSuffix}
-				at ${stream.video_height}p.
-				Title: ${stream.channel.status} 
+				for ${sb.Utils.groupDigits(stream.viewer_count)} viewer${viewersSuffix}.
+				Title: ${stream.title} 
 				https://twitch.tv/${targetChannel.toLowerCase()}
 			`
 		};
