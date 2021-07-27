@@ -126,6 +126,26 @@ module.exports = {
 			if (!result) { // Banphrase result: Do not reply
 				currentArgs = [];
 			}
+			else if (!result.reply) {
+				// If it is the last command in sequence, change the reply of the command accordingly
+				if (i === invocations.length - 1) {
+					if (typeof result.reply === "string") {
+						return {
+							success: false,
+							reply: "Empty pipe result!"
+						};
+					}
+					else {
+						return {
+							reply: null
+						};
+					}
+				}
+				// If it isn't, simply reset the arguments to be empty for the next command
+				else {
+					currentArgs = [];
+				}
+			}
 			else if (typeof result !== "object") { // Banphrase result: Reply with message
 				return {
 					reply: result
@@ -157,19 +177,6 @@ module.exports = {
 					return {
 						success: false,
 						reply: `Pipe command ${cmd} failed: ${reply}`
-					};
-				}
-			}
-			else if (!result.reply) {
-				if (typeof result.reply === "string") {
-					return {
-						success: false,
-						reply: "Empty pipe result!"
-					};
-				}
-				else {
-					return {
-						reply: null
 					};
 				}
 			}
