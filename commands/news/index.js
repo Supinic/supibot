@@ -537,7 +537,7 @@ module.exports = {
 				: "";
 
 			return {
-				reply: sb.Utils.removeHTML(`${title}${separator}${content} ${delta}`)
+				reply: sb.Utils.fixHTML(sb.Utils.removeHTML(`${title}${separator}${content} ${delta}`))
 			};
 		}
 
