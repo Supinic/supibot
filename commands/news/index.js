@@ -423,6 +423,33 @@ module.exports = {
 						helpers: ["unitedfingers"]
 					}
 				]
+			},
+			{
+				code: "ro",
+				language: "romanian",
+				sources: [
+					{
+						name: "G4Media",
+						url: "https://www.g4media.ro",
+						path: null,
+						endpoints: ["rss"],
+						helpers: ["agenttud"]
+					},
+					{
+						name: "HotNews",
+						url: "https://www.hotnews.ro",
+						path: null,
+						endpoints: ["feed"],
+						helpers: ["agenttud"]
+					},
+					{
+						name: "Mediafax",
+						url: "https://www.mediafax.ro/",
+						path: null,
+						endpoints: ["rss"],
+						helpers: ["agenttud"]
+					}
+				]
 			}
 		],
 
