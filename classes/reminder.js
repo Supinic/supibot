@@ -625,6 +625,7 @@ module.exports = class Reminder extends require("./template.js") {
 	 * @private
 	 * @param {number} ID
 	 * @param {boolean} permanent If `true`, the reminder will also be removed/deactivated in the database as well
+	 * @returns {boolean} whether or not the changes were applied
 	 */
 	static async #remove (ID, permanent = false) {
 		if (permanent) {
@@ -643,6 +644,10 @@ module.exports = class Reminder extends require("./template.js") {
 
 		const targetUserID = Reminder.available.get(ID);
 		const list = Reminder.data.get(targetUserID);
+		if (!list) {
+			return false;
+		}
+
 		const index = list.findIndex(i => i.ID === ID);
 		if (index === -1) {
 			return false;
@@ -653,8 +658,9 @@ module.exports = class Reminder extends require("./template.js") {
 		list.splice(index, 1);
 
 		Reminder.available.delete(ID);
-	}
 
+		return true;
+	}
 };
 
 /**
