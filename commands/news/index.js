@@ -396,6 +396,33 @@ module.exports = {
 						helpers: ["de_munkey"]
 					}
 				]
+			},
+			{
+				code: "be",
+				language: "(multiple)",
+				sources: [
+					{
+						name: "VRT",
+						url: "https://www.vrt.be",
+						path: "vrtnws",
+						endpoints: ["de.rss.articles.xml", "fr.rss.articles.xml", "nl.rss.articles.xml"],
+						helpers: ["supinic"]
+					},
+					{
+						name: "La Libre",
+						url: "https://www.lalibre.be/",
+						path: "rss/section",
+						endpoints: ["belgique.xml"],
+						helpers: ["unitedfingers"]
+					},
+					{
+						name: "La Libre",
+						url: "https://www.nieuwsblad.be",
+						path: "rss/section",
+						endpoints: ["55178e67-15a8-4ddd-a3d8-bfe5708f8932"],
+						helpers: ["unitedfingers"]
+					}
+				]
 			}
 		],
 
