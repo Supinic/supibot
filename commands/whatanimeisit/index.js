@@ -29,7 +29,7 @@ module.exports = {
 		});
 
 		if (statusCode !== 200) {
-			const filtered = data.replace(link, "");
+			const filtered = data.error.replace(link, "");
 			return {
 				success: false,
 				reply: `${filtered}!`
