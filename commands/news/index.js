@@ -390,7 +390,7 @@ module.exports = {
 					},
 					{
 						name: "Tagesspiegel",
-						url: "https://www.tagesspiegel.de/contentexport/feed",
+						url: "https://www.tagesspiegel.de/contentexport",
 						path: "feed",
 						endpoints: ["home"],
 						helpers: ["de_munkey"]
