@@ -8,6 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
+		threshold: 10,
 		channels: {
 			amouranth: "💃🏼",
 			athenelive: "🇫🇷🤖",
@@ -21,22 +22,40 @@ module.exports = {
 		}
 	})),
 	Code: (async function randomLineExtra () {
-		const [channel, emoji] = sb.Utils.randArray(Object.entries(this.staticData.channels));
-		const max = (await sb.Query.getRecordset(rs => rs
+		const { channels, threshold } = this.staticData;
+		const [channel, emoji] = sb.Utils.randArray(Object.entries(channels));
+
+		const maxID = await sb.Query.getRecordset(rs => rs
 			.select("MAX(ID) AS ID")
 			.from("chat_line", channel)
 			.single()
-		));
-	
-		const line = (await sb.Query.getRecordset(rs => rs
-			.select("Text")
-			.from("chat_line", channel)
-			.where("ID = %n", sb.Utils.random(1, max.ID))
-			.single()
-		));
-	
+			.flat("ID")
+		);
+
+		let message;
+		let i = 0;
+		while (!message && i < threshold) {
+			message = await sb.Query.getRecordset(rs => rs
+				.select("Text")
+				.from("chat_line", channel)
+				.where("ID = %n", sb.Utils.random(1, maxID))
+				.single()
+				.limit(1)
+				.flat("Text")
+			);
+
+			i++;
+		}
+
+		if (!message) {
+			return {
+				success: false,
+				reply: "Could not roll a random line extra! Please try again."
+			};
+		}
+
 		return {
-			reply: `${emoji} ${line.Text}`
+			reply: `${emoji} ${message}`
 		};
 	}),
 	Dynamic_Description: null
