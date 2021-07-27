@@ -416,7 +416,7 @@ module.exports = {
 						helpers: ["unitedfingers"]
 					},
 					{
-						name: "La Libre",
+						name: "Nieuwsblad",
 						url: "https://www.nieuwsblad.be",
 						path: "rss/section",
 						endpoints: ["55178e67-15a8-4ddd-a3d8-bfe5708f8932"],
