@@ -376,6 +376,26 @@ module.exports = {
 						helpers: []
 					}
 				]
+			},
+			{
+				code: "de",
+				language: "german",
+				sources: [
+					{
+						name: "Tagesschau",
+						url: "https://www.tagesschau.de",
+						path: "xml",
+						endpoints: ["rss2"],
+						helpers: ["nerixyz"]
+					},
+					{
+						name: "Tagesspiegel",
+						url: "https://www.tagesspiegel.de/contentexport/feed",
+						path: "feed",
+						endpoints: ["home"],
+						helpers: ["de_munkey"]
+					}
+				]
 			}
 		],
 
