@@ -121,7 +121,7 @@ module.exports = {
 		const text = await target.text(context, args.join(" ").trim());
 		await sb.AwayFromKeyboard.set(context.user, {
 			Text: text,
-			Type: target.type ?? invocation,
+			Status: target.type ?? invocation,
 			Silent: false,
 			Interrupted_ID: null
 		});
