@@ -75,7 +75,6 @@ module.exports = {
 			}
 		}
 
-		const resultsInPastebin = args[args.length - 1] === "pastebin";
 		let finalResult = null;
 		let currentArgs = [];
 
@@ -179,9 +178,6 @@ module.exports = {
 						reply: `Pipe command ${cmd} failed: ${reply}`
 					};
 				}
-			}
-			else if (resultsInPastebin) {
-				currentArgs = result.reply.split(" ");
 			}
 			else {
 				const string = sb.Utils.wrapString(result.reply, this.staticData.resultCharacterLimit, {
