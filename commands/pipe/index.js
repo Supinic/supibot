@@ -125,8 +125,13 @@ module.exports = {
 			if (!result) { // Banphrase result: Do not reply
 				currentArgs = [];
 			}
-			else if (!result.reply && i < invocations.length - 1) { // Only applies to commands that aren't last in the sequence
-				currentArgs = [];
+			else if (!result.reply) {
+				if (i < invocations.length - 1) { // Only applies to commands that aren't last in the sequence
+					currentArgs = [];
+				}
+				else { // Short-circuit if the command is the last one in pipe
+					return result;
+				}
 			}
 			else if (typeof result !== "object") { // Banphrase result: Reply with message
 				return {
