@@ -385,7 +385,7 @@ module.exports = {
 			"",
 
 			`<code>${prefix}tts lang:french Ceci est un message.</code>`,
-			"Plays the TTS using a French.",
+			"Plays the TTS using French.",
 			"",
 
 			`<code>${prefix}tts lang:fr-fr Ceci est un message.</code>`,
