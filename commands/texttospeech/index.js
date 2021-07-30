@@ -323,6 +323,7 @@ module.exports = {
 			});
 
 			if (response.statusCode !== 200) {
+				this.data.pending = false;
 				return {
 					success: false,
 					reply: `Lithuanian TTS failed with code ${response.statusCode}!`
@@ -335,6 +336,7 @@ module.exports = {
 				limit: this.staticData.limit
 			});
 
+			this.data.pending = false;
 			return {
 				reply: `Lithuanian TTS has been successfully played on stream!`
 			};
