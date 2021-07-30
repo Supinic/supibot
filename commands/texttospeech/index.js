@@ -313,7 +313,7 @@ module.exports = {
 				json: {
 					userId: "public-access",
 					ssml: `<speak><p>${args.join(" ")}</p></speak>`,
-					voice: "Leonas",
+					voice: "lt-LT-LeonasNeural",
 					narrationStyle: "regular",
 					globalSpeed: "100%",
 					globalVolume: "+0dB",
