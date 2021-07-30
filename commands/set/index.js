@@ -182,7 +182,7 @@ module.exports = {
 						else {
 							const reminder = sb.Reminder.get(ID);
 							if (reminder) {
-								await reminder.deactivate(true);
+								await reminder.deactivate(true, true);
 							}
 							else {
 								row.values.Active = false;
