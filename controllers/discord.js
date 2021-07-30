@@ -355,8 +355,9 @@ module.exports = class DiscordController extends require("./template.js") {
 
 	parseMessage (messageObject) {
 		const links = messageObject.attachments.map(i => i.proxyURL);
+		const content = messageObject.content.replace(/<(https?:\/\/.+?)>/g, "$1"); // Replaces all "un-embed" links' brackets
 		const args = [
-			...messageObject.content.split(" "),
+			...content.split(" "),
 			...links
 		];
 
