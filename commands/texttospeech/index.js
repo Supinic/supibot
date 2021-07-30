@@ -300,6 +300,46 @@ module.exports = {
 		const input = context.params.language ?? context.params.lang ?? "en-us";
 		const code = sb.Utils.modules.languageISO.getCode(input);
 
+		if (code === "lt") {
+			const response = await sb.Got("FakeAgent", {
+				url: "",
+				method: "POST",
+				contentType: "json",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				referrer: "https://play.ht/text-to-speech-voices/welsh/",
+				referrerPolicy: "no-referrer-when-downgrade",
+				json: {
+					userId: "public-access",
+					ssml: `<speak><p>${args.join(" ")}</p></speak>`,
+					voice: "Leonas",
+					narrationStyle: "regular",
+					globalSpeed: "100%",
+					globalVolume: "+0dB",
+					pronunciations: [],
+					platform: "landing_demo"
+				}
+			});
+
+			if (response.statusCode !== 200) {
+				return {
+					success: false,
+					reply: `Lithuanian TTS failed with code ${response.statusCode}!`
+				};
+			}
+
+			await sb.LocalRequest.playSpecialAudio({
+				url: response.body.file,
+				volume: sb.Config.get("TTS_VOLUME"),
+				limit: this.staticData.limit
+			});
+
+			return {
+				reply: `Lithuanian TTS has been successfully played on stream!`
+			};
+		}
+
 		const { locales } = this.staticData;
 		const currentLocale = locales.find(i => i.locale === input || i.code === code);
 		if (!currentLocale) {
