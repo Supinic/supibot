@@ -302,13 +302,13 @@ module.exports = {
 
 		if (code === "lt") {
 			const response = await sb.Got("FakeAgent", {
-				url: "",
+				url: "https://play.ht/api/transcribe",
 				method: "POST",
 				contentType: "json",
 				headers: {
 					"Content-Type": "application/json"
 				},
-				referrer: "https://play.ht/text-to-speech-voices/welsh/",
+				referrer: "https://play.ht/text-to-speech-voices/lithuanian/",
 				referrerPolicy: "no-referrer-when-downgrade",
 				json: {
 					userId: "public-access",
