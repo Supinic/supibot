@@ -363,7 +363,7 @@ module.exports = {
 					}
 
 					const reminder = await sb.Query.getRecordset(rs => rs
-						.select("ID", "User_From", "User_To", "Text", "Active", "Schedule")
+						.select("ID", "User_From", "User_To", "Text", "Active", "Schedule", "Cancelled")
 						.from("chat_data", "Reminder")
 						.where("ID = %n", ID)
 						.single()
@@ -380,7 +380,11 @@ module.exports = {
 						};
 					}
 
-					const alreadyFired = (reminder.Active) ? "" : "(inactive)";
+					let status = "";
+					if (!reminder.Active) {
+						status = (reminder.Cancelled) ? "(cancelled)" : "(inactive)";
+					}
+
 					const reminderUser = (context.user.ID === reminder.User_From)
 						? await sb.User.get(reminder.User_To, true)
 						: await sb.User.get(reminder.User_From, true);
@@ -394,7 +398,7 @@ module.exports = {
 						: "";
 
 					return {
-						reply: `${owner} ID ${ID} ${target}${delta}: ${reminder.Text} ${alreadyFired}`
+						reply: `${owner} ID ${ID} ${target}${delta}: ${reminder.Text} ${status}`
 					};
 				}
 			},
