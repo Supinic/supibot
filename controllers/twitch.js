@@ -1061,7 +1061,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					animated: (i.imageType === "gif")
 				})),
 
-			...sevenTv.value?.body.map(i => ({
+			...(sevenTv.value?.body ?? []).map(i => ({
 				id: i.id,
 				name: i.name,
 				type: "7tv",
