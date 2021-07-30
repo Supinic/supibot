@@ -30,11 +30,28 @@ module.exports = {
 			direction: context.params.direction ?? (!context.append.pipe),
 			confidence: context.params.confidence ?? (!context.append.pipe)
 		};
-	
+
 		for (const option of ["from", "to"]) {
-			const lang = context.params[option];
+			let lang = context.params[option];
 			if (!lang) {
 				continue;
+			}
+
+			if (option === "to" && lang === "random") {
+				let codeList = await this.getCacheData("supported-language-list");
+				if (!codeList) {
+					const html = await sb.Got("https://translate.google.com/").text();
+					const $ = sb.Utils.cheerio(html);
+					const codes = Array.from($("[data-language-code]")).map(i => i.attribs["data-language-code"]);
+					const list = new Set(codes.filter(i => i !== "auto" && !i.includes("-")));
+
+					codeList = Array.from(list);
+					await this.setCacheData("supported-language-list", codeList, {
+						expiry: 7 * 864e5 // 7 days
+					});
+				}
+
+				lang = sb.Utils.randArray(codeList);
 			}
 
 			const newLang = languageISO.get(lang);
@@ -45,10 +62,10 @@ module.exports = {
 					reply: `Language "${lang}" was not recognized!`
 				};
 			}
-	
+
 			options[option] = code.toLowerCase();
 		}
-	
+
 		const response = await sb.Got({
 			url: "https://translate.googleapis.com/translate_a/single",
 			responseType: "json",
@@ -97,18 +114,47 @@ module.exports = {
 					reply: "Language code could not be translated into a name! Please let @Supinic know about this :)"
 				};
 			}
-	
+
 			const array = [sb.Utils.capitalize(fromLanguageName)];
 			if (options.confidence && data[6] && data[6] !== 1) {
 				const confidence = `${sb.Utils.round(data[6] * 100, 0)}%`;
 				array.push(`(${confidence})`);
 			}
-	
+
 			array.push("->", sb.Utils.capitalize(languageISO.getName(options.to)));
 			reply = `${array.join(" ")}: ${reply}`;
 		}
-	
+
 		return { reply };
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"Translates provided text from one language into another provided language.",
+		"Default languages are: from = auto-detected, to = English. This can be changed with the from and to parameters - see below.",
+		"",
+
+		`<code>${prefix}translate (text)</code>`,
+		"Translates the text from auto-detected language to English.",
+		"",
+
+		`<code>${prefix}translate from:fr (text)</code>`,
+		`<code>${prefix}translate from:french (text)</code>`,
+		`<code>${prefix}translate from:French (text)</code>`,
+		"Translates the text from a provided language (French here, can use a language code or name) to English.",
+		"The language auto-detection usually works fine. However, if you run into issues or if the text is too short, you can force the source langauge.",
+		"",
+
+		`<code>${prefix}translate to:de (text)</code>`,
+		`<code>${prefix}translate to:german (text)</code>`,
+		`<code>${prefix}translate to:German (text)</code>`,
+		"Translates the text from a auto-detected language to a provided language (German here).",
+		"",
+
+		`<code>${prefix}translate to:italian from:swahili (text)</code>`,
+		"Both parameters can be combined together for maximum accuracy.",
+		"",
+
+		`<code>${prefix}translate to:random (text)</code>`,
+		"Translates provided text to a randomly picked, supported language.",
+		""
+	])
 };
