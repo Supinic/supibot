@@ -640,7 +640,7 @@ module.exports = class Reminder extends require("./template.js") {
 				row.values.Active = false;
 				row.values.Cancelled = Boolean(cancelled);
 
-				await row.save({ skipLoad });
+				await row.save({ skipLoad: true });
 			}
 		}
 

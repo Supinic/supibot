@@ -323,8 +323,8 @@ module.exports = (function () {
 
 						case "Refuse": {
 							let string;
-							if (code === "ETIMEDOUT"){
-								string = `Cannot reply - banphrase API timed out.`
+							if (code === "ETIMEDOUT") {
+								string = `Cannot reply - banphrase API timed out.`;
 							}
 							else if (code === "HTTPError") {
 								const match = message.match(/Response code (\d+)/);
@@ -332,10 +332,10 @@ module.exports = (function () {
 									? `(status code ${match[1]})`
 									: "";
 
-								string = `Cannot reply - banphrase API is currently down. ${statusString}`
+								string = `Cannot reply - banphrase API is currently down. ${statusString}`;
 							}
 							else {
-								string = `Cannot reply - banphrase API encountered an unexpected error.`
+								string = `Cannot reply - banphrase API encountered an unexpected error.`;
 							}
 
 							return {

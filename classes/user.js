@@ -122,7 +122,7 @@ module.exports = class User extends require("./template.js") {
 		else if (!data.Type) {
 			throw new sb.Error({
 				message: "No type is associated with this variable",
-				args: { property }
+				args: { options, property }
 			});
 		}
 
@@ -155,7 +155,7 @@ module.exports = class User extends require("./template.js") {
 		if (!type) {
 			throw new sb.Error({
 				message: "No type is associated with this variable",
-				args: { property }
+				args: { options, property }
 			});
 		}
 
