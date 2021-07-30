@@ -332,7 +332,7 @@ module.exports = {
 
 			await sb.LocalRequest.playSpecialAudio({
 				url: response.body.file,
-				volume: sb.Config.get("TTS_VOLUME"),
+				volume: sb.Config.get("TTS_VOLUME") * 2,
 				limit: this.staticData.limit
 			});
 
