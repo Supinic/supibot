@@ -174,10 +174,11 @@ module.exports = class Reminder extends require("./template.js") {
 
 	/**
 	 * Deactivates a reminder. Also deactivates it in database if required.
+	 * @param {boolean} cancelled If true, the reminder will be flagged as cancelled
 	 * @param {boolean} permanent If true, the reminder was completed, and can be removed in database.
 	 * @returns {Reminder}
 	 */
-	async deactivate (permanent) {
+	async deactivate (permanent, cancelled) {
 		this.Active = false;
 
 		// Always deactivate timed reminder timeout
@@ -185,7 +186,7 @@ module.exports = class Reminder extends require("./template.js") {
 			this.timeout.clear();
 		}
 
-		await Reminder.#remove(this.ID, permanent);
+		await Reminder.#remove(this.ID, { cancelled, permanent });
 
 		return this;
 	}
@@ -624,17 +625,22 @@ module.exports = class Reminder extends require("./template.js") {
 	/**
 	 * @private
 	 * @param {number} ID
-	 * @param {boolean} permanent If `true`, the reminder will also be removed/deactivated in the database as well
+	 * @param {Object} options
+	 * @param {boolean} [options.cancelled] If `true`, the reminder will be flagged as "Cancelled"
+	 * @param {boolean} [options.permanent] If `true`, the reminder will also be removed/deactivated in the database as well
 	 * @returns {boolean} whether or not the changes were applied
 	 */
-	static async #remove (ID, permanent = false) {
+	static async #remove (ID, options = {}) {
+		const { cancelled, permanent } = options;
 		if (permanent) {
 			const row = await sb.Query.getRow("chat_data", "Reminder");
 			await row.load(ID, true);
 
 			if (row.loaded) {
 				row.values.Active = false;
-				await row.save();
+				row.values.Cancelled = Boolean(cancelled);
+
+				await row.save({ skipLoad });
 			}
 		}
 
