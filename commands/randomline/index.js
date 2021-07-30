@@ -9,7 +9,9 @@ module.exports = {
 		{ name: "textOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: (() => ({
+		optoutRerollThreshold: 5
+	})),
 	Code: (async function randomLine (context, user) {
 		if (context.channel === null) {
 			return {
@@ -178,15 +180,37 @@ module.exports = {
 				};
 			}
 
-			result = await sb.Query.getRecordset(rs => rs
-				.select("Text", "Posted", "Name")
-				.from("chat_line", channelName)
-				.join("chat_data", "User_Alias")
-				.where(`\`${channelName}\`.ID >= %n`, sb.Utils.random(1, data.Total))
-				.orderBy(`\`${channelName}\`.ID ASC`)
-				.limit(1)
-				.single()
-			);
+			const threshold = this.staticData.optoutRerollThreshold;
+			let passed = false;
+			let counter = 0;
+			
+			while (!passed && counter < threshold) {
+				result = await sb.Query.getRecordset(rs => rs
+					.select("Text", "User_Alias", "Posted", "Name")
+					.from("chat_line", channelName)
+					.join("chat_data", "User_Alias")
+					.where(`\`${channelName}\`.ID >= %n`, sb.Utils.random(1, data.Total))
+					.orderBy(`\`${channelName}\`.ID ASC`)
+					.limit(1)
+					.single()
+				);
+
+				const optouts = sb.Filter.getLocals("Opt-out", {
+					channel: context.channel,
+					command: this,
+					user: { ID: result.User_Alias }
+				});
+				
+				counter++;
+				passed = (optouts.length === 0);
+			}
+			
+			if (!passed) {
+				return {
+					success: false,
+					reply: `Could not find a random line from a user that's not opted out! Please try again.`
+				};
+			}
 		}
 
 		const partialReplies = [{
