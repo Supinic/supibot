@@ -37,6 +37,7 @@ module.exports = {
 		};
 
 		return {
+
 			types: ["artwork", "automobile", "cat", "fuckeduphomer", "fursona", "horse", "mp", "person", "vessel", "waifu", "word"],
 			fetch: [
 				{
@@ -100,9 +101,19 @@ module.exports = {
 					types: ["word"],
 					descriptions: [`<code>word</code> - <a href="https://www.thisworddoesnotexist.com/">This word does not exist</a>`],
 					execute: async (context, type) => {
-						const html = await sb.Got("https://www.thisworddoesnotexist.com/").text();
-						const $ = sb.Utils.cheerio(html);
+						const response = await sb.Got("FakeAgent", {
+							url: "https://www.thisworddoesnotexist.com/",
+							throwHttpErrors: false
+						});
 
+						if (response.statusCode !== 200) {
+							return {
+								success: false,
+								reply: `Could not fetch a random word definition - website error!`
+							};
+						}
+
+						const $ = sb.Utils.cheerio(response.body);
 						const wordClass = $("div#definition-pos")
 							.text()
 							.replace(/\./g, "")
