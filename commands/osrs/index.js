@@ -332,7 +332,7 @@ module.exports = {
 					};
 				}
 
-				const activity = context.params.activity ?? context.params.boss;
+				let activity = context.params.activity ?? context.params.boss;
 				if (!activity) {
 					return {
 						success: false,
@@ -346,6 +346,10 @@ module.exports = {
 
 				if (data.success === false) {
 					return data;
+				}
+
+				if (this.staticData.activityAliases[activity.toLowerCase()]) {
+					activity = this.staticData.activityAliases[activity.toLowerCase()];
 				}
 
 				const activities = data.activities.map(i => i.name.toLowerCase());
