@@ -19,12 +19,12 @@ module.exports = {
 				if (!await this.staticData.helpers.exists(dir)) {
 					await fs.mkdir(dir);
 				}
-	
+
 				const row = await sb.Query.getRow(options.database, options.table);
 				let save = false;
 				try {
 					await row.load(item.ID);
-	
+
 					// Only allow the overwriting of an existing item when
 					// the database definition changed more recently than the file
 					const stats = await fs.stat(`${dir}/index.js`);
@@ -40,12 +40,12 @@ module.exports = {
 						throw e;
 					}
 				}
-	
+
 				let updated = false;
 				if (save) {
 					updated = true;
 					row.values.Last_Edit = options.now ?? new sb.Date();
-	
+
 					await Promise.all([
 						row.save(),
 						item.serialize({
@@ -54,7 +54,7 @@ module.exports = {
 						})
 					]);
 				}
-	
+
 				return { updated };
 			}),
 			load: (async (item, options) => {
@@ -63,7 +63,7 @@ module.exports = {
 					console.warn(`index.js file for ${options.name} ${item} does not exist`);
 					return { updated: false };
 				}
-	
+
 				// Fetch the latest commit for a given file
 				const shellResult = await this.staticData.helpers.shell(sb.Utils.tag.trim `
 					git
@@ -72,27 +72,27 @@ module.exports = {
 					--pretty=format:%H
 					-- ${options.dir}/${item}/index.js
 				`);
-	
+
 				// Command file has no git history, skip
 				const commitHash = shellResult.stdout;
 				if (!commitHash) {
 					console.log(`No Git history for ${options.name} ${item}`);
 					return { updated: false };
 				}
-	
+
 				const liveItem = options.module.get(item);
 				const row = await sb.Query.getRow(options.database, options.table);
 				if (liveItem) {
 					await row.load(liveItem.ID);
 				}
-	
+
 				if (row.values.Latest_Commit === commitHash) {
 					console.log(`No change for ${options.name} ${item}`);
 					return { updated: false };
 				}
-	
+
 				delete require.cache[require.resolve(itemFile)];
-	
+
 				const definition = require(itemFile);
 				for (const [key, value] of Object.entries(definition)) {
 					if (value === null) {
@@ -108,17 +108,17 @@ module.exports = {
 								lines[i] = lines[i].slice(1);
 							}
 						}
-	
+
 						row.values[key] = lines.join("\n");
 					}
 					else {
 						row.values[key] = value;
 					}
 				}
-	
+
 				row.values.Latest_Commit = commitHash;
 				await row.save();
-	
+
 				return {
 					name: row.values.Name,
 					updated: Boolean(liveItem),
@@ -144,14 +144,14 @@ module.exports = {
 					const commands = (args.length > 0)
 						? args.map(i => sb.Command.get(i)).filter(Boolean)
 						: sb.Command.data;
-	
+
 					if (commands.length === 0) {
 						return {
 							success: false,
 							reply: "No valid commands provided!"
 						};
 					}
-	
+
 					const promises = commands.map(async (command) => {
 						const result = await helpers.save(command, {
 							dir: "commands",
@@ -159,19 +159,19 @@ module.exports = {
 							table: "Command",
 							now
 						});
-	
+
 						if (result.updated) {
 							updated.push(command.Name);
 						}
 					});
-	
+
 					await Promise.all(promises);
-	
+
 					updated.sort();
 					const suffix = (updated.length === 0) ? "" : "s";
 					return {
 						reply: (updated.length === 0)
-							? `No changes detected, nothing was saved peepoNerdDank 👆`
+							? `No changes detected, nothing was saved 🤓 👆`
 							: `Saved ${updated.length} command${suffix} into spm/commands peepoHackies`
 					};
 				},
@@ -181,7 +181,7 @@ module.exports = {
 					const commandDirs = (args.length > 0)
 						? args.map(i => sb.Command.get(i)?.Name ?? i)
 						: await helpers.fs.readdir("/code/spm/commands");
-	
+
 					const promises = commandDirs.map(async (command) => {
 						const result = await helpers.load(command, {
 							dir: "commands",
@@ -192,7 +192,7 @@ module.exports = {
 							jsonify: ["Aliases", "Params"],
 							functionify: ["Static_Data", "Code", "Dynamic_Description"]
 						});
-	
+
 						if (result.updated) {
 							updated.push(result.name);
 						}
@@ -200,9 +200,9 @@ module.exports = {
 							added.push(result.name);
 						}
 					});
-	
+
 					await Promise.all(promises);
-	
+
 					// If the spm command is tasked with reloading itself, don't call reloadSpecific immediately,
 					// as this destroys the command before it finishes executing.
 					if (updated.includes("spm")) {
@@ -210,22 +210,22 @@ module.exports = {
 							await sb.Command.reloadSpecific("spm");
 							await helpers.message(context, "spm command reloaded peepoHackies");
 						}, 2500);
-	
+
 						await helpers.message(
 							context,
 							`The spm command was tasked to reload itself! monkaS I will reload it in 2.5 seconds instead of right now.`
 						);
-	
+
 						updated.splice(updated.indexOf("spm"), 1);
 					}
-	
+
 					if (added.length > 0 || updated.length > 0) {
 						await sb.Command.reloadSpecific(...added, ...updated);
 					}
-	
+
 					return {
 						reply: (updated.length === 0)
-							? `No changes detected, no commands were loaded peepoNerdDank 👆`
+							? `No changes detected, no commands were loaded 🤓 👆`
 							: `Loaded ${updated.length} and added ${added.length} commands from spm peepoHackies`
 					};
 				}
@@ -239,14 +239,14 @@ module.exports = {
 					const modules = (args.length > 0)
 						? args.map(i => sb.ChatModule.get(i)).filter(Boolean)
 						: sb.ChatModule.data;
-	
+
 					if (modules.length === 0) {
 						return {
 							success: false,
 							reply: "No valid chat modules provided!"
 						};
 					}
-	
+
 					const promises = modules.map(async (chatModule) => {
 						const result = await helpers.save(chatModule, {
 							dir: "chat-modules",
@@ -254,19 +254,19 @@ module.exports = {
 							table: "Chat_Module",
 							now
 						});
-	
+
 						if (result.updated) {
 							updated.push(chatModule.Name);
 						}
 					});
-	
+
 					await Promise.all(promises);
-	
+
 					updated.sort();
 					const suffix = (updated.length === 0) ? "" : "s";
 					return {
 						reply: (updated.length === 0)
-							? `No changes detected, nothing was saved peepoNerdDank 👆`
+							? `No changes detected, nothing was saved 🤓 👆`
 							: `Saved ${updated.length} chat-module${suffix} into spm/chat-modules peepoHackies`
 					};
 				},
@@ -276,7 +276,7 @@ module.exports = {
 					const moduleDirs = (args.length > 0)
 						? args.map(i => sb.ChatModule.get(i)?.Name ?? i)
 						: await helpers.fs.readdir("/code/spm/chat-modules");
-	
+
 					const promises = moduleDirs.map(async (chatModule) => {
 						const result = await helpers.load(chatModule, {
 							dir: "chat-modules",
@@ -287,7 +287,7 @@ module.exports = {
 							jsonify: ["Events"],
 							functionify: ["Code"]
 						});
-	
+
 						if (result.updated) {
 							updated.push(result.name);
 						}
@@ -295,16 +295,16 @@ module.exports = {
 							added.push(result.name);
 						}
 					});
-	
+
 					await Promise.all(promises);
-	
+
 					if (added.length > 0 || updated.length > 0) {
 						await sb.ChatModule.reloadSpecific(...added, ...updated);
 					}
-	
+
 					return {
 						reply: (updated.length === 0)
-							? `No changes detected, nothing was added or updated peepoNerdDank 👆`
+							? `No changes detected, nothing was added or updated 🤓 👆`
 							: `Loaded ${updated.length} and added ${added.length} chat modules from spm peepoHackies`
 					};
 				}
@@ -318,14 +318,14 @@ module.exports = {
 					const crons = (args.length > 0)
 						? args.map(i => sb.Cron.get(i)).filter(Boolean)
 						: sb.Cron.data;
-	
+
 					if (crons.length === 0) {
 						return {
 							success: false,
 							reply: "No valid crons provided!"
 						};
 					}
-	
+
 					const promises = crons.map(async (cron) => {
 						const result = await helpers.save(cron, {
 							dir: "crons",
@@ -333,19 +333,19 @@ module.exports = {
 							table: "Cron",
 							now
 						});
-	
+
 						if (result.updated) {
 							updated.push(cron.Name);
 						}
 					});
-	
+
 					await Promise.all(promises);
-	
+
 					updated.sort();
 					const suffix = (updated.length === 0) ? "" : "s";
 					return {
 						reply: (updated.length === 0)
-							? `No changes detected, nothing was saved peepoNerdDank 👆`
+							? `No changes detected, nothing was saved 🤓 👆`
 							: `Saved ${updated.length} cron${suffix} into spm/crons peepoHackies`
 					};
 				},
@@ -355,7 +355,7 @@ module.exports = {
 					const cronDirs = (args.length > 0)
 						? args.map(i => sb.Cron.get(i)?.Name ?? i)
 						: await helpers.fs.readdir("/code/spm/crons");
-	
+
 					const promises = cronDirs.map(async (cron) => {
 						const result = await helpers.load(cron, {
 							dir: "crons",
@@ -366,7 +366,7 @@ module.exports = {
 							jsonify: [],
 							functionify: ["Code", "Defer"]
 						});
-	
+
 						if (result.updated) {
 							updated.push(result.name);
 						}
@@ -374,16 +374,16 @@ module.exports = {
 							added.push(result.name);
 						}
 					});
-	
+
 					await Promise.all(promises);
-	
+
 					if (added.length > 0 || updated.length > 0) {
 						await sb.Cron.reloadData();
 					}
-	
+
 					return {
 						reply: (updated.length === 0)
-							? `No changes detected, no crons were loaded peepoNerdDank 👆`
+							? `No changes detected, no crons were loaded 🤓 👆`
 							: `Loaded ${updated.length} and added ${added.length} crons from spm peepoHackies`
 					};
 				}
@@ -397,14 +397,14 @@ module.exports = {
 					const crons = (args.length > 0)
 						? args.map(i => sb.Cron.get(i)).filter(Boolean)
 						: sb.Cron.data;
-	
+
 					if (crons.length === 0) {
 						return {
 							success: false,
 							reply: "No valid crons provided!"
 						};
 					}
-	
+
 					const promises = crons.map(async (cron) => {
 						const result = await helpers.save(cron, {
 							dir: "crons",
@@ -412,19 +412,19 @@ module.exports = {
 							table: "Cron",
 							now
 						});
-	
+
 						if (result.updated) {
 							updated.push(cron.Name);
 						}
 					});
-	
+
 					await Promise.all(promises);
-	
+
 					updated.sort();
 					const suffix = (updated.length === 0) ? "" : "s";
 					return {
 						reply: (updated.length === 0)
-							? `No changes detected, nothing was saved peepoNerdDank 👆`
+							? `No changes detected, nothing was saved 🤓 👆`
 							: `Saved ${updated.length} cron${suffix} into spm/crons peepoHackies`
 					};
 				},
@@ -434,7 +434,7 @@ module.exports = {
 					const cronDirs = (args.length > 0)
 						? args.map(i => sb.Cron.get(i)?.Name ?? i)
 						: await helpers.fs.readdir("/code/spm/crons");
-	
+
 					const promises = cronDirs.map(async (cron) => {
 						const result = await helpers.load(cron, {
 							dir: "crons",
@@ -445,7 +445,7 @@ module.exports = {
 							jsonify: [],
 							functionify: ["Code", "Defer"]
 						});
-	
+
 						if (result.updated) {
 							updated.push(result.name);
 						}
@@ -453,16 +453,16 @@ module.exports = {
 							added.push(result.name);
 						}
 					});
-	
+
 					await Promise.all(promises);
-	
+
 					if (added.length > 0 || updated.length > 0) {
 						await sb.Cron.reloadData();
 					}
-	
+
 					return {
 						reply: (updated.length === 0)
-							? `No changes detected, no crons were loaded peepoNerdDank 👆`
+							? `No changes detected, no crons were loaded 🤓 👆`
 							: `Loaded ${updated.length} and added ${added.length} crons from spm peepoHackies`
 					};
 				}
@@ -484,7 +484,7 @@ module.exports = {
 				reply: "Invalid spm operation provided"
 			};
 		}
-	
+
 		const type = args.shift()?.toLowerCase();
 		const definition = commands.find(i => i.name === type || i.aliases.includes(type));
 		if (!type) {
@@ -499,11 +499,12 @@ module.exports = {
 				reply: `spm ${type} does not have functionality for the "${operation}" operation`
 			};
 		}
-	
+
 		if (operation === "load") {
 			try {
+				const emote = context.getBestAvailableEmote(["DankG", "PepoG"], "😶📚");
 				const result = await helpers.shell("git -C /code/spm pull origin master");
-				await helpers.message(context, `git pull PepoG ${result.stdout}`);
+				await helpers.message(context, `git pull ${emote} ${result.stdout}`);
 			}
 			catch (e) {
 				console.error("git pull error", e);
@@ -513,7 +514,7 @@ module.exports = {
 				};
 			}
 		}
-	
+
 		return await definition[operation](context, helpers, ...args);
 	}),
 	Dynamic_Description: null
