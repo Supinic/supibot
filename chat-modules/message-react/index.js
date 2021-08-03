@@ -47,7 +47,7 @@ module.exports = {
 			}
 
 			if (!passed) {
-				return;
+				continue;
 			}
 
 			if (typeof item.response === "string") {
