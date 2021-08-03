@@ -818,7 +818,7 @@ class Command extends require("./template.js") {
 				execution = {
 					success: false,
 					reason: "api-error",
-					reply: `${statusCode}: Couldn't execute command because ${apiName} failed! This is not my fault :) (ID ${errorID})}`
+					reply: `🚨 Third party ${apiName} failed! Status code ${statusCode ?? "(N/A)"} (error ID ${errorID})}`
 				};
 			}
 			else if (e instanceof sb.errors.GenericRequestError) {
@@ -826,14 +826,14 @@ class Command extends require("./template.js") {
 				execution = {
 					success: false,
 					reason: "generic-request-error",
-					reply: `Third party ${hostname} failed: ${message ?? "(no message)"} (ID ${errorID})`
+					reply: `🚨 Third party ${hostname} failed! ${message ?? "(no message)"} (error ID ${errorID})`
 				};
 			}
 			else if (e instanceof sb.Got.GotError) {
 				execution = {
 					success: false,
 					reason: "got-error",
-					reply: `Could not execute command due to network error: ${errorContext.message}`
+					reply: `🚨 Third party network error! ${errorContext.message ?? "(no message)"} (error ID ${errorID})`
 				};
 			}
 			else {
