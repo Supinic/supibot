@@ -502,7 +502,7 @@ module.exports = {
 
 		if (operation === "load") {
 			try {
-				const emote = context.getBestAvailableEmote(["DankG", "PepoG"], "😶📚");
+				const emote = await context.getBestAvailableEmote(["DankG", "PepoG"], "😶📚");
 				const result = await helpers.shell("git -C /code/spm pull origin master");
 				await helpers.message(context, `git pull ${emote} ${result.stdout}`);
 			}
