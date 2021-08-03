@@ -766,40 +766,78 @@ class Command extends require("./template.js") {
 			}
 		}
 		catch (e) {
+			let errorContext;
+			const loggingContext = {
+				user: userData.ID,
+				command: command.ID,
+				invocation: identifier,
+				channel: channelData?.ID ?? null,
+				platform: options.platform.ID,
+				params: context.params ?? {},
+				isPrivateMessage
+			};
+
 			if (e instanceof sb.errors.APIError) {
 				const { apiName, reason, statusCode } = e;
-				console.warn("Command API Error", { apiName, statusCode, reason });
-
-				execution = {
-					success: false,
-					reason: "api-error",
-					reply: `${statusCode}: Couldn't execute command because ${apiName} failed! This is not my fault :)`
+				errorContext = {
+					type: "Command API Error",
+					apiName,
+					statusCode,
+					reason
 				};
 			}
 			else if (e instanceof sb.errors.GenericRequestError) {
 				const { hostname, message, statusCode, statusMessage } = e;
-				console.warn("Command request error", { hostname, message, statusCode, statusMessage });
+				errorContext = {
+					type: "Command request error",
+					hostname,
+					message,
+					statusCode,
+					statusMessage
+				};
+			}
+			else if (e instanceof sb.Got.GotError) {
+				const { code, name, message, options } = e;
+				errorContext = {
+					type: "GotError",
+					code,
+					message,
+					name,
+					url: options.url?.toString() ?? "(N/A)"
+				};
+			}
 
+			const errorID = await sb.Logger.logError(
+				"Command",
+				e,
+				[loggingContext, identifier, ...args, errorContext ?? {}]
+			);
+
+			if (e instanceof sb.errors.APIError) {
+				const { apiName, statusCode } = errorContext;
+				execution = {
+					success: false,
+					reason: "api-error",
+					reply: `${statusCode}: Couldn't execute command because ${apiName} failed! This is not my fault :) (ID ${errorID})}`
+				};
+			}
+			else if (e instanceof sb.errors.GenericRequestError) {
+				const { hostname, message } = errorContext;
 				execution = {
 					success: false,
 					reason: "generic-request-error",
-					reply: `Third party ${hostname} failed: ${message ?? "(no message)"}`
+					reply: `Third party ${hostname} failed: ${message ?? "(no message)"} (ID ${errorID})`
+				};
+			}
+			else if (e instanceof sb.Got.GotError) {
+				execution = {
+					success: false,
+					reason: "got-error",
+					reply: `Could not execute command due to network error: ${errorContext.message}`
 				};
 			}
 			else {
-				console.error(e);
 				if (typeof command.ID === "number") {
-					const loggingContext = {
-						user: userData.ID,
-						command: command.ID,
-						invocation: identifier,
-						channel: channelData?.ID ?? null,
-						platform: options.platform.ID,
-						params: context.params ?? {},
-						isPrivateMessage
-					};
-
-					const errorID = await sb.Logger.logError("Command", e, [loggingContext, identifier, ...args]);
 					const prettify = (channelData?.Data.developer)
 						? sb.Config.get("COMMAND_ERROR_DEVELOPER")
 						: sb.Config.get("COMMAND_ERROR_GENERIC");
