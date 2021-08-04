@@ -11,7 +11,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		regexV1: /^\d+$/,
-		regexV2: /^v2_[a-z0-9]{32}$/
+		regexV2: /^emotesv2_[a-z0-9]{32}$/
 	})),
 	Code: (async function whatEmoteIsIt (context, input) {
 		if (!input) {
@@ -19,6 +19,10 @@ module.exports = {
 				success: false,
 				reply: `No emote name or ID provided!`
 			};
+		}
+
+		if (context.platform.Name === "twitch" && context.append.emotes) {
+			input = context.append.emotes.split(":")[0];
 		}
 
 		const { regexV1, regexV2 } = this.staticData;
