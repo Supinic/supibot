@@ -20,12 +20,12 @@ module.exports = {
 				reply: `No emote name or ID provided!`
 			};
 		}
-		
+
 		const { regexV1, regexV2 } = this.staticData;
 		const isEmoteID = (regexV1.test(input) || regexV2.test(input));
 
 		const response = await sb.Got("Leppunen", {
-			url: `twitch/emotes/${input}`,
+			url: `v2/twitch/emotes/${input}`,
 			searchParams: (isEmoteID) ? { id: "true" } : {},
 			throwHttpErrors: false
 		});
