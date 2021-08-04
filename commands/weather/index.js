@@ -326,9 +326,23 @@ module.exports = {
 		}
 		else if (type === "hourly") {
 			target = data.hourly[number];
+
+			if (!target) {
+				return {
+					success: false,
+					reply: `Invalid hour offset provided! Use a number between 0 and ${data.hourly.length}.`
+				};
+			}
 		}
 		else if (type === "daily") {
 			target = data.daily[number];
+
+			if (!target) {
+				return {
+					success: false,
+					reply: `Invalid day offset provided! Use a number between 0 and ${data.daily.length}.`
+				};
+			}
 		}
 
 		const obj = {
