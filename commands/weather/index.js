@@ -87,13 +87,9 @@ module.exports = {
 					type = "hourly";
 				}
 				else {
-					type = null;
-				}
-
-				if (!type || (type === "daily" && number > 7) || (type === "hourly" && number > 48)) {
 					return {
 						success: false,
-						reply: "Invalid combination of parameters!"
+						reply: "Invalid combination of parameters! Use day+# or hour+#"
 					};
 				}
 			}
@@ -330,7 +326,7 @@ module.exports = {
 			if (!target) {
 				return {
 					success: false,
-					reply: `Invalid hour offset provided! Use a number between 0 and ${data.hourly.length}.`
+					reply: `Invalid hour offset provided! Use a number between 0 and ${data.hourly.length - 1}.`
 				};
 			}
 		}
@@ -340,7 +336,7 @@ module.exports = {
 			if (!target) {
 				return {
 					success: false,
-					reply: `Invalid day offset provided! Use a number between 0 and ${data.daily.length}.`
+					reply: `Invalid day offset provided! Use a number between 0 and ${data.daily.length - 1}.`
 				};
 			}
 		}
