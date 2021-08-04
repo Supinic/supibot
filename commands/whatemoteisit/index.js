@@ -77,7 +77,7 @@ module.exports = {
 				channelString = `@${channelLogin} (${channelName})`;
 			}
 
-			tierString = `emoteTier ${emoteTier} sub emote to channel ${channelString}`;
+			tierString = `tier ${emoteTier} sub emote to channel ${channelString}`;
 		}
 		else {
 			tierString = `special ${channelName} emote`;
