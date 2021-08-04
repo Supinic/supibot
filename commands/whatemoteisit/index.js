@@ -9,17 +9,31 @@ module.exports = {
 		{ name: "linkOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
-	Code: (async function whatEmoteIsIt (context, emote) {
+	Static_Data: (() => ({
+		regexV1: /^\d+$/,
+		regexV2: /^v2_[a-z0-9]{32}$/
+	})),
+	Code: (async function whatEmoteIsIt (context, input) {
+		if (!input) {
+			return {
+				success: false,
+				reply: `No emote name or ID provided!`
+			};
+		}
+		
+		const { regexV1, regexV2 } = this.staticData;
+		const isEmoteID = (regexV1.test(input) || regexV2.test(input));
+
 		const response = await sb.Got("Leppunen", {
-			url: `twitch/emotes/${emote}`,
+			url: `twitch/emotes/${input}`,
+			searchParams: (isEmoteID) ? { id: "true" } : {},
 			throwHttpErrors: false
 		});
 
 		if (response.statusCode >= 500) {
 			const { error } = response.body;
 			await sb.Platform.get("twitch").pm(
-				`twitch/emotes API failed for emote "${emote}" - server error ${response.statusCode}: ${error ?? "(unknown)"}`,
+				`twitch/emotes API failed for "${input}" - server error ${response.statusCode}: ${error ?? "(unknown)"}`,
 				"leppunen"
 			);
 
@@ -35,17 +49,17 @@ module.exports = {
 			};
 		}
 
-		const { channel, channelid: channelID, emotecode, emoteid, channellogin: login, tier } = response.body;
+		const { channel, channelID, emoteCode, emoteID, channelLogin, emoteTier } = response.body;
 		const originID = await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("data", "Origin")
-			.where("Emote_ID = %s", emoteid)
+			.where("Emote_ID = %s", emoteID)
 			.limit(1)
 			.single()
 			.flat("ID")
 		);
 
-		const cdnLink = `https://static-cdn.jtvnw.net/emoticons/v2/${emoteid}/default/dark/3.0`;
+		const cdnLink = `https://static-cdn.jtvnw.net/emoticons/v2/${emoteID}/default/dark/3.0`;
 		if (context.params.linkOnly) {
 			return {
 				reply: cdnLink
@@ -53,13 +67,13 @@ module.exports = {
 		}
 
 		let tierString;
-		if (tier && login) {
+		if (emoteTier && channelLogin) {
 			let channelString = `@${channel}`;
-			if (channel.toLowerCase() !== login.toLowerCase()) {
-				channelString = `@${login} (${channel})`;
+			if (channel.toLowerCase() !== channelLogin.toLowerCase()) {
+				channelString = `@${channelLogin} (${channel})`;
 			}
 
-			tierString = `tier ${tier} sub emote to channel ${channelString}`;
+			tierString = `emoteTier ${emoteTier} sub emote to channel ${channelString}`;
 		}
 		else {
 			tierString = `special ${channel} emote`;
@@ -71,16 +85,16 @@ module.exports = {
 
 		let emoteLink;
 		if (channel) {
-			emoteLink = `https://twitchemotes.com/channels/${channelID}/emotes/${emoteid}`;
+			emoteLink = `https://twitchemotes.com/channels/${channelID}/emotes/${emoteID}`;
 		}
 		else {
-			emoteLink = `https://twitchemotes.com/global/emotes/${emoteid}`;
+			emoteLink = `https://twitchemotes.com/global/emotes/${emoteID}`;
 		}
 
 		return {
 			reply: (channel)
-				? `${emotecode} (ID ${emoteid}) - ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
-				: `${emotecode} (ID ${emoteid}) - global Twitch emote. ${emoteLink} ${cdnLink} ${originString}`
+				? `${emoteCode} (ID ${emoteID}) - ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
+				: `${emoteCode} (ID ${emoteID}) - global Twitch emote. ${emoteLink} ${cdnLink} ${originString}`
 		};
 	}),
 	Dynamic_Description: null
