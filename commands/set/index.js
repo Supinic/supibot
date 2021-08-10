@@ -8,12 +8,6 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
-		const birthdayRegex = /(\d+)[.\-/\s]+(\w{3})/i;
-		const birthdayFormatter = new Intl.DateTimeFormat("en-us", {
-			day: "numeric",
-			month: "long"
-		});
-
 		const timersLimit = 5;
 		const timerNameRegex = /^[-\w\u00a9\u00ae\u2000-\u3300\ud83c\ud000-\udfff\ud83d\ud000-\udfff\ud83e\ud000-\udfff]{2,25}$/;
 
@@ -427,12 +421,6 @@ module.exports = {
 								reply: "No date provided!"
 							};
 						}
-						else if (!birthdayRegex.test(query)) {
-							return {
-								success: false,
-								reply: `The date you provided must be in form "day-month", where month is specified by 3 characters, e.g. "Jan" or "Aug"`
-							};
-						}
 
 						const date = new sb.Date(query);
 						if (!date.valueOf()) {
@@ -445,8 +433,9 @@ module.exports = {
 						context.user.Data.birthday = {
 							month: date.month,
 							day: date.day,
-							string: birthdayFormatter.format(date)
+							string: date.format("F dS")
 						};
+
 						await context.user.saveProperty("Data", context.user.Data);
 
 						return {
