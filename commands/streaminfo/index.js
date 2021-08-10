@@ -66,7 +66,7 @@ module.exports = {
 
 			const start = new sb.Date(lastBroadcast.startedAt);
 			const title = lastBroadcast.title ?? "(no title)";
-			const delta = sb.Utils.timeDelta(start, true);
+			const delta = sb.Utils.timeDelta(start);
 
 			return {
 				reply: `Channel is ${status} - last streamed ${delta}, title: ${title}`
