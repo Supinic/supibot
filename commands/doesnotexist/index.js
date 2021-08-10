@@ -103,6 +103,7 @@ module.exports = {
 					execute: async (context, type) => {
 						const response = await sb.Got("FakeAgent", {
 							url: "https://www.thisworddoesnotexist.com/",
+							responseType: "text",
 							throwHttpErrors: false
 						});
 
@@ -118,6 +119,7 @@ module.exports = {
 							.text()
 							.replace(/\./g, "")
 							.trim();
+
 						const word = $("div#definition-word").text();
 						const definition = $("div#definition-definition").text().trim();
 						const example = $("div#definition-example").text();
