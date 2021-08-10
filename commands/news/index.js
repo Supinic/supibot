@@ -450,6 +450,26 @@ module.exports = {
 						helpers: ["agenttud"]
 					}
 				]
+			},
+			{
+				code: "ir",
+				language: "iranian",
+				sources: [
+					{
+						name: "رادیو فردا",
+						url: "https://www.radiofarda.com",
+						path: "api",
+						endpoints: ["zpoqie-kqp"],
+						helpers: ["somso2e"]
+					},
+					{
+						name: "خبرگزاری مهر",
+						url: "https://www.mehrnews.com/",
+						path: null,
+						endpoints: ["rss"],
+						helpers: ["supinic"]
+					}
+				]
 			}
 		],
 
