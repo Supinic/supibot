@@ -78,7 +78,11 @@ module.exports = {
 				"This whole game feels off. I noticed it before the game, Mahomes demeanor felt different. Something is up. Huge conspiracy. Probably Shungite related.",
 				"Hey @timthetatman aka Timmy Really Tough Tenders, have you ever solo que'd a video game in your life? You're doing Valorant placements with a squad? Come on. Weak and pathetic.",
 				"I woke up this morning and faced a very difficult question. The black Lambo or the red one?",
-				"To this day, I still have no idea what League of Legends is about. Is it a trading card game?"
+				"To this day, I still have no idea what League of Legends is about. Is it a trading card game?",
+				"Designed half the maps for Call of Duty Advanced Warfare. I’m on another level when it comes to creativity, design, and being ripped out of my mind. How’s your job at Arby’s? Pack that roast beef sandwich puto."
+			],
+			notes: [
+				"Source for the \"puto\" tweet - deleted, available on Wayback Machine: http://web.archive.org/web/20210805221637/https://twitter.com/drdisrespect/status/1423407584141189120"
 			]
 		};
 	}),
