@@ -278,28 +278,28 @@ module.exports = {
 					"HypeFrog",
 					"HypeCherry",
 					"HypePeace",
-	
+
 					"HypeBug",
 					"HypeBrain",
 					"HypeZap",
 					"HypeShip",
 					"HypeSign",
 					"HypeSideeye",
-	
+
 					"HypeYikes",
 					"HypeRacer",
 					"HypeCar",
 					"HypeFirst",
 					"HypeTrophy",
 					"HypeBanana",
-	
+
 					"HypeBlock",
 					"HypeDaze",
 					"HypeBounce",
 					"HypeJewel",
 					"HypeBlobk",
 					"HypeTeamwork",
-	
+
 					"HypeLove",
 					"HypePunk",
 					"HypeKO",
@@ -319,28 +319,28 @@ module.exports = {
 					"HypeGriffin4",
 					"HypeGriffin5",
 					"HypeGriffin6",
-	
+
 					"HypeBigfoot1",
 					"HypeBigfoot2",
 					"HypeBigfoot3",
 					"HypeBigfoot4",
 					"HypeBigfoot5",
 					"HypeBigfoot6",
-	
+
 					"HypeOni1",
 					"HypeOni2",
 					"HypeOni3",
 					"HypeOni4",
 					"HypeOni5",
 					"HypeOni6",
-	
+
 					"HypeDragon1",
 					"HypeDragon2",
 					"HypeDragon3",
 					"HypeDragon4",
 					"HypeDragon5",
 					"HypeDragon6",
-	
+
 					"HypeUnicorn1",
 					"HypeUnicorn2",
 					"HypeUnicorn3",
@@ -512,6 +512,20 @@ module.exports = {
 					"HypeYesPlease",
 					"HypeYum"
 				]
+			},
+			{
+				name: "h1z1",
+				aliases: [],
+				description: "",
+				notes: "https://blog.twitch.tv/en/2017/08/29/get-h1-z1-invitational-crates-on-twitch-and-earn-exclusive-loot-1402034fe7fe/",
+				emotes: [
+					"H1BodyCount",
+					"H1Deal",
+					"H1Loot",
+					"H1SkillGap",
+					"H1Skull",
+					"H1TwoTap"
+				]
 			}
 		]
 	})),
@@ -521,7 +535,7 @@ module.exports = {
 				reply: `Check available emote sets here: https://supinic.com/bot/command/${this.ID}`
 			};
 		}
-	
+
 		name = name.toLowerCase();
 		const result = this.staticData.sets.find(i => i.name === name || i.aliases.includes(name));
 		if (!result) {
@@ -529,7 +543,7 @@ module.exports = {
 				reply: `No valid emote set found! Check available emote sets here: https://supinic.com/bot/command/${this.ID}`
 			};
 		}
-		
+
 		return {
 			reply: result.emotes.join(" ")
 		};
@@ -540,19 +554,19 @@ module.exports = {
 			const aliases = (i.aliases.length === 0)
 				? ""
 				: `(${i.aliases.join(", ")})`;
-	
+
 			return `<li><code>${i.name} ${aliases}</code><br>${i.description}</li>`;
 		}).join("<br>");
-		
+
 		return [
 			"Posts entire emote sets on Twitch and stuff.",
 			"Useful to see if you are missing any of given emotes, or just for convience and/or novelty",
 			"",
-	
+
 			`<code>${prefix}emotecheck (set name)</code>`,
 			"(emotes)",
 			"",
-	
+
 			`<ul>${list}</ul>`
 		];
 	})
