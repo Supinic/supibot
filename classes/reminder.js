@@ -453,7 +453,7 @@ module.exports = class Reminder extends require("./template.js") {
 
 				// If the result message would be longer than twice the channel limit, post a list of reminder IDs
 				// instead along with a link to the website, where the user can check them out.
-				if (message.length > (limit * 2)) {
+				if (message.length > limit) {
 					const listID = reminders.filter(i => !i.Private_Message).map(i => `ID=${i.ID}`).join("&");
 					const link = await Reminder.createRelayLink("lookup", listID);
 
@@ -464,13 +464,11 @@ module.exports = class Reminder extends require("./template.js") {
 					`;
 				}
 
-				const messageArray = sb.Utils.partitionString(message, limit, 2);
-				for (const splitMessage of messageArray) {
-					await Promise.all([
-						channelData.send(splitMessage),
-						channelData.mirror(splitMessage, targetUserData, false)
-					]);
-				}
+				const [resultMessage] = sb.Utils.partitionString(message, limit, 1);
+				await Promise.all([
+					channelData.send(resultMessage),
+					channelData.mirror(resultMessage, targetUserData, false)
+				]);
 			}
 			else {
 				const listID = reminders.map(i => `ID=${i.ID}`).join("&");
