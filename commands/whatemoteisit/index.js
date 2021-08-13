@@ -53,7 +53,17 @@ module.exports = {
 			};
 		}
 
-		const { channelName, channelLogin, channelID, emoteCode, emoteID, emoteTier } = response.body;
+		const {
+			channelName,
+			channelLogin,
+			channelID,
+			emoteAssetType: emoteType,
+			emoteCode,
+			emoteID,
+			emoteState,
+			emoteTier
+		} = response.body;
+
 		const originID = await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("data", "Origin")
@@ -77,10 +87,10 @@ module.exports = {
 				channelString = `@${channelLogin} (${channelName})`;
 			}
 
-			tierString = `tier ${emoteTier} sub emote to channel ${channelString}`;
+			tierString = `tier ${emoteTier} ${emoteType.toLowerCase()} sub emote to channel ${channelString}`;
 		}
 		else {
-			tierString = `special ${channelName} emote`;
+			tierString = `special ${emoteType.toLowerCase()} ${channelName} emote`;
 		}
 
 		const originString = (originID)
@@ -95,10 +105,11 @@ module.exports = {
 			emoteLink = `https://twitchemotes.com/global/emotes/${emoteID}`;
 		}
 
+		const active = (emoteState === "INACTIVE") ? "inactive" : "";
 		return {
 			reply: (channelName)
-				? `${emoteCode} (ID ${emoteID}) - ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
-				: `${emoteCode} (ID ${emoteID}) - global Twitch emote. ${emoteLink} ${cdnLink} ${originString}`
+				? `${emoteCode} (ID ${emoteID}) - ${active} ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
+				: `${emoteCode} (ID ${emoteID}) - ${active} global Twitch emote. ${emoteLink} ${cdnLink} ${originString}`
 		};
 	}),
 	Dynamic_Description: null
