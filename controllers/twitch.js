@@ -150,12 +150,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				}
 
 				if (error.message.includes("suspended")) {
-					const row = await sb.Query.getRow("chat_data", "Channel");
-					await row.load(channelData.ID);
-
-					row.values.Mode = "Inactive";
-					await row.save();
-
+					await channelData.saveProperty("Mode", "Inactive");
 					await sb.Logger.log(
 						"Twitch.Fail",
 						`Channel ${channelData.Name} suspended - set to Inactive`,
@@ -170,18 +165,68 @@ module.exports = class TwitchController extends require("./template.js") {
 					});
 
 					if (response.body.data.length === 0) {
-						const row = await sb.Query.getRow("chat_data", "Channel");
-						await row.load(channelData.ID);
-
-						row.values.Mode = "Inactive";
-						await row.save();
-
+						await channelData.saveProperty("Mode", "Inactive");
 						await sb.Logger.log(
 							"Twitch.Fail",
-							`Channel ${channelData.Name} renamed/unavailable - set to Inactive`,
+							`Channel ${channelData.Name} unavailable - set to Inactive`,
 							channelData,
 							null
 						);
+					}
+					else {
+						const { login } = response.body.data[0];
+						if (login === channelData.Name) {
+							return;
+						}
+
+						const previousMode = channelData.Mode;
+						await channelData.saveProperty("Mode", "Inactive");
+
+						const otherChannelData = sb.Channel.get(login);
+						if (!otherChannelData) {
+							await sb.Channel.add(login, this.platform, previousMode, channelData.Specific_ID);
+							try {
+								await client.join(login);
+								await otherChannelData.send(`Rename detected MrDestructoid 👍 ${channelData.Name} -> ${login}`);
+								await sb.Logger.log(
+									"Twitch.Success",
+									`Channel ${channelData.Name} renamed to ${login} - new channel created`,
+									channelData,
+									null
+								);
+							}
+							catch (e) {
+								console.warn("Auto-rename failed", e);
+								await sb.Logger.log(
+									"Twitch.Fail",
+									`Channel ${channelData.Name} renamed to ${login} - new channel created, but join failed`,
+									channelData,
+									null
+								);
+							}
+						}
+						else if (otherChannelData && otherChannelData.Mode === "Inactive") {
+							await otherChannelData.saveProperty("Mode", "Write");
+							try {
+								await client.join(login);
+								await otherChannelData.send(`Re-rename detected MrDestructoid 👍 ${channelData.Name} -> ${login}`);
+								await sb.Logger.log(
+									"Twitch.Success",
+									`Channel ${channelData.Name} re-renamed to ${login} - existing old channel re-joined`,
+									channelData,
+									null
+								);
+							}
+							catch (e) {
+								console.warn("Auto-re-rename failed", e);
+								await sb.Logger.log(
+									"Twitch.Fail",
+									`Channel ${channelData.Name} re-renamed to ${login} - but join failed`,
+									channelData,
+									null
+								);
+							}
+						}
 					}
 				}
 			}
