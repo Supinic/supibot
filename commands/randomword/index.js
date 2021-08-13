@@ -47,6 +47,13 @@ module.exports = {
 			});
 		}
 
+		if (wordList.length === 0) {
+			return {
+				success: false,
+				reply: `Your filtering is too specific!`
+			};
+		}
+		
 		const words = [];
 		for (let i = 0; i < repeats; i++) {
 			words.push(sb.Utils.randArray(wordList));
