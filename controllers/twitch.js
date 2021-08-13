@@ -37,7 +37,9 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		this.queues = {};
 		this.evasion = {};
+
 		this.failedJoinChannels = new Set();
+		this.failedJoinReasons = new Map();
 
 		this.availableEmotes = [];
 		this.availableEmoteSets = [];
@@ -68,6 +70,7 @@ module.exports = class TwitchController extends require("./template.js") {
 						[...this.failedJoinChannels].map(i => this.client.join(i))
 					);
 
+					this.failedJoinReasons.clear();
 					this.failedJoinChannels.clear();
 
 					for (const { reason, status } of results) {
@@ -188,6 +191,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		client.on("error", (error) => {
 			if (error instanceof DankTwitch.JoinError && error.failedChannelName) {
 				this.failedJoinChannels.add(error.failedChannelName);
+				this.failedJoinReasons.set(error.failedChannelName, error.message);
 			}
 			else if (error instanceof DankTwitch.SayError && error.cause instanceof DankTwitch.MessageError) {
 				if (error.message.includes("Bad response message")) {
