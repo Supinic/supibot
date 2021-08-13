@@ -37,9 +37,13 @@ module.exports = {
 		}
 		else {
 			const follow = follows[0];
+			const followUser = (follow.user.name.toLowerCase() === context.user.Name)
+				? "you!"
+				: follow.user.name;
+
 			const delta = sb.Utils.timeDelta(new sb.Date(follow.created_at), false, true);
 			return {
-				reply: `The longest following user ${who} have is ${follow.user.name}, since ${delta}.`
+				reply: `The longest following user ${who} have is ${followUser}, since ${delta}.`
 			};
 		}
 	}),
