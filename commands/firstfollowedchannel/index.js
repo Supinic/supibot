@@ -43,7 +43,7 @@ module.exports = {
 		}
 		else {
 			const follow = follows[0];
-			const followUser = (follow.user.name.toLowerCase() === context.user.Name)
+			const followUser = (follow.channel.name.toLowerCase() === context.user.Name)
 				? "you!"
 				: follow.user.name;
 
