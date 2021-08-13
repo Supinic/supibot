@@ -71,8 +71,25 @@ module.exports = class TwitchController extends require("./template.js") {
 					this.failedJoinChannels.clear();
 
 					for (const { reason, status } of results) {
-						if (status === "rejected" && reason instanceof DankTwitch.JoinError && reason.failedChannelName) {
-							this.failedJoinChannels.add(reason.failedChannelName);
+						if (
+							status === "rejected"
+							&& reason instanceof DankTwitch.JoinError
+							&& reason.failedChannelName
+							&& reason.message.includes("suspended")
+						) {
+							const channelData = sb.Channel.get(reason.failedChannelName, this.platform);
+							const row = await sb.Query.getRow("chat_data", "Channel");
+							await row.load(channelData.ID);
+
+							row.values.Mode = "Inactive";
+							await row.save();
+
+							await sb.Logger.log(
+								"Twitch.Fail",
+								`Channel ${channelData.Name} set to Inactive`,
+								channelData,
+								null
+							);
 						}
 					}
 				}
