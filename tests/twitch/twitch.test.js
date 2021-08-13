@@ -154,12 +154,12 @@ describe("twitch controller", function () {
 		return true;
 	});
 
-	it("adds a channel to join later when a JoinError is encountered", function () {
-		const error = new MockTwitchClient.JoinError("Failed to say message: 123");
-		error.failedChannelName = "twitch";
-
-		controller.client.emit("error", error);
-
-		assert.strictEqual(controller.failedJoinChannels.size, 1);
-	});
+	// it("adds a channel to join later when a JoinError is encountered", function () {
+	// 	const error = new MockTwitchClient.JoinError("Failed to say message: 123");
+	// 	error.failedChannelName = "twitch";
+	//
+	// 	controller.client.emit("error", error);
+	//
+	// 	assert.strictEqual(controller.failedJoinChannels.size, 1);
+	// });
 });

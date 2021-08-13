@@ -38,9 +38,6 @@ module.exports = class TwitchController extends require("./template.js") {
 		this.queues = {};
 		this.evasion = {};
 
-		this.failedJoinChannels = new Set();
-		this.failedJoinReasons = new Map();
-
 		this.availableEmotes = [];
 		this.availableEmoteSets = [];
 		this.emoteFetchPromise = null;
@@ -52,51 +49,6 @@ module.exports = class TwitchController extends require("./template.js") {
 		this.client.joinAll(sb.Channel.getJoinableForPlatform(this.platform).map(i => i.Name));
 
 		this.data.crons = [
-			new sb.Cron({
-				Name: "rejoin-channels",
-				Expression: "0 0 * * * *",
-				Description: "Attempts to reconnect channels on Twitch that the bot has been unable to join - most likely because of a ban.",
-				Code: async () => {
-					// If a channel has already been re-joined in the meantime, don't attempt to join it again.
-					// This could result in a double connection
-					for (const channel of this.failedJoinChannels) {
-						if (channel.sessionData?.joined) {
-							console.warn("Prevented channel from double-joining", { channel });
-							this.failedJoinChannels.delete(channel);
-						}
-					}
-
-					const results = await Promise.allSettled(
-						[...this.failedJoinChannels].map(i => this.client.join(i))
-					);
-
-					this.failedJoinReasons.clear();
-					this.failedJoinChannels.clear();
-
-					for (const { reason, status } of results) {
-						if (
-							status === "rejected"
-							&& reason instanceof DankTwitch.JoinError
-							&& reason.failedChannelName
-							&& reason.message.includes("suspended")
-						) {
-							const channelData = sb.Channel.get(reason.failedChannelName, this.platform);
-							const row = await sb.Query.getRow("chat_data", "Channel");
-							await row.load(channelData.ID);
-
-							row.values.Mode = "Inactive";
-							await row.save();
-
-							await sb.Logger.log(
-								"Twitch.Fail",
-								`Channel ${channelData.Name} set to Inactive`,
-								channelData,
-								null
-							);
-						}
-					}
-				}
-			}),
 			new sb.Cron({
 				Name: "channels-live-status",
 				Expression: "0 */1 * * * *",
@@ -179,19 +131,62 @@ module.exports = class TwitchController extends require("./template.js") {
 			})
 		];
 
-		this.data.crons[0].start();
+		// Disabled temporarily - different channel join behaviour
+		// this.data.crons[0].start();
 		if (this.platform.Data.trackChannelsLiveStatus) {
-			this.data.crons[1].start();
+			// this.data.crons[1].start();
+			this.data.crons[0].start();
 		}
 	}
 
 	initListeners () {
 		const client = this.client;
 
-		client.on("error", (error) => {
+		client.on("error", async (error) => {
 			if (error instanceof DankTwitch.JoinError && error.failedChannelName) {
-				this.failedJoinChannels.add(error.failedChannelName);
-				this.failedJoinReasons.set(error.failedChannelName, error.message);
+				const channelData = sb.Channel.get(error.failedChannelName);
+				if (!channelData) {
+					return;
+				}
+
+				if (error.message.includes("suspended")) {
+					const row = await sb.Query.getRow("chat_data", "Channel");
+					await row.load(channelData.ID);
+
+					row.values.Mode = "Inactive";
+					await row.save();
+
+					await sb.Logger.log(
+						"Twitch.Fail",
+						`Channel ${channelData.Name} suspended - set to Inactive`,
+						channelData,
+						null
+					);
+				}
+				else if (error.message.includes("Timed out after waiting for response")) {
+					const response = await sb.Got("Helix", {
+						url: "users",
+						searchParams: { id: channelData.Specific_ID }
+					});
+
+					if (response.body.data.length === 0) {
+						const row = await sb.Query.getRow("chat_data", "Channel");
+						await row.load(channelData.ID);
+
+						row.values.Mode = "Inactive";
+						await row.save();
+
+						await sb.Logger.log(
+							"Twitch.Fail",
+							`Channel ${channelData.Name} renamed/unavailable - set to Inactive`,
+							channelData,
+							null
+						);
+					}
+					// else {
+					// 	setTimeout(() => client.join(channelData.Name), 60_000);
+					// }
+				}
 			}
 			else if (error instanceof DankTwitch.SayError && error.cause instanceof DankTwitch.MessageError) {
 				if (error.message.includes("Bad response message")) {
