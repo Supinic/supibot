@@ -45,7 +45,7 @@ module.exports = {
 			const follow = follows[0];
 			const followUser = (follow.channel.name.toLowerCase() === context.user.Name)
 				? "you!"
-				: follow.user.name;
+				: follow.channel.name;
 
 			const delta = sb.Utils.timeDelta(new sb.Date(follow.created_at), false, true);
 			return {
