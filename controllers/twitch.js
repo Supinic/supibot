@@ -174,8 +174,29 @@ module.exports = class TwitchController extends require("./template.js") {
 						);
 					}
 					else {
-						const { login } = response.body.data[0];
+						const { id, login } = response.body.data[0];
 						if (login === channelData.Name) {
+							return;
+						}
+						else if (channelData.Specific_ID !== id) {
+							const dump = JSON.stringify({
+								old: {
+									name: channelData.Name,
+									id: channelData.Specific_ID
+								},
+								new: {
+									name: login,
+									id
+								}
+							});
+
+							await sb.Logger.log(
+								"Twitch.Warning",
+								`Possible user rename has a mismatched user ID. Data dump: ${dump}`,
+								channelData,
+								null
+							);
+
 							return;
 						}
 
