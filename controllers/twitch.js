@@ -163,7 +163,7 @@ module.exports = class TwitchController extends require("./template.js") {
 						null
 					);
 				}
-				else if (error.message.includes("Timed out after waiting for response")) {
+				else {
 					const response = await sb.Got("Helix", {
 						url: "users",
 						searchParams: { id: channelData.Specific_ID }
@@ -183,9 +183,6 @@ module.exports = class TwitchController extends require("./template.js") {
 							null
 						);
 					}
-					// else {
-					// 	setTimeout(() => client.join(channelData.Name), 60_000);
-					// }
 				}
 			}
 			else if (error instanceof DankTwitch.SayError && error.cause instanceof DankTwitch.MessageError) {
