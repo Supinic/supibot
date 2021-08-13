@@ -184,10 +184,10 @@ module.exports = class TwitchController extends require("./template.js") {
 
 						const otherChannelData = sb.Channel.get(login);
 						if (!otherChannelData) {
-							await sb.Channel.add(login, this.platform, previousMode, channelData.Specific_ID);
+							const joinedChannel = await sb.Channel.add(login, this.platform, previousMode, channelData.Specific_ID);
 							try {
 								await client.join(login);
-								await otherChannelData.send(`Rename detected MrDestructoid 👍 ${channelData.Name} -> ${login}`);
+								await joinedChannel.send(`Rename detected MrDestructoid 👍 ${channelData.Name} -> ${login}`);
 								await sb.Logger.log(
 									"Twitch.Success",
 									`Channel ${channelData.Name} renamed to ${login} - new channel created`,
