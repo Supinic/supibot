@@ -3,6 +3,7 @@ module.exports = {
 	Events: ["online", "offline"],
 	Description: "Sets up a periodic \"health notification\" when the channel goes live, and removes it when going offline.",
 	Code: (async function streamerHealthPrevention (context, options = {}) {
+		const { channel, event } = context;
 		if (channel.mode === "Read") {
 			return;
 		}
@@ -11,7 +12,6 @@ module.exports = {
 		}
 
 		const { minuteDelay = 30 } = options;
-		const { channel, event } = context;
 		const { intervals } = this.data;
 		if (event === "online" && !intervals[channel.ID]) {
 			intervals[channel.ID] = setInterval(
