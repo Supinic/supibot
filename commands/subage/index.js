@@ -102,10 +102,10 @@ module.exports = {
 			: `User ${userName} is`;
 
 		let channelString;
-		if (channelName === context.userName && userName === channelName) {
+		if (channelName === context.user.Name && userName === channelName) {
 			channelString = "yourself";
 		}
-		else if (channelName === context.userName) {
+		else if (channelName === context.user.Name) {
 			channelString = "you";
 		}
 		else {
