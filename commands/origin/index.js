@@ -9,7 +9,31 @@ module.exports = {
 		{ name: "index", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: (() => ({
+		createRelay: async (IDs) => {
+			const response = await sb.Got("Supinic", {
+				method: "POST",
+				url: "relay",
+				throwHttpErrors: false,
+				json: {
+					url: `/data/origin/lookup?${IDs}`
+				}
+			});
+
+			if (response.statusCode !== 200) {
+				return {
+					reply: `Multiple emotes found! Use "index:0" through "index:${IDs.length - 1}" to access each one.`,
+					cooldown: { length: 2500 }
+				};
+			}
+			else {
+				return {
+					reply: `Multiple emotes found! Check the list here: ${response.body.data.link} or use "index:0" through "index:${IDs.length - 1} to access them.`,
+					cooldown: { length: 2500 }
+				};
+			}
+		}
+	})),
 	Code: (async function origin (context, emote) {
 		if (!emote) {
 			return {
@@ -29,37 +53,36 @@ module.exports = {
 
 		const customIndex = context.params.index ?? null;
 		if (emoteData.length === 0) {
-			return {
-				success: false,
-				reply: "No definition found for given emote!"
-			};
+			if (emote.length < 4) {
+				return {
+					success: false,
+					reply: "No definitions found for given emote!"
+				};
+			}
+
+			const emoteData = await sb.Query.getRecordset(rs => rs
+				.select("ID")
+				.from("data", "Origin")
+				.where("Name COLLATE utf8mb4_bin %*like*", emote)
+				.flat("ID")
+			);
+
+			if (emoteData.length === 0) {
+				return {
+					success: false,
+					reply: "No definitions found for given emote!"
+				};
+			}
+
+			const IDs = emoteData.map(i => `ID=${i.ID}`).join("&");
+			return await this.staticData.createRelay(IDs);
 		}
 
 		// Attempt to use the emote available in current channel (context) first, if no index is provided
 		const implicitEmote = emoteData.find(i => i.Emote_ID === contextEmoteID);
 		if (emoteData.length > 1 && customIndex === null && !implicitEmote) {
 			const IDs = emoteData.map(i => `ID=${i.ID}`).join("&");
-			const response = await sb.Got("Supinic", {
-				method: "POST",
-				url: "relay",
-				throwHttpErrors: false,
-				json: {
-					url: `/data/origin/lookup?${IDs}`
-				}
-			});
-
-			if (response.statusCode !== 200) {
-				return {
-					reply: `Multiple emotes found! Use "index:0" through "index:${emoteData.length - 1}" to access each one.`,
-					cooldown: { length: 2500 }
-				};
-			}
-			else {
-				return {
-					reply: `Multiple emotes found! Check the list here: ${response.body.data.link} or use "index:0" through "index:${emoteData.length - 1} to access them.`,
-					cooldown: { length: 2500 }
-				};
-			}
+			return await this.staticData.createRelay(IDs);
 		}
 
 		const data = (emoteData.length > 1 && customIndex === null)
