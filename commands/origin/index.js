@@ -64,7 +64,6 @@ module.exports = {
 				.select("ID")
 				.from("data", "Origin")
 				.where("Name COLLATE utf8mb4_bin %*like*", emote)
-				.flat("ID")
 			);
 
 			if (emoteData.length === 0) {
