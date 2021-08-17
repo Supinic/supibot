@@ -7,6 +7,7 @@ module.exports = {
 	Flags: ["mention","pipe","use-params"],
 	Params: [
 		{ name: "_apos", type: "object" },
+		{ name: "_char", type: "string" },
 		{ name: "_force", type: "boolean" },
 		{ name: "_pos", type: "number" }
 	],
@@ -26,7 +27,27 @@ module.exports = {
 		}
 	})),
 	Code: (async function pipe (context, ...args) {
-		const invocations = args.join(" ").split(this.staticData.pipeRegex).map(i => i.trim());
+		let splitter;
+		if (context.params._char) {
+			splitter = context.params._char;
+		}
+		else {
+			const input = args.join(" ");
+			const alonePipeCount = [...input.matchAll(/\s\|\s/g)].length;
+			const aloneBracketCount = [...input.matchAll(/\s>\s/g)].length;
+
+			if (alonePipeCount === 0 && aloneBracketCount === 0) {
+				splitter = this.staticData.pipeRegex;
+			}
+			else if (aloneBracketCount > alonePipeCount) {
+				splitter = /\s>\s/;
+			}
+			else {
+				splitter = /\s\|\s/;
+			}
+		}
+
+		const invocations = args.join(" ").split(splitter).map(i => i.trim());
 		if (!context.externalPipe && invocations.length < 2) {
 			return {
 				success: false,
@@ -200,6 +221,11 @@ module.exports = {
 		"",
 
 		"<h5>Advanced pipe parameters</h5>",
+		"",
+
+		`<code>${prefix}pipe _char:(text) (...)</code>`,
+		`<code>${prefix}pipe _char:<u>FOO</u> rw 10 <u>FOO</u> translate to:de <u>FOO</u> tt fancy</code>`,
+		"When the <code>_char</code> parameter is used, the commands will be separated by a character/text of your choosing",
 		"",
 
 		`<code>${prefix}pipe _apos:(index) (...)</code>`,
