@@ -97,16 +97,31 @@ module.exports = {
 			};
 		}
 
+		const userString = (userName === context.user.Name)
+			? "You are"
+			: `User ${userName} is`;
+
+		let channelString;
+		if (channelName === context.userName && userName === channelName) {
+			channelString = "yourself";
+		}
+		else if (channelName === context.userName) {
+			channelString = "you";
+		}
+		else {
+			channelString = channelName;
+		}
+
 		const { daysRemaining, months } = relationship.cumulativeTenure;
 		if (!relationship.subscriptionBenefit) {
 			if (daysRemaining === 0 && months === 0) {
 				return {
-					reply: `User ${userName} is not subscribed to ${channelName}, and never has been.`
+					reply: `${userString} not subscribed to ${channelString}, and never has been.`
 				};
 			}
 			else {
 				return {
-					reply: `User ${userName} is not subscribed to ${channelName}, but used to be subscribed for ${months} months in total.`
+					reply: `${userString} not subscribed to ${channelString}, but used to be subscribed for ${months} months in total.`
 				};
 			}
 		}
@@ -118,7 +133,7 @@ module.exports = {
 
 			return {
 				reply: sb.Utils.tag.trim `
-					User ${userName} is subscribed to ${channelName}
+					${userString} subscribed to ${channelString}
 					for ${months} months in total
 					with a Tier ${tier} ${giftString} ${primeString} subscription.
 					Sub will renew in ${daysRemaining} days.
