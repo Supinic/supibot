@@ -69,7 +69,7 @@ module.exports = {
 			}
 			else {
 				return {
-					reply: `Found ${emoteData.length} definitions for your query, check them out here: ${response.body.data}`
+					reply: `Found ${emoteData.length} definitions for your query, check them out here: ${response.body.data.link}`
 				};
 			}
 		}
