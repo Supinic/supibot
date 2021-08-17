@@ -88,7 +88,7 @@ module.exports = {
 			}
 			else {
 				return {
-					reply: `Multiple emotes found! Check the list here: ${response.body.data.link} or use "index:0" through "index:${IDs.length - 1}" to access them.`,
+					reply: `Multiple emotes found! Check the list here: ${response.body.data.link} or use "index:0" through "index:${emoteData.length - 1}" to access them.`,
 					cooldown: { length: 2500 }
 				};
 			}
