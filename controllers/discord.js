@@ -43,9 +43,10 @@ module.exports = class DiscordController extends require("./template.js") {
 			for (const channel of joinable) {
 				const exists = active.find(i => i.id === channel.Name);
 				if (!exists) {
-					channel.Mode = "Inactive";
-					await channel.saveProperty("Mode", channel.Mode);
-					console.debug("Discord channel set as inactive", channel);
+					await Promise.all([
+						channel.saveProperty("Mode", channel.Mode),
+						sb.Logger.log("Discord.Other", "Discord channel set as inactive", channel, null)
+					]);
 				}
 			}
 		});
