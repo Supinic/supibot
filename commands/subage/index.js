@@ -113,13 +113,13 @@ module.exports = {
 			channelString = "yourself";
 		}
 		else if (userName === context.platform.Self_Name && userName === channelName) {
-			userString = "myself";
+			channelString = "myself";
 		}
 		else if (channelName === context.user.Name) {
 			channelString = "you";
 		}
 		else if (userName === context.platform.Self_Name) {
-			userString = "me";
+			channelString = "me";
 		}
 		else {
 			channelString = channelName;
