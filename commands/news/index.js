@@ -363,7 +363,7 @@ module.exports = {
 						helpers: ["supinic"]
 					},
 					{
-						name: "Idnes",
+						name: "iRozhlas",
 						url: "https://www.irozhlas.cz/",
 						path: "rss/irozhlas/section",
 						endpoints: ["zpravy-domov"],
