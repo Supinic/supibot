@@ -46,7 +46,7 @@ module.exports = {
 		}
 
 		const channelName = sb.User.normalizeUsername(channel ?? context.channel.Name);
-		const userName = (user ?? context.user.Name).toLowerCase();
+		const userName = sb.User.normalizeUsername(user ?? context.user.Name);
 
 		const response = await sb.Got({
 			method: "POST",
