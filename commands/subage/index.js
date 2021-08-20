@@ -45,7 +45,7 @@ module.exports = {
 			};
 		}
 
-		const channelName = (channel ?? context.channel.Name).toLowerCase();
+		const channelName = sb.User.normalizeUsername(channel ?? context.channel.Name);
 		const userName = (user ?? context.user.Name).toLowerCase();
 
 		const response = await sb.Got({
@@ -86,6 +86,12 @@ module.exports = {
 			return {
 				success: false,
 				reply: `No subscription data available!`
+			};
+		}
+		else if (!sub.data.targetUser) {
+			return {
+				success: false,
+				reply: `Target user does not exist!`
 			};
 		}
 
