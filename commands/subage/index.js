@@ -97,16 +97,29 @@ module.exports = {
 			};
 		}
 
-		const userString = (userName === context.user.Name)
-			? "You are"
-			: `User ${userName} is`;
+		let userString;
+		if (userName === context.user.Name) {
+			userString = "You are";
+		}
+		else if (userName === context.platform.Self_Name) {
+			userString = "I am";
+		}
+		else {
+			userString = `User ${userName} is`;
+		}
 
 		let channelString;
 		if (channelName === context.user.Name && userName === channelName) {
 			channelString = "yourself";
 		}
+		else if (userName === context.platform.Self_Name && userName === channelName) {
+			userString = "myself";
+		}
 		else if (channelName === context.user.Name) {
 			channelString = "you";
+		}
+		else if (userName === context.platform.Self_Name) {
+			userString = "me";
 		}
 		else {
 			channelString = channelName;
@@ -116,12 +129,12 @@ module.exports = {
 		if (!relationship.subscriptionBenefit) {
 			if (daysRemaining === 0 && months === 0) {
 				return {
-					reply: `${userString} not subscribed to ${channelString}, and never has been.`
+					reply: `${userString} not subscribed to ${channelString}, and never been before.`
 				};
 			}
 			else {
 				return {
-					reply: `${userString} not subscribed to ${channelString}, but used to be subscribed for ${months} months in total.`
+					reply: `${userString} not subscribed to ${channelString}, but used to - for ${months} months in total.`
 				};
 			}
 		}
@@ -130,13 +143,16 @@ module.exports = {
 			const giftString = (benefit.gift.isGift) ? "gifted" : "";
 			const primeString = (benefit.purchasedWithPrime) ? "Prime" : "";
 			const tier = benefit.tier.replace("000", "");
+			const remainingString = (daysRemaining === 0)
+				? "less than 24 hours"
+				: `${daysRemaining} days`;
 
 			return {
 				reply: sb.Utils.tag.trim `
 					${userString} subscribed to ${channelString}
 					for ${months} months in total
 					with a Tier ${tier} ${giftString} ${primeString} subscription.
-					Sub will renew/expire in ${daysRemaining} days.
+					Sub will renew/expire in ${remainingString}.
 				`
 			};
 		}
