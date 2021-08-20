@@ -9,7 +9,8 @@ module.exports = {
 		{ name: "confidence", type: "boolean" },
 		{ name: "direction", type: "boolean" },
 		{ name: "from", type: "string" },
-		{ name: "to", type: "string" }
+		{ name: "to", type: "string" },
+		{ name: "textOnly", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -66,7 +67,7 @@ module.exports = {
 			options[option] = code.toLowerCase();
 		}
 
-		const response = await sb.Got({
+		const response = await sb.Got("FakeAgent", {
 			url: "https://translate.googleapis.com/translate_a/single",
 			responseType: "json",
 			throwHttpErrors: false,
@@ -78,9 +79,6 @@ module.exports = {
 				sl: options.from,
 				tl: options.to,
 				q: args.join(" ")
-			},
-			headers: {
-				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36"
 			}
 		});
 
@@ -104,7 +102,7 @@ module.exports = {
 
 		const data = response.body;
 		let reply = data[0].map(i => i[0]).join(" ");
-		if (options.direction) {
+		if (options.direction && !context.params.textOnly) {
 			const languageID = data[2].replace(/-.*/, "");
 			const fromLanguageName = languageISO.getName(languageID);
 			if (!fromLanguageName) {
@@ -134,6 +132,10 @@ module.exports = {
 
 		`<code>${prefix}translate (text)</code>`,
 		"Translates the text from auto-detected language to English.",
+		"",
+
+		`<code>${prefix}translate textOnly:true (text)</code>`,
+		"Translates the text, and only outputs the result text, without the direction and confidence %.",
 		"",
 
 		`<code>${prefix}translate from:fr (text)</code>`,
