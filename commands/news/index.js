@@ -359,7 +359,14 @@ module.exports = {
 						name: "Aktualne.cz",
 						url: "https://zpravy.aktualne.cz/",
 						path: "rss",
-						endpoints: ["", "domaci", "regiony"],
+						endpoints: ["domaci"],
+						helpers: ["supinic"]
+					},
+					{
+						name: "Idnes",
+						url: "https://www.irozhlas.cz/",
+						path: "rss/irozhlas/section",
+						endpoints: ["zpravy-domov"],
 						helpers: ["supinic"]
 					}
 				]
