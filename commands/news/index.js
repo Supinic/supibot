@@ -477,6 +477,19 @@ module.exports = {
 						helpers: ["supinic"]
 					}
 				]
+			},
+			{
+				code: "fr",
+				language: "french",
+				sources: [
+					{
+						name: "Europe 1",
+						url: "https://www.europe1.fr",
+						path: null,
+						endpoints: ["rss.xml", "rss/faits-divers.xml"],
+						helpers: ["supinic"]
+					}
+				]
 			}
 		],
 
