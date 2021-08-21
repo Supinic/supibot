@@ -440,12 +440,13 @@ module.exports = class TwitchController extends require("./template.js") {
 				maxSize: modes[channelData.Mode].queueSize
 			});
 
-			scheduler.on("message", (msg) => {
+			const channelID = channelData.ID;
+			scheduler.on("message", async (msg) => {
 				try {
-					this.client.say(channelName, msg);
+					await this.client.say(channelName, msg);
 				}
 				catch (e) {
-					console.debug("Twitch send error", e);
+					await sb.Logger.log("Twitch.Warning", String(e), { ID: channelID }, null);
 				}
 			});
 
@@ -479,7 +480,12 @@ module.exports = class TwitchController extends require("./template.js") {
 		const userData = await sb.User.get(user);
 		const trimmedMessage = message.replace(/[\r\n]/g, " ").trim();
 
-		await this.client.whisper(userData.Name, trimmedMessage);
+		try {
+			await this.client.whisper(userData.Name, trimmedMessage);
+		}
+		catch (e) {
+			await sb.Logger.log("Twitch.Warning", String(e), null, null);
+		}
 	}
 
 	/**
