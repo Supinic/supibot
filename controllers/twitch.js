@@ -677,16 +677,16 @@ module.exports = class TwitchController extends require("./template.js") {
 				skipBanphrases: true
 			});
 
-			this.pm(message, userData.Name);
+			await this.pm(message, userData.Name);
 		}
 		else {
 			if (channelData?.Mirror) {
-				this.mirror(execution.reply, userData, channelData, true);
+				await this.mirror(execution.reply, userData, channelData, true);
 			}
 
 			const message = await this.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
 			if (message) {
-				this.send(message, channelData);
+				await this.send(message, channelData);
 			}
 		}
 
@@ -802,7 +802,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 
 			if (this.platform.Logging.subs && !logSkipModes.includes(channelData.Mode)) {
-				sb.Logger.log("Twitch.Sub", plans[subPlanName], channelData, userData);
+				await sb.Logger.log("Twitch.Sub", plans[subPlanName], channelData, userData);
 			}
 		}
 		else if (messageObject.messageID === "anonsubgift" || messageObject.isSubgift()) {
