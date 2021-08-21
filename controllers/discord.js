@@ -64,10 +64,16 @@ module.exports = class DiscordController extends require("./template.js") {
 			} = this.parseMessage(messageObject);
 
 			if (Array.from(user).length > 32) {
-				console.debug("Invalid Discord username! user.length > 32, skipping", {
-					chan, discordID, guild, msg, user, userLength: user.length
+				const json = JSON.stringify({
+					chan,
+					discordID,
+					guild,
+					msg,
+					user,
+					userLength: user.length
 				});
 
+				await sb.Logger.log("Discord.Warning", `Discord username length > 32 characters: ${json}`);
 				return;
 			}
 
@@ -222,8 +228,8 @@ module.exports = class DiscordController extends require("./template.js") {
 			}
 		});
 
-		client.on("error", (err) => {
-			console.error(err);
+		client.on("error", async (err) => {
+			await sb.Logger.log("Discord.Error", err.toString(), null, null);
 			this.restart();
 		});
 	}
@@ -238,7 +244,6 @@ module.exports = class DiscordController extends require("./template.js") {
 		const channelData = sb.Channel.get(channel, this.platform);
 		const channelObject = await this.client.channels.fetch(channelData.Name);
 		if (!channelObject) {
-			console.warn("No Discord channel available!", channel);
 			return;
 		}
 

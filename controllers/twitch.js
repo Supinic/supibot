@@ -216,8 +216,7 @@ module.exports = class TwitchController extends require("./template.js") {
 									null
 								);
 							}
-							catch (e) {
-								console.warn("Auto-rename failed", e);
+							catch {
 								await sb.Logger.log(
 									"Twitch.Fail",
 									`Channel ${channelData.Name} renamed to ${login} - new channel created, but join failed`,
@@ -238,8 +237,7 @@ module.exports = class TwitchController extends require("./template.js") {
 									null
 								);
 							}
-							catch (e) {
-								console.warn("Auto-re-rename failed", e);
+							catch {
 								await sb.Logger.log(
 									"Twitch.Fail",
 									`Channel ${channelData.Name} re-renamed to ${login} - but join failed`,
@@ -260,7 +258,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					if (messageText.includes("reminders from")) {
 						const recipient = messageText.match(/(.*), reminders from:/);
 						if (recipient) {
-							this.pm(`Couldn't post reminder: ${messageText}`, recipient);
+							await this.pm(`Couldn't post reminder: ${messageText}`, recipient);
 
 							defaultReply = sb.Utils.tag.trim `
 								@${recipient[1]},
@@ -349,7 +347,13 @@ module.exports = class TwitchController extends require("./template.js") {
 			switch (messageID) {
 				case "msg_rejected":
 				case "msg_rejected_mandatory": {
-					console.warn("Rejected message", { channelName, messageID, rest });
+					const json = JSON.stringify({ channelName, messageID, rest });
+					await sb.Logger.log(
+						"Twitch.Warning",
+						`Rejected message: ${json}`,
+						channelData
+					);
+
 					break;
 				}
 
@@ -361,7 +365,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					const previousMode = channelData.Mode;
 					await Promise.all([
 						channelData.saveProperty("Mode", "Inactive"),
-						sb.Logger.log(
+						await sb.Logger.log(
 							"Twitch.Ban",
 							`Bot banned in channel ${channelData.Name}. Previous mode: ${previousMode}`,
 							channelData
