@@ -325,8 +325,8 @@ module.exports = class Reminder extends require("./template.js") {
 	}
 
 	/**
-	 * @param {User} targetUserData The user ID to check for
-	 * @param {Channel} channelData The channel where the reminder was fired
+	 * @param {sb.User} targetUserData The user ID to check for
+	 * @param {sb.Channel} channelData The channel where the reminder was fired
 	 */
 	static async checkActive (targetUserData, channelData) {
 		if (!Reminder.data.has(targetUserData.ID)) {
