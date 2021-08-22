@@ -226,10 +226,10 @@ module.exports = class Channel extends require("./template.js") {
 	 */
 	getPlatformName () {
 		if (this.Platform.Name === "twitch" || this.Platform.Name === "mixer") {
-			return `${this.Platform.capital}-${this.Name}`;
+			return `${this.Platform.Name}-${this.Name}`;
 		}
 		else {
-			return this.Platform.capital;
+			return this.Platform.Name;
 		}
 	}
 
