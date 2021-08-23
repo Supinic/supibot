@@ -21,7 +21,8 @@ module.exports = (function () {
 				headers: {
 					"Content-Type": "application/x-www-form-urlencoded"
 				},
-				timeout: sb.Config.get("PAJBOT_API_TIMEOUT")
+				timeout: sb.Config.get("PAJBOT_API_TIMEOUT"),
+				retry: 1
 			};
 
 			/** @type {PajbotBanphraseAPIResponse} */
@@ -276,6 +277,7 @@ module.exports = (function () {
 					);
 
 					response = responseData[apiResultSymbol];
+
 					if (response !== false) { // @todo platform-specific logging flag
 						const row = await sb.Query.getRow("chat_data", "Banphrase_API_Denial_Log");
 						row.setValues({
@@ -290,11 +292,9 @@ module.exports = (function () {
 					}
 				}
 				catch (e) {
-					const { code, message } = e;
-
 					await sb.Logger.log(
 						"System.Warning",
-						`Banphrase API fail - code: ${code}, message: ${message}`,
+						`Banphrase API fail - code: ${e.code ?? "N/A"}, message: ${e.message ?? "N/A"}`,
 						channelData,
 						null
 					);
@@ -323,11 +323,11 @@ module.exports = (function () {
 
 						case "Refuse": {
 							let string;
-							if (code === "ETIMEDOUT") {
+							if (e.code === "ETIMEDOUT") {
 								string = `Cannot reply - banphrase API timed out.`;
 							}
-							else if (code === "HTTPError") {
-								const match = message.match(/Response code (\d+)/);
+							else if (e.code === "HTTPError") {
+								const match = e.message.match(/Response code (\d+)/);
 								const statusString = (match)
 									? `(status code ${match[1]})`
 									: "";
