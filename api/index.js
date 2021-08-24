@@ -11,6 +11,7 @@ module.exports = (function () {
 	const subroutes = [
 		["afk", "afk.js"],
 		["channel", "channel.js"],
+		["filter", "filter.js"],
 		["health", "health.js"],
 		["reminder", "reminder.js"],
 		["user", "user.js"]

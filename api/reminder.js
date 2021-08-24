@@ -11,7 +11,7 @@ module.exports = {
 		const IDs = url.searchParams.getAll("ID").map(Number).filter(Boolean);
 		const result = await sb.Reminder.reloadSpecific(...IDs);
 
-		const [active, inactive] = sb.Utils.splitByCondition(IDs, sb.Reminder.get);
+		const [active, inactive] = sb.Utils.splitByCondition(IDs, i => sb.Reminder.get(i));
 		return {
 			statusCode: 200,
 			data: {
