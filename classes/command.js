@@ -35,10 +35,11 @@ class Context {
 	getMeta (name) { return this.#meta.get(name); }
 	setMeta (name, value) { this.#meta.set(name, value); }
 
+
 	/**
 	 * Fetches the proper permissions for a provided user/channel/platform combo, substituting those that are not
 	 * provided with the context's own options.
-	 * @param {"any"|"all"|"array"} type Determines the result "shape" - `any` returns true if at least one flag is set,
+	 * @param {UserPermissionResultType} type Determines the result "shape" - `any` returns true if at least one flag is set,
 	 * `all` returns true if all are set, and `array` returns the boolean array as is
 	 * @param {UserPermissionLevel[]} levels The permission levels to check
 	 * @param {Object} options
@@ -502,6 +503,8 @@ class Command extends require("./template.js") {
 	 * @param {Channel|null} channelData
 	 * @param {User} userData
 	 * @param {Object} options = {} any extra options that will be passed to the command as extra.append
+	 * @param {boolean} [options.internalExecution]
+	 * @param {Platform} options.platform
 	 * @param {boolean} [options.skipMention] If true, no mention will be added to the command string, regardless of other options.
 	 * @returns {CommandResult}
 	 */
@@ -699,7 +702,7 @@ class Command extends require("./template.js") {
 			args: args ?? []
 		});
 
-		if (!filterData.success) {
+		if (!filterData.success && !options.internalExecution) {
 			sb.CooldownManager.unsetPending(userData.ID);
 
 			let length = command.Cooldown;
@@ -1328,4 +1331,8 @@ module.exports = Command;
 
 /**
  * @typedef {"admin"|"owner"|"ambassador"} UserPermissionLevel
+ */
+
+/**
+ *  @typedef {"any"|"all"|"array"} UserPermissionResultType
  */
