@@ -15,7 +15,7 @@ module.exports = {
 				reply: "No search query provided!"
 			};
 		}
-	
+
 		const data = await sb.Got({
 			url: "https://www.npmjs.com/search",
 			method: "GET",
@@ -28,23 +28,26 @@ module.exports = {
 				.set("q", args.join(" "))
 				.toString()
 		}).json();
-	
+
 		if (data.package) {
+			const lastPublish = data.upsell?.createdAt ?? data.capsule?.lastPublish?.time;
+			const delta = (lastPublish)
+				? sb.Utils.timeDelta(new sb.Date(lastPublish))
+				: "N/A";
+
 			const { version, description, repository } = data.packument;
-			const { createdAt } = data.upsell;
-			const delta = sb.Utils.timeDelta(new sb.Date(createdAt));
 			return {
 				reply: `${data.package} v${version}: ${description} (last publish: ${delta}) ${repository}`
 			};
 		}
-	
+
 		if (data.objects.length === 0) {
 			return {
 				success: false,
 				reply: "No packages found for that query!"
 			};
 		}
-	
+
 		const { date, description, links, name, publisher, version } = data.objects[0].package;
 		return {
 			reply: `${name} v${version} by ${publisher?.name ?? "(unknown)"}: ${description} (last publish: ${date.rel}) ${links.npm}`
