@@ -714,7 +714,7 @@ class Command extends require("./template.js") {
 			&& filterData.filter.Invocation === null
 		);
 
-		if (!filterData.success && (!options.skipGlobalBan || isFilterGlobalBan)) {
+		if (!filterData.success && (!options.skipGlobalBan || !isFilterGlobalBan)) {
 			sb.CooldownManager.unsetPending(userData.ID);
 
 			let length = command.Cooldown;
