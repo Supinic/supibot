@@ -46,7 +46,7 @@ module.exports = {
 					url: "relay",
 					throwHttpErrors: false,
 					json: {
-						url: `/data/changelog/lookup/${params}`
+						url: `/data/changelog/lookup?${params}`
 					}
 				});
 
