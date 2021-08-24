@@ -56,6 +56,12 @@ module.exports = {
 				}
 			});
 
+			if (broadcasterData.statusCode !== 200) {
+				return {
+					reply: `Channel is offline - no more data currently available. Try again later`
+				};
+			}
+
 			const { banned, lastBroadcast } = broadcasterData.body;
 			const status = (banned) ? "banned" : "offline";
 			if (lastBroadcast.startedAt === null) {
