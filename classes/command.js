@@ -503,7 +503,8 @@ class Command extends require("./template.js") {
 	 * @param {Channel|null} channelData
 	 * @param {User} userData
 	 * @param {Object} options = {} any extra options that will be passed to the command as extra.append
-	 * @param {boolean} [options.internalExecution]
+	 * @param {boolean} [options.internalExecution] currently unused
+	 * @param {boolean} [options.skipGlobalBan]
 	 * @param {Platform} options.platform
 	 * @param {boolean} [options.skipMention] If true, no mention will be added to the command string, regardless of other options.
 	 * @returns {CommandResult}
@@ -702,7 +703,18 @@ class Command extends require("./template.js") {
 			args: args ?? []
 		});
 
-		if (!filterData.success && !options.internalExecution) {
+		const isFilterGlobalBan = Boolean(
+			!filterData.success
+			&& filterData.reason === "blacklist"
+			&& filterData.filter.Active
+			&& filterData.filter.User_Alias !== null
+			&& filterData.filter.Channel === null
+			&& filterData.filter.Platform === null
+			&& filterData.filter.Command === null
+			&& filterData.filter.Invocation === null
+		);
+
+		if (!filterData.success && (!options.skipGlobalBan || isFilterGlobalBan)) {
 			sb.CooldownManager.unsetPending(userData.ID);
 
 			let length = command.Cooldown;
