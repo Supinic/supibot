@@ -38,7 +38,10 @@ module.exports = {
 			args,
 			channelData,
 			userData,
-			{ platform: platformData }
+			{
+				platform: platformData,
+				skipGlobalBan: url.searchParams.has("skipGlobalBan")
+			}
 		);
 
 		return {
