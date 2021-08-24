@@ -1012,6 +1012,14 @@ module.exports = {
 		"If you use <code>copyplace</code>, it will replace whatever alias you have with that name without asking.",
 		"",
 
+		`<code>${prefix}alias link (username) (alias)</code>`,
+		"Takes someone else's alias, and creates a link of it for you, with the same name.",
+		"A link simply executes the user's alias, without you needing to specify it.",
+		"If the original link changes, then so will the execution of your link - as it is the same alias, really.",
+		"If the original is deleted, then your link will become invalid.",
+		"This is recommended to use with reputable alias creators, or if you actually trust someone with their alias and the changes.",
+		"",
+
 		`<code>${prefix}alias check</code>`,
 		`<code>${prefix}alias spy</code>`,
 		`<code>${prefix}alias code</code>`,
