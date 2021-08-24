@@ -16,7 +16,15 @@ module.exports = {
 		const channel = url.searchParams.get("channel");
 		const user = url.searchParams.get("user");
 
-		const channelData = sb.Channel.get(channel, platform) ?? null;
+		const platformData = sb.Platform.get(platform);
+		if (!platformData) {
+			return {
+				statusCode: 400,
+				error: { message: `Valid platform must be provided` }
+			};
+		}
+
+		const channelData = sb.Channel.get(channel, platformData) ?? null;
 		const userData = await sb.User.get(user, true) ?? null;
 		if (!userData) {
 			return {
@@ -29,7 +37,8 @@ module.exports = {
 			invocation,
 			args,
 			channelData,
-			userData
+			userData,
+			{ platform: platformData }
 		);
 
 		return {
