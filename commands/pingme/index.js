@@ -17,20 +17,33 @@ module.exports = {
 	})),
 	Code: (async function pingMe (context, user) {
 		if (!user) {
-			return { reply: "No user provided!" };
+			return {
+				success: false,
+				reply: "No target user provided!"
+			};
 		}
-	
+
+		const dankEmote = await context.getBestAvailableEmote(["FeelsDankMan", "BrokeBack"], "🤪");
 		const targetUser = await sb.User.get(user, true);
 		if (!targetUser) {
-			return { reply: "Target user does not exist!" };
+			return {
+				success: false,
+				reply: "Target user does not exist!"
+			};
 		}
 		else if (targetUser.ID === context.user.ID) {
-			return { reply: "That makes no sense FeelsDankMan" };
+			return {
+				success: false,
+				reply: `Pong! You just typed in chat! ${dankEmote}`
+			};
 		}
 		else if (targetUser.Name === context.platform.Self_Name) {
-			return { reply: "Pong! FeelsDankMan I'm here!" };
+			return {
+				success: false,
+				reply: `Pong! I just typed in chat! ${dankEmote}`
+			};
 		}
-	
+
 		const { success, cause, ID } = await sb.Reminder.create({
 			Channel: context.channel?.ID || null,
 			User_From: context.user.ID,
@@ -41,7 +54,7 @@ module.exports = {
 			Private_Message: Boolean(context.privateMessage),
 			Platform: context.platform.ID
 		});
-	
+
 		if (success && !cause) {
 			return {
 				reply: `I will ping you when they type in chat (ID ${ID})`
@@ -49,7 +62,7 @@ module.exports = {
 		}
 		else {
 			return {
-				reply: this.staticData.strings[cause]
+				reply: `Could not set up a ping! ${this.staticData.strings[cause] ?? "(Unknown)"}`
 			};
 		}
 	}),
