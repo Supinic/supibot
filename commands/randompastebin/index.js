@@ -70,6 +70,14 @@ module.exports = {
 			});
 		}
 
+		if (syntax === "list") {
+			const list = [...new Set(data.map(i => i.syntax))].sort();
+			return {
+				success: false,
+				reply: `List of currently available languages: ${list.join(", ")}`
+			};
+		}
+
 		let filteredData = data;
 		if (syntax || context.params.syntax) {
 			const inputSyntax = context.params.syntax ?? syntax;
@@ -132,6 +140,10 @@ module.exports = {
 			`<code>${prefix}rpb (language)</code>`,
 			`<code>${prefix}rpb syntax:(language)</code>`,
 			"Posts a summary of a paste, only using your provided programming language.",
+			"",
+
+			`<code>${prefix}rpb list</code>`,
+			"Shows a list of currently available languages.",
 			"",
 
 			listDescription,
