@@ -95,9 +95,11 @@ module.exports = {
 			};
 		}
 
+		// Apparently, especially for multi-word phrases, the API returns its type as "undefined" (string)
+		const type = (result.type === "undefined") ? "N/A" : result.type;
 		const position = `(index ${index}/${items.length - 1})`;
 		return {
-			reply: `${position} ${data[0].word} (${result.type}): ${result.definition}`
+			reply: `${position} ${data[0].word} (${type}): ${result.definition}`
 		};
 	}),
 	Dynamic_Description: (async (prefix, values) => {
