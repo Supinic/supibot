@@ -264,10 +264,19 @@ module.exports = {
 
 		const post = sb.Utils.randArray(validPosts);
 		if (!post) {
-			return {
-				success: false,
-				reply: "No suitable posts found!"
-			};
+			if (repeatedPosts.length === 0) {
+				return {
+					success: false,
+					reply: "No eligible posts found!"
+				};
+			}
+			else {
+				forum.repeatedPosts = [];
+				return {
+					success: false,
+					reply: "No suitable posts found! Repeated posts cleared ♻"
+				};
+			}
 		}
 		else {
 			if ((this.staticData.banned.includes(forum.name) || post.nsfw) && context.append.pipe) {
