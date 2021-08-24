@@ -73,7 +73,7 @@ module.exports = {
 		if (syntax === "list") {
 			const list = [...new Set(data.map(i => i.syntax))].sort();
 			return {
-				success: false,
+				cooldown: 2500,
 				reply: `List of currently available languages: ${list.join(", ")}`
 			};
 		}
@@ -89,6 +89,7 @@ module.exports = {
 			const list = [...new Set(data.map(i => i.syntax))].sort();
 			return {
 				success: false,
+				cooldown: 2500,
 				reply: `Could not find any pastes matching your search! Currently available languages: ${list.join(", ")}`
 			};
 		}
