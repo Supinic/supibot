@@ -153,7 +153,7 @@ module.exports = {
 		}
 
 		return {
-			repeats: 10,
+			repeats: 25,
 			expiration,
 			RedditPost,
 			Subreddit,
@@ -274,7 +274,7 @@ module.exports = {
 				forum.repeatedPosts = [];
 				return {
 					success: false,
-					reply: "No suitable posts found! Repeated posts cleared ♻"
+					reply: "Front page posts have all been posted! ♻ If you try again, you will receive repeated results."
 				};
 			}
 		}
