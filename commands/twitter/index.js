@@ -7,6 +7,7 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "includeRetweets", type: "boolean" },
+		{ name: "random", type: "boolean" },
 		{ name: "textOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
@@ -48,6 +49,8 @@ module.exports = {
 			});
 		}
 
+		// necessary to fetch - deleted/suspended tweets take up space in the slice
+		const limit = (context.params.random) ? "200" : "100";
 		const response = await sb.Got("GenericAPI", {
 			method: "GET",
 			url: "https://api.twitter.com/1.1/statuses/user_timeline.json",
@@ -58,7 +61,7 @@ module.exports = {
 			},
 			searchParams: {
 				screen_name: user,
-				count: "100", // necessary to fetch - deleted/suspended tweets take up space in the slice
+				count: limit,
 				trim_user: "true",
 				include_rts: "true",
 				exclude_replies: "true"
@@ -90,11 +93,18 @@ module.exports = {
 			}
 		}
 
-		const [tweet] = eligibleTweets;
-		if (!tweet) {
-			return {
-				reply: "That account has not tweeted so far."
-			};
+		let tweet;
+		if (context.params.random) {
+			tweet = sb.Utils.randArray(eligibleTweets);
+		}
+		else {
+			tweet = eligibleTweets[0];
+
+			if (!tweet) {
+				return {
+					reply: "That account has not tweeted so far."
+				};
+			}
 		}
 
 		const fixedText = sb.Utils.fixHTML(tweet.text);
@@ -117,6 +127,10 @@ module.exports = {
 		`<code>${prefix}tweet (account)</code>`,
 		`<code>${prefix}twitter (account)</code>`,
 		"Gets the last tweet.",
+		"",
+
+		`<code>${prefix}twitter random:true (account)</code>`,
+		"Instead of fetching the last tweet, fetches a random tweet from the account's recent history (up to 200 tweets)",
 		"",
 
 		`<code>${prefix}twitter includeRetweets:true (account)</code>`,
