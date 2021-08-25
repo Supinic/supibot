@@ -101,7 +101,7 @@ module.exports = {
 		const writeStream = fs.createWriteStream(`/tmp/${link}`);
 		await pipeline(downloadStream, writeStream);
 
-		const colours = ["#0F0", "#F00", "#00F", "#FF0", "#0FF", "#F0F"];
+		const colours = ["#0F0", "#F00", "#00F", "#FF0", "#0FF", "#F0F", "#0A0", "#A00", "#00A", "#FFF"];
 		const params = data.detections.map((i, ind) => {
 			const coords = i.bounding_box;
 			return sb.Utils.tag.trim `
