@@ -503,6 +503,26 @@ module.exports = {
 						helpers: ["supinic"]
 					}
 				]
+			},
+			{
+				code: "me",
+				language: "montenegrin",
+				sources: [
+					{
+						name: "RTCG",
+						url: "http://www.rtcg.me",
+						path: "vijesti",
+						endpoints: ["rss.html", "drustvo/rss.html", "region/rss.html"],
+						helpers: ["supinic"]
+					},
+					{
+						name: "Radio Slobodna Evropa",
+						url: "https://www.slobodnaevropa.org",
+						path: "api",
+						endpoints: ["zitorejoio"],
+						helpers: ["supinic"]
+					}
+				]
 			}
 		],
 
