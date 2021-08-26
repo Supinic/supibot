@@ -490,6 +490,19 @@ module.exports = {
 						helpers: ["supinic"]
 					}
 				]
+			},
+			{
+				code: "sg",
+				language: "english",
+				sources: [
+					{
+						name: "CNA",
+						url: "https://www.channelnewsasia.com",
+						path: "api/v1",
+						endpoints: ["rss-outbound-feed?_format=xml&category=10416"],
+						helpers: ["supinic"]
+					}
+				]
 			}
 		],
 
