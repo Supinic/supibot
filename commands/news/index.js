@@ -514,13 +514,6 @@ module.exports = {
 						path: "vijesti",
 						endpoints: ["rss.html", "drustvo/rss.html", "region/rss.html"],
 						helpers: ["supinic"]
-					},
-					{
-						name: "Radio Slobodna Evropa",
-						url: "https://www.slobodnaevropa.org",
-						path: "api",
-						endpoints: ["zitorejoio"],
-						helpers: ["supinic"]
 					}
 				]
 			}
