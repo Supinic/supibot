@@ -268,12 +268,12 @@ module.exports = {
 						});
 					}
 
-					await context.platform.pm(
-						`Detail of Supibot error ID ${ID}: ${link}`,
-						context.user.Name,
-						context.channel ?? null
-					);
+					const reply = `Detail of Supibot error ID ${ID}: ${link}`;
+					if (context.privateMessage) {
+						return { reply };
+					}
 
+					await context.platform.pm(reply, context.user.Name, context.channel ?? null);
 					return {
 						reply: "The error stack Pastebin link has been whispered to you 💻"
 					};
