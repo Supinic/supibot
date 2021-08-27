@@ -150,7 +150,10 @@ module.exports = class TwitchController extends require("./template.js") {
 				}
 
 				if (error.message.includes("suspended")) {
+					channelData.Data.inactiveReason = "suspended";
+					await channelData.saveProperty("Data");
 					await channelData.saveProperty("Mode", "Inactive");
+
 					await sb.Logger.log(
 						"Twitch.Fail",
 						`Channel ${channelData.Name} suspended - set to Inactive`,
@@ -165,7 +168,10 @@ module.exports = class TwitchController extends require("./template.js") {
 					});
 
 					if (response.body.data.length === 0) {
+						channelData.Data.inactiveReason = "suspended";
+						await channelData.saveProperty("Data");
 						await channelData.saveProperty("Mode", "Inactive");
+
 						await sb.Logger.log(
 							"Twitch.Fail",
 							`Channel ${channelData.Name} unavailable - set to Inactive`,
@@ -201,6 +207,8 @@ module.exports = class TwitchController extends require("./template.js") {
 						}
 
 						const previousMode = channelData.Mode;
+						channelData.Data.inactiveReason = "renamed";
+						await channelData.saveProperty("Data");
 						await channelData.saveProperty("Mode", "Inactive");
 
 						const otherChannelData = sb.Channel.get(login);
@@ -361,6 +369,9 @@ module.exports = class TwitchController extends require("./template.js") {
 					if (channelData.Mode === "Inactive") {
 						break;
 					}
+
+					channelData.Data.inactiveReason = "bot-banned";
+					await channelData.saveProperty("Data");
 
 					const previousMode = channelData.Mode;
 					await Promise.all([
@@ -711,6 +722,9 @@ module.exports = class TwitchController extends require("./template.js") {
 		const channelData = sb.Channel.get(channel, this.platform);
 		if (channelData) {
 			if (user === this.platform.Self_Name && length === null && this.platform.Data.partChannelsOnPermaban) {
+				channelData.Data.inactiveReason = "bot-banned";
+				await channelData.saveProperty("Data");
+
 				const previousMode = channelData.Mode;
 				await Promise.all([
 					channelData.saveProperty("Mode", "Inactive"),
