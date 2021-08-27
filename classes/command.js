@@ -1298,6 +1298,11 @@ module.exports = Command;
  * @property {Object} [cooldown] Dynamic cooldown settings
  * @property {string} [reason] Symbolic description of why command execution failed - used internally
  * @property {Object} [meta] Any other information passed back from the command execution
+ * @property {boolean} [partialExecute] Determines if a command is used as a part of a different meta-command
+ * @property {boolean} [hasExternalInput] Determines if a command can have arbitrary input - used for the "external prefix" symbol
+ * @property {boolean} [skipExternalPrefix] If `hasExternalInput` is true, this flag can override it and remove the symbol
+ * @property {boolean} [replyWithPrivateMessage] If true, the command reply should be sent via PMs
+ * @property {boolean} [removeEmbed] Determines if the command response should be embed or not
  */
 
 /**
