@@ -302,6 +302,7 @@ module.exports = {
 			: "";
 
 		return {
+			removeEmbeds: ((image.Score > 0.5 && detections.length > 0) || (image.Score > 0.75)),
 			reply: sb.Utils.tag.trim `
 				NSFW score: ${sb.Utils.round(image.Score * 100, 2)}%
 				Detections: ${detectionsString.length === 0 ? "N/A" : detectionsString.join(", ")}
