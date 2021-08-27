@@ -339,18 +339,23 @@ module.exports = class DiscordController extends require("./template.js") {
 			return;
 		}
 
+		if (execution.removeEmbeds === true) {
+			// wrapping a link in angle brackets removes its embedding from the Discord message
+			execution.reply = sb.Utils.replaceLinks(execution.reply, "<$1>");
+		}
+
 		if (channelData?.Mirror) {
-			this.mirror(execution.reply, userData,channelData, true);
+			await this.mirror(execution.reply, userData,channelData, true);
 		}
 
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
 			const message = await this.prepareMessage(execution.reply, null);
 
-			this.pm(message, userData);
+			await this.pm(message, userData);
 		}
 		else {
 			const message = await this.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
-			this.send(message, channelData);
+			await this.send(message, channelData);
 		}
 	}
 
