@@ -1302,7 +1302,7 @@ module.exports = Command;
  * @property {boolean} [hasExternalInput] Determines if a command can have arbitrary input - used for the "external prefix" symbol
  * @property {boolean} [skipExternalPrefix] If `hasExternalInput` is true, this flag can override it and remove the symbol
  * @property {boolean} [replyWithPrivateMessage] If true, the command reply should be sent via PMs
- * @property {boolean} [removeEmbed] Determines if the command response should be embed or not
+ * @property {boolean} [removeEmbeds] Determines if the command response should be embed or not
  */
 
 /**
