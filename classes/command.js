@@ -833,7 +833,7 @@ class Command extends require("./template.js") {
 				execution = {
 					success: false,
 					reason: "api-error",
-					reply: `🚨 Third party ${apiName} failed! Status code ${statusCode ?? "(N/A)"} (error ID ${errorID})}`
+					reply: `🚨 Third party ${apiName} failed! Status code ${statusCode ?? "(N/A)"} (error ID ${errorID})`
 				};
 			}
 			else if (e instanceof sb.errors.GenericRequestError) {
