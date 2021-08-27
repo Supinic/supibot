@@ -427,7 +427,7 @@ class Command extends require("./template.js") {
 	/**
 	 * Reloads a specific list of commands.
 	 * @param {string[]} list
-	 * @returns {Promise<void>} True if passed, false if
+	 * @returns {Promise<boolean>} True if passed, false if
 	 * @throws {sb.Error} If the list contains 0 valid commands
 	 */
 	static async reloadSpecific (...list) {
