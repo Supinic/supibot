@@ -223,14 +223,16 @@ module.exports = {
 				};
 			}
 
+			case "rejoin":
 			case "i-will-not-ban-supibot-again": {
+				const { inactiveReason } = channelData.Data;
 				if (channelData.Platform.Name !== "twitch") {
 					return {
 						success: false,
-						reply: `Re-enabling the bot after a ban is currently only available for Twitch channels!`
+						reply: `Re-enabling the bot is currently only available for Twitch channels!`
 					};
 				}
-				else if (channelData.Mode === "Inactive") {
+				else if (channelData.Mode === "Inactive" && (!inactiveReason || inactiveReason === "bot-banned")) {
 					return {
 						success: false,
 						reply: sb.Utils.tag.trim `
@@ -256,6 +258,11 @@ module.exports = {
 				}
 				catch {
 					joinFailed = true;
+				}
+
+				if (partFailed && joinFailed && (inactiveReason === "suspended" || inactiveReason === "renamed")) {
+					delete channelData.Data.inactiveReason;
+					await channelData.saveProperty("Data");
 				}
 
 				return {
@@ -337,7 +344,11 @@ module.exports = {
 			`If enabled, all links will be replaced by "[LINK]" or a similar placeholder.`,
 			"",
 
-			`<code>${prefix}bot i-will-not-ban-supibot-again</code>`,
+			`<code>${prefix}bot rejoin channel:(channel)</code>`,
+			"If you renamed your Twitch channel, or you got suspended and recently unbanned, you can use this command to get Supibot immediately!",
+			"This also works for other channels that you are an ambassador in.",
+			"",
+
 			`<code>${prefix}bot i-will-not-ban-supibot-again channel:(channel)</code>`,
 			`If the bot has been banned in the channel, and unbanned rather quickly (not more than ~1 hour), you can use this command to attempt to have Supibot re-join.`,
 			"Should the ban last for too long, Supibot will be unable to join automatically.",
