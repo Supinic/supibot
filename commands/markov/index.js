@@ -44,12 +44,25 @@ module.exports = {
 		});
 		this.data.updateCron.start();
 
+		const threshold = 250;
 		return {
 			limit: 20,
-			threshold: 250,
+			threshold,
 			destroy: (command) => {
 				if (command.data.updateCron) {
 					command.data.updateCron.destroy();
+				}
+
+				const module = sb.ChatModule.get("async-markov-experiment");
+				const fs = require("fs").promises;
+
+				for (const [channelID, markov] of module.data.markovs.entries()) {
+					if (markov.size < threshold) {
+						continue;
+					}
+
+					const fileName = `markov-dump-${new sb.Date().format("Y-m-d H:i")}-channel-${channelID}.json`;
+					fs.writeFile(`/code/markovs/${fileName}`, JSON.stringify(markov));
 				}
 			}
 		};
