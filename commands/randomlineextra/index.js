@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 7500,
 	Description: "Posts a random message from a special set of channels on Twitch. You should be able to identify the channel by its emoji.",
-	Flags: ["block","pipe"],
+	Flags: ["external-input","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
