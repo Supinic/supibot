@@ -127,7 +127,7 @@ module.exports = class Reminder extends require("./template.js") {
 				message = `@${toUserData.Name}, timed reminder from ${fromUserData.Name} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
 
-			const statusAFK = sb.AwayFromKeyboard.data.get(toUserData);
+			const statusAFK = sb.AwayFromKeyboard.get(toUserData);
 			if (statusAFK && channelData) {
 				await sb.Reminder.create({
 					User_From: sb.Config.get("SELF_ID"),
