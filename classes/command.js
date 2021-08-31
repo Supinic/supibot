@@ -1067,6 +1067,22 @@ class Command extends require("./template.js") {
 		}
 	}
 
+	/**
+	 * Extracts all boolean values from a command execution result.
+	 * @param {CommandResult} execution
+	 * @returns {Object}
+	 */
+	static extractMetaResultProperties (execution) {
+		const result = {};
+		for (const [key, value] of Object.entries(execution)) {
+			if (typeof value === "boolean") {
+				result[key] = value;
+			}
+		}
+
+		return result;
+	}
+
 	static async install (options = {}) {
 		let data = null;
 		if (options.filePath) {
