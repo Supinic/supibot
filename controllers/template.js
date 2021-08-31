@@ -44,10 +44,11 @@ module.exports = class Controller {
 	 * @param {string} message
 	 * @param {User} userData
 	 * @param {Channel} channelData The channel where the message is coming from
-	 * @param {boolean} commandUsed = false If a command was used, do not include the user name of who issued the command.
+	 * @param {Object} [options]
+	 * @param {boolean} [options.commandUsed] = false If a command was used, do not include the user name of who issued the command.
 	 * @returns {Promise<void>}
 	 */
-	async mirror (message, userData, channelData, commandUsed = false) {
+	async mirror (message, userData, channelData, options = {}) {
 		const mirrorChannelData = sb.Channel.get(channelData.Mirror);
 		if (!mirrorChannelData) {
 			console.warn("Provided channel does not have any mirror channel set up", { channelData });
@@ -65,7 +66,7 @@ module.exports = class Controller {
 			return;
 		}
 
-		const fixedMessage = (commandUsed)
+		const fixedMessage = (options.commandUsed)
 			? `${symbol} ${message}`
 			: `${symbol} ${userData.Name}: ${message}`;
 

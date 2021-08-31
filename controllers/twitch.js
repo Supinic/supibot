@@ -597,7 +597,7 @@ module.exports = class TwitchController extends require("./template.js") {
 
 			// Mirror messages to a linked channel, if the channel has one
 			if (channelData.Mirror) {
-				this.mirror(message, userData, channelData);
+				this.mirror(message, userData, channelData, { commandUsed: false });
 			}
 		}
 		else {
@@ -698,7 +698,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 		else {
 			if (channelData?.Mirror) {
-				await this.mirror(execution.reply, userData, channelData, true);
+				await this.mirror(execution.reply, userData, channelData, { commandUsed: true });
 			}
 
 			const message = await this.prepareMessage(execution.reply, channelData, { skipBanphrases: true });

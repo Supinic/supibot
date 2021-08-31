@@ -158,7 +158,7 @@ class CytubeClient {
 				sb.Reminder.checkActive(userData, this.channelData);
 
 				if (this.channelData.Mirror) {
-					this.controller.mirror(msg, userData, this.channelData, false);
+					this.controller.mirror(msg, userData, this.channelData, { commandUsed: false });
 				}
 			}
 			else {
@@ -321,7 +321,9 @@ class CytubeClient {
 		}
 		else {
 			if (this.channelData.Mirror) {
-				this.mirror(execution.reply, userData, true);
+				this.mirror(execution.reply, userData, {
+					commandUsed: true
+				});
 			}
 
 			const message = await this.controller.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
@@ -519,14 +521,15 @@ module.exports = class CytubeController extends require("./template.js") {
 	 * @param {string} message
 	 * @param {User} userData
 	 * @param {Channel} channelData
-	 * @param {boolean} commandUsed = false
+	 * @param {Object} [options]
+	 * @param {boolean} [options.commandUsed] = false
 	 */
-	mirror (message, userData, channelData, commandUsed = false) {
+	mirror (message, userData, channelData, options = {}) {
 		if (userData.Name === "[server]") {
 			return;
 		}
 
-		return super.mirror(message, userData, channelData, commandUsed);
+		return super.mirror(message, userData, channelData, options);
 	}
 
 	/**

@@ -179,7 +179,7 @@ module.exports = class DiscordController extends require("./template.js") {
 
 					// Mirroring is set up - mirror the message to the target channel
 					if (channelData.Mirror) {
-						this.mirror(msg, userData, channelData);
+						this.mirror(msg, userData, channelData, { commandUsed: false });
 					}
 				}
 			}
@@ -345,7 +345,7 @@ module.exports = class DiscordController extends require("./template.js") {
 		}
 
 		if (channelData?.Mirror) {
-			await this.mirror(execution.reply, userData,channelData, true);
+			await this.mirror(execution.reply, userData, channelData, { commandUsed: true });
 		}
 
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
