@@ -314,10 +314,11 @@ module.exports = class Channel extends require("./template.js") {
 	 * Mirrors the message to the given mirror channel, if this instance has been configured to do so.
 	 * @param {string} message
 	 * @param {sb.User} userData
-	 * @param {boolean} commandUsed = false
+	 * @param {Object} [options]
+	 * @param {boolean} [options.commandUsed] = false
 	 * @returns {Promise<void>}
 	 */
-	async mirror (message, userData, commandUsed = false) {
+	async mirror (message, userData, options = {}) {
 		if (this.Mirror === null) {
 			return;
 		}
@@ -330,7 +331,7 @@ module.exports = class Channel extends require("./template.js") {
 			});
 		}
 
-		return await this.Platform.controller.mirror(message, userData, this, commandUsed);
+		return await this.Platform.controller.mirror(message, userData, this, options);
 	}
 
 	async serialize () {

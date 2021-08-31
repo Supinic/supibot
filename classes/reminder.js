@@ -111,7 +111,6 @@ module.exports = class Reminder extends require("./template.js") {
 
 		/** @type {LongTimeout} */
 		this.timeout = new Reminder.LongTimeout(async () => {
-			/** @type {Channel|null} */
 			const channelData = (this.Channel === null) ? null : sb.Channel.get(this.Channel);
 			const fromUserData = await sb.User.get(this.User_From, true);
 			const toUserData = await sb.User.get(this.User_To, true);
@@ -157,9 +156,7 @@ module.exports = class Reminder extends require("./template.js") {
 						});
 					}
 
-					if (channelData.Mirror) {
-						channelData.Platform.controller.mirror(message, toUserData, channelData, false);
-					}
+					await channelData.mirror(message, toUserData, { commandUsed: false });
 
 					message = await channelData.prepareMessage(message);
 					await channelData.send(message);
@@ -467,7 +464,7 @@ module.exports = class Reminder extends require("./template.js") {
 				const [resultMessage] = sb.Utils.partitionString(message, limit, 1);
 				await Promise.all([
 					channelData.send(resultMessage),
-					channelData.mirror(resultMessage, targetUserData, false)
+					channelData.mirror(resultMessage, targetUserData, { commandUsed: false })
 				]);
 			}
 			else {
@@ -493,7 +490,7 @@ module.exports = class Reminder extends require("./template.js") {
 			const publicMessage = `Hey ${targetUserData.Name} - I just whispered you ${privateReply.length} private reminder(s) - make sure to check them out!`;
 			await Promise.all([
 				channelData.send(publicMessage),
-				channelData.mirror(publicMessage, targetUserData, false)
+				channelData.mirror(publicMessage, targetUserData, { commandUsed: false })
 			]);
 		}
 
