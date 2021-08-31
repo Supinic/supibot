@@ -322,7 +322,10 @@ class CytubeClient {
 		}
 		else {
 			if (this.channelData.Mirror) {
-				await this.mirror(execution.reply, userData, { commandUsed: true });
+				await this.mirror(execution.reply, userData, {
+					...commandOptions,
+					commandUsed: true
+				});
 			}
 
 			const message = await this.controller.prepareMessage(execution.reply, channelData, {

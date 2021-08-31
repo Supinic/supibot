@@ -700,7 +700,10 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 		else {
 			if (channelData?.Mirror) {
-				await this.mirror(execution.reply, userData, channelData, { commandUsed: true });
+				await this.mirror(execution.reply, userData, channelData, {
+					...commandOptions,
+					commandUsed: true
+				});
 			}
 
 			const message = await this.prepareMessage(execution.reply, channelData, {

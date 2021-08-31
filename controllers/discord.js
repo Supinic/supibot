@@ -339,10 +339,6 @@ module.exports = class DiscordController extends require("./template.js") {
 			return;
 		}
 
-		if (channelData?.Mirror) {
-			await this.mirror(execution.reply, userData, channelData, { commandUsed: true });
-		}
-
 		const commandOptions = sb.Command.extractMetaResultProperties(execution);
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
 			const message = await this.prepareMessage(execution.reply, null, commandOptions);
@@ -350,6 +346,13 @@ module.exports = class DiscordController extends require("./template.js") {
 			await this.pm(message, userData);
 		}
 		else {
+			if (channelData?.Mirror) {
+				await this.mirror(execution.reply, userData, channelData, {
+					...commandOptions,
+					commandUsed: true
+				});
+			}
+
 			const message = await this.prepareMessage(execution.reply, channelData, {
 				...commandOptions,
 				skipBanphrases: true
