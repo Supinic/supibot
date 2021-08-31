@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the current time and timezone for a given location, or a user, if they have set their location.",
-	Flags: ["mention","non-nullable","pipe"],
+	Flags: ["block","mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
