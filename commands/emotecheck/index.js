@@ -13,7 +13,7 @@ module.exports = {
 				name: "hyperscape",
 				aliases: ["hyper"],
 				description: "These emotes are acquired when you or someone else cheers, subs or gifts subs in a channel. Active in August 2020",
-				notes: "https://blog.twitch.tv/en/2020/08/11/hyper-scape-launches-celebrate-with-new-features-and-exclusive-emotes/",
+				link: "https://blog.twitch.tv/en/2020/08/11/hyper-scape-launches-celebrate-with-new-features-and-exclusive-emotes/",
 				emotes: [
 					"HyperCheese",
 					"HyperCooldown",
@@ -95,7 +95,7 @@ module.exports = {
 				name: "haha",
 				aliases: [],
 				description: "Winter-themed emotes awarded by having someone in chat gift subs or cheers, between 2019-12-03 and 2020-01-03.",
-				notes: "https://help.twitch.tv/s/article/happy-hahahalidays",
+				link: "https://help.twitch.tv/s/article/happy-hahahalidays",
 				emotes: [
 					"Haha2020",
 					"HahaBaby",
@@ -128,7 +128,7 @@ module.exports = {
 				name: "rpg",
 				aliases: [],
 				description: "RPG-related emotes awarded by having someone in chat gift subs or cheers, between 2019-10-04 and 2020-10-18.",
-				notes: "https://help.twitch.tv/s/article/rpg-megacheer",
+				link: "https://help.twitch.tv/s/article/rpg-megacheer",
 				emotes: [
 					"RPGAyaya",
 					"RPGBukka",
@@ -154,7 +154,7 @@ module.exports = {
 				name: "fb",
 				aliases: ["football"],
 				description: "Emotes related to American football, first handed out on 2018-07-16, meant to be temporary, but later became global.",
-				notes: "https://blog.twitch.tv/en/2018/06/11/support-streamers-and-get-gifts-by-cheering-for-your-favorite-world-cup-team-c10c455cedcc/",
+				link: "https://blog.twitch.tv/en/2018/06/11/support-streamers-and-get-gifts-by-cheering-for-your-favorite-world-cup-team-c10c455cedcc/",
 				emotes: [
 					"FBBlock",
 					"FBCatch",
@@ -170,7 +170,7 @@ module.exports = {
 				name: "fight",
 				aliases: ["food"],
 				description: "Emotes related to the subject of \"Food fight\". Handed out between 2019-08-22 and 2019-09-02, when someone cheered or gifted subs. They are no longer available.",
-				notes: "https://help.twitch.tv/s/article/megacheer-food-fight",
+				link: "https://help.twitch.tv/s/article/megacheer-food-fight",
 				emotes: [
 					"FightBagel",
 					"FightBerry",
@@ -236,7 +236,7 @@ module.exports = {
 				name: "luv",
 				aliases: ["valentine"],
 				description: "Valentine-themed emotes awarded by having someone in chat gift subs or cheers, handed out between 2020-01-30 and 2020-02-16.",
-				notes: "https://help.twitch.tv/s/article/streamer-love",
+				link: "https://help.twitch.tv/s/article/streamer-love",
 				emotes: [
 					"LuvBlondeL",
 					"LuvBlondeR",
@@ -372,7 +372,7 @@ module.exports = {
 				name: "kpop",
 				aliases: [],
 				description: "KPop themed emotes received by cheering, subscribing or gifting subs. Handed out between 2020-10-19 and 2020-10-30.",
-				notes: "https://help.twitch.tv/s/article/celebrate-kpop",
+				link: "https://help.twitch.tv/s/article/celebrate-kpop",
 				emotes: [
 					"KPOPdance",
 					"KPOPfan",
@@ -390,7 +390,7 @@ module.exports = {
 				name: "glitchcon",
 				aliases: [],
 				description: "Emotes related to GlitchCon 2020 - a replacement for TwitchCon because of Covid. Awarded for being in the stream on 2020-11-14 and 2020-11-15.",
-				notes: "https://blog.twitch.tv/en/glitchcon",
+				link: "https://blog.twitch.tv/en/glitchcon",
 				emotes: [
 					"AppaK",
 					"EnlightenD",
@@ -404,7 +404,7 @@ module.exports = {
 				name: "hype2020",
 				aliases: [],
 				description: "Another set of Hype train emotes, this time, available since November 2020",
-				notes: "No blogpost provided, emotes sourced from: https://sikorsky.rosuav.com/checklist",
+				link: "No blogpost provided, emotes sourced from: https://sikorsky.rosuav.com/checklist",
 				emotes: [
 					"HypeBard",
 					"HypeBook",
@@ -444,7 +444,7 @@ module.exports = {
 				name: "hindsight",
 				aliases: ["hind", "holiday2020"],
 				description: "Holiday emotes for 2020 holiday season. Called Hindsight, because 20-20 is the year and the hindsight. First set awarded between 2020-12-02 and 2020-12-16, the second from 2020-12-16 to 2021-01-04; whenever someone subs, gifts or cheers.",
-				notes: "https://help.twitch.tv/s/article/hindsight-2020",
+				link: "https://help.twitch.tv/s/article/hindsight-2020",
 				emotes: [
 					"2020Capture",
 					"2020Delivery",
@@ -479,7 +479,7 @@ module.exports = {
 				name: "hype2021",
 				aliases: ["hype"],
 				description: "Holiday emotes for 2020 holiday season. Called Hindsight, because 20-20 is the year and the hindsight. First set awarded between 2020-12-02 and 2020-12-16, the second from 2020-12-16 to 2021-01-04; whenever someone subs, gifts or cheers.",
-				notes: "https://twitter.com/TwitchSupport/status/1390743421208387592",
+				link: "https://twitter.com/TwitchSupport/status/1390743421208387592",
 				emotes: [
 					"HypeAttack",
 					"HypeBeard",
@@ -517,7 +517,7 @@ module.exports = {
 				name: "h1z1",
 				aliases: [],
 				description: "Emotes awarded from H1Z1 loot crates bought and opened via Twitch, around Augus 2017",
-				notes: "https://blog.twitch.tv/en/2017/08/29/get-h1-z1-invitational-crates-on-twitch-and-earn-exclusive-loot-1402034fe7fe/",
+				link: "https://blog.twitch.tv/en/2017/08/29/get-h1-z1-invitational-crates-on-twitch-and-earn-exclusive-loot-1402034fe7fe/",
 				emotes: [
 					"H1BodyCount",
 					"H1Deal",
@@ -550,13 +550,27 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { sets } = values.getStaticData();
-		const list = sets.map(i => {
-			const aliases = (i.aliases.length === 0)
-				? ""
-				: `(${i.aliases.join(", ")})`;
+		const list = sets
+			.sort((a, b) => a.name.localeCompare(b.name))
+			.map(i => {
+				const aliases = (i.aliases.length === 0)
+					? ""
+					: `(${i.aliases.join(", ")})`;
 
-			return `<li><code>${i.name} ${aliases}</code><br>${i.description}</li>`;
-		}).join("<br>");
+				const list = [];
+				if (i.link) {
+					list.push(`<a href="${i.link}">Reference</a><br>`);
+				}
+
+				list.push(
+					i.description,
+					i.emotes.sort().join(" ")
+				);
+
+				const listString = list.map(i => `<li>${i}</li>`).join("");
+				return `<li><code>${i.name} ${aliases}</code><ul>${listString}</ul></li>`;
+			})
+			.join("<br>");
 
 		return [
 			"Posts entire emote sets on Twitch and stuff.",
