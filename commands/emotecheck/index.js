@@ -564,7 +564,7 @@ module.exports = {
 
 				list.push(
 					i.description,
-					i.emotes.sort().join(" ")
+					`<code>${i.emotes.sort().join(" ")}</code>`
 				);
 
 				const listString = list.map(i => `<li>${i}</li>`).join("");
