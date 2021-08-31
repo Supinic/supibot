@@ -688,8 +688,10 @@ module.exports = class TwitchController extends require("./template.js") {
 			return execution;
 		}
 
+		const commandOptions = sb.Command.extractMetaResultProperties(execution);
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
 			const message = await this.prepareMessage(execution.reply, null, {
+				...commandOptions,
 				extraLength: (`/w ${userData.Name} `).length,
 				skipBanphrases: true
 			});
@@ -701,7 +703,11 @@ module.exports = class TwitchController extends require("./template.js") {
 				await this.mirror(execution.reply, userData, channelData, { commandUsed: true });
 			}
 
-			const message = await this.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
+			const message = await this.prepareMessage(execution.reply, channelData, {
+				...commandOptions,
+				skipBanphrases: true
+			});
+
 			if (message) {
 				await this.send(message, channelData);
 			}

@@ -316,19 +316,22 @@ class CytubeClient {
 			return;
 		}
 
+		const commandOptions = sb.Command.extractMetaResultProperties(execution);
 		if (execution.replyWithPrivateMessage || replyIntoPM) {
-			this.pm(execution.reply, userData.Name);
+			await this.pm(execution.reply, userData.Name);
 		}
 		else {
 			if (this.channelData.Mirror) {
-				this.mirror(execution.reply, userData, {
-					commandUsed: true
-				});
+				await this.mirror(execution.reply, userData, { commandUsed: true });
 			}
 
-			const message = await this.controller.prepareMessage(execution.reply, channelData, { skipBanphrases: true });
+			const message = await this.controller.prepareMessage(execution.reply, channelData, {
+				...commandOptions,
+				skipBanphrases: true
+			});
+
 			if (message) {
-				this.send(message);
+				await this.send(message);
 			}
 		}
 	}

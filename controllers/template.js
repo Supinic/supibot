@@ -70,7 +70,7 @@ module.exports = class Controller {
 			? `${symbol} ${message}`
 			: `${symbol} ${userData.Name}: ${message}`;
 
-		const finalMessage = await this.prepareMessage(fixedMessage, mirrorChannelData);
+		const finalMessage = await this.prepareMessage(fixedMessage, mirrorChannelData, options);
 		if (finalMessage) {
 			await mirrorChannelData.send(finalMessage);
 		}
