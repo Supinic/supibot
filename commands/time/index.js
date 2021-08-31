@@ -91,7 +91,7 @@ module.exports = {
 			else if (!targetUser.Data.location) {
 				const message = (targetUser === context.user)
 					? "You have not set up your location! You can use $set location (location) to set it, or add \"private\" to make it private 🙂"
-					: "They have not set up their location";
+					: "They have not set up their location!";
 
 				return {
 					success: false,
