@@ -12,6 +12,13 @@ module.exports = class User extends require("./template.js") {
 	static data = new Map();
 	static bots = new Map();
 
+	static permissions = {
+		regular: 0b0000_0001,
+		ambassador: 0b0000_0010,
+		channelOwner: 0b0000_0100,
+		administrator: 0b1000_0000
+	};
+
 	constructor (data) {
 		super();
 
