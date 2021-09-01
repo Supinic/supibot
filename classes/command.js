@@ -35,13 +35,12 @@ class Context {
 	getMeta (name) { return this.#meta.get(name); }
 	setMeta (name, value) { this.#meta.set(name, value); }
 
-
 	/**
 	 * Fetches the proper permissions for a provided user/channel/platform combo, substituting those that are not
 	 * provided with the context's own options.
 	 * @param {UserPermissionResultType} type Determines the result "shape" - `any` returns true if at least one flag is set,
 	 * `all` returns true if all are set, and `array` returns the boolean array as is
-	 * @param {UserPermissionLevel[]} levels The permission levels to check
+	 * @param {UserPermissionLevel|UserPermissionLevel[]} levels The permission levels to check
 	 * @param {Object} options
 	 * @param {User} [options.user]
 	 * @param {Channel} [options.channel]
@@ -52,6 +51,10 @@ class Context {
 		const userData = options.user ?? this.#user;
 		const channelData = options.channel ?? this.#channel;
 		const platformData = options.platform ?? this.#platform;
+
+		if (!Array.isArray(levels)) {
+			levels = [levels];
+		}
 
 		const promises = levels.map(async (level) => {
 			if (level === "admin") {
