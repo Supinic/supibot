@@ -43,8 +43,7 @@ class Context {
 	 * @param {Platform} [options.platform]
 	 * @returns {Promise<{
 	 *  flag: number,
-	 *  is: (function(UserPermissionLevel): boolean),
-	 *  isNone: (function(): boolean)
+	 *  is: (function(UserPermissionLevel): boolean)
 	 * }>}
 	 */
 	async getUserPermissions (options = {}) {
