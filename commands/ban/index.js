@@ -130,19 +130,19 @@ module.exports = {
 
 		if (options.Channel && !isAdmin) {
 			const channelData = sb.Channel.get(options.Channel);
-			const permissions = await context.getUserPermissions("array", ["admin", "owner", "ambassador"], {
+			const permissions = await context.getUserPermissions({
 				channel: channelData,
 				platform: channelData?.Platform
 			});
 
-			if (permissions.every(i => !i)) {
+			if (permissions.flag === sb.User.permissions.regular) {
 				return {
 					success: false,
 					reply: "Can't do that in this channel!"
 				};
 			}
 
-			const channelPermissions = permissions[1] || permissions[2];
+			const channelPermissions = permissions.is("ambassador") || permissions.is("channelOwner");
 			if (!options.User_Alias && !options.Command && channelPermissions) {
 				return {
 					success: false,

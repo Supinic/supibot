@@ -94,7 +94,8 @@ module.exports = {
 		}
 
 		if (context.params.debug) {
-			if (!await context.getUserPermissions("all", ["admin"])) {
+			const permissions = await context.getUserPermissions();
+			if (!permissions.is("administrator")) {
 				return {
 					success: false,
 					reply: `You don't have access to the debug commands!`
