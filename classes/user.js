@@ -565,3 +565,7 @@ module.exports = class User extends require("./template.js") {
 		User.data.clear();
 	}
 };
+
+/**
+ * @typedef {"admin"|"owner"|"ambassador"} UserPermissionLevel
+ */

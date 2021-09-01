@@ -35,6 +35,14 @@ class Context {
 	getMeta (name) { return this.#meta.get(name); }
 	setMeta (name, value) { this.#meta.set(name, value); }
 
+	/**
+	 * Fetches an object wrapper describing the user's permissions in given command context.
+	 * @param {Object} [options] When provided, allows overriding the command context's locations
+	 * @param {User} [options.user]
+	 * @param {Channel} [options.channel]
+	 * @param {Platform} [options.platform]
+	 * @returns {Promise<{flag: number, is: (function(UserPermissionLevel): boolean)}>}
+	 */
 	async getUserPermissions (options = {}) {
 		const userData = options.user ?? this.#user;
 		const channelData = options.channel ?? this.#channel;
@@ -61,14 +69,18 @@ class Context {
 
 		return {
 			flag,
+			/**
+			 * @param {UserPermissionLevel} type
+			 * @returns {boolean}
+			 */
 			is: (type) => {
 				if (!sb.User.permissions[type]) {
 					throw new sb.Error({
-						message: "Invalid permission type provided"
+						message: "Invalid user permission type provided"
 					});
 				}
 
-				return (flag & sb.User.permissions[type]);
+				return ((flag & sb.User.permissions[type]) !== 0);
 			}
 		};
 	}
@@ -1355,10 +1367,6 @@ module.exports = Command;
  * @typedef {Object} CommandParameterDefinition
  * @property {string} name Parameter name, as it will be used in execution
  * @property {"string"|"number"|"boolean"|"date"|"object"|"regex"} type Parameter type - string value will be parsed into this type
- */
-
-/**
- * @typedef {"admin"|"owner"|"ambassador"} UserPermissionLevel
  */
 
 /**
