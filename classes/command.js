@@ -35,50 +35,42 @@ class Context {
 	getMeta (name) { return this.#meta.get(name); }
 	setMeta (name, value) { this.#meta.set(name, value); }
 
-	/**
-	 * Fetches the proper permissions for a provided user/channel/platform combo, substituting those that are not
-	 * provided with the context's own options.
-	 * @param {UserPermissionResultType} type Determines the result "shape" - `any` returns true if at least one flag is set,
-	 * `all` returns true if all are set, and `array` returns the boolean array as is
-	 * @param {UserPermissionLevel|UserPermissionLevel[]} levels The permission levels to check
-	 * @param {Object} options
-	 * @param {User} [options.user]
-	 * @param {Channel} [options.channel]
-	 * @param {Platform} [options.platform]
-	 * @returns {Promise<boolean[]|boolean>}
-	 */
-	async getUserPermissions (type, levels, options = {}) {
+	async getUserPermissions (options = {}) {
 		const userData = options.user ?? this.#user;
 		const channelData = options.channel ?? this.#channel;
 		const platformData = options.platform ?? this.#platform;
 
-		if (!Array.isArray(levels)) {
-			levels = [levels];
+		const data = await Promise.all([
+			userData.getDataProperty("administrator"),
+			platformData?.isUserChannelOwner(channelData, userData),
+			channelData?.isUserAmbassador(userData)
+		]);
+
+		const flags = {
+			administrator: (data[0] === true),
+			channelOwner: Boolean(data[1]),
+			ambassador: Boolean(data[2])
+		};
+
+		let flag = 0;
+		for (const [key, value] of Object.entries(flags)) {
+			if (value) {
+				flag ||= sb.User.permissions[key];
+			}
 		}
 
-		const promises = levels.map(async (level) => {
-			if (level === "admin") {
-				const isAdmin = await userData.getDataProperty("administrator");
-				return (isAdmin === true);
-			}
-			else if (level === "owner") {
-				return Boolean(await platformData?.isUserChannelOwner(channelData, userData));
-			}
-			else if (level === "ambassador") {
-				return Boolean(channelData?.isUserAmbassador(userData));
-			}
-		});
+		return {
+			flag,
+			is: (type) => {
+				if (!sb.User.permissions[type]) {
+					throw new sb.Error({
+						message: "Invalid permission type provided"
+					});
+				}
 
-		const result = await Promise.all(promises);
-		if (type === "any") {
-			return result.some(Boolean);
-		}
-		else if (type === "all") {
-			return result.every(Boolean);
-		}
-		else if (type === "array") {
-			return result;
-		}
+				return (flag & sb.User.permissions[type]);
+			}
+		};
 	}
 
 	/**
