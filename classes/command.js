@@ -67,7 +67,7 @@ class Context {
 		let flag = sb.User.permissions.regular;
 		for (const [key, value] of Object.entries(flags)) {
 			if (value) {
-				flag ||= sb.User.permissions[key];
+				flag |= sb.User.permissions[key];
 			}
 		}
 
