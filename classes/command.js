@@ -41,7 +41,11 @@ class Context {
 	 * @param {User} [options.user]
 	 * @param {Channel} [options.channel]
 	 * @param {Platform} [options.platform]
-	 * @returns {Promise<{flag: number, is: (function(UserPermissionLevel): boolean)}>}
+	 * @returns {Promise<{
+	 *  flag: number,
+	 *  is: (function(UserPermissionLevel): boolean),
+	 *  isNone: (function(): boolean)
+	 * }>}
 	 */
 	async getUserPermissions (options = {}) {
 		const userData = options.user ?? this.#user;
@@ -60,7 +64,7 @@ class Context {
 			ambassador: Boolean(data[2])
 		};
 
-		let flag = 0;
+		let flag = sb.User.permissions.regular;
 		for (const [key, value] of Object.entries(flags)) {
 			if (value) {
 				flag ||= sb.User.permissions[key];
