@@ -35,14 +35,24 @@ module.exports = {
 		command = command.toLowerCase();
 		switch (command) {
 			case "check": {
+				const processed = new Set();
 				const results = [];
-				for (const input of args) {
+				const fixedArgs = args.flatMap(i => i.split(/\s+/).filter(Boolean));
+
+				for (const input of fixedArgs) {
 					const type = sb.Utils.modules.linkParser.autoRecognize(input);
 					if (type !== "youtube") {
 						continue;
 					}
 
 					const link = sb.Utils.modules.linkParser.parseLink(input);
+					if (link.has(processed)) {
+						continue;
+					}
+					else {
+						processed.add(link);
+					}
+
 					const existing = await sb.Query.getRecordset(rs => rs
 						.select("ID", "Device", "Link")
 						.from("data", "Bad_Apple")
