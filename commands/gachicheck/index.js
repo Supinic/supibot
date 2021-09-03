@@ -17,7 +17,7 @@ module.exports = {
 				cooldown: { length: 2500 }
 			};
 		}
-	
+
 		const links = [];
 		if (args[0] === "playlist") {
 			args.shift();
@@ -28,16 +28,16 @@ module.exports = {
 					reply: `No playlist ID provided!`
 				};
 			}
-	
+
 			const { amount, limit, reason, result, success } = await sb.Utils.fetchYoutubePlaylist({
 				playlistID,
 				key: sb.Config.get("API_GOOGLE_YOUTUBE"),
 				limit: this.staticData.limit,
 				limitAction: "return"
 			});
-	
+
 			console.log({ amount, limit, reason, result, success });
-	
+
 			if (!success) {
 				if (reason === "limit-exceeded") {
 					return {
@@ -57,12 +57,13 @@ module.exports = {
 					link: i.ID,
 					type: "youtube"
 				}));
-	
+
 				links.push(...items);
 			}
 		}
 		else {
-			for (const word of args) {
+			const fixedArgs = args.flatMap(i => i.split(/\s+/).filter(Boolean));
+			for (const word of fixedArgs) {
 				const type = sb.Utils.modules.linkParser.autoRecognize(word);
 				if (type) {
 					links.push({
@@ -72,29 +73,34 @@ module.exports = {
 				}
 			}
 		}
-	
+
 		if (links.length === 0) {
 			return {
 				reply: "No valid links provided!",
 				cooldown: { length: 2500 }
 			};
 		}
-	
+
 		const trackToLink = (id) => (!context.channel || context.channel.Links_Allowed)
 			? `https://supinic.com/track/detail/${id}`
 			: `track list ID ${id}`;
-	
+
 		if (!this.data.typeMap) {
 			const typeData = await sb.Query.getRecordset(rs => rs
 				.select("ID", "Parser_Name")
 				.from("data", "Video_Type")
 				.where("Parser_Name IS NOT NULL"));
-	
+
 			this.data.typeMap = Object.fromEntries(typeData.map(i => [i.Parser_Name, i.ID]));
 		}
-	
+
 		const results = [];
-		for (const { link, type } of links) {
+		const uniqueLinks = links.filter((item, ind, arr) => {
+			const index = arr.findIndex(i => item.link === i.link);
+			return (index === ind);
+		});
+
+		for (const { link, type } of uniqueLinks) {
 			const videoData = await sb.Utils.modules.linkParser.fetchData(link, type);
 			if (!videoData) {
 				results.push({
@@ -103,17 +109,17 @@ module.exports = {
 					ID: null,
 					formatted: `Video not available - it is deleted or private.`
 				});
-	
+
 				continue;
 			}
-	
+
 			const check = await sb.Query.getRecordset(rs => rs
 				.select("ID")
 				.from("music", "Track")
 				.where("Link = %s", String(videoData.ID))
 				.single()
 			);
-	
+
 			if (check) {
 				const tagData = (await sb.Query.getRecordset(rs => rs
 					.select("Tag.Name AS Tag_Name")
@@ -124,11 +130,11 @@ module.exports = {
 					.where("Track_Tag.Track = %n", check.ID)
 					.flat("Tag_Name")
 				));
-	
+
 				const tags = tagData.join(", ");
 				const row = await sb.Query.getRow("music", "Track");
 				await row.load(check.ID);
-	
+
 				const added = { name: "(unknown)", date: "(unknown time ago)" };
 				if (row.values.Added_By) {
 					const userData = await sb.User.get(row.values.Added_By);
@@ -137,7 +143,7 @@ module.exports = {
 				if (row.values.Added_On) {
 					added.date = sb.Utils.timeDelta(row.values.Added_On);
 				}
-	
+
 				results.push({
 					link,
 					existing: true,
@@ -154,7 +160,7 @@ module.exports = {
 				const tag = { todo: 20 };
 				const videoData = await sb.Utils.modules.linkParser.fetchData(link, type);
 				const row = await sb.Query.getRow("music", "Track");
-	
+
 				row.setValues({
 					Link: videoData.ID,
 					Name: (videoData && videoData.name) || null,
@@ -166,7 +172,7 @@ module.exports = {
 					Track_Type: null,
 					Notes: videoData?.description ?? null
 				});
-	
+
 				const { insertId: trackID } = await row.save();
 				const tagRow = await sb.Query.getRow("music", "Track_Tag");
 				tagRow.setValues({
@@ -175,9 +181,9 @@ module.exports = {
 					Added_By: context.user.ID,
 					Notes: JSON.stringify(videoData)
 				});
-	
+
 				await tagRow.save();
-	
+
 				if (videoData?.author) {
 					let authorID = null;
 					const normal = videoData.author.toLowerCase().replace(/\s+/g, "_");
@@ -197,10 +203,10 @@ module.exports = {
 							Normalized_Name: normal,
 							Added_By: context.user.ID
 						});
-	
+
 						authorID = (await authorRow.save()).insertId;
 					}
-	
+
 					const authorRow = await sb.Query.getRow("music", "Track_Author");
 					authorRow.setValues({
 						Track: trackID,
@@ -210,7 +216,7 @@ module.exports = {
 					});
 					await authorRow.save();
 				}
-	
+
 				results.push({
 					link,
 					existing: false,
@@ -248,21 +254,21 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { limit } = values.getStaticData();
-	
+
 		return [
 			"Checks if a video is already in the gachi list.",
 			"If it isn't, it is added with the Todo tag.",
 			"",
-		
+
 			`<code>${prefix}gc (link)</code>`,
 			"Check for a single link. If it exists already, it is also checked for availability and updated accordingly.",
 			"",
-	
+
 			`<code>${prefix}gc (link1) (link2) ...</code>`,
 			"Checks multiple links in one command. Availability will not be updated.",
-	
+
 			"",
-	
+
 			`<code>${prefix}gc playlist (playlistID)</code>`,
 			"Checks all videos in a single Youtube playlist. Summary will be posted in a Pastebin paste.",
 			`Does not check playlists that have more than <b>${limit}</b> videos.`,
