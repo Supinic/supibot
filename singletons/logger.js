@@ -254,7 +254,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 
 	/**
 	 * Inserts a log message into the database - `chat_data.Log` table
-	 * @param {CompoundSystemLogTag} tag
+	 * @param {string} tag
 	 * @param {string} [description] = null
 	 * @param {Channel} [channel] = null
 	 * @param {User} [user] = null
@@ -282,28 +282,27 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 
 	/**
 	 * Logs a new error, and returns its ID.
-	 * @param {string} tag
+	 * @param {string} type
 	 * @param {Error} error
-	 * @param {*[]} [args] Any additional arguments passed to code that produced this error
+	 * @param {Object} [data]
+	 * @param {"Internal"|"External"} [data.origin] Whether the error is first- or third-party
+	 * @param {Object} [data.context] Object with any additional info
+	 * @param {Array} [data.arguments] Possible command arguments that led to the error
 	 * @returns {Promise<void>}
 	 */
-	async logError (tag, error, ...args) {
+	async logError (type, error, data = {}) {
 		if (!sb.Config.get("LOG_ERROR_ENABLED", false)) {
 			return;
 		}
 
-		let context = {};
-		if (args[0] && typeof args[0] === "object") {
-			context = args.shift();
-		}
-
 		const row = await sb.Query.getRow("chat_data", "Error");
 		row.setValues({
-			Type: tag,
+			Type: type,
+			Origin: data.origin ?? null,
 			Message: error.message ?? null,
 			Stack: error.stack ?? null,
-			Context: JSON.stringify(context),
-			Arguments: (args) ? JSON.stringify(args) : null
+			Context: (data.context) ? JSON.stringify(data.context) : null,
+			Arguments: (data.arguments) ? JSON.stringify(data.arguments) : null
 		});
 
 		const { insertId } = await row.save();

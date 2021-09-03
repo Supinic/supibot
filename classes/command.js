@@ -791,6 +791,7 @@ class Command extends require("./template.js") {
 			}
 		}
 		catch (e) {
+			let origin = "Internal";
 			let errorContext;
 			const loggingContext = {
 				user: userData.ID,
@@ -802,16 +803,8 @@ class Command extends require("./template.js") {
 				isPrivateMessage
 			};
 
-			if (e instanceof sb.errors.APIError) {
-				const { apiName, reason, statusCode } = e;
-				errorContext = {
-					type: "Command API Error",
-					apiName,
-					statusCode,
-					reason
-				};
-			}
-			else if (e instanceof sb.errors.GenericRequestError) {
+			if (e instanceof sb.errors.GenericRequestError) {
+				origin = "External";
 				const { hostname, message, statusCode, statusMessage } = e;
 				errorContext = {
 					type: "Command request error",
@@ -822,6 +815,7 @@ class Command extends require("./template.js") {
 				};
 			}
 			else if (e instanceof sb.Got.GotError) {
+				origin = "External";
 				const { code, name, message, options } = e;
 				errorContext = {
 					type: "GotError",
@@ -832,21 +826,17 @@ class Command extends require("./template.js") {
 				};
 			}
 
-			const errorID = await sb.Logger.logError(
-				"Command",
-				e,
-				[loggingContext, identifier, ...args, errorContext ?? {}]
-			);
+			const errorID = await sb.Logger.logError("Command", e, {
+				origin,
+				context: {
+					identifier,
+					error: errorContext,
+					command: loggingContext
+				},
+				arguments: args
+			});
 
-			if (e instanceof sb.errors.APIError) {
-				const { apiName, statusCode } = errorContext;
-				execution = {
-					success: false,
-					reason: "api-error",
-					reply: `🚨 Third party ${apiName} failed! Status code ${statusCode ?? "(N/A)"} (error ID ${errorID})`
-				};
-			}
-			else if (e instanceof sb.errors.GenericRequestError) {
+			if (e instanceof sb.errors.GenericRequestError) {
 				const { hostname, message } = errorContext;
 				execution = {
 					success: false,
