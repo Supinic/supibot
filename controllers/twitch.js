@@ -644,7 +644,11 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		// Check and execute command if necessary
 		if (sb.Command.is(message)) {
-			const [command, ...args] = message.replace(sb.Command.prefix, "").split(" ").filter(Boolean);
+			const [command, ...args] = message
+				.replace(sb.Command.prefix, "")
+				.split(/\s+/)
+				.filter(Boolean);
+
 			const result = await this.handleCommand(
 				command,
 				userData,
