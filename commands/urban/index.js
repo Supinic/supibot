@@ -33,38 +33,21 @@ module.exports = {
 			};
 		}
 
-		let data = null;
-		try {
-			data = await sb.Got({
-				retry: 0,
-				timeout: this.staticData.timeout,
-				url: "https://api.urbandictionary.com/v0/define",
-				searchParams: { term }
-			}).json();
-		}
-		catch (e) {
-			if (e instanceof sb.Got.TimeoutError) {
-				return {
-					success: false,
-					reply: `Urban command timed out after ${this.staticData.timeout / 1000} seconds!`
-				};
-			}
-			else {
-				throw new sb.errors.APIError({
-					apiName: "UrbanDictionaryAPI",
-					statusCode: e.statusCode ?? 500
-				});
-			}
-		}
+		const response = await sb.Got("GenericAPI", {
+			url: "https://api.urbandictionary.com/v0/define",
+			searchParams: { term },
+			retry: 0,
+			timeout: this.staticData.timeout
+		});
 
-		if (!data.list || data.result_type === "no_results") {
+		if (!response.body.list || response.body.result_type === "no_results") {
 			return {
 				success: false,
 				reply: "No results found!"
 			};
 		}
 
-		const items = data.list
+		const items = response.body.list
 			.filter(i => i.word.toLowerCase() === args.join(" ").toLowerCase())
 			.sort((a, b) => b.thumbs_up - a.thumbs_up);
 

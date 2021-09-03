@@ -195,16 +195,19 @@ module.exports = {
 		/** @type {Subreddit} */
 		let forum = this.data.subreddits[subreddit];
 		if (!forum) {
-			const { statusCode, body: response } = await sb.Got("Reddit", `${subreddit}/about.json`);
+			const { body, statusCode } = await sb.Got("Reddit", `${subreddit}/about.json`);
 
 			if (statusCode !== 200 && statusCode !== 403 && statusCode !== 404) {
-				throw new sb.errors.APIError({
+				throw new sb.errors.GenericRequestError({
 					statusCode,
-					apiName: "RedditAPI"
+					hostname: "reddit.com",
+					statusMessage: body.statusMessage ?? null,
+					message: body.message ?? null,
+					stack: null
 				});
 			}
 
-			forum = new this.staticData.Subreddit(response);
+			forum = new this.staticData.Subreddit(body);
 			if (!this.staticData.uncached.includes(subreddit)) {
 				this.data.subreddits[subreddit] = forum;
 			}
@@ -230,16 +233,19 @@ module.exports = {
 		}
 
 		if (forum.posts.length === 0 || sb.Date.now() > forum.expiration) {
-			const { statusCode, body: response } = await sb.Got("Reddit", `${subreddit}/hot.json`);
+			const { statusCode, body } = await sb.Got("Reddit", `${subreddit}/hot.json`);
 			if (statusCode !== 200) {
-				throw new sb.errors.APIError({
+				throw new sb.errors.GenericRequestError({
 					statusCode,
-					apiName: "RedditAPI"
+					hostname: "reddit.com",
+					statusMessage: body.statusMessage ?? null,
+					message: body.message ?? null,
+					stack: null
 				});
 			}
 
 			forum.setExpiration();
-			forum.addPosts(response.data.children);
+			forum.addPosts(body.data.children);
 		}
 
 		if (context.params.showFlairs) {

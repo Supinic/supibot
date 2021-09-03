@@ -15,7 +15,7 @@ module.exports = {
 			sb.Utils.random(1, 12)
 		);
 
-		const { statusCode, body: rawData } = await sb.Got({
+		const response = await sb.Got("GenericAPI", {
 			responseType: "json",
 			throwHttpErrors: false,
 
@@ -24,14 +24,7 @@ module.exports = {
 			searchParams: `d=${randomDate.toJSON()}`
 		});
 
-		if (statusCode !== 200) {
-			throw new sb.errors.APIError({
-				statusCode,
-				apiName: "UselessFactsAPI"
-			});
-		}
-
-		const data = rawData.filter(i => i._id !== this.data.previousFactID);
+		const data = response.body.filter(i => i._id !== this.data.previousFactID);
 		if (data.length === 0) {
 			return {
 				reply: "No fun facts found :("

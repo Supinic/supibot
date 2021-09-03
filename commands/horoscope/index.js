@@ -79,7 +79,7 @@ module.exports = {
 				cooldown: { length: 2500 }
 			};
 		}
-	
+
 		let zodiac = null;
 		const { day, month } = context.user.Data.birthday;
 		for (const { start, end, name } of this.staticData.zodiac) {
@@ -88,30 +88,23 @@ module.exports = {
 				break;
 			}
 		}
-	
+
 		if (zodiac === null) {
 			return {
 				success: false,
 				reply: `No zodiac sign detected...?`
 			};
 		}
-	
-		const { statusCode, body: data } = await sb.Got({
+
+		const response = await sb.Got("GenericAPI", {
 			prefixUrl: "https://horoscope-api.herokuapp.com",
 			url: `horoscope/today/${zodiac}`,
 			throwHttpErrors: false,
 			responseType: "json"
 		});
-		
-		if (statusCode !== 200) {
-			throw new sb.errors.APIError({
-				statusCode,
-				apiName: "HoroscopeHerokuAPI"
-			});
-		}
-	
+
 		return {
-			reply: `Your horoscope for today: ${data.horoscope}`
+			reply: `Your horoscope for today: ${response.body.horoscope}`
 		};
 	}),
 	Dynamic_Description: null

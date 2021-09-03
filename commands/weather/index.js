@@ -167,22 +167,15 @@ module.exports = {
 
 			let geoData = await this.getCacheData(geoKey);
 			if (!geoData) {
-				const response = await sb.Got({
+				const response = await sb.Got("GenericAPI", {
 					url: "https://maps.googleapis.com/maps/api/geocode/json",
 					responseType: "json",
 					throwHttpErrors: false,
-					searchParams: new sb.URLParams()
-						.set("key", sb.Config.get("API_GOOGLE_GEOCODING"))
-						.set("address", args.join(" "))
-						.toString()
+					searchParams: {
+						key: sb.Config.get("API_GOOGLE_GEOCODING"),
+						address: args.join(" ")
+					}
 				});
-
-				if (response.statusCode !== 200) {
-					throw new sb.errors.APIError({
-						statusCode: response.statusCode,
-						apiName: "GoogleGeoAPI"
-					});
-				}
 
 				if (!response.body.results[0]) {
 					geoData = { empty: true };

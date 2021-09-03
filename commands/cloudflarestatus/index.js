@@ -9,22 +9,15 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function cloudflareStatus () {
-		const { statusCode, body: data } = await sb.Got({
+		const response = await sb.Got("GenericAPI", {
 			url: "https://yh6f0r4529hb.statuspage.io/api/v2/summary.json",
 			responseType: "json",
 			throwHttpErrors: false,
 			retry: 0,
 			timeout: 5000
 		});
-	
-		if (statusCode !== 200) {
-			throw new sb.errors.APIError({
-				statusCode,
-				apiName: "CloudflareAPI"
-			});
-		}
-	
-		const { incidents, page, status, scheduled_maintenances: maintenances } = data;
+
+		const { incidents, page, status, scheduled_maintenances: maintenances } = response.body;
 		const update = sb.Utils.timeDelta(new sb.Date(page.updated_at));
 		return {
 			reply: sb.Utils.tag.trim `
