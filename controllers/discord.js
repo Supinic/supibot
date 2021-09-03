@@ -248,7 +248,7 @@ module.exports = class DiscordController extends require("./template.js") {
 		}
 
 		if (channelObject.guild) {
-			const wordSet = new Set(message.split(/\W+/).filter(Boolean));
+			const wordSet = new Set(message.split(/\W+/).filter(i => i && i.length > 1));
 			const globalEmotesMap = this.client.emojis.cache;
 			const guildEmotesMap = channelObject.guild.emojis.cache;
 
@@ -262,7 +262,7 @@ module.exports = class DiscordController extends require("./template.js") {
 					emote = guildEmotesMap.find(i => i.name === word);
 
 					// If not found and the word is not overly common, simply pick a random emote out of the global list
-					if (!emote && globalEmoteRegex.test(word)) {
+					if (!emote && globalEmoteRegex.test(word) && word.length > 2) {
 						emote = sb.Utils.randArray([...globalEmotes.values()]);
 					}
 				}
