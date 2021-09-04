@@ -111,11 +111,11 @@ module.exports = class User extends require("./template.js") {
 	async getDataProperty (property, options = {}) {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("Property", "Value")
-			.select("User_Alias_Data_Property.Type AS Type")
+			.select("Custom_Data_Property.Type AS Type")
 			.from("chat_data", "User_Alias_Data")
 			.leftJoin({
-				toTable: "User_Alias_Data_Property",
-				on: "User_Alias_Data_Property.Name = User_Alias_Data.Property"
+				toTable: "Custom_Data_Property",
+				on: "Custom_Data_Property.Name = User_Alias_Data.Property"
 			})
 			.where("User_Alias = %n", this.ID)
 			.where("Property = %s", property)
@@ -152,7 +152,7 @@ module.exports = class User extends require("./template.js") {
 	async setDataProperty (property, value, options = {}) {
 		const type = await sb.Query.getRecordset(rs => rs
 			.select("Type")
-			.from("chat_data", "User_Alias_Data_Property")
+			.from("chat_data", "Custom_Data_Property")
 			.where("Name = %s", property)
 			.limit(1)
 			.single()
@@ -185,7 +185,7 @@ module.exports = class User extends require("./template.js") {
 			});
 		}
 
-		row.values.Value = variable.value;
+		row.values.Value = variable.stringValue;
 		await row.save({ skipLoad: true });
 	}
 
