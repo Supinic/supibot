@@ -144,16 +144,16 @@ module.exports = class User extends require("./template.js") {
 
 	/**
 	 * Saves a user data property into the database.
-	 * @param {string} property
+	 * @param {string} propertyName
 	 * @param {*} value
 	 * @param {Object} options
 	 * @returns {Promise<void>}
 	 */
-	async setDataProperty (property, value, options = {}) {
+	async setDataProperty (propertyName, value, options = {}) {
 		const type = await sb.Query.getRecordset(rs => rs
 			.select("Type")
 			.from("chat_data", "Custom_Data_Property")
-			.where("Name = %s", property)
+			.where("Name = %s", propertyName)
 			.limit(1)
 			.single()
 			.flat("Type")
@@ -162,12 +162,12 @@ module.exports = class User extends require("./template.js") {
 		if (!type) {
 			throw new sb.Error({
 				message: "Data property has no type associated with it",
-				args: { options, property, type }
+				args: { options, propertyName, type }
 			});
 		}
 
 		const variable = sb.Config.from({
-			name: property,
+			name: propertyName,
 			type: type,
 			value
 		});
@@ -175,13 +175,13 @@ module.exports = class User extends require("./template.js") {
 		const row = await sb.Query.getRow("chat_data", "User_Alias_Data");
 		await row.load({
 			User_Alias: this.ID,
-			Property: property
+			Property: propertyName
 		}, true);
 
 		if (!row.loaded) {
 			row.setValues({
 				User_Alias: this.ID,
-				Property: property
+				Property: propertyName
 			});
 		}
 
