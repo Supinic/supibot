@@ -609,7 +609,7 @@ module.exports = {
 
 		let availableLanguages = await sb.Cache.getByPrefix(this);
 		if (!availableLanguages) {
-			const { languages } = await sb.Got({
+			const { languages } = await sb.Got("GenericAPI", {
 				url: "https://api.currentsapi.services/v1/available/languages",
 				headers: {
 					Authorization: sb.Config.get("API_CURRENTSAPI_TOKEN")
@@ -652,26 +652,42 @@ module.exports = {
 			params.set("keywords", rest.join(" "));
 		}
 
-		const response = await sb.Got("GenericAPI", {
-			url: "https://api.currentsapi.services/v1/search",
-			searchParams: params.toString(),
-			headers: {
-				Authorization: sb.Config.get("API_CURRENTSAPI_TOKEN")
-			},
-			throwHttpErros: false,
-			responseType: "json",
-			retry: 0,
-			timeout: 5000
-		});
+		let response;
+		try {
+			response = await sb.Got("GenericAPI", {
+				url: "https://api.currentsapi.services/v1/search",
+				searchParams: params.toString(),
+				headers: {
+					Authorization: sb.Config.get("API_CURRENTSAPI_TOKEN")
+				},
+				throwHttpErros: false,
+				responseType: "json",
+				retry: 0,
+				timeout: 2500
+			});
+		}
+		catch (e) {
+			if (e instanceof sb.Got.TimeoutError) {
+				return {
+					success: false,
+					reply: "No relevant news articles found!"
+				};
+			}
+			else {
+				throw e;
+			}
+		}
 
 		const { news } = response.body;
 		if (!news) {
 			return {
+				success: false,
 				reply: "No news data returned!"
 			};
 		}
 		else if (news.length === 0) {
 			return {
+				success: false,
 				reply: "No relevant articles found!"
 			};
 		}
