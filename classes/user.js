@@ -161,15 +161,15 @@ module.exports = class User extends require("./template.js") {
 
 		if (!type) {
 			throw new sb.Error({
-				message: "No type is associated with this variable",
-				args: { options, property }
+				message: "Data property has no type associated with it",
+				args: { options, property, type }
 			});
 		}
 
-		const variable = new sb.Config({
-			Name: property,
-			Value: value,
-			Type: type
+		const variable = sb.Config.from({
+			name: property,
+			type: type,
+			value
 		});
 
 		const row = await sb.Query.getRow("chat_data", "User_Alias_Data");
