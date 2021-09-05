@@ -18,12 +18,19 @@ module.exports = {
 		if (!redemption) {
 			return;
 		}
-		else if (typeof redemption.reply !== "string") {
-			console.warn("Redemption has no/invalid message configured", { channel: channel.ID });
-			return;
-		}
 
-		await channel.send(redemption.reply);
+		if (typeof redemption.reply === "string") {
+			await channel.send(redemption.reply);
+		}
+		else if (typeof redemption.callback === "function") {
+			const result = await redemption.callback(context, redemption);
+			if (result) {
+				await channel.send(result);
+			}
+		}
+		else {
+			console.warn("Redemption has no/invalid message configured", { channel: channel.ID });
+		}
 	}),
 	Author: "supinic"
 };
