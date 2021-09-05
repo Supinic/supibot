@@ -142,8 +142,22 @@ module.exports = {
 			}
 		}
 
-		const timeData = await this.staticData.fetchTimeData(coordinates);
-		if (timeData.status === "ZERO_RESULTS") {
+		const response = await sb.Utils.fetchTimeData({
+			coordinates,
+			key: sb.Config.get("API_GOOGLE_TIMEZONE")
+		});
+
+		const timeData = response.body;
+		if (response.statusCode !== 200) {
+			throw new sb.errors.GenericRequestError({
+				statusCode: response.statusCode,
+				hostname: "maps.googleapis.com",
+				statusMessage: timeData.statusMessage ?? null,
+				message: timeData.message ?? null,
+				stack: null
+			});
+		}
+		else if (timeData.status === "ZERO_RESULTS") {
 			return {
 				success: false,
 				reply: "Target place is ambiguous - it contains more than one timezone!"

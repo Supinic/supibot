@@ -92,9 +92,12 @@ module.exports = {
 			const location = await context.user.getDataProperty("location");
 			const isRelative = (Object.keys(chronoData.component.knownValues).length === 0);
 			if (location && !isRelative) {
-				const timeCommand = sb.Command.get("time");
-				const timestamp = chronoData.component.date().valueOf();
-				const timeData = await timeCommand.staticData.fetchTimeData(location.coordinates, timestamp);
+				const date = chronoData.component.date();
+				const timeData = await sb.Utils.fetchTimeData({
+					date,
+					coordinates: location.coordinates,
+					key: sb.Config.get("API_GOOGLE_TIMEZONE")
+				});
 
 				if (timeData.status === "ZERO_RESULTS") {
 					return {
