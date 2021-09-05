@@ -166,12 +166,6 @@ module.exports = class User extends require("./template.js") {
 			});
 		}
 
-		const variable = sb.Config.from({
-			name: propertyName,
-			type: type,
-			value
-		});
-
 		const row = await sb.Query.getRow("chat_data", "User_Alias_Data");
 		await row.load({
 			User_Alias: this.ID,
@@ -185,7 +179,19 @@ module.exports = class User extends require("./template.js") {
 			});
 		}
 
-		row.values.Value = variable.stringValue;
+		if (value === null) {
+			row.values.Value = null;
+		}
+		else {
+			const variable = sb.Config.from({
+				name: propertyName,
+				type: type,
+				value
+			});
+
+			row.values.Value = variable.stringValue;
+		}
+
 		await row.save({ skipLoad: true });
 	}
 
