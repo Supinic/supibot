@@ -12,7 +12,7 @@ module.exports = {
 		}
 
 		const now = sb.Date.now();
-		if (now > this.data.timeout && regex.test(message) && skippedUsers.includes(user.ID)) {
+		if (now > this.data.timeout && regex.test(message) && !skippedUsers.includes(user.ID)) {
 			const userName = user?.Name ?? `❓${context.raw.user}`;
 
 			this.data.timeout = now + 1000;
