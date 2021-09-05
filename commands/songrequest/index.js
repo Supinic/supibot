@@ -141,12 +141,12 @@ module.exports = {
 				}
 
 				totalTime = Math.ceil(totalTime);
-				if (totalTime >= limits.time) {
-					return {
-						canRequest: false,
-						reason: `Maximum video time exceeded! (${totalTime}/${limits.time} seconds)`
-					};
-				}
+				// if (totalTime >= limits.time) {
+				// 	return {
+				// 		canRequest: false,
+				// 		reason: `Maximum video time exceeded! (${totalTime}/${limits.time} seconds)`
+				// 	};
+				// }
 
 				return {
 					canRequest: true,
@@ -202,7 +202,7 @@ module.exports = {
 		}
 
 		const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
-		const limits = this.staticData.checkLimits(context.user, queue);
+		const limits = await this.staticData.checkLimits(context.user, queue);
 		if (!limits.canRequest) {
 			return {
 				reply: limits.reason
@@ -432,14 +432,24 @@ module.exports = {
 
 		const authorString = (data.author) ? ` by ${data.author}` : "";
 		const segmentLength = (endTime ?? length) - (startTime ?? 0);
+
+		let bonusString = "";
+		const bonusLimit = await context.user.getDataProperty("supinicStreamSongRequestExtension") ?? 0;
 		if ((limits.totalTime + segmentLength) > limits.time) {
 			const excess = (limits.totalTime + segmentLength) - limits.time;
-			return {
-				reply: sb.Utils.tag.trim `
-					Your video would exceed the total video limit by ${excess} seconds!.
-					You can change the start and end points of the video with these arguments, e.g.: start:0 end:${limits.totalTime - limits.time}
-				`
-			};
+			if (excess > bonusLimit) {
+				return {
+					success: false,
+					reply: sb.Utils.tag.trim `
+						Your video would exceed the total video limit by ${excess} seconds!.
+						You can change the start and end points of the video with these arguments, e.g.: start:0 end:${limits.totalTime - limits.time}
+					`
+				};
+			}
+			else {
+				await context.user.setDataProperty("supinicStreamSongRequestExtension", bonusLimit - excess);
+				bonusString = `Used up ${excess} seconds from your extension, ${bonusLimit} remaining.`;
+			}
 		}
 
 		let id = null;
@@ -552,6 +562,7 @@ module.exports = {
 				${pauseString}
 				${existsString}
 				(slots: ${limits.requests + 1}/${limits.amount}, length: ${Math.round(limits.totalTime + segmentLength)}/${limits.time})
+				${bonusString}
 			`
 		};
 	}),
