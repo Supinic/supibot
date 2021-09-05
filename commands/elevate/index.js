@@ -47,7 +47,7 @@ module.exports = {
 			};
 		}
 
-		const permissions = await context.user.getUserPermissions();
+		const permissions = await context.getUserPermissions();
 		if (!permissions.is("administrator") && context.user.ID !== row.values.User_Alias) {
 			return {
 				success: false,

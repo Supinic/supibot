@@ -16,7 +16,7 @@ module.exports = {
 			};
 		}
 
-		const permissions = await context.user.getUserPermissions();
+		const permissions = await context.getUserPermissions();
 		if (permissions.flag === sb.User.permissions.regular) {
 			return {
 				success: false,

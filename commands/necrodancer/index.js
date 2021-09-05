@@ -50,7 +50,7 @@ module.exports = {
 		const { invocation } = context;
 		const { createURL, zones } = this.staticData;
 		if (invocation === "ndr" || invocation === "necrodancerreset") {
-			const permissions = await context.user.getUserPermissions();
+			const permissions = await context.getUserPermissions();
 			if (!permissions.is("administrator")) {
 				return {
 					success: false,

@@ -59,7 +59,7 @@ module.exports = {
 			? "this channel"
 			: `channel "${channelData.Name}"`;
 
-		const permissions = await context.user.getUserPermissions({ channel: channelData });
+		const permissions = await context.getUserPermissions({ channel: channelData });
 		if (permissions.flag === sb.User.permissions.regular) {
 			return {
 				success: false,
