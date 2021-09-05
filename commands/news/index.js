@@ -667,7 +667,7 @@ module.exports = {
 			});
 		}
 		catch (e) {
-			if (e instanceof sb.Got.TimeoutError) {
+			if (e instanceof sb.Got.TimeoutError || e instanceof sb.errors.GenericRequestError) {
 				return {
 					success: false,
 					reply: "No relevant news articles found!"
