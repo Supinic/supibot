@@ -14,35 +14,34 @@ module.exports = {
 				reply: "Some arguments are missing!"
 			};
 		}
-	
+
 		const allowedTypes = ["bird", "cat", "dog", "fox"];
 		if (!allowedTypes.includes(type)) {
 			return {
 				reply: "Unknown animal type provided!"
 			};
 		}
-	
+
 		const userData = await sb.User.get(user);
 		if (!userData) {
 			return {
 				reply: "Invalid user provided!"
 			};
 		}
-	
-		userData.Data.animals = userData.Data.animals ?? {};
-		if (userData.Data.animals[type]) {
+
+		const animalsData = await userData.getDataProperty("animals") ?? {};
+		if (animalsData[type]) {
 			return {
 				reply: `That user is already verified for ${type}(s). If you want to add more pictures, do it manually please :)`
 			};
 		}
-	
-		userData.Data.animals[type] = {
+
+		animalsData[type] = {
 			verified: true,
 			notes: rest.join(" ")
 		};
-	
-		await userData.saveProperty("Data", userData.Data);
-	
+
+		await userData.setDataProperty("animals", animalsData);
 		return {
 			reply: `Okay, they are now verified to use ${type}-related commands :)`
 		};

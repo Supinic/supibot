@@ -59,11 +59,12 @@ module.exports = {
 		let place = args.join(" ");
 
 		if (args.length === 0) {
-			if (context.user.Data.location) {
+			const location = await context.user.getDataProperty("location");
+			if (location) {
 				user = context.user;
-				coordinates = context.user.Data.location.coordinates;
-				skipLocation = context.user.Data.location.hidden;
-				place = context.user.Data.location.formatted;
+				coordinates = location.coordinates;
+				skipLocation = location.hidden;
+				place = location.formatted;
 			}
 			else {
 				return {
@@ -88,7 +89,9 @@ module.exports = {
 					reply: `My current time is ${sb.Date.now()} ${robotEmote}`
 				};
 			}
-			else if (!targetUser.Data.location) {
+
+			const targetUserLocation = await targetUser.getDataProperty("location");
+			if (!targetUserLocation) {
 				const message = (targetUser === context.user)
 					? "You have not set up your location! You can use $set location (location) to set it, or add \"private\" to make it private 🙂"
 					: "They have not set up their location!";
@@ -101,9 +104,9 @@ module.exports = {
 			}
 			else {
 				user = targetUser;
-				coordinates = targetUser.Data.location.coordinates;
-				skipLocation = targetUser.Data.location.hidden;
-				place = targetUser.Data.location.formatted;
+				coordinates = targetUserLocation.coordinates;
+				skipLocation = targetUserLocation.hidden;
+				place = targetUserLocation.formatted;
 			}
 		}
 
@@ -117,8 +120,10 @@ module.exports = {
 			}).json();
 
 			if (!geoData) {
-				const userData = await sb.User.get(args[0]);
-				if (userData && userData.Data.location) {
+				const checkUserData = await sb.User.get(args[0]);
+				const checkLocation = await checkUserData?.getDataProperty("location");
+
+				if (checkUserData && !checkLocation) {
 					return {
 						success: false,
 						reply: `That place was not found! However, you probably meant to check that user's location - make sure to add the @ symbol before their name.`,
@@ -154,15 +159,18 @@ module.exports = {
 		const time = new sb.Date();
 		time.setTimezoneOffset(totalOffset / 60);
 
-		if (user && user.Data.location && !user.Data.location.timezone) {
-			user.Data.location.timezone = {
-				dstOffset: 1111,
-				stringOffset: offset,
-				offset: totalOffset,
-				name: timeData.timeZoneName
-			};
+		if (user) {
+			const locationData = await user.getDataProperty("location");
+			if (locationData && !locationData.timezone) {
+				locationData.timezone = {
+					dstOffset: 1111,
+					stringOffset: offset,
+					offset: totalOffset,
+					name: timeData.timeZoneName
+				};
 
-			await user.saveProperty("Data");
+				await user.setDataProperty("Data", locationData);
+			}
 		}
 
 		const locationDateTime = time.format("H:i (Y-m-d)");

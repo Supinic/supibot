@@ -46,17 +46,18 @@ module.exports = {
 				reply: "This command cannot be used in PMs!"
 			};
 		}
-	
+
 		const { invocation } = context;
 		const { createURL, zones } = this.staticData;
 		if (invocation === "ndr" || invocation === "necrodancerreset") {
-			if (!context.user.Data.administrator) {
+			const permissions = await context.user.getUserPermissions();
+			if (!permissions.is("administrator")) {
 				return {
 					success: false,
 					reply: "You can't do that!"
 				};
 			}
-	
+
 			const result = await sb.Got({
 				url: createURL({
 					command: "reset",
@@ -66,7 +67,7 @@ module.exports = {
 				timeout: 30_000,
 				retry: 0
 			}).json();
-	
+
 			if (result.success) {
 				return {
 					reply: "Zone(s) reset successfully."
@@ -80,7 +81,7 @@ module.exports = {
 				};
 			}
 		}
-	
+
 		let [link, zone] = args;
 		if (!link) {
 			return {
@@ -95,7 +96,7 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-	
+
 		zone = zone.toLowerCase();
 		if (!zones.includes(zone)) {
 			return {
@@ -104,9 +105,9 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-	
+
 		this.data.cooldowns[zone] = this.data.cooldowns[zone] ?? 0;
-	
+
 		const now = sb.Date.now();
 		if (this.data.cooldowns[zone] >= now) {
 			const delta = sb.Utils.timeDelta(this.data.cooldowns[zone]);
@@ -116,9 +117,9 @@ module.exports = {
 		}
 		this.data.cooldowns[zone] = now + this.staticData.zoneCooldown;
 		// be sure that the HTTP request is done after the cooldown to avoid a race condition
-		
+
 		await context.channel.send("Download + beat mapping + saving started! Please wait...");
-	
+
 		let result;
 		try {
 			result = await sb.Got({
@@ -134,7 +135,7 @@ module.exports = {
 		}
 		catch (e) {
 			this.data.cooldowns[zone] = 0;
-	
+
 			if (e instanceof sb.Got.TimeoutError) {
 				return {
 					success: false,
@@ -145,7 +146,7 @@ module.exports = {
 				throw e;
 			}
 		}
-	
+
 		if (result.success) {
 			const length = sb.Utils.formatTime(sb.Utils.round(result.length), true);
 			const bpm = sb.Utils.round(60 / (result.length / result.beats));
@@ -156,7 +157,7 @@ module.exports = {
 		else {
 			console.warn({ result });
 			this.data.cooldowns[zone] = 0;
-	
+
 			return {
 				success: false,
 				reply: "There was an error while downloading/beatmapping your link!"
@@ -168,11 +169,11 @@ module.exports = {
 		return [
 			"Downloads, beatmaps and inserts a song from a link into the Crypt of the Necrodancer game.",
 			"",
-	
+
 			`<code>${prefix}necrodancer (link) (zone)</code>`,
 			"From a given link, extracts the song, beatmaps it automatically and inserts it as the song to play in game in the provided zone",
 			"",
-	
+
 			"Zone list:",
 			`<ul>${zones.map(i => `<li><code>${i}</code></li>`).join("")}</ul>`
 		];

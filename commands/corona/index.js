@@ -138,26 +138,28 @@ module.exports = {
 					reply: "That user does not exist!"
 				};
 			}
-			else if (!userData.Data.location) {
+
+			const location = await userData.getDataProperty("location");
+			if (!location) {
 				return {
 					success: false,
 					reply: "That user does not have their location set!"
 				};
 			}
-			else if (userData.Data.location.hidden) {
+			else if (location.hidden) {
 				return {
 					success: false,
 					reply: "That user has hidden their precise location!"
 				};
 			}
-			else if (!userData.Data.location.components.country) {
+			else if (!location.components.country) {
 				return {
 					success: false,
 					reply: "That user does not have their country location set!"
 				};
 			}
 
-			country = userData.Data.location.components.country;
+			country = location.components.country;
 		}
 		else if (input === "stats" || input === "dump") {
 			return {

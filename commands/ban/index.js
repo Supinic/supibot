@@ -116,7 +116,7 @@ module.exports = {
 			options.User_Alias = userData.ID;
 		}
 
-		const isAdmin = Boolean(context.user.Data.administrator);
+		const isAdmin = await context.user.getDataProperty("administrator");
 		if (!options.Channel && !isAdmin) {
 			if (context.privateMessage) {
 				return {

@@ -223,7 +223,8 @@ module.exports = {
 				aliases: [],
 				description: "If you are marked as a developer, you can check the full text of an error within Supibot, based on its ID.",
 				execute: async (context, identifier) => {
-					if (!context.user.Data.inspectErrorStacks) {
+					const inspectErrorStacks = await context.user.getDataProperty("inspectErrorStacks");
+					if (!inspectErrorStacks) {
 						return {
 							reply: "Sorry, you can't inspect error stacks!"
 						};
@@ -553,7 +554,7 @@ module.exports = {
 				aliases: [],
 				description: "If you have set a timer, this will show its name and date.",
 				execute: async (context, identifier) => {
-					const { timers } = context.user.Data;
+					const timers = await context.user.getDataProperty("timers");
 					if (!timers) {
 						return {
 							success: false,

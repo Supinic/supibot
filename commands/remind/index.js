@@ -89,13 +89,13 @@ module.exports = {
 				};
 			}
 
+			const location = await context.user.getDataProperty("location");
 			const isRelative = (Object.keys(chronoData.component.knownValues).length === 0);
-			if (context.user.Data.location && !isRelative) {
-				const location = context.user.Data.location;
+			if (location && !isRelative) {
 				const timeCommand = sb.Command.get("time");
-
 				const timestamp = chronoData.component.date().valueOf();
 				const timeData = await timeCommand.staticData.fetchTimeData(location.coordinates, timestamp);
+
 				if (timeData.status === "ZERO_RESULTS") {
 					return {
 						success: false,

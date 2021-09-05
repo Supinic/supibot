@@ -19,8 +19,9 @@ module.exports = {
 	Code: (async function randomAnimalPicture (context, input) {
 		const { invocations, types } = this.staticData;
 		const type = invocations[context.invocation] ?? input?.toLowerCase() ?? null;
+		const animalsData = await context.user.getDataProperty("animals");
 
-		if (!context.user.Data.animals) {
+		if (!animalsData) {
 			return {
 				reply: `You must verify that you have any type of animal as a pet first! Verify by $suggest-ing a picture of your pet(s), along with your name and mention that you want the command access.`
 			};
@@ -35,32 +36,32 @@ module.exports = {
 				reply: `That type is not supported! Use on of: ${types.join(", ")}`
 			};
 		}
-		else if (!context.user.Data.animals[type]) {
-			const available = Object.keys(context.user.Data.animals);
+		else if (!animalsData[type]) {
+			const available = Object.keys(animalsData);
 			return {
 				reply: `You can only use this command for ${available.join(", ")}! If you want to use it for ${type}s, you need to $suggest a picture of it, like before.`
 			};
 		}
-	
+
 		let result = null;
 		switch (type) {
 			case "bird":
 				result = (await sb.Got("SRA", "img/birb").json()).link;
 				break;
-	
+
 			case "cat":
 				result = (await sb.Got("https://api.thecatapi.com/v1/images/search").json())[0].url;
 				break;
-	
+
 			case "dog":
 				result = (await sb.Got("https://dog.ceo/api/breeds/image/random").json()).message;
 				break;
-	
+
 			case "fox":
 				result = (await sb.Got("SRA", "img/fox").json()).link;
 				break;
 		}
-	
+
 		return {
 			reply: result
 		};
@@ -68,7 +69,7 @@ module.exports = {
 	Dynamic_Description: (async (prefix, values) => {
 		const { invocations, types } = values.getStaticData();
 		const list = [];
-	
+
 		for (const [short, type] of Object.entries(invocations)) {
 			list.push([
 				`<code>${prefix}${short}</code>`,
@@ -76,16 +77,16 @@ module.exports = {
 				""
 			]);
 		}
-	
+
 		return [
 			"If you have verified that you own a given animal type, you can use this command to get a random picture of a selected animal type.",
 			`To verify, <code>${prefix}suggest</code> a picture of your animal and mention that you want to get verified.`,
 			"",
-	
+
 			`<code>${prefix}randomanimalpicture ${types.join("/")}</code>`,
 			"Posts a random picture of a given animal",
 			"",
-	
+
 			...list.flat()
 		];
 	})

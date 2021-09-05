@@ -4,13 +4,14 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 120000,
 	Description: "Resumes your AFK status, if used within 5 minutes of coming back from AFK. This command can only be used once every 2 minutes (!) globally.",
-	Flags: ["mention","pipe"],
+	Flags: ["mention"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function resumeAFK (context) {
 		if (context.privateMessage) {
 			return {
+				success: false,
 				reply: "Resuming your AFK status is only permitted outside of private messages!"
 			};
 		}
@@ -58,7 +59,7 @@ module.exports = {
 			Active: false
 		});
 
-		await oldAFK.save();
+		await oldAFK.save({ skipLoad: true });
 
 		return {
 			reply: "Your AFK status has been resumed.",

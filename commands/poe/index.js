@@ -160,7 +160,8 @@ module.exports = {
 							};
 						}
 
-						const link = userData.Data?.pathOfExile?.uniqueTabs ?? null;
+						const poeData = await userData.getDataProperty("pathOfExile");
+						const link = poeData?.uniqueTabs ?? null;
 						if (!link) {
 							return {
 								success: false,

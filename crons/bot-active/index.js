@@ -7,8 +7,15 @@ module.exports = {
 	Code: (async function verifyBotAcitivity () {
 		const platform = sb.Platform.get(1);
 		const userData = await sb.User.get(platform.Self_Name);
-		if (!userData || !userData.Data.authKey) {
-			console.warn("Bot-activity refresh cron is missing bot data or auth key");
+		if (!userData) {
+			console.warn("Bot-activity refresh cron is missing bot's user data");
+			this.stop();
+			return;
+		}
+
+		const authKey = await userData.getDataProperty("authKey");
+		if (!authKey) {
+			console.warn("Bot-activity refresh cron is missing bot's auth key");
 			this.stop();
 			return;
 		}
@@ -17,7 +24,7 @@ module.exports = {
 			method: "PUT",
 			url: "bot-program/bot/active",
 			headers: {
-				Authorization: `Basic ${userData.ID}:${userData.Data.authKey}`
+				Authorization: `Basic ${userData.ID}:${authKey}`
 			}
 		});
 	})

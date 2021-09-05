@@ -103,10 +103,11 @@ module.exports = {
 		if (args.length === 0) {
 			isOwnLocation = true;
 
-			if (context.user.Data.location) {
-				skipLocation = context.user.Data.location.hidden;
-				coords = context.user.Data.location.coordinates;
-				formattedAddress = context.user.Data.location.formatted;
+			const location = await context.user.getDataProperty("location");
+			if (location) {
+				skipLocation = location.hidden;
+				coords = location.coordinates;
+				formattedAddress = location.formatted;
 			}
 			else {
 				return {
@@ -136,7 +137,9 @@ module.exports = {
 					}
 				};
 			}
-			else if (!userData.Data.location) {
+
+			const location = await userData.getDataProperty("location");
+			if (!location) {
 				return {
 					reply: "That user did not set their location!",
 					cooldown: {
@@ -145,9 +148,9 @@ module.exports = {
 				};
 			}
 			else {
-				coords = userData.Data.location.coordinates;
-				skipLocation = userData.Data.location.hidden;
-				formattedAddress = userData.Data.location.formatted;
+				coords = location.coordinates;
+				skipLocation = location.hidden;
+				formattedAddress = location.formatted;
 			}
 		}
 
@@ -193,8 +196,10 @@ module.exports = {
 			}
 
 			if (geoData.empty) {
-				const userCheck = await sb.User.get(args.join("_"));
-				if (userCheck?.Data.location) {
+				const checkUserData = await sb.User.get(args.join("_"));
+				const checkLocation = await checkUserData?.getDataProperty("location");
+
+				if (checkLocation) {
 					return {
 						success: false,
 						reply: `That place was not found! However, you probably meant to check that user's location - make sure to add the @ symbol before their name.`,

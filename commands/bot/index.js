@@ -59,13 +59,8 @@ module.exports = {
 			? "this channel"
 			: `channel "${channelData.Name}"`;
 
-		const hasAccess = (
-			context.user.Data.administrator
-			|| await channelData.isUserChannelOwner(context.user)
-			|| channelData.isUserAmbassador(context.user)
-		);
-
-		if (!hasAccess) {
+		const permissions = await context.user.getUserPermissions({ channel: channelData });
+		if (permissions.flag === sb.User.permissions.regular) {
 			return {
 				success: false,
 				reply: `You're not authorized to do that in ${channelString}!`

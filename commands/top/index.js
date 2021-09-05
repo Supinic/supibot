@@ -16,17 +16,14 @@ module.exports = {
 			};
 		}
 
-		if (
-			!context.user.Data.administrator
-			&& !await context.channel.isUserChannelOwner(context.user)
-			&& !context.channel.isUserAmbassador(context.user)
-		) {
+		const permissions = await context.user.getUserPermissions();
+		if (permissions.flag === sb.User.permissions.regular) {
 			return {
 				success: false,
 				reply: `You're not allowed to use this command here! Only administrators, channel owners and channel ambassadors can.`
 			};
 		}
-	
+
 		const limit = Number(rawLimit);
 		if (!sb.Utils.isValidInteger(limit)) {
 			return {
@@ -42,11 +39,11 @@ module.exports = {
 				cooldown: 5000
 			};
 		}
-	
+
 		const channels = (context.channel.ID === 7 || context.channel.ID === 8)
 			? [7, 8, 46]
 			: [context.channel.ID];
-	
+
 		const top = await sb.Query.getRecordset(rs => rs
 			.select("SUM(Message_Count) AS Total")
 			.select("User_Alias.Name AS Name")
@@ -57,12 +54,12 @@ module.exports = {
 			.orderBy("SUM(Message_Count) DESC")
 			.limit(limit)
 		);
-	
+
 		const chatters = top.map((i, ind) => {
 			const name = `${i.Name[0]}\u{E0000}${i.Name.slice(1)}`;
 			return `#${ind + 1}: ${name} (${sb.Utils.groupDigits(i.Total)})`;
 		}).join(", ");
-	
+
 		return {
 			meta: {
 				skipWhitespaceCheck: true

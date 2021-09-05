@@ -81,14 +81,16 @@ module.exports = {
 		};
 
 		const setInstagramFlags = async (context, flag) => {
-			const { channel, user } = context;
+			const { channel } = context;
 			if (!channel) {
 				return {
 					success: false,
 					reply: "You can't set any settings without being in a channel!"
 				};
 			}
-			else if (!user.Data.administrator && !await channel.isUserChannelOwner(user) && !channel.isUserAmbassador(user)) {
+
+			const permissions = await context.getUserPermissions();
+			if (permissions.flag === sb.User.permissions.regular) {
 				return {
 					success: false,
 					reply: "You don't have access to this channel's settings! Only administrators, channel owners and ambassadors can."
@@ -270,7 +272,7 @@ module.exports = {
 						}
 
 						if (args.length === 0) {
-							const { location } = context.user.Data;
+							const location = await context.user.getDataProperty("location");
 							if (location && visibilityType !== null) {
 								if (location.hidden === hidden) {
 									return {
@@ -280,7 +282,7 @@ module.exports = {
 								}
 								else {
 									location.hidden = hidden;
-									await context.user.saveProperty("Data", context.user.Data);
+									await context.user.setDataProperty("location", location);
 									return {
 										reply: `Your location is now ${visibilityType}!`
 									};
@@ -308,31 +310,29 @@ module.exports = {
 							};
 						}
 
-						context.user.Data.location = {
+						await context.user.setDataProperty("location", {
 							formatted,
 							placeID,
 							components,
 							hidden,
 							coordinates: coordinates ?? location,
 							original: query
-						};
+						});
 
-						await context.user.saveProperty("Data", context.user.Data);
 						return {
 							reply: `Successfully set your ${hidden ? "private" : "public"} location!`
 						};
 					},
 					unset: async (context) => {
-						if (!context.user.Data.location) {
+						const location = await context.user.getDataProperty("location");
+						if (!location) {
 							return {
 								success: false,
 								reply: `You don't have a location set up, so there is nothing to unset!`
 							};
 						}
 
-						context.user.Data.location = null;
-
-						await context.user.saveProperty("Data", context.user.Data);
+						await context.user.setDataProperty("location", null);
 						return {
 							reply: "Your location has been unset successfully!"
 						};
@@ -355,7 +355,8 @@ module.exports = {
 							};
 						}
 
-						if (!context.user.Data.administrator && row.values.Added_By !== context.user.ID) {
+						const permissions = await context.getUserPermissions();
+						if (!permissions.is("administrator") && row.values.Added_By !== context.user.ID) {
 							return {
 								success: false,
 								reply: "This track was not added by you!"
@@ -430,29 +431,27 @@ module.exports = {
 							};
 						}
 
-						context.user.Data.birthday = {
+						const birthdayString = date.format("F dS");
+						await context.user.setDataProperty("birthday", {
 							month: date.month,
 							day: date.day,
-							string: date.format("F dS")
-						};
-
-						await context.user.saveProperty("Data", context.user.Data);
+							string: birthdayString
+						});
 
 						return {
-							reply: `Successfully set your birthday to ${context.user.Data.birthday.string}.`
+							reply: `Successfully set your birthday to ${birthdayString}.`
 						};
 					},
 					unset: async (context) => {
-						if (!context.user.Data.birthday) {
+						const birthdayData = await context.user.getDataProperty("birthday");
+						if (!birthdayData) {
 							return {
 								success: false,
 								reply: `You don't have a birthday date set up, so there is nothing to unset!`
 							};
 						}
 
-						context.user.Data.birthday = null;
-						await context.user.saveProperty("Data", context.user.Data);
-
+						await context.user.setDataProperty("birthday", null);
 						return {
 							reply: "Your birthday date has been unset successfully!"
 						};
@@ -464,7 +463,8 @@ module.exports = {
 					parameter: "arguments",
 					description: `If you have been nominated as a TwitchLotto-trusted user, you can then set flags to TL links. Available flags: <code>${availableFlags.join(", ")}</code>`,
 					set: async (context, link, ...flags) => {
-						if (!context.user.Data.trustedTwitchLottoFlagger) {
+						const hasAccess = await context.user.getDataProperty("trustedTwitchLottoFlagger");
+						if (!hasAccess) {
 							return {
 								success: false,
 								reply: `You don't have access to flag TwitchLotto images!`
@@ -637,13 +637,8 @@ module.exports = {
 					parameter: "arguments",
 					description: `Sets/unsets a timer with a given name + date, which you can then check on later.`,
 					set: async (context, ...args) => {
-						if (!context.user.Data.timers) {
-							context.user.Data.timers = {};
-						}
-
-						const { timers } = context.user.Data;
+						const timers = await context.user.getDataProperty("timers") ?? {};
 						const name = args[0];
-						const date = new sb.Date(args.slice(1, 2).filter(Boolean).join(" "));
 						if (!timerNameRegex.test(name)) {
 							return {
 								success: false,
@@ -663,6 +658,7 @@ module.exports = {
 							};
 						}
 
+						const date = new sb.Date(args.slice(1, 2).filter(Boolean).join(" "));
 						if (Number.isNaN(date.valueOf())) {
 							return {
 								success: false,
@@ -674,13 +670,13 @@ module.exports = {
 							date: date.valueOf()
 						};
 
-						await context.user.saveProperty("Data");
+						await context.user.setDataProperty("timers", timers);
 						return {
 							reply: `Successfully added your timer "${name}".`
 						};
 					},
 					unset: async (context, name) => {
-						const { timers } = context.user.Data;
+						const timers = await context.user.getDataProperty("timers");
 						if (!timers) {
 							return {
 								success: false,
@@ -695,7 +691,8 @@ module.exports = {
 						}
 
 						delete timers[name];
-						await context.user.saveProperty("Data");
+						await context.user.setDataProperty("timers", timers);
+
 						return {
 							reply: `Successfully removed your timer "${name}".`
 						};
@@ -729,17 +726,14 @@ module.exports = {
 			};
 		}
 
-		if (target.adminOnly && !context.user.Data.administrator) {
+		const permissions = await context.getUserPermissions();
+		if (target.adminOnly && !permissions.is("administrator")) {
 			return {
 				success: false,
 				reply: `Only administrators can work with the type "${type}"!`
 			};
 		}
-		else if (
-			target.elevatedChannelAccess
-			&& !await context.channel.isUserChannelOwner(context.user)
-			&& !context.channel.isUserAmbassador(context.user)
-		) {
+		else if (target.elevatedChannelAccess && permissions.flag === sb.User.permissions.regular) {
 			return {
 				success: false,
 				reply: `Only channel owners and ambassadors can work with the type "${type}"!`

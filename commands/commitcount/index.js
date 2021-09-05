@@ -17,15 +17,17 @@ module.exports = {
 		if (user) {
 			const userData = await sb.User.get(user);
 			if (userData) {
+				const githubData = await userData.getDataProperty("github");
+				username = githubData?.login ?? userData.Name;
 				self = (userData === context.user);
-				username = userData.Data.github?.login ?? userData.Name;
 			}
 			else {
 				username = user;
 			}
 		}
 		else {
-			username = context.user.Data.github?.login ?? context.user.Name;
+			const githubData = await context.user.getDataProperty("github");
+			username = githubData?.login ?? context.user.Name;
 			self = true;
 		}
 
