@@ -196,7 +196,8 @@ module.exports = {
 			}
 
 			if (geoData.empty) {
-				const checkUserData = await sb.User.get(args.join("_"));
+				// Check if the location is actually someone's username
+				const checkUserData = await sb.User.get(location);
 				const checkLocation = await checkUserData?.getDataProperty("location");
 
 				if (checkLocation) {
