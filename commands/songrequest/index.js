@@ -447,8 +447,9 @@ module.exports = {
 				};
 			}
 			else {
-				await context.user.setDataProperty("supinicStreamSongRequestExtension", bonusLimit - excess);
-				bonusString = `Used up ${excess} seconds from your extension, ${bonusLimit} remaining.`;
+				const remainingBonus = bonusLimit - excess;
+				await context.user.setDataProperty("supinicStreamSongRequestExtension", remainingBonus);
+				bonusString = `Used up ${excess} seconds from your extension, ${remainingBonus} remaining.`;
 			}
 		}
 
