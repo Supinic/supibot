@@ -1148,6 +1148,11 @@ class Command extends require("./template.js") {
 	}
 
 	static parseParameter (value, type) {
+		// Empty parameter value is always incorrect, since it is written as `$command param:`
+		if (value === "") {
+			return null;
+		}
+
 		if (type === "string") {
 			return String(value);
 		}
