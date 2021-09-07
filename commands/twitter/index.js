@@ -99,12 +99,12 @@ module.exports = {
 		}
 		else {
 			tweet = eligibleTweets[0];
+		}
 
-			if (!tweet) {
-				return {
-					reply: "That account has not tweeted so far."
-				};
-			}
+		if (!tweet) {
+			return {
+				reply: "That account has not tweeted so far."
+			};
 		}
 
 		const fixedText = sb.Utils.fixHTML(tweet.text);
