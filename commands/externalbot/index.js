@@ -64,7 +64,7 @@ module.exports = {
 
 		// Sends the actual external bot's command, and wait to see if it responds
 		const safeMessage = await context.platform.prepareMessage(message, context.channel);
-		const messagePromise = context.channel.waitForUserMessage(botData.ID);
+		const messagePromise = context.channel.waitForUserMessage(botData);
 
 		await context.channel.send(safeMessage);
 
