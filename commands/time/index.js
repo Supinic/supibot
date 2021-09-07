@@ -175,15 +175,15 @@ module.exports = {
 
 		if (user) {
 			const locationData = await user.getDataProperty("location");
-			if (locationData && !locationData.timezone) {
+			if (locationData && (!locationData.timezone || locationData.timezone?.dstOffset === 1111)) {
 				locationData.timezone = {
-					dstOffset: 1111,
+					dstOffset: timeData.dstOffset,
 					stringOffset: offset,
 					offset: totalOffset,
 					name: timeData.timeZoneName
 				};
 
-				await user.setDataProperty("Data", locationData);
+				await user.setDataProperty("location", locationData);
 			}
 		}
 
