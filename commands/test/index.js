@@ -6,6 +6,11 @@ module.exports = {
 	Description: "?",
 	Flags: ["developer","pipe","skip-banphrase","system","use-params"],
 	Params: [
+		{ name: "boolean", type: "boolean" },
+		{ name: "date", type: "date" },
+		{ name: "number", type: "number" },
+		{ name: "object", type: "object" },
+		{ name: "regex", type: "regex" },
 		{ name: "string", type: "string" }
 	],
 	Whitelist_Response: "For debugging purposes only :)",
