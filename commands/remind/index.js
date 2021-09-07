@@ -254,7 +254,7 @@ module.exports = {
 		let deprecationString = "";
 		if (this.staticData.deprecation[context.invocation]) {
 			const replacement = this.staticData.deprecation[context.invocation];
-			deprecationString = ` ${sb.Command.prefix}${context.invocation} will be disabled soon! Use ${replacement} instead.`;
+			deprecationString = ` ${sb.Command.prefix}${context.invocation} will be disabled soon! Use ${sb.Command.prefix}${replacement} instead.`;
 		}
 
 		if (result.success) {
