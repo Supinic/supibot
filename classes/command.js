@@ -1189,25 +1189,7 @@ class Command extends require("./template.js") {
 			return { key, value: outputValue };
 		}
 		else if (type === "regex") {
-			const string = value.replace(/^\/|\/$/g, "");
-
-			// find last possible forward slash that is not escaped with a backslash
-			// this determines the forceful end of a regex, which is then followed by flag characters
-			// Regex: find the slash not preceded by backslashes, that is also not ultimately followed by another slash
-			const lastSlashIndex = string.match(/(?<!\\)(\/)(?!.*\/)/)?.index ?? -1;
-
-			const regexBody = (lastSlashIndex !== -1) ? string.slice(0, lastSlashIndex) : string;
-			const flags = (lastSlashIndex !== -1) ? string.slice(lastSlashIndex + 1) : "";
-
-			let regex;
-			try {
-				regex = new RegExp(regexBody, flags);
-			}
-			catch (e) {
-				return null;
-			}
-
-			return regex;
+			return sb.Utils.parseRegExp(value);
 		}
 
 		return null;
