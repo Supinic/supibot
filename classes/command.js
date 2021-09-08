@@ -629,7 +629,7 @@ class Command extends require("./template.js") {
 
 				if (name !== null && value !== null) {
 					const cleanValue = value.replace(/^"|"$/g, "").replace(/\\"/g, "\"");
-					const parsedValue = Command.parseParameter(cleanValue, type);
+					const parsedValue = Command.parseParameter(cleanValue, type, true);
 					if (parsedValue === null) {
 						sb.CooldownManager.unsetPending(userData.ID);
 						return {
@@ -669,7 +669,7 @@ class Command extends require("./template.js") {
 				const { type } = command.Params.find(i => i.name === name);
 
 				if (name !== null && value !== null) {
-					const parsedValue = Command.parseParameter(value, type);
+					const parsedValue = Command.parseParameter(value, type, false);
 					if (parsedValue === null) {
 						sb.CooldownManager.unsetPending(userData.ID);
 						return {
@@ -1147,9 +1147,13 @@ class Command extends require("./template.js") {
 		};
 	}
 
-	static parseParameter (value, type) {
-		// Empty parameter value is always incorrect, since it is written as `$command param:`
-		if (value === "") {
+	static parseParameter (value, type, explicit) {
+		// Empty implicit string value is always invalid, since that is written as `$command param:` which is a typo/mistake
+		if (type === "string" && explicit === false && value === "") {
+			return null;
+		}
+		// Non-string parameters are also always invalid with empty string value, regardless of implicitness
+		else if (type !== "string" && value === "") {
 			return null;
 		}
 
