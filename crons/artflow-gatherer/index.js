@@ -33,7 +33,7 @@ module.exports = {
 			return;
 		}
 
-		for (const item of data.slice(0, 2)) {
+		for (const item of data) {
 			const row = await sb.Query.getRow("data", "Artflow_Image");
 			await row.load(item.filename, true);
 			if (row.loaded) {
