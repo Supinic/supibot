@@ -23,10 +23,10 @@ module.exports = {
 		]);
 
 		const data = [];
-		if (editorData.responseCode === 200) {
+		if (editorData.statusCode === 200) {
 			data.push(...editorData.body);
 		}
-		if (communityData.responseCode === 200) {
+		if (communityData.statusCode === 200) {
 			data.push(...communityData.body);
 		}
 		if (data.length === 0) {
