@@ -67,6 +67,10 @@ module.exports = {
 				continue;
 			}
 
+			if (item.status === "Queued") { // Image currently being processed, skip
+				continue;
+			}
+
 			let imageURL = `https://artflowbucket.s3.amazonaws.com/generated/${item.index}.webp`;
 			const indexResponse = await sb.Got("FakeAgent", {
 				method: "HEAD",
