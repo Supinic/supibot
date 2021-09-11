@@ -36,13 +36,39 @@ module.exports = {
 		for (const item of data) {
 			const row = await sb.Query.getRow("data", "Artflow_Image");
 			await row.load(item.filename, true);
-			if (row.loaded) {
+			if (row.loaded) { // Image already exists in the database
+				continue;
+			}
+
+			let fileIndex;
+			const indexResponse = await sb.Got({
+				method: "HEAD",
+				url: `https://artflowbucket.s3.amazonaws.com/generated/${item.index}.webp`,
+				throwHttpErrors: false
+			});
+
+			if (indexResponse.statusCode === 200) {
+				fileIndex = item.index;
+			}
+			else {
+				const filenameResponse = await sb.Got({
+					method: "HEAD",
+					url: `https://artflowbucket.s3.amazonaws.com/generated/${item.filename}.webp`,
+					throwHttpErrors: false
+				});
+
+				if (filenameResponse.statusCode === 200) {
+					fileIndex = item.filename;
+				}
+			}
+
+			if (!fileIndex) { // File does not exist anymore
 				continue;
 			}
 
 			const formData = new sb.Got.FormData();
 			formData.append("reqtype", "urlupload");
-			formData.append("url", `https://artflowbucket.s3.amazonaws.com/generated/${item.index}.webp`);
+			formData.append("url", `https://artflowbucket.s3.amazonaws.com/generated/${fileIndex}.webp`);
 
 			const uploadResponse = await sb.Got({
 				url: "https://catbox.moe/user/api.php",
@@ -56,7 +82,7 @@ module.exports = {
 				timeout: 10000
 			});
 
-			if (uploadResponse.statusCode !== 200) {
+			if (uploadResponse.statusCode !== 200) { // Upload failed
 				continue;
 			}
 
