@@ -17,10 +17,27 @@ module.exports = {
 			throwHttpErrors: false
 		});
 
-		const [editorData, communityData] = await Promise.all([
+		const dataPromises = [
 			get("show_editor_choice"),
 			get("show_community_work")
-		]);
+		];
+
+		if (sb.Config.has("ARTFLOW_AI_CUSTOM_USER_LIST", true)) {
+			for (const userID of sb.Config.get("ARTFLOW_AI_CUSTOM_USER_LIST")) {
+				const formData = new sb.Got.FormData();
+				formData.append("user_id_val", userID);
+
+				const customPromise = get({
+					url: "show_my_work",
+					headers: formData.getHeaders(),
+					body: formData.getBuffer()
+				});
+
+				dataPromises.push(customPromise);
+			}
+		}
+
+		const [editorData, communityData, ...customData] = await Promise.all(dataPromises);
 
 		const data = [];
 		if (editorData.statusCode === 200) {
@@ -29,6 +46,16 @@ module.exports = {
 		if (communityData.statusCode === 200) {
 			data.push(...communityData.body);
 		}
+
+		for (let i = 0; i < customData.length; i++) {
+			if (customData[i].statusCode === 200) {
+				const userID = sb.Config.get("ARTFLOW_AI_CUSTOM_USER_LIST")[i];
+				const items = customData[i].body.map(i => ({ ...i, userID }));
+
+				data.push(...items);
+			}
+		}
+
 		if (data.length === 0) {
 			return;
 		}
@@ -40,35 +67,36 @@ module.exports = {
 				continue;
 			}
 
-			let fileIndex;
-			const indexResponse = await sb.Got({
+			let imageURL = `https://artflowbucket.s3.amazonaws.com/generated/${item.index}.webp`;
+			const indexResponse = await sb.Got("FakeAgent", {
 				method: "HEAD",
-				url: `https://artflowbucket.s3.amazonaws.com/generated/${item.index}.webp`,
-				throwHttpErrors: false
+				url: imageURL,
+				throwHttpErrors: false,
+				responseType: "text"
 			});
 
-			if (indexResponse.statusCode === 200) {
-				fileIndex = item.index;
-			}
-			else {
-				const filenameResponse = await sb.Got({
+			if (indexResponse.statusCode !== 200) {
+				imageURL = `https://artflowbucket-new.s3.amazonaws.com/generated/${item.filename}.webp`;
+
+				const filenameResponse = await sb.Got("FakeAgent", {
 					method: "HEAD",
-					url: `https://artflowbucket.s3.amazonaws.com/generated/${item.filename}.webp`,
-					throwHttpErrors: false
+					url: imageURL,
+					throwHttpErrors: false,
+					responseType: "text"
 				});
 
-				if (filenameResponse.statusCode === 200) {
-					fileIndex = item.filename;
+				if (filenameResponse.statusCode !== 200) {
+					imageURL = null;
 				}
 			}
 
-			if (!fileIndex) { // File does not exist anymore
+			if (!imageURL) { // File does not exist anymore
 				continue;
 			}
 
 			const formData = new sb.Got.FormData();
 			formData.append("reqtype", "urlupload");
-			formData.append("url", `https://artflowbucket.s3.amazonaws.com/generated/${fileIndex}.webp`);
+			formData.append("url", imageURL);
 
 			const uploadResponse = await sb.Got({
 				url: "https://catbox.moe/user/api.php",
@@ -89,6 +117,7 @@ module.exports = {
 			row.setValues({
 				Filename: item.filename,
 				ID: item.index,
+				User_ID: item.userID ?? null,
 				Prompt: item.text_prompt ?? null,
 				Upload_Link: uploadResponse.body
 			});
