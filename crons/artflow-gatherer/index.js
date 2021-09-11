@@ -67,7 +67,7 @@ module.exports = {
 				continue;
 			}
 
-			if (item.status === "Queued") { // Image currently being processed, skip
+			if (item.status === "Queuing") { // Image currently being processed, skip
 				continue;
 			}
 
