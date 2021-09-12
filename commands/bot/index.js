@@ -255,9 +255,10 @@ module.exports = {
 					joinFailed = true;
 				}
 
-				if (partFailed && joinFailed && (inactiveReason === "suspended" || inactiveReason === "renamed")) {
+				if (!partFailed && !joinFailed && (inactiveReason === "suspended" || inactiveReason === "renamed")) {
 					delete channelData.Data.inactiveReason;
 					await channelData.saveProperty("Data");
+					await channelData.saveProperty("Mode", "Write");
 				}
 
 				return {
