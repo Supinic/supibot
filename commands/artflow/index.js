@@ -15,7 +15,7 @@ module.exports = {
 	Code: (async function artflow (context, word) {
 		if (context.params.prompt) {
 			this.data.pendingRequests ??= [];
-			const pending = this.data.pendingRequests.find(i => i.user === context.user.ID);
+			const pending = this.data.pendingRequests.find(i => i.user === context.user.ID && i.pending);
 			if (pending) {
 				const range = [
 					Math.trunc(pending.queue / 30),
@@ -61,7 +61,8 @@ module.exports = {
 				platform: context.platform?.ID ?? null,
 				imageIndex: response.body.index,
 				prompt: context.params.prompt,
-				queue: response.body.queue_length
+				queue: response.body.queue_length,
+				pending: true
 			};
 
 			requestObject.interval = setInterval((async (self) => {
@@ -96,6 +97,7 @@ module.exports = {
 					status: "Finished"
 				}]);
 
+				self.pending = false;
 				clearInterval(self.interval);
 
 				await sb.Reminder.create({
