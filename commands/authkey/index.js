@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Works with an authentication string used to access supinic.com APIs that require a login; outside of Twitch login.",
-	Flags: ["developer","mention","pipe"],
+	Flags: ["archived","developer","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
