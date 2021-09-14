@@ -17,7 +17,7 @@ module.exports = {
 				.single();
 
 			if (word) {
-				rs.where("Prompt LIKE %*like*", word.toLowerCase());
+				rs.where("Prompt %*like*", word.toLowerCase());
 			}
 
 			return rs;
