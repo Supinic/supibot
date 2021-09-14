@@ -38,6 +38,7 @@ module.exports = {
 			formData.append("text_prompt", context.params.prompt);
 
 			const response = await sb.Got("FakeAgent", {
+				method: "POST",
 				url: "https://artflow.ai/add_to_generation_queue",
 				headers: {
 					"x-requested-with": "XMLHttpRequest",
@@ -69,6 +70,7 @@ module.exports = {
 				formData.append("my_work_id", imageIndex);
 
 				const check = await sb.Got("FakeAgent", {
+					method: "POST",
 					url: "https://artflow.ai/check_status",
 					headers: {
 						"x-requested-with": "XMLHttpRequest",
