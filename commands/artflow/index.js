@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches a random Artflow.ai image along with the prompt that was used to generate it.",
-	Flags: ["mention","null","pipe","skip-banphrase"],
+	Flags: ["mention","non-nullable","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
