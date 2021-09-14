@@ -16,7 +16,7 @@ module.exports = {
 		if (context.params.prompt) {
 			this.data.pendingRequests ??= [];
 			const pending = this.data.pendingRequests.find(i => i.author === context.user.ID);
-			if (!pending) {
+			if (pending) {
 				return {
 					success: false,
 					reply: `You already have a pending request!`
