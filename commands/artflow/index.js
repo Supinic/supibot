@@ -37,7 +37,7 @@ module.exports = {
 			formData.append("user_id_val", artflowUserID);
 			formData.append("text_prompt", context.params.prompt);
 
-			const response = sb.Got("FakeAgent", {
+			const response = await sb.Got("FakeAgent", {
 				url: "https://artflow.ai/add_to_generation_queue",
 				headers: {
 					"x-requested-with": "XMLHttpRequest",
@@ -63,7 +63,7 @@ module.exports = {
 				queue: response.body.queue_length
 			};
 
-			requestObject.interval = setInterval(async function (self) {
+			requestObject.interval = setInterval((async (self) => {
 				const imageIndex = self.imageIndex;
 				const formData = new sb.Got.FormData();
 				formData.append("my_work_id", imageIndex);
@@ -94,7 +94,7 @@ module.exports = {
 					status: "Finished"
 				}]);
 
-				clearInterval(this.interval);
+				clearInterval(self.interval);
 
 				await sb.Reminder.create({
 					Channel: null,
@@ -106,7 +106,7 @@ module.exports = {
 					Private_Message: true,
 					Platform: self.platform ?? 1
 				}, true);
-			}, 300_000, requestObject);
+			}), 300_000, requestObject);
 
 			this.data.pendingRequests.push(requestObject);
 
