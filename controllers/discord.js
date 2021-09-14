@@ -285,6 +285,8 @@ module.exports = class DiscordController extends require("./template.js") {
 			}
 		}
 
+		message = message.replace(/\\/g, "\\\\");
+
 		channelObject.send(sb.Utils.wrapString(message, channelData.Message_Limit ?? this.platform.Message_Limit));
 	}
 
