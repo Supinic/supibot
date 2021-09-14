@@ -15,7 +15,7 @@ module.exports = {
 	Code: (async function artflow (context, word) {
 		if (context.params.prompt) {
 			this.data.pendingRequests ??= [];
-			const pending = this.data.pendingRequests.find(i => i.author === context.user.ID);
+			const pending = this.data.pendingRequests.find(i => i.user === context.user.ID);
 			if (pending) {
 				const range = [
 					Math.trunc(pending.queue / 30),
