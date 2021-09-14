@@ -2919,7 +2919,7 @@ strnum@^1.0.3:
 
 "supi-core@github:Supinic/supi-core":
   version "2.2.0"
-  resolved "https://codeload.github.com/Supinic/supi-core/tar.gz/0ed7bc3b45df8dc09ab7c134f050253b7995056b"
+  resolved "https://codeload.github.com/Supinic/supi-core/tar.gz/4066e35cc56e45b29f5f3c898c10afb751f3cdf8"
   dependencies:
     async-markov "github:supinic/async-markov"
     cheerio "^1.0.0-rc.5"
@@ -3017,7 +3017,7 @@ to-regex-range@^5.0.1:
 
 "track-link-parser@github:supinic/track-link-parser":
   version "1.2.0"
-  resolved "https://codeload.github.com/supinic/track-link-parser/tar.gz/01d7e6835b4436937e9177b55714b1378680d6f5"
+  resolved "https://codeload.github.com/supinic/track-link-parser/tar.gz/ca73fc16a3f035206707e550ad97cfc968bff289"
   dependencies:
     fast-xml-parser "^3.19.0"
     got "^11.8.0"
