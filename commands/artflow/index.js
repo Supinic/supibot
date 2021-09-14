@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches a random Artflow.ai image along with the prompt that was used to generate it.",
 	Flags: ["mention","non-nullable","pipe","skip-banphrase"],
-	Params: null,
+	Params: [
+		{ name: "prompt", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		generationUserID: "5555-7f7f-4747-a44b"
