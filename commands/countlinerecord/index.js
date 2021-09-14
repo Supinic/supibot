@@ -9,6 +9,13 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function countLineRecord (context) {
+		if (context.privateMessage) {
+			return {
+				success: false,
+				reply: `There are no count line records in private messages!`
+			};
+		}
+		
 		const [amountData, lengthData] = await Promise.all([
 			sb.Query.getRecordset(rs => rs
 				.select("Amount", "Timestamp")
