@@ -50,56 +50,59 @@ module.exports = {
 				};
 			}
 
-			this.data.pendingRequests.push({
+			const requestObject = {
 				user: context.user.ID,
 				channel: context.channel?.ID ?? null,
 				platform: context.platform?.ID ?? null,
 				imageIndex: response.body.index,
-				prompt: context.params.prompt,
-				interval: setInterval(async function () {
-					const imageIndex = this.imageIndex;
-					const formData = new sb.Got.formData();
-					formData.append("my_work_id", imageIndex);
+				prompt: context.params.prompt
+			};
 
-					const check = await sb.Got("FakeAgent", {
-						url: "https://artflow.ai/check_status",
-						headers: {
-							"x-requested-with": "XMLHttpRequest",
-							...formData.getHeaders()
-						},
-						body: formData.getBuffer(),
-						referrer: "https://artflow.ai/"
-					});
+			requestObject.interval = setInterval(async function (self) {
+				const imageIndex = self.imageIndex;
+				const formData = new sb.Got.formData();
+				formData.append("my_work_id", imageIndex);
 
-					if (check.statusCode !== 200) {
-						return; // api failed
-					}
-					else if (check.body.current_rank > -1) {
-						return; // still pending
-					}
+				const check = await sb.Got("FakeAgent", {
+					url: "https://artflow.ai/check_status",
+					headers: {
+						"x-requested-with": "XMLHttpRequest",
+						...formData.getHeaders()
+					},
+					body: formData.getBuffer(),
+					referrer: "https://artflow.ai/"
+				});
 
-					const [result] = await sb.Utils.processArtflowData([{
-						filename: check.body.filename,
-						userID: artflowUserID,
-						text_prompt: this.prompt,
-						index: imageIndex,
-						status: "Finished"
-					}]);
+				if (check.statusCode !== 200) {
+					return; // api failed
+				}
+				else if (check.body.current_rank > -1) {
+					return; // still pending
+				}
 
-					clearInterval(this.interval);
+				const [result] = await sb.Utils.processArtflowData([{
+					filename: check.body.filename,
+					userID: artflowUserID,
+					text_prompt: self.prompt,
+					index: imageIndex,
+					status: "Finished"
+				}]);
 
-					await sb.Reminder.create({
-						Channel: null,
-						User_From: 1127,
-						User_To: this.user,
-						Text: `Your Artflow prompt "${this.prompt} has finished: ${result.link}`,
-						Schedule: null,
-						Created: new sb.Date(),
-						Private_Message: true,
-						Platform: this.platform ?? 1
-					}, true);
-				}, 300_000)
-			});
+				clearInterval(this.interval);
+
+				await sb.Reminder.create({
+					Channel: null,
+					User_From: 1127,
+					User_To: self.user,
+					Text: `Your Artflow prompt "${self.prompt} has finished: ${result.link}`,
+					Schedule: null,
+					Created: new sb.Date(),
+					Private_Message: true,
+					Platform: self.platform ?? 1
+				}, true);
+			}, 300_000, requestObject);
+
+			this.data.pendingRequests.push(requestObject);
 
 			const range = [
 				Math.trunc(response.body.queue_length / 30),
