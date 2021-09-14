@@ -46,7 +46,7 @@ module.exports = {
 					}
 
 					const link = sb.Utils.modules.linkParser.parseLink(input);
-					if (link.has(processed)) {
+					if (processed.has(link)) {
 						continue;
 					}
 					else {
