@@ -17,14 +17,23 @@ module.exports = {
 			this.data.pendingRequests ??= [];
 			const pending = this.data.pendingRequests.find(i => i.author === context.user.ID);
 			if (pending) {
+				const range = [
+					Math.trunc(pending.queue / 30),
+					Math.trunc(pending.queue / 12)
+				];
+
 				return {
 					success: false,
-					reply: `You already have a pending request!`
+					reply: sb.Utils.tag.trim `
+						You already have a pending request!
+						Your queue rank is ${pending.queue},
+						and it should be finished in around ${range[0]} to ${range[1]} minutes.
+					`
 				};
 			}
 
 			const artflowUserID = this.staticData.generationUserID;
-			const formData = new sb.Got.formData();
+			const formData = new sb.Got.FormData();
 			formData.append("user_id_val", artflowUserID);
 			formData.append("text_prompt", context.params.prompt);
 
@@ -50,12 +59,13 @@ module.exports = {
 				channel: context.channel?.ID ?? null,
 				platform: context.platform?.ID ?? null,
 				imageIndex: response.body.index,
-				prompt: context.params.prompt
+				prompt: context.params.prompt,
+				queue: response.body.queue_length
 			};
 
 			requestObject.interval = setInterval(async function (self) {
 				const imageIndex = self.imageIndex;
-				const formData = new sb.Got.formData();
+				const formData = new sb.Got.FormData();
 				formData.append("my_work_id", imageIndex);
 
 				const check = await sb.Got("FakeAgent", {
@@ -72,6 +82,7 @@ module.exports = {
 					return; // api failed
 				}
 				else if (check.body.current_rank > -1) {
+					self.queue = check.body.current_rank;
 					return; // still pending
 				}
 
