@@ -32,6 +32,13 @@ module.exports = {
 		});
 
 		const { follows } = response.body;
+		if (!follows) {
+			return {
+				success: false,
+				reply: `No follow data found!`
+			};
+		}
+
 		const who = (!target || context.user.Name === target.toLowerCase())
 			? "you"
 			: "they";
