@@ -12,13 +12,6 @@ module.exports = {
 	})),
 	Code: (async function artflow (context, word) {
 		if (context.params.prompt) {
-			return {
-				success: false,
-				reply: `Prompt generation is currently being tested, and should be available soon!`
-			};
-		}
-
-		if (context.params.prompt) {
 			this.data.pendingRequests ??= [];
 			const pending = this.data.pendingRequests.find(i => i.author === context.user.ID);
 			if (!pending) {
@@ -94,7 +87,7 @@ module.exports = {
 					Channel: null,
 					User_From: 1127,
 					User_To: self.user,
-					Text: `Your Artflow prompt "${self.prompt} has finished: ${result.link}`,
+					Text: `Your Artflow prompt "${self.prompt}" has finished: ${result.link}`,
 					Schedule: null,
 					Created: new sb.Date(),
 					Private_Message: true,
