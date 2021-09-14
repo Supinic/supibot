@@ -135,12 +135,13 @@ module.exports = {
 			};
 		}
 
+		const searchString = (word) ? ` for the word "${word}"` : "";
 		const postedDelta = (imageData.Added)
 			? `(posted ${sb.Utils.timeDelta(imageData.Added)})`
 			: "";
 
 		return {
-			reply: `Your random prompt "${imageData.Prompt}": ${imageData.Upload_Link} ${postedDelta}`
+			reply: `Your random prompt${searchString} "${imageData.Prompt}": ${imageData.Upload_Link} ${postedDelta}`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
