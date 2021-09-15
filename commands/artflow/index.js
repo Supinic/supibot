@@ -91,10 +91,11 @@ module.exports = {
 					Platform: self.platform ?? 1
 				};
 
-				if (check.statusCode % 100 === 5) { // 5xx response, API failed - ignore
+				const statusCodeDigit = Math.trunc(check.statusCode / 100);
+				if (statusCodeDigit === 5) { // 5xx response, API failed - ignore
 					return;
 				}
-				else if (check.statusCode % 100 === 4 || check.statusCode !== 200) { // 4xx or other non-200 response
+				else if (statusCodeDigit === 4 || check.statusCode !== 200) { // 4xx or other non-200 response
 					console.warn("Unknown status code", { body: check.body, code: check.statusCode });
 
 					reminderData.Text = `Your Artflow prompt "${self.prompt}" has failed with status code ${check.statusCode}! Please try again.`;
