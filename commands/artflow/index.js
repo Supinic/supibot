@@ -81,12 +81,32 @@ module.exports = {
 					referrer: "https://artflow.ai/"
 				});
 
-				if (check.statusCode !== 200) {
-					return; // api failed
+				const reminderData = {
+					Channel: null,
+					User_From: 1127,
+					User_To: self.user,
+					Schedule: null,
+					Created: new sb.Date(),
+					Private_Message: true,
+					Platform: self.platform ?? 1
+				};
+
+				if (check.statusCode % 100 === 5) { // 5xx response, API failed - ignore
+					return;
 				}
-				else if (check.body.current_rank > -1) {
+				else if (check.statusCode % 100 === 4 || check.statusCode !== 200) { // 4xx or other non-200 response
+					console.warn("Unknown status code", { body: check.body, code: check.statusCode });
+
+					reminderData.Text = `Your Artflow prompt "${self.prompt}" has failed with status code ${check.statusCode}! Please try again.`;
+					await sb.Reminder.create(reminderData, true);
+
+					self.pending = false;
+					clearInterval(self.interval);
+					return;
+				}
+				else if (check.body.current_rank > -1) { // still pending
 					self.queue = check.body.current_rank;
-					return; // still pending
+					return;
 				}
 
 				const [result] = await sb.Utils.processArtflowData([{
@@ -110,7 +130,7 @@ module.exports = {
 					Private_Message: true,
 					Platform: self.platform ?? 1
 				}, true);
-			}), 300_000, requestObject);
+			}), 30_000, requestObject);
 
 			this.data.pendingRequests.push(requestObject);
 
