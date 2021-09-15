@@ -122,7 +122,7 @@ module.exports = {
 			return {
 				reply: sb.Utils.tag.trim `
 					Your Artflow image will be ready in around ${range[0]} to ${range[1]} minutes. 
-					You will receive a system reminder when it is finished
+					You will receive a system reminder when it is finished.
 				`
 			};
 		}
@@ -171,7 +171,7 @@ module.exports = {
 		"",
 
 		`<code>${prefix}artflow prompt:(single word)</code>`,
-		`<code>${prefix}artflow prompt:"multiple word prompt"code>`,
+		`<code>${prefix}artflow prompt:"multiple word prompt"</code>`,
 		"Creates an Artflow-generated picture based on your prompt.",
 		"This might take a long time, so you will only be notified via a reminder when it is finished.",
 		"Each user can only have one request pending at a time.",
