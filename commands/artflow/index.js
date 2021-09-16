@@ -14,9 +14,11 @@ module.exports = {
 	})),
 	Code: (async function artflow (context, word) {
 		if (context.params.prompt) {
-			this.data.pendingRequests ??= [];
-			const pending = this.data.pendingRequests.find(i => i.user === context.user.ID && i.pending);
-			if (pending) {
+			const rawPrompts = await sb.Cache.server.hgetall("artflow");
+			const existingPrompts = Object.entries(rawPrompts).map(([key, value]) => [key, JSON.parse(value)]);
+
+			const pending = existingPrompts.filter(i => i.user === context.user.ID);
+			if (pending.length > 0) {
 				const range = [
 					Math.trunc(pending.queue / 30),
 					Math.trunc(pending.queue / 12)
@@ -55,83 +57,18 @@ module.exports = {
 				};
 			}
 
+			const uuid = require("crypto").randomUUID();
 			const requestObject = {
+				artflowUserID,
 				user: context.user.ID,
 				channel: context.channel?.ID ?? null,
 				platform: context.platform?.ID ?? null,
 				imageIndex: response.body.index,
 				prompt: context.params.prompt,
-				queue: response.body.queue_length,
-				pending: true
+				queue: response.body.queue_length
 			};
 
-			requestObject.interval = setInterval((async (self) => {
-				const imageIndex = self.imageIndex;
-				const formData = new sb.Got.FormData();
-				formData.append("my_work_id", imageIndex);
-
-				const check = await sb.Got("FakeAgent", {
-					method: "POST",
-					url: "https://artflow.ai/check_status",
-					headers: {
-						"x-requested-with": "XMLHttpRequest",
-						...formData.getHeaders()
-					},
-					body: formData.getBuffer(),
-					referrer: "https://artflow.ai/"
-				});
-
-				const reminderData = {
-					Channel: null,
-					User_From: 1127,
-					User_To: self.user,
-					Schedule: null,
-					Created: new sb.Date(),
-					Private_Message: true,
-					Platform: self.platform ?? 1
-				};
-
-				const statusCodeDigit = Math.trunc(check.statusCode / 100);
-				if (statusCodeDigit === 5) { // 5xx response, API failed - ignore
-					return;
-				}
-				else if (statusCodeDigit === 4 || check.statusCode !== 200) { // 4xx or other non-200 response
-					console.warn("Unknown status code", { body: check.body, code: check.statusCode });
-
-					reminderData.Text = `Your Artflow prompt "${self.prompt}" has failed with status code ${check.statusCode}! Please try again.`;
-					await sb.Reminder.create(reminderData, true);
-
-					self.pending = false;
-					clearInterval(self.interval);
-					return;
-				}
-				else if (check.body.current_rank > -1) { // still pending
-					self.queue = check.body.current_rank;
-					return;
-				}
-
-				const [result] = await sb.Utils.processArtflowData([{
-					filename: check.body.filename,
-					userID: artflowUserID,
-					text_prompt: self.prompt,
-					index: imageIndex,
-					status: "Finished"
-				}]);
-
-				self.pending = false;
-				clearInterval(self.interval);
-
-				if (result.saved) {
-					reminderData.Text = `Your Artflow prompt "${self.prompt}" has finished: ${result.link}`;
-				}
-				else {
-					reminderData.Text = `Your Artflow prompt "${self.prompt}" failed with this reason: ${result.reason}`;
-				}
-
-				await sb.Reminder.create(reminderData, true);
-			}), 30_000, requestObject);
-
-			this.data.pendingRequests.push(requestObject);
+			await sb.Cache.server.hset("artflow", uuid, JSON.stringify(requestObject));
 
 			const range = [
 				Math.trunc(response.body.queue_length / 30),
