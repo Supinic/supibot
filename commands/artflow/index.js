@@ -121,16 +121,14 @@ module.exports = {
 				self.pending = false;
 				clearInterval(self.interval);
 
-				await sb.Reminder.create({
-					Channel: null,
-					User_From: 1127,
-					User_To: self.user,
-					Text: `Your Artflow prompt "${self.prompt}" has finished: ${result.link}`,
-					Schedule: null,
-					Created: new sb.Date(),
-					Private_Message: true,
-					Platform: self.platform ?? 1
-				}, true);
+				if (result.saved) {
+					reminderData.Text = `Your Artflow prompt "${self.prompt}" has finished: ${result.link}`;
+				}
+				else {
+					reminderData.Text = `Your Artflow prompt "${self.prompt}" failed with this reason: ${result.reason}`;
+				}
+
+				await sb.Reminder.create(reminderData, true);
 			}), 30_000, requestObject);
 
 			this.data.pendingRequests.push(requestObject);
