@@ -70,7 +70,7 @@ module.exports = {
 				status: "Finished"
 			}]);
 
-			if (result.saved) {
+			if (result.link) {
 				reminderData.Text = `Your Artflow prompt "${value.prompt}" has finished: ${result.link}`;
 			}
 			else {
