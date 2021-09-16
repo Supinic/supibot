@@ -40,4 +40,19 @@
 	sb.API = require("./api");
 
 	sb.Platform.assignControllers(controllers);
+
+	process.on("unhandledRejection", async (reason) => {
+		if (!(reason instanceof Error)) {
+			return;
+		}
+
+		try {
+			await sb.Logger.logError("Internal", reason, {
+				context: { cause: "UnhandledPromiseRejection" }
+			});
+		}
+		catch {
+			console.warn("Rejected the promise of promise rejection handler", { reason });
+		}
+	});
 })();
