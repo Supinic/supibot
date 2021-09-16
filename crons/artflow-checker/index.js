@@ -8,7 +8,7 @@ module.exports = {
 	})),
 	Type: "Bot",
 	Code: (async function artflowChecker () {
-		const activePrompts = await sb.Cache.server.hgetall("artflow", "active-prompts");
+		const activePrompts = await sb.Cache.server.hgetall("artflow");
 		if (!activePrompts || Object.keys(activePrompts).length === 0) {
 			return;
 		}
