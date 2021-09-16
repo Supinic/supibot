@@ -1,5 +1,5 @@
 module.exports = {
-	Name: "artflow-gatherer",
+	Name: "artflow-checker",
 	Expression: "*/30 * * * * *",
 	Description: "Checks active artflow.ai requests created by users, and determines their status",
 	Defer: (() => ({
