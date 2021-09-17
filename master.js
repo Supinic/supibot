@@ -47,8 +47,11 @@
 		}
 
 		try {
-			await sb.Logger.logError("Internal", reason, {
-				context: { cause: "UnhandledPromiseRejection" }
+			await sb.Logger.logError("Backend", reason, {
+				origin: "Internal",
+				context: {
+					cause: "UnhandledPromiseRejection"
+				}
 			});
 		}
 		catch {
