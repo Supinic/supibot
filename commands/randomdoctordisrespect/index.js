@@ -28,6 +28,13 @@ module.exports = {
 			? inputNumber
 			: 25;
 
+		if (words > 500) {
+			return {
+				success: false,
+				reply: `Too many words provided!`
+			};
+		}
+		
 		const result = this.data.model.generateWords(words);
 		const emote = await context.getBestAvailableEmote(["forsenCD"], "💿");
 
