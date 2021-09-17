@@ -8,17 +8,32 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function randomDoctorDisrepsect () {
+	Code: (async function randomDoctorDisrepsect (context, input) {
+		if (!this.data.markov) {
+			const data = await sb.Cache.getByPrefix("markov-random-guy-beahm");
+			if (!data) {
+				return {
+					success: false,
+					reply: `Markov model has not been set up! Add the provided JSON file into sb.Cache as "markov-random-guy-beahm"`
+				};
+			}
+
+			const Markov = require("async-markov");
+			this.data.model = new Markov();
+			this.data.model.load(data);
+		}
+
+		const inputNumber = Number(input);
+		const words = (sb.Utils.isValidInteger(inputNumber))
+			? inputNumber
+			: 25;
+
+		const result = this.data.markov.generateWords(words);
+		const emote = await context.getBestAvailableEmote(["forsenCD"], "💿");
+
 		return {
-			reply: "This command is not currently available - undergoing maintenance."
+			reply: `${emote} ✌ ${result}`
 		};
-	
-	/*
-		const model = await sb.MarkovChain.get("disrespect");
-		return {
-			reply: model.sentences(3)
-		};
-	*/
 	}),
 	Dynamic_Description: null
 };
