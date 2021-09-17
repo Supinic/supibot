@@ -556,6 +556,19 @@ module.exports = {
 						helpers: ["supinic"]
 					}
 				]
+			},
+			{
+				code: "no",
+				language: "norwegian",
+				sources: [
+					{
+						name: "NRK",
+						url: "https://www.nrk.no",
+						path: null,
+						endpoints: ["norge/toppsaker.rss"],
+						helpers: ["hotbear1110"]
+					}
+				]
 			}
 		],
 
