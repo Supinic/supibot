@@ -9,7 +9,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomDoctorDisrepsect (context, input) {
-		if (!this.data.markov) {
+		if (!this.data.model) {
 			const data = await sb.Cache.getByPrefix("markov-random-guy-beahm");
 			if (!data) {
 				return {
@@ -28,7 +28,7 @@ module.exports = {
 			? inputNumber
 			: 25;
 
-		const result = this.data.markov.generateWords(words);
+		const result = this.data.model.generateWords(words);
 		const emote = await context.getBestAvailableEmote(["forsenCD"], "💿");
 
 		return {
