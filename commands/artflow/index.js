@@ -104,7 +104,7 @@ module.exports = {
 			};
 		}
 
-		const searchString = (word) ? ` for the word "${word}"` : "";
+		const searchString = (word) ? ` for the word "${word}" -` : "";
 		const postedDelta = (imageData.Added)
 			? `(posted ${sb.Utils.timeDelta(imageData.Added)})`
 			: "";
