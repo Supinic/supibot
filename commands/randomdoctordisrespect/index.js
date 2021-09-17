@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Posts a Markov chain-generated tweet from Dr. Disrespect.",
-	Flags: ["mention","pipe"],
+	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
