@@ -516,6 +516,26 @@ module.exports = {
 						helpers: ["supinic"]
 					}
 				]
+			},
+			{
+				code: "pl",
+				language: "polish",
+				sources: [
+					{
+						name: "Polsat",
+						url: "https://www.polsatnews.pl",
+						path: "rss",
+						endpoints: ["polska.xml"],
+						helpers: ["n14pn", "supinic"]
+					},
+					{
+						name: "TVN24",
+						url: "https://tvn24.pl",
+						path: null,
+						endpoints: ["najnowsze.xml"],
+						helpers: ["n14pn", "supinic"]
+					}
+				]
 			}
 		],
 
