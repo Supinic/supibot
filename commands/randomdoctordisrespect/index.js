@@ -8,7 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function randomDoctorDisrepsect (context, input) {
+	Code: (async function randomDoctorDisrespect (context, input) {
 		if (!this.data.model) {
 			const data = await sb.Cache.getByPrefix("markov-random-guy-beahm");
 			if (!data) {
