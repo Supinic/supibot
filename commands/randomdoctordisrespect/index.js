@@ -24,7 +24,7 @@ module.exports = {
 		}
 
 		const inputNumber = Number(input);
-		const words = (sb.Utils.isValidInteger(inputNumber))
+		const words = (sb.Utils.isValidInteger(inputNumber, 1))
 			? inputNumber
 			: 25;
 
@@ -34,7 +34,7 @@ module.exports = {
 				reply: `Too many words provided!`
 			};
 		}
-		
+
 		const result = this.data.model.generateWords(words);
 		const emote = await context.getBestAvailableEmote(["forsenCD"], "💿");
 
