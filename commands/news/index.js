@@ -565,7 +565,7 @@ module.exports = {
 						name: "NRK",
 						url: "https://www.nrk.no",
 						path: null,
-						endpoints: ["norge/toppsaker.rss"],
+						endpoints: ["norge/toppsaker.rss", "innlandet/siste.rss"],
 						helpers: ["hotbear1110"]
 					}
 				]
