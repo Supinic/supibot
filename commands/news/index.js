@@ -536,6 +536,26 @@ module.exports = {
 						helpers: ["n14pn", "supinic"]
 					}
 				]
+			},
+			{
+				code: "si",
+				language: "slovenian",
+				sources: [
+					{
+						name: "STA",
+						url: "https://www.sta.si",
+						path: null,
+						endpoints: ["rss-1"],
+						helpers: ["supinic"]
+					},
+					{
+						name: "RTV SLO",
+						url: "https://img.rtvslo.si",
+						path: "feeds",
+						endpoints: ["01.xml"],
+						helpers: ["supinic"]
+					}
+				]
 			}
 		],
 
