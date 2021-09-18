@@ -28,7 +28,7 @@ module.exports = {
 			const savedImageData = await sb.Query.getRecordset(rs => rs
 				.select("Upload_Link")
 				.from("data", "Artflow_Image")
-				.where("ID = %s", value.imageIndex)
+				.where("ID = %s", String(value.imageIndex))
 				.limit(1)
 				.single()
 			);
