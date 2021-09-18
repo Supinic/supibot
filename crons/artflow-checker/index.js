@@ -38,7 +38,7 @@ module.exports = {
 
 				await sb.Reminder.create(reminderData, true);
 				await sb.Cache.server.hdel("artflow", key);
-				return;
+				continue;
 			}
 
 			const formData = new sb.Got.FormData();
@@ -57,7 +57,7 @@ module.exports = {
 
 			const statusCodeDigit = Math.trunc(check.statusCode / 100);
 			if (statusCodeDigit === 5) { // 5xx response, API failed - ignore
-				return;
+				continue;
 			}
 			else if (statusCodeDigit === 4 || check.statusCode !== 200) { // 4xx or other non-200 response
 				console.warn("Unknown status code", {
@@ -69,13 +69,13 @@ module.exports = {
 				await sb.Reminder.create(reminderData, true);
 
 				await sb.Cache.server.hdel("artflow", key);
-				return;
+				continue;
 			}
 			else if (check.body.current_rank > -1) { // still pending
 				value.queue = check.body.current_rank;
 				await sb.Cache.server.hset("artflow", key, JSON.stringify(value));
 
-				return;
+				continue;
 			}
 
 			const [result] = await sb.Utils.processArtflowData([{
