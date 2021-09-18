@@ -17,7 +17,7 @@ module.exports = {
 			const rawPrompts = await sb.Cache.server.hgetall("artflow");
 			const existingPrompts = Object.values(rawPrompts).map(i => JSON.parse(i));
 
-			const pending = existingPrompts.filter(i => i.user === context.user.ID);
+			const pending = existingPrompts.find(i => i.user === context.user.ID);
 			if (pending.length > 0) {
 				const range = [
 					Math.trunc(pending.queue / 30),
