@@ -15,6 +15,32 @@ module.exports = {
 
 		for (const [key, rawValue] of Object.entries(activePrompts)) {
 			const value = (typeof rawValue === "string") ? JSON.parse(rawValue) : rawValue;
+			const reminderData = {
+				Channel: null,
+				User_From: 1127,
+				User_To: value.user,
+				Schedule: null,
+				Created: new sb.Date(),
+				Private_Message: true,
+				Platform: value.platform ?? 1
+			};
+
+			const savedImageData = await sb.Query.getRecordset(rs => rs
+				.select("Upload_Link")
+				.from("data", "Artflow_Image")
+				.where("ID = %s", value.imageIndex)
+				.limit(1)
+				.single()
+			);
+
+			if (savedImageData) {
+				reminderData.Text = `Your Artflow prompt "${value.prompt}" has finished: ${savedImageData.Upload_Link}`;
+
+				await sb.Reminder.create(reminderData, true);
+				await sb.Cache.server.hdel("artflow", key);
+				return;
+			}
+
 			const formData = new sb.Got.FormData();
 			formData.append("my_work_id", value.imageIndex);
 
@@ -28,16 +54,6 @@ module.exports = {
 				body: formData.getBuffer(),
 				referrer: "https://artflow.ai/"
 			});
-
-			const reminderData = {
-				Channel: null,
-				User_From: 1127,
-				User_To: value.user,
-				Schedule: null,
-				Created: new sb.Date(),
-				Private_Message: true,
-				Platform: value.platform ?? 1
-			};
 
 			const statusCodeDigit = Math.trunc(check.statusCode / 100);
 			if (statusCodeDigit === 5) { // 5xx response, API failed - ignore
