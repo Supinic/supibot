@@ -15,7 +15,7 @@ module.exports = {
 	Code: (async function artflow (context, word) {
 		if (context.params.prompt) {
 			const rawPrompts = await sb.Cache.server.hgetall("artflow");
-			const existingPrompts = Object.entries(rawPrompts).map(([key, value]) => [key, JSON.parse(value)]);
+			const existingPrompts = Object.values(rawPrompts).map(i => JSON.parse(i));
 
 			const pending = existingPrompts.filter(i => i.user === context.user.ID);
 			if (pending.length > 0) {
