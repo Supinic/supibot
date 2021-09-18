@@ -10,12 +10,19 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		generationUserID: "5555-7f7f-4747-a44b"
+		generationUserID: "5555-7f7f-4747-a44b",
+		threshold: 20
 	})),
 	Code: (async function artflow (context, word) {
 		if (context.params.prompt) {
 			const rawPrompts = await sb.Cache.server.hgetall("artflow");
 			const existingPrompts = Object.values(rawPrompts).map(i => JSON.parse(i));
+			if (existingPrompts.length >= this.staticData.threshold) {
+				return {
+					success: false,
+					reply: `There are too many prompts being processed right now! Try again later.`
+				};
+			}
 
 			const pending = existingPrompts.find(i => i.user === context.user.ID);
 			if (pending.length > 0) {
