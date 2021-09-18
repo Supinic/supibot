@@ -27,7 +27,7 @@ module.exports = {
 				return {
 					success: false,
 					reply: sb.Utils.tag.trim `
-						You already have a pending request!
+						You already have a pending request "${pending.prompt}"!
 						Your queue rank is ${pending.queue},
 						and it should be finished in around ${range[0]} to ${range[1]} minutes.
 					`
