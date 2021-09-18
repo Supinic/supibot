@@ -25,7 +25,7 @@ module.exports = {
 			}
 
 			const pending = existingPrompts.find(i => i.user === context.user.ID);
-			if (pending.length > 0) {
+			if (pending) {
 				const range = [
 					Math.trunc(pending.queue / 30),
 					Math.trunc(pending.queue / 12)
