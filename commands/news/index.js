@@ -596,8 +596,8 @@ module.exports = {
 					const feed = await sb.Utils.parseRSS(xml);
 
 					articles = feed.items.map(i => ({
-						title: i.title,
-						content: i.content,
+						title: (i.title) ? i.title.trim() : null,
+						content: (i.content) ? i.content.trim() : null,
 						link: i.link || i.url,
 						published: new sb.Date(i.pubDate).valueOf()
 					}));
