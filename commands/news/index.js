@@ -636,8 +636,34 @@ module.exports = {
 						helpers: ["supinic"]
 					}
 				]
+			},
+			{
+				code: "mk",
+				language: "macedonian",
+				sources: [
+					{
+						name: "Канал 5 ТВ",
+						url: "https://kanal5.com.mk",
+						path: null,
+						endpoints: ["rss.aspx?id=2", "rss.aspx?id=7"],
+						helpers: ["supinic"]
+					},
+					{
+						name: "Time.mk",
+						url: "https://time.mk",
+						path: "rss",
+						endpoints: ["makedonija", "skopje"],
+						helpers: ["supinic"]
+					},
+					{
+						name: "Макфакс",
+						url: "https://makfax.com.mk",
+						path: null,
+						endpoints: ["makedonija/feed", "crna-hronika/feed"],
+						helpers: ["supinic"]
+					}
+				]
 			}
-
 		],
 
 		extra: {
