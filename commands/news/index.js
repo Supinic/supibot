@@ -589,6 +589,33 @@ module.exports = {
 						helpers: []
 					}
 				]
+			},
+			{
+				code: "sk",
+				language: "slovak",
+				sources: [
+					{
+						name: "TA3",
+						url: "https://www.ta3.com",
+						path: "rss",
+						endpoints: ["5/novinky-z-domova"],
+						helpers: []
+					},
+					{
+						name: "Aktuality",
+						url: "https://www.akutality.sk",
+						path: "rss",
+						endpoints: ["domace", "krimi"],
+						helpers: []
+					},
+					{
+						name: "Teraz",
+						url: "https://www.teraz.sk/rss/",
+						path: "rss",
+						endpoints: ["slovensko.rss"],
+						helpers: []
+					}
+				]
 			}
 		],
 
