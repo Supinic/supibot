@@ -603,7 +603,7 @@ module.exports = {
 					},
 					{
 						name: "Aktuality",
-						url: "https://www.akutality.sk",
+						url: "https://www.aktuality.sk",
 						path: "rss",
 						endpoints: ["domace", "krimi"],
 						helpers: ["supinic"]
