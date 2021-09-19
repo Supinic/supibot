@@ -599,21 +599,21 @@ module.exports = {
 						url: "https://www.ta3.com",
 						path: "rss",
 						endpoints: ["5/novinky-z-domova"],
-						helpers: []
+						helpers: ["supinic"]
 					},
 					{
 						name: "Aktuality",
 						url: "https://www.akutality.sk",
 						path: "rss",
 						endpoints: ["domace", "krimi"],
-						helpers: []
+						helpers: ["supinic"]
 					},
 					{
 						name: "Teraz",
 						url: "https://www.teraz.sk/rss/",
 						path: "rss",
 						endpoints: ["slovensko.rss"],
-						helpers: []
+						helpers: ["supinic"]
 					}
 				]
 			},
@@ -636,7 +636,7 @@ module.exports = {
 						helpers: ["supinic"]
 					}
 				]
-			},
+			}
 
 		],
 
