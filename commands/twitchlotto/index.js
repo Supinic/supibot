@@ -301,8 +301,9 @@ module.exports = {
 			? `Manual NSFW flags: ${image.Adult_Flags.join(", ")}`
 			: "";
 
+		const scoreThresholdExceeded = ((image.Score > 0.5 && detections.length > 0) || (image.Score > 0.75));
 		return {
-			removeEmbeds: ((image.Score > 0.5 && detections.length > 0) || (image.Score > 0.75)),
+			removeEmbeds: (context.channel && !context.channel.NSFW && scoreThresholdExceeded),
 			reply: sb.Utils.tag.trim `
 				NSFW score: ${sb.Utils.round(image.Score * 100, 2)}%
 				Detections: ${detectionsString.length === 0 ? "N/A" : detectionsString.join(", ")}
