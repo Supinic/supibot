@@ -569,6 +569,19 @@ module.exports = {
 						helpers: ["hotbear1110"]
 					}
 				]
+			},
+			{
+				code: "el",
+				language: "greek",
+				sources: [
+					{
+						name: "Skai.gr",
+						url: "http://feeds.feedburner.com/skai",
+						path: null,
+						endpoints: ["PLwa"],
+						helpers: []
+					}
+				]
 			}
 		],
 
