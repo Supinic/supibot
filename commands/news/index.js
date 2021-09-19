@@ -118,6 +118,13 @@ module.exports = {
 						path: "rssfeed",
 						endpoints: ["all", "nyheder"],
 						helpers: ["gubbyfish"]
+					},
+					{
+						name: "DR",
+						url: "https://www.dr.dk/nyheder/service",
+						path: "feeds",
+						endpoints: ["indland", "regionale"],
+						helpers: []
 					}
 				]
 			},
