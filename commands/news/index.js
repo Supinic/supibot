@@ -616,7 +616,28 @@ module.exports = {
 						helpers: []
 					}
 				]
-			}
+			},
+			{
+				code: "lv",
+				language: "latvian",
+				sources: [
+					{
+						name: "LSM",
+						url: "https://www.lsm.lv",
+						path: "rss",
+						endpoints: ["?catid=20"],
+						helpers: ["supinic"]
+					},
+					{
+						name: "Delfi",
+						url: "https://www.delfi.lv",
+						path: "rss",
+						endpoints: ["?channel=aculiecinieks"],
+						helpers: ["supinic"]
+					}
+				]
+			},
+
 		],
 
 		extra: {
