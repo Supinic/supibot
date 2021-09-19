@@ -583,7 +583,7 @@ module.exports = {
 				sources: [
 					{
 						name: "Skai.gr",
-						url: "http://feeds.feedburner.com/skai",
+						url: "https://feeds.feedburner.com/skai",
 						path: null,
 						endpoints: ["PLwa"],
 						helpers: []
