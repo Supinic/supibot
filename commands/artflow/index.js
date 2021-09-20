@@ -122,11 +122,12 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix) => [
 		`Fetches a random <a href="//artflow.ai">Artflow.ai</a> image along with the prompt that was used to generate it.`,
-		"This command does NOT generate new things, it only posts pictures that others have created.",
+		"Alternatively, lets you create your own pictures with a special parameter.",
 		"",
 
 		`<code>${prefix}artflow</code>`,
 		"Posts a random picture with a random prompt.",
+		"This does NOT generate new things, it only posts pictures that others have created.",
 		"",
 
 		`<code>${prefix}artflow (single word)</code>`,
