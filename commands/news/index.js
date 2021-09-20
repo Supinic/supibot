@@ -663,6 +663,19 @@ module.exports = {
 						helpers: ["supinic"]
 					}
 				]
+			},
+			{
+				code: "al",
+				language: "albanian",
+				sources: [
+					{
+						name: "fax.al",
+						url: "https://fax.al",
+						path: "rss",
+						endpoints: ["shqiperi", "kronika"],
+						helpers: ["supinic"]
+					}
+				]
 			}
 		],
 
