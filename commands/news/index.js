@@ -583,8 +583,8 @@ module.exports = {
 				sources: [
 					{
 						name: "Skai.gr",
-						url: "https://feeds.feedburner.com/skai",
-						path: null,
+						url: "https://feeds.feedburner.com",
+						path: "skai",
 						endpoints: ["PLwa"],
 						helpers: []
 					}
@@ -610,7 +610,7 @@ module.exports = {
 					},
 					{
 						name: "Teraz",
-						url: "https://www.teraz.sk/rss/",
+						url: "https://www.teraz.sk",
 						path: "rss",
 						endpoints: ["slovensko.rss"],
 						helpers: ["supinic"]
