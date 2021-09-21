@@ -60,20 +60,22 @@ module.exports = {
 				continue;
 			}
 			else if (statusCodeDigit === 4 || check.statusCode !== 200) { // 4xx or other non-200 response
-				console.warn("Unknown status code", {
-					body: check.body,
-					code: check.statusCode
-				});
-
 				reminderData.Text = `Your Artflow prompt "${value.prompt}" has failed with status code ${check.statusCode}! Please try again.`;
 				await sb.Reminder.create(reminderData, true);
-
 				await sb.Cache.server.hdel("artflow", key);
+
 				continue;
 			}
 			else if (check.body.current_rank > -1) { // still pending
 				value.queue = check.body.current_rank;
 				await sb.Cache.server.hset("artflow", key, JSON.stringify(value));
+
+				continue;
+			}
+			else if (!check.body.filename) {
+				reminderData.Text = `Your Artflow prompt "${value.prompt}" succeeded, but the API did not return a filename. Try using $artflow (your prompt) to saerch for it.`;
+				await sb.Reminder.create(reminderData, true);
+				await sb.Cache.server.hdel("artflow", key);
 
 				continue;
 			}
