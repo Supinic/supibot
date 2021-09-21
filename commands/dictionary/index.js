@@ -29,6 +29,13 @@ module.exports = {
 		]
 	})),
 	Code: (async function dictionary (context, ...args) {
+		if (context.invocation === "define" || context.invocation === "def") {
+			return {
+				success: false,
+				reply: `The "${context.invocation}" command will be renamed soon! Use $dict or $dictionary instead. Reference: Suggestion #9437`
+			};
+		}
+
 		if (args.length === 0) {
 			return {
 				success: false,
