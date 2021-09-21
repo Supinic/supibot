@@ -86,22 +86,25 @@ module.exports = class DiscordController extends require("./template.js") {
 						await userData.saveProperty("Discord_ID", discordID);
 					}
 					else {
-						if (userData.Data.discordChallengeNotificationSent || !msg.startsWith(sb.Command.prefix)) {
+						if (!msg.startsWith(sb.Command.prefix)) {
+							return;
+						}
+
+						const status = await DiscordController.fetchAccountChallengeStatus(userData, discordID);
+						if (status === "Active") {
 							return;
 						}
 
 						const { challenge } = await DiscordController.createAccountChallenge(userData, discordID);
-						userData.Data.discordChallengeNotificationSent = true;
-						await userData.saveProperty("Data");
+						const message = sb.Utils.tag.trim `
+							You were found to be likely to own a Twitch account with the same name as your current Discord account.
+							If you want to use my commands on Discord, whisper me the following command on Twitch:
+							${sb.Command.prefix}link ${challenge}
+						 `;
 
-						await this.directPm(
-							discordID,
-							sb.Utils.tag.trim `
-								You were found to be likely to own a Twitch account with the same name as your current Discord account.
-								If you want to use my commands on Discord, whisper me the following command on Twitch:
-								${sb.Command.prefix}link ${challenge}
-							 `
-						);
+						// todo: if this method fails when the target has DMs disabled, catch the error and handle it
+						// appropriately - disable the challenge, send a message to the channel, etc.
+						await this.directPm(discordID, message);
 
 						return;
 					}
@@ -527,6 +530,19 @@ module.exports = class DiscordController extends require("./template.js") {
 
 	static removeEmoteTags (message) {
 		return message.replace(/<a?:(.*?):(\d*)>/g, (total, emote) => `${emote} `).trim();
+	}
+
+	static async fetchAccountChallengeStatus (userData, discordID) {
+		return await sb.Query.getRecordset(rs => rs
+			.select("Status")
+			.from("chat_data", "User_Verification_Challenge")
+			.where("User_Alias = %n", userData.ID)
+			.where("Specific_ID = %n", discordID)
+			.orderBy("ID DESC")
+			.limit(1)
+			.single()
+			.flat("Status")
+		);
 	}
 
 	static async createAccountChallenge (userData, discordID) {
