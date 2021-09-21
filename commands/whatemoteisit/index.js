@@ -86,23 +86,30 @@ module.exports = {
 			};
 		}
 
-		let tierString;
+		let tierString = "";
 		if (emoteType === "SUBSCRIPTIONS") {
 			if (!channelName && !channelLogin && !emoteTier) {
 				return {
 					reply: `${emoteCode} (ID ${emoteID}) - ${active} emote to an unknown banned/deleted channel. ${cdnLink} ${originString}`
 				};
 			}
+			else if (channelName !== null) {
+				let channelString = `@${channelName}`;
+				if (channelName.toLowerCase() !== channelLogin.toLowerCase()) {
+					channelString = `@${channelLogin} (${channelName})`;
+				}
 
-			let channelString = `@${channelName}`;
-			if (channelName.toLowerCase() !== channelLogin.toLowerCase()) {
-				channelString = `@${channelLogin} (${channelName})`;
+				tierString = `tier ${emoteTier} ${emoteAsssetType.toLowerCase()} sub emote to channel ${channelString}`;
 			}
-
-			tierString = `tier ${emoteTier} ${emoteAsssetType.toLowerCase()} sub emote to channel ${channelString}`;
+		}
+		else if (emoteType === "GLOBALS") {
+			tierString = "global Twitch emote";
+		}
+		else if (channelName !== null) {
+			tierString = `special ${emoteAsssetType.toLowerCase()} ${channelName} emote`;
 		}
 		else {
-			tierString = `special ${emoteAsssetType.toLowerCase()} ${channelName} emote`;
+			tierString = "emote";
 		}
 
 		let emoteLink;
@@ -114,9 +121,7 @@ module.exports = {
 		}
 
 		return {
-			reply: (channelName)
-				? `${emoteCode} (ID ${emoteID}) - ${active} ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
-				: `${emoteCode} (ID ${emoteID}) - ${active} global Twitch emote. ${emoteLink} ${cdnLink} ${originString}`
+			reply: `${emoteCode} (ID ${emoteID}) - ${active} ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
 		};
 	}),
 	Dynamic_Description: null
