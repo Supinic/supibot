@@ -57,7 +57,7 @@ module.exports = {
 			channelName,
 			channelLogin,
 			channelID,
-			emoteAsssetType,
+			emoteAssetType,
 			emoteCode,
 			emoteID,
 			emoteState,
@@ -99,14 +99,14 @@ module.exports = {
 					channelString = `@${channelLogin} (${channelName})`;
 				}
 
-				tierString = `tier ${emoteTier} ${emoteAsssetType.toLowerCase()} sub emote to channel ${channelString}`;
+				tierString = `tier ${emoteTier} ${emoteAssetType.toLowerCase()} sub emote to channel ${channelString}`;
 			}
 		}
 		else if (emoteType === "GLOBALS") {
 			tierString = "global Twitch emote";
 		}
 		else {
-			tierString = `${emoteAsssetType.toLowerCase()} ${channelName ?? ""} emote`;
+			tierString = `${emoteAssetType.toLowerCase()} ${channelName ?? ""} emote`;
 		}
 
 		let emoteLink;
