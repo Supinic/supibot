@@ -85,6 +85,7 @@ module.exports = {
 				userDataID: value.user,
 				userID: value.artflowUserID,
 				text_prompt: value.prompt,
+				textPrompt: value.prompt,
 				index: value.imageIndex,
 				status: "Finished"
 			}]);

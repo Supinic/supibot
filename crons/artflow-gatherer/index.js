@@ -60,6 +60,11 @@ module.exports = {
 			return;
 		}
 
-		await sb.Utils.processArtflowData(data);
+		const preparedData = data.map(i => ({
+			...i,
+			textPrompt: i.text_prompt
+		}));
+
+		await sb.Utils.processArtflowData(preparedData);
 	})
 };
