@@ -105,11 +105,8 @@ module.exports = {
 		else if (emoteType === "GLOBALS") {
 			tierString = "global Twitch emote";
 		}
-		else if (channelName !== null) {
-			tierString = `special ${emoteAsssetType.toLowerCase()} ${channelName} emote`;
-		}
 		else {
-			tierString = "emote";
+			tierString = `${emoteAsssetType.toLowerCase()} ${channelName ?? ""} emote`;
 		}
 
 		let emoteLink;
