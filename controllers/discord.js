@@ -537,7 +537,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			.select("Status")
 			.from("chat_data", "User_Verification_Challenge")
 			.where("User_Alias = %n", userData.ID)
-			.where("Specific_ID = %n", discordID)
+			.where("Specific_ID = %s", discordID)
 			.orderBy("ID DESC")
 			.limit(1)
 			.single()
