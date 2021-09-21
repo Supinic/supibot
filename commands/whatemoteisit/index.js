@@ -74,6 +74,7 @@ module.exports = {
 			.flat("ID")
 		);
 
+		const active = (emoteState === "INACTIVE") ? "inactive" : "";
 		const originString = (originID)
 			? `This emote has origin info - use the ${sb.Command.prefix}origin command.`
 			: "";
@@ -112,7 +113,6 @@ module.exports = {
 			emoteLink = `https://twitchemotes.com/global/emotes/${emoteID}`;
 		}
 
-		const active = (emoteState === "INACTIVE") ? "inactive" : "";
 		return {
 			reply: (channelName)
 				? `${emoteCode} (ID ${emoteID}) - ${active} ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
