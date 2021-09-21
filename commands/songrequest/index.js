@@ -489,7 +489,7 @@ module.exports = {
 			};
 		}
 
-		let when = "right now!";
+		let when = "right now";
 		let videoStatus = "Current";
 		let started = new sb.Date();
 		const status = await sb.VideoLANConnector.status();
@@ -510,7 +510,7 @@ module.exports = {
 			videoStatus = "Queued";
 
 			if (playingDate <= sb.Date.now()) {
-				when = "right now!";
+				when = "right now";
 			}
 			else {
 				when = sb.Utils.timeDelta(playingDate);
