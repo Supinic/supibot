@@ -287,7 +287,24 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		message = message.replace(/\\/g, "\\\\");
 
-		channelObject.send(sb.Utils.wrapString(message, channelData.Message_Limit ?? this.platform.Message_Limit));
+		const wrappedMessage = sb.Utils.wrapString(message, channelData.Message_Limit ?? this.platform.Message_Limit);
+		try {
+			await channelObject.send(wrappedMessage);
+		}
+		catch (e) {
+			await sb.Logger.logError("Backend", e, {
+				origin: "Internal",
+				context: {
+					message: wrappedMessage,
+					channelID: channelObject.id,
+					channelName: channelObject.name ?? null,
+					guildID: channelObject.guild?.id ?? null,
+					guildName: channelObject.guild?.name ?? null
+				}
+			});
+
+			throw e;
+		}
 	}
 
 	/**
@@ -308,7 +325,22 @@ module.exports = class DiscordController extends require("./template.js") {
 		}
 
 		const discordUser = await this.client.users.fetch(userData.Discord_ID);
-		await discordUser.send(message);
+		try {
+			await discordUser.send(message);
+		}
+		catch (e) {
+			await sb.Logger.logError("Backend", e, {
+				origin: "Internal",
+				context: {
+					message,
+					userName: userData.Name,
+					userID: userData.ID,
+					discordUserID: userData.Discord_ID
+				}
+			});
+
+			throw e;
+		}
 	}
 
 	/**
@@ -319,7 +351,28 @@ module.exports = class DiscordController extends require("./template.js") {
 	 */
 	async directPm (userID, msg) {
 		const discordUser = await this.client.users.fetch(userID);
-		await discordUser.send(msg);
+		if (!discordUser) {
+			throw new sb.Error({
+				message: "Direct Discord PM user does not exist",
+				args: { userID }
+			});
+		}
+
+		try {
+			await discordUser.send(msg);
+		}
+		catch (e) {
+			await sb.Logger.logError("Backend", e, {
+				origin: "Internal",
+				context: {
+					message: msg,
+					discordUserName: discordUser.username,
+					discordUserID: userID
+				}
+			});
+
+			throw e;
+		}
 	}
 
 	/**
