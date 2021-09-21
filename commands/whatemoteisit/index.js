@@ -57,11 +57,12 @@ module.exports = {
 			channelName,
 			channelLogin,
 			channelID,
-			emoteAssetType: emoteType,
+			emoteAsssetType,
 			emoteCode,
 			emoteID,
 			emoteState,
-			emoteTier
+			emoteTier,
+			emoteType
 		} = response.body;
 
 		const originID = await sb.Query.getRecordset(rs => rs
@@ -73,6 +74,10 @@ module.exports = {
 			.flat("ID")
 		);
 
+		const originString = (originID)
+			? `This emote has origin info - use the ${sb.Command.prefix}origin command.`
+			: "";
+
 		const cdnLink = `https://static-cdn.jtvnw.net/emoticons/v2/${emoteID}/default/dark/3.0`;
 		if (context.params.linkOnly) {
 			return {
@@ -81,21 +86,23 @@ module.exports = {
 		}
 
 		let tierString;
-		if (emoteTier && channelLogin) {
+		if (emoteType === "SUBSCRIPTIONS") {
+			if (!channelName && !channelLogin && !emoteTier) {
+				return {
+					reply: `${emoteCode} (ID ${emoteID}) - ${active} emote to an unknown banned/deleted channel. ${cdnLink} ${originString}`
+				};
+			}
+
 			let channelString = `@${channelName}`;
 			if (channelName.toLowerCase() !== channelLogin.toLowerCase()) {
 				channelString = `@${channelLogin} (${channelName})`;
 			}
 
-			tierString = `tier ${emoteTier} ${emoteType.toLowerCase()} sub emote to channel ${channelString}`;
+			tierString = `tier ${emoteTier} ${emoteAsssetType.toLowerCase()} sub emote to channel ${channelString}`;
 		}
 		else {
-			tierString = `special ${emoteType.toLowerCase()} ${channelName} emote`;
+			tierString = `special ${emoteAsssetType.toLowerCase()} ${channelName} emote`;
 		}
-
-		const originString = (originID)
-			? `This emote has origin info - use the ${sb.Command.prefix}origin command.`
-			: "";
 
 		let emoteLink;
 		if (channelName) {
