@@ -167,6 +167,10 @@ module.exports = class TwitchController extends require("./template.js") {
 						searchParams: { id: channelData.Specific_ID }
 					});
 
+					if (response.statusCode !== 200) {
+						return;
+					}
+
 					if (response.body.data.length === 0) {
 						channelData.Data.inactiveReason = "suspended";
 						await channelData.saveProperty("Data");
