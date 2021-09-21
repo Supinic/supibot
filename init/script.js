@@ -102,6 +102,7 @@
 	const dataFileList = [
 		"chat_data/Command",
 		"chat_data/Platform",
+		"chat_data/tables/Custom_Data_Property",
 		"data/Config",
 		"data/Got_Instance"
 	];
