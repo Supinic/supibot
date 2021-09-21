@@ -82,6 +82,7 @@ module.exports = {
 
 			const [result] = await sb.Utils.processArtflowData([{
 				filename: check.body.filename,
+				userDataID: value.user,
 				userID: value.artflowUserID,
 				text_prompt: value.prompt,
 				index: value.imageIndex,
