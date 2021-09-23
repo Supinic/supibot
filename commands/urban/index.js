@@ -50,7 +50,7 @@ module.exports = {
 			const match = autocompleteResponse.body.results.find(i => i.term.toLowerCase() === lowerTerm);
 			if (match) {
 				return {
-					reply: `Only a preview exists for this word → ${match.term}: ${match.preview}`
+					reply: `Short description: ${match.preview}`
 				};
 			}
 			else {
