@@ -25,16 +25,6 @@ module.exports = {
 
 		const term = args.join(" ");
 		const lowerTerm = term.toLowerCase();
-		if (this.staticData.brokenWords.includes(lowerTerm)) {
-			return {
-				success: false,
-				reply: sb.Utils.tag.trim `
-					For whatever reason, UrbanDictionary cannot process this word! 
-					Check it for yourself: https://api.urbandictionary.com/v0/define?term=${term}
-				`
-			};
-		}
-
 		const response = await sb.Got("GenericAPI", {
 			url: "https://api.urbandictionary.com/v0/define",
 			searchParams: {
@@ -47,7 +37,7 @@ module.exports = {
 		});
 
 		if (response.statusCode === 500) {
-			const response = await sb.Got("GenericAPI", {
+			const autocompleteResponse = await sb.Got("GenericAPI", {
 				url: "https://api.urbandictionary.com/v0/autocomplete-extra",
 				searchParams: {
 					api_key: this.staticData.fauxKey,
@@ -57,10 +47,19 @@ module.exports = {
 				timeout: this.staticData.timeout
 			});
 
-			const match = response.body.results.find(i => i.term.toLowerCase() === lowerTerm);
+			const match = autocompleteResponse.body.results.find(i => i.term.toLowerCase() === lowerTerm);
 			if (match) {
 				return {
 					reply: `Only a preview exists for this word → ${match.term}: ${match.preview}`
+				};
+			}
+			else {
+				return {
+					success: false,
+					reply: sb.Utils.tag.trim `
+						For whatever reason, UrbanDictionary cannot process this word! 
+						Check it for yourself: https://api.urbandictionary.com/v0/define?term=${term}
+					`
 				};
 			}
 		}
