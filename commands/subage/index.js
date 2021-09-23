@@ -140,7 +140,7 @@ module.exports = {
 			}
 			else {
 				return {
-					reply: `${userString} not subscribed to ${channelString}, but used to - for ${months} months in total.`
+					reply: `${userString} not subscribed to ${channelString}, but used to be subscribed for ${months} months.`
 				};
 			}
 		}
