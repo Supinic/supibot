@@ -63,6 +63,12 @@ module.exports = {
 					reply: `Image generation did not succeed! Please try again later.`
 				};
 			}
+			else if (response.body.is_bad_prompt === "true") {
+				return {
+					success: false,
+					reply: `Your image will not be created, as your input seems to contain inappropriate content!`
+				};
+			}
 
 			const uuid = require("crypto").randomUUID();
 			const requestObject = {
