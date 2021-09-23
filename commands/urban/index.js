@@ -11,6 +11,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		timeout: 10000,
+		fauxKey: "ab71d33b15d36506acf1e379b0ed07ee",
 		brokenWords: ["as", "at", "but", "by", "for", "if", "in", "into", "of", "on", "or", "this", "to", "with"]
 	})),
 	Code: (async function urban (context, ...args) {
@@ -23,7 +24,8 @@ module.exports = {
 		}
 
 		const term = args.join(" ");
-		if (this.staticData.brokenWords.includes(term.toLowerCase())) {
+		const lowerTerm = term.toLowerCase();
+		if (this.staticData.brokenWords.includes(lowerTerm)) {
 			return {
 				success: false,
 				reply: sb.Utils.tag.trim `
@@ -35,10 +37,33 @@ module.exports = {
 
 		const response = await sb.Got("GenericAPI", {
 			url: "https://api.urbandictionary.com/v0/define",
-			searchParams: { term },
+			searchParams: {
+				api_key: this.staticData.fauxKey,
+				term
+			},
+			throwHttpErrors: false,
 			retry: 0,
 			timeout: this.staticData.timeout
 		});
+
+		if (response.statusCode === 500) {
+			const response = await sb.Got("GenericAPI", {
+				url: "https://api.urbandictionary.com/v0/autocomplete-extra",
+				searchParams: {
+					api_key: this.staticData.fauxKey,
+					term
+				},
+				retry: 0,
+				timeout: this.staticData.timeout
+			});
+
+			const match = response.body.results.find(i => i.term.toLowerCase() === lowerTerm);
+			if (match) {
+				return {
+					reply: `Only a preview exists for this word → ${match.term}: ${match.preview}`
+				};
+			}
+		}
 
 		if (!response.body.list || response.body.result_type === "no_results") {
 			return {
