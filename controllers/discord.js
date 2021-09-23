@@ -295,18 +295,17 @@ module.exports = class DiscordController extends require("./template.js") {
 			await channelObject.send(wrappedMessage);
 		}
 		catch (e) {
-			await sb.Logger.logError("Backend", e, {
-				origin: "Internal",
-				context: {
+			throw new sb.Error({
+				message: "Sending Discord channel message failed",
+				args: {
 					message: wrappedMessage,
 					channelID: channelObject.id,
 					channelName: channelObject.name ?? null,
 					guildID: channelObject.guild?.id ?? null,
 					guildName: channelObject.guild?.name ?? null
-				}
+				},
+				cause: e
 			});
-
-			throw e;
 		}
 	}
 
@@ -321,60 +320,89 @@ module.exports = class DiscordController extends require("./template.js") {
 	 */
 	async pm (message, user) {
 		const userData = await sb.User.get(user, true);
-		if (!userData.Discord_ID) {
+		if (!userData) {
 			throw new sb.Error({
-				message: `Discord PM attempt: User ${userData.Name} has no Discord ID`
+				message: `Cannot private message: user does not exist`,
+				args: { user, message }
+			});
+		}
+		else if (!userData.Discord_ID) {
+			throw new sb.Error({
+				message: `Cannot send private message: user has no Discord ID`,
+				args: {
+					message,
+					userID: userData.ID,
+					userName: userData.Name
+				}
 			});
 		}
 
-		const discordUser = await this.client.users.fetch(userData.Discord_ID);
+		let discordUser;
+		try {
+			discordUser = await this.client.users.fetch(userData.Discord_ID);
+		}
+		catch (e) {
+			throw new sb.Error({
+				message: "Cannot send private message: Discord user does not exist",
+				args: {
+					message,
+					discordUserID: userData.Discord_ID,
+					userID: userData.ID,
+					userName: userData.Name
+				},
+				cause: e
+			});
+		}
+
 		try {
 			await discordUser.send(message);
 		}
 		catch (e) {
-			await sb.Logger.logError("Backend", e, {
-				origin: "Internal",
-				context: {
+			throw new sb.Error({
+				message: "Sending Discord private message failed",
+				args: {
 					message,
 					userName: userData.Name,
 					userID: userData.ID,
 					discordUserID: userData.Discord_ID
-				}
+				},
+				cause: e
 			});
-
-			throw e;
 		}
 	}
 
 	/**
 	 * Directly sends a private message to user, without them necessarily being saved as a user.
 	 * @param {string} userID
-	 * @param {string }msg
+	 * @param {string} message
 	 * @returns {Promise<void>}
 	 */
-	async directPm (userID, msg) {
-		const discordUser = await this.client.users.fetch(userID);
-		if (!discordUser) {
+	async directPm (userID, message) {
+		let discordUser;
+		try {
+			discordUser = await this.client.users.fetch(userID);
+		}
+		catch (e) {
 			throw new sb.Error({
-				message: "Direct Discord PM user does not exist",
-				args: { userID }
+				message: "Cannot send direct private message: Discord user does not exist",
+				args: { message, userID },
+				cause: e
 			});
 		}
 
 		try {
-			await discordUser.send(msg);
+			await discordUser.send(message);
 		}
 		catch (e) {
-			await sb.Logger.logError("Backend", e, {
-				origin: "Internal",
-				context: {
-					message: msg,
+			throw new sb.Error({
+				message: "Sending direct Discord private message failed",
+				args: {
+					message,
 					discordUserName: discordUser.username,
 					discordUserID: userID
-				}
+				},
+				cause: e
 			});
-
-			throw e;
 		}
 	}
 
