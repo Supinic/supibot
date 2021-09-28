@@ -16,7 +16,7 @@ module.exports = {
 				reply: `You must provide something to ${invocation} from! Check the command's help if needed.`
 			};
 		}
-	
+
 		let deliberateGlobalUnping = false;
 		const types = ["command", "platform", "channel"];
 		const names = {};
@@ -25,7 +25,7 @@ module.exports = {
 			platform: null,
 			channel: null
 		};
-	
+
 		if (args.every(i => !i.includes(":"))) { // Simple mode
 			[filterData.command] = args;
 			args.splice(0, 1);
@@ -40,17 +40,17 @@ module.exports = {
 				}
 			}
 		}
-	
+
 		if (filterData.command === "all") {
 			filterData.command = null;
 			deliberateGlobalUnping = true;
 		}
-	
+
 		for (const [type, value] of Object.entries(filterData)) {
 			if (value === null) {
 				continue;
 			}
-	
+
 			const module = sb[sb.Utils.capitalize(type)];
 			const specificData = await module.get(value);
 			if (!specificData) {
@@ -64,7 +64,7 @@ module.exports = {
 				filterData[type] = specificData.ID;
 			}
 		}
-	
+
 		if (!deliberateGlobalUnping && filterData.command === null) {
 			return {
 				success: false,
@@ -77,7 +77,7 @@ module.exports = {
 				reply: "Cannot specify both the channel and platform!"
 			};
 		}
-	
+
 		const filter = sb.Filter.data.find(i => (
 			i.Type === "Unping"
 			&& i.Channel === filterData.channel
@@ -85,7 +85,7 @@ module.exports = {
 			&& i.Platform === filterData.platform
 			&& i.User_Alias === context.user.ID
 		));
-	
+
 		if (filter) {
 			if ((filter.Active && invocation === "unping") || (!filter.Active && invocation === "reping")) {
 				return {
@@ -93,10 +93,10 @@ module.exports = {
 					reply: `You already used this command on this combination!`
 				};
 			}
-	
+
 			const suffix = (filter.Active) ? "" : " again";
 			await filter.toggle();
-	
+
 			return {
 				reply: `Succesfully ${invocation}ed${suffix}!`
 			};
@@ -108,7 +108,7 @@ module.exports = {
 					reply: "You haven't made this command not ping you yet!"
 				};
 			}
-	
+
 			const filter = await sb.Filter.create({
 				Active: true,
 				Type: "Unping",
@@ -118,12 +118,12 @@ module.exports = {
 				Platform: filterData.platform,
 				Issued_By: context.user.ID
 			});
-	
+
 			let commandString = `command ${sb.Command.prefix}${names.command}`;
 			if (filterData.command === null) {
 				commandString = "all commands";
 			}
-	
+
 			let location = "";
 			if (filterData.channel) {
 				location = ` in channel ${names.channel}`;
@@ -131,10 +131,10 @@ module.exports = {
 			else if (filterData.platform) {
 				location = ` in platform ${names.platform}`;
 			}
-	
+
 			return {
 				reply: sb.Utils.tag.trim `
-					You made the command ${commandString} not ping you
+					You made the ${commandString} not ping you
 					${location}
 					(ID ${filter.ID}).
 				`
