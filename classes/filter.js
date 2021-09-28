@@ -656,7 +656,11 @@ module.exports = class Filter extends require("./template.js") {
 	}
 
 	static getReminderPreventions (options) {
-		const filters = Filter.getLocals("Reminder-prevention", options);
+		const filters = Filter.getLocals("Reminder-prevention", {
+			...options,
+			skipUserCheck: true
+		});
+
 		return filters.map(i => i.User_Alias);
 	}
 
