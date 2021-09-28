@@ -176,7 +176,11 @@ module.exports = {
 			if (exact) {
 				return {
 					success: false,
-					reply: "That exact word is not available as seed for random generation! Check the list here: https://supinic.com/data/other/markov/words"
+					reply: sb.Utils.tag.trim `
+						That exact word is not available as seed for random generation!
+						Check the list here:
+						https://supinic.com/data/other/markov/${targetChannel.ID}/words
+					`
 				};
 			}
 
