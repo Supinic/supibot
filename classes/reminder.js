@@ -335,7 +335,13 @@ module.exports = class Reminder extends require("./template.js") {
 			return;
 		}
 
-		const reminders = list.filter(i => !i.Schedule);
+		const excludedUserIDs = sb.Filter.getReminderPreventions({
+			platform: channelData?.Platform ?? null,
+			channel: channelData,
+			user: targetUserData
+		});
+
+		const reminders = list.filter(i => !i.Schedule && !excludedUserIDs.includes(i.User_From));
 		if (reminders.length === 0) {
 			return;
 		}

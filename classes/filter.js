@@ -655,6 +655,11 @@ module.exports = class Filter extends require("./template.js") {
 		return flags;
 	}
 
+	static getReminderPreventions (options) {
+		const filters = Filter.getLocals("Reminder-prevention", options);
+		return filters.map(i => i.Blocked_User);
+	}
+
 	/**
 	 * Picks the correct response type, based on the type provided
 	 * @param {Object} options
@@ -719,6 +724,7 @@ module.exports = class Filter extends require("./template.js") {
  * @typedef {
  *   "Blacklist","Whitelist","Opt-out","Block",
  *   "Unping","Unmention","Cooldown","Flags",
- *   "Offline-only","Online-only","Arguments"
+ *   "Offline-only","Online-only","Arguments",
+ *   "Reminder-prevention"
  * } FilterType
  */
