@@ -17,7 +17,7 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		availableTypes: ["Arguments", "Blacklist", "Online-only", "Offline-only"]
+		availableTypes: ["Arguments", "Blacklist", "Online-only", "Offline-only", "Reminder-prevention"]
 	})),
 	Code: (async function ban (context) {
 		const { invocation } = context;
@@ -163,12 +163,20 @@ module.exports = {
 			};
 		}
 
-		const existing = sb.Filter.data.find(i => i.Type === type
+		if (type === "Reminder-prevention" && (!options.Channel || !options.User_Alias || options.Command || options.Invocation)) {
+			return {
+				success: false,
+				reply: `You must provide the channel and a user (no other params) to create a reminder prevention!`
+			};
+		}
+
+		const existing = sb.Filter.data.find(i => (
+			i.Type === type
 			&& i.Channel === options.Channel
 			&& i.Command === options.Command
 			&& i.Invocation === options.Invocation
 			&& i.User_Alias === options.User_Alias
-		);
+		));
 
 		if (existing) {
 			if (existing.Issued_By !== context.user.ID && !isAdmin) {
@@ -328,6 +336,12 @@ module.exports = {
 
 			`<code>${prefix}ban type:online-only (...)</code>`,
 			"Just like <code>offline-only</code>, but reverse - result will be available only in online channels.",
+			"",
+
+			`<code>${prefix}ban type:reminder-prevention user:(user)</code>`,
+			`<code>${prefix}ban type:reminder-prevention user:(user) channel:(channel)</code>`,
+			"Reminders created by provided user will no longer fire in the specified channel.",
+			"The reminders will still exist, they will simply not trigger.",
 			"",
 
 			`<code>${prefix}ban type:arguments index:(number) string:(text)</code>`,
