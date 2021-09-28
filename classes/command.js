@@ -805,11 +805,11 @@ class Command extends require("./template.js") {
 
 			if (e instanceof sb.errors.GenericRequestError) {
 				origin = "External";
-				const { hostname, message, statusCode, statusMessage } = e;
+				const { hostname, statusCode, statusMessage } = e.args;
 				errorContext = {
 					type: "Command request error",
 					hostname,
-					message,
+					message: e.message,
 					statusCode,
 					statusMessage
 				};
