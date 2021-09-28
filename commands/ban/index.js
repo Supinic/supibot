@@ -42,7 +42,7 @@ module.exports = {
 		};
 
 		if (context.params.channel) {
-			const channelData = sb.Channel.get(context.params.channel);
+			const channelData = sb.Channel.get(context.params.channel, context.platform);
 			if (!channelData) {
 				return {
 					success: false,
