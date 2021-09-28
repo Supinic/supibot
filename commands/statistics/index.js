@@ -188,6 +188,7 @@ module.exports = {
 							"Status = %s",
 							type
 						)
+						.flat("Amount")
 						.single()
 					);
 
@@ -208,7 +209,7 @@ module.exports = {
 								${data.Amount} times,
 								for a total of ~${delta}.
 								This averages to ~${average} spent AFK per invocation.
-								${who} resumed AFK statuses ${interruptedAmount.length} times.
+								${who} resumed AFK statuses ${interruptedAmount} times.
 							`
 						};
 					}
