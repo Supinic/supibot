@@ -451,9 +451,9 @@ module.exports = class Channel extends require("./template.js") {
 			return identifier;
 		}
 		else if (typeof identifier === "string") {
-			identifier = identifier.replace("#", "");
+			const channelName = Channel.normalizeName(identifier);
 
-			let result = Channel.data.filter(i => i.Name === identifier || i.Specific_ID === identifier);
+			let result = Channel.data.filter(i => i.Name === channelName || i.Specific_ID === identifier);
 			if (platform) {
 				result = result.find(i => i.Platform === platform);
 			}
@@ -495,7 +495,7 @@ module.exports = class Channel extends require("./template.js") {
 	 * @returns {Promise<Channel>}
 	 */
 	static async add (name, platformData, mode = "Write", specificID) {
-		const channelName = name.replace(/^#/, "");
+		const channelName = Channel.normalizeName(name);
 
 		// Creates Channel row
 		const row = await sb.Query.getRow("chat_data", "Channel");
@@ -556,6 +556,19 @@ module.exports = class Channel extends require("./template.js") {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Normalizes non-standard strings into standardized database channel names..
+	 * Turns input string into lowercase, removes leading `@`, leading `#`.
+	 * @param {string} username
+	 * @returns {string}
+	 */
+	static normalizeName (username) {
+		return username
+			.toLowerCase()
+			.replace(/^@/, "")
+			.replace(/^#/, "");
 	}
 };
 
