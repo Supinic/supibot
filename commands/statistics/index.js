@@ -159,6 +159,7 @@ module.exports = {
 							.select("SUM(UNIX_TIMESTAMP(Ended) - UNIX_TIMESTAMP(Started)) AS Delta")
 							.from("chat_data", "AFK")
 							.where("User_Alias = %n", targetUser.ID)
+							.where("Interrupted_ID IS NULL")
 							.single();
 
 						if (type === "total-afk") {
