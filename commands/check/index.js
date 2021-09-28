@@ -284,7 +284,7 @@ module.exports = {
 				name: "markov",
 				aliases: [],
 				description: "Posts the link for the word list, for a specified channel's markov module.",
-				execute: async (context, channelName) => {
+				execute: async (context, identifier) => {
 					const module = sb.ChatModule.get("async-markov-experiment");
 					if (!module) {
 						return {
@@ -292,7 +292,9 @@ module.exports = {
 							reply: `No Markov module is currently available!`
 						};
 					}
-					else if (!channelName) {
+
+					const channelName = identifier ?? context.channel.Name;
+					if (!channelName) {
 						return {
 							success: false,
 							reply: `No channel provided!`
