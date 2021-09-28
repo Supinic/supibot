@@ -154,26 +154,42 @@ module.exports = {
 						};
 					}
 
-					const data = await sb.Query.getRecordset(rs => {
-						rs.select("COUNT(*) AS Amount")
-							.select("SUM(UNIX_TIMESTAMP(Ended) - UNIX_TIMESTAMP(Started)) AS Delta")
-							.from("chat_data", "AFK")
-							.where("User_Alias = %n", targetUser.ID)
-							.where("Interrupted_ID IS NULL")
-							.single();
+					const data = await sb.Query.getRecordset(rs => rs
+						.select("COUNT(*) AS Amount")
+						.select("SUM(UNIX_TIMESTAMP(Ended) - UNIX_TIMESTAMP(Started)) AS Delta")
+						.from("chat_data", "AFK")
+						.where("User_Alias = %n", targetUser.ID)
+						.where("Interrupted_ID IS NULL")
+						.where(
+							{ condition: (type === "afk") },
+							"Status = %s OR Status IS NULL",
+							type
+						)
+						.where(
+							{ condition: (type !== "afk" && type !== "total-afk") },
+							"Status = %s",
+							type
+						)
+						.single()
+					);
 
-						if (type === "total-afk") {
-							// Do not add a condition - counts totals
-						}
-						else if (type === "afk") {
-							rs.where("Status = %s OR Status IS NULL", type);
-						}
-						else {
-							rs.where("Status = %s", type);
-						}
-
-						return rs;
-					});
+					const interruptedAmount = await sb.Query.getRecordset(rs => rs
+						.select("COUNT(*) AS Amount")
+						.from("chat_data", "AFK")
+						.where("User_Alias = %n", targetUser.ID)
+						.where("Interrupted_ID IS NOT NULL")
+						.where(
+							{ condition: (type === "afk") },
+							"Status = %s OR Status IS NULL",
+							type
+						)
+						.where(
+							{ condition: (type !== "afk" && type !== "total-afk") },
+							"Status = %s",
+							type
+						)
+						.single()
+					);
 
 					const who = (targetUser === context.user) ? "You have" : "That user has";
 					const target = (type === "total-afk") ? "(all combined)" : type;
@@ -192,6 +208,7 @@ module.exports = {
 								${data.Amount} times,
 								for a total of ~${delta}.
 								This averages to ~${average} spent AFK per invocation.
+								${who} resumed AFK statuses ${interruptedAmount.length} times.
 							`
 						};
 					}
