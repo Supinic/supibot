@@ -112,6 +112,12 @@ module.exports = {
 					reply: `You can't ${invocation} yourself!`
 				};
 			}
+			else if (userData.Name === context.platform.Self_Name) {
+				return {
+					success: false,
+					reply: `You can't do that!`
+				};
+			}
 
 			options.User_Alias = userData.ID;
 		}
