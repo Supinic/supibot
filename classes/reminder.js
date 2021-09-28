@@ -337,8 +337,7 @@ module.exports = class Reminder extends require("./template.js") {
 
 		const excludedUserIDs = sb.Filter.getReminderPreventions({
 			platform: channelData?.Platform ?? null,
-			channel: channelData,
-			user: targetUserData
+			channel: channelData
 		});
 
 		const reminders = list.filter(i => !i.Schedule && !excludedUserIDs.includes(i.User_From));
