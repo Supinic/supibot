@@ -88,9 +88,10 @@ module.exports = {
 
 		let tierString = "";
 		if (emoteType === "SUBSCRIPTIONS") {
-			if (!channelName && !channelLogin && !emoteTier) {
+			if (!channelName && !channelLogin) {
+				const tier = (emoteTier) ? `tier ${emoteTier}` : "";
 				return {
-					reply: `${emoteCode} (ID ${emoteID}) - ${active} emote to an unknown banned/deleted channel. ${cdnLink} ${originString}`
+					reply: `${emoteCode} (ID ${emoteID}) - ${active} ${tier} emote to an unknown banned/deleted channel. ${cdnLink} ${originString}`
 				};
 			}
 			else if (channelName !== null) {
