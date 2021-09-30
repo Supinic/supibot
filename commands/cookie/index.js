@@ -21,14 +21,14 @@ module.exports = {
 				reply: `Use the give command instead!`
 			};
 		}
-	
+
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("Cookie_Today")
 			.from("chat_data", "Extra_User_Data")
 			.where("User_Alias = %n", context.user.ID)
 			.single()
 		);
-	
+
 		if (data?.Cookie_Today) {
 			const tomorrow = new sb.Date().addDays(1);
 			const nextMidnight = new sb.Date(sb.Date.UTC(tomorrow.getUTCFullYear(), tomorrow.getUTCMonth(), tomorrow.getUTCDate()));
@@ -36,25 +36,26 @@ module.exports = {
 
 			const rudeRoll = sb.Utils.random(1, 100);
 			return {
+				success: false,
 				reply: (rudeRoll === 99)
 					? `Stop stuffing your face so often! What are you doing, do you want to get fat? Get another cookie ${delta}.`
 					: `You already opened or gifted a fortune cookie today. You can get another one at midnight UTC, which is ${delta}.`
 			};
 		}
-	
+
 		const [cookie] = await sb.Query.getRecordset(rs => rs
 			.select("Text")
 			.from("data", "Fortune_Cookie")
 			.orderBy("RAND() DESC")
 			.limit(1)
 		);
-	
+
 		await context.transaction.query([
 			"INSERT INTO chat_data.Extra_User_Data (User_Alias, Cookie_Today)",
 			`VALUES (${context.user.ID}, 1)`,
 			"ON DUPLICATE KEY UPDATE Cookie_Today = 1"
 		].join(" "));
-	
+
 		return {
 			reply: cookie.Text
 		};
