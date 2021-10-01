@@ -143,7 +143,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 				string: message
 			});
 
-			const fixedMessage = channelData.prepareMessage(unpingedMessage);
+			const fixedMessage = await channelData.prepareMessage(unpingedMessage);
 			await Promise.all([
 				channelData.send(fixedMessage),
 				channelData.mirror(message, userData, { commandUsed: false })
