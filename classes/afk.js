@@ -136,20 +136,14 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 
 		if (!data.Silent) {
 			const message = `${userData.Name} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
-
-			let fixedMessage = (await Promise.all([
-				channelData.prepareMessage(`${userData.Name} ${status}: `),
-				channelData.prepareMessage(data.Text ?? "(no message)"),
-				`(${sb.Utils.timeDelta(data.Started)})`
-			])).join(" ");
-
-			fixedMessage = await sb.Filter.applyUnping({
+			const unpingedMessage = await sb.Filter.applyUnping({
 				command: afkCommand,
 				channel: channelData ?? null,
 				platform: channelData?.Platform ?? null,
-				string: fixedMessage
+				string: message
 			});
 
+			const fixedMessage = channelData.prepareMessage(unpingedMessage);
 			await Promise.all([
 				channelData.send(fixedMessage),
 				channelData.mirror(message, userData, { commandUsed: false })
