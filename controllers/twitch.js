@@ -314,9 +314,12 @@ module.exports = class TwitchController extends require("./template.js") {
 
 			// @todo: Could this possibly be a part of channelData? So that it is platform-independent...
 			const { channels, string } = this.platform.Data.reconnectAnnouncement;
+			const sayPromises = [];
 			if (channels && string && channels.includes(channelName)) {
-				await client.say(channelName, string);
+				sayPromises.push(client.say(channelName, string));
 			}
+
+			await Promise.allSettled(sayPromises);
 		});
 
 		client.on("PART", (message) => {
