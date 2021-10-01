@@ -8,6 +8,8 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
+		statusLengthLimit: 2000,
+
 		responses: {
 			afk: ["is no longer AFK"],
 			poop: ["is done taking a dump", "finished pooping", "forgot to flush", "washed hands", "didn't wash hands"],
@@ -121,7 +123,7 @@ module.exports = {
 
 		const text = await target.text(context, args.join(" ").trim());
 		await sb.AwayFromKeyboard.set(context.user, {
-			Text: text,
+			Text: sb.Utils.wrapString(text, this.staticData.statusLengthLimit, { keepWhitespace: false }),
 			Status: target.type ?? invocation,
 			Silent: false,
 			Interrupted_ID: null
