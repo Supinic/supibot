@@ -559,7 +559,14 @@ module.exports = class Reminder extends require("./template.js") {
 		}
 
 		if (schedule) {
-			const scheduleCheck = (await sb.Query.getRecordset(rs => rs
+			if (!(schedule instanceof Date) && !(schedule instanceof sb.Date)) {
+				throw new sb.Error({
+					message: "Invalid schedule provided",
+					args: { schedule, userFrom, userTo }
+				});
+			}
+
+			const scheduledCount = (await sb.Query.getRecordset(rs => rs
 				.select("COUNT(*) AS Count")
 				.from("chat_data", "Reminder")
 				.where("Active = %b", true)
@@ -570,9 +577,10 @@ module.exports = class Reminder extends require("./template.js") {
 				.where("YEAR(Schedule) = %n", schedule.year)
 				.groupBy("YEAR(Schedule)", "MONTH(Schedule)", "DAY(Schedule)")
 				.single()
+				.flat("Count")
 			));
 
-			if (scheduleCheck && scheduleCheck.Count >= incomingLimit) {
+			if (scheduledCount >= incomingLimit) {
 				return {
 					success: false,
 					cause: "scheduled-incoming"
