@@ -918,10 +918,6 @@ class Command extends require("./template.js") {
 			execution.reply = partResult.join(" ");
 		}
 
-		if (typeof execution.reply !== "string") {
-			console.warn(`Execution of command "${command.Name}" did not result with execution.reply of type string`);
-		}
-
 		execution.reply = String(execution.reply).trim();
 		if (execution.reply.length === 0) {
 			execution.reply = "(empty message)";
