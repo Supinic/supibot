@@ -669,6 +669,19 @@ module.exports = {
 						helpers: ["supinic"]
 					}
 				]
+			},
+			{
+				code: "ru",
+				language: "russian",
+				sources: [
+					{
+						name: "Интерфакс",
+						url: "https://www.interfax.ru",
+						path: null,
+						endpoints: ["rss.asp"],
+						helpers: ["supinic"]
+					}
+				]
 			}
 		],
 
