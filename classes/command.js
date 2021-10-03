@@ -809,7 +809,7 @@ class Command extends require("./template.js") {
 				errorContext = {
 					type: "Command request error",
 					hostname,
-					message: e.message,
+					message: e.simpleMessage,
 					statusCode,
 					statusMessage
 				};
