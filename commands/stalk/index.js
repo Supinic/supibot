@@ -10,12 +10,13 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function stalk (context, user) {
 		if (!user) {
+			const emote = await context.getBestAvailableEmote(["forsen1"], "👀");
 			return {
 				success: false,
-				reply: "👀 I'm watching you... (no user provided!)"
+				reply: `${emote} I'm watching you... (no user provided!)`
 			};
 		}
-	
+
 		const targetUser = await sb.User.get(user);
 		if (!targetUser) {
 			return {
@@ -24,18 +25,20 @@ module.exports = {
 			};
 		}
 		else if (targetUser.ID === context.user.ID) {
+			const emote = await context.getBestAvailableEmote(["forsen1"], "👀");
 			return {
 				success: false,
-				reply: "👀 You're right here 👀"
+				reply: `${emote} You're right here ${emote}`
 			};
 		}
 		else if (targetUser.Name === context.platform.Self_Name) {
+			const emote = await context.getBestAvailableEmote(["MrDestructoid"], "🤖");
 			return {
 				success: false,
-				reply: "🤖 I'm right here 🤖"
+				reply: `${emote} I'm right here ${emote}`
 			};
 		}
-	
+
 		const stalk = await sb.Query.getRecordset(rs => rs
 			.select("Last_Message_Text AS Text", "Last_Message_Posted AS Date", "Channel.Name AS Channel")
 			.select("Platform.Name AS Platform")
@@ -51,7 +54,7 @@ module.exports = {
 			.limit(1)
 			.single()
 		);
-	
+
 		if (!stalk) {
 			return {
 				reply: sb.Utils.tag.trim `
@@ -60,12 +63,12 @@ module.exports = {
 				`
 			};
 		}
-	
+
 		const delta = sb.Utils.timeDelta(stalk.Date);
 		const channel = (stalk.Platform === "Twitch" || stalk.Platform === "Mixer")
 			? `${stalk.Platform.toLowerCase()}-${stalk.Channel}`
 			: stalk.Platform;
-	
+
 		return {
 			meta: {
 				skipWhitespaceCheck: true
