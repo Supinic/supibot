@@ -272,7 +272,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 			Tag: parentTag,
 			Subtag: childTag,
 			Description: (typeof description === "string")
-				? description.slice(0, 1000)
+				? description.slice(0, 65000)
 				: description,
 			Channel: (channel) ? channel.ID : null,
 			User_Alias: (user) ? user.ID : null
