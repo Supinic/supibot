@@ -240,7 +240,7 @@ module.exports = {
 						name: "TRT Haber",
 						url: "https://www.trthaber.com",
 						path: null,
-						endpoints: ["sondakika.rss"],
+						endpoints: ["turkiye_articles.rss"],
 						helpers: ["caglapickaxe", "cgpx"]
 					}
 				]
