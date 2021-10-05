@@ -678,12 +678,13 @@ module.exports = {
 						.select("User_Alias", "Text")
 						.from("data", "Twitch_Lotto_Description")
 						.where("Preferred <> %b", false)
+						.where("Link = %s", match[4])
 					);
 
 					if (descriptions.length === 0) {
 						return {
 							success: false,
-							reply: `This picture has not been described so far!`
+							reply: `This picture either doesn't exist or has not been described so far!`
 						};
 					}
 
