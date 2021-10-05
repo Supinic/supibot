@@ -36,21 +36,6 @@ module.exports = class DiscordController extends require("./template.js") {
 	initListeners () {
 		const client = this.client;
 
-		client.on("ready", async () => {
-			const active = client.channels.cache.filter(i => i.type === "text");
-			const joinable = sb.Channel.getJoinableForPlatform("discord");
-
-			for (const channel of joinable) {
-				const exists = active.find(i => i.id === channel.Name);
-				if (!exists) {
-					await Promise.all([
-						channel.saveProperty("Mode", channel.Mode),
-						sb.Logger.log("Discord.Other", "Discord channel set as inactive", channel, null)
-					]);
-				}
-			}
-		});
-
 		client.on("message", async (messageObject) => {
 			const {
 				commandArguments,
