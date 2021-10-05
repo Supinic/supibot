@@ -4,8 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Checks certain user or system variables. For a list of types, check the command's extended help.",
-	Flags: ["mention","pipe"],
-	Params: null,
+	Flags: ["mention","pipe","use-params"],
+	Params: [
+		{ name: "index", type: "number" }
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		variables: [
@@ -638,6 +640,63 @@ module.exports = {
 						reply: (!flags || flags.length === 0)
 							? `There are currently no blacklisted TL flags in this channel.`
 							: `Currently blacklisted flags in this channel: ${flags.join(", ")}`
+					};
+				}
+			},
+			{
+				name: "twitchlottodescription",
+				aliases: ["tld"],
+				description: "Checks the posted description of a provided TwitchLotto link, if it exists.",
+				execute: async (context, link) => {
+					// @todo refactor this and similar usages to a common place
+					if (link.toLowerCase() === "last") {
+						const tl = sb.Command.get("tl");
+						const key = tl.staticData.createRecentUseCacheKey(context);
+
+						const cacheData = await tl.getCacheData(key);
+						if (!cacheData) {
+							return {
+								success: false,
+								reply: "You haven't rolled for any images in this channel recently!"
+							};
+						}
+						else {
+							link = cacheData;
+						}
+					}
+
+					const regex = /(https:\/\/)?(www\.)?(imgur\.com\/)?([\d\w]{5,8}\.\w{3})/;
+					const match = link.match(regex);
+					if (!match) {
+						return {
+							success: false,
+							reply: `Invalid link format!`
+						};
+					}
+					
+					const descriptions = await sb.Query.getRecordset(rs => rs
+						.select("User_Alias", "Text")
+						.from("data", "Twitch_Lotto_Description")
+					);
+					
+					if (descriptions.length === 0) {
+						return {
+							success: false,
+							reply: `This picture has not been described so far!`
+						};
+					}
+					
+					const item = descriptions[context.params.index ?? 0];
+					if (!item) {
+						return {
+							success: false,
+							reply: `There is no description with this index!`
+						};
+					}
+					
+					const authorData = await sb.User.get(item.User_Alias);
+					return {
+						reply: `(Use index:0 to index:${descriptions.length}) Description from ${authorData.Name}: ${item.Text}`
 					};
 				}
 			},
