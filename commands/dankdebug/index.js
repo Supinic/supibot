@@ -63,7 +63,9 @@ module.exports = {
 			const scriptContext = {
 				fixAsync: false,
 				sandbox: {
-					aliasStack: context.append.aliasStack ?? [],
+					aliasStack: (context.append.aliasStack)
+						? [...context.append.aliasStack]
+						: [],
 					args: scriptArgs ?? null,
 					executor: context.user.Name,
 					channel: context.channel?.Name ?? "(none)",
