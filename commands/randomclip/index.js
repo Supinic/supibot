@@ -91,14 +91,14 @@ module.exports = {
 				reply: "That user does not exist!"
 			};
 		}
-		else if (response.body.length === 0) {
+		else if (response.body.data.length === 0) {
 			return {
 				success: false,
 				reply: "No clips found!"
 			};
 		}
 
-		const clip = sb.Utils.randArray(response.body);
+		const clip = sb.Utils.randArray(response.body.data);
 		if (context.params.linkOnly) {
 			return {
 				reply: clip.url
