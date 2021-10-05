@@ -101,7 +101,7 @@ module.exports = {
 				sources: [
 					{
 						name: "N1 Info",
-						url: "http://rs.n1info.com",
+						url: "https://rs.n1info.com",
 						path: "rss",
 						endpoints: ["249/Naslovna"],
 						helpers: ["supinic", "infinitegachi"]
@@ -510,7 +510,7 @@ module.exports = {
 				sources: [
 					{
 						name: "RTCG",
-						url: "http://www.rtcg.me",
+						url: "https://www.rtcg.me",
 						path: "vijesti",
 						endpoints: ["rss.html", "drustvo/rss.html", "region/rss.html"],
 						helpers: ["supinic"]

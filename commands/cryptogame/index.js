@@ -22,7 +22,7 @@ module.exports = {
 					}
 
 					return sb.Got({
-						prefixUrl: "http://data.fixer.io/api",
+						prefixUrl: "https://data.fixer.io/api",
 						url: "latest",
 						throwHttpErrors: false,
 						responseType: "json",

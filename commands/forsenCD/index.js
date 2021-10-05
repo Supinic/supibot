@@ -82,7 +82,7 @@ module.exports = {
 				"Designed half the maps for Call of Duty Advanced Warfare. I’m on another level when it comes to creativity, design, and being ripped out of my mind. How’s your job at Arby’s? Pack that roast beef sandwich puto."
 			],
 			notes: [
-				"Source for the \"puto\" tweet - deleted, available on Wayback Machine: http://web.archive.org/web/20210805221637/https://twitter.com/drdisrespect/status/1423407584141189120"
+				"Source for the \"puto\" tweet - deleted, available on Wayback Machine: https://web.archive.org/web/20210805221637/https://twitter.com/drdisrespect/status/1423407584141189120"
 			]
 		};
 	}),
