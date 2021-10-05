@@ -70,8 +70,7 @@ module.exports = {
 					platform: context.platform.Name,
 					console: undefined,
 					utils: {
-						getEmote: (array, fallback) => context.getBestAvailableEmote(array, fallback),
-						Date: sb.Date
+						getEmote: (array, fallback) => context.getBestAvailableEmote(array, fallback)
 					}
 				}
 			};
