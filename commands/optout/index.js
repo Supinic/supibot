@@ -16,7 +16,7 @@ module.exports = {
 				reply: `You must provide something to ${invocation} from! Check the command's help if needed.`
 			};
 		}
-	
+
 		let deliberateGlobalOptout = false;
 		const types = ["command", "platform", "channel"];
 		const names = {};
@@ -25,7 +25,7 @@ module.exports = {
 			platform: null,
 			channel: null
 		};
-	
+
 		if (args.every(i => !i.includes(":"))) { // Simple mode
 			[filterData.command] = args;
 			args.splice(0, 1);
@@ -40,17 +40,17 @@ module.exports = {
 				}
 			}
 		}
-	
+
 		if (filterData.command === "all") { // Opt out from everything
 			filterData.command = null;
 			deliberateGlobalOptout = true;
 		}
-	
+
 		for (const [type, value] of Object.entries(filterData)) {
 			if (value === null) {
 				continue;
 			}
-	
+
 			const module = sb[sb.Utils.capitalize(type)];
 			const specificData = await module.get(value);
 			if (!specificData) {
@@ -66,12 +66,12 @@ module.exports = {
 						reply: `You cannot opt out from this command!`
 					};
 				}
-	
+
 				names[type] = specificData.Name;
 				filterData[type] = specificData.ID;
 			}
 		}
-	
+
 		if (!deliberateGlobalOptout && filterData.command === null) {
 			return {
 				success: false,
@@ -84,7 +84,7 @@ module.exports = {
 				reply: "Cannot specify both the channel and platform!"
 			};
 		}
-	
+
 		const filter = sb.Filter.data.find(i => (
 			i.Type === "Opt-out"
 			&& i.Channel === filterData.channel
@@ -92,7 +92,13 @@ module.exports = {
 			&& i.Platform === filterData.platform
 			&& i.User_Alias === context.user.ID
 		));
-	
+
+		const commandPrefix = sb.Config.get("COMMAND_PREFIX");
+		let commandString = `command ${commandPrefix}${names.command}`;
+		if (filterData.command === null) {
+			commandString = "all opt-outable commands";
+		}
+
 		if (filter) {
 			if (filter.Issued_By !== context.user.ID) {
 				return {
@@ -106,12 +112,12 @@ module.exports = {
 					reply: `You are already ${invocation}ed from that combination!`
 				};
 			}
-	
+
 			const suffix = (filter.Active) ? "" : " again";
 			await filter.toggle();
-	
+
 			return {
-				reply: `Succesfully ${invocation}ed${suffix}!`
+				reply: `Succesfully ${invocation}ed${suffix} from ${commandString}.`
 			};
 		}
 		else {
@@ -121,7 +127,7 @@ module.exports = {
 					reply: "You haven't opted out from this combination yet, so it cannot be reversed!"
 				};
 			}
-	
+
 			const filter = await sb.Filter.create({
 				Active: true,
 				Type: "Opt-out",
@@ -131,14 +137,7 @@ module.exports = {
 				Platform: filterData.platform,
 				Issued_By: context.user.ID
 			});
-	
-			const commandPrefix = sb.Config.get("COMMAND_PREFIX");
-			let commandString = `command ${commandPrefix}${names.command}`;
-	
-			if (filterData.command === null) {
-				commandString = "all opt-outable commands";
-			}
-	
+
 			let location = "";
 			if (filterData.channel) {
 				location = ` in channel ${names.channel}`;
@@ -146,7 +145,7 @@ module.exports = {
 			else if (filterData.platform) {
 				location = ` in platform ${names.platform}`;
 			}
-	
+
 			return {
 				reply: sb.Utils.tag.trim `
 					You opted out from ${commandString}
@@ -160,17 +159,18 @@ module.exports = {
 		"Opts you out of a specific command.",
 		"While opted out from command, nobody can use it with you as the parameter.",
 		"",
-		
+
 		`<code><u>Simple mode</u></code>`,
 		`<code>${prefix}optout (command)</code>`,
 		`Will opt you out from a given command`,
 		"",
-	
+
 		`<code><u>Total mode</u></code>`,
 		`<code>${prefix}optout all</code>`,
 		`Will opt you out from all current and future opt-outable commands, everywhere.`,
+		"NOTE: This command will not opt you out from each command separately. It simply applies a setting that opts you out from all command, present and future.",
 		"",
-	
+
 		`<code><u>Advanced mode</u></code>`,
 		`<code>${prefix}optout channel:(chn) command:(cmd) platform:(p)</code>`,
 		`Will opt you out from a specified combination of channel/command/platform.`,
@@ -188,6 +188,13 @@ module.exports = {
 					<code>${prefix}optout channel:supibot</code>
 					Will opt you out from all opt-outable commands, only in channel "supibot".
 				</li>
-			</ul>`
+			</ul>`,
+		"",
+
+		`<code><u>Un-optout</u></code>`,
+		`<code>${prefix}unoptout (command)</code>`,
+		`<code>${prefix}unoptout all</code>`,
+		`<code>${prefix}unoptout channel:(chn) command:(cmd) platform:(p)</code>`,
+		"To reverse an opt-out, simply use the <code>unoptout</code> command with the same parameters you used previously."
 	])
 };
