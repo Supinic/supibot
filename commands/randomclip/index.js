@@ -29,33 +29,29 @@ module.exports = {
 			};
 		}
 
-		let dateRange = [];
+		const earliestDate = new sb.Date("2011-01-01");
 		const now = new sb.Date();
+		const dateRange = [earliestDate, now];
 
 		if (context.params.period) {
 			switch (context.params.period) {
 				case "day": {
-					const yesterday = now.clone().addDays(-1);
-					dateRange = [yesterday, now];
+					dateRange[0] = now.clone().addDays(-1);
 					break;
 				}
 
 				case "week": {
-					const yesterday = now.clone().addDays(-7);
-					dateRange = [yesterday, now];
+					dateRange[0] = now.clone().addDays(-7);
 					break;
 				}
 
 				case "month": {
-					const yesterday = now.clone().addMonths(-1);
-					dateRange = [yesterday, now];
+					dateRange[0] = now.clone().addMonths(-1);
 					break;
 				}
 
-				case "all": {
-					dateRange = [new sb.Date("2011-01-01"), now];
-					break;
-				}
+				// No change, keep default date range
+				case "all": break;
 
 				default: return {
 					success: false,
@@ -95,14 +91,14 @@ module.exports = {
 				reply: "That user does not exist!"
 			};
 		}
-		else if (response.data.length === 0) {
+		else if (response.body.length === 0) {
 			return {
 				success: false,
 				reply: "No clips found!"
 			};
 		}
 
-		const clip = sb.Utils.randArray(response.data);
+		const clip = sb.Utils.randArray(response.body);
 		if (context.params.linkOnly) {
 			return {
 				reply: clip.url
