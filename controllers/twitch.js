@@ -409,7 +409,20 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 		});
 
-		client.on("PRIVMSG", (message) => this.handleMessage(message));
+		client.on("PRIVMSG", (message) => {
+			try {
+				this.handleMessage(message);
+			}
+			catch (e) {
+				throw new sb.Error({
+					cause: e,
+					message: "Twitch PRIVMSG handler failed",
+					args: {
+						rawIRCMessage: message.rawSource
+					}
+				});
+			}
+		});
 
 		client.on("WHISPER", (message) => this.handleMessage(message));
 
