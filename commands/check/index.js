@@ -63,10 +63,10 @@ module.exports = {
 				aliases: ["ambassadors"],
 				description: "Check who is the Supibot ambassador of a channel (or the current one, if none provided).",
 				execute: async (context, identifier) => {
-					if (!context.channel) {
+					if (!identifier && !context.channel) {
 						return {
 							success: false,
-							reply: `This command can't be used in whispers!`
+							reply: `You must a provide a channel when using this command in whispers!`
 						};
 					}
 
