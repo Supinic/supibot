@@ -6,70 +6,112 @@ module.exports = {
 	Description: "Posts a random clip from either the current channel or the specified channel. You can specify a parameter period, with options day/week/month/all, for example: period:week",
 	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
+		{ name: "limit", type: "number" },
 		{ name: "linkOnly", type: "boolean" },
 		{ name: "period", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function randomClip (context, ...args) {
-		let channel = context.channel?.Name ?? null;
-		if (args.length > 0 && !args[0].includes(":")) {
-			channel = args[0];
-		}
-	
+	Code: (async function randomClip (context, channelName) {
+		const channel = channelName ?? context.channel?.Name;
 		if (!channel && (context.privateMessage || context.platform.Name !== "twitch")) {
 			return {
 				success: false,
 				reply: "You must specify the target channel if you're in PMs or not on Twitch!"
 			};
 		}
-	
-		const period = context.params.period ?? "all";
-		if (!["day", "week", "month", "all"].includes(period)) {
+
+		const channelID = await sb.Platform.get("twitch").controller.getUserID(channel);
+		if (!channelID) {
 			return {
 				success: false,
-				reply: `Invalid clip creation period! Use one of: day, week, month, all`
+				reply: `No such channel exists!`
 			};
 		}
-	
-		const { statusCode, body: data } = await sb.Got("Kraken", {
-			url: "clips/top",
-			searchParams: new sb.URLParams()
-				.set("period", period)
-				.set("channel", channel || context.channel.Name)
-				.set("limit", "100")
-				.toString(),
+
+		let dateRange = [];
+		const now = new sb.Date();
+
+		if (context.params.period) {
+			switch (context.params.period) {
+				case "day": {
+					const yesterday = now.clone().addDays(-1);
+					dateRange = [yesterday, now];
+					break;
+				}
+
+				case "week": {
+					const yesterday = now.clone().addDays(-7);
+					dateRange = [yesterday, now];
+					break;
+				}
+
+				case "month": {
+					const yesterday = now.clone().addMonths(-1);
+					dateRange = [yesterday, now];
+					break;
+				}
+
+				case "all": {
+					dateRange = [new sb.Date("2011-01-01"), now];
+					break;
+				}
+
+				default: return {
+					success: false,
+					reply: `Invalid clip creation period! Use one of: day, week, month, all`
+				};
+			}
+		}
+
+		const limit = context.params.limit ?? 100;
+		if (!sb.Utils.isValidInteger(limit, 1)) {
+			return {
+				success: false,
+				reply: `Invalid limit provided!`
+			};
+		}
+		else if (limit > 100) {
+			return {
+				success: false,
+				reply: `Provided limit is too high! (maximum is 100)`
+			};
+		}
+
+		const response = await sb.Got("Helix", {
+			url: "clips",
+			searchParams: {
+				started_at: dateRange[0].toISOString(),
+				ended_at: dateRange[1].toISOString(),
+				first: limit,
+				broadcaster_id: channelID
+			},
 			throwHttpErrors: false
 		});
-	
-		if (statusCode === 404) {
+
+		if (response.statusCode === 404) {
 			return {
 				success: false,
 				reply: "That user does not exist!"
 			};
 		}
-		else if (!data.clips || data.clips.length === 0) {
-			if (!data.clips) {
-				console.warn("Unexpected Twitch API response", { statusCode, data, args, context });
-			}
-
+		else if (response.data.length === 0) {
 			return {
 				success: false,
 				reply: "No clips found!"
 			};
 		}
-	
-		const clip = sb.Utils.randArray(data.clips);
-		const link = `https://clips.twitch.tv/${clip.slug}`;
+
+		const clip = sb.Utils.randArray(response.data);
 		if (context.params.linkOnly) {
 			return {
-				reply: link
+				reply: clip.url
 			};
 		}
 
 		const delta = sb.Utils.timeDelta(new sb.Date(clip.created_at));
 		return {
-			reply: `${clip.title} - ${clip.duration} sec, clipped by ${clip.curator.name}, ${delta}: ${link}`
+			reply: `"${clip.title}" - ${clip.duration} sec, clipped by ${clip.creator_name}, ${delta}: ${clip.url}`
 		};
 	}),
 	Dynamic_Description: null
