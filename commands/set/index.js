@@ -554,6 +554,79 @@ module.exports = {
 					}
 				},
 				{
+					name: "twitchlottodescription",
+					aliases: ["tld"],
+					parameter: "arguments",
+					description: `Add a description to any TwitchLotto picture (link).`,
+					set: async (context, link, ...args) => {
+						if (!link) {
+							return {
+								success: false,
+								reply: `No link provided!`
+							};
+						}
+
+						if (link.toLowerCase() === "last") {
+							const tl = sb.Command.get("tl");
+							const key = tl.staticData.createRecentUseCacheKey(context);
+
+							const cacheData = await tl.getCacheData(key);
+							if (!cacheData) {
+								return {
+									success: false,
+									reply: "You haven't rolled for any images in this channel recently!"
+								};
+							}
+							else {
+								link = cacheData;
+							}
+						}
+
+						const regex = /(https:\/\/)?(www\.)?(imgur\.com\/)?([\d\w]{5,8}\.\w{3})/;
+						const match = link.match(regex);
+						if (!match) {
+							return {
+								success: false,
+								reply: `Invalid link format!`
+							};
+						}
+
+						const parsedLink = await sb.Query.getRecordset(rs => rs
+							.select("Link")
+							.from("data", "Twitch_Lotto")
+							.where("Link = %s", match[4])
+							.limit(1)
+							.single()
+							.flat("Link")
+						);
+
+						if (!parsedLink) {
+							return {
+								success: false,
+								reply: `Provided link (${parsedLink}) does not exist in the TwitchLotto database!`
+							};
+						}
+
+						const row = await sb.Query.getRow("data", "Twitch_Lotto_Description");
+						await row.load({
+							Link: parsedLink,
+							User_Alias: context.user.ID
+						}, true);
+
+						row.setValues({
+							Link: parsedLink,
+							User_Alias: context.user.ID,
+							Text: args.join(" ")
+						});
+
+						await row.save({ skipLoad: true });
+
+						return {
+							reply: `Successfully added your description of link ${parsedLink}.`
+						};
+					}
+				},
+				{
 					name: "twitchlottoblacklist",
 					aliases: ["tlbl"],
 					parameter: "arguments",
