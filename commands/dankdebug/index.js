@@ -72,7 +72,13 @@ module.exports = {
 					platform: context.platform.Name,
 					console: undefined,
 					utils: {
-						getEmote: (array, fallback) => context.getBestAvailableEmote(array, fallback)
+						getEmote: (array, fallback) => {
+							if (!Array.isArray(array) || array.some(i => typeof i !== "string")) {
+								throw new Error("Emotes must be provided as an Array containing strings only");
+							}
+
+							return context.getBestAvailableEmote(array, fallback);
+						}
 					}
 				}
 			};
