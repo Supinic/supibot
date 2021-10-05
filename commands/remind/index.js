@@ -258,6 +258,11 @@ module.exports = {
 		}
 
 		if (result.success) {
+			if (result.ID % 1_000_000 === 0) {
+				const trollShift = (Math.random() > 0.5) ? 1 : -1;
+				result.ID += trollShift;
+			}
+
 			const who = (targetUser.ID === context.user.ID) ? "you" : targetUser.Name;
 			const method = (isPrivate) ? "privately " : "";
 
