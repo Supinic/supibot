@@ -673,19 +673,20 @@ module.exports = {
 							reply: `Invalid link format!`
 						};
 					}
-					
+
 					const descriptions = await sb.Query.getRecordset(rs => rs
 						.select("User_Alias", "Text")
 						.from("data", "Twitch_Lotto_Description")
+						.where("Preferred <> %b", false)
 					);
-					
+
 					if (descriptions.length === 0) {
 						return {
 							success: false,
 							reply: `This picture has not been described so far!`
 						};
 					}
-					
+
 					const item = descriptions[context.params.index ?? 0];
 					if (!item) {
 						return {
@@ -693,7 +694,7 @@ module.exports = {
 							reply: `There is no description with this index!`
 						};
 					}
-					
+
 					const authorData = await sb.User.get(item.User_Alias);
 					return {
 						reply: `(Use index:0 to index:${descriptions.length}) Description from ${authorData.Name}: ${item.Text}`
