@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `chat_data`.`User_Alias_Data` (
-	`User_Alias` INT(11) NOT NULL,
+	`User_Alias` INT(10) UNSIGNED NOT NULL,
 	`Property` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`Value` MEDIUMTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	PRIMARY KEY (`User_Alias`, `Property`) USING BTREE,
