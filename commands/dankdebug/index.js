@@ -50,7 +50,7 @@ module.exports = {
 
 		if (context.params.function) {
 			script = context.params.function;
-			scriptArgs = args;
+			scriptArgs = [...args];
 		}
 		else if (!string.includes("return")) {
 			script = string;
