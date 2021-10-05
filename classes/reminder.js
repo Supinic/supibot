@@ -478,8 +478,8 @@ module.exports = class Reminder extends require("./template.js") {
 
 				const message = sb.Utils.tag.trim `
 					Hey ${notifySymbol}${targetUserData.Name},
-					you just got reminders, but there's something banphrased in them,
-					so you should check them out here instead: ${link}
+					you just got reminders, but they couldn't be displayed here.
+					Instead, check them out here: ${link}
 				`;
 
 				await channelData.send(message);
