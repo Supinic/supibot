@@ -37,20 +37,21 @@ module.exports = {
 			}
 		}
 
-		const [editorData, communityData, ...customData] = await Promise.all(dataPromises);
+		const [editorData, communityData, ...customData] = await Promise.allSettled(dataPromises);
 
 		const data = [];
-		if (editorData.statusCode === 200) {
-			data.push(...editorData.body);
+		if (editorData.status === "fulfilled" && editorData.value.statusCode === 200) {
+			data.push(...editorData.value.body);
 		}
-		if (communityData.statusCode === 200) {
-			data.push(...communityData.body);
+		if (communityData.status === "fulfilled" && communityData.value.statusCode === 200) {
+			data.push(...communityData.value.body);
 		}
 
+		const userIDList = sb.Config.get("ARTFLOW_AI_CUSTOM_USER_LIST");
 		for (let i = 0; i < customData.length; i++) {
-			if (customData[i].statusCode === 200) {
-				const userID = sb.Config.get("ARTFLOW_AI_CUSTOM_USER_LIST")[i];
-				const items = customData[i].body.map(i => ({ ...i, userID }));
+			if (customData[i].status === "fulfilled" && customData[i].value.statusCode === 200) {
+				const userID = userIDList[i];
+				const items = customData[i].value.body.map(i => ({ ...i, userID }));
 
 				data.push(...items);
 			}
