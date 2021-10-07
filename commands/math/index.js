@@ -4,8 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Does math. For more info, check the documentation for math.js",
-	Flags: ["external-input","mention","non-nullable","pipe"],
-	Params: null,
+	Flags: ["external-input","mention","non-nullable","pipe","use-params"],
+	Params: [
+		{ name: "precision", type: "number" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function math (context, ...args) {
@@ -16,13 +18,26 @@ module.exports = {
 			};
 		}
 
+		const parameters = {
+			expr: args.join(" ")
+		};
+
+		if (context.params.precision) {
+			if (!sb.Utils.isValidInteger(context.params.precision)) {
+				return {
+					success: false,
+					reply: "Provided precision must be a positive integer!"
+				};
+			}
+
+			parameters.precision = context.params.precision;
+		}
+
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
 			responseType: "json",
 			url: "https://api.mathjs.org/v4",
-			json: {
-				expr: args.join(" ")
-			}
+			json: parameters
 		});
 
 		if (response.body.error) {
