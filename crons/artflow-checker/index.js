@@ -44,16 +44,24 @@ module.exports = {
 			const formData = new sb.Got.FormData();
 			formData.append("my_work_id", value.imageIndex);
 
-			const check = await sb.Got("FakeAgent", {
-				method: "POST",
-				url: "https://artflow.ai/check_status",
-				headers: {
-					"x-requested-with": "XMLHttpRequest",
-					...formData.getHeaders()
-				},
-				body: formData.getBuffer(),
-				referrer: "https://artflow.ai/"
-			});
+			let check;
+			try {
+				check = await sb.Got("FakeAgent", {
+					method: "POST",
+					url: "https://artflow.ai/check_status",
+					headers: {
+						"x-requested-with": "XMLHttpRequest",
+						...formData.getHeaders()
+					},
+					body: formData.getBuffer(),
+					referrer: "https://artflow.ai/"
+				});
+			}
+			catch {
+				// If any non-HTTP error occurs, simply continue.
+				// All 5xx API errors are already ignored anyway.
+				continue;
+			}
 
 			const statusCodeDigit = Math.trunc(check.statusCode / 100);
 			if (statusCodeDigit === 5) { // 5xx response, API failed - ignore
