@@ -15,33 +15,25 @@ module.exports = {
 				reply: "No input provided!"
 			};
 		}
-	
-		const { statusCode, body: data } = await sb.Got("Leppunen", {
-			url: "math",
-			throwHttpErrors: false,
-			searchParams: new sb.URLParams()
-				.set("expr", args.join(" "))
-				.toString()
+
+		const response = await sb.Got("GenericAPI", {
+			method: "POST",
+			responseType: "json",
+			url: "https://api.mathjs.org/v4",
+			json: {
+				expr: args.join(" ")
+			}
 		});
-	
-		if (statusCode === 200 || statusCode === 503) {
+
+		if (response.body.error) {
 			return {
-				reply: (context.platform.Name === "discord")
-					? `\`${data.response}\``
-					: data.response
+				success: false,
+				reply: `Math failed: ${response.body.error}`
 			};
 		}
 		else {
-			if (statusCode >= 500) {
-				await sb.Platform.get("twitch").pm(
-					`Math command failed - server error ${statusCode} at ${sb.Date.now()}! monkaS`,
-					"leppunen"
-				);
-			}
-	
 			return {
-				success: false,
-				reply: `Math command failed due to request error ${statusCode}!`
+				reply: response.body.result
 			};
 		}
 	}),
@@ -49,15 +41,15 @@ module.exports = {
 		"Calculates advanced maths. You can use functions, derivatives, integrals, methods, ...",
 		`Look here for more info: <a href="https://mathjs.org/">mathjs documentation</a>`,
 		"",
-			
+
 		`<code>${prefix}math 1+1</code>`,
 		"2",
 		"",
-	
+
 		`<code>${prefix}math e^(i*pi)</code>`,
 		"-1 + 1.2246467991473532e-16i",
 		"",
-	
+
 		`<code>${prefix}math 100 inches to cm</code>`,
 		"254 cm",
 		""
