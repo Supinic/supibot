@@ -206,10 +206,15 @@ module.exports = class Reminder extends require("./template.js") {
 			.select("*")
 			.from("chat_data", "Reminder")
 			.where("Active = %b", true)
-			.where("Schedule IS NULL OR Schedule < (NOW() + INTERVAL 1 YEAR)")
 		);
 
+		const threshold = new sb.Date().addMonths(1).valueOf();
 		for (const row of data) {
+			// Skip scheduled reminders that are set to fire more than `threshold` in the future
+			if (row.Schedule && row.Schedule.valueOf() > threshold) {
+				continue;
+			}
+
 			const reminder = new Reminder(row);
 			Reminder.#add(reminder);
 		}
