@@ -42,7 +42,7 @@ module.exports = {
 			const records = data.flatMap(i => Object.entries(i.meaning));
 			const items = records.flatMap(([type, value]) => value.map(item => ({ type, definition: item.definition })));
 			if (items.length !== 0) {
-				result.push(`Dictionary: ${items[0].definition}`);
+				result.push(`Dictionary: "${items[0].definition}"`);
 			}
 		}
 
@@ -50,7 +50,7 @@ module.exports = {
 			const data = urbanData.value.body;
 			const match = data.results.find(i => i.term.toLowerCase() === query.toLowerCase());
 			if (match) {
-				result.push(`Urban: ${match.preview}`);
+				result.push(`Urban: "${match.preview}"`);
 			}
 		}
 
