@@ -31,38 +31,38 @@ module.exports = {
 			};
 		}
 
-		const searchData = await sb.Got({
+		const searchData = await sb.Got("GenericAPI", {
 			url: `https://${languageCode}.wikipedia.org/w/api.php`,
-			searchParams: new sb.URLParams()
-				.set("format", "json")
-				.set("action", "opensearch")
-				.set("limit", "1")
-				.set("profile", "fuzzy")
-				.set("search", args.join(" "))
-				.toString()
-		}).json();
+			searchParams: {
+				format: "json",
+				action: "opensearch",
+				limit: "10",
+				profile: "fuzzy",
+				search: args.join(" ")
+			}
+		});
 
-		if (searchData[1].length === 0) {
+		if (searchData[1].body.length === 0) {
 			return {
 				success: false,
 				reply: "No Wiki articles found for your query!"
 			};
 		}
 
-		const rawData = await sb.Got({
+		const response = await sb.Got("GenericAPI", {
 			url: `https://${languageCode}.wikipedia.org/w/api.php`,
-			searchParams: new sb.URLParams()
-				.set("format", "json")
-				.set("action", "query")
-				.set("prop", "extracts")
-				.set("redirects", "1")
-				.set("exintro", "1")
-				.set("explaintext", "1")
-				.set("titles", searchData[1])
-				.toString()
-		}).json();
+			searchParams: {
+				format: "json",
+				action: "query",
+				prop: "extracts",
+				redirects: "1",
+				exintro: "0",
+				explaintext: "0",
+				titles: searchData[1][0]
+			}
+		});
 
-		const data = rawData.query.pages;
+		const data = response.body.query.pages;
 		const key = Object.keys(data)[0];
 		if (key === "-1") {
 			return {
