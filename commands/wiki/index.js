@@ -42,7 +42,7 @@ module.exports = {
 			}
 		});
 
-		if (searchData[1].body.length === 0) {
+		if (searchData.body[1].length === 0) {
 			return {
 				success: false,
 				reply: "No Wiki articles found for your query!"
