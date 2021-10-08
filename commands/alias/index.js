@@ -948,7 +948,7 @@ module.exports = {
 					{
 						...context.append,
 						alias: true,
-						aliasArgs: resultArguments ?? [],
+						aliasArgs: aliasArguments ?? [],
 						aliasCount,
 						aliasStack: [...(context.append.aliasStack ?? []), name],
 						aliasTry,
