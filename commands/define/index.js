@@ -22,7 +22,7 @@ module.exports = {
 			searchParams: {
 				format: "json",
 				action: "opensearch",
-				limit: "1",
+				limit: "10",
 				profile: "fuzzy",
 				search: query
 			}
