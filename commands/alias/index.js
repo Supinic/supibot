@@ -948,7 +948,7 @@ module.exports = {
 					{
 						...context.append,
 						alias: true,
-						aliasArgs: runArgs.slice(1),
+						aliasArgs: Object.freeze(runArgs.slice(1)),
 						aliasCount,
 						aliasStack: [...(context.append.aliasStack ?? []), name],
 						aliasTry,
