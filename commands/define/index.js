@@ -49,7 +49,7 @@ module.exports = {
 		if (wikiData.status === "fulfilled" && wikiData.value.statusCode === 200) {
 			const searchData = wikiData.value.body;
 			if (searchData[1].length !== 0) {
-				const data = await sb.Got({
+				const data = await sb.Got("GenericAPI", {
 					url: `https://en.wikipedia.org/w/api.php`,
 					searchParams: {
 						format: "json",
