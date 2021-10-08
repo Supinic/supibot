@@ -69,7 +69,7 @@ module.exports = {
 
 		if (urbanData.status === "fulfilled" && urbanData.value.statusCode === 200) {
 			const data = urbanData.value.body;
-			const match = data.body.results.find(i => i.term.toLowerCase() === query.toLowerCase());
+			const match = data.results.find(i => i.term.toLowerCase() === query.toLowerCase());
 			if (match) {
 				result.push(`Urban: ${match.preview}`);
 			}
