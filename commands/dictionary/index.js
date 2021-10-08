@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "dictionary",
-	Aliases: ["define","def","dict"],
+	Aliases: ["dict"],
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the dictionary definition of a word. You can use \"lang:\" to specifiy a language, and if there are multiple definitions, you can add \"index:#\" with a number to access specific definition indexes.",
@@ -29,13 +29,6 @@ module.exports = {
 		]
 	})),
 	Code: (async function dictionary (context, ...args) {
-		if (context.invocation === "define" || context.invocation === "def") {
-			return {
-				success: false,
-				reply: `The "${context.invocation}" command will be renamed soon! Use $dict or $dictionary instead. Reference: Suggestion #9437`
-			};
-		}
-
 		if (args.length === 0) {
 			return {
 				success: false,
