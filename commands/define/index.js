@@ -42,7 +42,15 @@ module.exports = {
 			const records = data.flatMap(i => Object.entries(i.meaning));
 			const items = records.flatMap(([type, value]) => value.map(item => ({ type, definition: item.definition })));
 			if (items.length !== 0) {
-				result.push(`Dictionary: ${result.definition}`);
+				result.push(`Dictionary: ${items[0].definition}`);
+			}
+		}
+
+		if (urbanData.status === "fulfilled" && urbanData.value.statusCode === 200) {
+			const data = urbanData.value.body;
+			const match = data.results.find(i => i.term.toLowerCase() === query.toLowerCase());
+			if (match) {
+				result.push(`Urban: ${match.preview}`);
 			}
 		}
 
@@ -64,14 +72,6 @@ module.exports = {
 
 				const key = Object.keys(data.body.query.pages)[0];
 				result.push(`Wiki: https://en.wikipedia.org/?curid=${key}`);
-			}
-		}
-
-		if (urbanData.status === "fulfilled" && urbanData.value.statusCode === 200) {
-			const data = urbanData.value.body;
-			const match = data.results.find(i => i.term.toLowerCase() === query.toLowerCase());
-			if (match) {
-				result.push(`Urban: ${match.preview}`);
 			}
 		}
 
