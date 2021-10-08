@@ -58,7 +58,7 @@ module.exports = {
 				redirects: "1",
 				exintro: "0",
 				explaintext: "0",
-				titles: searchData[1][0]
+				titles: searchData.body[1][0]
 			}
 		});
 
