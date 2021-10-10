@@ -1,6 +1,15 @@
 const MessageScheduler = require("message-scheduler");
 const DankTwitch = require("dank-twitch-irc");
 
+const specialEmoteSetMap = {
+	472873131: "300636018", // Haha emotes
+	488737509: "300819901", // Luv emotes
+	537206155: "301450851", // Pride emotes
+	564265402: "301965751", // Hyper emotes
+	592920959: "302430190", // KPOP emotes
+	610186276: "302778679" // 2020 emotes
+};
+
 module.exports = class TwitchController extends require("./template.js") {
 	constructor () {
 		super();
@@ -999,13 +1008,17 @@ module.exports = class TwitchController extends require("./template.js") {
 
 	/**
 	 * Fetches a list of emote data for a given list of emote sets.
-	 * @param {string[]} sets
+	 * @param {string[]} inputSets
 	 * @returns {Promise<TwitchEmoteSetDataObject[]>}
 	 */
-	static async fetchTwitchEmotes (sets) {
+	static async fetchTwitchEmotes (inputSets) {
 		const data = [];
 		const sliceLength = 100;
 		let index = 0;
+
+		// Replace "special" emote sets that are not available with their "original" id with the one that is
+		// actually available in the emote set list
+		const sets = inputSets.map(i => specialEmoteSetMap[i] ?? i);
 
 		while (index < sets.length) {
 			const slice = sets.slice(index, index + sliceLength);
