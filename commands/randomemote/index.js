@@ -42,7 +42,7 @@ module.exports = {
 			"7tv": sevenTv,
 			animated,
 			bttv,
-			channel,
+			channel: channelString,
 			ffz,
 			global: globalEmotes,
 			sub,
@@ -50,36 +50,45 @@ module.exports = {
 		} = context.params;
 
 		let channelPrefixRegex;
-		if (channel) {
-			let channelPrefix;
-			const channelData = sb.Channel.get(channel, sb.Platform.get("twitch"));
+		if (channelString) {
+			const prefixList = [];
+			const channelList = channelString.split(/\W/);
+			for (const channel of channelList) {
+				let channelPrefix;
+				const channelData = sb.Channel.get(channel, sb.Platform.get("twitch"));
 
-			if (channelData) {
-				channelPrefix = await channelData.getCacheData("emote-prefix");
-			}
-
-			if (!channelPrefix) {
-				const response = await sb.Got("Leppunen", `v2/twitch/user/${channel}`);
-				if (response.statusCode === 404) {
-					return {
-						success: false,
-						reply: `Provided channel does not exist on Twitch!`
-					};
-				}
-				else if (!response.body.emotePrefix) {
-					return {
-						success: false,
-						reply: `Provided channel does not have a subscriber emote prefix!`
-					};
-				}
-
-				channelPrefix = response.body.emotePrefix;
 				if (channelData) {
-					await channelData.setCacheData("emote-prefix", channelPrefix, { expiry: 30 * 864e5 }); // cache for 30 days
+					channelPrefix = await channelData.getCacheData("emote-prefix");
 				}
+
+				if (!channelPrefix) {
+					const response = await sb.Got("Leppunen", `v2/twitch/user/${channel}`);
+					if (response.statusCode === 404) {
+						return {
+							success: false,
+							reply: `Provided channel does not exist on Twitch!`
+						};
+					}
+					else if (!response.body.emotePrefix) {
+						return {
+							success: false,
+							reply: `Provided channel does not have a subscriber emote prefix!`
+						};
+					}
+
+					channelPrefix = response.body.emotePrefix;
+					if (channelData) {
+						await channelData.setCacheData("emote-prefix", channelPrefix, { expiry: 30 * 864e5 }); // cache for 30 days
+					}
+				}
+
+				prefixList.push(channelPrefix);
 			}
 
-			channelPrefixRegex = new RegExp(`^${channelPrefix}[A-Z0-9][A-Za-z0-9]*$`);
+			if (prefixList.length !== 0) {
+				const string = prefixList.map(i => `${i}[A-Z0-9][A-Za-z0-9]*`).join("|");
+				channelPrefixRegex = new RegExp(`^${string}$`);
+			}
 		}
 
 		emotes = emotes.filter(i => {
@@ -170,7 +179,10 @@ module.exports = {
 			"If provided like this, then only unique emotes will be posted - no repeats.",
 			"",
 
-			`<code>${prefix}rem channel:(channel)</code>`,
+			`<code>${prefix}rem channel:(single channel or channel list)</code>`,
+			`<code>${prefix}rem channel:supinic</code>`,
+			`<code>${prefix}rem channel:supinic,pajlada,zneix</code>`,
+			`<code>${prefix}rem channel:"supinic pajlada forsen"</code>`,
 			"For a provided Twitch channel, this will attempt to use only its subscriber emotes that Supibot has available",
 			"",
 
