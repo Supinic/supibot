@@ -11,28 +11,27 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function profilePicture (context, username) {
-		const { statusCode, body } = await sb.Got("Helix", {
+		const login = sb.User.normalizeUsername(username ?? context.user.Name);
+		const response = await sb.Got("Helix", {
 			url: "users",
-			searchParams: {
-				login: (username ?? context.user.Name)
-			},
+			searchParams: { login },
 			throwHttpErrors: false
 		});
 
-		if (statusCode !== 200) {
+		if (response.statusCode !== 200) {
 			return {
 				success: false,
-				reply: `Could not fetch profile picture! ${body.message}`
+				reply: `Could not fetch profile picture! ${response.body.message}`
 			};
 		}
-		else if (body.data.length === 0) {
+		else if (response.body.data.length === 0) {
 			return {
 				success: false,
 				reply: `No such user found on Twitch!`
 			};
 		}
 
-		const [user] = body.data;
+		const [user] = response.body.data;
 		return {
 			reply: (context.params.linkOnly)
 				? user.profile_image_url
