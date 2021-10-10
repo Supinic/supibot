@@ -275,7 +275,11 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		message = message.replace(/\\/g, "\\\\");
 
-		const wrappedMessage = sb.Utils.wrapString(message, channelData.Message_Limit ?? this.platform.Message_Limit);
+		const limit = channelData.Message_Limit ?? this.platform.Message_Limit;
+		const wrappedMessage = sb.Utils.wrapString(message, limit, {
+			keepWhitespace: true
+		});
+
 		try {
 			await channelObject.send(wrappedMessage);
 		}
