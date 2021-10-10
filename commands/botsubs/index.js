@@ -74,7 +74,7 @@ module.exports = {
 		const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
 
 		if (message.length > limit) {
-			message = `Supibot is currently subscribed to ${result.length} channels: ${emotes}`;
+			message = `${result.length} channels: ${emotes}`;
 		}
 
 		return {
