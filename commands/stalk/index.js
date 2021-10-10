@@ -39,8 +39,8 @@ module.exports = {
 			};
 		}
 
-		const stalk = await sb.Query.getRecordset(rs => rs
-			.select("Last_Message_Text AS Text", "Last_Message_Posted AS Date", "Channel.Name AS Channel")
+		const stalkData = await sb.Query.getRecordset(rs => rs
+			.select("Last_Message_Text AS Text", "Last_Message_Posted AS Date", "Channel.ID AS ChannelID")
 			.select("Platform.Name AS Platform")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.join("chat_data", "Channel")
@@ -55,7 +55,7 @@ module.exports = {
 			.single()
 		);
 
-		if (!stalk) {
+		if (!stalkData) {
 			return {
 				reply: sb.Utils.tag.trim `
 					That user is in the database, but never showed up in chat.
@@ -64,25 +64,19 @@ module.exports = {
 			};
 		}
 
-		const delta = sb.Utils.timeDelta(stalk.Date);
-		const channel = (stalk.Platform === "Twitch" || stalk.Platform === "Mixer")
-			? `${stalk.Platform.toLowerCase()}-${stalk.Channel}`
-			: stalk.Platform;
+		const stalkChannelData = sb.Channel.get(stalkData.ChannelID);
+		const delta = sb.Utils.timeDelta(stalkData.Date);
 
 		return {
 			meta: {
 				skipWhitespaceCheck: true
 			},
-			partialReplies: [
-				{
-					bancheck: false,
-					message: `That user was last seen in chat ${delta}, (channel: ${channel}) their last message:`
-				},
-				{
-					bancheck: true,
-					message: stalk.Text
-				}
-			]
+			reply: sb.Utils.tag.trim `
+				That user was last seen in chat ${delta}, 
+				(${stalkChannelData.getFullName()})
+				their last message:
+				${stalkData.Text}
+			`
 		};
 	}),
 	Dynamic_Description: null
