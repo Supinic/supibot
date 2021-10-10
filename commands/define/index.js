@@ -29,10 +29,13 @@ module.exports = {
 		});
 
 		const urbanPromise = sb.Got("GenericAPI", {
-			url: "https://api.urbandictionary.com/v0/autocomplete-extra",
+			url: "https://api.urbandictionary.com/v0/define",
 			searchParams: {
 				term: query
-			}
+			},
+			throwHttpErrors: false,
+			retry: 0,
+			timeout: 5000
 		});
 
 		const result = [];
@@ -48,10 +51,10 @@ module.exports = {
 
 		if (urbanData.status === "fulfilled" && urbanData.value.statusCode === 200) {
 			const data = urbanData.value.body;
-			const match = data.results.find(i => i.term.toLowerCase() === query.toLowerCase());
-			if (match) {
-				result.push(`Urban: "${match.preview}"`);
-			}
+			const item = data.list[0];
+			const definition = sb.Utils.wrapString(item.definition, 150);
+
+			result.push(`Urban: "${definition}"`);
 		}
 
 		if (wikiData.status === "fulfilled" && wikiData.value.statusCode === 200) {
