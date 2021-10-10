@@ -221,15 +221,22 @@ module.exports = class Channel extends require("./template.js") {
 	}
 
 	/**
-	 * Returns a pretty-ish-fied name of the platform plus the channel, depending on the platform.
+	 * Returns the full name of a channel, including its platform name.
+	 * For Discord, uses the guild rather than the actual channel name.
 	 * @returns {string}
 	 */
-	getPlatformName () {
-		if (this.Platform.Name === "twitch" || this.Platform.Name === "mixer") {
-			return `${this.Platform.Name}-${this.Name}`;
+	getFullName () {
+		if (this.Platform.Name === "discord") {
+			if (this.Description) {
+				const [guild] = this.Description.split("-")
+				return `${this.Platform.Name}-${guild.trim()}`;
+			}
+			else {
+				return this.Platform.Name;
+			}
 		}
 		else {
-			return this.Platform.Name;
+			return `${this.Platform.Name}-${this.Name}`;
 		}
 	}
 

@@ -399,7 +399,7 @@ module.exports = class Reminder extends require("./template.js") {
 			}
 			else {
 				const fromUserData = await sb.User.get(reminder.User_From, false);
-				const channelName = channelData.getPlatformName();
+				const channelName = channelData.getFullName();
 
 				if (reminder.Private_Message) {
 					let platform = null;
