@@ -1030,7 +1030,14 @@ module.exports = class TwitchController extends require("./template.js") {
 			});
 
 			if (statusCode !== 200) {
-				console.warn("Fetching Twitch emotes failed", { statusCode, body, slice, sets });
+				await sb.Logger.log("Twitch.Warning", JSON.stringify({
+					message: "Fetching Twitch emotes failed",
+					statusCode,
+					body,
+					slice,
+					sets
+				}));
+
 				return [];
 			}
 
