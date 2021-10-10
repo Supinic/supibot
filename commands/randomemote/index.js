@@ -116,7 +116,7 @@ module.exports = {
 			if (context.params.regex && !context.params.regex.test(i.name)) {
 				return false;
 			}
-			if (channelPrefixRegex && !channelPrefixRegex.test(i.name)) {
+			if (channelPrefixRegex && (!channelPrefixRegex.test(i.name) || i.type !== "twitch-subscriber")) {
 				return false;
 			}
 
