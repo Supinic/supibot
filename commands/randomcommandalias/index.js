@@ -22,8 +22,8 @@ module.exports = {
 		const userData = await sb.User.get(randomAlias.User_Alias);
 		return {
 			reply: `
-				Random alias "${randomAlias.Name} from ${userData.Name}:
-				https://supinic.com/bot/user/alias/detail${randomAlias.ID}				
+				Random alias "${randomAlias.Name}" from ${userData.Name}:
+				https://supinic.com/bot/user/alias/detail/${randomAlias.ID}				
 			`
 		};
 	}),
