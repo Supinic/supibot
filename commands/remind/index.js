@@ -74,11 +74,11 @@ module.exports = {
 			.single()
 			.flat("1")
 		);
-		
+
 		if (!spotted) {
 			return {
 				success: false,
-				reply: `This user has never been seen in chat before, so you cannot remind them!`
+				reply: `I have never seen this user in chat before, so I cannot remind them!`
 			};
 		}
 
