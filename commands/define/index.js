@@ -52,9 +52,11 @@ module.exports = {
 		if (urbanData.status === "fulfilled" && urbanData.value.statusCode === 200) {
 			const data = urbanData.value.body;
 			const item = data.list[0];
-			const definition = sb.Utils.wrapString(item.definition, 150);
 
-			result.push(`Urban: "${definition}"`);
+			if (item) {
+				const definition = sb.Utils.wrapString(item.definition, 150);
+				result.push(`Urban: "${definition}"`);
+			}
 		}
 
 		if (wikiData.status === "fulfilled" && wikiData.value.statusCode === 200) {
