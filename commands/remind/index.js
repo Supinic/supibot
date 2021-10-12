@@ -66,6 +66,22 @@ module.exports = {
 			args.shift();
 		}
 
+		const spotted = await sb.Query.getRecordset(rs => rs
+			.select("1")
+			.from("chat_data", "Message_Meta_User_Alias")
+			.where("User_Alias = %n", targetUser.ID)
+			.limit(1)
+			.single()
+			.flat("1")
+		);
+		
+		if (!spotted) {
+			return {
+				success: false,
+				reply: `This user has never been seen in chat before, so you cannot remind them!`
+			};
+		}
+
 		let isPrivate = Boolean(context.invocation.includes("private") || context.params.private);
 		if (isPrivate && context.channel !== null) {
 			return {
