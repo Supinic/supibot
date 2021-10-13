@@ -36,6 +36,7 @@ module.exports = {
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
 			responseType: "json",
+			throwHttpErrors: false,
 			url: "https://api.mathjs.org/v4",
 			json: parameters
 		});
@@ -43,7 +44,7 @@ module.exports = {
 		if (response.body.error) {
 			return {
 				success: false,
-				reply: `Math failed: ${response.body.error}`
+				reply: `${response.body.error}`
 			};
 		}
 		else {
