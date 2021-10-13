@@ -10,6 +10,14 @@ const specialEmoteSetMap = {
 	610186276: "302778679" // 2020 emotes
 };
 
+const emoteGot = sb.Got.get("Global").extend({
+	mutableDefaults: true,
+	responseType: "json",
+	throwHttpErrors: false,
+	timeout: 2500,
+	retry: 1
+});
+
 module.exports = class TwitchController extends require("./template.js") {
 	constructor () {
 		super();
@@ -1075,10 +1083,8 @@ module.exports = class TwitchController extends require("./template.js") {
 			});
 		}
 
-		const { statusCode, body: data } = await sb.Got("GenericAPI", {
-			url: `https://api.betterttv.net/3/cached/users/twitch/${channelID}`,
-			responseType: "json",
-			throwHttpErrors: false
+		const { statusCode, body: data } = await emoteGot({
+			url: `https://api.betterttv.net/3/cached/users/twitch/${channelID}`
 		});
 
 		if (statusCode !== 200) {
@@ -1109,10 +1115,8 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	static async fetchChannelFFZEmotes (channelData) {
-		const { statusCode, body: data } = await sb.Got("GenericAPI", {
-			url: `https://api.frankerfacez.com/v1/room/${channelData.Name}`,
-			responseType: "json",
-			throwHttpErrors: false
+		const { statusCode, body: data } = await emoteGot({
+			url: `https://api.frankerfacez.com/v1/room/${channelData.Name}`
 		});
 
 		if (statusCode !== 200) {
@@ -1139,10 +1143,8 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	static async fetchChannelSevenTVEmotes (channelData) {
-		const { statusCode, body: data } = await sb.Got("GenericAPI", {
-			url: `https://api.7tv.app/v2/users/${channelData.Name}/emotes`,
-			responseType: "json",
-			throwHttpErrors: false
+		const { statusCode, body: data } = await emoteGot({
+			url: `https://api.7tv.app/v2/users/${channelData.Name}/emotes`
 		});
 
 		if (statusCode !== 200) {
@@ -1169,23 +1171,14 @@ module.exports = class TwitchController extends require("./template.js") {
 	 */
 	async fetchGlobalEmotes () {
 		const [bttv, ffz, sevenTv] = await Promise.allSettled([
-			sb.Got("GenericAPI", {
-				url: "https://api.betterttv.net/3/cached/emotes/global",
-				responseType: "json",
-				timeout: 2500,
-				retry: 1
+			emoteGot({
+				url: "https://api.betterttv.net/3/cached/emotes/global"
 			}),
-			sb.Got("GenericAPI", {
-				url: "https://api.frankerfacez.com/v1/set/global",
-				responseType: "json",
-				timeout: 2500,
-				retry: 1
+			emoteGot({
+				url: "https://api.frankerfacez.com/v1/set/global"
 			}),
-			sb.Got("GenericAPI", {
-				url: "https://api.7tv.app/v2/emotes/global",
-				responseType: "json",
-				timeout: 2500,
-				retry: 1
+			emoteGot({
+				url: "https://api.7tv.app/v2/emotes/global"
 			})
 		]);
 
