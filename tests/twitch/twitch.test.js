@@ -78,6 +78,12 @@ const initialize = (async () => {
 		})]
 	]);
 
+	sb.Got = {
+		get: () => ({
+			extend: () => {}
+		})
+	};
+
 	const userCheck = await sb.User.get("supinic");
 	assert.strictEqual(userCheck instanceof sb.User, true);
 
