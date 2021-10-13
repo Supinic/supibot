@@ -10,6 +10,7 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
+		leaderboardKeywords: ["leader", "leaders", "leaderboard", "winners"],
 		patterns: [
 			{
 				name: "nam",
@@ -194,9 +195,9 @@ module.exports = {
 		]
 	})),
 	Code: (async function slots (context, ...args) {
-		if (args[0] === "leader" || args[0] === "leaders") {
+		if (this.staticData.leaderboardKeywords.includes(args[0])) {
 			return {
-				reply: "Check out all the previous slots winners here! https://supinic.com/data/slots-winner/list",
+				reply: "Check out all the previous slots winners here: https://supinic.com/data/slots-winner/list",
 				cooldown: 5000
 			};
 		}
@@ -339,7 +340,7 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async (prefix, values) => {
-		const { patterns } = values.getStaticData();
+		const { leaderboardKeywords, patterns } = values.getStaticData();
 		const patternList = patterns
 			.sort((a, b) => a.name.localeCompare(b.name))
 			.map(i => `<li><code>${i.name}</code><br>${i.notes}</li>`)
@@ -359,7 +360,12 @@ module.exports = {
 			"",
 
 			"Supported patterns:",
-			`<ul>${patternList}</ul>`
+			`<ul>${patternList}</ul>`,
+			"",
+
+			...leaderboardKeywords.map(i => `<code>${prefix}slots ${i}</code>`),
+			"Posts a link to the slots winners leaderboard, sorted by the odds of winning.",
+			`You can also check it out here: <a href="/data/slots-winner/list">Slots winners list</a>`
 		];
 	})
 };
