@@ -158,8 +158,8 @@ module.exports = class Controller {
 
 /**
  * @typedef {Object} TypedEmote Describes any emote
- * @property {string} code
- * @property {string} [ID]
+ * @property {string} ID
+ * @property {string} name
  * @property {string} type
  * @property {boolean} global
  * @property {boolean} animated
