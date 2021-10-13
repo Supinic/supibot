@@ -361,7 +361,6 @@ module.exports = {
 
 			"Supported patterns:",
 			`<ul>${patternList}</ul>`,
-			"",
 
 			...leaderboardKeywords.map(i => `<code>${prefix}slots ${i}</code>`),
 			"Posts a link to the slots winners leaderboard, sorted by the odds of winning.",
