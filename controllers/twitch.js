@@ -982,7 +982,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	async fetchUserList (channelIdentifier) {
-		const { statusCode, body: data } = await sb.Got({
+		const { statusCode, body: data } = await sb.Got("GenericAPI", {
 			url: `https://tmi.twitch.tv/group/user/${channelIdentifier}/chatters`,
 			responseType: "json",
 			throwHttpErrors: false
@@ -1075,7 +1075,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			});
 		}
 
-		const { statusCode, body: data } = await sb.Got({
+		const { statusCode, body: data } = await sb.Got("GenericAPI", {
 			url: `https://api.betterttv.net/3/cached/users/twitch/${channelID}`,
 			responseType: "json",
 			throwHttpErrors: false
@@ -1109,7 +1109,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	static async fetchChannelFFZEmotes (channelData) {
-		const { statusCode, body: data } = await sb.Got({
+		const { statusCode, body: data } = await sb.Got("GenericAPI", {
 			url: `https://api.frankerfacez.com/v1/room/${channelData.Name}`,
 			responseType: "json",
 			throwHttpErrors: false
@@ -1139,7 +1139,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	static async fetchChannelSevenTVEmotes (channelData) {
-		const { statusCode, body: data } = await sb.Got({
+		const { statusCode, body: data } = await sb.Got("GenericAPI", {
 			url: `https://api.7tv.app/v2/users/${channelData.Name}/emotes`,
 			responseType: "json",
 			throwHttpErrors: false
@@ -1169,20 +1169,23 @@ module.exports = class TwitchController extends require("./template.js") {
 	 */
 	async fetchGlobalEmotes () {
 		const [bttv, ffz, sevenTv] = await Promise.allSettled([
-			sb.Got({
+			sb.Got("GenericAPI", {
 				url: "https://api.betterttv.net/3/cached/emotes/global",
 				responseType: "json",
-				throwHttpErrors: false
+				timeout: 2500,
+				retry: 1
 			}),
-			sb.Got({
+			sb.Got("GenericAPI", {
 				url: "https://api.frankerfacez.com/v1/set/global",
 				responseType: "json",
-				throwHttpErrors: false
+				timeout: 2500,
+				retry: 1
 			}),
-			sb.Got({
+			sb.Got("GenericAPI", {
 				url: "https://api.7tv.app/v2/emotes/global",
 				responseType: "json",
-				throwHttpErrors: false
+				timeout: 2500,
+				retry: 1
 			})
 		]);
 
