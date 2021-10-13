@@ -1082,7 +1082,10 @@ module.exports = class TwitchController extends require("./template.js") {
 		});
 
 		if (statusCode !== 200) {
-			console.warn("BTTV emote fetch failed", { statusCode, data });
+			if (statusCode !== 404) {
+				await sb.Logger.log("Twitch.Warning", `BTTV emote fetch failed, code: ${statusCode}`, channelData);
+			}
+
 			return [];
 		}
 
@@ -1114,7 +1117,7 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		if (statusCode !== 200) {
 			if (statusCode !== 404) {
-				console.warn("FFZ emote fetch failed", { statusCode, data });
+				await sb.Logger.log("Twitch.Warning", `FFZ emote fetch failed, code: ${statusCode}`, channelData);
 			}
 
 			return [];
@@ -1144,7 +1147,7 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		if (statusCode !== 200) {
 			if (statusCode !== 404) {
-				console.warn("7TV emote fetch failed", { statusCode, data });
+				await sb.Logger.log("Twitch.Warning", `7TV emote fetch failed, code: ${statusCode}`, channelData);
 			}
 
 			return [];
@@ -1232,13 +1235,17 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	async fetchChannelEmotes (channelData) {
-		const [bttv, ffz, sevenTv] = await Promise.all([
+		const [bttv, ffz, sevenTv] = await Promise.allSettled([
 			TwitchController.fetchChannelBTTVEmotes(channelData),
 			TwitchController.fetchChannelFFZEmotes(channelData),
 			TwitchController.fetchChannelSevenTVEmotes(channelData)
 		]);
 
-		return [...bttv, ...ffz, ...sevenTv];
+		return [
+			...(bttv.value ?? []),
+			...(ffz.value ?? []),
+			...(sevenTv.value ?? [])
+		];
 	}
 
 	destroy () {
