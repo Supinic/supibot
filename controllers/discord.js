@@ -52,7 +52,8 @@ module.exports = class DiscordController extends require("./template.js") {
 				const json = JSON.stringify({
 					chan,
 					discordID,
-					guild,
+					guildName: guild?.name ?? null,
+					guildMembers: guild?.memberCount ?? null,
 					msg,
 					user,
 					userLength: user.length
