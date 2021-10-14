@@ -298,7 +298,15 @@ module.exports = {
 		}
 
 		const input = context.params.language ?? context.params.lang ?? "en-us";
-		const code = sb.Utils.modules.languageISO.getCode(input);
+
+		let code;
+		if (input === "random") {
+			const randomItem = sb.Utils.randArray(this.staticData.locales);
+			code = randomItem.locale;
+		}
+		else {
+			code = sb.Utils.modules.languageISO.getCode(input);
+		}
 
 		if (code === "lt") {
 			const response = await sb.Got("FakeAgent", {
@@ -436,6 +444,10 @@ module.exports = {
 
 			`<code>${prefix}tts lang:en-au Once a jolly swagman, camped by a billabong, under the shade of a Coolibah tree.</code>`,
 			"Plays the TTS using Australian English. You must use the locale to access this voice, because English has multiple locales - Australian, Canadian UK English, US English, Indian, ....",
+			"",
+
+			`<code>${prefix}tts lang:random (your message)</code>`,
+			"Plays the TTS using a random supported language",
 			"",
 
 			"Available locales:",
