@@ -60,40 +60,65 @@ module.exports = {
 			this.data.videos = result.map(i => i.ID);
 		}
 
-		let videoID;
-		if (sb.Utils.random(1, 3) === 1) {
-			const filtered = this.data.videos.filter(i => !this.data.repeats.includes(i));
-			videoID = sb.Utils.randArray(filtered);
-		}
-		else {
-			const links = await sb.Query.getRecordset(rs => rs
-				.select("Track.Link AS Link")
-				.from("music", "User_Favourite")
-				.where("User_Alias = %n", 1)
-				.where("Video_Type = %n", 1)
-				.where(
-					{ condition: this.data.repeats.length > 0 },
-					"Track.Link NOT IN %s+",
-					this.data.repeats
-				)
-				.join("music", "Track")
-				.flat("Link")
+		let link;
+		if (sb.Utils.random(1, 2) === 1) {
+			const videoData = await sb.Query.getRecordset(rs => rs
+				.select("Link", "Video_Type")
+				.from("personal", "Favourite_Track")
+				.orderBy("RAND()")
+				.limit(1)
+				.single()
 			);
 
-			videoID = sb.Utils.randArray(links);
+			const prefix = await sb.Query.getRecordset(rs => rs
+				.select("Link_Prefix")
+				.from("data", "Video_Type")
+				.where("ID = %n", videoData.Video_Type)
+				.limit(1)
+				.single()
+				.flat("Link_Prefix")
+			);
+
+			link = prefix.replace("$", videoData.Link);
+		}
+		else {
+			const roll = sb.Utils.random(1, 3);
+			if (roll === 1) {
+				const filtered = this.data.videos.filter(i => !this.data.repeats.includes(i));
+				const videoID = sb.Utils.randArray(filtered);
+
+				link = `https://youtu.be/${videoID}`;
+			}
+			else {
+				const links = await sb.Query.getRecordset(rs => rs
+					.select("Track.Link AS Link")
+					.from("music", "User_Favourite")
+					.where("User_Alias = %n", 1)
+					.where("Video_Type = %n", 1)
+					.where(
+						{ condition: this.data.repeats.length > 0 },
+						"Track.Link NOT IN %s+",
+						this.data.repeats
+					)
+					.join("music", "Track")
+					.flat("Link")
+				);
+
+				const videoID = sb.Utils.randArray(links);
+				link = `https://youtu.be/${videoID}`;
+			}
 		}
 
 		// If there are no applicable video IDs, this means we ran out of possible videos.
 		// Clear and abort this invocation
-		if (!videoID) {
+		if (!link) {
 			this.data.repeats = [];
 			return;
 		}
 
-		this.data.repeats.push(videoID);
+		this.data.repeats.push(link);
 		this.data.repeats.splice(0, this.data.repeats - this.data.repeatsAmount);
 
-		const link = `https://youtu.be/${videoID}`;
 		if (state === "vlc") {
 			const self = await sb.User.get("supibot");
 			const sr = sb.Command.get("sr");
