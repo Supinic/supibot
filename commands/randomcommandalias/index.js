@@ -50,10 +50,9 @@ module.exports = {
 			};
 		}
 
-		const userData = await sb.User.get(randomAlias.User_Alias);
 		return {
 			reply: `
-				Random alias "${randomAlias.Name}" from ${userData.Name}:
+				Random alias for your query:
 				https://supinic.com/bot/user/alias/detail/${randomAlias.ID}				
 			`
 		};
