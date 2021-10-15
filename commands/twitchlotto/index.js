@@ -407,8 +407,9 @@ module.exports = {
 			"Rolls a random picture sourced from Twitch channels. The data is from the Twitchlotto website",
 			"You can specify a channel from the list below to get links only from there.",
 			`You will get an approximation of "NSFW score" by an AI, so keep an eye out for that.`,
+			"",
 
-			"<h6> Safe mode </h6>",
+			"<h5> Safe mode </h5>",
 			`All channels start with "Safe mode" turned on by default. In this mode, strict filtering is applied:`,
 			`<ul>
 				<li>Only already scored images are available</li>
@@ -422,8 +423,7 @@ module.exports = {
 			"Caution! With safe mode off, the images are not filtered by above means and can be quite NSFW.",
 			"",
 
-			"<h6> Command usage </h6>",
-
+			"<h5> Command usage </h5>",
 			`<code>${prefix}tl</code>`,
 			`<code>${prefix}twitchlotto</code>`,
 			"Fetches a random image from any channel - channels with more images have a bigger chance to be picked",
