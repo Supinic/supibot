@@ -53,7 +53,7 @@ module.exports = {
 		})
 	})),
 	Code: (async function twitchLotto (context, channel) {
-		if (context.params.safeMode) {
+		if (typeof context.params.safeMode === "boolean") {
 			if (!context.channel) {
 				return {
 					success: false,
