@@ -41,6 +41,13 @@ module.exports = {
 			.limit(1)
 			.single()
 		);
+		
+		if (!randomAlias) {
+			return {
+				success: false,
+				reply: `No command alias has been found for your query!`
+			};
+		}
 
 		const userData = await sb.User.get(randomAlias.User_Alias);
 		return {
