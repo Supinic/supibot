@@ -309,6 +309,7 @@ module.exports = {
 			image.Score = sb.Utils.round(data.score, 4);
 		}
 
+		const blacklistedFlags = context.channel?.Data.twitchLottoBlacklistedFlags ?? [];
 		const imageNSFWScore = `${sb.Utils.round(image.Score * 100, 2)}%`;
 		if (safeMode && blacklistedFlags.length === 0) {
 			if (imageFlags.length > 0) {
@@ -334,9 +335,7 @@ module.exports = {
 			detectionsString.push(...strings);
 		}
 
-		const blacklistedFlags = context.channel?.Data.twitchLottoBlacklistedFlags ?? [];
 		const imageFlags = image.Adult_Flags ?? [];
-
 		const illegalFlags = imageFlags.map(i => i.toLowerCase()).filter(i => blacklistedFlags.includes(i));
 		if (illegalFlags.length > 0) {
 			return {
