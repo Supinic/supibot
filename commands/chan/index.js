@@ -47,20 +47,17 @@ module.exports = {
 			}
 		};
 
+		if (context.channel.NSFW) {
+			enabled.content.nsfw = true;
+			enabled.file.nsfw = true;
+		}
+
 		if (context.platform.Name === "discord") {
 			enabled.file.sfw = true;
 			enabled.content.nsfw = true;
-
-			if (context.channel?.NSFW) {
-				enabled.file.nsfw = true;
-			}
 		}
 		else if (context.platform.Name === "twitch" && context.channel?.Links_Allowed) {
 			enabled.file.sfw = true;
-		}
-		else {
-			enabled.content.nsfw = Boolean(context.channel?.NSFW);
-			enabled.file.nsfw = Boolean(context.channel?.NSFW);
 		}
 
 		let resultType = (context.channel?.NSFW)
