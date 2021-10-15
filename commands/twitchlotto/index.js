@@ -3,16 +3,18 @@ module.exports = {
 	Aliases: ["tl"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Fetches a random Imgur image from a Twitch channel (based off Twitchlotto) and checks it for NSFW stuff via an AI. The \"nudity score\" is posted along with the link.",
-	Flags: ["mention","whitelist"],
+	Description: "Fetches a random Imgur image from a Twitch channel (based off Twitchlotto) and checks it for NSFW stuff via an AI. The \"NSFW score\" is posted along with the link.",
+	Flags: ["mention"],
 	Params: [
 		{ name: "excludeChannel", type: "string" },
 		{ name: "excludeChannels", type: "string" },
 		{ name: "forceUnscored", type: "boolean" },
-		{ name: "preferUnscored", type: "boolean" }
+		{ name: "preferUnscored", type: "boolean" },
+		{ name: "safeMode", type: "boolean" }
 	],
 	Whitelist_Response: "This command can't be executed here!",
 	Static_Data: (() => ({
+		scoreThreshold: 0.5,
 		detections: [
 			{
 				string: "Male Breast - Exposed",
@@ -51,6 +53,30 @@ module.exports = {
 		})
 	})),
 	Code: (async function twitchLotto (context, channel) {
+		if (context.params.safeMode) {
+			if (!context.channel) {
+				return {
+					success: false,
+					reply: `This setting cannot be applied in whispers!`
+				};
+			}
+
+			const permissions = await context.getUserPermissions();
+			if (permissions.flag === sb.User.permissions.regular) {
+				return {
+					success: false,
+					reply: `Only channel owners or ambassadors can set this setting!`
+				};
+			}
+
+			context.channel.Data.twitchLottoSafeMode = context.params.safeMode;
+			await context.channel.saveProperty("Data");
+
+			return {
+				reply: `Successfully set this channel's TwitchLotto safe mode to ${context.params.safeMode}.`
+			};
+		}
+
 		if (!this.data.channels) {
 			this.data.channels = await sb.Query.getRecordset(rs => rs
 				.select("LOWER(Name) AS Name")
@@ -121,12 +147,33 @@ module.exports = {
 			this.data.counts.total = total;
 		}
 
+		const safeMode = context.channel?.Data.twitchLottoSafeMode ?? true;
+
 		// Now try to find an image that is available.
 		let image = null;
 		let failedTries = 0;
 		while (image === null) {
-			if (context.params.forceUnscored) {
-				if (!channel) {
+			if (safeMode) {
+				image = await sb.Query.getRecordset(rs => rs
+					.select("*")
+					.from("data", "Twitch_Lotto")
+					.where({ condition: Boolean(channel) }, "Channel = %s", channel)
+					.where("Score IS NULL")
+					.where("Available IS NULL OR Available = %b", true)
+					.where("Adult_Flags IS NOT NULL OR Adult_Flags = %s", "None")
+					.orderBy("RAND()")
+					.limit(1)
+					.single()
+				);
+			}
+			else if (context.params.forceUnscored) {
+				if (safeMode) {
+					return {
+						success: false,
+						reply: `Cannot use the "forceUnscored" parameter in safe mode!`
+					};
+				}
+				else if (!channel) {
 					return {
 						success: false,
 						reply: `When using the forceUnscored parameter, a channel must be provided!`
@@ -262,6 +309,23 @@ module.exports = {
 			image.Score = sb.Utils.round(data.score, 4);
 		}
 
+		const imageNSFWScore = `${sb.Utils.round(image.Score * 100, 2)}%`;
+		if (safeMode && blacklistedFlags.length === 0) {
+			if (imageFlags.length > 0) {
+				return {
+					success: false,
+					reply: `Cannot post image! It contains the following NSFW flags: ${imageFlags.join(", ")}`
+				};
+			}
+			else if (image.Score > this.staticData.scoreThreshold) {
+				const thresholdPercent = `${sb.Utils.round(this.staticData.scoreThreshold * 100, 2)}%`;
+				return {
+					success: false,
+					reply: `Cannot post image! Its NSFW score (${imageNSFWScore}) is higher than the threshold (${thresholdPercent}).`
+				};
+			}
+		}
+
 		const detectionsString = [];
 		const { detections } = JSON.parse(image.Data);
 		for (const { replacement, string } of this.staticData.detections) {
@@ -313,7 +377,10 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async (prefix, values) => {
+		const { scoreThreshold } = values.getStaticData();
+		const thresholdPercent = `${sb.Utils.round(scoreThreshold, 2)}%`;
+
 		const countData = await sb.Query.getRecordset(rs => rs
 			.select("Name", "Amount", "Scored")
 			.from("data", "Twitch_Lotto_Channel")
@@ -340,9 +407,23 @@ module.exports = {
 
 			"Rolls a random picture sourced from Twitch channels. The data is from the Twitchlotto website",
 			"You can specify a channel from the list below to get links only from there.",
-			"Caution! The images are not filtered by any means and can be NSFW.",
 			`You will get an approximation of "NSFW score" by an AI, so keep an eye out for that.`,
+
+			"<h6> Safe mode </h6>",
+			`All channels start with "Safe mode" turned on by default. In this mode, strict filtering is applied:`,
+			`<ul>
+				<li>Only already scored images are available</li>
+				<li>Only images with manual confirmation of no adult content are available</li>
+				<li>Only images below the threshold of ${thresholdPercent} NSFW can be posted</li>
+			</ul>`,
+
+			`<code>${prefix}tl safeMode:true</code>`,
+			`<code>${prefix}tl safeMode:false</code>`,
+			"Toggles the TwitchLotto safe mode on or off. Only channel owners or ambassadors can set this setting.",
+			"Caution! With safe mode off, the images are not filtered by above means and can be quite NSFW.",
 			"",
+
+			"<h6> Command usage </h6>",
 
 			`<code>${prefix}tl</code>`,
 			`<code>${prefix}twitchlotto</code>`,
