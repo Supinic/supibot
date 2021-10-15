@@ -6,10 +6,10 @@ module.exports = {
 	Description: "Posts a random Supibot command alias. Can be configured to create a somewhat precise search query.",
 	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
+		{ name: "body", type: "string" },
 		{ name: "command", type: "string" },
 		{ name: "createdAfter", type: "date" },
 		{ name: "createdBefore", type: "date" },
-		{ name: "invocation", type: "string" },
 		{ name: "name", type: "string" },
 		{ name: "user", type: "string" }
 	],
@@ -33,7 +33,7 @@ module.exports = {
 			.where({ condition: Boolean(context.params.command) }, "Command = %s", context.params.command)
 			.where({ condition: Boolean(context.params.createdAfter) }, "Created > %d", context.params.createdAfter)
 			.where({ condition: Boolean(context.params.createdBefore) }, "Created < %d", context.params.createdBefore)
-			.where({ condition: Boolean(context.params.invocation) }, "Invocation %*like*", context.params.invocation)
+			.where({ condition: Boolean(context.params.body) }, "Arguments %*like*", context.params.body)
 			.where({ condition: Boolean(context.params.name) }, "Name = %s", context.params.name)
 			.where("Command IS NOT NULL")
 			.where("Parent IS NULL OR Edited IS NOT NULL") // either an original alias or an edited copy
@@ -41,7 +41,7 @@ module.exports = {
 			.limit(1)
 			.single()
 		);
-		
+
 		if (!randomAlias) {
 			return {
 				success: false,
