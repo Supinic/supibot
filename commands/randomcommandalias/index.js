@@ -35,7 +35,7 @@ module.exports = {
 			.where({ condition: Boolean(context.params.createdBefore) }, "Created < %d", context.params.createdBefore)
 			.where({ condition: Boolean(context.params.body) }, "Arguments %*like*", context.params.body)
 			.where({ condition: Boolean(context.params.name) }, "Name = %s", context.params.name)
-			.where({ condition: Boolean(targetUserAlias) }, "User_Alias = %n", targetUserAlias.ID)
+			.where({ condition: Boolean(targetUserAlias) }, "User_Alias = %n", targetUserAlias?.ID)
 			.where("Command IS NOT NULL")
 			.where("Parent IS NULL OR Edited IS NOT NULL") // either an original alias or an edited copy
 			.orderBy("RAND()")
