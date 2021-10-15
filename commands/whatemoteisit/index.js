@@ -10,8 +10,8 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		regexV1: /^\d+$/,
-		regexV2: /^emotesv2_[a-z0-9]{32}$/
+		regexV1: /\d+/,
+		regexV2: /emotesv2_[a-z0-9]{32}/
 	})),
 	Code: (async function whatEmoteIsIt (context, input) {
 		if (!input) {
