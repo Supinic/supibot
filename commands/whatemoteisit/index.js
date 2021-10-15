@@ -10,7 +10,7 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		regexV1: /\d+/,
+		regexV1: /^\d+$/,
 		regexV2: /emotesv2_[a-z0-9]{32}/
 	})),
 	Code: (async function whatEmoteIsIt (context, input) {
@@ -28,9 +28,21 @@ module.exports = {
 		const { regexV1, regexV2 } = this.staticData;
 		const isEmoteID = (regexV1.test(input) || regexV2.test(input));
 
+		let inputEmoteIdentifier = input;
+		if (isEmoteID) {
+			if (regexV2.test(input)) {
+				inputEmoteIdentifier = input.match(regexV2)[0];
+			}
+			else if (regexV1.test(input)) {
+				inputEmoteIdentifier = input.match(regexV1)[0];
+			}
+		}
+
 		const response = await sb.Got("Leppunen", {
-			url: `v2/twitch/emotes/${input}`,
-			searchParams: (isEmoteID) ? { id: "true" } : {},
+			url: `v2/twitch/emotes/${inputEmoteIdentifier}`,
+			searchParams: {
+				id: String(isEmoteID) // literally "true" or "false" based on if the intput is an emote ID
+			},
 			throwHttpErrors: false
 		});
 
