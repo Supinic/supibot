@@ -873,6 +873,13 @@ module.exports = {
 				);
 
 				if (!alias) {
+					if (!this.staticData.nameCheck.regex.test(name)) {
+						return {
+							success: false,
+							reply: null
+						};
+					}
+
 					const who = (user === context.user) ? "You" : "They";
 					return {
 						success: false,
