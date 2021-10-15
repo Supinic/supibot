@@ -378,7 +378,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { scoreThreshold } = values.getStaticData();
-		const thresholdPercent = `${sb.Utils.round(scoreThreshold, 2)}%`;
+		const thresholdPercent = `${sb.Utils.round(scoreThreshold * 100, 2)}%`;
 
 		const countData = await sb.Query.getRecordset(rs => rs
 			.select("Name", "Amount", "Scored")
