@@ -297,12 +297,12 @@ module.exports = {
 			};
 		}
 
-		const input = context.params.language ?? context.params.lang ?? "en-us";
-
 		let code;
+		let input = context.params.language ?? context.params.lang ?? "en-us";
+
 		if (input === "random") {
 			const randomItem = sb.Utils.randArray(this.staticData.locales);
-			code = randomItem.locale;
+			input = randomItem.locale;
 		}
 		else {
 			code = sb.Utils.modules.languageISO.getCode(input);
