@@ -30,11 +30,11 @@ module.exports = {
 		const randomAlias = await sb.Query.getRecordset(rs => rs
 			.select("ID", "User_Alias", "Name")
 			.from("data", "Custom_Command_Alias")
-			.where({ condition: context.params.command }, "Command = %s", context.params.command)
-			.where({ condition: context.params.createdAfter }, "Created > %d", context.params.createdAfter)
-			.where({ condition: context.params.createdBefore }, "Created < %d", context.params.createdBefore)
-			.where({ condition: context.params.invocation }, "Invocation %*like*", context.params.invocation)
-			.where({ condition: context.params.name }, "Name = %s", context.params.name)
+			.where({ condition: Boolean(context.params.command) }, "Command = %s", context.params.command)
+			.where({ condition: Boolean(context.params.createdAfter) }, "Created > %d", context.params.createdAfter)
+			.where({ condition: Boolean(context.params.createdBefore) }, "Created < %d", context.params.createdBefore)
+			.where({ condition: Boolean(context.params.invocation) }, "Invocation %*like*", context.params.invocation)
+			.where({ condition: Boolean(context.params.name) }, "Name = %s", context.params.name)
 			.where("Command IS NOT NULL")
 			.where("Parent IS NULL OR Edited IS NOT NULL") // either an original alias or an edited copy
 			.orderBy("RAND()")
