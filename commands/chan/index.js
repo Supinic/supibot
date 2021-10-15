@@ -64,6 +64,7 @@ module.exports = {
 			? "file"
 			: "content";
 
+
 		if (context.invocation === "textchan") {
 			resultType = "content";
 		}
@@ -235,14 +236,14 @@ module.exports = {
 			return {
 				reply: (context.params.textOnly)
 					? `${post.file} ${post.content}`
-					: `${post.ID} (posted ${delta}): ${post.file} ${post.content}`
+					: `${post.ID} (posted ${delta}): ${post.file} ${post.content ?? ""}`
 			};
 		}
 		else if (resultType === "content") {
 			return {
 				reply: (context.params.textOnly)
 					? `${post.content}`
-					: `${post.ID} (posted ${delta}): ${post.content}`
+					: `${post.ID} (posted ${delta}): ${post.content ?? ""}`
 			};
 		}
 	}),
