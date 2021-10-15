@@ -58,5 +58,34 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"Posts a random command alias -- either completely random or filtered by parameters",
+		"Unchanged alias copies and linked aliases will not be rolled - awwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwws they are identical to their parent aliases.",
+		"",
+
+		`<code>${prefix}rca</code>`,
+		"Posts a completely random command alias.",
+		"",
+
+		`<code>${prefix}rca command:(command name)</code>`,
+		"Filters aliases by ones that use the specified command as their main command (e.g. not inside of <code>$pipe</code>).",
+		"",
+
+		`<code>${prefix}rca createdAfter:(date)</code>`,
+		`<code>${prefix}rca createdBefore:(date)</code>`,
+		"Filters aliases by their creation time.",
+		"",
+
+		`<code>${prefix}rca body:(definition)</code>`,
+		"Filters aliases by their definition contents, e.g. parameters, arguments, pipe commands, ...",
+		"",
+
+		`<code>${prefix}rca name:(name)</code>`,
+		"Filters aliases by their names.",
+		"",
+
+		`<code>${prefix}rca user:(user name)</code>`,
+		"Filters aliases by their owners.",
+		""
+	])
 };
