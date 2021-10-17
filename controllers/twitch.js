@@ -469,6 +469,9 @@ module.exports = class TwitchController extends require("./template.js") {
 	async send (message, channel) {
 		const channelData = sb.Channel.get(channel, this.platform);
 		const channelName = channelData.Name;
+
+		message = message.replace(/\s+/g, " ").trim();
+
 		if (channelData.Mode === "Inactive" || channelData.Mode === "Read") {
 			return;
 		}
@@ -523,8 +526,6 @@ module.exports = class TwitchController extends require("./template.js") {
 				message += ` ${char}`;
 			}
 		}
-
-		message = message.replace(/\s+/g, " ");
 
 		this.evasion[channelName] = message;
 		this.queues[channelName].schedule(message);
