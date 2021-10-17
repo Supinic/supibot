@@ -480,7 +480,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				await this.client.say(channelName, message);
 			}
 			catch (e) {
-				await sb.Logger.log("Twitch.Warning", String(e), { ID: channelData.ID }, null);
+				await sb.Logger.log("Twitch.Warning", String(e), channelData, null);
 			}
 
 			return;
