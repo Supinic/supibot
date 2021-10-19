@@ -888,12 +888,17 @@ module.exports = {
 				}
 				else if (alias.Command === null && alias.Parent !== null) {
 					alias = await sb.Query.getRecordset(rs => rs
-						.select("Command", "Invocation", "Arguments", "Parent")
+						.select("User_Alias", "Command", "Invocation", "Arguments", "Parent")
 						.from("data", "Custom_Command_Alias")
 						.where("ID = %n", alias.Parent)
 						.limit(1)
 						.single()
 					);
+
+					// When running a linked alias, make sure to actually use the link owner's data -
+					// as if using $alias try (user) (linked alias)
+					type = "try";
+					user = await sb.User.get(alias.User_Alias);
 				}
 				else if (alias.Command === null && alias.Parent === null) {
 					return {
