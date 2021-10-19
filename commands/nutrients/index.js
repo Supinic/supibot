@@ -668,5 +668,35 @@ module.exports = {
 			reply: foodstuffs.join("; ")
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix, values) => {
+		const { nutrients } = values.getStaticData();
+		const tableBody = nutrients.map(i => `<tr><td>${i.code}</td><td>${i.name}</td></tr>`);
+
+		return [
+			"Fetches the nutrients for a given foodstuff (or multiple, if provided).",
+			"",
+
+			`<code>${prefix}nutrients (foodstuff)</code>`,
+			"Shows the macro-nutrients for a given input: energy (kcal), fat (saturated), carbohydrates (sugar), protein.",
+			"",
+
+			`<code>${prefix}nutrients (foodstuff) specific:(comma-separated list of specific nutrients)</code>`,
+			`<code>${prefix}nutrients coffee specific:caffeine,copper,FE</code>`,
+			"Shows a list of specific nutrients' values for your input. For available specific nutrients, check the table below.",
+			"",
+
+			`<table>
+				<thead>
+					<th>
+						<td>Code</td>
+						<td>Name</td>
+					</th>
+				</thead>
+				<tbody>
+					${tableBody}
+				</tbody>			
+			</table>
+			`
+		];
+	})
 };
