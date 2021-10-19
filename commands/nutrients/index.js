@@ -602,11 +602,10 @@ module.exports = {
 			throwHttpErrors: false
 		});
 
-		const { data } = response.body;
-		if (data.message) {
+		if (response.body.message) {
 			return {
 				success: false,
-				reply: data.message
+				reply: response.body.message
 			};
 		}
 
@@ -628,7 +627,7 @@ module.exports = {
 		}
 
 		const foodstuffs = [];
-		for (const food of data.food) {
+		for (const food of response.body.foods) {
 			const specificWeight = (food.serving_qty === 100 && food.serving_unit === "g")
 				? ""
 				: `(${food.serving_weight_grams}g)`;
