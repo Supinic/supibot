@@ -54,7 +54,7 @@ module.exports = {
 			const item = data.list[0];
 
 			if (item) {
-				const definition = sb.Utils.wrapString(item.definition, 150);
+				const definition = sb.Utils.wrapString(item.definition.replace(/[[\]]/g, ""), 150);
 				result.push(`Urban: "${definition}"`);
 			}
 		}
