@@ -8,7 +8,8 @@ module.exports = {
 	Params: [
 		{ name: "arguments", type: "string" },
 		{ name: "errorInfo", type: "boolean" },
-		{ name: "function", type: "string" }
+		{ name: "function", type: "string" },
+		{ name: "importGist", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
@@ -43,6 +44,32 @@ module.exports = {
 				};
 			}
 		}
+		let importedText;
+		if (context.params.importGist) {
+			if (context.params.importGist.includes(" ")) {
+				return {
+					success: false,
+					reply: `Gist IDs cannot contain spaces!`
+				};
+			}
+			const gistCommand = sb.Command.get("pastebin");
+			const fakeCtx = sb.Command.createFakeContext(
+				gistCommand,
+				{
+					...context,
+					invocation: "gist"
+				},
+				{}
+			);
+			const gistResult = await gistCommand.execute(fakeCtx, context.params.importGist);
+			if (gistResult.success === false) {
+				return gistResult;
+			}
+			importedText = gistResult.reply;
+			if (!(importedText.endsWith(";") || importedText.endsWith(","))) {
+				importedText += ";";
+			}
+		}
 
 		let result;
 		let script;
@@ -57,6 +84,10 @@ module.exports = {
 		}
 		else {
 			script = `(async () => {\n${string}\n})()`;
+		}
+		
+		if (importedText) {
+			script = `${importedText}${script}`;
 		}
 
 		try {
