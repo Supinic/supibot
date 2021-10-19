@@ -670,7 +670,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { nutrients } = values.getStaticData();
-		const tableBody = nutrients.map(i => `<tr><td>${i.code}</td><td>${i.name}</td></tr>`);
+		const tableBody = nutrients.map(i => `<tr><td>${i.code}</td><td>${i.name}</td></tr>`).join("");
 
 		return [
 			"Fetches the nutrients for a given foodstuff (or multiple, if provided).",
