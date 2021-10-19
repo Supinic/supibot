@@ -48,6 +48,7 @@ module.exports = {
 
 		try {
 			const scriptContext = vm.createContext({
+				crypto: require("crypto"),
 				version: process.version,
 				context,
 				sb,
