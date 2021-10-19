@@ -9,7 +9,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function accountAge (context, user) {
-		const login = (user ?? context.user.Name).toLowerCase();
+		const login = sb.User.normalizeUsername(user ?? context.user.Name).toLowerCase();
 		const { statusCode, body } = await sb.Got("Helix", {
 			url: "users",
 			searchParams: { login }
