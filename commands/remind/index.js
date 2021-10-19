@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "remind",
-	Aliases: ["notify","reminder","remindme","notifyme","remindprivate","notifyprivate","privateremind"],
+	Aliases: ["notify","remindme","remindprivate","privateremind"],
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Sets a notify for a given user. Can also set a time to ping that user (or yourself) in given amount of time, but in that case you must use the word \"in\" and then a number specifying the amount days, hours, minutes, etc.",
@@ -19,11 +19,6 @@ module.exports = {
 			"public-outgoing": "You have too many public reminders pending!",
 			"private-incoming": "That person has too many private reminders pending!",
 			"private-outgoing": "You have too many private reminders pending!"
-		},
-		deprecation: {
-			reminder: "remind",
-			notifyme: "remindme",
-			notifyprivate: "remindprivate or privateremind"
 		},
 		sqlDateLimit: new sb.Date(253402297199999) // SQL DATETIME limit - 9999-12-31 23:59:59.999
 	})),
@@ -267,12 +262,6 @@ module.exports = {
 			Private_Message: isPrivate
 		});
 
-		let deprecationString = "";
-		if (this.staticData.deprecation[context.invocation]) {
-			const replacement = this.staticData.deprecation[context.invocation];
-			deprecationString = ` ${sb.Command.prefix}${context.invocation} will be disabled soon! Use ${sb.Command.prefix}${replacement} instead.`;
-		}
-
 		if (result.success) {
 			if (result.ID % 1_000_000 === 0) {
 				const trollShift = (Math.random() > 0.5) ? 1 : -1;
@@ -284,13 +273,13 @@ module.exports = {
 
 			return {
 				cooldown: (context.privateMessage) ? 2500 : this.Cooldown,
-				reply: `I will ${method}remind ${who} ${targetReminderDelta} (ID ${result.ID})${deprecationString}`
+				reply: `I will ${method}remind ${who} ${targetReminderDelta} (ID ${result.ID})`
 			};
 		}
 		else {
 			return {
 				success: false,
-				reply: this.staticData.strings[result.cause] ?? `Reminder not created - result is ${result.cause}.${deprecationString}`
+				reply: this.staticData.strings[result.cause] ?? `Reminder not created - result is ${result.cause}.`
 			};
 		}
 	}),
