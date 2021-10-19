@@ -670,7 +670,9 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { nutrients } = values.getStaticData();
-		const tableBody = nutrients.map(i => `<tr><td>${i.code}</td><td>${i.name}</td></tr>`).join("");
+		const tableBody = nutrients
+			.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
+			.map(i => `<tr><td>${i.name}</td><td>${i.code}</td></tr>`).join("");
 
 		return [
 			"Fetches the nutrients for a given foodstuff (or multiple, if provided).",
@@ -683,13 +685,14 @@ module.exports = {
 			`<code>${prefix}nutrients (foodstuff) specific:(comma-separated list of specific nutrients)</code>`,
 			`<code>${prefix}nutrients coffee specific:caffeine,copper,FE</code>`,
 			"Shows a list of specific nutrients' values for your input. For available specific nutrients, check the table below.",
+			"Either the name or the code of a specific nutrient works.",
 			"",
 
 			`<table>
 				<thead>
 					<tr>
-						<th>Code</th>
 						<th>Name</th>
+						<th>Code</th>
 					</tr>
 				</thead>
 				<tbody>
