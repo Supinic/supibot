@@ -689,15 +689,11 @@ module.exports = {
 			"",
 
 			`<table>
-				<thead>
-					<tr>
-						<th>Name</th>
-						<th>Code</th>
-					</tr>
-				</thead>
-				<tbody>
-					${tableBody}
-				</tbody>			
+				<tr>
+					<th>Name</th>
+					<th>Code</th>
+				</tr>
+				${tableBody}	
 			</table>
 			`
 		];
