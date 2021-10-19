@@ -640,7 +640,7 @@ module.exports = {
 
 			if (customNutrients) {
 				const nutrientList = [...customNutrients].map(nutrient => {
-					const data = food.full_nutrients.find(i => nutrient.id === i.id);
+					const data = food.full_nutrients.find(i => nutrient.attr_id === i.id);
 					if (!data) {
 						return;
 					}
