@@ -687,10 +687,10 @@ module.exports = {
 
 			`<table>
 				<thead>
-					<th>
-						<td>Code</td>
-						<td>Name</td>
-					</th>
+					<tr>
+						<th>Code</th>
+						<th>Name</th>
+					</tr>
 				</thead>
 				<tbody>
 					${tableBody}
