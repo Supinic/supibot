@@ -6,6 +6,7 @@ module.exports = {
 	Description: "Returns the contents of a Pastebin paste, or from a GitHub gist; or posts your input into a new paste.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
+		{ name: "hasteServer", type: "string" },
 		{ name: "force", type: "boolean" }
 	],
 	Whitelist_Response: null,
