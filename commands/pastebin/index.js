@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "pastebin",
-	Aliases: ["pbg", "pbp", "gist"],
+	Aliases: ["pbg", "pbp", "gist", "hbg", "hbp"],
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Returns the contents of a Pastebin paste, or from a GitHub gist; or posts your input into a new paste.",
@@ -10,28 +10,54 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		allowedGistTypes: ["text/plain", "application/javascript"]
+		allowedGistTypes: ["text/plain", "application/javascript"],
+		getHastebinServer: (param) => {
+			let path = param ?? "https://hastebin.com";
+			if (!path.startsWith("http://") && !path.startsWith("https://")) {
+				path = `https://${path}`;
+			}
+
+			const { URL } = require("url");
+			let url;
+			try {
+				url = new URL(path);
+			}
+			catch {
+				return null;
+			}
+
+			return url.hostname;
+		},
+		textDataCharacterThreshold: 50_000
 	})),
 	Code: (async function pastebin (context, command, ...rest) {
 		let type;
+		let provider;
 		const args = [...rest];
+
 		if (command === "get" || context.invocation === "pbg") {
+			provider = "pastebin";
 			type = "get";
 			if (command && command !== "get") {
 				args.unshift(command);
 			}
 		}
 		else if (command === "post" || context.invocation === "pbp") {
+			provider = "pastebin";
 			type = "post";
 			if (command && command !== "post") {
 				args.unshift(command);
 			}
 		}
 		else if (context.invocation === "gist") {
-			type = "gist";
-			if (command && command !== "get") {
-				args.unshift(command);
-			}
+			provider = "gist";
+			type = "get";
+			args.unshift(command);
+		}
+		else if (context.invocation.startsWith("hb")) {
+			type = (context.invocation.endsWith("g")) ? "get" : "post";
+			provider = "hastebin";
+			args.unshift(command);
 		}
 		else {
 			const prefix = sb.Command.prefix;
@@ -49,31 +75,106 @@ module.exports = {
 		}
 
 		if (type === "post") {
-			const result = await sb.Pastebin.post(args.join(" "));
-			return {
-				success: Boolean(result.success),
-				reply: result.error ?? result.body
-			};
-		}
-		else if (type === "gist") {
-			const [ID] = args;
-			if (!ID) {
+			const text = args.join(" ");
+
+			if (provider === "pastebin") {
+				const result = await sb.Pastebin.post(text);
+				return {
+					success: Boolean(result.success),
+					reply: result.error ?? result.body
+				};
+			}
+			else if (provider === "hastebin") {
+				const server = this.staticData.getHastebinServer(context.params.hasteServer);
+				if (!server) {
+					return {
+						success: false,
+						reply: `Invalid custom Hastebin server provided!`
+					};
+				}
+
+				const response = await sb.Got("GenericAPI", {
+					method: "POST",
+					url: `https://${server}/documents`,
+					throwHttpErrors: false,
+					body: text
+				});
+
+				if (response.statusCode !== 200) {
+					return {
+						success: false,
+						reply: `Could not create a paste on ${server}!`
+					};
+				}
+
+				return {
+					reply: `https://${server}/${response.body.key}`
+				};
+			}
+			else {
 				return {
 					success: false,
-					reply: `No Gist ID provided!`
+					reply: `Cannot create new files/pastes with ${sb.Utils.capitalize(provider)}!`
+				};
+			}
+		}
+		else if (type === "get") {
+			const id = sb.Utils.getPathFromURL(args[0]);
+			if (!id) {
+				return {
+					success: false,
+					reply: `No file/paste ID provided!`
 				};
 			}
 
-			let data;
-			let cooldown = this.Cooldown;
-			const cacheData = (context.params.force) ? null : await this.getCacheData(ID);
+			const cacheData = (context.params.force) ? null : await this.getCacheData(id);
 			if (cacheData) {
-				data = cacheData;
-				cooldown = 5000;
+				return {
+					reply: cacheData,
+					cooldown: 5000
+				};
 			}
-			else {
+
+			let textData;
+			if (provider === "pastebin") {
+				const result = await sb.Pastebin.get(id);
+				if (result.success !== true) {
+					return {
+						success: false,
+						reply: result.error ?? result.body
+					};
+				}
+
+				textData = result.body;
+			}
+			else if (provider === "hastebin") {
+				const server = this.staticData.getHastebinServer(context.params.hasteServer);
+				if (!server) {
+					return {
+						success: false,
+						reply: `Invalid custom Hastebin server provided!`
+					};
+				}
+
+				const response = await sb.Got("GenericAPI", {
+					method: "GET",
+					url: `https://${server}/raw/${id}`,
+					throwHttpErrors: false,
+					responseType: "text"
+				});
+
+				if (response.statusCode !== 200) {
+					return {
+						success: false,
+						reply: `Could not fetch a paste from ${server}!`
+					};
+				}
+
+				textData = response.body;
+			}
+			else if (provider === "gist") {
 				const response = await sb.Got("GitHub", {
-					url: `gists/${ID}`
+					url: `gists/${id}`
 				});
 
 				if (response.statusCode !== 200) {
@@ -93,6 +194,7 @@ module.exports = {
 
 				const { allowedGistTypes } = this.staticData;
 				const eligibleFiles = Object.values(files).filter(i => allowedGistTypes.includes(i.type));
+
 				if (eligibleFiles.length === 0) {
 					return {
 						success: false,
@@ -112,92 +214,98 @@ module.exports = {
 					};
 				}
 
-				data = eligibleFiles[0].content;
-				await this.setCacheData(ID, data, {
-					expiry: 30 * 864e5
-				});
+				textData = eligibleFiles[0].content;
 			}
-
-			return {
-				cooldown,
-				reply: data
-			};
-		}
-		else if (type === "get") {
-			const path = sb.Utils.getPathFromURL(args[0]);
-			if (!path) {
+			else {
 				return {
 					success: false,
-					reply: `Invalid Pastebin link provided!`
+					reply: `Cannot fetch existing files/pastes with ${sb.Utils.capitalize(provider)}!`
 				};
 			}
 
-			let data;
-			let cooldown = this.Cooldown;
-			const cacheData = (context.params.force) ? null : await this.getCacheData(path);
-			if (cacheData) {
-				data = cacheData;
-				cooldown = 5000;
+			if (!textData) {
+				return {
+					success: false,
+					reply: `No text data found in your file/paste!`
+				};
 			}
-			else {
-				const result = await sb.Pastebin.get(path);
-				if (result.success !== true) {
-					return {
-						success: false,
-						reply: result.error ?? result.body
-					};
-				}
-
-				data = result.body;
-				if (!data) {
-					return {
-						success: false,
-						reply: `Could not fetch any data from your paste!`
-					};
-				}
-				else if (data.length >= 50000) {
-					data = null;
-					return {
-						success: false,
-						reply: `Paste character limit exceeded! (50 000 characters)`
-					};
-				}
-
-				await this.setCacheData(path, data, {
-					expiry: 30 * 864e5
-				});
+			else if (textData.length > this.staticData.textDataCharacterThreshold) {
+				return {
+					success: false,
+					reply: sb.Utils.tag.trim `
+						File/paste character limit exceeded!
+						(${sb.Utils.groupDigits(this.staticData.textDataCharacterThreshold)} characters)
+					`
+				};
 			}
+
+			await this.setCacheData(id, textData, {
+				expiry: 30 * 864e5 // 30 days
+			});
 
 			return {
-				cooldown,
-				reply: data
+				reply: textData
+			};
+		}
+		else {
+			return {
+				success: false,
+				reply: `Invalid operation provided!`
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => [
-		"Gets a paste from Pastebin, or creates a new one with your text.",
-		"",
+	Dynamic_Description: (async (prefix, values) => {
+		const { textDataCharacterThreshold } = values.getStaticData();
+		const threshold = sb.Utils.groupDigits(textDataCharacterThreshold);
 
-		`<code>${prefix}pastebin get (link)</code>`,
-		`<code>${prefix}pbg (link)</code>`,
-		"For a specified link or a paste ID, fetches the contents of it.",
-		"The output must not be longer than 50 000 characters, for performance reasons. If it is, the paste won't be fetched.",
-		"",
+		return [
+			"Gets or creates a new text paste on Pastebin or Hastebin; or fetches one from Gist.",
+			`When fetching existing text, the output must not be longer than ${threshold} characters, for performance reasons.`,
+			"If it is, the file/paste won't be fetched, and an error is returned instead.",
+			"",
 
-		`<code>${prefix}gist (gist ID)</code>`,
-		"For a specified Gist ID, fetches its contents.",
-		"The Gist must only contain a single text/plain file.",
-		"The output must not be longer than 50 000 characters, for performance reasons. If it is, the Gist won't be fetched.",
-		"",
+			"<h5> Pastebin </h5>",
 
-		`<code>${prefix}pastebin post (...text)</code>`,
-		`<code>${prefix}pbp (...text)</code>`,
-		"Creates a new temporary paste for you to see.",
-		"The paste is set to only be available for 10 minutes from posting, then it is deleted.",
-		"",
+			`<code>${prefix}pastebin get (link)</code>`,
+			`<code>${prefix}pbg (link)</code>`,
+			"Fetches the contents of a specified Pastebin paste via ID or link.",
+			"",
 
-		`<code>${prefix}pastebin get (link) force:true</code>`,
-		`<code>${prefix}pbg (link) force:true</code>`,
-		"Since the results of fetching pastes are cached, use force:true to forcibly fetch the current status of the paste."
-	])
+			`<code>${prefix}pastebin post (...text)</code>`,
+			`<code>${prefix}pbp (...text)</code>`,
+			"Creates a new temporary paste for you to use.",
+			"The paste is set to only be available for 10 minutes from posting, then it is deleted.",
+			"",
+
+			"<h5> Hastebin </h5>",
+
+			`<code>${prefix}hbg (link)</code>`,
+			`<code>${prefix}hbg (link) hasteServer:(custom Hastebin URL)</code>`,
+			"Fetches the contents of a specified Hastebin haste via ID or link.",
+			"Uses hastebin.com by default - but can use a specific custom instance of Hastebin via the <code>hasteServer</code> parameter.",
+			"",
+
+			`<code>${prefix}hbp (...text)</code>`,
+			`<code>${prefix}hbp (...text) hasteServer:(custom Hastebin URL)</code>`,
+			"Creates a new temporary haste for you to see.",
+			"Uses hastebin.com by default - but can use a specific custom instance of Hastebin via the <code>hasteServer</code> parameter.",
+			"",
+
+			"<h5> GitHub Gist </h5>",
+
+			`<code>${prefix}gist (gist ID)</code>`,
+			"Fetches the contents of a specified GitHub Gist paste via its ID.",
+			"The Gist must only contain a single text/plain or Javascript file.",
+			"",
+
+			"<h5> Caching </h5>",
+
+			`<code>${prefix}pastebin get (link) force:true</code>`,
+			`<code>${prefix}pbg (link) force:true</code>`,
+			`<code>${prefix}hbg (link)</code>`,
+			`<code>${prefix}hbg (link) hasteServer:(custom Hastebin URL)</code>`,
+			`<code>${prefix}gist (gist ID) force:true</code>`,
+			"Since the results of all fetching (pastebin, hastebin, gist) are cached, use <code>force:true</code> to forcibly fetch the current status of the paste."
+		];
+	})
 };
