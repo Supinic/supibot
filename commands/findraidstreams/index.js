@@ -12,7 +12,7 @@ module.exports = {
 	Static_Data: (() => ({
 		viewerThreshold: 100
 	})),
-	Code: (async function findRaidStreams () {
+	Code: (async function findRaidStreams (context) {
 		const channels = sb.Channel.getJoinableForPlatform("twitch");
 		const channelStreamData = await Promise.all(channels.map(async (channel) => {
 			const data = await channel.getStreamData();
