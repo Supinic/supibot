@@ -128,7 +128,7 @@ module.exports = {
 			const [provider, providerType = ""] = data.Type.split(" - ");
 			if (data.Type === "Twitch - Bits" && data.Tier !== null) {
 				const thousandBits = Number(data.Tier) / 1000;
-				type = `${thousandBits}k bits ${provider} emote`;
+				type = `${thousandBits}k bits ${provider}`;
 			}
 			else if (data.Tier) {
 				type = `T${data.Tier} ${providerType.toLowerCase()} ${provider}`;
