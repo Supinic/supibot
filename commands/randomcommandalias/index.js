@@ -10,6 +10,7 @@ module.exports = {
 		{ name: "command", type: "string" },
 		{ name: "createdAfter", type: "date" },
 		{ name: "createdBefore", type: "date" },
+		{ name: "description", type: "string" },
 		{ name: "name", type: "string" },
 		{ name: "user", type: "string" }
 	],
@@ -30,10 +31,11 @@ module.exports = {
 		const randomAlias = await sb.Query.getRecordset(rs => rs
 			.select("ID", "User_Alias", "Name")
 			.from("data", "Custom_Command_Alias")
+			.where({ condition: Boolean(context.params.body) }, "Arguments %*like*", context.params.body)
 			.where({ condition: Boolean(context.params.command) }, "Command = %s", context.params.command)
 			.where({ condition: Boolean(context.params.createdAfter) }, "Created > %d", context.params.createdAfter)
 			.where({ condition: Boolean(context.params.createdBefore) }, "Created < %d", context.params.createdBefore)
-			.where({ condition: Boolean(context.params.body) }, "Arguments %*like*", context.params.body)
+			.where({ condition: Boolean(context.params.description) }, "Arguments %*like*", context.params.description)
 			.where({ condition: Boolean(context.params.name) }, "Name = %s", context.params.name)
 			.where({ condition: Boolean(targetUserAlias) }, "User_Alias = %n", targetUserAlias?.ID)
 			.where("Command IS NOT NULL")
@@ -67,6 +69,10 @@ module.exports = {
 		"Posts a completely random command alias.",
 		"",
 
+		`<code>${prefix}rca body:(definition)</code>`,
+		"Filters aliases by their definition contents, e.g. parameters, arguments, pipe commands, ...",
+		"",
+
 		`<code>${prefix}rca command:(command name)</code>`,
 		"Filters aliases by ones that use the specified command as their main command (e.g. not inside of <code>$pipe</code>).",
 		"",
@@ -76,8 +82,8 @@ module.exports = {
 		"Filters aliases by their creation time.",
 		"",
 
-		`<code>${prefix}rca body:(definition)</code>`,
-		"Filters aliases by their definition contents, e.g. parameters, arguments, pipe commands, ...",
+		`<code>${prefix}rca description:(description)</code>`,
+		"Filters aliases by their description. Ignores commands with no description.",
 		"",
 
 		`<code>${prefix}rca name:(name)</code>`,
