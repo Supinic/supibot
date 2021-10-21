@@ -4,8 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 0,
 	Description: "Iterates over eligible Twitch channel, finds online streams and posts a summary to Pastebin. Used to find a good raid after a stream is finished.",
-	Flags: ["developer","pipe","whitelist"],
-	Params: null,
+	Flags: ["developer","pipe","use-params","whitelist"],
+	Params: [
+		{ name: "haste", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		viewerThreshold: 100
@@ -33,20 +35,24 @@ module.exports = {
 			.sort((a, b) => b.viewers - a.viewers);
 
 		const data = JSON.stringify(raidable, null, 4);
-		const paste = await sb.Pastebin.post(data, {
-			name: `Raid targets ${new sb.Date().format("Y-m-d H:i:s")}`,
-			format: "json"
+		const server = context.params.haste ?? "haste.zneix.eu";
+
+		const response = await sb.Got("GenericAPI", {
+			method: "POST",
+			url: `https:/${server}/documents`,
+			throwHttpErrors: false,
+			body: `Raid targets ${new sb.Date().format("Y-m-d H:i:s")}\n\n${data}`
 		});
 
-		if (paste.success !== true) {
+		if (response.statusCode !== 200) {
 			return {
 				success: false,
-				reply: paste.error ?? paste.body
+				reply: `Error ${response.statusCode} while posting paste!`
 			};
 		}
 
 		return {
-			reply: paste.body
+			reply: `https://${server}/raw/${response.body}`
 		};
 	}),
 	Dynamic_Description: null
