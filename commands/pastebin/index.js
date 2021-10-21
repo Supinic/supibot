@@ -7,7 +7,8 @@ module.exports = {
 	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
 		{ name: "hasteServer", type: "string" },
-		{ name: "force", type: "boolean" }
+		{ name: "force", type: "boolean" },
+		{ name: "raw", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
@@ -76,14 +77,26 @@ module.exports = {
 		}
 
 		if (type === "post") {
+			const rawString = (context.params.raw ?? true) ? "raw/" : "";
 			const text = args.join(" ");
 
 			if (provider === "pastebin") {
 				const result = await sb.Pastebin.post(text);
-				return {
-					success: Boolean(result.success),
-					reply: result.error ?? result.body
-				};
+				if (result.success) {
+					const link = (rawString)
+						? result.body.replace(/\.com/, ".com/raw")
+						: result.body;
+
+					return {
+						reply: link
+					};
+				}
+				else {
+					return {
+						success: false,
+						reply: result.error ?? result.body
+					};
+				}
 			}
 			else if (provider === "hastebin") {
 				const server = this.staticData.getHastebinServer(context.params.hasteServer);
@@ -109,7 +122,7 @@ module.exports = {
 				}
 
 				return {
-					reply: `https://${server}/${response.body.key}`
+					reply: `https://${server}/${rawString}${response.body.key}`
 				};
 			}
 			else {
@@ -299,7 +312,14 @@ module.exports = {
 			"The Gist must only contain a single text/plain or Javascript file.",
 			"",
 
-			"<h5> Caching </h5>",
+			"<h5> Other arguments </h5>",
+
+			`<code>${prefix}pbp (text) raw:false</code>`,
+			`<code>${prefix}hbp (text) raw:false</code>`,
+			`<code>${prefix}hbp (text) raw:false hasteServer:(custom Hastebin URL)</code>`,
+			"This command will post \"raw\" paste links, which only contain the text, rather than the website's layout.",
+			"If you would like to receive a proper link, use <code>raw:false</code> as this parameter is <code>true</code> by default!",
+			"",
 
 			`<code>${prefix}pastebin get (link) force:true</code>`,
 			`<code>${prefix}pbg (link) force:true</code>`,
