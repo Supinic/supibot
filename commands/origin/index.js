@@ -123,7 +123,15 @@ module.exports = {
 
 			const text = data.Text.replace(/\[(.+?)]\(\d+\)/g, "$1");
 			const link = `https://supinic.com/data/origin/detail/${data.ID}`;
-			const type = (data.Tier) ? `T${data.Tier}` : "";
+
+			let type = "";
+			if (data.Type === "Twitch - Bits" && data.Tier !== null) {
+				const thousandBits = Number(data.Tier) / 1000;
+				type = `Twitch - ${thousandBits}k Bits`;
+			}
+			else if (data.Tier) {
+				type = `T${data.Tier}`;
+			}
 
 			return {
 				reply: sb.Utils.tag.trim `
