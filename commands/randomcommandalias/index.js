@@ -35,7 +35,7 @@ module.exports = {
 			.where({ condition: Boolean(context.params.command) }, "Command = %s", context.params.command)
 			.where({ condition: Boolean(context.params.createdAfter) }, "Created > %d", context.params.createdAfter)
 			.where({ condition: Boolean(context.params.createdBefore) }, "Created < %d", context.params.createdBefore)
-			.where({ condition: Boolean(context.params.description) }, "Arguments %*like*", context.params.description)
+			.where({ condition: Boolean(context.params.description) }, "Description %*like*", context.params.description)
 			.where({ condition: Boolean(context.params.name) }, "Name = %s", context.params.name)
 			.where({ condition: Boolean(targetUserAlias) }, "User_Alias = %n", targetUserAlias?.ID)
 			.where("Command IS NOT NULL")
