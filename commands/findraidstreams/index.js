@@ -39,7 +39,7 @@ module.exports = {
 
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
-			url: `https:/${server}/documents`,
+			url: `https://${server}/documents`,
 			throwHttpErrors: false,
 			body: `Raid targets ${new sb.Date().format("Y-m-d H:i:s")}\n\n${data}`
 		});
