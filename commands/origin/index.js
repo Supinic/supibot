@@ -125,19 +125,23 @@ module.exports = {
 			const link = `https://supinic.com/data/origin/detail/${data.ID}`;
 
 			let type = "";
+			const [provider, providerType = ""] = data.Type.split(" - ");
 			if (data.Type === "Twitch - Bits" && data.Tier !== null) {
 				const thousandBits = Number(data.Tier) / 1000;
-				type = `Twitch - ${thousandBits}k Bits`;
+				type = `${thousandBits}k bits ${provider} emote`;
 			}
 			else if (data.Tier) {
-				type = `T${data.Tier}`;
+				type = `T${data.Tier} ${providerType.toLowerCase()} ${provider}`;
+			}
+			else {
+				type = `${providerType.toLowerCase()} ${provider}`;
 			}
 
 			return {
 				reply: sb.Utils.tag.trim `
 					${extras}
 					${link}					
-					${type} ${data.Type} emote:
+					${type} emote:
 					${text}
 					${addedString}
 					${authorString}
