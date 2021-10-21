@@ -52,7 +52,7 @@ module.exports = {
 		}
 
 		return {
-			reply: `https://${server}/raw/${response.body}`
+			reply: `https://${server}/raw/${response.body.key}`
 		};
 	}),
 	Dynamic_Description: null
