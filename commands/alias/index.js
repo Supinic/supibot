@@ -271,8 +271,7 @@ module.exports = {
 					alias = await sb.Query.getRecordset(rs => rs
 						.select("User_Alias", "Name", "Command", "Invocation", "Arguments", "Parent")
 						.from("data", "Custom_Command_Alias")
-						.where("User_Alias = %n", user.ID)
-						.where("Name COLLATE utf8mb4_bin = %s", aliasName)
+						.where("ID = %n", alias.Parent)
 						.limit(1)
 						.single()
 					);
