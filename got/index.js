@@ -1,17 +1,17 @@
-import * as CommanderRoot from "./commander-root/index.js";
-import * as FakeAgent from "./fake-agent/index.js";
-import * as GenericAPI from "./generic-api/index.js";
-import * as Global from "./global/index.js";
-import * as Helix from "./helix/index.js";
-import * as Kraken from "./kraken/index.js";
-import * as Leppunen from "./leppunen/index.js";
-import * as Reddit from "./reddit/index.js";
-import * as Speedrun from "./speedrun/index.js";
-import * as SRA from "./sra/index.js";
-import * as Supibot from "./supibot/index.js";
-import * as Supinic from "./supinic/index.js";
-import * as V5 from "./v5/index.js";
-import * as Vimeo from "./vimeo/index.js";
+import * as CommanderRoot from "./commander-root/index.mjs";
+import * as FakeAgent from "./fake-agent/index.mjs";
+import * as GenericAPI from "./generic-api/index.mjs";
+import * as Global from "./global/index.mjs";
+import * as Helix from "./helix/index.mjs";
+import * as Kraken from "./kraken/index.mjs";
+import * as Leppunen from "./leppunen/index.mjs";
+import * as Reddit from "./reddit/index.mjs";
+import * as Speedrun from "./speedrun/index.mjs";
+import * as SRA from "./sra/index.mjs";
+import * as Supibot from "./supibot/index.mjs";
+import * as Supinic from "./supinic/index.mjs";
+import * as V5 from "./v5/index.mjs";
+import * as Vimeo from "./vimeo/index.mjs";
 
 const definitions = [
 	CommanderRoot,
