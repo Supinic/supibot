@@ -279,7 +279,7 @@ module.exports = class Platform extends require("./template.js") {
 	}
 
 	get privateMessageLoggingTableName () {
-		return `@${this.Name}_private_messages`;
+		return `#${this.Name}_private_messages`;
 	}
 
 	/**
