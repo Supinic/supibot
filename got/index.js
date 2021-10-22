@@ -13,7 +13,7 @@ import * as Supinic from "./supinic/index.js";
 import * as V5 from "./v5/index.js";
 import * as Vimeo from "./vimeo/index.js";
 
-export const Got = [
+const definitions = [
 	CommanderRoot,
 	FakeAgent,
 	GenericAPI,
@@ -29,3 +29,7 @@ export const Got = [
 	V5,
 	Vimeo
 ];
+
+export { definitions };
+
+export default definitions;
