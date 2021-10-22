@@ -1,5 +1,6 @@
 const notified = {
-	lastSeen: false
+	lastSeen: false,
+	privatePlatformLogging: []
 };
 
 /**
@@ -29,6 +30,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 
 		if (sb.Config.get("LOG_MESSAGE_CRON", false)) {
 			this.channels = [];
+			this.platforms = [];
 			this.batches = {};
 			this.loggingWarnLimit = sb.Config.get("LOGGING_WARN_LIMIT", false) ?? 2500;
 
@@ -313,38 +315,69 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 	 * Pushes a message to a specified channel's queue.
 	 * Queues are emptied accordingly to cronjobs prepared in {@link LoggerSingleton.constructor}
 	 * @param {string} message
-	 * @param {User} userData
-	 * @param {Channel} channelData
+	 * @param {sb.User} userData
+	 * @param {sb.Channel} channelData
+	 * @param {sb.Platform} [platformData]
 	 * @returns {Promise<void>}
 	 */
-	async push (message, userData, channelData) {
+	async push (message, userData, channelData, platformData) {
 		if (!sb.Config.get("LOG_MESSAGE_ENABLED", false)) {
 			return;
 		}
 
-		const chan = channelData.ID;
-		if (!this.channels.includes(chan)) {
-			const name = channelData.getDatabaseName();
-			if (this.#presentTables !== null && !this.#presentTables.includes(name)) {
-				const exists = await sb.Query.isTablePresent("chat_line", name);
-				if (!exists) {
-					await channelData.setup();
-				}
-			}
-
-			this.batches[chan] = await sb.Query.getBatch("chat_line", name, ["User_Alias", "Text", "Posted"]);
-			this.meta[chan] = { amount: 0, length: 0 };
-			this.channels.push(chan);
+		if (!this.#presentTables === null) {
+			return;
 		}
 
-		this.batches[chan].add({
-			User_Alias: userData.ID,
-			Text: message,
-			Posted: new sb.Date()
-		});
+		if (channelData) {
+			const chan = `channel-${channelData.ID}`;
+			if (!this.channels.includes(chan)) {
+				const name = channelData.getDatabaseName();
+				if (!this.#presentTables.includes(name)) {
+					const exists = await sb.Query.isTablePresent("chat_line", name);
+					if (!exists) {
+						await channelData.setup();
+					}
+				}
 
-		this.meta[chan].amount += 1;
-		this.meta[chan].length += message.length;
+				this.batches[chan] = await sb.Query.getBatch("chat_line", name, ["User_Alias", "Text", "Posted"]);
+				this.meta[chan] = { amount: 0, length: 0 };
+				this.channels.push(chan);
+			}
+
+			this.batches[chan].add({
+				User_Alias: userData.ID,
+				Text: message,
+				Posted: new sb.Date()
+			});
+
+			this.meta[chan].amount += 1;
+			this.meta[chan].length += message.length;
+		}
+		else if (platformData) {
+			const id = `platform-${platformData.ID}`;
+
+			if (!this.platforms.includes(id)) {
+				const name = platformData.privateMessageLoggingTableName;
+				if (!this.#presentTables.includes(name)) {
+					if (!notified.privatePlatformLogging.includes(this.Name)) {
+						console.warn(`Cannot log private messages on platform ${this.Name} - logging table (chat_line.${name}) does not exist`);
+						notified.privatePlatformLogging.push(this.Name);
+					}
+
+					return;
+				}
+
+				this.batches[id] = await sb.Query.getBatch("chat_line", name, ["User_Alias", "Text", "Posted"]);
+				this.platforms.push(id);
+			}
+
+			this.batches[id].add({
+				User_Alias: userData.ID,
+				Text: message,
+				Posted: new sb.Date()
+			});
+		}
 	}
 
 	/**
