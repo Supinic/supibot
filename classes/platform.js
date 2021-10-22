@@ -278,6 +278,10 @@ module.exports = class Platform extends require("./template.js") {
 		return sb.Utils.capitalize(this.Name);
 	}
 
+	get privateMessageLoggingTableName () {
+		return `@${this.Name}_private_messages`;
+	}
+
 	/**
 	 * Platform controller
 	 * @type {Controller}
