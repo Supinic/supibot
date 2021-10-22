@@ -2,6 +2,7 @@ import * as CommanderRoot from "./commander-root/index.mjs";
 import * as FakeAgent from "./fake-agent/index.mjs";
 import * as GenericAPI from "./generic-api/index.mjs";
 import * as Global from "./global/index.mjs";
+import * as Google from "./google/index.mjs";
 import * as Helix from "./helix/index.mjs";
 import * as Kraken from "./kraken/index.mjs";
 import * as Leppunen from "./leppunen/index.mjs";
@@ -18,6 +19,7 @@ const definitions = [
 	FakeAgent,
 	GenericAPI,
 	Global,
+	Google,
 	Helix,
 	Kraken,
 	Leppunen,
