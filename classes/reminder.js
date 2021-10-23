@@ -158,8 +158,10 @@ module.exports = class Reminder extends require("./template.js") {
 
 					await channelData.mirror(message, toUserData, { commandUsed: false });
 
-					message = await channelData.prepareMessage(message);
-					await channelData.send(message);
+					const preparedMessage = await channelData.prepareMessage(message);
+					if (preparedMessage) {
+						await channelData.send(preparedMessage);
+					}
 				}
 			}
 
