@@ -426,9 +426,9 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 		});
 
-		client.on("PRIVMSG", (message) => {
+		client.on("PRIVMSG", async (message) => {
 			try {
-				this.handleMessage(message);
+				await this.handleMessage(message);
 			}
 			catch (e) {
 				throw new sb.Error({
