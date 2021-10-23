@@ -467,6 +467,19 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @param {Channel|string} channel
 	 */
 	async send (message, channel) {
+		if (typeof message !== "string") {
+			throw new sb.Error({
+				message: "Provided Twitch message is not a string",
+				args: {
+					channel,
+					message: {
+						type: typeof message,
+						constructor: message?.constructor?.name ?? "N/A"
+					}
+				}
+			});
+		}
+
 		const channelData = sb.Channel.get(channel, this.platform);
 		const channelName = channelData.Name;
 
