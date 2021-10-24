@@ -8,9 +8,7 @@ class Context {
 	#platform;
 	#transaction = null;
 	#privateMessage = false;
-	#append = {
-		tee: []
-	};
+	#append = {};
 	#params = {};
 	#meta = new Map();
 	#userFlags = {};
@@ -24,6 +22,8 @@ class Context {
 		this.#privateMessage = data.privateMessage ?? false;
 		this.#append = data.append ?? this.#append;
 		this.#params = data.params ?? this.#params;
+
+		this.#append.tee ??= [];
 
 		this.#userFlags = sb.Filter.getFlags({
 			command,
