@@ -8,11 +8,12 @@ class Context {
 	#platform;
 	#transaction = null;
 	#privateMessage = false;
-	#append = {};
+	#append = {
+		tee: []
+	};
 	#params = {};
 	#meta = new Map();
 	#userFlags = {};
-	#tee = [];
 
 	constructor (command, data = {}) {
 		this.#invocation = data.invocation ?? null;
@@ -113,7 +114,7 @@ class Context {
 		return "(no emote found)";
 	}
 
-	get tee () { return this.#tee; }
+	get tee () { return this.#append.tee; }
 	get invocation () { return this.#invocation; }
 	get user () { return this.#user; }
 	get channel () { return this.#channel; }
