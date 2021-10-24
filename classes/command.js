@@ -36,10 +36,6 @@ class Context {
 	getMeta (name) { return this.#meta.get(name); }
 	setMeta (name, value) { this.#meta.set(name, value); }
 
-	pushTee (string) {
-		this.#tee.push(string);
-	}
-
 	/**
 	 * Fetches an object wrapper describing the user's permissions in given command context.
 	 * @param {Object} [options] When provided, allows overriding the command context's locations
@@ -117,7 +113,7 @@ class Context {
 		return "(no emote found)";
 	}
 
-	get tee () { return Object.freeze([...this.#tee]); }
+	get tee () { return this.#tee; }
 	get invocation () { return this.#invocation; }
 	get user () { return this.#user; }
 	get channel () { return this.#channel; }
