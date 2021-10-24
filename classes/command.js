@@ -22,8 +22,8 @@ class Context {
 		this.#platform = data.platform ?? null;
 		this.#transaction = data.transaction ?? null;
 		this.#privateMessage = data.privateMessage ?? false;
-		this.#append = data.append ?? {};
-		this.#params = data.params ?? {};
+		this.#append = data.append ?? this.#append;
+		this.#params = data.params ?? this.#params;
 
 		this.#userFlags = sb.Filter.getFlags({
 			command,
