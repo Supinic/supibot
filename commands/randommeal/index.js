@@ -9,17 +9,24 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function randomMeal (context, ...args) {
-		let data = null;
+		let data;
+
 		if (args.length === 0) {
-			data = await sb.Got("https://www.themealdb.com/api/json/v1/1/random.php").json();
+			const response = await sb.Got("GenericAPI", {
+				url: "https://www.themealdb.com/api/json/v1/1/random.php"
+			});
+
+			data = response.body;
 		}
 		else {
-			data = await sb.Got({
+			const response = await sb.Got("GenericAPI", {
 				url: "https://www.themealdb.com/api/json/v1/1/search.php",
-				searchParams: new sb.URLParams()
-					.set("s", args.join(" "))
-					.toString()
-			}).json();
+				searchParams: {
+					s: args.join(" ")
+				}
+			});
+
+			data = response.body;
 
 			if (!data?.meals) {
 				return {
