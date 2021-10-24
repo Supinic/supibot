@@ -162,11 +162,11 @@ class CytubeClient {
 				}
 			}
 			else {
-				this.controller.resolveUserMessage(null, userData, msg);
-
 				if (this.controller.platform.Logging.whispers) {
-					sb.Logger.log("Cytube.Other", `PM: ${msg}`, this.channelData, userData);
+					await sb.Logger.push(msg, userData, null, this.controller.platform);
 				}
+
+				this.controller.resolveUserMessage(null, userData, msg);
 			}
 
 			// Handle commands if the message starts with the command prefix

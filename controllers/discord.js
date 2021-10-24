@@ -173,6 +173,10 @@ module.exports = class DiscordController extends require("./template.js") {
 				}
 			}
 			else {
+				if (this.platform.Logging.whispers) {
+					await sb.Logger.push(msg, userData, null, this.platform);
+				}
+
 				this.resolveUserMessage(null, userData, msg);
 			}
 
