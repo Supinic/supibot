@@ -10,6 +10,12 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function define (context, ...args) {
 		const query = args.join(" ");
+		if (!query) {
+			return {
+				success: false,
+				reply: `No input provided!`
+			};
+		}
 
 		const dictPromise = sb.Got("GenericAPI", {
 			url: `https://api.dictionaryapi.dev/api/v1/entries/en/${query}`,
