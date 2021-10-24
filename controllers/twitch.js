@@ -628,7 +628,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			this.resolveUserMessage(channelData, userData, message);
 
 			if (channelData.Mode === "Last seen") {
-				sb.Logger.updateLastSeen({ userData, channelData, message });
+				await sb.Logger.updateLastSeen({ userData, channelData, message });
 				return;
 			}
 			else if (channelData.Mode === "Inactive") {
@@ -636,7 +636,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 
 			if (this.platform.Logging.messages) {
-				sb.Logger.push(message, userData, channelData);
+				await sb.Logger.push(message, userData, channelData);
 			}
 
 			channelData.events.emit("message", {
