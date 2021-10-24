@@ -666,7 +666,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 		else {
 			if (this.platform.Logging.whispers) {
-				sb.Logger.log("Twitch.Other", `whisper: ${message}`, null, userData);
+				await sb.Logger.push(message, userData, null, this.platform);
 			}
 
 			this.resolveUserMessage(null, userData, message);
