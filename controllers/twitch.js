@@ -654,8 +654,10 @@ module.exports = class TwitchController extends require("./template.js") {
 				return;
 			}
 
-			sb.AwayFromKeyboard.checkActive(userData, channelData);
-			sb.Reminder.checkActive(userData, channelData);
+			await Promise.all([
+				sb.AwayFromKeyboard.checkActive(userData, channelData),
+				sb.Reminder.checkActive(userData, channelData)
+			]);
 
 			// Mirror messages to a linked channel, if the channel has one
 			if (channelData.Mirror) {
