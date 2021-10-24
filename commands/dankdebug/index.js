@@ -102,7 +102,7 @@ module.exports = {
 					console: undefined,
 					executor: context.user.Name,
 					platform: context.platform.Name,
-					tee: Object.freeze(...context.tee),
+					tee: Object.freeze([...context.tee]),
 					utils: {
 						getEmote: (array, fallback) => {
 							if (!Array.isArray(array) || array.some(i => typeof i !== "string")) {
