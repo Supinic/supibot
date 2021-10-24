@@ -115,7 +115,17 @@ module.exports = {
 		await shell(`convert /tmp/${link} ${params} /tmp/out_${link}`);
 		await fs.promises.unlink(`/tmp/${link}`);
 
-		const outputFile = await fs.promises.readFile(`/tmp/out_${link}`);
+		let outputFile;
+		try {
+			outputFile = await fs.promises.readFile(`/tmp/out_${link}`);
+		}
+		catch {
+			return {
+				success: false,
+				reply: `Could not find converted file! Check file extension and make sure it checks out with the file format.`
+			};
+		}
+
 		const { statusCode, link: outputLink } = await sb.Utils.uploadToImgur(outputFile, link);
 
 		await fs.promises.unlink(`/tmp/out_${link}`);
