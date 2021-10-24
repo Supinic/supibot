@@ -10,28 +10,57 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function vanish (context) {
 		if (context.channel === null || context.channel.Mode !== "Moderator") {
-			return { reply: "You cannot vanish here!" };
+			return {
+				success: false,
+				reply: "You cannot vanish here!"
+			};
 		}
 		else if (context.platform.Name !== "twitch") {
-			return { reply: "You cannot vanish outside of Twitch!" };
+			return {
+				success: false,
+				reply: "You cannot vanish outside of Twitch!"
+			};
 		}
 		else if (context.append.userBadges.hasModerator) {
-			return { reply: "I cannot time moderators out! monkaS" };
-		}
-		else if (context.append.userBadges.hasGlobalMod) {
-			return { reply: "I cannot time global moderators out! monkaS" };
+			return {
+				success: false,
+				reply: "I cannot time moderators out! monkaS"
+			};
 		}
 		else if (context.append.userBadges.hasBroadcaster) {
-			return { reply: "Why are you trying to vanish in your own channel? 4Head" };
+			const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "LuL"], "😄");
+			return {
+				success: false,
+				reply: `Why are you trying to vanish in your own channel? ${emote}`
+			};
 		}
 		else if (context.append.userBadges.hasStaff) {
-			return { reply: "I cannot time Twitch staff out! monkaS" };
+			return {
+				success: false,
+				reply: "I cannot time Twitch staff out! monkaS"
+			};
 		}
 		else if (context.append.userBadges.hasAdmin) {
-			return { reply: "I cannot time Twitch administrators out! monkaS" };
+			return {
+				success: false,
+				reply: "I cannot time Twitch administrators out! monkaS"
+			};
 		}
-	
-		context.platform.client.timeout(context.channel.Name, context.user.Name, 1, "Vanished");
+
+		try {
+			await context.platform.client.timeout(context.channel.Name, context.user.Name, 1, "Vanished");
+		}
+		catch {
+			const emote = await context.getBestAvailableEmote(["LULW", "LuL", "LUL"], "😄");
+			return {
+				success: false,
+				reply: `Could not time you out, because Twitch said nothing and left! ${emote}`
+			};
+		}
+
+		return {
+			reply: null
+		};
 	}),
 	Dynamic_Description: null
 };
