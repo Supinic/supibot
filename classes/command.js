@@ -12,6 +12,7 @@ class Context {
 	#params = {};
 	#meta = new Map();
 	#userFlags = {};
+	#tee = [];
 
 	constructor (command, data = {}) {
 		this.#invocation = data.invocation ?? null;
@@ -34,6 +35,10 @@ class Context {
 
 	getMeta (name) { return this.#meta.get(name); }
 	setMeta (name, value) { this.#meta.set(name, value); }
+
+	pushTee (string) {
+		this.#tee.push(string);
+	}
 
 	/**
 	 * Fetches an object wrapper describing the user's permissions in given command context.
@@ -112,6 +117,7 @@ class Context {
 		return "(no emote found)";
 	}
 
+	get tee () { return Object.freeze([...this.#tee]); }
 	get invocation () { return this.#invocation; }
 	get user () { return this.#user; }
 	get channel () { return this.#channel; }
