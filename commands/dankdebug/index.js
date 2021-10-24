@@ -85,7 +85,7 @@ module.exports = {
 		else {
 			script = `(async () => {\n${string}\n})()`;
 		}
-		
+
 		if (importedText) {
 			script = `${importedText}${script}`;
 		}
@@ -98,10 +98,11 @@ module.exports = {
 						? [...context.append.aliasStack]
 						: [],
 					args: scriptArgs ?? null,
-					executor: context.user.Name,
 					channel: context.channel?.Name ?? "(none)",
-					platform: context.platform.Name,
 					console: undefined,
+					executor: context.user.Name,
+					platform: context.platform.Name,
+					tee: Object.freeze(...context.tee),
 					utils: {
 						getEmote: (array, fallback) => {
 							if (!Array.isArray(array) || array.some(i => typeof i !== "string")) {
