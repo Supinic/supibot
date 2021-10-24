@@ -12,7 +12,7 @@ module.exports = {
 
 		let type = "";
 		const msg = sb.Utils.removeAccents(context.message).toLowerCase();
-		if (msg.includes("wanna become famous?") && msg.includes("bigfollows")) {
+		if (msg.includes("become famous?") && msg.includes("bigfollows")) {
 			type = "becoming famous";
 		}
 		else if (msg.includes("get raided")) {
@@ -31,7 +31,7 @@ module.exports = {
 
 			return;
 		}
-		
+
 		const messageCount = await sb.Query.getRecordset(rs => rs
 			.select("Message_Count")
 			.from("chat_data", "Message_Meta_User_Alias")
