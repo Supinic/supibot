@@ -134,6 +134,7 @@ module.exports = {
 				context.user,
 				{
 					...context.append,
+					tee: context.tee,
 					platform: context.platform,
 					pipe: true,
 					skipBanphrases: true,

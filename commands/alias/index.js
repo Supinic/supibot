@@ -967,7 +967,8 @@ module.exports = {
 						skipBanphrases: true,
 						skipMention: true,
 						skipPending: true,
-						partialExecute: true
+						partialExecute: true,
+						tee: context.tee
 					}
 				);
 
