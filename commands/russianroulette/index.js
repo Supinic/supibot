@@ -45,7 +45,7 @@ module.exports = {
 				reply: "Admins can't be timed out, cheaters! monkaS"
 			};
 		}
-	
+
 		timeoutLength = (timeoutLength) ? Number(timeoutLength) : 1;
 
 		if (timeoutLength < 1 || !Number.isFinite(timeoutLength) || Math.round(timeoutLength) !== timeoutLength) {
@@ -62,16 +62,25 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-	
+
 		const result = sb.Utils.random(1, 6);
 		if (result === 1) {
-			await context.platform.client.timeout(
-				context.channel.Name,
-				context.user.Name,
-				timeoutLength,
-				"Lost the roulette"
-			);
-	
+			try {
+				await context.platform.client.timeout(
+					context.channel.Name,
+					context.user.Name,
+					timeoutLength,
+					"Lost the roulette"
+				);
+			}
+			catch {
+				const emote = await context.getBestAvailableEmote(["LULW", "LuL", "LUL"], "😄");
+				return {
+					success: false,
+					reply: `Could not time you out, because Twitch said nothing and left! ${emote}`
+				};
+			}
+
 			return {
 				reply: "Bang! It's over."
 			};
