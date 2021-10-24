@@ -192,11 +192,11 @@ module.exports = {
 	})),
 	Code: (async function aliasBuildingBlock (context, type, ...args) {
 		const { blocks } = this.staticData;
-		if (!context.append.alias) {
+		if (!context.append.alias && !context.append.pipe) {
 			if (!type) {
 				return {
 					success: false,
-					reply: `This command can only be used within aliases! Check help here: https://supinic.com/bot/command/${this.ID}`
+					reply: `This command can only be used within aliases or pipes! Check help here: https://supinic.com/bot/command/${this.ID}`
 				};
 			}
 
@@ -205,13 +205,13 @@ module.exports = {
 			if (!block) {
 				return {
 					success: false,
-					reply: `This command can only be used within aliases! Check help here: https://supinic.com/bot/command/${this.ID}`
+					reply: `This command can only be used within aliases or pipes! Check help here: https://supinic.com/bot/command/${this.ID}`
 				};
 			}
 			else {
 				return {
 					success: false,
-					reply: `This command can only be used within aliases! Block description: ${block.description}`
+					reply: `This command can only be used within aliases or pipes! Block description: ${block.description}`
 				};
 			}
 		}
@@ -229,13 +229,6 @@ module.exports = {
 			return {
 				success: false,
 				reply: `Incorrect block type provided! Check help here: https://supinic.com/bot/command/${this.ID}`
-			};
-		}
-
-		if (!context.append.alias) {
-			return {
-				success: false,
-				reply: "This command can only be used within aliases!"
 			};
 		}
 
