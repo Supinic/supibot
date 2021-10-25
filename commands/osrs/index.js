@@ -8,6 +8,7 @@ module.exports = {
 	Params: [
 		{ name: "activity", type: "string" },
 		{ name: "boss", type: "string" },
+		{ name: "force", type: "boolean" },
 		{ name: "rude", type: "boolean" },
 		{ name: "seasonal", type: "boolean" },
 		{ name: "skill", type: "string" }
@@ -19,7 +20,10 @@ module.exports = {
 				? { user, seasonal: true }
 				: { user };
 
-			let data = await command.getCacheData(key);
+			let data = (options.force)
+				? null
+				: await command.getCacheData(key);
+
 			if (!data) {
 				let apiData;
 				if (!options.seasonal) {
@@ -256,7 +260,8 @@ module.exports = {
 				}
 
 				const data = await this.staticData.fetch(user, {
-					seasonal: Boolean(context.params.seasonal)
+					seasonal: Boolean(context.params.seasonal),
+					force: Boolean(context.params.force)
 				});
 
 				if (data.success === false) {
@@ -428,8 +433,10 @@ module.exports = {
 			"<u>Skill level overview</u>",
 			`<code>${prefix}osrs (username)</code>`,
 			`<code>${prefix}osrs stats (username)</code>`,
+			`<code>${prefix}osrs stats (username) force:true</code>`,
 			"Posts a full list of skill levels for provided user. Does not include experience or rankings.",
 			`If used with "seasonal-stats", the command will attempt to use that user's seasonal profile.`,
+			"Results are cached. If you would like to force a new user reload, use the <code>force:true</code> parameter.",
 			"",
 
 			"<u>Skill level detail</u>",
