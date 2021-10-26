@@ -60,5 +60,19 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"Fetches the first channel the provided user (or you) have ever followed on Twitch",
+		`To fetch the reverse - the first follower of a given channel - check out the <a href="/bot/command/firstchannelfollower">first channel follower</code> command`,
+		"",
+
+		`<code>${prefix}ffc</code>`,
+		`<code>${prefix}firstfollowedchannel/code>`,
+		"Posts your first ever followed channel that's still active.",
+		"",
+
+		`<code>${prefix}ffc (username)</code>`,
+		`<code>${prefix}firstfollowedchannel (username)</code>`,
+		"Posts target user's first ever followed channel that's still active.",
+		""
+	])
 };

@@ -47,5 +47,19 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"Fetches the first still active follower of a provided channel on Twitch.",
+		`To fetch the reverse - the first followed channel of a given user - check out the <a href="/bot/command/firstfollowedchannel">first followed channel</code> command`,
+		"",
+
+		`<code>${prefix}fcf</code>`,
+		`<code>${prefix}firstchannelfollower/code>`,
+		"Posts your first still active follower.",
+		"",
+
+		`<code>${prefix}fcf (username)</code>`,
+		`<code>${prefix}firstchannelfollower (username)</code>`,
+		"Posts the provided channel's first still active follower.",
+		""
+	])
 };
