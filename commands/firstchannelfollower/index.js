@@ -49,7 +49,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix) => [
 		"Fetches the first still active follower of a provided channel on Twitch.",
-		`To fetch the reverse - the first followed channel of a given user - check out the <a href="/bot/command/firstfollowedchannel">first followed channel</code> command`,
+		`To fetch the reverse - the first followed channel of a given user - check out the <a href="/bot/command/firstfollowedchannel">first followed channel</a> command`,
 		"",
 
 		`<code>${prefix}fcf</code>`,
