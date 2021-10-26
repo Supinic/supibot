@@ -18,11 +18,12 @@ module.exports = {
 		applyParameters: (context, aliasArguments, commandArguments) => {
 			const resultArguments = [];
 			const numberRegex = /(?<order>-?\d+)(\.\.(?<range>-?\d+))?(?<rest>\+?)/;
+			const strictNumberRegex = /^[\d-.+]+$/;
 
 			for (let i = 0; i < aliasArguments.length; i++) {
 				const parsed = aliasArguments[i].replace(/\${(.+?)}/g, (total, match) => {
 					const numberMatch = match.match(numberRegex);
-					if (numberMatch) {
+					if (numberMatch && strictNumberRegex.test(match)) {
 						let order = Number(numberMatch.groups.order);
 						if (order < 0) {
 							order = commandArguments.length + order;
