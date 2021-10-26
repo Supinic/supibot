@@ -27,7 +27,7 @@ module.exports = {
 			targetChannel = context.channel.Name;
 		}
 		else {
-			targetChannel = args[0];
+			targetChannel = sb.Channel.normalizeName(args[0]);
 		}
 
 		const { controller } = sb.Platform.get("twitch");
