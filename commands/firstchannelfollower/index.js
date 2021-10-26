@@ -53,7 +53,7 @@ module.exports = {
 		"",
 
 		`<code>${prefix}fcf</code>`,
-		`<code>${prefix}firstchannelfollower/code>`,
+		`<code>${prefix}firstchannelfollower</code>`,
 		"Posts your first still active follower.",
 		"",
 
