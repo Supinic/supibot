@@ -290,11 +290,15 @@ module.exports = {
 					}
 
 					const { emoji } = this.staticData.skills.find(i => i.name.toLowerCase() === skillName);
+					const experience = (skill.experience === -1)
+						? "(unranked)"
+						: sb.Utils.groupDigits(skill.experience);
+
 					return {
 						reply: sb.Utils.tag.trim `
 							${sb.Utils.capitalize(accountType)} ${user}
 							${emoji} ${skill.level} 
-							(XP: ${sb.Utils.groupDigits(skill.experience)})
+							(XP: ${experience})
 						`
 					};
 				}
