@@ -106,6 +106,12 @@ module.exports = {
 						reply: `Invalid custom Hastebin server provided!`
 					};
 				}
+				else if (server === "hastebin.com" && context.params.raw === false) {
+					return {
+						success: false,
+						reply: `Cannot use ${server} with the raw:false parameter! The link would redirect you to Toptal instead.`
+					};
+				}
 
 				const response = await sb.Got("GenericAPI", {
 					method: "POST",
