@@ -94,7 +94,9 @@ module.exports = {
 				url: `https://raters.ir/exchange/api/currency/${otherCurrency}`
 			});
 
-			if (response.statusCode === 200) {
+			// Apparently, this API sends 200 code even though the currency code wasn't found. The "actual" response code
+			// is sent as `body.status` {number}. So we gotta check that too.
+			if (response.statusCode === 200 && response.body.status !== 404) {
 				const [price] = response.body.data.prices;
 				let fixedRatio = Number(price.live.replace(",", ""));
 				if (first === "IRR") {
