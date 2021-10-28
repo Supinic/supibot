@@ -48,6 +48,18 @@ module.exports = class DiscordController extends require("./template.js") {
 				user
 			} = this.parseMessage(messageObject);
 
+			// If the bot does not have SEND_MESSAGES permission in the channel, completely ignore the message
+			// and just log it. Do not process it for commands or AFKs, Reminders, anything.
+			const selfPermissions = messageObject.channel.permissionsFor(this.platform.Self_ID);
+			if (selfPermissions && !selfPermissions.has("SEND_MESSAGES")) {
+				const userData = await sb.User.get(user);
+				const channelData = sb.Channel.get(chan, this.platform);
+
+				await sb.Logger.push(sb.Utils.wrapString(msg, this.platform.Message_Limit), userData, channelData);
+
+				return;
+			}
+
 			if (Array.from(user).length > 32) {
 				const json = JSON.stringify({
 					chan,
