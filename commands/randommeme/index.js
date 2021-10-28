@@ -202,7 +202,7 @@ module.exports = {
 					statusCode,
 					hostname: "reddit.com",
 					statusMessage: body.statusMessage ?? null,
-					message: body.message ?? null,
+					message: `Fetching ${subreddit}/about.json failed`,
 					stack: null
 				});
 			}
@@ -239,7 +239,7 @@ module.exports = {
 					statusCode,
 					hostname: "reddit.com",
 					statusMessage: body.statusMessage ?? null,
-					message: body.message ?? null,
+					message: `Fetching ${subreddit}/hot.json failed`,
 					stack: null
 				});
 			}
