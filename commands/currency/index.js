@@ -106,6 +106,9 @@ module.exports = {
 				const fixedSecondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * fixedRatio, 3));
 				message = `Official: ${message}; True: ${firstAmount} ${first} = ${fixedSecondAmount} ${second}`;
 			}
+			else {
+				message = `Official: ${message}; True: (no data)`;
+			}
 		}
 
 		return {
