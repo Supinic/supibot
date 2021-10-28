@@ -371,16 +371,41 @@ module.exports = class DiscordController extends require("./template.js") {
 			await discordUser.send(message);
 		}
 		catch (e) {
-			throw new sb.Error({
-				message: "Sending Discord private message failed",
-				args: {
-					message,
-					userName: userData.Name,
-					userID: userData.ID,
-					discordUserID: userData.Discord_ID
-				},
-				cause: e
+			if (!this.platform.Data.createReminderWhenSendingPrivateMessageFails) {
+				throw new sb.Error({
+					message: "Sending Discord private message failed",
+					args: {
+						message,
+						userName: userData.Name,
+						userID: userData.ID,
+						discordUserID: userData.Discord_ID
+					},
+					cause: e
+				});
+			}
+
+			const currentUTC = new sb.Date().setTimezoneOffset(0).format("Y-m-d H:i:s");
+			const pasteMessage = `Private message from Supibot, posted on ${currentUTC} GMT\n\n${message}`;
+
+			const result = await sb.Pastebin.post(pasteMessage, {
+				name: "Supibot private message",
+				privacy: "unlisted",
+				expiration: "1D"
 			});
+
+			if (result.success) {
+				const botData = await sb.User.get(this.platform.Self_Name);
+				await sb.Reminder.create({
+					User_From: botData.ID,
+					User_To: userData.ID,
+					Channel: null,
+					Platform: this.platform.ID,
+					Schedule: null,
+					Created: new sb.Date(),
+					Private_Message: false,
+					Text: `I tried to send you a DM, but it didn't go through. Check it here: ${result.body}`
+				}, true);
+			}
 		}
 	}
 
