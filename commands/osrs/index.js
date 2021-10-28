@@ -25,27 +25,29 @@ module.exports = {
 				: await command.getCacheData(key);
 
 			if (!data) {
-				let apiData;
+				let response;
 				if (!options.seasonal) {
-					apiData = await sb.Got("Supinic", `osrs/lookup/${user}`).json();
+					response = await sb.Got("Supinic", {
+						url: `osrs/lookup/${user}`
+					});
 				}
 				else {
-					apiData = await sb.Got("Supinic", {
+					response = await sb.Got("Supinic", {
 						url: `osrs/lookup/${user}`,
 						searchParams: {
 							seasonal: "1"
 						}
-					}).json();
+					});
 				}
 
-				if (!apiData.data) {
+				if (response.statusCode === 404 || !response.body.data) {
 					return {
 						success: false,
 						reply: `No data found for player name "${user}"!`
 					};
 				}
 
-				data = apiData.data;
+				data = response.body.data;
 				await command.setCacheData(key, data, {
 					expiry: 600_000
 				});
