@@ -41,12 +41,13 @@ module.exports = {
 			};
 		}
 
-		const vod = await sb.Got("Helix", {
+		const response = await sb.Got("Helix", {
 			url: "videos",
 			searchParams: `user_id=${channelID}`
-		}).json();
+		});
 
-		if (vod.data.length === 0) {
+		const vod = response.body;
+		if (!vod.data || vod.data.length === 0) {
 			return {
 				reply: "Target channel has no VODs saved!"
 			};
