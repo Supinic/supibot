@@ -29,10 +29,13 @@ module.exports = {
 		});
 
 		if (statusCode !== 200) {
-			const filtered = data.error.replace(link, "");
+			const errorMessage = (data.error)
+				? data.error.replace(link, "")
+				: `Unknown error occured (status code ${statusCode})`;
+
 			return {
 				success: false,
-				reply: `${filtered}!`
+				reply: `${errorMessage}!`
 			};
 		}
 
