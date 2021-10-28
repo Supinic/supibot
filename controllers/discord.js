@@ -88,9 +88,16 @@ module.exports = class DiscordController extends require("./template.js") {
 							${sb.Command.prefix}link ${challenge}
 						 `;
 
-						// todo: if this method fails when the target has DMs disabled, catch the error and handle it
-						// appropriately - disable the challenge, send a message to the channel, etc.
-						await this.directPm(discordID, message);
+						try {
+							await this.directPm(discordID, message);
+						}
+						catch (e) {
+							if (e.cause?.message !== "Cannot send messages to this user") {
+								throw e;
+							}
+
+							await this.send(`@${userData.Name}, ${message}`, chan);
+						}
 
 						return;
 					}
