@@ -1309,6 +1309,7 @@ module.exports = Command;
  * @property {boolean} [skipExternalPrefix] If `hasExternalInput` is true, this flag can override it and remove the symbol
  * @property {boolean} [replyWithPrivateMessage] If true, the command reply should be sent via PMs
  * @property {boolean} [removeEmbeds] Determines if the command response should be embed or not
+ * @property {boolean} [keepWhitespace] If true, the command's response will not be automatically stripped from whitespace
  */
 
 /**
