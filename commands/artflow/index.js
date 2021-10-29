@@ -96,7 +96,6 @@ module.exports = {
 			};
 		}
 
-		const query = args.join(" ");
 		const imageData = await sb.Query.getRecordset(rs => {
 			rs.select("Prompt", "Upload_Link")
 				.from("data", "Artflow_Image", "Added")
@@ -104,8 +103,10 @@ module.exports = {
 				.limit(1)
 				.single();
 
-			if (query) {
-				rs.where("Prompt %*like*", query.toLowerCase());
+			if (args.length !== 0) {
+				for (const word of args) {
+					rs.where("Prompt %*like*", word);
+				}
 			}
 
 			return rs;
@@ -118,6 +119,7 @@ module.exports = {
 			};
 		}
 
+		const query = args.join(" ");
 		const searchString = (query) ? ` for the query "${query}" -` : "";
 		const postedDelta = (imageData.Added)
 			? `(posted ${sb.Utils.timeDelta(imageData.Added)})`
