@@ -21,7 +21,7 @@ module.exports = {
 						return { rates: {} };
 					}
 
-					return sb.Got({
+					return sb.Got("GenericAPI", {
 						prefixUrl: "https://data.fixer.io/api",
 						url: "latest",
 						throwHttpErrors: false,
@@ -33,11 +33,11 @@ module.exports = {
 				});
 
 				const [cryptoData, currencyData, goldData, silverData] = await Promise.all([
-					sb.Got({
+					sb.Got("GenericAPI", {
 						url: "https://min-api.cryptocompare.com/data/price",
 						searchParams: new sb.URLParams()
 							.set("fsym", "EUR")
-							.set("tsyms", "BTC,XRP,DOGE,ETH,BCH,LTC,EOS,XLM,BNB,USDT,DOT,ADA,LINK,XMR,ANAL")
+							.set("tsyms", "BTC,XRP,DOGE,ETH,BCH,LTC,EOS,XLM,BNB,USDT,DOT,ADA,LINK,XMR,ANAL,SHIB")
 							.toString(),
 						headers: {
 							Authorization: `Apikey ${sb.Config.get("API_CRYPTO_COMPARE")}`
@@ -46,11 +46,11 @@ module.exports = {
 
 					conditionalFixerIo(),
 
-					sb.Got({
+					sb.Got("GenericAPI", {
 						url: "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/EUR"
 					}).json(),
 
-					sb.Got({
+					sb.Got("GenericAPI", {
 						url: "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAG/EUR"
 					}).json()
 				]);
