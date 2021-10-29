@@ -13,7 +13,7 @@ module.exports = {
 		generationUserID: "5555-7f7f-4747-a44b",
 		threshold: 20
 	})),
-	Code: (async function artflow (context, word) {
+	Code: (async function artflow (context, ...args) {
 		if (context.params.prompt) {
 			const rawPrompts = await sb.Cache.server.hgetall("artflow");
 			const existingPrompts = Object.values(rawPrompts).map(i => JSON.parse(i));
@@ -96,6 +96,7 @@ module.exports = {
 			};
 		}
 
+		const query = args.join(" ");
 		const imageData = await sb.Query.getRecordset(rs => {
 			rs.select("Prompt", "Upload_Link")
 				.from("data", "Artflow_Image", "Added")
@@ -103,8 +104,8 @@ module.exports = {
 				.limit(1)
 				.single();
 
-			if (word) {
-				rs.where("Prompt %*like*", word.toLowerCase());
+			if (query) {
+				rs.where("Prompt %*like*", query.toLowerCase());
 			}
 
 			return rs;
@@ -117,7 +118,7 @@ module.exports = {
 			};
 		}
 
-		const searchString = (word) ? ` for the word "${word}" -` : "";
+		const searchString = (query) ? ` for the query "${query}" -` : "";
 		const postedDelta = (imageData.Added)
 			? `(posted ${sb.Utils.timeDelta(imageData.Added)})`
 			: "";
@@ -136,8 +137,8 @@ module.exports = {
 		"This does NOT generate new things, it only posts pictures that others have created.",
 		"",
 
-		`<code>${prefix}artflow (single word)</code>`,
-		"Posts a random picture where the prompt includes your chosen word.",
+		`<code>${prefix}artflow (query)</code>`,
+		"Posts a random picture where the prompt includes your chosen words or multiple words query.",
 		"",
 
 		`<code>${prefix}artflow prompt:(single word)</code>`,
