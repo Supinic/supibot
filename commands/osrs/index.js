@@ -410,7 +410,7 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async (prefix, values) => {
-		const { activities, activityAliases } = await values.getStaticData();
+		const { activities, activityAliases, skills } = await values.getStaticData();
 		const aliases = [];
 		for (const [key, value] of Object.entries(activityAliases)) {
 			aliases.push({
@@ -419,7 +419,7 @@ module.exports = {
 			});
 		}
 
-		const list = [...activities]
+		const activityList = [...activities]
 			.sort()
 			.map(activity => {
 				let alias = "";
@@ -430,6 +430,11 @@ module.exports = {
 
 				return `<li>${activity}${alias}</li>`;
 			})
+			.join("");
+
+		const skillList = skills
+			.sort((a, b) => a.name.localeCompare(b.name))
+			.map(i => `<li>${i.name} - ${i.emoji}</li>`)
 			.join("");
 
 		return [
@@ -450,6 +455,10 @@ module.exports = {
 			`<code>${prefix}osrs stats (username) skill:(skill)</code>`,
 			"For given user, posts the skill's level, experience, and ranking.",
 			`If used with "seasonal-stats", the command will attempt to use that user's seasonal profile.`,
+			"",
+
+			"<u>Skills and used emojis</u>",
+			`<ul>${skillList}</ul>`,
 			"",
 
 			"<u>Kill-count</u>",
@@ -483,7 +492,7 @@ module.exports = {
 			"",
 
 			"<h6>Supported activities</h6>",
-			`<ul>${list}<ul>`
+			`<ul>${activityList}<ul>`
 		];
 	})
 };
