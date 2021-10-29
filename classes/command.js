@@ -310,7 +310,7 @@ class Command extends require("./template.js") {
 
 		this.#Author = data.Author;
 
-		if (typeof data.Code) {
+		if (typeof data.Code === "function") {
 			this.Code = data.Code;
 		}
 		else {
