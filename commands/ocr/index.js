@@ -126,11 +126,18 @@ module.exports = {
 		}
 
 		const result = data.ParsedResults[0].ParsedText;
-		return {
-			reply: (result.length === 0)
-				? "No text found."
-				: result
-		};
+		if (result.length === 0) {
+			return {
+				success: false,
+				reply: `No text found.`
+			};
+		}
+		else {
+			return {
+				keepWhitespace: true,
+				reply: result
+			};
+		}
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { languages } = values.getStaticData();
