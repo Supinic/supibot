@@ -230,7 +230,7 @@ module.exports = class DiscordController extends require("./template.js") {
 					args.push(...msg.split(" ").filter(Boolean));
 				}
 
-				this.handleCommand(
+				await this.handleCommand(
 					command,
 					args.map(i => DiscordController.removeEmoteTags(i)),
 					channelData,
@@ -487,7 +487,9 @@ module.exports = class DiscordController extends require("./template.js") {
 				skipBanphrases: true
 			});
 
-			await this.send(message, channelData);
+			await this.send(message, channelData, {
+				keepWhitespace: Boolean(commandOptions.keepWhitespace)
+			});
 		}
 	}
 

@@ -107,6 +107,7 @@ module.exports = class Controller {
 	 * @param {Platform} [options.platform] Platform object, if necessary. Usually used for PMs.
 	 * @param {boolean} [options.skipBanphrases] If true, no banphrases will be checked
 	 * @param {boolean} [options.skipLengthCheck] If true, length will not be checked
+	 * @param {boolean} [options.keepWhitespace] If true, whitespace will not be stripped
 	 * @returns {Promise<String|Boolean>} Returns prepared message, or false if nothing is to be sent (result is ignored)
 	 */
 	async prepareMessage (message, channel, options = {}) {
@@ -131,7 +132,9 @@ module.exports = class Controller {
 			}
 		}
 
-		message = sb.Utils.wrapString(message, limit);
+		message = sb.Utils.wrapString(message, limit, {
+			keepWhitespace: Boolean(options.keepWhitespace)
+		});
 
 		// Execute all eligible banphrases, if necessary
 		if (!options.skipBanphrases && sb.Banphrase) {
