@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "artflow-gatherer",
-	Expression: "0 */5 * * * *",
+	Expression: "0 */30 * * * *",
 	Description: "Collects image data from artflow.ai",
 	Defer: (() => ({
 		start: 0,
