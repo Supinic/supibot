@@ -809,8 +809,7 @@ module.exports = class TwitchController extends require("./template.js") {
 						"Twitch.Ban",
 						`Bot banned in channel ${channelData.Name}. Previous mode: ${previousMode}`,
 						channelData
-					),
-					this.client.part(channelData.Name)
+					)
 				]);
 			}
 
