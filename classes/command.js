@@ -308,45 +308,62 @@ class Command extends require("./template.js") {
 
 		this.Whitelist_Response = data.Whitelist_Response;
 
-		this.#Author = data.Author ?? null;
+		this.#Author = data.Author;
 
-		try {
-			this.Code = eval(data.Code);
+		if (typeof data.Code) {
+			this.Code = data.Code;
 		}
-		catch (e) {
-			console.error(`Command ${this.ID} has invalid code definition!`, e);
-			this.Code = async () => ({
-				success: false,
-				reply: "Command has invalid code definition! Please make sure to let @supinic know about this!"
-			});
-		}
-
-		if (data.Static_Data) {
-			let tempData = null;
+		else {
 			try {
-				tempData = eval(data.Static_Data);
+				this.Code = eval(data.Code);
 			}
 			catch (e) {
-				console.warn(`Command has invalid static data definition!`, { commandName: this.Name, error: e });
-				this.Code = () => ({
-					success: false,
-					reply: "Command has invalid code definition! Please make sure to let @supinic know about this!"
-				});
-			}
-
-			if (typeof tempData === "function") {
-				tempData = tempData(this);
-			}
-
-			if (tempData && typeof tempData === "object") {
-				this.staticData = tempData;
-			}
-			else {
-				console.warn(`Command ${this.ID} has invalid static data type!`);
+				console.error(`Command ${this.ID} has invalid code definition!`, e);
 				this.Code = async () => ({
 					success: false,
 					reply: "Command has invalid code definition! Please make sure to let @supinic know about this!"
 				});
+			}
+		}
+
+		if (data.Static_Data) {
+			let staticDataFn;
+
+			if (typeof data.Static_Data === "function") {
+				staticDataFn = data.Static_Data;
+			}
+			else {
+				try {
+					staticDataFn = eval(data.Static_Data);
+				}
+				catch (e) {
+					console.warn(`Command has invalid static data definition!`, { commandName: this.Name, error: e });
+					this.Code = () => ({
+						success: false,
+						reply: "Command has invalid code definition! Please make sure to let @supinic know about this!"
+					});
+				}
+			}
+
+			if (typeof staticDataFn !== "function") {
+				console.warn(`Command ${this.ID} static data is not a function!`);
+				this.Code = async () => ({
+					success: false,
+					reply: "Command's static data is not a function!"
+				});
+			}
+
+			const staticData = staticDataFn();
+
+			if (!staticData || staticData?.constructor?.name !== "Object") {
+				console.warn(`Command ${this.ID} has invalid static data type!`);
+				this.Code = async () => ({
+					success: false,
+					reply: "Command has invalid static data type!"
+				});
+			}
+			else {
+				this.staticData = staticData;
 			}
 		}
 
@@ -405,6 +422,15 @@ class Command extends require("./template.js") {
 
 	get Author () { return this.#Author; }
 
+	// Forward compatibility
+	static async _loadData () {
+		const { definitions } = require("supibot-package-manager/commands");
+
+		Command.data = definitions.map(record => new Command(record));
+
+		this.validate();
+	}
+
 	static async loadData () {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("*")
@@ -414,27 +440,58 @@ class Command extends require("./template.js") {
 
 		Command.data = data.map(record => new Command(record));
 
-		if (Command.data.length === 0) {
-			console.warn("No commands initialized - bot will not respond to any command queries");
+		this.validate();
+	}
+
+	// Forward compatibility
+	static async _reloadSpecific (...list) {
+		if (list.length === 0) {
+			return false;
 		}
 
-		if (!sb.Config) {
-			console.warn("sb.Config module missing - cannot fetch command prefix");
-		}
-		else if (Command.prefix === null) {
-			console.warn("Command prefix is configured as `null` - bot will not respond to any command queries");
-		}
+		delete require.cache[require.resolve("supibot-package-manager/commands")];
 
-		const names = Command.data.flatMap(i => [i.Name, ...i.Aliases]);
-		const duplicates = names.filter((i, ind, arr) => arr.indexOf(i) !== ind);
-		for (const dupe of duplicates) {
-			const affected = Command.data.filter(i => i.Aliases.includes(dupe));
-			for (const command of affected) {
-				const index = command.Aliases.indexOf(dupe);
-				command.Aliases.splice(index, 1);
-				console.warn(`Removed duplicate command name "${dupe}" from command ${command.Name}'s aliases`);
+		const failed = [];
+		const toReload = [];
+		for (const commandName of list) {
+			const commandData = Command.get(commandName);
+			if (commandData) {
+				commandData.destroy();
+			}
+
+			const identifier = commandData?.Name ?? commandData?.name ?? commandName;
+			toReload.push(identifier);
+
+			// Try-catch is mandatory because `require.resolves` throws when the path doesn't exist or is not a module
+			// This might occur when a command name is mistaken. The loading should continue though.
+			let path;
+			try {
+				path = require.resolve(`supibot-package-manager/commands/${identifier}`);
+				delete require.cache[path];
+			}
+			catch {
+				failed.push(identifier)
 			}
 		}
+
+		const { definitions } = require("supibot-package-manager/commands");
+
+		for (const commandName of toReload) {
+			const definition = definitions.find(i => i.Name === commandName || i.Aliases?.includes(commandName));
+			if (!definition) {
+				failed.push(commandName);
+				continue;
+			}
+
+			const commandData = new Command(definition);
+			Command.data.push(commandData);
+		}
+
+		if (failed.length > 0) {
+			await sb.Logger.log("Command.Warning", JSON.stringify(failed));
+		}
+
+		this.validate();
 	}
 
 	/**
@@ -480,6 +537,30 @@ class Command extends require("./template.js") {
 		}
 
 		return true;
+	}
+
+	static validate () {
+		if (Command.data.length === 0) {
+			console.warn("No commands initialized - bot will not respond to any command queries");
+		}
+
+		if (!sb.Config) {
+			console.warn("sb.Config module missing - cannot fetch command prefix");
+		}
+		else if (Command.prefix === null) {
+			console.warn("Command prefix is configured as `null` - bot will not respond to any command queries");
+		}
+
+		const names = Command.data.flatMap(i => [i.Name, ...i.Aliases]);
+		const duplicates = names.filter((i, ind, arr) => arr.indexOf(i) !== ind);
+		for (const dupe of duplicates) {
+			const affected = Command.data.filter(i => i.Aliases.includes(dupe));
+			for (const command of affected) {
+				const index = command.Aliases.indexOf(dupe);
+				command.Aliases.splice(index, 1);
+				console.warn(`Removed duplicate command name "${dupe}" from command ${command.Name}'s aliases`);
+			}
+		}
 	}
 
 	/**
