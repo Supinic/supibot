@@ -179,6 +179,7 @@ module.exports = {
 			return await sb.Command.get("current").execute(context);
 		}
 
+		// Figure out whether song request are available, and where specifically
 		const state = sb.Config.get("SONG_REQUESTS_STATE");
 		if (state === "off") {
 			return { reply: "Song requests are currently turned off." };
@@ -201,6 +202,7 @@ module.exports = {
 			return await this.staticData.cytubeIntegration.queue(args.join(" "));
 		}
 
+		// Determine the user's and global limits - both duration and video amount
 		const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
 		const limits = await this.staticData.checkLimits(context.user, queue);
 		if (!limits.canRequest) {
@@ -209,6 +211,7 @@ module.exports = {
 			};
 		}
 
+		// Determine requested video segment, if provided via the `start` and `end` parameters
 		/** @type {number|null} */
 		let startTime = (context.params.start) ? sb.Utils.parseVideoDuration(context.params.start) : null;
 		if (startTime !== null && (!Number.isFinite(startTime) || startTime > 2 ** 32)) {
@@ -227,6 +230,7 @@ module.exports = {
 			};
 		}
 
+		// Determine the video URL, based on the type of link provided
 		let url = args.join(" ");
 		const type = context.params.type ?? "youtube";
 		const potentialTimestamp = this.staticData.parseTimestamp(url);
@@ -237,6 +241,7 @@ module.exports = {
 		const parsedURL = require("url").parse(url);
 		let data = null;
 
+		// Special URL hosts settings - blacklist, `supinic.com`
 		const { blacklist } = this.staticData;
 		if (blacklist.sites.includes(parsedURL.host)) {
 			return {
@@ -383,6 +388,7 @@ module.exports = {
 			};
 		}
 
+		// Put together the total length of the video, for logging purposes
 		const length = data.duration ?? data.length;
 		if (startTime < 0) {
 			startTime = length + startTime;
@@ -453,6 +459,7 @@ module.exports = {
 			}
 		}
 
+		// Actually attempt to request the video into VLC
 		let id = null;
 		try {
 			let vlcLink = data.link;
@@ -525,6 +532,7 @@ module.exports = {
 			.single()
 		);
 
+		// Log the request into database
 		const row = await sb.Query.getRow("chat_data", "Song_Request");
 		row.setValues({
 			VLC_ID: id,
