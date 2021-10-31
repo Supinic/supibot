@@ -38,7 +38,7 @@ for (const dir of directoryList) {
 	}
 }
 
-return {
+module.exports = {
 	definitions,
 	failed,
 	skipped
