@@ -470,7 +470,10 @@ class Command extends require("./template.js") {
 				delete require.cache[path];
 			}
 			catch {
-				failed.push(identifier)
+				failed.push({
+					identifier,
+					reason: "no-path"
+				});
 			}
 		}
 
@@ -479,7 +482,11 @@ class Command extends require("./template.js") {
 		for (const commandName of toReload) {
 			const definition = definitions.find(i => i.Name === commandName || i.Aliases?.includes(commandName));
 			if (!definition) {
-				failed.push(commandName);
+				failed.push({
+					identifier: commandName,
+					reason: "no-definition"
+				});
+
 				continue;
 			}
 
