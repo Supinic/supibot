@@ -10,7 +10,7 @@ module.exports = (async () => {
 		throw new Error("Cannot combine both blacklist and whitelist options");
 	}
 
-	const nodeList = await fs.readdir(".", {
+	const nodeList = await fs.readdir(__dirname, {
 		withFileTypes: true
 	});
 
