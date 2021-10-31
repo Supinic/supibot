@@ -859,7 +859,8 @@ class Command extends require("./template.js") {
 			else if (execution?.partialReplies) {
 				result = execution.partialReplies
 					.map(i => i.message)
-					.join(" ").trim()
+					.join(" ")
+					.trim()
 					.slice(0, 300);
 			}
 
