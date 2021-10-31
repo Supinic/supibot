@@ -16,13 +16,15 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: ((command) => ({
 		fetch: async (user, options = {}) => {
+			const commandObject = command ?? this;
+
 			const key = (options.seasonal)
 				? { user, seasonal: true }
 				: { user };
 
 			let data = (options.force)
 				? null
-				: await command.getCacheData(key);
+				: await commandObject.getCacheData(key);
 
 			if (!data) {
 				let response;
@@ -48,7 +50,7 @@ module.exports = {
 				}
 
 				data = response.body.data;
-				await command.setCacheData(key, data, {
+				await commandObject.setCacheData(key, data, {
 					expiry: 600_000
 				});
 			}
