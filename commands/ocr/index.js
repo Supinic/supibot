@@ -62,19 +62,30 @@ module.exports = {
 			};
 		}
 
-		const rawLink = args.shift();
-		if (!rawLink) {
+		let link;
+		const { URL } = require("url");
+		for (const arg of args) {
+			let parsedURL;
+			try {
+				parsedURL = new URL(arg);
+			}
+			catch {
+				continue;
+			}
+
+			parsedURL.protocol = "https";
+			link = parsedURL.toString();
+
+			break;
+		}
+
+		if (!link) {
 			return {
 				success: false,
-				reply: "No link provided!",
+				reply: "No valid link provided!",
 				cooldown: 2500
 			};
 		}
-
-		const linkData = require("url").parse(rawLink);
-		const link = (linkData.protocol && linkData.host)
-			? `https://${linkData.host}${linkData.path}`
-			: `https://${linkData.path}`;
 
 		let data;
 		let statusCode;
