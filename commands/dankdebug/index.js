@@ -8,6 +8,7 @@ module.exports = {
 	Params: [
 		{ name: "arguments", type: "string" },
 		{ name: "errorInfo", type: "boolean" },
+		{ name: "force", type: "boolean" },
 		{ name: "function", type: "string" },
 		{ name: "importGist", type: "string" }
 	],
@@ -44,6 +45,7 @@ module.exports = {
 				};
 			}
 		}
+
 		let importedText;
 		if (context.params.importGist) {
 			if (context.params.importGist.includes(" ")) {
@@ -52,21 +54,28 @@ module.exports = {
 					reply: `Gist IDs cannot contain spaces!`
 				};
 			}
+
 			const gistCommand = sb.Command.get("pastebin");
 			const fakeCtx = sb.Command.createFakeContext(
 				gistCommand,
 				{
 					...context,
+					params: {
+						force: Boolean(context.params.force)
+					},
 					invocation: "gist"
 				},
 				{}
 			);
+
 			const gistResult = await gistCommand.execute(fakeCtx, context.params.importGist);
 			if (gistResult.success === false) {
 				return gistResult;
 			}
+
 			importedText = gistResult.reply;
-			if (!(importedText.endsWith(";") || importedText.endsWith(","))) {
+
+			if (!importedText.endsWith(";") && !importedText.endsWith(",")) {
 				importedText += ";";
 			}
 		}
