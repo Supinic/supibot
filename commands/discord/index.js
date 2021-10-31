@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 15000,
-	Description: "Posts the link to the current channel's Discord(?)",
+	Description: "Posts the link to the current channel's Discord. Can be set up with the $set command.",
 	Flags: ["external-input","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
@@ -15,10 +15,17 @@ module.exports = {
 				reply: "There's no Discord in whispers..."
 			};
 		}
-	
+
 		return {
 			reply: (context.channel.Data.discord) ?? "This channel has no Discord description set up."
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"Posts the link to the current channel's Discord description.",
+		`Use the <a href="/bot/command/set">${prefix}set discord</a> command to set up your custom description.`,
+		"",
+
+		`<code>${prefix}discord</code>`,
+		"Posts the Discord description of the current channel, if set up."
+	])
 };
