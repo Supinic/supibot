@@ -7,8 +7,8 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => {
-		this.data.labyrinth = {
+	Static_Data: (command => {
+		command.data.labyrinth = {
 			date: null,
 			normal: null,
 			cruel: null,
@@ -43,9 +43,9 @@ module.exports = {
 							};
 						}
 
-						if (!this.data.labyrinth.date || this.data.labyrinth.date.day !== new sb.Date().day) {
-							this.data.labyrinth.date = new sb.Date().setTimezoneOffset(0);
-							this.data.details = {};
+						if (!command.data.labyrinth.date || command.data.labyrinth.date.day !== new sb.Date().day) {
+							command.data.labyrinth.date = new sb.Date().setTimezoneOffset(0);
+							command.data.details = {};
 
 							const { statusCode, statusMessage, body: html } = await sb.Got("FakeAgent", {
 								url: "https://poelab.com",
@@ -64,7 +64,7 @@ module.exports = {
 
 							for (let i = 0; i < links.length; i++) {
 								const type = types[i];
-								this.data.details[type] = {
+								command.data.details[type] = {
 									type,
 									link: links[i],
 									imageLink: null
@@ -72,7 +72,7 @@ module.exports = {
 							}
 						}
 
-						const detail = this.data.details[labType];
+						const detail = command.data.details[labType];
 						if (detail.imageLink === null) {
 							const html = await sb.Got("FakeAgent", {
 								url: detail.link,

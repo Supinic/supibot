@@ -7,8 +7,8 @@ module.exports = {
 	Flags: ["mention","pipe","whitelist"],
 	Params: null,
 	Whitelist_Response: "Only available in supinic's channel!",
-	Static_Data: (() => {
-		this.data.cooldowns = {};
+	Static_Data: (command => {
+		command.data.cooldowns = {};
 		return {
 			// conga removed due to the fact the fight is dependent on the 8th missing beat
 			zones: [

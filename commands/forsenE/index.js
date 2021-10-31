@@ -7,8 +7,8 @@ module.exports = {
 	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => {
-		this.data.previousPosts = [];
+	Static_Data: (command => {
+		command.data.previousPosts = [];
 		return {
 			repeats: 5,
 			forsenE: [

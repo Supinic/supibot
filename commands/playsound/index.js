@@ -7,9 +7,9 @@ module.exports = {
 	Flags: ["mention","pipe","whitelist"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => {
-		this.data.cooldowns = {};
-	
+	Static_Data: (command => {
+		command.data.cooldowns = {};
+
 		return {
 			fetch: (name) => sb.Query.getRecordset(rs => rs
 				.select("*")
@@ -37,7 +37,7 @@ module.exports = {
 				.flat("Name")
 			);
 		}
-	
+
 		const data = await this.staticData.fetch(playsound);
 		if (!data) {
 			return {
@@ -45,9 +45,9 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-	
+
 		this.data.cooldowns[data.Name] = this.data.cooldowns[data.Name] ?? 0;
-	
+
 		const now = sb.Date.now();
 		if (this.data.cooldowns[data.Name] >= now) {
 			const delta = sb.Utils.timeDelta(this.data.cooldowns[data.Name]);
@@ -55,7 +55,7 @@ module.exports = {
 				reply: `The playsound's cooldown has not passed yet! Try again in ${delta}.`
 			};
 		}
-	
+
 		let success = null;
 		try {
 			success = await sb.LocalRequest.playAudio(data.Filename);
@@ -65,13 +65,13 @@ module.exports = {
 			await sb.Config.set("PLAYSOUNDS_ENABLED", false);
 			return { reply: "The desktop listener is not currently running, turning off playsounds!" };
 		}
-	
+
 		await sb.Query.getRecordUpdater(ru => ru
 			.update("data", "Playsound")
 			.set("Use_Count", data.Use_Count + 1)
 			.where("Name = %s", data.Name)
 		);
-	
+
 		this.data.cooldowns[data.Name] = now + data.Cooldown;
 		return {
 			success,

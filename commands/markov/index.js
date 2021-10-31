@@ -13,8 +13,8 @@ module.exports = {
 		{ name: "words", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => {
-		this.data.updateCron = new sb.Cron({
+	Static_Data: (command => {
+		command.data.updateCron = new sb.Cron({
 			Name: "markov-word-list-updater",
 			Description: "Regularly updates the available words in $markov.",
 			Expression: "0 * * * * *",
@@ -42,7 +42,7 @@ module.exports = {
 				await Promise.all(promises);
 			})
 		});
-		this.data.updateCron.start();
+		command.data.updateCron.start();
 
 		const threshold = 250;
 		return {

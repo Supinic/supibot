@@ -7,8 +7,8 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => {
-		this.data.updateCron = new sb.Cron({
+	Static_Data: (command => {
+		command.data.updateCron = new sb.Cron({
 			Name: "crypto-game-price-updater",
 			Description: "Regularly updates the prices used in the crypto-game command.",
 			Expression: "0 0 * * * *",
@@ -87,7 +87,7 @@ module.exports = {
 				await Promise.all(promises);
 			})
 		});
-		this.data.updateCron.start();
+		command.data.updateCron.start();
 
 		const baseAsset = {
 			Code: "EUR",
