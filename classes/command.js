@@ -353,7 +353,7 @@ class Command extends require("./template.js") {
 				});
 			}
 
-			const staticData = staticDataFn(this);
+			const staticData = staticDataFn.call(this);
 
 			if (!staticData || staticData?.constructor?.name !== "Object") {
 				console.warn(`Command ${this.ID} has invalid static data type!`);
