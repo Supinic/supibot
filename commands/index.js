@@ -1,4 +1,4 @@
-(async () => {
+module.exports = (async () => {
 	const fs = require("fs/promises");
 	const path = require("path");
 
@@ -39,7 +39,7 @@
 		}
 	}
 
-	module.exports = {
+	return {
 		definitions,
 		failed,
 		skipped
