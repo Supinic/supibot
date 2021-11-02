@@ -53,10 +53,10 @@ module.exports = {
 
 		const players = steamResponse.body.response.player_count;
 		let publisher = "";
-		if (game.developer.length === 1) {
+		if (game.publisher.length === 1) {
 			publisher = `(by ${game.publisher[0]})`;
 		}
-		else if (game.developer.length > 1) {
+		else if (game.publisher.length > 1) {
 			publisher = `(by ${game.publisher[0]} and others)`;
 		}
 
