@@ -869,8 +869,7 @@ class Command extends require("./template.js") {
 			if (typeof command.ID === "number") {
 				sb.Logger.logCommandExecution({
 					User_Alias: userData.ID,
-					Command: null,
-					Command_Name: command.Name,
+					Command: command.Name,
 					Platform: options.platform.ID,
 					Executed: new sb.Date(),
 					Channel: channelData?.ID ?? null,

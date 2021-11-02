@@ -168,7 +168,6 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 				[
 					"User_Alias",
 					"Command",
-					"Command_Name",
 					"Platform",
 					"Executed",
 					"Channel",
