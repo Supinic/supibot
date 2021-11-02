@@ -407,13 +407,24 @@ class Command extends require("./template.js") {
 		return await super.serialize(row, Command.#serializableProperties, options);
 	}
 
-	getDetailURL () {
+	/**
+	 * Creates the command's detail URL based on a Configuration variable
+	 * @param {Object} [options]
+	 * @param {boolean} [options.useCodePath] If true, returns a path for the command's code description
+	 * @returns {string}
+	 */
+	getDetailURL (options = {}) {
 		const baseURL = sb.Config.get("COMMAND_DETAIL_URL", false);
 		if (!baseURL) {
 			return "N/A";
 		}
 
-		return `${baseURL}/${this.Name}`;
+		if (options.useCodePath) {
+			return `${baseURL}/${this.Name}/code`;
+		}
+		else {
+			return `${baseURL}/${this.Name}`;
+		}
 	}
 
 	getCacheKey () {
