@@ -424,7 +424,7 @@ class Command extends require("./template.js") {
 
 	// Forward compatibility
 	static async _loadData () {
-		const { definitions } = require("supibot-package-manager/commands");
+		const { definitions } = await require("supibot-package-manager/commands");
 
 		Command.data = definitions.map(record => new Command(record));
 
@@ -477,7 +477,7 @@ class Command extends require("./template.js") {
 			}
 		}
 
-		const { definitions } = require("supibot-package-manager/commands");
+		const { definitions } = await require("supibot-package-manager/commands");
 
 		for (const commandName of toReload) {
 			const definition = definitions.find(i => i.Name === commandName || i.Aliases?.includes(commandName));
