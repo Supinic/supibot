@@ -6,7 +6,8 @@ module.exports = {
 	Description: "Adds a new channel to database, sets its tables and events, and joins it. Only applicable for Twitch channels (for now, at least).",
 	Flags: ["mention","pipe","system","whitelist"],
 	Params: [
-		{ name: "platform", type: "string" }
+		{ name: "platform", type: "string" },
+		{ name: "silent", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -23,7 +24,7 @@ module.exports = {
 				reply: `Only additional mode available is "Read"!`
 			};
 		}
-		
+
 		channel = channel.replace("#", "").toLowerCase();
 
 		const platformName = context.params.platform ?? "twitch";
@@ -64,7 +65,7 @@ module.exports = {
 			};
 		}
 
-		if (channelData) {
+		if (channelData && !context.params.silent) {
 			const emote = await channelData.getBestAvailableEmote(["MrDestructoid"], "🤖");
 			await channelData.send(`${emote} 👍 Successfully joined!`);
 		}
