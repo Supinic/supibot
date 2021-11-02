@@ -29,13 +29,22 @@ module.exports = (async () => {
 			continue;
 		}
 
+		let definition;
 		const indexPath = path.join(__dirname, dir.name, "index.js");
 		try {
-			const definition = require(indexPath);
-			definitions.push(definition);
+			definition = require(indexPath);
 		}
 		catch {
 			failed.push(dir.name);
+		}
+
+		if (definition) {
+			if (config.skipArchivedCommands && definition.flags.includes("archived")) {
+				skipped.push(definition);
+			}
+			else {
+				definitions.push(definition);
+			}
 		}
 	}
 
