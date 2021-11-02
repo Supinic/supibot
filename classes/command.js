@@ -648,7 +648,7 @@ class Command extends require("./template.js") {
 		const cooldownCheck = sb.CooldownManager.check(
 			channelID,
 			userData.ID,
-			command.ID,
+			command.Name,
 			Boolean(options.skipPending)
 		);
 
@@ -831,7 +831,7 @@ class Command extends require("./template.js") {
 				length = cooldownFilter.applyData(length);
 			}
 
-			sb.CooldownManager.set(channelID, userData.ID, command.ID, length);
+			sb.CooldownManager.set(channelID, userData.ID, command.Name, length);
 
 			await sb.Runtime.incrementRejectedCommands();
 
@@ -1093,7 +1093,7 @@ class Command extends require("./template.js") {
 
 		if (commandData.Flags.ownerOverride && channelData?.isUserChannelOwner(userData)) {
 			// Set a very small, only technical cooldown
-			sb.CooldownManager.set(channelID, userData.ID, commandData.ID, 500);
+			sb.CooldownManager.set(channelID, userData.ID, commandData.Name, 500);
 		}
 		else if (typeof cooldownData !== "undefined") {
 			if (cooldownData !== null) {
@@ -1110,7 +1110,7 @@ class Command extends require("./template.js") {
 					const {
 						channel = channelID,
 						user = userData.ID,
-						command = commandData.ID,
+						command = commandData.Name,
 						ignoreCooldownFilters = false,
 						options = {}
 					} = cooldown;
@@ -1150,7 +1150,7 @@ class Command extends require("./template.js") {
 				length = cooldownFilter.applyData(length);
 			}
 
-			sb.CooldownManager.set(channelID, userData.ID, commandData.ID, length);
+			sb.CooldownManager.set(channelID, userData.ID, commandData.Name, length);
 		}
 	}
 
