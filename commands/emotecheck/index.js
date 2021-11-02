@@ -532,7 +532,7 @@ module.exports = {
 	Code: (async function emoteCheck (context, name) {
 		if (!name) {
 			return {
-				reply: `Check available emote sets here: https://supinic.com/bot/command/${this.ID}`
+				reply: `Check available emote sets here: ${this.getDetailURL()}`
 			};
 		}
 
@@ -540,7 +540,7 @@ module.exports = {
 		const result = this.staticData.sets.find(i => i.name === name || i.aliases.includes(name));
 		if (!result) {
 			return {
-				reply: `No valid emote set found! Check available emote sets here: https://supinic.com/bot/command/${this.ID}`
+				reply: `No valid emote set found! Check available emote sets here: ${this.getDetailURL()}`
 			};
 		}
 

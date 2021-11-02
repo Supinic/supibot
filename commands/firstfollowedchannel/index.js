@@ -62,7 +62,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix) => [
 		"Fetches the first channel the provided user (or you) have ever followed on Twitch",
-		`To fetch the reverse - the first follower of a given channel - check out the <a href="/bot/command/firstchannelfollower">first channel follower</a> command`,
+		`To fetch the reverse - the first follower of a given channel - check out the <a href="/bot/command/detail/firstchannelfollower">first channel follower</a> command`,
 		"",
 
 		`<code>${prefix}ffc</code>`,

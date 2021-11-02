@@ -475,9 +475,9 @@ module.exports = {
 			"If you would like to help out and make the command more usable for everyone else, you have several options in which you can provide your input!",
 
 			`<ul>
-				<li><code>${prefix}set tl (link) (flags)</code> - Adds NSFW flags to an image. More info: <a href="/bot/command/set">$set</a></li>
-				<li><code>${prefix}set tld (link) (description)</code> - Adds a description to an image. More info: <a href="/bot/command/set">$set</a></li>
-				<li><code>${prefix}tle (link)</code> - If an image has NSFW detections, this will highlight them. More info: <a href="/bot/command/twitchlottoexplain">$tle</a></li>
+				<li><code>${prefix}set tl (link) (flags)</code> - Adds NSFW flags to an image. More info: <a href="/bot/command/detail/set">$set</a></li>
+				<li><code>${prefix}set tld (link) (description)</code> - Adds a description to an image. More info: <a href="/bot/command/detail/set">$set</a></li>
+				<li><code>${prefix}tle (link)</code> - If an image has NSFW detections, this will highlight them. More info: <a href="/bot/command/detail/twitchlottoexplain">$tle</a></li>
 			</ul>`
 		];
 	})

@@ -20,7 +20,7 @@ module.exports = {
 		const history = await sb.Query.getRecordset(rs => rs
 			.select("Executed", "Result")
 			.from("chat_data", "Command_Execution")
-			.where("Command = %n", this.ID)
+			.where("Command = %s", this.Name)
 			.where("Result <> %s", "")
 			.orderBy("Executed ASC")
 			.limit(1)

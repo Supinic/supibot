@@ -90,7 +90,7 @@ module.exports = {
 				reply: sb.Utils.tag.trim `
 					This command lets you create your own command aliases.
 					Check the extended help here:
-					https://supinic.com/bot/command/${this.ID}
+					${this.getDetailURL()}
 					If you created some, check your list here:
 					https://supinic.com/user/alias/list
 				`
@@ -986,7 +986,7 @@ module.exports = {
 			reply: sb.Utils.tag.trim `
 				Invalid sub-command provided!
 				Check the extended help here:
-				https://supinic.com/bot/command/${this.ID}
+				${this.getDetailURL()}
 			`
 		};
 	}),
@@ -1152,7 +1152,7 @@ module.exports = {
 				</li>
 			</ul>`,
 
-		`For a list of neat small commands usable within aliases to ease up your work, check the <a href="/bot/command/255">${prefix}aliasbuildingblock</a> command.`,
+		`For a list of neat small commands usable within aliases to ease up your work, check the <a href="/bot/command/detail/aliasbuildingblock">${prefix}aliasbuildingblock</a> command.`,
 		"This command lets you build up aliases without needing to create small aliases of your own for menial tasks.",
 		"A good example is <code>$abb say</code>, which simply returns its input - so you don't have to create an alias that does that for you."
 	])

@@ -22,7 +22,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix) => [
 		"Posts the link to the current channel's Discord description.",
-		`Use the <a href="/bot/command/set">${prefix}set discord</a> command to set up your custom description.`,
+		`Use the <a href="/bot/command/detail/set">${prefix}set discord</a> command to set up your custom description.`,
 		"",
 
 		`<code>${prefix}discord</code>`,

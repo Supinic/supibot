@@ -208,7 +208,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix) => [
 		"For a provided location, returns the current time, timezone and date it is observing.",
-		`Supports custom locations of users - this can be set with the <a href="/bot/command/207"><code>${prefix}set location</code></a> command.`,
+		`Supports custom locations of users - this can be set with the <a href="/bot/command/detail/set"><code>${prefix}set location</code></a> command.`,
 		"",
 
 		`<code>${prefix}time (location)</code>`,

@@ -215,12 +215,6 @@ module.exports = {
 					? `The Scourge league launches ${sb.Utils.timeDelta(scourge)}.`
 					: "The Scourge league has launched! Go and play!"
 			};
-
-		/*
-			return {
-				reply: `No subcommand provided! Check the command's help: https://supinic.com/bot/command/${this.ID}`
-			};
-		*/
 		}
 
 		type = type.toLowerCase();
@@ -229,7 +223,7 @@ module.exports = {
 		if (!target) {
 			return {
 				success: false,
-				reply: `Provided subcommand does not exist! Check the command's help: https://supinic.com/bot/command/${this.ID}`
+				reply: `Provided subcommand does not exist! Check the command's help: ${this.getDetailURL()}`
 			};
 		}
 

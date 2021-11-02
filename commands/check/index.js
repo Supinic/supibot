@@ -748,7 +748,7 @@ module.exports = {
 		if (!type) {
 			return {
 				success: false,
-				reply: `No type provided! https://supinic.com/bot/command/${this.ID}`
+				reply: `No type provided! Check here for more info: ${this.getDetailURL()}`
 			};
 		}
 
@@ -756,7 +756,7 @@ module.exports = {
 		if (!item) {
 			return {
 				success: false,
-				reply: `Invalid type provided! https://supinic.com/bot/command/${this.ID}`
+				reply: `Invalid type provided! Check here for more info: ${this.getDetailURL()}`
 			};
 		}
 

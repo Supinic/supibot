@@ -62,7 +62,7 @@ module.exports = {
 	Dynamic_Description: (async (prefix) => [
 		"Posts a random command alias -- either completely random or filtered by parameters",
 		"Unchanged alias copies and linked aliases will not be rolled - as they are identical to their parent aliases.",
-		`For more info about aliases, check the <a href="/bot/command/alias">${prefix}alias command</a>.`,
+		`For more info about aliases, check the <a href="/bot/command/detail/alias">${prefix}alias command</a>.`,
 		"",
 
 		`<code>${prefix}rca</code>`,

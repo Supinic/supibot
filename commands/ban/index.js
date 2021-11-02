@@ -68,7 +68,7 @@ module.exports = {
 				};
 			}
 
-			options.Command = commandData.ID;
+			options.Command = commandData.Name;
 		}
 		if (context.params.invocation) {
 			const commandData = sb.Command.get(context.params.invocation);
@@ -87,9 +87,9 @@ module.exports = {
 			}
 
 			if (!options.Command) {
-				options.Command = commandData.ID;
+				options.Command = commandData.Name;
 			}
-			else if (options.Command !== commandData.ID) {
+			else if (options.Command !== commandData.Name) {
 				return {
 					success: false,
 					reply: "Invalid command + invocation provided! Either keep command: empty, or use the command that belongs to the provided invocation"

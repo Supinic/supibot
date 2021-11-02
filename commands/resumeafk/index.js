@@ -65,7 +65,7 @@ module.exports = {
 			reply: "Your AFK status has been resumed.",
 			cooldown: { // Turns the cooldown into a global one (all channels)
 				user: context.user.ID,
-				command: this.ID,
+				command: this.Name,
 				channel: null,
 				length: this.Cooldown
 			}

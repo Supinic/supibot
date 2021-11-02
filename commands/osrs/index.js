@@ -167,7 +167,7 @@ module.exports = {
 		if (!first) {
 			return {
 				success: false,
-				reply: `Not enough arguments provided! Check the command help here: https://supinic.com/bot/command/${this.ID}`
+				reply: `Not enough arguments provided! Check the command help here: ${this.getDetailURL()}`
 			};
 		}
 
@@ -349,7 +349,7 @@ module.exports = {
 				if (!activity) {
 					return {
 						success: false,
-						reply: `No activity provided! Use activity:"boss name" - for a list, check here: https://supinic.com/bot/command/${this.ID}`
+						reply: `No activity provided! Use activity:"boss name" - for a list, check here: ${this.getDetailURL()}`
 					};
 				}
 
@@ -370,7 +370,7 @@ module.exports = {
 				if (!bestMatch) {
 					return {
 						success: false,
-						reply: `Invalid activity was not found! Check the list here: https://supinic.com/bot/command/${this.ID}`
+						reply: `Invalid activity was not found! Check the list here: ${this.getDetailURL()}`
 					};
 				}
 
@@ -407,7 +407,7 @@ module.exports = {
 			default:
 				return {
 					success: false,
-					reply: `Invalid subcommand provided! Check the help here: https://supinic.com/bot/command/${this.ID}`
+					reply: `Invalid subcommand provided! Check the help here: ${this.getDetailURL()}`
 				};
 		}
 	}),

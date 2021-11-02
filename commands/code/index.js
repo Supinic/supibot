@@ -16,7 +16,7 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-	
+
 		const command = sb.Command.get(commandString);
 		if (!command) {
 			return {
@@ -25,9 +25,10 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-	
+
+		const url = command.getDetailURL({ useCodePath: true });
 		return {
-			reply: `Website: https://supinic.com/bot/command/${command.ID}/code`
+			reply: `Website: ${url}`
 		};
 	}),
 	Dynamic_Description: null

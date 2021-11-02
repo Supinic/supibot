@@ -16,7 +16,7 @@ module.exports = {
 		if (!commandString || context.invocation === "commands") {
 			return {
 				reply: (!context.channel || context.channel.Links_Allowed)
-					? "Commands available here: https://supinic.com/bot/command/list - Also check the FAQ here: https://supinic.com/data/faq/list"
+					? "Commands available here: https://supinic.com/bot/command/detail/list - Also check the FAQ here: https://supinic.com/data/faq/list"
 					: "For the command and FAQ list, check out the Supibot tab on supinic dot com."
 			};
 		}
@@ -81,7 +81,7 @@ module.exports = {
 					${cooldownString}
 					${modifierString}
 					${filteredResponse}
-					https://supinic.com/bot/command/${command.ID}
+					${command.getDetailURL()}
 				`
 			};
 		}
