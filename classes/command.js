@@ -134,13 +134,6 @@ class Command extends require("./template.js") {
 	// <editor-fold defaultstate="collapsed" desc="=== INSTANCE PROPERTIES ===">
 
 	/**
-	 * Unique numeric ID.
-	 * If the command is anonymous, a Symbol() takes its place.
-	 * @type {number|symbol}
-	 */
-	ID;
-
-	/**
 	 * Unique command name.
 	 * @type {string}
 	 */
@@ -234,8 +227,6 @@ class Command extends require("./template.js") {
 
 	constructor (data) {
 		super();
-
-		this.ID = data.ID ?? Symbol();
 
 		this.Name = data.Name;
 		if (typeof this.Name !== "string" || this.Name.length === 0) {
@@ -414,6 +405,15 @@ class Command extends require("./template.js") {
 		await row.load(this.ID);
 
 		return await super.serialize(row, Command.#serializableProperties, options);
+	}
+
+	getDetailURL () {
+		const baseURL = sb.Config.get("COMMAND_DETAIL_URL", false);
+		if (!baseURL) {
+			return "N/A";
+		}
+
+		return `${baseURL}/${this.Name}`;
 	}
 
 	getCacheKey () {
