@@ -417,7 +417,7 @@ class Command extends require("./template.js") {
 	}
 
 	getCacheKey () {
-		return `sb-command-${this.ID}`;
+		return `sb-command-${this.Name}`;
 	}
 
 	get Author () { return this.#Author; }
@@ -514,7 +514,7 @@ class Command extends require("./template.js") {
 
 		const existingCommands = list.map(i => Command.get(i)).filter(Boolean);
 		for (const command of existingCommands) {
-			const index = Command.data.findIndex(i => i.ID === command.ID);
+			const index = Command.data.findIndex(i => i.Name === command.Name);
 
 			command.destroy();
 
@@ -571,9 +571,9 @@ class Command extends require("./template.js") {
 	}
 
 	/**
-	 * Searches for a command, based on its ID, Name or Alias.
+	 * Searches for a command, based on its name or alias.
 	 * Returns immediately if identifier is already a Command.
-	 * @param {Command|number|string|symbol} identifier
+	 * @param {Command|string|symbol} identifier
 	 * @returns {Command|null}
 	 * @throws {sb.Error} If identifier is unrecognized
 	 */
@@ -581,18 +581,16 @@ class Command extends require("./template.js") {
 		if (identifier instanceof Command) {
 			return identifier;
 		}
-		else if (typeof identifier === "number" || typeof identifier === "symbol") {
-			return Command.data.find(command => command.ID === identifier);
-		}
 		else if (typeof identifier === "string") {
-			return Command.data.find(command => command.Name === identifier
-				|| command.Aliases.includes(identifier)
-			);
+			return Command.data.find(command => command.Name === identifier || command.Aliases.includes(identifier));
 		}
 		else {
 			throw new sb.Error({
 				message: "Invalid command identifier type",
-				args: { id: identifier, type: typeof identifier }
+				args: {
+					id: identifier,
+					type: typeof identifier
+				}
 			});
 		}
 	}
@@ -866,27 +864,25 @@ class Command extends require("./template.js") {
 
 			await sb.Runtime.incrementCommandsCounter();
 
-			if (typeof command.ID === "number") {
-				sb.Logger.logCommandExecution({
-					User_Alias: userData.ID,
-					Command: command.Name,
-					Platform: options.platform.ID,
-					Executed: new sb.Date(),
-					Channel: channelData?.ID ?? null,
-					Success: true,
-					Invocation: identifier,
-					Arguments: JSON.stringify(argumentArray.filter(Boolean)),
-					Result: result,
-					Execution_Time: sb.Utils.round(Number(end - start) / 1.0e6, 3)
-				});
-			}
+			sb.Logger.logCommandExecution({
+				User_Alias: userData.ID,
+				Command: command.Name,
+				Platform: options.platform.ID,
+				Executed: new sb.Date(),
+				Channel: channelData?.ID ?? null,
+				Success: true,
+				Invocation: identifier,
+				Arguments: JSON.stringify(argumentArray.filter(Boolean)),
+				Result: result,
+				Execution_Time: sb.Utils.round(Number(end - start) / 1.0e6, 3)
+			});
 		}
 		catch (e) {
 			let origin = "Internal";
 			let errorContext;
 			const loggingContext = {
 				user: userData.ID,
-				command: command.ID,
+				command: command.Name,
 				invocation: identifier,
 				channel: channelData?.ID ?? null,
 				platform: options.platform.ID,
@@ -943,24 +939,15 @@ class Command extends require("./template.js") {
 				};
 			}
 			else {
-				if (typeof command.ID === "number") {
-					const prettify = (channelData?.Data.developer)
-						? sb.Config.get("COMMAND_ERROR_DEVELOPER")
-						: sb.Config.get("COMMAND_ERROR_GENERIC");
+				const prettify = (channelData?.Data.developer)
+					? sb.Config.get("COMMAND_ERROR_DEVELOPER")
+					: sb.Config.get("COMMAND_ERROR_GENERIC");
 
-					execution = {
-						success: false,
-						reason: "error",
-						reply: prettify(errorID, e)
-					};
-				}
-				else {
-					execution = {
-						success: false,
-						reason: "error",
-						reply: "Anonymous command failed!"
-					};
-				}
+				execution = {
+					success: false,
+					reason: "error",
+					reply: prettify(errorID, e)
+				};
 			}
 		}
 
