@@ -27,8 +27,8 @@ module.exports = class Filter extends require("./template.js") {
 		this.Channel = data.Channel;
 
 		/**
-		 * Unique numeric command identifier
-		 * @type {Command.ID|null}
+		 * Unique string command identifier - name
+		 * @type {Command.Name|null}
 		 */
 		this.Command = data.Command;
 
@@ -361,7 +361,7 @@ module.exports = class Filter extends require("./template.js") {
 			&& (!type || type === row.Type)
 			&& (options.skipUserCheck || (row.User_Alias === (options.user?.ID ?? null) || row.User_Alias === null))
 			&& (row.Channel === (options.channel?.ID ?? null) || row.Channel === null)
-			&& (row.Command === (options.command?.ID ?? null) || row.Command === null)
+			&& (row.Command === (options.command?.Name ?? null) || row.Command === null)
 			&& (row.Invocation === (options.invocation ?? null) || row.Invocation === null)
 			&& (row.Platform === (options.platform?.ID ?? null) || row.Platform === null)
 		));

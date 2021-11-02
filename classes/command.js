@@ -869,7 +869,8 @@ class Command extends require("./template.js") {
 			if (typeof command.ID === "number") {
 				sb.Logger.logCommandExecution({
 					User_Alias: userData.ID,
-					Command: command.ID,
+					Command: null,
+					Command_Name: command.Name,
 					Platform: options.platform.ID,
 					Executed: new sb.Date(),
 					Channel: channelData?.ID ?? null,
@@ -877,8 +878,7 @@ class Command extends require("./template.js") {
 					Invocation: identifier,
 					Arguments: JSON.stringify(argumentArray.filter(Boolean)),
 					Result: result,
-					Execution_Time: sb.Utils.round(Number(end - start) / 1.0e6, 3),
-					Command_Name: command.Name
+					Execution_Time: sb.Utils.round(Number(end - start) / 1.0e6, 3)
 				});
 			}
 		}

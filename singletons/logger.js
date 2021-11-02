@@ -168,6 +168,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 				[
 					"User_Alias",
 					"Command",
+					"Command_Name",
 					"Platform",
 					"Executed",
 					"Channel",
@@ -175,8 +176,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 					"Invocation",
 					"Arguments",
 					"Result",
-					"Execution_Time",
-					"Command_Name"
+					"Execution_Time"
 				]
 			).then(batch => (this.commandBatch = batch));
 
