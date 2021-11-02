@@ -139,7 +139,7 @@ module.exports = {
 			}
 		}
 		else if (type === "get") {
-			const id = sb.Utils.getPathFromURL(args[0]);
+			const id = sb.Utils.getPathFromURL(args[0]) || args[0];
 			if (!id) {
 				return {
 					success: false,
