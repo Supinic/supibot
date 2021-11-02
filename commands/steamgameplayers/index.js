@@ -1,10 +1,10 @@
 module.exports = {
 	Name: "steamgameplayers",
-	Aliases: null,
+	Aliases: ["sgp"],
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Searches for a Steam game, and attempts to find its current player amount.",
-	Flags: ["mention","pipe","skip-banphrase"],
+	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -26,7 +26,7 @@ module.exports = {
 				hitsPerPage: 25,
 				attributesToSnippet: "null",
 				attributesToHighlight: "null",
-				attributesToRetrieve: "name,developer",
+				attributesToRetrieve: "name,publisher",
 				facetFilters: "appType:Game",
 				query
 			},
