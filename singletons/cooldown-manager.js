@@ -99,9 +99,9 @@ class CooldownManagerSingleton extends require("./template.js") {
 
 	/**
 	 * Checks if given combination of parameters has a cooldown pending.
-	 * @param {number|null} channel
-	 * @param {number|null} user
-	 * @param {number|null} command
+	 * @param {string|number|null} channel
+	 * @param {string|number|null} user
+	 * @param {string|number|null} command
 	 * @param {boolean} skipPending If true, does not check for Pending status
 	 * @returns {boolean} True if it's safe to run the command, false if the execution should be denied.
 	 */
@@ -127,9 +127,9 @@ class CooldownManagerSingleton extends require("./template.js") {
 
 	/**
 	 * Sets a cooldown for given combination of parameters
-	 * @param {number|null} channel
-	 * @param {number|null} user
-	 * @param {number|null} command
+	 * @param {string|number|null} channel
+	 * @param {string|number|null} user
+	 * @param {string|number|null} command
 	 * @param {number} cooldown
 	 * @param {Object} options={}
 	 */
@@ -145,7 +145,7 @@ class CooldownManagerSingleton extends require("./template.js") {
 
 	/**
 	 * Sets a pending cooldown (it's really a status) for given user.
-	 * @param {number} user
+	 * @param {string|number} user
 	 * @param {string} [description]
 	 */
 	setPending (user, description) {
@@ -158,9 +158,9 @@ class CooldownManagerSingleton extends require("./template.js") {
 
 	/**
 	 * Prematurely revoke a cooldown given by its parameters.
-	 * @param {number|null} channel
-	 * @param {number|null} user
-	 * @param {number|null} command
+	 * @param {string|number|null} channel
+	 * @param {string|number|null} user
+	 * @param {string|number|null} command
 	 * @param {Object} options = {}
 	 */
 	unset (channel, user, command, options = {}) {
@@ -179,7 +179,7 @@ class CooldownManagerSingleton extends require("./template.js") {
 
 	/**
 	 * Unsets a pending cooldown for given user.
-	 * @param {number} user
+	 * @param {string|number} user
 	 */
 	unsetPending (user) {
 		const pendings = this.data.filter(i => (
@@ -194,7 +194,7 @@ class CooldownManagerSingleton extends require("./template.js") {
 
 	/**
 	 * Fetches the Pending for given user. Used mostly for their description.
-	 * @param {number} user
+	 * @param {string|number} user
 	 * @returns {Pending}
 	 */
 	fetchPending (user) {
