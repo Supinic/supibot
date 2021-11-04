@@ -59,14 +59,18 @@ module.exports = {
 					reply: `Provided ${type} was not found!`
 				};
 			}
-			else {
-				if (module === sb.Command && !specificData.Flags.optOut) {
+			else if (module === sb.Command) {
+				if (!specificData.Flags.block) {
 					return {
 						success: false,
 						reply: `You cannot opt out from this command!`
 					};
 				}
 
+				names[type] = specificData.Name;
+				filterData[type] = specificData.Name;
+			}
+			else {
 				names[type] = specificData.Name;
 				filterData[type] = specificData.ID;
 			}

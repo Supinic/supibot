@@ -19,7 +19,7 @@ module.exports = {
 			platform: null,
 			channel: null
 		};
-	
+
 		// If the user is using "simple" mode, extract user and command.
 		if (args.every(i => !i.includes(":"))) {
 			if (args.length < 2) {
@@ -28,7 +28,7 @@ module.exports = {
 					reply: `No user/command provided! For simple mode, use ${sb.Command.prefix}block (user) (command). For advanced mode, check this command's help.`
 				};
 			}
-	
+
 			[filterData.user, filterData.command] = args;
 		}
 		else {
@@ -41,17 +41,17 @@ module.exports = {
 				}
 			}
 		}
-	
+
 		if (filterData.command === "all") {
 			filterData.command = null;
 			deliberateGlobalBlock = true;
 		}
-	
+
 		for (const [type, value] of Object.entries(filterData)) {
 			if (value === null) {
 				continue;
 			}
-	
+
 			const module = sb[sb.Utils.capitalize(type)];
 			const specificData = await module.get(value);
 			if (!specificData) {
@@ -60,19 +60,23 @@ module.exports = {
 					reply: `Provided ${type} was not found!`
 				};
 			}
-			else {
-				if (module === sb.Command && !specificData.Flags.block) {
+			else if (module === sb.Command) {
+				if (!specificData.Flags.block) {
 					return {
 						success: false,
 						reply: `You cannot block people from this command!`
 					};
 				}
-	
+
+				names[type] = specificData.Name;
+				filterData[type] = specificData.Name;
+			}
+			else {
 				names[type] = specificData.Name;
 				filterData[type] = specificData.ID;
 			}
 		}
-	
+
 		if (!deliberateGlobalBlock && filterData.command === null) {
 			return {
 				success: false,
@@ -97,7 +101,7 @@ module.exports = {
 				reply: "I wouldn't try that."
 			};
 		}
-	
+
 		const filter = sb.Filter.data.find(i => (
 			i.Type === "Block"
 			&& i.Blocked_User === filterData.user
@@ -106,7 +110,7 @@ module.exports = {
 			&& i.Platform === filterData.platform
 			&& i.User_Alias === context.user.ID
 		));
-	
+
 		if (filter) {
 			if (filter.Issued_By !== context.user.ID) {
 				return {
@@ -120,10 +124,10 @@ module.exports = {
 					reply: `That combination is already ${invocation}ed!`
 				};
 			}
-	
+
 			const suffix = (filter.Active) ? "" : " again";
 			await filter.toggle();
-	
+
 			return {
 				reply: `Succesfully ${invocation}ed${suffix}!`
 			};
@@ -135,7 +139,7 @@ module.exports = {
 					reply: "This combination has not been blocked yet, so it cannot be unblocked!"
 				};
 			}
-	
+
 			const filter = await sb.Filter.create({
 				Active: true,
 				Type: "Block",
@@ -146,7 +150,7 @@ module.exports = {
 				Platform: filterData.platform,
 				Issued_By: context.user.ID
 			});
-	
+
 			let location = "";
 			if (filterData.channel) {
 				location = ` in channel ${names.channel}`;
@@ -154,13 +158,13 @@ module.exports = {
 			else if (filterData.platform) {
 				location = ` in platform ${names.platform}`;
 			}
-	
+
 			const commandPrefix = sb.Config.get("COMMAND_PREFIX");
 			let commandString = `the command ${commandPrefix}${names.command}`;
 			if (filterData.command === null) {
 				commandString = "all blockable commands";
 			}
-	
+
 			return {
 				reply: sb.Utils.tag.trim `
 					You blocked ${names.user}
@@ -174,17 +178,17 @@ module.exports = {
 	Dynamic_Description: (async (prefix) => [
 		"Blocks a specified user from using the specified command with you as the parameter",
 		"",
-	
+
 		`<code><u>Simple mode</u></code>`,
 		`<code>${prefix}block Kappa rl</code>`,
 		`Blocks the user Kappa from using the command rl on you. They can't do <code>$rl (you)</code>`,
 		"",
-	
+
 		`<code><u>Total mode</u></code>`,
 		`<code>${prefix}block Kappa all</code>`,
 		`Blocks user Kappa from all current and future commands that support blocking people.`,
 		"",
-	
+
 		`<code><u>Advanced mode</u></code>`,
 		`<code>${prefix}block user:(usr) channel:(chn) command:(cmd) platform:(p)</code>`,
 		`Will opt you out from a specified combination of channel/command/platform.`,

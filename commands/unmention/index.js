@@ -16,7 +16,7 @@ module.exports = {
 				reply: `You must provide something to ${invocation} from! Check the command's help if needed.`
 			};
 		}
-	
+
 		let deliberateGlobalUnmention = false;
 		const types = ["command", "platform", "channel"];
 		const names = {};
@@ -25,7 +25,7 @@ module.exports = {
 			platform: null,
 			channel: null
 		};
-	
+
 		if (args.every(i => !i.includes(":"))) { // Simple mode
 			[filterData.command] = args;
 			args.splice(0, 1);
@@ -40,17 +40,17 @@ module.exports = {
 				}
 			}
 		}
-	
+
 		if (filterData.command === "all") {
 			filterData.command = null;
 			deliberateGlobalUnmention = true;
 		}
-	
+
 		for (const [type, value] of Object.entries(filterData)) {
 			if (value === null) {
 				continue;
 			}
-	
+
 			const module = sb[sb.Utils.capitalize(type)];
 			const specificData = await module.get(value);
 			if (!specificData) {
@@ -59,19 +59,23 @@ module.exports = {
 					reply: `Provided ${type} was not found!`
 				};
 			}
-			else {
-				if (module === sb.Command && !specificData.Flags.mention) {
+			else if (module === sb.Command) {
+				if (!specificData.Flags.block) {
 					return {
 						success: false,
-						reply: `That command doesn't mention anyone in the first place, so you can't change that for yourself!`
+						reply: `You cannot block people from this command!`
 					};
 				}
-	
+
+				names[type] = specificData.Name;
+				filterData[type] = specificData.Name;
+			}
+			else {
 				names[type] = specificData.Name;
 				filterData[type] = specificData.ID;
 			}
 		}
-	
+
 		if (!deliberateGlobalUnmention && filterData.command === null) {
 			return {
 				success: false,
@@ -84,7 +88,7 @@ module.exports = {
 				reply: "Cannot specify both the channel and platform!"
 			};
 		}
-	
+
 		const filter = sb.Filter.data.find(i => (
 			i.Type === "Unmention"
 			&& i.Channel === filterData.channel
@@ -92,7 +96,7 @@ module.exports = {
 			&& i.Platform === filterData.platform
 			&& i.User_Alias === context.user.ID
 		));
-	
+
 		if (filter) {
 			if ((filter.Active && invocation === "unmention") || (!filter.Active && invocation === "remention")) {
 				return {
@@ -100,10 +104,10 @@ module.exports = {
 					reply: `You already used this command on this combination!`
 				};
 			}
-	
+
 			const suffix = (filter.Active) ? "" : " again";
 			await filter.toggle();
-	
+
 			return {
 				reply: `Succesfully ${invocation}ed${suffix}!`
 			};
@@ -115,7 +119,7 @@ module.exports = {
 					reply: "You haven't made this command not mention you yet!"
 				};
 			}
-	
+
 			const filter = await sb.Filter.create({
 				Active: true,
 				Type: "Unmention",
@@ -125,14 +129,14 @@ module.exports = {
 				Platform: filterData.platform,
 				Issued_By: context.user.ID
 			});
-	
+
 			const commandPrefix = sb.Config.get("COMMAND_PREFIX");
 			let commandString = `the command ${commandPrefix}${names.command}`;
-	
+
 			if (filterData.command === null) {
 				commandString = "all commands";
 			}
-	
+
 			let location = "";
 			if (filterData.channel) {
 				location = ` in channel ${names.channel}`;
@@ -140,7 +144,7 @@ module.exports = {
 			else if (filterData.platform) {
 				location = ` in platform ${names.platform}`;
 			}
-	
+
 			return {
 				reply: sb.Utils.tag.trim `
 					You made ${commandString} not mention you
@@ -155,23 +159,23 @@ module.exports = {
 		`A mention is basically the "user," part at the start of the command response.`,
 		"While unmentioned, the command(s) will not add this part.",
 		"",
-		
+
 		`<code><u>Simple mode</u></code>`,
 		`<code>${prefix}unmention (command)</code>`,
 		`Will remove the mention from a given command`,
 		"",
-	
+
 		`<code>${prefix}remention (command)</code>`,
 		`Will put the mention back in a given command`,
 		"",
-	
+
 		`<code><u>Total mode</u></code>`,
 		`<code>${prefix}unmention all</code>`,
 		`Will remove all mentions from all current and future commands that support unmentioning, everywhere.`,
 		"Currently, there is no way to combine a global unmention with command-specific ones.",
 		"E.g. you can't unmention all, and then decide to remention from one command. Support for this might come in the future, though.",
 		"",
-	
+
 		`<code><u>Advanced mode</u></code>`,
 		`<code>${prefix}unmention channel:(chn) command:(cmd) platform:(p)</code>`,
 		`Will remove the mention(s) from a specified combination of channel/command/platform.`,
