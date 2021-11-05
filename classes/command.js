@@ -433,8 +433,7 @@ class Command extends require("./template.js") {
 
 	get Author () { return this.#Author; }
 
-	// Forward compatibility
-	static async _loadData () {
+	static async loadData () {
 		const { definitions } = await require("supibot-package-manager/commands");
 
 		Command.data = definitions.map(record => new Command(record));
@@ -442,20 +441,7 @@ class Command extends require("./template.js") {
 		this.validate();
 	}
 
-	static async loadData () {
-		const data = await sb.Query.getRecordset(rs => rs
-			.select("*")
-			.from("chat_data", "Command")
-			.where("Flags NOT %*like* OR Flags IS NULL", "archived")
-		);
-
-		Command.data = data.map(record => new Command(record));
-
-		this.validate();
-	}
-
-	// Forward compatibility
-	static async _reloadSpecific (...list) {
+	static async reloadSpecific (...list) {
 		if (list.length === 0) {
 			return false;
 		}
@@ -466,15 +452,16 @@ class Command extends require("./template.js") {
 		const toReload = [];
 		for (const commandName of list) {
 			const commandData = Command.get(commandName);
+			const identifier = commandData?.Name ?? commandData?.name ?? commandName;
 			if (commandData) {
 				commandData.destroy();
 			}
 
-			const identifier = commandData?.Name ?? commandData?.name ?? commandName;
 			toReload.push(identifier);
 
-			// Try-catch is mandatory because `require.resolves` throws when the path doesn't exist or is not a module
-			// This might occur when a command name is mistaken. The loading should continue though.
+			// Try-catch is mandatory because `require.resolve` throws when the path doesn't exist or is not a module.
+			// This might occur when a command name is mistaken. While throwing here is correct, the loading
+			// should continue regardless of that.
 			let path;
 			try {
 				path = require.resolve(`supibot-package-manager/commands/${identifier}`);
@@ -510,51 +497,6 @@ class Command extends require("./template.js") {
 		}
 
 		this.validate();
-	}
-
-	/**
-	 * Reloads a specific list of commands.
-	 * @param {string[]} list
-	 * @returns {Promise<boolean>} True if passed, false if
-	 * @throws {sb.Error} If the list contains 0 valid commands
-	 */
-	static async reloadSpecific (...list) {
-		if (list.length === 0) {
-			return false;
-		}
-
-		const existingCommands = list.map(i => Command.get(i)).filter(Boolean);
-		for (const command of existingCommands) {
-			const index = Command.data.findIndex(i => i.Name === command.Name);
-
-			command.destroy();
-
-			if (index !== -1) {
-				Command.data.splice(index, 1);
-			}
-		}
-
-		const data = await sb.Query.getRecordset(rs => {
-			rs.select("*")
-				.from("chat_data", "Command")
-				.where("Flags NOT %*like* OR Flags IS NULL", "archived");
-
-			const nameConditions = list.map(i => {
-				const name = sb.Query.escapeString(i);
-				return `(Name = '${name}' OR JSON_CONTAINS(Aliases, JSON_QUOTE('${name}')))`;
-			});
-
-			rs.where(nameConditions.join(" OR "));
-
-			return rs;
-		});
-
-		for (const record of data) {
-			const command = new Command(record);
-			Command.data.push(command);
-		}
-
-		return true;
 	}
 
 	static validate () {
