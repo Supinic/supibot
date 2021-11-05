@@ -13,9 +13,9 @@ module.exports = {
 		{ name: "skipGalleries", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => {
+	Static_Data: (command => {
 		const expiration = 3_600_000; // 1 hour
-		this.data.subreddits = {};
+		command.subreddits = {};
 
 		class Subreddit {
 			#name;
