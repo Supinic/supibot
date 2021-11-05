@@ -87,7 +87,7 @@ module.exports = {
 			{
 				name: "study",
 				status: "now studying",
-				text: (context, text) => `${text ?? "🤓"}📚`
+				text: (context, text) => `${text ?? "🤓"} 📚`
 			},
 			{
 				name: "food",
