@@ -39,7 +39,8 @@ module.exports = (async () => {
 		}
 
 		if (definition) {
-			if (config.skipArchivedCommands && definition.flags.includes("archived")) {
+			const definitionFlags = definition.flags ?? definition.Flags ?? [];
+			if (config.skipArchivedCommands && definitionFlags.includes("archived")) {
 				skipped.push(definition);
 			}
 			else {
