@@ -8,7 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => {
-		const symbolData = sb.Config.get("STOCK_SYMBOLS_LIST");
+		const symbolData = sb.Config.get("STOCK_SYMBOLS_LIST", false) ?? [];
 		const findSymbol = (from) => {
 			from = from.toLowerCase();
 
@@ -65,19 +65,19 @@ module.exports = {
 				.set("apikey", sb.Config.get("API_ALPHA_AVANTAGE"))
 				.toString()
 		}).json();
-	
+
 		if (!rawData || Object.keys(rawData).length === 0) {
 			return {
 				reply: "Stock symbol could not be found!"
 			};
 		}
-	
+
 		const data = {};
 		for (const rawKey of Object.keys(rawData)) {
 			const key = sb.Utils.convertCase(rawKey.replace(/^\d+\.\s+/, ""), "text", "camel");
 			data[key] = rawData[rawKey];
 		}
-	
+
 		const changeSymbol = (Number(data.changePercent.replace("%", "")) >= 0) ? "+" : "";
 		return {
 			reply: sb.Utils.tag.trim `
