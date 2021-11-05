@@ -511,7 +511,7 @@ class Command extends require("./template.js") {
 			console.warn("Command prefix is configured as `null` - bot will not respond to any command queries");
 		}
 
-		const names = Command.data.flatMap(i => [i.Name, ...i.Aliases]);
+		const names = Command.data.flatMap(i => [i.Name, ...(i.Aliases ?? [])]);
 		const duplicates = names.filter((i, ind, arr) => arr.indexOf(i) !== ind);
 		for (const dupe of duplicates) {
 			const affected = Command.data.filter(i => i.Aliases.includes(dupe));
