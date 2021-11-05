@@ -7,7 +7,7 @@ module.exports = {
 	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
+	Static_Data: (command => ({
 		statusLengthLimit: 2000,
 
 		responses: {
@@ -94,7 +94,7 @@ module.exports = {
 				status: "now eating",
 				text: async (context, text) => {
 					let useAutoEmoji = true;
-					for (const emoji of this.staticData.foodEmojis) {
+					for (const emoji of command.staticData.foodEmojis) {
 						if (text.includes(emoji)) {
 							useAutoEmoji = false;
 						}
@@ -102,7 +102,7 @@ module.exports = {
 
 					const emote = await context.getBestAvailableEmote(["OpieOP"], "😋");
 					const appendText = (useAutoEmoji)
-						? sb.Utils.randArray(this.staticData.foodEmojis)
+						? sb.Utils.randArray(command.staticData.foodEmojis)
 						: "";
 
 					return (text) ? `${text} ${appendText}` : `${emote} ${appendText}`;
