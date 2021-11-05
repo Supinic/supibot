@@ -446,18 +446,13 @@ class Command extends require("./template.js") {
 			return false;
 		}
 
-		delete require.cache[require.resolve("supibot-package-manager/commands")];
-
 		const failed = [];
-		const toReload = [];
 		for (const commandName of list) {
-			const commandData = Command.get(commandName);
-			const identifier = commandData?.Name ?? commandData?.name ?? commandName;
-			if (commandData) {
-				commandData.destroy();
+			const originalCommand = Command.get(commandName);
+			const identifier = originalCommand?.Name ?? originalCommand?.name ?? commandName;
+			if (originalCommand) {
+				originalCommand.destroy();
 			}
-
-			toReload.push(identifier);
 
 			// Try-catch is mandatory because `require.resolve` throws when the path doesn't exist or is not a module.
 			// This might occur when a command name is mistaken. While throwing here is correct, the loading
@@ -472,24 +467,25 @@ class Command extends require("./template.js") {
 					identifier,
 					reason: "no-path"
 				});
+
+				continue;
 			}
-		}
 
-		const { definitions } = await require("supibot-package-manager/commands");
-
-		for (const commandName of toReload) {
-			const definition = definitions.find(i => i.Name === commandName || i.Aliases?.includes(commandName));
-			if (!definition) {
+			let definition;
+			try {
+				definition = require(`supibot-package-manager/commands/${identifier}`);
+			}
+			catch {
 				failed.push({
-					identifier: commandName,
+					identifier,
 					reason: "no-definition"
 				});
 
 				continue;
 			}
 
-			const commandData = new Command(definition);
-			Command.data.push(commandData);
+			const reloadedCommand = new Command(definition);
+			Command.data.push(reloadedCommand);
 		}
 
 		if (failed.length > 0) {
