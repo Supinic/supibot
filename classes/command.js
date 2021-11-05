@@ -493,11 +493,12 @@ class Command extends require("./template.js") {
 			Command.data.push(reloadedCommand);
 		}
 
-		if (failed.length > 0) {
-			await sb.Logger.log("Command.Warning", JSON.stringify(failed));
-		}
-
 		this.validate();
+
+		return {
+			success: true,
+			failed
+		};
 	}
 
 	static validate () {
