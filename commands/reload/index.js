@@ -27,7 +27,55 @@ module.exports = {
 			},
 			{
 				target: "Command",
-				names: ["command", "commands"]
+				names: ["command", "commands"],
+				execution: async (invocation, ...list) => {
+					if (invocation === "command" && list.length === 0) {
+						return {
+							success: false,
+							reply: "No command names provided!"
+						};
+					}
+
+					const shell = require("util").promisify(require("child_process").exec);
+					await shell("yarn upgrade supi-core/supibot-package-manager");
+
+					if (invocation === "commands") {
+						try {
+							await sb.Command.reloadData();
+						}
+						catch (e) {
+							await sb.Logger.log("Command.Warning", JSON.stringify(e));
+							return {
+								success: false,
+								reply: "An error occured while reloading all commands!"
+							};
+						}
+
+						return {
+							reply: `Reloaded all commands successfully.`
+						};
+					}
+					else if (invocation === "command") {
+						const result = await sb.Command.reloadSpecific(...list);
+						if (result.failed.length === 0) {
+							return {
+								reply: `${list.length} commands reloaded successfully.`
+							};
+						}
+						else if (result.failed.length < list.length) {
+							return {
+								success: false,
+								reply: `${result.failed.length - list.length} commands reloaded successfully, but ${result.failed.length} failed!`
+							};
+						}
+						else {
+							return {
+								success: false,
+								reply: `All ${list.length} commands failed to reload!`
+							};
+						}
+					}
+				}
 			},
 			{
 				target: "Config",
