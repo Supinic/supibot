@@ -15,7 +15,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (command => {
 		const expiration = 3_600_000; // 1 hour
-		command.subreddits = {};
+		command.data.subreddits = {};
 
 		class Subreddit {
 			#name;
