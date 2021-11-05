@@ -37,7 +37,7 @@ module.exports = {
 					}
 
 					const shell = require("util").promisify(require("child_process").exec);
-					await shell("yarn upgrade supi-core/supibot-package-manager");
+					await shell("yarn upgrade supi-core");
 
 					if (invocation === "commands") {
 						try {
