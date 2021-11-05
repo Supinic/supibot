@@ -14,13 +14,14 @@ module.exports = {
 			.from("bot_data", "Bot")
 			.where("Prefix IS NOT NULL")
 			.where("Prefix <> %s", sb.Command.prefix)
+			.where("Active = %b", true)
 		);
-	
+
 		for (const bot of bots) {
 			const space = bot.Prefix_Space ? " " : "";
 			context.channel.send(`${bot.Prefix}${space}ping`);
 		}
-	
+
 		return null;
 	}),
 	Dynamic_Description: null
