@@ -451,6 +451,11 @@ class Command extends require("./template.js") {
 			const originalCommand = Command.get(commandName);
 			const identifier = originalCommand?.Name ?? originalCommand?.name ?? commandName;
 			if (originalCommand) {
+				const index = Command.data.indexOf(originalCommand);
+				if (index !== -1) {
+					Command.data.splice(index, 1);
+				}
+
 				originalCommand.destroy();
 			}
 
