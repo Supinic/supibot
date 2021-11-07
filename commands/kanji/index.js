@@ -16,11 +16,12 @@ module.exports = {
 			};
 		}
 
-		const data = await sb.Got({
+		const response = await sb.Got("GenericAPI", {
 			prefixUrl: "https://app.kanjialive.com/api",
 			url: `kanji/${encodeURIComponent(character)}`
-		}).json();
+		});
 
+		const data = response.body;
 		if (data.Error) {
 			return {
 				success: false,
