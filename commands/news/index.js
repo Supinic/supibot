@@ -698,7 +698,7 @@ module.exports = {
 				const cacheKey = `${news.code}-${source.name}`;
 
 				let cacheExists = true;
-				let articles = await sb.Cache.getByPrefix(this.getCacheKey(), { keys: { cacheKey } });
+				let articles = await sb.Cache.getByPrefix(command.getCacheKey(), { keys: { cacheKey } });
 				if (!articles) {
 					cacheExists = false;
 
@@ -717,7 +717,7 @@ module.exports = {
 				}
 
 				if (!cacheExists) {
-					await sb.Cache.setByPrefix(this.getCacheKey(), articles, {
+					await sb.Cache.setByPrefix(command.getCacheKey(), articles, {
 						keys: { cacheKey },
 						expiry: 36e5
 					});
