@@ -7,7 +7,7 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
+	Static_Data: (command => ({
 		codeRegex: /^[a-z]{2}$/i,
 
 		definitions: [
@@ -686,10 +686,10 @@ module.exports = {
 		],
 
 		extra: {
-			exists: (code) => this.staticData.definitions.some(i => i.code === code.toLowerCase()),
+			exists: (code) => command.staticData.definitions.some(i => i.code === code.toLowerCase()),
 
 			fetch: async (code, query) => {
-				const news = this.staticData.definitions.find(i => i.code === code.toLowerCase());
+				const news = command.staticData.definitions.find(i => i.code === code.toLowerCase());
 				if (!news) {
 					throw new sb.Error({ message: "Extra news code does not exist!" });
 				}
