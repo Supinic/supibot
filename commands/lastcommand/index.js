@@ -32,7 +32,7 @@ module.exports = {
 		const data = await sb.Query.getRecordset(rs => {
 			rs.select("Result", "Invocation", "Arguments")
 				.from("chat_data", "Command_Execution")
-				.where("Command <> %n", this.Name)
+				.where("Command <> %s", this.Name)
 				.where("User_Alias = %n", targetUser.ID)
 				.where("Executed > DATE_ADD(NOW(), INTERVAL -5 MINUTE)")
 				.where("Result IS NOT NULL")
