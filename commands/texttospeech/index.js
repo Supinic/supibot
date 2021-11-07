@@ -11,12 +11,12 @@ module.exports = {
 		{ name: "speed", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => {
+	Static_Data: (command => {
 		const limit = 30_000;
 
 		return {
 			limit,
-			maxCooldown: (this.Cooldown + (limit - 10000) * 10),
+			maxCooldown: (command.Cooldown + (limit - 10000) * 10),
 			locales: [
 				{
 					locale: "en-gb",

@@ -10,7 +10,7 @@ module.exports = {
 		{ name: "wordOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => {
+	Static_Data: (command => {
 		const buildURL = (type) => {
 			if (type === "person") {
 				return `https://this${type}doesnotexist.com/image`;
@@ -187,7 +187,7 @@ module.exports = {
 					types: "mp",
 					descriptions: [`<code>mp</code> - <a href="https://vole.wtf/this-mp-does-not-exist/">This MP does not exist</a>`],
 					execute: async () => {
-						let data = await this.getCacheData("mp-data");
+						let data = await command.getCacheData("mp-data");
 						if (!data) {
 							const html = await sb.Got("https://vole.wtf/this-mp-does-not-exist/").text();
 							const $ = sb.Utils.cheerio(html);
@@ -201,7 +201,7 @@ module.exports = {
 								return { id, name, location };
 							});
 
-							await this.setCacheData("mp-data", data, { expiry: 30 * 864e5 }); // 30 days
+							await command.setCacheData("mp-data", data, { expiry: 30 * 864e5 }); // 30 days
 						}
 
 						const member = sb.Utils.randArray(data);

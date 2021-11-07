@@ -9,7 +9,7 @@ module.exports = {
 		{ name: "index", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
+	Static_Data: (command => ({
 		variables: [
 			{
 				name: "afk",
@@ -251,7 +251,7 @@ module.exports = {
 					const { ID, Stack: stack } = row.values;
 
 					const key = { type: "error-paste", ID };
-					let link = await this.getCacheData(key);
+					let link = await command.getCacheData(key);
 					if (!link) {
 						const result = await sb.Pastebin.post(stack, {
 							name: `Stack of Supibot error ID ${ID}`,
@@ -266,7 +266,7 @@ module.exports = {
 						}
 
 						link = result.body;
-						await this.setCacheData(key, link, {
+						await command.setCacheData(key, link, {
 							expiry: 36e5
 						});
 					}
