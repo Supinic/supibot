@@ -15,19 +15,19 @@ module.exports = {
 				reply: "Pepega"
 			};
 		}
-	
+
 		const data = await sb.Got({
 			prefixUrl: "https://app.kanjialive.com/api",
-			url: `kanji/${character}`
+			url: `kanji/${encodeURIComponent(character)}`
 		}).json();
-	
+
 		if (data.Error) {
 			return {
 				success: false,
 				reply: `Error: ${data.Error}`
 			};
 		}
-	
+
 		return {
 			reply: `${data.ka_utf} (${data.kunyomi}; ${data.onyomi}): ${data.meaning}.`
 		};
