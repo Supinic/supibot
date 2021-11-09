@@ -480,6 +480,10 @@ module.exports = class TwitchController extends require("./template.js") {
 			});
 		}
 
+		if (this.platform.Data.suspended) {
+			return;
+		}
+
 		const channelData = sb.Channel.get(channel, this.platform);
 		const channelName = channelData.Name;
 
