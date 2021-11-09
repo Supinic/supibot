@@ -405,8 +405,8 @@ module.exports = {
 			}
 
 			case "search": {
-				const query = args.join(" ");
-				if (!query) {
+				const search = args.join(" ");
+				if (!search) {
 					return {
 						success: false,
 						reply: `No input provided!`
@@ -417,13 +417,7 @@ module.exports = {
 					url: "https://oldschool.runescape.wiki/w/api.php",
 					responseType: "text",
 					throwHttpErrors: false,
-					searchParams: {
-						format: "json",
-						action: "opensearch",
-						limit: "10",
-						profile: "fuzzy",
-						search: query
-					}
+					searchParams: { search }
 				});
 
 				if (response.statusCode === 200) {
@@ -437,7 +431,7 @@ module.exports = {
 				}
 				else {
 					return {
-						reply: `No direct match, try this search link: https://osrs.wiki/?search=${encodeURIComponent(query)}`
+						reply: `No direct match, try this search link: https://osrs.wiki/?search=${encodeURIComponent(search)}`
 					};
 				}
 			}
