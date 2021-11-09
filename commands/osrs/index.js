@@ -422,7 +422,7 @@ module.exports = {
 						action: "opensearch",
 						limit: "10",
 						profile: "fuzzy",
-						search: "DS2"
+						search: query
 					}
 				});
 
