@@ -63,7 +63,18 @@ module.exports = class TwitchController extends require("./template.js") {
 		this.initListeners();
 
 		this.client.connect();
-		this.client.joinAll(sb.Channel.getJoinableForPlatform(this.platform).map(i => i.Name));
+
+		if (this.platform.Data.joinChannelsOverride.length === 0) {
+			this.client.joinAll(sb.Channel.getJoinableForPlatform(this.platform).map(i => i.Name));
+		}
+		else {
+			const channelList = this.platform.Data.joinChannelsOverride
+				.map(i => sb.Channel.get(i))
+				.filter(Boolean)
+				.map(i => i.Name);
+
+			this.client.joinAll(channelList);
+		}
 
 		this.data.crons = [
 			new sb.Cron({
