@@ -64,11 +64,12 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		this.client.connect();
 
-		if (this.platform.Data.joinChannelsOverride.length === 0) {
+		const joinOverride = this.platform?.Data.joinChannelsOverride ?? [];
+		if (joinOverride.length === 0) {
 			this.client.joinAll(sb.Channel.getJoinableForPlatform(this.platform).map(i => i.Name));
 		}
 		else {
-			const channelList = this.platform.Data.joinChannelsOverride
+			const channelList = joinOverride
 				.map(i => sb.Channel.get(i))
 				.filter(Boolean)
 				.map(i => i.Name);
