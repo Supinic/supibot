@@ -80,7 +80,7 @@ module.exports = {
 			return ironman;
 		},
 
-		subcommands: ["itemid", "kc", "price", "seasonal-kc", "seasonal-stats", "stats"],
+		subcommands: ["itemid", "kc", "price", "search", "seasonal-kc", "seasonal-stats", "stats"],
 
 		/* eslint-disable array-element-newline */
 		activities: [
@@ -404,6 +404,44 @@ module.exports = {
 				};
 			}
 
+			case "search": {
+				const query = args.join(" ");
+				if (!query) {
+					return {
+						success: false,
+						reply: `No input provided!`
+					};
+				}
+
+				const response = await sb.Got("GenericAPI", {
+					url: "https://oldschool.runescape.wiki/w/api.php",
+					responseType: "text",
+					throwHttpErrors: false,
+					searchParams: {
+						format: "json",
+						action: "opensearch",
+						limit: "10",
+						profile: "fuzzy",
+						search: "DS2"
+					}
+				});
+
+				if (response.statusCode === 200) {
+					const $ = sb.Utils.cheerio(response.body);
+					const summary = $($("#mw-content-text p")[0]).text();
+					const url = $("link[rel='canonical']").attr("href").replace("oldschool.runescape.wiki", "osrs.wiki");
+
+					return {
+						reply: `${url} ${summary}`
+					};
+				}
+				else {
+					return {
+						reply: `No direct match, try this search link: https://osrs.wiki/?search=${encodeURIComponent(query)}`
+					};
+				}
+			}
+
 			default:
 				return {
 					success: false,
@@ -481,6 +519,11 @@ module.exports = {
 			`<code>${prefix}osrs kc <u>rude:true</u> activity:(activity) (username)</code>`,
 			`Works the same way as the respective command - but when used, the command will call out dead hardcore ironmen by calling them "ex-hardcore".`,
 			"If set to false, or not set at all, it will just refer to them as regular ironmen.",
+			"",
+
+			"<u>Search the Wiki</u>",
+			`<code>${prefix}osrs search (query)</code>`,
+			`Attempts to post a direct OSRS Wiki link to whatever you're looking for.`,
 			"",
 
 			"<u>Item prices</u>",
