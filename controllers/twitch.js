@@ -498,7 +498,7 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		const channelData = sb.Channel.get(channel, this.platform);
 		const joinOverride = this.platform?.Data.joinChannelsOverride ?? [];
-		if (!joinOverride.includes(channelData.ID)) {
+		if (joinOverride.length !== 0 && !joinOverride.includes(channelData.ID)) {
 			return;
 		}
 
