@@ -218,6 +218,7 @@ module.exports = {
 					"CCabron",
 					"CChile",
 					"GGyros",
+					"KKanuck",
 					"KKarjala",
 					"KKebab",
 					"KKhan",
