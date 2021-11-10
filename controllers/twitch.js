@@ -497,8 +497,12 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 
 		const channelData = sb.Channel.get(channel, this.platform);
-		const channelName = channelData.Name;
+		const joinOverride = this.platform?.Data.joinChannelsOverride ?? [];
+		if (!joinOverride.includes(channelData.ID)) {
+			return;
+		}
 
+		const channelName = channelData.Name;
 		message = message.replace(/\s+/g, " ").trim();
 
 		if (channelData.Mode === "Inactive" || channelData.Mode === "Read") {
