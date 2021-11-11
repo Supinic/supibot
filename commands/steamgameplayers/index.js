@@ -54,7 +54,7 @@ module.exports = {
 				"x-algolia-agent": "SteamDB+Autocompletion",
 				"x-algolia-application-id": "94HE6YATEI",
 				"x-algolia-api-key": "4e93170f248c58869d226a339bd6a52c",
-				hitsPerPage: 25,
+				hitsPerPage: 50,
 				attributesToSnippet: "null",
 				attributesToHighlight: "null",
 				attributesToRetrieve: "name,publisher",
@@ -74,7 +74,12 @@ module.exports = {
 			};
 		}
 
-		const [game] = hits;
+		// attempt to find an exact match by game name
+		let game = hits.find(i => i.name.toLowerCase() === query.toLowerCase());
+		if (!game) {
+			game = hits[0];
+		}
+
 		const steamResponse = await sb.Got("GenericAPI", {
 			url: "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001",
 			searchParams: {
