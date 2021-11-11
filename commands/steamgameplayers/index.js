@@ -4,11 +4,42 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Searches for a Steam game, and attempts to find its current player amount.",
-	Flags: ["mention","pipe"],
-	Params: null,
+	Flags: ["mention","pipe","use-params"],
+	Params: [
+		{ name: "gameID", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function steamGamePlayers (context, ...args) {
+		if (context.params.gameID) {
+			const gameID = Number(context.params.gameID);
+			if (!sb.Utils.isValidInteger(gameID)) {
+				return {
+					success: false,
+					reply: `Invalid game ID provided!`
+				};
+			}
+
+			const response = await sb.Got("GenericAPI", {
+				url: "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001",
+				searchParams: {
+					appid: context.params.gameID
+				}
+			});
+
+			if (response.statusCode === 404) {
+				return {
+					success: false,
+					reply: `No game exists for provided ID!`
+				};
+			}
+
+			const players = response.body.response.player_count;
+			return {
+				reply: `That game currently has ${sb.Utils.groupDigits(players)} players in-game.`
+			};
+		}
+
 		const query = args.join(" ");
 		if (!query) {
 			return {
@@ -69,5 +100,17 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"Fetches the current amount of players for a specific Steam game.",
+		"",
+
+		`<code>${prefix}sgp (game name)</code>`,
+		"Fetches game data by its name",
+		"",
+
+
+		`<code>${prefix}sgp gameID:(game ID)</code>`,
+		"Fetches game data by its Steam ID",
+		""
+	])
 };
