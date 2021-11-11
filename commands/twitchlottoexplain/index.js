@@ -47,7 +47,7 @@ module.exports = {
 			}
 		}
 
-		const link = sb.Utils.getPathFromURL(inputLink);
+		const link = sb.Utils.getPathFromURL(inputLink) ?? inputLink;
 		if (!link) {
 			return {
 				success: false,
