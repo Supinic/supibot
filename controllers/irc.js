@@ -11,7 +11,7 @@ module.exports = class IRCController extends require("./template.js") {
 			});
 		}
 
-		this.platform = sb.Platform.get("IRC", options.host);
+		this.platform = sb.Platform.get("irc", options.host);
 		if (!this.platform) {
 			throw new sb.Error({
 				message: "IRC platform has not been created"
