@@ -9,10 +9,11 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function forsenE () {
+		this.data.previousPosts ??= [];
+
 		const { lines } = require("./forsenE.json");
 		const post = sb.Utils.randArray(lines.filter(i => !this.data.previousPosts.includes(i)));
 
-		this.data.previousPosts ??= [];
 		this.data.previousPosts.unshift(post);
 		this.data.previousPosts.splice(this.staticData.repeats);
 
