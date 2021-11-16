@@ -40,7 +40,7 @@ module.exports = class IRCController extends require("./template.js") {
 		client.on("registered", () => {
 			const channelsData = sb.Channel.getJoinableForPlatform(this.platform);
 			for (const channelData of channelsData) {
-				this.client.join(channelData.Name);
+				this.client.join(`#${channelData.Name}`);
 			}
 		});
 
@@ -48,9 +48,9 @@ module.exports = class IRCController extends require("./template.js") {
 			console.log("JOIN", { event });
 		});
 
-		client.on("message", async (event) => await this.handleMessage(event, false));
+		client.on("message", async (event) => await this.handleMessage(event));
 
-		client.on("privmsg", async (event) => await this.handleMessage(event, true));
+		client.on("privmsg", async (event) => await this.handleMessage(event));
 	}
 
 	async send (message, channel) {
@@ -62,14 +62,14 @@ module.exports = class IRCController extends require("./template.js") {
 			});
 		}
 
-		this.client.send(channel, message);
+		this.client.send(`#${channel}`, message);
 	}
 
 	async pm () {
 		throw new Error("Not yet implemented");
 	}
 
-	async handleMessage (event, isPrivate) {
+	async handleMessage (event) {
 		if (event.from_server) {
 			console.log("server message", { event });
 			return;
@@ -83,8 +83,9 @@ module.exports = class IRCController extends require("./template.js") {
 			return;
 		}
 
+		const isPrivateMessage = (event.target === this.platform.Self_Name.toLowerCase());
 		let channelData = null;
-		if (!isPrivate) {
+		if (!isPrivateMessage) {
 			channelData = sb.Channel.get(event.target, this.platform);
 
 			if (!channelData) {
