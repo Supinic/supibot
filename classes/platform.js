@@ -28,6 +28,8 @@ module.exports = class Platform extends require("./template.js") {
 		 */
 		this.Name = data.Name.toLowerCase();
 
+		this.Host = data.Host ?? null;
+
 		/**
 		 * Fallback message limit. Must be included.
 		 * @type {number}
