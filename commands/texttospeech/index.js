@@ -4,13 +4,13 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Plays TTS on Supinic's stream, if enabled. You can specify the language by using \"language:<language>\" anywhere in your message.",
-	Flags: ["mention","pipe","skip-banphrase","use-params"],
+	Flags: ["mention","pipe","skip-banphrase","use-params","whitelist"],
 	Params: [
 		{ name: "lang", type: "string" },
 		{ name: "language", type: "string" },
 		{ name: "speed", type: "number" }
 	],
-	Whitelist_Response: null,
+	Whitelist_Response: "Check out the possible voices and locales here: https://supinic.com/stream/tts",
 	Static_Data: (command => {
 		const limit = 30_000;
 
@@ -267,8 +267,10 @@ module.exports = {
 		};
 	}),
 	Code: (async function textToSpeech (context, ...args) {
-		if (context.channel?.ID !== 38 || args.length === 0) {
+		if (args.length === 0) {
 			return {
+				cooldown: 5000,
+				success: false,
 				reply: "Check out the possible voices and locales here: https://supinic.com/stream/tts"
 			};
 		}
