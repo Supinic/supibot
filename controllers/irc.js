@@ -48,8 +48,6 @@ module.exports = class IRCController extends require("./template.js") {
 			console.log("JOIN", { event });
 		});
 
-		client.on("message", async (event) => await this.handleMessage(event));
-
 		client.on("privmsg", async (event) => await this.handleMessage(event));
 	}
 
@@ -62,7 +60,7 @@ module.exports = class IRCController extends require("./template.js") {
 			});
 		}
 
-		this.client.send(`#${channel}`, message);
+		this.client.say(`#${channelData.Name}`, message);
 	}
 
 	async pm () {
@@ -149,7 +147,9 @@ module.exports = class IRCController extends require("./template.js") {
 				.split(/\s+/)
 				.filter(Boolean);
 
-			await this.handleCommand(command, userData, channelData, args, {});
+			await this.handleCommand(command, userData, channelData, args, {
+				privateMessage: isPrivateMessage
+			});
 		}
 	}
 
