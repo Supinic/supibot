@@ -27,7 +27,8 @@ module.exports = class IRCController extends require("./template.js") {
 		this.client.connect({
 			host: options.host,
 			port: this.platform.Data.port ?? 6667,
-			nick: this.platform.Self_Name
+			nick: this.platform.Self_Name,
+			tls: this.platform.Data.secure ?? this.platform.Data.tls ?? false
 		});
 
 		this.initListeners();
