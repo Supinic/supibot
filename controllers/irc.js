@@ -90,7 +90,7 @@ module.exports = class IRCController extends require("./template.js") {
 				return;
 			}
 
-			this.resolveUserMessage(channelData, userData, message);
+			await this.resolveUserMessage(channelData, userData, message);
 
 			if (channelData.Mode === "Last seen") {
 				await sb.Logger.updateLastSeen({ userData, channelData, message });
