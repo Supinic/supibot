@@ -12,22 +12,40 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function lastLine (context, user) {
 		if (!user) {
-			return { reply: "No user provided!" };
+			return {
+				success: false,
+				reply: "No user provided!"
+			};
 		}
 		else if (!context.channel) {
-			return { reply: "This command is not available in PMs!" };
+			return {
+				success: false,
+				reply: "This command is not available in PMs!"
+			};
 		}
-	
+
 		const targetUser = await sb.User.get(user, true);
 		if (!targetUser) {
-			return { reply: "User not found in the database!" };
+			return {
+				success: false,
+				reply: "User not found in the database!"
+			};
 		}
-	
+		else if (targetUser.Name === context.platform.Self_Name) {
+			return {
+				success: false,
+				reply: "I'm right here! Boo! 👻"
+			};
+		}
+
 		const userID = targetUser.ID;
 		if (userID === context.user.ID) {
-			return { reply: "You're right here NaM I can see you" };
+			return {
+				success: false,
+				reply: "You're right here! 👻 I can see you"
+			};
 		}
-	
+
 		let data = null;
 		if ([7, 8, 46].includes(context.channel.ID)) {
 			data = (await sb.Query.getRecordset(rs => rs
@@ -46,9 +64,12 @@ module.exports = {
 				.where("Channel = %n", context.channel.ID)
 			))[0];
 		}
-	
+
 		if (!data) {
-			return { reply: "That user has not said anything in this channel!" };
+			return {
+				success: false,
+				reply: "That user has not said anything in this channel!"
+			};
 		}
 
 		if (context.params.textOnly) {
