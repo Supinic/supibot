@@ -420,10 +420,10 @@ class Command extends require("./template.js") {
 		}
 
 		if (options.useCodePath) {
-			return `${baseURL}/${this.Name}/code`;
+			return `${baseURL}/${encodeURIComponent(this.Name)}/code`;
 		}
 		else {
-			return `${baseURL}/${this.Name}`;
+			return `${baseURL}/${encodeURIComponent(this.Name)}`;
 		}
 	}
 
