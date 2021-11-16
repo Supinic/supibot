@@ -326,10 +326,11 @@ module.exports = class Platform extends require("./template.js") {
 	 * Returns a platform object for a specified identifier.
 	 * Returns `null` if no platform can be found.
 	 * @param {string|number|sb.Platform} identifier
+	 * @param {string|null} [host]
 	 * @returns {sb.Platform|null}
-	 * @throws {sb.Error} If identifier type is not recognized
+	 * @throws {sb.Error} If identifier type is not recognized, or there are ambiguous platforms
 	 */
-	static get (identifier) {
+	static get (identifier, host) {
 		if (identifier instanceof Platform) {
 			return identifier;
 		}
@@ -337,7 +338,23 @@ module.exports = class Platform extends require("./template.js") {
 			return Platform.data.find(i => i.ID === identifier) ?? null;
 		}
 		else if (typeof identifier === "string") {
-			return Platform.data.find(i => i.Name === identifier) ?? null;
+			const eligible = Platform.data.filter(i => i.Name === identifier);
+			if (eligible.length === 0) {
+				return null;
+			}
+			else if (host === null || typeof host === "string") {
+				return eligible.find(i => i.Host === host);
+			}
+			else {
+				if (eligible.length > 1) {
+					throw new sb.Error({
+						message: "Ambiguous platform name - use host as second parameter",
+						args: { identifier }
+					});
+				}
+
+				return eligible[0];
+			}
 		}
 		else {
 			throw new sb.Error({
