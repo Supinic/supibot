@@ -70,6 +70,11 @@ module.exports = class IRCController extends require("./template.js") {
 	}
 
 	async handleMessage (event, isPrivate) {
+		if (event.from_server) {
+			console.log("server message", { event });
+			return;
+		}
+
 		// how to verify user? is there a way to check someone's registered status/ID or something?
 		// see userlist/whois/whowas
 		const { message } = event;
