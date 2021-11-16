@@ -1,7 +1,7 @@
-INSERT INTO `chat_data`.`Platform` 
-(`Name`, `Message_Limit`, `Self_Name`, `Logging`, `Defaults`)
+INSERT INTO `chat_data`.`Platform`
+(`Name`, `Host`, `Message_Limit`, `Self_Name`, `Logging`, `Defaults`)
 VALUES
-('Twitch',500,NULL,'{
+('Twitch',NULL,500,NULL,'{
 	"bans": false,
 	"bits": false,
 	"channelJoins": false,
@@ -41,8 +41,8 @@ VALUES
 	"rateLimits": "default",
 	"reconnectAnnouncement": {}
 }'),
-('Discord',2000,NULL,NULL,NULL),
-('Cytube',600,NULL,'{
+('Discord',NULL,2000,NULL,NULL,NULL),
+('Cytube','https://cytu.be',600,NULL,'{
     "videoRequests": false,
     "whispers": false
 }',NULL)
