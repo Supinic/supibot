@@ -15,28 +15,28 @@
 
 	const controllers = {};
 	const initialChannels = sb.Channel.data.filter(i => i.Mode !== "Inactive");
-	const initialData = initialChannels.map(i => [i.Platform.Name, i.Platform.Host]);
+	const initialPlatforms = initialChannels.map(i => i.Platform);
 
-	for (const [platformName, host] of initialData) {
+	for (const platformData of initialPlatforms) {
 		let Controller = null;
 		try {
-			Controller = require(`./controllers/${platformName}`);
+			Controller = require(`./controllers/${platformData.Name}`);
 		}
 		catch (e) {
-			console.error(`Require of ${platformName} controller module failed`, e);
+			console.error(`Require of ${platformData.Name} controller module failed`, e);
 			continue;
 		}
 
-		const options = { host };
+		const options = { host: platformData.Host };
 		try {
-			controllers[platformName] = new Controller(options);
+			controllers[platformData.Name] = new Controller(options);
 		}
 		catch (e) {
-			console.error(`Initialization of ${platformName} controller module failed`, e);
+			console.error(`Initialization of ${platformData.Name} controller module failed`, e);
 			continue;
 		}
 
-		console.debug(`Platform ${platformName} loaded successfully.`);
+		console.debug(`Platform ${platformData.Name} loaded successfully.`);
 	}
 
 	sb.API = require("./api");
