@@ -85,7 +85,7 @@ module.exports = class IRCController extends require("./template.js") {
 
 		let channelData = null;
 		if (!isPrivate) {
-			channelData = sb.Channel.get(event.channel, this.platform);
+			channelData = sb.Channel.get(event.target, this.platform);
 
 			if (!channelData) {
 				return;
