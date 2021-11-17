@@ -28,7 +28,8 @@ module.exports = class IRCController extends require("./template.js") {
 			host: this.platform.Data.url ?? options.host,
 			port: this.platform.Data.port ?? 6667,
 			nick: this.platform.Self_Name,
-			tls: this.platform.Data.secure ?? this.platform.Data.tls ?? false
+			tls: this.platform.Data.secure ?? this.platform.Data.tls ?? false,
+			enable_echomessage: true
 		});
 
 		this.nicknameChanged = false;
