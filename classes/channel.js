@@ -577,8 +577,7 @@ module.exports = class Channel extends require("./template.js") {
 	static normalizeName (username) {
 		return username
 			.toLowerCase()
-			.replace(/^@/, "")
-			.replace(/^#/, "");
+			.replace(/^@/, "");
 	}
 };
 
