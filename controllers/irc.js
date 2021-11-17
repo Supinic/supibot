@@ -52,6 +52,8 @@ module.exports = class IRCController extends require("./template.js") {
 	initListeners () {
 		const { client } = this;
 
+		client.on("debug", (...args) => console.debug("debug", args));
+
 		client.on("registered", () => {
 			const channelsData = sb.Channel.getJoinableForPlatform(this.platform);
 			for (const channelData of channelsData) {
