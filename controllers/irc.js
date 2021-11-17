@@ -54,11 +54,11 @@ module.exports = class IRCController extends require("./template.js") {
 				}
 
 				const message = `IDENTIFY ${this.platform.Self_Name} ${key}`;
-				this.directPm(user, message);
+				this.directPm(message, user);
 
 				if (this.nicknameChanged) {
 					this.nicknameChanged = false;
-					this.directPm(user, `REGAIN ${this.platform.Self_Name}`);
+					this.directPm(`REGAIN ${this.platform.Self_Name} ${key}`, user);
 				}
 			}
 
