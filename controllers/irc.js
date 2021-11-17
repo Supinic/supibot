@@ -63,7 +63,7 @@ module.exports = class IRCController extends require("./template.js") {
 
 			const channelsData = sb.Channel.getJoinableForPlatform(this.platform);
 			for (const channelData of channelsData) {
-				this.client.join(`#${channelData.Name}`);
+				this.client.join(channelData.Name);
 			}
 		});
 
@@ -89,7 +89,7 @@ module.exports = class IRCController extends require("./template.js") {
 			});
 		}
 
-		this.client.say(`#${channelData.Name}`, message);
+		this.client.say(channelData.Name, message);
 	}
 
 	async pm (message, user) {
