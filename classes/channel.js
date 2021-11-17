@@ -220,7 +220,7 @@ module.exports = class Channel extends require("./template.js") {
 	getDatabaseName () {
 		return (this.Platform.Name === "twitch")
 			? this.Name
-			: `${this.Platform.Name}_${this.Name}`;
+			: `${this.Platform.getFullName("_").toLowerCase()}_${this.Name}`;
 	}
 
 	/**
