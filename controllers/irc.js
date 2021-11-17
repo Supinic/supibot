@@ -39,7 +39,7 @@ module.exports = class IRCController extends require("./template.js") {
 
 		client.on("debug", (...args) => console.debug("debug", args));
 
-		client.on("socket connected", () => {
+		client.on("registered", () => {
 			const { authentication } = this.platform.Data ?? {};
 			if (authentication.type === "privmsg-identify") {
 				const { configVariable, user } = authentication;
@@ -51,12 +51,14 @@ module.exports = class IRCController extends require("./template.js") {
 					});
 				}
 
+				console.debug("sending IDENTIFY");
+
 				const message = `IDENTIFY ${this.platform.Self_Name} ${key}`;
 				this.directPm(user, message);
 			}
-		});
 
-		client.on("registered", () => {
+			console.debug("joining channels");
+
 			const channelsData = sb.Channel.getJoinableForPlatform(this.platform);
 			for (const channelData of channelsData) {
 				this.client.join(`#${channelData.Name}`);
