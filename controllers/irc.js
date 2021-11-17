@@ -42,6 +42,8 @@ module.exports = class IRCController extends require("./template.js") {
 		client.on("registered", () => {
 			const { authentication } = this.platform.Data ?? {};
 			if (authentication.type === "privmsg-identify") {
+				this.client.changeNick("Supibot");
+
 				const { configVariable, user } = authentication;
 				const key = sb.Config.get(configVariable, false);
 				if (!key) {
@@ -50,8 +52,6 @@ module.exports = class IRCController extends require("./template.js") {
 						args: { configVariable }
 					});
 				}
-
-				console.debug("sending IDENTIFY");
 
 				const message = `IDENTIFY ${this.platform.Self_Name} ${key}`;
 				this.directPm(user, message);
@@ -67,6 +67,14 @@ module.exports = class IRCController extends require("./template.js") {
 
 		client.on("join", async (event) => {
 			console.log("JOIN", { event });
+		});
+
+		client.on("raw", async (event) => {
+			const { line } = event;
+			if (line?.includes("Nickname is already in use")) {
+				const string = sb.Utils.randomString(16);
+				this.client.changeNick(string);
+			}
 		});
 
 		client.on("privmsg", async (event) => await this.handleMessage(event));
