@@ -31,6 +31,8 @@ module.exports = class IRCController extends require("./template.js") {
 			tls: this.platform.Data.secure ?? this.platform.Data.tls ?? false
 		});
 
+		this.nicknameChanged = false;
+
 		this.initListeners();
 	}
 
@@ -42,8 +44,6 @@ module.exports = class IRCController extends require("./template.js") {
 		client.on("registered", () => {
 			const { authentication } = this.platform.Data ?? {};
 			if (authentication.type === "privmsg-identify") {
-				this.client.changeNick("Supibot");
-
 				const { configVariable, user } = authentication;
 				const key = sb.Config.get(configVariable, false);
 				if (!key) {
@@ -55,9 +55,12 @@ module.exports = class IRCController extends require("./template.js") {
 
 				const message = `IDENTIFY ${this.platform.Self_Name} ${key}`;
 				this.directPm(user, message);
-			}
 
-			console.debug("joining channels");
+				if (this.nicknameChanged) {
+					this.nicknameChanged = false;
+					this.directPm(user, `REGAIN ${this.platform.Self_Name}`);
+				}
+			}
 
 			const channelsData = sb.Channel.getJoinableForPlatform(this.platform);
 			for (const channelData of channelsData) {
@@ -69,12 +72,10 @@ module.exports = class IRCController extends require("./template.js") {
 			console.log("JOIN", { event });
 		});
 
-		client.on("raw", async (event) => {
-			const { line } = event;
-			if (line?.includes("Nickname is already in use")) {
-				const string = sb.Utils.randomString(16);
-				this.client.changeNick(string);
-			}
+		client.on("nick in use", async () => {
+			const string = sb.Utils.randomString(16);
+			this.client.changeNick(string);
+			this.nicknameChanged = true;
 		});
 
 		client.on("privmsg", async (event) => await this.handleMessage(event));
