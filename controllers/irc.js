@@ -25,11 +25,26 @@ module.exports = class IRCController extends require("./template.js") {
 
 		this.client = new IRC.Client();
 		this.client.connect({
-			host: options.host,
+			host: this.platform.Data.url ?? options.host,
 			port: this.platform.Data.port ?? 6667,
 			nick: this.platform.Self_Name,
 			tls: this.platform.Data.secure ?? this.platform.Data.tls ?? false
 		});
+
+		const { authentication } = this.platform.Data ?? {};
+		if (authentication.type === "privmsg-identify") {
+			const { configVariable, user } = authentication;
+			const key = sb.Config.get(configVariable, false);
+			if (!key) {
+				throw new sb.Error({
+					message: "Invalid IRC authentication key exists in sb.Config",
+					args: { configVariable }
+				});
+			}
+
+			const message = `IDENTIFY ${this.platform.Self_Name} ${key}`;
+			this.directPm(user, message);
+		}
 
 		this.initListeners();
 	}
@@ -63,8 +78,17 @@ module.exports = class IRCController extends require("./template.js") {
 		this.client.say(`#${channelData.Name}`, message);
 	}
 
-	async pm () {
-		throw new Error("Not yet implemented");
+	async pm (message, user) {
+		const userData = await sb.User.get(user);
+		if (!userData) {
+			return;
+		}
+
+		this.client.say(userData.Name, message);
+	}
+
+	async directPm (message, userName) {
+		this.client.say(userName, message);
 	}
 
 	async handleMessage (event) {
@@ -73,8 +97,12 @@ module.exports = class IRCController extends require("./template.js") {
 			return;
 		}
 
-		// how to verify user? is there a way to check someone's registered status/ID or something?
-		// see userlist/whois/whowas
+		// TODO verify user
+		// idea:
+		// 1) ignore all non-registered users;
+		// 2a) registered users receive a prompt to link their account (if it already exists)
+		// 2b) added registered users without an existing user_alias (?)
+		// see userlist/whois/whowas/details
 		const { message } = event;
 		const userData = await sb.User.get(event.nick, true);
 		if (!userData) {
@@ -126,7 +154,7 @@ module.exports = class IRCController extends require("./template.js") {
 
 			// Mirror messages to a linked channel, if the channel has one
 			if (channelData.Mirror) {
-				this.mirror(message, userData, channelData, { commandUsed: false });
+				await this.mirror(message, userData, channelData, { commandUsed: false });
 			}
 		}
 		else {
