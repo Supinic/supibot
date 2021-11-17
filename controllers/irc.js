@@ -31,21 +31,6 @@ module.exports = class IRCController extends require("./template.js") {
 			tls: this.platform.Data.secure ?? this.platform.Data.tls ?? false
 		});
 
-		const { authentication } = this.platform.Data ?? {};
-		if (authentication.type === "privmsg-identify") {
-			const { configVariable, user } = authentication;
-			const key = sb.Config.get(configVariable, false);
-			if (!key) {
-				throw new sb.Error({
-					message: "Invalid IRC authentication key exists in sb.Config",
-					args: { configVariable }
-				});
-			}
-
-			const message = `IDENTIFY ${this.platform.Self_Name} ${key}`;
-			this.directPm(user, message);
-		}
-
 		this.initListeners();
 	}
 
@@ -53,6 +38,23 @@ module.exports = class IRCController extends require("./template.js") {
 		const { client } = this;
 
 		client.on("debug", (...args) => console.debug("debug", args));
+
+		client.on("socket connected", () => {
+			const { authentication } = this.platform.Data ?? {};
+			if (authentication.type === "privmsg-identify") {
+				const { configVariable, user } = authentication;
+				const key = sb.Config.get(configVariable, false);
+				if (!key) {
+					throw new sb.Error({
+						message: "Invalid IRC authentication key exists in sb.Config",
+						args: { configVariable }
+					});
+				}
+
+				const message = `IDENTIFY ${this.platform.Self_Name} ${key}`;
+				this.directPm(user, message);
+			}
+		});
 
 		client.on("registered", () => {
 			const channelsData = sb.Channel.getJoinableForPlatform(this.platform);
