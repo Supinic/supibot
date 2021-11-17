@@ -268,8 +268,13 @@ module.exports = class Platform extends require("./template.js") {
 		});
 	}
 
+	getFullName (separator = "-") {
+		return [this.Name, this.Host].filter(Boolean).join(separator);
+	}
+
 	getCacheKey () {
-		return `sb-platform-${this.Name}`;
+		const name = this.getFullName("-");
+		return `sb-platform-${name}`;
 	}
 
 	get userMessagePromises () {
@@ -281,7 +286,8 @@ module.exports = class Platform extends require("./template.js") {
 	}
 
 	get privateMessageLoggingTableName () {
-		return `#${this.Name}_private_messages`;
+		const name = this.getFullName("_");
+		return `#${name}_private_messages`;
 	}
 
 	/**
