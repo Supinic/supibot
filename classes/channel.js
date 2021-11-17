@@ -157,7 +157,10 @@ module.exports = class Channel extends require("./template.js") {
 		}
 
 		const limit = this.Message_Limit ?? this.Platform.Message_Limit;
-		const prefix = (this.Platform.Name === "twitch") ? "" : (`${this.Platform.Name}_`);
+		const prefix = (this.Platform.Name === "twitch")
+			? ""
+			: `${this.Platform.getFullName("_")}_`;
+
 		const name = prefix + this.Name.toLowerCase();
 		const alreadySetup = await sb.Query.isTablePresent("chat_line", name);
 		if (alreadySetup) {
