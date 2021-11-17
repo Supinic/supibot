@@ -121,10 +121,11 @@ module.exports = class IRCController extends require("./template.js") {
 			return;
 		}
 
-		const userVerificationData = await userData.getDataProperty("platformVerification");
-		userVerificationData[this.platform.Host] ??= {};
-		const platformVerification = userVerificationData[this.platform.Host];
+		let userVerificationData = await userData.getDataProperty("platformVerification");
+		userVerificationData ??= {};
+		userVerificationData[this.platform.ID] ??= {};
 
+		const platformVerification = userVerificationData[this.platform.ID];
 		if (!platformVerification.active) {
 			// TODO: verification challenge creation for Discord/Twitch and sending the message
 			if (!platformVerification.notificationSent) {
