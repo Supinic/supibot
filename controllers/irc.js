@@ -110,19 +110,45 @@ module.exports = class IRCController extends require("./template.js") {
 			return;
 		}
 
-		// TODO verify user
-		// idea:
-		// 1) ignore all non-registered users;
-		// 2a) registered users receive a prompt to link their account (if it already exists)
-		// 2b) added registered users without an existing user_alias (?)
-		// see userlist/whois/whowas/details
+		if (!event.tags.account) {
+			return;
+		}
+
 		const { message } = event;
-		const userData = await sb.User.get(event.nick, true);
+		const isPrivateMessage = (event.target === this.platform.Self_Name.toLowerCase());
+		const userData = await sb.User.get(event.tags.account, false);
 		if (!userData) {
 			return;
 		}
 
-		const isPrivateMessage = (event.target === this.platform.Self_Name.toLowerCase());
+		const userVerificationData = await userData.getDataProperty("platformVerification");
+		userVerificationData[this.platform.Host] ??= {};
+		const platformVerification = userVerificationData[this.platform.Host];
+
+		if (!platformVerification.active) {
+			// TODO: verification challenge creation for Discord/Twitch and sending the message
+			if (!platformVerification.notificationSent) {
+				const accountType = (userData.Twitch_ID) ? "Twitch" : "Discord";
+				const message = sb.Utils.tag.trim `
+					@${userData.Name},
+					You were found to be likely to own a ${accountType} account with the same name as your current IRC account.
+					Please contact @Supinic to resolve this manually (for now).
+				`;
+
+				if (isPrivateMessage) {
+					await this.send(message, event.target);
+				}
+				else {
+					await this.pm(message, userData.Name);
+				}
+
+				platformVerification.notificationSent = true;
+				await userData.setDataProperty("platformVerification", userVerificationData);
+			}
+
+			return;
+		}
+
 		let channelData = null;
 		if (!isPrivateMessage) {
 			channelData = sb.Channel.get(event.target, this.platform);
