@@ -39,8 +39,6 @@ module.exports = class IRCController extends require("./template.js") {
 	initListeners () {
 		const { client } = this;
 
-		client.on("debug", (...args) => console.debug("debug", args));
-
 		client.on("registered", () => {
 			const { authentication } = this.platform.Data ?? {};
 			if (authentication.type === "privmsg-identify") {
