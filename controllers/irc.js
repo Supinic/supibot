@@ -264,7 +264,7 @@ module.exports = class IRCController extends require("./template.js") {
 	}
 
 	async isUserChannelOwner (channelData, userData) {
-		throw new Error("Not yet implemented");
+		return false;
 	}
 
 	async fetchUserList (channelIdentifier) {
