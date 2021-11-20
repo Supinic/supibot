@@ -569,6 +569,11 @@ module.exports = class TwitchController extends require("./template.js") {
 		const userData = await sb.User.get(user);
 		const trimmedMessage = message.replace(/[\r\n]/g, " ").trim();
 
+		const joinOverride = this.platform?.Data.joinChannelsOverride ?? [];
+		if (this.platform.Data.suspended || joinOverride.length !== 0) {
+			return;
+		}
+
 		try {
 			await this.client.whisper(userData.Name, trimmedMessage);
 		}
