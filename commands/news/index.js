@@ -689,7 +689,7 @@ module.exports = {
 				sources: [
 					{
 						name: "UOL",
-						url: "http://rss.uol.com.br",
+						url: "https://rss.uol.com.br",
 						path: "feed",
 						endpoints: ["noticias.xml"],
 						helpers: ["vhns_"]
