@@ -682,6 +682,19 @@ module.exports = {
 						helpers: ["supinic"]
 					}
 				]
+			},
+			{
+				code: "br",
+				language: "portuguese",
+				sources: [
+					{
+						name: "UOL",
+						url: "http://rss.uol.com.br",
+						path: "feed",
+						endpoints: ["noticias.xml"],
+						helpers: ["vhns_"]
+					}
+				]
 			}
 		],
 
