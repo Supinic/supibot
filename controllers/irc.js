@@ -118,13 +118,8 @@ module.exports = class IRCController extends require("./template.js") {
 			const userName = event.nick;
 			if (sb.Command.is(message) && !this.data.notifiedUnregisteredUsers.includes(userName)) {
 				const message = `You must register an account before using my commands!`;
-				if (isPrivateMessage) {
-					await this.directPm(message, userName);
-				}
-				else {
-					await this.send(message, event.target);
-				}
 
+				this.client.say(event.target, message);
 				this.data.notifiedUnregisteredUsers.push(userName);
 			}
 
