@@ -496,7 +496,7 @@ module.exports = class Reminder extends require("./template.js") {
 		// Handle private reminders
 		if (privateReply.length !== 0) {
 			for (const privateReminder of privateReply) {
-				await channelData.Platform.pm(`Private reminder: ${privateReminder}`, targetUserData);
+				await channelData.Platform.pm(`Private reminder: ${privateReminder}`, targetUserData, channelData);
 			}
 
 			const publicMessage = `Hey ${targetUserData.Name} - I just whispered you ${privateReply.length} private reminder(s) - make sure to check them out!`;
