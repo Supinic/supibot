@@ -99,6 +99,8 @@ module.exports = {
 			script = `${importedText}${script}`;
 		}
 
+		let customDeveloperDataChanged = false;
+		const customDeveloperData = await context.user.getDataProperty("customDeveloperData") ?? {};
 		try {
 			const scriptContext = {
 				fixAsync: false,
@@ -112,6 +114,22 @@ module.exports = {
 					executor: context.user.Name,
 					platform: context.platform.Name,
 					tee: Object.freeze([...context.tee]),
+					customData: {
+						set: (key, value) => {
+							if (typeof key !== "string") {
+								throw new Error("Only strings are available as keys");
+							}
+							else if (value && (typeof value === "object" || typeof value === "function")) {
+								throw new Error("Only primitives are accepted as object values");
+							}
+
+							customDeveloperDataChanged = true;
+							customDeveloperData[key] = value;
+						},
+						get: (key) => (Object.hasOwn(customDeveloperData, key))
+							? customDeveloperData[key]
+							: undefined
+					},
 					utils: {
 						getEmote: (array, fallback) => {
 							if (!Array.isArray(array) || array.some(i => typeof i !== "string")) {
@@ -170,6 +188,28 @@ module.exports = {
 				success: false,
 				reply: e.toString()
 			};
+		}
+
+		if (customDeveloperDataChanged) {
+			let string;
+			try {
+				string = JSON.stringify(customDeveloperData);
+			}
+			catch {
+				return {
+					success: false,
+					reply: `Cannot stringify your custom data object!`
+				};
+			}
+
+			if (string.length >= this.staticData.customDataLimit) {
+				return {
+					success: false,
+					reply: `Your custom data object is too long! Maximum: ${this.staticData.customDataLimit}`
+				};
+			}
+
+			await context.user.setDataProperty("customDeveloperData", customDeveloperData);
 		}
 
 		if (result && typeof result === "object") {
