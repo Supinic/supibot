@@ -114,7 +114,7 @@ module.exports = {
 					executor: context.user.Name,
 					platform: context.platform.Name,
 					tee: Object.freeze([...context.tee]),
-					customData: {
+					customData: sb.Utils.deepFreeze({
 						set: (key, value) => {
 							if (typeof key !== "string") {
 								throw new Error("Only strings are available as keys");
@@ -129,7 +129,7 @@ module.exports = {
 						get: (key) => (Object.hasOwn(customDeveloperData, key))
 							? customDeveloperData[key]
 							: undefined
-					},
+					}),
 					utils: {
 						getEmote: (array, fallback) => {
 							if (!Array.isArray(array) || array.some(i => typeof i !== "string")) {
