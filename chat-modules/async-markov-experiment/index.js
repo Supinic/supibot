@@ -3,6 +3,8 @@ module.exports = {
 	Events: ["message"],
 	Description: "Super experimental automatic async markov tester thing",
 	Code: (async function asyncMarkovExperiment (context) {
+		this.data.markovs ??= new Map();
+
 		if (this.data.skipped) {
 			return;
 		}
@@ -10,9 +12,6 @@ module.exports = {
 			return;
 		}
 
-		if (!this.data.markovs) {
-			this.data.markovs = new Map();
-		}
 		if (!this.data.markovs.has(context.channel.ID)) {
 			try {
 				const Markov = require("async-markov");
