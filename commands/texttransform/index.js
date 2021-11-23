@@ -426,7 +426,9 @@ module.exports = {
 	Dynamic_Description: (async (prefix, values) => {
 		const lorem = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
 		const { types, convert } = values.getStaticData();
-		const examples = types.sort((a, b) => a.name.localeCompare(b.name)).map(transform => {
+
+		const sortedTypes = [...types].sort((a, b) => a.name.localeCompare(b.name));
+		const examples = sortedTypes.map(transform => {
 			const description = transform.description ?? "(no description)";
 			const message = convert[transform.type](lorem, transform.data ?? null);
 			const aliases = (transform.aliases.length === 0)
