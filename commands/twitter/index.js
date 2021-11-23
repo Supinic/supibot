@@ -82,7 +82,18 @@ module.exports = {
 		}
 
 		let eligibleTweets = response.body;
-		if (!context.params.includeRetweets) {
+		if (!Array.isArray(eligibleTweets)) {
+			await sb.Logger.log("Command.Warning", JSON.stringify({
+				eligibleTweets,
+				statusCode: response.statusCode
+			}));
+
+			return {
+				success: false,
+				reply: `Twitter response data is invalid! Contact @Supinic and/or try again later.`
+			};
+		}
+		else if (!context.params.includeRetweets) {
 			eligibleTweets = eligibleTweets.filter(i => !i.retweeted_status);
 
 			if (eligibleTweets.length === 0) {
