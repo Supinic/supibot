@@ -14,7 +14,6 @@ module.exports = {
 			Expression: "0 0 * * * *",
 			Code: (async function cryptoGamePriceUpdate () {
 				const ignoredAssets = ["VEF"];
-				const totalData = {};
 
 				const conditionalFixerIo = (async () => {
 					if (new sb.Date().hours % 12 !== 0) {
@@ -32,7 +31,7 @@ module.exports = {
 					}).json();
 				});
 
-				const [cryptoData, currencyData, goldData, silverData] = await Promise.all([
+				const [cryptoData, currencyData, goldData, silverData] = await Promise.allSettled([
 					sb.Got("GenericAPI", {
 						url: "https://min-api.cryptocompare.com/data/price",
 						searchParams: new sb.URLParams()
@@ -55,9 +54,17 @@ module.exports = {
 					}).json()
 				]);
 
-				Object.assign(totalData, cryptoData, currencyData.rates);
-				totalData.XAU = goldData[0].spreadProfilePrices[0].bid;
-				totalData.XAG = silverData[0].spreadProfilePrices[0].bid;
+				const totalData = {
+					...(cryptoData?.value ?? {}),
+					...(currencyData?.value.rates ?? {})
+				};
+
+				if (goldData.status === "fulfilled") {
+					totalData.XAU = goldData.value[0].spreadProfilePrices[0].bid;
+				}
+				if (silverData.status === "fulfilled") {
+					totalData.XAG = silverData.value[0].spreadProfilePrices[0].bid;
+				}
 
 				const now = new sb.Date();
 				const uppercaseOnly = /^[A-Z]+$/;
