@@ -7,7 +7,7 @@ module.exports = {
 	Flags: ["developer","mention","whitelist"],
 	Params: null,
 	Whitelist_Response: "Only Supi can use this command, but you can check the repository here: https://github.com/supinic/supibot-package-manager peepoHackies",
-	Static_Data: (() => ({
+	Static_Data: (command => ({
 		operations: ["dump", "load"],
 		helpers: {
 			fs: require("fs").promises,
@@ -16,7 +16,7 @@ module.exports = {
 			save: (async (item, options) => {
 				const fs = require("fs").promises;
 				const dir = `/code/spm/${options.dir}/${item.Name}`;
-				if (!await this.staticData.helpers.exists(dir)) {
+				if (!await command.staticData.helpers.exists(dir)) {
 					await fs.mkdir(dir);
 				}
 
@@ -59,13 +59,13 @@ module.exports = {
 			}),
 			load: (async (item, options) => {
 				const itemFile = `/code/spm/${options.dir}/${item}/index.js`;
-				if (!await this.staticData.helpers.exists(itemFile)) {
+				if (!await command.staticData.helpers.exists(itemFile)) {
 					console.warn(`index.js file for ${options.name} ${item} does not exist`);
 					return { updated: false };
 				}
 
 				// Fetch the latest commit for a given file
-				const shellResult = await this.staticData.helpers.shell(sb.Utils.tag.trim `
+				const shellResult = await command.staticData.helpers.shell(sb.Utils.tag.trim `
 					git
 					-C /code/spm
 					log -n 1
