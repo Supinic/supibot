@@ -85,7 +85,7 @@ module.exports = {
 			};
 		}
 
-		const markov = module.data.markovs.get(targetChannel.ID);
+		const markov = module.data.markovs?.get(targetChannel.ID);
 		if (!markov) {
 			return {
 				success: false,
