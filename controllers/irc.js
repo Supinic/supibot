@@ -135,8 +135,9 @@ module.exports = class IRCController extends require("./template.js") {
 		userVerificationData ??= {};
 		userVerificationData[this.platform.ID] ??= {};
 
+		const isSelf = (userData.Name === this.platform.Self_Name);
 		const platformVerification = userVerificationData[this.platform.ID];
-		if ((userData.Twitch_ID || userData.Discord_ID) && !platformVerification.active) {
+		if (!isSelf && (userData.Twitch_ID || userData.Discord_ID) && !platformVerification.active) {
 			// TODO: verification challenge creation for Discord/Twitch and sending the message
 			if (!platformVerification.notificationSent) {
 				const accountType = (userData.Twitch_ID) ? "Twitch" : "Discord";
