@@ -106,6 +106,16 @@ module.exports = class IRCController extends require("./template.js") {
 		this.client.say(userName, message);
 	}
 
+	async prepareMessage (message, channel, options = {}) {
+		const preparedMessage = await super.prepareMessage(message, channel, {
+			...options,
+			skipLengthCheck: true
+		});
+
+		const limit = (this.platform.Message_Limit * 2) - (options.extraLength ?? 0);
+		return sb.Utils.wrapString(preparedMessage, limit);
+	}
+
 	async handleMessage (event) {
 		if (event.from_server) {
 			return;
@@ -246,7 +256,7 @@ module.exports = class IRCController extends require("./template.js") {
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
 			const message = await this.prepareMessage(execution.reply, null, {
 				...commandOptions,
-				extraLength: (`/w ${userData.Name} `).length,
+				extraLength: (`PRIVMSG ${userData.Name} `).length,
 				skipBanphrases: true
 			});
 
@@ -262,6 +272,7 @@ module.exports = class IRCController extends require("./template.js") {
 
 			const message = await this.prepareMessage(execution.reply, channelData, {
 				...commandOptions,
+				extraLength: (`PRIVMSG ${channelData.Name} `).length,
 				skipBanphrases: true
 			});
 
