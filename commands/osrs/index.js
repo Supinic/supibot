@@ -11,7 +11,8 @@ module.exports = {
 		{ name: "force", type: "boolean" },
 		{ name: "rude", type: "boolean" },
 		{ name: "seasonal", type: "boolean" },
-		{ name: "skill", type: "string" }
+		{ name: "skill", type: "string" },
+		{ name: "virtual", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: ((command) => ({
@@ -298,10 +299,11 @@ module.exports = {
 						? "(unranked)"
 						: sb.Utils.groupDigits(skill.experience);
 
+					const level = (context.params.virtual) ? skill.virtualLevel : skill.level;
 					return {
 						reply: sb.Utils.tag.trim `
 							${sb.Utils.capitalize(accountType)} ${user}
-							${emoji} ${skill.level} 
+							${emoji} ${level} 
 							(XP: ${experience})
 						`
 					};
@@ -311,7 +313,8 @@ module.exports = {
 				for (const { emoji, name } of this.staticData.skills) {
 					const found = data.skills.find(i => i.name.toLowerCase() === name.toLowerCase());
 					if (found && found.level !== null) {
-						strings.push(`${emoji} ${found.level}`);
+						const level = (context.params.virtual) ? found.virtualLevel : found.level;
+						strings.push(`${emoji} ${level}`);
 					}
 				}
 
@@ -496,6 +499,12 @@ module.exports = {
 			`<code>${prefix}osrs stats (username) skill:(skill)</code>`,
 			"For given user, posts the skill's level, experience, and ranking.",
 			`If used with "seasonal-stats", the command will attempt to use that user's seasonal profile.`,
+			"",
+
+			"<u>Virtual levels</u>",
+			`<code>${prefix}osrs (username) skill:(skill) virtual:true</code>`,
+			`<code>${prefix}osrs (username) virtual:true</code>`,
+			"Will take into account virtual levels.",
 			"",
 
 			"<u>Skills and used emojis</u>",
