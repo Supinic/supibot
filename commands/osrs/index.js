@@ -313,7 +313,10 @@ module.exports = {
 				for (const { emoji, name } of this.staticData.skills) {
 					const found = data.skills.find(i => i.name.toLowerCase() === name.toLowerCase());
 					if (found && found.level !== null) {
-						const level = (context.params.virtual) ? found.virtualLevel : found.level;
+						const level = (context.params.virtual)
+							? (found.virtualLevel ?? found.level)
+							: found.level;
+
 						strings.push(`${emoji} ${level}`);
 					}
 				}
