@@ -326,11 +326,16 @@ module.exports = {
 						? `XP: ${sb.Utils.groupDigits(total.experience)}`
 						: "";
 
+					const combatLevelString = (data.combatLevel !== null)
+						? `Combat level: ${data.combatLevel}`
+						: "";
+
 					return {
 						reply: sb.Utils.tag.trim `
 							Stats for ${accountType} ${user}:
 							${strings.join(" ")}
 							${totalXPString}
+							${combatLevelString}
 						`
 					};
 				}
