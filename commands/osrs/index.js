@@ -334,7 +334,9 @@ module.exports = {
 						reply: sb.Utils.tag.trim `
 							Stats for ${accountType} ${user}:
 							${strings.join(" ")}
+							|
 							${totalXPString}
+							|
 							${combatLevelString}
 						`
 					};
