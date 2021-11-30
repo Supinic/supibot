@@ -215,7 +215,7 @@ module.exports = class User extends require("./template.js") {
 			}
 
 			const userCache = User.dataCache.get(this);
-			userCache.set(property, value);
+			userCache.set(propertyName, value);
 		}
 
 		await row.save({ skipLoad: true });
