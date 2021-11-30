@@ -55,6 +55,20 @@ module.exports = {
 			}
 
 			return "";
+		},
+		getWindDirection: (degrees) => {
+			degrees %= 360;
+
+			const base = 11.25;
+			const interval = 22.5;
+			if (degrees < base) {
+				return "N";
+			}
+
+			const directions = ["NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+			const index = Math.trunc((degrees - base) / interval);
+
+			return directions[index];
 		}
 	})),
 	Code: (async function weather (context, ...args) {
@@ -340,14 +354,15 @@ module.exports = {
 			}
 		}
 
+		const { getIcon, getWindDirection } = this.staticData;
 		const obj = {
 			place: (skipLocation) ? "(location hidden)" : formattedAddress,
-			icon: this.staticData.getIcon(target.weather[0].id, data.current),
+			icon: getIcon(target.weather[0].id, data.current),
 			cloudCover: `Cloud cover: ${target.clouds}%.`,
 			humidity: `Humidity: ${target.humidity}%.`,
 			pressure: `Air pressure: ${target.pressure} hPa.`,
 			windSpeed: (target.wind_speed)
-				? `Wind speed: ${sb.Utils.round(target.wind_speed * 3.6)} km/h.`
+				? `${getWindDirection(target.wind_deg)} wind speed: ${sb.Utils.round(target.wind_speed * 3.6)} km/h.`
 				: "No wind.",
 			windGusts: (target.wind_gust)
 				? `Wind gusts: up to ${sb.Utils.round(target.wind_gust * 3.6)} km/h.`
