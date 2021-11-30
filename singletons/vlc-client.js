@@ -18,10 +18,10 @@ const get = (options) => {
 				reject(new Error("Invalid content type. Expected application/json or text/plain, received " + contentType));
 			}
 
-			let data = '';
-			response.on('error', reject);
-			response.on('data', chunk => (data += chunk));
-			response.on('end', () => {
+			let data = "";
+			response.on("error", reject);
+			response.on("data", chunk => (data += chunk));
+			response.on("end", () => {
 				try {
 					resolve(JSON.parse(data));
 				}
@@ -129,14 +129,14 @@ module.exports = class VLCClient extends require("events") {
 	constructor (options) {
 		super();
 
-		this.#host = options.host ?? '127.0.0.1';
+		this.#host = options.host ?? "127.0.0.1";
 		this.#port = options.port ?? 8080;
 
-		if (typeof options.autoUpdate === 'boolean') {
+		if (typeof options.autoUpdate === "boolean") {
 			this.#autoUpdate = options.autoUpdate;
 		}
 
-		if (typeof options.changeEvents === 'boolean') {
+		if (typeof options.changeEvents === "boolean") {
 			this.#changeEvents = options.changeEvents;
 		}
 
@@ -172,7 +172,7 @@ module.exports = class VLCClient extends require("events") {
 	}
 
 	async #doTick() {
-		this.emit('tick', this.#running);
+		this.emit("tick", this.#running);
 
 		if (this.#running) {
 			try {
@@ -208,7 +208,7 @@ module.exports = class VLCClient extends require("events") {
 		return get({
 			host: this.#host,
 			port: this.#port,
-			path: `${scope}${query ? `?${query}` : ''}`,
+			path: `${scope}${query ? `?${query}` : ""}`,
 			headers: {
 				Authorization: this.#authorization
 			}
@@ -226,10 +226,10 @@ module.exports = class VLCClient extends require("events") {
 
 		if (this.#changeEvents && !equal(status, this.#status)) {
 			try {
-				this.emit('statuschange', this.#status || status, status);
+				this.emit("statuschange", this.#status || status, status);
 			}
 			catch (err) {
-				this.emit('error', err);
+				this.emit("error", err);
 			}
 
 			this.#status = status;
@@ -243,10 +243,10 @@ module.exports = class VLCClient extends require("events") {
 
 		if (this.#changeEvents && !equal(playlist, this.#playlist)) {
 			try {
-				this.emit('playlistchange', this.#playlist || playlist, playlist);
+				this.emit("playlistchange", this.#playlist || playlist, playlist);
 			}
 			catch (err) {
-				this.emit('error', err);
+				this.emit("error", err);
 			}
 
 
@@ -263,10 +263,10 @@ module.exports = class VLCClient extends require("events") {
 		]);
 
 		try {
-			this.emit('update', status, playlist);
+			this.emit("update", status, playlist);
 		}
 		catch (err) {
-			this.emit('error', err);
+			this.emit("error", err);
 		}
 
 		return [status, playlist];
@@ -283,7 +283,7 @@ module.exports = class VLCClient extends require("events") {
 			option
 		};
 
-		return await this.#sendCommand(CommandScope.STATUS, 'in_play', options);
+		return await this.#sendCommand(CommandScope.STATUS, "in_play", options);
 	}
 
 	/**
@@ -291,7 +291,7 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {string} uri
 	 */
 	async addToQueue (uri) {
-		return await this.#sendCommand(CommandScope.STATUS, 'in_enqueue', { input: uri });
+		return await this.#sendCommand(CommandScope.STATUS, "in_enqueue", { input: uri });
 	}
 
 	/**
@@ -299,7 +299,7 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {string} uri
 	 */
 	async addSubtitle (uri) {
-		return await this.#sendCommand(CommandScope.STATUS, 'addsubtitle', {
+		return await this.#sendCommand(CommandScope.STATUS, "addsubtitle", {
 			input: uri
 		});
 	}
@@ -309,51 +309,51 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {number} id
 	 */
 	async play (id) {
-		return await this.#sendCommand(CommandScope.STATUS, 'pl_play', { id });
+		return await this.#sendCommand(CommandScope.STATUS, "pl_play", { id });
 	}
 
 	/**
-	 * Toggle pause. If current state was 'stop', play item `id`, if `id` is omitted, play current item.
+	 * Toggle pause. If current state was "stop", play item `id`, if `id` is omitted, play current item.
 	 * If no current item, play 1st item in the playlist.
 	 * @param {number} id
 	 */
 	async pause (id) {
-		return await this.#sendCommand(CommandScope.STATUS, 'pl_pause', { id });
+		return await this.#sendCommand(CommandScope.STATUS, "pl_pause", { id });
 	}
 
 	/**
 	 * Stop playback.
 	 */
 	async stop () {
-		return await this.#sendCommand(CommandScope.STATUS, 'pl_stop');
+		return await this.#sendCommand(CommandScope.STATUS, "pl_stop");
 	}
 
 	/**
-	 * Resume playback if state was 'paused', else do nothing.
+	 * Resume playback if state was "paused", else do nothing.
 	 */
 	async resume () {
-		return await this.#sendCommand(CommandScope.STATUS, 'pl_forceresume');
+		return await this.#sendCommand(CommandScope.STATUS, "pl_forceresume");
 	}
 
 	/**
-	 * Pause playback, do nothing if state was 'paused'.
+	 * Pause playback, do nothing if state was "paused".
 	 */
 	async forcePause () {
-		return await this.#sendCommand(CommandScope.STATUS, 'pl_forcepause');
+		return await this.#sendCommand(CommandScope.STATUS, "pl_forcepause");
 	}
 
 	/**
 	 * Jump to next item in playlist.
 	 */
 	async playlistNext () {
-		return await this.#sendCommand(CommandScope.STATUS, 'pl_next');
+		return await this.#sendCommand(CommandScope.STATUS, "pl_next");
 	}
 
 	/**
 	 * Jump to previous item in playlist.
 	 */
 	async playlistPrevious () {
-		return await this.#sendCommand(CommandScope.STATUS, 'pl_previous');
+		return await this.#sendCommand(CommandScope.STATUS, "pl_previous");
 	}
 
 	/**
@@ -361,14 +361,14 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {number} id
 	 */
 	async playlistDelete (id) {
-		return await this.#sendCommand(CommandScope.STATUS, 'pl_delete', { id });
+		return await this.#sendCommand(CommandScope.STATUS, "pl_delete", { id });
 	}
 
 	/**
 	 * Empty playlist.
 	 */
 	async playlistEmpty () {
-		return await this.#sendCommand(CommandScope.STATUS, 'pl_empty');
+		return await this.#sendCommand(CommandScope.STATUS, "pl_empty");
 	}
 
 	/**
@@ -384,7 +384,7 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {0|1|3|5|7} mode
 	 */
 	async sortPlaylist (order, mode) {
-		return await this.#sendCommand(CommandScope.STATUS, 'pl_sort', {
+		return await this.#sendCommand(CommandScope.STATUS, "pl_sort", {
 			id: mode,
 			val: order
 		});
@@ -395,7 +395,7 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {number} delay
 	 */
 	async setAudioDelay (delay) {
-		return await this.#sendCommand(CommandScope.STATUS, 'audiodelay', { val: delay });
+		return await this.#sendCommand(CommandScope.STATUS, "audiodelay", { val: delay });
 	}
 
 	/**
@@ -403,7 +403,7 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {number} delay
 	 */
 	async setSubtitleDelay (delay) {
-		return await this.#sendCommand(CommandScope.STATUS, 'subdelay', { val: delay });
+		return await this.#sendCommand(CommandScope.STATUS, "subdelay", { val: delay });
 	}
 
 	/**
@@ -411,7 +411,7 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {number} rate
 	 */
 	async setPlaybackRate (rate) {
-		return await this.#sendCommand(CommandScope.STATUS, 'rate', { val: rate });
+		return await this.#sendCommand(CommandScope.STATUS, "rate", { val: rate });
 	}
 
 	/**
@@ -419,7 +419,7 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {VLCAspectRatio} ratio
 	 */
 	setAspectRatio (ratio) {
-		return this.#sendCommand(CommandScope.STATUS, 'aspectratio', {
+		return this.#sendCommand(CommandScope.STATUS, "aspectratio", {
 			val: ratio
 		});
 	}
@@ -429,7 +429,7 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {number|string} volume
 	 */
 	async setVolume (volume) {
-		return await this.#sendCommand(CommandScope.STATUS, 'volume', { val: volume });
+		return await this.#sendCommand(CommandScope.STATUS, "volume", { val: volume });
 	}
 
 	/**
@@ -437,7 +437,7 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {number} value
 	 */
 	async setPreamp (value) {
-		return await this.#sendCommand(CommandScope.STATUS, 'preamp', { val: value });
+		return await this.#sendCommand(CommandScope.STATUS, "preamp", { val: value });
 	}
 
 	/**
@@ -446,7 +446,7 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {number} gain
 	 */
 	async setEqualizer (band, gain) {
-		return await this.#sendCommand(CommandScope.STATUS, 'equalizer', {
+		return await this.#sendCommand(CommandScope.STATUS, "equalizer", {
 			band: band,
 			val: gain
 		});
@@ -457,35 +457,35 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {number} id
 	 */
 	async setEqualizerPreset (id) {
-		return await this.#sendCommand(CommandScope.STATUS, 'equalizer', { val: id });
+		return await this.#sendCommand(CommandScope.STATUS, "equalizer", { val: id });
 	}
 
 	/**
 	 * Toggle random playback.
 	 */
 	async toggleRandom () {
-		return await this.#sendCommand(CommandScope.STATUS, 'pl_random');
+		return await this.#sendCommand(CommandScope.STATUS, "pl_random");
 	}
 
 	/**
 	 * Toggle loop.
 	 */
 	async toggleLoop () {
-		return await this.#sendCommand(CommandScope.STATUS, 'pl_loop');
+		return await this.#sendCommand(CommandScope.STATUS, "pl_loop");
 	}
 
 	/**
 	 * Toggle repeat.
 	 */
 	async toggleRepeat () {
-		return await this.#sendCommand(CommandScope.STATUS, 'pl_repeat');
+		return await this.#sendCommand(CommandScope.STATUS, "pl_repeat");
 	}
 
 	/**
 	 * Toggle fullscreen.
 	 */
 	async toggleFullscreen () {
-		return await this.#sendCommand(CommandScope.STATUS, 'fullscreen');
+		return await this.#sendCommand(CommandScope.STATUS, "fullscreen");
 	}
 
 	/**
@@ -493,7 +493,7 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {number} time
 	 */
 	async seek (time) {
-		return await this.#sendCommand(CommandScope.STATUS, 'seek', { val: time });
+		return await this.#sendCommand(CommandScope.STATUS, "seek", { val: time });
 	}
 
 	/**
@@ -501,7 +501,7 @@ module.exports = class VLCClient extends require("events") {
 	 * @param {number} chapter
 	 */
 	async seekToChapter (chapter) {
-		return await this.#sendCommand(CommandScope.STATUS, 'chapter', { val: chapter });
+		return await this.#sendCommand(CommandScope.STATUS, "chapter", { val: chapter });
 	}
 }
 
@@ -548,16 +548,16 @@ module.exports = class VLCClient extends require("events") {
  type Stats = { [key: string]: number };
 
  type AspectRatio =
- | '1:1'
- | '4:3'
- | '5:4'
- | '16:9'
- | '16:10'
- | '221:100'
- | '235:100'
- | '239:100';
+ | "1:1"
+ | "4:3"
+ | "5:4"
+ | "16:9"
+ | "16:10"
+ | "221:100"
+ | "235:100"
+ | "239:100";
 
- type State = 'paused' | 'playing' | 'stopped';
+ type State = "paused" | "playing" | "stopped";
 
  type StatusBase = {
  fullscreen: boolean;
@@ -586,19 +586,19 @@ module.exports = class VLCClient extends require("events") {
  type StatusPaused = StatusBase & {
  stats: Stats;
  aspectratio: AspectRatio;
- state: 'paused';
+ state: "paused";
  };
 
  type StatusPlaying = StatusBase & {
  stats: Stats;
  aspectratio: AspectRatio;
- state: 'playing';
+ state: "playing";
  };
 
  type StatusStopped = StatusBase & {
  stats: null;
  aspectratio: null;
- state: 'stopped';
+ state: "stopped";
  };
 
  type Status = StatusPaused | StatusPlaying | StatusStopped;
