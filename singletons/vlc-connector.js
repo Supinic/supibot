@@ -1,6 +1,3 @@
-const NodeVLC = require("node-vlc-http");
-const VideoLAN = NodeVLC.VLC;
-
 const actions = [
 	"addToQueue",
 	"addToQueueAndPlay",
@@ -64,7 +61,9 @@ module.exports = class VLCSingleton extends require("./template.js") {
 	constructor (options = {}) {
 		super();
 
-		this.client = new VideoLAN({
+		const VLCClient = require("./vlc-client.js");
+
+		this.client = new VLCClient({
 			host: options.url,
 			port: options.port,
 			username: options.username,
@@ -443,44 +442,4 @@ module.exports = class VLCSingleton extends require("./template.js") {
 		this.client.removeAllListeners();
 		this.client = null;
 	}
-
-	/*
-	async playlistLength (id) {
-		const status = await VLC.status();
-		const playlist = await VLC.playlist();
-
-		if (status.currentplid === -1) {
-			return {
-				length: 0,
-				amount: 0
-			};
-		}
-
-		if (typeof id !== "number") {
-			id = playlist.children.find(i => i.current).id;
-		}
-
-		let amount = 1;
-		let length = Number(status.length) - Number(status.time);
-		for (const song of playlist.children) {
-			if (song.id <= id) {
-				continue;
-			}
-			amount++;
-			length += Number(VLC.extraData[song.id - 1].length);
-		}
-		return {
-			length: length,
-			amount: amount
-		};
-	}
-	*/
-
-	/*
-	async userPendingQueue (user) {
-		this.requestsID[user] = this.requestsID[user] || [];
-		const currentID = await this.currentlyPlaying(true);
-		return this.requestsID[user].filter(songID => (songID >= currentID)).length;
-	}
-	*/
 };
