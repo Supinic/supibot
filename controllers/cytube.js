@@ -76,9 +76,11 @@ class CytubeClient {
 			// Problem: Sometimes, cytube sends messages in batches, as if it was lagging.
 			// This block of code then removes legitimate messages.
 			// Need to figure out a good limit, or a better solution overall.
+
 			// On login, cytube sends a couple of history messages - skip those
 			const difference = (sb.Date.now() - data.time);
-			if (data.time && difference > 30.0e3) {
+			const threshold = this.controller.platform.Data.messageDelayThreshold ?? 30_000;
+			if (data.time && difference > threshold) {
 				return;
 			}
 
