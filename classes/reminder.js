@@ -499,7 +499,7 @@ module.exports = class Reminder extends require("./template.js") {
 				await channelData.Platform.pm(`Private reminder: ${privateReminder}`, targetUserData, channelData);
 			}
 
-			const publicMessage = `Hey ${targetUserData.Name} - I just whispered you ${privateReply.length} private reminder(s) - make sure to check them out!`;
+			const publicMessage = `Hey ${targetUserData.Name} - I just private messaged you ${privateReply.length} private reminder(s) - make sure to check them out!`;
 			await Promise.all([
 				channelData.send(publicMessage),
 				channelData.mirror(publicMessage, targetUserData, { commandUsed: false })
