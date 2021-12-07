@@ -68,7 +68,7 @@ module.exports = {
 					if (!identifier && !context.channel) {
 						return {
 							success: false,
-							reply: `You must a provide a channel when using this command in whispers!`
+							reply: `You must a provide a channel when using this command in private messages!`
 						};
 					}
 
@@ -278,7 +278,7 @@ module.exports = {
 
 					await context.platform.pm(reply, context.user.Name, context.channel ?? null);
 					return {
-						reply: "The error stack Pastebin link has been whispered to you 💻"
+						reply: "I private messaged you with the link to the error stack Pastebin 💻"
 					};
 				}
 			},

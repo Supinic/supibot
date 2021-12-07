@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["/w","pm"],
 	Author: "supinic",
 	Cooldown: 1000,
-	Description: "Usable in pipe only - turns the response into a whisper.",
+	Description: "Usable in pipe only - turns the response into a private message.",
 	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
@@ -15,7 +15,7 @@ module.exports = {
 				cooldown: 5000
 			};
 		}
-	
+
 		return {
 			reply: `Result of your pipe: ${args.join(" ")}`,
 			replyWithPrivateMessage: true

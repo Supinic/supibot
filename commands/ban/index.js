@@ -127,7 +127,7 @@ module.exports = {
 			if (context.privateMessage) {
 				return {
 					success: false,
-					reply: `When using this command in whispers, you must provide a channel with the "channel:(name)" parameter!`
+					reply: `When using this command in private messages, you must provide a channel with the "channel:(name)" parameter!`
 				};
 			}
 

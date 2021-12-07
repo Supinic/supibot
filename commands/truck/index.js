@@ -12,7 +12,7 @@ module.exports = {
 		if (!context.channel) {
 			return {
 				success: false,
-				reply: `You can't truck someone in whispers, there's just the two of us here!`
+				reply: `You can't truck someone in private messages, there's just the two of us here!`
 			};
 		}
 

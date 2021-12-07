@@ -1,7 +1,7 @@
 module.exports = {
 	Name: "bot-request-denial-manager",
 	Expression: "*/15 * * * *",
-	Description: "Sends out whispers whenever a bot request suggestion is denied. Only runs on Tuesdays",
+	Description: "Sends out private messages whenever a bot request suggestion is denied. Only runs on Tuesdays",
 	Defer: null,
 	Type: "Bot",
 	Code: (async function activeChattersLog () {

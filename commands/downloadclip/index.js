@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["dlclip"],
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Takes a Twitch clip name or link, and sends a download link to it into whispers.",
+	Description: "Takes a Twitch clip name or link, and sends a download link to it into private messages.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,

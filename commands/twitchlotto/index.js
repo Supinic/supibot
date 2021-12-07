@@ -57,7 +57,7 @@ module.exports = {
 			if (!context.channel) {
 				return {
 					success: false,
-					reply: `This setting cannot be applied in whispers!`
+					reply: `This setting cannot be applied in private messages!`
 				};
 			}
 

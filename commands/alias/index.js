@@ -63,7 +63,7 @@ module.exports = {
 						return context.user.Name;
 					}
 					else if (match === "channel") {
-						return context.channel?.Description ?? context.channel?.Name ?? "[whispers]";
+						return context.channel?.Description ?? context.channel?.Name ?? "[private messages]";
 					}
 					else {
 						return total;

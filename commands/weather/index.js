@@ -305,7 +305,7 @@ module.exports = {
 					return {
 						reply: sb.Utils.tag.trim `
 							Weather alert summary for your hidden location: ${data.alerts.length} alerts.
-							A link with the complete, unabridged description has been whispered to you.
+							I sent you a private message with the link to the full description.
 						`
 					};
 				}

@@ -12,7 +12,10 @@ module.exports = {
 		if (context.privateMessage) {
 			return {
 				success: false,
-				reply: "There's no Discord in whispers..."
+				reply: sb.Utils.tag.trim `
+					No Discord server is available here, because you're whispering me instead of using the command in a channel.
+					But hey, why not check out Supinic's Hackerman Club instead: https://discord.gg/RtYSuV9"
+				`
 			};
 		}
 

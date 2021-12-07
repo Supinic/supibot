@@ -31,7 +31,7 @@ module.exports = {
 			},
 			{
 				name: "Whisper",
-				description: "Won't reply in the main channel at all, but the response will be whispered to target user."
+				description: "Won't reply in the main channel at all, but the response will be private messaged to target user."
 			}
 		]
 	})),
