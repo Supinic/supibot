@@ -19,7 +19,7 @@ module.exports = class User extends require("./template.js") {
 		administrator: 0b1000_0000
 	};
 
-	/** @type {WeakMap<User, Map<string, *>>} */
+	/** @type {WeakMap<sb.User, Map<string, *>>} */
 	static dataCache = new WeakMap();
 
 	constructor (data) {
@@ -254,7 +254,7 @@ module.exports = class User extends require("./template.js") {
 	}
 
 	static async loadData () {
-		/** @type {Map<string, User>} */
+		/** @type {Map<string, sb.User>} */
 		User.data = User.data || new Map();
 
 		const botDataExist = await sb.Query.isTablePresent("bot_data", "Bot");
@@ -285,10 +285,10 @@ module.exports = class User extends require("./template.js") {
 	/**
 	 * Searches for a user, based on their ID, or Name.
 	 * Returns immediately if identifier is already a User.
-	 * @param {User|number|string} identifier
+	 * @param {sb.User|number|string} identifier
 	 * @param {boolean} strict If false and searching for user via string, and it is not found, creates a new User.
 	 * @param {Object} [options]
-	 * @returns {User|void}
+	 * @returns {sb.User|void}
 	 * @throws {sb.Error} If the type of identifier is unrecognized
 	 */
 	static async get (identifier, strict = true, options = {}) {

@@ -67,20 +67,20 @@ module.exports = (function () {
 
 		/**
 		 * Platform of the banphrase.
-		 * @type {sb.Channel#ID|null}
+		 * @type {sb.Platform.ID|null}
 		 */
 		Platform = null;
 
 		/**
 		 * Channel of the banphrase.
 		 * If null, then the banphrase applies to the entire {@link sb.Platform}.
-		 * @type {Channel#ID|null}
+		 * @type {sb.Channel.ID|null}
 		 */
 		Channel = null;
 
 		/**
-		 * @type {boolean}
 		 * Determines if a banphrase is to be executed.
+		 * @type {boolean}
 		 */
 		Active;
 

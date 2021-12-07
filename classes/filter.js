@@ -16,25 +16,25 @@ module.exports = class Filter extends require("./template.js") {
 
 		/**
 		 * Unique numeric user identifier
-		 * @type {User.ID|null}
+		 * @type {sb.User.ID|null}
 		 */
 		this.User_Alias = data.User_Alias;
 
 		/**
 		 * Unique numeric channel identifier
-		 * @type {Channel.ID|null}
+		 * @type {sb.Channel.ID|null}
 		 */
 		this.Channel = data.Channel;
 
 		/**
 		 * Unique string command identifier - name
-		 * @type {Command.Name|null}
+		 * @type {sb.Command.Name|null}
 		 */
 		this.Command = data.Command;
 
 		/**
 		 * Unique numeric platform identifier
-		 * @type {Platform.ID|null}
+		 * @type {sb.Platform.ID|null}
 		 */
 		this.Platform = data.Platform;
 
@@ -74,7 +74,7 @@ module.exports = class Filter extends require("./template.js") {
 
 		/**
 		 * If the filter is a block, this is the user who is being blocked from targetting someone with a command.
-		 * @type {User.ID|null}
+		 * @type {sb.User.ID|null}
 		 */
 		this.Blocked_User = data.Blocked_User;
 
@@ -86,7 +86,7 @@ module.exports = class Filter extends require("./template.js") {
 
 		/**
 		 * Unique numeric user identifier of the person who created the filter.
-		 * @type {User.ID|null}
+		 * @type {sb.User.ID|null}
 		 */
 		this.Issued_By = data.Issued_By;
 	}
@@ -567,16 +567,16 @@ module.exports = class Filter extends require("./template.js") {
 	/**
 	 * Creates a new filter record.
 	 * @param {Object} options
-	 * @param {number} [options.Platform]
-	 * @param {number} [options.Channel]
-	 * @param {number} [options.Command]
-	 * @param {number} [options.User_Alias]
+	 * @param {sb.Platform.ID} [options.Platform]
+	 * @param {sb.Channel.ID} [options.Channel]
+	 * @param {sb.Command.Name} [options.Command]
+	 * @param {sb.User.ID} [options.User_Alias]
 	 * @param {string} [options.Reason]
 	 * @param {string} [options.Invocation]
 	 * @param {Object} [options.Data]
 	 * @param {FilterType} [options.Type]
-	 * @param {number} [options.Blocked_User]
-	 * @param {number} [options.Issued_By]
+	 * @param {sb.User.ID} [options.Blocked_User]
+	 * @param {sb.User.ID} [options.Issued_By]
 	 */
 	static async create (options) {
 		const data = {
@@ -668,7 +668,7 @@ module.exports = class Filter extends require("./template.js") {
 	 * Picks the correct response type, based on the type provided
 	 * @param {Object} options
 	 * @param {string} options.string
-	 * @param {Filter#Response} options.response
+	 * @param {sb.Filter.Response} options.response
 	 * @param {string} [options.reason]
 	 * @returns {null|string}
 	 */

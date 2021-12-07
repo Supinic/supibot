@@ -40,9 +40,9 @@ class Context {
 	/**
 	 * Fetches an object wrapper describing the user's permissions in given command context.
 	 * @param {Object} [options] When provided, allows overriding the command context's locations
-	 * @param {User} [options.user]
-	 * @param {Channel} [options.channel]
-	 * @param {Platform} [options.platform]
+	 * @param {sb.User} [options.user]
+	 * @param {sb.Channel} [options.channel]
+	 * @param {sb.Platform} [options.platform]
 	 * @returns {Promise<{
 	 *  flag: number,
 	 *  is: (function(UserPermissionLevel): boolean)
@@ -95,8 +95,8 @@ class Context {
 	 * @param {string[]} emotes
 	 * @param {string} fallback
 	 * @param {Object} options
-	 * @param {Channel} [options.channel]
-	 * @param {Platform} [options.platform]
+	 * @param {sb.Channel} [options.channel]
+	 * @param {sb.Platform} [options.platform]
 	 * @param {boolean} [options.returnEmoteObject]
 	 * @param {Function} [options.filter]
 	 * @returns {Promise<string>}
@@ -536,8 +536,8 @@ class Command extends require("./template.js") {
 	/**
 	 * Searches for a command, based on its name or alias.
 	 * Returns immediately if identifier is already a Command.
-	 * @param {Command|string|symbol} identifier
-	 * @returns {Command|null}
+	 * @param {sb.Command|string|symbol} identifier
+	 * @returns {sb.Command|null}
 	 * @throws {sb.Error} If identifier is unrecognized
 	 */
 	static get (identifier) {
@@ -560,14 +560,14 @@ class Command extends require("./template.js") {
 
 	/**
 	 * Checks if a command exists, and executes it if needed.
-	 * @param {Command|string} identifier
+	 * @param {sb.Command|string} identifier
 	 * @param {string[]} argumentArray
-	 * @param {Channel|null} channelData
-	 * @param {User} userData
+	 * @param {sb.Channel|null} channelData
+	 * @param {sb.User} userData
 	 * @param {Object} options = {} any extra options that will be passed to the command as extra.append
 	 * @param {boolean} [options.internalExecution] currently unused
 	 * @param {boolean} [options.skipGlobalBan]
-	 * @param {Platform} options.platform
+	 * @param {sb.Platform} options.platform
 	 * @param {boolean} [options.skipMention] If true, no mention will be added to the command string, regardless of other options.
 	 * @returns {CommandResult}
 	 */
@@ -1032,9 +1032,9 @@ class Command extends require("./template.js") {
 
 	/**
 	 * Handles the setting (or skipping) cooldowns for given combination of data.
-	 * @param {Channel} channelData
-	 * @param {User} userData
-	 * @param {Command} commandData
+	 * @param {sb.Channel} channelData
+	 * @param {sb.User} userData
+	 * @param {sb.Command} commandData
 	 * @param {Object} cooldownData
 	 */
 	static handleCooldown (channelData, userData, commandData, cooldownData) {
@@ -1234,7 +1234,7 @@ class Command extends require("./template.js") {
 
 	/**
 	 * Creates a functioning command context, with data filled in based on what data is passed
-	 * @param {Command} commandData
+	 * @param {sb.Command} commandData
 	 * @param {Object|Context} [contextData]
 	 * @param {Object} [extraData]
 	 * @returns {Context}
@@ -1353,9 +1353,9 @@ module.exports = Command;
 /**
  * @typedef {Object} CommandContext
  * @property {string} invocation Exact command name used for invocation - name or alias
- * @property {User} user Data about the user who invoked the command
- * @property {Channel} channel Data about the channel where the command was invoked
- * @property {Command} command Data about the command being invoked
+ * @property {sb.User} user Data about the user who invoked the command
+ * @property {sb.Channel} channel Data about the channel where the command was invoked
+ * @property {sb.Command} command Data about the command being invoked
  * @property {Object} append = {} other platform-specific options
  * @property {?} [transaction] For rollbackable commands, a transaction is set up and later committed/rollbacked.
  * Commands must use this.data.transaction for whatever sbase access should be safeguarded.

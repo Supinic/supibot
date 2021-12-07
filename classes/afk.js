@@ -4,7 +4,7 @@
  */
 module.exports = class AwayFromKeyboard extends require("./template.js") {
 	/**
-	 * @type {Map<number, AwayFromKeyboard>}
+	 * @type {Map<number, sb.AwayFromKeyboard>}
 	 */
 	static data = new Map();
 
@@ -19,7 +19,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 
 		/**
 		 * Unique numeric user identifier
-		 * @type {User.ID}
+		 * @type {sb.User.ID}
 		 */
 		this.User_Alias = data.User_Alias;
 
@@ -179,7 +179,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 	 * @param {string} [data.Status]
 	 * @param {boolean} [data.Silent] If true, user coming back will not be broadcast.
 	 * @param {boolean} [data.Interrupted_ID] If true, user coming back will not be broadcast.
-	 * @returns {Promise<AwayFromKeyboard>}
+	 * @returns {Promise<sb.AwayFromKeyboard>}
 	 */
 	static async set (userData, data = {}) {
 		const now = new sb.Date();

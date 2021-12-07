@@ -257,8 +257,8 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 	 * Inserts a log message into the database - `chat_data.Log` table
 	 * @param {string} tag
 	 * @param {string} [description] = null
-	 * @param {Channel} [channel] = null
-	 * @param {User} [user] = null
+	 * @param {sb.Channel} [channel] = null
+	 * @param {sb.User} [user] = null
 	 * @returns {Promise<void>}
 	 */
 	async log (tag, description = null, channel = null, user = null) {
@@ -284,7 +284,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 	/**
 	 * Logs a new error, and returns its ID.
 	 * @param {string} type
-	 * @param {Error} error
+	 * @param {sb.Error|Error} error
 	 * @param {Object} [data]
 	 * @param {"Internal"|"External"} [data.origin] Whether the error is first- or third-party
 	 * @param {Object} [data.context] Object with any additional info
@@ -384,8 +384,8 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 	 * @param {string} link
 	 * @param {string} typeIdentifier
 	 * @param {number} length
-	 * @param {User} userData
-	 * @param {Channel} channelData
+	 * @param {sb.User} userData
+	 * @param {sb.Channel} channelData
 	 * @returns {Promise<void>}
 	 */
 	async logVideoRequest (link, typeIdentifier, length, userData, channelData) {
@@ -426,7 +426,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 	/**
 	 * Inserts a Twitch-specific ban data to the database.
 	 * @param {string|number} identifier
-	 * @param {Channel} channelData
+	 * @param {sb.Channel} channelData
 	 * @param {number} length
 	 * @param {sb.Date} date
 	 * @param {string|null} notes
@@ -446,7 +446,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 
 	/**
 	 * Logs a command execution.
-	 * @param options
+	 * @param {Object} options
 	 */
 	logCommandExecution (options) {
 		if (!sb.Config.get("LOG_COMMAND_ENABLED", false)) {

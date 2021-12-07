@@ -103,8 +103,8 @@ module.exports = class ChatModule extends require("./template.js") {
 	 * Detaches the module instance from all channels determined by options.
 	 * @param {Object} options
 	 * @param {boolean} [options.remove] If true, the module reference will be removed instead of deactivated.
-	 * @param {Platform} [options.platform] Specified attachment platform
-	 * @param {Channel|Channel[]} [options.channel] Specified attachment channels	 *
+	 * @param {sb.Platform} [options.platform] Specified attachment platform
+	 * @param {sb.Channel|sb.Channel[]} [options.channel] Specified attachment channels	 *
 	 */
 	detach (options) {
 		for (const event of this.Events) {

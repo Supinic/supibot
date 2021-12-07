@@ -16,7 +16,7 @@ module.exports = class Channel extends require("./template.js") {
 		this.ID = data.ID;
 
 		/**
-		 * Channel name. Must be unique in the scope of its {@link Channel.Platform}.
+		 * Channel name. Must be unique in the scope of its {@link sb.Platform}.
 		 * @type {string}
 		 */
 		this.Name = data.Name;
@@ -59,14 +59,14 @@ module.exports = class Channel extends require("./template.js") {
 
 		/**
 		 * Type of banphrase API.
-		 * If not null and {@link Channel.Banphrase_API_URL} is also not null, all messages will be also checked against this banphrase API
+		 * If not null and {@link sb.Channel.Banphrase_API_URL} is also not null, all messages will be also checked against this banphrase API
 		 * @type {string|null}
 		 */
 		this.Banphrase_API_Type = data.Banphrase_API_Type;
 
 		/**
 		 * URL of banphrase API.
-		 * If not null and {@link Channel.Banphrase_API_Type} is also not null, all messages will be also checked against this banphrase API
+		 * If not null and {@link sb.Channel.Banphrase_API_Type} is also not null, all messages will be also checked against this banphrase API
 		 * @type {string|null}
 		 */
 		this.Banphrase_API_URL = data.Banphrase_API_URL;
@@ -502,7 +502,7 @@ module.exports = class Channel extends require("./template.js") {
 	 * @param {sb.Platform} platformData
 	 * @param {string} mode
 	 * @param {string} [specificID]
-	 * @returns {Promise<Channel>}
+	 * @returns {Promise<sb.Channel>}
 	 */
 	static async add (name, platformData, mode = "Write", specificID) {
 		const channelName = Channel.normalizeName(name);
