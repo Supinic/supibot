@@ -298,7 +298,7 @@ module.exports = class TwitchController extends require("./template.js") {
 
 					let defaultReply;
 					if (/reminders? from/i.test(messageText)) {
-						const recipient = messageText.match(/(.*), reminders? from:/);
+						const recipient = messageText.match(/(.*), reminders? from/);
 						if (recipient) {
 							await this.pm(`Couldn't post reminder: ${messageText}`, recipient[1]);
 
