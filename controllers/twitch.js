@@ -309,7 +309,7 @@ module.exports = class TwitchController extends require("./template.js") {
 							`;
 						}
 						else {
-							defaultReply = "A reminder that was about be posted violated this channel's moderation settings,";
+							defaultReply = "A reminder that was about be posted violated this channel's moderation settings.";
 						}
 					}
 					else {
