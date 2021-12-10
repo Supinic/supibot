@@ -54,6 +54,7 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		this.queues = {};
 		this.evasion = {};
+		this.rejectedMessageTimeouts = {};
 
 		this.availableEmotes = [];
 		this.availableEmoteSets = [];
@@ -316,8 +317,13 @@ module.exports = class TwitchController extends require("./template.js") {
 						defaultReply = "A message that was about be posted violated this channel's moderation settings.";
 					}
 
-					if (!messageText.includes(defaultReply)) {
-						this.send(defaultReply, channelData);
+					this.rejectedMessageTimeouts[channelData.ID] ??= 0;
+
+					if (this.rejectedMessageTimeouts[channelData.ID] < sb.Date.now() && !messageText.includes(defaultReply)) {
+						await this.send(defaultReply, channelData);
+
+						const timeout = this.platform.Data.rejectedMessageTimeout ?? 10_000;
+						this.rejectedMessageTimeouts[channelData.ID] = sb.Date.now() + timeout;
 					}
 				}
 				else if (error.message.includes("has been suspended")) {
