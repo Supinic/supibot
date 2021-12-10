@@ -304,7 +304,7 @@ module.exports = class TwitchController extends require("./template.js") {
 							await this.pm(`Couldn't post reminder: ${messageText}`, recipient[1]);
 
 							defaultReply = sb.Utils.tag.trim `
-								@${recipient[1]},
+								@${recipient[1].replace(/^@/, "")},
 								a reminder you would have received violated this channel's moderation settings.
 								You can check your whispers, or head to https://supinic.com/bot/reminder/history 
 							`;
