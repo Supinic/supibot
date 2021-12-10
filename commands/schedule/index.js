@@ -87,7 +87,7 @@ module.exports = {
 				const isLive = Boolean(liveData.stream);
 
 				if (!isLive) { // Stream is not live - use the first segment (when it should have started), and mention that stream is late
-					const emote = await context.getBestAvailableEmote(["Weirdga", "WeirdChamp", "FeelsWeirdMan"], "🤨");
+					const emote = await context.getBestAvailableEmote(["Weirdga", "WeirdChamp", "supiniWeirdga", "FeelsWeirdMan"], "🤨");
 					lateString = `The stream seems to be late ${emote}`;
 
 					segment = segments[0];
