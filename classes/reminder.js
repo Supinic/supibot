@@ -434,7 +434,9 @@ module.exports = class Reminder extends require("./template.js") {
 			});
 
 			const username = (checkResult === false) ? "[Banphrased username]," : checkResult;
-			let message = `reminders from: ${reply.join("; ")}`;
+			const noun = (reply.length === 1) ? "reminder" : "reminders";
+
+			let message = `${noun} from: ${reply.join("; ")}`;
 
 			if (channelData.Links_Allowed === false) {
 				message = sb.Utils.replaceLinks(message, "[LINK]");
