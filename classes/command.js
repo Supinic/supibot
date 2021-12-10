@@ -978,18 +978,18 @@ class Command extends require("./template.js") {
 
 			if (command.Flags.rollback) {
 				if (passed) {
-					context.transaction.commit();
+					await context.transaction.commit();
 				}
 				else {
-					context.transaction.rollback();
+					await context.transaction.rollback();
 				}
 
-				context.transaction.end();
+				await context.transaction.end();
 			}
 		}
 		else if (command.Flags.rollback) {
-			context.transaction.commit();
-			context.transaction.end();
+			await context.transaction.commit();
+			await context.transaction.end();
 		}
 
 		// Apply all unpings to the result, if it is still a string (aka the response should be sent)
