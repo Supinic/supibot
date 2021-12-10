@@ -122,7 +122,7 @@ module.exports = class Reminder extends require("./template.js") {
 				message = `@${toUserData.Name}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
 			else if (this.User_To) {
-				message = `@${toUserData.Name}, timed reminder from ${fromUserData.Name} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+				message = `@${toUserData.Name}, timed reminder from @${fromUserData.Name} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
 
 			const statusAFK = sb.AwayFromKeyboard.get(toUserData);
@@ -359,11 +359,11 @@ module.exports = class Reminder extends require("./template.js") {
 		const privateReply = [];
 		const sorter = async (flag, username, message, channelData) => {
 			if (flag) {
-				privateReply.push(`${username} - ${message}`);
+				privateReply.push(`@${username} - ${message}`);
 			}
 			else {
 				const checkedMessage = await channelData.prepareMessage(message);
-				reply.push(`${username} - ${checkedMessage}`);
+				reply.push(`@${username} - ${checkedMessage}`);
 			}
 		};
 
@@ -412,13 +412,13 @@ module.exports = class Reminder extends require("./template.js") {
 					}
 
 					await platform.pm(
-						`@${fromUserData.Name}, ${targetUserData.Name} just typed in channel ${channelName}`,
+						`@${fromUserData.Name}, @${targetUserData.Name} just typed in channel ${channelName}`,
 						fromUserData
 					);
 				}
 				else {
 					await sb.Channel.get(reminder.Channel).send(
-						`@${fromUserData.Name}, ${targetUserData.Name} just typed in channel ${channelName}`
+						`@${fromUserData.Name}, @${targetUserData.Name} just typed in channel ${channelName}`
 					);
 				}
 			}
