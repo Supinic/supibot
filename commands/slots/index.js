@@ -339,8 +339,8 @@ module.exports = {
 			reply: `[ ${rolledItems.join(" ")} ] ${deprecationWarning}`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
-		const { leaderboardKeywords, patterns } = this.staticData;
+	Dynamic_Description: (async (prefix, values) => {
+		const { leaderboardKeywords, patterns } = values;
 		const patternList = [...patterns]
 			.sort((a, b) => a.name.localeCompare(b.name))
 			.map(i => `<li><code>${i.name}</code><br>${i.notes}</li>`)
