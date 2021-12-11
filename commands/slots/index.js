@@ -340,7 +340,7 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async (prefix, values) => {
-		const { leaderboardKeywords, patterns } = values;
+		const { leaderboardKeywords, patterns } = values.staticData;
 		const patternList = [...patterns]
 			.sort((a, b) => a.name.localeCompare(b.name))
 			.map(i => `<li><code>${i.name}</code><br>${i.notes}</li>`)
