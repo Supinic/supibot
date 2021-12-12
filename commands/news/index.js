@@ -883,7 +883,9 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { definitions } = values.getStaticData();
-		const extraNews = definitions.sort((a, b) => a.code.localeCompare(b.code)).map(def => {
+		const sorted = [...definitions].sort((a, b) => a.code.localeCompare(b.code));
+
+		const extraNews = sorted.map(def => {
 			const { code, language, sources } = def;
 
 			const links = [];

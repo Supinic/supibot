@@ -479,7 +479,7 @@ module.exports = {
 			})
 			.join("");
 
-		const skillList = skills
+		const skillList = [...skills]
 			.sort((a, b) => a.name.localeCompare(b.name))
 			.map(i => `<li>${i.name} - ${i.emoji}</li>`)
 			.join("");
