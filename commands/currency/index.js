@@ -89,21 +89,54 @@ module.exports = {
 
 		// Special case for Iranian Rial - official exchange rates are frozen (as of 2021) and not relevant
 		if (first === "IRR" || second === "IRR") {
-			const otherCurrency = (first === "IRR") ? second : first;
-			const response = await sb.Got("GenericAPI", {
-				url: `https://raters.ir/exchange/api/currency/${otherCurrency}`
-			});
+			let currencyData = await this.getCacheData("iranian-currency-data");
+			if (!currencyData) {
+				const result = [];
+				const url = "https://api.accessban.com/v1/data/sana/json";
 
-			// Apparently, this API sends 200 code even though the currency code wasn't found. The "actual" response code
-			// is sent as `body.status` {number}. So we gotta check that too.
-			if (response.statusCode === 200 && response.body.status !== 404) {
-				const [price] = response.body.data.prices;
-				let fixedRatio = Number(price.live.replace(",", ""));
-				if (first === "IRR") {
-					fixedRatio = 1 / fixedRatio;
+				let searchParams = "";
+				let finished = false;
+				while (!finished) {
+					const response = await sb.Got("GenericAPI", {
+						url,
+						searchParams
+					});
+
+					if (response.statusCode !== 200) {
+						finished = true;
+					}
+					else {
+						const data = response.body.sana ?? {};
+
+						finished = Boolean(data.next_page_url);
+						searchParams = data.next_page_url;
+
+						const items = data.data.filter(i => i.slug.includes("buy"));
+						result.push(items.map(i => ({
+							code: i.slug.replace("sana_buy_", "").toUpperCase(),
+							price: i.p
+						})));
+					}
 				}
 
-				const fixedSecondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * fixedRatio, 3));
+				currencyData = result;
+
+				if (result.length !== 0) {
+					await this.setCacheData("iranian-currency-data", result, {
+						expiry: 864e5 // 1 day
+					});
+				}
+			}
+
+			const otherCurrency = (first === "IRR") ? second : first;
+			const data = currencyData.find(i => i.code === otherCurrency.toUpperCase());
+			if (data) {
+				let ratio = data.price;
+				if (first === "IRR") {
+					ratio = 1 / ratio;
+				}
+
+				const fixedSecondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, 3));
 				message = `Official: ${message}; True: ${firstAmount} ${first} = ${fixedSecondAmount} ${second}`;
 			}
 			else {
