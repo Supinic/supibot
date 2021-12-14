@@ -701,10 +701,10 @@ module.exports = {
 				language: "hebrew",
 				sources: [
 					{
-						name: "ynet",
-						url: "https://www.ynet.co.il",
-						path: "Integration",
-						endpoints: ["StoryRss2.xml"],
+						name: "מעריב אונליין",
+						url: "https://www.maariv.co.il/",
+						path: "Rss",
+						endpoints: ["RssFeedsChadashotBaArez"],
 						helpers: ["nitewaver"]
 					}
 				]
