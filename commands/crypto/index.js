@@ -34,7 +34,7 @@ module.exports = {
 			};
 		}
 		else {
-			let status = null;
+			let url;
 			if (!context.channel || context.channel.Links_Allowed) {
 				try {
 					const response = await sb.Got("Global", {
@@ -48,15 +48,15 @@ module.exports = {
 						}
 					});
 
-					status = response.statusCode;
+					url = response.url;
 				}
 				catch (e) {
-					status = 500;
+					url = null;
 				}
 			}
 
-			const link = (status === 200)
-				? `Check recent history here: https://www.coindesk.com/price/${symbol.toLowerCase()}`
+			const link = (url)
+				? `Check recent history here: ${url}`
 				: "";
 
 			const usd = (data.USD) ? `$${data.USD}` : "";
