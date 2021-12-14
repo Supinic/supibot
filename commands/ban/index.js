@@ -230,7 +230,7 @@ module.exports = {
 								await existing.saveProperty("Data");
 
 								return {
-									reply: `Succesfully removed an item from the Arguments filter (ID ${existing.ID})`
+									reply: `Successfully removed an item from the Arguments filter (ID ${existing.ID})`
 								};
 							}
 						}
@@ -251,7 +251,7 @@ module.exports = {
 					else if (existing.Active) {
 						await existing.toggle();
 						return {
-							reply: `Succesfully disabled Arguments filter (ID ${existing.ID}). Its items are still available, it just isn't active.`
+							reply: `Successfully disabled Arguments filter (ID ${existing.ID}). Its items are still available, it just isn't active.`
 						};
 					}
 
@@ -272,7 +272,7 @@ module.exports = {
 
 				const [prefix, suffix] = (existing.Active) ? ["", " again"] : ["un", ""];
 				return {
-					reply: `Succesfully ${prefix}banned${suffix}.`
+					reply: `Successfully ${prefix}banned${suffix}.`
 				};
 			}
 		}
@@ -301,7 +301,7 @@ module.exports = {
 
 			const ban = await sb.Filter.create(options);
 			return {
-				reply: `Succesfully banned (ID ${ban.ID})`
+				reply: `Successfully banned (ID ${ban.ID})`
 			};
 		}
 	}),

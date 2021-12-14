@@ -102,7 +102,7 @@ module.exports = {
 			await filter.toggle();
 
 			return {
-				reply: `Succesfully ${invocation}ed${suffix}!`
+				reply: `Successfully ${invocation}ed${suffix}!`
 			};
 		}
 		else {

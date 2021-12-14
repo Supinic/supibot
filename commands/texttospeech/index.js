@@ -366,7 +366,7 @@ module.exports = {
 		}
 
 		return {
-			reply: `Your message has been succesfully played on TTS! It took ${duration / 1000} seconds to read out, and your cooldown is ${cooldown / 1000} seconds.`,
+			reply: `Your message has been successfully played on TTS! It took ${duration / 1000} seconds to read out, and your cooldown is ${cooldown / 1000} seconds.`,
 			cooldown: {
 				length: cooldown
 			}

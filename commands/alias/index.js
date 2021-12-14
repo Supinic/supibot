@@ -767,7 +767,7 @@ module.exports = {
 				await row.delete();
 				return {
 					success: false,
-					reply: `Your alias "${name}" has been succesfully removed.`
+					reply: `Your alias "${name}" has been successfully removed.`
 				};
 			}
 
@@ -822,7 +822,7 @@ module.exports = {
 
 				await row.save({ skipLoad: true });
 				return {
-					reply: `Your alias "${oldAliasName}" has been succesfully renamed to "${newAliasName}".`
+					reply: `Your alias "${oldAliasName}" has been successfully renamed to "${newAliasName}".`
 				};
 			}
 

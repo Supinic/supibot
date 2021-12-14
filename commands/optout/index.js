@@ -121,7 +121,7 @@ module.exports = {
 			await filter.toggle();
 
 			return {
-				reply: `Succesfully ${invocation}ed${suffix} from ${commandString}.`
+				reply: `Successfully ${invocation}ed${suffix} from ${commandString}.`
 			};
 		}
 		else {
