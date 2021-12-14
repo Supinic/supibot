@@ -341,13 +341,6 @@ module.exports = {
 						path: "ukr",
 						endpoints: ["rss.xml"],
 						helpers: ["boring_nick"]
-					},
-					{
-						name: "24TV",
-						url: "https://24tv.ua",
-						path: "rss",
-						endpoints: ["all.xml"],
-						helpers: ["boring_nick"]
 					}
 				]
 			},
