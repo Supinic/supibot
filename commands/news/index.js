@@ -695,6 +695,19 @@ module.exports = {
 						helpers: ["vhns_"]
 					}
 				]
+			},
+			{
+				code: "il",
+				language: "hebrew",
+				sources: [
+					{
+						name: "ynet",
+						url: "https://www.ynet.co.il",
+						path: "Integration",
+						endpoints: ["StoryRss2.xml"],
+						helpers: ["nitewaver"]
+					}
+				]
 			}
 		],
 
