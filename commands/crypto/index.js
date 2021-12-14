@@ -36,15 +36,20 @@ module.exports = {
 		else {
 			let status = null;
 			if (!context.channel || context.channel.Links_Allowed) {
-				const response = await sb.Got("Global", {
-					method: "HEAD",
-					url: `https://www.coindesk.com/price/${symbol.toLowerCase()}`,
-					throwHttpErrors: false,
-					timeout: 2500,
-					retry: 0
-				});
+				try {
+					const response = await sb.Got("Global", {
+						method: "HEAD",
+						url: `https://www.coindesk.com/price/${symbol.toLowerCase()}`,
+						throwHttpErrors: false,
+						timeout: 2500,
+						retry: 0
+					});
 
-				status = response.statusCode;
+					status = response.statusCode;
+				}
+				catch (e) {
+					status = 500;
+				}
 			}
 
 			const link = (status === 200)
