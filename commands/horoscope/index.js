@@ -97,15 +97,28 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("GenericAPI", {
-			prefixUrl: "https://horoscope-api.herokuapp.com",
-			url: `horoscope/today/${zodiac}`,
-			throwHttpErrors: false,
-			responseType: "json"
+		const response = await sb.Got("FakeAgent", {
+			url: `https://www.ganeshaspeaks.com/horoscopes/daily-horoscope/${zodiac}`,
+			responseType: "text"
 		});
 
+		const $ = sb.Utils.cheerio(response.body);
+		const node = $("#horo_content");
+		if (node.length === 0) {
+			return {
+				success: false,
+				reply: `No horoscope is currently available for this zodiac sign!`
+			};
+		}
+		else if (node.length > 1) {
+			return {
+				success: false,
+				reply: `Received horoscope data is invalid!`
+			};
+		}
+
 		return {
-			reply: `Your horoscope for today: ${response.body.horoscope}`
+			reply: `Your horoscope for today: ${node.text()}`
 		};
 	}),
 	Dynamic_Description: null
