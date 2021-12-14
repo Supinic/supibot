@@ -97,9 +97,20 @@ module.exports = {
 
 		const { relationship } = sub.data.targetUser;
 		if (!relationship.cumulativeTenure) {
+			const response = await sb.Got("Leppunen", `v2/twitch/user/${channelName}`);
+			if (response.statusCode === 200) {
+				const { isAffliate, isPartner } = response.body.roles ?? {};
+				if (isAffliate === false && isPartner === false) {
+					return {
+						success: false,
+						reply: `Target channel is not affiliated nor partnered!`
+					};
+				}
+			}
+
 			return {
 				success: false,
-				reply: "User has hidden their subscription status."
+				reply: "User has hidden their subscription status!"
 			};
 		}
 
