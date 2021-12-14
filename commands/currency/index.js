@@ -112,7 +112,7 @@ module.exports = {
 						searchParams = data.next_page_url;
 
 						const items = data.data.filter(i => i.slug.includes("buy"));
-						result.push(items.map(i => ({
+						result.push(...items.map(i => ({
 							code: i.slug.replace("sana_buy_", "").toUpperCase(),
 							price: i.p
 						})));
