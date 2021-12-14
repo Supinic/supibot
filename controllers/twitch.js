@@ -620,6 +620,10 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserID });
 		if (!userData) {
+			if (messageType === "whisper") {
+				return;
+			}
+
 			const channelData = sb.Channel.get(channelName, this.platform);
 			if (channelData) {
 				channelData.events.emit("message", {
