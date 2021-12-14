@@ -41,8 +41,11 @@ module.exports = {
 						method: "HEAD",
 						url: `https://www.coindesk.com/price/${symbol.toLowerCase()}`,
 						throwHttpErrors: false,
-						timeout: 2500,
-						retry: 0
+						timeout: 10_000,
+						retry: 0,
+						headers: {
+							Referer: "https://www.coindesk.com/"
+						}
 					});
 
 					status = response.statusCode;
