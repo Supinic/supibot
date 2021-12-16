@@ -551,7 +551,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { sets } = values.getStaticData();
-		const list = sets
+		const list = [...sets]
 			.sort((a, b) => a.name.localeCompare(b.name))
 			.map(i => {
 				const aliases = (i.aliases.length === 0)
