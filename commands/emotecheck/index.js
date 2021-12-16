@@ -563,9 +563,10 @@ module.exports = {
 					list.push(`<a href="${i.link}">Reference</a><br>`);
 				}
 
+				const emotesCopy = [...i.emotes];
 				list.push(
 					i.description,
-					`<code>${i.emotes.sort().join(" ")}</code>`
+					`<code>${emotesCopy.sort().join(" ")}</code>`
 				);
 
 				const listString = list.map(i => `<li>${i}</li>`).join("");
