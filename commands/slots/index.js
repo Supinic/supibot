@@ -197,7 +197,7 @@ module.exports = {
 	Code: (async function slots (context, ...args) {
 		if (this.staticData.leaderboardKeywords.includes(args[0])) {
 			return {
-				reply: "Check out all the previous slots winners here: https://supinic.com/data/slots-winner/list",
+				reply: "Check out all the previous slots winners here: https://supinic.com/data/slots-winner/leaderboard",
 				cooldown: 5000
 			};
 		}
