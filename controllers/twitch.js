@@ -310,11 +310,11 @@ module.exports = class TwitchController extends require("./template.js") {
 							`;
 						}
 						else {
-							defaultReply = "A reminder that was about be posted violated this channel's moderation settings.";
+							defaultReply = "A reminder that was about to be posted violated this channel's moderation settings.";
 						}
 					}
 					else {
-						defaultReply = "A message that was about be posted violated this channel's moderation settings.";
+						defaultReply = "A message that was about to be posted violated this channel's moderation settings.";
 					}
 
 					this.rejectedMessageTimeouts[channelData.ID] ??= 0;
