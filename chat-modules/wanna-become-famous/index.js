@@ -18,6 +18,9 @@ module.exports = {
 		else if (msg.includes("get raided")) {
 			type = "getting raided";
 		}
+		else if (msg.includes("buy followers")) {
+			type = "buying followers";
+		}
 		else {
 			return;
 		}
