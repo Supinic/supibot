@@ -17,7 +17,7 @@ module.exports = {
 		}
 
 		const lastAFK = (await sb.Query.getRecordset(rs => rs
-			.select("ID", "Text", "Started", "Ended", "Status")
+			.select("ID", "Text", "Started", "Ended", "Status", "Interrupted_ID")
 			.from("chat_data", "AFK")
 			.where("User_Alias = %n", context.user.ID)
 			.orderBy("ID DESC")
@@ -27,19 +27,27 @@ module.exports = {
 
 		if (!lastAFK) {
 			return {
+				success: false,
 				reply: "You cannot resume your AFK status, because you have never went AFK with me before!"
 			};
 		}
 		else if (!lastAFK.Ended) {
 			return {
 				reply: "You were AFK until this moment... Try again?",
-				cooldown: 2500
+				cooldown: 10_000
 			};
 		}
 		else if (lastAFK.Ended <= new sb.Date().addMinutes(-5).valueOf()) {
 			return {
 				reply: "You cannot resume your AFK status, because it ended more than 5 minutes ago!",
-				cooldown: 2500
+				cooldown: 10_000
+			};
+		}
+		else if (lastAFK.Interrupted_ID) {
+			return {
+				success: false,
+				reply: "You have somehow already resumed this AFK status!",
+				cooldown: 10_000
 			};
 		}
 
