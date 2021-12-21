@@ -60,8 +60,6 @@ module.exports = class TwitchController extends require("./template.js") {
 		this.availableEmoteSets = [];
 		this.emoteFetchPromise = null;
 		this.emoteFetchTimeout = 0;
-
-		this.spamPreventionThreshold = this.platform.Data.spamPreventionThreshold ?? 100; // milliseconds
 		this.userCommandSpamPrevention = new Map();
 
 		this.initListeners();
@@ -748,7 +746,8 @@ module.exports = class TwitchController extends require("./template.js") {
 				return;
 			}
 
-			this.userCommandSpamPrevention.set(userData.ID, now + this.spamPreventionThreshold);
+			const threshold = this.platform.Data.spamPreventionThreshold ?? 100;
+			this.userCommandSpamPrevention.set(userData.ID, now + threshold);
 
 			const [command, ...args] = message
 				.replace(sb.Command.prefix, "")
