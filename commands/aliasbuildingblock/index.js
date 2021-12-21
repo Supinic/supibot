@@ -77,7 +77,7 @@ module.exports = {
 						return {
 							success: false,
 							reply,
-							forceExternalInput: true
+							forceExternalPrefix: true
 						};
 					}
 				}
