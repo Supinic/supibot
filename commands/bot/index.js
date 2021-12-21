@@ -49,6 +49,13 @@ module.exports = {
 			: context.channel;
 
 		if (!channelData) {
+			if (command.includes("join") && params.channel.toLowerCase() === context.user.Name) {
+				return {
+					success: false,
+					reply: `Cannot join your channel directly! Use this form instead: https://supinic.com/bot/request-bot/form`
+				};
+			}
+
 			return {
 				success: false,
 				reply: "Invalid or no channel provided!"
