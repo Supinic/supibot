@@ -61,6 +61,9 @@ module.exports = class TwitchController extends require("./template.js") {
 		this.emoteFetchPromise = null;
 		this.emoteFetchTimeout = 0;
 
+		this.spamPreventionThreshold = this.platform.Data.spamPreventionThreshold ?? 100; // milliseconds
+		this.userCommandSpamPrevention = new Map();
+
 		this.initListeners();
 
 		this.client.connect();
@@ -739,6 +742,14 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		// Check and execute command if necessary
 		if (sb.Command.is(message)) {
+			const now = sb.Date.now();
+			const timeout = this.userCommandSpamPrevention.get(userData.ID);
+			if (typeof timeout === "number" && timeout > now) {
+				return;
+			}
+
+			this.userCommandSpamPrevention.set(userData.ID, now + this.spamPreventionThreshold);
+
 			const [command, ...args] = message
 				.replace(sb.Command.prefix, "")
 				.split(/\s+/)
