@@ -128,7 +128,8 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		await sb.Query.getRecordUpdater(rs => rs
 			.update("chat_data", "AFK")
 			.set("Active", false)
-			.where("ID = %n", data.ID)
+			.where("User_Alias = %n", userData.ID)
+			.where("Active = %b", true)
 		);
 
 		const afkCommand = sb.Command.get("afk");
