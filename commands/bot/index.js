@@ -48,8 +48,9 @@ module.exports = {
 			? sb.Channel.get(params.channel ?? value)
 			: context.channel;
 
+		const channelName = params.channel ?? value ?? context.channel?.Name ?? null;
 		if (!channelData) {
-			if (command.includes("join") && params.channel.toLowerCase() === context.user.Name) {
+			if (command.includes("join") && channelName && channelName.toLowerCase() === context.user.Name) {
 				return {
 					success: false,
 					reply: `Cannot join your channel directly! Use this form instead: https://supinic.com/bot/request-bot/form`
