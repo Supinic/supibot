@@ -76,7 +76,8 @@ module.exports = {
 
 						return {
 							success: false,
-							reply
+							reply,
+							forceExternalInput: true
 						};
 					}
 				}
