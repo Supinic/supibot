@@ -1023,7 +1023,11 @@ class Command extends require("./template.js") {
 			execution.reply = `${string}, ${execution.reply}`;
 		}
 
-		if (!options.partialExecute && execution.success !== false && execution.hasExternalInput && !execution.skipExternalPrefix) {
+		// If the `hasPrefix` condition is met (we want the external prefix to be added), we check two more conditions:
+		// a) Either the command succeeded and the prefix isn't skipped, or
+		// b) The prefix is forced no matter the command's success status
+		const hasPrefix = Boolean(!options.partialExecute && execution.hasExternalInput);
+		if (hasPrefix && ((execution.success !== false && !execution.skipExternalPrefix) || execution.forceExternalPrefix)) {
 			execution.reply = `👥 ${execution.reply}`;
 		}
 
@@ -1345,6 +1349,7 @@ module.exports = Command;
  * @property {boolean} [partialExecute] Determines if a command is used as a part of a different meta-command
  * @property {boolean} [hasExternalInput] Determines if a command can have arbitrary input - used for the "external prefix" symbol
  * @property {boolean} [skipExternalPrefix] If `hasExternalInput` is true, this flag can override it and remove the symbol
+ * @property {boolean} [forceExternalPrefix] If true, the external prefix will be added even if the command's success flag is `false`
  * @property {boolean} [replyWithPrivateMessage] If true, the command reply should be sent via PMs
  * @property {boolean} [removeEmbeds] Determines if the command response should be embed or not
  * @property {boolean} [keepWhitespace] If true, the command's response will not be automatically stripped from whitespace
