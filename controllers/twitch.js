@@ -511,16 +511,6 @@ module.exports = class TwitchController extends require("./template.js") {
 		if (channelData.Mode === "Inactive" || channelData.Mode === "Read") {
 			return;
 		}
-		else if (channelData.Mode === "VIP" || channelData.Mode === "Moderator") {
-			try {
-				await this.client.say(channelName, message);
-			}
-			catch (e) {
-				await sb.Logger.log("Twitch.Warning", String(e), channelData, null);
-			}
-
-			return;
-		}
 
 		// Create a message scheduler for the channel if there is none
 		// OR if the queue mode does not match the current channel mode
