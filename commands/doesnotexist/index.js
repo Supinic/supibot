@@ -118,8 +118,8 @@ module.exports = {
 					}
 				},
 				{
-					parameter: "summary",
 					method: "rolls a random number for a static link - posting a summary rather than a single link",
+					parameter: "summary",
 					types: ["anime", "sneaker"],
 					descriptions: [
 						`<code>waifu</code> - <a href="https://www.thiswaifudoesnotexist.net/">This waifu does not exist</a> - supports <code>summary</code> parameter`,
@@ -261,7 +261,7 @@ module.exports = {
 
 		type = type.toLowerCase();
 
-		const types = fetch.flatMap(i => i.types);
+		const types = [...new Set(fetch.flatMap(i => i.types))].sort();
 		if (type === "list") {
 			return {
 				reply: `Available types: ${types.join(", ")}`
@@ -284,7 +284,7 @@ module.exports = {
 				};
 			}
 
-			execute = definition.execution;
+			execute = definition.execute;
 		}
 		else {
 			execute = fetch.find(i => i.types.includes(type)).execute;
