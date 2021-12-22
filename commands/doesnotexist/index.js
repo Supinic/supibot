@@ -7,6 +7,7 @@ module.exports = {
 	Flags: ["non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "linkOnly", type: "boolean" },
+		{ name: "summary", type: "boolean" },
 		{ name: "wordOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
@@ -21,11 +22,28 @@ module.exports = {
 		};
 
 		const staticNumberedLinkMap = {
+			anime: () => {
+				const id = sb.Utils.random(10000, 99999);
+				const creativity = sb.Utils.random(3, 20);
+				const psi = (creativity / 10).toFixed(1);
+
+				return `https://thisanimedoesnotexist.ai/results/psi-${psi}/seed${id}.png`;
+			},
 			fursona: () => {
 				const number = sb.Utils.random(1, 99999);
 				const padded = sb.Utils.zf(number, 5);
 
 				return `https://thisfursonadoesnotexist.com/v2/jpgs-2x/seed${padded}.jpg`;
+			},
+			sneaker: () => {
+				const id = sb.Utils.random(1, 2000);
+				const params = [
+					sb.Utils.random(1, 5),
+					sb.Utils.random(1, 5),
+					sb.Utils.random(1, 3)
+				];
+
+				return `https://thissneakerdoesnotexist.com/wp-content/plugins/sneaker-plugin/imsout2/${params[0]}-${params[1]}-${params[2]}-${id}.jpg`;
 			},
 			vessel: () => {
 				const number = sb.Utils.random(1, 2e4);
@@ -35,6 +53,11 @@ module.exports = {
 			},
 			waifu: () => `https://www.thiswaifudoesnotexist.net/example-${sb.Utils.random(1, 1e5)}.jpg`,
 			wojak: () => `https://thiswojakdoesnotexist.com/img/${sb.Utils.random(1, 1576)}.png`
+		};
+
+		const staticNumberedLinkMapSummary = {
+			anime: () => `https://thisanimedoesnotexist.ai/slider.html?seed=${sb.Utils.random(10000, 99999)}`,
+			sneaker: () => `https://thissneakerdoesnotexist.com/editor/?seed=${sb.Utils.random(1, 2000)}`
 		};
 
 		return {
@@ -82,17 +105,32 @@ module.exports = {
 				},
 				{
 					method: "rolls a random number for a static link",
-					types: ["fursona", "vessel", "waifu", "wojak"],
+					types: ["anime", "fursona", "sneaker", "vessel", "waifu", "wojak"],
 					descriptions: [
 						`<code>fursona</code> - <a href="https://thisfursonadoesnotexist.com/">This fursona does not exist</a>`,
-						`<code>vessel</code> - <a href="https://thisvesseldoesnotexist.com/#/fakes/">This vessel does not exist</a>`,
-						`<code>waifu</code> - <a href="https://www.thiswaifudoesnotexist.net/">This waifu does not exist</a>`
+						`<code>vessel</code> - <a href="https://thisvesseldoesnotexist.com/#/fakes/">This vessel does not exist</a>`
 					],
 					execute: async (context, type) => {
 						const link = staticNumberedLinkMap[type]();
 						return {
 							link,
 							reply: `This ${type} does not exist: ${link}`
+						};
+					}
+				},
+				{
+					parameter: "summary",
+					method: "rolls a random number for a static link - posting a summary rather than a single link",
+					types: ["anime", "sneaker"],
+					descriptions: [
+						`<code>waifu</code> - <a href="https://www.thiswaifudoesnotexist.net/">This waifu does not exist</a> - supports <code>summary</code> parameter`,
+						`<code>wojak</code> - <a href="https://thiswojakdoesnotexist.com//">This wojak does not exist</a> - supports <code>summary</code> parameter`
+					],
+					execute: async (context, type) => {
+						const link = staticNumberedLinkMapSummary[type]();
+						return {
+							link,
+							reply: `This ${type} summary does not exist: ${link}`
 						};
 					}
 				},
@@ -235,7 +273,22 @@ module.exports = {
 			};
 		}
 
-		const { execute } = fetch.find(i => i.types.includes(type));
+		let execute;
+		if (context.params.summary === true) {
+			const definition = fetch.find(i => i.types.includes(type) && i.parameter === "summary");
+			if (!definition) {
+				return {
+					success: false,
+					reply: `That type does not support the "summary" parameter!`
+				};
+			}
+
+			execute = definition.execution;
+		}
+		else {
+			execute = fetch.find(i => i.types.includes(type)).execute;
+		}
+
 		const result = await execute(context, type);
 
 		if (context.params.linkOnly && result.link) {
@@ -274,6 +327,11 @@ module.exports = {
 
 			`<code>${prefix}dne word wordOnly:true</code>`,
 			"Posts a random word, without the word class, definition or examples",
+			"",
+
+			`<code>${prefix}dne anime summary:true</code>`,
+			`<code>${prefix}dne sneaker summary:true</code>`,
+			"Posts a random type, but instead of a picture a summary of multiple pictures or a slider menu is shown.",
 			"",
 
 			"Available types:",
