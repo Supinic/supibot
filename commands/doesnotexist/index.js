@@ -61,7 +61,6 @@ module.exports = {
 		};
 
 		return {
-			types: ["artwork", "automobile", "cat", "fuckeduphomer", "fursona", "horse", "mp", "person", "vessel", "waifu", "word"],
 			fetch: [
 				{
 					method: "reuploading a provided random image",
@@ -255,12 +254,14 @@ module.exports = {
 		};
 	}),
 	Code: (async function doesnotexist (context, type) {
-		const { fetch, types } = this.staticData;
+		const { fetch } = this.staticData;
 		if (!type) {
 			type = "person";
 		}
 
 		type = type.toLowerCase();
+
+		const types = fetch.flatMap(i => i.types);
 		if (type === "list") {
 			return {
 				reply: `Available types: ${types.join(", ")}`
