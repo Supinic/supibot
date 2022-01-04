@@ -7,6 +7,7 @@ module.exports = {
 	Flags: ["non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "debug", type: "string" },
+		{ name: "dull", type: "boolean" },
 		{ name: "channel", type: "string" },
 		{ name: "exact", type: "boolean" },
 		{ name: "stop", type: "boolean" },
@@ -171,7 +172,7 @@ module.exports = {
 			wordCount = words;
 		}
 
-		if (typeof input === "string" && !markov.has(input)) {
+		if (typeof input === "string" && !markov.has(input) && context.params.dull === true) {
 			const exact = context.params.exact ?? false;
 			if (exact) {
 				return {
@@ -247,19 +248,20 @@ module.exports = {
 			"Generates words in the specified channel's context.",
 			`List of currently supported channels: <ul>${channelList}</ul>`,
 
-			`<code>${prefix}markov (word)</code>`,
+			`<code>${prefix}markov dull:true (first word)</code>`,
 			`Generates words, with your chosen word being the "seed", which is the first word in the sequence.`,
-			"Only one word will be taken into account, because this is how the implementation works.",
 			"If your word isn't matched exactly, other, case-insensitive variants will be attempted.",
 			"Like, if <code>4HEad</code> isn't in the word list, <code>4Head</code> will be used instead.",
+			"If the parameter is not set to true, the generation will simply continue as if the word existed.",
+			"",
+
+			`<code>${prefix}markov exact:true</code>`,
+			"If you want your seed word to be specific, use <code>exact:true</code> to force to use just that case-sensitive version.",
 			"",
 
 			`<code>${prefix}markov words:(number)</code>`,
 			`Generates between 1-${limit} words, based on your choice.`,
-			"",
-
-			`<code>${prefix}markov exact:true</code>`,
-			"If you want your seed word to be specific, use <code>exact:true</code> to force to use just that case-sensitive version."
+			""
 		];
 	})
 };
