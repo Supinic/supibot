@@ -174,7 +174,7 @@ module.exports = class Reminder extends require("./template.js") {
 	 * Deactivates a reminder. Also deactivates it in database if required.
 	 * @param {boolean} cancelled If true, the reminder will be flagged as cancelled
 	 * @param {boolean} permanent If true, the reminder was completed, and can be removed in database.
-	 * @returns {sb.Reminder}
+	 * @returns {Promise<sb.Reminder>}
 	 */
 	async deactivate (permanent, cancelled) {
 		this.Active = false;
@@ -346,13 +346,16 @@ module.exports = class Reminder extends require("./template.js") {
 			channel: channelData
 		});
 
-		const reminders = list.filter(i => !i.Schedule && !excludedUserIDs.includes(i.User_From));
+		const reminders = list.filter(i => i.Active && !i.Schedule && !excludedUserIDs.includes(i.User_From));
 		if (reminders.length === 0) {
 			return;
 		}
 
+		// Only set the triggering reminders to be inactive in memory. This is a necessary step to avoid re-sending
+		// the reminders if tons of messages are being sent at the same time.
+		// The reminders will be deactived propery at the end.
 		for (const reminder of reminders) {
-			await reminder.deactivate(true);
+			reminder.Active = false;
 		}
 
 		const reply = [];
@@ -506,6 +509,10 @@ module.exports = class Reminder extends require("./template.js") {
 				channelData.mirror(publicMessage, targetUserData, { commandUsed: false })
 			]);
 		}
+
+		// Properly deactivate all reminders here - after all work has been done.
+		const deactivatePromises = reminders.map(reminder => reminder.deactivate(true));
+		await Promises.all(deactivatePromises);
 
 		Reminder.data.delete(targetUserData.ID);
 	}
