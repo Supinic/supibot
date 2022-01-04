@@ -45,7 +45,7 @@ module.exports = {
 		});
 		command.data.updateCron.start();
 
-		const threshold = 250;
+		const threshold = 100;
 		return {
 			limit: 20,
 			threshold,
