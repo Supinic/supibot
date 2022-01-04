@@ -678,7 +678,7 @@ module.exports = {
 						.select("User_Alias", "Text")
 						.from("data", "Twitch_Lotto_Description")
 						.where("Link = %s", match[4])
-						.sort("Preferred DESC")
+						.orderBy("Preferred DESC")
 					);
 
 					if (descriptions.length === 0) {
