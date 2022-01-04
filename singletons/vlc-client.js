@@ -7,94 +7,31 @@
 const http = require("http");
 const querystring = require("querystring");
 
-const get = (options) => {
-	return new Promise((resolve, reject) => {
-		http.get(options, response => {
-			const contentType = response.headers["content-type"] || "text/plain";
-			if (response.statusCode !== 200) {
-				reject(new Error("Request failed. Status code " + response.statusCode));
+const get = (options) => new Promise((resolve, reject) => {
+	http.get(options, response => {
+		const contentType = response.headers["content-type"] || "text/plain";
+		if (response.statusCode !== 200) {
+			reject(new Error(`Request failed. Status code ${response.statusCode}`));
+		}
+		else if (!/^application\/json/.test(contentType) && !/^text\/plain/.test(contentType)) {
+			reject(new Error(`Invalid content type. Expected application/json or text/plain, received ${contentType}`));
+		}
+
+		let data = "";
+		response.on("error", reject);
+		response.on("data", chunk => (data += chunk));
+		response.on("end", () => {
+			try {
+				resolve(JSON.parse(data));
 			}
-			else if (!/^application\/json/.test(contentType) && !/^text\/plain/.test(contentType)) {
-				reject(new Error("Invalid content type. Expected application/json or text/plain, received " + contentType));
+			catch (e) {
+				reject(e);
 			}
+		});
+	}).on("error", (e) => reject(e));
+});
 
-			let data = "";
-			response.on("error", reject);
-			response.on("data", chunk => (data += chunk));
-			response.on("end", () => {
-				try {
-					resolve(JSON.parse(data));
-				}
-				catch (err) {
-					reject(err);
-				}
-			});
-		}).on("error", (e) => reject(e));
-	});
-}
-
-const equal = (one, two) => {
-	return (JSON.stringify(one) === JSON.stringify(two));
-
-	// if (one === two) {
-	// 	return true;
-	// }
-	// else if (typeof one !== typeof two) {
-	// 	return false;
-	// }
-	// else if (one?.constructor !== two?.constructor) {
-	// 	return false;
-	// }
-	// else if (one !== null && typeof one === "object") {
-	// 	const keys1 = Object.keys(one);
-	// 	const keys2 = Object.keys(two);
-	// 	for (const key of keys1) {
-	// 		const equivalent = keys2.findIndex(i => i === key);
-	// 		if (equivalent === -1) {
-	// 			return false;
-	// 		}
-	// 	}
-	// 	for (const key of keys2) {
-	// 		const equivalent = keys1.findIndex(i => i === key);
-	// 		if (equivalent === -1) {
-	// 			return false;
-	// 		}
-	// 	}
-	//
-	// 	for (const key of keys1) {
-	// 		const equivalent = deepEqual(one[key], two[key]);
-	// 		if (!equivalent) {
-	// 			return false;
-	// 		}
-	// 	}
-	//
-	// 	if (typeof one.valueOf === "function" && typeof two.valueOf === "function") {
-	// 		const valueOne = one.valueOf();
-	// 		const valueTwo = two.valueOf();
-	// 		if (typeof valueOne !== "object" && typeof valueTwo !== "object" && valueOne !== valueTwo) {
-	// 			return false;
-	// 		}
-	// 	}
-	// 	if (typeof one.toJSON === "function" && typeof two.toJSON === "function") {
-	// 		const valueOne = one.toJSON();
-	// 		const valueTwo = two.toJSON();
-	// 		if (typeof valueOne !== "object" && typeof valueTwo !== "object" && valueOne !== valueTwo) {
-	// 			return false;
-	// 		}
-	// 	}
-	// 	if (typeof one.toString === "function" && typeof two.toString === "function") {
-	// 		const valueOne = one.toString();
-	// 		const valueTwo = two.toString();
-	// 		if (typeof valueOne !== "object" && typeof valueTwo !== "object" && valueOne !== valueTwo) {
-	// 			return false;
-	// 		}
-	// 	}
-	//
-	// }
-	// else {
-	// 	return false;
-	// }
-}
+const equal = (one, two) => (JSON.stringify(one) === JSON.stringify(two));
 
 const CommandScope = {
 	BROWSE: "/requests/browse.json",
@@ -171,7 +108,7 @@ module.exports = class VLCClient extends require("events") {
 		this.#running = false;
 	}
 
-	async #doTick() {
+	async #doTick () {
 		this.emit("tick", this.#running);
 
 		if (this.#running) {
@@ -228,8 +165,8 @@ module.exports = class VLCClient extends require("events") {
 			try {
 				this.emit("statuschange", this.#status || status, status);
 			}
-			catch (err) {
-				this.emit("error", err);
+			catch (e) {
+				this.emit("error", e);
 			}
 
 			this.#status = status;
@@ -245,8 +182,8 @@ module.exports = class VLCClient extends require("events") {
 			try {
 				this.emit("playlistchange", this.#playlist || playlist, playlist);
 			}
-			catch (err) {
-				this.emit("error", err);
+			catch (e) {
+				this.emit("error", e);
 			}
 
 
@@ -265,8 +202,8 @@ module.exports = class VLCClient extends require("events") {
 		try {
 			this.emit("update", status, playlist);
 		}
-		catch (err) {
-			this.emit("error", err);
+		catch (e) {
+			this.emit("error", e);
 		}
 
 		return [status, playlist];
@@ -447,7 +384,7 @@ module.exports = class VLCClient extends require("events") {
 	 */
 	async setEqualizer (band, gain) {
 		return await this.#sendCommand(CommandScope.STATUS, "equalizer", {
-			band: band,
+			band,
 			val: gain
 		});
 	}
@@ -503,7 +440,7 @@ module.exports = class VLCClient extends require("events") {
 	async seekToChapter (chapter) {
 		return await this.#sendCommand(CommandScope.STATUS, "chapter", { val: chapter });
 	}
-}
+};
 
 /**
  * @typedef {"1:1" | "4:3" | "5:4" | "16:9" | "16:10" | "221:100" | "235:100" | "239:100"} VLCAspectRatio

@@ -231,7 +231,7 @@ module.exports = class Channel extends require("./template.js") {
 	getFullName () {
 		if (this.Platform.Name === "discord") {
 			if (this.Description) {
-				const [guild] = this.Description.split("-")
+				const [guild] = this.Description.split("-");
 				return `${this.Platform.Name}-${guild.trim()}`;
 			}
 			else {
