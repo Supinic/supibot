@@ -6,7 +6,8 @@ module.exports = {
 	Description: "supiniHack ",
 	Flags: ["external-input","developer","pipe","skip-banphrase","system","use-params","whitelist"],
 	Params: [
-		{ name: "function", type: "string" }
+		{ name: "function", type: "string" },
+		{ name: "importGist", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -22,9 +23,42 @@ module.exports = {
 		const vm = require("vm");
 		const string = args.join(" ");
 
-		let script;
 		let scriptString;
 		let scriptArgs;
+
+		let importedText;
+		if (context.params.importGist) {
+			if (context.params.importGist.includes(" ")) {
+				return {
+					success: false,
+					reply: `Gist IDs cannot contain spaces!`
+				};
+			}
+
+			const gistCommand = sb.Command.get("pastebin");
+			const fakeCtx = sb.Command.createFakeContext(
+				gistCommand,
+				{
+					...context,
+					params: {
+						force: Boolean(context.params.force)
+					},
+					invocation: "gist"
+				},
+				{}
+			);
+
+			const gistResult = await gistCommand.execute(fakeCtx, context.params.importGist);
+			if (gistResult.success === false) {
+				return gistResult;
+			}
+
+			importedText = gistResult.reply;
+
+			if (!importedText.endsWith(";") && !importedText.endsWith(",")) {
+				importedText += ";";
+			}
+		}
 
 		if (context.params.function) {
 			scriptString = context.params.function;
@@ -37,6 +71,11 @@ module.exports = {
 			scriptString = `(async () => {"use strict"; \n${string}\n})()`;
 		}
 
+		if (importedText) {
+			scriptString = `${importedText}${scriptString}`;
+		}
+
+		let script;
 		try {
 			script = new vm.Script(scriptString);
 		}
