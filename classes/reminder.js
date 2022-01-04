@@ -512,7 +512,7 @@ module.exports = class Reminder extends require("./template.js") {
 
 		// Properly deactivate all reminders here - after all work has been done.
 		const deactivatePromises = reminders.map(reminder => reminder.deactivate(true));
-		await Promises.all(deactivatePromises);
+		await Promise.all(deactivatePromises);
 
 		Reminder.data.delete(targetUserData.ID);
 	}
