@@ -677,14 +677,25 @@ module.exports = {
 					const descriptions = await sb.Query.getRecordset(rs => rs
 						.select("User_Alias", "Text")
 						.from("data", "Twitch_Lotto_Description")
-						.where("Preferred <> %b", false)
 						.where("Link = %s", match[4])
+						.sort("Preferred DESC")
 					);
 
 					if (descriptions.length === 0) {
+						const exists = await sb.Query.getRecordset(rs => rs
+							.select("Link")
+							.from("data", "Twitch_Lotto")
+							.where("Link = %s", match[4])
+							.limit(1)
+							.flat("Link")
+							.single()
+						);
+
 						return {
 							success: false,
-							reply: `This picture either doesn't exist or has not been described so far!`
+							reply: (exists)
+								? `This picture either has not been described so far!`
+								: `This picture does not exist in the database!`
 						};
 					}
 
