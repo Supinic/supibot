@@ -177,7 +177,7 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: (async function (prefix) {
+	Dynamic_Description: (async function getDynamicDescription (prefix) {
 		const gameData = await this.getCacheData({ type: "games" });
 		const games = (gameData)
 			? gameData.map(i => `<li><code>${i.name}</code></li>`).sort().join("")
