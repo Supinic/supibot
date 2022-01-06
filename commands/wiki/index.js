@@ -31,6 +31,21 @@ module.exports = {
 			};
 		}
 
+		let query = args.join(" ");
+		if (query.toLowerCase() === "random") {
+			const response = await sb.Got("FakeAgent", `https://${languageCode}.wikipedia.org/wiki/Special:Random`);
+			const [redirectUrl] = response.redirectUrls;
+			if (!redirectUrl) {
+				return {
+					success: false,
+					reply: `Could not find any random articles!`
+				};
+			}
+
+			const blobs = redirectUrl.split("wiki/");
+			query = blobs[1];
+		}
+
 		const searchData = await sb.Got("GenericAPI", {
 			url: `https://${languageCode}.wikipedia.org/w/api.php`,
 			searchParams: {
@@ -38,7 +53,7 @@ module.exports = {
 				action: "opensearch",
 				limit: "10",
 				profile: "fuzzy",
-				search: args.join(" ")
+				search: query
 			}
 		});
 
@@ -99,6 +114,11 @@ module.exports = {
 
 		`<code>${prefix}wiki linkOnly:true (topic)</code>`,
 		"Only posts the link for the given wiki topic.",
-		"..."
+		"...",
+
+		`<code>${prefix}wiki random (topic)</code>`,
+		`<code>${prefix}wiki lang:pl random (topic)</code>`,
+		"Posts a completely random article, using the Wikipedia <code>Special:Random</code> article.",
+		"Also supports specifiying languages."
 	])
 };
