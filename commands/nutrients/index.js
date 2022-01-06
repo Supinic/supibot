@@ -670,7 +670,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { nutrients } = values.getStaticData();
-		const tableBody = nutrients
+		const tableBody = [...nutrients]
 			.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
 			.map(i => `<tr><td>${i.name}</td><td>${i.code}</td></tr>`).join("");
 
