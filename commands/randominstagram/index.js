@@ -29,6 +29,7 @@ module.exports = {
 			data = profileCacheData.data;
 		}
 		else {
+			let redirected = false;
 			const response = await sb.Got("FakeAgent", {
 				url: `https://www.instagram.com/${user}/`,
 				searchParams: {
@@ -40,17 +41,44 @@ module.exports = {
 					beforeRedirect: [
 						(options, res) => {
 							if (res.statusCode >= 300 && res.statusCode <= 399) {
-								throw new sb.errors.GenericRequestError({
-									statusCode: 403,
-									statusMessage: "Forbidden",
-									hostname: "instagram.com",
-									message: "Temporarily blocked - try again later"
-								});
+								redirected = true;
 							}
 						}
 					]
 				}
 			});
+
+			if (redirected) {
+				const backup = await sb.Got(`https://bibliogram.art/u/${user}`);
+				const $ = sb.Utils.cheerio(backup.body);
+
+				const posts = Array.from($("a.sized-link")).map(i => ({
+					id: i.attribs["data-shortcode"],
+					description: i.children[0].attribs.alt,
+					raw: unescape(i.children[0].attribs.src).split("&url=")[1]
+				}));
+
+				const post = sb.Utils.randArray(posts);
+				if (context.params.rawLinkOnly) {
+					return {
+						reply: post.raw
+					};
+				}
+				else if (context.params.postLinkOnly) {
+					return {
+						reply: `https://www.instagram.com/p/${post.id}`
+					};
+				}
+				else {
+					return {
+						reply: `
+							Backup Instagram source:
+							${post.description}
+							https://www.instagram.com/p/${post.id}
+						`
+					};
+				}
+			}
 
 			statusCode = response.statusCode;
 			data = response.body;
