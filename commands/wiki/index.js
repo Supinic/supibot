@@ -38,15 +38,14 @@ module.exports = {
 				responseType: "text"
 			});
 
-			const [redirectUrl] = response.redirectUrls;
-			if (!redirectUrl) {
+			if (!response.url) {
 				return {
 					success: false,
 					reply: `Could not find any random articles!`
 				};
 			}
 
-			const blobs = redirectUrl.split("wiki/");
+			const blobs = response.url.split("wiki/");
 			query = blobs[1];
 		}
 
