@@ -78,7 +78,17 @@ module.exports = {
 			};
 		}
 
-		const targetChannel = sb.Channel.get(context.params.channel ?? "forsen");
+		let targetChannel;
+		if (context.params.channel) {
+			targetChannel = sb.Channel.get(context.params.channel);
+		}
+		else if (context.channel && module.data.markovs?.has(context.channel.ID)) {
+			targetChannel = context.channel;
+		}
+		else {
+			targetChannel = sb.Channel.get("forsen"); // legacy fallback behaviour
+		}
+
 		if (!targetChannel) {
 			return {
 				success: false,
