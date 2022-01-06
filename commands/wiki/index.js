@@ -33,7 +33,11 @@ module.exports = {
 
 		let query = args.join(" ");
 		if (query.toLowerCase() === "random") {
-			const response = await sb.Got("FakeAgent", `https://${languageCode}.wikipedia.org/wiki/Special:Random`);
+			const response = await sb.Got("FakeAgent", {
+				url: `https://${languageCode}.wikipedia.org/wiki/Special:Random`,
+				responseType: "text"
+			});
+
 			const [redirectUrl] = response.redirectUrls;
 			if (!redirectUrl) {
 				return {
