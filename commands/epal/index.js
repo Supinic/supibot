@@ -177,8 +177,8 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const gameData = await values.getCacheData({ type: "games" });
+	Dynamic_Description: (async function (prefix) {
+		const gameData = await this.getCacheData({ type: "games" });
 		const games = (gameData)
 			? gameData.map(i => `<li><code>${i.name}</code></li>`).sort().join("")
 			: "<li>No game data available - use the command to populate the list!</li>";
