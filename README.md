@@ -7,7 +7,8 @@ Supibot can and is currently run on four distinct platforms:
 - [Discord](https://discordapp.com/)
 - [Cytube](https://cytu.be/)
 - ~~Mixer~~ (until 2020-07-22)
-- [Minecraft](https://www.minecraft.net/) (not currently active)
+- [~~Minecraft~~](https://www.minecraft.net/) (not currently active)
+- [IRC](https://datatracker.ietf.org/doc/html/rfc1459)
 
 ## I want to use Supibot!
 Pick your platform, and follow these steps: 
@@ -15,9 +16,9 @@ Pick your platform, and follow these steps:
 | Platform | Directions |
 | :---: |:---|
 | **Twitch channel**   | Fill out [this form](https://supinic.com/bot/request-bot/form). |
-| **Discord server**   | The **admin** of said server PMs me on Discord (friend request is not required).  | 
+| **Discord server**   | The _**admin**_ of said server PMs me on Discord after joining my [Discord server](https://supinic.com/contact).  | 
 | **Cytube room**      | Fill out [this form](https://supinic.com/bot/request-bot/form). |
-| **Minecraft server** | The owner of given Vanilla/Forge-modded Minecraft server needs to contact me, as this process is not trivial. |
+| **IRC channel**      | Currently only active on [Libera](https://libera.chat/). [Contact me](https://supinic.com/contact) for more info.  |
 
 To contact me, see [Contact](https://supinic.com/contact) on my website.
 
