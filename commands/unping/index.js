@@ -18,7 +18,7 @@ module.exports = {
 		}
 
 		let deliberateGlobalUnping = false;
-		const types = ["command", "platform", "channel"];
+		const types = ["command", "platform", "channel", "user"];
 		const names = {};
 		const filterData = {
 			command: null,
@@ -87,6 +87,7 @@ module.exports = {
 			&& i.Channel === filterData.channel
 			&& i.Command === filterData.command
 			&& i.Platform === filterData.platform
+			&& i.Blocked_User === filterData.user
 			&& i.User_Alias === context.user.ID
 		));
 
@@ -120,6 +121,7 @@ module.exports = {
 				Command: filterData.command,
 				Channel: filterData.channel,
 				Platform: filterData.platform,
+				Blocked_User: filterData.user,
 				Issued_By: context.user.ID
 			});
 
