@@ -460,7 +460,7 @@ module.exports = class Reminder extends require("./template.js") {
 					channel: channelData ?? null,
 					platform: channelData?.Platform ?? null,
 					string: message,
-					executor: userData
+					executor: targetUserData
 				});
 
 				const limit = channelData.Message_Limit ?? channelData.Platform.Message_Limit;
