@@ -82,7 +82,7 @@ module.exports = {
 		}
 
 		const verb = (user.toLowerCase() === context.user.Name) ? "have" : "has";
-		const delta = sb.Utils.timeDelta(new sb.Date(followData.followed_at), true);
+		const delta = sb.Utils.timeDelta(new sb.Date(followData.followed_at), true, true);
 		return {
 			reply: `${prefix} ${verb} been following ${suffix} for ${delta}.`
 		};
