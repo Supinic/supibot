@@ -622,10 +622,17 @@ module.exports = class Filter extends require("./template.js") {
 	 * @param {Object} options
 	 */
 	static async applyUnping (options) {
-		const filters = Filter.getLocals("Unping", {
+		const rawFilters = Filter.getLocals("Unping", {
 			...options,
 			skipUserCheck: true
 		});
+
+		// Either the filter doesn't care about who is executing the command,
+		// or the executing user isn't passed,
+		// or the filter has to match the executor precisely.
+		const filters = rawFilters.filter(i => (
+			(i.Blocked_User === null || options.executor === null || i.Blocked_User === options.executor.ID)
+		));
 
 		let { string } = options;
 		const unpingUsers = await sb.User.getMultiple(filters.map(i => i.User_Alias));

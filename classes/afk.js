@@ -140,7 +140,8 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 				command: afkCommand,
 				channel: channelData ?? null,
 				platform: channelData?.Platform ?? null,
-				string: message
+				string: message,
+				executor: userData
 			});
 
 			const fixedMessage = await channelData.prepareMessage(unpingedMessage);

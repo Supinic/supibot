@@ -998,7 +998,8 @@ class Command extends require("./template.js") {
 				command,
 				channel: channelData ?? null,
 				platform: channelData?.Platform ?? null,
-				string: execution.reply
+				string: execution.reply,
+				executor: userData
 			});
 		}
 

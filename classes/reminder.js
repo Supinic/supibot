@@ -459,7 +459,8 @@ module.exports = class Reminder extends require("./template.js") {
 					command: sb.Command.get("remind"),
 					channel: channelData ?? null,
 					platform: channelData?.Platform ?? null,
-					string: message
+					string: message,
+					executor: userData
 				});
 
 				const limit = channelData.Message_Limit ?? channelData.Platform.Message_Limit;
