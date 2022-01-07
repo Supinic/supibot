@@ -23,7 +23,8 @@ module.exports = {
 		const filterData = {
 			command: null,
 			platform: null,
-			channel: null
+			channel: null,
+			user: null
 		};
 
 		if (args.every(i => !i.includes(":"))) { // Simple mode
@@ -147,5 +148,46 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		`Makes a specific command/channel/platform/user combination not "ping" you - the message will not be highlighted.`,
+		"",
+
+		`<code><u>Simple mode</u></code>`,
+		`<code>${prefix}unping (command)</code>`,
+		`Makes the given command not ping you anymore.`,
+		"",
+
+		`<code>${prefix}reping (command)</code>`,
+		`Returns the ping from a given command.`,
+		"",
+
+		`<code><u>Total mode</u></code>`,
+		`<code>${prefix}unping all</code>`,
+		`<code>${prefix}reping all</code>`,
+		"Removes (or adds back) pinging of your username from all current and future commands.",
+		"",
+
+		`<code><u>Advanced mode</u></code>`,
+		`<code>${prefix}unping channel:(channel) user:(username) command:(command) platform:(platform)</code>`,
+		`Removes pinging of your username for a given user/channel/command/platform combination.`,
+		"E.g.:",
+		`<ul>
+				<li> 
+					<code>${prefix}unmention command:rl channel:supibot</code>
+					Will remove the mention from command rl only in channel "supibot".
+				</li>				
+				<li> 
+					<code>${prefix}unmention command:rl user:foobar</code>
+					Will remove the mention from command rl only if used by user "foobar".
+				</li>
+				<li> 
+					<code>${prefix}unmention command:rl platform:twitch</code>
+					Will remove the mention from command rl only in Twitch.
+				</li>
+				<li> 
+					<code>${prefix}unmention channel:supibot</code>
+					Will remove the mention from opt-outable commands, only in channel "supibot".
+				</li>
+			</ul>`
+	])
 };
