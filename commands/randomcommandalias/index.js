@@ -54,7 +54,7 @@ module.exports = {
 
 		return {
 			reply: `
-				Random alias for your query:
+				Random alias "${randomAlias.Name}" for your query:
 				https://supinic.com/bot/user/alias/detail/${randomAlias.ID}				
 			`
 		};
