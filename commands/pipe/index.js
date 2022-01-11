@@ -151,8 +151,14 @@ module.exports = {
 				if (i < invocations.length - 1) { // Only applies to commands that aren't last in the sequence
 					currentArgs = [];
 				}
-				else { // Short-circuit if the command is the last one in pipe
+				else if (i === 0) { // Short-circuit if the command is the last one in pipe
 					return result;
+				}
+				else {
+					return {
+						...result,
+						reply: `Your pipe failed because the "${cmd}" command is currently on cooldown!`
+					};
 				}
 			}
 			else if (typeof result !== "object") { // Banphrase result: Reply with message
