@@ -5,50 +5,49 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Blocks, or unblocks a specified user from using a specified command with you as the target. You can also set a channel, or platform for the block to be active on.",
 	Flags: ["mention"],
-	Params: null,
+	Params: [
+		{ name: "channel", type: "string" },
+		{ name: "command", type: "string" },
+		{ name: "platform", type: "string" },
+		{ name: "user", type: "string" }
+	],
 	Whitelist_Response: null,
-	Static_Data: null,
-	Code: (async function block (context, ...args) {
+	Static_Data: (() => ({
+		types: ["user", "command", "platform", "channel"]
+	})),
+	Code: (async function block (context, user, command) {
 		const { invocation } = context;
-		let deliberateGlobalBlock = false;
-		const types = ["user", "command", "platform", "channel"];
-		const names = {};
-		const filterData = {
+		const { types } = this.staticData;
+		const values = {
 			user: null,
 			command: null,
 			platform: null,
 			channel: null
 		};
 
-		// If the user is using "simple" mode, extract user and command.
-		if (args.every(i => !i.includes(":"))) {
-			if (args.length < 2) {
-				return {
-					success: false,
-					reply: `No user/command provided! For simple mode, use ${sb.Command.prefix}block (user) (command). For advanced mode, check this command's help.`
-				};
-			}
-
-			[filterData.user, filterData.command] = args;
+		if (user && command) {
+			values.user = user;
+			values.command = command;
 		}
 		else {
-			for (let i = args.length - 1; i >= 0; i--) {
-				const token = args[i];
-				const [type, value] = token.split(":");
-				if (type && value && types.includes(type)) {
-					filterData[type] = value;
-					args.splice(i, 1);
+			for (const type of types) {
+				if (context.params[type]) {
+					values[type] = context.params[type];
 				}
 			}
 		}
 
-		if (filterData.command === "all") {
-			filterData.command = null;
+		let deliberateGlobalBlock = false;
+		if (values.command === "all") {
+			values.command = null;
 			deliberateGlobalBlock = true;
 		}
 
-		for (const [type, value] of Object.entries(filterData)) {
+		const names = {};
+		const filterData = {};
+		for (const [type, value] of Object.entries(values)) {
 			if (value === null) {
+				filterData[type] = null;
 				continue;
 			}
 
@@ -83,10 +82,10 @@ module.exports = {
 				reply: `A command (or "all" to ${invocation} globally) must be provided!`
 			};
 		}
-		else if (!filterData.user && !filterData.command) {
+		else if (!filterData.user) {
 			return {
 				success: false,
-				reply: "Specify both the user and the command to block!"
+				reply: "The user to block must be specified!"
 			};
 		}
 		else if (filterData.channel && filterData.platform) {
