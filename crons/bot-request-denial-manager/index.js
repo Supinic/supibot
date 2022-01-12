@@ -45,9 +45,9 @@ module.exports = {
 				request.Username
 			);
 
-			const index = this.data.requests.indexOf(request.ID);
+			const index = this.data.requestIDs.indexOf(request.ID);
 			if (index !== -1) {
-				this.data.requests.splice(index, 1);
+				this.data.requestIDs.splice(index, 1);
 			}
 		}
 	})
