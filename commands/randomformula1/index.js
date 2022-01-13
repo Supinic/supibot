@@ -46,7 +46,7 @@ module.exports = {
 
 				while (!resultRace || index < races.length) {
 					const race = races[index];
-					const raceName = race.raceName.toLowerCase;
+					const raceName = race.raceName.toLowerCase();
 					const circuitName = race.Circuit.circuitName.toLowerCase();
 					const location = race.Circuit.Location.locality.toLowerCase();
 
