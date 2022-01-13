@@ -119,11 +119,18 @@ module.exports = {
 							reply: "There is nobody else here 😨"
 						};
 					}
-
-					if (typeof context.channel.fetchUserList !== "function") {
+					else if (typeof context.channel.fetchUserList !== "function") {
 						return {
 							success: false,
 							reply: "This has not been implemented here... yet! 4Head"
+						};
+					}
+
+					const onCooldown = !sb.CooldownManager.check(context.channel.ID, context.user.ID, "abb-chatter");
+					if (onCooldown) {
+						return {
+							success: false,
+							reply: "Currently on cooldown!"
 						};
 					}
 
@@ -140,8 +147,8 @@ module.exports = {
 						}
 					}
 
+					sb.CooldownManager.set(context.channel.ID, context.user.ID, "abb-chatter", this.Cooldown);
 					return {
-						cooldown: 10_000,
 						reply: sb.Utils.randArray(users)
 					};
 				}
