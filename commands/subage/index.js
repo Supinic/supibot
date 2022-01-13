@@ -169,7 +169,7 @@ module.exports = {
 					${userString} subscribed to ${channelString}
 					for ${months} months in total
 					with a Tier ${tier} ${giftString} ${primeString} subscription.
-					Sub will renew/expire in ${remainingString}.
+					Next Sub anniversary: in ${remainingString}.
 				`
 			};
 		}
