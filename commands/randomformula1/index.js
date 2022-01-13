@@ -40,21 +40,18 @@ module.exports = {
 				return race ?? null;
 			}
 			else if (searchType === "name") {
-				let index = 0;
 				let resultRace;
 				const lower = searchValue.toLowerCase();
 
-				while (!resultRace || index < races.length) {
-					const race = races[index];
+				for (const race of races) {
 					const raceName = race.raceName.toLowerCase();
 					const circuitName = race.Circuit.circuitName.toLowerCase();
 					const location = race.Circuit.Location.locality.toLowerCase();
 
 					if (raceName.includes(lower) || circuitName.includes(lower) || location.includes(lower)) {
 						resultRace = race;
+						break;
 					}
-
-					index++;
 				}
 
 				return resultRace ?? null;
