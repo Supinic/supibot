@@ -228,6 +228,7 @@ module.exports = {
 		}
 		else {
 			return {
+				cooldown: (context.append.pipe) ? null : this.Cooldown,
 				reply: String(result)
 			};
 		}
