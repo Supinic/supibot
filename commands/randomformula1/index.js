@@ -23,17 +23,14 @@ module.exports = {
 
 			if (searchType === "current") {
 				const now = new sb.Date();
-				let index = 0;
 				let resultRace;
 
-				while (!resultRace || index < races.length) {
-					const race = races[index];
+				for (const race of races) {
 					const raceDate = new sb.Date(`${race.date} ${race.time}`);
 					if (now < raceDate) {
 						resultRace = race;
+						break;
 					}
-
-					index++;
 				}
 
 				return resultRace ?? null;
