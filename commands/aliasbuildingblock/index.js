@@ -126,7 +126,7 @@ module.exports = {
 						};
 					}
 
-					const onCooldown = !sb.CooldownManager.check(context.channel.ID, context.user.ID, "abb-chatter");
+					const onCooldown = !sb.CooldownManager.check(context.channel.ID, context.user.ID, "abb-chatter", true);
 					if (onCooldown) {
 						return {
 							success: false,
