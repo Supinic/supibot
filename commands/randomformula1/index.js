@@ -26,7 +26,10 @@ module.exports = {
 				let resultRace;
 
 				for (const race of races) {
-					const raceDate = new sb.Date(`${race.date} ${race.time}`);
+					const raceDate = (race.time)
+						? new sb.Date(`${race.date} ${race.time}`)
+						: new sb.Date(race.date);
+
 					if (now < raceDate) {
 						resultRace = race;
 						break;
@@ -86,11 +89,11 @@ module.exports = {
 		};
 		const fetchDriverStandings = async (year) => {
 			const response = await sb.Got("GenericAPI", `${url}${year}/driverStandings.json`);
-			return response.body.MRData?.StandingsTable?.StandingsLists?.DriverStandings ?? [];
+			return response.body.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings ?? [];
 		};
 		const fetchConstructorStandings = async (year) => {
 			const response = await sb.Got("GenericAPI", `${url}${year}/constructorStandings.json`);
-			return response.body.MRData?.StandingsTable?.StandingsLists?.ConstructorStandings ?? [];
+			return response.body.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings ?? [];
 		};
 
 		return {
@@ -128,7 +131,10 @@ module.exports = {
 					};
 				}
 
-				const raceDate = new sb.Date(`${race.date} ${race.time}`);
+				const raceDate = (race.time)
+					? new sb.Date(`${race.date} ${race.time}`)
+					: new sb.Date(race.date);
+
 				const delta = sb.Utils.timeDelta(raceDate);
 
 				const afterRaceDate = raceDate.clone().addHours(3);
