@@ -161,7 +161,10 @@ module.exports = {
 					["$abb explode this is a test", "t h i s i s a t e s t"]
 				],
 				execute: (context, ...args) => ({
-					reply: args.join(" ").split("").join(" ")
+					reply: args
+						.join(" ")
+						.split("")
+						.join(" ")
 						.replace(/\s+/g, " ")
 				})
 			},
