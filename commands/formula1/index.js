@@ -1,5 +1,5 @@
 module.exports = {
-	Name: "randomformula1",
+	Name: "formula1",
 	Aliases: ["f1"],
 	Author: "supinic",
 	Cooldown: 30000,
