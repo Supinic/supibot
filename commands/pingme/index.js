@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Sets a self-notification in the current channel when the target user is spotted in a different channel.",
-	Flags: ["mention","opt-out","pipe"],
+	Flags: ["block","mention","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: (() => ({
