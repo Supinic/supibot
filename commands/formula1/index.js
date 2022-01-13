@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "randomformula1",
-	Aliases: ["rf1"],
+	Aliases: ["f1"],
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Aggregate command about anything regarding Formula 1.",
@@ -104,7 +104,7 @@ module.exports = {
 			fetchNextRaceDetail
 		};
 	}),
-	Code: (async function randomFormula1 (context, ...args) {
+	Code: (async function formula1 (context, ...args) {
 		const { fetchDriverStandings, fetchConstructorStandings, fetchRace, fetchNextRaceDetail } = this.staticData;
 		const now = new sb.Date();
 
@@ -199,25 +199,25 @@ module.exports = {
 		`"If you have any suggestions or addition ideas or anything, make sure to let me know via the <a href="https://supinic.com/bot/command/detail/suggest">$suggest</a> command!`,
 		"",
 
-		`<code>${prefix}rf1</code>`,
+		`<code>${prefix}f1</code>`,
 		"Posts quick info about the upcoming race - in the current season.",
 		"",
 
-		`<code>${prefix}rf1 race (name)</code>`,
-		`<code>${prefix}rf1 year:1990 race (name)</code>`,
+		`<code>${prefix}f1 race (name)</code>`,
+		`<code>${prefix}f1 year:1990 race (name)</code>`,
 		"Searches for info about a race given by its name or country.",
 		"Use <code>season</code> to select a season, otherwise defaults to current year.",
 		"",
 
-		`<code>${prefix}rf1 wdc</code>`,
-		`<code>${prefix}rf1 driverStandings</code>`,
-		`<code>${prefix}rf1 year:1990 driverStandings (name)</code>`,
+		`<code>${prefix}f1 wdc</code>`,
+		`<code>${prefix}f1 driverStandings</code>`,
+		`<code>${prefix}f1 year:1990 driverStandings (name)</code>`,
 		"Posts a summary for the season's WDC - driver standings.",
 		"",
 
-		`<code>${prefix}rf1 wcc</code>`,
-		`<code>${prefix}rf1 constructorStandings</code>`,
-		`<code>${prefix}rf1 year:1990 constructorStandings (name)</code>`,
+		`<code>${prefix}f1 wcc</code>`,
+		`<code>${prefix}f1 constructorStandings</code>`,
+		`<code>${prefix}f1 year:1990 constructorStandings (name)</code>`,
 		"Posts a summary for the season's WCC - constructor standings.",
 		""
 	])
