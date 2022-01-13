@@ -103,7 +103,7 @@ module.exports = {
 			}
 
 			const excludedChannels = excludedInput.split(/\W/).filter(i => this.data.channels.includes(i));
-			const availableChannels = this.data.channels.filter(i => !i.includes(excludedChannels));
+			const availableChannels = this.data.channels.filter(i => !excludedChannels.includes(i));
 			if (availableChannels.length === 0) {
 				return {
 					success: false,
