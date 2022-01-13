@@ -162,7 +162,7 @@ module.exports = {
 					};
 				}
 
-				const string = standings.map(i => `#${i.position}: ${i.Driver.code} (${i.points})`).join(" ");
+				const string = standings.map(i => `#${i.position}: ${i.Driver.code ?? i.Driver.familyName} (${i.points})`).join(" ");
 				return {
 					reply: `Driver standings for season ${year}: ${string}`
 				};
@@ -179,7 +179,7 @@ module.exports = {
 					};
 				}
 
-				const string = standings.map(i => `#${i.position}: ${i.Constructor.code} (${i.points})`).join(" ");
+				const string = standings.map(i => `#${i.position}: ${i.Constructor.name} (${i.points})`).join(" ");
 				return {
 					reply: `Constructor standings for season ${year}: ${string}`
 				};
