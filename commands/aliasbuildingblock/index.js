@@ -141,6 +141,7 @@ module.exports = {
 					}
 
 					return {
+						cooldown: 10_000,
 						reply: sb.Utils.randArray(users)
 					};
 				}
