@@ -168,18 +168,22 @@ module.exports = {
 
 					const pole = qualiResults[0];
 					if (pole) {
-						const driver = pole.Driver.code ?? pole.Driver.familyName;
+						const driver = `${pole.Driver.givenName.at(0)}. ${pole.Driver.familyName}`;
 						const time = pole.Q3 ?? pole.Q2 ?? pole.Q1 ?? "";
+						const constructor = pole.Constructor.name;
 
-						results.pole = `${driver} ${time}`;
+						results.pole = `Pole position: ${driver} (${constructor}) ${time}`;
 					}
 
 					if (raceResults.length !== 0) {
-						results.podium = raceResults.slice(0, 3).map(i => {
-							const driver = i.Driver.code ?? i.Driver.familyName;
+						const podium = raceResults.slice(0, 3).map(i => {
+							const driver = `${pole.Driver.givenName.at(0)}. ${pole.Driver.familyName}`;
+							const constructor = i.Constructor.name;
 
-							return `${i.position}: ${driver}, started ${i.grid}., +${i.points}`;
+							return `#${i.position}: ${driver} (${constructor})`;
 						}).join("; ");
+
+						results.podium = `Podium: ${podium}`;
 					}
 				}
 
