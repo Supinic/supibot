@@ -34,6 +34,11 @@ module.exports = {
 			}
 		});
 
+		const wiktionaryPromise = sb.Got("FakeAgent", {
+			url: `https://en.wiktionary.org/wiki/${encodeURIComponent(query)}`,
+			throwHttpErrors: false
+		});
+
 		const urbanPromise = sb.Got("GenericAPI", {
 			url: "https://api.urbandictionary.com/v0/define",
 			searchParams: {
@@ -45,7 +50,7 @@ module.exports = {
 		});
 
 		const result = [];
-		const [dictData, wikiData, urbanData] = await Promise.allSettled([dictPromise, wikiPromise, urbanPromise]);
+		const [dictData, wikiData, wiktionaryData, urbanData] = await Promise.allSettled([dictPromise, wikiPromise, wiktionaryPromise, urbanPromise]);
 		if (dictData.status === "fulfilled" && dictData.value.statusCode === 200) {
 			const data = dictData.value.body;
 			const records = data.flatMap(i => Object.entries(i.meaning));
@@ -84,6 +89,10 @@ module.exports = {
 				const key = Object.keys(data.body.query.pages)[0];
 				result.push(`Wiki: https://en.wikipedia.org/?curid=${key}`);
 			}
+		}
+
+		if (wiktionaryData.status === "fulfilled" && wiktionaryData.value.statusCode === 200) {
+			result.push(`Wiktionary: ${wiktionaryData.value.url}`);
 		}
 
 		if (result.length === 0) {
