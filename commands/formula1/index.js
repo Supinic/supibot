@@ -67,6 +67,14 @@ module.exports = {
 				});
 			}
 		};
+		const fetchQualifyingResults = async (year, round) => {
+			const response = await sb.Got("GenericAPI", `${url}${year}/${round}/qualifying.json`);
+			return response.body.MRData?.RaceTable?.Races?.[0]?.QualifyingResults ?? [];
+		};
+		const fetchRaceResults = async (year, round) => {
+			const response = await sb.Got("GenericAPI", `${url}${year}/${round}/results.json`);
+			return response.body.MRData?.RaceTable?.Races?.[0]?.Results ?? [];
+		};
 		const fetchNextRaceDetail = async () => {
 			const year = new sb.Date().year;
 			const race = await fetchRace(year, "current");
@@ -102,11 +110,21 @@ module.exports = {
 			fetchDriverStandings,
 			fetchConstructorStandings,
 			fetchRace,
+			fetchQualifyingResults,
+			fetchRaceResults,
 			fetchNextRaceDetail
 		};
 	}),
 	Code: (async function formula1 (context, ...args) {
-		const { fetchDriverStandings, fetchConstructorStandings, fetchRace, fetchNextRaceDetail } = this.staticData;
+		const {
+			fetchDriverStandings,
+			fetchConstructorStandings,
+			fetchRace,
+			fetchQualifyingResults,
+			fetchRaceResults,
+			fetchNextRaceDetail
+		} = this.staticData;
+
 		const now = new sb.Date();
 
 		if (args.length === 0) {
@@ -141,12 +159,38 @@ module.exports = {
 				const afterRaceDate = raceDate.clone().addHours(3);
 				const verb = (now > afterRaceDate) ? "took" : "takes";
 
+				const results = {};
+				if (now > afterRaceDate) {
+					const [qualiResults, raceResults] = await Promise.all([
+						fetchQualifyingResults(race.season, race.round),
+						fetchRaceResults(race.season, race.round)
+					]);
+
+					const pole = qualiResults[0];
+					if (pole) {
+						const driver = pole.Driver.code ?? pole.Driver.familyName;
+						const time = pole.Q3 ?? pole.Q2 ?? pole.Q1 ?? "";
+
+						results.pole = `${driver} ${time}`;
+					}
+
+					if (raceResults.length !== 0) {
+						results.podium = raceResults.slice(0, 3).map(i => {
+							const driver = i.Driver.code ?? i.Driver.familyName;
+
+							return `${i.position}: ${driver}, started ${i.grid}., +${i.points}`;
+						}).join("; ");
+					}
+				}
+
 				return {
 					reply: sb.Utils.tag.trim `
 						Season ${race.season},
 						round ${race.round}:
 						${race.raceName},
 						${verb} place ${delta}.
+						${results.pole ?? ""}
+						${results.podium ?? ""}						
 						${race.url}	
 					`
 				};
