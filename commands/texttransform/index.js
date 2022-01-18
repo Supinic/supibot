@@ -217,6 +217,16 @@ module.exports = {
 				data: (message) => message.replace(/\s+/g, "")
 			},
 			{
+				name: "explode",
+				type: "method",
+				aliases: [],
+				description: "Opposite of trim - adds a space between every character of the message.",
+				data: (message) => message
+					.split("")
+					.join(" ")
+					.replace(/\s+/g, " ")
+			},
+			{
 				name: "binary",
 				type: "method",
 				aliases: ["bin"],
