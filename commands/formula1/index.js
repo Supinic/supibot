@@ -192,7 +192,7 @@ module.exports = {
 
 					if (highlights.length !== 0) {
 						const relevantHighlight = highlights.find(i => (
-							i.title.includes(race.season) && i.title.includes()
+							i.title.includes(race.season) && i.title.tolowerCase().includes(race.raceName.toLowerCase())
 						));
 
 						if (relevantHighlight) {
