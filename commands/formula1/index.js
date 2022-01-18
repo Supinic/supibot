@@ -50,8 +50,9 @@ module.exports = {
 					const raceName = race.raceName.toLowerCase();
 					const circuitName = race.Circuit.circuitName.toLowerCase();
 					const location = race.Circuit.Location.locality.toLowerCase();
+					const country = race.Circuit.Location.country.toLowerCase();
 
-					if (raceName.includes(lower) || circuitName.includes(lower) || location.includes(lower)) {
+					if (raceName.includes(lower) || circuitName.includes(lower) || location.includes(lower) || country.includes(lower)) {
 						resultRace = race;
 						break;
 					}
