@@ -341,13 +341,6 @@ module.exports = {
 						path: "ukr",
 						endpoints: ["rss.xml"],
 						helpers: ["boring_nick"]
-					},
-					{
-						name: "Pravda",
-						url: "https://www.pravda.com.ua",
-						path: "rss",
-						endpoints: ["view_mainnews"],
-						helpers: ["boring_nick"]
 					}
 				]
 			},
