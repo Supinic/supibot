@@ -61,7 +61,7 @@ module.exports = {
 
 			const base = 11.25;
 			const interval = 22.5;
-			if (degrees < base) {
+			if (degrees < base || degrees >= (360 - base)) {
 				return "N";
 			}
 
