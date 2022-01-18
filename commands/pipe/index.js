@@ -147,11 +147,8 @@ module.exports = {
 			if (!result) { // Banphrase result: Do not reply
 				currentArgs = [];
 			}
-			else if (!result.reply) {
-				if (i < invocations.length - 1) { // Only applies to commands that aren't last in the sequence
-					currentArgs = [];
-				}
-				else if (i === 0) { // Short-circuit if the command is the last one in pipe
+			else if (result.success === false && result.reason === "cooldown") {
+				if (i === 0) { // Short-circuit if the command is the last one in pipe
 					return result;
 				}
 				else {
@@ -160,6 +157,9 @@ module.exports = {
 						reply: `Your pipe failed because the "${cmd}" command is currently on cooldown!`
 					};
 				}
+			}
+			else if (!result.reply && i < invocations.length - 1) { // Only applies to commands that aren't last in the sequence
+				currentArgs = [];
 			}
 			else if (typeof result !== "object") { // Banphrase result: Reply with message
 				return {
