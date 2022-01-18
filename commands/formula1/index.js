@@ -161,9 +161,13 @@ module.exports = {
 
 				const results = {};
 				if (now > afterRaceDate) {
-					const [qualiResults, raceResults] = await Promise.all([
+					const [qualiResults, raceResults, highlights] = await Promise.all([
 						fetchQualifyingResults(race.season, race.round),
-						fetchRaceResults(race.season, race.round)
+						fetchRaceResults(race.season, race.round),
+						sb.Utils.searchYoutube(
+							`${race.season} ${race.raceName} highlights formula 1`,
+							sb.Config.get("API_GOOGLE_YOUTUBE")
+						)
 					]);
 
 					const pole = qualiResults[0];
@@ -185,6 +189,16 @@ module.exports = {
 
 						results.podium = `Podium: ${podium}`;
 					}
+
+					if (highlights.length !== 0) {
+						const relevantHighlight = highlights.find(i => (
+							i.title.includes(race.season) && i.title.includes()
+						));
+
+						if (relevantHighlight) {
+							results.highlight = `Highlights: https://youtu.be/${relevantHighlight.id}`;
+						}
+					}
 				}
 
 				return {
@@ -194,7 +208,8 @@ module.exports = {
 						${race.raceName},
 						${verb} place ${delta}.
 						${results.pole ?? ""}
-						${results.podium ?? ""}						
+						${results.podium ?? ""}		
+						${results.highlight ?? ""}				
 						${race.url}	
 					`
 				};
