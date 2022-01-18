@@ -36,7 +36,8 @@ module.exports = {
 
 		const wiktionaryPromise = sb.Got("FakeAgent", {
 			url: `https://en.wiktionary.org/wiki/${encodeURIComponent(query)}`,
-			throwHttpErrors: false
+			throwHttpErrors: false,
+			responseType: "text"
 		});
 
 		const urbanPromise = sb.Got("GenericAPI", {
