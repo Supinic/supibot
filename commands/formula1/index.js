@@ -157,7 +157,6 @@ module.exports = {
 				const delta = sb.Utils.timeDelta(raceDate);
 
 				const afterRaceDate = raceDate.clone().addHours(3);
-				const verb = (now > afterRaceDate) ? "took" : "takes";
 
 				const data = {};
 				if (now > afterRaceDate) {
@@ -203,7 +202,7 @@ module.exports = {
 					data.wiki = `Wiki: ${race.url}`;
 				}
 				else {
-					data.delta = `${verb} place ${delta}.`;
+					data.delta = `Takes place ${delta}.`;
 				}
 
 				return {
