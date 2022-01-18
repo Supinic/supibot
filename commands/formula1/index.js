@@ -159,7 +159,7 @@ module.exports = {
 				const afterRaceDate = raceDate.clone().addHours(3);
 				const verb = (now > afterRaceDate) ? "took" : "takes";
 
-				const results = {};
+				const data = {};
 				if (now > afterRaceDate) {
 					const [qualiResults, raceResults, highlights] = await Promise.all([
 						fetchQualifyingResults(race.season, race.round),
@@ -176,7 +176,7 @@ module.exports = {
 						const time = pole.Q3 ?? pole.Q2 ?? pole.Q1 ?? "";
 						const constructor = pole.Constructor.name;
 
-						results.pole = `Pole position: ${driver} (${constructor}) ${time}`;
+						data.pole = `Pole position: ${driver} (${constructor}) ${time}`;
 					}
 
 					if (raceResults.length !== 0) {
@@ -187,30 +187,35 @@ module.exports = {
 							return `#${i.position}: ${driver} (${constructor})`;
 						}).join("; ");
 
-						results.podium = `Podium: ${podium}`;
+						data.podium = `Podium: ${podium}`;
 					}
 
 					if (highlights.length !== 0) {
 						const relevantHighlight = highlights.find(i => (
-							i.title.includes(race.season) && i.title.tolowerCase().includes(race.raceName.toLowerCase())
+							i.title.includes(race.season) && i.title.toLowerCase().includes(race.raceName.toLowerCase())
 						));
 
 						if (relevantHighlight) {
-							results.highlight = `Highlights: https://youtu.be/${relevantHighlight.id}`;
+							data.highlight = `Highlights: https://youtu.be/${relevantHighlight.ID}`;
 						}
 					}
+
+					data.wiki = `Wiki: ${race.url}`;
+				}
+				else {
+					data.delta = `${verb} place ${delta}.`;
 				}
 
 				return {
 					reply: sb.Utils.tag.trim `
 						Season ${race.season},
 						round ${race.round}:
-						${race.raceName},
-						${verb} place ${delta}.
-						${results.pole ?? ""}
-						${results.podium ?? ""}		
-						${results.highlight ?? ""}				
-						${race.url}	
+						${race.raceName}.
+						${data.delta ?? ""}						
+						${data.pole ?? ""}
+						${data.podium ?? ""}		
+						${data.highlight ?? ""}				
+						${data.wiki ?? ""}	
 					`
 				};
 			}
