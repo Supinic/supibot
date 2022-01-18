@@ -161,6 +161,9 @@ module.exports = {
 			else if (!result.reply && i < invocations.length - 1) { // Only applies to commands that aren't last in the sequence
 				currentArgs = [];
 			}
+			else if (result.reply === null && result.success !== false) { // "Special" case for successful `null` results - pretend as if nothing happened
+				return result;
+			}
 			else if (typeof result !== "object") { // Banphrase result: Reply with message
 				return {
 					reply: result
