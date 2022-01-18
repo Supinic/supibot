@@ -177,7 +177,7 @@ module.exports = {
 
 					if (raceResults.length !== 0) {
 						const podium = raceResults.slice(0, 3).map(i => {
-							const driver = `${pole.Driver.givenName.at(0)}. ${pole.Driver.familyName}`;
+							const driver = `${i.Driver.givenName.at(0)}. ${i.Driver.familyName}`;
 							const constructor = i.Constructor.name;
 
 							return `#${i.position}: ${driver} (${constructor})`;
