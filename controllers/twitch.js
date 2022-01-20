@@ -632,6 +632,41 @@ module.exports = class TwitchController extends require("./template.js") {
 
 			return;
 		}
+		else if (userData.Twitch_ID === null && userData.Discord_ID !== null) {
+			if (!this.platform.Data.sendVerificationChallenge) {
+				// No verification challenge - just assume it's correct
+				await userData.saveProperty("Twitch_ID", senderUserID);
+			}
+			else {
+				if (!message.startsWith(sb.Command.prefix)) {
+					return;
+				}
+
+				const status = await TwitchController.fetchAccountChallengeStatus(userData, senderUserID);
+				if (status === "Active") {
+					return;
+				}
+
+				const { challenge } = await TwitchController.createAccountChallenge(userData, senderUserID);
+				const message = sb.Utils.tag.trim `
+					You were found to be likely to own a Discord account with the same name as your current Twitch account.
+					If you want to use my commands on Twitch, whisper me the following command on Discord:
+					${sb.Command.prefix}link ${challenge}
+				 `;
+
+				await this.pm(userData.Name, message);
+				return;
+			}
+		}
+		else if (userData.Twitch_ID === null && userData.Discord_ID === null) {
+			await userData.saveProperty("Discord_ID", senderUserID);
+		}
+		else if (userData.Twitch_ID !== senderUserID) {
+			// Mismatch between senderUserID and userData.Twitch_ID means someone renamed into a different
+			// user's username, or that there is a different mishap happening. This case is unfortunately exceptional
+			// for the current user-database structure and the event handler must be aborted.
+			return;
+		}
 
 		// Only check channels,
 		if (messageType !== "whisper") {
@@ -1297,6 +1332,37 @@ module.exports = class TwitchController extends require("./template.js") {
 			...(ffz.value ?? []),
 			...(sevenTv.value ?? [])
 		];
+	}
+
+	static async fetchAccountChallengeStatus (userData, twitchID) {
+		return await sb.Query.getRecordset(rs => rs
+			.select("Status")
+			.from("chat_data", "User_Verification_Challenge")
+			.where("User_Alias = %n", userData.ID)
+			.where("Specific_ID = %s", twitchID)
+			.orderBy("ID DESC")
+			.limit(1)
+			.single()
+			.flat("Status")
+		);
+	}
+
+	static async createAccountChallenge (userData, twitchID) {
+		const row = await sb.Query.getRow("chat_data", "User_Verification_Challenge");
+		const challenge = require("crypto").randomBytes(16).toString("hex");
+
+		row.setValues({
+			User_Alias: userData.ID,
+			Specific_ID: twitchID,
+			Challenge: challenge,
+			Platform_From: sb.Platform.get("twitch").ID,
+			Platform_To: sb.Platform.get("discord").ID
+		});
+
+		await row.save();
+		return {
+			challenge
+		};
 	}
 
 	destroy () {
