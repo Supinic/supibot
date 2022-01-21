@@ -60,7 +60,7 @@ module.exports = {
 				};
 			}
 			else if (module === sb.Command) {
-				if (!specificData.Flags.block) {
+				if (!specificData.Flags.optOut) {
 					return {
 						success: false,
 						reply: `You cannot opt out from this command!`
