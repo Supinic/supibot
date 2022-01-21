@@ -11,13 +11,14 @@ module.exports = {
 		{ name: "command", type: "string" },
 		{ name: "index", type: "number" },
 		{ name: "invocation", type: "string" },
+		{ name: "multiplier", type: "number" },
 		{ name: "type", type: "string" },
 		{ name: "string", type: "string" },
 		{ name: "user", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		availableTypes: ["Arguments", "Blacklist", "Online-only", "Offline-only", "Reminder-prevention"]
+		availableTypes: ["Arguments", "Blacklist", "Cooldown", "Online-only", "Offline-only", "Reminder-prevention"]
 	})),
 	Code: (async function ban (context) {
 		const { invocation } = context;
@@ -261,6 +262,40 @@ module.exports = {
 					};
 				}
 			}
+			else if (type === "Cooldown") {
+				const { multiplier } = context.params;
+				if (invocation === "ban") {
+					if (!existing.Active) {
+						await existing.toggle();
+					}
+
+					if (typeof multiplier !== "number") {
+						return {
+							success: false,
+							reply: `No multiplier provided! Use multiplier:(number) to set it.`
+						};
+					}
+					else if (multiplier < 1.0 || multiplier >= 1e6) {
+						return {
+							success: false,
+							reply: `Invalid multiplier provided! Must be in range between <1, 1 000 000>.`
+						};
+					}
+
+					existing.Data = { multiplier };
+					await existing.saveProperty("Data");
+
+					return {
+						reply: `Successfully updated the cooldown filter!`
+					};
+				}
+				else if (invocation === "unban") {
+					await existing.toggle();
+					return {
+						reply: `Successfully disabled Cooldown filter (ID ${existing.ID}).`
+					};
+				}
+			}
 			else if ((existing.Active && invocation === "ban") || (!existing.Active && invocation === "unban")) {
 				return {
 					success: false,
@@ -297,6 +332,23 @@ module.exports = {
 						reply: `Invalid combination of parameters for the Argument type! "index" and "string" must be provided.`
 					};
 				}
+			}
+			else if (type === "Cooldown") {
+				const { multiplier } = context.params;
+				if (typeof multiplier !== "number") {
+					return {
+						success: false,
+						reply: `No multiplier provided! Use multiplier:(number) to set it.`
+					};
+				}
+				else if (multiplier < 1.0 || multiplier >= 1e6) {
+					return {
+						success: false,
+						reply: `Invalid multiplier provided! Must be in range between <1, 1 000 000>.`
+					};
+				}
+
+				options.Data = JSON.stringify({ multiplier });
 			}
 
 			const ban = await sb.Filter.create(options);
@@ -344,6 +396,11 @@ module.exports = {
 			"Just like <code>offline-only</code>, but reverse - result will be available only in online channels.",
 			"",
 
+			`<code>${prefix}ban type:cooldown multiplier:(number) (...)</code>`,
+			"Creates a cooldown modifiying filter - will multiply the original cooldown of any provided combination of command/user/channel by a constant.",
+			"The number provided must always be above 1.0 - as to not go below the intended cooldowns.",
+			"",
+
 			`<code>${prefix}ban type:reminder-prevention user:(user)</code>`,
 			`<code>${prefix}ban type:reminder-prevention user:(user) channel:(channel)</code>`,
 			"Reminders created by provided user will no longer fire in the specified channel.",
@@ -362,6 +419,7 @@ module.exports = {
 
 			`<code>${prefix}unban (...)</code>`,
 			`<code>${prefix}unban type:blacklist (...)</code>`,
+			`<code>${prefix}unban type:cooldown (...)</code>`,
 			`<code>${prefix}unban type:offline-only (...)</code>`,
 			`<code>${prefix}unban type:online-only (...)</code>`,
 			"Unbans any previously mentioned combination.",
