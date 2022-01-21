@@ -107,6 +107,7 @@ module.exports = {
 
 		return {
 			url,
+			pastaRepeatThreshold: 5,
 			fetchDriverStandings,
 			fetchConstructorStandings,
 			fetchRace,
@@ -122,7 +123,8 @@ module.exports = {
 			fetchRace,
 			fetchQualifyingResults,
 			fetchRaceResults,
-			fetchNextRaceDetail
+			fetchNextRaceDetail,
+			pastaRepeatThreshold
 		} = this.staticData;
 
 		const now = new sb.Date();
@@ -253,6 +255,23 @@ module.exports = {
 				};
 			}
 
+			case "copypasta": {
+				const channelID = context.channel?.ID ?? "whipsers";
+				this.data.repeatedPastas ??= {};
+				this.data.repeatedPastas[channelID] ??= [];
+
+				const pastas = require("./copypasta.json");
+				const availablePastas = pastas.filter(i => !this.data.repeatedPastas[channelID].includes(i));
+
+				const pasta = sb.Utils.randArray(availablePastas);
+				this.data.repeatedPastas[channelID].unshift(pasta);
+				this.data.repeatedPastas[channelID].splice(pastaRepeatThreshold);
+
+				return {
+					reply: pasta
+				};
+			}
+
 			default: {
 				return {
 					success: false,
@@ -287,6 +306,10 @@ module.exports = {
 		`<code>${prefix}f1 constructorStandings</code>`,
 		`<code>${prefix}f1 year:1990 constructorStandings (name)</code>`,
 		"Posts a summary for the season's WCC - constructor standings.",
+		"",
+
+		`<code>${prefix}f1 copypasta</code>`,
+		"Posts a random F1 related copypasta.",
 		""
 	])
 };
