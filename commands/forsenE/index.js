@@ -7,7 +7,9 @@ module.exports = {
 	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: (() => ({
+		repeats: 5
+	})),
 	Code: (async function forsenE () {
 		this.data.previousPosts ??= [];
 
