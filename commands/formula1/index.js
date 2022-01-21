@@ -2,7 +2,7 @@ module.exports = {
 	Name: "formula1",
 	Aliases: ["f1"],
 	Author: "supinic",
-	Cooldown: 30000,
+	Cooldown: 7500,
 	Description: "Aggregate command about anything regarding Formula 1.",
 	Flags: ["mention","pipe"],
 	Params: [
