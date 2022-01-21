@@ -73,3 +73,13 @@ Alternatively, if `run setup` does not work or for whatever other reason, follow
 11) Set up at least one channel per platform to `chat_data.Channel` table, by inserting a new row, and filling the channel's `Name` and `Platform`
 12) Edit `COMMAND_PREFIX` in `data.Config` for your preferred command prefix
 13) Run the bot as in **7)**, or `npm/yarn run debug` for debug access
+
+### Final adjustments
+
+In order to set yourself as the `administrator` of Supibot:
+1) Make sure you have been seen by the bot - check the `chat_data.User_Alias` table, find your name, and note the user ID
+2) Create a new row in the `chat_data.User_Alias_Data` table: 
+  - `User_Alias` is the ID you noted
+  - `Property` is `administrator`
+  - `Value` is `true`
+3) Changes should apply immediately, in case they don't, restart the bot
