@@ -148,48 +148,6 @@ module.exports = {
 						reply: `Use the ${sb.Command.prefix}remind command instead!`
 					}),
 					unset: async (context, ID) => {
-						if (context.params.from) {
-							const authorUserData = await sb.User.get(context.params.from);
-							if (!authorUserData) {
-								return {
-									success: false,
-									reply: `No such user exists!`
-								};
-							}
-
-							const reminderIDs = await sb.Query.getRecordset(rs => rs
-								.select("ID")
-								.from("chat_data", "Reminder")
-								.where("Active = %b", true)
-								.where("Schedule IS NOT NULL")
-								.where("User_From = %n", authorUserData.ID)
-								.where("User_To = %n", context.user.ID)
-								.flat("ID")
-							);
-
-							if (reminderIDs.length === 0) {
-								return {
-									success: false,
-									reply: `You have no active timed reminders pending from that user!`
-								};
-							}
-
-							const promises = [];
-							for (const reminderID of reminderIDs) {
-								const reminder = sb.Reminder.get(reminderID);
-								if (!reminder) {
-									continue;
-								}
-
-								promises.push(reminder.deactivate(true, true));
-							}
-
-							await Promise.all(promises);
-							return {
-								reply: `Successfully unset ${promises.length} timed reminders from that user.`
-							};
-						}
-
 						const row = await sb.Query.getRow("chat_data", "Reminder");
 						try {
 							await row.load(ID);
@@ -233,6 +191,47 @@ module.exports = {
 								reply: `Reminder ID ${ID} unset successfully.`
 							};
 						}
+					},
+					userSpecificUnset: async (context) => {
+						const authorUserData = await sb.User.get(context.params.from);
+						if (!authorUserData) {
+							return {
+								success: false,
+								reply: `No such user exists!`
+							};
+						}
+
+						const reminderIDs = await sb.Query.getRecordset(rs => rs
+							.select("ID")
+							.from("chat_data", "Reminder")
+							.where("Active = %b", true)
+							.where("Schedule IS NOT NULL")
+							.where("User_From = %n", authorUserData.ID)
+							.where("User_To = %n", context.user.ID)
+							.flat("ID")
+						);
+
+						if (reminderIDs.length === 0) {
+							return {
+								success: false,
+								reply: `You have no active timed reminders pending from that user!`
+							};
+						}
+
+						const promises = [];
+						for (const reminderID of reminderIDs) {
+							const reminder = sb.Reminder.get(reminderID);
+							if (!reminder) {
+								continue;
+							}
+
+							promises.push(reminder.deactivate(true, true));
+						}
+
+						await Promise.all(promises);
+						return {
+							reply: `Successfully unset ${promises.length} timed reminders from that user.`
+						};
 					}
 				},
 				{
@@ -861,7 +860,10 @@ module.exports = {
 			return await target[invocation](context, ...args);
 		}
 		else if (target.parameter === "ID") {
-			if (args.length === 0) {
+			if (invocation === "unset" && context.params.from && target.userSpecificUnset) {
+				return await target.userSpecificUnset(context);
+			}
+			else if (args.length === 0) {
 				return {
 					success: false,
 					reply: "At least one item must be provided!"
