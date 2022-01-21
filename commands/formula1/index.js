@@ -81,7 +81,7 @@ module.exports = {
 			if (!race) {
 				return {
 					success: false,
-					reply: `No next race is currently scheduled!`
+					reply: `No next F1 race is currently scheduled!`
 				};
 			}
 
@@ -89,7 +89,7 @@ module.exports = {
 			const delta = sb.Utils.timeDelta(date);
 			return {
 				reply: sb.Utils.tag.trim `
-					Next race:
+					Next F1 race:
 					Round ${race.round} - ${race.raceName},
 					scheduled ${delta}.
 					${race.url}					
@@ -146,7 +146,7 @@ module.exports = {
 				if (!race) {
 					return {
 						success: false,
-						reply: `No such race exists!`
+						reply: `No such F1 race exists!`
 					};
 				}
 
