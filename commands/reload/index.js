@@ -4,8 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 0,
 	Description: "Reloads a database definition or hotloads an updated script",
-	Flags: ["pipe","skip-banphrase","system","whitelist"],
-	Params: null,
+	Flags: ["pipe","skip-banphrase","system","use-params","whitelist"],
+	Params: [
+		{ name: "skipUpgrade", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		types: [
@@ -28,7 +30,7 @@ module.exports = {
 			{
 				target: "Command",
 				names: ["command", "commands"],
-				execution: async (invocation, ...list) => {
+				execution: async (context, invocation, ...list) => {
 					if (invocation === "command" && list.length === 0) {
 						return {
 							success: false,
@@ -36,8 +38,10 @@ module.exports = {
 						};
 					}
 
-					const shell = require("util").promisify(require("child_process").exec);
-					await shell("yarn upgrade supi-core");
+					if (context.params.skipUpgrade !== true) {
+						const shell = require("util").promisify(require("child_process").exec);
+						await shell("yarn upgrade supi-core");
+					}
 
 					if (invocation === "commands") {
 						try {
@@ -100,7 +104,7 @@ module.exports = {
 			{
 				target: "User",
 				names: ["user", "users"],
-				execution: async (invocation, ...names) => {
+				execution: async (context, invocation, ...names) => {
 					if (invocation === "user") {
 						await Promise.all(names.map(name => sb.User.invalidateUserCache(name)));
 						await sb.User.getMultiple(names);
@@ -130,7 +134,7 @@ module.exports = {
 		}
 
 		if (typeof item.execution === "function") {
-			return await item.execution(command, ...rest);
+			return await item.execution(context, command, ...rest);
 		}
 
 		const module = sb[item.target];
