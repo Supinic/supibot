@@ -221,8 +221,7 @@ module.exports = {
 				type: "method",
 				aliases: [],
 				description: "Opposite of trim - adds a space between every character of the message.",
-				data: (message) => message
-					.split("")
+				data: (message) => Array.from(message)
 					.join(" ")
 					.replace(/\s+/g, " ")
 			},
