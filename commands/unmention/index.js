@@ -60,10 +60,10 @@ module.exports = {
 				};
 			}
 			else if (module === sb.Command) {
-				if (!specificData.Flags.block) {
+				if (!specificData.Flags.mention) {
 					return {
 						success: false,
-						reply: `You cannot block people from this command!`
+						reply: `That command doesn't mention you in the first place!`
 					};
 				}
 
