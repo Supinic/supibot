@@ -81,7 +81,7 @@ module.exports = {
 			return {
 				reply: (context.params.linkOnly)
 					? link
-					: `"${directMatch.Name}" - ${link}`
+					: `${directMatch.Name} ${link}`
 			};
 		}
 
