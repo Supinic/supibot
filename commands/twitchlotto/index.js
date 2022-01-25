@@ -33,6 +33,10 @@ module.exports = {
 				replacement: "vagina"
 			},
 			{
+				string: "Female Genitalia - Covered",
+				replacement: "covered vagina"
+			},
+			{
 				string: "Female Breast - Exposed",
 				replacement: "breast"
 			},
