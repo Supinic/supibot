@@ -256,7 +256,7 @@ module.exports = {
 			}
 
 			case "copypasta": {
-				const channelID = context.channel?.ID ?? "whipsers";
+				const channelID = context.channel?.ID ?? "whispers";
 				this.data.repeatedPastas ??= {};
 				this.data.repeatedPastas[channelID] ??= [];
 
@@ -269,6 +269,24 @@ module.exports = {
 
 				return {
 					reply: pasta
+				};
+			}
+
+			case "gimi":
+			case "kimi": {
+				const channelID = context.channel?.ID ?? "whispers";
+				this.data.repeatedGimi ??= {};
+				this.data.repeatedGimi[channelID] ??= [];
+
+				const quotes = require("./kimi.json");
+				const availableQuotes = quotes.filter(i => !this.data.repeatedGimi[channelID].includes(i));
+
+				const quote = sb.Utils.randArray(availableQuotes);
+				this.data.repeatedGimi[channelID].unshift(quote);
+				this.data.repeatedGimi[channelID].splice(pastaRepeatThreshold);
+
+				return {
+					reply: quote
 				};
 			}
 
