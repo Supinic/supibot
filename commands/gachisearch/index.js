@@ -68,6 +68,23 @@ module.exports = {
 			};
 		}
 
+		const directMatch = await sb.Query.getRecordset(rs => rs
+			.select("ID", "Name")
+			.from("music", "Track")
+			.where("Link = %s", query)
+			.limit(1)
+			.single()
+		);
+
+		if (directMatch) {
+			const link = `https://supinic.com/track/detail/${directMatch.ID}`;
+			return {
+				reply: (context.params.linkOnly)
+					? link
+					: `"${directMatch.Name}" - ${link}`
+			};
+		}
+
 		const data = await sb.Query.raw(sb.Utils.tag.trim `
 			SELECT
 				ID,
