@@ -8,12 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function vod (context, target, type) {
-		if ((target === "current" || target === "exact") && !type) {
-			type = target;
-			target = null;
-		}
-
+	Code: (async function vod (context, target) {
 		if (!target) {
 			if (context.platform.Name === "twitch") {
 				if (!context.channel) {
@@ -53,32 +48,28 @@ module.exports = {
 			};
 		}
 
-		let liveString = "";
-		const isLive = (await sb.Command.get("streaminfo").execute(context, target)).reply;
-		if (isLive && !isLive.includes("not exist") && !isLive.includes("offline")) {
-			liveString = " 🔴";
-		}
+		const streamResponse = await sb.Got("Helix", {
+			url: "streams",
+			searchParams: {
+				user_id: channelID
+			}
+		});
 
 		const data = vod.data[0];
 		const delta = sb.Utils.timeDelta(new sb.Date(data.created_at));
-		const prettyDuration = data.duration.match(/\d+[hms]/g).join(", ");
+		const isLive = Boolean(streamResponse.body.data[0]);
 
-		if (type === "current" || type === "exact") {
-			if (!liveString) {
-				return {
-					reply: `Channel is not currently live, no current/exact timestamp supported.`
-				};
-			}
-
-			const offset = (type === "current") ? 90 : 0;
+		if (isLive) {
+			const offset = 90; // Implicitly offset the VOD by several seconds, to account for inaccuracies
 			const stamp = sb.Utils.parseDuration(data.duration, { target: "sec" }) - offset;
 			return {
-				reply: `${sb.Utils.capitalize(type)} VOD timestamp: ${data.url}?t=${(stamp < 0) ? 0 : stamp}s`
+				reply: `Started ${delta}: ${data.title}  ${data.url}?t=${(stamp < 0) ? 0 : stamp}s`
 			};
 		}
 
+		const prettyDuration = data.duration.match(/\d+[hms]/g).join(", ");
 		return {
-			reply: `${data.title} (length: ${prettyDuration}) - published ${delta} ${data.url}${liveString}`
+			reply: `Published ${delta}: ${data.title} (length: ${prettyDuration}) ${data.url}`
 		};
 	}),
 	Dynamic_Description: null
