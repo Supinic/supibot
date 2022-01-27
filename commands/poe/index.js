@@ -202,18 +202,18 @@ module.exports = {
 	}),
 	Code: (async function poe (context, type, ...args) {
 		if (!type) {
-			const announcement = new sb.Date("2021-10-14 21:00");
+			const announcement = new sb.Date("2021-01-27 20:00");
 			if (announcement > Date.now()) {
 				return {
-					reply: `The Scourge league will be revealed ${sb.Utils.timeDelta(announcement)}.`
+					reply: `The Archnemesis league will be revealed ${sb.Utils.timeDelta(announcement)}.`
 				};
 			}
 
-			const scourge = new sb.Date("2021-10-22 21:00");
+			const scourge = new sb.Date("2021-02-04 21:00");
 			return {
 				reply: (scourge > Date.now())
-					? `The Scourge league launches ${sb.Utils.timeDelta(scourge)}.`
-					: "The Scourge league has launched! Go and play!"
+					? `The Archnemesis league launches ${sb.Utils.timeDelta(scourge)}.`
+					: "The Archnemesis league has launched! Go and play!"
 			};
 		}
 
