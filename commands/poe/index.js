@@ -209,10 +209,10 @@ module.exports = {
 				};
 			}
 
-			const scourge = new sb.Date("2022-02-04 21:00");
+			const archnemesis = new sb.Date("2022-02-04 21:00");
 			return {
-				reply: (scourge > Date.now())
-					? `The Archnemesis league launches ${sb.Utils.timeDelta(scourge)}.`
+				reply: (archnemesis > Date.now())
+					? `The Archnemesis league launches ${sb.Utils.timeDelta(archnemesis)}.`
 					: "The Archnemesis league has launched! Go and play!"
 			};
 		}
