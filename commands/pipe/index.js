@@ -89,10 +89,7 @@ module.exports = {
 
 			const { aliasTry } = context.append;
 			if (commandData.Name === "alias" && aliasTry?.userName && (cmdArgs[0] === "run" || commandString === "$")) {
-				cmdArgs[0] = "try";
-				cmdArgs.splice(1, 0, aliasTry.userName);
-
-				invocations[i] = [commandString, ...cmdArgs].join(" ");
+				invocations[i] = ["alias", "try", aliasTry.userName, ...cmdArgs].join(" ");
 			}
 		}
 
