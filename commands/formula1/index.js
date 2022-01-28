@@ -6,7 +6,8 @@ module.exports = {
 	Description: "Aggregate command about anything regarding Formula 1.",
 	Flags: ["mention","pipe"],
 	Params: [
-		{ name: "season", type: "number" }
+		{ name: "season", type: "number" },
+		{ name: "year", type: "number" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => {
@@ -142,7 +143,7 @@ module.exports = {
 					return await fetchNextRaceDetail();
 				}
 
-				const year = context.params.season ?? now.year;
+				const year = context.params.season ?? context.params.year ?? now.year;
 				const query = rest.join(" ").toLowerCase();
 				const race = await fetchRace(year, "name", query);
 				if (!race) {
@@ -223,7 +224,7 @@ module.exports = {
 
 			case "wdc":
 			case "driverStandings": {
-				const year = context.params.season ?? now.year;
+				const year = context.params.season ?? context.params.year ?? now.year;
 				const standings = await fetchDriverStandings(year);
 				if (standings.length === 0) {
 					return {
@@ -240,7 +241,7 @@ module.exports = {
 
 			case "wcc":
 			case "constructorStandings": {
-				const year = context.params.season ?? now.year;
+				const year = context.params.season ?? context.params.year ?? now.year;
 				const standings = await fetchConstructorStandings(year);
 				if (standings.length === 0) {
 					return {
@@ -309,6 +310,9 @@ module.exports = {
 		"",
 
 		`<code>${prefix}f1 race (name)</code>`,
+		`<code>${prefix}f1 race (country)</code>`,
+		`<code>${prefix}f1 race (circuit)</code>`,
+		`<code>${prefix}f1 season:1990 race (name)</code>`,
 		`<code>${prefix}f1 year:1990 race (name)</code>`,
 		"Searches for info about a race given by its name or country.",
 		"Use <code>season</code> to select a season, otherwise defaults to current year.",
@@ -316,18 +320,24 @@ module.exports = {
 
 		`<code>${prefix}f1 wdc</code>`,
 		`<code>${prefix}f1 driverStandings</code>`,
-		`<code>${prefix}f1 year:1990 driverStandings (name)</code>`,
+		`<code>${prefix}f1 season:1990 wdc (name)</code>`,
+		`<code>${prefix}f1 year:1990 wdc (name)</code>`,
 		"Posts a summary for the season's WDC - driver standings.",
 		"",
 
 		`<code>${prefix}f1 wcc</code>`,
 		`<code>${prefix}f1 constructorStandings</code>`,
-		`<code>${prefix}f1 year:1990 constructorStandings (name)</code>`,
+		`<code>${prefix}f1 season:1990 wcc (name)</code>`,
+		`<code>${prefix}f1 year:1990 wcc (name)</code>`,
 		"Posts a summary for the season's WCC - constructor standings.",
 		"",
 
 		`<code>${prefix}f1 copypasta</code>`,
 		"Posts a random F1 related copypasta.",
+		"",
+
+		`<code>${prefix}f1 gimi</code>`,
+		"Posts a random Kimi Räikkönen related quote or radio comms.",
 		""
 	])
 };
