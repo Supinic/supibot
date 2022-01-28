@@ -300,9 +300,9 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async (prefix) => [
-		"All things F1-related in a single command!",
-		`Powered by <a href="https://ergast.com/mrd/">Ergas Developer API</a>`,
-		`"If you have any suggestions or addition ideas or anything, make sure to let me know via the <a href="https://supinic.com/bot/command/detail/suggest">$suggest</a> command!`,
+		"All things F1-related in a single command.",
+		`Powered by <a href="https://ergast.com/mrd/">Ergast Developer API</a>`,
+		`If you have any suggestions, addition ideas or anything else, make sure to let me know via the <a href="https://supinic.com/bot/command/detail/suggest">$suggest</a> command!`,
 		"",
 
 		`<code>${prefix}f1</code>`,
@@ -318,17 +318,17 @@ module.exports = {
 		"Use <code>season</code> to select a season, otherwise defaults to current year.",
 		"",
 
-		`<code>${prefix}f1 wdc</code>`,
 		`<code>${prefix}f1 driverStandings</code>`,
-		`<code>${prefix}f1 season:1990 wdc (name)</code>`,
-		`<code>${prefix}f1 year:1990 wdc (name)</code>`,
+		`<code>${prefix}f1 wdc</code>`,
+		`<code>${prefix}f1 season:1990 wdc</code>`,
+		`<code>${prefix}f1 year:1990 wdc</code>`,
 		"Posts a summary for the season's WDC - driver standings.",
 		"",
 
 		`<code>${prefix}f1 wcc</code>`,
 		`<code>${prefix}f1 constructorStandings</code>`,
-		`<code>${prefix}f1 season:1990 wcc (name)</code>`,
-		`<code>${prefix}f1 year:1990 wcc (name)</code>`,
+		`<code>${prefix}f1 season:1990 wcc</code>`,
+		`<code>${prefix}f1 year:1990 wcc</code>`,
 		"Posts a summary for the season's WCC - constructor standings.",
 		"",
 
@@ -337,7 +337,7 @@ module.exports = {
 		"",
 
 		`<code>${prefix}f1 gimi</code>`,
-		"Posts a random Kimi Räikkönen related quote or radio comms.",
+		"Posts a random Kimi Räikkönen quote or radio comms.",
 		""
 	])
 };
