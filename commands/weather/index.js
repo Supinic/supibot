@@ -362,10 +362,10 @@ module.exports = {
 			humidity: `Humidity: ${target.humidity}%.`,
 			pressure: `Air pressure: ${target.pressure} hPa.`,
 			windSpeed: (target.wind_speed)
-				? `${getWindDirection(target.wind_deg)} wind speed: ${sb.Utils.round(target.wind_speed * 3.6)} km/h.`
+				? `${getWindDirection(target.wind_deg)} wind speed: ${target.wind_speed} m/s.`
 				: "No wind.",
 			windGusts: (target.wind_gust)
-				? `Wind gusts: up to ${sb.Utils.round(target.wind_gust * 3.6)} km/h.`
+				? `Wind gusts: up to ${target.wind_gust} m/s.`
 				: "No wind gusts.",
 			sun: ""
 		};
