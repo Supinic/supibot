@@ -115,6 +115,7 @@ module.exports = {
 					platform: context.platform.Name,
 					tee: Object.freeze([...context.tee]),
 					customData: sb.Utils.deepFreeze({
+						getKeys: () => Object.keys(customDeveloperData),
 						set: (key, value) => {
 							if (typeof key !== "string") {
 								throw new Error("Only strings are available as keys");
