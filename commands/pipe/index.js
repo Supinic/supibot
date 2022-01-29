@@ -208,6 +208,7 @@ module.exports = {
 		}
 
 		return {
+			cooldown: (context.append.pipe) ? null : this.Cooldown,
 			hasExternalInput,
 			// skipExternalPrefix: Boolean(lastCommand.Flags.skipBanphrase),
 			replyWithPrivateMessage: Boolean(finalResult?.replyWithPrivateMessage),
