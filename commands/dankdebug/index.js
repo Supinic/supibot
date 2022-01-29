@@ -123,6 +123,9 @@ module.exports = {
 							else if (value && (typeof value === "object" || typeof value === "function")) {
 								throw new Error("Only primitives are accepted as object values");
 							}
+							else if (customDeveloperData[key] && !Object.hasOwn(customDeveloperData, key)) {
+								throw new Error("Cannot overwrite prototype properties");
+							}
 
 							customDeveloperDataChanged = true;
 							customDeveloperData[key] = value;
