@@ -431,6 +431,14 @@ module.exports = class Filter extends require("./template.js") {
 				const targetType = (optout.Invocation) ? "command invocation" : "command";
 				const targetAmount = (optout.Command) ? "this" : "every";
 
+				let string;
+				if (user.ID === optout.User_Alias) {
+					string = `🚫 You have opted out from being the target of ${targetAmount} ${targetType}! This includes yourself! 😅`;
+				}
+				else {
+					string = `🚫 That user has opted out from being the target of ${targetAmount} ${targetType}!`;
+				}
+
 				return {
 					success: false,
 					reason: "opt-out",
@@ -438,7 +446,7 @@ module.exports = class Filter extends require("./template.js") {
 					reply: Filter.getReason({
 						reason: optout.Reason,
 						response: optout.Response,
-						string: `🚫 That user has opted out from being the target of ${targetAmount} ${targetType}!`
+						string
 					})
 				};
 			}
