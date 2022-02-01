@@ -81,9 +81,8 @@ module.exports = {
 	})),
 	Code: (async function alias (context, type, ...args) {
 		if (context.invocation === "$") {
-			// turning $$ (alias) => $alias try (username) (alias)
-			args = [context.user.Name, type, ...args]; // This the command name
-			type = "try"; // This is the implicit subcommand
+			args = [type, ...args]; // This the command name
+			type = "run"; // This is the implicit subcommand
 		}
 
 		if (!type) {
