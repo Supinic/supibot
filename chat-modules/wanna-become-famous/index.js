@@ -26,7 +26,7 @@ module.exports = {
 		}
 
 		const { client } = context.channel.Platform;
-		const emote = await context.channel.getBestAvailableEmote(["NOIDONTTHINKSO", "forsenSmug", "RarePepe"], "😅");
+		const emote = await context.channel.getBestAvailableEmote(["NOIDONTTHINKSO", "forsenSmug", "supiniNOIDONTTHINKSO", "RarePepe"], "😅");
 		if (!context.user && context.raw?.user) {
 			const name = context.raw.user;
 			await client.ban(context.channel.Name, name, type);
