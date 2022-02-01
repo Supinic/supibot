@@ -79,6 +79,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			this.client.joinAll(channelList);
 		}
 
+		this.data.savingUserID = null;
 		this.data.crons = [
 			new sb.Cron({
 				Name: "channels-live-status",
@@ -635,7 +636,12 @@ module.exports = class TwitchController extends require("./template.js") {
 		else if (userData.Twitch_ID === null && userData.Discord_ID !== null) {
 			if (!this.platform.Data.sendVerificationChallenge) {
 				// No verification challenge - just assume it's correct
-				await userData.saveProperty("Twitch_ID", senderUserID);
+				if (this.data.savingUserID === null) {
+					this.data.savingUserID = userData.saveProperty("Twitch_ID", senderUserID);
+					await this.data.savingUserID;
+
+					this.data.savingUserID === null;
+				}
 			}
 			else {
 				if (!message.startsWith(sb.Command.prefix)) {
@@ -658,8 +664,11 @@ module.exports = class TwitchController extends require("./template.js") {
 				return;
 			}
 		}
-		else if (userData.Twitch_ID === null && userData.Discord_ID === null) {
-			await userData.saveProperty("Discord_ID", senderUserID);
+		else if (userData.Twitch_ID === null && userData.Discord_ID === null && this.data.savingUserID === null) {
+			this.data.savingUserID = userData.saveProperty("Twitch_ID", senderUserID);
+			await this.data.savingUserID;
+
+			this.data.savingUserID = null;
 		}
 		else if (userData.Twitch_ID !== senderUserID) {
 			// Mismatch between senderUserID and userData.Twitch_ID means someone renamed into a different
