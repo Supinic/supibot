@@ -96,7 +96,7 @@ module.exports = {
 		}
 
 		if (importedText) {
-			script = `${importedText}${script}`;
+			script = `${importedText}\n${script}`;
 		}
 
 		let customDeveloperDataChanged = false;
