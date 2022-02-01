@@ -404,6 +404,7 @@ module.exports = class Reminder extends require("./template.js") {
 			else {
 				const fromUserData = await sb.User.get(reminder.User_From, false);
 				const channelName = channelData.getFullName();
+				const message = `@${fromUserData.Name}, @${targetUserData.Name} just typed in channel ${channelName}`;
 
 				if (reminder.Private_Message) {
 					let platform = null;
@@ -414,15 +415,16 @@ module.exports = class Reminder extends require("./template.js") {
 						platform = sb.Platform.get(reminder.Platform);
 					}
 
-					await platform.pm(
-						`@${fromUserData.Name}, @${targetUserData.Name} just typed in channel ${channelName}`,
-						fromUserData
-					);
+					await platform.pm(message, fromUserData);
 				}
 				else {
-					await sb.Channel.get(reminder.Channel).send(
-						`@${fromUserData.Name}, @${targetUserData.Name} just typed in channel ${channelName}`
-					);
+					const channelData = sb.Channel.get(reminder.Channel);
+					const fixedMessage = await channelData.prepareMessage(message, {
+						returnBooleanOnFail: true,
+						skipLengthCheck: true
+					});
+
+					await channelData.send(fixedMessage);
 				}
 			}
 		}
