@@ -6,6 +6,7 @@
 module.exports = class ChatModule extends require("./template.js") {
 	// <editor-fold defaultstate="collapsed" desc="=== INSTANCE PROPERTIES ===">
 
+	/** @deprecated */
 	ID;
 	Name;
 	/** @type {ChatModuleEvent[]} */
@@ -146,23 +147,12 @@ module.exports = class ChatModule extends require("./template.js") {
 		this.attachmentReferences = null;
 
 		this.Events = null;
-		this.ID = null;
 		this.Code = null;
 	}
 
 	async serialize (options = {}) {
-		if (typeof this.ID !== "number") {
-			throw new sb.Error({
-				message: "Cannot serialize an anonymous ChatModule",
-				args: {
-					ID: this.ID,
-					Name: this.Name
-				}
-			});
-		}
-
 		const row = await sb.Query.getRow("chat_data", "Chat_Module");
-		await row.load(this.ID);
+		await row.load(this.Name);
 
 		return await super.serialize(row, ChatModule.#serializableProperties, options);
 	}
@@ -193,10 +183,6 @@ module.exports = class ChatModule extends require("./template.js") {
 	static get (identifier) {
 		if (identifier instanceof ChatModule) {
 			return identifier;
-		}
-		else if (typeof identifier === "number" || typeof identifier === "symbol") {
-			const target = ChatModule.data.find(i => i.ID === identifier);
-			return target ?? null;
 		}
 		else if (typeof identifier === "string") {
 			const target = ChatModule.data.find(i => i.Name === identifier);
@@ -322,7 +308,7 @@ module.exports = class ChatModule extends require("./template.js") {
 			const args = ChatModule.parseModuleArgs(attachment.Args);
 			if (!args) {
 				console.warn("Reattaching module failed", {
-					module: module.ID,
+					module: module.Name,
 					channel: channelData.ID
 				});
 				continue;
@@ -357,7 +343,7 @@ module.exports = class ChatModule extends require("./template.js") {
 
 	static async #fetch (specificNames) {
 		return await sb.Query.getRecordset(rs => {
-			rs.select("Chat_Module.ID AS Module_ID")
+			rs.select("Chat_Module.Name AS Module_Name")
 				.select("Chat_Module.*")
 				.select("Channel.ID AS Channel_ID")
 				.select("Channel_Chat_Module.Specific_Arguments AS Args")
@@ -368,7 +354,7 @@ module.exports = class ChatModule extends require("./template.js") {
 					sourceTable: "Chat_Module",
 					targetTable: "Channel",
 					referenceTable: "Channel_Chat_Module",
-					collapseOn: "Module_ID",
+					collapseOn: "Module_Name",
 					fields: ["Channel_ID", "Args"]
 				});
 
@@ -403,7 +389,7 @@ module.exports = class ChatModule extends require("./template.js") {
 			const args = ChatModule.parseModuleArgs(channelItem.Args);
 			if (!args) {
 				console.warn("Reattaching module failed", {
-					module: chatModule.ID,
+					module: chatModule.Name,
 					channel: channelItem.ID
 				});
 				continue;
