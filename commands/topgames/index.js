@@ -9,20 +9,18 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function topGames () {
-		const data = await sb.Got("Kraken", "games/top").json();
-		if (!Array.isArray(data.top)) {
+		const response = await sb.Got("Helix", "games/top");
+		if (response.statusCode !== 200 || response.body.data.length === 0) {
 			return {
 				success: false,
-				reply: "Twitch API returned no data..."
+				reply: `No data for top games are currently available on Twitch!`
 			};
 		}
-	
-		const games = data.top.map(i => (
-			`${i.game.name} (${sb.Utils.round(i.viewers / 1000, 1)}k)`
-		));
-		
+
+		const emote = await context.getBestAvailableEmote(["Clueless"], "😕 ");
+		const games = response.body.data.map(i => i.game.name);
 		return {
-			reply: `Top categories on Twitch (sorted by viewers): ${games.join(", ")}`
+			reply: `Top categories on Twitch (sorted by viewers ${emote} but Twitch doesn't tell us how many): ${games.join(", ")}`
 		};
 	}),
 	Dynamic_Description: null

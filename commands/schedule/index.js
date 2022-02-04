@@ -83,8 +83,14 @@ module.exports = {
 		else {
 			const firstSegmentStart = new sb.Date(segments[0].start_time);
 			if (firstSegmentStart < sb.Date.now()) { // First stream segment should already be underway
-				const liveData = await sb.Got("Kraken", `streams/${channelID}`).json();
-				const isLive = Boolean(liveData.stream);
+				const response = await sb.Got("Helix", {
+					url: "streams",
+					searchParams: {
+						user_id: channelID
+					}
+				});
+
+				const isLive = Boolean(response.statusCode === 200 && response.body.data.length !== 0);
 
 				if (!isLive) { // Stream is not live - use the first segment (when it should have started), and mention that stream is late
 					const emote = await context.getBestAvailableEmote(["Weirdga", "WeirdChamp", "supiniWeirdga", "FeelsWeirdMan"], "🤨");
