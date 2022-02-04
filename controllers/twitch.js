@@ -640,7 +640,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					this.data.savingUserID = userData.saveProperty("Twitch_ID", senderUserID);
 					await this.data.savingUserID;
 
-					this.data.savingUserID === null;
+					this.data.savingUserID = null;
 				}
 			}
 			else {
