@@ -18,7 +18,7 @@ module.exports = {
 		}
 
 		const emote = await context.getBestAvailableEmote(["Clueless"], "😕 ");
-		const games = response.body.data.map(i => i.game.name);
+		const games = response.body.data.map(i => i.name);
 		return {
 			reply: `Top categories on Twitch (sorted by viewers ${emote} but Twitch doesn't tell us how many): ${games.join(", ")}`
 		};
