@@ -8,7 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function topGames () {
+	Code: (async function topGames (context) {
 		const response = await sb.Got("Helix", "games/top");
 		if (response.statusCode !== 200 || response.body.data.length === 0) {
 			return {
