@@ -260,7 +260,7 @@ module.exports = class ChatModule extends require("./template.js") {
 		const failed = [];
 		const existingModules = list.map(i => ChatModule.get(i)).filter(Boolean);
 
-		const chatModulePath = require.resolve("supibot-package-manager/chat-module/");
+		const chatModulePath = require.resolve("supibot-package-manager/chat-modules/");
 		delete require.cache[chatModulePath];
 
 		for (const originalChatModule of existingModules) {
@@ -275,7 +275,7 @@ module.exports = class ChatModule extends require("./template.js") {
 
 			let path;
 			try {
-				path = require.resolve(`supibot-package-manager/chat-module/${identifier}`);
+				path = require.resolve(`supibot-package-manager/chat-modules/${identifier}`);
 				delete require.cache[path];
 			}
 			catch {
