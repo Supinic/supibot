@@ -74,8 +74,20 @@ module.exports = class Controller {
 		const finalMessage = await controller.prepareMessage(fixedMessage, mirrorChannelData, options);
 
 		if (finalMessage) {
-			await mirrorChannelData.send(finalMessage);
+			try {
+				await mirrorChannelData.send(finalMessage);
+			}
+			catch (e) {
+				return {
+					error: e,
+					success: false
+				};
+			}
 		}
+
+		return {
+			success: true
+		};
 	}
 
 	fetchUserList () {
