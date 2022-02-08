@@ -74,8 +74,18 @@ module.exports = {
 			since = "in the past 24 hours";
 		}
 
+		let who;
+		if (self) {
+			who = "You have";
+		}
+		else if (user && username !== sb.User.normalizeUsername(user)) {
+			who = "They have";
+		}
+		else {
+			who = `GitHub user ${username} has`;
+		}
+
 		const suffix = (commitCount === 1) ? "" : "s";
-		const who = (self) ? "You have" : `GitHub user ${username} has`;
 		return {
 			reply: `${who} created ${commitCount} commit${suffix} ${since}.`
 		};
