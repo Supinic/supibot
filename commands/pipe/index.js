@@ -155,7 +155,7 @@ module.exports = {
 				else {
 					return {
 						...result,
-						reply: `Your pipe failed because the "${cmd}" command is currently on cooldown!`
+						reply: result.reply ?? `Your pipe failed because the "${cmd}" command is currently on cooldown!`
 					};
 				}
 			}
