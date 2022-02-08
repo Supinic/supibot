@@ -32,5 +32,6 @@ module.exports = {
 			console.warn("Redemption has no/invalid message configured", { channel: channel.ID });
 		}
 	}),
-	Author: "supinic"
+	Global: false,
+	Platform: null
 };

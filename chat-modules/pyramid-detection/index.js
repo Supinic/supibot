@@ -15,11 +15,11 @@ module.exports = {
 		else if (!user || user.Name === channel.Platform.Self_Name) {
 			return;
 		}
-	
+
 		if (!this.data.pyramids) {
 			this.data.pyramids = {};
 		}
-	
+
 		const normalMessage = `${message.trim().replace(/\s+/g, " ")} `;
 		if (!this.data.pyramids[channel.ID]) {
 			this.data.pyramids[channel.ID] = {
@@ -29,10 +29,10 @@ module.exports = {
 				ascending: true
 			};
 		}
-	
+
 		const pyramid = this.data.pyramids[channel.ID];
 		const previousLevel = pyramid.level;
-	
+
 		if (pyramid.ascending && pyramid.base.repeat(pyramid.level + 1) === normalMessage) {
 			pyramid.maxLevel++;
 			pyramid.level++;
@@ -41,12 +41,12 @@ module.exports = {
 			pyramid.ascending = false;
 			pyramid.level--;
 		}
-	
+
 		if (previousLevel !== pyramid.level && !pyramid.ascending && pyramid.level === 1) {
 			if (pyramid.maxLevel >= threshold) {
 				await channel.send(`${user.Name} finished a ${pyramid.maxLevel} tall pyramid Kappa Clap`);
 			}
-	
+
 			pyramid.maxLevel = 1;
 			pyramid.ascending = true;
 			pyramid.level = 1;
@@ -56,12 +56,13 @@ module.exports = {
 			if (pyramid.maxLevel >= threshold) {
 				await channel.send(`${user.Name} ruined a ${pyramid.maxLevel} tall pyramid PepeLaugh Clap`);
 			}
-	
+
 			pyramid.maxLevel = 1;
 			pyramid.ascending = true;
 			pyramid.level = 1;
 			pyramid.base = normalMessage;
 		}
 	}),
-	Author: "supinic"
+	Global: false,
+	Platform: null
 };

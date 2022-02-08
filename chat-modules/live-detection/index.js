@@ -22,5 +22,6 @@ module.exports = {
 			platformData.pm(`Channel ${channel.Name} has just gone live! https://twitch.tv/${channel.Name}`, userData);
 		}
 	}),
-	Author: "supinic"
+	Global: true,
+	Platform: "twitch"
 };

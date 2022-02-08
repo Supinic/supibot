@@ -49,5 +49,6 @@ module.exports = {
 			await context.channel.send(`${emote} ${type} again`);
 		}
 	}),
-	Author: "supinic"
+	Global: false,
+	Platform: null
 };

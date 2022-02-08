@@ -15,5 +15,6 @@ module.exports = {
 			cron.start();
 		}
 	}),
-	Author: "supinic"
+	Global: false,
+	Platform: null
 };

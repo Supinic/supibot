@@ -21,5 +21,6 @@ module.exports = {
 			await sb.Platform.get("twitch").pm(pingMessage, await sb.User.get("supinic"));
 		}
 	}),
-	Author: "supinic"
+	Global: true,
+	Platform: null
 };

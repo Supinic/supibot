@@ -38,5 +38,6 @@ module.exports = {
 
 		this.data.timeout = now + 5000;
 	}),
-	Author: "supinic"
+	Global: false,
+	Platform: null
 };

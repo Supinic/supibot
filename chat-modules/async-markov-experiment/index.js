@@ -51,5 +51,6 @@ module.exports = {
 
 		markov.add(fixedMessage);
 	}),
-	Author: "supinic"
+	Global: false,
+	Platform: null
 };

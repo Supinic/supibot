@@ -20,5 +20,6 @@ module.exports = {
 			await channel.saveProperty("Mode", "Write");
 		}
 	}),
-	Author: "supinic"
+	Global: false,
+	Platform: null
 };

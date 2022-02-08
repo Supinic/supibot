@@ -65,5 +65,6 @@ module.exports = {
 			}
 		}
 	}),
-	Author: "supinic"
+	Global: false,
+	Platform: null
 };

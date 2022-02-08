@@ -24,5 +24,6 @@ module.exports = {
 			intervals[channel.ID] = null;
 		}
 	}),
-	Author: "supinic"
+	Global: false,
+	Platform: null
 };

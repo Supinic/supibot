@@ -4,7 +4,7 @@ module.exports = {
 	Description: "This module manages channel mirrors so that they are only in effect when the channel is offline.",
 	Code: (async function offlineOnlyMirror (context) {
 		const { event, channel } = context;
-		
+
 		if (event === "online" && channel.Mirror !== null && !channel.Data.offlineOnlyMirror) {
 			channel.Data.offlineOnlyMirror = channel.Mirror;
 
@@ -27,5 +27,6 @@ module.exports = {
 			});
 		}
 	}),
-	Author: "supinic"
+	Global: false,
+	Platform: null
 };
