@@ -9,7 +9,61 @@ module.exports = {
 		{ name: "gameID", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: (() => ({
+		refetchAlgoliaInfo: async () => {
+			let configRowsAdded = false;
+			if (!sb.Config.has("ALGOLIA_STEAMDB_APP_ID", false)) {
+				const row = await sb.Query.getRow("data", "Config");
+				row.setValues({
+					Name: "ALGOLIA_STEAMDB_APP_ID",
+					Type: "string",
+					Editable: true
+				});
+
+				await row.save({ skipLoad: true });
+				configRowsAdded = true;
+			}
+			if (!sb.Config.has("ALGOLIA_STEAMDB_API_KEY", false)) {
+				const row = await sb.Query.getRow("data", "Config");
+				row.setValues({
+					Name: "ALGOLIA_STEAMDB_API_KEY",
+					Type: "string",
+					Editable: true
+				});
+
+				await row.save({ skipLoad: true });
+				configRowsAdded = true;
+			}
+
+			if (configRowsAdded) {
+				await sb.Config.reloadData();
+			}
+
+			const response = await sb.Got("FakeAgent", {
+				url: "https://steamdb.info/static/js/instantsearch.js",
+				responseType: "text"
+			});
+
+			if (response.statusCode !== 200) {
+				return {
+					success: false
+				};
+			}
+
+			const match = response.body.match(/algoliasearch\("(.*?)"\s*,\s*"(.*?)"/);
+			const appID = match[1];
+			const apiKey = match[2];
+
+			await Promise.all([
+				sb.Config.set("ALGOLIA_STEAMDB_APP_ID", appID),
+				sb.Config.set("ALGOLIA_STEAMDB_API_KEY", apiKey)
+			]);
+
+			return {
+				success: true
+			};
+		}
+	})),
 	Code: (async function steamGamePlayers (context, ...args) {
 		if (context.params.gameID) {
 			const gameID = Number(context.params.gameID);
@@ -52,8 +106,8 @@ module.exports = {
 			url: "https://94he6yatei-dsn.algolia.net/1/indexes/steamdb",
 			searchParams: {
 				"x-algolia-agent": "SteamDB+Autocompletion",
-				"x-algolia-application-id": "94HE6YATEI",
-				"x-algolia-api-key": "4e93170f248c58869d226a339bd6a52c",
+				"x-algolia-application-id": sb.Config.get("ALGOLIA_STEAMDB_APP_ID", false),
+				"x-algolia-api-key": sb.Config.get("ALGOLIA_STEAMDB_API_KEY", false),
 				hitsPerPage: 50,
 				attributesToSnippet: "null",
 				attributesToHighlight: "null",
@@ -65,6 +119,21 @@ module.exports = {
 				Referer: "https://steamdb.info/"
 			}
 		});
+
+		if (searchResponse.statusCode !== 200) {
+			const result = await this.staticData.refetchAlgoliaInfo();
+			if (result.success) {
+				return {
+					reply: `Could not fetch game data. I tried to fix it, and it seems to be okay now. Try again, please? 😊`
+				};
+			}
+			else {
+				return {
+					success: false,
+					reply: `Could not fetch game data! The source site is probably broken 😟`
+				};
+			}
+		}
 
 		const { hits } = searchResponse.body;
 		if (hits.length === 0) {
