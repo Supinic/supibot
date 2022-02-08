@@ -226,9 +226,7 @@ module.exports = class ChatModule extends require("./template.js") {
 			ChatModule.data.push(chatModule);
 
 			const moduleAttachmentData = attachmentData.filter(i => i.Chat_Module === chatModule.Name);
-			if (moduleAttachmentData.length !== 0) {
-				chatModule.#initialize(moduleAttachmentData);
-			}
+			chatModule.#initialize(moduleAttachmentData);
 		}
 	}
 
@@ -296,9 +294,7 @@ module.exports = class ChatModule extends require("./template.js") {
 			ChatModule.data.push(chatModule);
 
 			const moduleAttachmentData = attachmentData.filter(i => i.Chat_Module === chatModule.Name);
-			if (moduleAttachmentData.length !== 0) {
-				chatModule.#initialize(moduleAttachmentData);
-			}
+			chatModule.#initialize(moduleAttachmentData);
 		}
 
 		return {
