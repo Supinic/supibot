@@ -13,6 +13,8 @@ module.exports = class ChatModule extends require("./template.js") {
 	Events;
 	Active = true;
 	Code;
+	Global; // @todo refactor out into attachment table
+	Platform; // @todo refactor out into attachment table
 	attachmentReferences = [];
 	data = {};
 
@@ -20,49 +22,65 @@ module.exports = class ChatModule extends require("./template.js") {
 
 	/** @type {ChatModule[]} */
 	static data = [];
-	static #serializableProperties = {
-		Name: { type: "string" },
-		Events: { type: "descriptor" },
-		Description: { type: "string" },
-		Code: { type: "descriptor" },
-		Author: { type: "string" }
-	};
 
 	constructor (data) {
 		super();
 
-		this.ID = (typeof data.ID === "number")
-			? data.ID
-			: Symbol();
-
 		this.Name = data.Name;
 
-		try {
-			this.Events = JSON.parse(data.Events);
-			if (!Array.isArray(this.Events)) {
-				console.warn("Chat module has invalid events - not Array");
-				this.Events = [];
-			}
-		}
-		catch (e) {
-			console.warn("Chat module events parse failed", e);
+		this.Events = data.Events;
+		if (!Array.isArray(this.Events)) {
+			console.warn("Chat module has invalid events - not Array");
 			this.Events = [];
 		}
 
-		if (typeof data.Active === "boolean") {
-			this.Active = data.Active;
+		this.Code = data.Code;
+		this.Global = Boolean(data.Global);
+		this.Platform = (data.Platform) ? sb.Platform.get(data.Platform) : null;
+	}
+
+	#initialize (attachmentData) {
+		if (this.Global) {
+			if (this.attachmentReferences.length !== 0) {
+				return;
+			}
+
+			if (this.Platform) {
+				this.attach({
+					platform: this.Platform.ID
+				});
+			}
+			else {
+				this.attach({
+					platform: sb.Platform.data
+				});
+			}
+
+			return;
 		}
 
-		let fn;
-		try {
-			fn = eval(data.Code);
-		}
-		catch (e) {
-			console.warn("Chat module code parse failed", e);
-			fn = () => undefined;
+		for (const data of attachmentData) {
+			if (data.Chat_Module !== this.Name) {
+				continue;
+			}
+
+			const args = ChatModule.parseModuleArgs(data.Args);
+			if (!args) {
+				console.warn("Reattaching module failed", {
+					module: this.Name,
+					channel: data.Channel
+				});
+
+				continue;
+			}
+
+			this.attach({
+				args,
+				channel: sb.Channel.get(data.Channel)
+			});
 		}
 
-		this.Code = fn.bind(this);
+		return this;
 	}
 
 	attach (options) {
@@ -150,13 +168,6 @@ module.exports = class ChatModule extends require("./template.js") {
 		this.Code = null;
 	}
 
-	async serialize (options = {}) {
-		const row = await sb.Query.getRow("chat_data", "Chat_Module");
-		await row.load(this.Name);
-
-		return await super.serialize(row, ChatModule.#serializableProperties, options);
-	}
-
 	static getTargets (options) {
 		const result = [];
 		if (options.channel) {
@@ -197,24 +208,27 @@ module.exports = class ChatModule extends require("./template.js") {
 	}
 
 	static async loadData () {
-		const presentTables = await Promise.all([
-			sb.Query.isTablePresent("chat_data", "Chat_Module"),
-			sb.Query.isTablePresent("chat_data", "Channel_Chat_Module")
-		]);
-
-		if (presentTables.includes(false)) {
+		const hasConnectorTable = await sb.Query.isTablePresent("chat_data", "Channel_Chat_Module");
+		if (!hasConnectorTable) {
 			console.warn("Cannot load Chat_Module", {
 				reason: "missing-tables",
-				tables: ["Chat_Module", "Channel_Chat_Module"].filter((i, ind) => !presentTables[ind])
+				tables: "Channel_Chat_Module"
 			});
 
 			return;
 		}
 
-		const data = await ChatModule.#fetch();
-		for (const row of data) {
-			const chatModule = ChatModule.#create(row);
+		const { definitions } = await require("supibot-package-manager/chat-modules");
+		const attachmentData = await ChatModule.#fetch();
+
+		for (const definition of definitions) {
+			const chatModule = new ChatModule(definition);
 			ChatModule.data.push(chatModule);
+
+			const moduleAttachmentData = attachmentData.filter(i => i.Chat_Module === chatModule.Name);
+			if (moduleAttachmentData.length !== 0) {
+				chatModule.#initialize(moduleAttachmentData);
+			}
 		}
 	}
 
@@ -223,7 +237,7 @@ module.exports = class ChatModule extends require("./template.js") {
 			chatModule.destroy();
 		}
 
-		super.reloadData();
+		await super.reloadData();
 	}
 
 	static async reloadSpecific (...list) {
@@ -231,24 +245,66 @@ module.exports = class ChatModule extends require("./template.js") {
 			return false;
 		}
 
-		const existingModules = list.map(i => ChatModule.get(i)).filter(Boolean);
-		for (const chatModule of existingModules) {
-			const index = ChatModule.data.indexOf(chatModule);
+		const hasConnectorTable = await sb.Query.isTablePresent("chat_data", "Channel_Chat_Module");
+		if (!hasConnectorTable) {
+			console.warn("Cannot load Chat_Module", {
+				reason: "missing-tables",
+				tables: "Channel_Chat_Module"
+			});
 
-			chatModule.destroy();
+			return {
+				success: false,
+				reason: "no-attachment-table",
+				failed: []
+			};
+		}
+
+		const failed = [];
+		const existingModules = list.map(i => ChatModule.get(i)).filter(Boolean);
+
+		const chatModulePath = require.resolve("supibot-package-manager/chat-module/");
+		delete require.cache[chatModulePath];
+
+		for (const originalChatModule of existingModules) {
+			const index = ChatModule.data.indexOf(originalChatModule);
+			const identifier = originalChatModule.Name;
+
+			originalChatModule.destroy();
 
 			if (index !== -1) {
 				ChatModule.data.splice(index, 1);
 			}
+
+			let path;
+			try {
+				path = require.resolve(`supibot-package-manager/chat-module/${identifier}`);
+				delete require.cache[path];
+			}
+			catch {
+				failed.push({
+					identifier,
+					reason: "no-path"
+				});
+			}
 		}
 
-		const data = await ChatModule.#fetch(list);
-		for (const row of data) {
-			const chatModule = ChatModule.#create(row);
+		const { definitions } = await require("supibot-package-manager/chat-modules");
+		const attachmentData = await ChatModule.#fetch(list);
+
+		for (const definition of definitions) {
+			const chatModule = new ChatModule(definition);
 			ChatModule.data.push(chatModule);
+
+			const moduleAttachmentData = attachmentData.filter(i => i.Chat_Module === chatModule.Name);
+			if (moduleAttachmentData.length !== 0) {
+				chatModule.#initialize(moduleAttachmentData);
+			}
 		}
 
-		return true;
+		return {
+			success: true,
+			failed
+		};
 	}
 
 	static getChannelModules (channel) {
@@ -343,65 +399,18 @@ module.exports = class ChatModule extends require("./template.js") {
 
 	static async #fetch (specificNames) {
 		return await sb.Query.getRecordset(rs => {
-			rs.select("Chat_Module.Name AS Module_Name")
-				.select("Chat_Module.*")
-				.select("Channel.ID AS Channel_ID")
-				.select("Channel_Chat_Module.Specific_Arguments AS Args")
-				.from("chat_data", "Chat_Module")
-				.where("Active = %b", true)
-				.reference({
-					left: true,
-					sourceTable: "Chat_Module",
-					targetTable: "Channel",
-					referenceTable: "Channel_Chat_Module",
-					collapseOn: "Module_Name",
-					fields: ["Channel_ID", "Args"]
-				});
+			rs.select("Channel", "Chat_Module", "Specific_Arguments as Args")
+				.from("chat_data", "Channel_Chat_Module");
 
 			if (typeof specificNames === "string") {
-				rs.where("Chat_Module.Name = %s", specificNames);
+				rs.where("Chat_Module = %s", specificNames);
 			}
 			else if (Array.isArray(specificNames)) {
-				rs.where("Chat_Module.Name IN %s+", specificNames);
+				rs.where("Chat_Module IN %s+", specificNames);
 			}
 
 			return rs;
 		});
-	}
-
-	static #create (row) {
-		const chatModule = new ChatModule(row);
-		if (row.Global) {
-			if (row.Platform) {
-				chatModule.attach({
-					platform: row.Platform
-				});
-			}
-			else {
-				chatModule.attach({
-					platform: sb.Platform.data
-				});
-			}
-		}
-
-		const channelItems = row.Channel.filter(i => i.ID);
-		for (const channelItem of channelItems) {
-			const args = ChatModule.parseModuleArgs(channelItem.Args);
-			if (!args) {
-				console.warn("Reattaching module failed", {
-					module: chatModule.Name,
-					channel: channelItem.ID
-				});
-				continue;
-			}
-
-			chatModule.attach({
-				args,
-				channel: sb.Channel.get(channelItem.ID)
-			});
-		}
-
-		return chatModule;
 	}
 
 	static destroy () {
