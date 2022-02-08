@@ -96,15 +96,15 @@ module.exports = class TwitchController extends require("./template.js") {
 					const channelList = sb.Channel.getJoinableForPlatform("twitch").filter(i => i.Specific_ID);
 
 					while (counter < channelList.length) {
-						const slice = channelList.slice(counter, counter + batchSize).map(i => i.Specific_ID);
+						const sliceString = channelList
+							.slice(counter, counter + batchSize)
+							.map(i => `user_id=${i.Specific_ID}`)
+							.join("&");
+
 						promises.push(
-							sb.Got("Kraken", {
-								url: "streams",
-								responseType: "json",
-								searchParams: new sb.URLParams()
-									.set("channel", slice.join(","))
-									.set("limit", "100")
-									.toString()
+							sb.Got("Helix", {
+								url: `streams?${sliceString}`,
+								responseType: "json"
 							})
 						);
 
@@ -119,7 +119,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					}
 
 					const channelPromises = channelList.map(async (channelData) => {
-						const stream = streams.find(i => channelData.Specific_ID === String(i.channel._id));
+						const stream = streams.find(i => channelData.Specific_ID === String(i.user_id));
 						const streamData = await channelData.getStreamData();
 
 						if (!stream) {
@@ -135,13 +135,10 @@ module.exports = class TwitchController extends require("./template.js") {
 						}
 						else {
 							const currentStreamData = {
-								game: stream.game,
-								since: new sb.Date(stream.created_at),
-								status: stream.channel.status,
-								viewers: stream.viewers,
-								quality: `${stream.video_height}p`,
-								fps: stream.average_fps,
-								delay: stream.delay
+								game: stream.game_name,
+								since: new sb.Date(stream.started_at),
+								status: stream.title,
+								viewers: stream.viewer_count
 							};
 
 							if (!streamData.live) {
