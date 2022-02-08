@@ -7,7 +7,8 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "alerts", type: "boolean" },
-		{ name: "format", type: "string" }
+		{ name: "format", type: "string" },
+		{ name: "pollution", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
@@ -231,6 +232,36 @@ module.exports = {
 
 			formattedAddress = geoData.formattedAddress;
 			coords = geoData.coords;
+		}
+
+		if (context.params.pollution) {
+			const response = await sb.Got("GenericAPI", {
+				url: "https://api.openweathermap.org/data/2.5/air_pollution",
+				responseType: "json",
+				throwHttpErrors: false,
+				timeout: 60_000,
+				searchParams: {
+					lat: coords.lat,
+					lon: coords.lng,
+					appid: sb.Config.get("API_OPEN_WEATHER_MAP")
+				}
+			});
+
+			const [data] = response.body.list;
+			const index = data.main.aqi;
+			const { components } = data;
+			const place = (skipLocation) ? "(location hidden)" : formattedAddress;
+
+			const componentsString = Object.entries(components)
+				.map(([type, value]) => `${type.toUpperCase().replace("_", ".")}: ${value.toFixed(3)}`)
+				.join(", ");
+
+			return {
+				reply: sb.Utils.tag.trim `
+					Current pollution index for ${place}: ${index}.
+					Particles: ${componentsString}.				
+				`
+			};
 		}
 
 		const weatherKey = { type: "weather", coords: `${coords.lat}-${coords.lng}` };
@@ -575,6 +606,10 @@ module.exports = {
 			"Posts a summary of all weather alerts for the provided location - for the next 7 days.",
 			"",
 
+			`<code>${prefix}weather (place) pollution:true</code>`,
+			"Posts a summary of the current pollution for the provided location.",
+			"",
+
 			`<code>${prefix}weather (place) format:(custom format)</code>`,
 			`<code>${prefix}weather (place) format:temperature</code>`,
 			`<code>${prefix}weather (place) format:temperature,humidity,pressure</code>`,
@@ -600,10 +635,15 @@ module.exports = {
 
 			`<code>${prefix}weather @User <b>(hour+X/day+X)</b></code>`,
 			"Similar to above, shows the user's weather, but uses the hour/day specifier.",
+			"",
 
 			`<code>${prefix}weather @User alerts:true</code>`,
 			"Posts a summary of all weather alerts for the user's location - for the next 7 days.",
-			""
+			"",
+
+			`<code>${prefix}weather pollution:true</code>`,
+			`<code>${prefix}weather @User pollution:true</code>`,
+			"Posts a summary of the current pollution for your or the provided user's location."
 		];
 	})
 };
