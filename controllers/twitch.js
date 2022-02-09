@@ -1313,7 +1313,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				})),
 
 			...(sevenTv.value?.body ?? []).map(i => ({
-				id: i.id,
+				ID: i.id,
 				name: i.name,
 				type: "7tv",
 				global: true,
