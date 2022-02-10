@@ -15,6 +15,7 @@ module.exports = {
 		limit: 2000,
 		strings: {
 			"scheduled-incoming": "That person has too many timed reminders pending for them on that day!",
+			"scheduled-outgoing": "You have too many timed reminders pending on that day!",
 			"public-incoming": "That person has too many public reminders pending!",
 			"public-outgoing": "You have too many public reminders pending!",
 			"private-incoming": "That person has too many private reminders pending!",
