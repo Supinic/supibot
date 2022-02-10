@@ -493,7 +493,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		const channelName = channelData.Name;
 		message = message.replace(/\s+/g, " ").trim();
 
-		if (channelData.Mode === "Inactive" || channelData.Mode === "Read") {
+		if (channelData.Mode === "Inactive" || channelData.Mode === "Read" || channelData.Mode === "Last seen") {
 			return;
 		}
 
