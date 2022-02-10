@@ -33,9 +33,9 @@ const initialize = (async () => {
 	};
 
 	sb.User.data = new Map([
-		["supinic", new sb.User({ Name: "supinic" })],
-		["mm2pl", new sb.User({ Name: "mm2pl" })],
-		["mickeyzzzz", new sb.User({ Name: "mickeyzzzz" })]
+		["supinic", new sb.User({ Name: "supinic", Twitch_ID: "31400525" })],
+		["mm2pl", new sb.User({ Name: "mm2pl", Twitch_ID: "117691339" })],
+		["mickeyzzzz", new sb.User({ Name: "mickeyzzzz", Twitch_ID: "161967202" })]
 	]);
 
 	sb.AwayFromKeyboard = { checkActive: () => void 0 };
