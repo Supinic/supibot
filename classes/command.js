@@ -414,15 +414,20 @@ class Command extends require("./template.js") {
 	 * @returns {string}
 	 */
 	getDetailURL (options = {}) {
-		const baseURL = sb.Config.get("COMMAND_DETAIL_URL", false);
-		if (!baseURL) {
-			return "N/A";
-		}
-
 		if (options.useCodePath) {
-			return `${baseURL}/${encodeURIComponent(this.Name)}/code`;
+			const baseURL = sb.Config.get("COMMAND_DETAIL_CODE_URL", false);
+			if (!baseURL) {
+				return "N/A";
+			}
+
+			return `${baseURL}/${encodeURIComponent(this.Name)}/index.js`;
 		}
 		else {
+			const baseURL = sb.Config.get("COMMAND_DETAIL_URL", false);
+			if (!baseURL) {
+				return "N/A";
+			}
+
 			return `${baseURL}/${encodeURIComponent(this.Name)}`;
 		}
 	}
