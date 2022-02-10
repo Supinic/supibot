@@ -584,24 +584,45 @@ module.exports = class Reminder extends require("./template.js") {
 				});
 			}
 
-			const scheduledCount = (await sb.Query.getRecordset(rs => rs
-				.select("COUNT(*) AS Count")
-				.from("chat_data", "Reminder")
-				.where("Active = %b", true)
-				.where("Schedule IS NOT NULL")
-				.where("User_To = %n", userTo)
-				.where("DAY(Schedule) = %n", schedule.day)
-				.where("MONTH(Schedule) = %n", schedule.month)
-				.where("YEAR(Schedule) = %n", schedule.year)
-				.groupBy("YEAR(Schedule)", "MONTH(Schedule)", "DAY(Schedule)")
-				.single()
-				.flat("Count")
-			));
+			const [scheduledIncoming, scheduledOutgoing] = await Promise.all([
+				sb.Query.getRecordset(rs => rs
+					.select("COUNT(*) AS Count")
+					.from("chat_data", "Reminder")
+					.where("Active = %b", true)
+					.where("Schedule IS NOT NULL")
+					.where("User_To = %n", userTo)
+					.where("DAY(Schedule) = %n", schedule.day)
+					.where("MONTH(Schedule) = %n", schedule.month)
+					.where("YEAR(Schedule) = %n", schedule.year)
+					.groupBy("YEAR(Schedule)", "MONTH(Schedule)", "DAY(Schedule)")
+					.single()
+					.flat("Count")
+				),
+				sb.Query.getRecordset(rs => rs
+					.select("COUNT(*) AS Count")
+					.from("chat_data", "Reminder")
+					.where("Active = %b", true)
+					.where("Schedule IS NOT NULL")
+					.where("User_From = %n", userTo)
+					.where("DAY(Schedule) = %n", schedule.day)
+					.where("MONTH(Schedule) = %n", schedule.month)
+					.where("YEAR(Schedule) = %n", schedule.year)
+					.groupBy("YEAR(Schedule)", "MONTH(Schedule)", "DAY(Schedule)")
+					.single()
+					.flat("Count")
+				)
+			]);
 
-			if (scheduledCount >= incomingLimit) {
+			if (scheduledIncoming >= incomingLimit) {
 				return {
 					success: false,
 					cause: "scheduled-incoming"
+				};
+			}
+			else if (scheduledOutgoing >= outgoingLimit) {
+				return {
+					success: false,
+					cause: "scheduled-outgoing"
 				};
 			}
 		}
