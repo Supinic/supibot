@@ -620,7 +620,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		else if (userData.Twitch_ID === null && userData.Discord_ID !== null) {
 			if (!this.platform.Data.sendVerificationChallenge) {
 				// No verification challenge - just assume it's correct
-				if (this.data.updatingUserIDPromises < 5) {
+				if (this.data.updatingUserIDPromises < 10) {
 					this.data.updatingUserIDPromises++;
 					await userData.saveProperty("Twitch_ID", senderUserID);
 					this.data.updatingUserIDPromise--;
@@ -647,10 +647,15 @@ module.exports = class TwitchController extends require("./template.js") {
 				return;
 			}
 		}
-		else if (userData.Twitch_ID === null && userData.Discord_ID === null && this.data.updatingUserIDPromises < 5) {
-			this.data.updatingUserIDPromises++;
-			await userData.saveProperty("Twitch_ID", senderUserID);
-			this.data.updatingUserIDPromise--;
+		else if (userData.Twitch_ID === null && userData.Discord_ID === null) {
+			if (this.data.updatingUserIDPromises < 10) {
+				this.data.updatingUserIDPromises++;
+				await userData.saveProperty("Twitch_ID", senderUserID);
+				this.data.updatingUserIDPromise--;
+			}
+			else {
+				// try again later
+			}
 		}
 		else if (userData.Twitch_ID !== senderUserID) {
 			// Mismatch between senderUserID and userData.Twitch_ID means someone renamed into a different
@@ -658,7 +663,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			// for the current user-database structure and the event handler must be aborted.
 
 			const channelData = sb.Channel.get(channelName, this.platform);
-			if (channelData) {
+			if (channelData && sb.Command.is(message)) {
 				const notified = await userData.getDataProperty("twitch-userid-mismatch-notification");
 				if (!notified) {
 					await channelData.send(sb.Utils.tag.trim `
