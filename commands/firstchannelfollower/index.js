@@ -10,7 +10,8 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function firstChannelFollower (context, target) {
 		const { controller } = sb.Platform.get("twitch");
-		const channelID = await controller.getUserID(target ?? context.user.Name);
+		const name = target ?? context.user.Name;
+		const channelID = await controller.getUserID(name);
 		if (!channelID) {
 			return {
 				success: false,
@@ -18,34 +19,55 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("Kraken", {
-			url: `channels/${channelID}/follows`,
-			searchParams: {
-				direction: "asc"
-			}
+		const response = await sb.Got.gql({
+			url: "https://gql.twitch.tv/gql",
+			responseType: "json",
+			headers: {
+				Accept: "*/*",
+				"Accept-Language": "en-US",
+				Authorization: `OAuth ${sb.Config.get("TWITCH_GQL_OAUTH")}`,
+				"Client-ID": sb.Config.get("TWITCH_GQL_CLIENT_ID"),
+				"Client-Version": sb.Config.get("TWITCH_GQL_CLIENT_VERSION"),
+				"Content-Type": "text/plain;charset=UTF-8",
+				Referer: `https://dashboard.twitch.tv/`,
+				"X-Device-ID": sb.Config.get("TWITCH_GQL_DEVICE_ID")
+			},
+			query: ` 
+				query {
+					user(login: "${name}") {
+						followers(order: ASC, first: 1) {
+							edges {
+								followedAt
+								node {
+									login
+								}
+							}
+						}
+					}
+				}`
 		});
 
-		const { follows } = response.body;
-		const who = (!target || context.user.Name === target.toLowerCase())
+		const who = (context.user.Name === name.toLowerCase())
 			? "you"
 			: "they";
 
-		if (follows.length === 0) {
+		const { edges } = response.body.data.user.followers;
+		if (edges.length === 0) {
 			return {
 				reply: `${sb.Utils.capitalize(who)} don't have any followers.`
 			};
 		}
-		else {
-			const follow = follows[0];
-			const followUser = (follow.user.name.toLowerCase() === context.user.Name)
-				? "you!"
-				: follow.user.name;
 
-			const delta = sb.Utils.timeDelta(new sb.Date(follow.created_at), false, true);
-			return {
-				reply: `The longest following user ${who} have is ${followUser}, since ${delta}.`
-			};
-		}
+		const date = edges[0].followedAt;
+		const followUsername = edges[0].node.login;
+		const followUser = (followUsername.toLowerCase() === context.user.Name)
+			? "you!"
+			: followUsername;
+
+		const delta = sb.Utils.timeDelta(new sb.Date(date), false, true);
+		return {
+			reply: `The longest still following user ${who} have is ${followUser}, since ${delta}.`
+		};
 	}),
 	Dynamic_Description: (async (prefix) => [
 		"Fetches the first still active follower of a provided channel on Twitch.",

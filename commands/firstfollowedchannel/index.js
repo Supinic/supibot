@@ -10,7 +10,8 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function firstFollowedChannel (context, target) {
 		const { controller } = sb.Platform.get("twitch");
-		const channelID = await controller.getUserID(target ?? context.user.Name);
+		const name = target ?? context.user.Name;
+		const channelID = await controller.getUserID(name);
 		if (!channelID) {
 			return {
 				success: false,
@@ -18,47 +19,55 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("Kraken", {
-			url: `users/${channelID}/follows/channels`,
-			searchParams: {
-				// If the limit is 1, and the followed channel is banned, then no response will be used...
-
-				// UPDATE: apparently this can mess up the entire response if enough channels are N/A,
-				// so just skip the limit altogether...
-				// limit: "10"
-				direction: "asc",
-				sortby: "created_at"
-			}
+		const response = await sb.Got.gql({
+			url: "https://gql.twitch.tv/gql",
+			responseType: "json",
+			headers: {
+				Accept: "*/*",
+				"Accept-Language": "en-US",
+				Authorization: `OAuth ${sb.Config.get("TWITCH_GQL_OAUTH")}`,
+				"Client-ID": sb.Config.get("TWITCH_GQL_CLIENT_ID"),
+				"Client-Version": sb.Config.get("TWITCH_GQL_CLIENT_VERSION"),
+				"Content-Type": "text/plain;charset=UTF-8",
+				Referer: `https://dashboard.twitch.tv/`,
+				"X-Device-ID": sb.Config.get("TWITCH_GQL_DEVICE_ID")
+			},
+			query: ` 
+				query {
+					user(login: "${name}") {
+						follows(order: ASC, first: 1) {
+							edges {
+								followedAt
+								node {
+									login
+								}
+							}
+						}
+					}
+				}`
 		});
 
-		const { follows } = response.body;
-		if (!follows) {
-			return {
-				success: false,
-				reply: `No follow data found!`
-			};
-		}
-
-		const who = (!target || context.user.Name === target.toLowerCase())
+		const who = (context.user.Name === name.toLowerCase())
 			? "you"
 			: "they";
 
-		if (follows.length === 0) {
+		const { edges } = response.body.data.user.follows;
+		if (edges.length === 0) {
 			return {
 				reply: `${sb.Utils.capitalize(who)} don't follow anyone.`
 			};
 		}
-		else {
-			const follow = follows[0];
-			const followUser = (follow.channel.name.toLowerCase() === context.user.Name)
-				? "you!"
-				: follow.channel.name;
 
-			const delta = sb.Utils.timeDelta(new sb.Date(follow.created_at), false, true);
-			return {
-				reply: `The channel ${who} have followed the longest is ${followUser}, since ${delta}.`
-			};
-		}
+		const date = edges[0].followedAt;
+		const followUsername = edges[0].node.login;
+		const followUser = (followUsername.toLowerCase() === context.user.Name)
+			? "you!"
+			: followUsername;
+
+		const delta = sb.Utils.timeDelta(new sb.Date(date), false, true);
+		return {
+			reply: `The channel ${who} have followed the longest is ${followUser}, since ${delta}.`
+		};
 	}),
 	Dynamic_Description: (async (prefix) => [
 		"Fetches the first channel the provided user (or you) have ever followed on Twitch",
