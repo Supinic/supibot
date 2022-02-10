@@ -17,7 +17,7 @@ module.exports = {
 				searchParams: { name }
 			});
 
-			if (response.statusCode !== 200 && response.body.data.length === 0) {
+			if (response.statusCode !== 200 || response.body.data.length === 0) {
 				return {
 					success: false,
 					reply: `Provided game is not available on Twitch! Must use an exact match.`
