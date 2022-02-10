@@ -443,20 +443,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 		});
 
-		client.on("PRIVMSG", async (message) => {
-			try {
-				await this.handleMessage(message);
-			}
-			catch (e) {
-				throw new sb.Error({
-					cause: e,
-					message: "Twitch PRIVMSG handler failed",
-					args: {
-						rawIRCMessage: message.rawSource
-					}
-				});
-			}
-		});
+		client.on("PRIVMSG", async (message) => await this.handleMessage(message));
 
 		client.on("WHISPER", (message) => this.handleMessage(message));
 
