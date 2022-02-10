@@ -79,7 +79,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			this.client.joinAll(channelList);
 		}
 
-		this.data.savingUserID = null;
+		this.data.updatingUserIDPromises = 0;
 		this.data.crons = [
 			new sb.Cron({
 				Name: "channels-live-status",
@@ -633,11 +633,10 @@ module.exports = class TwitchController extends require("./template.js") {
 		else if (userData.Twitch_ID === null && userData.Discord_ID !== null) {
 			if (!this.platform.Data.sendVerificationChallenge) {
 				// No verification challenge - just assume it's correct
-				if (this.data.savingUserID === null) {
-					this.data.savingUserID = userData.saveProperty("Twitch_ID", senderUserID);
-					await this.data.savingUserID;
-
-					this.data.savingUserID = null;
+				if (this.data.updatingUserIDPromises < 5) {
+					this.data.updatingUserIDPromises++;
+					await userData.saveProperty("Twitch_ID", senderUserID);
+					this.data.updatingUserIDPromise--;
 				}
 			}
 			else {
@@ -661,16 +660,39 @@ module.exports = class TwitchController extends require("./template.js") {
 				return;
 			}
 		}
-		else if (userData.Twitch_ID === null && userData.Discord_ID === null && this.data.savingUserID === null) {
-			this.data.savingUserID = userData.saveProperty("Twitch_ID", senderUserID);
-			await this.data.savingUserID;
-
-			this.data.savingUserID = null;
+		else if (userData.Twitch_ID === null && userData.Discord_ID === null && this.data.updatingUserIDPromises < 5) {
+			this.data.updatingUserIDPromises++;
+			await userData.saveProperty("Twitch_ID", senderUserID);
+			this.data.updatingUserIDPromise--;
 		}
 		else if (userData.Twitch_ID !== senderUserID) {
 			// Mismatch between senderUserID and userData.Twitch_ID means someone renamed into a different
 			// user's username, or that there is a different mishap happening. This case is unfortunately exceptional
 			// for the current user-database structure and the event handler must be aborted.
+
+			const channelData = sb.Channel.get(channelName, this.platform);
+			if (channelData) {
+				const notified = await userData.getDataProperty("twitch-userid-mismatch-notification");
+				if (!notified) {
+					await channelData.send(sb.Utils.tag.trim `
+						@${userData.Name}, you have been flagged as suspicious.
+						This is because I have seen your Twitch username on a different account before.
+						This is usually caused by renaming into an account that existed before.
+						To remedy this, head into Supinic's channel chat twitch.tv/supinic and mention this.												
+					`);
+
+					await Promise.all([
+						sb.Logger.log(
+							"Twitch.Other",
+							`Suspicious user: ${userData.Name} - ${userData.Twitch_ID}`,
+							null,
+							userData
+						),
+						userData.setDataProperty("twitch-userid-mismatch-notification", true)
+					]);
+				}
+			}
+
 			return;
 		}
 
