@@ -4,10 +4,7 @@ const actions = [
 	"addSubtitle",
 	"play",
 	"pause",
-	{
-		name: "stop",
-		command: "pl_stop"
-	},
+	"stop",
 	"resume",
 	"forcePause",
 	"playlistDelete",
@@ -83,12 +80,7 @@ module.exports = class VLCSingleton extends require("./template.js") {
 
 		this._actions = {};
 		for (const action of actions) {
-			if (typeof action === "string") {
-				this._actions[action] = (...args) => this.client[action](...args);
-			}
-			else if (action?.constructor === Object) {
-				this._actions[action.name] = () => this.client._sendCommand("/requests/status.json", action.command);
-			}
+			this._actions[action] = (...args) => this.client[action](...args);
 		}
 
 		this.initListeners();
