@@ -92,7 +92,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				Code: async () => {
 					let counter = 0;
 					const promises = [];
-					const batchSize = 250;
+					const batchSize = 100;
 					const channelList = sb.Channel.getJoinableForPlatform("twitch").filter(i => i.Specific_ID);
 
 					while (counter < channelList.length) {
@@ -114,7 +114,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					const streams = [];
 					const results = await Promise.all(promises);
 					for (const partialResult of results) {
-						const streamsBlock = partialResult.body?.streams ?? [];
+						const streamsBlock = partialResult.body?.data ?? [];
 						streams.push(...streamsBlock);
 					}
 
