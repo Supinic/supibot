@@ -47,7 +47,7 @@ module.exports = {
 			}
 		};
 
-		if (context.channel.NSFW) {
+		if (context.channel?.NSFW) {
 			enabled.content.nsfw = true;
 			enabled.file.nsfw = true;
 		}
