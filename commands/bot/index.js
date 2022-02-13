@@ -166,6 +166,13 @@ module.exports = {
 			}
 
 			case "offline-only": {
+				if (!channelData) {
+					return {
+						success: false,
+						reply: `No channel has been specified!`
+					};
+				}
+
 				const moduleData = sb.ChatModule.get("offline-only-mode");
 				const check = await sb.Query.getRecordset(rs => rs
 					.select("1")
@@ -196,6 +203,13 @@ module.exports = {
 				};
 			}
 			case "disable-offline-only": {
+				if (!channelData) {
+					return {
+						success: false,
+						reply: `No channel has been specified!`
+					};
+				}
+
 				const moduleData = sb.ChatModule.get("offline-only-mode");
 				const check = await sb.Query.getRecordset(rs => rs
 					.select("1")
