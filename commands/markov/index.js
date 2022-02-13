@@ -232,7 +232,7 @@ module.exports = {
 		const channels = await sb.Query.getRecordset(rs => rs
 			.select("Channel.ID AS Channel_ID", "Name")
 			.from("chat_data", "Channel_Chat_Module")
-			.where("Chat_Module = %n", 20)
+			.where("Chat_Module = %s", "async-markov-experiment")
 			.where("Channel.Platform = %n", 1)
 			.join({
 				toTable: "Channel",

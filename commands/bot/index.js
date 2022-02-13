@@ -178,7 +178,7 @@ module.exports = {
 					.select("1")
 					.from("chat_data", "Channel_Chat_Module")
 					.where("Channel = %n", channelData.ID)
-					.where("Chat_Module = %n", moduleData.ID)
+					.where("Chat_Module = %s", moduleData.Name)
 					.single()
 					.flat("1")
 				);
@@ -215,7 +215,7 @@ module.exports = {
 					.select("1")
 					.from("chat_data", "Channel_Chat_Module")
 					.where("Channel = %n", channelData.ID)
-					.where("Chat_Module = %n", moduleData.ID)
+					.where("Chat_Module = %s", moduleData.Name)
 					.single()
 					.flat("1")
 				);
@@ -231,7 +231,7 @@ module.exports = {
 					.delete()
 					.from("chat_data", "Channel_Chat_Module")
 					.where("Channel = %n", channelData.ID)
-					.where("Chat_Module = %n", moduleData.ID)
+					.where("Chat_Module = %s", moduleData.Name)
 				);
 
 				await sb.Channel.reloadSpecific(channelData);
