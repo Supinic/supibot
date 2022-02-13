@@ -123,7 +123,8 @@ module.exports = {
 				};
 			}
 			else if (debug === "load") {
-				const data = await fs.readFile(`/code/markovs/${fileName}`);
+				const loadFileName = input ?? fileName;
+				const data = await fs.readFile(`/code/markovs/${loadFileName}`);
 				markov.reset();
 				markov.load(data.toString());
 
