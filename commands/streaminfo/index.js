@@ -79,11 +79,29 @@ module.exports = {
 			};
 		}
 
+		const tags = [];
+		if (stream.tags_ids.length !== 0) {
+			const { URLSearchParams } = require("url");
+
+			const paramsIterable = stream.tags_ids.map(i => ["tag_id", i]);
+			const searchParams = new URLSearchParams(paramsIterable);
+
+			const response = await sb.Got("Helix", {
+				url: "tags/streams",
+				searchParams
+			});
+
+			const tagDescriptions = response.body.data.map(i => i.localization_names["en-us"]);
+			tags.push(...tagDescriptions);
+		}
 		const started = sb.Utils.timeDelta(new sb.Date(stream.started_at));
 		const viewersSuffix = (stream.viewer_count === 1) ? "" : "s";
 		const broadcast = (stream.game_name)
 			? `playing ${stream.game_name}`
 			: `streaming under no category`;
+		const tagString = (tags.length === 0)
+			? ""
+			: `Current tags: ${tags.join(", ")}`;
 
 		return {
 			reply: sb.Utils.tag.trim `
@@ -91,6 +109,7 @@ module.exports = {
 				since ${started} 
 				for ${sb.Utils.groupDigits(stream.viewer_count)} viewer${viewersSuffix}.
 				Title: ${stream.title} 
+				${tagString}
 				https://twitch.tv/${targetChannel.toLowerCase()}
 			`
 		};
