@@ -52,7 +52,8 @@ module.exports = {
 
 		const result = [];
 		const [dictData, wikiData, wiktionaryData, urbanData] = await Promise.allSettled([dictPromise, wikiPromise, wiktionaryPromise, urbanPromise]);
-		if (dictData.status === "fulfilled" && dictData.value.statusCode === 200) {
+
+		if (dictData.status === "fulfilled" && dictData.value.statusCode === 200 && Array.isArray(dictData.value.body)) {
 			const data = dictData.value.body;
 			const records = data.flatMap(i => Object.entries(i.meaning));
 			const items = records.flatMap(([type, value]) => value.map(item => ({ type, definition: item.definition })));
