@@ -94,6 +94,7 @@ module.exports = {
 			const tagDescriptions = response.body.data.map(i => i.localization_names["en-us"]);
 			tags.push(...tagDescriptions);
 		}
+
 		const started = sb.Utils.timeDelta(new sb.Date(stream.started_at));
 		const viewersSuffix = (stream.viewer_count === 1) ? "" : "s";
 		const broadcast = (stream.game_name)
