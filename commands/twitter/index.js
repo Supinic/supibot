@@ -94,14 +94,21 @@ module.exports = {
 			};
 		}
 		else if (!context.params.includeRetweets) {
-			eligibleTweets = eligibleTweets.filter(i => !i.retweeted_status);
-
 			if (eligibleTweets.length === 0) {
+				return {
+					reply: "That account has not tweeted so far."
+				};
+			}
+
+			const notRetweets = eligibleTweets.filter(i => !i.retweeted_status);
+			if (notRetweets.length === 0) {
 				return {
 					success: false,
 					reply: `All fetched tweets of this account are retweets! Use includeRetweets:true to fetch those as well.`
 				};
 			}
+
+			eligibleTweets = notRetweets;
 		}
 
 		let tweet;
