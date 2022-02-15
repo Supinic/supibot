@@ -701,6 +701,19 @@ module.exports = {
 						helpers: ["nitewaver"]
 					}
 				]
+			},
+			{
+				code: "mn",
+				language: "mongolian",
+				sources: [
+					{
+						name: "News.mn",
+						url: "https://news.mn",
+						path: null,
+						endpoints: ["feed"],
+						helpers: ["supinic"]
+					}
+				]
 			}
 		],
 
