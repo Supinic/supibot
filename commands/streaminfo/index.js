@@ -83,7 +83,7 @@ module.exports = {
 		if (stream.tag_ids.length !== 0) {
 			const { URLSearchParams } = require("url");
 
-			const paramsIterable = stream.tags_ids.map(i => ["tag_id", i]);
+			const paramsIterable = stream.tag_ids.map(i => ["tag_id", i]);
 			const searchParams = new URLSearchParams(paramsIterable);
 
 			const response = await sb.Got("Helix", {
