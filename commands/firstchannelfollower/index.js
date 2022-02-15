@@ -52,7 +52,7 @@ module.exports = {
 			: "they";
 
 		const { edges } = response.body.data.user.followers;
-		if (edges.length === 0) {
+		if (!edges || edges.length === 0) {
 			return {
 				reply: `${sb.Utils.capitalize(who)} don't have any followers.`
 			};
