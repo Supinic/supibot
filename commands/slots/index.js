@@ -348,7 +348,7 @@ module.exports = {
 
 		return [
 			"Rolls three random words out of the given list of words. If you get a flush, you win!",
-			`Every winner is listed in <a href="https://supinic.com/data/slots-winner/list">this neat table</a>.`,
+			`Every winner is listed in <a href="https://supinic.com/data/slots-winner/leaderboard">this neat table</a>.`,
 			"",
 
 			`<code>${prefix}slots (list of words)</code>`,
@@ -364,7 +364,7 @@ module.exports = {
 
 			...leaderboardKeywords.map(i => `<code>${prefix}slots ${i}</code>`),
 			"Posts a link to the slots winners leaderboard, sorted by the odds of winning.",
-			`You can also check it out here: <a href="/data/slots-winner/list">Slots winners list</a>`
+			`You can also check it out here: <a href="/data/slots-winner/leaderboard">Slots winners list</a>`
 		];
 	})
 };
