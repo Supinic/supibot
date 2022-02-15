@@ -64,7 +64,9 @@ module.exports = {
 
 		if (urbanData.status === "fulfilled" && urbanData.value.statusCode === 200) {
 			const data = urbanData.value.body;
-			const item = data.list[0];
+			const [item] = data.list
+				.filter(i => i.word.toLowerCase() === query.toLowerCase())
+				.sort((a, b) => b.thumbs_up - a.thumbs_up);
 
 			if (item) {
 				const definition = sb.Utils.wrapString(item.definition.replace(/[[\]]/g, ""), 150);
