@@ -192,20 +192,9 @@ module.exports = class TwitchController extends require("./template.js") {
 					);
 				}
 				else {
-					const response = await sb.Got("Helix", {
-						url: "users",
-						searchParams: { id: channelData.Specific_ID }
-					});
+					const result = await TwitchController.executeChannelRename(channelData);
 
-					if (response.statusCode !== 200) {
-						return;
-					}
-
-					if (response.body.data.length === 0) {
-						channelData.Data.inactiveReason = "suspended";
-						await channelData.saveProperty("Data");
-						await channelData.saveProperty("Mode", "Inactive");
-
+					if (result.reason === "channel-suspended") {
 						await sb.Logger.log(
 							"Twitch.Fail",
 							`Channel ${channelData.Name} unavailable - set to Inactive`,
@@ -213,81 +202,13 @@ module.exports = class TwitchController extends require("./template.js") {
 							null
 						);
 					}
-					else {
-						const { id, login } = response.body.data[0];
-						if (login === channelData.Name) {
-							return;
-						}
-						else if (channelData.Specific_ID !== id) {
-							const dump = JSON.stringify({
-								old: {
-									name: channelData.Name,
-									id: channelData.Specific_ID
-								},
-								new: {
-									name: login,
-									id
-								}
-							});
-
-							await sb.Logger.log(
-								"Twitch.Warning",
-								`Possible user rename has a mismatched user ID. Data dump: ${dump}`,
-								channelData,
-								null
-							);
-
-							return;
-						}
-
-						const previousMode = channelData.Mode;
-						channelData.Data.inactiveReason = "renamed";
-						await channelData.saveProperty("Data");
-						await channelData.saveProperty("Mode", "Inactive");
-
-						const otherChannelData = sb.Channel.get(login);
-						if (!otherChannelData) {
-							const joinedChannel = await sb.Channel.add(login, this.platform, previousMode, channelData.Specific_ID);
-							try {
-								await client.join(login);
-								await joinedChannel.send(`Rename detected MrDestructoid 👍 ${channelData.Name} -> ${login}`);
-								await sb.Logger.log(
-									"Twitch.Success",
-									`Channel ${channelData.Name} renamed to ${login} - new channel created`,
-									channelData,
-									null
-								);
-							}
-							catch {
-								await sb.Logger.log(
-									"Twitch.Fail",
-									`Channel ${channelData.Name} renamed to ${login} - new channel created, but join failed`,
-									channelData,
-									null
-								);
-							}
-						}
-						else if (otherChannelData && otherChannelData.Mode === "Inactive") {
-							await otherChannelData.saveProperty("Mode", "Write");
-							try {
-								await client.join(login);
-								await otherChannelData.send(`Re-rename detected MrDestructoid 👍 ${channelData.Name} -> ${login}`);
-								await sb.Logger.log(
-									"Twitch.Success",
-									`Channel ${channelData.Name} re-renamed to ${login} - existing old channel re-joined`,
-									channelData,
-									null
-								);
-							}
-							catch {
-								await sb.Logger.log(
-									"Twitch.Fail",
-									`Channel ${channelData.Name} re-renamed to ${login} - but join failed`,
-									channelData,
-									null
-								);
-							}
-						}
+					else if (result.reason === "channel-id-mismatch") {
+						await sb.Logger.log(
+							"Twitch.Warning",
+							`Possible user rename has a mismatched user ID. Data dump: ${JSON.stringify(result)}`,
+							channelData,
+							null
+						);
 					}
 				}
 			}
@@ -1352,6 +1273,125 @@ module.exports = class TwitchController extends require("./template.js") {
 			...(ffz.value ?? []),
 			...(sevenTv.value ?? [])
 		];
+	}
+
+	/**
+	 * @param {string} channel ChannelLike
+	 * @returns {Promise<{
+	 *  success: boolean,
+	 *  reason?: "no-channel" | "no-channel-exists" | "channel-suspended" | "no-rename" | "channel-id-mismatch" | "no-action",
+	 *  action?: "rename" | "repeat-rename",
+	 *  channel?: number
+	 *  data?: {
+	 *      id: string,
+	 *      login: string,
+	 *      joinFailed?: boolean,
+	 *      newChannel?: string
+	 *  }>}}
+	 */
+	static async executeChannelRename (channel) {
+		const channelData = sb.Channel.get(channel);
+		if (!channelData) {
+			return {
+				success: false,
+				reason: "no-channel"
+			};
+		}
+
+		const userID = await this.getUserID(channelData.Name);
+		const response = await sb.Got("Helix", {
+			url: "users",
+			searchParams: {
+				id: userID
+			}
+		});
+
+		if (response.statusCode !== 200) {
+			return {
+				success: false,
+				reason: "no-channel-exists",
+				channel: channelData.ID
+			};
+		}
+		else if (response.body.data.length === 0) {
+			channelData.Data.inactiveReason = "suspended";
+			await channelData.saveProperty("Data");
+			await channelData.saveProperty("Mode", "Inactive");
+
+			return {
+				success: false,
+				reason: "channel-suspended",
+				channel: channelData.ID
+			};
+		}
+
+		const { id, login } = response.body.data[0];
+		if (login === channelData.Name) {
+			return {
+				success: false,
+				reason: "no-rename",
+				channel: channelData.ID,
+				data: { id, login }
+			};
+		}
+		else if (id !== channelData.Twitch_ID) {
+			return {
+				success: false,
+				reason: "channel-id-mismatch",
+				channel: channelData.ID,
+				data: { id, login }
+			};
+		}
+
+		const previousMode = channelData.Mode;
+		channelData.Data.inactiveReason = "renamed";
+		await channelData.saveProperty("Data");
+		await channelData.saveProperty("Mode", "Inactive");
+
+		const otherChannelData = sb.Channel.get(login);
+		if (!otherChannelData) {
+			let joinFailed = false;
+			const joinedChannel = await sb.Channel.add(login, this.platform, previousMode, channelData.Specific_ID);
+			try {
+				await this.client.join(login);
+			}
+			catch {
+				joinFailed = true;
+			}
+
+			return {
+				success: true,
+				action: "rename",
+				data: {
+					id,
+					newChannel: joinedChannel.ID,
+					joinFailed,
+					login
+				}
+			};
+		}
+		else if (otherChannelData && otherChannelData.Mode === "Inactive") {
+			let joinFailed = false;
+			await otherChannelData.saveProperty("Mode", "Write");
+			try {
+				await this.client.join(login);
+			}
+			catch {
+				joinFailed = true;
+			}
+
+			return {
+				success: true,
+				action: "repeat-rename",
+				data: { id, joinFailed, login }
+			};
+		}
+
+		return {
+			success: false,
+			reason: "no-action",
+			data: { id, login }
+		};
 	}
 
 	static async fetchAccountChallengeStatus (userData, twitchID) {
