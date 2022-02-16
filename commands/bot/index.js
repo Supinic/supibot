@@ -307,6 +307,74 @@ module.exports = {
 				};
 			}
 
+			case "rename":
+			case "renamed": {
+				if (channelData.Platform.Name !== "twitch") {
+					return {
+						success: false,
+						reply: `Re-enabling the bot in recently renamed channels is only available on Twitch!`
+					};
+				}
+
+				const { controller } = sb.Platform.get("twitch");
+				if (!controller.executeChannelRename) { // @todo remove after supibot changes are pulled
+					return {
+						success: false,
+						reply: `This functionality is not yet available. This should change soon ™`
+					};
+				}
+
+				const result = await controller.executeChannelRename(channelData);
+				if (result.success === true) {
+					if (result.joinFailed) {
+						return {
+							reply: sb.Utils.tag.trim `
+								Successfully ${result.action}d: ${channelData.Name} => ${result.data.login}.
+								But, joining it might have failed due to Twitch.
+								Please check if I respond to commands there 🙊
+							`
+						};
+					}
+					else {
+						return {
+							reply: `Successfully ${result.action}d: ${channelData.Name} => ${result.data.login}.`
+						};
+					}
+				}
+				else {
+					let reply;
+					switch (result.reason) {
+						case "no-channel-exists":
+							reply = "No such channel exists on Twitch!";
+							break;
+
+						case "channel-suspended":
+							reply = "That channel is currently suspended!";
+							break;
+
+						case "no-rename":
+							reply = "That channel has not renamed recently!";
+							break;
+
+						case "channel-id-mismatch":
+							reply = sb.Utils.tag.trim `
+								There is a user ID mismatch between original and renamed channels!
+								${channelData.Twitch_ID} ≠ ${result.data.id}
+							`;
+							break;
+
+						case "no-action":
+						default:
+							reply = "No action was executed! Please contact @Supinic about this";
+					}
+
+					return {
+						success: false,
+						reply
+					};
+				}
+			}
+
 			default: return {
 				success: false,
 				reply: "Invalid command provided!"
@@ -362,8 +430,14 @@ module.exports = {
 			`If enabled, all links will be replaced by "[LINK]" or a similar placeholder.`,
 			"",
 
+			`<code>${prefix}bot rename channel:(channel)</code>`,
+			`<code>${prefix}bot renamed channel:(channel)</code>`,
+			"If you recently renamed your Twitch account, you can use this command to get Supibot back immediately!",
+			"This also works for other channels that you are an ambassador in.",
+			"",
+
 			`<code>${prefix}bot rejoin channel:(channel)</code>`,
-			"If you renamed your Twitch channel, or you got suspended and recently unbanned, you can use this command to get Supibot immediately!",
+			"If your Twitch channel got suspended and recently unbanned, you can use this command to get Supibot back immediately!",
 			"This also works for other channels that you are an ambassador in.",
 			"",
 
