@@ -13,7 +13,7 @@ module.exports = {
 		{ name: "replacement", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
+	Static_Data: ((commandData) => ({
 		blocks: [
 			{
 				name: "argumentsCheck",
@@ -147,7 +147,7 @@ module.exports = {
 						}
 					}
 
-					sb.CooldownManager.set(context.channel.ID, context.user.ID, "abb-chatter", this.Cooldown);
+					sb.CooldownManager.set(context.channel.ID, context.user.ID, "abb-chatter", commandData.Cooldown);
 					return {
 						reply: sb.Utils.randArray(users)
 					};
