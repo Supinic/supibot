@@ -63,8 +63,8 @@ module.exports = {
 				by ${body.artistDisplayName || "(unknown)"},
 				in ${body.objectDate || "(unknown)"}.
 				
-				Image: ${body.primaryImage ?? "N/A"}
-				Website: ${body.objectURL ?? "N/A"}				
+				Image: ${body.primaryImage || "N/A"}
+				Website: ${body.objectURL || "N/A"}				
 			`
 		};
 	}),
