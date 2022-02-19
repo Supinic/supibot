@@ -51,7 +51,7 @@ module.exports = {
 			? "you"
 			: "they";
 
-		if (!response.body.data.user.followers) {
+		if (!response.body.data.user) {
 			return {
 				success: false,
 				reply: `${sb.Utils.capitalize(who)} are currently banned!`
