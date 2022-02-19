@@ -51,6 +51,13 @@ module.exports = {
 			? "you"
 			: "they";
 
+		if (!response.body.data.user.followers) {
+			return {
+				success: false,
+				reply: `${sb.Utils.capitalize(who)} are currently banned!`
+			};
+		}
+
 		const { edges } = response.body.data.user.followers;
 		if (!edges || edges.length === 0) {
 			return {
