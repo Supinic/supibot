@@ -15,6 +15,7 @@ module.exports = {
 	Static_Data: (() => ({
 		// matches | and > characters if and only if they're not preceded, nor followed by another | or >.
 		pipeRegex: /(?<![|>])[|>](?![|>])/,
+		pipeLimit: 10,
 		resultCharacterLimit: 50_000,
 		reasons: {
 			block: "That user has blocked you from this command!",
@@ -128,6 +129,18 @@ module.exports = {
 				cmdArgs.splice(argumentStartPosition, 0, ...currentArgs);
 			}
 
+			const pipeCount = (context.append.pipeCount ?? 0) + 1;
+			if (pipeCount > this.staticData.pipeLimit) {
+				return {
+					success: false,
+					reply: sb.Utils.tag.trim `
+						Your pipe cannot continue!
+						It causes more than ${this.staticData.pipeLimit} pipe calls.
+						Please reduce the complexity first.
+					`
+				};
+			}
+
 			const result = await sb.Command.checkAndExecute(
 				cmd,
 				cmdArgs,
@@ -135,6 +148,7 @@ module.exports = {
 				context.user,
 				{
 					...context.append,
+					pipeCount,
 					tee: context.tee,
 					platform: context.platform,
 					pipe: true,
