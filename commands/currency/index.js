@@ -126,7 +126,8 @@ module.exports = {
 					: (dollarExchangeRate / otherCurrencyRatio);
 			}
 
-			const fixedSecondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, 3));
+			const roundLimit = (first === "IRR") ? 3 : 0;
+			const fixedSecondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, roundLimit));
 			message = `Official: ${message}; True: ${firstAmount} ${first} = ${fixedSecondAmount} ${second}`;
 		}
 
