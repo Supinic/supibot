@@ -52,9 +52,10 @@ module.exports = {
 			: "they";
 
 		if (!response.body.data.user) {
+			const target = (context.user.Name === name.toLowerCase()) ? "you" : "that user";
 			return {
 				success: false,
-				reply: `${sb.Utils.capitalize(who)} are currently banned!`
+				reply: `No follower data is currently available for ${target}!`
 			};
 		}
 
