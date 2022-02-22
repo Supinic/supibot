@@ -89,59 +89,45 @@ module.exports = {
 
 		// Special case for Iranian Rial - official exchange rates are frozen (as of 2021) and not relevant
 		if (first === "IRR" || second === "IRR") {
-			let currencyData = await this.getCacheData("iranian-currency-data");
-			if (!currencyData) {
-				const result = [];
-				const url = "https://api.accessban.com/v1/data/sana/json";
-
-				let searchParams = "";
-				let finished = false;
-				while (!finished) {
-					const response = await sb.Got("GenericAPI", {
-						url,
-						searchParams
-					});
-
-					if (response.statusCode !== 200) {
-						finished = true;
+			let dollarExchangeRate = await this.getCacheData("irr-usd-exchange-rate");
+			if (!dollarExchangeRate) {
+				const response = await sb.Got("GenericAPI", {
+					url: "https://dapi.p3p.repl.co/api/",
+					searchParams: {
+						currency: "usd"
 					}
-					else {
-						const data = response.body.sana ?? {};
+				});
 
-						finished = Boolean(data.next_page_url);
-						searchParams = data.next_page_url;
-
-						const items = data.data.filter(i => i.slug.includes("buy"));
-						result.push(...items.map(i => ({
-							code: i.slug.replace("sana_buy_", "").toUpperCase(),
-							price: i.p
-						})));
-					}
-				}
-
-				currencyData = result;
-
-				if (result.length !== 0) {
-					await this.setCacheData("iranian-currency-data", result, {
-						expiry: 864e5 // 1 day
-					});
+				if (response.statusCode === 200) {
+					dollarExchangeRate = Number(response.body.Price);
+					await this.setCacheData("irr-usd-exchange-rate", dollarExchangeRate);
 				}
 			}
 
 			const otherCurrency = (first === "IRR") ? second : first;
-			const data = currencyData.find(i => i.code === otherCurrency.toUpperCase());
-			if (data) {
-				let ratio = data.price;
-				if (first === "IRR") {
-					ratio = 1 / ratio;
-				}
-
-				const fixedSecondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, 3));
-				message = `Official: ${message}; True: ${firstAmount} ${first} = ${fixedSecondAmount} ${second}`;
+			let ratio;
+			if (first === "USD" || second === "USD") {
+				ratio = (second === "USD") ? (1 / dollarExchangeRate) : dollarExchangeRate;
 			}
 			else {
-				message = `Official: ${message}; True: (no data)`;
+				const convertKey = `USD_${otherCurrency}`;
+				const response = await sb.Got("GenericAPI", {
+					url: "https://free.currconv.com/api/v7/convert",
+					searchParams: {
+						apiKey: sb.Config.get("API_FREE_CURRENCY_CONVERTER"),
+						q: convertKey,
+						compact: "y"
+					}
+				});
+
+				const otherCurrencyRatio = response.body[convertKey].val;
+				ratio = (first === "IRR")
+					? (otherCurrencyRatio / dollarExchangeRate)
+					: (dollarExchangeRate / otherCurrencyRatio);
 			}
+
+			const fixedSecondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, 3));
+			message = `Official: ${message}; True: ${firstAmount} ${first} = ${fixedSecondAmount} ${second}`;
 		}
 
 		return {
