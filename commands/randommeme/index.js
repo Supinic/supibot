@@ -216,19 +216,19 @@ module.exports = {
 		if (forum.error) {
 			return {
 				success: false,
-				reply: `That subreddit is ${forum.reason ?? "not available"}!`
+				reply: `Subreddit ${input} is ${forum.reason ?? "not available"}!`
 			};
 		}
 		else if (!forum.exists) {
 			return {
 				success: false,
-				reply: "That subreddit does not exist!"
+				reply: "There is no subreddit with that name!"
 			};
 		}
 		else if (safeSpace && (this.staticData.banned.includes(forum.name) || forum.nsfw)) {
 			return {
 				success: false,
-				reply: "That subreddit is flagged as 18+, and thus not safe to post here!"
+				reply: `Subreddit ${input} is flagged as 18+, and thus not safe to post here!`
 			};
 		}
 
@@ -273,7 +273,7 @@ module.exports = {
 			if (repeatedPosts.length === 0) {
 				return {
 					success: false,
-					reply: "No eligible posts found!"
+					reply: `Subreddit ${input} has no eligible posts!`
 				};
 			}
 			else {
