@@ -184,6 +184,7 @@ module.exports = {
 
 				const link = (paste.success) ? paste.body : paste.error;
 				return {
+					success: false,
 					reply: `${e.toString()} - More info: ${link}`
 				};
 			}
