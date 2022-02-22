@@ -456,7 +456,7 @@ module.exports = {
 					name: "birthday",
 					aliases: ["bday"],
 					parameter: "arguments",
-					description: "Lets you set your birthday (only day and month!) for use in other commands, like $horoscope.",
+					description: "Lets you set your birthday (only day and month!) for use in other commands, like $horoscope. Use the MM-DD format (05-01 for May 1st), or \"may 1\", or \"1 may\".",
 					set: async (context, ...args) => {
 						const query = args.join(" ");
 						if (!query) {
@@ -467,14 +467,14 @@ module.exports = {
 						}
 
 						const date = new sb.Date(query);
-						if (!date.valueOf()) {
+						if (Number.isNaN(date.valueOf())) {
 							return {
 								success: false,
-								reply: "Date could not be parsed :("
+								reply: "Date could not be parsed! Use the MM-DD format (e.g.: 05-01 for May 1st) if in doubt."
 							};
 						}
 
-						const birthdayString = date.format("F dS");
+						const birthdayString = date.format("F jS");
 						await context.user.setDataProperty("birthday", {
 							month: date.month,
 							day: date.day,
