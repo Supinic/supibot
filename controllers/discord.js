@@ -143,6 +143,9 @@ module.exports = class DiscordController extends require("./template.js") {
 					channelData = await sb.Channel.add(chan, this.platform);
 					await channelData.setup();
 				}
+				if (guild && guild.id && channelData.Specific_ID !== guild.id) {
+					await channelData.saveProperty("Specific_ID", guild.id);
+				}
 
 				// If a message comes from a channel set as "Inactive", this means it is active again.
 				// Change its mode back to active.
