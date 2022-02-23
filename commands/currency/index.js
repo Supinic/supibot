@@ -100,7 +100,9 @@ module.exports = {
 
 				if (response.statusCode === 200) {
 					dollarExchangeRate = Number(response.body.Price);
-					await this.setCacheData("irr-usd-exchange-rate", dollarExchangeRate);
+					await this.setCacheData("irr-usd-exchange-rate", dollarExchangeRate, {
+						expiry: 3_600_000 // 1 hour
+					});
 				}
 			}
 
