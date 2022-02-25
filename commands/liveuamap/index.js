@@ -81,6 +81,8 @@ module.exports = {
 		}
 
 		const [event] = filteredEvents;
+		this.data.repeats.push(event.title);
+
 		return {
 			reply: `${repeated} ${event.title} ${event.image ?? ""} (posted ${event.delta})`
 		};
