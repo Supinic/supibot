@@ -993,6 +993,11 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	async getUserID (user) {
+		console.warn("Deprecated: Use static getUserID method");
+		return await TwitchController.getUserID(user);
+	}
+
+	static async getUserID (user) {
 		let userData = await sb.User.get(user, true);
 		if (userData?.Twitch_ID) {
 			return userData.Twitch_ID;
