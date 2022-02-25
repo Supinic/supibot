@@ -128,7 +128,6 @@ class Context {
 
 /**
  * Represents a single bot command.
- * @memberof sb
  */
 class Command extends require("./template.js") {
 	// <editor-fold defaultstate="collapsed" desc="=== INSTANCE PROPERTIES ===">

@@ -1,7 +1,6 @@
 /**
  * Represents a chat user.
  * Since there can be hundreds of thousands of users loaded, a class is used to simplify the prototype, and potentially save some memory and/or processing power with V8.
- * @memberof sb
  */
 module.exports = class User extends require("./template.js") {
 	static mapCacheExpiration = 300_000;
@@ -19,7 +18,7 @@ module.exports = class User extends require("./template.js") {
 		administrator: 0b1000_0000
 	};
 
-	/** @type {WeakMap<sb.User, Map<string, *>>} */
+	/** @type {WeakMap<User, Map<string, *>>} */
 	static dataCache = new WeakMap();
 
 	constructor (data) {
@@ -254,7 +253,7 @@ module.exports = class User extends require("./template.js") {
 	}
 
 	static async loadData () {
-		/** @type {Map<string, sb.User>} */
+		/** @type {Map<string, User>} */
 		User.data = User.data || new Map();
 
 		const botDataExist = await sb.Query.isTablePresent("bot_data", "Bot");
@@ -285,10 +284,10 @@ module.exports = class User extends require("./template.js") {
 	/**
 	 * Searches for a user, based on their ID, or Name.
 	 * Returns immediately if identifier is already a User.
-	 * @param {sb.User|number|string} identifier
+	 * @param {User|number|string} identifier
 	 * @param {boolean} strict If false and searching for user via string, and it is not found, creates a new User.
 	 * @param {Object} [options]
-	 * @returns {sb.User|void}
+	 * @returns {User|void}
 	 * @throws {sb.Error} If the type of identifier is unrecognized
 	 */
 	static async get (identifier, strict = true, options = {}) {
@@ -317,7 +316,7 @@ module.exports = class User extends require("./template.js") {
 		else if (typeof identifier === "string") {
 			const username = User.normalizeUsername(identifier);
 
-			// 1. attempt to fetch the user from low-cache (sb.User.data)
+			// 1. attempt to fetch the user from low-cache (User.data)
 			const mapCacheUser = User.data.get(username);
 			if (mapCacheUser) {
 				return mapCacheUser;
@@ -381,8 +380,8 @@ module.exports = class User extends require("./template.js") {
 	 * Fetches a batch of users together.
 	 * Takes existing records from cache, the rest is pulled from dataase.
 	 * Does not support creating new records like `get()` does.
-	 * @param {Array<sb.User|string|number>} identifiers
-	 * @returns {Promise<sb.User[]>}
+	 * @param {Array<User|string|number>} identifiers
+	 * @returns {Promise<User[]>}
 	 */
 	static async getMultiple (identifiers) {
 		const result = [];
@@ -467,7 +466,7 @@ module.exports = class User extends require("./template.js") {
 	 * @deprecated
 	 * @param {string} property
 	 * @param {number} identifier
-	 * @returns {sb.User|void}
+	 * @returns {User|void}
 	 */
 	static getByProperty (property, identifier) {
 		const iterator = User.data.values();
@@ -504,7 +503,7 @@ module.exports = class User extends require("./template.js") {
 	/**
 	 * Adds a new user to the database.
 	 * @param {string} name
-	 * @returns {Promise<sb.User>}
+	 * @returns {Promise<User>}
 	 */
 	static async add (name) {
 		const preparedName = User.normalizeUsername(name);

@@ -1,7 +1,6 @@
 /**
  * Represents a pending reminder from (usually) one user to another.
  * An active reminder will be printed into the chat once the target user is spotted.
- * @memberof sb
  */
 module.exports = class Reminder extends require("./template.js") {
 	static LongTimeout = require("long-timeout");
@@ -9,7 +8,7 @@ module.exports = class Reminder extends require("./template.js") {
 	/**
 	 * Holds all currently active reminders in a Map, keyed by the target recipient user's IDs.
 	 * The list of
-	 * @type {Map<number, sb.Reminder[]>}
+	 * @type {Map<number, Reminder[]>}
 	 */
 	static data = new Map();
 
@@ -34,14 +33,14 @@ module.exports = class Reminder extends require("./template.js") {
 		/**
 		 * The user who set the reminder up.
 		 * Since anonymous reminders are not supported, this cannot be null.
-		 * @type {sb.User.ID}
+		 * @type {User.ID}
 		 */
 		this.User_From = data.User_From;
 
 		/**
 		 * The user who the reminder is set up for.
 		 * If none is specified, it is a reminder for the origin user themselves.
-		 * @type {sb.User.ID}
+		 * @type {User.ID}
 		 */
 		this.User_To = data.User_To || data.User_From;
 
@@ -94,11 +93,6 @@ module.exports = class Reminder extends require("./template.js") {
 		this.timeout = null;
 	}
 
-	/**
-	 * Sets up the timeout of a timed reminder.
-	 * The reminder will be broadcasted in the origin channel.
-	 * @returns {sb.Reminder}
-	 */
 	activateTimeout () {
 		if (!this.Schedule) {
 			return this;
@@ -174,7 +168,7 @@ module.exports = class Reminder extends require("./template.js") {
 	 * Deactivates a reminder. Also deactivates it in database if required.
 	 * @param {boolean} cancelled If true, the reminder will be flagged as cancelled
 	 * @param {boolean} permanent If true, the reminder was completed, and can be removed in database.
-	 * @returns {Promise<sb.Reminder>}
+	 * @returns {Promise<Reminder>}
 	 */
 	async deactivate (permanent, cancelled) {
 		this.Active = false;
@@ -293,7 +287,7 @@ module.exports = class Reminder extends require("./template.js") {
 	/**
 	 * Creates a new Reminder, and saves it to database.
 	 * Used mostly in commands to set up reminders.
-	 * @param {Object} data {@link sb.Reminder}-compliant data
+	 * @param {Object} data {@link Reminder}-compliant data
 	 * @param {boolean} [skipChecks = false] If true, skips all reminder checks. This is done for system reminders, so they always go through.
 	 * @return {ReminderCreationResult}
 	 */
@@ -328,7 +322,7 @@ module.exports = class Reminder extends require("./template.js") {
 	}
 
 	/**
-	 * @param {sb.User} targetUserData The user ID to check for
+	 * @param {User} targetUserData The user ID to check for
 	 * @param {sb.Channel} channelData The channel where the reminder was fired
 	 */
 	static async checkActive (targetUserData, channelData) {
@@ -656,7 +650,7 @@ module.exports = class Reminder extends require("./template.js") {
 
 	/**
 	 * @private
-	 * @param {sb.Reminder} reminder
+	 * @param {Reminder} reminder
 	 */
 	static #add (reminder) {
 		if (!Reminder.data.has(reminder.User_To)) {

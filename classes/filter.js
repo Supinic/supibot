@@ -1,6 +1,5 @@
 /**
  * Represents a filter of the bot's commands.
- * @memberof sb
  */
 module.exports = class Filter extends require("./template.js") {
 	#filterData = null;

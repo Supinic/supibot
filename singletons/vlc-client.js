@@ -355,8 +355,8 @@ module.exports = class VLCClient extends require("events") {
 	 * Set aspect ratio.
 	 * @param {VLCAspectRatio} ratio
 	 */
-	setAspectRatio (ratio) {
-		return this.#sendCommand(CommandScope.STATUS, "aspectratio", {
+	async setAspectRatio (ratio) {
+		return await this.#sendCommand(CommandScope.STATUS, "aspectratio", {
 			val: ratio
 		});
 	}

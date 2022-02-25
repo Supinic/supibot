@@ -38,10 +38,8 @@ module.exports = (function () {
 	 * Represents a chat banphrase, used to filter the bot's responses when invoking commands
 	 * or otherwise posting messages into a channel.
 	 * Note: this does NOT represent a banphrase that the bot then uses to moderate a channel!
-	 * @memberof sb
-	 * @type Banphrase
 	 */
-	return class Banphrase extends require("./template.js") {
+	class Banphrase extends require("./template.js") {
 		/**
 		 * Unique numeric ID.
 		 * @type {number|symbol}
@@ -205,8 +203,8 @@ module.exports = (function () {
 
 		/**
 		 * Fetches a banphrase, based on the identifier provided.
-		 * @param {number|symbol|sb.Banphrase} identifier
-		 * @returns {sb.Banphrase|null}
+		 * @param {number|symbol|Banphrase} identifier
+		 * @returns {Banphrase|null}
 		 * @throws {sb.Error} If invalid identifier type was provided
 		 */
 		static get (identifier) {
@@ -401,7 +399,9 @@ module.exports = (function () {
 					: false;
 			}
 		}
-	};
+	}
+
+	return Banphrase;
 })();
 
 /**

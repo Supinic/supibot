@@ -1,10 +1,9 @@
 /**
  * Represents a user's AFK status
- * @memberof sb
  */
 module.exports = class AwayFromKeyboard extends require("./template.js") {
 	/**
-	 * @type {Map<number, sb.AwayFromKeyboard>}
+	 * @type {Map<number, AwayFromKeyboard>}
 	 */
 	static data = new Map();
 
@@ -19,7 +18,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 
 		/**
 		 * Unique numeric user identifier
-		 * @type {sb.User.ID}
+		 * @type {User.ID}
 		 */
 		this.User_Alias = data.User_Alias;
 
@@ -107,10 +106,10 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 	}
 
 	/**
-	 * Checks if an user is AFK.
+	 * Checks if a user is AFK.
 	 * If they are, returns their AFK data and unsets the AFK status.
 	 * If the status is set as not silent, also emits an event to Master to send a message
-	 * @param {sb.User} userData
+	 * @param {User} userData
 	 * @param {sb.Channel} channelData
 	 * @returns {Promise<void>}
 	 */
@@ -173,14 +172,14 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 
 	/**
 	 * Sets (and creates a database row) a user's AFK status.
-	 * @param {sb.User} userData
+	 * @param {User} userData
 	 * @param {Object} [data]
 	 * @param {string} [data.Text]
 	 * @param {sb.Date} [data.Started]
 	 * @param {string} [data.Status]
 	 * @param {boolean} [data.Silent] If true, user coming back will not be broadcast.
 	 * @param {boolean} [data.Interrupted_ID] If true, user coming back will not be broadcast.
-	 * @returns {Promise<sb.AwayFromKeyboard>}
+	 * @returns {Promise<AwayFromKeyboard>}
 	 */
 	static async set (userData, data = {}) {
 		const now = new sb.Date();

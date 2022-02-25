@@ -1,7 +1,5 @@
 /**
  * Represents a chat channel.
- * @memberof sb
- * @type Channel
  */
 module.exports = class Channel extends require("./template.js") {
 	static redisPrefix = "sb-channel";
@@ -245,7 +243,7 @@ module.exports = class Channel extends require("./template.js") {
 
 	/**
 	 * Determines if a user is the owner of the channel the instances represents.
-	 * @param {sb.User} userData
+	 * @param {User} userData
 	 * @returns {Promise<null|boolean>}
 	 */
 	isUserChannelOwner (userData) {
@@ -254,7 +252,7 @@ module.exports = class Channel extends require("./template.js") {
 
 	/**
 	 * Checks if a provided user is an ambassador of the channel instance
-	 * @param {sb.User} userData
+	 * @param {User} userData
 	 * @returns {boolean}
 	 */
 	isUserAmbassador (userData) {
@@ -290,7 +288,7 @@ module.exports = class Channel extends require("./template.js") {
 
 	/**
 	 * Toggles a provided user's ambassador status in the current channel instance.
-	 * @param {sb.User} userData
+	 * @param {User} userData
 	 * @returns {Promise<void>}
 	 */
 	async toggleAmbassador (userData) {
@@ -323,7 +321,7 @@ module.exports = class Channel extends require("./template.js") {
 	/**
 	 * Mirrors the message to the given mirror channel, if this instance has been configured to do so.
 	 * @param {string} message
-	 * @param {sb.User} userData
+	 * @param {User} userData
 	 * @param {Object} [options]
 	 * @param {boolean} [options.commandUsed] = false
 	 * @returns {Promise<void>}
