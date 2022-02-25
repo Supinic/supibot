@@ -80,7 +80,7 @@ module.exports = {
 		}
 
 		const tags = [];
-		if (Array.isArray(stream.tag_ids) || stream.tag_ids.length !== 0) {
+		if (Array.isArray(stream.tag_ids) && stream.tag_ids.length !== 0) {
 			const { URLSearchParams } = require("url");
 
 			const paramsIterable = stream.tag_ids.map(i => ["tag_id", i]);
