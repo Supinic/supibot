@@ -9,7 +9,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		cacheKey: "liveuamap-data",
-		threshold: 5
+		threshold: 10
 	})),
 	Code: (async function liveUaMap () {
 		const { cacheKey } = this.staticData;
@@ -71,15 +71,18 @@ module.exports = {
 
 		this.data.repeats ??= [];
 
+		let repeated = "";
 		let filteredEvents = data.filter(i => !this.data.repeats.includes(i.title));
 		if (!filteredEvents) {
 			filteredEvents = data;
+
+			repeated = "♻";
 			this.data.repeats = [];
 		}
 
-		const event = sb.Utils.randArray(filteredEvents);
+		const [event] = filteredEvents;
 		return {
-			reply: `${event.title} ${event.image ?? ""} (posted ${event.delta})`
+			reply: `${repeated} ${event.title} ${event.image ?? ""} (posted ${event.delta})`
 		};
 	}),
 	Dynamic_Description: null
