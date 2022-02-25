@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "liveuamap",
-	Aliases: ["lum"],
+	Aliases: ["lum", "luam"],
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Gets a recent event from the 2022 Russia/Ukraine war",
