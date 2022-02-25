@@ -721,6 +721,19 @@ module.exports = {
 						helpers: ["supinic"]
 					}
 				]
+			},
+			{
+				code: "in",
+				language: "english",
+				sources: [
+					{
+						name: "Times of India",
+						url: "https://timesofindia.indiatimes.com",
+						path: "rssfeeds",
+						endpoints: ["-2128936835.cms"],
+						helpers: ["collapsingwave"]
+					}
+				]
 			}
 		],
 
