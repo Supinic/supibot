@@ -242,6 +242,13 @@ module.exports = {
 						path: null,
 						endpoints: ["turkiye_articles.rss"],
 						helpers: ["caglapickaxe", "cgpx"]
+					},
+					{
+						name: "Amerika'nın Sesi",
+						url: "https://www.amerikaninsesi.com",
+						path: "api",
+						endpoints: ["zv$vteottq"],
+						helpers: ["caglapickaxe", "cgpx"]
 					}
 				]
 			},
