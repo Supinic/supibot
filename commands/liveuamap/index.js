@@ -23,7 +23,7 @@ module.exports = {
 					timeout: 60_000
 				});
 			}
-			catch {
+			catch (e) {
 				return {
 					success: false,
 					reply: `No response received from website! Try again later.`
@@ -33,7 +33,7 @@ module.exports = {
 			if (response.statusCode !== 200) {
 				return {
 					success: false,
-					reply: `Website is currently unavailable! Try again later.`
+					reply: `Website is currently unavailable (status code ${response.statusCode})! Try again later.`
 				};
 			}
 
