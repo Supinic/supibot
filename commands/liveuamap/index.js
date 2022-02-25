@@ -2,7 +2,7 @@ module.exports = {
 	Name: "liveuamap",
 	Aliases: ["lum", "luam"],
 	Author: "supinic",
-	Cooldown: 30000,
+	Cooldown: 10000,
 	Description: "Gets a recent event from the 2022 Russia/Ukraine war",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
