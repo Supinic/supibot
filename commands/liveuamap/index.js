@@ -73,7 +73,7 @@ module.exports = {
 
 		let repeated = "";
 		let filteredEvents = data.filter(i => !this.data.repeats.includes(i.title));
-		if (!filteredEvents) {
+		if (filteredEvents.length === 0) {
 			filteredEvents = data;
 
 			repeated = "♻";
