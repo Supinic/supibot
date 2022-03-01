@@ -1,0 +1,726 @@
+[
+  {
+    "code": "fi",
+    "language": "finnish",
+    "sources": [
+      {
+        "name": "High",
+        "url": "https://high.fi",
+        "path": "kotimaa",
+        "endpoints": ["rss"],
+        "helpers": ["kalastelija01", "leppunen"]
+      }
+    ]
+  },
+  {
+    "code": "vn",
+    "language": "vietnamese",
+    "sources": [
+      {
+        "name": "VietNamNet",
+        "url": "https://vietnamnet.vn",
+        "path": "rss",
+        "endpoints": ["thoi-su.rss", "tuanvietnam.rss"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "ug",
+    "language": "swahili",
+    "sources": [
+      {
+        "name": "Bukedde Online",
+        "url": "https://www.bukedde.co.ug",
+        "path": "feed",
+        "endpoints": ["rss"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "es",
+    "language": "spanish",
+    "sources": [
+      {
+        "name": "ABC",
+        "url": "https://www.abc.es",
+        "path": "rss/feeds",
+        "endpoints": [
+          "abc_Economia.xml",
+          "abc_opinioncompleto.xml",
+          "abc_Cultura.xml",
+          "abc_EspanaEspana.xml",
+          "abcPortada.xml"
+        ],
+        "helpers": []
+      }
+    ]
+  },
+  {
+    "code": "cl",
+    "language": "spanish",
+    "sources": [
+      {
+        "name": "Copperativa",
+        "url": "https://www.cooperativa.cl",
+        "path": "noticias/site/tax/port",
+        "endpoints": ["all/rss____1.xml"],
+        "helpers": ["namtheweebs"]
+      }
+    ]
+  },
+  {
+    "code": "is",
+    "language": "icelandic",
+    "sources": [
+      {
+        "name": "RÚV",
+        "url": "https://www.ruv.is",
+        "path": "rss",
+        "endpoints": ["frettir", "innlent", "erlent"],
+        "helpers": ["kawaqa"]
+      }
+    ]
+  },
+  {
+    "code": "rs",
+    "language": "serbian",
+    "sources": [
+      {
+        "name": "N1 Info",
+        "url": "https://rs.n1info.com",
+        "path": "rss",
+        "endpoints": ["249/Naslovna"],
+        "helpers": ["supinic", "infinitegachi"]
+      }
+    ]
+  },
+  {
+    "code": "dk",
+    "language": "danish",
+    "sources": [
+      {
+        "name": "Ekstra Bladet",
+        "url": "https://ekstrabladet.dk",
+        "path": "rssfeed",
+        "endpoints": ["all", "nyheder"],
+        "helpers": ["gubbyfish"]
+      },
+      {
+        "name": "DR",
+        "url": "https://www.dr.dk/nyheder/service",
+        "path": "feeds",
+        "endpoints": ["indland", "regionale"],
+        "helpers": []
+      }
+    ]
+  },
+  {
+    "code": "ee",
+    "language": "estonian",
+    "sources": [
+      {
+        "name": "Postimees",
+        "url": "https://www.postimees.ee",
+        "path": null,
+        "endpoints": ["rss"],
+        "helpers": ["slordniir"]
+      }
+    ]
+  },
+  {
+    "code": "mt",
+    "language": "maltese",
+    "sources": [
+      {
+        "name": "TVM",
+        "url": "https://www.tvm.com.mt/mt",
+        "path": null,
+        "endpoints": ["feed"],
+        "helpers": ["trollpotat0"]
+      }
+    ]
+  },
+  {
+    "code": "by",
+    "language": "belarusian",
+    "sources": [
+      {
+        "name": "Charter 97",
+        "url": "https://charter97.org/be",
+        "path": "rss",
+        "endpoints": ["all"],
+        "helpers": ["karylul", "gw_ua"]
+      }
+    ]
+  },
+  {
+    "code": "hr",
+    "language": "croatian",
+    "sources": [
+      {
+        "name": "Index.hr",
+        "url": "https://www.index.hr",
+        "path": "rss",
+        "endpoints": ["vijesti", "vijesti-hrvatska"],
+        "helpers": ["lordborne"]
+      }
+    ]
+  },
+  {
+    "code": "onion",
+    "language": "english",
+    "sources": [
+      {
+        "name": "Onion",
+        "url": "https://www.theonion.com",
+        "path": null,
+        "endpoints": ["rss"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "vz",
+    "language": "spanish",
+    "sources": [
+      {
+        "name": "Voz de América",
+        "url": "https://www.voanoticias.com",
+        "path": "api",
+        "endpoints": ["zvirqoeojrqi"],
+        "helpers": []
+      }
+    ]
+  },
+  {
+    "code": "vice",
+    "language": "english",
+    "sources": [
+      {
+        "name": "Vice",
+        "url": "https://www.vice.com",
+        "path": "en_ca",
+        "endpoints": ["rss"],
+        "helpers": []
+      }
+    ]
+  },
+  {
+    "code": "ch",
+    "language": "german",
+    "sources": [
+      {
+        "name": "NZZ",
+        "url": "https://www.nzz.ch",
+        "path": null,
+        "endpoints": ["recent.rss", "international.rss", "schweiz.rss"],
+        "helpers": ["avulsed_"]
+      }
+    ]
+  },
+  {
+    "code": "tr",
+    "language": "turkish",
+    "sources": [
+      {
+        "name": "TRT Haber",
+        "url": "https://www.trthaber.com",
+        "path": null,
+        "endpoints": ["turkiye_articles.rss"],
+        "helpers": ["caglapickaxe", "cgpx"]
+      },
+      {
+        "name": "Amerika'nın Sesi",
+        "url": "https://www.amerikaninsesi.com",
+        "path": "api",
+        "endpoints": ["zv$vteottq"],
+        "helpers": ["caglapickaxe", "cgpx"]
+      }
+    ]
+  },
+  {
+    "code": "hu",
+    "language": "hungarian",
+    "sources": [
+      {
+        "name": "Origo",
+        "url": "https://www.origo.hu",
+        "path": "contentpartner/rss/itthon",
+        "endpoints": ["origo.xml"],
+        "helpers": ["noiredayz"]
+      },
+      {
+        "name": "Index.hu",
+        "url": "https://index.hu",
+        "path": "24ora",
+        "endpoints": ["rss"],
+        "helpers": ["noiredayz"]
+      }
+    ]
+  },
+  {
+    "code": "nl",
+    "language": "dutch",
+    "sources": [
+      {
+        "name": "NU",
+        "url": "https://nu.nl",
+        "path": "",
+        "endpoints": ["rss"],
+        "helpers": ["cbdg"]
+      }
+    ]
+  },
+  {
+    "code": "hacker",
+    "language": "english",
+    "sources": [
+      {
+        "name": "HackerNews",
+        "url": "https://hnrss.org",
+        "path": "",
+        "endpoints": ["frontpage"],
+        "helpers": []
+      }
+    ]
+  },
+  {
+    "code": "lt",
+    "language": "lithuanian",
+    "sources": [
+      {
+        "name": "15min",
+        "url": "https://15min.lt",
+        "path": "",
+        "endpoints": ["rss"],
+        "helpers": ["danolifer"]
+      },
+      {
+        "name": "Lrytas.lt",
+        "url": "https://lrytas.lt",
+        "path": "",
+        "endpoints": ["rss"],
+        "helpers": ["danolifer"]
+      }
+    ]
+  },
+  {
+    "code": "at",
+    "language": "german",
+    "sources": [
+      {
+        "name": "ORF.at",
+        "url": "https://rss.orf.at",
+        "path": "",
+        "endpoints": ["news.xml", "oesterreich.xml", "wien.xml"],
+        "helpers": ["kalifail_disbang"]
+      }
+    ]
+  },
+  {
+    "code": "ua",
+    "language": "ukrainian",
+    "sources": [
+      {
+        "name": "Radio Svoboda",
+        "url": "https://www.radiosvoboda.org",
+        "path": "api",
+        "endpoints": ["zrqiteuuir", "zjmkrey$ko"],
+        "helpers": ["boring_nick"]
+      },
+      {
+        "name": "Obozrevatel",
+        "url": "https://www.obozrevatel.com",
+        "path": "ukr",
+        "endpoints": ["rss.xml"],
+        "helpers": ["boring_nick"]
+      }
+    ]
+  },
+  {
+    "code": "cz",
+    "language": "czech",
+    "sources": [
+      {
+        "name": "Aktualne.cz",
+        "url": "https://zpravy.aktualne.cz/",
+        "path": "rss",
+        "endpoints": ["domaci"],
+        "helpers": ["supinic"]
+      },
+      {
+        "name": "iRozhlas",
+        "url": "https://www.irozhlas.cz/",
+        "path": "rss/irozhlas/section",
+        "endpoints": ["zpravy-domov"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "se",
+    "language": "swedish",
+    "sources": [
+      {
+        "name": "SVT",
+        "url": "https://www.svt.se/",
+        "path": "nyheter",
+        "endpoints": ["rss.xml"],
+        "helpers": []
+      }
+    ]
+  },
+  {
+    "code": "de",
+    "language": "german",
+    "sources": [
+      {
+        "name": "Tagesschau",
+        "url": "https://www.tagesschau.de",
+        "path": "xml",
+        "endpoints": ["rss2"],
+        "helpers": ["nerixyz"]
+      },
+      {
+        "name": "Tagesspiegel",
+        "url": "https://www.tagesspiegel.de/contentexport",
+        "path": "feed",
+        "endpoints": ["home"],
+        "helpers": ["de_munkey"]
+      }
+    ]
+  },
+  {
+    "code": "be",
+    "language": "(multiple)",
+    "sources": [
+      {
+        "name": "VRT",
+        "url": "https://www.vrt.be",
+        "path": "vrtnws",
+        "endpoints": ["de.rss.articles.xml", "fr.rss.articles.xml", "nl.rss.articles.xml"],
+        "helpers": ["supinic"]
+      },
+      {
+        "name": "La Libre",
+        "url": "https://www.lalibre.be/",
+        "path": "rss/section",
+        "endpoints": ["belgique.xml"],
+        "helpers": ["unitedfingers"]
+      },
+      {
+        "name": "Nieuwsblad",
+        "url": "https://www.nieuwsblad.be",
+        "path": "rss/section",
+        "endpoints": ["55178e67-15a8-4ddd-a3d8-bfe5708f8932"],
+        "helpers": ["unitedfingers"]
+      }
+    ]
+  },
+  {
+    "code": "ro",
+    "language": "romanian",
+    "sources": [
+      {
+        "name": "G4Media",
+        "url": "https://www.g4media.ro",
+        "path": null,
+        "endpoints": ["feed"],
+        "helpers": ["agenttud"]
+      },
+      {
+        "name": "HotNews",
+        "url": "https://www.hotnews.ro",
+        "path": null,
+        "endpoints": ["rss"],
+        "helpers": ["agenttud"]
+      },
+      {
+        "name": "Mediafax",
+        "url": "https://www.mediafax.ro/",
+        "path": null,
+        "endpoints": ["rss"],
+        "helpers": ["agenttud"]
+      }
+    ]
+  },
+  {
+    "code": "ir",
+    "language": "iranian",
+    "sources": [
+      {
+        "name": "رادیو فردا",
+        "url": "https://www.radiofarda.com",
+        "path": "api",
+        "endpoints": ["zpoqie-kqp"],
+        "helpers": ["somso2e"]
+      },
+      {
+        "name": "خبرگزاری مهر",
+        "url": "https://www.mehrnews.com/",
+        "path": null,
+        "endpoints": ["rss"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "fr",
+    "language": "french",
+    "sources": [
+      {
+        "name": "Europe 1",
+        "url": "https://www.europe1.fr",
+        "path": null,
+        "endpoints": ["rss.xml", "rss/faits-divers.xml"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "sg",
+    "language": "english",
+    "sources": [
+      {
+        "name": "CNA",
+        "url": "https://www.channelnewsasia.com",
+        "path": "api/v1",
+        "endpoints": ["rss-outbound-feed?_format=xml&category=10416"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "me",
+    "language": "montenegrin",
+    "sources": [
+      {
+        "name": "RTCG",
+        "url": "https://www.rtcg.me",
+        "path": "vijesti",
+        "endpoints": ["rss.html", "drustvo/rss.html", "region/rss.html"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "pl",
+    "language": "polish",
+    "sources": [
+      {
+        "name": "Polsat",
+        "url": "https://www.polsatnews.pl",
+        "path": "rss",
+        "endpoints": ["polska.xml"],
+        "helpers": ["n14pn", "supinic"]
+      },
+      {
+        "name": "TVN24",
+        "url": "https://tvn24.pl",
+        "path": null,
+        "endpoints": ["najnowsze.xml"],
+        "helpers": ["n14pn", "supinic"]
+      }
+    ]
+  },
+  {
+    "code": "si",
+    "language": "slovenian",
+    "sources": [
+      {
+        "name": "STA",
+        "url": "https://www.sta.si",
+        "path": null,
+        "endpoints": ["rss-1"],
+        "helpers": ["supinic"]
+      },
+      {
+        "name": "RTV SLO",
+        "url": "https://img.rtvslo.si",
+        "path": "feeds",
+        "endpoints": ["01.xml"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "no",
+    "language": "norwegian",
+    "sources": [
+      {
+        "name": "NRK",
+        "url": "https://www.nrk.no",
+        "path": null,
+        "endpoints": ["norge/toppsaker.rss", "innlandet/siste.rss"],
+        "helpers": ["hotbear1110"]
+      }
+    ]
+  },
+  {
+    "code": "el",
+    "language": "greek",
+    "sources": [
+      {
+        "name": "Skai.gr",
+        "url": "https://feeds.feedburner.com",
+        "path": "skai",
+        "endpoints": ["PLwa"],
+        "helpers": []
+      }
+    ]
+  },
+  {
+    "code": "sk",
+    "language": "slovak",
+    "sources": [
+      {
+        "name": "TA3",
+        "url": "https://www.ta3.com",
+        "path": "rss",
+        "endpoints": ["5/novinky-z-domova"],
+        "helpers": ["supinic"]
+      },
+      {
+        "name": "Aktuality",
+        "url": "https://www.aktuality.sk",
+        "path": "rss",
+        "endpoints": ["domace", "krimi"],
+        "helpers": ["supinic"]
+      },
+      {
+        "name": "Teraz",
+        "url": "https://www.teraz.sk",
+        "path": "rss",
+        "endpoints": ["slovensko.rss"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "lv",
+    "language": "latvian",
+    "sources": [
+      {
+        "name": "LSM",
+        "url": "https://www.lsm.lv",
+        "path": "rss",
+        "endpoints": ["?catid=20"],
+        "helpers": ["supinic"]
+      },
+      {
+        "name": "Delfi",
+        "url": "https://www.delfi.lv",
+        "path": "rss",
+        "endpoints": ["?channel=aculiecinieks"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "mk",
+    "language": "macedonian",
+    "sources": [
+      {
+        "name": "Канал 5 ТВ",
+        "url": "https://kanal5.com.mk",
+        "path": null,
+        "endpoints": ["rss.aspx?id=2", "rss.aspx?id=7"],
+        "helpers": ["supinic"]
+      },
+      {
+        "name": "Time.mk",
+        "url": "https://time.mk",
+        "path": "rss",
+        "endpoints": ["makedonija", "skopje"],
+        "helpers": ["supinic"]
+      },
+      {
+        "name": "Макфакс",
+        "url": "https://makfax.com.mk",
+        "path": null,
+        "endpoints": ["makedonija/feed", "crna-hronika/feed"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "al",
+    "language": "albanian",
+    "sources": [
+      {
+        "name": "fax.al",
+        "url": "https://fax.al",
+        "path": "rss",
+        "endpoints": ["shqiperi", "kronika"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "ru",
+    "language": "russian",
+    "sources": [
+      {
+        "name": "Интерфакс",
+        "url": "https://www.interfax.ru",
+        "path": null,
+        "endpoints": ["rss.asp"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "br",
+    "language": "portuguese",
+    "sources": [
+      {
+        "name": "UOL",
+        "url": "https://rss.uol.com.br",
+        "path": "feed",
+        "endpoints": ["noticias.xml"],
+        "helpers": ["vhns_"]
+      }
+    ]
+  },
+  {
+    "code": "il",
+    "language": "hebrew",
+    "sources": [
+      {
+        "name": "מעריב אונליין",
+        "url": "https://www.maariv.co.il/",
+        "path": "Rss",
+        "endpoints": ["RssFeedsChadashotBaArez"],
+        "helpers": ["nitewaver"]
+      }
+    ]
+  },
+  {
+    "code": "mn",
+    "language": "mongolian",
+    "sources": [
+      {
+        "name": "News.mn",
+        "url": "https://news.mn",
+        "path": null,
+        "endpoints": ["feed"],
+        "helpers": ["supinic"]
+      }
+    ]
+  },
+  {
+    "code": "in",
+    "language": "english",
+    "sources": [
+      {
+        "name": "Times of India",
+        "url": "https://timesofindia.indiatimes.com",
+        "path": "rssfeeds",
+        "endpoints": ["-2128936835.cms"],
+        "helpers": ["collapsingwave"]
+      }
+    ]
+  }
+]
