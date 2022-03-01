@@ -1294,7 +1294,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 *      newChannel?: string
 	 *  }>}}
 	 */
-	static async executeChannelRename (channel) {
+	async executeChannelRename (channel) {
 		const channelData = sb.Channel.get(channel);
 		if (!channelData) {
 			return {
