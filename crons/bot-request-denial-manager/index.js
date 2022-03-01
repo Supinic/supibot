@@ -4,7 +4,7 @@ module.exports = {
 	Description: "Sends out private messages whenever a bot request suggestion is denied. Only runs on Tuesdays",
 	Defer: null,
 	Type: "Bot",
-	Code: (async function activeChattersLog () {
+	Code: (async function botRequestDenialManager () {
 		this.data.requestIDs ??= [];
 
 		if (this.data.requestIDs.length === 0) {
