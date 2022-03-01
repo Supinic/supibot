@@ -173,20 +173,20 @@ module.exports = {
 		"E.g.:",
 		`<ul>
 				<li> 
-					<code>${prefix}unmention command:rl channel:supibot</code>
-					Will remove the mention from command rl only in channel "supibot".
+					<code>${prefix}unping command:rl channel:supibot</code>
+					Will remove the ping from command rl only in channel "supibot".
 				</li>				
 				<li> 
-					<code>${prefix}unmention command:rl user:foobar</code>
-					Will remove the mention from command rl only if used by user "foobar".
+					<code>${prefix}unping command:rl user:foobar</code>
+					Will remove the ping from command rl only if used by user "foobar".
 				</li>
 				<li> 
-					<code>${prefix}unmention command:rl platform:twitch</code>
-					Will remove the mention from command rl only in Twitch.
+					<code>${prefix}unping command:rl platform:twitch</code>
+					Will remove the ping from command rl only in Twitch.
 				</li>
 				<li> 
-					<code>${prefix}unmention channel:supibot</code>
-					Will remove the mention from opt-outable commands, only in channel "supibot".
+					<code>${prefix}unping channel:supibot</code>
+					Will remove the ping from opt-outable commands, only in channel "supibot".
 				</li>
 			</ul>`
 	])
