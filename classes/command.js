@@ -200,19 +200,6 @@ class Command extends require("./template.js") {
 	// </editor-fold>
 
 	static #privateMessageChannelID = Symbol("private-message-channel");
-	static #serializableProperties = {
-		Name: { type: "string" },
-		Aliases: { type: "descriptor" },
-		Author: { type: "string" },
-		Cooldown: { type: "descriptor" },
-		Description: { type: "string" },
-		Flags: { type: "json" },
-		Params: { type: "json" },
-		Whitelist_Response: { type: "string" },
-		Static_Data: { type: "descriptor" },
-		Code: { type: "descriptor" },
-		Dynamic_Description: { type: "descriptor" }
-	};
 
 	/**
 	 * Privileged command characters are such characters, that when a command is invoked, there does not have to be any
@@ -389,23 +376,6 @@ class Command extends require("./template.js") {
 	 */
 	execute (...args) {
 		return this.Code(...args);
-	}
-
-	async serialize (options = {}) {
-		if (typeof this.ID !== "number") {
-			throw new sb.Error({
-				message: "Cannot serialize an anonymous Command",
-				args: {
-					ID: this.ID,
-					Name: this.Name
-				}
-			});
-		}
-
-		const row = await sb.Query.getRow("chat_data", "Command");
-		await row.load(this.ID);
-
-		return await super.serialize(row, Command.#serializableProperties, options);
 	}
 
 	/**
@@ -1141,70 +1111,6 @@ class Command extends require("./template.js") {
 		}
 
 		return result;
-	}
-
-	static async install (options = {}) {
-		let data = null;
-		if (options.filePath) {
-			data = require(options.filePath);
-		}
-		else {
-			const Module = require("module");
-			const mod = new Module();
-			mod._compile(options.data, "");
-			data = mod.exports;
-		}
-
-		const conflictingAliases = Command.data.filter(i => i.Aliases.includes(data.Name));
-		if (conflictingAliases.length > 0) {
-			return {
-				success: false,
-				result: "conflicting-alias"
-			};
-		}
-
-		let result = "";
-		const conflictIndex = Command.data.findIndex(i => i.Name === data.Name);
-		if (conflictIndex !== -1) {
-			if (options.override) {
-				const previous = Command.data[conflictIndex];
-				Command.data[conflictIndex] = new Command({
-					ID: previous.ID,
-					...data
-				});
-
-				const row = await sb.Query.getRow("chat_data", "Command");
-				await row.load(previous.ID);
-				row.setValues(data);
-				await row.save();
-
-				previous.destroy();
-				result = "updated";
-			}
-			else {
-				return {
-					success: false,
-					reason: "conflicting-name"
-				};
-			}
-		}
-		else {
-			const row = await sb.Query.getRow("chat_data", "Command");
-			row.setValues(data);
-			await row.save();
-
-			Command.data.push(new Command({
-				ID: row.values.ID,
-				...data
-			}));
-
-			result = "added";
-		}
-
-		return {
-			success: true,
-			result
-		};
 	}
 
 	static parseParameter (value, type, explicit) {

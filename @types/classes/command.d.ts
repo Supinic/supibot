@@ -182,7 +182,6 @@ export declare class Command extends ClassTemplate {
     static setPrefix (value: string): void;
     static get (identifier: Like): Command | null;
     static validate (): void;
-    static install (option: unknown): Promise<never>;
     static extractMetaResultProperties (execution: Result): TypeExtract<Result, boolean>;
     static createFakeContext (commandData: Command, contextData: ContextConstructorData, extraData: SimpleGenericData): Context;
     static parseParameter (value: string, type: Parameter.Type, explicit?: boolean): Parameter.ParsedType;
@@ -221,6 +220,5 @@ export declare class Command extends ClassTemplate {
     constructor (data: ConstructorData);
 
     execute (...args: string[]): ReturnType<Command["Code"]>;
-    serialize (options: unknown): Promise<never>;
     getDetailURL (options?: { useCodePath?: boolean }): string;
 }
