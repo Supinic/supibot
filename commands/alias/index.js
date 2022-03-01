@@ -176,7 +176,7 @@ module.exports = {
 				let prefix;
 
 				const [firstName, secondName] = args;
-				if (type === "list" || (!firstName && !secondName)) {
+				if (!firstName && !secondName) {
 					const username = encodeURIComponent(context.user.Name);
 					return {
 						reply: `List of your aliases: https://supinic.com/bot/user/${username}/alias/list`
