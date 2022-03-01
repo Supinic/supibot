@@ -5,7 +5,7 @@ module.exports = {
 	Code: (async function pingSupi (context) {
 		const { message, channel, user } = context;
 		const regex = /supi\b|supinic(?!\.com)|bupi/i;
-		const skippedUsers = [1, 1127, 12182780];
+		const skippedUsers = [1, 1127, 8697460, 12182780];
 
 		if (typeof this.data.timeout === "undefined") {
 			this.data.timeout = 0;
