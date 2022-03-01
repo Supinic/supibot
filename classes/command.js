@@ -1,3 +1,5 @@
+const pathModule = require("path");
+
 /**
  * Represents the context a command is being executed in
  */
@@ -476,6 +478,18 @@ class Command extends require("./template.js") {
 			try {
 				path = require.resolve(`supibot-package-manager/commands/${identifier}`);
 				delete require.cache[path];
+
+				// Automatically attempt to find all related files in the command's directory, and then remove
+				// them from `require.cache`. This is to remove the burden of reloading from commands themselves.
+				const dirPath = pathModule.resolve(path).dir;
+				const otherFilePaths = Object.keys(require.cache).filter(filePath => {
+					const fileDirPath = pathModule.resolve(filePath);
+					return (fileDirPath === dirPath && !filePath.endsWith("index.js"));
+				});
+
+				for (const otherFilePath of otherFilePaths) {
+					delete require.cache[otherFilePath];
+				}
 			}
 			catch {
 				failed.push({
