@@ -415,7 +415,7 @@ class Command extends require("./template.js") {
 		Command.data = definitions.map(record => new Command(record));
 		Command.definitions = definitions;
 
-		this.validate();
+		await this.validate();
 	}
 
 	static async reloadSpecific (...list) {
@@ -489,7 +489,7 @@ class Command extends require("./template.js") {
 			Command.definitions.push(definition);
 		}
 
-		this.validate();
+		await this.validate();
 
 		return {
 			success: true,
@@ -497,7 +497,7 @@ class Command extends require("./template.js") {
 		};
 	}
 
-	static validate () {
+	static async validate () {
 		if (Command.data.length === 0) {
 			console.warn("No commands initialized - bot will not respond to any command queries");
 		}
@@ -519,6 +519,24 @@ class Command extends require("./template.js") {
 				console.warn(`Removed duplicate command name "${dupe}" from command ${command.Name}'s aliases`);
 			}
 		}
+
+		const addMissingRowsPromises = Command.data.map(async (commandData) => {
+			const row = await sb.Query.getRow("chat_data", "Command");
+			await row.load(commandData.Name, true);
+
+			if (!row.loaded) {
+				row.setValues({
+					Name: commandData.Name,
+					Aliases: (commandData.Aliases.length !== 0)
+						? JSON.stringify(commandData.Aliases)
+						: null
+				});
+
+				await row.save({ skipLoad: true });
+			}
+		})
+
+		await Promise.all(addMissingRowsPromises);
 	}
 
 	/**
