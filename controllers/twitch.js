@@ -1339,7 +1339,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				data: { id, login }
 			};
 		}
-		else if (id !== channelData.Twitch_ID) {
+		else if (id !== channelData.Specific_ID) {
 			return {
 				success: false,
 				reason: "channel-id-mismatch",
