@@ -993,11 +993,6 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	async getUserID (user) {
-		console.warn("Deprecated: Use static getUserID method");
-		return await TwitchController.getUserID(user);
-	}
-
-	static async getUserID (user) {
 		let userData = await sb.User.get(user, true);
 		if (userData?.Twitch_ID) {
 			return userData.Twitch_ID;
@@ -1112,7 +1107,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	static async fetchChannelBTTVEmotes (channelData) {
-		const channelID = channelData.Specific_ID ?? await TwitchController.getUserID(channelData.Name);
+		const channelID = channelData.Specific_ID ?? await channelData.platform.controller.getUserID(channelData.Name);
 		if (!channelID) {
 			throw new sb.Error({
 				message: "No available ID for channel",
