@@ -192,7 +192,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					);
 				}
 				else {
-					const result = await TwitchController.executeChannelRename(channelData);
+					const result = await this.executeChannelRename(channelData);
 
 					if (result.reason === "channel-suspended") {
 						await sb.Logger.log(
