@@ -517,7 +517,7 @@ module.exports = {
 			{
 				name: "h1z1",
 				aliases: [],
-				description: "Emotes awarded from H1Z1 loot crates bought and opened via Twitch, around Augus 2017",
+				description: "Emotes awarded from H1Z1 loot crates bought and opened via Twitch, around August 2017",
 				link: "https://blog.twitch.tv/en/2017/08/29/get-h1-z1-invitational-crates-on-twitch-and-earn-exclusive-loot-1402034fe7fe/",
 				emotes: [
 					"H1BodyCount",
