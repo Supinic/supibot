@@ -5,6 +5,10 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function verifyBotAcitivity () {
+		if (!sb.Platform || !sb.User) {
+			return;
+		}
+
 		const platform = sb.Platform.get(1);
 		const userData = await sb.User.get(platform.Self_Name);
 		if (!userData) {
