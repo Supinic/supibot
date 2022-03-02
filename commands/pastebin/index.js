@@ -14,7 +14,7 @@ module.exports = {
 	Static_Data: (() => ({
 		allowedGistTypes: ["text/plain", "application/javascript"],
 		getHastebinServer: (param) => {
-			let path = param ?? "https://hastebin.com";
+			let path = param ?? "https://haste.zneix.eu";
 			if (!path.startsWith("http://") && !path.startsWith("https://")) {
 				path = `https://${path}`;
 			}
