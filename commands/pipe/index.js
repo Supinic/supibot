@@ -162,14 +162,37 @@ module.exports = {
 			if (!result) { // Banphrase result: Do not reply
 				currentArgs = [];
 			}
-			else if (result.success === false && result.reason === "cooldown") {
-				if (i === 0) { // Short-circuit if the command is the last one in pipe
-					return result;
+			else if (result.success === false) {
+				if (context.params._force) {
+					let reply = result.reply;
+					if (!reply) {
+						reply = (result.reason === "cooldown")
+							? `Your pipe failed because the "${cmd}" command is currently on cooldown!`
+							: "(no reply)";
+					}
+
+					const string = sb.Utils.wrapString(reply, this.staticData.resultCharacterLimit, {
+						keepWhitespace: true
+					});
+
+					currentArgs = string.split(" ");
+				}
+				else if (result.reason === "cooldown") {
+					if (i === 0) { // Short-circuit if the command is the last one in pipe
+						return result;
+					}
+					else {
+						return {
+							...result,
+							reply: result.reply ?? `Your pipe failed because the "${cmd}" command is currently on cooldown!`
+						};
+					}
 				}
 				else {
+					const reply = this.staticData.reasons[result.reason] ?? result.reply ?? result.reason;
 					return {
-						...result,
-						reply: result.reply ?? `Your pipe failed because the "${cmd}" command is currently on cooldown!`
+						success: false,
+						reply: `Pipe command ${cmd} failed: ${reply}`
 					};
 				}
 			}
@@ -195,23 +218,6 @@ module.exports = {
 					success: false,
 					reply: result.reply
 				};
-			}
-			else if (result.success === false) { // Command result: Failed (cooldown, no command, ...)
-				if (context.params._force) {
-					const reply = result.reply ?? "(no reply)";
-					const string = sb.Utils.wrapString(reply, this.staticData.resultCharacterLimit, {
-						keepWhitespace: true
-					});
-
-					currentArgs = string.split(" ");
-				}
-				else {
-					const reply = this.staticData.reasons[result.reason] ?? result.reply ?? result.reason;
-					return {
-						success: false,
-						reply: `Pipe command ${cmd} failed: ${reply}`
-					};
-				}
 			}
 			else {
 				const string = sb.Utils.wrapString(result.reply, this.staticData.resultCharacterLimit, {
