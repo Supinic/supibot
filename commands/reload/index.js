@@ -155,7 +155,7 @@ module.exports = {
 		}
 
 		const module = sb[item.target];
-		if (item.type === "upgrade") {
+		if (item.executionType === "upgrade") {
 			const isPlural = (item.plural.includes(command));
 
 			return await upgrade(context, module, item.name, isPlural, ...rest);
