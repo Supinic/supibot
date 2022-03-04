@@ -285,10 +285,23 @@ module.exports = class ChatModule extends require("./template.js") {
 			}
 		}
 
-		const { definitions } = await require("supibot-package-manager/chat-modules");
 		const attachmentData = await ChatModule.#fetch(list);
+		for (const name of list) {
+			let definition;
+			try {
+				definition = require(`supibot-package-manager/chat-modules/${name}`);
+			}
+			catch {
+				failed.push({
+					name,
+					reason: "no-new-path"
+				});
+			}
 
-		for (const definition of definitions) {
+			if (!definition) {
+				continue;
+			}
+
 			const chatModule = new ChatModule(definition);
 			ChatModule.data.push(chatModule);
 
