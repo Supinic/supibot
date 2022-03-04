@@ -676,10 +676,10 @@
     "language": "portuguese",
     "sources": [
       {
-        "name": "UOL",
-        "url": "https://rss.uol.com.br",
-        "path": "feed",
-        "endpoints": ["noticias.xml"],
+        "name": "G1",
+        "url": "https://g1.globo.com/",
+        "path": "rss",
+        "endpoints": ["g1"],
         "helpers": ["vhns_"]
       }
     ]
