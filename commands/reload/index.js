@@ -9,122 +9,143 @@ module.exports = {
 		{ name: "skipUpgrade", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		types: [
-			{
-				target: "AwayFromKeyboard",
-				names: ["afk", "afks"]
-			},
-			{
-				target: "Banphrase",
-				names: ["banphrase", "banphrases"]
-			},
-			{
-				target: "Channel",
-				names: ["channel", "channels"]
-			},
-			{
-				target: "ChatModule",
-				names: ["chatmodule", "chatmodules", "chat-module", "chat-modules"]
-			},
-			{
-				target: "Command",
-				names: ["command", "commands"],
-				execution: async (context, invocation, ...list) => {
-					if (invocation === "command" && list.length === 0) {
-						return {
-							success: false,
-							reply: "No command names provided!"
-						};
-					}
+	Static_Data: (() => {
+		const shell = require("util").promisify(require("child_process").exec);
+		const upgrade = async (context, module, name, isPlural, ...list) => {
+			if (!isPlural && list.length === 0) {
+				return {
+					success: false,
+					reply: `No ${name} names provided!`
+				};
+			}
 
-					if (context.params.skipUpgrade !== true) {
-						const shell = require("util").promisify(require("child_process").exec);
-						await shell("yarn upgrade supi-core");
-					}
+			if (context.params.skipUpgrade !== true) {
+				await shell("yarn upgrade supi-core");
+			}
 
-					if (invocation === "commands") {
-						try {
-							await sb.Command.reloadData();
-						}
-						catch (e) {
-							await sb.Logger.log("Command.Warning", JSON.stringify(e));
-							return {
-								success: false,
-								reply: "An error occured while reloading all commands!"
-							};
-						}
+			if (isPlural) {
+				try {
+					await module.reloadData();
+				}
+				catch (e) {
+					await sb.Logger.log("Command.Warning", JSON.stringify(e));
+					return {
+						success: false,
+						reply: `An error occured while reloading all ${name}!`
+					};
+				}
 
-						return {
-							reply: `Reloaded all commands successfully.`
-						};
-					}
-					else if (invocation === "command") {
-						const result = await sb.Command.reloadSpecific(...list);
-						if (result.failed.length === 0) {
+				return {
+					reply: `Reloaded all ${name} successfully.`
+				};
+			}
+			else {
+				const result = await module.reloadSpecific(...list);
+				if (result.failed.length === 0) {
+					return {
+						reply: `${list.length} ${name}s reloaded successfully.`
+					};
+				}
+				else if (result.failed.length < list.length) {
+					return {
+						success: false,
+						reply: `${result.failed.length - list.length} ${name}s reloaded successfully, but ${result.failed.length} failed!`
+					};
+				}
+				else {
+					return {
+						success: false,
+						reply: `All ${list.length} ${name}s failed to reload!`
+					};
+				}
+			}
+		};
+
+		return {
+			upgrade,
+
+			types: [
+				{
+					target: "AwayFromKeyboard",
+					names: ["afk", "afks"]
+				},
+				{
+					target: "Banphrase",
+					names: ["banphrase", "banphrases"]
+				},
+				{
+					target: "Channel",
+					names: ["channel", "channels"]
+				},
+				{
+					executionType: "upgrade",
+					target: "ChatModule",
+					name: "chat module",
+					names: ["chatmodule", "chatmodules", "chat-module", "chat-modules"],
+					singular: ["chatmodule", "chat-module"],
+					plural: ["chatmodules", "chat-modules"]
+				},
+				{
+					executionType: "upgrade",
+					target: "Command",
+					name: "command",
+					names: ["command", "commands"],
+					singular: ["command"],
+					plural: ["commands"]
+				},
+				{
+					target: "Config",
+					names: ["config", "configs"]
+				},
+				{
+					executionType: "upgrade",
+					target: "Cron",
+					name: "cron",
+					names: ["cron", "crons"],
+					singular: ["cron"],
+					plural: ["crons"]
+				},
+				{
+					target: "Filter",
+					names: ["filter", "filters"]
+				},
+				{
+					executionType: "upgrade",
+					target: "Got",
+					name: "got instance",
+					names: ["got", "gots"],
+					singular: ["got"],
+					plural: ["gots"]
+				},
+				{
+					target: "Reminder",
+					names: ["reminder", "reminders"]
+				},
+				{
+					target: "User",
+					names: ["user", "users"],
+					execution: async (context, invocation, ...names) => {
+						if (invocation === "user") {
+							await Promise.all(names.map(name => sb.User.invalidateUserCache(name)));
+							await sb.User.getMultiple(names);
+
 							return {
-								reply: `${list.length} commands reloaded successfully.`
-							};
-						}
-						else if (result.failed.length < list.length) {
-							return {
-								success: false,
-								reply: `${result.failed.length - list.length} commands reloaded successfully, but ${result.failed.length} failed!`
+								reply: `${names.length} user(s) reload successfully.`
 							};
 						}
 						else {
+							await sb.User.reloadData();
 							return {
-								success: false,
-								reply: `All ${list.length} commands failed to reload!`
+								reply: `All users reload successfully.`
 							};
 						}
 					}
 				}
-			},
-			{
-				target: "Config",
-				names: ["config", "configs"]
-			},
-			{
-				target: "Cron",
-				names: ["cron", "crons"]
-			},
-			{
-				target: "Filter",
-				names: ["filter", "filters"]
-			},
-			{
-				target: "Got",
-				names: ["gots"]
-			},
-			{
-				target: "Reminder",
-				names: ["reminder", "reminders"]
-			},
-			{
-				target: "User",
-				names: ["user", "users"],
-				execution: async (context, invocation, ...names) => {
-					if (invocation === "user") {
-						await Promise.all(names.map(name => sb.User.invalidateUserCache(name)));
-						await sb.User.getMultiple(names);
-
-						return {
-							reply: `${names.length} user(s) reload successfully.`
-						};
-					}
-					else {
-						await sb.User.reloadData();
-						return {
-							reply: `All users reload successfully.`
-						};
-					}
-				}
-			}
-		]
-	})),
+			]
+		};
+	}),
 	Code: (async function reload (context, command, ...rest) {
-		const { types } = this.staticData;
+		const { types, upgrade } = this.staticData;
 		const item = types.find(i => i.names.includes(command));
 		if (!item) {
 			return {
@@ -133,11 +154,13 @@ module.exports = {
 			};
 		}
 
-		if (typeof item.execution === "function") {
-			return await item.execution(context, command, ...rest);
+		const module = sb[item.target];
+		if (item.type === "upgrade") {
+			const isPlural = (item.plural.includes(command));
+
+			return await upgrade(context, module, item.name, isPlural, ...rest);
 		}
 
-		const module = sb[item.target];
 		if (command.endsWith("s")) {
 			await module.reloadData();
 			return {
