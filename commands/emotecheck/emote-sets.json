@@ -517,5 +517,43 @@
       "H1Skull",
       "H1TwoTap"
     ]
+  },
+  {
+    "name": "hype-animal",
+    "aliases": ["animal-week-2021"],
+    "description": "Emotes awarded during animal week in November 2021. Received whenever you gift/cheer/sub during a Hype Train.",
+    "link": "https://blog.twitch.tv/en/2021/11/01/animal-week-is-very-good-yes-it-is/",
+    "emotes": [
+      "HypeApplause",
+      "HypeAwww",
+      "HypeBLEH",
+      "HypeBoop",
+      "HypeCheer",
+      "HypeCool",
+      "HypeCozy1",
+      "HypeCry",
+      "HypeDerp1",
+      "HypeEvil",
+      "HypeFail",
+      "HypeHai",
+      "HypeHands1",
+      "HypeHands2",
+      "HypeHuh",
+      "HypeHype",
+      "HypeLUL",
+      "HypeLove1",
+      "HypeLurk",
+      "HypeMwah",
+      "HypeNom",
+      "HypePat",
+      "HypePopcorn",
+      "HypeRage",
+      "HypeReading",
+      "HypeSeemsGood",
+      "HypeShock",
+      "HypeSleep",
+      "HypeStress",
+      "HypeWave"
+    ]
   }
 ]
