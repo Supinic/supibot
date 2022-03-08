@@ -55,11 +55,13 @@ module.exports = {
 				const delta = deltaEl.children[0].data;
 				const imgEl = [...node.children].find(i => i.attribs?.class?.includes("img"));
 				const image = imgEl.children[0]?.children[0].attribs.src ?? null;
+				const isPropaganda = [...node.children].some(i => i.attribs?.class?.includes("propaganda"));
 
 				result.push({
 					title,
 					delta,
-					image
+					image,
+					isPropaganda
 				});
 			}
 
@@ -76,15 +78,16 @@ module.exports = {
 		if (filteredEvents.length === 0) {
 			filteredEvents = data;
 
-			repeated = "♻";
+			repeated = " ♻";
 			this.data.repeats = [];
 		}
 
 		const [event] = filteredEvents;
+		const propagandaEmoji = (event.isPropaganda) ? "⚠" : "";
 		this.data.repeats.push(event.title);
 
 		return {
-			reply: `${repeated} ${event.title} ${event.image ?? ""} (posted ${event.delta})`
+			reply: `${propagandaEmoji} ${event.title} ${event.image ?? ""} (posted ${event.delta}${repeated})`
 		};
 	}),
 	Dynamic_Description: null
