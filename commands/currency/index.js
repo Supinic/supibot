@@ -92,18 +92,19 @@ module.exports = {
 			let dollarExchangeRate = await this.getCacheData("irr-usd-exchange-rate");
 			if (!dollarExchangeRate) {
 				const response = await sb.Got("GenericAPI", {
-					url: "https://dapi.p3p.repl.co/api/",
-					throwHttpErrors: false,
-					searchParams: {
-						currency: "usd"
-					}
+					url: "https://call4.tgju.org/ajax.json",
+					throwHttpErrors: false
 				});
 
 				if (response.statusCode === 200) {
-					dollarExchangeRate = Number(response.body.Price);
-					await this.setCacheData("irr-usd-exchange-rate", dollarExchangeRate, {
-						expiry: 864e5 // 24 hours
-					});
+					const data = response.body.current?.price_dollar_rl;
+					dollarExchangeRate = Number(data.p.replaceAll(",", ""));
+
+					if (!Number.isNaN(dollarExchangeRate)) {
+						await this.setCacheData("irr-usd-exchange-rate", dollarExchangeRate, {
+							expiry: 3_600_000 // 1 hour
+						});
+					}
 				}
 			}
 
