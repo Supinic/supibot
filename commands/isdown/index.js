@@ -10,7 +10,7 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function isDown (context, input) {
 		const { domainToASCII } = require("url");
-		const fixedInput = domainToASCII(input);
+		const fixedInput = domainToASCII(input) || input; // domainToASCII returns empty string for invalid input - hence ||
 		const response = await sb.Got("GenericAPI", {
 			url: `https://api-prod.downfor.cloud/httpcheck/${fixedInput}`
 		});
@@ -25,7 +25,7 @@ module.exports = {
 		const now = sb.Date.now();
 		const { isDown, lastChecked, statusCode } = response.body;
 		const deltaString = (Math.abs(now - lastChecked) > 1000)
-			? ` Last checked ${sb.Utils.timeDelta(new sb.Date(lastChecked))}`
+			? ` Last checked ${sb.Utils.timeDelta(new sb.Date(lastChecked))}.`
 			: "";
 
 		if (statusCode === 0) {
@@ -36,12 +36,12 @@ module.exports = {
 		}
 		else if (isDown) {
 			return {
-				reply: `That website is currently not available with status code ${statusCode}.${deltaString}.`
+				reply: `That website is currently not available with status code ${statusCode}.${deltaString}`
 			};
 		}
 		else {
 			return {
-				reply: `That website is currently up and available.${deltaString}.`
+				reply: `That website is currently up and available.${deltaString}`
 			};
 		}
 	}),
