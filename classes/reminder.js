@@ -540,8 +540,8 @@ module.exports = class Reminder extends require("./template.js") {
 			)
 		]);
 
-		const incomingLimit = sb.Config.get("MAX_ACTIVE_INCOMING_REMINDERS");
-		const outgoingLimit = sb.Config.get("MAX_ACTIVE_OUTGOING_REMINDERS");
+		const incomingLimit = sb.Config.get("MAX_ACTIVE_INCOMING_REMINDERS", false) ?? 10;
+		const outgoingLimit = sb.Config.get("MAX_ACTIVE_OUTGOING_REMINDERS", false) ?? 10;
 		const [privateIncoming, publicIncoming] = sb.Utils.splitByCondition(incomingData, i => i.Private_Message);
 		const [privateOutgoing, publicOutgoing] = sb.Utils.splitByCondition(outgoingData, i => i.Private_Message);
 
@@ -571,7 +571,9 @@ module.exports = class Reminder extends require("./template.js") {
 		}
 
 		if (schedule) {
-			if (!(schedule instanceof Date) && !(schedule instanceof sb.Date)) {
+			const incomingScheduledLimit = sb.Config.get("MAX_ACTIVE_SCHEDULED_INCOMING_REMINDERS", false) ?? 5;
+			const outgoingScheduledLimit = sb.Config.get("MAX_ACTIVE_SCHEDULED_OUTGOING_REMINDERS", false) ?? 5;
+			if (!(schedule instanceof sb.Date)) {
 				throw new sb.Error({
 					message: "Invalid schedule provided",
 					args: { schedule, userFrom, userTo }
@@ -597,7 +599,7 @@ module.exports = class Reminder extends require("./template.js") {
 					.from("chat_data", "Reminder")
 					.where("Active = %b", true)
 					.where("Schedule IS NOT NULL")
-					.where("User_From = %n", userTo)
+					.where("User_From = %n", userFrom)
 					.where("DAY(Schedule) = %n", schedule.day)
 					.where("MONTH(Schedule) = %n", schedule.month)
 					.where("YEAR(Schedule) = %n", schedule.year)
@@ -607,13 +609,13 @@ module.exports = class Reminder extends require("./template.js") {
 				)
 			]);
 
-			if (scheduledIncoming >= incomingLimit) {
+			if (scheduledIncoming >= incomingScheduledLimit) {
 				return {
 					success: false,
 					cause: "scheduled-incoming"
 				};
 			}
-			else if (scheduledOutgoing >= outgoingLimit) {
+			else if (scheduledOutgoing >= outgoingScheduledLimit) {
 				return {
 					success: false,
 					cause: "scheduled-outgoing"
