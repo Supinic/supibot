@@ -468,8 +468,8 @@
   },
   {
     "name": "hype2021",
-    "aliases": ["hype"],
-    "description": "Holiday emotes for 2020 holiday season. Called Hindsight, because 20-20 is the year and the hindsight. First set awarded between 2020-12-02 and 2020-12-16, the second from 2020-12-16 to 2021-01-04; whenever someone subs, gifts or cheers.",
+    "aliases": [],
+    "description": "Hype emotes awarded in May 2021. Received when you keep a Hype Train going by cheering/gifting/subbing.",
     "link": "https://twitter.com/TwitchSupport/status/1390743421208387592",
     "emotes": [
       "HypeAttack",
