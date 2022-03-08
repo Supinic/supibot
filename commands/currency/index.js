@@ -93,6 +93,7 @@ module.exports = {
 			if (!dollarExchangeRate) {
 				const response = await sb.Got("GenericAPI", {
 					url: "https://dapi.p3p.repl.co/api/",
+					throwHttpErrors: false,
 					searchParams: {
 						currency: "usd"
 					}
@@ -101,36 +102,38 @@ module.exports = {
 				if (response.statusCode === 200) {
 					dollarExchangeRate = Number(response.body.Price);
 					await this.setCacheData("irr-usd-exchange-rate", dollarExchangeRate, {
-						expiry: 3_600_000 // 1 hour
+						expiry: 864e5 // 24 hours
 					});
 				}
 			}
 
-			const otherCurrency = (first === "IRR") ? second : first;
-			let ratio;
-			if (first === "USD" || second === "USD") {
-				ratio = (second === "USD") ? (1 / dollarExchangeRate) : dollarExchangeRate;
-			}
-			else {
-				const convertKey = `USD_${otherCurrency}`;
-				const response = await sb.Got("GenericAPI", {
-					url: "https://free.currconv.com/api/v7/convert",
-					searchParams: {
-						apiKey: sb.Config.get("API_FREE_CURRENCY_CONVERTER"),
-						q: convertKey,
-						compact: "y"
-					}
-				});
+			if (dollarExchangeRate) {
+				const otherCurrency = (first === "IRR") ? second : first;
+				let ratio;
+				if (first === "USD" || second === "USD") {
+					ratio = (second === "USD") ? (1 / dollarExchangeRate) : dollarExchangeRate;
+				}
+				else {
+					const convertKey = `USD_${otherCurrency}`;
+					const response = await sb.Got("GenericAPI", {
+						url: "https://free.currconv.com/api/v7/convert",
+						searchParams: {
+							apiKey: sb.Config.get("API_FREE_CURRENCY_CONVERTER"),
+							q: convertKey,
+							compact: "y"
+						}
+					});
 
-				const otherCurrencyRatio = response.body[convertKey].val;
-				ratio = (first === "IRR")
-					? (otherCurrencyRatio / dollarExchangeRate)
-					: (dollarExchangeRate / otherCurrencyRatio);
-			}
+					const otherCurrencyRatio = response.body[convertKey].val;
+					ratio = (first === "IRR")
+						? (otherCurrencyRatio / dollarExchangeRate)
+						: (dollarExchangeRate / otherCurrencyRatio);
+				}
 
-			const roundLimit = (first === "IRR") ? 3 : 0;
-			const fixedSecondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, roundLimit));
-			message = `Official: ${message}; True: ${firstAmount} ${first} = ${fixedSecondAmount} ${second}`;
+				const roundLimit = (first === "IRR") ? 3 : 0;
+				const fixedSecondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, roundLimit));
+				message = `Official: ${message}; True: ${firstAmount} ${first} = ${fixedSecondAmount} ${second}`;
+			}
 		}
 
 		return {
