@@ -294,7 +294,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			}
 
 			const guildUsers = await channelObject.guild.members.fetch();
-			const sortedUsers = guildUsers.array().sort((a, b) => b.user.username.length - a.user.username.length);
+			const sortedUsers = [...guildUsers.values()].sort((a, b) => b.user.username.length - a.user.username.length);
 			for (const member of sortedUsers) {
 				const name = sb.User.normalizeUsername(member.user.username);
 				const regex = new RegExp(`(\\s|^)@${sb.Utils.escapeRegExp(name)}\\b`, "gi");
@@ -584,7 +584,7 @@ module.exports = class DiscordController extends require("./template.js") {
 		const discordChannel = await this.client.channels.fetch(channelData.Name);
 		const guild = await this.client.guilds.fetch(discordChannel.guild.id);
 
-		const emojis = guild.emojis.cache.array();
+		const emojis = [...guild.emojis.cache.values()];
 		return emojis.map(i => ({
 			ID: i.id,
 			name: i.name,
@@ -595,7 +595,7 @@ module.exports = class DiscordController extends require("./template.js") {
 	}
 
 	async fetchGlobalEmotes () {
-		return this.client.emojis.cache.array().map(i => ({
+		return this.client.emojis.cache.map(i => ({
 			ID: i.id,
 			name: i.name,
 			type: "discord",
