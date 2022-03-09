@@ -179,7 +179,7 @@ module.exports = class Channel extends require("./template.js") {
 			"PRIMARY KEY (`ID`),",
 			`INDEX \`fk_user_alias_${name}\` (\`User_Alias\`),`,
 			`CONSTRAINT \`fk_user_alias_${name}\` FOREIGN KEY (\`User_Alias\`) REFERENCES \`chat_data\`.\`User_Alias\` (\`ID\`) ON UPDATE CASCADE ON DELETE CASCADE)`,
-			"COLLATE=`utf8mb4_general_ci` ENGINE=InnoDB AUTO_INCREMENT=1;"
+			"COLLATE=`utf8mb4_general_ci` ENGINE=InnoDB AUTO_INCREMENT=1 PAGE_COMPRESSED=1;"
 		].join(" "));
 
 		// Set up user-specific meta logging trigger
