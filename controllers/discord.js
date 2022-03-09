@@ -23,13 +23,13 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		const intents = new Intents();
 		intents.add(
-			"GUILD_ROLE_UPDATE",
-			"GUILD_ROLE_DELETE",
-			"MESSAGE_CREATE",
-			"GUILD_EMOJIS",
+			"GUILDS",
+			"GUILD_MEMBERS",
+			"GUILD_EMOJIS_AND_STICKERS",
 			"GUILD_MESSAGES",
+			"GUILD_MESSAGE_REACTIONS",
 			"DIRECT_MESSAGES",
-			"GUILD_MEMBERS"
+			"DIRECT_MESSAGE_REACTIONS"
 		);
 
 		this.client = new Client({
