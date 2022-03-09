@@ -531,8 +531,10 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		let index = 0;
 		let targetMessage = messageObject.cleanContent.replace(/\n/g, " ");
-		while (targetMessage.length < this.platform.Message_Limit && index < links.length) {
-			targetMessage += ` ${links[index]}`;
+
+		const extras = [...stickers, ...links];
+		while (targetMessage.length < this.platform.Message_Limit && index < extras.length) {
+			targetMessage += ` ${extras[index]}`;
 			index++;
 		}
 
