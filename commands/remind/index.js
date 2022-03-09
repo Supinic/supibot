@@ -297,7 +297,7 @@ module.exports = {
 
 		`<code>${prefix}remindprivate (person) hello :)</code>`,
 		`<code>${prefix}remind private:true (person) hello :)</code>`,
-		"Privately reminds target person (via whispers/PMs) when they next type in chat with Supibot.",
+		"Privately reminds target person (via whispers/PMs) when they next type in a channel that has Supibot active.",
 		"",
 
 		`<code>${prefix}remind (person) hello :) in (time)</code>`,
