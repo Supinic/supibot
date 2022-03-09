@@ -4,7 +4,7 @@
   "dependencies": {
     "cytube-connector": "github:Supinic/cytube-connector",
     "dank-twitch-irc": "^4.3.0",
-    "discord.js": "^12.2.0",
+    "discord.js": "^13.0.0",
     "irc-framework": "^4.11.0",
     "message-scheduler": "github:Supinic/message-scheduler",
     "supi-core": "github:Supinic/supi-core",

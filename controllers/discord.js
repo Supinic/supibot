@@ -20,12 +20,20 @@ module.exports = class DiscordController extends require("./template.js") {
 		}
 
 		const { Client, Intents } = require("discord.js");
+
 		const intents = new Intents();
-		intents.add(Intents.NON_PRIVILEGED, "GUILD_MEMBERS");
+		intents.add(
+			"GUILD_ROLE_UPDATE",
+			"GUILD_ROLE_DELETE",
+			"MESSAGE_CREATE",
+			"GUILD_EMOJIS",
+			"GUILD_MESSAGES",
+			"DIRECT_MESSAGES",
+			"GUILD_MEMBERS"
+		);
 
 		this.client = new Client({
-			ws: { intents },
-			disableMentions: "everyone"
+			intents
 		});
 
 		this.initListeners();
@@ -36,7 +44,7 @@ module.exports = class DiscordController extends require("./template.js") {
 	initListeners () {
 		const client = this.client;
 
-		client.on("message", async (messageObject) => {
+		client.on("messageCreate", async (messageObject) => {
 			const {
 				commandArguments,
 				chan,
@@ -215,9 +223,9 @@ module.exports = class DiscordController extends require("./template.js") {
 					: commandArguments.slice(1);
 
 				if (messageObject.reference) {
-					const { channelID, messageID } = messageObject.reference;
-					const referenceChannel = await this.client.channels.fetch(channelID);
-					const referenceMessageObject = await referenceChannel.messages.fetch(messageID);
+					const { channelId, messageId } = messageObject.reference;
+					const referenceChannel = await this.client.channels.fetch(channelId);
+					const referenceMessageObject = await referenceChannel.messages.fetch(messageId);
 					const { msg } = this.parseMessage(referenceMessageObject);
 
 					args.push(...msg.split(" ").filter(Boolean));
