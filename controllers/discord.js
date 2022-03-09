@@ -548,7 +548,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			author: messageObject.author,
 			mentions: messageObject.mentions,
 			guild: messageObject?.channel?.guild ?? null,
-			privateMessage: Boolean(messageObject.channel.type === "dm"),
+			privateMessage: Boolean(messageObject.channel.type.toLowerCase() === "dm"),
 			commandArguments: args
 		};
 	}
