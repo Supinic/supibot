@@ -33,7 +33,8 @@ module.exports = class DiscordController extends require("./template.js") {
 		);
 
 		this.client = new Client({
-			intents
+			intents,
+			partials: ["CHANNEL"]
 		});
 
 		this.initListeners();
