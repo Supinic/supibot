@@ -476,8 +476,14 @@ module.exports = {
 					}
 
 					const asset = portfolioData.assets.find(i => i.Code === sourceAsset.Code);
-					const multiplier = sb.Utils.round(percent * 0.01, 4);
+					if (!asset) {
+						return {
+							success: false,
+							reply: `You don't have any ${sourceAsset.Code}!`
+						};
+					}
 
+					const multiplier = sb.Utils.round(percent * 0.01, 4);
 					sourceAmount = ((asset.Amount ?? 0) * multiplier);
 				}
 
