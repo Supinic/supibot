@@ -9,42 +9,37 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function countLineTotal (context) {
-		const data = await sb.Query.getRecordset(rs => rs
-			.select("(SUM(DATA_LENGTH) + SUM(INDEX_LENGTH)) AS Bytes")
-			.select("SUM(AUTO_INCREMENT) AS Chat_Lines")
-			.from("INFORMATION_SCHEMA", "TABLES")
-			.where("TABLE_SCHEMA = %s", "chat_line")
-			.single()
-		);
-
-		const history = await sb.Query.getRecordset(rs => rs
-			.select("Executed", "Result")
-			.from("chat_data", "Command_Execution")
-			.where("Command = %s", this.Name)
-			.where("Result <> %s", "")
-			.orderBy("Executed ASC")
-			.limit(1)
-			.single()
-		);
+		const [response, chatLineAmount, history] = await Promise.all([
+			sb.Got("GenericAPI", "http://192.168.1.102:11111/ssd"),
+			sb.Query.getRecordset(rs => rs
+				.select("SUM(AUTO_INCREMENT) AS Chat_Lines")
+				.from("INFORMATION_SCHEMA", "TABLES")
+				.where("TABLE_SCHEMA = %s", "chat_line")
+				.flat("Chat_Lines")
+				.single()
+			),
+			sb.Query.getRecordset(rs => rs
+				.select("Executed", "Result")
+				.from("chat_data", "Command_Execution")
+				.where("Command = %s", this.Name)
+				.where("Result <> %s", "")
+				.orderBy("Executed ASC")
+				.limit(1)
+				.single()
+			)
+		]);
 
 		let historyText = "";
-		const currentSize = sb.Utils.round(data.Bytes / (10 ** 9), 3);
+		const currentSize = sb.Utils.round(response.body.data.size / (10 ** 9), 3);
+		const maximumSize = sb.Config.get("DATA_DRIVE_MAXIMUM_SIZE_GB", false) ?? 220; // default size is hardcoded ~220 GB
+		const percentUsage = sb.Utils.round((currentSize / maximumSize) * 100, 2);
 
 		if (history) {
 			const days = (sb.Date.now() - history.Executed) / 864.0e5;
-
 			const originalLines = Number(history.Result.match(/logging([\d ])+lines/)[1]);
-			const linesPerHour = sb.Utils.round((data.Chat_Lines - originalLines) / (days * 24), 0);
+			const linesPerHour = sb.Utils.round((chatLineAmount - originalLines) / (days * 24), 0);
 
-			const originalSize = Number(history.Result.match(/([\d.]+) GB of space/)[1]);
-			const rate = sb.Utils.round((currentSize - originalSize) / days, 3);
-			const megabytesPerHour = sb.Utils.round(rate * 1024 / 24, 3);
-			const fillDate = new sb.Date().addDays((220 - currentSize) / rate); // 238 GB minus an estimate of ~18GB of other stuff
-
-			historyText = `Lines are added at a rate of ~${megabytesPerHour} MB/hr and ${sb.Utils.groupDigits(linesPerHour)} lines/hr. `;
-			historyText += (megabytesPerHour === 0)
-				? `At this rate, its impossible to calculate when Supibot's hard drive will fill.`
-				: `At this rate, Supibot's hard drive will run out of space approximately on ${fillDate.format("Y-m-d")}.`;
+			historyText = `Lines are added at a rate of ${sb.Utils.groupDigits(linesPerHour)} lines/hr.`;
 		}
 
 		const cooldown = {};
@@ -62,8 +57,8 @@ module.exports = {
 		return {
 			cooldown,
 			reply: sb.Utils.tag.trim `
-				Currently logging ${sb.Utils.groupDigits(data.Chat_Lines)} lines in total across all channels,
-				taking up ~${currentSize} GB of space.
+				Currently logging ${sb.Utils.groupDigits(chatLineAmount)} lines in total across all channels,
+				taking up ~${currentSize} GB of space (${percentUsage}%).
 				${historyText}
 			`
 		};
