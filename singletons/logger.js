@@ -121,7 +121,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 						};
 					}
 
-					await this.metaBatch.insert({ ignore: true });
+					await this.metaBatch.insert({ ignore: false });
 				}
 			});
 			this.metaCron.start();
