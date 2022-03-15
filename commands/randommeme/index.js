@@ -8,6 +8,7 @@ module.exports = {
 	Params: [
 		{ name: "comments", type: "boolean" },
 		{ name: "flair", type: "string" },
+		{ name: "ignoreFlair", type: "string" },
 		{ name: "linkOnly", type: "boolean" },
 		{ name: "showFlairs", type: "boolean" },
 		{ name: "skipGalleries", type: "boolean" }
@@ -265,6 +266,7 @@ module.exports = {
 			&& !i.isTextPost
 			&& !repeatedPosts.includes(i.id)
 			&& (!context.params.flair || i.hasFlair(context.params.flair, false))
+			&& (!context.params.ignoreFlair || !i.hasFlair(context.params.ignoreFlair, false))
 			&& (!context.params.skipGalleries || !i.hasGallery())
 		));
 
@@ -335,6 +337,10 @@ module.exports = {
 
 			`<code>${prefix}rm (subreddit) flair:(flair)</code>`,
 			"If a flair is provided, only the posts that contain such flair will be used (case-insensitive).",
+			"",
+
+			`<code>${prefix}rm (subreddit) ignoreFlair:(flair)</code>`,
+			"The opposite of <code>flair</code>, only the posts that do not contain such flair will be used (case-insensitive).",
 			"",
 
 			`<code>${prefix}rm (subreddit) showFlairs:true</code>`,
