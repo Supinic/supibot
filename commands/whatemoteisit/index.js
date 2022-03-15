@@ -76,7 +76,7 @@ module.exports = {
 		const {
 			channelName,
 			channelLogin,
-			channelID,
+			// channelID,
 			emoteAssetType,
 			emoteCode,
 			emoteID,
@@ -130,14 +130,7 @@ module.exports = {
 			tierString = `${emoteAssetType?.toLowerCase() ?? ""} ${emoteType?.toLowerCase() ?? ""} ${channelName ?? ""} emote`;
 		}
 
-		let emoteLink;
-		if (channelName) {
-			emoteLink = `https://twitchemotes.com/channels/${channelID}/emotes/${emoteID}`;
-		}
-		else {
-			emoteLink = `https://twitchemotes.com/global/emotes/${emoteID}`;
-		}
-
+		const emoteLink = `https://e.wrnv.xyz/${emoteCode}`;
 		return {
 			reply: `${emoteCode} (ID ${emoteID}) - ${active} ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
 		};
