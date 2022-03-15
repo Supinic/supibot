@@ -49,7 +49,7 @@ module.exports = {
 				else if (result.failed.length < list.length) {
 					return {
 						success: false,
-						reply: `${result.failed.length - list.length} ${name}s reloaded successfully, but ${result.failed.length} failed!`
+						reply: `${list.length - result.failed.length} ${name}s reloaded successfully, but ${result.failed.length} failed!`
 					};
 				}
 				else {
