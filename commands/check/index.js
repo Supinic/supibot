@@ -606,6 +606,13 @@ module.exports = {
 							reply: `You don't have any timers set up!`
 						};
 					}
+
+					if (!identifier) {
+						const timerNames = Object.keys(timers).sort();
+						return {
+							reply: `You have ${timerNames.length} timers: ${timerNames.join(", ")}`
+						};
+					}
 					else if (!timers[identifier]) {
 						return {
 							success: false,
