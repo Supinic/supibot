@@ -11,7 +11,8 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		regexV1: /^\d+$/,
-		regexV2: /emotesv2_[a-z0-9]{32}/
+		regexV2: /emotesv2_[a-z0-9]{32}/,
+		regexCDN: /emoticons\/v[12]\/([\w\d]*)\//
 	})),
 	Code: (async function whatEmoteIsIt (context, ...args) {
 		let input = args.join(" ");
@@ -26,12 +27,15 @@ module.exports = {
 			input = context.append.emotes.split(":")[0];
 		}
 
-		const { regexV1, regexV2 } = this.staticData;
-		const isEmoteID = (regexV1.test(input) || regexV2.test(input));
+		const { regexCDN, regexV1, regexV2 } = this.staticData;
+		const isEmoteID = (regexV1.test(input) || regexV2.test(input) || regexCDN.test(input));
 
 		let inputEmoteIdentifier;
 		if (isEmoteID) {
-			if (regexV2.test(input)) {
+			if (regexCDN.test(input)) {
+				inputEmoteIdentifier = input.match(regexCDN)[1];
+			}
+			else if (regexV2.test(input)) {
 				inputEmoteIdentifier = input.match(regexV2)[0];
 			}
 			else if (regexV1.test(input)) {
