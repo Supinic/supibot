@@ -101,12 +101,13 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 						return;
 					}
 
-					const now = new sb.Date().discardTimeUnits("s", "ms");
-					for (const [channelID, { amount, length }] of Object.entries(this.meta)) {
+					const now = new sb.Date().discardTimeUnits("m", "s", "ms");
+					for (const [channel, { amount, length }] of Object.entries(this.meta)) {
 						if (amount === 0 && length === 0) {
 							continue;
 						}
 
+						const channelID = Number(channel.replace("channel-", ""));
 						this.metaBatch.add({
 							Timestamp: now,
 							Channel: channelID,
