@@ -130,7 +130,7 @@ module.exports = {
 			tierString = `${emoteAssetType?.toLowerCase() ?? ""} ${emoteType?.toLowerCase() ?? ""} ${channelName ?? ""} emote`;
 		}
 
-		const emoteLink = `https://e.wrnv.xyz/${emoteCode}`;
+		const emoteLink = `https://emotes.raccatta.cc/twitch/emote/${emoteID}`;
 		return {
 			reply: `${emoteCode} - ID ${emoteID} - ${active} ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
 		};
