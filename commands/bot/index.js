@@ -284,8 +284,8 @@ module.exports = {
 				}
 
 				return {
-					reply: (partFailed && joinFailed)
-						? `Attempted to re-join ${channelString} - but it was likely unsuccessful. The ban might still be active, make sure to check.`
+					reply: (partFailed || joinFailed)
+						? `Attempted to re-join ${channelString} - but it was likely unsuccessful. If I'm not active in the channel now, try again in a little bit.`
 						: `Attempted to re-join ${channelString} - it was likely successful.`
 				};
 			}
