@@ -132,7 +132,7 @@ module.exports = {
 
 		const emoteLink = `https://e.wrnv.xyz/${emoteCode}`;
 		return {
-			reply: `${emoteCode} (ID ${emoteID}) - ${active} ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
+			reply: `${emoteCode} - ID ${emoteID} - ${active} ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
 		};
 	}),
 	Dynamic_Description: null
