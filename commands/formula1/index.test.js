@@ -8,4 +8,11 @@ describe("command: f1", () => {
 
 		assert.strictEqual(duplicates.length, 0, `There are duplicates:\n${duplicates.join("\n")}`);
 	});
+
+	it("should not have any duplicate Kimi Räikkönen", () => {
+		const pastas = require("./kimi.json");
+		const duplicates = pastas.filter((i, ind, arr) => arr.indexOf(i) !== ind);
+
+		assert.strictEqual(duplicates.length, 0, `There are duplicates:\n${duplicates.join("\n")}`);
+	});
 });
