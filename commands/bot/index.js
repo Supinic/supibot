@@ -193,7 +193,7 @@ module.exports = {
 				const row = await sb.Query.getRow("chat_data", "Channel_Chat_Module");
 				row.setValues({
 					Channel: channelData.ID,
-					Chat_Module: moduleData.ID
+					Chat_Module: moduleData.Name
 				});
 				await row.save();
 
