@@ -35,7 +35,7 @@ module.exports = {
 			query: ` 
 				query {
 					user(login: "${name}") {
-						followers(order: ASC, first: 1) {
+						followers(order: ASC, first: 10) {
 							edges {
 								followedAt
 								node {
@@ -66,8 +66,16 @@ module.exports = {
 			};
 		}
 
-		const date = edges[0].followedAt;
-		const followUsername = edges[0].node.login;
+		const edge = edges.find(i => i.node);
+		if (!edge) {
+			return {
+				success: false,
+				reply: `You seem to have hit a very rare case where all 10 first followers are banned! Congratulations?`
+			};
+		}
+		
+		const date = edge.followedAt;
+		const followUsername = edge.node.login;
 		const followUser = (followUsername.toLowerCase() === context.user.Name)
 			? "you!"
 			: followUsername;

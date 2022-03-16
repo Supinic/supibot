@@ -35,7 +35,7 @@ module.exports = {
 			query: ` 
 				query {
 					user(login: "${name}") {
-						follows(order: ASC, first: 1) {
+						follows(order: ASC, first: 10) {
 							edges {
 								followedAt
 								node {
@@ -60,14 +60,22 @@ module.exports = {
 		}
 
 		const { edges } = response.body.data.user.follows;
-		if (edges.length === 0) {
+		if (!edges || edges.length === 0) {
 			return {
 				reply: `${sb.Utils.capitalize(who)} don't follow anyone.`
 			};
 		}
 
-		const date = edges[0].followedAt;
-		const followUsername = edges[0].node.login;
+		const edge = edges.find(i => i.node);
+		if (!edge) {
+			return {
+				success: false,
+				reply: `You seem to have hit a very rare case where all 10 first followers are banned! Congratulations?`
+			};
+		}
+
+		const date = edge.followedAt;
+		const followUsername = edge.node.login;
 		const followUser = (followUsername.toLowerCase() === context.user.Name)
 			? "you!"
 			: followUsername;
