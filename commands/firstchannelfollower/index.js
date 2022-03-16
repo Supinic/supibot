@@ -73,7 +73,7 @@ module.exports = {
 				reply: `You seem to have hit a very rare case where all 10 first followers are banned! Congratulations?`
 			};
 		}
-		
+
 		const date = edge.followedAt;
 		const followUsername = edge.node.login;
 		const followUser = (followUsername.toLowerCase() === context.user.Name)
@@ -82,7 +82,7 @@ module.exports = {
 
 		const delta = sb.Utils.timeDelta(new sb.Date(date), false, true);
 		return {
-			reply: `The longest still following user ${who} have is ${followUser}, since ${delta}.`
+			reply: `The longest still following user ${who} have is @${followUser}, since ${delta}.`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
