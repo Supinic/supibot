@@ -91,7 +91,8 @@ module.exports = {
 				embed.addField("Description", item.Description);
 			}
 
-			await discordChannel.send(`<@&${discordUpdatesRole}>`, {
+			await discordChannel.send({
+				content: `<@&${discordUpdatesRole}>`,
 				embeds: [embed]
 			});
 		}
