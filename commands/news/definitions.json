@@ -722,5 +722,18 @@
         "helpers": ["collapsingwave"]
       }
     ]
+  },
+  {
+    "code": "phoronix",
+    "language": "english",
+    "sources": [
+      {
+        "name": "Phoronix",
+        "url": "https://www.phoronix.com",
+        "path": null,
+        "endpoints": ["rss.php"],
+        "helpers": ["boring_nick"]
+      }
+    ]
   }
 ]
