@@ -63,7 +63,7 @@ module.exports = {
 					user: context.user
 				});
 
-				if (!whitelist) {
+				if (whitelist.length === 0) {
 					filteredResponse = "🚷 You don't have access to this command here!";
 				}
 			}
