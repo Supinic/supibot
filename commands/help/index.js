@@ -59,7 +59,7 @@ module.exports = {
 			const cooldownString = `${sb.Utils.round(command.Cooldown / 1000, 1)} seconds cooldown.`;
 			const cooldownModifier = sb.Filter.getCooldownModifiers({
 				command,
-				invocation: context.invocation,
+				invocation: identifier,
 				platform: context.platform,
 				channel: context.channel ?? null,
 				user: context.user
