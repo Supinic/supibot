@@ -18,7 +18,7 @@ module.exports = {
 		const { baseCacheKey, supportedLanguageCodes } = this.staticData;
 
 		const inputLanguage = context.params.lang ?? "en";
-		const languageCode = sb.Utils.modules.languagesISO.getCode(inputLanguage);
+		const languageCode = sb.Utils.modules.languageISO.getCode(inputLanguage);
 		if (!languageCode) {
 			return {
 				success: false,
