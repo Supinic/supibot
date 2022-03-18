@@ -83,7 +83,7 @@ module.exports = {
 				const type = (cooldownModifier.Data.multiplier) ? "multiplier" : "override";
 				const modified = sb.Utils.round(cooldownModifier.applyData(command.Cooldown) / 1000, 1);
 
-				modifierString = `(cooldown ${type}: - ${modified}s)`;
+				modifierString = `(cooldown ${type}: ${modified}s)`;
 			}
 
 			return {
