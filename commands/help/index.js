@@ -53,9 +53,22 @@ module.exports = {
 				};
 			}
 
-			const filteredResponse = (command.Flags.whitelist) ? "(whitelisted)" : "";
-			const aliases = (command.Aliases.length === 0) ? "" : (` (${command.Aliases.map(i => prefix + i).join(", ")})`);
+			let filteredResponse = "";
+			if (command.Flags.whitelist) {
+				const whitelist = sb.Filter.getLocals("Whitelist", {
+					command,
+					invocation: identifier,
+					platform: context.platform,
+					channel: context.channel,
+					user: context.user
+				});
 
+				if (!whitelist) {
+					filteredResponse = "🚷 You don't have access to this command here!";
+				}
+			}
+
+			const aliases = (command.Aliases.length === 0) ? "" : (` (${command.Aliases.map(i => prefix + i).join(", ")})`);
 			const cooldownString = `${sb.Utils.round(command.Cooldown / 1000, 1)} seconds cooldown.`;
 			const cooldownModifier = sb.Filter.getCooldownModifiers({
 				command,
@@ -70,17 +83,17 @@ module.exports = {
 				const type = (cooldownModifier.Data.multiplier) ? "multiplier" : "override";
 				const modified = sb.Utils.round(cooldownModifier.applyData(command.Cooldown) / 1000, 1);
 
-				modifierString = `(you have a cooldown ${type} active - ${modified} seconds cooldown)`;
+				modifierString = `(cooldown ${type}: - ${modified}s)`;
 			}
 
 			return {
 				reply: sb.Utils.tag.trim `
 					${prefix}${command.Name}${aliases}:
 					${command.Description ?? "(no description)"}
+					${filteredResponse}
 					-
 					${cooldownString}
 					${modifierString}
-					${filteredResponse}
 					${command.getDetailURL()}
 				`
 			};
