@@ -160,6 +160,9 @@ module.exports = {
 
 			return await upgrade(context, module, item.name, isPlural, ...rest);
 		}
+		else if (typeof item.execution === "function") {
+			return await upgrade(context, command, ...rest);
+		}
 
 		if (command.endsWith("s")) {
 			await module.reloadData();
