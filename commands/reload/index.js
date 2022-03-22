@@ -161,7 +161,7 @@ module.exports = {
 			return await upgrade(context, module, item.name, isPlural, ...rest);
 		}
 		else if (typeof item.execution === "function") {
-			return await upgrade(context, command, ...rest);
+			return await item.execution(context, command, ...rest);
 		}
 
 		if (command.endsWith("s")) {
