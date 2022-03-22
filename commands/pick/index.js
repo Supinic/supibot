@@ -23,12 +23,28 @@ module.exports = {
 
 		// normalize input - there might be arguments with other or multiple whitespace inside them
 		const prepared = words.join(" ").split(splitRegex).filter(Boolean);
+		const word = sb.Utils.randArray(prepared);
+
 		return {
-			reply: sb.Utils.randArray(prepared),
+			reply: word,
 			cooldown: (context.append.pipe)
 				? 0
 				: this.Cooldown
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"Picks a single word from a list in your message.",
+		`This command has no cooldown if used within a <a href="/bot/command/detail/pipe">${prefix}pipe</a> command.`,
+		"",
+
+		`<code>${prefix}pick (list of words)</code>`,
+		`<code>${prefix}pick a b c d e</code>`,
+		"Returns exactly one word - a letter in this case.",
+		"The words are separated by any amount of spaces or other whitespace.",
+
+		`<code>${prefix}pick <u>delimiter:;</u> a;b;c;d;e</code>`,
+		`<code>${prefix}pick <u>delimiter:"-FOO-"</u> a-FOO-b-FOO-c-FOO-d-FOO-e</code>`,
+		"Returns exactly one word - like in previous example.",
+		"The words are separated by a delimiter character or string of characters, specified by you."
+	])
 };
