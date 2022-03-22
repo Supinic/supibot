@@ -39,7 +39,9 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		this.initListeners();
 
-		this.client.login(sb.Config.get("DISCORD_BOT_TOKEN"));
+		/** @type {string|undefined} */
+		const token = sb.Config.get("DISCORD_BOT_TOKEN");
+		this.client.login(token);
 	}
 
 	initListeners () {
@@ -178,7 +180,7 @@ module.exports = class DiscordController extends require("./template.js") {
 				};
 
 				this.resolveUserMessage(channelData, userData, msg);
-				sb.Logger.push(sb.Utils.wrapString(msg, this.platform.Message_Limit), userData, channelData);
+				await sb.Logger.push(sb.Utils.wrapString(msg, this.platform.Message_Limit), userData, channelData);
 
 				channelData.events.emit("message", {
 					type: "message",
@@ -189,12 +191,12 @@ module.exports = class DiscordController extends require("./template.js") {
 				});
 
 				if (channelData.Mode !== "Read") {
-					sb.AwayFromKeyboard.checkActive(userData, channelData);
-					sb.Reminder.checkActive(userData, channelData);
+					await sb.AwayFromKeyboard.checkActive(userData, channelData);
+					await sb.Reminder.checkActive(userData, channelData);
 
 					// Mirroring is set up - mirror the message to the target channel
 					if (channelData.Mirror) {
-						this.mirror(msg, userData, channelData, { commandUsed: false });
+						await this.mirror(msg, userData, channelData, { commandUsed: false });
 					}
 				}
 			}
@@ -349,7 +351,10 @@ module.exports = class DiscordController extends require("./template.js") {
 		if (!userData) {
 			throw new sb.Error({
 				message: `Cannot private message: user does not exist`,
-				args: { user, message }
+				args: {
+					user: String(user),
+					message
+				}
 			});
 		}
 		else if (!userData.Discord_ID) {
