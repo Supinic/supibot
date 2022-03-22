@@ -31,7 +31,7 @@ export declare class User extends ClassTemplate {
     static readonly redisCacheExpiration: number;
 
     static add (name: string): Promise<User>;
-    static get (identifier: Like, strict?: boolean, options?: UserGetOptions): Promise<User>;
+    static get (identifier: Like, strict?: boolean, options?: UserGetOptions): Promise<User|null>;
     static getMultiple (identifier: Like[]): Promise<User[]>;
     static getByProperty (property: string, identifier: any): User;
     static destroy (): void;
