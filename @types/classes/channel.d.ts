@@ -60,7 +60,7 @@ export declare class Channel extends ClassTemplate {
     static readonly redisPrefix: string;
     static get (identifier: Like, platform?: PlatformLike): Channel;
     static getJoinableForPlatform (platform: PlatformLike): Channel[];
-    static add (name: string, platformData: Platform, mode: Mode, specificID: string): Promise<Channel>;
+    static add (name: string, platformData: Platform, mode?: Mode, specificID?: string): Promise<Channel>;
     static normalizeName (username: string): string;
 
     readonly ID: number;
