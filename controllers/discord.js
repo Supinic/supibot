@@ -267,7 +267,13 @@ module.exports = class DiscordController extends require("./template.js") {
 		}
 
 		if (channelObject.guild) {
-			const wordSet = new Set(message.split(/\W+/).filter(i => i && i.length > 1));
+			const emojiNameRegex = /^[\w\d]+$/;
+			const words = message
+				.split(/\s+/)
+				.filter(Boolean)
+				.filter(i => i.length > 2 && emojiNameRegex.test(i));
+
+			const wordSet = new Set(words);
 			const globalEmotesMap = this.client.emojis.cache;
 			const guildEmotesMap = channelObject.guild.emojis.cache;
 
