@@ -6,6 +6,7 @@ module.exports = {
 	Description: "Bans/unbans any combination of channel, user, and command from being executed. Only usable by administrators, or Twitch channel owners.",
 	Flags: ["mention","use-params"],
 	Params: [
+		{ name: "all", type: "boolean" },
 		{ name: "channel", type: "string" },
 		{ name: "clear", type: "boolean" },
 		{ name: "command", type: "string" },
@@ -208,13 +209,23 @@ module.exports = {
 						}
 					}
 
-					if (sb.Utils.isValidInteger(index) && typeof string === "string") {
-						existing.Data.args.push({ index, string });
+					if (typeof string === "string") {
+						let changed = false;
+						if (context.params.all === true) {
+							changed = true;
+							existing.Data.args.push({ range: "0..Infinity", string });
+						}
+						else if (sb.Utils.isValidInteger(index)) {
+							changed = true;
+							existing.Data.args.push({ index, string });
+						}
 
-						await existing.saveProperty("Data");
-						return {
-							reply: `Successfully added a new item to Arguments filter (ID ${existing.ID})`
-						};
+						if (changed) {
+							await existing.saveProperty("Data");
+							return {
+								reply: `Successfully added a new item to Arguments filter (ID ${existing.ID})`
+							};
+						}
 					}
 
 					return {
@@ -223,10 +234,14 @@ module.exports = {
 					};
 				}
 				else if (invocation === "unban") {
-					if (sb.Utils.isValidInteger(index) && typeof string === "string") {
+					if ((sb.Utils.isValidInteger(index) || context.params.all === true) && typeof string === "string") {
 						for (let i = 0; i < existing.Data.args.length; i++) {
 							const item = existing.Data.args[i];
-							if (item.index === index && item.string === string) {
+							const condition = (context.params.all === true)
+								? (item.range === "0..Infinity")
+								: (item.index === index);
+
+							if (condition && item.string === string) {
 								existing.Data.args.splice(i, 1);
 								await existing.saveProperty("Data");
 
@@ -408,7 +423,8 @@ module.exports = {
 			"",
 
 			`<code>${prefix}ban type:arguments index:(number) string:(text)</code>`,
-			"Disables the use of a specific argument position for given text.",
+			`<code>${prefix}ban type:arguments all:true string:(text)</code>`,
+			"Disables the use of a specific argument position for given text, or any position if <code>all:true</code> is used.",
 			`If you use <code>${prefix}ban type:arguments</code> again with the same combination of channel/command/user, then the arguments will stack. To remove or disable, see the help for <code>${prefix}unban type:arguments</code> below.`,
 			`Example: <code>${prefix}ban type:arguments command:rm index:0 string:livestreamfail</code> will ban the use of <code>${prefix}rm livestreamfail</code>. This is because the first argument (index 0) is the subreddit name and it matches the text exactly.`,
 			`Example: <code>${prefix}ban type:arguments command:remind index:1 string:hello</code> will ban the use of <code>${prefix}remind (anyone) hello</code>. This is because "hello" is the second argument (index 1) and it matches.`,
