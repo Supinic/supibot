@@ -373,7 +373,7 @@ module.exports = class Filter extends require("./template.js") {
 	 */
 	static async execute (options) {
 		const { command, targetUser, user } = options;
-		if (user.Data?.administrator) {
+		if (user instanceof sb.User && await user.getDataProperty("administrator")) {
 			return { success: true };
 		}
 
