@@ -341,6 +341,11 @@ module.exports = {
 						args: [{ index, string }]
 					});
 				}
+				else if (context.params.all === true && typeof string === "string") {
+					options.Data = JSON.stringify({
+						args: [{ range: "0..Infinity", string }]
+					});
+				}
 				else {
 					return {
 						success: false,
