@@ -69,7 +69,8 @@ module.exports = {
 				};
 			}
 
-			for (const node of events.slice(0, threshold)) {
+			for (let i = 0; i < Array.from(events).length; i++) {
+				const node = events[i];
 				const title = [...node.children].find(i => i.attribs?.class === "title").children[0].data;
 				const timeEl = [...node.children].find(i => i.attribs?.class?.includes("time"));
 				const deltaEl = [...timeEl.children].find(i => i.attribs?.class === "date_add");
@@ -78,12 +79,20 @@ module.exports = {
 				const image = imgEl.children[0]?.children[0].attribs.src ?? null;
 				const isPropaganda = [...node.children].some(i => i.attribs?.class?.includes("propaganda"));
 
+				if (title.toLowerCase().includes("siren")) {
+					continue;
+				}
+
 				result.push({
 					title,
 					delta,
 					image,
 					isPropaganda
 				});
+
+				if (result.length >= threshold) {
+					break;
+				}
 			}
 
 			data = result;
