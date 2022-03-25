@@ -14,12 +14,17 @@ module.exports = {
 			randomString = "randomly";
 			user = sb.Utils.randArray([...sb.User.data.values()]).Name;
 		}
-	
+
 		user = user.toLowerCase();
-	
+
 		if (user === context.user.Name || user === "me") {
 			return {
 				reply: "There are toys made for that, you know..."
+			};
+		}
+		else if (user === "you") {
+			return {
+				reply: "Fuck you, leather man..."
 			};
 		}
 		else if (user === context.platform.Self_Name.toLowerCase()) {
