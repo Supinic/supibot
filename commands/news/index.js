@@ -4,8 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches short articles. You can use a 2 character ISO code to get country specific news, or any other word as a search query.",
-	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Flags: ["mention","non-nullable","pipe","use-params"],
+	Params: [
+		{ name: "country", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: (command => {
 		const path = require.resolve("./definitions.json");
@@ -124,9 +126,33 @@ module.exports = {
 			});
 		}
 
-		const params = new sb.URLParams();
-		if (rest[0] && codeRegex.test(rest[0])) {
-			const languageDescriptor = sb.Utils.modules.languageISO.get(rest[0]);
+		const params = {};
+		if (context.params.country || (rest[0] && codeRegex.test(rest[0]))) {
+			let input;
+			if (context.params.country) {
+				const value = context.params.country;
+				const code = await sb.Query.getRecordset(rs => rs
+					.select("Code_Alpha_2 AS Code")
+					.from("data", "Country")
+					.where("Name = %s OR Code_Alpha_2 = %s OR Code_Alpha_3 = %s", value, value, value)
+					.single()
+					.flat("Code")
+				);
+
+				if (!code) {
+					return {
+						success: false,
+						reply: `No country found for your input!`
+					};
+				}
+
+				input = code;
+			}
+			else {
+				input = rest[0];
+			}
+
+			const languageDescriptor = sb.Utils.modules.languageISO.get(input);
 			if (!languageDescriptor) {
 				return {
 					success: false,
@@ -143,21 +169,21 @@ module.exports = {
 			}
 
 			rest.splice(0, 1);
-			params.set("language", languageDescriptor.iso6391);
+			params.language = languageDescriptor.iso6391;
 		}
 		else {
-			params.set("language", "en");
+			params.language = "en";
 		}
 
 		if (rest.length > 0) {
-			params.set("keywords", rest.join(" "));
+			params.keywords = rest.join(" ");
 		}
 
 		let response;
 		try {
 			response = await sb.Got("GenericAPI", {
 				url: "https://api.currentsapi.services/v1/search",
-				searchParams: params.toString(),
+				searchParams: params,
 				headers: {
 					Authorization: sb.Config.get("API_CURRENTSAPI_TOKEN")
 				},
@@ -244,6 +270,10 @@ module.exports = {
 			"",
 
 			`<code>${prefix}news (two-letter country code)</code>`,
+			`<code>${prefix}news <u>country:(country code)</u></code>`,
+			`<code>${prefix}news <u>country:(country name)</u></code>`,
+			`<code>${prefix}news <u>country:belgium</u></code>`,
+			`<code>${prefix}news <u>country:"united kingdom"</u></code>`,
 			"(country-specific news)",
 			"",
 
