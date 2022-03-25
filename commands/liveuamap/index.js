@@ -97,7 +97,7 @@ module.exports = {
 
 			data = result;
 			await this.setCacheData(cacheKey, data, {
-				expiry: 600_000 // 5 minutes
+				expiry: 600_000 // 10 minutes
 			});
 		}
 
