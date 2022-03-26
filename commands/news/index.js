@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches short articles. You can use a 2 character ISO code to get country specific news, or any other word as a search query.",
-	Flags: ["mention","non-nullable","use-params"],
+	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "country", type: "string" }
 	],
