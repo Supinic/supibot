@@ -79,7 +79,7 @@ module.exports = {
 				const image = imgEl.children[0]?.children[0].attribs.src ?? null;
 				const isPropaganda = [...node.children].some(i => i.attribs?.class?.includes("propaganda"));
 
-				if (title.toLowerCase().includes("siren")) {
+				if (title && title.toLowerCase().includes("siren")) {
 					continue;
 				}
 
