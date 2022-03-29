@@ -301,14 +301,13 @@ module.exports = {
 				if (!context.append.pipe && message.length >= limit) {
 					const escapedAliasName = encodeURIComponent(aliasName);
 					const escapedUsername = encodeURIComponent(user.Name);
-					let prefix = "";
-					if (type !== "code") {
-						prefix = `${prefix} alias "${firstName}" details: `;
-					}
+					const prefixMessage = (type !== "code")
+						? `${prefix} alias "${aliasName}" details: `
+						: "";
 
 					return {
 						cooldown,
-						reply: `${prefix}https://supinic.com/bot/user/${escapedUsername}/alias/detail/${escapedAliasName}`
+						reply: `${prefixMessage}https://supinic.com/bot/user/${escapedUsername}/alias/detail/${escapedAliasName}`
 					};
 				}
 				else {
