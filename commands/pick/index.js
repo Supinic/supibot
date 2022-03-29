@@ -18,7 +18,7 @@ module.exports = {
 		}
 
 		const splitRegex = (context.params.delimiter)
-			? new RegExp(context.params.delimiter)
+			? new RegExp(sb.Utils.escapeRegExp(context.params.delimiter))
 			: /\s+/;
 
 		// normalize input - there might be arguments with other or multiple whitespace inside them
