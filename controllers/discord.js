@@ -1,3 +1,5 @@
+const { Client, Intents, DiscordAPIError } = require("discord.js");
+
 module.exports = class DiscordController extends require("./template.js") {
 	constructor () {
 		super();
@@ -18,8 +20,6 @@ module.exports = class DiscordController extends require("./template.js") {
 				message: "Discord bot token has not been configured"
 			});
 		}
-
-		const { Client, Intents } = require("discord.js");
 
 		const intents = new Intents();
 		intents.add(
@@ -323,17 +323,31 @@ module.exports = class DiscordController extends require("./template.js") {
 			await channelObject.send(wrappedMessage);
 		}
 		catch (e) {
-			throw new sb.Error({
-				message: "Sending Discord channel message failed",
-				args: {
-					message: wrappedMessage,
-					channelID: channelObject.id,
-					channelName: channelObject.name ?? null,
-					guildID: channelObject.guild?.id ?? null,
-					guildName: channelObject.guild?.name ?? null
-				},
-				cause: e
-			});
+			if (e instanceof DiscordAPIError) {
+				await sb.Logger.logError("Backend", e, {
+					origin: "External",
+					context: {
+						message: wrappedMessage,
+						channelID: channelObject.id,
+						channelName: channelObject.name ?? null,
+						guildID: channelObject.guild?.id ?? null,
+						guildName: channelObject.guild?.name ?? null
+					}
+				});
+			}
+			else {
+				throw new sb.Error({
+					message: "Sending Discord channel message failed",
+					args: {
+						message: wrappedMessage,
+						channelID: channelObject.id,
+						channelName: channelObject.name ?? null,
+						guildID: channelObject.guild?.id ?? null,
+						guildName: channelObject.guild?.name ?? null
+					},
+					cause: e
+				});
+			}
 		}
 	}
 
