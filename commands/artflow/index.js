@@ -15,84 +15,9 @@ module.exports = {
 	})),
 	Code: (async function artflow (context, ...args) {
 		if (context.params.prompt) {
-			const rawPrompts = await sb.Cache.server.hgetall("artflow");
-			const existingPrompts = Object.values(rawPrompts).map(i => JSON.parse(i));
-			if (existingPrompts.length >= this.staticData.threshold) {
-				return {
-					success: false,
-					reply: `There are too many prompts being processed right now! Try again later.`
-				};
-			}
-
-			const pending = existingPrompts.find(i => i.user === context.user.ID);
-			if (pending) {
-				const range = [
-					Math.trunc(pending.queue / 30),
-					Math.trunc(pending.queue / 12)
-				];
-
-				return {
-					success: false,
-					reply: sb.Utils.tag.trim `
-						You already have a pending request "${pending.prompt}"!
-						Your queue rank is ${pending.queue},
-						and it should be finished in around ${range[0]} to ${range[1]} minutes.
-					`
-				};
-			}
-
-			const artflowUserID = this.staticData.generationUserID;
-			const formData = new sb.Got.FormData();
-			formData.append("user_id_val", artflowUserID);
-			formData.append("text_prompt", context.params.prompt);
-
-			const response = await sb.Got("FakeAgent", {
-				method: "POST",
-				url: "https://artflow.ai/add_to_generation_queue",
-				headers: {
-					"x-requested-with": "XMLHttpRequest",
-					...formData.getHeaders()
-				},
-				body: formData.getBuffer(),
-				referrer: "https://artflow.ai/"
-			});
-
-			if (response.statusCode !== 200) {
-				return {
-					success: false,
-					reply: `Image generation did not succeed! Please try again later.`
-				};
-			}
-			else if (response.body.is_bad_prompt === "true") {
-				return {
-					success: false,
-					reply: `Your image will not be created, as your input seems to contain inappropriate content!`
-				};
-			}
-
-			const uuid = require("crypto").randomUUID();
-			const requestObject = {
-				artflowUserID,
-				user: context.user.ID,
-				channel: context.channel?.ID ?? null,
-				platform: context.platform?.ID ?? null,
-				imageIndex: response.body.index,
-				prompt: context.params.prompt,
-				queue: response.body.queue_length
-			};
-
-			await sb.Cache.server.hset("artflow", uuid, JSON.stringify(requestObject));
-
-			const range = [
-				Math.trunc(response.body.queue_length / 30),
-				Math.trunc(response.body.queue_length / 12)
-			];
-
 			return {
-				reply: sb.Utils.tag.trim `
-					Your Artflow image will be ready in around ${range[0]} to ${range[1]} minutes. 
-					You will receive a system reminder when it is finished.
-				`
+				success: false,
+				reply: `Unforunately, generating new images is now only available to logged in users! Check https://artflow.ai/ for more info.`
 			};
 		}
 
