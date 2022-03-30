@@ -222,7 +222,7 @@ module.exports = {
 			args.splice(0, 1);
 		}
 
-		let emotes = args.join(" ").split(/\s+/).join(" ");
+		let emotes = args.join(" ").split(/\s+/).filter(Boolean);
 		const preset = this.staticData.patterns.find(i => i.name === patternName);
 		if (preset) {
 			if (Array.isArray(preset.pattern)) {
