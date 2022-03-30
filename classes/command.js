@@ -534,7 +534,7 @@ class Command extends require("./template.js") {
 
 				await row.save({ skipLoad: true });
 			}
-		})
+		});
 
 		await Promise.all(addMissingRowsPromises);
 	}
