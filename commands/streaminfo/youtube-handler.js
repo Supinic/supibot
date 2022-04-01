@@ -13,7 +13,7 @@ module.exports = async function youtubeStreamInfoHandler (context) {
 			url: "https://www.googleapis.com/youtube/v3/search",
 			searchParams: {
 				q: input,
-				sort: "relevance",
+				order: "relevance",
 				type: "channel",
 				key: sb.Config.get("API_GOOGLE_YOUTUBE")
 			}
@@ -39,7 +39,7 @@ module.exports = async function youtubeStreamInfoHandler (context) {
 		url: "https://www.googleapis.com/youtube/v3/search",
 		searchParams: {
 			part: "snippet",
-			sort: "relevance",
+			order: "relevance",
 			channelId: channelID,
 			eventType: "live",
 			type: "video",
