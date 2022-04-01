@@ -10,9 +10,11 @@ module.exports = async function youtubeStreamInfoHandler (context) {
 		const channelResponse = await sb.Got("GenericAPI", {
 			throwHttpErrors: false,
 			responseType: "json",
-			url: "https://www.googleapis.com/youtube/v3/channels",
+			url: "https://www.googleapis.com/youtube/v3/search",
 			searchParams: {
-				forUsername: context.params.youtube,
+				q: input,
+				sort: "relevance",
+				type: "channel",
 				key: sb.Config.get("API_GOOGLE_YOUTUBE")
 			}
 		});
@@ -23,12 +25,12 @@ module.exports = async function youtubeStreamInfoHandler (context) {
 				reply: sb.Utils.tag.trim `
 					No channel found for that name!
 					Try using the "real" channel name instead of its display name.
-					You couldalso  try using the channel's ID directly.
+					You could also try using the channel's ID directly.
 				`
 			};
 		}
 
-		channelID = channelResponse.body.items[0].id;
+		channelID = channelResponse.body.items[0].id.channelId;
 	}
 
 	const streamResponse = await sb.Got("GenericAPI", {
@@ -44,7 +46,7 @@ module.exports = async function youtubeStreamInfoHandler (context) {
 			key: sb.Config.get("API_GOOGLE_YOUTUBE")
 		}
 	});
-	
+
 	if (streamResponse.statusCode !== 200) {
 		return {
 			success: false,
