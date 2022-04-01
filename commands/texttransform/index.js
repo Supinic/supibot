@@ -134,7 +134,11 @@ module.exports = {
 				name: "capitalize",
 				type: "method",
 				aliases: ["cap"],
-				data: (message) => message.split(" ").filter(Boolean).map(i => sb.Utils.capitalize(i)).join(" ")
+				data: (message) => message
+					.split(" ")
+					.filter(Boolean)
+					.map(i => sb.Utils.capitalize(i))
+					.join(" ")
 			},
 			{
 				name: "lowercase",
