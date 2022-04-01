@@ -3,12 +3,19 @@ module.exports = {
 	Aliases: ["si","uptime"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Posts stream info about a Twitch channel.",
-	Flags: ["external-input","mention","non-nullable","pipe"],
-	Params: null,
+	Description: "Posts stream info about a Twitch channel. Also supports YouTube - check the help article.",
+	Flags: ["external-input","mention","non-nullable","pipe","use-params"],
+	Params: [
+		{ name: "youtube", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function streamInfo (context, ...args) {
+		if (context.params.youtube) {
+			const handler = require("./youtube-handler.js");
+			return await handler(context, ...args);
+		}
+
 		let targetChannel;
 		if (args.length === 0) {
 			if (context.platform.Name !== "twitch") {
@@ -115,5 +122,20 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"Fetches the live status of a Twitch or YouTube channel.",
+		"",
+
+		`<code>${prefix}$streaminfo (channel)</code>`,
+		`Posts info about a Twitch channel's stream.`,
+		`If it is live - posts info about the stream, and details.`,
+		`If not currently live - posts info about the previous stream.`,
+		"",
+
+		`<code>${prefix}$streaminfo <u>youtube:(channel name)</u></code>`,
+		`<code>${prefix}$streaminfo <u>youtube:(channel id)</u></code>`,
+		`Posts info about a YouTube channel's stream`,
+		`You can use the channel name (watch out - name, not display name), or the channel ID directly`,
+		`If the channel has multiple live streams at the same time, this command only posts the more relevant one.`
+	])
 };
