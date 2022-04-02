@@ -29,7 +29,8 @@ module.exports = {
 
 			return url.hostname;
 		},
-		textDataCharacterThreshold: 50_000
+		textDataCharacterThreshold: 50_000,
+		validateHastebinServer: require("./validate-hastebin.js")
 	})),
 	Code: (async function pastebin (context, command, ...rest) {
 		let type;
@@ -179,6 +180,14 @@ module.exports = {
 					return {
 						success: false,
 						reply: `Invalid custom Hastebin server provided!`
+					};
+				}
+
+				const isValid = await this.staticData.validateHastebinServer(this, server);
+				if (!isValid) {
+					return {
+						success: false,
+						reply: `Provided server is not a valid Hastebin server`
 					};
 				}
 
