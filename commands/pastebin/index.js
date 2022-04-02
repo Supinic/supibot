@@ -19,7 +19,6 @@ module.exports = {
 				path = `https://${path}`;
 			}
 
-			const { URL } = require("url");
 			let url;
 			try {
 				url = new URL(path);
@@ -113,14 +112,20 @@ module.exports = {
 					};
 				}
 
-				const response = await sb.Got("GenericAPI", {
-					method: "POST",
-					url: `https://${server}/documents`,
-					throwHttpErrors: false,
-					body: text
-				});
+				let response;
+				try {
+					response = await sb.Got("GenericAPI", {
+						method: "POST",
+						url: `https://${server}/documents`,
+						throwHttpErrors: false,
+						body: text
+					});
+				}
+				catch (e) {
+					response = null;
+				}
 
-				if (response.statusCode !== 200) {
+				if (!response || response.statusCode !== 200) {
 					return {
 						success: false,
 						reply: `Could not create a paste on ${server}!`
