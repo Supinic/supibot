@@ -184,10 +184,16 @@ module.exports = {
 				}
 
 				const isValid = await this.staticData.validateHastebinServer(this, server);
-				if (!isValid) {
+				if (isValid === false) {
 					return {
 						success: false,
 						reply: `Provided server is not a valid Hastebin server!`
+					};
+				}
+				else if (isValid === null) {
+					return {
+						success: false,
+						reply: `Provided server is currently not available!`
 					};
 				}
 
