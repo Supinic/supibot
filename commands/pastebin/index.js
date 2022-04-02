@@ -187,7 +187,7 @@ module.exports = {
 				if (!isValid) {
 					return {
 						success: false,
-						reply: `Provided server is not a valid Hastebin server`
+						reply: `Provided server is not a valid Hastebin server!`
 					};
 				}
 
