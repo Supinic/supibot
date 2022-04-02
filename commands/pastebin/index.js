@@ -152,7 +152,8 @@ module.exports = {
 				};
 			}
 
-			const cacheData = (context.params.force) ? null : await this.getCacheData(id);
+			const cacheKey = `${context.params.hasteServer ?? provider}-${id}`;
+			const cacheData = (context.params.force) ? null : await this.getCacheData(cacheKey);
 			if (cacheData) {
 				return {
 					reply: cacheData,
@@ -264,7 +265,7 @@ module.exports = {
 				};
 			}
 
-			await this.setCacheData(id, textData, {
+			await this.setCacheData(cacheKey, textData, {
 				expiry: 30 * 864e5 // 30 days
 			});
 
