@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `chat_data`.`Filter` (
   `ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `User_Alias` INT(10) UNSIGNED DEFAULT NULL,
   `Channel` INT(10) UNSIGNED DEFAULT NULL,
-  `Command` INT(10) UNSIGNED DEFAULT NULL,
+  `Command` VARCHAR(50) DEFAULT NULL,
   `Platform` INT(10) UNSIGNED DEFAULT NULL,
   `Invocation` VARCHAR(50) DEFAULT NULL COMMENT 'This is specific command invocation - must always be coupled with Command',
   `Type` ENUM('Blacklist','Whitelist','Opt-out','Block','Unping','Unmention','Cooldown','Flags','Offline-only','Online-only','Arguments','Reminder-prevention') NOT NULL DEFAULT 'Blacklist' COMMENT 'Determins the type of filter:\r\nBlacklist - given combo WILL NOT be able to use commands. By setting all combo fields to NULL, you will blacklist everyone everywhere. Not recommended.\r\nWhitelist - given combo WILL be able to use commands. Command must NOT be null.\r\nOpt-out - given Command will not accept User_Alias as its first argument. Other combo fields are ignored.\r\nBlock - given Command will not accept User_Alias as its first argument, only for user Blocked_User. Other combo fields are ignored.\r\nUnping - given Command will attempt to un-ping (insert ZWSP characters in their name) User_Alias. Other combo fields are ignored.' COLLATE 'utf8mb4_general_ci',
