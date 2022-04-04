@@ -145,7 +145,8 @@ module.exports = {
 		);
 
 		return {
-			reply: outputLink
+			reply: outputLink,
+			removeEmbeds: true
 		};
 	}),
 	Dynamic_Description: null
