@@ -28,7 +28,7 @@ module.exports = {
 
 		const url = command.getDetailURL({ useCodePath: true });
 		return {
-			reply: `Website: ${url}`
+			reply: `GitHub link: ${url}`
 		};
 	}),
 	Dynamic_Description: null
