@@ -63,9 +63,11 @@ module.exports = {
 			}
 			catch (e) {
 				console.warn(e);
+				const code = e.statusCode ?? e.message;
+
 				return {
 					success: false,
-					reply: "Banphrase API did not respond in time!"
+					reply: `Banphrase API did not respond in time! (code ${code})`
 				};
 			}
 
