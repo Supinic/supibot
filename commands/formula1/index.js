@@ -7,7 +7,8 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Params: [
 		{ name: "season", type: "number" },
-		{ name: "year", type: "number" }
+		{ name: "year", type: "number" },
+		{ name: "weather", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => {
@@ -30,6 +31,9 @@ module.exports = {
 					const raceDate = (race.time)
 						? new sb.Date(`${race.date} ${race.time}`)
 						: new sb.Date(race.date);
+
+					// Add 2 hours to compensate for the race being underway
+					raceDate.addHours(2);
 
 					if (now < raceDate) {
 						resultRace = race;
@@ -76,7 +80,7 @@ module.exports = {
 			const response = await sb.Got("GenericAPI", `${url}${year}/${round}/results.json`);
 			return response.body.MRData?.RaceTable?.Races?.[0]?.Results ?? [];
 		};
-		const fetchNextRaceDetail = async () => {
+		const fetchNextRaceDetail = async (options = {}) => {
 			const year = new sb.Date().year;
 			const race = await fetchRace(year, "current");
 			if (!race) {
@@ -86,13 +90,89 @@ module.exports = {
 				};
 			}
 
-			const date = new sb.Date(`${race.date} ${race.time}`);
-			const delta = sb.Utils.timeDelta(date);
+			const weatherCommand = sb.Command.get("weather");
+			const fakeWeatherContext = sb.Command.createFakeContext(weatherCommand, {
+				params: {
+					format: "icon,temperature,precipitation"
+				},
+				invocation: "weather"
+			});
+
+			const now = new sb.Date();
+			const raceStart = new sb.Date(`${race.date} ${race.time}`);
+			const raceEnd = raceStart.clone().addHours(2); // Compensate for the race being underway
+
+			let qualiString = "";
+			const qualiStart = new sb.Date(`${race.Qualifying.date} ${race.Qualifying.time}`);
+			const qualiEnd = qualiStart.clone().addHours(2); // Compensate for the qualifying being underway
+
+			if (now < qualiEnd) {
+				qualiString = "Qualifying";
+
+				if (now < qualiStart) {
+					qualiString += ` will begin ${sb.Utils.timeDelta(qualiStart)}.`;
+
+					if (options.weather) {
+						const hourDifference = Math.floor((qualiStart - now) / 36e5);
+						if (hourDifference < 48) {
+							const result = await weatherCommand.execute(fakeWeatherContext, `${race.Circuit.circuitName} hour+${hourDifference}`);
+							qualiString += ` Weather forecast: ${result.reply ?? "N/A"}`;
+						}
+						else if (hourDifference < (7 * 24)) {
+							const dayDifference = Math.floor(hourDifference / 7);
+							const result = await weatherCommand.execute(fakeWeatherContext, `${race.Circuit.circuitName} day+${dayDifference}`);
+							qualiString += ` Weather forecast: ${result.reply ?? "N/A"}`;
+						}
+						else {
+							qualiString += " Weather forecast not available.";
+						}
+					}
+				}
+				else {
+					qualiString += ` is currently underway.`;
+
+					if (options.weather) {
+						const result = await weatherCommand.execute(fakeWeatherContext, race.Circuit.circuitName);
+						qualiString += ` Current weather: ${result.reply ?? "N/A"}`;
+					}
+				}
+			}
+
+			let raceString;
+			if (now < raceStart) {
+				raceString = `Race is scheduled ${sb.Utils.timeDelta(raceStart)}.`;
+
+				if (options.weather) {
+					const hourDifference = Math.floor((raceStart - now) / 36e5);
+					if (hourDifference < 48) {
+						const result = await weatherCommand.execute(fakeWeatherContext, `${race.Circuit.circuitName} hour+${hourDifference}`);
+						raceString += ` Weather forecast: ${result.reply ?? "N/A"}`;
+					}
+					else if (hourDifference < (7 * 24)) {
+						const dayDifference = Math.floor(hourDifference / 7);
+						const result = await weatherCommand.execute(fakeWeatherContext, `${race.Circuit.circuitName} day+${dayDifference}`);
+						raceString += ` Weather forecast: ${result.reply ?? "N/A"}`;
+					}
+					else {
+						qualiString += " Weather forecast not available.";
+					}
+				}
+			}
+			else if (now < raceEnd) {
+				raceString = "Race is currently underway!";
+
+				if (options.weather) {
+					const result = await weatherCommand.execute(fakeWeatherContext, race.Circuit.circuitName);
+					raceString += ` Current weather: ${result.reply ?? "N/A"}`;
+				}
+			}
+
 			return {
 				reply: sb.Utils.tag.trim `
 					Next F1 race:
-					Round ${race.round} - ${race.raceName},
-					scheduled ${delta}.
+					Round ${race.round} - ${race.raceName}.
+					${qualiString}
+					${raceString}					
 					${race.url}					
 				`
 			};
@@ -131,7 +211,9 @@ module.exports = {
 		const now = new sb.Date();
 
 		if (args.length === 0) {
-			return await fetchNextRaceDetail();
+			return await fetchNextRaceDetail({
+				weather: context.params.weather
+			});
 		}
 
 		const type = args[0].toLowerCase();
@@ -140,7 +222,9 @@ module.exports = {
 		switch (type) {
 			case "race": {
 				if (rest.length === 0) {
-					return await fetchNextRaceDetail();
+					return await fetchNextRaceDetail({
+						weather: context.params.weather
+					});
 				}
 
 				const year = context.params.season ?? context.params.year ?? now.year;
