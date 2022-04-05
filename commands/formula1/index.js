@@ -80,7 +80,7 @@ module.exports = {
 			const response = await sb.Got("GenericAPI", `${url}${year}/${round}/results.json`);
 			return response.body.MRData?.RaceTable?.Races?.[0]?.Results ?? [];
 		};
-		const fetchNextRaceDetail = async (options = {}) => {
+		const fetchNextRaceDetail = async (context) => {
 			const year = new sb.Date().year;
 			const race = await fetchRace(year, "current");
 			if (!race) {
@@ -90,13 +90,16 @@ module.exports = {
 				};
 			}
 
+			const location = race.Circuit.circuitName.split(/\s+/).filter(Boolean);
 			const weatherCommand = sb.Command.get("weather");
 			const fakeWeatherContext = sb.Command.createFakeContext(weatherCommand, {
+				user: context.user,
 				params: {
 					format: "icon,temperature,precipitation"
 				},
 				invocation: "weather"
 			});
+			const getWeather = (time) => weatherCommand.execute(fakeWeatherContext, ...location, time ?? "");
 
 			const now = new sb.Date();
 			const raceStart = new sb.Date(`${race.date} ${race.time}`);
@@ -112,15 +115,15 @@ module.exports = {
 				if (now < qualiStart) {
 					qualiString += ` will begin ${sb.Utils.timeDelta(qualiStart)}.`;
 
-					if (options.weather) {
+					if (context.params.weather) {
 						const hourDifference = Math.floor((qualiStart - now) / 36e5);
 						if (hourDifference < 48) {
-							const result = await weatherCommand.execute(fakeWeatherContext, `${race.Circuit.circuitName} hour+${hourDifference}`);
+							const result = await getWeather(`hour+${hourDifference}`);
 							qualiString += ` Weather forecast: ${result.reply ?? "N/A"}`;
 						}
 						else if (hourDifference < (7 * 24)) {
 							const dayDifference = Math.floor(hourDifference / 7);
-							const result = await weatherCommand.execute(fakeWeatherContext, `${race.Circuit.circuitName} day+${dayDifference}`);
+							const result = await getWeather(`day+${dayDifference}`);
 							qualiString += ` Weather forecast: ${result.reply ?? "N/A"}`;
 						}
 						else {
@@ -131,8 +134,8 @@ module.exports = {
 				else {
 					qualiString += ` is currently underway.`;
 
-					if (options.weather) {
-						const result = await weatherCommand.execute(fakeWeatherContext, race.Circuit.circuitName);
+					if (context.params.weather) {
+						const result = await getWeather();
 						qualiString += ` Current weather: ${result.reply ?? "N/A"}`;
 					}
 				}
@@ -142,15 +145,15 @@ module.exports = {
 			if (now < raceStart) {
 				raceString = `Race is scheduled ${sb.Utils.timeDelta(raceStart)}.`;
 
-				if (options.weather) {
+				if (context.params.weather) {
 					const hourDifference = Math.floor((raceStart - now) / 36e5);
 					if (hourDifference < 48) {
-						const result = await weatherCommand.execute(fakeWeatherContext, `${race.Circuit.circuitName} hour+${hourDifference}`);
+						const result = await getWeather(`hour+${hourDifference}`);
 						raceString += ` Weather forecast: ${result.reply ?? "N/A"}`;
 					}
 					else if (hourDifference < (7 * 24)) {
 						const dayDifference = Math.floor(hourDifference / 7);
-						const result = await weatherCommand.execute(fakeWeatherContext, `${race.Circuit.circuitName} day+${dayDifference}`);
+						const result = await getWeather(`day+${dayDifference}`);
 						raceString += ` Weather forecast: ${result.reply ?? "N/A"}`;
 					}
 					else {
@@ -161,8 +164,8 @@ module.exports = {
 			else if (now < raceEnd) {
 				raceString = "Race is currently underway!";
 
-				if (options.weather) {
-					const result = await weatherCommand.execute(fakeWeatherContext, race.Circuit.circuitName);
+				if (context.params.weather) {
+					const result = await getWeather();
 					raceString += ` Current weather: ${result.reply ?? "N/A"}`;
 				}
 			}
@@ -211,9 +214,7 @@ module.exports = {
 		const now = new sb.Date();
 
 		if (args.length === 0) {
-			return await fetchNextRaceDetail({
-				weather: context.params.weather
-			});
+			return await fetchNextRaceDetail(context);
 		}
 
 		const type = args[0].toLowerCase();
@@ -222,9 +223,7 @@ module.exports = {
 		switch (type) {
 			case "race": {
 				if (rest.length === 0) {
-					return await fetchNextRaceDetail({
-						weather: context.params.weather
-					});
+					return await fetchNextRaceDetail(context);
 				}
 
 				const year = context.params.season ?? context.params.year ?? now.year;
