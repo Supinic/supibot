@@ -122,7 +122,7 @@ module.exports = {
 							qualiString += ` Weather forecast: ${result.reply ?? "N/A"}`;
 						}
 						else if (hourDifference < (7 * 24)) {
-							const dayDifference = Math.floor(hourDifference / 7);
+							const dayDifference = Math.floor(hourDifference / 24);
 							const result = await getWeather(`day+${dayDifference}`);
 							qualiString += ` Weather forecast: ${result.reply ?? "N/A"}`;
 						}
@@ -152,7 +152,7 @@ module.exports = {
 						raceString += ` Weather forecast: ${result.reply ?? "N/A"}`;
 					}
 					else if (hourDifference < (7 * 24)) {
-						const dayDifference = Math.floor(hourDifference / 7);
+						const dayDifference = Math.floor(hourDifference / 24);
 						const result = await getWeather(`day+${dayDifference}`);
 						raceString += ` Weather forecast: ${result.reply ?? "N/A"}`;
 					}
