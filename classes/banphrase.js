@@ -15,12 +15,7 @@ module.exports = (function () {
 			const options = {
 				method: "POST",
 				url: `https://${URL}/api/v1/banphrases/test`,
-				body: new sb.URLParams()
-					.set("message", message)
-					.toString(),
-				headers: {
-					"Content-Type": "application/x-www-form-urlencoded"
-				},
+				json: { message },
 				timeout: sb.Config.get("PAJBOT_API_TIMEOUT"),
 				retry: 1
 			};
