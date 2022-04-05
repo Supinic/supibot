@@ -26,7 +26,7 @@ module.exports = {
 			};
 		}
 		else if (!supportedLanguageCodes.includes(languageCode)) {
-			const supportedLanguageNames = supportedLanguageCodes.map(i => sb.Utils.modules.languagesISO.getName(i));
+			const supportedLanguageNames = supportedLanguageCodes.map(i => sb.Utils.modules.languageISO.getName(i));
 			return {
 				success: false,
 				reply: `Your provided language is not supported! Use one of: ${supportedLanguageNames.join(", ")}`
