@@ -214,15 +214,15 @@ class Command extends require("./template.js") {
 	static privilegedCommandCharacters = ["$"];
 
 	/**
-	 * Command parameter parsing will only continue up until this character string is found.
+	 * Command parameter parsing will only continue up until this character string or regex is found.
 	 * If it is not defined or falsy, commands will use up the entire string instead.
 	 * @example If there is no delimiter:
 	 * "$foo bar:baz -- bar:zed"; { bar: "zed" }
 	 * @example If "--" is the delimiter:
 	 * "$foo bar:baz -- bar:zed"; { bar: "baz" }
-	 * @type {string}
+	 * @type {string|RegExp}
 	 */
-	static ignoreParametersDelimiter = " -- ";
+	static ignoreParametersDelimiter = /(^|\s)--(\s|$)/;
 
 	constructor (data) {
 		super();
