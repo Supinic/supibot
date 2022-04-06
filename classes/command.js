@@ -222,7 +222,7 @@ class Command extends require("./template.js") {
 	 * "$foo bar:baz -- bar:zed"; { bar: "baz" }
 	 * @type {string}
 	 */
-	static ignoreParametersDelimiter = "--";
+	static ignoreParametersDelimiter = " -- ";
 
 	constructor (data) {
 		super();
