@@ -684,12 +684,17 @@ class Command extends require("./template.js") {
 		}
 
 		if (command.Params.length > 0) {
+			let remainingStrings;
+			let argsString;
+			if (Command.ignoreParametersDelimiter) {
+				[argsString, remainingStrings] = args.join(" ").split(Command.ignoreParametersDelimiter);
+			}
+			else {
+				argsString = args.join(" ");
+				remainingStrings = [];
+			}
+
 			const paramNames = command.Params.map(i => i.name);
-
-			let argsString = (Command.ignoreParametersDelimiter)
-				? args.join(" ").split(Command.ignoreParametersDelimiter)[0]
-				: args.join(" ");
-
 			const quotesRegex = new RegExp(`(?<name>${paramNames.join("|")}):(?<!\\\\)"(?<value>.*?)(?<!\\\\)"`, "g");
 			const quoteMatches = [...argsString.matchAll(quotesRegex)];
 
@@ -772,7 +777,7 @@ class Command extends require("./template.js") {
 				}
 			}
 
-			args = remainingArgs.filter(Boolean);
+			args = [remainingArgs, ...remainingStrings].filter(Boolean);
 		}
 
 		const filterData = await sb.Filter.execute({
