@@ -687,7 +687,7 @@ class Command extends require("./template.js") {
 			let remainingStrings;
 			let argsString;
 			if (Command.ignoreParametersDelimiter) {
-				[argsString, remainingStrings] = args.join(" ").split(Command.ignoreParametersDelimiter);
+				[argsString, ...remainingStrings] = args.join(" ").split(Command.ignoreParametersDelimiter);
 			}
 			else {
 				argsString = args.join(" ");
@@ -777,7 +777,7 @@ class Command extends require("./template.js") {
 				}
 			}
 
-			args = [remainingArgs, ...remainingStrings].filter(Boolean);
+			args = [...remainingArgs, ...remainingStrings].filter(Boolean);
 		}
 
 		const filterData = await sb.Filter.execute({
