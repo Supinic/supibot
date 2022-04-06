@@ -213,6 +213,17 @@ class Command extends require("./template.js") {
 	 */
 	static privilegedCommandCharacters = ["$"];
 
+	/**
+	 * Command parameter parsing will only continue up until this character string is found.
+	 * If it is not defined or falsy, commands will use up the entire string instead.
+	 * @example If there is no delimiter:
+	 * "$foo bar:baz -- bar:zed"; { bar: "zed" }
+	 * @example If "--" is the delimiter:
+	 * "$foo bar:baz -- bar:zed"; { bar: "baz" }
+	 * @type {string}
+	 */
+	static ignoreParametersDelimiter = "--";
+
 	constructor (data) {
 		super();
 
@@ -675,7 +686,10 @@ class Command extends require("./template.js") {
 		if (command.Params.length > 0) {
 			const paramNames = command.Params.map(i => i.name);
 
-			let argsString = args.join(" ");
+			let argsString = (Command.ignoreParametersDelimiter)
+				? args.join(" ").split(Command.ignoreParametersDelimiter)[0]
+				: args.join(" ");
+
 			const quotesRegex = new RegExp(`(?<name>${paramNames.join("|")}):(?<!\\\\)"(?<value>.*?)(?<!\\\\)"`, "g");
 			const quoteMatches = [...argsString.matchAll(quotesRegex)];
 
