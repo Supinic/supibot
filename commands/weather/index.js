@@ -453,6 +453,9 @@ module.exports = {
 				else if (snow) {
 					obj.precipitation = `${percent} chance of ${snow}mm/h snow.`;
 				}
+				else {
+					obj.precipitation = `${percent} chance of precipitation.`;
+				}
 			}
 		}
 
