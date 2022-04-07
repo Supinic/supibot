@@ -21,6 +21,9 @@ module.exports = {
 		else if (msg.includes("followers")) {
 			type = "buying followers";
 		}
+		else if (/get\s+viewers\s+pro/.test(msg)) {
+			type = "feeling more popular";
+		}
 		else {
 			return;
 		}
