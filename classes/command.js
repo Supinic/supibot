@@ -684,100 +684,14 @@ class Command extends require("./template.js") {
 		}
 
 		if (command.Params.length > 0) {
-			let remainingStrings;
-			let argsString;
-			if (Command.ignoreParametersDelimiter) {
-				[argsString, ...remainingStrings] = args.join(" ").split(Command.ignoreParametersDelimiter);
-			}
-			else {
-				argsString = args.join(" ");
-				remainingStrings = [];
+			const result = Command.parseParametersFromArguments(command.Params, args);
+			if (result.success === false) {
+				sb.CooldownManager.unsetPending(userData.ID);
+				return result;
 			}
 
-			const paramNames = command.Params.map(i => i.name);
-			const quotesRegex = new RegExp(`(?<name>${paramNames.join("|")}):(?<!\\\\)"(?<value>.*?)(?<!\\\\)"`, "g");
-			const quoteMatches = [...argsString.matchAll(quotesRegex)];
-
-			for (const match of quoteMatches.reverse()) {
-				argsString = argsString.slice(0, match.index) + argsString.slice(match.index + match[0].length + 1);
-
-				const { name = null, value = null } = match.groups;
-				const { type } = command.Params.find(i => i.name === name);
-
-				if (name !== null && value !== null) {
-					const cleanValue = value.replace(/^"|"$/g, "").replace(/\\"/g, "\"");
-					const parsedValue = Command.parseParameter(cleanValue, type, true);
-					if (parsedValue === null) {
-						sb.CooldownManager.unsetPending(userData.ID);
-						return {
-							success: false,
-							reply: `Cannot parse parameter "${name}"!`
-						};
-					}
-
-					if (type === "object") {
-						if (typeof contextOptions.params[name] === "undefined") {
-							contextOptions.params[name] = {};
-						}
-						if (typeof contextOptions.params[name][parsedValue.key] !== "undefined") {
-							sb.CooldownManager.unsetPending(userData.ID);
-							return {
-								success: false,
-								reply: `Cannot use multiple values for parameter "${name}", key ${parsedValue.key}!`
-							};
-						}
-
-						contextOptions.params[name][parsedValue.key] = parsedValue.value;
-					}
-					else {
-						contextOptions.params[name] = parsedValue;
-					}
-				}
-			}
-
-			const remainingArgs = argsString.split(" ");
-			const paramRegex = new RegExp(`^(?<name>${paramNames.join("|")}):(?<value>.*)$`);
-			for (let i = remainingArgs.length - 1; i >= 0; i--) {
-				if (!paramRegex.test(remainingArgs[i])) {
-					continue;
-				}
-
-				const { name = null, value = null } = remainingArgs[i].match(paramRegex).groups;
-				const { type } = command.Params.find(i => i.name === name);
-
-				if (name !== null && value !== null) {
-					const parsedValue = Command.parseParameter(value, type, false);
-					if (parsedValue === null) {
-						sb.CooldownManager.unsetPending(userData.ID);
-						return {
-							success: false,
-							reply: `Cannot parse parameter "${name}"!`
-						};
-					}
-
-					if (type === "object") {
-						if (typeof contextOptions.params[name] === "undefined") {
-							contextOptions.params[name] = {};
-						}
-						if (typeof contextOptions.params[name][parsedValue.key] !== "undefined") {
-							sb.CooldownManager.unsetPending(userData.ID);
-							return {
-								success: false,
-								reply: `Cannot use multiple values for parameter "${name}", key ${parsedValue.key}!`
-							};
-						}
-
-						contextOptions.params[name][parsedValue.key] = parsedValue.value;
-					}
-					else {
-						contextOptions.params[name] = parsedValue;
-					}
-
-					remainingArgs.splice(i, 1);
-				}
-			}
-
-			args = [...remainingArgs, ...remainingStrings].filter(Boolean);
+			args = result.args;
+			contextOptions.params = result.parameters;
 		}
 
 		const filterData = await sb.Filter.execute({
@@ -1229,6 +1143,110 @@ class Command extends require("./template.js") {
 		};
 
 		return new Context(commandData, data);
+	}
+
+	/**
+	 * For an input params definition and command arguments, parses out the relevant parameters along with their
+	 * values converted properly from string.
+	 */
+	static parseParametersFromArguments (paramsDefinition, argsArray) {
+		let remainingStrings;
+		let argsString;
+		const parameters = {};
+
+		if (Command.ignoreParametersDelimiter) {
+			[argsString, ...remainingStrings] = argsArray.join(" ").split(Command.ignoreParametersDelimiter);
+		}
+		else {
+			argsString = argsArray.join(" ");
+			remainingStrings = [];
+		}
+
+		const paramNames = paramsDefinition.map(i => i.name);
+		const quotesRegex = new RegExp(`(?<name>${paramNames.join("|")}):(?<!\\\\)"(?<value>.*?)(?<!\\\\)"`, "g");
+		const quoteMatches = [...argsString.matchAll(quotesRegex)];
+
+		for (const match of quoteMatches.reverse()) {
+			argsString = argsString.slice(0, match.index) + argsString.slice(match.index + match[0].length + 1);
+
+			const { name = null, value = null } = match.groups;
+			const { type } = paramsDefinition.find(i => i.name === name);
+
+			if (name !== null && value !== null) {
+				const cleanValue = value.replace(/^"|"$/g, "").replace(/\\"/g, "\"");
+				const parsedValue = Command.parseParameter(cleanValue, type, true);
+				if (parsedValue === null) {
+					return {
+						success: false,
+						reply: `Cannot parse parameter "${name}"!`
+					};
+				}
+
+				if (type === "object") {
+					if (typeof parameters[name] === "undefined") {
+						parameters[name] = {};
+					}
+
+					if (typeof parameters[name][parsedValue.key] !== "undefined") {
+						return {
+							success: false,
+							reply: `Cannot use multiple values for parameter "${name}", key ${parsedValue.key}!`
+						};
+					}
+
+					parameters[name][parsedValue.key] = parsedValue.value;
+				}
+				else {
+					parameters[name] = parsedValue;
+				}
+			}
+		}
+
+		const remainingArgs = argsString.split(" ");
+		const paramRegex = new RegExp(`^(?<name>${paramNames.join("|")}):(?<value>.*)$`);
+		for (let i = remainingArgs.length - 1; i >= 0; i--) {
+			if (!paramRegex.test(remainingArgs[i])) {
+				continue;
+			}
+
+			const { name = null, value = null } = remainingArgs[i].match(paramRegex).groups;
+			const { type } = paramsDefinition.find(i => i.name === name);
+
+			if (name !== null && value !== null) {
+				const parsedValue = Command.parseParameter(value, type, false);
+				if (parsedValue === null) {
+					return {
+						success: false,
+						reply: `Cannot parse parameter "${name}"!`
+					};
+				}
+
+				if (type === "object") {
+					if (typeof parameters[name] === "undefined") {
+						parameters[name] = {};
+					}
+
+					if (typeof parameters[name][parsedValue.key] !== "undefined") {
+						return {
+							success: false,
+							reply: `Cannot use multiple values for parameter "${name}", key ${parsedValue.key}!`
+						};
+					}
+
+					parameters[name][parsedValue.key] = parsedValue.value;
+				}
+				else {
+					parameters[name] = parsedValue;
+				}
+
+				remainingArgs.splice(i, 1);
+			}
+		}
+
+		return {
+			parameters,
+			args: [...remainingArgs, ...remainingStrings].filter(Boolean)
+		};
 	}
 
 	/**

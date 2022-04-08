@@ -144,6 +144,14 @@ declare type CooldownObject = {
     channel?: number;
 };
 declare type CooldownDescriptor = Cooldown | CooldownObject;
+declare type CommandFailure = {
+    success: false;
+    reply?: string;
+};
+declare type ParsedParametersData = {
+    parameters: Record<string, Parameter.ParsedType>;
+    args: string[]
+};
 
 export declare class Context {
     #invocation: string;
@@ -185,6 +193,10 @@ export declare class Command extends ClassTemplate {
     static extractMetaResultProperties (execution: Result): TypeExtract<Result, boolean>;
     static createFakeContext (commandData: Command, contextData: ContextConstructorData, extraData: SimpleGenericData): Context;
     static parseParameter (value: string, type: Parameter.Type, explicit?: boolean): Parameter.ParsedType;
+    static parseParametersFromArguments (
+        paramsDefinition: Parameter.Descriptor[],
+        argsArray: string[]
+    ): ParsedParametersData | CommandFailure;
     static checkAndExecute (
         identifier: string,
         argumentArray: string[],
