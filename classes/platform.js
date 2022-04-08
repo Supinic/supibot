@@ -268,7 +268,12 @@ module.exports = class Platform extends require("./template.js") {
 	}
 
 	getFullName (separator = "-") {
-		return [this.Name, this.Host].filter(Boolean).join(separator);
+		if (this.Name === "irc") {
+			return [this.Name, this.Host].filter(Boolean).join(separator);
+		}
+		else {
+			return this.Name;
+		}
 	}
 
 	getCacheKey () {
