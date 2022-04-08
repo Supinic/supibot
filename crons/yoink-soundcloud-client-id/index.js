@@ -26,7 +26,7 @@ module.exports = {
 		const scripts = Array.from(elements).map(i => $(i).attr("src"));
 		for (const script of scripts) {
 			const scriptSource = await sb.Got(script).text();
-			const match = scriptSource.match(/client_id=(.*?)&/);
+			const match = scriptSource.match(/client_id=(\w+?)\W/);
 			if (!match) {
 				continue;
 			}
