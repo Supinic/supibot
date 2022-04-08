@@ -32,9 +32,16 @@ declare type ContextOptions = {
 declare type UnpingContextOptions = ContextOptions & {
 	string: string
 };
-declare type ExecuteResult = {
-	success: boolean;
+declare type ExecuteSuccess = {
+	success: true;
+}
+declare type ExecuteFailure = {
+	success: false;
+	reason: string;
+	filter: Filter;
+	reply: string | null;
 };
+declare type ExecuteResult = ExecuteSuccess | ExecuteFailure;
 declare type ArgumentDescriptor = {
 	index?: number;
 	range?: [number, number];

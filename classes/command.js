@@ -182,7 +182,7 @@ class Command extends require("./template.js") {
 	 * If null, the command is considered created anonymously.
 	 * @type {string}
 	 */
-	#Author = null;
+	#Author;
 
 	/**
 	 * Session-specific data for the command that can be modified at runtime.
@@ -374,8 +374,6 @@ class Command extends require("./template.js") {
 		}
 
 		this.Code = null;
-		this.Flags = null;
-		this.Aliases = null;
 		this.data = null;
 		this.staticData = null;
 	}
@@ -431,7 +429,9 @@ class Command extends require("./template.js") {
 
 	static async reloadSpecific (...list) {
 		if (list.length === 0) {
-			return false;
+			return {
+				success: false
+			};
 		}
 
 		const failed = [];
@@ -568,7 +568,7 @@ class Command extends require("./template.js") {
 			throw new sb.Error({
 				message: "Invalid command identifier type",
 				args: {
-					id: identifier,
+					id: String(identifier),
 					type: typeof identifier
 				}
 			});
@@ -673,8 +673,10 @@ class Command extends require("./template.js") {
 			params: {}
 		};
 
+		/** @type {RegExp} */
+		const whitespaceRegex = sb.Config.get("WHITESPACE_REGEX");
 		let args = argumentArray
-			.map(i => i.replace(sb.Config.get("WHITESPACE_REGEX"), ""))
+			.map(i => i.replace(whitespaceRegex, ""))
 			.filter(Boolean);
 
 		// If the command is rollbackable, set up a transaction.
@@ -694,6 +696,7 @@ class Command extends require("./template.js") {
 			contextOptions.params = result.parameters;
 		}
 
+		/** @type {ExecuteResult} */
 		const filterData = await sb.Filter.execute({
 			user: userData,
 			command,

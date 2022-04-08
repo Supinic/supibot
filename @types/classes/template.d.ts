@@ -5,7 +5,7 @@ type FailedReloadDescriptor = {
     reason: string; // "no-path"
 }
 type ReloadResult = {
-    failed: FailedReloadDescriptor[],
+    failed?: FailedReloadDescriptor[],
     success: boolean
 };
 
