@@ -10,6 +10,7 @@ module.exports = {
 		{ name: "flair", type: "string" },
 		{ name: "ignoreFlair", type: "string" },
 		{ name: "linkOnly", type: "boolean" },
+		{ name: "safemode", type: "boolean" },
 		{ name: "showFlairs", type: "boolean" },
 		{ name: "skipGalleries", type: "boolean" }
 	],
@@ -182,9 +183,40 @@ module.exports = {
 		};
 	}),
 	Code: (async function randomMeme (context, ...args) {
+		if (typeof context.params.safeMode === "boolean") {
+			if (!context.channel) {
+				return {
+					success: false,
+					reply: `This setting cannot be applied in private messages!`
+				};
+			}
+
+			const permissions = await context.getUserPermissions();
+			if (permissions.flag === sb.User.permissions.regular) {
+				return {
+					success: false,
+					reply: `Only channel owners or ambassadors can set this setting!`
+				};
+			}
+
+			context.channel.Data.redditSafeMode = context.params.safeMode;
+			await context.channel.saveProperty("Data");
+
+			return {
+				reply: `Successfully set this channel's Reddit safe mode to ${context.params.safeMode}.`
+			};
+		}
+
 		let safeSpace = false;
 		if (context.platform.Name === "twitch") {
-			safeSpace = true;
+			if (context.channel) {
+				safeSpace = (typeof context.channel.Data.redditSafeMode === "boolean")
+					? context.channel.Data.redditSafeMode
+					: true;
+			}
+			else {
+				safeSpace = true;
+			}
 		}
 		else if (!context.channel?.NSFW && !context.privateMessage) {
 			safeSpace = true;
