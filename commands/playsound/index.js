@@ -6,7 +6,7 @@ module.exports = {
 	Description: "Plays a sound on supinic stream, if enabled. Use \"list\" as an argument to see the list of available playsounds.",
 	Flags: ["mention","pipe","whitelist"],
 	Params: null,
-	Whitelist_Response: null,
+	Whitelist_Response: "You can't use the command here, but here's a list of supported playsounds: https://supinic.com/stream/playsound/list",
 	Static_Data: (command => {
 		command.data.cooldowns = {};
 
@@ -22,10 +22,14 @@ module.exports = {
 	}),
 	Code: (async function playSound (context, playsound) {
 		if (!sb.Config.get("PLAYSOUNDS_ENABLED")) {
-			return { reply: "Playsounds are currently disabled!" };
+			return {
+				reply: "Playsounds are currently disabled!"
+			};
 		}
 		else if (!playsound || playsound === "list") {
-			return { reply: "Currently available playsounds: https://supinic.com/stream/playsound/list" };
+			return {
+				reply: "Currently available playsounds: https://supinic.com/stream/playsound/list"
+			};
 		}
 		else if (playsound === "random") {
 			playsound = await sb.Query.getRecordset(rs => rs
@@ -63,7 +67,9 @@ module.exports = {
 		catch (e) {
 			console.warn(e);
 			await sb.Config.set("PLAYSOUNDS_ENABLED", false);
-			return { reply: "The desktop listener is not currently running, turning off playsounds!" };
+			return {
+				reply: "The desktop listener is not currently running, turning off playsounds!"
+			};
 		}
 
 		await sb.Query.getRecordUpdater(ru => ru
