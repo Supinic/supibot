@@ -19,8 +19,8 @@ module.exports = {
 			return;
 		}
 
-		const deniedRequests = await sb.Query.getRecordset(rs => rs
-			.select("Suggestion.ID")
+		const requests = await sb.Query.getRecordset(rs => rs
+			.select("Suggestion.ID", "Suggestion.Status")
 			.select("User_Alias.Name AS Username")
 			.from("data", "Suggestion")
 			.join({
@@ -29,19 +29,19 @@ module.exports = {
 				on: "Suggestion.User_Alias = User_Alias.ID"
 			})
 			.where("Category = %s", "Bot addition")
-			.where("Status = %s", "Denied")
+			.where("Status IN %s+", ["Denied", "Dismissed"])
 			.where("Suggestion.ID IN %n+", this.data.requestIDs)
 		);
 
-		if (deniedRequests.length === 0) {
+		if (requests.length === 0) {
 			return;
 		}
 
 		const twitchPlatform = sb.Platform.get("twitch");
-		for (const request of deniedRequests) {
+		for (const request of requests) {
 			const url = `https://supinic.com/data/suggestion/${request.ID}`;
 			await twitchPlatform.pm(
-				`Your Supibot request (ID ${request.ID}) has been denied! Check the suggestion detail for more info: ${url}`,
+				`Your Supibot request (ID ${request.ID}) has been ${request.Status.toLowerCase()}! Check the suggestion detail for more info: ${url}`,
 				request.Username
 			);
 
