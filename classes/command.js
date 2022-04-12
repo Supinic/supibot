@@ -1247,8 +1247,9 @@ class Command extends require("./template.js") {
 		}
 
 		return {
+			success: true,
 			parameters,
-			args: [...remainingArgs, ...remainingStrings].filter(Boolean)
+			args: [...remainingArgs, ...remainingStrings].filter(i => i && /\S/.test(i))
 		};
 	}
 
