@@ -69,8 +69,11 @@ module.exports = {
 				};
 			}
 
-			const { banned, lastBroadcast } = broadcasterData.body;
-			const status = (banned) ? "banned" : "offline";
+			const { banned, banReason, lastBroadcast } = broadcasterData.body;
+			const status = (banned)
+				? `banned (${banReason})`
+				: "offline";
+
 			if (lastBroadcast.startedAt === null) {
 				return {
 					reply: `Channel is ${status} - never streamed before.`

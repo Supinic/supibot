@@ -99,11 +99,17 @@ module.exports = {
 		if (!relationship.cumulativeTenure) {
 			const response = await sb.Got("Leppunen", `v2/twitch/user/${channelName}`);
 			if (response.statusCode === 200) {
-				const { isAffiliate, isPartner } = response.body.roles ?? {};
+				const { banned, banReason, isAffiliate, isPartner } = response.body.roles ?? {};
 				if (isAffiliate === false && isPartner === false) {
 					return {
 						success: false,
 						reply: `Target channel is not affiliated nor partnered!`
+					};
+				}
+				else if (banned) {
+					return {
+						success: false,
+						reply: `Target channel is currently banned (${banReason})!`
 					};
 				}
 			}
