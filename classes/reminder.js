@@ -104,14 +104,12 @@ module.exports = class Reminder extends require("./template.js") {
 
 		/** @type {LongTimeout} */
 		this.timeout = new Reminder.LongTimeout(async () => {
-			const platform = channelData?.Platform ?? this.Platform;
-
 			const channelData = (this.Channel === null) ? null : sb.Channel.get(this.Channel);
 			const fromUserData = await sb.User.get(this.User_From, true);
 			const toUserData = await sb.User.get(this.User_To, true);
 
-			const fromMention = platform.createUserMention(fromUserData);
-			const toMention = platform.createUserMention(toUserData);
+			const fromMention = this.Platform.createUserMention(fromUserData);
+			const toMention = this.Platform.createUserMention(toUserData);
 
 			let message = null;
 			if (this.User_From === this.User_To) {
@@ -141,7 +139,7 @@ module.exports = class Reminder extends require("./template.js") {
 
 			if (message) {
 				if (this.Private_Message) {
-					await platform.pm(message, toUserData);
+					await this.Platform.pm(message, toUserData);
 				}
 				else {
 					if (channelData === null) {
