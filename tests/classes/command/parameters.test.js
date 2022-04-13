@@ -1,5 +1,5 @@
 /* eslint-disable max-nested-callbacks */
-/* global describe, it */
+/* global describe, it, beforeEach, afterEach */
 const assert = require("assert");
 
 globalThis.sb = {
@@ -134,7 +134,7 @@ describe("Command parameter parsing", () => {
 					[`object:foo=bar`, `object:foo=baz`],
 					[`object:"foo=bar"`, `object:foo=baz`],
 					[`object:foo=bar`, `object:"foo=baz"`],
-					[`object:"foo=bar"`, `object:"foo=baz"`],
+					[`object:"foo=bar"`, `object:"foo=baz"`]
 				];
 
 				for (const params of paramCombinations) {
@@ -211,10 +211,10 @@ describe("Command parameter parsing", () => {
 		const originalDelimiterDefinition = Command.ignoreParametersDelimiter;
 		const delimiter = "--";
 
-		before(() => {
+		beforeEach(() => {
 			Command.ignoreParametersDelimiter = testDelimiterDefinition;
 		});
-		after(() => {
+		afterEach(() => {
 			Command.ignoreParametersDelimiter = originalDelimiterDefinition;
 		});
 
