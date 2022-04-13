@@ -58,8 +58,7 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		this.availableEmotes = [];
 		this.availableEmoteSets = [];
-		this.emoteFetchPromise = null;
-		this.emoteFetchTimeout = 0;
+		this.recentEmoteFetchTimeout = 0;
 		this.userCommandSpamPrevention = new Map();
 
 		this.initListeners();
@@ -289,10 +288,12 @@ module.exports = class TwitchController extends require("./template.js") {
 		});
 
 		client.on("USERSTATE", async (messageObject) => {
+			const now = sb.Date.now();
+
 			if (!this.platform.Data.updateAvailableBotEmotes) {
 				return;
 			}
-			else if (this.emoteFetchPromise || this.emoteFetchTimeout > sb.Date.now()) {
+			else if (this.recentEmoteFetchTimeout < now) {
 				return;
 			}
 
@@ -300,12 +301,21 @@ module.exports = class TwitchController extends require("./template.js") {
 			if (this.availableEmotes.length === 0 || incomingEmoteSets.sort().join(",") !== this.availableEmoteSets.sort().join(",")) {
 				this.availableEmoteSets = incomingEmoteSets;
 
-				this.emoteFetchPromise = TwitchController.fetchTwitchEmotes(this.availableEmoteSets);
-				this.availableEmotes = await this.emoteFetchPromise;
-				this.emoteFetchPromise = null;
+				const timeout = this.platform.Data.emoteFetchTimeout ?? 10_000;
+				this.recentEmoteFetchTimeout = now + timeout;
 
-				this.emoteFetchTimeout = sb.Date.now() + (this.platform.Data.emoteFetchTimeout ?? 10_000);
-				await this.platform.invalidateGlobalEmotesCache();
+				let emotes;
+				try {
+					emotes = await TwitchController.fetchTwitchEmotes(this.availableEmoteSets);
+				}
+				catch {
+					emotes = null;
+				}
+
+				if (emotes) {
+					this.availableEmotes = emotes;
+					await this.platform.invalidateGlobalEmotesCache();
+				}
 			}
 		});
 
