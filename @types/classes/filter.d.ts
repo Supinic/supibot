@@ -67,7 +67,7 @@ export declare class Filter extends ClassTemplate {
 	static execute (options: ContextOptions): Promise<ExecuteResult>;
 	static create (options: ConstructorData): Promise<Filter>;
 	static getMentionStatus (options: ContextOptions): boolean;
-	static applyUnping (options: UnpingContextOptions): string;
+	static applyUnping (options: UnpingContextOptions): Promise<string>;
 	static getCooldownModifiers (options: ContextOptions): Filter | null;
 	static getFlags (options: ContextOptions): FlagObject;
 	static getReminderPreventions (options: ContextOptions): Filter["User_Alias"][];

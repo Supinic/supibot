@@ -372,7 +372,7 @@ module.exports = class Reminder extends require("./template.js") {
 				reminderMessage = `system reminder - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
 			}
 			else if (reminder.Text !== null) {
-				const mention = channelData.Platform.createUserReminder(fromUserData);
+				const mention = channelData.Platform.createUserMention(fromUserData);
 				const { string } = await sb.Banphrase.execute(mention, channelData);
 
 				reminderMessage = `${string} - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
@@ -446,7 +446,7 @@ module.exports = class Reminder extends require("./template.js") {
 				message = `${userMention} ${message}`;
 
 				// Apply unpings, governed by the reminder command itself
-				message = sb.Filter.applyUnping({
+				message = await sb.Filter.applyUnping({
 					command: sb.Command.get("remind"),
 					channel: channelData ?? null,
 					platform: channelData?.Platform ?? null,
