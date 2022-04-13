@@ -47,7 +47,7 @@ module.exports = class Reminder extends require("./template.js") {
 		/**
 		 * The channel the reminder was set up in.
 		 * This is necessary for timed reminders, as otherwise it is ambiguous where the reminder should be executed.
-		 * @typeof {sb.Channel.ID}
+		 * @typeof {Channel.ID}
 		 */
 		this.Channel = data.Channel;
 
@@ -60,14 +60,14 @@ module.exports = class Reminder extends require("./template.js") {
 
 		/**
 		 * Date of creation.
-		 * @type {sb.Date}
+		 * @type {CustomDate}
 		 */
 		this.Created = data.Created;
 
 		/**
 		 * Schedule date of reminder, if it's timed.
 		 * If null, reminder is tied to a user typing in chat.
-		 * @type {sb.Date}
+		 * @type {CustomDate|null}
 		 */
 		this.Schedule = data.Schedule;
 
@@ -80,7 +80,7 @@ module.exports = class Reminder extends require("./template.js") {
 
 		/**
 		 * Platform of the reminder. Can be independent from the channel.
-		 * @type {sb.Platform.ID|null}
+		 * @type {Platform.ID|null}
 		 */
 		this.Platform = (data.Platform)
 			? sb.Platform.get(data.Platform)
@@ -323,7 +323,7 @@ module.exports = class Reminder extends require("./template.js") {
 
 	/**
 	 * @param {User} targetUserData The user ID to check for
-	 * @param {sb.Channel} channelData The channel where the reminder was fired
+	 * @param {Channel} channelData The channel where the reminder was fired
 	 */
 	static async checkActive (targetUserData, channelData) {
 		if (!Reminder.data.has(targetUserData.ID)) {
@@ -347,68 +347,50 @@ module.exports = class Reminder extends require("./template.js") {
 
 		// Only set the triggering reminders to be inactive in memory. This is a necessary step to avoid re-sending
 		// the reminders if tons of messages are being sent at the same time.
-		// The reminders will be deactived propery at the end.
+		// The reminders will be deactivated properly at the end.
 		for (const reminder of reminders) {
 			reminder.Active = false;
 		}
 
 		const reply = [];
 		const privateReply = [];
-		const sorter = async (flag, username, message, channelData) => {
-			if (flag) {
-				privateReply.push(`@${username} - ${message}`);
-			}
-			else {
-				const checkedMessage = await channelData.prepareMessage(message);
-				reply.push(`@${username} - ${checkedMessage}`);
-			}
-		};
 
 		for (const reminder of reminders) {
 			const platformData = channelData.Platform;
 			const fromUserData = await sb.User.get(reminder.User_From);
 
+			let reminderMessage;
+
 			if (reminder.User_From === targetUserData.ID) {
-				await sorter(
-					reminder.Private_Message,
-					"yourself",
-					`${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`,
-					channelData
-				);
+				reminderMessage = `yourself - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
 			}
 			else if (fromUserData.Name === platformData.Self_Name) {
-				await sorter(
-					reminder.Private_Message,
-					"system reminder",
-					`${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`,
-					channelData
-				);
+				reminderMessage = `system reminder - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
 			}
 			else if (reminder.Text !== null) {
-				const { string } = await sb.Banphrase.execute(fromUserData.Name, channelData);
-				const delta = sb.Utils.timeDelta(reminder.Created);
+				const mention = channelData.Platform.createUserReminder(fromUserData);
+				const { string } = await sb.Banphrase.execute(mention, channelData);
 
-				await sorter(
-					reminder.Private_Message,
-					string,
-					`${reminder.Text} (${delta})`,
-					channelData
-				);
+				reminderMessage = `${string} - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
 			}
 			else {
 				const fromUserData = await sb.User.get(reminder.User_From, false);
 				const channelName = channelData.getFullName();
-				const message = `@${fromUserData.Name}, @${targetUserData.Name} just typed in channel ${channelName}`;
+
+				let platform = null;
+				if (reminder.Channel) {
+					platform = sb.Channel.get(reminder.Channel).Platform;
+				}
+				else {
+					platform = sb.Platform.get(reminder.Platform);
+				}
+
+				const authorMention = platform.controller.createUserMention(fromUserData);
+				const targetMention = platform.controller.createUserMention(targetUserData);
+
+				const message = `${authorMention}, ${targetMention} just typed in channel ${channelName}`;
 
 				if (reminder.Private_Message) {
-					let platform = null;
-					if (reminder.Channel) {
-						platform = sb.Channel.get(reminder.Channel).Platform;
-					}
-					else {
-						platform = sb.Platform.get(reminder.Platform);
-					}
-
 					await platform.pm(message, fromUserData);
 				}
 				else {
@@ -421,20 +403,29 @@ module.exports = class Reminder extends require("./template.js") {
 					await channelData.send(fixedMessage);
 				}
 			}
+
+			if (reminderMessage) {
+				if (reminder.Private_Message) {
+					privateReply.push(reminderMessage);
+				}
+				else {
+					const checked = await channelData.prepareMessage(reminderMessage);
+					reply.push(checked);
+				}
+			}
 		}
+
+		const targetUserMention = channelData.Platform.createUserMention(targetUserData);
+		const checkResult = await channelData.prepareMessage(targetUserMention, {
+			returnBooleanOnFail: true,
+			skipLengthCheck: true
+		});
+
+		const userMention = (checkResult === false) ? "[Banphrased username]," : `${checkResult},`;
 
 		// Handle non-private reminders
 		if (reply.length !== 0) {
-			const notifySymbol = (channelData.Platform.Name === "discord") ? "@" : "";
-			const checkedUsername = `${notifySymbol}${targetUserData.Name},`;
-			const checkResult = await channelData.prepareMessage(checkedUsername, {
-				returnBooleanOnFail: true,
-				skipLengthCheck: true
-			});
-
-			const username = (checkResult === false) ? "[Banphrased username]," : checkResult;
 			const noun = (reply.length === 1) ? "reminder" : "reminders";
-
 			let message = `${noun} from: ${reply.join("; ")}`;
 
 			if (channelData.Links_Allowed === false) {
@@ -448,10 +439,10 @@ module.exports = class Reminder extends require("./template.js") {
 			});
 
 			if (typeof message === "string" && !message.includes("[LINK]")) {
-				message = `${username} ${message}`;
+				message = `${userMention} ${message}`;
 
 				// Apply unpings, governed by the reminder command itself
-				message = await sb.Filter.applyUnping({
+				message = sb.Filter.applyUnping({
 					command: sb.Command.get("remind"),
 					channel: channelData ?? null,
 					platform: channelData?.Platform ?? null,
@@ -468,7 +459,7 @@ module.exports = class Reminder extends require("./template.js") {
 					const link = await Reminder.createRelayLink("lookup", listID);
 
 					message = sb.Utils.tag.trim `
-						Hey ${notifySymbol}${targetUserData.Name},
+						Hey ${userMention},
 						you have reminders, but they're too long to be posted here. 
 						Check them out here: ${link}
 					`;
@@ -485,7 +476,7 @@ module.exports = class Reminder extends require("./template.js") {
 				const link = await Reminder.createRelayLink("lookup", listID);
 
 				const message = sb.Utils.tag.trim `
-					Hey ${notifySymbol}${targetUserData.Name},
+					Hey ${userMention},
 					you just got reminders, but they couldn't be displayed here.
 					Instead, check them out here: ${link}
 				`;
@@ -500,7 +491,7 @@ module.exports = class Reminder extends require("./template.js") {
 				await channelData.Platform.pm(`Private reminder: ${privateReminder}`, targetUserData, channelData);
 			}
 
-			const publicMessage = `Hey ${targetUserData.Name} - I just private messaged you ${privateReply.length} private reminder(s) - make sure to check them out!`;
+			const publicMessage = `Hey ${userMention} - I just private messaged you ${privateReply.length} private reminder(s) - make sure to check them out!`;
 			await Promise.all([
 				channelData.send(publicMessage),
 				channelData.mirror(publicMessage, targetUserData, { commandUsed: false })
@@ -519,7 +510,7 @@ module.exports = class Reminder extends require("./template.js") {
 	 * Used mostly in commands to set up reminders.
 	 * @param {number} userFrom
 	 * @param {number} userTo
-	 * @param {sb.Date} [schedule]
+	 * @param {CustomDate} [schedule]
 	 * @return {ReminderCreationResult}
 	 */
 	static async checkLimits (userFrom, userTo, schedule) {
