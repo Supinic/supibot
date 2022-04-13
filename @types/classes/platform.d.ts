@@ -71,7 +71,7 @@ export declare class Platform extends ClassTemplate {
 	readonly Mirror_Identifier: string | null;
 	readonly Logging: Log | null;
 	readonly Defaults: Partial<Platform["Data"]>;
-	readonly Data: Record<string, any>; // is overriden in subclasses
+	readonly Data: Record<string, any>; // is overridden in subclasses
 
 	constructor (data: ConstructorOptions);
 
@@ -87,6 +87,7 @@ export declare class Platform extends ClassTemplate {
 	prepareMessage (message: Message, channel: string, options: PrepareMessageOptions): Promise<string>;
 	getFullName (separator: string): string;
 	getCacheKey (): string;
+	createUserMention (userData: User): string;
 
 	get capital (): string;
 	get privateMessageLoggingTableName (): string;
