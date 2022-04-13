@@ -662,7 +662,7 @@ module.exports = class Reminder extends require("./template.js") {
 	 * @param {Object} options
 	 * @param {boolean} [options.cancelled] If `true`, the reminder will be flagged as "Cancelled"
 	 * @param {boolean} [options.permanent] If `true`, the reminder will also be removed/deactivated in the database as well
-	 * @returns {boolean} whether or not the changes were applied
+	 * @returns {Promise<boolean>} whether or not the changes were applied
 	 */
 	static async #remove (ID, options = {}) {
 		const { cancelled, permanent } = options;
