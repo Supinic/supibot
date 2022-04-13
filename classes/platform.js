@@ -281,6 +281,10 @@ module.exports = class Platform extends require("./template.js") {
 		return `sb-platform-${name}`;
 	}
 
+	createUserMention (userData) {
+		return this.#controller.createUserMention(userData);
+	}
+
 	get userMessagePromises () {
 		return this.#userMessagePromises;
 	}
