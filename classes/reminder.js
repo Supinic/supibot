@@ -104,19 +104,24 @@ module.exports = class Reminder extends require("./template.js") {
 
 		/** @type {LongTimeout} */
 		this.timeout = new Reminder.LongTimeout(async () => {
+			const platform = channelData?.Platform ?? this.Platform;
+
 			const channelData = (this.Channel === null) ? null : sb.Channel.get(this.Channel);
 			const fromUserData = await sb.User.get(this.User_From, true);
 			const toUserData = await sb.User.get(this.User_To, true);
-			let message = null;
 
+			const fromMention = platform.createUserMention(fromUserData);
+			const toMention = platform.createUserMention(toUserData);
+
+			let message = null;
 			if (this.User_From === this.User_To) {
-				message = `@${fromUserData.Name}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+				message = `${toMention}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
 			else if (this.User_From === sb.Config.get("SELF_ID")) {
-				message = `@${toUserData.Name}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+				message = `${toMention}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
 			else if (this.User_To) {
-				message = `@${toUserData.Name}, timed reminder from @${fromUserData.Name} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+				message = `${toMention}, timed reminder from ${fromMention} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
 
 			const statusAFK = sb.AwayFromKeyboard.get(toUserData);
@@ -136,7 +141,6 @@ module.exports = class Reminder extends require("./template.js") {
 
 			if (message) {
 				if (this.Private_Message) {
-					const platform = channelData?.Platform ?? this.Platform;
 					await platform.pm(message, toUserData);
 				}
 				else {
