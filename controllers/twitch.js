@@ -1056,6 +1056,10 @@ module.exports = class TwitchController extends require("./template.js") {
 		return preparedMessage;
 	}
 
+	createUserMention (userData) {
+		return `@${userData.Name}`;
+	}
+
 	/**
 	 * Fetches a list of emote data for a given list of emote sets.
 	 * @param {string[]} inputSets

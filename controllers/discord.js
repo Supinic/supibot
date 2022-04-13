@@ -632,6 +632,10 @@ module.exports = class DiscordController extends require("./template.js") {
 		}));
 	}
 
+	createUserMention (userData) {
+		return `<@${userData.Specific_ID}>`;
+	}
+
 	static removeEmoteTags (message) {
 		return message.replace(/<a?:(.*?):(\d*)>/g, (total, emote) => `${emote} `).trim();
 	}

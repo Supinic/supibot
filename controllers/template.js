@@ -166,6 +166,10 @@ module.exports = class Controller {
 		return message;
 	}
 
+	createUserMention (userData) {
+		return userData.Name;
+	}
+
 	restart () {}
 
 	destroy () {}
