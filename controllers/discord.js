@@ -633,7 +633,7 @@ module.exports = class DiscordController extends require("./template.js") {
 	}
 
 	createUserMention (userData) {
-		return `<@${userData.Specific_ID}>`;
+		return `<@${userData.Discord_ID}>`;
 	}
 
 	static removeEmoteTags (message) {
