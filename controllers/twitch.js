@@ -293,7 +293,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			if (!this.platform.Data.updateAvailableBotEmotes) {
 				return;
 			}
-			else if (this.recentEmoteFetchTimeout < now) {
+			else if (this.recentEmoteFetchTimeout > now) {
 				return;
 			}
 
