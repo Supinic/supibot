@@ -88,11 +88,11 @@
     "language": "serbian",
     "sources": [
       {
-        "name": "N1 Info",
-        "url": "https://rs.n1info.com",
-        "path": "rss",
-        "endpoints": ["249/Naslovna"],
-        "helpers": ["supinic", "infinitegachi"]
+        "name": "Danas",
+        "url": "https://www.danas.rs",
+        "path": null,
+        "endpoints": ["feed"],
+        "helpers": ["conevee"]
       }
     ]
   },
