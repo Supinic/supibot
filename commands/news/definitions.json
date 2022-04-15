@@ -755,5 +755,18 @@
         "helpers": []
       }
     ]
+  },
+  {
+    "code": "pt",
+    "language": "portuguese",
+    "sources": [
+      {
+        "name": "RTP",
+        "url": "https://www.rtp.pt/",
+        "path": "noticias",
+        "endpoints": ["rss", "rss/pais"],
+        "helpers": ["sugolyollom", "zebisnaga3"]
+      }
+    ]
   }
 ]
