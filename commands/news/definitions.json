@@ -795,5 +795,25 @@
         "helpers": ["llama_shockz"]
       }
     ]
+  },
+  {
+    "code": "nz",
+    "language": "english",
+    "sources": [
+      {
+        "name": "Stuff",
+        "url": "https://www.stuff.co.nz",
+        "path": null,
+        "endpoints": ["rss"],
+        "helpers": ["jammehcow"]
+      },
+      {
+        "name": "RNZ",
+        "url": "https://www.rnz.co.nz/rss",
+        "path": "rss",
+        "endpoints": ["te-manu-korihi.xml"],
+        "helpers": ["jammehcow"]
+      }
+    ]
   }
 ]
