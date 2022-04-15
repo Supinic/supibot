@@ -78,7 +78,7 @@
         "name": "RÚV",
         "url": "https://www.ruv.is",
         "path": "rss",
-        "endpoints": ["frettir", "innlent", "erlent"],
+        "endpoints": ["innlent"],
         "helpers": ["kawaqa"]
       }
     ]
