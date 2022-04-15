@@ -568,6 +568,13 @@
         "path": "skai",
         "endpoints": ["PLwa"],
         "helpers": []
+      },
+      {
+        "name": "Google aggregate",
+        "url": "https://news.google.com",
+        "path": "rss/topics",
+        "endpoints": ["CAAqIQgKIhtDQkFTRGdvSUwyMHZNRE0xY1hrU0FtVnNLQUFQAQ?hl=el&gl=GR&ceid=GR:el"],
+        "helpers": ["l7mon"]
       }
     ]
   },
