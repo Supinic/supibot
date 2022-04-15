@@ -766,6 +766,13 @@
         "path": "noticias",
         "endpoints": ["rss", "rss/pais"],
         "helpers": ["sugolyollom", "zebisnaga3"]
+      },
+      {
+        "name": "Radio Renascença",
+        "url": "https://rr.sapo.pt",
+        "path": "rss",
+        "endpoints": ["rssfeed.aspx"],
+        "helpers": ["zebisnaga3"]
       }
     ]
   },
