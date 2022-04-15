@@ -742,5 +742,18 @@
         "helpers": ["boring_nick"]
       }
     ]
+  },
+  {
+    "code": "uk",
+    "language": "english",
+    "sources": [
+      {
+        "name": "BBC",
+        "url": "http://feeds.bbci.co.uk",
+        "path": "news",
+        "endpoints": ["uk/rss.xml"],
+        "helpers": []
+      }
+    ]
   }
 ]
