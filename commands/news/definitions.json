@@ -762,10 +762,30 @@
     "sources": [
       {
         "name": "RTP",
-        "url": "https://www.rtp.pt/",
+        "url": "https://www.rtp.pt",
         "path": "noticias",
         "endpoints": ["rss", "rss/pais"],
         "helpers": ["sugolyollom", "zebisnaga3"]
+      }
+    ]
+  },
+  {
+    "code": "ie",
+    "language": "irish",
+    "sources": [
+      {
+        "name": "Irish Times",
+        "url": "https://www.irishtimes.com",
+        "path": null,
+        "endpoints": ["cmlink/news-1.1319192"],
+        "helpers": []
+      },
+      {
+        "name": "Irish Examiner",
+        "url": "https://feeds.feedburner.com",
+        "path": null,
+        "endpoints": ["ieireland"],
+        "helpers": ["llama_shockz"]
       }
     ]
   }
