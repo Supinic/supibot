@@ -1,7 +1,7 @@
 export default {
 	name: "V5",
 	optionsType: "function",
-	options: ((sb) => ({
+	options: (() => ({
 		prefixUrl: "https://api.twitch.tv/v5",
 		headers: {
 			Accept: "application/vnd.twitchtv.v5+json",

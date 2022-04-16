@@ -1,7 +1,7 @@
 export default {
 	name: "Kraken",
 	optionsType: "function",
-	options: ((sb) => {
+	options: (() => {
 		if (!sb.Config.has("TWITCH_CLIENT_ID")) {
 			throw new Error("Kraken sb.Got instance cannot initialize - missing client-id");
 		}

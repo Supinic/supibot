@@ -1,7 +1,7 @@
 export default {
 	name: "Global",
 	optionsType: "function",
-	options: ((sb) => ({
+	options: (() => ({
 		responseType: "json",
 		retry: 0,
 		timeout: 30000,

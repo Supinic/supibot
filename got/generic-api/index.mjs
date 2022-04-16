@@ -1,7 +1,7 @@
 export default {
 	name: "GenericAPI",
 	optionsType: "function",
-	options: ((sb) => ({
+	options: (() => ({
 		mutableDefaults: true,
 		throwHttpErrors: true,
 		hooks: {
