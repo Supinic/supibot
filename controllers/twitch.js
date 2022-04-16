@@ -592,17 +592,26 @@ module.exports = class TwitchController extends require("./template.js") {
 			// Mismatch between senderUserID and userData.Twitch_ID means someone renamed into a different
 			// user's username, or that there is a different mishap happening. This case is unfortunately exceptional
 			// for the current user-database structure and the event handler must be aborted.
+			const channelData = (channelName)
+				? sb.Channel.get(channelName, this.platform)
+				: null;
 
-			const channelData = sb.Channel.get(channelName, this.platform);
-			if (channelData && sb.Command.is(message)) {
+			if (!channelName || (channelData && sb.Command.is(message))) {
 				const notified = await userData.getDataProperty("twitch-userid-mismatch-notification");
 				if (!notified) {
-					await channelData.send(sb.Utils.tag.trim `
+					const message = sb.Utils.tag.trim `
 						@${userData.Name}, you have been flagged as suspicious.
 						This is because I have seen your Twitch username on a different account before.
 						This is usually caused by renaming into an account that existed before.
 						To remedy this, head into Supinic's channel chat twitch.tv/supinic and mention this.												
-					`);
+					`;
+
+					if (channelData) {
+						await channelData.send(message);
+					}
+					else {
+						await this.pm(message, userData.Name);
+					}
 
 					await Promise.all([
 						sb.Logger.log(
