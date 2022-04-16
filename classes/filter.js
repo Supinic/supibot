@@ -1,5 +1,3 @@
-const sb = globalThis._namespace;
-
 /**
  * Represents a filter of the bot's commands.
  */

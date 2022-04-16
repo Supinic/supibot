@@ -1,4 +1,3 @@
-const sb = globalThis._namespace;
 const pathModule = require("path");
 
 /**

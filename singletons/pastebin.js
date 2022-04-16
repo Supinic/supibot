@@ -1,5 +1,3 @@
-const sb = globalThis._namespace;
-
 let loginConfigMissingNotified = false;
 const loginConfigs = [
 	"API_PASTEBIN",

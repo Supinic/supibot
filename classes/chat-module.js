@@ -1,5 +1,3 @@
-const sb = globalThis._namespace;
-
 /**
  * Represents a custom hook-like function that gets invoked every time a specified event
  * is emitted in a given channel.
