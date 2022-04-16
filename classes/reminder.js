@@ -1,3 +1,5 @@
+const sb = globalThis._namespace;
+
 /**
  * Represents a pending reminder from (usually) one user to another.
  * An active reminder will be printed into the chat once the target user is spotted.

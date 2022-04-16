@@ -1,3 +1,5 @@
+const sb = globalThis._namespace;
+
 class Cooldown {
 	#channel = null;
 	#user = null;

@@ -1,3 +1,5 @@
+const sb = globalThis._namespace;
+
 /**
  * Represents a user's AFK status
  */

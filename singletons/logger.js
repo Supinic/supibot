@@ -1,3 +1,4 @@
+const sb = globalThis._namespace;
 const notified = {
 	lastSeen: false,
 	privatePlatformLogging: []

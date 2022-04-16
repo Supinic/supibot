@@ -1,3 +1,5 @@
+const sb = globalThis._namespace;
+
 /**
  * Represents a platform - a location where the bot can be active and respond to messages.
  * It is an API to manage communication between channels and the platform controller.

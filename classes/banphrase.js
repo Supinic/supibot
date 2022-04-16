@@ -1,3 +1,5 @@
+const sb = globalThis._namespace;
+
 /**
  * Represents a single output modifier that will change the output of the bot in specified channel/platform.
  * @memberof sb

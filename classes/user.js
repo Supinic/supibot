@@ -1,3 +1,5 @@
+const sb = globalThis._namespace;
+
 /**
  * Represents a chat user.
  * Since there can be hundreds of thousands of users loaded, a class is used to simplify the prototype, and potentially save some memory and/or processing power with V8.

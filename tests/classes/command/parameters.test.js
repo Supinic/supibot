@@ -1,24 +1,19 @@
 /* eslint-disable max-nested-callbacks */
-/* global describe, it, beforeEach, afterEach */
 const assert = require("assert");
 
-globalThis.sb = {
-	Date: require("../../../objects/date"),
-	Utils: {
-		parseRegExp: (input) => {
-			try {
-				return new RegExp(input);
-			}
-			catch {
-				return null;
-			}
-		}
-	}
-};
+let sb;
+let Command;
+console.log("kek");
+(async function () {
+	sb = await require("../../../")({
+		skipData: ["classes/command"],
+		whitelist: ["objects/date", "objects/error", "classes/command", "singletons/utils"]
+	});
 
-const Command = require("../../../classes/command");
+	Command = sb.Command;
+})();
 
-describe("Command parameter parsing", () => {
+describe("Command parameter parsing", function () {
 	const paramsDefinition = [
 		{ name: "boolean", type: "boolean" },
 		{ name: "date", type: "date" },
@@ -208,14 +203,10 @@ describe("Command parameter parsing", () => {
 
 	describe("parameters ignore delimiter", () => {
 		const testDelimiterDefinition = /(^|\s)--(\s|$)/;
-		const originalDelimiterDefinition = Command.ignoreParametersDelimiter;
 		const delimiter = "--";
 
 		beforeEach(() => {
 			Command.ignoreParametersDelimiter = testDelimiterDefinition;
-		});
-		afterEach(() => {
-			Command.ignoreParametersDelimiter = originalDelimiterDefinition;
 		});
 
 		it("should ignore parameters after the delimiter", () => {

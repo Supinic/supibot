@@ -1,3 +1,5 @@
+const sb = globalThis._namespace;
+
 module.exports = class ClassTemplate {
 	destroy () {}
 
