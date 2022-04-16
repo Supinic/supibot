@@ -1,7 +1,7 @@
 export default {
 	name: "Supibot",
 	optionsType: "function",
-	options: (() => {
+	options: ((sb) => {
 		const secure = sb.Config.get("SUPIBOT_API_SECURE", false) ?? false;
 		const protocol = (secure) ? "https" : "http";
 		const port = sb.Config.get("SUPIBOT_API_PORT", false) ?? 80;
