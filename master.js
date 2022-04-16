@@ -11,9 +11,8 @@
 	 * Used for various utilities, prototype changes and custom classes.
 	 * Assigned to global.sb upon requiring the globals module.
 	 */
-	/** @type {GlobalSbObject} */
-	globalThis.sb = {};
-	await require("supi-core")("sb");
+	const initializeSbObject = require("supi-core");
+	globalThis.sb = await initializeSbObject();
 
 	const controllers = {};
 	const initialChannels = sb.Channel.data.filter(i => i.Mode !== "Inactive");
