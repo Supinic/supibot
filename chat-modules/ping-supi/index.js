@@ -4,6 +4,10 @@ module.exports = {
 	Description: "This module notifies Supinic whenever he is mentioned (in any channel, across platforms) via Twitch whispers.",
 	Code: (async function pingSupi (context) {
 		const { message, channel, user } = context;
+		if (channel.Data?.globalPingRemoved === true) {
+			return;
+		}
+
 		const regex = /supi\b|supinic(?!\.com)|bupi/i;
 		const skippedUsers = [1, 1127, 8697460, 12182780];
 
