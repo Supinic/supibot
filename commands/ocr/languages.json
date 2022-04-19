@@ -1,0 +1,95 @@
+{
+  "ara": {
+    "engines": [1, 3]
+  },
+  "bul": {
+    "engines": [1]
+  },
+  "chs": {
+    "engines": [1, 3]
+  },
+  "hrv": {
+    "engines": [1]
+  },
+  "cze": {
+    "engines": [1]
+  },
+  "dan": {
+    "engines": [1, 2]
+  },
+  "dut": {
+    "engines": [1, 2]
+  },
+  "eng": {
+    "engines": [1, 2, 3]
+  },
+  "fin": {
+    "engines": [1]
+  },
+  "fre": {
+    "engines": [1, 2, 3]
+  },
+  "ger": {
+    "engines": [1, 2, 3]
+  },
+  "hin": {
+    "engines": [3]
+  },
+  "gre": {
+    "engines": [1]
+  },
+  "hun": {
+    "engines": [1]
+  },
+  "ita": {
+    "engines": [1, 2]
+  },
+  "jpn": {
+    "engines": [1, 3]
+  },
+  "kan": {
+    "engines": [3]
+  },
+  "kor": {
+    "engines": [1]
+  },
+  "fas": {
+    "engines": [3]
+  },
+  "pol": {
+    "engines": [1]
+  },
+  "por": {
+    "engines": [1, 2, 3]
+  },
+  "rus": {
+    "engines": [1, 3]
+  },
+  "slv": {
+    "engines": [1]
+  },
+  "spa": {
+    "engines": [1, 2]
+  },
+  "swe": {
+    "engines": [1, 2]
+  },
+  "tam": {
+    "engines": [3]
+  },
+  "tel": {
+    "engines": [3]
+  },
+  "tha": {
+    "engines": [3]
+  },
+  "tur": {
+    "engines": [1, 3]
+  },
+  "ukr": {
+    "engines": [3]
+  },
+  "vie": {
+    "engines": [3]
+  }
+}

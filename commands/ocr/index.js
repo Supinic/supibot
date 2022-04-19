@@ -10,38 +10,19 @@ module.exports = {
 		{ name: "lang", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		languages: {
-			ara: "Arabic",
-			bul: "Bulgarian",
-			chs: "Chinese",
-			hrv: "Croatian",
-			cze: "Czech",
-			dan: "Danish",
-			dut: "Dutch",
-			eng: "English",
-			fin: "Finnish",
-			fre: "French",
-			ger: "German",
-			gre: "Greek",
-			hun: "Hungarian",
-			kor: "Korean",
-			ita: "Italian",
-			jpn: "Japanese",
-			pol: "Polish",
-			por: "Portuguese",
-			rus: "Russian",
-			slv: "Slovenian",
-			spa: "Spanish",
-			swe: "Swedish",
-			tur: "Turkish"
-		}
-	})),
+	Static_Data: (() => {
+		const definitions = require("./languages.json");
+		const names = Object.keys(definitions)
+			.map(i => sb.Utils.capitalize(sb.Utils.modules.languageISO.getName(i)))
+			.join(", ");
+
+		return { definitions, names };
+	}),
 	Code: (async function ocr (context, ...args) {
-		let language = "eng";
+		let languageCode = "eng";
 		if (context.params.lang) {
-			language = sb.Utils.modules.languageISO.getCode(context.params.lang, "iso6393");
-			if (!language) {
+			languageCode = sb.Utils.modules.languageISO.getCode(context.params.lang, "iso6393");
+			if (!languageCode) {
 				return {
 					success: false,
 					reply: "Provided language could not be parsed!"
@@ -49,15 +30,15 @@ module.exports = {
 			}
 		}
 
-		if (language === "chi") {
-			language = "chs"; // thanks for using standard codes everyone
+		if (languageCode === "chi") {
+			languageCode = "chs"; // thanks for using standard codes everyone
 		}
 
-		if (!this.staticData.languages[language]) {
-			const list = Object.values(this.staticData.languages).join(", ");
+		const language = this.staticData.languages[languageCode];
+		if (!language) {
 			return {
 				success: false,
-				reply: `Language is not supported! Use one of these: ${list}`,
+				reply: `Language is not supported! Use one of these: ${this.staticData.names}`,
 				cooldown: 2500
 			};
 		}
@@ -89,7 +70,9 @@ module.exports = {
 
 		let data;
 		let statusCode;
-		const key = { language, link };
+
+		const engine = Math.max(...language.engines);
+		const key = { language: languageCode, link };
 
 		// If force is true, don't even bother fetching the cache data
 		const cacheData = (context.params.force) ? null : await this.getCacheData(key);
@@ -108,10 +91,10 @@ module.exports = {
 				},
 				searchParams: {
 					url: link,
-					language,
+					language: languageCode,
 					scale: "true",
 					isTable: "true",
-					OCREngine: "1",
+					OCREngine: String(engine),
 					isOverlayRequired: "false"
 				}
 			});
@@ -151,8 +134,8 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async (prefix, values) => {
-		const { languages } = values.getStaticData();
-		const list = Object.values(languages).map(name => `<li>${name}</li>`).join("");
+		const { names } = values.getStaticData();
+		const list = names.map(name => `<li>${name}</li>`).join("");
 
 		return [
 			"Attempts to read a provided image with OCR, and posts the found text in chat.",
