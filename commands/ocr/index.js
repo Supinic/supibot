@@ -29,15 +29,11 @@ module.exports = {
 			}
 		}
 
-		if (languageCode === "chi") {
-			languageCode = "chs"; // thanks for using standard codes everyone
-		}
-
 		const language = this.staticData.definitions[languageCode];
 		if (!language) {
 			return {
 				success: false,
-				reply: `Language is not supported! Use one of these: ${this.staticData.names}`,
+				reply: `Language is not supported! Use one of these: ${this.staticData.names.join(", ")}`,
 				cooldown: 2500
 			};
 		}
@@ -90,7 +86,7 @@ module.exports = {
 				},
 				searchParams: {
 					url: link,
-					language: languageCode,
+					language: language.nonStandardLanguageCode ?? languageCode,
 					scale: "true",
 					isTable: "true",
 					OCREngine: String(engine),
