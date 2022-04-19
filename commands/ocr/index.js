@@ -13,7 +13,7 @@ module.exports = {
 	Static_Data: (() => {
 		const definitions = require("./languages.json");
 		const names = Object.keys(definitions)
-			.map(i => sb.Utils.capitalize(sb.Utils.modules.languageISO.getName(i)))
+			.map(i => sb.Utils.modules.languageISO.getName(i))
 			.join(", ");
 
 		return { definitions, names };
@@ -135,7 +135,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix, values) => {
 		const { names } = values.getStaticData();
-		const list = names.map(name => `<li>${name}</li>`).join("");
+		const list = names.map(name => `<li>${sb.Utils.capitalize(name)}</li>`).join("");
 
 		return [
 			"Attempts to read a provided image with OCR, and posts the found text in chat.",
