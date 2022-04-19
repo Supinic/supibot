@@ -142,7 +142,14 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		const status = sb.Utils.randArray(afkCommand.staticData.responses[data.Status]);
 
 		if (!data.Silent) {
-			const message = `${userData.Name} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
+			const now = sb.Date.now();
+			let message = `${userData.Name} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
+
+			// If the AFK status has not been extended and lasted over 30 days, append the message
+			if (!data.extended && ((now - data.Started) >= (30 * 864e5))) {
+				message += ` Welcome back! 🙂👋`;
+			}
+
 			const unpingedMessage = await sb.Filter.applyUnping({
 				command: afkCommand,
 				channel: channelData ?? null,
