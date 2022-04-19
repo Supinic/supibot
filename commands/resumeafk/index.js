@@ -56,7 +56,8 @@ module.exports = {
 			Text: lastAFK.Text,
 			Started: lastAFK.Started,
 			Active: true,
-			Status: lastAFK.Status
+			Status: lastAFK.Status,
+			extended: true
 		});
 
 		const oldAFK = await sb.Query.getRow("chat_data", "AFK");
