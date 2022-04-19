@@ -13,8 +13,7 @@ module.exports = {
 	Static_Data: (() => {
 		const definitions = require("./languages.json");
 		const names = Object.keys(definitions)
-			.map(i => sb.Utils.modules.languageISO.getName(i))
-			.join(", ");
+			.map(i => sb.Utils.modules.languageISO.getName(i));
 
 		return { definitions, names };
 	}),
@@ -34,7 +33,7 @@ module.exports = {
 			languageCode = "chs"; // thanks for using standard codes everyone
 		}
 
-		const language = this.staticData.languages[languageCode];
+		const language = this.staticData.definitions[languageCode];
 		if (!language) {
 			return {
 				success: false,
