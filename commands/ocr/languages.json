@@ -55,6 +55,7 @@
     "engines": [1]
   },
   "fas": {
+    "nonStandardLanguageCode": "per",
     "engines": [3]
   },
   "pol": {
