@@ -67,5 +67,16 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"Sets a notification to yourself for when the target user types in a channel with Supibot.",
+		"",
+
+		`<code>${prefix}pingme (user)</code>`,
+		"When the target user types a message, you will be reminder in the current channel (or in whispers, if used in whispers)",
+		"",
+
+		`<code>${prefix}pingme (user) (... custom text)</code>`,
+		"Same as above, but your custom text will be mentioned as well.",
+		"This is useful if you want to set a note or something of that matter."
+	])
 };
