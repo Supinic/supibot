@@ -2,21 +2,23 @@
 /* global describe, it, beforeEach, afterEach */
 const assert = require("assert");
 
-globalThis.sb = {
-	Date: require("../../../objects/date"),
-	Utils: {
-		parseRegExp: (input) => {
-			try {
-				return new RegExp(input);
-			}
-			catch {
-				return null;
+const Command =  require("../../../classes/command");
+
+beforeEach(() => {
+	globalThis.sb = {
+		Date: require("../../../objects/date"),
+		Utils: {
+			parseRegExp: (input) => {
+				try {
+					return new RegExp(input);
+				}
+				catch {
+					return null;
+				}
 			}
 		}
-	}
-};
-
-const Command = require("../../../classes/command");
+	};
+});
 
 describe("Command parameter parsing", () => {
 	const paramsDefinition = [
@@ -52,6 +54,7 @@ describe("Command parameter parsing", () => {
 			assert.strictEqual(typeof value, type, `${type}-type param must be of the correct type`);
 		}
 	};
+
 
 	it("returns no arguments for empty input", () => {
 		const result = Command.parseParametersFromArguments(paramsDefinition, []);
@@ -149,6 +152,7 @@ describe("Command parameter parsing", () => {
 	it("returns a correctly typed single argument", () => {
 		for (const delimiter of ["", "\""]) {
 			for (const { name, type } of paramsDefinition) {
+				console.log({ sb });
 				const result = Command.parseParametersFromArguments(
 					paramsDefinition,
 					[`${name}:${delimiter}${sampleStringValues[type]}${delimiter}`]
