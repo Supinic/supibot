@@ -13,7 +13,6 @@ declare type ConstructorData = {
 	Text: string;
 	Silent: boolean;
 	Status: Status;
-	extended?: boolean;
 };
 
 export declare class AwayFromKeyboard extends ClassTemplate {
@@ -29,7 +28,6 @@ export declare class AwayFromKeyboard extends ClassTemplate {
 	readonly Text: string;
 	readonly Silent: boolean;
 	readonly Status: Status;
-	readonly extended: boolean;
 
 	constructor (data: ConstructorData);
 }

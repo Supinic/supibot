@@ -46,11 +46,6 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		 * @type {string}
 		 */
 		this.Status = data.Status ?? "afk";
-
-		/**
-		 * Determines whether or not the AFK status is "extending" a previous, different AFK status.
-		 */
-		this.extended = data.extended ?? false;
 	}
 
 	async serialize () {
@@ -215,8 +210,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			Silent: Boolean(data.Silent),
 			Started: data.Started ?? now,
 			Status: data.Status ?? "afk",
-			Interrupted_ID: data.Interrupted_ID ?? null,
-			extended: data.extended ?? null
+			Interrupted_ID: data.Interrupted_ID ?? null
 		};
 
 		const row = await sb.Query.getRow("chat_data", "AFK");
