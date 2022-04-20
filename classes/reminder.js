@@ -383,7 +383,10 @@ module.exports = class Reminder extends require("./template.js") {
 				const authorMention = platform.controller.createUserMention(fromUserData);
 				const targetMention = platform.controller.createUserMention(targetUserData);
 
-				const message = `${authorMention}, ${targetMention} just typed in channel ${channelName}`;
+				let message = `${authorMention}, ${targetMention} just typed in channel ${channelName}`;
+				if (reminder.Text) {
+					message += `: ${reminder.Text}`;
+				}
 
 				if (reminder.Private_Message) {
 					await platform.pm(message, fromUserData);
