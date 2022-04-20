@@ -15,7 +15,7 @@ module.exports = {
 			"private-outgoing": "You have too many private reminders pending!"
 		}
 	})),
-	Code: (async function pingMe (context, user) {
+	Code: (async function pingMe (context, user, ...args) {
 		if (!user) {
 			return {
 				success: false,
@@ -48,7 +48,7 @@ module.exports = {
 			Channel: context.channel?.ID || null,
 			User_From: context.user.ID,
 			User_To: targetUser.ID,
-			Text: null,
+			Text: args.filter(Boolean).join(" ") ?? null,
 			Schedule: null,
 			Created: new sb.Date(),
 			Private_Message: Boolean(context.privateMessage),
