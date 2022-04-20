@@ -74,7 +74,6 @@ module.exports = {
 		}
 
 		const name = show.title.english ?? show.title.romaji ?? show.title.native;
-		const adult = (show.isAdult) ? "(18+)" : "";
 
 		const time = sb.Utils.formatTime(Math.trunc(result.from), true);
 		const similarity = sb.Utils.round(result.similarity * 100, 2);
@@ -111,6 +110,11 @@ module.exports = {
 			await this.setCacheData(videoLinkKey, videoLink, { expiry: 30 * 864e5 }); // 30 days
 		}
 
+		const adult = (show.isAdult) ? "(18+)" : "";
+		if (show.isAdult && (context.channel && !context.channel.NSFW)) {
+			videoLink = "(NSFW link omitted)";
+		}
+
 		return {
 			reply: sb.Utils.tag.trim `
 				Best match for your picture:
@@ -123,5 +127,13 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"For a provided screenshot or picture of an anime show, attempts to recognize the show's name, episode, timestamp and even a video preview (if possible).",
+		"If the detected show is marked as NSFW (18+) and the command is NOT used in an NSFW channel or in private messages, the video preview will be omitted.",
+		"",
+
+		`<code>${prefix}whatanimeisit (link)</code>`,
+		`<code>${prefix}tracemoe (link)</code>`,
+		"If found, creates a little summary of the detected show."
+	])
 };
