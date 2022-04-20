@@ -8,11 +8,11 @@ module.exports = class Reminder extends require("./template.js") {
 	/**
 	 * Holds all currently active reminders in a Map, keyed by the target recipient user's IDs.
 	 * The list of
-	 * @type {Map<number, Reminder[]>}
+	 * @type {Map<User.ID, Reminder[]>}
 	 */
 	static data = new Map();
 
-	/* @type {Map<number, number>} */
+	/* @type {Map<Reminder.ID, User.ID>} */
 	static available = new Map();
 
 	constructor (data) {
@@ -85,6 +85,13 @@ module.exports = class Reminder extends require("./template.js") {
 		this.Platform = (data.Platform)
 			? sb.Platform.get(data.Platform)
 			: null;
+
+		/**
+		 * The type of the reminder, whether it reminds the target ("regular reminder") or the author
+		 * ("pingme reminder" - the author will be pinged when the target user types somewhere)
+		 * @type {"Reminder"|"Pingme"}
+		 */
+		this.Type = data.Type;
 
 		/**
 		 * If the reminder is a timed one, a timeout will be active that holds the info about the activation.
@@ -361,21 +368,7 @@ module.exports = class Reminder extends require("./template.js") {
 			const platformData = channelData.Platform;
 			const fromUserData = await sb.User.get(reminder.User_From);
 
-			let reminderMessage;
-
-			if (reminder.User_From === targetUserData.ID) {
-				reminderMessage = `yourself - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
-			}
-			else if (fromUserData.Name === platformData.Self_Name) {
-				reminderMessage = `system reminder - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
-			}
-			else if (reminder.Text !== null) {
-				const mention = channelData.Platform.createUserMention(fromUserData);
-				const { string } = await sb.Banphrase.execute(mention, channelData);
-
-				reminderMessage = `${string} - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
-			}
-			else {
+			if (reminder.Type === "Pingme") {
 				const fromUserData = await sb.User.get(reminder.User_From, false);
 				const channelName = channelData.getFullName();
 
@@ -404,6 +397,23 @@ module.exports = class Reminder extends require("./template.js") {
 
 					await channelData.send(fixedMessage);
 				}
+
+				// Pingme reminders do not follow the regular reminder logic, so continue to next iteration.
+				continue;
+			}
+
+			let reminderMessage;
+			if (reminder.User_From === targetUserData.ID) {
+				reminderMessage = `yourself - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
+			}
+			else if (fromUserData.Name === platformData.Self_Name) {
+				reminderMessage = `system reminder - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
+			}
+			else if (reminder.Text !== null) {
+				const mention = channelData.Platform.createUserMention(fromUserData);
+				const { string } = await sb.Banphrase.execute(mention, channelData);
+
+				reminderMessage = `${string} - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
 			}
 
 			if (reminderMessage) {
