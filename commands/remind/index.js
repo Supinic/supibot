@@ -260,7 +260,8 @@ module.exports = {
 			Text: message,
 			Schedule: targetReminderDate ?? null,
 			Created: new sb.Date(),
-			Private_Message: isPrivate
+			Private_Message: isPrivate,
+			Type: "Reminder"
 		});
 
 		if (result.success) {

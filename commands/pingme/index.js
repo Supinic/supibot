@@ -52,7 +52,8 @@ module.exports = {
 			Schedule: null,
 			Created: new sb.Date(),
 			Private_Message: Boolean(context.privateMessage),
-			Platform: context.platform.ID
+			Platform: context.platform.ID,
+			Type: "Pingme"
 		});
 
 		if (success && !cause) {
