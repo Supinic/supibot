@@ -29,26 +29,34 @@ module.exports = {
 			data = profileCacheData.data;
 		}
 		else {
-			let redirected = false;
-			const response = await sb.Got("FakeAgent", {
-				url: `https://www.instagram.com/${user}/`,
-				searchParams: {
-					__a: "1"
-				},
-				throwHttpErrors: false,
-				responseType: "json",
-				hooks: {
-					beforeRedirect: [
-						(options, res) => {
-							if (res.statusCode >= 300 && res.statusCode <= 399) {
-								redirected = true;
+			let rateLimited = false;
+			let response;
+			try {
+				response = await sb.Got("FakeAgent", {
+					url: `https://www.instagram.com/${user}/`,
+					searchParams: {
+						__a: "1"
+					},
+					throwHttpErrors: false,
+					responseType: "json",
+					hooks: {
+						beforeRedirect: [
+							(options, res) => {
+								if (res.statusCode >= 300 && res.statusCode <= 399) {
+									rateLimited = true;
+								}
 							}
-						}
-					]
-				}
-			});
+						]
+					}
+				});
+			}
+			catch (e) {
+				// Instagram API can randomly return an HTML login page as a response to the JSON api.
+				// In that case, the parsing fails due to expecing JSON instead.
+				rateLimited = true;
+			}
 
-			if (redirected) {
+			if (rateLimited) {
 				const backup = await sb.Got(`https://bibliogram.art/u/${user}`);
 				const $ = sb.Utils.cheerio(backup.body);
 
