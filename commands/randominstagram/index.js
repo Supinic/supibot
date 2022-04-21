@@ -63,7 +63,7 @@ module.exports = {
 				const posts = Array.from($("a.sized-link")).map(i => ({
 					id: i.attribs["data-shortcode"],
 					description: i.children[0].attribs.alt,
-					raw: unescape(i.children[0].attribs.src).split("&url=")[1]
+					raw: decodeURI(i.children[0].attribs.src).split("&url=")[1]
 				}));
 
 				const post = sb.Utils.randArray(posts);
