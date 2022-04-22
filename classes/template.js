@@ -126,7 +126,7 @@ module.exports = class ClassTemplate {
 		const {
 			cacheMap,
 			databaseProperty,
-			databaseTable = databaseProperty,
+			databaseTable,
 			instance,
 			options,
 			propertyName
@@ -183,6 +183,7 @@ module.exports = class ClassTemplate {
 		const {
 			cacheMap,
 			databaseProperty,
+			databaseTable,
 			propertyName,
 			options,
 			instance,
@@ -204,7 +205,7 @@ module.exports = class ClassTemplate {
 			});
 		}
 
-		const row = await sb.Query.getRow("chat_data", "User_Alias_Data");
+		const row = await sb.Query.getRow("chat_data", databaseTable);
 		await row.load({
 			[databaseProperty]: this.ID,
 			Property: propertyName

@@ -407,8 +407,8 @@ module.exports = class Channel extends require("./template.js") {
 	async getDataProperty (propertyName, options = {}) {
 		return await super.getGenericDataProperty({
 			cacheMap: Channel.dataCache,
-			databaseTable: "Channel",
 			databaseProperty: "Channel",
+			databaseTable: "Channel_Data",
 			instance: this,
 			options,
 			propertyName
@@ -425,8 +425,8 @@ module.exports = class Channel extends require("./template.js") {
 	async setDataProperty (propertyName, value, options = {}) {
 		return await super.setGenericDataProperty({
 			cacheMap: Channel.dataCache,
-			databaseTable: "Channel",
 			databaseProperty: "Channel",
+			databaseTable: "Channel_Data",
 			instance: this,
 			propertyName,
 			options,

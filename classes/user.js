@@ -114,8 +114,8 @@ module.exports = class User extends require("./template.js") {
 	async getDataProperty (propertyName, options = {}) {
 		return await super.getGenericDataProperty({
 			cacheMap: User.dataCache,
-			databaseTable: "User_Alias",
 			databaseProperty: "User_Alias",
+			databaseTable: "User_Alias_Data",
 			instance: this,
 			options,
 			propertyName
@@ -132,8 +132,8 @@ module.exports = class User extends require("./template.js") {
 	async setDataProperty (propertyName, value, options = {}) {
 		return await super.setGenericDataProperty({
 			cacheMap: User.dataCache,
-			databaseTable: "User_Alias",
 			databaseProperty: "User_Alias",
+			databaseTable: "User_Alias_Data",
 			instance: this,
 			propertyName,
 			options,
