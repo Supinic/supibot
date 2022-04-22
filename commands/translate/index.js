@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["external-input","mention","non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "confidence", type: "boolean" },
-		{ name: "direction", type: "boolean" },
 		{ name: "from", type: "string" },
 		{ name: "to", type: "string" },
 		{ name: "textOnly", type: "string" }
@@ -23,13 +22,14 @@ module.exports = {
 			};
 		}
 
+		// default: false if normal execution, true if inside of pipe
+		const textOnly = context.params.textOnly ?? context.append.pipe;
+
 		const { languageISO } = sb.Utils.modules;
 		const options = {
 			from: "auto",
 			to: "en",
-			// default: true if normal execution, false if inside of pipe
-			direction: context.params.direction ?? (!context.append.pipe),
-			confidence: context.params.confidence ?? (!context.append.pipe)
+			confidence: context.params.confidence ?? !textOnly
 		};
 
 		for (const option of ["from", "to"]) {
@@ -102,7 +102,7 @@ module.exports = {
 
 		const data = response.body;
 		let reply = data[0].map(i => i[0]).join(" ");
-		if (options.direction && !context.params.textOnly) {
+		if (!textOnly) {
 			const languageID = data[2].replace(/-.*/, "");
 			const fromLanguageName = languageISO.getName(languageID);
 			if (!fromLanguageName) {
@@ -131,11 +131,18 @@ module.exports = {
 		"",
 
 		`<code>${prefix}translate (text)</code>`,
-		"Translates the text from auto-detected language to English.",
+		"Translates the text from auto-detected language to English, e.g.:",
+		`<code>${prefix}translate FeelsDankMan</code> => Luxembourgish (53%) -> English: FeelsDankMan`,
 		"",
 
 		`<code>${prefix}translate textOnly:true (text)</code>`,
-		"Translates the text, and only outputs the result text, without the direction and confidence %.",
+		"Translates the text, and only outputs the result text, without the direction and confidence %, e.g.:",
+		`<code>${prefix}translate textOnly:true FeelsDankMan</code> => FeelsDankMan`,
+		"",
+
+		`<code>${prefix}translate confidence:false (text)</code>`,
+		"Translates the text, and outputs the result text with direction, but without the confidence %, e.g.:",
+		`<code>${prefix}translate confidence:false FeelsDankMan</code> => Luxembourgish -> English: FeelsDankMan`,
 		"",
 
 		`<code>${prefix}translate from:fr (text)</code>`,
