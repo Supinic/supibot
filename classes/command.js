@@ -844,7 +844,7 @@ class Command extends require("./template.js") {
 				};
 			}
 			else {
-				const prettify = (channelData?.Data.developer)
+				const prettify = (await channelData?.getDataProperty("showFullCommandErrorMessage"))
 					? sb.Config.get("COMMAND_ERROR_DEVELOPER")
 					: sb.Config.get("COMMAND_ERROR_GENERIC");
 
