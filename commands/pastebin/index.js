@@ -218,7 +218,16 @@ module.exports = {
 					url: `gists/${id}`
 				});
 
-				if (response.statusCode !== 200) {
+				if (response.statusCode === 403) {
+					const reset = response.headers["x-ratelimit-reset"];
+					const resetDate = new Date(Number(reset) * 1000);
+
+					return {
+						success: false,
+						reply: `Too many requests have been used recently! Try again ${sb.Utils.timeDelta(resetDate)}.`
+					};
+				}
+				else if (response.statusCode !== 200) {
 					return {
 						success: false,
 						reply: response.body.message
