@@ -109,7 +109,7 @@ module.exports = {
 			};
 		}
 
-		const nsfwEnabled = await context.channel.setDataProperty("instagramNSFW");
+		const nsfwEnabled = await context.channel.getDataProperty("instagramNSFW");
 		const nsfwCheck = (!context.channel || (!context.channel.NSFW && !nsfwEnabled));
 		const posts = (data.graphql.user.edge_owner_to_timeline_media?.edges ?? []).filter(i => !i.node.is_video);
 		if (posts.length === 0) {

@@ -207,7 +207,7 @@ module.exports = {
 
 		let safeSpace = false;
 		if (context.platform.Name === "twitch") {
-			const safeMode = await context.channel.setDataProperty("redditSafeMode");
+			const safeMode = await context.channel.getDataProperty("redditSafeMode");
 			if (context.channel) {
 				safeSpace = (typeof safeMode === "boolean") ? safeMode : true;
 			}
