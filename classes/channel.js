@@ -127,7 +127,19 @@ module.exports = class Channel extends require("./template.js") {
 		 * Optional channel data.
 		 * @type {Object}
 		 */
-		this.Data = data.Data ?? {};
+		this._Data = data.Data ?? {};
+		this.Data = new Proxy(this._Data, {
+			set: function (target, p, value) {
+				console.warn("Deprecated Channel.Data set");
+				target[p] = value;
+
+				return true;
+			},
+			get: function (target, p) {
+				console.warn("Deprecated Channel.Data get");
+				return target[p];
+			}
+		});
 
 		/**
 		 * Session-specific data for a channel. Dyanamically updated at runtime.
@@ -258,8 +270,9 @@ module.exports = class Channel extends require("./template.js") {
 	 * @param {User} userData
 	 * @returns {boolean}
 	 */
-	isUserAmbassador (userData) {
-		return Boolean(this.Data.ambassadors?.includes(userData.ID));
+	async isUserAmbassador (userData) {
+		const ambassadors = await this.getDataProperty("ambassadors") ?? [];
+		return ambassadors.includes(userData.ID);
 	}
 
 	/**
@@ -295,17 +308,16 @@ module.exports = class Channel extends require("./template.js") {
 	 * @returns {Promise<void>}
 	 */
 	async toggleAmbassador (userData) {
-		this.Data.ambassadors = this.Data.ambassadors ?? [];
-
-		if (this.Data.ambassadors.includes(userData.ID)) {
-			const index = this.Data.ambassadors.indexOf(userData.ID);
-			this.Data.ambassadors.splice(index, 1);
+		const ambassadors = await this.getDataProperty("ambassadors", { forceCacheReload: true }) ?? [];
+		if (ambassadors.includes(userData.ID)) {
+			const index = ambassadors.indexOf(userData.ID);
+			ambassadors.splice(index, 1);
 		}
 		else {
-			this.Data.ambassadors.push(userData.ID);
+			ambassadors.push(userData.ID);
 		}
 
-		await this.saveProperty("Data");
+		await this.setDataProperty("ambassadors", ambassadors);
 	}
 
 	/**
