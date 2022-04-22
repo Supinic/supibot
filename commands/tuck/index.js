@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 20000,
 	Description: "Tucks target user to bed",
-	Flags: ["opt-out","pipe"],
+	Flags: ["block","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
