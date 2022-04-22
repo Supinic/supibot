@@ -73,9 +73,7 @@ module.exports = {
 				};
 			}
 
-			context.channel.Data.twitchLottoSafeMode = context.params.safeMode;
-			await context.channel.saveProperty("Data");
-
+			await context.channel.setDataProperty("twitchLottoSafeMode", context.params.safeMode);
 			return {
 				reply: `Successfully set this channel's TwitchLotto safe mode to ${context.params.safeMode}.`
 			};

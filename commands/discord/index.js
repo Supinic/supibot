@@ -19,8 +19,9 @@ module.exports = {
 			};
 		}
 
+		const discordDescription = await context.channel.getDataProperty("discord");
 		return {
-			reply: (context.channel.Data.discord) ?? "This channel has no Discord description set up."
+			reply: discordDescription ?? "This channel has no Discord description set up."
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [

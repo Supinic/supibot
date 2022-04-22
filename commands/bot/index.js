@@ -242,7 +242,7 @@ module.exports = {
 
 			case "rejoin":
 			case "i-will-not-ban-supibot-again": {
-				const { inactiveReason } = channelData.Data;
+				const inactiveReason = await context.channel.setDataProperty("inactiveReason");
 				if (channelData.Platform.Name !== "twitch") {
 					return {
 						success: false,
@@ -278,8 +278,7 @@ module.exports = {
 				}
 
 				if (!partFailed && !joinFailed && (inactiveReason === "suspended" || inactiveReason === "renamed")) {
-					delete channelData.Data.inactiveReason;
-					await channelData.saveProperty("Data");
+					await context.channel.setDataProperty("inactiveReason", null);
 					await channelData.saveProperty("Mode", "Write");
 				}
 

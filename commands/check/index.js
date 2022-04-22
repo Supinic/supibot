@@ -82,14 +82,16 @@ module.exports = {
 							reply: "Provided channel does not exist!"
 						};
 					}
-					else if (!channelData.Data.ambassadors || channelData.Data.ambassadors.length === 0) {
+
+					const rawAmbassadors = await context.channel.getDataProperty("ambassadors");
+					if (!rawAmbassadors || rawAmbassadors.length === 0) {
 						const prefix = (context.channel === channelData) ? "This" : "Target";
 						return {
 							reply: `${prefix} channel has no ambassadors.`
 						};
 					}
 
-					const ambassadors = await sb.User.getMultiple(channelData.Data.ambassadors);
+					const ambassadors = await sb.User.getMultiple(rawAmbassadors);
 					return {
 						reply: `Active ambassadors: ${ambassadors.map(i => i.Name)}`
 					};
@@ -642,7 +644,7 @@ module.exports = {
 						};
 					}
 
-					const { twitchLottoBlacklistedFlags: flags } = context.channel.Data;
+					const flags = await context.channel.getDataProperty("twitchLottoBlacklistedFlags");
 					return {
 						reply: (!flags || flags.length === 0)
 							? `There are currently no blacklisted TL flags in this channel.`

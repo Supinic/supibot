@@ -199,9 +199,7 @@ module.exports = {
 				};
 			}
 
-			context.channel.Data.redditSafeMode = context.params.safeMode;
-			await context.channel.saveProperty("Data");
-
+			await context.channel.setDataProperty("redditSafeMode", context.params.safeMode);
 			return {
 				reply: `Successfully set this channel's Reddit safe mode to ${context.params.safeMode}.`
 			};
@@ -209,10 +207,9 @@ module.exports = {
 
 		let safeSpace = false;
 		if (context.platform.Name === "twitch") {
+			const safeMode = await context.channel.setDataProperty("redditSafeMode");
 			if (context.channel) {
-				safeSpace = (typeof context.channel.Data.redditSafeMode === "boolean")
-					? context.channel.Data.redditSafeMode
-					: true;
+				safeSpace = (typeof safeMode === "boolean") ? safeMode : true;
 			}
 			else {
 				safeSpace = true;

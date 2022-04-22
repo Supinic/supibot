@@ -100,7 +100,7 @@ module.exports = {
 			}
 
 			const string = (flag) ? "set" : "unset";
-			const currentFlag = channel.Data.instagramNSFW;
+			const currentFlag = await context.channel.getDataProperty("instagramNSFW");
 			if ((typeof currentFlag === "undefined" && !flag) || currentFlag === flag) {
 				return {
 					success: false,
@@ -108,9 +108,7 @@ module.exports = {
 				};
 			}
 
-			channel.Data.instagramNSFW = flag;
-			await channel.saveProperty("Data");
-
+			await context.channel.setDataProperty("instagramNSFW", flag);
 			return {
 				reply: `Successfully ${string} this channel's Instagram NSFW.`
 			};
@@ -436,17 +434,13 @@ module.exports = {
 					parameter: "arguments",
 					description: "If you're the channel owner or a channel ambassador, you can use this to set the response of the discord command.",
 					set: async (context, ...args) => {
-						context.channel.Data.discord = args.join(" ");
-						await context.channel.saveProperty("Data");
-
+						await context.channel.setDataProperty("discord", args.join(" "));
 						return {
 							reply: `Discord description set successfully.`
 						};
 					},
 					unset: async (context) => {
-						context.channel.Data.discord = null;
-						await context.channel.saveProperty("Data");
-
+						await context.channel.setDataProperty("discord", null);
 						return {
 							reply: `Discord description unset successfully.`
 						};
@@ -706,9 +700,7 @@ module.exports = {
 							};
 						}
 
-						context.channel.Data.twitchLottoBlacklistedFlags = suitableFlags.map(i => i.toLowerCase());
-						await context.channel.saveProperty("Data");
-
+						await context.channel.setDataProperty("twitchLottoBlacklistedFlags", suitableFlags.map(i => i.toLowerCase()));
 						return {
 							reply: `Blacklisted flags successfully updated for this channel.`
 						};
@@ -731,9 +723,7 @@ module.exports = {
 							};
 						}
 
-						context.channel.Data.twitchLottoBlacklistedFlags = [];
-						await context.channel.saveProperty("Data");
-
+						await context.channel.setDataProperty("twitchLottoBlacklistedFlags", []);
 						return {
 							reply: `Blacklisted flags successfully removed.`
 						};
