@@ -336,6 +336,13 @@
         "path": "ukr",
         "endpoints": ["rss.xml"],
         "helpers": ["boring_nick"]
+      },
+      {
+        "name": "Suspilne",
+        "url": "https://suspilne.media",
+        "path": "rss",
+        "endpoints": ["ukrnet.rss"],
+        "helpers": ["boring_nick"]
       }
     ]
   },
