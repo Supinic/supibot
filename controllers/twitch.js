@@ -179,8 +179,8 @@ module.exports = class TwitchController extends require("./template.js") {
 				}
 
 				if (error.message.includes("suspended")) {
-					channelData.Data.inactiveReason = "suspended";
-					await channelData.saveProperty("Data");
+					// @todo Promise.all
+					await channelData.setDataProperty("inactiveReason", "suspended");
 					await channelData.saveProperty("Mode", "Inactive");
 
 					await sb.Logger.log(
@@ -343,11 +343,9 @@ module.exports = class TwitchController extends require("./template.js") {
 						break;
 					}
 
-					channelData.Data.inactiveReason = "bot-banned";
-					await channelData.saveProperty("Data");
-
 					const previousMode = channelData.Mode;
 					await Promise.all([
+						channelData.setDataProperty("inactiveReason", "bot-banned"),
 						channelData.saveProperty("Mode", "Inactive"),
 						await sb.Logger.log(
 							"Twitch.Ban",
@@ -825,11 +823,9 @@ module.exports = class TwitchController extends require("./template.js") {
 		const channelData = sb.Channel.get(channel, this.platform);
 		if (channelData) {
 			if (user === this.platform.Self_Name && length === null && this.platform.Data.partChannelsOnPermaban) {
-				channelData.Data.inactiveReason = "bot-banned";
-				await channelData.saveProperty("Data");
-
 				const previousMode = channelData.Mode;
 				await Promise.all([
+					channelData.setDataProperty("inactiveReason", "bot-banned"),
 					channelData.saveProperty("Mode", "Inactive"),
 					sb.Logger.log(
 						"Twitch.Ban",
@@ -1337,8 +1333,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			};
 		}
 		else if (response.body.data.length === 0) {
-			channelData.Data.inactiveReason = "suspended";
-			await channelData.saveProperty("Data");
+			await channelData.setDataProperty("inactiveReason", "suspended");
 			await channelData.saveProperty("Mode", "Inactive");
 
 			return {
@@ -1367,8 +1362,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 
 		const previousMode = channelData.Mode;
-		channelData.Data.inactiveReason = "renamed";
-		await channelData.saveProperty("Data");
+		await channelData.setDataProperty("inactiveReason", "renameed");
 		await channelData.saveProperty("Mode", "Inactive");
 
 		const otherChannelData = sb.Channel.get(login);
