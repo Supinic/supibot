@@ -38,7 +38,7 @@ module.exports = {
 				};
 			}
 
-			const isAmbassador = channelData.isUserAmbassador(userData);
+			const isAmbassador = await channelData.isUserAmbassador(userData);
 			if ((type === "set" && isAmbassador) || (type === "unset" && !isAmbassador)) {
 				const prefix = (type === "set") ? "already" : "not";
 				return {
@@ -677,7 +677,7 @@ module.exports = {
 						}
 
 						// const flagger = Boolean(context.user.Data.trustedTwitchLottoFlagger); // skipped for now
-						const ambassador = context.channel.isUserAmbassador(context.user);
+						const ambassador = await context.channel.isUserAmbassador(context.user);
 						const owner = await context.channel.isUserChannelOwner(context.user);
 						if (!ambassador && !owner) {
 							return {
@@ -714,7 +714,7 @@ module.exports = {
 						}
 
 						// const flagger = Boolean(context.user.Data.trustedTwitchLottoFlagger); // skipped for now
-						const ambassador = context.channel.isUserAmbassador(context.user);
+						const ambassador = await context.channel.isUserAmbassador(context.user);
 						const owner = await context.channel.isUserChannelOwner(context.user);
 						if (!ambassador && !owner) {
 							return {
