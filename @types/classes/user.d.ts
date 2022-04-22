@@ -1,5 +1,10 @@
-import { ClassTemplate } from "./template";
-import { SimpleGenericData } from "../globals";
+import {
+    CacheName,
+    CacheValue,
+    ClassTemplate,
+    GenericCacheMap,
+    SpecificCacheOptions
+} from "./template";
 
 export declare namespace Permissions {
     export type Descriptor = {
@@ -18,13 +23,12 @@ declare type UserGetOptions = {
     Discord_ID?: string;
     Twitch_ID?: string;
 };
-declare type WeakUserData = SimpleGenericData;
 
 export declare class User extends ClassTemplate {
     static bots: Map<string, User>;
     static data: Map<string, User>;
     static readonly permissions: Permissions.Descriptor;
-    static readonly dataCache: WeakMap<User, WeakUserData>;
+    static readonly dataCache: GenericCacheMap<User>;
     static readonly mapExpirationInterval: ReturnType<typeof setInterval>;
     static readonly pendingNewUsers: Set<User>;
     static readonly mapCacheExpiration: number;
@@ -57,10 +61,10 @@ export declare class User extends ClassTemplate {
      * - `undefined` if propertyName doesn't exist
      * - `null` or any respective primitive/object/function value as determined by the saved value
      */
-    getDataProperty (propertyName: string, options?: { forceDataReload: boolean }): Promise<undefined | null | any>;
+    getDataProperty (propertyName: CacheName, options?: SpecificCacheOptions): ReturnType<ClassTemplate["getGenericDataProperty"]>;
     /**
      * Saves a user data property into the database.
      */
-    setDataProperty (propertyName: string, options?: any): Promise<void>;
+    setDataProperty (propertyName: CacheName, value: CacheValue, options?: SpecificCacheOptions): ReturnType<ClassTemplate["setGenericDataProperty"]>;
     serialize (): never;
 }

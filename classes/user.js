@@ -109,54 +109,17 @@ module.exports = class User extends require("./template.js") {
 	 * @param {boolean} [options.forceCacheReload] if the property is cached, setting this to true will force its reload
 	 * @returns {Promise<undefined|null|*>}
 	 * - Returns `undefined` if propertyName doesn't exist
-	 * - Returns `null` or any respective primitive/objec/function value as determined by the saved value
+	 * - Returns `null` or any respective primitive/object/function value as determined by the saved value
 	 */
 	async getDataProperty (propertyName, options = {}) {
-		const cache = User.dataCache.get(this);
-		if (cache && cache.has(propertyName) && !options.forceCacheReload) {
-			return cache.get(propertyName);
-		}
-
-		const data = await sb.Query.getRecordset(rs => rs
-			.select("Property", "Value")
-			.select("Custom_Data_Property.Type AS Type", "Custom_Data_Property.Cached AS Cached")
-			.from("chat_data", "User_Alias_Data")
-			.leftJoin({
-				toTable: "Custom_Data_Property",
-				on: "Custom_Data_Property.Name = User_Alias_Data.Property"
-			})
-			.where("User_Alias = %n", this.ID)
-			.where("Property = %s", propertyName)
-			.limit(1)
-			.single()
-		);
-
-		if (!data) {
-			return undefined;
-		}
-		else if (!data.Type) {
-			throw new sb.Error({
-				message: "No type is associated with this variable",
-				args: { options, property: propertyName }
-			});
-		}
-
-		const variable = new sb.Config({
-			Name: propertyName,
-			Value: data.Value,
-			Type: data.Type
+		return await super.getGenericDataProperty({
+			cacheMap: User.dataCache,
+			databaseTable: "User_Alias",
+			databaseProperty: "User_Alias",
+			instance: this,
+			options,
+			propertyName
 		});
-
-		if (data.Cached) {
-			if (!User.dataCache.has(this)) {
-				User.dataCache.set(this, new Map());
-			}
-
-			const userCache = User.dataCache.get(this);
-			userCache.set(propertyName, variable.value);
-		}
-
-		return variable.value;
 	}
 
 	/**
@@ -167,57 +130,15 @@ module.exports = class User extends require("./template.js") {
 	 * @returns {Promise<void>}
 	 */
 	async setDataProperty (propertyName, value, options = {}) {
-		const propertyData = await sb.Query.getRecordset(rs => rs
-			.select("Type", "Cached")
-			.from("chat_data", "Custom_Data_Property")
-			.where("Name = %s", propertyName)
-			.limit(1)
-			.single()
-		);
-
-		if (!propertyData.Type) {
-			throw new sb.Error({
-				message: "Data property has no type associated with it",
-				args: { options, propertyName, propertyData }
-			});
-		}
-
-		const row = await sb.Query.getRow("chat_data", "User_Alias_Data");
-		await row.load({
-			User_Alias: this.ID,
-			Property: propertyName
-		}, true);
-
-		if (!row.loaded) {
-			row.setValues({
-				User_Alias: this.ID,
-				Property: propertyName
-			});
-		}
-
-		if (value === null) {
-			row.values.Value = null;
-		}
-		else {
-			const variable = sb.Config.from({
-				name: propertyName,
-				type: propertyData.Type,
-				value
-			});
-
-			row.values.Value = variable.stringValue;
-		}
-
-		if (propertyData.Cached) {
-			if (!User.dataCache.has(this)) {
-				User.dataCache.set(this, new Map());
-			}
-
-			const userCache = User.dataCache.get(this);
-			userCache.set(propertyName, value);
-		}
-
-		await row.save({ skipLoad: true });
+		return await super.setGenericDataProperty({
+			cacheMap: User.dataCache,
+			databaseTable: "User_Alias",
+			databaseProperty: "User_Alias",
+			instance: this,
+			propertyName,
+			options,
+			value
+		});
 	}
 
 	async serialize () {

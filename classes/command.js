@@ -42,9 +42,9 @@ class Context {
 	/**
 	 * Fetches an object wrapper describing the user's permissions in given command context.
 	 * @param {Object} [options] When provided, allows overriding the command context's locations
-	 * @param {sb.User} [options.user]
-	 * @param {sb.Channel} [options.channel]
-	 * @param {sb.Platform} [options.platform]
+	 * @param {User} [options.user]
+	 * @param {Channel} [options.channel]
+	 * @param {Platform} [options.platform]
 	 * @returns {Promise<{
 	 *  flag: number,
 	 *  is: (function(UserPermissionLevel): boolean)

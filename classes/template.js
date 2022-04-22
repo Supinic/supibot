@@ -122,6 +122,126 @@ module.exports = class ClassTemplate {
 		await row.save();
 	}
 
+	async getGenericDataProperty (inputData = {}) {
+		const {
+			cacheMap,
+			databaseProperty,
+			databaseTable = databaseProperty,
+			instance,
+			options,
+			propertyName
+		} = inputData;
+
+		const cache = cacheMap.get(instance);
+		if (cache && cache.has(propertyName) && !options.forceCacheReload) {
+			return cache.get(propertyName);
+		}
+
+		const data = await sb.Query.getRecordset(rs => rs
+			.select("Property", "Value")
+			.select("Custom_Data_Property.Type AS Type", "Custom_Data_Property.Cached AS Cached")
+			.from("chat_data", databaseTable)
+			.leftJoin({
+				toTable: "Custom_Data_Property",
+				on: `Custom_Data_Property.Name = ${databaseTable}.Property`
+			})
+			.where(`${databaseProperty} = %n`, this.ID)
+			.where("Property = %s", propertyName)
+			.limit(1)
+			.single()
+		);
+
+		if (!data) {
+			return undefined;
+		}
+		else if (!data.Type) {
+			throw new sb.Error({
+				message: "No type is associated with this variable",
+				args: { options, property: propertyName }
+			});
+		}
+
+		const variable = new sb.Config({
+			Name: propertyName,
+			Value: data.Value,
+			Type: data.Type
+		});
+
+		if (data.Cached) {
+			if (!cacheMap.has(instance)) {
+				cacheMap.set(instance, new Map());
+			}
+
+			const userCache = cacheMap.get(instance);
+			userCache.set(propertyName, variable.value);
+		}
+
+		return variable.value;
+	}
+
+	async setGenericDataProperty (inputData = {}) {
+		const {
+			cacheMap,
+			databaseProperty,
+			propertyName,
+			options,
+			instance,
+			value
+		} = inputData;
+
+		const propertyData = await sb.Query.getRecordset(rs => rs
+			.select("Type", "Cached")
+			.from("chat_data", "Custom_Data_Property")
+			.where("Name = %s", propertyName)
+			.limit(1)
+			.single()
+		);
+
+		if (!propertyData.Type) {
+			throw new sb.Error({
+				message: "Data property has no type associated with it",
+				args: { options, propertyName, propertyData }
+			});
+		}
+
+		const row = await sb.Query.getRow("chat_data", "User_Alias_Data");
+		await row.load({
+			[databaseProperty]: this.ID,
+			Property: propertyName
+		}, true);
+
+		if (!row.loaded) {
+			row.setValues({
+				[databaseProperty]: this.ID,
+				Property: propertyName
+			});
+		}
+
+		if (value === null) {
+			row.values.Value = null;
+		}
+		else {
+			const variable = sb.Config.from({
+				name: propertyName,
+				type: propertyData.Type,
+				value
+			});
+
+			row.values.Value = variable.stringValue;
+		}
+
+		if (propertyData.Cached) {
+			if (!cacheMap.has(instance)) {
+				cacheMap.set(instance, new Map());
+			}
+
+			const userCache = !cacheMap.get(instance);
+			userCache.set(propertyName, value);
+		}
+
+		await row.save({ skipLoad: true });
+	}
+
 	static data = [];
 
 	static async initialize () {

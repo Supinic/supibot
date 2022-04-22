@@ -4,6 +4,9 @@
 module.exports = class Channel extends require("./template.js") {
 	static redisPrefix = "sb-channel";
 
+	/** @type {WeakMap<Channel, Map<string, *>>} */
+	static dataCache = new WeakMap();
+
 	constructor (data) {
 		super();
 
@@ -399,6 +402,36 @@ module.exports = class Channel extends require("./template.js") {
 
 	async prepareMessage (message, options = {}) {
 		return await this.Platform.prepareMessage(message, this, options);
+	}
+
+	async getDataProperty (propertyName, options = {}) {
+		return await super.getGenericDataProperty({
+			cacheMap: Channel.dataCache,
+			databaseTable: "Channel",
+			databaseProperty: "Channel",
+			instance: this,
+			options,
+			propertyName
+		});
+	}
+
+	/**
+	 * Saves a user data property into the database.
+	 * @param {string} propertyName
+	 * @param {*} value
+	 * @param {Object} options
+	 * @returns {Promise<void>}
+	 */
+	async setDataProperty (propertyName, value, options = {}) {
+		return await super.setGenericDataProperty({
+			cacheMap: Channel.dataCache,
+			databaseTable: "Channel",
+			databaseProperty: "Channel",
+			instance: this,
+			propertyName,
+			options,
+			value
+		});
 	}
 
 	getCacheKey () {

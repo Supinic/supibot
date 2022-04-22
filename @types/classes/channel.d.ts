@@ -1,6 +1,23 @@
-import { Emote, JSONifiable, Message, SimpleGenericData } from "../globals";
-import { ClassTemplate } from "./template";
-import { APIType as BanphraseAPIType, DowntimeBehaviour as BanphraseDowntimeBehaviour } from "./banphrase";
+import {
+    Emote,
+    JSONifiable,
+    Message,
+    SimpleGenericData
+} from "../globals";
+
+import {
+    CacheName,
+    CacheValue,
+    ClassTemplate,
+    GenericCacheMap,
+    SpecificCacheOptions
+} from "./template";
+
+import {
+    APIType as BanphraseAPIType,
+    DowntimeBehaviour as BanphraseDowntimeBehaviour
+} from "./banphrase";
+
 import {
     AvailableEmoteOptions,
     Like as PlatformLike,
@@ -8,6 +25,7 @@ import {
     Platform,
     PrepareMessageOptions
 } from "./platform";
+
 import { User } from "./user";
 import { CustomDate } from "../objects/date";
 
@@ -58,6 +76,8 @@ declare type StreamData = OfflineStreamData | OnlineStreamData;
 
 export declare class Channel extends ClassTemplate {
     static readonly redisPrefix: string;
+    static readonly cacheData: GenericCacheMap<Channel>;
+
     static get (identifier: Like, platform?: PlatformLike): Channel;
     static getJoinableForPlatform (platform: PlatformLike): Channel[];
     static add (name: string, platformData: Platform, mode?: Mode, specificID?: string): Promise<Channel>;
@@ -91,6 +111,8 @@ export declare class Channel extends ClassTemplate {
     send (message: Message): Promise<void>;
     getStreamData (): Promise<StreamData | {}>;
     setStreamData (data: any): ReturnType<ClassTemplate["setCacheData"]>;
+    getDataProperty (propertyName: CacheName, options?: SpecificCacheOptions): ReturnType<ClassTemplate["getGenericDataProperty"]>;
+    setDataProperty (propertyName: CacheName, value: CacheValue, options?: SpecificCacheOptions): ReturnType<ClassTemplate["setGenericDataProperty"]>;
     saveProperty (property: string, value: any): ReturnType<ClassTemplate["saveRowProperty"]>;
     toggleAmbassador (userData: User): ReturnType<Channel["saveProperty"]>;
     mirror (message: Message, userData: User, options?: MirrorOptions): ReturnType<Controller["mirror"]>;
