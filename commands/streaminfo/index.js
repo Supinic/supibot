@@ -129,14 +129,14 @@ module.exports = {
 		"Fetches the live status of a Twitch or YouTube channel.",
 		"",
 
-		`<code>${prefix}$streaminfo (channel)</code>`,
+		`<code>${prefix}streaminfo (channel)</code>`,
 		`Posts info about a Twitch channel's stream.`,
 		`If it is live - posts info about the stream, and details.`,
 		`If not currently live - posts info about the previous stream.`,
 		"",
 
-		`<code>${prefix}$streaminfo <u>youtube:(channel name)</u></code>`,
-		`<code>${prefix}$streaminfo <u>youtube:(channel id)</u></code>`,
+		`<code>${prefix}streaminfo <u>youtube:(channel name)</u></code>`,
+		`<code>${prefix}streaminfo <u>youtube:(channel id)</u></code>`,
 		`Posts info about a YouTube channel's stream`,
 		`You can use the channel name (watch out - name, not display name), or the channel ID directly`,
 		`If the channel has multiple live streams at the same time, this command only posts the more relevant one.`
