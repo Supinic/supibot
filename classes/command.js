@@ -464,8 +464,8 @@ class Command extends require("./template.js") {
 				// them from `require.cache`. This is to remove the burden of reloading from commands themselves.
 				const dirPath = pathModule.parse(path).dir;
 				const otherFilePaths = Object.keys(require.cache).filter(filePath => {
-					const fileDirPath = pathModule.resolve(filePath);
-					return (fileDirPath === dirPath && !filePath.endsWith("index.js"));
+					const fileDirPath = pathModule.parse(filePath);
+					return (fileDirPath.dir === dirPath && !filePath.endsWith("index.js"));
 				});
 
 				for (const otherFilePath of otherFilePaths) {
