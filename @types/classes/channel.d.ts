@@ -1,6 +1,5 @@
 import {
     Emote,
-    JSONifiable,
     Message,
     SimpleGenericData
 } from "../globals";
@@ -35,7 +34,6 @@ declare type Controller = any; // @todo should be imported from github:supinic/s
 
 export declare type Mode = "Inactive" | "Last seen" | "Read" | "Write" | "VIP" | "Moderator";
 export declare type Like = string | number | Channel;
-export declare type CustomData = Record<string, JSONifiable>;
 
 declare type ConstructorData = {
     ID: number;
@@ -51,7 +49,6 @@ declare type ConstructorData = {
     NSFW: boolean;
     Mirror: Channel["ID"] | null;
     Description: string | null;
-    Data: CustomData;
 };
 declare type MirrorOptions = {
     commandUsed: boolean;
@@ -96,7 +93,6 @@ export declare class Channel extends ClassTemplate {
     NSFW: boolean;
     Mirror: Channel["ID"] | null;
     Description: string | null;
-    readonly Data: CustomData;
     readonly sessionData: SimpleGenericData;
     readonly events: EventEmitter;
 

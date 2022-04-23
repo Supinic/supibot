@@ -109,40 +109,8 @@ module.exports = class Channel extends require("./template.js") {
 		 */
 		this.Description = data.Description ?? null;
 
-		if (data.Data) {
-			try {
-				data.Data = JSON.parse(data.Data);
-				if (data.Data && data.Data.constructor !== Object) {
-					console.warn(`Channel ${this.Name} (ID ${this.ID}) does not result in an Object`);
-					data.Data = {};
-				}
-			}
-			catch (e) {
-				console.warn(`Channel ${this.Name} (ID ${this.ID}) has incorrect data definition`, e);
-				data.Data = {};
-			}
-		}
-
 		/**
-		 * Optional channel data.
-		 * @type {Object}
-		 */
-		this._Data = data.Data ?? {};
-		this.Data = new Proxy(this._Data, {
-			set: function (target, p, value) {
-				console.warn("Deprecated Channel.Data set");
-				target[p] = value;
-
-				return true;
-			},
-			get: function (target, p) {
-				console.warn("Deprecated Channel.Data get");
-				return target[p];
-			}
-		});
-
-		/**
-		 * Session-specific data for a channel. Dyanamically updated at runtime.
+		 * Session-specific data for a channel. Dynamically updated at runtime.
 		 * Is always reset on bot reset or channel reset.
 		 * @type {Object}
 		 */
@@ -455,7 +423,6 @@ module.exports = class Channel extends require("./template.js") {
 			sb.ChatModule.detachChannelModules(this.ID);
 		}
 
-		this.Data = null;
 		this.sessionData = null;
 	}
 
