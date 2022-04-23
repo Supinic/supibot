@@ -131,7 +131,9 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 		sandbox,
 		handleUserDataChange: async (limit) => {
 			if (!userDataChanged) {
-				return;
+				return {
+					success: true
+				};
 			}
 
 			let string;
@@ -153,11 +155,15 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 			}
 
 			await context.user.setDataProperty("customDeveloperData", customUserData);
-			return { success: true };
+			return {
+				success: true
+			};
 		},
 		handleChannelDataChange: async (limit) => {
 			if (!context.channel || !channelDataChanged) {
-				return;
+				return {
+					success: true
+				};
 			}
 
 			let string;
@@ -179,7 +185,9 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 			}
 
 			await context.channel.setDataProperty("sharedChannelData", customChannelData);
-			return { success: true };
+			return {
+				success: true
+			};
 		}
 	};
 };
