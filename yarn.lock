@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@alloc/quick-lru@^5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@alloc/quick-lru/-/quick-lru-5.2.0.tgz#7bf68b20c0a350f936915fcae06f58e32007ce30"
+  integrity sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==
+
 "@ampproject/remapping@^2.1.0":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.1.2.tgz#4edca94973ded9630d20101cd8559cedb8d8bd34"
@@ -905,7 +910,7 @@ css-what@^6.0.1:
   resolved "https://codeload.github.com/Supinic/cytube-connector/tar.gz/e4028df17df9481e0fd821779c10c401f9217d25"
   dependencies:
     got "^11.3.0"
-    socket.io-client "^4.4.0"
+    socket.io-client "^2.4.0"
     xmlhttprequest-ssl "^1.6.2"
 
 dank-twitch-irc@^4.3.0:
@@ -2248,11 +2253,6 @@ log-symbols@4.1.0:
   version "1.0.0"
   resolved "https://codeload.github.com/supinic/long-timeout/tar.gz/0af0725d12646bfe99de59b299d81efc5a50d93d"
 
-long@^5.2.0:
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/long/-/long-5.2.0.tgz#2696dadf4b4da2ce3f6f6b89186085d94d52fd61"
-  integrity sha512-9RTUNjK60eJbx3uz+TEGF7fUr29ZDxR5QzXcyDpeSfeH28S9ycINflOgOlppit5U+4kNTe83KQnMEerw7GmE8w==
-
 lowercase-keys@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/lowercase-keys/-/lowercase-keys-2.0.0.tgz#2603e78b7b4b0006cbca2fbcc8a3202558ac9479"
@@ -2284,16 +2284,16 @@ make-error@^1.3.5:
   resolved "https://registry.yarnpkg.com/make-error/-/make-error-1.3.6.tgz#2eb2e37ea9b67c4891f684a1394799af484cf7a2"
   integrity sha512-s8UhlNe7vPKomQhC1qFelMokr/Sc3AgNbso3n74mVPA5LTZwkB9NlXf4XPamLxJE8h0gh73rM94xvwRT2CVInw==
 
-mariadb@^2.5.2:
-  version "2.5.6"
-  resolved "https://registry.yarnpkg.com/mariadb/-/mariadb-2.5.6.tgz#7314e9287cdba212831ebf16ef3b34dc6a1f0f06"
-  integrity sha512-zBx7loYY5GzLl8Y6AKxGXfY9DUYIIdGrmEORPOK9FEu0pg5ZLBKCGJuucHwKADxTBxKY7eM4rxndqxRcnMZKIw==
+mariadb@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/mariadb/-/mariadb-3.0.0.tgz#0738b14036be097991172b22c0ce1d43e261c014"
+  integrity sha512-1uIqD6AWLP5ojMY67XP4+4uRLe9L92HD1ZGU8fidi8cGdYIC+Ghx1JliAtf7lc/tGjOh6J400f/1M4BXVtZFvA==
   dependencies:
+    "@alloc/quick-lru" "^5.2.0"
     "@types/geojson" "^7946.0.8"
     "@types/node" "^17.0.10"
     denque "^2.0.1"
     iconv-lite "^0.6.3"
-    long "^5.2.0"
     moment-timezone "^0.5.34"
     please-upgrade-node "^3.2.0"
 
@@ -3195,7 +3195,7 @@ strnum@^1.0.4:
 
 "supi-core@github:Supinic/supi-core":
   version "2.2.0"
-  resolved "https://codeload.github.com/Supinic/supi-core/tar.gz/beabe9451f454d6ef9d67b0bd25ffc1ed3d3ca08"
+  resolved "https://codeload.github.com/Supinic/supi-core/tar.gz/e43f1f0c6ea8010d73cea4e4249ef7cb2affac40"
   dependencies:
     async-markov "github:supinic/async-markov"
     cheerio "^1.0.0-rc.5"
@@ -3209,7 +3209,7 @@ strnum@^1.0.4:
     ioredis "^4.17.3"
     language-iso-codes "github:supinic/language-iso-codes"
     long-timeout "github:supinic/long-timeout"
-    mariadb "^2.5.2"
+    mariadb "^3.0.0"
     random-js "^2.1.0"
     rss-parser "^3.10.0"
     supibot-package-manager "github:supinic/supibot-package-manager"
@@ -3219,7 +3219,7 @@ strnum@^1.0.4:
 
 "supibot-package-manager@github:supinic/supibot-package-manager":
   version "1.0.0"
-  resolved "https://codeload.github.com/supinic/supibot-package-manager/tar.gz/c8617af5a7143f2f10c8967f6f5ac6d1e4c76b4a"
+  resolved "https://codeload.github.com/supinic/supibot-package-manager/tar.gz/a9ec321cad55dbe59fc31101f74068af234b5220"
 
 supports-color@8.1.1:
   version "8.1.1"
