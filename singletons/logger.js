@@ -297,6 +297,11 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 			return;
 		}
 
+		const message = error.message ?? null;
+		if (message && message.includes("retrieve connection from pool timeout")) {
+			return;
+		}
+
 		const row = await sb.Query.getRow("chat_data", "Error");
 		row.setValues({
 			Type: type,
