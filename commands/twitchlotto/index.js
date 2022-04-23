@@ -149,7 +149,7 @@ module.exports = {
 			this.data.counts.total = total;
 		}
 
-		const safeMode = context.channel?.Data.twitchLottoSafeMode ?? true;
+		const safeMode = await context.channel.getDataProperty("twitchLottoSafeMode") ?? true;
 
 		// Now try to find an image that is available.
 		let image = null;
