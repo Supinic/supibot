@@ -184,7 +184,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				};
 			}
 
-			await context.channel.setDataProperty("sharedChannelData", customChannelData);
+			await context.channel.setDataProperty("sharedCustomData", customChannelData);
 			return {
 				success: true
 			};
