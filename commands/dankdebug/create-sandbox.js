@@ -93,7 +93,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				return context.getBestAvailableEmote(array, fallback);
 			},
 			parseParameter: (value, type) => {
-				if (!allowedTypes.includes(value)) {
+				if (!allowedTypes.includes(type)) {
 					throw new Error("Invalid value type provided");
 				}
 
