@@ -15,6 +15,6 @@ module.exports = {
 			Timestamp: new sb.Date().discardTimeUnits("s", "ms")
 		});
 
-		await row.save();
+		await row.save({ skipLoad: true });
 	})
 };
