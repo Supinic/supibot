@@ -14,16 +14,7 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		allowedUtilsMethods: [
-			"capitalize",
-			"randArray",
-			"random",
-			"randomString",
-			"removeAccents",
-			"timeDelta",
-			"wrapString",
-			"zf"
-		]
+		customDataLimit: 1_000_000
 	})),
 	Code: (async function dankDebug (context, ...args) {
 		let scriptArgs;
@@ -99,57 +90,14 @@ module.exports = {
 			script = `${importedText}\n${script}`;
 		}
 
-		let customDeveloperDataChanged = false;
-		const customDeveloperData = await context.user.getDataProperty("customDeveloperData") ?? {};
+		const createSandbox = require("./create-sandbox");
+		const sandboxData = await createSandbox(context, scriptArgs);
+
+		const scriptContext = {
+			fixAsync: false,
+			sandbox: sandboxData.sandbox
+		};
 		try {
-			const scriptContext = {
-				fixAsync: false,
-				sandbox: {
-					aliasStack: (context.append.aliasStack)
-						? [...context.append.aliasStack]
-						: [],
-					args: scriptArgs ?? null,
-					channel: context.channel?.Name ?? "(none)",
-					console: undefined,
-					executor: context.user.Name,
-					platform: context.platform.Name,
-					tee: Object.freeze([...context.tee]),
-					customData: sb.Utils.deepFreeze({
-						getKeys: () => Object.keys(customDeveloperData),
-						set: (key, value) => {
-							if (typeof key !== "string") {
-								throw new Error("Only strings are available as keys");
-							}
-							else if (value && (typeof value === "object" || typeof value === "function")) {
-								throw new Error("Only primitives are accepted as object values");
-							}
-							else if (customDeveloperData[key] && !Object.hasOwn(customDeveloperData, key)) {
-								throw new Error("Cannot overwrite prototype properties");
-							}
-
-							customDeveloperDataChanged = true;
-							customDeveloperData[key] = value;
-						},
-						get: (key) => (Object.hasOwn(customDeveloperData, key))
-							? customDeveloperData[key]
-							: undefined
-					}),
-					utils: {
-						getEmote: (array, fallback) => {
-							if (!Array.isArray(array) || array.some(i => typeof i !== "string")) {
-								throw new Error("Emotes must be provided as an Array containing strings only");
-							}
-
-							return context.getBestAvailableEmote(array, fallback);
-						}
-					}
-				}
-			};
-
-			for (const method of this.staticData.allowedUtilsMethods) {
-				scriptContext.sandbox.utils[method] = (...args) => sb.Utils[method](...args);
-			}
-
 			result = await sb.Sandbox.run(script, scriptContext);
 		}
 		catch (e) {
@@ -195,26 +143,14 @@ module.exports = {
 			};
 		}
 
-		if (customDeveloperDataChanged) {
-			let string;
-			try {
-				string = JSON.stringify(customDeveloperData);
-			}
-			catch {
-				return {
-					success: false,
-					reply: `Cannot stringify your custom data object!`
-				};
-			}
+		const channelDataResult = await sandboxData.handleChannelDataChange(this.staticData.limit);
+		if (channelDataResult.success === false) {
+			return channelDataResult;
+		}
 
-			if (string.length >= this.staticData.customDataLimit) {
-				return {
-					success: false,
-					reply: `Your custom data object is too long! Maximum: ${this.staticData.customDataLimit}`
-				};
-			}
-
-			await context.user.setDataProperty("customDeveloperData", customDeveloperData);
+		const userDataResult = await sandboxData.handleUserDataChange(this.staticData.limit);
+		if (userDataResult.success === false) {
+			return channelDataResult;
 		}
 
 		if (result && typeof result === "object") {
