@@ -312,7 +312,8 @@ module.exports = {
 		}
 
 		const imageFlags = image.Adult_Flags ?? [];
-		const blacklistedFlags = context.channel?.Data.twitchLottoBlacklistedFlags ?? [];
+
+		const blacklistedFlags = await context.channel.getDataProperty("twitchLottoBlacklistedFlags") ?? [];
 		const imageNSFWScore = `${sb.Utils.round(image.Score * 100, 2)}%`;
 		if (safeMode && blacklistedFlags.length === 0) {
 			if (imageFlags.length > 0) {
