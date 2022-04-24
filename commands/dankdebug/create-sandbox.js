@@ -104,7 +104,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 					throw new Error("Definition must be provided as an Array of { name: string, type: string }");
 				}
 
-				else if (!Array.isArray(args) || definition.some(i => typeof i !== "string")) {
+				else if (!Array.isArray(args) || args.some(i => typeof i !== "string")) {
 					throw new Error("Arguments must be provided as a string Array");
 				}
 
