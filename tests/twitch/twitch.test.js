@@ -7,7 +7,7 @@ const MockTwitchClient = require("./mock-client.js");
 require.cache[require.resolve("dank-twitch-irc")].exports = MockTwitchClient;
 
 const initialize = (async () => {
-	await require("supi-core")("sb", {
+	await require("supi-core")({
 		whitelist: [
 			"objects/date",
 			"objects/error",
