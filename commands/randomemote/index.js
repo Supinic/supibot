@@ -207,6 +207,7 @@ module.exports = {
 			"Posts an emote, which must be included in the set you specified.",
 			"E.g. <code>bttv:true</code> will <u>only</u> post random BTTV emotes.",
 			"Combining these will just result in zero emotes, as they don't share their types.",
+			"Note: <code>twitch</code> applies to twitch global emotes only; <code>sub</code> applies to twitch subscribes emotes only.",
 			"",
 
 			`<code>${prefix}rem 7tv:false</code>`,
@@ -217,7 +218,8 @@ module.exports = {
 			`<code>${prefix}rem sub:false</code>`,
 			`<code>${prefix}rem twitch:false</code>`,
 			"Posts an emote, which must not be included in the set(s) you specified.",
-			"E.g. <code>bttv:false</code> wil post random emotes that are <u>not</u> BTTV."
+			"E.g. <code>bttv:false</code> wil post random emotes that are <u>not</u> BTTV.",
+			"Note: <code>twitch</code> applies to twitch global emotes only; <code>sub</code> applies to twitch subscribes emotes only."
 		];
 	})
 };
