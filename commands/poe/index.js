@@ -29,6 +29,12 @@ module.exports = {
 		trials.all = Object.values(trials).join(" -- ");
 
 		return {
+			nextLeague: {
+				patch: "3.18",
+				name: "Sentinel",
+				reveal: new sb.Date("2022-05-05 22:00"),
+				launch: new sb.Date("2022-05-05 22:00")
+			},
 			commands: [
 				{
 					name: "labyrinth",
@@ -202,18 +208,29 @@ module.exports = {
 	}),
 	Code: (async function poe (context, type, ...args) {
 		if (!type) {
-			const announcement = new sb.Date("2022-01-27 20:00");
-			if (announcement > Date.now()) {
+			const now = sb.Date.now();
+			const { name, patch, reveal, launch } = this.staticData.nextLeague;
+			if (reveal > now) {
 				return {
-					reply: `The Archnemesis league will be revealed ${sb.Utils.timeDelta(announcement)}.`
+					reply: `The ${patch} ${name} league will be revealed ${sb.Utils.timeDelta(reveal)}.`
+				};
+			}
+			else if (launch > now) {
+				return {
+					reply: `The ${patch} ${name} league will be revealed ${sb.Utils.timeDelta(launch)}.`
 				};
 			}
 
-			const archnemesis = new sb.Date("2022-02-04 20:00");
+			const possibleEnd = reveal.clone().addMonths(3);
+			if (possibleEnd > now) {
+				const delta = sb.Utils.timeDelta(possibleEnd, true);
+				return {
+					reply: `The ${patch} ${name} league has launched - go and play. It will last approximately for ${delta}.`
+				};
+			}
+
 			return {
-				reply: (archnemesis > Date.now())
-					? `The Archnemesis league launches ${sb.Utils.timeDelta(archnemesis)}.`
-					: "The Archnemesis league has launched! Go and play!"
+				reply: `The ${patch} ${name} league has likely concluded. Ask @Supinic to add new info about the next league!`
 			};
 		}
 
