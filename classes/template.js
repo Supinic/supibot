@@ -236,8 +236,8 @@ module.exports = class ClassTemplate {
 				cacheMap.set(instance, new Map());
 			}
 
-			const userCache = !cacheMap.get(instance);
-			userCache.set(propertyName, value);
+			const instanceCache = cacheMap.get(instance);
+			instanceCache.set(propertyName, value);
 		}
 
 		await row.save({ skipLoad: true });
