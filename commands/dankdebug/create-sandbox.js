@@ -92,6 +92,17 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 
 				return context.getBestAvailableEmote(array, fallback);
 			},
+			fetchEmotes: async () => {
+				let emotes;
+				if (context.channel) {
+					emotes = await context.channel.fetchEmotes();
+				}
+				else {
+					emotes = await context.platform.fetchGlobalEmotes();
+				}
+
+				return emotes;
+			},
 			parseParameter: (value, type) => {
 				if (!allowedTypes.includes(type)) {
 					throw new Error("Invalid value type provided");
