@@ -90,7 +90,7 @@
 	console.log("Loading database credentials & query builder...");
 	try {
 		eval(accessFileString);
-		await require("supi-core")("sb", {
+		globalThis.sb = await require("supi-core")({
 			whitelist: [
 				"objects/date",
 				"objects/error",

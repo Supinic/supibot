@@ -10,7 +10,7 @@
 	}
 
 	console.log("Loading utils");
-	await require("supi-core")("sb", {
+	globalThis.sb = await require("supi-core")({
 		whitelist: [
 			"objects/date",
 			"objects/error",

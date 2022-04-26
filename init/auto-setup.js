@@ -30,7 +30,7 @@
 
 	console.log("Setting up query builder...");
 	try {
-		await require("supi-core")("sb", {
+		globalThis.sb = await require("supi-core")({
 			whitelist: [
 				"objects/date",
 				"objects/error",
