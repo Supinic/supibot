@@ -67,7 +67,14 @@ module.exports = {
 
 		if (channelData && !context.params.silent) {
 			const emote = await channelData.getBestAvailableEmote(["MrDestructoid"], "🤖");
-			await channelData.send(`${emote} 👍 Successfully joined!`);
+			await channelData.send(sb.Utils.tag.trim `
+				${emote} 👍
+				Successfully joined!
+				Make sure to check out my commands here:
+				https://supinic.com/bot/command/list 
+				and the FAQ list here:
+				https://supinic.com/data/faq/list
+			`);
 		}
 
 		return {
