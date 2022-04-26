@@ -33,7 +33,7 @@ module.exports = {
 				patch: "3.18",
 				name: "Sentinel",
 				reveal: new sb.Date("2022-05-05 22:00"),
-				launch: new sb.Date("2022-05-05 22:00")
+				launch: new sb.Date("2022-05-13 22:00")
 			},
 			commands: [
 				{
