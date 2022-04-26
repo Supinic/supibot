@@ -115,7 +115,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 					throw new Error("Invalid value type provided");
 				}
 
-				return sb.Command.parseParameter(value, type);
+				return sb.Command.parseParameter(value, type, true);
 			},
 			parseParametersFromArguments: (definition, args) => {
 				if (!Array.isArray(definition) || definition.some(i => typeof i.name !== "string" || typeof i.type !== "string")) {
