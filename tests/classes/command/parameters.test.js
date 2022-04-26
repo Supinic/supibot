@@ -1,8 +1,5 @@
-/* eslint-disable max-nested-callbacks */
-/* global describe, it, beforeEach, afterEach */
 const assert = require("assert");
-
-const Command =  require("../../../classes/command");
+const Command = require("../../../classes/command");
 
 beforeEach(() => {
 	globalThis.sb = {
