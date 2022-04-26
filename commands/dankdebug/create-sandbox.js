@@ -28,7 +28,14 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 		console: undefined,
 		executor: context.user.Name,
 		platform: context.platform.Name,
-		tee: Object.freeze([...context.tee]),
+		get tee () { return Object.freeze([...context.tee]); },
+		_teePush (value) {
+			if (typeof value !== "string") {
+				throw new Error("Only string values can be pushed to tee");
+			}
+
+			return context.tee.push(value);
+		},
 		channelCustomData: sb.Utils.deepFreeze({
 			getKeys: () => {
 				if (!customChannelData) {
