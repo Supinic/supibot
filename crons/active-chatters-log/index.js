@@ -5,7 +5,13 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function activeChattersLog () {
-		if (!sb.Query || !sb.User) {
+		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Active_Chatter_Log");
+		if (this.data.isTableAvailable === false) {
+			this.stop();
+			return;
+		}
+
+		if (!sb.User) {
 			return;
 		}
 

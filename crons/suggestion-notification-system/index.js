@@ -5,6 +5,20 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function notifyOnSuggestionChange () {
+		if (typeof this.data.isTableAvailable === "undefined") {
+			const [subscription, suggestion] = await Promise.all([
+				sb.Query.isTablePresent("data", "Event_Subscription"),
+				sb.Query.isTablePresent("data", "Suggestion")
+			]);
+
+			this.data.isTableAvailable = (subscription && suggestion);
+		}
+
+		if (this.data.isTableAvailable === false) {
+			this.stop();
+			return;
+		}
+
 		const subscriptions = await sb.Query.getRecordset(rs => rs
 			.select("User_Alias", "Platform")
 			.from("data", "Event_Subscription")
@@ -12,7 +26,7 @@ module.exports = {
 			.where("Type = %s", "Suggestion")
 		);
 		const users = subscriptions.map(i => i.User_Alias);
-	
+
 		const suggestions = await sb.Query.getRecordset(rs => rs
 			.select("ID", "User_Alias", "Status")
 			.from("data", "Suggestion")
@@ -20,12 +34,12 @@ module.exports = {
 			.where("User_Alias IN %n+", users)
 			.orderBy("ID DESC")
 		);
-	
+
 		if (!this.data.previousSuggestions) {
 			this.data.previousSuggestions = suggestions;
 			return;
 		}
-	
+
 		for (const oldRow of this.data.previousSuggestions) {
 			const newRow = suggestions.find(i => i.ID === oldRow.ID);
 			if (!newRow) {
@@ -34,7 +48,7 @@ module.exports = {
 			else if (oldRow.Status === newRow.Status) {
 				continue;
 			}
-	
+
 			const subscription = subscriptions.find(i => i.User_Alias === oldRow.User_Alias);
 			if (!subscription) {
 				continue;
@@ -46,7 +60,7 @@ module.exports = {
 				: ((oldRow.values.Github_Link === null)
 					? `GitHub link added: ${newRow.Github_Link}`
 					: `GitHub link modified: ${newRow.Github_Link}`);
-	
+
 			await sb.Reminder.create({
 				Channel: null,
 				Platform: subscription.Platform,
@@ -58,7 +72,7 @@ module.exports = {
 				Private_Message: true
 			}, true);
 		}
-	
+
 		this.data.previousSuggestions = suggestions;
 	})
 };

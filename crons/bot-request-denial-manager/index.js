@@ -5,8 +5,13 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function botRequestDenialManager () {
-		this.data.requestIDs ??= [];
+		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Suggestion");
+		if (this.data.isTableAvailable === false) {
+			this.stop();
+			return;
+		}
 
+		this.data.requestIDs ??= [];
 		if (this.data.requestIDs.length === 0) {
 			this.data.requestIDs = await sb.Query.getRecordset(rs => rs
 				.select("ID")

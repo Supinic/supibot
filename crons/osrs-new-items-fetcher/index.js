@@ -5,6 +5,12 @@ module.exports = {
 	Defer: null,
 	Type: "Website",
 	Code: (async function osrsNewItemsFetcher () {
+		this.data.isTableAvailable ??= await sb.Query.isTablePresent("osrs", "Item");
+		if (this.data.isTableAvailable === false) {
+			this.stop();
+			return;
+		}
+
 		const wikiResponse = await sb.Got({
 			url: "https://prices.runescape.wiki/api/v1/osrs/latest",
 			responseType: "json"

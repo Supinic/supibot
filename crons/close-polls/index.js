@@ -5,6 +5,20 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function closeActivePoll () {
+		if (typeof this.data.isTableAvailable === "undefined") {
+			const [pollExists, pollVoteExists] = await Promise.all([
+				sb.Query.isTablePresent("chat_data", "Poll"),
+				sb.Query.isTablePresent("chat_data", "Poll_Vote")
+			]);
+
+			this.data.isTableAvailable = (pollExists && pollVoteExists);
+		}
+
+		if (this.data.isTableAvailable === false) {
+			this.stop();
+			return;
+		}
+
 		const activePoll = await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("chat_data", "Poll")
@@ -13,20 +27,20 @@ module.exports = {
 			.limit(1)
 			.single()
 		);
-	
+
 		if (!activePoll?.ID) {
 			return;
 		}
-	
+
 		const row = await sb.Query.getRow("chat_data", "Poll");
 		await row.load(activePoll.ID);
-	
+
 		const votes = await sb.Query.getRecordset(rs => rs
 			.select("Vote", "User_Alias")
 			.from("chat_data", "Poll_Vote")
 			.where("Poll = %n", activePoll.ID)
 		);
-	
+
 		const [yes, no] = sb.Utils.splitByCondition(votes, i => i.Vote === "Yes");
 		const voteString = `${yes.length}:${no.length}`;
 		if (yes.length > no.length) {
@@ -35,7 +49,7 @@ module.exports = {
 		else {
 			row.values.Status = "Failed";
 		}
-	
+
 		await row.save();
 		const reminders = votes.map(vote => sb.Reminder.create({
 			Channel: null,
@@ -47,7 +61,7 @@ module.exports = {
 			Private_Message: true,
 			Platform: 1
 		}, true));
-	
+
 		await Promise.all(reminders);
 	})
 };

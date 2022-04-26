@@ -5,6 +5,12 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function checkLastNodeVersion () {
+		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Event_Subscription");
+		if (this.data.isTableAvailable === false) {
+			this.stop();
+			return;
+		}
+
 		const rawData = await sb.Got("GitHub", {
 			url: "repos/nodejs/node/releases"
 		}).json();
@@ -15,7 +21,7 @@ module.exports = {
 		if (latest.tag_name !== sb.Config.get("LATEST_NODE_JS_VERSION")) {
 			console.log("New nodejs version!", sb.Config.get("LATEST_NODE_JS_VERSION"), latest.tag_name);
 			sb.Config.set("LATEST_NODE_JS_VERSION", latest.tag_name);
-			
+
 			const users = await sb.Query.getRecordset(rs => rs
 				.select("Event_Subscription.User_Alias AS ID")
 				.select("User_Alias.Name AS Username")

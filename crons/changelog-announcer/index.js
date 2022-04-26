@@ -5,6 +5,12 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function changelogAnnouncer () {
+		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Event_Subscription");
+		if (this.data.isTableAvailable === false) {
+			this.stop();
+			return;
+		}
+
 		if (typeof this.data.latestID === "undefined") {
 			this.data.latestID = await sb.Query.getRecordset(rs => rs
 				.select("MAX(ID) AS Max")

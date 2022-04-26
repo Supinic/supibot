@@ -5,6 +5,12 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function checkLastV8Version () {
+		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Event_Subscription");
+		if (this.data.isTableAvailable === false) {
+			this.stop();
+			return;
+		}
+
 		const response = await sb.Got("https://v8.dev/blog.atom");
 		if (response.statusCode !== 200) {
 			return;
