@@ -85,12 +85,12 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				: undefined
 		}),
 		utils: {
-			getEmote: (array, fallback) => {
+			getEmote: async (array, fallback) => {
 				if (!Array.isArray(array) || array.some(i => typeof i !== "string")) {
 					throw new Error("Emotes must be provided as a string Array");
 				}
 
-				return context.getBestAvailableEmote(array, fallback);
+				return await context.getBestAvailableEmote(array, fallback);
 			},
 			fetchEmotes: async () => {
 				let emotes;
