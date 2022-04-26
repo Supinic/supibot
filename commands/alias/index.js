@@ -367,7 +367,10 @@ module.exports = {
 				else if (targetAlias.Command === null) {
 					return {
 						success: false,
-						reply: `You cannot copy links to other aliases!`
+						reply: sb.Utils.tag.trim `
+							You cannot copy links to other aliases
+						 	Instead, use ${sb.Command.prefix}alias link ${targetUser.Name} ${targetAliasName}
+						`
 					};
 				}
 
