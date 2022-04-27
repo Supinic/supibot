@@ -178,9 +178,10 @@
         "wrap-iife": ["warn", "inside"],
         "yoda": "error"
     },
-    "parser": "babel-eslint",
+    "parser": "@babel/eslint-parser",
     "parserOptions": {
-        "ecmaVersion": 2021
+        "ecmaVersion": 2021,
+        "requireConfigFile": false
     },
     "globals": {
         "sb": "readonly"
