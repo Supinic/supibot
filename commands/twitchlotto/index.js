@@ -149,7 +149,7 @@ module.exports = {
 			this.data.counts.total = total;
 		}
 
-		const safeMode = await context.channel.getDataProperty("twitchLottoSafeMode") ?? true;
+		const safeMode = await context.channel?.getDataProperty("twitchLottoSafeMode") ?? true;
 
 		// Now try to find an image that is available.
 		let image = null;
@@ -312,9 +312,9 @@ module.exports = {
 		}
 
 		const imageFlags = image.Adult_Flags ?? [];
-
-		const blacklistedFlags = await context.channel.getDataProperty("twitchLottoBlacklistedFlags") ?? [];
 		const imageNSFWScore = `${sb.Utils.round(image.Score * 100, 2)}%`;
+		const blacklistedFlags = await context.channel?.getDataProperty("twitchLottoBlacklistedFlags") ?? [];
+
 		if (safeMode && blacklistedFlags.length === 0) {
 			if (imageFlags.length > 0) {
 				return {
