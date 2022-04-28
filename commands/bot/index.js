@@ -242,7 +242,7 @@ module.exports = {
 
 			case "rejoin":
 			case "i-will-not-ban-supibot-again": {
-				const inactiveReason = await context.channel.getDataProperty("inactiveReason");
+				const inactiveReason = await channelData.getDataProperty("inactiveReason");
 				if (channelData.Platform.Name !== "twitch") {
 					return {
 						success: false,
