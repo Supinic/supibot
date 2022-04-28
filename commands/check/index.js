@@ -83,7 +83,7 @@ module.exports = {
 						};
 					}
 
-					const rawAmbassadors = await context.channel.getDataProperty("ambassadors");
+					const rawAmbassadors = await channelData.getDataProperty("ambassadors");
 					if (!rawAmbassadors || rawAmbassadors.length === 0) {
 						const prefix = (context.channel === channelData) ? "This" : "Target";
 						return {
