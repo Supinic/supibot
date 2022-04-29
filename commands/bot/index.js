@@ -48,8 +48,8 @@ module.exports = {
 			? sb.Channel.get(params.channel ?? value)
 			: context.channel;
 
-		const channelName = params.channel ?? value ?? context.channel?.Name ?? null;
 		if (!channelData) {
+			const channelName = params.channel ?? value ?? context.channel?.Name ?? null;
 			if (command.includes("join") && channelName && channelName.toLowerCase() === context.user.Name) {
 				return {
 					success: false,
@@ -278,7 +278,7 @@ module.exports = {
 				}
 
 				if (!partFailed && !joinFailed && (inactiveReason === "suspended" || inactiveReason === "renamed")) {
-					await context.channel.setDataProperty("inactiveReason", null);
+					await channelData.setDataProperty("inactiveReason", null);
 					await channelData.saveProperty("Mode", "Write");
 				}
 
