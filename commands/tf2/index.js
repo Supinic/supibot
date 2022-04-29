@@ -34,10 +34,10 @@ module.exports = {
 				const secondary = sb.Utils.randArray(classWeapons.filter(i => i.slot === "secondary"));
 				const melee = sb.Utils.randArray(classWeapons.filter(i => i.slot === "melee"));
 
-				const loadout = [primary, secondary, melee];
+				const loadout = [primary.name, secondary.name, melee.name];
 				if (playerClass === "Spy") {
 					const watch = sb.Utils.randArray(classWeapons.filter(i => i.slot === "watch"));
-					loadout.push(watch);
+					loadout.push(watch.name);
 				}
 
 				return {
