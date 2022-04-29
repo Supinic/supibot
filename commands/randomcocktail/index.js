@@ -11,15 +11,22 @@ module.exports = {
 	Code: (async function randomCocktail (context, ...args) {
 		let data;
 		if (args.length === 0) {
-			data = await sb.Got("https://www.thecocktaildb.com/api/json/v1/1/random.php").json();
+			const response = await sb.Got("GenericAPI", {
+				url: "https://www.thecocktaildb.com/api/json/v1/1/random.php",
+				responseType: "json"
+			});
+
+			data = response.body;
 		}
 		else {
-			data = await sb.Got({
+			const response = await sb.Got("GenericAPI", {
 				url: "https://www.thecocktaildb.com/api/json/v1/1/search.php",
-				searchParams: new sb.URLParams()
-					.set("s", args.join(" "))
-					.toString()
-			}).json();
+				searchParams: {
+					s: args.join(" ")
+				}
+			});
+
+			data = response.body;
 
 			if (!data?.drinks) {
 				return {
