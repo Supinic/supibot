@@ -22,10 +22,10 @@ module.exports = {
 
 		switch (subcommand.toLowerCase()) {
 			case "roll": {
-				const classes = this.staticData.classes.map(i => i.toLowerCase());
-				const playerClass = (classes.includes(args[0]?.toLowerCase()))
+				const lowercaseClasses = this.staticData.classes.map(i => i.toLowerCase());
+				const playerClass = (lowercaseClasses.includes(args[0]?.toLowerCase()))
 					? sb.Utils.capitalize(args[0])
-					: sb.Utils.randArray(classes);
+					: sb.Utils.randArray(this.staticData.classes);
 
 				const weapons = require("./weapons.json");
 				const classWeapons = weapons.filter(i => i.classes.includes(playerClass));
