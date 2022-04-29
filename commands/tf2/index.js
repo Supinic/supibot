@@ -23,7 +23,7 @@ module.exports = {
 		switch (subcommand.toLowerCase()) {
 			case "roll": {
 				const classes = this.staticData.classes.map(i => i.toLowerCase());
-				const playerClass = (classes.includes(args[0].toLowerCase()))
+				const playerClass = (classes.includes(args[0]?.toLowerCase()))
 					? sb.Utils.capitalize(args[0])
 					: sb.Utils.randArray(classes);
 
