@@ -1233,6 +1233,14 @@ module.exports = class TwitchController extends require("./template.js") {
 			})
 		]);
 
+		const rawFFZEmotes = Object.values(ffz.value?.body.sets ?? {});
+		const rawBTTVEmotes = (bttv.value?.body && typeof bttv.value?.body === "object")
+			? Object.values(bttv.value.body)
+			: [];
+		const rawSevenTvEmotes = (sevenTv.value?.body && typeof sevenTv.value?.body === "object")
+			? Object.values(sevenTv.value.body)
+			: [];
+
 		return [
 			...this.availableEmotes
 				.flatMap(set => set.emotes.map(i => ({
@@ -1247,31 +1255,30 @@ module.exports = class TwitchController extends require("./template.js") {
 					animated: i.animated
 				}))),
 
-			...Object.values(ffz.value?.body.sets ?? {})
-				.flatMap(i => i.emoticons)
-				.map(i => ({
-					ID: i.id,
-					name: i.name,
-					type: "ffz",
-					global: true ,
-					animated: false
-				})),
+			...rawFFZEmotes.flatMap(i => i.emoticons).map(i => ({
+				ID: i.id,
+				name: i.name,
+				type: "ffz",
+				global: true ,
+				animated: false
+			})),
 
-			...Object.values(bttv.value?.body ?? {})
-				.map(i => ({
-					ID: i.id,
-					name: i.code,
-					type: "bttv",
-					global: true,
-					animated: (i.imageType === "gif")
-				})),
+			...rawBTTVEmotes.map(i => ({
+				ID: i.id,
+				name: i.code,
+				type: "bttv",
+				global: true,
+				animated: (i.imageType === "gif")
+			})),
 
-			...(sevenTv.value?.body ?? []).map(i => ({
+			...rawSevenTvEmotes.map(i => ({
 				ID: i.id,
 				name: i.name,
 				type: "7tv",
 				global: true,
-				animated: (typeof i.animated === "boolean") ? i.animated : null
+				// Just hoping that .gif emotes are always animated.
+				// @todo proper animated emote checking with new 7TV API (?)
+				animated: (i.mime === "image/gif")
 			}))
 		];
 	}
