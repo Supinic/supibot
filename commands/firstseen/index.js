@@ -98,7 +98,7 @@ module.exports = {
 			reply: sb.Utils.tag.trim `
 				${who}
 				first seen in chat ${sb.Utils.timeDelta(data.Date)},
-				(channel ${channelData.Description ?? channelData.Name})
+				(${channelData.getFullName()})
 				${belongsTo} message: ${data.Message}
 			`
 		};
