@@ -214,15 +214,18 @@ class Command extends require("./template.js") {
 	static privilegedCommandCharacters = ["$"];
 
 	/**
-	 * Command parameter parsing will only continue up until this character string or regex is found.
+	 * Command parameter parsing will only continue up until this argument is encountered, and not part
+	 * of a parameter.
+	 * The delimiter must not contain any spaces.
 	 * If it is not defined or falsy, commands will use up the entire string instead.
 	 * @example If there is no delimiter:
 	 * "$foo bar:baz -- bar:zed"; { bar: "zed" }
 	 * @example If "--" is the delimiter:
 	 * "$foo bar:baz -- bar:zed"; { bar: "baz" }
-	 * @type {string|RegExp}
+	 * "$foo bar:\"baz -- buz\" -- bar:zed"; { bar: "baz -- buz" }
+	 * @type {string}
 	 */
-	static ignoreParametersDelimiter = /(^|\s)--(\s|$)/;
+	static ignoreParametersDelimiter = "--";
 
 	constructor (data) {
 		super();
@@ -1149,107 +1152,159 @@ class Command extends require("./template.js") {
 	}
 
 	/**
-	 * For an input params definition and command arguments, parses out the relevant parameters along with their
-	 * values converted properly from string.
+	 * Parse a parameter value from a string, and return a new parameters object with the parameter set.
+	 * Fails parameter value cannot be parsed, or conflicts with previous parameters allowed.
+	 * @param {string} value
+	 * @param {{ name: string, type: string }} parameterDefinition
+	 * @param {boolean} explicit
+	 * @param {Record<string, any>} existingParameters Parameters already parsed
+	 * @returns {{ success: true, newParameters: Record<string, any> } | { success: false, reply: string }}
 	 */
-	static parseParametersFromArguments (paramsDefinition, argsArray) {
-		let remainingStrings;
-		let argsString;
-		const parameters = {};
+	static #parseAndAppendParameter (value, parameterDefinition, explicit, existingParameters) {
+		const parameters = { ...existingParameters };
+		const parsedValue = Command.parseParameter(value, parameterDefinition.type, explicit);
+		if (parsedValue === null) {
+			return {
+				success: false,
+				reply: `Could not parse parameter "${parameterDefinition.name}"!`
+			};
+		}
+		else if (parameterDefinition.type === "object") {
+			if (typeof parameters[parameterDefinition.name] === "undefined") {
+				parameters[parameterDefinition.name] = {};
+			}
 
-		if (Command.ignoreParametersDelimiter) {
-			[argsString, ...remainingStrings] = argsArray.join(" ").split(Command.ignoreParametersDelimiter);
+			if (typeof parameters[parameterDefinition.name][parsedValue.key] !== "undefined") {
+				return {
+					success: false,
+					reply: `Cannot use multiple values for parameter "${parameterDefinition.name}", key ${parsedValue.key}!`
+				};
+			}
+
+			parameters[parameterDefinition.name][parsedValue.key] = parsedValue.value;
 		}
 		else {
-			argsString = argsArray.join(" ");
-			remainingStrings = [];
+			parameters[parameterDefinition.name] = parsedValue;
 		}
 
-		const paramNames = paramsDefinition.map(i => i.name);
-		const quotesRegex = new RegExp(`(?<name>${paramNames.join("|")}):(?<!\\\\)"(?<value>.*?)(?<!\\\\)"`, "g");
-		const quoteMatches = [...argsString.matchAll(quotesRegex)];
+		return { success: true, newParameters: parameters };
+	}
 
-		for (const match of quoteMatches.reverse()) {
-			argsString = argsString.slice(0, match.index) + argsString.slice(match.index + match[0].length + 1);
+	/**
+	 * For an input params definition and command arguments, parses out the relevant parameters along with their
+	 * values converted properly from string.
+	 * @param {Array<{ name: string; type: "string" | "number" | "boolean" | "date" | "object" | "regex" }>} paramsDefinition Definition of parameters to parse out of the arguments
+	 * @param {Array<string>} argsArray The arguments to parse from
+	 */
+	static parseParametersFromArguments (paramsDefinition, argsArray) {
+		const argsStr = argsArray.join(" ");
+		const outputArguments = [];
+		let parameters = {};
 
-			const { name = null, value = null } = match.groups;
-			const { type } = paramsDefinition.find(i => i.name === name);
+		// Buffer used to store read characters before we know what to do with them
+		let buffer = "";
+		/** Parameter definition of the current parameter @type {typeof paramsDefinition[0] | null} */
+		let currentParam = null;
+		// is true if currently reading inside of a parameter
+		let insideParam = false;
+		// is true if the current param started using quotes
+		let quotedParam = false;
 
-			if (name !== null && value !== null) {
-				const cleanValue = value.replace(/^"|"$/g, "").replace(/\\"/g, "\"");
-				const parsedValue = Command.parseParameter(cleanValue, type, true);
-				if (parsedValue === null) {
+		for (let i = 0; i < argsStr.length; i++) {
+			const char = argsStr[i];
+			buffer += char;
+
+			if (!insideParam) {
+				if (buffer.slice(0, -1) === Command.ignoreParametersDelimiter && char === " ") {
+					// Delimiter means all arguments after this point will be ignored, and just passed as-is
+					outputArguments.push(...argsStr.slice(i + 1).split(" "));
 					return {
-						success: false,
-						reply: `Cannot parse parameter "${name}"!`
+						success: true,
+						parameters,
+						args: outputArguments
 					};
 				}
 
-				if (type === "object") {
-					if (typeof parameters[name] === "undefined") {
-						parameters[name] = {};
+				if (char === ":") {
+					currentParam = paramsDefinition.find(i => i.name === buffer.slice(0,-1)) ?? null;
+					if (currentParam) {
+						insideParam = true;
+						buffer = "";
+						if (argsStr[i + 1] === "\"") {
+							i++;
+							quotedParam = true;
+						}
 					}
-
-					if (typeof parameters[name][parsedValue.key] !== "undefined") {
-						return {
-							success: false,
-							reply: `Cannot use multiple values for parameter "${name}", key ${parsedValue.key}!`
-						};
-					}
-
-					parameters[name][parsedValue.key] = parsedValue.value;
 				}
-				else {
-					parameters[name] = parsedValue;
+				else if (char === " ") {
+					const sliced = buffer.slice(0, -1);
+					if (sliced.length > 0) {
+						outputArguments.push(sliced);
+					}
+					buffer = "";
+				}
+			}
+
+			if (insideParam) {
+				if (!quotedParam && char === " ") {
+					// end of unquoted param
+					const value = Command.#parseAndAppendParameter(buffer.slice(0, -1), currentParam, quotedParam, parameters);
+					if (!value.success) {
+						return value;
+					}
+					buffer = "";
+					parameters = value.newParameters;
+					insideParam = false;
+					quotedParam = false;
+					currentParam = null;
+				}
+
+				if (quotedParam && char === "\"") {
+					if (buffer.at(-2) === "\\") {
+						// remove the backslash, and add quote
+						buffer = `${buffer.slice(0, -2)}"`;
+					}
+					else {
+						// end of quoted param
+						const value = Command.#parseAndAppendParameter(buffer.slice(0, -1), currentParam, quotedParam, parameters);
+						if (!value.success) {
+							return value;
+						}
+						buffer = "";
+						parameters = value.newParameters;
+						insideParam = false;
+						quotedParam = false;
+						currentParam = null;
+					}
 				}
 			}
 		}
 
-		const remainingArgs = argsString.split(" ");
-		const paramRegex = new RegExp(`^(?<name>${paramNames.join("|")}):(?<value>.*)$`);
-		for (let i = remainingArgs.length - 1; i >= 0; i--) {
-			if (!paramRegex.test(remainingArgs[i])) {
-				continue;
+		// Handle the buffer after all characters are read
+		if (insideParam) {
+			if (quotedParam) {
+				return {
+					success: false,
+					reply: `Unclosed quoted parameter "${currentParam.name}"!`
+				};
 			}
-
-			const { name = null, value = null } = remainingArgs[i].match(paramRegex).groups;
-			const { type } = paramsDefinition.find(i => i.name === name);
-
-			if (name !== null && value !== null) {
-				const parsedValue = Command.parseParameter(value, type, false);
-				if (parsedValue === null) {
-					return {
-						success: false,
-						reply: `Cannot parse parameter "${name}"!`
-					};
+			else {
+				const value = Command.#parseAndAppendParameter(buffer, currentParam, quotedParam, parameters);
+				if (!value.success) {
+					return value;
 				}
-
-				if (type === "object") {
-					if (typeof parameters[name] === "undefined") {
-						parameters[name] = {};
-					}
-
-					if (typeof parameters[name][parsedValue.key] !== "undefined") {
-						return {
-							success: false,
-							reply: `Cannot use multiple values for parameter "${name}", key ${parsedValue.key}!`
-						};
-					}
-
-					parameters[name][parsedValue.key] = parsedValue.value;
-				}
-				else {
-					parameters[name] = parsedValue;
-				}
-
-				remainingArgs.splice(i, 1);
+				parameters = value.newParameters;
 			}
+		}
+		else if (buffer !== "" && buffer !== Command.ignoreParametersDelimiter) {
+			// Ignore the last parameter if its the delimiter
+			outputArguments.push(buffer);
 		}
 
 		return {
 			success: true,
 			parameters,
-			args: [...remainingArgs, ...remainingStrings].filter(i => i && /\S/.test(i))
+			args: outputArguments
 		};
 	}
 
