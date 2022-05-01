@@ -134,25 +134,15 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		const status = sb.Utils.randArray(afkCommand.staticData.responses[data.Status]);
 
 		if (!data.Silent) {
-			const now = sb.Date.now();
-			let message = `${userData.Name} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
+			const userMention = channelData.Platform.createUserMention(userData);
+			const message = `${userMention} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
 
-			// If the AFK status lasted over 30 days
-			if ((now - data.Started) >= (30 * 864e5)) {
-				// find out if AFK status has been extended before
-				const extended = await sb.Query.getRecordset(rs => rs
-					.select("ID")
-					.from("chat_data", "AFK")
-					.where("Interrupted_ID = %n", data.ID)
-					.limit(1)
-					.flat("ID")
-					.single()
-				);
+			if (channelData.Mirror) {
+				const mirrorPlatform = sb.Channel.get(channelData.Mirror).Platform;
+				const mirrorUserMention = mirrorPlatform.createUserMention(userData);
+				const mirroredMessage = `${mirrorUserMention} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
 
-				// If it has not, append a welcoming message
-				if (!extended) {
-					message += ` Welcome back! 🙂👋`;
-				}
+				await channelData.mirror(mirroredMessage, null, { commandUsed: false })
 			}
 
 			const unpingedMessage = await sb.Filter.applyUnping({
@@ -164,10 +154,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			});
 
 			const fixedMessage = await channelData.prepareMessage(unpingedMessage);
-			await Promise.all([
-				channelData.send(fixedMessage),
-				channelData.mirror(message, userData, { commandUsed: false })
-			]);
+			await channelData.send(fixedMessage);
 		}
 	}
 

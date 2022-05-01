@@ -304,7 +304,7 @@ module.exports = class Channel extends require("./template.js") {
 	/**
 	 * Mirrors the message to the given mirror channel, if this instance has been configured to do so.
 	 * @param {string} message
-	 * @param {User} userData
+	 * @param {User|null} userData
 	 * @param {Object} [options]
 	 * @param {boolean} [options.commandUsed] = false
 	 * @returns {Promise<void>}

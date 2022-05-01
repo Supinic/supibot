@@ -118,7 +118,7 @@ module.exports = class Reminder extends require("./template.js") {
 			const fromMention = this.Platform.createUserMention(fromUserData);
 			const toMention = this.Platform.createUserMention(toUserData);
 
-			let message = null;
+			let message;
 			if (this.User_From === this.User_To) {
 				message = `${toMention}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
@@ -158,7 +158,24 @@ module.exports = class Reminder extends require("./template.js") {
 						});
 					}
 
-					await channelData.mirror(message, toUserData, { commandUsed: false });
+					if (channelData.Mirror) {
+						const mirrorPlatform = sb.Channel.get(channelData.Mirror).Platform;
+						const mirrorFromMention = mirrorPlatform.createUserMention(fromUserData);
+						const mirrorToMention = mirrorPlatform.createUserMention(toUserData);
+
+						let mirrorMessage;
+						if (this.User_From === this.User_To) {
+							mirrorMessage = `${mirrorToMention}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+						}
+						else if (this.User_From === sb.Config.get("SELF_ID")) {
+							mirrorMessage = `${mirrorToMention}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+						}
+						else if (this.User_To) {
+							mirrorMessage = `${mirrorToMention}, timed reminder from ${mirrorFromMention} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+						}
+
+						await channelData.mirror(mirrorMessage, null, { commandUsed: false });
+					}
 
 					const preparedMessage = await channelData.prepareMessage(message);
 					if (preparedMessage) {
