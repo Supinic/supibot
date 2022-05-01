@@ -152,6 +152,14 @@ module.exports = {
 					`
 				};
 			}
+
+			default: {
+				const commands = this.staticData.commands.map(i => i.name).join(", ");
+				return {
+					success: false,
+					reply: `Unrecognized command used! Pick one of these: ${commands}`
+				};
+			}
 		}
 	}),
 	Dynamic_Description: (async (prefix, values) => {
