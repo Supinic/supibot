@@ -42,7 +42,7 @@ module.exports = class Controller {
 	 * Mirrored messages should not be prepared in the origin channel, they are checked against the target channel.
 	 * Double checking would lead to inconsistent behaviour.
 	 * @param {string} message
-	 * @param {User} userData
+	 * @param {User|null} userData
 	 * @param {Channel} channelData The channel where the message is coming from
 	 * @param {Object} [options]
 	 * @param {boolean} [options.commandUsed] = false If a command was used, do not include the user name of who issued the command.
@@ -62,11 +62,11 @@ module.exports = class Controller {
 		}
 
 		// Do not mirror own messages
-		if (userData.Name === channelData.Platform.Self_Name) {
+		if (userData && userData.Name === channelData.Platform.Self_Name) {
 			return;
 		}
 
-		const fixedMessage = (options.commandUsed)
+		const fixedMessage = (!userData || options.commandUsed)
 			? `${symbol} ${message}`
 			: `${symbol} ${userData.Name}: ${message}`;
 

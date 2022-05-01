@@ -525,15 +525,16 @@ module.exports = class CytubeController extends require("./template.js") {
 	}
 
 	/**
+	 * @override
 	 * Sets the message to be mirrored to a mirror channel.
 	 * @param {string} message
-	 * @param {User} userData
+	 * @param {User|null} userData
 	 * @param {Channel} channelData
 	 * @param {Object} [options]
 	 * @param {boolean} [options.commandUsed] = false
 	 */
 	mirror (message, userData, channelData, options = {}) {
-		if (userData.Name === "[server]") {
+		if (userData && userData.Name === "[server]") {
 			return;
 		}
 
