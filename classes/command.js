@@ -1401,21 +1401,21 @@ module.exports = Command;
  * @property {sb.Channel} channel Data about the channel where the command was invoked
  * @property {sb.Command} command Data about the command being invoked
  * @property {Object} append = {} other platform-specific options
- * @property {?} [transaction] For rollbackable commands, a transaction is set up and later committed/rollbacked.
- * Commands must use this.data.transaction for whatever sbase access should be safeguarded.
+ * @property {?} [transaction] For rollback-able commands, a transaction is set up and later committed/rolled back.
+ * Commands must use this.data.transaction for whatever database access that should be safeguarded with a transaction.
  */
 
 /**
  * @typedef {Object} CommandFlagsObject
  * @property {boolean} developer If true, the command will be hidden from the command list, unless the person is marked as a developer.
  * @property {boolean} system If true, the command will be hidden (even from developers) and only shown to admins.
- * @property {boolean} rollback Determines if command is rollbackable.
+ * @property {boolean} rollback Determines if command is rollback-able.
  * If true, all sensitive database operations will be handled in a transaction - provided in options object.
  * @property {boolean} optOut If true, any user can "opt-out" from being the target of the command.
  * If done, nobody will be able to use their username as the command parameter.
  * @property {boolean} skipBanphrase If true, command result will not be checked for banphrases.
  * Mostly used for system or simple commands with little or no chance to trigger banphrases.
- * @property {boolean} block If true, any user can "block" another user from targetting them with this command.
+ * @property {boolean} block If true, any user can "block" another user from targeting them with this command.
  * If done, the specified user will not be able to use their username as the command parameter.
  * Similar to optOut, but not global, and only applies to one user.
  * @property {boolean} ownerOverride If true, the command's cooldown will be vastly reduced when a user invokes it in their own channel.
@@ -1426,7 +1426,7 @@ module.exports = Command;
  * This also requires the channel to have this option enabled.
  * @property {boolean} useParams If true, all arguments in form of key:value will be parsed into an object
  * @property {boolean} nonNullable If true, the command cannot be directly piped into the null command
- * @property {boolean} externalInput If true, the command is marked as being able to receive aribtrary user input - used in meta-commands
+ * @property {boolean} externalInput If true, the command is marked as being able to receive arbitrary user input - used in meta-commands
  */
 
 /**

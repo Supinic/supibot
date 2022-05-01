@@ -64,6 +64,17 @@ describe("Command parameter parsing", () => {
 	describe("invalid parameters definition", () => {
 		const nonStringTypes = Object.keys(sampleStringValues).filter(i => i !== "string");
 
+		it("fails for invalid multiple params", () => {
+			const result = Command.parseParametersFromArguments(
+				paramsDefinition,
+				[
+					"number:foobar", "boolean:barbaz"
+				]
+			);
+
+			assert.strictEqual(result.success, false, `Param parsing must fail: ${JSON.stringify(result)}`);
+		})
+
 		it("fails for empty implicit string param", () => {
 			const result = Command.parseParametersFromArguments(
 				paramsDefinition,
@@ -120,24 +131,33 @@ describe("Command parameter parsing", () => {
 			it("fails for boolean", () => {
 				const invalidValues = ["FALSE", "foo", "TRUE", ""];
 				for (const value of invalidValues) {
-					const result = Command.parseParametersFromArguments(paramsDefinition, [`boolean:${value}`]);
-					assert.strictEqual(result.success, false, `Param parsing must fail: ${JSON.stringify(result)}`);
+					const unquotedResult = Command.parseParametersFromArguments(paramsDefinition, [`boolean:${value}`]);
+					assert.strictEqual(unquotedResult.success, false, `Param parsing must fail: ${JSON.stringify(unquotedResult)}`);
+
+					const quotedResult = Command.parseParametersFromArguments(paramsDefinition, [`boolean:"${value}"`]);
+					assert.strictEqual(quotedResult.success, false, `Param parsing must fail: ${JSON.stringify(quotedResult)}`);
 				}
 			});
 
 			it("fails for number", () => {
 				const invalidValues = ["foo", "NaN", "Infinity", "-Infinity"];
 				for (const value of invalidValues) {
-					const result = Command.parseParametersFromArguments(paramsDefinition, [`number:${value}`]);
-					assert.strictEqual(result.success, false, `Param parsing must fail: ${JSON.stringify(result)}`);
+					const unquotedResult = Command.parseParametersFromArguments(paramsDefinition, [`number:${value}`]);
+					assert.strictEqual(unquotedResult.success, false, `Param parsing must fail: ${JSON.stringify(unquotedResult)}`);
+
+					const quotedResult = Command.parseParametersFromArguments(paramsDefinition, [`number:"${value}"`]);
+					assert.strictEqual(quotedResult.success, false, `Param parsing must fail: ${JSON.stringify(quotedResult)}`);
 				}
 			});
 
 			it("fails for date", () => {
 				const invalidValues = ["foo", "Infinity", "-Infinity", "NaN", "9".repeat(100)];
 				for (const value of invalidValues) {
-					const result = Command.parseParametersFromArguments(paramsDefinition, [`date:${value}`]);
-					assert.strictEqual(result.success, false, `Param parsing must fail: ${JSON.stringify(result)}`);
+					const unquotedResult = Command.parseParametersFromArguments(paramsDefinition, [`date:${value}`]);
+					assert.strictEqual(unquotedResult.success, false, `Param parsing must fail: ${JSON.stringify(unquotedResult)}`);
+
+					const quotedResult = Command.parseParametersFromArguments(paramsDefinition, [`date:"${value}"`]);
+					assert.strictEqual(quotedResult.success, false, `Param parsing must fail: ${JSON.stringify(quotedResult)}`);
 				}
 			});
 
