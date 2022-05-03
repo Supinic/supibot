@@ -34,7 +34,7 @@ module.exports = {
 			parameters.precision = context.params.precision;
 		}
 
-		if (context.params.fixed !== false) {
+		if (context.params.fixed === true) {
 			parameters.expr = `format((${parameters.expr}), { notation: "fixed" })`;
 		}
 
@@ -86,7 +86,7 @@ module.exports = {
 		"",
 
 		"Fixed notation:",
-		"When <code>fixed:false</code> is provided, the result use the default exponential notation.",
+		"When <code>fixed:true</code> is provided, the result will use a fixed notation, rather than the default exponential notation.",
 		`<code>${prefix}math (expression) <u>fixed:false</u></code>`,
 		`<code>${prefix}math 1000 * 1000 fixed:true</code> => 1000000`,
 		`<code>${prefix}math 1000 * 1000 fixed:false</code> => 1e+6`
