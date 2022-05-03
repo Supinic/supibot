@@ -236,7 +236,7 @@ module.exports = {
 						.from("chat_data", "AFK")
 						.where("User_Alias = %n", targetUser.ID)
 						.where("Interrupted_ID IS NULL")
-						.where("NOT EXISTS(SELECT 1 FROM chat_data.AFK AS SubAFK WHERE AFK.ID = SubAFK.Interrupted_ID LIMIT 1")
+						.where("NOT EXISTS(SELECT 1 FROM chat_data.AFK AS SubAFK WHERE AFK.ID = SubAFK.Interrupted_ID LIMIT 1)")
 						.orderBy("(UNIX_TIMESTAMP(Ended) - UNIX_TIMESTAMP(Started)) DESC")
 						.limit(1)
 						.single()
