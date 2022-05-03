@@ -83,7 +83,7 @@ module.exports = {
 
 		const ratio = response.body[convertKey].val;
 		const firstAmount = sb.Utils.groupDigits(amount * multiplier);
-		const secondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, 3));
+		const secondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, 2));
 
 		let message = `${firstAmount} ${first} = ${secondAmount} ${second}`;
 
@@ -131,7 +131,7 @@ module.exports = {
 						: (dollarExchangeRate / otherCurrencyRatio);
 				}
 
-				const roundLimit = (first === "IRR") ? 3 : 0;
+				const roundLimit = (first === "IRR") ? 2 : 0;
 				const fixedSecondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, roundLimit));
 				message = `Official: ${message}; True: ${firstAmount} ${first} = ${fixedSecondAmount} ${second}`;
 			}
