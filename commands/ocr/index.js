@@ -6,6 +6,7 @@ module.exports = {
 	Description: "Takes your image link and attempts to find the text in it by using OCR.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
+		{ name: "engine", type: "number" },
 		{ name: "force", type: "boolean" },
 		{ name: "lang", type: "string" }
 	],
@@ -63,10 +64,24 @@ module.exports = {
 			};
 		}
 
+		let engine;
+		if (typeof context.params.engine === "number") {
+			if (!language.engines.includes(context.params.engine)) {
+				const engines = language.engines.join(", ");
+				return {
+					success: false,
+					reply: `Your selected language does not support that engine version! Choose one of: ${engines}`
+				};
+			}
+
+			engine = context.params.engine;
+		}
+		else {
+			engine = Math.min(...language.engines);
+		}
+
 		let data;
 		let statusCode;
-
-		const engine = Math.max(...language.engines);
 		const key = { language: languageCode, link };
 
 		// If force is true, don't even bother fetching the cache data
@@ -129,8 +144,27 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async (prefix, values) => {
-		const { names } = values.getStaticData();
-		const list = names.map(name => `<li>${sb.Utils.capitalize(name)}</li>`).join("");
+		const { definitions } = values.getStaticData();
+		const tableBody = Object.entries(definitions).map(([code, definition]) => {
+			const name = sb.Utils.modules.languageISO.getName(code);
+			const engines = definition.engines.join(", ");
+			return `<tr><td>${name}</td><td>${code}</td><td>${engines}</td></tr>`;
+		}).join("");
+
+		const table = `
+			<table>
+				<thead>
+					<tr>
+						<th>Language</th>
+						<th>Code</th>
+						<th>Engine versions</th>
+					</tr>
+				</thead>
+				<tbody>
+					${tableBody}
+				</tbody>
+			</table>
+		`;
 
 		return [
 			"Attempts to read a provided image with OCR, and posts the found text in chat.",
@@ -146,12 +180,18 @@ module.exports = {
 			"ロ明寝マンRetweeted 蜜柑すい@mikansul・May11 ティフアに壁ドンされるだけ",
 			"",
 
+			`<code>${prefix}ocr (link) engine:(1, 2, or 3)</code>`,
+			"Advanced modee: you can select a specific recognition engine version, if you feel fancy.",
+			"By default, the most reliable version will be chosen.",
+			"Check the table below to see which language supports which engine versions.",
+			"",
+
 			`<code>${prefix}ocr (link) force:true</code>`,
 			"Since the results of ocr results are cached, use force:true to forcibly run another detection.",
 			"",
 
-			"List of supported languages:",
-			list
+			"List of supported languages + engine versions:",
+			table
 		];
 	})
 };
