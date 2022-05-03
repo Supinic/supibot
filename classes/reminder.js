@@ -491,7 +491,7 @@ module.exports = class Reminder extends require("./template.js") {
 					const link = await Reminder.createRelayLink("lookup", listID);
 
 					message = sb.Utils.tag.trim `
-						Hey ${userMention},
+						Hey ${userMention}
 						you have reminders, but they're too long to be posted here. 
 						Check them out here: ${link}
 					`;
@@ -508,7 +508,7 @@ module.exports = class Reminder extends require("./template.js") {
 				const link = await Reminder.createRelayLink("lookup", listID);
 
 				const message = sb.Utils.tag.trim `
-					Hey ${userMention},
+					Hey ${userMention}
 					you just got reminders, but they couldn't be displayed here.
 					Instead, check them out here: ${link}
 				`;
