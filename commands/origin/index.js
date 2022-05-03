@@ -28,7 +28,7 @@ module.exports = {
 
 		const contextEmote = await context.getBestAvailableEmote([emote], null, { returnEmoteObject: true });
 		const contextEmoteID = (contextEmote?.id) ? String(contextEmote.id) : "";
-		const emoteData = await sb.Query.getRecordset(rs => rs
+		let emoteData = await sb.Query.getRecordset(rs => rs
 			.select("ID", "Emote_ID", "Text", "Tier", "Type", "Todo", "Emote_Added", "Author")
 			.from("data", "Origin")
 			.where("Name COLLATE utf8mb4_bin LIKE %s", emote)
@@ -45,32 +45,38 @@ module.exports = {
 				};
 			}
 
-			const emoteData = await sb.Query.getRecordset(rs => rs
-				.select("ID")
+			const fallbackEmoteData = await sb.Query.getRecordset(rs => rs
+				.select("ID", "Emote_ID", "Text", "Tier", "Type", "Todo", "Emote_Added", "Author")
 				.from("data", "Origin")
 				.where("Name COLLATE utf8mb4_bin %*like*", emote)
 			);
 
-			if (emoteData.length === 0) {
+			if (fallbackEmoteData.length === 0) {
 				return {
 					success: false,
 					reply: "No definitions found for given query!"
 				};
 			}
-
-			const IDs = emoteData.map(i => `ID=${i.ID}`).join("&");
-			const response = await this.staticData.createRelay(IDs);
-
-			if (response.statusCode !== 200) {
-				return {
-					success: false,
-					reply: "Could not create a relay link for found definitions! Try again later."
-				};
+			else if (fallbackEmoteData.length === 1) {
+				// if there is exactly one emote found with the fallback query, continue on with the code in
+				// the branch below, basically pretending that that emote name was the input.
+				emoteData = fallbackEmoteData;
 			}
 			else {
-				return {
-					reply: `Found ${emoteData.length} definitions for your query, check them out here: ${response.body.data.link}`
-				};
+				const IDs = fallbackEmoteData.map(i => `ID=${i.ID}`).join("&");
+				const response = await this.staticData.createRelay(IDs);
+
+				if (response.statusCode !== 200) {
+					return {
+						success: false,
+						reply: "Could not create a relay link for found definitions! Try again later."
+					};
+				}
+				else {
+					return {
+						reply: `Found ${fallbackEmoteData.length} definitions for your query, check them out here: ${response.body.data.link}`
+					};
+				}
 			}
 		}
 
