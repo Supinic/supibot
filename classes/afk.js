@@ -138,10 +138,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			const message = `${userMention} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
 
 			if (channelData.Mirror) {
-				const mirrorPlatform = sb.Channel.get(channelData.Mirror).Platform;
-				const mirrorUserMention = mirrorPlatform.createUserMention(userData);
-				const mirroredMessage = `${mirrorUserMention} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
-
+				const mirroredMessage = `${userData.Name} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
 				await channelData.mirror(mirroredMessage, null, { commandUsed: false })
 			}
 

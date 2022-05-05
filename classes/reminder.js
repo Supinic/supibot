@@ -159,19 +159,15 @@ module.exports = class Reminder extends require("./template.js") {
 					}
 
 					if (channelData.Mirror) {
-						const mirrorPlatform = sb.Channel.get(channelData.Mirror).Platform;
-						const mirrorFromMention = mirrorPlatform.createUserMention(fromUserData);
-						const mirrorToMention = mirrorPlatform.createUserMention(toUserData);
-
 						let mirrorMessage;
 						if (this.User_From === this.User_To) {
-							mirrorMessage = `${mirrorToMention}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+							mirrorMessage = `${toUserData.Name}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
 						else if (this.User_From === sb.Config.get("SELF_ID")) {
-							mirrorMessage = `${mirrorToMention}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+							mirrorMessage = `${toUserData.Name}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
 						else if (this.User_To) {
-							mirrorMessage = `${mirrorToMention}, timed reminder from ${mirrorFromMention} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
+							mirrorMessage = `${toUserData.Name}, timed reminder from ${fromUserData.Name} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
 
 						await channelData.mirror(mirrorMessage, null, { commandUsed: false });
@@ -471,6 +467,7 @@ module.exports = class Reminder extends require("./template.js") {
 			});
 
 			if (typeof message === "string" && !message.includes("[LINK]")) {
+				let mirrorMessage = `${targetUserData.Name} ${message}`;
 				message = `${userMention} ${message}`;
 
 				// Apply unpings, governed by the reminder command itself
@@ -495,12 +492,17 @@ module.exports = class Reminder extends require("./template.js") {
 						you have reminders, but they're too long to be posted here. 
 						Check them out here: ${link}
 					`;
+					mirrorMessage = sb.Utils.tag.trim `
+						Hey ${targetUserData.Name}
+						you have reminders, but they're too long to be posted here. 
+						Check them out here: ${link}
+					`;
 				}
 
 				const [resultMessage] = sb.Utils.partitionString(message, limit, 1);
 				await Promise.all([
 					channelData.send(resultMessage),
-					channelData.mirror(resultMessage, targetUserData, { commandUsed: false })
+					channelData.mirror(mirrorMessage, null, { commandUsed: false })
 				]);
 			}
 			else {
@@ -512,8 +514,16 @@ module.exports = class Reminder extends require("./template.js") {
 					you just got reminders, but they couldn't be displayed here.
 					Instead, check them out here: ${link}
 				`;
+				const mirrorMessage = sb.Utils.tag.trim `
+					Hey ${targetUserData.Name}
+					you just got reminders, but they couldn't be displayed here.
+					Instead, check them out here: ${link}
+				`;
 
-				await channelData.send(message);
+				await Promise.all([
+					channelData.send(message),
+					channelData.mirror(mirrorMessage, null, { commandUsed: false })
+				]);
 			}
 		}
 
@@ -524,9 +534,11 @@ module.exports = class Reminder extends require("./template.js") {
 			}
 
 			const publicMessage = `Hey ${userMention} - I just private messaged you ${privateReply.length} private reminder(s) - make sure to check them out!`;
+			const publicMirrorMessage = `Hey ${targetUserData.Name} - I just private messaged you ${privateReply.length} private reminder(s) - make sure to check them out!`;
+
 			await Promise.all([
 				channelData.send(publicMessage),
-				channelData.mirror(publicMessage, targetUserData, { commandUsed: false })
+				channelData.mirror(publicMirrorMessage, null, { commandUsed: false })
 			]);
 		}
 
