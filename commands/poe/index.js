@@ -217,7 +217,7 @@ module.exports = {
 			}
 			else if (launch > now) {
 				return {
-					reply: `The ${patch} ${name} league will be revealed ${sb.Utils.timeDelta(launch)}.`
+					reply: `The ${patch} ${name} league will start ${sb.Utils.timeDelta(launch)}.`
 				};
 			}
 
