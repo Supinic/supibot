@@ -67,6 +67,24 @@ module.exports = {
 		const stalkChannelData = sb.Channel.get(stalkData.ChannelID);
 		const delta = sb.Utils.timeDelta(stalkData.Date);
 
+		// automated bot protettion - do not allow stalking of banned Twitch users outside of whispers
+		if (context.platform.Name === "twitch" && context.channel && stalkChannelData.Platform.Name === "twitch") {
+			const response = await sb.Got("Helix", {
+				url: "users",
+				searchParams: {
+					login: targetUser.Name
+				},
+				throwHttpErrors: false
+			});
+
+			if (response.statusCode === 200 && response.body.data.length === 0) {
+				return {
+					success: false,
+					reply: "You cannot stalk that user as they're currently banned on Twitch!"
+				};
+			}
+		}
+
 		return {
 			meta: {
 				skipWhitespaceCheck: true
