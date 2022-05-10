@@ -64,24 +64,47 @@ module.exports = {
 			};
 		}
 
-		const convertKey = `${first}_${second}`;
-		const response = await sb.Got("GenericAPI", {
-			url: "https://free.currconv.com/api/v7/convert",
-			searchParams: {
-				apiKey: sb.Config.get("API_FREE_CURRENCY_CONVERTER"),
-				q: convertKey,
-				compact: "y"
-			}
-		});
+		let data = await this.getCacheData("currency-rates");
+		if (!data) {
+			const response = await sb.Got("GenericAPI", {
+				method: "GET",
+				url: "https://openexchangerates.org/api/latest.json",
+				searchParams: {
+					app_id: sb.Config.get("API_OPEN_EXCHANGE_RATES")
+				}
+			});
 
-		if (!response.body[convertKey]) {
+			data = response.body.rates;
+			await this.setCacheData("currency-rates", data, {
+				expiry: 3_600_000 // 1 hour
+			});
+		}
+
+		if (!data[first] || !data[second]) {
+			const unrecognized = [];
+			if (!data[first]) {
+				unrecognized.push(first);
+			}
+			if (!data[second]) {
+				unrecognized.push(first);
+			}
+
 			return {
 				success: false,
-				reply: "One or both currency codes were not recognized!"
+				reply: `One or more currency codes were not recognized! ${unrecognized.join(", ")}`
 			};
 		}
 
-		const ratio = response.body[convertKey].val;
+		let ratio;
+		if (first === "USD" || second === "USD") {
+			ratio = (first === "USD")
+				? data[second]
+				: 1 / data[first];
+		}
+		else {
+			ratio = (data[first] / data[second]);
+		}
+
 		const firstAmount = sb.Utils.groupDigits(amount * multiplier);
 		const secondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, 2));
 
