@@ -6,6 +6,7 @@ module.exports = {
 	Description: "Fetches a random recently posted programming-related Pastebin paste.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
+		{ name: "linkOnly", type: "boolean" },
 		{ name: "syntax", type: "string" }
 	],
 	Whitelist_Response: null,
@@ -94,6 +95,12 @@ module.exports = {
 			};
 		}
 
+		if (context.params.linkOnly) {
+			return {
+				reply: `https://pastebin.com/${paste.key}`
+			};
+		}
+
 		const delta = sb.Utils.timeDelta(new sb.Date(paste.posted));
 		const expiryString = (paste.expires) ? `Expires ${sb.Utils.timeDelta(new sb.Date(paste.expires))}.` : "";
 		return {
@@ -141,6 +148,10 @@ module.exports = {
 			`<code>${prefix}rpb (language)</code>`,
 			`<code>${prefix}rpb syntax:(language)</code>`,
 			"Posts a summary of a paste, only using your provided programming language.",
+			"",
+
+			`<code>${prefix}rpb linkOnly:true</code>`,
+			"Posts only the link of a given random paste, without the summary itself.",
 			"",
 
 			`<code>${prefix}rpb list</code>`,
