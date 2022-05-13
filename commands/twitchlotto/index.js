@@ -13,50 +13,11 @@ module.exports = {
 		{ name: "safeMode", type: "boolean" }
 	],
 	Whitelist_Response: "This command can't be executed here!",
-	Static_Data: (() => ({
-		scoreThreshold: 0.5,
-		detections: [
-			{
-				string: "Male Breast - Exposed",
-				replacement: "male breast"
-			},
-			{
-				string: "Male Genitalia - Exposed",
-				replacement: "penis"
-			},
-			{
-				string: "Male Genitalia - Covered",
-				replacement: "covered penis"
-			},
-			{
-				string: "Female Genitalia - Exposed",
-				replacement: "vagina"
-			},
-			{
-				string: "Female Genitalia - Covered",
-				replacement: "covered vagina"
-			},
-			{
-				string: "Female Breast - Exposed",
-				replacement: "breast"
-			},
-			{
-				string: "Female Breast - Covered",
-				replacement: "covered breast"
-			},
-			{
-				string: "Buttocks - Exposed",
-				replacement: "ass"
-			}
-		],
-		maxRetries: 10,
-		createRecentUseCacheKey: (context) => ({
-			type: "recent-use",
-			user: context.user.ID,
-			channel: context.channel?.ID ?? null
-		})
-	})),
+	Static_Data: null,
 	Code: (async function twitchLotto (context, channel) {
+		const definitions = require("./definitions.js");
+		const checkSafety = require("./safety-check.js");
+
 		if (typeof context.params.safeMode === "boolean") {
 			if (!context.channel) {
 				return {
@@ -150,6 +111,7 @@ module.exports = {
 		}
 
 		const safeMode = await context.channel?.getDataProperty("twitchLottoSafeMode") ?? true;
+		const blacklistedFlags = await context.channel?.getDataProperty("twitchLottoBlacklistedFlags") ?? [];
 
 		// Now try to find an image that is available.
 		let image = null;
@@ -256,18 +218,24 @@ module.exports = {
 					image = null;
 				}
 			}
-			else if (context.param.preferUnscored && image.Score !== null && failedTries < this.staticData.maxRetries) {
+			else if (context.param.preferUnscored && image.Score !== null && failedTries < definitions.maxRetries) {
 				// "soft" re-attempting. only attempt again if the limit hasn't been reached.
 				// if it has, continue ahead and use the last image rolled, regardless of if it has the Score value or not
 				failedTries++;
 				image = null;
 			}
 
-			if (failedTries > this.staticData.maxRetries) {
+			const legalityCheck = checkSafety(safeMode, blacklistedFlags, image);
+			if (legalityCheck.success === false) {
+				failedTries++;
+				image = null;
+			}
+
+			if (failedTries > definitions.maxRetries) {
 				// Was not able to find an image that existed.
 				return {
 					success: false,
-					reply: `Could not find an image that was still available (${this.staticData.maxRetries} images were checked and found to be deleted)!`,
+					reply: `Could not find an image that was still available (${definitions.maxRetries} images were checked and found to be deleted)!`,
 					cooldown: 2500
 				};
 			}
@@ -309,45 +277,22 @@ module.exports = {
 
 			image.Data = json;
 			image.Score = sb.Utils.round(data.score, 4);
-		}
 
-		const imageFlags = image.Adult_Flags ?? [];
-		const imageNSFWScore = `${sb.Utils.round(image.Score * 100, 2)}%`;
-		const blacklistedFlags = await context.channel?.getDataProperty("twitchLottoBlacklistedFlags") ?? [];
-
-		if (safeMode && blacklistedFlags.length === 0) {
-			if (imageFlags.length > 0) {
-				return {
-					success: false,
-					reply: `Cannot post image! It contains the following NSFW flags: ${imageFlags.join(", ")}`
-				};
-			}
-			else if (image.Score > this.staticData.scoreThreshold) {
-				const thresholdPercent = `${sb.Utils.round(this.staticData.scoreThreshold * 100, 2)}%`;
-				return {
-					success: false,
-					reply: `Cannot post image! Its NSFW score (${imageNSFWScore}) is higher than the threshold (${thresholdPercent}).`
-				};
+			const legalityCheck = checkSafety(safeMode, blacklistedFlags, image);
+			if (legalityCheck.success === false) {
+				return legalityCheck;
 			}
 		}
 
 		const detectionsString = [];
 		const { detections } = JSON.parse(image.Data);
-		for (const { replacement, string } of this.staticData.detections) {
+		for (const { replacement, string } of definitions.detections) {
 			const elements = detections.filter(i => i.name === string);
 			const strings = elements.map(i => `${replacement} (${Math.round(i.confidence * 100)}%)`);
 			detectionsString.push(...strings);
 		}
 
-		const illegalFlags = imageFlags.map(i => i.toLowerCase()).filter(i => blacklistedFlags.includes(i));
-		if (illegalFlags.length > 0) {
-			return {
-				success: false,
-				reply: `Cannot post image! These flags are blacklisted: ${illegalFlags.join(", ")}`
-			};
-		}
-
-		await this.setCacheData(this.staticData.createRecentUseCacheKey(context), image.Link, {
+		await this.setCacheData(definitions.createRecentUseCacheKey(context), image.Link, {
 			expiry: 600_000
 		});
 
@@ -371,7 +316,7 @@ module.exports = {
 		return {
 			removeEmbeds: (context.channel && !context.channel.NSFW && scoreThresholdExceeded),
 			reply: sb.Utils.tag.trim `
-				NSFW score: ${imageNSFWScore}
+				NSFW score: ${definitions.formatScore(image.Score)}
 				Detections: ${detectionsString.length === 0 ? "N/A" : detectionsString.join(", ")}
 				${flagsString}
 				https://i.imgur.com/${image.Link}
@@ -379,8 +324,8 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { scoreThreshold } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { scoreThreshold } = require("./definitions.js");
 		const thresholdPercent = `${sb.Utils.round(scoreThreshold * 100, 2)}%`;
 
 		const countData = await sb.Query.getRecordset(rs => rs
