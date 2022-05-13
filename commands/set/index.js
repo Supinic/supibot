@@ -13,7 +13,15 @@ module.exports = {
 		const timersLimit = 5;
 		const timerNameRegex = /^[-\w\u00a9\u00ae\u2000-\u3300\ud83c\ud000-\udfff\ud83d\ud000-\udfff\ud83e\ud000-\udfff]{2,25}$/;
 
-		const availableFlags = ["anime", "animal", "body-fluids", "disfigured", "disturbing", "drawn", "furry", "gore", "hentai", "human", "language", "none", "porn", "scat", "softcore"];
+		let availableFlags = [];
+		try {
+			const definitions = require("../twitchlotto/definitions.js");
+			availableFlags = definitions.flags.map(i => i.toLowerCase());
+		}
+		catch {
+			availableFlags = [];
+		}
+
 		const handleAmbassadors = async (type, context, ...args) => {
 			const [user, channel = context.channel?.Name] = args;
 			if (!user || !channel) {
