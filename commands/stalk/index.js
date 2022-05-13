@@ -68,11 +68,11 @@ module.exports = {
 		const delta = sb.Utils.timeDelta(stalkData.Date);
 
 		// automated bot protettion - do not allow stalking of banned Twitch users outside of whispers
-		if (context.platform.Name === "twitch" && context.channel && stalkChannelData.Platform.Name === "twitch") {
+		if (targetUser.Twitch_ID && context.platform.Name === "twitch" && context.channel && stalkChannelData.Platform.Name === "twitch") {
 			const response = await sb.Got("Helix", {
 				url: "users",
 				searchParams: {
-					login: targetUser.Name
+					id: targetUser.Twitch_ID
 				},
 				throwHttpErrors: false
 			});
