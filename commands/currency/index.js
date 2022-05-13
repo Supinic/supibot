@@ -102,7 +102,7 @@ module.exports = {
 				: 1 / data[first];
 		}
 		else {
-			ratio = (data[first] / data[second]);
+			ratio = (data[second] / data[first]);
 		}
 
 		const firstAmount = sb.Utils.groupDigits(amount * multiplier);
