@@ -225,10 +225,12 @@ module.exports = {
 				image = null;
 			}
 
-			const legalityCheck = checkSafety(safeMode, blacklistedFlags, image);
-			if (legalityCheck.success === false) {
-				failedTries++;
-				image = null;
+			if (image) {
+				const legalityCheck = checkSafety(safeMode, blacklistedFlags, image);
+				if (legalityCheck.success === false) {
+					failedTries++;
+					image = null;
+				}
 			}
 
 			if (failedTries > definitions.maxRetries) {
