@@ -409,7 +409,7 @@ module.exports = class VLCSingleton extends require("./template.js") {
 	}
 
 	get currentPlaylist () {
-		return this.client._playlist?.children?.[0]?.children ?? [];
+		return this.client.playlist?.children?.[0]?.children ?? [];
 	}
 
 	get currentPlaylistItem () {
