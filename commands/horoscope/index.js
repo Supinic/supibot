@@ -7,70 +7,7 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		zodiac: [
-			{
-				name: "Aries",
-				start: [3, 21],
-				end: [4, 20]
-			},
-			{
-				name: "Taurus",
-				start: [4, 21],
-				end: [5, 20]
-			},
-			{
-				name: "Gemini",
-				start: [5, 21],
-				end: [6, 21]
-			},
-			{
-				name: "Cancer",
-				start: [6, 22],
-				end: [7, 22]
-			},
-			{
-				name: "Leo",
-				start: [7, 23],
-				end: [8, 22]
-			},
-			{
-				name: "Virgo",
-				start: [8, 23],
-				end: [9, 21]
-			},
-			{
-				name: "Libra",
-				start: [9, 22],
-				end: [10, 22]
-			},
-			{
-				name: "Scorpio",
-				start: [10, 23],
-				end: [11, 22]
-			},
-			{
-				name: "Sagittarius",
-				start: [11, 23],
-				end: [12, 21]
-			},
-			{
-				name: "Capricorn",
-				start: [12, 22],
-				end: [1, 20]
-			},
-			{
-				name: "Aquarius",
-				start: [1, 21],
-				end: [2, 19]
-			},
-			{
-				name: "Pisces",
-				start: [2, 20],
-				end: [3, 20]
-			}
-		]
-	})),
+	Static_Data: null,
 	Code: (async function horoscope (context) {
 		const birthdayData = await context.user.getDataProperty("birthday");
 		if (!birthdayData) {
@@ -81,16 +18,18 @@ module.exports = {
 			};
 		}
 
-		let zodiac = null;
+		let zodiacName = null;
+		const zodiacData = require("./zodiac.json");
 		const { day, month } = birthdayData;
-		for (const { start, end, name } of this.staticData.zodiac) {
+
+		for (const { start, end, name } of zodiacData) {
 			if ((month === start[0] && day >= start[1]) || (month === end[0] && day <= end[1])) {
-				zodiac = name;
+				zodiacName = name;
 				break;
 			}
 		}
 
-		if (zodiac === null) {
+		if (zodiacName === null) {
 			return {
 				success: false,
 				reply: `No zodiac sign detected...?`
@@ -98,7 +37,7 @@ module.exports = {
 		}
 
 		const response = await sb.Got("FakeAgent", {
-			url: `https://www.ganeshaspeaks.com/horoscopes/daily-horoscope/${zodiac}`,
+			url: `https://www.ganeshaspeaks.com/horoscopes/daily-horoscope/${zodiacName}`,
 			responseType: "text"
 		});
 
@@ -118,7 +57,7 @@ module.exports = {
 		}
 
 		return {
-			reply: `Your horoscope for today: ${node.text()}`
+			reply: `Your ${zodiacName} horoscope for today: ${node.text()}`
 		};
 	}),
 	Dynamic_Description: null
