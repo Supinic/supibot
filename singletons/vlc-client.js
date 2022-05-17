@@ -100,6 +100,8 @@ module.exports = class VLCClient extends require("events") {
 		}
 	}
 
+	get playlist () { return this.#playlist; }
+
 	startRunning () {
 		this.#running = true;
 	}
