@@ -139,6 +139,10 @@
 			counter++;
 			console.log(`${database}.${table} initial data inserted successfully`);
 		}
+		else if (status === 1) {
+			counter++;
+			console.log(`${database}.${table} initial data inserted successfully, some rows were skipped as they already existed before`);
+		}
 		else {
 			console.log(`${database}.${table} initial data skipped - error occured`);
 		}
