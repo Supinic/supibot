@@ -14,12 +14,16 @@ module.exports = {
 		const timerNameRegex = /^[-\w\u00a9\u00ae\u2000-\u3300\ud83c\ud000-\udfff\ud83d\ud000-\udfff\ud83e\ud000-\udfff]{2,25}$/;
 
 		let availableFlags = [];
+		let createRecentTwitchLottoCacheKey;
 		try {
 			const definitions = require("../twitchlotto/definitions.js");
+
 			availableFlags = definitions.flags.map(i => i.toLowerCase());
+			createRecentTwitchLottoCacheKey = definitions.createRecentUseCacheKey;
 		}
 		catch {
 			availableFlags = [];
+			createRecentTwitchLottoCacheKey = null;
 		}
 
 		const handleAmbassadors = async (type, context, ...args) => {
@@ -612,10 +616,15 @@ module.exports = {
 						}
 
 						if (link.toLowerCase() === "last") {
-							const tl = sb.Command.get("tl");
-							const key = tl.staticData.createRecentUseCacheKey(context);
+							if (!createRecentTwitchLottoCacheKey) {
+								return {
+									success: false,
+									reply: `This functionality is not available at the moment!`
+								};
+							}
 
-							const cacheData = await tl.getCacheData(key);
+							const key = createRecentTwitchLottoCacheKey(context);
+							const cacheData = await sb.Command.get("tl").getCacheData(key);
 							if (!cacheData) {
 								return {
 									success: false,
