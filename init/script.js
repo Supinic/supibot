@@ -47,7 +47,6 @@
 		"chat_data/tables/Message_Meta_User_Alias",
 		"chat_data/tables/Reminder",
 		"chat_data/tables/Twitch_Ban",
-		"chat_data/triggers/User_Alias_after_update",
 
 		"data/database",
 		"data/tables/Config",
