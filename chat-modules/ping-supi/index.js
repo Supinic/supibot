@@ -5,18 +5,25 @@ module.exports = {
 	Code: (async function pingSupi (context) {
 		const { message, channel, user } = context;
 
-		const regex = /supi\b|supinic(?!\.com)|bupi/i;
+		this.data.timeout ??= 0;
+
+		const relaxedRegex = /supi\b|supinic(?!\.com)|bupi/i;
+		const strictRegex = /\bsupinic(?!\.com)\b/i;
+
 		const skippedUsers = [1, 1127, 8697460, 12182780];
-
-		if (typeof this.data.timeout === "undefined") {
-			this.data.timeout = 0;
-		}
-
 		const now = sb.Date.now();
-		if (now > this.data.timeout && regex.test(message) && !skippedUsers.includes(user?.ID)) {
+
+		if (now > this.data.timeout && relaxedRegex.test(message) && !skippedUsers.includes(user?.ID)) {
 			if (channel) {
-				const skip = await channel.getDataProperty("globalPingRemoved");
-				if (skip) {
+				let enforceStrictRegex = await channel.getDataProperty("globalPingRemoved");
+
+				const platformData = channel.Platform;
+				if (platformData.Name === "discord") {
+					const discordChannel = await platformData.client.channels.fetch(channel.Specific_ID);
+					enforceStrictRegex = !discordChannel.members.has("168719563741986816"); // @supinic discord ID
+				}
+
+				if (enforceStrictRegex && !strictRegex.test(message)) {
 					return;
 				}
 			}
