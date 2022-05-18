@@ -15,8 +15,11 @@ module.exports = {
 			url: "repos/nodejs/node/releases"
 		}).json();
 
-		const latest = rawData.sort((a, b) => new sb.Date(b.created_at) - new sb.Date(a.created_at)).shift();
-		const nodeString = `New Node.js version detected! PagChomp 👉 ${latest.tag_name} Changelog: ${latest.html_url}`;
+		const data = rawData.sort((a, b) => new sb.Date(b.created_at) - new sb.Date(a.created_at));
+		const latest = data[0];
+
+		const releaseDate = new sb.Date(latest.created_at).format("Y-m-d H:i");
+		const message = `New Node.js version detected! PagChomp 👉 ${latest.tag_name}; Changelog: ${latest.html_url}; Released on ${releaseDate}`;
 
 		if (latest.tag_name !== sb.Config.get("LATEST_NODE_JS_VERSION")) {
 			console.log("New nodejs version!", sb.Config.get("LATEST_NODE_JS_VERSION"), latest.tag_name);
@@ -47,7 +50,7 @@ module.exports = {
 					Channel: null,
 					User_From: 1127,
 					User_To: user.ID,
-					Text: `${nodeString} (you were not around when it was announced)`,
+					Text: `${message} (you were not around when it was announced)`,
 					Schedule: null,
 					Created: new sb.Date(),
 					Private_Message: true,
@@ -56,7 +59,7 @@ module.exports = {
 			)));
 
 			const chatPing = pingedUsers.map(i => `@${i.Username}`).join(" ");
-			await sb.Channel.get(38).send(`${chatPing} ${nodeString}`);
+			await sb.Channel.get(38).send(`${chatPing} ${message}`);
 		}
 	})
 };
