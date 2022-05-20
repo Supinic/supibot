@@ -11,195 +11,9 @@ module.exports = {
 		{ name: "weather", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => {
-		const url = "https://ergast.com/api/f1/";
-		const fetchRace = async (year, searchType, searchValue) => {
-			const response = await sb.Got("GenericAPI", `${url}${year}.json`);
-			const races = response.body.MRData?.RaceTable?.Races ?? [];
-			if (races.length === 0) {
-				return {
-					success: false,
-					reply: `This season has no races!`
-				};
-			}
-
-			if (searchType === "current") {
-				const now = new sb.Date();
-				let resultRace;
-
-				for (const race of races) {
-					const raceDate = (race.time)
-						? new sb.Date(`${race.date} ${race.time}`)
-						: new sb.Date(race.date);
-
-					// Add 2 hours to compensate for the race being underway
-					raceDate.addHours(2);
-
-					if (now < raceDate) {
-						resultRace = race;
-						break;
-					}
-				}
-
-				return resultRace ?? null;
-			}
-			else if (searchType === "index") {
-				const race = races.find(i => Number(i.round) === searchValue);
-				return race ?? null;
-			}
-			else if (searchType === "name") {
-				let resultRace;
-				const lower = searchValue.toLowerCase();
-
-				for (const race of races) {
-					const raceName = race.raceName.toLowerCase();
-					const circuitName = race.Circuit.circuitName.toLowerCase();
-					const location = race.Circuit.Location.locality.toLowerCase();
-					const country = race.Circuit.Location.country.toLowerCase();
-
-					if (raceName.includes(lower) || circuitName.includes(lower) || location.includes(lower) || country.includes(lower)) {
-						resultRace = race;
-						break;
-					}
-				}
-
-				return resultRace ?? null;
-			}
-			else {
-				throw new sb.Error({
-					message: "Invalid search type provided",
-					args: { searchType, searchValue }
-				});
-			}
-		};
-		const fetchQualifyingResults = async (year, round) => {
-			const response = await sb.Got("GenericAPI", `${url}${year}/${round}/qualifying.json`);
-			return response.body.MRData?.RaceTable?.Races?.[0]?.QualifyingResults ?? [];
-		};
-		const fetchRaceResults = async (year, round) => {
-			const response = await sb.Got("GenericAPI", `${url}${year}/${round}/results.json`);
-			return response.body.MRData?.RaceTable?.Races?.[0]?.Results ?? [];
-		};
-		const fetchNextRaceDetail = async (context) => {
-			const year = new sb.Date().year;
-			const race = await fetchRace(year, "current");
-			if (!race) {
-				return {
-					success: false,
-					reply: `No next F1 race is currently scheduled!`
-				};
-			}
-
-			const location = race.Circuit.circuitName.split(/\s+/).filter(Boolean);
-			const weatherCommand = sb.Command.get("weather");
-			const fakeWeatherContext = sb.Command.createFakeContext(weatherCommand, {
-				user: context.user,
-				params: {
-					format: "icon,temperature,precipitation"
-				},
-				invocation: "weather"
-			});
-			const getWeather = (time) => weatherCommand.execute(fakeWeatherContext, ...location, time ?? "");
-
-			const now = new sb.Date();
-			const raceStart = new sb.Date(`${race.date} ${race.time}`);
-			const raceEnd = raceStart.clone().addHours(2); // Compensate for the race being underway
-
-			let qualiString = "";
-			const qualiStart = new sb.Date(`${race.Qualifying.date} ${race.Qualifying.time}`);
-			const qualiEnd = qualiStart.clone().addHours(2); // Compensate for the qualifying being underway
-
-			if (now < qualiEnd) {
-				qualiString = "Qualifying";
-
-				if (now < qualiStart) {
-					qualiString += ` will begin ${sb.Utils.timeDelta(qualiStart)}.`;
-
-					if (context.params.weather) {
-						const hourDifference = Math.floor((qualiStart - now) / 36e5);
-						if (hourDifference < 48) {
-							const result = await getWeather(`hour+${hourDifference}`);
-							qualiString += ` Weather forecast: ${result.reply ?? "N/A"}`;
-						}
-						else if (hourDifference < (7 * 24)) {
-							const dayDifference = Math.floor(hourDifference / 24);
-							const result = await getWeather(`day+${dayDifference}`);
-							qualiString += ` Weather forecast: ${result.reply ?? "N/A"}`;
-						}
-						else {
-							qualiString += " Weather forecast not available.";
-						}
-					}
-				}
-				else {
-					qualiString += ` is currently underway.`;
-
-					if (context.params.weather) {
-						const result = await getWeather();
-						qualiString += ` Current weather: ${result.reply ?? "N/A"}`;
-					}
-				}
-			}
-
-			let raceString;
-			if (now < raceStart) {
-				raceString = `Race is scheduled ${sb.Utils.timeDelta(raceStart)}.`;
-
-				if (context.params.weather) {
-					const hourDifference = Math.floor((raceStart - now) / 36e5);
-					if (hourDifference < 48) {
-						const result = await getWeather(`hour+${hourDifference}`);
-						raceString += ` Weather forecast: ${result.reply ?? "N/A"}`;
-					}
-					else if (hourDifference < (7 * 24)) {
-						const dayDifference = Math.floor(hourDifference / 24);
-						const result = await getWeather(`day+${dayDifference}`);
-						raceString += ` Weather forecast: ${result.reply ?? "N/A"}`;
-					}
-					else {
-						qualiString += " Weather forecast not available.";
-					}
-				}
-			}
-			else if (now < raceEnd) {
-				raceString = "Race is currently underway!";
-
-				if (context.params.weather) {
-					const result = await getWeather();
-					raceString += ` Current weather: ${result.reply ?? "N/A"}`;
-				}
-			}
-
-			return {
-				reply: sb.Utils.tag.trim `
-					Next F1 race:
-					Round ${race.round} - ${race.raceName}.
-					${qualiString}
-					${raceString}					
-					${race.url}					
-				`
-			};
-		};
-		const fetchDriverStandings = async (year) => {
-			const response = await sb.Got("GenericAPI", `${url}${year}/driverStandings.json`);
-			return response.body.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings ?? [];
-		};
-		const fetchConstructorStandings = async (year) => {
-			const response = await sb.Got("GenericAPI", `${url}${year}/constructorStandings.json`);
-			return response.body.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings ?? [];
-		};
-
-		return {
-			url,
-			pastaRepeatThreshold: 5,
-			fetchDriverStandings,
-			fetchConstructorStandings,
-			fetchRace,
-			fetchQualifyingResults,
-			fetchRaceResults,
-			fetchNextRaceDetail
-		};
-	}),
+	Static_Data: (() => ({
+		pastaRepeatThreshold: 5
+	})),
 	Code: (async function formula1 (context, ...args) {
 		const {
 			fetchDriverStandings,
@@ -207,9 +21,8 @@ module.exports = {
 			fetchRace,
 			fetchQualifyingResults,
 			fetchRaceResults,
-			fetchNextRaceDetail,
-			pastaRepeatThreshold
-		} = this.staticData;
+			fetchNextRaceDetail
+		} = require("./api-wrapper.js");
 
 		const now = new sb.Date();
 
@@ -349,7 +162,7 @@ module.exports = {
 
 				const pasta = sb.Utils.randArray(availablePastas);
 				this.data.repeatedPastas[channelID].unshift(pasta);
-				this.data.repeatedPastas[channelID].splice(pastaRepeatThreshold);
+				this.data.repeatedPastas[channelID].splice(this.staticData.pastaRepeatThreshold);
 
 				return {
 					reply: pasta
@@ -367,7 +180,7 @@ module.exports = {
 
 				const quote = sb.Utils.randArray(availableQuotes);
 				this.data.repeatedGimi[channelID].unshift(quote);
-				this.data.repeatedGimi[channelID].splice(pastaRepeatThreshold);
+				this.data.repeatedGimi[channelID].splice(this.staticData.pastaRepeatThreshold);
 
 				return {
 					reply: quote
