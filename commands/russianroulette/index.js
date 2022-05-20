@@ -7,9 +7,31 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: (() => ({
+		cannotTimeoutBadges: ["hasModerator", "hasBroadcaster", "hasStaff", "hasAdmin"],
+		outcomes: {
+			blank: [
+				"Bang! The timeout bullet was a blank. It's not very effective.",
+				"Bang! The timeout bullet hits the ceiling. I'm not allowed to time you out monkaS",
+				"Bang! You masterfully dodge the bullet. Seems like your agility level is too high.",
+				"Bang! You stop the bullet in front of the palm of your hand. How? Are you The One?"
+			],
+			nerf: [
+				"Poof! You got hit in the face by a nerf pellet. It's not very effective.",
+				"Bonk! You got hit on the head with an inflatable hammer. It doesn't do anything.",
+				"Woosh! A splash of water gushes from the gun. Best I can do, sorry.",
+				"Pop! You got \"hit\" by my finger guns 👉👉. Nothing happens."
+			],
+			real: [
+				"Bang! It's over.",
+				"Bang! See you in a bit.",
+				"Bang! Sayonara.",
+				"Bang! Time for a bit of a break."
+			]
+		}
+	})),
 	Code: (async function russianRoulette (context, timeoutLength) {
-		if (context.channel === null || context.channel.Mode !== "Moderator") {
+		if (context.channel === null) {
 			return {
 				success: false,
 				reply: "You cannot play the roulette in here!"
@@ -19,30 +41,6 @@ module.exports = {
 			return {
 				success: false,
 				reply: "You cannot play the roulette outside of Twitch!"
-			};
-		}
-		else if (context.append.userBadges.hasModerator) {
-			return {
-				success: false,
-				reply: "Moderators can't be timed out, cheaters!"
-			};
-		}
-		else if (context.append.userBadges.hasBroadcaster) {
-			return {
-				success: false,
-				reply: "Broadcasters can't be timed out, cheaters!"
-			};
-		}
-		else if (context.append.userBadges.hasStaff) {
-			return {
-				success: false,
-				reply: "Staff can't be timed out, cheaters!"
-			};
-		}
-		else if (context.append.userBadges.hasAdmin) {
-			return {
-				success: false,
-				reply: "Admins can't be timed out, cheaters! monkaS"
 			};
 		}
 
@@ -63,26 +61,49 @@ module.exports = {
 			};
 		}
 
+		const { userBadges } = context.append;
+
+		let timeoutMode;
+		if (context.channel.Mode !== "Moderator") {
+			timeoutMode = "nerf";
+		}
+		else if (this.staticData.cannotTimeoutBadges.some(i => userBadges[i] === true)) {
+			timeoutMode = "blank";
+		}
+		else {
+			timeoutMode = "real";
+		}
+
 		const result = sb.Utils.random(1, 6);
 		if (result === 1) {
-			try {
-				await context.platform.client.timeout(
-					context.channel.Name,
-					context.user.Name,
-					timeoutLength,
-					"Lost the roulette"
-				);
+			if (timeoutMode === "real") {
+				try {
+					await context.platform.client.timeout(
+						context.channel.Name,
+						context.user.Name,
+						timeoutLength,
+						"Lost the roulette"
+					);
+				}
+				catch {
+					const emote = await context.getBestAvailableEmote(["LULW", "LuL", "LUL"], "😄");
+					return {
+						success: false,
+						reply: `Could not time you out, because Twitch said nothing and left! ${emote}`
+					};
+				}
 			}
-			catch {
-				const emote = await context.getBestAvailableEmote(["LULW", "LuL", "LUL"], "😄");
-				return {
-					success: false,
-					reply: `Could not time you out, because Twitch said nothing and left! ${emote}`
-				};
+
+			let outcome = sb.Utils.randArray(this.staticData.outcomes[timeoutMode]);
+			if (timeoutMode === "nerf") {
+				outcome += ` (can't time out anyone if I'm not a moderator)`;
+			}
+			else if (timeoutMode === "blank") {
+				outcome += ` (can't time you out)`;
 			}
 
 			return {
-				reply: "Bang! It's over."
+				reply: outcome
 			};
 		}
 		else {
