@@ -24,16 +24,16 @@ const getWeather = async (context, sessionStart, location) => {
 	const now = sb.Date.now();
 	const hourDifference = Math.floor((sessionStart - now) / 36e5);
 	if (hourDifference <= 1) {
-		const result = weatherCommand.execute(fakeWeatherContext, ...location);
+		const result = await weatherCommand.execute(fakeWeatherContext, ...location);
 		return `Current weather: ${result.reply ?? "N/A"}`;
 	}
 	else if (hourDifference < 48) {
-		const result = weatherCommand.execute(fakeWeatherContext, ...location, `hour+${hourDifference}`);
+		const result = await weatherCommand.execute(fakeWeatherContext, ...location, `hour+${hourDifference}`);
 		return `Weather forecast: ${result.reply ?? "N/A"}`;
 	}
 	else if (hourDifference < (7 * 24)) {
 		const dayDifference = Math.floor(hourDifference / 24);
-		const result = weatherCommand.execute(fakeWeatherContext, ...location, `day+${dayDifference}`);
+		const result = await weatherCommand.execute(fakeWeatherContext, ...location, `day+${dayDifference}`);
 		return `Weather forecast: ${result.reply ?? "N/A"}`;
 	}
 	else {
