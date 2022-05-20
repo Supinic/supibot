@@ -323,6 +323,13 @@ module.exports = {
 					};
 				}
 
+				if (channelData.Name === context.user.Name) {
+					return {
+						success: false,
+						reply: `Use the previous username you renamed from instead of your current one!`
+					};
+				}
+
 				const result = await controller.executeChannelRename(channelData);
 				if (result.success === true) {
 					if (result.joinFailed) {
