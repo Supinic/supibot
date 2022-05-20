@@ -11,6 +11,12 @@ module.exports = {
 	Code: (async function isDown (context, input) {
 		const { domainToASCII } = require("url");
 		const fixedInput = domainToASCII(input) || input; // domainToASCII returns empty string for invalid input - hence ||
+		if (fixedInput.includes("shouldiblamecaching.com")) {
+			return {
+				reply: `That website is currently up and available. However, this result may be invalid due to caching.`
+			};
+		}
+
 		const response = await sb.Got("GenericAPI", {
 			url: `https://api-prod.downfor.cloud/httpcheck/${fixedInput}`
 		});
