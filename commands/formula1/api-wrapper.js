@@ -1,11 +1,12 @@
 const url = "https://ergast.com/api/f1/";
 const weatherCommand = sb.Command.get("weather");
-const sessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying"];
+const sessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying", "Sprint"];
 const sessionNames = {
 	FirstPractice: "First practice",
 	SecondPractice: "Second practice",
 	ThirdPractice: "Third practice",
-	Qualifying: "Qualifying"
+	Qualifying: "Qualifying",
+	Sprint: "Sprint race"
 };
 
 const getWeather = async (context, sessionStart, location) => {
