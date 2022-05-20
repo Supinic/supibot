@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["rr"],
 	Author: "supinic",
 	Cooldown: 15000,
-	Description: "Play the roulette. If you win, nothing happens; if you lose, you get timed out. You can add a number 1-600 (default: 1) which says how long you will be timed out, should you lose. Only works in channels where Supibot is moderator.",
+	Description: "Play the roulette. If you win, nothing happens; if you lose, you get timed out. You can add a number 1-600 (default: 1) which says how long you will be timed out, should you lose. You can use the command anywhere, but you can only get timed out in a channel where Supibot is a moderator.",
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
