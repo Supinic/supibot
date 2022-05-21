@@ -528,7 +528,7 @@ module.exports = {
 
 						if (link.toLowerCase() === "last") {
 							const tl = sb.Command.get("tl");
-							const key = tl.staticData.createRecentUseCacheKey(context);
+							const key = createRecentTwitchLottoCacheKey(context);
 
 							const cacheData = await tl.getCacheData(key);
 							if (!cacheData) {
