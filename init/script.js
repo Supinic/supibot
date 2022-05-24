@@ -34,7 +34,7 @@ const config = {
 		"data/database",
 		"data/tables/Config"
 	],
-	initialDataFiles: [
+	initialDataFilePaths: [
 		"chat_data/Platform",
 		"data/Config"
 	],
