@@ -197,6 +197,22 @@ describe("Command parameter parsing", () => {
 		}
 	});
 
+	it("returns a correct explicit empty string", () => {
+		const result = Command.parseParametersFromArguments(
+			paramsDefinition,
+			[`string:""`]
+		);
+
+		assert.strictEqual(result.success, true, `Param parsing must not fail: ${JSON.stringify(result)}`);
+		assert.strictEqual(Object.keys(result.parameters).length, 1, "Exactly one param must be extracted");
+		assert.strictEqual(result.args.length, 0, "Remaining args must be an empty array");
+
+		const value = result.parameters.string;
+		checkParameterType(value, "string");
+
+		assert.strictEqual(result.parameters.string, "", "Resulting parameter must be an empty string");
+	});
+
 	it("returns a correctly typed single argument and remaining non-param args", () => {
 		const remaining = ["a", "b", "c"];
 		const result = Command.parseParametersFromArguments(
