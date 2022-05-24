@@ -9,7 +9,7 @@ module.exports = {
 		{ name: "function", type: "string" },
 		{ name: "importGist", type: "string" }
 	],
-	Whitelist_Response: null,
+	Whitelist_Response: "Only administrators can access the debug command!",
 	Static_Data: null,
 	Code: (async function debug (context, ...args) {
 		const permissions = await context.getUserPermissions();
