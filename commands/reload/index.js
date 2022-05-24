@@ -20,6 +20,13 @@ module.exports = {
 			}
 
 			if (context.params.skipUpgrade !== true) {
+				if (context.channel) {
+					await context.channel.send("ppCircle running yarn upgrade, please wait ppCircle");
+				}
+				else {
+					await context.platform.pm("ppCircle running yarn upgrade, please wait ppCircle", context.user.Name);
+				}
+
 				await shell("yarn upgrade supi-core");
 			}
 
