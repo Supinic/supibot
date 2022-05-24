@@ -342,6 +342,21 @@ const types = [
 		description: "Transforms your input into Base-64 encoding.",
 		data: (string) => Buffer.from(string, "utf8").toString("base64"),
 		reverseData: (string) => Buffer.from(string, "base64").toString("utf8")
+	},
+	{
+		name: "ascii",
+		type: "method",
+		aliases: [],
+		description: "Transforms your input into ASCII number representation.",
+		data: (string) => string.split("").map(i => i.charCodeAt(0)).join(" "),
+		reverseData: (string) => {
+			const data = string
+				.split(/\s+/)
+				.map(Number)
+				.filter(i => sb.Utils.isValidInteger(i));
+
+			return String.fromCodePoint(...data);
+		}
 	}
 ];
 
