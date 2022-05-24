@@ -348,14 +348,20 @@ const types = [
 		type: "method",
 		aliases: [],
 		description: "Transforms your input into ASCII number representation.",
-		data: (string) => string.split("").map(i => i.charCodeAt(0)).join(" "),
+		data: (string) => new TextEncoder().encode(string).join(" "),
+		reverseData: (string) => new TextDecoder().decode(new Uint8Array(string.split(/\s+/).map(Number)))
+	},
+	{
+		name: "hex",
+		type: "method",
+		aliases: ["hexadecimal"],
+		description: "Transforms your input into a string of hexadecimal identifiers, based on their ASCII representation. The characters should be two-byte, separated or not.",
+		data: (string) => Array.from(new TextEncoder().encode(string)).map(i => i.toString(16)).join(""),
 		reverseData: (string) => {
-			const data = string
-				.split(/\s+/)
-				.map(Number)
-				.filter(i => sb.Utils.isValidInteger(i));
+			const regexMatch = string.matchAll(/([a-f0-9]{2})(\W)?/gi);
+			const hexArray = regexMatch.map(i => parseInt(i[1], 16));
 
-			return String.fromCodePoint(...data);
+			return new TextDecoder().decode(new Uint8Array(hexArray));
 		}
 	}
 ];
