@@ -15,7 +15,7 @@ module.exports = {
 	Code: (async function current (context, ...args) {
 		const linkSymbol = sb.Config.get("VIDEO_TYPE_REPLACE_PREFIX");
 		const state = sb.Config.get("SONG_REQUESTS_STATE");
-	
+
 		if (state === "off") {
 			return {
 				reply: "Song requests are currently turned off."
@@ -28,12 +28,12 @@ module.exports = {
 					reply: "Nothing is currently playing."
 				};
 			}
-	
+
 			let leaf = item;
 			while (leaf.type !== "leaf" && leaf.children.length > 0) {
 				leaf = leaf.children[0];
 			}
-	
+
 			return {
 				reply: `Currently playing: ${leaf.name}`
 			};
@@ -44,13 +44,13 @@ module.exports = {
 
 			const client = controller.clients.get(channelData.ID);
 			const playing = client.currentlyPlaying ?? client.playlistData[0];
-	
+
 			if (!playing) {
 				return {
 					reply: "Nothing is currently playing on Cytube."
 				};
 			}
-	
+
 			const media = playing.media;
 			const prefix = await sb.Query.getRecordset(rs => rs
 				.select("Link_Prefix")
@@ -60,7 +60,7 @@ module.exports = {
 				.single()
 				.flat("Link_Prefix")
 			);
-	
+
 			const link = prefix.replace(linkSymbol, media.id);
 			if (context.params.linkOnly) {
 				return {
@@ -73,18 +73,18 @@ module.exports = {
 				reply: `Currently playing on Cytube: ${media.title} ${link} (${media.duration}), queued by ${requester}`
 			};
 		}
-	
+
 		let type = (context.invocation === "current")
 			? "current"
 			: (args.shift() ?? "current");
-	
+
 		if (!this.staticData.types.includes(type)) {
 			type = "current";
 		}
-	
+
 		let includePosition = false;
 		let introductionString = null;
-	
+
 		const playing = await sb.Query.getRecordset(rs => {
 			rs.select("Name", "VLC_ID", "Link", "User_Alias AS User", "Start_Time", "End_Time")
 				.select("Video_Type.Link_Prefix AS Prefix")
@@ -96,7 +96,7 @@ module.exports = {
 				})
 				.limit(1)
 				.single();
-	
+
 			if (type === "previous") {
 				introductionString = "Previously played:";
 				rs.where("Status = %s", "Inactive");
@@ -112,10 +112,10 @@ module.exports = {
 				rs.where("Status = %s", "Queued");
 				rs.orderBy("Song_Request.ID ASC");
 			}
-	
+
 			return rs;
 		});
-	
+
 		if (playing) {
 			const link = playing.Prefix.replace(linkSymbol, playing.Link);
 			if (context.params.linkOnly) {
@@ -134,13 +134,20 @@ module.exports = {
 				segmentLength = (playing.End_Time ?? length) - (playing.Start_Time ?? 0);
 			}
 
-			const position = (includePosition)
-				? `Current position: ${currentPosition}/${segmentLength}s.`
-				: "";
+			let position = "";
+			if (includePosition) {
+				if (currentPosition === -1) {
+					position = "The song is currently being queued, but hasn't started playing yet.";
+				}
+				else {
+					position = `Current position: ${currentPosition}/${segmentLength}s.`;
+				}
+			}
+
 			const pauseString = (sb.Config.get("SONG_REQUESTS_VLC_PAUSED"))
 				? "The song request is paused at the moment."
 				: "";
-	
+
 			return {
 				reply: sb.Utils.tag.trim `
 					${introductionString}
@@ -163,15 +170,15 @@ module.exports = {
 	Dynamic_Description: (async (prefix) => [
 		`Checks the currently playinyg song on Supinic's channel/stream`,
 		``,
-	
+
 		`<code>${prefix}song</code>`,
 		`Currently playing: (link)`,
 		``,
-	
+
 		`<code>${prefix}song linkOnly:true</code>`,
 		`(link)`,
 		``,
-	
+
 		`<code>${prefix}song previous</code>`,
 		`Last played song: (link)`,
 		``,
