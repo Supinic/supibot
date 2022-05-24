@@ -359,7 +359,7 @@ const types = [
 		data: (string) => Array.from(new TextEncoder().encode(string)).map(i => i.toString(16)).join(""),
 		reverseData: (string) => {
 			const regexMatch = string.matchAll(/([a-f0-9]{2})(\W)?/gi);
-			const hexArray = regexMatch.map(i => parseInt(i[1], 16));
+			const hexArray = Array.from(regexMatch).map(i => parseInt(i[1], 16));
 
 			return new TextDecoder().decode(new Uint8Array(hexArray));
 		}
