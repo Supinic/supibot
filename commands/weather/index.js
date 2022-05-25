@@ -117,7 +117,7 @@ module.exports = {
 		let formattedAddress = null;
 		let isOwnLocation = null;
 
-		if (typeof latitude === "number" || typeof longitude === "number") {
+		if (typeof context.param.latitude === "number" || typeof context.param.longitude === "number") {
 			const { latitude, longitude } = context.params;
 			if (typeof latitude !== "number" || typeof longitude !== "number") {
 				return {
