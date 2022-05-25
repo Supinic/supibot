@@ -73,9 +73,9 @@ module.exports = {
 			}
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
+	Dynamic_Description: (async (prefix) => {
 		const lorem = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
-		const { types, convert } = values.getStaticData();
+		const { types, convert } = require("./transforms.js");
 
 		const sortedTypes = [...types].sort((a, b) => a.name.localeCompare(b.name));
 		const examples = sortedTypes.map(transform => {
@@ -105,6 +105,10 @@ module.exports = {
 
 			`Note: if used within the <a href="/bot/command/detail/pipe">pipe command</a>, this command has no cooldown, and you can use it multiple times within the same pipe!`,
 			"",
+
+			`<code>${prefix}tt (type) (text)</code>`,
+			`<code>${prefix}texttransform (type) (text)</code>`,
+			"Provided text transformed based on the type selected.",
 
 			`Example text: ${lorem}`,
 			"",
