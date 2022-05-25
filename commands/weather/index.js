@@ -8,6 +8,8 @@ module.exports = {
 	Params: [
 		{ name: "alerts", type: "boolean" },
 		{ name: "format", type: "string" },
+		{ name: "latitude", type: "number" },
+		{ name: "longitude", type: "number" },
 		{ name: "pollution", type: "boolean" }
 	],
 	Whitelist_Response: null,
@@ -115,7 +117,34 @@ module.exports = {
 		let formattedAddress = null;
 		let isOwnLocation = null;
 
-		if (args.length === 0) {
+		if (context.params.latitude || context.params.longitude) {
+			const { latitude, longitude } = context.params;
+			if (typeof latitude !== "number" || typeof longitude === "number") {
+				return {
+					success: false,
+					reply: `If using exact coordinates, you must specify both the latitude and the longitude!`
+				};
+			}
+
+			if (latitude > 90 || latitude < -90) {
+				return {
+					success: false,
+					reply: `Invalid latitude! Must be in range <-90, 90>`
+				};
+			}
+			else if (longitude < -180 || longitude > 180) {
+				return {
+					success: false,
+					reply: `Invalid longitude! Must be in range <-180, 180>`
+				};
+			}
+
+			coords = {
+				lat: latitude,
+				lng: longitude
+			};
+		}
+		else if (args.length === 0) {
 			isOwnLocation = true;
 
 			const location = await context.user.getDataProperty("location");
@@ -618,6 +647,10 @@ module.exports = {
 			`<code>${prefix}weather (place) format:temperature,humidity,pressure</code>`,
 			"Lets you choose specific weather elements to show in the result.",
 			`Supported elements: <code>${allowedTypes.join(", ")}</code>`,
+			"",
+
+			`<code>${prefix}weather latitude:(number) longitude:(number)</code>`,
+			"Allows you to query a location to find weather in by GPS coordinates precisely.",
 			"",
 
 			"",
