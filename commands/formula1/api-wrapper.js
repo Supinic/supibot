@@ -126,7 +126,7 @@ const fetchNextRaceDetail = async (context) => {
 
 	const coordinates = {
 		latitude: race.Circuit.Location.lat,
-		longitude: race.Circuit.Location.lng
+		longitude: race.Circuit.Location.long
 	};
 
 	const now = new sb.Date();
