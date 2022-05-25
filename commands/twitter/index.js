@@ -7,6 +7,7 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "includeRetweets", type: "boolean" },
+		{ name: "mediaOnly", type: "boolean" },
 		{ name: "random", type: "boolean" },
 		{ name: "textOnly", type: "boolean" }
 	],
@@ -111,6 +112,16 @@ module.exports = {
 			eligibleTweets = notRetweets;
 		}
 
+		if (context.params.mediaOnly) {
+			eligibleTweets = eligibleTweets.filter(i => i.entities.media.length > 0);
+			if (eligibleTweets.length === 0) {
+				return {
+					success: false,
+					reply: `There are no recent tweets that have any kind of media attached to them!`
+				};
+			}
+		}
+
 		let tweet;
 		if (context.params.random) {
 			tweet = sb.Utils.randArray(eligibleTweets);
@@ -125,17 +136,23 @@ module.exports = {
 			};
 		}
 
-		const fixedText = sb.Utils.fixHTML(tweet.text);
-		if (context.params.textOnly) {
+		const delta = sb.Utils.timeDelta(new sb.Date(tweet.created_at));
+		const fixedText = sb.Utils.fixHTML(tweet.text ?? "");
+		if (context.params.mediaOnly) {
+			const links = tweet.entities.media.map(i => i.media_url_https).join(" ");
 			return {
-				reply: fixedText
+				reply: (context.params.textOnly)
+					? links
+					: `${fixedText} ${links} (posted ${delta}}`
 			};
 		}
-
-		const delta = sb.Utils.timeDelta(new sb.Date(tweet.created_at));
-		return {
-			reply: `${fixedText} (posted ${delta})`
-		};
+		else {
+			return {
+				reply: (context.params.textOnly)
+					? fixedText
+					: `${fixedText} (posted ${delta}}`
+			};
+		}
 	}),
 	Dynamic_Description: async (prefix) => [
 		"Fetches the last tweet of a provided account.",
@@ -155,7 +172,16 @@ module.exports = {
 		"Gets the last tweet, including retweets",
 		"",
 
+		`<code>${prefix}twitter mediaOnly:true (account)</code>`,
+		"Filters out all tweets that contain no media.",
+		"",
+
 		`<code>${prefix}twitter textOnly:true (account)</code>`,
-		"Gets the last tweet only - without the date of posting and all other descriptions that come with the command"
+		"Gets the text of the last tweet only - without the date of posting and all other descriptions that come with the command",
+		"",
+
+		`<code>${prefix}twitter textOnly:true mediaOnly:true (account)</code>`,
+		"Filters out all tweets that contain no media, and only posts the link(s) to the media in a given tweet.",
+		""
 	]
 };
