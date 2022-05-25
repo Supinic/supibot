@@ -9,7 +9,7 @@ const sessionNames = {
 	Sprint: "Sprint race"
 };
 
-const getWeather = async (context, sessionStart, location) => {
+const getWeather = async (context, sessionStart, coordinates) => {
 	if (!weatherCommand) {
 		return "Weather checking is not available!";
 	}
@@ -17,6 +17,8 @@ const getWeather = async (context, sessionStart, location) => {
 	const fakeWeatherContext = sb.Command.createFakeContext(weatherCommand, {
 		user: context.user,
 		params: {
+			latitude: coordinates.latitude,
+			longitude: coordinates.longitude,
 			format: "icon,temperature,precipitation"
 		},
 		invocation: "weather"
@@ -25,16 +27,16 @@ const getWeather = async (context, sessionStart, location) => {
 	const now = sb.Date.now();
 	const hourDifference = Math.floor((sessionStart - now) / 36e5);
 	if (hourDifference <= 1) {
-		const result = await weatherCommand.execute(fakeWeatherContext, ...location);
+		const result = await weatherCommand.execute(fakeWeatherContext);
 		return `Current weather: ${result.reply ?? "N/A"}`;
 	}
 	else if (hourDifference < 48) {
-		const result = await weatherCommand.execute(fakeWeatherContext, ...location, `hour+${hourDifference}`);
+		const result = await weatherCommand.execute(fakeWeatherContext, `hour+${hourDifference}`);
 		return `Weather forecast: ${result.reply ?? "N/A"}`;
 	}
 	else if (hourDifference < (7 * 24)) {
 		const dayDifference = Math.floor(hourDifference / 24);
-		const result = await weatherCommand.execute(fakeWeatherContext, ...location, `day+${dayDifference}`);
+		const result = await weatherCommand.execute(fakeWeatherContext, `day+${dayDifference}`);
 		return `Weather forecast: ${result.reply ?? "N/A"}`;
 	}
 	else {
@@ -122,7 +124,10 @@ const fetchNextRaceDetail = async (context) => {
 		};
 	}
 
-	const location = race.Circuit.circuitName.split(/\s+/).filter(Boolean);
+	const coordinates = {
+		latitude: race.Circuit.Location.lat,
+		longitude: race.Circuit.Location.lng
+	};
 
 	const now = new sb.Date();
 	const raceStart = new sb.Date(`${race.date} ${race.time}`);
@@ -160,7 +165,7 @@ const fetchNextRaceDetail = async (context) => {
 		}
 
 		if (context.params.weather) {
-			const weatherResult = await getWeather(context, nextSessionStart, location);
+			const weatherResult = await getWeather(context, nextSessionStart, coordinates);
 			nextSessionString += ` ${weatherResult}`;
 		}
 	}
@@ -174,7 +179,7 @@ const fetchNextRaceDetail = async (context) => {
 	}
 
 	if (context.params.weather) {
-		const weatherResult = await getWeather(context, raceStart, location);
+		const weatherResult = await getWeather(context, raceStart, coordinates);
 		raceString += ` ${weatherResult}`;
 	}
 
