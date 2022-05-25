@@ -113,7 +113,7 @@ module.exports = {
 		}
 
 		if (context.params.mediaOnly) {
-			eligibleTweets = eligibleTweets.filter(i => i.entities.media.length > 0);
+			eligibleTweets = eligibleTweets.filter(i => Array.isArray(i.entities.media) && i.entities.media.length !== 0);
 			if (eligibleTweets.length === 0) {
 				return {
 					success: false,
