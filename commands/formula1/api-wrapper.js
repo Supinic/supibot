@@ -17,8 +17,8 @@ const getWeather = async (context, sessionStart, coordinates) => {
 	const fakeWeatherContext = sb.Command.createFakeContext(weatherCommand, {
 		user: context.user,
 		params: {
-			latitude: coordinates.latitude,
-			longitude: coordinates.longitude,
+			latitude: Number(coordinates.latitude),
+			longitude: Number(coordinates.longitude),
 			format: "icon,temperature,precipitation"
 		},
 		invocation: "weather"
