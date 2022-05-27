@@ -265,7 +265,7 @@ const subcommands = [
 
 			/** @type {PlaylistVideo} */
 			const video = sb.Utils.randArray(deathData.videoCache);
-			const emote = context.getBestAvailableEmote(
+			const emote = await context.getBestAvailableEmote(
 				["PepeLaugh", "pepeLaugh", "LULW", "LULE", "LuL"],
 				"😂"
 			);
