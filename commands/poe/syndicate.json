@@ -1,0 +1,121 @@
+[
+  {
+    "name": "Aisling",
+    "transportation": "Veiled weapons",
+    "fortification": "Veiled armour",
+    "research": "Add veiled mods",
+    "intervention": "Metamorph scarabs"
+  },
+  {
+    "name": "Cameria",
+    "transportation": "Timeworn item",
+    "fortification": "Harbinger orbs",
+    "research": "Sextants",
+    "intervention": "Sulphite scarabs"
+  },
+  {
+    "name": "Elreon",
+    "transportation": "Unique weapons",
+    "fortification": "Unique armours",
+    "research": "Unique jewellery",
+    "intervention": "Reliquary scarabs"
+  },
+  {
+    "name": "Gravicius",
+    "transportation": "Full divination card stack",
+    "fortification": "Random divination cards",
+    "research": "Swap divination card",
+    "intervention": "Divination scarabs"
+  },
+  {
+    "name": "Guff",
+    "transportation": "Craft with chaos",
+    "fortification": "Craft with essences",
+    "research": "Craft with annul/exalt",
+    "intervention": "Craft with alterations"
+  },
+  {
+    "name": "Haku",
+    "transportation": "Rare items",
+    "fortification": "Random strongbox",
+    "research": "Rare items with quality",
+    "intervention": "Ambush scarabs"
+  },
+  {
+    "name": "Hillock",
+    "transportation": "Quality weapons",
+    "fortification": "Quality armour",
+    "research": "Quality flask",
+    "intervention": "Quality map"
+  },
+  {
+    "name": "It That Fled",
+    "transportation": "Breach splinters",
+    "fortification": "Abyss jewels",
+    "research": "Upgrade breachstone",
+    "intervention": "Breach scarabs"
+  },
+  {
+    "name": "Janus",
+    "transportation": "Quality currency",
+    "fortification": "Currency shards",
+    "research": "Perandus coins",
+    "intervention": "Perandus scarabs"
+  },
+  {
+    "name": "Jorgin",
+    "transportation": "Talismans",
+    "fortification": "Bestiary items",
+    "research": "Transform amulet to talisman",
+    "intervention": "Bestiary scarabs"
+  },
+  {
+    "name": "Korell",
+    "transportation": "Essences",
+    "fortification": "Map fragments",
+    "research": "Fossils",
+    "intervention": "Elder scarabs"
+  },
+  {
+    "name": "Leo",
+    "transportation": "Silver coins",
+    "fortification": "Random currency",
+    "research": "Use currency on item",
+    "intervention": "Torment scarabs"
+  },
+  {
+    "name": "Riker",
+    "transportation": "Take currency",
+    "fortification": "Take unique item",
+    "research": "Take veiled rare",
+    "intervention": "Take divination card"
+  },
+  {
+    "name": "Rin",
+    "transportation": "Normal maps",
+    "fortification": "Rare maps",
+    "research": "Unique maps",
+    "intervention": "Cartography scarabs"
+  },
+  {
+    "name": "Tora",
+    "transportation": "Timed item trap",
+    "fortification": "Enchanted item",
+    "research": "Add experience to gem",
+    "intervention": "Harbinger scarabs"
+  },
+  {
+    "name": "Vagan",
+    "transportation": "Legion splinters",
+    "fortification": "Legion chests",
+    "research": "Incubators",
+    "intervention": "Legion scarabs"
+  },
+  {
+    "name": "Vorici",
+    "transportation": "Quality gems",
+    "fortification": "Socketing currency",
+    "research": "Add white sockets to item",
+    "intervention": "Shaper scarabs"
+  }
+]
