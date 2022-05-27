@@ -21,6 +21,27 @@ const labyrinthData = {
 	uber: null
 };
 
+const randomDeathData = [
+	{
+		player: "zizaran",
+		aliases: ["ziz"],
+		playlists: [
+			"PLbpExg9_Xax24tS9rNt8IP49VFFaDghAG"
+		],
+		/** @type {PlaylistVideo[]} */
+		videoCache: []
+	},
+	{
+		player: "quin69",
+		aliases: ["quin"],
+		playlists: [
+			"PLcKDsqoF983aHkqXwR1HmkE7F2u6MI_FQ"
+		],
+		/** @type {PlaylistVideo[]} */
+		videoCache: []
+	}
+];
+
 const subcommands = [
 	{
 		name: "labyrinth",
@@ -206,6 +227,51 @@ const subcommands = [
 
 			return {
 				reply: `The ${patch} ${name} league has likely concluded. Ask @Supinic to add new info about the next league!`
+			};
+		}
+	},
+	{
+		name: "randomdeath",
+		aliases: ["rd"],
+		description: "Links a random YouTube video or clip regarding a streamer's death.",
+		execute: async (context, player) => {
+			player = (player ?? "zizaran").toLowerCase();
+
+			const deathData = randomDeathData.find(i => i.player === player || i.aliases.includes(player));
+			if (!deathData) {
+				return {
+					success: false,
+					reply: `There are no random death clips for that player!`
+				};
+			}
+			
+			if (deathData.videoCache.length === 0) {
+				const playlist = sb.Utils.randArray(deathData.playlists);
+				const { result, reason, success } = await sb.Utils.fetchYoutubePlaylist({
+					key: sb.Config.get("API_GOOGLE_YOUTUBE"),
+					playlistID: playlist
+				});
+
+				if (!success) {
+					return {
+						success,
+						reply: `Playlist could not be fetched! Reason: ${reason}`
+					};
+				}
+				else {
+					deathData.videoCache = result;
+				}
+			}
+
+			/** @type {PlaylistVideo} */
+			const video = sb.Utils.randArray(deathData.videoCache);
+			const emote = context.getBestAvailableEmote(
+				["PepeLaugh", "pepeLaugh", "LULW", "LULE", "LuL"],
+				"😂"
+			);
+
+			return {
+				reply: `${emote} 👉 https://youtu.be/${video.ID}`
 			};
 		}
 	}
