@@ -1,6 +1,6 @@
 const ascendancies = require("./ascendancies.json");
-const syndicate = require("syndicate.json");
-const leagues = require("leagues.json");
+const syndicate = require("./syndicate.json");
+const leagues = require("./leagues.json");
 const gems = require("./gems.json");
 const additionalGems = gems.filter(i => i.type === "additional");
 const skillGems = gems.filter(i => i.type === "main");
@@ -244,7 +244,7 @@ const subcommands = [
 					reply: `There are no random death clips for that player!`
 				};
 			}
-			
+
 			if (deathData.videoCache.length === 0) {
 				const playlist = sb.Utils.randArray(deathData.playlists);
 				const { result, reason, success } = await sb.Utils.fetchYoutubePlaylist({
