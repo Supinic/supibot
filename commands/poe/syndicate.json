@@ -1,16 +1,16 @@
 [
   {
     "name": "Aisling",
-    "transportation": "Veiled weapons",
-    "fortification": "Veiled armour",
+    "transportation": "Twice veiled weapons and jewellery",
+    "fortification": "Twice veiled armour and jewellery",
     "research": "Add veiled mods",
-    "intervention": "Metamorph scarabs"
+    "intervention": "Torment scarabs"
   },
   {
     "name": "Cameria",
-    "transportation": "Timeworn item",
+    "transportation": "League-specific uniques",
     "fortification": "Harbinger orbs",
-    "research": "Sextants",
+    "research": "Orbs of unmaking",
     "intervention": "Sulphite scarabs"
   },
   {
@@ -43,15 +43,15 @@
   },
   {
     "name": "Hillock",
-    "transportation": "Quality weapons",
-    "fortification": "Quality armour",
-    "research": "Quality flask",
-    "intervention": "Quality map"
+    "transportation": "Quality weapons 24/26/28/30",
+    "fortification": "Quality armour 24/26/28/30",
+    "research": "Quality flask 22/24/26/28",
+    "intervention": "Abyss scarabs"
   },
   {
     "name": "It That Fled",
     "transportation": "Breach splinters",
-    "fortification": "Abyss jewels",
+    "fortification": "Enchanted maps (+ breach)",
     "research": "Upgrade breachstone",
     "intervention": "Breach scarabs"
   },
@@ -59,8 +59,8 @@
     "name": "Janus",
     "transportation": "Quality currency",
     "fortification": "Currency shards",
-    "research": "Perandus coins",
-    "intervention": "Perandus scarabs"
+    "research": "Expedition currency",
+    "intervention": "Expedition scarabs"
   },
   {
     "name": "Jorgin",
@@ -78,17 +78,17 @@
   },
   {
     "name": "Leo",
-    "transportation": "Silver coins",
+    "transportation": "Catalysts",
     "fortification": "Random currency",
     "research": "Use currency on item",
-    "intervention": "Torment scarabs"
+    "intervention": "Metamorph scarabs"
   },
   {
     "name": "Riker",
     "transportation": "Take currency",
     "fortification": "Take unique item",
     "research": "Take veiled rare",
-    "intervention": "Take divination card"
+    "intervention": "Blight scarabs"
   },
   {
     "name": "Rin",
@@ -101,7 +101,7 @@
     "name": "Tora",
     "transportation": "Timed item trap",
     "fortification": "Enchanted item",
-    "research": "Add experience to gem",
+    "research": "Gem experience (20M/70M/200M)",
     "intervention": "Harbinger scarabs"
   },
   {
@@ -115,7 +115,7 @@
     "name": "Vorici",
     "transportation": "Quality gems",
     "fortification": "Socketing currency",
-    "research": "Add white sockets to item",
+    "research": "Add white sockets to item (up to 1/2/3/6)",
     "intervention": "Shaper scarabs"
   }
 ]
