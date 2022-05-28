@@ -60,11 +60,23 @@ module.exports = {
 			reply: cookie.Text
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
-		"Fetch a daily fortune cookie and read its wisdom!",
-		"Only available once per day, and resets at midnight UTC.",
-		"No arguments",
-		"",
-		`${prefix}cookie => <Random wisdom!>`
-	])
+	Dynamic_Description: (async (prefix) => {
+		const tomorrow = new sb.Date().addDays(1);
+		const nextMidnight = new sb.Date(sb.Date.UTC(tomorrow.getUTCFullYear(), tomorrow.getUTCMonth(), tomorrow.getUTCDate()));
+		const delta = sb.Utils.timeDelta(nextMidnight);
+
+		return [
+			"Fetch a daily fortune cookie and read its wisdom!",
+			`Only available once per day, and resets at midnight UTC, which is ${delta}`,
+			"",
+
+			`Cookies can also be gifted to other users, via the <a href="/bot/command/detail/gift"><code>${prefix}gift cookie</code></a> command.`,
+			`You can check the <a href="/bot/cookie/list">cookie leaderboards as well.`,
+			"",
+
+			`<code>${prefix}cookie</code>`,
+			"Opens your daily fortune cookie.",
+			""
+		];
+	})
 };
