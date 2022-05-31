@@ -30,9 +30,12 @@ module.exports = {
 
 		return await subcommand.execute(context, identifier);
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { variables } = values.getStaticData();
-		const list = variables.map(i => {
+	Dynamic_Description: (async (prefix) => {
+		const getCommands = require("./subcommands.js");
+
+		// no need to pass the command itself as param, since no subcommands are executed
+		const subcommands = getCommands(null);
+		const list = subcommands.map(i => {
 			const aliases = (i.aliases && i.aliases.length > 0)
 				? ` (${i.aliases.join(", ")})`
 				: "";
