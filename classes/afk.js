@@ -139,7 +139,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 
 			if (channelData.Mirror) {
 				const mirroredMessage = `${userData.Name} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
-				await channelData.mirror(mirroredMessage, null, { commandUsed: false })
+				await channelData.mirror(mirroredMessage, null, { commandUsed: false });
 			}
 
 			const unpingedMessage = await sb.Filter.applyUnping({
