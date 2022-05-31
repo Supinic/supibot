@@ -215,7 +215,7 @@ module.exports = (command) => [
 	{
 		name: "error",
 		aliases: [],
-		description: "If you are marked as a developer, you can check the full text of an error within Supibot, based on its ID.",
+		description: "If you have been granted access, you can check the full text of an error within Supibot, based on its ID.",
 		execute: (context, identifier) => handleErrorInspection(command, context, "error", identifier)
 	},
 	{
@@ -699,7 +699,7 @@ module.exports = (command) => [
 	{
 		name: "weberror",
 		aliases: ["web-error"],
-		description: "If you are marked as a developer, you can check the full text of an error within the supinic.com website, based on its ID.",
+		description: "If you have been granted access, you can check the full text of an error within the supinic.com website, based on its ID.",
 		execute: (context, identifier) => handleErrorInspection(command, context, "webError", identifier)
 	}
 ];

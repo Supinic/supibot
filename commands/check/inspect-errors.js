@@ -12,7 +12,7 @@ module.exports = async function inspectErrorStacks (command, context, type, iden
 	if (!inspectErrorStacks) {
 		return {
 			success: false,
-			reply: "Sorry, you can't inspect error stacks!"
+			reply: "Sorry, you can't inspect error stacks! If you think you should have access, make a suggestion."
 		};
 	}
 
