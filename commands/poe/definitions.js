@@ -185,7 +185,7 @@ const subcommands = [
 			const ascendancy = sb.Utils.randArray(ascendancies);
 
 			return {
-				reply: `${skill.name} + ${additional.name} ${ascendancy.name}`
+				reply: `${skill.name} + ${additional.name} ${ascendancy}`
 			};
 		}
 	},
