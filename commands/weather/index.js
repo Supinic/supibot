@@ -650,6 +650,7 @@ module.exports = {
 			"",
 
 			`<code>${prefix}weather latitude:(number) longitude:(number)</code>`,
+			`<code>${prefix}weather latitude:0.2998175 longitude:32.5394548</code>`,
 			"Allows you to query a location to find weather in by GPS coordinates precisely.",
 			"",
 
