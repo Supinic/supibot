@@ -73,7 +73,7 @@ describe("Command parameter parsing", () => {
 			);
 
 			assert.strictEqual(result.success, false, `Param parsing must fail: ${JSON.stringify(result)}`);
-		})
+		});
 
 		it("fails for empty implicit string param", () => {
 			const result = Command.parseParametersFromArguments(
