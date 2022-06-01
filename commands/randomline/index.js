@@ -47,7 +47,7 @@ module.exports = {
 			else if (!user) {
 				return {
 					success: false,
-					reply: `Check random lines without a provided user is currently not supported!`
+					reply: `Checking random lines without a provided user is currently not supported!`
 				};
 			}
 
