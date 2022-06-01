@@ -232,7 +232,8 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 					}
 
 					await sb.Query.batchUpdate(data, {
-						batchSize: 1,
+						batchSize: 200,
+						staggerDelay: 5000,
 						callback: (ru, row) => ru
 							.update("chat_data", "Message_Meta_User_Alias")
 							.set("Message_Count", {
@@ -245,6 +246,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 							.where("Channel = %n", row.channel)
 							.ignoreDuplicates()
 					});
+
 					this.lastSeenRunning = false;
 				}
 			});
