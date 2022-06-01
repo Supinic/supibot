@@ -231,6 +231,6 @@ export declare class Command extends ClassTemplate {
 
     constructor (data: ConstructorData);
 
-    execute (...args: string[]): ReturnType<Command["Code"]>;
+    execute (...args: Parameters<Command["Code"]>): ReturnType<Command["Code"]>;
     getDetailURL (options?: { useCodePath?: boolean }): string;
 }
