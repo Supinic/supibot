@@ -21,13 +21,53 @@ module.exports = {
 
 		const channelName = context.channel.getDatabaseName();
 		const channelID = context.channel.ID;
-		let result = null;
 
 		if (context.invocation === "rq") {
 			user = context.user.Name;
 		}
 
-		if (user) {
+		let result;
+		if (!context.channel.Logging.has("Lines")) {
+			if (context.channel.Platform.Name !== "twitch") {
+				return {
+					success: false,
+					reply: `This channel does not support random lines!`
+				};
+			}
+
+			const channelID = context.channel.Specific_ID;
+			const { isSupported, getRandomUserLine } = require("./justlog.js");
+
+			if (!await isSupported(channelID)) {
+				return {
+					success: false,
+					reply: `This channel does not currently support random lines!`
+				};
+			}
+
+			const userID = await sb.Utils.getTwitchID(user);
+			if (!userID) {
+				return {
+					success: false,
+					reply: `That user does not exist!`
+				};
+			}
+
+			const randomLine = await getRandomUserLine(channelID, userID);
+			if (!randomLine) {
+				return {
+					success: false,
+					reply: `Could not load logs for that user!`
+				};
+			}
+
+			result = {
+				Posted: randomLine.date,
+				Name: randomLine.username,
+				Text: randomLine.text
+			};
+		}
+		else if (user) {
 			const targetUser = await sb.User.get(user);
 			if (!targetUser) {
 				return {
@@ -183,7 +223,7 @@ module.exports = {
 			const threshold = this.staticData.optoutRerollThreshold;
 			let passed = false;
 			let counter = 0;
-			
+
 			while (!passed && counter < threshold) {
 				result = await sb.Query.getRecordset(rs => rs
 					.select("Text", "User_Alias", "Posted", "Name")
@@ -200,11 +240,11 @@ module.exports = {
 					command: this,
 					user: { ID: result.User_Alias }
 				});
-				
+
 				counter++;
 				passed = (optouts.length === 0);
 			}
-			
+
 			if (!passed) {
 				return {
 					success: false,
