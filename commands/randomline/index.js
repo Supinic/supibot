@@ -28,6 +28,8 @@ module.exports = {
 
 		let result;
 		if (!context.channel.Logging.has("Lines")) {
+			const { isSupported, getRandomUserLine } = require("./justlog.js");
+
 			if (context.channel.Platform.Name !== "twitch") {
 				return {
 					success: false,
@@ -36,12 +38,16 @@ module.exports = {
 			}
 
 			const channelID = context.channel.Specific_ID;
-			const { isSupported, getRandomUserLine } = require("./justlog.js");
-
 			if (!await isSupported(channelID)) {
 				return {
 					success: false,
 					reply: `This channel does not currently support random lines!`
+				};
+			}
+			else if (!user) {
+				return {
+					success: false,
+					reply: `Check random lines without a provided user is currently not supported!`
 				};
 			}
 

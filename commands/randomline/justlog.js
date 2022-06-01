@@ -25,7 +25,7 @@ const isSupported = async function (channelID) {
 
 const getRandomUserLine = async function (channelID, userID) {
 	const response = await sb.Got("GenericAPI", {
-		url: `https://logs.ivr.fi/chanelid/${channelID}/userid/${userID}/random`,
+		url: `https://logs.ivr.fi/channelid/${channelID}/userid/${userID}/random`,
 		throwHttpErrors: false,
 		searchParams: {
 			json: "1"
