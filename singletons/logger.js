@@ -320,9 +320,9 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 	 * Pushes a message to a specified channel's queue.
 	 * Queues are emptied accordingly to cronjobs prepared in {@link LoggerSingleton.constructor}
 	 * @param {string} message
-	 * @param {sb.User} userData
-	 * @param {sb.Channel} channelData
-	 * @param {sb.Platform} [platformData]
+	 * @param {User} userData
+	 * @param {Channel} channelData
+	 * @param {Platform} [platformData]
 	 * @returns {Promise<void>}
 	 */
 	async push (message, userData, channelData, platformData) {
@@ -335,6 +335,18 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 		}
 
 		if (channelData) {
+			if (!channelData.Logging.has("Lines")) {
+				if (channelData.Logging.has("Meta")) {
+					await this.updateLastSeen({
+						channelData,
+						message,
+						userData
+					});
+				}
+
+				return;
+			}
+
 			const chan = `channel-${channelData.ID}`;
 			if (!this.channels.includes(chan)) {
 				const name = channelData.getDatabaseName();
