@@ -232,18 +232,17 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 					}
 
 					await sb.Query.batchUpdate(data, {
-						batchSize: 200,
-						staggerDelay: 5000,
+						batchSize: 1,
 						callback: (ru, row) => ru
 							.update("chat_data", "Message_Meta_User_Alias")
 							.set("Message_Count", {
-								useField: true, value: `Message_Count + ${row.count}`
+								useField: true,
+								value: `Message_Count + ${row.count}`
 							})
 							.set("Last_Message_Posted", row.date)
 							.set("Last_Message_Text", row.message)
 							.where("User_Alias = %n", row.user)
 							.where("Channel = %n", row.channel)
-							.priority("low")
 							.ignoreDuplicates()
 					});
 					this.lastSeenRunning = false;
