@@ -97,6 +97,12 @@ module.exports = class Channel extends require("./template.js") {
 		this.NSFW = data.NSFW;
 
 		/**
+		 * Determines the level of logging for the specified channel.
+		 * @type {Set<"Lines"|"Meta">}
+		 */
+		this.Logging = new Set(data.Logging ?? []);
+
+		/**
 		 * If not null, every message sent to this channel will also be mirrored to the channel with this ID.
 		 * Only 1-to-1 or one-way mirroring is supported.
 		 * @type {sb.Channel.ID|null}

@@ -91,6 +91,7 @@ export declare class Channel extends ClassTemplate {
     Banphrase_API_Downtime: BanphraseDowntimeBehaviour | null;
     Message_Limit: number | null;
     NSFW: boolean;
+    Logging: Set<"Lines"|"Meta">;
     Mirror: Channel["ID"] | null;
     Description: string | null;
     readonly sessionData: SimpleGenericData;
