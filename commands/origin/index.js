@@ -29,7 +29,7 @@ module.exports = {
 		const contextEmote = await context.getBestAvailableEmote([emote], null, { returnEmoteObject: true });
 		const contextEmoteID = (contextEmote?.id) ? String(contextEmote.id) : "";
 		let emoteData = await sb.Query.getRecordset(rs => rs
-			.select("ID", "Emote_ID", "Text", "Tier", "Type", "Todo", "Emote_Added", "Author")
+			.select("ID", "Emote_ID", "Text", "Tier", "Type", "Todo", "Emote_Added", "Emote_Deleted", "Author")
 			.from("data", "Origin")
 			.where("Name COLLATE utf8mb4_bin LIKE %s", emote)
 			.where("Replaced = %b", false)
@@ -110,50 +110,55 @@ module.exports = {
 				reply: "No emote definition exists for this index!"
 			};
 		}
-		else {
-			let extras = "";
-			if (emoteData.length > 1 && customIndex === null) {
-				extras = `(${emoteData.length - 1} extras) `;
-			}
 
-			let authorString = "";
-			if (data.Author) {
-				const authorUserData = await sb.User.get(data.Author);
-				authorString = `Made by @${authorUserData.Name}.`;
-			}
-
-			let addedString = "";
-			if (data.Emote_Added) {
-				addedString = `Added on ${data.Emote_Added.format("Y-m-d")}.`;
-			}
-
-			const text = data.Text.replace(/\[(.+?)]\(\d+\)/g, "$1");
-			const link = `https://supinic.com/data/origin/detail/${data.ID}`;
-
-			let type = "";
-			const [provider, providerType = ""] = data.Type.split(" - ");
-			if (data.Type === "Twitch - Bits" && data.Tier !== null) {
-				const thousandBits = Number(data.Tier) / 1000;
-				type = `${thousandBits}k bits ${provider}`;
-			}
-			else if (data.Tier) {
-				type = `T${data.Tier} ${providerType.toLowerCase()} ${provider}`;
-			}
-			else {
-				type = `${providerType.toLowerCase()} ${provider}`;
-			}
-
-			return {
-				reply: sb.Utils.tag.trim `
-					${extras}
-					${link}					
-					${type} emote:
-					${text}
-					${addedString}
-					${authorString}
-				`
-			};
+		let extras = "";
+		if (emoteData.length > 1 && customIndex === null) {
+			extras = `(${emoteData.length - 1} extras) `;
 		}
+
+		let authorString = "";
+		if (data.Author) {
+			const authorUserData = await sb.User.get(data.Author);
+			authorString = `Made by @${authorUserData.Name}.`;
+		}
+
+		let addedString = "";
+		if (data.Emote_Added) {
+			addedString = `Added on ${data.Emote_Added.format("Y-m-d")}.`;
+		}
+
+		let deletedString = "";
+		if (data.Emote_Deleted) {
+			deletedString = `Removed on ${data.deletedString.format("Y-m-d")}.`;
+		}
+
+		const text = data.Text.replace(/\[(.+?)]\(\d+\)/g, "$1");
+		const link = `https://supinic.com/data/origin/detail/${data.ID}`;
+
+		let type = "";
+		const [provider, providerType = ""] = data.Type.split(" - ");
+		if (data.Type === "Twitch - Bits" && data.Tier !== null) {
+			const thousandBits = Number(data.Tier) / 1000;
+			type = `${thousandBits}k bits ${provider}`;
+		}
+		else if (data.Tier) {
+			type = `T${data.Tier} ${providerType.toLowerCase()} ${provider}`;
+		}
+		else {
+			type = `${providerType.toLowerCase()} ${provider}`;
+		}
+
+		return {
+			reply: sb.Utils.tag.trim `
+				${extras}
+				${link}					
+				${type} emote:
+				${text}
+				${addedString}
+				${deletedString}
+				${authorString}
+			`
+		};
 	}),
 	Dynamic_Description: null
 };
