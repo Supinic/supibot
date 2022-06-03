@@ -129,7 +129,7 @@ module.exports = {
 
 		let deletedString = "";
 		if (data.Emote_Deleted) {
-			deletedString = `Removed on ${data.deletedString.format("Y-m-d")}.`;
+			deletedString = `Removed on ${data.Emote_Deleted.format("Y-m-d")}.`;
 		}
 
 		const text = data.Text.replace(/\[(.+?)]\(\d+\)/g, "$1");
