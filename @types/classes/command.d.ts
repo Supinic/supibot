@@ -98,7 +98,7 @@ declare type ConstructorData = {
     Aliases: string[] | null;
     Description: string | null;
     Cooldown: number | null;
-    Flags: keyof FlagsObject | Partial<FlagsObject> | null;
+    Flags: (keyof FlagsObject)[] | Partial<FlagsObject> | null;
     Params: Parameter.Descriptor[];
     Whitelist_Response: string | null;
     Author: string | null;
