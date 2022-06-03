@@ -469,12 +469,10 @@ module.exports = (command) => [
 			if (!identifier) {
 				return {
 					reply: sb.Utils.tag.trim `
-							Check all suggestions:
-							https://supinic.com/data/suggestion/list
-							||
-							Your suggestions:
-							https://supinic.com/data/suggestion/list?userName=${context.user.Name}
-						`
+						All suggestions: https://supinic.com/data/suggestion/list
+						Your active suggestions: https://supinic.com/data/suggestion/list/active?columnAuthor=${context.user.Name}
+						Your previous suggestions: https://supinic.com/data/suggestion/list/resolved?columnAuthor=${context.user.Name}
+					`
 				};
 			}
 
