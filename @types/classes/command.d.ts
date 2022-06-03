@@ -106,7 +106,7 @@ declare type ConstructorData = {
     Static_Data: (() => Record<string, any>) | null;
 };
 export declare type Definition = ConstructorData & {
-    Dynamic_Description: ((prefix: string, values: never) => Promise<string[]>);
+    Dynamic_Description: ((prefix: string, values: never) => Promise<string[]>) | null;
 };
 
 declare type AppendData = {
