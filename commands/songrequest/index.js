@@ -312,6 +312,13 @@ module.exports = {
 
 		if (sb.Utils.modules.linkParser.autoRecognize(url)) {
 			data = await sb.Utils.modules.linkParser.fetchData(url);
+
+			if (!data) {
+				return {
+					success: false,
+					reply: `The video link you posted is currently unavailable!`
+				};
+			}
 		}
 		else if (parsedURL.host) {
 			const meta = await sb.Utils.getMediaFileData(url);
