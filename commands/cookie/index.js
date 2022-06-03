@@ -71,7 +71,7 @@ module.exports = {
 			"",
 
 			`Cookies can also be gifted to other users, via the <a href="/bot/command/detail/gift"><code>${prefix}gift cookie</code></a> command.`,
-			`You can check the <a href="/bot/cookie/list">cookie leaderboards as well.`,
+			`You can check the <a href="/bot/cookie/list">cookie leaderboards as well</a>.`,
 			"",
 
 			`<code>${prefix}cookie</code>`,
