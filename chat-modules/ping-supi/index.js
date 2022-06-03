@@ -19,7 +19,7 @@ module.exports = {
 
 				const platformData = channel.Platform;
 				if (platformData.Name === "discord") {
-					const discordChannel = await platformData.client.channels.fetch(channel.Specific_ID);
+					const discordChannel = await platformData.client.channels.fetch(channel.Name);
 					enforceStrictRegex = !discordChannel.members.has("168719563741986816"); // @supinic discord ID
 				}
 
