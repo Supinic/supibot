@@ -115,7 +115,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 							Length: length
 						});
 
-						this.meta[channelID] = {
+						this.meta[channel] = {
 							amount: 0,
 							length: 0
 						};
