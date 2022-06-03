@@ -102,7 +102,7 @@ declare type ConstructorData = {
     Params: Parameter.Descriptor[];
     Whitelist_Response: string | null;
     Author: string | null;
-    Code: (context: Context, ...args: string[]) => (Result | Promise<Result>);
+    Code: (this: Command, context: Context, ...args: string[]) => (Result | Promise<Result>);
     Static_Data: (() => Record<string, any>) | null;
 };
 export declare type Definition = ConstructorData & {
