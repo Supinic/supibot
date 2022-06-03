@@ -95,16 +95,20 @@ declare type ContextConstructorData = {
 };
 declare type ConstructorData = {
     Name: string;
-    Aliases: string | string[] | null;
+    Aliases: string[] | null;
     Description: string | null;
     Cooldown: number | null;
-    Flags: string | string[] | Partial<FlagsObject> | null;
-    Params: string | Parameter.Descriptor[];
+    Flags: keyof FlagsObject | Partial<FlagsObject> | null;
+    Params: Parameter.Descriptor[];
     Whitelist_Response: string | null;
-    Author?: string | null;
-    Code: string | ((context: Context, ...args: string[]) => Result);
-    Static_Data: string | (() => Record<string, any>) | null;
+    Author: string | null;
+    Code: (context: Context, ...args: string[]) => (Result | Promise<Result>);
+    Static_Data: (() => Record<string, any>) | null;
 };
+export declare type Definition = ConstructorData & {
+    Dynamic_Description: ((prefix: string, values: never) => Promise<string[]>);
+};
+
 declare type AppendData = {
     platform: Platform;
     tee?: Readonly<string[]>;
@@ -150,7 +154,7 @@ declare type CommandFailure = {
 };
 declare type ParsedParametersData = {
     parameters: Record<string, Parameter.ParsedType>;
-    args: string[]
+    args: string[];
 };
 
 export declare class Context {
