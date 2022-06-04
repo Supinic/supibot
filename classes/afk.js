@@ -151,7 +151,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			}
 
 			const unpingedMessage = await sb.Filter.applyUnping({
-				command: afkCommand,
+				command: "afk",
 				channel: channelData ?? null,
 				platform: channelData?.Platform ?? null,
 				string: message,
