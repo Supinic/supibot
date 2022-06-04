@@ -60,10 +60,10 @@ module.exports = {
 			}
 
 			const randomLine = await getRandomUserLine(channelID, userID);
-			if (!randomLine) {
+			if (randomLine.success === false) {
 				return {
 					success: false,
-					reply: `Could not load logs for that user!`
+					reply: randomLine.reason
 				};
 			}
 
