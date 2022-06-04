@@ -60,8 +60,8 @@ export declare class Platform extends ClassTemplate {
 	static get (identifier: "Twitch" | "twitch"): TwitchPlatform;
 	static get (identifier: Like, host?: string): Platform | null;
 
-	private readonly controller: Controller;
-	private readonly userMessagePromises: Map<Channel, UserMessageAwaiterMap>;
+	readonly controller: Controller;
+	readonly userMessagePromises: Map<Channel, UserMessageAwaiterMap>;
 	readonly ID: number;
 	readonly Name: string;
 	readonly Host: string | null;
