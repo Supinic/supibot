@@ -130,9 +130,17 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			.where("ID = %n", data.ID)
 		);
 
-		const afkCommand = sb.Command.get("afk");
-		const status = sb.Utils.randArray(afkCommand.staticData.responses[data.Status]);
+		let responses;
+		try {
+			responses = require("supibot-package-manager/commands/afk/responses.json");
+		}
+		catch (e) {
+			// Abort the AFK responses logic handling if no data is available
+			console.warn("Cannot load AFK statuses", e);
+			return;
+		}
 
+		const status = sb.Utils.randArray(responses[data.Status]);
 		if (!data.Silent) {
 			const userMention = channelData.Platform.createUserMention(userData);
 			const message = `${userMention} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
