@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "afk",
-	Aliases: ["gn","brb","shower","food","lurk","poop","💩","ppPoof","work","study"],
+	Aliases: ["gn","brb","shower","food","lurk","poop","💩","work","study","nap"],
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Flags you as AFK. Supports a custom AFK message.",
@@ -9,19 +9,8 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (command => ({
 		statusLengthLimit: 2000,
-
-		responses: {
-			afk: ["is no longer AFK"],
-			poop: ["is done taking a dump", "finished pooping", "forgot to flush", "washed hands", "didn't wash hands"],
-			brb: ["just got back", "hopped back", "- welcome back"],
-			food: ["finished eating", "is no longer stuffing their face", "is now full", "is done eating OpieOP describe taste"],
-			shower: ["is now squeaky clean", "finished showering"],
-			lurk: ["stopped lurking", "turned off the lurk mode"],
-			gn: ["just woke up", "finished their beauty sleep", "just got up"],
-			work: ["finished their work", "is taking a break from work", "finished working hard Kappa //"],
-			ppPoof: ["ppFoop materialized back", "ppFoop re-appeared", "ppFoop fooped back"],
-			study: ["is full of knowledge", "finished studying", "is now ready for the exam", "is fed up with studying", "is now smarter than most of the people in chat"]
-		},
+		// Only used within the AFK module
+		responses: require("./responses.json"),
 		/* eslint-disable array-element-newline */
 		foodEmojis: [
 			"🍋", "🍞", "🥐", "🥖", "🥨", "🥯", "🥞", "🧀", "🍖", "🍗", "🥩", "🥓", "🍔", "🍟", "🍕", "🌭", "🥪", "🌮", "🌯",
@@ -80,14 +69,14 @@ module.exports = {
 				text: (context, text) => (text) ? `${text} 💼` : " 👷"
 			},
 			{
-				name: "ppPoof",
-				status: "now poofing away",
-				text: (context, text) => `${text ?? ""} 💨`
-			},
-			{
 				name: "study",
 				status: "now studying",
 				text: (context, text) => `${text ?? "🤓"} 📚`
+			},
+			{
+				name: "nap",
+				status: "now taking a nap",
+				text: (context, text) => (text) ? `${text} 😴` : "😴"
 			},
 			{
 				name: "food",
