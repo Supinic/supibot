@@ -32,12 +32,22 @@ const getRandomUserLine = async function (channelID, userID) {
 		}
 	});
 
-	if (response.statusCode === 404) {
-		return null;
+	if (response.statusCode === 403) {
+		return {
+			success: false,
+			reason: "That user has opted out of logging their messages!"
+		};
+	}
+	else if (response.statusCode === 404) {
+		return {
+			success: false,
+			reason: "Could not load logs for that user!"
+		};
 	}
 
 	const [message] = response.body.messages;
 	return {
+		success: true,
 		date: new sb.Date(message.timestamp),
 		text: message.text,
 		username: message.username
