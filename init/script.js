@@ -30,6 +30,7 @@ const config = {
 		"chat_data/tables/Message_Meta_Channel",
 		"chat_data/tables/Message_Meta_User_Alias",
 		"chat_data/tables/Reminder",
+		"chat_data/triggers/add_missing_first_message_data_after_insert",
 
 		"data/database",
 		"data/tables/Config"
