@@ -1,4 +1,3 @@
-const currentsApiNews = require("./currents-api");
 module.exports = {
 	Name: "news",
 	Aliases: null,
