@@ -40,21 +40,21 @@ module.exports = {
 					success: false,
 					reply: (context.params.linkOnly === true)
 						? "N/A"
-						: `User ${user.display_name} has no profile banner set up!`
+						: `User ${user.displayName} has no profile banner set up!`
 				};
 			}
 
 			return {
 				reply: (context.params.linkOnly === true)
 					? user.banner
-					: `Profile banner for ${user.display_name}: ${user.banner}`
+					: `Profile banner for ${user.displayName}: ${user.banner}`
 			};
 		}
 
 		return {
 			reply: (context.params.linkOnly)
 				? user.profile_image_url
-				: `Profile picture for ${user.display_name}: ${user.profile_image_url}`
+				: `Profile picture for ${user.displayName}: ${user.logo}`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
