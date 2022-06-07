@@ -32,7 +32,7 @@ module.exports = {
 	],
 	execute: async (context) => {
 		const response = await sb.Got("GenericAPI", {
-			url: `https://open.faceit.com/data/v4/${forsenUserID}/history`,
+			url: `https://open.faceit.com/data/v4/players/${forsenUserID}/history`,
 			searchParams: {
 				limit: "20"
 			},
