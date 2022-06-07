@@ -21,7 +21,7 @@ module.exports = {
 	Code: (async function ocr (context, ...args) {
 		let languageCode = "eng";
 		if (context.params.lang) {
-			languageCode = sb.Utils.modules.languageISO.getCode(context.params.lang, "iso6393");
+			languageCode = sb.Utils.modules.languageISO.getCode(context.params.lang, "iso6392");
 			if (!languageCode) {
 				return {
 					success: false,
