@@ -16,7 +16,9 @@ module.exports = {
 			};
 		}
 
-		const { controller } = sb.Platform.get("twitch");
+		const twitchPlatform = sb.Platform.get("twitch");
+		const { controller } = twitchPlatform;
+
 		const targetUserID = await controller.getUserID(sb.User.normalizeUsername(target));
 		if (!targetUserID) {
 			return {
@@ -28,6 +30,11 @@ module.exports = {
 			return {
 				success: false,
 				reply: "This isn't going to make you any more famous, you got to put the work in yourself!"
+			};
+		}
+		else if (targetUserID === twitchPlatform.Self_ID) {
+			return {
+				reply: "Thanks for the effort, but I don't stream, so I suggest you use some of my commands instead to make me more famous 🙂"
 			};
 		}
 
