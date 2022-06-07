@@ -2,9 +2,9 @@ module.exports = {
 	Name: "chat-suggestion-linker",
 	Events: ["message"],
 	Description: "If a Supibot suggestion ID format is detected, posts a link to it - plus a github link, if the suggestion has one.",
-	Code: (async function liveDetection (context) {
+	Code: (async function linkChatSuggestions (context) {
 		const { channel, message } = context;
-		const match = message.match(/S#(\d+)/i);
+		const match = message.match(/\bS#(\d+)\b/i);
 		if (!match) {
 			return;
 		}
