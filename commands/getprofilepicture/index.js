@@ -26,14 +26,14 @@ module.exports = {
 				reply: `Could not fetch profile picture! ${response.body.message}`
 			};
 		}
-		else if (response.body.data.length === 0) {
+		else if (response.body.length === 0) {
 			return {
 				success: false,
 				reply: `No such user found!`
 			};
 		}
 
-		const [user] = response.body.data;
+		const [user] = response.body;
 		if (context.params.banner === true) {
 			if (user.banner === null) {
 				return {
