@@ -2,9 +2,10 @@ const definitions = require("./definitions.json");
 const rssCacheKey = "command-news-rss-cache";
 
 module.exports = {
-	has: (code) => definitions.some(i => i.code === code.toLowerCase()),
+	isCountryCode: (code) => /[A-Z]{2}/.test(code),
+	has: (code) => definitions.some(i => i.code === code?.toLowerCase()),
 	fetch: async (code, query) => {
-		const news = definitions.find(i => i.code === code.toLowerCase());
+		const news = definitions.find(i => i.code === code?.toLowerCase());
 		if (!news) {
 			throw new sb.Error({ message: "Extra news code does not exist!" });
 		}

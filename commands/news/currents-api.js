@@ -27,7 +27,7 @@ module.exports = {
 				return {
 					success: false,
 					reply: (query)
-						? "No relevant news articles found for your query! If you used a country code, this means it's currently not supported."
+						? "No relevant news articles found for your query!"
 						: "There are no news available right now!"
 				};
 			}

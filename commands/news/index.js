@@ -1,3 +1,4 @@
+const currentsApiNews = require("./currents-api");
 module.exports = {
 	Name: "news",
 	Aliases: null,
@@ -45,8 +46,17 @@ module.exports = {
 
 			return await rssNews.fetch(code, args.join(" "));
 		}
-		else {
+		else if (!rssNews.isCountryCode(input)) {
 			return await currentsApiNews.fetch(args.join(" "));
+		}
+		else {
+			return {
+				success: false,
+				reply: sb.Utils.tag.trim `
+					Your provided country code is currently not supported!
+					If you know a good relevant news source with RSS support, you could $suggest it and it would be added.
+				`
+			};
 		}
 	}),
 	Dynamic_Description: (async (prefix) => {
