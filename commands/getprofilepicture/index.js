@@ -53,7 +53,7 @@ module.exports = {
 
 		return {
 			reply: (context.params.linkOnly)
-				? user.profile_image_url
+				? user.logo
 				: `Profile picture for ${user.displayName}: ${user.logo}`
 		};
 	}),
