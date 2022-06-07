@@ -9,76 +9,12 @@ module.exports = {
 		{ name: "country", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (command => {
-		const path = require.resolve("./definitions.json");
-		delete require.cache[path];
+	Static_Data: null,
+	Code: (async function news (context, ...args) {
+		const rssNews = require("./rss.js");
+		const currentsApiNews = require("./currents-api.js");
 
-		const definitions = require("./definitions.json");
-		return {
-			definitions,
-			codeRegex: /^[a-z]{2}$/i,
-			extra: {
-				exists: (code) => definitions.some(i => i.code === code.toLowerCase()),
-
-				fetch: async (code, query) => {
-					const news = definitions.find(i => i.code === code.toLowerCase());
-					if (!news) {
-						throw new sb.Error({ message: "Extra news code does not exist!" });
-					}
-
-					const source = sb.Utils.randArray(news.sources);
-					const cacheKey = `${news.code}-${source.name}`;
-
-					let cacheExists = true;
-					let articles = await sb.Cache.getByPrefix(command.getCacheKey(), { keys: { cacheKey } });
-					if (!articles) {
-						cacheExists = false;
-
-						const endpoint = sb.Utils.randArray(source.endpoints);
-						const url = [source.url, source.path, endpoint].filter(Boolean)
-							.join("/");
-
-						const xml = await sb.Got(url)
-							.text();
-						const feed = await sb.Utils.parseRSS(xml);
-
-						articles = feed.items.map(i => ({
-							title: (i.title) ? i.title.trim() : null,
-							content: (i.content) ? i.content.trim() : null,
-							link: i.link || i.url,
-							published: new sb.Date(i.pubDate).valueOf()
-						}));
-					}
-
-					if (!cacheExists) {
-						await sb.Cache.setByPrefix(command.getCacheKey(), articles, {
-							keys: { cacheKey },
-							expiry: 36e5
-						});
-					}
-
-					if (query) {
-						query = query.toLowerCase();
-
-						const filteredArticles = articles.filter(i => (
-							(i.title?.toLowerCase()
-								.includes(query))
-							|| (i.content?.toLowerCase()
-								.includes(query))
-						));
-
-						return sb.Utils.randArray(filteredArticles);
-					}
-					else {
-						return sb.Utils.randArray(articles);
-					}
-				}
-			}
-		};
-	}),
-	Code: (async function news (context, ...rest) {
-		const { codeRegex, extra } = this.staticData;
-		let input = context.params.country ?? rest[0];
+		let input;
 		if (context.params.country) {
 			const value = context.params.country;
 			const code = await sb.Query.getRecordset(rs => rs
@@ -99,140 +35,22 @@ module.exports = {
 			input = code;
 		}
 		else {
-			input = rest[0];
+			input = args[0];
 		}
 
-		if (input && extra.exists(input)) {
+		if (rssNews.has(input)) {
 			const code = (context.params.country)
 				? input
-				: rest.shift();
+				: args.shift();
 
-			let article;
-			try {
-				article = await extra.fetch(code, rest.join(" ") || null);
-			}
-			catch (e) {
-				console.warn(e);
-				return {
-					success: false,
-					reply: `Could not fetch any articles due to website error!`
-				};
-			}
-
-			if (!article) {
-				return {
-					reply: "No relevant articles found!"
-				};
-			}
-
-			const { content, title, published } = article;
-			const separator = (title && content) ? " - " : "";
-			const delta = (published)
-				? `(published ${sb.Utils.timeDelta(new sb.Date(published))})`
-				: "";
-
-			return {
-				reply: sb.Utils.fixHTML(sb.Utils.removeHTML(`${title ?? ""}${separator}${content ?? ""} ${delta}`))
-			};
-		}
-
-		let availableLanguages = await sb.Cache.getByPrefix(this);
-		if (!availableLanguages) {
-			const { languages } = await sb.Got("GenericAPI", {
-				url: "https://api.currentsapi.services/v1/available/languages",
-				headers: {
-					Authorization: sb.Config.get("API_CURRENTSAPI_TOKEN")
-				},
-				responseType: "json"
-			}).json();
-
-			availableLanguages = Object.keys(languages).map(i => i.toLowerCase());
-			await sb.Cache.setByPrefix(this, availableLanguages, {
-				expiry: 7 * 864e5
-			});
-		}
-
-		const params = new sb.URLParams();
-		if (rest[0] && codeRegex.test(rest[0])) {
-			const languageDescriptor = sb.Utils.modules.languageISO.get(rest[0]);
-			if (!languageDescriptor) {
-				return {
-					success: false,
-					reply: "Provided language does not exist!"
-				};
-			}
-
-			const languageName = languageDescriptor.names[0];
-			if (!availableLanguages.includes(languageName)) {
-				return {
-					success: false,
-					reply: "Provided language is not supported!"
-				};
-			}
-
-			rest.splice(0, 1);
-			params.set("language", languageDescriptor.iso6391);
+			return await rssNews.fetch(code, args.join(" "));
 		}
 		else {
-			params.set("language", "en");
+			return await currentsApiNews.fetch(args.join(" "));
 		}
-
-		if (rest.length > 0) {
-			params.set("keywords", rest.join(" "));
-		}
-
-		let response;
-		try {
-			response = await sb.Got("GenericAPI", {
-				url: "https://api.currentsapi.services/v1/search",
-				searchParams: params.toString(),
-				headers: {
-					Authorization: sb.Config.get("API_CURRENTSAPI_TOKEN")
-				},
-				throwHttpErros: false,
-				responseType: "json",
-				retry: 0,
-				timeout: 2500
-			});
-		}
-		catch (e) {
-			if (e instanceof sb.Got.TimeoutError || e instanceof sb.errors.GenericRequestError) {
-				return {
-					success: false,
-					reply: "No relevant news articles found!"
-				};
-			}
-			else {
-				throw e;
-			}
-		}
-
-		const { news } = response.body;
-		if (!news) {
-			return {
-				success: false,
-				reply: "No news data returned!"
-			};
-		}
-		else if (news.length === 0) {
-			return {
-				success: false,
-				reply: "No relevant articles found!"
-			};
-		}
-
-		const { description = "", published, title } = sb.Utils.randArray(news);
-		const separator = (title && description) ? " - " : "";
-		const delta = (published)
-			? `(published ${sb.Utils.timeDelta(new sb.Date(published))})`
-			: "";
-
-		return {
-			reply: sb.Utils.removeHTML(`${title}${separator}${description} ${delta}`)
-		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { definitions } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const definitions = require("./definitions.json");
 		const sorted = [...definitions].sort((a, b) => a.code.localeCompare(b.code));
 
 		const extraNews = sorted.map(def => {
