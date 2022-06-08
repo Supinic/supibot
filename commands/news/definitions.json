@@ -809,5 +809,39 @@
         "helpers": ["jammehcow"]
       }
     ]
+  },
+  {
+    "code": "au",
+    "language": "english",
+    "sources": [
+      {
+        "name": "news.com.au",
+        "url": "https://www.news.com.au",
+        "path": "content-feeds",
+        "endpoints": ["latest-news-national"],
+        "helpers": ["ALazyMeme"]
+      },
+      {
+        "name": "The Sydney Morning Herald",
+        "url": "https://www.smh.com.au",
+        "path": "rss",
+        "endpoints": ["national.xml"],
+        "helpers": ["ALazyMeme"]
+      },
+      {
+        "name": "SBS News",
+        "url": "https://www.sbs.com.au",
+        "path": "news/topic",
+        "endpoints": ["australia/feed"],
+        "helpers": ["ALazyMeme"]
+      },
+      {
+        "name": "The West Australian",
+        "url": "https://thewest.com.au",
+        "path": "news",
+        "endpoints": ["australia/rss"],
+        "helpers": ["ALazyMeme"]
+      }
+    ]
   }
 ]
