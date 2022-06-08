@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Fetches short articles. You can use a 2 character ISO code to get country specific news, or any other word as a search query.",
+	Description: "Fetches short articles. You can use a 2 uppercase letter code to get country specific news, or any other word as a search query.",
 	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
 		{ name: "country", type: "string" }
@@ -87,7 +87,7 @@ module.exports = {
 		}).join("");
 
 		return [
-			`Fetches short news articles. Powered by <a href="https://currentsapi.services/en">CurrentsAPI</a>`,
+			`Fetches short news articles. Powered by RSS and <a href="https://currentsapi.services/en">CurrentsAPI</a>`,
 			"",
 
 			`<code>${prefix}news</code>`,
@@ -95,29 +95,34 @@ module.exports = {
 			"",
 
 			`<code>${prefix}news (text to search)</code>`,
-			"(worldwide news in english, that contain the text you searched for",
+			`<code>${prefix}news trump</code>`,
+			"(worldwide news in English that contain the text you searched for",
 			"",
 
+			`<code>${prefix}news <u>(uppercase two-letter country code)</u></code>`,
+			`<code>${prefix}news <u>BE</u></code>`,
+			"Fetches country-specific news, based on the code provided.",
 
-			`<code>${prefix}news (two-letter country code)</code>`,
-			`<code>${prefix}news <u>country:(country code)</u></code>`,
-			`<code>${prefix}news <u>country:(country name)</u></code>`,
+			`<code>${prefix}news <u>country:(country name or code)</u></code>`,
+			`<code>${prefix}news <u>country:BE</u></code>`,
 			`<code>${prefix}news <u>country:belgium</u></code>`,
 			`<code>${prefix}news <u>country:"united kingdom"</u></code>`,
-			"(country-specific news)",
-			"",
-			"(country-specific news)",
+			"Fetches country-specific news, based on the code/name provided.",
 			"",
 
-			`<code>${prefix}news (two-letter country code) (text to search for)</code>`,
-			"(country-specific news that contain the text you searched for)",
+			`<code>${prefix}news (two-letter country code) <u>(text to search for)</u></code>`,
+			`<code>${prefix}news country:(country name or code) <u>(text to search for)</u></code>`,
+			`<code>${prefix}news DE </u>berlin</u></code>`,
+			`<code>${prefix}news country:czechia </u>prague</u></code>`,
+			"Fetches country-specific news that contain the text you searched for.",
 			"",
 
-			`<code>${prefix}news (special combination)</code>`,
-			"(special news, usually country-specific. consult table below)",
+			`<code>${prefix}news <u>(special code)</u></code>`,
+			`<code>${prefix}news <u>ONION</u></code>`,
+			"Fetches special news, usually from a specific source. Consult the table below.",
 			"",
 
-			"The following are special codes. Those were often 'helped' by people.",
+			"The following are supported country-specific codes and special codes.",
 			`<table><thead><th>Code</th><th>Language</th><th>Sources</th><th>Helpers</th></thead>${extraNews}</table>`,
 			""
 		];
