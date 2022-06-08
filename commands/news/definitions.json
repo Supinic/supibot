@@ -19,8 +19,8 @@
       {
         "name": "VietNamNet",
         "url": "https://vietnamnet.vn",
-        "path": "rss",
-        "endpoints": ["thoi-su.rss", "tuanvietnam.rss"],
+        "path": null,
+        "endpoints": ["thoi-su.rss"],
         "helpers": ["supinic"]
       }
     ]
@@ -113,19 +113,6 @@
         "path": null,
         "endpoints": ["rss"],
         "helpers": ["slordniir"]
-      }
-    ]
-  },
-  {
-    "code": "mt",
-    "language": "maltese",
-    "sources": [
-      {
-        "name": "TVM",
-        "url": "https://www.tvm.com.mt/mt",
-        "path": null,
-        "endpoints": ["feed"],
-        "helpers": ["trollpotat0"]
       }
     ]
   },
@@ -320,7 +307,7 @@
       {
         "name": "Obozrevatel",
         "url": "https://www.obozrevatel.com",
-        "path": "ukr",
+        "path": null,
         "endpoints": ["rss.xml"],
         "helpers": ["boring_nick"]
       },
@@ -775,13 +762,6 @@
     "language": "irish",
     "sources": [
       {
-        "name": "Irish Times",
-        "url": "https://www.irishtimes.com",
-        "path": null,
-        "endpoints": ["cmlink/news-1.1319192"],
-        "helpers": []
-      },
-      {
         "name": "Irish Examiner",
         "url": "https://feeds.feedburner.com",
         "path": null,
@@ -803,7 +783,7 @@
       },
       {
         "name": "RNZ",
-        "url": "https://www.rnz.co.nz/rss",
+        "url": "https://www.rnz.co.nz",
         "path": "rss",
         "endpoints": ["te-manu-korihi.xml"],
         "helpers": ["jammehcow"]
