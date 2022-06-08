@@ -62,21 +62,29 @@ module.exports = {
 				}
 
 				if (!channelPrefix) {
-					const response = await sb.Got("Leppunen", `v2/twitch/user/${channel}`);
-					if (response.statusCode === 404) {
+					const response = await sb.Got("Leppunen", {
+						url: "v2/twitch/user",
+						searchParams: {
+							login: channel
+						}
+					});
+
+					if (response.statusCode !== 200 || response.body.length === 0) {
 						return {
 							success: false,
 							reply: `Provided channel does not exist on Twitch!`
 						};
 					}
-					else if (!response.body.emotePrefix) {
+
+					const [channelInfo] = response.body;
+					if (!channelInfo.emotePrefix) {
 						return {
 							success: false,
 							reply: `Provided channel does not have a subscriber emote prefix!`
 						};
 					}
 
-					channelPrefix = response.body.emotePrefix;
+					channelPrefix = channelInfo.emotePrefix;
 					if (channelData) {
 						await channelData.setCacheData("emote-prefix", channelPrefix, { expiry: 30 * 864e5 }); // cache for 30 days
 					}

@@ -97,9 +97,16 @@ module.exports = {
 
 		const { relationship } = sub.data.targetUser;
 		if (!relationship.cumulativeTenure) {
-			const response = await sb.Got("Leppunen", `v2/twitch/user/${channelName}`);
-			if (response.statusCode === 200) {
-				const { banned, banReason, isAffiliate, isPartner } = response.body.roles ?? {};
+			const response = await sb.Got("Leppunen", {
+				url: "v2/twitch/user",
+				searchParams: {
+					login: channelName
+				}
+			});
+
+			if (response.statusCode === 200 && response.body.length !== 0) {
+				const channelInfo = [response.body];
+				const { banned, banReason, isAffiliate, isPartner } = channelInfo.roles ?? {};
 				if (isAffiliate === false && isPartner === false) {
 					return {
 						success: false,

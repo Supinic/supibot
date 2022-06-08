@@ -56,20 +56,22 @@ module.exports = {
 
 		const [stream] = streamResponse.body.data;
 		if (!stream) {
-			const broadcasterData = await sb.Got("Leppunen", {
-				url: `v2/twitch/user/${channelID}`,
+			const broadcasterResponse = await sb.Got("Leppunen", {
+				url: "v2/twitch/user",
 				searchParams: {
-					id: "true"
+					id: channelID
 				}
 			});
 
-			if (broadcasterData.statusCode !== 200) {
+			if (broadcasterResponse.statusCode !== 200 || broadcasterResponse.body.length === 0) {
 				return {
 					reply: `Channel is offline - no more data currently available. Try again later`
 				};
 			}
 
-			const { banned, banReason, lastBroadcast } = broadcasterData.body;
+			const [broadcasterData] = broadcasterResponse.body;
+			const { banned, banReason, lastBroadcast } = broadcasterData;
+
 			const status = (banned)
 				? `banned (${banReason})`
 				: "offline";
