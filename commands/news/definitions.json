@@ -26,19 +26,6 @@
     ]
   },
   {
-    "code": "ug",
-    "language": "swahili",
-    "sources": [
-      {
-        "name": "Bukedde Online",
-        "url": "https://www.bukedde.co.ug",
-        "path": "feed",
-        "endpoints": ["rss"],
-        "helpers": ["supinic"]
-      }
-    ]
-  },
-  {
     "code": "es",
     "language": "spanish",
     "sources": [
