@@ -18,10 +18,6 @@
   "dan": {
     "engines": [1, 2]
   },
-  "deu": {
-    "nonStandardLanguageCode": "ger",
-    "engines": [1, 2, 3]
-  },
   "dut": {
     "engines": [1, 2]
   },
@@ -32,6 +28,9 @@
     "engines": [1]
   },
   "fre": {
+    "engines": [1, 2, 3]
+  },
+  "ger": {
     "engines": [1, 2, 3]
   },
   "hin": {
