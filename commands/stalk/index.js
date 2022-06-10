@@ -67,17 +67,19 @@ module.exports = {
 		const stalkChannelData = sb.Channel.get(stalkData.ChannelID);
 		const delta = sb.Utils.timeDelta(stalkData.Date);
 
-		// automated bot protettion - do not allow stalking of banned Twitch users outside of whispers
+		// automated bot protection - do not allow stalking of banned Twitch users outside of whispers
 		if (targetUser.Twitch_ID && context.platform.Name === "twitch" && context.channel && stalkChannelData.Platform.Name === "twitch") {
-			const response = await sb.Got("Helix", {
-				url: "users",
+			const response = await sb.Got("Leppunen", {
+				url: "v2/twitch/user",
 				searchParams: {
 					id: targetUser.Twitch_ID
-				},
-				throwHttpErrors: false
+				}
 			});
 
-			if (response.statusCode === 200 && response.body.data.length === 0) {
+			// Only refuse to send the message if the ban type ("reason") is a TOS violation.
+			// Memo: possibly also refuse to send when type is `DEACTIVATED`?
+			const [userData] = response.body;
+			if (userData && userData.banned && userData.banReason === "TOS_TEMPORARY" || userData.banReason === "TOS_INDEFINITE") {
 				return {
 					success: false,
 					reply: "You cannot stalk that user as they're currently banned on Twitch!"
