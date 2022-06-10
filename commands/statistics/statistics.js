@@ -1,16 +1,25 @@
-const fs = require("fs/promises");
-const exactProperties = ["name", "aliases", "description", "execute"];
-const definitions = [];
+const types = [
+	"afk-longest",
+	"afk",
+	"alias-names",
+	"aliases",
+	"cookie-count",
+	"markov",
+	"playsounds",
+	"reminders",
+	"song-requests",
+	"suggestions",
+	"supibot",
+	"twitch-lotto"
+];
 
-module.exports = async function loadStatisticsTypes () {
+const definitions = [];
+module.exports = function loadStatisticsTypes () {
 	if (definitions.length !== 0) {
 		return definitions;
 	}
 
-	const files = await fs.readdir("./types");
-	const statsFiles = files.filter(i => i.endsWith(".js"));
-
-	for (const file of statsFiles) {
+	for (const file of types) {
 		let definition;
 		try {
 			definition = require(`./types/${file}.js`);
@@ -21,15 +30,6 @@ module.exports = async function loadStatisticsTypes () {
 		}
 
 		if (!definition || typeof definition !== "object") {
-			continue;
-		}
-		else if (exactProperties.some(i => !Object.hasOwn(definition, i))) {
-			continue;
-		}
-		else if (Object.keys(definition).some(i => !exactProperties.includes(i))) {
-			continue;
-		}
-		else if (typeof definition.execute !== "function") {
 			continue;
 		}
 

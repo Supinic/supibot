@@ -20,8 +20,8 @@ module.exports = {
 			};
 		}
 
-		const loadDefinitions = await require("./statistics.js");
-		const definitions = await loadDefinitions();
+		const loadDefinitions = require("./statistics.js");
+		const definitions = loadDefinitions();
 
 		type = type.toLowerCase();
 		const target = definitions.find(i => i.name === type || i.aliases.includes(type));
