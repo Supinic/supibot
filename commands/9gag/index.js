@@ -28,7 +28,7 @@ module.exports = {
 			};
 		}
 
-		const nsfw = Boolean(context?.channel.NSFW);
+		const nsfw = Boolean(context.channel?.NSFW);
 		const filtered = (nsfw)
 			? body.data.posts
 			: body.data.posts.filter(i => i.nsfw !== 1);
