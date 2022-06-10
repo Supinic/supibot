@@ -151,10 +151,18 @@ module.exports = {
 
 		const steamResponse = await sb.Got("GenericAPI", {
 			url: "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001",
+			throwHttpErrors: false,
 			searchParams: {
 				appid: game.objectID
 			}
 		});
+
+		if (steamResponse.statusCode !== 200) {
+			return {
+				success: false,
+				reply: "Could not find any data regarding this game's current player count! This is probably on Steam's end."
+			};
+		}
 
 		const players = steamResponse.body.response.player_count;
 		let publisher = "";
