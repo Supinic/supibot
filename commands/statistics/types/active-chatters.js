@@ -1,7 +1,7 @@
 module.exports = {
-	name: "active-users",
-	aliases: ["activeusers"],
-	description: "Checks how many users are active in chat in the past 5 minutes.",
+	name: "active-chatters",
+	aliases: ["activechatters"],
+	description: "Checks how many chatters are active in chat in the past 5 minutes.",
 	execute: async () => {
 		const amount = await sb.Query.getRecordset(rs => rs
 			.select("Amount")
