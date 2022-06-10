@@ -1,4 +1,5 @@
 const names = [
+	"elo",
 	"forsen"
 ];
 
