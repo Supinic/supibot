@@ -1,5 +1,5 @@
 const forsenUserID = "ea1864f6-5748-41e1-a084-1e5c0044322d";
-const lossStreakMemeThreshold = 5;
+const lossStreakMemeThreshold = 3;
 const lossEmotes = ["forsenClown", "forsenFITTA", "forsenSWA", "forsenInsane", "forsenLaughingAtYou", "forsenLookingAtYou"];
 const regularEmotes = ["forsenE", "forsenGaGun", "forsenOkay", "forsenGun"];
 
@@ -9,19 +9,6 @@ const hasForsenWon = (gameData) => {
 
 	return winningPlayerIDs.includes(forsenUserID);
 };
-
-const shuffleArray = (sb.Utils.shuffleArray) ?? ((array) => {
-	const clone = JSON.parse(JSON.stringify(array));
-	const shuffle = [];
-
-	while (clone.length > 0) {
-		const index = sb.Utils.random(0, clone.length - 1);
-		shuffle.push(clone[index]);
-		clone.splice(index, 1);
-	}
-
-	return shuffle;
-});
 
 module.exports = {
 	name: "forsen",
@@ -74,17 +61,13 @@ module.exports = {
 		}
 
 		if (lossStreak > lossStreakMemeThreshold) {
-			const emotes = shuffleArray(lossEmotes);
-			const emote = await context.getBestAvailableEmote(emotes, "😡");
-
+			const emote = await context.getBestAvailableEmote(lossEmotes, "😡", { shuffle: true });
 			return {
 				reply: `Sebastian "Forsen" Fors ${emote} Lost ${lossStreak} games in a row.`
 			};
 		}
 		else {
-			const emotes = shuffleArray(regularEmotes);
-			const emote = await context.getBestAvailableEmote(emotes, "😎");
-
+			const emote = await context.getBestAvailableEmote(regularEmotes, "😎", { shuffle: true });
 			return {
 				reply: `Forsen's score for the past 20 games ${emote} ${results.won}:${results.lost}`
 			};
