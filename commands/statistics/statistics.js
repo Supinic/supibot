@@ -1,4 +1,5 @@
 const types = [
+	"active-users",
 	"afk-longest",
 	"afk",
 	"alias-names",
