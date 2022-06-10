@@ -204,20 +204,23 @@ const subcommands = [
 		execute: async () => {
 			const now = sb.Date.now();
 			const [nextLeague] = leagues.sort((a, b) => new sb.Date(b) - new sb.Date(a));
+
 			const { name, patch, reveal, launch } = nextLeague;
+			const revealDate = new sb.Date(reveal);
+			const launchDate = new sb.Date(launch);
 
-			if (reveal > now) {
+			if (revealDate > now) {
 				return {
-					reply: `The ${patch} ${name} league will be revealed ${sb.Utils.timeDelta(reveal)}.`
+					reply: `The ${patch} ${name} league will be revealed ${sb.Utils.timeDelta(revealDate)}.`
 				};
 			}
-			else if (launch > now) {
+			else if (launchDate > now) {
 				return {
-					reply: `The ${patch} ${name} league will start ${sb.Utils.timeDelta(launch)}.`
+					reply: `The ${patch} ${name} league will start ${sb.Utils.timeDelta(launchDate)}.`
 				};
 			}
 
-			const possibleEnd = reveal.clone().addMonths(3);
+			const possibleEnd = revealDate.clone().addMonths(3);
 			if (possibleEnd > now) {
 				const delta = sb.Utils.timeDelta(possibleEnd, true);
 				return {
