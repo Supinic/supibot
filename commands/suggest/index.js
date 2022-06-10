@@ -13,21 +13,21 @@ module.exports = {
 			return {
 				reply: sb.Utils.tag.trim `
 					No suggestion text provided!
-					Your suggestions here: https://supinic.com/data/suggestion/list?userName=${context.user.Name}
+					Your suggestions here: https://supinic.com/data/suggestion/list?columnAuthor=${context.user.Name}
 				`,
 				cooldown: 5000
 			};
 		}
-	
+
 		const row = await sb.Query.getRow("data", "Suggestion");
 		row.setValues({
 			Text: args.join(" "),
 			User_Alias: context.user.ID,
 			Priority: 255
 		});
-	
+
 		await row.save();
-	
+
 		const isSubscribed = await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("data", "Event_Subscription")
@@ -36,7 +36,7 @@ module.exports = {
 			.flat("ID")
 			.single()
 		);
-	
+
 		let subscribed = "";
 		if (!isSubscribed) {
 			const row = await sb.Query.getRow("data", "Event_Subscription");
@@ -46,16 +46,16 @@ module.exports = {
 				Type: "Suggestion",
 				User_Alias: context.user.ID
 			});
-	
+
 			await row.save();
 			subscribed = "You will now receive reminders when your suggestions get updated - you can use the $unsubscribe command to remove this. ";
 		}
-	
+
 		const link = `https://supinic.com/data/suggestion/${row.values.ID}`;
 		const emote = (context.platform.Name === "twitch")
 			? "BroBalt"
 			: "👍";
-	
+
 		return {
 			reply: `Suggestion saved, and will eventually be processed (ID ${row.values.ID}) ${link} ${emote} ${subscribed}`
 		};
