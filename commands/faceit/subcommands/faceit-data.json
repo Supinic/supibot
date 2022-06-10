@@ -1,6 +1,6 @@
 {
   "maxPointsPerGame": 25,
-  "skillLevelsRanges": {
+  "skillLevelRanges": {
     "1": [null, 800],
     "2": [801, 950],
     "3": [801, 1100],
