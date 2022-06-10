@@ -370,11 +370,15 @@ module.exports = class Channel extends require("./template.js") {
 	 * @param {Object} options = {}
 	 * @param {boolean} [options.returnEmoteObject]
 	 * @param {function} [options.filter]
-	 * @returns {Promise<void>}
+	 * @returns {Promise<string>}
 	 */
 	async getBestAvailableEmote (emotes, fallbackEmote, options = {}) {
 		const availableEmotes = await this.fetchEmotes();
-		for (const emote of emotes) {
+		const emoteArray = (options.shuffle)
+			? sb.Utils.shuffleArray(emotes)
+			: emotes;
+
+		for (const emote of emoteArray) {
 			const available = availableEmotes.find(i => i.name === emote);
 			if (available && (typeof options.filter !== "function" || options.filter(available))) {
 				return (options.returnEmoteObject)

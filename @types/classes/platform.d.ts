@@ -47,6 +47,7 @@ export declare interface MessageAwaiter {
 }
 export declare type Like = number | string | Platform;
 export declare type AvailableEmoteOptions = {
+	shuffle?: boolean;
 	returnEmoteObject?: boolean;
 	filter?: (value: Emote) => boolean;
 };

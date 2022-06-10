@@ -99,6 +99,7 @@ class Context {
 	 * @param {Object} options
 	 * @param {sb.Channel} [options.channel]
 	 * @param {sb.Platform} [options.platform]
+	 * @param {boolean} [options.shuffle]
 	 * @param {boolean} [options.returnEmoteObject]
 	 * @param {Function} [options.filter]
 	 * @returns {Promise<string>}

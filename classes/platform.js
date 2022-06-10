@@ -248,7 +248,11 @@ module.exports = class Platform extends require("./template.js") {
 		}
 
 		const availableEmotes = await this.fetchGlobalEmotes();
-		for (const emote of emotes) {
+		const emoteArray = (options.shuffle)
+			? sb.Utils.shuffleArray(emotes)
+			: emotes;
+
+		for (const emote of emoteArray) {
 			const available = availableEmotes.find(i => i.name === emote);
 			if (available && (typeof options.filter !== "function" || options.filter(available))) {
 				return (options.returnEmoteObject)
