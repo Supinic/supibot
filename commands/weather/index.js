@@ -72,6 +72,13 @@ module.exports = {
 			const index = Math.trunc((degrees - base) / interval);
 
 			return directions[index];
+		},
+		pollutionIndexIcons: {
+			1: "🔵",
+			2: "🟢",
+			3: "🟡",
+			4: "🟠",
+			5: "🔴"
 		}
 	})),
 	Code: (async function weather (context, ...args) {
@@ -281,13 +288,16 @@ module.exports = {
 			const { components } = data;
 			const place = (skipLocation) ? "(location hidden)" : formattedAddress;
 
+			const { pollutionIndexIcons } = this.staticData;
+			const icon = pollutionIndexIcons[index];
+
 			const componentsString = Object.entries(components)
 				.map(([type, value]) => `${type.toUpperCase().replace("_", ".")}: ${value.toFixed(3)}`)
 				.join(", ");
 
 			return {
 				reply: sb.Utils.tag.trim `
-					Current pollution index for ${place}: ${index}.
+					${place} current pollution index: ${index} ${icon}
 					Particles: ${componentsString}.				
 				`
 			};
