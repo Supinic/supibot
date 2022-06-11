@@ -154,6 +154,17 @@ module.exports = {
 				}
 			},
 			{
+				name: "executor",
+				aliases: ["self"],
+				description: "Prints your username.",
+				examples: [
+					["$abb executor", "(you)"]
+				],
+				execute: (context) => ({
+					reply: context.user.Name
+				})
+			},
+			{
 				name: "explode",
 				aliases: [],
 				description: "Adds a space between all characters of the provided input - then, each one can be used as a specific argument.",
