@@ -443,7 +443,7 @@ module.exports = class Reminder extends require("./template.js") {
 			}
 		}
 
-		const targetUserMention = await hannelData.Platform.createUserMention(targetUserData);
+		const targetUserMention = await channelData.Platform.createUserMention(targetUserData);
 		const checkResult = await channelData.prepareMessage(targetUserMention, {
 			returnBooleanOnFail: true,
 			skipLengthCheck: true
