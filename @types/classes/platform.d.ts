@@ -88,7 +88,7 @@ export declare class Platform extends ClassTemplate {
 	prepareMessage (message: Message, channel: string, options: PrepareMessageOptions): Promise<string>;
 	getFullName (separator: string): string;
 	getCacheKey (): string;
-	createUserMention (userData: User): string;
+	createUserMention (userData: User): Promise<string>;
 
 	get capital (): string;
 	get privateMessageLoggingTableName (): string;

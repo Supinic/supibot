@@ -115,8 +115,8 @@ module.exports = class Reminder extends require("./template.js") {
 			const fromUserData = await sb.User.get(this.User_From, true);
 			const toUserData = await sb.User.get(this.User_To, true);
 
-			const fromMention = this.Platform.createUserMention(fromUserData);
-			const toMention = this.Platform.createUserMention(toUserData);
+			const fromMention = await this.Platform.createUserMention(fromUserData);
+			const toMention = await this.Platform.createUserMention(toUserData);
 
 			let message;
 			if (this.User_From === this.User_To) {
@@ -393,8 +393,8 @@ module.exports = class Reminder extends require("./template.js") {
 					platform = sb.Platform.get(reminder.Platform);
 				}
 
-				const authorMention = platform.controller.createUserMention(fromUserData);
-				const targetMention = platform.controller.createUserMention(targetUserData);
+				const authorMention = await platform.controller.createUserMention(fromUserData);
+				const targetMention = await platform.controller.createUserMention(targetUserData);
 
 				let message = `${authorMention}, ${targetMention} just typed in channel ${channelName}`;
 				if (reminder.Text) {
@@ -426,7 +426,7 @@ module.exports = class Reminder extends require("./template.js") {
 				reminderMessage = `system reminder - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
 			}
 			else if (reminder.Text !== null) {
-				const mention = channelData.Platform.createUserMention(fromUserData);
+				const mention = await channelData.Platform.createUserMention(fromUserData);
 				const { string } = await sb.Banphrase.execute(mention, channelData);
 
 				reminderMessage = `${string} - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
@@ -443,7 +443,7 @@ module.exports = class Reminder extends require("./template.js") {
 			}
 		}
 
-		const targetUserMention = channelData.Platform.createUserMention(targetUserData);
+		const targetUserMention = await hannelData.Platform.createUserMention(targetUserData);
 		const checkResult = await channelData.prepareMessage(targetUserMention, {
 			returnBooleanOnFail: true,
 			skipLengthCheck: true

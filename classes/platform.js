@@ -285,8 +285,8 @@ module.exports = class Platform extends require("./template.js") {
 		return `sb-platform-${name}`;
 	}
 
-	createUserMention (userData) {
-		return this.#controller.createUserMention(userData);
+	async createUserMention (userData) {
+		return await this.#controller.createUserMention(userData);
 	}
 
 	get userMessagePromises () {

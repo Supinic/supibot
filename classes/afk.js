@@ -142,7 +142,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 
 		const status = sb.Utils.randArray(responses[data.Status]);
 		if (!data.Silent) {
-			const userMention = channelData.Platform.createUserMention(userData);
+			const userMention = await channelData.Platform.createUserMention(userData);
 			const message = `${userMention} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
 
 			if (channelData.Mirror) {
