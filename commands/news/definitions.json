@@ -823,5 +823,18 @@
         "helpers": ["ALazyMeme"]
       }
     ]
+  },
+  {
+    "code": "az",
+    "language": "Azerbaijani",
+    "sources": [
+      {
+        "name": "AZƏRTAC",
+        "url": "https://azertag.az/",
+        "path": null,
+        "endpoints": ["rss", "rssofficialchronicle", "rssculture"],
+        "helpers": []
+      }
+    ]
   }
 ]
