@@ -1,4 +1,4 @@
-const { Client, Intents, DiscordAPIError } = require("discord.js");
+const { Client, Intents, DiscordAPIError, GuildMember } = require("discord.js");
 
 module.exports = class DiscordController extends require("./template.js") {
 	constructor () {
@@ -632,8 +632,15 @@ module.exports = class DiscordController extends require("./template.js") {
 		}));
 	}
 
-	createUserMention (userData) {
-		return (userData.Discord_ID)
+	async createUserMention (userData, channelData) {
+		if (!userData.Discord_ID || !channelData || !channelData.Specific_ID) {
+			return userData.Name;
+		}
+
+		const guild = await this.client.guilds.fetch(channelData.Specific_ID);
+		const guildMember = await guild.members.resolve(userData.Discord_ID);
+
+		return (guildMember instanceof GuildMember)
 			? `<@${userData.Discord_ID}>`
 			: userData.Name;
 	}

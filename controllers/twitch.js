@@ -1061,7 +1061,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		return preparedMessage;
 	}
 
-	createUserMention (userData) {
+	async createUserMention (userData) {
 		return `@${userData.Name}`;
 	}
 

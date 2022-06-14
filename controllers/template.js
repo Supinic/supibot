@@ -166,7 +166,7 @@ module.exports = class Controller {
 		return message;
 	}
 
-	createUserMention (userData) {
+	async createUserMention (userData) {
 		return userData.Name;
 	}
 
