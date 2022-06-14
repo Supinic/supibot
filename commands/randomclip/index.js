@@ -6,7 +6,7 @@ module.exports = {
 	Description: "Posts a random clip from either the current channel or the specified channel.",
 	Flags: ["mention","non-nullable","pipe","use-params"],
 	Params: [
-		{ name: "clippedBy", type: "string" },
+		{ name: "author", type: "string" },
 		{ name: "dateFrom", type: "date" },
 		{ name: "dateTo", type: "date" },
 		{ name: "limit", type: "number" },
@@ -133,8 +133,8 @@ module.exports = {
 		}
 
 		let clips = response.body.data;
-		if (context.params.clippedBy) {
-			const userID = await sb.Utils.getTwitchID(context.params.clippedBy);
+		if (context.params.author) {
+			const userID = await sb.Utils.getTwitchID(context.params.author);
 			if (!userID) {
 				return {
 					success: false,
@@ -187,9 +187,9 @@ module.exports = {
 		"The number must be in a range between 1 and 100.",
 		"",
 
-		`<code>${prefix}rc <u>clippedBy:(username)</u></code>`,
-		`<code>${prefix}rc <u>clippedBy:ClipItAndShipIt</u></code>`,
-		"Filters the top clips by their creator, and then posts a random one.",
+		`<code>${prefix}rc <u>author:(username)</u></code>`,
+		`<code>${prefix}rc <u>author:ClipItAndShipIt</u></code>`,
+		"Filters the top clips by their author, and then posts a random one.",
 		"",
 
 		`<code>${prefix}rc <u>period:(time frame)</u></code>`,
