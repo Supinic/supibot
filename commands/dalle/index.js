@@ -18,7 +18,7 @@ module.exports = {
 		}
 
 		const notificationTimeout = setTimeout(() => {
-			context.channel?.send("Seems like it's working PauseChamp ppCircle see you in two minutes or so");
+			context.channel?.send("Seems like it's working PauseChamp ppCircle see you in two to five minutes or so");
 		}, 2000);
 
 		const start = process.hrtime.bigint();
@@ -32,7 +32,7 @@ module.exports = {
 			json: {
 				prompt: query
 			},
-			timeout: 120_000,
+			timeout: 300_000,
 			throwHttpErrors: false
 		});
 
