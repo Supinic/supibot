@@ -63,6 +63,7 @@ module.exports = {
 			hash.update(base64Image);
 		}
 
+		const jsonImageData = response.body.images.map(i => i.replace(/\\n/g, ""));
 		const row = await sb.Query.getRow("data", "DALL-E");
 		row.setValues({
 			ID: hash.digest().toString("hex").slice(0, 16),
@@ -71,7 +72,7 @@ module.exports = {
 			Prompt: query,
 			Created: new sb.Date(),
 			Creation_Time: (Number(nanoExecutionTime) / 1e9),
-			Data: JSON.stringify(response.body.images)
+			Data: JSON.stringify(jsonImageData)
 		});
 
 		await row.save({ skipLoad: false });
