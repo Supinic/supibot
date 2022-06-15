@@ -17,6 +17,10 @@ module.exports = {
 			};
 		}
 
+		const notificationTimeout = setTimeout(() => {
+			context.channel?.send("Seems like it's working PauseChamp ppCircle see you in two minutes or so");
+		}, 2000);
+
 		const start = process.hrtime.bigint();
 		const response = await sb.Got("FakeAgent", {
 			url: "https://bf.dallemini.ai/generate",
@@ -32,8 +36,9 @@ module.exports = {
 			throwHttpErrors: false
 		});
 
-		const executionTime = process.hrtime.bigint() - start;
+		const nanoExecutionTime = process.hrtime.bigint() - start;
 		if (response.statusCode === 503) {
+			clearTimeout(notificationTimeout);
 			return {
 				success: false,
 				reply: `The service is currently overloaded! Try again later.`
@@ -41,6 +46,7 @@ module.exports = {
 		}
 
 		const { images } = response.body;
+		/** @type {string} */
 		const image = sb.Utils.randArray(images);
 		const buffer = Buffer.from(image, "base64");
 
@@ -59,7 +65,7 @@ module.exports = {
 			User_Alias: context.user.ID,
 			Created: new sb.Date(),
 			Prompt: query,
-			Creation_Time: executionTime
+			Creation_Time: (nanoExecutionTime / 1e9)
 		});
 
 		await row.save({ skipLoad: true });
