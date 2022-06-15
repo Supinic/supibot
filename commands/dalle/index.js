@@ -77,9 +77,9 @@ module.exports = {
 
 		await row.save({ skipLoad: false });
 
-		const { UUID } = row.values;
+		const { ID } = row.values;
 		return {
-			reply: `Your DALL-E image: https://supinic.com/data/dalle/detail/${UUID}`
+			reply: `Your DALL-E image: https://supinic.com/data/dalle/detail/${ID}`
 		};
 	}),
 	Dynamic_Description: null
