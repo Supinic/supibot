@@ -65,7 +65,7 @@ module.exports = {
 			User_Alias: context.user.ID,
 			Created: new sb.Date(),
 			Prompt: query,
-			Creation_Time: (nanoExecutionTime / 1e9)
+			Creation_Time: (Number(nanoExecutionTime) / 1e9)
 		});
 
 		await row.save({ skipLoad: true });
