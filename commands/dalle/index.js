@@ -58,19 +58,21 @@ module.exports = {
 			};
 		}
 
-		const imgurMatch = uploadData.link.match(/imgur\.com\/(\w+\.\w+)$/);
 		const row = await sb.Query.getRow("data", "DALL-E");
 		row.setValues({
-			Imgur_ID: imgurMatch[1],
 			User_Alias: context.user.ID,
-			Created: new sb.Date(),
+			Channel: context.channel?.ID ?? null,
 			Prompt: query,
-			Creation_Time: (Number(nanoExecutionTime) / 1e9)
+			Created: new sb.Date(),
+			Creation_Time: (Number(nanoExecutionTime) / 1e9),
+			Data: JSON.stringify(response.body.images)
 		});
 
-		await row.save({ skipLoad: true });
+		await row.save({ skipLoad: false });
+
+		const { UUID } = row.values;
 		return {
-			reply: `Your DALL-E image: ${uploadData.link}`
+			reply: `Your DALL-E image: https://supinic.com/data/dalle/detail/${UUID}`
 		};
 	}),
 	Dynamic_Description: null
