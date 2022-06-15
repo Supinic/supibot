@@ -79,7 +79,7 @@ module.exports = {
 
 		const { ID } = row.values;
 		return {
-			reply: `Your DALL-E image: https://supinic.com/data/dalle/detail/${ID}`
+			reply: `Your DALL-E image: https://supinic.com/data/dall-e/detail/${ID}`
 		};
 	}),
 	Dynamic_Description: null
