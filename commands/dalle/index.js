@@ -58,8 +58,14 @@ module.exports = {
 			};
 		}
 
+		const hash = require("crypto").createHash("sha512");
+		for (const base64Image of response.body.images) {
+			hash.update(base64Image);
+		}
+
 		const row = await sb.Query.getRow("data", "DALL-E");
 		row.setValues({
+			ID: hash.digest().toString("hex").slice(0, 16),
 			User_Alias: context.user.ID,
 			Channel: context.channel?.ID ?? null,
 			Prompt: query,
