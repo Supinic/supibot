@@ -71,7 +71,11 @@ module.exports = {
 		pending.set(context.user, context.channel);
 
 		const notificationTimeout = setTimeout(() => {
-			reply(`Seems like the API is working ${waitingEmote} ${loadingEmote} Result should be coming up anywhere between two to five minutes or so`);
+			reply(sb.Utils.tag.trim `
+				Seems like the API is working
+				${waitingEmote} ${loadingEmote}
+				The result should be coming up anywhere between two to five minutes or so.
+			`);
 		}, 2000);
 
 		const start = process.hrtime.bigint();
@@ -93,7 +97,9 @@ module.exports = {
 
 		const nanoExecutionTime = process.hrtime.bigint() - start;
 		if (response.statusCode === 503) {
+			pending.setOverloaded();
 			clearTimeout(notificationTimeout);
+
 			return {
 				success: false,
 				reply: `The service is currently overloaded! Try again later.`
