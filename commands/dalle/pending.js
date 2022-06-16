@@ -3,7 +3,7 @@ const usersPending = new Set();
 const channelThreshold = 3;
 
 let overloadedTimestamp = 0;
-const overloadTimeout = 300_000;
+const overloadTimeout = 30_000;
 
 const setOverloaded = () => {
 	overloadedTimestamp = sb.Date.now() + overloadTimeout;
