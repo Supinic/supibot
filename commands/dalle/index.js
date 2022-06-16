@@ -122,6 +122,12 @@ module.exports = {
 
 		const { ID } = row.values;
 		return {
+			cooldown: {
+				user: context.user.ID,
+				command: this.Name,
+				channel: null,
+				length: 60_000
+			},
 			reply: `Your DALL-E image set: https://supinic.com/data/dall-e/detail/${ID}`
 		};
 	}),
