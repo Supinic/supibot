@@ -19,11 +19,11 @@ module.exports = {
 		const latest = data[0];
 
 		const releaseDate = new sb.Date(latest.created_at).format("Y-m-d H:i");
-		const message = `New Node.js version detected! PagChomp 👉 ${latest.tag_name}; Changelog: ${latest.html_url}; Released on ${releaseDate}`;
+		const message = `New Node.js version detected! PagChomp 👉 ${latest.tag_name}; Released on ${releaseDate}; Changelog: ${latest.html_url}`;
 
 		if (latest.tag_name !== sb.Config.get("LATEST_NODE_JS_VERSION")) {
 			console.log("New nodejs version!", sb.Config.get("LATEST_NODE_JS_VERSION"), latest.tag_name);
-			sb.Config.set("LATEST_NODE_JS_VERSION", latest.tag_name);
+			await sb.Config.set("LATEST_NODE_JS_VERSION", latest.tag_name);
 
 			const users = await sb.Query.getRecordset(rs => rs
 				.select("Event_Subscription.User_Alias AS ID")
