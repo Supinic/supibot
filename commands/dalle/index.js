@@ -3,22 +3,75 @@ module.exports = {
 	Aliases: [],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Creates a new DALL-E image based on your prompt, or fetches one that was already made.",
+	Description: "Fetches a new DALL-E image based on your prompt, or fetches one that was already made.",
 	Flags: ["mention","non-nullable"],
-	Params: null,
+	Params: [
+		{ name: "search", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function dallE (context, ...args) {
+		if (context.params.search) {
+			const { search } = context.params;
+			const image = await sb.Query.getRecordset(rs => rs
+				.select("ID", "Prompt")
+				.from("data", "DALL-E")
+				.orderBy("RAND()")
+				.where(
+					{ condition: Boolean(search) },
+					"Prompt %*like*",
+					search
+				)
+				.limit(1)
+				.single()
+			);
+
+			return {
+				reply: `Random DALL-E image set for "${image.Prompt}": https://supinic.com/data/dall-e/detail/${image.ID}`
+			};
+		}
+		else if (context.append.pipe) {
+			return {
+				success: false,
+				reply: `Piping input into this command in order to create a prompt is not allowed!`
+			};
+		}
+
+		const pending = require("./pending.js");
 		const query = args.join(" ");
 		if (!query) {
 			return {
 				success: false,
-				reply: `Checking existing images is currently not supported!`
+				reply: `No prompt provided! If you want to search for existing image sets, use the "search" parameter.`
 			};
 		}
 
+		const pendingResult = pending.check(context.user, context.channel);
+		if (!pendingResult.success) {
+			return pendingResult;
+		}
+
+		const [waitingEmote, loadingEmote] = await Promise.all([
+			context.getBestAvailableEmote(
+				["PauseChamp", "pajaPause", "CoolStoryBob", "GivePLZ"],
+				"😴",
+				{ shuffle: true }
+			),
+			context.getBestAvailableEmote(
+				["ppCircle", "supiniLoading", "dankCircle", "ppAutismo", "pajaAAAAAAAAAAA"],
+				"⌛",
+				{ shuffle: true }
+			)
+		]);
+
+		const reply = (context.channel)
+			? (message) => context.channel.send(message)
+			: (message) => context.platform.pm(message, context.channel.user);
+
+		pending.set(context.user, context.channel);
+
 		const notificationTimeout = setTimeout(() => {
-			context.channel?.send("Seems like it's working PauseChamp ppCircle see you in two to five minutes or so");
+			reply(`Seems like the API is working ${waitingEmote} ${loadingEmote} Result should be coming up anywhere between two to five minutes or so`);
 		}, 2000);
 
 		const start = process.hrtime.bigint();
@@ -35,6 +88,8 @@ module.exports = {
 			timeout: 300_000,
 			throwHttpErrors: false
 		});
+
+		pending.unset(context.user, context.channel);
 
 		const nanoExecutionTime = process.hrtime.bigint() - start;
 		if (response.statusCode === 503) {
@@ -67,7 +122,7 @@ module.exports = {
 
 		const { ID } = row.values;
 		return {
-			reply: `Your DALL-E image: https://supinic.com/data/dall-e/detail/${ID}`
+			reply: `Your DALL-E image set: https://supinic.com/data/dall-e/detail/${ID}`
 		};
 	}),
 	Dynamic_Description: null
