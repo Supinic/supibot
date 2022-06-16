@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Creates a new DALL-E image based on your prompt, or fetches one that was already made.",
-	Flags: ["mention","non-nullable","pipe","skip-banphrase"],
+	Flags: ["mention","non-nullable"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
