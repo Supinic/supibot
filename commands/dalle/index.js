@@ -46,24 +46,12 @@ module.exports = {
 		}
 
 		const { images } = response.body;
-		/** @type {string} */
-		const image = sb.Utils.randArray(images);
-		const buffer = Buffer.from(image, "base64");
-
-		const uploadData = await sb.Utils.uploadToImgur(buffer);
-		if (!uploadData.link) {
-			return {
-				success: false,
-				reply: `Image upload failed!`
-			};
-		}
-
 		const hash = require("crypto").createHash("sha512");
-		for (const base64Image of response.body.images) {
+		for (const base64Image of images) {
 			hash.update(base64Image);
 		}
 
-		const jsonImageData = response.body.images.map(i => i.replace(/\\n/g, ""));
+		const jsonImageData = images.map(i => i.replace(/\\n/g, ""));
 		const row = await sb.Query.getRow("data", "DALL-E");
 		row.setValues({
 			ID: hash.digest().toString("hex").slice(0, 16),
