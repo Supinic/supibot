@@ -6,19 +6,21 @@ module.exports = {
 	Description: "Fetches a new DALL-E image based on your prompt, or fetches one that was already made.",
 	Flags: ["mention","non-nullable"],
 	Params: [
+		{ name: "random", type: "boolean" },
 		{ name: "search", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function dallE (context, ...args) {
-		if (context.params.search) {
-			const { search } = context.params;
+		if (context.params.search || context.params.random) {
+			const { random, search } = context.params;
 			const image = await sb.Query.getRecordset(rs => rs
 				.select("ID", "Prompt")
 				.from("data", "DALL-E")
 				.orderBy("RAND()")
 				.where(
-					{ condition: Boolean(search) },
+					// In order to search for a prompt, `random` must be falsy and `search` must be provided
+					{ condition: (!random && search) },
 					"Prompt %*like*",
 					search
 				)
@@ -34,7 +36,7 @@ module.exports = {
 			}
 
 			return {
-				reply: `Random DALL-E image set for "${image.Prompt}": https://supinic.com/data/dall-e/detail/${image.ID}`
+				reply: `DALL-E image set for "${image.Prompt}": https://supinic.com/data/dall-e/detail/${image.ID}`
 			};
 		}
 
@@ -137,8 +139,28 @@ module.exports = {
 				channel: null,
 				length: 60_000
 			},
-			reply: `Your DALL-E image set for prompt "${query}": https://supinic.com/data/dall-e/detail/${ID}`
+			reply: `DALL-E image set for prompt "${query}": https://supinic.com/data/dall-e/detail/${ID}`
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"Creates a DALL-E AI generated image, based on your prompt.",
+		"Alternatively, searches for an existing prompt someone else has created.",
+		"",
+
+		`<code>${prefix}dalle (your prompt here)</code>`,
+		`<code>${prefix}dalle Billy Herrington as president of the United States</code>`,
+		"Creates a set of nine pictures with your prompt, and posts a link to it in the chat.",
+		"Warning: This creation can take up to 2-5 minutes, so be patient. When the image is being generated, you cannot use any other commands until it finishes.",
+		"Even still, the generation service can be overloaded at times (usually in the evening EU time), in which case you'll have to try again later.",
+		"",
+
+		`<code>${prefix}dalle search:(your search here)</code>`,
+		`<code>${prefix}dalle search:forsen</code>`,
+		`<code>${prefix}dalle search:"my nightmare tonight"</code>`,
+		"Searches for an existing image set, based on your prompt - that someone has created before.",
+		"",
+
+		`<code>${prefix}dalle random:true</code>`,
+		"Posts a random image set that someone has created before."
+	])
 };
