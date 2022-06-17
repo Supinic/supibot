@@ -141,7 +141,7 @@ module.exports = {
 				channel: null,
 				length: 60_000
 			},
-			reply: `Your DALL-E image set: https://supinic.com/data/dall-e/detail/${ID}`
+			reply: `Your DALL-E image set for prompt "${query}": https://supinic.com/data/dall-e/detail/${ID}`
 		};
 	}),
 	Dynamic_Description: null
