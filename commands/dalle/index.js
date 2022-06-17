@@ -71,6 +71,7 @@ module.exports = {
 			)
 		]);
 
+		const username = context.user.Name;
 		const reply = (context.channel)
 			? (message) => context.channel.send(message)
 			: (message) => context.platform.pm(message, context.user);
@@ -79,6 +80,7 @@ module.exports = {
 
 		const notificationTimeout = setTimeout(() => {
 			reply(sb.Utils.tag.trim `
+				@${username},
 				Seems like the API is working
 				${waitingEmote} ${loadingEmote}
 				The result should be coming up anywhere between two to five minutes or so.
