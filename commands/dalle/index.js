@@ -25,6 +25,13 @@ module.exports = {
 				.limit(1)
 				.single()
 			);
+			
+			if (!image) {
+				return {
+					success: false,
+					reply: `No images found for your query!`
+				};
+			}
 
 			return {
 				reply: `Random DALL-E image set for "${image.Prompt}": https://supinic.com/data/dall-e/detail/${image.ID}`
