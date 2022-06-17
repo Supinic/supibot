@@ -25,7 +25,7 @@ module.exports = {
 				.limit(1)
 				.single()
 			);
-			
+
 			if (!image) {
 				return {
 					success: false,
@@ -73,7 +73,7 @@ module.exports = {
 
 		const reply = (context.channel)
 			? (message) => context.channel.send(message)
-			: (message) => context.platform.pm(message, context.channel.user);
+			: (message) => context.platform.pm(message, context.user);
 
 		pending.set(context.user, context.channel);
 
