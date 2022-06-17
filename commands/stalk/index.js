@@ -78,8 +78,10 @@ module.exports = {
 
 			// Only refuse to send the message if the ban type ("reason") is a TOS violation.
 			// Memo: possibly also refuse to send when type is `DEACTIVATED`?
-			const [userData] = response.body;
-			if (userData && userData.banned && userData.banReason === "TOS_TEMPORARY" || userData.banReason === "TOS_INDEFINITE") {
+			const [userInfo] = response.body;
+			const omittedBanReasons = ["TOS_TEMPORARY", "TOS_INDEFINITE"];
+
+			if (userInfo && userInfo.banned && omittedBanReasons.includes(userInfo.banReason)) {
 				return {
 					success: false,
 					reply: "You cannot stalk that user as they're currently banned on Twitch!"
