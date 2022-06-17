@@ -37,12 +37,6 @@ module.exports = {
 				reply: `Random DALL-E image set for "${image.Prompt}": https://supinic.com/data/dall-e/detail/${image.ID}`
 			};
 		}
-		else if (context.append.pipe) {
-			return {
-				success: false,
-				reply: `Piping input into this command in order to create a prompt is not allowed!`
-			};
-		}
 
 		const pending = require("./pending.js");
 		const query = args.join(" ");
