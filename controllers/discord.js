@@ -165,13 +165,14 @@ module.exports = class DiscordController extends require("./template.js") {
 					await channelData.saveProperty("Mode", channelData.Mode);
 				}
 
-				const channelDescription = `${guild.name} - #${messageObject.channel.name}`;
+				const discordChannel = messageObject.channel;
+				const channelDescription = `${guild.name} - #${discordChannel.name}`;
 				if (channelData.Description !== channelDescription) {
 					await channelData.saveProperty("Description", channelDescription);
 				}
 
-				if (channelData.NSFW !== messageObject.channel.nsfw) {
-					await channelData.saveProperty("NSFW", messageObject.channel.nsfw);
+				if (channelData.NSFW !== discordChannel.nsfw) {
+					await channelData.saveProperty("NSFW", discordChannel.nsfw);
 				}
 
 				channelData.sessionData.lastActivity = {
