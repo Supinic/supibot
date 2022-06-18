@@ -318,6 +318,13 @@ module.exports = {
 					appid: sb.Config.get("API_OPEN_WEATHER_MAP")
 				}
 			});
+			
+			if (response.statusCode === 429) {
+				return {
+					success: false,
+					reply: `The weather API is currently unavailable due to too many requests! Try again later.`
+				};
+			}
 
 			data = response.body;
 			await this.setCacheData(weatherKey, data, { expiry: 600_000 }); // 10 minutes cache
