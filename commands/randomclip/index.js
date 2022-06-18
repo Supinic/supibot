@@ -125,6 +125,12 @@ module.exports = {
 				reply: "That user does not exist!"
 			};
 		}
+		else if (response.statusCode !== 200) {
+			return {
+				success: false,
+				reply: `Twitch didn't send any clips data! Try again later`
+			};
+		}
 		else if (response.body.data.length === 0) {
 			return {
 				success: false,
