@@ -6,6 +6,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 	 * @type {Map<number, AwayFromKeyboard>}
 	 */
 	static data = new Map();
+	static defaultStatus = "afk";
 
 	constructor (data) {
 		super();
@@ -45,7 +46,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		 * E.g. "no longer AFK", "no longer taking a shower", ...
 		 * @type {string}
 		 */
-		this.Status = data.Status ?? "afk";
+		this.Status = data.Status ?? AwayFromKeyboard.defaultStatus;
 	}
 
 	async serialize () {
@@ -140,7 +141,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			return;
 		}
 
-		const status = sb.Utils.randArray(responses[data.Status]);
+		const status = sb.Utils.randArray(responses[data.Status] ?? responses[AwayFromKeyboard.defaultStatus]);
 		if (!data.Silent) {
 			const userMention = await channelData.Platform.createUserMention(userData);
 			const message = `${userMention} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
