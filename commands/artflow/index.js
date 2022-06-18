@@ -10,8 +10,8 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function artflow (context, ...args) {
 		const imageData = await sb.Query.getRecordset(rs => {
-			rs.select("Prompt", "Upload_Link")
-				.from("data", "Artflow_Image", "Added")
+			rs.select("Prompt", "Upload_Link", "Added")
+				.from("data", "Artflow_Image")
 				.orderBy("RAND()")
 				.limit(1)
 				.single();
