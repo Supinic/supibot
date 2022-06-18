@@ -36,7 +36,7 @@ module.exports = {
 			}
 
 			return {
-				reply: `DALL-E image set for "${image.Prompt}": https://supinic.com/data/dall-e/detail/${image.ID}`
+				reply: `https://supinic.com/data/dall-e/detail/${image.ID} DALL-E image set for "${image.Prompt}"`
 			};
 		}
 
@@ -139,7 +139,7 @@ module.exports = {
 				channel: null,
 				length: 60_000
 			},
-			reply: `DALL-E image set for prompt "${query}": https://supinic.com/data/dall-e/detail/${ID}`
+			reply: `https://supinic.com/data/dall-e/detail/${ID} DALL-E image set for prompt "${query}"`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
