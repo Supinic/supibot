@@ -1,5 +1,4 @@
 const url = "https://ergast.com/api/f1/";
-const weatherCommand = sb.Command.get("weather");
 const sessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying", "Sprint"];
 const sessionNames = {
 	FirstPractice: "First practice",
@@ -10,6 +9,7 @@ const sessionNames = {
 };
 
 const getWeather = async (context, sessionStart, coordinates) => {
+	const weatherCommand = sb.Command.get("weather");
 	if (!weatherCommand) {
 		return "Weather checking is not available!";
 	}
