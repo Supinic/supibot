@@ -143,7 +143,7 @@ module.exports = {
 			return {
 				reply: (context.params.textOnly)
 					? links
-					: `${fixedText} ${links} (posted ${delta}}`
+					: `${fixedText} ${links} (posted ${delta})`
 			};
 		}
 		else {
