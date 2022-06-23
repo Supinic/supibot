@@ -59,11 +59,11 @@ module.exports = {
 			retry: 0,
 			throwHttpErrors: false,
 			url: "https://www.alphavantage.co/query",
-			searchParams: new sb.URLParams()
-				.set("function", "GLOBAL_QUOTE")
-				.set("symbol", symbol)
-				.set("apikey", sb.Config.get("API_ALPHA_AVANTAGE"))
-				.toString()
+			searchParams: {
+				function: "GLOBAL_QUOTE",
+				symbol,
+				apikey: sb.Config.get("API_ALPHA_AVANTAGE")
+			}
 		}).json();
 
 		if (!rawData || Object.keys(rawData).length === 0) {

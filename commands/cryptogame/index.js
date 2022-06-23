@@ -25,19 +25,19 @@ module.exports = {
 						url: "latest",
 						throwHttpErrors: false,
 						responseType: "json",
-						searchParams: new sb.URLParams()
-							.set("access_key", sb.Config.get("API_FIXER_IO"))
-							.toString()
+						searchParams: {
+							access_key: sb.Config.get("API_FIXER_IO")
+						}
 					}).json();
 				});
 
 				const [cryptoData, currencyData, goldData, silverData] = await Promise.allSettled([
 					sb.Got("GenericAPI", {
 						url: "https://min-api.cryptocompare.com/data/price",
-						searchParams: new sb.URLParams()
-							.set("fsym", "EUR")
-							.set("tsyms", "BTC,XRP,DOGE,ETH,BCH,LTC,EOS,XLM,BNB,USDT,DOT,ADA,LINK,XMR,ANAL,SHIB")
-							.toString(),
+						searchParams: {
+							fsym: "EUR",
+							tsyms: "BTC,XRP,DOGE,ETH,BCH,LTC,EOS,XLM,BNB,USDT,DOT,ADA,LINK,XMR,ANAL,SHIB"
+						},
 						headers: {
 							Authorization: `Apikey ${sb.Config.get("API_CRYPTO_COMPARE")}`
 						}

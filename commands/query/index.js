@@ -15,16 +15,16 @@ module.exports = {
 				cooldown: { length: 2500 }
 			};
 		}
-	
+
 		const rawData = await sb.Got({
 			throwHttpErrors: false,
 			url: "http://api.wolframalpha.com/v1/result",
-			searchParams: new sb.URLParams()
-				.set("appid", sb.Config.get("API_WOLFRAM_ALPHA_APPID"))
-				.set("i", args.join(" "))
-				.toString()
+			searchParams: {
+				appid: sb.Config.get("API_WOLFRAM_ALPHA_APPID"),
+				i: args.join(" ")
+			}
 		}).text();
-	
+
 		const data = sb.Config.get("WOLFRAM_QUERY_CENSOR_FN")(rawData);
 		return {
 			reply: (context.platform.Name === "discord")

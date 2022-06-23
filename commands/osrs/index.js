@@ -229,9 +229,9 @@ module.exports = {
 					url: "https://secure.runescape.com/m=itemdb_oldschool/api/catalogue/detail.json",
 					throwHttpErrors: false,
 					followRedirect: false,
-					searchParams: new sb.URLParams()
-						.set("item", item.Game_ID)
-						.toString()
+					searchParams: {
+						item: item.Game_ID
+					}
 				});
 
 				if (response.statusCode === 302) {

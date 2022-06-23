@@ -24,9 +24,9 @@ module.exports = {
 				"X-Requested-With": "XMLHttpRequest",
 				"X-Spiferack": "1"
 			},
-			searchParams: new sb.URLParams()
-				.set("q", args.join(" "))
-				.toString()
+			searchParams: {
+				q: args.join(" ")
+			}
 		}).json();
 
 		if (data.package) {

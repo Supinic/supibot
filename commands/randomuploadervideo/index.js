@@ -18,7 +18,7 @@ module.exports = {
 				reply: `No link provided!`
 			};
 		}
-	
+
 		const type = sb.Utils.modules.linkParser.autoRecognize(link);
 		if (type === null) {
 			return {
@@ -32,7 +32,7 @@ module.exports = {
 				reply: `Provided link is not located on YouTube - cannot continue!`
 			};
 		}
-	
+
 		const linkData = await sb.Utils.modules.linkParser.fetchData(link);
 		if (!linkData) {
 			return {
@@ -40,18 +40,18 @@ module.exports = {
 				reply: `Provided video is not available!`
 			};
 		}
-	
+
 		const authorData = await sb.Got({
 			throwHttpErrors: false,
 			responseType: "json",
 			url: "https://www.googleapis.com/youtube/v3/channels",
-			searchParams: new sb.URLParams()
-				.set("part", "contentDetails,snippet")
-				.set("id", linkData.authorID)
-				.set("key", sb.Config.get("API_GOOGLE_YOUTUBE"))
-				.toString()
+			searchParams: {
+				part: "contentDetails,snippet",
+				id: linkData.authorID,
+				key: sb.Config.get("API_GOOGLE_YOUTUBE")
+			}
 		}).json();
-	
+
 		const playlistID = authorData?.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
 		if (!playlistID) {
 			return {
@@ -59,7 +59,7 @@ module.exports = {
 				reply: `No uploads playlist found!`
 			};
 		}
-	
+
 		const { result } = await sb.Utils.fetchYoutubePlaylist({
 			key: sb.Config.get("API_GOOGLE_YOUTUBE"),
 			limit: 50,
@@ -67,7 +67,7 @@ module.exports = {
 			perPage: 50,
 			playlistID
 		});
-	
+
 		const playlistData = result.filter(i => i.ID !== linkData.ID);
 		if (playlistData.length === 0) {
 			return {
@@ -75,7 +75,7 @@ module.exports = {
 				reply: `There are no other videos from this uploader!`
 			};
 		}
-	
+
 		const { ID } = sb.Utils.randArray(playlistData);
 		if (context.params.linkOnly) {
 			return {

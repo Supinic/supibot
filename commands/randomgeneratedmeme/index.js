@@ -258,11 +258,11 @@ module.exports = {
 				url: "https://imgflip.com/ajax_get_le_data",
 				responseType: "json"
 			});
-	
+
 			this.data.token = body.__tok;
 			this.data.cookie = headers["set-cookie"].find(i => i.includes("iflipsess"));
 		}
-	
+
 		const { ID, name } = sb.Utils.randArray(this.staticData.memes);
 		const { statusCode, body: data } = await sb.Got("FakeAgent", {
 			method: "POST",
@@ -272,23 +272,23 @@ module.exports = {
 				"content-type": "application/x-www-form-urlencoded; charset=UTF-8",
 				cookie: this.data.cookie
 			},
-			body: new sb.URLParams()
-				.set("meme_id", ID)
-				.set("init_text", "")
-				.set("__cookie_enabled", "1")
-				.set("__tok", this.data.token)
-				.toString()
+			body: {
+				meme_id: ID,
+				init_text: "",
+				__cookie_enabled: "1",
+				__tok: this.data.token
+			}
 		});
-	
+
 		if (!Array.isArray(data.texts)) {
 			console.warn("rgm no text", { statusCode, data });
-	
+
 			return {
 				success: false,
 				reply: "Could not fetch any text from this meme!"
 			};
 		}
-	
+
 		return {
 			reply: `${name}: ${data.texts.join(" - ")}`
 		};

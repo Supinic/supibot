@@ -47,10 +47,10 @@ module.exports = {
 
 		const name = await sb.Got({
 			url: "https://donjon.bin.sh/name/rpc-name.fcgi",
-			searchParams: new sb.URLParams()
-				.set("type", type)
-				.set("n", "1")
-				.toString()
+			searchParams: {
+				type,
+				n: "1"
+			}
 		}).text();
 
 		return {

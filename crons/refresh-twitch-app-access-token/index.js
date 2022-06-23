@@ -9,16 +9,16 @@ module.exports = {
 			method: "POST",
 			url: "https://id.twitch.tv/oauth2/token",
 			responseType: "json",
-			searchParams: new sb.URLParams()
-				.set("grant_type", "client_credentials")
-				.set("client_id", sb.Config.get("TWITCH_CLIENT_ID"))
-				.set("client_secret", sb.Config.get("TWITCH_CLIENT_SECRET"))
-				.set("scope", "")
-				.toString()
+			searchParams: {
+				grant_type: "client_credentials",
+				client_id: sb.Config.get("TWITCH_CLIENT_ID"),
+				client_secret: sb.Config.get("TWITCH_CLIENT_SECRET"),
+				scope: ""
+			}
 		}).json();
-	
+
 		await sb.Config.set("TWITCH_APP_ACCESS_TOKEN", token);
-		
+
 		console.log("Twitch app access token successfuly updated");
 	})
 };

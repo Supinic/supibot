@@ -342,12 +342,12 @@ module.exports = {
 				const { body, statusCode } = await sb.Got("Vimeo", {
 					url: "videos",
 					throwHttpErrors: false,
-					searchParams: new sb.URLParams()
-						.set("query", args.join(" "))
-						.set("per_page", "1")
-						.set("sort", "relevant")
-						.set("direction", "desc")
-						.toString()
+					searchParams: {
+						query: args.join(" "),
+						per_page: "1",
+						sort: "relevant",
+						direction: "desc"
+					}
 				});
 
 				if (statusCode !== 200 || body.error) {

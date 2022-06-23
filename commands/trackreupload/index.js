@@ -10,14 +10,14 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function trackReload (extra, existingID, reuploadLink) {
 		existingID = Number(existingID);
-		
+
 		if (!sb.Utils.isValidInteger(existingID)) {
 			return { reply: "First argument must be positive finite integer!" };
 		}
 		else if (!reuploadLink) {
 			return { reply: "Second argument must either be positive finite integer or a link!" };
 		}
-	
+
 		const reuploadCheck = Number(reuploadLink);
 		if (sb.Utils.isValidInteger(reuploadCheck)) {
 			const row = await sb.Query.getRecordset(rs => rs
@@ -28,23 +28,20 @@ module.exports = {
 				.where("Track.ID = %n", reuploadCheck)
 				.single()
 			);
-			
+
 			if (!row) {
 				return { reply: "Given reupload ID does not exist!" };
 			}
-	
+
 			reuploadLink = row.Link_Prefix.replace(sb.Config.get("VIDEO_TYPE_REPLACE_PREFIX"), row.Link);
 		}
-	
+
 		const result = await sb.Got("Supinic", {
 			method: "POST",
 			url: "track/reupload",
-			searchParams: new sb.URLParams()
-				.set("reuploadLink", reuploadLink)
-				.set("existingID", existingID)
-				.toString()
+			searchParams: { reuploadLink, existingID }
 		}).json();
-		
+
 		return {
 			reply: `Result: ${result.data.message}.`
 		};

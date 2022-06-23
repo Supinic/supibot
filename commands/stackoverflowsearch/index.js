@@ -13,25 +13,25 @@ module.exports = {
 		if (!message) {
 			return { reply: "No search text provided!" };
 		}
-	
+
 		const data = await sb.Got({
 			url: "https://api.stackexchange.com/2.2/search/advanced",
 			gzip: true,
-			searchParams: new sb.URLParams()
-				.set("order", "desc")
-				.set("sort", "relevance")
-				.set("site", "stackoverflow")
-				.set("q", message)
-				.toString()
+			searchParams: {
+				order: "desc",
+				sort: "relevance",
+				site: "stackoverflow",
+				q: message
+			}
 		}).json();
-		
+
 		if (data.quota_remaining === 0) {
 			return { reply: "Daily quota exceeded! :(" };
 		}
 		else if (data.items.length === 0) {
 			return { reply: "No relevant questions found!" };
 		}
-	
+
 		const item = data.items[0];
 		return {
 			reply: sb.Utils.tag.trim `

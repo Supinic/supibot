@@ -5,10 +5,10 @@ module.exports = {
 	Code: (async function supinicStreamDB (context) {
 		const { data: [stream] } = await sb.Got("Helix", {
 			url: "videos",
-			searchParams: new sb.URLParams()
-				.set("user_id", "31400525")
-				.set("first", "1")
-				.toString()
+			searchParams: {
+				user_id: "31400525",
+				first: "1"
+			}
 		}).json();
 
 		if (stream) {

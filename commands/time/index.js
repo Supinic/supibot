@@ -38,11 +38,11 @@ module.exports = {
 		},
 		fetchTimeData: async (coordinates, timestamp = sb.Date.now()) => await sb.Got("Google", {
 			url: "timezone/json",
-			searchParams: new sb.URLParams()
-				.set("timestamp", Math.trunc(timestamp / 1000).toString())
-				.set("location", `${coordinates.lat},${coordinates.lng}`)
-				.set("key", sb.Config.get("API_GOOGLE_TIMEZONE"))
-				.toString()
+			searchParams: {
+				timestamp: Math.trunc(timestamp / 1000).toString(),
+				location: `${coordinates.lat},${coordinates.lng}`,
+				key: sb.Config.get("API_GOOGLE_TIMEZONE")
+			}
 		}).json()
 	})),
 	Code: (async function time (context, ...args) {
@@ -113,10 +113,10 @@ module.exports = {
 		if (coordinates === null) {
 			const { results: [geoData] } = await sb.Got("Google", {
 				url: "geocode/json",
-				searchParams: new sb.URLParams()
-					.set("address", place)
-					.set("key", sb.Config.get("API_GOOGLE_GEOCODING"))
-					.toString()
+				searchParams: {
+					address: place,
+					key: sb.Config.get("API_GOOGLE_GEOCODING")
+				}
 			}).json();
 
 			if (!geoData) {

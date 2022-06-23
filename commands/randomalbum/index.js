@@ -16,7 +16,7 @@ module.exports = {
 	})),
 	Code: (async function randomAlbum () {
 		const { accessToken, minID, maxID, maxRetries } = this.staticData;
-	
+
 		let data;
 		let retries = 0;
 		while (!data && retries < maxRetries) {
@@ -25,30 +25,30 @@ module.exports = {
 				url: `https://api.genius.com/albums/${albumID}`,
 				responseType: "json",
 				throwHttpErrors: false,
-				searchParams: new sb.URLParams()
-					.set("access_token", accessToken)
-					.toString()
+				searchParams: {
+					access_token: accessToken
+				}
 			});
-	
+
 			retries++;
 			if (statusCode === 200) {
 				data = albumData;
 			}
 		}
-	
+
 		if (retries >= maxRetries) {
 			return {
 				success: false,
 				reply: "Maximum amount of retries exceeded!"
 			};
 		}
-	
+
 		const { album } = data.response;
 		const { artist, url } = album;
 		const releaseYear = (album.release_date)
 			? new sb.Date(album.release_date).year
 			: "(unknown)";
-	
+
 		return {
 			reply: `Your random album: ${album.name} by ${artist.name}, released in ${releaseYear}. More info here: ${url}`
 		};

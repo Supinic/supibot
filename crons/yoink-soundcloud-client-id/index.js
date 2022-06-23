@@ -8,10 +8,10 @@ module.exports = {
 		const { statusCode } = await sb.Got({
 			url: "https://api-v2.soundcloud.com/resolve",
 			throwHttpErrors: false,
-			searchParams: new sb.URLParams()
-				.set("client_id", sb.Config.get("SOUNDCLOUD_CLIENT_ID"))
-				.set("url", "https://soundcloud.com/terribleterrio/mararinha")
-				.toString()
+			searchParams: {
+				client_id: sb.Config.get("SOUNDCLOUD_CLIENT_ID"),
+				url: "https://soundcloud.com/terribleterrio/mararinha"
+			}
 		});
 
 		if (statusCode === 200) {
@@ -35,10 +35,10 @@ module.exports = {
 			const { statusCode } = await sb.Got({
 				url: "https://api-v2.soundcloud.com/resolve",
 				throwHttpErrors: false,
-				searchParams: new sb.URLParams()
-					.set("client_id", clientID)
-					.set("url", "https://soundcloud.com/terribleterrio/mararinha")
-					.toString()
+				searchParams: {
+					client_id: clientID,
+					url: "https://soundcloud.com/terribleterrio/mararinha"
+				}
 			});
 
 			if (statusCode === 200) {

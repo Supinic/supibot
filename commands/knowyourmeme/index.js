@@ -17,7 +17,9 @@ module.exports = {
 
 		const searchHTML = await sb.Got("FakeAgent", {
 			url: "https://knowyourmeme.com/search",
-			searchParams: new sb.URLParams().set("q", args.join(" ")).toString(),
+			searchParams: {
+				q: args.join(" ")
+			},
 			responseType: "text"
 		}).text();
 
