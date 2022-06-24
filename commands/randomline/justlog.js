@@ -23,6 +23,37 @@ const isSupported = async function (channelID) {
 	return list.some(i => i.userID === channelID);
 };
 
+const getRandomChannelLine = async function (channelID) {
+	const response = await sb.Got("GenericAPI", {
+		url: `https://logs.ivr.fi/channelid/${channelID}/random`,
+		throwHttpErrors: false,
+		searchParams: {
+			json: "1"
+		}
+	});
+
+	if (response.statusCode === 403) {
+		return {
+			success: false,
+			reason: "That channel has opted out of logging their messages!"
+		};
+	}
+	else if (response.statusCode === 404) {
+		return {
+			success: false,
+			reason: "Could not load logs for that channel!"
+		};
+	}
+
+	const [message] = response.body.messages;
+	return {
+		success: true,
+		date: new sb.Date(message.timestamp),
+		text: message.text,
+		username: message.username
+	};
+};
+
 const getRandomUserLine = async function (channelID, userID) {
 	const response = await sb.Got("GenericAPI", {
 		url: `https://logs.ivr.fi/channelid/${channelID}/userid/${userID}/random`,
@@ -56,5 +87,6 @@ const getRandomUserLine = async function (channelID, userID) {
 
 module.exports = {
 	isSupported,
+	getRandomChannelLine,
 	getRandomUserLine
 };

@@ -28,8 +28,7 @@ module.exports = {
 
 		let result;
 		if (!context.channel.Logging.has("Lines")) {
-			const { isSupported, getRandomUserLine } = require("./justlog.js");
-
+			const { isSupported, getRandomUserLine, getRandomChannelLine } = require("./justlog.js");
 			if (context.channel.Platform.Name !== "twitch") {
 				return {
 					success: false,
@@ -44,22 +43,23 @@ module.exports = {
 					reply: `This channel does not currently support random lines!`
 				};
 			}
-			else if (!user) {
-				return {
-					success: false,
-					reply: `Checking random lines without a provided user is currently not supported!`
-				};
+
+			let randomLine;
+			if (user) {
+				const userID = await sb.Utils.getTwitchID(user);
+				if (!userID) {
+					return {
+						success: false,
+						reply: `That user does not exist!`
+					};
+				}
+
+				randomLine = await getRandomUserLine(channelID, userID);
+			}
+			else {
+				randomLine = await getRandomChannelLine(channelID);
 			}
 
-			const userID = await sb.Utils.getTwitchID(user);
-			if (!userID) {
-				return {
-					success: false,
-					reply: `That user does not exist!`
-				};
-			}
-
-			const randomLine = await getRandomUserLine(channelID, userID);
 			if (randomLine.success === false) {
 				return {
 					success: false,
