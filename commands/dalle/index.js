@@ -6,21 +6,28 @@ module.exports = {
 	Description: "Fetches a new DALL-E image based on your prompt, or fetches one that was already made.",
 	Flags: ["mention","non-nullable"],
 	Params: [
+		{ name: "id", type: "string" },
 		{ name: "random", type: "boolean" },
 		{ name: "search", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function dallE (context, ...args) {
-		if (context.params.search || context.params.random) {
-			const { random, search } = context.params;
+		if (context.params.search || context.params.random || context.params.id) {
+			const { id, random, search } = context.params;
 			const image = await sb.Query.getRecordset(rs => rs
 				.select("ID", "Prompt")
 				.from("data", "DALL-E")
 				.orderBy("RAND()")
 				.where(
 					// In order to search for a prompt, `random` must be falsy and `search` must be provided
-					{ condition: (!random && search) },
+					{ condition: Boolean(id) },
+					"ID = %s",
+					id
+				)
+				.where(
+					// In order to search for a prompt, `random` must be falsy and `search` must be provided
+					{ condition: (!id && !random && search) },
 					"Prompt %*like*",
 					search
 				)
@@ -158,6 +165,11 @@ module.exports = {
 		`<code>${prefix}dalle search:forsen</code>`,
 		`<code>${prefix}dalle search:"my nightmare tonight"</code>`,
 		"Searches for an existing image set, based on your prompt - that someone has created before.",
+		"",
+
+		`<code>${prefix}dalle id:(post ID)</code>`,
+		`<code>${prefix}dalle id:e5832f798a41d335</code>`,
+		"Looks up a specific post by its ID",
 		"",
 
 		`<code>${prefix}dalle random:true</code>`,
