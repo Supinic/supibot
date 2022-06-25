@@ -150,7 +150,7 @@ module.exports = {
 			return {
 				reply: (context.params.textOnly)
 					? fixedText
-					: `${fixedText} (posted ${delta}}`
+					: `${fixedText} (posted ${delta})`
 			};
 		}
 	}),
