@@ -17,99 +17,86 @@ module.exports = {
 				reply: "This command is not available in private messages!"
 			};
 		}
-	
+
 		const targetUser = (user)
 			? await sb.User.get(user)
 			: context.user;
-	
+
 		if (!targetUser) {
 			return {
 				success: false,
 				reply: "Provided user not found in the database!"
 			};
 		}
-	
-		const check = await sb.Query.getRecordset(rs => rs
-			.select("User_Alias")
+
+		let metaData = await sb.Query.getRecordset(rs => rs
+			.select("First_Message_Posted", "First_Message_Text")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.where("User_Alias = %n", targetUser.ID)
-			.where(
-				"Channel IN %n+",
-				[7, 8, 46].includes(context.channel.ID)
-					? [7, 8, 46]
-					: [context.channel.ID]
-			)
+			.where("Channel = %n", context.channel.ID)
 			.limit(1)
-			.flat("User_Alias")
 			.single()
 		);
-	
-		if (!check) {
+
+		if (!metaData) {
 			return {
 				success: false,
 				reply: "That user has not said anything in this channel!"
 			};
 		}
-	
-		let line;
-		if ([7, 8, 46].includes(context.channel.ID)) {
-			const promises = [7, 8, 46].map(async ID => {
-				const channelData = sb.Channel.get(ID);
-				return await sb.Query.getRecordset(rs => rs
-					.select("Text", "Posted")
-					.from("chat_line", channelData.getDatabaseName())
-					.where("User_Alias = %n", targetUser.ID)
-					.orderBy("ID ASC")
-					.limit(1)
-					.single()
-				);
-			});
-	
-			const lineData = (await Promise.all(promises)).filter(Boolean);
-			if (!lineData) {
+		else if (!metaData.First_Message_Posted) {
+			const dbChannelName = context.channel.getDatabaseName();
+			if (!await sb.Query.isTablePresent("chat_line", dbChannelName)) {
 				return {
 					success: false,
-					reply: "No chat lines found?!"
+					reply: `No first line data is available for that user in this channel!`
 				};
 			}
-	
-			lineData.sort((a, b) => a.Posted - b.Posted);
-			line = lineData[0];
-		}
-		else {
-			line = await sb.Query.getRecordset(rs => rs
+
+			const lineData = await sb.Query.getRecordset(rs => rs
 				.select("Text", "Posted")
-				.from("chat_line", context.channel.getDatabaseName())
+				.from("chat_line", dbChannelName)
 				.where("User_Alias = %n", targetUser.ID)
 				.orderBy("ID ASC")
 				.limit(1)
 				.single()
 			);
-		}
-	
-		if (!line) {
-			return {
-				success: false,
-				reply: "No chat lines found?!"
+
+			const row = await sb.Query.getRow("chat_data", "Message_Meta_User_Alias");
+			await row.load({
+				User_Alias: targetUser.ID,
+				Channel: context.channel.ID
+			});
+
+			row.setValues({
+				First_Message_Posted: lineData.Posted,
+				First_Message_Text: lineData.Text
+			});
+
+			await row.save({ skipLoad: true });
+
+			metaData = {
+				First_Message_Posted: lineData.Posted,
+				First_Message_Text: lineData.Text
 			};
 		}
 
 		if (context.params.textOnly) {
 			return {
-				reply: line.Text
+				reply: metaData.First_Message_Text
 			};
 		}
-	
+
 		const prefix = (targetUser.ID === context.user.ID) ? "Your" : "That user's";
 		return {
 			partialReplies: [
 				{
 					bancheck: false,
-					message: `${prefix} first message in this channel was (${sb.Utils.timeDelta(line.Posted)}):`
+					message: `${prefix} first message in this channel was (${sb.Utils.timeDelta(metaData.First_Message_Posted)}):`
 				},
 				{
 					bancheck: true,
-					message: line.Text
+					message: metaData.First_Message_Text
 				}
 			]
 		};
