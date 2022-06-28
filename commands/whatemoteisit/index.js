@@ -47,7 +47,7 @@ module.exports = {
 		}
 
 		const response = await sb.Got("Leppunen", {
-			url: `v2/twitch/emotes/${inputEmoteIdentifier}`,
+			url: `v2/twitch/emotes/${encodeURIComponent(inputEmoteIdentifier)}`,
 			searchParams: {
 				id: String(isEmoteID) // literally "true" or "false" based on if the intput is an emote ID
 			},
