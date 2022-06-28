@@ -54,22 +54,16 @@ module.exports = {
 			throwHttpErrors: false
 		});
 
-		if (response.statusCode >= 500) {
-			const { error } = response.body;
-			await sb.Platform.get("twitch").pm(
-				`twitch/emotes API failed for "${input}" - server error ${response.statusCode}: ${error ?? "(unknown)"}`,
-				"leppunen"
-			);
-
+		if (response.statusCode === 404) {
 			return {
 				success: false,
-				reply: `API failed with error ${response.statusCode}: ${error}!`
+				reply: "Emote has not been found!"
 			};
 		}
 		else if (response.statusCode !== 200) {
 			return {
 				success: false,
-				reply: response.body.error
+				reply: response.body.error.message
 			};
 		}
 
