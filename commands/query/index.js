@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "query",
-	Aliases: null,
+	Aliases: ["wolframalpha", "wa"],
 	Author: "supinic",
 	Cooldown: 60000,
 	Description: "Wolfram Alpha query",
