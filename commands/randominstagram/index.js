@@ -66,6 +66,13 @@ module.exports = {
 					raw: decodeURI(i.children[0].attribs.src).split("&url=")[1]
 				}));
 
+				if (posts.length === 0) {
+					return {
+						success: false,
+						reply: `No posts have been found! The profile could also be private.`
+					};
+				}
+				
 				const post = sb.Utils.randArray(posts);
 				if (context.params.rawLinkOnly) {
 					return {
