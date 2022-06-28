@@ -252,37 +252,45 @@ module.exports = {
 		]
 	})),
 	Code: (async function randomGeneratedMeme () {
-		if (!this.data.token || !this.data.cookie) {
+		let sessionData = await this.getCacheData("session-data");
+		if (!sessionData) {
 			const { body, headers } = await sb.Got("FakeAgent", {
 				method: "GET",
 				url: "https://imgflip.com/ajax_get_le_data",
 				responseType: "json"
 			});
 
-			this.data.token = body.__tok;
-			this.data.cookie = headers["set-cookie"].find(i => i.includes("iflipsess"));
+			const token = body.__tok;
+			const cookie = headers["set-cookie"].find(i => i.includes("iflipsess"));
+
+			sessionData = { token, cookie };
+
+			await this.setCacheData("session-data", sessionData, {
+				expiry: 36e5 // 1 hour
+			});
 		}
 
 		const { ID, name } = sb.Utils.randArray(this.staticData.memes);
-		const { statusCode, body: data } = await sb.Got("FakeAgent", {
+		const formData = new sb.Got.FormData();
+		formData.append("meme_id", ID);
+		formData.append("init_text", "");
+		formData.append("use_openai", "0");
+		formData.append("__cookie_enabled", "1");
+		formData.append("__tok", sessionData.token);
+
+		const response = await sb.Got("GenericAPI", {
 			method: "POST",
 			responseType: "json",
 			url: "https://imgflip.com/ajax_ai_meme",
 			headers: {
-				"content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-				cookie: this.data.cookie
+				...formData.getHeaders(),
+				cookie: sessionData.cookie
 			},
-			body: {
-				meme_id: ID,
-				init_text: "",
-				__cookie_enabled: "1",
-				__tok: this.data.token
-			}
+			body: formData.getBuffer()
 		});
 
-		if (!Array.isArray(data.texts)) {
-			console.warn("rgm no text", { statusCode, data });
-
+		const { texts } = response.body;
+		if (!Array.isArray(texts)) {
 			return {
 				success: false,
 				reply: "Could not fetch any text from this meme!"
@@ -290,7 +298,7 @@ module.exports = {
 		}
 
 		return {
-			reply: `${name}: ${data.texts.join(" - ")}`
+			reply: `${name}: ${texts.join(" - ")}`
 		};
 	}),
 	Dynamic_Description: null
