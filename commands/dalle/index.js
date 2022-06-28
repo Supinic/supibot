@@ -108,14 +108,23 @@ module.exports = {
 		pending.unset(context.user, context.channel);
 
 		const nanoExecutionTime = process.hrtime.bigint() - start;
-		if (response.statusCode === 503) {
-			pending.setOverloaded();
+		if (response.statusCode !== 200) {
 			clearTimeout(notificationTimeout);
 
-			return {
-				success: false,
-				reply: `The service is currently overloaded! Try again later.`
-			};
+			if (response.statusCode === 429 || response.statusCode === 503) {
+				pending.setOverloaded();
+				return {
+					success: false,
+					reply: `The service is currently overloaded! Try again later. (status code ${response.statusCode})`
+				};
+			}
+			else {
+				console.warn("DALL-E unhandled status code", { response });
+				return {
+					success: false,
+					reply: `The service failed with status code ${response.statusCode}!`
+				};
+			}
 		}
 
 		const { images } = response.body;
