@@ -52,8 +52,14 @@ module.exports = {
 				if (remainder === 0) {
 					return (current.uvi === 0) ? "🌙" : "☀";
 				}
+				else if (remainder === 1) {
+					return "🌤️";
+				}
+				else if (remainder === 2) {
+					return "🌥";
+				}
 				else {
-					return "☁";
+					return "️☁";
 				}
 			}
 
@@ -318,7 +324,7 @@ module.exports = {
 					appid: sb.Config.get("API_OPEN_WEATHER_MAP")
 				}
 			});
-			
+
 			if (response.statusCode === 429) {
 				return {
 					success: false,
