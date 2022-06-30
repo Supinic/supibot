@@ -46,7 +46,13 @@ module.exports = {
 			json: parameters
 		});
 
-		if (response.body.error) {
+		if (response.statusCode !== 200) {
+			return {
+				success: false,
+				reply: `The math API is currently unavailable! Try again later (status code ${response.statusCode})`
+			};
+		}
+		else if (response.body.error) {
 			return {
 				success: false,
 				reply: `${response.body.error}`
