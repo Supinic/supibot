@@ -19,6 +19,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 	let userDataChanged = false;
 	let channelDataChanged = false;
 
+	// When editing the sandbox context, make sure to update the type definitions in ./sandbox.d.ts
 	const sandbox = {
 		aliasStack: (context.append.aliasStack)
 			? [...context.append.aliasStack]

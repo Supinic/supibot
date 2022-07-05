@@ -180,5 +180,49 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"Runs JavaScript in a sandboxed VM, with access to specific methods and variables relating to supibot and the current command context.",
+		`This description assumes you already know JavaScript, it only goes over a brief overview of how the ${prefix}dankdebug command works, and caveats specific to the command.`,
+		`For an extensive look at all of the variables and methods available within the dankdebug context, see <a target="_blank" href="//github.com/supinic/supibot-package-manager/tree/master/commands/dankdebug/">these files</a>.`,
+		"",
+
+		`<code>${prefix}js (JavaScript code)</code>`,
+		"Runs your code, and replies with the result value. If there is no return, the last statement's value is used, e.g.:",
+		`<code>${prefix}js 0x100 * 2</code> => <code>512</code>`,
+		`<code>${prefix}js let array = [ 'foo', 'bar', 'baz' ]; array.pop()</code> => <code>baz</code>`,
+		"Note: If your code contains <code>return</code> <em>anywhere</em>, it will be wrapped in an async function, e.g.:",
+		`<code>${prefix}js return 0x100 * 2</code> => <code>512</code>`,
+		`<code>${prefix}js let array = [ 'foo', 'bar', 'baz' ]; return array.pop()</code> => <code>baz</code>`,
+		`<code>${prefix}js let array = [ 'foo', 'foo_return_bar', 'baz' ]; array.pop()</code> => <code>undefined</code>`,
+		`<code>${prefix}js let array = [ 'foo', 'foo_return_bar', 'baz' ]; return array.pop()</code> => <code>baz</code>`,
+		"",
+
+		`<code>${prefix}js errorInfo:true (JavaScript code)</code>`,
+		"Runs your code as normal, but if there is an error, it will post a link to where you can view the entire call stack and script, e.g.:",
+		`<code>${prefix}js errorInfo:true throw new Error('Critical error!')</code> => <code>Error: Critical error! - More info: &lt;link&gt;</code>`,
+		"If there is an error without <code>errorInfo:true</code> provided, only the error message is provided back.",
+		`<code>${prefix}js throw new Error('Critical error!')</code> => <code>Error: Critical error!</code>`,
+		"",
+
+		`<code>${prefix}js function:"(JavaScript code)"</code>`,
+		"Runs the function provided inside the parameter. Using return in this context without providing your own function wrapping your code is a syntax error.",
+		"When the command in invoked in this way the <code>args</code> variable set to a string array of the input, e.g.:",
+		`<code>${prefix}js function:args foo bar baz</code> => <code>[ 'foo', 'bar', 'baz' ]</code>`,
+		`<code>${prefix}js function:"let len = args.length; len"</code> => <code>0</code>`,
+		`<code>${prefix}js function:"(()=>{ return args[1] })()" foo bar</code> => <code>bar</code>`,
+		"",
+
+		`<code>${prefix}js arguments:"(JSON value)"</code>`,
+		"Sets the <code>args</code> variable to the parsed JSON written in the arguments parameter.",
+		"Because the arguments parameter and the function parameter both control the value of the <code>args</code> variable, you cannot use them together.",
+		`<code>${prefix}js arguments:"{ \\"foo\\": \\"bar\\", \\"dank\\": true }" return args.foo;</code> => <code>bar</code>`,
+		`<code>${prefix}js arguments:false return args;</code> => <code>false</code>`,
+		`<code>${prefix}js arguments:127 return args;</code> => <code>127</code>`,
+		"",
+
+		`<code>${prefix}js importGist:(gist ID)</code>`,
+		`<code>${prefix}js importGist:(gist ID) force:true</code>`,
+		`Prepends a GitHub gist to the beginning of your code before running it. For more information about file selection, caching, and length limits, see the <a href="/bot/command/detail/pastebin">${prefix}pastebin</a> command.`,
+		`The force parameter does the same as in the <a href="/bot/command/detail/pastebin">${prefix}pastebin</a> command, and skips caching when fetching the gist.`
+	])
 };
