@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "pingme",
-	Aliases: null,
+	Aliases: ["letmeknow", "lmk"],
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Sets a self-notification in the current channel when the target user is spotted in a different channel.",
