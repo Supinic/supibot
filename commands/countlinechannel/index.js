@@ -11,47 +11,28 @@ module.exports = {
 	Code: (async function countLineChannel (context) {
 		if (!context.channel) {
 			return {
-				reply: "Command not available in private messages!"
+				reply: "This command is not available in private messages!"
 			};
 		}
-	
-		const channelID = context.channel.ID;
-		if (channelID === 7 || channelID === 8) {
-			const [{ cerebot }, { discord }, { refuge }] = await Promise.all([
-				sb.Query.getRecordset(rs => rs.select("MAX(ID) AS cerebot").from("chat_line", "cerebot").single()),
-				sb.Query.getRecordset(rs => rs.select("MAX(ID) AS discord").from("chat_line", "discord_150782269382983689").single()),
-				sb.Query.getRecordset(rs => rs.select("MAX(ID) AS refuge").from("chat_line", "_trump_nonsub_refuge").single())
-			]);
-	
-			const total = cerebot + discord + refuge;
+
+		const amount = await sb.Query.getRecordset(rs => rs
+			.select("SUM(Message_Count) AS TotalCount")
+			.from("chat_data", "Message_Meta_User_Alias")
+			.where("Channel = %n", context.channel.ID)
+			.flat("TotalCount")
+			.single()
+		);
+		
+		// Works for both `undefined` (no meta rows) and `0` (no lines, but meta rows exist)
+		if (!amount) {
 			return {
-				reply: `Amount of lines: Cerebot: ${cerebot}; Discord: ${discord}; Refuge: ${refuge}; Total: ${total}`
+				reply: `I have not processed any messages in this channel so far. This should change rather soon though!`
 			};
 		}
-		else if (channelID === 82) {
-			const [{ nasabot }, { discord }, { offlineChat }] = await Promise.all([
-				sb.Query.getRecordset(rs => rs.select("MAX(ID) AS nasabot").from("chat_line", "nasabot").single()),
-				sb.Query.getRecordset(rs => rs.select("MAX(ID) AS discord").from("chat_line", "discord_240523866026278913").single()),
-				sb.Query.getRecordset(rs => rs.select("MAX(ID) AS offlineChat").from("chat_line", "_core54_1464148741723").single())
-			]);
-	
-			const total = nasabot + discord + offlineChat;
-			return {
-				reply: `Amount of lines: Nasabot: ${nasabot}; Discord #general: ${discord}; Group chat: ${offlineChat}; Total: ${total}`
-			};
-		}
-		else {
-			const channelName = context.channel.getDatabaseName();
-			const { Amount: amount } = (await sb.Query.getRecordset(rs => rs
-				.select("MAX(ID) AS Amount")
-				.from("chat_line", channelName)
-				.single()
-			));
-	
-			return {
-				reply: `Currently logging ${sb.Utils.groupDigits(amount)} messages in this channel.`
-			};
-		}
+
+		return {
+			reply: `I have seen ${sb.Utils.groupDigits(amount)} messages in this channel so far.`
+		};
 	}),
 	Dynamic_Description: null
 };
