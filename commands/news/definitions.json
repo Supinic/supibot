@@ -307,8 +307,8 @@
       {
         "name": "Obozrevatel",
         "url": "https://www.obozrevatel.com",
-        "path": null,
-        "endpoints": ["rss.xml"],
+        "path": "out/rss",
+        "endpoints": ["lastnews.xml"],
         "helpers": ["boring_nick"]
       },
       {
