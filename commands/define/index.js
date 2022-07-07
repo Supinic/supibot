@@ -4,8 +4,10 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Combines multiple ways of fetching a definition of a word or a phrase, and picks the best result.",
-	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Flags: ["mention","non-nullable","pipe","use-params"],
+	Params: [
+		{ name: "lang", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function define (context, ...args) {
@@ -17,6 +19,17 @@ module.exports = {
 			};
 		}
 
+		let languageCode = "en";
+		if (context.params.lang) {
+			languageCode = sb.Utils.modules.languageISO.getCode(context.params.lang, "iso6391");
+			if (!languageCode) {
+				return {
+					success: false,
+					reply: `Your provided language is not supported!`
+				};
+			}
+		}
+
 		const dictPromise = sb.Got("GenericAPI", {
 			url: `https://api.dictionaryapi.dev/api/v1/entries/en/${query}`,
 			throwHttpErrors: false,
@@ -24,7 +37,7 @@ module.exports = {
 		});
 
 		const wikiPromise = sb.Got("GenericAPI" ,{
-			url: `https://en.wikipedia.org/w/api.php`,
+			url: `https://${languageCode}.wikipedia.org/w/api.php`,
 			searchParams: {
 				format: "json",
 				action: "opensearch",
@@ -35,7 +48,7 @@ module.exports = {
 		});
 
 		const wiktionaryPromise = sb.Got("FakeAgent", {
-			url: `https://en.wiktionary.org/wiki/${encodeURIComponent(query)}`,
+			url: `https://${languageCode}.wiktionary.org/wiki/${encodeURIComponent(query)}`,
 			throwHttpErrors: false,
 			responseType: "text"
 		});
@@ -53,24 +66,33 @@ module.exports = {
 		const result = [];
 		const [dictData, wikiData, wiktionaryData, urbanData] = await Promise.allSettled([dictPromise, wikiPromise, wiktionaryPromise, urbanPromise]);
 
-		if (dictData.status === "fulfilled" && dictData.value.statusCode === 200 && Array.isArray(dictData.value.body)) {
-			const data = dictData.value.body;
-			const records = data.flatMap(i => Object.entries(i.meaning));
-			const items = records.flatMap(([type, value]) => value.map(item => ({ type, definition: item.definition })));
-			if (items.length !== 0) {
-				result.push(`Dictionary: "${items[0].definition}"`);
+		// If a custom non-English language is used, the Dictionary and Urban API responses are skipped,
+		// as they do not support non-English languages.
+		if (languageCode === "en") {
+			if (dictData.status === "fulfilled" && dictData.value.statusCode === 200 && Array.isArray(dictData.value.body)) {
+				const data = dictData.value.body;
+				const records = data.flatMap(i => Object.entries(i.meaning));
+
+				const items = records.flatMap(([type, value]) => value.map(item => ({
+					type,
+					definition: item.definition
+				})));
+
+				if (items.length !== 0) {
+					result.push(`Dictionary: "${items[0].definition}"`);
+				}
 			}
-		}
 
-		if (urbanData.status === "fulfilled" && urbanData.value.statusCode === 200) {
-			const data = urbanData.value.body;
-			const [item] = data.list
-				.filter(i => i.word.toLowerCase() === query.toLowerCase())
-				.sort((a, b) => b.thumbs_up - a.thumbs_up);
+			if (urbanData.status === "fulfilled" && urbanData.value.statusCode === 200) {
+				const data = urbanData.value.body;
+				const [item] = data.list
+					.filter(i => i.word.toLowerCase() === query.toLowerCase())
+					.sort((a, b) => b.thumbs_up - a.thumbs_up);
 
-			if (item) {
-				const definition = sb.Utils.wrapString(item.definition.replace(/[[\]]/g, ""), 150);
-				result.push(`Urban: "${definition}"`);
+				if (item) {
+					const definition = sb.Utils.wrapString(item.definition.replace(/[[\]]/g, ""), 150);
+					result.push(`Urban: "${definition}"`);
+				}
 			}
 		}
 
@@ -78,7 +100,7 @@ module.exports = {
 			const searchData = wikiData.value.body;
 			if (searchData[1].length !== 0) {
 				const data = await sb.Got("GenericAPI", {
-					url: `https://en.wikipedia.org/w/api.php`,
+					url: `https://${languageCode}.wikipedia.org/w/api.php`,
 					searchParams: {
 						format: "json",
 						action: "query",
@@ -91,7 +113,13 @@ module.exports = {
 				});
 
 				const key = Object.keys(data.body.query.pages)[0];
-				result.push(`Wiki: https://en.wikipedia.org/?curid=${key}`);
+				let message = `Wiki: https://${languageCode}.wikipedia.org/?curid=${key}`;
+				if (languageCode !== "en") {
+					const { extract } = data.body.query.pages[key];
+					message += ` ${sb.Utils.wrapString(extract, 150)}`;
+				}
+
+				result.push(message);
 			}
 		}
 
@@ -110,5 +138,26 @@ module.exports = {
 			reply: result.join(" ")
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		`Combines four different ways of fetching a definition for a term, word, anything.`,
+		"Uses the following data sources:",
+		`<ul>
+			<li><a href="//dictionaryapi.dev">DictionaryAPI.dev</a></li>
+			<li><a href="//urbandictionary.com">Urban Dictionary</a></li>
+			<li><a href="//en.wikipedia.org">Wikipedia</a></li>
+			<li><a href="//en.wiktionary.org">Wiktionary</a></li>		
+		</ul>`,
+		"",
+
+		`<code>${prefix}define (term)</code>`,
+		`<code>${prefix}define Twitch.tv</code>`,
+		"Provides up to four different definitions.",
+		"",
+
+		`<code>${prefix}define <u>lang:(language)</u> (term)</code>`,
+		`<code>${prefix}define <u>lang:polish Grzegorz Brzęczyszczykiewicz</u></code>`,
+		`<code>${prefix}define <u>lang:FI mämmi</u></code>`,
+		"Provides language-specific definitions.",
+		"However, if the language selected isn't English, only results from Wikipedia and Wiktionary are used."
+	])
 };
