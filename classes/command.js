@@ -683,7 +683,7 @@ class Command extends require("./template.js") {
 			.map(i => i.replace(whitespaceRegex, ""))
 			.filter(Boolean);
 
-		// If the command is rollbackable, set up a transaction.
+		// If the command is rollback-able, set up a transaction.
 		// The command must use the connection in transaction - that's why it is passed to context
 		if (command.Flags.rollback) {
 			contextOptions.transaction = await sb.Query.getTransaction();
@@ -953,7 +953,7 @@ class Command extends require("./template.js") {
 			!options.skipMention
 			&& command.Flags.mention
 			&& channelData?.Mention
-			&& await sb.Filter.getMentionStatus({
+			&& sb.Filter.getMentionStatus({
 				user: userData,
 				command,
 				channel: channelData ?? null,
@@ -1425,7 +1425,6 @@ module.exports = Command;
  * @property {boolean} pipe If true, the command can be used as a part of the "pipe" command.
  * @property {boolean} mention If true, command will attempt to mention its invokers by adding their username at the start.
  * This also requires the channel to have this option enabled.
- * @property {boolean} useParams If true, all arguments in form of key:value will be parsed into an object
  * @property {boolean} nonNullable If true, the command cannot be directly piped into the null command
  * @property {boolean} externalInput If true, the command is marked as being able to receive arbitrary user input - used in meta-commands
  */

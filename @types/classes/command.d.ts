@@ -57,7 +57,6 @@ export declare interface FlagsObject extends GenericFlagsObject {
     whitelist: boolean;
     pipe: boolean;
     mention: boolean;
-    useParams: boolean;
     nonNullable: boolean;
     externalInput: boolean;
     /**
@@ -79,7 +78,6 @@ export declare interface FlagsObject extends GenericFlagsObject {
      * @property {boolean} pipe If true, the command can be used as a part of the "pipe" command.
      * @property {boolean} mention If true, command will attempt to mention its invokers by adding their username at the start.
      * This also requires the channel to have this option enabled.
-     * @property {boolean} useParams If true, all arguments in form of key:value will be parsed into an object
      * @property {boolean} nonNullable If true, the command cannot be directly piped into the null command
      * @property {boolean} externalInput If true, the command is marked as being able to receive aribtrary user input - used in meta-commands
      */
