@@ -114,8 +114,8 @@ module.exports = {
 				const result = [];
 				if (params.url) {
 					if (params.url === "none") {
-						channelData.saveProperty("Banphrase_API_URL", null);
-						channelData.saveProperty("Banphrase_API_Type", null);
+						await channelData.saveProperty("Banphrase_API_URL", null);
+						await channelData.saveProperty("Banphrase_API_Type", null);
 						result.push("Banphrase API URL has been unset.");
 					}
 					else {
@@ -131,8 +131,8 @@ module.exports = {
 							};
 						}
 
-						channelData.saveProperty("Banphrase_API_URL", fixedURL);
-						channelData.saveProperty("Banphrase_API_Type", "Pajbot");
+						await channelData.saveProperty("Banphrase_API_URL", fixedURL);
+						await channelData.saveProperty("Banphrase_API_Type", "Pajbot");
 						result.push(`Banphrase API URL has been set to ${fixedURL}.`);
 					}
 				}
@@ -148,7 +148,7 @@ module.exports = {
 						};
 					}
 
-					channelData.saveProperty("Banphrase_API_Downtime", params.mode);
+					await channelData.saveProperty("Banphrase_API_Downtime", params.mode);
 					result.push(`Banphrase API mode has been set to ${params.mode}.`);
 				}
 
