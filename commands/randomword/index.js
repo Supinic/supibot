@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Fetches a random word. If a number is provided, rolls that many words.",
-	Flags: ["pipe","use-params"],
+	Flags: ["pipe"],
 	Params: [
 		{ name: "endsWith", type: "string" },
 		{ name: "regex", type: "regex" },

@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Fetches the headline of the first article found according to user query. Watch out, articles might be case sensitive.",
-	Flags: ["mention","non-nullable","pipe","use-params"],
+	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "lang", type: "string" },
 		{ name: "language", type: "string" },

@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Gets a recent event from the 2022 Russia/Ukraine war",
-	Flags: ["mention","non-nullable","pipe","use-params"],
+	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "lang", type: "string" }
 	],

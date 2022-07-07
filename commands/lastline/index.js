@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Posts the target user's last chat line in the context of the current channel, and the date they sent it.",
-	Flags: ["external-input","mention","opt-out","pipe","use-params"],
+	Flags: ["external-input","mention","opt-out","pipe"],
 	Params: [
 		{ name: "textOnly", type: "boolean" }
 	],

@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the origin of a given emote",
-	Flags: ["mention","pipe","use-params"],
+	Flags: ["mention","pipe"],
 	Params: [
 		{ name: "index", type: "number" }
 	],

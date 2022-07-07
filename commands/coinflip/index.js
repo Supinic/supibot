@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 2500,
 	Description: "Flips a coin.",
-	Flags: ["mention","pipe","skip-banphrase","use-params"],
+	Flags: ["mention","pipe","skip-banphrase"],
 	Params: [
 		{ name: "fail", type: "boolean" }
 	],

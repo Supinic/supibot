@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Shuffles the provided message, word by word.",
-	Flags: ["non-nullable","pipe","use-params"],
+	Flags: ["non-nullable","pipe"],
 	Params: [
 		{ name: "fancy", type: "boolean" }
 	],

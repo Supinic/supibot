@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 2500,
 	Description: "Allows broadcasters to set various parameters for the bot in their own channel. Usable anywhere, but only applies to their own channel.",
-	Flags: ["mention","pipe","skip-banphrase","use-params"],
+	Flags: ["mention","pipe","skip-banphrase"],
 	Params: [
 		{ name: "channel", type: "string" },
 		{ name: "mode", type: "string" },

@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Transliterates non-latin text into Latin. Should support most of the languages not using Latin (like Japanese, Chinese, Russian, ...)",
-	Flags: ["mention","non-nullable","pipe","use-params"],
+	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "japaneseOnly", type: "boolean" }
 	],

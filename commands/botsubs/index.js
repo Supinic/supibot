@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Posts the channels supibot is currently subscribed to on Twitch, along with a sample sub emote to each.",
-	Flags: ["pipe","use-params"],
+	Flags: ["pipe"],
 	Params: [
 		{ name: "channel", type: "string" },
 		{ name: "channelsOnly", type: "boolean" },

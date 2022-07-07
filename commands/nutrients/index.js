@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Posts basic nutrients for a specified food query",
-	Flags: ["mention","non-nullable","pipe","use-params"],
+	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "specific", type: "string" }
 	],

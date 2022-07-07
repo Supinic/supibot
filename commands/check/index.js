@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Checks certain user or system variables. For a list of types, check the command's extended help.",
-	Flags: ["mention","pipe","use-params"],
+	Flags: ["mention","pipe"],
 	Params: [
 		{ name: "index", type: "number" }
 	],

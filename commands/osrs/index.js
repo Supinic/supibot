@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Aggregate command for whatever regarding Old School Runescape.",
-	Flags: ["mention","non-nullable","pipe","use-params"],
+	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "activity", type: "string" },
 		{ name: "boss", type: "string" },

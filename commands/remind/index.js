@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Sets a notify for a given user. Can also set a time to ping that user (or yourself) in given amount of time, but in that case you must use the word \"in\" and then a number specifying the amount days, hours, minutes, etc.",
-	Flags: ["block","mention","opt-out","pipe","use-params"],
+	Flags: ["block","mention","opt-out","pipe"],
 	Params: [
 		{ name: "at", type: "string" },
 		{ name: "on", type: "string" },

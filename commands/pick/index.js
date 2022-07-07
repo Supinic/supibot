@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Picks a single word from the provided list of words in a message.",
-	Flags: ["mention","pipe","use-params"],
+	Flags: ["mention","pipe"],
 	Params: [
 		{ name: "delimiter", type: "string" }
 	],

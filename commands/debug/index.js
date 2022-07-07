@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 0,
 	Description: "supiniHack ",
-	Flags: ["external-input","developer","pipe","skip-banphrase","system","use-params","whitelist"],
+	Flags: ["external-input","developer","pipe","skip-banphrase","system","whitelist"],
 	Params: [
 		{ name: "function", type: "string" },
 		{ name: "importGist", type: "string" }

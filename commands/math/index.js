@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Does math. For more info, check the documentation for math.js",
-	Flags: ["external-input","mention","non-nullable","pipe","use-params"],
+	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
 		{ name: "fixed", type: "boolean" },
 		{ name: "precision", type: "number" }

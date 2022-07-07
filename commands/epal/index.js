@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches a random person from epal.gg - post their description. If used on supinic's channel with TTS on, and if they have an audio introduction, it will be played on stream.",
-	Flags: ["mention","use-params"],
+	Flags: ["mention"],
 	Params: [
 		{ name: "game", type: "string" },
 		{ name: "gender", type: "string" },

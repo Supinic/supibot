@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "For a given Twitch user, this command will fetch their profile picture.",
-	Flags: ["mention","non-nullable","pipe","use-params"],
+	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "banner", type: "boolean" },
 		{ name: "linkOnly", type: "boolean" }

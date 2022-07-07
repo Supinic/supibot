@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Creates a random sequence of words based on a Markov-chain module from Twitch chat.",
-	Flags: ["non-nullable","pipe","use-params"],
+	Flags: ["non-nullable","pipe"],
 	Params: [
 		{ name: "debug", type: "string" },
 		{ name: "dull", type: "boolean" },

@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 20000,
 	Description: "On supinic's stream, takes the currently playing video (if there is any) and fetches another random video from the same Youtube uploader.",
-	Flags: ["mention","non-nullable","pipe","use-params"],
+	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "linkOnly", type: "boolean" }
 	],

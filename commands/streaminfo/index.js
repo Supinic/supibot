@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Posts stream info about a Twitch channel. Also supports YouTube - check the help article.",
-	Flags: ["external-input","mention","non-nullable","pipe","use-params"],
+	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
 		{ name: "youtube", type: "string" }
 	],

@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Searches for a given track in the gachi list, and attempts to post a link.",
-	Flags: ["mention","pipe","use-params"],
+	Flags: ["mention","pipe"],
 	Params: [
 		{ name: "linkOnly", type: "boolean" }
 	],

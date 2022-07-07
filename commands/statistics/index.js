@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Posts various statistics regarding you or other users, e.g. total afk time.",
-	Flags: ["mention","pipe","use-params"],
+	Flags: ["mention","pipe"],
 	Params: [
 		{ name: "recalculate", type: "boolean" }
 	],

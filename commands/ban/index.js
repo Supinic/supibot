@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Bans/unbans any combination of channel, user, and command from being executed. Only usable by administrators, or Twitch channel owners.",
-	Flags: ["mention","use-params"],
+	Flags: ["mention"],
 	Params: [
 		{ name: "all", type: "boolean" },
 		{ name: "channel", type: "string" },

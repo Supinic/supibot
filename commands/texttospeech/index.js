@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Plays TTS on Supinic's stream, if enabled. You can specify the language by using \"language:<language>\" anywhere in your message.",
-	Flags: ["mention","pipe","skip-banphrase","use-params","whitelist"],
+	Flags: ["mention","pipe","skip-banphrase","whitelist"],
 	Params: [
 		{ name: "lang", type: "string" },
 		{ name: "language", type: "string" },

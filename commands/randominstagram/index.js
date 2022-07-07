@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches a random Instagram user's post, from their most recently posted ones.",
-	Flags: ["mention","non-nullable","use-params"],
+	Flags: ["mention","non-nullable"],
 	Params: [
 		{ name: "rawLinkOnly", type: "boolean" },
 		{ name: "postLinkOnly", type: "boolean" }

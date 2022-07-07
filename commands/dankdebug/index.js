@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Debug command for public use, which means it's quite limited because of security.",
-	Flags: ["external-input","developer","mention","pipe","use-params"],
+	Flags: ["external-input","developer","mention","pipe"],
 	Params: [
 		{ name: "arguments", type: "string" },
 		{ name: "errorInfo", type: "boolean" },

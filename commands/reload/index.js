@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 0,
 	Description: "Reloads a database definition or hotloads an updated script",
-	Flags: ["pipe","skip-banphrase","system","use-params","whitelist"],
+	Flags: ["pipe","skip-banphrase","system","whitelist"],
 	Params: [
 		{ name: "skipUpgrade", type: "boolean" }
 	],

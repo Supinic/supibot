@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "?",
-	Flags: ["developer","pipe","skip-banphrase","system","use-params"],
+	Flags: ["developer","pipe","skip-banphrase","system"],
 	Params: [
 		{ name: "boolean", type: "boolean" },
 		{ name: "date", type: "date" },
