@@ -27,7 +27,9 @@ module.exports = {
 
 		const foundersString = response.body.founders.map(i => {
 			const date = new sb.Date(i.entitlementStart);
-			return `${i.login} (${date.format("Y-m-d")})`;
+			const unpingedLogin = `${i.login[0]}\u{E0000}${i.login.slice(1)}`;
+
+			return `${unpingedLogin} (${date.format("Y-m-d")})`;
 		}).join("; ");
 
 		return {
