@@ -17,7 +17,7 @@ module.exports = {
 		}
 
 		const channel = encodeURIComponent(channelName ?? context.channel.Name);
-		const response = await sb.Got("Leppunen", `twitch/founders/${channel}`);
+		const response = await sb.Got("Leppunen", `v2/twitch/founders/${channel}`);
 		if (response.statusCode === 404) {
 			return {
 				success: false,
