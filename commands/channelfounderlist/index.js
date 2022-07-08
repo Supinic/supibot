@@ -33,7 +33,7 @@ module.exports = {
 		}).join("; ");
 
 		return {
-			reply: foundersString
+			reply: `Current founders list: ${foundersString}`
 		};
 	}),
 	Dynamic_Description: null
