@@ -156,7 +156,7 @@ const fetchNextRaceDetail = async (context) => {
 		nextSessionString = `Next session: ${sessionNames[nextSessionType]}`;
 
 		if (now < nextSessionStart) {
-			nextSessionString += ` is scheduled in ${sb.Utils.timeDelta(nextSessionStart)}.`;
+			nextSessionString += ` is scheduled ${sb.Utils.timeDelta(nextSessionStart)}.`;
 		}
 		else {
 			nextSessionString += ` is currently underway.`;
