@@ -3,14 +3,15 @@ import { ClassTemplate } from "./template";
 import { Channel } from "./channel";
 import { AvailableEmoteOptions, Platform } from "./platform";
 import { Permissions as UserPermissions, User } from "./user";
+import { Language } from "language-iso-codes";
 import { CustomDate as Date } from "../objects/date";
 import { DeepFrozen } from "../singletons/utils";
 
 import { PoolConnection } from "mariadb";
 
 export declare namespace Parameter {
-    type Type = "string" | "number" | "boolean" | "date" | "object" | "regex";
-    type ParsedType = string | number | boolean | Date | SimpleGenericData | RegExp;
+    type Type = "string" | "number" | "boolean" | "date" | "object" | "regex" | "language";
+    type ParsedType = string | number | boolean | Date | SimpleGenericData | RegExp | Language;
     type Descriptor = {
         type: Type;
         name: string

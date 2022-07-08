@@ -1115,6 +1115,9 @@ class Command extends require("./template.js") {
 		else if (type === "regex") {
 			return sb.Utils.parseRegExp(value);
 		}
+		else if (type === "language") {
+			return sb.Utils.modules.languageISO.getLanguage(value);
+		}
 
 		return null;
 	}
