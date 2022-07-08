@@ -9,7 +9,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function channelFounderList (context, channelName) {
-		if (!channelName && !context.platform.Name !== "twitch") {
+		if (!channelName && context.platform.Name !== "twitch") {
 			return {
 				success: false,
 				reply: `When not on Twitch, you must provide the channel name!`
