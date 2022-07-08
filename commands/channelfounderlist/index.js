@@ -6,7 +6,8 @@ module.exports = {
 	Description: "Shows the list of founders for the specified (or current) channel. Does not \"ping\" the users in chat.",
 	Flags: ["mention"],
 	Params: [
-		{ name: "includeDates", type: "boolean" }
+		{ name: "includeDates", type: "boolean" },
+		{ name: "subStatus", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -27,22 +28,27 @@ module.exports = {
 			};
 		}
 
+		const separator = (context.params.subStatus) ? " " : ", ";
 		const foundersString = response.body.founders.map(i => {
-			const date = new sb.Date(i.entitlementStart);
-			const unpingedLogin = `${i.login[0]}\u{E0000}${i.login.slice(1)}`;
-			const stillSubbed = (i.isSubscribed) ? "✅" : "⛔";
+			let message = `${i.login[0]}\u{E0000}${i.login.slice(1)}`;
+			if (context.params.subStatus) {
+				const stillSubbed = (i.isSubscribed) ? "✅" : "⛔";
+				message += ` ${stillSubbed}`;
+			}
+			if (context.params.includeDates) {
+				const date = new sb.Date(i.entitlementStart);
+				message += ` (${date.format("Y-m-d")})`;
+			}
 
-			return (context.params.includeDates)
-				? `${unpingedLogin} ${stillSubbed} (${date.format("Y-m-d")})`
-				: `${unpingedLogin} ${stillSubbed}`;
-		}).join(" ");
+			return message;
+		}).join(separator);
 
 		return {
 			reply: `Current founders list: ${foundersString}`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
-		"Fetches the list of current founders of a given (or current) Twitch channel, and if they are still subscribed",
+		"Fetches the list of current founders of a given (or current) Twitch channel",
 		"",
 
 		`<code>${prefix}channelfounderlist</code>`,
@@ -58,5 +64,9 @@ module.exports = {
 		`<code>${prefix}cfl <u>includeDates:true</u></code>`,
 		`<code>${prefix}cfl (channel) <u>includeDates:true</u></code>`,
 		`Also provides the date when the given user became a founder.`,
+
+		`<code>${prefix}cfl <u>subStatus:true</u></code>`,
+		`<code>${prefix}cfl (channel) <u>subStatus:true</u></code>`,
+		`Also provides whether or not that user is still subscribed`
 	])
 };
