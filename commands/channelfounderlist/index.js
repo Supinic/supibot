@@ -30,12 +30,12 @@ module.exports = {
 		const foundersString = response.body.founders.map(i => {
 			const date = new sb.Date(i.entitlementStart);
 			const unpingedLogin = `${i.login[0]}\u{E0000}${i.login.slice(1)}`;
-			const stillSubbed = (i.isSubscribed) ? "✔" : "❌";
+			const stillSubbed = (i.isSubscribed) ? "✅" : "⛔";
 
 			return (context.params.includeDates)
 				? `${unpingedLogin} ${stillSubbed} (${date.format("Y-m-d")})`
 				: `${unpingedLogin} ${stillSubbed}`;
-		}).join(", ");
+		}).join(" ");
 
 		return {
 			reply: `Current founders list: ${foundersString}`
