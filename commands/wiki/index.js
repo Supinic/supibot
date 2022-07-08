@@ -6,8 +6,7 @@ module.exports = {
 	Description: "Fetches the headline of the first article found according to user query. Watch out, articles might be case sensitive.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
-		{ name: "lang", type: "string" },
-		{ name: "language", type: "string" },
+		{ name: "lang", type: "language" },
 		{ name: "linkOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
@@ -21,15 +20,8 @@ module.exports = {
 			};
 		}
 
-		const language = context.params.lang ?? context.params.language ?? "english";
-		const languageCode = sb.Utils.modules.languageISO.getCode(language)?.toLowerCase();
-		if (!languageCode) {
-			return {
-				success: false,
-				reply: "Invalid language provided!",
-				cooldown: { length: 2500 }
-			};
-		}
+		const language = context.params.lang ?? sb.Utils.modules.languageISO.getLanguage("english");
+		const languageCode = language.getIsoCode(1);
 
 		let query = args.join(" ");
 		if (query.toLowerCase() === "random") {
