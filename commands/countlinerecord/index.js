@@ -15,7 +15,7 @@ module.exports = {
 				reply: `There are no count line records in private messages!`
 			};
 		}
-		
+
 		const [amountData, lengthData] = await Promise.all([
 			sb.Query.getRecordset(rs => rs
 				.select("Amount", "Timestamp")
@@ -25,7 +25,7 @@ module.exports = {
 				.limit(1)
 				.single()
 			),
-	
+
 			sb.Query.getRecordset(rs => rs
 				.select("Length", "Timestamp")
 				.from("chat_data", "Message_Meta_Channel")
@@ -35,21 +35,22 @@ module.exports = {
 				.single()
 			)
 		]);
-		
+
 		if (!amountData || !lengthData) {
 			return {
 				success: false,
 				reply: `This channel doesn't have enough data saved just yet!`
 			};
 		}
-	
+
+		const byteData = sb.Utils.formatByteSize(lengthData.Length);
 		return {
 			reply: [
 				"This channel's records are",
-				`${amountData.Amount} messages/min`,
+				`${amountData.Amount} messages/hr`,
 				`(${amountData.Timestamp.format("Y-m-d H:i")});`,
 				"and",
-				`${sb.Utils.round(lengthData.Length / 1000, 2)} kB/min`,
+				`${byteData}/hr`,
 				`(${lengthData.Timestamp.format("Y-m-d H:i")})`
 			].join(" ")
 		};
