@@ -134,7 +134,7 @@ const fetchNextRaceDetail = async (context) => {
 	const raceEnd = raceStart.clone().addHours(2); // Compensate for the race being underway
 
 	let nextSessionString = "";
-	let nextSessionStart = 0;
+	let nextSessionStart = Infinity;
 	let nextSessionEnd;
 	let nextSessionType;
 
@@ -145,7 +145,7 @@ const fetchNextRaceDetail = async (context) => {
 		}
 
 		const sessionStart = new sb.Date(`${race[session].date} ${race[session].time}`);
-		if (now <= sessionStart && nextSessionStart < sessionStart) {
+		if (now <= sessionStart && sessionStart < nextSessionStart) {
 			nextSessionType = session;
 			nextSessionStart = sessionStart;
 			nextSessionEnd = nextSessionStart.clone().addHours(2); // Compensate for the session being underway
