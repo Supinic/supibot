@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Shows the list of founders for the specified (or current) channel. Does not \"ping\" the users in chat.",
 	Flags: ["mention"],
-	Params: null,
+	Params: [
+		{ name: "includeDates", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function channelFounderList (context, channelName) {
@@ -28,13 +30,33 @@ module.exports = {
 		const foundersString = response.body.founders.map(i => {
 			const date = new sb.Date(i.entitlementStart);
 			const unpingedLogin = `${i.login[0]}\u{E0000}${i.login.slice(1)}`;
+			const stillSubbed = (i.isSubscribed) ? "✔" : "❌";
 
-			return `${unpingedLogin} (${date.format("Y-m-d")})`;
-		}).join("; ");
+			return (context.params.includeDates)
+				? `${unpingedLogin} ${stillSubbed} (${date.format("Y-m-d")})`
+				: `${unpingedLogin} ${stillSubbed}`;
+		}).join(", ");
 
 		return {
 			reply: `Current founders list: ${foundersString}`
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"Fetches the list of current founders of a given (or current) Twitch channel, and if they are still subscribed",
+		"",
+
+		`<code>${prefix}channelfounderlist</code>`,
+		`<code>${prefix}cfl</code>`,
+		`<code>${prefix}founders</code>`,
+		`List of founders for the current channel.`,
+		``,
+
+		`<code>${prefix}cfl <u>(channel)</u></code>`,
+		`List of founders for the provided channel.`,
+		``,
+
+		`<code>${prefix}cfl <u>includeDates:true</u></code>`,
+		`<code>${prefix}cfl (channel) <u>includeDates:true</u></code>`,
+		`Also provides the date when the given user became a founder.`,
+	])
 };
