@@ -33,7 +33,7 @@ module.exports = {
 			let message = `${i.login[0]}\u{E0000}${i.login.slice(1)}`;
 			if (context.params.subStatus) {
 				const stillSubbed = (i.isSubscribed) ? "✅" : "⛔";
-				message += ` ${stillSubbed}`;
+				message = `${stillSubbed} ${message}`;
 			}
 			if (context.params.includeDates) {
 				const date = new sb.Date(i.entitlementStart);
