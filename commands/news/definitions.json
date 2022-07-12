@@ -836,5 +836,18 @@
         "helpers": []
       }
     ]
+  },
+  {
+    "code": "th",
+    "language": "Thai",
+    "sources": [
+      {
+        "name": "Prachachat",
+        "url": "https://prachachat.net",
+        "path": null,
+        "endpoints": ["feed"],
+        "helpers": ["rod41732"]
+      }
+    ]
   }
 ]
