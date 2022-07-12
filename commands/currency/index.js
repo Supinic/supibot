@@ -29,6 +29,12 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
+		else if (first === second) {
+			const dankEmote = await context.getBestAvailableEmote(["FeelsDankMan"], "😕");
+			return {
+				reply: `${dankEmote} 👍 1 ${first} = 1 ${second}, who would have thought?`
+			};
+		}
 
 		let multiplier = 1;
 		if (/k/i.test(amount)) {
