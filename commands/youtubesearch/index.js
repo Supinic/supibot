@@ -90,8 +90,8 @@ module.exports = {
 
 		const track = tracks[index];
 		if (!track) {
-			const message = (typeof context.params.index === "number")
-				? "There is no such video for your provided index! Up to ${length} videos are available."
+			const message = (tracks.length > 0 && typeof context.params.index === "number")
+				? `There is no such video for your provided index! Up to ${tracks.length} videos are available.`
 				: "No videos found for that query!";
 
 			return {
