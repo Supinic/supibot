@@ -9,15 +9,22 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function currency (context, amount, first, separator, second) {
-		if (!second && !separator) {
-			second = first;
-			first = amount;
-			amount = "1";
-		}
-		if (!second) {
-			second = separator;
-			first = amount;
-			amount = "1";
+		const isAmountNumeric = Number.isFinite(Number(amount));
+		if (!isAmountNumeric && !second) {
+			if (separator) { // CZK to EUR
+				second = separator;
+				first = amount;
+				amount = "1";
+			}
+			else if (first) { // CZK EUR
+				second = first;
+				first = amount;
+				amount = "1";
+			}
+			else { // CZK
+				first = amount;
+				amount = "1";
+			}
 		}
 
 		second ??= "USD";
