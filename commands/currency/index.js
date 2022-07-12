@@ -27,7 +27,7 @@ module.exports = {
 			}
 		}
 
-		second ??= "USD";
+		second ??= "EUR";
 
 		if (!first || !second) {
 			return {
