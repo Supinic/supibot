@@ -19,6 +19,9 @@ module.exports = {
 			first = amount;
 			amount = "1";
 		}
+
+		second ??= "USD";
+
 		if (!first || !second) {
 			return {
 				success: false,
