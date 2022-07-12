@@ -73,12 +73,6 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-		else if (first === second) {
-			const dankEmote = await context.getBestAvailableEmote(["FeelsDankMan"], "😕");
-			return {
-				reply: `${dankEmote} 👍 1 ${first} = 1 ${second}, who would have thought?`
-			};
-		}
 
 		let data = await this.getCacheData("currency-rates");
 		if (!data) {
@@ -108,6 +102,13 @@ module.exports = {
 			return {
 				success: false,
 				reply: `One or more currency codes were not recognized! ${unrecognized.join(", ")}`
+			};
+		}
+
+		if (first === second) {
+			const dankEmote = await context.getBestAvailableEmote(["FeelsDankMan"], "😕");
+			return {
+				reply: `${dankEmote} 👍 1 ${first} = 1 ${second}, who would have thought?`
 			};
 		}
 
