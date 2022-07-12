@@ -29,12 +29,6 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-		else if (first === second) {
-			const dankEmote = await context.getBestAvailableEmote(["FeelsDankMan"], "😕");
-			return {
-				reply: `${dankEmote} 👍 1 ${first} = 1 ${second}, who would have thought?`
-			};
-		}
 
 		let multiplier = 1;
 		if (/k/i.test(amount)) {
@@ -70,6 +64,12 @@ module.exports = {
 				success: false,
 				reply: "Invalid symbol syntax - must use 3-letter codes!",
 				cooldown: 2500
+			};
+		}
+		else if (first === second) {
+			const dankEmote = await context.getBestAvailableEmote(["FeelsDankMan"], "😕");
+			return {
+				reply: `${dankEmote} 👍 1 ${first} = 1 ${second}, who would have thought?`
 			};
 		}
 
