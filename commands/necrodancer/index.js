@@ -32,6 +32,7 @@ module.exports = {
 				"metal",
 				"mole"
 			],
+			extraCooldown: 600_000,
 			zoneCooldown: 300_000,
 			createURL: (data) => {
 				const json = encodeURIComponent(JSON.stringify(data));
@@ -47,8 +48,9 @@ module.exports = {
 			};
 		}
 
+		const now = sb.Date.now();
 		const { invocation } = context;
-		const { createURL, zones } = this.staticData;
+		const { createURL, extraCooldown, zones, zoneCooldown } = this.staticData;
 		if (invocation === "ndr" || invocation === "necrodancerreset") {
 			const permissions = await context.getUserPermissions();
 			if (!permissions.is("administrator")) {
@@ -90,11 +92,21 @@ module.exports = {
 			};
 		}
 		else if (!zone) {
-			return {
-				success: false,
-				reply: `No game zone provided! Use one of: ${zones.join(", ")}`,
-				cooldown: 2500
-			};
+			for (const zoneName of zones) {
+				const cooldown = this.data.cooldowns[zoneName];
+
+				if (!cooldown || ((cooldown + extraCooldown) < now)) {
+					zone = zoneName;
+				}
+			}
+
+			if (!zone) {
+				return {
+					success: false,
+					reply: `No zones are currently off cooldown! You can try and use a zone name manually instead.`,
+					cooldown: 2500
+				};
+			}
 		}
 
 		zone = zone.toLowerCase();
@@ -108,14 +120,13 @@ module.exports = {
 
 		this.data.cooldowns[zone] = this.data.cooldowns[zone] ?? 0;
 
-		const now = sb.Date.now();
 		if (this.data.cooldowns[zone] >= now) {
 			const delta = sb.Utils.timeDelta(this.data.cooldowns[zone]);
 			return {
 				reply: `The cooldown for zone ${zone} has not passed yet. Try again in ${delta}.`
 			};
 		}
-		this.data.cooldowns[zone] = now + this.staticData.zoneCooldown;
+		this.data.cooldowns[zone] = now + zoneCooldown;
 		// be sure that the HTTP request is done after the cooldown to avoid a race condition
 
 		await context.channel.send("Download + beat mapping + saving started! Please wait...");
@@ -164,14 +175,19 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: ((prefix, values) => {
-		const { zones } = values.getStaticData();
+	Dynamic_Description: (prefix => {
+		const { zones } = this.staticData;
 		return [
 			"Downloads, beatmaps and inserts a song from a link into the Crypt of the Necrodancer game.",
 			"",
 
-			`<code>${prefix}necrodancer (link) (zone)</code>`,
-			"From a given link, extracts the song, beatmaps it automatically and inserts it as the song to play in game in the provided zone",
+			`<code>${prefix}necrodancer (link)</code>`,
+			"From a given link, extracts the song, beatmaps it automatically and inserts it as the song to play ingame.",
+			"You can omit the zone - in this case, the first free game zone will be used, based on a cooldown system.",
+			"",
+
+			`<code>${prefix}necrodancer (link) <u>(zone)</u></code>`,
+			"Like above, but uses a specific game zone from the list below.",
 			"",
 
 			"Zone list:",
