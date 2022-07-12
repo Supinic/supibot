@@ -6,10 +6,12 @@ module.exports = {
 	Description: "Searches Youtube for video(s) with your query. Only a certain amount of uses are available daily.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
+		{ name: "index", type: "number" },
 		{ name: "linkOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
+		indexThreshold: 25,
 		threshold: 2000,
 		getClosestPacificMidnight: () => {
 			const now = new sb.Date().discardTimeUnits("m", "s", "ms");
@@ -51,10 +53,28 @@ module.exports = {
 			};
 		}
 
-		const track = await sb.Utils.searchYoutube(
+		const index = context.params.index ?? 0;
+		const { indexThreshold } = this.staticData;
+
+		if (!sb.Utils.isValidInteger(index)) {
+			return {
+				success: false,
+				reply: `Provided index must be a valid integer!`
+			};
+		}
+		else if (index > indexThreshold) {
+			return {
+				success: false,
+				reply: `Your index must be in the range <0, ${indexThreshold}>!`
+			};
+		}
+
+		const tracks = await sb.Utils.searchYoutube(
 			query,
 			sb.Config.get("API_GOOGLE_YOUTUBE"),
-			{ single: true }
+			{
+				maxResults: indexThreshold
+			}
 		);
 
 		if (cacheRecordExists) {
@@ -68,10 +88,15 @@ module.exports = {
 			});
 		}
 
+		const track = tracks[index];
 		if (!track) {
+			const message = (typeof context.params.index === "number")
+				? "There is no such video for your provided index! Up to ${length} videos are available."
+				: "No videos found for that query!";
+
 			return {
 				success: false,
-				reply: "No videos found for that query!"
+				reply: message
 			};
 		}
 
