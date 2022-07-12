@@ -79,7 +79,7 @@ module.exports = {
 				})));
 
 				if (items.length !== 0) {
-					result.push(`Dictionary: "${items[0].definition}"`);
+					result.push(`Dictionary: "${sb.Utils.wrapString(items[0].definition, 150)}"`);
 				}
 			}
 
