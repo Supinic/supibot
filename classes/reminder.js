@@ -393,10 +393,16 @@ module.exports = class Reminder extends require("./template.js") {
 					platform = sb.Platform.get(reminder.Platform);
 				}
 
-				const authorMention = await platform.controller.createUserMention(fromUserData);
-				const targetMention = await platform.controller.createUserMention(targetUserData);
+				const uncheckedAuthorMention = await platform.controller.createUserMention(fromUserData);
+				const authorMentionCheck = await channelData.prepareMessage(uncheckedAuthorMention, {
+					returnBooleanOnFail: true,
+					skipLengthCheck: true
+				});
+				const authorMention = (authorMentionCheck === false) ? "[Banphrased username]," : `${authorMentionCheck}`;
 
+				const targetMention = await platform.controller.createUserMention(targetUserData);
 				let message = `${authorMention}, ${targetMention} just typed in channel ${channelName}`;
+
 				if (reminder.Text) {
 					message += `: ${reminder.Text}`;
 				}
@@ -411,7 +417,18 @@ module.exports = class Reminder extends require("./template.js") {
 						skipLengthCheck: true
 					});
 
-					await channelData.send(fixedMessage);
+					if (!fixedMessage) {
+						await channelData.send(sb.Utils.tag.trim `
+							${authorMention},
+							a user you set up a "pingme" reminder for has typed somewhere, but I can't post it here.
+							I have whispered you the result instead.
+						`);
+
+						await platform.pm(message, fromUserData.Name, channelData);
+					}
+					else {
+						await channelData.send(fixedMessage);
+					}
 				}
 
 				// Pingme reminders do not follow the regular reminder logic, so continue to next iteration.
@@ -489,12 +506,12 @@ module.exports = class Reminder extends require("./template.js") {
 
 					message = sb.Utils.tag.trim `
 						Hey ${userMention}
-						you have reminders, but they're too long to be posted here. 
+						you have reminders, but they're too long to be posted here.
 						Check them out here: ${link}
 					`;
 					mirrorMessage = sb.Utils.tag.trim `
 						Hey ${targetUserData.Name}
-						you have reminders, but they're too long to be posted here. 
+						you have reminders, but they're too long to be posted here.
 						Check them out here: ${link}
 					`;
 				}
