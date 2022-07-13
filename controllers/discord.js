@@ -166,7 +166,10 @@ module.exports = class DiscordController extends require("./template.js") {
 				}
 
 				const discordChannel = messageObject.channel;
-				const channelDescription = `${guild.name} - #${discordChannel.name}`;
+				const guildName = guild.name;
+				const discordChannelName = discordChannel.name;
+
+				const channelDescription = `${guildName} - #${discordChannelName}`;
 				if (channelData.Description !== channelDescription) {
 					await channelData.saveProperty("Description", channelDescription);
 				}
