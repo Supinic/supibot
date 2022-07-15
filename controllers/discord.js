@@ -282,6 +282,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			const wordSet = new Set(words);
 			const globalEmotesMap = this.client.emojis.cache;
 			const guildEmotesMap = channelObject.guild.emojis.cache;
+			const skipGlobalEmotes = Boolean(await channelData.getDataProperty("disableDiscordGlobalEmotes"));
 
 			for (const word of wordSet) {
 				// First, attempt to find a unique global emoji available to the bot
@@ -293,7 +294,8 @@ module.exports = class DiscordController extends require("./template.js") {
 					emote = guildEmotesMap.find(i => i.name === word);
 
 					// If not found and the word is not overly common, simply pick a random emote out of the global list
-					if (!emote && globalEmoteRegex.test(word) && word.length > 2) {
+					// Also take into account the Discord channel setting to ignore global emotes
+					if (!emote && !skipGlobalEmotes && globalEmoteRegex.test(word) && word.length > 2) {
 						emote = sb.Utils.randArray([...globalEmotes.values()]);
 					}
 				}
