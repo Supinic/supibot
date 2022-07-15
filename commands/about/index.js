@@ -48,7 +48,7 @@ module.exports = {
 			reply: sb.Utils.tag.trim `
 				I am a smol variety and utility bot ${emote}
 				Running on a smol Raspberry Pi 3B ${emote}
-				Powered by Node.js ${hackEmote} running since February 2018.
+				Powered by NodeJS ${hackEmote} running since February 2018.
 				${presentSince}
 			`
 		};
