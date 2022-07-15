@@ -11,14 +11,31 @@ module.exports = {
 	Code: (async function about (context) {
 		let presentSince = "";
 		if (context.channel) {
-			const date = await sb.Query.getRecordset(rs => rs
-				.select("Posted")
-				.from("chat_line", context.channel.getDatabaseName())
-				.orderBy("ID ASC")
-				.limit(1)
-				.flat("Posted")
-				.single()
-			);
+			let date;
+			const tableName = context.channel.getDatabaseName();
+
+			if (!await sb.Query.isTablePresent("chat_line", tableName)) {
+				const botData = await sb.User.get(context.platform.Self_Name);
+				date = await sb.Query.getRecordset(rs => rs
+					.select("First_Message_Posted")
+					.from("chat_data", "Message_Meta_User_Alias")
+					.where("Channel = %n", context.channel.ID)
+					.where("User_Alias = %n", botData.ID)
+					.limit(1)
+					.flat("First_Message_Posted")
+					.single()
+				);
+			}
+			else {
+				date = await sb.Query.getRecordset(rs => rs
+					.select("Posted")
+					.from("chat_line", tableName)
+					.orderBy("ID ASC")
+					.limit(1)
+					.flat("Posted")
+					.single()
+				);
+			}
 
 			if (date) {
 				presentSince = `I am present in this channel since ${date.format("Y-m-d")} (${sb.Utils.timeDelta(date)})`;
