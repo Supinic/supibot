@@ -381,6 +381,38 @@ module.exports = {
 				}
 			}
 
+			case "enable-global-emotes":
+			case "disable-global-emotes": {
+				if (channelData.Platform.Name !== "discord") {
+					return {
+						success: false,
+						reply: `Cannot set the global emotes configuration in channels outside of Discord!`
+					};
+				}
+
+				const currentValue = await channelData.getDataProperty("disableDiscordGlobalEmotes");
+				if (currentValue === true && command.includes("disable")) {
+					return {
+						success: false,
+						reply: `Global emotes are already disabled in this channel!`
+					};
+				}
+				else if (!currentValue && command.includes("enable")) {
+					return {
+						success: false,
+						reply: `Global emotes are already enabled in this channel!`
+					};
+				}
+
+				const newValue = !currentValue;
+				await channelData.setDataProperty("disableDiscordGlobalEmotes", newValue);
+				const verb = (newValue) ? "disabled" : "re-enabled";
+
+				return {
+					reply: `Global emotes have been ${verb} in this channel successfully.`
+				};
+			}
+
 			default: return {
 				success: false,
 				reply: "Invalid command provided!"
@@ -440,6 +472,13 @@ module.exports = {
 			`<code>${prefix}bot renamed channel:(channel)</code>`,
 			"If you recently renamed your Twitch account, you can use this command to get Supibot back immediately!",
 			"This also works for other channels that you are an ambassador in.",
+			"",
+
+			`<code>${prefix}bot disable-global-emotes channel:(channel)</code>`,
+			`<code>${prefix}bot enable-global-emotes channel:(channel)</code>`,
+			"Disables (or re-enables, respectively) the automatic usage of global Discord emotes in the current channel.",
+			"Supibot has access to all emotes from all servers it's on, and these might prove to be annoying somewhat.",
+			"This configuration lets you disable those, only the ones from the current server will be used.",
 			"",
 
 			`<code>${prefix}bot rejoin channel:(channel)</code>`,
