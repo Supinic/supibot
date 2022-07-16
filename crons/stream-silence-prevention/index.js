@@ -64,7 +64,11 @@ module.exports = {
 			const videoData = await sb.Query.getRecordset(rs => rs
 				.select("Link", "Video_Type")
 				.from("personal", "Favourite_Track")
-				.where("Link NOT IN %s+", this.data.repeats)
+				.where(
+					{ cond: (this.data.repeats.length !== 0) },
+					"Link NOT IN %s+",
+					this.data.repeats
+				)
 				.orderBy("RAND()")
 				.limit(1)
 				.single()
