@@ -23,20 +23,20 @@ module.exports = {
 		const processType = (types.includes("web") || types.includes("site") || types.includes("website"))
 			? "web"
 			: "bot";
-	
+
 		types = types.map(i => i.toLowerCase());
-	
+
 		const queue = [];
 		const dir = this.staticData.dir[processType];
 		const pm2 = this.staticData.pm2[processType];
 		const respond = (context.channel)
 			? (string) => context.channel.send(string)
 			: (string) => context.platform.pm(string, context.user.Name);
-	
+
 		if (types.includes("all") || types.includes("pull")) {
 			queue.push(async () => {
 				await respond("VisLaud 👉 git pull origin master");
-	
+
 				await shell(`git -C ${dir} checkout -- yarn.lock package.json`);
 				const result = await shell(`git -C ${dir} pull origin master`);
 				console.log("pull result", { stdout: result.stdout, stderr: result.stderr });
@@ -44,23 +44,30 @@ module.exports = {
 		}
 		if (types.includes("all") || types.includes("yarn") || types.includes("upgrade")) {
 			queue.push(async () => {
-				await respond("VisLaud 👉 yarn upgrade supi-core");
-	
-				const result = await shell(`yarn --cwd ${dir} upgrade supi-core`);
+				await respond("VisLaud 👉 yarn upgrade");
+
+				const result = await shell(`yarn --cwd ${dir} upgrade`);
 				console.log("upgrade result", { stdout: result.stdout, stderr: result.stderr });
 			});
 		}
-	
+
 		queue.push(async () => {
 			await respond("VisLaud 👉 Restarting process");
 			setTimeout(() => shell(pm2), 1000);
 		});
-	
+
 		for (const fn of queue) {
 			await fn();
 		}
-	
-		return null;
+
+		if (processType === "bot") {
+			return null;
+		}
+		else {
+			return {
+				reply: `Process ${processType} restarted succesfully.`
+			};
+		}
 	}),
 	Dynamic_Description: null
 };
