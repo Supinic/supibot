@@ -78,11 +78,11 @@ module.exports = {
 		const followUsername = edge.node.login;
 		const followUser = (followUsername.toLowerCase() === context.user.Name)
 			? "you!"
-			: followUsername;
+			: `@${followUsername}`;
 
 		const delta = sb.Utils.timeDelta(new sb.Date(date), false, true);
 		return {
-			reply: `The longest still following user ${who} have is @${followUser}, since ${delta}.`
+			reply: `The longest still following user ${who} have is ${followUser}, since ${delta}.`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
