@@ -814,7 +814,7 @@ class Command extends require("./template.js") {
 				origin = "External";
 				const { code, name, message, options } = e;
 				errorContext = {
-					type: "Got.RequestError",
+					type: "GotError",
 					code,
 					message,
 					name,
@@ -840,7 +840,7 @@ class Command extends require("./template.js") {
 					reply: `🚨 Third party ${hostname} failed! ${message ?? "(no message)"} (error ID ${errorID})`
 				};
 			}
-			else if (e instanceof sb.Got.RequestError) {
+			else if (e instanceof sb.Got.GotError) {
 				execution = {
 					success: false,
 					reason: "got-error",
