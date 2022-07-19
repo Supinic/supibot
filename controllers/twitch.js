@@ -1383,6 +1383,11 @@ module.exports = class TwitchController extends require("./template.js") {
 				joinFailed = true;
 			}
 
+			await sb.Channel.moveData(channelData, joinedChannel, {
+				deleteOriginalValues: true,
+				skipProperties: ["inactiveReason"]
+			});
+
 			return {
 				success: true,
 				action: "rename",
@@ -1403,6 +1408,11 @@ module.exports = class TwitchController extends require("./template.js") {
 			catch {
 				joinFailed = true;
 			}
+
+			await sb.Channel.moveData(channelData, otherChannelData, {
+				deleteOriginalValues: true,
+				skipProperties: ["inactiveReason"]
+			});
 
 			return {
 				success: true,
