@@ -548,6 +548,43 @@ module.exports = class Channel extends require("./template.js") {
 		return channelData;
 	}
 
+	static async moveData (oldChannelData, newChannelData, options = {}) {
+		const properties = await sb.Query.getRecordset(rs => rs
+			.select("Property", "Value")
+			.from("chat_data", "Channel_Data")
+			.where("Channel = %n", oldChannelData.ID)
+		);
+
+		const skipProperties = options.skipProperties ?? [];
+		const savePromises = [];
+		for (const row of properties) {
+			if (skipProperties.includes(row.Property)) {
+				continue;
+			}
+
+			const propertyRow = await sb.Query.getRow("chat_data", "Channel_Data");
+			await propertyRow.load({
+				Channel: newChannelData.ID,
+				Property: row.Property
+			}, true);
+
+			propertyRow.values.Value = row.Value;
+
+			const promise = propertyRow.save({ skipLoad: true });
+			savePromises.push(promise);
+		}
+
+		await Promise.all(savePromises);
+
+		if (options.deleteOriginalValues) {
+			await sb.Query.getRecordDeleter(rd => rd
+				.delete()
+				.from("chat_data", "Channel_Data")
+				.where("Channel = %n", oldChannelData.ID)
+			);
+		}
+	}
+
 	/**
 	 * @param {ChannelLike[]} list
 	 * @returns {Promise<boolean>}

@@ -70,6 +70,10 @@ declare type OnlineStreamData = {
     }
 }
 declare type StreamData = OfflineStreamData | OnlineStreamData;
+declare type MoveDataOptions = {
+    deleteOriginalValues?: boolean;
+    skipProperties?: string[];
+};
 
 export declare class Channel extends ClassTemplate {
     static readonly redisPrefix: string;
@@ -78,6 +82,8 @@ export declare class Channel extends ClassTemplate {
     static get (identifier: Like, platform?: PlatformLike): Channel;
     static getJoinableForPlatform (platform: PlatformLike): Channel[];
     static add (name: string, platformData: Platform, mode?: Mode, specificID?: string): Promise<Channel>;
+
+    static moveData (oldChannelData: Channel, newChannelData: Channel, options?: MoveDataOptions): Promise<void>;
     static normalizeName (username: string): string;
 
     readonly ID: number;
