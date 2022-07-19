@@ -810,7 +810,7 @@ class Command extends require("./template.js") {
 					statusMessage
 				};
 			}
-			else if (e instanceof sb.Got.GotError) {
+			else if (e instanceof sb.Got.RequestError) {
 				origin = "External";
 				const { code, name, message, options } = e;
 				errorContext = {
