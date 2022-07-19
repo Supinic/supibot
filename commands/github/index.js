@@ -20,11 +20,16 @@ module.exports = {
 				`
 			};
 		}
-	
-		const { items } = await sb.Got("GitHub", {
-			url: `search/code?q=${query}+in:file+repo:supinic/supi-core+repo:supinic/supibot+repo:supinic/supibot-package-manager`
-		}).json();
-	
+
+		const encodedQuery = encodeURIComponent(query);
+		const response = await sb.Got("GitHub", {
+			url: "search/code",
+			searchParams: {
+				q: `${encodedQuery}+in:file+repo:supinic/supi-core+repo:supinic/supibot+repo:supinic/supibot-package-manager`
+			}
+		});
+
+		const { items } = response.body;
 		const filtered = items.filter(i => i.name.endsWith(".js"));
 		if (filtered.length === 0) {
 			return {
@@ -32,7 +37,7 @@ module.exports = {
 				reply: "No search results found!"
 			};
 		}
-	
+
 		const file = filtered.shift();
 		const link = `https://github.com/${file.repository.full_name}/blob/master/${file.path}`;
 		return {
@@ -42,12 +47,13 @@ module.exports = {
 	Dynamic_Description: (async (prefix) => [
 		"If nothing is specified, posts GitHub repo links; otherwise, will execute a search on Supibot's repositories.",
 		"",
-	
+
 		`<code>${prefix}github</code>`,
 		"Supibot: https://github.com/Supinic/supibot - Website: https://github.com/Supinic/supinic.com",
 		"",
-	
-		`<code>${prefix}github (search query)</code>`,
+
+		`<code>${prefix}github <u>(search query)</u></code>`,
+		`<code>${prefix}github <u>github</u></code>`,
 		"Searches supibot's repositories for that query"
 	])
 };
