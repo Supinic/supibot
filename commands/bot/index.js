@@ -316,17 +316,10 @@ module.exports = {
 				}
 
 				const { controller } = sb.Platform.get("twitch");
-				if (!controller.executeChannelRename) { // @todo remove after supibot changes are pulled
-					return {
-						success: false,
-						reply: `This functionality is not yet available. This should change soon ™`
-					};
-				}
-
 				if (channelData.Name === context.user.Name) {
 					return {
 						success: false,
-						reply: `Use the previous username you renamed from instead of your current one!`
+						reply: `Use the previous username you renamed from, instead of your current one!`
 					};
 				}
 
