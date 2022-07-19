@@ -5,6 +5,7 @@ const types = [
 	"alias-names",
 	"aliases",
 	"cookie-count",
+	"dalle",
 	"markov",
 	"playsounds",
 	"reminders",
