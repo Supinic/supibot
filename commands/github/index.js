@@ -23,10 +23,7 @@ module.exports = {
 
 		const encodedQuery = encodeURIComponent(query);
 		const response = await sb.Got("GitHub", {
-			url: "search/code",
-			searchParams: {
-				q: `${encodedQuery}+in:file+repo:supinic/supi-core+repo:supinic/supibot+repo:supinic/supibot-package-manager`
-			}
+			url: `search/code?q=${encodedQuery}+in:file+repo:supinic/supi-core+repo:supinic/supibot+repo:supinic/supibot-package-manager`
 		});
 
 		const { items } = response.body;
