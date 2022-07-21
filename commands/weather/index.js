@@ -333,7 +333,9 @@ module.exports = {
 			}
 
 			data = response.body;
-			await this.setCacheData(weatherKey, data, { expiry: 600_000 }); // 10 minutes cache
+			await this.setCacheData(weatherKey, data, {
+				expiry: 30 * 60_000 // 30 minutes cache
+			});
 		}
 
 		if (context.params.alerts) {
