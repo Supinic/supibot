@@ -168,6 +168,7 @@ module.exports = {
 		"Creates a set of nine pictures with your prompt, and posts a link to it in the chat.",
 		"Warning: This creation can take up to 2-5 minutes, so be patient. When the image is being generated, you cannot use any other commands until it finishes.",
 		"Even still, the generation service can be overloaded at times (usually in the evening EU time), in which case you'll have to try again later.",
+		"<u>Special cooldown: <code>60 seconds</code></u>",
 		"",
 
 		`<code>${prefix}dalle search:(your search here)</code>`,
