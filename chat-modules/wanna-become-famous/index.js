@@ -12,7 +12,7 @@ module.exports = {
 
 		let type = "";
 		const msg = sb.Utils.removeAccents(context.message).toLowerCase();
-		if (msg.includes("become famous?") && msg.includes("bigfollows")) {
+		if (msg.includes("become famous?")) {
 			type = "becoming famous";
 		}
 		else if (msg.includes("get raided")) {
