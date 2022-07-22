@@ -568,6 +568,13 @@ module.exports = class Channel extends require("./template.js") {
 				Property: row.Property
 			}, true);
 
+			if (!propertyRow.loaded) {
+				propertyRow.setValues({
+					Channel: newChannelData.ID,
+					Property: row.Property
+				});
+			}
+
 			propertyRow.values.Value = row.Value;
 
 			const promise = propertyRow.save({ skipLoad: true });
