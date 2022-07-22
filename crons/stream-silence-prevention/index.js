@@ -65,7 +65,7 @@ module.exports = {
 				.select("Link", "Video_Type")
 				.from("personal", "Favourite_Track")
 				.where(
-					{ cond: (this.data.repeats.length !== 0) },
+					{ condition: (this.data.repeats.length !== 0) },
 					"Link NOT IN %s+",
 					this.data.repeats
 				)
