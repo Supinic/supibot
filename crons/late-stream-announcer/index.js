@@ -23,7 +23,7 @@ module.exports = {
 		const result = await scheduleCommand.execute(fakeContext, "supinic");
 		if (result.reply?.includes("seems to be late")) {
 			const channel = sb.Channel.get("supinic", platform);
-			await channel.send("Weirdga TeaTim @Supinic seems to be late");
+			await channel.send("Weirdga TeaTime @Supinic seems to be late");
 		}
 	})
 };
