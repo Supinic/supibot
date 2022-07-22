@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Download, beatmap and assign any (supported by youtube-dl) song link into Crypt of the Necrodancer directly. Use (link) and then (zone) - for more info, check extended help.",
 	Flags: ["mention","pipe","whitelist"],
-	Params: null,
+	Params: [
+		{ name: "zone", type: "string" }
+	],
 	Whitelist_Response: "Only available in supinic's channel!",
 	Static_Data: (command => {
 		command.data.cooldowns = {};
@@ -84,7 +86,9 @@ module.exports = {
 			}
 		}
 
-		let [link, zone] = args;
+		const query = args.join(" ");
+		let { zone } = context.params;
+
 		if (!link) {
 			return {
 				reply: "Check the basic guidelines for Necrodancer songs here: https://pastebin.com/K4n151xz TL;DR - not too fast, not too slow, not too short." ,
@@ -110,12 +114,27 @@ module.exports = {
 		}
 
 		zone = zone.toLowerCase();
+
 		if (!zones.includes(zone)) {
 			return {
 				success: false,
 				reply: `Invalid zone provided! Use one of: ${zones.join(", ")}`,
 				cooldown: 2500
 			};
+		}
+
+		let link;
+		if (query.startsWith("https://")) {
+			link = query;
+		}
+		else {
+			const searchResult = await sb.Utils.searchYoutube(
+				query,
+				sb.Config.get("API_GOOGLE_YOUTUBE"),
+				{ single: true }
+			);
+
+			link = `https://youtu.be/${searchResult.ID}`;
 		}
 
 		this.data.cooldowns[zone] = this.data.cooldowns[zone] ?? 0;
@@ -183,10 +202,12 @@ module.exports = {
 
 			`<code>${prefix}necrodancer (link)</code>`,
 			"From a given link, extracts the song, beatmaps it automatically and inserts it as the song to play ingame.",
-			"You can omit the zone - in this case, the first free game zone will be used, based on a cooldown system.",
+			"If you do not pass the zone (see below), the first free game zone will be used, based on a cooldown system.",
 			"",
 
-			`<code>${prefix}necrodancer (link) <u>(zone)</u></code>`,
+			`<code>${prefix}necrodancer (link) <u>zone:(zone)</u></code>`,
+			`<code>${prefix}necrodancer (link) <u>zone:1-1</u></code>`,
+			`<code>${prefix}necrodancer (link) <u>zone:coral</u></code>`,
 			"Like above, but uses a specific game zone from the list below.",
 			"",
 
