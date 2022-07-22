@@ -89,7 +89,7 @@ module.exports = {
 		const query = args.join(" ");
 		let { zone } = context.params;
 
-		if (!link) {
+		if (!query) {
 			return {
 				reply: "Check the basic guidelines for Necrodancer songs here: https://pastebin.com/K4n151xz TL;DR - not too fast, not too slow, not too short." ,
 				cooldown: 2500
