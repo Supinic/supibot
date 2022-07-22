@@ -905,7 +905,8 @@ class Command extends require("./template.js") {
 			execution.reply = partResult.join(" ");
 		}
 
-		execution.reply = String(execution.reply).trim();
+		execution.reply = String(execution.reply).trim().replace(whitespaceRegex, "");
+
 		if (execution.reply.length === 0) {
 			execution.reply = "(empty message)";
 		}
