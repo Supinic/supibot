@@ -44,7 +44,7 @@ export declare class Reminder extends ClassTemplate {
 	static get (identifier: Like): Reminder | null;
 	static create (data: ConstructorData, skipChecks?: boolean): Promise<Result>;
 	static checkActive (targetUserData: User, channelData: Channel): Promise<void>;
-	static checkLimits (userFrom: User, userTo: User, schedule?: Date): Promise<Result>;
+	static checkLimits (userFrom: number, userTo: number, schedule?: Date): Promise<Result>;
 	static createRelayLink (endpoint: string, params: string): Promise<string>;
 	static clear (): void;
 	static destroy (): void;
