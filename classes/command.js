@@ -905,7 +905,7 @@ class Command extends require("./template.js") {
 			execution.reply = partResult.join(" ");
 		}
 
-		execution.reply = String(execution.reply).trim().replace(whitespaceRegex, "");
+		execution.reply = String(execution.reply).trim();
 
 		if (execution.reply.length === 0) {
 			execution.reply = "(empty message)";
@@ -913,7 +913,8 @@ class Command extends require("./template.js") {
 
 		const metaSkip = Boolean(!execution.partialReplies && (options.skipBanphrases || execution?.meta?.skipBanphrases));
 		if (!command.Flags.skipBanphrase && !metaSkip) {
-			const { passed, privateMessage, string } = await sb.Banphrase.execute(execution.reply.slice(0, 2000), channelData);
+			const messageSlice = execution.reply.slice(0, 2000).replace(whitespaceRegex, "");
+			const { passed, privateMessage, string } = await sb.Banphrase.execute(messageSlice, channelData);
 			execution.reply = string;
 
 			if (
