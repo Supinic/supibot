@@ -7,6 +7,9 @@ module.exports = class Channel extends require("./template.js") {
 	/** @type {WeakMap<Channel, Map<string, *>>} */
 	static dataCache = new WeakMap();
 
+	/** @type {Promise<boolean>|null} */
+	#setupPromise = null;
+
 	constructor (data) {
 		super();
 
@@ -131,59 +134,67 @@ module.exports = class Channel extends require("./template.js") {
 
 	/**
 	 * Sets up the logging table and triggers for a newly created channel.
-	 * @returns {boolean} True if new tables and triggeres were created, false if channel already has them set up
+	 * @returns {boolean} True if new tables and triggers were created, false if channel already has them set up
 	 */
 	async setup () {
 		if (!this.Platform.Logging || !this.Platform.Logging.messages) {
 			return false;
 		}
 
-		const databasePresent = await sb.Query.isDatabasePresent("chat_line");
-		if (!databasePresent) {
-			return false;
+		if (this.#setupPromise) {
+			return this.#setupPromise;
 		}
 
-		const limit = this.Message_Limit ?? this.Platform.Message_Limit;
-		const prefix = (this.Platform.Name === "twitch")
-			? ""
-			: `${this.Platform.getFullName("_")}_`;
+		this.#setupPromise = (async () => {
+			const databasePresent = await sb.Query.isDatabasePresent("chat_line");
+			if (!databasePresent) {
+				return false;
+			}
 
-		const name = prefix + this.Name.toLowerCase();
-		const alreadySetup = await sb.Query.isTablePresent("chat_line", name);
-		if (alreadySetup) {
-			return false;
-		}
+			const limit = this.Message_Limit ?? this.Platform.Message_Limit;
+			const prefix = (this.Platform.Name === "twitch")
+				? ""
+				: `${this.Platform.getFullName("_")}_`;
 
-		const userAliasDefinition = await sb.Query.getDefinition("chat_data", "User_Alias");
-		const idCol = userAliasDefinition.columns.find(i => i.name === "ID");
-		const sign = (idCol.unsigned) ? "UNSIGNED" : "";
+			const name = prefix + this.Name.toLowerCase();
+			const alreadySetup = await sb.Query.isTablePresent("chat_line", name);
+			if (alreadySetup) {
+				return false;
+			}
 
-		// Set up logging table
-		await sb.Query.raw([
-			`CREATE TABLE IF NOT EXISTS chat_line.\`${name}\` (`,
-			"`ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,",
-			`\`User_Alias\` INT(${idCol.length}) ${sign} NOT NULL,`,
-			`\`Text\` VARCHAR(${limit}),`,
-			"`Posted` DATETIME(3) NULL DEFAULT NULL,",
-			"PRIMARY KEY (`ID`),",
-			`INDEX \`fk_user_alias_${name}\` (\`User_Alias\`),`,
-			`CONSTRAINT \`fk_user_alias_${name}\` FOREIGN KEY (\`User_Alias\`) REFERENCES \`chat_data\`.\`User_Alias\` (\`ID\`) ON UPDATE CASCADE ON DELETE CASCADE)`,
-			"COLLATE=`utf8mb4_general_ci` ENGINE=InnoDB AUTO_INCREMENT=1 PAGE_COMPRESSED=1;"
-		].join(" "));
+			const userAliasDefinition = await sb.Query.getDefinition("chat_data", "User_Alias");
+			const idCol = userAliasDefinition.columns.find(i => i.name === "ID");
+			const sign = (idCol.unsigned) ? "UNSIGNED" : "";
 
-		// Set up user-specific meta logging trigger
-		await sb.Query.raw([
-			`CREATE TRIGGER IF NOT EXISTS chat_line.\`${name}_after_insert\``,
-			`AFTER INSERT ON chat_line.\`${name}\` FOR EACH ROW`,
-			"INSERT INTO chat_data.Message_Meta_User_Alias (User_Alias, Channel, Last_Message_Text, Last_Message_Posted)",
-			`VALUES (NEW.User_Alias, ${this.ID}, NEW.Text, NEW.Posted)`,
-			"ON DUPLICATE KEY UPDATE",
-			"Message_Count = Message_Count + 1,",
-			"Last_Message_Text = NEW.Text,",
-			"Last_Message_Posted = NEW.Posted;"
-		].join(" "));
+			// Set up logging table
+			await sb.Query.raw([
+				`CREATE TABLE IF NOT EXISTS chat_line.\`${name}\` (`,
+				"`ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,",
+				`\`User_Alias\` INT(${idCol.length}) ${sign} NOT NULL,`,
+				`\`Text\` VARCHAR(${limit}),`,
+				"`Posted` DATETIME(3) NULL DEFAULT NULL,",
+				"PRIMARY KEY (`ID`),",
+				`INDEX \`fk_user_alias_${name}\` (\`User_Alias\`),`,
+				`CONSTRAINT \`fk_user_alias_${name}\` FOREIGN KEY (\`User_Alias\`) REFERENCES \`chat_data\`.\`User_Alias\` (\`ID\`) ON UPDATE CASCADE ON DELETE CASCADE)`,
+				"COLLATE=`utf8mb4_general_ci` ENGINE=InnoDB AUTO_INCREMENT=1 PAGE_COMPRESSED=1;"
+			].join(" "));
 
-		return true;
+			// Set up user-specific meta logging trigger
+			await sb.Query.raw([
+				`CREATE TRIGGER IF NOT EXISTS chat_line.\`${name}_after_insert\``,
+				`AFTER INSERT ON chat_line.\`${name}\` FOR EACH ROW`,
+				"INSERT INTO chat_data.Message_Meta_User_Alias (User_Alias, Channel, Last_Message_Text, Last_Message_Posted)",
+				`VALUES (NEW.User_Alias, ${this.ID}, NEW.Text, NEW.Posted)`,
+				"ON DUPLICATE KEY UPDATE",
+				"Message_Count = Message_Count + 1,",
+				"Last_Message_Text = NEW.Text,",
+				"Last_Message_Posted = NEW.Posted;"
+			].join(" "));
+
+			return true;
+		})();
+
+		return this.#setupPromise;
 	}
 
 	/**
