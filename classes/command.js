@@ -913,7 +913,11 @@ class Command extends require("./template.js") {
 
 		const metaSkip = Boolean(!execution.partialReplies && (options.skipBanphrases || execution?.meta?.skipBanphrases));
 		if (!command.Flags.skipBanphrase && !metaSkip) {
-			const messageSlice = execution.reply.slice(0, 2000).replace(whitespaceRegex, "");
+			let messageSlice = execution.reply.slice(0, 2000);
+			if (!execution.meta?.skipWhitespaceCheck) {
+				messageSlice = messageSlice.replace(whitespaceRegex, "");
+			}
+
 			const { passed, privateMessage, string } = await sb.Banphrase.execute(messageSlice, channelData);
 			execution.reply = string;
 
