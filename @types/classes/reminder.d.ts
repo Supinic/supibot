@@ -1,7 +1,7 @@
 import { ClassTemplate } from "./template";
 import { CustomDate as Date } from "../objects/date";
 import { Channel } from "./channel";
-import { Platform } from "./platform";
+import { Platform, Like as PlatformLike } from "./platform";
 import { User } from "./user";
 
 import { LongTimeout } from "long-timeout";
@@ -16,8 +16,20 @@ type ConstructorData = {
 	Created: Date;
 	Schedule: Date | null;
 	Private_Message: boolean;
-	Platform: Platform | null;
+	Platform: PlatformLike;
 	Type: Type;
+};
+
+type OmittableConstructorData = {
+	User_From: ConstructorData["User_From"];
+	User_To: ConstructorData["User_To"];
+	Platform: ConstructorData["Platform"];
+
+	Channel?: ConstructorData["Channel"];
+	Text?: ConstructorData["Text"];
+	Schedule?: ConstructorData["Schedule"];
+	Private_Message?: ConstructorData["Private_Message"];
+	Type?: ConstructorData["Type"];
 };
 
 type Result = {
@@ -37,12 +49,13 @@ export declare class Reminder extends ClassTemplate {
 	static LongTimeout: LongTimeout;
 	static data: Map<User["ID"], Reminder[]>;
 	static available: Map<Reminder["ID"], User["ID"]>;
+	static readonly mandatoryConstructorOptions: (keyof ConstructorData)[];
 
 	static #add (reminder: Reminder): void;
 	static #remove (ID: Reminder["ID"], options: RemoveOptions): Promise<boolean>;
 
 	static get (identifier: Like): Reminder | null;
-	static create (data: ConstructorData, skipChecks?: boolean): Promise<Result>;
+	static create (data: OmittableConstructorData, skipChecks?: boolean): Promise<Result>;
 	static checkActive (targetUserData: User, channelData: Channel): Promise<void>;
 	static checkLimits (userFrom: number, userTo: number, schedule?: Date): Promise<Result>;
 	static createRelayLink (endpoint: string, params: string): Promise<string>;

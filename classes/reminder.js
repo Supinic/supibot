@@ -15,6 +15,8 @@ module.exports = class Reminder extends require("./template.js") {
 	/* @type {Map<Reminder.ID, User.ID>} */
 	static available = new Map();
 
+	static mandatoryConstructorOptions = ["User_From", "User_To", "Platform"];
+
 	constructor (data) {
 		super();
 
@@ -314,8 +316,6 @@ module.exports = class Reminder extends require("./template.js") {
 	 * @return {ReminderCreationResult}
 	 */
 	static async create (data, skipChecks = false) {
-		data.Active = true;
-
 		if (!skipChecks) {
 			const { success, cause } = await Reminder.checkLimits(data.User_From, data.User_To, data.Schedule);
 			if (!success) {
@@ -323,17 +323,32 @@ module.exports = class Reminder extends require("./template.js") {
 			}
 		}
 
-		if (!data.Platform) {
-			console.warn("Creating reminder without platform!");
-			data.Platform = 1;
+		for (const option of Reminder.mandatoryConstructorOptions) {
+			if (!data[option]) {
+				throw new sb.Error({
+					message: "Missing mandatory Reminder constructor option",
+					args: { data, option }
+				});
+			}
 		}
 
 		const row = await sb.Query.getRow("chat_data", "Reminder");
-		row.setValues(data);
-		await row.save();
-		data.ID = row.values.ID;
+		row.setValues({
+			Active: true,
+			User_From: data.User_From,
+			User_To: data.User_To,
+			Channel: data.Channel ?? null,
+			Text: data.Text ?? null,
+			Created: new sb.Date(),
+			Schedule: data.Schedule ?? null,
+			Private_Message: data.Private_Message ?? false,
+			Platform: data.Platform,
+			Type: data.Type ?? "Reminder"
+		});
 
-		const reminder = new Reminder(data);
+		await row.save({ skipLoad: false });
+
+		const reminder = new Reminder(row.valuesObject);
 		Reminder.#add(reminder);
 
 		return {
