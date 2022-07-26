@@ -13,7 +13,7 @@ const encode = (input, codeWord) => {
 
 	for (let i = 0; i < input.length; i++) {
 		const value = input.charCodeAt(i);
-		if (value > max || /\s/.test(input[i])) {
+		if (value > max) {
 			output.push(input[i]);
 			continue;
 		}
