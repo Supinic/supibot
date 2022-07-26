@@ -69,6 +69,8 @@ module.exports = {
 				extra = "(don't actually remove anything before 2022-08-01!)";
 			}
 
+			result.sort((a, b) => new sb.Date(a.lastCommandExecuted) - new sb.Date(b.lastCommandExecuted));
+
 			message = `${extra} Found ${result.length} potentially inactive Discord guilds:\n\n${JSON.stringify(result, null, 4)}`;
 		}
 
