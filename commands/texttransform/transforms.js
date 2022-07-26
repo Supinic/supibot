@@ -1,5 +1,5 @@
 const convert = {
-	method: (string, fn) => fn(string),
+	method: (string, fn, context) => fn(string, context),
 	map: (string, map) => [...string].map(i => map[i] || i).join(""),
 	unmap: (string, map) => {
 		const reverseMap = {};
@@ -39,6 +39,7 @@ const convert = {
 	}
 };
 
+const textCaseCode = require("./textCaseCode.js");
 const officialCharactersMap = require("./definitions/official-characters.json");
 
 const types = [
@@ -363,6 +364,14 @@ const types = [
 
 			return new TextDecoder().decode(new Uint8Array(hexArray));
 		}
+	},
+	{
+		name: "forsen",
+		type: "method",
+		aliases: ["forsencode"],
+		description: "Transforms your input a list of \"forsen\", based on GaZaTu's ForsenCode protocol.",
+		data: (string) => textCaseCode.encode(string, "forsen"),
+		reverseData: (string) => textCaseCode.decode(string, "forsen")
 	}
 ];
 

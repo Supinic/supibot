@@ -52,7 +52,7 @@ module.exports = {
 			}
 		}
 
-		const result = transforms.convert[type](message, data);
+		const result = transforms.convert[type](message, data, context);
 		if (!result) {
 			return {
 				success: false,
