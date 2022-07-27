@@ -83,7 +83,7 @@ module.exports = {
 
 		const notificationTimeout = setTimeout(() => {
 			reply(sb.Utils.tag.trim `
-				@${username},
+				${username},
 				Seems like the API is working
 				${waitingEmote} ${loadingEmote}
 				The result should be coming up anywhere between two to five minutes or so.
