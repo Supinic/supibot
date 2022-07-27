@@ -862,5 +862,18 @@
         "helpers": ["ALazyMeme"]
       }
     ]
+  },
+  {
+    "code": "bg",
+    "language": "Bulgarian",
+    "sources": [
+      {
+        "name": "BNT",
+        "url": "https://news.bnt.bg",
+        "path": ["bg/rss"],
+        "endpoints": ["news.xml"],
+        "helpers": ["ALazyMeme"]
+      }
+    ]
   }
 ]
