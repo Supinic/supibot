@@ -3,11 +3,23 @@ const rssCacheKey = "command-news-rss-cache";
 
 module.exports = {
 	isCountryCode: (code) => /[A-Z]{2}/.test(code),
-	has: (code) => definitions.some(i => i.code === code?.toLowerCase() || i.alternateCodes?.includes(code)),
+	has: (code) => {
+		if (!code) {
+			return false;
+		}
+
+		const lower = code.toLowerCase();
+		return definitions.some(i => i.code === lower || i.alternateCodes?.includes(lower));
+	},
 	fetch: async (code, query) => {
-		const news = definitions.find(i => i.code === code?.toLowerCase() || i.alternateCodes?.includes(code));
+		if (!code) {
+			throw new sb.Error({ message: "No code provided" });
+		}
+
+		const lower = code.toLowerCase();
+		const news = definitions.find(i => i.code === lower || i.alternateCodes?.includes(lower));
 		if (!news) {
-			throw new sb.Error({ message: "Extra news code does not exist!" });
+			throw new sb.Error({ message: "Extra news code does not exist" });
 		}
 
 		const source = sb.Utils.randArray(news.sources);
