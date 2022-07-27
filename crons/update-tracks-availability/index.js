@@ -18,7 +18,7 @@ module.exports = {
 
 		const youtubeIDs = videoIDs.filter(i => i.Type === "yt");
 		for (const track of youtubeIDs) {
-			const trackData = await sb.Utils.modules.linkParser.fetchData(track.Link);
+			const trackData = await sb.Utils.modules.linkParser.fetchData(track.Link, "youtube");
 			if ((trackData && track.Available) || (!trackData && !track.Available)) {
 				continue;
 			}
