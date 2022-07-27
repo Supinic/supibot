@@ -726,6 +726,7 @@
   },
   {
     "code": "gb",
+    "alternateCodes": ["uk"],
     "language": "english",
     "sources": [
       {

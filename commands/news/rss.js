@@ -3,9 +3,9 @@ const rssCacheKey = "command-news-rss-cache";
 
 module.exports = {
 	isCountryCode: (code) => /[A-Z]{2}/.test(code),
-	has: (code) => definitions.some(i => i.code === code?.toLowerCase()),
+	has: (code) => definitions.some(i => i.code === code?.toLowerCase() || i.alternateCodes?.includes(code)),
 	fetch: async (code, query) => {
-		const news = definitions.find(i => i.code === code?.toLowerCase());
+		const news = definitions.find(i => i.code === code?.toLowerCase() || i.alternateCodes?.includes(code));
 		if (!news) {
 			throw new sb.Error({ message: "Extra news code does not exist!" });
 		}
