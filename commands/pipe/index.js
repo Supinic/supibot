@@ -58,9 +58,13 @@ module.exports = {
 
 		let hasExternalInput = false;
 		const nullCommand = sb.Command.get("null");
+		const { prefix } = sb.Command;
+
 		for (let i = 0; i < invocations.length; i++) {
 			const [commandString, ...cmdArgs] = invocations[i].split(" ");
-			const commandData = sb.Command.get(commandString);
+			const commandData = (commandString.startsWith(prefix) && commandString.length > prefix.length)
+				? sb.Command.get(commandString.slice(prefix.length))
+				: sb.Command.get(commandString);
 
 			if (!commandData) {
 				return {
@@ -104,7 +108,7 @@ module.exports = {
 		// let lastCommand;
 		for (let i = 0; i < invocations.length; i++) {
 			const inv = invocations[i];
-			const [cmd, ...restArgs] = inv.split(" ");
+			const [rawCmd, ...restArgs] = inv.split(" ");
 
 			let argumentStartPosition = null;
 			if (typeof context.params._apos?.[i] !== "undefined") {
@@ -140,6 +144,10 @@ module.exports = {
 					`
 				};
 			}
+
+			const cmd = (rawCmd.startsWith(prefix) && rawCmd.length > prefix.length)
+				? rawCmd.slice(prefix.length)
+				: rawCmd;
 
 			const result = await sb.Command.checkAndExecute(
 				cmd,
