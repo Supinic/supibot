@@ -311,7 +311,7 @@ module.exports = {
 				if (channelData.Platform.Name !== "twitch") {
 					return {
 						success: false,
-						reply: `Re-enabling the bot in recently renamed channels is only available on Twitch!`
+						reply: `Adding me back to recently renamed channels is only available on Twitch!`
 					};
 				}
 
@@ -320,6 +320,15 @@ module.exports = {
 					return {
 						success: false,
 						reply: `Use the previous username you renamed from, instead of your current one!`
+					};
+				}
+
+				const currentNameCheck = sb.Channel.get(context.user.Name);
+				if (currentNameCheck.Mode !== "Inactive") {
+					const emote = await context.getBestAvailableEmote(["Okayga", "supiniOkay", "FeelsOkayMan"], "🙂");
+					return {
+						success: false,
+						reply: `I'm already active in your channel! No need to run this command ${emote}`
 					};
 				}
 
