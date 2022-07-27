@@ -876,5 +876,18 @@
         "helpers": ["ALazyMeme"]
       }
     ]
+  },
+  {
+    "code": "li",
+    "language": "German",
+    "sources": [
+      {
+        "name": "Vaterland",
+        "url": "https://www.vaterland.li",
+        "path": ["storage/rss/rss/vaterland"],
+        "endpoints": ["liechtenstein.xml"],
+        "helpers": ["howtoeat6"]
+      }
+    ]
   }
 ]
