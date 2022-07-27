@@ -231,21 +231,24 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 						userMap.clear();
 					}
 
-					await sb.Query.batchUpdate(data, {
-						batchSize: 200,
-						staggerDelay: 5000,
-						callback: (ru, row) => ru
-							.update("chat_data", "Message_Meta_User_Alias")
-							.set("Message_Count", {
-								useField: true,
-								value: `Message_Count + ${row.count}`
-							})
-							.set("Last_Message_Posted", row.date)
-							.set("Last_Message_Text", row.message)
-							.where("User_Alias = %n", row.user)
-							.where("Channel = %n", row.channel)
-							.ignoreDuplicates()
-					});
+					await sb.Query.pool.batch(
+						sb.Utils.tag.trim `
+							INSERT INTO chat_data.Message_Meta_User_Alias
+							(User_Alias, Channel, Message_Count, Last_Message_Posted, Last_Message_Text)
+							VALUES (?, ?, ?, ?, ?)
+							ON DUPLICATE KEY UPDATE
+							Message_Count = Message_Count + VALUES(Message_Count),
+							Last_Message_Posted = VALUES(Last_Message_Posted),
+							Last_Message_Text = VALUES(Last_Message_Text)
+						`,
+						data.map(i => [
+							i.user,
+							i.channel,
+							i.count,
+							i.date,
+							i.message
+						])
+					);
 
 					this.lastSeenRunning = false;
 				}
