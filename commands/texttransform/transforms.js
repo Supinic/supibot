@@ -369,7 +369,7 @@ const types = [
 		name: "forsen",
 		type: "method",
 		aliases: ["forsencode"],
-		description: "Transforms your input a list of \"forsen\", based on GaZaTu's ForsenCode protocol.",
+		description: "Transforms your input into a list of \"forsen\" words, based on GaZaTu's ForsenCode protocol.",
 		data: (string) => textCaseCode.encode(string, "forsen").join(" ").trim(),
 		reverseData: (string) => textCaseCode.decode(string, "forsen").join("").trim()
 	}
