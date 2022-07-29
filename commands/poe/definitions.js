@@ -220,10 +220,10 @@ const subcommands = [
 			const launchDate = new sb.Date(launch);
 
 			if (revealDate > now) {
-				result.push(`The ${patch} ${name} league will be revealed ${sb.Utils.timeDelta(revealDate)}.`);
+				result.push(`The ${patch} ${name ?? ""} league will be revealed ${sb.Utils.timeDelta(revealDate)}.`);
 			}
 			else if (launchDate > now) {
-				result.push(`The ${patch} ${name} league will start ${sb.Utils.timeDelta(launchDate)}.`);
+				result.push(`The ${patch} ${name ?? ""} league will start ${sb.Utils.timeDelta(launchDate)}.`);
 			}
 			else {
 				const possibleEnd = revealDate.clone().addMonths(3).addDays(7);
