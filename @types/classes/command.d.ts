@@ -9,6 +9,31 @@ import { DeepFrozen } from "../singletons/utils";
 
 import { PoolConnection } from "mariadb";
 
+declare type DiscordEmbedDefinition = {
+    title: string;
+    color?: string;
+    url?: string;
+    author?: {
+        name: string;
+        icon_url?: string;
+        url?: string;
+    };
+    description?: string;
+    fields: {
+        name: string;
+        value: string;
+        inline?: boolean;
+    }[];
+    image?: {
+        url: string;
+    };
+    timestamp?: Date;
+    footer?: {
+        text: string;
+        icon_url?: string;
+    }
+};
+
 export declare namespace Parameter {
     type Type = "string" | "number" | "boolean" | "date" | "object" | "regex" | "language";
     type ParsedType = string | number | boolean | Date | SimpleGenericData | RegExp | Language;
@@ -23,6 +48,9 @@ export declare type Result = {
     cooldown?: CooldownDescriptor;
     reason?: string;
     meta?: never;
+    discord?: {
+        embeds?: DiscordEmbedDefinition[]
+    };
     partialExecute?: boolean;
     hasExternalInput?: boolean;
     skipExternalPrefix?: boolean;
