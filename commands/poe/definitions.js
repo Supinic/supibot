@@ -207,10 +207,11 @@ const subcommands = [
 
 			const currentLeague = leagues.find(i => i.end && new sb.Date(i.end) > now);
 			if (currentLeague) {
-				result.push(`The ${currentLeague.patch} ${currentLeague.patch} league will end ${sb.Utils.timeDelta(currentLeague.end)}.`);
+				const endDate = new sb.Date(currentLeague.end);
+				result.push(`The ${currentLeague.patch} ${currentLeague.patch} league will end ${sb.Utils.timeDelta(endDate)}.`);
 			}
 
-			const [nextLeague] = leagues.sort((a, b) => new sb.Date(b) - new sb.Date(a))
+			const [nextLeague] = leagues.sort((a, b) => new sb.Date(b) - new sb.Date(a));
 
 			const { name, patch, reveal, launch } = nextLeague;
 			const revealDate = new sb.Date(reveal);
