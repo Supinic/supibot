@@ -324,7 +324,7 @@ module.exports = class DiscordController extends require("./template.js") {
 		const limit = channelData.Message_Limit ?? this.platform.Message_Limit;
 
 		let sendTarget;
-		if (options.embeds && options.embeds.length === 0) {
+		if (!Array.isArray(options.embeds) || options.embeds.length === 0) {
 			sendTarget = sb.Utils.wrapString(message, limit, {
 				keepWhitespace: true
 			});
