@@ -263,8 +263,9 @@ module.exports = class DiscordController extends require("./template.js") {
 	 * Sends a message
 	 * @param message
 	 * @param channel
+	 * @param {Object} options
 	 */
-	async send (message, channel) {
+	async send (message, channel, options = {}) {
 		const globalEmoteRegex = /[A-Z]/;
 		const channelData = sb.Channel.get(channel, this.platform);
 		const channelObject = await this.client.channels.fetch(channelData.Name);
@@ -321,19 +322,28 @@ module.exports = class DiscordController extends require("./template.js") {
 		message = message.replace(/\\/g, "\\\\");
 
 		const limit = channelData.Message_Limit ?? this.platform.Message_Limit;
-		const wrappedMessage = sb.Utils.wrapString(message, limit, {
-			keepWhitespace: true
-		});
+
+		let sendTarget;
+		if (options.embeds && options.embeds.length === 0) {
+			sendTarget = sb.Utils.wrapString(message, limit, {
+				keepWhitespace: true
+			});
+		}
+		else {
+			sendTarget = {
+				embeds: options.embeds
+			};
+		}
 
 		try {
-			await channelObject.send(wrappedMessage);
+			await channelObject.send(sendTarget);
 		}
 		catch (e) {
 			if (e instanceof DiscordAPIError) {
 				await sb.Logger.logError("Backend", e, {
 					origin: "External",
 					context: {
-						message: wrappedMessage,
+						message: sendTarget,
 						channelID: channelObject.id,
 						channelName: channelObject.name ?? null,
 						guildID: channelObject.guild?.id ?? null,
@@ -345,7 +355,7 @@ module.exports = class DiscordController extends require("./template.js") {
 				throw new sb.Error({
 					message: "Sending Discord channel message failed",
 					args: {
-						message: wrappedMessage,
+						message: sendTarget,
 						channelID: channelObject.id,
 						channelName: channelObject.name ?? null,
 						guildID: channelObject.guild?.id ?? null,
@@ -362,11 +372,13 @@ module.exports = class DiscordController extends require("./template.js") {
 	 * The user in question must have their Discord ID filled out, otherwise the method fails.
 	 * @param {string} message
 	 * @param {User|string|number} user
+	 * @param {Object} options
+	 * @param {Object[]} [options.embeds]
 	 * @returns {Promise<void>}
 	 * @throws {sb.Error} If the provided user does not exist
 	 * @throws {sb.Error} If the provided user has no Discord ID connected.
 	 */
-	async pm (message, user) {
+	async pm (message, user, options = {}) {
 		const userData = await sb.User.get(user, true);
 		if (!userData) {
 			throw new sb.Error({
@@ -406,7 +418,14 @@ module.exports = class DiscordController extends require("./template.js") {
 		}
 
 		try {
-			await discordUser.send(message);
+			if (typeof message === "string") {
+				await discordUser.send(message);
+			}
+			else if (options.embeds && options.embeds.length !== 0) {
+				await discordUser.send({
+					embeds: options.embeds
+				});
+			}
 		}
 		catch (e) {
 			if (!this.platform.Data.createReminderWhenSendingPrivateMessageFails) {
@@ -497,31 +516,42 @@ module.exports = class DiscordController extends require("./template.js") {
 			...options
 		});
 
-		if (!execution || !execution.reply) {
+		if (!execution) {
+			return;
+		}
+
+		const { embeds = [], reply } = execution;
+		if (!reply && embeds.length === 0) {
 			return;
 		}
 
 		const commandOptions = sb.Command.extractMetaResultProperties(execution);
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
-			const message = await this.prepareMessage(execution.reply, null, commandOptions);
+			const message = await this.prepareMessage(reply, null, commandOptions);
 
-			await this.pm(message, userData);
+			await this.pm(message, userData, { embeds });
 		}
-		else {
+		else if (reply) {
 			if (channelData?.Mirror) {
-				await this.mirror(execution.reply, userData, channelData, {
+				await this.mirror(reply, userData, channelData, {
 					...commandOptions,
 					commandUsed: true
 				});
 			}
 
-			const message = await this.prepareMessage(execution.reply, channelData, {
+			const message = await this.prepareMessage(reply, channelData, {
 				...commandOptions,
 				skipBanphrases: true
 			});
 
 			await this.send(message, channelData, {
 				keepWhitespace: Boolean(commandOptions.keepWhitespace)
+			});
+		}
+		else {
+			await this.send(null, channelData, {
+				keepWhitespace: Boolean(commandOptions.keepWhitespace),
+				embeds
 			});
 		}
 	}

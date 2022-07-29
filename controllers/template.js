@@ -9,7 +9,7 @@ module.exports = class Controller {
 
 	initListeners () {}
 
-	async send (message, channel) {}
+	async send (message, channel, options = {}) {}
 
 	async pm (message, user) {}
 
