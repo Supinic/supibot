@@ -520,7 +520,8 @@ module.exports = class DiscordController extends require("./template.js") {
 			return;
 		}
 
-		const { embeds = [], reply } = execution;
+		const { reply } = execution;
+		const embeds = execution.discord?.embeds ?? [];
 		if (!reply && embeds.length === 0) {
 			return;
 		}
