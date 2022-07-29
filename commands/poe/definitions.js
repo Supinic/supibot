@@ -202,34 +202,39 @@ const subcommands = [
 		aliases: [],
 		description: "Posts data about the upcoming or current league.",
 		execute: async () => {
+			const result = [];
 			const now = sb.Date.now();
-			const [nextLeague] = leagues.sort((a, b) => new sb.Date(b) - new sb.Date(a));
+
+			const currentLeague = leagues.find(i => i.end && new sb.Date(i.end) > now);
+			if (currentLeague) {
+				result.push(`The ${currentLeague.patch} ${currentLeague.patch} league will end ${sb.Utils.timeDelta(currentLeague.end)}.`);
+			}
+
+			const [nextLeague] = leagues.sort((a, b) => new sb.Date(b) - new sb.Date(a))
 
 			const { name, patch, reveal, launch } = nextLeague;
 			const revealDate = new sb.Date(reveal);
 			const launchDate = new sb.Date(launch);
 
 			if (revealDate > now) {
-				return {
-					reply: `The ${patch} ${name} league will be revealed ${sb.Utils.timeDelta(revealDate)}.`
-				};
+				result.push(`The ${patch} ${name} league will be revealed ${sb.Utils.timeDelta(revealDate)}.`);
 			}
 			else if (launchDate > now) {
-				return {
-					reply: `The ${patch} ${name} league will start ${sb.Utils.timeDelta(launchDate)}.`
-				};
+				result.push(`The ${patch} ${name} league will start ${sb.Utils.timeDelta(launchDate)}.`);
 			}
-
-			const possibleEnd = revealDate.clone().addMonths(3);
-			if (possibleEnd > now) {
-				const delta = sb.Utils.timeDelta(possibleEnd, true);
-				return {
-					reply: `The ${patch} ${name} league has launched - go and play. It will last approximately for ${delta}.`
-				};
+			else {
+				const possibleEnd = revealDate.clone().addMonths(3).addDays(7);
+				if (possibleEnd > now) {
+					const delta = sb.Utils.timeDelta(possibleEnd, true);
+					result.push(`The ${patch} ${name} league has launched - go and play. It will last approximately for ${delta}.`);
+				}
+				else {
+					result.push(`The ${patch} ${name} league has likely concluded. Ask @Supinic to add new info about the next league!`);
+				}
 			}
 
 			return {
-				reply: `The ${patch} ${name} league has likely concluded. Ask @Supinic to add new info about the next league!`
+				reply: result.join(" ")
 			};
 		}
 	},
