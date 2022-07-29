@@ -528,11 +528,19 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		const commandOptions = sb.Command.extractMetaResultProperties(execution);
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
-			const message = await this.prepareMessage(reply, null, commandOptions);
+			const message = (reply)
+				? await this.prepareMessage(reply, null, commandOptions)
+				: null;
 
 			await this.pm(message, userData, { embeds });
 		}
-		else if (reply) {
+		else if (embeds.length !== 0) {
+			await this.send(null, channelData, {
+				keepWhitespace: Boolean(commandOptions.keepWhitespace),
+				embeds
+			});
+		}
+		else {
 			if (channelData?.Mirror) {
 				await this.mirror(reply, userData, channelData, {
 					...commandOptions,
@@ -547,12 +555,6 @@ module.exports = class DiscordController extends require("./template.js") {
 
 			await this.send(message, channelData, {
 				keepWhitespace: Boolean(commandOptions.keepWhitespace)
-			});
-		}
-		else {
-			await this.send(null, channelData, {
-				keepWhitespace: Boolean(commandOptions.keepWhitespace),
-				embeds
 			});
 		}
 	}
