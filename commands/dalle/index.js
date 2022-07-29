@@ -1,4 +1,3 @@
-const { createEmbeds } = require("./discord-embed");
 module.exports = {
 	Name: "dalle",
 	Aliases: [],
