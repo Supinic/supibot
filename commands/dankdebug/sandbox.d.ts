@@ -83,6 +83,11 @@ declare namespace DankDebug {
 		removeAccents: UtilsSingleton["removeAccents"];
 
 		/**
+		 * Creates a shallow copy of the array with elements shuffled around randomly.
+		 */
+		shuffleArray: UtilsSingleton["shuffleArray"];
+
+		/**
 		 * Returns a formatted string, specifying an amount of time delta from current date to provided date.
 		 */
 		timeDelta: UtilsSingleton["timeDelta"];
