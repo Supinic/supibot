@@ -12,6 +12,7 @@ import * as Speedrun from "./speedrun/index.mjs";
 import * as SRA from "./sra/index.mjs";
 import * as Supibot from "./supibot/index.mjs";
 import * as Supinic from "./supinic/index.mjs";
+import * as TwitchGQL from "./twitch-gql/index.mjs";
 import * as V5 from "./v5/index.mjs";
 import * as Vimeo from "./vimeo/index.mjs";
 
@@ -30,6 +31,7 @@ const definitions = [
 	SRA,
 	Supibot,
 	Supinic,
+	TwitchGQL,
 	V5,
 	Vimeo
 ];
