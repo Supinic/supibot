@@ -188,7 +188,7 @@ module.exports = {
 			Data: JSON.stringify(jsonImageData)
 		});
 
-		await row.save({ skipLoad: false });
+		await row.save({ skipLoad: true });
 
 		const discordData = {};
 		if (context.platform.Name === "discord") {
