@@ -6,7 +6,8 @@ module.exports = {
 	Description: "Posts stream info about a Twitch channel. Also supports YouTube - check the help article.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
-		{ name: "youtube", type: "string" }
+		{ name: "summary", type: "boolean" },
+		{ name: "youtube", type: "string" },
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -44,6 +45,44 @@ module.exports = {
 			return {
 				success: false,
 				reply: "There is no Twitch channel with that name!"
+			};
+		}
+
+		if (context.params.summary) {
+			const response = await sb.Got("TwitchGQL", {
+				body: JSON.stringify([{
+					operationName: "HomeShelfGames",
+					extensions: {
+						persistedQuery: {
+							version: 1,
+							sha256Hash: "cb7711739c2b520ebf89f3027863c0f985e8094df91cc5ef28896d57375a9700"
+						}
+					},
+					variables: {
+						channelLogin: targetChannel
+					}
+				}])
+			});
+
+			const { user } = response.body[0].data;
+			if (!user) {
+				return {
+					success: false,
+					reply: `Summary data is not available! Channel is probably banned or inactive.`
+				};
+			}
+
+			const edges = user.channel.home.shelves.categoryShelf.edges ?? [];
+			if (edges.length === 0) {
+				return {
+					success: false,
+					reply: `That channel did not stream in any category recently!`
+				};
+			}
+
+			const games = edges.map(i => i.node.displayName).join(", ");
+			return {
+				reply: `Recently streamed categories: ${games}`
 			};
 		}
 
@@ -132,9 +171,15 @@ module.exports = {
 		"",
 
 		`<code>${prefix}streaminfo (channel)</code>`,
+		`<code>${prefix}streaminfo forsen</code>`,
 		`Posts info about a Twitch channel's stream.`,
 		`If it is live - posts info about the stream, and details.`,
 		`If not currently live - posts info about the previous stream.`,
+		"",
+
+		`<code>${prefix}streaminfo (channel) <u>summary:true</u></code>`,
+		`<code>${prefix}streaminfo forsen <u>summary:true</u></code>`,
+		`Posts a list of recently streamed games and categories for a given channel.`,
 		"",
 
 		`<code>${prefix}streaminfo <u>youtube:(channel name)</u></code>`,
