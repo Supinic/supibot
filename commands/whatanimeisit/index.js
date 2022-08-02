@@ -97,7 +97,9 @@ module.exports = {
 
 			let uploadResult = await sb.Utils.uploadToNuuls(videoData.rawBody ?? videoData.body, "file.mp4");
 			if (uploadResult.statusCode !== 200) {
-				uploadResult = await sb.Utils.uploadToImgur(videoData.rawBody ?? videoData.body, "file.mp4");
+				uploadResult = await sb.Utils.uploadToImgur(videoData.rawBody ?? videoData.body, "file.mp4", {
+					type: "video"
+				});
 			}
 
 			if (uploadResult.link) {
