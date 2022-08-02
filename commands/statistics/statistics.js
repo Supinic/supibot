@@ -6,6 +6,7 @@ const types = [
 	"aliases",
 	"cookie-count",
 	"dalle",
+	"discord",
 	"markov",
 	"playsounds",
 	"reminders",
