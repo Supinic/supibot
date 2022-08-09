@@ -17,14 +17,9 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got(
-			{
-				url: "https://sitecheck.sucuri.net/api/v3",
-				searchParams: {
-					scan: fixedInput
-				}
-			}
-		);
+		const response = await sb.Got("GenericAPI",{
+			url: `https://sitecheck.sucuri.net/api/v3/?scan=${fixedInput}`
+		});
 
 		if (response.statusCode !== 200) {
 			return {
