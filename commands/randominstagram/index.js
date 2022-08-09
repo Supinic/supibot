@@ -72,7 +72,7 @@ module.exports = {
 						reply: `No posts have been found! The profile could also be private.`
 					};
 				}
-				
+
 				const post = sb.Utils.randArray(posts);
 				if (context.params.rawLinkOnly) {
 					return {
@@ -177,7 +177,7 @@ module.exports = {
 			return {
 				reply: `
 					Random post from "${post.owner.username}":
-					${description}
+					${description ?? ""}
 					(${commentCount} comments, ${likeCount} likes)
 					https://www.instagram.com/p/${post.shortcode}
 				`
