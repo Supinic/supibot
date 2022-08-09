@@ -57,9 +57,26 @@ module.exports = {
 			}
 
 			if (rateLimited) {
-				const backup = await sb.Got(`https://bibliogram.art/u/${user}`);
-				const $ = sb.Utils.cheerio(backup.body);
+				const backup = await sb.Got("GenericAPI", {
+					url: `https://bibliogram.art/u/${user}`,
+					responseType: "text",
+					throwHttpErrors: false
+				});
+				
+				if (backup.statusCode === 503) {
+					return {
+						success: false,
+						reply: `User "${user}" not found on Instagram!`
+					};
+				}
+				else if (backup.statusCode === 200) {
+					return {
+						success: false,
+						reply: `Cannot check for Instagram posts of user "${user}" at the moment! (Status code ${backup.statusCode})`
+					};
+				}
 
+				const $ = sb.Utils.cheerio(backup.body);
 				const posts = Array.from($("a.sized-link")).map(i => ({
 					id: i.attribs["data-shortcode"],
 					description: i.children[0].attribs.alt,
