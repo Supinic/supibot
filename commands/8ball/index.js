@@ -2,7 +2,7 @@ module.exports = {
 	Name: "8ball",
 	Aliases: null,
 	Author: "supinic",
-	Cooldown: 30000,
+	Cooldown: 10000,
 	Description: "Checks your question against the fortune-telling 8-ball.",
 	Flags: ["mention","pipe"],
 	Params: null,
@@ -39,15 +39,15 @@ module.exports = {
 	Dynamic_Description: (async (prefix, values) => {
 		const { responses } = values.getStaticData();
 		const list = responses.map(i => `<li>${i}</li>`).join("");
-	
+
 		return [
 			"Consult the 8-ball for your inquiry!",
 			"",
-	
+
 			`<code>${prefix}8ball Is this command cool?</code>`,
 			sb.Utils.randArray(responses),
 			"",
-	
+
 			"List of responses:",
 			`<ul>${list}</ul>`
 		];
