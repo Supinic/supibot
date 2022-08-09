@@ -273,7 +273,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			return;
 		}
 
-		if (channelObject.guild) {
+		if (message && channelObject.guild) {
 			const emojiNameRegex = /^[\w\d]+$/;
 			const words = message
 				.split(/\s+/)
@@ -319,20 +319,30 @@ module.exports = class DiscordController extends require("./template.js") {
 			}
 		}
 
-		message = message.replace(/\\/g, "\\\\");
-
-		const limit = channelData.Message_Limit ?? this.platform.Message_Limit;
-
 		let sendTarget;
-		if (!Array.isArray(options.embeds) || options.embeds.length === 0) {
+		if (Array.isArray(options.embeds) && options.embeds.length !== 0) {
+			sendTarget = {
+				embeds: options.embeds
+			};
+		}
+		else if (typeof message === "string") {
+			const limit = channelData.Message_Limit ?? this.platform.Message_Limit;
+			message = message.replace(/\\/g, "\\\\");
+
 			sendTarget = sb.Utils.wrapString(message, limit, {
 				keepWhitespace: true
 			});
 		}
 		else {
-			sendTarget = {
-				embeds: options.embeds
-			};
+			throw new sb.Error({
+				message: "Invalid Discord message provided",
+				args: {
+					message,
+					type: typeof message,
+					channel,
+					options
+				}
+			});
 		}
 
 		try {
