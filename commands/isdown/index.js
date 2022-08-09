@@ -18,7 +18,11 @@ module.exports = {
 		}
 
 		const response = await sb.Got("GenericAPI", {
-			url: `https://api-prod.downfor.cloud/httpcheck/${fixedInput}`
+			url: "https://steakovercooked.com/api/can-visit",
+			searchParams: {
+				url: fixedInput,
+				hash: "20b566a8924fd48fbb105a690fc5699e"
+			}
 		});
 
 		if (response.statusCode !== 200) {
@@ -28,26 +32,20 @@ module.exports = {
 			};
 		}
 
-		const now = sb.Date.now();
-		const { isDown, lastChecked, statusCode } = response.body;
-		const deltaString = (Math.abs(now - lastChecked) > 1000)
-			? ` Last checked ${sb.Utils.timeDelta(new sb.Date(lastChecked))}.`
-			: "";
-
-		if (statusCode === 0) {
+		const { code, error, result } = response.body;
+		if (error) {
 			return {
-				success: false,
-				reply: `Could not check the website being down due to API error! Please try a different format.`
+				reply: `Error while checking: ${error}.`
 			};
 		}
-		else if (isDown) {
+		else if (!result) {
 			return {
-				reply: `That website is currently not available with status code ${statusCode}.${deltaString}`
+				reply: `That website is currently not available with status code ${code} - error ${error ?? "(N/A)"}.`
 			};
 		}
 		else {
 			return {
-				reply: `That website is currently up and available.${deltaString}`
+				reply: `That website is currently up and available.`
 			};
 		}
 	}),
