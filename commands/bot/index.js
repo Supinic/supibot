@@ -323,8 +323,8 @@ module.exports = {
 					};
 				}
 
-				const checkChannelData = sb.Channel.get(context.user.Name);
-				if (checkChannelData && checkChannelData.Mode !== "Inactive") {
+				const checkChannel = sb.Channel.get(context.user.Name);
+				if (checkChannel && checkChannel.Mode !== "Inactive" && checkChannel.Specific_ID === channelData.Specific_ID) {
 					const emote = await context.getBestAvailableEmote(["Okayga", "supiniOkay", "FeelsOkayMan"], "🙂");
 					return {
 						success: false,
