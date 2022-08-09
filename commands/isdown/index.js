@@ -17,13 +17,14 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("GenericAPI", {
-			url: "https://steakovercooked.com/api/can-visit",
-			searchParams: {
-				url: fixedInput,
-				hash: "20b566a8924fd48fbb105a690fc5699e"
+		const response = await sb.Got(
+			{
+				url: "https://sitecheck.sucuri.net/api/v3",
+				searchParams: {
+					scan: fixedInput
+				}
 			}
-		});
+		);
 
 		if (response.statusCode !== 200) {
 			return {
@@ -32,20 +33,27 @@ module.exports = {
 			};
 		}
 
-		const { code, error, result } = response.body;
-		if (error) {
-			return {
-				reply: `Error while checking: ${error}.`
-			};
-		}
-		else if (!result) {
-			return {
-				reply: `That website is currently not available with status code ${code} - error ${error ?? "(N/A)"}.`
-			};
+		const { scan, warnings } = response.body;
+		const lastScan = new sb.Date(scan.last_scan);
+		const delta = sb.Utils.timeDelta(lastScan);
+
+		if (Array.isArray(warnings) && warnings.length > 0) {
+			const error = warnings.scan_failed[0].msg;
+			if (error === "Host not found") {
+				return {
+					success: false,
+					reply: `Provided website was not found!`
+				};
+			}
+			else {
+				return {
+					reply: `Website is currently down: ${error ?? "(N/A)"}. Last scanned ${delta}.`
+				};
+			}
 		}
 		else {
 			return {
-				reply: `That website is currently up and available.`
+				reply: `That website is currently up and available. Last scanned ${delta}.`
 			};
 		}
 	}),
