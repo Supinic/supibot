@@ -12,6 +12,8 @@ module.exports = {
 		const messageThreshold = new sb.Date().addMonths(-3);
 		const guilds = await discord.guilds.fetch();
 
+		const sanitize = (string) => string.replace(/\p{Emoji}/gu, (match) => escape(match).replaceAll("%", "\\"));
+
 		const result = [];
 		for (const guildData of guilds.values()) {
 			const guild = await discord.guilds.fetch(guildData.id);
@@ -41,11 +43,11 @@ module.exports = {
 			const nonBotMembers = members.filter(i => !i.user.bot);
 			const admins = nonBotMembers
 				.filter(i => i.permissions.has("ADMINISTRATOR"))
-				.map(i => `${i.user.username} (${i.user.id})`);
+				.map(i => `${sanitize(i.user.username)} (${i.user.id})`);
 
 			result.push({
 				guild: {
-					name: guild.name,
+					name: sanitize(guild.name),
 					id: guild.id
 				},
 				joined: new sb.Date(guild.joinedTimestamp),
