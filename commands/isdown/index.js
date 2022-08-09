@@ -29,10 +29,17 @@ module.exports = {
 		}
 
 		const { scan, warnings } = response.body;
+		if (scan?.error) {
+			return {
+				success: false,
+				reply: `Cannot check website status! ${scan.error}`
+			};
+		}
+
 		const lastScan = new sb.Date(scan.last_scan);
 		const delta = sb.Utils.timeDelta(lastScan);
 
-		if (Array.isArray(warnings) && warnings.length > 0) {
+		if (Array.isArray(warnings?.scan_failed)) {
 			const error = warnings.scan_failed[0].msg;
 			if (error === "Host not found") {
 				return {
