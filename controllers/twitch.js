@@ -605,7 +605,13 @@ module.exports = class TwitchController extends require("./template.js") {
 					`;
 
 					if (channelData) {
-						await channelData.send(message);
+						const finalMessage = await this.prepareMessage(message, channelData);
+						if (!finalMessage) {
+							await this.pm(message, userData.Name);
+						}
+						else {
+							await channelData.send(finalMessage);
+						}
 					}
 					else {
 						await this.pm(message, userData.Name);
