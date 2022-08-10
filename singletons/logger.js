@@ -82,12 +82,6 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 				["Timestamp", "Channel", "Amount", "Length"]
 			).then(batch => (this.metaBatch = batch));
 
-			sb.Query.getBatch(
-				"chat_data",
-				"Twitch_Ban",
-				["User_Alias", "Channel", "Length", "Issued"]
-			).then(batch => (this.banBatch = batch));
-
 			this.meta = {};
 			this.metaCron = new sb.Cron({
 				Name: "message-meta-cron",
@@ -126,40 +120,6 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 			});
 			this.metaCron.start();
 			this.#crons.push(this.metaCron);
-
-			this.banCollector = new Map();
-			this.banCron = new sb.Cron({
-				Name: "ban-cron",
-				Expression: sb.Config.get("LOG_MESSAGE_META_CRON"),
-				Defer: { end: 2500 },
-				Code: async () => {
-					if (!this.banBatch?.ready) {
-						return;
-					}
-
-					const bannedUsers = await sb.User.getMultiple([...this.banCollector.keys()]);
-					for (const userData of bannedUsers) {
-						const linkedUser = this.banCollector.get(userData.Name);
-						if (linkedUser) {
-							linkedUser.User_Alias = userData.ID;
-							this.banBatch.add(linkedUser);
-						}
-					}
-
-					const channelList = Array.from(this.banCollector.values())
-						.map(record => sb.Channel.get(record.Channel))
-						.filter((i, ind, arr) => i && arr.indexOf(i) === ind);
-
-					for (const channelData of channelList) {
-						channelData.sessionData.recentBans = 0;
-					}
-
-					this.banCollector.clear();
-					await this.banBatch.insert();
-				}
-			});
-			this.banCron.start();
-			this.#crons.push(this.banCron);
 		}
 
 		if (sb.Config.get("LOG_COMMAND_CRON", false)) {
@@ -520,9 +480,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 		}
 		this.#crons = null;
 
-		this.banBatch?.destroy();
 		this.metaBatch?.destroy();
-		this.banBatch = null;
 		this.metaBatch = null;
 
 		if (this.channels) {
