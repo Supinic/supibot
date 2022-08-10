@@ -19,7 +19,7 @@ module.exports = {
 			url: "subscriptions",
 			headers: {
 				// client ID for @Supinic
-				"Client-ID": sb.Config.get("TWITCH_GQL_CLIENT_ID"),
+				"Client-ID": sb.Config.get("TWITCH_READ_SUBSCRIPTIONS_CLIENT_ID"),
 				// read subscriptions-only token for @Supinic
 				Authorization: `Bearer ${sb.Config.get("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN")}`
 			},
