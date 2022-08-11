@@ -209,6 +209,26 @@ module.exports = class TwitchController extends require("./template.js") {
 							null
 						);
 					}
+					else if (result.action && result.action.includes("rename")) {
+						const { login } = result;
+						const suggestionIDs = await sb.Query.getRecordset(rs => rs
+							.select("ID")
+							.from("data", "Suggestion")
+							.where("Category = %s", "Bot suggestion")
+							.where("Status IS NULL")
+							.where("Text %like", login)
+							.flat("ID")
+						);
+
+						for (const ID of suggestionIDs) {
+							const row = await sb.Query.getRow("data", "Suggestion");
+							await row.load(ID);
+
+							row.values.Status = "Completed";
+							row.values.Notes = `Completed due to automatic rename detection\n\n${row.values.Notes}`;
+							await row.save({ skipLoad: true });
+						}
+					}
 				}
 			}
 			else if (error instanceof DankTwitch.SayError && error.cause instanceof DankTwitch.MessageError) {
