@@ -20,11 +20,12 @@ module.exports = {
 			}
 
 			if (context.params.skipUpgrade !== true) {
+				const emote = await context.getBestAvailableEmote(["ppCircle", "supiniLoading"], "⏳");
 				if (context.channel) {
-					await context.channel.send("ppCircle running yarn upgrade, please wait ppCircle");
+					await context.channel.send(`${emote} running yarn upgrade, please wait ${emote}`);
 				}
 				else {
-					await context.platform.pm("ppCircle running yarn upgrade, please wait ppCircle", context.user.Name);
+					await context.platform.pm(`${emote} running yarn upgrade, please wait ${emote}`, context.user.Name);
 				}
 
 				await shell("yarn upgrade supi-core");
