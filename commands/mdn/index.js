@@ -16,20 +16,21 @@ module.exports = {
 			};
 		}
 
-		const data = await sb.Got({
-			url: "https://developer.mozilla.org/api/v1/search/en-US",
+		const response = await sb.Got("GenericAPI", {
+			url: "https://developer.mozilla.org/api/v1/search",
 			searchParams: {
-				q: query
+				q: query,
+				locale: "en-US"
 			}
-		}).json();
+		});
 
-		if (data.documents.length === 0) {
+		if (response.body.documents.length === 0) {
 			return {
 				reply: "No articles found!"
 			};
 		}
 
-		const { title, slug } = data.documents[0];
+		const { title, slug } = response.body.documents[0];
 		return {
 			reply: `${title}: https://developer.mozilla.org/en-US/docs/${slug}`
 		};
