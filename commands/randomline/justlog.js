@@ -47,7 +47,7 @@ const getRandomChannelLine = async function (channelID) {
 	else if (response.statusCode !== 200) {
 		return {
 			success: false,
-			reason: "The channel logs are not available at the moment! Try again later."
+			reason: `The channel logs are not available at the moment (status code ${response.statusCode})! Try again later.`
 		};
 	}
 
