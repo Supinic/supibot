@@ -116,6 +116,13 @@ module.exports = {
 				};
 			}
 
+			let errorDescription = e.toString?.();
+			if (!errorDescription) {
+				errorDescription = (typeof e.message === "string")
+					? e.message
+					: "(nondescript error)";
+			}
+
 			if (context.params.errorInfo) {
 				const stack = e.stack.split(/\r?\n/);
 				const lastLine = stack.findIndex(i => i.includes("Script.runInContext"));
@@ -133,13 +140,13 @@ module.exports = {
 				const link = (paste.success) ? paste.body : paste.error;
 				return {
 					success: false,
-					reply: `${e.toString()} - More info: ${link}`
+					reply: `${errorDescription} - More info: ${link}`
 				};
 			}
 
 			return {
 				success: false,
-				reply: e.toString()
+				reply: errorDescription
 			};
 		}
 
