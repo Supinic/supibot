@@ -7,8 +7,13 @@ const getSupportedChannelList = async function () {
 	}
 
 	const response = await sb.Got("GenericAPI", {
-		url: "https://logs.ivr.fi/channels"
+		url: "https://logs.ivr.fi/channels",
+		throwHttpErrors: false
 	});
+
+	if (response.statusCode !== 200) {
+		return null;
+	}
 
 	data = response.body.channels;
 	await sb.Cache.setByPrefix(supportedChannelsCacheKey, data, {
@@ -20,6 +25,10 @@ const getSupportedChannelList = async function () {
 
 const isSupported = async function (channelID) {
 	const list = await getSupportedChannelList();
+	if (list === null) {
+		return null;
+	}
+
 	return list.some(i => i.userID === channelID);
 };
 

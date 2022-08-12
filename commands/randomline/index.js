@@ -1,3 +1,4 @@
+const { isSupported } = require("./justlog");
 module.exports = {
 	Name: "randomline",
 	Aliases: ["rl","rq"],
@@ -37,7 +38,14 @@ module.exports = {
 			}
 
 			const channelID = context.channel.Specific_ID;
-			if (!await isSupported(channelID)) {
+			const isChannelSupported = await isSupported(channelID);
+			if (isChannelSupported === null) {
+				return {
+					success: false,
+					reply: `The logging service is currently unavailable! Please try again later.`
+				};
+			}
+			else if (isChannelSupported === false) {
 				return {
 					success: false,
 					reply: `This channel does not currently support random lines!`
