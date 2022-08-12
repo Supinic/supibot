@@ -148,7 +148,7 @@ module.exports = {
 			);
 		};
 
-		const updateTrackFavouriteStatus = async (IDs, status) => {
+		const updateTrackFavouriteStatus = async (context, IDs, status) => {
 			for (const ID of IDs) {
 				const row = await sb.Query.getRow("music", "Track");
 				await row.load({ User_Alias: context.user.ID, Track: ID }, true);
@@ -866,7 +866,7 @@ module.exports = {
 					description: `Lets you favourite a track in Supinic's track list from chat. Not toggleable, only sets the favourite. You can unset or check the favourite on the website. https://supinic.com/track/gachi/list`,
 					set: async (context, ...args) => {
 						const IDs = await fetchTrackIDs(args);
-						await updateTrackFavouriteStatus(IDs, true);
+						await updateTrackFavouriteStatus(context, IDs, true);
 
 						return {
 							reply: `Successfully set ${IDs.length} track(s) as your favourite.`
@@ -874,7 +874,7 @@ module.exports = {
 					},
 					unset: async (context, ...args) => {
 						const IDs = await fetchTrackIDs(args);
-						await updateTrackFavouriteStatus(IDs, false);
+						await updateTrackFavouriteStatus(context, IDs, false);
 
 						return {
 							reply: `Successfully unset ${IDs.length} track(s) as your favourite.`
