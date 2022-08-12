@@ -150,8 +150,12 @@ module.exports = {
 
 		const updateTrackFavouriteStatus = async (context, IDs, status) => {
 			for (const ID of IDs) {
-				const row = await sb.Query.getRow("music", "Track");
-				await row.load({ User_Alias: context.user.ID, Track: ID }, true);
+				const row = await sb.Query.getRow("music", "User_Favourite");
+				await row.load({
+					User_Alias: context.user.ID,
+					Track: ID
+				}, true);
+
 				if (!row.loaded) {
 					row.setValues({
 						User_Alias: context.user.ID,
