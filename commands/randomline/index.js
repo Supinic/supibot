@@ -1,4 +1,3 @@
-const { isSupported } = require("./justlog");
 module.exports = {
 	Name: "randomline",
 	Aliases: ["rl","rq"],
