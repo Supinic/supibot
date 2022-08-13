@@ -339,8 +339,12 @@ module.exports = {
 				: "";
 
 			const symbol = (forum.quarantine) ? "⚠" : "";
+			const postURL = (context.platform.Name === "discord")
+				? `https://reddit.com/${post.id}`
+				: post.toString();
+
 			return {
-				reply: sb.Utils.fixHTML(`${symbol} ${post.toString()} ${commentsUrl}`)
+				reply: sb.Utils.fixHTML(`${symbol} ${postURL} ${commentsUrl}`)
 			};
 		}
 	}),
