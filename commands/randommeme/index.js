@@ -340,7 +340,7 @@ module.exports = {
 
 			const symbol = (forum.quarantine) ? "⚠" : "";
 			const postURL = (context.platform.Name === "discord")
-				? `https://reddit.com/${post.id}`
+				? `https://reddit.com/${post.commentsUrl}`
 				: post.toString();
 
 			return {
