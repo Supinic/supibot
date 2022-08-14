@@ -118,6 +118,7 @@ module.exports = {
 			get nsfw () { return this.#nsfw; }
 			get stickied () { return this.#stickied; }
 			get isTextPost () { return this.#isTextPost; }
+			get isVideoPost () { return this.#url.includes("v.reddit"); }
 			get url () { return this.#url; }
 			get commentsUrl () { return this.#commentsUrl; }
 			get flairs () { return this.#flairs; }
@@ -339,7 +340,7 @@ module.exports = {
 				: "";
 
 			const symbol = (forum.quarantine) ? "⚠" : "";
-			const postURL = (context.platform.Name === "discord")
+			const postURL = (context.platform.Name === "discord" && post.isVideoPost)
 				? `https://reddit.com/${post.commentsUrl}`
 				: post.toString();
 
