@@ -555,5 +555,16 @@
       "HypeStress",
       "HypeWave"
     ]
+  },
+  {
+    "name": "clappy",
+    "aliases": ["Clappy"],
+    "description": "Awarded during the 1st anniversary of clips on 2017-05-24 to users who clipped anything in the week following the anniversary.",
+    "link": "https://blog.twitch.tv/en/2017/05/24/clips-turns-1-this-week-celebrate-with-us-20136c7e2cff/",
+    "emotes": [
+      "Clappy",
+      "ClappyDerp",
+      "ClappyHype"
+    ]
   }
 ]
