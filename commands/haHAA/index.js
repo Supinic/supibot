@@ -5,21 +5,54 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Posts a random, hilarious joke, 100% guaranteed.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [
+		{ name: "search", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function _4head (context) {
-		const data = await sb.Got("https://icanhazdadjoke.com/").json();
+		let joke;
+		if (context.params.search) {
+			const response = await sb.Got("GenericAPI", {
+				url: "https://icanhazdadjoke.com/search",
+				searchParams: {
+					term: context.params.search,
+					limit: "20"
+				}
+			});
+
+			const jokes = response.body.results;
+			if (!Array.isArray(jokes) || jokes.length === 0) {
+				return {
+					success: false,
+					reply: `No jokes found for that search query!`
+				};
+			}
+
+			joke = sb.Utils.randArray(jokes).joke;
+		}
+		else {
+			const response = await sb.Got("GenericAPI", "https://icanhazdadjoke.com/");
+			joke = response.body.joke;
+		}
+
 		return {
-			reply: `${data.joke} ${context.invocation}`
+			reply: `${joke} ${context.invocation}`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
 		"Posts a random, 100% hilarious dad joke.",
 		"Guaranteed to make you grimace",
 		"",
-	
+
 		`<code>${prefix}4Head</code>`,
-		"(random joke)"
+		`<code>${prefix}haHAA</code>`,
+		"Fetches a completely random joke.",
+		"",
+
+		`<code>${prefix}4Head <u>search:(search query)</u></code>`,
+		`<code>${prefix}4Head <u>search:robot</u></code>`,
+		`<code>${prefix}4Head <u>search:"guy walks in"</u></code>`,
+		"Fetches a random joke, filtered with your search query."
 	])
 };
