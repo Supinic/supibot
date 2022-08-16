@@ -7,7 +7,7 @@ const name = {
 	webError: "Website error"
 };
 
-module.exports = async function inspectErrorStacks (command, context, type, identifier) {
+module.exports = async function inspectErrorStacks (command, context, type, rawIdentifier) {
 	const inspectErrorStacks = await context.user.getDataProperty("inspectErrorStacks");
 	if (!inspectErrorStacks) {
 		return {
@@ -16,7 +16,8 @@ module.exports = async function inspectErrorStacks (command, context, type, iden
 		};
 	}
 
-	if (!Number(identifier)) {
+	const identifier = Number(rawIdentifier);
+	if (!sb.Utils.isValidInteger(identifier)) {
 		return {
 			success: false,
 			reply: "Invalid ID provided!"
@@ -24,7 +25,7 @@ module.exports = async function inspectErrorStacks (command, context, type, iden
 	}
 
 	const row = await getRow[type]();
-	await row.load(Number(identifier), true);
+	await row.load(identifier, true);
 
 	if (!row.loaded) {
 		return {
