@@ -266,7 +266,8 @@ module.exports = (command) => [
 		aliases: [],
 		description: `Checks the currently running Supibot-related poll, if there is any.`,
 		execute: async (context, identifier) => {
-			if (identifier && !Number(identifier)) {
+			const ID = Number(identifier);
+			if (!ID || !sb.Utils.isValidInteger(ID)) {
 				return {
 					success: false,
 					reply: "Invalid ID provided! Check all polls here: https://supinic.com/bot/poll/list"
@@ -279,7 +280,7 @@ module.exports = (command) => [
 					.single();
 
 				if (identifier) {
-					rs.where("ID = %n", Number(identifier));
+					rs.where("ID = %n", ID);
 				}
 				else {
 					rs.orderBy("ID DESC").limit(1);
@@ -334,7 +335,7 @@ module.exports = (command) => [
 			}
 
 			const ID = Number(identifier);
-			if (!ID) {
+			if (!ID || !sb.Utils.isValidInteger(ID)) {
 				return {
 					reply: sb.Utils.tag.trim `
 								Check all of your reminders here (requires login):
@@ -418,7 +419,7 @@ module.exports = (command) => [
 		aliases: ["songrequests"],
 		description: `For supinic's Twitch channel, checks the current status of song requests.`,
 		execute: async (context) => {
-			if (context?.channel.ID !== 38) {
+			if (context.channel?.ID !== 38) {
 				return {
 					success: false,
 					reply: "Only usable in Supinic's Twitch channel!"
@@ -592,7 +593,8 @@ module.exports = (command) => [
 			// @todo refactor this and similar usages to a common place
 			if (link.toLowerCase() === "last") {
 				const tl = sb.Command.get("tl");
-				const key = tl.staticData.createRecentUseCacheKey(context);
+				const definitions = require("../twitchlotto/definitions.js");
+				const key = definitions.createRecentUseCacheKey(context);
 
 				const cacheData = await tl.getCacheData(key);
 				if (!cacheData) {
