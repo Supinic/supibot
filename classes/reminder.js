@@ -516,18 +516,21 @@ module.exports = class Reminder extends require("./template.js") {
 				// If the result message would be longer than twice the channel limit, post a list of reminder IDs
 				// instead along with a link to the website, where the user can check them out.
 				if (message.length > limit) {
-					const listID = reminders.filter(i => !i.Private_Message).map(i => `ID=${i.ID}`).join("&");
+					const reminderIDs = reminders.filter(i => !i.Private_Message).map(i => i.ID);
+					const listID = reminderIDs.map(i => `ID=${i}`).join("&");
 					const link = await Reminder.createRelayLink("lookup", listID);
 
 					message = sb.Utils.tag.trim `
 						Hey ${userMention}
-						you have reminders, but they're too long to be posted here.
-						Check them out here: ${link}
+						you have ${reminderIDs.length} reminders, but they're too long to be posted.
+						Check them here: ${link}
+						or by ID: ${reminderIDs.join(" ")}
 					`;
 					mirrorMessage = sb.Utils.tag.trim `
 						Hey ${targetUserData.Name}
-						you have reminders, but they're too long to be posted here.
-						Check them out here: ${link}
+						you have ${reminderIDs.length} reminders, but they're too long to be posted.
+						Check them here: ${link}
+						or by ID: ${reminderIDs.join(" ")}
 					`;
 				}
 
@@ -538,18 +541,21 @@ module.exports = class Reminder extends require("./template.js") {
 				]);
 			}
 			else {
-				const listID = reminders.map(i => `ID=${i.ID}`).join("&");
+				const reminderIDs = reminders.filter(i => !i.Private_Message).map(i => i.ID);
+				const listID = reminderIDs.map(i => `ID=${i}`).join("&");
 				const link = await Reminder.createRelayLink("lookup", listID);
 
 				const message = sb.Utils.tag.trim `
 					Hey ${userMention}
-					you just got reminders, but they couldn't be displayed here.
-					Instead, check them out here: ${link}
+					you have ${reminderIDs.length} reminders, but they couldn't be posted.
+					Check them here: ${link}
+					or by ID: ${reminderIDs.join(" ")}
 				`;
 				const mirrorMessage = sb.Utils.tag.trim `
 					Hey ${targetUserData.Name}
-					you just got reminders, but they couldn't be displayed here.
-					Instead, check them out here: ${link}
+					you have ${reminderIDs.length} reminders, but they couldn't be posted.
+					Check them here: ${link}
+					or by ID: ${reminderIDs.join(" ")}
 				`;
 
 				await Promise.all([
