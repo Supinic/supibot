@@ -4,6 +4,7 @@ const pathModule = require("path");
  * Represents the context a command is being executed in
  */
 class Context {
+	#command;
 	#invocation;
 	#user;
 	#channel;
@@ -16,6 +17,7 @@ class Context {
 	#userFlags = {};
 
 	constructor (command, data = {}) {
+		this.#command = command;
 		this.#invocation = data.invocation ?? null;
 		this.#user = data.user ?? null;
 		this.#channel = data.channel ?? null;
@@ -38,6 +40,24 @@ class Context {
 
 	getMeta (name) { return this.#meta.get(name); }
 	setMeta (name, value) { this.#meta.set(name, value); }
+
+	getMentionStatus () {
+		return sb.Filter.getMentionStatus({
+			user: this.#user,
+			command: this.#command,
+			channel: this.#channel ?? null,
+			platform: this.#platform
+		});
+	}
+
+	async sendIntermediateMessage (string) {
+		if (this.#channel) {
+			return await this.#channel.send(string);
+		}
+		else {
+			return await this.#platform.pm(string, this.#user.Name);
+		}
+	}
 
 	/**
 	 * Fetches an object wrapper describing the user's permissions in given command context.

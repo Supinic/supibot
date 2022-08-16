@@ -185,6 +185,7 @@ declare type ParsedParametersData = {
 };
 
 export declare class Context {
+    #command: Command;
     #invocation: string;
     #user: User;
     #channel: Channel;
@@ -202,6 +203,13 @@ export declare class Context {
     setMeta (name: string, value: any): void;
     getUserPermissions (options: ContextSpecificator): Promise<PermissionsDescriptor>;
     getBestAvailableEmote (emote: string[], fallback: string, options: AvailableEmoteOptions): Promise<string>;
+    getMentionStatus (): boolean;
+
+    /**
+     * Sends a message to the current channel or the PM channel, depending on the usage.
+     * This method should only be used to send intermittent updates, it does not serve as the command response.
+     */
+    sendIntermediateMessage (string: string): Promise<void>;
 
     get tee (): string[]
     get invocation (): string;
