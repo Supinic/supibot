@@ -117,20 +117,16 @@ module.exports = {
 			? `${context.user.Name},`
 			: "";
 
-		const reply = (context.channel)
-			? (message) => context.channel.send(message)
-			: (message) => context.platform.pm(message, context.user);
-
 		pending.set(context.user, context.channel);
 
-		const notificationTimeout = setTimeout(() => {
-			reply(sb.Utils.tag.trim `
+		const notificationTimeout = setTimeout(async (timeoutContext) => {
+			await timeoutContext.sendIntermediateMessage(sb.Utils.tag.trim `
 				${mentionUsername}
 				Seems like the API is working
 				${waitingEmote} ${loadingEmote}
 				The result should be coming up anywhere between two to five minutes or so.
 			`);
-		}, 2000);
+		}, 2000, context);
 
 		const start = process.hrtime.bigint();
 		const response = await sb.Got("FakeAgent", {
