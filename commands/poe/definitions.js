@@ -213,7 +213,7 @@ const subcommands = [
 
 			const nextLeague = (currentLeague)
 				? leagues.find(i => !i.end && new sb.Date(i.launch) > now)
-				: leagues.find(i => !i.end || new sb.Date(i.end) < now);
+				: leagues.find(i => !i.end || new sb.Date(i.end) > now);
 
 			const { name, patch, reveal, launch } = nextLeague;
 			const revealDate = new sb.Date(reveal);
