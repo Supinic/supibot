@@ -65,7 +65,8 @@ module.exports = {
 				count: limit,
 				trim_user: "true",
 				include_rts: "true",
-				exclude_replies: "true"
+				exclude_replies: "true",
+				tweet_mode: "extended"
 			}
 		});
 
@@ -137,7 +138,7 @@ module.exports = {
 		}
 
 		const delta = sb.Utils.timeDelta(new sb.Date(tweet.created_at));
-		const fixedText = sb.Utils.fixHTML(tweet.text ?? "");
+		const fixedText = sb.Utils.fixHTML(tweet.full_text ?? "");
 		if (context.params.mediaOnly) {
 			const links = tweet.entities.media.map(i => i.media_url_https).join(" ");
 			return {
