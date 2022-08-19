@@ -9,7 +9,17 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function wrongSong (context, target) {
-		const targetID = Number(target) || null;
+		let targetID;
+		if (target) {
+			targetID = Number(target);
+			if (!sb.Utils.isValidInteger(targetID)) {
+				return {
+					success: false,
+					reply: `Could not parse your provided song ID!`
+				};
+			}
+		}
+		
 		const userRequest = await sb.Query.getRecordset(rs => rs
 			.select("Song_Request.ID", "Name", "VLC_ID", "Status")
 			.select("Video_Type.Link_Prefix AS Prefix")
