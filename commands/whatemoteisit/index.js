@@ -54,7 +54,7 @@ module.exports = {
 			throwHttpErrors: false
 		});
 
-		if (response.statusCode === 404) {
+		if (response.statusCode === 404 || !response.body.emoteID) {
 			return {
 				success: false,
 				reply: "Emote has not been found!"

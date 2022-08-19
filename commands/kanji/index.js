@@ -12,14 +12,22 @@ module.exports = {
 		if (!character) {
 			return {
 				success: false,
-				reply: "Pepega"
+				reply: "No kanji character provided!"
 			};
 		}
 
 		const response = await sb.Got("GenericAPI", {
 			prefixUrl: "https://app.kanjialive.com/api",
-			url: `kanji/${encodeURIComponent(character)}`
+			url: `kanji/${encodeURIComponent(character)}`,
+			throwHttpErrors: false
 		});
+		
+		if (response.statusCode !== 200) {
+			return {
+				success: false,
+				reply: `Could not find any data about your provided character(s)!`
+			};
+		}
 
 		const data = response.body;
 		if (data.Error) {
