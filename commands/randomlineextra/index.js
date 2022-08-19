@@ -10,15 +10,13 @@ module.exports = {
 	Static_Data: (() => ({
 		threshold: 10,
 		channels: {
-			amouranth: "💃🏼",
 			athenelive: "🇫🇷🤖",
 			drdisrespect: "💿",
 			drdisrespectlive: "💿",
 			ninja: "👤",
 			stpeach: "🍑",
 			alinity: "🍝👩💰",
-			p4wnyhof: "🇩🇪🤖",
-			pokimane: "😍"
+			p4wnyhof: "🇩🇪🤖"
 		}
 	})),
 	Code: (async function randomLineExtra () {
