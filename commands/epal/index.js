@@ -76,11 +76,19 @@ module.exports = {
 				url: "https://play.epal.gg/web/product-search/list",
 				json: {
 					pn: 1,
-					ps: 100,
+					ps: 20, // If set above 20, the resulting array is empty
 					sex: selectedSex,
-					productType: gameData.ID
+					productType: gameData.ID,
+					clientNo: "e3bde1a312"
 				}
 			});
+			
+			if (!response.body.content) {
+				return {
+					success: false,
+					reply: `No profile data is currently available! Try again later.`
+				};
+			}
 
 			profilesData = response.body.content.map(i => ({
 				ID: i.userId,
