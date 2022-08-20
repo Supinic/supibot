@@ -73,23 +73,23 @@ module.exports = {
 			const response = await sb.Got("GenericAPI", {
 				method: "POST",
 				responseType: "json",
-				url: "https://play.epal.gg/web/home/most-services-top",
+				url: "https://play.epal.gg/web/product-search/list",
 				json: {
 					pn: 1,
 					ps: 100,
-					sex: String(selectedSex),
+					sex: selectedSex,
 					productType: gameData.ID
 				}
 			});
 
 			profilesData = response.body.content.map(i => ({
 				ID: i.userId,
-				level: i.userLevel,
+				level: i.levelDesc,
 				name: i.userName,
 				gameLevel: i.levelName,
-				languages: (i.languageName) ? i.languageName.split(",") : [],
 				description: i.introductionText,
 				audioFile: i.introductionSpeech,
+				profilePicture: i.cover,
 				revenue: (i.serveNum)
 					? sb.Utils.round(i.serveNum * i.price / 100, 2)
 					: null,
@@ -120,7 +120,6 @@ module.exports = {
 			audioFile,
 			description,
 			gameLevel,
-			languages,
 			name,
 			revenue,
 			price
@@ -138,17 +137,11 @@ module.exports = {
 			ttsData.pending = false;
 		}
 
-		let suffix = "";
-		let pronoun = "They";
 		let type = "(other)";
 		if (selectedSex === "0") {
-			suffix = "s";
-			pronoun = "He";
 			type = "(M)";
 		}
 		else if (selectedSex === "1") {
-			suffix = "s";
-			pronoun = "She";
 			type = "(F)";
 		}
 
@@ -164,15 +157,14 @@ module.exports = {
 			? `Total revenue: $${revenue}.`
 			: "";
 
-		const languageString = (languages.length > 0)
-			? `${pronoun} speak${suffix} ${languages.join(", ")}.`
+		const roleString = (gameData.role)
+			? `${gameData.role} in`
 			: "";
 
 		return {
 			reply: sb.Utils.tag.trim `
-				${name} ${type} plays ${gameData.name} ${levelString} for ${priceString}.
+				${name} ${type} plays ${roleString} ${gameData.name} ${levelString} for ${priceString}.
 				${revenueString}
-				${languageString}
 				${description}
 			`
 		};
