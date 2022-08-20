@@ -45,7 +45,6 @@ module.exports = {
 		const existingUserIDs = await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("twitter", "User")
-			.where("ID IN %s+", tweets.map(i => i.user.id_str))
 			.flat("ID")
 		);
 
