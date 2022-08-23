@@ -29,46 +29,23 @@ module.exports = {
 			return;
 		}
 
-		const conditions = [];
-		for (const id of missingIDs) {
-			conditions.push({ id: String(id) });
-		}
-
-		let page = 1;
-		let added = false;
-		const items = [];
-		do {
-			const boxResponse = await sb.Got({
-				url: "https://api.osrsbox.com/items",
+		for (const ID of missingIDs) {
+			const response = await sb.Got("GenericAPI", {
+				url: "https://secure.runescape.com/m=itemdb_oldschool/api/catalogue/detail.json",
 				searchParams: {
-					where: JSON.stringify({ $id: conditions }),
-					page
-				},
-				responseType: "json"
+					item: ID
+				}
 			});
 
-			const newItems = boxResponse.body._items;
-			items.push(...newItems);
-			added = (newItems.length > 0);
-			page++;
-		} while (added && page < 20); // fallback - max. 20 pages (500 items)
-
-		for (const item of items) {
+			const { item } = response.body;
 			const row = await sb.Query.getRow("osrs", "Item");
 			row.setValues({
 				Game_ID: Number(item.id),
 				Name: item.name,
-				Aliases: null,
-				Cost: item.cost,
-				High_Alchemy: item.highalch,
-				Low_Alchemy: item.lowalch,
-				Trade_Limit: item.buy_limit ?? null,
-				Members: item.members,
-				Equippable: item.equipable,
-				Noteable: item.noteable
+				Aliases: null
 			});
 
-			await row.save();
+			await row.save({ skipLoad: true });
 		}
 	})
 };
