@@ -253,6 +253,26 @@ module.exports = class DiscordController extends require("./template.js") {
 			}
 		});
 
+		client.on("guildCreate", async (guild) => {
+			const message = `Joined guild ${guild.name}  - ID ${guild.id} - ${guild.memberCount} members`;
+			await sb.Logger.log(
+				"Discord.Join",
+				message
+			);
+
+			const announce = sb.Config.get("DISCORD_GUILD_JOIN_ANNOUNCE_CHANNEL", false);
+			if (announce) {
+				const channelList = (Array.isArray(announce))
+					? announce
+					: [announce];
+
+				for (const channelID of channelList) {
+					const channelData = sb.Channel.get(channelID);
+					await channelData.send(message);
+				}
+			}
+		});
+
 		client.on("error", async (err) => {
 			await sb.Logger.log("Discord.Error", err.toString(), null, null);
 			this.restart();
