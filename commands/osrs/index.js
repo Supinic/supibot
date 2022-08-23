@@ -240,11 +240,17 @@ module.exports = {
 					};
 				}
 
-				const formatPrice = (price) => sb.Utils.formatSI(price, "", 3, true).replace("G", "B");
-				const itemData = response.body.data[item.Game_ID];
+				const formatPrice = (price) => {
+					if (price < 1000) {
+						return price;
+					}
+					else {
+						return sb.Utils.formatSI(price, "", 3, true).replace("G", "B");
+					}
+				};
 
-				const low = sb.Utils.groupDigits(itemData.low);
-				const high = sb.Utils.groupDigits(itemData.high);
+				const itemData = response.body.data[item.Game_ID];
+				const { low, high } = itemData;
 				const priceString = (low === high)
 					? `${formatPrice(low)} gp`
 					: `${formatPrice(low)} gp - ${formatPrice(high)} gp`;
