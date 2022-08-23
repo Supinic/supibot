@@ -71,7 +71,11 @@ module.exports = {
 		if (permissions.flag === sb.User.permissions.regular) {
 			return {
 				success: false,
-				reply: `You're not authorized to do that in ${channelString}!`
+				reply: sb.Utils.tag.trim `
+					You're not authorized to do that in ${channelString}!
+					You should ask the broadcaster or an ambassador to do this instead.
+					Check the ambassadors with this command: ${sb.Command.prefix}check ambassadors ${channelString}
+				`
 			};
 		}
 
