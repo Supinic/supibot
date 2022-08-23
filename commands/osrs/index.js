@@ -225,34 +225,38 @@ module.exports = {
 				// followRedirect: false and omitting `responseType` is necessary for when the API is offline
 				// Apparently, Jagex's API will redirect to https://runescape.com/offline with an HTML response
 				// and a 302 code - this must be caught manually, as Got will attempt to parse it as JSON and fail.
-				const response = await sb.Got({
-					url: "https://secure.runescape.com/m=itemdb_oldschool/api/catalogue/detail.json",
+				const response = await sb.Got("GenericAPI", {
+					url: "https://prices.runescape.wiki/api/v1/osrs/latest",
 					throwHttpErrors: false,
-					followRedirect: false,
 					searchParams: {
-						item: item.Game_ID
+						id: item.Game_ID
 					}
 				});
 
-				if (response.statusCode === 302) {
-					return {
-						success: false,
-						reply: `Old School Runescape API is currently unreachable! Please try again later, or check Twitter: https://twitter.com/oldschoolrs/`
-					};
-				}
-				else if (response.statusCode !== 200) {
+				if (response.statusCode !== 200) {
 					return {
 						success: false,
 						reply: `Item not found!`
 					};
 				}
 
-				const { current, name, today } = JSON.parse(response.body).item;
+				const formatPrice = (price) => sb.Utils.formatSI(price, "", 3, true).replace("G", "B");
+				const itemData = response.body.data[item.Game_ID];
+
+				const low = sb.Utils.groupDigits(itemData.low);
+				const high = sb.Utils.groupDigits(itemData.high);
+				const priceString = (low === high)
+					? `${formatPrice(low)} gp`
+					: `${formatPrice(low)} gp - ${formatPrice(high)} gp`;
+
+				// const lowDelta = sb.Utils.timeDelta(new sb.Date(itemData.lowTime * 1000));
+				// const highDelta = sb.Utils.timeDelta(new sb.Date(itemData.highTime * 1000));
+
 				const wiki = `https://osrs.wiki/${item.Name.replace(/\s+/g, "_")}`;
 				return {
 					reply: sb.Utils.tag.trim `
-						Current price of ${name}: ${current.price},
-						current trend: ${today.trend} (${today.price})
+						Current price range of ${item.Name}:
+						${priceString}
 						${wiki}
 					`
 				};
