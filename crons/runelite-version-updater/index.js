@@ -22,22 +22,22 @@ module.exports = {
 		}
 
 		const xml = response.body;
-		const releaseData = await sb.Utils.parseRSS(xml);
+		const { items } = await sb.Utils.parseRSS(xml);
 
 		const configReleaseDate = sb.Config.get("LATEST_RUNELITE_RELEASE_DATE");
 		const lastReleaseDate = (configReleaseDate !== null)
 			? new sb.Date(configReleaseDate)
 			: new sb.Date(0);
 
-		const sortedReleaseData = releaseData.sort((a, b) => new sb.Date(b.isoDate) - new sb.Date(a.isoDate));
-		const currentRelease = sortedReleaseData[0];
-		const currentReleaseDate = new sb.Date(currentRelease.isoDate);
+		const sortedItems = items.sort((a, b) => new sb.Date(b.isoDate) - new sb.Date(a.isoDate));
+		const current = sortedItems[0];
+		const currentReleaseDate = new sb.Date(current.isoDate);
 
 		if (currentReleaseDate <= lastReleaseDate) {
 			return;
 		}
 
-		const message = `New Runelite version detected! PagChomp 👉 ${currentRelease.title} - ${currentRelease.summary}. Link: ${currentRelease.link}`;
+		const message = `New Runelite version detected! PagChomp 👉 ${current.title} - ${current.summary}. Link: ${current.link}`;
 		await sb.Config.set("LATEST_RUNELITE_RELEASE_DATE", currentReleaseDate.valueOf());
 
 		await handleSubscription("runelite", message);
