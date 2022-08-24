@@ -132,6 +132,8 @@ module.exports = {
 			"corrupted gauntlet": "the corrupted gauntlet",
 			tob: "theatre of blood",
 			"tob hard": "theatre of blood: hard mode",
+			toa: "tombs of amascut",
+			"toa hard": "tombs of amascut: expert mode",
 			thermy: "thermonuclear smoke devil",
 			zuk: "tzkal-zuk",
 			inferno: "tzkal-zuk",
