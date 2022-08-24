@@ -29,7 +29,7 @@ module.exports = {
 			},
 			{
 				name: "Runelite",
-				aliases: ["Runelite updates"],
+				aliases: ["runelite"],
 				notes: "Every hour, supibot checks for new releases of Runelite. If a change is detected, you will be notified in #supinic.",
 				response: {
 					added: "You will now be pinged whenever a new release of Runelite is detected.",
