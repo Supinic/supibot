@@ -12,7 +12,7 @@ const fetchSubscriptionUsers = async function (subType, lastSeenThreshold = 36e5
 			on: "Event_Subscription.User_Alias = Meta.User_Alias"
 		})
 		.groupBy("Meta.User_Alias")
-		.where("Type = %s", "Node.js updates")
+		.where("Type = %s", subType)
 		.where("Active = %b", true)
 	);
 
@@ -38,7 +38,7 @@ const createReminders = async function (users, message) {
 			Platform: 1
 		}, true)
 	)));
-}
+};
 
 const handleSubscription = async function (subType, message, options = {}) {
 	const { activeUsers, inactiveUsers } = await fetchSubscriptionUsers(subType);
