@@ -340,12 +340,12 @@ module.exports = {
 				: "";
 
 			const symbol = (forum.quarantine) ? "⚠" : "";
-			const postURL = (context.platform.Name === "discord" && post.isVideoPost)
+			const postString = (context.platform.Name === "discord" && post.isVideoPost)
 				? `https://reddit.com/${post.commentsUrl}`
 				: post.toString();
 
 			return {
-				reply: sb.Utils.fixHTML(`${symbol} ${postURL} ${commentsUrl}`)
+				reply: sb.Utils.fixHTML(`${symbol} r/${forum.name}: ${postString} ${commentsUrl}`)
 			};
 		}
 	}),
