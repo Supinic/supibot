@@ -102,14 +102,11 @@ module.exports = {
 				existingUserIDs.push(user.id_str);
 			}
 
-			const replaceURL = tweet.entities?.urls?.[0]?.url ?? null;
 			const row = await sb.Query.getRow("twitter", "Tweet");
 			row.setValues({
 				ID,
 				User: user.id_str,
-				Text: (replaceURL)
-					? tweet.full_text.replaceAll(replaceURL, "")
-					: tweet.full_text,
+				Text: tweet.full_text,
 				Created: new sb.Date(tweet.created_at),
 				Reply_Tweet: tweet.in_reply_to_status_id_str,
 				Reply_User: tweet.in_reply_to_user_id_str,
