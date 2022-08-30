@@ -147,6 +147,14 @@ module.exports = {
 			notes: "Rolls from FFZ emotes in the current channel."
 		},
 		{
+			name: "7tv",
+			emotesRequired: true,
+			pattern: (context, data) => data.emotes
+				.filter(i => i.type === "7tv")
+				.map(i => i.name),
+			notes: "Rolls from 7TV emotes in the current channel."
+		},
+		{
 			name: "pepe",
 			emotesRequired: true,
 			pattern: (context, data) => data.emotes
