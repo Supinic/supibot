@@ -264,6 +264,18 @@ module.exports = {
 					};
 				}
 
+				const offlineConfiguration = await channelData.getDataProperty("offlineOnlyBot");
+				if (channelData.Mode === "Read" && offlineConfiguration) {
+					await context.channel.setDataProperty("offlineOnlyBot", null);
+					await channelData.saveProperty("Mode", offlineConfiguration.mode ?? "Write");
+
+					return {
+						reply: sb.Utils.tag.trim ` 
+							I rejoined ${channelString} immediately, it was in read-only mode because of the "offline-only" configuration.
+						`
+					};
+				}
+
 				let partFailed = false;
 				let joinFailed = false;
 				const { client } = sb.Platform.get("twitch");

@@ -8,14 +8,15 @@ module.exports = {
 
 		if (event === "online" && channel.Mode !== "Read" && !offlineConfiguration) {
 			await context.channel.setDataProperty("offlineOnlyBot", {
-				started: new sb.Date().sqlDateTime()
+				started: new sb.Date().sqlDateTime(),
+				mode: channel.Mode ?? "Write"
 			});
 
 			await channel.saveProperty("Mode", "Read");
 		}
 		else if (event === "offline" && channel.Mode === "Read" && offlineConfiguration) {
 			await context.channel.setDataProperty("offlineOnlyBot", null);
-			await channel.saveProperty("Mode", "Write");
+			await channel.saveProperty("Mode", offlineConfiguration.mode ?? "Write");
 		}
 	}),
 	Global: false,
