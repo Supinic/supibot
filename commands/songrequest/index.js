@@ -503,34 +503,6 @@ module.exports = {
 			};
 		}
 
-		let when = "right now";
-		let videoStatus = "Current";
-		let started = new sb.Date();
-		const status = await sb.VideoLANConnector.status();
-
-		if (queue.length > 0) {
-			const current = queue.find(i => i.Status === "Current");
-			const { time: currentVideoPosition, length } = status;
-			const endTime = current?.End_Time ?? length;
-
-			const playingDate = new sb.Date().addSeconds(endTime - currentVideoPosition);
-			const inQueue = queue.filter(i => i.Status === "Queued");
-
-			for (const { Duration: length } of inQueue) {
-				playingDate.addSeconds(length ?? 0);
-			}
-
-			started = null;
-			videoStatus = "Queued";
-
-			if (playingDate <= sb.Date.now()) {
-				when = "right now";
-			}
-			else {
-				when = sb.Utils.timeDelta(playingDate);
-			}
-		}
-
 		const videoType = data.videoType ?? await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("data", "Video_Type")
@@ -547,13 +519,35 @@ module.exports = {
 			Name: sb.Utils.wrapString(data.name, 100),
 			Video_Type: videoType.ID,
 			Length: (data.duration) ? Math.ceil(data.duration) : null,
-			Status: videoStatus,
-			Started: started,
+			Status: (queue.length === 0) ? "Current" : "Queued",
+			Started: (queue.length === 0) ? new sb.Date() : null,
 			User_Alias: context.user.ID,
 			Start_Time: startTime ?? null,
 			End_Time: endTime ?? null
 		});
 		await row.save();
+
+		let when = "right now";
+		const status = await sb.VideoLANConnector.status();
+		if (queue.length > 0) {
+			const current = queue.find(i => i.Status === "Current");
+			const { time: currentVideoPosition, length } = status;
+			const endTime = current?.End_Time ?? length;
+
+			const playingDate = new sb.Date().addSeconds(endTime - currentVideoPosition);
+			const inQueue = queue.filter(i => i.Status === "Queued");
+
+			for (const { Duration: length } of inQueue) {
+				playingDate.addSeconds(length ?? 0);
+			}
+
+			if (playingDate <= sb.Date.now()) {
+				when = "right now";
+			}
+			else {
+				when = sb.Utils.timeDelta(playingDate);
+			}
+		}
 
 		const seek = [];
 		if (startTime !== null) {
