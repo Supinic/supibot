@@ -266,7 +266,7 @@ module.exports = {
 
 				const offlineConfiguration = await channelData.getDataProperty("offlineOnlyBot");
 				if (channelData.Mode === "Read" && offlineConfiguration) {
-					await context.channel.setDataProperty("offlineOnlyBot", null);
+					await channelData.setDataProperty("offlineOnlyBot", null);
 					await channelData.saveProperty("Mode", offlineConfiguration.mode ?? "Write");
 
 					return {
