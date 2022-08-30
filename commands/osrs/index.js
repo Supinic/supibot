@@ -81,7 +81,7 @@ module.exports = {
 			return ironman;
 		},
 
-		subcommands: ["itemid", "kc", "price", "search", "seasonal-kc", "seasonal-stats", "stats"],
+		subcommands: ["itemid", "kc", "price", "search", "seasonal-kc", "seasonal-stats", "stats", "wiki"],
 
 		/* eslint-disable array-element-newline */
 		activities: [
@@ -432,7 +432,8 @@ module.exports = {
 				};
 			}
 
-			case "search": {
+			case "search":
+			case "wiki": {
 				const search = args.join(" ");
 				if (!search) {
 					return {
