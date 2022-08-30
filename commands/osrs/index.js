@@ -260,7 +260,7 @@ module.exports = {
 				// const lowDelta = sb.Utils.timeDelta(new sb.Date(itemData.lowTime * 1000));
 				// const highDelta = sb.Utils.timeDelta(new sb.Date(itemData.highTime * 1000));
 
-				const wiki = `https://osrs.wiki/${item.Name.replace(/\s+/g, "_")}`;
+				const wiki = `https://prices.runescape.wiki/osrs/item/${item.Game_ID}`;
 				return {
 					reply: sb.Utils.tag.trim `
 						Current price range of ${item.Name}:
