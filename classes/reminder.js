@@ -117,8 +117,8 @@ module.exports = class Reminder extends require("./template.js") {
 			const fromUserData = await sb.User.get(this.User_From, true);
 			const toUserData = await sb.User.get(this.User_To, true);
 
-			const fromMention = await this.Platform.createUserMention(fromUserData);
-			const toMention = await this.Platform.createUserMention(toUserData);
+			const fromMention = await this.Platform.createUserMention(fromUserData, channelData);
+			const toMention = await this.Platform.createUserMention(toUserData, channelData);
 
 			let message;
 			if (this.User_From === this.User_To) {
