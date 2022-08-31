@@ -700,16 +700,18 @@ module.exports = class Reminder extends require("./template.js") {
 		}
 
 		if (type === "Pingme") {
-			const targetUserPingmeData = await sb.Query.getRecordset(rs => rs
+			const existingPingmeReminderID = await sb.Query.getRecordset(rs => rs
 				.select("ID")
 				.from("chat_data", "Reminder")
 				.where("Active = %b", true)
 				.where("Type = %s", "Pingme")
 				.where("User_From = %n", userFrom)
 				.where("User_To = %n", userTo)
+				.flat("ID")
+				.single()
 			)
 
-			if (targetUserPingmeData) {
+			if (existingPingmeReminderID) {
 				return {
 					success: false,
 					cause: "existing-pingme"
