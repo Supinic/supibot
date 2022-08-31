@@ -78,6 +78,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			this.client.joinAll(channelList);
 		}
 
+		this.data.updatingPromisesThreshold = 0;
 		this.data.updatingUserIDPromises = 0;
 		this.data.crons = [
 			new sb.Cron({
@@ -569,7 +570,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		else if (userData.Twitch_ID === null && userData.Discord_ID !== null) {
 			if (!this.platform.Data.sendVerificationChallenge) {
 				// No verification challenge - just assume it's correct
-				if (this.data.updatingUserIDPromises < 10) {
+				if (this.data.updatingUserIDPromises < this.data.updatingPromisesThreshold) {
 					this.data.updatingUserIDPromises++;
 					await userData.saveProperty("Twitch_ID", senderUserID);
 					this.data.updatingUserIDPromise--;
@@ -597,7 +598,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 		}
 		else if (userData.Twitch_ID === null && userData.Discord_ID === null) {
-			if (this.data.updatingUserIDPromises < 10) {
+			if (this.data.updatingUserIDPromises < this.data.updatingPromisesThreshold) {
 				this.data.updatingUserIDPromises++;
 				await userData.saveProperty("Twitch_ID", senderUserID);
 				this.data.updatingUserIDPromise--;
