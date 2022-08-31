@@ -29,13 +29,10 @@ module.exports = {
 		const queue = [];
 		const dir = this.staticData.dir[processType];
 		const pm2 = this.staticData.pm2[processType];
-		const respond = (context.channel)
-			? (string) => context.channel.send(string)
-			: (string) => context.platform.pm(string, context.user.Name);
 
 		if (types.includes("all") || types.includes("pull") || types.includes("static")) {
 			queue.push(async () => {
-				await respond("VisLaud 👉 git pull origin master");
+				await context.sendIntermediateMessage("VisLaud 👉 git pull origin master");
 
 				await shell(`git -C ${dir} checkout -- yarn.lock package.json`);
 				const result = await shell(`git -C ${dir} pull origin master`);
@@ -44,7 +41,7 @@ module.exports = {
 		}
 		if (types.includes("all") || types.includes("yarn") || types.includes("upgrade")) {
 			queue.push(async () => {
-				await respond("VisLaud 👉 yarn upgrade");
+				await context.sendIntermediateMessage("VisLaud 👉 yarn upgrade");
 
 				const result = await shell(`yarn --cwd ${dir} upgrade`);
 				console.log("upgrade result", { stdout: result.stdout, stderr: result.stderr });
@@ -53,11 +50,13 @@ module.exports = {
 
 		let resultMessage = `Process ${processType} restarted succesfully.`;
 		if (!types.includes("static")) {
-			resultMessage = `Process ${processType} successfully updated from Git. (no restart)`;
 			queue.push(async () => {
-				await respond("VisLaud 👉 Restarting process");
+				await context.sendIntermediateMessage("VisLaud 👉 Restarting process");
 				setTimeout(() => shell(pm2), 1000);
 			});
+		}
+		else {
+			resultMessage = `Process ${processType} successfully updated from Git. (no restart)`;
 		}
 
 		for (const fn of queue) {
