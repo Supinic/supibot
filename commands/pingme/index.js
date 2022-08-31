@@ -12,7 +12,8 @@ module.exports = {
 			"public-incoming": "That person has too many public reminders pending!",
 			"public-outgoing": "You have too many public reminders pending!",
 			"private-incoming": "That person has too many private reminders pending!",
-			"private-outgoing": "You have too many private reminders pending!"
+			"private-outgoing": "You have too many private reminders pending!",
+			"existing-pingme": "You already have a \"pingme\" reminder set up for that user!",
 		}
 	})),
 	Code: (async function pingMe (context, user, ...args) {
