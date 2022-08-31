@@ -41,7 +41,7 @@ module.exports = {
 				};
 			}
 
-			const uploadResult = await sb.Utils.uploadToImgur(response.data);
+			const uploadResult = await sb.Utils.uploadToImgur(response.body);
 			if (!uploadResult.link) {
 				return {
 					success: false,
