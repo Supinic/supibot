@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 0,
 	Description: "Restarts the bot/website process via pm2, optionally also git-pulls changes and/or upgrades the supi-core module.",
-	Flags: ["read-only","system","whitelist"],
+	Flags: ["system","whitelist"],
 	Params: null,
 	Whitelist_Response: "Only available to administrators!",
 	Static_Data: (() => ({
