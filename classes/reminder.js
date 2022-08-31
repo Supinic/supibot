@@ -317,7 +317,7 @@ module.exports = class Reminder extends require("./template.js") {
 	 */
 	static async create (data, skipChecks = false) {
 		if (!skipChecks) {
-			const { success, cause } = await Reminder.checkLimits(data.User_From, data.User_To, data.Schedule);
+			const { success, cause } = await Reminder.checkLimits(data.User_From, data.User_To, data.Schedule, data.Type);
 			if (!success) {
 				return { success, cause };
 			}
@@ -593,15 +593,17 @@ module.exports = class Reminder extends require("./template.js") {
 	 * @param {number} userFrom
 	 * @param {number} userTo
 	 * @param {CustomDate} [schedule]
+	 * @param {string} [type]
 	 * @return {ReminderCreationResult}
 	 */
-	static async checkLimits (userFrom, userTo, schedule) {
+	static async checkLimits (userFrom, userTo, schedule, type = "Reminder") {
 		const [incomingData, outgoingData] = await Promise.all([
 			sb.Query.getRecordset(rs => rs
 				.select("Private_Message")
 				.from("chat_data", "Reminder")
 				.where("Active = %b", true)
 				.where("Schedule IS NULL")
+				.where("Type = %s", "Reminder")
 				.where("User_To = %n", userTo)
 			),
 			sb.Query.getRecordset(rs => rs
@@ -609,6 +611,7 @@ module.exports = class Reminder extends require("./template.js") {
 				.from("chat_data", "Reminder")
 				.where("Active = %b", true)
 				.where("Schedule IS NULL")
+				.where("Type = %s", "Reminder")
 				.where("User_From = %n", userFrom)
 			)
 		]);
@@ -692,6 +695,24 @@ module.exports = class Reminder extends require("./template.js") {
 				return {
 					success: false,
 					cause: "scheduled-outgoing"
+				};
+			}
+		}
+
+		if (type === "Pingme") {
+			const targetUserPingmeData = await sb.Query.getRecordset(rs => rs
+				.select("ID")
+				.from("chat_data", "Reminder")
+				.where("Active = %b", true)
+				.where("Type = %s", "Pingme")
+				.where("User_From = %n", userFrom)
+				.where("User_To = %n", userTo)
+			)
+
+			if (targetUserPingmeData) {
+				return {
+					success: false,
+					cause: "existing-pingme"
 				};
 			}
 		}
