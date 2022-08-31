@@ -33,7 +33,7 @@ module.exports = {
 			? (string) => context.channel.send(string)
 			: (string) => context.platform.pm(string, context.user.Name);
 
-		if (types.includes("all") || types.includes("pull")) {
+		if (types.includes("all") || types.includes("pull") || types.includes("static")) {
 			queue.push(async () => {
 				await respond("VisLaud 👉 git pull origin master");
 
@@ -51,10 +51,14 @@ module.exports = {
 			});
 		}
 
-		queue.push(async () => {
-			await respond("VisLaud 👉 Restarting process");
-			setTimeout(() => shell(pm2), 1000);
-		});
+		let resultMessage = `Process ${processType} restarted succesfully.`;
+		if (!types.includes("static")) {
+			resultMessage = `Process ${processType} successfully updated from Git. (no restart)`;
+			queue.push(async () => {
+				await respond("VisLaud 👉 Restarting process");
+				setTimeout(() => shell(pm2), 1000);
+			});
+		}
 
 		for (const fn of queue) {
 			await fn();
@@ -65,7 +69,7 @@ module.exports = {
 		}
 		else {
 			return {
-				reply: `Process ${processType} restarted succesfully.`
+				reply: resultMessage
 			};
 		}
 	}),
