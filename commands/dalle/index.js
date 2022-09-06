@@ -122,9 +122,9 @@ module.exports = {
 		const notificationTimeout = setTimeout(async (timeoutContext) => {
 			await timeoutContext.sendIntermediateMessage(sb.Utils.tag.trim `
 				${mentionUsername}
-				Seems like the API is working
+				Processing...
 				${waitingEmote} ${loadingEmote}
-				The result should be coming up anywhere between two to five minutes or so.
+				Please wait up to 5 minutes.
 			`);
 		}, 2000, context);
 
