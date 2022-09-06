@@ -565,6 +565,13 @@ module.exports = class DiscordController extends require("./template.js") {
 			await this.pm(message, userData, { embeds });
 		}
 		else if (embeds.length !== 0) {
+			if (channelData?.Mirror && reply) {
+				await this.mirror(reply, userData, channelData, {
+					...commandOptions,
+					commandUsed: true
+				});
+			}
+
 			await this.send(null, channelData, {
 				keepWhitespace: Boolean(commandOptions.keepWhitespace),
 				embeds
