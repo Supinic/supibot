@@ -8,6 +8,7 @@ import * as Helix from "./helix/index.mjs";
 import * as Kraken from "./kraken/index.mjs";
 import * as Leppunen from "./leppunen/index.mjs";
 import * as Reddit from "./reddit/index.mjs";
+import * as RaspberryPi4 from "./raspberry-pi-4/index.mjs";
 import * as Speedrun from "./speedrun/index.mjs";
 import * as SRA from "./sra/index.mjs";
 import * as Supibot from "./supibot/index.mjs";
@@ -27,6 +28,7 @@ const definitions = [
 	Kraken,
 	Leppunen,
 	Reddit,
+	RaspberryPi4,
 	Speedrun,
 	SRA,
 	Supibot,
