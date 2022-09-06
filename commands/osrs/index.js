@@ -149,7 +149,7 @@ module.exports = {
 			{ name: "Ranged", emoji: "🏹" },
 			{ name: "Prayer", emoji: "✨" },
 			{ name: "Magic", emoji: "🧙‍" },
-			{ name: "Runecrafting", emoji: "➰" },
+			{ name: "Runecraft", emoji: "➰" },
 			{ name: "Construction", emoji: "🏡" },
 			{ name: "Hitpoints", emoji: "♥" },
 			{ name: "Agility", emoji: "🏃‍" },
@@ -294,8 +294,19 @@ module.exports = {
 
 				if (context.params.skill) {
 					const skillName = context.params.skill.toLowerCase();
-					const skill = data.skills.find(i => i.name.toLowerCase() === skillName);
+					const [topMatch] = sb.Utils.selectClosestString(skillName, data.skills.map(i => i.name), {
+						fullResult: true,
+						ignoreCase: true
+					});
 
+					if (topMatch.score < 0.5) {
+						return {
+							success: false,
+							reply: "No valid skill matching your query has been found!"
+						};
+					}
+
+					const skill = data.skills.find(i => i.name.toLowerCase() === topMatch.string.toLowerCase());
 					if (!skill) {
 						return {
 							success: false,
