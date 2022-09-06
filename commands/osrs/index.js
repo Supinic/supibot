@@ -320,7 +320,7 @@ module.exports = {
 						};
 					}
 
-					const { emoji } = this.staticData.skills.find(i => i.name.toLowerCase() === skillName);
+					const { emoji } = this.staticData.skills.find(i => i.name.toLowerCase() === topMatch.string.toLowerCase());
 					const experience = (skill.experience === -1)
 						? "(unranked)"
 						: sb.Utils.groupDigits(skill.experience);
