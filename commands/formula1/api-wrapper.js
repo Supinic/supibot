@@ -187,7 +187,7 @@ const fetchNextRaceDetail = async (context) => {
 			Round ${race.round} - ${race.raceName}.
 			${nextSessionString}
 			${raceString}					
-			${race.url}					
+			Check more session times here: https://f1calendar.com/			
 		`
 	};
 };
