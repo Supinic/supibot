@@ -219,6 +219,29 @@ module.exports = (command) => [
 		execute: (context, identifier) => handleErrorInspection(command, context, "error", identifier)
 	},
 	{
+		name: "mariadb",
+		aliases: ["maria"],
+		description: "Checks for the current memory usage of the MariaDB database process, running on Supinic's Raspberry Pi 4.",
+		execute: async () => {
+			const response = await sb.Got("RaspberryPi4", {
+				url: "maria/memoryUsage",
+				throwHttpErrors: false
+			});
+
+			if (response.statusCode !== 200) {
+				return {
+					success: false,
+					reply: "Could not check for the process memory usage!"
+				};
+			}
+
+			const memoryUsage = sb.Utils.formatByteSize(response.body.data.memory, 2);
+			return {
+				reply: `The MariaDB process is currently using ${memoryUsage} of memory.`
+			};
+		}
+	},
+	{
 		name: "markov",
 		aliases: [],
 		description: "Posts the link for the word list, for a specified channel's markov module.",
