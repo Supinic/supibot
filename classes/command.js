@@ -52,10 +52,13 @@ class Context {
 
 	async sendIntermediateMessage (string) {
 		if (this.#channel) {
-			return await this.#channel.send(string);
+			await Promise.all([
+				this.#channel.send(string),
+				this.#channel.mirror(string)
+			]);
 		}
 		else {
-			return await this.#platform.pm(string, this.#user.Name);
+			await this.#platform.pm(string, this.#user.Name);
 		}
 	}
 
