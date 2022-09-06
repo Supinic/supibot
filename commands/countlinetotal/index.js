@@ -10,7 +10,7 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function countLineTotal (context) {
 		const [response, chatLineAmount, history] = await Promise.all([
-			sb.Got("GenericAPI", "http://192.168.1.102:11111/ssd"),
+			sb.Got("RaspberryPi4", { url: "ssd/size" }),
 			sb.Query.getRecordset(rs => rs
 				.select("SUM(AUTO_INCREMENT) AS Chat_Lines")
 				.from("INFORMATION_SCHEMA", "TABLES")
