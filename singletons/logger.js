@@ -191,6 +191,11 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 						userMap.clear();
 					}
 
+					if (data.length === 0) {
+						this.lastSeenRunning = false;
+						return;
+					}
+
 					await sb.Query.pool.batch(
 						sb.Utils.tag.trim `
 							INSERT INTO chat_data.Message_Meta_User_Alias
