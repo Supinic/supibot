@@ -164,6 +164,10 @@ module.exports = class DiscordController extends require("./template.js") {
 					await channelData.saveProperty("Mode", channelData.Mode);
 				}
 
+				if (!messageObject.channel) {
+					await sb.Logger.log("Discord.Warning", JSON.stringify(messageObject), channelData.ID);
+				}
+
 				const discordChannel = messageObject.channel;
 				const guildName = guild.name;
 				const discordChannelName = discordChannel.name;
