@@ -134,11 +134,11 @@ module.exports = class Channel extends require("./template.js") {
 
 	/**
 	 * Sets up the logging table and triggers for a newly created channel.
-	 * @returns {boolean} True if new tables and triggers were created, false if channel already has them set up
+	 * @returns {Promise<boolean>} True if new tables and triggers were created, false if channel already has them set up
 	 */
-	async setup () {
+	setup () {
 		if (!this.Platform.Logging || !this.Platform.Logging.messages) {
-			return false;
+			return Promise.resolve(false);
 		}
 
 		if (this.#setupPromise) {
@@ -537,6 +537,10 @@ module.exports = class Channel extends require("./template.js") {
 	 */
 	static async add (name, platformData, mode = "Write", specificID) {
 		const channelName = Channel.normalizeName(name);
+		const existing = Channel.get(channelName);
+		if (existing) {
+			return existing;
+		}
 
 		// Creates Channel row
 		const row = await sb.Query.getRow("chat_data", "Channel");
@@ -549,9 +553,10 @@ module.exports = class Channel extends require("./template.js") {
 		await row.save();
 
 		const channelData = new Channel({ ...row.valuesObject });
+		Channel.data.push(channelData);
+
 		await channelData.setup();
 
-		Channel.data.push(channelData);
 		if (sb.ChatModule) {
 			sb.ChatModule.attachChannelModules(channelData);
 		}
