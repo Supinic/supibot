@@ -20,6 +20,8 @@ module.exports = {
 		const config = require("./config.json");
 		const Subreddit = require("./subreddit.js");
 
+		this.data.subreddits ??= {};
+
 		if (typeof context.params.safeMode === "boolean") {
 			if (!context.channel) {
 				return {
