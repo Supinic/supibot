@@ -210,14 +210,13 @@ module.exports = class TwitchController extends require("./template.js") {
 							null
 						);
 					}
-					else if (result.action && result.action.includes("rename")) {
-						const { login } = result;
+					else if (result.action && result.action.includes("rename") && result.login) {
 						const suggestionIDs = await sb.Query.getRecordset(rs => rs
 							.select("ID")
 							.from("data", "Suggestion")
 							.where("Category = %s", "Bot suggestion")
 							.where("Status IS NULL")
-							.where("Text %like", login)
+							.where("Text %like", result.login)
 							.flat("ID")
 						);
 
