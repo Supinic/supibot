@@ -15,175 +15,11 @@ module.exports = {
 		{ name: "skipGalleries", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (command => {
-		const expiration = 3_600_000; // 1 hour
-		command.data.subreddits = {};
-
-		class Subreddit {
-			#name;
-			#error = null;
-			#errorMessage = null;
-			#exists = false;
-			#reason = null;
-			#quarantine = null;
-			#nsfw = null;
-			#expiration = -Infinity;
-			#posts = [];
-			repeatedPosts = [];
-
-			constructor (meta) {
-				this.#errorMessage = meta.message ?? null;
-				this.#error = meta.error ?? null;
-				this.#reason = meta.reason ?? null;
-
-				if (meta.data && typeof meta.data.dist === "undefined") {
-					const { data } = meta;
-					this.#name = data.display_name;
-					this.#exists = (!data.children || data.children !== 0);
-					this.#quarantine = Boolean(data.quarantine);
-					this.#nsfw = Boolean(data.over_18);
-				}
-				else {
-					this.#exists = false;
-					this.#expiration = Infinity;
-				}
-			}
-
-			setExpiration () {
-				this.#expiration = new sb.Date().addMilliseconds(expiration);
-			}
-
-			addPosts (data) {
-				this.#posts = data.map(i => new RedditPost(i.data));
-			}
-
-			get availableFlairs () {
-				return new Set(this.#posts.flatMap(i => i.flairs));
-			}
-
-			get posts () { return this.#posts; }
-			get expiration () { return this.#expiration; }
-			get error () { return this.#error; }
-			get exists () { return this.#exists; }
-			get name () { return this.#name; }
-			get nsfw () { return this.#nsfw; }
-			get quarantine () { return this.#quarantine; }
-			get reason () { return this.#reason; }
-		}
-
-		class RedditPost {
-			#author;
-			#created;
-			#id;
-			#title;
-			#url;
-			#commentsUrl;
-
-			#flairs = [];
-			#crosspostOrigin = null;
-			#isTextPost = false;
-			#nsfw = false;
-			#stickied = false;
-
-			#score = 0;
-
-			constructor (data) {
-				let crossPostNSFW = false;
-				if (data.crosspost_parent_list && data.crosspost_parent_list.length > 0) {
-					crossPostNSFW = crossPostNSFW || data.over_18;
-					data = data.crosspost_parent_list.pop();
-					this.#crosspostOrigin = data.subreddit_name_prefixed;
-				}
-
-				this.#author = data.author;
-				this.#created = new sb.Date(data.created_utc * 1000);
-				this.#id = data.id;
-				this.#title = data.title;
-				this.#url = data.url;
-				this.#commentsUrl = `r/${data.subreddit}/comments/${data.id}`;
-
-				this.#flairs = data.link_flair_richtext.filter(i => i.t && i.e === "text").map(i => sb.Utils.fixHTML(i.t.trim()));
-				// if (data.link_flair_text) {
-				// 	this.#flairs.push(data.link_flair_text.toLowerCase().trim());
-				// }
-
-				this.#isTextPost = Boolean(data.selftext && data.selftext_html);
-				this.#nsfw = Boolean(data.over_18) || crossPostNSFW;
-				this.#stickied = Boolean(data.stickied);
-
-				this.#score = data.ups ?? 0;
-			}
-
-			get id () { return this.#id; }
-			get nsfw () { return this.#nsfw; }
-			get stickied () { return this.#stickied; }
-			get isTextPost () { return this.#isTextPost; }
-			get isVideoPost () { return this.#url.includes("v.reddit"); }
-			get url () { return this.#url; }
-			get commentsUrl () { return this.#commentsUrl; }
-			get flairs () { return this.#flairs; }
-
-			get posted () {
-				return sb.Utils.timeDelta(this.#created);
-			}
-
-			hasFlair (input, caseSensitive = false) {
-				if (!caseSensitive) {
-					input = input.toLowerCase();
-				}
-
-				return this.#flairs.some(flair => {
-					if (!caseSensitive) {
-						return (flair.toLowerCase().includes(input));
-					}
-					else {
-						return (flair.includes(input));
-					}
-				});
-			}
-
-			hasGallery () {
-				return this.#url.includes("gallery");
-			}
-
-			toString () {
-				const xpost = (this.#crosspostOrigin)
-					? `, x-posted from ${this.#crosspostOrigin}`
-					: "";
-
-				return `${this.#title} ${this.#url} (Score: ${this.#score}, posted ${this.posted}${xpost})`;
-			}
-		}
-
-		return {
-			repeats: 25,
-			expiration,
-			RedditPost,
-			Subreddit,
-
-			uncached: [
-				"random"
-			],
-			banned: [
-				"bigpenis",
-				"cockcourt",
-				"cosplaygirls",
-				"moobs",
-				"fatasses",
-				"feetpics",
-				"foot",
-				"instagrammodels",
-				"russianbabes"
-			],
-			defaultMemeSubreddits: [
-				"okbuddyretard",
-				"memes",
-				"dankmemes",
-				"pewdiepiesubmissions"
-			]
-		};
-	}),
+	Static_Data: null,
 	Code: (async function randomMeme (context, ...args) {
+		const config = require("./config.json");
+		const Subreddit = require("./subreddit.js");
+
 		if (typeof context.params.safeMode === "boolean") {
 			if (!context.channel) {
 				return {
@@ -220,7 +56,7 @@ module.exports = {
 			safeSpace = true;
 		}
 
-		const input = (args.shift() ?? sb.Utils.randArray(this.staticData.defaultMemeSubreddits));
+		const input = (args.shift() ?? sb.Utils.randArray(config.defaultMemeSubreddits));
 		const subreddit = encodeURIComponent(input.toLowerCase());
 
 		/** @type {Subreddit} */
@@ -238,8 +74,8 @@ module.exports = {
 				});
 			}
 
-			forum = new this.staticData.Subreddit(body);
-			if (!this.staticData.uncached.includes(subreddit)) {
+			forum = new Subreddit(body);
+			if (!config.uncached.includes(subreddit)) {
 				this.data.subreddits[subreddit] = forum;
 			}
 		}
@@ -256,7 +92,7 @@ module.exports = {
 				reply: "There is no subreddit with that name!"
 			};
 		}
-		else if (safeSpace && (this.staticData.banned.includes(forum.name) || forum.nsfw)) {
+		else if (safeSpace && (config.banned.includes(forum.name) || forum.nsfw)) {
 			return {
 				success: false,
 				reply: `Subreddit ${input} is flagged as 18+, and thus not safe to post here!`
@@ -288,7 +124,21 @@ module.exports = {
 			};
 		}
 
-		const { posts, repeatedPosts } = forum;
+		let repeatedPosts;
+		if (context.channel) {
+			this.data.repeatedChannelPostsMap ??= {};
+			this.data.repeatedChannelPostsMap[context.channel.ID] ??= [];
+
+			repeatedPosts = this.data.repeatedChannelPostsMap[context.channel.ID];
+		}
+		else {
+			this.data.repeatedPrivateMessagePostsMap ??= {};
+			this.data.repeatedPrivateMessagePostsMap[context.user.ID] ??= [];
+
+			repeatedPosts = this.data.repeatedPrivateMessagePostsMap[context.user.ID];l
+		}
+
+		const { posts } = forum;
 		const validPosts = posts.filter(i => (
 			(!safeSpace || !i.nsfw)
 			&& !i.stickied
@@ -317,7 +167,7 @@ module.exports = {
 			}
 		}
 		else {
-			if ((this.staticData.banned.includes(forum.name) || post.nsfw) && context.append.pipe) {
+			if ((config.banned.includes(forum.name) || post.nsfw) && context.append.pipe) {
 				return {
 					success: false,
 					reason: "pipe-nsfw"
@@ -327,7 +177,7 @@ module.exports = {
 			// Add the currently used post ID at the beginning of the array
 			repeatedPosts.unshift(post.id);
 			// And then splice off everything over the length of 3.
-			repeatedPosts.splice(this.staticData.repeats);
+			repeatedPosts.splice(config.repeats);
 
 			if (context.params.linkOnly) {
 				return {
