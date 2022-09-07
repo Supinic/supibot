@@ -135,7 +135,7 @@ module.exports = {
 			this.data.repeatedPrivateMessagePostsMap ??= {};
 			this.data.repeatedPrivateMessagePostsMap[context.user.ID] ??= [];
 
-			repeatedPosts = this.data.repeatedPrivateMessagePostsMap[context.user.ID];l
+			repeatedPosts = this.data.repeatedPrivateMessagePostsMap[context.user.ID];
 		}
 
 		const { posts } = forum;
