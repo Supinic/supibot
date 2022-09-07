@@ -92,6 +92,13 @@ module.exports = {
 				user_id: channelID
 			}
 		});
+		
+		if (streamResponse.statusCode !== 200) {
+			return {
+				success: false,
+				reply: `Cannot check for stream info! Try again later.`
+			};
+		}
 
 		const [stream] = streamResponse.body.data;
 		if (!stream) {
