@@ -18,8 +18,12 @@ module.exports = {
 		for (const guildData of guilds.values()) {
 			const guild = await discord.guilds.fetch(guildData.id);
 			const guildChannels = botChannels.filter(i => i.Specific_ID === guild.id);
-			const channelIDs = guildChannels.map(i => i.ID);
+			// In the future, also check guilds with 0 channels - the bot is possibly restricted from all of them
+			if (guildChannels.length === 0) {
+				continue;
+			}
 
+			const channelIDs = guildChannels.map(i => i.ID);
 			const lastCommandExecuted = await sb.Query.getRecordset(rs => rs
 				.select("MAX(Executed) AS Last_Command_Executed")
 				.from("chat_data", "Command_Execution")
