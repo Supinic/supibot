@@ -23,7 +23,11 @@ module.exports = {
 			return;
 		}
 
-		const { reply } = await query.execute({ platform: context.channel.Platform }, `unscramble ${scramble}`);
+		const fauxContext = sb.Command.createFakeContext(query, {
+			platform: context.channel.Platform
+		});
+
+		const { reply } = await query.execute(fauxContext, `unscramble ${scramble}`);
 		if (reply.includes("did not understand")) {
 			console.warn("Unscramble module - could not run query", { message, reply, scramble });
 			return;
