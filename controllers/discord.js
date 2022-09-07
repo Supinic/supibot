@@ -152,7 +152,6 @@ module.exports = class DiscordController extends require("./template.js") {
 				channelData = sb.Channel.get(chan, this.platform);
 				if (!channelData) {
 					channelData = await sb.Channel.add(chan, this.platform);
-					await channelData.setup();
 				}
 				if (guild && guild.id && channelData.Specific_ID !== guild.id) {
 					await channelData.saveProperty("Specific_ID", guild.id);
