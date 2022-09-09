@@ -245,7 +245,7 @@ module.exports = (command) => [
 			);
 
 			const uptime = sb.Utils.timeDelta(new sb.Date().addSeconds(Number(uptimeVariable)), true);
-			const residental = sb.Utils.formatByteSize(response.body.data.VmRss, 2);
+			const residental = sb.Utils.formatByteSize(response.body.data.VmRSS, 2);
 			const swap = sb.Utils.formatByteSize(response.body.data.VmSwap, 2);
 
 			return {
