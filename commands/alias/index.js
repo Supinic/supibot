@@ -871,8 +871,6 @@ module.exports = {
 					.where({ condition: !context.channel }, "User_Alias = %n", user.ID)
 					.where({ condition: context.channel }, "User_Alias = %n OR Channel = %n", user.ID, context.channel.ID)
 					.where("Name COLLATE utf8mb4_bin = %s", name)
-					.limit(1)
-					.single()
 				);
 
 				let alias;
