@@ -35,7 +35,7 @@ const execute = async (context, query) => {
 	};
 
 	if (context.params.from) {
-		const code = languageISO.get(context.params.from);
+		const code = languageISO.getCode(context.params.from);
 		if (!code) {
 			return {
 				success: false,
@@ -60,7 +60,7 @@ const execute = async (context, query) => {
 			searchParams.target_lang = sb.Utils.randArray(supportedLanguages);
 		}
 		else {
-			const code = languageISO.get(context.params.to);
+			const code = languageISO.getCode(context.params.to);
 			if (!code) {
 				return {
 					success: false,
