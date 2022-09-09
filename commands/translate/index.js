@@ -7,14 +7,18 @@ module.exports = {
 	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
 		{ name: "confidence", type: "boolean" },
+		{ name: "engine", type: "string" },
 		{ name: "from", type: "string" },
 		{ name: "to", type: "string" },
 		{ name: "textOnly", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: (() => ({
+		engines: ["deepl", "google"]
+	})),
 	Code: (async function translate (context, ...args) {
-		if (args.length === 0) {
+		const query = args.join(" ");
+		if (query.length === 0) {
 			return {
 				success: false,
 				reply: "No text for translation provided!",
@@ -22,108 +26,30 @@ module.exports = {
 			};
 		}
 
-		// default: false if normal execution, true if inside of pipe
-		const textOnly = context.params.textOnly ?? context.append.pipe;
-
-		const { languageISO } = sb.Utils.modules;
-		const options = {
-			from: "auto",
-			to: "en",
-			confidence: context.params.confidence ?? !textOnly
-		};
-
-		for (const option of ["from", "to"]) {
-			let lang = context.params[option];
-			if (!lang) {
-				continue;
-			}
-
-			if (option === "to" && lang === "random") {
-				let codeList = await this.getCacheData("supported-language-list");
-				if (!codeList) {
-					const html = await sb.Got("https://translate.google.com/").text();
-					const $ = sb.Utils.cheerio(html);
-					const codes = Array.from($("[data-language-code]")).map(i => i.attribs["data-language-code"]);
-					const list = new Set(codes.filter(i => i !== "auto" && !i.includes("-")));
-
-					codeList = Array.from(list);
-					await this.setCacheData("supported-language-list", codeList, {
-						expiry: 7 * 864e5 // 7 days
-					});
-				}
-
-				lang = sb.Utils.randArray(codeList);
-			}
-
-			const newLang = languageISO.get(lang);
-			const code = newLang?.iso6391 ?? newLang?.iso6392 ?? null;
-			if (!code) {
-				return {
-					success: false,
-					reply: `Language "${lang}" was not recognized!`
-				};
-			}
-
-			options[option] = code.toLowerCase();
-		}
-
-		const response = await sb.Got("FakeAgent", {
-			url: "https://translate.googleapis.com/translate_a/single",
-			responseType: "json",
-			throwHttpErrors: false,
-			searchParams: {
-				client: "gtx",
-				dt: "t",
-				ie: "UTF-8",
-				oe: "UTF-8",
-				sl: options.from,
-				tl: options.to,
-				q: args.join(" ")
-			}
-		});
-
-		if (response.statusCode === 400) {
-			const targets = [options.from, options.to].filter(i => i !== "en" && i !== "auto");
-			const languages = targets.map(i => `${i}: ${languageISO.getName(i)}`);
+		const { engines } = this.staticData;
+		const engine = context.params.engine ?? "google";
+		if (!engines.includes(engine)) {
 			return {
 				success: false,
-				reply: `One or both languages are not supported! (${languages.join(", ")})`
+				reply: `Invalid translation engine provided! Use one of: ${engines.join(", ")}`
 			};
 		}
-		else if (response.statusCode !== 200) {
-			throw new sb.errors.GenericRequestError({
-				statusCode: response.statusCode,
-				statusMessage: response.statusMessage,
-				hostname: "TranslateAPI",
-				message: response.statusMessage,
-				stack: null
-			});
+
+		const { execute } = require(`./${engine}.js`);
+		const result = await execute(context, query);
+		if (!result.success) {
+			return result;
 		}
-
-		const data = response.body;
-		let reply = data[0].map(i => i[0]).join(" ");
-		if (!textOnly) {
-			const languageID = data[2].replace(/-.*/, "");
-			const fromLanguageName = languageISO.getName(languageID);
-			if (!fromLanguageName) {
-				console.warn("$translate - could not get language name", { data, reply, options, languageID });
-				return {
-					success: false,
-					reply: "Language code could not be translated into a name! Please let @Supinic know about this :)"
-				};
-			}
-
-			const array = [sb.Utils.capitalize(fromLanguageName)];
-			if (options.confidence && data[6] && data[6] !== 1) {
-				const confidence = `${sb.Utils.round(data[6] * 100, 0)}%`;
-				array.push(`(${confidence})`);
-			}
-
-			array.push("->", sb.Utils.capitalize(languageISO.getName(options.to)));
-			reply = `${array.join(" ")}: ${reply}`;
+		else if (context.params.textOnly && result.text) {
+			return {
+				reply: result.text
+			};
 		}
-
-		return { reply };
+		else {
+			return {
+				reply: result.reply
+			};
+		}
 	}),
 	Dynamic_Description: (async (prefix) => [
 		"Translates provided text from one language into another provided language.",
@@ -135,12 +61,18 @@ module.exports = {
 		`<code>${prefix}translate FeelsDankMan</code> => Luxembourgish (53%) -> English: FeelsDankMan`,
 		"",
 
+		`<code>${prefix}translate engine:(translation engine)</code>`,
+		"Allows you to choose a translation engine. Keep in mind they both support different parameters and languages!",
+		"Supported: <code>google</code> and <code>deepl</code>",
+		"",
+
 		`<code>${prefix}translate textOnly:true (text)</code>`,
 		"Translates the text, and only outputs the result text, without the direction and confidence %, e.g.:",
 		`<code>${prefix}translate textOnly:true FeelsDankMan</code> => FeelsDankMan`,
 		"",
 
 		`<code>${prefix}translate confidence:false (text)</code>`,
+		"<b>Only works for the Google translation engine!</b>",
 		"Translates the text, and outputs the result text with direction, but without the confidence %, e.g.:",
 		`<code>${prefix}translate confidence:false FeelsDankMan</code> => Luxembourgish -> English: FeelsDankMan`,
 		"",
