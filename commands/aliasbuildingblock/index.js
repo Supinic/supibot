@@ -105,6 +105,17 @@ module.exports = {
 				}
 			},
 			{
+				name: "channel",
+				aliases: [],
+				description: "Prints the current channel, or \"(none\") if in PMs.",
+				examples: [
+					["$abb channel", "(current channel)"]
+				],
+				execute: (context) => ({
+					reply: context.channel?.Name ?? "(none)"
+				})
+			},
+			{
 				name: "chatter",
 				aliases: [],
 				description: "Selects a random chatter within the channel, and outputs their name. Not applicable in PMs. Use the \"excludeSelf:true\" parameter to exclude yourself from the random chatter roll",
@@ -175,6 +186,17 @@ module.exports = {
 					reply: Array.from(args.join(" "))
 						.join(" ")
 						.replace(/\s+/g, " ")
+				})
+			},
+			{
+				name: "platform",
+				aliases: [],
+				description: "Prints the name of the current platform.",
+				examples: [
+					["$abb platform", "twitch"]
+				],
+				execute: (context) => ({
+					reply: context.platform.Name
 				})
 			},
 			{
