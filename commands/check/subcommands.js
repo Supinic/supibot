@@ -235,9 +235,21 @@ module.exports = (command) => [
 				};
 			}
 
-			const memoryUsage = sb.Utils.formatByteSize(response.body.data.memory, 2);
+			const uptimeVariable = await sb.Query.getRecordset(rs => rs
+				.select("VARIABLE_VALUE AS Uptime")
+				.from("INFORMATION_SCHEMA", "GLOBAL_STATUS")
+				.where("VARIABLE_NAME = %s", "Uptime")
+				.limit(1)
+				.single()
+				.flat("Uptime")
+			);
+
+			const uptime = sb.Utils.timeDelta(new sb.Date().addSeconds(Number(uptimeVariable)), true);
+			const residental = sb.Utils.formatByteSize(response.body.data.VmRss, 2);
+			const swap = sb.Utils.formatByteSize(response.body.data.VmSwap, 2);
+
 			return {
-				reply: `The MariaDB process is currently using ${memoryUsage} of memory.`
+				reply: `The MariaDB process is running for ${uptime}, and it is currently using ${residental} of memory + ${swap} in swap.`
 			};
 		}
 	},
