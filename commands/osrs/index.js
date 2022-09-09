@@ -81,7 +81,19 @@ module.exports = {
 			return ironman;
 		},
 
-		subcommands: ["itemid", "kc", "price", "search", "seasonal-kc", "seasonal-stats", "stats", "wiki"],
+		subcommands: [
+			"guthix",
+			"itemid",
+			"kc",
+			"price",
+			"search",
+			"seasonal-kc",
+			"seasonal-stats",
+			"stats",
+			"tears",
+			"tog",
+			"wiki"
+		],
 
 		/* eslint-disable array-element-newline */
 		activities: [
@@ -443,6 +455,36 @@ module.exports = {
 				};
 			}
 
+			case "tog":
+			case "tears":
+			case "guthix": {
+				const response = await sb.Got("GenericAPI", {
+					url: "https://www.togcrowdsourcing.com/worldinfo"
+				});
+
+				if (response.statusCode !== 200) {
+					return {
+						success: false,
+						reply: `The Crowdsourcing API failed! Try again later.`
+					};
+				}
+
+				const worlds = response.body;
+				if (!Array.isArray(worlds) || worlds.length === 0) {
+					return {
+						success: false,
+						reply: `No crowdsourced data is currently available! Try again later.`
+					};
+				}
+
+				const idealWorlds = worlds.filter(i => i.stream_order === "gggbbb");
+				const string = idealWorlds.map(i => `W${i.world_number} (${i.hits} hits)`).join(", ");
+
+				return {
+					reply: `Ideal Tears of Guthix worlds (GGGBBB): ${string}`
+				};
+			}
+
 			case "search":
 			case "wiki": {
 				const search = args.join(" ");
@@ -574,6 +616,14 @@ module.exports = {
 			"<u>Item IDs</u>",
 			`<code>${prefix}osrs itemid (item)</code>`,
 			`Posts the item's ingame ID. Shows up to 5 best matching results.`,
+			"",
+
+			"<u>Tears of Guthix</u>",
+			`<code>${prefix}osrs tog</code>`,
+			`<code>${prefix}osrs tears</code>`,
+			`<code>${prefix}osrs guthix</code>`,
+			`Posts the list of "ideal" worlds for Tears of Guthix.`,
+			`Powered by <a href="https://github.com/jcarbelbide/tog-crowdsourcing-server">Tears of Guthix Crowdsourcing API</a>.`,
 			"",
 
 			"<h6>Supported activities</h6>",
