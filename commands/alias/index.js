@@ -918,7 +918,13 @@ module.exports = {
 				}
 
 				const commandData = sb.Command.get(invocation);
-				if (context.append.pipe && !commandData.Flags.pipe) {
+				if (!commandData) {
+					return {
+						success: false,
+						reply: `Your alias contains the command ${invocation} which has been archived, retired, or removed!`
+					};
+				}
+				else if (context.append.pipe && !commandData.Flags.pipe) {
 					return {
 						success: false,
 						reply: `Cannot use the ${invocation} command inside of a pipe, despite being wrapped in an alias!`
