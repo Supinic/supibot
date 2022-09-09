@@ -865,14 +865,23 @@ module.exports = {
 					}
 				}
 
-				let alias = await sb.Query.getRecordset(rs => rs
-					.select("ID", "Command", "Invocation", "Arguments", "Parent")
+				const eligibleAliases = await sb.Query.getRecordset(rs => rs
+					.select("ID", "User_Alias", "Channel", "Command", "Invocation", "Arguments", "Parent")
 					.from("data", "Custom_Command_Alias")
-					.where("User_Alias = %n", user.ID)
+					.where({ condition: !context.channel }, "User_Alias = %n", user.ID)
+					.where({ condition: context.channel }, "User_Alias = %n OR Channel = %n", user.ID, context.channel.ID)
 					.where("Name COLLATE utf8mb4_bin = %s", name)
 					.limit(1)
 					.single()
 				);
+
+				let alias;
+				if (eligibleAliases.length <= 1) {
+					alias = eligibleAliases[0];
+				}
+				else {
+					alias = eligibleAliases.find(i => i.User_Alias === user.ID) ?? eligibleAliases.find(i => i.Channel === context.channel?.ID);
+				}
 
 				if (!alias) {
 					if (!this.staticData.nameCheck.regex.test(name)) {
