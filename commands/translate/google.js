@@ -96,7 +96,7 @@ const execute = async (context, query) => {
 		array.push(`(${confidence})`);
 	}
 
-	array.push("->", sb.Utils.capitalize(languageISO.getName(options.to)));
+	array.push("→", sb.Utils.capitalize(languageISO.getName(options.to)));
 	const reply = `${array.join(" ")}: ${text}`;
 
 	return {

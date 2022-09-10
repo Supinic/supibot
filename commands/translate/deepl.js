@@ -103,8 +103,8 @@ const execute = async (context, query) => {
 	}
 
 	const [data] = response.body.translations;
-	const fromLanguageName = languageISO.getName(data.detected_source_language);
-	const toLanguageName = languageISO.getName(searchParams.target_lang);
+	const fromLanguageName = sb.Utils.capitalize(languageISO.getName(data.detected_source_language));
+	const toLanguageName = sb.Utils.capitalize(languageISO.getName(searchParams.target_lang));
 
 	return {
 		reply: `${fromLanguageName} → ${toLanguageName}: ${data.text}`,
