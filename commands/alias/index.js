@@ -869,7 +869,7 @@ module.exports = {
 					.select("ID", "User_Alias", "Channel", "Command", "Invocation", "Arguments", "Parent")
 					.from("data", "Custom_Command_Alias")
 					.where({ condition: !context.channel }, "User_Alias = %n", user.ID)
-					.where({ condition: context.channel }, "User_Alias = %n OR Channel = %n", user.ID, context.channel.ID)
+					.where({ condition: Boolean(context.channel) }, "User_Alias = %n OR Channel = %n", user.ID, context.channel.ID)
 					.where("Name COLLATE utf8mb4_bin = %s", name)
 				);
 
