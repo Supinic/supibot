@@ -387,6 +387,26 @@ module.exports = {
 						};
 					}
 
+					const existingAliasAuthor = await sb.Query.getRecordset(rs => rs
+						.select("User_Alias")
+						.from("data", "Custom_Command_Alias")
+						.where("Name = %s", aliasName)
+						.where("Channel = %n", context.channel.ID)
+						.single()
+						.limit(1)
+						.flat("User_Alias")
+					);
+					if (existingAliasAuthor) {
+						const existingAuthorData = await sb.User.get(existingAliasAuthor);
+						return {
+							success: false,
+							reply: sb.Utils.tag.trim `
+								The alias name "${aliasName}" (by ${existingAuthorData.Name}) is already published in this channel!
+								If you want to publish the version made by ${userData.Name}, you must unpublish the other one first.
+							`
+						};
+					}
+
 					const row = await sb.Query.getRow("data", "Custom_Command_Alias");
 					row.setValues({
 						Name: aliasName,
