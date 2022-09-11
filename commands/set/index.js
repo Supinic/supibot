@@ -310,7 +310,10 @@ module.exports = {
 							await row.load(ID);
 						}
 						catch {
-							return { reply: "ID does not exist!" };
+							return {
+								success: false,
+								reply: "ID does not exist!"
+							};
 						}
 
 						if (row.values.User_Alias !== context.user.ID) {
