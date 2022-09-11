@@ -353,6 +353,13 @@ module.exports = {
 				);
 
 				if (type === "publish") {
+					if (!userName) {
+						return {
+							success: false,
+							reply: `No username provided!`
+						};
+					}
+					
 					const userData = await sb.User.get(userName);
 					if (!userData) {
 						return {
