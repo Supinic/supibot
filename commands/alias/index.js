@@ -335,24 +335,33 @@ module.exports = {
 					};
 				}
 
-				const [user, aliasName] = args;
-				if (!user || !aliasName) {
+				const [aliasName, userName] = args;
+				if (!aliasName) {
 					return {
 						success: false,
-						reply: `No user or alias provided! Use syntax: $alias ${type} (user) (alias name)`
+						reply: `No alias name provided!`
 					};
 				}
 
-				const userData = await sb.User.get(user);
-				if (!userData) {
-					return {
-						success: false,
-						reply: `Provided user does not exist!`
-					};
-				}
+				const existing = await sb.Query.getRecordset(rs => rs
+					.select("ID", "Parent")
+					.from("data", "Custom_Command_Alias")
+					.where("User_Alias IS NULL")
+					.where("Channel = %n", context.channel.ID)
+					.where("Name COLLATE utf8mb4_bin = %s", aliasName)
+					.single()
+				);
 
-				const [aliasID, existing] = await Promise.all([
-					sb.Query.getRecordset(rs => rs
+				if (type === "publish") {
+					const userData = await sb.User.get(userName);
+					if (!userData) {
+						return {
+							success: false,
+							reply: `Provided user does not exist!`
+						};
+					}
+
+					const aliasID = await sb.Query.getRecordset(rs => rs
 						.select("ID")
 						.from("data", "Custom_Command_Alias")
 						.where("User_Alias = %n", userData.ID)
@@ -360,18 +369,8 @@ module.exports = {
 						.single()
 						.limit(1)
 						.flat("ID")
-					),
-					sb.Query.getRecordset(rs => rs
-						.select("ID", "Parent")
-						.from("data", "Custom_Command_Alias")
-						.where("User_Alias IS NULL")
-						.where("Channel = %n", context.channel.ID)
-						.where("Name COLLATE utf8mb4_bin = %s", aliasName)
-						.single()
-					)
-				]);
+					);
 
-				if (type === "publish") {
 					if (!aliasID) {
 						return {
 							success: false,
@@ -1210,8 +1209,8 @@ module.exports = {
 		"If your or someone else's alias has a description, this command will print it to chat.",
 		"",
 
-		`<code>${prefix}alias publish (username) alias</code>`,
-		`<code>${prefix}alias unpublish (username) (alias)</code>`,
+		`<code>${prefix}alias publish (alias) (username)</code>`,
+		`<code>${prefix}alias unpublish (alias) (username)</code>`,
 		"Channel owners and ambassadors are able to \"publish\" an existing alias in the channel they're authorized in.",
 		"An alias being published means that anyone in that channel will be able to use it as if they had made it.",
 		"Naturally, if a user has their own alias with the same name, that one will be used first.",
