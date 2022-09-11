@@ -80,9 +80,12 @@ module.exports = {
 		}
 
 		let filteredData = data;
-		if (syntax || context.params.syntax) {
-			const inputSyntax = context.params.syntax ?? syntax;
-			filteredData = data.filter(i => i.syntax.toLowerCase() === inputSyntax.toLowerCase());
+		if (context.params.syntax) {
+			const syntaxList = context.params.syntax.split(/\W+/).filter(Boolean);
+			filteredData = data.filter(i => syntaxList.includes(i.syntax.toLowerCase()));
+		}
+		else if (syntax) {
+			filteredData = data.filter(i => i.syntax.toLowerCase() === syntax.toLowerCase());
 		}
 
 		const paste = sb.Utils.randArray(filteredData);
@@ -146,7 +149,10 @@ module.exports = {
 			"",
 
 			`<code>${prefix}rpb (language)</code>`,
-			`<code>${prefix}rpb syntax:(language)</code>`,
+			`<code>${prefix}rpb syntax:(languages)</code>`,
+			`<code>${prefix}rpb javascript</code>`,
+			`<code>${prefix}rpb syntax:javascript</code>`,
+			`<code>${prefix}rpb syntax:"c cpp csharp"</code>`,
 			"Posts a summary of a paste, only using your provided programming language.",
 			"",
 
