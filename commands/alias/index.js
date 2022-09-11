@@ -353,14 +353,10 @@ module.exports = {
 				);
 
 				if (type === "publish") {
-					if (!userName) {
-						return {
-							success: false,
-							reply: `No username provided!`
-						};
-					}
-					
-					const userData = await sb.User.get(userName);
+					const userData = (userName)
+						? await sb.User.get(userName)
+						: context.user;
+
 					if (!userData) {
 						return {
 							success: false,
@@ -1217,7 +1213,7 @@ module.exports = {
 		"",
 
 		`<code>${prefix}alias publish (alias) (username)</code>`,
-		`<code>${prefix}alias unpublish (alias) (username)</code>`,
+		`<code>${prefix}alias unpublish (alias)</code>`,
 		"Channel owners and ambassadors are able to \"publish\" an existing alias in the channel they're authorized in.",
 		"An alias being published means that anyone in that channel will be able to use it as if they had made it.",
 		"Naturally, if a user has their own alias with the same name, that one will be used first.",
