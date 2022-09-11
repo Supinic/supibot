@@ -356,7 +356,7 @@ module.exports = {
 						.select("ID")
 						.from("data", "Custom_Command_Alias")
 						.where("User_Alias = %n", userData.ID)
-						.where("Name = %s", aliasName)
+						.where("Name COLLATE utf8mb4_bin = %s", aliasName)
 						.single()
 						.limit(1)
 						.flat("ID")
@@ -366,7 +366,7 @@ module.exports = {
 						.from("data", "Custom_Command_Alias")
 						.where("User_Alias IS NULL")
 						.where("Channel = %n", context.channel.ID)
-						.where("Name = %s", aliasName)
+						.where("Name COLLATE utf8mb4_bin = %s", aliasName)
 						.single()
 					)
 				]);
