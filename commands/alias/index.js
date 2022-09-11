@@ -1098,7 +1098,7 @@ module.exports = {
 					...result,
 					cooldown: (context.append.pipe) ? null : this.Cooldown,
 					hasExternalInput: Boolean(result?.hasExternalInput ?? commandData.Flags.externalInput),
-					isChannelAlias: (alias.Channel !== null)
+					isChannelAlias: Boolean(alias.Channel)
 				};
 			}
 		}
