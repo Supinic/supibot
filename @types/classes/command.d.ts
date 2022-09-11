@@ -53,6 +53,7 @@ export declare type Result = {
     };
     partialExecute?: boolean;
     hasExternalInput?: boolean;
+    isChannelAlias?: boolean;
     skipExternalPrefix?: boolean;
     forceExternalPrefix?: boolean;
     replyWithPrivateMessage?: boolean;
@@ -68,6 +69,7 @@ export declare type Result = {
      * @property {Object} [meta] Any other information passed back from the command execution
      * @property {boolean} [partialExecute] Determines if a command is used as a part of a different meta-command
      * @property {boolean} [hasExternalInput] Determines if a command can have arbitrary input - used for the "external prefix" symbol
+     * @property {boolean} [isChannelAlias] Determines whether the executed alias is a channel-published one
      * @property {boolean} [skipExternalPrefix] If `hasExternalInput` is true, this flag can override it and remove the symbol
      * @property {boolean} [forceExternalPrefix] If true, the external prefix will be added even if the command's success flag is `false`
      * @property {boolean} [replyWithPrivateMessage] If true, the command reply should be sent via PMs

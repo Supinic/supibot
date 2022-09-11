@@ -1001,9 +1001,13 @@ class Command extends require("./template.js") {
 
 		// If the `hasPrefix` condition is met (we want the external prefix to be added), we check two more conditions:
 		// a) Either the command succeeded and the prefix isn't skipped, or
-		// b) The prefix is forced no matter the command's success status
+		// b) The prefix is forced no matter the command's success status.
+		// The "channel alias" prefix takes precedence before teh "external input" one.
 		const hasPrefix = Boolean(!options.partialExecute && execution.hasExternalInput);
-		if (hasPrefix && ((execution.success !== false && !execution.skipExternalPrefix) || execution.forceExternalPrefix)) {
+		if (execution.isChannelAlias) {
+			execution.reply = `#⃣  ${execution.reply}`;
+		}
+		else if (hasPrefix && ((execution.success !== false && !execution.skipExternalPrefix) || execution.forceExternalPrefix)) {
 			execution.reply = `👥 ${execution.reply}`;
 		}
 
@@ -1420,6 +1424,7 @@ module.exports = Command;
  * @property {Object} [meta] Any other information passed back from the command execution
  * @property {boolean} [partialExecute] Determines if a command is used as a part of a different meta-command
  * @property {boolean} [hasExternalInput] Determines if a command can have arbitrary input - used for the "external prefix" symbol
+ * @property {boolean} [isChannelAlias] Determines whether the executed alias is a channel-published one
  * @property {boolean} [skipExternalPrefix] If `hasExternalInput` is true, this flag can override it and remove the symbol
  * @property {boolean} [forceExternalPrefix] If true, the external prefix will be added even if the command's success flag is `false`
  * @property {boolean} [replyWithPrivateMessage] If true, the command reply should be sent via PMs
