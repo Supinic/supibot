@@ -351,7 +351,7 @@ module.exports = {
 					};
 				}
 
-				const [aliasID, existingID] = await Promise.all([
+				const [aliasID, existing] = await Promise.all([
 					sb.Query.getRecordset(rs => rs
 						.select("ID")
 						.from("data", "Custom_Command_Alias")
@@ -362,14 +362,12 @@ module.exports = {
 						.flat("ID")
 					),
 					sb.Query.getRecordset(rs => rs
-						.select("ID")
+						.select("ID", "Parent")
 						.from("data", "Custom_Command_Alias")
 						.where("User_Alias IS NULL")
 						.where("Channel = %n", context.channel.ID)
 						.where("Name = %s", aliasName)
 						.single()
-						.limit(1)
-						.flat("ID")
 					)
 				]);
 
@@ -380,28 +378,15 @@ module.exports = {
 							reply: `That user does not have an alias with that name!`
 						};
 					}
-					else if (existingID) {
-						return {
-							success: false,
-							reply: `That alias has already been published in this channel!`
-						};
-					}
+					else if (existing) {
+						const sourceAlias = await sb.Query.getRow("data", "Custom_Command_Alias");
+						await sourceAlias.load(existing.Parent);
 
-					const existingAliasAuthor = await sb.Query.getRecordset(rs => rs
-						.select("User_Alias")
-						.from("data", "Custom_Command_Alias")
-						.where("Name = %s", aliasName)
-						.where("Channel = %n", context.channel.ID)
-						.single()
-						.limit(1)
-						.flat("User_Alias")
-					);
-					if (existingAliasAuthor) {
-						const existingAuthorData = await sb.User.get(existingAliasAuthor);
+						const sourceAuthorData = await sb.User.get(sourceAlias.values.User_Alias);
 						return {
 							success: false,
 							reply: sb.Utils.tag.trim `
-								The alias name "${aliasName}" (by ${existingAuthorData.Name}) is already published in this channel!
+								The alias name "${aliasName}" (by ${sourceAuthorData.Name}) is already published in this channel!
 								If you want to publish the version made by ${userData.Name}, you must unpublish the other one first.
 							`
 						};
@@ -420,7 +405,7 @@ module.exports = {
 					};
 				}
 				else {
-					if (!existingID) {
+					if (!existing) {
 						return {
 							success: false,
 							reply: `That alias has not been published in this channel!`
@@ -428,7 +413,7 @@ module.exports = {
 					}
 
 					const row = await sb.Query.getRow("data", "Custom_Command_Alias");
-					await row.load(existingID);
+					await row.load(existing);
 					await row.delete();
 
 					return {
