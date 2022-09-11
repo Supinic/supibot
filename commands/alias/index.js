@@ -391,7 +391,7 @@ module.exports = {
 					row.setValues({
 						Name: aliasName,
 						Channel: context.channel.ID,
-						Link: aliasID
+						Parent: aliasID
 					});
 
 					await row.save({ skipLoad: true });
