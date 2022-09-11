@@ -328,7 +328,7 @@ module.exports = {
 				}
 
 				const permissions = await context.getUserPermissions();
-				if (permissions.is("regular")) {
+				if (permissions.flag === sb.User.permissions.regular) {
 					return {
 						success: false,
 						reply: `Only the owner and ambassadors of this channel can use this subcommand!`
