@@ -11,6 +11,9 @@ module.exports = {
 
 		this.data.repeats ??= [];
 		this.data.repeatsAmount ??= 100;
+		this.data.bannedLinks ??= [
+			"BaMcFghlVEU" // Gachillmuchi
+		];
 
 		// early return - avoid errors during modules loading
 		if (!sb.Channel || !sb.Platform || !sb.VideoLANConnector) {
@@ -116,6 +119,9 @@ module.exports = {
 		// Clear and abort this invocation
 		if (!videoID) {
 			this.data.repeats = [];
+			return;
+		}
+		else if (this.data.bannedLinks.includes(videoID)) {
 			return;
 		}
 
