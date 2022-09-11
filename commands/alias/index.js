@@ -413,7 +413,7 @@ module.exports = {
 					}
 
 					const row = await sb.Query.getRow("data", "Custom_Command_Alias");
-					await row.load(existing);
+					await row.load(existing.ID);
 					await row.delete();
 
 					return {
@@ -978,11 +978,15 @@ module.exports = {
 				);
 
 				let alias;
+				let replyPrefix = "";
 				if (eligibleAliases.length <= 1) {
 					alias = eligibleAliases[0];
 				}
 				else {
 					alias = eligibleAliases.find(i => i.User_Alias === user.ID) ?? eligibleAliases.find(i => i.Channel === context.channel?.ID);
+					if (alias.Channel) {
+						replyPrefix = "#⃣ ";
+					}
 				}
 
 				if (!alias) {
