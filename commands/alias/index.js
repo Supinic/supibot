@@ -318,6 +318,105 @@ module.exports = {
 				}
 			}
 
+			case "publish":
+			case "unpublish": {
+				if (!context.channel) {
+					return {
+						success: false,
+						reply: `This subcommand can only be used in the channel you want the alias to be global in!`
+					};
+				}
+
+				const permissions = await context.getUserPermissions();
+				if (permissions.is(sb.User.permission.regular)) {
+					return {
+						success: false,
+						reply: `Only the owner and ambassadors of this channel can use this subcommand!`
+					};
+				}
+
+				const [user, aliasName] = args;
+				if (!user || !aliasName) {
+					return {
+						success: false,
+						reply: `No user or alias provided! Use syntax: $alias ${type} (user) (alias name)`
+					};
+				}
+
+				const userData = await sb.User.get(user);
+				if (!userData) {
+					return {
+						success: false,
+						reply: `Provided user does not exist!`
+					};
+				}
+
+				const [aliasID, existingID] = await Promise.all([
+					sb.Query.getRecordset(rs => rs
+						.select("ID")
+						.from("data", "Custom_Command_Alias")
+						.where("User_Alias = %n", userData.ID)
+						.where("Name = %s", aliasName)
+						.single()
+						.limit(1)
+						.flat("ID")
+					),
+					sb.Query.getRecordset(rs => rs
+						.select("ID")
+						.from("data", "Custom_Command_Alias")
+						.where("User_Alias IS NULL")
+						.where("Channel = %n", context.channel.ID)
+						.where("Name = %s", aliasName)
+						.single()
+						.limit(1)
+						.flat("ID")
+					)
+				]);
+
+				if (type === "publish") {
+					if (!aliasID) {
+						return {
+							success: false,
+							reply: `That user does not have an alias with that name!`
+						};
+					}
+					else if (existingID) {
+						return {
+							success: false,
+							reply: `That alias has already been published in this channel!`
+						};
+					}
+
+					const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+					row.setValues({
+						Name: aliasName,
+						Channel: context.channel.ID,
+						Link: aliasID
+					});
+
+					await row.save({ skipLoad: true });
+					return {
+						reply: `Succesfully published alias ${aliasName} in this channel. Users in this channel can now use it directly.`
+					};
+				}
+				else {
+					if (!existingID) {
+						return {
+							success: false,
+							reply: `That alias has not been published in this channel!`
+						};
+					}
+
+					const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+					await row.load(existingID);
+					await row.delete();
+
+					return {
+						reply: `Succesfully unpublished alias ${aliasName} in this channel. Users in this channel won't be able to use it directly.`
+					};
+				}
+			}
+
 			case "copy":
 			case "copyplace": {
 				const [targetUserName, targetAliasName] = args;
@@ -1100,6 +1199,13 @@ module.exports = {
 		`<code>${prefix}alias inspect (alias)</code>`,
 		`<code>${prefix}alias inspect (username) (alias)</code>`,
 		"If your or someone else's alias has a description, this command will print it to chat.",
+		"",
+
+		`<code>${prefix}alias publish (username) alias</code>`,
+		`<code>${prefix}alias unpublish (username) (alias)</code>`,
+		"Channel owners and ambassadors are able to \"publish\" an existing alias in the channel they're authorized in.",
+		"An alias being published means that anyone in that channel will be able to use it as if they had made it.",
+		"Naturally, if a user has their own alias with the same name, that one will be used first.",
 		"",
 
 		"<h5>Replacements</h5>",
