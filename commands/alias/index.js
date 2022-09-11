@@ -364,6 +364,13 @@ module.exports = {
 						};
 					}
 
+					if (!this.staticData.nameCheck.regex.test(aliasName)) {
+						return {
+							success: false,
+							reply: `Published alias name is not valid! ${this.staticData.nameCheck.response}`
+						};
+					}
+
 					const aliasID = await sb.Query.getRecordset(rs => rs
 						.select("ID")
 						.from("data", "Custom_Command_Alias")
