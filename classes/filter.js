@@ -399,7 +399,7 @@ module.exports = class Filter extends require("./template.js") {
 					success: false,
 					reason: "whitelist",
 					filter: { Reason: "Reply" },
-					reply: command.Whitelist_Response ?? "You can't use this command as it whitelisted!"
+					reply: command.Whitelist_Response ?? "You can't use this command as it is whitelisted!"
 				};
 			}
 		}
