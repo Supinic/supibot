@@ -980,15 +980,11 @@ module.exports = {
 				);
 
 				let alias;
-				let replyPrefix = "";
 				if (eligibleAliases.length <= 1) {
 					alias = eligibleAliases[0];
 				}
 				else {
 					alias = eligibleAliases.find(i => i.User_Alias === user.ID) ?? eligibleAliases.find(i => i.Channel === context.channel?.ID);
-					if (alias.Channel) {
-						replyPrefix = "#⃣ ";
-					}
 				}
 
 				if (!alias) {
@@ -1101,7 +1097,8 @@ module.exports = {
 				return {
 					...result,
 					cooldown: (context.append.pipe) ? null : this.Cooldown,
-					hasExternalInput: Boolean(result?.hasExternalInput ?? commandData.Flags.externalInput)
+					hasExternalInput: Boolean(result?.hasExternalInput ?? commandData.Flags.externalInput),
+					isChannelAlias: (alias.Channel !== null)
 				};
 			}
 		}
