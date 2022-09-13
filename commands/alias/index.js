@@ -431,6 +431,19 @@ module.exports = {
 				}
 			}
 
+			case "published": {
+				if (!context.channel) {
+					return {
+						success: false,
+						reply: `There are no channel-published aliases in private messages!`
+					};
+				}
+
+				return {
+					reply: `List of published aliases in this channel: https://supinic.com/bot/channel/detail/${context.channel.ID}/alias/list`
+				};
+			}
+
 			case "copy":
 			case "copyplace": {
 				const [targetUserName, targetAliasName] = args;
@@ -1221,6 +1234,10 @@ module.exports = {
 		"Channel owners and ambassadors are able to \"publish\" an existing alias in the channel they're authorized in.",
 		"An alias being published means that anyone in that channel will be able to use it as if they had made it.",
 		"Naturally, if a user has their own alias with the same name, that one will be used first.",
+		"",
+
+		`<code>${prefix}alias published</code>`,
+		"Lists the currently published channel aliases in the current channel",
 		"",
 
 		"<h5>Replacements</h5>",
