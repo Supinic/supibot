@@ -148,7 +148,7 @@ const types = [
 	{
 		name: "owoify",
 		type: "method",
-		aliases: ["owo"],
+		aliases: ["owo", "uwu", "uwuify"],
 		data: (message) => message.replace(/[rl]/g, "w")
 			.replace(/[RL]/g, "W")
 			.replace(/n([aeiou])/g, "ny$1")
