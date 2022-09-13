@@ -101,6 +101,12 @@ const execute = async (context, query) => {
 			reply: `The monthly limit for DeepL has been exhausted! Try again next month.`
 		};
 	}
+	else if (response.statusCode !== 200) {
+		return {
+			success: false,
+			reply: `The DeepL translation API failed with status code ${response.statusCode}! Try again later.`
+		};
+	}
 
 	const [data] = response.body.translations;
 	const fromLanguageName = sb.Utils.capitalize(languageISO.getName(data.detected_source_language));
