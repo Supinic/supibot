@@ -12,7 +12,8 @@ module.exports = {
 		this.data.repeats ??= [];
 		this.data.repeatsAmount ??= 100;
 		this.data.bannedLinks ??= [
-			"BaMcFghlVEU" // Gachillmuchi
+			"BaMcFghlVEU", // Gachillmuchi
+			"QO0CRvQ0WRA" // Gachillmuchi reupload by DJ Gachi
 		];
 
 		// early return - avoid errors during modules loading
