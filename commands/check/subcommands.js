@@ -73,6 +73,7 @@ module.exports = (command) => [
 				};
 			}
 
+			/** @type {number[]} */
 			const rawAmbassadors = await channelData.getDataProperty("ambassadors");
 			if (!rawAmbassadors || rawAmbassadors.length === 0) {
 				const prefix = (context.channel === channelData) ? "This" : "Target";
@@ -330,6 +331,7 @@ module.exports = (command) => [
 				};
 			}
 
+			/** @type {Object[]} */
 			const votes = await sb.Query.getRecordset(rs => rs
 				.select("Vote")
 				.from("chat_data", "Poll_Vote")
@@ -373,10 +375,10 @@ module.exports = (command) => [
 			if (!ID || !sb.Utils.isValidInteger(ID)) {
 				return {
 					reply: sb.Utils.tag.trim `
-								Check all of your reminders here (requires login):
-							 	Active - https://supinic.com/bot/reminder/list
-							 	History - https://supinic.com/bot/reminder/history
-							`
+						Check all of your reminders here (requires login):
+						Active - https://supinic.com/bot/reminder/list
+						History - https://supinic.com/bot/reminder/history
+					`
 				};
 			}
 
@@ -411,8 +413,10 @@ module.exports = (command) => [
 				? ["Your reminder", `to ${reminderUser.Name}`]
 				: ["Reminder", `by ${reminderUser.Name} to you`];
 
+			/** @type {CustomDate|null} */
+			const schedule = reminder.Schedule;
 			const delta = (reminder.Schedule)
-				? ` (${sb.Utils.timeDelta(reminder.Schedule)})`
+				? ` (${sb.Utils.timeDelta(schedule)})`
 				: "";
 
 			return {
@@ -631,6 +635,8 @@ module.exports = (command) => [
 				const definitions = require("../twitchlotto/definitions.js");
 				const key = definitions.createRecentUseCacheKey(context);
 
+				// Seems like a mismatched documentation - tl.getCacheData can allow objects too
+				// noinspection JSCheckFunctionSignatures
 				const cacheData = await tl.getCacheData(key);
 				if (!cacheData) {
 					return {
