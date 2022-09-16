@@ -36,8 +36,9 @@ module.exports = {
 			joke = response.body.joke;
 		}
 
+		const emote = await context.getBestAvailableEmote([context.invocation], "😅");
 		return {
-			reply: `${joke} ${context.invocation}`
+			reply: `${joke} ${emote}`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
