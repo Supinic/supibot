@@ -113,7 +113,7 @@ module.exports = {
 				const response = await sb.Utils.fetchTimeData({
 					date,
 					coordinates: location.coordinates,
-					key: sb.Config.get("API_GOOGLE_TIMEZONE")
+					key: String(sb.Config.get("API_GOOGLE_TIMEZONE"))
 				});
 
 				const timeData = response.body;
@@ -254,7 +254,7 @@ module.exports = {
 		}
 
 		const message = (reminderText)
-			? sb.Utils.wrapString(reminderText, this.staticData.limit)
+			? sb.Utils.wrapString(reminderText, Number(this.staticData.limit))
 			: "(no message)";
 
 		const result = await sb.Reminder.create({
@@ -264,7 +264,6 @@ module.exports = {
 			User_To: targetUser.ID,
 			Text: message,
 			Schedule: targetReminderDate ?? null,
-			Created: new sb.Date(),
 			Private_Message: isPrivate,
 			Type: "Reminder"
 		});
