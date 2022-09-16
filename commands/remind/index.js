@@ -229,7 +229,12 @@ module.exports = {
 		else if (targetUser === context.user) {
 			return {
 				success: false,
-				reply: `To remind yourself, you must use the word "in"! Such as "in 5 minutes"`,
+				reply: sb.Utils.tag.trim `
+					To remind yourself, you must use the word "in"!
+					Such as → in 5 minutes.
+				    Alternatively, you can use the "on" or "at" parameter.
+				    Such as → on:Sunday or at:"5:30 pm".
+				`,
 				cooldown: 2500
 			};
 		}
