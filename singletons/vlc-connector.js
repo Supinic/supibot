@@ -219,19 +219,15 @@ module.exports = class VLCSingleton extends require("./template.js") {
 	 * @returns {Promise<Object>}
 	 */
 	async send (command, options = {}, parent) {
-		const params = new sb.URLParams();
-		for (const key of Object.keys(options)) {
-			params.set(key, options[key]);
-		}
-
+		const searchParams = { ...options };
 		if (command) {
-			params.set("command", command);
+			searchParams.command = command;
 		}
 
 		return await sb.Got({
 			prefixUrl: this.baseURL,
 			url: parent ?? "",
-			searchParams: params.toString(),
+			searchParams,
 			timeout: 1000
 		}).json();
 	}

@@ -78,11 +78,11 @@ module.exports = class PastebinSingleton extends require("./template.js") {
 			method: "POST",
 			url: "api/api_login.php",
 			timeout: 5000,
-			body: new sb.URLParams()
-				.set("api_dev_key", sb.Config.get("API_PASTEBIN"))
-				.set("api_user_name", sb.Config.get("PASTEBIN_USER_NAME"))
-				.set("api_user_password", sb.Config.get("PASTEBIN_PASSWORD"))
-				.toString()
+			body: new URLSearchParams({
+				api_dev_key: sb.Config.get("API_PASTEBIN"),
+				api_user_name: sb.Config.get("PASTEBIN_USER_NAME"),
+				api_user_password: sb.Config.get("PASTEBIN_PASSWORD"),
+			}).toString()
 		});
 
 		this.#authenticationPending = false;
@@ -139,20 +139,22 @@ module.exports = class PastebinSingleton extends require("./template.js") {
 			await this.login();
 		}
 
-		const params = new sb.URLParams()
-			.set("api_dev_key", sb.Config.get("API_PASTEBIN"))
-			.set("api_option", "paste")
-			.set("api_paste_code", text)
-			.set("api_paste_name", options.name || "untitled supibot paste")
-			.set("api_paste_private", (options.privacy) ? PastebinSingleton.getPrivacy(options.privacy) : "1")
-			.set("api_paste_expire_date", (options.expiration) ? PastebinSingleton.getExpiration(options.expiration) : "10M");
+		const params = new URLSearchParams({
+			api_dev_key: sb.Config.get("API_PASTEBIN"),
+			api_option: "paste",
+			api_paste_code: text,
+			api_paste_name: options.name || "untitled Supibot paste",
+			api_paste_private: (options.privacy) ? PastebinSingleton.getPrivacy(options.privacy) : "1",
+			api_paste_expire_date: (options.expiration)
+				? PastebinSingleton.getExpiration(options.expiration)
+				: "10M"
+		});
 
 		if (this.#authData) {
-			params.set("api_user_key", this.#authData);
+			params.append("api_user_key", this.#authData);
 		}
-
 		if (options.format) {
-			params.set("api_paste_format", options.format);
+			params.append("api_paste_format", options.format);
 		}
 
 		const { statusCode, body } = await this.#got({
