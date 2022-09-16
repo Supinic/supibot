@@ -214,6 +214,28 @@ module.exports = (command) => [
 		}
 	},
 	{
+		name: "deepl",
+		aliases: ["DeepL"],
+		description: "Checks the current usage limits of the DeepL translation engine in $translate.",
+		execute: async () => {
+			const response = await sb.Got("GenericAPI", {
+				url: "https://api-free.deepl.com/v2/usage",
+				headers: {
+					Authorization: `DeepL-Auth-Key ${sb.Config.get("API_DEEPL_KEY")}`
+				}
+			});
+
+			const data = response.body;
+			const current = sb.Utils.groupDigits(data.character_count);
+			const max = sb.Utils.groupDigits(data.character_limit);
+			const percentage = sb.Utils.round((data.character_count / data.character_limit) * 100, 2);
+
+			return {
+				reply: `Current usage of DeepL engine API: ${current} characters used out of ${max}, which is ${percentage}%`
+			};
+		}
+	},
+	{
 		name: "error",
 		aliases: [],
 		description: "If you have been granted access, you can check the full text of an error within Supibot, based on its ID.",
