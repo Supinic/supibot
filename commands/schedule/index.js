@@ -24,7 +24,8 @@ module.exports = {
 			};
 		}
 
-		const channelID = await sb.Utils.getTwitchID(channelName);
+		const { controller } = sb.Platform.get("twitch");
+		const channelID = await controller.getUserID(channelName);
 		if (!channelID) {
 			return {
 				success: false,

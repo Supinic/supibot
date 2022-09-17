@@ -140,7 +140,8 @@ module.exports = {
 
 		let clips = response.body.data;
 		if (context.params.author) {
-			const userID = await sb.Utils.getTwitchID(context.params.author);
+			const { controller } = sb.Platform.get("twitch");
+			const userID = await controller.getUserID(context.params.author);
 			if (!userID) {
 				return {
 					success: false,
