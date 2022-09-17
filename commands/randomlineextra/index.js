@@ -13,7 +13,6 @@ module.exports = {
 			athenelive: "🇫🇷🤖",
 			drdisrespect: "💿",
 			drdisrespectlive: "💿",
-			ninja: "👤",
 			stpeach: "🍑",
 			alinity: "🍝👩💰",
 			p4wnyhof: "🇩🇪🤖"
