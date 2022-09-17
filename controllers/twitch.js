@@ -1034,7 +1034,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	async getUserID (user) {
-		let userData = await sb.User.get(user, true);
+		const userData = await sb.User.get(user, true);
 		if (userData?.Twitch_ID) {
 			return userData.Twitch_ID;
 		}
@@ -1042,18 +1042,15 @@ module.exports = class TwitchController extends require("./template.js") {
 		const channelInfo = await sb.Got("Helix", {
 			url: "users",
 			throwHttpErrors: false,
-			searchParams: new sb.URLParams()
-				.set("login", user)
-				.toString()
+			searchParams: {
+				login: user
+			}
 		}).json();
 
 		if (!channelInfo.error && channelInfo.data.length !== 0) {
 			const { id, display_name: name } = channelInfo.data[0];
 			if (!userData) {
-				userData = await sb.User.get(name, false);
-			}
-			if (userData) {
-				await userData.saveProperty("Twitch_ID", id);
+				await sb.User.get(name, false, { Twitch_ID: id });
 			}
 
 			return id;
