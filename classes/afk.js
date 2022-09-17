@@ -1,51 +1,15 @@
-/**
- * Represents a user's AFK status
- */
 module.exports = class AwayFromKeyboard extends require("./template.js") {
-	/**
-	 * @type {Map<number, AwayFromKeyboard>}
-	 */
 	static data = new Map();
 	static defaultStatus = "afk";
 
 	constructor (data) {
 		super();
 
-		/**
-		 * Unique AFK status identifier
-		 * @type {number}
-		 */
 		this.ID = data.ID;
-
-		/**
-		 * Unique numeric user identifier
-		 * @type {User.ID}
-		 */
 		this.User_Alias = data.User_Alias;
-
-		/**
-		 * The timestamp of AFK status setup
-		 * @type {sb.Date}
-		 */
 		this.Started = data.Started;
-
-		/**
-		 * AFK status description
-		 * @type {string}
-		 */
 		this.Text = data.Text;
-
-		/**
-		 * If true, the AFK status will not be broadcasted when the user comes back from AFK
-		 * @type {boolean}
-		 */
 		this.Silent = data.Silent;
-
-		/**
-		 * Determines the sort of "action" the user was doing while being AFK.
-		 * E.g. "no longer AFK", "no longer taking a shower", ...
-		 * @type {string}
-		 */
 		this.Status = data.Status ?? AwayFromKeyboard.defaultStatus;
 	}
 
@@ -73,11 +37,6 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		}
 	}
 
-	/**
-	 * @override
-	 * @param {number[]} list
-	 * @returns {Promise<boolean>}
-	 */
 	static async reloadSpecific (...list) {
 		if (list.length === 0) {
 			return false;
@@ -106,14 +65,6 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		return true;
 	}
 
-	/**
-	 * Checks if a user is AFK.
-	 * If they are, returns their AFK data and unsets the AFK status.
-	 * If the status is set as not silent, also emits an event to Master to send a message
-	 * @param {User} userData
-	 * @param {sb.Channel} channelData
-	 * @returns {Promise<void>}
-	 */
 	static async checkActive (userData, channelData) {
 		if (!AwayFromKeyboard.data.has(userData.ID)) {
 			return;
@@ -183,18 +134,6 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		}
 	}
 
-	/**
-	 * Sets (and creates a database row) a user's AFK status.
-	 * @param {User} userData
-	 * @param {Object} [data]
-	 * @param {string} [data.Text]
-	 * @param {sb.Date} [data.Started]
-	 * @param {string} [data.Status]
-	 * @param {boolean} [data.Silent] If true, user coming back will not be broadcast.
-	 * @param {boolean} [data.Interrupted_ID] If true, user coming back will not be broadcast.
-	 * @param {boolean} [data.extended] If true, the AFK status is extending a previous one.
-	 * @returns {Promise<AwayFromKeyboard>}
-	 */
 	static async set (userData, data = {}) {
 		const now = new sb.Date();
 		const afkData = {
