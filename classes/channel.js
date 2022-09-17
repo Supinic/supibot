@@ -151,7 +151,7 @@ module.exports = class Channel extends require("./template.js") {
 				return false;
 			}
 
-			const limit = this.Message_Limit ?? this.Platform.Message_Limit;
+			const limit = this.Platform.Message_Limit;
 			const prefix = (this.Platform.Name === "twitch")
 				? ""
 				: `${this.Platform.getFullName("_")}_`;
