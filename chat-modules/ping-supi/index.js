@@ -20,7 +20,10 @@ module.exports = {
 				const platformData = channel.Platform;
 				if (platformData.Name === "discord") {
 					const discordChannel = await platformData.client.channels.fetch(channel.Name);
-					enforceStrictRegex = !discordChannel.members.cache.has("168719563741986816"); // @supinic discord ID
+					const membersMap = discordChannel.members.cache ?? discordChannel.members;
+					if (membersMap) {
+						enforceStrictRegex = !membersMap.has("168719563741986816"); // @supinic discord ID
+					}
 				}
 
 				if (enforceStrictRegex && !strictRegex.test(message)) {
