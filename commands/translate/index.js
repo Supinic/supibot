@@ -36,7 +36,8 @@ module.exports = {
 		}
 
 		const { execute } = require(`./${engine}.js`);
-		const result = await execute(context, query);
+		const boundExecute = execute.bind(this);
+		const result = await boundExecute(context, query);
 		if (!result.success) {
 			return result;
 		}
