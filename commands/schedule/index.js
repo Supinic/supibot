@@ -47,7 +47,9 @@ module.exports = {
 			};
 		}
 
-		const { segments, vacation } = response.body.data;
+		const { segments: rawSegments, vacation } = response.body.data;
+		const segments = rawSegments.filter(i => !i.canceled_until);
+
 		if (!Array.isArray(segments) || segments.length === 0) {
 			return {
 				success: false,
