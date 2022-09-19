@@ -140,7 +140,6 @@ module.exports = {
 			}
 
 			const filter = await sb.Filter.create({
-				Active: true,
 				Type: "Block",
 				User_Alias: context.user.ID,
 				Blocked_User: filterData.user,
