@@ -28,7 +28,7 @@ const supportedLanguages = [
 	"zh"
 ];
 
-const execute = async (context, query) => {
+const execute = async function (context, query) {
 	const { languageISO } = sb.Utils.modules;
 	const searchParams = {
 		text: query

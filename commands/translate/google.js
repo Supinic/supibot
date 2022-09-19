@@ -1,4 +1,4 @@
-const execute = async (context, query) => {
+const execute = async function (context, query) {
 	const { languageISO } = sb.Utils.modules;
 
 	// default: false if normal execution, true if inside of pipe
