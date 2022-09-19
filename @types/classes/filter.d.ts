@@ -21,6 +21,7 @@ declare type ConstructorData = {
 	Active: boolean;
 	Issued_By: User["ID"] | null;
 };
+declare type CreateData = Partial<Omit<ConstructorData, "ID" | "Data" | "Active" | "Response">>;
 declare type ContextOptions = {
 	skipUserCheck?: boolean;
 	user?: User | null;
@@ -65,7 +66,7 @@ export declare class Filter extends ClassTemplate {
 	static get (identifier: Like): Filter | null;
 	static getLocals (type: Type, options: ContextOptions): Filter[];
 	static execute (options: ContextOptions): Promise<ExecuteResult>;
-	static create (options: ConstructorData): Promise<Filter>;
+	static create (options: CreateData): Promise<Filter>;
 	static getMentionStatus (options: ContextOptions): boolean;
 	static applyUnping (options: UnpingContextOptions): Promise<string>;
 	static getCooldownModifiers (options: ContextOptions): Filter | null;
