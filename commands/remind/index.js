@@ -269,7 +269,7 @@ module.exports = {
 			Platform: context.platform.ID,
 			User_From: context.user.ID,
 			User_To: targetUser.ID,
-			Text: message,
+			Text: message.trim(),
 			Schedule: targetReminderDate ?? null,
 			Private_Message: isPrivate,
 			Type: "Reminder"
