@@ -6,6 +6,7 @@ module.exports = {
 	Description: "Sets a notify for a given user. Can also set a time to ping that user (or yourself) in given amount of time, but in that case you must use the word \"in\" and then a number specifying the amount days, hours, minutes, etc.",
 	Flags: ["block","mention","opt-out","pipe"],
 	Params: [
+		{ name: "after", type: "string" },
 		{ name: "at", type: "string" },
 		{ name: "on", type: "string" },
 		{ name: "private", type: "boolean" }
@@ -24,11 +25,20 @@ module.exports = {
 		sqlDateLimit: new sb.Date(253402297199999) // SQL DATETIME limit - 9999-12-31 23:59:59.999
 	})),
 	Code: (async function remind (context, ...args) {
-		const hasChrono = Boolean(context.params.at ?? context.params.on);
-		if (!hasChrono && args.length === 0) {
+		const chronoParams = Object.keys(context.params).filter(i => i !== "private");
+		if (chronoParams.length >= 2) {
 			return {
 				success: false,
-				reply: `Incorrect syntax! Use "remind (person) (text)"`,
+				reply: `Cannot specify more than one of the parameters "after", "at" and "on" at the same time!`
+			};
+		}
+
+		const chronoType = chronoParams[0] ?? null;
+		const chronoParam = context.params[chronoType];
+		if (!chronoParam && args.length === 0) {
+			return {
+				success: false,
+				reply: `Incorrect syntax! Use "remind (person) (text)" or check the command's help for more info.`,
 				cooldown: 2500
 			};
 		}
@@ -96,9 +106,8 @@ module.exports = {
 		let delta = 0;
 
 		const now = new sb.Date();
-		if (hasChrono) {
-			const chronoDefinition = context.params.at ?? context.params.on;
-			const chronoData = sb.Utils.parseChrono(chronoDefinition, null, { forwardDate: true });
+		if (chronoParam) {
+			const chronoData = sb.Utils.parseChrono(chronoParam, null, { forwardDate: true });
 			if (!chronoData) {
 				return {
 					success: false,
@@ -260,6 +269,7 @@ module.exports = {
 			}
 		}
 
+		const type = (chronoType === "after") ? "Deferred" : "Reminder";
 		const message = (reminderText)
 			? sb.Utils.wrapString(reminderText, Number(this.staticData.limit))
 			: "(no message)";
@@ -272,7 +282,7 @@ module.exports = {
 			Text: message.trim(),
 			Schedule: targetReminderDate ?? null,
 			Private_Message: isPrivate,
-			Type: "Reminder"
+			Type: type
 		});
 
 		if (result.success) {
@@ -333,6 +343,12 @@ module.exports = {
 		"Will use your timezone, if you have it set up via the <code>$set location</code> command.",
 		"If you don't, the command will use Supibot's timezone - CET/CEST (UTC+1/+2)",
 		"There are plenty of words that you can use - like morning, evening, noon, midnight, ... and more",
+		"",
+
+		`<code>${prefix}remind (person) test after:8pm</code>`,
+		`<code>${prefix}remindme check keys after:"tomorrow 10am"</code>`,
+		"Creates a regular reminder that will only fire when you or target user type in chat <b>after</b> the provided time has passed.",
+		"E.g. for the 10am example, any messages sent by yourself up to 10:00:00 will not make the reminder fire, whereas the first one afterwards will.",
 		""
 	])
 };
