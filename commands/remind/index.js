@@ -132,6 +132,13 @@ module.exports = {
 				targetReminderDate = new sb.Date(chronoData.date);
 			}
 
+			// S#12177
+			// If there is no user-provided day value (e.g. "2 am") and that timestamp has already been passed today,
+			// automatically add one day to the resulting date object - we assume it's tomorrow.
+			if (chronoData.component.impliedValues.day && chronoData.date < now) {
+				targetReminderDate.addDays(1);
+			}
+
 			targetReminderDate.milliseconds = now.milliseconds;
 			delta = sb.Utils.round(targetReminderDate - now, -3);
 		}
