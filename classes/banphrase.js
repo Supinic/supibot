@@ -1,7 +1,3 @@
-/**
- * Represents a single output modifier that will change the output of the bot in specified channel/platform.
- * @memberof sb
- */
 module.exports = (function () {
 	"use strict";
 
@@ -29,58 +25,13 @@ module.exports = (function () {
 		}
 	}
 
-	/**
-	 * Represents a chat banphrase, used to filter the bot's responses when invoking commands
-	 * or otherwise posting messages into a channel.
-	 * Note: this does NOT represent a banphrase that the bot then uses to moderate a channel!
-	 */
 	class Banphrase extends require("./template.js") {
-		/**
-		 * Unique numeric ID.
-		 * @type {number|symbol}
-		 */
 		ID;
-
-		/**
-		 * Banphrase code.
-		 * @type {Function}
-		 */
 		Code;
-
-		/**
-		 * Type of banphrase.
-		 * Inactive: Banphrase is not active, will not be loaded or triggered.
-		 * Denial: If the result is not undefined, there will be no reply at all.
-		 * Replacement: Runs the message through String.prototype.replace and returns the result.
-		 * Custom response: If the result is not undefined, the reply will be completely replaced with the result of the function.
-		 * API response: Not technically a banphrase, simply returns custom text based on what a banphrase API returned.
-		 * @type {("Denial","API response","Custom response","Replacement","Inactive")}
-		 */
 		Type;
-
-		/**
-		 * Platform of the banphrase.
-		 * @type {sb.Platform.ID|null}
-		 */
 		Platform = null;
-
-		/**
-		 * Channel of the banphrase.
-		 * If null, then the banphrase applies to the entire {@link sb.Platform}.
-		 * @type {sb.Channel.ID|null}
-		 */
 		Channel = null;
-
-		/**
-		 * Determines if a banphrase is to be executed.
-		 * @type {boolean}
-		 */
 		Active;
-
-		/**
-		 * Wrapper for the instance's custom data.
-		 * @type {Object}
-		 */
 		data = {};
 
 		constructor (data) {
@@ -109,11 +60,6 @@ module.exports = (function () {
 			this.Active = data.Active ?? true;
 		}
 
-		/**
-		 * Executes the banphrase
-		 * @param {string} message
-		 * @returns {string|undefined}
-		 */
 		execute (message) {
 			if (!this.Active) {
 				return inactiveSymbol;
@@ -132,10 +78,6 @@ module.exports = (function () {
 			this.data = null;
 		}
 
-		/**
-		 * Toggles the banphrase's activity flag.
-		 * @returns {Promise<void>}
-		 */
 		async toggle () {
 			this.Active = !this.Active;
 			if (typeof this.ID === "number") {
@@ -164,11 +106,6 @@ module.exports = (function () {
 			Banphrase.data = data.map(record => new Banphrase(record));
 		}
 
-		/**
-		 * @override
-		 * @param {number[]} list
-		 * @returns {Promise<boolean>}
-		 */
 		static async reloadSpecific (...list) {
 			if (list.length === 0) {
 				return false;
@@ -196,12 +133,6 @@ module.exports = (function () {
 			return true;
 		}
 
-		/**
-		 * Fetches a banphrase, based on the identifier provided.
-		 * @param {number|symbol|Banphrase} identifier
-		 * @returns {Banphrase|null}
-		 * @throws {sb.Error} If invalid identifier type was provided
-		 */
 		static get (identifier) {
 			if (identifier instanceof Banphrase) {
 				return identifier;
@@ -221,14 +152,6 @@ module.exports = (function () {
 			}
 		}
 
-		/**
-		 * Checks all banphrases associated with given channel and platform. Global ones are checked as well.
-		 * If a channel is configured to use an external API, that is chcked too.
-		 * @param {string} message
-		 * @param {sb.Channel|null} channelData
-		 * @param {Object} options = {}
-		 * @returns {Promise<BanphraseCheckResult>}
-		 */
 		static async execute (message, channelData, options = {}) {
 			const banphraseList = Banphrase.data.filter(banphrase => (
 				(banphrase.Type !== "API response") && (
@@ -373,16 +296,6 @@ module.exports = (function () {
 			return { string: message, passed: true };
 		}
 
-		/**
-		 * Checks an external banphrase API.
-		 * @param {string} message
-		 * @param {ExternalBanphraseAPIName} type Type of banphrase API - required to build request URL and data parsing
-		 * @param {string} URL Banphrase API URL
-		 * @param {Object} options = {} extra options
-		 * @param {boolean} [options.fullResponse] If true, returns the entire API response. Otherwise, returns
-		 * string (if banphrased) or false.
-		 * @returns {Promise<Object|string|boolean>} False if no banphrase found, string specifying tha banphrase otherwise.
-		 */
 		static async executeExternalAPI (message, type, URL, options = {}) {
 			const reply = await ExternalBanphraseAPI[type.toLowerCase()](message, URL);
 			if (options.fullResponse) {
@@ -398,29 +311,3 @@ module.exports = (function () {
 
 	return Banphrase;
 })();
-
-/**
- * @typedef {"Pajbot"} ExternalBanphraseAPIName
- */
-
-/**
- * @typedef {Object} PajbotBanphraseAPIResponse
- * @property {boolean} banned
- * @property {string} input_message
- * @property {Object} banphrase_data
- * @property {boolean} banphrase_data.case_sensitive
- * @property {number} banphrase_data.id
- * @property {number} banphrase_data.length
- * @property {string} banphrase_data.name
- * @property {string} banphrase_data.operator
- * @property {boolean} banphrase_data.permanent
- * @property {string} banphrase_data.phrase
- * @property {boolean} banphrase_data.remove_accents
- * @property {boolean} banphrase_data.sub_immunity
- */
-
-/**
- * @typedef {Object} BanphraseCheckResult
- * @property {string|null} string Resulting string. Can be null, if it was deemed there should be no reply at all.
- * @property {boolean} passed If true, no banphrases were triggered; otherwise false.
- */
