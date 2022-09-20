@@ -132,13 +132,10 @@ export declare class Banphrase extends ClassTemplate {
 
     // cannot directly assign `inactiveSymbol` here
     // https://github.com/microsoft/TypeScript/issues/37469
-
     execute (message: Message): ReturnType<Banphrase["Code"]> | symbol;
 
     /**
      * Toggles the banphrase's activity flag.
      */
     toggle (): Promise<void>;
-
-
 }
