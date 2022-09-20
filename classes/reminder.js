@@ -103,7 +103,7 @@ module.exports = class Reminder extends require("./template.js") {
 	}
 
 	activateTimeout () {
-		if (!this.Schedule) {
+		if (!this.Schedule || this.Type === "Deferred") {
 			return this;
 		}
 		else if (new sb.Date() > this.Schedule) {
@@ -377,7 +377,13 @@ module.exports = class Reminder extends require("./template.js") {
 			channel: channelData
 		});
 
-		const reminders = list.filter(i => i.Active && !i.Schedule && !excludedUserIDs.includes(i.User_From));
+		const now = sb.Date.now();
+		const reminders = list.filter(i => (
+			i.Active
+			&& (i.Type === "Deferred" && i.Schedule <= now) || (i.Type !== "Deferred" && !i.Schedule)
+			&& !excludedUserIDs.includes(i.User_From)
+		));
+
 		if (reminders.length === 0) {
 			return;
 		}
@@ -602,8 +608,7 @@ module.exports = class Reminder extends require("./template.js") {
 				.select("Private_Message")
 				.from("chat_data", "Reminder")
 				.where("Active = %b", true)
-				.where("Schedule IS NULL")
-				.where("Type = %s", "Reminder")
+				.where("(Type = %s AND Schedule IS NULL) OR (Type = %s AND Schedule IS NOT NULL)", "Reminder", "Deferred")
 				.where("User_To = %n", userTo)
 			),
 			sb.Query.getRecordset(rs => rs
@@ -611,7 +616,7 @@ module.exports = class Reminder extends require("./template.js") {
 				.from("chat_data", "Reminder")
 				.where("Active = %b", true)
 				.where("Schedule IS NULL")
-				.where("Type = %s", "Reminder")
+				.where("(Type = %s AND Schedule IS NULL) OR (Type = %s AND Schedule IS NOT NULL)", "Reminder", "Deferred")
 				.where("User_From = %n", userFrom)
 			)
 		]);
@@ -663,6 +668,7 @@ module.exports = class Reminder extends require("./template.js") {
 					.where("Active = %b", true)
 					.where("Schedule IS NOT NULL")
 					.where("User_To = %n", userTo)
+					.where("Type = %s", "Deferred")
 					.where("DAY(Schedule) = %n", schedule.day)
 					.where("MONTH(Schedule) = %n", schedule.month)
 					.where("YEAR(Schedule) = %n", schedule.year)
@@ -676,6 +682,7 @@ module.exports = class Reminder extends require("./template.js") {
 					.where("Active = %b", true)
 					.where("Schedule IS NOT NULL")
 					.where("User_From = %n", userFrom)
+					.where("Type = %s", "Deferred")
 					.where("DAY(Schedule) = %n", schedule.day)
 					.where("MONTH(Schedule) = %n", schedule.month)
 					.where("YEAR(Schedule) = %n", schedule.year)

@@ -41,7 +41,7 @@ type RemoveOptions = {
 	permanent: boolean;
 	cancelled: boolean;
 };
-type Type = "Reminder" | "Pingme";
+type Type = "Reminder" | "Pingme" | "Deferred";
 
 export declare type Like = number | Reminder;
 
