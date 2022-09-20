@@ -204,10 +204,10 @@ module.exports = {
 		if (targetReminderDate) {
 			if (typeof targetReminderDate === "number") {
 				targetReminderDate = new sb.Date(targetReminderDate);
-				targetReminderDelta = sb.Utils.timeDelta(targetReminderDate);
+				targetReminderDelta = sb.Utils.timeDelta(targetReminderDate, true);
 			}
 			else {
-				targetReminderDelta = sb.Utils.timeDelta(targetReminderDate);
+				targetReminderDelta = sb.Utils.timeDelta(targetReminderDate, true);
 			}
 
 			const comparison = new sb.Date(now.valueOf() + delta);
@@ -293,10 +293,11 @@ module.exports = {
 
 			const who = (targetUser.ID === context.user.ID) ? "you" : targetUser.Name;
 			const method = (isPrivate) ? "privately " : "";
+			const preposition = (type === "Deferred") ? "after" : "in";
 
 			return {
 				cooldown: (context.privateMessage) ? 2500 : this.Cooldown,
-				reply: `I will ${method}remind ${who} ${targetReminderDelta} (ID ${result.ID})`
+				reply: `I will ${method}remind ${who} ${preposition} ${targetReminderDelta} (ID ${result.ID})`
 			};
 		}
 		else {
