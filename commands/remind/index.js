@@ -292,12 +292,20 @@ module.exports = {
 			}
 
 			const who = (targetUser.ID === context.user.ID) ? "you" : targetUser.Name;
+			const target = (targetUser.ID === context.user.ID) ? "you" : "they";
 			const method = (isPrivate) ? "privately " : "";
-			const preposition = (type === "Deferred") ? "after" : "in";
+
+			let message;
+			if (type === "Deferred") {
+				message = `I will ${method}remind ${who} when ${target} type in chat after ${targetReminderDelta} (ID ${result.ID})`;
+			}
+			else {
+				message = `I will ${method}remind ${who} in ${targetReminderDelta} (ID ${result.ID})`;
+			}
 
 			return {
 				cooldown: (context.privateMessage) ? 2500 : this.Cooldown,
-				reply: `I will ${method}remind ${who} ${preposition} ${targetReminderDelta} (ID ${result.ID})`
+				reply: message
 			};
 		}
 		else {
