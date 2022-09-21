@@ -1,141 +1,34 @@
-/**
- * Represents a chat channel.
- */
+
 module.exports = class Channel extends require("./template.js") {
 	static redisPrefix = "sb-channel";
-
-	/** @type {WeakMap<Channel, Map<string, *>>} */
 	static dataCache = new WeakMap();
-
-	/** @type {Promise<boolean>|null} */
 	#setupPromise = null;
 
 	constructor (data) {
 		super();
 
-		/**
-		 * Unique numeric ID.
-		 * @type {number}
-		 */
 		this.ID = data.ID;
-
-		/**
-		 * Channel name. Must be unique in the scope of its {@link sb.Platform}.
-		 * @type {string}
-		 */
 		this.Name = data.Name;
-
-		/**
-		 * Platform object the channel belongs to.
-		 * @type {sb.Platform}
-		 */
 		this.Platform = sb.Platform.get(data.Platform);
-
-		/**
-		 * Platform-specific ID. Used in Discord and Twitch, for example.
-		 * @type {string|null}
-		 */
 		this.Specific_ID = data.Specific_ID || null;
-
-		/**
-		 * Channel mode - determines bot behaviour.
-		 * Inactive - will not attempt to join, and will ignore every data and chat messages or commands.
-		 * Read - will ignore all command requests.
-		 * Write - normal mode, channel cooldown set at 1250 milliseconds - normalized for Twitch.
-		 * VIP - elevated mode, channel cooldown set at 250 milliseconds - using the VIP mode, but also not spamming too much.
-		 * Moderator - super mode, channel cooldown set at 50 milliseconds - only used in channels where it is OK to spam.
-		 * @type {("Inactive"|"Read"|"Write"|"VIP"|"Moderator")}
-		 */
 		this.Mode = data.Mode;
-
-		/**
-		 * If true, commands that are configured to mention the invoking user will do so.
-		 * If false, no mentions will be added.
-		 * @type {boolean}
-		 */
 		this.Mention = data.Mention;
-
-		/**
-		 * If true, all links that would otherwise be sent will be replaced with a placeholder string.
-		 * @type {boolean}
-		 */
 		this.Links_Allowed = data.Links_Allowed;
-
-		/**
-		 * Type of banphrase API.
-		 * If not null and {@link sb.Channel.Banphrase_API_URL} is also not null, all messages will be also checked against this banphrase API
-		 * @type {string|null}
-		 */
 		this.Banphrase_API_Type = data.Banphrase_API_Type;
-
-		/**
-		 * URL of banphrase API.
-		 * If not null and {@link sb.Channel.Banphrase_API_Type} is also not null, all messages will be also checked against this banphrase API
-		 * @type {string|null}
-		 */
 		this.Banphrase_API_URL = data.Banphrase_API_URL;
-
-		/**
-		 * Bot behaviour when given banphrase API is not available (downtime).
-		 * Ignore = Pretend as if the API was not there. Post messages as normal.
-		 * Notify = As Ignore, but prepend a warning message that the API is unreachable.
-		 * Refuse = Do not post the message at all, post a warning message instead.
-		 * (null) = Default value for channels that have no banphrase API set up.
-		 * @type {"Ignore"|"Notify"|"Refuse"|"Nothing"|"Whisper"|null}
-		 */
 		this.Banphrase_API_Downtime = data.Banphrase_API_Downtime;
-
-		/**
-		 * Channel-specific character limit for any message sent in it.
-		 * If null, uses a global platform-specific setting instead.
-		 * @type {number|null}
-		 */
 		this.Message_Limit = data.Message_Limit;
-
-		/**
-		 * Flag specifying channel's NSFW status.
-		 * Mostly used for Discord channels.
-		 * @type {number|null}
-		 */
 		this.NSFW = data.NSFW;
-
-		/**
-		 * Determines the level of logging for the specified channel.
-		 * @type {Set<"Lines"|"Meta">}
-		 */
 		this.Logging = new Set(data.Logging ?? []);
-
-		/**
-		 * If not null, every message sent to this channel will also be mirrored to the channel with this ID.
-		 * Only 1-to-1 or one-way mirroring is supported.
-		 * @type {sb.Channel.ID|null}
-		 */
 		this.Mirror = data.Mirror;
-
-		/**
-		 * A human-readable description of the channel.
-		 * @type {string|null}
-		 */
 		this.Description = data.Description ?? null;
 
-		/**
-		 * Session-specific data for a channel. Dynamically updated at runtime.
-		 * Is always reset on bot reset or channel reset.
-		 * @type {Object}
-		 */
 		this.sessionData = {};
 
-		/**
-		 * Experimental support for external channel events.
-		 */
 		const EventEmitter = require("events");
 		this.events = new EventEmitter();
 	}
 
-	/**
-	 * Sets up the logging table and triggers for a newly created channel.
-	 * @returns {Promise<boolean>} True if new tables and triggers were created, false if channel already has them set up
-	 */
 	setup () {
 		if (!this.Platform.Logging || !this.Platform.Logging.messages) {
 			return Promise.resolve(false);
@@ -197,35 +90,16 @@ module.exports = class Channel extends require("./template.js") {
 		return this.#setupPromise;
 	}
 
-	/**
-	 * Waits until the user sends a message. Resolves with their response, or rejects if timed out.
-	 * @param {number} userID
-	 * @param {Object} options
-	 * @returns {sb.Promise<UserMessageResolution>}
-	 */
 	waitForUserMessage (userID, options) {
 		return this.Platform.waitForUserMessage(this, userID, options);
 	}
 
-	/**
-	 * Returns the database name for the logging table of a given channel.
-	 * Non-Twitch channels have their platform as lowercase prefix.
-	 * @example cytube_somechannel (Cytube)
-	 * @example discord_12345 (Discord)
-	 * @example some_channel (Twitch)
-	 * @returns {string}
-	 */
 	getDatabaseName () {
 		return (this.Platform.Name === "twitch")
 			? this.Name
 			: `${this.Platform.getFullName("_").toLowerCase()}_${this.Name}`;
 	}
 
-	/**
-	 * Returns the full name of a channel, including its platform name.
-	 * For Discord, uses the guild rather than the actual channel name.
-	 * @returns {string}
-	 */
 	getFullName () {
 		if (this.Platform.Name === "discord") {
 			if (this.Description) {
@@ -241,57 +115,28 @@ module.exports = class Channel extends require("./template.js") {
 		}
 	}
 
-	/**
-	 * Determines if a user is the owner of the channel the instances represents.
-	 * @param {User} userData
-	 * @returns {Promise<null|boolean>}
-	 */
 	isUserChannelOwner (userData) {
 		return this.Platform.isUserChannelOwner(this, userData);
 	}
 
-	/**
-	 * Checks if a provided user is an ambassador of the channel instance
-	 * @param {User} userData
-	 * @returns {boolean}
-	 */
 	async isUserAmbassador (userData) {
 		const ambassadors = await this.getDataProperty("ambassadors") ?? [];
 		return ambassadors.includes(userData.ID);
 	}
 
-	/**
-	 * Sends a message into the current channel.
-	 * @param message
-	 * @returns {Promise<void>}
-	 */
 	send (message) {
 		return this.Platform.send(message, this);
 	}
 
-	/**
-	 * Returns the channel's stream-related data.
-	 * @returns {Promise<Object>}
-	 */
 	async getStreamData () {
 		const streamData = await this.getCacheData("stream-data");
 		return streamData ?? {};
 	}
 
-	/**
-	 * Sets the channel's stream-related data.
-	 * @param {object} data
-	 * @returns {Promise<any>}
-	 */
 	async setStreamData (data) {
 		return await this.setCacheData("stream-data", data, { expiry: 3_600_000 });
 	}
 
-	/**
-	 * Toggles a provided user's ambassador status in the current channel instance.
-	 * @param {User} userData
-	 * @returns {Promise<void>}
-	 */
 	async toggleAmbassador (userData) {
 		const ambassadors = await this.getDataProperty("ambassadors", { forceCacheReload: true }) ?? [];
 		if (ambassadors.includes(userData.ID)) {
@@ -305,12 +150,6 @@ module.exports = class Channel extends require("./template.js") {
 		await this.setDataProperty("ambassadors", ambassadors);
 	}
 
-	/**
-	 * Pushes a property change to the dataabse.
-	 * @param {string} property
-	 * @param {*} [value]
-	 * @returns {Promise<void>}
-	 */
 	async saveProperty (property, value) {
 		const row = await sb.Query.getRow("chat_data", "Channel");
 		await row.load(this.ID);
@@ -318,14 +157,6 @@ module.exports = class Channel extends require("./template.js") {
 		await super.saveRowProperty(row, property, value, this);
 	}
 
-	/**
-	 * Mirrors the message to the given mirror channel, if this instance has been configured to do so.
-	 * @param {string} message
-	 * @param {User|null} userData
-	 * @param {Object} [options]
-	 * @param {boolean} [options.commandUsed] = false
-	 * @returns {Promise<void>}
-	 */
 	async mirror (message, userData, options = {}) {
 		if (this.Mirror === null) {
 			return;
@@ -348,10 +179,6 @@ module.exports = class Channel extends require("./template.js") {
 		});
 	}
 
-	/**
-	 * Returns the current user list of the channel instance.
-	 * @returns {Promise<string[]>}
-	 */
 	async fetchUserList () {
 		return await this.Platform.fetchChannelUserList(this);
 	}
@@ -374,15 +201,6 @@ module.exports = class Channel extends require("./template.js") {
 		return await this.setCacheData("emotes", null);
 	}
 
-	/**
-	 * Fetches the best fitting emote for the current channel instance.
-	 * @param {string[]} emotes
-	 * @param {string} fallbackEmote
-	 * @param {Object} options = {}
-	 * @param {boolean} [options.returnEmoteObject]
-	 * @param {function} [options.filter]
-	 * @returns {Promise<string>}
-	 */
 	async getBestAvailableEmote (emotes, fallbackEmote, options = {}) {
 		const availableEmotes = await this.fetchEmotes();
 		const emoteArray = (options.shuffle)
@@ -416,13 +234,6 @@ module.exports = class Channel extends require("./template.js") {
 		});
 	}
 
-	/**
-	 * Saves a user data property into the database.
-	 * @param {string} propertyName
-	 * @param {*} value
-	 * @param {Object} options
-	 * @returns {Promise<void>}
-	 */
 	async setDataProperty (propertyName, value, options = {}) {
 		return await super.setGenericDataProperty({
 			cacheMap: Channel.dataCache,
@@ -448,7 +259,6 @@ module.exports = class Channel extends require("./template.js") {
 	}
 
 	static async loadData () {
-		/** @type Channel[] */
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("*")
 			.from("chat_data", "Channel")
@@ -476,13 +286,6 @@ module.exports = class Channel extends require("./template.js") {
 		await Channel.loadData();
 	}
 
-	/**
-	 * Returns a Channel object, based on the identifier provided, and a optional platform parameter
-	 * @param {ChannelLike} identifier
-	 * @param {PlatformLike} [platform]
-	 * @returns {sb.Channel|null}
-	 * @throws {sb.Error} If identifier type is not recognized
-	 */
 	static get (identifier, platform) {
 		if (platform) {
 			platform = sb.Platform.get(platform);
@@ -515,11 +318,6 @@ module.exports = class Channel extends require("./template.js") {
 		}
 	}
 
-	/**
-	 * Fetches a list of joinable channels for a given platform.
-	 * @param {PlatformLike} platform
-	 * @returns {sb.Channel[]}
-	 */
 	static getJoinableForPlatform (platform) {
 		const platformData = sb.Platform.get(platform);
 		return Channel.data.filter(channel => (
@@ -527,14 +325,6 @@ module.exports = class Channel extends require("./template.js") {
 		));
 	}
 
-	/**
-	 * Creates a new channel and pushes its definition to the database
-	 * @param {string} name
-	 * @param {sb.Platform} platformData
-	 * @param {string} mode
-	 * @param {string} [specificID]
-	 * @returns {Promise<sb.Channel>}
-	 */
 	static async add (name, platformData, mode = "Write", specificID) {
 		const channelName = Channel.normalizeName(name);
 		const existing = Channel.get(channelName);
@@ -608,10 +398,6 @@ module.exports = class Channel extends require("./template.js") {
 		}
 	}
 
-	/**
-	 * @param {ChannelLike[]} list
-	 * @returns {Promise<boolean>}
-	 */
 	static async reloadSpecific (...list) {
 		const channelsData = list.map(i => Channel.get(i)).filter(Boolean);
 		if (channelsData.length === 0) {
@@ -648,19 +434,9 @@ module.exports = class Channel extends require("./template.js") {
 		return true;
 	}
 
-	/**
-	 * Normalizes non-standard strings into standardized database channel names..
-	 * Turns input string into lowercase, removes leading `@`, leading `#`.
-	 * @param {string} username
-	 * @returns {string}
-	 */
 	static normalizeName (username) {
 		return username
 			.toLowerCase()
 			.replace(/^@/, "");
 	}
 };
-
-/**
- * @typedef {string|number|sb.Channel} ChannelLike
- */
