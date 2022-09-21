@@ -133,8 +133,11 @@ module.exports = {
 					};
 				}
 
-				const secondsOffset = (timeData.rawOffset + timeData.dstOffset);
-				chronoData.component.assign("timezoneOffset", secondsOffset / 60);
+				if (chronoType !== "after") {
+					const secondsOffset = (timeData.rawOffset + timeData.dstOffset);
+					chronoData.component.assign("timezoneOffset", secondsOffset / 60);
+				}
+
 				targetReminderDate = new sb.Date(chronoData.component.date());
 			}
 			else {
