@@ -1,7 +1,7 @@
 import { GenericFlagsObject, SimpleGenericData, TypeExtract } from "../globals";
 import { ClassTemplate } from "./template";
 import { Channel } from "./channel";
-import { AvailableEmoteOptions, Platform } from "./platform";
+import { Platform } from "./platform";
 import { Permissions as UserPermissions, User } from "./user";
 import { Language } from "language-iso-codes";
 import { CustomDate as Date } from "../objects/date";
@@ -186,6 +186,19 @@ declare type ParsedParametersData = {
     args: string[];
 };
 
+declare type ParameterParseFailure = {
+    success: true,
+    newParameters: Record<string, SimpleGenericData>
+};
+declare type ParameterParseSuccess = {
+    success: false,
+    reply: string
+};
+declare type ParameterParseResult = ParameterParseFailure | ParameterParseSuccess;
+
+/**
+ * Represents the context a command is being executed in.
+ */
 export declare class Context {
     #command: Command;
     #invocation: string;
@@ -203,8 +216,24 @@ export declare class Context {
 
     getMeta (name: string): void;
     setMeta (name: string, value: any): void;
+
+    /**
+     * Fetches an object wrapper describing the user's permissions in given command context.
+     * @param options When provided, allows overriding the command context's properties.
+     */
     getUserPermissions (options: ContextSpecificator): Promise<PermissionsDescriptor>;
-    getBestAvailableEmote (emote: string[], fallback: string, options: AvailableEmoteOptions): Promise<string>;
+
+    /**
+     * Fetches the best available emote for given context - based on platform/channel availability.
+     * @param emotes Array of emotes as strings.
+     * The "best" fetching emote will be chosen iterating through the array and picking the first one that is available
+     * in the current channel instance.
+     * @param fallbackEmote If none of the provided emotes are available in the channel, this string will be used instead.
+     * @param options
+     * @param options.returnEmoteObject If `true`, an object with its full definition will be returned instead of an emote string.
+     * @param options.filter Filter function used to choose from the available emotes. Receives `Emote` as input
+     */
+    getBestAvailableEmote: Channel["getBestAvailableEmote"];
     getMentionStatus (): boolean;
 
     /**
@@ -225,19 +254,58 @@ export declare class Context {
     get userFlags (): FlagsObject;
 }
 
+/**
+ * Represents a bot command, providing API to execute it and access its internals.
+ */
 export declare class Command extends ClassTemplate {
+    /**
+     * Checks if the given string counts as a proper command execution.
+     * @param string
+     */
     static is (string: string): boolean;
     static getPrefix (): string;
     static setPrefix (value: string): void;
     static get (identifier: Like): Command | null;
     static validate (): void;
+
+    /**
+     * Extracts all boolean values from a command execution result.
+     * @param execution
+     */
     static extractMetaResultProperties (execution: Result): TypeExtract<Result, boolean>;
+
+    /**
+     * Creates a functioning command context, with data filled in based on what data is passed
+     * @param commandData
+     * @param contextData
+     * @param extraData
+     */
     static createFakeContext (commandData: Command, contextData: ContextConstructorData, extraData: SimpleGenericData): Context;
     static parseParameter (value: string, type: Parameter.Type, explicit?: boolean): Parameter.ParsedType;
+
+    /**
+     * For an input params definition and command arguments, parses out the relevant parameters along with their
+     * values converted properly from string.
+     * @param paramsDefinition Definition of parameters to parse out of the arguments
+     * @param argsArray The arguments to parse from
+     */
     static parseParametersFromArguments (
         paramsDefinition: Parameter.Descriptor[],
         argsArray: string[]
     ): ParsedParametersData | CommandFailure;
+
+    /**
+     * Checks if a command exists, and then executes it if needed.
+     * @param identifier
+     * @param argumentArray
+     * @param channelData
+     * @param userData
+     * @param options Any extra options that will be passed to the command as extra.append
+     * @param options.internalExecution currently unused
+     * @param options.skipGlobalBan
+     * @param options.platform
+     * @param options.skipMention If true, no mention will be added to the command string, regardless of other options.
+     */
     static checkAndExecute (
         identifier: string,
         argumentArray: string[],
@@ -245,6 +313,14 @@ export declare class Command extends ClassTemplate {
         userData: User,
         options: ExecutionOptions
     ): Result;
+
+    /**
+     * Handles the setting (or skipping) cooldowns for given combination of data.
+     * @param channelData
+     * @param userData
+     * @param commandData
+     * @param cooldownData
+     */
     static handleCooldown (
         channelData: Channel | null,
         userData: User,
@@ -255,23 +331,119 @@ export declare class Command extends ClassTemplate {
     static set prefix (value: string);
     static get prefixRegex (): RegExp;
     static validate (): void;
+
+    /**
+     * Parse a parameter value from a string, and return a new parameters object with the parameter set.
+     * Fails parameter value cannot be parsed, or conflicts with previous parameters allowed.
+     * @param value
+     * @param parameterDefinition
+     * @param explicit
+     * @param existingParameters Parameters already parsed
+     */
+    static #parseAndAppendParameter (
+        value: string,
+        parameterDefinition: Parameter.Descriptor,
+        explicit: boolean,
+        existingParameters: Record<string, SimpleGenericData>
+    ): ParameterParseResult;
+
     static readonly #privateMessageChannelID: unique symbol;
+
+    /**
+     * Privileged command characters are such characters, that when a command is invoked, there does not have to be any
+     * whitespace separating the character and the first argument.
+     * Consider the bot's prefix to be "!", and the test command string to be `!$foo bar`.
+     * @example If "$" is not privileged:
+     * prefix = "!"; command = "$foo"; arguments = ["bar"];
+     * @example If "$" is privileged:
+     * prefix = "!"; command = "$"; arguments = ["foo", "bar"];
+     */
     private static privilegedCommandCharacters: string[];
 
+    /**
+     * Command parameter parsing will only continue up until this argument is encountered, and not part
+     * of a parameter.
+     * The delimiter must not contain any spaces.
+     * If it is not defined or falsy, commands will use up the entire string instead.
+     * @example If there is no delimiter:
+     * "$foo bar:baz -- bar:zed"; { bar: "zed" }
+     * @example If "--" is the delimiter:
+     * "$foo bar:baz -- bar:zed"; { bar: "baz" }
+     * "$foo bar:\"baz -- buz\" -- bar:zed"; { bar: "baz -- buz" }
+     */
+    private static ignoreParametersDelimiter: string;
+
+    /**
+     * Unique command name.
+     */
     readonly Name: string;
+
+    /**
+     * Array of string aliases.
+     * These are used as variable invocations for the command to execute.
+     */
     readonly Aliases: string[];
+
+    /**
+     * Command description. Also used for the `help` meta command.
+     */
     readonly Description: string | null;
+
+    /**
+     * Command cooldown, in milliseconds.
+     * If `null`, no cooldown is set at at all (!)
+     */
     readonly Cooldown: number | null;
+
+    /**
+     * Holds all flags of a command, all of which are booleans.
+     * This object is frozen after initialization, so that the flags can only be modified outside of runtime.
+     */
     readonly Flags: Readonly<FlagsObject>;
+
+    /**
+     * Contains info about the command's parameters.
+     */
     readonly Params: Readonly<Parameter.Descriptor[]>;
+
+    /**
+     * If not null, this is the response for a whitelisted command when invoked outside of the whitelist.
+     */
     readonly Whitelist_Response: string | null;
-    private readonly Author: string | null;
+
+    /**
+     * The actual code function of the command.
+     */
     private Code: (context: Context, ...args: string[]) => Result;
+
+    /**
+     * Session-specific data for the command that can be modified at runtime.
+     */
     private data: SimpleGenericData;
+
+    /**
+     * Data specific for the command. Usually hosts utils methods, or constants.
+     * The object is deeply frozen, preventing any changes.
+     */
     private staticData: DeepFrozen<Record<string, any>>;
+
+    /**
+     * Determines the author of the command. Used for updates and further command downloads.
+     * If null, the command is considered to be created anonymously.
+     */
+    #Author: string | null;
 
     constructor (data: ConstructorData);
 
+    /**
+     * Wrapper for the internal `Code` function, allowing execution from outside of the internal scope.
+     */
     execute (...args: Parameters<Command["Code"]>): ReturnType<Command["Code"]>;
+
+    /**
+     * Creates the command's detail URL based on a Configuration variable
+     * @param options
+     * @param options.useCodePath If true, returns a path for the command's code description
+     */
     getDetailURL (options?: { useCodePath?: boolean }): string;
 }

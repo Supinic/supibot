@@ -1,8 +1,5 @@
 const pathModule = require("path");
 
-/**
- * Represents the context a command is being executed in
- */
 class Context {
 	#command;
 	#invocation;
@@ -62,17 +59,6 @@ class Context {
 		}
 	}
 
-	/**
-	 * Fetches an object wrapper describing the user's permissions in given command context.
-	 * @param {Object} [options] When provided, allows overriding the command context's locations
-	 * @param {User} [options.user]
-	 * @param {Channel} [options.channel]
-	 * @param {Platform} [options.platform]
-	 * @returns {Promise<{
-	 *  flag: number,
-	 *  is: (function(UserPermissionLevel): boolean)
-	 * }>}
-	 */
 	async getUserPermissions (options = {}) {
 		const userData = options.user ?? this.#user;
 		const channelData = options.channel ?? this.#channel;
@@ -115,18 +101,6 @@ class Context {
 		};
 	}
 
-	/**
-	 * Fetches the best available emote for given context - based on platform/channel availability
-	 * @param {string[]} emotes
-	 * @param {string} fallback
-	 * @param {Object} options
-	 * @param {sb.Channel} [options.channel]
-	 * @param {sb.Platform} [options.platform]
-	 * @param {boolean} [options.shuffle]
-	 * @param {boolean} [options.returnEmoteObject]
-	 * @param {Function} [options.filter]
-	 * @returns {Promise<string>}
-	 */
 	async getBestAvailableEmote (emotes, fallback, options = {}) {
 		const channelData = options.channel ?? this.#channel;
 		const platformData = options.platform ?? this.#platform;
@@ -152,103 +126,25 @@ class Context {
 	get userFlags () { return this.#userFlags; }
 }
 
-/**
- * Represents a single bot command.
- */
 class Command extends require("./template.js") {
-	// <editor-fold defaultstate="collapsed" desc="=== INSTANCE PROPERTIES ===">
-
-	/**
-	 * Unique command name.
-	 * @type {string}
-	 */
 	Name;
-
-	/**
-	 * Array of string aliases. Can be empty if none are provided.
-	 * @type {string[]}
-	 */
 	Aliases = [];
-
-	/**
-	 * Command description. Also used for the help meta command.
-	 * @type {string|null}
-	 */
 	Description = null;
-
-	/**
-	 * Command cooldown, in milliseconds.
-	 * @type {number}
-	 */
 	Cooldown;
-
-	/**
-	 * Holds all flags of a command, all of which are booleans.
-	 * This object is frozen after initialization, so that the flags can only be modified outside of runtime.
-	 * @type {CommandFlagsObject}
-	 */
 	Flags = {};
-
-	/**
-	 * Contains info about the command's parameters - these are formatted as (name):(value)
-	 * @type {CommandParameterDefinition[]|null}
-	 */
 	Params = [];
-
-	/**
-	 * If not null, specified the response for a whitelisted command when invoked outside of the whitelist.
-	 * @type {string|null}
-	 */
 	Whitelist_Response = null;
+	Code;
 
-	/**
-	 * Determines the author of the command. Used for updates and further command downloads.
-	 * If null, the command is considered created anonymously.
-	 * @type {string}
-	 */
 	#Author;
 
-	/**
-	 * Session-specific data for the command that can be modified at runtime.
-	 * @type {Object}
-	 */
 	data = {};
-
-	/**
-	 * Data specific for the command. Usually hosts utils methods, or constants.
-	 * The object is deeply frozen, preventing any changes.
-	 * @type {Object}
-	 */
 	staticData = {};
-
-	// </editor-fold>
 
 	static #privateMessageChannelID = Symbol("private-message-channel");
 
-	/**
-	 * Privileged command characters are such characters, that when a command is invoked, there does not have to be any
-	 * whitespace separating the character and the first argument.
-	 * Consider the bot's prefix to be "!", and the test command string to be `!$foo bar`.
-	 * @example If "$" is not privileged:
-	 * prefix = "!"; command = "$foo"; arguments = ["bar"];
-	 * @example If "$" is privileged:
-	 * prefix = "!"; command = "$"; arguments = ["foo", "bar"];
-	 * @type {[string]}
-	 */
 	static privilegedCommandCharacters = ["$"];
 
-	/**
-	 * Command parameter parsing will only continue up until this argument is encountered, and not part
-	 * of a parameter.
-	 * The delimiter must not contain any spaces.
-	 * If it is not defined or falsy, commands will use up the entire string instead.
-	 * @example If there is no delimiter:
-	 * "$foo bar:baz -- bar:zed"; { bar: "zed" }
-	 * @example If "--" is the delimiter:
-	 * "$foo bar:baz -- bar:zed"; { bar: "baz" }
-	 * "$foo bar:\"baz -- buz\" -- bar:zed"; { bar: "baz -- buz" }
-	 * @type {string}
-	 */
 	static ignoreParametersDelimiter = "--";
 
 	constructor (data) {
@@ -387,9 +283,6 @@ class Command extends require("./template.js") {
 		sb.Utils.deepFreeze(this.staticData);
 	}
 
-	/**
-	 * Destroys the command instance.
-	 */
 	destroy () {
 		if (typeof this.staticData.destroy === "function") {
 			try {
@@ -405,21 +298,10 @@ class Command extends require("./template.js") {
 		this.staticData = null;
 	}
 
-	/**
-	 * Executes the command.
-	 * @param {*[]} args
-	 * @returns CommandResult
-	 */
 	execute (...args) {
 		return this.Code(...args);
 	}
 
-	/**
-	 * Creates the command's detail URL based on a Configuration variable
-	 * @param {Object} [options]
-	 * @param {boolean} [options.useCodePath] If true, returns a path for the command's code description
-	 * @returns {string}
-	 */
 	getDetailURL (options = {}) {
 		if (options.useCodePath) {
 			const baseURL = sb.Config.get("COMMAND_DETAIL_CODE_URL", false);
@@ -577,13 +459,6 @@ class Command extends require("./template.js") {
 		await Promise.all(addMissingRowsPromises);
 	}
 
-	/**
-	 * Searches for a command, based on its name or alias.
-	 * Returns immediately if identifier is already a Command.
-	 * @param {sb.Command|string|symbol} identifier
-	 * @returns {sb.Command|null}
-	 * @throws {sb.Error} If identifier is unrecognized
-	 */
 	static get (identifier) {
 		if (identifier instanceof Command) {
 			return identifier;
@@ -602,19 +477,6 @@ class Command extends require("./template.js") {
 		}
 	}
 
-	/**
-	 * Checks if a command exists, and executes it if needed.
-	 * @param {sb.Command|string} identifier
-	 * @param {string[]} argumentArray
-	 * @param {sb.Channel|null} channelData
-	 * @param {sb.User} userData
-	 * @param {Object} options = {} any extra options that will be passed to the command as extra.append
-	 * @param {boolean} [options.internalExecution] currently unused
-	 * @param {boolean} [options.skipGlobalBan]
-	 * @param {sb.Platform} options.platform
-	 * @param {boolean} [options.skipMention] If true, no mention will be added to the command string, regardless of other options.
-	 * @returns {CommandResult}
-	 */
 	static async checkAndExecute (identifier, argumentArray, channelData, userData, options = {}) {
 		if (!identifier) {
 			return { success: false, reason: "no-identifier" };
@@ -687,7 +549,6 @@ class Command extends require("./template.js") {
 		const appendOptions = { ...options };
 		const isPrivateMessage = (!channelData);
 
-		/** @type CommandContext */
 		const contextOptions = {
 			platform: options.platform,
 			invocation: identifier,
@@ -773,7 +634,6 @@ class Command extends require("./template.js") {
 			return filterData;
 		}
 
-		/** @type CommandResult */
 		let execution;
 		const context = options.context ?? new Context(command, contextOptions);
 
@@ -1014,13 +874,6 @@ class Command extends require("./template.js") {
 		return execution;
 	}
 
-	/**
-	 * Handles the setting (or skipping) cooldowns for given combination of data.
-	 * @param {sb.Channel} channelData
-	 * @param {sb.User} userData
-	 * @param {sb.Command} commandData
-	 * @param {Object} cooldownData
-	 */
 	static handleCooldown (channelData, userData, commandData, cooldownData) {
 		// Take care of private messages, where channel === null
 		const channelID = channelData?.ID ?? Command.#privateMessageChannelID;
@@ -1088,11 +941,6 @@ class Command extends require("./template.js") {
 		}
 	}
 
-	/**
-	 * Extracts all boolean values from a command execution result.
-	 * @param {CommandResult} execution
-	 * @returns {Object}
-	 */
 	static extractMetaResultProperties (execution) {
 		const result = {};
 		for (const [key, value] of Object.entries(execution)) {
@@ -1155,13 +1003,6 @@ class Command extends require("./template.js") {
 		return null;
 	}
 
-	/**
-	 * Creates a functioning command context, with data filled in based on what data is passed
-	 * @param {sb.Command} commandData
-	 * @param {Object|Context} [contextData]
-	 * @param {Object} [extraData]
-	 * @returns {Context}
-	 */
 	static createFakeContext (commandData, contextData = {}, extraData = {}) {
 		if (!(commandData instanceof Command)) {
 			throw new sb.Error({
@@ -1188,15 +1029,6 @@ class Command extends require("./template.js") {
 		return new Context(commandData, data);
 	}
 
-	/**
-	 * Parse a parameter value from a string, and return a new parameters object with the parameter set.
-	 * Fails parameter value cannot be parsed, or conflicts with previous parameters allowed.
-	 * @param {string} value
-	 * @param {{ name: string, type: string }} parameterDefinition
-	 * @param {boolean} explicit
-	 * @param {Record<string, any>} existingParameters Parameters already parsed
-	 * @returns {{ success: true, newParameters: Record<string, any> } | { success: false, reply: string }}
-	 */
 	static #parseAndAppendParameter (value, parameterDefinition, explicit, existingParameters) {
 		const parameters = { ...existingParameters };
 		const parsedValue = Command.parseParameter(value, parameterDefinition.type, explicit);
@@ -1227,12 +1059,6 @@ class Command extends require("./template.js") {
 		return { success: true, newParameters: parameters };
 	}
 
-	/**
-	 * For an input params definition and command arguments, parses out the relevant parameters along with their
-	 * values converted properly from string.
-	 * @param {Array<{ name: string; type: "string" | "number" | "boolean" | "date" | "object" | "regex" }>} paramsDefinition Definition of parameters to parse out of the arguments
-	 * @param {Array<string>} argsArray The arguments to parse from
-	 */
 	static parseParametersFromArguments (paramsDefinition, argsArray) {
 		const argsStr = argsArray.join(" ");
 		const outputArguments = [];
@@ -1345,11 +1171,6 @@ class Command extends require("./template.js") {
 		};
 	}
 
-	/**
-	 * Checks if the given string counts as a proper command execution.
-	 * @param {string} string
-	 * @returns {boolean}
-	 */
 	static is (string) {
 		const prefix = Command.getPrefix();
 		if (prefix === null) {
@@ -1389,19 +1210,10 @@ class Command extends require("./template.js") {
 		Command.setPrefix(value);
 	}
 
-	/**
-	 * Fetches the command prefix by fetching the config.
-	 * @returns {string|null}
-	 */
 	static getPrefix () {
 		return sb.Config.get("COMMAND_PREFIX", false) ?? null;
 	}
 
-	/**
-	 * Sets a command prefix by changing the config value.
-	 * @param {string} value
-	 * @returns {Promise<void>}
-	 */
 	static setPrefix (value) {
 		if (typeof value !== "string") {
 			throw new sb.Error({
@@ -1414,64 +1226,3 @@ class Command extends require("./template.js") {
 }
 
 module.exports = Command;
-
-/**
- * @typedef {Object} CommandResult
- * @property {boolean} success If true, result contains reply; if false, result contains error
- * @property {string} [reply] Command result as a string to reply. If not provided, no message should be sent
- * @property {Object} [cooldown] Dynamic cooldown settings
- * @property {string} [reason] Symbolic description of why command execution failed - used internally
- * @property {Object} [meta] Any other information passed back from the command execution
- * @property {boolean} [partialExecute] Determines if a command is used as a part of a different meta-command
- * @property {boolean} [hasExternalInput] Determines if a command can have arbitrary input - used for the "external prefix" symbol
- * @property {boolean} [isChannelAlias] Determines whether the executed alias is a channel-published one
- * @property {boolean} [skipExternalPrefix] If `hasExternalInput` is true, this flag can override it and remove the symbol
- * @property {boolean} [forceExternalPrefix] If true, the external prefix will be added even if the command's success flag is `false`
- * @property {boolean} [replyWithPrivateMessage] If true, the command reply should be sent via PMs
- * @property {boolean} [removeEmbeds] Determines if the command response should be embed or not
- * @property {boolean} [keepWhitespace] If true, the command's response will not be automatically stripped from whitespace
- */
-
-/**
- * @typedef {Object} CommandContext
- * @property {string} invocation Exact command name used for invocation - name or alias
- * @property {sb.User} user Data about the user who invoked the command
- * @property {sb.Channel} channel Data about the channel where the command was invoked
- * @property {sb.Command} command Data about the command being invoked
- * @property {Object} append = {} other platform-specific options
- * @property {?} [transaction] For rollback-able commands, a transaction is set up and later committed/rolled back.
- * Commands must use this.data.transaction for whatever database access that should be safeguarded with a transaction.
- */
-
-/**
- * @typedef {Object} CommandFlagsObject
- * @property {boolean} developer If true, the command will be hidden from the command list, unless the person is marked as a developer.
- * @property {boolean} system If true, the command will be hidden (even from developers) and only shown to admins.
- * @property {boolean} rollback Determines if command is rollback-able.
- * If true, all sensitive database operations will be handled in a transaction - provided in options object.
- * @property {boolean} optOut If true, any user can "opt-out" from being the target of the command.
- * If done, nobody will be able to use their username as the command parameter.
- * @property {boolean} skipBanphrase If true, command result will not be checked for banphrases.
- * Mostly used for system or simple commands with little or no chance to trigger banphrases.
- * @property {boolean} block If true, any user can "block" another user from targeting them with this command.
- * If done, the specified user will not be able to use their username as the command parameter.
- * Similar to optOut, but not global, and only applies to one user.
- * @property {boolean} ownerOverride If true, the command's cooldown will be vastly reduced when a user invokes it in their own channel.
- * @property {boolean} readOnly If true, command is guaranteed to not reply, and as such, no banphrases, cooldowns or pings are checked.
- * @property {boolean} whitelist If true, command is only accessible to certain users or channels, or their combination.
- * @property {boolean} pipe If true, the command can be used as a part of the "pipe" command.
- * @property {boolean} mention If true, command will attempt to mention its invokers by adding their username at the start.
- * This also requires the channel to have this option enabled.
- * @property {boolean} nonNullable If true, the command cannot be directly piped into the null command
- * @property {boolean} externalInput If true, the command is marked as being able to receive arbitrary user input - used in meta-commands
- */
-
-/**
- * @typedef {Object} CommandParameterDefinition
- * @property {string} name Parameter name, as it will be used in execution
- * @property {"string"|"number"|"boolean"|"date"|"object"|"regex"} type Parameter type - string value will be parsed into this type
- */
-
-/**
- *  @typedef {"any"|"all"|"array"} UserPermissionResultType
- */
