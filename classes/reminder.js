@@ -177,7 +177,15 @@ module.exports = class Reminder extends require("./template.js") {
 
 					const preparedMessage = await channelData.prepareMessage(message);
 					if (preparedMessage) {
-						await channelData.send(preparedMessage);
+						const fixedMessage = await sb.Filter.applyUnping({
+							command: sb.Command.get("remind"),
+							channel: channelData ?? null,
+							platform: channelData?.Platform ?? null,
+							string: preparedMessage,
+							executor: fromUserData
+						});
+
+						await channelData.send(fixedMessage);
 					}
 				}
 			}
@@ -433,9 +441,17 @@ module.exports = class Reminder extends require("./template.js") {
 				}
 				else {
 					const channelData = sb.Channel.get(reminder.Channel);
-					const fixedMessage = await channelData.prepareMessage(message, {
+					const preparedMessage = await channelData.prepareMessage(message, {
 						returnBooleanOnFail: true,
 						skipLengthCheck: true
+					});
+
+					const fixedMessage = await sb.Filter.applyUnping({
+						command: sb.Command.get("remind"),
+						channel: channelData ?? null,
+						platform: channelData?.Platform ?? null,
+						string: preparedMessage,
+						executor: fromUserData
 					});
 
 					if (!fixedMessage) {
@@ -716,7 +732,7 @@ module.exports = class Reminder extends require("./template.js") {
 				.where("User_To = %n", userTo)
 				.flat("ID")
 				.single()
-			)
+			);
 
 			if (existingPingmeReminderID) {
 				return {
