@@ -7,7 +7,7 @@ module.exports = {
 	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
 		{ name: "summary", type: "boolean" },
-		{ name: "youtube", type: "string" },
+		{ name: "youtube", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -92,7 +92,7 @@ module.exports = {
 				user_id: channelID
 			}
 		});
-		
+
 		if (streamResponse.statusCode !== 200) {
 			return {
 				success: false,
@@ -128,12 +128,28 @@ module.exports = {
 				};
 			}
 
+			const vodResponse = await sb.Got("Helix", {
+				url: "videos",
+				searchParams: {
+					user_id: channelID
+				}
+			});
+
+			let videoURL = "";
+			let durationString = "";
+			if (vodResponse.statusCode === 200 && vodResponse.body[0]) {
+				const [vod] = vodResponse.body;
+
+				durationString = ` for ${vod.duration.match(/\d+[hms]/g).join(", ")}`;
+				videoURL = vod.url;
+			}
+
 			const start = new sb.Date(lastBroadcast.startedAt);
 			const title = lastBroadcast.title ?? "(no title)";
 			const delta = sb.Utils.timeDelta(start);
 
 			return {
-				reply: `Channel is ${status} - last streamed ${delta}, title: ${title}`
+				reply: `Channel is ${status} - last streamed ${delta}${durationString}, title: ${title} ${videoURL}`
 			};
 		}
 
