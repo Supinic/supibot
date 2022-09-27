@@ -132,10 +132,8 @@ declare type ConstructorData = {
     Whitelist_Response: string | null;
     Author: string | null;
     Code: (this: Command, context: Context, ...args: string[]) => (Result | Promise<Result>);
+    Dynamic_Description: ((this: Command, prefix: string) => Promise<string[]>) | null;
     Static_Data: (() => Record<string, any>) | null;
-};
-export declare type Definition = ConstructorData & {
-    Dynamic_Description: ((prefix: string, values: never) => Promise<string[]>) | null;
 };
 
 declare type AppendData = {
@@ -417,6 +415,12 @@ export declare class Command extends ClassTemplate {
     private Code: (context: Context, ...args: string[]) => Result;
 
     /**
+     * Description function, returns a HTML string array to be used outside of the bot's scope.
+     * Each line represents a new line in the description - hence a `br` tag should probably be used.
+     */
+    private Dynamic_Description: (((prefix: string) => Promise<string[]>) | null);
+
+    /**
      * Session-specific data for the command that can be modified at runtime.
      */
     private data: SimpleGenericData;
@@ -439,6 +443,11 @@ export declare class Command extends ClassTemplate {
      * Wrapper for the internal `Code` function, allowing execution from outside of the internal scope.
      */
     execute (...args: Parameters<Command["Code"]>): ReturnType<Command["Code"]>;
+
+    /**
+     * Wrapper for the internal `Dynamic_Description` function, allowing simplified execution from outside of the internal scope.
+     */
+    getDynamicDescription: () => Promise<string[] | null>;
 
     /**
      * Creates the command's detail URL based on a Configuration variable

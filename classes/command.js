@@ -135,6 +135,7 @@ class Command extends require("./template.js") {
 	Params = [];
 	Whitelist_Response = null;
 	Code;
+	Dynamic_Description;
 
 	#Author;
 
@@ -239,6 +240,13 @@ class Command extends require("./template.js") {
 			}
 		}
 
+		if (typeof data.Dynamic_Description === "function") {
+			this.Dynamic_Description = data.Dynamic_Description;
+		}
+		else {
+			this.Dynamic_Description = null;
+		}
+
 		if (data.Static_Data) {
 			let staticDataFn;
 
@@ -300,6 +308,15 @@ class Command extends require("./template.js") {
 
 	execute (...args) {
 		return this.Code(...args);
+	}
+
+	async getDynamicDescription () {
+		if (!this.Dynamic_Description) {
+			return null;
+		}
+		else {
+			return await this.Dynamic_Description(Command.prefix);
+		}
 	}
 
 	getDetailURL (options = {}) {
