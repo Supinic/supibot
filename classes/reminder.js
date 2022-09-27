@@ -380,7 +380,7 @@ module.exports = class Reminder extends require("./template.js") {
 		const now = sb.Date.now();
 		const reminders = list.filter(i => (
 			i.Active
-			&& (i.Type === "Deferred" && i.Schedule <= now) || (i.Type !== "Deferred" && !i.Schedule)
+			&& ((i.Type === "Deferred" && i.Schedule <= now) || (i.Type !== "Deferred" && !i.Schedule))
 			&& !excludedUserIDs.includes(i.User_From)
 		));
 
