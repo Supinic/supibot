@@ -81,7 +81,7 @@ module.exports = class PastebinSingleton extends require("./template.js") {
 			body: new URLSearchParams({
 				api_dev_key: sb.Config.get("API_PASTEBIN"),
 				api_user_name: sb.Config.get("PASTEBIN_USER_NAME"),
-				api_user_password: sb.Config.get("PASTEBIN_PASSWORD"),
+				api_user_password: sb.Config.get("PASTEBIN_PASSWORD")
 			}).toString()
 		});
 
