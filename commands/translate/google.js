@@ -99,10 +99,11 @@ const execute = async function (context, query) {
 			additionalInfo.push(`(${confidence})`);
 		}
 
-		additionalInfo.push("→", sb.Utils.capitalize(languageISO.getName(options.to)));
+		const toLanguageName = sb.Utils.capitalize(languageISO.getName(options.to));
+		additionalInfo.push("→", `${toLanguageName}:`);
 	}
 
-	const reply = `${additionalInfo.join(" ")}: ${text}`;
+	const reply = `${additionalInfo.join(" ")} ${text}`;
 	return {
 		reply,
 		text
