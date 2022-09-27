@@ -50,5 +50,43 @@ module.exports = {
 				result
 			}
 		};
+	},
+
+	dynamicDescription: async (req, res, url) => {
+		const commandName = url.searchParams.get("command");
+		if (!commandName) {
+			return {
+				statusCode: 400,
+				error: { message: `Valid command name must be provided` }
+			};
+		}
+
+		const commandData = sb.Command.get(commandName);
+		if (!commandData) {
+			return {
+				statusCode: 404,
+				error: { message: `Provided command does not exist` }
+			};
+		}
+
+		let description;
+		try {
+			description = await commandData.getDynamicDescription();
+		}
+		catch (e) {
+			return {
+				statusCode: 500,
+				error: {
+					message: e.message
+				}
+			};
+		}
+
+		return {
+			statusCode: 200,
+			data: {
+				description
+			}
+		};
 	}
 };
