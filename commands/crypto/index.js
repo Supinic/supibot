@@ -63,6 +63,7 @@ module.exports = {
 			const eur = (data.EUR) ? `€${data.EUR}` : "";
 
 			return {
+				removeEmbeds: true,
 				reply: `Current price of ${symbol}: ${usd} ${eur} ${link}`
 			};
 		}
