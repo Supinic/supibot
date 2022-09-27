@@ -52,7 +52,7 @@ module.exports = {
 		};
 	},
 
-	dynamicDescription: async (req, res, url) => {
+	info: async (req, res, url) => {
 		const commandName = url.searchParams.get("command");
 		if (!commandName) {
 			return {
@@ -69,14 +69,24 @@ module.exports = {
 			};
 		}
 
-		let description;
+		const info = {
+			aliases: commandData.Aliases,
+			author: commandData.Author,
+			cooldown: commandData.Cooldown,
+			description: commandData.Description,
+			flags: commandData.Flags,
+			name: commandData.Name,
+			params: commandData.Params
+		};
+
 		try {
-			description = await commandData.getDynamicDescription();
+			info.dynamicDescription = await commandData.getDynamicDescription();
 		}
 		catch (e) {
 			return {
 				statusCode: 500,
 				error: {
+					reason: "Command dynamic description function failed",
 					message: e.message
 				}
 			};
@@ -84,9 +94,7 @@ module.exports = {
 
 		return {
 			statusCode: 200,
-			data: {
-				description
-			}
+			data: { info }
 		};
 	}
 };
