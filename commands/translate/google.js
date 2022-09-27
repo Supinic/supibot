@@ -90,15 +90,19 @@ const execute = async function (context, query) {
 		};
 	}
 
-	const array = [sb.Utils.capitalize(fromLanguageName)];
-	if (options.confidence && data[6] && data[6] !== 1) {
-		const confidence = `${sb.Utils.round(data[6] * 100, 0)}%`;
-		array.push(`(${confidence})`);
+	const additionalInfo = [];
+	if (!textOnly) {
+		additionalInfo.push(sb.Utils.capitalize(fromLanguageName));
+
+		if (options.confidence && data[6] && data[6] !== 1) {
+			const confidence = `${sb.Utils.round(data[6] * 100, 0)}%`;
+			additionalInfo.push(`(${confidence})`);
+		}
+
+		additionalInfo.push("→", sb.Utils.capitalize(languageISO.getName(options.to)));
 	}
 
-	array.push("→", sb.Utils.capitalize(languageISO.getName(options.to)));
-	const reply = `${array.join(" ")}: ${text}`;
-
+	const reply = `${additionalInfo.join(" ")}: ${text}`;
 	return {
 		reply,
 		text
