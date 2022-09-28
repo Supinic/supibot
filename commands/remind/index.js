@@ -123,7 +123,8 @@ module.exports = {
 
 			const location = await context.user.getDataProperty("location");
 			const isRelative = (Object.keys(chronoData.component.knownValues).length === 0);
-			if (location && !isRelative) {
+			const explicitTimezone = (typeof chronoData.component.knownValues.timezoneOffset === "number");
+			if (location && !isRelative && !explicitTimezone && chronoType !== "after") {
 				const date = chronoData.component.date();
 				const response = await sb.Utils.fetchTimeData({
 					date,
@@ -139,11 +140,8 @@ module.exports = {
 					};
 				}
 
-				if (chronoType !== "after") {
-					const secondsOffset = (timeData.rawOffset + timeData.dstOffset);
-					chronoData.component.assign("timezoneOffset", secondsOffset / 60);
-				}
-
+				const secondsOffset = (timeData.rawOffset + timeData.dstOffset);
+				chronoData.component.assign("timezoneOffset", secondsOffset / 60);
 				targetReminderDate = new sb.Date(chronoData.component.date());
 			}
 			else {
