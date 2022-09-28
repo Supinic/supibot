@@ -74,22 +74,26 @@ module.exports = {
 			author: commandData.Author,
 			cooldown: commandData.Cooldown,
 			description: commandData.Description,
+			dynamicDescription: null,
 			flags: commandData.Flags,
 			name: commandData.Name,
 			params: commandData.Params
 		};
 
-		try {
-			info.dynamicDescription = await commandData.getDynamicDescription();
-		}
-		catch (e) {
-			return {
-				statusCode: 500,
-				error: {
-					reason: "Command dynamic description function failed",
-					message: e.message
-				}
-			};
+		const includeDynamicDescription = url.searchParams.has("includeDynamicDescription");
+		if (includeDynamicDescription) {
+			try {
+				info.dynamicDescription = await commandData.getDynamicDescription();
+			}
+			catch (e) {
+				return {
+					statusCode: 500,
+					error: {
+						reason: "Command dynamic description function failed",
+						message: e.message
+					}
+				};
+			}
 		}
 
 		return {
