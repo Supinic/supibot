@@ -252,8 +252,8 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { limit } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { limit } = this.staticData;
 
 		return [
 			"Checks if a video is already in the gachi list.",

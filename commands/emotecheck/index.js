@@ -35,8 +35,8 @@ module.exports = {
 			reply: result.emotes.join(" ")
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { sets } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { sets } = this.staticData;
 		const list = [...sets]
 			.sort((a, b) => a.name.localeCompare(b.name))
 			.map(i => {

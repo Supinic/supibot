@@ -36,8 +36,8 @@ module.exports = {
 			reply: sb.Utils.randArray(this.staticData.responses)
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { responses } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { responses } = this.staticData;
 		const list = responses.map(i => `<li>${i}</li>`).join("");
 
 		return [

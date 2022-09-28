@@ -24,23 +24,23 @@ module.exports = {
 			reply: [...new Array(repeats)].map(() => sb.Utils.randArray(emojis)).join(" ")
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { limit } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { limit } = this.staticData;
 		const list = sb.Config.get("EMOJI_LIST");
-	
+
 		return [
 			`Returns a random word from a list of ${list.length} pre-determined emojis.`,
 			`Maximum amount of words: ${limit}`,
 			"",
-			
+
 			`<code>${prefix}re</code>`,
 			"(one random emoji)",
 			"",
-	
+
 			`<code>${prefix}re 10</code>`,
 			"(ten random emojis)",
 			"",
-	
+
 			`Emoji list: <br>${list.join(" ")}`
 		];
 	})

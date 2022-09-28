@@ -525,8 +525,8 @@ module.exports = {
 				};
 		}
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { activities, activityAliases, skills } = await values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { activities, activityAliases, skills } = this.staticData;
 		const aliases = [];
 		for (const [key, value] of Object.entries(activityAliases)) {
 			aliases.push({

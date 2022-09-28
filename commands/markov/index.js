@@ -228,8 +228,8 @@ module.exports = {
 			reply: `🔮 ${string}`
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { threshold, limit } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { threshold, limit } = this.staticData;
 		const channels = await sb.Query.getRecordset(rs => rs
 			.select("Channel.ID AS Channel_ID", "Name")
 			.from("chat_data", "Channel_Chat_Module")

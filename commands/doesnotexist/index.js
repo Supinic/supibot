@@ -302,8 +302,8 @@ module.exports = {
 			return result;
 		}
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { fetch } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { fetch } = this.staticData;
 		const list = fetch
 			.flatMap(i => i.descriptions)
 			.sort()

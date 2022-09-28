@@ -668,8 +668,8 @@ module.exports = {
 			reply: foodstuffs.join("; ")
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { nutrients } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { nutrients } = this.staticData;
 		const tableBody = [...nutrients]
 			.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
 			.map(i => `<tr><td>${i.name}</td><td>${i.code}</td></tr>`).join("");

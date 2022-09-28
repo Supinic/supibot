@@ -346,8 +346,8 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { regions } = await values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { regions } = this.staticData;
 		const regionList = regions.map(i => `<li><code>${i}</code></li>`).join("");
 
 		const subregions = (await sb.Query.getRecordset(rs => rs

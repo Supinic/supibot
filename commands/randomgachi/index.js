@@ -113,8 +113,8 @@ module.exports = {
 			reply: `Here's ${favouriteString}: "${data.TrackName}" by ${authors} - ${supiLink} ${emote}`
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { types } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { types } = this.staticData;
 		const list = Object.keys(types).map(i => `<li>${i}</li>`).join("");
 
 		return [

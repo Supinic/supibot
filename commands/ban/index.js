@@ -377,8 +377,8 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { availableTypes } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { availableTypes } = this.staticData;
 
 		return [
 			"Bans or unbans any combination of user/channel/command.",

@@ -53,7 +53,7 @@ module.exports = {
 				reply: `Your filtering is too specific!`
 			};
 		}
-		
+
 		const words = [];
 		for (let i = 0; i < repeats; i++) {
 			words.push(sb.Utils.randArray(wordList));
@@ -63,8 +63,8 @@ module.exports = {
 			reply: words.join(" ")
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { limit } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { limit } = this.staticData;
 		const list = sb.Config.get("WORD_LIST");
 
 		return [

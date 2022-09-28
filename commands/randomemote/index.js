@@ -160,8 +160,8 @@ module.exports = {
 			reply: partition
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { limit } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { limit } = this.staticData;
 		return [
 			"Returns a random emote in the scope of the current channel.",
 			"You can use parameters to force-include or exclude several of types of emotes.",

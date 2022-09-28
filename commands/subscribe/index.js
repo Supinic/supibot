@@ -225,8 +225,8 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { types } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { types } = this.staticData;
 		const typesList = types.map(i => sb.Utils.tag.trim `
 			<li>
 				<code>${i.name}</code>

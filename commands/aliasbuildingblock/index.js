@@ -304,8 +304,8 @@ module.exports = {
 			...result
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { blocks } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { blocks } = this.staticData;
 		const list = blocks.map(i => {
 			const aliases = (i.aliases.length > 0)
 				? `(${i.aliases.join(", ")})`

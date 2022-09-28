@@ -437,8 +437,8 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { allowedModes } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { allowedModes } = this.staticData;
 		const list = allowedModes.map(i => `<li><code>${i.name}</code><br>${i.description}</li><br>`).join("");
 
 		return [

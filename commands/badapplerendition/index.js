@@ -162,8 +162,8 @@ module.exports = {
 			}
 		}
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const staticData = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const staticData = this.staticData;
 		const subcommands = staticData.commands.map(i => `<li><code>${prefix}bar ${i.name}</code><br>${i.description}</li>`);
 
 		return [

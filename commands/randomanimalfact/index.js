@@ -76,8 +76,8 @@ module.exports = {
 			reply: extractor(data)
 		};
 	}),
-	Dynamic_Description: (async (prefix, values) => {
-		const { invocations, types } = values.getStaticData();
+	Dynamic_Description: (async (prefix) => {
+		const { invocations, types } = this.staticData;
 		const list = [];
 
 		for (const [short, type] of Object.entries(invocations)) {
