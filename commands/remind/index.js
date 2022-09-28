@@ -107,7 +107,8 @@ module.exports = {
 
 		const now = new sb.Date();
 		if (chronoParam) {
-			const chronoData = sb.Utils.parseChrono(chronoParam, null, { forwardDate: true });
+			const chronoValue = (chronoType === "after") ? `in ${chronoParam}` : chronoParam;
+			const chronoData = sb.Utils.parseChrono(chronoValue, null, { forwardDate: true });
 			if (!chronoData) {
 				return {
 					success: false,
