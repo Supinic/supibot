@@ -35,7 +35,7 @@ module.exports = {
 			reply: `${title}: https://developer.mozilla.org/en-US/docs/${slug}`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const url = "https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_operator";
 
 		return [

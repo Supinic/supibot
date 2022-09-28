@@ -143,7 +143,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { definitions } = this.staticData;
 		const tableBody = Object.entries(definitions).map(([code, definition]) => {
 			const name = sb.Utils.modules.languageISO.getName(code);

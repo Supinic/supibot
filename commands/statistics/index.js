@@ -36,7 +36,7 @@ module.exports = {
 
 		return await target.execute(context, type, ...args);
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const loadDefinitions = await require("./statistics.js");
 		const definitions = await loadDefinitions();
 

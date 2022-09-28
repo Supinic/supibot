@@ -58,7 +58,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const definitions = require("./definitions.json");
 		const sorted = [...definitions].sort((a, b) => a.code.localeCompare(b.code));
 

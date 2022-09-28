@@ -372,7 +372,7 @@ module.exports = {
 			}
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { locales } = this.staticData;
 		const list = locales.map(i => `<li><code>${i.locale}</code> - ${i.language}</li>`).join("");
 

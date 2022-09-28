@@ -87,7 +87,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { types } = this.staticData;
 		const list = types.map(i => {
 			const aliases = (i.aliases.length > 0)

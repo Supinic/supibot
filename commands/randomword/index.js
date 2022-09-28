@@ -63,7 +63,7 @@ module.exports = {
 			reply: words.join(" ")
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { limit } = this.staticData;
 		const list = sb.Config.get("WORD_LIST");
 

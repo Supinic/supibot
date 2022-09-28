@@ -1011,7 +1011,7 @@ module.exports = {
 			}
 		}
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { variables } = this.staticData;
 		const list = variables.map(i => {
 			let names = i.name;

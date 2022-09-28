@@ -30,7 +30,7 @@ module.exports = {
 
 		return await subcommand.execute(context, identifier);
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const getCommands = require("./subcommands.js");
 
 		// no need to pass the command itself as param, since no subcommands are executed

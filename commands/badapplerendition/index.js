@@ -162,7 +162,7 @@ module.exports = {
 			}
 		}
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const staticData = this.staticData;
 		const subcommands = staticData.commands.map(i => `<li><code>${prefix}bar ${i.name}</code><br>${i.description}</li>`);
 

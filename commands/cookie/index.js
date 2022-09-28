@@ -60,7 +60,7 @@ module.exports = {
 			reply: cookie.Text
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const tomorrow = new sb.Date().addDays(1);
 		const nextMidnight = new sb.Date(sb.Date.UTC(tomorrow.getUTCFullYear(), tomorrow.getUTCMonth(), tomorrow.getUTCDate()));
 		const delta = sb.Utils.timeDelta(nextMidnight);

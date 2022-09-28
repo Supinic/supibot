@@ -326,7 +326,7 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { scoreThreshold } = require("./definitions.js");
 		const thresholdPercent = `${sb.Utils.round(scoreThreshold * 100, 2)}%`;
 

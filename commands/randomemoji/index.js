@@ -24,7 +24,7 @@ module.exports = {
 			reply: [...new Array(repeats)].map(() => sb.Utils.randArray(emojis)).join(" ")
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { limit } = this.staticData;
 		const list = sb.Config.get("EMOJI_LIST");
 

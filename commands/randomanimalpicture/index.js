@@ -66,7 +66,7 @@ module.exports = {
 			reply: result
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { invocations, types } = this.staticData;
 		const list = [];
 

@@ -102,7 +102,7 @@ module.exports = {
 			reply: `${position} ${data[0].word} (${type}): ${result.definition}`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { languages } = this.staticData;
 		const list = languages.map(([code, name]) => `<li><code>${code}</code> - ${name}</li>`).join("");
 

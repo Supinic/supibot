@@ -228,7 +228,7 @@ module.exports = {
 			reply: `🔮 ${string}`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { threshold, limit } = this.staticData;
 		const channels = await sb.Query.getRecordset(rs => rs
 			.select("Channel.ID AS Channel_ID", "Name")

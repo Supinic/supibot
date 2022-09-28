@@ -23,7 +23,7 @@ module.exports = {
 
 		return await target.execute(context, ...args);
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { subcommands } = require("./definitions.js");
 
 		return [

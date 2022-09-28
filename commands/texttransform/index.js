@@ -73,7 +73,7 @@ module.exports = {
 			}
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const lorem = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
 		const { types, convert } = require("./transforms.js");
 

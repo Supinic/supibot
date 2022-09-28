@@ -117,7 +117,7 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { languages } = this.staticData;
 		const data = await sb.Cache.getByPrefix("random-pastebin-paste-list");
 

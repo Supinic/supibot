@@ -304,7 +304,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { textDataCharacterThreshold } = this.staticData;
 		const threshold = sb.Utils.groupDigits(textDataCharacterThreshold);
 

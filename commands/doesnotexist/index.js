@@ -302,7 +302,7 @@ module.exports = {
 			return result;
 		}
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { fetch } = this.staticData;
 		const list = fetch
 			.flatMap(i => i.descriptions)

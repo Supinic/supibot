@@ -20,7 +20,7 @@ module.exports = {
 
 		return await subcommand.execute(context, ...args);
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { commands } = require("./subcommands.js");
 		const commandDescriptions = commands.flatMap(i => [
 			`<h6>${i.name}</h6>`,

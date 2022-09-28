@@ -157,7 +157,7 @@ module.exports = {
 			reply: `[ ${rolledItems.join(" ")} ] ${deprecationWarning}`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { leaderboardKeywords, patterns } = require("./definitions.js");
 		const patternList = [...patterns]
 			.sort((a, b) => a.name.localeCompare(b.name))

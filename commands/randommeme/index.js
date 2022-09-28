@@ -201,7 +201,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { defaultMemeSubreddits } = require("./config.json");
 		return [
 			"Posts a random Reddit meme. If a subreddit is provided, posts a random non-text post from there.",

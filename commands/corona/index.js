@@ -346,7 +346,7 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: (async (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const { regions } = this.staticData;
 		const regionList = regions.map(i => `<li><code>${i}</code></li>`).join("");
 
