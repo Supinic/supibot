@@ -52,9 +52,11 @@ module.exports = {
 			};
 		}
 
+		const authorData = await sb.User.get(randomAlias.User_Alias);
+		const unpingedAuthorName = `${authorData[0]}\u{E0000}${authorData.slice(1)}`;
 		return {
 			reply: `
-				Random alias "${randomAlias.Name}" for your query:
+				Random alias "${randomAlias.Name}" made by ${unpingedAuthorName} for your query:
 				https://supinic.com/bot/user/alias/detail/${randomAlias.ID}				
 			`
 		};
