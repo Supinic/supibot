@@ -53,7 +53,7 @@ module.exports = {
 		}
 
 		const authorData = await sb.User.get(randomAlias.User_Alias);
-		const unpingedAuthorName = `${authorData[0]}\u{E0000}${authorData.slice(1)}`;
+		const unpingedAuthorName = `${authorData.Name[0]}\u{E0000}${authorData.Name.slice(1)}`;
 		return {
 			reply: `
 				Random alias "${randomAlias.Name}" made by ${unpingedAuthorName} for your query:
