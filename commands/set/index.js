@@ -79,8 +79,6 @@ module.exports = {
 						User_To: userData.ID,
 						Platform: context.platform.ID,
 						Channel: context.channel.ID,
-						Created: new sb.Date(),
-						Active: true,
 						Schedule: null,
 						Text: message,
 						Private_Message: false
