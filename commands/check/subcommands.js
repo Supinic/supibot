@@ -84,7 +84,7 @@ module.exports = (command) => [
 
 			const ambassadors = await sb.User.getMultiple(rawAmbassadors);
 			return {
-				reply: `Active ambassadors: ${ambassadors.map(i => i.Name)}`
+				reply: `Active ambassadors in channel ${channelData.Name}: ${ambassadors.map(i => i.Name)}`
 			};
 		}
 	},
