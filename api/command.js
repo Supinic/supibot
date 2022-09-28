@@ -57,7 +57,7 @@ module.exports = {
 		if (!commandName) {
 			return {
 				statusCode: 400,
-				error: { message: `Valid command name must be provided` }
+				error: { message: `Command name must be provided` }
 			};
 		}
 
