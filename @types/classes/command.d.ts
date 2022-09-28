@@ -278,7 +278,7 @@ export declare class Command extends ClassTemplate {
      * @param contextData
      * @param extraData
      */
-    static createFakeContext (commandData: Command, contextData: ContextConstructorData, extraData: SimpleGenericData): Context;
+    static createFakeContext (commandData: Command, contextData?: ContextConstructorData, extraData?: SimpleGenericData): Context;
     static parseParameter (value: string, type: Parameter.Type, explicit?: boolean): Parameter.ParsedType;
 
     /**
