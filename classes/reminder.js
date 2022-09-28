@@ -141,7 +141,7 @@ module.exports = class Reminder extends require("./template.js") {
 					Created: new sb.Date(),
 					Active: true,
 					Schedule: null,
-					Text: `A timed reminder fired while you were AFK, check it here: https://supinic.com/bot/reminder/lookup?ID=${this.ID}`,
+					Text: `You got a scheduled reminder (ID ${this.ID}) while you were AFK: ${message}`,
 					Private_Message: true
 				}, true);
 			}
