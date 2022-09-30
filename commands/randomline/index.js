@@ -134,13 +134,17 @@ module.exports = {
 				}
 
 				result = await sb.Query.getRecordset(rs => rs
-					.select("Text", "Posted", `"${targetUser.Name}" AS Name`)
+					.select("Text", "Posted")
 					.from("chat_line", targetChannel.getDatabaseName())
 					.where("ID >= %n", data.ID)
 					.orderBy("ID ASC")
 					.limit(1)
 					.single()
 				);
+
+				if (result) {
+					result.Name = targetUser.Name;
+				}
 			}
 			else {
 				const data = await sb.Query.getRecordset(rs => rs
@@ -178,13 +182,17 @@ module.exports = {
 				}
 
 				result = await sb.Query.getRecordset(rs => rs
-					.select("Text", "Posted", `"${targetUser.Name}" AS Name`)
+					.select("Text", "Posted")
 					.from("chat_line", channelName)
 					.where("ID >= %n", random.ID)
 					.orderBy("ID ASC")
 					.limit(1)
 					.single()
 				);
+
+				if (result) {
+					result.Name = targetUser.Name;
+				}
 			}
 		}
 		else if (channelID === 7 || channelID === 8 || channelID === 82) {
