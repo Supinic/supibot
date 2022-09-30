@@ -165,7 +165,7 @@ module.exports = class DiscordController extends require("./template.js") {
 				}
 
 				if (!messageObject.channel) {
-					await sb.Logger.log("Discord.Warning", JSON.stringify(messageObject), channelData.ID);
+					await sb.Logger.log("Discord.Warning", JSON.stringify(messageObject), channelData);
 				}
 
 				const discordChannel = messageObject.channel;
