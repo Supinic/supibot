@@ -111,7 +111,9 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			});
 
 			const fixedMessage = await channelData.prepareMessage(unpingedMessage);
-			await channelData.send(fixedMessage);
+			if (fixedMessage) {
+				await channelData.send(fixedMessage);
+			}
 		}
 	}
 
