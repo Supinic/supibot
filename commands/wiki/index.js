@@ -81,7 +81,27 @@ module.exports = {
 			};
 		}
 		else {
-			const link = `https://${languageCode}.wikipedia.org/?curid=${key}`;
+			const idLink = `https://${languageCode}.wikipedia.org/?curid=${key}`;
+			const params = new URLSearchParams();
+			params.append("action", "shortenurl");
+			params.append("format", "json");
+			params.append("url", idLink);
+
+			const shortenResponse = await sb.Got({
+				method: "POST",
+				responseType: "json",
+				url: "https://meta.wikimedia.org/w/api.php",
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded"
+				},
+				body: params.toString()
+			});
+
+			let link = idLink;
+			if (shortenResponse.statusCode === 200) {
+				link = shortenResponse.body.shortenurl.shorturl;
+			}
+
 			if (context.params.linkOnly) {
 				return {
 					reply: link
