@@ -250,6 +250,7 @@ module.exports = {
 					prefix = (context.user === user) ? "Your" : "Their";
 				}
 
+				/** @type {{ Command: string|null, Invocation: string|null, Arguments: string|null, Parent: number|null } | undefined} */
 				let alias = await sb.Query.getRecordset(rs => rs
 					.select("Command", "Invocation", "Arguments", "Parent")
 					.from("data", "Custom_Command_Alias")
@@ -371,6 +372,7 @@ module.exports = {
 						};
 					}
 
+					/** @type {number | null} */
 					const aliasID = await sb.Query.getRecordset(rs => rs
 						.select("ID")
 						.from("data", "Custom_Command_Alias")
@@ -991,6 +993,18 @@ module.exports = {
 					}
 				}
 
+				/**
+				 * @typedef {Object} EligibleAlias
+				 * @property {number} ID
+				 * @property {number|null} User_Alias
+				 * @property {number|null} Channel
+				 * @property {string} Command
+				 * @property {string|null} Invocation
+				 * @property {string|null} Arguments
+				 * @property {number|null} Parent
+				 */
+
+				/** @type {EligibleAlias[]} */
 				const eligibleAliases = await sb.Query.getRecordset(rs => rs
 					.select("ID", "User_Alias", "Channel", "Command", "Invocation", "Arguments", "Parent")
 					.from("data", "Custom_Command_Alias")
@@ -999,6 +1013,7 @@ module.exports = {
 					.where("Name COLLATE utf8mb4_bin = %s", name)
 				);
 
+				/** @type {EligibleAlias} */
 				let alias;
 				if (eligibleAliases.length <= 1) {
 					alias = eligibleAliases[0];
@@ -1251,8 +1266,8 @@ module.exports = {
 					<code>${prefix}alias add test translate to:\${0} hello!</code>
 					<br>
 					<code>${prefix}alias run test spanish</code> => <code>${prefix}translate to:spanish hello</code>
-				</li>		
-				<br>		
+				</li>
+				<br>
 				<li>
 					<code>\${-#}</code> (e.g. \${-1}, \${-3}, ...)
 					<br>
