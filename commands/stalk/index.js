@@ -67,7 +67,8 @@ module.exports = {
 		const stalkChannelData = sb.Channel.get(stalkData.ChannelID);
 		const delta = sb.Utils.timeDelta(stalkData.Date);
 
-		// automated bot protection - do not allow stalking of banned Twitch users outside of whispers
+		// Automated protection of the bot from being banned:
+		// Do not allow stalking of banned Twitch users in Twitch channels - available in Twitch whispers and other platforms.
 		if (targetUser.Twitch_ID && context.platform.Name === "twitch" && context.channel && stalkChannelData.Platform.Name === "twitch") {
 			const response = await sb.Got("Leppunen", {
 				url: "v2/twitch/user",
@@ -78,9 +79,15 @@ module.exports = {
 
 			// Only refuse to send the message if the ban type ("reason") is a TOS violation.
 			// Memo: possibly also refuse to send when type is `DEACTIVATED`?
-			const [userInfo] = response.body;
-			const omittedBanReasons = ["TOS_TEMPORARY", "TOS_INDEFINITE"];
+			let userInfo;
+			if (Array.isArray(response.body)) {
+				userInfo = response.body[0];
+			}
+			else {
+				userInfo = response.body;
+			}
 
+			const omittedBanReasons = ["TOS_TEMPORARY", "TOS_INDEFINITE"];
 			if (userInfo && userInfo.banned && omittedBanReasons.includes(userInfo.banReason)) {
 				return {
 					success: false,
