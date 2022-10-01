@@ -1,14 +1,5 @@
-/**
- * Represents a custom hook-like function that gets invoked every time a specified event
- * is emitted in a given channel.
- */
 module.exports = class ChatModule extends require("./template.js") {
-	// <editor-fold defaultstate="collapsed" desc="=== INSTANCE PROPERTIES ===">
-
-	/** @deprecated */
-	ID;
 	Name;
-	/** @type {ChatModuleEvent[]} */
 	Events;
 	Active = true;
 	Code;
@@ -17,9 +8,6 @@ module.exports = class ChatModule extends require("./template.js") {
 	attachmentReferences = [];
 	data = {};
 
-	// </editor-fold>
-
-	/** @type {ChatModule[]} */
 	static data = [];
 
 	constructor (data) {
@@ -117,13 +105,6 @@ module.exports = class ChatModule extends require("./template.js") {
 		}
 	}
 
-	/**
-	 * Detaches the module instance from all channels determined by options.
-	 * @param {Object} options
-	 * @param {boolean} [options.remove] If true, the module reference will be removed instead of deactivated.
-	 * @param {sb.Platform} [options.platform] Specified attachment platform
-	 * @param {sb.Channel|sb.Channel[]} [options.channel] Specified attachment channels	 *
-	 */
 	detach (options) {
 		for (const event of this.Events) {
 			for (const channelData of ChatModule.getTargets(options)) {
@@ -429,7 +410,3 @@ module.exports = class ChatModule extends require("./template.js") {
 		super.destroy();
 	}
 };
-
-/**
- * @typedef {"message"|"online"|"offline"|"raid"|"subscription"} ChatModuleEvent
- */
