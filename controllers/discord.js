@@ -629,7 +629,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			if (match) {
 				const user = messageObject.mentions.users.get(match[1]);
 				if (user) {
-					args[i] = `@${user.username}`;
+					args[i] = `@${sb.User.normalizeUsername(user.username)}`;
 				}
 			}
 		}
