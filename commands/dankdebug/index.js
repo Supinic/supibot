@@ -157,7 +157,7 @@ module.exports = {
 
 		const userDataResult = await sandboxData.handleUserDataChange(this.staticData.limit);
 		if (userDataResult.success === false) {
-			return channelDataResult;
+			return userDataResult;
 		}
 
 		if (result && typeof result === "object") {
