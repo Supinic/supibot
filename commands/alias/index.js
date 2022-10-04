@@ -373,17 +373,16 @@ module.exports = {
 					}
 
 					/** @type {number | null} */
-					const aliasID = await sb.Query.getRecordset(rs => rs
-						.select("ID")
+					const alias = await sb.Query.getRecordset(rs => rs
+						.select("ID", "Parent")
 						.from("data", "Custom_Command_Alias")
 						.where("User_Alias = %n", userData.ID)
 						.where("Name COLLATE utf8mb4_bin = %s", aliasName)
 						.single()
 						.limit(1)
-						.flat("ID")
 					);
 
-					if (!aliasID) {
+					if (!alias) {
 						return {
 							success: false,
 							reply: `That user does not have an alias with that name!`
@@ -407,7 +406,7 @@ module.exports = {
 					row.setValues({
 						Name: aliasName,
 						Channel: context.channel.ID,
-						Parent: aliasID
+						Parent: alias.Parent ?? alias.ID
 					});
 
 					await row.save({ skipLoad: true });
