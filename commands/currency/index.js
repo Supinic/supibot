@@ -7,7 +7,11 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: (() => ({
+		currencyAliases: {
+			RMB: "CNY"
+		}
+	})),
 	Code: (async function currency (context, amount, first, separator, second) {
 		const isAmountNumeric = Number.isFinite(Number(amount));
 		if (!isAmountNumeric && !second) {
@@ -65,6 +69,14 @@ module.exports = {
 		const symbolCheck = /^[A-Z]{3}$/;
 		first = first.toUpperCase();
 		second = second.toUpperCase();
+
+		const { currencyAliases } = this.staticData;
+		if (currencyAliases[first]) {
+			first = currencyAliases[first];
+		}
+		if (currencyAliases[second]) {
+			second = currencyAliases[second];
+		}
 
 		if (!symbolCheck.test(first) || !symbolCheck.test(second)) {
 			return {
