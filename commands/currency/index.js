@@ -80,6 +80,7 @@ module.exports = {
 				method: "GET",
 				url: "https://openexchangerates.org/api/latest.json",
 				searchParams: {
+					/** @type {string} */
 					app_id: sb.Config.get("API_OPEN_EXCHANGE_RATES")
 				}
 			});
@@ -159,6 +160,7 @@ module.exports = {
 					const response = await sb.Got("GenericAPI", {
 						url: "https://free.currconv.com/api/v7/convert",
 						searchParams: {
+							/** @type {string} */
 							apiKey: sb.Config.get("API_FREE_CURRENCY_CONVERTER"),
 							q: convertKey,
 							compact: "y"
