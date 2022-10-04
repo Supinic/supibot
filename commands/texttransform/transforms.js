@@ -301,25 +301,38 @@ const types = [
 		description: "Shuffles a message to make it typoglycemic. This means that every word with 4+ characters will have all of its letters shuffled, except the first and last one.",
 		data: (message) => {
 			const result = [];
-			for (const word of message.split(/\b/)) {
+			for (const word of message.split(/\s/)) {
+				if (word.length <= 3) {
+					result.push(word);
+					continue;
+				}
+
 				const stripped = sb.Utils.removeAccents(word);
 				if (/[^a-z]/i.test(stripped)) {
 					result.push(word);
 					continue;
 				}
 
+				const prefixThreshold = Math.ceil(word.length / 5);
+				const suffixThreshold = -Math.max(prefixThreshold - 1, 1);
+
 				const scrambled = [];
-				const chars = word.slice(1, -1).split("");
+				const chars = word.slice(prefixThreshold, suffixThreshold).split("");
+
 				while (chars.length > 0) {
 					const randomIndex = sb.Utils.random(0, chars.length - 1);
 					scrambled.push(chars[randomIndex]);
 					chars.splice(randomIndex, 1);
 				}
 
-				result.push(`${word[0]}${scrambled.join("")}${word[word.length - 1]}`);
+				const prefix = word.slice(0, prefixThreshold);
+				const center = scrambled.join("");
+				const suffix = word.slice(suffixThreshold);
+
+				result.push(`${prefix}${center}${suffix}`);
 			}
 
-			return result.join("");
+			return result.join(" ");
 		}
 	},
 	{
