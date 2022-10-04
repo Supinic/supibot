@@ -223,8 +223,9 @@ module.exports = {
 						};
 					}
 
-					const query = args.join(" ");
-					if (!query) {
+					// Add a space to the end of the query, to preserve words
+					const query = `${args.join(" ")} `;
+					if (/^\s+$/.test(query)) {
 						return {
 							success: false,
 							reply: `You must provide something to repeat!`
