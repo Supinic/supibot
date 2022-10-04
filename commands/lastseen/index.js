@@ -32,7 +32,7 @@ module.exports = {
 			};
 		}
 		else if (targetUser.Name === context.platform.Self_Name) {
-			const emote = await context.getBestAvailableEmote(["monkaStare", "MrDestructoid"], "🤖");
+			const emote = await context.getBestAvailableEmote(["supiniStare", "supiniPoint", "monkaStare", "MrDestructoid"], "🤖");
 			return {
 				success: false,
 				reply: `${emote} I'm always around!`
