@@ -231,7 +231,7 @@ module.exports = {
 						};
 					}
 
-					const limit = context.channel?.Message_Limit ?? context.platofmr.Message_Limit;
+					const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
 					const maximumRepeats = Math.trunc(limit / query.length);
 					const actualRepeats = Math.min(amount, maximumRepeats);
 
