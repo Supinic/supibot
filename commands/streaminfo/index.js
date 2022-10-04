@@ -80,7 +80,7 @@ module.exports = {
 				};
 			}
 
-			const games = edges.map(i => i.node.displayName).join(", ");
+			const games = edges.filter(i => i.node?.displayName).map(i => i.node.displayName).join(", ");
 			return {
 				reply: `Recently streamed categories: ${games}`
 			};
