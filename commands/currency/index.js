@@ -96,7 +96,7 @@ module.exports = {
 				unrecognized.push(first);
 			}
 			if (!data[second]) {
-				unrecognized.push(first);
+				unrecognized.push(second);
 			}
 
 			return {
