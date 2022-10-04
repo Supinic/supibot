@@ -30,7 +30,7 @@ module.exports = {
 
 		if (statusCode !== 200) {
 			const errorMessage = (data.error)
-				? data.error.replace(link, "")
+				? data.error.replace(link, "").trim()
 				: `Unknown error occured (status code ${statusCode})`;
 
 			return {
