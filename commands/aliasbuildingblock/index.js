@@ -6,6 +6,7 @@ module.exports = {
 	Description: "A collection of smaller commands, only usable within aliases - and not as standalone commands. Consider these \"building blocks\" for more complex aliases, without needing to make them yourself.",
 	Flags: ["external-input","pipe","skip-banphrase"],
 	Params: [
+		{ name: "amount", type: "number" },
 		{ name: "em", type: "string" },
 		{ name: "errorMessage", type: "string" },
 		{ name: "excludeSelf", type: "boolean" },
@@ -198,6 +199,46 @@ module.exports = {
 				execute: (context) => ({
 					reply: context.platform.Name
 				})
+			},
+			{
+				name: "repeat",
+				aliases: [],
+				description: "For the provided word or words, they will be repeated up to provided amount of times",
+				examples: [
+					["$abb repeat amount:5 hello", "hello hello hello hello hello"],
+					["$abb repeat amount:3 hello world everyone", "hello world everyone hello world everyone hello world everyone"]
+				],
+				execute: (context, ...args) => {
+					const { amount } = context.params;
+					if (typeof amount !== "number") {
+						return {
+							success: false,
+							reply: `No repeat amount provided!`
+						};
+					}
+					else if (!sb.Utils.isValidInteger(amount)) {
+						return {
+							success: false,
+							reply: `The provided amount must be a positive integer!`
+						};
+					}
+
+					const query = args.join(" ");
+					if (!query) {
+						return {
+							success: false,
+							reply: `You must provide something to repeat!`
+						};
+					}
+
+					const limit = context.channel?.Message_Limit ?? context.platofmr.Message_Limit;
+					const maximumRepeats = Math.trunc(limit / query.length);
+					const actualRepeats = Math.min(amount, maximumRepeats);
+
+					return {
+						reply: query.repeat(actualRepeats)
+					};
+				}
 			},
 			{
 				name: "replace",
