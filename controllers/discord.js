@@ -4,7 +4,8 @@ const {
 	DiscordAPIError,
 	GuildMember,
 	GatewayIntentBits,
-	Partials
+	Partials,
+	PermissionFlagsBits
 } = require("discord.js");
 
 module.exports = class DiscordController extends require("./template.js") {
@@ -68,7 +69,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			// If the bot does not have SEND_MESSAGES permission in the channel, completely ignore the message.
 			// Do not process it for logging, commands, AFKs, Reminders, anything.
 			const selfPermissions = messageObject.channel.permissionsFor?.(this.platform.Self_ID);
-			if (selfPermissions && !selfPermissions.has("SEND_MESSAGES")) {
+			if (selfPermissions && !selfPermissions.has(PermissionFlagsBits.SendMessages)) {
 				return;
 			}
 
