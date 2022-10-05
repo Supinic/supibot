@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Checks the top 5 streams on twitch - if you add a game, will look for top 5 streams playing that game. Game must be provided verbatim",
+	Description: "Checks the top 10 streams on twitch - if you add a game, will look for top 10 streams playing that game. Game must be provided verbatim",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
@@ -62,5 +62,18 @@ module.exports = {
 			reply: `These streamers ${gameString}: ${streamers.join("; ")}`
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async (prefix) => [
+		"Fetches the top 10 streamers currently live on Twitch, sorted by viewers descending.",
+		"If you provide a game, only that game's streams will be shown.",
+		"",
+
+		`<code>${prefix}topstreams</code>`,
+		"Shows the top streamers currently live",
+		"",
+
+
+		`<code>${prefix}topstreams (game)</code>`,
+		`<code>${prefix}topstreams Old School Runescape</code>`,
+		"Shows the top streamers currently live in that game or category."
+	])
 };
