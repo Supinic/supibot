@@ -710,7 +710,7 @@ class Command extends require("./template.js") {
 					statusMessage
 				};
 			}
-			else if (e instanceof sb.Got.GotError) {
+			else if (e instanceof sb.Got.RequestError) {
 				origin = "External";
 				const { code, name, message, options } = e;
 				errorContext = {
@@ -740,7 +740,7 @@ class Command extends require("./template.js") {
 					reply: `🚨 Third party ${hostname} failed! ${message ?? "(no message)"} (error ID ${errorID})`
 				};
 			}
-			else if (e instanceof sb.Got.GotError) {
+			else if (e instanceof sb.Got.RequestError) {
 				execution = {
 					success: false,
 					reason: "got-error",
