@@ -228,7 +228,9 @@ module.exports = class VLCSingleton extends require("./template.js") {
 			prefixUrl: this.baseURL,
 			url: parent ?? "",
 			searchParams,
-			timeout: 1000
+			timeout: {
+				request: 1000
+			}
 		}).json();
 	}
 

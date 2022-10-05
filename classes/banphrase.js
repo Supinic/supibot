@@ -12,7 +12,9 @@ module.exports = (function () {
 				method: "POST",
 				url: `https://${URL}/api/v1/banphrases/test`,
 				json: { message },
-				timeout: sb.Config.get("PAJBOT_API_TIMEOUT"),
+				timeout: {
+					request: sb.Config.get("PAJBOT_API_TIMEOUT")
+				},
 				retry: 1
 			};
 

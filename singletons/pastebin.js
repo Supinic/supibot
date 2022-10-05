@@ -77,7 +77,9 @@ module.exports = class PastebinSingleton extends require("./template.js") {
 		const { body, statusCode } = await this.#got({
 			method: "POST",
 			url: "api/api_login.php",
-			timeout: 5000,
+			timeout: {
+				request: 5000
+			},
 			body: new URLSearchParams({
 				api_dev_key: sb.Config.get("API_PASTEBIN"),
 				api_user_name: sb.Config.get("PASTEBIN_USER_NAME"),
@@ -162,7 +164,9 @@ module.exports = class PastebinSingleton extends require("./template.js") {
 			throwHttpErrors: false,
 			url: "api/api_post.php",
 			body: params.toString(),
-			timeout: 5000
+			timeout: {
+				request: 5000
+			}
 		});
 
 		if (statusCode === 200) {
