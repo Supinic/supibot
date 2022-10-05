@@ -82,7 +82,7 @@ module.exports = {
 					clientNo: "e3bde1a312"
 				}
 			});
-			
+
 			if (!response.body.content) {
 				return {
 					success: false,
@@ -177,7 +177,7 @@ module.exports = {
 			`
 		};
 	}),
-	Dynamic_Description: (async function getDynamicDescription (prefix) {
+	Dynamic_Description: (async function (prefix) {
 		const gameData = await this.getCacheData({ type: "games" });
 		const games = (gameData)
 			? gameData.map(i => `<li><code>${i.name}</code></li>`).sort().join("")
