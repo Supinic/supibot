@@ -15,7 +15,9 @@ module.exports = (function () {
 				timeout: {
 					request: sb.Config.get("PAJBOT_API_TIMEOUT")
 				},
-				retry: 1
+				retry: {
+					limit: 1
+				}
 			};
 
 			/** @type {PajbotBanphraseAPIResponse} */
