@@ -32,6 +32,7 @@ module.exports = class DiscordController extends require("./template.js") {
 		this.client = new Client({
 			intents: [
 				GatewayIntentBits.Guilds,
+				GatewayIntentBits.GuildMembers,
 				GatewayIntentBits.GuildMessages,
 				GatewayIntentBits.GuildEmojisAndStickers,
 				GatewayIntentBits.GuildMessageReactions,
