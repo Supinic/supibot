@@ -4,7 +4,7 @@
   "dependencies": {
     "cytube-connector": "github:Supinic/cytube-connector",
     "dank-twitch-irc": "^4.3.0",
-    "discord.js": "^13.0.0",
+    "discord.js": "^14.5.0",
     "irc-framework": "^4.12.1",
     "message-scheduler": "github:Supinic/message-scheduler",
     "supi-core": "github:Supinic/supi-core"
@@ -30,10 +30,10 @@
   "license": "AGPL-3.0",
   "description": "Multiplatform, utility & novelty chat bot.",
   "devDependencies": {
-    "@babel/core": "^7.18.9",
-    "@babel/eslint-parser": "^7.18.9",
-    "eslint": "^8.20.0",
-    "eslint-plugin-unicorn": "^43.0.2",
+    "@babel/core": "^7.19.3",
+    "@babel/eslint-parser": "^7.19.1",
+    "eslint": "^8.24.0",
+    "eslint-plugin-unicorn": "^44.0.1",
     "mocha": "^10.0.0",
     "nyc": "^15.1.0",
     "supi-db-init": "github:Supinic/supi-db-init"

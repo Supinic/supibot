@@ -1,4 +1,4 @@
-const { Client, Intents, DiscordAPIError, GuildMember } = require("discord.js");
+const { Client, GatewayIntentBits, Partials, DiscordAPIError, GuildMember } = require("discord.js");
 
 module.exports = class DiscordController extends require("./template.js") {
 	constructor () {
@@ -21,20 +21,19 @@ module.exports = class DiscordController extends require("./template.js") {
 			});
 		}
 
-		const intents = new Intents();
-		intents.add(
-			"GUILDS",
-			"GUILD_MEMBERS",
-			"GUILD_EMOJIS_AND_STICKERS",
-			"GUILD_MESSAGES",
-			"GUILD_MESSAGE_REACTIONS",
-			"DIRECT_MESSAGES",
-			"DIRECT_MESSAGE_REACTIONS"
-		);
-
 		this.client = new Client({
-			intents,
-			partials: ["CHANNEL"]
+			intents: [
+				GatewayIntentBits.Guilds,
+				GatewayIntentBits.GuildMessages,
+				GatewayIntentBits.GuildEmojisAndStickers,
+				GatewayIntentBits.GuildMessageReactions,
+				GatewayIntentBits.DirectMessages,
+				GatewayIntentBits.DirectMessageReactions,
+				GatewayIntentBits.MessageContent
+			],
+			partials: [
+				Partials.Channel
+			]
 		});
 
 		this.initListeners();
