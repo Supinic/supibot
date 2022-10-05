@@ -643,8 +643,8 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: ((prefix, values) => {
-		const { allowedTypes } = values.getStaticData();
+	Dynamic_Description: ((prefix) => {
+		const { allowedTypes } = this.staticData;
 
 		return [
 			"Checks for current weather, or for hourly/daily forecast in a given location.",
