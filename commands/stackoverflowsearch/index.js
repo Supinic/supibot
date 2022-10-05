@@ -14,17 +14,17 @@ module.exports = {
 			return { reply: "No search text provided!" };
 		}
 
-		const data = await sb.Got({
+		const response = await sb.Got("GenericAPI", {
 			url: "https://api.stackexchange.com/2.2/search/advanced",
-			gzip: true,
 			searchParams: {
 				order: "desc",
 				sort: "relevance",
 				site: "stackoverflow",
 				q: message
 			}
-		}).json();
+		});
 
+		const data = response.body;
 		if (data.quota_remaining === 0) {
 			return { reply: "Daily quota exceeded! :(" };
 		}
