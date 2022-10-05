@@ -3,8 +3,12 @@ export default {
 	optionsType: "function",
 	options: (() => ({
 		responseType: "json",
-		retry: 0,
-		timeout: 30000,
+		retry: {
+			limit: 0
+		},
+		timeout: {
+			request: 30000
+		},
 		mutableDefaults: true,
 		throwHttpErrors: false,
 		headers: {

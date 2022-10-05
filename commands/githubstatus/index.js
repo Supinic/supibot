@@ -11,8 +11,12 @@ module.exports = {
 	Code: (async function githubStatus () {
 		const response = await sb.Got("GenericAPI", {
 			url: "https://www.githubstatus.com/history.json",
-			retry: 0,
-			timeout: 5000
+			retry: {
+				limit: 0
+			},
+			timeout: {
+				request: 5000
+			}
 		});
 
 		const { components, page_status: pageStatus } = response.body;

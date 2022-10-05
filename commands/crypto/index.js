@@ -17,7 +17,9 @@ module.exports = {
 				fsym: symbol,
 				tsyms: "USD,EUR"
 			},
-			timeout: 10000,
+			timeout: {
+				request: 10000
+			},
 			headers: {
 				Authorization: `Apikey ${sb.Config.get("API_CRYPTO_COMPARE")}`
 			}
@@ -41,8 +43,12 @@ module.exports = {
 						method: "HEAD",
 						url: `https://www.coindesk.com/price/${symbol.toLowerCase()}`,
 						throwHttpErrors: false,
-						timeout: 10_000,
-						retry: 0,
+						timeout: {
+							request: 10_000
+						},
+						retry: {
+							limit: 0
+						},
 						headers: {
 							Referer: "https://www.coindesk.com/"
 						}

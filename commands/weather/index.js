@@ -281,7 +281,9 @@ module.exports = {
 				url: "https://api.openweathermap.org/data/2.5/air_pollution",
 				responseType: "json",
 				throwHttpErrors: false,
-				timeout: 60_000,
+				timeout: {
+					request: 60_000
+				},
 				searchParams: {
 					lat: coords.lat,
 					lon: coords.lng,
@@ -316,7 +318,9 @@ module.exports = {
 				url: "https://api.openweathermap.org/data/2.5/onecall",
 				responseType: "json",
 				throwHttpErrors: false,
-				timeout: 60_000,
+				timeout: {
+					request: 60_000
+				},
 				searchParams: {
 					lat: coords.lat,
 					lon: coords.lng,

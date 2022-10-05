@@ -13,8 +13,12 @@ module.exports = {
 			url: "https://yh6f0r4529hb.statuspage.io/api/v2/summary.json",
 			responseType: "json",
 			throwHttpErrors: false,
-			retry: 0,
-			timeout: 5000
+			retry: {
+				limit: 0
+			},
+			timeout: {
+				request: 5000
+			}
 		});
 
 		const { incidents, page, status, scheduled_maintenances: maintenances } = response.body;

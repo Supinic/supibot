@@ -59,8 +59,12 @@ module.exports = {
 				term: query
 			},
 			throwHttpErrors: false,
-			retry: 0,
-			timeout: 5000
+			retry: {
+				limit: 0
+			},
+			timeout: {
+				request: 5000
+			}
 		});
 
 		const result = [];

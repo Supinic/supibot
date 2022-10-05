@@ -68,8 +68,12 @@ module.exports = {
 					zone: args
 				}),
 				throwHttpErrors: false,
-				timeout: 30_000,
-				retry: 0
+				timeout: {
+					request: 30_000
+				},
+				retry: {
+					limit: 0
+				}
 			}).json();
 
 			if (result.success) {
@@ -159,8 +163,12 @@ module.exports = {
 					command: "request"
 				}),
 				throwHttpErrors: false,
-				timeout: 30_000,
-				retry: 0
+				timeout: {
+					request: 30_000
+				},
+				retry: {
+					limit: 0
+				}
 			}).json();
 		}
 		catch (e) {

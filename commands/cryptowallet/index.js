@@ -71,7 +71,9 @@ module.exports = {
 				fsym: symbol,
 				tsyms: "USD,EUR"
 			},
-			timeout: 10000,
+			timeout: {
+				request: 10000
+			},
 			headers: {
 				Authorization: `Apikey ${sb.Config.get("API_CRYPTO_COMPARE")}`
 			}

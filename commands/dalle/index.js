@@ -139,7 +139,9 @@ module.exports = {
 			json: {
 				prompt: query
 			},
-			timeout: 300_000,
+			timeout: {
+				request: 300_000
+			},
 			throwHttpErrors: false
 		});
 

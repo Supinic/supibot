@@ -41,7 +41,9 @@ module.exports = {
 				response = await sb.Got("FakeAgent", {
 					url: `https://liveuamap.com/${languageCode}`,
 					responseType: "text",
-					timeout: 60_000
+					timeout: {
+						request: 60_000
+					}
 				});
 			}
 			catch (e) {

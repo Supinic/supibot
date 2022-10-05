@@ -32,8 +32,12 @@ module.exports = {
 				term
 			},
 			throwHttpErrors: false,
-			retry: 0,
-			timeout: this.staticData.timeout
+			retry: {
+				limit: 0
+			},
+			timeout: {
+				request: this.staticData.timeout
+			}
 		});
 
 		if (response.statusCode === 500) {
@@ -43,8 +47,12 @@ module.exports = {
 					api_key: this.staticData.fauxKey,
 					term
 				},
-				retry: 0,
-				timeout: this.staticData.timeout
+				retry: {
+					limit: 0
+				},
+				timeout: {
+					request: this.staticData.timeout
+				}
 			});
 
 			const match = autocompleteResponse.body.results.find(i => i.term.toLowerCase() === lowerTerm);

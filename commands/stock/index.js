@@ -56,7 +56,9 @@ module.exports = {
 			: findSymbol(input) ?? args[0];
 
 		const { "Global Quote": rawData } = await sb.Got({
-			retry: 0,
+			retry: {
+				limit: 0
+			},
 			throwHttpErrors: false,
 			url: "https://www.alphavantage.co/query",
 			searchParams: {

@@ -15,7 +15,7 @@ export default {
 
 		return {
 			method: "POST",
-			url: "https://gql.twitch.tv/gql",
+			prefixUrl: "https://gql.twitch.tv/gql",
 			responseType: "json",
 			headers: {
 				Accept: "*/*",
