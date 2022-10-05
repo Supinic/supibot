@@ -16,7 +16,7 @@ module.exports = {
 				headers: {
 					Authorization: sb.Config.get("API_CURRENTSAPI_TOKEN")
 				},
-				throwHttpErros: false,
+				throwHttpErrors: false,
 				responseType: "json",
 				retry: {
 					limit: 0

@@ -86,7 +86,7 @@ module.exports = {
 		const { statusCode, body: data } = await sb.Got("GitHub", {
 			method: "POST",
 			responseType: "json",
-			throwHttpErros: false,
+			throwHttpErrors: false,
 			url: `repos/Supinic/${repo}/issues`,
 			json: {
 				title: `S#${ID} - elevated`,
