@@ -10,9 +10,7 @@ module.exports = class SandboxSingleton extends require("./template.js") {
 		eval: false,
 		wasm: false,
 		fixAsync: true,
-		timeout: {
-			request: 5000
-		}
+		timeout: 5000
 	};
 
 	/**
