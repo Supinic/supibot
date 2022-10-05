@@ -1,4 +1,11 @@
-const { Client, GatewayIntentBits, Partials, DiscordAPIError, GuildMember } = require("discord.js");
+const {
+	ChannelType,
+	Client,
+	DiscordAPIError,
+	GuildMember,
+	GatewayIntentBits,
+	Partials
+} = require("discord.js");
 
 module.exports = class DiscordController extends require("./template.js") {
 	constructor () {
@@ -651,7 +658,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			author: messageObject.author,
 			mentions: messageObject.mentions,
 			guild: messageObject?.channel?.guild ?? null,
-			privateMessage: Boolean(messageObject.channel.type.toLowerCase() === "dm"),
+			privateMessage: (messageObject.channel.type === ChannelType.DM),
 			commandArguments: args
 		};
 	}
