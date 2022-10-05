@@ -643,7 +643,7 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: ((prefix) => {
+	Dynamic_Description: (async function getDynamicDescription (prefix) {
 		const { allowedTypes } = this.staticData;
 
 		return [
