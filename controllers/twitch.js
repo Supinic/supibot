@@ -14,8 +14,12 @@ const emoteGot = sb.Got.get("Global").extend({
 	mutableDefaults: true,
 	responseType: "json",
 	throwHttpErrors: false,
-	timeout: 2500,
-	retry: 1
+	timeout: {
+		request: 2500
+	},
+	retry: {
+		limit: 1
+	}
 });
 
 module.exports = class TwitchController extends require("./template.js") {
