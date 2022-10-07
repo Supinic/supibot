@@ -40,7 +40,6 @@ module.exports = {
 		}
 
 		let link;
-		const { URL } = require("url");
 		for (const arg of args) {
 			let parsedURL;
 			try {
