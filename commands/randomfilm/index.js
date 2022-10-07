@@ -13,13 +13,16 @@ module.exports = {
 			url: "https://www.bestrandoms.com/random-movie-generator",
 			responseType: "text"
 		}).text();
-	
+
 		const $ = sb.Utils.cheerio(html);
 		const movies = $(".content .list-unstyled li").map((ind, i) => {
-			const name = $($(i).children()[1]);
-			return name.text().replace(/\s+/g, " ");
+			const name = $($(i).children()[2]);
+			return name
+				.text()
+				.replace(/\s+/g, " ")
+				.replace(/(\(\d+\))/, " $1");
 		});
-	
+
 		return {
 			reply: `Your random movie is: ${sb.Utils.randArray(movies)}.`
 		};
