@@ -23,6 +23,7 @@ module.exports = {
 
 		let statusCode;
 		let data;
+		const { getFacebookAppID } = require("./instagram-api.js");
 		const profileCacheData = await this.getCacheData({ user });
 		if (profileCacheData) {
 			statusCode = profileCacheData.statusCode;
@@ -31,11 +32,24 @@ module.exports = {
 		else {
 			let rateLimited = false;
 			let response;
+			const key = await getFacebookAppID();
+			if (!key) {
+				return {
+					success: false,
+					reply: `Cannot fetch the Instagram API key! Please let @Supinic know about this.`
+				};
+			}
+
 			try {
 				response = await sb.Got("FakeAgent", {
-					url: `https://www.instagram.com/${user}/`,
+					url: `https://i.instagram.com/api/v1/users/web_profile_info`,
 					searchParams: {
-						__a: "1"
+						username: user
+					},
+					headers: {
+						"X-IG-App-ID": key,
+						Referer: "https://www.instagram.com/",
+						"Referrer-Policy": "strict-origin-when-cross-origin"
 					},
 					throwHttpErrors: false,
 					responseType: "json",
@@ -57,63 +71,14 @@ module.exports = {
 			}
 
 			if (rateLimited) {
-				const backup = await sb.Got("GenericAPI", {
-					url: `https://bibliogram.art/u/${user}`,
-					responseType: "text",
-					throwHttpErrors: false
-				});
-
-				if (backup.statusCode === 503) {
-					return {
-						success: false,
-						reply: `User "${user}" not found on Instagram!`
-					};
-				}
-				else if (backup.statusCode !== 200) {
-					return {
-						success: false,
-						reply: `Cannot check for Instagram posts of user "${user}" at the moment! (Status code ${backup.statusCode})`
-					};
-				}
-
-				const $ = sb.Utils.cheerio(backup.body);
-				const posts = Array.from($("a.sized-link")).map(i => ({
-					id: i.attribs["data-shortcode"],
-					description: i.children[0].attribs.alt,
-					raw: decodeURI(i.children[0].attribs.src).split("&url=")[1]
-				}));
-
-				if (posts.length === 0) {
-					return {
-						success: false,
-						reply: `No posts have been found! The profile could also be private.`
-					};
-				}
-
-				const post = sb.Utils.randArray(posts);
-				if (context.params.rawLinkOnly) {
-					return {
-						reply: post.raw
-					};
-				}
-				else if (context.params.postLinkOnly) {
-					return {
-						reply: `https://www.instagram.com/p/${post.id}`
-					};
-				}
-				else {
-					return {
-						reply: `
-							Backup Instagram source:
-							${post.description}
-							https://www.instagram.com/p/${post.id}
-						`
-					};
-				}
+				return {
+					success: false,
+					reply: `Instagram API does not allow any more requests now! Try again later.`
+				};
 			}
 
 			statusCode = response.statusCode;
-			data = response.body;
+			data = response.body?.data?.user ?? null;
 
 			await this.setCacheData({ user }, { statusCode, data }, {
 				expiry: 36e5
@@ -126,7 +91,7 @@ module.exports = {
 				reply: `User "${user}" not found on Instagram!`
 			};
 		}
-		else if (!data.graphql) {
+		else if (!data) {
 			return {
 				success: false,
 				reply: `No posts data received for user "${user}"!`
@@ -135,7 +100,7 @@ module.exports = {
 
 		const nsfwEnabled = await context.channel.getDataProperty("instagramNSFW");
 		const nsfwCheck = (!context.channel || (!context.channel.NSFW && !nsfwEnabled));
-		const posts = (data.graphql.user.edge_owner_to_timeline_media?.edges ?? []).filter(i => !i.node.is_video);
+		const posts = (data.edge_owner_to_timeline_media?.edges ?? []).filter(i => !i.node.is_video);
 		if (posts.length === 0) {
 			return {
 				success: false,
