@@ -23,7 +23,7 @@ module.exports = {
 
 		let statusCode;
 		let data;
-		const { getFacebookAppID } = require("./instagram-api.js");
+		const { getFacebookAppID, resetFacebookAppID } = require("./instagram-api.js");
 		const profileCacheData = await this.getCacheData({ user });
 		if (profileCacheData) {
 			statusCode = profileCacheData.statusCode;
@@ -62,6 +62,7 @@ module.exports = {
 			}
 
 			if (rateLimited) {
+				await resetFacebookAppID();
 				return {
 					success: false,
 					reply: `Instagram API does not allow any more requests now! Try again later.`

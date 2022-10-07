@@ -32,6 +32,11 @@ const getFacebookAppID = async () => {
 	return key;
 };
 
+const resetFacebookAppID = async () => {
+	await sb.Cache.setByPrefix(cacheKey, null);
+};
+
 module.exports = {
-	getFacebookAppID
+	getFacebookAppID,
+	resetFacebookAppID
 };
