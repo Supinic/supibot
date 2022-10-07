@@ -52,16 +52,7 @@ module.exports = {
 						"Referrer-Policy": "strict-origin-when-cross-origin"
 					},
 					throwHttpErrors: false,
-					responseType: "json",
-					hooks: {
-						beforeRedirect: [
-							(options, res) => {
-								if (res.statusCode >= 300 && res.statusCode <= 399) {
-									rateLimited = true;
-								}
-							}
-						]
-					}
+					responseType: "json"
 				});
 			}
 			catch (e) {
