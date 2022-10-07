@@ -62,14 +62,14 @@ module.exports = {
 					responseType: "text",
 					throwHttpErrors: false
 				});
-				
+
 				if (backup.statusCode === 503) {
 					return {
 						success: false,
 						reply: `User "${user}" not found on Instagram!`
 					};
 				}
-				else if (backup.statusCode === 200) {
+				else if (backup.statusCode !== 200) {
 					return {
 						success: false,
 						reply: `Cannot check for Instagram posts of user "${user}" at the moment! (Status code ${backup.statusCode})`
