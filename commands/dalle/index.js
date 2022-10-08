@@ -17,6 +17,11 @@ module.exports = {
 		"Alternatively, searches for an existing prompt someone else has created.",
 		"",
 
+		`<code>${prefix}dalle</code>`,
+		"Posts a link to the list of all previously generated images.",
+		`<a href="https://supinic.com/data/dall-e/list">https://supinic.com/data/dall-e/list</a>`,
+		"",
+
 		`<code>${prefix}dalle (your prompt here)</code>`,
 		`<code>${prefix}dalle Billy Herrington as president of the United States</code>`,
 		"Creates a set of nine pictures with your prompt, and posts a link to it in the chat.",
@@ -91,7 +96,7 @@ module.exports = {
 		if (!query) {
 			return {
 				success: false,
-				reply: `No prompt provided! If you want to search for existing image sets, use the "search" parameter.`
+				reply: `No prompt provided! Check the list of images here: https://supinic.com/data/dall-e/list`
 			};
 		}
 
