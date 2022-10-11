@@ -733,18 +733,18 @@ class Command extends require("./template.js") {
 			});
 
 			if (e instanceof sb.errors.GenericRequestError) {
-				const { hostname, message } = errorContext;
+				const { hostname } = errorContext;
 				execution = {
 					success: false,
 					reason: "generic-request-error",
-					reply: `🚨 Third party ${hostname} failed! ${message ?? "(no message)"} (error ID ${errorID})`
+					reply: `Third party service ${hostname} failed! 🚨 (ID ${errorID})`
 				};
 			}
 			else if (e instanceof sb.Got.RequestError) {
 				execution = {
 					success: false,
 					reason: "got-error",
-					reply: `🚨 Third party network error! ${errorContext.message ?? "(no message)"} (error ID ${errorID})`
+					reply: `Third party service failed! 🚨 (ID ${errorID})`
 				};
 			}
 			else {
