@@ -889,5 +889,18 @@
         "helpers": ["howtoeat6"]
       }
     ]
+  },
+  {
+    "code": "sa",
+    "language": "Arabic",
+    "sources": [
+      {
+        "name": "Al Arabiya",
+        "url": "https://alarabiya.net",
+        "path": ["feed/rss2/ar"],
+        "endpoints": ["saudi-today.xml"],
+        "helpers": ["ALazyMeme"]
+      }
+    ]
   }
 ]
