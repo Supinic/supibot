@@ -56,7 +56,7 @@ module.exports = {
 			}
 
 			/** @type {CookieData} */
-			const receiverCookieData = await receiverUserData.getDataProperty("cookie") ?? Logic.initialStats;
+			const receiverCookieData = await receiverUserData.getDataProperty("cookie") ?? Logic.getInitialStats();
 			const result = Logic.donateCookie(cookieData, receiverCookieData);
 			if (!result.success) {
 				return result;
