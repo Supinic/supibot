@@ -94,7 +94,7 @@ const resetDailyStats = (data) => {
  */
 const canEatDailyCookie = (data) => {
 	const today = sb.Date.getTodayUTC();
-	return (data.lastTimestamp.today !== today);
+	return (data.lastTimestamp.daily !== today);
 };
 
 /**
