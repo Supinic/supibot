@@ -36,7 +36,7 @@ const getInitialStats = () => structuredClone(basicStats);
 const subcommands = [
 	{
 		name: "donate",
-		aliases: ["gift"],
+		aliases: ["gift", "give"],
 		default: false
 	},
 	{
