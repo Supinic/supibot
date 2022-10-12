@@ -39,7 +39,7 @@ module.exports = {
 			if (!receiverUserData) {
 				return {
 					success: false,
-					reply: `I haven't seen that user before, so you can't gift cookies to them!`
+					reply: `I haven't seen that user before, so you can't donate cookies to them!`
 				};
 			}
 			else if (receiverUserData.Name === context.platform.Self_Name) {
