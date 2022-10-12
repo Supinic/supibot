@@ -4,9 +4,9 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Open a random fortune cookie wisdom. Watch out - only one allowed per day, and no refunds! Daily reset occurs at midnight UTC.",
-	Flags: ["mention","pipe","rollback","whitelist"],
+	Flags: ["mention","pipe","rollback"],
 	Params: null,
-	Whitelist_Response: "The $cookie command is currently under reconstruction! Please try again later.",
+	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function cookie (context, type, receiver) {
 		const Logic = require("./cookie-logic.js");
