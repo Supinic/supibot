@@ -87,16 +87,18 @@ module.exports = {
 
 		return [
 			"Fetch a daily fortune cookie and read its wisdom!",
-			`Only available once per day, and resets at midnight UTC - which from now, is in ${delta}`,
-			"",
-
-			`Cookies can also be gifted to other users, via the <a href="/bot/command/detail/gift"><code>${prefix}gift cookie</code></a> command.`,
-			`You can check the <a href="/bot/cookie/list">cookie leaderboards as well</a>.`,
+			`Only available once per day, and resets at midnight UTC - which from now, is ${delta}`,
 			"",
 
 			`<code>${prefix}cookie</code>`,
-			"Opens your daily fortune cookie.",
-			""
+			`<code>${prefix}cookie eat</code>`,
+			"Opens up, eats and reads a daily fortune cookie.",
+			"",
+
+			`<code>${prefix}cookie gift (user)</code>`,
+			`<code>${prefix}cookie give (user)</code>`,
+			`<code>${prefix}cookie donate (user)</code>`,
+			"Cookies can also be donated to other users, if you so wish."
 		];
 	})
 };

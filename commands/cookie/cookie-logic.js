@@ -187,28 +187,28 @@ const eatCookie = (data) => {
  * @returns {boolean}
  */
 const donateCookie = (donator, receiver) => {
-	if (canEatReceivedCookie(donator)) { // Got gifted cookie, can't gift those
+	if (canEatReceivedCookie(donator)) { // Got donated cookie, can't donate those
 		return {
 			success: false,
-			reply: "That cookie was gifted to you! Eat it, don't give it away!"
+			reply: "That cookie was donated to you! Eat it, don't give it away!"
 		};
 	}
-	else if (!canEatDailyCookie(donator)) { // No daily cookie left to gift to others
+	else if (!canEatDailyCookie(donator)) { // No daily cookie left to donate to others
 		return {
 			success: false,
-			reply: "You already ate or gifted your cookie today, so you can't gift it to someone else!"
+			reply: "You already ate or donated your cookie today, so you can't gift it to someone else!"
 		};
 	}
-	else if (canEatDailyCookie(receiver)) { // Receiver hasn't eaten their gifted cookie yet
+	else if (canEatDailyCookie(receiver)) { // Receiver hasn't eaten their donated cookie yet
 		return {
 			success: false,
-			reply: "That user hasn't eaten their cookie today, so you would be wasting your gift! Get them to eat it!"
+			reply: "That user hasn't eaten their daily cookie today, so you would be wasting your donation! Get them to eat it!"
 		};
 	}
-	else if (canEatReceivedCookie(receiver)) { // Receiver already has a gift pending
+	else if (canEatReceivedCookie(receiver)) { // Receiver already has a donation pending
 		return {
 			success: false,
-			reply: "That user hasn't eaten their cookie today, so you would be wasting your gift! Get them to eat it!"
+			reply: "That user hasn't eaten their donated cookie, so you would be wasting your donation! Get them to eat it!"
 		};
 	}
 
