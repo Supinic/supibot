@@ -47,6 +47,13 @@ module.exports = {
 					reply: "I appreciate the gesture, but thanks, I don't eat sweets :)"
 				};
 			}
+			else if (context.user === receiverUserData) {
+				return {
+					reply: (!Logic.canEatDailyCookie(cookieData) && !Logic.canEatReceivedCookie(cookieData))
+						? "You already ate or donated your daily cookie today, so you can't donate it, not even to yourself!"
+						: "Okay...! So you passed the cookie from one hand to the other... Now what?"
+				};
+			}
 
 			/** @type {CookieData} */
 			const receiverCookieData = await receiverUserData.getDataProperty("cookie") ?? Logic.initialStats;

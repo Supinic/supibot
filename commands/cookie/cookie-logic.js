@@ -243,6 +243,8 @@ module.exports = {
 	hasOutdatedDailyStats,
 	resetDailyStats,
 	getValidTypeNames,
+	canEatDailyCookie,
+	canEatReceivedCookie,
 	eatDailyCookie,
 	eatReceivedCookie,
 	eatCookie,
