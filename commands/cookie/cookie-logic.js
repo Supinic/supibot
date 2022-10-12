@@ -57,7 +57,7 @@ const parseSubcommand = (type) => {
 	}
 	else {
 		type = type.toLowerCase();
-		subcommand = subcommands.find(i => i.name === type);
+		subcommand = subcommands.find(i => i.name === type || i.aliases.includes(type));
 	}
 
 	return (subcommand) ? subcommand.name : null;
