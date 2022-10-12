@@ -4,61 +4,72 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Open a random fortune cookie wisdom. Watch out - only one allowed per day, and no refunds! Daily reset occurs at midnight UTC.",
-	Flags: ["mention","pipe","rollback"],
+	Flags: ["mention","pipe","rollback","whitelist"],
 	Params: null,
-	Whitelist_Response: null,
+	Whitelist_Response: "The $cookie command is currently under reconstruction! Please try again later.",
 	Static_Data: null,
-	Code: (async function cookie (context, check) {
-		if (check === "check") {
+	Code: (async function cookie (context, type, receiver) {
+		const Logic = require("./cookie-logic.js");
+		const subcommand = Logic.parseSubcommand(type);
+
+		/** @type {CookieData} */
+		const cookieData = await context.user.getDataProperty("cookie") ?? Logic.initialStats;
+		Logic.resetDailyStats(cookieData);
+
+		if (subcommand === "eat") {
+			const result = Logic.eatCookie(cookieData);
+			if (!result.success) {
+				return result;
+			}
+
+			const [cookieText] = await Promise.all([
+				Logic.fetchRandomCookieText(),
+				context.user.setDataProperty("cookie", cookieData)
+			]);
+
+			const string = `Your ${result.type} cookie:`;
 			return {
-				success: false,
-				reply: `Use the check command instead!`
+				reply: `${string} ${cookieText}`
 			};
 		}
-		else if (check === "gift" || check === "give") {
+		else if (subcommand === "donate") {
+			const receiverUserData = await sb.User.get(receiver);
+			if (!receiverUserData) {
+				return {
+					success: false,
+					reply: `I haven't seen that user before, so you can't gift cookies to them!`
+				};
+			}
+			else if (receiverUserData.Name === context.platform.Self_Name) {
+				return {
+					reply: "I appreciate the gesture, but thanks, I don't eat sweets :)"
+				};
+			}
+
+			/** @type {CookieData} */
+			const receiverCookieData = await receiverUserData.getDataProperty("cookie") ?? Logic.initialStats;
+			const result = Logic.donateCookie(cookieData, receiverCookieData);
+			if (!result.success) {
+				return result;
+			}
+
+			// noinspection JSCheckFunctionSignatures
+			await Promise.all([
+				context.user.setDataProperty("cookie", cookieData),
+				receiverUserData.setDataProperty("cookie", receiverCookieData)
+			]);
+
+			const emote = await context.getBestAvailableEmote(["Okayga", "supiniOkay", "FeelsOkayMan"], "😊");
 			return {
-				success: false,
-				reply: `Use the give command instead!`
+				reply: `Successfully given your cookie for today to ${receiverUserData.Name} ${emote}`
 			};
 		}
-
-		const data = await sb.Query.getRecordset(rs => rs
-			.select("Cookie_Today")
-			.from("chat_data", "Extra_User_Data")
-			.where("User_Alias = %n", context.user.ID)
-			.single()
-		);
-
-		if (data?.Cookie_Today) {
-			const tomorrow = new sb.Date().addDays(1);
-			const nextMidnight = new sb.Date(sb.Date.UTC(tomorrow.getUTCFullYear(), tomorrow.getUTCMonth(), tomorrow.getUTCDate()));
-			const delta = sb.Utils.timeDelta(nextMidnight);
-
-			const rudeRoll = sb.Utils.random(1, 100);
+		else {
 			return {
 				success: false,
-				reply: (rudeRoll === 99)
-					? `Stop stuffing your face so often! What are you doing, do you want to get fat? Get another cookie ${delta}.`
-					: `You already opened or gifted a fortune cookie today. You can get another one at midnight UTC, which is ${delta}.`
+				reply: `Unrecognized subcommand! Use one of: ${Logic.getValidTypeNames()}`
 			};
 		}
-
-		const [cookie] = await sb.Query.getRecordset(rs => rs
-			.select("Text")
-			.from("data", "Fortune_Cookie")
-			.orderBy("RAND() DESC")
-			.limit(1)
-		);
-
-		await context.transaction.query([
-			"INSERT INTO chat_data.Extra_User_Data (User_Alias, Cookie_Today)",
-			`VALUES (${context.user.ID}, 1)`,
-			"ON DUPLICATE KEY UPDATE Cookie_Today = 1"
-		].join(" "));
-
-		return {
-			reply: cookie.Text
-		};
 	}),
 	Dynamic_Description: (async function (prefix) {
 		const tomorrow = new sb.Date().addDays(1);
@@ -67,7 +78,7 @@ module.exports = {
 
 		return [
 			"Fetch a daily fortune cookie and read its wisdom!",
-			`Only available once per day, and resets at midnight UTC, which is ${delta}`,
+			`Only available once per day, and resets at midnight UTC - which from now, is in ${delta}`,
 			"",
 
 			`Cookies can also be gifted to other users, via the <a href="/bot/command/detail/gift"><code>${prefix}gift cookie</code></a> command.`,

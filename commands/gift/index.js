@@ -8,7 +8,13 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function gift (context, type, target) {
+	Code: (async function gift (/* context, type, target */) {
+		return {
+			success: false,
+			reply: `The $gift command is currently under reconstruction! In the future, use the "$cookie gift (user)" command.`
+		};
+
+		/*
 		if (!type) {
 			return {
 				success: false,
@@ -21,7 +27,7 @@ module.exports = {
 				reply: "No user target provided!"
 			};
 		}
-	
+
 		const targetUserData = await sb.User.get(target, true);
 		if (!targetUserData) {
 			return {
@@ -29,7 +35,7 @@ module.exports = {
 				reply: "Provided user has not been found!"
 			};
 		}
-	
+
 		type = type.toLowerCase();
 		switch (type) {
 			case "cookie": {
@@ -38,14 +44,14 @@ module.exports = {
 						reply: "I appreciate the gesture, but thanks, I don't eat sweets :)"
 					};
 				}
-	
+
 				const sourceUser = await sb.Query.getRow("chat_data", "Extra_User_Data");
 				await sourceUser.load(context.user.ID, true);
 				if (!sourceUser.loaded) {
 					sourceUser.values.User_Alias = context.user.ID;
 					await sourceUser.save({});
 				}
-	
+
 				if (targetUserData === context.user) {
 					return {
 						reply: (sourceUser.values.Cookie_Today)
@@ -53,14 +59,14 @@ module.exports = {
 							: "Okay, so you pass the cookie from one hand to the other... Now what?"
 					};
 				}
-	
+
 				const targetUser = await sb.Query.getRow("chat_data", "Extra_User_Data");
 				await targetUser.load(targetUserData.ID, true);
 				if (!targetUser.loaded) {
 					targetUser.values.User_Alias = targetUserData.ID;
 					await targetUser.save();
 				}
-		
+
 				if (sourceUser.values.Cookie_Today) {
 					return {
 						success: false,
@@ -79,35 +85,37 @@ module.exports = {
 						reply: "That user hasn't eaten their cookie today, so you would be wasting your gift! Get them to eat it!"
 					};
 				}
-	
+
 				sourceUser.setValues({
 					Cookie_Today: true,
 					Cookie_Gifts_Sent: sourceUser.values.Cookie_Gifts_Sent + 1
 				});
-	
+
 				targetUser.setValues({
 					Cookie_Today: false,
 					Cookie_Is_Gifted: true,
 					Cookie_Gifts_Received: targetUser.values.Cookie_Gifts_Received + 1
 				});
-	
+
 				await Promise.all([
 					sourceUser.save(),
 					targetUser.save()
 				]);
-	
+
 				sb.CooldownManager.unset(null, targetUser.ID, sb.Command.get("cookie").ID);
-	
+
 				return {
 					reply: `Successfully given your cookie for today to ${targetUserData.Name} 🙂`
 				};
 			}
-	
+
 			default: return {
 				success: false,
 				reply: "Target type cannot be gifted (yet, at least)."
 			};
 		}
+
+	 */
 	}),
 	Dynamic_Description: null
 };
