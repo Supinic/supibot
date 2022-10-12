@@ -29,9 +29,9 @@ const basicStats = {
 };
 
 /**
- * @type {DeepFrozen<CookieData>}
+ * @returns {CookieData}
  */
-const initialStats = sb.Utils.deepFreeze(basicStats);
+const getInitialStats = () => structuredClone(basicStats);
 
 const subcommands = [
 	{
@@ -69,17 +69,22 @@ const parseSubcommand = (type) => {
 const getValidTypeNames = () => subcommands.map(i => i.name).join(", ");
 
 /**
- * Resets the daily cookie stats if needed.
+ * Determines if the cookie data has an outdated daily property.
+ * @param {CookieData} data
+ * @returns {boolean}
+ */
+const hasOutdatedDailyStats = (data) => {
+	const today = sb.Date.getTodayUTC();
+	return (data.today.timestamp < today);
+};
+
+/**
+ * Resets the daily cookie stats.
  * @param {CookieData} data
  * @returns {boolean} `true` if the data was changed, `false` if no saving is necessary.
  */
 const resetDailyStats = (data) => {
-	const today = sb.Date.getTodayUTC();
-	if (data.today.timestamp >= today) {
-		return false;
-	}
-
-	data.today.timestamp = today;
+	data.today.timestamp = sb.Date.getTodayUTC();
 	data.today.donated = 0;
 	data.today.eaten.daily = 0;
 	data.today.eaten.received = 0;
@@ -233,8 +238,9 @@ const fetchRandomCookieText = async () => (
 );
 
 module.exports = {
-	initialStats,
+	getInitialStats,
 	parseSubcommand,
+	hasOutdatedDailyStats,
 	resetDailyStats,
 	getValidTypeNames,
 	eatDailyCookie,

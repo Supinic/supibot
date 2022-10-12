@@ -13,8 +13,10 @@ module.exports = {
 		const subcommand = Logic.parseSubcommand(type);
 
 		/** @type {CookieData} */
-		const cookieData = await context.user.getDataProperty("cookie") ?? Logic.initialStats;
-		Logic.resetDailyStats(cookieData);
+		const cookieData = await context.user.getDataProperty("cookie") ?? Logic.getInitialStats();
+		if (Logic.hasOutdatedDailyStats(cookieData)) {
+			Logic.resetDailyStats(cookieData);
+		}
 
 		if (subcommand === "eat") {
 			const result = Logic.eatCookie(cookieData);
