@@ -52,15 +52,17 @@ const subcommands = [
  */
 const parseSubcommand = (type) => {
 	let subcommand;
+	const defaultSubcommand = subcommands.find(i => i.default);
+
 	if (!type) {
-		subcommand = subcommands.find(i => i.default);
+		return defaultSubcommand.name;
 	}
 	else {
 		type = type.toLowerCase();
 		subcommand = subcommands.find(i => i.name === type || i.aliases.includes(type));
-	}
 
-	return (subcommand) ? subcommand.name : null;
+		return (subcommand) ? subcommand.name : defaultSubcommand.name;
+	}
 };
 
 /**
