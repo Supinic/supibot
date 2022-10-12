@@ -81,9 +81,9 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const tomorrow = new sb.Date().addDays(1);
-		const nextMidnight = new sb.Date(sb.Date.UTC(tomorrow.getUTCFullYear(), tomorrow.getUTCMonth(), tomorrow.getUTCDate()));
-		const delta = sb.Utils.timeDelta(nextMidnight);
+		const utcMidnightToday = sb.Date.getTodayUTC();
+		const nextUtcMidnightDate = new sb.Date(utcMidnightToday).addHours(24);
+		const delta = sb.Utils.timeDelta(nextUtcMidnightDate);
 
 		return [
 			"Fetch a daily fortune cookie and read its wisdom!",
