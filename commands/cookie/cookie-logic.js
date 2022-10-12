@@ -117,7 +117,7 @@ const eatDailyCookie = (data) => {
 		return false;
 	}
 
-	data.lastTimestamp.today = today;
+	data.lastTimestamp.daily = today;
 	data.today.eaten.daily++;
 	data.total.eaten.daily++;
 
