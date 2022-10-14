@@ -902,5 +902,18 @@
         "helpers": ["ALazyMeme"]
       }
     ]
+  },
+  {
+    "code": "lu",
+    "language": "Luxembourgish",
+    "sources": [
+      {
+        "name": "RTL.lu",
+        "url": "https://rtl.lu",
+        "path": "rss",
+        "endpoints": ["national"],
+        "helpers": ["howtoeat6"]
+      }
+    ]
   }
 ]
