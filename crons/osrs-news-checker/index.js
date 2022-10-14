@@ -1,10 +1,10 @@
 module.exports = {
-	Name: "nodejs",
+	Name: "osrs-news-checker",
 	Expression: "0 */15 * * * *",
 	Description: "Checks for new OSRS articles, and posts updates for subscribed users.",
 	Defer: null,
 	Type: "Bot",
-	Code: (async function checkLastNodeVersion () {
+	Code: (async function checkOldSchoolRunescapeNews () {
 		const { handleSubscription } = require("../subscription-utils.js");
 		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Event_Subscription");
 		if (this.data.isTableAvailable === false) {
