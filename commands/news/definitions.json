@@ -871,7 +871,7 @@
       {
         "name": "BNT",
         "url": "https://news.bnt.bg",
-        "path": ["bg/rss"],
+        "path": "bg/rss",
         "endpoints": ["news.xml"],
         "helpers": ["ALazyMeme"]
       }
@@ -884,7 +884,7 @@
       {
         "name": "Vaterland",
         "url": "https://www.vaterland.li",
-        "path": ["storage/rss/rss/vaterland"],
+        "path": "storage/rss/rss/vaterland",
         "endpoints": ["liechtenstein.xml"],
         "helpers": ["howtoeat6"]
       }
@@ -897,7 +897,7 @@
       {
         "name": "Al Arabiya",
         "url": "https://alarabiya.net",
-        "path": ["feed/rss2/ar"],
+        "path": "feed/rss2/ar",
         "endpoints": ["saudi-today.xml"],
         "helpers": ["ALazyMeme"]
       }
