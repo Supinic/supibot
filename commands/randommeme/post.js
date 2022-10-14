@@ -74,10 +74,11 @@ module.exports = class RedditPost {
 	}
 
 	toString () {
+		const fixedUrl = this.#url.replace(/(www\.)?reddit.com/, "old.reddit.com");
 		const xpost = (this.#crosspostOrigin)
 			? `, x-posted from ${this.#crosspostOrigin}`
 			: "";
 
-		return `${this.#title} ${this.#url} (Score: ${this.#score}, posted ${this.posted}${xpost})`;
+		return `${this.#title} ${fixedUrl} (Score: ${this.#score}, posted ${this.posted}${xpost})`;
 	}
 };
