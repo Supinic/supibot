@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["unsubscribe"],
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Subscribe or unsubcribe to plethora of events, such as a channel going live, or a suggestion you made being updated. Check the extended help for detailed info on each event.",
+	Description: "Subscribe or unsubscribe to plethora of events, such as a channel going live, or a suggestion you made being updated. Check the extended help for detailed info on each event.",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
@@ -33,7 +33,7 @@ module.exports = {
 				notes: "Every hour, supibot checks for new releases of Runelite. If a change is detected, you will be notified in #supinic.",
 				response: {
 					added: "You will now be pinged whenever a new release of Runelite is detected.",
-					removed: "You will no longer receive pings when Runelite releases an uupdate."
+					removed: "You will no longer receive pings when Runelite releases an update."
 				}
 			},
 			{
