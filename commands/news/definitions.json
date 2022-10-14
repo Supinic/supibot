@@ -915,5 +915,18 @@
         "helpers": ["howtoeat6"]
       }
     ]
+  },
+  {
+    "code": "va",
+    "language": "Italian",
+    "sources": [
+      {
+        "name": "Vatican News",
+        "url": "https://www.vaticannews.va",
+        "path": null,
+        "endpoints": ["it.rss.xml"],
+        "helpers": ["howtoeat6"]
+      }
+    ]
   }
 ]
