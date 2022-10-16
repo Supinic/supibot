@@ -68,13 +68,12 @@ module.exports = {
 			}
 
 			for (const sub of subscriptions) {
-				sb.Reminder.create({
+				await sb.Reminder.create({
 					Channel: null,
 					User_From: 1127,
 					User_To: sub.User_Alias,
 					Text: message,
 					Schedule: null,
-					Created: new sb.Date(),
 					Private_Message: true,
 					Platform: sub.Platform ?? 1
 				}, true);
@@ -83,22 +82,30 @@ module.exports = {
 
 		const discord = sb.Platform.get("discord");
 		const discordUpdatesRole = "748957148439904336";
-		const discordChannel = await discord.client.channels.fetch("748955843415900280");
-		const EmbedConstructor = discord.controller.data.Embed ?? require("discord.js").MessageEmbed;
+		const channelData = sb.Channel.get("748955843415900280");
 
 		for (const item of data) {
-			const embed = new EmbedConstructor()
-				.setTitle(item.Type)
-				.setURL(`https://supinic.com/data/changelog/detail/${item.ID}`)
-				.setTimestamp(new sb.Date(item.Created))
-				.addField("Title", item.Title);
+			const embed = {
+				title: item.Type,
+				url: `https://supinic.com/data/changelog/detail/${item.ID}`,
+				description: `<@&${discordUpdatesRole}>`,
+				timestamp: new sb.Date(item.Created).format("Y-m-d"),
+				fields: [
+					{
+						name: "Title",
+						value: item.Title
+					}
+				]
+			};
 
 			if (item.Description) {
-				embed.addField("Description", item.Description);
+				embed.fields.push({
+					name: "Description",
+					value: item.Description
+				});
 			}
 
-			await discordChannel.send({
-				content: `<@&${discordUpdatesRole}>`,
+			await discord.controller.send(null, channelData, {
 				embeds: [embed]
 			});
 		}
