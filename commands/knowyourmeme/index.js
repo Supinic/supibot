@@ -33,7 +33,7 @@ module.exports = {
 
 		const detailHTML = await sb.Got("FakeAgent", {
 			prefixUrl: "https://knowyourmeme.com",
-			url: firstLink,
+			url: firstLink.replace(/^\//, ""),
 			responseType: "text"
 		}).text();
 
