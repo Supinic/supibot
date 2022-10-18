@@ -50,6 +50,8 @@ module.exports = class DiscordController extends require("./template.js") {
 		/** @type {string|undefined} */
 		const token = sb.Config.get("DISCORD_BOT_TOKEN");
 		this.client.login(token);
+
+		this.data.permissions = PermissionFlagsBits;
 	}
 
 	initListeners () {
