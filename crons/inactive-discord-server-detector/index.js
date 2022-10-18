@@ -7,6 +7,7 @@ module.exports = {
 	Code: (async function detectInactiveDiscordServers () {
 		// Runs every Tuesday, at 12:00 (noon)
 		const discord = sb.Platform.get("discord").client;
+		const controller = sb.Platform.get("discord").controller;
 		const botChannels = sb.Channel.getJoinableForPlatform("discord");
 
 		const messageThreshold = new sb.Date().addMonths(-3);
@@ -46,7 +47,7 @@ module.exports = {
 			const members = await guild.members.fetch();
 			const nonBotMembers = members.filter(i => !i.user.bot);
 			const admins = nonBotMembers
-				.filter(i => i.permissions.has("ADMINISTRATOR"))
+				.filter(i => i.permissions.has(controller.data.permissions.Administrator))
 				.map(i => `${sanitize(i.user.username)} (${i.user.id})`);
 
 			result.push({
