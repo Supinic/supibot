@@ -115,6 +115,16 @@ const canEatReceivedCookie = (data) => {
 };
 
 /**
+ * Determines if the user has donated their cookie(s) today.
+ * @param {CookieData} data
+ * @returns {boolean}
+ */
+const hasDonatedDailyCookie = (data) => {
+	const today = sb.Date.getTodayUTC();
+	return (data.lastTimestamp.today === today && data.today.donated !== 0);
+};
+
+/**
  * @param {CookieData} data
  * @returns {boolean} `false` if unable to eat, `true` if the process succeeded.
  */
@@ -240,18 +250,19 @@ const fetchRandomCookieText = async () => (
 );
 
 module.exports = {
-	getInitialStats,
-	parseSubcommand,
-	hasOutdatedDailyStats,
-	resetDailyStats,
-	getValidTypeNames,
 	canEatDailyCookie,
 	canEatReceivedCookie,
+	donateCookie,
+	eatCookie,
 	eatDailyCookie,
 	eatReceivedCookie,
-	eatCookie,
-	donateCookie,
-	fetchRandomCookieText
+	fetchRandomCookieText,
+	getInitialStats,
+	getValidTypeNames,
+	hasDonatedDailyCookie,
+	hasOutdatedDailyStats,
+	parseSubcommand,
+	resetDailyStats
 };
 
 /**

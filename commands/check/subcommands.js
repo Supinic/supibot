@@ -181,35 +181,42 @@ module.exports = (command) => [
 			}
 
 			const pronoun = (context.user.ID === targetUser.ID) ? "You" : "They";
-			const check = await sb.Query.getRecordset(rs => rs
-				.select("Cookie_Today", "Cookie_Is_Gifted")
-				.from("chat_data", "Extra_User_Data")
-				.where("User_Alias = %n", targetUser.ID)
-				.single()
-			);
+			const posPronoun = (context.user.ID === targetUser.ID) ? "your" : "their";
+			const userCookieData = await context.user.getDataProperty("cookie");
+			if (!userCookieData) {
+				return {
+					reply: `${pronoun} have never eaten a cookie before.`
+				};
+			}
+
+			let CookieLogic;
+			try {
+				CookieLogic = require("../cookie/cookie-logic.js");
+			}
+			catch (e) {
+				return {
+					success: false,
+					reply: `Could not load the cookie logic module!`
+				};
+			}
 
 			let string;
-			if (!check) {
-				string = `${pronoun} have never eaten a cookie before.`;
+			if (CookieLogic.canEatDailyCookie(userCookieData)) {
+				string = `${pronoun} have a daily cookie waiting to be eaten.`;
 			}
-			else if (check.Cookie_Today) {
-				string = (check.Cookie_Is_Gifted)
-					? `${pronoun} have already eaten the daily and gifted cookie today.`
-					: `${pronoun} have already eaten/gifted the daily cookie today.`;
-
-				const date = new sb.Date().addDays(1);
-				date.setUTCHours(0, 0, 0, 0);
-
-				string += ` The next cookie will be available in ${sb.Utils.timeDelta(date)}.`;
+			else if (CookieLogic.canEatReceivedCookie(userCookieData)) {
+				string = `${pronoun} have a donated cookie waiting to be eaten.`;
+			}
+			else if (CookieLogic.hasDonatedDailyCookie(userCookieData)) {
+				string = `${pronoun} have already donated ${posPronoun} daily cookie today.`;
 			}
 			else {
-				string = (check.Cookie_Is_Gifted)
-					? `${pronoun} have a gifted cookie waiting.`
-					: `${pronoun} have an unused cookie waiting.`;
+				string = `${pronoun} have already eaten ${posPronoun} daily cookie today.`;
 			}
 
+			const delta = sb.Utils.timeDelta(sb.Date.getTodayUTC().addHours(24));
 			return {
-				reply: string
+				reply: `${string} Next daily cookie will be available in ${delta}.`
 			};
 		}
 	},

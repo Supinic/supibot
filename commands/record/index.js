@@ -67,17 +67,21 @@ module.exports = {
 			}
 
 			case "cookie": {
-				const { Cookies_Total: cookies, User_Alias: user } = await sb.Query.getRecordset(rs => rs
-					.select("Cookies_Total", "User_Alias")
-					.from("chat_data", "Extra_User_Data")
-					.orderBy("Cookies_Total DESC")
-					.limit(1)
+				const data = await sb.Query.getRecordset(rs => rs
+					.select("CONVERT(JSON_EXTRACT(Value, '$.total.eaten.daily'), INT) AS Daily")
+					.select("CONVERT(JSON_EXTRACT(Value, '$.legacy.daily'), INT) AS Legacy")
+					.select("User_Alias")
+					.from("chat_data", "User_Alias_Data")
+					.where("Property = %s", "cookie")
+					.orderBy("(Daily + Legacy) DESC")
 					.single()
+					.limit(1)
 				);
 
-				const userData = await sb.User.get(user, true);
+				const total = data.Daily + data.Legacy;
+				const userData = await sb.User.get(data.User_Alias, true);
 				return {
-					reply: `Currently, the most consistent cookie consumer is ${userData.Name} with ${cookies} daily cookies eaten.`
+					reply: `Currently, the most consistent cookie consumer is ${userData.Name} with ${total} daily cookies eaten (out of which ${data.Legacy} are legacy).`
 				};
 			}
 
