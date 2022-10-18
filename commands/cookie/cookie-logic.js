@@ -121,7 +121,7 @@ const canEatReceivedCookie = (data) => {
  */
 const hasDonatedDailyCookie = (data) => {
 	const today = sb.Date.getTodayUTC();
-	return (data.lastTimestamp.today === today && data.today.donated !== 0);
+	return (data.lastTimestamp.daily === today && data.today.donated !== 0);
 };
 
 /**
