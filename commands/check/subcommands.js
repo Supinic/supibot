@@ -214,7 +214,8 @@ module.exports = (command) => [
 				string = `${pronoun} have already eaten ${posPronoun} daily cookie today.`;
 			}
 
-			const delta = sb.Utils.timeDelta(sb.Date.getTodayUTC().addHours(24));
+			const nextMidnight = new sb.Date(sb.Date.getTodayUTC()).addHours(24);
+			const delta = sb.Utils.timeDelta(nextMidnight);
 			return {
 				reply: `${string} Next daily cookie will be available in ${delta}.`
 			};
