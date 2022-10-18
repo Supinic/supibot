@@ -54,8 +54,8 @@ module.exports = {
 			? ["You have", "you"]
 			: ["That user has", "them"];
 
-		const daily = cookieData.total.daily + cookieData.legacy.daily;
-		const received = cookieData.total.received + cookieData.legacy.received;
+		const daily = cookieData.total.eaten.daily + cookieData.legacy.daily;
+		const received = cookieData.total.eaten.received + cookieData.legacy.received;
 		const donated = cookieData.total.donated + cookieData.legacy.donated;
 
 		const donatedString = (donated === 0)
