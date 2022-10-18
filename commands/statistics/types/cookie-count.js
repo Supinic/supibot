@@ -11,10 +11,11 @@ module.exports = {
 				.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.legacy.donated'), INT)) AS Legacy_Donated`)
 				.from("chat_data", "User_Alias_Data")
 				.where("Property = %s", "cookie")
+				.single()
 			);
 
 			const total = sb.Utils.groupDigits(data.Modern + data.Legacy);
-			const donated = sb.Utils.groupDigits(data.Donated = data.Legacy_Donated);
+			const donated = sb.Utils.groupDigits(data.Donated + data.Legacy_Donated);
 
 			return {
 				reply: `${total} cookies have been eaten so far in total, out of which ${donated} were gifted :)`
