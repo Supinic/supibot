@@ -274,9 +274,8 @@ module.exports = {
 				const wiki = `https://prices.runescape.wiki/osrs/item/${item.Game_ID}`;
 				return {
 					reply: sb.Utils.tag.trim `
-						Current price range of ${item.Name}:
-						${priceString}
-						HA value: ${highAlchValue}
+						Current price range of ${item.Name}: ${priceString};
+						HA value: ${highAlchValue} gp
 						${wiki}
 					`
 				};
