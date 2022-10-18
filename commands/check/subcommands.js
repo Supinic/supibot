@@ -202,11 +202,11 @@ module.exports = (command) => [
 			}
 
 			let string;
-			if (CookieLogic.canEatDailyCookie(userCookieData)) {
-				string = `${pronoun} have a daily cookie waiting to be eaten.`;
-			}
-			else if (CookieLogic.canEatReceivedCookie(userCookieData)) {
+			if (CookieLogic.canEatReceivedCookie(userCookieData)) {
 				string = `${pronoun} have a donated cookie waiting to be eaten.`;
+			}
+			else if (CookieLogic.canEatDailyCookie(userCookieData)) {
+				string = `${pronoun} have a daily cookie waiting to be eaten.`;
 			}
 			else if (CookieLogic.hasDonatedDailyCookie(userCookieData)) {
 				string = `${pronoun} have already donated ${posPronoun} daily cookie today.`;
