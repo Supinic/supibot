@@ -11,38 +11,28 @@ module.exports = {
 			return;
 		}
 
-		const wikiResponse = await sb.Got({
-			url: "https://prices.runescape.wiki/api/v1/osrs/latest",
-			responseType: "json"
-		});
-
-		const maxDatabaseID = await sb.Query.getRecordset(rs => rs
-			.select("MAX(Game_ID) AS ID")
+		const databaseIDs = await sb.Query.getRecordset(rs => rs
+			.select("Game_ID")
 			.from("osrs", "Item")
-			.single()
-			.flat("ID")
+			.flat("Game_ID")
 		);
 
-		const availableIDs = Object.keys(wikiResponse.body.data).map(Number);
-		const missingIDs = availableIDs.filter(i => i > maxDatabaseID);
-		if (missingIDs.length === 0) {
+		const response = await sb.Got("GenericAPI", {
+			url: "https://prices.runescape.wiki/api/v1/osrs/mapping"
+		});
+
+		const missingItems = response.body.filter(i => !databaseIDs.includes(i.id));
+		if (missingItems.length === 0) {
 			return;
 		}
 
-		for (const ID of missingIDs) {
-			const response = await sb.Got("GenericAPI", {
-				url: "https://secure.runescape.com/m=itemdb_oldschool/api/catalogue/detail.json",
-				searchParams: {
-					item: ID
-				}
-			});
-
-			const { item } = response.body;
+		for (const item of missingItems) {
 			const row = await sb.Query.getRow("osrs", "Item");
 			row.setValues({
-				Game_ID: Number(item.id),
+				Game_ID: item.id,
 				Name: item.name,
-				Aliases: null
+				Aliases: null,
+				Value: item.value
 			});
 
 			await row.save({ skipLoad: true });
