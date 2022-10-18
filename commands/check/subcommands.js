@@ -182,7 +182,8 @@ module.exports = (command) => [
 
 			const pronoun = (context.user.ID === targetUser.ID) ? "You" : "They";
 			const posPronoun = (context.user.ID === targetUser.ID) ? "your" : "their";
-			const userCookieData = await context.user.getDataProperty("cookie");
+			/** @type {CookieData} */
+			const userCookieData = await targetUser.getDataProperty("cookie");
 			if (!userCookieData) {
 				return {
 					reply: `${pronoun} have never eaten a cookie before.`
