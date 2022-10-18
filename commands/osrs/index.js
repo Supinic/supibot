@@ -208,7 +208,8 @@ module.exports = {
 
 				const query = (alias ?? args.join(" ")).toLowerCase();
 				const data = await sb.Query.getRecordset(rs => {
-					rs.select("Game_ID", "Name").from("osrs", "Item");
+					rs.select("Game_ID", "Name", "Value")
+						.from("osrs", "Item");
 
 					for (const word of query.split(" ")) {
 						rs.where("Name %*like*", word);
@@ -236,9 +237,6 @@ module.exports = {
 					};
 				}
 
-				// followRedirect: false and omitting `responseType` is necessary for when the API is offline
-				// Apparently, Jagex's API will redirect to https://runescape.com/offline with an HTML response
-				// and a 302 code - this must be caught manually, as Got will attempt to parse it as JSON and fail.
 				const response = await sb.Got("GenericAPI", {
 					url: "https://prices.runescape.wiki/api/v1/osrs/latest",
 					throwHttpErrors: false,
@@ -272,11 +270,13 @@ module.exports = {
 				// const lowDelta = sb.Utils.timeDelta(new sb.Date(itemData.lowTime * 1000));
 				// const highDelta = sb.Utils.timeDelta(new sb.Date(itemData.highTime * 1000));
 
+				const highAlchValue = formatPrice(Math.floor(item.Value * 0.6));
 				const wiki = `https://prices.runescape.wiki/osrs/item/${item.Game_ID}`;
 				return {
 					reply: sb.Utils.tag.trim `
 						Current price range of ${item.Name}:
 						${priceString}
+						HA value: ${highAlchValue}
 						${wiki}
 					`
 				};
