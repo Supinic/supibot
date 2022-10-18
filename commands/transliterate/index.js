@@ -21,6 +21,7 @@ module.exports = {
 		if (context.params.japaneseOnly) {
 			const response = await sb.Got("GenericAPI", {
 				url: "https://ichi.moe/cl/qr",
+				responseType: "text",
 				searchParams: {
 					r: "htr",
 					q: args.join(" ")
