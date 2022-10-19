@@ -105,10 +105,10 @@ module.exports = {
 	list: () => {
 		const data = sb.Command.data.map(i => ({
 			name: i.Name,
-			aliases: i.aliases,
-			description: i.description,
+			aliases: i.Aliases,
+			description: i.Description,
 			cooldown: i.Cooldown,
-			flags: Object.keys(i.flags)
+			flags: Object.keys(i.Flags)
 		}));
 
 		return {
