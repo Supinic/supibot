@@ -108,7 +108,7 @@ module.exports = {
 			aliases: i.aliases,
 			description: i.description,
 			cooldown: i.Cooldown,
-			flags: i.flags
+			flags: Object.keys(i.flags)
 		}));
 
 		return {
