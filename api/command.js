@@ -157,6 +157,12 @@ module.exports = {
 			.where("Active = %b", true)
 		);
 
+		for (const item of data) {
+			if (item.Data) {
+				item.Data = JSON.parse(item.Data);
+			}
+		}
+
 		return {
 			statusCode: 200,
 			data
