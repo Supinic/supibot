@@ -179,7 +179,7 @@ module.exports = {
 			const temperature = `${exec("/opt/vc/bin/vcgencmd measure_temp").toString().match(/([\d.]+)/)[1]}°C`;
 
 			return {
-				reply: `Supibot, Supinic's table, Raspberry Pi 3B: ${temperature}. No wind detected. No precipitation expected.`
+				reply: `Supibot, Supinic's LACK table, Raspberry Pi 3B: ${temperature}. No wind detected. No precipitation expected.`
 			};
 		}
 		else if (args[0].startsWith("@")) {
