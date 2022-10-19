@@ -134,35 +134,32 @@ module.exports = {
 			};
 		}
 
-		const optout = await sb.Query.getRecordset(rs => rs
-			.select("ID")
+		const data = await sb.Query.getRecordset(rs => rs
+			.select("Filter.ID", "Type", "User_Alias", "Channel", "Invocation", "Response", "Reason", "Filter.Data")
+			.select("Channel.Name AS Channel_Name", "Channel.Description AS Channel_Description")
+			.select("User_Alias.Name AS Username")
+			.select("Platform.Name AS Platform_Name")
+			.select("Blocked.Name AS Blocked_Username")
 			.from("chat_data", "Filter")
-			.where("Command = %s", commandData.Name)
-			.where("Type = %s", "Opt-out")
-			.where("Active = %b", true)
-			.single()
-			.flat("ID")
-		);
-
-		const blocks = await sb.Query.getRecordset(rs => rs
-			.select("Filter.ID AS ID", "Blocked_User.Name AS blockedUsername")
-			.from("chat_data", "Filter")
-			.join({
-				alias: "Blocked_User",
+			.leftJoin("chat_data", "Channel")
+			.leftJoin("chat_data", "User_Alias")
+			.leftJoin({
+				alias: "Blocked",
 				toTable: "User_Alias",
-				on: "Filter.Blocked_User = Blocked_User.ID"
+				on: "Filter.Blocked_User = Blocked.ID"
 			})
+			.leftJoin({
+				toTable: "Platform",
+				on: "Channel.Platform = Platform.ID"
+			})
+			.where("Channel IS NULL OR Channel.Mode <> %s", "Inactive")
 			.where("Command = %s", commandData.Name)
-			.where("Type = %s", "Block")
 			.where("Active = %b", true)
 		);
 
 		return {
 			statusCode: 200,
-			data: {
-				optout,
-				blocks
-			}
+			data
 		};
 	},
 
