@@ -211,6 +211,13 @@
         "path": "api",
         "endpoints": ["zv$vteottq"],
         "helpers": ["caglapickaxe", "cgpx"]
+      },
+      {
+        "name": "Anadolu Ajansı",
+        "url": "https://www.aa.com.tr",
+        "path": "tr/rss",
+        "endpoints": ["default?cat=gundem"],
+        "helpers": ["caglapickaxe", "cgpx"]
       }
     ]
   },
