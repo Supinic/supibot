@@ -232,6 +232,7 @@ module.exports = {
 					responseType: "json",
 					throwHttpErrors: false,
 					searchParams: {
+						/** @type {string} */
 						key: sb.Config.get("API_GOOGLE_GEOCODING"),
 						address: args.join(" ")
 					}
@@ -287,6 +288,7 @@ module.exports = {
 				searchParams: {
 					lat: coords.lat,
 					lon: coords.lng,
+					/** @type {string} */
 					appid: sb.Config.get("API_OPEN_WEATHER_MAP")
 				}
 			});
@@ -325,6 +327,7 @@ module.exports = {
 					lat: coords.lat,
 					lon: coords.lng,
 					units: "metric",
+					/** @type {string} */
 					appid: sb.Config.get("API_OPEN_WEATHER_MAP")
 				}
 			});
