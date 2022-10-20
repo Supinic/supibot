@@ -42,15 +42,19 @@ module.exports = {
 		const response = await sb.Got.gql({
 			url: "https://api.github.com/graphql",
 			token: sb.Config.get("GITHUB_PUBLIC_REPO_GQL_TOKEN"),
-			query: `{
-				user(login: "${username}") {
-					contributionsCollection(from: "${threshold.toISOString()}") {
+			query: `query ($username: String!, $threshold: DateTime!) {
+				user (login: $username) {
+					contributionsCollection (from: $threshold) {
 						totalCommitContributions
 						restrictedContributionsCount
-						endedAt 
+						endedAt
 					}
 				}
-			}`
+			}`,
+			variables: {
+				username,
+				threshold: threshold.toISOString()
+			}
 		}).json();
 
 		if (response.errors) {
