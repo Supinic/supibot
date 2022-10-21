@@ -112,7 +112,7 @@ module.exports = {
 		const vod = vodResponse.body;
 		if (vod.data && vod.data.length !== 0) {
 			const data = vod.data[0];
-			if (!stream) {
+			if (stream) {
 				const offset = 90; // Implicitly offset the VOD by several seconds, to account for inaccuracies
 				const stamp = sb.Utils.parseDuration(data.duration, { target: "sec" }) - offset;
 				vodString = `${data.url}?t=${(stamp < 0) ? 0 : stamp}s`;
