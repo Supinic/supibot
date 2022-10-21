@@ -79,6 +79,7 @@ module.exports = {
 		}).join(separator);
 
 		return {
+			skipWhitespaceCheck: true,
 			reply: `Current founders list: ${foundersString}`
 		};
 	}),
