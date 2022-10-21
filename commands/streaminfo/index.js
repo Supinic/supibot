@@ -150,67 +150,52 @@ module.exports = {
 				};
 			}
 
-			const vodResponse = await sb.Got("Helix", {
-				url: "videos",
-				searchParams: {
-					user_id: channelID
-				}
-			});
-
-			let videoURL = "";
-			let durationString = "";
-			if (vodResponse.statusCode === 200 && vodResponse.body[0]) {
-				const [vod] = vodResponse.body;
-
-				durationString = ` for ${vod.duration.match(/\d+[hms]/g).join(", ")}`;
-				videoURL = vod.url;
-			}
-
 			const start = new sb.Date(lastBroadcast.startedAt);
 			const title = lastBroadcast.title ?? "(no title)";
 			const delta = sb.Utils.timeDelta(start);
 
 			return {
-				reply: `Channel is ${status} - last streamed ${delta}${durationString}, title: ${title} ${videoURL}`
+				reply: `Channel is ${status} - last streamed ${delta} - title: ${title} ${vodString}`
 			};
 		}
+		else {
+			const tags = [];
+			if (Array.isArray(stream.tag_ids) && stream.tag_ids.length !== 0) {
+				const { URLSearchParams } = require("url");
 
-		const tags = [];
-		if (Array.isArray(stream.tag_ids) && stream.tag_ids.length !== 0) {
-			const { URLSearchParams } = require("url");
+				const paramsIterable = stream.tag_ids.map(i => ["tag_id", i]);
+				const searchParams = new URLSearchParams(paramsIterable);
 
-			const paramsIterable = stream.tag_ids.map(i => ["tag_id", i]);
-			const searchParams = new URLSearchParams(paramsIterable);
+				const response = await sb.Got("Helix", {
+					url: "tags/streams",
+					searchParams
+				});
 
-			const response = await sb.Got("Helix", {
-				url: "tags/streams",
-				searchParams
-			});
+				const tagDescriptions = response.body.data.map(i => i.localization_names["en-us"]);
+				tags.push(...tagDescriptions);
+			}
 
-			const tagDescriptions = response.body.data.map(i => i.localization_names["en-us"]);
-			tags.push(...tagDescriptions);
+			const started = sb.Utils.timeDelta(new sb.Date(stream.started_at));
+			const viewersSuffix = (stream.viewer_count === 1) ? "" : "s";
+			const broadcast = (stream.game_name)
+				? `playing ${stream.game_name}`
+				: `streaming under no category`;
+			const tagString = (tags.length === 0)
+				? ""
+				: `Current tags: ${tags.join(", ")}`;
+
+			return {
+				reply: sb.Utils.tag.trim `
+					${targetChannel} is ${broadcast}, 
+					since ${started} 
+					for ${sb.Utils.groupDigits(stream.viewer_count)} viewer${viewersSuffix}.
+					Title: ${stream.title} 
+					${tagString}
+					https://twitch.tv/${targetChannel.toLowerCase()}
+					${vodString}
+				`
+			};
 		}
-
-		const started = sb.Utils.timeDelta(new sb.Date(stream.started_at));
-		const viewersSuffix = (stream.viewer_count === 1) ? "" : "s";
-		const broadcast = (stream.game_name)
-			? `playing ${stream.game_name}`
-			: `streaming under no category`;
-		const tagString = (tags.length === 0)
-			? ""
-			: `Current tags: ${tags.join(", ")}`;
-
-		return {
-			reply: sb.Utils.tag.trim `
-				${targetChannel} is ${broadcast}, 
-				since ${started} 
-				for ${sb.Utils.groupDigits(stream.viewer_count)} viewer${viewersSuffix}.
-				Title: ${stream.title} 
-				${tagString}
-				https://twitch.tv/${targetChannel.toLowerCase()}
-				${vodString}
-			`
-		};
 	}),
 	Dynamic_Description: (async (prefix) => [
 		"Fetches the live status of a Twitch or YouTube channel.",
