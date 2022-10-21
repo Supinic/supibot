@@ -11,7 +11,7 @@ module.exports = {
 	Code: (async function gift (/* context, type, target */) {
 		return {
 			success: false,
-			reply: `The $gift command is currently under reconstruction! In the future, use the "$cookie gift (user)" command.`
+			reply: `This command is deprecated! Use $cookie gift instead. By using this command, you did not give anything away.`
 		};
 
 		/*
