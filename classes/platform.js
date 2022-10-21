@@ -1,65 +1,18 @@
-/**
- * Represents a platform - a location where the bot can be active and respond to messages.
- * It is an API to manage communication between channels and the platform controller.
- */
 module.exports = class Platform extends require("./template.js") {
-	/**
-	 * Platform controller
-	 * @type {Controller}
-	 */
 	#controller = null;
-
-	/** @type {Map<sb.Channel, Map<User, UserMessageResolutionWrapper>>} */
 	#userMessagePromises = new Map();
 
 	constructor (data) {
 		super();
-
-		/**
-		 * Unique numeric platform identifier.
-		 * @type {number}
-		 */
 		this.ID = data.ID;
-
-		/**
-		 * Unique platform name. Always lowercased.
-		 * @type {string}
-		 */
 		this.Name = data.Name.toLowerCase();
-
 		this.Host = data.Host ?? null;
-
-		/**
-		 * Fallback message limit. Must be included.
-		 * @type {number}
-		 */
 		this.Message_Limit = data.Message_Limit;
-
-		/**
-		 * Name of the bot's account in the given platform. Always lowercased.
-		 * @type {string|null}
-		 */
 		this.Self_Name = (data.Self_Name === null)
 			? null
 			: data.Self_Name.toLowerCase();
-
-		/**
-		 * Specific ID of the bot's account in given platform.
-		 * Can be null if the platform does not support UIDs.
-		 * @type {string|null}
-		 */
 		this.Self_ID = data.Self_ID;
-
-		/**
-		 * A string identifier to recognize a platform for mirroring.
-		 * @type {string}
-		 */
 		this.Mirror_Identifier = data.Mirror_Identifier ?? null;
-
-		/**
-		 * Settings related to logging permissions and levels.
-		 * @type {Object}
-		 */
 		this.Logging = {};
 
 		if (data.Logging) {
@@ -72,12 +25,6 @@ module.exports = class Platform extends require("./template.js") {
 			}
 		}
 
-		/**
-		 * Default platform-specific data.
-		 * This can be customised in the Data column.
-		 * The object is frozen, and thus cannot be modified.
-		 * @type {Object}
-		 */
 		this.Defaults = Object.freeze({});
 
 		if (data.Defaults) {
@@ -90,11 +37,6 @@ module.exports = class Platform extends require("./template.js") {
 			}
 		}
 
-		/**
-		 * Custom platform-specific data, parsed from JSON format.
-		 * It is merged with defaults on startup.
-		 * @type {Object}
-		 */
 		this.Data = {};
 
 		if (data.Data) {
@@ -115,12 +57,6 @@ module.exports = class Platform extends require("./template.js") {
 		}
 	}
 
-	/**
-	 * Determines if a user is an "owner" of a given channel in the platform.
-	 * @param {sb.Channel} channelData
-	 * @param {User} userData
-	 * @returns {null|boolean}
-	 */
 	isUserChannelOwner (channelData, userData) {
 		if (typeof this.#controller.isUserChannelOwner !== "function") {
 			return null;
@@ -129,24 +65,10 @@ module.exports = class Platform extends require("./template.js") {
 		return this.#controller.isUserChannelOwner(channelData, userData);
 	}
 
-	/**
-	 * Sends a message into a given channel.
-	 * @param message
-	 * @param channel
-	 * @param options
-	 * @returns {Promise<void>}
-	 */
 	send (message, channel, options = {}) {
 		return this.#controller.send(message, channel, options);
 	}
 
-	/**
-	 * Sends a private message to a given user.
-	 * @param {string} message
-	 * @param {string} user
-	 * @param {sb.Channel} [channelData]
-	 * @returns {Promise<void>}
-	 */
 	pm (message, user, channelData) {
 		return this.#controller.pm(message, user, channelData);
 	}
@@ -155,16 +77,6 @@ module.exports = class Platform extends require("./template.js") {
 		this.#controller = null;
 	}
 
-	/**
-	 * For a given combination of channel and user, creates and returns a promise that will be resolved when the
-	 * provided user sends a message in the provided channel. The promise will be rejected if the user does not post
-	 * a message within a timeout specified in options.
-	 * @param {Channel} channelData
-	 * @param {User} userData
-	 * @param {Object} options
-	 * @param {number} [options.timeout] Default: 10 seconds
-	 * @returns {sb.Promise<UserMessageResolution>}
-	 */
 	waitForUserMessage (channelData, userData, options = {}) {
 		const delay = options.timeout ?? 10_000;
 		const promise = new sb.Promise();
@@ -195,11 +107,6 @@ module.exports = class Platform extends require("./template.js") {
 		});
 	}
 
-	/**
-	 * For a provided channel, fetches its current list using the platform's controller.
-	 * @param {sb.Channel} channelData
-	 * @returns {Promise<string[]>}
-	 */
 	async fetchChannelUserList (channelData) {
 		const key = {
 			type: "channel-user-list",
@@ -303,10 +210,6 @@ module.exports = class Platform extends require("./template.js") {
 		return `#${name}_private_messages`;
 	}
 
-	/**
-	 * Platform controller
-	 * @type {Controller}
-	 */
 	get controller () {
 		return this.#controller;
 	}
@@ -328,10 +231,6 @@ module.exports = class Platform extends require("./template.js") {
 		}
 	}
 
-	/**
-	 * Assigns controllers to each platform after they have been prepared.
-	 * @param {Object<string, Controller>} controllers
-	 */
 	static assignControllers (controllers) {
 		for (const [name, controller] of Object.entries(controllers)) {
 			const platform = Platform.get(name);
@@ -341,14 +240,6 @@ module.exports = class Platform extends require("./template.js") {
 		}
 	}
 
-	/**
-	 * Returns a platform object for a specified identifier.
-	 * Returns `null` if no platform can be found.
-	 * @param {string|number|sb.Platform} identifier
-	 * @param {string|null} [host]
-	 * @returns {sb.Platform|null}
-	 * @throws {sb.Error} If identifier type is not recognized, or there are ambiguous platforms
-	 */
 	static get (identifier, host) {
 		if (identifier instanceof Platform) {
 			return identifier;
@@ -383,9 +274,6 @@ module.exports = class Platform extends require("./template.js") {
 		}
 	}
 
-	/**
-	 * Cleans up.
-	 */
 	static destroy () {
 		for (const platform of Platform.data) {
 			platform.destroy();
@@ -394,18 +282,3 @@ module.exports = class Platform extends require("./template.js") {
 		super.destroy();
 	}
 };
-
-/**
- * @typedef {string|number|sb.Platform} PlatformLike
- */
-
-/**
- * @typedef {Object} UserMessageResolutionWrapper
- * @property {number} timeout
- * @property {sb.Promise<UserMessageResolution>} promise
- */
-
-/**
- * @typedef {Object} UserMessageResolution
- * @property {string} message
- */
