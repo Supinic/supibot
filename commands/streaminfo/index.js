@@ -104,7 +104,9 @@ module.exports = {
 		const [stream] = streamResponse.body.data;
 		const vodResponse = await sb.Got("Helix", {
 			url: "videos",
-			searchParams: `user_id=${channelID}`
+			searchParams: {
+				user_id: channelID
+			}
 		});
 
 		const vod = vodResponse.body;
@@ -116,8 +118,7 @@ module.exports = {
 				vodString = `${data.url}?t=${(stamp < 0) ? 0 : stamp}s`;
 			}
 			else {
-				const prettyDuration = data.duration.match(/\d+[hms]/g).join(", ");
-				vodString = `${data.url} (length: ${prettyDuration})`;
+				vodString = `${data.url}`;
 			}
 		}
 
@@ -131,7 +132,8 @@ module.exports = {
 
 			if (broadcasterResponse.statusCode !== 200 || broadcasterResponse.body.length === 0) {
 				return {
-					reply: `Channel is offline - no more data currently available. Try again later`
+					reply: `Channel
+			} is offline - no more data currently available. Try again later`
 				};
 			}
 
