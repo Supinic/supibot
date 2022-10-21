@@ -264,9 +264,10 @@ export declare class Channel extends ClassTemplate {
     isUserAmbassador (userData: User): Promise<boolean | null>;
 
     /**
+     * @todo When `supi-core` and `supibot` merge, expand the `options` type fully.
      * Sends a message into the current channel.
      */
-    send (message: Message): Promise<void>;
+    send (message: Message, options?: Object): Promise<void>;
 
     /**
      * Returns the channel's stream-related data.

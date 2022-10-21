@@ -123,8 +123,8 @@ module.exports = class Channel extends require("./template.js") {
 		return ambassadors.includes(userData.ID);
 	}
 
-	send (message) {
-		return this.Platform.send(message, this);
+	send (message, options = {}) {
+		return this.Platform.send(message, this, options);
 	}
 
 	async getStreamData () {

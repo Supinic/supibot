@@ -131,12 +131,13 @@ module.exports = class Platform extends require("./template.js") {
 
 	/**
 	 * Sends a message into a given channel.
-	 * @param {string} message
+	 * @param message
 	 * @param channel
+	 * @param options
 	 * @returns {Promise<void>}
 	 */
-	send (message, channel) {
-		return this.#controller.send(message, channel);
+	send (message, channel, options = {}) {
+		return this.#controller.send(message, channel, options);
 	}
 
 	/**

@@ -77,7 +77,9 @@ export declare class Platform extends ClassTemplate {
 	constructor (data: ConstructorOptions);
 
 	isUserChannelOwner (channelData: Channel, userData: User): Promise<boolean | null>;
-	send (message: string, channel: string): Promise<void>;
+
+	// @todo When `supi-core` and `supibot` merge, expand the `options` type fully.
+	send (message: string, channel: string, options?: Object): Promise<void>;
 	pm (message: string, user: string, channelData?: Channel): Promise<void>;
 	waitForUserMessage (channelData: Channel, userData: User, options: MessageAwaiter["Options"]): Promise<MessageAwaiter["Resolution"]>;
 	fetchChannelUserList (channelData: Channel): Promise<string[]>;
