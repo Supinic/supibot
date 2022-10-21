@@ -100,7 +100,27 @@ module.exports = {
 			};
 		}
 
+		let vodString = "";
 		const [stream] = streamResponse.body.data;
+		const vodResponse = await sb.Got("Helix", {
+			url: "videos",
+			searchParams: `user_id=${channelID}`
+		});
+
+		const vod = vodResponse.body;
+		if (vod.data && vod.data.length !== 0) {
+			const data = vod.data[0];
+			if (!stream) {
+				const offset = 90; // Implicitly offset the VOD by several seconds, to account for inaccuracies
+				const stamp = sb.Utils.parseDuration(data.duration, { target: "sec" }) - offset;
+				vodString = `${data.url}?t=${(stamp < 0) ? 0 : stamp}s`;
+			}
+			else {
+				const prettyDuration = data.duration.match(/\d+[hms]/g).join(", ");
+				vodString = `${data.url} (length: ${prettyDuration})`;
+			}
+		}
+
 		if (!stream) {
 			const broadcasterResponse = await sb.Got("Leppunen", {
 				url: "v2/twitch/user",
@@ -186,6 +206,7 @@ module.exports = {
 				Title: ${stream.title} 
 				${tagString}
 				https://twitch.tv/${targetChannel.toLowerCase()}
+				${vodString}
 			`
 		};
 	}),
