@@ -58,8 +58,17 @@ module.exports = {
 			}
 		}
 
+		const platformIdArray = [];
+		if (targetUser.Twitch_ID) {
+			platformIdArray.push(`Twitch ID: ${targetUser.Twitch_ID}`);
+		}
+		if (targetUser.Discord_ID) {
+			platformIdArray.push(`Discord ID: ${targetUser.Discord_ID}`);
+		}
+
+		const platformIdString = platformIdArray.join(";");
 		return {
-			reply: `${idString} ${targetUser.ID} and ${pronoun} ${temporalReply} ${delta}. ${birthdayString}`
+			reply: `${idString} ${targetUser.ID} and ${pronoun} ${temporalReply} ${delta}. ${platformIdString} ${birthdayString}`
 		};
 	}),
 	Dynamic_Description: null
