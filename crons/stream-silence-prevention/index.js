@@ -26,52 +26,54 @@ module.exports = {
 		const channelData = sb.Channel.get("supinic", "twitch");
 		const cytubeChannelData = sb.Channel.get(49);
 
+		// Don't autorequest when stream is offline
 		const streamData = await channelData.getStreamData();
 		if (!streamData.live) {
 			return;
 		}
 
+		// Don't autorequest in an unsupported songrequest state
 		const state = sb.Config.get("SONG_REQUESTS_STATE");
 		if (state !== "vlc" && state !== "cytube") {
 			return;
 		}
 
-		let isQueueEmpty = null;
+		let repeatsArray;
+		let isQueueEmpty = false;
 		if (state === "vlc") {
 			const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
 			isQueueEmpty = (queue.length === 0);
+
+			repeatsArray = await sb.Query.getRecordset(rs => rs
+				.select("Link")
+				.from("chat_data", "Song_Request")
+				.orderBy("ID DESC")
+				.limit(this.data.repeatsAmount)
+				.flat("Link")
+			);
 		}
 		else if (state === "cytube") {
+			repeatsArray = this.data.repeats;
 			isQueueEmpty = (cytube.controller.clients.get(cytubeChannelData.ID).playlistData.length === 0);
 		}
 
+		// Don't autorequest if queue is not empty
 		if (!isQueueEmpty) {
 			return;
 		}
 
-		if (!this.data.videos) {
-			// const playlistID = "PL9TsqVDcBIdtyegewA00JC0mlSkoq-VnJ"; // supinic's "stream playlist"
-			const playlistID = "PL9gZzeM4mz7aySWRb0Hsl7Xbp3YCPg88l"; // "TOS Gachi and Cancer music FeelsGoodMan" by TeoTheParty
-			// const playlistID = "PL9gZzeM4mz7bUF3LXcPRAU-7RFPa6NYqa"; // "Rare Gachi and Cancer HandsUp" by TeoTheParty
-			const { result } = await sb.Utils.fetchYoutubePlaylist({
-				key: sb.Config.get("API_GOOGLE_YOUTUBE"),
-				playlistID
-			});
-
-			this.data.videos = result.map(i => i.ID);
-		}
 
 		let link;
 		let videoID;
-		const roll = sb.Utils.random(1, 3);
-		if (roll === 1) {
+		const roll = sb.Utils.random(1, 4);
+		if (roll < 4) {
 			const videoData = await sb.Query.getRecordset(rs => rs
 				.select("Link", "Video_Type")
 				.from("personal", "Favourite_Track")
 				.where(
-					{ condition: (this.data.repeats.length !== 0) },
+					{ condition: (repeatsArray.length !== 0) },
 					"Link NOT IN %s+",
-					this.data.repeats
+					repeatsArray
 				)
 				.orderBy("RAND()")
 				.limit(1)
@@ -90,13 +92,7 @@ module.exports = {
 			videoID = videoData.Link;
 			link = prefix.replace("$", videoData.Link);
 		}
-		else if (roll === 2) {
-			const filtered = this.data.videos.filter(i => !this.data.repeats.includes(i));
-
-			videoID = sb.Utils.randArray(filtered);
-			link = `https://youtu.be/${videoID}`;
-		}
-		else if (roll === 3) {
+		else {
 			/** @type {string[]} */
 			const links = await sb.Query.getRecordset(rs => rs
 				.select("Track.Link AS Link")
@@ -104,9 +100,9 @@ module.exports = {
 				.where("User_Alias = %n", 1)
 				.where("Video_Type = %n", 1)
 				.where(
-					{ condition: this.data.repeats.length > 0 },
+					{ condition: (repeatsArray.length !== 0) },
 					"Track.Link NOT IN %s+",
-					this.data.repeats
+					repeatsArray
 				)
 				.join("music", "Track")
 				.flat("Link")
@@ -116,18 +112,10 @@ module.exports = {
 			link = `https://youtu.be/${videoID}`;
 		}
 
-		// If there are no applicable video IDs, this means we ran out of possible videos.
-		// Clear and abort this invocation
-		if (!videoID) {
-			this.data.repeats = [];
+		// If the rolled video is in the banned list, exit early and repeat later
+		if (this.data.bannedLinks.includes(videoID)) {
 			return;
 		}
-		else if (this.data.bannedLinks.includes(videoID)) {
-			return;
-		}
-
-		this.data.repeats.push(videoID);
-		this.data.repeats.splice(0, this.data.repeats - this.data.repeatsAmount);
 
 		if (state === "vlc") {
 			const self = await sb.User.get("supibot");
@@ -140,7 +128,6 @@ module.exports = {
 			});
 
 			await sr.execute(fakeContext, link);
-			// result = commandResult.reply;
 		}
 		else if (state === "cytube") {
 			const videoID = sb.Utils.modules.linkParser.parseLink(link);
@@ -148,9 +135,7 @@ module.exports = {
 
 			// noinspection ES6MissingAwait
 			client.queue("yt", videoID);
-			// result = `Silence prevention! Successfully added ${link} to Cytube (hopefully).`;
+			repeatsArray.push(videoID);
 		}
-
-		// await channelData.send(result);
 	})
 };
