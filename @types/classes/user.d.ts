@@ -25,7 +25,7 @@ declare type UserGetOptions = {
 };
 
 export declare class User extends ClassTemplate {
-    static bots: Map<string, User>;
+    static bots: Map<User["ID"], User>;
     static data: Map<string, User>;
     static readonly permissions: Permissions.Descriptor;
     static readonly dataCache: GenericCacheMap<User>;
