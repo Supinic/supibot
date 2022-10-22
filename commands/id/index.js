@@ -66,7 +66,7 @@ module.exports = {
 			platformIdArray.push(`Discord ID: ${targetUser.Discord_ID}`);
 		}
 
-		const platformIdString = platformIdArray.join(";");
+		const platformIdString = platformIdArray.join("; ");
 		return {
 			reply: `${idString} ${targetUser.ID} and ${pronoun} ${temporalReply} ${delta}. ${platformIdString} ${birthdayString}`
 		};
