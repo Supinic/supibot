@@ -183,21 +183,9 @@ module.exports = class TwitchController extends require("./template.js") {
 					return;
 				}
 
-				if (error.message.includes("suspended")) {
-					// @todo Promise.all
-					await channelData.setDataProperty("inactiveReason", "suspended");
-					await channelData.saveProperty("Mode", "Inactive");
-
-					await sb.Logger.log(
-						"Twitch.Fail",
-						`Channel ${channelData.Name} suspended - set to Inactive`,
-						channelData,
-						null
-					);
-				}
-				else {
+				const message = error.message.toLowerCase();
+				if (message.includes("suspended") || message.includes("timed out")) {
 					const result = await this.executeChannelRename(channelData);
-
 					if (result.reason === "channel-suspended") {
 						await sb.Logger.log(
 							"Twitch.Fail",
