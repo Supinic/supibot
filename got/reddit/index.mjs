@@ -4,7 +4,7 @@ export default {
 	options: {
 		prefixUrl: "https://www.reddit.com/r/",
 		headers: {
-			Cookie: "_options={%22pref_quarantine_optin%22:true};"
+			Cookie: "_options={%22pref_quarantine_optin%22:true,%22pref_gated_sr_optin%22:true};"
 		}
 	},
 	parent: "Global",
