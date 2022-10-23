@@ -184,7 +184,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				}
 
 				const message = error.message.toLowerCase();
-				if (message.includes("suspended") || message.includes("timed out")) {
+				if (message.includes("suspended")) {
 					const result = await this.executeChannelRename(channelData);
 					if (result.reason === "channel-suspended") {
 						await sb.Logger.log(
