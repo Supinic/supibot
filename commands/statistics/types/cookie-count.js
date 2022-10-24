@@ -50,13 +50,17 @@ module.exports = {
 			};
 		}
 
+		const { total, legacy } = cookieData;
 		const [who, target] = (context.user.ID === targetUser.ID)
 			? ["You have", "you"]
 			: ["That user has", "them"];
 
-		const daily = cookieData.total.eaten.daily + cookieData.legacy.daily;
-		const received = cookieData.total.eaten.received + cookieData.legacy.received;
-		const donated = cookieData.total.donated + cookieData.legacy.donated;
+		// Legacy daily stats are based on the following calculation:
+		// `const total = cookies.Daily + cookies.Received - cookies.Sent + cookies.Today;`
+		const legacyDaily = legacy.daily + legacy.received - legacy.donated;
+		const daily = total.eaten.daily + legacyDaily;
+		const received = total.eaten.received + legacy.received;
+		const donated = total.donated + legacy.donated;
 
 		const donatedString = (donated === 0)
 			? `${who} never given out a single cookie`
