@@ -122,43 +122,6 @@ module.exports = (command) => [
 		}
 	},
 	{
-		name: "command-id",
-		aliases: ["cid", "CID", "commandid", "commandID"],
-		description: "Checks the command execution ID for the current channel.",
-		execute: async (context) => {
-			const data = await sb.Query.getRecordset(rs => {
-				rs.select("Executed", "Execution_Time", "Invocation")
-					.from("chat_data", "Command_Execution")
-					.where("User_Alias = %n", context.user.ID)
-					.where("Platform = %n", context.platform.ID)
-					.orderBy("Executed DESC")
-					.limit(1)
-					.single();
-
-				if (context.channel === null) {
-					rs.where("Channel IS NULL");
-				}
-				else {
-					rs.where("Channel = %n", context.channel.ID);
-				}
-
-				return rs;
-			});
-
-			if (!data) {
-				return {
-					success: false,
-					reply: "You have not executed any commands in this channel before! (except this one)"
-				};
-			}
-			else {
-				return {
-					reply: `Last used command: ${sb.Command.prefix}${data.Invocation} - Identifier: ${data.Executed.valueOf()} - Execution time: ${data.Execution_Time}ms`
-				};
-			}
-		}
-	},
-	{
 		name: "cookie",
 		aliases: [],
 		description: "Checks if someone (or you, if not provided) has their fortune cookie available for today.",
