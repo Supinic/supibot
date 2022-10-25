@@ -5,7 +5,7 @@ module.exports = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function checkOldSchoolRunescapeNews () {
-		const { handleSubscription } = require("../subscription-utils.js");
+		const { handleSubscription, parseRssNews } = require("../subscription-utils.js");
 		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Event_Subscription");
 		if (this.data.isTableAvailable === false) {
 			this.stop();
