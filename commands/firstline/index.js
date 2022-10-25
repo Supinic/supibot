@@ -28,7 +28,7 @@ module.exports = {
 			return {
 				success: false,
 				reply: "Provided channel not found in the database!"
-			}
+			};
 		}
 
 		const channelArticle = (targetChannel === context.channel)
