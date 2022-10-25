@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "rust-news-checker",
-	Expression: "0 */15 * * * *",
+	Expression: "0 0 * * * *",
 	Description: "Checks for new Rust (programming language) articles, and posts updates for subscribed users.",
 	Defer: null,
 	Type: "Bot",
