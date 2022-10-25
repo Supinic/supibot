@@ -32,7 +32,7 @@ module.exports = {
 		}
 		else {
 			cooldown.user = context.user.ID;
-			cooldown.channel - null;
+			cooldown.channel = null;
 			cooldown.length = this.Cooldown * 2;
 		}
 
