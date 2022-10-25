@@ -150,6 +150,15 @@ module.exports = {
 					added: "You will now be pinged whenever a new OSRS article is published.",
 					removed: "You will no longer receive pings when a new OSRS article is published."
 				}
+			},
+			{
+				name: "Rust",
+				aliases: ["rust"],
+				notes: "Every hour, Supibot checks for news on the Rust language RSS. If a new article is detected, you will be notified in #supinic.",
+				response: {
+					added: "You will now be pinged whenever a new Rust article is published.",
+					removed: "You will no longer receive pings when a new Rust article is published."
+				}
 			}
 		]
 	})),
