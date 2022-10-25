@@ -17,15 +17,6 @@ module.exports = {
 				.where("TABLE_SCHEMA = %s", "chat_line")
 				.flat("Chat_Lines")
 				.single()
-			),
-			sb.Query.getRecordset(rs => rs
-				.select("Executed", "Result")
-				.from("chat_data", "Command_Execution")
-				.where("Command = %s", this.Name)
-				.where("Result <> %s", "")
-				.orderBy("Executed ASC")
-				.limit(1)
-				.single()
 			)
 		]);
 
