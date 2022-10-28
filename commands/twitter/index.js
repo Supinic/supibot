@@ -67,7 +67,18 @@ module.exports = {
 				locationsData = response.body.map(i => ({
 					name: i.name,
 					woeid: i.woeid,
+					country: {
+						name: i.country,
+						code: i.countryCode
+					},
 					type: {
+						/**
+						 * 7 - Town (Toronto)
+						 * 9 - Unknown (Ahsa)
+						 * 12 - Country (Australia)
+						 * 19 - Supername (Worldwide)
+						 * 22 - Unknown (Soweto)
+						 */
 						code: i.placeType.code,
 						name: i.placeType.name
 					}
@@ -78,20 +89,32 @@ module.exports = {
 				});
 			}
 
-			const locationNames = locationsData.map(i => i.name);
-			const [bestMatch] = sb.Utils.selectClosestString(context.params.trends, locationNames, {
-				fullResult: true,
-				ignoreCase: true
-			});
+			// Only support countries (for now) - ignores city-related trends
+			const input = context.params.trends;
+			const countryData = await sb.Query.getRecordset(rs => rs
+				.select("Code_Alpha_2 AS Code")
+				.select("Name")
+				.from("data", "Country")
+				.where("Name = %s OR Code_Alpha_2 = %s OR Code_Alpha_3 = %s", input, input, input)
+				.single()
+				.limit(1)
+			);
 
-			if (bestMatch.score === 0) {
+			if (!countryData) {
 				return {
 					success: false,
-					reply: `No trends location found for your query!`
+					reply: `Could not match your query to a country!`
 				};
 			}
 
-			const inputLocation = locationsData.find(i => i.name === bestMatch.original);
+			const match = locationsData.find(i => i.country.code === countryData.Code);
+			if (!match) {
+				return {
+					success: false,
+					reply: `${countryData.Name} is not supported by Twitter Trends!`
+				};
+			}
+
 			const response = await sb.Got("GenericAPI", {
 				method: "GET",
 				url: "https://api.twitter.com/1.1/trends/place.json",
@@ -101,7 +124,7 @@ module.exports = {
 					Authorization: `Bearer ${bearerToken}`
 				},
 				searchParams: {
-					id: inputLocation.woeid
+					id: match.woeid
 				}
 			});
 
@@ -118,7 +141,7 @@ module.exports = {
 				.join("; ");
 
 			return {
-				reply: `Current top 10 Twitter trends for ${inputLocation.name}: ${trendsString}.`
+				reply: `Current top 10 Twitter trends for ${match.name}: ${trendsString}.`
 			};
 		}
 
