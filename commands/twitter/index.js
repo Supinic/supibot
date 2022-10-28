@@ -15,7 +15,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function twitter (context, user) {
-		if (!user) {
+		if (!user && !context.params.trends) {
 			return {
 				success: false,
 				reply: "No user provided!"
