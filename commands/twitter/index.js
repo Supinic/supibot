@@ -9,7 +9,8 @@ module.exports = {
 		{ name: "includeRetweets", type: "boolean" },
 		{ name: "mediaOnly", type: "boolean" },
 		{ name: "random", type: "boolean" },
-		{ name: "textOnly", type: "boolean" }
+		{ name: "textOnly", type: "boolean" },
+		{ name: "trends", type: "string" },
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -48,6 +49,69 @@ module.exports = {
 			await this.setCacheData("bearer-token", bearerToken, {
 				expiry: 30 * 864e5 // 30 days
 			});
+		}
+
+		if (context.params.trends) {
+			let locationsData = await this.getCacheData("trends-locations");
+			if (!locationsData) {
+				const response = await sb.Got("GenericAPI", {
+					method: "GET",
+					url: "https://api.twitter.com/1.1/trends/available.json",
+					responseType: "json",
+					throwHttpErrors: false,
+					headers: {
+						Authorization: `Bearer ${bearerToken}`
+					}
+				});
+
+				locationsData = response.body.map(i => ({
+					name: i.name,
+					woeid: i.woeid,
+					type: {
+						code: i.placeType.code,
+						name: i.placeType.name
+					}
+				}));
+
+				await this.setCacheData("trends-locations", locationsData, {
+					expiry: 30 * 864e5 // 30 days
+				});
+			}
+
+			const locationNames = locationsData.map(i => i.name);
+			const [bestMatch] = sb.Utils.selectClosestString(context.params.trends, locationNames, {
+				fullResult: true,
+				ignoreCase: true
+			});
+
+			if (bestMatch.score === 0) {
+				return {
+					success: false,
+					reply: `No trends location found for your query!`
+				};
+			}
+
+			const inputLocation = locationsData.find(i => i.name === bestMatch.original);
+			const response = await sb.Got("GenericAPI", {
+				method: "GET",
+				url: "https://api.twitter.com/1.1/trends/place.json",
+				responseType: "json",
+				throwHttpErrors: false,
+				headers: {
+					Authorization: `Bearer ${await c.getCacheData("bearer-token")}`
+				},
+				searchParams: {
+					id: inputLocation.woeid
+				}
+			});
+
+			const { as_of: createdDate, trends } = response.body[0];
+			const delta = sb.Utils.timeDelta(new sb.Date(createdDate));
+			const trendsString = trends.slice(0, 10).map(i => `${i.name} (${i.tweet_volume})`).join("; ");
+
+			return {
+				reply: `Current top 10 Twitter trends for ${inputLocation.name} (updated ${delta}): ${trendsString}.`
+			};
 		}
 
 		// necessary to fetch - deleted/suspended tweets take up space in the slice
@@ -163,6 +227,16 @@ module.exports = {
 		`<code>${prefix}tweet (account)</code>`,
 		`<code>${prefix}twitter (account)</code>`,
 		"Gets the last tweet.",
+		"",
+
+		`<code>${prefix}twitter trends:(location)</code>`,
+		`<code>${prefix}twitter trends:Worldwide</code>`,
+		`<code>${prefix}twitter trends:France</code>`,
+		`<code>${prefix}twitter trends:"United Arab Emirates"</code>`,
+		`<code>${prefix}twitter trends:Berlin</code>`,
+		`<code>${prefix}twitter trends:"Mexico City"</code>`,
+		"Fetches the top 10 trending hashtags for a given location.",
+		"Supports \"Worldwide\", most countries and the largest and most well-known cities.",
 		"",
 
 		`<code>${prefix}twitter random:true (account)</code>`,
