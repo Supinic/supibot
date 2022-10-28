@@ -10,7 +10,7 @@ module.exports = {
 		{ name: "mediaOnly", type: "boolean" },
 		{ name: "random", type: "boolean" },
 		{ name: "textOnly", type: "boolean" },
-		{ name: "trends", type: "string" },
+		{ name: "trends", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -98,7 +98,7 @@ module.exports = {
 				responseType: "json",
 				throwHttpErrors: false,
 				headers: {
-					Authorization: `Bearer ${await c.getCacheData("bearer-token")}`
+					Authorization: `Bearer ${bearerToken}`
 				},
 				searchParams: {
 					id: inputLocation.woeid
