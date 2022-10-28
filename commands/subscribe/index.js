@@ -127,7 +127,7 @@ module.exports = {
 
 			await row.save({ skipLoad: true });
 			return {
-				reply: `Sucessfully subscribed ${location} ${location}. ${response}`
+				reply: `Sucessfully subscribed ${location}. ${response}`
 			};
 		}
 	}),
