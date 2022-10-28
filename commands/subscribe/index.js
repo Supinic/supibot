@@ -28,7 +28,7 @@ module.exports = {
 
 		/** @type {{ ID: number, Active: boolean }} */
 		const subData = await sb.Query.getRecordset(rs => rs
-			.select("ID", "Active")
+			.select("ID", "Active", "Channel", "Platform")
 			.from("data", "Event_Subscription")
 			.where("User_Alias = %n", context.user.ID)
 			.where("Type = %s", event.name)
