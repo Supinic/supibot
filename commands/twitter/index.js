@@ -147,6 +147,7 @@ module.exports = {
 			};
 		}
 
+		/** @type {Object[]} */
 		let eligibleTweets = response.body;
 		if (!Array.isArray(eligibleTweets)) {
 			await sb.Logger.log("Command.Warning", JSON.stringify({
