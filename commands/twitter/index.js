@@ -262,13 +262,10 @@ module.exports = {
 		"",
 
 		`<code>${prefix}twitter trends:(location)</code>`,
-		`<code>${prefix}twitter trends:Worldwide</code>`,
 		`<code>${prefix}twitter trends:France</code>`,
+		`<code>${prefix}twitter trends:PL</code>`,
 		`<code>${prefix}twitter trends:"United Arab Emirates"</code>`,
-		`<code>${prefix}twitter trends:Berlin</code>`,
-		`<code>${prefix}twitter trends:"Mexico City"</code>`,
-		"Fetches the top 10 trending hashtags for a given location.",
-		"Supports \"Worldwide\", most countries and the largest and most well-known cities.",
+		"Fetches the top 10 trending hashtags for a given country, either as full name or code.",
 		"",
 
 		`<code>${prefix}twitter random:true (account)</code>`,
