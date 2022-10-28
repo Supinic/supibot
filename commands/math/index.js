@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Does math. For more info, check the documentation for math.js",
+	Description: "Does math. For more info, check the documentation for math.js.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
 		{ name: "fixed", type: "boolean" },

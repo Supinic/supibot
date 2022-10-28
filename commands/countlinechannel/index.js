@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["clc"],
 	Author: "supinic",
 	Cooldown: 60000,
-	Description: "Fetches the amount of chat lines in the current channel.",
+	Description: "Fetches the number of chat lines in the current channel.",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,

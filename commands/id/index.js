@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Checks your (or someone else's) ID in the database of users - the lower the number, the earlier the user was first spotted",
+	Description: "Checks your (or someone else's) ID in the database of users - the lower the number, the earlier the user was first spotted.",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,

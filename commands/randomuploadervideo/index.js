@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["ruv"],
 	Author: "supinic",
 	Cooldown: 20000,
-	Description: "On supinic's stream, takes the currently playing video (if there is any) and fetches another random video from the same Youtube uploader.",
+	Description: "On Supinic's stream, takes the currently playing video (if there is any) and fetches another random video from the same YouTube uploader.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "linkOnly", type: "boolean" }

@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["kym"],
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Gets a smol description of a meme from KnowYourMeme, it's just the summary.",
+	Description: "Gets a smol description of a meme from Know Your Meme, it's just the summary.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,

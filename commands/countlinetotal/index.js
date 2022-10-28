@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["clt"],
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Fetches the amount of data lines from ALL the log tables Supibot uses, including the total size and a prediction of when the storage will run out.",
+	Description: "Fetches the number of data lines from ALL the log tables Supibot uses, including the total size and a prediction of when the storage will run out.",
 	Flags: ["mention"],
 	Params: null,
 	Whitelist_Response: null,

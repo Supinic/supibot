@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["rem"],
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Fetches a random emote from the scope of current channel. Configurable with parameters.",
+	Description: "Fetches a random emote from the scope of the current channel. Configurable with parameters.",
 	Flags: ["pipe"],
 	Params: [
 		{ name: "7tv", type: "boolean" },

@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["tt","reversetexttransform","rtt"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Transforms provided text into one of provided types, such as \"vaporwave\", for example.",
+	Description: "Transforms provided text into one of the provided types, such as \"vaporwave\", for example.",
 	Flags: ["external-input","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,

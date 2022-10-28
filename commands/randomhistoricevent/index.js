@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["rhe"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "For a given day, posts a random historic event that happened on that day. If not provided, uses the today's date.",
+	Description: "For a given day, posts a random historic event that happened on that day. If not provided, uses today's date.",
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,

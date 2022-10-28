@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["gnkiss","headpat"],
 	Author: "supinic",
 	Cooldown: 20000,
-	Description: "Tucks target user to bed",
+	Description: "Tucks target user to bed.",
 	Flags: ["block","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,

@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 15000,
-	Description: "Posts the link to channel's cytube",
+	Description: "Posts the link to the channel's CyTube.",
 	Flags: ["mention","pipe","whitelist"],
 	Params: null,
 	Whitelist_Response: null,

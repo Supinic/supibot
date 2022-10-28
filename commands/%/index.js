@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Rolls a random percentage between 0 and 100%",
+	Description: "Rolls a random percentage between 0 and 100%.",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,

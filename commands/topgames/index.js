@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Fetches the top 10 most popular games on twitch, based on current viewer count.",
+	Description: "Fetches the top 10 most popular games on Twitch, based on current viewer count.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,

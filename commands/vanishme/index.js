@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Posts !vanish",
+	Description: "Posts !vanish.",
 	Flags: ["pipe","skip-banphrase","system","whitelist"],
 	Params: null,
 	Whitelist_Response: null,

@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["pl"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Predicts the amount of lines a given user will have in some amount of time.",
+	Description: "Predicts the number of lines a given user will have in some amount of time.",
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,

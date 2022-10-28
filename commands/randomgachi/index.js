@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["rg"],
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Fetches a random gachi track from the gachi list, excluding Bilibili and Nicovideo videos with no Youtube reuploads",
+	Description: "Fetches a random gachi track from the gachi list, excluding Bilibili and Nicovideo videos with no YouTube reuploads.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "fav", type: "string" },

@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Checks your horoscope, if you have set your birthday within supibot.",
+	Description: "Checks your horoscope, if you have set your birthday within Supibot.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,

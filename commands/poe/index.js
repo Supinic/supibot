@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 7500,
-	Description: "A collection of various Path of Exile related commands. Check the extended help on website for more info.",
+	Description: "A collection of various Path of Exile-related commands. Check the extended help on the website for more info.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,

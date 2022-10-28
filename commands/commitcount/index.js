@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["FarmingCommits"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "For a given GitHub user, this command gives you the amount of push events they have done in the last 24 hours. If nothing is provided, your username is used instead.",
+	Description: "For a given GitHub user, this command gives you the number of push events they have done in the last 24 hours. If nothing is provided, your username is used instead.",
 	Flags: ["developer","mention","non-nullable","pipe","skip-banphrase"],
 	Params: [
 		{ name: "since", type: "date" }

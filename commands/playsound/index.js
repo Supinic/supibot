@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["ps"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Plays a sound on supinic stream, if enabled. Use \"list\" as an argument to see the list of available playsounds.",
+	Description: "Plays a sound on Supinic's stream, if enabled. Use \"list\" as an argument to see the list of available playsounds.",
 	Flags: ["mention","pipe","whitelist"],
 	Params: null,
 	Whitelist_Response: "You can't use the command here, but here's a list of supported playsounds: https://supinic.com/stream/playsound/list",

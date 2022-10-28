@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["stat","stats"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Posts various statistics regarding you or other users, e.g. total afk time.",
+	Description: "Posts various statistics regarding you or other users, e.g. total AFK time.",
 	Flags: ["mention","pipe"],
 	Params: [
 		{ name: "recalculate", type: "boolean" }

@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 60000,
-	Description: "Posts the top X (implicitly 10) users by chat lines sent in the context of current channel.",
+	Description: "Posts the top X (implicitly 10) users by chat lines sent in the context of the current channel.",
 	Flags: ["mention"],
 	Params: null,
 	Whitelist_Response: null,

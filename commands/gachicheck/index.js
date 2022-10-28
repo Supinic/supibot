@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["gc"],
 	Author: "supinic",
 	Cooldown: 2500,
-	Description: "Checks if a given gachi link exists in the database, if not, adds it to the todo list to be processed later.",
+	Description: "Checks if a given gachi link exists in the database, if not, adds it to the to-do list to be processed later.",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,

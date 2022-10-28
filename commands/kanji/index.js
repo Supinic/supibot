@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Posts a quick summary of a given Kanji(?) character",
+	Description: "Posts a quick summary of a given Kanji(?) character.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,

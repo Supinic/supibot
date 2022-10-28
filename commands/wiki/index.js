@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 15000,
-	Description: "Fetches the headline of the first article found according to user query. Watch out, articles might be case sensitive.",
+	Description: "Fetches the headline of the first article found according to the user query. Watch out, articles might be case-sensitive.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "lang", type: "language" },

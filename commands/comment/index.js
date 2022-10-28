@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 15000,
-	Description: "Fetches a random comment from a set of 10 thousand randomly generated Youtube videos.",
+	Description: "Fetches a random comment from a set of 10 thousand randomly generated YouTube videos.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,

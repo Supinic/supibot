@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["games","sg"],
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Posts the link to supinic's stream game list on the website.",
+	Description: "Posts the link to Supinic's stream game list on the website.",
 	Flags: ["developer","mention","pipe","system","whitelist"],
 	Params: null,
 	Whitelist_Response: null,

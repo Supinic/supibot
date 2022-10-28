@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["lum", "luam"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Gets a recent event from the 2022 Russia/Ukraine war",
+	Description: "Gets a recent event from the Russia-Ukraine War.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "lang", type: "string" }

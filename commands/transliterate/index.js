@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 15000,
-	Description: "Transliterates non-latin text into Latin. Should support most of the languages not using Latin (like Japanese, Chinese, Russian, ...)",
+	Description: "Transliterates non-Latin text into Latin. Should support most of the languages not using Latin (like Japanese, Chinese, Russian, ...)",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "japaneseOnly", type: "boolean" }

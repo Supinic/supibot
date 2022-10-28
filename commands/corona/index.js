@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["covid"],
 	Author: "supinic",
 	Cooldown: 7500,
-	Description: "Checks the current amount of infected/deceased people from the Corona Virus spread started in October-December 2019.",
+	Description: "Checks the current number of infected/deceased people from the Coronavirus spread that started in October-December 2019.",
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,

@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 60000,
-	Description: "Posts a summary of what supibot does, and what it is.",
+	Description: "Posts a summary of what Supibot does, and what it is.",
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,

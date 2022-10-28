@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["srq","queue"],
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Posts the summary of song request queue. EXPERIMENTAL monkaS",
+	Description: "Posts the summary of the song request queue. EXPERIMENTAL monkaS",
 	Flags: ["mention","pipe","whitelist"],
 	Params: null,
 	Whitelist_Response: "Only available in supinic's channel.",

@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["ForeverAlone"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Fetches a random person from epal.gg - post their description. If used on supinic's channel with TTS on, and if they have an audio introduction, it will be played on stream.",
+	Description: "Fetches a random person from epal.gg - posts their description. If used on Supinic's channel with TTS on, and if they have an audio introduction, it will be played on stream.",
 	Flags: ["mention"],
 	Params: [
 		{ name: "game", type: "string" },
