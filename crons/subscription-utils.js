@@ -1,6 +1,9 @@
+const defaultChannelId = 38;
+
 const fetchSubscriptionUsers = async function (subType, lastSeenThreshold = 36e5) {
 	/** @type {Object[]} */
 	const users = await sb.Query.getRecordset(rs => rs
+		.select("Event_Subscription.Channel as Reminder_Channel")
 		.select("Event_Subscription.User_Alias AS ID")
 		.select("User_Alias.Name AS Username")
 		.select("MAX(Meta.Last_Message_Posted) AS Last_Seen")
@@ -45,9 +48,19 @@ const handleSubscription = async function (subType, message, options = {}) {
 
 	await createReminders(inactiveUsers, message);
 
-	const chatPing = activeUsers.map(i => `@${i.Username}`).join(" ");
-	const targetChannel = sb.Channel.get(options.targetChannel ?? 38);
-	await targetChannel.send(`${chatPing} ${message}`);
+	const channelUsers = {};
+	for (const activeUser of activeUsers) {
+		const channelID = activeUser.Reminder_Channel ?? defaultChannelId;
+		channelUsers[channelID] ??= [];
+		channelUsers[channelID].push(activeUser);
+	}
+
+	for (const [channelID, userDataList] of Object.entries(channelUsers)) {
+		const chatPing = userDataList.map(i => `@${i.Username}`).join(" ");
+		const channelData = sb.Channel.get(Number(channelID));
+
+		await channelData.send(`${chatPing} ${message}`);
+	}
 };
 
 const parseRssNews = async function (xml, cacheKey) {
