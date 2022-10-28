@@ -105,15 +105,20 @@ module.exports = {
 				}
 			});
 
-			const { as_of: createdDate, trends } = response.body[0];
-			const delta = sb.Utils.timeDelta(new sb.Date(createdDate));
+			const { trends } = response.body[0];
 			const trendsString = trends.slice(0, 10)
 				.sort((a, b) => (b.tweet_volume ?? 0) - (a.tweet_volume ?? 0))
-				.map(i => `${i.name} (${i.tweet_volume ?? "N/A"} tweets)`)
+				.map(i => {
+					const volume = (i.tweet_volume)
+						? sb.Utils.groupDigits(i.tweet_volume)
+						: "N/A";
+
+					return `${i.name} (${volume} tweets)`;
+				})
 				.join("; ");
 
 			return {
-				reply: `Current top 10 Twitter trends for ${inputLocation.name} (updated ${delta}): ${trendsString}.`
+				reply: `Current top 10 Twitter trends for ${inputLocation.name}: ${trendsString}.`
 			};
 		}
 
