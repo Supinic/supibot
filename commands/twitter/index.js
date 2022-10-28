@@ -107,7 +107,7 @@ module.exports = {
 				};
 			}
 
-			const match = locationsData.find(i => i.country.code === countryData.Code);
+			const match = locationsData.find(i => i.type.name === "Country" && i.country.code === countryData.Code);
 			if (!match) {
 				return {
 					success: false,
