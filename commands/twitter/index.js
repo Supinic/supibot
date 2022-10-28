@@ -107,7 +107,7 @@ module.exports = {
 
 			const { as_of: createdDate, trends } = response.body[0];
 			const delta = sb.Utils.timeDelta(new sb.Date(createdDate));
-			const trendsString = trends.slice(0, 10).map(i => `${i.name} (${i.tweet_volume})`).join("; ");
+			const trendsString = trends.slice(0, 10).map(i => `${i.name} (${i.tweet_volume ?? "N/A"} tweets)`).join("; ");
 
 			return {
 				reply: `Current top 10 Twitter trends for ${inputLocation.name} (updated ${delta}): ${trendsString}.`
