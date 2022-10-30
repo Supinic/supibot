@@ -83,7 +83,7 @@ const execute = async function (context, query) {
 	const languageID = data[2].replace(/-.*/, "");
 	const fromLanguageName = languageISO.getName(languageID);
 	if (!fromLanguageName) {
-		console.warn("$translate - could not get language name", { data, reply, options, languageID });
+		console.warn("$translate - could not get language name", { data, options, languageID });
 		return {
 			success: false,
 			reply: "Language code could not be translated into a name! Please let @Supinic know about this :)"
