@@ -78,5 +78,26 @@ module.exports = {
 			reply
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (prefix) => {
+		const categoriesList = this.staticData.terms.map(i => `<li>${i}</li>`).join("");
+		return [
+			"Fetches the latest losses of the Russian Army in Ukraine during the Russian invasion of Ukraine started in 2022.",
+			`The data is shown as provided by <a href="https://www.zsu.gov.ua/en">Armed Forces of Ukraine</a> and the <a href="https://www.mil.gov.ua/en/">Ministry of Defence of Ukraine</a>.`,
+			"",
+
+			`<code>${prefix}russianarmylosses</code>`,
+			`<code>${prefix}ral</code>`,
+			"Fetches the summary of all personnel and equipment losses, categorized into groups.",
+			"Also includes the daily increase, if it has been reported.",
+			"",
+
+			`<code>${prefix}ral (category)</code>`,
+			"Fetches the personnel or equipment losses for a provided category.",
+			"Also includes the daily increase, if it has been reported.",
+			"",
+
+			"Supported categories:",
+			`<ul>${categoriesList}</ul>`
+		];
+	}
 };
