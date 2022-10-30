@@ -35,6 +35,13 @@ module.exports = {
 			};
 		}
 		else if (subcommand === "donate") {
+			if (!receiver) {
+				return {
+					success: false,
+					reply: `No user provided! Who do you want to ${type} the cookie to?`
+				};
+			}
+			
 			const receiverUserData = await sb.User.get(receiver);
 			if (!receiverUserData) {
 				return {
