@@ -33,7 +33,7 @@ const execute = async function (context, query) {
 		}
 
 		const newLang = languageISO.get(lang);
-		const code = newLang?.iso6391 ?? newLang?.iso6392 ?? null;
+		const code = newLang?.iso6391 ?? newLang?.iso6392 ?? newLang?.iso6393 ?? null;
 		if (!code) {
 			return {
 				success: false,
