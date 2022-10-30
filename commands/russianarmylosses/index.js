@@ -108,7 +108,7 @@ module.exports = {
 				};
 			}
 
-			reply = `Latest Russian Army losses for ${category.name}: ${stats[category.code]}`;
+			reply = `Latest Russian Army losses for ${category.name}, as claimed by Ukraine: ${stats[category.code]}`;
 
 			const statsIncrease = increase[category.code];
 			if (statsIncrease !== 0) {
@@ -128,7 +128,7 @@ module.exports = {
 				return string;
 			});
 
-			reply = `Latest Russian Army losses: ${replyParts.join(", ")}`;
+			reply = `Latest Russian Army losses, as claimed by Ukraine: ${replyParts.join(", ")}`;
 		}
 
 		return {
