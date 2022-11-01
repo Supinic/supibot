@@ -22,7 +22,7 @@ module.exports = {
 					limit: 0
 				},
 				timeout: {
-					request: 2500
+					request: 15_000
 				}
 			});
 		}
