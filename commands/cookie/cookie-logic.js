@@ -100,7 +100,7 @@ const resetDailyStats = (data) => {
 };
 
 /**
- * Determines if a cookie is available to be eaten today.
+ * Determines if an extra cookie is available to be eaten today.
  * @param data {CookieData}
  * @param [options] {ExtraUserOptions}
  * @returns {boolean}
@@ -110,7 +110,7 @@ const hasExtraCookieAvailable = (data, options) => {
 		return false;
 	}
 
-	return (data.today.eaten.daily <= 2);
+	return (data.today.eaten.daily === 1);
 };
 
 /**
@@ -122,7 +122,7 @@ const hasExtraCookieAvailable = (data, options) => {
 const canEatDailyCookie = (data, options) => {
 	const today = sb.Date.getTodayUTC();
 	if (options?.hasDoubleCookieAccess === true) {
-		return (data.today.eaten.daily <= 2);
+		return (data.today.eaten.daily < 2);
 	}
 
 	return (data.lastTimestamp.daily !== today);
