@@ -69,7 +69,7 @@ module.exports = {
 
 		const item = sb.Utils.randArray(eligibleItems);
 		return {
-			reply: `${typeName} is ${item.name}: ${item.excerpt} ${item.url}`
+			reply: `${typeName} is ${item.name}: ${sb.Utils.fixHTML(item.excerpt)} ${item.url}`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
