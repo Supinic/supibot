@@ -40,6 +40,11 @@ const subcommands = [
 		default: false
 	},
 	{
+		name: "stats",
+		aliases: ["statistics"],
+		default: false
+	},
+	{
 		name: "eat",
 		aliases: [],
 		default: true
@@ -61,7 +66,7 @@ const parseSubcommand = (type) => {
 		type = type.toLowerCase();
 		subcommand = subcommands.find(i => i.name === type || i.aliases.includes(type));
 
-		return (subcommand) ? subcommand.name : defaultSubcommand.name;
+		return (subcommand) ? subcommand.name : null;
 	}
 };
 

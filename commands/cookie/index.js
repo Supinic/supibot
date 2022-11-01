@@ -41,7 +41,7 @@ module.exports = {
 					reply: `No user provided! Who do you want to ${type} the cookie to?`
 				};
 			}
-			
+
 			const receiverUserData = await sb.User.get(receiver);
 			if (!receiverUserData) {
 				return {
@@ -80,10 +80,16 @@ module.exports = {
 				reply: `Successfully given your cookie for today to ${receiverUserData.Name} ${emote}`
 			};
 		}
+		else if (subcommand === "stats") {
+			return {
+				success: false,
+				reply: `You should use "$stats cookie" instead!`
+			};
+		}
 		else {
 			return {
 				success: false,
-				reply: `Unrecognized subcommand! Use one of: ${Logic.getValidTypeNames()}`
+				reply: `Unrecognized subcommand! Use one of: ${Logic.getValidTypeNames()}; or just use $cookie with no text behind.`
 			};
 		}
 	}),
