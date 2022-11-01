@@ -15,7 +15,7 @@ module.exports = {
 				reply: `This command is not available! Configuration variable API_DAYS_OF_THE_YEAR is missing.`
 			};
 		}
-		
+
 		const { invocation } = context;
 		const type = (invocation === "doty" || invocation === "dayoftheyear")
 			? "day"
@@ -32,8 +32,8 @@ module.exports = {
 			};
 		}
 
-		const month = sb.Date.zf(date.month);
-		const day = sb.Date.zf(date.day);
+		const month = sb.Date.zf(date.month, 2);
+		const day = sb.Date.zf(date.day, 2);
 		const identifier = (type === "day")
 			? `${date.year}/${month}/${day}`
 			: `${date.year}/${month}`;
