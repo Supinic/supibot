@@ -101,11 +101,30 @@ const resetDailyStats = (data) => {
 
 /**
  * Determines if a cookie is available to be eaten today.
- * @param data
+ * @param data {CookieData}
+ * @param [options] {ExtraUserOptions}
  * @returns {boolean}
  */
-const canEatDailyCookie = (data) => {
+const hasExtraCookieAvailable = (data, options) => {
+	if (options?.hasDoubleCookieAccess !== true) {
+		return false;
+	}
+
+	return (data.today.eaten.daily <= 2);
+};
+
+/**
+ * Determines if a cookie is available to be eaten today.
+ * @param data {CookieData}
+ * @param [options] {ExtraUserOptions}
+ * @returns {boolean}
+ */
+const canEatDailyCookie = (data, options) => {
 	const today = sb.Date.getTodayUTC();
+	if (options?.hasDoubleCookieAccess === true) {
+		return (data.today.eaten.daily <= 2);
+	}
+
 	return (data.lastTimestamp.daily !== today);
 };
 
@@ -131,17 +150,23 @@ const hasDonatedDailyCookie = (data) => {
 
 /**
  * @param {CookieData} data
+ * @param {ExtraUserOptions} [options]
  * @returns {boolean} `false` if unable to eat, `true` if the process succeeded.
  */
-const eatDailyCookie = (data) => {
+const eatDailyCookie = (data, options) => {
 	const today = sb.Date.getTodayUTC();
-	if (!canEatDailyCookie(data)) {
+	if (!canEatDailyCookie(data, options)) {
 		return false;
 	}
 
 	data.lastTimestamp.daily = today;
 	data.today.eaten.daily++;
-	data.total.eaten.daily++;
+
+	// Only increment the total count if the user is eating their first cookie daily.
+	// This is to prevent the "additional privileged" cookies counting for statistics.
+	if (data.today.eaten.daily === 0) {
+		data.total.eaten.daily++;
+	}
 
 	return true;
 };
@@ -164,14 +189,16 @@ const eatReceivedCookie = (data) => {
 
 /**
  * @param {CookieData} data
+ * @param {ExtraUserOptions} options
  * @returns {Result}
  */
-const eatCookie = (data) => {
-	if (canEatDailyCookie(data)) {
-		eatDailyCookie(data);
+const eatCookie = (data, options) => {
+	if (canEatDailyCookie(data, options)) {
+		eatDailyCookie(data, options);
 
+		const isExtra = (options.hasDoubleCookieAccess && data.today.eaten.daily >= 2);
 		return {
-			type: "daily",
+			type: (isExtra) ? "golden" : "daily",
 			success: true
 		};
 	}
@@ -201,9 +228,10 @@ const eatCookie = (data) => {
  * Attempts to donate a cookie to another user.
  * @param {CookieData} donator
  * @param {CookieData} receiver
+ * @param {ExtraUserOptions} [options]
  * @returns {boolean}
  */
-const donateCookie = (donator, receiver) => {
+const donateCookie = (donator, receiver, options) => {
 	if (canEatReceivedCookie(donator)) { // Got donated cookie, can't donate those
 		return {
 			success: false,
@@ -211,16 +239,32 @@ const donateCookie = (donator, receiver) => {
 		};
 	}
 	else if (!canEatDailyCookie(donator)) { // No daily cookie left to donate to others
-		return {
-			success: false,
-			reply: "You already ate or donated your cookie today, so you can't gift it to someone else!"
-		};
+		if (hasExtraCookieAvailable(donator, options)) {
+			return {
+				success: false,
+				reply: `You have an exclusive cookie available to you, but you can't gift those away!`
+			};
+		}
+		else {
+			return {
+				success: false,
+				reply: "You already ate or donated your cookie today, so you can't gift it to someone else!"
+			};
+		}
 	}
-	else if (canEatDailyCookie(receiver)) { // Receiver hasn't eaten their donated cookie yet
-		return {
-			success: false,
-			reply: "That user hasn't eaten their daily cookie today, so you would be wasting your donation! Get them to eat it!"
-		};
+	else if (canEatDailyCookie(receiver)) { // Receiver hasn't eaten their daily cookie yet
+		if (hasExtraCookieAvailable(receiver, options)) {
+			return {
+				success: false,
+				reply: `That user hasn't eaten their exclusive cookie today, so you would be wasting your donation even more than usual! Get them to eat it!`
+			};
+		}
+		else {
+			return {
+				success: false,
+				reply: "That user hasn't eaten their daily cookie today, so you would be wasting your donation! Get them to eat it!"
+			};
+		}
 	}
 	else if (canEatReceivedCookie(receiver)) { // Receiver already has a donation pending
 		return {
@@ -273,7 +317,8 @@ module.exports = {
 /**
  * @typedef {Object} Response
  * @property {boolean} success
- * @property {string} reply
+ * @property {string} type
+ * @property {string} type
  */
 
 /**
@@ -298,4 +343,9 @@ module.exports = {
  * @property {number} legacy.daily
  * @property {number} legacy.donated
  * @property {number} legacy.received
+ */
+
+/**
+ * @typedef {Object} ExtraUserOptions
+ * @property {boolean} hasDoubleCookieAccess
  */

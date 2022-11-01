@@ -18,8 +18,15 @@ module.exports = {
 			Logic.resetDailyStats(cookieData);
 		}
 
+		const subscriberList = await sb.Cache.getByPrefix("twitch-subscriber-list-supinic");
+		let hasDoubleCookieAccess = false;
+		if (Array.isArray(subscriberList)) {
+			hasDoubleCookieAccess = subscriberList.some(i => i.user_id === context.user.Twitch_ID);
+		}
+
+		const options = { hasDoubleCookieAccess };
 		if (subcommand === "eat") {
-			const result = Logic.eatCookie(cookieData);
+			const result = Logic.eatCookie(cookieData, options);
 			if (!result.success) {
 				return result;
 			}
