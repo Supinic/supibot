@@ -39,7 +39,7 @@ module.exports = {
 				console.warn("RSS news fetch error", e);
 				return {
 					success: false,
-					reply: `Could not fetch any articles due to website error!`
+					reply: `Could not fetch any articles due to website error! News site: ${source.name}`
 				};
 			}
 
