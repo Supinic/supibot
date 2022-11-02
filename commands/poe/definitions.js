@@ -215,24 +215,26 @@ const subcommands = [
 				? leagues.find(i => !i.end && new sb.Date(i.launch) > now)
 				: leagues.find(i => !i.end || new sb.Date(i.end) > now);
 
-			const { name, patch, reveal, launch } = nextLeague;
-			const revealDate = new sb.Date(reveal);
-			const launchDate = new sb.Date(launch);
+			if (nextLeague) {
+				const { name, patch, reveal, launch } = nextLeague;
+				const revealDate = new sb.Date(reveal);
+				const launchDate = new sb.Date(launch);
 
-			if (revealDate > now) {
-				result.push(`The ${patch} ${name ?? ""} league will be revealed ${sb.Utils.timeDelta(revealDate)}.`);
-			}
-			else if (launchDate > now) {
-				result.push(`The ${patch} ${name ?? ""} league will start ${sb.Utils.timeDelta(launchDate)}.`);
-			}
-			else {
-				const possibleEnd = revealDate.clone().addMonths(3).addDays(7);
-				if (possibleEnd > now) {
-					const delta = sb.Utils.timeDelta(possibleEnd, true);
-					result.push(`The ${patch} ${name} league has launched - go and play. It will last approximately for ${delta}.`);
+				if (revealDate > now) {
+					result.push(`The ${patch} ${name ?? ""} league will be revealed ${sb.Utils.timeDelta(revealDate)}.`);
+				}
+				else if (launchDate > now) {
+					result.push(`The ${patch} ${name ?? ""} league will start ${sb.Utils.timeDelta(launchDate)}.`);
 				}
 				else {
-					result.push(`The ${patch} ${name} league has likely concluded. Ask @Supinic to add new info about the next league!`);
+					const possibleEnd = revealDate.clone().addMonths(3).addDays(7);
+					if (possibleEnd > now) {
+						const delta = sb.Utils.timeDelta(possibleEnd, true);
+						result.push(`The ${patch} ${name} league has launched - go and play. It will last approximately for ${delta}.`);
+					}
+					else {
+						result.push(`The ${patch} ${name} league has likely concluded. Ask @Supinic to add new info about the next league!`);
+					}
 				}
 			}
 
