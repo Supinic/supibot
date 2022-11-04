@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "id",
-	Aliases: null,
+	Aliases: ["uid"],
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Checks your (or someone else's) ID in the database of users - the lower the number, the earlier the user was first spotted.",
