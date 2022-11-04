@@ -42,18 +42,18 @@ module.exports = {
 			};
 		}
 
-		/** @type {CookieData|null} */
-		const cookieData = await targetUser.getDataProperty("cookie");
-		if (!cookieData || cookieData.total.daily === 0) {
-			return {
-				reply: `${who} never eaten a single cookie 🙁`
-			};
-		}
-
 		const { total, legacy } = cookieData;
 		const [who, target] = (context.user.ID === targetUser.ID)
 			? ["You have", "you"]
 			: ["That user has", "them"];
+
+		/** @type {CookieData|null} */
+		const cookieData = await targetUser.getDataProperty("cookie");
+		if (!cookieData || cookieData.total.eaten.daily === 0) {
+			return {
+				reply: `${who} never eaten a single cookie 🙁`
+			};
+		}
 
 		// Legacy daily stats are based on the following calculation:
 		// `const total = cookies.Daily + cookies.Received - cookies.Sent + cookies.Today;`
