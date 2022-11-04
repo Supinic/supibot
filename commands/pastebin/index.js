@@ -146,7 +146,50 @@ module.exports = {
 			}
 		}
 		else if (type === "get") {
-			const id = sb.Utils.getPathFromURL(args[0]) || args[0];
+			let userInput = args[0];
+			const { allowedGistTypes } = this.staticData;
+			if (provider === "gist" && context.params.gistUser) {
+				const escapedUser = encodeURI(context.params.gistUser);
+				const response = await sb.Got("GitHub", {
+					url: `users/${escapedUser}/gists`,
+					throwHttpErrors: false
+				});
+
+				if (response.statusCode === 404) {
+					return {
+						success: false,
+						reply: `Provided user does not exist on GitHub!`
+					};
+				}
+				else if (response.statusCode !== 200) {
+					return {
+						success: false,
+						reply: `GitHub error: ${response.body.message}`
+					};
+				}
+
+				/** @type {Array} */
+				const gists = response.body;
+				const eligibleGists = gists.filter(gist => {
+					const eligibleFiles = Object.values(gist.files).filter(i => allowedGistTypes.includes(i.type));
+					return (eligibleFiles.length === 1);
+				});
+
+				if (eligibleGists.length === 0) {
+					return {
+						success: false,
+						reply: sb.Utils.tag.trim `
+							That user does not have any Gists I can use!							
+							A Gist valid for this command must use exactly one file of one of these types: ${allowedGistTypes.join(", ")}
+						`
+					};
+				}
+
+				const randomUserGist = sb.Utils.randArray(eligibleGists);
+				userInput = randomUserGist.url;
+			}
+
+			const id = sb.Utils.getPathFromURL(userInput) || userInput;
 			if (!id) {
 				return {
 					success: false,
@@ -215,52 +258,8 @@ module.exports = {
 				textData = response.body;
 			}
 			else if (provider === "gist") {
-				let gistID = id;
-				const { allowedGistTypes } = this.staticData;
-
-				if (context.params.gistUser) {
-					const escapedUser = encodeURI(context.params.gistUser);
-					const response = await sb.Got("GitHub", {
-						url: `users/${escapedUser}/gists`,
-						throwHttpErrors: false
-					});
-
-					if (response.statusCode === 404) {
-						return {
-							success: false,
-							reply: `Provided user does not exist on GitHub!`
-						};
-					}
-					else if (response.statusCode !== 200) {
-						return {
-							success: false,
-							reply: `GitHub error: ${response.body.message}`
-						};
-					}
-
-					/** @type {Array} */
-					const gists = response.body;
-					const eligibleGists = gists.filter(gist => {
-						const eligibleFiles = Object.values(gist.files).filter(i => allowedGistTypes.includes(i.type));
-						return (eligibleFiles.length === 1);
-					});
-
-					if (eligibleGists.length === 0) {
-						return {
-							success: false,
-							reply: sb.Utils.tag.trim `
-								That user does not have any Gists I can use!							
-								A Gist valid for this command must use exactly one file of one of these types: ${allowedGistTypes.join(", ")}
-							`
-						};
-					}
-
-					const randomUserGist = sb.Utils.randArray(eligibleGists);
-					gistID = randomUserGist.id;
-				}
-
 				const response = await sb.Got("GitHub", {
-					url: `gists/${gistID}`
+					url: `gists/${id}`
 				});
 
 				if (response.statusCode === 403) {
