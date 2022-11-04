@@ -186,7 +186,7 @@ module.exports = {
 				}
 
 				const randomUserGist = sb.Utils.randArray(eligibleGists);
-				userInput = randomUserGist.url;
+				userInput = randomUserGist.id;
 			}
 
 			const id = sb.Utils.getPathFromURL(userInput) || userInput;
