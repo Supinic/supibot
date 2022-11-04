@@ -446,6 +446,21 @@ module.exports = {
 			}
 		}
 
+		if (!target) {
+			const json = JSON.stringify(data);
+			await sb.Logger.log(
+				"Command.Fail",
+				`No "target" variable in $weather: ${json}`,
+				context.channel,
+				context.user.ID
+			);
+
+			return {
+				success: false,
+				reply: `Cannot get any weather data! Please let @Supinic know about this via the $suggest command.`
+			};
+		}
+
 		const { getIcon, getWindDirection } = this.staticData;
 		const obj = {
 			place: (skipLocation) ? "(location hidden)" : formattedAddress,
