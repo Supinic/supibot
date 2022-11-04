@@ -102,6 +102,7 @@ module.exports = {
 
 		let vodString = "";
 		const [stream] = streamResponse.body.data;
+
 		const vodResponse = await sb.Got("Helix", {
 			url: "videos",
 			searchParams: {
@@ -109,9 +110,34 @@ module.exports = {
 			}
 		});
 
+		let vodTitle;
 		const vod = vodResponse.body;
 		if (vod.data && vod.data.length !== 0) {
+			/**
+			 * @typedef {Object} HelixVideo
+			 * @property {string} created_at ISO timestamp
+			 * @property {string} description
+			 * @property {string} duration
+			 * @property {string} id
+			 * @property {string} language
+			 * @property {Array|null} muted_segments
+			 * @property {string} published_at ISO timestamp
+			 * @property {string} stream_id
+			 * @property {string} thubmnail_url
+			 * @property {string} title
+			 * @property {string} type
+			 * @property {string} url
+			 * @property {string} user_id
+			 * @property {string} user_login
+			 * @property {string} user_name
+			 * @property {number} view_count
+			 * @property {string} viewable
+			 */
+
+			/** @type {HelixVideo | undefined} */
 			const data = vod.data[0];
+			vodTitle = data.title;
+
 			if (stream) {
 				const offset = 90; // Implicitly offset the VOD by several seconds, to account for inaccuracies
 				const stamp = sb.Utils.parseDuration(data.duration, { target: "sec" }) - offset;
@@ -132,8 +158,7 @@ module.exports = {
 
 			if (broadcasterResponse.statusCode !== 200 || broadcasterResponse.body.length === 0) {
 				return {
-					reply: `Channel
-			} is offline - no more data currently available. Try again later`
+					reply: `Channel is offline - no more data currently available. Try again later`
 				};
 			}
 
@@ -151,7 +176,7 @@ module.exports = {
 			}
 
 			const start = new sb.Date(lastBroadcast.startedAt);
-			const title = lastBroadcast.title ?? "(no title)";
+			const title = vodTitle ?? lastBroadcast.title ?? "(no title)";
 			const delta = sb.Utils.timeDelta(start);
 
 			return {
