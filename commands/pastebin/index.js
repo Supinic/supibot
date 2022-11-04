@@ -8,6 +8,7 @@ module.exports = {
 	Params: [
 		{ name: "hasteServer", type: "string" },
 		{ name: "force", type: "boolean" },
+		{ name: "gistUser", type: "string" },
 		{ name: "raw", type: "boolean" }
 	],
 	Whitelist_Response: null,
@@ -214,8 +215,52 @@ module.exports = {
 				textData = response.body;
 			}
 			else if (provider === "gist") {
+				let gistID = id;
+				const { allowedGistTypes } = this.staticData;
+
+				if (context.params.gistUser) {
+					const escapedUser = encodeURI(context.params.gistUser);
+					const response = await sb.Got("GitHub", {
+						url: `users/${escapedUser}/gists`,
+						throwHttpErrors: false
+					});
+
+					if (response.statusCode === 404) {
+						return {
+							success: false,
+							reply: `Provided user does not exist on GitHub!`
+						};
+					}
+					else if (response.statusCode !== 200) {
+						return {
+							success: false,
+							reply: `GitHub error: ${response.body.message}`
+						};
+					}
+
+					/** @type {Array} */
+					const gists = response.body;
+					const eligibleGists = gists.filter(gist => {
+						const eligibleFiles = Object.values(gist.files).filter(i => allowedGistTypes.includes(i.type));
+						return (eligibleFiles.length === 1);
+					});
+
+					if (eligibleGists.length === 0) {
+						return {
+							success: false,
+							reply: sb.Utils.tag.trim `
+								That user does not have any Gists I can use!							
+								A Gist valid for this command must use exactly one file of one of these types: ${allowedGistTypes.join(", ")}
+							`
+						};
+					}
+
+					const randomUserGist = sb.Utils.randArray(eligibleGists);
+					gistID = randomUserGist.id;
+				}
+
 				const response = await sb.Got("GitHub", {
-					url: `gists/${id}`
+					url: `gists/${gistID}`
 				});
 
 				if (response.statusCode === 403) {
@@ -242,9 +287,7 @@ module.exports = {
 					};
 				}
 
-				const { allowedGistTypes } = this.staticData;
 				const eligibleFiles = Object.values(files).filter(i => allowedGistTypes.includes(i.type));
-
 				if (eligibleFiles.length === 0) {
 					return {
 						success: false,
@@ -346,6 +389,11 @@ module.exports = {
 			`<code>${prefix}gist (gist ID)</code>`,
 			"Fetches the contents of a specified GitHub Gist paste via its ID.",
 			"The Gist must only contain a single text/plain or Javascript file.",
+			"",
+
+			`<code>${prefix}gist gistUser:(username)</code>`,
+			"Fetches the contents of a randomg GitHub Gist owned by the provided user.",
+			"This will automatically filter out all Gists that don't contain a single text/plain or Javascript file.",
 			"",
 
 			"<h5> Other arguments </h5>",
