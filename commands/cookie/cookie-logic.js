@@ -238,25 +238,23 @@ const donateCookie = (donator, receiver, options) => {
 			reply: "That cookie was donated to you! Eat it, don't give it away!"
 		};
 	}
+	else if (canEatDailyCookie(donator) && hasExtraCookieAvailable(donator, options)) { // Regular cookie eaten/donated, golden available
+		return {
+			success: false,
+			reply: `You have a golden cookie available to you, but you can't gift those away!`
+		};
+	}
 	else if (!canEatDailyCookie(donator)) { // No daily cookie left to donate to others
-		if (hasExtraCookieAvailable(donator, options)) {
-			return {
-				success: false,
-				reply: `You have an exclusive cookie available to you, but you can't gift those away!`
-			};
-		}
-		else {
-			return {
-				success: false,
-				reply: "You already ate or donated your cookie today, so you can't gift it to someone else!"
-			};
-		}
+		return {
+			success: false,
+			reply: "You already ate or donated your cookie today, so you can't gift it to someone else!"
+		};
 	}
 	else if (canEatDailyCookie(receiver)) { // Receiver hasn't eaten their daily cookie yet
 		if (hasExtraCookieAvailable(receiver, options)) {
 			return {
 				success: false,
-				reply: `That user hasn't eaten their exclusive cookie today, so you would be wasting your donation even more than usual! Get them to eat it!`
+				reply: `That user hasn't eaten their golden cookie today, so you would be wasting your donation even more than usual! Get them to eat it!`
 			};
 		}
 		else {
