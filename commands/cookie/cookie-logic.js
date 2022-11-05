@@ -160,13 +160,14 @@ const eatDailyCookie = (data, options) => {
 	}
 
 	data.lastTimestamp.daily = today;
-	data.today.eaten.daily++;
 
 	// Only increment the total count if the user is eating their first cookie daily.
 	// This is to prevent the "additional privileged" cookies counting for statistics.
 	if (data.today.eaten.daily === 0) {
 		data.total.eaten.daily++;
 	}
+
+	data.today.eaten.daily++;
 
 	return true;
 };
@@ -189,10 +190,10 @@ const eatReceivedCookie = (data) => {
 
 /**
  * @param {CookieData} data
- * @param {ExtraUserOptions} options
- * @returns {Result}
+ * @param {ExtraUserOptions} [options]
+ * @returns {CookieLogicResponse}
  */
-const eatCookie = (data, options) => {
+const eatCookie = (data, options = {}) => {
 	if (canEatDailyCookie(data, options)) {
 		eatDailyCookie(data, options);
 
@@ -313,7 +314,7 @@ module.exports = {
 };
 
 /**
- * @typedef {Object} Response
+ * @typedef {Object} CookieLogicResponse
  * @property {boolean} success
  * @property {string} type
  * @property {string} type
