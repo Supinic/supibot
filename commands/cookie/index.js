@@ -69,9 +69,18 @@ module.exports = {
 				};
 			}
 
+			let receiverHasDoubleCookieAccess = false;
+			if (Array.isArray(subscriberList)) {
+				receiverHasDoubleCookieAccess = subscriberList.some(i => i.user_id === receiverUserData.Twitch_ID);
+			}
+
+			const receiverOptions = {
+				hasDoubleCookieAccess: receiverHasDoubleCookieAccess
+			};
+
 			/** @type {CookieData} */
 			const receiverCookieData = await receiverUserData.getDataProperty("cookie") ?? Logic.getInitialStats();
-			const result = Logic.donateCookie(cookieData, receiverCookieData);
+			const result = Logic.donateCookie(cookieData, receiverCookieData, options, receiverOptions);
 			if (!result.success) {
 				return result;
 			}

@@ -82,21 +82,18 @@ const getValidTypeNames = () => subcommands.map(i => i.name).join(", ");
  */
 const hasOutdatedDailyStats = (data) => {
 	const today = sb.Date.getTodayUTC();
-	return (data.today.timestamp < today);
+	return (data.lastTimestamp.daily < today);
 };
 
 /**
  * Resets the daily cookie stats.
  * @param {CookieData} data
- * @returns {boolean} `true` if the data was changed, `false` if no saving is necessary.
  */
 const resetDailyStats = (data) => {
-	data.today.timestamp = sb.Date.getTodayUTC();
+	data.lastTimestamp.daily = sb.Date.getTodayUTC();
 	data.today.donated = 0;
 	data.today.eaten.daily = 0;
 	data.today.eaten.received = 0;
-
-	return true;
 };
 
 /**
@@ -110,7 +107,8 @@ const hasExtraCookieAvailable = (data, options) => {
 		return false;
 	}
 
-	return (data.today.eaten.daily === 1);
+	const used = data.today.eaten.daily + data.today.donated;
+	return (used === 1);
 };
 
 /**
@@ -122,7 +120,8 @@ const hasExtraCookieAvailable = (data, options) => {
 const canEatDailyCookie = (data, options) => {
 	const today = sb.Date.getTodayUTC();
 	if (options?.hasDoubleCookieAccess === true) {
-		return (data.today.eaten.daily < 2);
+		const used = data.today.eaten.daily + data.today.donated;
+		return (used < 2);
 	}
 
 	return (data.lastTimestamp.daily !== today);
@@ -197,7 +196,8 @@ const eatCookie = (data, options = {}) => {
 	if (canEatDailyCookie(data, options)) {
 		eatDailyCookie(data, options);
 
-		const isExtra = (options.hasDoubleCookieAccess && data.today.eaten.daily >= 2);
+		const used = data.today.eaten.daily + data.today.donated;
+		const isExtra = (used >= 2);
 		return {
 			type: (isExtra) ? "golden" : "daily",
 			success: true
@@ -229,30 +229,31 @@ const eatCookie = (data, options = {}) => {
  * Attempts to donate a cookie to another user.
  * @param {CookieData} donator
  * @param {CookieData} receiver
- * @param {ExtraUserOptions} [options]
- * @returns {boolean}
+ * @param {ExtraUserOptions} [donatorOptions]
+ * @param {ExtraUserOptions} [receiverOptions]
+ * @returns {CookieLogicResponse}
  */
-const donateCookie = (donator, receiver, options) => {
+const donateCookie = (donator, receiver, donatorOptions = {}, receiverOptions = {}) => {
 	if (canEatReceivedCookie(donator)) { // Got donated cookie, can't donate those
 		return {
 			success: false,
 			reply: "That cookie was donated to you! Eat it, don't give it away!"
 		};
 	}
-	else if (canEatDailyCookie(donator) && hasExtraCookieAvailable(donator, options)) { // Regular cookie eaten/donated, golden available
+	else if (canEatDailyCookie(donator, donatorOptions) && hasExtraCookieAvailable(donator, donatorOptions)) { // Regular cookie eaten/donated, golden available
 		return {
 			success: false,
 			reply: `You have a golden cookie available to you, but you can't gift those away!`
 		};
 	}
-	else if (!canEatDailyCookie(donator)) { // No daily cookie left to donate to others
+	else if (!canEatDailyCookie(donator, donatorOptions)) { // No daily cookie left to donate to others
 		return {
 			success: false,
 			reply: "You already ate or donated your cookie today, so you can't gift it to someone else!"
 		};
 	}
-	else if (canEatDailyCookie(receiver)) { // Receiver hasn't eaten their daily cookie yet
-		if (hasExtraCookieAvailable(receiver, options)) {
+	else if (canEatDailyCookie(receiver, receiverOptions)) { // Receiver hasn't eaten their daily cookie yet
+		if (hasExtraCookieAvailable(receiver, receiverOptions)) {
 			return {
 				success: false,
 				reply: `That user hasn't eaten their golden cookie today, so you would be wasting your donation even more than usual! Get them to eat it!`
@@ -286,6 +287,7 @@ const donateCookie = (donator, receiver, options) => {
 	};
 };
 
+/* istanbul ignore next */
 const fetchRandomCookieText = async () => (
 	await sb.Query.getRecordset(rs => rs
 		.select("Text")
@@ -298,6 +300,7 @@ const fetchRandomCookieText = async () => (
 );
 
 module.exports = {
+	subcommands,
 	canEatDailyCookie,
 	canEatReceivedCookie,
 	donateCookie,
