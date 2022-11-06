@@ -10,6 +10,10 @@ globalThis.sb = {
 	}
 };
 
+// Allow proper object cloning when `structuredClone` is not available
+// E.g. in workers
+globalThis.structuredClone ??= (input) => JSON.parse(JSON.stringify(input));
+
 const notPrivileged = Object.freeze({ hasDoubleCookieAccess: false });
 const privileged = Object.freeze({ hasDoubleCookieAccess: true });
 
