@@ -422,11 +422,13 @@ const types = [
 		aliases: ["fug", "Spurdo"],
 		description: "\"Spurdo-ifies\" your input.",
 		data: (string) => string.toLowerCase()
+			.replaceAll("cca", "gga")
+			.replaceAll("cci", "gci")
 			.replaceAll("ck", "gg")
-			.replaceAll("cc", "gc")
 			.replaceAll("th", "d")
 			.replaceAll("t", "d")
-			.replaceAll(/c(?![he])/g, "g")
+			// replace remaining C- groups, but not those we already replaced (have a preceding "G" char)
+			.replaceAll(/(?<![g])c(?![he])/g, "g")
 			.replaceAll("k", "g")
 			.replaceAll("p", "b")
 			.replaceAll(/[,.?!](\s+|$)/g, " :DD ")
