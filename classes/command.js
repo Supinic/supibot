@@ -389,9 +389,10 @@ class Command extends require("./template.js") {
 				// Automatically attempt to find all related files in the command's directory, and then remove
 				// them from `require.cache`. This is to remove the burden of reloading from commands themselves.
 				const dirPath = pathModule.parse(path).dir;
+				const mainFilePath = pathModule.join(dirPath, "index.js");
 				const otherFilePaths = Object.keys(require.cache).filter(filePath => {
-					const fileDirPath = pathModule.parse(filePath);
-					return (fileDirPath.dir === dirPath && !filePath.endsWith("index.js"));
+					const hasCorrectExtension = (filePath.endsWith(".js") || filePath.endsWith(".json"));
+					return (filePath.startsWith(dirPath) && hasCorrectExtension && filePath !== mainFilePath);
 				});
 
 				for (const otherFilePath of otherFilePaths) {
