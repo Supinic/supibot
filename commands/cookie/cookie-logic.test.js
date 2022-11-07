@@ -207,12 +207,9 @@ describe("cookie logic", function () {
 
 	describe("meta operations", function () {
 		it("properly resets daily stats after usage", function () {
-			const today = sb.Date.getTodayUTC();
 			const data = Logic.getInitialStats();
-			assert.strictEqual(data.lastTimestamp.daily, 0);
 
 			Logic.eatCookie(data);
-			assert.strictEqual(data.lastTimestamp.daily, today);
 
 			const isOutdated = Logic.hasOutdatedDailyStats(data);
 			assert.strictEqual(isOutdated, false);
@@ -224,10 +221,38 @@ describe("cookie logic", function () {
 			assert.strictEqual(isOutdatedAfter, true);
 
 			Logic.resetDailyStats(data);
-			assert.strictEqual(data.lastTimestamp.daily, today);
+			assert.strictEqual(data.lastTimestamp.daily, 0);
 			assert.strictEqual(data.today.donated, 0);
 			assert.strictEqual(data.today.eaten.daily, 0);
 			assert.strictEqual(data.today.eaten.received, 0);
+		});
+
+		it("allows eating a cookie after stats are reset", function () {
+			const data = Logic.getInitialStats();
+			Logic.eatCookie(data, notPrivileged);
+
+			Logic.resetDailyStats(data);
+
+			const canEat = Logic.canEatDailyCookie(data, notPrivileged);
+			assert.strictEqual(canEat, true);
+
+			const result = Logic.eatCookie(data, notPrivileged);
+			assert.strictEqual(result.success, true);
+		});
+
+		it("allows donating a cookie after stats are reset", function () {
+			const userOne = Logic.getInitialStats();
+			const userTwo = Logic.getInitialStats();
+			Logic.eatCookie(userOne, notPrivileged);
+			Logic.eatCookie(userTwo, notPrivileged);
+
+			Logic.resetDailyStats(userOne);
+
+			const canEat = Logic.hasDonatedDailyCookie(userOne);
+			assert.strictEqual(canEat, false);
+
+			const result = Logic.donateCookie(userOne, userTwo, notPrivileged, notPrivileged);
+			assert.strictEqual(result.success, true, JSON.stringify(result));
 		});
 
 		it("cannot execute `Logic.eatDailyCookie` if already eaten", function () {
