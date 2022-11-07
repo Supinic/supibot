@@ -42,6 +42,36 @@ const convert = {
 const textCaseCode = require("./textCaseCode.js");
 const officialCharactersMap = require("./definitions/official-characters.json");
 
+/**
+ * @typedef {Record<string, string>} TextTransformMap
+ */
+
+/**
+ * @typedef {Object} TextTransformDictionary
+ * @property {[string, string]} phrasesWords
+ * @property {[string, string]} suffixes
+ * @property {[string, string]} prefixes
+ * @property {[string, string]} intraWords
+ * @property {[string, string]} [endings]
+ */
+
+/**
+ * @typedef {Function} TextTransformFunction
+ * @param {string} message
+ * @returns {string}
+ */
+
+/**
+ * @typedef {Object} TextTransformDefinition
+ * @property {string} name
+ * @property {string} type
+ * @property {string[]} aliases
+ * @property {TextTransformMap | TextTransformDictionary | TextTransformFunction} data
+ */
+
+/**
+ * @type {TextTransformDefinition[]}
+ */
 const types = [
 	{
 		name: "bubble",
