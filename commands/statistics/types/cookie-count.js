@@ -49,9 +49,9 @@ module.exports = {
 			? ["You have", "you"]
 			: ["That user has", "them"];
 
-		if (!cookieData || cookieData.total.eaten.daily === 0) {
+		if (!cookieData) {
 			return {
-				reply: `${who} never eaten a single cookie 🙁`
+				reply: `${who} never eaten, donated or received a single cookie before 🙁`
 			};
 		}
 
@@ -61,6 +61,10 @@ module.exports = {
 		const daily = total.eaten.daily + legacyDaily;
 		const received = total.eaten.received + legacy.received;
 		const donated = total.donated + legacy.donated;
+
+		const eatenString = (daily === 0)
+			? `${who} never eaten a single cookie`
+			: `${who} eaten ${daily} cookies so far.`;
 
 		const donatedString = (donated === 0)
 			? `${who} never given out a single cookie`
@@ -89,7 +93,7 @@ module.exports = {
 
 		return {
 			reply: sb.Utils.tag.trim `
-				${who} eaten ${daily} cookies so far.
+				${eatenString}
 			    ${received} were gifted to ${target}.
 			    ${donatedString}
 			    ${reaction}
