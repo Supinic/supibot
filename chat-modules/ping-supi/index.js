@@ -7,7 +7,7 @@ module.exports = {
 
 		this.data.timeout ??= 0;
 
-		const relaxedRegex = /supi\b|supinic(?!\.com)|bupi|супи/i;
+		const relaxedRegex = /(supi|supinic(?!\.com)|bupi|супи)\b/i;
 		const strictRegex = /\bsupinic(?!\.com)\b/i;
 
 		const skippedUsers = [1, 1127, 8697460, 12182780];
