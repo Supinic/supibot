@@ -423,12 +423,13 @@ const types = [
 		description: "\"Spurdo-ifies\" your input.",
 		data: (string) => string.toLowerCase()
 			.replaceAll("ck", "gg")
+			.replaceAll("cc", "gc")
 			.replaceAll("th", "d")
 			.replaceAll("t", "d")
 			.replaceAll(/c(?![he])/g, "g")
 			.replaceAll("k", "g")
 			.replaceAll("p", "b")
-			.replaceAll(/[,.?!](\s+|$)/g, ` :${"D".repeat(sb.Utils.random(1, 4))} `)
+			.replaceAll(/[,.?!](\s+|$)/g, " :DD ")
 	}
 ];
 
