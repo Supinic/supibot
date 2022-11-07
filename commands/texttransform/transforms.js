@@ -415,6 +415,20 @@ const types = [
 		description: "Transforms your input into a list of \"forsen\" words, based on GaZaTu's ForsenCode protocol.",
 		data: (string) => textCaseCode.encode(string, "forsen").join(" ").trim(),
 		reverseData: (string) => textCaseCode.decode(string, "forsen").join("").trim()
+	},
+	{
+		name: "spurdo",
+		type: "method",
+		aliases: ["fug", "Spurdo"],
+		description: "\"Spurdo-ifies\" your input.",
+		data: (string) => string.toLowerCase()
+			.replaceAll("ck", "gg")
+			.replaceAll("th", "d")
+			.replaceAll("t", "d")
+			.replaceAll(/c(?![he])/g, "g")
+			.replaceAll("k", "g")
+			.replaceAll("p", "b")
+			.replaceAll(/[,.?!](\s+|$)/g, ` :${"D".repeat(sb.Utils.random(1, 4))} `)
 	}
 ];
 
