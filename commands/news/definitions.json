@@ -333,14 +333,14 @@
     "sources": [
       {
         "name": "Aktualne.cz",
-        "url": "https://zpravy.aktualne.cz/",
+        "url": "https://zpravy.aktualne.cz",
         "path": "rss",
         "endpoints": ["domaci"],
         "helpers": ["supinic"]
       },
       {
         "name": "iRozhlas",
-        "url": "https://www.irozhlas.cz/",
+        "url": "https://www.irozhlas.cz",
         "path": "rss/irozhlas/section",
         "endpoints": ["zpravy-domov"],
         "helpers": ["supinic"]
@@ -353,7 +353,7 @@
     "sources": [
       {
         "name": "SVT",
-        "url": "https://www.svt.se/",
+        "url": "https://www.svt.se",
         "path": "nyheter",
         "endpoints": ["rss.xml"],
         "helpers": []
@@ -393,7 +393,7 @@
       },
       {
         "name": "La Libre",
-        "url": "https://www.lalibre.be/",
+        "url": "https://www.lalibre.be",
         "path": "rss/section",
         "endpoints": ["belgique.xml"],
         "helpers": ["unitedfingers"]
@@ -427,7 +427,7 @@
       },
       {
         "name": "Mediafax",
-        "url": "https://www.mediafax.ro/",
+        "url": "https://www.mediafax.ro",
         "path": null,
         "endpoints": ["rss"],
         "helpers": ["agenttud"]
@@ -454,7 +454,7 @@
       },
       {
         "name": "Voice of America",
-        "url": "https://ir.voanews.com/",
+        "url": "https://ir.voanews.com",
         "path": "api",
         "endpoints": ["zkup_empmy"],
         "helpers": ["krafchenko"]
@@ -679,7 +679,7 @@
     "sources": [
       {
         "name": "G1",
-        "url": "https://g1.globo.com/",
+        "url": "https://g1.globo.com",
         "path": "rss",
         "endpoints": ["g1"],
         "helpers": ["vhns_"]
@@ -692,7 +692,7 @@
     "sources": [
       {
         "name": "מעריב אונליין",
-        "url": "https://www.maariv.co.il/",
+        "url": "https://www.maariv.co.il",
         "path": "Rss",
         "endpoints": ["RssFeedsChadashotBaArez"],
         "helpers": ["nitewaver"]
@@ -845,7 +845,7 @@
     "sources": [
       {
         "name": "AZƏRTAC",
-        "url": "https://azertag.az/",
+        "url": "https://azertag.az",
         "path": null,
         "endpoints": ["rss", "rssofficialchronicle", "rssculture"],
         "helpers": []
