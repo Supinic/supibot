@@ -942,5 +942,32 @@
         "helpers": ["howtoeat6"]
       }
     ]
+  },
+  {
+    "code": "ba",
+    "language": "Bosnian",
+    "sources": [
+      {
+        "name": "Oslobodjenje",
+        "url": "https://www.oslobodjenje.ba",
+        "path": "feed/category",
+        "endpoints": ["1"],
+        "helpers": ["supinic"]
+      },
+      {
+        "name": "The Bosnia Times",
+        "url": "https://thebosniatimes.ba",
+        "path": null,
+        "endpoints": ["feed"],
+        "helpers": ["boring_nick"]
+      },
+      {
+        "name": "Slobodna Bosna",
+        "url": "https://www.slobodna-bosna.ba",
+        "path": "rss",
+        "endpoints": ["3/hronika.html"],
+        "helpers": ["supinic"]
+      }
+    ]
   }
 ]
