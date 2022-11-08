@@ -995,5 +995,18 @@
         "helpers": ["boring_nick"]
       }
     ]
+  },
+  {
+    "code": "ad",
+    "language": "Catalan",
+    "sources": [
+      {
+        "name": "Diaria D'Andorra",
+        "url": "https://www.diariandorra.ad",
+        "path":  null,
+        "endpoints": ["rss"],
+        "helpers": ["howtoeat6"]
+      }
+    ]
   }
 ]
