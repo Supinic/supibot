@@ -447,10 +447,17 @@
       },
       {
         "name": "خبرگزاری مهر",
-        "url": "https://www.mehrnews.com/",
+        "url": "https://www.mehrnews.com",
         "path": null,
         "endpoints": ["rss"],
         "helpers": ["supinic"]
+      },
+      {
+        "name": "Voice of America",
+        "url": "https://ir.voanews.com/",
+        "path": "api",
+        "endpoints": ["zkup_empmy"],
+        "helpers": ["krafchenko"]
       }
     ]
   },
