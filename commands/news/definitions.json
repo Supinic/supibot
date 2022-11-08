@@ -969,5 +969,18 @@
         "helpers": ["supinic"]
       }
     ]
+  },
+  {
+    "code": "it",
+    "language": "Italian",
+    "sources": [
+      {
+        "name": "ANSA",
+        "url": "https://www.ansa.it",
+        "path": "sito/notizie",
+        "endpoints": ["cronaca/cronaca_rss.xml"],
+        "helpers": ["supinic"]
+      }
+    ]
   }
 ]
