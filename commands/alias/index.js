@@ -80,6 +80,7 @@ module.exports = {
 		}
 	})),
 	Code: (async function alias (context, type, ...args) {
+		const AliasUtils = require("./alias-utils.js");
 		if (context.invocation === "$") {
 			args = [type, ...args]; // This the command name
 			type = "run"; // This is the implicit subcommand
@@ -135,7 +136,7 @@ module.exports = {
 					};
 				}
 
-				const commandCheck = sb.Command.get(command);
+				const commandCheck = AliasUtils.parseCommandName(command);
 				if (!commandCheck) {
 					return {
 						success: false,
@@ -668,7 +669,7 @@ module.exports = {
 					};
 				}
 
-				const commandCheck = sb.Command.get(command);
+				const commandCheck = AliasUtils.parseCommandName(command);
 				if (!commandCheck) {
 					return {
 						success: false,
