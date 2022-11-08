@@ -998,7 +998,7 @@ module.exports = {
 				 * @property {number} ID
 				 * @property {number|null} User_Alias
 				 * @property {number|null} Channel
-				 * @property {string} Command
+				 * @property {string|null} Command
 				 * @property {string|null} Invocation
 				 * @property {string|null} Arguments
 				 * @property {number|null} Parent
@@ -1065,7 +1065,7 @@ module.exports = {
 					return { success, reply };
 				}
 
-				const commandData = sb.Command.get(invocation);
+				const commandData = AliasUtils.parseCommandName(invocation);
 				if (!commandData) {
 					return {
 						success: false,
