@@ -982,5 +982,18 @@
         "helpers": ["supinic"]
       }
     ]
+  },
+  {
+    "code": "md",
+    "language": "Romanian",
+    "sources": [
+      {
+        "name": "YAM News",
+        "url": "https://news.yam.md",
+        "path": "ro/feeds",
+        "endpoints": ["rss201"],
+        "helpers": ["boring_nick"]
+      }
+    ]
   }
 ]
