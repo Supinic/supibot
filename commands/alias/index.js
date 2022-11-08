@@ -1057,7 +1057,6 @@ module.exports = {
 					};
 				}
 
-				let invocation = alias.Invocation;
 				const aliasArguments = (alias.Arguments) ? JSON.parse(alias.Arguments) : [];
 
 				const { success, reply, resultArguments } = this.staticData.applyParameters(context, aliasArguments, runArgs.slice(1));
@@ -1065,7 +1064,8 @@ module.exports = {
 					return { success, reply };
 				}
 
-				const commandData = AliasUtils.parseCommandName(invocation);
+				let invocation = AliasUtils.parseInvocationName(alias.Invocation);
+				const commandData = AliasUtils.parseCommandName(alias.Invocation);
 				if (!commandData) {
 					return {
 						success: false,

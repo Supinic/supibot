@@ -9,6 +9,18 @@ const parseCommandName = (string) => {
 		: sb.Command.get(string);
 };
 
+/**
+ * @param {string} string
+ * @returns {Command | null}
+ */
+const parseInvocationName = (string) => {
+	const { prefix } = sb.Command;
+	return (string.startsWith(prefix) && string.length > prefix.length)
+		? string.slice(prefix.length)
+		: string;
+};
+
 module.exports = {
-	parseCommandName
+	parseCommandName,
+	parseInvocationName
 };
