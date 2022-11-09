@@ -71,6 +71,7 @@ module.exports = {
 
 		const tracks = await sb.Utils.searchYoutube(
 			query,
+			/** @type {string} */
 			sb.Config.get("API_GOOGLE_YOUTUBE"),
 			{
 				maxResults: indexThreshold
