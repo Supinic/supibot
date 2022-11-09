@@ -844,10 +844,17 @@
     "language": "Azerbaijani",
     "sources": [
       {
-        "name": "AZƏRTAC",
-        "url": "https://azertag.az",
-        "path": null,
-        "endpoints": ["rss", "rssofficialchronicle", "rssculture"],
+        "name": "APA",
+        "url": "https://apa.az",
+        "path": "az",
+        "endpoints": ["rss"],
+        "helpers": []
+      },
+      {
+        "name": "President's office",
+        "url": "https://prezident.az",
+        "path": "az",
+        "endpoints": ["rss"],
         "helpers": []
       }
     ]
