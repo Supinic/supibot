@@ -110,14 +110,17 @@ module.exports = {
 
 		const data = await sb.Utils.modules.linkParser.fetchData(link);
 		const published = new sb.Date(data.created).format("Y-m-d");
-		const duration = sb.Utils.formatTime(data.duration, true);
+		const durationString = (data.duration === null)
+			? ""
+			: `Duration: ${sb.Utils.formatTime(data.duration, true)}`;
+
 		return {
 			reply: sb.Utils.tag.trim `
 				"${data.name}"
 				by ${data.author},
 				${sb.Utils.groupDigits(data.views)} views,
-				published on ${published},
-				duration: ${duration}
+				published on ${published}.
+				${durationString}
 				${link}
 			`
 		};
