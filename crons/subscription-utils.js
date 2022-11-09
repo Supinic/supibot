@@ -1,5 +1,21 @@
 const defaultChannelId = 38;
 
+/**
+ * @typedef {Object} UserSubscription
+ * @property {number} ID
+ * @property {number|null} Reminder_Channel
+ * @property {string} Username
+ * @property {Date} Last_Seen
+ */
+
+/**
+ * @param {string} subType
+ * @param {number} [lastSeenThreshold]
+ * @returns {Promise<{
+ * 	inactiveUsers: UserSubscription[],
+ * 	activeUsers: UserSubscription[]
+ * 	}>}
+ */
 const fetchSubscriptionUsers = async function (subType, lastSeenThreshold = 36e5) {
 	/** @type {Object[]} */
 	const users = await sb.Query.getRecordset(rs => rs
@@ -29,6 +45,11 @@ const fetchSubscriptionUsers = async function (subType, lastSeenThreshold = 36e5
 	};
 };
 
+/**
+ * @param {UserSubscription[]} users
+ * @param {string} message
+ * @returns {Promise<void>}
+ */
 const createReminders = async function (users, message) {
 	return await Promise.all(users.map(user => (
 		sb.Reminder.create({
@@ -43,16 +64,23 @@ const createReminders = async function (users, message) {
 	)));
 };
 
+/**
+ * @param {string} subType
+ * @param {string} message
+ * @param {Object} [options]
+ * @param {number} [options.lastSeenThreshold]
+ * @returns {Promise<void>}
+ */
 const handleSubscription = async function (subType, message, options = {}) {
-	const { activeUsers, inactiveUsers } = await fetchSubscriptionUsers(subType);
+	const { activeUsers, inactiveUsers } = await fetchSubscriptionUsers(subType, options.lastSeenThreshold);
 
 	await createReminders(inactiveUsers, message);
 
 	const channelUsers = {};
-	for (const activeUser of activeUsers) {
-		const channelID = activeUser.Reminder_Channel ?? defaultChannelId;
+	for (const user of [...activeUsers, ...inactiveUsers]) {
+		const channelID = user.Reminder_Channel ?? defaultChannelId;
 		channelUsers[channelID] ??= [];
-		channelUsers[channelID].push(activeUser);
+		channelUsers[channelID].push(user);
 	}
 
 	for (const [channelID, userDataList] of Object.entries(channelUsers)) {
