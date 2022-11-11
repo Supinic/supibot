@@ -1384,7 +1384,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 
 		const previousMode = channelData.Mode;
-		await channelData.setDataProperty("inactiveReason", "renameed");
+		await channelData.setDataProperty("inactiveReason", "renamed");
 		await channelData.saveProperty("Mode", "Inactive");
 
 		const otherChannelData = sb.Channel.get(login);
