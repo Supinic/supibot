@@ -1,4 +1,4 @@
-import { GenericFlagsObject, SimpleGenericData, TypeExtract } from "../globals";
+import { GenericFlagsObject, JSONifiable, SimpleGenericData, TypeExtract } from "../globals";
 import { ClassTemplate } from "./template";
 import { Channel } from "./channel";
 import { Platform } from "./platform";
@@ -44,6 +44,7 @@ export declare namespace Parameter {
 }
 export declare type Result = {
     reply: string | null;
+    output?: Record<string, JSONifiable>;
     success?: boolean;
     cooldown?: CooldownDescriptor;
     reason?: string;
@@ -265,6 +266,10 @@ export declare class Command extends ClassTemplate {
     static setPrefix (value: string): void;
     static get (identifier: Like): Command | null;
     static validate (): void;
+    /**
+     * Reloads a specific list of commands, provided as identifiers or instances.
+     */
+    static reloadSpecific (...list: Like[]): Promise<boolean>;
 
     /**
      * Extracts all boolean values from a command execution result.

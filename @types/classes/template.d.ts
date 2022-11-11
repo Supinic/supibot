@@ -40,7 +40,6 @@ export declare class ClassTemplate {
     static initialize(): Promise<ClassTemplate>;
     static loadData (): Promise<void>;
     static reloadData (): Promise<void>;
-    static reloadSpecific (): Promise<ReloadResult>;
     static hasReloadSpecific (): boolean;
 
     // static get <Class> (identifier: string | Class): Class | null;

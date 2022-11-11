@@ -264,12 +264,6 @@ module.exports = class ClassTemplate {
 		await this.loadData();
 	}
 
-	static async reloadSpecific () {
-		throw new sb.Error({
-			message: "Module does not implement reloadSpecific"
-		});
-	}
-
 	/**
 	 * Determines whether a child class has its own implemenation of `reloadSpecific`
 	 * @returns {boolean}

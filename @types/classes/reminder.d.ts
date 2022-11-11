@@ -54,6 +54,10 @@ export declare class Reminder extends ClassTemplate {
 	static #add (reminder: Reminder): void;
 	static #remove (ID: Reminder["ID"], options: RemoveOptions): Promise<boolean>;
 
+	/**
+	 * Reloads a specific list of reminders, provided as identifiers or instances.
+	 */
+	static reloadSpecific (...list: Like[]): Promise<boolean>;
 	static get (identifier: Like): Reminder | null;
 	static create (data: OmittableConstructorData, skipChecks?: boolean): Promise<Result>;
 	static checkActive (targetUserData: User, channelData: Channel): Promise<void>;

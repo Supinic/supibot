@@ -84,6 +84,11 @@ export declare class Channel extends ClassTemplate {
     static readonly dataCache: WeakMap<Channel, Map<string, SimpleGenericData>>;
 
     /**
+     * Reloads a specific list of channels, provided as identifiers or instances.
+     */
+    static reloadSpecific (...list: Like[]): Promise<boolean>;
+
+    /**
      * Returns a Channel object, based on the identifier provided, and a optional platform parameter.
      * @param identifier Channel identifier
      * @param platform If provided, only channels in the provided platform will be used.

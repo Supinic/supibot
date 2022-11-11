@@ -27,6 +27,11 @@ export declare class AwayFromKeyboard extends ClassTemplate {
 	static readonly data: Map<number, AwayFromKeyboard>;
 
 	/**
+	 * Reloads a specific list of AFK statuses, provided as identifiers.
+	 */
+	static reloadSpecific (...list: AwayFromKeyboard["ID"][]): Promise<boolean>;
+
+	/**
 	 * Checks if a user is AFK.
 	 * If they are, returns their AFK data and unsets the AFK status.
 	 * If the status is set as not silent, also sends a message to the given channel.

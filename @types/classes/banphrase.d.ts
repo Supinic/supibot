@@ -61,6 +61,11 @@ export declare type APIType = Uppercase<ExternalBanphraseType>;
  */
 export declare class Banphrase extends ClassTemplate {
     /**
+     * Reloads a specific list of banphrases, provided as identifiers.
+     */
+    static reloadSpecific (...list: Banphrase["ID"][]): Promise<boolean>;
+
+    /**
      * Fetches a banphrase, based on the identifier provided.
      */
     static get (identifier: Like): Banphrase | null;
