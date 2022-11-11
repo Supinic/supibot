@@ -14,7 +14,7 @@ module.exports = {
 			};
 		}
 
-		const { data } = await sb.Got("Supinic", `/data/suggestion/stats/user/${userData.Name}`).json();
+		const { data } = await sb.Got("Supinic", `data/suggestion/stats/user/${userData.Name}`).json();
 		const percent = sb.Utils.round(data.userTotal / data.globalTotal * 100, 2);
 		const who = (userData === context.user) ? "You" : "They";
 
