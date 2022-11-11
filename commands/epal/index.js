@@ -149,12 +149,15 @@ module.exports = {
 			ttsData.pending = false;
 		}
 
-		let type = "(other)";
+		let type = "";
 		if (selectedSex === "0") {
 			type = "(M)";
 		}
 		else if (selectedSex === "1") {
 			type = "(F)";
+		}
+		else if (selectedSex === "2") {
+			type = "(NC)";
 		}
 
 		const levelString = (gameLevel)
