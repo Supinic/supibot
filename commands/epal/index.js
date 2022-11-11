@@ -78,6 +78,7 @@ module.exports = {
 					pn: 1,
 					ps: 20, // If set above 20, the resulting array is empty
 					sex: selectedSex,
+					orderField: 4,
 					productType: gameData.ID,
 					clientNo: "bb203a8d12"
 				}
