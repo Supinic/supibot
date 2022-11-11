@@ -246,21 +246,18 @@ module.exports = {
 
 			case "rejoin":
 			case "i-will-not-ban-supibot-again": {
-				const inactiveReason = await channelData.getDataProperty("inactiveReason");
 				if (channelData.Platform.Name !== "twitch") {
 					return {
 						success: false,
 						reply: `Re-enabling the bot is currently only available for Twitch channels!`
 					};
 				}
-				else if (channelData.Mode === "Inactive" && (!inactiveReason || inactiveReason === "bot-banned")) {
+
+				const inactiveReason = await channelData.getDataProperty("inactiveReason");
+				if (inactiveReason === "bot-banned" && command !== "i-will-not-ban-supibot-again") {
 					return {
 						success: false,
-						reply: sb.Utils.tag.trim `
-							The ban has already taken place for too long.
-							Create a suggestion with the "$suggest" command and describe what happened.
-							Also mention how you intend to make sure this doesn't happen again.
-						`
+						reply: `Because I have been banned in ${channelString}, you must use the "$bot i-will-not-ban-supibot-again" command instead!`
 					};
 				}
 
@@ -271,7 +268,9 @@ module.exports = {
 
 					return {
 						reply: sb.Utils.tag.trim ` 
-							I rejoined ${channelString} immediately, it was in read-only mode because of the "offline-only" configuration.
+							I rejoined ${channelString} immediately.
+							It was in read-only mode because someone used "$bot disable" before.
+							Next time, you can just do "$bot enable".
 						`
 					};
 				}
@@ -293,15 +292,26 @@ module.exports = {
 					joinFailed = true;
 				}
 
-				if (!partFailed && !joinFailed && (inactiveReason === "suspended" || inactiveReason === "renamed")) {
+				if (!partFailed && !joinFailed) {
 					await channelData.setDataProperty("inactiveReason", null);
 					await channelData.saveProperty("Mode", "Write");
 				}
 
+				let resultString;
+				if (inactiveReason === "bot-banned") {
+					if (!partFailed || !joinFailed) {
+						resultString = `Could not re-join ${channelString} - make sure I'm unbanned first! Then try this command again.`;
+					}
+					else {
+						resultString = `Tried to re-join ${channelString} - not sure if it worked. If I don't respond to commands, try this command again in a little bit.`;
+					}
+				}
+				else {
+					resultString = `Re-joined ${channelString} successfully!`;
+				}
+
 				return {
-					reply: (partFailed || joinFailed)
-						? `Attempted to re-join ${channelString} - but it was likely unsuccessful. If I'm not active in the channel now, try again in a little bit.`
-						: `Attempted to re-join ${channelString} - it was likely successful.`
+					reply: resultString
 				};
 			}
 
