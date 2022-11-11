@@ -59,6 +59,9 @@ module.exports = {
 			else if (gender === "female") {
 				selectedSex = "1";
 			}
+			else if (gender === "nonconforming") {
+				selectedSex = "2";
+			}
 			else {
 				return {
 					success: false,
@@ -79,7 +82,7 @@ module.exports = {
 					ps: 20, // If set above 20, the resulting array is empty
 					sex: selectedSex,
 					orderField: 4,
-					productType: gameData.ID,
+					productTypeId: gameData.ID,
 					clientNo: "bb203a8d12"
 				}
 			});
