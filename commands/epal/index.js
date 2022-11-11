@@ -79,7 +79,7 @@ module.exports = {
 					ps: 20, // If set above 20, the resulting array is empty
 					sex: selectedSex,
 					productType: gameData.ID,
-					clientNo: "e3bde1a312"
+					clientNo: "bb203a8d12"
 				}
 			});
 
