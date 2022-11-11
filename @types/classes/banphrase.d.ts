@@ -89,7 +89,7 @@ export declare class Banphrase extends ClassTemplate {
         message: Message,
         type: ExternalBanphraseType,
         URL: string,
-        options: ExternalOptions
+        options?: ExternalOptions
     ): Promise<ExternalAPIResponse | string | boolean>;
 
     /**
