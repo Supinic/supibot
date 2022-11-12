@@ -42,6 +42,32 @@ const advancedParse = (string) => JSON.parse(string, (key, value) => {
 	return value;
 });
 
+const supportedPrimitiveTypes = ["number", "string", "boolean"];
+const supportedPrototypes = [Array.prototype, Object.prototype, Map.prototype, Set.prototype];
+const isTypeSupported = (value) => {
+	const type = typeof value;
+	const prototype = Object.getPrototypeOf(value);
+	if (supportedPrototypes.includes(prototype)) {
+		let validObjectProperties = true;
+		const entries = (prototype === Map.prototype || prototype === Set.prototype)
+			? [...value.entries()]
+			: Object.entries(value);
+
+		for (const [propertyKey, propertyValue] of entries) {
+			validObjectProperties &&= isTypeSupported(propertyKey);
+			validObjectProperties &&= isTypeSupported(propertyValue);
+		}
+
+		return validObjectProperties;
+	}
+
+	return (
+		value === null
+		|| value === undefined
+		|| supportedPrimitiveTypes.includes(type)
+	);
+};
+
 module.exports = async function createDebugSandbox (context, scriptArgs) {
 	const rawCustomUserData = await context.user.getDataProperty("customDeveloperData") ?? {};
 	const customUserData = advancedParse(JSON.stringify(rawCustomUserData));
@@ -90,6 +116,9 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				else if (customChannelData[key] && !Object.hasOwn(customChannelData, key)) {
 					throw new Error("Cannot overwrite prototype properties");
 				}
+				else if (!isTypeSupported(value)) {
+					throw new Error("Only primitives (except bigint) and basic objects (Object, Array, Map, Set) are accepted as data property values");
+				}
 
 				channelDataChanged = true;
 				customChannelData[key] = value;
@@ -112,6 +141,9 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				}
 				else if (customUserData[key] && !Object.hasOwn(customUserData, key)) {
 					throw new Error("Cannot overwrite prototype properties");
+				}
+				else if (!isTypeSupported(value)) {
+					throw new Error("Only primitives (except bigint) and basic objects (Object, Array, Map, Set) are accepted as data property values");
 				}
 
 				userDataChanged = true;
