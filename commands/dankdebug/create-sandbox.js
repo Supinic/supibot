@@ -202,7 +202,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				};
 			}
 
-			await context.user.setDataProperty("customDeveloperData", customUserData);
+			await context.user.setDataProperty("customDeveloperData", JSON.parse(string));
 			return {
 				success: true
 			};
@@ -232,7 +232,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				};
 			}
 
-			await context.channel.setDataProperty("sharedCustomData", customChannelData);
+			await context.user.setDataProperty("sharedCustomData", JSON.parse(string));
 			return {
 				success: true
 			};
