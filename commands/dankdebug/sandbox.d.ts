@@ -103,8 +103,16 @@ declare namespace DankDebug {
 		zf: UtilsSingleton["zf"];
 	}
 
+	/** Supported primitive value types, used to construct the full value types later */
+	export type SupibotStorePrimitive = string | number | boolean | null | undefined;
+
 	/** A value that can be stored in a supibot store */
-	export type SupibotStoreValue = string | number | boolean | null | undefined;
+	export type SupibotStoreValue =
+		SupibotStorePrimitive
+		| Record<string, SupibotStorePrimitive>
+		| SupibotStorePrimitive[]
+		| Map<SupibotStorePrimitive, SupibotStorePrimitive>
+		| Set<SupibotStorePrimitive>;
 
 	/** A place to store persistent data within supibot */
 	export interface SupibotStore {
