@@ -104,7 +104,7 @@ declare namespace DankDebug {
 	}
 
 	/** Supported primitive value types, used to construct the full value types later */
-	export type SupibotStorePrimitive = string | number | boolean | null | undefined;
+	export type SupibotStorePrimitive = string | number | boolean | null;
 
 	/** A value that can be stored in a supibot store */
 	export type SupibotStoreValue =
@@ -117,7 +117,7 @@ declare namespace DankDebug {
 	/** A place to store persistent data within supibot */
 	export interface SupibotStore {
 		set(key: string, value: SupibotStoreValue): void;
-		get(key: string): SupibotStoreValue;
+		get(key: string): SupibotStoreValue | undefined;
 		getKeys(): string[];
 	}
 
