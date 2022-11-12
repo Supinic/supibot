@@ -11,10 +11,44 @@ const allowedUtilsMethods = [
 	"zf"
 ];
 
+const advancedStringify = (data) => JSON.stringify(data, (key, value) => {
+	if (value instanceof Map) {
+		return {
+			"@objectRepresentation": "Map",
+			entries: [...value.entries()]
+		};
+	}
+	else if (value instanceof Set) {
+		return {
+			"@objectRepresentation": "Set",
+			entries: [...value.entries()]
+		};
+	}
+	else {
+		return value;
+	}
+});
+
+const advancedParse = (string) => JSON.parse(string, (key, value) => {
+	if (typeof value === "object" && value !== null) {
+		if (value["@objectRepresentation"] === "Map") {
+			return new Map(value.entries);
+		}
+		else if (value["@objectRepresentation"] === "Set") {
+			return new Set(value.entries);
+		}
+	}
+
+	return value;
+});
+
 module.exports = async function createDebugSandbox (context, scriptArgs) {
-	const customUserData = await context.user.getDataProperty("customDeveloperData") ?? {};
+	const rawCustomUserData = await context.user.getDataProperty("customDeveloperData") ?? {};
+	const customUserData = advancedParse(JSON.stringify(rawCustomUserData));
+
+	const rawCustomChannelData = await context.channel?.getDataProperty("sharedCustomData") ?? {};
 	const customChannelData = (context.channel)
-		? await context.channel.getDataProperty("sharedCustomData") ?? {}
+		? advancedParse(JSON.stringify(rawCustomChannelData))
 		: null;
 
 	let userDataChanged = false;
@@ -53,9 +87,6 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				else if (typeof key !== "string") {
 					throw new Error("Only strings are available as keys");
 				}
-				else if (value && (typeof value === "object" || typeof value === "function")) {
-					throw new Error("Only primitives are accepted as object values");
-				}
 				else if (customChannelData[key] && !Object.hasOwn(customChannelData, key)) {
 					throw new Error("Cannot overwrite prototype properties");
 				}
@@ -78,9 +109,6 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 			set: (key, value) => {
 				if (typeof key !== "string") {
 					throw new Error("Only strings are available as keys");
-				}
-				else if (value && (typeof value === "object" || typeof value === "function")) {
-					throw new Error("Only primitives are accepted as object values");
 				}
 				else if (customUserData[key] && !Object.hasOwn(customUserData, key)) {
 					throw new Error("Cannot overwrite prototype properties");
@@ -158,7 +186,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 
 			let string;
 			try {
-				string = JSON.stringify(customUserData);
+				string = advancedStringify(customUserData);
 			}
 			catch {
 				return {
@@ -188,7 +216,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 
 			let string;
 			try {
-				string = JSON.stringify(customChannelData);
+				string = advancedStringify(customChannelData);
 			}
 			catch {
 				return {
