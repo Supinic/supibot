@@ -21,7 +21,7 @@ const advancedStringify = (data) => JSON.stringify(data, (key, value) => {
 	else if (value instanceof Set) {
 		return {
 			"@objectRepresentation": "Set",
-			entries: [...value.entries()]
+			values: [...value.values()]
 		};
 	}
 	else {
@@ -35,7 +35,7 @@ const advancedParse = (string) => JSON.parse(string, (key, value) => {
 			return new Map(value.entries);
 		}
 		else if (value["@objectRepresentation"] === "Set") {
-			return new Set(value.entries);
+			return new Set(value.values);
 		}
 	}
 
