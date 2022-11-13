@@ -31,11 +31,21 @@ const advancedStringify = (data) => JSON.stringify(data, (key, value) => {
 
 const advancedParse = (string) => JSON.parse(string, (key, value) => {
 	if (typeof value === "object" && value !== null) {
-		if (value["@objectRepresentation"] === "Map") {
-			return new Map(value.entries);
+		if (value["@objectRepresentation"] === "Map" && Array.isArray(value.entries)) {
+			try {
+				return new Map(value.entries);
+			}
+			catch (e) {
+				return new Map();
+			}
 		}
-		else if (value["@objectRepresentation"] === "Set") {
-			return new Set(value.values);
+		else if (value["@objectRepresentation"] === "Set" && Array.isArray(value.values)) {
+			try {
+				return new Set(value.values);
+			}
+			catch (e) {
+				return new Set();
+			}
 		}
 	}
 
