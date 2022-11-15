@@ -775,12 +775,13 @@ module.exports = {
 					};
 				}
 
+				const name = customLinkName ?? aliasName;
 				const existing = await sb.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NULL")
 					.where("User_Alias = %n", context.user.ID)
-					.where("Name COLLATE utf8mb4_bin = %s", aliasName)
+					.where("Name COLLATE utf8mb4_bin = %s", name)
 					.single()
 					.flat("ID")
 					.limit(1)
@@ -845,7 +846,6 @@ module.exports = {
 					};
 				}
 
-				const name = customLinkName ?? targetAlias.Name;
 				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
 				row.setValues({
 					User_Alias: context.user.ID,
