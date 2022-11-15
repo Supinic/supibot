@@ -164,12 +164,17 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				: undefined
 		}),
 		utils: {
-			getEmote: async (array, fallback) => {
+			getEmote: async (array, fallback, inputOptions = {}) => {
 				if (!Array.isArray(array) || array.some(i => typeof i !== "string")) {
 					throw new Error("Emotes must be provided as a string Array");
 				}
 
-				return await context.getBestAvailableEmote(array, fallback);
+				const options = {};
+				if (typeof inputOptions?.caseSensitivity === "boolean") {
+					options.filter = inputOptions.caseSensitivity;
+				}
+
+				return await context.getBestAvailableEmote(array, fallback, options);
 			},
 			fetchEmotes: async () => {
 				let emotes;
