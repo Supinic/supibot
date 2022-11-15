@@ -863,7 +863,7 @@ module.exports = {
 				await row.save({ skipLoad: true });
 
 				const nameString = (customLinkName && customLinkName !== targetAlias.Name)
-					? ` with a custom name ${customLinkName}`
+					? ` with a custom name "${customLinkName}"`
 					: "";
 
 				return {
