@@ -50,6 +50,8 @@ export declare type AvailableEmoteOptions = {
 	shuffle?: boolean;
 	returnEmoteObject?: boolean;
 	filter?: (value: Emote) => boolean;
+	// `true` by default
+	caseSensitivity?: boolean;
 };
 
 /**

@@ -160,8 +160,14 @@ module.exports = class Platform extends require("./template.js") {
 			? sb.Utils.shuffleArray(emotes)
 			: emotes;
 
+		const caseSensitive = options.caseSensitivity ?? true;
 		for (const emote of emoteArray) {
-			const available = availableEmotes.find(i => i.name === emote);
+			const lowerEmote = emote.toLowerCase();
+			const available = availableEmotes.find(i => (caseSensitive)
+				? (i.name === emote)
+				: (i.name.toLowerCase() === lowerEmote)
+			);
+
 			if (available && (typeof options.filter !== "function" || options.filter(available))) {
 				return (options.returnEmoteObject)
 					? available
