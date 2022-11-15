@@ -108,11 +108,10 @@ declare namespace DankDebug {
 
 	/** A value that can be stored in a supibot store */
 	export type SupibotStoreValue =
-		SupibotStorePrimitive
-		| Record<string, SupibotStorePrimitive>
-		| SupibotStorePrimitive[]
-		| Map<SupibotStorePrimitive, SupibotStorePrimitive>
-		| Set<SupibotStorePrimitive>;
+		{ [P: string]: SupibotStoreValue }
+		| SupibotStoreValue[]
+		| Map<SupibotStorePrimitive, SupibotStoreValue>
+		| Set<SupibotStoreValue>;
 
 	/** A place to store persistent data within supibot */
 	export interface SupibotStore {
