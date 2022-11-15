@@ -22,9 +22,27 @@ module.exports = {
 			headers: {
 				Referer: "https://howlongtobeat.com"
 			},
+			// All the default values (e.g. empty strings, nulls, zeroes) must be filled,
+			// else the API fails with 500 Internal Server Error.
 			json: {
 				searchType: "games",
 				searchTerms: [...args],
+				searchPage: 1,
+				searchOptions: {
+					filter: "",
+					games: {
+						gameplay: { perspective: "", flow: "", genre: "" },
+						modifier: "",
+						platform: "",
+						rangeCategory: "main",
+						rangeTime: { min: null, max: null },
+						rangeYear: { min: "", max: "" },
+						sortCategory: "popular",
+						userId: 0
+					},
+					randomizer: 0,
+					sort: 0
+				},
 				size: 1
 			}
 		});
