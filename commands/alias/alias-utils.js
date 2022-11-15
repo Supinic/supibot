@@ -11,7 +11,7 @@ const parseCommandName = (string) => {
 
 /**
  * @param {string} string
- * @returns {Command | null}
+ * @returns {string | null}
  */
 const parseInvocationName = (string) => {
 	const { prefix } = sb.Command;

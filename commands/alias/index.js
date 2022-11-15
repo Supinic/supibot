@@ -767,7 +767,7 @@ module.exports = {
 			}
 
 			case "link": {
-				const [userName, aliasName] = args;
+				const [userName, aliasName, customLinkName] = args;
 				if (!userName || !aliasName) {
 					return {
 						success: false,
@@ -845,11 +845,12 @@ module.exports = {
 					};
 				}
 
+				const name = customLinkName ?? targetAlias.Name;
 				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
 				row.setValues({
 					User_Alias: context.user.ID,
 					Channel: null,
-					Name: targetAlias.Name,
+					Name: name,
 					Command: null,
 					Invocation: null,
 					Arguments: null,
@@ -861,8 +862,12 @@ module.exports = {
 
 				await row.save({ skipLoad: true });
 
+				const nameString = (customLinkName && customLinkName !== targetAlias.Name)
+					? ` with a custom name ${customLinkName}`
+					: "";
+
 				return {
-					reply: `Successfully created the alias link! When the original changes, so will yours. ${appendix}`
+					reply: `Successfully created your alias link${nameString}. When the original changes, so will yours. ${appendix}`
 				};
 			}
 
@@ -1189,6 +1194,11 @@ module.exports = {
 		"If the original link changes, then so will the execution of your link - as it is the same alias, really.",
 		"If the original is deleted, then your link will become invalid.",
 		"This is recommended to use with reputable alias creators, or if you actually trust someone with their alias and the changes.",
+		"",
+
+		`<code>${prefix}alias link (username) (alias) (custom name)</code>`,
+		"Takes someone else's alias, and creates a link of it for you, with your own custom name for it.",
+		"This can also be used to create links to your own aliases - essentially creating aliases of your own aliases 😅",
 		"",
 
 		`<code>${prefix}alias check</code>`,
