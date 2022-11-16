@@ -307,7 +307,8 @@ module.exports = {
 				message = `I will ${method}remind ${who} when ${target} type in chat after ${targetReminderDelta} (ID ${result.ID})`;
 			}
 			else {
-				message = `I will ${method}remind ${who} ${targetReminderDelta} (ID ${result.ID})`;
+				const deltaString = (targetReminderDate === null) ? targetReminderDelta : `in ${targetReminderDelta}`;
+				message = `I will ${method}remind ${who} ${deltaString} (ID ${result.ID})`;
 			}
 
 			return {
