@@ -25,7 +25,7 @@ module.exports = {
 	},
 
 	command: async (req, res, url) => {
-		const commandName = url.searchParams.get("command");
+		const commandName = url.searchParams.get("identifier");
 		if (!commandName) {
 			return {
 				statusCode: 400,
