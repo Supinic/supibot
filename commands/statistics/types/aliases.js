@@ -41,13 +41,13 @@ module.exports = {
 				const data = await sb.Query.getRecordset(rs => rs
 					.select("Invocation")
 					.from("data", "Custom_Command_Alias")
-					.where("User_Alias = %n", userData.ID)
+					.where("User_Alias <> %n", userData.ID)
 					.where("Parent = %n", aliasData.ID)
 				);
 
 				const [copies, links] = sb.Utils.splitByCondition(data, i => i.Invocation);
 				return {
-					reply: `${posPronoun} alias "${aliasName} has been copied ${copies.length} times, and linked ${links.length} times.`
+					reply: `${posPronoun} alias "${aliasName}" has been copied ${copies.length} times, and linked ${links.length} times by other users.`
 				};
 			}
 			else {
