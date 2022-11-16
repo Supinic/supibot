@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["hltb"],
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "For a provided game, shows how long it takes to beat based on the howlongobeat.com website's data.",
+	Description: "For a provided game, shows how long it takes to beat based on the https://howlongtobeat.com website's data.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
