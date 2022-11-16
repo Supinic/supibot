@@ -42,11 +42,20 @@ module.exports = {
 		}
 
 		const data = await sb.Query.getRecordset(rs => rs
-			.select("Filter.ID", "Type", "User_Alias", "Channel", "Invocation", "Response", "Reason", "Filter.Data")
-			.select("Channel.Name AS Channel_Name", "Channel.Description AS Channel_Description")
-			.select("User_Alias.Name AS Username")
-			.select("Platform.Name AS Platform_Name")
-			.select("Blocked.Name AS Blocked_Username")
+			.select(
+				"Filter.ID AS ID",
+				"Type AS type",
+				"User_Alias AS userAlias",
+				"Channel AS channel",
+				"Invocation AS invocation",
+				"Response AS response",
+				"Reason AS reason",
+				"Filter.Data AS data"
+			)
+			.select("Channel.Name AS channelName", "Channel.Description AS channelDescription")
+			.select("User_Alias.Name AS username")
+			.select("Platform.Name AS platformnName")
+			.select("Blocked.Name AS blockedUsername")
 			.from("chat_data", "Filter")
 			.leftJoin("chat_data", "Channel")
 			.leftJoin("chat_data", "User_Alias")
@@ -65,8 +74,8 @@ module.exports = {
 		);
 
 		for (const item of data) {
-			if (item.Data) {
-				item.Data = JSON.parse(item.Data);
+			if (item.data) {
+				item.data = JSON.parse(item.data);
 			}
 		}
 
