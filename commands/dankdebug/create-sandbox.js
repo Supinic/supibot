@@ -171,7 +171,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 
 				const options = {};
 				if (typeof inputOptions?.caseSensitivity === "boolean") {
-					options.filter = inputOptions.caseSensitivity;
+					options.caseSensitivity = inputOptions.caseSensitivity;
 				}
 
 				return await context.getBestAvailableEmote(array, fallback, options);
