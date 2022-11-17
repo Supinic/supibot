@@ -1,4 +1,3 @@
-const Logic = require("./cookie-logic");
 module.exports = {
 	Name: "cookie",
 	Aliases: null,
