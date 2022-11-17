@@ -1,3 +1,4 @@
+const Logic = require("./cookie-logic");
 module.exports = {
 	Name: "cookie",
 	Aliases: null,
@@ -80,6 +81,10 @@ module.exports = {
 
 			/** @type {CookieData} */
 			const receiverCookieData = await receiverUserData.getDataProperty("cookie") ?? Logic.getInitialStats();
+			if (Logic.hasOutdatedDailyStats(receiverCookieData)) {
+				Logic.resetDailyStats(receiverCookieData);
+			}
+
 			const result = Logic.donateCookie(cookieData, receiverCookieData, options, receiverOptions);
 			if (!result.success) {
 				return result;

@@ -17,7 +17,7 @@ globalThis.structuredClone ??= (input) => JSON.parse(JSON.stringify(input));
 const notPrivileged = Object.freeze({ hasDoubleCookieAccess: false });
 const privileged = Object.freeze({ hasDoubleCookieAccess: true });
 
-describe("cookie logic", function () {
+describe("cookie logic", function ()  {
 	describe("initial logic", function () {
 		it("can eat daily cookie", function () {
 			const data = Logic.getInitialStats();
