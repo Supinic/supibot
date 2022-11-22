@@ -85,8 +85,9 @@ module.exports = {
 			? `(published ${sb.Utils.timeDelta(new sb.Date(published))})`
 			: "";
 
+		const result = sb.Utils.fixHTML(sb.Utils.removeHTML(`${title ?? ""}${separator}${content ?? ""} ${delta}`));
 		return {
-			reply: sb.Utils.fixHTML(sb.Utils.removeHTML(`${title ?? ""}${separator}${content ?? ""} ${delta}`))
+			reply: result.replace(/\s+/g, " ")
 		};
 	}
 };
