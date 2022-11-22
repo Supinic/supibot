@@ -37,8 +37,9 @@ module.exports = {
 			case "check": {
 				const processed = new Set();
 				const results = [];
-				const fixedArgs = args.flatMap(i => i.split(/\s+/).filter(Boolean));
 
+				/** @type {string[]} */
+				const fixedArgs = args.flatMap(i => i.split(/\s+/).filter(Boolean));
 				for (const input of fixedArgs) {
 					const type = sb.Utils.modules.linkParser.autoRecognize(input);
 					if (type !== "youtube") {
@@ -54,7 +55,7 @@ module.exports = {
 					}
 
 					const existing = await sb.Query.getRecordset(rs => rs
-						.select("ID", "Device", "Link")
+						.select("ID", "Device", "Link", "Timestamp")
 						.from("data", "Bad_Apple")
 						.where(`Link = %s OR JSON_SEARCH(Reuploads, "one", %s) IS NOT NULL`, link, link)
 						.limit(1)
@@ -62,6 +63,7 @@ module.exports = {
 					);
 
 					if (existing) {
+						const timestamp = (existing.Timestamp) ? `?t=${existing.Timestamp}` : "";
 						results.push({
 							input,
 							reply: sb.Utils.tag.trim `
@@ -69,7 +71,7 @@ module.exports = {
 								https://supinic.com/data/bad-apple/detail/${existing.ID}
 								Bad Apple!! on ${existing.Device}
 								-
-								https://youtu.be/${existing.Link}	
+								https://youtu.be/${existing.Link}${timestamp}
 							`
 						});
 						continue;
@@ -136,7 +138,7 @@ module.exports = {
 
 			case "random": {
 				const random = await sb.Query.getRecordset(rs => rs
-					.select("ID", "Device", "Link")
+					.select("ID", "Device", "Link", "Timestamp")
 					.from("data", "Bad_Apple")
 					.where("Status = %s", "Approved")
 					.orderBy("RAND() DESC")
@@ -144,10 +146,11 @@ module.exports = {
 					.single()
 				);
 
+				const timestamp = (random.Timestamp) ? `?t=${random.Timestamp}` : "";
 				return {
 					reply: sb.Utils.tag.trim `
 						Bad Apple!! on ${random.Device}
-						https://youtu.be/${random.Link}	
+						https://youtu.be/${random.Link}${timestamp}
 						https://supinic.com/data/bad-apple/detail/${random.ID}
 					`
 				};
