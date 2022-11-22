@@ -1010,9 +1010,36 @@
       {
         "name": "Diaria D'Andorra",
         "url": "https://www.diariandorra.ad",
-        "path":  null,
+        "path": null,
         "endpoints": ["rss"],
         "helpers": ["howtoeat6"]
+      }
+    ]
+  },
+  {
+    "code": "my",
+    "language": "Malay",
+    "sources": [
+      {
+        "name": "Harian Metro",
+        "url": "https://www.hmetro.com.my",
+        "path": null,
+        "endpoints": ["mutakhir.xml"],
+        "helpers": ["Somso2e", "UgandanWarriarZULUL"]
+      },
+      {
+        "name": "Malaysiakini",
+        "url": "https://www.hmetro.com.my",
+        "path": "rss/my",
+        "endpoints": ["news.rss"],
+        "helpers": ["Somso2e", "UgandanWarriarZULUL"]
+      },
+      {
+        "name": "BERNAMA",
+        "url": "https://www.bernama.com",
+        "path": "bm",
+        "endpoints": ["rssfeed.php"],
+        "helpers": ["Somso2e", "UgandanWarriarZULUL"]
       }
     ]
   }
