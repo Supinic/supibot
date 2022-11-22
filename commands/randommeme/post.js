@@ -15,6 +15,8 @@ module.exports = class RedditPost {
 	#score = 0;
 
 	constructor (data) {
+		this.#title = data.title;
+
 		let crossPostNSFW = false;
 		if (data.crosspost_parent_list && data.crosspost_parent_list.length > 0) {
 			crossPostNSFW = crossPostNSFW || data.over_18;
@@ -25,7 +27,6 @@ module.exports = class RedditPost {
 		this.#author = data.author;
 		this.#created = new sb.Date(data.created_utc * 1000);
 		this.#id = data.id;
-		this.#title = data.title;
 		this.#url = data.url;
 		this.#commentsUrl = `r/${data.subreddit}/comments/${data.id}`;
 
