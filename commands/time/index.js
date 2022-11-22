@@ -93,7 +93,7 @@ module.exports = {
 			const targetUserLocation = await targetUser.getDataProperty("location");
 			if (!targetUserLocation) {
 				const message = (targetUser === context.user)
-					? "You have not set up your location! You can use $set location (location) to set it, or add \"private\" to make it private 🙂"
+					? `You have not set up your location! You can use "$set location (location)" to set it up, or "$set location private (location)" to make it private 🙂`
 					: "They have not set up their location!";
 
 				return {
