@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Sets/unsets certain variables within Supibot. Check the extended help for full info.",
-	Flags: ["mention","owner-override"],
+	Flags: ["mention","owner-override","pipe"],
 	Params: [
 		{ name: "from", type: "string" }
 	],
@@ -175,6 +175,7 @@ module.exports = {
 					adminOnly: true,
 					parameter: "arguments",
 					description: `Designates a user as an "Ambassador" in a specific channel, which grants them elevated access to some Supibot commands.`,
+					pipe: false, // administrative action
 					set: (context, ...args) => handleAmbassadors("set", context, ...args),
 					unset: (context, ...args) => handleAmbassadors("unset", context, ...args)
 				},
@@ -183,6 +184,7 @@ module.exports = {
 					aliases: ["notify", "reminders", "notification", "notifications"],
 					parameter: "ID",
 					description: "Unsets an active reminder either set by you, or for you. You can use the <code>from:(user)</code> parameter to quickly unset all timed reminders set for you by a given user.",
+					pipe: true,
 					getLastID: (context) => sb.Query.getRecordset(rs => rs
 						.select("ID")
 						.from("chat_data", "Reminder")
@@ -289,6 +291,7 @@ module.exports = {
 					aliases: ["suggest", "suggestions"],
 					parameter: "ID",
 					description: "Marks an active suggestion created by you to be \"Dismissed by author\", therefore removing it from the list of active suggestions.",
+					pipe: false, // $suggest itself isn't pipe-able
 					getLastID: (context) => sb.Query.getRecordset(rs => rs
 						.select("ID")
 						.from("data", "Suggestion")
@@ -355,6 +358,7 @@ module.exports = {
 					aliases: [],
 					parameter: "arguments",
 					description: `Sets/unsets your IRL location. If you add the keyword "private", it's going to be hidden. This location is used in commands such as weather, time, and others.`,
+					pipe: false,
 					set: async (context, ...args) => {
 						let hidden = false;
 						let visibilityType = null;
@@ -440,6 +444,7 @@ module.exports = {
 					aliases: [],
 					parameter: "ID",
 					description: "If you made a mistake with the gc command, you can use this to remove a track from the todo list.",
+					pipe: true,
 					unset: async (context, ID) => {
 						const row = await sb.Query.getRow("music", "Track");
 						try {
@@ -489,6 +494,7 @@ module.exports = {
 					elevatedChannelAccess: true,
 					parameter: "arguments",
 					description: "If you're the channel owner or a channel ambassador, you can use this to set the response of the discord command.",
+					pipe: false, // administrative action
 					set: async (context, ...args) => {
 						await context.channel.setDataProperty("discord", args.join(" "));
 						return {
@@ -507,6 +513,7 @@ module.exports = {
 					aliases: ["bday"],
 					parameter: "arguments",
 					description: "Lets you set your birthday (only day and month!) for use in other commands, like $horoscope. Use the MM-DD format (05-01 for May 1st), or \"may 1\", or \"1 may\".",
+					pipe: false,
 					set: async (context, ...args) => {
 						const query = args.join(" ");
 						if (!query) {
@@ -555,6 +562,7 @@ module.exports = {
 					aliases: ["tl"],
 					parameter: "arguments",
 					description: `If you have been nominated as a TwitchLotto-trusted user, you can then set flags to TL links. Available flags: <code>${availableFlags.join(", ")}</code>`,
+					pipe: true,
 					set: async (context, link, ...flags) => {
 						const hasAccess = await context.user.getDataProperty("trustedTwitchLottoFlagger");
 						if (!hasAccess) {
@@ -651,6 +659,7 @@ module.exports = {
 					aliases: ["tld"],
 					parameter: "arguments",
 					description: `Add a description to any TwitchLotto picture (link).`,
+					pipe: true,
 					set: async (context, link, ...args) => {
 						if (!link) {
 							return {
@@ -730,6 +739,7 @@ module.exports = {
 					aliases: ["tlbl"],
 					parameter: "arguments",
 					description: `If you are the channel ambassador/owner, you can decide what flags should be blacklisted. Each usage removes the previous ones, so always use a full list.`,
+					pipe: false, // administrative action
 					set: async (context, ...flags) => {
 						if (!context.channel) {
 							return {
@@ -796,6 +806,7 @@ module.exports = {
 					aliases: ["rig-nsfw"],
 					parameter: "arguments",
 					description: `If you are the channel ambassador/owner, you can decide if your channel will filter out NSFW Instagram links in the random Instagram command.`,
+					pipe: false, // administrative action
 					set: async (context) => await setInstagramFlags(context, true),
 					unset: async (context) => await setInstagramFlags(context, false)
 				},
@@ -804,6 +815,7 @@ module.exports = {
 					aliases: [],
 					parameter: "arguments",
 					description: `Sets/unsets a timer with a given name + date, which you can then check on later.`,
+					pipe: true,
 					set: async (context, ...args) => {
 						const timers = await context.user.getDataProperty("timers") ?? {};
 						const name = args[0];
@@ -871,6 +883,7 @@ module.exports = {
 					aliases: ["tf", "track-fav", "trackfavorite", "track-favourite", "track-favorite"],
 					parameter: "arguments",
 					description: `Lets you favourite a track in Supinic's track list from chat. Not toggleable, only sets the favourite. You can unset or check the favourite on the website. https://supinic.com/track/gachi/list`,
+					pipe: true,
 					set: async (context, ...args) => {
 						const IDs = await fetchTrackIDs(args);
 						await updateTrackFavouriteStatus(context, IDs, true);
@@ -914,6 +927,11 @@ module.exports = {
 				success: false,
 				reply: `You cannot ${invocation} the type ${type}!`
 			};
+		} else if (!target.pipe && context.append.pipe) {
+			return {
+				success: false,
+				reply: `You cannot use the type ${type} in a pipe`,
+			}
 		}
 
 		const permissions = await context.getUserPermissions();
@@ -1024,7 +1042,9 @@ module.exports = {
 				(i.unset) ? "unset" : ""
 			].filter(Boolean).join("/");
 
-			return `<li><code>${names}</code> (${types}) ${i.description}</li>`;
+			const noPipeInfo = (i.pipe) ? "" : ", cannot be piped";
+
+			return `<li><code>${names}</code> (${types}${noPipeInfo}) ${i.description}</li>`;
 		}).join("");
 
 		return [
