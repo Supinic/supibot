@@ -1,7 +1,11 @@
 module.exports = {
 	fetch: async (query) => {
 		const searchParams = {
-			language: "en"
+			language: "en",
+			type: 1,
+			page_size: 10,
+			limit: 10,
+			start_date: new sb.Date().addDays(-7).toISOString() // Only use articles 7 days or newer
 		};
 
 		if (query.length !== 0) {
@@ -22,7 +26,7 @@ module.exports = {
 					limit: 0
 				},
 				timeout: {
-					request: 15_000
+					request: 30_000
 				}
 			});
 		}
