@@ -1029,7 +1029,7 @@
       },
       {
         "name": "Malaysiakini",
-        "url": "https://www.hmetro.com.my",
+        "url": "https://www.malaysiakini.com",
         "path": "rss/my",
         "endpoints": ["news.rss"],
         "helpers": ["Somso2e", "UgandanWarriarZULUL"]
