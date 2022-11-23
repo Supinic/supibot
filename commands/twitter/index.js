@@ -234,8 +234,11 @@ module.exports = {
 			};
 		}
 
+		const replyUrl = (context.params.includeReplies) ? `https://twitter.com/${user}/status/${tweet.id_str}` : "";
 		const delta = sb.Utils.timeDelta(new sb.Date(tweet.created_at));
-		const fixedText = sb.Utils.fixHTML(tweet.full_text ?? "");
+		const fullText = sb.Utils.fixHTML(tweet.full_text ?? "");
+		const fixedText = `${fullText} ${replyUrl}`;
+
 		if (context.params.mediaOnly) {
 			const links = tweet.entities.media.map(i => i.media_url_https).join(" ");
 			return {
