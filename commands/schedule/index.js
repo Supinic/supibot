@@ -57,6 +57,7 @@ module.exports = {
 			};
 		}
 
+		const scheduleUrl = `https://twitch.tv/${channelName}/schedule`;
 		if (vacation !== null) {
 			const start = new sb.Date(vacation.start_time);
 			const end = new sb.Date(vacation.end_time);
@@ -73,6 +74,7 @@ module.exports = {
 						Streaming schedule is interrupted.
 						Vacation ${verb} on ${start.format("Y-m-d")}
 						and ends on ${end.format("Y-m-d")} (${sb.Utils.timeDelta(end)}).
+						${scheduleUrl}
 					`
 				};
 			}
@@ -112,13 +114,9 @@ module.exports = {
 
 		const game = segment.category?.name ?? "(no category)";
 		const title = (segment.title !== "") ? segment.title : "(no title)";
-
-		let ownStreamString = "";
-		let target = `${channelName}'s`;
-		if (channelName.toLowerCase() === context.user.Name) {
-			target = "Your";
-			ownStreamString = "(shouldn't you know when you're supposed to stream? 😉)";
-		}
+		const target = (channelName.toLowerCase() === context.user.Name)
+			? "Your"
+			: `${channelName}'s`;
 
 		const time = sb.Utils.timeDelta(new sb.Date(segment.start_time));
 		return {
@@ -127,7 +125,7 @@ module.exports = {
 				${game} - ${title},
 				starting ${time}.
 				${lateString} 
-				${ownStreamString}
+				${scheduleUrl}
 			`
 		};
 	}),
