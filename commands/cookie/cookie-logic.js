@@ -37,17 +37,20 @@ const subcommands = [
 	{
 		name: "donate",
 		aliases: ["gift", "give"],
-		default: false
+		default: false,
+		hidden: false
 	},
 	{
 		name: "stats",
 		aliases: ["statistics"],
-		default: false
+		default: false,
+		hidden: true
 	},
 	{
 		name: "eat",
 		aliases: [],
-		default: true
+		default: true,
+		hidden: false
 	}
 ];
 
@@ -73,7 +76,7 @@ const parseSubcommand = (type) => {
 /**
  * @returns {string}
  */
-const getValidTypeNames = () => subcommands.map(i => i.name).join(", ");
+const getValidTypeNames = () => subcommands.filter(i => !i.hidden).map(i => i.name).join(", ");
 
 /**
  * Determines if the cookie data has an outdated daily property.
