@@ -6,6 +6,7 @@ module.exports = {
 	Description: "Fetches the last tweet from a given user. No retweets or replies, just plain standalone tweets.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
+		{ name: "includeReplies", type: "boolean" },
 		{ name: "includeRetweets", type: "boolean" },
 		{ name: "mediaOnly", type: "boolean" },
 		{ name: "random", type: "boolean" },
@@ -160,7 +161,7 @@ module.exports = {
 				count: limit,
 				trim_user: "true",
 				include_rts: "true",
-				exclude_replies: "true",
+				exclude_replies: (context.params.includeReplies) ? "false" : "true",
 				tweet_mode: "extended"
 			}
 		});
@@ -272,8 +273,12 @@ module.exports = {
 		"Instead of fetching the last tweet, fetches a random tweet from the account's recent history (up to 200 tweets)",
 		"",
 
+		`<code>${prefix}twitter includeReplies:true (account)</code>`,
+		"Gets the last tweet or a reply to another tweet.",
+		"",
+
 		`<code>${prefix}twitter includeRetweets:true (account)</code>`,
-		"Gets the last tweet, including retweets",
+		"Gets the last tweet, including retweets.",
 		"",
 
 		`<code>${prefix}twitter mediaOnly:true (account)</code>`,
