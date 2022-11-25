@@ -47,9 +47,9 @@ const advancedParse = (string) => JSON.parse(string, (key, value) => {
 				return new Set();
 			}
 		}
-		else if (Object.getPrototypeOf(value) === Object.prototype) {
-			return Object.create(null);
-		}
+		// else if (Object.getPrototypeOf(value) === Object.prototype) {
+		// 	return Object.create(null);
+		// }
 	}
 
 	return value;
