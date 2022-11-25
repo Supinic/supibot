@@ -279,7 +279,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				};
 			}
 
-			await context.user.setDataProperty("sharedCustomData", JSON.parse(string));
+			await context.channel.setDataProperty("sharedCustomData", JSON.parse(string));
 			return {
 				success: true
 			};
