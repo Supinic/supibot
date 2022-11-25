@@ -162,14 +162,8 @@ module.exports = {
 
 		if (result && typeof result === "object") {
 			try {
-				if (typeof result.toJSON === "function") {
-					return {
-						reply: String(result.toJSON())
-					};
-				}
-
 				return {
-					reply: require("util").inspect(result)
+					reply: JSON.stringify(result, null, 1)
 				};
 			}
 			catch (e) {
