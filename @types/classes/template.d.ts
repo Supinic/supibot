@@ -22,7 +22,8 @@ type GenericCacheOptions<T extends ClassTemplate> = {
     databaseProperty: ColumnDefinition["name"];
     instance: ClassTemplate;
     options?: SpecificCacheOptions;
-    propertyName: CacheName
+    propertyName: CacheName,
+    propertyContext?: string;
 };
 
 export declare class ClassTemplate {

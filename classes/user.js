@@ -117,6 +117,7 @@ module.exports = class User extends require("./template.js") {
 			databaseProperty: "User_Alias",
 			databaseTable: "User_Alias_Data",
 			instance: this,
+			propertyContext: "User",
 			options,
 			propertyName
 		});
@@ -135,6 +136,7 @@ module.exports = class User extends require("./template.js") {
 			databaseProperty: "User_Alias",
 			databaseTable: "User_Alias_Data",
 			instance: this,
+			propertyContext: "User",
 			propertyName,
 			options,
 			value

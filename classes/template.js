@@ -129,7 +129,8 @@ module.exports = class ClassTemplate {
 			databaseTable,
 			instance,
 			options,
-			propertyName
+			propertyName,
+			object
 		} = inputData;
 
 		const cache = cacheMap.get(instance);
@@ -147,6 +148,7 @@ module.exports = class ClassTemplate {
 			})
 			.where(`${databaseProperty} = %n`, this.ID)
 			.where("Property = %s", propertyName)
+			.where({ condition: Boolean(object) }, "Target %*like*", object)
 			.limit(1)
 			.single()
 		);
@@ -187,6 +189,7 @@ module.exports = class ClassTemplate {
 			propertyName,
 			options,
 			instance,
+			object,
 			value
 		} = inputData;
 
@@ -194,6 +197,7 @@ module.exports = class ClassTemplate {
 			.select("Type", "Cached")
 			.from("chat_data", "Custom_Data_Property")
 			.where("Name = %s", propertyName)
+			.where({ condition: Boolean(object) }, "Target %*like*", object)
 			.limit(1)
 			.single()
 		);

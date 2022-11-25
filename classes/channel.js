@@ -234,6 +234,7 @@ module.exports = class Channel extends require("./template.js") {
 			databaseProperty: "Channel",
 			databaseTable: "Channel_Data",
 			instance: this,
+			propertyContext: "Channel",
 			options,
 			propertyName
 		});
@@ -245,6 +246,7 @@ module.exports = class Channel extends require("./template.js") {
 			databaseProperty: "Channel",
 			databaseTable: "Channel_Data",
 			instance: this,
+			propertyContext: "Channel",
 			propertyName,
 			options,
 			value
