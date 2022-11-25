@@ -47,13 +47,16 @@ const advancedParse = (string) => JSON.parse(string, (key, value) => {
 				return new Set();
 			}
 		}
+		else if (Object.getPrototypeOf(value) === Object.prototype) {
+			return Object.create(null);
+		}
 	}
 
 	return value;
 });
 
 const supportedPrimitiveTypes = ["number", "string", "boolean"];
-const supportedPrototypes = [Array.prototype, Object.prototype, Map.prototype, Set.prototype];
+const supportedPrototypes = [Array.prototype, Object.prototype, null, Map.prototype, Set.prototype];
 const isTypeSupported = (value) => {
 	const type = typeof value;
 	const prototype = (value) ? Object.getPrototypeOf(value) : null;
