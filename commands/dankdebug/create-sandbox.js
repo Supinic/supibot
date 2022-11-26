@@ -64,8 +64,8 @@ const supportedPrimitiveTypes = ["number", "string", "boolean"];
 const supportedPrototypes = [Array.prototype, Object.prototype, null, Map.prototype, Set.prototype];
 const isTypeSupported = (value) => {
 	const type = typeof value;
-	const prototype = (value) ? Object.getPrototypeOf(value) : null;
-	if (supportedPrototypes.includes(prototype)) {
+	const prototype = (value) ? Object.getPrototypeOf(value) : undefined;
+	if (value && supportedPrototypes.includes(prototype)) {
 		let validObjectProperties = true;
 		const entries = (prototype === Map.prototype || prototype === Set.prototype)
 			? [...value.entries()]
