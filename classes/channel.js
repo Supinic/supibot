@@ -64,7 +64,7 @@ module.exports = class Channel extends require("./template.js") {
 				"`ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,",
 				`\`User_Alias\` INT(${idCol.length}) ${sign} NOT NULL,`,
 				`\`Platform_ID\` VARCHAR(100) NOT NULL,`,
-				`\`HISTORIC\` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,`,
+				`\`Historic\` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,`,
 				`\`Text\` VARCHAR(${limit}),`,
 				"`Posted` DATETIME(3) NULL DEFAULT NULL,",
 				"PRIMARY KEY (`ID`),",
