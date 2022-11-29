@@ -49,7 +49,10 @@ module.exports = {
 				};
 			}
 
-			const number = sb.Utils.random(first, second);
+			const number = (first < second)
+				? sb.Utils.random(first, second)
+				: sb.Utils.random(second, first);
+
 			if (context.params.textOnly) {
 				return {
 					reply: String(number)
