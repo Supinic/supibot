@@ -181,6 +181,10 @@ module.exports = {
 
 		/** @type {Object[]} */
 		let eligibleTweets = response.body;
+		if (context.channel && !context.channel.NSFW) { // @todo add a check for a new flag, akin to $tl
+			eligibleTweets = eligibleTweets.filter(i => !i.possibly_sensitive);
+		}
+
 		if (!Array.isArray(eligibleTweets)) {
 			await sb.Logger.log("Command.Warning", JSON.stringify({
 				eligibleTweets,
