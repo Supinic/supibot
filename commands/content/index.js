@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Shows how many suggestions there are Uncategorized and New - basically showing how much content I have for the next stream.",
-	Flags: ["mention","pipe"],
+	Flags: ["developer","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -14,14 +14,14 @@ module.exports = {
 			.from("data", "Suggestion")
 			.where("Status IS NULL OR Status IN %s+", ["Approved", "Blocked"])
 		);
-	
+
 		const count = {
 			approved: 0,
 			blocked: 0,
 			botRequest: 0,
 			new: 0
 		};
-	
+
 		for (const item of data) {
 			if (item.Category === null && item.Status === null) {
 				count.new++;
@@ -36,7 +36,7 @@ module.exports = {
 				count.approved++;
 			}
 		}
-	
+
 		return {
 			reply: sb.Utils.tag.trim `
 				Content status: 

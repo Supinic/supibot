@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Fetches the current song playing on stream.",
-	Flags: ["mention","pipe","whitelist"],
+	Flags: ["developer","mention","pipe","whitelist"],
 	Params: [
 		{ name: "linkOnly", type: "boolean" }
 	],

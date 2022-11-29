@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 0,
 	Description: "Fetches the top 10 users by total amount of chat lines across all channels. This is a very heavy operation on SQL, so please use it sparingly.",
-	Flags: ["mention","pipe","system","whitelist"],
+	Flags: ["developer","mention","pipe","system","whitelist"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -16,13 +16,13 @@ module.exports = {
 			.orderBy("SUM(Message_Count) DESC")
 			.limit(10)
 		);
-	
+
 		const users = await sb.User.getMultiple(top.map(i => i.User_Alias));
 		const string = top.map((stats, index) => {
 			const user = users.find(i => stats.User_Alias === i.ID);
 			return `#${index + 1}: ${user.Name} (${sb.Utils.groupDigits(stats.Total)})`;
 		}).join("; ");
-	
+
 		return {
 			reply: `Top users by total chat lines across all channels: ${string}`
 		};

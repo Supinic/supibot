@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "If you have at least one song playing or in the queue, this command will skip the first one. You can also add an ID to skip a specific song.",
-	Flags: ["mention","pipe","whitelist"],
+	Flags: ["developer","mention","pipe","whitelist"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -19,7 +19,7 @@ module.exports = {
 				};
 			}
 		}
-		
+
 		const userRequest = await sb.Query.getRecordset(rs => rs
 			.select("Song_Request.ID", "Name", "VLC_ID", "Status")
 			.select("Video_Type.Link_Prefix AS Prefix")
@@ -36,7 +36,7 @@ module.exports = {
 			.limit(1)
 			.single()
 		);
-	
+
 		if (!userRequest) {
 			return {
 				reply: (target)
@@ -44,7 +44,7 @@ module.exports = {
 					: "You don't currently have any videos in the playlist!"
 			};
 		}
-	
+
 		let action = "";
 		if (userRequest.Status === "Current") {
 			const requestsAhead = await sb.Query.getRecordset(rs => rs
@@ -55,7 +55,7 @@ module.exports = {
 				.limit(1)
 				.single()
 			);
-	
+
 			if (requestsAhead.Amount > 0) {
 				action = "skipped";
 				await sb.VideoLANConnector.client.playlistNext();
@@ -69,7 +69,7 @@ module.exports = {
 			action = "deleted from the playlist";
 			await sb.VideoLANConnector.client.playlistDelete(userRequest.VLC_ID);
 		}
-	
+
 		return {
 			reply: `Your request "${userRequest.Name}" (ID ${userRequest.VLC_ID}) has been successfully ${action}.`
 		};
@@ -78,11 +78,11 @@ module.exports = {
 		"Skips your current or queued song.",
 		"Can add an ID to skip/delete a specific song in the queue, queued by you only.",
 		"",
-	
+
 		`<code>${prefix}ws</code>`,
 		"Skips the earliest request you have playing or in the queue.",
 		"",
-	
+
 		`<code>${prefix}ws (ID)</code>`,
 		"Skips your request with given ID. Fails if it's not your request."
 	])

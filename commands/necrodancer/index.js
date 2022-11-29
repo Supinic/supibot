@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Download, beatmap and assign any (supported by youtube-dl) song link into Crypt of the Necrodancer directly. Use (link) and then (zone) - for more info, check extended help.",
-	Flags: ["mention","pipe","whitelist"],
+	Flags: ["developer","mention","pipe","whitelist"],
 	Params: [
 		{ name: "zone", type: "string" }
 	],

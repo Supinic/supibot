@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 0,
 	Description: "Attempts to check all channel bots by using their ping commands.",
-	Flags: ["developer","pipe","skip-banphrase","whitelist"],
+	Flags: ["pipe","skip-banphrase","system","whitelist"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,

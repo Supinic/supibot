@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["tle"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "For a given processed TwitchLotto link, creates a version where the detections are marked with boxes.",
+	Description: "For a given processed TwitchLotto link from $tl, creates a version where the detections are marked with boxes.",
 	Flags: ["mention"],
 	Params: null,
 	Whitelist_Response: null,

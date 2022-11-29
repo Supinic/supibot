@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Gifts a certain something to someone else. Right now, supported parameters are: \"cookie\" - gifts your cooldown for a cookie to someone else!",
-	Flags: ["mention","pipe"],
+	Flags: ["developer","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,

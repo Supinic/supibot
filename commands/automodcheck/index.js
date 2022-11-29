@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 2500,
 	Description: "For a Twitch message outside of whispers, this command will show you how AutoMod sees it - posting how offensive it is in several categories.",
-	Flags: ["mention","pipe"],
+	Flags: ["developer","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -26,7 +26,7 @@ module.exports = {
 				reply: "No toxicity detected :)"
 			};
 		}
-	
+
 		const mapper = {
 			A: "aggressive",
 			I: "identity",
@@ -34,7 +34,7 @@ module.exports = {
 			S: "sexual",
 			unknown: "unknown"
 		};
-	
+
 		let total = 0;
 		const counter = {};
 		const words = context.append.flags.split(",");
@@ -45,23 +45,23 @@ module.exports = {
 					reply: `AutoMod detected something at positions ${positions}, but sent no category score.`
 				};
 			}
-	
+
 			const scores = rest.split("/");
 			for (const score of scores) {
 				const [type, value] = score.split(".");
 				if (!type || !value) {
 					continue;
 				}
-	
+
 				if (typeof counter[type] === "undefined") {
 					counter[type] = 0;
 				}
-	
+
 				counter[type] += Number(value);
 				total += Number(value);
 			}
 		}
-	
+
 		const arr = Object.entries(counter).map(([key, value]) => `${mapper[key]}: ${value}`);
 		return {
 			reply: `AutoMod score: ${total}. Categories: ${arr.join(", ")}`
