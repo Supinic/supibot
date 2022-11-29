@@ -53,7 +53,7 @@ module.exports = {
 		);
 
 		return {
-			reply: "OK."
+			reply: "I whispered you the download link 🤫"
 		};
 	}),
 	Dynamic_Description: null
