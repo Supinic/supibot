@@ -31,7 +31,6 @@ const fillObjectByPlatform = (obj, userData, platformData) => {
 	}
 };
 
-
 /**
  * Logging module that handles all possible chat message and video logging.
  * Accesses the database so that nothing needs to be exposed in chat clients.
