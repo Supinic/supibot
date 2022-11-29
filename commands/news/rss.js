@@ -36,7 +36,16 @@ module.exports = {
 				feed = await sb.Utils.parseRSS(xml);
 			}
 			catch (e) {
-				console.warn("RSS news fetch error", e);
+				await sb.Logger.logError("Command", e, {
+					origin: "Internal",
+					message: "RSS fetching/parsing failed",
+					context: {
+						code: news.code,
+						url,
+						source
+					}
+				});
+
 				return {
 					success: false,
 					reply: `Could not fetch any articles due to website error! News site: ${source.name}`
