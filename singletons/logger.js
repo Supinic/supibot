@@ -402,7 +402,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 				Posted: new sb.Date()
 			};
 
-			fillObjectByPlatform(lineObject, userData, channelData.Platform);
+			fillObjectByPlatform(lineObject, userData, platformData);
 			this.batches[id].add(lineObject);
 		}
 	}
