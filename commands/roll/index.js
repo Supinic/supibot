@@ -26,17 +26,29 @@ module.exports = {
 		}
 
 		let [first, second] = args;
-		if (Number(first) && Number(second)) {
+		if (first && second) {
 			first = Number(first);
 			second = Number(second);
-	
-			if (first > Number.MAX_SAFE_INTEGER || second > Number.MAX_SAFE_INTEGER) {
+
+			if (!Number.isInteger(first) || !Number.isInteger(second)) {
 				return {
 					success: false,
-					reply: "That's too much."
+					reply: "You must use integers as the roll boundaries!"
 				};
 			}
-	
+			else if (first > Number.MAX_SAFE_INTEGER || second > Number.MAX_SAFE_INTEGER) {
+				return {
+					success: false,
+					reply: "That number is too large!"
+				};
+			}
+			else if (first < Number.MIN_SAFE_INTEGER || second < Number.MIN_SAFE_INTEGER) {
+				return {
+					success: false,
+					reply: "That negative number is too large!"
+				};
+			}
+
 			const number = sb.Utils.random(first, second);
 			if (context.params.textOnly) {
 				return {
@@ -45,14 +57,14 @@ module.exports = {
 			}
 			else {
 				return {
-					reply: `Your specific roll (no dice) is ${number}.`
+					reply: `Your roll is ${number}.`
 				};
 			}
 		}
-	
+
 		const [fixedInput] = args.join(" ").split(/[a-ce-zA-Z]/);
 		const result = sb.Utils.evalDiceRoll(fixedInput, 1_000_000);
-	
+
 		if (result === null) {
 			return {
 				success: false,
