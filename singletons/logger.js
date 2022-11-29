@@ -3,6 +3,35 @@ const notified = {
 	privatePlatformLogging: []
 };
 
+// Added on 2022-11-29, when a partial refactor to new logging tables was created and this was the highest
+// channel ID that did not have the new system.
+const channelLogTableDesignThresholdID = 12993;
+
+/**
+ * @param {Object} obj
+ * @param {User} userData
+ * @param {Platform} platformData
+ */
+const fillObjectByPlatform = (obj, userData, platformData) => {
+	if (platformData.Name === "twitch") {
+		obj.Platform_ID = userData.Twitch_ID ?? userData.Name;
+		obj.Historic = !(userData.Twitch_ID); // `false` if user has a Twitch ID, true otherwise
+	}
+	else if (platformData.Name === "discord") {
+		obj.Platform_ID = userData.Discord_ID ?? userData.Name;
+		obj.Historic = !(userData.Discord_ID); // `false` if user has a Discord ID, true otherwise
+	}
+	else if (platformData.Name === "cytube") {
+		obj.Platform_ID = userData.Name;
+		obj.Historic = false; // Always false, names are unique on Cytube
+	}
+	else {
+		obj.Platform_ID = userData.Name;
+		obj.Historic = true; // Always true, undefined ID behaviour on other, unspecified platforms
+	}
+};
+
+
 /**
  * Logging module that handles all possible chat message and video logging.
  * Accesses the database so that nothing needs to be exposed in chat clients.
@@ -287,7 +316,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 
 	/**
 	 * Pushes a message to a specified channel's queue.
-	 * Queues are emptied accordingly to cronjobs prepared in {@link LoggerSingleton.constructor}
+	 * Queues are emptied accordingly to cron-jobs prepared in {@link LoggerSingleton.constructor}
 	 * @param {string} message
 	 * @param {User} userData
 	 * @param {Channel} channelData
@@ -326,17 +355,26 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 					}
 				}
 
-				this.batches[chan] = await sb.Query.getBatch("chat_line", name, ["User_Alias", "Text", "Posted"]);
+				const columns = (channelData.ID >= channelLogTableDesignThresholdID)
+					? ["User_Alias", "Text", "Posted", "Platform_ID", "Historic"]
+					: ["User_Alias", "Text", "Posted"];
+
+				this.batches[chan] = await sb.Query.getBatch("chat_line", name, columns);
 				this.meta[chan] = { amount: 0, length: 0 };
 				this.channels.push(chan);
 			}
 
-			this.batches[chan].add({
+			const lineObject = {
 				User_Alias: userData.ID,
 				Text: message,
 				Posted: new sb.Date()
-			});
+			};
 
+			if (channelData.ID > channelLogTableDesignThresholdID) {
+				fillObjectByPlatform(lineObject, userData, channelData.Platform);
+			}
+
+			this.batches[chan].add(lineObject);
 			this.meta[chan].amount += 1;
 			this.meta[chan].length += message.length;
 		}
@@ -354,15 +392,18 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 					return;
 				}
 
-				this.batches[id] = await sb.Query.getBatch("chat_line", name, ["User_Alias", "Text", "Posted"]);
+				this.batches[id] = await sb.Query.getBatch("chat_line", name, ["User_Alias", "Text", "Posted", "Platform_ID", "Historic"]);
 				this.platforms.push(id);
 			}
 
-			this.batches[id].add({
+			const lineObject = {
 				User_Alias: userData.ID,
 				Text: message,
 				Posted: new sb.Date()
-			});
+			};
+
+			fillObjectByPlatform(lineObject, userData, channelData.Platform);
+			this.batches[id].add(lineObject);
 		}
 	}
 
