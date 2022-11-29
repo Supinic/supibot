@@ -652,10 +652,10 @@
     "language": "albanian",
     "sources": [
       {
-        "name": "fax.al",
-        "url": "https://fax.al",
-        "path": "rss",
-        "endpoints": ["shqiperi", "kronika"],
+        "name": "Abc News",
+        "url": "https://abcnews.al",
+        "path": null,
+        "endpoints": ["feed"],
         "helpers": ["supinic"]
       }
     ]
