@@ -86,6 +86,13 @@ const isTypeSupported = (value) => {
 	);
 };
 
+const predefinedQueries = {
+	content: (rs) => rs
+		.select("Category", "Status")
+		.from("data", "Suggestion")
+		.where("Status IS NULL OR Status IN %s+", ["Approved", "Blocked"])
+};
+
 module.exports = async function createDebugSandbox (context, scriptArgs) {
 	const rawCustomUserData = await context.user.getDataProperty("customDeveloperData") ?? {};
 	const customUserData = advancedParse(JSON.stringify(rawCustomUserData));
@@ -108,6 +115,23 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 		console: undefined,
 		executor: context.user.Name,
 		platform: context.platform.Name,
+		query: sb.Utils.deepFreeze({
+			run: async (queryName) => {
+				if (!queryName) {
+					throw new Error("Query name must be provided");
+				}
+				else if (typeof queryName !== "string") {
+					throw new Error("Query name must be provided as a string");
+				}
+
+				const callback = predefinedQueries[queryName];
+				if (!callback) {
+					throw new Error("Predefined query not found");
+				}
+
+				return await sb.Query.getRecordset(callback);
+			}
+		}),
 		get tee () { return Object.freeze([...context.tee]); },
 		_teePush (value) {
 			if (typeof value !== "string") {
