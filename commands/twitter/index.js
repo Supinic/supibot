@@ -181,29 +181,6 @@ module.exports = {
 
 		/** @type {Object[]} */
 		let eligibleTweets = response.body;
-		let isSensitiveContentAllowed = false;
-		if (!context.channel) {
-			isSensitiveContentAllowed = true;
-		}
-		else {
-			if (context.channel.NSFW) {
-				isSensitiveContentAllowed = true;
-			}
-
-			isSensitiveContentAllowed = Boolean(await context.channel.getDataProperty("twitterNSFW"));
-		}
-
-		if (!isSensitiveContentAllowed) { // @todo add a check for a new flag, akin to $tl
-			eligibleTweets = eligibleTweets.filter(i => !i.possibly_sensitive);
-
-			if (eligibleTweets.length === 0) {
-				return {
-					success: false,
-					reply: `There are no recent tweets that are not marked as sensitive (NSFW) content!`
-				};
-			}
-		}
-
 		if (!Array.isArray(eligibleTweets)) {
 			await sb.Logger.log("Command.Warning", JSON.stringify({
 				eligibleTweets,
@@ -239,6 +216,29 @@ module.exports = {
 				return {
 					success: false,
 					reply: `There are no recent tweets that have any kind of media attached to them!`
+				};
+			}
+		}
+
+		let isSensitiveContentAllowed = false;
+		if (!context.channel) {
+			isSensitiveContentAllowed = true;
+		}
+		else {
+			if (context.channel.NSFW) {
+				isSensitiveContentAllowed = true;
+			}
+
+			isSensitiveContentAllowed = Boolean(await context.channel.getDataProperty("twitterNSFW"));
+		}
+
+		if (!isSensitiveContentAllowed) {
+			eligibleTweets = eligibleTweets.filter(i => !i.possibly_sensitive);
+
+			if (eligibleTweets.length === 0) {
+				return {
+					success: false,
+					reply: `There are no recent tweets that are not marked as sensitive (NSFW) content!`
 				};
 			}
 		}
