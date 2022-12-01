@@ -103,53 +103,6 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 			this.#crons.push(this.messageCron);
 		}
 
-		if (sb.Config.get("LOG_MESSAGE_META_ENABLED", false)) {
-			sb.Query.getBatch(
-				"chat_data",
-				"Message_Meta_Channel",
-				["Timestamp", "Channel", "Amount", "Length"]
-			).then(batch => (this.metaBatch = batch));
-
-			this.meta = {};
-			this.metaCron = new sb.Cron({
-				Name: "message-meta-cron",
-				Expression: sb.Config.get("LOG_MESSAGE_META_CRON"),
-				Defer: {
-					start: 2500,
-					end: 7500
-				},
-				Code: async () => {
-					if (!this.metaBatch?.ready) {
-						return;
-					}
-
-					const now = new sb.Date().discardTimeUnits("m", "s", "ms");
-					for (const [channel, { amount, length }] of Object.entries(this.meta)) {
-						if (amount === 0 && length === 0) {
-							continue;
-						}
-
-						const channelID = Number(channel.replace("channel-", ""));
-						this.metaBatch.add({
-							Timestamp: now,
-							Channel: channelID,
-							Amount: amount,
-							Length: length
-						});
-
-						this.meta[channel] = {
-							amount: 0,
-							length: 0
-						};
-					}
-
-					await this.metaBatch.insert({ ignore: false });
-				}
-			});
-			this.metaCron.start();
-			this.#crons.push(this.metaCron);
-		}
-
 		if (sb.Config.get("LOG_COMMAND_CRON", false)) {
 			sb.Query.getBatch(
 				"chat_data",
