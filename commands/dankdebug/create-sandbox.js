@@ -261,6 +261,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 
 				return sb.Command.parseParametersFromArguments(definition, args);
 			},
+			trim: (...args) => sb.Utils.tag.trim(...args),
 			unping: (string) => {
 				if (typeof string !== "string") {
 					throw new Error("Passed value must be a string");

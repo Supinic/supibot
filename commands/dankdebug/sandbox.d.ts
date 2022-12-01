@@ -1,6 +1,7 @@
 import type { JSONifiable, Emote } from 'supi-core/@types/globals';
 import type { Command, Parameter } from 'supi-core/@types/classes/command';
 import type { UtilsSingleton } from 'supi-core/@types/singletons/utils';
+import * as Util from "util";
 
 // This file is mostly meant to be used as a form of documentation for the $js
 // command, and can also be used by more technical users to help them make
@@ -91,6 +92,12 @@ declare namespace DankDebug {
 		 * Returns a formatted string, specifying an amount of time delta from current date to provided date.
 		 */
 		timeDelta: UtilsSingleton["timeDelta"];
+
+		/**
+		 * Trims all redundant and duplicated whitespace from the provided string.
+		 * Uses a tag-function syntax, and should be used with template strings directly.
+		 */
+		trim: UtilsSingleton["tag"]["trim"];
 
 		/**
 		 * Wraps the input string into the given amount of characters, discarding the rest.
