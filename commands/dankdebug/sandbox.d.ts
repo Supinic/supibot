@@ -120,6 +120,30 @@ declare namespace DankDebug {
 		getKeys(): string[];
 	}
 
+	export type QueryResult = {
+		content: { Category: string | null, Status: string | null; }[]
+	};
+
+	export type SupibotDatabaseValue = string
+		| number
+		| boolean
+		| null
+		| bigint
+		| Date
+		| { [P: string]: SupibotStoreValue }
+		| SupibotDatabaseValue[];
+
+	export interface SupibotDankDebugQuery {
+		/**
+		 * Runs a predefined query based on its name, and returns the data in an array of objects, or an object, if determined so.
+		 */
+		run (string: string): Promise<SupibotDatabaseValue>;
+		/**
+		 * Retrieves meta data about currently active suggestions.
+		 */
+		run (string: "content"): Promise<QueryResult["content"]>;
+	}
+
 	/**
 	 * A list of aliases that are currently "in execution" for the current user. Similar to a call stack.
 	 * The first element of the array is the "highest level" alias in the stack (the one the user typed).
@@ -171,6 +195,11 @@ declare namespace DankDebug {
 	 * A persistent key/value store tied to the current user.
 	 */
 	export const customData: SupibotStore;
+
+	/**
+	 * Collection of database-related methods.
+	 */
+	export const query: SupibotDankDebugQuery;
 
 	/**
 	 * Utils methods built into supibot.
