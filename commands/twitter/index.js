@@ -181,7 +181,19 @@ module.exports = {
 
 		/** @type {Object[]} */
 		let eligibleTweets = response.body;
-		if (context.channel && !context.channel.NSFW) { // @todo add a check for a new flag, akin to $tl
+		let isSensitiveContentAllowed = false;
+		if (!context.channel) {
+			isSensitiveContentAllowed = true;
+		}
+		else {
+			if (context.channel.NSFW) {
+				isSensitiveContentAllowed = true;
+			}
+
+			isSensitiveContentAllowed = Boolean(await context.channel.getDataProperty("twitterNSFW"));
+		}
+
+		if (!isSensitiveContentAllowed) { // @todo add a check for a new flag, akin to $tl
 			eligibleTweets = eligibleTweets.filter(i => !i.possibly_sensitive);
 		}
 

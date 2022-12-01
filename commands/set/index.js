@@ -92,7 +92,12 @@ module.exports = {
 			};
 		};
 
-		const setInstagramFlags = async (context, flag) => {
+		const flagDisplayNames = {
+			instagramNSFW: "Instagram",
+			twitterNSFW: "Twitter"
+		};
+
+		const setChannelFlag = async (context, flagName, flagValue) => {
 			const { channel } = context;
 			if (!channel) {
 				return {
@@ -109,18 +114,18 @@ module.exports = {
 				};
 			}
 
-			const string = (flag) ? "set" : "unset";
-			const currentFlag = await context.channel.getDataProperty("instagramNSFW");
-			if ((typeof currentFlag === "undefined" && !flag) || currentFlag === flag) {
+			const string = (flagValue) ? "set" : "unset";
+			const currentFlag = await context.channel.getDataProperty(flagName);
+			if ((typeof currentFlag === "undefined" && !flagValue) || currentFlag === flagValue) {
 				return {
 					success: false,
-					reply: `This channel's Instagram NSFW flag is already ${string}!`
+					reply: `This channel's ${flagDisplayNames[flagName]} NSFW flag is already ${string}!`
 				};
 			}
 
-			await context.channel.setDataProperty("instagramNSFW", flag);
+			await context.channel.setDataProperty(flagName, flagValue);
 			return {
-				reply: `Successfully ${string} this channel's Instagram NSFW.`
+				reply: `Successfully ${string} this channel's ${flagDisplayNames[flagName]} NSFW.`
 			};
 		};
 
@@ -807,8 +812,17 @@ module.exports = {
 					parameter: "arguments",
 					description: `If you are the channel ambassador/owner, you can decide if your channel will filter out NSFW Instagram links in the random Instagram command.`,
 					pipe: false, // administrative action
-					set: async (context) => await setInstagramFlags(context, true),
-					unset: async (context) => await setInstagramFlags(context, false)
+					set: async (context) => await setChannelFlag(context, "instagramNSFW", true),
+					unset: async (context) => await setChannelFlag(context,"instagramNSFW", false)
+				},
+				{
+					name: "twitter-nsfw",
+					aliases: ["tweet-nsfw"],
+					parameter: "arguments",
+					description: `If you are the channel ambassador/owner, you can decide if your channel will filter out NSFW Twitter links in the $twitter command.`,
+					pipe: false, // administrative action
+					set: async (context) => await setChannelFlag(context, "twitterNSFW", true),
+					unset: async (context) => await setChannelFlag(context,"twitterNSFW", false)
 				},
 				{
 					name: "timer",
