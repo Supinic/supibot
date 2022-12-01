@@ -129,7 +129,31 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 					throw new Error("Predefined query not found");
 				}
 
-				return await sb.Query.getRecordset(callback);
+				const data = await sb.Query.getRecordset(callback);
+				if (Array.isArray(data)) {
+					for (let i = 0; i < data.length; i++) {
+						const row = data[i];
+						if (row && typeof row === "object") {
+							for (const [key, value] of Object.entries(row)) {
+								if (value instanceof sb.Date) {
+									row[key] = new Date(Number(value));
+								}
+							}
+						}
+						else if (row instanceof sb.Date) {
+							data[i] = new Date(Number(data[i]));
+						}
+					}
+				}
+				else if (data && typeof data === "object") {
+					for (const [key, value] of Object.entries(data)) {
+						if (value instanceof sb.Date) {
+							data[key] = new Date(Number(value));
+						}
+					}
+				}
+
+				return data;
 			}
 		}),
 		get tee () { return Object.freeze([...context.tee]); },
