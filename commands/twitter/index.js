@@ -195,6 +195,13 @@ module.exports = {
 
 		if (!isSensitiveContentAllowed) { // @todo add a check for a new flag, akin to $tl
 			eligibleTweets = eligibleTweets.filter(i => !i.possibly_sensitive);
+
+			if (eligibleTweets.length === 0) {
+				return {
+					success: false,
+					reply: `There are no recent tweets that are not marked as sensitive (NSFW) content!`
+				};
+			}
 		}
 
 		if (!Array.isArray(eligibleTweets)) {
