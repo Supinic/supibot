@@ -452,7 +452,7 @@ module.exports = {
 				"Command.Fail",
 				`No "target" variable in $weather: ${json}`,
 				context.channel,
-				context.user.ID
+				context.user
 			);
 
 			return {
