@@ -909,7 +909,7 @@ module.exports = {
 					await sb.Query.getRecordDeleter(rd => rd
 						.delete()
 						.from("data", "Custom_Command_Alias")
-						.where("ID %n+", publishedIDs)
+						.where("ID IN %n+", publishedIDs)
 						.where("Channel IS NOT NULL")
 						.where("Parent = %n", alias.ID)
 					);
