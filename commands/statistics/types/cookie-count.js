@@ -44,7 +44,6 @@ module.exports = {
 
 		/** @type {CookieData|null} */
 		const cookieData = await targetUser.getDataProperty("cookie");
-		const { total, legacy } = cookieData;
 		const [who, target] = (context.user.ID === targetUser.ID)
 			? ["You have", "you"]
 			: ["That user has", "them"];
@@ -57,6 +56,7 @@ module.exports = {
 
 		// Legacy daily stats are based on the following calculation:
 		// `const total = cookies.Daily + cookies.Received - cookies.Sent + cookies.Today;`
+		const { total, legacy } = cookieData;
 		const legacyDaily = legacy.daily + legacy.received - legacy.donated;
 		const daily = total.eaten.daily + legacyDaily;
 		const received = total.eaten.received + legacy.received;
