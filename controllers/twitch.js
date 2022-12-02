@@ -15,10 +15,10 @@ const emoteGot = sb.Got.get("Global").extend({
 	responseType: "json",
 	throwHttpErrors: false,
 	timeout: {
-		request: 2500
+		request: 10_000
 	},
 	retry: {
-		limit: 1
+		limit: 0
 	}
 });
 
