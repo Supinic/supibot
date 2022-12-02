@@ -312,7 +312,6 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 					: ["User_Alias", "Text", "Posted"];
 
 				this.batches[chan] = await sb.Query.getBatch("chat_line", name, columns);
-				this.meta[chan] = { amount: 0, length: 0 };
 				this.channels.push(chan);
 			}
 
@@ -327,8 +326,6 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 			}
 
 			this.batches[chan].add(lineObject);
-			this.meta[chan].amount += 1;
-			this.meta[chan].length += message.length;
 		}
 		else if (platformData) {
 			const id = `platform-${platformData.ID}`;
@@ -478,18 +475,13 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 		}
 		this.#crons = null;
 
-		this.metaBatch?.destroy();
-		this.metaBatch = null;
-
 		if (this.channels) {
 			for (const chan of this.channels) {
 				this.batches[chan].destroy();
-				this.meta[chan] = null;
 			}
 		}
 
 		this.batches = null;
-		this.meta = null;
 	}
 
 	get modulePath () { return "logger"; }
