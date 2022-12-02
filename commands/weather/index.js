@@ -338,6 +338,12 @@ module.exports = {
 					reply: `The weather API is currently unavailable due to too many requests! Try again later.`
 				};
 			}
+			else if (response.statusCode !== 200) {
+				return {
+					success: false,
+					reply: `The weather API is currently not available! Try again later.`
+				};
+			}
 
 			data = response.body;
 			await this.setCacheData(weatherKey, data, {
