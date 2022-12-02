@@ -61,14 +61,19 @@ module.exports = {
 		const daily = total.eaten.daily + legacyDaily;
 		const received = total.eaten.received + legacy.received;
 		const donated = total.donated + legacy.donated;
+		if (daily === 0 && received === 0 && donated === 0) {
+			return {
+				reply: `${who} never eaten, donated or received a single cookie before 🙁`
+			};
+		}
 
 		const eatenString = (daily === 0)
-			? `${who} never eaten a single cookie`
+			? `${who} never eaten a single cookie.`
 			: `${who} eaten ${daily} cookies so far.`;
 
 		const donatedString = (donated === 0)
-			? `${who} never given out a single cookie`
-			: `${who} gifted away ${donated} cookie(s)`;
+			? `${who} never given out a single cookie.`
+			: `${who} gifted away ${donated} cookie(s).`;
 
 		let reaction;
 		const percentage = sb.Utils.round((donated / (daily + donated)) * 100, 0);
