@@ -896,13 +896,34 @@ module.exports = {
 					};
 				}
 
+				let publishString = "";
+				const publishedIDs = await sb.Query.getRecordset(rs => rs
+					.select("ID")
+					.from("data", "Custom_Command_Alias")
+					.where("Channel IS NOT NULL")
+					.where("Parent = %n", alias.ID)
+					.flat("ID")
+				);
+
+				if (publishedIDs.length !== 0) {
+					await sb.Query.getRecordDeleter(rd => rd
+						.delete()
+						.from("data", "Custom_Command_Alias")
+						.where("ID %n+", publishedIDs)
+						.where("Channel IS NOT NULL")
+						.where("Parent = %n", alias.ID)
+					);
+
+					publishString = ` It was also published in ${publishedIDs.length} channels - these have also been removed.`;
+				}
+
 				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
 				await row.load(alias.ID);
 
 				await row.delete();
 				return {
 					success: false,
-					reply: `Your alias "${name}" has been successfully removed.`
+					reply: `Your alias "${name}" has been successfully removed.${publishString}`
 				};
 			}
 
