@@ -203,7 +203,7 @@ module.exports = class Platform extends require("./template.js") {
 		return await this.#controller.createUserMention(userData);
 	}
 
-	async fetchUsernameByPlatformID (userPlatformID) {
+	async fetchUsernameByUserPlatformID (userPlatformID) {
 		if (this.Name === "twitch") {
 			const response = await sb.Got("Helix", {
 				url: "users",
