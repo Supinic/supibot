@@ -203,6 +203,46 @@ module.exports = class Platform extends require("./template.js") {
 		return await this.#controller.createUserMention(userData);
 	}
 
+	async fetchUsernameByPlatformID (userPlatformID) {
+		if (this.Name === "twitch") {
+			const response = await sb.Got("Helix", {
+				url: "users",
+				throwHttpErrors: false,
+				searchParams: {
+					id: userPlatformID
+				}
+			});
+
+			if (!response.ok || response.body.data.length === 0) {
+				return null;
+			}
+
+			return response.body.data[0].login;
+		}
+		else if (this.Name === "discord") {
+			let response;
+			try {
+				response = await this.client.users.fetch(userPlatformID);
+			}
+			catch {
+				return null;
+			}
+
+			return response.username;
+		}
+		else if (this.Name === "cytube") {
+			return userPlatformID;
+		}
+		else {
+			throw new sb.Error({
+				message: "This platform does not support fetching usernames by their platform IDs",
+				args: {
+					platform: this.Name
+				}
+			});
+		}
+	}
+
 	get userMessagePromises () {
 		return this.#userMessagePromises;
 	}

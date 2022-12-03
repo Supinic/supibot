@@ -173,6 +173,10 @@ export declare class Platform extends ClassTemplate {
 	getFullName (separator: string): string;
 	getCacheKey (): string;
 	createUserMention (userData: User): Promise<string>;
+	/**
+	 * Fetches the username for a given user platform ID, depending on which platform instance is used.
+	 */
+	fetchUsernameByPlatformID (userPlatformID: string): Promise<string | null>
 
 	get capital (): string;
 	get privateMessageLoggingTableName (): string;
