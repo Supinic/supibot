@@ -20,33 +20,31 @@ module.exports = {
 				reply: "This command can only be used on Twitch!"
 			};
 		}
-	
-		const { chatters } = await sb.Got(`https://tmi.twitch.tv/group/user/${context.channel.Name}/chatters`).json();
-		const list = Object.values(chatters).flat();
-	
+
+		const list = await context.channel.fetchUserList();
 		if (!list.includes(context.user.Name)) {
 			list.push(context.user.Name);
 		}
-	
+
 		list.sort();
-	
+
 		if (list.length < 2) {
 			return {
 				reply: "There don't seem to be enough people here."
 			};
 		}
-	
+
 		const userData = (targetUser)
 			? await sb.User.get(targetUser)
 			: context.user;
-	
+
 		if (!userData) {
 			return {
 				success: false,
 				reply: "That user does not exist!"
 			};
 		}
-	
+
 		const index = list.indexOf(userData.Name);
 		if (index === -1) {
 			return {
@@ -54,22 +52,22 @@ module.exports = {
 				reply: "That user is not currently present in chat!"
 			};
 		}
-	
+
 		const neighbours = [list[index - 1], list[index], list[index + 1]]
 			.filter(Boolean)
 			.map(i => `${i[0]}\u{E0000}${i.slice(1)}`);
-	
+
 		if (neighbours.length < 2) {
 			return {
 				reply: `No chat neighbours have been detected... This shouldn't happen?`
 			};
 		}
-	
+
 		return {
 			meta: {
 				skipWhitespaceCheck: true
 			},
-	
+
 			reply: `Chat neighbour(s): ${neighbours.join(" 🤝 ")}`
 		};
 	}),
