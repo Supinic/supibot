@@ -6,7 +6,7 @@ const fetchUserRandomLine = async function (userData, channelData) {
 		.select("Message_Count AS Count")
 		.from("chat_data", "Message_Meta_User_Alias")
 		.where("User_Alias = %n", userData.ID)
-		.where("Channel = %n", channelData)
+		.where("Channel = %n", channelData.ID)
 		.single()
 		.flat("Count")
 	);
