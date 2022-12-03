@@ -106,7 +106,7 @@ module.exports = {
 			});
 
 			if (response.statusCode === 200 && response.body.length !== 0) {
-				const channelInfo = [response.body];
+				const [channelInfo] = response.body;
 				const { banned, banReason, isAffiliate, isPartner } = channelInfo.roles ?? {};
 				if (isAffiliate === false && isPartner === false) {
 					return {
