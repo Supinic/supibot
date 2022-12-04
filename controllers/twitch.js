@@ -97,7 +97,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					let counter = 0;
 					const promises = [];
 					const batchSize = 100;
-					const channelList = sb.Channel.getJoinableForPlatform("twitch").filter(i => i.Specific_ID);
+					const channelList = sb.Channel.getLiveEventSubscribedChannels("twitch").filter(i => i.Specific_ID);
 
 					while (counter < channelList.length) {
 						const sliceString = channelList
