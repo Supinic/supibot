@@ -102,6 +102,12 @@ export declare class Channel extends ClassTemplate {
     static getJoinableForPlatform (platform: PlatformLike): Channel[];
 
     /**
+     * Fetches a list of channels that are in some way connected to having an online/offline event trigger.
+     * This method mostly regards Twitch channels, but this might be possibly useful on other platforms later.
+     */
+    static getLiveEventSubscribedChannels (platform?: PlatformLike): Channel[];
+
+    /**
      * Creates a new channel, saves its definition to the database, and creates a logging table if needed.
      */
     static add (name: string, platformData: Platform, mode?: Mode, specificID?: string): Promise<Channel>;

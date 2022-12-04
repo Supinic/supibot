@@ -334,6 +334,35 @@ module.exports = class Channel extends require("./template.js") {
 		));
 	}
 
+	static async getLiveEventSubscribedChannels (platform = null) {
+		const eventChannelIDs = await sb.Query.getRecordset(rs => rs
+			.select("Channel")
+			.from("chat_data", "Channel_Chat_Module")
+			.where("Chat_Module IN %s+", ["offline-only-mode", "offline-only-mirror"])
+			.where("Channel IS NOT NULL")
+			.groupBy("Channel")
+			.flat("Channel")
+		);
+
+		const configChannelIDs = await sb.Query.getRecordset(rs => rs
+			.select("Channel")
+			.from("chat_data", "Channel_Data")
+			.where("Property = %s", "offlineOnlyBot")
+			.where("Channel IS NOT NULL")
+			.groupBy("Channel")
+			.flat("Channel")
+		);
+
+		const channelIDs = new Set([...eventChannelIDs, ...configChannelIDs]);
+		let channelsData = Array.from(channelIDs).map(i => Channel.get(i)).filter(Boolean);
+		if (platform) {
+			const platformData = sb.Platform.get(platform);
+			channelsData = channelsData.filter(i => i.Platform === platformData);
+		}
+
+		return channelsData;
+	}
+
 	static async add (name, platformData, mode = "Write", specificID) {
 		const channelName = Channel.normalizeName(name);
 		const existing = Channel.get(channelName);
