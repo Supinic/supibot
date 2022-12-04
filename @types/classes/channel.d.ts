@@ -105,7 +105,7 @@ export declare class Channel extends ClassTemplate {
      * Fetches a list of channels that are in some way connected to having an online/offline event trigger.
      * This method mostly regards Twitch channels, but this might be possibly useful on other platforms later.
      */
-    static getLiveEventSubscribedChannels (platform?: PlatformLike): Channel[];
+    static getLiveEventSubscribedChannels (platform?: PlatformLike): Promise<Channel[]>;
 
     /**
      * Creates a new channel, saves its definition to the database, and creates a logging table if needed.
