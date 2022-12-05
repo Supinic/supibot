@@ -62,24 +62,11 @@ module.exports = {
 					};
 				}
 
-				randomLine = await Justlog.getRandomUserLine(channelID, userID);
+				result = await Justlog.getRandomUserLine(channelID, userID);
 			}
 			else {
-				randomLine = await Justlog.getRandomChannelLine(channelID);
+				result = await Justlog.getRandomChannelLine(channelID);
 			}
-
-			if (randomLine.success === false) {
-				return {
-					success: false,
-					reply: randomLine.reason
-				};
-			}
-
-			result = {
-				date: randomLine.date,
-				username: randomLine.username,
-				text: randomLine.text
-			};
 		}
 		else if (user) {
 			const targetUser = await sb.User.get(user);
