@@ -51,7 +51,6 @@ module.exports = {
 				};
 			}
 
-			let randomLine;
 			if (user) {
 				const { controller } = sb.Platform.get("twitch");
 				const userID = await controller.getUserID(user);
