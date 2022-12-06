@@ -58,7 +58,7 @@ module.exports = {
 		// `const total = cookies.Daily + cookies.Received - cookies.Sent + cookies.Today;`
 		const { total, legacy } = cookieData;
 		const legacyDaily = legacy.daily + legacy.received - legacy.donated;
-		const daily = total.eaten.daily + legacyDaily;
+		const daily = total.eaten.daily + total.eaten.received + legacyDaily;
 		const received = total.eaten.received + legacy.received;
 		const donated = total.donated + legacy.donated;
 		if (daily === 0 && received === 0 && donated === 0) {
