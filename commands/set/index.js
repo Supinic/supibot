@@ -94,6 +94,7 @@ module.exports = {
 
 		const flagDisplayNames = {
 			instagramNSFW: "Instagram",
+			redditNSFW: "Reddit",
 			twitterNSFW: "Twitter"
 		};
 
