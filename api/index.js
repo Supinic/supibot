@@ -14,6 +14,7 @@ module.exports = (function () {
 		["command", "command.js"],
 		["filter", "filter.js"],
 		["health", "health.js"],
+		["platform", "platform.js"],
 		["reminder", "reminder.js"],
 		["user", "user.js"]
 	];
