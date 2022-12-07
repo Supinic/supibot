@@ -810,10 +810,19 @@ module.exports = {
 					name: "instagram-nsfw",
 					aliases: ["rig-nsfw"],
 					parameter: "arguments",
-					description: `If you are the channel ambassador/owner, you can decide if your channel will filter out NSFW Instagram links in the random Instagram command.`,
+					description: `If you are the channel ambassador/owner, you can decide if your channel will filter out NSFW Instagram links in the random Instagram ($rig) command.`,
 					pipe: false, // administrative action
 					set: async (context) => await setChannelFlag(context, "instagramNSFW", true),
 					unset: async (context) => await setChannelFlag(context,"instagramNSFW", false)
+				},
+				{
+					name: "reddit-nsfw",
+					aliases: ["rm-nsfw"],
+					parameter: "arguments",
+					description: `If you are the channel ambassador/owner, you can decide if your channel will filter out NSFW Reddit links in the random Reddit ($rm) command.`,
+					pipe: false, // administrative action
+					set: async (context) => await setChannelFlag(context, "redditNSFW", true),
+					unset: async (context) => await setChannelFlag(context,"redditNSFW", false)
 				},
 				{
 					name: "twitter-nsfw",

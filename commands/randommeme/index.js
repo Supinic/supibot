@@ -22,33 +22,11 @@ module.exports = {
 
 		this.data.subreddits ??= {};
 
-		if (typeof context.params.safeMode === "boolean") {
-			if (!context.channel) {
-				return {
-					success: false,
-					reply: `This setting cannot be applied in private messages!`
-				};
-			}
-
-			const permissions = await context.getUserPermissions();
-			if (permissions.flag === sb.User.permissions.regular) {
-				return {
-					success: false,
-					reply: `Only channel owners or ambassadors can set this setting!`
-				};
-			}
-
-			await context.channel.setDataProperty("redditSafeMode", context.params.safeMode);
-			return {
-				reply: `Successfully set this channel's Reddit safe mode to ${context.params.safeMode}.`
-			};
-		}
-
 		let safeSpace = false;
 		if (context.platform.Name === "twitch") {
 			if (context.channel) {
-				const safeMode = await context.channel.getDataProperty("redditSafeMode");
-				safeSpace = (typeof safeMode === "boolean") ? safeMode : true;
+				const unsafeMode = await context.channel.getDataProperty("redditNSFW");
+				safeSpace = (typeof unsafeMode === "boolean") ? (!unsafeMode) : true;
 			}
 			else {
 				safeSpace = true;
@@ -205,6 +183,16 @@ module.exports = {
 		const { defaultMemeSubreddits } = require("./config.json");
 		return [
 			"Posts a random Reddit meme. If a subreddit is provided, posts a random non-text post from there.",
+			"",
+
+			"This command filters out NSFW content!",
+			"In a non-NSFW channel, or in private messages:",
+			"If the subreddit was marked as NSFW, the command will fail.",
+			"All NSFW posts will be filtered out, even if that means nothing can be posted.",
+			"",
+
+			"All channels are non-NSFW by default - except for explicit NSFW channels on Discord.",
+			`This check can be disabled - at the channel owner's (or ambassador's) risk - via the <a href="/bot/command/detail/set>$set reddit-nsfw</a> command. Check it for more info.`,
 			"",
 
 			`<code>${prefix}rm</code>`,
