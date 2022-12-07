@@ -118,5 +118,27 @@ module.exports = {
 		};
 	},
 	join: async (req, res, url) => await partOrJoin("join", url),
-	part: async (req, res, url) => await partOrJoin("part", url)
+	part: async (req, res, url) => await partOrJoin("part", url),
+	stats: async () => {
+		let total = 0;
+		const platformStats = {};
+
+		for (const channelData of sb.Channel.data) {
+			if (channelData.Mode === "Inactive") {
+				continue;
+			}
+
+			platformStats[channelData.Platform.Name] ??= 0;
+			platformStats[channelData.Platform.Name]++;
+			total++;
+		}
+
+		return {
+			statusCode: 200,
+			data: {
+				platforms: platformStats,
+				total
+			}
+		};
+	}
 };
