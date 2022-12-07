@@ -141,13 +141,13 @@ module.exports = {
 				};
 			}
 		}
-		
+
 		if (safeSpace) {
 			validPosts = posts.filter(i => !i.nsfw);
 			if (validPosts.length === 0) {
 				return {
 					success: false,
-					reply: `Subreddit ${input} has non-NSFW posts! This channel is marked as non-NSFW posts only.`
+					reply: `Subreddit ${input} only has NSFW posts! This channel is marked as SFW posts only.`
 				};
 			}
 		}
