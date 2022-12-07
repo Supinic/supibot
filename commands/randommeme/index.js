@@ -119,32 +119,72 @@ module.exports = {
 		}
 
 		const { posts } = forum;
-		const validPosts = posts.filter(i => (
-			(!safeSpace || !i.nsfw)
-			&& !i.stickied
+		let validPosts = posts.filter(i => (
+			!i.stickied
 			&& !i.isSelftext
 			&& !i.isTextPost
 			&& !repeatedPosts.includes(i.id)
-			&& (!context.params.flair || i.hasFlair(context.params.flair, false))
-			&& (!context.params.ignoreFlair || !i.hasFlair(context.params.ignoreFlair, false))
-			&& (!context.params.skipGalleries || !i.hasGallery())
 		));
 
-		const post = sb.Utils.randArray(validPosts);
-		if (!post) {
+		if (validPosts.length === 0) {
 			if (repeatedPosts.length === 0) {
-				return {
-					success: false,
-					reply: `Subreddit ${input} has no eligible posts!`
-				};
-			}
-			else {
 				forum.repeatedPosts = [];
 				return {
 					success: false,
 					reply: "Front page posts have all been posted! ♻ If you try again, you will receive repeated results."
 				};
 			}
+			else {
+				return {
+					success: false,
+					reply: `Subreddit ${input} has no eligible (not stickied, self or text) posts!`
+				};
+			}
+		}
+		
+		if (safeSpace) {
+			validPosts = posts.filter(i => !i.nsfw);
+			if (validPosts.length === 0) {
+				return {
+					success: false,
+					reply: `Subreddit ${input} has non-NSFW posts! This channel is marked as non-NSFW posts only.`
+				};
+			}
+		}
+		if (context.params.flair) {
+			validPosts = posts.filter(i => i.hasFlair(context.params.flair, false));
+			if (validPosts.length === 0) {
+				return {
+					success: false,
+					reply: `Subreddit ${input} has no posts with the flair ${context.params.flair}!`
+				};
+			}
+		}
+		if (context.params.ignoreFlair) {
+			validPosts = posts.filter(i => !i.hasFlair(context.params.ignoreFlair, false));
+			if (validPosts.length === 0) {
+				return {
+					success: false,
+					reply: `Subreddit ${input} has no posts that don't have the flair ${context.params.ignoreFlair}!`
+				};
+			}
+		}
+		if (context.params.skipGalleries) {
+			validPosts = posts.filter(i => !i.hasGallery());
+			if (validPosts.length === 0) {
+				return {
+					success: false,
+					reply: `Subreddit ${input} has no posts that are not galleries!`
+				};
+			}
+		}
+
+		const post = sb.Utils.randArray(validPosts);
+		if (!post) {
+			return {
+				success: false,
+				reply: `No eligible post found! This should not happen though, please contact @Supinic`
+			};
 		}
 		else {
 			if ((config.banned.includes(forum.name) || post.nsfw) && context.append.pipe) {
