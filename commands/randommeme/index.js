@@ -127,7 +127,7 @@ module.exports = {
 		));
 
 		if (validPosts.length === 0) {
-			if (repeatedPosts.length === 0) {
+			if (repeatedPosts.length !== 0) {
 				forum.repeatedPosts = [];
 				return {
 					success: false,
