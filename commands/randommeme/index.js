@@ -143,7 +143,7 @@ module.exports = {
 		}
 
 		if (safeSpace) {
-			validPosts = posts.filter(i => !i.nsfw);
+			validPosts = validPosts.filter(i => !i.nsfw);
 			if (validPosts.length === 0) {
 				return {
 					success: false,
@@ -152,7 +152,7 @@ module.exports = {
 			}
 		}
 		if (context.params.flair) {
-			validPosts = posts.filter(i => i.hasFlair(context.params.flair, false));
+			validPosts = validPosts.filter(i => i.hasFlair(context.params.flair, false));
 			if (validPosts.length === 0) {
 				return {
 					success: false,
@@ -161,7 +161,7 @@ module.exports = {
 			}
 		}
 		if (context.params.ignoreFlair) {
-			validPosts = posts.filter(i => !i.hasFlair(context.params.ignoreFlair, false));
+			validPosts = validPosts.filter(i => !i.hasFlair(context.params.ignoreFlair, false));
 			if (validPosts.length === 0) {
 				return {
 					success: false,
@@ -170,7 +170,7 @@ module.exports = {
 			}
 		}
 		if (context.params.skipGalleries) {
-			validPosts = posts.filter(i => !i.hasGallery());
+			validPosts = validPosts.filter(i => !i.hasGallery());
 			if (validPosts.length === 0) {
 				return {
 					success: false,
