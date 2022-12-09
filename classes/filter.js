@@ -542,7 +542,7 @@ module.exports = class Filter extends require("./template.js") {
 			channelLive = streamData.live ?? false;
 		}
 
-		const offlineOnly = localFilters.find(i => i.Type === "Offline-only");
+		const offlineOnly = localFilters.find(i => i.Type === "Offline-only" && (i.User_Alias === user.ID || i.User_Alias === null));
 		if (offlineOnly && channelLive === true) {
 			const targetType = (offlineOnly.Invocation) ? "command invocation" : "command";
 			return {
@@ -557,7 +557,7 @@ module.exports = class Filter extends require("./template.js") {
 			};
 		}
 
-		const onlineOnly = localFilters.find(i => i.Type === "Online-only");
+		const onlineOnly = localFilters.find(i => i.Type === "Online-only" && (i.User_Alias === user.ID || i.User_Alias === null));
 		if (onlineOnly && channelLive === false) {
 			const targetType = (onlineOnly.Invocation) ? "command invocation" : "command";
 			return {
