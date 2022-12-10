@@ -285,7 +285,7 @@ module.exports = {
 
 		"If the post has sensitive content in it (determined by Twitter), it will not be posted outside of a NSFW channel.",
 		"All channels are not NSFW by default - except for explicit NSFW channels on Discord.",
-		`This check can be disabled - at the channel owner's (or ambassador's) risk - via the <a href="/bot/command/detail/set>$set twitter-nsfw</a> command. Check it for more info.`,
+		`This check can be disabled - at the channel owner's (or ambassador's) risk - via the <a href="/bot/command/detail/set">$set twitter-nsfw</a> command. Check it for more info.`,
 		"",
 
 		`<code>${prefix}tweet (account)</code>`,
