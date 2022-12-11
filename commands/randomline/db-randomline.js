@@ -94,7 +94,19 @@ const fetchChannelRandomLine = async function (channelData) {
 	}
 	else {
 		const userData = await sb.User.get(randomLine.User_Alias);
-		username = userData.Name;
+		if (!userData) {
+			await sb.Logger.log(
+				"Command.Warning",
+				"Missing User_Alias",
+				channelData,
+				{ ID: randomLine.User_Alias }
+			);
+
+			username = "(N/A)";
+		}
+		else {
+			username = userData.Name;
+		}
 	}
 
 	return {
