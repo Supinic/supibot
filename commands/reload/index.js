@@ -134,13 +134,13 @@ module.exports = {
 							await sb.User.getMultiple(names);
 
 							return {
-								reply: `${names.length} user(s) reload successfully.`
+								reply: `${names.length} user(s) reloaded successfully.`
 							};
 						}
 						else {
 							await sb.User.reloadData();
 							return {
-								reply: `All users reload successfully.`
+								reply: `All users reloaded successfully.`
 							};
 						}
 					}
