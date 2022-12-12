@@ -9,36 +9,13 @@ module.exports = {
 		{ name: "excludeChannel", type: "string" },
 		{ name: "excludeChannels", type: "string" },
 		{ name: "forceUnscored", type: "boolean" },
-		{ name: "preferUnscored", type: "boolean" },
-		{ name: "safeMode", type: "boolean" }
+		{ name: "preferUnscored", type: "boolean" }
 	],
 	Whitelist_Response: "This command can't be executed here!",
 	Static_Data: null,
 	Code: (async function twitchLotto (context, channel) {
 		const definitions = require("./definitions.js");
 		const checkSafety = require("./safety-check.js");
-
-		if (typeof context.params.safeMode === "boolean") {
-			if (!context.channel) {
-				return {
-					success: false,
-					reply: `This setting cannot be applied in private messages!`
-				};
-			}
-
-			const permissions = await context.getUserPermissions();
-			if (permissions.flag === sb.User.permissions.regular) {
-				return {
-					success: false,
-					reply: `Only channel owners or ambassadors can set this setting!`
-				};
-			}
-
-			await context.channel.setDataProperty("twitchLottoSafeMode", context.params.safeMode);
-			return {
-				reply: `Successfully set this channel's TwitchLotto safe mode to ${context.params.safeMode}.`
-			};
-		}
 
 		if (!this.data.channels) {
 			this.data.channels = await sb.Query.getRecordset(rs => rs
@@ -110,7 +87,7 @@ module.exports = {
 			this.data.counts.total = total;
 		}
 
-		const safeMode = await context.channel?.getDataProperty("twitchLottoSafeMode") ?? true;
+		const safeMode = await context.channel?.getDataProperty("twitchLottoNSFW") ?? true;
 		const blacklistedFlags = await context.channel?.getDataProperty("twitchLottoBlacklistedFlags") ?? [];
 
 		// Now try to find an image that is available.
@@ -367,10 +344,8 @@ module.exports = {
 				<li>Only images below the threshold of ${thresholdPercent} NSFW can be posted</li>
 			</ul>`,
 
-			`<code>${prefix}tl safeMode:true</code>`,
-			`<code>${prefix}tl safeMode:false</code>`,
-			"Toggles the TwitchLotto safe mode on or off. Only channel owners or ambassadors can set this setting.",
-			"Caution! With safe mode off, the images are not filtered by above means and can be quite NSFW.",
+			"All channels are in safe mode by default - except for explicit NSFW channels on Discord.",
+			`This check can be disabled - at the channel owner's (or ambassador's) risk - via the <a href="/bot/command/detail/set">$set twitch-lotto-nsfw</a> command. Check it for more info.`,
 			"",
 
 			"<h5> Command usage </h5>",
