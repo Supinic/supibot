@@ -36,9 +36,8 @@ module.exports = {
 
 		return {
 			reply: sb.Utils.tag.trim `
-				FAQ list here: https://supinic.com/data/faq/list
-				For discussions, check https://github.com/Supinic/supibot/discussions/
-			 	or make a suggestion with the $suggest command.
+				Check the FAQ here: https://supinic.com/data/faq/list
+			 	If you didn't find an answer, make a suggestion with the $suggest command.
 			`
 		};
 	}),
