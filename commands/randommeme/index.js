@@ -10,7 +10,6 @@ module.exports = {
 		{ name: "flair", type: "string" },
 		{ name: "ignoreFlair", type: "string" },
 		{ name: "linkOnly", type: "boolean" },
-		{ name: "safeMode", type: "boolean" },
 		{ name: "showFlairs", type: "boolean" },
 		{ name: "skipGalleries", type: "boolean" }
 	],
