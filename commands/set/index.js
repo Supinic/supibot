@@ -95,6 +95,7 @@ module.exports = {
 		const flagDisplayNames = {
 			instagramNSFW: "Instagram",
 			redditNSFW: "Reddit",
+			twitchLottoNSFW: "TwitchLotto",
 			twitterNSFW: "Twitter"
 		};
 
@@ -811,7 +812,7 @@ module.exports = {
 					name: "instagram-nsfw",
 					aliases: ["rig-nsfw"],
 					parameter: "arguments",
-					description: `If you are the channel ambassador/owner, you can decide if your channel will filter out NSFW Instagram links in the random Instagram ($rig) command.`,
+					description: `If you are the channel ambassador/owner, you can decide whether or not your channel will filter out NSFW Instagram links in the random Instagram ($rig) command.`,
 					pipe: false, // administrative action
 					set: async (context) => await setChannelFlag(context, "instagramNSFW", true),
 					unset: async (context) => await setChannelFlag(context,"instagramNSFW", false)
@@ -820,16 +821,25 @@ module.exports = {
 					name: "reddit-nsfw",
 					aliases: ["rm-nsfw"],
 					parameter: "arguments",
-					description: `If you are the channel ambassador/owner, you can decide if your channel will filter out NSFW Reddit links in the random Reddit ($rm) command.`,
+					description: `If you are the channel ambassador/owner, you can decide whether or not your channel will filter out NSFW Reddit links in the random Reddit ($rm) command.`,
 					pipe: false, // administrative action
 					set: async (context) => await setChannelFlag(context, "redditNSFW", true),
 					unset: async (context) => await setChannelFlag(context,"redditNSFW", false)
 				},
 				{
+					name: "twitch-lotto-nsfw",
+					aliases: ["twitchlotto-nsfw", "tl-nsfw"],
+					parameter: "arguments",
+					description: `If you are the channel ambassador/owner, you can decide whether or not your channel will filter out NSFW TwitchLotto links in the $twitchlotto command.`,
+					pipe: false, // administrative action
+					set: async (context) => await setChannelFlag(context, "twitchLottoNSFW", true),
+					unset: async (context) => await setChannelFlag(context,"twitchLottoNSFW", false)
+				},
+				{
 					name: "twitter-nsfw",
 					aliases: ["tweet-nsfw"],
 					parameter: "arguments",
-					description: `If you are the channel ambassador/owner, you can decide if your channel will filter out NSFW Twitter links in the $twitter command.`,
+					description: `If you are the channel ambassador/owner, you can decide whether or not your channel will filter out NSFW Twitter links in the $twitter command.`,
 					pipe: false, // administrative action
 					set: async (context) => await setChannelFlag(context, "twitterNSFW", true),
 					unset: async (context) => await setChannelFlag(context,"twitterNSFW", false)
