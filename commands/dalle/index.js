@@ -78,11 +78,14 @@ module.exports = {
 
 			const discordData = {};
 			if (context.platform.Name === "discord") {
-				discordData.embeds = createEmbeds(image.ID, {
-					prompt: image.Prompt,
-					created: image.Created,
-					creationTime: image.Creation_Time
-				});
+				const discordChannel = context.platform.client.channels.fetch(context.channel.Name);
+				if (discordChannel && discordChannel.members.size <= 1000) {
+					discordData.embeds = createEmbeds(image.ID, {
+						prompt: image.Prompt,
+						created: image.Created,
+						creationTime: image.Creation_Time
+					});
+				}
 			}
 
 			return {
