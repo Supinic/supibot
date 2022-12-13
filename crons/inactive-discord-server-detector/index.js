@@ -10,11 +10,15 @@ module.exports = {
 		const controller = sb.Platform.get("discord").controller;
 		const botChannels = sb.Channel.getJoinableForPlatform("discord");
 
-		const messageThreshold = new sb.Date().addMonths(-3);
+		const guildThreshold = 95;
 		const guilds = await discord.guilds.fetch();
+		if (guilds.size < guildThreshold) {
+			return;
+		}
 
 		const sanitize = (string) => string.replace(/\p{Emoji}/gu, (match) => escape(match).replaceAll("%", "\\"));
 
+		const messageThreshold = new sb.Date().addMonths(-3);
 		const result = [];
 		for (const guildData of guilds.values()) {
 			const guild = await discord.guilds.fetch(guildData.id);
