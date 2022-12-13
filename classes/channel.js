@@ -43,6 +43,7 @@ module.exports = class Channel extends require("./template.js") {
 				return false;
 			}
 
+			const limit = this.Platform.Message_Limit;
 			const prefix = (this.Platform.Name === "twitch")
 				? ""
 				: `${this.Platform.getFullName("_")}_`;
@@ -53,15 +54,22 @@ module.exports = class Channel extends require("./template.js") {
 				return false;
 			}
 
+			const userAliasDefinition = await sb.Query.getDefinition("chat_data", "User_Alias");
+			const idCol = userAliasDefinition.columns.find(i => i.name === "ID");
+			const sign = (idCol.unsigned) ? "UNSIGNED" : "";
+
 			// Set up logging table
 			await sb.Query.raw([
 				`CREATE TABLE IF NOT EXISTS chat_line.\`${name}\` (`,
 				"`ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,",
+				`\`User_Alias\` INT(${idCol.length}) ${sign} NOT NULL,`,
 				`\`Platform_ID\` VARCHAR(100) NOT NULL,`,
 				`\`Historic\` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,`,
-				`\`Text\` TEXT NOT NULL,`,
+				`\`Text\` VARCHAR(${limit}),`,
 				"`Posted` DATETIME(3) NULL DEFAULT NULL,",
 				"PRIMARY KEY (`ID`),",
+				`INDEX \`fk_user_alias_${name}\` (\`User_Alias\`),`,
+				`CONSTRAINT \`fk_user_alias_${name}\` FOREIGN KEY (\`User_Alias\`) REFERENCES \`chat_data\`.\`User_Alias\` (\`ID\`) ON UPDATE CASCADE ON DELETE CASCADE)`,
 				"COLLATE=`utf8mb4_general_ci` ENGINE=InnoDB AUTO_INCREMENT=1 PAGE_COMPRESSED=1;"
 			].join(" "));
 
