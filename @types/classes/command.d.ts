@@ -266,6 +266,19 @@ export declare class Command extends ClassTemplate {
     static setPrefix (value: string): void;
     static get (identifier: Like): Command | null;
     static validate (): void;
+
+    /**
+     * Initializes the module by importing the initial batch of command definitions.
+     * If ran after already initialized, all current commands will be destroyed first.
+     */
+    static importData (definitions: ConstructorData[]): Promise<void>;
+
+    /**
+     * Imports a specific one or multiple command definitions.
+     * If any number of these already exist (matched by command name), then the existing ones will be destroyed first.
+     */
+    static importSpecific (...definitions: ConstructorData[]): Promise<void>;
+
     /**
      * Reloads a specific list of commands, provided as identifiers or instances.
      */
