@@ -87,8 +87,14 @@ module.exports = {
 			this.data.counts.total = total;
 		}
 
-		const safeMode = await context.channel?.getDataProperty("twitchLottoNSFW") ?? true;
-		const blacklistedFlags = await context.channel?.getDataProperty("twitchLottoBlacklistedFlags") ?? [];
+		let safeMode = true;
+		let blacklistedFlags = [];
+		if (context.channel) {
+			const unsafeMode = await context.channel.getDataProperty("twitchLottoNSFW");
+
+			safeMode = (typeof unsafeMode === "boolean") ? !unsafeMode : true;
+			blacklistedFlags = await context.channel.getDataProperty("twitchLottoBlacklistedFlags") ?? [];
+		}
 
 		// Now try to find an image that is available.
 		let image = null;
