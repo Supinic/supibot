@@ -55,13 +55,15 @@ module.exports = class Channel extends require("./template.js") {
 
 			// Set up logging table
 			await sb.Query.raw([
-				`CREATE TABLE IF NOT EXISTS chat_line.\`${name}\` (`,
+				`CREATE TABLE IF NOT EXISTS chat_line.\`${name}\``,
+				"(",
 				"`ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,",
 				`\`Platform_ID\` VARCHAR(100) NOT NULL,`,
 				`\`Historic\` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,`,
 				`\`Text\` TEXT NOT NULL,`,
 				"`Posted` DATETIME(3) NULL DEFAULT NULL,",
 				"PRIMARY KEY (`ID`),",
+				")",
 				"COLLATE=`utf8mb4_general_ci` ENGINE=InnoDB AUTO_INCREMENT=1 PAGE_COMPRESSED=1;"
 			].join(" "));
 
