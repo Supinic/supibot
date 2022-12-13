@@ -91,7 +91,7 @@ module.exports = {
 
 		const delta = sb.Utils.timeDelta(new sb.Date(post.date));
 		return {
-			reply: `${post.content} ${post.link} (${delta})`
+			reply: `${post.content} ${post.link} (posted ${delta})`
 		};
 	}),
 	Dynamic_Description: async (prefix) => [
