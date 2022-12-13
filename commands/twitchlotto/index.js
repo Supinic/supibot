@@ -106,6 +106,13 @@ module.exports = {
 					.limit(1)
 					.single()
 				);
+
+				if (!image) {
+					return {
+						success: false,
+						reply: `Cannot post any pictures from channel ${channel}! This is because this channel has safe mode enabled.`
+					};
+				}
 			}
 			else if (context.params.forceUnscored) {
 				if (safeMode) {
