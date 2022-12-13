@@ -38,6 +38,8 @@ module.exports = (function () {
 		Active;
 		data = {};
 
+		static importable = true;
+
 		constructor (data) {
 			super();
 

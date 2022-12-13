@@ -1,4 +1,6 @@
 module.exports = class ClassTemplate {
+	static importable = false;
+
 	destroy () {}
 
 	async serialize (row, properties, options) {
@@ -266,6 +268,48 @@ module.exports = class ClassTemplate {
 	static async reloadData () {
 		this.data = [];
 		await this.loadData();
+	}
+
+	static importData (definitions) {
+		if (!this.importable) {
+			throw new sb.Error({
+				message: "This class does not support importing definitions"
+			});
+		}
+
+		if (this.data && this.data.length !== 0) {
+			for (const instance of this.data) {
+				instance.destroy();
+			}
+
+			this.data = [];
+		}
+
+		this.data = definitions.map(definition => new this(definition));
+	}
+
+	static importSpecific (identifierProperty, ...definitions) {
+		if (!this.importable) {
+			throw new sb.Error({
+				message: "This class does not support importing definitions"
+			});
+		}
+
+		if (definitions.length === 0) {
+			return;
+		}
+
+		for (const definition of definitions) {
+			const previousInstance = this.get(definition[identifierProperty]);
+			if (previousInstance) {
+				const index = this.data.indexOf(previousInstance);
+				this.data.splice(index, 1);
+				previousInstance.destroy();
+			}
+
+			const currentInstance = new this(definition);
+			this.data.push(currentInstance);
+		}
 	}
 
 	/**

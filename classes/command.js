@@ -142,6 +142,8 @@ class Command extends require("./template.js") {
 	data = {};
 	staticData = {};
 
+	static importable = true;
+
 	static #privateMessageChannelID = Symbol("private-message-channel");
 
 	static privilegedCommandCharacters = ["$"];
@@ -345,35 +347,12 @@ class Command extends require("./template.js") {
 	get Author () { return this.#Author; }
 
 	static async importData (definitions) {
-		if (Command.data && Command.data.length !== 0) {
-			for (const commandData of Command.data) {
-				commandData.destroy();
-			}
-
-			Command.data = [];
-		}
-
-		Command.data = definitions.map(record => new Command(record));
+		super.importData(definitions);
 		await this.validate();
 	}
 
 	static async importSpecific (...definitions) {
-		if (definitions.length === 0) {
-			return;
-		}
-
-		for (const definition of definitions) {
-			const previousCommand = Command.get(definition.Name);
-			if (previousCommand) {
-				const index = Command.data.indexOf(previousCommand);
-				Command.data.splice(index, 1);
-				previousCommand.destroy();
-			}
-
-			const currentCommand = new Command(definition);
-			Command.data.push(currentCommand);
-		}
-
+		super.importSpecific("Name", ...definitions);
 		await this.validate();
 	}
 
