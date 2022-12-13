@@ -43,7 +43,6 @@ module.exports = class Channel extends require("./template.js") {
 				return false;
 			}
 
-			const limit = this.Platform.Message_Limit;
 			const prefix = (this.Platform.Name === "twitch")
 				? ""
 				: `${this.Platform.getFullName("_")}_`;
@@ -65,7 +64,7 @@ module.exports = class Channel extends require("./template.js") {
 				`\`User_Alias\` INT(${idCol.length}) ${sign} NOT NULL,`,
 				`\`Platform_ID\` VARCHAR(100) NOT NULL,`,
 				`\`Historic\` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,`,
-				`\`Text\` VARCHAR(${limit}),`,
+				`\`Text\` TEXT NOT NULL,`,
 				"`Posted` DATETIME(3) NULL DEFAULT NULL,",
 				"PRIMARY KEY (`ID`),",
 				`INDEX \`fk_user_alias_${name}\` (\`User_Alias\`),`,
