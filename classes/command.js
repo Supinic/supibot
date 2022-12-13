@@ -348,8 +348,6 @@ class Command extends require("./template.js") {
 		const { definitions } = await require("supibot-package-manager/commands");
 
 		Command.data = definitions.map(record => new Command(record));
-		Command.definitions = definitions;
-
 		await this.validate();
 	}
 
@@ -368,11 +366,6 @@ class Command extends require("./template.js") {
 				const commandIndex = Command.data.indexOf(originalCommand);
 				if (commandIndex !== -1) {
 					Command.data.splice(commandIndex, 1);
-				}
-
-				const definitionIndex = Command.definitions.findIndex(i => i.Name === identifier);
-				if (commandIndex !== -1) {
-					Command.definitions.splice(definitionIndex, 1);
 				}
 
 				originalCommand.destroy();
@@ -424,7 +417,6 @@ class Command extends require("./template.js") {
 			const reloadedCommand = new Command(definition);
 
 			Command.data.push(reloadedCommand);
-			Command.definitions.push(definition);
 		}
 
 		await this.validate();
