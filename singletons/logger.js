@@ -303,18 +303,18 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 					if (!exists) {
 						await channelData.setup();
 					}
+				}
 
-					const [hasUserAlias, hasPlatformID] = await Promise.all([
-						sb.Query.isTableColumnPresent("chat_line", name, "User_Alias"),
-						sb.Query.isTableColumnPresent("chat_line", name, "Platform_ID")
-					]);
+				const [hasUserAlias, hasPlatformID] = await Promise.all([
+					sb.Query.isTableColumnPresent("chat_line", name, "User_Alias"),
+					sb.Query.isTableColumnPresent("chat_line", name, "Platform_ID")
+				]);
 
-					if (hasUserAlias) {
-						columns.push("User_Alias");
-					}
-					if (hasPlatformID) {
-						columns.push("Platform_ID", "Historic");
-					}
+				if (hasUserAlias) {
+					columns.push("User_Alias");
+				}
+				if (hasPlatformID) {
+					columns.push("Platform_ID", "Historic");
 				}
 
 				this.batches[chan] = await sb.Query.getBatch("chat_line", name, columns);
