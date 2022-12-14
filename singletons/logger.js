@@ -3,10 +3,6 @@ const notified = {
 	privatePlatformLogging: []
 };
 
-// Added on 2022-11-29, when a partial refactor to new logging tables was created and this was the highest
-// channel ID that did not have the new system.
-const channelLogTableDesignThresholdID = 12993;
-
 /**
  * @param {Object} obj
  * @param {User} userData
@@ -300,32 +296,49 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 			const chan = `channel-${channelData.ID}`;
 			if (!this.channels.includes(chan)) {
 				const name = channelData.getDatabaseName();
+				const columns = ["Text", "Posted"];
+
 				if (!this.#presentTables.includes(name)) {
 					const exists = await sb.Query.isTablePresent("chat_line", name);
 					if (!exists) {
 						await channelData.setup();
 					}
-				}
 
-				const columns = (channelData.ID >= channelLogTableDesignThresholdID)
-					? ["User_Alias", "Text", "Posted", "Platform_ID", "Historic"]
-					: ["User_Alias", "Text", "Posted"];
+					const [hasUserAlias, hasPlatformID] = await Promise.all([
+						sb.Query.isTableColumnPresent("chat_line", name, "User_Alias"),
+						sb.Query.isTableColumnPresent("chat_line", name, "Platform_ID")
+					]);
+
+					if (hasUserAlias) {
+						columns.push("User_Alias");
+					}
+					if (hasPlatformID) {
+						columns.push("Platform_ID", "Historic");
+					}
+				}
 
 				this.batches[chan] = await sb.Query.getBatch("chat_line", name, columns);
 				this.channels.push(chan);
 			}
 
 			const lineObject = {
-				User_Alias: userData.ID,
 				Text: message,
 				Posted: new sb.Date()
 			};
 
-			if (channelData.ID > channelLogTableDesignThresholdID) {
+			const batch = this.batches[chan];
+			const hasUserAlias = batch.columns.some(i => i.name === "User_Alias");
+			const hasPlatformID = batch.columns.some(i => i.name === "Platform_ID");
+
+			if (hasPlatformID) {
 				fillObjectByPlatform(lineObject, userData, channelData.Platform);
+
+				if (!hasUserAlias) {
+					delete lineObject.User_Alias;
+				}
 			}
 
-			this.batches[chan].add(lineObject);
+			batch.add(lineObject);
 		}
 		else if (platformData) {
 			const id = `platform-${platformData.ID}`;
