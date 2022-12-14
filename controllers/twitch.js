@@ -654,11 +654,6 @@ module.exports = class TwitchController extends require("./template.js") {
 				return;
 			}
 
-			channelData.sessionData.lastActivity = {
-				user: userData.ID,
-				date: new sb.Date().valueOf()
-			};
-
 			this.resolveUserMessage(channelData, userData, message);
 
 			if (channelData.Mode === "Last seen") {

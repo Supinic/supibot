@@ -132,11 +132,6 @@ class CytubeClient {
 					this.channelData.sessionData = {};
 				}
 
-				this.channelData.sessionData.lastActivity = {
-					user: userData.ID,
-					date: new sb.Date().valueOf()
-				};
-
 				this.controller.resolveUserMessage(this.channelData, userData, msg);
 
 				sb.Logger.push(msg, userData, this.channelData);

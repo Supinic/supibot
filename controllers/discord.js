@@ -191,11 +191,6 @@ module.exports = class DiscordController extends require("./template.js") {
 					await channelData.saveProperty("NSFW", discordChannel.nsfw);
 				}
 
-				channelData.sessionData.lastActivity = {
-					user: userData.ID,
-					date: new sb.Date().valueOf()
-				};
-
 				this.resolveUserMessage(channelData, userData, msg);
 				await sb.Logger.push(sb.Utils.wrapString(msg, this.platform.Message_Limit), userData, channelData);
 
