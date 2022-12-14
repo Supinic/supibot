@@ -178,19 +178,21 @@ module.exports = class IRCController extends require("./template.js") {
 			if (!channelData) {
 				return;
 			}
-
-			await this.resolveUserMessage(channelData, userData, message);
-
-			if (channelData.Mode === "Last seen") {
-				await sb.Logger.updateLastSeen({ userData, channelData, message });
-				return;
-			}
 			else if (channelData.Mode === "Inactive") {
 				return;
 			}
 
-			if (this.platform.Logging.messages) {
-				await sb.Logger.push(message, userData, channelData);
+			await this.resolveUserMessage(channelData, userData, message);
+
+			if (this.channelData.Logging.has("Meta")) {
+				await sb.Logger.updateLastSeen({
+					userData,
+					channelData: this.channelData,
+					message
+				});
+			}
+			if (this.platform.Logging.messages && this.channelData.Logging.has("Lines")) {
+				await sb.Logger.push(message, userData, this.channelData);
 			}
 
 			channelData.events.emit("message", {

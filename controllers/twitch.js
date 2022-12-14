@@ -649,25 +649,24 @@ module.exports = class TwitchController extends require("./template.js") {
 		if (messageType !== "whisper") {
 			channelData = sb.Channel.get(channelName, this.platform);
 
-			if (!channelData) {
-				console.error(`Cannot find channel ${channelName}`);
+			if (!channelData || channelData.Mode === "Inactive") {
 				return;
 			}
 
 			this.resolveUserMessage(channelData, userData, message);
 
-			if (channelData.Mode === "Last seen") {
+			if (channelData.Logging.has("Meta")) {
 				await sb.Logger.updateLastSeen({ userData, channelData, message });
-				return;
 			}
-			else if (channelData.Mode === "Inactive") {
-				return;
-			}
-
-			if (this.platform.Logging.messages) {
+			if (this.platform.Logging.messages && channelData.Logging.has("Lines")) {
 				await sb.Logger.push(message, userData, channelData);
 			}
 
+			/**
+			 * Message events should be emitted even if the channel is in "Read" mode (see below).
+			 * This is due to the fact that chat-modules listening to this event can rely on being processed,
+			 * even if the channel is in read-only mode.
+ 			 */
 			channelData.events.emit("message", {
 				event: "message",
 				message,

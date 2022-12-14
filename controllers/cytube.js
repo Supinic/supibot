@@ -134,8 +134,6 @@ class CytubeClient {
 
 				this.controller.resolveUserMessage(this.channelData, userData, msg);
 
-				sb.Logger.push(msg, userData, this.channelData);
-
 				this.channelData.events.emit("message", {
 					type: "message",
 					message: msg,
@@ -144,6 +142,17 @@ class CytubeClient {
 					platform: this.controller.platform
 				});
 
+				if (this.channelData.Logging.has("Meta")) {
+					await sb.Logger.updateLastSeen({
+						userData,
+						channelData: this.channelData,
+						message: msg
+					});
+				}
+				if (this.controller.platform.Logging.messages && this.channelData.Logging.has("Lines")) {
+					await sb.Logger.push(msg, userData, this.channelData);
+				}
+
 				if (this.channelData.Mode === "Read") {
 					return;
 				}
@@ -151,8 +160,10 @@ class CytubeClient {
 					return;
 				}
 
-				sb.AwayFromKeyboard.checkActive(userData, this.channelData);
-				sb.Reminder.checkActive(userData, this.channelData);
+				await Promise.all([
+					sb.AwayFromKeyboard.checkActive(userData, this.channelData),
+					sb.Reminder.checkActive(userData, this.channelData)
+				]);
 
 				if (this.channelData.Mirror) {
 					this.controller.mirror(msg, userData, this.channelData, { commandUsed: false });

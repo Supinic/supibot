@@ -192,7 +192,13 @@ module.exports = class DiscordController extends require("./template.js") {
 				}
 
 				this.resolveUserMessage(channelData, userData, msg);
-				await sb.Logger.push(sb.Utils.wrapString(msg, this.platform.Message_Limit), userData, channelData);
+
+				if (channelData.Logging.has("Meta")) {
+					await sb.Logger.updateLastSeen({ channelData, userData, message: msg });
+				}
+				if (this.platform.Logging.messages && channelData.Logging.has("Lines")) {
+					await sb.Logger.push(sb.Utils.wrapString(msg, this.platform.Message_Limit), userData, channelData);
+				}
 
 				channelData.events.emit("message", {
 					type: "message",
@@ -202,14 +208,18 @@ module.exports = class DiscordController extends require("./template.js") {
 					platform: this.platform
 				});
 
-				if (channelData.Mode !== "Read") {
-					await sb.AwayFromKeyboard.checkActive(userData, channelData);
-					await sb.Reminder.checkActive(userData, channelData);
+				if (channelData.Mode === "Read") {
+					return;
+				}
 
-					// Mirroring is set up - mirror the message to the target channel
-					if (channelData.Mirror) {
-						await this.mirror(msg, userData, channelData, { commandUsed: false });
-					}
+				await Promise.all([
+					sb.AwayFromKeyboard.checkActive(userData, channelData),
+					sb.Reminder.checkActive(userData, channelData)
+				]);
+
+				// Mirroring is set up - mirror the message to the target channel
+				if (channelData.Mirror) {
+					await this.mirror(msg, userData, channelData, { commandUsed: false });
 				}
 			}
 			else {
