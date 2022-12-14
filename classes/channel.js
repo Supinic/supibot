@@ -53,35 +53,16 @@ module.exports = class Channel extends require("./template.js") {
 				return false;
 			}
 
-			const userAliasDefinition = await sb.Query.getDefinition("chat_data", "User_Alias");
-			const idCol = userAliasDefinition.columns.find(i => i.name === "ID");
-			const sign = (idCol.unsigned) ? "UNSIGNED" : "";
-
 			// Set up logging table
 			await sb.Query.raw([
 				`CREATE TABLE IF NOT EXISTS chat_line.\`${name}\` (`,
 				"`ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,",
-				`\`User_Alias\` INT(${idCol.length}) ${sign} NOT NULL,`,
 				`\`Platform_ID\` VARCHAR(100) NOT NULL,`,
 				`\`Historic\` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,`,
 				`\`Text\` TEXT NOT NULL,`,
 				"`Posted` DATETIME(3) NULL DEFAULT NULL,",
-				"PRIMARY KEY (`ID`),",
-				`INDEX \`fk_user_alias_${name}\` (\`User_Alias\`),`,
-				`CONSTRAINT \`fk_user_alias_${name}\` FOREIGN KEY (\`User_Alias\`) REFERENCES \`chat_data\`.\`User_Alias\` (\`ID\`) ON UPDATE CASCADE ON DELETE CASCADE)`,
-				"COLLATE=`utf8mb4_general_ci` ENGINE=InnoDB AUTO_INCREMENT=1 PAGE_COMPRESSED=1;"
-			].join(" "));
-
-			// Set up user-specific meta logging trigger
-			await sb.Query.raw([
-				`CREATE TRIGGER IF NOT EXISTS chat_line.\`${name}_after_insert\``,
-				`AFTER INSERT ON chat_line.\`${name}\` FOR EACH ROW`,
-				"INSERT INTO chat_data.Message_Meta_User_Alias (User_Alias, Channel, Last_Message_Text, Last_Message_Posted)",
-				`VALUES (NEW.User_Alias, ${this.ID}, NEW.Text, NEW.Posted)`,
-				"ON DUPLICATE KEY UPDATE",
-				"Message_Count = Message_Count + 1,",
-				"Last_Message_Text = NEW.Text,",
-				"Last_Message_Posted = NEW.Posted;"
+				"PRIMARY KEY (`ID`)",
+				") COLLATE=`utf8mb4_general_ci` ENGINE=InnoDB AUTO_INCREMENT=1 PAGE_COMPRESSED=1;"
 			].join(" "));
 
 			return true;
