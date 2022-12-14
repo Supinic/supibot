@@ -331,7 +331,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 			const hasPlatformID = batch.columns.some(i => i.name === "Platform_ID");
 
 			if (hasUserAlias) {
-				lineObject.User_Alias = userData.User_Alias;
+				lineObject.User_Alias = userData.ID;
 			}
 			if (hasPlatformID) {
 				fillObjectByPlatform(lineObject, userData, channelData.Platform);
