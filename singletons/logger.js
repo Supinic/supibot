@@ -353,18 +353,19 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 					return;
 				}
 
-				this.batches[id] = await sb.Query.getBatch("chat_line", name, ["User_Alias", "Text", "Posted", "Platform_ID", "Historic"]);
+				this.batches[id] = await sb.Query.getBatch("chat_line", name, ["Text", "Posted", "Platform_ID", "Historic"]);
 				this.platforms.push(id);
 			}
 
 			const lineObject = {
-				User_Alias: userData.ID,
 				Text: message,
 				Posted: new sb.Date()
 			};
 
-			fillObjectByPlatform(lineObject, userData, platformData);
-			this.batches[id].add(lineObject);
+			const batch = this.batches[id];
+			fillObjectByPlatform(lineObject, userData, channelData.Platform);
+
+			batch.add(lineObject);
 		}
 	}
 
