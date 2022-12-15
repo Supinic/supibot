@@ -363,7 +363,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 			};
 
 			const batch = this.batches[id];
-			fillObjectByPlatform(lineObject, userData, channelData.Platform);
+			fillObjectByPlatform(lineObject, userData, platformData);
 
 			batch.add(lineObject);
 		}
