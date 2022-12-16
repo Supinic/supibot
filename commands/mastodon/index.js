@@ -45,7 +45,8 @@ module.exports = {
 		if (!data) {
 			const response = await sb.Got("GenericAPI", {
 				url,
-				responseType: "text"
+				responseType: "text",
+				throwHttpErrors: false
 			});
 
 			if (!response.ok) {
