@@ -192,7 +192,7 @@ module.exports = class IRCController extends require("./template.js") {
 				});
 			}
 			if (this.platform.Logging.messages && channelData.Logging.has("Lines")) {
-				await sb.Logger.push(message, userData, this.channelData);
+				await sb.Logger.push(message, userData, channelData);
 			}
 
 			channelData.events.emit("message", {
