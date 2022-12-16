@@ -243,6 +243,26 @@ module.exports = class Platform extends require("./template.js") {
 		}
 	}
 
+	fetchInternalPlatformIDByUsername (userData) {
+		if (this.Name === "twitch") {
+			return userData.Twitch_ID;
+		}
+		else if (this.Name === "discord") {
+			return userData.Discord_ID;
+		}
+		else if (this.Name === "cytube") {
+			return userData.Name;
+		}
+		else {
+			throw new sb.Error({
+				message: "This platform does not support fetching users' platformIDs by their name",
+				args: {
+					platform: this.Name
+				}
+			});
+		}
+	}
+
 	get userMessagePromises () {
 		return this.#userMessagePromises;
 	}

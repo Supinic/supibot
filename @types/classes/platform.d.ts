@@ -177,6 +177,12 @@ export declare class Platform extends ClassTemplate {
 	 * Fetches the username for a given user platform ID, depending on which platform instance is used.
 	 */
 	fetchUsernameByUserPlatformID (userPlatformID: string): Promise<string | null>
+	/**
+	 * Fetches the platform ID for a given user object, depending on which platform instance is used.
+	 * Does not use the platforms' API for fetching, simply uses the internal sb.User data - and hence should not
+	 * be used long-term (more specifically, after the User_Alias refactor).
+	 */
+	fetchInternalPlatformIDByUsername (userData: User): string | null;
 
 	get capital (): string;
 	get privateMessageLoggingTableName (): string;
