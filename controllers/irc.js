@@ -184,14 +184,14 @@ module.exports = class IRCController extends require("./template.js") {
 
 			await this.resolveUserMessage(channelData, userData, message);
 
-			if (this.channelData.Logging.has("Meta")) {
+			if (channelData.Logging.has("Meta")) {
 				await sb.Logger.updateLastSeen({
 					userData,
 					channelData: this.channelData,
 					message
 				});
 			}
-			if (this.platform.Logging.messages && this.channelData.Logging.has("Lines")) {
+			if (this.platform.Logging.messages && channelData.Logging.has("Lines")) {
 				await sb.Logger.push(message, userData, this.channelData);
 			}
 
