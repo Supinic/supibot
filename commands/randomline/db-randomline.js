@@ -18,15 +18,50 @@ const fetchUserRandomLine = async function (userData, channelData) {
 		};
 	}
 
-	const randomID = await sb.Query.getRecordset(rs => rs
-		.select("ID")
-		.from("chat_line", channelName)
-		.where("User_Alias = %n", userData.ID)
-		.limit(1)
-		.offset(sb.Utils.random(1, userMessageCount) - 1)
-		.single()
-		.flat("ID")
-	);
+	let randomID;
+	const tableHasPlatformID = await sb.Query.isTableColumnPresent("chat_line", channelName, "Platform_ID");
+	if (tableHasPlatformID) {
+		let userIdentifier;
+		const platformData = channelData.Platform;
+
+		if (typeof platformData.fetchInternalPlatformIDByUsername === "function") {
+			userIdentifier = platformData.fetchInternalPlatformIDByUsername(userData);
+		}
+		else if (platformData.Name === "twitch") {
+			userIdentifier = userData.Twitch_ID;
+		}
+		else if (platformData.Name === "discord") {
+			userIdentifier = userData.Discord_ID;
+		}
+		else if (platformData.Name === "cytube") {
+			userIdentifier = userData.Name;
+		}
+
+		if (!userIdentifier) {
+			userIdentifier = userData.Name;
+		}
+
+		randomID = await sb.Query.getRecordset(rs => rs
+			.select("ID")
+			.from("chat_line", channelName)
+			.where("Platform_ID = %s", userIdentifier)
+			.limit(1)
+			.offset(sb.Utils.random(1, userMessageCount) - 1)
+			.single()
+			.flat("ID")
+		);
+	}
+	else {
+		randomID = await sb.Query.getRecordset(rs => rs
+			.select("ID")
+			.from("chat_line", channelName)
+			.where("User_Alias = %n", userData.ID)
+			.limit(1)
+			.offset(sb.Utils.random(1, userMessageCount) - 1)
+			.single()
+			.flat("ID")
+		);
+	}
 
 	if (!randomID) {
 		return {
