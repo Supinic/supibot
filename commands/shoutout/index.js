@@ -19,14 +19,21 @@ module.exports = {
 		const twitchPlatform = sb.Platform.get("twitch");
 		const { controller } = twitchPlatform;
 
-		const targetUserID = await controller.getUserID(sb.User.normalizeUsername(target));
-		if (!targetUserID) {
+		const userLookupResponse = await sb.Got("Helix", {
+			url: "users",
+			searchParams: { login: target }
+		});
+
+		const [helixUserData] = userLookupResponse.body.data;
+		if (!helixUserData) {
 			return {
 				success: false,
 				reply: "Cannot find that user on Twitch!"
 			};
 		}
-		else if (targetUserID === context.user.Twitch_ID) {
+
+		const targetUserID = helixUserData.id;
+		if (targetUserID === context.user.Twitch_ID) {
 			return {
 				success: false,
 				reply: "This isn't going to make you any more famous, you got to put the work in yourself!"
