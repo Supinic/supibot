@@ -99,7 +99,17 @@ module.exports = {
 
 			let link = idLink;
 			if (shortenResponse.statusCode === 200) {
-				link = shortenResponse.body.shortenurl.shorturl;
+				if (shortenResponse.body.shortenurl?.shorturl) {
+					link = shortenResponse.body.shortenurl.shorturl;
+				}
+				else {
+					await sb.Logger.log(
+						"Command.Warning",
+						`Unexpected Wiki shorturl response: ${JSON.stringify(shortenResponse.body)}`,
+						context.channelData ?? null,
+						context.user
+					);
+				}
 			}
 
 			if (context.params.linkOnly) {
