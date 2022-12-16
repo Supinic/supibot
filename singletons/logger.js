@@ -87,7 +87,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 							}
 
 							setTimeout(
-								() => this.batches[key].insert(),
+								() => this.batches[key]?.insert(),
 								i * 250
 							);
 						}
