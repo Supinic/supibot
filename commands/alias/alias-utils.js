@@ -20,7 +20,10 @@ const parseInvocationName = (string) => {
 		: string;
 };
 
+const isRestricted = (type, aliasData) => aliasData.Restrictions.includes(type);
+
 module.exports = {
+	isRestricted,
 	parseCommandName,
 	parseInvocationName
 };

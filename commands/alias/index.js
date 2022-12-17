@@ -477,7 +477,7 @@ module.exports = {
 				}
 
 				const targetAlias = await sb.Query.getRecordset(rs => rs
-					.select("ID", "Command", "Invocation", "Arguments", "Parent")
+					.select("ID", "Command", "Invocation", "Arguments", "Parent", "Restrictions")
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NULL")
 					.where("User_Alias = %n", targetUser.ID)
@@ -499,6 +499,12 @@ module.exports = {
 							You cannot copy links to other aliases
 						 	Instead, use ${sb.Command.prefix}alias link ${targetUser.Name} ${targetAliasName}
 						`
+					};
+				}
+				else if (context.user !== targetUser && AliasUtils.isRestricted("copy", targetAlias)) {
+					return {
+						success: false,
+						reply: `You cannot copy this alias! Its creator has prevented new copies from being created.`
 					};
 				}
 
@@ -793,8 +799,8 @@ module.exports = {
 					};
 				}
 
-				const userData = await sb.User.get(userName);
-				if (!userData) {
+				const targetUserData = await sb.User.get(userName);
+				if (!targetUserData) {
 					return {
 						success: false,
 						reply: `Provided user does not exist!`
@@ -805,7 +811,7 @@ module.exports = {
 					.select("ID", "Name", "Description", "Command", "Parent")
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NULL")
-					.where("User_Alias = %n", userData.ID)
+					.where("User_Alias = %n", targetUserData.ID)
 					.where("Name COLLATE utf8mb4_bin = %s", aliasName)
 					.single()
 					.limit(1)
@@ -819,6 +825,13 @@ module.exports = {
 						reply: `Provided user does not have the "${aliasName}" alias!`
 					};
 				}
+				else if (context.user !== targetUserData && AliasUtils.isRestricted("link", targetAlias)) {
+					return {
+						success: false,
+						reply: `You cannot link this alias! Its creator has prevented new links from being created.`
+					};
+				}
+
 				else if (targetAlias.Command === null && targetAlias.Parent !== null) {
 					// If attempting to link an already linked alias, change the pointer to the original alias
 					targetAlias = await sb.Query.getRecordset(rs => rs
@@ -979,6 +992,55 @@ module.exports = {
 				await row.save({ skipLoad: true });
 				return {
 					reply: `Your alias "${oldAliasName}" has been successfully renamed to "${newAliasName}".`
+				};
+			}
+
+			case "restrict":
+			case "unrestrict": {
+				const [name, restriction] = args;
+				if (!name || !restriction || (restriction !== "link" && restriction !== "copy")) {
+					return {
+						success: false,
+						reply: `You didn't provide a name or a correct restriction type! Use: "$alias ${restriction} (alias name) (copy/link)"`
+					};
+				}
+
+				const verb = (restriction === "link") ? "linked" : "copied";
+				const alias = await sb.Query.getRecordset(rs => rs
+					.select("ID", "Restrictions")
+					.from("data", "Custom_Command_Alias")
+					.where("User_Alias = %n", context.user.ID)
+					.where("Name COLLATE utf8mb4_bin = %s", name)
+					.limit(1)
+					.single()
+				);
+
+				if (!alias) {
+					return {
+						success: false,
+						reply: `You don't have the "${name}" alias!`
+					};
+				}
+				else if (type === "restrict" && AliasUtils.isRestricted(restriction, alias)) {
+					return {
+						success: false,
+						reply: `Your alias ${name} is already restricted from being ${verb}!`
+					};
+				}
+				else if (type === "unrestrict" && !AliasUtils.isRestricted(restriction, alias)) {
+					return {
+						success: false,
+						reply: `Your alias ${name} is already unrestricted from being ${verb}!`
+					};
+				}
+
+				const row = await sb.Query.getRow("chat_data", "Custom_Command_Alias");
+				await row.load(alias.ID);
+				row.values.Restrictions.push(restriction);
+
+				await row.save({ skipLoad: true });
+				return {
+					reply: `Your alias ${name} has been successfully ${type}ed from being ${verb}!`
 				};
 			}
 
@@ -1284,6 +1346,13 @@ module.exports = {
 
 		`<code>${prefix}alias published</code>`,
 		"Lists the currently published channel aliases in the current channel",
+		"",
+
+		`<code>${prefix}alias restrict (name) (type)</code>`,
+		`<code>${prefix}alias unrestrict (name) (type)</code>`,
+		"Restricts, or unrestricts one of your aliases from being copied or linked by other people.",
+		"You (as the creator of the alias) will still be able to copy and link it yourself, though.",
+		`Use "copy" and "link" as the type name respectively to allow/disallow each operation.`,
 		"",
 
 		"<h5>Replacements</h5>",
