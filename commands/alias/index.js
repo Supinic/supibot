@@ -1044,6 +1044,10 @@ module.exports = {
 				else if (type === "unrestrict") {
 					const index = row.values.Restrictions.indexOf(restriction);
 					row.values.Restrictions.splice(index, 1);
+
+					if (row.values.Restrictions.length === 0) {
+						row.values.Restrictions = null;
+					}
 				}
 
 				await row.save({ skipLoad: true });
