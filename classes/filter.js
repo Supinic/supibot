@@ -648,7 +648,12 @@ module.exports = class Filter extends require("./template.js") {
 		let { string } = options;
 		const unpingUsers = await sb.User.getMultiple(filters.map(i => i.User_Alias));
 		for (const user of unpingUsers) {
-			const regex = new RegExp(String.raw `(^|[@#,:;\s]+)(${user.Name})([?!,:;\s]|$)`, "gi");
+			// Only unping usernames if they are preceded and followed by a specific set of characters.
+			// The \b escape group isn't usable here due to usernames sometimes being parts of URLs, and unping-ing those
+			// makes the links unusable.
+			// Note for the succeeding character part of this regex: Only unping with a succeeding dot if the dot is then
+			// also followed by a whitespace - this prevents links from being unping-ed (e.g. "supinic.com")
+			const regex = new RegExp(String.raw `(^|[(@#,:;\s]+)(${user.Name})([)?!,:;\s]|(\.(?=\s|$))|$)`, "gi");
 			string = string.replace(regex, (match, prefix, name, suffix) => (
 				`${prefix}${name[0]}\u{E0000}${name.slice(1)}${suffix}`
 			));
