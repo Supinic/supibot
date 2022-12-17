@@ -1036,6 +1036,7 @@ module.exports = {
 
 				const row = await sb.Query.getRow("chat_data", "Custom_Command_Alias");
 				await row.load(alias.ID);
+				row.values.Restrictions ??= [];
 				row.values.Restrictions.push(restriction);
 
 				await row.save({ skipLoad: true });
