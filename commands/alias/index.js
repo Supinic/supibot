@@ -1037,7 +1037,14 @@ module.exports = {
 				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
 				await row.load(alias.ID);
 				row.values.Restrictions = (row.values.Restrictions) ? [...row.values.Restrictions] : [];
-				row.values.Restrictions.push(restriction);
+
+				if (type === "restrict") {
+					row.values.Restrictions.push(restriction);
+				}
+				else if (type === "unrestrict") {
+					const index = row.values.Restrictions.indexOf(restriction);
+					row.values.Restrictions.splice(index, 1);
+				}
 
 				await row.save({ skipLoad: true });
 				return {
