@@ -106,9 +106,9 @@ const fetchChannelRandomLine = async function (channelData) {
 	}
 
 	const tableHasPlatformID = await sb.Query.isTableColumnPresent("chat_line", channelName, "Platform_ID");
-	const userIdentifierColumn = (tableHasPlatformID) ? "Platform_ID" : "User_Alias";
+	const specificColumns = (tableHasPlatformID) ? ["Platform_ID", "Historic"] : ["User_Alias"];
 	const randomLine = await sb.Query.getRecordset(rs => rs
-		.select("Text", "Posted", userIdentifierColumn)
+		.select("Text", "Posted", ...specificColumns)
 		.from("chat_line", channelName)
 		.where("ID >= %n", sb.Utils.random(1, channelMessageCount))
 		.orderBy("ID ASC")
@@ -125,7 +125,12 @@ const fetchChannelRandomLine = async function (channelData) {
 
 	let username;
 	if (randomLine.Platform_ID) {
-		username = await channelData.Platform.fetchUsernameByUserPlatformID(randomLine.Platform_ID);
+		username = (randomLine.Historic)
+			? randomLine.Platform_ID
+			: await channelData.Platform.fetchUsernameByUserPlatformID(randomLine.Platform_ID);
+
+		// Fallback - if no name is available, use the platform IDa or a fallback string if not even that is available
+		username ??= `(${randomLine.Platform_ID ?? "unknown"})`;
 	}
 	else {
 		const userData = await sb.User.get(randomLine.User_Alias);
