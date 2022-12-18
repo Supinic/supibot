@@ -337,7 +337,23 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 				fillObjectByPlatform(lineObject, userData, channelData.Platform);
 			}
 
-			batch.add(lineObject);
+			try {
+				batch.add(lineObject);
+			}
+			catch (e) {
+				await sb.Logger.log(
+					"System.Warning",
+					"Incorrect Batch definition",
+					channelData
+				);
+
+				const index = this.channels.indexOf(chan);
+				this.channels.splice(index, 1);
+
+				batch.clear();
+				batch.destroy();
+				delete this.batches[chan];
+			}
 		}
 		else if (platformData) {
 			const id = `platform-${platformData.ID}`;
