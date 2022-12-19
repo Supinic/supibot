@@ -8,6 +8,17 @@ const {
 	PermissionFlagsBits
 } = require("discord.js");
 
+const ignoredChannelTypes = [
+	ChannelType.GuildAnnouncement,
+	ChannelType.GuildCategory,
+	ChannelType.GuildNews,
+	ChannelType.GuildNewsThread,
+	ChannelType.GuildPrivateThread,
+	ChannelType.GuildPublicThread,
+	ChannelType.PrivateThread,
+	ChannelType.PublicThread
+];
+
 module.exports = class DiscordController extends require("./template.js") {
 	constructor () {
 		super();
@@ -61,6 +72,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			const {
 				commandArguments,
 				chan,
+				channelType,
 				discordID,
 				guild,
 				msg,
@@ -68,6 +80,11 @@ module.exports = class DiscordController extends require("./template.js") {
 				privateMessage,
 				user
 			} = this.parseMessage(messageObject);
+
+			// Ignore all configured channel types - mostly threads and other non-discussion channels
+			if (ignoredChannelTypes.includes(channelType)) {
+				return;
+			}
 
 			// If the bot does not have SEND_MESSAGES permission in the channel, completely ignore the message.
 			// Do not process it for logging, commands, AFKs, Reminders, anything.
