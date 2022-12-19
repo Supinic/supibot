@@ -1,4 +1,17 @@
-const fetchUserRandomLine = async function (userData, channelData) {
+const throwOrReturn = (throwFlag, message) => {
+	if (throwFlag) {
+		throw new sb.Error({ message });
+	}
+	else {
+		return {
+			success: false,
+			reply: message
+		};
+	}
+};
+
+const fetchUserRandomLine = async function (userData, channelData, options = {}) {
+	const { throwOnFailure } = options;
 	const channelName = channelData.getDatabaseName();
 
 	/** @type {number|null} */
@@ -12,10 +25,7 @@ const fetchUserRandomLine = async function (userData, channelData) {
 	);
 
 	if (!userMessageCount) {
-		return {
-			success: false,
-			reason: "That user has not posted any messages in this channel!"
-		};
+		return throwOrReturn(throwOnFailure, "That user has not posted any messages in this channel!");
 	}
 
 	let randomID;
@@ -64,10 +74,7 @@ const fetchUserRandomLine = async function (userData, channelData) {
 	}
 
 	if (!randomID) {
-		return {
-			success: false,
-			reason: "No chat lines found for this user!"
-		};
+		return throwOrReturn(throwOnFailure, "No chat lines found for this user!");
 	}
 
 	const randomLine = await sb.Query.getRecordset(rs => rs
@@ -87,7 +94,8 @@ const fetchUserRandomLine = async function (userData, channelData) {
 	};
 };
 
-const fetchChannelRandomLine = async function (channelData) {
+const fetchChannelRandomLine = async function (channelData, options = {}) {
+	const { throwOnFailure } = options;
 	const channelName = channelData.getDatabaseName();
 
 	/** @type {number|null} */
@@ -99,10 +107,7 @@ const fetchChannelRandomLine = async function (channelData) {
 	);
 
 	if (!channelMessageCount) {
-		return {
-			success: false,
-			reason: "This channel does not have enough chat lines saved just yet!"
-		};
+		return throwOrReturn(throwOnFailure, "This channel does not have enough chat lines saved just yet!");
 	}
 
 	const tableHasPlatformID = await sb.Query.isTableColumnPresent("chat_line", channelName, "Platform_ID");
@@ -117,10 +122,7 @@ const fetchChannelRandomLine = async function (channelData) {
 	);
 
 	if (!randomLine) {
-		return {
-			success: false,
-			reason: "No chat lines found for this user!"
-		};
+		return throwOrReturn(throwOnFailure, "No chat lines found for this user!");
 	}
 
 	let username;
@@ -161,23 +163,31 @@ const fetchGroupResult = async function (type, group, userData = null) {
 	const promises = group.map(async (channelID) => {
 		const channelData = sb.Channel.get(channelID);
 		if (type === "user") {
-			return await fetchUserRandomLine(userData, channelData);
+			return await fetchUserRandomLine(userData, channelData, { throwOnFailure: true });
 		}
 		else {
-			return await fetchChannelRandomLine(channelData);
+			return await fetchChannelRandomLine(channelData, { throwOnFailure: true });
 		}
 	});
 
-	const partialResults = await Promise.all(promises);
-	const filteredResults = partialResults.filter(i => i.success === true);
-	if (filteredResults.length === 0) {
+	let result;
+	try {
+		result = await Promise.any(promises);
+	}
+	catch (e) {
+		await sb.Logger.log(
+			"Command.Warning",
+			`Group $rl error: ${JSON.stringify({ type, group, userData, e })}`
+		);
+
+		const [error] = e.errors;
 		return {
 			success: false,
-			reply: partialResults[0].reason
+			reply: error.simpleMessage ?? "An error occured!"
 		};
 	}
 
-	return sb.Utils.randArray(partialResults.filter(i => i.success === true));
+	return result;
 };
 
 const fetchGroupUserRandomLine = async function (group, userData) {
