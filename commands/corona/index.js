@@ -285,29 +285,6 @@ module.exports = {
 			}
 		}
 
-		let vaccines = "";
-		if (targetData && targetData.Place_ID) {
-			const vaccineData = await sb.Query.getRecordset(rs => rs
-				.select("People_Fully")
-				.from("corona", "Vaccine_Status")
-				.where("Place = %n", targetData.Place_ID)
-				.orderBy("Date DESC")
-				.limit(1)
-				.single()
-			);
-
-			if (vaccineData) {
-				const fullyVaccinated = vaccineData.People_Fully;
-				const percent = sb.Utils.round(fullyVaccinated / population * 100, 2);
-
-				vaccines = sb.Utils.tag.trim `
-					Vaccine status: 
-					${group(fullyVaccinated)} people have been fully vaccinated so far,
-					which is ${percent}% of the population.
-				`;
-			}
-		}
-
 		return {
 			reply: sb.Utils.tag.trim `
 				${intro}
@@ -341,8 +318,6 @@ module.exports = {
 				: ` ${group(ratios.cpm)} cases, and ${group(ratios.dpm)} deaths per million.`)
 			: ""
 		}
-				
-				${vaccines}
 			`
 		};
 	}),
