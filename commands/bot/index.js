@@ -297,13 +297,15 @@ module.exports = {
 					await channelData.saveProperty("Mode", "Write");
 				}
 
+				let success = true;
 				let resultString;
 				if (inactiveReason === "bot-banned") {
-					if (!partFailed || !joinFailed) {
+					if (partFailed || joinFailed) {
+						success = false;
 						resultString = `Could not re-join ${channelString} - make sure I'm unbanned first! Then try this command again.`;
 					}
 					else {
-						resultString = `Tried to re-join ${channelString} - not sure if it worked. If I don't respond to commands, try this command again in a little bit.`;
+						resultString = `Tried to re-join ${channelString} - it was probably successful. Make sure I respond to commands, and if not, try this command again in a little bit.`;
 					}
 				}
 				else {
@@ -311,6 +313,7 @@ module.exports = {
 				}
 
 				return {
+					success,
 					reply: resultString
 				};
 			}
