@@ -10,6 +10,7 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function horoscope (context, inputZodiacName) {
 		let zodiacName = null;
+		let own = false;
 		const zodiacData = require("./zodiac.json");
 
 		if (inputZodiacName) {
@@ -39,6 +40,7 @@ module.exports = {
 			for (const { start, end, name } of zodiacData) {
 				if ((month === start[0] && day >= start[1]) || (month === end[0] && day <= end[1])) {
 					zodiacName = name;
+					own = true;
 					break;
 				}
 			}
@@ -72,8 +74,9 @@ module.exports = {
 			};
 		}
 
+		const prefix = (own) ? "Your" : "";
 		return {
-			reply: `Your ${zodiacName} horoscope for today: ${node.text()}`
+			reply: `${prefix} ${sb.Utils.capitalize(zodiacName)} horoscope for today: ${node.text()}`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => {
