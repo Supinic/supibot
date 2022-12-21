@@ -137,7 +137,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async function (prefix) {
 		const categoriesList = this.staticData.categories.map(category => {
-			const aliasList = category.aliases.map(i => `<code>${i}</code>`).join(", ");
+			const aliasList = category.aliases.map(i => `<code>${i}</code>`).join("");
 			const aliasString = (aliasList) ? ` - aliases: ${aliasList}` : "";
 			return `<li>${category.name}${aliasString}</li>`;
 		});
