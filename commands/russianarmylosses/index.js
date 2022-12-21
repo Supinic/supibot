@@ -135,7 +135,7 @@ module.exports = {
 			reply
 		};
 	}),
-	Dynamic_Description: (prefix) => {
+	Dynamic_Description: (async function (prefix) {
 		const categoriesList = this.staticData.categories.map(category => {
 			const aliasList = category.aliases.map(i => `<code>${i}</code>`).join(", ");
 			const aliasString = (aliasList) ? ` - aliases: ${aliasList}` : "";
@@ -161,5 +161,5 @@ module.exports = {
 			"Supported categories:",
 			`<ul>${categoriesList}</ul>`
 		];
-	}
+	})
 };
