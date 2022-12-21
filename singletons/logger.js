@@ -477,18 +477,28 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 		}
 
 		const { channelData, message, userData } = options;
-		if (!userData || !channelData || !message) {
+		if (!userData) {
 			throw new sb.Error({
-				message: "Missing some or all arguments for lastSeen data"
+				message: "Missing userData for lastSeen data"
+			});
+		}
+		else if (!channelData) {
+			throw new sb.Error({
+				message: "Missing channelData for lastSeen data"
+			});
+		}
+		else if (!message) {
+			throw new sb.Error({
+				message: "Missing message for lastSeen data"
 			});
 		}
 
-		if (!this.lastSeen.has(channelData)) {
-			this.lastSeen.set(channelData, new Map());
+		if (!this.lastSeen.has(channelData.ID)) {
+			this.lastSeen.set(channelData.ID, new Map());
 		}
 
-		const count = this.lastSeen.get(channelData).get(userData)?.count ?? 0;
-		this.lastSeen.get(channelData).set(userData, {
+		const count = this.lastSeen.get(channelData.ID).get(userData.ID)?.count ?? 0;
+		this.lastSeen.get(channelData.ID).set(userData.ID, {
 			message,
 			count: count + 1,
 			date: new sb.Date()
