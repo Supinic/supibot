@@ -126,7 +126,7 @@ module.exports = {
 						const url = require("url");
 						const fixedURL = url.parse(params.url).hostname ?? params.url;
 						try {
-							await sb.Banphrase.executeExternalAPI("test", "Pajbot", fixedURL);
+							await sb.Banphrase.executeExternalAPI("test", "pajbot", fixedURL);
 						}
 						catch {
 							return {
