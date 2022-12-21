@@ -1,5 +1,15 @@
 [
   {
+    "name": "Aquarius",
+    "start": [1, 21],
+    "end": [2, 19]
+  },
+  {
+    "name": "Pisces",
+    "start": [2, 20],
+    "end": [3, 20]
+  },
+  {
     "name": "Aries",
     "start": [3, 21],
     "end": [4, 20]
@@ -48,15 +58,5 @@
     "name": "Capricorn",
     "start": [12, 22],
     "end": [1, 20]
-  },
-  {
-    "name": "Aquarius",
-    "start": [1, 21],
-    "end": [2, 19]
-  },
-  {
-    "name": "Pisces",
-    "start": [2, 20],
-    "end": [3, 20]
   }
 ]
