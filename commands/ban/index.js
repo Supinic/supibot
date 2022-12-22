@@ -37,6 +37,7 @@ module.exports = {
 			User_Alias: null,
 			Command: null,
 			Invocation: null,
+			/** @type {"Arguments" | "Blacklist" | "Cooldown" | "Online-only" | "Offline-only" | "Reminder-prevention"} */
 			Type: type,
 			Response: "None",
 			Reason: null,
