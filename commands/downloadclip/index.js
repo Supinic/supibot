@@ -36,7 +36,7 @@ module.exports = {
 				reply: "Invalid slug format provided!"
 			};
 		}
-		if (response.statusCode === 404) {
+		else if (!response.ok) {
 			return {
 				success: false,
 				reply: "No data found for given slug!"
