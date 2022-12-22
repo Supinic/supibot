@@ -17,12 +17,19 @@ module.exports = {
 		}
 
 		const twitchPlatform = sb.Platform.get("twitch");
-		const { controller } = twitchPlatform;
-
 		const userLookupResponse = await sb.Got("Helix", {
 			url: "users",
-			searchParams: { login: target }
+			searchParams: {
+				login: sb.User.normalizeUsername(target.trim())
+			}
 		});
+		
+		if (!Array.isArray(userLookupResponse.body.data)) {
+			return {
+				success: false,
+				reply: `Your provided username is not valid!`
+			};
+		}
 
 		const [helixUserData] = userLookupResponse.body.data;
 		if (!helixUserData) {
