@@ -154,14 +154,14 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 					this.lastSeenRunning = true;
 
 					const data = [];
-					for (const [channelData, userMap] of this.lastSeen) {
-						for (const [userData, { count, date, message }] of userMap) {
+					for (const [channelID, userMap] of this.lastSeen) {
+						for (const [userID, { count, date, message }] of userMap) {
 							data.push({
 								count,
-								channel: channelData.ID,
+								channel: channelID,
 								date,
 								message,
-								user: userData.ID
+								user: userID
 							});
 						}
 
