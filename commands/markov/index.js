@@ -117,7 +117,7 @@ module.exports = {
 						? await this.execute(fakeContext, lastWord)
 						: await this.execute(fakeContext);
 
-					if (!commandResult.success) {
+					if (commandResult.success === false) {
 						return commandResult;
 					}
 
