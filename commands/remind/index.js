@@ -139,7 +139,7 @@ module.exports = {
 				chronoValue += ` ${timezoneAbbreviation}`;
 
 				referenceDate = new sb.Date();
-				referenceDate.setTimezoneOffset((timeData.rawOffset + timeData.dstOffset) / 60);
+				referenceDate.setTimezoneOffset((timeData.rawOffset + timeData.dstOffset + date.getTimezoneOffset()) / 60);
 			}
 
 			const chronoData = sb.Utils.parseChrono(chronoValue, referenceDate, { forwardDate: true });
