@@ -48,8 +48,14 @@ module.exports = {
 		}
 
 		const { segments: rawSegments, vacation } = response.body.data;
-		const segments = rawSegments.filter(i => !i.canceled_until);
+		if (!rawSegments) {
+			return {
+				success: false,
+				reply: `Provided user does not have a schedule set up anymore!`
+			};
+		}
 
+		const segments = rawSegments.filter(i => !i.canceled_until);
 		if (!Array.isArray(segments) || segments.length === 0) {
 			return {
 				success: false,
