@@ -247,7 +247,7 @@ module.exports = {
 
 		return [
 			`Uses a <a href="//en.wikipedia.org/wiki/Markov_model">Markov model</a> to generate "real-looking" sentences based on Twitch chat.`,
-			"Multiple channels can be supported, the command currently uses @Forsen's channel by default if no channel is provided.",
+			"Various channel are supported, and the command currently uses @Forsen's channel by default if no channel is provided.",
 			`The model is not available until ${threshold} unique words have been added to it!`,
 			"",
 
