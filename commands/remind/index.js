@@ -135,8 +135,13 @@ module.exports = {
 					};
 				}
 
-				const timezoneAbbreviation = timeData.timeZoneName.replace(/[^A-Z]/g, "");
-				chronoValue += ` ${timezoneAbbreviation}`;
+				const totalOffset = (timeData.rawOffset + timeData.dstOffset);
+				const symbol = (totalOffset >= 0 ? "+" : "-");
+				const hours = Math.trunc(Math.abs(totalOffset) / 3600);
+				const minutes = sb.Utils.zf((Math.abs(totalOffset) % 3600) / 60, 2);
+				const prettyOffset = `${symbol}${hours}:${minutes}`;
+
+				chronoValue += ` UTC${prettyOffset}`;
 
 				referenceDate = new sb.Date();
 				referenceDate.setTimezoneOffset(((timeData.rawOffset + timeData.dstOffset) / 60) + date.getTimezoneOffset());
