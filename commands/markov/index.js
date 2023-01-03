@@ -121,6 +121,12 @@ module.exports = {
 						return commandResult;
 					}
 
+					// Remove the last word, if available. Otherwise, the word will be duplicated across the commands'
+					// results, since it is a "boundary" between the channels' markov chains.
+					if (lastWord) {
+						results.splice(results.length - 1, 1);
+					}
+
 					const string = commandResult.reply.replace("🔮", "").split(/\s+/);
 					results.push(...string);
 				}
