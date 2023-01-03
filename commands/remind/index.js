@@ -113,19 +113,14 @@ module.exports = {
 				.replaceAll(/(\b|\d)m(\b|\d)/g, "$1min$2")
 				.replaceAll(/(\b|\d)s(\b|\d)/g, "$1sec$2");
 
-			const chronoData = sb.Utils.parseChrono(chronoValue, null, { forwardDate: true });
-			if (!chronoData) {
-				return {
-					success: false,
-					reply: "Invalid time provided!"
-				};
-			}
-
+			const preCheckChronoData = sb.Utils.parseChrono(chronoValue);
 			const location = await context.user.getDataProperty("location");
-			const isRelative = (Object.keys(chronoData.component.knownValues).length === 0);
-			const explicitTimezone = (typeof chronoData.component.knownValues.timezoneOffset === "number");
-			if (location && !isRelative && !explicitTimezone && chronoType !== "after") {
-				const date = chronoData.component.date();
+			const hasExplicitTimezone = (typeof preCheckChronoData.component.knownValues.timezoneOffset === "number");
+			const isRelative = (Object.keys(preCheckChronoData.component.knownValues).length === 0);
+			let referenceDate = null;
+
+			if (!hasExplicitTimezone && !isRelative && location && chronoType !== "after") {
+				const date = preCheckChronoData.component.date();
 				const response = await sb.Utils.fetchTimeData({
 					date,
 					coordinates: location.coordinates,
@@ -140,13 +135,22 @@ module.exports = {
 					};
 				}
 
-				const secondsOffset = (timeData.rawOffset + timeData.dstOffset);
-				chronoData.component.assign("timezoneOffset", secondsOffset / 60);
-				targetReminderDate = new sb.Date(chronoData.component.date());
+				const timezoneAbbreviation = timeData.timeZoneName.replace(/[^A-Z]/g, "");
+				chronoValue += ` ${timezoneAbbreviation}`;
+
+				referenceDate = new sb.Date();
+				referenceDate.setTimezoneOffset((timeData.rawOffset + timeData.dstOffset) / 60);
 			}
-			else {
-				targetReminderDate = new sb.Date(chronoData.date);
+
+			const chronoData = sb.Utils.parseChrono(chronoValue, referenceDate, { forwardDate: true });
+			if (!chronoData) {
+				return {
+					success: false,
+					reply: "Invalid time provided!"
+				};
 			}
+
+			targetReminderDate = new sb.Date(chronoData.component.date());
 
 			// S#12177
 			// If there is no user-provided day value (e.g. "2 am") and that timestamp has already been passed today,
