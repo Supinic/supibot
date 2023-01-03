@@ -80,7 +80,55 @@ module.exports = {
 
 		let targetChannel;
 		if (context.params.channel) {
-			targetChannel = sb.Channel.get(context.params.channel);
+			/** @type {string} */
+			const channelParameter = context.params.channel;
+			const channelList = channelParameter
+				.split(/\W/)
+				.filter(Boolean)
+				.map(i => sb.Channel.get(i))
+				.filter(Boolean)
+				.filter(i => module.data.markovs?.get(i.ID))
+				.filter((i, ind, arr) => arr.indexOf(i) === ind);
+
+			if (channelList.length === 0) {
+				return {
+					success: false,
+					reply: `No valid channel(s) provided! You can only use those with Markov support enabled.`
+				};
+			}
+			else if (channelList.length === 1) {
+				targetChannel = sb.Channel.get(context.params.channel);
+			}
+			else {
+				const results = [];
+				for (const channel of channelList) {
+					const fakeContext = sb.Command.createFakeContext(this, {
+						user: context.user,
+						platform: context.platform,
+						channel: context.channel,
+						params: {
+							channel: channel.Name,
+							words: Math.floor(limit / channelList.length)
+						}
+					});
+
+					const lastWord = results.at(-1);
+					const commandResult = (lastWord)
+						? await this.execute(fakeContext, lastWord)
+						: await this.execute(fakeContext);
+
+					if (!commandResult.success) {
+						return commandResult;
+					}
+
+					const string = commandResult.reply.replace("🔮", "").split(/\s+/);
+					results.push(...string);
+				}
+
+				return {
+					reply: `🔮 ${results.join(" ")}`
+				};
+			}
 		}
 		else if (context.channel && module.data.markovs?.has(context.channel.ID)) {
 			targetChannel = context.channel;
@@ -258,6 +306,13 @@ module.exports = {
 			`<code>${prefix}markov channel:(channel)</code>`,
 			"Generates words in the specified channel's context.",
 			`List of currently supported channels: <ul>${channelList}</ul>`,
+			"",
+
+			`<code>${prefix}markov channel:(multiple channels)</code>`,
+			`<code>${prefix}markov channel:supinic,forsen,pajlada</code>`,
+			`<code>${prefix}markov channel:"forsen pajlada"</code>`,
+			"Creates a chain of words from multiple channels, combining them together.",
+			"",
 
 			`<code>${prefix}markov dull:true (first word)</code>`,
 			`Generates words, with your chosen word being the "seed", which is the first word in the sequence.`,
