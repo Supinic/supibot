@@ -211,7 +211,23 @@ module.exports = class DiscordController extends require("./template.js") {
 				this.resolveUserMessage(channelData, userData, msg);
 
 				if (channelData.Logging.has("Meta")) {
-					await sb.Logger.updateLastSeen({ channelData, userData, message: msg });
+					if (!msg) {
+						const obj = {
+							channel: channelData.Name,
+							guild: guild.id,
+							message: msg
+						};
+
+						await sb.Logger.log(
+							"Discord.Warning",
+							`No message text on Discord: ${JSON.stringify(obj)}`,
+							channelData,
+							userData
+						);
+					}
+					else {
+						await sb.Logger.updateLastSeen({ channelData, userData, message: msg });
+					}
 				}
 				if (this.platform.Logging.messages && channelData.Logging.has("Lines")) {
 					await sb.Logger.push(sb.Utils.wrapString(msg, this.platform.Message_Limit), userData, channelData);
