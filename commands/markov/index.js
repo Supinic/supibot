@@ -108,7 +108,7 @@ module.exports = {
 						channel: context.channel,
 						params: {
 							channel: channel.Name,
-							words: Math.floor(limit / channelList.length)
+							words: Math.floor(2 * limit / channelList.length)
 						}
 					});
 
