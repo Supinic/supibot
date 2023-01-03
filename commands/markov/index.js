@@ -100,7 +100,7 @@ module.exports = {
 				targetChannel = sb.Channel.get(context.params.channel);
 			}
 			else {
-				const results = [];
+				const results = [input].filter(Boolean);
 				for (const channel of channelList) {
 					const fakeContext = sb.Command.createFakeContext(this, {
 						user: context.user,
