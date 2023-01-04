@@ -168,18 +168,14 @@ module.exports = {
 					ratio = (second === "USD") ? (1 / dollarExchangeRate) : dollarExchangeRate;
 				}
 				else {
-					const convertKey = `USD_${otherCurrency}`;
-					const response = await sb.Got("GenericAPI", {
-						url: "https://free.currconv.com/api/v7/convert",
-						searchParams: {
-							/** @type {string} */
-							apiKey: sb.Config.get("API_FREE_CURRENCY_CONVERTER"),
-							q: convertKey,
-							compact: "y"
-						}
-					});
+					const otherCurrencyRatio = data[otherCurrency];
+					if (!otherCurrencyRatio) {
+						return {
+							success: false,
+							reply: `Currency code not recognized! ${otherCurrency}`
+						};
+					}
 
-					const otherCurrencyRatio = response.body[convertKey].val;
 					ratio = (first === "IRR")
 						? (otherCurrencyRatio / dollarExchangeRate)
 						: (dollarExchangeRate / otherCurrencyRatio);
