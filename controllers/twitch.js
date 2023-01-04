@@ -82,8 +82,6 @@ module.exports = class TwitchController extends require("./template.js") {
 			this.client.joinAll(channelList);
 		}
 
-		this.data.updatingPromisesThreshold = 0;
-		this.data.updatingUserIDPromises = 0;
 		this.data.crons = [
 			new sb.Cron({
 				Name: "channels-live-status",
@@ -561,12 +559,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 		else if (userData.Twitch_ID === null && userData.Discord_ID !== null) {
 			if (!this.platform.Data.sendVerificationChallenge) {
-				// No verification challenge - just assume it's correct
-				if (this.data.updatingUserIDPromises < this.data.updatingPromisesThreshold) {
-					this.data.updatingUserIDPromises++;
-					await userData.saveProperty("Twitch_ID", senderUserID);
-					this.data.updatingUserIDPromise--;
-				}
+				await userData.saveProperty("Twitch_ID", senderUserID);
 			}
 			else {
 				if (!message.startsWith(sb.Command.prefix)) {
@@ -590,14 +583,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 		}
 		else if (userData.Twitch_ID === null && userData.Discord_ID === null) {
-			if (this.data.updatingUserIDPromises < this.data.updatingPromisesThreshold) {
-				this.data.updatingUserIDPromises++;
-				await userData.saveProperty("Twitch_ID", senderUserID);
-				this.data.updatingUserIDPromise--;
-			}
-			else {
-				// try again later
-			}
+			await userData.saveProperty("Twitch_ID", senderUserID);
 		}
 		else if (userData.Twitch_ID !== senderUserID) {
 			// Mismatch between senderUserID and userData.Twitch_ID means someone renamed into a different
