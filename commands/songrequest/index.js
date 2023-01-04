@@ -321,7 +321,7 @@ module.exports = {
 			}
 		}
 		else if (parsedURL.host) {
-			if (parsedURL === "clips.twitch.tv") {
+			if (parsedURL.host === "clips.twitch.tv") {
 				// `find(Boolean)` is meant to take the first non-empty string in the resulting split-array
 				const slug = parsedURL.path.split("/").find(Boolean);
 				const response = await sb.Got("Leppunen", `v2/twitch/clip/${slug}`);
