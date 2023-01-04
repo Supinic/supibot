@@ -337,7 +337,7 @@ module.exports = {
 
 				data = {
 					name: clip.title,
-					ID: clip.slug,
+					ID: `https://clips.twitch.tv/${clip.slug}`,
 					link: bestQuality.sourceURL,
 					duration: clip.durationSeconds,
 					videoType: { ID: 19 }
