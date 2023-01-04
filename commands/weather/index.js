@@ -10,7 +10,8 @@ module.exports = {
 		{ name: "format", type: "string" },
 		{ name: "latitude", type: "number" },
 		{ name: "longitude", type: "number" },
-		{ name: "pollution", type: "boolean" }
+		{ name: "pollution", type: "boolean" },
+		{ name: "radar", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
@@ -275,6 +276,21 @@ module.exports = {
 
 			formattedAddress = geoData.formattedAddress;
 			coords = geoData.coords;
+		}
+
+		if (context.params.radar) {
+			if (skipLocation) {
+				return {
+					success: false,
+					reply: `Cannot show the radar for your location, as you have set it to private!`
+				};
+			}
+
+			const lat = coords.lat.toFixed(4);
+			const lng = coords.lng.toFixed(4);
+			return {
+				reply: `Weather radar for ${formattedAddress}: https://www.windy.com/-Weather-radar-radar?radar,${lat},${lng},6,d:picker`
+			};
 		}
 
 		if (context.params.pollution) {
@@ -693,6 +709,10 @@ module.exports = {
 
 			`<code>${prefix}weather (place) pollution:true</code>`,
 			"Posts a summary of the current pollution for the provided location.",
+			"",
+
+			`<code>${prefix}weather (place) radar:true</code>`,
+			"Posts a link to a weather radar for the provided location. Uses Windy.com",
 			"",
 
 			`<code>${prefix}weather (place) format:(custom format)</code>`,
