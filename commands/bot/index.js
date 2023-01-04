@@ -302,7 +302,11 @@ module.exports = {
 				if (inactiveReason === "bot-banned") {
 					if (partFailed || joinFailed) {
 						success = false;
-						resultString = `Could not re-join ${channelString} - make sure I'm unbanned first! Then try this command again.`;
+						resultString = sb.Utils.tag.trim `
+							Could not re-join ${channelString} - make sure I'm unbanned first!
+							Sometimes, Twitch takes several minutes to catch up, so wait ~5 minutes if this still doesn't work.
+							Then try this command again.
+						`;
 					}
 					else {
 						resultString = `Tried to re-join ${channelString} - it was probably successful. Make sure I respond to commands, and if not, try this command again in a little bit.`;
