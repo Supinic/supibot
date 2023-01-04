@@ -399,15 +399,6 @@ module.exports = class DiscordController extends require("./template.js") {
 					message = message.replace(regex, emote.toString());
 				}
 			}
-
-			const guildUsers = await channelObject.guild.members.fetch();
-			const sortedUsers = [...guildUsers.values()].sort((a, b) => b.user.username.length - a.user.username.length);
-			for (const member of sortedUsers) {
-				const name = sb.User.normalizeUsername(member.user.username);
-				const regex = new RegExp(`(\\s|^)@${sb.Utils.escapeRegExp(name)}\\b`, "gi");
-
-				message = message.replace(regex, `$1<@${member.user.id}>`);
-			}
 		}
 
 		let sendTarget;
