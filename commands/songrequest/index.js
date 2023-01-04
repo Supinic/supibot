@@ -321,17 +321,41 @@ module.exports = {
 			}
 		}
 		else if (parsedURL.host) {
-			const meta = await sb.Utils.getMediaFileData(url);
-			if (meta?.duration) {
-				const name = decodeURIComponent(parsedURL.path.split("/").pop());
-				const encoded = encodeURI(decodeURI(url));
+			if (parsedURL === "clips.twitch.tv") {
+				// `find(Boolean)` is meant to take the first non-empty string in the resulting split-array
+				const slug = parsedURL.path.split("/").find(Boolean);
+				const response = await sb.Got("Leppunen", `v2/twitch/clip/${slug}`);
+				if (!response.ok) {
+					return {
+						success: false,
+						reply: "Invalid Twitch clip provided!"
+					};
+				}
+
+				const { clip } = response.body;
+				const [bestQuality] = clip.videoQualities.sort((a, b) => Number(b.quality) - Number(a.quality));
+
 				data = {
-					name,
-					ID: encoded,
-					link: encoded,
-					duration: meta.duration,
+					name: clip.title,
+					ID: clip.slug,
+					link: bestQuality.sourceURL,
+					duration: clip.durationSeconds,
 					videoType: { ID: 19 }
 				};
+			}
+			else {
+				const meta = await sb.Utils.getMediaFileData(url);
+				if (meta?.duration) {
+					const name = decodeURIComponent(parsedURL.path.split("/").pop());
+					const encoded = encodeURI(decodeURI(url));
+					data = {
+						name,
+						ID: encoded,
+						link: encoded,
+						duration: meta.duration,
+						videoType: { ID: 19 }
+					};
+				}
 			}
 		}
 
