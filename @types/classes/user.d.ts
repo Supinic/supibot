@@ -20,8 +20,8 @@ export declare namespace Permissions {
 export declare type Like = string | number | User;
 
 declare type UserGetOptions = {
-    Discord_ID?: string;
-    Twitch_ID?: string;
+    Discord_ID?: string | null;
+    Twitch_ID?: string | null;
 };
 
 export declare class User extends ClassTemplate {
@@ -34,7 +34,7 @@ export declare class User extends ClassTemplate {
     static readonly mapCacheExpiration: number;
     static readonly redisCacheExpiration: number;
 
-    static add (name: string): Promise<User>;
+    static add (name: string, properties?: UserGetOptions): Promise<User>;
     static get (identifier: Like, strict?: boolean, options?: UserGetOptions): Promise<User|null>;
     static getMultiple (identifier: Like[]): Promise<User[]>;
     static getByProperty (property: string, identifier: any): User;

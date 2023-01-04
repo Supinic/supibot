@@ -7,7 +7,6 @@ module.exports = class User extends require("./template.js") {
 	static redisCacheExpiration = 3_600_000;
 	static mapExpirationInterval = setInterval(() => User.data.clear(), User.mapCacheExpiration);
 
-	static pendingNewUsers = new Set();
 	static data = new Map();
 	static bots = new Map();
 
@@ -153,23 +152,6 @@ module.exports = class User extends require("./template.js") {
 	static async initialize () {
 		User.bots = new Map();
 		User.data = new Map();
-		User.pendingNewUsers = new Set();
-
-		User.insertBatch = await sb.Query.getBatch(
-			"chat_data",
-			"User_Alias",
-			["Name", "Discord_ID", "Twitch_ID"]
-		);
-
-		User.insertCron = new sb.Cron({
-			Name: "log-user-cron",
-			Expression: sb.Config.get("LOG_USER_CRON"),
-			Code: async () => {
-				await User.insertBatch.insert({ ignore: true });
-				User.pendingNewUsers.clear();
-			}
-		});
-		User.insertCron.start();
 
 		await User.loadData();
 		return User;
@@ -265,31 +247,24 @@ module.exports = class User extends require("./template.js") {
 				.single()
 			);
 
+			let userData;
 			if (dbUserData) {
-				const user = new User(dbUserData);
-				await User.populateCaches(user);
-
-				return user;
+				userData = new User(dbUserData);
 			}
+			// 4. If strict mode is off, create the user and return the instance immediately
+			else if (!strict) {
+				userData = await User.add(username, {
+					Discord_ID: options.Discord_ID ?? null,
+					Twitch_ID: options.Twitch_ID ?? null
+				});
+			}
+			// 5. If strict mode is on and the user does not exist, return null and exit
 			else {
-				// 4. Create the user, if strict mode is off
-				if (!strict && !User.pendingNewUsers.has(username)) {
-					User.pendingNewUsers.add(username);
-					User.insertBatch.add({
-						Name: username,
-						Discord_ID: options.Discord_ID ?? null,
-						Twitch_ID: options.Twitch_ID ?? null
-					});
-
-					// Returns null, which should usually abort working with user's message.
-					// We lose a couple of messages from a brand new user, but this is an acceptable measure
-					// in order to reduce the amount of user-insert db connections.
-					return null;
-				}
-
-				// No cache hits, user does not exist - return null
 				return null;
 			}
+
+			await User.populateCaches(userData);
+			return userData;
 		}
 		else {
 			throw new sb.Error({
@@ -426,9 +401,10 @@ module.exports = class User extends require("./template.js") {
 	/**
 	 * Adds a new user to the database.
 	 * @param {string} name
+	 * @param {Object} properties
 	 * @returns {Promise<User>}
 	 */
-	static async add (name) {
+	static async add (name, properties = {}) {
 		const preparedName = User.normalizeUsername(name);
 		const exists = await sb.Query.getRecordset(rs => rs
 			.select("Name")
@@ -444,6 +420,14 @@ module.exports = class User extends require("./template.js") {
 
 		const row = await sb.Query.getRow("chat_data", "User_Alias");
 		row.values.Name = preparedName;
+
+		if (properties.Twitch_ID) {
+			row.values.Twitch_ID = properties.Twitch_ID;
+		}
+		if (properties.Discord_ID) {
+			row.values.Discord_ID = properties.Discord_ID;
+		}
+
 		await row.save();
 
 		const user = new User(row.valuesObject);
