@@ -332,13 +332,13 @@ module.exports = {
 					};
 				}
 
-				const { clip } = response.body;
+				const { clip, clipKey = "" } = response.body;
 				const [bestQuality] = clip.videoQualities.sort((a, b) => Number(b.quality) - Number(a.quality));
 
 				data = {
 					name: clip.title,
 					ID: `https://clips.twitch.tv/${clip.slug}`,
-					link: bestQuality.sourceURL,
+					link: `${bestQuality.sourceURL}${clipKey}`,
 					duration: clip.durationSeconds,
 					videoType: { ID: 19 }
 				};
