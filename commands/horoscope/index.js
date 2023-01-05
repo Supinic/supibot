@@ -19,10 +19,10 @@ module.exports = {
 				zodiacName = inputZodiacName;
 			}
 			else {
-				const prettyNames = zodiacNames.sort().map(i => sb.Utils.capitalize(i));
 				return {
 					success: false,
-					reply: `Invalid zodiac sign provided! Use one of: ${prettyNames.join(", ")}`
+					reply: `Invalid zodiac sign provided! Either use a valid one, or you can set up your birthday with "${sb.Command.prefix}set birthday (birthday)" to automatically use your zodiac sign.`,
+					cooldown: { length: 2500 }
 				};
 			}
 		}
@@ -31,7 +31,7 @@ module.exports = {
 			if (!birthdayData) {
 				return {
 					success: false,
-					reply: `You don't have a birthday set up! Use "${sb.Command.prefix}set birthday (birthday)" command first.`,
+					reply: `You don't have a birthday set up! Either set up your birthday with "${sb.Command.prefix}set birthday (birthday)" to automatically use your zodiac sign, or use a zodiac sign directly.`,
 					cooldown: { length: 2500 }
 				};
 			}
