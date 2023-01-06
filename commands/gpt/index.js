@@ -1,6 +1,6 @@
 module.exports = {
-	Name: "chatgpt",
-	Aliases: ["gpt"],
+	Name: "gpt",
+	Aliases: ["chatgpt"],
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Posts a random, hilarious joke, 100% guaranteed.",
