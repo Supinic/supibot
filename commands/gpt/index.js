@@ -3,10 +3,10 @@ module.exports = {
 	Aliases: ["chatgpt"],
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Posts a random, hilarious joke, 100% guaranteed.",
+	Description: "Queries ChatGPT for a text response",
 	Flags: ["mention","non-nullable","pipe","whitelist"],
 	Params: null,
-	Whitelist_Response: "Currently only available in @Supinic 's channel - testing!",
+	Whitelist_Response: "Currently only available in these channels for testing: @Supinic @Supibot",
 	Static_Data: null,
 	Code: (async function chatGPT (context, ...args) {
 		const { messageLimit } = require("./config.json");
