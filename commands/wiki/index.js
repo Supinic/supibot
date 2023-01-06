@@ -120,7 +120,7 @@ module.exports = {
 
 			const { extract, title } = data[key];
 			return {
-				reply: `${link} ${title}: ${sb.Utils.wrapString(extract, 1000)}`
+				reply: `${link} ${title}: ${sb.Utils.wrapString(extract, 500)}`
 			};
 		}
 	}),
