@@ -114,12 +114,19 @@ module.exports = {
 				.replaceAll(/(\b|\d)s(\b|\d)/g, "$1sec$2");
 
 			const preCheckChronoData = sb.Utils.parseChrono(chronoValue);
+			if (!preCheckChronoData) {
+				return {
+					success: false,
+					reply: "Invalid time provided!"
+				};
+			}
+
 			const location = await context.user.getDataProperty("location");
 			const hasExplicitTimezone = (typeof preCheckChronoData.component.knownValues.timezoneOffset === "number");
 			const isRelative = (Object.keys(preCheckChronoData.component.knownValues).length === 0);
 			let referenceDate = null;
 
-			if (!hasExplicitTimezone && !isRelative && location && chronoType !== "after") {
+			if (!hasExplicitTimezone && !isRelative && location) {
 				const date = preCheckChronoData.component.date();
 				const response = await sb.Utils.fetchTimeData({
 					date,
