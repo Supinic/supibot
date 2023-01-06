@@ -6,7 +6,7 @@ module.exports = {
 	Description: "Queries ChatGPT for a text response",
 	Flags: ["mention","non-nullable","pipe","whitelist"],
 	Params: null,
-	Whitelist_Response: "Currently only available in these channels for testing: @Supinic @Supibot",
+	Whitelist_Response: "Currently only available in these channels for testing: @pajlada @Supinic @Supibot",
 	Static_Data: null,
 	Code: (async function chatGPT (context, ...args) {
 		const { messageLimit } = require("./config.json");
