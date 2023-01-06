@@ -89,7 +89,7 @@ module.exports = {
 				title: item.Type,
 				url: `https://supinic.com/data/changelog/detail/${item.ID}`,
 				description: `<@&${discordUpdatesRole}>`,
-				timestamp: new sb.Date(item.Created).format("Y-m-d"),
+				timestamp: new sb.Date(item.Created).format("Y-m-d H:i:s"),
 				fields: [
 					{
 						name: "Title",
