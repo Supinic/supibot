@@ -154,7 +154,7 @@ module.exports = {
 				referenceDate.setTimezoneOffset((timeData.rawOffset + timeData.dstOffset) / 60);
 			}
 
-			const chronoData = sb.Utils.parseChrono(chronoValue, referenceDate, { forwardDate: true });
+			const chronoData = sb.Utils.parseChrono(chronoValue, referenceDate, { forwardDate: false });
 			if (!chronoData) {
 				return {
 					success: false,
