@@ -473,7 +473,7 @@ module.exports = {
 		let bonusString = "";
 		const bonusLimit = await context.user.getDataProperty("supinicStreamSongRequestExtension") ?? 0;
 		if ((limits.totalTime + segmentLength) > limits.time) {
-			const excess = (limits.totalTime + segmentLength) - limits.time;
+			const excess = sb.Utils.round((limits.totalTime + segmentLength) - limits.time, 1);
 			if (excess > bonusLimit) {
 				return {
 					success: false,
@@ -484,7 +484,7 @@ module.exports = {
 				};
 			}
 			else {
-				const remainingBonus = bonusLimit - excess;
+				const remainingBonus = sb.Utils.round(bonusLimit - excess, 1);
 				await context.user.setDataProperty("supinicStreamSongRequestExtension", remainingBonus);
 				bonusString = `Used up ${excess} seconds from your extension, ${remainingBonus} remaining.`;
 			}
