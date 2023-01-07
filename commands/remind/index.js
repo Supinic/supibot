@@ -107,7 +107,7 @@ module.exports = {
 
 		const now = new sb.Date();
 		if (chronoParam) {
-			let chronoValue = (chronoType === "after") ? `in ${chronoParam}` : chronoParam;
+			let chronoValue = (chronoType === "after" && !chronoParam.includes(":")) ? `in ${chronoParam}` : chronoParam;
 			chronoValue = chronoValue
 				.replaceAll(/(\b|\d)hr(\b|\d)/g, "$1hr$2")
 				.replaceAll(/(\b|\d)m(\b|\d)/g, "$1min$2")
