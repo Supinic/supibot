@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 30000,
 	Description: "Queries ChatGPT for a text response",
 	Flags: ["mention","non-nullable","pipe","whitelist"],
-	Params: null,
+	Params: [
+		{ name: "temperature", type: "number" }
+	],
 	Whitelist_Response: "Currently only available in these channels for testing: @pajlada @Supinic @Supibot",
 	Static_Data: null,
 	Code: (async function chatGPT (context, ...args) {
@@ -26,7 +28,15 @@ module.exports = {
 			};
 		}
 
-		const prompt = `User: ${query}\nSupibot: `;
+		const { temperature } = context.params;
+		if (typeof temperature === "number" && (temperature < 0 || temperature > 1)) {
+			return {
+				success: false,
+				reply: `Your provided temperature is outside of the valid range! Use a value between 0 and 1.`
+			};
+		}
+
+		const prompt = `Query: ${query}\nAnswer: `;
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
 			url: "https://api.openai.com/v1/engines/text-babbage-001/completions",
@@ -36,9 +46,9 @@ module.exports = {
 			json: {
 				prompt,
 				max_tokens: 100,
-				temperature: Math.random(),
-				top_p: Math.random(),
-				frequency_penalty: Math.random(),
+				temperature: temperature ?? sb.Utils.random(0.5, 1),
+				top_p: sb.Utils.random(0.5, 1),
+				frequency_penalty: 0,
 				presence_penalty: 0,
 				user: context.user.Name
 			}
