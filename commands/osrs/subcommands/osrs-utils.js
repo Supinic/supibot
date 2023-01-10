@@ -4,13 +4,9 @@ module.exports = {
 	 * @param options
 	 */
 	fetch: async (user, options = {}) => {
-		let key;
-		if (options.seasonal) {
-			key = { user, seasonal: true };
-		}
-		else {
-			key = { user };
-		}
+		const key = (options.seasonal)
+			? `osrs-user-data-${user}`
+			: `osrs-user-data-${user}-seasonal`;
 
 		let data = (options.force)
 			? null
