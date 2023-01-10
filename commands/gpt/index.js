@@ -24,7 +24,7 @@ module.exports = {
 
 		const { model = "curie" } = context.params;
 		if (!ChatGptConfig.models[model]) {
-			const names = Object.keys(ChatGptConfig.models).map(i => i.name).join(", ");
+			const names = Object.keys(ChatGptConfig.models).sort().join(", ");
 			return {
 				success: false,
 				reply: `Invalid ChatGPT model supported! Use one of: ${names}`
