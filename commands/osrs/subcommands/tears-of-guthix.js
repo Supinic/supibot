@@ -78,16 +78,18 @@ module.exports = {
 			};
 		}
 
-		const idealWorlds = worlds.filter(i => i.stream_order === "gggbbb");
-		const worldsData = await fetchWorldLocations();
-
 		let string;
+		const worldsData = await fetchWorldLocations();
+		const idealWorlds = worlds
+			.filter(i => i.stream_order === "gggbbb")
+			.sort((a, b) => b.hits - a.hits);
+
 		if (worldsData) {
 			string = idealWorlds.map(i => {
 				const country = worldsData[i.world_number];
 				const emoji = country?.flagEmoji ?? "";
 
-				return `${emoji} W${i.world_number} (${i.hits} hits)`;
+				return `${emoji} W${i.world_number} (${i.hits} votes)`;
 			}).join(", ");
 		}
 		else {
