@@ -18,7 +18,7 @@ const fetchWorldLocations = async function () {
 		}
 
 		const $ = sb.Utils.cheerio(response.body);
-		const rows = $("tr.server-list__row-cell");
+		const rows = $("tr.server-list__row");
 		const worlds = {};
 
 		for (const row of rows) {
