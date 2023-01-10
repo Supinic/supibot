@@ -3,15 +3,16 @@ module.exports = {
 	Aliases: ["chatgpt"],
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Queries ChatGPT for a text response",
+	Description: "Queries ChatGPT for a text response. Still being beta-tested! Coming to a chat near you, soon ™",
 	Flags: ["mention","non-nullable","pipe","whitelist"],
 	Params: [
+		{ name: "model", type: "string" },
 		{ name: "temperature", type: "number" }
 	],
 	Whitelist_Response: "Currently only available in these channels for testing: @pajlada @Supinic @Supibot",
 	Static_Data: null,
 	Code: (async function chatGPT (context, ...args) {
-		const { messageLimit } = require("./config.json");
+		const ChatGptConfig = require("./config.json");
 		const query = args.join(" ");
 		if (!query) {
 			return {
@@ -20,10 +21,28 @@ module.exports = {
 				cooldown: 2500
 			};
 		}
-		else if (query.length >= messageLimit) {
+
+		const { model = "curie" } = context.params;
+		if (!ChatGptConfig.models[model]) {
+			const names = Object.keys(ChatGptConfig.models).map(i => i.name).join(", ");
 			return {
 				success: false,
-				reply: `Maximum message length exceeded! (${query.length}/${messageLimit})`,
+				reply: `Invalid ChatGPT model supported! Use one of: ${names}`
+			};
+		}
+
+		const modelData = ChatGptConfig.models[model];
+		if (typeof modelData.inputLimit === "number" && query.length > modelData.inputLimit) {
+			return {
+				success: false,
+				reply: `Maximum message length exceeded! (${query.length}/${modelData.inputLimit})`,
+				cooldown: 2500
+			};
+		}
+		else if (query.length > ChatGptConfig.globalInputLimit) {
+			return {
+				success: false,
+				reply: `Maximum message length exceeded! (${query.length}/${ChatGptConfig.globalInputLimit})`,
 				cooldown: 2500
 			};
 		}
@@ -39,15 +58,15 @@ module.exports = {
 		const prompt = `Query: ${query}\nAnswer: `;
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
-			url: "https://api.openai.com/v1/engines/text-babbage-001/completions",
+			url: `https://api.openai.com/v1/engines/${modelData.url}/completions`,
 			headers: {
 				Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
 			},
 			json: {
 				prompt,
-				max_tokens: 100,
-				temperature: temperature ?? sb.Utils.random(0.5, 1),
-				top_p: sb.Utils.random(0.5, 1),
+				max_tokens: modelData.outputLimit ?? ChatGptConfig.globalOutputLimit,
+				temperature: temperature ?? 0.75,
+				top_p: 1,
 				frequency_penalty: 0,
 				presence_penalty: 0,
 				user: context.user.Name
@@ -81,5 +100,7 @@ module.exports = {
 			reply: `🤖 ${chatResponse.text.trim()}`
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async () => ([
+		"Currently being beta-tested! Coming to a chat near you, soon ™"
+	]))
 };

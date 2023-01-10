@@ -1,3 +1,30 @@
 {
-  "messageLimit": 500
+  "globalInputLimit": 500,
+  "globalOutputLimit": 100,
+  "models": {
+    "ada": {
+      "url": "text-ada-001",
+      "inputLimit": 500,
+      "outputLimit": 100,
+      "default": false
+    },
+    "babbage": {
+      "url": "text-babbage-001",
+      "inputLimit": 500,
+      "outputLimit": 100,
+      "default": false
+    },
+    "curie": {
+      "url": "text-curie-001",
+      "inputLimit": 500,
+      "outputLimit": 100,
+      "default": true
+    },
+    "davinci": {
+      "url": "text-davinci-003",
+      "inputLimit": 150,
+      "outputLimit": 75,
+      "default": false
+    }
+  }
 }
