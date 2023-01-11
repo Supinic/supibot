@@ -101,6 +101,7 @@ module.exports = {
 		}
 
 		let vodString = "";
+		let vodEnd;
 		const [stream] = streamResponse.body.data;
 
 		const vodResponse = await sb.Got("Helix", {
@@ -136,11 +137,13 @@ module.exports = {
 
 			/** @type {HelixVideo | undefined} */
 			const data = vod.data[0];
+			const vodDurationSeconds = sb.Utils.parseDuration(data.duration, { target: "sec" });
 			vodTitle = data.title;
+			vodEnd = new sb.Date(data.created_at).addMilliseconds(vodDurationSeconds);
 
 			if (stream) {
 				const offset = 90; // Implicitly offset the VOD by several seconds, to account for inaccuracies
-				const stamp = sb.Utils.parseDuration(data.duration, { target: "sec" }) - offset;
+				const stamp = vodDurationSeconds - offset;
 				vodString = `${data.url}?t=${(stamp < 0) ? 0 : stamp}s`;
 			}
 			else {
@@ -176,9 +179,18 @@ module.exports = {
 			}
 
 			const start = new sb.Date(lastBroadcast.startedAt);
+			if (vodString) {
+				// If the difference between the VOD being created and end of stream is > 1 hour, assume this is
+				// not the correct VOD link and potentiallya random highlight video, or something else.
+				// In that case, delete the value of `vodString` so the URL does not appear.
+				const difference = Math.abs(start.valueOf() - vodEnd.valueOf());
+				if (difference > 3_600_000) {
+					vodString = "";
+				}
+			}
+
 			const title = vodTitle ?? lastBroadcast.title ?? "(no title)";
 			const delta = sb.Utils.timeDelta(start);
-
 			return {
 				reply: `Channel is ${status} - last streamed ${delta} - title: ${title} ${vodString}`
 			};
