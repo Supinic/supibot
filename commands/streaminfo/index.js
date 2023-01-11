@@ -139,7 +139,7 @@ module.exports = {
 			const data = vod.data[0];
 			const vodDurationSeconds = sb.Utils.parseDuration(data.duration, { target: "sec" });
 			vodTitle = data.title;
-			vodEnd = new sb.Date(data.created_at).addMilliseconds(vodDurationSeconds);
+			vodEnd = new sb.Date(data.created_at).addSeconds(vodDurationSeconds);
 
 			if (stream) {
 				const offset = 90; // Implicitly offset the VOD by several seconds, to account for inaccuracies
