@@ -130,19 +130,16 @@ module.exports = (command) => [
 		aliases: ["chat-gpt", "gpt"],
 		description: "Posts a summary of how much USD has been spent on the $gpt command in the current month.",
 		execute: async () => {
-			const startDate = new sb.Date().setDate(1).format("Y-m-d");
-			const endDate = new sb.Date()
-				.addMonths(1)
-				.addDays(-1)
-				.setDate(1)
-				.format("Y-m-d");
+			// `Date.prototype.setDate` returns a number (!)
+			const startDate = new sb.Date().setDate(1);
+			const endDate = new sb.Date().addMonths(1).addDays(-1).setDate(1);
 
 			const response = await sb.Got("GenericAPI", {
 				method: "GET",
 				url: `https://api.openai.com/v1/usage`,
 				searchParams: {
-					start_date: startDate,
-					end_date: endDate
+					start_date: new sb.Date(startDate).format("Y-m-d"),
+					end_date: new sb.Date(endDate).format("Y-m-d")
 				},
 				headers: {
 					Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
