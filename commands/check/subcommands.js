@@ -149,7 +149,7 @@ module.exports = (command) => [
 			let requests = 0;
 			let inputTokens = 0;
 			let outputTokens = 0;
-			const total = sb.Utils.round(response.body.data.current_usage_usd * 100, 3);
+			const total = sb.Utils.round(response.body.current_usage_usd * 100, 3);
 			const prettyMonthName = new sb.Date().format("F Y");
 
 			for (const row of response.body.data) {
@@ -160,8 +160,8 @@ module.exports = (command) => [
 
 			return {
 				reply: sb.Utils.tag.trim `
-					So far, there have been ${requests} ChatGPT requests in ${prettyMonthName}. 
-					${inputTokens} input and ${outputTokens} output tokens have been processed,
+					So far, there have been ${sb.Utils.groupDigits(requests)} ChatGPT requests in ${prettyMonthName}. 
+					${sb.Utils.groupDigits(inputTokens)} input and ${sb.Utils.groupDigits(outputTokens)} output tokens have been processed,
 					for a total expenditure of $${total}.
 				`
 			};
