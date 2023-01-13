@@ -149,7 +149,7 @@ module.exports = (command) => [
 			let requests = 0;
 			let inputTokens = 0;
 			let outputTokens = 0;
-			const total = sb.Utils.round(response.body.current_usage_usd * 100, 3);
+			const total = sb.Utils.round(response.body.current_usage_usd, 3);
 			const prettyMonthName = new sb.Date().format("F Y");
 
 			for (const row of response.body.data) {
