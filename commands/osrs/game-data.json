@@ -43,6 +43,7 @@
     "nightmare",
     "phosani's nightmare",
     "obor",
+    "phantom muspah",
     "sarachnis",
     "scorpia",
     "skotizo",
@@ -100,7 +101,9 @@
     "zuk": "tzkal-zuk",
     "inferno": "tzkal-zuk",
     "jad": "tztok-jad",
-    "vetion": "vet'ion"
+    "vetion": "vet'ion",
+    "muspah": "phantom muspah",
+    "phantom": "phantom muspah"
   },
   "skills": [
     {
