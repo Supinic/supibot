@@ -126,6 +126,51 @@ module.exports = (command) => [
 		}
 	},
 	{
+		name: "chatgpt",
+		aliases: ["chat-gpt", "gpt"],
+		description: "Posts a summary of how much USD has been spent on the $gpt command in the current month.",
+		execute: async () => {
+			const startDate = new sb.Date().setDate(1).format("Y-m-d");
+			const endDate = new sb.Date()
+				.addMonths(1)
+				.addDays(-1)
+				.setDate(1)
+				.format("Y-m-d");
+
+			const response = await sb.Got("GenericAPI", {
+				method: "GET",
+				url: `https://api.openai.com/v1/usage`,
+				searchParams: {
+					start_date: startDate,
+					end_date: endDate
+				},
+				headers: {
+					Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
+				}
+			});
+
+			let requests = 0;
+			let inputTokens = 0;
+			let outputTokens = 0;
+			const total = sb.Utils.round(response.body.data.current_usage_usd * 100, 3);
+			const prettyMonthName = new sb.Date().format("F Y");
+
+			for (const row of response.body.data) {
+				requests += row.n_requests;
+				inputTokens += row.n_context_tokens_total;
+				outputTokens += row.n_generated_tokens_total;
+			}
+
+			return {
+				reply: sb.Utils.tag.trim `
+					So far, there have been ${requests} ChatGPT requests in ${prettyMonthName}. 
+					${inputTokens} input and ${outputTokens} output tokens have been processed,
+					for a total expenditure of $${total}.
+				`
+			};
+		}
+	},
+	{
 		name: "cookie",
 		aliases: [],
 		description: "Checks if someone (or you, if not provided) has their fortune cookie available for today.",
