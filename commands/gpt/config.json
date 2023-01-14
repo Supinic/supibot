@@ -1,6 +1,7 @@
 {
   "globalInputLimit": 500,
   "globalOutputLimit": 100,
+  "ignoreLimitChannels": [38],
   "models": {
     "ada": {
       "url": "text-ada-001",
@@ -22,6 +23,8 @@
     },
     "davinci": {
       "url": "text-davinci-003",
+      "publicInputLimit": 50,
+      "publicOutputLimit": 25,
       "inputLimit": 150,
       "outputLimit": 75,
       "default": false

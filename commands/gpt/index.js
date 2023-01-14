@@ -31,18 +31,20 @@ module.exports = {
 			};
 		}
 
+		const isPrivilegedChannel = (ChatGptConfig.ignoreLimitChannels.includes(context.channel.ID));
+		const subscriberList = await sb.Cache.getByPrefix("twitch-subscriber-list-supinic");
+		const isSubscribed = subscriberList.some(i => i.user_id === context.user.Twitch_ID);
 		const modelData = ChatGptConfig.models[model];
-		if (typeof modelData.inputLimit === "number" && query.length > modelData.inputLimit) {
+
+		const modelInputLimit = modelData.inputLimit ?? ChatGptConfig.globalInputLimit;
+		const applicableInputLimit = (isSubscribed || isPrivilegedChannel)
+			? modelInputLimit
+			: modelData.publicInputLimit ?? modelInputLimit;
+
+		if (query.length > applicableInputLimit) {
 			return {
 				success: false,
-				reply: `Maximum message length exceeded! (${query.length}/${modelData.inputLimit})`,
-				cooldown: 2500
-			};
-		}
-		else if (query.length > ChatGptConfig.globalInputLimit) {
-			return {
-				success: false,
-				reply: `Maximum message length exceeded! (${query.length}/${ChatGptConfig.globalInputLimit})`,
+				reply: `Maximum message length exceeded! (${query.length}/${applicableInputLimit})`,
 				cooldown: 2500
 			};
 		}
@@ -55,6 +57,11 @@ module.exports = {
 			};
 		}
 
+		const modelOutputLimit = modelData.outputLimit ?? ChatGptConfig.globalOutputLimit;
+		const applicablOutputLimit = (isSubscribed || isPrivilegedChannel)
+			? modelOutputLimit
+			: modelData.publicOutputLimit ?? modelOutputLimit;
+
 		const prompt = `Query: ${query}\nAnswer: `;
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
@@ -64,7 +71,7 @@ module.exports = {
 			},
 			json: {
 				prompt,
-				max_tokens: modelData.outputLimit ?? ChatGptConfig.globalOutputLimit,
+				max_tokens: applicablOutputLimit,
 				temperature: temperature ?? 0.75,
 				top_p: 1,
 				frequency_penalty: 0,
