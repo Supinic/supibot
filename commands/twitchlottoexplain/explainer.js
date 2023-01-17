@@ -6,7 +6,7 @@ const explainDetections = (data) => {
 	const result = [];
 	for (let i = 0; i < data.detections.length; i++) {
 		const item = data.detections[i];
-		const detectionType = detectionsData.find(i => i.name === item.name);
+		const detectionType = detectionsData.find(i => i.string === item.name);
 		const confidence = sb.Utils.round(item.confidence * 100, 0);
 
 		result.push(`${coloursData[i]}: ${confidence}% ${detectionType.replacement}`);
