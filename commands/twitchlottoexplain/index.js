@@ -1,4 +1,3 @@
-const Explain = require("./explainer");
 module.exports = {
 	Name: "twitchlottoexplain",
 	Aliases: ["tle"],
