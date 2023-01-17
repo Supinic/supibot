@@ -21,7 +21,7 @@ module.exports = {
 
 				const offset = multiplier * (Number(hours) * 60 + numMinutes);
 
-				if (!Number.isFinite(timezone)) {
+				if (!Number.isFinite(offset)) {
 					return {
 						success: false,
 						reply: `Malformed timezone offset provided!`
