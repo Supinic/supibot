@@ -9,14 +9,41 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		detectTimezone: async (...args) => {
-			const place = args.join(" ");
-			const timezone = await sb.Query.getRecordset(rs => rs
-				.select("Abbreviation", "Offset", "Name")
-				.from("data", "Timezone")
-				.where("Abbreviation = %s", place)
-				.limit(1)
-				.single()
-			);
+			let timezone;
+			const query = args.join(" ");
+			const utcRegex = /(UTC|GMT)(?<operator>[+-])(?<hours>\d{1,2})(:?(?<minutes>\d{1,2}))?/i;
+
+			if (utcRegex.test(query)) {
+				const match = query.match(utcRegex);
+				const sign = (match.groups.operator === "-") ? -1 : 1;
+				const minutes = (match.groups.minutes)
+					? (Number(match.groups.minutes) / 60)
+					: 0;
+
+				timezone = sign * (Number(match.groups.hours) + minutes);
+
+				if (!Number.isFinite(timezone)) {
+					return {
+						success: false,
+						reply: `Malformed timezone offset provided!`
+					};
+				}
+				else if (Math.abs(timezone) > 14) {
+					return {
+						success: false,
+						reply: `Maximum timezone offset exceeded!`
+					};
+				}
+			}
+			else {
+				timezone = await sb.Query.getRecordset(rs => rs
+					.select("Abbreviation", "Offset", "Name")
+					.from("data", "Timezone")
+					.where("Abbreviation = %s", query)
+					.limit(1)
+					.single()
+				);
+			}
 
 			if (!timezone) {
 				return null;
@@ -213,6 +240,14 @@ module.exports = {
 
 		`<code>${prefix}time (location)</code>`,
 		"Shows the location's time data.",
+		"",
+
+		`<code>${prefix}time (timezone name)</code>`,
+		`<code>${prefix}time (timezone offset)</code>`,
+		`<code>${prefix}time NZDT</code>`,
+		`<code>${prefix}time GMT-5</code>`,
+		`<code>${prefix}time UTC+4:45</code>`,
+		"Shows the time data for a provided timezone.",
 		"",
 
 		`<code>${prefix}time</code>`,
