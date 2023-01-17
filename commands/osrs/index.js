@@ -33,7 +33,7 @@ module.exports = {
 			subcommand = subcommands.find(i => i.default === true);
 		}
 
-		return await subcommand.call(this, context, ...args);
+		return await subcommand.execute.apply(context, ...args);
 	}),
 	Dynamic_Description: (async function (prefix) {
 		const subcommands = require("./subcommands");
