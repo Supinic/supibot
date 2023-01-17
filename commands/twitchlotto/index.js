@@ -43,7 +43,19 @@ module.exports = {
 			}
 
 			const excludedChannels = excludedInput.split(/\W/).filter(i => this.data.channels.includes(i));
-			const availableChannels = this.data.channels.filter(i => !excludedChannels.includes(i));
+			let availableChannels = this.data.channels.filter(i => !excludedChannels.includes(i));
+
+			if (context.params.forceUnscored) {
+				const eligibleChannels = await sb.Query.getRecordset(rs => rs
+					.select("LOWER(Name) AS Name")
+					.from("data", "Twitch_Lotto_Channel")
+					.where("Amount <= Scored")
+					.flat("Name")
+				);
+
+				availableChannels = availableChannels.filter(i => eligibleChannels.includes(i));
+			}
+
 			if (availableChannels.length === 0) {
 				return {
 					success: false,
@@ -59,13 +71,24 @@ module.exports = {
 
 			if (channel === "random") {
 				randomRoll = true;
-				channel = sb.Utils.randArray(this.data.channels);
+
+				let eligibleChannels = this.data.channels;
+				if (context.params.forceUnscored) {
+					eligibleChannels = await sb.Query.getRecordset(rs => rs
+						.select("LOWER(Name) AS Name")
+						.from("data", "Twitch_Lotto_Channel")
+						.where("Amount <= Scored")
+						.flat("Name")
+					);
+				}
+
+				channel = sb.Utils.randArray(eligibleChannels);
 			}
 
 			if (!this.data.channels.includes(channel)) {
 				return {
 					success: false,
-					reply: "The channel you provided has no images saved!"
+					reply: "This channel is not currently supported!"
 				};
 			}
 		}
