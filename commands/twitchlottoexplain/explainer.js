@@ -7,9 +7,10 @@ const explainDetections = (data) => {
 	for (let i = 0; i < data.detections.length; i++) {
 		const item = data.detections[i];
 		const detectionType = detectionsData.find(i => i.string === item.name);
+		const detectionName = detectionType?.replacement ?? "Unknown";
 		const confidence = sb.Utils.round(item.confidence * 100, 0);
 
-		result.push(`${coloursData[i]}: ${confidence}% ${detectionType.replacement}`);
+		result.push(`${coloursData[i]}: ${confidence}% ${detectionName}`);
 	}
 
 	return result;
