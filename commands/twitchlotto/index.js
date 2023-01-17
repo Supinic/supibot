@@ -49,7 +49,7 @@ module.exports = {
 				const eligibleChannels = await sb.Query.getRecordset(rs => rs
 					.select("LOWER(Name) AS Name")
 					.from("data", "Twitch_Lotto_Channel")
-					.where("Amount <= Scored")
+					.where("Amount > Scored")
 					.flat("Name")
 				);
 
@@ -77,7 +77,7 @@ module.exports = {
 					eligibleChannels = await sb.Query.getRecordset(rs => rs
 						.select("LOWER(Name) AS Name")
 						.from("data", "Twitch_Lotto_Channel")
-						.where("Amount <= Scored")
+						.where("Amount > Scored")
 						.flat("Name")
 					);
 				}
