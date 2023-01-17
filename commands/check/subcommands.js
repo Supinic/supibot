@@ -210,17 +210,22 @@ module.exports = (command) => [
 				};
 			}
 
+			if (CookieLogic.hasOutdatedDailyStats(userCookieData)) {
+				CookieLogic.resetDailyStats(userCookieData);
+				await targetUser.setDataProperty("cookie", userCookieData);
+			}
+
+			const subscriberList = await sb.Cache.getByPrefix("twitch-subscriber-list-supinic");
+			let hasDoubleCookieAccess = false;
+			if (Array.isArray(subscriberList)) {
+				hasDoubleCookieAccess = subscriberList.some(i => i.user_id === context.user.Twitch_ID);
+			}
+
 			let string;
 			if (CookieLogic.canEatReceivedCookie(userCookieData)) {
 				string = `${pronoun} have a donated cookie waiting to be eaten.`;
 			}
-			else if (CookieLogic.canEatDailyCookie(userCookieData)) {
-				const subscriberList = await sb.Cache.getByPrefix("twitch-subscriber-list-supinic");
-				let hasDoubleCookieAccess = false;
-				if (Array.isArray(subscriberList)) {
-					hasDoubleCookieAccess = subscriberList.some(i => i.user_id === context.user.Twitch_ID);
-				}
-
+			else if (CookieLogic.canEatDailyCookie(userCookieData, { hasDoubleCookieAccess })) {
 				const cookieType = CookieLogic.determineAvailableDailyCookieType(userCookieData, {
 					hasDoubleCookieAccess
 				});
@@ -237,7 +242,7 @@ module.exports = (command) => [
 			const nextMidnight = new sb.Date(sb.Date.getTodayUTC()).addHours(24);
 			const delta = sb.Utils.timeDelta(nextMidnight);
 			return {
-				reply: `${string} Next daily cookie will be available in ${delta}.`
+				reply: `${string} Next reset of daily cookies will occur in ${delta}.`
 			};
 		}
 	},
