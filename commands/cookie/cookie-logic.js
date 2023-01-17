@@ -51,6 +51,12 @@ const subcommands = [
 		aliases: [],
 		default: true,
 		hidden: false
+	},
+	{
+		name: "top",
+		aliases: ["leaders", "leaderboard"],
+		default: false,
+		hidden: false
 	}
 ];
 

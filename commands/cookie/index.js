@@ -106,6 +106,11 @@ module.exports = {
 				reply: `You should use "$stats cookie" instead!`
 			};
 		}
+		else if (subcommand === "top") {
+			return {
+				reply: `Check out the cookie leaderboard here: https://supinic.com/bot/cookie/list`
+			};
+		}
 		else {
 			return {
 				success: false,
@@ -131,7 +136,12 @@ module.exports = {
 			`<code>${prefix}cookie gift (user)</code>`,
 			`<code>${prefix}cookie give (user)</code>`,
 			`<code>${prefix}cookie donate (user)</code>`,
-			"Cookies can also be donated to other users, if you so wish."
+			"Cookies can also be donated to other users, if you so wish.",
+			"",
+
+			`<code>${prefix}cookie top</code>`,
+			`<code>${prefix}cookie leaderboard</code>`,
+			`Posts the link to the <a href="/bot/cookie/list">cookie leaderboard</a> in the chat.`
 		];
 	})
 };
