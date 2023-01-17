@@ -36,7 +36,7 @@ module.exports = {
 
 				return {
 					date: new sb.Date().setTimezoneOffset(offset).format("H:i (Y-m-d)"),
-					offset: query,
+					offset: `${sign}${hours}${minutes ?? ""}`,
 					abbr: null,
 					name: null
 				};
@@ -81,7 +81,9 @@ module.exports = {
 		const zone = await this.staticData.detectTimezone(...args);
 		if (zone) {
 			return {
-				reply: `TIMEZONEDETECTED ${zone.abbr} is ${zone.name}, which is UTC${zone.offset} and it is ${zone.date} there right now.`
+				reply: (zone.name && zone.abbr)
+					? `TIMEZONEDETECTED ${zone.abbr} is ${zone.name}, which is UTC${zone.offset} and it is ${zone.date} there right now.`
+					: `TIMEZONEDETECTED Time in UTC${zone.offset} is ${zone.date} right now.`
 			};
 		}
 
