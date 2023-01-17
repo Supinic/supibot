@@ -68,7 +68,7 @@ module.exports = {
 			const links = [];
 			const helpers = [];
 			for (const source of sources) {
-				links.push(`<a href="${source.url}">${source.name}</a>`);
+				links.push(`<a href="${source.specificMainPageUrl ?? source.url}">${source.name}</a>`);
 				helpers.push(...source.helpers);
 			}
 

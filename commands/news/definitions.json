@@ -1042,5 +1042,19 @@
         "helpers": ["Somso2e", "UgandanWarriarZULUL"]
       }
     ]
+  },
+  {
+    "code": "za",
+    "language": "English",
+    "sources": [
+      {
+        "name": "News24",
+        "specificMainPageUrl": "https://www.news24.com",
+        "url": "https://feeds.24.com/",
+        "path": "articles/news24",
+        "endpoints": ["SouthAfrica/rss"],
+        "helpers": ["bananaslayer_"]
+      }
+    ]
   }
 ]
