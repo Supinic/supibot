@@ -9,18 +9,17 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => ({
 		detectTimezone: async (...args) => {
-			let timezone;
 			const query = args.join(" ");
-			const utcRegex = /(UTC|GMT)(?<operator>[+-])(?<hours>\d{1,2})(:?(?<minutes>\d{1,2}))?/i;
+			const utcRegex = /(?<base>UTC|GMT)(?<sign>[+-])(?<hours>\d{1,2})(:?(?<minutes>\d{1,2}))?/i;
 
 			if (utcRegex.test(query)) {
 				const match = query.match(utcRegex);
-				const sign = (match.groups.operator === "-") ? -1 : 1;
-				const minutes = (match.groups.minutes)
-					? (Number(match.groups.minutes) / 60)
-					: 0;
+				const { sign, hours, minutes } = match.groups;
 
-				timezone = sign * (Number(match.groups.hours) + minutes);
+				const multiplier = (sign === "-") ? -1 : 1;
+				const numMinutes = (minutes) ? Number(minutes) : 0;
+
+				const offset = multiplier * (Number(hours) * 60 + numMinutes);
 
 				if (!Number.isFinite(timezone)) {
 					return {
@@ -28,22 +27,28 @@ module.exports = {
 						reply: `Malformed timezone offset provided!`
 					};
 				}
-				else if (Math.abs(timezone) > 14) {
+				else if (Math.abs(offset) > (14 * 60)) { // UTC[+/-]14 is the maximum offset
 					return {
 						success: false,
 						reply: `Maximum timezone offset exceeded!`
 					};
 				}
+
+				return {
+					date: new sb.Date().setTimezoneOffset(offset).format("H:i (Y-m-d)"),
+					offset: query,
+					abbr: null,
+					name: null
+				};
 			}
-			else {
-				timezone = await sb.Query.getRecordset(rs => rs
-					.select("Abbreviation", "Offset", "Name")
-					.from("data", "Timezone")
-					.where("Abbreviation = %s", query)
-					.limit(1)
-					.single()
-				);
-			}
+
+			const timezone = await sb.Query.getRecordset(rs => rs
+				.select("Abbreviation", "Offset", "Name")
+				.from("data", "Timezone")
+				.where("Abbreviation = %s", query)
+				.limit(1)
+				.single()
+			);
 
 			if (!timezone) {
 				return null;
