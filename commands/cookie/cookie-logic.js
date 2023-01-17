@@ -121,6 +121,35 @@ const hasExtraCookieAvailable = (data, options) => {
 };
 
 /**
+ * Determines what type of cookie is available to be eaten today.
+ * @param data {CookieData}
+ * @param [options] {ExtraUserOptions}
+ * @returns {string}
+ */
+const determineAvailableDailyCookieType = (data, options) => {
+	const today = sb.Date.getTodayUTC();
+	if (options?.hasDoubleCookieAccess === true) {
+		const used = data.today.eaten.daily + data.today.donated;
+		if (used === 0) {
+			return "daily";
+		}
+		else if (used === 1) {
+			return "golden";
+		}
+		else {
+			return "none";
+		}
+	}
+
+	if (data.lastTimestamp.daily !== today) {
+		return "daily";
+	}
+	else {
+		return "none";
+	}
+};
+
+/**
  * Determines if a cookie is available to be eaten today.
  * @param data {CookieData}
  * @param [options] {ExtraUserOptions}
@@ -310,6 +339,7 @@ const fetchRandomCookieText = async () => (
 
 module.exports = {
 	subcommands,
+	determineAvailableDailyCookieType,
 	canEatDailyCookie,
 	canEatReceivedCookie,
 	donateCookie,
