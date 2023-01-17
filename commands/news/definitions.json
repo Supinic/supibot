@@ -1050,10 +1050,23 @@
       {
         "name": "News24",
         "specificMainPageUrl": "https://www.news24.com",
-        "url": "https://feeds.24.com/",
+        "url": "https://feeds.24.com",
         "path": "articles/news24",
         "endpoints": ["SouthAfrica/rss"],
         "helpers": ["bananaslayer_"]
+      }
+    ]
+  },
+  {
+    "code": "ge",
+    "language": "Georgian",
+    "sources": [
+      {
+        "name": "ალია",
+        "url": "https://alia.ge",
+        "path": null,
+        "endpoints": ["feed"],
+        "helpers": ["boring_nick"]
       }
     ]
   }
