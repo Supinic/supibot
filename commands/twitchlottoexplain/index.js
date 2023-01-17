@@ -1,3 +1,4 @@
+const Explain = require("./explainer");
 module.exports = {
 	Name: "twitchlottoexplain",
 	Aliases: ["tle"],
@@ -48,6 +49,9 @@ module.exports = {
 			}
 		}
 
+		const Explain = require("./explainer.js");
+		const coloursData = require("./colours.json");
+
 		const link = sb.Utils.getPathFromURL(inputLink) ?? inputLink;
 		if (!link) {
 			return {
@@ -84,9 +88,12 @@ module.exports = {
 				reply: `There are no detections on this image!`
 			};
 		}
-		else if (data.explainLink) {
+
+		const explanation = Explain.explainDetections(data);
+		if (data.explainLink) {
 			return {
-				reply: data.explainLink
+				reply: `${explanation.join("; ")} ${data.explainLink}`,
+				removeEmbeds: true
 			};
 		}
 
@@ -102,7 +109,7 @@ module.exports = {
 		const writeStream = fs.createWriteStream(`/tmp/${link}`);
 		await pipeline(downloadStream, writeStream);
 
-		const colours = ["#0F0", "#F00", "#00F", "#FF0", "#0FF", "#F0F", "#0A0", "#A00", "#00A", "#FFF"];
+		const colours = Object.keys(coloursData);
 		const params = data.detections.map((i, ind) => {
 			const coords = i.bounding_box;
 			return sb.Utils.tag.trim `
@@ -146,7 +153,7 @@ module.exports = {
 		);
 
 		return {
-			reply: outputLink,
+			reply: `${explanation.join("; ")} ${outputLink}`,
 			removeEmbeds: true
 		};
 	}),

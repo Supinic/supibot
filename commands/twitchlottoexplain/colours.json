@@ -1,0 +1,12 @@
+{
+  "#0F0": "green",
+  "#F00": "red",
+  "#00F": "blue",
+  "#FF0": "yellow",
+  "#0FF": "cyan",
+  "#F0F": "magenta",
+  "#0A0": "dark green",
+  "#A00": "dark red",
+  "#00A": "dark blue",
+  "#FFF": "white"
+}
