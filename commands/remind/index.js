@@ -372,6 +372,7 @@ module.exports = {
 		`<code>${prefix}remindme fireworks at:"July 4th 2021, 8pm"</code>`,
 		`<code>${prefix}remind (person) test on:"tomorrow 10am"</code>`,
 		`<code>${prefix}remind (person) test on:"today evening"</code>`,
+		`<code>${prefix}remind (person) test on:"10am UTC+3"</code>`,
 		"Creates a timed reminder just like normal, but using a specific date + time to time it.",
 		"Will use your timezone, if you have it set up via the <code>$set location</code> command.",
 		"If you don't, the command will use Supibot's timezone - CET/CEST (UTC+1/+2)",
