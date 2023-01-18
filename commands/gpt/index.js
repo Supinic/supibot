@@ -119,7 +119,7 @@ module.exports = {
 		}
 
 		const { choices, usage } = response.body;
-		await GptCache.addUsageRecord(context.user, usage.total_tokens);
+		await GptCache.addUsageRecord(context.user, usage.total_tokens, model);
 
 		const [chatResponse] = choices;
 		return {
