@@ -7,6 +7,10 @@ const removeRedundantSortedListValues = async (cacheKey) => {
 	await sb.Cache.server.zremrangebyscore(cacheKey, 0, yesterday);
 };
 
+/**
+ * @param {User} userData
+ * @returns {Promise<{summary: Record<string, number>, dailyTokens: number, hourlyTokens: number}>}
+ */
 const getTokenUsage = async (userData) => {
 	const cacheKey = createCacheKey(userData.ID);
 	await removeRedundantSortedListValues(cacheKey);
