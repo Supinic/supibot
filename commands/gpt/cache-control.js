@@ -22,8 +22,8 @@ const getTokenUsage = async (userData) => {
 	const summary = {};
 
 	for (let i = 0; i < rawCacheData.length; i += 2) {
-		const timestamp = Number(rawCacheData[i]);
-		const value = Number(rawCacheData[i + 1]);
+		const value = Number(rawCacheData[i]);
+		const timestamp = Number(rawCacheData[i + 1]);
 
 		if (timestamp >= lastHour) {
 			hourlyTokens += value;
