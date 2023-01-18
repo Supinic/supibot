@@ -205,8 +205,9 @@ module.exports = (command) => [
 				const externalString = (externalLink.body) ? `Full usage details: ${externalLink.body}` : "";
 				return {
 					reply: sb.Utils.tag.trim `
-						${pronoun} have used ${usage.hourlyTokens} in the last hour,
-						and ${usage.dailyTokens} in the last 24 hours.
+						${pronoun} have used up
+						${usage.hourlyTokens} tokens in the last hour,
+						and ${usage.dailyTokens} tokens in the last 24 hours.
 						${externalString}
 					`
 				};
