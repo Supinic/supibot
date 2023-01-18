@@ -194,6 +194,12 @@ module.exports = (command) => [
 					externalResult[pretty.toUTCString()] = tokens;
 				}
 
+				if (usage.dailyTokens === 0) {
+					return {
+						reply: `${pronoun} have not used any GPT tokens in the past 24 hours.`
+					};
+				}
+
 				const externalLink = await sb.Pastebin.post(JSON.stringify(externalResult, null, 4), {
 					expiration: "10 minutes",
 					format: "json",
