@@ -14,7 +14,7 @@ const getTokenUsage = async (userData) => {
 	const now = sb.Date.now();
 	const lastHour = new sb.Date().addHours(-1).valueOf();
 	const yesterday = new sb.Date().addDays(-1).valueOf();
-	const rawCacheData = await sb.Cache.server.zrange(cacheKey, yesterday, now, "WITHSCORES");
+	const rawCacheData = await sb.Cache.server.zrangebyscore(cacheKey, yesterday, now, "WITHSCORES");
 
 	// Retrieve the cached values along with their timestamps
 	let hourlyTokens = 0;
