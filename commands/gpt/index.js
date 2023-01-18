@@ -47,7 +47,7 @@ module.exports = {
 		}
 
 		const { temperature } = context.params;
-		if (typeof temperature === "number" && (temperature < 0 || temperature > 1)) {
+		if (typeof temperature === "number" && (temperature < 0 || temperature > 2)) {
 			return {
 				success: false,
 				reply: `Your provided temperature is outside of the valid range! Use a value between 0 and 1.`
