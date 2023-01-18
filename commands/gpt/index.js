@@ -13,6 +13,8 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function chatGPT (context, ...args) {
 		const ChatGptConfig = require("./config.json");
+		const GptCache = require("./cache-control.js");
+
 		const query = args.join(" ");
 		if (!query) {
 			return {
@@ -22,7 +24,7 @@ module.exports = {
 			};
 		}
 
-		const { model = "curie" } = context.params;
+		const { model = "davinci" } = context.params;
 		if (!ChatGptConfig.models[model]) {
 			const names = Object.keys(ChatGptConfig.models).sort().join(", ");
 			return {
@@ -31,20 +33,10 @@ module.exports = {
 			};
 		}
 
-		const isPrivilegedChannel = (ChatGptConfig.ignoreLimitChannels.includes(context.channel.ID));
-		const subscriberList = await sb.Cache.getByPrefix("twitch-subscriber-list-supinic");
-		const isSubscribed = subscriberList.some(i => i.user_id === context.user.Twitch_ID);
-		const modelData = ChatGptConfig.models[model];
-
-		const modelInputLimit = modelData.inputLimit ?? ChatGptConfig.globalInputLimit;
-		const applicableInputLimit = (isSubscribed || isPrivilegedChannel)
-			? modelInputLimit
-			: modelData.publicInputLimit ?? modelInputLimit;
-
-		if (query.length > applicableInputLimit) {
+		if (query.length > ChatGptConfig.globalInputLimit) {
 			return {
 				success: false,
-				reply: `Maximum message length exceeded! (${query.length}/${applicableInputLimit})`,
+				reply: `Maximum query length exceeded! (${query.length}/${ChatGptConfig.globalInputLimit})`,
 				cooldown: 2500
 			};
 		}
@@ -57,10 +49,11 @@ module.exports = {
 			};
 		}
 
-		const modelOutputLimit = modelData.outputLimit ?? ChatGptConfig.globalOutputLimit;
-		const applicablOutputLimit = (isSubscribed || isPrivilegedChannel)
-			? modelOutputLimit
-			: modelData.publicOutputLimit ?? modelOutputLimit;
+		const modelData = ChatGptConfig.models[model];
+		const limitCheckResult = await GptCache.checkLimits(context.user);
+		if (limitCheckResult.success !== true) {
+			return limitCheckResult;
+		}
 
 		const prompt = `Query: ${query}\nAnswer: `;
 		const response = await sb.Got("GenericAPI", {
@@ -71,7 +64,7 @@ module.exports = {
 			},
 			json: {
 				prompt,
-				max_tokens: applicablOutputLimit,
+				max_tokens: ChatGptConfig.globalOutputLimit,
 				temperature: temperature ?? 0.75,
 				top_p: 1,
 				frequency_penalty: 0,
@@ -102,7 +95,10 @@ module.exports = {
 			}
 		}
 
-		const [chatResponse] = response.body.choices;
+		const { choices, usage } = response.body;
+		await GptCache.addUsageRecord(context.user, usage.total_tokens);
+
+		const [chatResponse] = choices;
 		return {
 			reply: `🤖 ${chatResponse.text.trim()}`
 		};

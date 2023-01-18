@@ -2,32 +2,36 @@
   "globalInputLimit": 500,
   "globalOutputLimit": 100,
   "ignoreLimitChannels": [38],
+  "userTokenLimits": {
+    "regular": {
+      "hourly": 200,
+      "daily": 1000
+    },
+    "subscriber": {
+      "hourly": 1000,
+      "daily": 10000
+    }
+  },
   "models": {
     "ada": {
       "url": "text-ada-001",
-      "inputLimit": 500,
-      "outputLimit": 100,
-      "default": false
+      "default": false,
+      "usageDivisor": 50
     },
     "babbage": {
       "url": "text-babbage-001",
-      "inputLimit": 500,
-      "outputLimit": 100,
-      "default": false
+      "default": false,
+      "usageDivisor": 40
     },
     "curie": {
       "url": "text-curie-001",
-      "inputLimit": 500,
-      "outputLimit": 100,
-      "default": true
+      "default": false,
+      "usageDivisor": 10
     },
     "davinci": {
       "url": "text-davinci-003",
-      "publicInputLimit": 50,
-      "publicOutputLimit": 25,
-      "inputLimit": 150,
-      "outputLimit": 75,
-      "default": false
+      "default": true,
+      "usageDivisor": 1
     }
   }
 }
