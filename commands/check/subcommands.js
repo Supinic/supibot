@@ -207,7 +207,7 @@ module.exports = (command) => [
 					privacy: "unlisted"
 				});
 
-				const dailyTokenString = (usage.dailyTokens === usage.hourlyTokens)
+				const dailyTokenString = (usage.dailyTokens !== usage.hourlyTokens)
 					? `and ${usage.dailyTokens} tokens in the last 24 hours`
 					: "";
 
