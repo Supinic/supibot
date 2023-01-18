@@ -60,7 +60,7 @@ module.exports = {
 			return limitCheckResult;
 		}
 
-		let outputLimit = ChatGptConfig.globalOutputLimit;
+		let outputLimit = ChatGptConfig.outputLimit.default;
 		if (typeof customOutputLimit === "number") {
 			if (!sb.Utils.isValidInteger(customOutputLimit)) {
 				return {
@@ -68,10 +68,10 @@ module.exports = {
 					reply: `Your provided output limit must be a positive integer!`
 				};
 			}
-			else if (customOutputLimit > ChatGptConfig.globalOutputLimit) {
+			else if (customOutputLimit > ChatGptConfig.outputLimit.maximum) {
 				return {
 					success: false,
-					reply: `Your provided output limit must be lower or equal to the default value! Default limit: ${ChatGptConfig.globalOutputLimit} tokens`
+					reply: `Your provided output limit must be lower than the maximum of ${ChatGptConfig.outputLimit.maximum} tokens`
 				};
 			}
 

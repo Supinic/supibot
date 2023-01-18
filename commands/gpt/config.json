@@ -1,6 +1,9 @@
 {
   "globalInputLimit": 500,
-  "globalOutputLimit": 100,
+  "outputLimit": {
+    "default": 50,
+    "maximum": 100
+  },
   "userTokenLimits": {
     "regular": {
       "hourly": 200,
