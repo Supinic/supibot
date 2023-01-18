@@ -194,6 +194,7 @@ module.exports = (command) => [
 					externalResult[pretty.toUTCString()] = tokens;
 				}
 
+				const pronoun = (targetUser === context.user) ? "You" : "They";
 				if (usage.dailyTokens === 0) {
 					return {
 						reply: `${pronoun} have not used any GPT tokens in the past 24 hours.`
@@ -208,11 +209,10 @@ module.exports = (command) => [
 				});
 
 				const dailyTokenString = (usage.dailyTokens !== usage.hourlyTokens)
-					? `and ${usage.dailyTokens} tokens in the last 24 hours.`
-					: ".";
+					? `and ${usage.dailyTokens} tokens in the last 24 hours`
+					: "";
 
-				const pronoun = (targetUser === context.user) ? "You" : "They";
-				const externalString = (externalLink.body) ? `Full usage details: ${externalLink.body}` : "";
+				const externalString = (externalLink.body) ? `- full usage details: ${externalLink.body}` : "";
 				return {
 					reply: sb.Utils.tag.trim `
 						${pronoun} have used up
