@@ -208,8 +208,8 @@ module.exports = (command) => [
 				});
 
 				const dailyTokenString = (usage.dailyTokens !== usage.hourlyTokens)
-					? `and ${usage.dailyTokens} tokens in the last 24 hours`
-					: "";
+					? `and ${usage.dailyTokens} tokens in the last 24 hours.`
+					: ".";
 
 				const pronoun = (targetUser === context.user) ? "You" : "They";
 				const externalString = (externalLink.body) ? `Full usage details: ${externalLink.body}` : "";
