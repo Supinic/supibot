@@ -128,43 +128,89 @@ module.exports = (command) => [
 	{
 		name: "chatgpt",
 		aliases: ["chat-gpt", "gpt"],
-		description: "Posts a summary of how much USD has been spent on the $gpt command in the current month.",
-		execute: async () => {
-			// `Date.prototype.setDate` returns a number (!)
-			const startDate = new sb.Date().setDate(1);
-			const endDate = new sb.Date().addMonths(1).addDays(-1).setDate(1);
+		description: "Posts either: how many tokens you (or someone else) have used recently in the $gpt command; or, if used with \"global\", the amount of USD @Supinic has been billed so far this month.",
+		execute: async (context, target) => {
+			if (target === "global") {
+				// `Date.prototype.setDate` returns a number (!)
+				const startDate = new sb.Date().setDate(1);
+				const endDate = new sb.Date().addMonths(1).addDays(-1).setDate(1);
 
-			const response = await sb.Got("GenericAPI", {
-				method: "GET",
-				url: `https://api.openai.com/v1/usage`,
-				searchParams: {
-					start_date: new sb.Date(startDate).format("Y-m-d"),
-					end_date: new sb.Date(endDate).format("Y-m-d")
-				},
-				headers: {
-					Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
+				const response = await sb.Got("GenericAPI", {
+					method: "GET",
+					url: `https://api.openai.com/v1/usage`,
+					searchParams: {
+						start_date: new sb.Date(startDate).format("Y-m-d"),
+						end_date: new sb.Date(endDate).format("Y-m-d")
+					},
+					headers: {
+						Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
+					}
+				});
+
+				let requests = 0;
+				let inputTokens = 0;
+				let outputTokens = 0;
+				const total = sb.Utils.round(response.body.current_usage_usd, 3);
+				const prettyMonthName = new sb.Date().format("F Y");
+
+				for (const row of response.body.data) {
+					requests += row.n_requests;
+					inputTokens += row.n_context_tokens_total;
+					outputTokens += row.n_generated_tokens_total;
 				}
-			});
 
-			let requests = 0;
-			let inputTokens = 0;
-			let outputTokens = 0;
-			const total = sb.Utils.round(response.body.current_usage_usd, 3);
-			const prettyMonthName = new sb.Date().format("F Y");
-
-			for (const row of response.body.data) {
-				requests += row.n_requests;
-				inputTokens += row.n_context_tokens_total;
-				outputTokens += row.n_generated_tokens_total;
+				return {
+					reply: sb.Utils.tag.trim `
+						So far, there have been ${sb.Utils.groupDigits(requests)} ChatGPT requests in ${prettyMonthName}. 
+						${sb.Utils.groupDigits(inputTokens)} input and ${sb.Utils.groupDigits(outputTokens)} output tokens have been processed,
+						for a total expenditure of $${total}.
+					`
+				};
 			}
+			else {
+				let GptCache;
+				try {
+					GptCache = require("../gpt/cache-control.js");
+				}
+				catch {
+					return {
+						success: false,
+						reply: `ChatGPT caching module is currently not available!`
+					};
+				}
 
-			return {
-				reply: sb.Utils.tag.trim `
-					So far, there have been ${sb.Utils.groupDigits(requests)} ChatGPT requests in ${prettyMonthName}. 
-					${sb.Utils.groupDigits(inputTokens)} input and ${sb.Utils.groupDigits(outputTokens)} output tokens have been processed,
-					for a total expenditure of $${total}.
-				`
-			};
+				const targetUser = (target) ? await sb.User.get(target) : context.user;
+				if (!targetUser) {
+					return {
+						success: false,
+						reply: `Provided user does not exist!`
+					};
+				}
+
+				const usage = await GptCache.getTokenUsage(targetUser);
+				const externalResult = {};
+				for (const [timestamp, tokens] of Object.entries(usage.summary)) {
+					const pretty = new sb.Date(Number(timestamp));
+					externalResult[pretty.toUTCString()] = tokens;
+				}
+
+				const externalLink = await sb.Pastebin.post(JSON.stringify(externalResult, null, 4), {
+					expiration: "10 minutes",
+					format: "json",
+					name: `${targetUser.Name}'s usage of Supibot $gpt command`,
+					privacy: "unlisted"
+				});
+
+				const pronoun = (targetUser === context.user) ? "You" : "They";
+				const externalString = (externalLink.body) ? `Full usage details: ${externalLink.body}` : "";
+				return {
+					reply: sb.Utils.tag.trim `
+						${pronoun} have used ${usage.hourlyTokens} in the last hour,
+						and ${usage.dailyTokens} in the last 24 hours.
+						${externalString}
+					`
+				};
+			}
 		}
 	},
 	{
