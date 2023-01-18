@@ -7,6 +7,7 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe","whitelist"],
 	Params: [
 		{ name: "model", type: "string" },
+		{ name: "limit", type: "number" },
 		{ name: "temperature", type: "number" }
 	],
 	Whitelist_Response: "Currently only available in these channels for testing: @pajlada @Supinic @Supibot",
@@ -24,7 +25,11 @@ module.exports = {
 			};
 		}
 
-		const { model = "davinci" } = context.params;
+		const {
+			limit: customOutputLimit,
+			model = "davinci"
+		} = context.params;
+
 		if (!ChatGptConfig.models[model]) {
 			const names = Object.keys(ChatGptConfig.models).sort().join(", ");
 			return {
@@ -55,6 +60,24 @@ module.exports = {
 			return limitCheckResult;
 		}
 
+		let outputLimit = ChatGptConfig.globalOutputLimit;
+		if (typeof customOutputLimit === "number") {
+			if (!sb.Utils.isValidInteger(customOutputLimit)) {
+				return {
+					success: false,
+					reply: `Your provided output limit must be a positive integer!`
+				};
+			}
+			else if (customOutputLimit > ChatGptConfig.globalOutputLimit) {
+				return {
+					success: false,
+					reply: `Your provided output limit must be lower or equal to the default value! Default limit: ${ChatGptConfig.globalOutputLimit} tokens`
+				};
+			}
+
+			outputLimit = customOutputLimit;
+		}
+
 		const prompt = `Query: ${query}\nAnswer: `;
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
@@ -64,7 +87,7 @@ module.exports = {
 			},
 			json: {
 				prompt,
-				max_tokens: ChatGptConfig.globalOutputLimit,
+				max_tokens: outputLimit,
 				temperature: temperature ?? 0.75,
 				top_p: 1,
 				frequency_penalty: 0,

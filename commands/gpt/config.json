@@ -1,7 +1,6 @@
 {
   "globalInputLimit": 500,
   "globalOutputLimit": 100,
-  "ignoreLimitChannels": [38],
   "userTokenLimits": {
     "regular": {
       "hourly": 200,
