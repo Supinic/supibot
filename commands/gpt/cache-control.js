@@ -46,7 +46,7 @@ const checkLimits = async (userData) => {
 	const { hourlyTokens, dailyTokens } = await getTokenUsage(userData);
 
 	const subscriberList = await sb.Cache.getByPrefix("twitch-subscriber-list-supinic");
-	const isSubscribed = subscriberList.some(i => i.user_id === context.user.Twitch_ID);
+	const isSubscribed = subscriberList.some(i => i.user_id === userData.Twitch_ID);
 
 	const userLimits = (isSubscribed)
 		? ChatGptConfig.userTokenLimits.subscriber
