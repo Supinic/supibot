@@ -206,7 +206,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 	 * @param {string} [description] = null
 	 * @param {sb.Channel} [channel] = null
 	 * @param {sb.User} [user] = null
-	 * @returns {Promise<void>}
+	 * @returns {Promise<number>} ID of the created database logging record
 	 */
 	async log (tag, description = null, channel = null, user = null) {
 		if (!sb.Config.get("GENERAL_LOGGING_ENABLED", false)) {
@@ -225,7 +225,9 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 			Channel: (channel) ? channel.ID : null,
 			User_Alias: (user) ? user.ID : null
 		});
-		await row.save();
+
+		const { insertId } = await row.save();
+		return insertId;
 	}
 
 	/**
@@ -236,7 +238,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 	 * @param {"Internal"|"External"} [data.origin] Whether the error is first- or third-party
 	 * @param {Object} [data.context] Object with any additional info
 	 * @param {Array} [data.arguments] Possible command arguments that led to the error
-	 * @returns {Promise<void>}
+	 * @returns {Promise<number>} ID of the created database error record
 	 */
 	async logError (type, error, data = {}) {
 		if (!sb.Config.get("LOG_ERROR_ENABLED", false)) {

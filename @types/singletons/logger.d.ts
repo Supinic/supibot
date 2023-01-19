@@ -46,7 +46,7 @@ export declare class LoggerSingleton implements Template {
 
     constructor ();
 
-    log (tag: LogTag, description?: string | null, channel?: HasID | null, user?: HasID | null ): Promise<void>;
+    log (tag: LogTag, description?: string | null, channel?: HasID | null, user?: HasID | null ): Promise<number>;
     logError (type: ErrorType, error: Error | CustomError, data: ErrorLogData): Promise<number>;
     push (message: Message, userData: User, channelData: Channel, platformData?: Platform): Promise<void>;
     logVideoRequest (link: string, typeIdentifier: VideoType, length: number, userData: User, channelData: Channel): Promise<void>;
