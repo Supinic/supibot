@@ -130,16 +130,16 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix) => {
 		const ChatGptConfig = require("./config.json");
-		const [defaultModelName, defaultModelData] = Object.entries(ChatGptConfig.models).find(i => i.default === true);
+		const [defaultModelName, defaultModelData] = Object.entries(ChatGptConfig.models).find(i => i[1].default === true);
 		const { regular, subscriber } = ChatGptConfig.userTokenLimits;
 		const { outputLimit } = ChatGptConfig;
 
 		const modelListHTML = Object.entries(ChatGptConfig.models).map(([name, modelData]) => {
+			const letter = name[0].toUpperCase();
 			if (modelData === defaultModelData) {
 				return `<li>${sb.Utils.capitalize(name)} (${letter})></li>`;
 			}
 			else {
-				const letter = name[0].toUpperCase();
 				return `<li>${sb.Utils.capitalize(name)} (${letter}) - ${modelData.usageDivisor}x cheaper than ${sb.Utils.capitalize(defaultModelName)}</li>`
 			}
 		}).join("");
