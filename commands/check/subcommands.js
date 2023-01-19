@@ -159,6 +159,9 @@ module.exports = (command) => [
 					outputTokens += row.n_generated_tokens_total;
 				}
 
+				inputTokens = sb.Utils.round(inputTokens, 2);
+				outputTokens = sb.Utils.round(outputTokens, 2);
+
 				return {
 					reply: sb.Utils.tag.trim `
 						So far, there have been ${sb.Utils.groupDigits(requests)} ChatGPT requests in ${prettyMonthName}. 
