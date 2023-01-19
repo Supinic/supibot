@@ -159,9 +159,6 @@ module.exports = (command) => [
 					outputTokens += row.n_generated_tokens_total;
 				}
 
-				inputTokens = sb.Utils.round(inputTokens, 2);
-				outputTokens = sb.Utils.round(outputTokens, 2);
-
 				return {
 					reply: sb.Utils.tag.trim `
 						So far, there have been ${sb.Utils.groupDigits(requests)} ChatGPT requests in ${prettyMonthName}. 
@@ -198,7 +195,7 @@ module.exports = (command) => [
 				}
 
 				const pronoun = (targetUser === context.user) ? "You" : "They";
-				if (usage.dailyTokens === 0) {
+				if (usage.dailyTokens <= 0) {
 					return {
 						reply: `${pronoun} have not used any GPT tokens in the past 24 hours.`
 					};
@@ -211,15 +208,16 @@ module.exports = (command) => [
 					privacy: "unlisted"
 				});
 
+				const dailyDigitString = sb.Utils.groupDigits(sb.Utils.round(usage.dailyTokens, 2));
 				const dailyTokenString = (usage.dailyTokens !== usage.hourlyTokens)
-					? `and ${usage.dailyTokens} tokens in the last 24 hours`
+					? `and ${dailyDigitString} tokens in the last 24 hours`
 					: "";
 
 				const externalString = (externalLink.body) ? `- full usage details: ${externalLink.body}` : "";
 				return {
 					reply: sb.Utils.tag.trim `
 						${pronoun} have used up
-						${usage.hourlyTokens} tokens in the last hour
+						${sb.Utils.round(usage.hourlyTokens, 2)} tokens in the last hour
 						${dailyTokenString}
 						${externalString}
 					`
