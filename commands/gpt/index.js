@@ -191,10 +191,11 @@ module.exports = {
 			`Temperature is more-or-less understood to be "wildness" or "creativity" of the input.`,
 			"The lower the value, the more predictable, but factual the response is.",
 			"The higher the value, the more creative, unpredictable and wild the response becomes.",
+			"By default, the temperature value is <code>0.75</code>.",
 			"",
 
-			"<b>Important:</b> Only temperature values between 0.0 and 1.0 are guaranteed to give you proper replies!.",
-			"The command however supports temperature values all the way up to 2.0 - where you can receive completely garbled responses! Watch out for your token usage!",
+			"<b>Important:</b> Only temperature values between 0.0 and 1.0 are guaranteed to give you proper replies.",
+			"The command however supports temperature values all the way up to 2.0 - where you can receive completely garbled responses - which can be fun, but watch out for your token usage!",
 			"",
 
 			"<h5>Other</h5>",
