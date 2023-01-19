@@ -34,7 +34,8 @@ module.exports = {
 			const names = Object.keys(ChatGptConfig.models).sort().join(", ");
 			return {
 				success: false,
-				reply: `Invalid ChatGPT model supported! Use one of: ${names}`
+				reply: `Invalid ChatGPT model supported! Use one of: ${names}`,
+				cooldown: 2500
 			};
 		}
 
@@ -50,7 +51,8 @@ module.exports = {
 		if (typeof temperature === "number" && (temperature < 0 || temperature > 2)) {
 			return {
 				success: false,
-				reply: `Your provided temperature is outside of the valid range! Use a value between 0 and 1.`
+				reply: `Your provided temperature is outside of the valid range! Use a value between 0 and 1.`,
+				cooldown: 2500
 			};
 		}
 
@@ -65,13 +67,15 @@ module.exports = {
 			if (!sb.Utils.isValidInteger(customOutputLimit)) {
 				return {
 					success: false,
-					reply: `Your provided output limit must be a positive integer!`
+					reply: `Your provided output limit must be a positive integer!`,
+					cooldown: 2500
 				};
 			}
 			else if (customOutputLimit > ChatGptConfig.outputLimit.maximum) {
 				return {
 					success: false,
-					reply: `Your provided output limit must be lower than the maximum of ${ChatGptConfig.outputLimit.maximum} tokens`
+					reply: `Your provided output limit must be lower than the maximum of ${ChatGptConfig.outputLimit.maximum} tokens`,
+					cooldown: 2500
 				};
 			}
 
