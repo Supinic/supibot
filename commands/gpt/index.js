@@ -140,7 +140,7 @@ module.exports = {
 				return `<li><b>${sb.Utils.capitalize(name)}</b> (${letter}) (default)</li>`;
 			}
 			else {
-				return `<li><b>${sb.Utils.capitalize(name)}</b> (${letter}) - ${modelData.usageDivisor}x cheaper than ${sb.Utils.capitalize(defaultModelName)}</li>`
+				return `<li><b>${sb.Utils.capitalize(name)}</b> (${letter}) - ${modelData.usageDivisor}x cheaper than ${sb.Utils.capitalize(defaultModelName)}</li>`;
 			}
 		}).join("");
 
@@ -170,6 +170,8 @@ module.exports = {
 
 			"Each next model in succession is more powerful and more coherent than the previous, but also more expensive to use.",
 			"When experimenting, consider using one of the lower tier models, only then moving up to higher tiers!",
+			"For example: 100 tokens used in Davinci → 100 tokens used from your limit,",
+			"but: 100 tokens used in Babbage (which is 40x cheaper) → 2.5 tokens used from your limit.",
 			"",
 
 			"<h5>Basic usage</h5>",
