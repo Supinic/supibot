@@ -81,6 +81,7 @@ module.exports = {
 		const prompt = `Query: ${query}\nAnswer: `;
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
+			throwHttpErrors: false,
 			url: `https://api.openai.com/v1/engines/${modelData.url}/completions`,
 			headers: {
 				Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
@@ -97,23 +98,24 @@ module.exports = {
 		});
 
 		if (!response.ok) {
+			const logID = await sb.Logger.log(
+				"Command.Warning",
+				`ChatGPT API fail: ${response.statusCode} → ${JSON.stringify(response.body)}`,
+				context.channel,
+				context.user
+			);
+
 			if (response.statusCode === 429) {
 				return {
 					success: false,
-					reply: `Exceeded maximum amount of uses for this month! Please try again later next month.`
+					reply: `The ChatGPT service is likely overloaded at the moment! Please try again later.`
 				};
 			}
 			else {
-				await sb.Logger.log(
-					"Command.Warning",
-					`GPT command warning: ${response.statusCode} → ${JSON.stringify(response.body)}`,
-					context.channel,
-					context.user
-				);
-
+				const idString = (logID) ? `Mention this ID: Log-${logID}` : "";
 				return {
 					success: false,
-					reply: `Something went wrong! Please let @Supinic know: status code ${response.statusCode}`
+					reply: `Something went wrong with the ChatGPT service! Please let @Supinic know. ${idString}`
 				};
 			}
 		}
