@@ -3,8 +3,8 @@ module.exports = {
 	Aliases: ["chatgpt"],
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Queries ChatGPT for a text response. Still being beta-tested! Coming to a chat near you, soon ™",
-	Flags: ["mention","non-nullable","pipe","whitelist"],
+	Description: "Queries ChatGPT for a text response. Supports multiple models and parameter settings. Limited by tokens usage!",
+	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "model", type: "string" },
 		{ name: "limit", type: "number" },
