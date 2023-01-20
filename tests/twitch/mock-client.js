@@ -8,5 +8,5 @@ module.exports = class DankTwitchMock {
 	static ChatClient = class extends EventEmitter {
 		connect () {}
 		joinAll () {}
-	}
+	};
 };
