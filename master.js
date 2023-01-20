@@ -15,7 +15,7 @@
 	globalThis.sb = await initializeSbObject();
 
 	const { commands } = await require("supibot-package-manager");
-	await sb.Command.importData(commands);
+	await sb.Command.importData(commands.definitions);
 
 	const controllers = {};
 	const initialChannels = sb.Channel.data.filter(i => i.Mode !== "Inactive");
