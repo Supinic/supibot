@@ -349,6 +349,7 @@ class Command extends require("./template.js") {
 	static async initialize () {
 		// Override the default template behaviour of automatically calling `loadData()` by doing nothing.
 		// This is new (experimental) behaviour, where the commands' definitions will be loaded externally!
+		return this;
 	}
 
 	static async importData (definitions) {
