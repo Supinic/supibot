@@ -14,6 +14,9 @@
 	const initializeSbObject = require("supi-core");
 	globalThis.sb = await initializeSbObject();
 
+	const commandsDefinitions = require("supibot-package-manager");
+	await sb.Command.importData(commandsDefinitions);
+
 	const controllers = {};
 	const initialChannels = sb.Channel.data.filter(i => i.Mode !== "Inactive");
 	const initialPlatforms = new Set(initialChannels.map(i => i.Platform));
