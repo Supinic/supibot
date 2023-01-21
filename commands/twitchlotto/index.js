@@ -323,8 +323,22 @@ module.exports = {
 			channelString = `Posted in channel(s): ${channels.join(", ")}`;
 		}
 
+		const descriptionData = await sb.Query.getRecordset(rs => rs
+			.select("Text")
+			.from("data", "Twitch_Lotto_Description")
+			.where("Link = %s", image.Link)
+			.orderBy("Preferred DESC")
+			.orderBy("Created ASC")
+			.limit(1)
+			.single()
+		);
+
+		const descriptionString = (descriptionData?.Text)
+			? `Description: ${descriptionData.Text}`
+			: "";
+
 		const flagsString = (image.Adult_Flags)
-			? `Manual NSFW flags: ${image.Adult_Flags.join(", ")}`
+			? `NSFW flags: ${image.Adult_Flags.join(", ")}`
 			: "";
 
 		const scoreThresholdExceeded = ((image.Score > 0.5 && detections.length > 0) || (image.Score > 0.75));
@@ -336,6 +350,7 @@ module.exports = {
 				${flagsString}
 				https://i.imgur.com/${image.Link}
 				${channelString}
+				${descriptionString}
 			`
 		};
 	}),
