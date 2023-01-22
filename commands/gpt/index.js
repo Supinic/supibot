@@ -82,6 +82,15 @@ module.exports = {
 			outputLimit = customOutputLimit;
 		}
 
+		// @todo remove this try-catch and make the method return `null` with some param
+		let userPlatformID;
+		try {
+			userPlatformID = context.platform.fetchInternalPlatformIDByUsername(context.user);
+		}
+		catch {
+			userPlatformID = "N/A";
+		}
+
 		const prompt = `Query: ${query}\nAnswer: `;
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
@@ -97,7 +106,7 @@ module.exports = {
 				top_p: 1,
 				frequency_penalty: 0,
 				presence_penalty: 0,
-				user: context.user.Name
+				user: `${context.user.Name} (${context.platform.Name}: ${userPlatformID})`
 			}
 		});
 
