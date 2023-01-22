@@ -103,7 +103,7 @@ module.exports = {
 				model: modelData.url,
 				prompt,
 				max_tokens: outputLimit,
-				temperature: temperature ?? 0.75,
+				temperature: temperature ?? ChatGptConfig.defaultTemperature,
 				top_p: 1,
 				frequency_penalty: 0,
 				presence_penalty: 0,
@@ -210,7 +210,7 @@ module.exports = {
 			`Temperature is more-or-less understood to be "wildness" or "creativity" of the input.`,
 			"The lower the value, the more predictable, but factual the response is.",
 			"The higher the value, the more creative, unpredictable and wild the response becomes.",
-			"By default, the temperature value is <code>0.75</code>.",
+			`By default, the temperature value is <code>${ChatGptConfig.defaultTemperature}</code>.`,
 			"",
 
 			"<b>Important:</b> Only temperature values between 0.0 and 1.0 are guaranteed to give you proper replies.",

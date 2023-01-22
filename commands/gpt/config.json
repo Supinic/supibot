@@ -1,4 +1,5 @@
 {
+  "defaultTemperature": 0.5,
   "globalInputLimit": 500,
   "outputLimit": {
     "default": 50,
