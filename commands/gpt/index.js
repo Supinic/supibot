@@ -95,11 +95,12 @@ module.exports = {
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
 			throwHttpErrors: false,
-			url: `https://api.openai.com/v1/engines/${modelData.url}/completions`,
+			url: `https://api.openai.com/v1/completions`,
 			headers: {
 				Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
 			},
 			json: {
+				model: modelData.url,
 				prompt,
 				max_tokens: outputLimit,
 				temperature: temperature ?? 0.75,
