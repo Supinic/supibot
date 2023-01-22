@@ -30,20 +30,32 @@ module.exports = {
 			model = "davinci"
 		} = context.params;
 
-		if (!ChatGptConfig.models[model]) {
+		const modelData = ChatGptConfig.models[model.toLowerCase()];
+		if (!modelData) {
 			const names = Object.keys(ChatGptConfig.models).sort().join(", ");
 			return {
 				success: false,
-				reply: `Invalid ChatGPT model supported! Use one of: ${names}`,
-				cooldown: 2500
+				cooldown: 2500,
+				reply: `Invalid ChatGPT model supported! Use one of: ${names}`
 			};
 		}
 
 		if (query.length > ChatGptConfig.globalInputLimit) {
 			return {
 				success: false,
-				reply: `Maximum query length exceeded! (${query.length}/${ChatGptConfig.globalInputLimit})`,
-				cooldown: 2500
+				cooldown: 2500,
+				reply: `Maximum query length exceeded! ${query.length}/${ChatGptConfig.globalInputLimit}`
+			};
+		}
+		else if (modelData.inputLimit && query.length > modelData.inputLimit) {
+			return {
+				success: false,
+				cooldown: 2500,
+				reply: sb.Utils.tag.trim `
+					Maximum query length exceeded for this model!
+					Shorten your query, or use a lower-ranked model instead.
+					${query.length}/${modelData.inputLimit}
+				`
 			};
 		}
 
@@ -56,13 +68,12 @@ module.exports = {
 			};
 		}
 
-		const modelData = ChatGptConfig.models[model];
 		const limitCheckResult = await GptCache.checkLimits(context.user);
 		if (limitCheckResult.success !== true) {
 			return limitCheckResult;
 		}
 
-		let outputLimit = ChatGptConfig.outputLimit.default;
+		let outputLimit = modelData.outputLimit.default;
 		if (typeof customOutputLimit === "number") {
 			if (!sb.Utils.isValidInteger(customOutputLimit)) {
 				return {
@@ -71,11 +82,17 @@ module.exports = {
 					cooldown: 2500
 				};
 			}
-			else if (customOutputLimit > ChatGptConfig.outputLimit.maximum) {
+
+			const maximum = modelData.outputLimit.maximum;
+			if (customOutputLimit > maximum) {
 				return {
 					success: false,
-					reply: `Your provided output limit must be lower than the maximum of ${ChatGptConfig.outputLimit.maximum} tokens`,
-					cooldown: 2500
+					cooldown: 2500,
+					reply: `
+						Maximum output limit exceeded for this model!
+						Lower your limit, or use a lower-ranked model instead.
+						${customOutputLimit}/${maximum}
+					`
 				};
 			}
 
