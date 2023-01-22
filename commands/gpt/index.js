@@ -51,7 +51,7 @@ module.exports = {
 		if (typeof temperature === "number" && (temperature < 0 || temperature > 2)) {
 			return {
 				success: false,
-				reply: `Your provided temperature is outside of the valid range! Use a value between 0 and 1.`,
+				reply: `Your provided temperature is outside of the valid range! Use a value between 0.0 and 2.0 - inclusive.`,
 				cooldown: 2500
 			};
 		}
@@ -185,6 +185,9 @@ module.exports = {
 			"When experimenting, consider using one of the lower tier models, only then moving up to higher tiers!",
 			"For example: 100 tokens used in Davinci → 100 tokens used from your limit,",
 			"but: 100 tokens used in Babbage (which is 40x cheaper) → 2.5 tokens used from your limit.",
+			"",
+
+			`You can also check out the <a href="https://beta.openai.com/docs/models/feature-specific-models">official documentation</a> of GPT-3 models on the official site for full info.`,
 			"",
 
 			"<h5>Basic usage</h5>",
