@@ -72,7 +72,7 @@ const checkLimits = async (userData) => {
 	else if (dailyTokens >= userLimits.daily) {
 		return {
 			success: false,
-			reply: `You have used up all tyour ChatGPT tokens for today! Try again later.`
+			reply: `You have used up all your ChatGPT tokens for today! Try again later.`
 		};
 	}
 
