@@ -66,11 +66,7 @@ module.exports = {
 				};
 			}
 
-			let receiverHasDoubleCookieAccess = false;
-			if (Array.isArray(subscriberList)) {
-				receiverHasDoubleCookieAccess = subscriberList.some(i => i.user_id === receiverUserData.Twitch_ID);
-			}
-
+			const receiverHasDoubleCookieAccess = await controller.fetchUserCacheSubscription(receiverUserData);
 			const receiverOptions = {
 				hasDoubleCookieAccess: receiverHasDoubleCookieAccess
 			};
