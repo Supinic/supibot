@@ -7,7 +7,7 @@
   },
   "userTokenLimits": {
     "regular": {
-      "hourly": 200,
+      "hourly": 100,
       "daily": 1000
     },
     "subscriber": {
@@ -36,7 +36,7 @@
     },
     "curie": {
       "url": "text-curie-001",
-      "default": false,
+      "default": true,
       "outputLimit": {
         "default": 100,
         "maximum": 250
@@ -45,7 +45,7 @@
     },
     "davinci": {
       "url": "text-davinci-003",
-      "default": true,
+      "default": false,
       "inputLimit": 250,
       "outputLimit": {
         "default": 25,
