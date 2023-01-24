@@ -204,6 +204,7 @@
     "aliases": ["kkona"],
     "description": "KKona-style emotes, mostly available in Supinic's channel on Twitch. Each variation represents a country.",
     "emotes": [
+      "BBetyar",
       "BBrexit",
       "CCabron",
       "CChile",
