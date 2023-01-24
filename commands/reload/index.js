@@ -21,10 +21,10 @@ module.exports = {
 
 			if (context.params.skipUpgrade !== true) {
 				const emote = await context.getBestAvailableEmote(["ppCircle", "supiniLoading"], "⏳");
-				const message = `${emote} running yarn, please wait ${emote}`;
+				const message = `${emote} running yarn up, please wait ${emote}`;
 
 				await context.sendIntermediateMessage(message);
-				await shell("yarn");
+				await shell("yarn up supibot-package-manager@Supinic/supibot-package-manager#master");
 			}
 
 			if (isPlural) {
