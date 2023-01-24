@@ -412,7 +412,7 @@ module.exports = {
 
 					await row.save({ skipLoad: true });
 					return {
-						reply: `Succesfully published alias ${aliasName} in this channel. Users in this channel can now use it directly.`
+						reply: `Successfully published alias ${aliasName} in this channel. Users in this channel can now use it directly.`
 					};
 				}
 				else {
@@ -428,7 +428,7 @@ module.exports = {
 					await row.delete();
 
 					return {
-						reply: `Succesfully unpublished alias ${aliasName} in this channel. Users in this channel won't be able to use it directly.`
+						reply: `Successfully unpublished alias ${aliasName} in this channel. Users in this channel won't be able to use it directly.`
 					};
 				}
 			}

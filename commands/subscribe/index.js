@@ -105,7 +105,7 @@ module.exports = {
 			);
 
 			return {
-				reply: `Sucessfully ${invocation}d ${location}. ${response}`
+				reply: `Successfully ${invocation}d ${location}. ${response}`
 			};
 		}
 		else {
@@ -127,7 +127,7 @@ module.exports = {
 
 			await row.save({ skipLoad: true });
 			return {
-				reply: `Sucessfully subscribed ${location}. ${response}`
+				reply: `Successfully subscribed ${location}. ${response}`
 			};
 		}
 	}),

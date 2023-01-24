@@ -48,7 +48,7 @@ module.exports = {
 			});
 		}
 
-		let resultMessage = `Process ${processType} restarted succesfully.`;
+		let resultMessage = `Process ${processType} restarted successfully.`;
 		if (!types.includes("static")) {
 			queue.push(async () => {
 				await context.sendIntermediateMessage("VisLaud 👉 Restarting process");

@@ -35,7 +35,7 @@ module.exports = {
 					await sb.Logger.log("Command.Warning", JSON.stringify(e));
 					return {
 						success: false,
-						reply: `An error occured while reloading all ${name}!`
+						reply: `An error occurred while reloading all ${name}!`
 					};
 				}
 

@@ -83,7 +83,7 @@ module.exports = {
 			success,
 			reply: (success)
 				? "Playsound has been played correctly on stream."
-				: "An error occured while playing the playsound!"
+				: "An error occurred while playing the playsound!"
 		};
 	}),
 	Dynamic_Description: null

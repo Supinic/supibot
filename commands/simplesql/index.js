@@ -26,7 +26,7 @@ module.exports = {
 		}
 		catch (e) {
 			console.warn(e);
-			return { reply: "An error occured!" };
+			return { reply: "An error occurred!" };
 		}
 	}),
 	Dynamic_Description: null

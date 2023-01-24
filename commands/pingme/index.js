@@ -73,7 +73,7 @@ module.exports = {
 		"",
 
 		`<code>${prefix}pingme (user)</code>`,
-		"When the target user types a message, you will be reminder in the current channel (or in whispers, if used in whispers)",
+		"When the target user types a message, you will be reminded in the current channel (or in whispers, if used in whispers)",
 		"",
 
 		`<code>${prefix}pingme (user) (... custom text)</code>`,

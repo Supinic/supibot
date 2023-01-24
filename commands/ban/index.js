@@ -168,7 +168,7 @@ module.exports = {
 		if (!options.User_Alias && !options.Command && !options.Channel && isAdmin) {
 			return {
 				success: false,
-				reply: "Not enough data provided to create a ban! You are missing all idenitifiers."
+				reply: "Not enough data provided to create a ban! You are missing all identifiers."
 			};
 		}
 

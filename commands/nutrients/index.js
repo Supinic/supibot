@@ -621,7 +621,7 @@ module.exports = {
 			if (customNutrients.size === 0) {
 				return {
 					success: false,
-					reply: `Could not pase any of your provided specific nutrients!`
+					reply: `Could not parse any of your provided specific nutrients!`
 				};
 			}
 		}

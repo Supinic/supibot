@@ -67,7 +67,7 @@ module.exports = {
 		if (!category) {
 			return {
 				success: false,
-				reply: `No such category found! Try one of thise: ${categoryData.map(i => i.name).join(", ")}`
+				reply: `No such category found! Try one of these: ${categoryData.map(i => i.name).join(", ")}`
 			};
 		}
 
