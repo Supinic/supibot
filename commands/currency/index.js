@@ -12,36 +12,28 @@ module.exports = {
 			RMB: "CNY"
 		}
 	})),
-	Code: (async function currency (context, amount, first, separator, second) {
-		const isAmountNumeric = Number.isFinite(Number(amount));
-		if (!isAmountNumeric && !second) {
-			if (separator) { // CZK to EUR
-				second = separator;
-				first = amount;
-				amount = "1";
-			}
-			else if (first) { // CZK EUR
-				second = first;
-				first = amount;
-				amount = "1";
-			}
-			else { // CZK
-				first = amount;
-				amount = "1";
-			}
-		}
-
-		second ??= "EUR";
-
-		if (!first || !second) {
+	Code: (async function currency (context, ...args) {
+		const query = args.join(" ");
+		if (!query) {
 			return {
 				success: false,
-				reply: "Invalid syntax! Use (amount) (from-currency) to (to-currency) - e.g. 1 USD to EUR",
+				reply: `No amount or currencies provided! Use this, for example: "$${context.invocation} 100 EUR to USD"`
+			};
+		}
+
+		const parseRegex = /^(?<amount>(\d+)\s*)?\b(?<first>[a-z]{3})\b.*?\b(?<second>[a-z]{3})(\b|$)/i;
+		const amountMatch = query.match(parseRegex);
+		if (!amountMatch) {
+			return {
+				success: false,
+				reply: `Invalid syntax provided! Use this, for example: "$${context.invocation} 100 EUR to USD"`,
 				cooldown: 2500
 			};
 		}
 
+		let { amount, first, second } = amountMatch.groups;
 		let multiplier = 1;
+
 		if (/k/i.test(amount)) {
 			multiplier = 1.0e3;
 		}
@@ -56,7 +48,7 @@ module.exports = {
 		}
 
 		amount = amount.replace(/[kmbt]/gi, "").replace(/,/g, ".");
-		if (!Number(amount)) {
+		if (!Number(amount) || !Number.isFinite(Number(amount))) {
 			return {
 				success: false,
 				reply: "The amount of currency must be a proper finite number!",
@@ -193,13 +185,27 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix) => [
 		`Converts an amount of currency (or 1, if not specified) to another currency`,
-		``,
 
+		`<code>${prefix}currency (amount) (source currency) (separator) (target currency)</code>`,
+		`<code>${prefix}currency (amount) (source currency) (target currency)</code>`,
 		`<code>${prefix}currency 100 EUR to USD</code>`,
-		`100 EUR = (amount) USD`,
+		`<code>${prefix}currency 100 EUR in USD</code>`,
+		`<code>${prefix}currency 100 EUR USD</code>`,
+		`Converts a given amount of source currency to the target currency.`,
 		``,
 
+		`<code>${prefix}currency (source currency) to (target currency)</code>`,
+		`<code>${prefix}currency (source currency) (target currency)</code>`,
 		`<code>${prefix}currency EUR to VND</code>`,
-		`1 EUR = (amount) VND`
+		`<code>${prefix}currency EUR in VND</code>`,
+		`<code>${prefix}currency EUR VND</code>`,
+		`Converts <b>one</b> of the source currency to the target currency.`,
+		"",
+
+		`<code>${prefix}currency 10k CZK to EUR</code>`,
+		`<code>${prefix}currency 10B IRR to CHF</code>`,
+		"Supports text multipliers:",
+		`<code>k</code> for thousand, <code>M</code> for million, <code>B</code> for billion and <code>T</code> for trillion.`,
+		""
 	])
 };
