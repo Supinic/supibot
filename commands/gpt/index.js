@@ -108,6 +108,14 @@ module.exports = {
 			userPlatformID = "N/A";
 		}
 
+		const { createHash } = require("crypto");
+		const userHash = createHash("sha1")
+			.update(context.user.Name)
+			.update(context.platform.Name)
+			.update(userPlatformID)
+			.digest()
+			.toString("hex");
+
 		const prompt = `Query: ${query}\nAnswer: `;
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
@@ -124,7 +132,7 @@ module.exports = {
 				top_p: 1,
 				frequency_penalty: 0,
 				presence_penalty: 0,
-				user: `${context.user.Name} (${context.platform.Name}: ${userPlatformID})`
+				user: userHash
 			}
 		});
 
