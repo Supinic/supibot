@@ -1062,6 +1062,24 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	/**
+	 * Determines whether or not a user is subscribed to a given Twitch channel.
+	 * @param {sb.User} userData
+	 * @param {string} channelName
+	 * @returns {Promise<boolean>}
+	 */
+	async fetchUserCacheSubscription (userData, channelName) {
+		/**
+		 * @type {Object[]|null}
+		 */
+		const subscriberList = await sb.Cache.getByPrefix(`twitch-subscriber-list-${channelName}`);
+		if (!subscriberList || Array.isArray(subscriberList)) {
+			return false;
+		}
+
+		return subscriberList.some(i => i.user_id === userData.Twitch_ID);
+	}
+
+	/**
 	 * Fetches a list of emote data for a given list of emote sets.
 	 * @param {string[]} inputSets
 	 * @returns {Promise<TwitchEmoteSetDataObject[]>}
@@ -1209,24 +1227,6 @@ module.exports = class TwitchController extends require("./template.js") {
 			global: false,
 			animated: (typeof i.animated === "boolean") ? i.animated : null
 		}));
-	}
-
-	/**
-	 * Determines whether or not a user is subscribed to a given Twitch channel.
-	 * @param {sb.User} userData
-	 * @param {string} channelName
-	 * @returns {Promise<boolean>}
-	 */
-	static async fetchUserCacheSubscription (userData, channelName) {
-		/**
-		 * @type {Object[]|null}
-		 */
-		const subscriberList = await sb.Cache.getByPrefix(`twitch-subscriber-list-${channelName}`);
-		if (!subscriberList || Array.isArray(subscriberList)) {
-			return false;
-		}
-
-		return subscriberList.some(i => i.user_id === userData.Twitch_ID);
 	}
 
 	/**
