@@ -1072,7 +1072,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		 * @type {Object[]|null}
 		 */
 		const subscriberList = await sb.Cache.getByPrefix(`twitch-subscriber-list-${channelName}`);
-		if (!subscriberList || Array.isArray(subscriberList)) {
+		if (!subscriberList || !Array.isArray(subscriberList)) {
 			return false;
 		}
 
