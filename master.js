@@ -14,7 +14,7 @@
 	const initializeSbObject = require("supi-core");
 	globalThis.sb = await initializeSbObject();
 
-	const commands = await require("supibot-package-manager/commands");
+	const { commands } = await require("supibot-package-manager");
 	await sb.Command.importData(commands.definitions);
 
 	const controllers = {};
