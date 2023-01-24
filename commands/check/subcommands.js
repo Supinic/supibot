@@ -188,6 +188,8 @@ module.exports = (command) => [
 				}
 
 				const usage = await GptCache.getTokenUsage(targetUser);
+				const limits = await GptCache.determineUserLimits(targetUser);
+
 				const externalResult = {};
 				for (const [timestamp, tokens] of Object.entries(usage.summary)) {
 					const pretty = new sb.Date(Number(timestamp));
@@ -210,14 +212,14 @@ module.exports = (command) => [
 
 				const dailyDigitString = sb.Utils.groupDigits(sb.Utils.round(usage.dailyTokens, 2));
 				const dailyTokenString = (usage.dailyTokens !== usage.hourlyTokens)
-					? `and ${dailyDigitString} tokens in the last 24 hours`
+					? `and ${dailyDigitString}/${limits.daily} tokens in the last 24 hours`
 					: "";
 
 				const externalString = (externalLink.body) ? `- full usage details: ${externalLink.body}` : "";
 				return {
 					reply: sb.Utils.tag.trim `
 						${pronoun} have used up
-						${sb.Utils.round(usage.hourlyTokens, 2)} tokens in the last hour
+						${sb.Utils.round(usage.hourlyTokens, 2)}/${limits.hourly} tokens in the last hour
 						${dailyTokenString}
 						${externalString}
 					`
@@ -273,11 +275,8 @@ module.exports = (command) => [
 				await targetUser.setDataProperty("cookie", userCookieData);
 			}
 
-			const subscriberList = await sb.Cache.getByPrefix("twitch-subscriber-list-supinic");
-			let hasDoubleCookieAccess = false;
-			if (Array.isArray(subscriberList)) {
-				hasDoubleCookieAccess = subscriberList.some(i => i.user_id === context.user.Twitch_ID);
-			}
+			const { controller } = sb.Platform.get("twitch");
+			const hasDoubleCookieAccess = await controller.fetchUserCacheSubscription(targetUser, "supinic");
 
 			let string;
 			if (CookieLogic.canEatReceivedCookie(userCookieData)) {

@@ -46,15 +46,22 @@ const getTokenUsage = async (userData) => {
 	};
 };
 
-const checkLimits = async (userData) => {
-	const { hourlyTokens, dailyTokens } = await getTokenUsage(userData);
+/**
+ * @param userData
+ * @returns {Promise<{hourly: number, daily: number}>}
+ */
+const determineUserLimits = async (userData) => {
+	const { controller } = sb.Platform.get("twitch");
+	const isSubscribed = await controller.fetchUserCacheSubscription(userData, "supinic");
 
-	const subscriberList = await sb.Cache.getByPrefix("twitch-subscriber-list-supinic");
-	const isSubscribed = subscriberList.some(i => i.user_id === userData.Twitch_ID);
-
-	const userLimits = (isSubscribed)
+	return (isSubscribed)
 		? ChatGptConfig.userTokenLimits.subscriber
 		: ChatGptConfig.userTokenLimits.regular;
+};
+
+const checkLimits = async (userData) => {
+	const { hourlyTokens, dailyTokens } = await getTokenUsage(userData);
+	const userLimits = await determineUserLimits(userData);
 
 	if (hourlyTokens >= userLimits.hourly) {
 		return {
@@ -84,6 +91,7 @@ const addUsageRecord = async (userData, value, modelName) => {
 
 module.exports = {
 	getTokenUsage,
+	determineUserLimits,
 	checkLimits,
 	addUsageRecord
 };

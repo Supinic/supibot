@@ -18,11 +18,8 @@ module.exports = {
 			Logic.resetDailyStats(cookieData);
 		}
 
-		const subscriberList = await sb.Cache.getByPrefix("twitch-subscriber-list-supinic");
-		let hasDoubleCookieAccess = false;
-		if (Array.isArray(subscriberList)) {
-			hasDoubleCookieAccess = subscriberList.some(i => i.user_id === context.user.Twitch_ID);
-		}
+		const { controller } = sb.Platform.get("twitch");
+		const hasDoubleCookieAccess = await controller.fetchUserCacheSubscription(context.user, "supinic");
 
 		const options = { hasDoubleCookieAccess };
 		if (subcommand === "eat") {
