@@ -1212,6 +1212,24 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	/**
+	 * Determines whether or not a user is subscribed to a given Twitch channel.
+	 * @param {sb.User} userData
+	 * @param {string} channelName
+	 * @returns {Promise<boolean>}
+	 */
+	static async fetchUserCacheSubscription (userData, channelName) {
+		/**
+		 * @type {Object[]|null}
+		 */
+		const subscriberList = await sb.Cache.getByPrefix(`twitch-subscriber-list-${channelName}`);
+		if (!subscriberList || Array.isArray(subscriberList)) {
+			return false;
+		}
+
+		return subscriberList.some(i => i.user_id === userData.Twitch_ID);
+	}
+
+	/**
 	 * Fetches all global emotes for any context.
 	 * Ideally cached for a rather long time.
 	 * @returns {Promise<TypedEmote[]>}
