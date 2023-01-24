@@ -1358,7 +1358,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chrono-node@npm:^2.4.1":
+"chrono-node@npm:^2.5.0":
   version: 2.5.0
   resolution: "chrono-node@npm:2.5.0"
   dependencies:
@@ -1526,7 +1526,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cron@npm:^2.1.0":
+"cron@npm:^2.2.0":
   version: 2.2.0
   resolution: "cron@npm:2.2.0"
   dependencies:
@@ -1566,7 +1566,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cytube-connector@github:Supinic/cytube-connector":
+"cytube-connector@Supinic/cytube-connector#master":
   version: 2.1.0
   resolution: "cytube-connector@https://github.com/Supinic/cytube-connector.git#commit=12e2610118af8ab575fd28b47984f07e58086611"
   dependencies:
@@ -1725,13 +1725,6 @@ __metadata:
   version: 1.1.2
   resolution: "depd@npm:1.1.2"
   checksum: 6b406620d269619852885ce15965272b829df6f409724415e0002c8632ab6a8c0a08ec1f0bd2add05dc7bd7507606f7e2cc034fa24224ab829580040b835ecd9
-  languageName: node
-  linkType: hard
-
-"dice-roll-eval@github:jprochazk/dice-roll-eval":
-  version: 1.1.0
-  resolution: "dice-roll-eval@https://github.com/jprochazk/dice-roll-eval.git#commit=e1b9a5ace4b78de6cb767fb61975153b7063cc59"
-  checksum: 7832cea65594b22f6466b7644d55c2ffd123be998b671ad0f48e1d955c08f18b147e53c0c141203d57f52abf6eb07480d6f8da7eb551fc4dd7f7c5136112c102
   languageName: node
   linkType: hard
 
@@ -2619,7 +2612,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"got@npm:^12.5.1":
+"got@npm:^12.5.3":
   version: 12.5.3
   resolution: "got@npm:12.5.3"
   dependencies:
@@ -2898,7 +2891,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ioredis@npm:^5.2.3":
+"ioredis@npm:^5.2.5":
   version: 5.2.5
   resolution: "ioredis@npm:5.2.5"
   dependencies:
@@ -3625,7 +3618,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mariadb@npm:^3.0.1":
+"mariadb@npm:^3.0.2":
   version: 3.0.2
   resolution: "mariadb@npm:3.0.2"
   dependencies:
@@ -3639,7 +3632,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"message-scheduler@github:Supinic/message-scheduler":
+"message-scheduler@Supinic/message-scheduler#master":
   version: 1.0.0
   resolution: "message-scheduler@https://github.com/Supinic/message-scheduler.git#commit=c5ba12865e600821faafb235ab7b7211d44467fb"
   dependencies:
@@ -4635,6 +4628,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"roll-dice@npm:@jprochazk/roll-dice@^0.2.2":
+  version: 0.2.2
+  resolution: "@jprochazk/roll-dice@npm:0.2.2"
+  checksum: 70c6f867b48e153cbbd01086ca0dd6435a23a224884e2dcf17d804321e061c6940163e10c149b95680421a6fadb970a9f0f4461a48dfb3730022185256f2c6cd
+  languageName: node
+  linkType: hard
+
 "rss-parser@npm:^3.12.0":
   version: 3.12.0
   resolution: "rss-parser@npm:3.12.0"
@@ -5060,46 +5060,46 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supi-core@github:Supinic/supi-core":
+"supi-core@Supinic/supi-core#master":
   version: 2.2.0
-  resolution: "supi-core@https://github.com/Supinic/supi-core.git#commit=e50e6bf2f7e733575baae5732ebd75c6ea0b5545"
+  resolution: "supi-core@https://github.com/Supinic/supi-core.git#commit=c6f9e103c8dc91b0b62c86aee1665941fd4d5133"
   dependencies:
     async-markov: "github:supinic/async-markov"
     cheerio: ^1.0.0-rc.12
-    chrono-node: ^2.4.1
-    cron: ^2.1.0
-    dice-roll-eval: "github:jprochazk/dice-roll-eval"
+    chrono-node: ^2.5.0
+    cron: ^2.2.0
     duration-parser: "github:supinic/duration-parser"
     ffprobe: ^1.1.2
     form-data: ^4.0.0
-    got: ^12.5.1
-    ioredis: ^5.2.3
+    got: ^12.5.3
+    ioredis: ^5.2.5
     language-iso-codes: "github:supinic/language-iso-codes"
     long-timeout: "github:supinic/long-timeout"
-    mariadb: ^3.0.1
+    mariadb: ^3.0.2
     random-js: ^2.1.0
+    roll-dice: "npm:@jprochazk/roll-dice@^0.2.2"
     rss-parser: ^3.12.0
     supibot-package-manager: "github:supinic/supibot-package-manager"
     track-link-parser: "github:supinic/track-link-parser"
     transliteration: ^2.3.5
-    vm2: ^3.9.11
-  checksum: 7ef0a97b462e152d47b346ea4715e23ebfd213ed87b2a80d412e6a10e1d4b417a09154d3570592ac13e8e48f32b4bab003b4d883605501c91522276adba9da06
+    vm2: ^3.9.13
+  checksum: a4c7d4adc5d16b4095de070dbad34b9b5f16d0a79fa0002dea71dbc9a5dd5e063361fd29e594b7389a4d2b5430746f8871a6d7c67478bb3e849f06b9938a21ee
   languageName: node
   linkType: hard
 
-"supi-db-init@github:Supinic/supi-db-init":
+"supi-db-init@Supinic/supi-db-init#master":
   version: 1.0.0
-  resolution: "supi-db-init@https://github.com/Supinic/supi-db-init.git#commit=c4575264c3ba0b523cdf243b794f4841a4aa584c"
+  resolution: "supi-db-init@https://github.com/Supinic/supi-db-init.git#commit=1c24aa74e97a4e45f494d6426fb54293b976e17f"
   dependencies:
     mariadb: ^3.0.0
-  checksum: bdb45e0e1ab5c7791adfaa2cc8ca9944a4e99f10852c9b9d7d605c576758c7726f627acce6030a24a956c32458b4c2e27bb0af05ff98ac3ff53caba8de3c2e79
+  checksum: 1637a4707b90ffcefad59440bcf6813c7a770a52ffd88dc71998d4c748927718faae52f26897f2540f14e905fe08625817ce315df6dbfa0f41f45ed1e329e573
   languageName: node
   linkType: hard
 
-"supibot-package-manager@github:Supinic/supibot-package-manager":
+"supibot-package-manager@Supinic/supibot-package-manager#master":
   version: 1.0.0
-  resolution: "supibot-package-manager@https://github.com/Supinic/supibot-package-manager.git#commit=d7799da9e96f16dd3ebcb15019c6d6ae50f92f4a"
-  checksum: 1b35b3c1a997cdf9660a95e8cc14fa904ddc15de5efbd0aece58cf8b549319d61812ef3621b4e7c51a7e56f11880f827b49e18032bb45be1880290f440c8d400
+  resolution: "supibot-package-manager@https://github.com/Supinic/supibot-package-manager.git#commit=4fac32bcc39db6a11d14a1a8b509eccda884c1ca"
+  checksum: 9477088401b6fc4b44676060c80a6cf3a303b271f3cc46669765fdbf1710de9674fc3df959b2764e0dd836de24f3debc00a2a84fcd5c41e53de083924a54c10d
   languageName: node
   linkType: hard
 
@@ -5116,18 +5116,18 @@ __metadata:
   dependencies:
     "@babel/core": ^7.20.12
     "@babel/eslint-parser": ^7.19.1
-    cytube-connector: "github:Supinic/cytube-connector"
+    cytube-connector: "Supinic/cytube-connector#master"
     dank-twitch-irc: ^4.3.0
     discord.js: ^14.7.1
     eslint: ^8.32.0
     eslint-plugin-unicorn: ^45.0.2
     irc-framework: ^4.12.1
-    message-scheduler: "github:Supinic/message-scheduler"
+    message-scheduler: "Supinic/message-scheduler#master"
     mocha: ^10.2.0
     nyc: ^15.1.0
-    supi-core: "github:Supinic/supi-core"
-    supi-db-init: "github:Supinic/supi-db-init"
-    supibot-package-manager: "github:Supinic/supibot-package-manager"
+    supi-core: "Supinic/supi-core#master"
+    supi-db-init: "Supinic/supi-db-init#master"
+    supibot-package-manager: "Supinic/supibot-package-manager#master"
   languageName: unknown
   linkType: soft
 
@@ -5414,7 +5414,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vm2@npm:^3.9.11":
+"vm2@npm:^3.9.13":
   version: 3.9.13
   resolution: "vm2@npm:3.9.13"
   dependencies:

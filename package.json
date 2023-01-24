@@ -2,13 +2,13 @@
   "name": "supibot",
   "version": "2.2.0",
   "dependencies": {
-    "cytube-connector": "github:Supinic/cytube-connector",
+    "cytube-connector": "Supinic/cytube-connector#master",
     "dank-twitch-irc": "^4.3.0",
     "discord.js": "^14.7.1",
     "irc-framework": "^4.12.1",
-    "message-scheduler": "github:Supinic/message-scheduler",
-    "supi-core": "github:Supinic/supi-core",
-    "supibot-package-manager": "github:Supinic/supibot-package-manager"
+    "message-scheduler": "Supinic/message-scheduler#master",
+    "supi-core": "Supinic/supi-core#master",
+    "supibot-package-manager": "Supinic/supibot-package-manager#master"
   },
   "engines": {
     "node": ">= 16.0"
@@ -37,7 +37,7 @@
     "eslint-plugin-unicorn": "^45.0.2",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
-    "supi-db-init": "github:Supinic/supi-db-init"
+    "supi-db-init": "Supinic/supi-db-init#master"
   },
   "nyc": {
     "all": false,
