@@ -44,7 +44,7 @@ const subcommands = [
 		name: "stats",
 		aliases: ["statistics"],
 		default: false,
-		hidden: true
+		hidden: false
 	},
 	{
 		name: "eat",

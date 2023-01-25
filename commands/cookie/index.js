@@ -129,6 +129,7 @@ module.exports = {
 			const CookieStatistics = require("../statistics/types/cookie-count.js");
 			statisticsArray = [
 				`<code>${prefix}cookie stats</code>`,
+				`<code>${prefix}cookie statistics</code>`,
 				`<code>${prefix}cookie stats total</code>`,
 				`<code>${prefix}cookie stats (user)</code>`,
 				CookieStatistics.description
