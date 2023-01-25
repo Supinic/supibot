@@ -44,7 +44,28 @@ module.exports = {
 				};
 			}
 			else {
-				const result = await module.reloadSpecific(...list);
+				let result = {};
+				if (module.importable) {
+					const definitions = [];
+					result.failed = [];
+
+					for (const instanceName of list) {
+						const path = `supibot-package-manager/${name}s/${instanceName}`;
+						try {
+							const definition = require(path);
+							definitions.push(definition);
+						}
+						catch {
+							result.failed.push(instanceName);
+						}
+					}
+
+					result = await module.importSpecific(...definitions);
+				}
+				else {
+					result = await module.reloadSpecific(...list);
+				}
+
 				if (result.failed.length === 0) {
 					return {
 						reply: `${list.length} ${name}s reloaded successfully.`
