@@ -94,10 +94,18 @@ module.exports = {
 			};
 		}
 		else if (subcommand === "stats") {
-			return {
-				success: false,
-				reply: `You should use "$stats cookie" instead!`
-			};
+			let CookieStatistics;
+			try {
+				CookieStatistics = require("../statistics/types/cookie-count.js");
+			}
+			catch {
+				return {
+					success: false,
+					reply: `The cookie statistics module is currently not available!`
+				};
+			}
+
+			return await CookieStatistics.execute(context, "cookie", receiver);
 		}
 		else if (subcommand === "top") {
 			return {
@@ -115,6 +123,23 @@ module.exports = {
 		const utcMidnightToday = sb.Date.getTodayUTC();
 		const nextUtcMidnightDate = new sb.Date(utcMidnightToday).addHours(24);
 		const delta = sb.Utils.timeDelta(nextUtcMidnightDate);
+
+		let statisticsArray = [];
+		try {
+			const CookieStatistics = require("../statistics/types/cookie-count.js");
+			statisticsArray = [
+				`<code>${prefix}cookie stats</code>`,
+				`<code>${prefix}cookie stats total</code>`,
+				`<code>${prefix}cookie stats (user)</code>`,
+				CookieStatistics.description
+			];
+		}
+		catch {
+			return {
+				success: false,
+				reply: `The cookie statistics module is currently not available!`
+			};
+		}
 
 		return [
 			"Fetch a daily fortune cookie and read its wisdom!",
@@ -134,7 +159,15 @@ module.exports = {
 
 			`<code>${prefix}cookie top</code>`,
 			`<code>${prefix}cookie leaderboard</code>`,
-			`Posts the link to the <a href="/bot/cookie/list">cookie leaderboard</a> in the chat.`
+			`Posts the link to the <a href="/bot/cookie/list">cookie leaderboard</a> in the chat.`,
+			"",
+
+			`<code>${prefix}cookie top</code>`,
+			`<code>${prefix}cookie leaderboard</code>`,
+			`Posts the link to the <a href="/bot/cookie/list">cookie leaderboard</a> in the chat.`,
+			"",
+
+			...statisticsArray
 		];
 	})
 };
