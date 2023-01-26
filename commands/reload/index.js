@@ -49,6 +49,10 @@ module.exports = {
 					const definitions = [];
 					result.failed = [];
 
+					if (typeof module.invalidateRequireCahe === "function") {
+						module.invalidateRequireCache(...list);
+					}
+
 					for (const instanceName of list) {
 						const path = `supibot-package-manager/${name}s/${instanceName}`;
 						try {
