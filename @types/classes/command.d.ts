@@ -280,6 +280,11 @@ export declare class Command extends ClassTemplate {
     static importSpecific (...definitions: ConstructorData[]): Promise<void>;
 
     /**
+     * Invalidates the require cache for provided list of command names
+     */
+    static invalidateRequireCache (...names: string[]): ReturnType<typeof ClassTemplate["genericInvalidateRequireCache"]>;
+
+    /**
      * Reloads a specific list of commands, provided as identifiers or instances.
      */
     static reloadSpecific (...list: Like[]): Promise<boolean>;

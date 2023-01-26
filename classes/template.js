@@ -288,7 +288,7 @@ module.exports = class ClassTemplate {
 		this.data = definitions.map(definition => new this(definition));
 	}
 
-	static importSpecific (identifierProperty, ...definitions) {
+	static genericImportSpecific (identifierProperty, ...definitions) {
 		if (!this.importable) {
 			throw new sb.Error({
 				message: "This class does not support importing definitions"
@@ -310,6 +310,40 @@ module.exports = class ClassTemplate {
 			const currentInstance = new this(definition);
 			this.data.push(currentInstance);
 		}
+	}
+
+	static genericInvalidateRequireCache (options) {
+		const {
+			names,
+			extraDeletionCallback,
+			requireBasePath
+		} = options;
+
+		const failed = [];
+		const succeeded = [];
+		for (const instanceName of names) {
+			let path;
+			try {
+				path = require.resolve(`${requireBasePath}/${instanceName}`);
+				delete require.cache[path];
+
+				if (typeof extraDeletionCallback === "function") {
+					const files = extraDeletionCallback(path);
+					if (Array.isArray(files) && files.every(i => typeof i === "string")) {
+						for (const filePath of files) {
+							delete require.cache[filePath];
+						}
+					}
+				}
+
+				succeeded.push(instanceName);
+			}
+			catch {
+				failed.push(instanceName);
+			}
+		}
+
+		return { failed, succeeded };
 	}
 
 	/**

@@ -3,6 +3,7 @@ import {ColumnDefinition, Row, Table} from "../singletons/query";
 import { Name as CacheName, Value as CacheValue } from "./config";
 export { Name as CacheName, Value as CacheValue } from "./config";
 
+/*
 type FailedReloadDescriptor = {
     identifier: string;
     reason: string; // "no-path"
@@ -11,6 +12,7 @@ type ReloadResult = {
     failed?: FailedReloadDescriptor[],
     success: boolean
 };
+*/
 
 export type GenericCacheMap<T extends ClassTemplate> = WeakMap<T, Map<CacheName, CacheValue>>;
 export type SpecificCacheOptions = {
@@ -26,6 +28,18 @@ type GenericCacheOptions<T extends ClassTemplate> = {
     propertyContext?: string;
 };
 
+export type GenericIdentifier<T extends ClassTemplate> = keyof T;
+/**
+ * @todo this was supposed to be a generic data type that represents any of the subclasses' ConstructorParameters
+ * but it just doesn't seem to work
+ */
+type GenericConstructorData = Record<string, any>;
+type InvalidateRequireCacheOptions = {
+    names: string[];
+    requireBasePath: string;
+    extraDeletionCallback?: (path: string) => string[];
+};
+
 export declare class ClassTemplate {
     static data: ClassTemplate[]
         | Map<string | number, ClassTemplate>
@@ -38,7 +52,14 @@ export declare class ClassTemplate {
     setGenericDataProperty<T extends ClassTemplate> (inputData: GenericCacheOptions<T>): Promise<void>;
     saveRowProperty (row: Row, property: string, value: any, self: ClassTemplate): ReturnType<Row["save"]>;
 
-    static initialize(): Promise<ClassTemplate>;
+    static initialize (): Promise<ClassTemplate>;
+    static importData (definitions: GenericConstructorData[]): void;
+    static genericImportSpecific<T extends ClassTemplate> (identifierProperty: GenericIdentifier<T>, ...definitions: GenericConstructorData[]): void;
+    static genericInvalidateRequireCache (options: InvalidateRequireCacheOptions): {
+        failed: string[];
+        succeeded: string[];
+    };
+
     static loadData (): Promise<void>;
     static reloadData (): Promise<void>;
     static hasReloadSpecific (): boolean;

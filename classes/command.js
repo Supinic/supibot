@@ -358,8 +358,24 @@ class Command extends require("./template.js") {
 	}
 
 	static async importSpecific (...definitions) {
-		super.importSpecific("Name", ...definitions);
+		super.genericImportSpecific("Name", ...definitions);
 		await this.validate();
+	}
+
+	static invalidateRequireCache (...names) {
+		return super.genericInvalidateRequireCache({
+			names,
+			requireBasePath: "supibot-package-manager/commands",
+			extraDeletionCallback: (path) => {
+				const dirPath = pathModule.parse(path).dir;
+				const mainFilePath = pathModule.join(dirPath, "index.js");
+
+				return Object.keys(require.cache).filter(filePath => {
+					const hasCorrectExtension = (filePath.endsWith(".js") || filePath.endsWith(".json"));
+					return (filePath.startsWith(dirPath) && hasCorrectExtension && filePath !== mainFilePath);
+				});
+			}
+		});
 	}
 
 	static async loadData () {
