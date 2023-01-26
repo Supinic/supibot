@@ -1,3 +1,4 @@
+const ChatGptConfig = require("./config.json");
 module.exports = {
 	Name: "gpt",
 	Aliases: ["chatgpt"],
@@ -172,14 +173,19 @@ module.exports = {
 		const [defaultModelName, defaultModelData] = Object.entries(ChatGptConfig.models).find(i => i[1].default === true);
 		const { regular, subscriber } = ChatGptConfig.userTokenLimits;
 		const { outputLimit } = ChatGptConfig;
+		const basePriceModel = "Davinci";
 
 		const modelListHTML = Object.entries(ChatGptConfig.models).map(([name, modelData]) => {
 			const letter = name[0].toUpperCase();
-			if (modelData === defaultModelData) {
-				return `<li><b>${sb.Utils.capitalize(name)}</b> (${letter}) (default)</li>`;
+			const defaultString = (modelData === defaultModelData)
+				? " (default model)"
+				: "";
+
+			if (modelData.usageDivisor === 1) {
+				return `<li><b>${sb.Utils.capitalize(name)}</b> (${letter})${defaultString}</li>`;
 			}
 			else {
-				return `<li><b>${sb.Utils.capitalize(name)}</b> (${letter}) - ${modelData.usageDivisor}x cheaper than ${sb.Utils.capitalize(defaultModelName)}</li>`;
+				return `<li><b>${sb.Utils.capitalize(name)}</b> (${letter}) - ${modelData.usageDivisor}x cheaper than ${basePriceModel}${defaultString}</li>`;
 			}
 		}).join("");
 
