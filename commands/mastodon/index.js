@@ -110,6 +110,6 @@ module.exports = {
 
 		`<code>${prefix}mastodon random:true (user)</code>`,
 		`<code>${prefix}mastodon instance:(custom instance) random:true (user)</code>`,
-		"Gets a random post instead of the last one.",
+		"Gets a random post instead of the last one."
 	]
 };

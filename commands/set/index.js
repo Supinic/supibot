@@ -961,11 +961,12 @@ module.exports = {
 				success: false,
 				reply: `You cannot ${invocation} the type ${type}!`
 			};
-		} else if (!target.pipe && context.append.pipe) {
+		}
+		else if (!target.pipe && context.append.pipe) {
 			return {
 				success: false,
-				reply: `You cannot use the type ${type} in a pipe`,
-			}
+				reply: `You cannot use the type ${type} in a pipe`
+			};
 		}
 
 		const permissions = await context.getUserPermissions();
