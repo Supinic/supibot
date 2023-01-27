@@ -501,7 +501,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 
 		const count = this.lastSeen.get(channelData.ID).get(userData.ID)?.count ?? 0;
 		this.lastSeen.get(channelData.ID).set(userData.ID, {
-			message,
+			message: message.slice(0, 2000),
 			count: count + 1,
 			date: new sb.Date()
 		});
