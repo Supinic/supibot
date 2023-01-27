@@ -21,7 +21,7 @@ module.exports = {
 			};
 		}
 
-		const parseRegex = /^(?<amount>(\d+)\s*)?\b(?<first>[a-z]{3})\b.*?\b(?<second>[a-z]{3})(\b|$)/i;
+		const parseRegex = /^(?<amount>([\d.,]+)\s*)?\b(?<first>[a-z]{3})\b.*?\b(?<second>[a-z]{3})(\b|$)/i;
 		const amountMatch = query.match(parseRegex);
 		if (!amountMatch) {
 			return {
