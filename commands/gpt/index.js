@@ -144,7 +144,7 @@ module.exports = {
 				context.user
 			);
 
-			if (response.statusCode === 429) {
+			if (response.statusCode === 429 || response.statusCode >= 500) {
 				return {
 					success: false,
 					reply: `The ChatGPT service is likely overloaded at the moment! Please try again later.`
