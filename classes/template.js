@@ -315,13 +315,23 @@ module.exports = class ClassTemplate {
 	static genericInvalidateRequireCache (options) {
 		const {
 			names,
+			identifierProperty,
 			extraDeletionCallback,
 			requireBasePath
 		} = options;
 
 		const failed = [];
 		const succeeded = [];
-		for (const instanceName of names) {
+		for (const inputName of names) {
+			let instanceName;
+			try {
+				const instance = this.get(inputName);
+				instanceName = instance?.[identifierProperty] ?? inputName;
+			}
+			catch {
+				instanceName = inputName;
+			}
+
 			let path;
 			try {
 				path = require.resolve(`${requireBasePath}/${instanceName}`);

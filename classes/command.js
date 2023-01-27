@@ -365,6 +365,7 @@ class Command extends require("./template.js") {
 	static invalidateRequireCache (...names) {
 		return super.genericInvalidateRequireCache({
 			names,
+			identifierProperty: "Name",
 			requireBasePath: "supibot-package-manager/commands",
 			extraDeletionCallback: (path) => {
 				const dirPath = pathModule.parse(path).dir;
