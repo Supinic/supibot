@@ -360,7 +360,7 @@ module.exports = {
 		const thresholdPercent = `${sb.Utils.round(scoreThreshold * 100, 2)}%`;
 
 		const countData = await sb.Query.getRecordset(rs => rs
-			.select("Name", "Amount", "Scored")
+			.select("Name", "Amount", "MIN(Amount, Scored) AS Scored")
 			.from("data", "Twitch_Lotto_Channel")
 			.orderBy("Amount DESC")
 		);
