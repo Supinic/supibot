@@ -1,3 +1,4 @@
+const { unlink } = require("fs/promises");
 module.exports = {
 	Name: "reload",
 	Aliases: null,
@@ -20,11 +21,19 @@ module.exports = {
 			}
 
 			if (context.params.skipUpgrade !== true) {
+				const { unlink } = require("fs/promises");
+				try {
+					await unlink("/code/supibot/yarn.lock");
+				}
+				catch {
+					// Ignore
+				}
+
 				const emote = await context.getBestAvailableEmote(["ppCircle", "supiniLoading"], "⏳");
 				const message = `${emote} running yarn up, please wait ${emote}`;
-
 				await context.sendIntermediateMessage(message);
-				await shell("yarn up supibot-package-manager@Supinic/supibot-package-manager#master");
+
+				await shell(`yarn --cwd /code/supibot workspaces focus -A --production`);
 			}
 
 			if (isPlural) {

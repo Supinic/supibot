@@ -53,7 +53,6 @@ module.exports = {
 
 				await context.sendIntermediateMessage(`VisLaud 👉 ${message} VisLaud 👉 yarn`);
 
-				await shell(`rm /code/supibot/yarn.lock`);
 				const result = await shell(`yarn --cwd ${dir} workspaces focus -A --production`);
 				console.log("upgrade result", { stdout: result.stdout, stderr: result.stderr });
 			});
