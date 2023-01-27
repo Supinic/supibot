@@ -35,12 +35,12 @@ module.exports = {
 					await sb.Logger.log("Command.Warning", JSON.stringify(e));
 					return {
 						success: false,
-						reply: `An error occurred while reloading all ${name}!`
+						reply: `An error occurred while reloading all ${name}s!`
 					};
 				}
 
 				return {
-					reply: `Reloaded all ${name} successfully.`
+					reply: `Reloaded all ${name}s successfully.`
 				};
 			}
 			else {
@@ -72,7 +72,7 @@ module.exports = {
 
 				if (result.failed.length === 0) {
 					return {
-						reply: `${list.length} ${name}s reloaded successfully.`
+						reply: `${list.length} ${name}(s) reloaded successfully.`
 					};
 				}
 				else if (result.failed.length < list.length) {
@@ -84,7 +84,7 @@ module.exports = {
 				else {
 					return {
 						success: false,
-						reply: `All ${list.length} ${name}s failed to reload!`
+						reply: `All ${list.length} ${name}(s) failed to reload!`
 					};
 				}
 			}
@@ -196,7 +196,7 @@ module.exports = {
 		if (command.endsWith("s")) {
 			await module.reloadData();
 			return {
-				reply: `Reloaded sb.${item.target} completely.`
+				reply: `Reloaded the sb.${item.target} module completely.`
 			};
 		}
 		else {
