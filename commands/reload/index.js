@@ -64,7 +64,7 @@ module.exports = {
 						}
 					}
 
-					result = await module.importSpecific(...definitions);
+					await module.importSpecific(...definitions);
 				}
 				else {
 					result = await module.reloadSpecific(...list);
