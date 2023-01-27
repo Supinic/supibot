@@ -1,7 +1,3 @@
-/**
- * Represents a chat user.
- * Since there can be hundreds of thousands of users loaded, a class is used to simplify the prototype, and potentially save some memory and/or processing power with V8.
- */
 module.exports = class User extends require("./template.js") {
 	static mapCacheExpiration = 300_000;
 	static redisCacheExpiration = 3_600_000;
@@ -9,6 +5,8 @@ module.exports = class User extends require("./template.js") {
 
 	static data = new Map();
 	static bots = new Map();
+	static dataCache = new WeakMap();
+	static pendingNewUsers = new Map();
 
 	static permissions = {
 		regular: 0b0000_0001,
@@ -16,9 +14,6 @@ module.exports = class User extends require("./template.js") {
 		channelOwner: 0b0000_0100,
 		administrator: 0b1000_0000
 	};
-
-	/** @type {WeakMap<User, Map<string, *>>} */
-	static dataCache = new WeakMap();
 
 	constructor (data) {
 		super();
@@ -85,12 +80,6 @@ module.exports = class User extends require("./template.js") {
 		return `sb-user-${this.Name}`;
 	}
 
-	/**
-	 * Pushes a property change to the database.
-	 * @param {string} property
-	 * @param {*} value
-	 * @returns {Promise<void>}
-	 */
 	async saveProperty (property, value) {
 		const row = await sb.Query.getRow("chat_data", "User_Alias");
 		await row.load(this.ID);
@@ -101,15 +90,6 @@ module.exports = class User extends require("./template.js") {
 		await User.populateCaches(this);
 	}
 
-	/**
-	 * Fetches a user data propertyName from the database.
-	 * @param {string} propertyName
-	 * @param {Object} options
-	 * @param {boolean} [options.forceCacheReload] if the property is cached, setting this to true will force its reload
-	 * @returns {Promise<undefined|null|*>}
-	 * - Returns `undefined` if propertyName doesn't exist
-	 * - Returns `null` or any respective primitive/object/function value as determined by the saved value
-	 */
 	async getDataProperty (propertyName, options = {}) {
 		return await super.getGenericDataProperty({
 			cacheMap: User.dataCache,
@@ -122,13 +102,6 @@ module.exports = class User extends require("./template.js") {
 		});
 	}
 
-	/**
-	 * Saves a user data property into the database.
-	 * @param {string} propertyName
-	 * @param {*} value
-	 * @param {Object} options
-	 * @returns {Promise<void>}
-	 */
 	async setDataProperty (propertyName, value, options = {}) {
 		return await super.setGenericDataProperty({
 			cacheMap: User.dataCache,
@@ -148,7 +121,6 @@ module.exports = class User extends require("./template.js") {
 		});
 	}
 
-	/** @override */
 	static async initialize () {
 		User.bots = new Map();
 		User.data = new Map();
@@ -186,15 +158,6 @@ module.exports = class User extends require("./template.js") {
 		await User.loadData();
 	}
 
-	/**
-	 * Searches for a user, based on their ID, or Name.
-	 * Returns immediately if identifier is already a User.
-	 * @param {User|number|string} identifier
-	 * @param {boolean} strict If false and searching for user via string, and it is not found, creates a new User.
-	 * @param {Object} [options]
-	 * @returns {User|void}
-	 * @throws {sb.Error} If the type of identifier is unrecognized
-	 */
 	static async get (identifier, strict = true, options = {}) {
 		if (identifier instanceof User) {
 			return identifier;
@@ -274,13 +237,6 @@ module.exports = class User extends require("./template.js") {
 		}
 	}
 
-	/**
-	 * Fetches a batch of users together.
-	 * Takes existing records from cache, the rest is pulled from dataase.
-	 * Does not support creating new records like `get()` does.
-	 * @param {Array<User|string|number>} identifiers
-	 * @returns {Promise<User[]>}
-	 */
 	static async getMultiple (identifiers) {
 		const result = [];
 		const toFetch = [];
@@ -358,14 +314,6 @@ module.exports = class User extends require("./template.js") {
 		return result;
 	}
 
-	/**
-	 * Synchronously fetches a user based on their numeric ID.
-	 * No other types of ID are supported.
-	 * @deprecated
-	 * @param {string} property
-	 * @param {number} identifier
-	 * @returns {User|void}
-	 */
 	static getByProperty (property, identifier) {
 		const iterator = User.data.values();
 		let user = undefined;
@@ -381,14 +329,6 @@ module.exports = class User extends require("./template.js") {
 		return user;
 	}
 
-	/**
-	 * Normalizes non-standard strings into standard usernames.
-	 * Turns input string into lowercase.
-	 * Removes leading `@`, leading `#`, and trailing `:` symbols.
-	 * Replaces all consecutive whitespace with a single `_` symbol.
-	 * @param {string} username
-	 * @returns {string}
-	 */
 	static normalizeUsername (username) {
 		return username
 			.toLowerCase()
@@ -398,14 +338,12 @@ module.exports = class User extends require("./template.js") {
 			.replace(/\s+/g, "_");
 	}
 
-	/**
-	 * Adds a new user to the database.
-	 * @param {string} name
-	 * @param {Object} properties
-	 * @returns {Promise<User>}
-	 */
 	static async add (name, properties = {}) {
 		const preparedName = User.normalizeUsername(name);
+		if (User.pendingNewUsers.has(preparedName)) {
+			return User.pendingNewUsers.get(preparedName);
+		}
+
 		const exists = await sb.Query.getRecordset(rs => rs
 			.select("Name")
 			.from("chat_data", "User_Alias")
@@ -413,13 +351,19 @@ module.exports = class User extends require("./template.js") {
 			.limit(1)
 			.single()
 		);
-
 		if (exists) {
 			return await User.get(exists.Name);
 		}
 
+		const promise = User.#add(preparedName, properties);
+		User.pendingNewUsers.set(preparedName, promise);
+
+		return await promise;
+	}
+
+	static async #add (name, properties) {
 		const row = await sb.Query.getRow("chat_data", "User_Alias");
-		row.values.Name = preparedName;
+		row.values.Name = name;
 
 		if (properties.Twitch_ID) {
 			row.values.Twitch_ID = properties.Twitch_ID;
@@ -432,6 +376,10 @@ module.exports = class User extends require("./template.js") {
 
 		const user = new User(row.valuesObject);
 		await User.populateCaches(user);
+
+		if (User.pendingNewUsers.has(name)) {
+			User.pendingNewUsers.delete(name);
+		}
 
 		return user;
 	}
@@ -495,9 +443,6 @@ module.exports = class User extends require("./template.js") {
 		return `sb-user-${name}`;
 	}
 
-	/**
-	 * Cleans up.
-	 */
 	static destroy () {
 		User.insertCron.destroy();
 		User.data.clear();
