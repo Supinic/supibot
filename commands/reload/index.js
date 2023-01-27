@@ -1,4 +1,3 @@
-const { unlink } = require("fs/promises");
 module.exports = {
 	Name: "reload",
 	Aliases: null,
