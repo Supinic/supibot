@@ -43,7 +43,8 @@ module.exports = {
 			queue.push(async () => {
 				await context.sendIntermediateMessage("VisLaud 👉 yarn upgrade");
 
-				const result = await shell(`yarn --cwd ${dir} upgrade`);
+				await shell(`rm /code/supibot/yarn.lock`);
+				const result = await shell(`yarn --cwd ${dir} workspaces focus -A --production`);
 				console.log("upgrade result", { stdout: result.stdout, stderr: result.stderr });
 			});
 		}
