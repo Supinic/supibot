@@ -40,8 +40,18 @@ module.exports = {
 			});
 		}
 		if (types.includes("all") || types.includes("yarn") || types.includes("upgrade")) {
+			const { unlink } = require("fs/promises");
 			queue.push(async () => {
-				await context.sendIntermediateMessage("VisLaud 👉 yarn upgrade");
+				let message;
+				try {
+					await unlink("/code/supibot/yarn.lock");
+					message = "deleted yarn.lock";
+				}
+				catch {
+					message = "didn't delete yarn.lock";
+				}
+
+				await context.sendIntermediateMessage(`VisLaud 👉 ${message} VisLaud 👉 yarn`);
 
 				await shell(`rm /code/supibot/yarn.lock`);
 				const result = await shell(`yarn --cwd ${dir} workspaces focus -A --production`);
