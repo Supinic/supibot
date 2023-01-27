@@ -31,8 +31,12 @@ module.exports = {
 			};
 		}
 
-		let { amount, first, second } = amountMatch.groups;
 		let multiplier = 1;
+		let {
+			amount = "1",
+			first,
+			second
+		} = amountMatch.groups;
 
 		if (/k/i.test(amount)) {
 			multiplier = 1.0e3;
