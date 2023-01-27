@@ -491,7 +491,13 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 		}
 		else if (!message) {
 			throw new sb.Error({
-				message: "Missing message for lastSeen data"
+				message: "Missing message for lastSeen data",
+				arg: {
+					channel: channelData?.ID ?? null,
+					user: userData?.ID ?? null,
+					messageType: typeof message,
+					forcedMessage: String(message)
+				}
 			});
 		}
 
