@@ -30,8 +30,8 @@ type GenericCacheOptions<T extends ClassTemplate> = {
 
 export type GenericIdentifier<T extends ClassTemplate> = keyof T;
 /**
- * @todo this was supposed to be a generic data type that represents any of the subclasses' ConstructorParameters
- * but it just doesn't seem to work
+ * @todo
+ * this was supposed to be a generic data type that represents any of the subclasses' ConstructorParameters but it doesn't seem to work
  */
 type GenericConstructorData = Record<string, any>;
 type InvalidateRequireCacheOptions<T extends ClassTemplate> = {
@@ -42,7 +42,9 @@ type InvalidateRequireCacheOptions<T extends ClassTemplate> = {
 };
 
 export declare class ClassTemplate {
-    static data: ClassTemplate[]
+    static importable: boolean;
+    static data:
+        ClassTemplate[]
         | Map<string | number, ClassTemplate>
         | Map<string | number, ClassTemplate[]>;
 
@@ -55,6 +57,7 @@ export declare class ClassTemplate {
 
     static initialize (): Promise<ClassTemplate>;
     static importData (definitions: GenericConstructorData[]): void;
+    static importSpecific (...definitions: GenericConstructorData[]): void;
     static genericImportSpecific<T extends ClassTemplate> (identifierProperty: GenericIdentifier<T>, ...definitions: GenericConstructorData[]): void;
     static genericInvalidateRequireCache<T extends ClassTemplate> (options: InvalidateRequireCacheOptions<T>): {
         failed: string[];

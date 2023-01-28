@@ -288,6 +288,12 @@ module.exports = class ClassTemplate {
 		this.data = definitions.map(definition => new this(definition));
 	}
 
+	static importSpecific () {
+		throw new sb.Error({
+			message: "This method must be implemented by derived classes"
+		});
+	}
+
 	static genericImportSpecific (identifierProperty, ...definitions) {
 		if (!this.importable) {
 			throw new sb.Error({
