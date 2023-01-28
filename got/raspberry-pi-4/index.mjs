@@ -1,4 +1,4 @@
-export default {
+export const definition = {
 	name: "RaspberryPi4",
 	optionsType: "object",
 	options: {

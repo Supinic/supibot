@@ -1,4 +1,4 @@
-export default {
+export const definition = {
 	name: "V5",
 	optionsType: "function",
 	options: (() => ({

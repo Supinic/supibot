@@ -1,4 +1,4 @@
-export default {
+export const definition = {
 	name: "Leppunen",
 	optionsType: "object",
 	options: {

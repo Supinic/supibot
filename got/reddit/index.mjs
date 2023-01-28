@@ -1,4 +1,4 @@
-export default {
+export const definition = {
 	name: "Reddit",
 	optionsType: "object",
 	options: {

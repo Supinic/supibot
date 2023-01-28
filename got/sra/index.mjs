@@ -1,4 +1,4 @@
-export default {
+export const definition = {
 	name: "SRA",
 	optionsType: "object",
 	options: {
