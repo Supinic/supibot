@@ -145,8 +145,8 @@ module.exports = {
 			);
 
 			if (response.statusCode === 429 && response.body.error.type === "insufficient_quota") {
-				const nextMonthTimestamp = Number(new sb.Date().addMonths(1).setDate(1));
-				const nextMonthDate = new sb.Date(nextMonthTimestamp).discardTimeUnits("h", "m", "s", "ms");
+				const { year, month } = new sb.Date();
+				const nextMonthDate = new sb.Date(year, month + 1, 1).discardTimeUnits("h", "m", "s", "ms");
 				const nextMonthName = nextMonthDate.format("F Y");
 				const nextMonthDelta = sb.Utils.timeDelta(nextMonthDate);
 
