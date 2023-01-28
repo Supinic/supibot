@@ -144,7 +144,20 @@ module.exports = {
 				context.user
 			);
 
-			if (response.statusCode === 429 || response.statusCode >= 500) {
+			if (response.statusCode === 429 && response.body.error.type === "insufficient_quota") {
+				const startOfNextMonth = new sb.Date(new sb.Date().addMonths(1).setDate(1));
+				const nextMonthName = startOfNextMonth.format("F Y");
+				const nextMonthDelta = sb.Utils.timeDelta(startOfNextMonth);
+
+				return {
+					success: false,
+					reply: sb.Utils.tag.trim `
+						I have ran out of credits for the ChatGPT service for this month!
+						Please try again in ${nextMonthName}, which will begin ${nextMonthDelta}
+					`
+				};
+			}
+			else if (response.statusCode === 429 || response.statusCode >= 500) {
 				return {
 					success: false,
 					reply: `The ChatGPT service is likely overloaded at the moment! Please try again later.`
