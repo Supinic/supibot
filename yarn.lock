@@ -5062,7 +5062,7 @@ __metadata:
 
 supi-core@supinic/supi-core:
   version: 2.2.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=175fc54cd5b3b5efb9173597ba1468abc0913427"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=6cc9474b4dc9fa561bccfb3371d4dc92aa7fb67f"
   dependencies:
     async-markov: "github:supinic/async-markov"
     cheerio: ^1.0.0-rc.12
@@ -5083,7 +5083,7 @@ supi-core@supinic/supi-core:
     track-link-parser: "github:supinic/track-link-parser"
     transliteration: ^2.3.5
     vm2: ^3.9.13
-  checksum: 4a500ef833bc62b3d5567f8c070bdf1a9cf47636fccb3bfe13e15700e8924c46bf532bbab05e25ee7bccd2bc307b99a3321c7604fee4000201ae6de895e104da
+  checksum: f3bcc0ee356528fd4e30873896b39f5b8990ec80072f29cf2bdc8976c3d43e973565b4657542893cd82efeecde71c335f6f34f2f72fc498655eaf4cfc77b9e1b
   languageName: node
   linkType: hard
 
@@ -5096,17 +5096,17 @@ supi-core@supinic/supi-core:
   languageName: node
   linkType: hard
 
-"supibot-package-manager@Supinic/supibot-package-manager#master":
-  version: 1.0.0
-  resolution: "supibot-package-manager@https://github.com/Supinic/supibot-package-manager.git#commit=4fac32bcc39db6a11d14a1a8b509eccda884c1ca"
-  checksum: 9477088401b6fc4b44676060c80a6cf3a303b271f3cc46669765fdbf1710de9674fc3df959b2764e0dd836de24f3debc00a2a84fcd5c41e53de083924a54c10d
-  languageName: node
-  linkType: hard
-
 "supibot-package-manager@github:supinic/supibot-package-manager":
   version: 1.0.0
   resolution: "supibot-package-manager@https://github.com/supinic/supibot-package-manager.git#commit=d7799da9e96f16dd3ebcb15019c6d6ae50f92f4a"
   checksum: 1b35b3c1a997cdf9660a95e8cc14fa904ddc15de5efbd0aece58cf8b549319d61812ef3621b4e7c51a7e56f11880f827b49e18032bb45be1880290f440c8d400
+  languageName: node
+  linkType: hard
+
+supibot-package-manager@supinic/supibot-package-manager:
+  version: 1.0.0
+  resolution: "supibot-package-manager@https://github.com/supinic/supibot-package-manager.git#commit=4c6a11369bd011e7a9d3b2f62f4c90e0ed877a88"
+  checksum: f10f4a70baa6ea51b51e0482d95f2de6443be9aa109e1bec25662a02aa7ce8399edd4fe4efb595eda38370ede6cc45428d299baeda24f279c4dfeb851d7f5790
   languageName: node
   linkType: hard
 
@@ -5127,7 +5127,7 @@ supi-core@supinic/supi-core:
     nyc: ^15.1.0
     supi-core: supinic/supi-core
     supi-db-init: "Supinic/supi-db-init#master"
-    supibot-package-manager: "Supinic/supibot-package-manager#master"
+    supibot-package-manager: supinic/supibot-package-manager
   languageName: unknown
   linkType: soft
 

@@ -8,7 +8,7 @@
     "irc-framework": "^4.12.1",
     "message-scheduler": "Supinic/message-scheduler#master",
     "supi-core": "supinic/supi-core",
-    "supibot-package-manager": "Supinic/supibot-package-manager#master"
+    "supibot-package-manager": "supinic/supibot-package-manager"
   },
   "engines": {
     "node": ">= 16.0"
