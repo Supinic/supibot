@@ -7,7 +7,7 @@
     "discord.js": "^14.7.1",
     "irc-framework": "^4.12.1",
     "message-scheduler": "Supinic/message-scheduler#master",
-    "supi-core": "Supinic/supi-core#master",
+    "supi-core": "supinic/supi-core",
     "supibot-package-manager": "Supinic/supibot-package-manager#master"
   },
   "engines": {

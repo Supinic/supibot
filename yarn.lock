@@ -5060,9 +5060,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supi-core@Supinic/supi-core#master":
+supi-core@supinic/supi-core:
   version: 2.2.0
-  resolution: "supi-core@https://github.com/Supinic/supi-core.git#commit=c6f9e103c8dc91b0b62c86aee1665941fd4d5133"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=175fc54cd5b3b5efb9173597ba1468abc0913427"
   dependencies:
     async-markov: "github:supinic/async-markov"
     cheerio: ^1.0.0-rc.12
@@ -5083,7 +5083,7 @@ __metadata:
     track-link-parser: "github:supinic/track-link-parser"
     transliteration: ^2.3.5
     vm2: ^3.9.13
-  checksum: a4c7d4adc5d16b4095de070dbad34b9b5f16d0a79fa0002dea71dbc9a5dd5e063361fd29e594b7389a4d2b5430746f8871a6d7c67478bb3e849f06b9938a21ee
+  checksum: 4a500ef833bc62b3d5567f8c070bdf1a9cf47636fccb3bfe13e15700e8924c46bf532bbab05e25ee7bccd2bc307b99a3321c7604fee4000201ae6de895e104da
   languageName: node
   linkType: hard
 
@@ -5125,7 +5125,7 @@ __metadata:
     message-scheduler: "Supinic/message-scheduler#master"
     mocha: ^10.2.0
     nyc: ^15.1.0
-    supi-core: "Supinic/supi-core#master"
+    supi-core: supinic/supi-core
     supi-db-init: "Supinic/supi-db-init#master"
     supibot-package-manager: "Supinic/supibot-package-manager#master"
   languageName: unknown

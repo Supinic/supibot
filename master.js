@@ -17,6 +17,9 @@
 	const { commands } = await require("supibot-package-manager");
 	await sb.Command.importData(commands.definitions);
 
+	const { definitions } = await import("supibot-package-manager/got/index.mjs");
+	await sb.Got.importData(definitions);
+
 	const controllers = {};
 	const initialChannels = sb.Channel.data.filter(i => i.Mode !== "Inactive");
 	const initialPlatforms = new Set(initialChannels.map(i => i.Platform));
