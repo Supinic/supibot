@@ -15,7 +15,7 @@ export const definition = {
 
 		if (!this.data.markovs.has(context.channel.ID)) {
 			try {
-				const Markov = require("async-markov");
+				const { default: Markov } = await import("async-markov");
 				this.data.markovs.set(context.channel.ID, new Markov());
 			}
 			catch (e) {
