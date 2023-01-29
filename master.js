@@ -23,7 +23,7 @@ const importModule = async (module, path) => {
 	await sb.Command.importData(commands.definitions);
 
 	await Promise.all([
-		importModule(sb.ChatModule, "chat-module"),
+		importModule(sb.ChatModule, "chat-modules"),
 		importModule(sb.Got, "got")
 	]);
 
