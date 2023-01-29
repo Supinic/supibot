@@ -302,9 +302,10 @@ module.exports = class ClassTemplate {
 		}
 
 		if (definitions.length === 0) {
-			return;
+			return [];
 		}
 
+		const addedInstances = [];
 		for (const definition of definitions) {
 			const previousInstance = this.get(definition[identifierProperty]);
 			if (previousInstance) {
@@ -315,7 +316,10 @@ module.exports = class ClassTemplate {
 
 			const currentInstance = new this(definition);
 			this.data.push(currentInstance);
+			addedInstances.push(currentInstance);
 		}
+
+		return addedInstances;
 	}
 
 	static genericInvalidateRequireCache (options) {
@@ -363,7 +367,7 @@ module.exports = class ClassTemplate {
 	}
 
 	/**
-	 * Determines whether a child class has its own implemenation of `reloadSpecific`
+	 * Determines whether a child class has its own implementation of `reloadSpecific`
 	 * @returns {boolean}
 	 */
 	static hasReloadSpecific () {

@@ -187,7 +187,7 @@ module.exports = class ChatModule extends require("./template.js") {
 		}
 	}
 
-	static async loadData () {
+	static async importData (definitions) {
 		const hasConnectorTable = await sb.Query.isTablePresent("chat_data", "Channel_Chat_Module");
 		if (!hasConnectorTable) {
 			console.warn("Cannot load Chat_Module", {
@@ -198,7 +198,6 @@ module.exports = class ChatModule extends require("./template.js") {
 			return;
 		}
 
-		const { definitions } = await require("supibot-package-manager/chat-modules");
 		const attachmentData = await ChatModule.#fetch();
 
 		for (const definition of definitions) {
@@ -210,90 +209,25 @@ module.exports = class ChatModule extends require("./template.js") {
 		}
 	}
 
-	static async reloadData () {
-		for (const chatModule of ChatModule.data) {
-			chatModule.destroy();
-		}
-
-		await super.reloadData();
-	}
-
-	static async reloadSpecific (...list) {
-		if (list.length === 0) {
-			return false;
+	static async importSpecific (...definitions) {
+		if (definitions.length === 0) {
+			return;
 		}
 
 		const hasConnectorTable = await sb.Query.isTablePresent("chat_data", "Channel_Chat_Module");
 		if (!hasConnectorTable) {
-			console.warn("Cannot load Chat_Module", {
-				reason: "missing-tables",
-				tables: "Channel_Chat_Module"
+			throw new sb.Error({
+				message: "Cannot import chat module(s), attachment table is missing"
 			});
-
-			return {
-				success: false,
-				reason: "no-attachment-table",
-				failed: []
-			};
 		}
 
-		const failed = [];
-		const existingModules = list.map(i => ChatModule.get(i)).filter(Boolean);
+		const attachmentData = await ChatModule.#fetch(definitions.map(i => i.Name));
+		const newInstances = super.genericImportSpecific("Name", ...definitions);
 
-		const chatModulePath = require.resolve("supibot-package-manager/chat-modules/");
-		delete require.cache[chatModulePath];
-
-		for (const originalChatModule of existingModules) {
-			const index = ChatModule.data.indexOf(originalChatModule);
-			const identifier = originalChatModule.Name;
-
-			originalChatModule.destroy();
-
-			if (index !== -1) {
-				ChatModule.data.splice(index, 1);
-			}
-
-			let path;
-			try {
-				path = require.resolve(`supibot-package-manager/chat-modules/${identifier}`);
-				delete require.cache[path];
-			}
-			catch {
-				failed.push({
-					identifier,
-					reason: "no-path"
-				});
-			}
+		for (const instance of newInstances) {
+			const moduleAttachmentData = attachmentData.filter(i => i.Chat_Module === instance.Name);
+			instance.#initialize(moduleAttachmentData);
 		}
-
-		const attachmentData = await ChatModule.#fetch(list);
-		for (const name of list) {
-			let definition;
-			try {
-				definition = require(`supibot-package-manager/chat-modules/${name}`);
-			}
-			catch {
-				failed.push({
-					name,
-					reason: "no-new-path"
-				});
-			}
-
-			if (!definition) {
-				continue;
-			}
-
-			const chatModule = new ChatModule(definition);
-			ChatModule.data.push(chatModule);
-
-			const moduleAttachmentData = attachmentData.filter(i => i.Chat_Module === chatModule.Name);
-			chatModule.#initialize(moduleAttachmentData);
-		}
-
-		return {
-			success: true,
-			failed
-		};
 	}
 
 	static getChannelModules (channel) {

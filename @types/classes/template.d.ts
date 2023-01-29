@@ -56,9 +56,9 @@ export declare class ClassTemplate {
     saveRowProperty (row: Row, property: string, value: any, self: ClassTemplate): ReturnType<Row["save"]>;
 
     static initialize (): Promise<ClassTemplate>;
-    static importData (definitions: GenericConstructorData[]): void;
-    static importSpecific (...definitions: GenericConstructorData[]): void;
-    static genericImportSpecific<T extends ClassTemplate> (identifierProperty: GenericIdentifier<T>, ...definitions: GenericConstructorData[]): void;
+    static importData (definitions: GenericConstructorData[]): Promise<void>;
+    static importSpecific (...definitions: GenericConstructorData[]): Promise<void>;
+    static genericImportSpecific<T extends ClassTemplate> (identifierProperty: GenericIdentifier<T>, ...definitions: GenericConstructorData[]): ClassTemplate[];
     static genericInvalidateRequireCache<T extends ClassTemplate> (options: InvalidateRequireCacheOptions<T>): {
         failed: string[];
         succeeded: string[];

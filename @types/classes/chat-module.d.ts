@@ -54,9 +54,13 @@ export declare class ChatModule extends ClassTemplate {
 	static get (identifier: Like): ChatModule | null;
 
 	/**
-	 * Reloads a specific list of chat modules, provided as identifiers or instances.
+	 * Imports all provided definitions at once
 	 */
-	static reloadSpecific (...list: Like[]): Promise<boolean>;
+	static importData (definitions: ConstructorData[]): Promise<void>;
+	/**
+	 * Imports a specific list of definitions, destroying and releasing any existing instances
+	 */
+	static importSpecific (...definitions: ConstructorData[]): Promise<void>;
 	/**
 	 * Helper method - flattens out the provided channel array, and fetches a list of all channels
 	 * if a platform (or multiple) is provided.
