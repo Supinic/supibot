@@ -5062,7 +5062,7 @@ __metadata:
 
 supi-core@supinic/supi-core:
   version: 2.2.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=6cc9474b4dc9fa561bccfb3371d4dc92aa7fb67f"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=ded6b843a840098325140779edeb9a814795e575"
   dependencies:
     async-markov: "github:supinic/async-markov"
     cheerio: ^1.0.0-rc.12
@@ -5083,7 +5083,7 @@ supi-core@supinic/supi-core:
     track-link-parser: "github:supinic/track-link-parser"
     transliteration: ^2.3.5
     vm2: ^3.9.13
-  checksum: f3bcc0ee356528fd4e30873896b39f5b8990ec80072f29cf2bdc8976c3d43e973565b4657542893cd82efeecde71c335f6f34f2f72fc498655eaf4cfc77b9e1b
+  checksum: e634591f8e90e55cffc204cc52f3432de566f72a7504f4551e135a8481a113a7df9d2ae573febccce81111982980a4f53df910d3f8a87f74959f16b3159defc8
   languageName: node
   linkType: hard
 
@@ -5105,8 +5105,8 @@ supi-core@supinic/supi-core:
 
 supibot-package-manager@supinic/supibot-package-manager:
   version: 1.0.0
-  resolution: "supibot-package-manager@https://github.com/supinic/supibot-package-manager.git#commit=4c6a11369bd011e7a9d3b2f62f4c90e0ed877a88"
-  checksum: f10f4a70baa6ea51b51e0482d95f2de6443be9aa109e1bec25662a02aa7ce8399edd4fe4efb595eda38370ede6cc45428d299baeda24f279c4dfeb851d7f5790
+  resolution: "supibot-package-manager@https://github.com/supinic/supibot-package-manager.git#commit=063e8d8428406e93687fcde5711690b6dd6fe47d"
+  checksum: 438fcd52fbda68485e06978ee47661e87ebcc7cabc1643ee037b1da69ee46b174c737e300083cb39eab9e5fbbff49620e2d2c04ece5429fe1028685f51532544
   languageName: node
   linkType: hard
 
