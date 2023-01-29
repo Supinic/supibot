@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "live-detection",
 	Events: ["online"],
 	Description: "Sends out PMs to all users subbed to the live event, whenever a channel set up there goes live.",

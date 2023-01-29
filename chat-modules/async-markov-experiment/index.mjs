@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "async-markov-experiment",
 	Events: ["message"],
 	Description: "Super experimental automatic async markov tester thing",

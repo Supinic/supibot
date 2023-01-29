@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "pyramid-detection",
 	Events: ["message"],
 	Description: "Detects \"pyramids\" in chat. Congratulates the persons who finishes one and demeans the persons who break one.",

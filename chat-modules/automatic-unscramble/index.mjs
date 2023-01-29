@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "automatic-unscramble",
 	Events: ["message"],
 	Description: "Attempts to auto-unscramble thepositivebot's unscramble minigame.",

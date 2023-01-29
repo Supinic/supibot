@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "wanna-become-famous",
 	Events: ["message"],
 	Description: "Bans various spam or follow bots.",

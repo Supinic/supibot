@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "message-react",
 	Events: ["message"],
 	Description: "According to arguments, reacts to a specific message(s) with a determined response.",

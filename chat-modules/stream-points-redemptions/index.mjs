@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "stream-points-redemptions",
 	Events: ["message"],
 	Description: "Reacts to redemptions",

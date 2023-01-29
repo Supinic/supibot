@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "offline-only-mode",
 	Events: ["online", "offline"],
 	Description: "Makes Supibot go into Read-only mode when the channel is online. Reverts back when the channel goes offline.",

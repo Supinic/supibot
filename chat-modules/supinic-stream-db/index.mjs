@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "supinic-stream-db",
 	Events: ["online", "offline"],
 	Description: "Creates and updates database rows of Streams on Supinic's channel as he goes on/offline.",

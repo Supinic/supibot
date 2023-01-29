@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "supinic-silence-prevention-trigger",
 	Events: ["online", "offline"],
 	Description: "Toggles the silence-prevention cron on/off on Supinic's stream going on/off.",

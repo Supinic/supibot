@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "raid-react",
 	Events: ["raid"],
 	Description: "According to arguments, reacts to a Twitch channel being raided.",

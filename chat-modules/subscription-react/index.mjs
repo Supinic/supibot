@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "subscription-react",
 	Events: ["subscription"],
 	Description: "According to arguments, reacts to a subscription in a Twitch channel.",
