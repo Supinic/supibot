@@ -187,6 +187,11 @@ module.exports = class ChatModule extends require("./template.js") {
 		}
 	}
 
+	static async initialize () {
+		// Override default behaviour of automatically loading module's data on initialization
+		return this;
+	}
+
 	static async importData (definitions) {
 		const hasConnectorTable = await sb.Query.isTablePresent("chat_data", "Channel_Chat_Module");
 		if (!hasConnectorTable) {
