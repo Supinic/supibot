@@ -1,3 +1,8 @@
+const importModule = async (module, path) => {
+	const { definitions } = await import(`supibot-package-manager/${path}/index.mjs`);
+	await module.importData(definitions);
+};
+
 (async function () {
 	"use strict";
 
@@ -17,8 +22,10 @@
 	const { commands } = await require("supibot-package-manager");
 	await sb.Command.importData(commands.definitions);
 
-	const { definitions } = await import("supibot-package-manager/got/index.mjs");
-	await sb.Got.importData(definitions);
+	await Promise.all([
+		importModule(sb.ChatModule, "chat-module"),
+		importModule(sb.Got, "got")
+	]);
 
 	const controllers = {};
 	const initialChannels = sb.Channel.data.filter(i => i.Mode !== "Inactive");
