@@ -30,32 +30,39 @@ module.exports = {
 		const dir = this.staticData.dir[processType];
 		const pm2 = this.staticData.pm2[processType];
 
-		if (types.includes("all") || types.includes("pull") || types.includes("static")) {
-			queue.push(async () => {
-				await context.sendIntermediateMessage("VisLaud 👉 git pull origin master");
-
-				await shell(`git -C ${dir} checkout -- yarn.lock package.json`);
-				const result = await shell(`git -C ${dir} pull origin master`);
-				console.log("pull result", { stdout: result.stdout, stderr: result.stderr });
-			});
+		if (processType === "bot" && types.includes("all")) {
+			await context.sendIntermediateMessage("VisLaud 👉 yarn prod-update");
+			const result = await shell(`yarn prod-update`);
+			console.log("prod-update result", { stdout: result.stdout, stderr: result.stderr });
 		}
-		if (types.includes("all") || types.includes("yarn") || types.includes("upgrade")) {
-			const { unlink } = require("fs/promises");
-			queue.push(async () => {
-				let message;
-				try {
-					await unlink("/code/supibot/yarn.lock");
-					message = "deleted yarn.lock";
-				}
-				catch {
-					message = "didn't delete yarn.lock";
-				}
+		else {
+			if (types.includes("all") || types.includes("pull") || types.includes("static")) {
+				queue.push(async () => {
+					await context.sendIntermediateMessage("VisLaud 👉 git pull origin master");
 
-				await context.sendIntermediateMessage(`VisLaud 👉 ${message} VisLaud 👉 yarn`);
+					await shell(`git -C ${dir} checkout -- yarn.lock package.json`);
+					const result = await shell(`git -C ${dir} pull origin master`);
+					console.log("pull result", { stdout: result.stdout, stderr: result.stderr });
+				});
+			}
+			if (types.includes("all") || types.includes("yarn") || types.includes("upgrade")) {
+				const { unlink } = require("fs/promises");
+				queue.push(async () => {
+					let message;
+					try {
+						await unlink("/code/supibot/yarn.lock");
+						message = "deleted yarn.lock";
+					}
+					catch {
+						message = "didn't delete yarn.lock";
+					}
 
-				const result = await shell(`yarn --cwd ${dir} workspaces focus -A --production`);
-				console.log("upgrade result", { stdout: result.stdout, stderr: result.stderr });
-			});
+					await context.sendIntermediateMessage(`VisLaud 👉 ${message} VisLaud 👉 yarn`);
+
+					const result = await shell(`yarn --cwd ${dir} workspaces focus -A --production`);
+					console.log("upgrade result", { stdout: result.stdout, stderr: result.stderr });
+				});
+			}
 		}
 
 		let resultMessage = `Process ${processType} restarted successfully.`;
