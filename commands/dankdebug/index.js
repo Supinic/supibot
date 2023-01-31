@@ -160,6 +160,12 @@ module.exports = {
 			return userDataResult;
 		}
 
+		let cooldown = (context.append.pipe) ? null : this.Cooldown;
+		const overrideCooldown = sandboxData.determineCommandCooldown();
+		if (overrideCooldown !== null) {
+			cooldown = overrideCooldown;
+		}
+
 		if (result && typeof result === "object") {
 			try {
 				return {
@@ -176,7 +182,7 @@ module.exports = {
 		}
 		else {
 			return {
-				cooldown: (context.append.pipe) ? null : this.Cooldown,
+				cooldown,
 				reply: String(result)
 			};
 		}

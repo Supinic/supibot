@@ -87,10 +87,19 @@ const isTypeSupported = (value) => {
 };
 
 const predefinedQueries = {
-	content: (rs) => rs
+	content: () => sb.Query.getRecordset(rs => rs
 		.select("Category", "Status")
 		.from("data", "Suggestion")
 		.where("Status IS NULL OR Status IN %s+", ["Approved", "Blocked"])
+	),
+	suscheck: (username) => sb.Query.getRecordset(rs => rs
+		.select("Twitch_ID")
+		.from("data", "Suggestion")
+		.where("Name = %s", username)
+		.flat("Twitch_ID")
+		.single()
+		.limit(1)
+	)
 };
 
 module.exports = async function createDebugSandbox (context, scriptArgs) {
@@ -102,6 +111,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 		? advancedParse(JSON.stringify(rawCustomChannelData))
 		: null;
 
+	const queryExecutions = new Set();
 	let userDataChanged = false;
 	let channelDataChanged = false;
 
@@ -116,20 +126,28 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 		executor: context.user.Name,
 		platform: context.platform.Name,
 		query: sb.Utils.deepFreeze({
-			run: async (queryName) => {
+			run: async (queryName, ...args) => {
 				if (!queryName) {
 					throw new Error("Query name must be provided");
 				}
 				else if (typeof queryName !== "string") {
 					throw new Error("Query name must be provided as a string");
 				}
+				else if (queryExecutions.has(queryName)) {
+					throw new Error("This query has already been executed in this command before");
+				}
 
 				const callback = predefinedQueries[queryName];
 				if (!callback) {
 					throw new Error("Predefined query not found");
 				}
+				else if (callback.length !== args.length) {
+					throw new Error("Amount of arguments provided doesn't match the query function signature");
+				}
 
-				const data = await sb.Query.getRecordset(callback);
+				queryExecutions.add(queryName);
+
+				const data = await callback(...args);
 				if (Array.isArray(data)) {
 					for (let i = 0; i < data.length; i++) {
 						const row = data[i];
@@ -340,6 +358,14 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 			return {
 				success: true
 			};
+		},
+		determineCommandCooldown: () => {
+			if (queryExecutions.size > 0) {
+				return 5000;
+			}
+			else {
+				return null;
+			}
 		}
 	};
 };
