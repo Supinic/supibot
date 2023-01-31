@@ -62,7 +62,11 @@ module.exports = {
 					}
 
 					for (const instanceName of list) {
-						const path = `supibot-package-manager/${name}s/${instanceName}`;
+						// const path = `supibot-package-manager/${name}s/${instanceName}`;
+						// 2023-02-01: Temporary solution (until repositories are merged)
+						const path = `/code/supibot/node_modules/supibot-package-manager/${name}s/${instanceName}`;
+						delete require.cache[require.resolve(path)];
+
 						try {
 							const definition = require(path);
 							definitions.push(definition);
