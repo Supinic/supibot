@@ -465,7 +465,11 @@ module.exports = {
 						}
 
 						const permissions = await context.getUserPermissions();
-						if (!permissions.is("administrator") && row.values.Added_By !== context.user.ID) {
+						const isAdmin = permissions.is("administrator");
+						const isAuthor = (row.values.Added_By === context.user.ID);
+						const isHelper = Boolean(await context.user.getDataProperty("trackListHelper"));
+
+						if (!isAdmin && !isHelper && !isAuthor) {
 							return {
 								success: false,
 								reply: "This track was not added by you!"
