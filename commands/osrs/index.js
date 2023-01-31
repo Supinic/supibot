@@ -68,7 +68,7 @@ module.exports = {
 
 		const skillList = [...skills]
 			.sort((a, b) => a.name.localeCompare(b.name))
-			.map(i => `<li>${i.name} - ${i.emoji}</li>`)
+			.map(i => `<li>${sb.Utils.capitalize(i.name)} - ${i.emoji}</li>`)
 			.join("");
 
 		return [

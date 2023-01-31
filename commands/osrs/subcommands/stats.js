@@ -51,19 +51,16 @@ module.exports = {
 
 		if (context.params.skill) {
 			const skillName = context.params.skill.toLowerCase();
-			const [topMatch] = sb.Utils.selectClosestString(skillName, userStats.skills.map(i => i.name), {
-				fullResult: true,
-				ignoreCase: true
-			});
-
-			if (topMatch.score < 0.5) {
+			const skillData = GameData.find(i => i.name === skillName || i.aliases.includes(skillName));
+			if (!skillData) {
 				return {
 					success: false,
 					reply: "No valid skill matching your query has been found!"
 				};
 			}
 
-			const skill = userStats.skills.find(i => i.name.toLowerCase() === topMatch.string.toLowerCase());
+			const { name, emoji } = skillData;
+			const skill = userStats.skills.find(i => i.name.toLowerCase() === name);
 			if (!skill) {
 				return {
 					success: false,
@@ -77,7 +74,6 @@ module.exports = {
 				};
 			}
 
-			const { emoji } = GameData.skills.find(i => i.name.toLowerCase() === topMatch.string.toLowerCase());
 			const experience = (skill.experience === -1)
 				? "(unranked)"
 				: sb.Utils.groupDigits(skill.experience);

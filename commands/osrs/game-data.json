@@ -151,100 +151,120 @@
   },
   "skills": [
     {
-      "name": "Overall",
-      "emoji": "🏆"
+      "name": "overall",
+      "emoji": "🏆",
+      "aliases": ["total"]
     },
     {
-      "name": "Attack",
-      "emoji": "⚔"
+      "name": "attack",
+      "emoji": "⚔",
+      "aliases": ["atk", "att"]
     },
     {
-      "name": "Strength",
-      "emoji": "✊"
+      "name": "strength",
+      "emoji": "✊",
+      "aliases": ["str"]
     },
     {
-      "name": "Defence",
-      "emoji": "🛡"
+      "name": "defence",
+      "emoji": "🛡",
+      "aliases": ["def"]
     },
     {
-      "name": "Ranged",
+      "name": "ranged",
       "emoji": "🏹"
     },
     {
-      "name": "Prayer",
-      "emoji": "✨"
+      "name": "prayer",
+      "emoji": "✨",
+      "aliases": ["pray"]
     },
     {
-      "name": "Magic",
-      "emoji": "🧙‍"
+      "name": "magic",
+      "emoji": "🧙‍",
+      "aliases": ["mage"]
     },
     {
-      "name": "Runecraft",
-      "emoji": "➰"
+      "name": "runecraft",
+      "emoji": "➰",
+      "aliases": ["rc", "cancer", "runecrafting"]
     },
     {
-      "name": "Construction",
-      "emoji": "🏡"
+      "name": "construction",
+      "emoji": "🏡",
+      "aliases": ["con"]
     },
     {
-      "name": "Hitpoints",
-      "emoji": "♥"
+      "name": "hitpoints",
+      "emoji": "♥",
+      "aliases": ["hp"]
     },
     {
-      "name": "Agility",
-      "emoji": "🏃‍"
+      "name": "agility",
+      "emoji": "🏃‍",
+      "aliases": ["agi"]
     },
     {
-      "name": "Herblore",
-      "emoji": "🌿"
+      "name": "herblore",
+      "emoji": "🌿",
+      "aliases": ["herb"]
     },
     {
-      "name": "Thieving",
+      "name": "thieving",
       "emoji": "💰"
     },
     {
-      "name": "Crafting",
-      "emoji": "🛠"
+      "name": "crafting",
+      "emoji": "🛠",
+      "aliases": ["craft"]
     },
     {
-      "name": "Fletching",
-      "emoji": "🔪"
+      "name": "fletching",
+      "emoji": "🔪",
+      "aliases": ["fletch"]
     },
     {
-      "name": "Slayer",
-      "emoji": "💀"
+      "name": "slayer",
+      "emoji": "💀",
+      "aliases": ["slay"]
     },
     {
-      "name": "Hunter",
+      "name": "hunter",
       "emoji": "🐾"
     },
     {
-      "name": "Mining",
+      "name": "mining",
       "emoji": "⛏"
     },
     {
-      "name": "Smithing",
-      "emoji": "🔨"
+      "name": "smithing",
+      "emoji": "🔨",
+      "aliases": ["smith"]
     },
     {
-      "name": "Fishing",
-      "emoji": "🐟"
+      "name": "fishing",
+      "emoji": "🐟",
+      "aliases": ["fish"]
     },
     {
-      "name": "Cooking",
-      "emoji": "🍲"
+      "name": "cooking",
+      "emoji": "🍲",
+      "aliases": ["cook"]
     },
     {
-      "name": "Firemaking",
-      "emoji": "🔥"
+      "name": "firemaking",
+      "emoji": "🔥",
+      "aliases": ["fm"]
     },
     {
-      "name": "Woodcutting",
-      "emoji": "🌳"
+      "name": "woodcutting",
+      "emoji": "🌳",
+      "aliases": ["wc"]
     },
     {
-      "name": "Farming",
-      "emoji": "‍🌽"
+      "name": "farming",
+      "emoji": "‍🌽",
+      "aliases": ["farm"]
     }
   ]
 }
