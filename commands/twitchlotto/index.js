@@ -356,7 +356,7 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { scoreThreshold } = require("./definitions.js");
+		const { taggingGuide, flags, scoreThreshold } = require("./definitions.js");
 		const thresholdPercent = `${sb.Utils.round(scoreThreshold * 100, 2)}%`;
 
 		const countData = await sb.Query.getRecordset(rs => rs
@@ -373,6 +373,23 @@ module.exports = {
 				<td>${sb.Utils.round(100 * i.Scored / i.Amount, 2)}%</td>
 			</tr>
 		`).join("\n");
+
+		const flagList = flags.map(flagData => {
+			const { name, wrong, correct, description } = flagData;
+			const examples = [
+				...correct.map(i => `<li>Correct: ${i}</li>`),
+				...wrong.map(i => `<li>Wrong: ${i}</li>`)
+			];
+
+			return sb.Utils.tag.trim `
+				<li>
+					<code>${name}</code> - ${description}
+					<ul>
+						${examples.join("")}
+					</ul>
+				</li>
+			`;
+		}).join("");
 
 		return [
 			`<script>
@@ -455,7 +472,14 @@ module.exports = {
 				<li><code>${prefix}set tl (link) (flags)</code> - Adds NSFW flags to an image. More info: <a href="/bot/command/detail/set">$set</a></li>
 				<li><code>${prefix}set tld (link) (description)</code> - Adds a description to an image. More info: <a href="/bot/command/detail/set">$set</a></li>
 				<li><code>${prefix}tle (link)</code> - If an image has NSFW detections, this will highlight them. More info: <a href="/bot/command/detail/twitchlottoexplain">$tle</a></li>
-			</ul>`
+			</ul>`,
+			"",
+
+			"TwitchLotto flags guide",
+			...taggingGuide,
+			"",
+
+			`<ul>${flagList}</ul>`
 		];
 	})
 };

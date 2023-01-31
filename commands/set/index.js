@@ -18,7 +18,7 @@ module.exports = {
 		try {
 			const definitions = require("../twitchlotto/definitions.js");
 
-			availableFlags = definitions.flags.map(i => i.toLowerCase());
+			availableFlags = definitions.flags.map(i => i.name.toLowerCase());
 			createRecentTwitchLottoCacheKey = definitions.createRecentUseCacheKey;
 		}
 		catch {
