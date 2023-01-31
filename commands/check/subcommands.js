@@ -135,7 +135,7 @@ module.exports = (command) => [
 				const startDate = new sb.Date().setDate(1);
 				const endDate = new sb.Date().addMonths(1).addDays(-1).setDate(1);
 
-				const response = await sb.Got("GenericAPI", {
+				const tokenPromise = sb.Got("GenericAPI", {
 					method: "GET",
 					url: `https://api.openai.com/v1/usage`,
 					searchParams: {
@@ -147,23 +147,50 @@ module.exports = (command) => [
 					}
 				});
 
+				const limitPromise = sb.Got("GenericAPI", {
+					method: "GET",
+					url: `https://api.openai.com/dashboard/billing/subscription`,
+					headers: {
+						Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
+					}
+				});
+
+				const [tokenResponse, limitResponse] = await Promise.all([tokenPromise, limitPromise]);
+
 				let requests = 0;
 				let inputTokens = 0;
 				let outputTokens = 0;
-				const total = sb.Utils.round(response.body.current_usage_usd, 2);
 				const prettyMonthName = new sb.Date().format("F Y");
+				const total = sb.Utils.round(tokenResponse.body.current_usage_usd, 2);
 
-				for (const row of response.body.data) {
+				for (const row of tokenResponse.body.data) {
 					requests += row.n_requests;
 					inputTokens += row.n_context_tokens_total;
 					outputTokens += row.n_generated_tokens_total;
+				}
+
+				let totalString = `${total} USD`;
+				let limitExceededString = "";
+				if (limitResponse.ok) {
+					const limit = sb.Utils.round(limitResponse.body.hard_limit_usd, 0);
+					totalString = `${total} / ${limit} USD`;
+
+					if (total >= limit) {
+						const { year, month } = new sb.Date();
+						const nextMonthDate = new sb.Date(year, month + 1, 1).discardTimeUnits("h", "m", "s", "ms");
+						const nextMonthName = nextMonthDate.format("F Y");
+						const nextMonthDelta = sb.Utils.timeDelta(nextMonthDate);
+
+						limitExceededString = `The limit for this month has been exceeded, try again in ${nextMonthName}, which begins ${nextMonthDelta}.`;
+					}
 				}
 
 				return {
 					reply: sb.Utils.tag.trim `
 						So far, there have been ${sb.Utils.groupDigits(requests)} ChatGPT requests in ${prettyMonthName}. 
 						${sb.Utils.groupDigits(inputTokens)} input and ${sb.Utils.groupDigits(outputTokens)} output tokens have been processed,
-						for a total expenditure of $${total}
+						for a total expenditure of ${totalString}.
+						${limitExceededString}
 					`
 				};
 			}
