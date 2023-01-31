@@ -132,15 +132,15 @@ module.exports = (command) => [
 		execute: async (context, target) => {
 			if (target === "global") {
 				// `Date.prototype.setDate` returns a number (!)
-				const startDate = new sb.Date().setDate(1);
-				const endDate = new sb.Date().addMonths(1).addDays(-1).setDate(1);
+				const startDate = new sb.Date(new sb.Date().setDate(1));
+				const endDate = new sb.Date(startDate.year, startDate.month + 1, 1);
 
 				const tokenPromise = sb.Got("GenericAPI", {
 					method: "GET",
 					url: `https://api.openai.com/v1/usage`,
 					searchParams: {
-						start_date: new sb.Date(startDate).format("Y-m-d"),
-						end_date: new sb.Date(endDate).format("Y-m-d")
+						start_date: startDate.format("Y-m-d"),
+						end_date: endDate.format("Y-m-d")
 					},
 					headers: {
 						Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
