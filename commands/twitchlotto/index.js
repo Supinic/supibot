@@ -417,6 +417,21 @@ module.exports = {
 			`This check can be disabled - at the channel owner's (or ambassador's) risk - via the <a href="/bot/command/detail/set">$set twitch-lotto-nsfw</a> command. Check it for more info.`,
 			"",
 
+			"<h5> Data gathering </h5>",
+			"If you would like to help out and make the command more usable for everyone else, you have several options in which you can provide your input!",
+
+			`<ul>
+				<li><code>${prefix}set tl (link) (flags)</code> - Adds NSFW flags to an image. More info: see below.</li>
+				<li><code>${prefix}set tld (link) (description)</code> - Adds a description to an image. More info: <a href="/bot/command/detail/set">$set</a></li>
+				<li><code>${prefix}tle (link)</code> - If an image has NSFW detections, this will highlight them. More info: <a href="/bot/command/detail/twitchlottoexplain">$tle</a></li>
+			</ul>`,
+
+			"<h5>NSFW flags guide</h5>",
+			...taggingGuide,
+			"",
+
+			`<ul>${flagList}</ul>`,
+
 			"<h5> Command usage </h5>",
 			`<code>${prefix}tl</code>`,
 			`<code>${prefix}twitchlotto</code>`,
@@ -463,23 +478,6 @@ module.exports = {
 					${data}
 				</tbody>					
 			</table>`,
-			"",
-
-			"<h5> Data gathering </h5>",
-			"If you would like to help out and make the command more usable for everyone else, you have several options in which you can provide your input!",
-
-			`<ul>
-				<li><code>${prefix}set tl (link) (flags)</code> - Adds NSFW flags to an image. More info: <a href="/bot/command/detail/set">$set</a></li>
-				<li><code>${prefix}set tld (link) (description)</code> - Adds a description to an image. More info: <a href="/bot/command/detail/set">$set</a></li>
-				<li><code>${prefix}tle (link)</code> - If an image has NSFW detections, this will highlight them. More info: <a href="/bot/command/detail/twitchlottoexplain">$tle</a></li>
-			</ul>`,
-			"",
-
-			"TwitchLotto flags guide",
-			...taggingGuide,
-			"",
-
-			`<ul>${flagList}</ul>`
 		];
 	})
 };
