@@ -1,6 +1,7 @@
 module.exports = class Channel extends require("./template.js") {
 	static redisPrefix = "sb-channel";
 	static dataCache = new WeakMap();
+	static uniqueIdentifier = "ID";
 	#setupPromise = null;
 
 	constructor (data) {

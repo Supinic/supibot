@@ -11,6 +11,7 @@ module.exports = class Reminder extends require("./template.js") {
 	 * @type {Map<User.ID, Reminder[]>}
 	 */
 	static data = new Map();
+	static uniqueIdentifier = "ID";
 
 	/* @type {Map<Reminder.ID, User.ID>} */
 	static available = new Map();

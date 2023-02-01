@@ -1,6 +1,7 @@
 module.exports = class AwayFromKeyboard extends require("./template.js") {
 	static data = new Map();
 	static defaultStatus = "afk";
+	static uniqueIdentifier = "ID";
 
 	constructor (data) {
 		super();

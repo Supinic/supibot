@@ -1,6 +1,7 @@
 module.exports = class Platform extends require("./template.js") {
 	#controller = null;
 	#userMessagePromises = new Map();
+	static uniqueIdentifier = "Name";
 
 	constructor (data) {
 		super();

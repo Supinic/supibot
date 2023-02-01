@@ -3,6 +3,7 @@
  */
 module.exports = class Filter extends require("./template.js") {
 	#filterData = null;
+	static uniqueIdentifier = "ID";
 
 	constructor (data) {
 		super();

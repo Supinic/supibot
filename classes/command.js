@@ -143,6 +143,7 @@ class Command extends require("./template.js") {
 	staticData = {};
 
 	static importable = true;
+	static uniqueIdentifier = "Name";
 
 	static #privateMessageChannelID = Symbol("private-message-channel");
 

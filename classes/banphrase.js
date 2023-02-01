@@ -39,6 +39,7 @@ module.exports = (function () {
 		data = {};
 
 		static importable = true;
+		static uniqueIdentifier = "ID";
 
 		constructor (data) {
 			super();

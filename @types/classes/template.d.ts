@@ -43,6 +43,7 @@ type InvalidateRequireCacheOptions<T extends ClassTemplate> = {
 
 export declare class ClassTemplate {
     static importable: boolean;
+    static uniqueIdentifier: GenericIdentifier<ClassTemplate>;
     static data:
         ClassTemplate[]
         | Map<string | number, ClassTemplate>

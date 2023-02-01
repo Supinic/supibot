@@ -1,4 +1,6 @@
 module.exports = class ChatModule extends require("./template.js") {
+	static uniqueIdentifier = "Name";
+
 	Name;
 	Events;
 	Active = true;

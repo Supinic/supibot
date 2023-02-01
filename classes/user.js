@@ -7,6 +7,7 @@ module.exports = class User extends require("./template.js") {
 	static bots = new Map();
 	static dataCache = new WeakMap();
 	static pendingNewUsers = new Map();
+	static uniqueIdentifier = "ID";
 
 	static permissions = {
 		regular: 0b0000_0001,

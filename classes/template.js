@@ -1,6 +1,8 @@
 module.exports = class ClassTemplate {
 	static importable = false;
 
+	static uniqueIdentifier;
+
 	destroy () {}
 
 	async serialize (row, properties, options) {
