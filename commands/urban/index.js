@@ -94,11 +94,6 @@ module.exports = {
 			};
 		}
 
-		let extra = "";
-		if (items.length > 1 && index === null) {
-			extra = `(${items.length - 1} extra definitions)`;
-		}
-
 		const thumbs = `(+${item.thumbs_up}/-${item.thumbs_down})`;
 		const example = (item.example)
 			? ` - Example: ${item.example}`
@@ -117,7 +112,7 @@ module.exports = {
 		}
 
 		return {
-			reply: `${url} ${extra} ${thumbs} ${content}`
+			reply: `${url} ${thumbs} ${content}`
 		};
 	}),
 	Dynamic_Description: null
