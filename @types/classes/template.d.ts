@@ -34,9 +34,8 @@ export type GenericIdentifier<T extends ClassTemplate> = keyof T;
  * this was supposed to be a generic data type that represents any of the subclasses' ConstructorParameters but it doesn't seem to work
  */
 type GenericConstructorData = Record<string, any>;
-type InvalidateRequireCacheOptions<T extends ClassTemplate> = {
+type InvalidateRequireCacheOptions = {
     names: string[];
-    identifierProperty: GenericIdentifier<T>,
     requireBasePath: string;
     extraDeletionCallback?: (path: string) => string[];
 };
@@ -60,7 +59,7 @@ export declare class ClassTemplate {
     static importData (definitions: GenericConstructorData[]): Promise<void>;
     static importSpecific (...definitions: GenericConstructorData[]): Promise<void>;
     static genericImportSpecific<T extends ClassTemplate> (identifierProperty: GenericIdentifier<T>, ...definitions: GenericConstructorData[]): ClassTemplate[];
-    static genericInvalidateRequireCache<T extends ClassTemplate> (options: InvalidateRequireCacheOptions<T>): {
+    static genericInvalidateRequireCache (options: InvalidateRequireCacheOptions): {
         failed: string[];
         succeeded: string[];
     };

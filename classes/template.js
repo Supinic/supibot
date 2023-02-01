@@ -327,7 +327,6 @@ module.exports = class ClassTemplate {
 	static genericInvalidateRequireCache (options) {
 		const {
 			names,
-			identifierProperty,
 			extraDeletionCallback,
 			requireBasePath
 		} = options;
@@ -338,7 +337,7 @@ module.exports = class ClassTemplate {
 			let instanceName;
 			try {
 				const instance = this.get(inputName);
-				instanceName = instance?.[identifierProperty] ?? inputName;
+				instanceName = instance?.[this.uniqueIdentifier] ?? inputName;
 			}
 			catch {
 				instanceName = inputName;
