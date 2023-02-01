@@ -1,4 +1,3 @@
-const ChatGptConfig = require("./config.json");
 module.exports = {
 	Name: "gpt",
 	Aliases: ["chatgpt"],
