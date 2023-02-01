@@ -1,3 +1,4 @@
+const ChatGptConfig = require("./config.json");
 module.exports = {
 	Name: "gpt",
 	Aliases: ["chatgpt"],
@@ -25,9 +26,10 @@ module.exports = {
 			};
 		}
 
+		const [defaultModelName] = Object.entries(ChatGptConfig.models).find(i => i[1].default === true);
 		const {
 			limit: customOutputLimit,
-			model = "davinci"
+			model = defaultModelName
 		} = context.params;
 
 		const modelData = ChatGptConfig.models[model.toLowerCase()];
