@@ -22,6 +22,7 @@
     "update-yarn-v1": "git pull origin master && yarn upgrade supi-core",
     "dev-update": "git pull origin master && yarn up supi-core@supinic/supi-core supibot-package-manager@supinic/supibot-package-manager",
     "prod-update": "git pull origin master && yarn workspaces focus --production -A",
+    "dev-deps-push": "yarn dev-update && git commit ./yarn.lock -m \"bumped dependencies\" && git pull && git push",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "mocha ./tests --recursive --exit",
