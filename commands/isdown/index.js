@@ -16,6 +16,18 @@ module.exports = {
 				reply: `That website is currently up and available. However, this result may be invalid due to caching.`
 			};
 		}
+		else if (fixedInput.includes("shouldiblametmi.com")) {
+			const emote = await context.getBestAvailableEmote(["TMIAteMyMessage", "Clue", "OpieOP"], "😋");
+			const [first, second] = sb.Utils.shuffleArray([
+				"That website is currently up and available.",
+				`Website is currently down: ${emote}`
+			]);
+
+			context.sendIntermediateMessage(first);
+			return {
+				reply: second
+			};
+		}
 
 		const response = await sb.Got("GenericAPI",{
 			url: `https://sitecheck.sucuri.net/api/v3/?scan=${fixedInput}`
