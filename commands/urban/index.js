@@ -103,10 +103,21 @@ module.exports = {
 		const example = (item.example)
 			? ` - Example: ${item.example}`
 			: "";
+
 		const content = (item.definition + example).replace(/[\][]/g, "");
 
+		let url = "";
+		if (typeof context.params.index !== "number" && items.length > 1) {
+			if (term.includes(" ")) {
+				url = `https://urbandictionary.com/define.php?term=${encodeURI(term)}`;
+			}
+			else {
+				url = `https://urbandictionary.com/${encodeURI(term)}`;
+			}
+		}
+
 		return {
-			reply: `${extra} ${thumbs} ${content}`
+			reply: `${url} ${extra} ${thumbs} ${content}`
 		};
 	}),
 	Dynamic_Description: null
