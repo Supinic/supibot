@@ -33,6 +33,19 @@ module.exports = {
 			url: `twitter/timeline/${encodeURI(input)}`
 		});
 
+		if (response.statusCode === 404) {
+			return {
+				success: false,
+				reply: `No such user exists!`
+			};
+		}
+		else if (!response.ok) {
+			return {
+				success: false,
+				reply: `That user's tweets are not available!`
+			};
+		}
+		
 		let eligibleTweets = response.body.timeline;
 		if (context.params.mediaOnly) {
 			eligibleTweets = eligibleTweets.filter(i => Array.isArray(i.entities.media) && i.entities.media.length !== 0);
