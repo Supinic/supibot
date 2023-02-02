@@ -477,7 +477,7 @@ module.exports = {
 				<tbody>
 					${data}
 				</tbody>					
-			</table>`,
+			</table>`
 		];
 	})
 };
