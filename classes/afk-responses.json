@@ -1,0 +1,27 @@
+{
+  "afk": ["is no longer AFK"],
+  "poop": ["is done taking a dump", "finished pooping", "forgot to flush", "washed hands", "didn't wash hands"],
+  "brb": ["just got back", "hopped back", "- welcome back"],
+  "food": [
+    "finished eating",
+    "is no longer stuffing their face",
+    "is now full",
+    "is done eating OpieOP describe taste"
+  ],
+  "shower": ["is now squeaky clean", "finished showering"],
+  "lurk": ["stopped lurking", "turned off the lurk mode"],
+  "gn": ["just woke up", "finished their beauty sleep", "just got up"],
+  "work": ["finished their work", "is taking a break from work", "finished working hard Kappa //"],
+  "nap": [
+    "is feeling refreshed",
+    "is full of energy",
+    "surely didn't oversleep"
+  ],
+  "study": [
+    "is full of knowledge",
+    "finished studying",
+    "is now ready for the exam",
+    "is fed up with studying",
+    "is now smarter than most of the people in chat"
+  ]
+}
