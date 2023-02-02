@@ -292,7 +292,7 @@ module.exports = class ClassTemplate {
 
 	// Overridden in derived classes
 	// eslint-disable-next-line no-unused-vars
-	static importSpecific (requireBasePath, ...definitions) {
+	static importSpecific (...definitions) {
 		throw new sb.Error({
 			message: "This method must be implemented by derived classes"
 		});
