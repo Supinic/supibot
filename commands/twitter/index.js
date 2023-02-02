@@ -57,6 +57,16 @@ module.exports = {
 			}
 		}
 
+		if (!context.params.includeRetweets) {
+			eligibleTweets = eligibleTweets.filter(i => !i.retweeted_status_result);
+			if (eligibleTweets.length === 0) {
+				return {
+					success: false,
+					reply: `There are no recent tweets that are not retweets!`
+				};
+			}
+		}
+
 		let isSensitiveContentAllowed = false;
 		if (!context.channel) {
 			isSensitiveContentAllowed = true;
