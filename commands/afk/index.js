@@ -9,8 +9,6 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (command => ({
 		statusLengthLimit: 2000,
-		// Only used within the AFK module
-		responses: require("./responses.json"),
 		/* eslint-disable array-element-newline */
 		foodEmojis: [
 			"🍋", "🍞", "🥐", "🥖", "🥨", "🥯", "🥞", "🧀", "🍖", "🍗", "🥩", "🥓", "🍔", "🍟", "🍕", "🌭", "🥪", "🌮", "🌯",
