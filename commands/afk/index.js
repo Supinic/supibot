@@ -16,7 +16,7 @@ module.exports = {
 			"🍥", "🍡", "🥟", "🥠", "🥡", "🍦", "🍧", "🍨", "🍩", "🍪", "🎂", "🍰", "🥧", "🍫", "🍬", "🍭", "🍮", "🍯"
 		],
 		/* eslint-enable array-element-newline */
-
+		// @todo eventually merge these definitions with `supi-core/classes/afk-responses.json`
 		invocations: [
 			{
 				name: "afk",
