@@ -359,15 +359,14 @@ class Command extends require("./template.js") {
 	}
 
 	static async importSpecific (...definitions) {
-		super.genericImportSpecific("Name", ...definitions);
+		super.genericImportSpecific(...definitions);
 		await this.validate();
 	}
 
-	static invalidateRequireCache (...names) {
+	static invalidateRequireCache (requireBasePath, ...names) {
 		return super.genericInvalidateRequireCache({
 			names,
-			identifierProperty: "Name",
-			requireBasePath: "supibot-package-manager/commands",
+			requireBasePath,
 			extraDeletionCallback: (path) => {
 				const dirPath = pathModule.parse(path).dir;
 				const mainFilePath = pathModule.join(dirPath, "index.js");
@@ -378,89 +377,6 @@ class Command extends require("./template.js") {
 				});
 			}
 		});
-	}
-
-	static async loadData () {
-		const { definitions } = await require("supibot-package-manager/commands");
-
-		Command.data = definitions.map(record => new Command(record));
-		await this.validate();
-	}
-
-	static async reloadSpecific (...list) {
-		if (list.length === 0) {
-			return {
-				success: false
-			};
-		}
-
-		const failed = [];
-		for (const commandName of list) {
-			const originalCommand = Command.get(commandName);
-			const identifier = originalCommand?.Name ?? originalCommand?.name ?? commandName;
-			if (originalCommand) {
-				const commandIndex = Command.data.indexOf(originalCommand);
-				if (commandIndex !== -1) {
-					Command.data.splice(commandIndex, 1);
-				}
-
-				originalCommand.destroy();
-			}
-
-			// Try-catch is mandatory because `require.resolve` throws when the path doesn't exist or is not a module.
-			// This might occur when a command name is mistaken. While throwing here is correct, the loading
-			// should continue regardless of that.
-			let path;
-			try {
-				path = require.resolve(`supibot-package-manager/commands/${identifier}`);
-				delete require.cache[path];
-
-				// Automatically attempt to find all related files in the command's directory, and then remove
-				// them from `require.cache`. This is to remove the burden of reloading from commands themselves.
-				const dirPath = pathModule.parse(path).dir;
-				const mainFilePath = pathModule.join(dirPath, "index.js");
-				const otherFilePaths = Object.keys(require.cache).filter(filePath => {
-					const hasCorrectExtension = (filePath.endsWith(".js") || filePath.endsWith(".json"));
-					return (filePath.startsWith(dirPath) && hasCorrectExtension && filePath !== mainFilePath);
-				});
-
-				for (const otherFilePath of otherFilePaths) {
-					delete require.cache[otherFilePath];
-				}
-			}
-			catch {
-				failed.push({
-					identifier,
-					reason: "no-path"
-				});
-
-				continue;
-			}
-
-			let definition;
-			try {
-				definition = require(`supibot-package-manager/commands/${identifier}`);
-			}
-			catch {
-				failed.push({
-					identifier,
-					reason: "no-definition"
-				});
-
-				continue;
-			}
-
-			const reloadedCommand = new Command(definition);
-
-			Command.data.push(reloadedCommand);
-		}
-
-		await this.validate();
-
-		return {
-			success: true,
-			failed
-		};
 	}
 
 	static async validate () {

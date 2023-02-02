@@ -57,8 +57,8 @@ export declare class ClassTemplate {
 
     static initialize (): Promise<ClassTemplate>;
     static importData (definitions: GenericConstructorData[]): Promise<void>;
-    static importSpecific (...definitions: GenericConstructorData[]): Promise<void>;
-    static genericImportSpecific<T extends ClassTemplate> (identifierProperty: GenericIdentifier<T>, ...definitions: GenericConstructorData[]): ClassTemplate[];
+    static importSpecific (requireBasePath: string, ...definitions: GenericConstructorData[]): Promise<void>;
+    static genericImportSpecific (...definitions: GenericConstructorData[]): ClassTemplate[];
     static genericInvalidateRequireCache (options: InvalidateRequireCacheOptions): {
         failed: string[];
         succeeded: string[];

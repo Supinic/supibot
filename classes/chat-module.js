@@ -229,7 +229,7 @@ module.exports = class ChatModule extends require("./template.js") {
 		}
 
 		const attachmentData = await ChatModule.#fetch(definitions.map(i => i.Name));
-		const newInstances = super.genericImportSpecific("Name", ...definitions);
+		const newInstances = super.genericImportSpecific(...definitions);
 
 		for (const instance of newInstances) {
 			const moduleAttachmentData = attachmentData.filter(i => i.Chat_Module === instance.Name);

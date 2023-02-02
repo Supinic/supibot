@@ -290,13 +290,15 @@ module.exports = class ClassTemplate {
 		this.data = definitions.map(definition => new this(definition));
 	}
 
-	static importSpecific () {
+	// Overridden in derived classes
+	// eslint-disable-next-line no-unused-vars
+	static importSpecific (requireBasePath, ...definitions) {
 		throw new sb.Error({
 			message: "This method must be implemented by derived classes"
 		});
 	}
 
-	static genericImportSpecific (identifierProperty, ...definitions) {
+	static genericImportSpecific (...definitions) {
 		if (!this.importable) {
 			throw new sb.Error({
 				message: "This class does not support importing definitions"
@@ -309,7 +311,7 @@ module.exports = class ClassTemplate {
 
 		const addedInstances = [];
 		for (const definition of definitions) {
-			const previousInstance = this.get(definition[identifierProperty]);
+			const previousInstance = this.get(definition[this.uniqueIdentifier]);
 			if (previousInstance) {
 				const index = this.data.indexOf(previousInstance);
 				this.data.splice(index, 1);
