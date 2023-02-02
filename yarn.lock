@@ -5062,7 +5062,7 @@ __metadata:
 
 supi-core@supinic/supi-core:
   version: 2.2.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=aa926e61cb2054ff7689323db0bf8323cc1f6005"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=fe5202fcead38b48aace96cfa1958cf34a173f2c"
   dependencies:
     async-markov: "github:supinic/async-markov"
     cheerio: ^1.0.0-rc.12
@@ -5079,11 +5079,10 @@ supi-core@supinic/supi-core:
     random-js: ^2.1.0
     roll-dice: "npm:@jprochazk/roll-dice@^0.2.2"
     rss-parser: ^3.12.0
-    supibot-package-manager: "github:supinic/supibot-package-manager"
     track-link-parser: "github:supinic/track-link-parser"
     transliteration: ^2.3.5
     vm2: ^3.9.13
-  checksum: 90ab0ca0921cb37d4badf83f83fa59526ceb8d804e860679385288c80452836446947929d8bd8392529aad9f9b2a80e486e62b1a6d0fec167f913255ca5f5b50
+  checksum: c02bce088589b6d359cb3ca2606aae3371c531fda81fefe7641365538b4f40c34e2ea45f87e12ad917574d94ed0408971d480b9e8fc2d43193cc0f359e2581e3
   languageName: node
   linkType: hard
 
@@ -5096,17 +5095,10 @@ supi-core@supinic/supi-core:
   languageName: node
   linkType: hard
 
-"supibot-package-manager@github:supinic/supibot-package-manager":
-  version: 1.0.0
-  resolution: "supibot-package-manager@https://github.com/supinic/supibot-package-manager.git#commit=d7799da9e96f16dd3ebcb15019c6d6ae50f92f4a"
-  checksum: 1b35b3c1a997cdf9660a95e8cc14fa904ddc15de5efbd0aece58cf8b549319d61812ef3621b4e7c51a7e56f11880f827b49e18032bb45be1880290f440c8d400
-  languageName: node
-  linkType: hard
-
 supibot-package-manager@supinic/supibot-package-manager:
   version: 1.0.0
-  resolution: "supibot-package-manager@https://github.com/supinic/supibot-package-manager.git#commit=2659356659a8a60b8ad89481415b889279e1f97d"
-  checksum: 1007ee957a224b2ab787fdbd2f08bc89364119e5312821b41b9e5962d07f06705d8b2731851e75ae71b3754f8519cc4a98c9d28aadb0f4cb98e03ba3f518feb5
+  resolution: "supibot-package-manager@https://github.com/supinic/supibot-package-manager.git#commit=ee7137984504679ad3de6137c180352cdddc5d34"
+  checksum: 3c619228fa4810574f6a577fc096c060a93b09f9081aa7354977b0d0ca087034709af6e18d1f5346dfbf3643a93bf7c61457339e56523815beaeb1e96f18516d
   languageName: node
   linkType: hard
 
