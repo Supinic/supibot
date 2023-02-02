@@ -45,8 +45,8 @@ module.exports = {
 				reply: `That user's tweets are not available!`
 			};
 		}
-		
-		let eligibleTweets = response.body.timeline;
+
+		let eligibleTweets = response.body.data.timeline;
 		if (context.params.mediaOnly) {
 			eligibleTweets = eligibleTweets.filter(i => Array.isArray(i.entities.media) && i.entities.media.length !== 0);
 			if (eligibleTweets.length === 0) {
