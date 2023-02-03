@@ -6,8 +6,6 @@ const importModule = async (module, path) => {
 (async function () {
 	"use strict";
 
-	process.env.PROJECT_TYPE = "bot";
-
 	/** Database access keys are loaded here, and stored to process.env */
 	require("./db-access");
 
