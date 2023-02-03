@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "stay-hydrated",
 	Expression: "0 20 * * * *",
 	Description: "Stay hydrated!",

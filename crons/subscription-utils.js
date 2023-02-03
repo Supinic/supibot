@@ -48,7 +48,7 @@ const fetchSubscriptionUsers = async function (subType, lastSeenThreshold = 36e5
 /**
  * @param {UserSubscription[]} users
  * @param {string} message
- * @returns {Promise<void>}
+ * @returns {Promise<Array>}
  */
 const createReminders = async function (users, message) {
 	return await Promise.all(users.map(user => (
@@ -71,7 +71,7 @@ const createReminders = async function (users, message) {
  * @param {number} [options.lastSeenThreshold]
  * @returns {Promise<void>}
  */
-const handleSubscription = async function (subType, message, options = {}) {
+export const handleSubscription = async function (subType, message, options = {}) {
 	const { activeUsers, inactiveUsers } = await fetchSubscriptionUsers(subType, options.lastSeenThreshold);
 
 	await createReminders(inactiveUsers, message);
@@ -91,7 +91,7 @@ const handleSubscription = async function (subType, message, options = {}) {
 	}
 };
 
-const parseRssNews = async function (xml, cacheKey) {
+export const parseRssNews = async function (xml, cacheKey) {
 	const feed = await sb.Utils.parseRSS(xml);
 	const lastPublishDate = await sb.Cache.getByPrefix(cacheKey) ?? 0;
 	const eligibleArticles = feed.items
@@ -119,9 +119,4 @@ const parseRssNews = async function (xml, cacheKey) {
 	}
 
 	return result;
-};
-
-module.exports = {
-	handleSubscription,
-	parseRssNews
 };

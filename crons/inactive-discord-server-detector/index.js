@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "inactive-discord-server-detector",
 	Expression: "0 0 12 * * 2",
 	Description: "Logs the amount of currently active chatters.",

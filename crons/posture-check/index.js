@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "posture-check",
 	Expression: "0 50 * * * *",
 	Description: "Check your posture!",

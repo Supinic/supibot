@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "v8-version-checker",
 	Expression: "0 5 */1 * * *",
 	Description: "Checks new releases of V8, and if one is detected, posts about it in chat and reminds subscribed users if they're not around.",

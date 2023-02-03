@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "train-twitter-archiver",
 	Expression: "0 */15 * * * *",
 	Description: "Archives @Trainwreckstv's tweets",

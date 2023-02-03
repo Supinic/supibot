@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "bot-request-denial-manager",
 	Expression: "*/15 * * * *",
 	Description: "Sends out private messages whenever a bot request suggestion is denied. Only runs on Tuesdays",

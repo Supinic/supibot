@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "fetch-twitch-subscriber-list",
 	Expression: "0 0 * * * *",
 	Description: "Fetches the current subscriber list, then saves it to sb.Cache",

@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "supinic-tcb",
 	Expression: "0 0 * * * *",
 	Description: "Posts a small help for titlechange_bot in #supinic",

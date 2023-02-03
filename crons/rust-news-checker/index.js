@@ -1,11 +1,11 @@
-module.exports = {
+export const definition = {
 	Name: "rust-news-checker",
 	Expression: "0 0 * * * *",
 	Description: "Checks for new Rust (programming language) articles, and posts updates for subscribed users.",
 	Defer: null,
 	Type: "Bot",
 	Code: (async function checkRustNews () {
-		const { handleSubscription, parseRssNews } = require("../subscription-utils.js");
+		const { handleSubscription, parseRssNews } = await import("../subscription-utils.js");
 		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Event_Subscription");
 		if (this.data.isTableAvailable === false) {
 			this.stop();

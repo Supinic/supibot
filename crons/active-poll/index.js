@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "active-poll",
 	Expression: "0 15,45 * * * *",
 	Description: "If a poll is running, announce it in chat every couple of minutes.",

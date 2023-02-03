@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "close-polls",
 	Expression: "0 * * * * *",
 	Description: "Checks for unclosed polls that have ended, and if it finds one, determines the result, and sends system reminders to everyone who voted.",

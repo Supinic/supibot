@@ -1,11 +1,11 @@
-module.exports = {
+export const definition = {
 	Name: "runelite-version-updater",
 	Expression: "0 0 */1 * * *",
 	Description: "Checks new releases of nodejs, and if one is detected, then posts it in chat.",
 	Defer: null,
 	Type: "Bot",
 	Code: (async function checkLastRuneliteVersion () {
-		const { handleSubscription } = require("../subscription-utils.js");
+		const { handleSubscription } = await import("../subscription-utils.js");
 		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Event_Subscription");
 		if (this.data.isTableAvailable === false) {
 			this.stop();

@@ -1,4 +1,4 @@
-module.exports = {
+export const definition = {
 	Name: "yoink-soundcloud-client-id",
 	Expression: "0 */10 * * * *",
 	Description: "\"Borrows\" the clientside Soundcloud API key to be used for TrackLinkParser module.",
