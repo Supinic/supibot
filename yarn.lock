@@ -5097,8 +5097,8 @@ supi-core@supinic/supi-core:
 
 supibot-package-manager@supinic/supibot-package-manager:
   version: 1.0.0
-  resolution: "supibot-package-manager@https://github.com/supinic/supibot-package-manager.git#commit=9522b813646c968489907105f628cf1a7a28ac9f"
-  checksum: 697fb0971c155ae21ba9800d489b8d13d20b0b409453a101610d5b57652f956f7154aa8c836fe27169a8b36fb36f1a3a0c310b61145a5735350a6cc8b88f5529
+  resolution: "supibot-package-manager@https://github.com/supinic/supibot-package-manager.git#commit=70a55869d1cd6b9a1935c8a94755bba7b476347d"
+  checksum: 7f4a9e3fb686b560377d1a8741d227a2efd47dda9f3add9e1b07301a17db0611e19cb8061f75279c14b0640c1d301c9f0f9a8e22ff28c9dfc0fcec4321c03a6e
   languageName: node
   linkType: hard
 
