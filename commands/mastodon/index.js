@@ -50,10 +50,36 @@ module.exports = {
 			};
 		}
 
+		let nodeInfoUrl;
+		try {
+			nodeInfoUrl = new URL(`https://${instance}/.well-known/nodeinfo`);
+		}
+		catch {
+			return {
+				success: false,
+				reply: `Invalid instance URL provided!`
+			};
+		}
+
+		// Try and find nodeinfo response
+		const nodeInfoResponse = await sb.Got("GenericAPI", {
+			url: nodeInfoUrl
+		});
+
+		if (!nodeInfoResponse.ok) {
+			return {
+				success: false,
+				reply: `Provided URL is not a proper Mastodon instance!`
+			};
+		}
+
+		const properInstance = nodeInfoResponse.body.links[0].href;
+		const node = new URL(properInstance);
 		const fixedUser = (user.startsWith("@")) ? user : `@${user}`;
+
 		let url;
 		try {
-			url = new URL(`https://${instance}/${fixedUser}.rss`);
+			url = new URL(`https://${node.host}/${fixedUser}.rss`);
 		}
 		catch {
 			return {
