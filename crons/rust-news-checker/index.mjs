@@ -5,7 +5,7 @@ export const definition = {
 	Defer: null,
 	Type: "Bot",
 	Code: (async function checkRustNews () {
-		const { handleSubscription, parseRssNews } = await import("../subscription-utils.js");
+		const { handleSubscription, parseRssNews } = await import("../subscription-utils.mjs");
 		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Event_Subscription");
 		if (this.data.isTableAvailable === false) {
 			this.stop();
