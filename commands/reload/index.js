@@ -58,7 +58,7 @@ module.exports = {
 					result.failed = [];
 
 					if (typeof module.invalidateRequireCahe === "function") {
-						module.invalidateRequireCache(...list);
+						module.invalidateRequireCache(`supibot-package-manager/${name}s`, ...list);
 					}
 
 					for (const instanceName of list) {
