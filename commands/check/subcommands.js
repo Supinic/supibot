@@ -169,11 +169,15 @@ module.exports = (command) => [
 					outputTokens += row.n_generated_tokens_total;
 				}
 
-				let totalString = `${total} USD`;
+				let totalString = `for a total expenditure of ${total} USD`;
 				let limitExceededString = "";
-				if (limitResponse.ok) {
+
+				if (total === 0) {
+					totalString = "but the expenditure for this moneth is currently unknown"
+				}
+				else if (limitResponse.ok) {
 					const limit = sb.Utils.round(limitResponse.body.hard_limit_usd, 0);
-					totalString = `${total} / ${limit} USD`;
+					totalString = `for a total expenditure of ${total} / ${limit} USD`;
 
 					if (total >= limit) {
 						const { year, month } = new sb.Date();
@@ -189,7 +193,7 @@ module.exports = (command) => [
 					reply: sb.Utils.tag.trim `
 						So far, there have been ${sb.Utils.groupDigits(requests)} ChatGPT requests in ${prettyMonthName}. 
 						${sb.Utils.groupDigits(inputTokens)} input and ${sb.Utils.groupDigits(outputTokens)} output tokens have been processed,
-						for a total expenditure of ${totalString}.
+						${totalString}.
 						${limitExceededString}
 					`
 				};
