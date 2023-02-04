@@ -26,12 +26,12 @@ module.exports = {
 		}
 
 		const [defaultModelName] = Object.entries(ChatGptConfig.models).find(i => i[1].default === true);
-		const {
-			limit: customOutputLimit,
-			model = defaultModelName
-		} = context.params;
+		const customOutputLimit = context.params.limit;
+		const modelName = (context.params.model)
+			? context.params.model.toLowerCase()
+			: defaultModelName;
 
-		const modelData = ChatGptConfig.models[model.toLowerCase()];
+		const modelData = ChatGptConfig.models[modelName];
 		if (!modelData) {
 			const names = Object.keys(ChatGptConfig.models).sort().join(", ");
 			return {
@@ -174,7 +174,7 @@ module.exports = {
 		}
 
 		const { choices, usage } = response.body;
-		await GptCache.addUsageRecord(context.user, usage.total_tokens, model);
+		await GptCache.addUsageRecord(context.user, usage.total_tokens, modelName);
 
 		const [chatResponse] = choices;
 		return {
