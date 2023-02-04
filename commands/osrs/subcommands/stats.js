@@ -51,7 +51,7 @@ module.exports = {
 
 		if (context.params.skill) {
 			const skillName = context.params.skill.toLowerCase();
-			const skillData = GameData.skillsfind(i => i.name === skillName || i.aliases.includes(skillName));
+			const skillData = GameData.skills.find(i => i.name === skillName || i.aliases.includes(skillName));
 			if (!skillData) {
 				return {
 					success: false,
