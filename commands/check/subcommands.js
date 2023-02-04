@@ -173,7 +173,7 @@ module.exports = (command) => [
 				let limitExceededString = "";
 
 				if (total === 0) {
-					totalString = "but the expenditure for this moneth is currently unknown"
+					totalString = "but the expenditure for this month is currently unknown";
 				}
 				else if (limitResponse.ok) {
 					const limit = sb.Utils.round(limitResponse.body.hard_limit_usd, 0);
