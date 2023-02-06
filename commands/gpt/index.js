@@ -190,17 +190,21 @@ module.exports = {
 
 		const modelListHTML = Object.entries(ChatGptConfig.models).map(([name, modelData]) => {
 			const letter = name[0].toUpperCase();
+			const capName = sb.Utils.capitalize(name);
 			const defaultString = (modelData === defaultModelData)
 				? " (default model)"
 				: "";
 
-			if (modelData.usageDivisor === 1) {
-				return `<li><b>${sb.Utils.capitalize(name)}</b> (${letter})${defaultString}</li>`;
+			if (modelData.disabled) {
+				return `<li><del><b>${capName}</b> (${letter})</del> - ${modelData.disableReason}</li>`;
+			}
+			else if (modelData.usageDivisor === 1) {
+				return `<li><b>${capName}</b> (${letter}) ${defaultString}</li>`;
 			}
 			else {
-				return `<li><b>${sb.Utils.capitalize(name)}</b> (${letter}) - ${modelData.usageDivisor}x cheaper than ${basePriceModel}${defaultString}</li>`;
+				return `<li><b>${capName}</b> (${letter}) - ${modelData.usageDivisor}x cheaper than ${basePriceModel}${defaultString}</li>`;
 			}
-		}).join("");
+		}).filter(Boolean).join("");
 
 		return [
 			"Ask ChatGPT pretty much anything, and watch technology respond to you in various fun and interesting ways!",
