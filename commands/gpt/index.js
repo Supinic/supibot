@@ -40,6 +40,12 @@ module.exports = {
 				reply: `Invalid ChatGPT model supported! Use one of: ${names}`
 			};
 		}
+		else if (modelData.disabled) {
+			return {
+				success: false,
+				reply: `That model is currently disabled! Reason: ${modelData.disableReason ?? "(N/A)"}`
+			};
+		}
 
 		if (query.length > ChatGptConfig.globalInputLimit) {
 			return {
@@ -196,7 +202,7 @@ module.exports = {
 				: "";
 
 			if (modelData.disabled) {
-				return `<li><del><b>${capName}</b> (${letter})</del> - ${modelData.disableReason}</li>`;
+				return `<li><del><b>${capName}</b> (${letter})</del> - model is currently disabled: ${modelData.disableReason ?? "(N/A)"}</li>`;
 			}
 			else if (modelData.usageDivisor === 1) {
 				return `<li><b>${capName}</b> (${letter}) ${defaultString}</li>`;

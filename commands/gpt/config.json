@@ -38,7 +38,7 @@
       "url": "text-curie-001",
       "default": false,
       "disabled": true,
-      "disableReason": "temporarily disabled due to unsafe generated content",
+      "disableReason": "unsafe generated content",
       "outputLimit": {
         "default": 100,
         "maximum": 250
