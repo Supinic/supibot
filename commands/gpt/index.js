@@ -200,7 +200,8 @@ module.exports = {
 			}
 		});
 
-		const { categories, category_scores: scores } = moderationCheck.body;
+		const [moderationResult] = moderationCheck.body.results;
+		const { categories, category_scores: scores } = moderationResult;
 		if (categories.hate || categories["violence/graphic"] || categories["sexual/minors"]) {
 			const logId = await sb.Logger.log(
 				"Command.Warning",
