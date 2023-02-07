@@ -188,7 +188,7 @@ module.exports = {
 				},
 				{
 					name: "reminder",
-					aliases: ["notify", "reminders", "notification", "notifications"],
+					aliases: ["remind", "reminders"],
 					parameter: "ID",
 					description: "Unsets an active reminder either set by you, or for you. You can use the <code>from:(user)</code> parameter to quickly unset all timed reminders set for you by a given user.",
 					pipe: true,
