@@ -24,6 +24,9 @@ export const definition = {
 		else if (/get\s+viewers\s+pro/.test(msg)) {
 			type = "feeling more popular";
 		}
+		else if (msg.includes("upgrade your stream")) {
+			type = "upgrading your stream";
+		}
 		else {
 			return;
 		}
