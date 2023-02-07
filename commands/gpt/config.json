@@ -25,7 +25,7 @@
         "maximum": 2000
       },
       "usageDivisor": 50,
-      "usePromptPrefix": true
+      "usePromptPrefix": false
     },
     "babbage": {
       "url": "text-babbage-001",
@@ -35,7 +35,7 @@
         "maximum": 1000
       },
       "usageDivisor": 40,
-      "usePromptPrefix": true
+      "usePromptPrefix": false
     },
     "curie": {
       "url": "text-curie-001",
@@ -47,7 +47,7 @@
         "maximum": 250
       },
       "usageDivisor": 10,
-      "usePromptPrefix": true
+      "usePromptPrefix": false
     },
     "davinci": {
       "url": "text-davinci-003",
@@ -58,7 +58,7 @@
         "maximum": 100
       },
       "usageDivisor": 1,
-      "usePromptPrefix": true
+      "usePromptPrefix": false
     }
   }
 }
