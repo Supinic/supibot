@@ -1,4 +1,5 @@
 {
+  "defaultPromptPefix": "You are a chat bot. Don't use slurs.",
   "defaultTemperature": 0.5,
   "globalInputLimit": 500,
   "outputLimit": {
@@ -23,7 +24,8 @@
         "default": 200,
         "maximum": 2000
       },
-      "usageDivisor": 50
+      "usageDivisor": 50,
+      "usePromptPrefix": true
     },
     "babbage": {
       "url": "text-babbage-001",
@@ -32,7 +34,8 @@
         "default": 200,
         "maximum": 1000
       },
-      "usageDivisor": 40
+      "usageDivisor": 40,
+      "usePromptPrefix": true
     },
     "curie": {
       "url": "text-curie-001",
@@ -43,7 +46,8 @@
         "default": 100,
         "maximum": 250
       },
-      "usageDivisor": 10
+      "usageDivisor": 10,
+      "usePromptPrefix": true
     },
     "davinci": {
       "url": "text-davinci-003",
@@ -53,7 +57,8 @@
         "default": 25,
         "maximum": 100
       },
-      "usageDivisor": 1
+      "usageDivisor": 1,
+      "usePromptPrefix": true
     }
   }
 }

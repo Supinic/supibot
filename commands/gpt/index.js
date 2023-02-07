@@ -123,7 +123,11 @@ module.exports = {
 			.digest()
 			.toString("hex");
 
-		const prompt = `Query: ${query}\nAnswer: `;
+		const promptPrefix = (modelData.usePromptPrefix)
+			? `${ChatGptConfig.defaultPromptPefix}\n`
+			: "";
+
+		const prompt = `${promptPrefix} Query: ${query}\nAnswer: `;
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
 			throwHttpErrors: false,
