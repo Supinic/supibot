@@ -2,11 +2,11 @@ module.exports = {
 	Name: "externalbot",
 	Aliases: ["ebot"],
 	Author: "supinic",
-	Cooldown: 0,
+	Cooldown: 15000,
 	Description: "Makes Supibot execute a command of a different bot, and then the result will be that bot's command response. As such, this command can only be used in a pipe.",
-	Flags: ["external-input","mention","pipe","whitelist"],
+	Flags: ["external-input","mention","pipe"],
 	Params: null,
-	Whitelist_Response: "Currently being tested, and only available to trusted developers",
+	Whitelist_Response: null,
 	Static_Data: (() => ({
 		responseTimeout: 10_000
 	})),
@@ -32,9 +32,11 @@ module.exports = {
 		}
 
 		let botData = null;
+		let foundPrefix;
 		const message = rest.join(" ");
 		for (const { Prefix: prefix, Bot_Alias: botID } of this.data.prefixes) {
 			if (message.startsWith(prefix)) {
+				foundPrefix = prefix;
 				botData = await sb.User.get(botID);
 				break;
 			}
@@ -52,6 +54,14 @@ module.exports = {
 				success: false,
 				reason: "bad_invocation",
 				reply: "I'm not an external bot! 😠"
+			};
+		}
+
+		const presentUsers = await context.channel.fetchUserList();
+		if (!presentUsers.includes(botData.Name)) {
+			return {
+				success: false,
+				reply: `Bot ${botData.Name} (based on command prefix ${foundPrefix}) is not present in this channel!`
 			};
 		}
 
