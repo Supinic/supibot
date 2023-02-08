@@ -77,8 +77,13 @@ const execute = async function (context, query) {
 			searchParams.target_lang = code;
 		}
 	}
+
 	else {
-		searchParams.target_lang = "EN";
+		const userDefaultLanguage = await context.user.getDataProperty("defaultUserLanguage");
+
+		searchParams.target_lang = (userDefaultLanguage)
+			? userDefaultLanguage.code.toUpperCase()
+			: "EN";
 	}
 
 	const response = await sb.Got("GenericAPI", {

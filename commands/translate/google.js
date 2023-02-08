@@ -44,6 +44,14 @@ const execute = async function (context, query) {
 		options[option] = code.toLowerCase();
 	}
 
+	if (!context.params.to && options.to === "en") {
+		const userDefaultLanguage = await context.user.getDataProperty("defaultUserLanguage");
+
+		options.to = (userDefaultLanguage)
+			? userDefaultLanguage.code.toLowerCase()
+			: "en";
+	}
+
 	const response = await sb.Got("FakeAgent", {
 		url: "https://translate.googleapis.com/translate_a/single",
 		responseType: "json",
