@@ -74,13 +74,14 @@ const execute = async function (context, query) {
 	if (!targetLanguageCode) {
 		return {
 			success: false,
-			reply: `Output language was not recognized!`
+			reply: `Invalid or unsupported language provided!`
 		};
 	}
 	else if (!supportedLanguages.includes(targetLanguageCode)) {
+		const languageName = sb.Utils.capitalize(languageISO.getName(targetLanguageCode));
 		return {
 			success: false,
-			reply: `Output language is not supported by DeepL!`
+			reply: `Target language (${languageName}) is not supported by DeepL!`
 		};
 	}
 
