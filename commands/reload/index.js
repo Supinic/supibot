@@ -29,7 +29,7 @@ module.exports = {
 				}
 
 				const emote = await context.getBestAvailableEmote(["ppCircle", "supiniLoading"], "⏳");
-				const message = `${emote} running yarn, please wait ${emote}`;
+				const message = `${emote} running git pull, please wait ${emote}`;
 				await context.sendIntermediateMessage(message);
 
 				await shell(`git pull origin master`);
