@@ -1,4 +1,5 @@
 module.exports = class ChatModule extends require("./template.js") {
+	static importable = true;
 	static uniqueIdentifier = "Name";
 
 	Name;
