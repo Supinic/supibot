@@ -55,36 +55,36 @@ const execute = async function (context, query) {
 		// keep the source_lang property empty - API will attempt to figure it out
 	}
 
+	let targetLanguageCode;
 	if (context.params.to) {
 		if (context.params.to === "random") {
 			searchParams.target_lang = sb.Utils.randArray(supportedLanguages);
 		}
 		else {
-			const code = languageISO.getCode(context.params.to);
-			if (!code) {
-				return {
-					success: false,
-					reply: `Output language was not recognized!`
-				};
-			}
-			else if (!supportedLanguages.includes(code)) {
-				return {
-					success: false,
-					reply: `Output language is not supported by DeepL!`
-				};
-			}
-
-			searchParams.target_lang = code;
+			targetLanguageCode = languageISO.getCode(context.params.to);
 		}
 	}
-
 	else {
 		const userDefaultLanguage = await context.user.getDataProperty("defaultUserLanguage");
-
-		searchParams.target_lang = (userDefaultLanguage)
+		targetLanguageCode = (userDefaultLanguage)
 			? userDefaultLanguage.code.toUpperCase()
 			: "EN";
 	}
+
+	if (!targetLanguageCode) {
+		return {
+			success: false,
+			reply: `Output language was not recognized!`
+		};
+	}
+	else if (!supportedLanguages.includes(targetLanguageCode)) {
+		return {
+			success: false,
+			reply: `Output language is not supported by DeepL!`
+		};
+	}
+
+	searchParams.target_lang = targetLanguageCode;
 
 	const response = await sb.Got("GenericAPI", {
 		url: "https://api-free.deepl.com/v2/translate",
