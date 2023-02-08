@@ -583,27 +583,25 @@ module.exports = {
 							};
 						}
 
-						const language = sb.Utils.modules.languageISO.getLanguage(query);
-						if (!language) {
+						const name = sb.Utils.modules.languageISO.getName(query);
+						if (!name) {
 							return {
 								success: false,
 								reply: `Invalid or unsupported language name or code provided!`
 							};
 						}
 
+						const code = sb.Utils.modules.languageISO.getCode(name) ?? null;
 						const existing = await context.user.getDataProperty("defaultUserLanguage");
-						const data = {
-							name: language.name
-						};
 
-						await context.user.setDataProperty("defaultUserLanguage", data);
+						await context.user.setDataProperty("defaultUserLanguage", { code, name });
 
 						const existingString = (existing)
 							? `from ${existing.name ?? "(N/A)"} to`
 							: "to";
 
 						return {
-							reply: `Successfully set your default translation language ${existingString} ${language.name}.`
+							reply: `Successfully set your default translation language ${existingString} ${name.name}.`
 						};
 					},
 					unset: async (context) => {
