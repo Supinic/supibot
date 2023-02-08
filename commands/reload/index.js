@@ -20,14 +20,6 @@ module.exports = {
 			}
 
 			if (context.params.skipUpgrade !== true) {
-				const { unlink } = require("fs/promises");
-				try {
-					await unlink("/code/supibot/yarn.lock");
-				}
-				catch {
-					// Ignore
-				}
-
 				const emote = await context.getBestAvailableEmote(["ppCircle", "supiniLoading"], "⏳");
 				const message = `${emote} running git pull, please wait ${emote}`;
 				await context.sendIntermediateMessage(message);
