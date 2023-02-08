@@ -669,14 +669,30 @@ module.exports = (command) => [
 					.single()
 					.flat("ID")
 				);
+
+				if (!identifier) {
+					return {
+						success: false,
+						reply: `You have never made a suggestion, so you can't check for your last one!`
+					};
+				}
+			}
+
+			const inputID = Number(identifier);
+			if (!sb.Utils.isValidInteger(inputID, 0)) {
+				return {
+					success: false,
+					reply: `Malformed suggestion ID provided - must be a positive integer!`
+				};
 			}
 
 			const row = await sb.Query.getRow("data", "Suggestion");
-			try {
-				await row.load(Number(identifier));
-			}
-			catch {
-				return { reply: "No such suggestion exists!" };
+			await row.load(inputID, true);
+			if (!row.loaded) {
+				return {
+					success: false,
+					reply: "No such suggestion exists!"
+				};
 			}
 
 			const {
