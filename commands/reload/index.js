@@ -58,7 +58,7 @@ module.exports = {
 						try {
 							const definition = (name === "command")
 								? require(path)
-								: await import(`${path}.mjs`);
+								: await import(`${path}/index.mjs`);
 
 							definitions.push(definition);
 						}
