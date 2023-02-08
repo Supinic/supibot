@@ -579,7 +579,7 @@ module.exports = {
 						if (!query) {
 							return {
 								success: false,
-								reply: "No date provided!"
+								reply: "No language provided!"
 							};
 						}
 
