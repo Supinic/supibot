@@ -113,6 +113,7 @@ module.exports = {
 					executionType: "upgrade",
 					target: "ChatModule",
 					name: "chat module",
+					dir: "chat-modules",
 					names: ["chatmodule", "chatmodules", "chat-module", "chat-modules"],
 					singular: ["chatmodule", "chat-module"],
 					plural: ["chatmodules", "chat-modules"]
@@ -121,6 +122,7 @@ module.exports = {
 					executionType: "upgrade",
 					target: "Command",
 					name: "command",
+					dir: "commands",
 					names: ["command", "commands"],
 					singular: ["command"],
 					plural: ["commands"]
@@ -133,6 +135,7 @@ module.exports = {
 					executionType: "upgrade",
 					target: "Cron",
 					name: "cron",
+					dir: "crons",
 					names: ["cron", "crons"],
 					singular: ["cron"],
 					plural: ["crons"]
@@ -146,6 +149,7 @@ module.exports = {
 					target: "Got",
 					name: "got instance",
 					names: ["got", "gots"],
+					dir: "gots",
 					singular: ["got"],
 					plural: ["gots"]
 				},
@@ -190,7 +194,7 @@ module.exports = {
 		if (item.executionType === "upgrade") {
 			const isPlural = (item.plural.includes(command));
 
-			return await upgrade(context, module, item.name, isPlural, ...rest);
+			return await upgrade(context, module, item.dir ?? item.name, isPlural, ...rest);
 		}
 		else if (typeof item.execution === "function") {
 			return await item.execution(context, command, ...rest);
