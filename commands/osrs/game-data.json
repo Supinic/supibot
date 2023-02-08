@@ -1,0 +1,270 @@
+{
+  "activities": [
+    "abyssal sire",
+    "alchemical hydra",
+    "barrows chests",
+    "bounty hunter - hunter",
+    "bounty hunter - rogue",
+    "bryophyta",
+    "callisto",
+    "cerberus",
+    "chambers of xeric",
+    "chambers of xeric: challenge mode",
+    "chaos elemental",
+    "chaos fanatic",
+    "clue scrolls (all)",
+    "clue scrolls (beginner)",
+    "clue scrolls (easy)",
+    "clue scrolls (elite)",
+    "clue scrolls (hard)",
+    "clue scrolls (master)",
+    "clue scrolls (medium)",
+    "commander zilyana",
+    "corporeal beast",
+    "crazy archaeologist",
+    "dagannoth prime",
+    "dagannoth rex",
+    "dagannoth supreme",
+    "deranged archaeologist",
+    "general graardor",
+    "giant mole",
+    "grotesque guardians",
+    "guardians of the rift",
+    "hespori",
+    "k'ril tsutsaroth",
+    "kalphite queen",
+    "king black dragon",
+    "kraken",
+    "kree'arra",
+    "league points",
+    "lms - rank",
+    "mimic",
+    "nex",
+    "nightmare",
+    "phosani's nightmare",
+    "obor",
+    "phantom muspah",
+    "sarachnis",
+    "scorpia",
+    "skotizo",
+    "tempoross",
+    "the corrupted gauntlet",
+    "the gauntlet",
+    "theatre of blood",
+    "theatre of blood: hard mode",
+    "thermonuclear smoke devil",
+    "tzkal-zuk",
+    "tztok-jad",
+    "venenatis",
+    "vet'ion",
+    "vorkath",
+    "wintertodt",
+    "zalcano",
+    "zulrah"
+  ],
+  "activityAliases": {
+    "all clues": "clue scrolls (all)",
+    "arma": "kree'arra",
+    "armadyl": "kree'arra",
+    "bandos": "general graardor",
+    "barrows": "barrows chests",
+    "beginner clues": "clue scrolls (beginner)",
+    "cerb": "cerberus",
+    "cg": "the corrupted gauntlet",
+    "chambers": "chambers of xeric",
+    "chambers cm": "chambers of xeric: challenge mode",
+    "chaos ele": "chaos elemental",
+    "corp": "corporeal beast",
+    "corrupted gauntlet": "the corrupted gauntlet",
+    "cox": "chambers of xeric",
+    "cox cm": "chambers of xeric: challenge mode",
+    "crazy arch": "crazy archaeologist",
+    "dawn": "grotesque guardians",
+    "deranged arch": "deranged archaeologist",
+    "dusk": "grotesque guardians",
+    "easy clues": "clue scrolls (easy)",
+    "elite clues": "clue scrolls (elite)",
+    "gargs": "grotesque guardians",
+    "gauntlet": "the gauntlet",
+    "gotr": "guardians of the rift",
+    "graardor": "general graardor",
+    "hard clues": "clue scrolls (hard)",
+    "hydra": "alchemical hydra",
+    "inferno": "tzkal-zuk",
+    "jad": "tztok-jad",
+    "k'ril": "k'ril tsutsaroth",
+    "kbd": "king black dragon",
+    "kq": "kalphite queen",
+    "kree": "kree'arra",
+    "kreearra": "kree'arra",
+    "kril": "k'ril tsutsaroth",
+    "kril tsutsaroth": "k'ril tsutsaroth",
+    "master clues": "clue scrolls (master)",
+    "medium clues": "clue scrolls (medium)",
+    "mole": "giant mole",
+    "muspah": "phantom muspah",
+    "nm": "nightmare",
+    "nmare": "nightmare",
+    "olm": "chambers of xeric",
+    "olm cm": "chambers of xeric: challenge mode",
+    "phantom": "phantom muspah",
+    "phosani": "phosani's nightmare",
+    "pnm": "phosani's nightmare",
+    "prime": "dagannoth prime",
+    "raids": "chambers of xeric",
+    "raids 2": "theatre of blood",
+    "raids 2 hard": "theatre of blood: hard mode",
+    "raids 3": "tombs of amascut",
+    "raids 3 hard": "tombs of amascut: expert mode",
+    "raids cm": "chambers of xeric: challenge mode",
+    "rex": "dagannoth rex",
+    "rifts": "guardians of the rift",
+    "rifts closed": "guardians of the rift",
+    "sara": "commander zilyana",
+    "saradomin": "commander zilyana",
+    "sire": "abyssal sire",
+    "smoke devil": "thermonuclear smoke devil",
+    "supreme": "dagannoth supreme",
+    "the nightmare": "nightmare",
+    "theatre": "theatre of blood",
+    "thermy": "thermonuclear smoke devil",
+    "tnm": "nightmare",
+    "toa": "tombs of amascut",
+    "toa hard": "tombs of amascut: expert mode",
+    "tob": "theatre of blood",
+    "tob hard": "theatre of blood: hard mode",
+    "vene": "venenatis",
+    "verzik": "theatre of blood",
+    "verzik hard": "theatre of blood: hard mode",
+    "verzik vitur": "theatre of blood",
+    "verzik vitur hard": "theatre of blood: hard mode",
+    "vetion": "vet'ion",
+    "vork": "vorkath",
+    "wt": "wintertodt",
+    "xeric": "chambers of xeric",
+    "xeric cm": "chambers of xeric: challenge mode",
+    "zammy": "k'ril tsutsaroth",
+    "zamorak": "k'ril tsutsaroth",
+    "zily": "commander zilyana",
+    "zilyana": "commander zilyana",
+    "zuk": "tzkal-zuk"
+  },
+  "skills": [
+    {
+      "name": "overall",
+      "emoji": "🏆",
+      "aliases": ["total"]
+    },
+    {
+      "name": "attack",
+      "emoji": "⚔",
+      "aliases": ["atk", "att"]
+    },
+    {
+      "name": "strength",
+      "emoji": "✊",
+      "aliases": ["str"]
+    },
+    {
+      "name": "defence",
+      "emoji": "🛡",
+      "aliases": ["def"]
+    },
+    {
+      "name": "ranged",
+      "emoji": "🏹"
+    },
+    {
+      "name": "prayer",
+      "emoji": "✨",
+      "aliases": ["pray"]
+    },
+    {
+      "name": "magic",
+      "emoji": "🧙‍",
+      "aliases": ["mage"]
+    },
+    {
+      "name": "runecraft",
+      "emoji": "➰",
+      "aliases": ["rc", "cancer", "runecrafting"]
+    },
+    {
+      "name": "construction",
+      "emoji": "🏡",
+      "aliases": ["con"]
+    },
+    {
+      "name": "hitpoints",
+      "emoji": "♥",
+      "aliases": ["hp"]
+    },
+    {
+      "name": "agility",
+      "emoji": "🏃‍",
+      "aliases": ["agi"]
+    },
+    {
+      "name": "herblore",
+      "emoji": "🌿",
+      "aliases": ["herb"]
+    },
+    {
+      "name": "thieving",
+      "emoji": "💰"
+    },
+    {
+      "name": "crafting",
+      "emoji": "🛠",
+      "aliases": ["craft"]
+    },
+    {
+      "name": "fletching",
+      "emoji": "🔪",
+      "aliases": ["fletch"]
+    },
+    {
+      "name": "slayer",
+      "emoji": "💀",
+      "aliases": ["slay"]
+    },
+    {
+      "name": "hunter",
+      "emoji": "🐾"
+    },
+    {
+      "name": "mining",
+      "emoji": "⛏"
+    },
+    {
+      "name": "smithing",
+      "emoji": "🔨",
+      "aliases": ["smith"]
+    },
+    {
+      "name": "fishing",
+      "emoji": "🐟",
+      "aliases": ["fish"]
+    },
+    {
+      "name": "cooking",
+      "emoji": "🍲",
+      "aliases": ["cook"]
+    },
+    {
+      "name": "firemaking",
+      "emoji": "🔥",
+      "aliases": ["fm"]
+    },
+    {
+      "name": "woodcutting",
+      "emoji": "🌳",
+      "aliases": ["wc"]
+    },
+    {
+      "name": "farming",
+      "emoji": "‍🌽",
+      "aliases": ["farm"]
+    }
+  ]
+}

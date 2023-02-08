@@ -1,0 +1,1102 @@
+[
+  {
+    "name": "Absolution",
+    "type": "main"
+  },
+  {
+    "name": "Ambush",
+    "type": "additional"
+  },
+  {
+    "name": "Ancestral Cry",
+    "type": "additional"
+  },
+  {
+    "name": "Ancestral Protector",
+    "type": "main"
+  },
+  {
+    "name": "Ancestral Warchief",
+    "type": "main"
+  },
+  {
+    "name": "Anger",
+    "type": "additional"
+  },
+  {
+    "name": "Animate Guardian",
+    "type": "main"
+  },
+  {
+    "name": "Arc",
+    "type": "main"
+  },
+  {
+    "name": "Arcane Cloak",
+    "type": "additional"
+  },
+  {
+    "name": "Arcanist Brand",
+    "type": "additional"
+  },
+  {
+    "name": "Arctic Armour",
+    "type": "additional"
+  },
+  {
+    "name": "Armageddon Brand",
+    "type": "main"
+  },
+  {
+    "name": "Artillery Ballista",
+    "type": "main"
+  },
+  {
+    "name": "Assassin's Mark",
+    "type": "additional"
+  },
+  {
+    "name": "Ball Lightning",
+    "type": "main"
+  },
+  {
+    "name": "Bane",
+    "type": "main"
+  },
+  {
+    "name": "Barrage",
+    "type": "main"
+  },
+  {
+    "name": "Battlemage's Cry",
+    "type": "additional"
+  },
+  {
+    "name": "Bear Trap",
+    "type": "main"
+  },
+  {
+    "name": "Berserk",
+    "type": "additional"
+  },
+  {
+    "name": "Blade Blast",
+    "type": "main"
+  },
+  {
+    "name": "Blade Flurry",
+    "type": "main"
+  },
+  {
+    "name": "Blade Trap",
+    "type": "main"
+  },
+  {
+    "name": "Blade Vortex",
+    "type": "main"
+  },
+  {
+    "name": "Bladefall",
+    "type": "main"
+  },
+  {
+    "name": "Bladestorm",
+    "type": "main"
+  },
+  {
+    "name": "Blast Rain",
+    "type": "main"
+  },
+  {
+    "name": "Blight",
+    "type": "main"
+  },
+  {
+    "name": "Blink Arrow",
+    "type": "main"
+  },
+  {
+    "name": "Blood and Sand",
+    "type": "additional"
+  },
+  {
+    "name": "Blood Rage",
+    "type": "main"
+  },
+  {
+    "name": "Bodyswap",
+    "type": "main"
+  },
+  {
+    "name": "Bone Offering",
+    "type": "additional"
+  },
+  {
+    "name": "Burning Arrow",
+    "type": "main"
+  },
+  {
+    "name": "Caustic Arrow",
+    "type": "main"
+  },
+  {
+    "name": "Chain Hook",
+    "type": "main"
+  },
+  {
+    "name": "Charged Dash",
+    "type": "main"
+  },
+  {
+    "name": "Clarity",
+    "type": "additional"
+  },
+  {
+    "name": "Cleave",
+    "type": "main"
+  },
+  {
+    "name": "Cobra Lash",
+    "type": "main"
+  },
+  {
+    "name": "Cold Snap",
+    "type": "main"
+  },
+  {
+    "name": "Conductivity",
+    "type": "additional"
+  },
+  {
+    "name": "Consecrated Path",
+    "type": "main"
+  },
+  {
+    "name": "Contagion",
+    "type": "main"
+  },
+  {
+    "name": "Conversion Trap",
+    "type": "main"
+  },
+  {
+    "name": "Convocation",
+    "type": "additional"
+  },
+  {
+    "name": "Creeping Frost",
+    "type": "main"
+  },
+  {
+    "name": "Cremation",
+    "type": "main"
+  },
+  {
+    "name": "Cyclone",
+    "type": "main"
+  },
+  {
+    "name": "Dark Pact",
+    "type": "main"
+  },
+  {
+    "name": "Dash",
+    "type": "additional"
+  },
+  {
+    "name": "Decoy Totem",
+    "type": "additional"
+  },
+  {
+    "name": "Defiance Banner",
+    "type": "additional"
+  },
+  {
+    "name": "Desecrate",
+    "type": "additional"
+  },
+  {
+    "name": "Despair",
+    "type": "additional"
+  },
+  {
+    "name": "Determination",
+    "type": "additional"
+  },
+  {
+    "name": "Detonate Dead",
+    "type": "main"
+  },
+  {
+    "name": "Devouring Totem",
+    "type": "additional"
+  },
+  {
+    "name": "Discharge",
+    "type": "main"
+  },
+  {
+    "name": "Discipline",
+    "type": "additional"
+  },
+  {
+    "name": "Divine Ire",
+    "type": "main"
+  },
+  {
+    "name": "Dominating Blow",
+    "type": "main"
+  },
+  {
+    "name": "Double Strike",
+    "type": "main"
+  },
+  {
+    "name": "Dread Banner",
+    "type": "additional"
+  },
+  {
+    "name": "Dual Strike",
+    "type": "main"
+  },
+  {
+    "name": "Earthquake",
+    "type": "main"
+  },
+  {
+    "name": "Earthshatter",
+    "type": "main"
+  },
+  {
+    "name": "Elemental Hit",
+    "type": "main"
+  },
+  {
+    "name": "Elemental Weakness",
+    "type": "additional"
+  },
+  {
+    "name": "Enduring Cry",
+    "type": "additional"
+  },
+  {
+    "name": "Enfeeble",
+    "type": "additional"
+  },
+  {
+    "name": "Ensnaring Arrow",
+    "type": "additional"
+  },
+  {
+    "name": "Essence Drain",
+    "type": "main"
+  },
+  {
+    "name": "Ethereal Knives",
+    "type": "main"
+  },
+  {
+    "name": "Explosive Arrow",
+    "type": "main"
+  },
+  {
+    "name": "Explosive Concoction",
+    "type": "main"
+  },
+  {
+    "name": "Explosive Trap",
+    "type": "main"
+  },
+  {
+    "name": "Exsanguinate",
+    "type": "main"
+  },
+  {
+    "name": "Eye of Winter",
+    "type": "main"
+  },
+  {
+    "name": "Fire Trap",
+    "type": "main"
+  },
+  {
+    "name": "Fireball",
+    "type": "main"
+  },
+  {
+    "name": "Firestorm",
+    "type": "main"
+  },
+  {
+    "name": "Flame Dash",
+    "type": "main"
+  },
+  {
+    "name": "Flame Surge",
+    "type": "main"
+  },
+  {
+    "name": "Flameblast",
+    "type": "main"
+  },
+  {
+    "name": "Flamethrower Trap",
+    "type": "main"
+  },
+  {
+    "name": "Flammability",
+    "type": "additional"
+  },
+  {
+    "name": "Flesh and Stone",
+    "type": "additional"
+  },
+  {
+    "name": "Flesh Offering",
+    "type": "additional"
+  },
+  {
+    "name": "Flicker Strike",
+    "type": "main"
+  },
+  {
+    "name": "Forbidden Rite",
+    "type": "main"
+  },
+  {
+    "name": "Freezing Pulse",
+    "type": "main"
+  },
+  {
+    "name": "Frenzy",
+    "type": "main"
+  },
+  {
+    "name": "Frost Blades",
+    "type": "main"
+  },
+  {
+    "name": "Frost Bomb",
+    "type": "main"
+  },
+  {
+    "name": "Frost Wall",
+    "type": "additional"
+  },
+  {
+    "name": "Frostbite",
+    "type": "main"
+  },
+  {
+    "name": "Frostblink",
+    "type": "main"
+  },
+  {
+    "name": "Frostbolt",
+    "type": "main"
+  },
+  {
+    "name": "Galvanic Arrow",
+    "type": "main"
+  },
+  {
+    "name": "General's Cry",
+    "type": "additional"
+  },
+  {
+    "name": "Glacial Cascade",
+    "type": "main"
+  },
+  {
+    "name": "Glacial Hammer",
+    "type": "main"
+  },
+  {
+    "name": "Grace",
+    "type": "additional"
+  },
+  {
+    "name": "Ground Slam",
+    "type": "main"
+  },
+  {
+    "name": "Haste",
+    "type": "additional"
+  },
+  {
+    "name": "Hatred",
+    "type": "additional"
+  },
+  {
+    "name": "Heavy Strike",
+    "type": "main"
+  },
+  {
+    "name": "Herald of Agony",
+    "type": "main"
+  },
+  {
+    "name": "Herald of Ash",
+    "type": "additional"
+  },
+  {
+    "name": "Herald of Ice",
+    "type": "additional"
+  },
+  {
+    "name": "Herald of Purity",
+    "type": "main"
+  },
+  {
+    "name": "Herald of Thunder",
+    "type": "additional"
+  },
+  {
+    "name": "Holy Flame Totem",
+    "type": "main"
+  },
+  {
+    "name": "Ice Crash",
+    "type": "main"
+  },
+  {
+    "name": "Ice Nova",
+    "type": "main"
+  },
+  {
+    "name": "Ice Shot",
+    "type": "main"
+  },
+  {
+    "name": "Ice Spear",
+    "type": "main"
+  },
+  {
+    "name": "Ice Trap",
+    "type": "main"
+  },
+  {
+    "name": "Icicle Mine",
+    "type": "main"
+  },
+  {
+    "name": "Immortal Call",
+    "type": "additional"
+  },
+  {
+    "name": "Incinerate",
+    "type": "main"
+  },
+  {
+    "name": "Infernal Blow",
+    "type": "main"
+  },
+  {
+    "name": "Infernal Cry",
+    "type": "main"
+  },
+  {
+    "name": "Intimidating Cry",
+    "type": "additional"
+  },
+  {
+    "name": "Kinetic Blast",
+    "type": "main"
+  },
+  {
+    "name": "Kinetic Bolt",
+    "type": "main"
+  },
+  {
+    "name": "Lacerate",
+    "type": "main"
+  },
+  {
+    "name": "Lancing Steel",
+    "type": "main"
+  },
+  {
+    "name": "Leap Slam",
+    "type": "main"
+  },
+  {
+    "name": "Lightning Arrow",
+    "type": "main"
+  },
+  {
+    "name": "Lightning Spire Trap",
+    "type": "main"
+  },
+  {
+    "name": "Lightning Strike",
+    "type": "main"
+  },
+  {
+    "name": "Lightning Tendrils",
+    "type": "main"
+  },
+  {
+    "name": "Lightning Trap",
+    "type": "main"
+  },
+  {
+    "name": "Lightning Warp",
+    "type": "main"
+  },
+  {
+    "name": "Magma Orb",
+    "type": "main"
+  },
+  {
+    "name": "Malevolence",
+    "type": "additional"
+  },
+  {
+    "name": "Manabond",
+    "type": "main"
+  },
+  {
+    "name": "Mirror Arrow",
+    "type": "main"
+  },
+  {
+    "name": "Molten Shell",
+    "type": "main"
+  },
+  {
+    "name": "Molten Strike",
+    "type": "main"
+  },
+  {
+    "name": "Orb of Storms",
+    "type": "main"
+  },
+  {
+    "name": "Penance Brand",
+    "type": "main"
+  },
+  {
+    "name": "Perforate",
+    "type": "main"
+  },
+  {
+    "name": "Pestilent Strike",
+    "type": "main"
+  },
+  {
+    "name": "Phase Run",
+    "type": "additional"
+  },
+  {
+    "name": "Plague Bearer",
+    "type": "additional"
+  },
+  {
+    "name": "Poacher's Mark",
+    "type": "additional"
+  },
+  {
+    "name": "Power Siphon",
+    "type": "main"
+  },
+  {
+    "name": "Precision",
+    "type": "additional"
+  },
+  {
+    "name": "Pride",
+    "type": "additional"
+  },
+  {
+    "name": "Projectile Weakness",
+    "type": "additional"
+  },
+  {
+    "name": "Puncture",
+    "type": "main"
+  },
+  {
+    "name": "Punishment",
+    "type": "additional"
+  },
+  {
+    "name": "Purifying Flame",
+    "type": "main"
+  },
+  {
+    "name": "Purity of Elements",
+    "type": "additional"
+  },
+  {
+    "name": "Purity of Fire",
+    "type": "additional"
+  },
+  {
+    "name": "Purity of Ice",
+    "type": "additional"
+  },
+  {
+    "name": "Purity of Lightning",
+    "type": "additional"
+  },
+  {
+    "name": "Pyroclast Mine",
+    "type": "main"
+  },
+  {
+    "name": "Rage Vortex",
+    "type": "main"
+  },
+  {
+    "name": "Rain of Arrows",
+    "type": "main"
+  },
+  {
+    "name": "Raise Spectre",
+    "type": "main"
+  },
+  {
+    "name": "Raise Zombie",
+    "type": "main"
+  },
+  {
+    "name": "Rallying Cry",
+    "type": "additional"
+  },
+  {
+    "name": "Reap",
+    "type": "main"
+  },
+  {
+    "name": "Reave",
+    "type": "main"
+  },
+  {
+    "name": "Reckoning",
+    "type": "additional"
+  },
+  {
+    "name": "Rejuvenation Totem",
+    "type": "additional"
+  },
+  {
+    "name": "Righteous Fire",
+    "type": "main"
+  },
+  {
+    "name": "Riposte",
+    "type": "additional"
+  },
+  {
+    "name": "Scorching Ray",
+    "type": "main"
+  },
+  {
+    "name": "Scourge Arrow",
+    "type": "main"
+  },
+  {
+    "name": "Searing Bond",
+    "type": "main"
+  },
+  {
+    "name": "Seismic Cry",
+    "type": "additional"
+  },
+  {
+    "name": "Seismic Trap",
+    "type": "main"
+  },
+  {
+    "name": "Shattering Steel",
+    "type": "main"
+  },
+  {
+    "name": "Shield Charge",
+    "type": "main"
+  },
+  {
+    "name": "Shield Crush",
+    "type": "main"
+  },
+  {
+    "name": "Shock Nova",
+    "type": "main"
+  },
+  {
+    "name": "Shockwave Totem",
+    "type": "main"
+  },
+  {
+    "name": "Shrapnel Ballista",
+    "type": "main"
+  },
+  {
+    "name": "Siege Ballista",
+    "type": "main"
+  },
+  {
+    "name": "Siphoning Trap",
+    "type": "main"
+  },
+  {
+    "name": "Smite",
+    "type": "main"
+  },
+  {
+    "name": "Smoke Mine",
+    "type": "additional"
+  },
+  {
+    "name": "Soulrend",
+    "type": "main"
+  },
+  {
+    "name": "Spark",
+    "type": "main"
+  },
+  {
+    "name": "Spectral Helix",
+    "type": "main"
+  },
+  {
+    "name": "Spectral Shield Throw",
+    "type": "main"
+  },
+  {
+    "name": "Spectral Throw",
+    "type": "main"
+  },
+  {
+    "name": "Spellslinger",
+    "type": "additional"
+  },
+  {
+    "name": "Spirit Offering",
+    "type": "additional"
+  },
+  {
+    "name": "Split Arrow",
+    "type": "main"
+  },
+  {
+    "name": "Static Strike",
+    "type": "main"
+  },
+  {
+    "name": "Steelskin",
+    "type": "additional"
+  },
+  {
+    "name": "Storm Brand",
+    "type": "main"
+  },
+  {
+    "name": "Storm Burst",
+    "type": "main"
+  },
+  {
+    "name": "Storm Call",
+    "type": "main"
+  },
+  {
+    "name": "Storm Rain",
+    "type": "main"
+  },
+  {
+    "name": "Stormbind",
+    "type": "main"
+  },
+  {
+    "name": "Stormblast Mine",
+    "type": "main"
+  },
+  {
+    "name": "Summon Carrion Golem",
+    "type": "main"
+  },
+  {
+    "name": "Summon Chaos Golem",
+    "type": "main"
+  },
+  {
+    "name": "Summon Flame Golem",
+    "type": "main"
+  },
+  {
+    "name": "Summon Holy Relic",
+    "type": "main"
+  },
+  {
+    "name": "Summon Ice Golem",
+    "type": "main"
+  },
+  {
+    "name": "Summon Lightning Golem",
+    "type": "main"
+  },
+  {
+    "name": "Summon Raging Spirit",
+    "type": "main"
+  },
+  {
+    "name": "Summon Reaper",
+    "type": "main"
+  },
+  {
+    "name": "Summon Skeletons",
+    "type": "main"
+  },
+  {
+    "name": "Summon Skitterbots",
+    "type": "main"
+  },
+  {
+    "name": "Summon Stone Golem",
+    "type": "main"
+  },
+  {
+    "name": "Sunder",
+    "type": "main"
+  },
+  {
+    "name": "Sweep",
+    "type": "main"
+  },
+  {
+    "name": "Tectonic Slam",
+    "type": "main"
+  },
+  {
+    "name": "Tempest Shield",
+    "type": "main"
+  },
+  {
+    "name": "Temporal Chains",
+    "type": "additional"
+  },
+  {
+    "name": "Tornado Shot",
+    "type": "main"
+  },
+  {
+    "name": "Toxic Rain",
+    "type": "main"
+  },
+  {
+    "name": "Unearth",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Ancestral Warchief",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Arc",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Blade Vortex",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Blight",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Burning Arrow",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Clarity",
+    "type": "additional"
+  },
+  {
+    "name": "Vaal Cold Snap",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Cyclone",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Detonate Dead",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Discipline",
+    "type": "additional"
+  },
+  {
+    "name": "Vaal Double Strike",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Earthquake",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Fireball",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Flameblast",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Glacial Hammer",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Grace",
+    "type": "additional"
+  },
+  {
+    "name": "Vaal Ground Slam",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Haste",
+    "type": "additional"
+  },
+  {
+    "name": "Vaal Ice Nova",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Impurity of Fire",
+    "type": "additional"
+  },
+  {
+    "name": "Vaal Impurity of Ice",
+    "type": "additional"
+  },
+  {
+    "name": "Vaal Impurity of Lightning",
+    "type": "additional"
+  },
+  {
+    "name": "Vaal Lightning Strike",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Lightning Trap",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Molten Shell",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Power Siphon",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Rain of Arrows",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Reave",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Righteous Fire",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Spark",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Spectral Throw",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Storm Call",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Summon Skeletons",
+    "type": "main"
+  },
+  {
+    "name": "Vengeance",
+    "type": "additional"
+  },
+  {
+    "name": "Venom Gyre",
+    "type": "main"
+  },
+  {
+    "name": "Vigilant Strike",
+    "type": "main"
+  },
+  {
+    "name": "Viper Strike",
+    "type": "main"
+  },
+  {
+    "name": "Vitality",
+    "type": "additional"
+  },
+  {
+    "name": "Volatile Dead",
+    "type": "main"
+  },
+  {
+    "name": "Voltaxic Burst",
+    "type": "main"
+  },
+  {
+    "name": "Vortex",
+    "type": "main"
+  },
+  {
+    "name": "Vulnerability",
+    "type": "additional"
+  },
+  {
+    "name": "War Banner",
+    "type": "additional"
+  },
+  {
+    "name": "Warlord's Mark",
+    "type": "additional"
+  },
+  {
+    "name": "Wave of Conviction",
+    "type": "main"
+  },
+  {
+    "name": "Whirling Blades",
+    "type": "main"
+  },
+  {
+    "name": "Wild Strike",
+    "type": "main"
+  },
+  {
+    "name": "Winter Orb",
+    "type": "main"
+  },
+  {
+    "name": "Wintertide Brand",
+    "type": "main"
+  },
+  {
+    "name": "Wither",
+    "type": "additional"
+  },
+  {
+    "name": "Withering Step",
+    "type": "additional"
+  },
+  {
+    "name": "Wrath",
+    "type": "additional"
+  },
+  {
+    "name": "Zealotry",
+    "type": "additional"
+  }
+]
