@@ -17,7 +17,7 @@ const importModule = async (module, path) => {
 	const initializeSbObject = require("supi-core");
 	globalThis.sb = await initializeSbObject();
 
-	const { commands } = await require("./commands/index.js");
+	const commands = await require("./commands/index.js");
 	await sb.Command.importData(commands.definitions);
 
 	await Promise.all([
