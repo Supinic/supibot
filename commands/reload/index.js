@@ -29,7 +29,7 @@ module.exports = {
 				}
 
 				const emote = await context.getBestAvailableEmote(["ppCircle", "supiniLoading"], "⏳");
-				const message = `${emote} running yarn up, please wait ${emote}`;
+				const message = `${emote} running yarn, please wait ${emote}`;
 				await context.sendIntermediateMessage(message);
 
 				await shell(`yarn --cwd /code/supibot workspaces focus -A --production`);
