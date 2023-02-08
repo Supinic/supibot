@@ -56,7 +56,10 @@ module.exports = {
 					for (const instanceName of list) {
 						const path = `/code/supibot/${name}s/${instanceName}`;
 						try {
-							const definition = require(path);
+							const definition = (name === "command")
+								? require(path)
+								: await import(path);
+
 							definitions.push(definition);
 						}
 						catch {
