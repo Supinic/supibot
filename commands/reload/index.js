@@ -62,8 +62,8 @@ module.exports = {
 
 							definitions.push(definition);
 						}
-						catch {
-							result.failed.push(instanceName);
+						catch (e) {
+							result.failed.push({ e, instanceName });
 						}
 					}
 
