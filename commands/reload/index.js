@@ -58,11 +58,11 @@ module.exports = {
 					result.failed = [];
 
 					if (typeof module.invalidateRequireCahe === "function") {
-						module.invalidateRequireCache(`./${name}s`, ...list);
+						module.invalidateRequireCache(`/code/supibot/${name}s`, ...list);
 					}
 
 					for (const instanceName of list) {
-						const path = `./${name}s/${instanceName}`;
+						const path = `/code/supibot/${name}s/${instanceName}`;
 						try {
 							const definition = require(path);
 							definitions.push(definition);
