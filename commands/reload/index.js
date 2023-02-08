@@ -32,7 +32,7 @@ module.exports = {
 				const message = `${emote} running yarn, please wait ${emote}`;
 				await context.sendIntermediateMessage(message);
 
-				await shell(`yarn --cwd /code/supibot workspaces focus -A --production`);
+				await shell(`git pull origin master`);
 			}
 
 			if (isPlural) {
