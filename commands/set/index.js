@@ -569,6 +569,59 @@ module.exports = {
 					}
 				},
 				{
+					name: "language",
+					aliases: ["lang"],
+					parameter: "arguments",
+					description: "Lets you set your default translation language to be used in $translate.",
+					pipe: false,
+					set: async (context, ...args) => {
+						const query = args.join(" ");
+						if (!query) {
+							return {
+								success: false,
+								reply: "No date provided!"
+							};
+						}
+
+						const language = sb.Utils.modules.languageISO.getLanguage(query);
+						if (!language) {
+							return {
+								success: false,
+								reply: `Invalid or unsupported language name or code provided!`
+							};
+						}
+
+						const existing = await context.user.getDataProperty("defaultUserLanguage");
+						const data = {
+							name: language.name
+						};
+
+						await context.user.setDataProperty("defaultUserLanguage", data);
+
+						const existingString = (existing)
+							? `from ${existing.name ?? "(N/A)"} to`
+							: "to";
+
+						return {
+							reply: `Successfully set your default translation language ${existingString} ${language.name}.`
+						};
+					},
+					unset: async (context) => {
+						const existing = await context.user.getDataProperty("defaultUserLanguage");
+						if (!existing) {
+							return {
+								success: false,
+								reply: `You don't have a default translation language set up, so there is nothing to unset!`
+							};
+						}
+
+						await context.user.setDataProperty("defaultUserLanguage", null);
+						return {
+							reply: `Successfully unset your default translation language.`
+						};
+					}
+				},
+				{
 					name: "twitchlotto",
 					aliases: ["tl"],
 					parameter: "arguments",
