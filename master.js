@@ -23,7 +23,7 @@ const importModule = async (module, path) => {
 	await Promise.all([
 		importModule(sb.ChatModule, "chat-modules"),
 		importModule(sb.Cron, "crons"),
-		importModule(sb.Got, "got")
+		importModule(sb.Got, "gots")
 	]);
 
 	const controllers = {};
