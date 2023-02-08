@@ -49,7 +49,7 @@ module.exports = {
 					const definitions = [];
 					result.failed = [];
 
-					if (typeof module.invalidateRequireCahe === "function") {
+					if (typeof module.invalidateRequireCache === "function") {
 						module.invalidateRequireCache(`/code/supibot/${name}s`, ...list);
 					}
 
