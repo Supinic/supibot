@@ -56,11 +56,13 @@ module.exports = {
 					for (const instanceName of list) {
 						const path = `/code/supibot/${name}/${instanceName}`;
 						try {
-							const definition = (name === "command")
-								? require(path)
-								: await import(`${path}/index.mjs`);
-
-							definitions.push(definition);
+							if (name === "commands") {
+								definitions.push(require(path));
+							}
+							else {
+								const { definition } = await import(`${path}/index.mjs`);
+								definitions.push(definition);
+							}
 						}
 						catch (e) {
 							result.failed.push({ e, instanceName });
