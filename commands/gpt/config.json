@@ -40,7 +40,7 @@
     "curie": {
       "url": "text-curie-001",
       "default": false,
-      "disabled": true,
+      "disabled": false,
       "disableReason": "unsafe generated content",
       "outputLimit": {
         "default": 100,
