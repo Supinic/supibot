@@ -18,7 +18,7 @@ import * as Util from "util";
 //		3)	Change the namespace from 'namespace DankDebug' to 'global' which will make all of these
 //			declarations global to all files (if the file is included when compiling).
 //	Option b: Install & Redeclare
-// 		1)	Add the GitHub repo 'supinic/supibot-package-manager' (this one) as a dev dependency.
+// 		1)	Add the GitHub repo 'supinic/supibot' (this one) as a dev dependency.
 //		2)	Make a new file, and redeclare all the variables you will need as global
 //			(using `declare global { /* ... */ }`) with the types defined in this file.
 

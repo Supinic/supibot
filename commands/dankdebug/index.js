@@ -190,7 +190,7 @@ module.exports = {
 	Dynamic_Description: (async (prefix) => [
 		"Runs JavaScript in a sandboxed VM, with access to specific methods and variables relating to supibot and the current command context.",
 		`This description assumes you already know JavaScript, it only goes over a brief overview of how the ${prefix}dankdebug command works, and caveats specific to the command.`,
-		`For an extensive look at all of the variables and methods available within the dankdebug context, see <a target="_blank" href="//github.com/supinic/supibot-package-manager/tree/master/commands/dankdebug/">these files</a>.`,
+		`For an extensive look at all of the variables and methods available within the dankdebug context, see <a target="_blank" href="//github.com/supinic/supibot/tree/master/commands/dankdebug/">these files</a>.`,
 		"",
 
 		`<code>${prefix}js (JavaScript code)</code>`,

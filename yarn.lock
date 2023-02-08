@@ -5095,13 +5095,6 @@ supi-core@supinic/supi-core:
   languageName: node
   linkType: hard
 
-supibot-package-manager@supinic/supibot-package-manager:
-  version: 1.0.0
-  resolution: "supibot-package-manager@https://github.com/supinic/supibot-package-manager.git#commit=f203e9b43b4b3bee9792970a2f579a66fc336fbd"
-  checksum: 483e1527b05041e3c7a785d93f928da0af02890fcc49f36114c510440d6a229a95a392a209ab8fe78152ca8659f12a114446bbcc5782b09e726fd9c0ef5c776b
-  languageName: node
-  linkType: hard
-
 "supibot@workspace:.":
   version: 0.0.0-use.local
   resolution: "supibot@workspace:."
@@ -5119,7 +5112,6 @@ supibot-package-manager@supinic/supibot-package-manager:
     nyc: ^15.1.0
     supi-core: supinic/supi-core
     supi-db-init: "Supinic/supi-db-init#master"
-    supibot-package-manager: supinic/supibot-package-manager
   languageName: unknown
   linkType: soft
 

@@ -16,14 +16,13 @@ module.exports = {
 					Supibot: https://github.com/Supinic/supibot 
 					// Website: https://github.com/Supinic/supinic.com
 					// Modules: https://github.com/Supinic/supi-core
-					// SPM: https://github.com/Supinic/supibot-package-manager
 				`
 			};
 		}
 
 		const encodedQuery = encodeURIComponent(query);
 		const response = await sb.Got("GitHub", {
-			url: `search/code?q=${encodedQuery}+in:file+repo:supinic/supi-core+repo:supinic/supibot+repo:supinic/supibot-package-manager`
+			url: `search/code?q=${encodedQuery}+in:file+repo:supinic/supi-core+repo:supinic/supibot`
 		});
 
 		const { items } = response.body;

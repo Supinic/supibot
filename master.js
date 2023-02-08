@@ -1,5 +1,5 @@
 const importModule = async (module, path) => {
-	const { definitions } = await import(`supibot-package-manager/${path}/index.mjs`);
+	const { definitions } = await import(`./${path}/index.mjs`);
 	await module.importData(definitions);
 };
 
@@ -17,7 +17,7 @@ const importModule = async (module, path) => {
 	const initializeSbObject = require("supi-core");
 	globalThis.sb = await initializeSbObject();
 
-	const { commands } = await require("supibot-package-manager");
+	const { commands } = await require("./commands/index.js");
 	await sb.Command.importData(commands.definitions);
 
 	await Promise.all([
