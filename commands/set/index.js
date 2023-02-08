@@ -601,7 +601,7 @@ module.exports = {
 							: "to";
 
 						return {
-							reply: `Successfully set your default translation language ${existingString} ${name.name}.`
+							reply: `Successfully set your default $translate language ${existingString} ${name}.`
 						};
 					},
 					unset: async (context) => {
@@ -609,13 +609,13 @@ module.exports = {
 						if (!existing) {
 							return {
 								success: false,
-								reply: `You don't have a default translation language set up, so there is nothing to unset!`
+								reply: `You don't have a default $translate language set up, so there is nothing to unset!`
 							};
 						}
 
 						await context.user.setDataProperty("defaultUserLanguage", null);
 						return {
-							reply: `Successfully unset your default translation language.`
+							reply: `Successfully unset your default $translate language.`
 						};
 					}
 				},
