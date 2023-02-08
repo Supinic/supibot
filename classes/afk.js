@@ -1,4 +1,4 @@
-// @todo eventually merge these definitions with `supibot-package-manager/commands/afk.js` static data
+// @todo eventually merge these definitions with `supibot/commands/afk.js` static data
 const afkResponses = require("./afk-responses.json");
 
 module.exports = class AwayFromKeyboard extends require("./template.js") {
