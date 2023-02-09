@@ -77,7 +77,7 @@ const execute = async function (context, query) {
 			reply: `Invalid or unsupported language provided!`
 		};
 	}
-	else if (!supportedLanguages.includes(targetLanguageCode)) {
+	else if (!supportedLanguages.includes(targetLanguageCode.toLowerCase())) {
 		const languageName = sb.Utils.capitalize(languageISO.getName(targetLanguageCode));
 		return {
 			success: false,
@@ -85,7 +85,7 @@ const execute = async function (context, query) {
 		};
 	}
 
-	searchParams.target_lang = targetLanguageCode;
+	searchParams.target_lang = targetLanguageCode.toUpperCase();
 
 	const response = await sb.Got("GenericAPI", {
 		url: "https://api-free.deepl.com/v2/translate",
