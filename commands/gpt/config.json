@@ -29,7 +29,7 @@
     },
     "babbage": {
       "url": "text-babbage-001",
-      "default": true,
+      "default": false,
       "outputLimit": {
         "default": 200,
         "maximum": 1000
@@ -39,7 +39,7 @@
     },
     "curie": {
       "url": "text-curie-001",
-      "default": false,
+      "default": true,
       "disabled": false,
       "disableReason": "unsafe generated content",
       "outputLimit": {
