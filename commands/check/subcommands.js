@@ -259,6 +259,49 @@ module.exports = (command) => [
 		}
 	},
 	{
+		name: "chatgpt-history",
+		aliases: ["chat-gpt-history", "gpt-history"],
+		description: "Exports your currently active ChatGPT history to Pastebin, if you have any.",
+		execute: async (context) => {
+			let GptHistory;
+			try {
+				GptHistory = require("../gpt/history-control.js");
+			}
+			catch {
+				return {
+					success: false,
+					reply: `The GPT history module is currently not available!`
+				};
+			}
+
+			const history = await GptHistory.dump(context.user);
+			if (history.length === 0) {
+				return {
+					reply: `You have no ChatGPT history at the moment.`
+				};
+			}
+
+			const string = history.join("\n\n");
+			const { body } = await sb.Pastebin.post(string, {
+				name: `ChatGPT history for ${context.user.Name}`,
+				privacy: "unlisted",
+				expiration: "1D"
+			});
+
+			if (!body) {
+				return {
+					success: false,
+					reply: `Could not export the ChatGPT history! Please try again later.`
+				};
+			}
+			else {
+				return {
+					reply: body
+				};
+			}
+		}
+	},
+	{
 		name: "cookie",
 		aliases: [],
 		description: "Checks if someone (or you, if not provided) has their fortune cookie available for today.",

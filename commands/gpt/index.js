@@ -6,6 +6,7 @@ module.exports = {
 	Description: "Queries ChatGPT for a text response. Supports multiple models and parameter settings. Limited by tokens usage!",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
+		{ name: "history", type: "boolean" },
 		{ name: "model", type: "string" },
 		{ name: "limit", type: "number" },
 		{ name: "temperature", type: "number" }
@@ -15,6 +16,7 @@ module.exports = {
 	Code: (async function chatGPT (context, ...args) {
 		const ChatGptConfig = require("./config.json");
 		const GptCache = require("./cache-control.js");
+		const GptHistory = require("./history-control.js");
 
 		const query = args.join(" ");
 		if (!query) {
@@ -47,22 +49,32 @@ module.exports = {
 			};
 		}
 
-		if (query.length > ChatGptConfig.globalInputLimit) {
+		let promptPrefix = "";
+		if (context.params.history) {
+			const historicPrompt = await GptHistory.prepare(context.user, query);
+			if (historicPrompt.length !== 0) {
+				promptPrefix = `${historicPrompt.join("\n")}\n`;
+			}
+		}
+
+		const { queryNames } = ChatGptConfig;
+		const prompt = `${promptPrefix}${queryNames.prompt}: ${query}\n${queryNames.response}: `;
+
+		if (modelData.inputLimit && prompt.length > modelData.inputLimit) {
+			const messages = ChatGptConfig.lengthLimitExceededMessage;
+			const message = (promptPrefix) ? messages.history : messages.regular;
+
 			return {
 				success: false,
 				cooldown: 2500,
-				reply: `Maximum query length exceeded! ${query.length}/${ChatGptConfig.globalInputLimit}`
+				reply: `${message} ${prompt.length}/${modelData.inputLimit}`
 			};
 		}
-		else if (modelData.inputLimit && query.length > modelData.inputLimit) {
+		else if (!modelData.inputLimit && prompt.length > ChatGptConfig.globalInputLimit) {
 			return {
 				success: false,
 				cooldown: 2500,
-				reply: sb.Utils.tag.trim `
-					Maximum query length exceeded for this model!
-					Shorten your query, or use a lower-ranked model instead.
-					${query.length}/${modelData.inputLimit}
-				`
+				reply: `Maximum query length exceeded! ${prompt.length}/${ChatGptConfig.globalInputLimit}`
 			};
 		}
 
@@ -123,11 +135,6 @@ module.exports = {
 			.digest()
 			.toString("hex");
 
-		const promptPrefix = (modelData.usePromptPrefix)
-			? `${ChatGptConfig.defaultPromptPefix}\n`
-			: "";
-
-		const prompt = `${promptPrefix} Query: ${query}\nAnswer: `;
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
 			throwHttpErrors: false,
@@ -216,8 +223,17 @@ module.exports = {
 			};
 		}
 
+		const reply = chatResponse.text.trim();
+		if (context.params.history) {
+			await GptHistory.add(context.user, {
+				prompt,
+				response: reply,
+				temperature
+			});
+		}
+
 		return {
-			reply: `🤖 ${chatResponse.text.trim()}`
+			reply: `🤖 ${reply}`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => {
@@ -302,6 +318,20 @@ module.exports = {
 
 			"<b>Important:</b> Only temperature values between 0.0 and 1.0 are guaranteed to give you proper replies.",
 			"The command however supports temperature values all the way up to 2.0 - where you can receive completely garbled responses - which can be fun, but watch out for your token usage!",
+			"",
+
+			"<h5>History</h5>",
+			`<code>${prefix}gpt history:true (your query)</code>`,
+			`<code>${prefix}gpt temperature:0.5 What should I eat today?</code>`,
+			`Queries ChatGPT while keeping history of your prompts.`,
+			`This allows you to keep some sort of a "session" with ChatGPT.`,
+			"The history will track the responses and allow the use of any model until the model's input limit is exceeded.",
+			"You can always downgrade the model to receive more data, even if a higher model refuses to work with that muich data.",
+			"",
+
+			"Your history is kept for 7 days or until you delete it yourself.",
+			`To delete your history, use the <a href="/bot/command/detail/set">$unset gpt-history</a> command.`,
+			`To export your history, use the <a href="/bot/command/detail/check">$check gpt-history</a> command.`,
 			"",
 
 			"<h5>Other</h5>",

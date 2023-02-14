@@ -1,10 +1,18 @@
 {
   "defaultPromptPefix": "You are a chat bot. Don't use slurs.",
   "defaultTemperature": 0.5,
-  "globalInputLimit": 500,
+  "globalInputLimit": 5000,
   "outputLimit": {
     "default": 50,
     "maximum": 100
+  },
+  "queryNames": {
+    "prompt": "Query",
+    "response": "Answer"
+  },
+  "lengthLimitExceededMessage": {
+    "history": "Maximum history length exceeded for this model! Shorten your query, use a lower-ranked model, or wipe your history with \"$unset gpt-history\" instead.",
+    "regular": "Maximum query length exceeded for this model! Shorten your query, or use a lower-ranked model instead."
   },
   "userTokenLimits": {
     "regular": {

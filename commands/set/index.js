@@ -520,6 +520,42 @@ module.exports = {
 					}
 				},
 				{
+					name: "gpt-history",
+					aliases: ["gpthistory"],
+					elevatedChannelAccess: true,
+					parameter: "arguments",
+					description: "Deletes your current ChatGPT history.",
+					pipe: true,
+					set: () => ({
+						reply: `Use the "$gpt history:true" command to set your history with some prompts.`
+					}),
+					unset: async (context) => {
+						let GptHistory;
+						try {
+							GptHistory = require("../gpt/history-control.js");
+						}
+						catch {
+							return {
+								success: false,
+								reply: `The GPT history module is currently not available!`
+							};
+						}
+						
+						const existing = await GptHistory.get(context.user);
+						if (existing.length === 0) {
+							return {
+								success: false,
+								reply: `You have no ChatGPT history saved at the moment!`
+							};
+						}
+
+						await GptHistory.reset(context.user);
+						return {
+							reply: `Your ChatGPT history has been successfuly deleted.`
+						};
+					}
+				},
+				{
 					name: "birthday",
 					aliases: ["bday"],
 					parameter: "arguments",
