@@ -94,7 +94,7 @@ const predefinedQueries = {
 	),
 	suscheck: (username) => sb.Query.getRecordset(rs => rs
 		.select("Twitch_ID")
-		.from("data", "Suggestion")
+		.from("chat_data", "User_Alias")
 		.where("Name = %s", username)
 		.flat("Twitch_ID")
 		.single()
