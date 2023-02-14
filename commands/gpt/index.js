@@ -243,7 +243,7 @@ module.exports = {
 			else {
 				return `<li><b>${capName}</b> (${letter}) - ${modelData.usageDivisor}x cheaper than ${basePriceModel}${defaultString}</li>`;
 			}
-		}).filter(Boolean).join("");
+		}).join("");
 
 		return [
 			"Ask ChatGPT pretty much anything, and watch technology respond to you in various fun and interesting ways!",
