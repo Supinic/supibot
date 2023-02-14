@@ -207,6 +207,20 @@ module.exports = {
 			}
 		});
 
+		if (!moderationCheck.ok || !Array.isArray(moderationCheck.body.results)) {
+			const logId = await sb.Logger.log(
+				"Command.Warning",
+				`GPT moderation failed! ${JSON.stringify({ body: moderationCheck.body })}`,
+				context.channel,
+				context.user
+			);
+
+			return {
+				success: false,
+				reply: `Could not check your response for moderation! Please try again later. Reference ID: ${logId}`
+			};
+		}
+
 		const [moderationResult] = moderationCheck.body.results;
 		const { categories, category_scores: scores } = moderationResult;
 		if (categories.hate || categories["violence/graphic"] || categories["sexual/minors"]) {
