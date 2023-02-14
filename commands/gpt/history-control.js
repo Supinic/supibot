@@ -32,36 +32,21 @@ const add = async (userData, promptData) => {
 	});
 };
 
-const prepare = async (userData) => {
+const dump = async (userData) => {
 	const { queryNames } = ChatGptConfig;
 	const history = await get(userData) ?? [];
-	const result = [];
 
+	const result = [];
 	for (const { prompt, response } of history) {
-		result.push(
-			`${queryNames.prompt}: ${prompt}`,
-			`${queryNames.response}: ${response}`
-		);
+		result.push(`${queryNames.prompt}: ${prompt}\n${queryNames.response}: ${response}`);
 	}
 
 	return result;
-};
-
-const dump = async (userData) => {
-	const { queryNames } = ChatGptConfig;
-	const history = await prepare(userData);
-	return history.map(i => {
-		const prompt = `${queryNames.prompt}: ${i.prompt}`;
-		const response = `${queryNames.response}: ${i.response}`;
-
-		return `${prompt}\n${response}`;
-	});
 };
 
 module.exports = {
 	add,
 	dump,
 	get,
-	reset,
-	prepare
+	reset
 };
