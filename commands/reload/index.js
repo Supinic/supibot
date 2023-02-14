@@ -49,11 +49,16 @@ module.exports = {
 					const definitions = [];
 					result.failed = [];
 
-					if (typeof module.invalidateRequireCache === "function") {
-						module.invalidateRequireCache(`/code/supibot/${name}`, ...list);
-					}
+					for (const rawInstanceName of list) {
+						const instance = module.get(rawInstanceName);
+						const instanceName = (instance)
+							? instance[module.uniqueIdentifier]
+							: rawInstanceName;
 
-					for (const instanceName of list) {
+						if (typeof module.invalidateRequireCache === "function") {
+							module.invalidateRequireCache(`/code/supibot/${name}`, instanceName);
+						}
+
 						const path = `/code/supibot/${name}/${instanceName}`;
 						try {
 							if (name === "commands") {
