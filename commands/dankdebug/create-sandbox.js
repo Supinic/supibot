@@ -35,7 +35,7 @@ const advancedParse = (string) => JSON.parse(string, (key, value) => {
 			try {
 				return new Map(value.entries);
 			}
-			catch (e) {
+			catch {
 				return new Map();
 			}
 		}
@@ -43,7 +43,7 @@ const advancedParse = (string) => JSON.parse(string, (key, value) => {
 			try {
 				return new Set(value.values);
 			}
-			catch (e) {
+			catch {
 				return new Set();
 			}
 		}
