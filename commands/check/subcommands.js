@@ -294,7 +294,7 @@ module.exports = (command) => [
 			try {
 				CookieLogic = require("../cookie/cookie-logic.js");
 			}
-			catch (e) {
+			catch {
 				return {
 					success: false,
 					reply: `Could not load the cookie logic module!`
