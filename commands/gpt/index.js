@@ -18,7 +18,7 @@ module.exports = {
 		const GptCache = require("./cache-control.js");
 		const GptHistory = require("./history-control.js");
 
-		const query = args.join(" ");
+		const query = args.join(" ").trim();
 		if (!query) {
 			return {
 				success: false,
