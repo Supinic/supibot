@@ -51,9 +51,9 @@ module.exports = {
 
 		let promptPrefix = "";
 		if (context.params.history) {
-			const historicPrompt = await GptHistory.prepare(context.user, query);
+			const historicPrompt = await GptHistory.dump(context.user, query);
 			if (historicPrompt.length !== 0) {
-				promptPrefix = `${historicPrompt.join("\n")}\n`;
+				promptPrefix = `${historicPrompt.join("\n\n")}\n`;
 			}
 		}
 
