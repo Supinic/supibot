@@ -226,7 +226,7 @@ module.exports = {
 		const reply = chatResponse.text.trim();
 		if (context.params.history) {
 			await GptHistory.add(context.user, {
-				prompt,
+				prompt: query,
 				response: reply,
 				temperature
 			});
