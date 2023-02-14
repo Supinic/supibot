@@ -20,9 +20,10 @@
     "ada": {
       "url": "text-ada-001",
       "default": false,
+      "inputLimit": 5000,
       "outputLimit": {
-        "default": 200,
-        "maximum": 2000
+        "default": 500,
+        "maximum": 2500
       },
       "usageDivisor": 50,
       "usePromptPrefix": false
@@ -30,9 +31,10 @@
     "babbage": {
       "url": "text-babbage-001",
       "default": false,
+      "inputLimit": 5000,
       "outputLimit": {
-        "default": 200,
-        "maximum": 1000
+        "default": 400,
+        "maximum": 2000
       },
       "usageDivisor": 40,
       "usePromptPrefix": false
@@ -42,9 +44,10 @@
       "default": true,
       "disabled": false,
       "disableReason": "unsafe generated content",
+      "inputLimit": 2500,
       "outputLimit": {
         "default": 100,
-        "maximum": 250
+        "maximum": 500
       },
       "usageDivisor": 10,
       "usePromptPrefix": false
@@ -54,8 +57,8 @@
       "default": false,
       "inputLimit": 250,
       "outputLimit": {
-        "default": 25,
-        "maximum": 100
+        "default": 50,
+        "maximum": 250
       },
       "usageDivisor": 1,
       "usePromptPrefix": false
