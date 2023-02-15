@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 1000,
 	Description: "Usable in pipe only - turns the response into a private message.",
-	Flags: ["pipe"],
+	Flags: [],
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
