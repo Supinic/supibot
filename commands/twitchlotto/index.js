@@ -169,9 +169,26 @@ module.exports = {
 				);
 
 				if (!image) {
+					const data = JSON.stringify({
+						failedTries,
+						safeMode,
+						channel,
+						params: context.params,
+						// Only used for temporary log debugging
+						// eslint-disable-next-line prefer-rest-params
+						arguments
+					});
+
+					const logId = await sb.Logger.log(
+						"Command.Other",
+						`All images scored log: ${data}`,
+						context.channel,
+						context.user
+					);
+
 					return {
 						success: false,
-						reply: `All the images have been scored in this channel!`
+						reply: `All the images have been scored in this channel! Reference ID: ${logId}`
 					};
 				}
 			}
