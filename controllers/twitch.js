@@ -23,6 +23,8 @@ const emoteGot = sb.Got.get("Global").extend({
 });
 
 module.exports = class TwitchController extends require("./template.js") {
+	supportsMeAction = true;
+
 	constructor () {
 		super();
 
@@ -803,7 +805,12 @@ module.exports = class TwitchController extends require("./template.js") {
 			});
 
 			if (message) {
-				await this.send(message, channelData);
+				if (execution.replyWithMeAction === true) {
+					await this.me(channelData, message);
+				}
+				else {
+					await this.send(message, channelData);
+				}
 			}
 		}
 
@@ -1077,6 +1084,15 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 
 		return subscriberList.some(i => i.user_id === userData.Twitch_ID);
+	}
+
+	/**
+	 * @param {Channel} channelData
+	 * @param {string} message
+	 * @returns {Promise<void>}
+	 */
+	async me (channelData, message) {
+		await this.client.me(channelData.Name, message);
 	}
 
 	/**

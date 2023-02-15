@@ -3,6 +3,7 @@
  * @name {Controller}
 */
 module.exports = class Controller {
+	supportsMeAction = false;
 	data = {
 		crons: []
 	};
@@ -14,6 +15,12 @@ module.exports = class Controller {
 	async pm (message, user) {}
 
 	async handleCommand () {}
+
+	me () {
+		throw new sb.Error({
+			message: "This method is not implemented by the derived Controller class"
+		});
+	}
 
 	/**
 	 * Resolves a registered awaiting message.
