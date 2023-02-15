@@ -244,6 +244,7 @@ module.exports = {
 			hasExternalInput,
 			// skipExternalPrefix: Boolean(lastCommand.Flags.skipBanphrase),
 			replyWithPrivateMessage: Boolean(finalResult?.replyWithPrivateMessage),
+			replyWithMeAction: Boolean(finalResult?.replyWithMeAction),
 			reply: currentArgs.join(" ")
 		};
 	}),
