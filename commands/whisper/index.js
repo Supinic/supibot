@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "whisper",
-	Aliases: ["/w","pm"],
+	Aliases: ["/w", "pm"],
 	Author: "supinic",
 	Cooldown: 1000,
 	Description: "Usable in pipe only - turns the response into a private message.",
@@ -11,6 +11,7 @@ module.exports = {
 	Code: (async function whisper (context, ...args) {
 		if (!context.append.pipe) {
 			return {
+				success: false,
 				reply: "This command is only usable in pipes!",
 				cooldown: 5000
 			};
