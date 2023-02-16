@@ -507,6 +507,77 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	/**
+	 * @param {Channel|string} channelData
+	 * @param {User|string} userData
+	 * @param {number|null} length If number = timeout, if null = permaban
+	 * @param {string|null} reason
+	 * @returns {Promise<{ ok: boolean, statusCode: number, body: Object[] }>}
+	 */
+	async timeout (channelData, userData, length = 1, reason = null) {
+		if (!channelData || !userData) {
+			throw new sb.Error({
+				message: "Missing user or channel",
+				args: { channelData, userData }
+			});
+		}
+
+		let channelID;
+		if (channelData instanceof sb.Channel) {
+			if (channelData.Platform !== this.platform) {
+				throw new sb.Error({
+					message: "Non-Twitch channel provided",
+					args: { channelData }
+				});
+			}
+
+			channelID = channelData.Specific_ID;
+		}
+		else {
+			channelID = await this.getUserID(channelData);
+		}
+
+		if (!channelID) {
+			throw new sb.Error({
+				message: "Invalid channel provided",
+				args: { userData }
+			});
+		}
+
+		const userID = (userData instanceof sb.User)
+			? userData.Twitch_ID
+			: await this.getUserID(userData);
+
+		if (!userID) {
+			throw new sb.Error({
+				message: "Invalid user provided",
+				args: { userData }
+			});
+		}
+
+		const response = await sb.Got("Helix", {
+			method: "POST",
+			url: "moderation/bans",
+			searchParams: {
+				broadcaster_id: channelID,
+				moderator_id: this.platform.Self_ID
+			},
+			json: {
+				data: {
+					user_id: userID,
+					length,
+					reason
+				}
+			}
+		});
+
+		return {
+			ok: response.ok,
+			statusCode: response.statusCode,
+			body: response.body
+		};
+	}
+
+	/**
 	 * Handles incoming messages.
 	 * @param {DankTwitch.PrivmsgMessage|DankTwitch.WhisperMessage} messageObject
 	 * @returns {Promise<void>}
