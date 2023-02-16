@@ -509,11 +509,11 @@ module.exports = class TwitchController extends require("./template.js") {
 	/**
 	 * @param {Channel|string} channelData
 	 * @param {User|string} userData
-	 * @param {number|null} length If number = timeout, if null = permaban
+	 * @param {number|null} duration If number = timeout, if null = permaban
 	 * @param {string|null} reason
 	 * @returns {Promise<{ ok: boolean, statusCode: number, body: Object[] }>}
 	 */
-	async timeout (channelData, userData, length = 1, reason = null) {
+	async timeout (channelData, userData, duration = 1, reason = null) {
 		if (!channelData || !userData) {
 			throw new sb.Error({
 				message: "Missing user or channel",
@@ -564,7 +564,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			json: {
 				data: {
 					user_id: userID,
-					length,
+					duration,
 					reason
 				}
 			}
