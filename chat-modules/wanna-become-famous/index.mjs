@@ -3,40 +3,50 @@ export const definition = {
 	Events: ["message"],
 	Description: "Bans various spam or follow bots.",
 	Code: (async function wannaBecomeFamous (context) {
-		if (context.channel.mode === "Read") {
-			return;
+		/** @type {Channel} */
+		const channelData = context.channel;
+		if (channelData.Mode === "Read") {
+			return; // don't time out in read-only channels
 		}
-		else if (context.channel.Platform.Name !== "twitch") {
-			return; // cannot timeout when not on twitch
+		else if (channelData.Platform.Name !== "twitch") {
+			return; // cannot time out when not on twitch
 		}
 
-		let type = "";
+		let reason = "";
 		const msg = sb.Utils.removeAccents(context.message).toLowerCase();
 		if (msg.includes("become famous?")) {
-			type = "becoming famous";
+			reason = "becoming famous";
 		}
 		else if (msg.includes("get raided")) {
-			type = "getting raided";
+			reason = "getting raided";
 		}
 		else if (msg.includes("followers")) {
-			type = "buying followers";
+			reason = "buying followers";
 		}
 		else if (/get\s+viewers\s+pro/.test(msg)) {
-			type = "feeling more popular";
+			reason = "feeling more popular";
 		}
 		else if (msg.includes("upgrade your stream")) {
-			type = "upgrading your stream";
+			reason = "upgrading your stream";
 		}
 		else {
 			return;
 		}
 
-		const { client } = context.channel.Platform;
-		const emote = await context.channel.getBestAvailableEmote(["NOIDONTTHINKSO", "forsenSmug", "supiniNOIDONTTHINKSO", "RarePepe"], "😅");
-		if (!context.user && context.raw?.user) {
+		/** @type {TwitchController} */
+		const controller = channelData.Platform.controller;
+		const emote = await channelData.getBestAvailableEmote(
+			["NOIDONTTHINKSO", "forsenSmug", "supiniNOIDONTTHINKSO", "RarePepe"],
+			"😅",
+			{ shuffle: true }
+		);
+
+		/** @type {User} */
+		const userData = context.user;
+		if (!userData && context.raw?.user) {
 			const name = context.raw.user;
-			await client.ban(context.channel.Name, name, type);
-			await context.channel.send(`${emote} ${type}`);
+			await controller.timeout(channelData, name, null, reason);
+			await channelData.send(`${emote} ${reason}`);
 
 			return;
 		}
@@ -51,8 +61,8 @@ export const definition = {
 		);
 
 		if (typeof messageCount === "undefined" || messageCount <= 1) {
-			await client.ban(context.channel.Name, context.user.Name, type);
-			await context.channel.send(`${emote} ${type} again`);
+			await controller.timeout(channelData, userData, null, reason);
+			await channelData.send(`${emote} ${reason} again`);
 		}
 	}),
 	Global: false,

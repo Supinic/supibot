@@ -47,8 +47,10 @@ module.exports = {
 			};
 		}
 
+		/** @type {TwitchController} */
+		const controller = context.platform.controller;
 		try {
-			await context.platform.client.timeout(context.channel.Name, context.user.Name, 1, "Vanished");
+			await controller.timeout(context.channel, context.user, 1, "Vanished");
 		}
 		catch {
 			const emote = await context.getBestAvailableEmote(["LULW", "LuL", "LUL"], "😄");

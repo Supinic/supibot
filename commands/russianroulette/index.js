@@ -61,6 +61,8 @@ module.exports = {
 			};
 		}
 
+		/** @type {TwitchController} */
+		const controller = context.platform.controller;
 		const { userBadges } = context.append;
 
 		let timeoutMode;
@@ -78,9 +80,9 @@ module.exports = {
 		if (result === 1) {
 			if (timeoutMode === "real") {
 				try {
-					await context.platform.client.timeout(
-						context.channel.Name,
-						context.user.Name,
+					await controller.timeout(
+						context.channel,
+						context.user,
 						timeoutLength,
 						"Lost the roulette"
 					);
