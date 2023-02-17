@@ -132,6 +132,11 @@ declare namespace DankDebug {
 		suscheck: string | null | undefined,
 	};
 
+	export type PartialCommandResult = {
+		success: boolean;
+		reply?: string | null;
+	};
+
 	export type SupibotDatabaseValue = string
 		| number
 		| boolean
@@ -154,6 +159,10 @@ declare namespace DankDebug {
 		 * Retrieves the target user's Twitch ID, as is stored in Supibot's database (*NOT* the actual ID from Helix)
 		 */
 		run (string: "suscheck", username: string): Promise<QueryResult["suscheck"]>;
+	}
+
+	export interface SupibotDankDebugCommand {
+		execute (commandName: string, ...args: string[]): Promise<PartialCommandResult>;
 	}
 
 	/**
@@ -212,6 +221,11 @@ declare namespace DankDebug {
 	 * Collection of database-related methods.
 	 */
 	export const query: SupibotDankDebugQuery;
+
+	/**
+	 * Collection of subcommand execution-related methods.
+	 */
+	export const command: SupibotDankDebugCommand;
 
 	/**
 	 * Utils methods built into supibot.
