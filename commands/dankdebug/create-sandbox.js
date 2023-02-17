@@ -101,6 +101,7 @@ const predefinedQueries = {
 		.limit(1)
 	)
 };
+const restrictedCommands = ["js"].map(i => sb.Command.get(i));
 
 module.exports = async function createDebugSandbox (context, scriptArgs) {
 	const rawCustomUserData = await context.user.getDataProperty("customDeveloperData") ?? {};
@@ -114,6 +115,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 	const queryExecutions = new Set();
 	let userDataChanged = false;
 	let channelDataChanged = false;
+	let commandExecutionCounter = 0;
 
 	// When editing the sandbox context, make sure to update the type definitions in ./sandbox.d.ts
 	const sandbox = {
@@ -174,6 +176,45 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				return data;
 			}
 		}),
+		command: {
+			execute: async (command, ...args) => {
+				if (typeof command !== "string") {
+					throw new sb.Error({
+						message: "Provided command name must be a string"
+					});
+				}
+				else if (args.some(i => typeof i !== "string")) {
+					throw new sb.Error({
+						message: "Provided command arguments must all be strings"
+					});
+				}
+				else if (commandExecutionCounter > 0) {
+					throw new sb.Error({
+						message: "Too many commands executed in this invocation"
+					});
+				}
+
+				const commandData = sb.Command.get(command);
+				if (restrictedCommands.includes(commandData)) {
+					throw new sb.Error({
+						message: "Provided command is unavailable from being used inside of $js"
+					});
+				}
+
+				commandExecutionCounter++;
+
+				const result = await sb.Command.checkAndExecute(command, args, context.channel, context.user, {
+					...context.append,
+					partialExecute: true,
+					tee: context.tee
+				});
+
+				return {
+					success: (result.success !== false),
+					reply: result.reply
+				};
+			}
+		},
 		get tee () { return Object.freeze([...context.tee]); },
 		_teePush (value) {
 			if (typeof value !== "string") {
