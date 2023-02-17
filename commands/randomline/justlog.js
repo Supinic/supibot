@@ -44,7 +44,7 @@ const getRandomChannelLine = async function (channelID) {
 	if (response.statusCode === 403) {
 		return {
 			success: false,
-			reason: "That channel has opted out of logging their messages!"
+			reason: "This channel has opted out of having their messages logged via a third party service (Justlog)!"
 		};
 	}
 	else if (response.statusCode === 404) {
@@ -81,7 +81,7 @@ const getRandomUserLine = async function (channelID, userID) {
 	if (response.statusCode === 403) {
 		return {
 			success: false,
-			reason: "That user has opted out of logging their messages!"
+			reason: "That user has opted out of having their messages logged via a third party service (Justlog)!"
 		};
 	}
 	else if (response.statusCode === 404) {
