@@ -1,7 +1,7 @@
 import type { JSONifiable, Emote } from 'supi-core/@types/globals';
 import type { Command, Parameter } from 'supi-core/@types/classes/command';
 import type { UtilsSingleton } from 'supi-core/@types/singletons/utils';
-import * as Util from "util";
+// import * as Util from "util";
 
 // This file is mostly meant to be used as a form of documentation for the $js
 // command, and can also be used by more technical users to help them make
@@ -128,7 +128,8 @@ declare namespace DankDebug {
 	}
 
 	export type QueryResult = {
-		content: { Category: string | null, Status: string | null; }[]
+		content: { Category: string | null, Status: string | null; }[],
+		suscheck: string | null | undefined,
 	};
 
 	export type SupibotDatabaseValue = string
@@ -144,11 +145,15 @@ declare namespace DankDebug {
 		/**
 		 * Runs a predefined query based on its name, and returns the data in an array of objects, or an object, if determined so.
 		 */
-		run (string: string): Promise<SupibotDatabaseValue>;
+		run (string: string, ...args: string[]): Promise<SupibotDatabaseValue>;
 		/**
 		 * Retrieves meta data about currently active suggestions.
 		 */
 		run (string: "content"): Promise<QueryResult["content"]>;
+		/**
+		 * Retrieves the target user's Twitch ID, as is stored in Supibot's database (*NOT* the actual ID from Helix)
+		 */
+		run (string: "suscheck", username: string): Promise<QueryResult["suscheck"]>;
 	}
 
 	/**
