@@ -207,6 +207,9 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 					...context.append,
 					partialExecute: true,
 					pipe: true,
+					skipPending: true,
+					skipMention: true,
+					skipBanphrases: true,
 					tee: context.tee
 				});
 
