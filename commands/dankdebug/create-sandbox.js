@@ -214,7 +214,8 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				});
 
 				return {
-					success: (result.success !== false),
+					success: result.success ?? null,
+					reason: result.reason ?? null,
 					reply: result.reply
 				};
 			}
