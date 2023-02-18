@@ -540,7 +540,7 @@ module.exports = {
 								reply: `The GPT history module is currently not available!`
 							};
 						}
-						
+
 						const existing = await GptHistory.get(context.user);
 						if (existing.length === 0) {
 							return {
@@ -700,7 +700,7 @@ module.exports = {
 							};
 						}
 
-						const regex = /(https:\/\/)?(www\.)?(imgur\.com\/)?([\d\w]{5,8}\.\w{3})/;
+						const regex = /(https:\/\/)?(www\.)?(imgur\.com\/)?([\d\w]{5,8}\.\w{3,4})/;
 						const match = link.match(regex);
 						if (!match) {
 							return {
@@ -787,7 +787,7 @@ module.exports = {
 							}
 						}
 
-						const regex = /(https:\/\/)?(www\.)?(imgur\.com\/)?([\d\w]{5,8}\.\w{3})/;
+						const regex = /(https:\/\/)?(www\.)?(imgur\.com\/)?([\d\w]{5,8}\.\w{3,4})/;
 						const match = link.match(regex);
 						if (!match) {
 							return {
