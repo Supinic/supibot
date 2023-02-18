@@ -206,6 +206,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				const result = await sb.Command.checkAndExecute(command, args, context.channel, context.user, {
 					...context.append,
 					partialExecute: true,
+					pipe: true,
 					tee: context.tee
 				});
 
