@@ -101,10 +101,17 @@ module.exports = {
 			result = await sb.Sandbox.run(script, scriptContext);
 		}
 		catch (e) {
-			if (!(e instanceof Error)) {
+			// Special case - error is coming directly from VM2-land, and isn't `instanceof` this realm's `Error`
+			if (e?.constructor?.message?.includes("execution timed out")) {
 				return {
 					success: false,
-					reply: `Your dank debug threw or rejected with a non-Error value!`
+					reply: `Your execution timed out!`
+				};
+			}
+			else if (!(e instanceof Error) && e?.constructor?.name !== "Error") {
+				return {
+					success: false,
+					reply: `Your execution threw or rejected with a non-Error value!`
 				};
 			}
 
@@ -112,7 +119,7 @@ module.exports = {
 			if (name === "EvalError") {
 				return {
 					success: false,
-					reply: "Your dank debug contains code that isn't allowed!"
+					reply: "Your execution contains code that isn't allowed!"
 				};
 			}
 
