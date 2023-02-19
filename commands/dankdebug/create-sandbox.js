@@ -176,7 +176,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				return data;
 			}
 		}),
-		command: {
+		command: sb.Utils.deepFreeze({
 			execute: async (command, ...args) => {
 				if (typeof command !== "string") {
 					throw new Error("Provided command name must be a string");
@@ -217,7 +217,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 					reply: result.reply
 				};
 			}
-		},
+		}),
 		get tee () { return Object.freeze([...context.tee]); },
 		_teePush (value) {
 			if (typeof value !== "string") {
