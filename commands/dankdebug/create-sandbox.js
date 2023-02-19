@@ -193,7 +193,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 					throw new Error("Command not found - separate command name from parameters");
 				}
 				else if (restrictedCommands.includes(commandData)) {
-					throw new Error("Provided command is not usable of $js");
+					throw new Error("Provided command is not usable in the $js execution");
 				}
 				else if (!commandData.Flags.pipe) {
 					throw new Error("This command cannot be used directly within this sandbox");
