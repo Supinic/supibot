@@ -92,7 +92,6 @@ module.exports = {
 
 		const createSandbox = require("./create-sandbox");
 		const sandboxData = await createSandbox(context, scriptArgs);
-
 		try {
 			result = await sb.Sandbox.run(script, {
 				fixAsync: false,
@@ -102,7 +101,7 @@ module.exports = {
 		}
 		catch (e) {
 			// Special case - error is coming directly from VM2-land, and isn't `instanceof` this realm's `Error`
-			if (e?.message?.includes("execution timed out")) {
+			if (e?.code === "ERR_SCRIPT_EXECUTION_TIMEOUT") {
 				return {
 					success: false,
 					reply: `Your execution timed out!`
