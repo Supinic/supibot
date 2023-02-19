@@ -182,7 +182,7 @@ module.exports = {
 				console.warn(e);
 				return {
 					success: false,
-					reply: "Your dank debug's return value cannot be serialized!"
+					reply: "Your execution's return value cannot be serialized!"
 				};
 			}
 		}
