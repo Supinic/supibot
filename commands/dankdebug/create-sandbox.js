@@ -195,7 +195,12 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				}
 
 				const commandData = sb.Command.get(command);
-				if (restrictedCommands.includes(commandData)) {
+				if (!commandData) {
+					throw new sb.Error({
+						message: "Command not found - separate command name from parameters"
+					});
+				}
+				else if (restrictedCommands.includes(commandData)) {
 					throw new sb.Error({
 						message: "Provided command is unavailable from being used inside of $js"
 					});
