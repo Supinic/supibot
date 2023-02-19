@@ -205,6 +205,11 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 						message: "Provided command is unavailable from being used inside of $js"
 					});
 				}
+				else if (!commandData.Flags.pipe) {
+					throw new sb.Error({
+						message: "This command cannot be used directly within this sandbox"
+					});
+				}
 
 				commandExecutionCounter++;
 
