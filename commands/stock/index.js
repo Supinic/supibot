@@ -7,40 +7,9 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => {
-		const symbolData = sb.Config.get("STOCK_SYMBOLS_LIST", false) ?? [];
-		const findSymbol = (from) => {
-			from = from.toLowerCase();
-
-			let bestScore = -Infinity;
-			let index = -1;
-			for (let i = 0; i < symbolData.length; i++) {
-				const currentName = symbolData[i][1];
-				if (!currentName.includes(from)) {
-					continue;
-				}
-
-				const score = sb.Utils.jaroWinklerSimilarity(from, currentName);
-				if (score > 0 && score > bestScore) {
-					bestScore = score;
-					index = i;
-				}
-			}
-
-			if (bestScore === -Infinity) {
-				return null;
-			}
-			else {
-				return symbolData[index][0];
-			}
-		};
-
-		return {
-			findSymbol
-		};
-	}),
+	Static_Data: null,
 	Code: (async function stock (context, ...args) {
-		const { findSymbol } = this.staticData;
+		const { findPopularSymbol } = require("./stocks.js");
 		const input = args.join(" ");
 		if (!input) {
 			return {
@@ -50,12 +19,12 @@ module.exports = {
 		}
 
 		// If the input is a single argument consisting of capital characters only, we can (somewhat) safely assume
-		// that it's a stock symbol and not a name.
+		// that it's a stock symbol and not a name. We can then try looking up a popular stock name instead of its code.
 		const symbol = (args.length === 1 && /^[A-Z]+$/.test(args[0]))
 			? args[0]
-			: findSymbol(input) ?? args[0];
+			: findPopularSymbol(input) ?? args[0];
 
-		const { "Global Quote": rawData } = await sb.Got({
+		const response = await sb.Got("GenericAPI", {
 			retry: {
 				limit: 0
 			},
@@ -66,17 +35,21 @@ module.exports = {
 				symbol,
 				apikey: sb.Config.get("API_ALPHA_AVANTAGE")
 			}
-		}).json();
+		});
 
+		const rawData = response.body["Global Quote"];
 		if (!rawData || Object.keys(rawData).length === 0) {
 			return {
+				success: false,
 				reply: "Stock symbol could not be found!"
 			};
 		}
 
+		// Fix the API's crazy key naming syntax (e.g. data["01. symbol"])
 		const data = {};
 		for (const rawKey of Object.keys(rawData)) {
-			const key = sb.Utils.convertCase(rawKey.replace(/^\d+\.\s+/, ""), "text", "camel");
+			const fixedKey = rawKey.replace(/^\d+\.\s+/, "");
+			const key = sb.Utils.convertCase(fixedKey, "text", "camel");
 			data[key] = rawData[rawKey];
 		}
 
