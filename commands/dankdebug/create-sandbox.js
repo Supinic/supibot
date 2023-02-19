@@ -101,7 +101,7 @@ const predefinedQueries = {
 		.limit(1)
 	)
 };
-const restrictedCommands = ["js"].map(i => sb.Command.get(i));
+const restrictedCommands = ["alias", "pipe", "js"].map(i => sb.Command.get(i));
 
 module.exports = async function createDebugSandbox (context, scriptArgs) {
 	const rawCustomUserData = await context.user.getDataProperty("customDeveloperData") ?? {};
