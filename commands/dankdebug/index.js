@@ -93,12 +93,12 @@ module.exports = {
 		const createSandbox = require("./create-sandbox");
 		const sandboxData = await createSandbox(context, scriptArgs);
 
-		const scriptContext = {
-			fixAsync: false,
-			sandbox: sandboxData.sandbox
-		};
 		try {
-			result = await sb.Sandbox.run(script, scriptContext);
+			result = await sb.Sandbox.run(script, {
+				fixAsync: false,
+				timeout: 2500,
+				sandbox: sandboxData.sandbox
+			});
 		}
 		catch (e) {
 			// Special case - error is coming directly from VM2-land, and isn't `instanceof` this realm's `Error`
