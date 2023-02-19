@@ -179,36 +179,24 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 		command: {
 			execute: async (command, ...args) => {
 				if (typeof command !== "string") {
-					throw new sb.Error({
-						message: "Provided command name must be a string"
-					});
+					throw new Error("Provided command name must be a string");
 				}
 				else if (args.some(i => typeof i !== "string")) {
-					throw new sb.Error({
-						message: "Provided command arguments must all be strings"
-					});
+					throw new Error("Provided command arguments must all be strings");
 				}
 				else if (commandExecutionCounter > 0) {
-					throw new sb.Error({
-						message: "Too many commands executed in this invocation"
-					});
+					throw new Error("Too many commands executed in this invocation");
 				}
 
 				const commandData = sb.Command.get(command);
 				if (!commandData) {
-					throw new sb.Error({
-						message: "Command not found - separate command name from parameters"
-					});
+					throw new Error("Command not found - separate command name from parameters");
 				}
 				else if (restrictedCommands.includes(commandData)) {
-					throw new sb.Error({
-						message: "Provided command is unavailable from being used inside of $js"
-					});
+					throw new Error("Provided command is not usable of $js");
 				}
 				else if (!commandData.Flags.pipe) {
-					throw new sb.Error({
-						message: "This command cannot be used directly within this sandbox"
-					});
+					throw new Error("This command cannot be used directly within this sandbox");
 				}
 
 				commandExecutionCounter++;
