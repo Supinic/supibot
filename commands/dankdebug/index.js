@@ -102,7 +102,7 @@ module.exports = {
 		}
 		catch (e) {
 			// Special case - error is coming directly from VM2-land, and isn't `instanceof` this realm's `Error`
-			if (e?.constructor?.message?.includes("execution timed out")) {
+			if (e?.message?.includes("execution timed out")) {
 				return {
 					success: false,
 					reply: `Your execution timed out!`
