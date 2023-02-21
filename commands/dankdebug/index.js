@@ -108,6 +108,13 @@ module.exports = {
 					reply: `Your execution timed out!`
 				};
 			}
+			else if (e?.message?.includes("Asynchronous execution timed out")) {
+				// Special case - notify Administrator for async timeouts
+				await sb.Platform.get("twitch").pm(
+					`${context.user.Name} exceeded async timeout in ${context.channel?.Name ?? "whispers"}`,
+					sb.Config.get("ADMINISTRATOR")
+				);
+			}
 			else if (!(e instanceof Error) && e?.constructor?.name !== "Error") {
 				return {
 					success: false,
