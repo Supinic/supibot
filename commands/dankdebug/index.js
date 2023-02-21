@@ -96,7 +96,7 @@ module.exports = {
 		try {
 			result = await safeAsyncScriptExecute(script, {
 				fixAsync: false,
-				timeout: 2500,
+				timeout: 5000,
 				sandbox: sandboxData.sandbox
 			});
 		}
