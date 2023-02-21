@@ -34,7 +34,15 @@ const safeAsyncScriptExecute = async (script, context) => {
 
 	const start = process.hrtime.bigint();
 	const promise = new sb.Promise((resolve, reject) => {
-		const result = sb.Sandbox.run(script, context);
+		let result;
+		try {
+			result = sb.Sandbox.run(script, context);
+		}
+		catch (e) {
+			executionFinished = true;
+			return reject(e);
+		}
+
 		if (result instanceof Promise) {
 			result
 				.then(i => resolve(i))
