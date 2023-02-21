@@ -117,6 +117,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 	let userDataChanged = false;
 	let channelDataChanged = false;
 	let commandExecutionCounter = 0;
+	let commandExecutionPending = false;
 
 	// When editing the sandbox context, make sure to update the type definitions in ./sandbox.d.ts
 	const sandbox = {
@@ -188,6 +189,9 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				else if (commandExecutionCounter > commandExecutionCountThreshold) {
 					throw new Error("Too many commands executed in this invocation");
 				}
+				else if (commandExecutionPending) {
+					throw new Error("A command execution is already pending in this invocation");
+				}
 
 				const commandData = sb.Command.get(command);
 				if (!commandData) {
@@ -200,6 +204,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 					throw new Error("This command cannot be used directly within this sandbox");
 				}
 
+				commandExecutionPending = true;
 				commandExecutionCounter++;
 
 				const result = await sb.Command.checkAndExecute(command, args, context.channel, context.user, {
@@ -211,6 +216,8 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 					skipBanphrases: true,
 					tee: context.tee
 				});
+
+				commandExecutionPending = false;
 
 				return {
 					success: result.success ?? true,
