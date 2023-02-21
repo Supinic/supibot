@@ -102,6 +102,7 @@ const predefinedQueries = {
 	)
 };
 const restrictedCommands = ["alias", "pipe", "js"].map(i => sb.Command.get(i));
+const commandExecutionCountThreshold = 5;
 
 module.exports = async function createDebugSandbox (context, scriptArgs) {
 	const rawCustomUserData = await context.user.getDataProperty("customDeveloperData") ?? {};
@@ -184,7 +185,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				else if (args.some(i => typeof i !== "string")) {
 					throw new Error("Provided command arguments must all be strings");
 				}
-				else if (commandExecutionCounter > 0) {
+				else if (commandExecutionCounter > commandExecutionCountThreshold) {
 					throw new Error("Too many commands executed in this invocation");
 				}
 
