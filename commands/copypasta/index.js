@@ -6,7 +6,7 @@ module.exports = {
 	Description: "Fetches a random Twitch-related copypasta.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
-		{ name: "textOnly", type: "boolean" }
+		{ name: "allowAsciiArt", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
@@ -29,18 +29,20 @@ module.exports = {
 
 		let copypasta;
 		let repeats = 0;
+		const asciiArtDisabled = context.params.allowAsciiArt ?? (context.platform.Name === "twitch");
+
 		do {
 			copypasta = await fetch();
 			repeats++;
-		} while (context.params.textOnly && hasAsciiArt(copypasta) && repeats < repeatLimit);
-		
+		} while (asciiArtDisabled && hasAsciiArt(copypasta) && repeats < repeatLimit);
+
 		if (repeats >= repeatLimit) {
 			return {
 				success: false,
 				reply: `Could not find a fitting copypasta within ${repeats} attempts!`
 			};
 		}
-	
+
 		return {
 			success: Boolean(copypasta),
 			reply: (copypasta)
@@ -56,7 +58,7 @@ module.exports = {
 		"(random copypasta)",
 		"",
 
-		`<code>${prefix}copypasta textOnly:true</code>`,
-		"(random copypasta) - excludes ASCII art pastas. Retries up to 5 times, if one isn't found, then fails."
+		`<code>${prefix}copypasta allowAsciiArt:true</code>`,
+		"(random copypasta) - includes ASCII art pastas, which are disabled on Twitch by defualt. Retries up to 5 times, if one isn't found, then fails."
 	])
 };
