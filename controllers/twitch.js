@@ -220,10 +220,10 @@ module.exports = class TwitchController extends require("./template.js") {
 						await row.save({ skipLoad: true });
 					}
 				}
-				else {
+				else if (result.success === true) {
 					await sb.Logger.log(
 						"Twitch.Other",
-						`No rename for this channel despite JoinError: ${JSON.stringify({ result, error })}`,
+						`Channel rename: ${JSON.stringify({ result, error })}`,
 						channelData,
 						null
 					);
