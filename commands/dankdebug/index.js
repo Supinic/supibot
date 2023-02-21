@@ -90,10 +90,11 @@ module.exports = {
 			script = `${importedText}\n${script}`;
 		}
 
+		const { safeAsyncScriptExecute } = require("./async-timeout.js");
 		const createSandbox = require("./create-sandbox");
 		const sandboxData = await createSandbox(context, scriptArgs);
 		try {
-			result = await sb.Sandbox.run(script, {
+			result = await safeAsyncScriptExecute(script, {
 				fixAsync: false,
 				timeout: 2500,
 				sandbox: sandboxData.sandbox
