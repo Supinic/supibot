@@ -68,7 +68,7 @@ module.exports = {
 				extensions: {
 					persistedQuery: {
 						version: 1,
-						sha256Hash: "1ad9680b56b15e64eb05cf6a99b49793a788315d32cab241968b582cc5520ed4"
+						sha256Hash: "823772cac91efa0a24f86a80463f37f0377cb216d7ce57a4ab90b61d1e01de8b"
 					}
 				},
 				variables: {
