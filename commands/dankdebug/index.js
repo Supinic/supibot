@@ -79,7 +79,7 @@ module.exports = {
 			script = context.params.function;
 			scriptArgs = [...args];
 		}
-		else if (!string.includes("return")) {
+		else if (!string.includes("return")) { // @todo refactor this to use acorn heuristic for ReturnStatement
 			script = string;
 		}
 		else {
@@ -90,11 +90,19 @@ module.exports = {
 			script = `${importedText}\n${script}`;
 		}
 
-		const { safeAsyncScriptExecute } = require("./async-timeout.js");
+		const { analyze } = require("./acorn-heuristic.js");
+		const analyzeResult = analyze(script);
+		if (analyzeResult.illegalAsync) {
+			return {
+				success: false,
+				reply: "Your execution contains illegal asynchronous code!"
+			};
+		}
+
 		const createSandbox = require("./create-sandbox");
 		const sandboxData = await createSandbox(context, scriptArgs);
 		try {
-			result = await safeAsyncScriptExecute(script, {
+			result = await sb.Sandbox.run(script, {
 				fixAsync: false,
 				timeout: 5000,
 				sandbox: sandboxData.sandbox
