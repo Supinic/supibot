@@ -495,19 +495,32 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @param {string} user
 	 */
 	async pm (message, user) {
-		const userData = await sb.User.get(user);
-		const trimmedMessage = message.replace(/[\r\n]/g, " ").trim();
-
 		const joinOverride = this.platform?.Data.joinChannelsOverride ?? [];
 		if (this.platform.Data.suspended || joinOverride.length !== 0) {
 			return;
 		}
 
-		try {
-			await this.client.whisper(userData.Name, trimmedMessage);
-		}
-		catch (e) {
-			await sb.Logger.log("Twitch.Warning", String(e), null, null);
+		const userData = await sb.User.get(user);
+		const trimmedMessage = message.replace(/[\r\n]/g, " ").trim();
+		const response = await sb.Got("Helix", {
+			method: "POST",
+			url: "whispers",
+			searchParams: {
+				from_user_id: this.platform.Self_ID,
+				to_user_id: userData.Twitch_ID
+			},
+			json: {
+				message: trimmedMessage
+			}
+		});
+
+		if (!response.ok) {
+			const data = JSON.stringify({
+				body: response.body,
+				statusCode: response.statusCode
+			});
+
+			await sb.Logger.log("Twitch.Warning", data, null, userData);
 		}
 	}
 
