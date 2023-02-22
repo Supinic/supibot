@@ -37,7 +37,7 @@ export const definition = {
 			this.data.timeout = now + 1000;
 
 			const pingMessage = `[ ${channel.Description ?? channel.Name} ]: ${userName} : ${message}`;
-			await platformData.client.whisper("supinic", pingMessage);
+			await platformData.pm(pingMessage, "supinic");
 		}
 	}),
 	Global: true,
