@@ -22,15 +22,14 @@ module.exports = {
 				reply: `Trends are not supported after Twitter API change!`
 			};
 		}
-		else if (context.params.includeReplies) {
-			return {
-				success: false,
-				reply: `Replies are not supported after Twitter API change!`
-			};
-		}
+
+		const searchParams = (context.params.includeReplies)
+			? { includeReplies: true }
+			: {};
 
 		const response = await sb.Got("Supinic", {
-			url: `twitter/timeline/${encodeURI(input)}`
+			url: `twitter/timeline/${encodeURI(input)}`,
+			searchParams
 		});
 
 		if (response.statusCode === 404) {
@@ -67,7 +66,7 @@ module.exports = {
 			}
 		}
 
-		let isSensitiveContentAllowed = false;
+		let isSensitiveContentAllowed;
 		if (!context.channel) {
 			isSensitiveContentAllowed = true;
 		}
