@@ -92,11 +92,21 @@ const predefinedQueries = {
 		.from("data", "Suggestion")
 		.where("Status IS NULL OR Status IN %s+", ["Approved", "Blocked"])
 	),
-	suscheck: (username) => sb.Query.getRecordset(rs => rs
+	suscheck: (context, username) => sb.Query.getRecordset(rs => rs
 		.select("Twitch_ID")
 		.from("chat_data", "User_Alias")
 		.where("Name = %s", username)
 		.flat("Twitch_ID")
+		.single()
+		.limit(1)
+	),
+	ownAlias: (context, name) => sb.Query.getRecordset(rs => rs
+		.select("Invocation", "Arguments")
+		.from("data", "Custom_Command_Alias")
+		.where("Name = %s", name)
+		.where("User_Alias = %n", context.user.ID)
+		.where("Channel IS NULL")
+		.where("Parent IS NULL")
 		.single()
 		.limit(1)
 	)
@@ -145,13 +155,13 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				if (!callback) {
 					throw new Error("Predefined query not found");
 				}
-				else if (callback.length !== args.length) {
+				else if (args.length > 0 && (callback.length - 1) !== args.length) {
 					throw new Error("Amount of arguments provided doesn't match the query function signature");
 				}
 
 				queryExecutions.add(queryName);
+				const data = await callback(context, ...args);
 
-				const data = await callback(...args);
 				if (Array.isArray(data)) {
 					for (let i = 0; i < data.length; i++) {
 						const row = data[i];

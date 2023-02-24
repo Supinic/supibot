@@ -128,8 +128,9 @@ declare namespace DankDebug {
 	}
 
 	export type QueryResult = {
-		content: { Category: string | null, Status: string | null; }[],
-		suscheck: string | null | undefined,
+		content: { Category: string | null, Status: string | null; }[];
+		suscheck: string | null | undefined;
+		ownAlias: { Invocation: string, Arguments: string | null } | undefined;
 	};
 
 	export type PartialCommandResult = {
@@ -159,6 +160,10 @@ declare namespace DankDebug {
 		 * Retrieves the target user's Twitch ID, as is stored in Supibot's database (*NOT* the actual ID from Helix)
 		 */
 		run (string: "suscheck", username: string): Promise<QueryResult["suscheck"]>;
+		/**
+		 * Fetches the definition of an alias from the current user, based on the alias name provided.
+		 */
+		run (string: "ownAlias", name: string): Promise<QueryResult["ownAlias"]>;
 	}
 
 	export interface SupibotDankDebugCommand {
