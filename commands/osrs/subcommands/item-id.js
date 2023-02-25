@@ -2,7 +2,10 @@ module.exports = {
 	name: "itemid",
 	title: "Item IDs",
 	aliases: ["item-id"],
-	description: [`Posts the item's ingame ID. Shows up to 5 best matching results.`],
+	description: [
+		`<code>$osrs itemid (item name)</code>`,
+		`Posts the item's in-game ID. Shows up to 5 best matching results.`
+	],
 	execute: async function (context, ...args) {
 		const data = await sb.Query.getRecordset(rs => {
 			rs.select("Game_ID", "Name")
