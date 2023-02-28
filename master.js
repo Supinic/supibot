@@ -32,14 +32,14 @@ const importModule = async (module, path) => {
 
 let config;
 try {
-	config = require("./modules-config.json");
+	config = require("./config.json");
 }
 catch {
 	try {
-		config = require("./modules-config-default.json");
+		config = require("./config-default.json");
 	}
 	catch {
-		throw new Error("No default or custom modules configuration found");
+		throw new Error("No default or custom configuration found");
 	}
 }
 

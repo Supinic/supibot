@@ -1,7 +1,7 @@
 {
   "usageGuide": [
     "This file is designed to have a bare-metal working fork of Supibot.",
-    "If you want to configure your fork further, copy this file as \"modules-config.json\" and edit as desired.",
+    "If you want to configure your fork further, copy this file as \"config.json\" and edit as desired.",
     "Do not add the new file to Git.",
     "If no such \"custom configuration\" file exists, this default will be used instead.",
     "The \"disableAll\" flag overrides the black/whitelists completely.",
