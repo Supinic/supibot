@@ -1,0 +1,44 @@
+{
+  "usageGuide": [
+    "This file is designed to have a bare-metal working fork of Supibot.",
+    "If you want to configure your fork further, copy this file as \"modules-config.json\" and edit as desired.",
+    "Do not add the new file to Git.",
+    "If no such \"custom configuration\" file exists, this default will be used instead.",
+    "The \"disableAll\" flag overrides the black/whitelists completely.",
+    "If that flag is \"false\" and both the arrays are empty, it is assumed all modules should be loaded."
+  ],
+  "modules": {
+    "chat-modules": {
+      "disableAll": true,
+      "blacklist": [],
+      "whitelist": []
+    },
+    "commands": {
+      "disableAll": false,
+      "blacklist": [],
+      "whitelist": [
+        "debug",
+        "help",
+        "ping",
+        "pipe",
+        "reload"
+      ]
+    },
+    "crons": {
+      "disableAll": true,
+      "blacklist": [],
+      "whitelist": []
+    },
+    "got": {
+      "disableAll": false,
+      "blacklist": [
+        "Kraken",
+        "RaspberryPi4",
+        "Supinic",
+        "TwitchGQL",
+        "V5"
+      ],
+      "whitelist": []
+    }
+  }
+}

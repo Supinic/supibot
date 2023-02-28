@@ -1,7 +1,44 @@
 const importModule = async (module, path) => {
+	if (!config.modules[path]) {
+		throw new Error(`Missing configuration for ${path}`);
+	}
+
+	const {
+		disableAll = true,
+		whitelist = [],
+		blacklist = []
+	} = config.modules[path];
+
+	if (whitelist.length > 0 && blacklist.length > 0) {
+		throw new Error(`Cannot combine blacklist and whitelist for ${path}`);
+	}
+	else if (disableAll) {
+		console.log(`Module ${path} is disabled - will not load`);
+		return;
+	}
+
+	const identifier = module.uniqueIdentifier;
 	const { definitions } = await import(`./${path}/index.mjs`);
-	await module.importData(definitions);
+	if (blacklist.length > 0) {
+		await module.importData(definitions.filter(i => !blacklist.includes(i[identifier])));
+	}
+	else {
+		await module.importData(definitions.filter(i => whitelist.includes(i[identifier])));
+	}
 };
+
+let config;
+try {
+	config = require("./modules-config.json");
+}
+catch {
+	try {
+		config = require("./modules-config-default.json");
+	}
+	catch {
+		throw new Error("No default or custom modules configuration found");
+	}
+}
 
 (async function () {
 	"use strict";
@@ -17,8 +54,13 @@ const importModule = async (module, path) => {
 	const initializeSbObject = require("supi-core");
 	globalThis.sb = await initializeSbObject();
 
-	const commands = await require("./commands/index.js");
-	await sb.Command.importData(commands.definitions);
+	if (!config.modules.commands.disableAll) {
+		const { blacklist, whitelist } = config.commands;
+		const { loadCommands } = await require("./commands/index.js");
+		const commands = await loadCommands({ blacklist, whitelist });
+
+		await sb.Command.importData(commands.definitions);
+	}
 
 	await Promise.all([
 		importModule(sb.ChatModule, "chat-modules"),

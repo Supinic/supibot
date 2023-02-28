@@ -1,8 +1,7 @@
-module.exports = (async () => {
+const loadCommands = (async (config) => {
 	const fs = require("fs/promises");
 	const path = require("path");
 
-	const config = require("./config.json");
 	const blacklist = config?.blacklist ?? [];
 	const whitelist = config?.whitelist ?? [];
 
@@ -54,4 +53,8 @@ module.exports = (async () => {
 		failed,
 		skipped
 	};
-})();
+});
+
+module.exports = {
+	loadCommands
+};

@@ -1,6 +1,7 @@
 .idea
 node_modules
 db-access.js
+modules-config.json
 .nyc_output
 .yarn/*
 !.yarn/patches
