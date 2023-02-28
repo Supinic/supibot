@@ -29,7 +29,7 @@
       "blacklist": [],
       "whitelist": []
     },
-    "got": {
+    "gots": {
       "disableAll": false,
       "blacklist": [
         "Kraken",

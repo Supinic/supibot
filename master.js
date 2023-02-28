@@ -17,13 +17,16 @@ const importModule = async (module, path) => {
 		return;
 	}
 
-	const identifier = module.uniqueIdentifier;
+	const identifier = (path === "gots") ? "name" : "Name";
 	const { definitions } = await import(`./${path}/index.mjs`);
 	if (blacklist.length > 0) {
 		await module.importData(definitions.filter(i => !blacklist.includes(i[identifier])));
 	}
-	else {
+	else if (whitelist.length > 0) {
 		await module.importData(definitions.filter(i => whitelist.includes(i[identifier])));
+	}
+	else {
+		await module.importData(definitions);
 	}
 };
 
@@ -55,7 +58,7 @@ catch {
 	globalThis.sb = await initializeSbObject();
 
 	if (!config.modules.commands.disableAll) {
-		const { blacklist, whitelist } = config.commands;
+		const { blacklist, whitelist } = config.modules.commands;
 		const { loadCommands } = await require("./commands/index.js");
 		const commands = await loadCommands({ blacklist, whitelist });
 
