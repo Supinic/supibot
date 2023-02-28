@@ -326,16 +326,12 @@ const donateCookie = (donator, receiver, donatorOptions = {}, receiverOptions = 
 };
 
 /* istanbul ignore next */
-const fetchRandomCookieText = async () => (
-	await sb.Query.getRecordset(rs => rs
-		.select("Text")
-		.from("data", "Fortune_Cookie")
-		.orderBy("RAND()")
-		.limit(1)
-		.single()
-		.flat("Text")
-	)
-);
+const fetchRandomCookieText = async () => {
+	const cookies = require("./fortune-cookies.json");
+	const cookie = sb.Utils.randArray(cookies);
+
+	return cookie.text;
+};
 
 module.exports = {
 	subcommands,
