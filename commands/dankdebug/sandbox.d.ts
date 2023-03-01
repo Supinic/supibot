@@ -128,9 +128,9 @@ declare namespace DankDebug {
 	}
 
 	export type QueryResult = {
-		content: { Category: string | null, Status: string | null; }[];
+		content: { category: string | null, status: string | null; }[];
 		suscheck: string | null | undefined;
-		ownAlias: { Invocation: string, Arguments: string | null } | undefined;
+		ownAlias: { invocation: string, arguments: string[] } | null;
 	};
 
 	export type PartialCommandResult = {

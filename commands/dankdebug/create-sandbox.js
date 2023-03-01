@@ -88,7 +88,7 @@ const isTypeSupported = (value) => {
 
 const predefinedQueries = {
 	content: () => sb.Query.getRecordset(rs => rs
-		.select("Category", "Status")
+		.select("Category AS category", "Status AS status")
 		.from("data", "Suggestion")
 		.where("Status IS NULL OR Status IN %s+", ["Approved", "Blocked"])
 	),
@@ -100,16 +100,29 @@ const predefinedQueries = {
 		.single()
 		.limit(1)
 	),
-	ownAlias: (context, name) => sb.Query.getRecordset(rs => rs
-		.select("Invocation", "Arguments")
-		.from("data", "Custom_Command_Alias")
-		.where("Name = %s", name)
-		.where("User_Alias = %n", context.user.ID)
-		.where("Channel IS NULL")
-		.where("Parent IS NULL")
-		.single()
-		.limit(1)
-	)
+	ownAlias: async (context, name) => {
+		const raw = await sb.Query.getRecordset(rs => rs
+			.select("Invocation", "Arguments")
+			.from("data", "Custom_Command_Alias")
+			.where("Name = %s", name)
+			.where("User_Alias = %n", context.user.ID)
+			.where("Channel IS NULL")
+			.where("Parent IS NULL")
+			.single()
+			.limit(1)
+		);
+
+		if (!raw) {
+			return null;
+		}
+
+		return {
+			invocation: raw.Invocation,
+			arguments: (raw.Arguments)
+				? JSON.parse(raw.Arguments)
+				: []
+		};
+	}
 };
 const restrictedCommands = ["alias", "pipe", "js"].map(i => sb.Command.get(i));
 const commandExecutionCountThreshold = 5;
