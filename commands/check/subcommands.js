@@ -137,7 +137,7 @@ module.exports = (command) => [
 
 				const tokenPromise = sb.Got("GenericAPI", {
 					method: "GET",
-					url: `https://api.openai.com/v1/usage`,
+					url: `https://api.openai.com/dashboard/billing/usage`,
 					searchParams: {
 						start_date: startDate.format("Y-m-d"),
 						end_date: endDate.format("Y-m-d")
@@ -160,8 +160,10 @@ module.exports = (command) => [
 				let requests = 0;
 				let inputTokens = 0;
 				let outputTokens = 0;
+
+				// The `total_usage` field signifies the API cost in USD cents, so a division is necessary.
+				const total = sb.Utils.round(tokenResponse.body.total_usage / 100 , 2);
 				const prettyMonthName = new sb.Date().format("F Y");
-				const total = sb.Utils.round(tokenResponse.body.current_usage_usd, 2);
 
 				for (const row of tokenResponse.body.data) {
 					requests += row.n_requests;
