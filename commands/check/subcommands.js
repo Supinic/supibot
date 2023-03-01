@@ -137,7 +137,7 @@ module.exports = (command) => [
 
 				const tokenPromise = sb.Got("GenericAPI", {
 					method: "GET",
-					url: `https://api.openai.com/dashboard/billing/usage`,
+					url: `https://api.openai.com/v1/usage`,
 					searchParams: {
 						start_date: startDate.format("Y-m-d"),
 						end_date: endDate.format("Y-m-d")
