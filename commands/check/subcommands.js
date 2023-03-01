@@ -147,6 +147,18 @@ module.exports = (command) => [
 					}
 				});
 
+				const spendingPromise = sb.Got("GenericAPI", {
+					method: "GET",
+					url: `https://api.openai.com/dashboard/billing/usage`,
+					searchParams: {
+						start_date: startDate.format("Y-m-d"),
+						end_date: endDate.format("Y-m-d")
+					},
+					headers: {
+						Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
+					}
+				});
+
 				const limitPromise = sb.Got("GenericAPI", {
 					method: "GET",
 					url: `https://api.openai.com/dashboard/billing/subscription`,
@@ -155,14 +167,18 @@ module.exports = (command) => [
 					}
 				});
 
-				const [tokenResponse, limitResponse] = await Promise.all([tokenPromise, limitPromise]);
+				const [spendingResponse, tokenResponse, limitResponse] = await Promise.all([
+					spendingPromise,
+					tokenPromise,
+					limitPromise
+				]);
 
 				let requests = 0;
 				let inputTokens = 0;
 				let outputTokens = 0;
 
 				// The `total_usage` field signifies the API cost in USD cents, so a division is necessary.
-				const total = sb.Utils.round(tokenResponse.body.total_usage / 100 , 2);
+				const total = sb.Utils.round(spendingResponse.body.total_usage / 100 , 2);
 				const prettyMonthName = new sb.Date().format("F Y");
 
 				for (const row of tokenResponse.body.data) {
