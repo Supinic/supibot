@@ -136,6 +136,7 @@ declare namespace DankDebug {
 	export type PartialCommandResult = {
 		success: boolean;
 		reply?: string | null;
+		reason?: string | null;
 	};
 
 	export type SupibotDatabaseValue = string
@@ -168,6 +169,7 @@ declare namespace DankDebug {
 
 	export interface SupibotDankDebugCommand {
 		execute (commandName: string, ...args: string[]): Promise<PartialCommandResult>;
+		multi (input: Array<[commandName: string, ...args: string[]]>): Promise<PartialCommandResult[]>;
 	}
 
 	/**

@@ -202,6 +202,34 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 			}
 		}),
 		command: sb.Utils.deepFreeze({
+			multi: async function (input) {
+				if (!Array.isArray(input) || input.some(i => !Array.isArray(i) || i.some(j => typeof j !== "string"))) {
+					throw new Error("Provided input must be an array of arrays - each being the name and arguments for one command");
+				}
+				else if (commandExecutionPending) {
+					throw new Error("A command execution is already pending in this invocation");
+				}
+				else if ((commandExecutionCounter + input.length) > commandExecutionCountThreshold) {
+					throw new Error("Too many commands executed in this invocation");
+				}
+
+				const totalResult = [];
+				let previousArguments = [];
+				for (const [name, ...args] of input) {
+					const result = await this.execute(name, ...args, ...previousArguments);
+					totalResult.push(result);
+
+					if (!result.success) {
+						return totalResult;
+					}
+
+					previousArguments = (typeof result.reply === "string")
+						? result.reply.split(/\s+/).filter(Boolean)
+						: [];
+				}
+
+				return totalResult;
+			},
 			execute: async (command, ...args) => {
 				if (typeof command !== "string") {
 					throw new Error("Provided command name must be a string");
