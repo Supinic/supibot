@@ -104,10 +104,18 @@ module.exports = {
 				const isLive = Boolean(response.statusCode === 200 && response.body.data.length !== 0);
 
 				if (!isLive) { // Stream is not live - use the first segment (when it should have started), and mention that stream is late
-					const emote = await context.getBestAvailableEmote(["Weirdga", "WeirdChamp", "supiniWeirdga", "FeelsWeirdMan"], "🤨");
-					lateString = `The stream seems to be late ${emote}`;
-
 					segment = segments[0];
+
+					const preparationTime = new sb.Date(segment.start_time).addMinutes(5);
+					const now = new sb.Date();
+					if (now < preparationTime) {
+						const emote = await context.getBestAvailableEmote(["pajaPause", "PauseMan", "PauseManSit", "PauseChamp"], "😐");
+						lateString = `The stream is about to start ${emote}`;
+					}
+					else {
+						const emote = await context.getBestAvailableEmote(["Weirdga", "WeirdChamp", "supiniWeirdga", "FeelsWeirdMan"], "🤨");
+						lateString = `The stream seems to be late ${emote}`;
+					}
 				}
 				else { // Stream is live - all good, show the schedule for the next segment
 					segment = segments[1];
