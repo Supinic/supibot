@@ -1,75 +1,36 @@
 {
-  "defaultPromptPefix": "You are a chat bot. Don't use slurs.",
   "defaultTemperature": 0.5,
+  "defaultHistoryMode": "enabled",
   "globalInputLimit": 5000,
   "outputLimit": {
     "default": 50,
     "maximum": 100
   },
-  "queryNames": {
-    "prompt": "Query",
-    "response": "Answer"
-  },
   "lengthLimitExceededMessage": {
-    "history": "Maximum history length exceeded for this model! Shorten your query, use a lower-ranked model, or wipe your history with \"$unset gpt-history\" instead.",
-    "regular": "Maximum query length exceeded for this model! Shorten your query, or use a lower-ranked model instead."
+    "history": "Maximum history length exceeded for this model! Shorten your query, or wipe your history with \"$unset gpt-history\" instead.",
+    "regular": "Maximum query length exceeded for this model! Shorten your query instead."
   },
   "userTokenLimits": {
     "regular": {
-      "hourly": 100,
+      "hourly": 200,
       "daily": 1000
     },
     "subscriber": {
-      "hourly": 1000,
+      "hourly": 2000,
       "daily": 10000
     }
   },
   "models": {
-    "ada": {
-      "url": "text-ada-001",
-      "default": false,
-      "inputLimit": 5000,
-      "outputLimit": {
-        "default": 500,
-        "maximum": 2500
-      },
-      "usageDivisor": 50,
-      "usePromptPrefix": false
-    },
-    "babbage": {
-      "url": "text-babbage-001",
-      "default": false,
-      "inputLimit": 5000,
-      "outputLimit": {
-        "default": 400,
-        "maximum": 2000
-      },
-      "usageDivisor": 40,
-      "usePromptPrefix": false
-    },
-    "curie": {
-      "url": "text-curie-001",
+    "turbo": {
+      "url": "gpt-3.5-turbo",
+      "chat": true,
       "default": true,
-      "disabled": false,
-      "disableReason": "unsafe generated content",
       "inputLimit": 2500,
       "outputLimit": {
         "default": 100,
         "maximum": 500
       },
-      "usageDivisor": 10,
-      "usePromptPrefix": false
-    },
-    "davinci": {
-      "url": "text-davinci-003",
-      "default": false,
-      "inputLimit": 250,
-      "outputLimit": {
-        "default": 50,
-        "maximum": 250
-      },
-      "usageDivisor": 1,
-      "usePromptPrefix": false
+      "usageDivisor": 10
     }
   }
 }
