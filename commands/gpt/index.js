@@ -6,7 +6,7 @@ module.exports = {
 	Description: "Queries ChatGPT for a text response. Supports multiple models and parameter settings. Limited by tokens usage!",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
-		{ name: "history", type: "boolean" },
+		{ name: "history", type: "string" },
 		{ name: "model", type: "string" },
 		{ name: "limit", type: "number" },
 		{ name: "temperature", type: "number" }
@@ -14,9 +14,42 @@ module.exports = {
 	Whitelist_Response: "Currently only available in these channels for testing: @pajlada @Supinic @Supibot",
 	Static_Data: null,
 	Code: (async function chatGPT (context, ...args) {
-		const ChatGptConfig = require("./config.json");
+		const GptConfig = require("./config.json");
 		const GptCache = require("./cache-control.js");
 		const GptHistory = require("./history-control.js");
+		const GptModeration = require("./moderation.js");
+
+		let historyMode = await context.user.getDataProperty("chatGptHistoryMode") ?? GptConfig.defaultHistoryMode;
+		if (context.params.history) {
+			const command = context.params.history;
+			if (command === "enable" && command === "disable") {
+				if (historyMode === command) {
+					return {
+						success: false,
+						reply: `Your ChatGPT history is already ${command}d!`,
+						cooldown: 2500
+					};
+				}
+
+				await context.user.setDataProperty("chatGptHistoryMode", command);
+				return {
+					reply: `Your ChatGPT history was successfully ${command}d.`,
+					cooldown: 5000
+				};
+			}
+			else if (command === "clear") {
+				await GptHistory.reset(context.user);
+				return {
+					reply: "Successfully cleared your ChatGPT history."
+				};
+			}
+			else if (command === "export" || command === "check") {
+				return await GptHistory.dump(context.user);
+			}
+			else if (command === "ignore") {
+				historyMode = "disabled";
+			}
+		}
 
 		const query = args.join(" ").trim();
 		if (!query) {
@@ -27,15 +60,15 @@ module.exports = {
 			};
 		}
 
-		const [defaultModelName] = Object.entries(ChatGptConfig.models).find(i => i[1].default === true);
+		const [defaultModelName] = Object.entries(GptConfig.models).find(i => i[1].default === true);
 		const customOutputLimit = context.params.limit;
 		const modelName = (context.params.model)
 			? context.params.model.toLowerCase()
 			: defaultModelName;
 
-		const modelData = ChatGptConfig.models[modelName];
+		const modelData = GptConfig.models[modelName];
 		if (!modelData) {
-			const names = Object.keys(ChatGptConfig.models).sort().join(", ");
+			const names = Object.keys(GptConfig.models).sort().join(", ");
 			return {
 				success: false,
 				cooldown: 2500,
@@ -49,32 +82,29 @@ module.exports = {
 			};
 		}
 
-		let promptPrefix = "";
-		if (context.params.history) {
-			const historicPrompt = await GptHistory.dump(context.user, query);
-			if (historicPrompt.length !== 0) {
-				promptPrefix = `${historicPrompt.join("\n\n")}\n`;
-			}
-		}
+		const promptHistory = (historyMode === "enabled")
+			? (await GptHistory.get(context.user) ?? [])
+			: [];
 
-		const { queryNames } = ChatGptConfig;
-		const prompt = `${promptPrefix}${queryNames.prompt}: ${query}\n${queryNames.response}: `;
+		const messages = [
+			...promptHistory,
+			{ role: "user", content: query }
+		];
+		const messagesLength = messages.reduce((acc, cur) => acc + cur.content.length, 0);
 
-		if (modelData.inputLimit && prompt.length > modelData.inputLimit) {
-			const messages = ChatGptConfig.lengthLimitExceededMessage;
-			const message = (promptPrefix) ? messages.history : messages.regular;
-
+		if (modelData.inputLimit && messagesLength > modelData.inputLimit) {
+			const errorMessages = GptConfig.lengthLimitExceededMessage;
 			return {
 				success: false,
 				cooldown: 2500,
-				reply: `${message} ${prompt.length}/${modelData.inputLimit}`
+				reply: `${errorMessages.history} ${messagesLength}/${modelData.inputLimit}`
 			};
 		}
-		else if (!modelData.inputLimit && prompt.length > ChatGptConfig.globalInputLimit) {
+		else if (!modelData.inputLimit && messagesLength > GptConfig.globalInputLimit) {
 			return {
 				success: false,
 				cooldown: 2500,
-				reply: `Maximum query length exceeded! ${prompt.length}/${ChatGptConfig.globalInputLimit}`
+				reply: `Maximum query length exceeded! ${messagesLength}/${GptConfig.globalInputLimit}`
 			};
 		}
 
@@ -138,15 +168,15 @@ module.exports = {
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
 			throwHttpErrors: false,
-			url: `https://api.openai.com/v1/completions`,
+			url: `https://api.openai.com/v1/chat/completions`,
 			headers: {
 				Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
 			},
 			json: {
 				model: modelData.url,
-				prompt,
+				messages,
 				max_tokens: outputLimit,
-				temperature: temperature ?? ChatGptConfig.defaultTemperature,
+				temperature: temperature ?? GptConfig.defaultTemperature,
 				top_p: 1,
 				frequency_penalty: 0,
 				presence_penalty: 0,
@@ -194,56 +224,15 @@ module.exports = {
 		await GptCache.addUsageRecord(context.user, usage.total_tokens, modelName);
 
 		const [chatResponse] = choices;
-		const text = chatResponse.text.trim();
-		const moderationCheck = await sb.Got("GenericAPI", {
-			method: "POST",
-			throwHttpErrors: false,
-			url: `https://api.openai.com/v1/moderations`,
-			headers: {
-				Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
-			},
-			json: {
-				input: text
-			}
-		});
+		const reply = chatResponse.message.content.trim();
 
-		if (!moderationCheck.ok || !Array.isArray(moderationCheck.body.results)) {
-			const logId = await sb.Logger.log(
-				"Command.Warning",
-				`GPT moderation failed! ${JSON.stringify({ body: moderationCheck.body })}`,
-				context.channel,
-				context.user
-			);
-
-			return {
-				success: false,
-				reply: `Could not check your response for moderation! Please try again later. Reference ID: ${logId}`
-			};
+		const moderationResult = await GptModeration.check(context, reply);
+		if (moderationResult.success === false) {
+			return moderationResult;
 		}
 
-		const [moderationResult] = moderationCheck.body.results;
-		const { categories, category_scores: scores } = moderationResult;
-		if (categories.hate || categories["violence/graphic"] || categories["sexual/minors"]) {
-			const logId = await sb.Logger.log(
-				"Command.Warning",
-				`Unsafe GPT content generated! ${JSON.stringify({ text, scores })}`,
-				context.channel,
-				context.user
-			);
-
-			return {
-				success: false,
-				reply: `Unsafe content generated! Reference ID: ${logId}`
-			};
-		}
-
-		const reply = chatResponse.text.trim();
-		if (context.params.history) {
-			await GptHistory.add(context.user, {
-				prompt: query,
-				response: reply,
-				temperature
-			});
+		if (historyMode === "enabled") {
+			await GptHistory.add(context.user, query, reply);
 		}
 
 		return {
@@ -316,7 +305,7 @@ module.exports = {
 			"",
 
 			`<code>${prefix}gpt model:(name) (your query)</code>`,
-			`<code>${prefix}gpt model:curie What should I name my goldfish?</code>`,
+			`<code>${prefix}gpt model:turbo What should I name my goldfish?</code>`,
 			"Queries ChatGPT with your selected model.",
 			"",
 
@@ -335,17 +324,27 @@ module.exports = {
 			"",
 
 			"<h5>History</h5>",
-			`<code>${prefix}gpt history:true (your query)</code>`,
-			`<code>${prefix}gpt temperature:0.5 What should I eat today?</code>`,
-			`Queries ChatGPT while keeping history of your prompts.`,
-			`This allows you to keep some sort of a "session" with ChatGPT.`,
-			"The history will track the responses and allow the use of any model until the model's input limit is exceeded.",
-			"You can always downgrade the model to receive more data, even if a higher model refuses to work with that muich data.",
+			"This command keeps the ChatGPT history, to allow for a conversation to happen.",
+			"Your history is kept for 10 minutes since your last request, or until you delete it yourself.",
+			"You can disable it, if you would like to preserve tokens or if you would prefer each prompt to be separate.",
 			"",
 
-			"Your history is kept for 7 days or until you delete it yourself.",
-			`To delete your history, use the <a href="/bot/command/detail/set">$unset gpt-history</a> command.`,
-			`To export your history, use the <a href="/bot/command/detail/check">$check gpt-history</a> command.`,
+			`<code>${prefix}gpt history:enable</code>`,
+			`<code>${prefix}gpt history:disable</code>`,
+			"Disables or enables the history keeping of your ChatGPT prompts.",
+			"",
+
+			`<code>${prefix}gpt history:ignore What should I eat today?</code>`,
+			"Disables the keeping of history for a single prompt, without setting its default mode.",
+			"",
+
+			`<code>${prefix}gpt history:clear</code>`,
+			"Removes all of your current prompt history.",
+			"",
+
+			`<code>${prefix}gpt history:export</code>`,
+			`<code>${prefix}gpt history:check</code>`,
+			"Posts a link with your current prompt history as text.",
 			"",
 
 			"<h5>Other</h5>",
