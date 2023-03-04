@@ -22,7 +22,7 @@ module.exports = {
 		let historyMode = await context.user.getDataProperty("chatGptHistoryMode") ?? GptConfig.defaultHistoryMode;
 		if (context.params.history) {
 			const command = context.params.history;
-			if (command === "enable" && command === "disable") {
+			if (command === "enable" || command === "disable") {
 				if (historyMode === command) {
 					return {
 						success: false,
