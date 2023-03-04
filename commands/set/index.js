@@ -522,7 +522,6 @@ module.exports = {
 				{
 					name: "gpt-history",
 					aliases: ["gpthistory"],
-					elevatedChannelAccess: true,
 					parameter: "arguments",
 					description: "Deletes your current ChatGPT history.",
 					pipe: true,
