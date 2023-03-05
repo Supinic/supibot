@@ -275,16 +275,8 @@ module.exports = {
 					};
 				}
 
-				let partFailed = false;
 				let joinFailed = false;
 				const { client } = sb.Platform.get("twitch");
-				try {
-					await client.part(channelData.Name);
-				}
-				catch {
-					partFailed = true;
-				}
-
 				try {
 					await client.join(channelData.Name);
 				}
@@ -292,7 +284,7 @@ module.exports = {
 					joinFailed = true;
 				}
 
-				if (!partFailed && !joinFailed) {
+				if (!joinFailed) {
 					await channelData.setDataProperty("inactiveReason", null);
 					await channelData.saveProperty("Mode", "Write");
 				}
@@ -300,7 +292,7 @@ module.exports = {
 				let success = true;
 				let resultString;
 				if (inactiveReason === "bot-banned") {
-					if (partFailed || joinFailed) {
+					if (joinFailed) {
 						success = false;
 						resultString = sb.Utils.tag.trim `
 							Could not re-join ${channelString} - make sure I'm unbanned first!
