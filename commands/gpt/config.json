@@ -7,7 +7,7 @@
     "maximum": 100
   },
   "lengthLimitExceededMessage": {
-    "history": "Maximum history length exceeded for this model! Shorten your query, or wipe your history with \"$unset gpt-history\" instead.",
+    "history": "Maximum history length exceeded for this model! Shorten your query, or clear your history with \"$gpt history:clear\" instead.",
     "regular": "Maximum query length exceeded for this model! Shorten your query instead."
   },
   "userTokenLimits": {
