@@ -23,8 +23,7 @@ module.exports = {
 			};
 		}
 
-		const term = args.join(" ");
-		const lowerTerm = term.toLowerCase();
+		const term = args.join(" ").toLowerCase();
 		const response = await sb.Got("GenericAPI", {
 			url: "https://api.urbandictionary.com/v0/define",
 			searchParams: {
@@ -55,7 +54,7 @@ module.exports = {
 				}
 			});
 
-			const match = autocompleteResponse.body.results.find(i => i.term.toLowerCase() === lowerTerm);
+			const match = autocompleteResponse.body.results.find(i => i.term.toLowerCase() === term);
 			if (match) {
 				return {
 					reply: `Short description: ${match.preview}`
