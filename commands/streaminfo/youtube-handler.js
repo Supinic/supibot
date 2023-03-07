@@ -68,7 +68,7 @@ module.exports = async function youtubeStreamInfoHandler (context) {
 	return {
 		reply: sb.Utils.tag.trim `
 			Channel ${snippet.channelTitle} is live:
-			${snippet.title}
+			${sb.Utils.fixHTML(snippet.title)}
 			https://youtu.be/${stream.id.videoId}
 			(live since ${delta})
 		`
