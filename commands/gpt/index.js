@@ -37,7 +37,7 @@ module.exports = {
 					cooldown: 5000
 				};
 			}
-			else if (command === "clear") {
+			else if (command === "clear" || command === "reset") {
 				await GptHistory.reset(context.user);
 				return {
 					reply: "Successfully cleared your ChatGPT history."
@@ -339,7 +339,8 @@ module.exports = {
 			"",
 
 			`<code>${prefix}gpt history:clear</code>`,
-			"Removes all of your current prompt history.",
+			`<code>${prefix}gpt history:reset</code>`,
+			"Resets all of your current prompt history.",
 			"",
 
 			`<code>${prefix}gpt history:export</code>`,
