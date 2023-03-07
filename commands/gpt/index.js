@@ -285,14 +285,14 @@ module.exports = {
 			"",
 
 			"<h5>Models</h5>",
-			"There are four models you can choose from:",
+			"Models you can choose from:",
 			`<ul>${modelListHTML}</ul>`,
 
-			"Each next model in succession is more powerful and more coherent than the previous, but also more expensive to use.",
-			"When experimenting, consider using one of the lower tier models, only then moving up to higher tiers!",
-			"For example: 100 tokens used in Davinci → 100 tokens used from your limit,",
-			"but: 100 tokens used in Babbage (which is 40x cheaper) → 2.5 tokens used from your limit.",
-			"",
+			// "Each next model in succession is more powerful and more coherent than the previous, but also more expensive to use.",
+			// "When experimenting, consider using one of the lower tier models, only then moving up to higher tiers!",
+			// "For example: 100 tokens used in Davinci → 100 tokens used from your limit,",
+			// "but: 100 tokens used in Babbage (which is 40x cheaper) → 2.5 tokens used from your limit.",
+			// "",
 
 			`You can also check out the <a href="https://beta.openai.com/docs/models/feature-specific-models">official documentation</a> of GPT-3 models on the official site for full info.`,
 			"",
