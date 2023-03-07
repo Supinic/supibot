@@ -90,5 +90,13 @@ module.exports = {
 			reply: `Suggestion saved, and will eventually be processed (ID ${row.values.ID}) ${link} ${emote} ${subscribed}`
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (() => [
+		`<code>$suggest (text)</code>`,
+		"Creates a new suggestion for Supinic to take a look at in the near future.",
+		"These should avoid all jokes, memes and such - and only focus on proper issues, bug reports, questions etc.",
+		"",
+
+		`<code>$suggest amend:(ID) (text)</code>`,
+		"Amends an existing suggestion that you've made with more text."
+	])
 };
