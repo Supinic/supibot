@@ -16,6 +16,7 @@ module.exports = {
 		},
 
 		applyParameters: (context, aliasArguments, commandArguments) => {
+			let errorReason;
 			const resultArguments = [];
 			const numberRegex = /(?<order>-?\d+)(\.\.(?<range>-?\d+))?(?<rest>\+?)/;
 			const strictNumberRegex = /^[\d-.+]+$/;
@@ -44,10 +45,7 @@ module.exports = {
 
 						const useRest = (numberMatch.groups.rest === "+");
 						if (useRest && range) {
-							return {
-								success: false,
-								reply: `Cannot combine both the "range" and "rest" argument identifiers!`
-							};
+							errorReason = `Cannot combine both the "range" and "rest" argument identifiers!`;
 						}
 						else if (useRest) {
 							return commandArguments.slice(order).join(" ");
@@ -69,6 +67,13 @@ module.exports = {
 						return total;
 					}
 				});
+
+				if (errorReason) {
+					return {
+						success: false,
+						reply: errorReason
+					};
+				}
 
 				resultArguments.push(...parsed.split(" "));
 			}
