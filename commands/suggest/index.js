@@ -40,7 +40,7 @@ module.exports = {
 
 			const date = new sb.Date().format("Y-m-d H:i:s");
 			row.setValues({
-				Text: `${row.values.Text}\n\n--- Amended on ${date}: ---\n${text}`
+				Text: `${row.values.Text}\n\n--- Amended on ${date} ---\n${text}`
 			});
 
 			await row.save({ skipLoad: true });
