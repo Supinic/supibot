@@ -45,7 +45,7 @@ module.exports = {
 
 						const useRest = (numberMatch.groups.rest === "+");
 						if (useRest && range) {
-							errorReason = `Cannot combine both the "range" and "rest" argument identifiers!`;
+							errorReason = `Cannot combine both the "range" (..) and "rest" (+) argument symbols!`;
 						}
 						else if (useRest) {
 							return commandArguments.slice(order).join(" ");
