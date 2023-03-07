@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 60000,
 	Description: "Suggest something for Supinic. When you post your first suggestion, you will automatically receive reminders when your suggestions get updated. Posts links to a suggestion list if you don't provide any text. To remove, check the $unset command.",
 	Flags: ["mention","skip-banphrase"],
-	Params: null,
+	Params: [
+		{ name: "amend", type: "number" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function suggest (context, ...args) {
@@ -19,14 +21,42 @@ module.exports = {
 			};
 		}
 
+		const text = args.join(" ");
 		const row = await sb.Query.getRow("data", "Suggestion");
-		row.setValues({
-			Text: args.join(" "),
-			User_Alias: context.user.ID,
-			Priority: 255
-		});
+		if (context.params.amend) {
+			await row.load(context.params.amend, true);
+			if (!row.loaded) {
+				return {
+					success: false,
+					reply: "There is no suggestion with that ID!"
+				};
+			}
+			else if (row.values.User_Alias !== context.user.ID) {
+				return {
+					success: false,
+					reply: "That suggestion was not made by you!"
+				};
+			}
 
-		await row.save();
+			row.setValues({
+				Text: `${row.values.Text}\n\n--- Amended on ${new sb.Date()}: ---\n${text}`
+			});
+
+			await row.save({ skipLoad: true });
+
+			return {
+				reply: `Your suggestion ID ${row.values.ID} was succesfully amended.`
+			};
+		}
+		else {
+			row.setValues({
+				Text: text,
+				User_Alias: context.user.ID,
+				Priority: 255
+			});
+
+			await row.save({ skipLoad: true });
+		}
 
 		const isSubscribed = await sb.Query.getRecordset(rs => rs
 			.select("ID")
