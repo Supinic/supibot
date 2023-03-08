@@ -14,9 +14,10 @@ import { definition as RuneliteVersionAnnouncer } from "./runelite-version-updat
 import { definition as RustNewsAnnouncer } from "./rust-news-checker/index.mjs";
 import { definition as StayHydratedChecker } from "./stay-hydrated/index.mjs";
 import { definition as StreamSilencePreventer } from "./stream-silence-prevention/index.mjs";
+import { definition as SuggestionNotificator } from "./suggestion-notification-system/index.mjs";
 import { definition as SupinicAdvertiser } from "./supinic-advert/index.mjs";
 import { definition as TitlechangeBotAnnouncer } from "./supinic-tcb/index.mjs";
-import { definition as TrainwreckstTwitterArchiver } from "./train-twitter-archiver/index.mjs";
+import { definition as TrainwrecksTwitterArchiver } from "./train-twitter-archiver/index.mjs";
 import { definition as V8VersionAnnouncer } from "./v8-version-checker/index.mjs";
 import { definition as SoundcloudClientIdFetcher } from "./yoink-soundcloud-client-id/index.mjs";
 
@@ -36,10 +37,11 @@ const definitions = [
 	RuneliteVersionAnnouncer,
 	RustNewsAnnouncer,
 	StayHydratedChecker,
+	SuggestionNotificator,
 	StreamSilencePreventer,
 	SupinicAdvertiser,
 	TitlechangeBotAnnouncer,
-	TrainwreckstTwitterArchiver,
+	TrainwrecksTwitterArchiver,
 	V8VersionAnnouncer,
 	SoundcloudClientIdFetcher
 ];
