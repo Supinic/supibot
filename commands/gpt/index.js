@@ -87,7 +87,7 @@ module.exports = {
 			: [];
 
 		const messages = [
-			{ role: "system", content: "Do not include \"As an AI language model\" in your replies. Instead, simply say \"I'm sorry\"." },
+			{ role: "system", content: "Omit the \"as an AI language model\" phrase from your replies fully." },
 			...promptHistory,
 			{ role: "user", content: query }
 		];
