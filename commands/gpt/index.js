@@ -87,7 +87,7 @@ module.exports = {
 			: [];
 
 		const messages = [
-			{ role: "system", content: "Omit the \"as an AI language model\" phrase from your replies fully." },
+			{ role: "system", content: "Use a short summary, unless instructed." },
 			...promptHistory,
 			{ role: "user", content: query }
 		];
