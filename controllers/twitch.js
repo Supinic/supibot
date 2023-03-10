@@ -501,6 +501,28 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 
 		const userData = await sb.User.get(user);
+		if (!userData.Twitch_ID) {
+			const response = await sb.Got("Helix", {
+				url: "users",
+				searchParams: {
+					login: userData.Name
+				}
+			});
+
+			const helixUserData = response.body?.data?.[0];
+			if (!response.ok || !helixUserData) {
+				throw new sb.Error({
+					message: "No Helix data found for user",
+					args: {
+						ID: userData.ID,
+						name: userData.Name
+					}
+				});
+			}
+
+			await userData.saveProperty("Twitch_ID", helixUserData.id);
+		}
+
 		const trimmedMessage = message.replace(/[\r\n]/g, " ").trim();
 		const response = await sb.Got("Helix", {
 			method: "POST",
@@ -1420,6 +1442,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		];
 	}
 
+	// noinspection JSClosureCompilerSyntax
 	/**
 	 * @param {string} channel ChannelLike
 	 * @returns {Promise<{
