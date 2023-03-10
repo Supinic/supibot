@@ -12,10 +12,15 @@ export const definition = {
 			return;
 		}
 
-		const rawData = await sb.Got("GitHub", {
+		const response = await sb.Got("GitHub", {
 			url: "repos/nodejs/node/releases"
-		}).json();
+		});
 
+		if (!response.ok) {
+			return;
+		}
+
+		const rawData = response.body.data;
 		const data = rawData.sort((a, b) => new sb.Date(b.created_at) - new sb.Date(a.created_at));
 		const latest = data[0];
 
