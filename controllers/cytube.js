@@ -93,6 +93,10 @@ class CytubeClient {
 			data.username = data.username.toLowerCase();
 
 			const msg = sb.Utils.fixHTML(data.msg).replace(/<(?:.|\n)*?>/gm, "");
+			if (!msg) {
+				return; // Ignore if the result message becomes empty string (HTML issues, seemingly)
+			}
+
 			const userData = await sb.User.get(data.username, false);
 			const platformUserData = (data.username === "[server]")
 				? { rank: -1 }
