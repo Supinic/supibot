@@ -7,7 +7,7 @@ export const definition = {
 		if (platform.Name !== "twitch") {
 			return;
 		}
-		else if (channel.mode === "Read") {
+		else if (channel.Mode === "Read") {
 			return;
 		}
 		else if (!definition) {
