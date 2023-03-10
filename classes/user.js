@@ -345,20 +345,24 @@ module.exports = class User extends require("./template.js") {
 			return User.pendingNewUsers.get(preparedName);
 		}
 
-		const exists = await sb.Query.getRecordset(rs => rs
-			.select("Name")
-			.from("chat_data", "User_Alias")
-			.where("Name = %s", preparedName)
-			.limit(1)
-			.single()
-		);
-		if (exists) {
-			return await User.get(exists.Name);
-		}
+		const promise = (async () => {
+			const exists = await sb.Query.getRecordset(rs => rs
+				.select("Name")
+				.from("chat_data", "User_Alias")
+				.where("Name = %s", preparedName)
+				.limit(1)
+				.single()
+			);
 
-		const promise = User.#add(preparedName, properties);
+			if (exists) {
+				User.pendingNewUsers.delete(preparedName);
+				return await User.get(exists.Name);
+			}
+
+			return await User.#add(preparedName, properties);
+		})();
+
 		User.pendingNewUsers.set(preparedName, promise);
-
 		return await promise;
 	}
 
