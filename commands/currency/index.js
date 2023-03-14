@@ -131,6 +131,14 @@ module.exports = {
 			ratio = (data[second] / data[first]);
 		}
 
+		// Override the default amount by a larger number in the case the ratio is too low to see
+		if (!amountMatch.groups.amount && ratio < 0.1) {
+			// If the ratio is lower than 0.1, the default amount automatically becomes:
+			// 0.1 → 100; 0.01 → 1000; 0.001 → 10_000; etc.
+			const power = -Math.trunc(Math.log10(ratio)) + 1;
+			amount = 10 ** power;
+		}
+
 		const firstAmount = sb.Utils.groupDigits(amount * multiplier);
 		const secondAmount = sb.Utils.groupDigits(sb.Utils.round(amount * multiplier * ratio, 2));
 
