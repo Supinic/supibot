@@ -5,7 +5,7 @@ export const definition = {
 	Defer: null,
 	Type: "All",
 	Code: (async function yoinkSoundcloudClientID () {
-		const { statusCode } = await sb.Got({
+		const { statusCode } = await sb.Got("GenericAPI", {
 			url: "https://api-v2.soundcloud.com/resolve",
 			throwHttpErrors: false,
 			searchParams: {
@@ -25,14 +25,14 @@ export const definition = {
 		const elements = $("body > script[crossorigin]");
 		const scripts = Array.from(elements).map(i => $(i).attr("src"));
 		for (const script of scripts) {
-			const scriptSource = await sb.Got(script).text();
+			const scriptSource = await sb.Got("FakeAgent", script).text();
 			const match = scriptSource.match(/client_id=(\w+?)\W/);
 			if (!match) {
 				continue;
 			}
 
 			const clientID = match[1];
-			const { statusCode } = await sb.Got({
+			const { statusCode } = await sb.Got("GenericAPI", {
 				url: "https://api-v2.soundcloud.com/resolve",
 				throwHttpErrors: false,
 				searchParams: {

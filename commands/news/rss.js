@@ -32,7 +32,7 @@ module.exports = {
 
 			let feed;
 			try {
-				const xml = await sb.Got(url).text();
+				const xml = await sb.Got("Global", url).text();
 				feed = await sb.Utils.parseRSS(xml);
 			}
 			catch (e) {

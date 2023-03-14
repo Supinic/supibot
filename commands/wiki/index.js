@@ -87,7 +87,7 @@ module.exports = {
 			params.append("format", "json");
 			params.append("url", idLink);
 
-			const shortenResponse = await sb.Got({
+			const shortenResponse = await sb.Got("GenericAPI", {
 				method: "POST",
 				responseType: "json",
 				url: "https://meta.wikimedia.org/w/api.php",

@@ -30,19 +30,21 @@ module.exports = {
 		}
 
 		const phrase = encodeURIComponent(args.join(" "));
-		const { statusCode, body: data } = await sb.Got({
+		const response = await sb.Got("GenericAPI", {
 			url: `https://api.dictionaryapi.dev/api/v1/entries/en/${phrase}`,
 			throwHttpErrors: false,
 			responseType: "json"
 		});
 
-		if (statusCode !== 200) {
+		if (!response.ok) {
 			return {
 				success: false,
-				reply: data.message
+				reply: response.body.message
 			};
 		}
 
+		/** @type {Array} */
+		const data = response.body;
 		const records = data.flatMap(i => Object.entries(i.meaning));
 		const items = records.flatMap(([type, value]) => value.map(item => ({ type, definition: item.definition })));
 		if (items.length === 0) {

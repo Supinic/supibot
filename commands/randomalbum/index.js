@@ -21,7 +21,7 @@ module.exports = {
 		let retries = 0;
 		while (!data && retries < maxRetries) {
 			const albumID = sb.Utils.random(minID, maxID);
-			const { statusCode, body: albumData } = await sb.Got({
+			const { statusCode, body: albumData } = await sb.Got("GenericAPI", {
 				url: `https://api.genius.com/albums/${albumID}`,
 				responseType: "json",
 				throwHttpErrors: false,

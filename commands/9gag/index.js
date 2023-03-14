@@ -20,20 +20,14 @@ module.exports = {
 			};
 		}
 
-		const { statusCode, body } = await sb.Got(options);
-		if (statusCode !== 200) {
-			return {
-				success: false,
-				reply: `9GAG API returned error ${statusCode}!`
-			};
-		}
+		const response = await sb.Got("GenericAPI", options);
 
 		const nsfw = Boolean(context.channel?.NSFW);
-		const filtered = (nsfw)
-			? body.data.posts
-			: body.data.posts.filter(i => i.nsfw !== 1);
+		const filteredPosts = (nsfw)
+			? response.body.data.posts
+			: response.body.data.posts.filter(i => i.nsfw !== 1);
 
-		const post = sb.Utils.randArray(filtered);
+		const post = sb.Utils.randArray(filteredPosts);
 		if (!post) {
 			return {
 				success: false,

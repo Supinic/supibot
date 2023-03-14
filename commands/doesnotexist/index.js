@@ -69,7 +69,7 @@ module.exports = {
 					)),
 					types: ["artwork", "cat", "horse", "person"],
 					execute: async (context, type) => {
-						const imageData = await sb.Got({
+						const imageData = await sb.Got("GenericAPI", {
 							url: buildURL(type),
 							responseType: "buffer",
 							throwHttpErrors: false

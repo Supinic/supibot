@@ -62,7 +62,7 @@ module.exports = {
 				};
 			}
 
-			const result = await sb.Got({
+			const result = await sb.Got("GenericAPI", {
 				url: createURL({
 					command: "reset",
 					zone: args
@@ -156,7 +156,7 @@ module.exports = {
 
 		let result;
 		try {
-			result = await sb.Got({
+			result = await sb.Got("GenericAPI", {
 				url: createURL({
 					link,
 					zone,
