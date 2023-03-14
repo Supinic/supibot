@@ -193,57 +193,37 @@ Since all command code functions are `await`ed, it doesn't really make a differe
 
 ##### Advanced command using an external API
 ```js
-(async function wiki (context, ...args) {
+(async function gag (context, ...args) {
+    const options = { responseType: "json" };
     if (args.length === 0) {
-        return {
-            reply: "No article specified!",
-            cooldown: { length: 2500 }
-        };
-    }
-
-    let language = "en";
-    for (let i = args.length - 1; i >= 0; i--) {
-        const token = args[i];
-        if (/lang:\w+/.test(token)) {
-            language = sb.Utils.modules.languageISO.getCode(token.split(":")[1]);
-            if (language === null) {
-                return {
-                    reply: "Invalid language provided!",
-                    cooldown: { length: 1000 }
-                };
-            }
-
-            language = language.toLowerCase();
-            args.splice(i, 1);
-        }
-    }
-
-    const rawData = await sb.Got({
-        url: `https://${language}.wikipedia.org/w/api.php`,
-        searchParams: {
-			format: "json",
-            action: "query",
-            prop: "extracts",
-            redirects: "1",
-            titles: args.map(i => sb.Utils.capitalize(i)).join(" ")
-		}
-    }).json();
-
-    const data = rawData.query.pages;
-    const key = Object.keys(data)[0];
-    if (key === "-1") {
-        return { reply: "No results found!" };
+        options.url = "https://9gag.com/v1/group-posts/group/default/type/hot";
     }
     else {
-        let link = "";
-        if (!context.channel || context.channel.Links_Allowed === true) {
-            link = `https://${language}.wikipedia.org/?curid=${key}`;
-        }
-
-        return {
-            reply: link + " " + data[key].title + ": " + sb.Utils.removeHTML(data[key].extract)
+        options.url = "https://9gag.com/v1/search-posts";
+        options.searchParams = {
+            query: args.join(" ")
         };
     }
+
+    const response = await sb.Got("GenericAPI", options);
+
+    const nsfw = Boolean(context.channel?.NSFW);
+    const filteredPosts = (nsfw)
+        ? response.body.data.posts
+        : response.body.data.posts.filter(i => i.nsfw !== 1);
+
+    const post = sb.Utils.randArray(filteredPosts);
+    if (!post) {
+        return {
+            success: false,
+            reply: `No suitable posts found!`
+        };
+    }
+
+    const delta = sb.Utils.timeDelta(new sb.Date(post.creationTs * 1000));
+    return {
+        reply: `${sb.Utils.fixHTML(post.title)} - ${post.url} - Score: ${post.upVoteCount}, posted ${delta}.`
+    };
 })
 ```
 
