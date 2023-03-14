@@ -229,7 +229,7 @@ module.exports = {
 				image = null;
 			}
 			else if (image.Available === null) {
-				const { statusCode } = await sb.Got({
+				const { statusCode } = await sb.Got("GenericAPI", {
 					method: "HEAD",
 					throwHttpErrors: false,
 					followRedirect: false,

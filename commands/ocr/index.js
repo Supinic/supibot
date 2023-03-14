@@ -90,7 +90,7 @@ module.exports = {
 			statusCode = cacheData.statusCode;
 		}
 		else {
-			const response = await sb.Got({
+			const response = await sb.Got("GenericAPI", {
 				method: "GET",
 				responseType: "json",
 				throwHttpErrors: false,

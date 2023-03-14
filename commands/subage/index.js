@@ -49,7 +49,7 @@ module.exports = {
 		const channelName = sb.User.normalizeUsername(channel ?? context.channel.Name);
 		const userName = sb.User.normalizeUsername(user ?? context.user.Name);
 
-		const response = await sb.Got({
+		const response = await sb.Got("FakeAgent", {
 			method: "POST",
 			url: "https://gql.twitch.tv/gql",
 			responseType: "json",

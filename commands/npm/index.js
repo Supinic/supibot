@@ -16,7 +16,7 @@ module.exports = {
 			};
 		}
 
-		const data = await sb.Got({
+		const data = await sb.Got("FakeAgent", {
 			url: "https://www.npmjs.com/search",
 			method: "GET",
 			headers: {

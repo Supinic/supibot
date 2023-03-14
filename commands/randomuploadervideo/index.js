@@ -41,7 +41,7 @@ module.exports = {
 			};
 		}
 
-		const authorData = await sb.Got({
+		const authorData = await sb.Got("GenericAPI", {
 			throwHttpErrors: false,
 			responseType: "json",
 			url: "https://www.googleapis.com/youtube/v3/channels",
