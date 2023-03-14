@@ -21,7 +21,7 @@ module.exports = (function () {
 			};
 
 			/** @type {PajbotBanphraseAPIResponse} */
-			const data = await sb.Got(options).json();
+			const data = await sb.Got("GenericAPI", options).json();
 			data[apiResultSymbol] = Boolean(data.banned ? data.banphrase_data.phrase : false);
 			data[apiDataSymbol] = data.banphrase_data;
 

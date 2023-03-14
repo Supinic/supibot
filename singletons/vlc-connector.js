@@ -224,7 +224,7 @@ module.exports = class VLCSingleton extends require("./template.js") {
 			searchParams.command = command;
 		}
 
-		return await sb.Got({
+		return await sb.Got("GenericAPI", {
 			prefixUrl: this.baseURL,
 			url: parent ?? "",
 			searchParams,
