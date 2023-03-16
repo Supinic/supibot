@@ -1256,7 +1256,8 @@ module.exports = class TwitchController extends require("./template.js") {
 			emotes: (set.emoteList ?? []).map(i => ({
 				ID: i.id,
 				token: i.code,
-				animated: (i.assetType === "ANIMATED")
+				animated: (i.assetType === "ANIMATED"),
+				follower: (i.type === "FOLLOWER")
 			}))
 		}));
 	}
@@ -1382,45 +1383,55 @@ module.exports = class TwitchController extends require("./template.js") {
 			? Object.values(sevenTv.value.body)
 			: [];
 
+		const twitchEmotes = this.availableEmotes.flatMap(set => set.emotes.map(i => {
+			let type = "twitch-global";
+
+			// Massive hackfuck-workaround - animated emotes are present in their own emoteset without a tier,
+			// hence a special check must be added here. Otherwise, they will be considered as global.
+			if (i.animated || ["1", "2", "3"].includes(set.tier)) {
+				type = "twitch-subscriber";
+			}
+			else if (i.follower) {
+				type = "twitch-follower";
+			}
+
+			return {
+				ID: i.ID,
+				name: i.token,
+				type,
+				global: true,
+				animated: i.animated
+			};
+		}));
+		const ffzEmotes = rawFFZEmotes.flatMap(i => i.emoticons).map(i => ({
+			ID: i.id,
+			name: i.name,
+			type: "ffz",
+			global: true ,
+			animated: false
+		}));
+		const bttvEmotes = rawBTTVEmotes.map(i => ({
+			ID: i.id,
+			name: i.code,
+			type: "bttv",
+			global: true,
+			animated: (i.imageType === "gif")
+		}));
+		const sevenTvEmotes = rawSevenTvEmotes.map(i => ({
+			ID: i.id,
+			name: i.name,
+			type: "7tv",
+			global: true,
+			// Just hoping that .gif emotes are always animated.
+			// @todo proper animated emote checking with new 7TV API (?)
+			animated: (i.mime === "image/gif")
+		}));
+
 		return [
-			...this.availableEmotes
-				.flatMap(set => set.emotes.map(i => ({
-					ID: i.ID,
-					name: i.token,
-					// Massive hackfuck-workaround - animated emotes are present in their own emoteset without a tier,
-					// hence a special check must be added here. Otherwise, they will be considered as global.
-					type: (i.animated || set.tier === "1" || set.tier === "2" || set.tier === "3")
-						? "twitch-subscriber"
-						: "twitch-global",
-					global: true,
-					animated: i.animated
-				}))),
-
-			...rawFFZEmotes.flatMap(i => i.emoticons).map(i => ({
-				ID: i.id,
-				name: i.name,
-				type: "ffz",
-				global: true ,
-				animated: false
-			})),
-
-			...rawBTTVEmotes.map(i => ({
-				ID: i.id,
-				name: i.code,
-				type: "bttv",
-				global: true,
-				animated: (i.imageType === "gif")
-			})),
-
-			...rawSevenTvEmotes.map(i => ({
-				ID: i.id,
-				name: i.name,
-				type: "7tv",
-				global: true,
-				// Just hoping that .gif emotes are always animated.
-				// @todo proper animated emote checking with new 7TV API (?)
-				animated: (i.mime === "image/gif")
-			}))
+			...twitchEmotes,
+			...ffzEmotes,
+			...bttvEmotes,
+			...sevenTvEmotes
 		];
 	}
 
