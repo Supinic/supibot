@@ -11,6 +11,7 @@ module.exports = {
 		{ name: "bttv", type: "boolean" },
 		{ name: "channel", type: "string" },
 		{ name: "ffz", type: "boolean" },
+		{ name: "follower", type: "boolean" },
 		{ name: "global", type: "boolean" },
 		{ name: "repeat", type: "boolean" },
 		{ name: "regex", type: "regex" },
@@ -44,6 +45,7 @@ module.exports = {
 			bttv,
 			channel: channelString,
 			ffz,
+			follower,
 			global: globalEmotes,
 			sub,
 			twitch
@@ -116,6 +118,9 @@ module.exports = {
 				return false;
 			}
 			if (sub === true && i.type !== "twitch-subscriber" || sub === false && i.type === "twitch-subscriber") {
+				return false;
+			}
+			if (follower === true && i.type !== "twitch-follower" || follower === false && i.type === "twitch-follower") {
 				return false;
 			}
 			if (twitch === true && i.type !== "twitch-global" || twitch === false && i.type === "twitch-global") {
@@ -211,6 +216,7 @@ module.exports = {
 			`<code>${prefix}rem bttv:true</code>`,
 			`<code>${prefix}rem ffz:true</code>`,
 			`<code>${prefix}rem sub:true</code>`,
+			`<code>${prefix}rem follower:true</code>`,
 			`<code>${prefix}rem twitch:true</code>`,
 			"Posts an emote, which must be included in the set you specified.",
 			"E.g. <code>bttv:true</code> will <u>only</u> post random BTTV emotes.",
@@ -224,6 +230,7 @@ module.exports = {
 			`<code>${prefix}rem global:false</code>`,
 			`<code>${prefix}rem ffz:false</code>`,
 			`<code>${prefix}rem sub:false</code>`,
+			`<code>${prefix}rem follower:false</code>`,
 			`<code>${prefix}rem twitch:false</code>`,
 			"Posts an emote, which must not be included in the set(s) you specified.",
 			"E.g. <code>bttv:false</code> wil post random emotes that are <u>not</u> BTTV.",
