@@ -14,7 +14,7 @@ VALUES
 ('LOG_COMMAND_CRON','*/10 * * * * *','string',NULL,0,0,'Determines how often the executions will be logged, if enabled by COMMAND_LOGGING_ENABLED.'),
 ('LOG_ERROR_ENABLED','1','boolean',NULL,0,1,'If enabled, any errors will be saved to the Error table, along with their stack.'),
 ('LOG_LAST_SEEN_CRON','0 */30 * * * *','string',NULL,0,0,'Determines how often channels in the "Last seen" mode will add their data to message meta table.'),
-('LOG_LAST_SEEN_ENABLED','0','boolean',NULL,0,1,'If true, channels with the "Last seen" mode will save users\' last activity into the meta tables.'),
+('LOG_LAST_SEEN_ENABLED','1','boolean',NULL,0,1,'If true, channels with the "Last seen" mode will save users\' last activity into the meta tables.'),
 ('LOG_MESSAGE_CRON','*/10 * * * * *','string',NULL,0,0,'Determines how often logged messages save to their chat_line tables.'),
 ('LOG_MESSAGE_ENABLED','0','boolean',NULL,0,1,'Determines if message logging is enabled'),
 ('LOG_MESSAGE_META_CRON','0 * * * * *','string',NULL,0,0,'Determines how often "metadata" about messages saves to the Message_Meta tables.'),
