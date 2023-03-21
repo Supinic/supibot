@@ -134,12 +134,18 @@ module.exports = {
 			if (modelData.disabled) {
 				return `<li><del><b>${capName}</b> (${letter})</del> - model is currently disabled: ${modelData.disableReason ?? "(N/A)"}</li>`;
 			}
-			else if (modelData.usageDivisor === 1) {
-				return `<li><b>${capName}</b> (${letter}) ${defaultString}</li>`;
+
+			let priceChangeString = "";
+			if (modelData !== defaultModelData) {
+				if (modelData.usageDivisor === 1) {
+					priceChangeString = ` (same price as ${basePriceModel}`;
+				}
+				else if (modelData.usageDivisor > 1) {
+					priceChangeString = ` (${modelData.usageDivisor}x more expensive than as ${basePriceModel}`;
+				}
 			}
-			else {
-				return `<li><b>${capName}</b> (${letter}) - ${modelData.usageDivisor}x cheaper than ${basePriceModel}${defaultString}</li>`;
-			}
+
+			return `<li><b>${capName}</b> (${letter})${defaultString}${priceChangeString}</li>`;
 		}).join("");
 
 		return [
@@ -202,7 +208,8 @@ module.exports = {
 			"",
 
 			"<h5>History</h5>",
-			"This command keeps the ChatGPT history, to allow for a conversation to happen.",
+			"This command keeps the ChatGPT history for <b>chat</b> models, to allow for a conversation to happen.",
+			"<b>String</b> models on the other hand, don't and can't support history.",
 			"Your history is kept for 10 minutes since your last request, or until you delete it yourself.",
 			"You can disable it, if you would like to preserve tokens or if you would prefer each prompt to be separate.",
 			"",

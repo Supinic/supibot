@@ -30,7 +30,7 @@
         "default": 100,
         "maximum": 500
       },
-      "usageDivisor": 10
+      "usageDivisor": 1
     },
     "turbo": {
       "url": "gpt-3.5-turbo",
@@ -41,7 +41,7 @@
         "default": 100,
         "maximum": 500
       },
-      "usageDivisor": 10
+      "usageDivisor": 1
     }
   }
 }
