@@ -138,7 +138,7 @@ module.exports = {
 			let priceChangeString = "";
 			if (modelData !== defaultModelData) {
 				if (modelData.usageDivisor === 1) {
-					priceChangeString = ` (same price as ${basePriceModel}`;
+					priceChangeString = ` (same price as ${basePriceModel})`;
 				}
 				else if (modelData.usageDivisor > 1) {
 					priceChangeString = ` (${modelData.usageDivisor}x more expensive than as ${basePriceModel}`;
