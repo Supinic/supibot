@@ -135,6 +135,8 @@ module.exports = {
 				return `<li><del><b>${capName}</b> (${letter})</del> - model is currently disabled: ${modelData.disableReason ?? "(N/A)"}</li>`;
 			}
 
+			const typeString = `is a <b>${modelData.type}</b> model`;
+
 			let priceChangeString = "";
 			if (modelData !== defaultModelData) {
 				if (modelData.usageDivisor === 1) {
@@ -145,7 +147,7 @@ module.exports = {
 				}
 			}
 
-			return `<li><b>${capName}</b> (${letter})${defaultString}${priceChangeString}</li>`;
+			return `<li><b>${capName}</b> (${letter}): ${typeString} ${defaultString}${priceChangeString}</li>`;
 		}).join("");
 
 		return [
