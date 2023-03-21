@@ -29,12 +29,19 @@ module.exports = class GptMessages extends Template {
 	}
 
 	static async execute (context, query, modelData) {
-		const messages = await GptMessages.getHistory(context, query);
+		let messages = await GptMessages.getHistory(context, query);
 		const messagesLength = messages.reduce((acc, cur) => acc + cur.content.length, 0);
 
 		const inputLimitCheck = super.checkInputLimits(modelData, messagesLength);
 		if (inputLimitCheck.success === false) {
-			return inputLimitCheck;
+			await GptHistory.reset(context.user);
+
+			messages = await GptMessages.getHistory(context, query);
+			const messagesLength = messages.reduce((acc, cur) => acc + cur.content.length, 0);
+			const repeatInputLimitCheck = super.checkInputLimits(modelData, messagesLength);
+			if (repeatInputLimitCheck.success === false) {
+				return repeatInputLimitCheck;
+			}
 		}
 
 		const outputLimitCheck = super.determineOutputLimit(context, modelData);
