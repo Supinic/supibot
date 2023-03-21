@@ -277,6 +277,17 @@ module.exports = {
 
 				let joinFailed = false;
 				const { client } = sb.Platform.get("twitch");
+
+				// First round of join/part - do not track any responses
+				try {
+					await client.join(channelData.Name);
+				}
+				catch { /* skip over - we don't care about the result */ }
+				try {
+					await client.part(channelData.Name);
+				}
+				catch { /* skip over - we don't care about the result */ }
+
 				try {
 					await client.join(channelData.Name);
 				}
