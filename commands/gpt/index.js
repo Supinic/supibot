@@ -16,39 +16,15 @@ module.exports = {
 	Code: (async function chatGPT (context, ...args) {
 		const GptConfig = require("./config.json");
 		const GptCache = require("./cache-control.js");
-		const GptHistory = require("./history-control.js");
 		const GptModeration = require("./moderation.js");
 
-		let historyMode = await context.user.getDataProperty("chatGptHistoryMode") ?? GptConfig.defaultHistoryMode;
-		if (context.params.history) {
-			const command = context.params.history;
-			if (command === "enable" || command === "disable") {
-				if (historyMode === command) {
-					return {
-						success: false,
-						reply: `Your ChatGPT history is already ${command}d!`,
-						cooldown: 2500
-					};
-				}
+		const GptTemplate = require("./gpt-template.js");
+		const GptMessages = require("./gpt-messages.js");
+		const GptString = require("./gpt-string.js");
 
-				await context.user.setDataProperty("chatGptHistoryMode", command);
-				return {
-					reply: `Your ChatGPT history was successfully ${command}d.`,
-					cooldown: 5000
-				};
-			}
-			else if (command === "clear" || command === "reset") {
-				await GptHistory.reset(context.user);
-				return {
-					reply: "Successfully cleared your ChatGPT history."
-				};
-			}
-			else if (command === "export" || command === "check") {
-				return await GptHistory.dump(context.user);
-			}
-			else if (command === "ignore") {
-				historyMode = "disabled";
-			}
+		const historyCommandResult = await GptTemplate.handleHistoryCommand(context);
+		if (historyCommandResult) {
+			return historyCommandResult;
 		}
 
 		const query = args.join(" ").trim();
@@ -61,7 +37,6 @@ module.exports = {
 		}
 
 		const [defaultModelName] = Object.entries(GptConfig.models).find(i => i[1].default === true);
-		const customOutputLimit = context.params.limit;
 		const modelName = (context.params.model)
 			? context.params.model.toLowerCase()
 			: defaultModelName;
@@ -82,109 +57,16 @@ module.exports = {
 			};
 		}
 
-		const promptHistory = (historyMode === "enabled")
-			? (await GptHistory.get(context.user) ?? [])
-			: [];
+		const Handler = (modelData.type === "messages")
+			? GptMessages
+			: GptString;
 
-		const messages = [
-			{ role: "system", content: "Use a short summary, unless instructed." },
-			...promptHistory,
-			{ role: "user", content: query }
-		];
-		const messagesLength = messages.reduce((acc, cur) => acc + cur.content.length, 0);
-
-		if (modelData.inputLimit && messagesLength > modelData.inputLimit) {
-			const errorMessages = GptConfig.lengthLimitExceededMessage;
-			return {
-				success: false,
-				cooldown: 2500,
-				reply: `${errorMessages.history} ${messagesLength}/${modelData.inputLimit}`
-			};
-		}
-		else if (!modelData.inputLimit && messagesLength > GptConfig.globalInputLimit) {
-			return {
-				success: false,
-				cooldown: 2500,
-				reply: `Maximum query length exceeded! ${messagesLength}/${GptConfig.globalInputLimit}`
-			};
+		const executionResult = await Handler.execute(context, query, modelData);
+		if (executionResult.success === false) {
+			return executionResult;
 		}
 
-		const { temperature } = context.params;
-		if (typeof temperature === "number" && (temperature < 0 || temperature > 2)) {
-			return {
-				success: false,
-				reply: `Your provided temperature is outside of the valid range! Use a value between 0.0 and 2.0 - inclusive.`,
-				cooldown: 2500
-			};
-		}
-
-		const limitCheckResult = await GptCache.checkLimits(context.user);
-		if (limitCheckResult.success !== true) {
-			return limitCheckResult;
-		}
-
-		let outputLimit = modelData.outputLimit.default;
-		if (typeof customOutputLimit === "number") {
-			if (!sb.Utils.isValidInteger(customOutputLimit)) {
-				return {
-					success: false,
-					reply: `Your provided output limit must be a positive integer!`,
-					cooldown: 2500
-				};
-			}
-
-			const maximum = modelData.outputLimit.maximum;
-			if (customOutputLimit > maximum) {
-				return {
-					success: false,
-					cooldown: 2500,
-					reply: `
-						Maximum output limit exceeded for this model!
-						Lower your limit, or use a lower-ranked model instead.
-						${customOutputLimit}/${maximum}
-					`
-				};
-			}
-
-			outputLimit = customOutputLimit;
-		}
-
-		// @todo remove this try-catch and make the method return `null` with some param
-		let userPlatformID;
-		try {
-			userPlatformID = context.platform.fetchInternalPlatformIDByUsername(context.user);
-		}
-		catch {
-			userPlatformID = "N/A";
-		}
-
-		const { createHash } = require("crypto");
-		const userHash = createHash("sha1")
-			.update(context.user.Name)
-			.update(context.platform.Name)
-			.update(userPlatformID)
-			.digest()
-			.toString("hex");
-
-		const response = await sb.Got("GenericAPI", {
-			method: "POST",
-			throwHttpErrors: false,
-			url: `https://api.openai.com/v1/chat/completions`,
-			headers: {
-				Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
-			},
-			json: {
-				model: modelData.url,
-				messages,
-				max_tokens: outputLimit,
-				temperature: temperature ?? GptConfig.defaultTemperature,
-				top_p: 1,
-				frequency_penalty: 0,
-				presence_penalty: 0,
-				user: userHash
-			}
-		});
-
+		const { response } = executionResult;
 		if (!response.ok) {
 			const logID = await sb.Logger.log(
 				"Command.Warning",
@@ -221,20 +103,15 @@ module.exports = {
 			}
 		}
 
-		const { choices, usage } = response.body;
-		await GptCache.addUsageRecord(context.user, usage.total_tokens, modelName);
+		await GptCache.addUsageRecord(context.user, Handler.getUsageRecord(response), modelName);
 
-		const [chatResponse] = choices;
-		const reply = chatResponse.message.content.trim();
-
+		const reply = Handler.extractMessage(response);
 		const moderationResult = await GptModeration.check(context, reply);
 		if (moderationResult.success === false) {
 			return moderationResult;
 		}
 
-		if (historyMode === "enabled") {
-			await GptHistory.add(context.user, query, reply);
-		}
+		await Handler.setHistory(context, query, reply);
 
 		return {
 			reply: `🤖 ${reply}`
@@ -245,7 +122,7 @@ module.exports = {
 		const [defaultModelName, defaultModelData] = Object.entries(ChatGptConfig.models).find(i => i[1].default === true);
 		const { regular, subscriber } = ChatGptConfig.userTokenLimits;
 		const { outputLimit } = ChatGptConfig;
-		const basePriceModel = "Davinci";
+		const basePriceModel = "Turbo";
 
 		const modelListHTML = Object.entries(ChatGptConfig.models).map(([name, modelData]) => {
 			const letter = name[0].toUpperCase();

@@ -21,9 +21,20 @@
     }
   },
   "models": {
+    "curie": {
+      "url": "text-curie-001",
+      "type": "string",
+      "default": false,
+      "inputLimit": 2500,
+      "outputLimit": {
+        "default": 100,
+        "maximum": 500
+      },
+      "usageDivisor": 10
+    },
     "turbo": {
       "url": "gpt-3.5-turbo",
-      "chat": true,
+      "type": "messages",
       "default": true,
       "inputLimit": 2500,
       "outputLimit": {
