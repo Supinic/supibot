@@ -210,7 +210,7 @@ module.exports = {
 			"",
 
 			"<h5>History</h5>",
-			"This command keeps the ChatGPT history for <b>chat</b> models, to allow for a conversation to happen.",
+			"This command keeps the ChatGPT history for <b>messages</b> models, to allow for a conversation to happen.",
 			"<b>String</b> models on the other hand, don't and can't support history.",
 			"Your history is kept for 10 minutes since your last request, or until you delete it yourself.",
 			"You can disable it, if you would like to preserve tokens or if you would prefer each prompt to be separate.",
