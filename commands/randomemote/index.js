@@ -158,7 +158,9 @@ module.exports = {
 		}
 
 		const string = result.join(" ");
-		const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
+		const limit = (context.append.pipe)
+			? (context.channel?.Message_Limit ?? context.platform.Message_Limit)
+			: 50_000; // maximum character limit in a pipe command (resultCharacterLimit)
 
 		const [partition] = sb.Utils.partitionString(string, limit, 1);
 		return {
