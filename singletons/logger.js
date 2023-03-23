@@ -270,10 +270,6 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 	 * @returns {Promise<void>}
 	 */
 	async push (message, userData, channelData, platformData) {
-		if (!sb.Config.get("LOG_MESSAGE_ENABLED", false)) {
-			return;
-		}
-
 		if (!this.#presentTables === null) {
 			return;
 		}
