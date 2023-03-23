@@ -209,13 +209,9 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 	 * @returns {Promise<number>} ID of the created database logging record
 	 */
 	async log (tag, description = null, channel = null, user = null) {
-		if (!sb.Config.get("GENERAL_LOGGING_ENABLED", false)) {
-			return;
-		}
-
 		const [parentTag, childTag = null] = tag.split(".");
-
 		const row = await sb.Query.getRow("chat_data", "Log");
+
 		row.setValues({
 			Tag: parentTag,
 			Subtag: childTag,
