@@ -147,7 +147,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 					end: 60000
 				},
 				Code: async () => {
-					if (!sb.Config.get("LOG_MESSAGE_META_ENABLED", false) || this.lastSeenRunning) {
+					if (!sb.Config.get("LOG_LAST_SEEN_ENABLED", false) || this.lastSeenRunning) {
 						return;
 					}
 
@@ -470,7 +470,8 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 	}
 
 	async updateLastSeen (options) {
-		if (sb.Config.get("LOG_LAST_SEEN_ENABLED", false)) {
+		const lastSeenEnabled = sb.Config.get("LOG_LAST_SEEN_ENABLED", false);
+		if (lastSeenEnabled === false) {
 			if (!notified.lastSeen) {
 				console.warn("Requested last-seen update, but it is not enabled", options);
 				notified.lastSeen = true;
