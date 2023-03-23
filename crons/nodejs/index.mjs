@@ -20,8 +20,7 @@ export const definition = {
 			return;
 		}
 
-		const rawData = response.body.data;
-		const data = rawData.sort((a, b) => new sb.Date(b.created_at) - new sb.Date(a.created_at));
+		const data = response.body.sort((a, b) => new sb.Date(b.created_at) - new sb.Date(a.created_at));
 		const latest = data[0];
 
 		if (latest.tag_name === sb.Config.get("LATEST_NODE_JS_VERSION")) {
