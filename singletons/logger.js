@@ -69,10 +69,6 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 				Name: "message-cron",
 				Expression: sb.Config.get("LOG_MESSAGE_CRON"),
 				Code: async () => {
-					if (!sb.Config.get("LOG_MESSAGE_ENABLED", false)) {
-						return;
-					}
-
 					const keys = Object.keys(this.batches);
 					for (let i = 0; i < keys.length; i++) {
 						const key = keys[i];
