@@ -12,11 +12,11 @@
   },
   "userTokenLimits": {
     "regular": {
-      "hourly": 200,
+      "hourly": 150,
       "daily": 1000
     },
     "subscriber": {
-      "hourly": 2000,
+      "hourly": 1500,
       "daily": 10000
     }
   },
@@ -36,7 +36,7 @@
       "url": "gpt-3.5-turbo",
       "type": "messages",
       "default": true,
-      "inputLimit": 2500,
+      "inputLimit": 1500,
       "outputLimit": {
         "default": 100,
         "maximum": 500
