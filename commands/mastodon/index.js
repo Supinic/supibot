@@ -28,7 +28,7 @@ module.exports = {
 			const userInstanceRegex = /^@(?<username>\w+)@(?<instance>\w+)$/;
 			const userLinkRegex = /^https:\/\/@(?<instance>\w+)\/@(?<username>\w+)@$/;
 
-			const match = userInstanceRegex.match(input) ?? userLinkRegex.match(input);
+			const match = input.match(userInstanceRegex) ?? input.match(userLinkRegex);
 			if (match) {
 				instance = match.groups.instance;
 				user = match.groups.user;
