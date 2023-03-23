@@ -92,7 +92,7 @@ module.exports = class GptTemplate {
 		return response.body.usage.total_tokens;
 	}
 
-	static async handleHistoryCommand (context) {
+	static async handleHistoryCommand (context, query) {
 		if (!context.params.history) {
 			return;
 		}
@@ -115,10 +115,14 @@ module.exports = class GptTemplate {
 			};
 		}
 		else if (command === "clear" || command === "reset") {
+			// If no query provided, return immediately. Otherwise, continue with cleared history as normal.
+			if (!query) {
+				return {
+					reply: "Successfully cleared your ChatGPT history."
+				};
+			}
+
 			await History.reset(context.user);
-			return {
-				reply: "Successfully cleared your ChatGPT history."
-			};
 		}
 		else if (command === "export" || command === "check") {
 			return await History.dump(context.user);

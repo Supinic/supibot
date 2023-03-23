@@ -22,12 +22,12 @@ module.exports = {
 		const GptMessages = require("./gpt-messages.js");
 		const GptString = require("./gpt-string.js");
 
-		const historyCommandResult = await GptTemplate.handleHistoryCommand(context);
+		const query = args.join(" ").trim();
+		const historyCommandResult = await GptTemplate.handleHistoryCommand(context, query);
 		if (historyCommandResult) {
 			return historyCommandResult;
 		}
 
-		const query = args.join(" ").trim();
 		if (!query) {
 			return {
 				success: false,
@@ -227,7 +227,9 @@ module.exports = {
 
 			`<code>${prefix}gpt history:clear</code>`,
 			`<code>${prefix}gpt history:reset</code>`,
+			`<code>${prefix}gpt history:clear (your query)</code>`,
 			"Resets all of your current prompt history.",
+			"If you provide any text along with this parameter, your history is cleared and a new prompt is started immediately.",
 			"",
 
 			`<code>${prefix}gpt history:export</code>`,
