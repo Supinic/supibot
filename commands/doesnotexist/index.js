@@ -63,11 +63,62 @@ module.exports = {
 		return {
 			fetch: [
 				{
+					method: "reuploading an API request response",
+					descriptions: ["person"].map(i => (
+						`<code>${i}</code> - <a href="https://this-person-does-not-exist.com/">This ${i} does not exist</a>`
+					)),
+					types: ["person"],
+					execute: async (context, type) => {
+						const response = await sb.Got("GenericAPI", {
+							url: "https://this-person-does-not-exist.com/en",
+							searchParams: {
+								new: sb.Date.now(),
+								gender: "all", // male, female
+								age: "all", // 12-18, 19-25, 26-35, 35-50, 50+
+								etnic: "all" // asian, black, white, indian, middle eastern, latino hispanic
+							}
+						});
+
+						if (!response.ok) {
+							return {
+								success: false,
+								reply: `Could not generate a random picture!`
+							};
+						}
+
+						const { src } = response.body;
+						const imageResponse = await sb.Got("FakeAgent", {
+							url: `https://this-person-does-not-exist.com${src}`,
+							responseType: "buffer"
+						});
+
+						if (!imageResponse.ok) {
+							return {
+								success: false,
+								reply: `Could not fetch a random picture!`
+							};
+						}
+
+						const { statusCode, link } = await sb.Utils.uploadToImgur(imageResponse.rawBody ?? imageResponse.body);
+						if (statusCode !== 200) {
+							return {
+								success: false,
+								reply: `Could not upload the image to either Imgur! Errors: ${statusCode}`
+							};
+						}
+
+						return {
+							link,
+							reply: `This ${type} does not exist: ${link}`
+						};
+					}
+				},
+				{
 					method: "reuploading a provided random image",
-					descriptions: ["artwork", "cat", "horse", "person"].map(i => (
+					descriptions: ["artwork", "cat", "horse"].map(i => (
 						`<code>${i}</code> - <a href="${buildURL(i)}">This ${i} does not exist</a>`
 					)),
-					types: ["artwork", "cat", "horse", "person"],
+					types: ["artwork", "cat", "horse"],
 					execute: async (context, type) => {
 						const imageData = await sb.Got("GenericAPI", {
 							url: buildURL(type),
