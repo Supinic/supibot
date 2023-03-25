@@ -3,9 +3,10 @@ module.exports = {
 	Aliases: ["4chan","textchan","filechan","imagechan"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Pulls a random post from a random board, or a specified one, if you provide it.",
+	Description: "Pulls a random post from a random 4Chan board, or a specified one if you provide it.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
+		{ name: "regex", type: "regex" },
 		{ name: "textOnly", type: "string" }
 	],
 	Whitelist_Response: null,
@@ -63,7 +64,6 @@ module.exports = {
 		let resultType = (context.channel?.NSFW)
 			? "file"
 			: "content";
-
 
 		if (context.invocation === "textchan") {
 			resultType = "content";
@@ -148,11 +148,21 @@ module.exports = {
 		}
 
 		let threadID;
-		if (rest.length > 0) {
+		if (rest.length > 0 || context.params.regex) {
 			const query = rest.join(" ").toLowerCase();
-			const validThreads = threadList.filter(i => !i.dead && i.content.toLowerCase().includes(query));
+			const filteredThreads = threadList.filter(i => {
+				if (i.dead) {
+					return false;
+				}
+				else if (context.params.regex) {
+					return context.params.regex.test(i.content);
+				}
+				else {
+					return i.content.toLowerCase().includes(query);
+				}
+			});
 
-			const thread = sb.Utils.randArray(validThreads);
+			const thread = sb.Utils.randArray(filteredThreads);
 			if (!thread) {
 				return {
 					success: false,
