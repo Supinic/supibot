@@ -105,7 +105,23 @@ module.exports = {
 			}
 
 			const xml = response.body;
-			const rss = await sb.Utils.parseRSS(xml);
+			let rss;
+			try {
+				rss = await sb.Utils.parseRSS(xml);
+			}
+			catch (e) {
+				await sb.Logger.log(
+					"Command.Warning",
+					`Invalid Mastodon RSS feed: ${url}`,
+					context.channel,
+					context.user
+				);
+
+				return {
+					success: false,
+					reply: "Could not check that user's Mastodon posts!"
+				};
+			}
 
 			data = {
 				username: fixedUser,
