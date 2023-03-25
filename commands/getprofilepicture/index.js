@@ -20,7 +20,7 @@ module.exports = {
 			}
 		});
 
-		if (response.statusCode !== 200) {
+		if (!response.ok) {
 			return {
 				success: false,
 				reply: `Could not fetch profile picture! ${response.body.message}`
