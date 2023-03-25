@@ -805,6 +805,13 @@ module.exports = (command) => [
 		aliases: ["tld"],
 		description: "Checks the posted description of a provided TwitchLotto link, if it exists.",
 		execute: async (context, link) => {
+			if (!link) {
+				return {
+					success: false,
+					reply: `No image link provided! You must provide a Twitchlotto image link to check its description.`
+				};
+			}
+			
 			// @todo refactor this and similar usages to a common place
 			if (link.toLowerCase() === "last") {
 				const tl = sb.Command.get("tl");
