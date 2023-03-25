@@ -26,6 +26,19 @@ module.exports = {
 				reply: `Could not fetch profile picture! ${response.body.message}`
 			};
 		}
+		else if (!Array.isArray(response.body)) {
+			// 2023-03-25: Super sanity check, IVR API maybe(?) sometimes returns a non-Array response for the `user` endpoint
+			const logId = await sb.Logger.log(
+				"Command.Fail",
+				`IVR API returned non-array: ${JSON.stringify(response.body)}`,
+				context.channel,
+				context.user
+			);
+
+			throw new sb.Error({
+				message: `Invalid IVR API response - more data: Log #${logId}`
+			});
+		}
 		else if (response.body.length === 0) {
 			return {
 				success: false,
