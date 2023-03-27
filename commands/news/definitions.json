@@ -295,7 +295,7 @@
         "name": "ORF.at",
         "url": "https://rss.orf.at",
         "path": "",
-        "endpoints": ["news.xml", "oesterreich.xml", "wien.xml"],
+        "endpoints": ["oesterreich.xml", "wien.xml", "noe.xml", "ooe.xml", "salzburg.xml", "steiermark.xml"],
         "helpers": ["kalifail_disbang"]
       }
     ]
