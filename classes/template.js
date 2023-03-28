@@ -142,19 +142,22 @@ module.exports = class ClassTemplate {
 			return cache.get(propertyName);
 		}
 
-		const data = await sb.Query.getRecordset(rs => rs
-			.select("Property", "Value")
-			.select("Custom_Data_Property.Type AS Type", "Custom_Data_Property.Cached AS Cached")
-			.from("chat_data", databaseTable)
-			.leftJoin({
-				toTable: "Custom_Data_Property",
-				on: `Custom_Data_Property.Name = ${databaseTable}.Property`
-			})
-			.where(`${databaseProperty} = %n`, this.ID)
-			.where("Property = %s", propertyName)
-			.where({ condition: Boolean(object) }, "Target %*like*", object)
-			.limit(1)
-			.single()
+		const { transaction = null } = options;
+		const data = await sb.Query.getRecordset(
+			rs => rs
+				.select("Property", "Value")
+				.select("Custom_Data_Property.Type AS Type", "Custom_Data_Property.Cached AS Cached")
+				.from("chat_data", databaseTable)
+				.leftJoin({
+					toTable: "Custom_Data_Property",
+					on: `Custom_Data_Property.Name = ${databaseTable}.Property`
+				})
+				.where(`${databaseProperty} = %n`, this.ID)
+				.where("Property = %s", propertyName)
+				.where({ condition: Boolean(object) }, "Target %*like*", object)
+				.limit(1)
+				.single(),
+			{ transaction }
 		);
 
 		if (!data) {
@@ -197,13 +200,16 @@ module.exports = class ClassTemplate {
 			value
 		} = inputData;
 
-		const propertyData = await sb.Query.getRecordset(rs => rs
-			.select("Type", "Cached")
-			.from("chat_data", "Custom_Data_Property")
-			.where("Name = %s", propertyName)
-			.where({ condition: Boolean(object) }, "Target %*like*", object)
-			.limit(1)
-			.single()
+		const { transaction = null } = options;
+		const propertyData = await sb.Query.getRecordset(
+			rs => rs
+				.select("Type", "Cached")
+				.from("chat_data", "Custom_Data_Property")
+				.where("Name = %s", propertyName)
+				.where({ condition: Boolean(object) }, "Target %*like*", object)
+				.limit(1)
+				.single(),
+			{ transaction }
 		);
 
 		if (!propertyData.Type) {
@@ -213,7 +219,7 @@ module.exports = class ClassTemplate {
 			});
 		}
 
-		const row = await sb.Query.getRow("chat_data", databaseTable);
+		const row = await sb.Query.getRow("chat_data", databaseTable, { transaction });
 		await row.load({
 			[databaseProperty]: this.ID,
 			Property: propertyName
