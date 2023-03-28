@@ -128,7 +128,7 @@ module.exports = (command) => [
 	{
 		name: "chatgpt",
 		aliases: ["chat-gpt", "gpt"],
-		description: "Posts either: how many tokens you (or someone else) have used recently in the $gpt command; or, if used with \"global\", the amount of USD @Supinic has been billed so far this month.",
+		description: "Posts either: how many tokens you (or someone else) have used recently in the $gpt command; if used with \"total\", shows your total token amount overall; or, if used with \"global\", the amount of USD @Supinic has been billed so far this month.",
 		execute: async (context, target) => {
 			if (target === "global") {
 				// `Date.prototype.setDate` returns a number (!)
@@ -215,6 +215,27 @@ module.exports = (command) => [
 						${limitExceededString}
 					`
 				};
+			}
+			else if (target === "total") {
+				const total = await sb.Query.getRecordset(rs => rs
+					.select("(SUM(Input_Tokens) + SUM(Output_Tokens)) AS Total")
+					.from("data", "ChatGPT_Log")
+					.where("User_Alias = %n", context.user.ID)
+					.flat("Total")
+					.single()
+				);
+
+				if (!total) {
+					return {
+						reply: `You have not used any ChatGPT tokens since April 2023.`
+					};
+				}
+				else {
+					const formatted = sb.Utils.groupDigits(total);
+					return {
+						reply: `You have used ${formatted} ChatGPT tokens since April 2023.`
+					};
+				}
 			}
 			else {
 				let GptCache;
@@ -811,7 +832,7 @@ module.exports = (command) => [
 					reply: `No image link provided! You must provide a Twitchlotto image link to check its description.`
 				};
 			}
-			
+
 			// @todo refactor this and similar usages to a common place
 			if (link.toLowerCase() === "last") {
 				const tl = sb.Command.get("tl");
