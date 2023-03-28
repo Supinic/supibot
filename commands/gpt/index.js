@@ -107,15 +107,35 @@ module.exports = {
 
 		const reply = Handler.extractMessage(response);
 		const moderationResult = await GptModeration.check(context, reply);
+
+		let result;
 		if (moderationResult.success === false) {
-			return moderationResult;
+			result = moderationResult;
+		}
+		else {
+			await Handler.setHistory(context, query, reply);
+			result = {
+				reply: `🤖 ${reply}`
+			};
 		}
 
-		await Handler.setHistory(context, query, reply);
+		if (await sb.Query.isTablePresent("data", "ChatGPT_Log")) {
+			const row = await sb.Query.getRow("data", "ChatGPT_Log");
+			row.setValues({
+				User_Alias: context.user.ID,
+				Channel: context.channnel?.ID ?? null,
+				Model: modelName,
+				Query: query,
+				Reply: reply,
+				Input_Tokens: response.body.usage.prompt_tokens,
+				Output_Tokens: response.body.usage.completion_tokens,
+				Rejected: !(moderationResult.success)
+			});
 
-		return {
-			reply: `🤖 ${reply}`
-		};
+			await row.save({ skipLoad: true });
+		}
+
+		return result;
 	}),
 	Dynamic_Description: (async (prefix) => {
 		const ChatGptConfig = require("./config.json");
