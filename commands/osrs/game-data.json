@@ -184,7 +184,8 @@
     },
     {
       "name": "ranged",
-      "emoji": "🏹"
+      "emoji": "🏹",
+      "aliases": ["range", "archery"]
     },
     {
       "name": "prayer",
@@ -204,7 +205,7 @@
     {
       "name": "construction",
       "emoji": "\uD83E\uDE9A",
-      "aliases": ["con"]
+      "aliases": ["con", "cons"]
     },
     {
       "name": "hitpoints",
@@ -223,7 +224,8 @@
     },
     {
       "name": "thieving",
-      "emoji": "💰"
+      "emoji": "💰",
+      "aliases": ["thief"]
     },
     {
       "name": "crafting",
@@ -242,11 +244,13 @@
     },
     {
       "name": "hunter",
-      "emoji": "🐾"
+      "emoji": "🐾",
+      "aliases": ["hunt"]
     },
     {
       "name": "mining",
-      "emoji": "⛏"
+      "emoji": "⛏",
+      "aliases": ["mine"]
     },
     {
       "name": "smithing",
