@@ -18,6 +18,7 @@ module.exports = {
 			Logic.resetDailyStats(cookieData);
 		}
 
+		const { transaction } = context;
 		const { controller } = sb.Platform.get("twitch");
 		const hasDoubleCookieAccess = await controller.fetchUserCacheSubscription(context.user, "supinic");
 
@@ -30,7 +31,7 @@ module.exports = {
 
 			const [cookieText] = await Promise.all([
 				Logic.fetchRandomCookieText(),
-				context.user.setDataProperty("cookie", cookieData)
+				context.user.setDataProperty("cookie", cookieData, { transaction })
 			]);
 
 			const string = `Your ${result.type} cookie:`;
@@ -72,7 +73,7 @@ module.exports = {
 			};
 
 			/** @type {CookieData} */
-			const receiverCookieData = await receiverUserData.getDataProperty("cookie") ?? Logic.getInitialStats();
+			const receiverCookieData = await receiverUserData.getDataProperty("cookie", { transaction }) ?? Logic.getInitialStats();
 			if (Logic.hasOutdatedDailyStats(receiverCookieData)) {
 				Logic.resetDailyStats(receiverCookieData);
 			}
@@ -84,8 +85,8 @@ module.exports = {
 
 			// noinspection JSCheckFunctionSignatures
 			await Promise.all([
-				context.user.setDataProperty("cookie", cookieData),
-				receiverUserData.setDataProperty("cookie", receiverCookieData)
+				context.user.setDataProperty("cookie", cookieData, { transaction }),
+				receiverUserData.setDataProperty("cookie", receiverCookieData, { transaction })
 			]);
 
 			const emote = await context.getBestAvailableEmote(["Okayga", "supiniOkay", "FeelsOkayMan"], "😊");
