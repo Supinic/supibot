@@ -813,7 +813,7 @@ module.exports = {
 				}
 
 				let targetAlias = await sb.Query.getRecordset(rs => rs
-					.select("ID", "Name", "Description", "Command", "Parent")
+					.select("ID", "Name", "Description", "Command", "Parent", "Restrictions")
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NULL")
 					.where("User_Alias = %n", targetUserData.ID)
