@@ -21,7 +21,7 @@ import { definition as TrainwrecksTwitterArchiver } from "./train-twitter-archiv
 import { definition as V8VersionAnnouncer } from "./v8-version-checker/index.mjs";
 import { definition as SoundcloudClientIdFetcher } from "./yoink-soundcloud-client-id/index.mjs";
 
-const definitions = [
+export const definitions = [
 	ActiveChattersLog,
 	ActivePoll,
 	BotActivity,
@@ -46,5 +46,4 @@ const definitions = [
 	SoundcloudClientIdFetcher
 ];
 
-export { definitions };
 export default definitions;

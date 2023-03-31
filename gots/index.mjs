@@ -17,7 +17,7 @@ import { definition as TwitchGQL } from "./twitch-gql/index.mjs";
 import { definition as V5 } from "./v5/index.mjs";
 import { definition as Vimeo } from "./vimeo/index.mjs";
 
-const definitions = [
+export const definitions = [
 	CommanderRoot,
 	FakeAgent,
 	GenericAPI,
@@ -38,5 +38,4 @@ const definitions = [
 	Vimeo
 ];
 
-export { definitions };
 export default definitions;

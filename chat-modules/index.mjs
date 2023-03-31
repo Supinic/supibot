@@ -15,7 +15,7 @@ import { definition as SilencePreventionTrigger } from "./supinic-silence-preven
 import { definition as StreamDatabaseUpdater } from "./supinic-stream-db/index.mjs";
 import { definition as WannaBecomeFamous } from "./wanna-become-famous/index.mjs";
 
-const definitions = [
+export const definitions = [
 	AsyncMarkovExperiment,
 	AutomaticUnscramble,
 	ChatSuggestionLinker,
@@ -35,5 +35,4 @@ const definitions = [
 	WannaBecomeFamous
 ];
 
-export { definitions };
 export default definitions;
