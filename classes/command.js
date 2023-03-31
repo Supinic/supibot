@@ -644,7 +644,7 @@ class Command extends require("./template.js") {
 				isPrivateMessage
 			};
 
-			if (e instanceof sb.errors.GenericRequestError) {
+			if (e instanceof sb.Error.GenericRequest) {
 				origin = "External";
 				const { hostname, statusCode, statusMessage } = e.args;
 				errorContext = {
@@ -677,7 +677,7 @@ class Command extends require("./template.js") {
 				arguments: args
 			});
 
-			if (e instanceof sb.errors.GenericRequestError) {
+			if (e instanceof sb.Error.GenericRequest) {
 				const { hostname } = errorContext;
 				execution = {
 					success: false,
