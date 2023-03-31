@@ -23,7 +23,7 @@ module.exports = {
 		while (counter < channels.length) {
 			const sliceString = channels
 				.slice(counter, counter + batchSize)
-				.map(i => `user_id=${i.Specific_ID}`)
+				.map(i => `user_id=${i}`)
 				.join("&");
 
 			promises.push(
