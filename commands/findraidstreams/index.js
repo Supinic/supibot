@@ -13,28 +13,49 @@ module.exports = {
 		viewerThreshold: 100
 	})),
 	Code: (async function findRaidStreams (context) {
-		const channels = sb.Channel.getJoinableForPlatform("twitch");
-		const channelStreamData = await Promise.all(channels.map(async (channel) => {
-			const data = await channel.getStreamData();
-			return { channel, data };
-		}));
+		const channels = sb.Channel.getJoinableForPlatform("twitch")
+			.map(i => i.Specific_ID)
+			.filter(Boolean);
 
-		const raidable = channelStreamData
-			.filter(i => i.data.live)
-			.map(i => {
-				const { channel, data } = i;
-				return {
-					name: channel.Name,
-					game: data.stream.game,
-					status: data.stream.status,
-					viewers: data.stream.viewers,
-					online: sb.Utils.timeDelta(new sb.Date(data.stream.since), true)
-				};
-			})
-			.filter(i => i.viewers < this.staticData.viewerThreshold)
+		let counter = 0;
+		const promises = [];
+		const batchSize = 100;
+		while (counter < channels.length) {
+			const sliceString = channels
+				.slice(counter, counter + batchSize)
+				.map(i => `user_id=${i.Specific_ID}`)
+				.join("&");
+
+			promises.push(
+				sb.Got("Helix", {
+					url: `streams?${sliceString}`,
+					responseType: "json"
+				})
+			);
+
+			counter += batchSize;
+		}
+
+		const raidData = [];
+		const results = await Promise.all(promises);
+		for (const partialResult of results) {
+			const block = partialResult.body?.data ?? [];
+			const formatted = block.map(i => ({
+				name: i.user_login,
+				viewers: i.viewer_count,
+				game: i.game_name,
+				title: i.title,
+				liveFor: sb.Utils.timeDelta(new sb.Date(i.started_at), true)
+			}));
+
+			raidData.push(...formatted);
+		}
+
+		const filteredRaidData = raidData
+			.filter(i => i.viewers < i.staticData.viewerThreshold)
 			.sort((a, b) => b.viewers - a.viewers);
 
-		const data = JSON.stringify(raidable, null, 4);
+		const data = JSON.stringify(filteredRaidData, null, 4);
 		const server = context.params.haste ?? "haste.zneix.eu";
 
 		const response = await sb.Got("GenericAPI", {
