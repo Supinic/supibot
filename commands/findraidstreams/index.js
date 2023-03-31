@@ -52,7 +52,7 @@ module.exports = {
 		}
 
 		const filteredRaidData = raidData
-			.filter(i => i.viewers < i.staticData.viewerThreshold)
+			.filter(i => i.viewers < this.staticData.viewerThreshold)
 			.sort((a, b) => b.viewers - a.viewers);
 
 		const data = JSON.stringify(filteredRaidData, null, 4);
