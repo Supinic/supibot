@@ -31,7 +31,7 @@ module.exports = {
 			});
 		}
 		catch (e) {
-			if (e instanceof sb.Got.TimeoutError || e instanceof sb.errors.GenericRequestError) {
+			if (e instanceof sb.Got.TimeoutError || e instanceof sb.Error.GenericRequest) {
 				return {
 					success: false,
 					reply: (query)

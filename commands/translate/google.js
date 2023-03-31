@@ -75,8 +75,8 @@ const execute = async function (context, query) {
 			reply: `One or both languages are not supported! (${languages.join(", ")})`
 		};
 	}
-	else if (response.statusCode !== 200) {
-		throw new sb.errors.GenericRequestError({
+	else if (!response.ok) {
+		throw new sb.Error.GenericRequest({
 			statusCode: response.statusCode,
 			statusMessage: response.statusMessage,
 			hostname: "TranslateAPI",

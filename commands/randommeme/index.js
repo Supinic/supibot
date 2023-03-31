@@ -44,7 +44,7 @@ module.exports = {
 			const { body, statusCode } = await sb.Got("Reddit", `${subreddit}/about.json`);
 
 			if (statusCode !== 200 && statusCode !== 403 && statusCode !== 404) {
-				throw new sb.errors.GenericRequestError({
+				throw new sb.Error.GenericRequest({
 					statusCode,
 					hostname: "reddit.com",
 					statusMessage: body.statusMessage ?? null,
@@ -81,7 +81,7 @@ module.exports = {
 		if (forum.posts.length === 0 || sb.Date.now() > forum.expiration) {
 			const { statusCode, body } = await sb.Got("Reddit", `${subreddit}/hot.json`);
 			if (statusCode !== 200) {
-				throw new sb.errors.GenericRequestError({
+				throw new sb.Error.GenericRequest({
 					statusCode,
 					hostname: "reddit.com",
 					statusMessage: body.statusMessage ?? null,

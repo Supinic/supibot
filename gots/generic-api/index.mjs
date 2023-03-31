@@ -6,7 +6,7 @@ export const definition = {
 		throwHttpErrors: true,
 		hooks: {
 			beforeError: [
-				(e) => new sb.errors.GenericRequestError({
+				(e) => new sb.Error.GenericRequest({
 					body: e.response?.body ?? null,
 					statusCode: e.response?.statusCode,
 					statusMessage: e.response?.statusMessage,

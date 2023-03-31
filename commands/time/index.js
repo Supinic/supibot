@@ -183,7 +183,7 @@ module.exports = {
 
 		const timeData = response.body;
 		if (response.statusCode !== 200) {
-			throw new sb.errors.GenericRequestError({
+			throw new sb.Error.GenericRequest({
 				statusCode: response.statusCode,
 				hostname: "maps.googleapis.com",
 				statusMessage: timeData.statusMessage ?? null,
