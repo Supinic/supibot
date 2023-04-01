@@ -123,7 +123,7 @@ module.exports = {
 			const row = await sb.Query.getRow("data", "ChatGPT_Log");
 			row.setValues({
 				User_Alias: context.user.ID,
-				Channel: context.channnel?.ID ?? null,
+				Channel: context.channel?.ID ?? null,
 				Model: modelName,
 				Query: query,
 				Reply: reply,
