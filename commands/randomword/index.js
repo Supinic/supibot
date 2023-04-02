@@ -23,15 +23,16 @@ module.exports = {
 			};
 		}
 
+		const fullWordList = require("./words.json");
 		const { endsWith, regex, startsWith } = context.params;
 
 		// performance "save" - skip filtering if not needed
 		let wordList;
 		if (!endsWith && !regex && !startsWith) {
-			wordList = sb.Config.get("WORD_LIST");
+			wordList = fullWordList;
 		}
 		else {
-			wordList = sb.Config.get("WORD_LIST").filter(word => {
+			wordList = fullWordList.filter(word => {
 				let result = true;
 				if (endsWith) {
 					result &&= word.endsWith(endsWith);
@@ -65,7 +66,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async function (prefix) {
 		const { limit } = this.staticData;
-		const list = sb.Config.get("WORD_LIST");
+		const list = require("./words.json");
 
 		return [
 			`Returns a random word from a list of ${list.length} pre-determined words.`,
