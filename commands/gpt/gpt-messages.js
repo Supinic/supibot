@@ -21,8 +21,30 @@ module.exports = class GptMessages extends Template {
 			? (await GptHistory.get(context.user) ?? [])
 			: [];
 
+		const systemMessages = [];
+		if (context.params.debug) {
+			const permissions = await context.getUserPermissions();
+			if (!permissions.is(sb.User.permissions.administrator)) {
+				return {
+					success: false,
+					reply: `Debug mode is currently only available to administrators!`
+				};
+			}
+
+			systemMessages.push({
+				role: "system",
+				content: context.params.debug
+			});
+		}
+		else {
+			systemMessages.push({
+				role: "system",
+				content: "Use a short summary, unless instructed."
+			});
+		}
+
 		return [
-			{ role: "system", content: "Use a short summary, unless instructed." },
+			...systemMessages,
 			...promptHistory,
 			{ role: "user", content: query }
 		];
