@@ -58,6 +58,11 @@ module.exports = {
 			};
 		}
 
+		const limitCheckResult = await GptCache.checkLimits(context.user);
+		if (limitCheckResult.success !== true) {
+			return limitCheckResult;
+		}
+
 		const Handler = (modelData.type === "messages")
 			? GptMessages
 			: GptString;
