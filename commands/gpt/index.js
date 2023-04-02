@@ -128,6 +128,9 @@ module.exports = {
 				Model: modelName,
 				Query: query,
 				Reply: reply,
+				Parameters: (Object.keys(context.params).length > 0)
+					? JSON.stringify(context.params)
+					: null,
 				Input_Tokens: response.body.usage.prompt_tokens,
 				Output_Tokens: response.body.usage.completion_tokens,
 				Rejected: !(moderationResult.success)
