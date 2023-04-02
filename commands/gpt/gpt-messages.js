@@ -24,7 +24,7 @@ module.exports = class GptMessages extends Template {
 		const systemMessages = [];
 		if (context.params.debug) {
 			const permissions = await context.getUserPermissions();
-			if (!permissions.is(sb.User.permissions.administrator)) {
+			if (!permissions.is("administrator")) {
 				return {
 					success: false,
 					reply: `Debug mode is currently only available to administrators!`
