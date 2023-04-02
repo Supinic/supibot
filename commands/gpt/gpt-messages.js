@@ -26,16 +26,14 @@ module.exports = class GptMessages extends Template {
 		let systemMessage = "Use a short summary, unless instructed.";
 		if (context.params.context) {
 			if (!context.channel) {
-				return {
-					success: false,
-					reply: `This functionality is being rolled out, and as such, it is not available in private messages!`
-				};
+				throw new sb.Error({
+					message: `This functionality is being rolled out, and as such, it is not available in private messages!`
+				});
 			}
 			else if (!partialInstructionRolloutChannels.includes(context.channel.ID)) {
-				return {
-					success: false,
+				throw new sb.Error({
 					reply: `This functionality is being rolled out, and as such, it is not available in this channel!`
-				};
+				});
 			}
 
 			systemMessage = context.params.context;
@@ -49,9 +47,18 @@ module.exports = class GptMessages extends Template {
 	}
 
 	static async execute (context, query, modelData) {
-		let messages = await GptMessages.getHistory(context, query);
-		const messagesLength = messages.reduce((acc, cur) => acc + cur.content.length, 0);
+		let messages;
+		try {
+			messages = await GptMessages.getHistory(context, query);
+		}
+		catch (e) {
+			return {
+				success: false,
+				reply: e.message
+			};
+		}
 
+		const messagesLength = messages.reduce((acc, cur) => acc + cur.content.length, 0);
 		const inputLimitCheck = super.checkInputLimits(modelData, messagesLength);
 		if (inputLimitCheck.success === false) {
 			await GptHistory.reset(context.user);
