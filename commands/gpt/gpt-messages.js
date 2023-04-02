@@ -2,6 +2,8 @@ const Config = require("./config.json");
 const Template = require("./gpt-template.js");
 const GptHistory = require("./history-control.js");
 
+const partialInstructionRolloutChannels = [30, 37, 38];
+
 module.exports = class GptMessages extends Template {
 	static async getHistoryMode (context) {
 		let historyMode = await context.user.getDataProperty("chatGptHistoryMode") ?? Config.defaultHistoryMode;
@@ -21,30 +23,26 @@ module.exports = class GptMessages extends Template {
 			? (await GptHistory.get(context.user) ?? [])
 			: [];
 
-		const systemMessages = [];
-		if (context.params.debug) {
-			const permissions = await context.getUserPermissions();
-			if (!permissions.is("administrator")) {
+		let systemMessage = "Use a short summary, unless instructed.";
+		if (context.params.context) {
+			if (!context.channel) {
 				return {
 					success: false,
-					reply: `Debug mode is currently only available to administrators!`
+					reply: `This functionality is being rolled out, and as such, it is not available in private messages!`
+				};
+			}
+			else if (!partialInstructionRolloutChannels.includes(context.channel.ID)) {
+				return {
+					success: false,
+					reply: `This functionality is being rolled out, and as such, it is not available in this channel!`
 				};
 			}
 
-			systemMessages.push({
-				role: "system",
-				content: context.params.debug
-			});
-		}
-		else {
-			systemMessages.push({
-				role: "system",
-				content: "Use a short summary, unless instructed."
-			});
+			systemMessage = context.params.context;
 		}
 
 		return [
-			...systemMessages,
+			{ role: "system", content: systemMessage },
 			...promptHistory,
 			{ role: "user", content: query }
 		];

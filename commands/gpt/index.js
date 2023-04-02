@@ -6,7 +6,7 @@ module.exports = {
 	Description: "Queries ChatGPT for a text response. Supports multiple models and parameter settings. Limited by tokens usage!",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
-		{ name: "debug", type: "string" },
+		{ name: "context", type: "string" },
 		{ name: "history", type: "string" },
 		{ name: "model", type: "string" },
 		{ name: "limit", type: "number" },
