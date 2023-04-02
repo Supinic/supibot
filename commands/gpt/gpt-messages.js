@@ -23,7 +23,7 @@ module.exports = class GptMessages extends Template {
 			? (await GptHistory.get(context.user) ?? [])
 			: [];
 
-		let systemMessage = "Use a short summary, unless instructed.";
+		let systemMessage = "Keep the response as short and concise as possible.";
 		if (context.params.context) {
 			if (!context.channel) {
 				throw new sb.Error({
