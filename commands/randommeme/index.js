@@ -186,13 +186,6 @@ module.exports = {
 			};
 		}
 		else {
-			if ((config.banned.includes(forum.name) || post.nsfw) && context.append.pipe) {
-				return {
-					success: false,
-					reason: "pipe-nsfw"
-				};
-			}
-
 			// Add the currently used post ID at the beginning of the array
 			repeatedPosts.unshift(post.id);
 			// And then splice off everything over the length of 3.
