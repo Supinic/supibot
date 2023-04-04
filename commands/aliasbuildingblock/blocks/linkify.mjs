@@ -16,7 +16,9 @@ export const definition = {
 
 		const query = args.join(" ");
 		if (query.length <= limit) {
-			return query;
+			return {
+				reply: query
+			};
 		}
 
 		const response = await sb.Got("GenericAPI", {
