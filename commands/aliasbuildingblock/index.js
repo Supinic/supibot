@@ -17,7 +17,8 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function aliasBuildingBlock (context, type, ...args) {
-		const { blocks } = await import("./blocks/index.mjs");
+		const cacheBypass = sb.Date.now() + Math.random();
+		const { blocks } = await import(`./blocks/index.mjs?xd=${cacheBypass}`);
 
 		if (!context.append.alias && !context.append.pipe) {
 			if (!type) {
