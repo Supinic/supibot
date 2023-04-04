@@ -10,6 +10,7 @@ module.exports = {
 		{ name: "em", type: "string" },
 		{ name: "errorMessage", type: "string" },
 		{ name: "excludeSelf", type: "boolean" },
+		{ name: "limit", type: "number" },
 		{ name: "regex", type: "regex" },
 		{ name: "replacement", type: "string" }
 	],

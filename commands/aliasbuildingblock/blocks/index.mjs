@@ -4,6 +4,7 @@ import { definition as ChannelBlock } from "./channel.mjs";
 import { definition as ChatterBlock } from "./chatter.mjs";
 import { definition as ExecutorBlock } from "./executor.mjs";
 import { definition as ExplodeBlock } from "./explode.mjs";
+import { definition as LinkifyBlock } from "./linkify.mjs";
 import { definition as PlatformBlock } from "./platform.mjs";
 import { definition as RepeatBlock } from "./repeat.mjs";
 import { definition as ReplaceBlock } from "./replace.mjs";
@@ -17,6 +18,7 @@ export const blocks = [
 	ChatterBlock,
 	ExecutorBlock,
 	ExplodeBlock,
+	LinkifyBlock,
 	PlatformBlock,
 	RepeatBlock,
 	ReplaceBlock,
