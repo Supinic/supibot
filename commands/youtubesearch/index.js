@@ -72,17 +72,17 @@ module.exports = {
 		let data;
 		let videoID;
 		const { linkParser } = sb.Utils.modules;
-		const parser = linkParser.getParser("youtube");
+		const youtubeParser = linkParser.getParser("youtube");
 
-		if (parser.checkLink(query, false)) {
-			videoID = parser.parseLink(query);
+		if (youtubeParser.checkLink(query, false)) {
+			videoID = youtubeParser.parseLink(query);
 		}
-		else if (parser.checkLink(query, true)) {
+		else if (youtubeParser.checkLink(query, true)) {
 			videoID = query;
 		}
 
 		if (videoID) {
-			data = await sb.Utils.modules.linkParser.fetchData(videoID);
+			data = await youtubeParser.fetchData(videoID);
 		}
 
 		if (!data) {
@@ -125,7 +125,7 @@ module.exports = {
 				};
 			}
 
-			data = await sb.Utils.modules.linkParser.fetchData(track.ID);
+			data = await youtubeParser.fetchData(track.ID);
 		}
 
 		const published = new sb.Date(data.created).format("Y-m-d");
