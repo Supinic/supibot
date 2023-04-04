@@ -748,6 +748,10 @@
     "type": "additional"
   },
   {
+    "name": "Snipe",
+    "type": "main"
+  },
+  {
     "name": "Soulrend",
     "type": "main"
   },
@@ -888,12 +892,24 @@
     "type": "main"
   },
   {
+    "name": "Vaal Absolution",
+    "type": "main"
+  },
+  {
     "name": "Vaal Ancestral Warchief",
+    "type": "main"
+  },
+  {
+    "name": "Vaal Animate Weapon",
     "type": "main"
   },
   {
     "name": "Vaal Arc",
     "type": "main"
+  },
+  {
+    "name": "Vaal Arctic Armour",
+    "type": "additional"
   },
   {
     "name": "Vaal Blade Vortex",
@@ -928,6 +944,10 @@
     "type": "additional"
   },
   {
+    "name": "Vaal Domination",
+    "type": "main"
+  },
+  {
     "name": "Vaal Double Strike",
     "type": "main"
   },
@@ -938,6 +958,10 @@
   {
     "name": "Vaal Fireball",
     "type": "main"
+  },
+  {
+    "name": "Vaal Firestorm",
+    "type": "additional"
   },
   {
     "name": "Vaal Flameblast",
@@ -964,6 +988,10 @@
     "type": "main"
   },
   {
+    "name": "Vaal Ice Shot",
+    "type": "main"
+  },
+  {
     "name": "Vaal Impurity of Fire",
     "type": "additional"
   },
@@ -974,6 +1002,10 @@
   {
     "name": "Vaal Impurity of Lightning",
     "type": "additional"
+  },
+  {
+    "name": "Vaal Lightning Arrow",
+    "type": "main"
   },
   {
     "name": "Vaal Lightning Strike",
@@ -996,8 +1028,16 @@
     "type": "main"
   },
   {
+    "name": "Vaal Reap",
+    "type": "main"
+  },
+  {
     "name": "Vaal Reave",
     "type": "main"
+  },
+  {
+    "name": "Vaal Rejuvenation Totem",
+    "type": "additional"
   },
   {
     "name": "Vaal Righteous Fire",
