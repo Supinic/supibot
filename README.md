@@ -27,7 +27,7 @@ It's possible to host your own instance of supibot. You can either set it up as 
 
 Follow [the guide](docs/setup.md) if you are interested, and contact me if you have any questions or notes.
 
-Also check out the [modules configuration file](./modules-config-default.json) for a brief guide on how to enable/disable a specific set of commands or other modules. 
+Also check out the [modules configuration file](./config-default.json) for a brief guide on how to enable/disable a specific set of commands or other modules. 
 
 ## DankChat integration
 The [DankChat](https://github.com/flex3r/DankChat) mobile application for Twitch chat uses Supibot's API in order to hint its commands in any channel Supibot is actively in!
