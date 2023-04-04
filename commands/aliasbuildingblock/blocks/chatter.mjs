@@ -40,7 +40,7 @@ export const definition = {
 			}
 		}
 
-		sb.CooldownManager.set(context.channel.ID, context.user.ID, "abb-chatter", commandData.Cooldown);
+		sb.CooldownManager.set(context.channel.ID, context.user.ID, "abb-chatter", 10_000);
 		return {
 			reply: sb.Utils.randArray(users)
 		};
