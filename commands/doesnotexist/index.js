@@ -70,7 +70,7 @@ module.exports = {
 					types: ["person"],
 					execute: async (context, type) => {
 						const response = await sb.Got("GenericAPI", {
-							url: "https://this-person-does-not-exist.com/en",
+							url: "https://this-person-does-not-exist.com/new",
 							searchParams: {
 								new: sb.Date.now(),
 								gender: "all", // male, female
