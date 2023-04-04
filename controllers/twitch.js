@@ -1151,17 +1151,17 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	async fetchUserList (channelIdentifier) {
-		const { statusCode, body: data } = await sb.Got("GenericAPI", {
-			url: `https://tmi.twitch.tv/group/user/${channelIdentifier}/chatters`,
-			responseType: "json",
-			throwHttpErrors: false
-		});
+		const channelData = sb.Channel.get(channelIdentifier);
+		const fullUserList = [...sb.User.data.values()].filter(i => i.Twitch_ID);
 
-		if (statusCode !== 200) {
-			return [];
-		}
-
-		return Object.values(data.chatters).flat();
+		return await sb.Query.getRecordset(rs => rs
+			.select("User_Alias.Name AS Name")
+			.from("chat_data", "Message_Meta_User_Alias")
+			.join("chat_data", "User_Alias")
+			.where("Channel = %n", channelData.ID)
+			.where("User_Alias IN %n+", fullUserList.map(i => i.ID))
+			.flat("Name")
+		);
 	}
 
 	async prepareMessage (message, channel, options) {
