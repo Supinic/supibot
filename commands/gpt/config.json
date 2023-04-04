@@ -12,11 +12,11 @@
   },
   "userTokenLimits": {
     "regular": {
-      "hourly": 150,
+      "hourly": 250,
       "daily": 1000
     },
     "subscriber": {
-      "hourly": 1500,
+      "hourly": 2500,
       "daily": 10000
     }
   },
