@@ -69,46 +69,65 @@ module.exports = {
 			};
 		}
 
-		const tracks = await sb.Utils.searchYoutube(
-			query,
-			/** @type {string} */
-			sb.Config.get("API_GOOGLE_YOUTUBE"),
-			{
-				maxResults: indexThreshold
+		let data;
+		let videoID;
+		const { linkParser } = sb.Utils.modules;
+		const parser = linkParser.getParser("youtube");
+
+		if (parser.checkLink(query, false)) {
+			videoID = parser.parseLink(query);
+		}
+		else if (parser.checkLink(query, true)) {
+			videoID = query;
+		}
+
+		if (videoID) {
+			data = await sb.Utils.modules.linkParser.fetchData(videoID);
+		}
+
+		if (!data) {
+			const tracks = await sb.Utils.searchYoutube(
+				query,
+				/** @type {string} */
+				sb.Config.get("API_GOOGLE_YOUTUBE"),
+				{
+					maxResults: indexThreshold
+				}
+			);
+
+			if (cacheRecordExists) {
+				await this.setCacheData("search-amount-today", searchAmountToday, {
+					keepTTL: true
+				});
 			}
-		);
+			else {
+				await this.setCacheData("search-amount-today", searchAmountToday, {
+					expiresAt: getClosestPacificMidnight()
+				});
+			}
 
-		if (cacheRecordExists) {
-			await this.setCacheData("search-amount-today", searchAmountToday, {
-				keepTTL: true
-			});
-		}
-		else {
-			await this.setCacheData("search-amount-today", searchAmountToday, {
-				expiresAt: getClosestPacificMidnight()
-			});
-		}
+			const track = tracks[index];
+			if (!track) {
+				const message = (tracks.length > 0 && typeof context.params.index === "number")
+					? `There is no such video for your provided index! Up to ${tracks.length} videos are available.`
+					: "No videos found for that query!";
 
-		const track = tracks[index];
-		if (!track) {
-			const message = (tracks.length > 0 && typeof context.params.index === "number")
-				? `There is no such video for your provided index! Up to ${tracks.length} videos are available.`
-				: "No videos found for that query!";
+				return {
+					success: false,
+					reply: message
+				};
+			}
 
-			return {
-				success: false,
-				reply: message
-			};
-		}
+			const link = `https://youtu.be/${track.ID}`;
+			if (context.params.linkOnly) {
+				return {
+					reply: link
+				};
+			}
 
-		const link = `https://youtu.be/${track.ID}`;
-		if (context.params.linkOnly) {
-			return {
-				reply: link
-			};
+			data = await sb.Utils.modules.linkParser.fetchData(track.ID);
 		}
 
-		const data = await sb.Utils.modules.linkParser.fetchData(link);
 		const published = new sb.Date(data.created).format("Y-m-d");
 		const durationString = (data.duration === null)
 			? ""
@@ -121,7 +140,7 @@ module.exports = {
 				${sb.Utils.groupDigits(data.views)} views,
 				published on ${published}.
 				${durationString}
-				${link}
+				${data.link}
 			`
 		};
 	}),
