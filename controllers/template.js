@@ -189,4 +189,5 @@ module.exports = class Controller {
  * @property {string} type
  * @property {boolean} global
  * @property {boolean} animated
+ * @property {boolean} zeroWidth
  */

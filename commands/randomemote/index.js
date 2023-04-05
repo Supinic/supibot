@@ -16,7 +16,8 @@ module.exports = {
 		{ name: "repeat", type: "boolean" },
 		{ name: "regex", type: "regex" },
 		{ name: "sub", type: "boolean" },
-		{ name: "twitch", type: "boolean" }
+		{ name: "twitch", type: "boolean" },
+		{ name: "zeroWidth", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
@@ -48,7 +49,8 @@ module.exports = {
 			follower,
 			global: globalEmotes,
 			sub,
-			twitch
+			twitch,
+			zeroWidth
 		} = context.params;
 
 		let channelPrefixRegex;
@@ -103,6 +105,9 @@ module.exports = {
 
 		emotes = emotes.filter(i => {
 			if (animated === true && !i.animated || animated === false && i.animated) {
+				return false;
+			}
+			if (zeroWidth === true && !i.zeroWidth || zeroWidth === false && i.zeroWidth) {
 				return false;
 			}
 			if (bttv === true && i.type !== "bttv" || bttv === false && i.type === "bttv") {
@@ -203,6 +208,7 @@ module.exports = {
 
 			`<code>${prefix}rem animated:true</code>`,
 			`<code>${prefix}rem global:true</code>`,
+			`<code>${prefix}rem zeroWidth:true</code>`,
 			"Posts an emote, which must have the attribute specified",
 			"E.g. <code>animated:true</code> will <u>only</u> post random animated emotes.",
 			"These can be combined with types.",
@@ -210,6 +216,7 @@ module.exports = {
 
 			`<code>${prefix}rem animated:false</code>`,
 			`<code>${prefix}rem global:false</code>`,
+			`<code>${prefix}rem zeroWidth:false</code>`,
 			"Posts an emote, which must <u>not</u> have the attribute specified",
 			"E.g. <code>global:false</code> will random non-global emotes.",
 			"",

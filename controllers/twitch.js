@@ -1298,7 +1298,8 @@ module.exports = class TwitchController extends require("./template.js") {
 			name: i.code,
 			type: "bttv",
 			global: false,
-			animated: (i.imageType === "gif")
+			animated: (i.imageType === "gif"),
+			zeroWidth: false
 		}));
 	}
 
@@ -1326,7 +1327,8 @@ module.exports = class TwitchController extends require("./template.js") {
 			name: i.name,
 			type: "ffz",
 			global: false,
-			animated: false
+			animated: false,
+			zeroWidth: false
 		}));
 	}
 
@@ -1353,7 +1355,8 @@ module.exports = class TwitchController extends require("./template.js") {
 			name: i.name,
 			type: "7tv",
 			global: false,
-			animated: (typeof i.animated === "boolean") ? i.animated : null
+			animated: (typeof i.animated === "boolean") ? i.animated : null,
+			zeroWidth: i.visibility_simple.includes("ZERO_WIDTH")
 		}));
 	}
 
