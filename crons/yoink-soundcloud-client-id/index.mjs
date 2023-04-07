@@ -25,7 +25,13 @@ export const definition = {
 		const elements = $("body > script[crossorigin]");
 		const scripts = Array.from(elements).map(i => $(i).attr("src"));
 		for (const script of scripts) {
-			const scriptSource = await sb.Got("FakeAgent", script).text();
+			const scriptResponse = await sb.Got("FakeAgent", {
+				url: script,
+				responseType: "text"
+			});
+
+			const scriptSource = scriptResponse.body;
+
 			const match = scriptSource.match(/client_id=(\w+?)\W/);
 			if (!match) {
 				continue;
