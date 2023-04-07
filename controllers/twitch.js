@@ -1153,6 +1153,9 @@ module.exports = class TwitchController extends require("./template.js") {
 	async fetchUserList (channelIdentifier) {
 		const channelData = sb.Channel.get(channelIdentifier);
 		const fullUserList = [...sb.User.data.values()].filter(i => i.Twitch_ID);
+		if (fullUserList.length === 0) {
+			return [];
+		}
 
 		return await sb.Query.getRecordset(rs => rs
 			.select("User_Alias.Name AS Name")
