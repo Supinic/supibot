@@ -31,7 +31,7 @@ module.exports = {
 			const match = input.match(userInstanceRegex) ?? input.match(userLinkRegex);
 			if (match) {
 				instance = match.groups.instance;
-				user = match.groups.user;
+				user = match.groups.username;
 			}
 		}
 
