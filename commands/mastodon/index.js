@@ -26,7 +26,7 @@ module.exports = {
 		}
 		else if (input) {
 			const userInstanceRegex = /^@(?<username>\w+)@(?<instance>\w+)$/;
-			const userLinkRegex = /^https:\/\/@(?<instance>\w+)\/@(?<username>\w+)@$/;
+			const userLinkRegex = /^https:\/\/(?<instance>[\w.]+)\/@(?<username>\w+)$/;
 
 			const match = input.match(userInstanceRegex) ?? input.match(userLinkRegex);
 			if (match) {
