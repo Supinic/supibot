@@ -38,11 +38,11 @@ const getTokenUsage = async (userData) => {
 		const timestamp = Number(rawCacheData[i + 1]);
 
 		if (timestamp >= lastHour) {
-			firstDailyUsage = Math.min(firstDailyUsage, timestamp);
+			firstHourlyUsage = Math.min(firstHourlyUsage, timestamp);
 			hourlyTokens += value;
 		}
 		if (timestamp >= yesterday) {
-			firstHourlyUsage = Math.min(firstHourlyUsage, timestamp);
+			firstDailyUsage = Math.min(firstDailyUsage, timestamp);
 			dailyTokens += value;
 		}
 
