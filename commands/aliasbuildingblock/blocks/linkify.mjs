@@ -3,7 +3,8 @@ export const definition = {
 	aliases: [],
 	description: "If the input is longer than the default (or provided) message length limit, posts a Hastebin instead. Otherwise, just re-posts the input again",
 	examples: [
-		["$abb linkify", "some long text that will most likely never fit into a single message"]
+		["$abb linkify short text", "short text"],
+		["$abb linkify some long text that will most likely never fit into a single message", "(hastebin link)"]
 	],
 	execute: async (context, ...args) => {
 		const limit = context.params.limit ?? context.channel?.Message_Limit ?? context.platform.Message_Limit;
