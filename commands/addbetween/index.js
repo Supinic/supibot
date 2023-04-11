@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 30000,
 	Description: "Fills the message provided with the word (usually an emote) provided as the first argument.",
 	Flags: ["external-input","mention","pipe"],
-	Params: null,
+	Params: [
+		{ name: "sentences", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function addBetween (context, word, ...args) {
@@ -15,17 +17,22 @@ module.exports = {
 				reply: "Both the word and the message must be provided!"
 			};
 		}
-	
-		if (args.length === 1) {
-			args = Array.from(args[0]);
+
+		let nodes = args;
+		if (context.params.sentences) {
+			nodes = args.join(" ").split(/[?!.]/);
 		}
-	
+		else if (args.length === 1) {
+			nodes = Array.from(args[0]);
+		}
+
 		const result = [];
-		for (const messageWord of args) {
+		for (const messageWord of nodes) {
 			result.push(word, messageWord);
 		}
-	
+
 		result.push(word);
+
 		return {
 			reply: result.join(" "),
 			cooldown: {
