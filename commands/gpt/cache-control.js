@@ -13,8 +13,8 @@ const removeRedundantSortedListValues = async (cacheKey) => {
  * summary: Record<string, number>,
  * dailyTokens: number,
  * hourlyTokens: number,
- * nextDailyReset: number,
- * nextHourlyReset: number
+ * firstHourlyUsage: number,
+ * firstDailyUsage: number
  * }>}
  */
 const getTokenUsage = async (userData) => {
@@ -29,8 +29,8 @@ const getTokenUsage = async (userData) => {
 	// Retrieve the cached values along with their timestamps
 	let hourlyTokens = 0;
 	let dailyTokens = 0;
-	let nextHourlyReset = Infinity;
-	let nextDailyReset = Infinity;
+	let firstHourlyUsage = Infinity;
+	let firstDailyUsage = Infinity;
 	const summary = {};
 
 	for (let i = 0; i < rawCacheData.length; i += 2) {
@@ -38,11 +38,11 @@ const getTokenUsage = async (userData) => {
 		const timestamp = Number(rawCacheData[i + 1]);
 
 		if (timestamp >= lastHour) {
-			nextDailyReset = Math.min(nextDailyReset, timestamp);
+			firstDailyUsage = Math.min(firstDailyUsage, timestamp);
 			hourlyTokens += value;
 		}
 		if (timestamp >= yesterday) {
-			nextHourlyReset = Math.min(nextHourlyReset, timestamp);
+			firstHourlyUsage = Math.min(firstHourlyUsage, timestamp);
 			dailyTokens += value;
 		}
 
@@ -52,8 +52,8 @@ const getTokenUsage = async (userData) => {
 	return {
 		hourlyTokens,
 		dailyTokens,
-		nextHourlyReset,
-		nextDailyReset,
+		firstHourlyUsage,
+		firstDailyUsage,
 		summary
 	};
 };
@@ -79,13 +79,14 @@ const checkLimits = async (userData) => {
 	const {
 		hourlyTokens,
 		dailyTokens,
-		nextDailyReset,
-		nextHourlyReset
+		firstHourlyUsage,
+		firstDailyUsage
 	} = await getTokenUsage(userData);
 
 	const userLimits = await determineUserLimits(userData);
 
 	if (dailyTokens >= userLimits.daily) {
+		const nextDailyReset = new sb.Date(firstDailyUsage).addDays(1);
 		const delta = (nextDailyReset !== Infinity)
 			? `${sb.Utils.timeDelta(nextDailyReset)}`
 			: "later";
@@ -96,6 +97,7 @@ const checkLimits = async (userData) => {
 		};
 	}
 	else if (hourlyTokens >= userLimits.hourly) {
+		const nextHourlyReset = new sb.Date(firstHourlyUsage).addHours(1);
 		const delta = (nextHourlyReset !== Infinity)
 			? `${sb.Utils.timeDelta(nextHourlyReset)}`
 			: "later";
