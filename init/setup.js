@@ -263,7 +263,7 @@
 		let skipped = false;
 
 		do {
-			port = await ask("Select a port for the bot internal API:");
+			port = await ask("Select a port for the bot internal API. This is not required and can be skipped - a random port will be generated then.");
 			skipped = Boolean(port);
 			port = Number(port);
 		} while (!skipped || !Number.isFinite(port) || port < 0 || port > 65535 || Math.trunc(port) !== port);
