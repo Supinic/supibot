@@ -63,16 +63,16 @@ const checkLimits = async (userData) => {
 	const { hourlyTokens, dailyTokens } = await getTokenUsage(userData);
 	const userLimits = await determineUserLimits(userData);
 
-	if (hourlyTokens >= userLimits.hourly) {
-		return {
-			success: false,
-			reply: `You have used up all your ChatGPT tokens for this hour! Try again later.`
-		};
-	}
-	else if (dailyTokens >= userLimits.daily) {
+	if (dailyTokens >= userLimits.daily) {
 		return {
 			success: false,
 			reply: `You have used up all your ChatGPT tokens for today! Try again later.`
+		};
+	}
+	else if (hourlyTokens >= userLimits.hourly) {
+		return {
+			success: false,
+			reply: `You have used up all your ChatGPT tokens for this hour! Try again later.`
 		};
 	}
 
