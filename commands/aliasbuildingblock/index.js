@@ -67,7 +67,7 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { blocks } = this.staticData;
+		const { blocks } = await import(`./blocks/index.mjs`);
 		const list = blocks.map(i => {
 			const aliases = (i.aliases.length > 0)
 				? `(${i.aliases.join(", ")})`
