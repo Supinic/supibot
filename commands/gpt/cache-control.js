@@ -9,7 +9,13 @@ const removeRedundantSortedListValues = async (cacheKey) => {
 
 /**
  * @param {User} userData
- * @returns {Promise<{summary: Record<string, number>, dailyTokens: number, hourlyTokens: number}>}
+ * @returns {Promise<{
+ * summary: Record<string, number>,
+ * dailyTokens: number,
+ * hourlyTokens: number,
+ * nextDailyReset: number,
+ * nextHourlyReset: number
+ * }>}
  */
 const getTokenUsage = async (userData) => {
 	const cacheKey = createCacheKey(userData.ID);
@@ -23,6 +29,8 @@ const getTokenUsage = async (userData) => {
 	// Retrieve the cached values along with their timestamps
 	let hourlyTokens = 0;
 	let dailyTokens = 0;
+	let nextHourlyReset = Infinity;
+	let nextDailyReset = Infinity;
 	const summary = {};
 
 	for (let i = 0; i < rawCacheData.length; i += 2) {
@@ -30,9 +38,11 @@ const getTokenUsage = async (userData) => {
 		const timestamp = Number(rawCacheData[i + 1]);
 
 		if (timestamp >= lastHour) {
+			nextDailyReset = Math.min(nextDailyReset, timestamp);
 			hourlyTokens += value;
 		}
 		if (timestamp >= yesterday) {
+			nextHourlyReset = Math.min(nextHourlyReset, timestamp);
 			dailyTokens += value;
 		}
 
@@ -42,6 +52,8 @@ const getTokenUsage = async (userData) => {
 	return {
 		hourlyTokens,
 		dailyTokens,
+		nextHourlyReset,
+		nextDailyReset,
 		summary
 	};
 };
@@ -59,20 +71,38 @@ const determineUserLimits = async (userData) => {
 		: ChatGptConfig.userTokenLimits.regular;
 };
 
+/**
+ * @param userData
+ * @returns {Promise<{success: true}|{success: false, reply: string}>}
+ */
 const checkLimits = async (userData) => {
-	const { hourlyTokens, dailyTokens } = await getTokenUsage(userData);
+	const {
+		hourlyTokens,
+		dailyTokens,
+		nextDailyReset,
+		nextHourlyReset
+	} = await getTokenUsage(userData);
+
 	const userLimits = await determineUserLimits(userData);
 
 	if (dailyTokens >= userLimits.daily) {
+		const delta = (nextDailyReset !== Infinity)
+			? `${sb.Utils.timeDelta(nextDailyReset)}`
+			: "later";
+
 		return {
 			success: false,
-			reply: `You have used up all your ChatGPT tokens for today! Try again later.`
+			reply: `You have used up all your ChatGPT tokens for today! Try again ${delta}.`
 		};
 	}
 	else if (hourlyTokens >= userLimits.hourly) {
+		const delta = (nextHourlyReset !== Infinity)
+			? `${sb.Utils.timeDelta(nextHourlyReset)}`
+			: "later";
+
 		return {
 			success: false,
-			reply: `You have used up all your ChatGPT tokens for this hour! Try again later.`
+			reply: `You have used up all your ChatGPT tokens for this hour! Try again ${delta}.`
 		};
 	}
 
