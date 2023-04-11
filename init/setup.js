@@ -241,6 +241,66 @@
 		}
 	} while (!done);
 
+	const adminUsername = await ask("Select an administrator username, or just send empty input to skip:");
+	if (adminUsername) {
+		const userRow = await sb.Query.getRow("chat_data", "User_Alias");
+		await userRow.load(adminUsername, true);
+		if (!userRow.loaded) {
+			userRow.values.Name = adminUsername;
+			await userRow.save({ skipLoad: false });
+
+			console.log("Successfully set up administrator user object");
+		}
+
+		const filteredCommands = ["ban", "debug", "reload"];
+		for (const command of filteredCommands) {
+			const commandRow = await sb.Query.getRow("chat_data", "Command");
+			await commandRow.load(command, true);
+			if (!commandRow.loaded) {
+				commandRow.values.Name = command;
+				await commandRow.save({ skipLoad: true });
+			}
+
+			const filterExists = await sb.Query.getRecordset(rs => rs
+				.select("ID")
+				.from("chat_data", "Filter")
+				.where("User_Alias = %n", userRow.values.ID)
+				.where("Command = %s", command)
+				.where("Type = %s", "Whitelist")
+				.where("Active = %b", true)
+				.single()
+				.flat("ID")
+			);
+
+			if (!filterExists) {
+				const filterRow = await sb.Query.getRow("chat_data", "Filter");
+				filterRow.setValues({
+					User_Alias: userRow.values.ID,
+					Command: command,
+					Type: "Whitelist",
+					Issued_By: userRow.values.ID,
+					Active: true
+				});
+
+				await filterRow.save({
+					ignore: true,
+					skipLoad: true
+				});
+
+				console.log(`Enabled the use of the "${command}" command for administrator`);
+			}
+		}
+
+		const userDataRow = await sb.Query.getRow("chat_data", "User_Alias_Data");
+		userDataRow.setValues({
+			Property: "administrator",
+			Value: "true"
+		});
+
+		await userDataRow.save({ ignore: true, skipLoad: true });
+		console.log(`Set up the "administrator" flag to "true"`);
+	}
+
 	const envCommandPrefix = process.env.COMMAND_PREFIX;
 	if (!envCommandPrefix) {
 		const commandPrefix = await ask("Select a command prefix:");
