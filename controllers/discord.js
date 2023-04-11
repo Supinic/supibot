@@ -40,6 +40,12 @@ module.exports = class DiscordController extends require("./template.js") {
 			});
 		}
 
+		this.#initClient();
+
+		this.data.permissions = PermissionFlagsBits;
+	}
+
+	#initClient () {
 		this.client = new Client({
 			intents: [
 				GatewayIntentBits.Guilds,
@@ -61,8 +67,6 @@ module.exports = class DiscordController extends require("./template.js") {
 		/** @type {string|undefined} */
 		const token = sb.Config.get("DISCORD_BOT_TOKEN");
 		this.client.login(token);
-
-		this.data.permissions = PermissionFlagsBits;
 	}
 
 	initListeners () {
@@ -781,6 +785,20 @@ module.exports = class DiscordController extends require("./template.js") {
 		return (guildMember instanceof GuildMember)
 			? `<@${userData.Discord_ID}>`
 			: userData.Name;
+	}
+
+	restart () {
+		sb.Logger.log("Discord.Restart");
+
+		if (this.client) {
+			for (const eventName of this.client._events) {
+				this.client.off(eventName);
+			}
+
+			this.client.destroy();
+		}
+
+		this.#initClient();
 	}
 
 	static removeEmoteTags (message) {
