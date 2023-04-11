@@ -7,7 +7,8 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "instance", type: "string" },
-		{ name: "random", type: "boolean" }
+		{ name: "random", type: "boolean" },
+		{ name: "textOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -61,7 +62,7 @@ module.exports = {
 			};
 		}
 
-		// Try and find nodeinfo response
+		// Try and find node-info response
 		const nodeInfoResponse = await sb.Got("GenericAPI", {
 			url: nodeInfoUrl
 		});
@@ -152,6 +153,12 @@ module.exports = {
 		}
 		else {
 			post = data.posts[0];
+		}
+
+		if (context.params.textOnly) {
+			return {
+				reply: String(post.content)
+			};
 		}
 
 		const delta = sb.Utils.timeDelta(new sb.Date(post.date));
