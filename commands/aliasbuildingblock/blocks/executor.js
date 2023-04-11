@@ -1,4 +1,4 @@
-export const definition = {
+module.exports = {
 	name: "executor",
 	aliases: ["self"],
 	description: "Prints your username.",

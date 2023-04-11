@@ -1,4 +1,4 @@
-export const definition = {
+module.exports = {
 	name: "chatter",
 	aliases: [],
 	description: "Selects a random chatter within the channel, and outputs their name. Not applicable in PMs. Use the \"excludeSelf:true\" parameter to exclude yourself from the random chatter roll",

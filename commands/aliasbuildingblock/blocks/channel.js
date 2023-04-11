@@ -1,4 +1,4 @@
-export const definition = {
+module.exports = {
 	name: "channel",
 	aliases: [],
 	description: "Prints the current channel, or \"(none\") if in PMs.",

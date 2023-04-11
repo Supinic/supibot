@@ -1,4 +1,4 @@
-export const definition = {
+module.exports = {
 	name: "argumentsCheck",
 	aliases: ["ac", "argCheck"],
 	description: "Takes a number range - expected amount of arguments as first argument. If the amount of actual arguments falls in the range, simply returns output; if not, returns an error. You can specify a custom error message with the parameter em/errorMessage, where your underscores will be replaced by spaces.",

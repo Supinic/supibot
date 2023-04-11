@@ -1,4 +1,4 @@
-export const definition = {
+module.exports = {
 	name: "replace",
 	aliases: [],
 	description: "Takes two params: regex, replacement. For the given regex, replaces all matches with the provided value.",

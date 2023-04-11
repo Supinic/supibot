@@ -1,4 +1,4 @@
-export const definition = {
+module.exports = {
 	name: "say",
 	aliases: ["echo"],
 	description: "Simply outputs the input, with no changes.",

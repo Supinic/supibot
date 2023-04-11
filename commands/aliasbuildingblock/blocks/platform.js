@@ -1,4 +1,4 @@
-export const definition = {
+module.exports = {
 	name: "platform",
 	aliases: [],
 	description: "Prints the name of the current platform.",
