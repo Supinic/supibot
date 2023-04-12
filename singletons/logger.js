@@ -169,26 +169,29 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 						return;
 					}
 
-					await sb.Query.pool.batch(
-						sb.Utils.tag.trim `
-							INSERT INTO chat_data.Message_Meta_User_Alias
-							(User_Alias, Channel, Message_Count, Last_Message_Posted, Last_Message_Text)
-							VALUES (?, ?, ?, ?, ?)
-							ON DUPLICATE KEY UPDATE
-							Message_Count = Message_Count + VALUES(Message_Count),
-							Last_Message_Posted = VALUES(Last_Message_Posted),
-							Last_Message_Text = VALUES(Last_Message_Text)
-						`,
-						data.map(i => [
-							i.user,
-							i.channel,
-							i.count,
-							i.date,
-							i.message
-						])
-					);
-
-					this.lastSeenRunning = false;
+					try {
+						await sb.Query.pool.batch(
+							sb.Utils.tag.trim `
+								INSERT INTO chat_data.Message_Meta_User_Alias
+								(User_Alias, Channel, Message_Count, Last_Message_Posted, Last_Message_Text)
+								VALUES (?, ?, ?, ?, ?)
+								ON DUPLICATE KEY UPDATE
+								Message_Count = Message_Count + VALUES(Message_Count),
+								Last_Message_Posted = VALUES(Last_Message_Posted),
+								Last_Message_Text = VALUES(Last_Message_Text)
+							`,
+							data.map(i => [
+								i.user,
+								i.channel,
+								i.count,
+								i.date,
+								i.message
+							])
+						);
+					}
+					finally {
+						this.lastSeenRunning = false;
+					}
 				}
 			});
 			this.lastSeenCron.start();
