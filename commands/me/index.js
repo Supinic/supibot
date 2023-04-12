@@ -9,14 +9,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function me (context, ...args) {
-		if (!context.append.pipe) {
-			return {
-				success: false,
-				reply: "This command is only usable in pipes!",
-				cooldown: 5000
-			};
-		}
-		else if (!context.channel) {
+		if (!context.channel) {
 			return {
 				success: false,
 				reply: "This command is not usable in PMs!",
