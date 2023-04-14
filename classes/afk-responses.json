@@ -55,22 +55,22 @@
   "duration": {
     "gn": [
       {
-        "interval": [0, 15],
+        "interval": [0, 5],
         "responses": [
           "made up their mind about going to bed",
           "decided to stay and chat"
         ]
       },
       {
-        "interval": [15, 90],
+        "interval": [5, 15],
         "responses": [
-          "is checking their phone in bed",
+          "checked their phone in bed",
           "opened chat in bed",
           "is checking chat while tucked in"
         ]
       },
       {
-        "interval": [90, 300],
+        "interval": [15, 90],
         "responses": [
           "should have used $nap instead",
           "feels refreshed after a nap",
@@ -78,7 +78,7 @@
         ]
       },
       {
-        "interval": [300, 480],
+        "interval": [90, 300],
         "responses": [
           "just woke up",
           "didn't have a great sleep",
@@ -89,7 +89,7 @@
         ]
       },
       {
-        "interval": [480, 720],
+        "interval": [300, 480],
         "responses": [
           "just woke up",
           "feels well rested",
@@ -97,8 +97,7 @@
         ]
       },
       {
-        "interval": [720, 1440],
-        "minutes": 720,
+        "interval": [480, 720],
         "responses": [
           "finally woke up",
           "definitely overslept",
@@ -107,8 +106,7 @@
         ]
       },
       {
-        "interval": [1440, 43200],
-        "minutes": 1440,
+        "interval": [720, 1440],
         "responses": [
           "probably forgot to check chat the entire day",
           "spent the entire day in bed",
@@ -116,9 +114,16 @@
         ]
       },
       {
+        "interval": [1440, 43200],
+        "responses": [
+          "should have used $afk instead"
+        ]
+      },
+      {
         "interval": [43200, null],
         "responses": [
-          "woke up from a coma"
+          "woke up from a coma",
+          "had a good month's sleep"
         ]
       }
     ]
