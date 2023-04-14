@@ -94,7 +94,8 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 
 			for (const definition of durationDefinitions) {
 				const { interval, responses } = definition;
-				const [minimum = 0, maximum = Infinity] = interval;
+				const minimum = interval[0] ?? 0;
+				const maximum = interval[1] ?? Infinity;
 
 				if (minimum < minutesDelta && minutesDelta < maximum) {
 					statusMessage = sb.Utils.randArray(responses);
