@@ -112,7 +112,7 @@ const types = [
 	{
 		name: "superscript",
 		type: "map",
-		aliases: ["smol", "super"],
+		aliases: ["small", "smol", "super", "tiny"],
 		data: require("./definitions/superscript.json")
 	},
 	{
