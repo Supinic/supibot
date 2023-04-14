@@ -86,13 +86,37 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			.where("ID = %n", data.ID)
 		);
 
-		const status = sb.Utils.randArray(afkResponses[data.Status] ?? afkResponses[AwayFromKeyboard.defaultStatus]);
+		let statusMessage;
+		const status = data.Status ?? AwayFromKeyboard.defaultStatus; // Fallback for old AFKs without `Status` property
+		if (afkResponses.duration[status]) {
+			const minutesDelta = (sb.Date.now() - data.Started.getTime()) / 60_000;
+			const durationDefinitions = afkResponses.duration[status];
+
+			for (const definition of durationDefinitions) {
+				const { interval, responses } = definition;
+				const [minimum = 0, maximum = Infinity] = interval;
+
+				if (minimum < minutesDelta && minutesDelta < maximum) {
+					statusMessage = sb.Utils.randArray(responses);
+					break;
+				}
+			}
+
+			statusMessage ??= sb.Utils.randArray(afkResponses.static[status]);
+		}
+		else {
+			// Fallback for missing responses in the `afk-responses.json` file
+			const responses = afkResponses.static[status] ?? afkResponses.static[AwayFromKeyboard.defaultStatus];
+			statusMessage = sb.Utils.randArray(responses);
+		}
+
+		// const statusMessage = sb.Utils.randArray(afkResponses[data.Status] ?? afkResponses[AwayFromKeyboard.defaultStatus]);
 		if (!data.Silent) {
 			const userMention = await channelData.Platform.createUserMention(userData);
-			const message = `${userMention} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
+			const message = `${userMention} ${statusMessage}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
 
 			if (channelData.Mirror) {
-				const mirroredMessage = `${userData.Name} ${status}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
+				const mirroredMessage = `${userData.Name} ${statusMessage}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
 				await channelData.mirror(mirroredMessage, null, { commandUsed: false });
 			}
 
