@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["rafi","randomartflowimage"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Fetches a random Artflow.ai image along with the prompt that was used to generate it.",
+	Description: "Fetches an Artflow image that someone has generated before, based on your search. Generating new images is not supported anymore.",
 	Flags: ["developer","mention","non-nullable","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
