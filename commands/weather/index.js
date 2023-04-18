@@ -279,18 +279,33 @@ module.exports = {
 		}
 
 		if (context.params.radar) {
-			if (skipLocation) {
-				return {
-					success: false,
-					reply: `Cannot show the radar for your location, as you have set it to private!`
-				};
-			}
-
 			const lat = coords.lat.toFixed(4);
 			const lng = coords.lng.toFixed(4);
-			return {
-				reply: `Weather radar for ${formattedAddress}: https://www.windy.com/-Weather-radar-radar?radar,${lat},${lng},6,d:picker`
-			};
+			const message = `Weather radar for ${formattedAddress}: https://www.windy.com/-Weather-radar-radar?radar,${lat},${lng},6,d:picker`;
+			if (skipLocation) {
+				if (isOwnLocation) {
+					await context.platform.pm(
+						message,
+						context.user.Name,
+						context.channel
+					);
+
+					return {
+						reply: `I private messaged the radar link, as you have set your location to private.`
+					};
+				}
+				else {
+					return {
+						success: false,
+						reply: `Cannot show the radar for their location, as they have set it to private!`
+					};
+				}
+			}
+			else {
+				return {
+					reply: message
+				};
+			}
 		}
 
 		if (context.params.pollution) {
