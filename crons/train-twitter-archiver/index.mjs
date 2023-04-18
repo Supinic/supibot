@@ -16,7 +16,7 @@ export const definition = {
 			url: `twitter/timeline/trainwreckstv`
 		});
 
-		const tweets = response.body.timeline;
+		const tweets = response.body.data.timeline;
 		const existingUserIDs = await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("twitter", "User")
