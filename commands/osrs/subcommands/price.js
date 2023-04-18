@@ -58,7 +58,15 @@ module.exports = {
 		if (response.statusCode !== 200) {
 			return {
 				success: false,
-				reply: `Item not found!`
+				reply: `Item prices could not be fetched!`
+			};
+		}
+
+		const itemData = response.body.data[item.Game_ID];
+		if (!itemData) {
+			return {
+				success: false,
+				reply: `${item.Name} cannot be traded!`
 			};
 		}
 
@@ -71,7 +79,6 @@ module.exports = {
 			}
 		};
 
-		const itemData = response.body.data[item.Game_ID];
 		const { low, high } = itemData;
 		const priceString = (low === high)
 			? `${formatPrice(low)} gp`
@@ -84,10 +91,10 @@ module.exports = {
 		const wiki = `https://prices.runescape.wiki/osrs/item/${item.Game_ID}`;
 		return {
 			reply: sb.Utils.tag.trim `
-					Current price range of ${item.Name}: ${priceString};
-					HA value: ${highAlchValue} gp
-					${wiki}
-				`
+				Current price range of ${item.Name}: ${priceString};
+				HA value: ${highAlchValue} gp
+				${wiki}
+			`
 		};
 	}
 };
