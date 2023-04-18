@@ -12,36 +12,11 @@ export const definition = {
 			return;
 		}
 
-		const cmd = sb.Command.get("twitter");
-		if (!cmd) {
-			return;
-		}
-
-		const token = await cmd.getCacheData("bearer-token");
-		if (!token) {
-			return; // possibly run the command to re-init the token and fetch it again from Redis
-		}
-
-		const response = await sb.Got("GenericAPI", {
-			method: "GET",
-			url: "https://api.twitter.com/1.1/statuses/user_timeline.json",
-			responseType: "json",
-			throwHttpErrors: false,
-			headers: {
-				Authorization: `Bearer ${token}`
-			},
-			searchParams: {
-				screen_name: "trainwreckstv",
-				count: "100",
-				trim_user: "false",
-				include_rts: "false",
-				exclude_replies: "false",
-				tweet_mode: "extended"
-			}
+		const response = await sb.Got("Supinic", {
+			url: `twitter/timeline/trainwreckstv`
 		});
 
-		const tweets = response.body;
-
+		const tweets = response.body.timeline;
 		const existingUserIDs = await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("twitter", "User")
