@@ -19,6 +19,9 @@ module.exports = {
 			};
 		}
 
+		const { checkPartialCommandFilters } = require("./check-partials.js");
+		const allowedPartials = await checkPartialCommandFilters(context, args);
+
 		let languageCode = "en";
 		if (context.params.lang) {
 			languageCode = sb.Utils.modules.languageISO.getCode(context.params.lang, "iso6391");
@@ -30,42 +33,52 @@ module.exports = {
 			}
 		}
 
-		const dictPromise = sb.Got("GenericAPI", {
-			url: `https://api.dictionaryapi.dev/api/v1/entries/en/${query}`,
-			throwHttpErrors: false,
-			responseType: "json"
-		});
+		let dictPromise;
+		if (allowedPartials.dictionary) {
+			dictPromise = sb.Got("GenericAPI", {
+				url: `https://api.dictionaryapi.dev/api/v1/entries/en/${query}`,
+				throwHttpErrors: false,
+				responseType: "json"
+			});
+		}
 
-		const wikiPromise = sb.Got("GenericAPI" ,{
-			url: `https://${languageCode}.wikipedia.org/w/api.php`,
-			searchParams: {
-				format: "json",
-				action: "opensearch",
-				limit: "10",
-				profile: "fuzzy",
-				search: query
-			}
-		});
+		let wikiPromise;
+		let wiktionaryPromise;
+		if (allowedPartials.wiki) {
+			wikiPromise = sb.Got("GenericAPI", {
+				url: `https://${languageCode}.wikipedia.org/w/api.php`,
+				searchParams: {
+					format: "json",
+					action: "opensearch",
+					limit: "10",
+					profile: "fuzzy",
+					search: query
+				}
+			});
 
-		const wiktionaryPromise = sb.Got("FakeAgent", {
-			url: `https://${languageCode}.wiktionary.org/wiki/${encodeURIComponent(query)}`,
-			throwHttpErrors: false,
-			responseType: "text"
-		});
+			wiktionaryPromise = sb.Got("FakeAgent", {
+				url: `https://${languageCode}.wiktionary.org/wiki/${encodeURIComponent(query)}`,
+				throwHttpErrors: false,
+				responseType: "text"
+			});
+		}
 
-		const urbanPromise = sb.Got("GenericAPI", {
-			url: "https://api.urbandictionary.com/v0/define",
-			searchParams: {
-				term: query
-			},
-			throwHttpErrors: false,
-			retry: {
-				limit: 0
-			},
-			timeout: {
-				request: 5000
-			}
-		});
+		let urbanPromise;
+		if (allowedPartials.urban) {
+			urbanPromise = sb.Got("GenericAPI", {
+				url: "https://api.urbandictionary.com/v0/define",
+				searchParams: {
+					term: query
+				},
+				throwHttpErrors: false,
+				retry: {
+					limit: 0
+				},
+				timeout: {
+					request: 5000
+				}
+			});
+		}
 
 		const result = [];
 		const [dictData, wikiData, wiktionaryData, urbanData] = await Promise.allSettled([dictPromise, wikiPromise, wiktionaryPromise, urbanPromise]);
@@ -73,7 +86,7 @@ module.exports = {
 		// If a custom non-English language is used, the Dictionary and Urban API responses are skipped,
 		// as they do not support non-English languages.
 		if (languageCode === "en") {
-			if (dictData.status === "fulfilled" && dictData.value.statusCode === 200 && Array.isArray(dictData.value.body)) {
+			if (dictData.status === "fulfilled" && dictData.value?.statusCode === 200 && Array.isArray(dictData.value.body)) {
 				const data = dictData.value.body;
 				const records = data.flatMap(i => Object.entries(i.meaning));
 
@@ -87,7 +100,7 @@ module.exports = {
 				}
 			}
 
-			if (urbanData.status === "fulfilled" && urbanData.value.statusCode === 200) {
+			if (urbanData.status === "fulfilled" && urbanData.value?.statusCode === 200) {
 				const data = urbanData.value.body;
 				const [item] = data.list
 					.filter(i => i.word.toLowerCase() === query.toLowerCase())
@@ -100,7 +113,7 @@ module.exports = {
 			}
 		}
 
-		if (wikiData.status === "fulfilled" && wikiData.value.statusCode === 200) {
+		if (wikiData.status === "fulfilled" && wikiData.value?.statusCode === 200) {
 			const searchData = wikiData.value.body;
 			if (searchData[1].length !== 0) {
 				const data = await sb.Got("GenericAPI", {
@@ -127,11 +140,23 @@ module.exports = {
 			}
 		}
 
-		if (wiktionaryData.status === "fulfilled" && wiktionaryData.value.statusCode === 200) {
+		if (wiktionaryData.status === "fulfilled" && wiktionaryData.value?.statusCode === 200) {
 			result.push(`Wiktionary: ${wiktionaryData.value.url}`);
 		}
 
 		if (result.length === 0) {
+			const checkedCommands = Object.values(allowedPartials);
+			const filteredCommandsCount = checkedCommands.filter(i => i === false).length;
+			if (filteredCommandsCount === checkedCommands.length) {
+				return {
+					success: false,
+					reply: sb.Utils.tag.trim `
+						This command cannot fetch anything, because all of its sources have been filtered out!
+						Check this command's help article if you're unsure why.
+					`
+				};
+			}
+
 			return {
 				success: false,
 				reply: `No definitions found!`
@@ -151,6 +176,11 @@ module.exports = {
 			<li><a href="//en.wikipedia.org">Wikipedia</a></li>
 			<li><a href="//en.wiktionary.org">Wiktionary</a></li>		
 		</ul>`,
+		"",
+
+		"If any of the partial commands for the sources is banned in the current context, it will also apply to this command.",
+		"E.g. if you block <code>$urban</code> in a channel, this command will skip the UrbanDictionary part of its result.",
+		`This similarly applies to the other commands - <code>$dictionary</code> and <code>$wiki</code>.`,
 		"",
 
 		`<code>${prefix}define (term)</code>`,
