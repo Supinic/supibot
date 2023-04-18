@@ -56,20 +56,25 @@ const subcommands = [
 			}
 
 			if (!labyrinthData.date || labyrinthData.date.day !== new sb.Date().day) {
-				labyrinthData.date = new sb.Date().setTimezoneOffset(0);
-				const { statusCode, statusMessage, body: html } = await sb.Got("FakeAgent", {
+				const response = await sb.Got("FakeAgent", {
 					url: "https://poelab.com",
 					responseType: "text"
 				});
 
-				if (statusCode === 503) {
+				if (!response.ok) {
 					return {
 						success: false,
-						reply: `Poelab website returned error ${statusCode} - ${statusMessage}! Can't access labyrinth images.`
+						reply: sb.Utils.tag.trim `
+							Poelab website returned error ${response.statusCode}!
+							Can't access labyrinth images.
+							Cloudflare protection is possibly turned on.
+						`
 					};
 				}
 
-				const $ = sb.Utils.cheerio(html);
+				labyrinthData.date = new sb.Date().setTimezoneOffset(0);
+
+				const $ = sb.Utils.cheerio(response.body);
 				const links = Array.from($(".redLink").slice(0, 4).map((_, i) => i.attribs.href));
 
 				for (let i = 0; i < links.length; i++) {
