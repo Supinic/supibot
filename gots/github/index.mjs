@@ -1,19 +1,14 @@
 export const definition = {
 	name: "GitHub",
-	optionsType: "object",
-	headers: {
-		Authorization: sb.Config.get("API_GITHUB_KEY")
-	},
+	optionsType: "function",
 	options: (() => {
-		if (!sb.Config.has("API_GITHUB_KEY")) {
-			throw new Error("GitHub sb.Got instance cannot initialize - missing client-id");
+		if (!sb.Config.has("API_GITHUB_KEY", true)) {
+			return {
+				prefixUrl: "https://api.github.com"
+			};
 		}
 
-		const token = sb.Config.get("API_GITHUB_KEY", false);
-		if (!token) {
-			throw new Error("GitHub sb.Got instance cannot initialize - missing token");
-		}
-
+		const token = sb.Config.get("API_GITHUB_KEY", true);
 		return {
 			prefixUrl: "https://api.github.com",
 			headers: {
