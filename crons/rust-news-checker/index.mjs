@@ -1,6 +1,6 @@
 export const definition = {
 	Name: "rust-news-checker",
-	Expression: "0 0 * * * *",
+	Expression: "0 */5 * * * *",
 	Description: "Checks for new Rust (programming language) articles, and posts updates for subscribed users.",
 	Defer: null,
 	Type: "Bot",

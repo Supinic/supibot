@@ -1,6 +1,6 @@
 export const definition = {
 	Name: "osrs-news-checker",
-	Expression: "0 */15 * * * *",
+	Expression: "0 * * * * *",
 	Description: "Checks for new OSRS articles, and posts updates for subscribed users.",
 	Defer: null,
 	Type: "Bot",
