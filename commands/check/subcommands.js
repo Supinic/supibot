@@ -135,18 +135,6 @@ module.exports = (command) => [
 				const startDate = new sb.Date(new sb.Date().setDate(1));
 				const endDate = new sb.Date(startDate.year, startDate.month + 1, 1);
 
-				const tokenPromise = sb.Got("GenericAPI", {
-					method: "GET",
-					url: `https://api.openai.com/v1/usage`,
-					searchParams: {
-						start_date: startDate.format("Y-m-d"),
-						end_date: endDate.format("Y-m-d")
-					},
-					headers: {
-						Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
-					}
-				});
-
 				const spendingPromise = sb.Got("GenericAPI", {
 					method: "GET",
 					url: `https://api.openai.com/dashboard/billing/usage`,
@@ -167,25 +155,26 @@ module.exports = (command) => [
 					}
 				});
 
-				const [spendingResponse, tokenResponse, limitResponse] = await Promise.all([
+				const tokenDbPromise = await sb.Query.getRecordset(rs => rs
+					.select("COUNT(*) AS Count", "SUM(Input_Tokens) AS Input", "SUM(Output_Tokens) AS Output")
+					.from("data", "ChatGPT_Log")
+					.where("Executed >= %d AND Executed <= %d", startDate, endDate)
+					.single()
+				);
+
+				const [tokenResponse, spendingResponse, limitResponse] = await Promise.all([
+					tokenDbPromise,
 					spendingPromise,
-					tokenPromise,
 					limitPromise
 				]);
 
-				let requests = 0;
-				let inputTokens = 0;
-				let outputTokens = 0;
+				const requests = tokenResponse.Count;
+				const inputTokens = tokenResponse.Input;
+				const outputTokens = tokenResponse.Output;
 
 				// The `total_usage` field signifies the API cost in USD cents, so a division is necessary.
 				const total = sb.Utils.round(spendingResponse.body.total_usage / 100 , 2);
 				const prettyMonthName = new sb.Date().format("F Y");
-
-				for (const row of tokenResponse.body.data) {
-					requests += row.n_requests;
-					inputTokens += row.n_context_tokens_total;
-					outputTokens += row.n_generated_tokens_total;
-				}
 
 				let totalString = `for a total expenditure of ${total} USD`;
 				let limitExceededString = "";
