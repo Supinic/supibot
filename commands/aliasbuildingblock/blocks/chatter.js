@@ -3,7 +3,7 @@ module.exports = {
 	aliases: [],
 	description: "Selects a random chatter within the channel, and outputs their name. Not applicable in PMs. Use the \"excludeSelf:true\" parameter to exclude yourself from the random chatter roll",
 	examples: [
-		["$abb chatter", "(user))"], ["$abb chatter excludeSelf:true", "(someone who is not you)"]
+		["$abb chatter", "(user)"], ["$abb chatter excludeSelf:true", "(someone who is not you)"]
 	],
 	execute: async (context) => {
 		if (context.privateMessage) {
