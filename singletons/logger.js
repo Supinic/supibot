@@ -74,12 +74,18 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 						const key = keys[i];
 						if (this.batches[key].records?.length > 0) {
 							if (this.batches[key].records.length > this.loggingWarnLimit) {
-								// Think about dropping these messages if limit is exceeded
-								console.warn("Logging limit exceeded", {
-									key,
-									limit: this.loggingWarnLimit,
-									messages: this.batches[key].records.length
-								});
+								const length = this.batches[key].records.length;
+								const channelID = Number(key.split("-")[1]);
+								const channelData = sb.Channel.get(channelID);
+
+								await sb.Logger.log(
+									"Message.Warning",
+									`Channel "${channelData.Name}" exceeded logging limit ${length}/${this.loggingWarnLimit}`,
+									channelData,
+									null
+								);
+
+								continue;
 							}
 
 							setTimeout(
