@@ -1157,12 +1157,14 @@ module.exports = class TwitchController extends require("./template.js") {
 			return [];
 		}
 
+		const threshold = new sb.Date().addHours(-1);
 		return await sb.Query.getRecordset(rs => rs
 			.select("User_Alias.Name AS Name")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.join("chat_data", "User_Alias")
 			.where("Channel = %n", channelData.ID)
 			.where("User_Alias IN %n+", fullUserList.map(i => i.ID))
+			.where("Last_Message_Posted >= %d", threshold)
 			.flat("Name")
 		);
 	}
