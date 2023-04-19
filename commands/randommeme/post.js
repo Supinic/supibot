@@ -74,6 +74,10 @@ module.exports = class RedditPost {
 		return this.#url.includes("gallery");
 	}
 
+	hasVideo () {
+		return this.#url.includes("v.reddit") || this.#url.includes("youtu");
+	}
+
 	toString () {
 		const fixedUrl = this.#url
 			.replace("www.reddit.com", "old.reddit.com")

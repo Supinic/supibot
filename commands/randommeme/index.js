@@ -11,7 +11,8 @@ module.exports = {
 		{ name: "ignoreFlair", type: "string" },
 		{ name: "linkOnly", type: "boolean" },
 		{ name: "showFlairs", type: "boolean" },
-		{ name: "skipGalleries", type: "boolean" }
+		{ name: "skipGalleries", type: "boolean" },
+		{ name: "skipVideos", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -177,6 +178,15 @@ module.exports = {
 				};
 			}
 		}
+		if (context.params.skipVideos) {
+			validPosts = validPosts.filter(i => !i.hasVideo());
+			if (validPosts.length === 0) {
+				return {
+					success: false,
+					reply: `Subreddit ${input} has no posts that are not videos!`
+				};
+			}
+		}
 
 		const post = sb.Utils.randArray(validPosts);
 		if (!post) {
@@ -258,7 +268,12 @@ module.exports = {
 			"",
 
 			`<code>${prefix}rm skipGalleries:true</code>`,
-			"As before, but all links that are a Reddit gallery will be skipped and not posted."
+			"As before, but all links that are a Reddit gallery will be skipped and not posted.",
+			"",
+
+			`<code>${prefix}rm skipVideos:true</code>`,
+			"As before, but all links that are a Reddit video or a YouTube link will be skipped over.",
+			""
 		];
 	})
 };
