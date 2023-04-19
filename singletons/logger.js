@@ -85,6 +85,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 									null
 								);
 
+								this.batches[key].clear();
 								continue;
 							}
 
