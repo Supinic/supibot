@@ -5089,7 +5089,7 @@ __metadata:
 
 supi-core@supinic/supi-core:
   version: 2.2.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=d8421793dd3c90ca77b9f2e27a07779dc4a26dc5"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=77b2ae7ace2866fa0c0c176b653ad8f439e222a5"
   dependencies:
     async-markov: "github:supinic/async-markov"
     cheerio: ^1.0.0-rc.12
