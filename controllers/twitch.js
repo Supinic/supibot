@@ -205,9 +205,9 @@ module.exports = class TwitchController extends require("./template.js") {
 					const suggestionIDs = await sb.Query.getRecordset(rs => rs
 						.select("ID")
 						.from("data", "Suggestion")
-						.where("Category = %s", "Bot suggestion")
+						.where("Category = %s", "Bot addition")
 						.where("Status IS NULL")
-						.where("Text %like", result.login)
+						.where("Text %*like*", result.login)
 						.flat("ID")
 					);
 
