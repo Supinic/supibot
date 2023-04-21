@@ -51,10 +51,18 @@ module.exports = {
 			const response = await sb.Got("GenericAPI", {
 				url: "https://scrape.pastebin.com/api_scraping.php",
 				responseType: "json",
+				throwHttpErrors: false,
 				searchParams: {
 					limit: "100"
 				}
 			});
+			
+			if (!response.ok) {
+				return {
+					success: false,
+					reply: `Pastebin API encountered an error (code ${response.statusCode})! Try again later.`
+				};
+			}
 
 			data = response.body.map(i => ({
 				key: i.key,
