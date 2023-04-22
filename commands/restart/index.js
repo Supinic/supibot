@@ -14,7 +14,7 @@ module.exports = {
 		},
 		pm2: {
 			bot: "pm2 restart supibot",
-			web: "sudo pm2 restart web"
+			web: "pm2 restart web"
 		}
 	})),
 	Code: (async function restart (context, ...types) {
