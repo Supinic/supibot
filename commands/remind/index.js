@@ -278,9 +278,9 @@ module.exports = {
 			};
 		}
 
-		// If it is a timed reminder via PMs, only allow it if it a self reminder.
+		// If it is a timed reminder via PMs, only allow it if it is a self reminder.
 		// Scheduled reminders for users via PMs violate the philosophy of reminders.
-		if (context.privateMessage && delta !== 0) {
+		if (context.privateMessage && delta !== 0 && !context.params.after) {
 			if (targetUser === context.user) {
 				isPrivate = true;
 			}
