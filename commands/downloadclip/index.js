@@ -44,17 +44,52 @@ module.exports = {
 		}
 
 		const { clip, clipKey = "" } = response.body;
-		const [source] = clip.videoQualities.sort((a, b) => Number(b.quality) - Number(a.quality));
+		if (clip.broadcaster) {
+			const [source] = clip.videoQualities.sort((a, b) => Number(b.quality) - Number(a.quality));
 
-		await context.platform.pm(
-			`${source.sourceURL}${clipKey}`,
-			context.user.Name,
-			context.channel ?? null
-		);
+			await context.platform.pm(
+				`${source.sourceURL}${clipKey}`,
+				context.user.Name,
+				context.channel ?? null
+			);
 
-		return {
-			reply: "I whispered you the download link 🤫"
-		};
+			return {
+				reply: "I whispered you the download link 🤫"
+			};
+		}
+		else {
+			// Broadcaster is suspended, commence experimental mode
+			// Extract the "clip slug" from the preview image URL, if exists
+			const previewUrl = clip.tiny ?? clip.small ?? clip.medium;
+			if (!previewUrl) {
+				return {
+					success: false,
+					reply: `Streamer is banned! Couldn't reconstruct clip URL (preview url)`
+				};
+			}
+
+			const regex = /\.\w+?\/(.+?)-preview/;
+			const match = previewUrl.match(regex)?.[1];
+			if (!match) {
+				return {
+					success: false,
+					reply: `Streamer is banned! Couldn't reconstruct clip URL (no match)`
+				};
+			}
+
+			const baseUrl = "https://production.assets.clips.twitchcdn.net";
+			const experimentalUrl = `${baseUrl}/${match}.mp4${clipKey}`;
+
+			await context.platform.pm(
+				experimentalUrl,
+				context.user.Name,
+				context.channel ?? null
+			);
+
+			return {
+				reply: "The streamer is banned... but I whispered you an experimental download link that might work 🤫"
+			};
+		}
 	}),
 	Dynamic_Description: null
 };
