@@ -34,6 +34,20 @@ module.exports = {
 					reply: `No data found for player name "${user}"!`
 				};
 			}
+			else if (response.statusCode === 502 || response.statusCode === 503) {
+				const { message } = response.data.error;
+				return {
+					success: false,
+					reply: `Could not reach the OSRS API: ${response.statusCode} ${message}`
+				};
+			}
+			else if (!response.ok) {
+				const { message } = response.data.error;
+				return {
+					success: false,
+					reply: `Supinic OSRS API has failed: ${response.statusCode} ${message}`
+				};
+			}
 
 			data = response.body.data;
 			await sb.Cache.setByPrefix(key, data, {
