@@ -17,12 +17,6 @@ export const definition = {
 		});
 
 		const tweets = response.body.data.timeline;
-		const existingUserIDs = await sb.Query.getRecordset(rs => rs
-			.select("ID")
-			.from("twitter", "User")
-			.flat("ID")
-		);
-
 		const existingTweetIDs = await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("twitter", "Tweet")
@@ -36,58 +30,17 @@ export const definition = {
 				continue;
 			}
 
-			const { user } = tweet;
-			if (!existingUserIDs.includes(tweet.user_id_str)) {
-				const row = await sb.Query.getRow("twitter", "User");
-				row.setValues({
-					ID: user.id_str,
-					Account_Name: user.screen_name,
-					Display_Name: user.name,
-					Location: user.location
-				});
-
-				await row.save({ skipLoad: true });
-				existingUserIDs.push(user.id_str);
-			}
-
-			if (tweet.in_reply_to_user_id_str && !existingUserIDs.includes(tweet.in_reply_to_user_id_str)) {
-				const response = await sb.Got("GenericAPI", {
-					method: "GET",
-					url: "https://api.twitter.com/1.1/users/show.json",
-					responseType: "json",
-					throwHttpErrors: false,
-					headers: {
-						Authorization: `Bearer ${token}`
-					},
-					searchParams: {
-						user_id: tweet.in_reply_to_user_id_str
-					}
-				});
-
-				const user = response.body;
-				const row = await sb.Query.getRow("twitter", "User");
-				row.setValues({
-					ID: user.id_str,
-					Account_Name: user.screen_name,
-					Display_Name: user.name,
-					Location: user.location
-				});
-
-				await row.save({ skipLoad: true });
-				existingUserIDs.push(user.id_str);
-			}
-
 			const row = await sb.Query.getRow("twitter", "Tweet");
 			row.setValues({
 				ID,
-				User: user.id_str,
+				User: tweet.user_id_str,
 				Text: sb.Utils.fixHTML(tweet.full_text),
 				Created: new sb.Date(tweet.created_at),
-				Reply_Tweet: tweet.in_reply_to_status_id_str,
-				Reply_User: tweet.in_reply_to_user_id_str,
+				Reply_Tweet: null,
+				Reply_User: null,
 				Language: tweet.lang,
-				Source: tweet.source,
-				Place: tweet.place
+				Source: null,
+				Place: null
 			});
 
 			await row.save({ skipLoad: true });
