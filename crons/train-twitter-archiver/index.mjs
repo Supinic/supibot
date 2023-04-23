@@ -37,7 +37,7 @@ export const definition = {
 			}
 
 			const { user } = tweet;
-			if (!existingUserIDs.includes(tweet.user.id_str)) {
+			if (!existingUserIDs.includes(tweet.user_id_str)) {
 				const row = await sb.Query.getRow("twitter", "User");
 				row.setValues({
 					ID: user.id_str,
