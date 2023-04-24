@@ -788,11 +788,9 @@ module.exports = class DiscordController extends require("./template.js") {
 	}
 
 	restart () {
-		sb.Logger.log("Discord.Restart");
-
 		if (this.client) {
-			for (const eventName of this.client._events) {
-				this.client.off(eventName);
+			for (const [eventName, listener] of Object.entries(this.client._events)) {
+				this.client.off(eventName, listener);
 			}
 
 			this.client.destroy();
