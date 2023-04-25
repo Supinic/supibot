@@ -203,7 +203,7 @@ declare namespace DankDebug {
 	export const executor: User["Name"];
 
 	/**
-	 * The username of the user the command was executed by.
+	 * The internal user ID of the user the command was executed by.
 	 */
 	export const executorID: User["ID"];
 
