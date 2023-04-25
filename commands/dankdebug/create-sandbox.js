@@ -151,6 +151,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 		channel: context.channel?.Name ?? "(none)",
 		console: undefined,
 		executor: context.user.Name,
+		executorID: context.user.ID,
 		platform: context.platform.Name,
 		query: sb.Utils.deepFreeze({
 			run: async (queryName, ...args) => {

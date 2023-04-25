@@ -1,5 +1,8 @@
 import type { JSONifiable, Emote } from 'supi-core/@types/globals';
 import type { Command, Parameter } from 'supi-core/@types/classes/command';
+import type { Channel } from 'supi-core/@types/classes/channel';
+import type { Platform } from 'supi-core/@types/classes/platform';
+import type { User } from 'supi-core/@types/classes/user';
 import type { UtilsSingleton } from 'supi-core/@types/singletons/utils';
 // import * as Util from "util";
 
@@ -192,17 +195,22 @@ declare namespace DankDebug {
 	 * The channel the command is being executed in.
 	 * On discord, the channel is the string channel ID.
 	 */
-	export const channel: string;
+	export const channel: Channel["Name"] | null;
 
 	/**
 	 * The username of the user the command was executed by.
 	 */
-	export const executor: string;
+	export const executor: User["Name"];
+
+	/**
+	 * The username of the user the command was executed by.
+	 */
+	export const executorID: User["ID"];
 
 	/**
 	 * The platform the command is being executed in.
 	 */
-	export const platform: string;
+	export const platform: Platform["Name"];
 
 	/**
 	 * Readonly access to the tee, see the help for `$abb tee`.
