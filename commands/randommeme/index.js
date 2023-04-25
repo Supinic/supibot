@@ -105,17 +105,24 @@ module.exports = {
 		}
 
 		let repeatedPosts;
+		let clearRepeatedPosts;
 		if (context.channel) {
 			this.data.repeatedChannelPostsMap ??= {};
 			this.data.repeatedChannelPostsMap[context.channel.ID] ??= [];
 
 			repeatedPosts = this.data.repeatedChannelPostsMap[context.channel.ID];
+			clearRepeatedPosts = () => {
+				this.data.repeatedChannelPostsMap[context.channel.ID] = [];
+			};
 		}
 		else {
 			this.data.repeatedPrivateMessagePostsMap ??= {};
 			this.data.repeatedPrivateMessagePostsMap[context.user.ID] ??= [];
 
 			repeatedPosts = this.data.repeatedPrivateMessagePostsMap[context.user.ID];
+			clearRepeatedPosts = () => {
+				this.data.repeatedPrivateMessagePostsMap[context.user.ID] = [];
+			};
 		}
 
 		const { posts } = forum;
@@ -128,7 +135,7 @@ module.exports = {
 
 		if (validPosts.length === 0) {
 			if (repeatedPosts.length !== 0) {
-				forum.repeatedPosts = [];
+				clearRepeatedPosts();
 				return {
 					success: false,
 					reply: "Front page posts have all been posted! ♻ If you try again, you will receive repeated results."
@@ -137,7 +144,7 @@ module.exports = {
 			else {
 				return {
 					success: false,
-					reply: `Subreddit ${input} has no eligible (not stickied, self or text) posts!`
+					reply: `Subreddit ${input} has no eligible (non-stickied, self or text) posts!`
 				};
 			}
 		}
@@ -145,6 +152,7 @@ module.exports = {
 		if (safeSpace) {
 			validPosts = validPosts.filter(i => !i.nsfw);
 			if (validPosts.length === 0) {
+				clearRepeatedPosts();
 				return {
 					success: false,
 					reply: `Subreddit ${input} only has NSFW posts! This channel is marked as SFW posts only.`
@@ -154,6 +162,7 @@ module.exports = {
 		if (context.params.flair) {
 			validPosts = validPosts.filter(i => i.hasFlair(context.params.flair, false));
 			if (validPosts.length === 0) {
+				clearRepeatedPosts();
 				return {
 					success: false,
 					reply: `Subreddit ${input} has no posts with the flair ${context.params.flair}!`
@@ -163,6 +172,7 @@ module.exports = {
 		if (context.params.ignoreFlair) {
 			validPosts = validPosts.filter(i => !i.hasFlair(context.params.ignoreFlair, false));
 			if (validPosts.length === 0) {
+				clearRepeatedPosts();
 				return {
 					success: false,
 					reply: `Subreddit ${input} has no posts that don't have the flair ${context.params.ignoreFlair}!`
@@ -172,6 +182,7 @@ module.exports = {
 		if (context.params.skipGalleries) {
 			validPosts = validPosts.filter(i => !i.hasGallery());
 			if (validPosts.length === 0) {
+				clearRepeatedPosts();
 				return {
 					success: false,
 					reply: `Subreddit ${input} has no posts that are not galleries!`
@@ -181,6 +192,7 @@ module.exports = {
 		if (context.params.skipVideos) {
 			validPosts = validPosts.filter(i => !i.hasVideo());
 			if (validPosts.length === 0) {
+				clearRepeatedPosts();
 				return {
 					success: false,
 					reply: `Subreddit ${input} has no posts that are not videos!`
