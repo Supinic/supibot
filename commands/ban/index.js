@@ -373,8 +373,16 @@ module.exports = {
 			}
 
 			const ban = await sb.Filter.create(options);
+			const summary = [
+				(options.User_Alias) ? "user-specific" : "",
+				(options.Command) ? "command-specific" : "",
+				(options.Invocation) ? "invocation-specific" : "",
+				(options.Channel) ? "channel-specific" : "global",
+				`filter of type ${options.Type}`
+			].filter(Boolean).join(", ");
+
 			return {
-				reply: `Successfully banned (ID ${ban.ID})`
+				reply: `Successfully banned (ID ${ban.ID}). Summary: you created a ${summary}`
 			};
 		}
 	}),
