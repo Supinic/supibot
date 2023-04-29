@@ -92,17 +92,23 @@
         "interval": [300, 480],
         "responses": [
           "just woke up",
+          "feels rested"
+        ]
+      },
+      {
+        "interval": [480, 600],
+        "responses": [
+          "woke up",
           "feels well rested",
           "finished their beauty sleep"
         ]
       },
       {
-        "interval": [480, 720],
+        "interval": [600, 720],
         "responses": [
           "finally woke up",
           "definitely overslept",
-          "spent the entire morning in bed",
-          "finished their beauty sleep"
+          "spent the entire morning in bed"
         ]
       },
       {
