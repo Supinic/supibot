@@ -32,6 +32,17 @@
       },
       "usageDivisor": 1
     },
+    "davinci": {
+      "url": "text-davinci-001",
+      "type": "string",
+      "default": false,
+      "inputLimit": 250,
+      "outputLimit": {
+        "default": 100,
+        "maximum": 100
+      },
+      "usageDivisor": 0.1
+    },
     "turbo": {
       "url": "gpt-3.5-turbo",
       "type": "messages",
