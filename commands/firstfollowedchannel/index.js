@@ -10,7 +10,8 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function firstFollowedChannel (context, target) {
 		const { controller } = sb.Platform.get("twitch");
-		const name = target ?? context.user.Name;
+		const name = sb.User.normalizeUsername(target ?? context.user.Name);
+
 		const channelID = await controller.getUserID(name);
 		if (!channelID) {
 			return {
