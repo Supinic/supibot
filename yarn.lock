@@ -1229,18 +1229,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cacheable-request@npm:^10.2.1":
-  version: 10.2.5
-  resolution: "cacheable-request@npm:10.2.5"
+"cacheable-request@npm:^10.2.8":
+  version: 10.2.10
+  resolution: "cacheable-request@npm:10.2.10"
   dependencies:
     "@types/http-cache-semantics": ^4.0.1
     get-stream: ^6.0.1
-    http-cache-semantics: ^4.1.0
+    http-cache-semantics: ^4.1.1
     keyv: ^4.5.2
     mimic-response: ^4.0.0
     normalize-url: ^8.0.0
     responselike: ^3.0.0
-  checksum: 9bf7443792072a50b5c5e17bd8e080e11d91b72a45ec7f287ffe47c96e9d64a4e60b7d7835114ef75b9667db45a85be1b16fa692cf31cf9a9c9fabae0ab3f098
+  checksum: 6f56cf6dc88c000936c89e386fdfd65c9a7833f6a4f73314f546287352efca50ef8c7ccc80c64d5c51fe104f5a60356366e190846f56abf3f2e90c1bacec7eee
   languageName: node
   linkType: hard
 
@@ -1385,12 +1385,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chrono-node@npm:^2.5.0":
-  version: 2.5.0
-  resolution: "chrono-node@npm:2.5.0"
+"chrono-node@npm:^2.6.3":
+  version: 2.6.3
+  resolution: "chrono-node@npm:2.6.3"
   dependencies:
     dayjs: ^1.10.0
-  checksum: 810681d3f14ce790a6f22afc269f407d8b0708239c4a255eb1a0a065c0234524d771d2dd01c438c1bd73843989bc8ac95b788d53d7a6a1116d2f891ce2e51238
+  checksum: 6f4dc453380d64cb5eb0a1d3641971d84463cea48b94f410b372e0e8a6be7cbf9aa614d252d088195409c699aee60afef85cdd9ad2a89f93ba991c3f97bb4f0f
   languageName: node
   linkType: hard
 
@@ -1553,12 +1553,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cron@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "cron@npm:2.2.0"
+"cron@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "cron@npm:2.3.0"
   dependencies:
     luxon: ^3.2.1
-  checksum: 53905d0f55e052742cf4fed34598a4ebfc311f4f9143c90384225bb4376fa639cd12f485cbf5d3dca00db377bf5117f27a1cae405f15e4745d1f69808e4fb9ac
+  checksum: 70b220f3fc4b6bcd594f7f2c690bbf7a3a03b0e081eb0119f8e3ca21635f2da07d89e038d561d4c0742c8b0dd04977f25e307d0608455ef9f527a556b2da92fc
   languageName: node
   linkType: hard
 
@@ -2639,14 +2639,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"got@npm:^12.5.3":
-  version: 12.5.3
-  resolution: "got@npm:12.5.3"
+"got@npm:^12.6.0":
+  version: 12.6.0
+  resolution: "got@npm:12.6.0"
   dependencies:
     "@sindresorhus/is": ^5.2.0
     "@szmarczak/http-timer": ^5.0.1
     cacheable-lookup: ^7.0.0
-    cacheable-request: ^10.2.1
+    cacheable-request: ^10.2.8
     decompress-response: ^6.0.0
     form-data-encoder: ^2.1.2
     get-stream: ^6.0.1
@@ -2654,7 +2654,7 @@ __metadata:
     lowercase-keys: ^3.0.0
     p-cancelable: ^3.0.0
     responselike: ^3.0.0
-  checksum: e35ea3ccdb5f2c36d0bb9648a6a87300d017900ce2e647ad95f54a6fb674a82fe7d53b2c838542d15a9fa25290cc5361d6f82cadac3e94b2e91d93b5670cf304
+  checksum: 3621897067068dcb3578d05535cfb10f60aac07198032b3349a488f5741964e7f63d6e37c976840f1bcaaf42f5c049ed3c6d8e0d6c622b74639ca9319ad178a1
   languageName: node
   linkType: hard
 
@@ -2783,6 +2783,13 @@ __metadata:
   version: 4.1.0
   resolution: "http-cache-semantics@npm:4.1.0"
   checksum: 974de94a81c5474be07f269f9fd8383e92ebb5a448208223bfb39e172a9dbc26feff250192ecc23b9593b3f92098e010406b0f24bd4d588d631f80214648ed42
+  languageName: node
+  linkType: hard
+
+"http-cache-semantics@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "http-cache-semantics@npm:4.1.1"
+  checksum: 83ac0bc60b17a3a36f9953e7be55e5c8f41acc61b22583060e8dedc9dd5e3607c823a88d0926f9150e571f90946835c7fe150732801010845c72cd8bbff1a236
   languageName: node
   linkType: hard
 
@@ -2918,20 +2925,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ioredis@npm:^5.2.5":
-  version: 5.2.5
-  resolution: "ioredis@npm:5.2.5"
+"ioredis@npm:^5.3.2":
+  version: 5.3.2
+  resolution: "ioredis@npm:5.3.2"
   dependencies:
     "@ioredis/commands": ^1.1.1
     cluster-key-slot: ^1.1.0
     debug: ^4.3.4
-    denque: ^2.0.1
+    denque: ^2.1.0
     lodash.defaults: ^4.2.0
     lodash.isarguments: ^3.1.0
     redis-errors: ^1.2.0
     redis-parser: ^3.0.0
     standard-as-callback: ^2.1.0
-  checksum: 3881c505b287f1277394fda78fa0239fe35ee0f88116ab0d4ad74d915bace68928afa802a455fa87a74009d68ac859becc820a8cb59ae2ffca95b84c8b575198
+  checksum: 9a23559133e862a768778301efb68ae8c2af3c33562174b54a4c2d6574b976e85c75a4c34857991af733e35c48faf4c356e7daa8fb0a3543d85ff1768c8754bc
   languageName: node
   linkType: hard
 
@@ -3645,17 +3652,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mariadb@npm:^3.0.2":
-  version: 3.0.2
-  resolution: "mariadb@npm:3.0.2"
+"mariadb@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "mariadb@npm:3.1.1"
   dependencies:
     "@types/geojson": ^7946.0.10
     "@types/node": ^17.0.45
     denque: ^2.1.0
     iconv-lite: ^0.6.3
     lru-cache: ^7.14.0
-    moment-timezone: ^0.5.38
-  checksum: 1d84f9ab760b146eb6a4cd728cc84e34255f4c5d17a182d1f36f7d1738de32b3ace328d1d8f2e81dfb0df3f5a43844006b4b74bbeb5f7f92d6a9d862a513de40
+  checksum: bc44b375cb247e04248f0c5cb3dcc7eaf5d8a2178cc4f62455b666a51ba95af1f47953260f5e34738766dd35a76502fa193277a6084cb9194c0bbe04173f7220
   languageName: node
   linkType: hard
 
@@ -3872,15 +3878,6 @@ __metadata:
   dependencies:
     moment: ">= 2.9.0"
   checksum: 9f972d3a29b2726d4fd1464df27738b756441fe57575f087cda91b7716a5a31d2cfd274255e3edfb15eb60af3ccf33fd339527b456092cac1a2a4124e4369c8b
-  languageName: node
-  linkType: hard
-
-"moment-timezone@npm:^0.5.38":
-  version: 0.5.40
-  resolution: "moment-timezone@npm:0.5.40"
-  dependencies:
-    moment: ">= 2.9.0"
-  checksum: 6f6be5412b37fd937bb143efe74bf65b2c3f115fd967a6dc13b717a126ed6dd198bff6db6e179d69a089e20ac03ce7622c6b5598dd585005195554487a91b528
   languageName: node
   linkType: hard
 
@@ -4662,13 +4659,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rss-parser@npm:^3.12.0":
-  version: 3.12.0
-  resolution: "rss-parser@npm:3.12.0"
+"rss-parser@npm:^3.13.0":
+  version: 3.13.0
+  resolution: "rss-parser@npm:3.13.0"
   dependencies:
     entities: ^2.0.3
-    xml2js: ^0.4.19
-  checksum: aa0f0eb2e3a5c70677a1c7cb6c2e96420f12c8963a8bed922ec2ff1bb9dbbb725fc5783be31ca8140154c3d5589ccd31580ced7d32ebd0dda7572f78ce242a41
+    xml2js: ^0.5.0
+  checksum: 7c6ab677386dbf14ddc0526f769ccdd5bf0b53a019dd2c0454ce80971dd4decb7ac567a4e78dffe99e87d7b595698e7f24eae45f09c49ef79ad644efb702db22
   languageName: node
   linkType: hard
 
@@ -5089,27 +5086,27 @@ __metadata:
 
 supi-core@supinic/supi-core:
   version: 2.2.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=77b2ae7ace2866fa0c0c176b653ad8f439e222a5"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=fc3fc9f8ab67c02b2c7cc0169fcbd47a8a2d9570"
   dependencies:
     async-markov: "github:supinic/async-markov"
     cheerio: ^1.0.0-rc.12
-    chrono-node: ^2.5.0
-    cron: ^2.2.0
+    chrono-node: ^2.6.3
+    cron: ^2.3.0
     duration-parser: "github:supinic/duration-parser"
     ffprobe: ^1.1.2
     form-data: ^4.0.0
-    got: ^12.5.3
-    ioredis: ^5.2.5
+    got: ^12.6.0
+    ioredis: ^5.3.2
     language-iso-codes: "github:supinic/language-iso-codes"
     long-timeout: "github:supinic/long-timeout"
-    mariadb: ^3.0.2
+    mariadb: ^3.1.1
     random-js: ^2.1.0
     roll-dice: "npm:@jprochazk/roll-dice@^0.2.2"
-    rss-parser: ^3.12.0
+    rss-parser: ^3.13.0
     track-link-parser: "github:supinic/track-link-parser"
     transliteration: ^2.3.5
-    vm2: ^3.9.13
-  checksum: 9b8e49e90906704dbbfe0eaf797507d5f43761b9156b2004ed85eca0afe3a57249099763d1d0d50a96bc8c8de73c655705d4fbec5ad2ddc61e1898b3e1b1c750
+    vm2: ^3.9.17
+  checksum: 3c3cad69f96bc9f9e235803ff3a4d3d01692562047dcb9113ee7d8e08a5359c4b2d0428c756f110897ade725ec15c942212c7e89b2ccb67f95c4bcadc2a425d3
   languageName: node
   linkType: hard
 
@@ -5426,15 +5423,15 @@ supi-core@supinic/supi-core:
   languageName: node
   linkType: hard
 
-"vm2@npm:^3.9.13":
-  version: 3.9.13
-  resolution: "vm2@npm:3.9.13"
+"vm2@npm:^3.9.17":
+  version: 3.9.17
+  resolution: "vm2@npm:3.9.17"
   dependencies:
     acorn: ^8.7.0
     acorn-walk: ^8.2.0
   bin:
     vm2: bin/vm2
-  checksum: ee82c130a9d1b45558fac4e95133ae022e69fafd4bec8aada44bb2f0aebe6ff8ae9b1176e7cbafceffec35267e009b518c121ad81a5565da06aa7a50ed3a09bc
+  checksum: 9a03740a40ab2be5e3348a95fb31512da1a3c85318febb07e5299fa103ff05bcd7b6f458211fa38a1281dc27beccd04ff90355fc1d34fe2ee6ca10d0bb8c6f35
   languageName: node
   linkType: hard
 
@@ -5592,13 +5589,13 @@ supi-core@supinic/supi-core:
   languageName: node
   linkType: hard
 
-"xml2js@npm:^0.4.19":
-  version: 0.4.23
-  resolution: "xml2js@npm:0.4.23"
+"xml2js@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "xml2js@npm:0.5.0"
   dependencies:
     sax: ">=0.6.0"
     xmlbuilder: ~11.0.0
-  checksum: ca0cf2dfbf6deeaae878a891c8fbc0db6fd04398087084edf143cdc83d0509ad0fe199b890f62f39c4415cf60268a27a6aed0d343f0658f8779bd7add690fa98
+  checksum: 1aa71d62e5bc2d89138e3929b9ea46459157727759cbc62ef99484b778641c0cd21fb637696c052d901a22f82d092a3e740a16b4ce218e81ac59b933535124ea
   languageName: node
   linkType: hard
 
