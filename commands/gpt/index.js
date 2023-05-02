@@ -172,10 +172,11 @@ module.exports = {
 					priceChangeString = ` (same price as ${basePriceModel})`;
 				}
 				else if (modelData.usageDivisor > 1) {
-					priceChangeString = ` (${modelData.usageDivisor}x cheaper than ${basePriceModel}`;
+					priceChangeString = ` (${modelData.usageDivisor}x cheaper than ${basePriceModel})`;
 				}
 				else if (modelData.usageDivisor < 1) {
-					priceChangeString = ` (${modelData.usageDivisor}x more expensive than ${basePriceModel}`;
+					const multiplier = sb.Utils.round(1 / modelData.usageDivisor, 2);
+					priceChangeString = ` (${multiplier}x more expensive than ${basePriceModel})`;
 				}
 			}
 
