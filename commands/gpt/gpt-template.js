@@ -108,7 +108,8 @@ module.exports = class GptTemplate {
 				};
 			}
 
-			await context.user.setDataProperty("chatGptHistoryMode", command);
+			const state = `${command}d`;
+			await context.user.setDataProperty("chatGptHistoryMode", state);
 			return {
 				reply: `Your ChatGPT history was successfully ${command}d.`,
 				cooldown: 5000
