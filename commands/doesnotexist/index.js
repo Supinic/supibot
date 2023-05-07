@@ -52,7 +52,7 @@ module.exports = {
 				return `https://thisvesseldoesnotexist.s3-us-west-2.amazonaws.com/public/v2/fakes/${padded}.jpg`;
 			},
 			waifu: () => `https://www.thiswaifudoesnotexist.net/example-${sb.Utils.random(1, 1e5)}.jpg`,
-			wojak: () => `https://thiswojakdoesnotexist.com/img/${sb.Utils.random(1, 1576)}.png`
+			wojak: () => `https://archive.org/download/thiswojakdoesnotexist.com/img/${sb.Utils.random(1, 1576)}.png`
 		};
 
 		const staticNumberedLinkMapSummary = {
@@ -115,10 +115,10 @@ module.exports = {
 				},
 				{
 					method: "reuploading a provided random image",
-					descriptions: ["artwork", "cat", "horse"].map(i => (
+					descriptions: ["artwork", "cat"].map(i => (
 						`<code>${i}</code> - <a href="${buildURL(i)}">This ${i} does not exist</a>`
 					)),
-					types: ["artwork", "cat", "horse"],
+					types: ["artwork", "cat"],
 					execute: async (context, type) => {
 						const imageData = await sb.Got("GenericAPI", {
 							url: buildURL(type),
