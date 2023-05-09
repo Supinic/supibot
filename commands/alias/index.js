@@ -788,7 +788,7 @@ module.exports = {
 				}
 
 				const name = customLinkName ?? aliasName;
-				const existing = await sb.Query.getRecordset(rs => rs
+				const existingID = await sb.Query.getRecordset(rs => rs
 					.select("ID")
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NULL")
@@ -798,7 +798,7 @@ module.exports = {
 					.flat("ID")
 					.limit(1)
 				);
-				if (existing && type !== "linkplace") {
+				if (existingID && type !== "linkplace") {
 					return {
 						success: false,
 						reply: `Cannot link a new alias - you already have an alias with this name!`
@@ -866,14 +866,14 @@ module.exports = {
 				}
 
 				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
-				if (existing) {
+				if (existingID) {
 					if (type !== "linkplace") {
 						throw new sb.Error({
 							message: "Sanity check - reached linkplace without $alias linkplace"
 						});
 					}
 
-					await row.load(existing.ID);
+					await row.load(existingID);
 				}
 
 				row.setValues({
