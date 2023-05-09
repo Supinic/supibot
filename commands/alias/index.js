@@ -777,7 +777,8 @@ module.exports = {
 				};
 			}
 
-			case "link": {
+			case "link":
+			case "linkplace": {
 				const [userName, aliasName, customLinkName] = args;
 				if (!userName || !aliasName) {
 					return {
@@ -797,7 +798,7 @@ module.exports = {
 					.flat("ID")
 					.limit(1)
 				);
-				if (existing) {
+				if (existing && type !== "linkplace") {
 					return {
 						success: false,
 						reply: `Cannot link a new alias - you already have an alias with this name!`
@@ -865,6 +866,16 @@ module.exports = {
 				}
 
 				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+				if (existing) {
+					if (type !== "linkplace") {
+						throw new sb.Error({
+							message: "Sanity check - reached linkplace without $alias linkplace"
+						});
+					}
+
+					await row.load(existing.ID);
+				}
+
 				row.setValues({
 					User_Alias: context.user.ID,
 					Channel: null,
@@ -880,12 +891,13 @@ module.exports = {
 
 				await row.save({ skipLoad: true });
 
+				const verb = (type === "linkplace") ? "linked and replaced" : "linked";
 				const nameString = (customLinkName && customLinkName !== targetAlias.Name)
-					? ` with a custom name "${customLinkName}"`
+					? `, with a custom name "${customLinkName}"`
 					: "";
 
 				return {
-					reply: `Successfully created your alias link${nameString}. When the original changes, so will yours. ${appendix}`
+					reply: `Successfully ${verb} alias${nameString}. When the original changes, so will yours. ${appendix}`
 				};
 			}
 
@@ -1289,11 +1301,16 @@ module.exports = {
 		"",
 
 		`<code>${prefix}alias link (username) (alias)</code>`,
+		`<code>${prefix}alias link (username) (alias) (custom name)</code>`,
+		`<code>${prefix}alias linkplace (username) (alias)</code>`,
+		`<code>${prefix}alias linkplace (username) (alias) (custom name)</code>`,
 		"Takes someone else's alias, and creates a link of it for you, with the same name.",
 		"A link simply executes the user's alias, without you needing to specify it.",
 		"If the original link changes, then so will the execution of your link - as it is the same alias, really.",
 		"If the original is deleted, then your link will become invalid.",
 		"This is recommended to use with reputable alias creators, or if you actually trust someone with their alias and the changes.",
+		"You can also rename the link immediately by providing your own custom alias name at the end of the command.",
+		"If you use <code>linkplace</code>, the command will replace any alias with the same name that you might already have.",
 		"",
 
 		`<code>${prefix}alias link (username) (alias) (custom name)</code>`,
