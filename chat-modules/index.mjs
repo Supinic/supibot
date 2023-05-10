@@ -13,6 +13,7 @@ import { definition as StreamerHealthNotification } from "./streamer-health-noti
 import { definition as SubscriptionReaction } from "./subscription-react/index.mjs";
 import { definition as SilencePreventionTrigger } from "./supinic-silence-prevention-trigger/index.mjs";
 import { definition as StreamDatabaseUpdater } from "./supinic-stream-db/index.mjs";
+import { definition as SuspiciousUserAutoChecker } from "./suspicious-user-auto-check/index.mjs";
 import { definition as WannaBecomeFamous } from "./wanna-become-famous/index.mjs";
 
 export const definitions = [
@@ -32,6 +33,7 @@ export const definitions = [
 	SubscriptionReaction,
 	SilencePreventionTrigger,
 	StreamDatabaseUpdater,
+	SuspiciousUserAutoChecker,
 	WannaBecomeFamous
 ];
 
