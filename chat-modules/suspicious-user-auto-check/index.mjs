@@ -55,8 +55,8 @@ export const definition = {
 
 		const resultMessage = sb.Utils.tag.trim `
 			Hey @${raw.user}, I'd like to verify whether @${data.login} is either: 
-			- another account,
-			- or a previous name that you have used in the past.
+			another account,
+			or a previous name that you have used in the past.
 			Can you confirm this for me?
 		`;
 
