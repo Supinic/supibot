@@ -22,6 +22,23 @@ const emoteGot = sb.Got.get("Global").extend({
 	}
 });
 
+const emitRawUserMessageEvent = (username, channelName, message, messageData = {}) => {
+	const channelData = sb.Channel.get(channelName, this.sb.Platform.get("twitch"));
+	if (channelData) {
+		channelData.events.emit("message", {
+			event: "message",
+			message,
+			user: null,
+			channel: channelData,
+			platform: sb.Platform.get("twitch"),
+			raw: {
+				user: username
+			},
+			messageData
+		});
+	}
+};
+
 module.exports = class TwitchController extends require("./template.js") {
 	supportsMeAction = true;
 
@@ -653,21 +670,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				return;
 			}
 
-			const channelData = sb.Channel.get(channelName, this.platform);
-			if (channelData) {
-				channelData.events.emit("message", {
-					event: "message",
-					message,
-					user: null,
-					channel: channelData,
-					platform: this.platform,
-					raw: {
-						user: senderUsername
-					},
-					messageData
-				});
-			}
-
+			emitRawUserMessageEvent(senderUsername, channelName, message, messageData);
 			return;
 		}
 		else if (userData.Twitch_ID === null && userData.Discord_ID !== null) {
@@ -738,6 +741,9 @@ module.exports = class TwitchController extends require("./template.js") {
 						),
 						userData.setDataProperty("twitch-userid-mismatch-notification", true)
 					]);
+				}
+				else {
+					emitRawUserMessageEvent(senderUsername, channelName, message, messageData);
 				}
 			}
 
