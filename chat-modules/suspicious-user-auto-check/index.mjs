@@ -22,10 +22,10 @@ export const definition = {
 		this.data.checkedUsernames.add(raw.user);
 
 		const assumedUserID = await sb.Query.getRecordset(rs => rs
-			.select("ID")
+			.select("Twitch_ID")
 			.from("chat_data", "User_Alias")
 			.where("Name = %s", raw.user)
-			.flat("ID")
+			.flat("Twitch_ID")
 			.single()
 			.limit(1)
 		);
