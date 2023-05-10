@@ -13,11 +13,13 @@ export const definition = {
 			return;
 		}
 
-		this.data.sent ??= new Set();
+		this.data.checkedUsernames ??= new Set();
 
 		if (!message.includes("suspicious")) {
 			return;
 		}
+
+		this.data.checkedUsernames.add(raw.user);
 
 		const assumedUserID = await sb.Query.getRecordset(rs => rs
 			.select("ID")
