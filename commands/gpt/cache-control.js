@@ -58,8 +58,8 @@ const getTokenUsage = async (userData) => {
 		summary[timestamp] = value;
 	}
 
-	let hourlyReset;
-	let dailyReset;
+	let hourlyReset = null;
+	let dailyReset = null;
 	let hourlyCounter = hourlyTokens;
 	let dailyCounter = dailyTokens;
 	const userLimits = await determineUserLimits(userData);
@@ -79,8 +79,10 @@ const getTokenUsage = async (userData) => {
 		}
 	}
 
-	hourlyReset ??= cacheData.at(-1).timestamp;
-	dailyReset ??= cacheData.at(-1).timestamp;
+	if (cacheData.length > 0) {
+		hourlyReset ??= cacheData.at(-1).timestamp;
+		dailyReset ??= cacheData.at(-1).timestamp;
+	}
 
 	return {
 		hourlyTokens,
