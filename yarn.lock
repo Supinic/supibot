@@ -3807,16 +3807,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mariadb@npm:^3.1.1":
-  version: 3.1.1
-  resolution: "mariadb@npm:3.1.1"
+"mariadb@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "mariadb@npm:3.1.2"
   dependencies:
     "@types/geojson": ^7946.0.10
     "@types/node": ^17.0.45
     denque: ^2.1.0
     iconv-lite: ^0.6.3
     lru-cache: ^7.14.0
-  checksum: bc44b375cb247e04248f0c5cb3dcc7eaf5d8a2178cc4f62455b666a51ba95af1f47953260f5e34738766dd35a76502fa193277a6084cb9194c0bbe04173f7220
+  checksum: 70079e09ecc2ae4113b317912419053645aabbcc3e584c7c1dba89306cb0af1a47438ccbf03f1c97f8fee07b952c33952edbc100847d55a30aa9d897b04c729f
   languageName: node
   linkType: hard
 
@@ -5234,7 +5234,7 @@ __metadata:
 
 supi-core@supinic/supi-core:
   version: 2.2.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=fc3fc9f8ab67c02b2c7cc0169fcbd47a8a2d9570"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=56dcdfbd26376fb1af56cbfd640ed4e876e0c8d7"
   dependencies:
     async-markov: "github:supinic/async-markov"
     cheerio: ^1.0.0-rc.12
@@ -5247,14 +5247,14 @@ supi-core@supinic/supi-core:
     ioredis: ^5.3.2
     language-iso-codes: "github:supinic/language-iso-codes"
     long-timeout: "github:supinic/long-timeout"
-    mariadb: ^3.1.1
+    mariadb: ^3.1.2
     random-js: ^2.1.0
     roll-dice: "npm:@jprochazk/roll-dice@^0.2.2"
     rss-parser: ^3.13.0
     track-link-parser: "github:supinic/track-link-parser"
     transliteration: ^2.3.5
-    vm2: ^3.9.17
-  checksum: 3c3cad69f96bc9f9e235803ff3a4d3d01692562047dcb9113ee7d8e08a5359c4b2d0428c756f110897ade725ec15c942212c7e89b2ccb67f95c4bcadc2a425d3
+    vm2: ^3.9.19
+  checksum: 1dc248556b8e8a0a458155b439450762a7f9e98218d5aaf213188214883673c76edec35388e0722d6b710ec03d717453e29eb3c052d75a7234d8faafda403565
   languageName: node
   linkType: hard
 
@@ -5570,15 +5570,15 @@ supi-core@supinic/supi-core:
   languageName: node
   linkType: hard
 
-"vm2@npm:^3.9.17":
-  version: 3.9.17
-  resolution: "vm2@npm:3.9.17"
+"vm2@npm:^3.9.19":
+  version: 3.9.19
+  resolution: "vm2@npm:3.9.19"
   dependencies:
     acorn: ^8.7.0
     acorn-walk: ^8.2.0
   bin:
     vm2: bin/vm2
-  checksum: 9a03740a40ab2be5e3348a95fb31512da1a3c85318febb07e5299fa103ff05bcd7b6f458211fa38a1281dc27beccd04ff90355fc1d34fe2ee6ca10d0bb8c6f35
+  checksum: fc6cf553134145cd7bb5246985bf242b056e3fb5ea71e2eef6710b2a5d6c6119cc6bc960435ff62480ee82efb43369be8f4db07b6690916ae7d3b2e714f395d8
   languageName: node
   linkType: hard
 
