@@ -13,8 +13,12 @@ const removeRedundantSortedListValues = async (cacheKey) => {
  * summary: Record<string, number>,
  * dailyTokens: number,
  * hourlyTokens: number,
- * firstHourlyUsage: number,
- * firstDailyUsage: number
+ * dailyReset: number,
+ * hourlyReset: number,
+ * userLimits: {
+ *  daily: number,
+ *  hourly: number
+ * }
  * }>}
  */
 const getTokenUsage = async (userData) => {
@@ -26,6 +30,14 @@ const getTokenUsage = async (userData) => {
 	const yesterday = new sb.Date().addDays(-1).valueOf();
 	const rawCacheData = await sb.Cache.server.zrangebyscore(cacheKey, yesterday, now, "WITHSCORES");
 
+	const cacheData = [];
+	for (let i = 0; i < rawCacheData.length; i += 2) {
+		cacheData.push({
+			value: Number(rawCacheData[i]),
+			timestamp: Number(rawCacheData[i + 1])
+		});
+	}
+
 	// Retrieve the cached values along with their timestamps
 	let hourlyTokens = 0;
 	let dailyTokens = 0;
@@ -33,10 +45,7 @@ const getTokenUsage = async (userData) => {
 	let firstDailyUsage = Infinity;
 	const summary = {};
 
-	for (let i = 0; i < rawCacheData.length; i += 2) {
-		const value = Number(rawCacheData[i]);
-		const timestamp = Number(rawCacheData[i + 1]);
-
+	for (const { value, timestamp } of cacheData) {
 		if (timestamp >= lastHour) {
 			firstHourlyUsage = Math.min(firstHourlyUsage, timestamp);
 			hourlyTokens += value;
@@ -49,12 +58,37 @@ const getTokenUsage = async (userData) => {
 		summary[timestamp] = value;
 	}
 
+	let hourlyReset;
+	let dailyReset;
+	let hourlyCounter = hourlyTokens;
+	let dailyCounter = dailyTokens;
+	const userLimits = await determineUserLimits(userData);
+
+	for (const { value, timestamp } of cacheData) {
+		if (!hourlyReset && timestamp >= lastHour) {
+			hourlyCounter -= value;
+			if (hourlyCounter < userLimits.hourly) {
+				hourlyReset = timestamp;
+			}
+		}
+		if (!dailyReset && timestamp >= yesterday) {
+			dailyCounter -= value;
+			if (dailyCounter < userLimits.daily) {
+				dailyReset = timestamp;
+			}
+		}
+	}
+
+	hourlyReset ??= cacheData.at(-1).timestamp;
+	dailyReset ??= cacheData.at(-1).timestamp;
+
 	return {
 		hourlyTokens,
 		dailyTokens,
-		firstHourlyUsage,
-		firstDailyUsage,
-		summary
+		hourlyReset,
+		dailyReset,
+		summary,
+		userLimits
 	};
 };
 
@@ -79,14 +113,13 @@ const checkLimits = async (userData) => {
 	const {
 		hourlyTokens,
 		dailyTokens,
-		firstHourlyUsage,
-		firstDailyUsage
+		hourlyReset,
+		dailyReset,
+		userLimits
 	} = await getTokenUsage(userData);
 
-	const userLimits = await determineUserLimits(userData);
-
 	if (dailyTokens >= userLimits.daily) {
-		const nextDailyReset = new sb.Date(firstDailyUsage).addDays(1);
+		const nextDailyReset = new sb.Date(dailyReset).addDays(1);
 		const delta = (nextDailyReset !== Infinity)
 			? `${sb.Utils.timeDelta(nextDailyReset)}`
 			: "later";
@@ -97,7 +130,7 @@ const checkLimits = async (userData) => {
 		};
 	}
 	else if (hourlyTokens >= userLimits.hourly) {
-		const nextHourlyReset = new sb.Date(firstHourlyUsage).addHours(1);
+		const nextHourlyReset = new sb.Date(hourlyReset).addHours(1);
 		const delta = (nextHourlyReset !== Infinity)
 			? `${sb.Utils.timeDelta(nextHourlyReset)}`
 			: "later";
