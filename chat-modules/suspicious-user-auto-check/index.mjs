@@ -4,7 +4,7 @@ export const definition = {
 	Description: "For each user who types (a part of) the \"suspicious user\" message, this module will automatically try the $$suscheck alias.",
 	Code: (async function suspiciousUserAutoChecker (context) {
 		const { channel, message, raw, user } = context;
-		if (channel.mode === "Read") {
+		if (channel.Mode === "Read") {
 			return;
 		}
 		// Immediately return if the user is **NOT** suspicious
