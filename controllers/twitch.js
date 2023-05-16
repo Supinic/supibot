@@ -23,7 +23,7 @@ const emoteGot = sb.Got.get("Global").extend({
 });
 
 const emitRawUserMessageEvent = (username, channelName, message, messageData = {}) => {
-	const channelData = sb.Channel.get(channelName, this.sb.Platform.get("twitch"));
+	const channelData = sb.Channel.get(channelName, sb.Platform.get("twitch"));
 	if (channelData) {
 		channelData.events.emit("message", {
 			event: "message",
