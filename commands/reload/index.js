@@ -80,21 +80,25 @@ module.exports = {
 					result = await module.reloadSpecific(...list);
 				}
 
+				const moduleName = (name.endsWith("s"))
+					? `${name.slice(0, -1)}(s)`
+					: `${name}(s)`;
+
 				if (result.failed.length === 0) {
 					return {
-						reply: `${list.length} ${name}(s) reloaded successfully.`
+						reply: `${list.length} ${moduleName} reloaded successfully.`
 					};
 				}
 				else if (result.failed.length < list.length) {
 					return {
 						success: false,
-						reply: `${list.length - result.failed.length} ${name}s reloaded successfully, but ${result.failed.length} failed!`
+						reply: `${list.length - result.failed.length} ${moduleName} reloaded successfully, but ${result.failed.length} failed!`
 					};
 				}
 				else {
 					return {
 						success: false,
-						reply: `All ${list.length} ${name}(s) failed to reload!`
+						reply: `All ${list.length} ${moduleName} failed to reload!`
 					};
 				}
 			}
