@@ -42,7 +42,7 @@ module.exports = {
 			};
 		}
 
-		let rollChance = 5;
+		let rollChance = 20;
 		const [selectedBait] = args;
 		if (selectedBait) {
 			const baitIndex = baitTypes.indexOf(selectedBait);
