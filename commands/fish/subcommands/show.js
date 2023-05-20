@@ -3,7 +3,9 @@ const { getInitialStats } = require("./fishing-utils.js");
 module.exports = {
 	name: "show",
 	aliases: ["count", "display", "collection"],
-	description: [],
+	description: [
+		"Show off your fishing trophy collection."
+	],
 	execute: async (context) => {
 		/** @type {UserFishData} */
 		const fishData = await context.user.getDataProperty("fishData") ?? getInitialStats();
@@ -24,7 +26,7 @@ module.exports = {
 		}
 
 		return {
-			reply: `You have ${fishData.catch.total} fish in your collection. Here they are: ${result.join(", ")}`
+			reply: `You have ${fishData.catch.total} fish in your collection. Here they are: ${result.join("")}`
 		};
 	}
 };

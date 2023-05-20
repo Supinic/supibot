@@ -1,9 +1,13 @@
 const { getInitialStats, fishTypes } = require("./fishing-utils.js");
+const fishEmojis = fishTypes.map(i => i.name);
 
 module.exports = {
 	name: "sell",
 	aliases: [],
-	description: [],
+	description: [
+		"Sell one of your fishing trophies for coins.",
+		"Those can then be used to buy bait (and more stuff in the future)."
+	],
 	execute: async (context, fishType) => {
 		/** @type {UserFishData} */
 		const fishData = await context.user.getDataProperty("fishData") ?? getInitialStats();
@@ -13,10 +17,10 @@ module.exports = {
 				reply: `You have no fish to sell!`
 			};
 		}
-		else if (!fishTypes.includes(fishType)) {
+		else if (!fishEmojis.includes(fishType)) {
 			return {
 				success: false,
-				reply: `Invalid fish provided! Use one of: ${fishTypes.join(", ")}`
+				reply: `Invalid fish provided! Use one of: ${fishEmojis.join(", ")}`
 			};
 		}
 
@@ -28,11 +32,20 @@ module.exports = {
 			};
 		}
 
+		const fishTypeData = fishTypes.find(i => i.name === fishType);
+		if (!fishTypeData.sellable) {
+			return {
+				success: false,
+				reply: `You can't sell this ${fishType} - nobody would buy it!`
+			};
+		}
+
 		fishData.catch.types[fishType]--;
 		fishData.catch.total--;
 
 		fishData.coins += 50;
 		fishData.lifetime.coins += 50;
+		fishData.lifetime.sold++;
 
 		await context.user.setDataProperty("fishData", fishData);
 

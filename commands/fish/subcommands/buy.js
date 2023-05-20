@@ -1,22 +1,10 @@
-const { baitTypes } = require("./fishing-utils.js");
-const priceList = baitTypes.map((i, index) => 2 + (3 * index));
-
-const baitInfo = [];
-for (let i = 0; i < baitTypes.length; i++) {
-	baitInfo.push(`${baitTypes[i]} costs ${priceList[i]}🪙`);
-}
-
-const baitInfoString = baitInfo.join("; ");
 module.exports = {
 	name: "buy",
 	aliases: [],
-	description: [],
+	description: [
+		"Buy goodies at the fishing gear store."
+	],
 	execute: async () => ({
-		reply: sb.Utils.tag.trim `
-			Bait slightly improves your catch chance.
-			Use it like this: "$fish 🦗" to buy, and use immediately.
-			Not reusable.
-			Available types: ${baitInfoString}
-		`
+		reply: "There isn't anything you can buy at the fishing gear shop... yet."
 	})
 };
