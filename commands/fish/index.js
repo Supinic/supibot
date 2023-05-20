@@ -29,11 +29,21 @@ module.exports = {
 	}),
 	Dynamic_Description: (async function () {
 		const { subcommands } = require("./subcommands/index.js");
-		const subcommandsDescription = subcommands.flatMap(i => [
-			`<h5>${i.name}</h5>`,
-			...i.description,
-			""
-		]);
+		const subcommandsDescription = subcommands
+			.sort((a, b) => {
+				if (a.default) {
+					return -1;
+				}
+				else if (b.default) {
+					return 1;
+				}
+
+				return a.name.localeCompare(b.name);
+			})
+			.flatMap(i => [
+				...i.description,
+				""
+			]);
 
 		return [
 			"Go fishing!",
