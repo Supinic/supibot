@@ -4,6 +4,7 @@ module.exports = {
 	name: "show",
 	aliases: ["count", "display", "collection"],
 	description: [
+		`<code>$fish show</code>`,
 		"Show off your fishing trophy collection."
 	],
 	execute: async (context) => {

@@ -27,9 +27,14 @@ module.exports = {
 	default: true,
 	aliases: [],
 	description: [
+		`<code>$fish</code>`,
 		"Go fishing!",
-		"You can buy fishing bait before fishing to increase your odds.",
-		`Use it like this: "$fish 🦗" to buy, and use immediately.`,
+		"",
+
+		`<code>$fish (bait)</code>`,
+		`<code>$fish 🦗</code>`,
+		"Buy bait before heading out to fish, to increase your odds.",
+		"The bait is immediately used as you go fishing, and cannot be used later.",
 		`Available bait: ${baitTypes.join(" ")}`
 	],
 	execute: async (context, ...args) => {

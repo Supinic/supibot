@@ -2,6 +2,7 @@ module.exports = {
 	name: "help",
 	aliases: [],
 	description: [
+		`<code>$fish help</code>`,
 		"Shows a brief description of the subcommands."
 	],
 	execute: async () => ({

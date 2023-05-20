@@ -5,8 +5,10 @@ module.exports = {
 	name: "sell",
 	aliases: [],
 	description: [
+		`<code>$fish sell (fish)</code>`,
+		`<code>$fish sell 🐡</code>`,
 		"Sell one of your fishing trophies for coins.",
-		"Those can then be used to buy bait (and more stuff in the future)."
+		"Those can then be used to buy bait (and more goodies in the future)."
 	],
 	execute: async (context, fishType) => {
 		/** @type {UserFishData} */
