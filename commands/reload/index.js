@@ -11,8 +11,8 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: (() => {
 		const shell = require("util").promisify(require("child_process").exec);
-		const upgrade = async (context, module, name, isPlural, ...list) => {
-			if (!isPlural && list.length === 0) {
+		const upgrade = async (context, module, name, reloadAll, ...list) => {
+			if (!reloadAll && list.length === 0) {
 				return {
 					success: false,
 					reply: `No ${name} names provided!`
@@ -27,7 +27,7 @@ module.exports = {
 				await shell(`git pull origin master`);
 			}
 
-			if (isPlural) {
+			if (reloadAll) {
 				try {
 					await module.reloadData();
 				}
