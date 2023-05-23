@@ -111,6 +111,11 @@ const fishTypes = [
 		name: "🐚",
 		sellable: true,
 		size: false
+	},
+	{
+		name: "💀",
+		sellable: true,
+		size: true
 	}
 ];
 const getInitialStats = () => structuredClone(defaultFishingData);
