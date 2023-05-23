@@ -157,24 +157,33 @@ module.exports = {
 				}
 			});
 
-			const result = await sb.Command.get("gpt").execute(fauxContext, prompt);
-			const fixedResult = result.reply.replace("🤖", "");
+			try {
+				const result = await sb.Command.get("gpt").execute(fauxContext, prompt);
+				const fixedResult = result.reply.replace("🤖", "");
 
-			return {
-				reply: `✨${fishType}✨ ${fixedResult} (30m cooldown${appendix})`
-			};
+				return {
+					reply: `✨${fishType}✨ ${fixedResult} (30m cooldown${appendix})`
+				};
+			}
+			catch (e) {
+				await sb.Logger.logError("Command", e, {
+					origin: "External",
+					context: {
+						cause: "GPT within $fish"
+					}
+				});
+			}
 		}
-		else {
-			const emote = await getEmote(context, "success");
-			return {
-				reply: sb.Utils.tag.trim `
-					You caught a ✨${fishType}✨
-					${sizeString}
-					${emote}
-					Now, go do something productive!
-					(30 minute fishing cooldown after a successful catch)
-				`
-			};
-		}
+
+		const emote = await getEmote(context, "success");
+		return {
+			reply: sb.Utils.tag.trim `
+				You caught a ✨${fishType}✨
+				${sizeString}
+				${emote}
+				Now, go do something productive!
+				(30 minute fishing cooldown after a successful catch)
+			`
+		};
 	}
 };
