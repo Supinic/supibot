@@ -12,19 +12,24 @@ module.exports = {
 	aliases: ["top"],
 	description: [
 		`<code>$fish leaderboard</code>`,
+		`<code>$fish top</code>`,
 		`<code>$fish leaderboard fish</code>`,
+		`<code>$fish top fish</code>`,
 		"Shows the list of top anglers - most currently owned fish.",
 		"",
 
 		`<code>$fish leaderboard coins</code>`,
+		`<code>$fish top coins</code>`,
 		"Shows the list of top coin collectors - most currently owned coins.",
 		"",
 
 		`<code>$fish leaderboard lucky</code>`,
+		`<code>$fish top lucky</code>`,
 		"Shows the list of the luckiest anglers - currently on the best lucky streak.",
 		"",
 
 		`<code>$fish leaderboard unlucky</code>`,
+		`<code>$fish top unlucky</code>`,
 		"Shows the list of the unluckiest anglers - currently on the worst unlucky streak."
 	],
 	execute: async (context, type) => {
