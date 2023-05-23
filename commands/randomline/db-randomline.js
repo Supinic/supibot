@@ -5,7 +5,7 @@ const throwOrReturn = (throwFlag, message) => {
 	else {
 		return {
 			success: false,
-			reply: message
+			reason: message
 		};
 	}
 };
@@ -183,7 +183,7 @@ const fetchGroupResult = async function (type, group, userData = null) {
 		const [error] = e.errors;
 		return {
 			success: false,
-			reply: error.simpleMessage ?? "An error occured!"
+			reason: error.simpleMessage ?? "An error occured!"
 		};
 	}
 
