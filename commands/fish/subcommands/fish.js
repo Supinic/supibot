@@ -39,38 +39,28 @@ module.exports = {
 		}
 
 		let rollChance = 20;
-		const [selectedBait] = args;
-		if (selectedBait) {
-			const baitIndex = baitTypes.indexOf(selectedBait);
-			if (baitIndex === -1) {
-				return {
-					success: false,
-					reply: `
-						Incorrect bait selected! 
-						Try one of these: ${baitTypes.join(" ")}
-						or use "${sb.Command.prefix}fish help" if you're lost.
-					`
-				};
-			}
-
-			const baitPrice = 2 + (3 * baitIndex);
-			if (fishData.coins < baitPrice) {
-				return {
-					success: false,
-					reply: `You need ${baitPrice}🪙 for one ${selectedBait}! (you have ${fishData.coins}🪙)`
-				};
-			}
-
-			fishData.coins -= baitPrice;
-			fishData.lifetime.baitUsed++;
-			rollChance -= (2 * baitIndex) + 4;
-		}
-
 		let appendix = "";
-		if (selectedBait) {
-			appendix = `, used ${selectedBait}, ${fishData.coins}🪙 left`;
+		if (args.length > 0) {
+			const [selectedBait] = args;
+			const baitIndex = baitTypes.indexOf(args[0]);
+			if (baitIndex !== -1) {
+				const baitPrice = 2 + (3 * baitIndex);
+				if (fishData.coins < baitPrice) {
+					return {
+						success: false,
+						reply: `You need ${baitPrice}🪙 for one ${selectedBait}! (you have ${fishData.coins}🪙)`
+					};
+				}
+
+				appendix = `, used ${args[0]}, ${fishData.coins}🪙 left`;
+
+				fishData.coins -= baitPrice;
+				fishData.lifetime.baitUsed++;
+				rollChance -= (2 * baitIndex) + 4;
+			}
 		}
 
+		// Clamp the roll chance in the case of unexpected/untested bonuses
 		if (rollChance < 1) {
 			rollChance = 1;
 		}
