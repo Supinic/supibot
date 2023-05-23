@@ -1,22 +1,13 @@
 const { baitTypes, getEmote, getInitialStats, fishTypes } = require("./fishing-utils.js");
 const { checkLimits } = require("../../gpt/cache-control.js");
-const randomWords = require("../../randomword/words.json");
 
 const gptStyles = ["exciting", "spooky", "smug", "radical", "insane", "hilarious", "infuriating"];
-const getRandomWords = (amount) => {
-	const result = new Set();
-	for (let i = 0; i < amount; i++) {
-		result.add(sb.Utils.randArray(randomWords));
-	}
-
-	return [...result];
-};
 const createGptPrompt = (executor, resultFish, sizeString) => sb.Utils.tag.trim `
-	Write a short fishing story	where a user named ${executor}
+	Write a short story	where a user named "${executor}"
 	catches a ${resultFish} in the water and keeps it! 
 	${sizeString}
-	Keep it short but somewhat ${sb.Utils.randArray(gptStyles)}, 
-	and include the following words or themes: ${getRandomWords(3).join(", ")}
+	Make it very concise - a maximum of 150 characters.
+    The writing style should be ${sb.Utils.randArray(gptStyles)}.
 `;
 
 const successfulFishDelay = 18e5; // 18e5 - 30 min
