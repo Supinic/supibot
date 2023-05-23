@@ -53,13 +53,13 @@ module.exports = {
 			best lucky streak: ${sb.Utils.groupDigits(data.BestLuckyStreak)}.
 		`;
 
-		let prefix = "Global statistics";
+		let prefix = "Global";
 		if (targetUserData) {
 			prefix = (targetUserData === context.user) ? "Your" : "Their";
 		}
 
 		return {
-			reply: `${prefix}: ${result}`
+			reply: `${prefix} fishing stats → ${result}`
 		};
 	}
 };
