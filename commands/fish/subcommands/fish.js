@@ -26,7 +26,11 @@ module.exports = {
 		`<code>$fish 🦗</code>`,
 		"Buy bait before heading out to fish, to increase your odds.",
 		"The bait is immediately used as you go fishing, and cannot be used later.",
-		`Available bait: ${baitTypes.join(" ")}`
+		`Available bait: ${baitTypes.join(" ")}`,
+		"",
+
+		`<code>$fish skipStory:true</code>`,
+		"Does not generate a GPT story about your fishing results, if successful."
 	],
 	execute: async (context, ...args) => {
 		/** @type {UserFishData} */
@@ -126,7 +130,7 @@ module.exports = {
 		const gptLimitResult = await checkLimits(context.user);
 		const gptRoll = sb.Utils.random(1, 3);
 
-		if (sb.Command.get("gpt") && gptRoll === 1 && gptLimitResult.success) {
+		if (!context.params.skipStory && sb.Command.get("gpt") && gptRoll === 1 && gptLimitResult.success) {
 			const gptCommand = sb.Command.get("gpt");
 			const prompt = createGptPrompt(context.user.Name, fishType, sizeString);
 			const fauxContext = sb.Command.createFakeContext(gptCommand, {

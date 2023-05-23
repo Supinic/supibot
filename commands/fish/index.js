@@ -11,7 +11,9 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Go fishing! Supports multiple subcommands - check those out in the full command description.",
 	Flags: ["mention","pipe"],
-	Params: null,
+	Params: [
+		{ name: "skipStory", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function fish (context, ...args) {
