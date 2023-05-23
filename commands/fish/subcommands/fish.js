@@ -56,9 +56,10 @@ module.exports = {
 					};
 				}
 
+				fishData.coins -= baitPrice;
+
 				appendix = `, used ${args[0]}, ${fishData.coins}🪙 left`;
 
-				fishData.coins -= baitPrice;
 				fishData.lifetime.baitUsed++;
 				rollChance -= (2 * baitIndex) + 4;
 			}
