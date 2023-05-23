@@ -50,7 +50,7 @@ module.exports = {
 			bait used: ${sb.Utils.groupDigits(data.BaitUsed)};
 			fish sold: ${sb.Utils.groupDigits(data.FishSold)};
 			worst dry streak: ${sb.Utils.groupDigits(data.WorstDryStreak)};
-			best lucky streak: ${sb.Utils.groupDigits(data.BestLuckyStreak)};
+			best lucky streak: ${sb.Utils.groupDigits(data.BestLuckyStreak)}.
 		`;
 
 		let prefix = "Global statistics";
