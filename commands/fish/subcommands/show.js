@@ -30,7 +30,12 @@ module.exports = {
 			? ["You", "your"]
 			: ["They", "their"];
 
-		if (fishData.catch.total === 0) {
+		if (fishData.lifetime.attempts === 0) {
+			return {
+				reply: `${subject} have never gone fishing before.`
+			};
+		}
+		else if (fishData.catch.total === 0) {
 			return {
 				reply: `${subject} have no fish in ${possessive} collection.`
 			};

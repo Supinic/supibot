@@ -55,6 +55,13 @@ module.exports = {
 
 		let prefix = "Global";
 		if (targetUserData) {
+			if (data.Attempts === 0) {
+				const subject = (targetUserData === context.user) ? "You" : "They";
+				return {
+					reply: `${subject} have never gone fishing before.`
+				};
+			}
+
 			prefix = (targetUserData === context.user) ? "Your" : "Their";
 		}
 
