@@ -55,7 +55,7 @@ module.exports = {
 
 		let prefix = "Global";
 		if (targetUserData) {
-			if (data.Attempts === 0) {
+			if (!data.Attempts) { // Can be either `null` or `0` if user has never gone fishing
 				const subject = (targetUserData === context.user) ? "You" : "They";
 				return {
 					reply: `${subject} have never gone fishing before.`
