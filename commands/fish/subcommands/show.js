@@ -37,7 +37,10 @@ module.exports = {
 		}
 		else if (fishData.catch.total === 0) {
 			return {
-				reply: `${subject} have no fish in ${possessive} collection.`
+				reply: sb.Utils.tag.trim `
+					${subject} have no fish in ${possessive} collection,
+					and ${possessive} purse contains ${fishData.coins}${COIN_EMOJI}.
+				`
 			};
 		}
 
