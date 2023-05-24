@@ -43,6 +43,10 @@ module.exports = {
 
 		const result = [];
 		for (const [fishType, count] of Object.entries(fishData.catch.types)) {
+			if (count <= 0) {
+				continue;
+			}
+
 			if (count < 5) {
 				result.push(fishType.repeat(count));
 			}
