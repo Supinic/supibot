@@ -55,7 +55,7 @@ module.exports = {
 			reply: sb.Utils.tag.trim `
 				${subject} have ${fishData.catch.total} fish in ${possessive} collection.
 				Here they are: ${result.join("")}
-				Finally, ${subject} have ${fishData.coins}${COIN_EMOJI} in ${possessive} purse.
+				${subject} also have ${fishData.coins}${COIN_EMOJI} in ${possessive} purse.
 			`
 		};
 	}
