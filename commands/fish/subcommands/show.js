@@ -1,16 +1,16 @@
-const { getInitialStats } = require("./fishing-utils.js");
+const { COIN_EMOJI, getInitialStats } = require("./fishing-utils.js");
 
 module.exports = {
 	name: "show",
 	aliases: ["count", "display", "collection"],
 	description: [
 		`<code>$fish show</code>`,
-		"Show off your fishing trophy collection.",
+		"Show off your fishing trophy collection and your coins.",
 		"",
 
 		`<code>$fish show (user)</code>`,
 		`<code>$fish show @Supinic</code>`,
-		"Check out another user's fishing collection."
+		"Check out another user's fishing collection and coins."
 	],
 	execute: async (context, user) => {
 		const targetUserData = (user)
@@ -52,7 +52,11 @@ module.exports = {
 		}
 
 		return {
-			reply: `${subject} have ${fishData.catch.total} fish in ${possessive} collection. Here they are: ${result.join("")}`
+			reply: sb.Utils.tag.trim `
+				${subject} have ${fishData.catch.total} fish in ${possessive} collection.
+				Here they are: ${result.join("")}
+				Finally, ${subject} have ${fishData.coins}${COIN_EMOJI} in ${possessive} purse.
+			`
 		};
 	}
 };
