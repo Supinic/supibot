@@ -195,49 +195,52 @@ module.exports = class TwitchController extends require("./template.js") {
 		const client = this.client;
 
 		client.on("error", async (error) => {
+			// noinspection UnnecessaryReturnStatementJS
 			if (error instanceof DankTwitch.JoinError && error.failedChannelName) {
-				const channelData = sb.Channel.get(error.failedChannelName);
-				if (!channelData) {
-					return;
-				}
-
-				const result = await this.executeChannelRename(channelData);
-				if (result.reason === "channel-suspended") {
-					await sb.Logger.log(
-						"Twitch.Fail",
-						`Channel ${channelData.Name} unavailable - set to Inactive`,
-						channelData,
-						null
-					);
-				}
-				else if (result.reason === "channel-id-mismatch") {
-					await sb.Logger.log(
-						"Twitch.Warning",
-						`Possible user rename has a mismatched user ID. Data dump: ${JSON.stringify(result)}`,
-						channelData,
-						null
-					);
-				}
-				else if (result.action && result.action.includes("rename") && result.login) {
-					const suggestionIDs = await sb.Query.getRecordset(rs => rs
-						.select("ID")
-						.from("data", "Suggestion")
-						.where("Category = %s", "Bot addition")
-						.where("Status IS NULL")
-						.where("Text %*like*", result.login)
-						.flat("ID")
-					);
-
-					for (const ID of suggestionIDs) {
-						const row = await sb.Query.getRow("data", "Suggestion");
-						await row.load(ID);
-
-						row.values.Status = "Completed";
-						row.values.Notes = `Completed due to automatic rename detection\n\n${row.values.Notes}`;
-						await row.save({ skipLoad: true });
+				return; // temporary solution
+				/*
+					const channelData = sb.Channel.get(error.failedChannelName);
+					if (!channelData) {
+						return;
 					}
-				}
-				else if (result.success === true) {
+
+					const result = await this.executeChannelRename(channelData);
+					if (result.reason === "channel-suspended") {
+						await sb.Logger.log(
+							"Twitch.Fail",
+							`Channel ${channelData.Name} unavailable - set to Inactive`,
+							channelData,
+							null
+						);
+					}
+					else if (result.reason === "channel-id-mismatch") {
+						await sb.Logger.log(
+							"Twitch.Warning",
+							`Possible user rename has a mismatched user ID. Data dump: ${JSON.stringify(result)}`,
+							channelData,
+							null
+						);
+					}
+					else if (result.action && result.action.includes("rename") && result.login) {
+						const suggestionIDs = await sb.Query.getRecordset(rs => rs
+							.select("ID")
+							.from("data", "Suggestion")
+							.where("Category = %s", "Bot addition")
+							.where("Status IS NULL")
+							.where("Text %*like*", result.login)
+							.flat("ID")
+						);
+
+						for (const ID of suggestionIDs) {
+							const row = await sb.Query.getRow("data", "Suggestion");
+							await row.load(ID);
+
+							row.values.Status = "Completed";
+							row.values.Notes = `Completed due to automatic rename detection\n\n${row.values.Notes}`;
+							await row.save({ skipLoad: true });
+						}
+					}
+					else if (result.success === true) {
 					await sb.Logger.log(
 						"Twitch.Other",
 						`Channel rename: ${JSON.stringify({ result, error })}`,
@@ -245,6 +248,7 @@ module.exports = class TwitchController extends require("./template.js") {
 						null
 					);
 				}
+			 */
 			}
 			else if (error instanceof DankTwitch.SayError && error.cause instanceof DankTwitch.MessageError) {
 				if (error.message.includes("Bad response message")) {
