@@ -1,4 +1,4 @@
-const { baitTypes, getEmote, getInitialStats, fishTypes } = require("./fishing-utils.js");
+const { baitTypes, COIN_EMOJI, getEmote, getInitialStats, fishTypes } = require("./fishing-utils.js");
 const { checkLimits } = require("../../gpt/cache-control.js");
 
 const gptStyles = ["exciting", "spooky", "smug", "radical", "insane", "hilarious", "infuriating"];
@@ -52,7 +52,7 @@ module.exports = {
 				if (fishData.coins < baitData.price) {
 					return {
 						success: false,
-						reply: `You need ${baitData.price}🪙 for one ${selectedBait}! (you have ${fishData.coins}🪙)`
+						reply: `You need ${baitData.price}${COIN_EMOJI} for one ${selectedBait}! (you have ${fishData.coins}${COIN_EMOJI})`
 					};
 				}
 
@@ -60,7 +60,7 @@ module.exports = {
 				fishData.coins -= baitData.price;
 				fishData.lifetime.baitUsed++;
 
-				appendix = `, used ${args[0]}, ${fishData.coins}🪙 left`;
+				appendix = `, used ${args[0]}, ${fishData.coins}${COIN_EMOJI} left`;
 			}
 		}
 

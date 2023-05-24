@@ -1,4 +1,4 @@
-const { getInitialStats, fishTypes } = require("./fishing-utils.js");
+const { COIN_EMOJI, getInitialStats, fishTypes } = require("./fishing-utils.js");
 const fishEmojis = fishTypes.map(i => i.name);
 
 module.exports = {
@@ -52,7 +52,7 @@ module.exports = {
 		await context.user.setDataProperty("fishData", fishData);
 
 		return {
-			reply: `Sold your ${fishType} for 50🪙 - now you have ${fishData.coins}🪙.`
+			reply: `Sold your ${fishType} for 50${COIN_EMOJI} - now you have ${fishData.coins}🪙.`
 		};
 	}
 };

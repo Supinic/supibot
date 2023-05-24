@@ -199,7 +199,10 @@ const getEmote = async (context, type) => {
 	return await context.getBestAvailableEmote(list, fallback, { shuffle: true });
 };
 
+const COIN_EMOJI = "🪙";
+
 module.exports = {
+	COIN_EMOJI,
 	baitTypes,
 	getEmote,
 	getInitialStats,
