@@ -4,7 +4,8 @@ const typeProperty = {
 	fish: ["catch.total", "anglers"],
 	coins: ["coins", "coin collectors"],
 	lucky: ["catch.luckyStreak", "lucky ducks"],
-	unlucky: ["catch.dryStreak", "jinxed sphinxes"]
+	unlucky: ["catch.dryStreak", "jinxed sphinxes"],
+	"total-unlucky": ["lifetime.dryStreak", "all-time unluckiest anglers"]
 };
 
 module.exports = {
@@ -30,7 +31,12 @@ module.exports = {
 
 		`<code>$fish leaderboard unlucky</code>`,
 		`<code>$fish top unlucky</code>`,
-		"Shows the list of the unluckiest anglers - currently on the worst unlucky streak."
+		"Shows the list of the unluckiest anglers - currently on the worst unlucky streak.",
+		"",
+
+		`<code>$fish leaderboard total-unlucky</code>`,
+		`<code>$fish top total-unlucky</code>`,
+		"Shows the list of the unluckiest anglers of all time - worst unlucky streaks of all time (not currently)."
 	],
 	execute: async (context, type) => {
 		const leaderboardType = type ?? "fish";
