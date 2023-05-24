@@ -20,7 +20,27 @@ const defaultFishingData = Object.freeze({
 	}
 });
 
-const baitTypes = ["🪱", "🪰", "🦗"];
+const baitTypes = [
+	{
+		emoji: "🪱",
+		name: "worm",
+		price: 2,
+		roll: 16
+	},
+	{
+		emoji: "🪰",
+		name: "fly",
+		price: 5,
+		roll: 14
+	},
+	{
+		emoji: "🦗",
+		name: "cricket",
+		price: 8,
+		roll: 12
+	}
+];
+
 const fishTypes = [
 	{
 		name: "🧦",

@@ -12,6 +12,7 @@ const createGptPrompt = (executor, resultFish, sizeString) => sb.Utils.tag.trim 
 
 const successfulFishDelay = 18e5; // 18e5 - 30 min
 const unsuccessfulFishDelay = 30_000; // 30_000 - 30s
+const baitDisplay = baitTypes.map(i => `${i.name} ${i.emoji} (${i.price} coins)`).join(" - ");
 
 module.exports = {
 	name: "fish",
@@ -26,7 +27,7 @@ module.exports = {
 		`<code>$fish 🦗</code>`,
 		"Buy bait before heading out to fish, to increase your odds.",
 		"The bait is immediately used as you go fishing, and cannot be used later.",
-		`Available bait: ${baitTypes.join(" ")}`,
+		`Available bait types: ${baitDisplay}`,
 		"",
 
 		`<code>$fish skipStory:true</code>`,
@@ -42,37 +43,35 @@ module.exports = {
 			};
 		}
 
-		let rollChance = 20;
+		let rollMaximum = 20;
 		let appendix = "";
 		if (args.length > 0) {
 			const [selectedBait] = args;
-			const baitIndex = baitTypes.indexOf(args[0]);
-			if (baitIndex !== -1) {
-				const baitPrice = 2 + (3 * baitIndex);
-				if (fishData.coins < baitPrice) {
+			const baitData = baitTypes.find(i => i.name === selectedBait || i.emoji === selectedBait);
+			if (baitData) {
+				if (fishData.coins < baitData.price) {
 					return {
 						success: false,
-						reply: `You need ${baitPrice}🪙 for one ${selectedBait}! (you have ${fishData.coins}🪙)`
+						reply: `You need ${baitData.price}🪙 for one ${selectedBait}! (you have ${fishData.coins}🪙)`
 					};
 				}
 
-				fishData.coins -= baitPrice;
+				rollMaximum = baitData.roll;
+				fishData.coins -= baitData.price;
+				fishData.lifetime.baitUsed++;
 
 				appendix = `, used ${args[0]}, ${fishData.coins}🪙 left`;
-
-				fishData.lifetime.baitUsed++;
-				rollChance -= (2 * baitIndex) + 4;
 			}
 		}
 
 		// Clamp the roll chance in the case of unexpected/untested bonuses
-		if (rollChance < 1) {
-			rollChance = 1;
+		if (rollMaximum < 1) {
+			rollMaximum = 1;
 		}
 
 		fishData.lifetime.attempts++;
 
-		const roll = sb.Utils.random(1, rollChance);
+		const roll = sb.Utils.random(1, rollMaximum);
 		if (roll !== 1) {
 			fishData.catch.dryStreak++;
 			fishData.catch.luckyStreak = 0;
