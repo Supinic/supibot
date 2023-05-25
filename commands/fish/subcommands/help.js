@@ -12,6 +12,8 @@ module.exports = {
 			$fish (bait) → buy bait and go fishing;
 			$fish sell (fish) → sell one of your fish;
 			$fish show → show off your collection;
+			$fish stats → fishing statistics;
+			$fish leaderboard → list of top anglers;
 			$fish help → you're reading this.
 		`
 	})
