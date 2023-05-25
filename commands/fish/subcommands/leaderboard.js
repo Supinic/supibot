@@ -61,6 +61,9 @@ module.exports = {
 
 		const result = data.map((i, ind) => `Rank ${ind + 1}: ${unping(i.Username)} (${i.Total}x)`);
 		return {
+			meta: {
+				skipWhitespaceCheck: true
+			},
 			reply: `Top 10 ${name}: ${result.join("; ")}`
 		};
 	}
