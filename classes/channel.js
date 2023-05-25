@@ -334,7 +334,17 @@ module.exports = class Channel extends require("./template.js") {
 			.flat("Channel")
 		);
 
-		const channelIDs = new Set([...eventChannelIDs, ...configChannelIDs]);
+		const filterChannelIDs = await sb.Query.getRecordset(rs => rs
+			.select("Channel")
+			.from("chat_data", "Filter")
+			.where("Type IN %s+", ["Online-only", "Offline-only"])
+			.where("Active = %b", true)
+			.where("Channel IS NOT NULL")
+			.groupBy("Channel")
+			.flat("Channel")
+		);
+
+		const channelIDs = new Set([...eventChannelIDs, ...configChannelIDs, ...filterChannelIDs]);
 		let channelsData = Array.from(channelIDs).map(i => Channel.get(i)).filter(Boolean);
 		if (platform) {
 			const platformData = sb.Platform.get(platform);
