@@ -10,8 +10,10 @@ const createGptPrompt = (executor, resultFish, sizeString) => sb.Utils.tag.trim 
     The writing style should be ${sb.Utils.randArray(gptStyles)}.
 `;
 
+const formatDelay = (delay) => sb.Utils.timeDelta(sb.Date.now() + delay, true);
+
 const successfulFishDelay = 18e5; // 18e5 - 30 min
-const unsuccessfulFishDelay = 30_000; // 30_000 - 30s
+const unsuccessfulFishDelay = [25_000, 55_000];
 const baitDisplay = baitTypes.map(i => `${i.name} ${i.emoji} (${i.price} coins)`).join(" - ");
 
 module.exports = {
@@ -73,9 +75,11 @@ module.exports = {
 
 		const roll = sb.Utils.random(1, rollMaximum);
 		if (roll !== 1) {
+			const fishingDelay = sb.Utils.random(...unsuccessfulFishDelay);
+
 			fishData.catch.dryStreak++;
 			fishData.catch.luckyStreak = 0;
-			fishData.readyTimestamp = sb.Date.now() + unsuccessfulFishDelay;
+			fishData.readyTimestamp = sb.Date.now() + fishingDelay + 1000;
 
 			if (fishData.catch.dryStreak > fishData.lifetime.dryStreak) {
 				fishData.lifetime.dryStreak = fishData.catch.dryStreak;
@@ -93,7 +97,12 @@ module.exports = {
 			const missDistance = sb.Utils.random(1, 500);
 			return {
 				success: false,
-				reply: `No luck... ${emote} Your bobber landed ${missDistance} cm away. (30s cooldown${appendix})${streakString}`
+				reply: sb.Utils.tag.trim `
+					No luck... ${emote}
+					Your bobber landed ${missDistance} cm away.
+					(${formatDelay(fishingDelay)} cooldown${appendix})
+					${streakString}
+				`
 			};
 		}
 
