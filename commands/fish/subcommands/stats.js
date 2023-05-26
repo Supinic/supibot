@@ -40,6 +40,7 @@ module.exports = {
 			.select(`MAX(CONVERT(JSON_EXTRACT(Value, '$.lifetime.luckyStreak'), INT)) AS BestLuckyStreak`)
 			.from("chat_data", "User_Alias_Data")
 			.where("Property = %s", "fishData")
+			.where("JSON_EXTRACT(Value, '$.removedFromLeaderboards') IS NULL")
 			.where({ condition: Boolean(targetUserData) }, "User_Alias = %n", targetUserData?.ID)
 			.single()
 		);

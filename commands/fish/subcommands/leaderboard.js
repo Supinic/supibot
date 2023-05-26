@@ -55,6 +55,7 @@ module.exports = {
 			.from("chat_data", "User_Alias_Data")
 			.join("chat_data", "User_Alias")
 			.where("Property = %s", "fishData")
+			.where("JSON_EXTRACT(Value, '$.removedFromLeaderboards') IS NULL")
 			.orderBy(`CONVERT(JSON_EXTRACT(Value, '$.${dataProperty}'), INT) DESC`)
 			.limit(10)
 		);
