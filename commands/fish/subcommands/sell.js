@@ -22,7 +22,7 @@ module.exports = {
 		else if (!fishEmojis.includes(fishType)) {
 			return {
 				success: false,
-				reply: `Invalid fish provided! Use one of: ${fishEmojis.join(", ")}`
+				reply: `Invalid fish provided! Use one of: ${fishEmojis.join("")}`
 			};
 		}
 
