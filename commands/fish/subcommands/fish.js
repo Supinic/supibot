@@ -3,7 +3,7 @@ const { checkLimits } = require("../../gpt/cache-control.js");
 
 const gptStyles = ["exciting", "spooky", "smug", "radical", "insane", "hilarious", "infuriating"];
 const createGptPrompt = (executor, resultFish, sizeString) => sb.Utils.tag.trim `
-	Write a short story	where a user named "${executor}"
+	Write a short story where a user named "${executor}"
 	catches a ${resultFish} in the water and keeps it! 
 	${sizeString}
 	Make it very concise - a maximum of 150 characters.
