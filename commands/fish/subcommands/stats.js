@@ -18,7 +18,7 @@ module.exports = {
 		if (userOrGlobal === "global") {
 			targetUserData = null;
 		}
-		else if (userOrGlobal) {
+		else {
 			targetUserData = (userOrGlobal)
 				? await sb.User.get(userOrGlobal)
 				: context.user;
