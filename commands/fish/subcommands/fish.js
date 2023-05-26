@@ -75,7 +75,7 @@ module.exports = {
 
 		const roll = sb.Utils.random(1, rollMaximum);
 		if (roll !== 1) {
-			const fishingDelay = sb.Utils.random(...unsuccessfulFishDelay);
+			const fishingDelay = sb.Utils.round(sb.Utils.random(...unsuccessfulFishDelay), 0);
 
 			fishData.catch.dryStreak++;
 			fishData.catch.luckyStreak = 0;
