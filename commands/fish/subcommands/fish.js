@@ -14,7 +14,7 @@ const formatDelay = (delay) => sb.Utils.timeDelta(sb.Date.now() + delay, true);
 
 const successfulFishDelay = 18e5; // 18e5 - 30 min
 const unsuccessfulFishDelay = [25_000, 55_000];
-const baitDisplay = baitTypes.map(i => `${i.name} ${i.emoji} (${i.price} coins)`).join(" - ");
+const baitDisplay = baitTypes.map(i => `<code>${i.name}</code> ${i.emoji} (${i.price} coins)`).join(" - ");
 
 module.exports = {
 	name: "fish",
@@ -27,6 +27,7 @@ module.exports = {
 
 		`<code>$fish (bait)</code>`,
 		`<code>$fish 🦗</code>`,
+		`<code>$fish cricket</code>`,
 		"Buy bait before heading out to fish, to increase your odds.",
 		"The bait is immediately used as you go fishing, and cannot be used later.",
 		`Available bait types: ${baitDisplay}`,
