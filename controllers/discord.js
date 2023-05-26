@@ -349,6 +349,11 @@ module.exports = class DiscordController extends require("./template.js") {
 		});
 
 		client.on("error", async (err) => {
+			// Don't restart on errors stemming from sending messages (usually caused by Discord API being momentarily down)
+			if (err.toString().includes("TextChannel.send")) {
+				return;
+			}
+
 			await sb.Logger.log("Discord.Error", err.toString(), null, null);
 			this.restart();
 		});
