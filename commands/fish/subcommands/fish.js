@@ -95,8 +95,8 @@ module.exports = {
 			}
 
 			let message;
-			const pityRoll = sb.Utils.random(1, 2);
-			if (pityRoll === 1) {
+			const junkRoll = sb.Utils.random(1, 100);
+			if (junkRoll <= 25) {
 				const item = getWeightedCatch("junk");
 
 				fishData.catch.junk = (fishData.catch.junk ?? 0) + 1;
