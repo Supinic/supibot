@@ -15,14 +15,12 @@ module.exports = {
 		"Those can then be used to buy bait (and more goodies in the future).",
 		"",
 
-		`<code>$fish sell all</code>`,
-		"Sells all of your catches, no matter what they are.",
+		`<code>$fish sell all fish</code>`,
+		"Sells all of your fish.",
 		"",
 
-		`<code>$fish sell all (type)</code>`,
-		`<code>$fish sell all fish</code>`,
 		`<code>$fish sell all junk</code>`,
-		"Sells all of your catches, depending on what type you chose."
+		"Sells all of your junk."
 	],
 	execute: async (context, fishType, modifier) => {
 		/** @type {UserFishData} */
@@ -38,9 +36,17 @@ module.exports = {
 			let coinsGained = 0;
 			let itemsSold = 0;
 
-			const itemType = itemTypeDefinitions.find(i => i.name === modifier);
+			const itemTypeDefinition = itemTypeDefinitions.find(i => i.name === modifier);
+			if (!itemTypeDefinition) {
+				const types = itemTypeDefinitions.map(i => i.name).join(", ");
+				return {
+					success: false,
+					reply: `When selling all, you must provide a type! Use one of: ${types}`
+				};
+			}
+
 			for (const itemData of itemTypes) {
-				if (itemType && modifier !== itemType.name) {
+				if (itemTypeDefinition && modifier !== itemData.name) {
 					continue;
 				}
 				else if (!itemData.sellable) {
@@ -72,14 +78,14 @@ module.exports = {
 			if (coinsGained === 0) {
 				return {
 					success: false,
-					reply: `You have no ${itemType?.description ?? "items"} to sell!`
+					reply: `You have no ${itemTypeDefinition?.description ?? "items"} to sell!`
 				};
 			}
 
 			await context.user.setDataProperty("fishData", fishData);
 
 			return {
-				reply: `You sold ${itemsSold} ${itemType?.description ?? "items"} for a grand total of ${coinsGained}${COIN_EMOJI}`
+				reply: `You sold ${itemsSold} ${itemTypeDefinition?.description ?? "items"} for a grand total of ${coinsGained}${COIN_EMOJI}`
 			};
 		}
 		else if (!fishEmojis.includes(fishType)) {
