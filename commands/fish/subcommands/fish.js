@@ -1,6 +1,7 @@
 const {
 	baitTypes,
 	COIN_EMOJI,
+	getCatchMessage,
 	getEmote,
 	getInitialStats,
 	getWeightedCatch
@@ -102,7 +103,7 @@ module.exports = {
 				fishData.lifetime.junk = (fishData.lifetime.junk ?? 0) + 1;
 				fishData.catch.types[item.name] = (fishData.catch.types[item.name] ?? 0) + 1;
 
-				message = `Your line gets tangled up in some junk and you reel out a ${item.name}`;
+				message = `${getCatchMessage("junk")} You reel out a ${item.name}`;
 			}
 			else {
 				const missDistance = sb.Utils.random(1, 500);

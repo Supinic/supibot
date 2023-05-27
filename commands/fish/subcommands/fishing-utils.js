@@ -325,12 +325,29 @@ const getWeightedCatch = (type) => {
 	throw new Error("Invalid weighted roll result");
 };
 
+const catchMessages = {
+	fish: [],
+	junk: [
+		"Oops! You snagged something that's better off in the garbage.",
+		"Oh dear, it looks like you've reeled in some unwanted clutter.",
+		"It seems luck wasn't on your side this time. You caught a piece of junk.",
+		"You've landed a piece of useless debris.",
+		"You pull up something disappointing.",
+		"Ah... just another item for the scrap heap.",
+		"Wow! Would you look at that! ...nevermind, it's just junk.",
+		"Your line gets tangled up in some junk."
+	]
+};
+
+const getCatchMessage = (type) => sb.Utils.randArray(catchMessages[type]);
+
 const COIN_EMOJI = "🪙";
 
 module.exports = {
 	COIN_EMOJI,
 	baitTypes,
 	itemTypeDefinitions,
+	getCatchMessage,
 	getEmote,
 	getInitialStats,
 	getWeightedCatch,
