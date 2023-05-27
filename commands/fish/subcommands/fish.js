@@ -46,7 +46,7 @@ module.exports = {
 			};
 		}
 
-		let rollMaximum = 1;
+		let rollMaximum = 20;
 		let appendix = "";
 		if (args.length > 0) {
 			const [selectedBait] = args;
