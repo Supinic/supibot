@@ -46,7 +46,7 @@ module.exports = {
 			}
 
 			for (const itemData of itemTypes) {
-				if (itemTypeDefinition && modifier !== itemData.name) {
+				if (modifier !== itemData.type) {
 					continue;
 				}
 				else if (!itemData.sellable) {
