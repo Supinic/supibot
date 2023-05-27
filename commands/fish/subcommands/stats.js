@@ -35,7 +35,9 @@ module.exports = {
 			.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.lifetime.attempts'), INT)) AS Attempts`)
 			.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.lifetime.baitUsed'), INT)) AS BaitUsed`)
 			.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.lifetime.fish'), INT)) AS FishCaught`)
+			.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.lifetime.junk'), INT)) AS JunkCaught`)
 			.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.lifetime.sold'), INT)) AS FishSold`)
+			.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.lifetime.scrapped'), INT)) AS JunkSold`)
 			.select(`MAX(CONVERT(JSON_EXTRACT(Value, '$.lifetime.dryStreak'), INT)) AS WorstDryStreak`)
 			.select(`MAX(CONVERT(JSON_EXTRACT(Value, '$.lifetime.luckyStreak'), INT)) AS BestLuckyStreak`)
 			.from("chat_data", "User_Alias_Data")
@@ -47,9 +49,11 @@ module.exports = {
 
 		const result = sb.Utils.tag.trim `
 			attempts: ${sb.Utils.groupDigits(data.Attempts)};
-			catches: ${sb.Utils.groupDigits(data.FishCaught)};
+			caught fish: ${sb.Utils.groupDigits(data.FishCaught)};
+			caught junk: ${sb.Utils.groupDigits(data.JunkCaught)};
 			bait used: ${sb.Utils.groupDigits(data.BaitUsed)};
 			fish sold: ${sb.Utils.groupDigits(data.FishSold)};
+			junk scrapped: ${sb.Utils.groupDigits(data.JunkSold)};
 			worst dry streak: ${sb.Utils.groupDigits(data.WorstDryStreak)};
 			best lucky streak: ${sb.Utils.groupDigits(data.BestLuckyStreak)}.
 		`;

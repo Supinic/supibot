@@ -43,137 +43,196 @@ const baitTypes = [
 
 const itemTypes = [
 	{
-		name: "🧦",
-		sellable: false,
+		name: "🥫",
+		sellable: true,
 		size: false,
 		type: "junk",
-		price: 0
-	},
-	{
-		name: "🦂",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🦑",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🦐",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🦞",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🦀",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🐡",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🐠",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🐟",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🐬",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🐳",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🐋",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🦈",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🐊",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🐸",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🐢",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🐙",
-		sellable: true,
-		size: true,
-		type: "fish",
-		price: 50
-	},
-	{
-		name: "🐚",
-		sellable: true,
-		size: false,
-		type: "fish",
-		price: 50
+		price: 8,
+		weight: 0.5
 	},
 	{
 		name: "💀",
 		sellable: true,
 		size: false,
 		type: "junk",
-		price: 5
+		price: 5,
+		weight: 1
+	},
+	{
+		name: "🥾",
+		sellable: true,
+		size: false,
+		type: "junk",
+		price: 20,
+		weight: 0.25
+	},
+	{
+		name: "🌿",
+		sellable: true,
+		size: false,
+		type: "junk",
+		price: 2,
+		weight: 1
+	},
+	{
+		name: "🍂",
+		sellable: true,
+		size: false,
+		type: "junk",
+		price: 1,
+		weight: 1
+	},
+	{
+		name: "🧦",
+		sellable: true,
+		size: false,
+		type: "junk",
+		price: 5,
+		weight: 1
+	},
+	{
+		name: "🌿",
+		sellable: true,
+		size: false,
+		type: "junk",
+		price: 10,
+		weight: 1
+	},
+	{
+		name: "🦂",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🦑",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🦐",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🦞",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🦀",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🐡",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🐠",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🐟",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🐬",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🐳",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🐋",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🦈",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🐊",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🐸",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🐢",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🐙",
+		sellable: true,
+		size: true,
+		type: "fish",
+		price: 50,
+		weight: 1
+	},
+	{
+		name: "🐚",
+		sellable: true,
+		size: false,
+		type: "fish",
+		price: 50,
+		weight: 1
 	}
 ];
 
@@ -249,6 +308,23 @@ const getEmote = async (context, type) => {
 	return await context.getBestAvailableEmote(list, fallback, { shuffle: true });
 };
 
+const getWeightedCatch = (type) => {
+	const applicableItems = itemTypes.filter(i => i.type === type);
+	const totalWeight = applicableItems.reduce((acc, cur) => acc + cur.weight ?? 1, 0);
+
+	let indexedWeight = 0;
+	const roll = sb.Utils.random(1, totalWeight);
+	for (const item of applicableItems) {
+		indexedWeight += item.weight;
+
+		if (roll <= indexedWeight) {
+			return item;
+		}
+	}
+
+	throw new Error("Invalid weighted roll result");
+};
+
 const COIN_EMOJI = "🪙";
 
 module.exports = {
@@ -257,6 +333,7 @@ module.exports = {
 	itemTypeDefinitions,
 	getEmote,
 	getInitialStats,
+	getWeightedCatch,
 	itemTypes
 };
 
@@ -264,8 +341,10 @@ module.exports = {
  * @typedef {Object} UserFishData
  * @property {Object} lifetime
  * @property {number} lifetime.fish
+ * @property {number} lifetime.junk
  * @property {number} lifetime.coins
  * @property {number} lifetime.sold
+ * @property {number} lifetime.scrapped
  * @property {number} lifetime.baitUsed
  * @property {number} lifetime.attempts
  * @property {number} lifetime.maxFishSize
@@ -273,7 +352,8 @@ module.exports = {
  * @property {number} lifetime.dryStreak
  * @property {number} lifetime.luckyStreak
  * @property {Object} catch
- * @property {number} catch.total
+ * @property {number} catch.fish
+ * @property {number} catch.junk
  * @property {number} catch.dryStreak
  * @property {number} catch.luckyStreak
  * @property {Record<string, number>} catch.types

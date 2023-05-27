@@ -1,7 +1,8 @@
 const unping = (str) => `${str[0]}\u{E0000}${str.slice(1)}`;
 
 const typeProperty = {
-	fish: ["catch.total", "anglers"],
+	fish: ["catch.fish", "anglers"],
+	junk: ["catch.junk", "junkrats"],
 	coins: ["coins", "coin collectors"],
 	lucky: ["catch.luckyStreak", "lucky ducks"],
 	unlucky: ["catch.dryStreak", "jinxed sphinxes"],
@@ -17,6 +18,11 @@ module.exports = {
 		`<code>$fish leaderboard fish</code>`,
 		`<code>$fish top fish</code>`,
 		"Shows the list of top anglers - most currently owned fish.",
+		"",
+
+		`<code>$fish leaderboard junk</code>`,
+		`<code>$fish top junk</code>`,
+		"Shows the list of top junk 'collectors' - most currently owned pieces of junk.",
 		"",
 
 		`<code>$fish leaderboard coins</code>`,
@@ -55,6 +61,7 @@ module.exports = {
 			.from("chat_data", "User_Alias_Data")
 			.join("chat_data", "User_Alias")
 			.where("Property = %s", "fishData")
+			.where(`JSON_EXTRACT(Value, '$.${dataProperty}') IS NOT NULL`)
 			.where("JSON_EXTRACT(Value, '$.removedFromLeaderboards') IS NULL")
 			.orderBy(`CONVERT(JSON_EXTRACT(Value, '$.${dataProperty}'), INT) DESC`)
 			.limit(10)

@@ -1,6 +1,10 @@
 const { COIN_EMOJI, itemTypeDefinitions, getInitialStats, itemTypes } = require("./fishing-utils.js");
 const fishEmojis = itemTypes.map(i => i.name);
 
+/**
+ * @todo Use `modifier` to allow selling multiple fish of a single type: $fish sell TYPE 5
+ */
+
 module.exports = {
 	name: "sell",
 	aliases: [],
@@ -23,10 +27,10 @@ module.exports = {
 	execute: async (context, fishType, modifier) => {
 		/** @type {UserFishData} */
 		const fishData = await context.user.getDataProperty("fishData") ?? getInitialStats();
-		if (fishData.catch.total === 0) {
+		if (fishData.catch.fish === 0 && fishData.catch.junk === 0) {
 			return {
 				success: false,
-				reply: `You have no fish to sell!`
+				reply: `You have no items to sell!`
 			};
 		}
 
@@ -52,24 +56,30 @@ module.exports = {
 				coinsGained += amount * itemData.price;
 
 				fishData.catch.types[itemData.name] = 0;
-				fishData.catch.total -= amount;
+				fishData.catch[itemData.type] -= amount;
 				fishData.coins += coinsGained;
 
-				fishData.lifetime.sold += amount;
+				if (itemData.name === "fish") {
+					fishData.lifetime.sold += amount;
+				}
+				else if (itemData.name === "junk") {
+					fishData.lifetime.scrapped = (fishData.lifetime.scrapped ?? 0) + amount;
+				}
+
 				fishData.lifetime.coins += coinsGained;
 			}
 
 			if (coinsGained === 0) {
 				return {
 					success: false,
-					reply: `You have no ${itemType.description ?? "items"} to sell!`
+					reply: `You have no ${itemType?.description ?? "items"} to sell!`
 				};
 			}
 
 			await context.user.setDataProperty("fishData", fishData);
 
 			return {
-				reply: `You sold ${itemsSold} ${itemType.description ?? "items"} for a grand total of ${coinsGained}${COIN_EMOJI}`
+				reply: `You sold ${itemsSold} ${itemType?.description ?? "items"} for a grand total of ${coinsGained}${COIN_EMOJI}`
 			};
 		}
 		else if (!fishEmojis.includes(fishType)) {
@@ -79,16 +89,16 @@ module.exports = {
 			};
 		}
 
-		const existingFish = fishData.catch.types[fishType];
-		if (typeof existingFish !== "number" || existingFish === 0) {
+		const itemAmount = fishData.catch.types[fishType];
+		if (typeof itemAmount !== "number" || itemAmount === 0) {
 			return {
 				success: false,
 				reply: `You have no ${fishType} to sell!`
 			};
 		}
 
-		const fishTypeData = itemTypes.find(i => i.name === fishType);
-		if (!fishTypeData.sellable) {
+		const itemTypeData = itemTypes.find(i => i.name === fishType);
+		if (!itemTypeData.sellable) {
 			return {
 				success: false,
 				reply: `You can't sell this ${fishType} - nobody would buy it!`
@@ -96,16 +106,16 @@ module.exports = {
 		}
 
 		fishData.catch.types[fishType]--;
-		fishData.catch.total--;
+		fishData.catch[itemTypeData.type]--;
 
-		fishData.coins += 50;
-		fishData.lifetime.coins += 50;
+		fishData.coins += itemTypeData.price;
+		fishData.lifetime.coins += itemTypeData.price;
 		fishData.lifetime.sold++;
 
 		await context.user.setDataProperty("fishData", fishData);
 
 		return {
-			reply: `Sold your ${fishType} for 50${COIN_EMOJI} - now you have ${fishData.coins}🪙.`
+			reply: `Sold your ${fishType} for ${itemTypeData.price}${COIN_EMOJI} - now you have ${fishData.coins}${COIN_EMOJI}.`
 		};
 	}
 };

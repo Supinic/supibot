@@ -1,27 +1,39 @@
-const { COIN_EMOJI, getInitialStats } = require("./fishing-utils.js");
+const { COIN_EMOJI, getInitialStats, itemTypes, itemTypeDefinitions } = require("./fishing-utils.js");
+const defaultShowType = itemTypeDefinitions.find(i => i.name === "fish");
 
 module.exports = {
 	name: "show",
 	aliases: ["count", "display", "collection"],
 	description: [
 		`<code>$fish show</code>`,
+		`<code>$fish show fish</code>`,
 		"Show off your fishing trophy collection and your coins.",
+		"",
+
+		`<code>$fish show junk</code>`,
+		"Check out your junk 'collection' and coins.",
 		"",
 
 		`<code>$fish show (user)</code>`,
 		`<code>$fish show @Supinic</code>`,
 		"Check out another user's fishing collection and coins."
 	],
-	execute: async (context, user) => {
-		const targetUserData = (user)
-			? await sb.User.get(user)
-			: context.user;
-
-		if (!targetUserData) {
-			return {
-				success: false,
-				reply: `No such user exists!`
-			};
+	execute: async (context, userOrType) => {
+		let showTypeData = defaultShowType;
+		let targetUserData = context.user;
+		if (userOrType) {
+			if (itemTypeDefinitions.some(i => i.name === userOrType)) {
+				showTypeData = itemTypeDefinitions.find(i => i.name === userOrType);
+			}
+			else {
+				targetUserData = await sb.User.get(userOrType);
+				if (!targetUserData) {
+					return {
+						success: false,
+						reply: `No such user exists!`
+					};
+				}
+			}
 		}
 
 		/** @type {UserFishData} */
@@ -35,32 +47,39 @@ module.exports = {
 				reply: `${subject} have never gone fishing before.`
 			};
 		}
-		else if (fishData.catch.total === 0) {
+
+		const itemTypeAmount = fishData.catch[showTypeData.name] ?? 0;
+		if (itemTypeAmount <= 0) {
 			return {
 				reply: sb.Utils.tag.trim `
-					${subject} have no fish in ${possessive} collection,
+					${subject} have no ${showTypeData.description} in ${possessive} collection,
 					and ${possessive} purse contains ${fishData.coins}${COIN_EMOJI}.
 				`
 			};
 		}
 
 		const result = [];
-		for (const [fishType, count] of Object.entries(fishData.catch.types)) {
+		for (const [itemEmoji, count] of Object.entries(fishData.catch.types)) {
 			if (count <= 0) {
 				continue;
 			}
 
+			const itemData = itemTypes.find(i => i.name === itemEmoji);
+			if (itemData.type !== showTypeData.name) {
+				continue;
+			}
+
 			if (count < 5) {
-				result.push(fishType.repeat(count));
+				result.push(itemEmoji.repeat(count));
 			}
 			else {
-				result.push(`${count}x ${fishType}`);
+				result.push(`${count}x ${itemEmoji}`);
 			}
 		}
 
 		return {
 			reply: sb.Utils.tag.trim `
-				${subject} have ${fishData.catch.total} fish in ${possessive} collection.
+				${subject} have ${itemTypeAmount} ${showTypeData.description} in ${possessive} collection.
 				Here they are: ${result.join("")}
 				${subject} also have ${fishData.coins}${COIN_EMOJI} in ${possessive} purse.
 			`

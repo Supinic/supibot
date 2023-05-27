@@ -1,4 +1,11 @@
-const { baitTypes, COIN_EMOJI, getEmote, getInitialStats, itemTypes } = require("./fishing-utils.js");
+const {
+	baitTypes,
+	COIN_EMOJI,
+	getEmote,
+	getInitialStats,
+	getWeightedCatch
+} = require("./fishing-utils.js");
+
 const { checkLimits } = require("../../gpt/cache-control.js");
 
 const gptStyles = ["exciting", "spooky", "smug", "radical", "insane", "hilarious", "infuriating"];
@@ -86,6 +93,22 @@ module.exports = {
 				fishData.lifetime.dryStreak = fishData.catch.dryStreak;
 			}
 
+			let message;
+			const pityRoll = sb.Utils.random(1, 2);
+			if (pityRoll === 1) {
+				const item = getWeightedCatch("junk");
+
+				fishData.catch.junk = (fishData.catch.junk ?? 0) + 1;
+				fishData.lifetime.junk = (fishData.lifetime.junk ?? 0) + 1;
+				fishData.catch.types[item.name] = (fishData.catch.types[item.name] ?? 0) + 1;
+
+				message = `Your line gets tangled up in some junk and you reel out a ${item.name}`;
+			}
+			else {
+				const missDistance = sb.Utils.random(1, 500);
+				message = `Your bobber landed ${missDistance} cm away.`;
+			}
+
 			await context.user.setDataProperty("fishData", fishData);
 
 			let streakString = "";
@@ -95,24 +118,22 @@ module.exports = {
 			}
 
 			const emote = await getEmote(context, "failure");
-			const missDistance = sb.Utils.random(1, 500);
 			return {
 				success: false,
 				reply: sb.Utils.tag.trim `
 					No luck... ${emote}
-					Your bobber landed ${missDistance} cm away.
+					${message}
 					(${formatDelay(fishingDelay)} cooldown${appendix})
 					${streakString}
 				`
 			};
 		}
 
-		const caughtFishData = sb.Utils.randArray(itemTypes);
+		const caughtFishData = getWeightedCatch("fish");
 		const fishType = caughtFishData.name;
 
-		fishData.catch.total++;
-		fishData.catch.types[fishType] ??= 0;
-		fishData.catch.types[fishType]++;
+		fishData.catch.fish++;
+		fishData.catch.types[fishType] = (fishData.catch.types[fishType] ?? 0) + 1;
 		fishData.lifetime.fish++;
 
 		fishData.catch.dryStreak = 0;
