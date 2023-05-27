@@ -1,4 +1,4 @@
-const { baitTypes, COIN_EMOJI, getEmote, getInitialStats, fishTypes } = require("./fishing-utils.js");
+const { baitTypes, COIN_EMOJI, getEmote, getInitialStats, itemTypes } = require("./fishing-utils.js");
 const { checkLimits } = require("../../gpt/cache-control.js");
 
 const gptStyles = ["exciting", "spooky", "smug", "radical", "insane", "hilarious", "infuriating"];
@@ -12,7 +12,7 @@ const createGptPrompt = (executor, resultFish, sizeString) => sb.Utils.tag.trim 
 
 const formatDelay = (delay) => sb.Utils.timeDelta(sb.Date.now() + delay, true);
 
-const successfulFishDelay = 18e5; // 18e5 - 30 min
+const successfulFishDelay = 1; // 18e5 - 30 min
 const unsuccessfulFishDelay = [25_000, 55_000];
 const baitDisplay = baitTypes.map(i => `<code>${i.name}</code> ${i.emoji} (${i.price} coins)`).join(" - ");
 
@@ -46,7 +46,7 @@ module.exports = {
 			};
 		}
 
-		let rollMaximum = 20;
+		let rollMaximum = 1;
 		let appendix = "";
 		if (args.length > 0) {
 			const [selectedBait] = args;
@@ -107,7 +107,7 @@ module.exports = {
 			};
 		}
 
-		const caughtFishData = sb.Utils.randArray(fishTypes);
+		const caughtFishData = sb.Utils.randArray(itemTypes);
 		const fishType = caughtFishData.name;
 
 		fishData.catch.total++;

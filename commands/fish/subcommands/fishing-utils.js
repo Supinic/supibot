@@ -41,103 +41,153 @@ const baitTypes = [
 	}
 ];
 
-const fishTypes = [
+const itemTypes = [
 	{
 		name: "🧦",
 		sellable: false,
-		size: false
+		size: false,
+		type: "junk",
+		price: 0
 	},
 	{
 		name: "🦂",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🦑",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🦐",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🦞",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🦀",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🐡",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🐠",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🐟",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🐬",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🐳",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🐋",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🦈",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🐊",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🐸",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🐢",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🐙",
 		sellable: true,
-		size: true
+		size: true,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "🐚",
 		sellable: true,
-		size: false
+		size: false,
+		type: "fish",
+		price: 50
 	},
 	{
 		name: "💀",
 		sellable: true,
-		size: false
+		size: false,
+		type: "junk",
+		price: 5
 	}
 ];
+
+const itemTypeDefinitions = [
+	{
+		name: "fish",
+		description: "fish"
+	},
+	{
+		name: "junk",
+		description: "pieces of junk"
+	}
+];
+
 const getInitialStats = () => structuredClone(defaultFishingData);
 
 const failureEmotes = [
@@ -204,9 +254,10 @@ const COIN_EMOJI = "🪙";
 module.exports = {
 	COIN_EMOJI,
 	baitTypes,
+	itemTypeDefinitions,
 	getEmote,
 	getInitialStats,
-	fishTypes
+	itemTypes
 };
 
 /**
