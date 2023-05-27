@@ -48,7 +48,7 @@ module.exports = {
 			]);
 
 		return [
-			"Go fishing!",
+			"<h4>The fishing minigame</h4>",
 			"",
 
 			...subcommandsDescription,
