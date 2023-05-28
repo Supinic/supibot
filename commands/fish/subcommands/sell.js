@@ -64,10 +64,10 @@ module.exports = {
 				fishData.catch.types[itemData.name] = 0;
 				fishData.catch[itemData.type] -= amount;
 
-				if (itemData.name === "fish") {
+				if (itemData.type === "fish") {
 					fishData.lifetime.sold += amount;
 				}
-				else if (itemData.name === "junk") {
+				else if (itemData.type === "junk") {
 					fishData.lifetime.scrapped = (fishData.lifetime.scrapped ?? 0) + amount;
 				}
 			}
