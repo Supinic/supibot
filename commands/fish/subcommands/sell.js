@@ -63,7 +63,6 @@ module.exports = {
 
 				fishData.catch.types[itemData.name] = 0;
 				fishData.catch[itemData.type] -= amount;
-				fishData.coins += coinsGained;
 
 				if (itemData.name === "fish") {
 					fishData.lifetime.sold += amount;
@@ -71,8 +70,6 @@ module.exports = {
 				else if (itemData.name === "junk") {
 					fishData.lifetime.scrapped = (fishData.lifetime.scrapped ?? 0) + amount;
 				}
-
-				fishData.lifetime.coins += coinsGained;
 			}
 
 			if (coinsGained === 0) {
@@ -81,6 +78,9 @@ module.exports = {
 					reply: `You have no ${itemTypeDefinition?.description ?? "items"} to sell!`
 				};
 			}
+
+			fishData.coins += coinsGained;
+			fishData.lifetime.coins += coinsGained;
 
 			await context.user.setDataProperty("fishData", fishData);
 
