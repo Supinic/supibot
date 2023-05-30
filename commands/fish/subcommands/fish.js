@@ -133,7 +133,7 @@ module.exports = {
 		const caughtFishData = getWeightedCatch("fish");
 		const fishType = caughtFishData.name;
 
-		fishData.catch.fish++;
+		fishData.catch.fish = (fishData.catch.fish ?? 0) + 1;
 		fishData.catch.types[fishType] = (fishData.catch.types[fishType] ?? 0) + 1;
 		fishData.lifetime.fish++;
 
