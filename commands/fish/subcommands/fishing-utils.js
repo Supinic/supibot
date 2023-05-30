@@ -2,7 +2,7 @@ const defaultFishingData = Object.freeze({
 	catch: {
 		luckyStreak: 0,
 		dryStreak: 0,
-		total: 0,
+		fish: 0,
 		types: {}
 	},
 	readyTimestamp: 0,
