@@ -107,7 +107,7 @@ module.exports = {
 			}
 			else {
 				const missDistance = sb.Utils.random(1, 500);
-				message = `Your bobber landed ${missDistance} cm away.`;
+				message = `Your fishing line landed ${missDistance} cm away.`;
 			}
 
 			await context.user.setDataProperty("fishData", fishData);
