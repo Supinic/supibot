@@ -113,6 +113,7 @@ const execute = async function (context, query) {
 
 	const reply = `${additionalInfo.join(" ")} ${text}`;
 	return {
+		success: true,
 		reply,
 		text
 	};

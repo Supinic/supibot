@@ -119,6 +119,7 @@ const execute = async function (context, query) {
 	const toLanguageName = sb.Utils.capitalize(languageISO.getName(searchParams.target_lang));
 
 	return {
+		success: true,
 		reply: `${fromLanguageName} → ${toLanguageName}: ${data.text}`,
 		text: data.text
 	};
