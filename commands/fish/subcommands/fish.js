@@ -22,7 +22,7 @@ const formatDelay = (delay) => sb.Utils.timeDelta(sb.Date.now() + delay, true);
 
 const successfulFishDelay = 18e5; // 18e5 - 30 min
 const unsuccessfulFishDelay = [25_000, 55_000];
-const baitDisplay = baitTypes.map(i => `<code>${i.name}</code> ${i.emoji} (${i.price} coins)`).join(" - ");
+const baitDisplay = baitTypes.map(i => `<code>${i.name}</code> ${i.emoji} (${i.price} coins, 1/${i.roll})`).join(" - ");
 
 module.exports = {
 	name: "fish",
