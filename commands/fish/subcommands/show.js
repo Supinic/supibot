@@ -34,6 +34,13 @@ module.exports = {
 					};
 				}
 			}
+
+			if (targetUserData.Name === context.platform.Self_Name) {
+				return {
+					success: false,
+					reply: `I can't go fishing, if water splashed around it would damage my circuits! 😨`
+				};
+			}
 		}
 
 		/** @type {UserFishData} */

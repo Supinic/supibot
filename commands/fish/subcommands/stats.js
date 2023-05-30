@@ -29,6 +29,13 @@ module.exports = {
 					reply: `No such user exists!`
 				};
 			}
+
+			if (targetUserData.Name === context.platform.Self_Name) {
+				return {
+					success: false,
+					reply: `I'm sitting on Supinic's table, there's no fish to catch here!`
+				};
+			}
 		}
 
 		const data = await sb.Query.getRecordset(rs => rs
