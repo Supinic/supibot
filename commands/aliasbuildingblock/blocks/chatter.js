@@ -38,6 +38,20 @@ module.exports = {
 			if (index !== -1) {
 				users.splice(index, 1);
 			}
+
+			if (users.length === 0) {
+				return {
+					success: false,
+					reply: `No users fetched! Platform provided me with no users, please try again later.`
+				};
+			}
+		}
+
+		// "Mask" the outages in chatter-list APIs across platforms by "pretending" to roll the user executing the command.
+		if (users.length === 0) {
+			return {
+				reply: context.user.Name
+			};
 		}
 
 		sb.CooldownManager.set(context.channel.ID, context.user.ID, "abb-chatter", 10_000);
