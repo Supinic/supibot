@@ -5,7 +5,7 @@ export const definition = {
 	Code: (async function gatherImgurLinks (context) {
 		const supportedExtensions = ["jpg", "jpeg", "png", "gif", "mp4"];
 		const regex = /(https:\/\/)?(i\.)?imgur\.com\/(?<slug>\w{5,8})\.(?<extension>\w{3,4})/g;
-		const matches = context.message.matchAll(regex);
+		const matches = [...context.message.matchAll(regex)];
 		if (matches.length === 0) {
 			return;
 		}
@@ -20,6 +20,8 @@ export const definition = {
 			else if (this.data.processedLinks.has(slug)) {
 				return;
 			}
+
+			this.data.processedLinks.add(slug);
 
 			const link = `${slug}.${extension}`;
 			const row = await sb.Query.getRow("data", "Imgur_Reupload");
