@@ -1,6 +1,7 @@
 import { definition as AsyncMarkovExperiment } from "./async-markov-experiment/index.mjs";
 import { definition as AutomaticUnscramble } from "./automatic-unscramble/index.mjs";
 import { definition as ChatSuggestionLinker } from "./chat-suggestion-linker/index.mjs";
+import { definition as ImgurLinkGatherer } from "./imgur-link-gatherer/index.mjs";
 import { definition as LiveDetection } from "./live-detection/index.mjs";
 import { definition as MessageReaction } from "./message-react/index.mjs";
 import { definition as OfflineOnlyMirror } from "./offline-only-mirror/index.mjs";
@@ -20,6 +21,7 @@ export const definitions = [
 	AsyncMarkovExperiment,
 	AutomaticUnscramble,
 	ChatSuggestionLinker,
+	ImgurLinkGatherer,
 	LiveDetection,
 	MessageReaction,
 	OfflineOnlyMirror,
