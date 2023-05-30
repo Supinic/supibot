@@ -48,7 +48,7 @@ const itemTypes = [
 		size: false,
 		type: "junk",
 		price: 8,
-		weight: 0.5
+		weight: 25
 	},
 	{
 		name: "💀",
@@ -56,7 +56,7 @@ const itemTypes = [
 		size: false,
 		type: "junk",
 		price: 5,
-		weight: 1
+		weight: 10
 	},
 	{
 		name: "🥾",
@@ -64,7 +64,7 @@ const itemTypes = [
 		size: false,
 		type: "junk",
 		price: 20,
-		weight: 0.25
+		weight: 5
 	},
 	{
 		name: "🌿",
@@ -72,7 +72,7 @@ const itemTypes = [
 		size: false,
 		type: "junk",
 		price: 2,
-		weight: 1
+		weight: 200
 	},
 	{
 		name: "🍂",
@@ -80,7 +80,7 @@ const itemTypes = [
 		size: false,
 		type: "junk",
 		price: 1,
-		weight: 1
+		weight: 100
 	},
 	{
 		name: "🧦",
@@ -88,15 +88,7 @@ const itemTypes = [
 		size: false,
 		type: "junk",
 		price: 5,
-		weight: 1
-	},
-	{
-		name: "🌿",
-		sellable: true,
-		size: false,
-		type: "junk",
-		price: 10,
-		weight: 1
+		weight: 50
 	},
 	{
 		name: "🦂",
