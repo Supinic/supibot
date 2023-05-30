@@ -102,7 +102,7 @@ module.exports = {
 		else if (!fishEmojis.includes(fishType)) {
 			return {
 				success: false,
-				reply: `You provided an unknown fish type! Use one of: ${fishEmojis.join("")}`
+				reply: `You provided an unknown item type! Use one of: ${fishEmojis.join("")}`
 			};
 		}
 
@@ -129,7 +129,7 @@ module.exports = {
 		else if (!sb.Utils.isValidInteger(requestedAmount, 1)) {
 			return {
 				success: false,
-				reply: `You provided an invalid amount of items to sell!`
+				reply: `You provided an invalid amount of items to sell! You need to use a positive integer (a whole number).`
 			};
 		}
 
