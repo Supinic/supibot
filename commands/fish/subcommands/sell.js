@@ -41,7 +41,11 @@ module.exports = {
 				const types = itemTypeDefinitions.map(i => i.name).join(", ");
 				return {
 					success: false,
-					reply: `When selling all, you must provide a type! Use one of: ${types}`
+					reply: sb.Utils.tag.trim `
+						When selling all, you must provide a type!
+						You don't wanna sell all of your stuff by accident, right?
+						Use one of: ${types}
+					`
 				};
 			}
 
@@ -85,13 +89,16 @@ module.exports = {
 			await context.user.setDataProperty("fishData", fishData);
 
 			return {
-				reply: `You sold ${itemsSold} ${itemTypeDefinition?.description ?? "items"} for a grand total of ${coinsGained}${COIN_EMOJI}`
+				reply: sb.Utils.tag.trim `
+					You sold ${itemsSold} ${itemTypeDefinition?.description ?? "items"} 
+					for a grand total of ${coinsGained}${COIN_EMOJI}
+				`
 			};
 		}
 		else if (!fishEmojis.includes(fishType)) {
 			return {
 				success: false,
-				reply: `Invalid fish provided! Use one of: ${fishEmojis.join("")}`
+				reply: `You provided an unknown fish type! Use one of: ${fishEmojis.join("")}`
 			};
 		}
 
@@ -121,7 +128,7 @@ module.exports = {
 		await context.user.setDataProperty("fishData", fishData);
 
 		return {
-			reply: `Sold your ${fishType} for ${itemTypeData.price}${COIN_EMOJI} - now you have ${fishData.coins}${COIN_EMOJI}.`
+			reply: `Sold your ${fishType}${suffix} for ${coinsGained}${COIN_EMOJI} - now you have ${fishData.coins}${COIN_EMOJI}.`
 		};
 	}
 };
