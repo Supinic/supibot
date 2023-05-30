@@ -38,7 +38,7 @@ module.exports = {
 		const { execute } = require(`./${engine}.js`);
 		const boundExecute = execute.bind(this);
 		const result = await boundExecute(context, query);
-		if (!result.success) {
+		if (result.success === false) {
 			return result;
 		}
 		else if (context.params.textOnly && result.text) {
