@@ -10,7 +10,7 @@ module.exports = {
 		{ name: "engine", type: "string" },
 		{ name: "from", type: "string" },
 		{ name: "to", type: "string" },
-		{ name: "textOnly", type: "string" }
+		{ name: "textOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
