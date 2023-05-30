@@ -9,10 +9,14 @@ module.exports = {
 	name: "sell",
 	aliases: [],
 	description: [
-		`<code>$fish sell (fish)</code>`,
+		`<code>$fish sell (item)</code>`,
 		`<code>$fish sell 🐡</code>`,
-		"Sell one of your fishing trophies for coins.",
-		"Those can then be used to buy bait (and more goodies in the future).",
+		"Sell one of your fishing trophies (or junk) for coins.",
+		"",
+
+		`<code>$fish sell (item) (amount)</code>`,
+		`<code>$fish sell 🧦 10</code>`,
+		"Sell several of your fishing trophies (or pieces of junk) at once.",
 		"",
 
 		`<code>$fish sell all fish</code>`,
@@ -118,12 +122,30 @@ module.exports = {
 			};
 		}
 
-		fishData.catch.types[fishType]--;
-		fishData.catch[itemTypeData.type]--;
+		let requestedAmount = Number(modifier);
+		if (Number.isNaN(requestedAmount)) {
+			requestedAmount = 1;
+		}
+		else if (!sb.Utils.isValidInteger(requestedAmount, 1)) {
+			return {
+				success: false,
+				reply: `You provided an invalid amount of items to sell!`
+			};
+		}
 
-		fishData.coins += itemTypeData.price;
-		fishData.lifetime.coins += itemTypeData.price;
-		fishData.lifetime.sold++;
+		let suffix = "";
+		const sellAmount = Math.min(itemAmount, requestedAmount);
+		if (sellAmount > 1) {
+			suffix = ` x${sellAmount}`;
+		}
+
+		fishData.catch.types[fishType] -= sellAmount;
+		fishData.catch[itemTypeData.type] -= sellAmount;
+		fishData.lifetime.sold += sellAmount;
+
+		const coinsGained = sellAmount * itemTypeData.price;
+		fishData.coins += coinsGained;
+		fishData.lifetime.coins += coinsGained;
 
 		await context.user.setDataProperty("fishData", fishData);
 
