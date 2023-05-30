@@ -120,7 +120,6 @@ module.exports = {
 
 			const emote = await getEmote(context, "failure");
 			return {
-				success: false,
 				reply: sb.Utils.tag.trim `
 					No luck... ${emote}
 					${message}
