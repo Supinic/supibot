@@ -26,7 +26,7 @@ module.exports = {
 		`<code>$fish sell all junk</code>`,
 		"Sells all of your junk."
 	],
-	execute: async (context, fishType, modifier) => {
+	execute: async (context, specifier, modifier) => {
 		/** @type {UserFishData} */
 		const fishData = await context.user.getDataProperty("fishData") ?? getInitialStats();
 		if (fishData.catch.fish === 0 && fishData.catch.junk === 0) {
@@ -36,7 +36,7 @@ module.exports = {
 			};
 		}
 
-		if (fishType === "all") {
+		if (specifier === "all") {
 			let coinsGained = 0;
 			let itemsSold = 0;
 
@@ -99,34 +99,26 @@ module.exports = {
 				`
 			};
 		}
-		else if (!fishEmojis.includes(fishType)) {
+		else if (!fishEmojis.includes(specifier)) {
 			return {
 				success: false,
 				reply: `You provided an unknown item type! Use one of: ${fishEmojis.join("")}`
 			};
 		}
 
-		const itemAmount = fishData.catch.types[fishType];
+		const itemAmount = fishData.catch.types[specifier];
 		if (typeof itemAmount !== "number" || itemAmount === 0) {
 			return {
 				success: false,
-				reply: `You have no ${fishType} to sell!`
+				reply: `You have no ${specifier} to sell!`
 			};
 		}
 
-		const itemTypeData = itemTypes.find(i => i.name === fishType);
-		if (!itemTypeData.sellable) {
+		const itemData = itemTypes.find(i => i.name === specifier);
+		if (!itemData.sellable) {
 			return {
 				success: false,
-				reply: `You can't sell this ${fishType} - nobody would buy it!`
-			};
-		}
-
-		// Temporary measure - fix total data later with some backward queries
-		if (itemTypeData.type === "junk") {
-			return {
-				success: false,
-				reply: `Selling junk by type is currently disabled!`
+				reply: `You can't sell this ${specifier} - nobody would buy it!`
 			};
 		}
 
@@ -147,18 +139,24 @@ module.exports = {
 			suffix = ` x${sellAmount}`;
 		}
 
-		fishData.catch.types[fishType] -= sellAmount;
-		fishData.catch[itemTypeData.type] -= sellAmount;
-		fishData.lifetime.sold += sellAmount;
+		fishData.catch.types[specifier] -= sellAmount;
+		fishData.catch[itemData.type] -= sellAmount;
 
-		const coinsGained = sellAmount * itemTypeData.price;
+		if (itemData.type === "fish") {
+			fishData.lifetime.sold += sellAmount;
+		}
+		else if (itemData.type === "junk") {
+			fishData.lifetime.scrapped = (fishData.lifetime.scrapped ?? 0) + sellAmount;
+		}
+
+		const coinsGained = sellAmount * itemData.price;
 		fishData.coins += coinsGained;
 		fishData.lifetime.coins += coinsGained;
 
 		await context.user.setDataProperty("fishData", fishData);
 
 		return {
-			reply: `Sold your ${fishType}${suffix} for ${coinsGained}${COIN_EMOJI} - now you have ${fishData.coins}${COIN_EMOJI}.`
+			reply: `Sold your ${specifier}${suffix} for ${coinsGained}${COIN_EMOJI} - now you have ${fishData.coins}${COIN_EMOJI}.`
 		};
 	}
 };
