@@ -122,6 +122,14 @@ module.exports = {
 			};
 		}
 
+		// Temporary measure - fix total data later with some backward queries
+		if (itemTypeData.type === "junk") {
+			return {
+				success: false,
+				reply: `Selling junk by type is currently disabled!`
+			};
+		}
+
 		let requestedAmount = Number(modifier);
 		if (Number.isNaN(requestedAmount)) {
 			requestedAmount = 1;
