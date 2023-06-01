@@ -8,6 +8,10 @@ const sessionNames = {
 	Sprint: "Sprint race"
 };
 
+const ergastGot = sb.Got.get("GenericAPI").extend({
+	rejectUnauthorized: false
+});
+
 const getWeather = async (context, sessionStart, coordinates) => {
 	const weatherCommand = sb.Command.get("weather");
 	if (!weatherCommand) {
@@ -45,7 +49,7 @@ const getWeather = async (context, sessionStart, coordinates) => {
 };
 
 const fetchRace = async (year, searchType, searchValue) => {
-	const response = await sb.Got("GenericAPI", `${url}${year}.json`);
+	const response = await ergastGot(`${url}${year}.json`);
 	const races = response.body.MRData?.RaceTable?.Races ?? [];
 	if (races.length === 0) {
 		return {
@@ -105,12 +109,12 @@ const fetchRace = async (year, searchType, searchValue) => {
 };
 
 const fetchQualifyingResults = async (year, round) => {
-	const response = await sb.Got("GenericAPI", `${url}${year}/${round}/qualifying.json`);
+	const response = await ergastGot(`${url}${year}/${round}/qualifying.json`);
 	return response.body.MRData?.RaceTable?.Races?.[0]?.QualifyingResults ?? [];
 };
 
 const fetchRaceResults = async (year, round) => {
-	const response = await sb.Got("GenericAPI", `${url}${year}/${round}/results.json`);
+	const response = await ergastGot(`${url}${year}/${round}/results.json`);
 	return response.body.MRData?.RaceTable?.Races?.[0]?.Results ?? [];
 };
 
@@ -193,12 +197,12 @@ const fetchNextRaceDetail = async (context) => {
 };
 
 const fetchDriverStandings = async (year) => {
-	const response = await sb.Got("GenericAPI", `${url}${year}/driverStandings.json`);
+	const response = await ergastGot(`${url}${year}/driverStandings.json`);
 	return response.body.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings ?? [];
 };
 
 const fetchConstructorStandings = async (year) => {
-	const response = await sb.Got("GenericAPI", `${url}${year}/constructorStandings.json`);
+	const response = await ergastGot(`${url}${year}/constructorStandings.json`);
 	return response.body.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings ?? [];
 };
 
