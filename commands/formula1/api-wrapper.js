@@ -9,7 +9,9 @@ const sessionNames = {
 };
 
 const ergastGot = sb.Got.get("GenericAPI").extend({
-	rejectUnauthorized: false
+	https: {
+		rejectUnauthorized: false
+	}
 });
 
 const getWeather = async (context, sessionStart, coordinates) => {
