@@ -54,18 +54,8 @@ module.exports = {
 			.single()
 		);
 
-		const result = sb.Utils.tag.trim `
-			attempts: ${sb.Utils.groupDigits(data.Attempts)};
-			caught fish: ${sb.Utils.groupDigits(data.FishCaught)};
-			caught junk: ${sb.Utils.groupDigits(data.JunkCaught)};
-			bait used: ${sb.Utils.groupDigits(data.BaitUsed)};
-			fish sold: ${sb.Utils.groupDigits(data.FishSold)};
-			junk scrapped: ${sb.Utils.groupDigits(data.JunkSold)};
-			worst dry streak: ${sb.Utils.groupDigits(data.WorstDryStreak)};
-			best lucky streak: ${sb.Utils.groupDigits(data.BestLuckyStreak)}.
-		`;
-
 		let prefix = "Global";
+		let userAmountString = "";
 		if (targetUserData) {
 			if (!data.Attempts) { // Can be either `null` or `0` if user has never gone fishing
 				const subject = (targetUserData === context.user) ? "You" : "They";
@@ -76,6 +66,28 @@ module.exports = {
 
 			prefix = (targetUserData === context.user) ? "Your" : "Their";
 		}
+		else {
+			const usersAmount = await sb.Query.getRecordset(rs => rs
+				.select("COUNT(User_Alias) AS Amount")
+				.from("chat_data", "User_Alias_Data")
+				.where("Property = %s", "fishData")
+				.where("CONVERT(JSON_EXTRACT(Value, \"$.lifetime.attempts\"), INT) > %d", 0)
+			);
+
+			userAmountString = `anglers: ${usersAmount};`;
+		}
+
+		const result = sb.Utils.tag.trim `
+			attempts: ${sb.Utils.groupDigits(data.Attempts)};
+			${userAmountString}
+			caught fish: ${sb.Utils.groupDigits(data.FishCaught)};
+			caught junk: ${sb.Utils.groupDigits(data.JunkCaught)};
+			bait used: ${sb.Utils.groupDigits(data.BaitUsed)};
+			fish sold: ${sb.Utils.groupDigits(data.FishSold)};
+			junk scrapped: ${sb.Utils.groupDigits(data.JunkSold)};
+			worst dry streak: ${sb.Utils.groupDigits(data.WorstDryStreak)};
+			best lucky streak: ${sb.Utils.groupDigits(data.BestLuckyStreak)}.
+		`;
 
 		return {
 			reply: `${prefix} fishing stats → ${result}`
