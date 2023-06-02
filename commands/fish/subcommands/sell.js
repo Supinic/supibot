@@ -96,6 +96,7 @@ module.exports = {
 				reply: sb.Utils.tag.trim `
 					You sold ${itemsSold} ${itemTypeDefinition?.description ?? "items"} 
 					for a grand total of ${coinsGained}${COIN_EMOJI}
+					- now you have ${fishData.coins}${COIN_EMOJI}
 				`
 			};
 		}
@@ -156,7 +157,7 @@ module.exports = {
 		await context.user.setDataProperty("fishData", fishData);
 
 		return {
-			reply: `Sold your ${specifier}${suffix} for ${coinsGained}${COIN_EMOJI} - now you have ${fishData.coins}${COIN_EMOJI}.`
+			reply: `Sold your ${specifier}${suffix} for ${coinsGained}${COIN_EMOJI} - now you have ${fishData.coins}${COIN_EMOJI}`
 		};
 	}
 };
