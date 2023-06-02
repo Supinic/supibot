@@ -72,6 +72,8 @@ module.exports = {
 				.from("chat_data", "User_Alias_Data")
 				.where("Property = %s", "fishData")
 				.where("CONVERT(JSON_EXTRACT(Value, \"$.lifetime.attempts\"), INT) > %n", 0)
+				.flat("Amount")
+				.single()
 			);
 
 			userAmountString = `anglers: ${usersAmount};`;
