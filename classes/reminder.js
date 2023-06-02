@@ -541,7 +541,9 @@ module.exports = class Reminder extends require("./template.js") {
 				if (message.length > limit) {
 					const reminderIDs = reminders.filter(i => !i.Private_Message).map(i => i.ID);
 					const listID = reminderIDs.map(i => `ID=${i}`).join("&");
-					const link = await Reminder.createRelayLink("lookup", listID);
+					const link = (channelData.Links_Allowed)
+						? await Reminder.createRelayLink("lookup", listID)
+						: "[LINK]";
 
 					message = sb.Utils.tag.trim `
 						Hey ${userMention}
@@ -566,7 +568,9 @@ module.exports = class Reminder extends require("./template.js") {
 			else {
 				const reminderIDs = reminders.filter(i => !i.Private_Message).map(i => i.ID);
 				const listID = reminderIDs.map(i => `ID=${i}`).join("&");
-				const link = await Reminder.createRelayLink("lookup", listID);
+				const link = (channelData.Links_Allowed)
+					? await Reminder.createRelayLink("lookup", listID)
+					: "[LINK]";
 
 				const message = sb.Utils.tag.trim `
 					Hey ${userMention}
