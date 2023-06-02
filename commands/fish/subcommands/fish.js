@@ -115,7 +115,8 @@ module.exports = {
 			let streakString = "";
 			const { dryStreak } = fishData.catch;
 			if (dryStreak >= 3) {
-				streakString = ` This is your attempt #${dryStreak} since your last catch.`;
+				const sinceString = (fishData.lifetime.fish === 0) ? "you started fishing" : "your last catch";
+				streakString = ` This is your attempt #${dryStreak} since ${sinceString}.`;
 			}
 
 			const emote = await getEmote(context, "failure");
