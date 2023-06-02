@@ -71,7 +71,7 @@ module.exports = {
 				.select("COUNT(User_Alias) AS Amount")
 				.from("chat_data", "User_Alias_Data")
 				.where("Property = %s", "fishData")
-				.where("CONVERT(JSON_EXTRACT(Value, \"$.lifetime.attempts\"), INT) > %d", 0)
+				.where("CONVERT(JSON_EXTRACT(Value, \"$.lifetime.attempts\"), INT) > %n", 0)
 			);
 
 			userAmountString = `anglers: ${usersAmount};`;
