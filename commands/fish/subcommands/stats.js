@@ -76,7 +76,7 @@ module.exports = {
 				.single()
 			);
 
-			userAmountString = `anglers: ${usersAmount};`;
+			userAmountString = `anglers: ${sb.Utils.groupDigits(usersAmount)};`;
 		}
 
 		const result = sb.Utils.tag.trim `
