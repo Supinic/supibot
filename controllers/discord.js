@@ -418,7 +418,12 @@ module.exports = class DiscordController extends require("./template.js") {
 		}
 		else if (typeof message === "string") {
 			const limit = channelData.Message_Limit ?? this.platform.Message_Limit;
-			message = message.replace(/\\/g, "\\\\");
+			message = message
+				.replace(/\\/g, "\\\\")
+				.replace(/\b(?<modifier>[*_]{1,2})(?<content>\w+)(\1)\b/g, (total, modifier, content) => {
+					const escapedModifier = [...modifier].map(i => `\\${i}`).join("");
+					return `${escapedModifier}${content}${escapedModifier}`;
+				});
 
 			sendTarget = sb.Utils.wrapString(message, limit, {
 				keepWhitespace: true
