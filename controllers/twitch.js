@@ -152,6 +152,11 @@ module.exports = class TwitchController extends require("./template.js") {
 								});
 							}
 
+							channelData.events.emit("offline-passthrough", {
+								event: "offline-passthrough",
+								channel: channelData
+							});
+
 							streamData.live = false;
 							streamData.stream = {};
 						}
@@ -170,6 +175,12 @@ module.exports = class TwitchController extends require("./template.js") {
 									channel: channelData
 								});
 							}
+
+							channelData.events.emit("online-passthrough", {
+								event: "online-passthrough",
+								stream: currentStreamData.stream,
+								channel: channelData
+							});
 
 							streamData.live = true;
 							streamData.stream = currentStreamData;
