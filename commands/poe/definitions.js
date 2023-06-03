@@ -232,7 +232,7 @@ const subcommands = [
 					result.push(`The ${patch} ${name ?? ""} league will start ${sb.Utils.timeDelta(launchDate)}.`);
 				}
 				else {
-					const possibleEnd = revealDate.clone().addMonths(3).addDays(7);
+					const possibleEnd = revealDate.clone().addMonths(4).addDays(7);
 					if (possibleEnd > now) {
 						const delta = sb.Utils.timeDelta(possibleEnd, true);
 						result.push(`The ${patch} ${name} league has launched - go and play. It will last approximately for ${delta}.`);
