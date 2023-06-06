@@ -16,6 +16,10 @@ module.exports = class User extends require("./template.js") {
 		administrator: 0b1000_0000
 	};
 
+	static highLoadUserKey = "sb-user-high-load";
+	static highLoadUserKeyExpiry = 60_000;
+	static highLoadThreshold = 100;
+
 	constructor (data) {
 		super();
 
@@ -340,9 +344,18 @@ module.exports = class User extends require("./template.js") {
 	}
 
 	static async add (name, properties = {}) {
+		await sb.Cache.setByPrefix(`${User.highLoadUserKey}-${name}`, "1", {
+			expiry: User.highLoadUserKeyExpiry
+		});
+
 		const preparedName = User.normalizeUsername(name);
 		if (User.pendingNewUsers.has(preparedName)) {
 			return User.pendingNewUsers.get(preparedName);
+		}
+
+		const keys = await sb.Cache.getKeysByPrefix(User.highLoadUserKeyExpiry);
+		if (keys.length > User.highLoadThreshold) {
+			return null;
 		}
 
 		const promise = (async () => {
