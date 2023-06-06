@@ -247,6 +247,12 @@ module.exports = class User extends require("./template.js") {
 					Discord_ID: options.Discord_ID ?? null,
 					Twitch_ID: options.Twitch_ID ?? null
 				});
+
+				// 4-1. If high-load (batching) or critical-load (no inserts) are enabled,
+				// don't populate caches and immediately return `null`.
+				if (!userData) {
+					return null;
+				}
 			}
 			// 5. If strict mode is on and the user does not exist, return null and exit
 			else {
@@ -381,10 +387,13 @@ module.exports = class User extends require("./template.js") {
 		}
 		else if (keys.length > User.highLoadThreshold) {
 			User.pendingNewUsers.set(preparedName, null);
-			User.highLoadUserBatch.add({
-				Name: preparedName,
-				...properties
-			});
+
+			if (User.highLoadUserBatch) {
+				User.highLoadUserBatch.add({
+					Name: preparedName,
+					...properties
+				});
+			}
 
 			return null;
 		}
