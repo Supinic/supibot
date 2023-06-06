@@ -375,7 +375,7 @@ module.exports = class User extends require("./template.js") {
 			return User.pendingNewUsers.get(preparedName);
 		}
 
-		const keys = await sb.Cache.getKeysByPrefix(User.loadUserPrefixExpiry);
+		const keys = await sb.Cache.getKeysByPrefix(`${User.loadUserPrefix}*`);
 		if (keys.length > User.criticalLoadThreshold) {
 			return null;
 		}
