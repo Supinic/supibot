@@ -16,16 +16,38 @@ module.exports = class User extends require("./template.js") {
 		administrator: 0b1000_0000
 	};
 
-	static highLoadUserKey = "sb-user-high-load";
-	static highLoadUserKeyExpiry = 60_000;
-	static highLoadThreshold = 100;
+	static loadUserPrefix = "sb-user-high-load";
+	static loadUserPrefixExpiry = 60_000;
+	static highLoadThreshold = 50;
+	static criticalLoadThreshold = 200;
+
+	static highLoadUserBatch;
+
+	static highLoadUserInterval = setInterval(async () => {
+		User.highLoadUserBatch ??= await sb.Query.getBatch(
+			"chat_data",
+			"User_Alias",
+			["Name", "Twitch_ID", "Discord_ID"]
+		);
+
+		if (!User.highLoadUserBatch.ready) {
+			return;
+		}
+
+		const users = User.highLoadUserBatch.records.map(i => i.Name);
+		await User.highLoadUserBatch.insert();
+
+		for (const user of users) {
+			User.pendingNewUsers.delete(user);
+		}
+	}, User.loadUserPrefixExpiry);
 
 	constructor (data) {
 		super();
 
 		/**
 		 * Unique numeric ID.
-		 * @type {number}
+		 * @type {number}.
 		 */
 		this.ID = data.ID;
 
@@ -344,8 +366,8 @@ module.exports = class User extends require("./template.js") {
 	}
 
 	static async add (name, properties = {}) {
-		await sb.Cache.setByPrefix(`${User.highLoadUserKey}-${name}`, "1", {
-			expiry: User.highLoadUserKeyExpiry
+		await sb.Cache.setByPrefix(`${User.loadUserPrefix}-${name}`, "1", {
+			expiry: User.loadUserPrefixExpiry
 		});
 
 		const preparedName = User.normalizeUsername(name);
@@ -353,30 +375,40 @@ module.exports = class User extends require("./template.js") {
 			return User.pendingNewUsers.get(preparedName);
 		}
 
-		const keys = await sb.Cache.getKeysByPrefix(User.highLoadUserKeyExpiry);
-		if (keys.length > User.highLoadThreshold) {
+		const keys = await sb.Cache.getKeysByPrefix(User.loadUserPrefixExpiry);
+		if (keys.length > User.criticalLoadThreshold) {
 			return null;
 		}
+		else if (keys.length > User.highLoadThreshold) {
+			User.pendingNewUsers.set(preparedName, null);
+			User.highLoadUserBatch.add({
+				Name: preparedName,
+				...properties
+			});
 
-		const promise = (async () => {
-			const exists = await sb.Query.getRecordset(rs => rs
-				.select("Name")
-				.from("chat_data", "User_Alias")
-				.where("Name = %s", preparedName)
-				.limit(1)
-				.single()
-			);
+			return null;
+		}
+		else {
+			const promise = (async () => {
+				const exists = await sb.Query.getRecordset(rs => rs
+					.select("Name")
+					.from("chat_data", "User_Alias")
+					.where("Name = %s", preparedName)
+					.limit(1)
+					.single()
+				);
 
-			if (exists) {
-				User.pendingNewUsers.delete(preparedName);
-				return await User.get(exists.Name);
-			}
+				if (exists) {
+					User.pendingNewUsers.delete(preparedName);
+					return await User.get(exists.Name);
+				}
 
-			return await User.#add(preparedName, properties);
-		})();
+				return await User.#add(preparedName, properties);
+			})();
 
-		User.pendingNewUsers.set(preparedName, promise);
-		return await promise;
+			User.pendingNewUsers.set(preparedName, promise);
+			return await promise;
+		}
 	}
 
 	static async #add (name, properties) {
