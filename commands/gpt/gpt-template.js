@@ -116,14 +116,14 @@ module.exports = class GptTemplate {
 			};
 		}
 		else if (command === "clear" || command === "reset") {
+			await History.reset(context.user);
+
 			// If no query provided, return immediately. Otherwise, continue with cleared history as normal.
 			if (!query) {
 				return {
 					reply: "Successfully cleared your ChatGPT history."
 				};
 			}
-
-			await History.reset(context.user);
 		}
 		else if (command === "export" || command === "check") {
 			return await History.dump(context.user);
