@@ -6,7 +6,7 @@ module.exports = {
 	Description: "Posts the top X (implicitly 10) users by chat lines sent in the context of the current channel.",
 	Flags: ["mention"],
 	Params: [
-		{ name: "previousChannel", type: "string" }
+		{ name: "currentOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
@@ -26,33 +26,6 @@ module.exports = {
 			};
 		}
 
-		let channelData = context.channel;
-		if (context.params.previousChannel) {
-			if (context.platform.Name !== "twitch") {
-				return {
-					success: false,
-					reply: `Checking previous channels' top data is only available on Twitch!`
-				};
-			}
-
-			const previousChannelData = sb.Channel.get(context.params.previousChannel, context.platform);
-			if (!previousChannelData) {
-				return {
-					success: false,
-					reply: `You gave me a channel that I have never been in!`
-				};
-			}
-
-			if (context.channel.Specific_ID !== previousChannelData.Specific_ID) {
-				return {
-					success: false,
-					reply: `The channel you gave me isn't the same as this one! The user IDs have to match`
-				};
-			}
-
-			channelData = previousChannelData;
-		}
-
 		const limit = Number(rawLimit);
 		if (!sb.Utils.isValidInteger(limit)) {
 			return {
@@ -69,25 +42,42 @@ module.exports = {
 			};
 		}
 
-		const channels = (channelData.ID === 7 || channelData.ID === 8)
-			? [7, 8, 46]
-			: [channelData.ID];
+		const channelIDs = new Set(context.channel.ID);
+		if (context.platform.Name === "twitch" && !context.platform.currentOnly) {
+			const previousIDs = await sb.Query.getRecordset(rs => rs
+				.select("ID")
+				.from("chat_data", "Channel")
+				.where("ID <> %s", context.channel.ID)
+				.flat("ID"));
+
+			for (const previousID of previousIDs) {
+				channelIDs.add(previousID);
+			}
+		}
+
+		const { connectedChannelGroups } = require("./connected-channels.json");
+		const group = connectedChannelGroups.find(i => i.includes(context.channel.ID));
+		if (group) {
+			for (const channelID of group) {
+				channelIDs.add(channelID);
+			}
+		}
 
 		const top = await sb.Query.getRecordset(rs => rs
 			.select("SUM(Message_Count) AS Total")
 			.select("User_Alias.Name AS Name")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.join("chat_data", "User_Alias")
-			.where("Channel IN %n+", channels)
+			.where("Channel IN %n+", [...channelIDs])
 			.groupBy("User_Alias")
 			.orderBy("SUM(Message_Count) DESC")
-			.limit(limit)
-		);
+			.limit(limit));
 
 		const chatters = top.map((i, ind) => {
 			const name = `${i.Name[0]}\u{E0000}${i.Name.slice(1)}`;
 			return `#${ind + 1}: ${name} (${sb.Utils.groupDigits(i.Total)})`;
-		}).join(", ");
+		})
+			.join(", ");
 
 		return {
 			meta: {
