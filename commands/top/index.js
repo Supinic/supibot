@@ -43,7 +43,8 @@ module.exports = {
 			const previousIDs = await sb.Query.getRecordset(rs => rs
 				.select("ID")
 				.from("chat_data", "Channel")
-				.where("ID <> %s", context.channel.ID)
+				.where("ID <> %n", context.channel.ID)
+				.where("Specific_ID = %s", context.channel.Specific_ID)
 				.flat("ID"));
 
 			for (const previousID of previousIDs) {
