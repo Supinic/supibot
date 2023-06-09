@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 60000,
 	Description: "Posts the top X (implicitly 10) users by chat lines sent in the context of the current channel.",
-	Flags: ["mention"],
+	Flags: ["mention","non-nullable","pipe"],
 	Params: [
 		{ name: "currentOnly", type: "boolean" }
 	],
