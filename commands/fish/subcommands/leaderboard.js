@@ -12,7 +12,7 @@ const typeProperty = {
 };
 
 for (const item of itemTypes) {
-	typeProperty[item.name] = [`catch.types.${item.name}`, item.name];
+	typeProperty[item.name] = [`catch.types.${item.name}`, `${item.name} collectors`];
 }
 
 module.exports = {
