@@ -38,7 +38,7 @@ module.exports = {
 			};
 		}
 
-		const channelIDs = new Set(context.channel.ID);
+		const channelIDs = new Set([context.channel.ID]);
 		if (context.platform.Name === "twitch" && !context.platform.currentOnly) {
 			const previousIDs = await sb.Query.getRecordset(rs => rs
 				.select("ID")
