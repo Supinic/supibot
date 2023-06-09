@@ -27,15 +27,15 @@ module.exports = {
 		}
 
 		let channelData = context.channel;
-		if (context.param.previousChannel) {
+		if (context.params.previousChannel) {
 			if (context.platform.Name !== "twitch") {
 				return {
 					success: false,
 					reply: `Checking previous channels' top data is only available on Twitch!`
 				};
 			}
-			
-			const previousChannelData = sb.Channel.get(context.param.previousChannel, context.platform);
+
+			const previousChannelData = sb.Channel.get(context.params.previousChannel, context.platform);
 			if (!previousChannelData) {
 				return {
 					success: false,
