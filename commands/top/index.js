@@ -5,7 +5,9 @@ module.exports = {
 	Cooldown: 60000,
 	Description: "Posts the top X (implicitly 10) users by chat lines sent in the context of the current channel.",
 	Flags: ["mention"],
-	Params: null,
+	Params: [
+		{ name: "previousChannel", type: "string" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function top (context, rawLimit) {
@@ -24,6 +26,33 @@ module.exports = {
 			};
 		}
 
+		let channelData = context.channel;
+		if (context.param.previousChannel) {
+			if (context.platform.Name !== "twitch") {
+				return {
+					success: false,
+					reply: `Checking previous channels' top data is only available on Twitch!`
+				};
+			}
+			
+			const previousChannelData = sb.Channel.get(context.param.previousChannel, context.platform);
+			if (!previousChannelData) {
+				return {
+					success: false,
+					reply: `You gave me a channel that I have never been in!`
+				};
+			}
+
+			if (context.channel.Specific_ID !== previousChannelData.Specific_ID) {
+				return {
+					success: false,
+					reply: `The channel you gave me isn't the same as this one! The user IDs have to match`
+				};
+			}
+
+			channelData = previousChannelData;
+		}
+
 		const limit = Number(rawLimit);
 		if (!sb.Utils.isValidInteger(limit)) {
 			return {
@@ -40,9 +69,9 @@ module.exports = {
 			};
 		}
 
-		const channels = (context.channel.ID === 7 || context.channel.ID === 8)
+		const channels = (channelData.ID === 7 || channelData.ID === 8)
 			? [7, 8, 46]
-			: [context.channel.ID];
+			: [channelData.ID];
 
 		const top = await sb.Query.getRecordset(rs => rs
 			.select("SUM(Message_Count) AS Total")
