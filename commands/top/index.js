@@ -26,18 +26,14 @@ module.exports = {
 			};
 		}
 
-		const limit = Number(rawLimit);
+		let limit = Number(rawLimit);
 		if (!sb.Utils.isValidInteger(limit)) {
-			return {
-				success: false,
-				reply: "The limit must be provided as a number!",
-				cooldown: 5000
-			};
+			limit = 10;
 		}
-		else if (limit > 10) {
+		else if (limit > 100) {
 			return {
 				success: false,
-				reply: "Limit set too high! Use a value between 1 and 10!",
+				reply: "You provided a limit that's too high! Use a value between 1 and 100 instead.",
 				cooldown: 5000
 			};
 		}
