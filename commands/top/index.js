@@ -84,5 +84,24 @@ module.exports = {
 			reply: `Top ${limit} chatters: ${chatters}`
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async () => [
+		"Shows you the top chatters in the current channel.",
+		"By default, shows the top 10 - but you can choose any number between 1 and 100.",
+		"In the case you select more users than 10-20, I recommend piping the output to $pbp or $hbp for ease of use.",
+		"",
+
+		`<code>$top</code>`,
+		"Shows the top 10 users in the current channel, sorted by posted chat lines.",
+		"",
+
+		`<code>$top (number)</code>`,
+		`<code>$top 5</code>`,
+		"Shows a different number of top users, based on your selected amount.",
+		"",
+
+		`<code>$top currentOnly:true</code>`,
+		"Instead of using all previous channels' data (e.g. when it was renamed), this parameter will force it so only the current is used.",
+		"E.g.: If you're in channel @Pepega, but the channel renamed from @PepeHands in the past, this command will only show the top chatters in @Pepega.",
+		"By default, the command shows you data from all channels."
+	])
 };
