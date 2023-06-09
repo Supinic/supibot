@@ -71,6 +71,7 @@ module.exports = {
 			.where(`JSON_EXTRACT(Value, '$.${dataProperty}') IS NOT NULL`)
 			.where("JSON_EXTRACT(Value, '$.removedFromLeaderboards') IS NULL")
 			.orderBy(`CONVERT(JSON_EXTRACT(Value, '$.${dataProperty}'), INT) DESC`)
+			.orderBy(`Username DESC`)
 			.limit(10)
 		);
 
