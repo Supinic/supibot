@@ -39,13 +39,14 @@ module.exports = {
 		}
 
 		const channelIDs = new Set([context.channel.ID]);
-		if (context.platform.Name === "twitch" && !context.platform.currentOnly) {
+		if (context.platform.Name === "twitch" && !context.params.currentOnly) {
 			const previousIDs = await sb.Query.getRecordset(rs => rs
 				.select("ID")
 				.from("chat_data", "Channel")
 				.where("ID <> %n", context.channel.ID)
 				.where("Specific_ID = %s", context.channel.Specific_ID)
-				.flat("ID"));
+				.flat("ID")
+			);
 
 			for (const previousID of previousIDs) {
 				channelIDs.add(previousID);
@@ -68,13 +69,13 @@ module.exports = {
 			.where("Channel IN %n+", [...channelIDs])
 			.groupBy("User_Alias")
 			.orderBy("SUM(Message_Count) DESC")
-			.limit(limit));
+			.limit(limit)
+		);
 
 		const chatters = top.map((i, ind) => {
 			const name = `${i.Name[0]}\u{E0000}${i.Name.slice(1)}`;
 			return `#${ind + 1}: ${name} (${sb.Utils.groupDigits(i.Total)})`;
-		})
-			.join(", ");
+		}).join(", ");
 
 		return {
 			meta: {
