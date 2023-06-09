@@ -1,3 +1,5 @@
+const { itemTypes } = require("./fishing-utils.js");
+
 const unping = (str) => `${str[0]}\u{E0000}${str.slice(1)}`;
 
 const typeProperty = {
@@ -8,6 +10,10 @@ const typeProperty = {
 	unlucky: ["catch.dryStreak", "jinxed sphinxes"],
 	"total-unlucky": ["lifetime.dryStreak", "all-time unluckiest anglers"]
 };
+
+for (const item of itemTypes) {
+	typeProperty[item.name] = [`catch.types.${item.name}`, item.name];
+}
 
 module.exports = {
 	name: "leaderboard",
@@ -20,27 +26,28 @@ module.exports = {
 		"Shows the list of top anglers - most currently owned fish.",
 		"",
 
-		`<code>$fish leaderboard junk</code>`,
 		`<code>$fish top junk</code>`,
 		"Shows the list of top junk 'collectors' - most currently owned pieces of junk.",
 		"",
 
-		`<code>$fish leaderboard coins</code>`,
 		`<code>$fish top coins</code>`,
 		"Shows the list of top coin collectors - most currently owned coins.",
 		"",
 
-		`<code>$fish leaderboard lucky</code>`,
+		`<code>$fish top (item emoji)</code>`,
+		`<code>$fish top 🐠</code>`,
+		`<code>$fish top 💀</code>`,
+		"Shows the list of top collectors for a specified item, fish or junk.",
+		"",
+
 		`<code>$fish top lucky</code>`,
 		"Shows the list of the luckiest anglers - currently on the best lucky streak.",
 		"",
 
-		`<code>$fish leaderboard unlucky</code>`,
 		`<code>$fish top unlucky</code>`,
 		"Shows the list of the unluckiest anglers - currently on the worst unlucky streak.",
 		"",
 
-		`<code>$fish leaderboard total-unlucky</code>`,
 		`<code>$fish top total-unlucky</code>`,
 		"Shows the list of the unluckiest anglers of all time - worst unlucky streaks of all time (not currently)."
 	],
