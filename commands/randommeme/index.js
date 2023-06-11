@@ -60,7 +60,7 @@ module.exports = {
 			}
 		}
 
-		if (forum.error) {
+		if (forum.error || forum.reason) {
 			return {
 				success: false,
 				reply: `Subreddit ${input} is ${forum.reason ?? "not available"}!`
