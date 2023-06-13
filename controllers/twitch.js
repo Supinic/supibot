@@ -854,8 +854,21 @@ module.exports = class TwitchController extends require("./template.js") {
 			return;
 		}
 
+		// If the handled message is a reply to another, append its content without the username mention to the end
+		// of the current one. This is so that a possible command execution can be handled with this input.
+		let targetMessage = message;
+		if (ircTags["reply-parent-user-login"] && ircTags["reply-parent-msg-body"]) {
+			const parentUsername = ircTags["reply-parent-user-login"].toLowerCase();
+			const [mention, ...rest] = message.split(" ");
+			const username = mention.replace(/^@/, "").toLowerCase();
+			if (username === parentUsername) {
+				const parentMessageArray = ircTags["reply-parent-msg-body"].split(" ");
+				targetMessage = [...rest, ...parentMessageArray].join(" ");
+			}
+		}
+
 		// Check and execute command if necessary
-		if (sb.Command.is(message)) {
+		if (sb.Command.is(targetMessage)) {
 			const now = sb.Date.now();
 			const timeout = this.userCommandSpamPrevention.get(userData.ID);
 			if (typeof timeout === "number" && timeout > now) {
@@ -865,7 +878,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			const threshold = this.platform.Data.spamPreventionThreshold ?? 100;
 			this.userCommandSpamPrevention.set(userData.ID, now + threshold);
 
-			const [command, ...args] = message
+			const [command, ...args] = targetMessage
 				.replace(sb.Command.prefix, "")
 				.split(/\s+/)
 				.filter(Boolean);
