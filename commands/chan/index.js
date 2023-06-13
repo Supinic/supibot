@@ -161,22 +161,23 @@ module.exports = {
 				if (i.dead) {
 					return false;
 				}
-				else if (context.params.regex) {
-					let targetString;
-					if (context.params.search === "title") {
-						targetString = i.content.slice(0, i.contentSplitIndex);
-					}
-					else if (context.params.search === "subtitle") {
-						targetString = i.content.slice(i.contentSplitIndex);
-					}
-					else {
-						targetString = i.content;
-					}
 
+				let targetString;
+				if (context.params.search === "title") {
+					targetString = i.content.slice(0, i.contentSplitIndex);
+				}
+				else if (context.params.search === "subtitle") {
+					targetString = i.content.slice(i.contentSplitIndex);
+				}
+				else {
+					targetString = i.content;
+				}
+
+				if (context.params.regex) {
 					return context.params.regex.test(targetString);
 				}
 				else {
-					return i.content.toLowerCase().includes(query);
+					return targetString.toLowerCase().includes(query);
 				}
 			});
 
@@ -298,9 +299,9 @@ module.exports = {
 		"Your regex is tested against the thread's title and subtitle together.",
 		"",
 
-		"<code>$4chan (board) regex:(regex) search:title</code>",
-		"<code>$4chan (board) regex:(regex) search:subtitle</code>",
-		"Same as above, but your regex will only match the specified content part.",
+		"<code>$4chan (board) search:(content part)</code>",
+		"<code>$4chan (board) regex:(regex) search:(content part)</code>",
+		"Same as above, but your regex/query will only match the specified content part.",
 		`Supports either "title" or "subtitle".`
 	])
 };
