@@ -173,9 +173,21 @@ module.exports = {
 				: "offline";
 
 			if (lastBroadcast.startedAt === null) {
-				return {
-					reply: `Channel is ${status} - never streamed before.`
-				};
+				if (banned) {
+					return {
+						reply: `Channel is ${status} - never streamed before.`
+					};
+				}
+				else {
+					return {
+						reply: sb.Utils.tag.trim `
+							Channel is ${status} - never streamed before.
+							However, lately Twitch doesn't always show the proper date of last stream.
+							Check the official link, maybe it will work there: 
+							https://www.twitch.tv/${targetChannel}/schedule
+						`
+					};
+				}
 			}
 
 			const start = new sb.Date(lastBroadcast.startedAt);
