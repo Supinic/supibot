@@ -79,10 +79,14 @@ module.exports = class RedditPost {
 	}
 
 	toString () {
-		const fixedUrl = this.#url
+		let fixedUrl = this.#url
 			.replace("www.reddit.com", "old.reddit.com")
 			.replace(/(?<!(old\.))reddit.com/, "old.reddit.com")
 			.replace("/gallery/", "/");
+
+		if (this.hasGallery() || this.hasVideo()) {
+			fixedUrl += ` https://old.reddit.com/${this.id}`;
+		}
 
 		const xpost = (this.#crosspostOrigin)
 			? `, x-posted from ${this.#crosspostOrigin}`
