@@ -278,6 +278,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (() => [
 		"Query 4chan for text or image posts",
+		"NSFW content is only enabled on Discord NSFW channels.",
 		"",
 
 		`<code>$4chan (board abbreviation)</code>`,
@@ -285,6 +286,11 @@ module.exports = {
 		"Fetches a random post from a random thread from the specified board.",
 		"You must specify the board abbreviation exactly as it is, without slashes.",
 		"Stickied threads are ignored for this purpose.",
+		"",
+
+		`<code>$filechan (...)</code>`,
+		`<code>$imagechan (...)</code>`,
+		"As above, but only queries posts that have images or media attached to them.",
 		"",
 
 		"<code>$4chan (board) (query)</code>",
