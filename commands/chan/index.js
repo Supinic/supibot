@@ -7,6 +7,7 @@ module.exports = {
 	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
 		{ name: "regex", type: "regex" },
+		{ name: "search", type: "string" },
 		{ name: "textOnly", type: "string" }
 	],
 	Whitelist_Response: null,
@@ -135,12 +136,18 @@ module.exports = {
 			threadList = response.body
 				.flatMap(i => i.threads)
 				.filter(i => !i.sticky && !i.closed && i.replies >= 5)
-				.map(i => ({
-					ID: i.no,
-					content: sb.Utils.fixHTML(sb.Utils.removeHTML(`${i.sub ?? ""}${i.com ?? ""}`)),
-					modified: new sb.Date(i.last_modified),
-					created: new sb.Date(i.tim)
-				}));
+				.map(i => {
+					const title = sb.Utils.fixHTML(sb.Utils.removeHTML(i.sub ?? ""));
+					const subtitle = sb.Utils.fixHTML(sb.Utils.removeHTML(i.com ?? ""));
+
+					return {
+						ID: i.no,
+						contentSplitIndex: title.length,
+						content: `${title}${subtitle}`,
+						modified: new sb.Date(i.last_modified),
+						created: new sb.Date(i.tim)
+					};
+				});
 
 			await this.setCacheData(threadKey, threadList, {
 				expiry: 60_000 // 10 minutes
@@ -155,7 +162,18 @@ module.exports = {
 					return false;
 				}
 				else if (context.params.regex) {
-					return context.params.regex.test(i.content);
+					let targetString;
+					if (context.params.search === "title") {
+						targetString = i.content.slice(0, i.contentSplitIndex);
+					}
+					else if (context.params.search === "subtitle") {
+						targetString = i.content.slice(i.contentSplitIndex);
+					}
+					else {
+						targetString = i.content;
+					}
+
+					return context.params.regex.test(targetString);
 				}
 				else {
 					return i.content.toLowerCase().includes(query);
@@ -257,5 +275,32 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (() => [
+		"Query 4chan for text or image posts",
+		"",
+
+		`<code>$4chan (board abbreviation)</code>`,
+		"<code>$4chan g</code>",
+		"Fetches a random post from a random thread from the specified board.",
+		"You must specify the board abbreviation exactly as it is, without slashes.",
+		"Stickied threads are ignored for this purpose.",
+		"",
+
+		"<code>$4chan (board) (query)</code>",
+		"<code>$4chan g /mkg/</code>",
+		"<code>$4chan vg old school runescape</code>",
+		"Fetches a random post from a thread specified by your query, from the given board.",
+		"Your query is checked against the thread's title and subtitle together.",
+		"",
+
+		"<code>$4chan (board) regex:(regex)</code>",
+		"Fetches a random post from a thread specified by your regex query, from the given board.",
+		"Your regex is tested against the thread's title and subtitle together.",
+		"",
+
+		"<code>$4chan (board) regex:(regex) search:title</code>",
+		"<code>$4chan (board) regex:(regex) search:subtitle</code>",
+		"Same as above, but your regex will only match the specified content part.",
+		`Supports either "title" or "subtitle".`
+	])
 };
