@@ -25,10 +25,18 @@ module.exports = {
 	})),
 	Code: (async function randomEmote (context, number = 1) {
 		const repeats = Number(number);
-		if (!sb.Utils.isValidInteger(repeats, 1) || repeats > this.staticData.limit) {
+		const { limit } = this.staticData;
+
+		if (!sb.Utils.isValidInteger(repeats, 1)) {
 			return {
 				success: false,
-				reply: "Invalid or too high amount of emotes!"
+				reply: `You must provide a valid number of emotes to post! Use a number between 1 and ${limit}.`
+			};
+		}
+		else if (repeats > this.staticData.limit) {
+			return {
+				success: false,
+				reply: `The number you provided is too large! Use a number between 1 and ${limit}.`
 			};
 		}
 
@@ -163,11 +171,11 @@ module.exports = {
 		}
 
 		const string = result.join(" ");
-		const limit = (context.append.pipe)
+		const messageLengthLimit = (context.append.pipe)
 			? (context.channel?.Message_Limit ?? context.platform.Message_Limit)
 			: 50_000; // maximum character limit in a pipe command (resultCharacterLimit)
 
-		const [partition] = sb.Utils.partitionString(string, limit, 1);
+		const [partition] = sb.Utils.partitionString(string, messageLengthLimit, 1);
 		return {
 			reply: partition
 		};
