@@ -137,16 +137,20 @@ module.exports = {
 			price
 		} = sb.Utils.randArray(profilesData);
 
-		if (context.channel?.ID === 38 && sb.Config.get("TTS_ENABLED") && !ttsData.pending) {
-			ttsData.pending = true;
+		// @todo add channel data that determines this instead of hardcoding its ID here
+		if (context.channel?.ID === 38 && sb.Config.get("TTS_ENABLED")) {
+			const ttsCommand = sb.Command.get("tts");
+			if (ttsCommand && ttsCommand.data.pending === false) {
+				ttsCommand.data.pending = true;
 
-			await sb.LocalRequest.playSpecialAudio({
-				url: audioFile,
-				volume: sb.Config.get("TTS_VOLUME"),
-				limit: 20_000
-			});
+				await sb.LocalRequest.playSpecialAudio({
+					url: audioFile,
+					volume: sb.Config.get("TTS_VOLUME"),
+					limit: 20_000
+				});
 
-			ttsData.pending = false;
+				ttsCommand.data.pending = false;
+			}
 		}
 
 		let type = "";
