@@ -6,7 +6,8 @@ const typeProperty = {
 	fish: ["catch.fish", "anglers"],
 	junk: ["catch.junk", "junkrats"],
 	coins: ["coins", "coin collectors"],
-	lucky: ["catch.luckyStreak", "all-time lucky ducks"],
+	lucky: ["catch.luckyStreak", "lucky ducks"],
+	"total-lucky": ["lifetime.luckyStreak", "all-time lucky ducks"],
 	unlucky: ["catch.dryStreak", "jinxed sphinxes"],
 	"total-unlucky": ["lifetime.dryStreak", "all-time unluckiest anglers"]
 };
@@ -41,6 +42,10 @@ module.exports = {
 		"",
 
 		`<code>$fish top lucky</code>`,
+		"Shows the list of the luckiest anglers - currently on the best lucky streak.",
+		"",
+
+		`<code>$fish top total-lucky</code>`,
 		"Shows the list of the luckiest anglers - best lucky streaks of all time (not currently).",
 		"",
 
