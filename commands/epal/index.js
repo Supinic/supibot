@@ -127,8 +127,8 @@ module.exports = {
 			};
 		}
 
-		const ttsData = sb.Command.get("tts").data;
 		const {
+			ID,
 			audioFile,
 			description,
 			gameLevel,
@@ -176,10 +176,13 @@ module.exports = {
 			? `${gameData.role} in`
 			: "";
 
+		const profileUrl = `https://www.epal.gg/epal/${ID}`;
+
 		return {
 			reply: sb.Utils.tag.trim `
 				${name} ${type} plays ${roleString} ${gameData.name} ${levelString} for ${priceString}.
 				${revenueString}
+				${profileUrl}
 				${description}
 			`
 		};
