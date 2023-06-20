@@ -420,7 +420,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			const limit = channelData.Message_Limit ?? this.platform.Message_Limit;
 			message = message
 				.replace(/\\/g, "\\\\")
-				.replace(/\b(?<modifier>[*_]{1,2})(?<content>\w+)(\1)\b/g, (total, modifier, content) => {
+				.replace(/\b(?<modifier>[*_]{1,2})(?<content>[^\\]+)(\1)\b/g, (total, modifier, content) => {
 					const escapedModifier = [...modifier].map(i => `\\${i}`).join("");
 					return `${escapedModifier}${content}${escapedModifier}`;
 				});
