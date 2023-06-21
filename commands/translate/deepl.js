@@ -87,6 +87,18 @@ const execute = async function (context, query) {
 
 	searchParams.target_lang = targetLanguageCode.toUpperCase();
 
+	if (context.params.formality) {
+		const allowedFormalities = ["more", "less", "default"];
+		if (!allowedFormalities.includes(context.params.formality)) {
+			return {
+				success: false,
+				reply: `You provided an incorrect formality level! Use one of: ${allowedFormalities.join(", ")}`
+			};
+		}
+
+		searchParams.formality = context.params.formality;
+	}
+
 	const response = await sb.Got("GenericAPI", {
 		url: "https://api-free.deepl.com/v2/translate",
 		headers: {

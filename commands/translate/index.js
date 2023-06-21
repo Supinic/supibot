@@ -9,6 +9,7 @@ module.exports = {
 		{ name: "confidence", type: "boolean" },
 		{ name: "engine", type: "string" },
 		{ name: "from", type: "string" },
+		{ name: "formality", type: "string" },
 		{ name: "to", type: "string" },
 		{ name: "textOnly", type: "boolean" }
 	],
