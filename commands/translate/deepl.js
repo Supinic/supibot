@@ -28,6 +28,19 @@ const supportedLanguages = [
 	"zh"
 ];
 
+// https://support.deepl.com/hc/en-us/articles/4406432463762-About-the-formal-informal-feature
+const formalitySupportedLanguages = [
+	"de",
+	"es",
+	"fr",
+	"it",
+	"ja",
+	"nl",
+	"pl",
+	"pt",
+	"ru"
+];
+
 const execute = async function (context, query) {
 	const { languageISO } = sb.Utils.modules;
 	const searchParams = {
@@ -93,6 +106,13 @@ const execute = async function (context, query) {
 			return {
 				success: false,
 				reply: `You provided an incorrect formality level! Use one of: ${allowedFormalities.join(", ")}`
+			};
+		}
+		else if (formalitySupportedLanguages.includes(targetLanguageCode.toLowerCase())) {
+			const languageNames = formalitySupportedLanguages.map(i => sb.Utils.capitalize(languageISO.getName(i)));
+			return {
+				success: false,
+				reply: `The language you provided does not support formality! Use one of: ${languageNames.join(", ")}`
 			};
 		}
 

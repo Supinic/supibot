@@ -1,6 +1,13 @@
 const execute = async function (context, query) {
 	const { languageISO } = sb.Utils.modules;
 
+	if (context.params.formality) {
+		return {
+			success: false,
+			reply: `You cannot use the "formality" parameter with Google! Use DeepL by using "engine:deepl".`
+		};
+	}
+	
 	// default: false if normal execution, true if inside of pipe
 	const textOnly = context.params.textOnly ?? context.append.pipe;
 	const options = {

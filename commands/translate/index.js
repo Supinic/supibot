@@ -63,6 +63,34 @@ module.exports = {
 		`<code>${prefix}translate FeelsDankMan</code> => Luxembourgish (53%) -> English: FeelsDankMan`,
 		"",
 
+		`<code>${prefix}translate from:fr (text)</code>`,
+		`<code>${prefix}translate from:french (text)</code>`,
+		`<code>${prefix}translate from:French (text)</code>`,
+		"Translates the text from a provided language (French here, can use a language code or name) to English.",
+		"The language auto-detection usually works fine. However, if you run into issues or if the text is too short, you can force the source langauge.",
+		"",
+
+		`<code>${prefix}translate to:italian from:swahili (text)</code>`,
+		"Both parameters can be combined together for maximum accuracy.",
+		"",
+
+		`<code>${prefix}translate to:random (text)</code>`,
+		"Translates provided text to a randomly picked, supported language.",
+		"",
+
+		`<code>${prefix}translate engine:deepl formality:(level) to:(language)</code>`,
+		"Translates provided text using a specified formality level - \"more\" or \"less\".",
+		"This will result in more or less formal reply.",
+		"Only supports some languages - check the command's response for a list.",
+		"Only supported by the DeepL engine. Attempting to use it with Google will fail the command.",
+		"",
+
+		`<code>${prefix}translate to:de (text)</code>`,
+		`<code>${prefix}translate to:german (text)</code>`,
+		`<code>${prefix}translate to:German (text)</code>`,
+		"Translates the text from a auto-detected language to a provided language (German here).",
+		"",
+
 		`<code>${prefix}translate engine:(translation engine)</code>`,
 		"Allows you to choose a translation engine. Keep in mind they both support different parameters and languages!",
 		"Supported: <code>google</code> and <code>deepl</code>",
@@ -77,27 +105,6 @@ module.exports = {
 		"<b>Only works for the Google translation engine!</b>",
 		"Translates the text, and outputs the result text with direction, but without the confidence %, e.g.:",
 		`<code>${prefix}translate confidence:false FeelsDankMan</code> => Luxembourgish -> English: FeelsDankMan`,
-		"",
-
-		`<code>${prefix}translate from:fr (text)</code>`,
-		`<code>${prefix}translate from:french (text)</code>`,
-		`<code>${prefix}translate from:French (text)</code>`,
-		"Translates the text from a provided language (French here, can use a language code or name) to English.",
-		"The language auto-detection usually works fine. However, if you run into issues or if the text is too short, you can force the source langauge.",
-		"",
-
-		`<code>${prefix}translate to:de (text)</code>`,
-		`<code>${prefix}translate to:german (text)</code>`,
-		`<code>${prefix}translate to:German (text)</code>`,
-		"Translates the text from a auto-detected language to a provided language (German here).",
-		"",
-
-		`<code>${prefix}translate to:italian from:swahili (text)</code>`,
-		"Both parameters can be combined together for maximum accuracy.",
-		"",
-
-		`<code>${prefix}translate to:random (text)</code>`,
-		"Translates provided text to a randomly picked, supported language.",
 		""
 	])
 };
