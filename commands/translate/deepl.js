@@ -109,7 +109,10 @@ const execute = async function (context, query) {
 			};
 		}
 		else if (!formalitySupportedLanguages.includes(targetLanguageCode.toLowerCase())) {
-			const languageNames = formalitySupportedLanguages.map(i => sb.Utils.capitalize(languageISO.getName(i)));
+			const languageNames = formalitySupportedLanguages
+				.map(i => sb.Utils.capitalize(languageISO.getName(i)))
+				.sort();
+
 			return {
 				success: false,
 				reply: `The language you provided does not support formality! Use one of: ${languageNames.join(", ")}`
