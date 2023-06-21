@@ -108,7 +108,7 @@ const execute = async function (context, query) {
 				reply: `You provided an incorrect formality level! Use one of: ${allowedFormalities.join(", ")}`
 			};
 		}
-		else if (formalitySupportedLanguages.includes(targetLanguageCode.toLowerCase())) {
+		else if (!formalitySupportedLanguages.includes(targetLanguageCode.toLowerCase())) {
 			const languageNames = formalitySupportedLanguages.map(i => sb.Utils.capitalize(languageISO.getName(i)));
 			return {
 				success: false,
