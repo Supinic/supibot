@@ -63,10 +63,7 @@ module.exports = {
 			};
 		}
 
-		const channelString = (channelData === context.channel)
-			? "this channel"
-			: `channel "${channelData.Name}"`;
-
+		const channelString = `channel "${channelData.Name}"`;
 		const permissions = await context.getUserPermissions({ channel: channelData });
 		if (permissions.flag === sb.User.permissions.regular) {
 			return {
@@ -74,7 +71,7 @@ module.exports = {
 				reply: sb.Utils.tag.trim `
 					You're not authorized to do that in ${channelString}!
 					You should ask the broadcaster or an ambassador to do this instead.
-					Check the ambassadors with this command → ${sb.Command.prefix}check ambassadors ${channelData.Name}
+					If you want a different channel, use the channel:channel_name parameter.
 				`
 			};
 		}
@@ -257,7 +254,10 @@ module.exports = {
 				if (inactiveReason === "bot-banned" && command !== "i-will-not-ban-supibot-again") {
 					return {
 						success: false,
-						reply: `Because I have been banned in ${channelString}, you must use the "$bot i-will-not-ban-supibot-again" command instead!`
+						reply: sb.Utils.tag.trim `
+							I have been banned in ${channelString} for too long!
+							You must use this command instead → $bot i-will-not-ban-supibot-again channel:${channelData.Name}
+						`
 					};
 				}
 
