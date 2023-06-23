@@ -28,7 +28,9 @@ module.exports = {
 		}
 
 		let result;
-		if (!context.channel.Logging.has("Lines")) {
+		const forceJustlog = await context.channel.getDataProperty("forceJustlog") ?? false;
+
+		if (forceJustlog || !context.channel.Logging.has("Lines")) {
 			if (context.channel.Platform.Name !== "twitch") {
 				return {
 					success: false,
