@@ -14,9 +14,14 @@ module.exports = {
 		const zodiacData = require("./zodiac.json");
 
 		if (inputZodiacName) {
-			const zodiacNames = zodiacData.map(i => i.name.toLowerCase());
-			if (zodiacNames.includes(inputZodiacName.toLowerCase())) {
-				zodiacName = inputZodiacName;
+			const lowerInput = inputZodiacName.toLowerCase().trim();
+			const zodiacObject = zodiacData.find(i => (
+				i.name.toLowerCase() === lowerInput
+				|| i.emoji === lowerInput
+			));
+
+			if (zodiacObject) {
+				zodiacName = zodiacObject.name.toLowerCase();
 			}
 			else {
 				return {

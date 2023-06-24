@@ -1,61 +1,73 @@
 [
   {
     "name": "Aquarius",
+    "emoji": "♒",
     "start": [1, 21],
     "end": [2, 19]
   },
   {
     "name": "Pisces",
+    "emoji": "♓",
     "start": [2, 20],
     "end": [3, 20]
   },
   {
     "name": "Aries",
+    "emoji": "♈",
     "start": [3, 21],
     "end": [4, 20]
   },
   {
     "name": "Taurus",
+    "emoji": "♉",
     "start": [4, 21],
     "end": [5, 20]
   },
   {
     "name": "Gemini",
+    "emoji": "♊",
     "start": [5, 21],
     "end": [6, 21]
   },
   {
     "name": "Cancer",
+    "emoji": "♋",
     "start": [6, 22],
     "end": [7, 22]
   },
   {
     "name": "Leo",
+    "emoji": "♌",
     "start": [7, 23],
     "end": [8, 22]
   },
   {
     "name": "Virgo",
+    "emoji": "♍",
     "start": [8, 23],
     "end": [9, 21]
   },
   {
     "name": "Libra",
+    "emoji": "♎",
     "start": [9, 22],
     "end": [10, 22]
   },
   {
     "name": "Scorpio",
+    "emoji": "♏",
     "start": [10, 23],
     "end": [11, 22]
   },
   {
     "name": "Sagittarius",
+    "emoji": "♐",
     "start": [11, 23],
     "end": [12, 21]
   },
   {
     "name": "Capricorn",
+    "emoji": "♑",
     "start": [12, 22],
     "end": [1, 20]
   }
