@@ -8,11 +8,11 @@ export const definition = {
 
 		if (event === "online" && channel.Mirror !== null && !mirroredChannelID) {
 			// Cannot Promise.all these statements, atomicity is required
-			await channel.setDataProperty("offlineOnlyBot", channel.Mirror);
+			await channel.setDataProperty("offlineOnlyMirror", channel.Mirror);
 			await channel.saveProperty("Mirror", null);
 		}
 		else if (event === "offline" && channel.Mirror === null && mirroredChannelID) {
-			await channel.setDataProperty("offlineOnlyBot", null);
+			await channel.setDataProperty("offlineOnlyMirror", null);
 			await channel.saveProperty("Mirror", mirroredChannelID);
 		}
 		else {
