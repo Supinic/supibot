@@ -43,7 +43,7 @@ module.exports = {
 			this.data.client = new Bing.BingChat({ cookie });
 		}
 
-		let variant = "Creative";
+		let variant = "Balanced";
 		if (context.params.variant) {
 			const allowedVariants = ["creative", "balanced", "precise"];
 			if (!allowedVariants.includes(context.params.variant.toLowerCase())) {
