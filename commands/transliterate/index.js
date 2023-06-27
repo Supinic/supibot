@@ -139,9 +139,10 @@ module.exports = {
 		"Transliterates using automatic character detection. Should work for most non-Latin scripts.",
 		"",
 
-		`<code>${prefix}transliterate (text) language:japanese</code>`,
-		`<code>${prefix}transliterate (text) language:hebrew</code>`,
+		`<code>${prefix}transliterate (text) lang:japanese</code>`,
+		`<code>${prefix}transliterate (text) lang:hebrew</code>`,
 		"Transliterates more specifically for Japanese/Hebrew.",
-		"Might not always work."
+		"Only these two languages currently have extended transliteration support.",
+		"Disclaimer: Might not always work properly."
 	])
 };

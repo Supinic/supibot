@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","pipe","skip-banphrase","whitelist"],
 	Params: [
 		{ name: "lang", type: "string" },
-		{ name: "language", type: "string" },
 		{ name: "speed", type: "number" }
 	],
 	Whitelist_Response: "Check out the possible voices and locales here: https://supinic.com/stream/tts",
@@ -300,7 +299,7 @@ module.exports = {
 		}
 
 		let code;
-		let input = context.params.language ?? context.params.lang ?? "en-us";
+		let input = context.params.lang ?? "en-us";
 
 		if (input === "random") {
 			const randomItem = sb.Utils.randArray(this.staticData.locales);
@@ -390,7 +389,7 @@ module.exports = {
 			"Plays the TTS, same as above, but at 50% speed.",
 			"",
 
-			`<code>${prefix}tts language:Italian Questo è un messaggio.</code>`,
+			`<code>${prefix}tts lang:Italian Questo è un messaggio.</code>`,
 			"Plays the TTS using Italian.",
 			"",
 
