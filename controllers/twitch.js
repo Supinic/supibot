@@ -1378,7 +1378,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 */
 	static async fetchChannelSevenTVEmotes (channelData) {
 		const { statusCode, body: data } = await emoteGot({
-			url: `https://api.7tv.app/v2/users/${channelData.Specific_ID}/emotes`
+			url: `https://7tv.io/v3/users/twitch/${channelData.Specific_ID}`
 		});
 
 		if (statusCode !== 200) {
