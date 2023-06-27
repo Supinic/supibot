@@ -63,26 +63,34 @@ module.exports = {
 			return moderationCheck;
 		}
 
+		const mentionUsername = (context.getMentionStatus())
+			? `${context.user.Name}, `
+			: "";
+
 		const { client } = this.data;
 		const promise = new sb.Promise((resolve, reject) => {
 			client.sendMessage(query, { variant })
 				.then(i => resolve(i))
 				.catch(e => reject(e))
 				.finally(() => {
-					clearTimeout(timeoutTimeout);
-					clearTimeout(messageReminderTimeout);
+					for (const timeout of messageTimeouts) {
+						clearTimeout(timeout);
+					}
 				});
 		});
 
-		const mentionUsername = (context.getMentionStatus())
-			? `${context.user.Name}, `
-			: "";
+		const messageTimeouts = [
+			setTimeout(() => promise.reject("Timeout reached"), 120_000)
+		];
 
-		const timeoutTimeout = setTimeout(() => promise.reject("Timeout reached"), 60_000);
-		const messageReminderTimeout = setTimeout(
-			() => context.sendIntermediateMessage(`${mentionUsername}30 seconds passed, still waiting ppCircle`),
-			30_000
-		);
+		for (const timeoutValue of [30, 60, 90]) {
+			const timeout = setTimeout(
+				() => context.sendIntermediateMessage(`${mentionUsername}${timeoutValue} seconds passed, still waiting ppCircle`),
+				(timeoutValue * 1000)
+			);
+
+			messageTimeouts.push(timeout);
+		}
 
 		await context.sendIntermediateMessage(`${mentionUsername}Query started, now we wait ppCircle`);
 
