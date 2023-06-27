@@ -1235,6 +1235,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bing-chat@npm:^0.2.3":
+  version: 0.2.3
+  resolution: "bing-chat@npm:0.2.3"
+  dependencies:
+    ws: ^8.13.0
+  checksum: 2afc3f2952aa358b4ca7c0150746afe19e35c337f9b768b8fb7f570f62ea3640d2ccea7ff579c1e93ed272ec307fbe4d25876df686f074a8b4fb982cfcf37eac
+  languageName: node
+  linkType: hard
+
 "bl@npm:^4.0.3":
   version: 4.1.0
   resolution: "bl@npm:4.1.0"
@@ -5274,6 +5283,7 @@ supi-core@supinic/supi-core:
     "@babel/core": ^7.21.8
     "@babel/eslint-parser": ^7.21.8
     acorn-node: ^2.0.1
+    bing-chat: ^0.2.3
     cytube-connector: "Supinic/cytube-connector#master"
     dank-twitch-irc: ^4.3.0
     discord.js: ^14.11.0
