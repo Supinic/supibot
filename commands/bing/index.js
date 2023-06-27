@@ -4,7 +4,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 30000,
 	Description: "Queries Bing AI for a response.",
-	Flags: ["mention"],
+	Flags: ["developer","mention","whitelist"],
 	Params: [
 		{ name: "variant", type: "string" }
 	],
