@@ -1,6 +1,10 @@
 const MessageScheduler = require("message-scheduler");
 const DankTwitch = require("dank-twitch-irc");
 
+// Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
+// Flag name: EmoteFlagsZeroWidth
+const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
+
 const specialEmoteSetMap = {
 	472873131: "300636018", // Haha emotes
 	488737509: "300819901", // Luv emotes
@@ -1394,8 +1398,8 @@ module.exports = class TwitchController extends require("./template.js") {
 			name: i.name,
 			type: "7tv",
 			global: false,
-			animated: (typeof i.animated === "boolean") ? i.animated : null,
-			zeroWidth: i.visibility_simple.includes("ZERO_WIDTH")
+			animated: i.data.animated,
+			zeroWidth: (i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
 		}));
 	}
 
@@ -1413,7 +1417,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				url: "https://api.frankerfacez.com/v1/set/global"
 			}),
 			emoteGot({
-				url: "https://api.7tv.app/v2/emotes/global"
+				url: "https://7tv.io/v3/emote-sets/global"
 			})
 		]);
 
@@ -1421,8 +1425,8 @@ module.exports = class TwitchController extends require("./template.js") {
 		const rawBTTVEmotes = (bttv.value?.body && typeof bttv.value?.body === "object")
 			? Object.values(bttv.value.body)
 			: [];
-		const rawSevenTvEmotes = (sevenTv.value?.body && typeof sevenTv.value?.body === "object")
-			? Object.values(sevenTv.value.body)
+		const rawSevenTvEmotes = (sevenTv.value?.body && Array.isArray(sevenTv.value?.body?.emotes))
+			? sevenTv.value.body?.emotes
 			: [];
 
 		const twitchEmotes = this.availableEmotes.flatMap(set => set.emotes.map(i => {
@@ -1464,9 +1468,8 @@ module.exports = class TwitchController extends require("./template.js") {
 			name: i.name,
 			type: "7tv",
 			global: true,
-			// Just hoping that .gif emotes are always animated.
-			// @todo proper animated emote checking with new 7TV API (?)
-			animated: (i.mime === "image/gif")
+			animated: i.data.animated,
+			zeroWidth: (i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
 		}));
 
 		return [
