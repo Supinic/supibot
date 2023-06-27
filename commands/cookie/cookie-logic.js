@@ -101,6 +101,7 @@ const hasOutdatedDailyStats = (data) => {
 const resetDailyStats = (data) => {
 	data.lastTimestamp.daily = 0;
 	data.today.donated = 0;
+	data.today.received = 0;
 	data.today.eaten.daily = 0;
 	data.today.eaten.received = 0;
 };

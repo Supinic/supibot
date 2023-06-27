@@ -223,6 +223,7 @@ describe("cookie logic", function () {
 			Logic.resetDailyStats(data);
 			assert.strictEqual(data.lastTimestamp.daily, 0);
 			assert.strictEqual(data.today.donated, 0);
+			assert.strictEqual(data.today.received, 0);
 			assert.strictEqual(data.today.eaten.daily, 0);
 			assert.strictEqual(data.today.eaten.received, 0);
 		});
