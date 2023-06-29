@@ -70,6 +70,7 @@ module.exports = {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("User_Alias.Name AS Username")
 			.select(`CONVERT(JSON_EXTRACT(Value, '$.${dataProperty}'), INT) AS Total`)
+			.select("RANK() OVER(ORDER BY Total DESC) AS Rank")
 			.from("chat_data", "User_Alias_Data")
 			.join("chat_data", "User_Alias")
 			.where("Property = %s", "fishData")
@@ -77,15 +78,29 @@ module.exports = {
 			.where("JSON_EXTRACT(Value, '$.removedFromLeaderboards') IS NULL")
 			.orderBy(`CONVERT(JSON_EXTRACT(Value, '$.${dataProperty}'), INT) DESC`)
 			.orderBy(`Username DESC`)
-			.limit(10)
 		);
 
-		const result = data.map((i, ind) => `Rank ${ind + 1}: ${unping(i.Username)} (${i.Total}x)`);
+		const message = [];
+		message.push(
+			`Top 10 ${name}:`,
+			data.map(i => `Rank #${i.Rank}: ${unping(i.Username)} (${i.Total}x)`).join("; ")
+		);
+
+		const hasFishData = Boolean(await context.user.getDataProperty("fishData"));
+		if (hasFishData) {
+			const userStats = data.find(i => i.User_Alias === context.user.ID);
+			if (userStats.Rank > 10) {
+				message.push(
+					`Your rank is: #${userStats.Rank} (${userStats.Total})`
+				);
+			}
+		}
+
 		return {
 			meta: {
 				skipWhitespaceCheck: true
 			},
-			reply: `Top 10 ${name}: ${result.join("; ")}`
+			reply: message.join(" ")
 		};
 	}
 };
