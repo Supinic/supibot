@@ -78,18 +78,43 @@ module.exports = {
 			.where("JSON_EXTRACT(Value, '$.removedFromLeaderboards') IS NULL")
 			.orderBy(`CONVERT(JSON_EXTRACT(Value, '$.${dataProperty}'), INT) DESC`)
 			.orderBy(`Username DESC`)
+			.limit(10)
 		);
 
-		const message = [];
-		message.push(
-			`Top 10 ${name}:`,
-			data.slice(0, 10).map(i => `Rank #${i.Rank}: ${unping(i.Username)} (${i.Total}x)`).join("; ")
-		);
+		let previousRank = null;
+		let rankMessage = [];
+		const message = [`Top 10 ${name}:`];
+		for (let i = 0; i < 10; i++) {
+			const stats = data[i];
+			if (previousRank !== stats.Rank) {
+				if (rankMessage.length !== 0) {
+					message.push(`${rankMessage.join(", ")};`);
+					rankMessage = [];
+				}
+
+				previousRank = stats.Rank;
+				rankMessage.push(`Rank #${stats.Rank} (${stats.Total}):`);
+			}
+
+			rankMessage.push(unping(stats.Username));
+		}
 
 		const hasFishData = Boolean(await context.user.getDataProperty("fishData"));
 		if (hasFishData) {
-			const userStats = data.find(i => i.Username === context.user.Name);
-			if (userStats.Rank > 10) {
+			const [userStats] = await sb.Query.raw(`
+				SELECT Total, Rank
+				FROM (
+			    	SELECT
+			          User_Alias,
+			          CONVERT(JSON_EXTRACT(Value, "$.${dataProperty}"), INT) AS Total,
+			          RANK() OVER (ORDER BY Total DESC) AS Rank
+			      	FROM chat_data.User_Alias_Data
+			     	WHERE Property = "fishData"
+			    ) AS Temp
+				WHERE User_Alias = ${context.user.ID}
+			`);
+
+			if (userStats) {
 				message.push(
 					`Your rank is: #${userStats.Rank} (${userStats.Total})`
 				);
