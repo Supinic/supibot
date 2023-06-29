@@ -88,7 +88,7 @@ module.exports = {
 
 		const hasFishData = Boolean(await context.user.getDataProperty("fishData"));
 		if (hasFishData) {
-			const userStats = data.find(i => i.User_Alias === context.user.ID);
+			const userStats = data.find(i => i.Username === context.user.Name);
 			if (userStats.Rank > 10) {
 				message.push(
 					`Your rank is: #${userStats.Rank} (${userStats.Total})`
