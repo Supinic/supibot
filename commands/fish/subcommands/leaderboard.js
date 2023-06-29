@@ -83,7 +83,7 @@ module.exports = {
 		const message = [];
 		message.push(
 			`Top 10 ${name}:`,
-			data.map(i => `Rank #${i.Rank}: ${unping(i.Username)} (${i.Total}x)`).join("; ")
+			data.slice(0, 10).map(i => `Rank #${i.Rank}: ${unping(i.Username)} (${i.Total}x)`).join("; ")
 		);
 
 		const hasFishData = Boolean(await context.user.getDataProperty("fishData"));
