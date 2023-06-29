@@ -88,7 +88,7 @@ module.exports = {
 			const stats = data[i];
 			if (previousRank !== stats.Rank) {
 				if (rankMessage.length !== 0) {
-					message.push(`${rankMessage.join(", ")};`);
+					message.push(`${rankMessage.join(" ")};`);
 					rankMessage = [];
 				}
 
@@ -96,7 +96,11 @@ module.exports = {
 				rankMessage.push(`Rank #${stats.Rank} (${stats.Total}):`);
 			}
 
-			rankMessage.push(unping(stats.Username));
+			rankMessage.push(`${unping(stats.Username)}, `);
+		}
+
+		if (rankMessage.length !== 0) {
+			message.push(rankMessage.join(" "));
 		}
 
 		const hasFishData = Boolean(await context.user.getDataProperty("fishData"));
