@@ -104,7 +104,7 @@ module.exports = {
 		}
 
 		const hasFishData = Boolean(await context.user.getDataProperty("fishData"));
-		if (hasFishData) {
+		if (hasFishData && data.every(i => i.Username !== context.user.Name)) {
 			const [userStats] = await sb.Query.raw(`
 				SELECT Total, Rank
 				FROM (
@@ -113,7 +113,10 @@ module.exports = {
 			          CONVERT(JSON_EXTRACT(Value, "$.${dataProperty}"), INT) AS Total,
 			          RANK() OVER (ORDER BY Total DESC) AS Rank
 			      	FROM chat_data.User_Alias_Data
-			     	WHERE Property = "fishData"
+			     	WHERE 
+			     		Property = "fishData"
+						JSON_EXTRACT(Value, "$.${dataProperty}") IS NOT NULL
+						JSON_EXTRACT(Value, "$.removedFromLeaderboards") IS NULL
 			    ) AS Temp
 				WHERE User_Alias = ${context.user.ID}
 			`);
