@@ -97,8 +97,8 @@ module.exports = {
 			message.push(rankMessage.join(" "));
 		}
 
-		const hasFishData = Boolean(await context.user.getDataProperty("fishData"));
-		if (hasFishData && data.every(i => i.Username !== context.user.Name)) {
+		const userFishData = await context.user.getDataProperty("fishData");
+		if (userFishData && data.every(i => i.Username !== context.user.Name)) {
 			const [userStats] = await sb.Query.raw(`
 				SELECT Total, Rank
 				FROM (
@@ -110,15 +110,17 @@ module.exports = {
 			     	WHERE 
 			     		Property = "fishData"
 						AND JSON_EXTRACT(Value, "$.${dataProperty}") IS NOT NULL
-						AND JSON_EXTRACT(Value, "$.removedFromLeaderboards") IS NULL
 			    ) AS Temp
 				WHERE User_Alias = ${context.user.ID}
 			`);
 
 			if (userStats) {
-				message.push(
-					`Your rank is: #${userStats.Rank} (${userStats.Total})`
-				);
+				if (userFishData.removedFromLeaderboards) {
+					message.push("You are not eligible for a rank, because your fishing licence has been revoked.");
+				}
+				else {
+					message.push(`Your rank is: #${userStats.Rank} (${userStats.Total})`);
+				}
 			}
 		}
 

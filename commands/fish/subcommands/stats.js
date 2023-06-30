@@ -56,15 +56,21 @@ module.exports = {
 
 		let prefix = "Global";
 		let userAmountString = "";
+		let appendix = "";
 		if (targetUserData) {
+			const subject = (targetUserData === context.user) ? "You" : "They";
 			if (!data.Attempts) { // Can be either `null` or `0` if user has never gone fishing
-				const subject = (targetUserData === context.user) ? "You" : "They";
 				return {
 					reply: `${subject} have never gone fishing before.`
 				};
 			}
 
 			prefix = (targetUserData === context.user) ? "Your" : "Their";
+
+			const fishData = await targetUserData.getDataProperty("fishData");
+			if (fishData.removedFromLeaderboards) {
+				appendix = `${subject} are exempt from statistics, as ${prefix.toLowerCase()} fishing licence has been revoked.`;
+			}
 		}
 		else {
 			const usersAmount = await sb.Query.getRecordset(rs => rs
@@ -89,6 +95,7 @@ module.exports = {
 			junk scrapped: ${sb.Utils.groupDigits(data.JunkSold)};
 			worst dry streak: ${sb.Utils.groupDigits(data.WorstDryStreak)};
 			best lucky streak: ${sb.Utils.groupDigits(data.BestLuckyStreak)}.
+			${appendix}
 		`;
 
 		return {
