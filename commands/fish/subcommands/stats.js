@@ -69,7 +69,7 @@ module.exports = {
 
 			const fishData = await targetUserData.getDataProperty("fishData");
 			if (fishData.removedFromLeaderboards) {
-				appendix = `${subject} are exempt from statistics, as ${prefix.toLowerCase()} fishing licence has been revoked.`;
+				appendix = `${prefix} fishing licence has been revoked.`;
 			}
 		}
 		else {
