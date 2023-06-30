@@ -4,8 +4,11 @@ const unping = (str) => `${str[0]}\u{E0000}${str.slice(1)}`;
 
 const typeProperty = {
 	fish: ["catch.fish", "anglers"],
+	"total-fish": ["lifetime.fish", "all-time piscators"],
 	junk: ["catch.junk", "junkrats"],
+	"total-junk": ["lifetime.junk", "all-time scraphounds"],
 	coins: ["coins", "coin collectors"],
+	"total-coins": ["lifetime.coins", "all-time scrooges"],
 	lucky: ["catch.luckyStreak", "lucky ducks"],
 	"total-lucky": ["lifetime.luckyStreak", "all-time lucky ducks"],
 	unlucky: ["catch.dryStreak", "jinxed sphinxes"],
@@ -20,19 +23,9 @@ module.exports = {
 	name: "leaderboard",
 	aliases: ["top"],
 	description: [
-		`<code>$fish leaderboard</code>`,
 		`<code>$fish top</code>`,
-		`<code>$fish leaderboard fish</code>`,
 		`<code>$fish top fish</code>`,
 		"Shows the list of top anglers - most currently owned fish.",
-		"",
-
-		`<code>$fish top junk</code>`,
-		"Shows the list of top junk 'collectors' - most currently owned pieces of junk.",
-		"",
-
-		`<code>$fish top coins</code>`,
-		"Shows the list of top coin collectors - most currently owned coins.",
 		"",
 
 		`<code>$fish top (item emoji)</code>`,
@@ -41,20 +34,21 @@ module.exports = {
 		"Shows the list of top collectors for a specified item, fish or junk.",
 		"",
 
+		`<code>$fish top coins</code>`,
+		`<code>$fish top junk</code>`,
 		`<code>$fish top lucky</code>`,
-		"Shows the list of the luckiest anglers - currently on the best lucky streak.",
-		"",
-
-		`<code>$fish top total-lucky</code>`,
-		"Shows the list of the luckiest anglers - best lucky streaks of all time (not currently).",
-		"",
-
 		`<code>$fish top unlucky</code>`,
-		"Shows the list of the unluckiest anglers - currently on the worst unlucky streak.",
+		"Shows the list of top owners of a given category - according to its name.",
+		"These are current ones, e.g. \"as many coins as they have now\".",
 		"",
 
+		`<code>$fish top total-fish</code>`,
+		`<code>$fish top total-coins</code>`,
+		`<code>$fish top total-junk</code>`,
+		`<code>$fish top total-lucky</code>`,
 		`<code>$fish top total-unlucky</code>`,
-		"Shows the list of the unluckiest anglers of all time - worst unlucky streaks of all time (not currently)."
+		"Shows the list of top owners all-time in a given category - according to its name.",
+		"These are <b>NOT</b> the current ones, but rather all-time statistics."
 	],
 	execute: async (context, type) => {
 		const leaderboardType = type ?? "fish";
