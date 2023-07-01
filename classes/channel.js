@@ -263,7 +263,7 @@ module.exports = class Channel extends require("./template.js") {
 			.from("chat_data", "Channel")
 		);
 
-		for (const platformMap of Channel.data.valu1es()) {
+		for (const platformMap of Channel.data.values()) {
 			for (const channelData of platformMap.values()) {
 				channelData.destroy();
 			}
