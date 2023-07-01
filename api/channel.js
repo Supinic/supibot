@@ -123,14 +123,16 @@ module.exports = {
 		let total = 0;
 		const platformStats = {};
 
-		for (const channelData of sb.Channel.data) {
-			if (channelData.Mode === "Inactive") {
-				continue;
-			}
+		for (const [platformData, platformMap] of Object.entries(sb.Channel.data)) {
+			for (const channelData of platformMap.values()) {
+				if (channelData.Mode === "Inactive") {
+					continue;
+				}
 
-			platformStats[channelData.Platform.Name] ??= 0;
-			platformStats[channelData.Platform.Name]++;
-			total++;
+				platformStats[platformData.Name] ??= 0;
+				platformStats[platformData.Name]++;
+				total++;
+			}
 		}
 
 		return {

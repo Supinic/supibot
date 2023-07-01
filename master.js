@@ -72,8 +72,7 @@ catch {
 	]);
 
 	const controllers = {};
-	const initialChannels = sb.Channel.data.filter(i => i.Mode !== "Inactive");
-	const initialPlatforms = new Set(initialChannels.map(i => i.Platform));
+	const initialPlatforms = [...sb.Channel.data.keys()];
 
 	for (const platformData of initialPlatforms) {
 		let Controller = null;

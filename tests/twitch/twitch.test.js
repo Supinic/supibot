@@ -46,18 +46,25 @@ const initialize = (async () => {
 		Self_Name: "supibot"
 	})];
 
-	sb.Channel.data = [
-		new sb.Channel({
-			Name: "supinic",
-			Platform: "twitch",
-			Mode: "Write"
-		}),
-		new sb.Channel({
-			Name: "forsen",
-			Platform: "twitch",
-			Mode: "Write"
-		})
-	];
+	// noinspection JSConstantReassignment
+	sb.Channel.data = new Map([
+		[
+			sb.Platform.get("twitch"),
+			new sb.Channel({
+				Name: "supinic",
+				Platform: "twitch",
+				Mode: "Write"
+			})
+		],
+		[
+			sb.Platform.get("twitch"),
+			new sb.Channel({
+				Name: "forsen",
+				Platform: "twitch",
+				Mode: "Write"
+			})
+		]
+	]);
 
 	sb.Command.data = [];
 	sb.Config.data = new Map([

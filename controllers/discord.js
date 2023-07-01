@@ -330,9 +330,12 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		// When a guild gets deleted, set all of its channels to be Inactive.
 		client.on("guildDelete", async (guild) => {
-			const guildChannelData = sb.Channel.data.filter(i => i.Platform === this.platform && i.Specific_ID === guild.id);
-			for (const channelData of guildChannelData) {
-				if (channelData.Mode === "Inactive") {
+			const platformMap = sb.Channel.data.get(this.platform);
+			for (const channelData of platformMap.values()) {
+				if (channelData.Specific_ID !== guild.id) {
+					continue;
+				}
+				else if (channelData.Mode === "Inactive") {
 					continue;
 				}
 
