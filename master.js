@@ -72,7 +72,7 @@ catch {
 	]);
 
 	const controllers = {};
-	const initialPlatforms = [...sb.Channel.data.keys()];
+	const initialPlatforms = sb.Channel.getActivePlatforms();
 
 	for (const platformData of initialPlatforms) {
 		let Controller = null;
