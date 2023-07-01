@@ -2,6 +2,8 @@ module.exports = class Channel extends require("./template.js") {
 	static redisPrefix = "sb-channel";
 	static dataCache = new WeakMap();
 	static uniqueIdentifier = "ID";
+	static data = new Map();
+
 	#setupPromise = null;
 
 	constructor (data) {
@@ -248,21 +250,35 @@ module.exports = class Channel extends require("./template.js") {
 		this.sessionData = null;
 	}
 
+	static async initialize () {
+		Channel.data = new Map();
+		await Channel.loadData();
+
+		return Channel;
+	}
+
 	static async loadData () {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("*")
 			.from("chat_data", "Channel")
 		);
 
-		const previous = Channel.data;
-		Channel.data = data.map(record => new Channel(record));
-		if (Array.isArray(previous)) {
-			for (const channel of previous) {
-				channel.destroy();
+		for (const platformMap of Object.values(Channel.data)) {
+			for (const channelData of platformMap.values()) {
+				channelData.destroy();
 			}
+
+			platformMap.clear();
 		}
 
-		if (Channel.data.length === 0) {
+		for (const row of data) {
+			const channelData = new Channel(row);
+
+			const platformMap = Channel.getPlatformMap(channelData.Platform);
+			platformMap.set(channelData.Name, channelData);
+		}
+
+		if (Channel.data.size === 0) {
 			console.warn("No channels initialized - bot will not attempt to join any channels");
 		}
 
@@ -287,18 +303,32 @@ module.exports = class Channel extends require("./template.js") {
 		else if (typeof identifier === "string") {
 			const channelName = Channel.normalizeName(identifier);
 
-			let result = Channel.data.filter(i => i.Name === channelName || i.Specific_ID === identifier);
 			if (platform) {
-				result = result.find(i => i.Platform === platform);
+				const platformMap = Channel.data.get(platform);
+				if (!platformMap) {
+					return null;
+				}
+
+				return platformMap.get(channelName) ?? null;
 			}
 			else {
-				result = result[0];
+				for (const platformMap of Channel.data.values()) {
+					if (platformMap.has(channelName)) {
+						return platformMap.get(channelName);
+					}
+				}
 			}
-
-			return result ?? null;
 		}
 		else if (typeof identifier === "number") {
-			return Channel.data.find(i => i.ID === identifier);
+			for (const platformMap of Channel.data.values()) {
+				for (const channelData of platformMap.values()) {
+					if (channelData.ID === identifier) {
+						return channelData;
+					}
+				}
+			}
+
+			return null;
 		}
 		else {
 			throw new sb.Error({
@@ -310,9 +340,19 @@ module.exports = class Channel extends require("./template.js") {
 
 	static getJoinableForPlatform (platform) {
 		const platformData = sb.Platform.get(platform);
-		return Channel.data.filter(channel => (
-			channel.Platform.ID === platformData.ID && channel.Mode !== "Inactive"
-		));
+		const platformMap = Channel.data.get(platformData);
+		if (!platformMap) {
+			return [];
+		}
+
+		const result = [];
+		for (const channelData of platformMap.values()) {
+			if (channelData.Mode !== "Inactive") {
+				result.push(channelData);
+			}
+		}
+
+		return result;
 	}
 
 	static async getLiveEventSubscribedChannels (platform = null) {
@@ -372,7 +412,8 @@ module.exports = class Channel extends require("./template.js") {
 		await row.save();
 
 		const channelData = new Channel({ ...row.valuesObject });
-		Channel.data.push(channelData);
+		const platformMap = Channel.getPlatformMap(channelData.Platform);
+		platformMap.set(channelName, channelData);
 
 		await channelData.setup();
 
@@ -440,15 +481,10 @@ module.exports = class Channel extends require("./template.js") {
 		);
 
 		for (const channelData of channelsData) {
-			const index = Channel.data.indexOf(channelData);
-			if (index === -1) {
-				throw new sb.Error({
-					message: "Unexpected channel ID mismatch during reload"
-				});
-			}
+			const platformMap = Channel.data.get(channelData.Platform);
+			platformMap.delete(channelData.Name);
 
 			channelData.destroy();
-			Channel.data.splice(index, 1);
 		}
 
 		for (const row of data) {
@@ -457,10 +493,19 @@ module.exports = class Channel extends require("./template.js") {
 				sb.ChatModule.attachChannelModules(newChannelData);
 			}
 
-			Channel.data.push(newChannelData);
+			const platformMap = Channel.getPlatformMap(newChannelData.Platform);
+			platformMap.set(newChannelData.Name, newChannelData);
 		}
 
 		return true;
+	}
+
+	static getPlatformMap (platformData) {
+		if (!Channel.data.has(platformData)) {
+			Channel.data.set(platformData, new Map());
+		}
+
+		return Channel.data.get(platformData);
 	}
 
 	static normalizeName (username) {

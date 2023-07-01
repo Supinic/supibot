@@ -82,6 +82,7 @@ export declare class Channel extends ClassTemplate {
     static readonly redisPrefix: string;
     static readonly cacheData: GenericCacheMap<Channel>;
     static readonly dataCache: WeakMap<Channel, Map<string, SimpleGenericData>>;
+    static readonly data: Map<Platform, Map<Channel["Name"], Channel>>;
 
     /**
      * Reloads a specific list of channels, provided as identifiers or instances.
@@ -116,6 +117,11 @@ export declare class Channel extends ClassTemplate {
      * Moves all existing channel-specific data from one channel to another one.
      */
     static moveData (oldChannelData: Channel, newChannelData: Channel, options?: MoveDataOptions): Promise<void>;
+
+    /**
+     * Returns a platform channel Map, or creates it if not created yet.
+     */
+    static getPlatformMap (platformData: Platform): Map<Channel["Name"], Channel>;
 
     /**
      * Normalizes non-standard strings into standardized database channel names.

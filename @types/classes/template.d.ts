@@ -46,7 +46,8 @@ export declare class ClassTemplate {
     static data:
         ClassTemplate[]
         | Map<string | number, ClassTemplate>
-        | Map<string | number, ClassTemplate[]>;
+        | Map<string | number, ClassTemplate[]>
+        | Map<any, Map<string | number, ClassTemplate>>;
 
     serialize (row: Row, properties: object, options: object): Promise<{ string: string }>;
     getCacheData (key: string): Promise<any>;
