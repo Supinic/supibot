@@ -1393,7 +1393,8 @@ module.exports = class TwitchController extends require("./template.js") {
 			return [];
 		}
 
-		return data.map(i => ({
+		const rawEmotes = data.emote_set?.emotes ?? [];
+		return rawEmotes.map(i => ({
 			ID: i.id,
 			name: i.name,
 			type: "7tv",
