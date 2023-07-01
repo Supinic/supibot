@@ -124,6 +124,11 @@ export declare class Channel extends ClassTemplate {
     static getPlatformMap (platformData: Platform): Map<Channel["Name"], Channel>;
 
     /**
+     * Returns an array of platforms that have at least one active channel.
+     */
+    static getActivePlatforms (): Platform[];
+
+    /**
      * Normalizes non-standard strings into standardized database channel names.
      * Turns input string into lowercase, removes leading `@` and leading `#`.
      */

@@ -263,7 +263,7 @@ module.exports = class Channel extends require("./template.js") {
 			.from("chat_data", "Channel")
 		);
 
-		for (const platformMap of Object.values(Channel.data)) {
+		for (const platformMap of Channel.data.valu1es()) {
 			for (const channelData of platformMap.values()) {
 				channelData.destroy();
 			}
@@ -353,6 +353,20 @@ module.exports = class Channel extends require("./template.js") {
 		}
 
 		return result;
+	}
+
+	static getActivePlatforms () {
+		const activePlatforms = [];
+		for (const [platformData, platformMap] of Channel.data.entries()) {
+			for (const channelData of platformMap.values()) {
+				if (channelData.Mode !== "Inactive") {
+					activePlatforms.push(platformData);
+					break;
+				}
+			}
+		}
+
+		return activePlatforms;
 	}
 
 	static async getLiveEventSubscribedChannels (platform = null) {
