@@ -482,9 +482,10 @@ module.exports = class Channel extends require("./template.js") {
 
 		for (const channelData of channelsData) {
 			const platformMap = Channel.data.get(channelData.Platform);
-			platformMap.delete(channelData.Name);
+			const channelName = channelData.Name;
 
 			channelData.destroy();
+			platformMap.delete(channelName);
 		}
 
 		for (const row of data) {
