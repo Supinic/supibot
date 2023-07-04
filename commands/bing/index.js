@@ -119,7 +119,7 @@ module.exports = {
 			);
 		}
 
-		const paste = await sb.Pastebin.post(text, {
+		const paste = await sb.Pastebin.post(text.join("\n"), {
 			name: `$bing result for ${context.user.Name}`,
 			expiration: "1D",
 			format: "markdown"
