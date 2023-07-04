@@ -106,13 +106,13 @@ module.exports = {
 		}
 
 		const { detail } = result;
-		const text = ["## Result", result.text, ""];
+		const text = ["# Result", result.text, ""];
 		if (detail.sourceAttributions.length > 0) {
 			text.push(
-				"## Sources",
+				"# Sources",
 				...detail.sourceAttributions.flatMap((i, ind) => [
 					`[^${ind + 1}^]`,
-					`[${i.providerDisplayName}[${i.seeMoreUrl}]`,
+					`[${i.providerDisplayName}](${i.seeMoreUrl})`,
 					""
 				]),
 				""
