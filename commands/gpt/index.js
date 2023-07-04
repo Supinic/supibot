@@ -26,7 +26,10 @@ module.exports = {
 		const query = args.join(" ").trim();
 		const historyCommandResult = await GptTemplate.handleHistoryCommand(context, query);
 		if (historyCommandResult) {
-			return historyCommandResult;
+			return {
+				...historyCommandResult,
+				cooldown: 2500
+			};
 		}
 
 		if (!query) {
