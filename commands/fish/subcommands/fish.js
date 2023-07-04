@@ -45,11 +45,18 @@ module.exports = {
 		"Does not generate a GPT story about your fishing results, if successful."
 	],
 	execute: async (context, ...args) => {
+		let whisperOnFailure = false;
+		if (context.channel) {
+			const fishConfig = await context.channel.getDataProperty("fishConfig") ?? {};
+			whisperOnFailure = Boolean(fishConfig.whisperOnFailure);
+		}
+
 		/** @type {UserFishData} */
 		const fishData = await context.user.getDataProperty("fishData") ?? getInitialStats();
 		if (fishData.readyTimestamp !== 0 && sb.Date.now() < fishData.readyTimestamp) {
 			return {
 				success: false,
+				replyWithPrivateMessage: whisperOnFailure,
 				reply: `Hol' up partner! You can go fishing again ${sb.Utils.timeDelta(fishData.readyTimestamp)}!`
 			};
 		}
@@ -121,6 +128,7 @@ module.exports = {
 
 			const emote = await getEmote(context, "failure");
 			return {
+				replyWithPrivateMessage: whisperOnFailure,
 				reply: sb.Utils.tag.trim `
 					No luck... ${emote}
 					${message}
