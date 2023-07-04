@@ -24,7 +24,7 @@ module.exports = {
 		`<code>$fish config whisper on</code>`,
 		`<code>$fish config whisper off</code>`,
 		"Turns on/off the setting that will whisper people in the current channel when they don't catch a fish.",
-		"This is to prevent unwanted spam."
+		"This is to prevent unwanted spam. As such, only channel owners and ambassadors can change this setting."
 	],
 	execute: async (context, type, value) => {
 		if (!type) {
