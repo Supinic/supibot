@@ -47,9 +47,9 @@ const initialize = (async () => {
 	})];
 
 	// noinspection JSConstantReassignment
-	sb.Channel.data = new Map([
+	sb.Channel.data = new Map().set(sb.Platform.data[0], new Map([
 		[
-			sb.Platform.get("twitch"),
+			"supinic",
 			new sb.Channel({
 				Name: "supinic",
 				Platform: "twitch",
@@ -57,14 +57,14 @@ const initialize = (async () => {
 			})
 		],
 		[
-			sb.Platform.get("twitch"),
+			"forsen",
 			new sb.Channel({
 				Name: "forsen",
 				Platform: "twitch",
 				Mode: "Write"
 			})
 		]
-	]);
+	]));
 
 	sb.Command.data = [];
 	sb.Config.data = new Map([
