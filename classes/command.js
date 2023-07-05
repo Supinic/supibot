@@ -352,7 +352,7 @@ class Command extends require("./template.js") {
 			sb.Metrics.registerCounter({
 				name: "supibot_command_executions_total",
 				help: "The total number of command executions.",
-				labelNames: ["name", "result", "failReason"]
+				labelNames: ["name", "result", "reason"]
 			});
 		}
 
@@ -609,7 +609,7 @@ class Command extends require("./template.js") {
 			metric.inc({
 				name: command.Name,
 				result: "filtered",
-				failReason: filterData.reason
+				reason: filterData.reason
 			});
 
 			return filterData;
