@@ -53,14 +53,23 @@ module.exports = (function () {
 			throw new Error(`Internal API error - invalid definition for path ${path.join("/")}`);
 		}
 
-		const { error = null, data = null, headers = {}, statusCode = 200 } = await target(req, res, url);
-		res.writeHead(statusCode, headers);
-		res.end(JSON.stringify({
-			statusCode,
-			data,
-			error,
-			timestamp: Date.now()
-		}));
+		const {
+			skipResponseHandling = false,
+			error = null,
+			data = null,
+			headers = {},
+			statusCode = 200
+		} = await target(req, res, url);
+
+		if (!skipResponseHandling) {
+			res.writeHead(statusCode, headers);
+			res.end(JSON.stringify({
+				statusCode,
+				data,
+				error,
+				timestamp: Date.now()
+			}));
+		}
 	});
 
 	server.listen(port);
