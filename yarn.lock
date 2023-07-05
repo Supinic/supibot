@@ -1244,6 +1244,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bintrees@npm:1.0.2":
+  version: 1.0.2
+  resolution: "bintrees@npm:1.0.2"
+  checksum: 56a52b7d3634e30002b1eda740d2517a22fa8e9e2eb088e919f37c030a0ed86e364ab59e472fc770fc8751308054bb1c892979d150e11d9e11ac33bcc1b5d16e
+  languageName: node
+  linkType: hard
+
 "bl@npm:^4.0.3":
   version: 4.1.0
   resolution: "bl@npm:4.1.0"
@@ -4507,6 +4514,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prom-client@npm:^14.2.0":
+  version: 14.2.0
+  resolution: "prom-client@npm:14.2.0"
+  dependencies:
+    tdigest: ^0.1.1
+  checksum: d4c04e57616c72643dd02862d0d4bde09cf8869a19d0aef5e7b785e6e27d02439b66cdc165e3492f62d579fa91579183820870cc757a09b99399d2d02f46b9f1
+  languageName: node
+  linkType: hard
+
 "promise-inflight@npm:^1.0.1":
   version: 1.0.1
   resolution: "promise-inflight@npm:1.0.1"
@@ -5243,7 +5259,7 @@ __metadata:
 
 supi-core@supinic/supi-core:
   version: 2.2.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=c189296a28e11c3e6b4dcd3f07248c8a75a5aa75"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=655a3cc16be4f168b176746f6fb1338d21f89a40"
   dependencies:
     async-markov: "github:supinic/async-markov"
     cheerio: ^1.0.0-rc.12
@@ -5257,13 +5273,14 @@ supi-core@supinic/supi-core:
     language-iso-codes: "github:supinic/language-iso-codes"
     long-timeout: "github:supinic/long-timeout"
     mariadb: ^3.1.2
+    prom-client: ^14.2.0
     random-js: ^2.1.0
     roll-dice: "npm:@jprochazk/roll-dice@^0.2.2"
     rss-parser: ^3.13.0
     track-link-parser: "github:supinic/track-link-parser"
     transliteration: ^2.3.5
     vm2: ^3.9.19
-  checksum: 8b05417f671abb7742512910a148ace2f296a9e73a861e8130430877f441e0b681030bb94b3cf83cb8eef30ed96bd0df41ac2e46d7abcdba518be3296100cbb4
+  checksum: e78ffd1e69009153c6c30790290af9f736a937bcb01b2ebc5d05e6204ae351e9081b72e4fac22c2138d10b34107be634d5c48b8845ed40628afea49c4b0047e4
   languageName: node
   linkType: hard
 
@@ -5343,6 +5360,15 @@ supi-core@supinic/supi-core:
     mkdirp: ^1.0.3
     yallist: ^4.0.0
   checksum: 8a278bed123aa9f53549b256a36b719e317c8b96fe86a63406f3c62887f78267cea9b22dc6f7007009738509800d4a4dccc444abd71d762287c90f35b002eb1c
+  languageName: node
+  linkType: hard
+
+"tdigest@npm:^0.1.1":
+  version: 0.1.2
+  resolution: "tdigest@npm:0.1.2"
+  dependencies:
+    bintrees: 1.0.2
+  checksum: 44de8246752b6f8c2924685f969fd3d94c36949f22b0907e99bef2b2220726dd8467f4730ea96b06040b9aa2587c0866049640039d1b956952dfa962bc2075a3
   languageName: node
   linkType: hard
 
