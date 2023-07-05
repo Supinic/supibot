@@ -27,8 +27,13 @@ module.exports = (function () {
 		const path = url.pathname.split("/").filter(Boolean);
 
 		let target = definition[path[0]];
-		for (let i = 1; i < path.length; i++) {
-			target = target?.[path[i]];
+		if (target && path.length === 1) {
+			target = target.index;
+		}
+		else if (path.length > 1) {
+			for (let i = 1; i < path.length; i++) {
+				target = target?.[path[i]];
+			}
 		}
 
 		if (!target) {
