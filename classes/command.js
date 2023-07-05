@@ -1,13 +1,5 @@
 const pathModule = require("path");
 
-if (sb.Metrics) {
-	sb.Metrics.registerCounter({
-		name: "supibot_command_executions_total",
-		help: "The total number of command executions.",
-		labelNames: ["name", "result", "failReason"]
-	});
-}
-
 class Context {
 	#command;
 	#invocation;
@@ -356,6 +348,14 @@ class Command extends require("./template.js") {
 	get Author () { return this.#Author; }
 
 	static async initialize () {
+		if (sb.Metrics) {
+			sb.Metrics.registerCounter({
+				name: "supibot_command_executions_total",
+				help: "The total number of command executions.",
+				labelNames: ["name", "result", "failReason"]
+			});
+		}
+
 		// Override the default template behaviour of automatically calling `loadData()` by doing nothing.
 		// This is new (experimental) behaviour, where the commands' definitions will be loaded externally!
 		return this;
