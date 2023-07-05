@@ -1,5 +1,13 @@
 const pathModule = require("path");
 
+if (sb.Metrics) {
+	sb.Metrics.registerCounter({
+		name: "supibot_command_executions_total",
+		help: "The total number of command executions.",
+		labelNames: ["name", "result", "failReason"]
+	});
+}
+
 class Context {
 	#command;
 	#invocation;
@@ -451,7 +459,10 @@ class Command extends require("./template.js") {
 		}
 
 		if (channelData?.Mode === "Inactive" || channelData?.Mode === "Read") {
-			return { success: false, reason: `channel-${channelData.Mode.toLowerCase()}` };
+			return {
+				success: false,
+				reason: `channel-${channelData.Mode.toLowerCase()}`
+			};
 		}
 
 		// Special parsing of privileged characters - they can be joined with other characters, and still be usable
@@ -470,6 +481,8 @@ class Command extends require("./template.js") {
 		if (!command) {
 			return { success: false, reason: "no-command" };
 		}
+
+		const metric = sb.Metrics.get("supibot_command_executions_total");
 
 		// Check for cooldowns, return if it did not pass yet.
 		// If skipPending flag is set, do not check for pending status.
@@ -593,6 +606,12 @@ class Command extends require("./template.js") {
 				filterData.reply = string;
 			}
 
+			metric.inc({
+				name: command.Name,
+				result: "filtered",
+				failReason: filterData.reason
+			});
+
 			return filterData;
 		}
 
@@ -618,6 +637,11 @@ class Command extends require("./template.js") {
 
 			await sb.Runtime.incrementCommandsCounter();
 
+			metric.inc({
+				name: command.Name,
+				result: (execution?.success === false) ? "fail" : "success"
+			});
+
 			sb.Logger.logCommandExecution({
 				User_Alias: userData.ID,
 				Command: command.Name,
@@ -632,6 +656,11 @@ class Command extends require("./template.js") {
 			});
 		}
 		catch (e) {
+			metric.inc({
+				name: command.Name,
+				result: "error"
+			});
+
 			let origin = "Internal";
 			let errorContext;
 			const loggingContext = {
