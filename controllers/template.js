@@ -3,6 +3,7 @@
  * @name {Controller}
 */
 module.exports = class Controller {
+	platform;
 	supportsMeAction = false;
 	data = {
 		crons: []
@@ -19,6 +20,34 @@ module.exports = class Controller {
 	me () {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Controller class"
+		});
+	}
+
+	incrementMessageMetric (type, channelIdentifier) {
+		if (!sb.Metrics) {
+			return;
+		}
+
+		if (type !== "sent" && type !== "read") {
+			throw new sb.Error({
+				message: "Incorrect message metric type provided",
+				args: { type, channelIdentifier }
+			});
+		}
+
+		let channel = "(private)";
+		if (channelIdentifier) {
+			const channelData = sb.Channel.get(channelIdentifier);
+			if (!channelData) {
+				return;
+			}
+
+			channel = channelData.Name;
+		}
+
+		sb.Metrics.get(`supibot_messages_${type}_total`).inc({
+			channel,
+			platform: this.platform.Name
 		});
 	}
 
@@ -105,6 +134,7 @@ module.exports = class Controller {
 
 	/**
 	 * Returns a list of usable emotes in the scope of the provided channel.
+	 * @abstract
 	 * @param {Channel} channelData
 	 * @returns {Promise<TypedEmote[]>}
 	 */

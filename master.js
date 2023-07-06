@@ -74,6 +74,20 @@ catch {
 	const controllers = {};
 	const initialPlatforms = sb.Channel.getActivePlatforms();
 
+	if (sb.Metrics) {
+		sb.Metrics.registerCounter({
+			name: "supibot_messages_sent_total",
+			help: "Total number of Twitch messages sent by the bot.",
+			labelNames: ["platform", "channel"]
+		});
+
+		sb.Metrics.registerCounter({
+			name: "supibot_messages_read_total",
+			help: "Total number of Twitch messages seen (read) by the bot.",
+			labelNames: ["platform", "channel"]
+		});
+	}
+
 	for (const platformData of initialPlatforms) {
 		let Controller = null;
 		try {

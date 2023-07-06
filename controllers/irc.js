@@ -86,11 +86,15 @@ module.exports = class IRCController extends require("./template.js") {
 		if (!channelData) {
 			throw new sb.Error({
 				message: "Invalid channel provided",
-				args: { message, channel }
+				args: {
+					message,
+					channel
+				}
 			});
 		}
 
 		this.client.say(channelData.Name, message);
+		this.incrementMessageMetric("sent", channelData);
 	}
 
 	async pm (message, user) {
@@ -100,10 +104,12 @@ module.exports = class IRCController extends require("./template.js") {
 		}
 
 		this.client.say(userData.Name, message);
+		this.incrementMessageMetric("sent", null);
 	}
 
 	async directPm (message, userName) {
 		this.client.say(userName, message);
+		this.incrementMessageMetric("sent", null);
 	}
 
 	async prepareMessage (message, channel, options = {}) {
@@ -227,6 +233,8 @@ module.exports = class IRCController extends require("./template.js") {
 
 			this.resolveUserMessage(null, userData, message);
 		}
+
+		this.incrementMessageMetric("read", channelData);
 
 		if (!sb.Command.prefix) {
 			return;

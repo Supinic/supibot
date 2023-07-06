@@ -172,6 +172,8 @@ class CytubeClient {
 				if (this.channelData.Mirror) {
 					this.controller.mirror(msg, userData, this.channelData, { commandUsed: false });
 				}
+
+				this.controller.incrementMessageMetric("read", this.channelData);
 			}
 			else {
 				if (this.controller.platform.Logging.whispers) {
@@ -179,6 +181,7 @@ class CytubeClient {
 				}
 
 				this.controller.resolveUserMessage(null, userData, msg);
+				this.controller.incrementMessageMetric("read", null);
 			}
 
 			// Handle commands if the message starts with the command prefix
@@ -510,7 +513,8 @@ module.exports = class CytubeController extends require("./template.js") {
 			});
 		}
 
-		return await client.send(message);
+		await client.send(message);
+		this.incrementMessageMetric("sent", channelData);
 	}
 
 	/**
@@ -531,7 +535,8 @@ module.exports = class CytubeController extends require("./template.js") {
 			});
 		}
 
-		return await client.pm(message, user);
+		await client.pm(message, user);
+		this.incrementMessageMetric("sent", null);
 	}
 
 	/**

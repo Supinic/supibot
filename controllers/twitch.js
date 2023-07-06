@@ -500,6 +500,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			scheduler.on("message", async (msg) => {
 				try {
 					await this.client.say(channelName, msg);
+					this.incrementMessageMetric("sent", channelData);
 				}
 				catch (e) {
 					await sb.Logger.log("Twitch.Warning", String(e), { ID: channelID }, null);
@@ -509,7 +510,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			this.queues[channelName] = scheduler;
 		}
 
-		// Check if the bot is about the send an identical message to the last one
+		// Check if the bot is about to send an identical message to the last one
 		if (this.evasion[channelName] === message) {
 			const { sameMessageEvasionCharacter: char } = this.platform.Data;
 			if (message.includes(char)) {
@@ -571,6 +572,8 @@ module.exports = class TwitchController extends require("./template.js") {
 				message: trimmedMessage
 			}
 		});
+
+		this.incrementMessageMetric("sent", null);
 
 		if (!response.ok) {
 			const data = JSON.stringify({
@@ -823,6 +826,8 @@ module.exports = class TwitchController extends require("./template.js") {
 
 			this.resolveUserMessage(null, userData, message);
 		}
+
+		this.incrementMessageMetric("read", channelData);
 
 		// Own message - check the regular/vip/mod/broadcaster status, and skip
 		if (userData.Name === this.platform.Self_Name && channelData) {

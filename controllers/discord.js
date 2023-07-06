@@ -267,6 +267,8 @@ module.exports = class DiscordController extends require("./template.js") {
 				this.resolveUserMessage(null, userData, msg);
 			}
 
+			this.incrementMessageMetric("read", channelData);
+
 			if (channelData && channelData.Mode === "Read") {
 				return;
 			}
@@ -446,6 +448,7 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		try {
 			await channelObject.send(sendTarget);
+			this.incrementMessageMetric("sent", channelData);
 		}
 		catch (e) {
 			if (e instanceof DiscordAPIError) {
@@ -535,6 +538,8 @@ module.exports = class DiscordController extends require("./template.js") {
 					embeds: options.embeds
 				});
 			}
+
+			this.incrementMessageMetric("sent", null);
 		}
 		catch (e) {
 			if (!this.platform.Data.createReminderWhenSendingPrivateMessageFails) {
@@ -596,6 +601,7 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		try {
 			await discordUser.send(message);
+			this.incrementMessageMetric("sent", null);
 		}
 		catch (e) {
 			throw new sb.Error({
