@@ -53,6 +53,17 @@
         "maximum": 500
       },
       "usageDivisor": 1
+    },
+    "4": {
+      "url": "gpt-4",
+      "type": "messages",
+      "default": false,
+      "inputLimit": 200,
+      "outputLimit": {
+        "default": 100,
+        "maximum": 100
+      },
+      "usageDivisor": 0.067
     }
   }
 }
