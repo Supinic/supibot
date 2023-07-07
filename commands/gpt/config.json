@@ -63,7 +63,7 @@
         "default": 100,
         "maximum": 100
       },
-      "usageDivisor": 0.067
+      "usageDivisor": 0.066667
     }
   }
 }
