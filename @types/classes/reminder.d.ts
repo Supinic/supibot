@@ -5,6 +5,7 @@ import { Platform, Like as PlatformLike } from "./platform";
 import { User } from "./user";
 
 import { LongTimeout } from "long-timeout";
+import { Counter, Gauge } from "prom-client";
 
 type ConstructorData = {
 	ID: number;
@@ -53,6 +54,10 @@ export declare class Reminder extends ClassTemplate {
 
 	static #add (reminder: Reminder): void;
 	static #remove (ID: Reminder["ID"], options: RemoveOptions): Promise<boolean>;
+
+	static #activeGauge: Gauge;
+	static #limitRejectedCounter: Counter;
+	static #totalCounter: Counter;
 
 	/**
 	 * Reloads a specific list of reminders, provided as identifiers or instances.
