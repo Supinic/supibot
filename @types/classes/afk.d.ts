@@ -2,6 +2,7 @@ import { ClassTemplate } from "./template";
 import { CustomDate } from "../objects/date";
 import { Channel } from "./channel";
 import { User } from "./user";
+import { Counter, Gauge } from "prom-client";
 
 export declare type Status = "afk" | "poop" | "gn" | "brb" | "shower" | "lurk" | "food" | "work" | "ppPoof" | "study";
 export declare type Like = number | AwayFromKeyboard;
@@ -25,6 +26,9 @@ declare type SetData = Omit<ConstructorData, "ID"> & {
  */
 export declare class AwayFromKeyboard extends ClassTemplate {
 	static readonly data: Map<number, AwayFromKeyboard>;
+
+	static #activeGauge: Gauge;
+	static #totalCounter: Counter;
 
 	/**
 	 * Reloads a specific list of AFK statuses, provided as identifiers.

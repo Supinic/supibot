@@ -6,6 +6,9 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 	static defaultStatus = "afk";
 	static uniqueIdentifier = "ID";
 
+	static #activeGauge;
+	static #totalCounter;
+
 	constructor (data) {
 		super();
 
@@ -23,6 +26,23 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		});
 	}
 
+	static async initialize () {
+		if (sb.Metrics) {
+			AwayFromKeyboard.#totalCounter = sb.Metrics.registerCounter({
+				name: "supibot_afk_statuses_created_total",
+				help: "Total amount of all AFK statuses created.",
+				labelNames: ["type"]
+			});
+
+			AwayFromKeyboard.#activeGauge = sb.Metrics.registerGauge({
+				name: "supibot_active_afk_statuses_count",
+				help: "Total amount of currently active AFK status."
+			});
+		}
+
+		return await super.initialize();
+	}
+
 	static async reloadData () {
 		AwayFromKeyboard.data.clear();
 		return await this.loadData();
@@ -38,6 +58,10 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		for (const record of data) {
 			const afk = new AwayFromKeyboard(record);
 			AwayFromKeyboard.data.set(afk.User_Alias, afk);
+		}
+
+		if (sb.Metrics) {
+			AwayFromKeyboard.#activeGauge.set(AwayFromKeyboard.data.size);
 		}
 	}
 
@@ -174,6 +198,14 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 
 		const afk = new AwayFromKeyboard(afkData);
 		AwayFromKeyboard.data.set(userData.ID, afk);
+
+		if (sb.Metrics) {
+			AwayFromKeyboard.#totalCounter.inc({
+				type: afkData.Status
+			});
+
+			AwayFromKeyboard.#activeGauge.inc(1);
+		}
 
 		return afk;
 	}
