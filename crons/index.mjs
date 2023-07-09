@@ -17,7 +17,7 @@ import { definition as StreamSilencePreventer } from "./stream-silence-preventio
 import { definition as SuggestionNotificator } from "./suggestion-notification-system/index.mjs";
 import { definition as SupinicAdvertiser } from "./supinic-advert/index.mjs";
 import { definition as TitlechangeBotAnnouncer } from "./supinic-tcb/index.mjs";
-import { definition as TrainwrecksTwitterArchiver } from "./train-twitter-archiver/index.mjs";
+// import { definition as TrainwrecksTwitterArchiver } from "./train-twitter-archiver/index.mjs";
 import { definition as V8VersionAnnouncer } from "./v8-version-checker/index.mjs";
 import { definition as SoundcloudClientIdFetcher } from "./yoink-soundcloud-client-id/index.mjs";
 
@@ -41,7 +41,8 @@ export const definitions = [
 	StreamSilencePreventer,
 	SupinicAdvertiser,
 	TitlechangeBotAnnouncer,
-	TrainwrecksTwitterArchiver,
+	// Temporarily disabled due to Twitter API changes - will possibly be shelved entirely
+	// TrainwrecksTwitterArchiver,
 	V8VersionAnnouncer,
 	SoundcloudClientIdFetcher
 ];
