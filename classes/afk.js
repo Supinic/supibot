@@ -110,6 +110,10 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			.where("ID = %n", data.ID)
 		);
 
+		if (sb.Metrics) {
+			AwayFromKeyboard.#activeGauge.dec(1);
+		}
+
 		let statusMessage;
 		const status = data.Status ?? AwayFromKeyboard.defaultStatus; // Fallback for old AFKs without `Status` property
 		if (afkResponses.duration[status]) {
