@@ -198,6 +198,18 @@ module.exports = {
 			};
 		}
 
+		if (!skipLocation) {
+			const counter = this.registerMetric("Counter", "geomap_count", {
+				help: "Total amount of command usages for specific GPS coordinates.",
+				labelNames: ["lat", "lng"]
+			});
+
+			counter.inc({
+				lat: coordinates.lat,
+				lng: coordinates.lng
+			});
+		}
+
 		const totalOffset = (timeData.rawOffset + timeData.dstOffset);
 		const symbol = (totalOffset >= 0 ? "+" : "-");
 		const hours = Math.trunc(Math.abs(totalOffset) / 3600);
