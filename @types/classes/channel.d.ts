@@ -355,6 +355,4 @@ export declare class Channel extends ClassTemplate {
     getBestAvailableEmote (emotes: string[], fallbackEmote: string, options: AvailableEmoteOptions): Promise<string|Emote>;
     prepareMessage (message: Message, options: PrepareMessageOptions): ReturnType<Platform["prepareMessage"]>;
     getCacheKey (): string;
-
-    serialize (): Promise<never>;
 }

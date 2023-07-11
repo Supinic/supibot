@@ -102,12 +102,6 @@ module.exports = class Platform extends require("./template.js") {
 		return promise;
 	}
 
-	async serialize () {
-		throw new sb.Error({
-			message: "Module Platform cannot be serialized"
-		});
-	}
-
 	async fetchChannelUserList (channelData) {
 		const key = {
 			type: "channel-user-list",

@@ -308,12 +308,6 @@ module.exports = class Filter extends require("./template.js") {
 		await row.save();
 	}
 
-	async serialize () {
-		throw new sb.Error({
-			message: "Module Filter cannot be serialized"
-		});
-	}
-
 	/**
 	 * Pushes a property change to the dataabse.
 	 * @param {string} property

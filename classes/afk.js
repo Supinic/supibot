@@ -20,12 +20,6 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		this.Status = data.Status ?? AwayFromKeyboard.defaultStatus;
 	}
 
-	async serialize () {
-		throw new sb.Error({
-			message: "Module AwayFromKeyboard cannot be serialized"
-		});
-	}
-
 	static async initialize () {
 		if (sb.Metrics) {
 			AwayFromKeyboard.#totalCounter = sb.Metrics.registerCounter({

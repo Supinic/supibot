@@ -157,12 +157,6 @@ module.exports = class Channel extends require("./template.js") {
 		return await this.Platform.controller.mirror(message, userData, this, options);
 	}
 
-	async serialize () {
-		throw new sb.Error({
-			message: "Module Channel cannot be serialized"
-		});
-	}
-
 	async fetchUserList () {
 		return await this.Platform.fetchChannelUserList(this);
 	}

@@ -96,12 +96,6 @@ module.exports = (function () {
 			}
 		}
 
-		async serialize () {
-			throw new sb.Error({
-				message: "Module Banphrase cannot be serialized"
-			});
-		}
-
 		static async loadData () {
 			const data = await sb.Query.getRecordset(rs => rs
 				.select("Banphrase.*")

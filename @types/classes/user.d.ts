@@ -110,5 +110,4 @@ export declare class User extends ClassTemplate {
      * Saves a user data property into the database.
      */
     setDataProperty (propertyName: CacheName, value: CacheValue, options?: SpecificCacheOptions): ReturnType<ClassTemplate["setGenericDataProperty"]>;
-    serialize (): never;
 }

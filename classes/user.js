@@ -141,12 +141,6 @@ module.exports = class User extends require("./template.js") {
 		});
 	}
 
-	async serialize () {
-		throw new sb.Error({
-			message: "Module User cannot be serialized"
-		});
-	}
-
 	static async initialize () {
 		User.bots = new Map();
 		User.data = new Map();

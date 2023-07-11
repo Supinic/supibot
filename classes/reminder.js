@@ -228,12 +228,6 @@ module.exports = class Reminder extends require("./template.js") {
 		}
 	}
 
-	async serialize () {
-		throw new sb.Error({
-			message: "Module Reminder cannot be serialized"
-		});
-	}
-
 	static async initialize () {
 		if (sb.Metrics) {
 			Reminder.#limitRejectedCounter = sb.Metrics.registerCounter({
