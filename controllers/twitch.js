@@ -43,6 +43,21 @@ const emitRawUserMessageEvent = (username, channelName, message, messageData = {
 	}
 };
 
+const userChannelActivityPrefix = "twitch-user-activity-";
+const populateUserChannelActivity = async (userData, channelData) => {
+	const key = `${userChannelActivityPrefix}-${channelData.ID}-${userData.Name}`;
+	await sb.Cache.setByPrefix(key, "1", {
+		expiry: 36e5 // 60 minutes
+	});
+};
+
+const getActiveUsernamesInChannel = async (channelData) => {
+	const prefix = `${userChannelActivityPrefix}-${channelData.ID}-`;
+	const prefixes = await sb.Cache.getKeysByPrefix(`${prefix}*`, {});
+
+	return prefixes.map(i => i.replace(prefix, ""));
+};
+
 module.exports = class TwitchController extends require("./template.js") {
 	supportsMeAction = true;
 
@@ -807,7 +822,8 @@ module.exports = class TwitchController extends require("./template.js") {
 
 			await Promise.all([
 				sb.AwayFromKeyboard.checkActive(userData, channelData),
-				sb.Reminder.checkActive(userData, channelData)
+				sb.Reminder.checkActive(userData, channelData),
+				populateUserChannelActivity(userData, channelData)
 			]);
 
 			// Mirror messages to a linked channel, if the channel has one
@@ -1190,22 +1206,8 @@ module.exports = class TwitchController extends require("./template.js") {
 	}
 
 	async fetchUserList (channelIdentifier) {
-		const channelData = sb.Channel.get(channelIdentifier);
-		const fullUserList = [...sb.User.data.values()].filter(i => i.Twitch_ID);
-		if (fullUserList.length === 0) {
-			return [];
-		}
-
-		const threshold = new sb.Date().addHours(-1);
-		return await sb.Query.getRecordset(rs => rs
-			.select("User_Alias.Name AS Name")
-			.from("chat_data", "Message_Meta_User_Alias")
-			.join("chat_data", "User_Alias")
-			.where("Channel = %n", channelData.ID)
-			.where("User_Alias IN %n+", fullUserList.map(i => i.ID))
-			.where("Last_Message_Posted >= %d", threshold)
-			.flat("Name")
-		);
+		const channelData = sb.Channel.get(channelIdentifier, this.platform);
+		return await getActiveUsernamesInChannel(channelData);
 	}
 
 	async prepareMessage (message, channel, options) {
