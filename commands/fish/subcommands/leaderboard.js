@@ -12,7 +12,8 @@ const typeProperty = {
 	lucky: ["catch.luckyStreak", "lucky ducks"],
 	"total-lucky": ["lifetime.luckyStreak", "all-time lucky ducks"],
 	unlucky: ["catch.dryStreak", "jinxed sphinxes"],
-	"total-unlucky": ["lifetime.dryStreak", "all-time unluckiest anglers"]
+	"total-unlucky": ["lifetime.dryStreak", "all-time unluckiest anglers"],
+	attempts: ["lifetime.attempts", "most persistent trawlers"]
 };
 
 for (const item of itemTypes) {
@@ -32,6 +33,10 @@ module.exports = {
 		`<code>$fish top 🐠</code>`,
 		`<code>$fish top 💀</code>`,
 		"Shows the list of top collectors for a specified item, fish or junk.",
+		"",
+
+		`<code>$fish top attempts</code>`,
+		"Shows the list of the most persistent trawlers (most attempts).",
 		"",
 
 		`<code>$fish top coins</code>`,
