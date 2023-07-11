@@ -8,6 +8,7 @@ import { CustomDate as Date } from "../objects/date";
 import { DeepFrozen } from "../singletons/utils";
 
 import { PoolConnection } from "mariadb";
+import { Metric, MetricConfiguration, MetricType } from "prom-client";
 
 declare type DiscordEmbedDefinition = {
     title: string;
@@ -478,4 +479,9 @@ export declare class Command extends ClassTemplate {
      * @param options.useCodePath If true, returns a path for the command's code description
      */
     getDetailURL (options?: { useCodePath?: boolean }): string;
+
+    /**
+     * Registers a metric (if needed) using standardized command labels.
+     */
+    registerMetric <T extends string>(type: MetricType, label: T, options: Partial<MetricConfiguration<T>>): Metric<T>;
 }

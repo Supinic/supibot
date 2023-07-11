@@ -345,6 +345,16 @@ class Command extends require("./template.js") {
 		return `sb-command-${this.Name}`;
 	}
 
+	registerMetric (type, label, options = {}) {
+		const metricLabel = `supibot_command_${this.Name}_${label}`;
+		const metricOptions = {
+			...options,
+			name: metricLabel
+		};
+
+		return sb.Metrics.register(type, metricOptions);
+	}
+
 	get Author () { return this.#Author; }
 
 	static async initialize () {
