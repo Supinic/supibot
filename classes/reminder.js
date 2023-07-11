@@ -19,6 +19,7 @@ module.exports = class Reminder extends require("./template.js") {
 	static mandatoryConstructorOptions = ["User_From", "User_To", "Platform"];
 
 	static #activeGauge;
+	static #userGauge;
 	static #limitRejectedCounter;
 	static #totalCounter;
 
@@ -216,8 +217,6 @@ module.exports = class Reminder extends require("./template.js") {
 		}
 
 		await Reminder.#remove(this.ID, { cancelled, permanent });
-		Reminder.#activeGauge.dec();
-
 		return this;
 	}
 
@@ -244,8 +243,12 @@ module.exports = class Reminder extends require("./template.js") {
 
 			Reminder.#activeGauge = sb.Metrics.registerGauge({
 				name: "supibot_active_reminders_count",
-				help: "Total amount of currently active reminders.",
-				labelNames: ["type"]
+				help: "Total amount of currently active reminders."
+			});
+
+			Reminder.#userGauge = sb.Metrics.registerGauge({
+				name: "supibot_reminder_recipient_user_count",
+				help: "Total amount of users that currently have at least one reminder pending for them."
 			});
 		}
 
@@ -259,7 +262,7 @@ module.exports = class Reminder extends require("./template.js") {
 			.where("Active = %b", true)
 		);
 
-		const threshold = new sb.Date().addMonths(1).valueOf();
+		const threshold = new sb.Date().addYears(1).valueOf();
 		for (const row of data) {
 			// Skip scheduled reminders that are set to fire more than `threshold` in the future
 			if (row.Schedule && row.Schedule.valueOf() > threshold) {
@@ -271,7 +274,8 @@ module.exports = class Reminder extends require("./template.js") {
 		}
 
 		if (sb.Metrics) {
-			Reminder.#activeGauge.set(Reminder.data.size);
+			Reminder.#activeGauge.set(Reminder.available.size);
+			Reminder.#userGauge.set(Reminder.data.size);
 		}
 	}
 
@@ -392,12 +396,14 @@ module.exports = class Reminder extends require("./template.js") {
 		Reminder.#add(reminder);
 
 		if (sb.Metrics) {
-			Reminder.#activeGauge.inc();
 			Reminder.#totalCounter.inc({
 				type: row.values.Type,
 				scheduled: Boolean(row.values.Schedule),
 				system: skipChecks
 			});
+
+			Reminder.#activeGauge.set(Reminder.available.size);
+			Reminder.#userGauge.set(Reminder.data.size);
 		}
 
 		return {
@@ -448,10 +454,6 @@ module.exports = class Reminder extends require("./template.js") {
 		const privateReply = [];
 
 		for (const reminder of reminders) {
-			if (sb.Metrics) {
-				Reminder.#activeGauge.dec();
-			}
-
 			const platformData = channelData.Platform;
 			const fromUserData = await sb.User.get(reminder.User_From);
 
@@ -654,6 +656,11 @@ module.exports = class Reminder extends require("./template.js") {
 		// Properly deactivate all reminders here - after all work has been done.
 		const deactivatePromises = reminders.map(reminder => reminder.deactivate(true));
 		await Promise.all(deactivatePromises);
+
+		if (sb.Metrics) {
+			Reminder.#activeGauge.set(Reminder.available.size);
+			Reminder.#userGauge.set(Reminder.data.size);
+		}
 	}
 
 	/**
