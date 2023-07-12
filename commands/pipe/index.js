@@ -102,10 +102,11 @@ module.exports = {
 			}
 		}
 
-		let finalResult = null;
+		// let finalResult = null;
 		let currentArgs = [];
+		let privateMessageReply = false;
+		let meActionReply = false;
 
-		// let lastCommand;
 		for (let i = 0; i < invocations.length; i++) {
 			const inv = invocations[i];
 			const [rawCmd, ...restArgs] = inv.split(" ");
@@ -235,16 +236,25 @@ module.exports = {
 				currentArgs = string.split(" ");
 			}
 
+			if (result) {
+				if (typeof result.replyWithPrivateMessage === "boolean") {
+					privateMessageReply = result.replyWithPrivateMessage;
+				}
+				else if (typeof result.replyWithMeAction === "boolean") {
+					meActionReply = result.replyWithMeAction;
+				}
+			}
+
 			// lastCommand = sb.Command.get(cmd.replace(sb.Command.prefix, ""));
-			finalResult = result;
+			// finalResult = result;
 		}
 
 		return {
 			cooldown: (context.append.pipe) ? null : this.Cooldown,
 			hasExternalInput,
 			// skipExternalPrefix: Boolean(lastCommand.Flags.skipBanphrase),
-			replyWithPrivateMessage: Boolean(finalResult?.replyWithPrivateMessage),
-			replyWithMeAction: Boolean(finalResult?.replyWithMeAction),
+			replyWithPrivateMessage: privateMessageReply,
+			replyWithMeAction: meActionReply,
 			reply: currentArgs.join(" ")
 		};
 	}),
