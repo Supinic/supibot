@@ -193,6 +193,8 @@ module.exports = {
 					else {
 						return {
 							...result,
+							replyWithPrivateMessage: privateMessageReply,
+							replyWithMeAction: meActionReply,
 							reply: result.reply ?? `Your pipe failed because the "${cmd}" command is currently on cooldown!`
 						};
 					}
@@ -201,6 +203,8 @@ module.exports = {
 					const reply = this.staticData.reasons[result.reason] ?? result.reply ?? result.reason;
 					return {
 						success: false,
+						replyWithPrivateMessage: privateMessageReply,
+						replyWithMeAction: meActionReply,
 						reply: `Pipe command ${cmd} failed: ${reply}`
 					};
 				}
