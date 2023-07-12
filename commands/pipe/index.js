@@ -168,6 +168,15 @@ module.exports = {
 				}
 			);
 
+			if (result) {
+				if (typeof result.replyWithPrivateMessage === "boolean") {
+					privateMessageReply = result.replyWithPrivateMessage;
+				}
+				else if (typeof result.replyWithMeAction === "boolean") {
+					meActionReply = result.replyWithMeAction;
+				}
+			}
+
 			if (!result) { // Banphrase result: Do not reply
 				currentArgs = [];
 			}
@@ -238,15 +247,6 @@ module.exports = {
 				});
 
 				currentArgs = string.split(" ");
-			}
-
-			if (result) {
-				if (typeof result.replyWithPrivateMessage === "boolean") {
-					privateMessageReply = result.replyWithPrivateMessage;
-				}
-				else if (typeof result.replyWithMeAction === "boolean") {
-					meActionReply = result.replyWithMeAction;
-				}
 			}
 
 			// lastCommand = sb.Command.get(cmd.replace(sb.Command.prefix, ""));
