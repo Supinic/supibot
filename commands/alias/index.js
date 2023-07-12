@@ -494,7 +494,7 @@ module.exports = {
 				if (!targetAlias) {
 					return {
 						success: false,
-						reply: `You don't have the "${targetAliasName}" alias!`
+						reply: `User "${targetUserName}" doesn't have the "${targetAliasName}" alias!`
 					};
 				}
 				else if (targetAlias.Command === null) {
