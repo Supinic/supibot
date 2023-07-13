@@ -662,6 +662,18 @@ module.exports = {
 			plusTime = " (now)";
 		}
 
+		if (!skipLocation) {
+			const counter = this.registerMetric("Counter", "geomap_count", {
+				help: "Total amount of command usages for specific GPS coordinates.",
+				labelNames: ["lat", "lng"]
+			});
+
+			counter.inc({
+				lat: coords.lat,
+				lng: coords.lng
+			});
+		}
+
 		if (context.params.format) {
 			const format = new Set(context.params.format.split(/\W/).filter(Boolean));
 			const reply = [];
