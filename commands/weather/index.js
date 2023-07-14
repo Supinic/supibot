@@ -51,7 +51,7 @@ module.exports = {
 			}
 			else if (type === 8) {
 				if (remainder === 0) {
-					return (current.uvi === 0) ? "🌙" : "☀";
+					return (current?.uvi === 0) ? "🌙" : "☀";
 				}
 				else if (remainder === 1) {
 					return "🌤️";
@@ -501,7 +501,7 @@ module.exports = {
 		const { getIcon, getWindDirection } = this.staticData;
 		const obj = {
 			place: (skipLocation) ? "(location hidden)" : formattedAddress,
-			icon: getIcon(target.weather[0].id, data.current),
+			icon: getIcon(target.weather[0].id, target),
 			cloudCover: `Cloud cover: ${target.clouds}%.`,
 			humidity: `Humidity: ${target.humidity}%.`,
 			pressure: `Air pressure: ${target.pressure} hPa.`,
