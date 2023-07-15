@@ -35,6 +35,9 @@ module.exports = class Channel extends require("./template.js") {
 		if (!this.Platform.Logging || !this.Platform.Logging.messages) {
 			return Promise.resolve(false);
 		}
+		else if (!this.Logging.has("Lines")) {
+			return Promise.resolve(false);
+		}
 
 		if (this.#setupPromise) {
 			return this.#setupPromise;
