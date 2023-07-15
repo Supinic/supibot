@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "math",
-	Aliases: null,
+	Aliases: ["calculate", "calc"],
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Does math. For more info, check the documentation for math.js.",
