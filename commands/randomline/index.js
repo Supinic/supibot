@@ -14,7 +14,7 @@ module.exports = {
 	})),
 	Code: (async function randomLine (context, user) {
 		const DatabaseLogs = require("./db-randomline.js");
-		const Justlog = require("./justlog.js");
+		const Rustlog = require("./rustlog.js");
 		const { connectedChannelGroups } = require("./connected-channels.json");
 
 		if (context.channel === null) {
@@ -28,9 +28,9 @@ module.exports = {
 		}
 
 		let result;
-		const forceJustlog = await context.channel.getDataProperty("forceJustlog") ?? false;
+		const forceRustlog = await context.channel.getDataProperty("forceRustlog") ?? false;
 
-		if (forceJustlog || !context.channel.Logging.has("Lines")) {
+		if (forceRustlog || !context.channel.Logging.has("Lines")) {
 			if (context.channel.Platform.Name !== "twitch") {
 				return {
 					success: false,
@@ -39,7 +39,7 @@ module.exports = {
 			}
 
 			const channelID = context.channel.Specific_ID;
-			const isChannelSupported = await Justlog.isSupported(channelID);
+			const isChannelSupported = await Rustlog.isSupported(channelID);
 			if (isChannelSupported === null) {
 				return {
 					success: false,
@@ -49,7 +49,18 @@ module.exports = {
 			else if (isChannelSupported === false) {
 				return {
 					success: false,
-					reply: `This channel does not currently support random lines!`
+					cooldown: {
+						user: null,
+						command: this.Name,
+						channel: context.channel.ID,
+						cooldown: 30_000
+					},
+					reply: sb.Utils.tag.trim `
+						This channel does not currently support random lines!
+						You can enable random lines by adding the Rustlog service in this channel, 
+						which can be done via the "$bot enable-rustlog" command.
+						That command is only usable by channel owners and ambassadors.
+					 `
 				};
 			}
 
@@ -63,10 +74,10 @@ module.exports = {
 					};
 				}
 
-				result = await Justlog.getRandomUserLine(channelID, userID);
+				result = await Rustlog.getRandomUserLine(channelID, userID);
 			}
 			else {
-				result = await Justlog.getRandomChannelLine(channelID);
+				result = await Rustlog.getRandomChannelLine(channelID);
 			}
 		}
 		else if (user) {

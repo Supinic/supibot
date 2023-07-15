@@ -1,4 +1,4 @@
-const supportedChannelsCacheKey = "justlog-supported-channels";
+const supportedChannelsCacheKey = "rustlog-supported-channels";
 
 const getSupportedChannelList = async function () {
 	let data = await sb.Cache.getByPrefix(supportedChannelsCacheKey);
@@ -17,7 +17,7 @@ const getSupportedChannelList = async function () {
 
 	data = response.body.channels;
 	await sb.Cache.setByPrefix(supportedChannelsCacheKey, data, {
-		expiry: 864e5 // 1 day
+		expiry: 60_000 // 5 min
 	});
 
 	return data;
@@ -44,7 +44,7 @@ const getRandomChannelLine = async function (channelID) {
 	if (response.statusCode === 403) {
 		return {
 			success: false,
-			reason: "This channel has opted out of having their messages logged via a third party service (Justlog)!"
+			reason: "This channel has opted out of having their messages logged via the Rustlog third party service!"
 		};
 	}
 	else if (response.statusCode === 404) {
@@ -81,7 +81,7 @@ const getRandomUserLine = async function (channelID, userID) {
 	if (response.statusCode === 403) {
 		return {
 			success: false,
-			reason: "That user has opted out of having their messages logged via a third party service (Justlog)!"
+			reason: "This channel has opted out of having their messages logged via the Rustlog third party service!"
 		};
 	}
 	else if (response.statusCode === 404) {
@@ -106,7 +106,41 @@ const getRandomUserLine = async function (channelID, userID) {
 	};
 };
 
+const addChannel = async function (channelID) {
+	if (!sb.Config.has("RUSTLOG_ADMIN_KEY")) {
+		return {
+			success: false,
+			reason: "no-key"
+		};
+	}
+
+	const response = await sb.Got("GenericAPI", {
+		url: "https://logs.ivr.fi/admin/channels",
+		method: "POST",
+		throwHttpErrors: false,
+		headers: {
+			"X-API-Key": sb.Config.get("RUSTLOG_ADMIN_KEY")
+		},
+		json: {
+			channels: [channelID]
+		}
+	});
+
+	if (!response.ok) {
+		return {
+			success: false,
+			code: response.statusCode
+		};
+	}
+	else {
+		return {
+			success: true
+		};
+	}
+};
+
 module.exports = {
+	addChannel,
 	isSupported,
 	getRandomChannelLine,
 	getRandomUserLine

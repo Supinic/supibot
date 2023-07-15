@@ -451,6 +451,62 @@ module.exports = {
 				};
 			}
 
+			case "enable-rustlog": {
+				if (channelData.Platform.Name !== "twitch") {
+					return {
+						success: false,
+						reply: ``
+					};
+				}
+
+				let Rustlog;
+				try {
+					Rustlog = require("../randomline/rustlog.js");
+				}
+				catch {
+					return {
+						success: false,
+						reply: `Could not load Rustlog methods module!`
+					};
+				}
+
+				const channelID = channelData.Specific_ID;
+				if (await Rustlog.isSupported(channelID)) {
+					return {
+						success: false,
+						reply: `This channel is already added and configured in Rustlog!`
+					};
+				}
+
+				const { reason, success, statusCode } = await Rustlog.addChannel(channelID);
+				if (success) {
+					return {
+						reply: sb.Utils.tag.trim `
+							Successfully added this channel to the Rustlog service! 
+							The $rl command should be enabled within approximately one minute.
+						`
+					};
+				}
+				else if (statusCode === 401 || reason === "no-key") {
+					return {
+						success: false,
+						reply: "Authentication failure!"
+					};
+				}
+				else if (statusCode === 403) {
+					return {
+						success: false,
+						reply: `Cannot add this channel, as the owner has opted out from being logged by the Rustlog service!`
+					};
+				}
+				else {
+					return {
+						success: false,
+						reply: `Unexpected error ocurred! Try again later. Status code: ${statusCode}`
+					};
+				}
+			}
+
 			default: return {
 				success: false,
 				reply: "Invalid command provided!"
@@ -484,6 +540,12 @@ module.exports = {
 			"Activates (or deactives, if used with disable-) the offline-only mode, which will make Supibot unresponsive in the channel when the streamer goes live.",
 			"After the stream ends, Supibot will automatically reactivate. There might be delay up to 2 minutes for both online/offline events.",
 			"Note: The stream must go online/offline for this mode to activate. If it is already live, Supibot won't deactivate until it goes live again in the future.",
+			"",
+
+			`<code>${prefix}bot enable-rustlog</code>`,
+			`<code>${prefix}bot enable-rustlog channel:(channel)</code>`,
+			"Enables the 3rd party Rustlog service in either the current, or in a provided channel.",
+			`This service gathers the chat logs in the channel, which are then used in Supibot for the <code>$randomline</code> command.`,
 			"",
 
 			`<code>${prefix}bot api url:(link) mode:(mode)</code>`,
