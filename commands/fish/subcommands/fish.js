@@ -20,6 +20,24 @@ const createGptPrompt = (executor, resultFish, sizeString) => sb.Utils.tag.trim 
 
 const formatDelay = (delay) => sb.Utils.timeDelta(sb.Date.now() + delay, true);
 
+const useDiscordReactions = (context, config, resultType) => {
+	if (context.platform.Name !== "discord") {
+		return false;
+	}
+	else if (config === "none") {
+		return false;
+	}
+
+	if (resultType === "fail" && (config === "all" || config === "fail-only")) {
+		return true;
+	}
+	else if (resultType === "catch" && config === "all") {
+		return true;
+	}
+
+	return false;
+};
+
 const successfulFishDelay = 18e5; // 18e5 - 30 min
 const unsuccessfulFishDelay = [30_000, 90_000];
 const baitDisplay = baitTypes.map(i => `<code>${i.name}</code> ${i.emoji} (${i.price} coins, 1/${i.roll})`).join(" - ");
@@ -46,9 +64,11 @@ module.exports = {
 	],
 	execute: async (context, ...args) => {
 		let whisperOnFailure = false;
+		let reactionsConfig = "none";
 		if (context.channel) {
 			const fishConfig = await context.channel.getDataProperty("fishConfig") ?? {};
 			whisperOnFailure = Boolean(fishConfig.whisperOnFailure);
+			reactionsConfig = fishConfig.discordReactionType ?? "none";
 		}
 
 		/** @type {UserFishData} */
@@ -102,9 +122,11 @@ module.exports = {
 			}
 
 			let message;
+			const reactions = ["🚫"];
 			const junkRoll = sb.Utils.random(1, 100);
 			if (junkRoll <= 25) {
 				const item = getWeightedCatch("junk");
+				reactions.push(item.name);
 
 				fishData.catch.junk = (fishData.catch.junk ?? 0) + 1;
 				fishData.lifetime.junk = (fishData.lifetime.junk ?? 0) + 1;
@@ -118,6 +140,12 @@ module.exports = {
 			}
 
 			await context.user.setDataProperty("fishData", fishData);
+
+			if (useDiscordReactions(context, reactionsConfig, "fail")) {
+				return {
+					discord: { reactions }
+				};
+			}
 
 			let streakString = "";
 			const { dryStreak } = fishData.catch;
@@ -166,6 +194,14 @@ module.exports = {
 		}
 
 		await context.user.setDataProperty("fishData", fishData);
+
+		if (useDiscordReactions(context, reactionsConfig, "success")) {
+			return {
+				discord: {
+					reactions: ["🎉", fishType]
+				}
+			};
+		}
 
 		const gptLimitResult = await checkLimits(context.user);
 		const gptRoll = sb.Utils.random(1, 3);
