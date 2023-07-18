@@ -64,11 +64,11 @@ module.exports = {
 	],
 	execute: async (context, ...args) => {
 		let whisperOnFailure = false;
-		let reactionsConfig = "none";
+		let discordReactionType = "none";
 		if (context.channel) {
 			const fishConfig = await context.channel.getDataProperty("fishConfig") ?? {};
 			whisperOnFailure = Boolean(fishConfig.whisperOnFailure);
-			reactionsConfig = fishConfig.discordReactionType ?? "none";
+			discordReactionType = fishConfig.discordReactionType ?? "none";
 		}
 
 		/** @type {UserFishData} */
@@ -141,7 +141,7 @@ module.exports = {
 
 			await context.user.setDataProperty("fishData", fishData);
 
-			if (useDiscordReactions(context, reactionsConfig, "fail")) {
+			if (useDiscordReactions(context, discordReactionType, "fail")) {
 				return {
 					discord: { reactions }
 				};
@@ -195,7 +195,7 @@ module.exports = {
 
 		await context.user.setDataProperty("fishData", fishData);
 
-		if (useDiscordReactions(context, reactionsConfig, "success")) {
+		if (useDiscordReactions(context, discordReactionType, "success")) {
 			return {
 				discord: {
 					reactions: ["🎉", fishType]
