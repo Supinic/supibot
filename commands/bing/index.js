@@ -83,16 +83,17 @@ module.exports = {
 			setTimeout(() => promise.reject("Timeout reached"), 120_000)
 		];
 
+		const emote = await context.getBestAvailableEmote(["ppCircle", "supiniLoading"], "⏳");
 		for (const timeoutValue of [30, 60, 90]) {
 			const timeout = setTimeout(
-				() => context.sendIntermediateMessage(`${mentionUsername}${timeoutValue} seconds passed, still waiting ppCircle`),
+				() => context.sendIntermediateMessage(`${mentionUsername}${timeoutValue} seconds passed, still waiting ${emote}`),
 				(timeoutValue * 1000)
 			);
 
 			messageTimeouts.push(timeout);
 		}
 
-		await context.sendIntermediateMessage(`${mentionUsername}Query started, now we wait ppCircle`);
+		await context.sendIntermediateMessage(`${mentionUsername}Query started, now we wait ${emote}`);
 
 		let result;
 		try {
@@ -107,7 +108,7 @@ module.exports = {
 
 		if (!result.detail) {
 			console.warn("Bing AI - missing result.detail", { result });
-			
+
 			const logID = await sb.Logger.log(
 				"Command.Warning",
 				`Bing AI fail: ${JSON.stringify(result)}`,
@@ -120,7 +121,7 @@ module.exports = {
 				reply: `Bing AI failed - incomplete data received! Reference ID: ${logID}`
 			};
 		}
-		
+
 		const { detail } = result;
 		const text = ["# Result", result.text, ""];
 		if (detail.sourceAttributions.length > 0) {
