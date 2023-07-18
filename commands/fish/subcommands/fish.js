@@ -76,6 +76,7 @@ module.exports = {
 		if (fishData.readyTimestamp !== 0 && sb.Date.now() < fishData.readyTimestamp) {
 			if (useDiscordReactions(context, discordReactionType, "fail")) {
 				return {
+					success: false,
 					discord: {
 						reactions: ["⏱"]
 					}
