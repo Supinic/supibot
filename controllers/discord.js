@@ -650,7 +650,10 @@ module.exports = class DiscordController extends require("./template.js") {
 		const reactions = execution.discord?.reactions ?? [];
 		if (reactions.length !== 0) {
 			for (const reaction of reactions) {
-				if (reaction.emoji) {
+				if (typeof reaction === "string") {
+					await messageObject.react(reaction);
+				}
+				else if (reaction.emoji) {
 					await messageObject.react(reaction.emoji);
 				}
 			}
