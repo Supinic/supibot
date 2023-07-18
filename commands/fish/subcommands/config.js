@@ -78,6 +78,12 @@ module.exports = {
 				if (!check.success) {
 					return check;
 				}
+				else if (context.platform.Name !== "discord") {
+					return {
+						success: false,
+						reply: `This setting is only available on Discord!`
+					};
+				}
 
 				const lower = value.toLowerCase();
 				if (lower !== "none" && lower !== "fail-only" && lower !== "all") {
