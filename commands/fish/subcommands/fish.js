@@ -74,6 +74,14 @@ module.exports = {
 		/** @type {UserFishData} */
 		const fishData = await context.user.getDataProperty("fishData") ?? getInitialStats();
 		if (fishData.readyTimestamp !== 0 && sb.Date.now() < fishData.readyTimestamp) {
+			if (useDiscordReactions(context, discordReactionType, "fail")) {
+				return {
+					discord: {
+						reactions: ["⏱"]
+					}
+				};
+			}
+
 			return {
 				success: false,
 				replyWithPrivateMessage: whisperOnFailure,
