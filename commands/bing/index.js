@@ -105,6 +105,22 @@ module.exports = {
 			};
 		}
 
+		if (!result.detail) {
+			console.warn("Bing AI - missing result.detail", { result });
+			
+			const logID = await sb.Logger.log(
+				"Command.Warning",
+				`Bing AI fail: ${JSON.stringify(result)}`,
+				context.channel,
+				context.user
+			);
+
+			return {
+				success: false,
+				reply: `Bing AI failed - incomplete data received! Reference ID: ${logID}`
+			};
+		}
+		
 		const { detail } = result;
 		const text = ["# Result", result.text, ""];
 		if (detail.sourceAttributions.length > 0) {
