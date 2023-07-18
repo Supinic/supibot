@@ -125,20 +125,28 @@ module.exports = {
 			format: "markdown"
 		});
 
-		return {
-			reply: paste.body ?? paste.error ?? "N/A"
-		};
+		if (paste.error) {
+			const response = await sb.Got("GenericAPI", {
+				method: "POST",
+				url: `https://haste.zneix.eu/documents`,
+				throwHttpErrors: false,
+				body: text.join("\n")
+			});
 
-		// const response = await sb.Got("GenericAPI", {
-		// 	method: "POST",
-		// 	url: `https://haste.zneix.eu/documents`,
-		// 	throwHttpErrors: false,
-		// 	body: text.join("\n")
-		// });
-		//
-		// return {
-		// 	reply: `https://haste.zneix.eu/raw/${response.body.key}`
-		// };
+			return {
+				reply: `Pastebin failed, unformatted summary: https://haste.zneix.eu/raw/${response.body.key}`
+			};
+		}
+		else if (result.text.length < 300) {
+			return {
+				reply: `Bing: ${result.text} Sources: ${paste.body}`
+			};
+		}
+		else {
+			return {
+				reply: `Bing: ${paste.body}`
+			};
+		}
 	}),
 	Dynamic_Description: (async () => [])
 };
