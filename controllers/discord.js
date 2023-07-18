@@ -295,18 +295,19 @@ module.exports = class DiscordController extends require("./template.js") {
 					args.push(...msg.split(" ").filter(Boolean));
 				}
 
-				await this.handleCommand(
+				await this.handleCommand({
 					command,
-					args.map(i => DiscordController.removeEmoteTags(i)),
+					args: args.map(i => DiscordController.removeEmoteTags(i)),
 					channelData,
 					userData,
-					{
+					messageObject,
+					options: {
 						mentions,
 						guild,
 						privateMessage,
 						member: messageObject.member
 					}
-				);
+				});
 			}
 		});
 
@@ -618,14 +619,25 @@ module.exports = class DiscordController extends require("./template.js") {
 
 	/**
 	 * Handles command execution.
-	 * @param {string} command Command invocation string
-	 * @param {User} userData
-	 * @param {Channel} channelData
-	 * @param {Array} args
-	 * @param {Object} options = {}
+	 * @param {Object} data
+	 * @param {string} data.command Command invocation string
+	 * @param {string[]} data.args
+	 * @param {User} data.userData
+	 * @param {Channel} data.channelData
+	 * @param {Object} data.options = {}
+	 * @param {Object} data.options = {}
 	 * @returns {Promise<void>}
 	 */
-	async handleCommand (command, args, channelData, userData, options = {}) {
+	async handleCommand (data) {
+		const {
+			command,
+			args,
+			channelData,
+			userData,
+			options = {},
+			messageObject
+		} = data;
+
 		const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
 			platform: this.platform,
 			...options
@@ -633,6 +645,15 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		if (!execution) {
 			return;
+		}
+
+		const reactions = execution.discord?.reactions ?? [];
+		if (reactions.length !== 0) {
+			for (const reaction of reactions) {
+				if (reaction.emoji) {
+					await messageObject.react(reaction.emoji);
+				}
+			}
 		}
 
 		const { reply } = execution;
