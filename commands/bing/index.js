@@ -124,7 +124,7 @@ module.exports = {
 
 		const { detail } = result;
 		const text = ["# Result", result.text, ""];
-		if (detail.sourceAttributions.length > 0) {
+		if (Array.isArray(detail.sourceAttributions) && detail.sourceAttributions.length > 0) {
 			text.push(
 				"# Sources",
 				...detail.sourceAttributions.flatMap((i, ind) => [
