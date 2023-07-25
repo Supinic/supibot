@@ -558,15 +558,18 @@ class Command extends require("./template.js") {
 			contextOptions.transaction = await sb.Query.getTransaction();
 		}
 
+		let failedParamsParseResult;
 		if (command.Params.length > 0) {
 			const result = Command.parseParametersFromArguments(command.Params, args);
-			if (result.success === false) {
-				sb.CooldownManager.unsetPending(userData.ID);
-				return result;
-			}
 
-			args = result.args;
-			contextOptions.params = result.parameters;
+			// Don't exit immediately, save the result and check filters first
+			if (result.success === false) {
+				failedParamsParseResult = result;
+			}
+			else {
+				args = result.args;
+				contextOptions.params = result.parameters;
+			}
 		}
 
 		/** @type {ExecuteResult} */
@@ -623,6 +626,12 @@ class Command extends require("./template.js") {
 			});
 
 			return filterData;
+		}
+
+		// If params parsing failed, filters were checked and none applied, return the failure result now
+		if (failedParamsParseResult) {
+			sb.CooldownManager.unsetPending(userData.ID);
+			return failedParamsParseResult;
 		}
 
 		let execution;
