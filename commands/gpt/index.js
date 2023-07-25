@@ -201,6 +201,7 @@ module.exports = {
 			`ChatGPT works with "tokens". You have a specific amount of tokens you can use per hour and per day (24 hours).`,
 			"If you exceed this limit, you will not be able to use the command until an hour (or a day) passes since your last command execution",
 			`One hundred "tokens" vaguely correspond to about ~75 words, or about one paragraph, or one full Twitch message.`,
+			"If the message is cut short by the GPT limits, the hourglass ⌛ emoji will be shown at the beginning of the message.",
 			"",
 
 			"Both your input and output tokens will be tracked.",
