@@ -219,7 +219,7 @@ module.exports = class DiscordController extends require("./template.js") {
 						const obj = {
 							channel: channelData.Name,
 							guild: guild.id,
-							message: msg
+							messageObject
 						};
 
 						await sb.Logger.log(
