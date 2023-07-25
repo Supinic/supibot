@@ -73,6 +73,11 @@ module.exports = class DiscordController extends require("./template.js") {
 		const client = this.client;
 
 		client.on("messageCreate", async (messageObject) => {
+			// Ignore all messages containing embeds
+			if (Array.isArray(messageObject.embeds) && messageObject.embeds.length > 0) {
+				return;
+			}
+
 			const {
 				commandArguments,
 				chan,
