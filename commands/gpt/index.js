@@ -15,8 +15,9 @@ module.exports = {
 	Whitelist_Response: "Currently only available in these channels for testing: @pajlada @Supinic @Supibot",
 	Static_Data: null,
 	Code: (async function chatGPT (context, ...args) {
-		const GptConfig = require("./config.json");
 		const GptCache = require("./cache-control.js");
+		const GptConfig = require("./config.json");
+		const GptMetrics = require("./metrics.js");
 		const GptModeration = require("./moderation.js");
 
 		const GptTemplate = require("./gpt-template.js");
@@ -154,6 +155,14 @@ module.exports = {
 
 			await row.save({ skipLoad: true });
 		}
+
+		GptMetrics.process({
+			command: this,
+			context,
+			response,
+			modelData,
+			success: moderationResult.success
+		});
 
 		return result;
 	}),
