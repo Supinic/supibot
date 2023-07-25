@@ -148,7 +148,7 @@ module.exports = {
 					? JSON.stringify(context.params)
 					: null,
 				Input_Tokens: response.body.usage.prompt_tokens,
-				Output_Tokens: response.body.usage.completion_tokens,
+				Output_Tokens: response.body.usage.completion_tokens ?? 0,
 				Rejected: !(moderationResult.success)
 			});
 
