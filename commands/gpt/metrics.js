@@ -8,7 +8,7 @@ const process = (data) => {
 	const labels = {
 		channel: context.channel?.Name ?? "(private)",
 		platform: context.platform.Name,
-		model: modelData.name
+		model: modelData.url
 	};
 
 	const promptTokensCounter = command.registerMetric("Counter", "input_tokens_total", {
