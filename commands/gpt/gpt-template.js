@@ -28,7 +28,7 @@ module.exports = class GptTemplate {
 		const { limit } = context.params;
 		let outputLimit = modelData.outputLimit.default;
 
-		if (typeof customOutputLimit === "number") {
+		if (typeof limit === "number") {
 			if (!sb.Utils.isValidInteger(limit)) {
 				return {
 					success: false,
