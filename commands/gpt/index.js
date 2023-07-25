@@ -134,7 +134,9 @@ module.exports = {
 			};
 		}
 
-		if (await sb.Query.isTablePresent("data", "ChatGPT_Log")) {
+		this.data.isLogTablePresent ??= await sb.Query.isTablePresent("data", "ChatGPT_Log");
+
+		if (this.data.isLogTablePresent) {
 			const row = await sb.Query.getRow("data", "ChatGPT_Log");
 			row.setValues({
 				User_Alias: context.user.ID,
