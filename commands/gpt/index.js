@@ -123,8 +123,14 @@ module.exports = {
 		}
 		else {
 			await Handler.setHistory(context, query, reply);
+
+			const limit = Handler.determineOutputLimit(context, modelData);
+			const emoji = (response.body.usage.completion_tokens >= limit)
+				? "⏳"
+				: "🤖";
+
 			result = {
-				reply: `🤖 ${reply}`
+				reply: `${emoji} ${reply}`
 			};
 		}
 
