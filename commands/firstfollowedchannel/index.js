@@ -48,6 +48,20 @@ module.exports = {
 				}`
 		});
 
+		if (Array.isArray(response.body.errors) && response.body.errors[0].message === "service error") {
+			return {
+				success: false,
+				cooldown: {
+					user: null,
+					command: this.Name,
+					channel: context.channel?.ID ?? null,
+					platform: context.platform.ID,
+					length: 60_000
+				},
+				reply: `Cannot fetch followers! Twitch has disabled, changed or broken the ability to check a channel's followers, which in turn breaks this command.`
+			};
+		}
+
 		const who = (context.user.Name === name.toLowerCase())
 			? "you"
 			: "they";
