@@ -124,8 +124,8 @@ module.exports = {
 		else {
 			await Handler.setHistory(context, query, reply);
 
-			const limit = Handler.determineOutputLimit(context, modelData);
-			const emoji = (response.body.usage.completion_tokens >= limit)
+			const { outputLimit } = Handler.determineOutputLimit(context, modelData);
+			const emoji = (response.body.usage.completion_tokens >= outputLimit)
 				? "⏳"
 				: "🤖";
 
