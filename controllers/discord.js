@@ -73,8 +73,10 @@ module.exports = class DiscordController extends require("./template.js") {
 		const client = this.client;
 
 		client.on("messageCreate", async (messageObject) => {
-			// Ignore all messages containing embeds
-			if (Array.isArray(messageObject.embeds) && messageObject.embeds.length > 0) {
+			// Ignore all empty messages containing embeds.
+			// User-embed media are included as message content, and direct uploads are included as attachments.
+			// The only embeds sent like this are (usually) from bots, and can be ignored.
+			if (messageObject.content.length === 0 && Array.isArray(messageObject.embeds) && messageObject.embeds.length > 0) {
 				return;
 			}
 
