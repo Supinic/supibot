@@ -90,6 +90,31 @@ module.exports = {
 			};
 		}
 
+		if (fishData.trap?.active === true) {
+			const now = sb.Date.now();
+			if (now > fishData.trap.end) {
+				return {
+					success: false,
+					replyWithPrivateMessage: whisperOnFailure,
+					reply: sb.Utils.tag.trim `
+						You cannot go fishing while your traps are laid out - you would be disturbing the catch!
+						Your traps are ready to be collected! Go ahead and use "$fish trap" to get your stuff.
+					`
+				};
+			}
+			else {
+				return {
+					success: false,
+					replyWithPrivateMessage: whisperOnFailure,
+					reply: sb.Utils.tag.trim `
+						You cannot go fishing while your traps are laid out - you would be disturbing the catch!
+						If you wish to get rid of the traps immediately, use "$fish trap cancel", 
+						but you will not get any catch from them.
+					`
+				};
+			}
+		}
+
 		let rollMaximum = 20;
 		let appendix = "";
 		if (args.length > 0) {

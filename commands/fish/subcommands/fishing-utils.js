@@ -5,6 +5,12 @@ const defaultFishingData = Object.freeze({
 		fish: 0,
 		types: {}
 	},
+	trap: {
+		active: false,
+		start: 0,
+		end: 0,
+		duration: 0
+	},
 	readyTimestamp: 0,
 	coins: 0,
 	lifetime: {
@@ -16,7 +22,13 @@ const defaultFishingData = Object.freeze({
 		dryStreak: 0,
 		luckyStreak: 0,
 		maxFishSize: 0,
-		maxFishType: null
+		maxFishType: null,
+		trap: {
+			times: 0,
+			timeSpent: 0,
+			bestFishCatch: 0,
+			cancelled: 0
+		}
 	}
 });
 
@@ -239,6 +251,9 @@ const itemTypeDefinitions = [
 	}
 ];
 
+/**
+ * @return {UserFishData}
+ */
 const getInitialStats = () => structuredClone(defaultFishingData);
 
 const failureEmotes = [
@@ -293,6 +308,11 @@ const successEmotes = [
 	`Shockisu`
 ];
 
+/**
+ * @param context
+ * @param {"success"|"failure"} type
+ * @return {Promise<string>}
+ */
 const getEmote = async (context, type) => {
 	const list = (type === "success") ? successEmotes : failureEmotes;
 	const fallback = (type === "success") ? "😃" : "😔";
@@ -300,6 +320,11 @@ const getEmote = async (context, type) => {
 	return await context.getBestAvailableEmote(list, fallback, { shuffle: true });
 };
 
+/**
+ * Returns a randomly weighted catch item.
+ * @param {CatchType} type
+ * @return {CatchItem}
+ */
 const getWeightedCatch = (type) => {
 	const applicableItems = itemTypes.filter(i => i.type === type);
 	const totalWeight = applicableItems.reduce((acc, cur) => acc + cur.weight ?? 1, 0);
@@ -333,18 +358,97 @@ const catchMessages = {
 
 const getCatchMessage = (type) => sb.Utils.randArray(catchMessages[type]);
 
+/**
+ * @param {string|null} [bait]
+ * @return {{catch: null, type: string}|{catch: CatchItem, type: string}}
+ */
+const rollCatch = (bait = null) => {
+	let odds = 20;
+	if (bait) {
+		const baitData = baitTypes.find(i => i.emoji === bait || i.name === bait);
+		if (!baitData) {
+			throw new sb.Error({
+				message: "Invalid bait type provided",
+				args: { bait }
+			});
+		}
+
+		odds = baitData.roll;
+	}
+
+	const roll = sb.Utils.random(1, odds);
+	if (roll === 1) {
+		return {
+			catch: getWeightedCatch("fish"),
+			type: "fish"
+		};
+	}
+	else {
+		const roll = sb.Utils.random(1, 4);
+		if (roll === 1) {
+			return {
+				catch: getWeightedCatch("junk"),
+				type: "junk"
+			};
+		}
+		else {
+			return {
+				catch: null,
+				type: "nothing"
+			};
+		}
+	}
+};
+
+const addFish = (fishData, emoji) => {
+	fishData.catch.fish = (fishData.catch.fish ?? 0) + 1;
+	fishData.lifetime.fish = (fishData.lifetime.fish ?? 0) + 1;
+
+	fishData.catch.types ??= {};
+	fishData.catch.types[emoji] = (fishData.catch.types[emoji] ?? 0) + 1;
+};
+
+const addJunk = (fishData, emoji) => {
+	fishData.catch.junk = (fishData.catch.junk ?? 0) + 1;
+	fishData.lifetime.junk = (fishData.lifetime.junk ?? 0) + 1;
+
+	fishData.catch.types ??= {};
+	fishData.catch.types[emoji] = (fishData.catch.types[emoji] ?? 0) + 1;
+};
+
+const saveData = async (context, data) => {
+	await context.user.setDataProperty("fishData", data);
+};
+
 const COIN_EMOJI = "🪙";
 
 module.exports = {
 	COIN_EMOJI,
 	baitTypes,
 	itemTypeDefinitions,
+	addFish,
+	addJunk,
 	getCatchMessage,
 	getEmote,
 	getInitialStats,
 	getWeightedCatch,
+	rollCatch,
+	saveData,
 	itemTypes
 };
+
+/**
+ * @typedef {"fish"|"junk"} CatchType
+ */
+
+/**
+ * @typedef {Object} CatchItem
+ * @property {string} name
+ * @property {boolean} sellable
+ * @property {CatchType} type
+ * @property {number} price
+ * @property {number} weight RNG weighting (not size weighting)
+ */
 
 /**
  * @typedef {Object} UserFishData
@@ -360,12 +464,25 @@ module.exports = {
  * @property {string|null} lifetime.maxFishType
  * @property {number} lifetime.dryStreak
  * @property {number} lifetime.luckyStreak
+ * @property {Object} lifetime.trap
+ * @property {number} lifetime.trap.times
+ * @property {number} lifetime.trap.timeSpent (minutes)
+ * @property {number} lifetime.trap.bestFishCatch
+ * @property {number} lifetime.trap.cancelled
+ *
  * @property {Object} catch
  * @property {number} catch.fish
  * @property {number} catch.junk
  * @property {number} catch.dryStreak
  * @property {number} catch.luckyStreak
  * @property {Record<string, number>} catch.types
+ *
+ * @property {Object} trap
+ * @property {boolean} trap.active
+ * @property {number} trap.start
+ * @property {number} trap.end
+ * @property {number} trap.duration
+ *
  * @property {number} readyTimestamp
  * @property {number} coins
  */

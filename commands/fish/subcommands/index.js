@@ -5,7 +5,8 @@ const subcommands = [
 	require(`./leaderboard.js`),
 	require(`./sell.js`),
 	require(`./show.js`),
-	require(`./stats.js`)
+	require(`./stats.js`),
+	require(`./trap.js`)
 ];
 
 module.exports = {
