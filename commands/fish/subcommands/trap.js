@@ -1,6 +1,7 @@
 const { addFish, addJunk, getInitialStats, rollCatch, saveData } = require("./fishing-utils.js");
 
 const FISHING_TRIP_STATIC_DURATION = 36e5; // 1 hour
+const FISH_SUCCESS_DELAY_MIN = 30;
 
 module.exports = {
 	name: "trap",
@@ -74,8 +75,8 @@ module.exports = {
 					continue;
 				}
 
-				if (item.type === "fish") {
-					i += 30; // "Lose" equivalent of 30 minutes fishing time
+				if (item.type === "fish" && i < (rolls - FISH_SUCCESS_DELAY_MIN)) { // Still "eligible" to catch a fish
+					i += FISH_SUCCESS_DELAY_MIN; // "Lose" equivalent of 30 minutes fishing time
 					addFish(fishData, item.catch.name);
 					results.push(item.catch.name);
 				}
