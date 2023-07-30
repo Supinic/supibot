@@ -103,9 +103,16 @@ module.exports = {
 
 			await saveData(context, fishData);
 
-			return {
-				reply: `You succesfully drag the traps out of the water and are rewarded with: ${results.join("")}`
-			};
+			if (results.length === 0) {
+				return {
+					reply: `You succesfully drag the traps out of the water... and find that there is nothing at all...!`
+				};
+			}
+			else {
+				return {
+					reply: `You succesfully drag the traps out of the water and are rewarded with: ${results.join("")}`
+				};
+			}
 		}
 		else {
 			const delta = sb.Utils.timeDelta(trap.end);
