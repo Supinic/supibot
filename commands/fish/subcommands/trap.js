@@ -18,6 +18,7 @@ module.exports = {
 		"Be warned though, you won't get any catch by removing them early!"
 	],
 	execute: async (context, operation) => {
+		/** @type {UserFishData} */
 		const fishData = await context.user.getDataProperty("fishData") ?? getInitialStats();
 		if (!fishData.trap) {
 			const { trap, lifetime } = getInitialStats();
@@ -68,6 +69,7 @@ module.exports = {
 			const randomEfficiencyPercentage = sb.Utils.random(75, 90) / 100;
 			const rolls = Math.floor(trap.duration / 60e3 * randomEfficiencyPercentage);
 
+			let fishAmount = 0;
 			const results = [];
 			for (let i = 0; i < rolls; i++) {
 				const item = rollCatch();
@@ -76,7 +78,9 @@ module.exports = {
 				}
 
 				if (item.type === "fish" && i < (rolls - FISH_SUCCESS_DELAY_MIN)) { // Still "eligible" to catch a fish
+					fishAmount++;
 					i += FISH_SUCCESS_DELAY_MIN; // "Lose" equivalent of 30 minutes fishing time
+
 					addFish(fishData, item.catch.name);
 					results.push(item.catch.name);
 				}
@@ -92,6 +96,10 @@ module.exports = {
 			trap.start = 0;
 			trap.end = 0;
 			trap.duration = 0;
+
+			if (fishAmount > lifetime.trap.bestFishCatch) {
+				lifetime.trap.bestFishCatch = fishAmount;
+			}
 
 			await saveData(context, fishData);
 
