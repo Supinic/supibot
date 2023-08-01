@@ -111,12 +111,17 @@ module.exports = {
 
 			if (results.length === 0) {
 				return {
-					reply: `You succesfully drag the traps out of the water... and find that there is nothing at all...!`
+					reply: `You drag the traps out of the water... and find that there is nothing at all...!`
+				};
+			}
+			else if (fishAmount === 0) {
+				return {
+					reply: `You drag the traps out of the water... and find a bunch of junk. ${results.join("")}`
 				};
 			}
 			else {
 				return {
-					reply: `You succesfully drag the traps out of the water and are rewarded with: ${results.join("")}`
+					reply: `You drag the traps out of the water... and you spot some fish! ${results.join("")}`
 				};
 			}
 		}
