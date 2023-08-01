@@ -28,6 +28,12 @@ module.exports = {
 
 		const now = sb.Date.now();
 		const { lifetime, trap } = fishData;
+		if (fishData.readyTimestamp !== 0 && now < fishData.readyTimestamp) {
+			return {
+				success: false,
+				reply: `Hol' up partner! You can go set up your fishing traps ${sb.Utils.timeDelta(fishData.readyTimestamp)}!`
+			};
+		}
 
 		if (operation === "cancel") {
 			if (trap.active) {
