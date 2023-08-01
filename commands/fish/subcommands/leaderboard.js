@@ -13,7 +13,8 @@ const typeProperty = {
 	"total-lucky": ["lifetime.luckyStreak", "all-time lucky ducks"],
 	unlucky: ["catch.dryStreak", "jinxed sphinxes"],
 	"total-unlucky": ["lifetime.dryStreak", "all-time unluckiest anglers"],
-	attempts: ["lifetime.attempts", "most persistent trawlers"]
+	attempts: ["lifetime.attempts", "most persistent trawlers"],
+	traps: ["lifetime.trap.times", "most persisent trappers"]
 };
 
 for (const item of itemTypes) {
@@ -36,7 +37,8 @@ module.exports = {
 		"",
 
 		`<code>$fish top attempts</code>`,
-		"Shows the list of the most persistent trawlers (most attempts).",
+		`<code>$fish top traps</code>`,
+		"Shows the list of the most persistent fishermen (most fishing attempts) or trappers (traps set up).",
 		"",
 
 		`<code>$fish top coins</code>`,

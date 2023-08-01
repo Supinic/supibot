@@ -45,6 +45,7 @@ module.exports = {
 			.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.lifetime.junk'), INT)) AS JunkCaught`)
 			.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.lifetime.sold'), INT)) AS FishSold`)
 			.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.lifetime.scrapped'), INT)) AS JunkSold`)
+			.select(`SUM(CONVERT(JSON_EXTRACT(Value, '$.lifetime.trap.times'), INT)) AS TrapsSet`)
 			.select(`MAX(CONVERT(JSON_EXTRACT(Value, '$.lifetime.dryStreak'), INT)) AS WorstDryStreak`)
 			.select(`MAX(CONVERT(JSON_EXTRACT(Value, '$.lifetime.luckyStreak'), INT)) AS BestLuckyStreak`)
 			.from("chat_data", "User_Alias_Data")
@@ -90,6 +91,7 @@ module.exports = {
 			${userAmountString}
 			caught fish: ${sb.Utils.groupDigits(data.FishCaught)};
 			caught junk: ${sb.Utils.groupDigits(data.JunkCaught)};
+			traps set up: ${sb.Utils.groupDigits(data.TrapsSet)};
 			bait used: ${sb.Utils.groupDigits(data.BaitUsed)};
 			fish sold: ${sb.Utils.groupDigits(data.FishSold)};
 			junk scrapped: ${sb.Utils.groupDigits(data.JunkSold)};
