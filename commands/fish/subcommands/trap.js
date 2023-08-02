@@ -61,7 +61,6 @@ module.exports = {
 			trap.start = now;
 			trap.end = now + FISHING_TRIP_STATIC_DURATION;
 			trap.duration = FISHING_TRIP_STATIC_DURATION;
-			lifetime.trap.times++;
 
 			await saveData(context, fishData);
 
