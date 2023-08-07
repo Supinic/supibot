@@ -104,7 +104,7 @@ module.exports = {
 		try {
 			result = await sb.Sandbox.run(script, {
 				fixAsync: false,
-				timeout: 5000,
+				timeout: 2400,
 				sandbox: sandboxData.sandbox
 			});
 		}
