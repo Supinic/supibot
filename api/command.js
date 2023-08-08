@@ -135,6 +135,7 @@ module.exports = {
 		}
 
 		const info = [
+			`$${commandData.Name}`,
 			`Quick description\n${commandData.Description}`
 		];
 
