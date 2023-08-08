@@ -12,28 +12,6 @@ module.exports = {
 	Static_Data: (command => {
 		command.data.cooldowns = {};
 		return {
-			// conga removed due to the fact the fight is dependent on the 8th missing beat
-			zones: [
-				"1-1",
-				"1-2",
-				"1-3",
-				"2-1",
-				"2-2",
-				"2-3",
-				"3-1",
-				"3-2",
-				"3-3",
-				"4-1",
-				"4-2",
-				"4-3",
-				"5-1",
-				"5-2",
-				"5-3",
-				"chess",
-				"coral",
-				"metal",
-				"mole"
-			],
 			extraCooldown: 600_000,
 			zoneCooldown: 300_000,
 			createURL: (data) => {
@@ -52,7 +30,8 @@ module.exports = {
 
 		const now = sb.Date.now();
 		const { invocation } = context;
-		const { createURL, extraCooldown, zones, zoneCooldown } = this.staticData;
+		const { zones } = require("./game-data.json");
+		const { createURL, extraCooldown, zoneCooldown } = this.staticData;
 		if (invocation === "ndr" || invocation === "necrodancerreset") {
 			const permissions = await context.getUserPermissions();
 			if (!permissions.is("administrator")) {
@@ -203,7 +182,7 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (prefix => {
-		const { zones } = this.staticData;
+		const { zones } = require("./game-data.json");
 		return [
 			"Downloads, beatmaps and inserts a song from a link into the Crypt of the Necrodancer game.",
 			"",
