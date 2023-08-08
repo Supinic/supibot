@@ -39,9 +39,7 @@ module.exports = {
 
 			`<code>${prefix}re 10</code>`,
 			"(ten random emojis)",
-			"",
-
-			`Emoji list: <br>${list.join(" ")}`
+			""
 		];
 	})
 };
