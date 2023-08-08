@@ -166,11 +166,13 @@ module.exports = {
 
 		const players = steamResponse.body.response.player_count;
 		let publisher = "";
-		if (game.publisher.length === 1) {
-			publisher = `(by ${game.publisher[0]})`;
-		}
-		else if (game.publisher.length > 1) {
-			publisher = `(by ${game.publisher[0]} and others)`;
+		if (Array.isArray(game.publisher)) {
+			if (game.publisher.length === 1) {
+				publisher = `(by ${game.publisher[0]})`;
+			}
+			else if (game.publisher.length > 1) {
+				publisher = `(by ${game.publisher[0]} and others)`;
+			}
 		}
 
 		return {
