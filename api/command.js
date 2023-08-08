@@ -155,7 +155,7 @@ module.exports = {
 			};
 		}
 
-		if (commandData.Params) {
+		if (commandData.Params.length > 0) {
 			const params = commandData.Params.map(i => `- ${i.name} (${i.type})`).join("\n");
 			info.push(`Parameters\n${params}`);
 		}
