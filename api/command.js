@@ -135,9 +135,15 @@ module.exports = {
 		}
 
 		const info = [
-			`$${commandData.Name}`,
-			`Quick description\n${commandData.Description}`
+			`$${commandData.Name}`
 		];
+
+		if (commandData.Aliases.length > 0) {
+			const aliases = commandData.Aliases.map(i => `$${i}`).join(", ");
+			info.push(`Aliases\n${aliases}`);
+		}
+
+		info.push(`Quick description\n${commandData.Description}`);
 
 		try {
 			const dynamicDescription = await commandData.getDynamicDescription();
@@ -163,7 +169,7 @@ module.exports = {
 		return {
 			statusCode: 200,
 			data: {
-				summary: info.join("\n\n")
+				summary: info.join("\n=====\n")
 			}
 		};
 	}
