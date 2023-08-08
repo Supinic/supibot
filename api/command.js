@@ -169,7 +169,7 @@ module.exports = {
 		return {
 			statusCode: 200,
 			data: {
-				summary: info.join("\n=====\n")
+				summary: info.join("\n\n")
 			}
 		};
 	}
