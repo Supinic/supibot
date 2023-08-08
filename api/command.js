@@ -145,6 +145,11 @@ module.exports = {
 
 		info.push(`Quick description\n${commandData.Description}`);
 
+		if (commandData.Params.length > 0) {
+			const params = commandData.Params.map(i => `${i.name} (${i.type})`).join("\n");
+			info.push(`Parameters\n${params}`);
+		}
+
 		try {
 			const dynamicDescription = await commandData.getDynamicDescription();
 			if (dynamicDescription) {
@@ -159,11 +164,6 @@ module.exports = {
 					message: e.message
 				}
 			};
-		}
-
-		if (commandData.Params.length > 0) {
-			const params = commandData.Params.map(i => `- ${i.name} (${i.type})`).join("\n");
-			info.push(`Parameters\n${params}`);
 		}
 
 		return {
