@@ -115,5 +115,55 @@ module.exports = {
 			statusCode: 200,
 			data
 		};
+	},
+
+	summary: async (req, res, url) => {
+		const commandName = url.searchParams.get("command");
+		if (!commandName) {
+			return {
+				statusCode: 400,
+				error: { message: `Command name must be provided` }
+			};
+		}
+
+		const commandData = sb.Command.get(commandName);
+		if (!commandData) {
+			return {
+				statusCode: 404,
+				error: { message: `Provided command does not exist` }
+			};
+		}
+
+		const info = [
+			`Quick description\n${commandData.Description}`
+		];
+
+		try {
+			const dynamicDescription = await commandData.getDynamicDescription();
+			if (dynamicDescription) {
+				info.push(`Full description\n${dynamicDescription.join("\n")}`);
+			}
+		}
+		catch (e) {
+			return {
+				statusCode: 500,
+				error: {
+					reason: "Command dynamic description function failed",
+					message: e.message
+				}
+			};
+		}
+
+		if (commandData.Params) {
+			const params = commandData.Params.map(i => `- ${i.name} (${i.type})`).join("\n");
+			info.push(`Parameters\n${params}`);
+		}
+
+		return {
+			statusCode: 200,
+			data: {
+				summary: info.join("\n\n")
+			}
+		};
 	}
 };
