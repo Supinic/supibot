@@ -21,46 +21,46 @@ module.exports = {
 			const remainder = code % 100;
 
 			if (type === 2) {
-				return "⛈";
+				return "⛈️";
 			}
 			else if (type === 3) {
-				return "🌧";
+				return "🌧️";
 			}
 			else if (type === 5) {
-				return "🌧";
+				return "🌧️";
 			}
 			else if (type === 6) {
-				return "🌨";
+				return "🌧️";
 			}
 			else if (type === 7) {
 				if (remainder === 1 || remainder === 21 || remainder === 41) {
-					return "🌫";
+					return "🌫️";
 				}
 				else if (remainder === 11) {
 					return "🔥💨";
 				}
 				else if (remainder === 31 || remainder === 51 || remainder === 61) {
-					return "🏜💨";
+					return "🏜️💨";
 				}
 				else if (remainder === 62) {
 					return "🌋💨";
 				}
 				else if (remainder === 71 || remainder === 81) {
-					return "🌪";
+					return "🌪️";
 				}
 			}
 			else if (type === 8) {
 				if (remainder === 0) {
-					return (current?.uvi === 0) ? "🌙" : "☀";
+					return (current?.uvi === 0) ? "🌙" : "☀️";
 				}
 				else if (remainder === 1) {
 					return "🌤️";
 				}
 				else if (remainder === 2) {
-					return "🌥";
+					return "🌥️";
 				}
 				else {
-					return "️☁";
+					return "️☁️";
 				}
 			}
 
@@ -644,7 +644,7 @@ module.exports = {
 
 			if (tags.length > 0) {
 				const plural = (tags.length > 1) ? "s" : "";
-				weatherAlert = `⚠ Weather alert${plural}: ${tags.join(", ")}.`;
+				weatherAlert = `⚠️ Weather alert${plural}: ${tags.join(", ")}.`;
 			}
 		}
 
