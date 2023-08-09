@@ -75,6 +75,8 @@ export const definition = {
 					"Link NOT IN %s+",
 					repeatsArray
 				)
+				.where({ condition: roll % 2 === 0 }, "Video_Type = %n", 3)
+				.where({ condition: roll % 2 !== 0 }, "Video_Type <> %n", 3)
 				.orderBy("RAND()")
 				.limit(1)
 				.single()
