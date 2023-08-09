@@ -26,13 +26,13 @@ export const definition = {
 		const channelData = sb.Channel.get("supinic", "twitch");
 		const cytubeChannelData = sb.Channel.get(49);
 
-		// Don't autorequest when stream is offline
+		// Don't auto-request when stream is offline
 		const streamData = await channelData.getStreamData();
 		if (!streamData.live) {
 			return;
 		}
 
-		// Don't autorequest in an unsupported songrequest state
+		// Don't auto-request in an unsupported song-request state
 		const state = sb.Config.get("SONG_REQUESTS_STATE");
 		if (state !== "vlc" && state !== "cytube") {
 			return;
@@ -57,7 +57,7 @@ export const definition = {
 			isQueueEmpty = (cytube.controller.clients.get(cytubeChannelData.ID).playlistData.length === 0);
 		}
 
-		// Don't autorequest if queue is not empty
+		// Don't auto-request if the queue is not empty
 		if (!isQueueEmpty) {
 			return;
 		}
@@ -65,8 +65,8 @@ export const definition = {
 
 		let link;
 		let videoID;
-		const roll = sb.Utils.random(1, 4);
-		if (roll < 4) {
+		const roll = sb.Utils.random(1, 20);
+		if (roll < 20) {
 			const videoData = await sb.Query.getRecordset(rs => rs
 				.select("Link", "Video_Type")
 				.from("personal", "Favourite_Track")
@@ -93,22 +93,28 @@ export const definition = {
 			link = prefix.replace("$", videoData.Link);
 		}
 		else {
-			/** @type {string[]} */
-			const links = await sb.Query.getRecordset(rs => rs
-				.select("Track.Link AS Link")
-				.from("music", "User_Favourite")
-				.where("User_Alias = %n", 1)
-				.where("Video_Type = %n", 1)
+			/** @type {string} */
+			videoID = await sb.Query.getRecordset(rs => rs
+				.select("Link")
+				.from("music", "Track")
+				.join({
+					toDatabase: "music",
+					toTable: "Track_Tag",
+					on: "Track_Tag.Track = Track.ID"
+				})
+				.where("Track.Video_Type = %n", 1)
+				.where("Track_Tag.Tag = %n OR Track_Tag.Tag = %n", 6, 20)
+				.where("Track.Available = %b", true)
 				.where(
-					{ condition: (repeatsArray.length !== 0) },
-					"Track.Link NOT IN %s+",
-					repeatsArray
+					{ condition: ([].length !== 0) },
+					"Link NOT IN %s+",
+					[]
 				)
-				.join("music", "Track")
+				.orderBy("RAND()")
+				.single()
 				.flat("Link")
 			);
 
-			videoID = sb.Utils.randArray(links);
 			link = `https://youtu.be/${videoID}`;
 		}
 
