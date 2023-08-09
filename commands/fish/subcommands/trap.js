@@ -25,11 +25,8 @@ const execute = async (context, operation) => {
 		if (!trap.active) { // If not active, run the entire command again → will set up traps.
 			return await execute(context);
 		}
-		else if (now < trap.end) {
-			return {
-				success: false,
-				reply: `You cannot reset your fishing traps as they are not fully loaded yet!`
-			};
+		else if (now < trap.end) { // If not ready, run the entire command again → will error out with proper timing.
+			return await execute(context);
 		}
 
 		const trapsRetrieveResult = await execute(context);
