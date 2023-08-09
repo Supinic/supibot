@@ -22,11 +22,8 @@ const execute = async (context, operation) => {
 	}
 
 	if (operation === "reset") {
-		if (!trap.active) {
-			return {
-				success: false,
-				reply: `You cannot reset your fishing traps as you don't have them set up!`
-			};
+		if (!trap.active) { // If not active, run the entire command again → will set up traps.
+			return await execute(context);
 		}
 		else if (now < trap.end) {
 			return {
