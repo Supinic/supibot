@@ -9,16 +9,22 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function vanish (context) {
-		if (context.channel === null || context.channel.Mode !== "Moderator") {
-			return {
-				success: false,
-				reply: "You cannot vanish here!"
-			};
-		}
-		else if (context.platform.Name !== "twitch") {
+		if (context.platform.Name !== "twitch") {
 			return {
 				success: false,
 				reply: "You cannot vanish outside of Twitch!"
+			};
+		}
+		else if (context.channel === null) {
+			return {
+				success: false,
+				reply: "Vanishing is impossible in private messages!"
+			};
+		}
+		else if (context.channel.Mode !== "Moderator") {
+			return {
+				success: false,
+				reply: "I cannot make you vanish here, as I'm not a moderator!"
 			};
 		}
 		else if (context.append.userBadges.hasModerator) {
