@@ -775,10 +775,9 @@ module.exports = class TwitchController extends require("./template.js") {
 						userData.setDataProperty("twitch-userid-mismatch-notification", true)
 					]);
 				}
-				else {
-					emitRawUserMessageEvent(senderUsername, channelName, message, messageData);
-				}
 			}
+
+			emitRawUserMessageEvent(senderUsername, channelName, message, messageData);
 
 			return;
 		}
