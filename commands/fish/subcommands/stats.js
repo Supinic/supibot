@@ -1,3 +1,5 @@
+const { hasFishedBefore } = require("./fishing-utils.js");
+
 module.exports = {
 	name: "stats",
 	aliases: ["statistics"],
@@ -59,8 +61,10 @@ module.exports = {
 		let userAmountString = "";
 		let appendix = "";
 		if (targetUserData) {
+			/** @type {UserFishData} */
+			const fishData = await targetUserData.getDataProperty("fishData");
 			const subject = (targetUserData === context.user) ? "You" : "They";
-			if (!data.Attempts) { // Can be either `null` or `0` if user has never gone fishing
+			if (!hasFishedBefore(fishData)) {
 				return {
 					reply: `${subject} have never gone fishing before.`
 				};
@@ -68,7 +72,6 @@ module.exports = {
 
 			prefix = (targetUserData === context.user) ? "Your" : "Their";
 
-			const fishData = await targetUserData.getDataProperty("fishData");
 			if (fishData.removedFromLeaderboards) {
 				appendix = `${prefix} fishing licence has been revoked.`;
 			}

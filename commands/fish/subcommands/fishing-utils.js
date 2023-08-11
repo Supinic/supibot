@@ -492,4 +492,6 @@ module.exports = {
  *
  * @property {number} readyTimestamp
  * @property {number} coins
+ *
+ * @property {boolean} [removedFromLeaderboards]
  */
