@@ -420,6 +420,12 @@ const saveData = async (context, data) => {
 	await context.user.setDataProperty("fishData", data);
 };
 
+const hasFishedBefore = (fishData) => {
+	const fishAttempts = fishData.lifetime.attempts;
+	const trapAttempts = fishData.lifetime.trap?.times ?? 0;
+	return (fishAttempts > 0 || trapAttempts > 0);
+};
+
 const COIN_EMOJI = "🪙";
 
 module.exports = {
@@ -432,6 +438,7 @@ module.exports = {
 	getEmote,
 	getInitialStats,
 	getWeightedCatch,
+	hasFishedBefore,
 	rollCatch,
 	saveData,
 	itemTypes
