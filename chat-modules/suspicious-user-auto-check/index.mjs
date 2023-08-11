@@ -14,8 +14,13 @@ export const definition = {
 		}
 
 		this.data.checkedUsernames ??= new Set();
+		this.data.keywords ??= ["sus", "username", "account", "supibot", "help", "flag"];
 
-		if (!message.includes("suspicious")) {
+		const lower = message.toLowerCase();
+		if (this.data.keywords.every(i => !lower.includes(i))) {
+			return;
+		}
+		else if (this.data.checkedUsernames.has(raw.user)) {
 			return;
 		}
 
