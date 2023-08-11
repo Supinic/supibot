@@ -1,4 +1,4 @@
-const { COIN_EMOJI, getInitialStats, itemTypes, itemTypeDefinitions } = require("./fishing-utils.js");
+const { COIN_EMOJI, getInitialStats, hasFishedBefore, itemTypes, itemTypeDefinitions } = require("./fishing-utils.js");
 const defaultShowType = itemTypeDefinitions.find(i => i.name === "fish");
 
 module.exports = {
@@ -49,7 +49,7 @@ module.exports = {
 			? ["You", "your"]
 			: ["They", "their"];
 
-		if (fishData.lifetime.attempts === 0) {
+		if (!hasFishedBefore(fishData)) {
 			return {
 				reply: `${subject} have never gone fishing before.`
 			};
