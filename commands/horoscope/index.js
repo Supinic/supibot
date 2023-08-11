@@ -60,7 +60,7 @@ module.exports = {
 
 		const response = await sb.Got("FakeAgent", {
 			// Zodiac signs must be lowercased as the website skips the horoscope summary if the zodiac is capitalized
-			url: `https://www.ganeshaspeaks.com/horoscopes/daily-horoscope/${zodiacName.toLowerCase()}`,
+			url: `https://www.ganeshaspeaks.com/horoscopes/yesterday-horoscope/${zodiacName.toLowerCase()}`,
 			responseType: "text"
 		});
 
