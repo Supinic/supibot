@@ -143,7 +143,7 @@ module.exports = (command) => [
 						end_date: endDate.format("Y-m-d")
 					},
 					headers: {
-						Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
+						Authorization: `Bearer ${sb.Config.get("API_OPENAI_SESSION_KEY")}`
 					}
 				});
 
@@ -151,7 +151,7 @@ module.exports = (command) => [
 					method: "GET",
 					url: `https://api.openai.com/dashboard/billing/subscription`,
 					headers: {
-						Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
+						Authorization: `Bearer ${sb.Config.get("API_OPENAI_SESSION_KEY")}`
 					}
 				});
 
