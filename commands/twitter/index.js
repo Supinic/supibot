@@ -16,6 +16,11 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function twitter (context, input) {
+		return {
+			success: false,
+			reply: `Command temporarily disabled due to Twitter API changes!`
+		};
+
 		if (context.params.trends) {
 			return {
 				success: false,
