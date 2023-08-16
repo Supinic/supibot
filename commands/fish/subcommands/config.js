@@ -29,7 +29,7 @@ module.exports = {
 	description: [
 		`<code>$fish config whisper on</code>`,
 		`<code>$fish config whisper off</code>`,
-		"Turns on/off the setting that will whisper people in the current channel when they don't catch a fish.",
+		"Turns on/off the setting that will whisper people in the current channel when they don't catch a fish or are too early to go fishing or trapping.",
 		"This is to prevent unwanted spam. As such, only channel owners and ambassadors can change this setting.",
 		"",
 
@@ -69,7 +69,7 @@ module.exports = {
 
 				const string = (lower === "off") ? "no longer" : "now";
 				return {
-					reply: `I will ${string} whisper people in this channel when they catch junk or nothing, or when they're too early to fish.`
+					reply: `I will ${string} whisper people in this channel when they catch junk or nothing, or when they're too early to fish or trap.`
 				};
 			}
 

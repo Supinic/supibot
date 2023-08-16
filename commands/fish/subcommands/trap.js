@@ -4,6 +4,12 @@ const FISHING_TRIP_STATIC_DURATION = 36e5; // 1 hour
 const FISH_SUCCESS_DELAY_MIN = 30;
 
 const execute = async (context, operation) => {
+	let whisperOnFailure = false;
+	if (context.channel) {
+		const fishConfig = await context.channel.getDataProperty("fishConfig") ?? {};
+		whisperOnFailure = Boolean(fishConfig.whisperOnFailure);
+	}
+
 	/** @type {UserFishData} */
 	const fishData = await context.user.getDataProperty("fishData") ?? getInitialStats();
 	if (!fishData.trap) {
@@ -16,6 +22,7 @@ const execute = async (context, operation) => {
 	const { lifetime, trap } = fishData;
 	if (fishData.readyTimestamp !== 0 && now < fishData.readyTimestamp) {
 		return {
+			replyWithPrivateMessage: whisperOnFailure,
 			success: false,
 			reply: `Hol' up partner! You can go set up your fishing traps ${sb.Utils.timeDelta(fishData.readyTimestamp)}!`
 		};
@@ -58,6 +65,7 @@ const execute = async (context, operation) => {
 		}
 		else {
 			return {
+				replyWithPrivateMessage: whisperOnFailure,
 				success: false,
 				reply: `You cannot cancel your fishing traps as you don't have them set up!`
 			};
@@ -135,12 +143,13 @@ const execute = async (context, operation) => {
 	else {
 		const delta = sb.Utils.timeDelta(trap.end);
 		return {
+			replyWithPrivateMessage: whisperOnFailure,
 			success: false,
 			reply: sb.Utils.tag.trim `
-					Your traps are not fully loaded yet! They will be ready to harvest ${delta}.
-					If you wish to get rid of them immediately, use "$fish trap cancel", 
-					but you will not get any catch from your traps.
-				`
+				Your traps are not fully loaded yet! They will be ready to harvest ${delta}.
+				If you wish to get rid of them immediately, use "$fish trap cancel", 
+				but you will not get any catch from your traps.
+			`
 		};
 	}
 };
