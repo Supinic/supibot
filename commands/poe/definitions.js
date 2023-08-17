@@ -72,12 +72,12 @@ const subcommands = [
 
 			if (!lab.images[type]) {
 				const html = await sb.Got("FakeAgent", {
-					url: `https://www.poelab.com/${urlSlug}/`,
+					url: `https://www.poelab.com/${urlSlug}`,
 					responseType: "text"
 				}).text();
 
 				const $ = sb.Utils.cheerio(html);
-				lab.images[type] = $("#notesImg")[0].attribs.src;
+				lab.images[type] = $("img#notesImg")[0].attribs.src;
 			}
 
 			return {
