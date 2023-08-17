@@ -12,13 +12,20 @@ const trials = {
 };
 trials.all = Object.values(trials).join(" -- ");
 
-const labyrinthTypes = ["uber", "merciless", "cruel", "normal"];
-const labyrinthData = {
-	date: null,
-	normal: null,
-	cruel: null,
-	merciless: null,
-	uber: null
+const lab = {
+	date: new sb.Date(),
+	slugs: {
+		uber: "wfbra",
+		merciless: "riikv",
+		cruel: "r8aws",
+		normal: "gtagx"
+	},
+	images: {
+		normal: null,
+		cruel: null,
+		merciless: null,
+		uber: null
+	}
 };
 
 const randomDeathData = [
@@ -49,57 +56,32 @@ const subcommands = [
 		description: "Fetches the current overview picture of today's Labyrinth. Use a difficulty (normal, cruel, merciless, uber) to see each one separately.",
 		execute: async (context, ...args) => {
 			const type = (args[0] || "").toLowerCase();
-			if (!labyrinthTypes.includes(type)) {
+			const urlSlug = lab.slugs[type];
+			if (!urlSlug) {
 				return {
-					reply: `Invalid labyrinth type provided! Supported types: ${labyrinthTypes.join(", ")}`
+					reply: `Invalid labyrinth type provided! Supported types: ${Object.keys(lab.slugs).join(", ")}`
 				};
 			}
 
-			if (!labyrinthData.date || labyrinthData.date.day !== new sb.Date().day) {
-				const response = await sb.Got("FakeAgent", {
-					url: "https://poelab.com",
-					responseType: "text"
-				});
-
-				if (!response.ok) {
-					return {
-						success: false,
-						reply: sb.Utils.tag.trim `
-							Poelab website returned error ${response.statusCode}!
-							Can't access labyrinth images.
-							Cloudflare protection is possibly turned on.
-						`
-					};
-				}
-
-				labyrinthData.date = new sb.Date().setTimezoneOffset(0);
-
-				const $ = sb.Utils.cheerio(response.body);
-				const links = Array.from($(".redLink").slice(0, 4).map((_, i) => i.attribs.href));
-
-				for (let i = 0; i < links.length; i++) {
-					const type = labyrinthTypes[i];
-					labyrinthData[type] = {
-						type,
-						link: links[i],
-						imageLink: null
-					};
+			// reset all image links if new day is reached
+			if (lab.date.day !== new sb.Date().day) {
+				for (const key of Object.keys(lab.images)) {
+					lab.images[key] = null;
 				}
 			}
 
-			const detail = labyrinthData[type];
-			if (detail.imageLink === null) {
+			if (!lab.images[type]) {
 				const html = await sb.Got("FakeAgent", {
-					url: detail.link,
+					url: `https://www.poelab.com/${urlSlug}/`,
 					responseType: "text"
 				}).text();
 
 				const $ = sb.Utils.cheerio(html);
-				detail.imageLink = $("#notesImg")[0].attribs.src;
+				lab.images[type] = $("#notesImg")[0].attribs.src;
 			}
 
 			return {
-				reply: `Today's ${type} labyrinth map: ${detail.imageLink}`
+				reply: `Today's ${type} labyrinth map: ${lab.images[type]}`
 			};
 		}
 	},
