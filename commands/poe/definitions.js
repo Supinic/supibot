@@ -71,12 +71,16 @@ const subcommands = [
 			}
 
 			if (!lab.images[type]) {
-				const html = await sb.Got("FakeAgent", {
+				const response = await sb.Got("FakeAgent", {
 					url: `https://www.poelab.com/${urlSlug}`,
 					responseType: "text"
-				}).text();
+				});
 
-				const $ = sb.Utils.cheerio(html);
+				if (!response.ok) {
+					console.warn("poelab lookup failure", { response });
+				}
+
+				const $ = sb.Utils.cheerio(response.body);
 				lab.images[type] = $("img#notesImg")[0].attribs.src;
 			}
 
