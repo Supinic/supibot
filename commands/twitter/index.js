@@ -15,119 +15,120 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function twitter (context, input) {
+	Code: (async function twitter (/* context, input */) {
 		return {
 			success: false,
 			reply: `Command temporarily disabled due to Twitter API changes!`
 		};
 
-		if (context.params.trends) {
-			return {
-				success: false,
-				reply: `Trends are not supported after Twitter API change!`
-			};
-		}
-
-		const searchParams = (context.params.includeReplies)
-			? { includeReplies: true }
-			: {};
-
-		const response = await sb.Got("Supinic", {
-			url: `twitter/timeline/${encodeURI(input)}`,
-			searchParams
-		});
-
-		if (response.statusCode === 404) {
-			return {
-				success: false,
-				reply: `No such user exists!`
-			};
-		}
-		else if (!response.ok) {
-			return {
-				success: false,
-				reply: `That user's tweets are not available!`
-			};
-		}
-
-		let eligibleTweets = response.body.data.timeline;
-		if (context.params.mediaOnly) {
-			eligibleTweets = eligibleTweets.filter(i => Array.isArray(i.entities.media) && i.entities.media.length !== 0);
-			if (eligibleTweets.length === 0) {
-				return {
-					success: false,
-					reply: `There are no recent tweets that have any kind of media attached to them!`
-				};
-			}
-		}
-
-		if (!context.params.includeRetweets) {
-			eligibleTweets = eligibleTweets.filter(i => !i.retweeted_status_result);
-			if (eligibleTweets.length === 0) {
-				return {
-					success: false,
-					reply: `There are no recent tweets that are not retweets!`
-				};
-			}
-		}
-
-		let isSensitiveContentAllowed;
-		if (!context.channel) {
-			isSensitiveContentAllowed = true;
-		}
-		else {
-			if (context.channel.NSFW) {
-				isSensitiveContentAllowed = true;
-			}
-
-			isSensitiveContentAllowed = Boolean(await context.channel.getDataProperty("twitterNSFW"));
-		}
-
-		if (!isSensitiveContentAllowed) {
-			eligibleTweets = eligibleTweets.filter(i => !i.possibly_sensitive);
-
-			if (eligibleTweets.length === 0) {
-				return {
-					success: false,
-					reply: `There are no recent tweets that are not marked as sensitive (NSFW) content!`
-				};
-			}
-		}
-
-		let tweet;
-		if (context.params.random) {
-			tweet = sb.Utils.randArray(eligibleTweets);
-		}
-		else {
-			tweet = eligibleTweets[0];
-		}
-
-		if (!tweet) {
-			return {
-				reply: "That account has not tweeted so far."
-			};
-		}
-
-		const replyUrl = (context.params.includeReplies) ? `https://twitter.com/${input}/status/${tweet.id_str}` : "";
-		const delta = sb.Utils.timeDelta(new sb.Date(tweet.created_at));
-		const fullText = sb.Utils.fixHTML(tweet.full_text ?? "");
-		const fixedText = `${fullText} ${replyUrl}`;
-
-		if (context.params.mediaOnly) {
-			const links = tweet.entities.media.map(i => i.media_url_https).join(" ");
-			return {
-				reply: (context.params.textOnly)
-					? links
-					: `${fixedText} ${links} (posted ${delta})`
-			};
-		}
-		else {
-			return {
-				reply: (context.params.textOnly)
-					? fixedText
-					: `${fixedText} (posted ${delta})`
-			};
-		}
+		// Commented out until proper solution is found
+		// if (context.params.trends) {
+		// 	return {
+		// 		success: false,
+		// 		reply: `Trends are not supported after Twitter API change!`
+		// 	};
+		// }
+		//
+		// const searchParams = (context.params.includeReplies)
+		// 	? { includeReplies: true }
+		// 	: {};
+		//
+		// const response = await sb.Got("Supinic", {
+		// 	url: `twitter/timeline/${encodeURI(input)}`,
+		// 	searchParams
+		// });
+		//
+		// if (response.statusCode === 404) {
+		// 	return {
+		// 		success: false,
+		// 		reply: `No such user exists!`
+		// 	};
+		// }
+		// else if (!response.ok) {
+		// 	return {
+		// 		success: false,
+		// 		reply: `That user's tweets are not available!`
+		// 	};
+		// }
+		//
+		// let eligibleTweets = response.body.data.timeline;
+		// if (context.params.mediaOnly) {
+		// 	eligibleTweets = eligibleTweets.filter(i => Array.isArray(i.entities.media) && i.entities.media.length !== 0);
+		// 	if (eligibleTweets.length === 0) {
+		// 		return {
+		// 			success: false,
+		// 			reply: `There are no recent tweets that have any kind of media attached to them!`
+		// 		};
+		// 	}
+		// }
+		//
+		// if (!context.params.includeRetweets) {
+		// 	eligibleTweets = eligibleTweets.filter(i => !i.retweeted_status_result);
+		// 	if (eligibleTweets.length === 0) {
+		// 		return {
+		// 			success: false,
+		// 			reply: `There are no recent tweets that are not retweets!`
+		// 		};
+		// 	}
+		// }
+		//
+		// let isSensitiveContentAllowed;
+		// if (!context.channel) {
+		// 	isSensitiveContentAllowed = true;
+		// }
+		// else {
+		// 	if (context.channel.NSFW) {
+		// 		isSensitiveContentAllowed = true;
+		// 	}
+		//
+		// 	isSensitiveContentAllowed = Boolean(await context.channel.getDataProperty("twitterNSFW"));
+		// }
+		//
+		// if (!isSensitiveContentAllowed) {
+		// 	eligibleTweets = eligibleTweets.filter(i => !i.possibly_sensitive);
+		//
+		// 	if (eligibleTweets.length === 0) {
+		// 		return {
+		// 			success: false,
+		// 			reply: `There are no recent tweets that are not marked as sensitive (NSFW) content!`
+		// 		};
+		// 	}
+		// }
+		//
+		// let tweet;
+		// if (context.params.random) {
+		// 	tweet = sb.Utils.randArray(eligibleTweets);
+		// }
+		// else {
+		// 	tweet = eligibleTweets[0];
+		// }
+		//
+		// if (!tweet) {
+		// 	return {
+		// 		reply: "That account has not tweeted so far."
+		// 	};
+		// }
+		//
+		// const replyUrl = (context.params.includeReplies) ? `https://twitter.com/${input}/status/${tweet.id_str}` : "";
+		// const delta = sb.Utils.timeDelta(new sb.Date(tweet.created_at));
+		// const fullText = sb.Utils.fixHTML(tweet.full_text ?? "");
+		// const fixedText = `${fullText} ${replyUrl}`;
+		//
+		// if (context.params.mediaOnly) {
+		// 	const links = tweet.entities.media.map(i => i.media_url_https).join(" ");
+		// 	return {
+		// 		reply: (context.params.textOnly)
+		// 			? links
+		// 			: `${fixedText} ${links} (posted ${delta})`
+		// 	};
+		// }
+		// else {
+		// 	return {
+		// 		reply: (context.params.textOnly)
+		// 			? fixedText
+		// 			: `${fixedText} (posted ${delta})`
+		// 	};
+		// }
 	}),
 	Dynamic_Description: async (prefix) => [
 		"Fetches the last tweet of a provided account.",
