@@ -78,6 +78,10 @@ const subcommands = [
 
 				if (!response.ok) {
 					console.warn("poelab lookup failure", { response });
+					return {
+						success: false,
+						reply: `Could not load labyrinth data!`
+					};
 				}
 
 				const $ = sb.Utils.cheerio(response.body);
