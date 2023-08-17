@@ -18,7 +18,7 @@ const lab = {
 		uber: "wfbra",
 		merciless: "riikv",
 		cruel: "r8aws",
-		normal: "gtagx"
+		normal: "gtgax"
 	},
 	images: {
 		normal: null,
