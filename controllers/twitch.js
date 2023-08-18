@@ -694,6 +694,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			messageID: ircTags.id,
 			emotes: ircTags.emotes,
 			flags: ircTags.flags,
+			pid: ircTags["user-id"],
 			customRewardID: ircTags["custom-reward-id"] ?? null
 		};
 
@@ -939,6 +940,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		const channelData = (channel === null) ? null : sb.Channel.get(channel, this.platform);
 		const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
 			platform: this.platform,
+			pid: options.pid,
 			...options
 		});
 
