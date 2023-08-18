@@ -647,7 +647,6 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
 			platform: this.platform,
-			pid: userData.Discord_ID,
 			...options
 		});
 
