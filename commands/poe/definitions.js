@@ -96,29 +96,10 @@ const subcommands = [
 	{
 		name: "syndicate",
 		aliases: ["syn"],
-		description: "Fetches info about the Syndicate. If nothing is specified, you get a chart. You can also specify a Syndicate member to get their overview, or add a position to be even more specific.",
-		execute: async (context, ...args) => {
-			const [person, type] = args;
-			if (!person) {
-				return {
-					reply: "Check the Syndicate sheet here (⚠HTTP only!⚠): http://poesyn.xyz/syndicate or the picture here: https://i.nuuls.com/huXFC.png"
-				};
-			}
-
-			const data = syndicate.find(i => i.name === person);
-			if (!data) {
-				return {
-					success: false,
-					reply: "Syndicate member or type does not exist!"
-				};
-			}
-
-			return {
-				reply: (type)
-					? `${data.Name} at ${type}: ${data[sb.Utils.capitalize(type)]}`
-					: Object.entries(data).map(([key, value]) => `${key}: ${value}`).join("; ")
-			};
-		}
+		description: "Fetches a cheat sheet link about the Syndicate.",
+		execute: async () => ({
+			reply: "Check the cheat sheet https://poesyn.xyz/syndicate"
+		})
 	},
 	{
 		name: "trial",
