@@ -41,7 +41,12 @@ module.exports = {
 		const encountered = new Set();
 		for (const setData of subEmoteSets) {
 			const channel = setData.channel.login;
-			if (encountered.has(channel)) {
+
+			// This happens when a channel gets suspended - all fields are `null`. Skip over in this case.
+			if (setData.channel.login === null) {
+				continue;
+			}
+			else if (encountered.has(channel)) {
 				continue;
 			}
 
