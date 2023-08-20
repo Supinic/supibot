@@ -41,7 +41,11 @@ services:
         - "SUPIBOT_API_PORT=<preferred_api_port>"
 ```
 
-Customize values such as `INITIAL_CHANNEL`, `COMMAND_PREFIX` and the authentication info as needed. You can use [this tool](https://twitchapps.com/tmi/) to get oauth keys for Twitch. Note: the database docker image currently doesn't accept any user names other than `supibot`.
+Customize values such as `INITIAL_CHANNEL`, `COMMAND_PREFIX` and the authentication info as needed.
+You can use [this tool](https://twitchapps.com/tmi/) or [this one](https://twitchtokengenerator.com/) to fetch your OAuth keys for Twitch.
+
+- Note 1: The database docker image currently doesn't accept any usernames other than `supibot`.
+- Note 2: Make sure to include the `user:manage:whispers` scope in your OAuth token if you would like the standard Twitch whisper functionality to work.
 
 ### Manual
 
