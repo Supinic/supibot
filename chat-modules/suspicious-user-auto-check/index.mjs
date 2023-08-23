@@ -58,11 +58,24 @@ export const definition = {
 			return;
 		}
 
+		const now = new sb.Date();
+		const logsUrl = `https://logs.ivr.fi/channel/supinic/${now.year}/${now.month}/${now.day}`;
+		const row = await sb.Query.getRow("data", "Suggestion");
+		row.setValues({
+			Text: `Automatic suspicious user suggestion!\nNew: @${raw.user} - Old: @${data.login}\nTimestamp - ${now.sqlTime()} - Logs: ${logsUrl}`,
+			User_Alias: context.platform.Self_ID,
+			Priority: 255,
+			Category: "Data"
+		});
+
+		await row.save({ skipLoad: true });
+
 		const resultMessage = sb.Utils.tag.trim `
 			Hey @${raw.user}, I'd like to verify whether @${data.login} is either: 
 			another account,
 			or a previous name that you have used in the past.
 			Can you confirm this for me?
+			(@Supinic has been notified)
 		`;
 
 		await channel.send(resultMessage);
