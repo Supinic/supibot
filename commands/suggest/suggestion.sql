@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `data`.`Suggestion` (
 	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-	`User_Alias` INT(11) NULL DEFAULT NULL COMMENT 'Author of the suggestion',
+	`User_Alias` INT(10) UNSIGNED NULL DEFAULT NULL COMMENT 'Author of the suggestion',
 	`Text` TEXT NOT NULL COLLATE 'utf8mb4_general_ci' COMMENT 'Suggestion body',
 	`Date` DATETIME NOT NULL DEFAULT current_timestamp() COMMENT 'Suggestion\'s creation datetime',
 	`Category` ENUM('Bot','Bot addition','Data','Legacy','Other','Other - code','SPM','Supi-core','Void','Website') NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',

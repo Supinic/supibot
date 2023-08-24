@@ -1,6 +1,6 @@
 CREATE TABLE `Twitch_Lotto_Description` (
 	`Link` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
-	`User_Alias` INT(11) NOT NULL,
+	`User_Alias` INT(10) UNSIGNED NOT NULL,
 	`Text` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`Preferred` TINYINT(1) NULL DEFAULT NULL,
 	`Created` DATETIME(3) NOT NULL DEFAULT current_timestamp(3),

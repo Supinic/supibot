@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS `data`.`Event_Subscription` (
 	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-	`User_Alias` INT(11) NOT NULL,
+	`User_Alias` INT(10) UNSIGNED NOT NULL,
 	`Channel` INT(10) UNSIGNED NULL DEFAULT NULL,
-	`Platform` INT(11) UNSIGNED NOT NULL,
+	`Platform` INT(10) UNSIGNED NOT NULL,
 	`Type` ENUM('Gachi','Node.js updates','Suggestion','GGG tracker','Channel live','Changelog','Runelite','OSRS','Rust') NOT NULL COLLATE 'utf8mb4_general_ci',
 	`Data` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_bin',
 	`Active` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
