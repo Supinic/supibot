@@ -320,6 +320,9 @@ module.exports = class TwitchController extends require("./template.js") {
 					console.debug("Unknown Say/MessageError", { error });
 				}
 			}
+			else {
+				console.warn("Other Twitch error", error);
+			}
 		});
 
 		client.on("JOIN", async (message) => {
