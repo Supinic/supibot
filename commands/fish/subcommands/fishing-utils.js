@@ -421,6 +421,10 @@ const saveData = async (context, data) => {
 };
 
 const hasFishedBefore = (fishData) => {
+	if (!fishData) {
+		return false;
+	}
+
 	const fishAttempts = fishData.lifetime.attempts;
 	const trapAttempts = fishData.lifetime.trap?.times ?? 0;
 	return (fishAttempts > 0 || trapAttempts > 0);
