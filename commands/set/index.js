@@ -179,7 +179,7 @@ module.exports = {
 				{
 					name: "ambassador",
 					aliases: [],
-					adminOnly: true,
+					ownerOnly: true,
 					parameter: "arguments",
 					description: `Designates a user as an "Ambassador" in a specific channel, which grants them elevated access to some Supibot commands.`,
 					pipe: false, // administrative action
@@ -1025,10 +1025,10 @@ module.exports = {
 		}
 
 		const permissions = await context.getUserPermissions();
-		if (target.adminOnly && !permissions.is("administrator")) {
+		if (target.ownerOnly && permissions.flag < sb.User.permissions.channelOwner) {
 			return {
 				success: false,
-				reply: `Only administrators can work with the type "${type}"!`
+				reply: `Only channel owners and administrators can work with the type "${type}"!`
 			};
 		}
 		else if (target.elevatedChannelAccess && permissions.flag === sb.User.permissions.regular) {
