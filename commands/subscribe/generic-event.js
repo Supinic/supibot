@@ -1,4 +1,4 @@
-const defaultChannelId = 38;
+const DEFAULT_CHANNEL_ID = 38;
 
 /**
  * @typedef {Object} UserSubscription
@@ -71,14 +71,14 @@ const createReminders = async function (users, message) {
  * @param {number} [options.lastSeenThreshold]
  * @returns {Promise<void>}
  */
-export const handleSubscription = async function (subType, message, options = {}) {
+const handleSubscription = async function (subType, message, options = {}) {
 	const { activeUsers, inactiveUsers } = await fetchSubscriptionUsers(subType, options.lastSeenThreshold);
 
 	await createReminders(inactiveUsers, message);
 
 	const channelUsers = {};
 	for (const user of [...activeUsers, ...inactiveUsers]) {
-		const channelID = user.Reminder_Channel ?? defaultChannelId;
+		const channelID = user.Reminder_Channel ?? DEFAULT_CHANNEL_ID;
 		channelUsers[channelID] ??= [];
 		channelUsers[channelID].push(user);
 	}
@@ -91,7 +91,13 @@ export const handleSubscription = async function (subType, message, options = {}
 	}
 };
 
-export const parseRssNews = async function (xml, cacheKey) {
+/**
+ * Parses RSS xml into a object definition, caching and uncaching it as required.
+ * @param {string} xml
+ * @param {string} cacheKey
+ * @return {Promise<*[]|null>}
+ */
+const parseRssNews = async function (xml, cacheKey) {
 	const feed = await sb.Utils.parseRSS(xml);
 	const lastPublishDate = await sb.Cache.getByPrefix(cacheKey) ?? 0;
 	const eligibleArticles = feed.items
@@ -119,4 +125,57 @@ export const parseRssNews = async function (xml, cacheKey) {
 	}
 
 	return result;
+};
+
+/**
+ * @typedef {Object} GenericEventDefinition
+ * @property {string} cacheKey
+ * @property {string} eventName
+ * @property {string} url
+ * @property {string} subName
+ * @property {"rss"|"custom"} type
+ * @property {Function} [process]
+ */
+
+/**
+ * For a given definition of a subscription event, fetches the newest item and handles the subscription if a new is found.
+ * @param {GenericEventDefinition} definition
+ * @return {Promise<void>}
+ */
+const handleGenericSubscription = async (definition) => {
+	const { cacheKey, name, process, url, subName, type } = definition;
+
+	let message;
+	if (type === "rss") {
+		const response = await sb.Got("GenericAPI", {
+			url,
+			responseType: "text"
+		});
+
+		if (response.statusCode !== 200) {
+			return;
+		}
+
+		const result = await parseRssNews(response.body, cacheKey);
+		if (!result) {
+			return;
+		}
+
+		const suffix = (result.length === 1) ? "" : "s";
+		message = `New ${subName}${suffix}! PagChomp 👉 ${result.join(" -- ")}`;
+	}
+	else {
+		const result = await process(url);
+		if (!result || !result.message) {
+			return;
+		}
+
+		message = result.message;
+	}
+
+	await handleSubscription(name, message);
+};
+
+module.exports = {
+	handleGenericSubscription
 };

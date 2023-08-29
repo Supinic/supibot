@@ -1,6 +1,7 @@
 const eventTypeFileList = [
 	"changelog",
 	"channel-live",
+	"deno",
 	"dotnet",
 	"ggg",
 	"nodejs",
@@ -8,7 +9,8 @@ const eventTypeFileList = [
 	"python",
 	"runelite",
 	"rust",
-	"suggestion"
+	"suggestion",
+	"v8"
 ];
 
 const subscriptionTypes = [];

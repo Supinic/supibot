@@ -7,7 +7,30 @@ module.exports = {
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
+	Static_Data: ((command) => {
+		const rssSubscriptions = require("./event-types/index.js").filter(i => i.generic);
+		const { handleGenericSubscription } = require("./generic-event.js");
+
+		command.data.crons = [];
+
+		for (const def of rssSubscriptions) {
+			const cron = new sb.Cron({
+				Name: `${def.name} event subscription handler`,
+				Expression: def.cronExpression ?? "0 */5 * * * *",
+				Code: () => handleGenericSubscription(def)
+			});
+
+			command.data.crons.push(cron);
+		}
+
+		return {
+			destroy: () => {
+				for (const cron of command.data.crons) {
+					cron.destroy();
+				}
+			}
+		};
+	}),
 	Code: (async function subscribe (context, type, ...args) {
 		if (!type) {
 			return {
