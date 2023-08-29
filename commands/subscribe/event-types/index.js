@@ -1,9 +1,11 @@
 const eventTypeFileList = [
 	"changelog",
 	"channel-live",
+	"dotnet",
 	"ggg",
 	"nodejs",
 	"osrs",
+	"python",
 	"runelite",
 	"rust",
 	"suggestion"

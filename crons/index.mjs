@@ -4,12 +4,14 @@ import { definition as BotActivity } from "./bot-active/index.mjs";
 import { definition as BotRequestDenialManager } from "./bot-request-denial-manager/index.mjs";
 import { definition as ChangelogAnnouncer } from "./changelog-announcer/index.mjs";
 import { definition as PollsCloser } from "./close-polls/index.mjs";
+import { definition as DotNetNewsChecker } from "./dotnet-news-checker/index.mjs";
 import { definition as TwitchSubscribersFetcher } from "./fetch-twitch-subscriber-list/index.mjs";
 import { definition as InactiveDiscordServersDetector } from "./inactive-discord-server-detector/index.mjs";
 import { definition as LateStreamChecker } from "./late-stream-announcer/index.mjs";
 import { definition as NodeJsVersionAnnouncer } from "./nodejs/index.mjs";
 import { definition as OldSchoolRunescapeNewsAnnouncer } from "./osrs-news-checker/index.mjs";
 import { definition as PostureChecker } from "./posture-check/index.mjs";
+import { definition as PythonNewsChecker } from "./python-news-checker/index.mjs";
 import { definition as RuneliteVersionAnnouncer } from "./runelite-version-updater/index.mjs";
 import { definition as RustNewsAnnouncer } from "./rust-news-checker/index.mjs";
 import { definition as StayHydratedChecker } from "./stay-hydrated/index.mjs";
@@ -28,12 +30,14 @@ export const definitions = [
 	BotRequestDenialManager,
 	ChangelogAnnouncer,
 	PollsCloser,
+	DotNetNewsChecker,
 	TwitchSubscribersFetcher,
 	InactiveDiscordServersDetector,
 	LateStreamChecker,
 	NodeJsVersionAnnouncer,
 	OldSchoolRunescapeNewsAnnouncer,
 	PostureChecker,
+	PythonNewsChecker,
 	RuneliteVersionAnnouncer,
 	RustNewsAnnouncer,
 	StayHydratedChecker,
