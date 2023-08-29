@@ -1,6 +1,6 @@
 module.exports = {
 	name: "OSRS",
-	aliases: ["osrs"],
+	aliases: [],
 	notes: "Every 15 minutes, Supibot checks for news on the Old School Runescape website. If a new article is detected, you will be notified in the channel you subscribed in.",
 	channelSpecificMention: true,
 	response: {

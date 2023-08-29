@@ -1,6 +1,6 @@
 module.exports = {
 	name: "Changelog",
-	aliases: ["changelog"],
+	aliases: [],
 	notes: "Every minute, Supibot checks for new changelogs. If you are subscribed, you will receive a private system reminder from Supibot.",
 	channelSpecificMention: false,
 	response: {

@@ -40,8 +40,15 @@ module.exports = {
 		}
 
 		type = type.toLowerCase();
+
 		const eventDefinitions = require("./event-types/index.js");
-		const event = eventDefinitions.find(i => i.name === type || i.aliases.includes(type));
+		const event = eventDefinitions.find(i => {
+			const lowerName = i.name.toLowerCase();
+			const lowerAliases = i.aliases.map(j => j.toLowerCase());
+
+			return (i.name === lowerName || lowerAliases.includes(type));
+		});
+
 		if (!event) {
 			return {
 				success: false,

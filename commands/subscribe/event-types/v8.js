@@ -1,6 +1,6 @@
 module.exports = {
 	name: "V8",
-	aliases: ["v8"],
+	aliases: [],
 	notes: "V8 versions",
 	channelSpecificMention: true,
 	response: {

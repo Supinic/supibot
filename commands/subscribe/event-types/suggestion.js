@@ -1,6 +1,6 @@
 module.exports = {
 	name: "Suggestion",
-	aliases: ["suggest", "suggestion", "suggestions"],
+	aliases: ["suggest", "suggestions"],
 	notes: "Whenever a suggestion you've made is updated, you will receive a private system reminder about it. Changes are detected every minute.",
 	channelSpecificMention: false,
 	response: {
