@@ -42,30 +42,25 @@ module.exports = {
 				};
 			}
 
-			const timezone = await sb.Query.getRecordset(rs => rs
-				.select("Abbreviation", "Offset", "Name")
-				.from("data", "Timezone")
-				.where("Abbreviation = %s", query)
-				.limit(1)
-				.single()
-			);
+			const timezones = require("./timezones.json");
+			const timezoneData = timezones.find(i => i.abbreviation === query);
 
-			if (!timezone) {
+			if (!timezoneData) {
 				return null;
 			}
 
-			const extraOffset = (Math.trunc(timezone.Offset) - timezone.Offset) * 60;
-			let offset = `${(`00${String(Math.trunc(timezone.Offset))}`).slice(-2)}:${(`00${extraOffset}`).slice(-2)}`;
+			const extraOffset = (Math.trunc(timezoneData.offset) - timezoneData.offset) * 60;
+			let offset = `${(`00${String(Math.trunc(timezoneData.offset))}`).slice(-2)}:${(`00${extraOffset}`).slice(-2)}`;
 			if (offset[0] !== "-") {
 				offset = `+${offset}`;
 			}
 
-			const date = new sb.Date().setTimezoneOffset(timezone.Offset * 60).format("H:i (Y-m-d)");
+			const date = new sb.Date().setTimezoneOffset(timezoneData.offset * 60).format("H:i (Y-m-d)");
 			return {
 				date,
 				offset,
-				abbr: timezone.Abbreviation,
-				name: timezone.Name
+				abbr: timezoneData.abbreviation,
+				name: timezoneData.name
 			};
 		},
 		fetchTimeData: async (coordinates, timestamp = sb.Date.now()) => await sb.Got("Google", {
