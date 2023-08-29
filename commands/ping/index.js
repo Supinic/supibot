@@ -22,28 +22,21 @@ module.exports = {
 	})),
 	Code: (async function ping (context) {
 		const promisify = require("util").promisify;
-		const readFile = require("fs").promises.readFile;
 		const exec = promisify(require("child_process").exec);
 
-		const [temperatureResult, memoryResult] = await Promise.allSettled([
-			exec("/opt/vc/bin/vcgencmd measure_temp"),
-			readFile("/proc/meminfo")
+		const temperatureResult = await Promise.allSettled([
+			exec("/opt/vc/bin/vcgencmd measure_temp")
 		]);
 
 		const temperature = (temperatureResult.value)
 			? `${temperatureResult.value.stdout.match(/([\d.]+)/)[1]}°C`
 			: "N/A";
 
-		const memoryData = (memoryResult.value)
-			? String(memoryResult.value).split("\n").filter(Boolean)
-				.map(i => Number(i.split(/:\s+/)[1].replace(/kB/, "")) * 1000)
-			: [...new Array(3)].fill(0);
-
 		const uptime = new sb.Date().addSeconds(-process.uptime());
 		const data = {
-			Uptime: sb.Utils.timeDelta(uptime).replace("ago", "").trim(),
+			Uptime: sb.Utils.timeDelta(uptime, true),
 			Temperature: temperature,
-			"Free memory": `${sb.Utils.formatByteSize(memoryData[2], 0)}/${sb.Utils.formatByteSize(memoryData[0], 0)}`
+			"Used memory": sb.Utils.formatByteSize(process.memoryUsage().rss, 0)
 		};
 
 		if (sb.Cache) {
@@ -67,9 +60,6 @@ module.exports = {
 
 				data["Banphrase API"] = `Using ${type} API: ${url} (${result})`;
 			}
-			else {
-				data["Banphrase API"] = "Not connected";
-			}
 		}
 
 		if (context.platform.Name === "twitch") {
@@ -77,8 +67,8 @@ module.exports = {
 				async () => context.platform.client.ping()
 			);
 
-			data["Latency to TMI"] = (ping === null)
-				? "No response from Twitch (?)"
+			data["Latency to Twitch"] = (ping === null)
+				? "No response?"
 				: `${Math.trunc(ping)}ms`;
 		}
 
