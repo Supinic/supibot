@@ -12,7 +12,7 @@ module.exports = {
 			try {
 				const start = process.hrtime.bigint();
 				await callback(...args);
-			
+
 				return sb.Utils.round(Number(process.hrtime.bigint() - start) / 1.0e6, 3);
 			}
 			catch {
@@ -21,11 +21,9 @@ module.exports = {
 		}
 	})),
 	Code: (async function ping (context) {
-		const getLoadAverages = require("os").loadavg;
 		const promisify = require("util").promisify;
 		const readFile = require("fs").promises.readFile;
 		const exec = promisify(require("child_process").exec);
-		const chars = { a: "e", e: "i", i: "o", o: "u", u: "y", y: "a" };
 
 		const [temperatureResult, memoryResult] = await Promise.allSettled([
 			exec("/opt/vc/bin/vcgencmd measure_temp"),
@@ -41,24 +39,11 @@ module.exports = {
 				.map(i => Number(i.split(/:\s+/)[1].replace(/kB/, "")) * 1000)
 			: [...new Array(3)].fill(0);
 
-		const pong = `P${chars[context.invocation[1]]}ng!`;
-
-		const [min1, min5] = getLoadAverages();
-		const loadRatio = (min1 / min5);
-		const loadDelta = Math.abs(1 - loadRatio);
-		const loadDirection = (loadRatio > 1) ? "rising" : ((loadRatio < 1) ? "falling" : "steady");
-		const loadChange = (loadDelta > 0.10) ? " sharply" : ((loadDelta > 0) ? " steadily" : "");
-
-		const uptime = sb.Runtime?.started ?? new sb.Date().addSeconds(-process.uptime());
+		const uptime = new sb.Date().addSeconds(-process.uptime());
 		const data = {
 			Uptime: sb.Utils.timeDelta(uptime).replace("ago", "").trim(),
 			Temperature: temperature,
-			"Free memory": `${sb.Utils.formatByteSize(memoryData[2], 0)}/${sb.Utils.formatByteSize(memoryData[0], 0)}`,
-			"CPU usage": (min5 === 0)
-				? "No stats available"
-				: `${loadDirection}${loadChange}`,
-			// Swap: sb.Utils.formatByteSize(swapUsed, 0) + "/" + sb.Utils.formatByteSize(swapTotal, 0),
-			"Commands used": await sb.Runtime.commands
+			"Free memory": `${sb.Utils.formatByteSize(memoryData[2], 0)}/${sb.Utils.formatByteSize(memoryData[0], 0)}`
 		};
 
 		if (sb.Cache) {
@@ -97,14 +82,16 @@ module.exports = {
 				: `${Math.trunc(ping)}ms`;
 		}
 
+		const chars = { a: "e", e: "i", i: "o", o: "u", u: "y", y: "a" };
+		const pongString = `P${chars[context.invocation[1]]}ng!`;
 		return {
-			reply: `${pong} ${Object.entries(data).map(([name, value]) => `${name}: ${value}`).join("; ")}`
+			reply: `${pongString} ${Object.entries(data).map(([name, value]) => `${name}: ${value}`).join("; ")}`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
 		"Pings the bot, checking if it's alive, and a bunch of other data, like latency and commands used this session",
 		"",
-	
+
 		`<code>${prefix}ping</code>`,
 		"Pong! Latency: ..., Commands used: ..."
 	])
