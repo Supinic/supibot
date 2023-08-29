@@ -20,11 +20,13 @@ module.exports = {
 		"",
 
 		`<code>$fish sell all fish</code>`,
-		"Sells all of your fish.",
+		`<code>$fish sell all junk</code>`,
+		"Sells all of your fish or junk.",
 		"",
 
-		`<code>$fish sell all junk</code>`,
-		"Sells all of your junk."
+		`<code>$fish sell duplicate fish</code>`,
+		`<code>$fish sell duplicate junk</code>`,
+		"Sells all but one of your fish or junk, keeping one exemplar for showcase purposes."
 	],
 	execute: async (context, specifier, modifier) => {
 		/** @type {UserFishData} */
@@ -36,7 +38,7 @@ module.exports = {
 			};
 		}
 
-		if (specifier === "all") {
+		if (specifier === "all" || specifier === "duplicate") {
 			let coinsGained = 0;
 			let itemsSold = 0;
 
@@ -53,6 +55,8 @@ module.exports = {
 				};
 			}
 
+			const threshold = (specifier === "all") ? 0 : 1;
+
 			for (const itemData of itemTypes) {
 				if (modifier !== itemData.type) {
 					continue;
@@ -62,28 +66,30 @@ module.exports = {
 				}
 
 				const amount = fishData.catch.types[itemData.name] ?? 0;
-				if (amount <= 0) {
+				if (amount <= threshold) {
 					continue;
 				}
 
-				itemsSold += amount;
-				coinsGained += amount * itemData.price;
+				const removeAmount = (specifier === "all") ? amount : (amount - 1);
+				itemsSold += removeAmount;
+				coinsGained += removeAmount * itemData.price;
 
-				fishData.catch.types[itemData.name] = 0;
-				fishData.catch[itemData.type] -= amount;
+				fishData.catch.types[itemData.name] = threshold;
+				fishData.catch[itemData.type] -= removeAmount;
 
 				if (itemData.type === "fish") {
-					fishData.lifetime.sold += amount;
+					fishData.lifetime.sold += removeAmount;
 				}
 				else if (itemData.type === "junk") {
-					fishData.lifetime.scrapped = (fishData.lifetime.scrapped ?? 0) + amount;
+					fishData.lifetime.scrapped = (fishData.lifetime.scrapped ?? 0) + removeAmount;
 				}
 			}
 
+			const prefix = (specifier === "duplicate") ? "duplicate " : "";
 			if (coinsGained === 0) {
 				return {
 					success: false,
-					reply: `You have no ${itemTypeDefinition?.description ?? "items"} to sell!`
+					reply: `You have no ${prefix}${itemTypeDefinition?.description ?? "items"} to sell!`
 				};
 			}
 
@@ -94,7 +100,7 @@ module.exports = {
 
 			return {
 				reply: sb.Utils.tag.trim `
-					You sold ${itemsSold} ${itemTypeDefinition?.description ?? "items"} 
+					You sold ${itemsSold} ${prefix}${itemTypeDefinition?.description ?? "items"} 
 					for a grand total of ${coinsGained}${COIN_EMOJI}
 					- now you have ${fishData.coins}${COIN_EMOJI}
 				`
