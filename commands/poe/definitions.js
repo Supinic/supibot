@@ -85,7 +85,16 @@ const subcommands = [
 				}
 
 				const $ = sb.Utils.cheerio(response.body);
-				lab.images[type] = $("img#notesImg")[0].attribs.src;
+				let imageLink = $("img#notesImg")[0].attribs.src;
+
+				if (type === "merciless" || type === "uber") {
+					const [infoEl] = $("div.su-spoiler img");
+					if (infoEl) {
+						imageLink += ` Additional info: ${infoEl.attribs.src}`;
+					}
+				}
+
+				lab.images[type] = imageLink;
 			}
 
 			return {
