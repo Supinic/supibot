@@ -1,5 +1,4 @@
 const ascendancies = require("./ascendancies.json");
-const syndicate = require("./syndicate.json");
 const leagues = require("./leagues.json");
 const gems = require("./gems.json");
 const additionalGems = gems.filter(i => i.type === "additional");
