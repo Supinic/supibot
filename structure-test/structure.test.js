@@ -142,7 +142,7 @@ describe("global module suite", () => {
 							}
 						}
 
-						const missingProperties = module.validProperties.filter(i => !foundProperties.has(i.name));
+						const missingProperties = module.validProperties.filter(i => i.optional !== true && !foundProperties.has(i.name));
 						if (missingProperties.length !== 0) {
 							throw new Error(`Missing properties: ${missingProperties.map(i => i.name)
 								.join(", ")}`);

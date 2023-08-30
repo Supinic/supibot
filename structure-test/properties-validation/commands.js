@@ -104,6 +104,32 @@ module.exports = [
 		)
 	},
 	{
+		name: "initialize",
+		failMessage: "null literal, non-generator FunctionExpression or ArrowFunctionExpression",
+		optional: true,
+		checkCallback: (v) => (
+			(v.type === "Literal" && v.value === null)
+			|| (
+				(v.type === "FunctionExpression" || v.type === "ArrowFunctionExpression")
+				&& v.generator === false
+				&& (typeof v.method !== "boolean" || v.method === false)
+			)
+		)
+	},
+	{
+		name: "destroy",
+		failMessage: "null literal, non-generator FunctionExpression or ArrowFunctionExpression",
+		optional: true,
+		checkCallback: (v) => (
+			(v.type === "Literal" && v.value === null)
+			|| (
+				(v.type === "FunctionExpression" || v.type === "ArrowFunctionExpression")
+				&& v.generator === false
+				&& (typeof v.method !== "boolean" || v.method === false)
+			)
+		)
+	},
+	{
 		name: "Static_Data",
 		failMessage: "null literal, non-generator FunctionExpression or ArrowFunctionExpression",
 		checkCallback: (v) => (
