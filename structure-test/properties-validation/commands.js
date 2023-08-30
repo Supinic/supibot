@@ -83,8 +83,12 @@ module.exports = [
 	},
 	{
 		name: "Author",
-		valueKind: "Literal",
-		valueTypes: ["string", "null"]
+		failMessage: "Literal null, literal non-empty string, or ArrayExpression of literal strings",
+		checkCallback: (v) => (
+			(v.type === "ArrayExpression" && v.elements.every(i => i.type === "Literal" && typeof i.value === "string"))
+			|| (typeof v.value === "string") && (v.value.length > 0)
+			|| (v.type === "Literal" && v.value === null)
+		)
 	},
 	{
 		name: "Whitelist_Response",
