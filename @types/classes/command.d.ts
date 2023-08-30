@@ -461,6 +461,23 @@ export declare class Command extends ClassTemplate {
      */
     #Author: string | null;
 
+    /**
+     * Determines whether or not the command's initialization has already passed.
+     * If a command is not ready (the value is `false`), its code execution will always return `undefined` rather than running its code.
+     */
+    #ready: boolean;
+
+    /**
+     * Determines whether or not the command has already been destroyed.
+     * If a command is destroyed (the value is `true`), its code execution will always return `undefined` rather than running its code.
+     */
+    #destroyed: boolean;
+
+    /**
+     * Custom `destroy` method to be run during the command's `destroy()` call.
+     */
+    #customDestroy: () => Promise<void> | null;
+
     constructor (data: ConstructorData);
 
     /**

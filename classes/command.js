@@ -137,6 +137,10 @@ class Command extends require("./template.js") {
 	Code;
 	Dynamic_Description;
 
+	#ready = false;
+	#destroyed = false;
+	#customDestroy = null;
+
 	#Author;
 
 	data = {};
@@ -230,18 +234,6 @@ class Command extends require("./template.js") {
 		if (typeof data.Code === "function") {
 			this.Code = data.Code;
 		}
-		else {
-			try {
-				this.Code = eval(data.Code);
-			}
-			catch (e) {
-				console.error(`Command ${this.ID} has invalid code definition!`, e);
-				this.Code = async () => ({
-					success: false,
-					reply: "Command has invalid code definition! Please make sure to let @supinic know about this!"
-				});
-			}
-		}
 
 		if (typeof data.Dynamic_Description === "function") {
 			this.Dynamic_Description = data.Dynamic_Description;
@@ -270,32 +262,58 @@ class Command extends require("./template.js") {
 			}
 
 			if (typeof staticDataFn !== "function") {
-				console.warn(`Command ${this.ID} static data is not a function!`);
-				this.Code = async () => ({
-					success: false,
-					reply: "Command's static data is not a function!"
-				});
+				console.warn(`Command ${this.ID} static data is not a function`);
+				return;
 			}
 
 			const staticData = staticDataFn(this);
-
 			if (!staticData || staticData?.constructor?.name !== "Object") {
-				console.warn(`Command ${this.ID} has invalid static data type!`);
-				this.Code = async () => ({
-					success: false,
-					reply: "Command has invalid static data type!"
-				});
+				console.warn(`Command ${this.ID} has invalid static data type`);
+				return;
 			}
 			else {
 				this.staticData = staticData;
 			}
 		}
 
+		if (typeof data.initialize === "function") {
+			try {
+				const result = data.initialize.call(this);
+
+				if (result instanceof Promise) {
+					result.then(() => {
+						this.#ready = true;
+					});
+				}
+				else {
+					this.#ready = true;
+				}
+			}
+			catch (e) {
+				console.warn("Custom command initialization failed", { command: this.Name, error: e });
+			}
+		}
+		else {
+			this.#ready = true;
+		}
+
+		if (typeof data.destroy === "function") {
+			this.#customDestroy = data.destroy;
+		}
+
 		sb.Utils.deepFreeze(this.staticData);
 	}
 
-	destroy () {
-		if (typeof this.staticData.destroy === "function") {
+	async destroy () {
+		if (this.#customDestroy === "function") {
+			try {
+				await this.#customDestroy();
+			}
+			catch (e) {
+				console.warn("Custom command destroy method failed", { command: this.Name, error: e });
+			}
+		}
+		else if (typeof this.staticData.destroy === "function") {
 			try {
 				this.staticData.destroy(this);
 			}
@@ -304,12 +322,23 @@ class Command extends require("./template.js") {
 			}
 		}
 
+		this.#destroyed = true;
+
 		this.Code = null;
 		this.data = null;
 		this.staticData = null;
 	}
 
 	execute (...args) {
+		if (this.#ready === false) {
+			console.warn("Attempt to run not yet initialized command", this.Name);
+			return;
+		}
+		else if (this.#destroyed === true) {
+			console.warn("Attempt to run destroyed command", this.Name);
+			return;
+		}
+
 		return this.Code(...args);
 	}
 
