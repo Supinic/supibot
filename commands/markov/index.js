@@ -1,3 +1,7 @@
+const MODEL_SIZE_THRESHOLD = 100;
+const WORD_LIMIT = 20;
+const DEFAULT_WORD_AMOUNT = 15;
+
 module.exports = {
 	Name: "markov",
 	Aliases: null,
@@ -14,8 +18,9 @@ module.exports = {
 		{ name: "words", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (command => {
-		command.data.updateCron = new sb.Cron({
+	Static_Data: null,
+	initialize: function () {
+		const updateCron = new sb.Cron({
 			Name: "markov-word-list-updater",
 			Description: "Regularly updates the available words in $markov.",
 			Expression: "0 * * * * *",
@@ -43,33 +48,28 @@ module.exports = {
 				await Promise.all(promises);
 			})
 		});
-		command.data.updateCron.start();
 
-		const threshold = 100;
-		return {
-			limit: 20,
-			threshold,
-			destroy: (command) => {
-				if (command.data.updateCron) {
-					command.data.updateCron.destroy();
-				}
+		updateCron.start();
+		this.data.updateCron = updateCron;
+	},
+	destroy: function () {
+		if (this.data.updateCron) {
+			this.data.updateCron.destroy();
+		}
 
-				const module = sb.ChatModule.get("async-markov-experiment");
-				const fs = require("fs").promises;
+		const module = sb.ChatModule.get("async-markov-experiment");
+		const fs = require("fs").promises;
 
-				for (const [channelID, markov] of module.data.markovs.entries()) {
-					if (markov.size < threshold) {
-						continue;
-					}
-
-					const fileName = `markov-dump-${new sb.Date().format("Y-m-d H:i")}-channel-${channelID}.json`;
-					fs.writeFile(`/code/markovs/${fileName}`, JSON.stringify(markov));
-				}
+		for (const [channelID, markov] of module.data.markovs.entries()) {
+			if (markov.size < MODEL_SIZE_THRESHOLD) {
+				continue;
 			}
-		};
-	}),
-	Code: (async function markov (context, input) {
-		const { limit, threshold } = this.staticData;
+
+			const fileName = `markov-dump-${new sb.Date().format("Y-m-d H:i")}-channel-${channelID}.json`;
+			fs.writeFile(`/code/markovs/${fileName}`, JSON.stringify(markov));
+		}
+	},
+	Code: async function markov (context, input) {
 		const module = sb.ChatModule.get("async-markov-experiment");
 		if (!module) {
 			return {
@@ -108,7 +108,7 @@ module.exports = {
 						channel: context.channel,
 						params: {
 							channel: channel.Name,
-							words: Math.floor(2 * limit / channelList.length)
+							words: Math.floor(2 * WORD_LIMIT / channelList.length)
 						}
 					});
 
@@ -211,14 +211,14 @@ module.exports = {
 			}
 		}
 
-		if (markov.size < threshold) {
+		if (markov.size < MODEL_SIZE_THRESHOLD) {
 			return {
 				success: false,
-				reply: `Markov-chain module does not have enough data available! (${markov?.size ?? 0}/${threshold} required)`
+				reply: `Markov-chain module does not have enough data available! (${markov?.size ?? 0}/${MODEL_SIZE_THRESHOLD} required)`
 			};
 		}
 
-		let wordCount = 15;
+		let wordCount = DEFAULT_WORD_AMOUNT;
 		if (context.params.words) {
 			const { words } = context.params;
 			if (!sb.Utils.isValidInteger(words, 1)) {
@@ -227,10 +227,10 @@ module.exports = {
 					reply: "Invalid number of words provided!"
 				};
 			}
-			else if (words > limit) {
+			else if (words > WORD_LIMIT) {
 				return {
 					success: false,
-					reply: `Too many words! Current maximum: ${limit}`
+					reply: `Too many words! Current maximum: ${WORD_LIMIT}`
 				};
 			}
 
@@ -281,8 +281,8 @@ module.exports = {
 		return {
 			reply: `🔮 ${string}`
 		};
-	}),
-	Dynamic_Description: (async function (prefix) {
+	},
+	Dynamic_Description: async function (prefix) {
 		const { threshold, limit } = this.staticData;
 		const channels = await sb.Query.getRecordset(rs => rs
 			.select("Channel.ID AS Channel_ID", "Name")
@@ -335,5 +335,5 @@ module.exports = {
 			`Generates between 1-${limit} words, based on your choice.`,
 			""
 		];
-	})
+	}
 };

@@ -7,11 +7,12 @@ module.exports = {
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: ((command) => {
+	Static_Data: null,
+	initialize: async function () {
 		const rssSubscriptions = require("./event-types/index.js").filter(i => i.generic);
 		const { handleGenericSubscription } = require("./generic-event.js");
 
-		command.data.crons = [];
+		this.data.crons = new Set();
 
 		for (const def of rssSubscriptions) {
 			const cron = new sb.Cron({
@@ -20,18 +21,18 @@ module.exports = {
 				Code: () => handleGenericSubscription(def)
 			});
 
-			command.data.crons.push(cron);
+			cron.start();
+			this.data.crons.add(cron);
+		}
+	},
+	destroy: function () {
+		for (const cron of this.data.crons) {
+			cron.destroy();
 		}
 
-		return {
-			destroy: () => {
-				for (const cron of command.data.crons) {
-					cron.destroy();
-				}
-			}
-		};
-	}),
-	Code: (async function subscribe (context, type, ...args) {
+		this.data.crons.clear();
+	},
+	Code: async function subscribe (context, type, ...args) {
 		if (!type) {
 			return {
 				success: false,
@@ -160,8 +161,8 @@ module.exports = {
 				reply: `Successfully subscribed ${location}. ${response}`
 			};
 		}
-	}),
-	Dynamic_Description: (async function (prefix) {
+	},
+	Dynamic_Description: async function (prefix) {
 		const types = require("./event-types/index.js");
 		const typesList = types.map(i => sb.Utils.tag.trim `
 			<li>
@@ -187,5 +188,5 @@ module.exports = {
 			"List of available events:",
 			`<ul>${typesList}</ul>`
 		];
-	})
+	}
 };
