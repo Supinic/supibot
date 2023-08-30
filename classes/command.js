@@ -305,7 +305,7 @@ class Command extends require("./template.js") {
 	}
 
 	async destroy () {
-		if (this.#customDestroy === "function") {
+		if (typeof this.#customDestroy === "function") {
 			try {
 				await this.#customDestroy();
 			}
