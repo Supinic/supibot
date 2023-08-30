@@ -46,7 +46,7 @@ module.exports = {
 			const lowerName = i.name.toLowerCase();
 			const lowerAliases = i.aliases.map(j => j.toLowerCase());
 
-			return (i.name === lowerName || lowerAliases.includes(type));
+			return (lowerName === type || lowerAliases.includes(type));
 		});
 
 		if (!event) {
