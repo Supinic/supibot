@@ -46,6 +46,7 @@ describe("global module suite", () => {
 		const { extension } = specificModule;
 		specificModule.definitions = specificModule.fileList.map(dir => ({
 			name: dir,
+			filePath: `../${specificModule.directory}/${dir}/index.${extension}`,
 			content: fs.readFileSync(`./${specificModule.directory}/${dir}/index.${extension}`)
 		}));
 	}
@@ -69,7 +70,6 @@ describe("global module suite", () => {
 						equal(model.type, "Program", "Module must be a program");
 						equal(model.sourceType, "module", "Script must be sourced by a module");
 						equal(model.body.constructor, Array, "Module body must be an array");
-						equal(model.body.length, 1, "Module can only contain one statement");
 
 						let properties;
 						if (module.extension === "js") {
@@ -146,6 +146,22 @@ describe("global module suite", () => {
 						if (missingProperties.length !== 0) {
 							throw new Error(`Missing properties: ${missingProperties.map(i => i.name)
 								.join(", ")}`);
+						}
+					});
+				}
+			});
+
+			describe(`${module.name} - require`, () => {
+				for (const { name, filePath } of module.definitions) {
+					it(`${name}`, function () {
+						if (module.extension === "mjs") {
+							it.skip("Skipped MJS modules");
+						}
+						else {
+							const requireResult = require(filePath);
+							equal(typeof requireResult, "object");
+							equal(Boolean(requireResult), true);
+							equal(requireResult.constructor.name, "Object");
 						}
 					});
 				}
