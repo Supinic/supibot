@@ -666,7 +666,7 @@ class Command extends require("./template.js") {
 
 		try {
 			const start = process.hrtime.bigint();
-			execution = await command.Code(context, ...args);
+			execution = await command.execute(context, ...args);
 			const end = process.hrtime.bigint();
 
 			let result = null;
