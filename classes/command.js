@@ -612,8 +612,6 @@ class Command extends require("./template.js") {
 
 			sb.CooldownManager.set(channelID, userData.ID, command.Name, length);
 
-			await sb.Runtime.incrementRejectedCommands();
-
 			if (filterData.filter.Response === "Reason" && typeof filterData.reply === "string") {
 				const { string } = await sb.Banphrase.execute(filterData.reply, channelData);
 				filterData.reply = string;
@@ -653,8 +651,6 @@ class Command extends require("./template.js") {
 					.trim()
 					.slice(0, 300);
 			}
-
-			await sb.Runtime.incrementCommandsCounter();
 
 			metric.inc({
 				name: command.Name,
