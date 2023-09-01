@@ -100,7 +100,7 @@ module.exports = {
 		const commandPrefix = sb.Config.get("COMMAND_PREFIX");
 		let commandString = `command ${commandPrefix}${names.command}`;
 		if (filterData.command === null) {
-			commandString = "all opt-outable commands";
+			commandString = "all opt-outable commands. This does not affect your other individual opt-outs for specific commands";
 		}
 
 		if (filter) {
