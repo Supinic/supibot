@@ -89,5 +89,37 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: (async () => [
+		"Restarts the process of Supibot or the supinic.com website.",
+		"Only usable by administrators and whitelisted users.",
+		"",
+
+		"<code>$restart</code>",
+		"<code>$restart bot</code>",
+		"Restarts Supibot via PM2 restart.",
+		"",
+
+		"<code>$restart web</code>",
+		"Restarts the website process, in the same way as Supibot's.",
+		"",
+
+		"<code>$restart bot pull</code>",
+		"<code>$restart web pull</code>",
+		"Runs <code>git pull</code> first, then restarts the process.",
+		"",
+
+		"<code>$restart bot upgrade</code>",
+		"<code>$restart web upgrade</code>",
+		"Runs <code>yarn upgrade</code> first, then restarts the process.",
+		"",
+
+		"<code>$restart bot all</code>",
+		"<code>$restart web all</code>",
+		"Combination of pull and upgrade.",
+		"",
+
+		"<code>$restart bot static</code>",
+		"<code>$restart web static</code>",
+		"Runs <code>git pull</code>, but doesn't restart the process."
+	])
 };
