@@ -72,10 +72,14 @@ describe("global module suite", () => {
 						equal(model.body.constructor, Array, "Module body must be an array");
 
 						let properties;
-						if (module.extension === "js") {
-							equal(model.body[0].type, "ExpressionStatement", "Statement must be an expression");
 
-							const expr = model.body[0].expression;
+						// @todo This is probably not necessary anymore as we allow multiple statements in each exported module file.
+						// The structure is properly checked down below, as the result of require() execution.
+						const lastExpression = model.body.at(-1);
+						if (module.extension === "js") {
+							equal(lastExpression.type, "ExpressionStatement", "Statement must be an expression");
+
+							const expr = lastExpression.expression;
 							equal(expr.type, "AssignmentExpression", "Statement must be an assignment expression");
 							equal(expr.operator, "=", "Statement must use the = operator");
 
@@ -89,9 +93,9 @@ describe("global module suite", () => {
 							properties = right.properties;
 						}
 						else {
-							equal(model.body[0].type, "ExportNamedDeclaration", "Statement must be a named exports declaration");
+							equal(lastExpression.type, "ExportNamedDeclaration", "Statement must be a named exports declaration");
 
-							const { declaration } = model.body[0];
+							const { declaration } = lastExpression;
 							equal(declaration.type, "VariableDeclaration", "Exports declaration must be a variable");
 							equal(declaration.kind, "const", "Exports declaration must be const");
 
