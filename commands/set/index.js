@@ -491,7 +491,7 @@ module.exports = {
 							};
 						}
 
-						// Deletes TODO tag of given track.
+						// Deletes the "to-do" tag of given track.
 						await sb.Query.raw(`DELETE FROM music.Track_Tag WHERE (Track = ${ID} AND Tag = 20)`);
 
 						return {
