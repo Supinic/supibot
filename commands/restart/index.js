@@ -13,7 +13,7 @@ module.exports = {
 	Name: "restart",
 	Aliases: null,
 	Author: "supinic",
-	Cooldown: 0,
+	Cooldown: 10_000,
 	Description: "Restarts the bot/website process via pm2, optionally also git-pulls changes and/or upgrades the supi-core module.",
 	Flags: ["system","whitelist"],
 	Params: null,
