@@ -1,3 +1,14 @@
+const paths = {
+	dir: {
+		bot: "/code/supibot",
+		web: "/code/web"
+	},
+	pm2: {
+		bot: "pm2 restart supibot",
+		web: "pm2 restart web"
+	}
+};
+
 module.exports = {
 	Name: "restart",
 	Aliases: null,
@@ -6,18 +17,9 @@ module.exports = {
 	Description: "Restarts the bot/website process via pm2, optionally also git-pulls changes and/or upgrades the supi-core module.",
 	Flags: ["system","whitelist"],
 	Params: null,
-	Whitelist_Response: "Only available to administrators!",
-	Static_Data: (() => ({
-		dir: {
-			bot: "/code/supibot",
-			web: "/code/web"
-		},
-		pm2: {
-			bot: "pm2 restart supibot",
-			web: "pm2 restart web"
-		}
-	})),
-	Code: (async function restart (context, ...types) {
+	Whitelist_Response: "Only available to administrators or helpers!",
+	Static_Data: null,
+	Code: async function restart (context, ...types) {
 		const { promisify } = require("util");
 		const shell = promisify(require("child_process").exec);
 		const processType = (types.includes("web") || types.includes("site") || types.includes("website"))
@@ -27,8 +29,8 @@ module.exports = {
 		types = types.map(i => i.toLowerCase());
 
 		const queue = [];
-		const dir = this.staticData.dir[processType];
-		const pm2 = this.staticData.pm2[processType];
+		const dir = paths.dir[processType];
+		const pm2 = paths.pm2[processType];
 
 		if (processType === "bot" && types.includes("all")) {
 			await context.sendIntermediateMessage("VisLaud 👉 yarn prod-update");
@@ -88,8 +90,8 @@ module.exports = {
 				reply: resultMessage
 			};
 		}
-	}),
-	Dynamic_Description: (async () => [
+	},
+	Dynamic_Description: async () => [
 		"Restarts the process of Supibot or the supinic.com website.",
 		"Only usable by administrators and whitelisted users.",
 		"",
@@ -121,5 +123,5 @@ module.exports = {
 		"<code>$restart bot static</code>",
 		"<code>$restart web static</code>",
 		"Runs <code>git pull</code>, but doesn't restart the process."
-	])
+	]
 };
