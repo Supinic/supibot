@@ -486,7 +486,7 @@ module.exports = {
  * @property {number} catch.junk
  * @property {number} catch.dryStreak
  * @property {number} catch.luckyStreak
- * @property {Record<string, number>} catch.types
+ * @property {Record<string, number|undefined>} catch.types
  *
  * @property {Object} trap
  * @property {boolean} trap.active
