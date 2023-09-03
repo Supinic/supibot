@@ -7,7 +7,7 @@ export const definition = {
 
 		this.data.timeout ??= 0;
 
-		const relaxedRegex = /(supi|supinic(?!\.com)|bupi|супи)\b/i;
+		const relaxedRegex = /(supi|supinic(?!\.com)|bupi|супи|супик.?|супиник.?)\b/i;
 		const strictRegex = /\bsupinic(?!\.com)\b/i;
 
 		const skippedUsers = [1, 1127, 582108, 8697460, 12182780];
