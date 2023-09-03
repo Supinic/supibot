@@ -136,7 +136,8 @@ const execute = async function (context, query) {
 			reply: `Invalid language(s) provided!`
 		};
 	}
-	else if (response.statusCode === 429) {
+	// DeepL uses 456 to signify "exhausted api tokens" instead of 429, which signifies "rate limits exceeded"
+	else if (response.statusCode === 456) {
 		return {
 			success: false,
 			reply: `The monthly limit for DeepL has been exhausted! Try again next month.`
