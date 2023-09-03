@@ -260,6 +260,12 @@ module.exports = {
 						`
 					};
 				}
+				else if (inactiveReason === "withdrawn") {
+					return {
+						success: false,
+						reply: `I have been withdrawn from this channel and cannot be re-added back!`
+					};
+				}
 
 				const offlineConfiguration = await channelData.getDataProperty("offlineOnlyBot");
 				if (channelData.Mode === "Read" && offlineConfiguration) {
