@@ -141,7 +141,7 @@ const execute = async function (context, query) {
 	else if (response.statusCode === 456) {
 		return {
 			success: false,
-			reply: `The monthly limit for DeepL has been exhausted! Try again next month.`
+			reply: `The monthly limit for DeepL has been exhausted! Try again in the next billing period.`
 		};
 	}
 	else if (response.statusCode !== 200) {
