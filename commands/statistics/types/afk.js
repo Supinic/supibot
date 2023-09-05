@@ -13,6 +13,12 @@ module.exports = {
 				reply: "Provided user does not exist!"
 			};
 		}
+		else if (targetUser === context.platform.Self_Name) {
+			return {
+				success: false,
+				reply: `I'm a bot - and we don't really need to sleep, I'm always awake!`
+			};
+		}
 
 		/** @type {{ Amount: bigint, Delta: number }} */
 		const data = await sb.Query.getRecordset(rs => rs
