@@ -127,6 +127,7 @@ const execute = async function (context, query) {
 		headers: {
 			Authorization: `DeepL-Auth-Key ${sb.Config.get("API_DEEPL_KEY")}`
 		},
+		throwHttpErrors: false,
 		searchParams
 	});
 
