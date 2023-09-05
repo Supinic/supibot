@@ -24,7 +24,7 @@ module.exports = {
 		const promisify = require("util").promisify;
 		const exec = promisify(require("child_process").exec);
 
-		const temperatureResult = await Promise.allSettled([
+		const [temperatureResult] = await Promise.allSettled([
 			exec("/opt/vc/bin/vcgencmd measure_temp")
 		]);
 
