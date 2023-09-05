@@ -5,10 +5,10 @@ export const definition = {
 	name: "changelog-announcer",
 	expression: "0 */30 * * * *",
 	description: "Watches for new changelogs, and if found, posts them to the specified channel(s).",
-	code: (async function changelogAnnouncer () {
+	code: (async function changelogAnnouncer (cron) {
 		isTableAvailable ??= await sb.Query.isTablePresent("data", "Event_Subscription");
 		if (isTableAvailable === false) {
-			this.job.stop();
+			cron.job.stop();
 			return;
 		}
 

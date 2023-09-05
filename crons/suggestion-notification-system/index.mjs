@@ -5,7 +5,7 @@ export const definition = {
 	name: "suggestion-notification-system",
 	expression: "0 * * * * *",
 	description: "Manages sending notifications about suggestions being changed. This is to notify users (via private system reminders) that their suggestion's status has changed.",
-	code: (async function notifyOnSuggestionChange () {
+	code: (async function notifyOnSuggestionChange (cron) {
 		if (typeof isTableAvailable === "undefined") {
 			const [subscription, suggestion] = await Promise.all([
 				sb.Query.isTablePresent("data", "Event_Subscription"),
@@ -16,7 +16,7 @@ export const definition = {
 		}
 
 		if (isTableAvailable === false) {
-			this.job.stop();
+			cron.job.stop();
 			return;
 		}
 

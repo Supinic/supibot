@@ -4,7 +4,7 @@ export const definition = {
 	name: "close-polls",
 	expression: "0 * * * * *",
 	description: "Checks for unclosed polls that have ended, and if it finds one, determines the result, and sends system reminders to everyone who voted.",
-	code: (async function closeActivePoll () {
+	code: (async function closeActivePoll (cron) {
 		if (typeof isTableAvailable === "undefined") {
 			const [pollExists, pollVoteExists] = await Promise.all([
 				sb.Query.isTablePresent("chat_data", "Poll"),
@@ -15,7 +15,7 @@ export const definition = {
 		}
 
 		if (isTableAvailable === false) {
-			this.job.stop();
+			cron.job.stop();
 			return;
 		}
 

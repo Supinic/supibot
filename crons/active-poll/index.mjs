@@ -4,10 +4,10 @@ export const definition = {
 	name: "active-poll",
 	expression: "0 15,45 * * * *",
 	description: "If a poll is running, announce it in chat every couple of minutes.",
-	code: (async function announceActivePoll () {
+	code: (async function announceActivePoll (cron) {
 		isTableAvailable ??= await sb.Query.isTablePresent("chat_data", "Poll");
 		if (isTableAvailable === false) {
-			this.job.stop();
+			cron.job.stop();
 			return;
 		}
 

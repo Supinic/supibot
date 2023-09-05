@@ -57,14 +57,17 @@ export function initializeCrons (options = {}) {
 			continue;
 		}
 
-		const job = new CronJob(definition.expression, definition.code);
-		job.start();
-
-		crons.push({
+		const cron = {
 			name: definition.name,
 			description: definition.description,
-			job
-		});
+			code: definition.code
+		};
+
+		const job = new CronJob(definition.expression, () => cron.code(cron));
+		job.start();
+
+		cron.job = job;
+		crons.push(cron);
 	}
 
 	return crons;

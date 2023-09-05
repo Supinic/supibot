@@ -5,10 +5,10 @@ export const definition = {
 	name: "bot-request-denial-manager",
 	expression: "*/15 * * * *",
 	description: "Sends out private messages whenever a bot request suggestion is denied. Only runs on Tuesdays",
-	code: (async function botRequestDenialManager () {
+	code: (async function botRequestDenialManager (cron) {
 		isTableAvailable ??= await sb.Query.isTablePresent("data", "Suggestion");
 		if (isTableAvailable === false) {
-			this.job.stop();
+			cron.job.stop();
 			return;
 		}
 

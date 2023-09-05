@@ -4,10 +4,10 @@ export const definition = {
 	name: "active-chatters-log",
 	expression: "0 */5 * * * *",
 	description: "Logs the amount of currently active chatters.",
-	code: (async function activeChattersLog () {
+	code: (async function activeChattersLog (cron) {
 		isTableAvailable ??= await sb.Query.isTablePresent("data", "Active_Chatter_Log");
 		if (isTableAvailable === false) {
-			this.job.stop();
+			cron.job.stop();
 			return;
 		}
 
