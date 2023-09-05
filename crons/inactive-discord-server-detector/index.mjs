@@ -27,6 +27,9 @@ export const definition = {
 			if (guildChannels.length === 0) {
 				continue;
 			}
+			else if (guildChannels.some(i => i.Mirror !== null)) {
+				continue;
+			}
 
 			const channelIDs = guildChannels.map(i => i.ID);
 			const lastCommandExecuted = await sb.Query.getRecordset(rs => rs
