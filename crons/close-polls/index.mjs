@@ -1,10 +1,8 @@
 export const definition = {
-	Name: "close-polls",
-	Expression: "0 * * * * *",
-	Description: "Checks for unclosed polls that have ended, and if it finds one, determines the result, and sends system reminders to everyone who voted.",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function closeActivePoll () {
+	name: "close-polls",
+	expression: "0 * * * * *",
+	description: "Checks for unclosed polls that have ended, and if it finds one, determines the result, and sends system reminders to everyone who voted.",
+	code: (async function closeActivePoll () {
 		if (typeof this.data.isTableAvailable === "undefined") {
 			const [pollExists, pollVoteExists] = await Promise.all([
 				sb.Query.isTablePresent("chat_data", "Poll"),

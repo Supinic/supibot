@@ -1,10 +1,8 @@
 export const definition = {
-	Name: "active-poll",
-	Expression: "0 15,45 * * * *",
-	Description: "If a poll is running, announce it in chat every couple of minutes.",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function announceActivePoll () {
+	name: "active-poll",
+	expression: "0 15,45 * * * *",
+	description: "If a poll is running, announce it in chat every couple of minutes.",
+	code: (async function announceActivePoll () {
 		this.data.isTableAvailable ??= await sb.Query.isTablePresent("chat_data", "Poll");
 		if (this.data.isTableAvailable === false) {
 			this.stop();

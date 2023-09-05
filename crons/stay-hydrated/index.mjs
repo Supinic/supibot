@@ -1,10 +1,8 @@
 export const definition = {
-	Name: "stay-hydrated",
-	Expression: "0 20 * * * *",
-	Description: "Stay hydrated!",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function announceStayHydrated () {
+	name: "stay-hydrated",
+	expression: "0 20 * * * *",
+	description: "Stay hydrated!",
+	code: (async function announceStayHydrated () {
 		const channelData = sb.Channel.get("supinic", "twitch");
 		const streamData = await channelData.getStreamData();
 

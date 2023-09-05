@@ -3,16 +3,20 @@ export const definition = {
 	Events: ["online", "offline"],
 	Description: "Toggles the silence-prevention cron on/off on Supinic's stream going on/off.",
 	Code: (async function silencePreventionTrigger (context) {
-		const cron = sb.Cron.get("stream-silence-prevention");
+		if (!globalThis.crons) {
+			return;
+		}
+
+		const cron = globalThis.crons.find(i => i.name === "stream-silence-prevention");
 		if (!cron) {
 			return;
 		}
 
-		if (context.event === "offline" && cron.started) {
-			cron.stop();
+		if (context.event === "offline" && cron.job.running) {
+			cron.job.stop();
 		}
-		else if (context.event === "online" && !cron.started) {
-			cron.start();
+		else if (context.event === "online" && !cron.job.running) {
+			cron.job.start();
 		}
 	}),
 	Global: false,

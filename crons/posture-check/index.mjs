@@ -1,10 +1,8 @@
 export const definition = {
-	Name: "posture-check",
-	Expression: "0 50 * * * *",
-	Description: "Check your posture!",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function announceStayHydrated () {
+	name: "posture-check",
+	expression: "0 50 * * * *",
+	description: "Check your posture!",
+	code: (async function announceStayHydrated () {
 		const channelData = sb.Channel.get("supinic", "twitch");
 		const streamData = await channelData.getStreamData();
 

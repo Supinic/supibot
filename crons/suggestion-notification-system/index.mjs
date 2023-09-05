@@ -1,10 +1,8 @@
 export const definition = {
-	Name: "suggestion-notification-system",
-	Expression: "0 * * * * *",
-	Description: "Manages sending notifications about suggestions being changed. This is to notify users (via private system reminders) that their suggestion's status has changed.",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function notifyOnSuggestionChange () {
+	name: "suggestion-notification-system",
+	expression: "0 * * * * *",
+	description: "Manages sending notifications about suggestions being changed. This is to notify users (via private system reminders) that their suggestion's status has changed.",
+	code: (async function notifyOnSuggestionChange () {
 		if (typeof this.data.isTableAvailable === "undefined") {
 			const [subscription, suggestion] = await Promise.all([
 				sb.Query.isTablePresent("data", "Event_Subscription"),

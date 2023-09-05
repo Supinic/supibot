@@ -143,15 +143,6 @@ module.exports = {
 					names: ["config", "configs"]
 				},
 				{
-					executionType: "upgrade",
-					target: "Cron",
-					name: "cron",
-					dir: "crons",
-					names: ["cron", "crons"],
-					singular: ["cron"],
-					plural: ["crons"]
-				},
-				{
 					target: "Filter",
 					names: ["filter", "filters"]
 				},

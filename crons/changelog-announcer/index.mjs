@@ -1,10 +1,8 @@
 export const definition = {
-	Name: "changelog-announcer",
-	Expression: "0 */30 * * * *",
-	Description: "Watches for new changelogs, and if found, posts them to the specified channel(s).",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function changelogAnnouncer () {
+	name: "changelog-announcer",
+	expression: "0 */30 * * * *",
+	description: "Watches for new changelogs, and if found, posts them to the specified channel(s).",
+	code: (async function changelogAnnouncer () {
 		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Event_Subscription");
 		if (this.data.isTableAvailable === false) {
 			this.stop();

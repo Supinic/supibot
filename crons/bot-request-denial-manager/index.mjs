@@ -1,10 +1,8 @@
 export const definition = {
-	Name: "bot-request-denial-manager",
-	Expression: "*/15 * * * *",
-	Description: "Sends out private messages whenever a bot request suggestion is denied. Only runs on Tuesdays",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function botRequestDenialManager () {
+	name: "bot-request-denial-manager",
+	expression: "*/15 * * * *",
+	description: "Sends out private messages whenever a bot request suggestion is denied. Only runs on Tuesdays",
+	code: (async function botRequestDenialManager () {
 		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Suggestion");
 		if (this.data.isTableAvailable === false) {
 			this.stop();

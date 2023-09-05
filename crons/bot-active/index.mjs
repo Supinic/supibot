@@ -1,10 +1,8 @@
 export const definition = {
-	Name: "bot-active",
-	Expression: "0 */10 * * * *",
-	Description: "Pings the bot active API to make sure supibot is being registered as online",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function verifyBotAcitivity () {
+	name: "bot-active",
+	expression: "0 */10 * * * *",
+	description: "Pings the bot active API to make sure supibot is being registered as online",
+	code: (async function verifyBotAcitivity () {
 		if (!sb.Platform || !sb.User) {
 			return;
 		}

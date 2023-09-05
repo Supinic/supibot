@@ -67,9 +67,11 @@ catch {
 
 	await Promise.all([
 		importModule(sb.ChatModule, "chat-modules"),
-		importModule(sb.Cron, "crons"),
 		importModule(sb.Got, "gots")
 	]);
+
+	const { initializeCrons } = await import("./crons/index.mjs");
+	globalThis.sb.crons = initializeCrons(config.modules.crons);
 
 	const controllers = {};
 	const initialPlatforms = sb.Channel.getActivePlatforms();

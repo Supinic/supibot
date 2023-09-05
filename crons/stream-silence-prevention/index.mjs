@@ -1,10 +1,8 @@
 export const definition = {
-	Name: "stream-silence-prevention",
-	Expression: "*/5 * * * * *",
-	Description: "Makes sure that there is not a prolonged period of song request silence on Supinic's stream while live.",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function preventStreamSilence () {
+	name: "stream-silence-prevention",
+	expression: "*/5 * * * * *",
+	description: "Makes sure that there is not a prolonged period of song request silence on Supinic's stream while live.",
+	code: (async function preventStreamSilence () {
 		if (this.data.stopped) {
 			return;
 		}

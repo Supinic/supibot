@@ -1,10 +1,8 @@
 export const definition = {
-	Name: "late-stream-announcer",
-	Expression: "30 3,33 * * * *",
-	Description: "Checks if Supi is streaming when he should, and if not, posts a Weirdga TeaTime",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function announceLateStream () {
+	name: "late-stream-announcer",
+	expression: "30 3,33 * * * *",
+	description: "Checks if Supi is streaming when he should, and if not, posts a Weirdga TeaTime",
+	code: (async function announceLateStream () {
 		if (!sb.Command) {
 			return;
 		}
