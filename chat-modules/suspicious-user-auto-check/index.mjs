@@ -63,7 +63,7 @@ export const definition = {
 		const row = await sb.Query.getRow("data", "Suggestion");
 		row.setValues({
 			Text: `Automatic suspicious user suggestion!\nNew: @${raw.user} - Old: @${data.login}\nTimestamp - ${now.sqlTime()} - Logs: ${logsUrl}`,
-			User_Alias: context.platform.Self_ID,
+			User_Alias: 1127,
 			Priority: 255,
 			Category: "Data"
 		});
