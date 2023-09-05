@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS `data`.`Event_Subscription` (
 	`User_Alias` INT(10) UNSIGNED NOT NULL,
 	`Channel` INT(10) UNSIGNED NULL DEFAULT NULL,
 	`Platform` INT(10) UNSIGNED NOT NULL,
-	`Type` ENUM('Gachi','Node.js updates','Suggestion','GGG tracker','Channel live','Changelog','Runelite','OSRS','Rust','.NET','Python','V8') NOT NULL COLLATE 'utf8mb4_general_ci',
+	`Type` ENUM('Gachi','Node.js updates','Suggestion','GGG tracker','Channel live','Changelog','Runelite','OSRS','Rust','.NET','Python','V8','Bun') NOT NULL COLLATE 'utf8mb4_general_ci',
 	`Data` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_bin',
 	`Active` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
 	`Created` DATETIME(3) NOT NULL DEFAULT current_timestamp(3),

@@ -1,4 +1,5 @@
 const eventTypeFileList = [
+	"bun",
 	"changelog",
 	"channel-live",
 	"deno",
