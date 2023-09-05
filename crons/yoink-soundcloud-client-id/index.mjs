@@ -2,7 +2,11 @@ export const definition = {
 	name: "yoink-soundcloud-client-id",
 	expression: "0 */10 * * * *",
 	description: "\"Borrows\" the clientside Soundcloud API key to be used for TrackLinkParser module.",
-	code: (async function yoinkSoundcloudClientID () {
+	code: (async function yoinkSoundcloudClientID (cron) {
+		if (!sb.Config.has("SOUNDCLOUD_CLIENT_ID")) {
+			cron.job.stop();
+		}
+
 		const { statusCode } = await sb.Got("GenericAPI", {
 			url: "https://api-v2.soundcloud.com/resolve",
 			throwHttpErrors: false,
