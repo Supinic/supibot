@@ -50,10 +50,10 @@ export function initializeCrons (options = {}) {
 
 	const crons = [];
 	for (const definition of definitions) {
-		if (blacklist.includes(definition.name)) {
+		if (blacklist.length > 0 && blacklist.includes(definition.name)) {
 			continue;
 		}
-		else if (!whitelist.includes(definition.name)) {
+		else if (whitelist.length > 0 && !whitelist.includes(definition.name)) {
 			continue;
 		}
 

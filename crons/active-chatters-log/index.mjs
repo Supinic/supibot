@@ -1,11 +1,13 @@
+let isTableAvailable;
+
 export const definition = {
 	name: "active-chatters-log",
 	expression: "0 */5 * * * *",
 	description: "Logs the amount of currently active chatters.",
 	code: (async function activeChattersLog () {
-		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Active_Chatter_Log");
-		if (this.data.isTableAvailable === false) {
-			this.stop();
+		isTableAvailable ??= await sb.Query.isTablePresent("data", "Active_Chatter_Log");
+		if (isTableAvailable === false) {
+			this.job.stop();
 			return;
 		}
 

@@ -1,16 +1,19 @@
+let isTableAvailable;
+let latestID;
+
 export const definition = {
 	name: "changelog-announcer",
 	expression: "0 */30 * * * *",
 	description: "Watches for new changelogs, and if found, posts them to the specified channel(s).",
 	code: (async function changelogAnnouncer () {
-		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Event_Subscription");
-		if (this.data.isTableAvailable === false) {
-			this.stop();
+		isTableAvailable ??= await sb.Query.isTablePresent("data", "Event_Subscription");
+		if (isTableAvailable === false) {
+			this.job.stop();
 			return;
 		}
 
-		if (typeof this.data.latestID === "undefined") {
-			this.data.latestID = await sb.Query.getRecordset(rs => rs
+		if (typeof latestID !== "number") {
+			latestID = await sb.Query.getRecordset(rs => rs
 				.select("MAX(ID) AS Max")
 				.from("data", "Changelog")
 				.single()
@@ -23,7 +26,7 @@ export const definition = {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("ID", "Created", "Title", "Type", "Description")
 			.from("data", "Changelog")
-			.where("ID > %n", this.data.latestID)
+			.where("ID > %n", latestID)
 		);
 
 		if (data.length === 0) {
@@ -108,6 +111,6 @@ export const definition = {
 			});
 		}
 
-		this.data.latestID = Math.max(...data.map(i => i.ID));
+		latestID = Math.max(...data.map(i => i.ID));
 	})
 };

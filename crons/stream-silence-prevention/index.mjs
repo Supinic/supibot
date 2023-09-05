@@ -1,19 +1,15 @@
+const repeats = [];
+const repeatAmount = 100;
+const bannedLinks = [
+	"BaMcFghlVEU", // Gachillmuchi
+	"QO0CRvQ0WRA" // Gachillmuchi reupload by DJ Gachi
+];
+
 export const definition = {
 	name: "stream-silence-prevention",
 	expression: "*/5 * * * * *",
 	description: "Makes sure that there is not a prolonged period of song request silence on Supinic's stream while live.",
 	code: (async function preventStreamSilence () {
-		if (this.data.stopped) {
-			return;
-		}
-
-		this.data.repeats ??= [];
-		this.data.repeatsAmount ??= 100;
-		this.data.bannedLinks ??= [
-			"BaMcFghlVEU", // Gachillmuchi
-			"QO0CRvQ0WRA" // Gachillmuchi reupload by DJ Gachi
-		];
-
 		// early return - avoid errors during modules loading
 		if (!sb.Channel || !sb.Platform || !sb.VideoLANConnector) {
 			return;
@@ -46,12 +42,12 @@ export const definition = {
 				.select("Link")
 				.from("chat_data", "Song_Request")
 				.orderBy("ID DESC")
-				.limit(this.data.repeatsAmount)
+				.limit(repeatAmount)
 				.flat("Link")
 			);
 		}
 		else if (state === "cytube") {
-			repeatsArray = this.data.repeats;
+			repeatsArray = repeats;
 			isQueueEmpty = (cytube.controller.clients.get(cytubeChannelData.ID).playlistData.length === 0);
 		}
 
@@ -119,7 +115,7 @@ export const definition = {
 		}
 
 		// If the rolled video is in the banned list, exit early and repeat later
-		if (this.data.bannedLinks.includes(videoID)) {
+		if (bannedLinks.includes(videoID)) {
 			return;
 		}
 
