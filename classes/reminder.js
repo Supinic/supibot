@@ -493,15 +493,7 @@ module.exports = class Reminder extends require("./template.js") {
 						skipLengthCheck: true
 					});
 
-					const fixedMessage = await sb.Filter.applyUnping({
-						command: sb.Command.get("remind"),
-						channel: channelData ?? null,
-						platform: channelData?.Platform ?? null,
-						string: preparedMessage,
-						executor: fromUserData
-					});
-
-					if (!fixedMessage) {
+					if (!preparedMessage) {
 						await channelData.send(sb.Utils.tag.trim `
 							${authorMention},
 							a user you set up a "pingme" reminder for has typed somewhere, but I can't post it here.
@@ -511,6 +503,14 @@ module.exports = class Reminder extends require("./template.js") {
 						await platform.pm(message, fromUserData.Name, channelData);
 					}
 					else {
+						const fixedMessage = await sb.Filter.applyUnping({
+							command: sb.Command.get("remind"),
+							channel: channelData ?? null,
+							platform: channelData?.Platform ?? null,
+							string: preparedMessage,
+							executor: fromUserData
+						});
+
 						await channelData.send(fixedMessage);
 					}
 				}
