@@ -774,6 +774,10 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		// Only check channels,
 		if (messageType !== "whisper") {
+			if (!channelName) {
+				await sb.Logger.log("Twitch.Error", `Missing channel in IRC message: ${JSON.stringify(messageObject)}`);
+			}
+
 			channelData = sb.Channel.get(channelName, this.platform);
 
 			if (!channelData || channelData.Mode === "Inactive") {
