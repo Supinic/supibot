@@ -1,3 +1,6 @@
+const engines = ["deepl", "google"];
+const tableExists = await sb.Query.isTablePresent("data", "Translate_Log");
+
 module.exports = {
 	Name: "translate",
 	Aliases: null,
@@ -14,9 +17,7 @@ module.exports = {
 		{ name: "textOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		engines: ["deepl", "google"]
-	})),
+	Static_Data: null,
 	Code: (async function translate (context, ...args) {
 		const query = args.join(" ");
 		if (query.length === 0) {
@@ -27,7 +28,6 @@ module.exports = {
 			};
 		}
 
-		const { engines } = this.staticData;
 		const engine = context.params.engine ?? "google";
 		if (!engines.includes(engine)) {
 			return {
@@ -39,6 +39,23 @@ module.exports = {
 		const { execute } = require(`./${engine}.js`);
 		const boundExecute = execute.bind(this);
 		const result = await boundExecute(context, query);
+
+		if (tableExists) {
+			const row = await sb.Query.getRow("data", "Translate_Log");
+			row.setValues({
+				User_Alias: context.user.ID,
+				Channel: context.channel?.ID ?? null,
+				Engine: engine,
+				Excerpt: sb.Utils.wrapString(query, 100),
+				Input_Length: query.length,
+				Output_Length: result.text?.length ?? null,
+				Success: result.success,
+				Params: (Object.keys(context.params) !== 0) ? JSON.stringify(context.params) : null
+			});
+
+			await row.save({ skipLoad: true });
+		}
+
 		if (result.success === false) {
 			return result;
 		}
