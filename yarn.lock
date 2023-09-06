@@ -1789,15 +1789,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cron@npm:^2.3.1":
-  version: 2.3.1
-  resolution: "cron@npm:2.3.1"
-  dependencies:
-    luxon: ^3.2.1
-  checksum: ac27c257cb8dba4b51978b4767119fc79bfc0dfa35ef0be2533bc4142ae006130515236e2102d04ee3ce44bffc2a4e37a3bee18a2152bbb303bf5ff944e25204
-  languageName: node
-  linkType: hard
-
 "cron@npm:^2.4.3":
   version: 2.4.3
   resolution: "cron@npm:2.4.3"
@@ -3839,13 +3830,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"luxon@npm:^3.2.1":
-  version: 3.2.1
-  resolution: "luxon@npm:3.2.1"
-  checksum: 3fa3def2c5f5d3032b4c46220c4da8aeb467ac979888fc9d2557adcd22195f93516b4ad5909a75862bec8dc6ddc0953b0f38e6d2f4a8ab8450ddc531a83cf20d
-  languageName: node
-  linkType: hard
-
 "luxon@npm:~3.3.0":
   version: 3.3.0
   resolution: "luxon@npm:3.3.0"
@@ -5360,12 +5344,12 @@ __metadata:
 
 supi-core@supinic/supi-core:
   version: 2.2.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=c32ae76cb6d95a3fa040740996f72b0a4e5c6b1d"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=54ccdb489f45b2deb89cf3022e62427bdddbd3f5"
   dependencies:
     async-markov: "github:supinic/async-markov"
     cheerio: ^1.0.0-rc.12
     chrono-node: ^2.6.3
-    cron: ^2.3.1
+    cron: ^2.4.3
     duration-parser: "github:supinic/duration-parser"
     ffprobe: ^1.1.2
     form-data: ^4.0.0
@@ -5381,7 +5365,7 @@ supi-core@supinic/supi-core:
     track-link-parser: "github:supinic/track-link-parser"
     transliteration: ^2.3.5
     vm2: ^3.9.19
-  checksum: 757a07f0279a4c374e9078a00503d2dc1d93f77d79e8069df71578b175054f5cab2f03361e02c7b6d942ca136bffdcd14a2e5844d1d552f5c91879e4ef4a4df8
+  checksum: c5dad0ceea316cf533d3b5c72fd45b826b698cae604bc6a041756d35178a4b61bacae1e7635536fc8bfb8bf57381f13d4b81cf567120edf4e3a343720713c132
   languageName: node
   linkType: hard
 
