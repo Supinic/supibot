@@ -49,32 +49,15 @@ module.exports = {
 			}
 		}
 
-		const { controller } = sb.Platform.get("twitch");
-		const [userID, channelID] = await Promise.all([
-			controller.getUserID(user),
-			controller.getUserID(channel)
-		]);
-
-		if (!userID || !channelID) {
-			return {
-				success: false,
-				reply: "One or both users were not found!"
-			};
-		}
-
-		const response = await sb.Got("Helix", {
-			url: "users/follows",
-			searchParams: {
-				from_id: userID,
-				to_id: channelID
-			}
+		const response = await sb.Got("Leppunen", {
+			url: `v2/twitch/subage/${user}/${channel}`
 		});
 
 		const prefix = (user.toLowerCase() === context.user.Name) ? "You" : user;
 		const suffix = (channel.toLowerCase() === context.user.Name) ? "you" : channel;
 
-		const [followData] = response.body.data;
-		if (!followData) {
+		const { followedAt } = response.body;
+		if (!followedAt) {
 			const verb = (user.toLowerCase() === context.user.Name) ? "are" : "is";
 			return {
 				reply: `${prefix} ${verb} not following ${suffix}.`
@@ -82,7 +65,7 @@ module.exports = {
 		}
 
 		const verb = (user.toLowerCase() === context.user.Name) ? "have" : "has";
-		const delta = sb.Utils.timeDelta(new sb.Date(followData.followed_at), true, true);
+		const delta = sb.Utils.timeDelta(new sb.Date(followedAt), true, true);
 		return {
 			reply: `${prefix} ${verb} been following ${suffix} for ${delta}.`
 		};
