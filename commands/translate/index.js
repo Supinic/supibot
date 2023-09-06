@@ -1,5 +1,5 @@
+let logTableExists;
 const engines = ["deepl", "google"];
-const tableExists = await sb.Query.isTablePresent("data", "Translate_Log");
 
 module.exports = {
 	Name: "translate",
@@ -18,6 +18,9 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
+	initialize: async () => {
+		logTableExists = await sb.Query.isTablePresent("data", "Translate_Log");
+	},
 	Code: (async function translate (context, ...args) {
 		const query = args.join(" ");
 		if (query.length === 0) {
@@ -40,7 +43,7 @@ module.exports = {
 		const boundExecute = execute.bind(this);
 		const result = await boundExecute(context, query);
 
-		if (tableExists) {
+		if (logTableExists) {
 			const row = await sb.Query.getRow("data", "Translate_Log");
 			row.setValues({
 				User_Alias: context.user.ID,
