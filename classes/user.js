@@ -496,7 +496,7 @@ module.exports = class User extends require("./template.js") {
 	}
 
 	static destroy () {
-		User.insertCron.destroy();
+		clearInterval(User.mapExpirationInterval);
 		User.data.clear();
 	}
 };

@@ -220,7 +220,7 @@ class CooldownManagerSingleton extends require("./template.js") {
 
 	get modulePath () { return "cooldown-manager"; }
 
-	get pruneCron () { return pruneCron; }
+	get pruneInterval () { return pruneInterval; }
 
 	// Exporting the classes, just in case they're needed externally
 	get Cooldown () { return Cooldown; }
@@ -234,13 +234,6 @@ class CooldownManagerSingleton extends require("./template.js") {
 	}
 }
 
-const pruneCron = new sb.Cron({
-	Name: "cooldown-prune",
-	Expression: "0 * * * * *",
-	Defer: {
-		end: 15000
-	},
-	Code: () => sb.CooldownManager.prune()
-}).start();
+const pruneInterval = setInterval(() => sb.CooldownManager.prune(), 60_000);
 
 module.exports = CooldownManagerSingleton;

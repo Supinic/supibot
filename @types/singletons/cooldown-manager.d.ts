@@ -66,6 +66,6 @@ export declare class CooldownManagerSingleton implements Template {
     get Cooldown (): typeof Cooldown;
     get Pending (): typeof Pending;
 
-    get pruneCron (): unknown;
+    get pruneInterval (): ReturnType<typeof setInterval>;
     get modulePath (): "cooldown-manager";
 }

@@ -1,3 +1,5 @@
+const { CronJob } = require("cron");
+
 const notified = {
 	lastSeen: false,
 	privatePlatformLogging: []
@@ -65,35 +67,31 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 				.flat("TABLE_NAME")
 			).then(data => (this.#presentTables = data));
 
-			this.messageCron = new sb.Cron({
-				Name: "message-cron",
-				Expression: sb.Config.get("LOG_MESSAGE_CRON"),
-				Code: async () => {
-					const keys = Object.keys(this.batches);
-					for (let i = 0; i < keys.length; i++) {
-						const key = keys[i];
-						if (this.batches[key].records?.length > 0) {
-							if (this.batches[key].records.length > this.loggingWarnLimit) {
-								const length = this.batches[key].records.length;
-								const channelID = Number(key.split("-")[1]);
-								const channelData = sb.Channel.get(channelID);
+			this.messageCron = new CronJob(sb.Config.get("LOG_MESSAGE_CRON"), async () => {
+				const keys = Object.keys(this.batches);
+				for (let i = 0; i < keys.length; i++) {
+					const key = keys[i];
+					if (this.batches[key].records?.length > 0) {
+						if (this.batches[key].records.length > this.loggingWarnLimit) {
+							const length = this.batches[key].records.length;
+							const channelID = Number(key.split("-")[1]);
+							const channelData = sb.Channel.get(channelID);
 
-								await sb.Logger.log(
-									"Message.Warning",
-									`Channel "${channelData.Name}" exceeded logging limit ${length}/${this.loggingWarnLimit}`,
-									channelData,
-									null
-								);
-
-								this.batches[key].clear();
-								continue;
-							}
-
-							setTimeout(
-								() => this.batches[key]?.insert(),
-								i * 250
+							await sb.Logger.log(
+								"Message.Warning",
+								`Channel "${channelData.Name}" exceeded logging limit ${length}/${this.loggingWarnLimit}`,
+								channelData,
+								null
 							);
+
+							this.batches[key].clear();
+							continue;
 						}
+
+						setTimeout(
+							() => this.batches[key]?.insert(),
+							i * 250
+						);
 					}
 				}
 			});
@@ -121,19 +119,16 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 			).then(batch => (this.commandBatch = batch));
 
 			this.commandCollector = new Set();
-			this.commandCron = new sb.Cron({
-				Name: "command-cron",
-				Expression: sb.Config.get("LOG_COMMAND_CRON"),
-				Code: async () => {
-					if (!sb.Config.get("LOG_COMMAND_ENABLED") || !this.commandBatch?.ready) {
-						return;
-					}
-
-					await this.commandBatch.insert({ ignore: true });
-
-					this.commandCollector.clear();
+			this.commandCron = new CronJob(sb.Config.get("LOG_COMMAND_CRON"), async () => {
+				if (!sb.Config.get("LOG_COMMAND_ENABLED") || !this.commandBatch?.ready) {
+					return;
 				}
+
+				await this.commandBatch.insert({ ignore: true });
+
+				this.commandCollector.clear();
 			});
+
 			this.commandCron.start();
 			this.#crons.push(this.commandCron);
 		}
@@ -142,65 +137,58 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 			this.lastSeen = new Map();
 			this.lastSeenRunning = false;
 
-			this.lastSeenCron = new sb.Cron({
-				Name: "last-seen-cron",
-				Expression: sb.Config.get("LOG_LAST_SEEN_CRON"),
-				Defer: {
-					start: 5000,
-					end: 60000
-				},
-				Code: async () => {
-					if (!sb.Config.get("LOG_LAST_SEEN_ENABLED", false) || this.lastSeenRunning) {
-						return;
+			this.lastSeenCron = new CronJob(sb.Config.get("LOG_LAST_SEEN_CRON"), async () => {
+				if (!sb.Config.get("LOG_LAST_SEEN_ENABLED", false) || this.lastSeenRunning) {
+					return;
+				}
+
+				this.lastSeenRunning = true;
+
+				const data = [];
+				for (const [channelID, userMap] of this.lastSeen) {
+					for (const [userID, { count, date, message }] of userMap) {
+						data.push({
+							count,
+							channel: channelID,
+							date,
+							message,
+							user: userID
+						});
 					}
 
-					this.lastSeenRunning = true;
+					userMap.clear();
+				}
 
-					const data = [];
-					for (const [channelID, userMap] of this.lastSeen) {
-						for (const [userID, { count, date, message }] of userMap) {
-							data.push({
-								count,
-								channel: channelID,
-								date,
-								message,
-								user: userID
-							});
-						}
+				if (data.length === 0) {
+					this.lastSeenRunning = false;
+					return;
+				}
 
-						userMap.clear();
-					}
-
-					if (data.length === 0) {
-						this.lastSeenRunning = false;
-						return;
-					}
-
-					try {
-						await sb.Query.pool.batch(
-							sb.Utils.tag.trim `
-								INSERT INTO chat_data.Message_Meta_User_Alias
-								(User_Alias, Channel, Message_Count, Last_Message_Posted, Last_Message_Text)
-								VALUES (?, ?, ?, ?, ?)
-								ON DUPLICATE KEY UPDATE
-								Message_Count = Message_Count + VALUES(Message_Count),
-								Last_Message_Posted = VALUES(Last_Message_Posted),
-								Last_Message_Text = VALUES(Last_Message_Text)
-							`,
-							data.map(i => [
-								i.user,
-								i.channel,
-								i.count,
-								i.date,
-								i.message
-							])
-						);
-					}
-					finally {
-						this.lastSeenRunning = false;
-					}
+				try {
+					await sb.Query.pool.batch(
+						sb.Utils.tag.trim `
+							INSERT INTO chat_data.Message_Meta_User_Alias
+							(User_Alias, Channel, Message_Count, Last_Message_Posted, Last_Message_Text)
+							VALUES (?, ?, ?, ?, ?)
+							ON DUPLICATE KEY UPDATE
+							Message_Count = Message_Count + VALUES(Message_Count),
+							Last_Message_Posted = VALUES(Last_Message_Posted),
+							Last_Message_Text = VALUES(Last_Message_Text)
+						`,
+						data.map(i => [
+							i.user,
+							i.channel,
+							i.count,
+							i.date,
+							i.message
+						])
+					);
+				}
+				finally {
+					this.lastSeenRunning = false;
 				}
 			});
+
 			this.lastSeenCron.start();
 			this.#crons.push(this.lastSeenCron);
 		}
@@ -517,7 +505,7 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 	 */
 	destroy () {
 		for (const cron of this.#crons) {
-			cron.destroy();
+			cron.stop();
 		}
 		this.#crons = null;
 

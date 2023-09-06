@@ -35,6 +35,7 @@ export declare class User extends ClassTemplate {
     static readonly permissions: Permissions.Descriptor;
     static readonly dataCache: GenericCacheMap<User>;
     static readonly mapExpirationInterval: ReturnType<typeof setInterval>;
+
     static readonly mapCacheExpiration: number;
     static readonly redisCacheExpiration: number;
     static readonly pendingNewUsers: Map<string, Promise<User>>;
