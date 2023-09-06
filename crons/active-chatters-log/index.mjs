@@ -1,13 +1,13 @@
+let isTableAvailable;
+
 export const definition = {
-	Name: "active-chatters-log",
-	Expression: "0 */5 * * * *",
-	Description: "Logs the amount of currently active chatters.",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function activeChattersLog () {
-		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Active_Chatter_Log");
-		if (this.data.isTableAvailable === false) {
-			this.stop();
+	name: "active-chatters-log",
+	expression: "0 */5 * * * *",
+	description: "Logs the amount of currently active chatters.",
+	code: (async function activeChattersLog (cron) {
+		isTableAvailable ??= await sb.Query.isTablePresent("data", "Active_Chatter_Log");
+		if (isTableAvailable === false) {
+			cron.job.stop();
 			return;
 		}
 

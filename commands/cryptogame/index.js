@@ -1,3 +1,5 @@
+const { CronJob } = require("cron");
+
 module.exports = {
 	Name: "cryptogame",
 	Aliases: ["cg"],
@@ -7,356 +9,17 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (command => {
-		command.data.updateCron = new sb.Cron({
-			Name: "crypto-game-price-updater",
-			Description: "Regularly updates the prices used in the crypto-game command.",
-			Expression: "0 0 * * * *",
-			Code: (async function cryptoGamePriceUpdate () {
-				const ignoredAssets = ["VEF"];
-
-				const conditionalFixerIo = (async () => {
-					if (new sb.Date().hours % 12 !== 0) {
-						return { rates: {} };
-					}
-
-					return sb.Got("GenericAPI", {
-						prefixUrl: "https://data.fixer.io/api",
-						url: "latest",
-						throwHttpErrors: false,
-						responseType: "json",
-						searchParams: {
-							access_key: sb.Config.get("API_FIXER_IO")
-						}
-					}).json();
-				});
-
-				const [cryptoData, currencyData, goldData, silverData] = await Promise.allSettled([
-					sb.Got("GenericAPI", {
-						url: "https://min-api.cryptocompare.com/data/price",
-						searchParams: {
-							fsym: "EUR",
-							tsyms: "BTC,XRP,DOGE,ETH,BCH,LTC,EOS,XLM,BNB,USDT,DOT,ADA,LINK,XMR,ANAL,SHIB"
-						},
-						headers: {
-							Authorization: `Apikey ${sb.Config.get("API_CRYPTO_COMPARE")}`
-						}
-					}).json(),
-
-					conditionalFixerIo(),
-
-					sb.Got("GenericAPI", {
-						url: "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/EUR"
-					}).json(),
-
-					sb.Got("GenericAPI", {
-						url: "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAG/EUR"
-					}).json()
-				]);
-
-				const totalData = {
-					...(cryptoData?.value ?? {}),
-					...(currencyData?.value.rates ?? {})
-				};
-
-				if (goldData.status === "fulfilled") {
-					totalData.XAU = goldData.value[0].spreadProfilePrices[0].bid;
-				}
-				if (silverData.status === "fulfilled") {
-					totalData.XAG = silverData.value[0].spreadProfilePrices[0].bid;
-				}
-
-				const now = new sb.Date();
-				const uppercaseOnly = /^[A-Z]+$/;
-				const promises = Object.entries(totalData).map(async ([code, value]) => {
-					if (!uppercaseOnly.test(code)) {
-						return;
-					}
-					else if (ignoredAssets.includes(code)) {
-						return;
-					}
-
-					const row = await sb.Query.getRow("crypto_game", "Asset");
-					await row.load(code, true);
-					if (!row.values.Code) {
-						row.values.Code = code;
-					}
-
-					const adjustedValue = (code === "XAU" || code === "XAG")
-						? value
-						: (1 / value);
-
-					row.values.Price = sb.Utils.round(adjustedValue, 9, { direction: "round" });
-					row.values.Last_Update = now;
-					await row.save({ skipLoad: true });
-				});
-
-				await Promise.all(promises);
-			})
-		});
-		command.data.updateCron.start();
-
-		const baseAsset = {
-			Code: "EUR",
-			Price: 1
-		};
-
-		const precisionRound = (num, precision, direction) => (
-			Number(sb.Utils.round(num, precision, { direction }).toPrecision(precision + 1))
-		);
-
-		const getAssetData = async (code) => {
-			const data = await sb.Query.getRecordset(rs => rs
-				.select("Code", "Price")
-				.from("crypto_game", "Asset")
-				.where("Code = %s", code.toUpperCase())
-				.single()
-				.limit(1)
-			);
-
-			return data ?? null;
-		};
-
-		const getPortfolioData = async (identifier) => {
-			const portfolioID = await sb.Query.getRecordset(rs => {
-				rs.select("ID")
-					.from("crypto_game", "Portfolio")
-					.where("Active = %b", true)
-					.limit(1)
-					.single()
-					.flat("ID");
-
-				if (typeof identifier === "number") {
-					rs.where("Owner = %n", identifier);
-				}
-				else if (typeof identifier === "string") {
-					rs.where("ID = %s", identifier);
-				}
-				else {
-					throw new sb.Error({
-						message: "Invalid portfolio identifier provided",
-						args: { identifier }
-					});
-				}
-
-				return rs;
-			});
-
-			if (!portfolioID) {
-				return null;
-			}
-
-			const data = await sb.Query.getRecordset(rs => rs
-				.select("Asset AS Code", "Amount")
-				.from("crypto_game", "Portfolio_Asset")
-				.where("Portfolio = %s", portfolioID)
-			);
-
-			return {
-				ID: portfolioID,
-				assets: data.map(i => ({
-					Code: i.Code,
-					Amount: sb.Utils.round(i.Amount, 6, { direction: "floor" })
-				}))
-			};
-		};
-
-		const parseArguments = async (input) => {
-			const result = {};
-			for (const [key, value] of Object.entries(input)) {
-				if (key === "user") {
-					if (!value) {
-						return {
-							success: false,
-							reply: "No user provided!"
-						};
-					}
-
-					const userData = await sb.User.get(value);
-					if (!userData) {
-						return {
-							success: false,
-							reply: "Invalid user provided!"
-						};
-					}
-
-					result.user = userData;
-				}
-				else if (key === "asset") {
-					if (!value) {
-						return {
-							success: false,
-							reply: "No asset provided!"
-						};
-					}
-
-					const assetData = await getAssetData(value);
-					if (!assetData) {
-						return {
-							success: false,
-							reply: "Invalid asset provided! Check list: https://supinic.com/crypto-game/asset/list"
-						};
-					}
-
-					result.asset = assetData;
-				}
-				else if (key === "amount") {
-					if (!value) {
-						return {
-							success: false,
-							reply: "No amount provided!"
-						};
-					}
-					else if (value === "all") {
-						result.amount = "all";
-					}
-					else if (value.endsWith("%")) {
-						result.amount = value.trim();
-					}
-					else {
-						const amount = Number(value);
-						if (!Number.isFinite(amount) || amount <= 0) {
-							return {
-								success: false,
-								reply: `Invalid amount provided!`
-							};
-						}
-
-						result.amount = amount;
-					}
-				}
-			}
-
-			return result;
-		};
-
-		const checkPortfolioAsset = (portfolioData, assetData, amount) => {
-			const asset = portfolioData.assets.find(i => i.Code === assetData.Code);
-			if (!asset) {
-				return `You don't have any ${assetData.Code}!`;
-			}
-			else if (asset.Amount < amount) {
-				return `You don't have enough ${assetData.Code}! You have ${asset.Amount}, and need ${amount}.`;
-			}
-			else {
-				return true;
-			}
-		};
-
-		const updatePortfolioAsset = async (portfolioData, assetData, amount) => {
-			if (typeof portfolioData === "string") {
-				portfolioData = await getPortfolioData(portfolioData);
-			}
-
-			const targetAsset = portfolioData.assets.find(i => i.Code === assetData.Code);
-			if (!targetAsset) {
-				if (amount <= 0) {
-					throw new sb.Error({
-						message: "Invalid operation - no asset, negative amount"
-					});
-				}
-
-				const row = await sb.Query.getRow("crypto_game", "Portfolio_Asset");
-				row.setValues({
-					Portfolio: portfolioData.ID,
-					Asset: assetData.Code,
-					Amount: amount
-				});
-				await row.save({ skipLoad: true });
-			}
-			else {
-				if ((targetAsset.Amount + amount) < 0) {
-					throw new sb.Error({
-						message: "Invalid operation - asset exists, negative net amount"
-					});
-				}
-
-				await sb.Query.getRecordUpdater(ru => ru
-					.update("crypto_game", "Portfolio_Asset")
-					.set("Amount", {
-						useField: true,
-						value: `Amount + ${amount}`
-					})
-					.where("Portfolio = %s", portfolioData.ID)
-					.where("Asset = %s", assetData.Code)
-				);
-			}
-		};
-
-		const createTransferTransaction = async (sourcePortfolio, targetPortfolio, assetData, amount) => {
-			const row = await sb.Query.getRow("crypto_game", "Transaction");
-			row.setValues({
-				Source_Portfolio: sourcePortfolio.ID,
-				Source_Asset: assetData.Code,
-				Source_Amount: amount,
-				Exchange_Rate: null,
-				Target_Portfolio: targetPortfolio.ID,
-				Target_Asset: assetData.Code,
-				Target_Amount: amount
-			});
-
-			await Promise.all([
-				row.save({ skipLoad: true }),
-				updatePortfolioAsset(sourcePortfolio, assetData, -amount),
-				updatePortfolioAsset(targetPortfolio, assetData, amount)
-			]);
-		};
-
-		const createConvertTransaction = async (portfolioData, sourceAsset, targetAsset, rawSourceAmount) => {
-			// const sourceAmount = precisionRound(rawSourceAmount, 9, "round");
-			const exchangeRate = targetAsset.Price / sourceAsset.Price;
-			const targetAmount = precisionRound(rawSourceAmount / exchangeRate, 6, "round");
-			let sourceAmount = precisionRound(targetAmount * exchangeRate, 6, "round");
-
-			const checkAmount = portfolioData.assets.find(i => i.Code === sourceAsset.Code)?.Amount ?? 0;
-			if (sourceAmount > checkAmount) {
-				sourceAmount = checkAmount;
-			}
-
-			const row = await sb.Query.getRow("crypto_game", "Transaction");
-			row.setValues({
-				Source_Portfolio: portfolioData.ID,
-				Source_Asset: sourceAsset.Code,
-				Source_Amount: sourceAmount,
-				Exchange_Rate: exchangeRate,
-				Target_Portfolio: portfolioData.ID,
-				Target_Asset: targetAsset.Code,
-				Target_Amount: targetAmount
-			});
-
-			await Promise.all([
-				row.save({ skipLoad: true }),
-				updatePortfolioAsset(portfolioData, sourceAsset, -sourceAmount),
-				updatePortfolioAsset(portfolioData, targetAsset, targetAmount)
-			]);
-
-			return {
-				exchangeRate,
-				sourceAmount,
-				targetAmount
-			};
-		};
-
-		const destroy = (command) => {
-			if (command.data.updateCron) {
-				command.data.updateCron.destroy();
-			}
-		};
-
-		return {
-			availableCommands: ["assets", "average", "buy", "check", "leaderboard", "register", "portfolios", "prices", "rank", "sell", "total"],
-			destroy,
-
-			baseAsset,
-			getPortfolioData,
-			parseArguments,
-			checkPortfolioAsset,
-			updatePortfolioAsset,
-			createConvertTransaction,
-			createTransferTransaction
-		};
-	}),
-	Code: (async function cryptoGame (context, command, ...args) {
+	Static_Data: null,
+	initialize: function () {
+		const { cryptoGamePriceUpdate } = require("./update-prices-cron.js");
+		this.data.updateCronJob = new CronJob("0 0 * * * *", () => cryptoGamePriceUpdate());
+		this.data.updateCronJob.start();
+	},
+	destroy: function () {
+		this.data.updateCronJob.stop();
+		this.data.updateCronJob = null;
+	},
+	Code: async function cryptoGame (context, command, ...args) {
 		const {
 			availableCommands,
 			baseAsset,
@@ -365,7 +28,7 @@ module.exports = {
 			getPortfolioData,
 			parseArguments,
 			updatePortfolioAsset
-		} = this.staticData;
+		} = require("./game.js");
 
 		command = command?.toLowerCase();
 		if (!command || !availableCommands.includes(command)) {
@@ -588,8 +251,8 @@ module.exports = {
 				};
 			}
 		}
-	}),
-	Dynamic_Description: (async (prefix) => [
+	},
+	Dynamic_Description: async (prefix) => [
 		`<h4>The Crypto Game</h4>`,
 		"Register your portfolio, receive some fake cash, invest it to various currencies and assets!",
 		"Who will be the one to profit, or crash the most?",
@@ -656,5 +319,5 @@ module.exports = {
 		"Posts a link to the list of portfolios, their owners, and the converted total prices.",
 		`You can check it here: <a href="/crypto-game/portfolio/list">List</a>`,
 		""
-	])
+	]
 };

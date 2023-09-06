@@ -1,21 +1,22 @@
+let isTableAvailable;
+let previousSuggestions;
+
 export const definition = {
-	Name: "suggestion-notification-system",
-	Expression: "0 * * * * *",
-	Description: "Manages sending notifications about suggestions being changed. This is to notify users (via private system reminders) that their suggestion's status has changed.",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function notifyOnSuggestionChange () {
-		if (typeof this.data.isTableAvailable === "undefined") {
+	name: "suggestion-notification-system",
+	expression: "0 * * * * *",
+	description: "Manages sending notifications about suggestions being changed. This is to notify users (via private system reminders) that their suggestion's status has changed.",
+	code: (async function notifyOnSuggestionChange (cron) {
+		if (typeof isTableAvailable === "undefined") {
 			const [subscription, suggestion] = await Promise.all([
 				sb.Query.isTablePresent("data", "Event_Subscription"),
 				sb.Query.isTablePresent("data", "Suggestion")
 			]);
 
-			this.data.isTableAvailable = (subscription && suggestion);
+			isTableAvailable = (subscription && suggestion);
 		}
 
-		if (this.data.isTableAvailable === false) {
-			this.stop();
+		if (isTableAvailable === false) {
+			cron.job.stop();
 			return;
 		}
 
@@ -35,12 +36,12 @@ export const definition = {
 			.orderBy("ID DESC")
 		);
 
-		if (!this.data.previousSuggestions) {
-			this.data.previousSuggestions = suggestions;
+		if (!previousSuggestions) {
+			previousSuggestions = suggestions;
 			return;
 		}
 
-		for (const oldRow of this.data.previousSuggestions) {
+		for (const oldRow of previousSuggestions) {
 			const newRow = suggestions.find(i => i.ID === oldRow.ID);
 			if (!newRow) {
 				continue;
@@ -73,6 +74,6 @@ export const definition = {
 			}, true);
 		}
 
-		this.data.previousSuggestions = suggestions;
+		previousSuggestions = suggestions;
 	})
 };

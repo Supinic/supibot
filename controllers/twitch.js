@@ -1,3 +1,4 @@
+const { CronJob } = require("cron");
 const MessageScheduler = require("message-scheduler");
 const DankTwitch = require("dank-twitch-irc");
 
@@ -120,104 +121,90 @@ module.exports = class TwitchController extends require("./template.js") {
 			this.client.joinAll(channelList);
 		}
 
-		this.data.crons = [
-			new sb.Cron({
-				Name: "channels-live-status",
-				Expression: "0 */1 * * * *",
-				Description: "Fetches the online status of all active Twitch channels. Basically, just caches the current status so that further API calls are not necessary.",
-				Defer: {
-					start: 0,
-					end: 30000
-				},
-				Code: async () => {
-					let counter = 0;
-					const promises = [];
-					const batchSize = 100;
-					const rawChannelList = await sb.Channel.getLiveEventSubscribedChannels("twitch");
-					const channelList = rawChannelList.filter(i => i.Specific_ID);
+		this.data.channelLiveStatus = new CronJob("0 */1 * * * *", async () => {
+			let counter = 0;
+			const promises = [];
+			const batchSize = 100;
+			const rawChannelList = await sb.Channel.getLiveEventSubscribedChannels("twitch");
+			const channelList = rawChannelList.filter(i => i.Specific_ID);
 
-					while (counter < channelList.length) {
-						const sliceString = channelList
-							.slice(counter, counter + batchSize)
-							.map(i => `user_id=${i.Specific_ID}`)
-							.join("&");
+			while (counter < channelList.length) {
+				const sliceString = channelList
+					.slice(counter, counter + batchSize)
+					.map(i => `user_id=${i.Specific_ID}`)
+					.join("&");
 
-						promises.push(
-							sb.Got("Helix", {
-								url: `streams?${sliceString}`,
-								responseType: "json"
-							})
-						);
+				promises.push(
+					sb.Got("Helix", {
+						url: `streams?${sliceString}`,
+						responseType: "json"
+					})
+				);
 
-						counter += batchSize;
+				counter += batchSize;
+			}
+
+			const streams = [];
+			const results = await Promise.all(promises);
+			for (const partialResult of results) {
+				const streamsBlock = partialResult.body?.data ?? [];
+				streams.push(...streamsBlock);
+			}
+
+			const channelPromises = channelList.map(async (channelData) => {
+				const stream = streams.find(i => channelData.Specific_ID === String(i.user_id));
+				const streamData = await channelData.getStreamData();
+
+				if (!stream) {
+					if (streamData.live === true) {
+						channelData.events.emit("offline", {
+							event: "offline",
+							channel: channelData
+						});
 					}
 
-					const streams = [];
-					const results = await Promise.all(promises);
-					for (const partialResult of results) {
-						const streamsBlock = partialResult.body?.data ?? [];
-						streams.push(...streamsBlock);
-					}
-
-					const channelPromises = channelList.map(async (channelData) => {
-						const stream = streams.find(i => channelData.Specific_ID === String(i.user_id));
-						const streamData = await channelData.getStreamData();
-
-						if (!stream) {
-							if (streamData.live === true) {
-								channelData.events.emit("offline", {
-									event: "offline",
-									channel: channelData
-								});
-							}
-
-							channelData.events.emit("offline-passthrough", {
-								event: "offline-passthrough",
-								channel: channelData
-							});
-
-							streamData.live = false;
-							streamData.stream = {};
-						}
-						else {
-							const currentStreamData = {
-								game: stream.game_name,
-								since: new sb.Date(stream.started_at),
-								status: stream.title,
-								viewers: stream.viewer_count
-							};
-
-							if (!streamData.live) {
-								channelData.events.emit("online", {
-									event: "online",
-									stream: currentStreamData.stream,
-									channel: channelData
-								});
-							}
-
-							channelData.events.emit("online-passthrough", {
-								event: "online-passthrough",
-								stream: currentStreamData.stream,
-								channel: channelData
-							});
-
-							streamData.live = true;
-							streamData.stream = currentStreamData;
-						}
-
-						await channelData.setStreamData(streamData);
+					channelData.events.emit("offline-passthrough", {
+						event: "offline-passthrough",
+						channel: channelData
 					});
 
-					await Promise.all(channelPromises);
+					streamData.live = false;
+					streamData.stream = {};
 				}
-			})
-		];
+				else {
+					const currentStreamData = {
+						game: stream.game_name,
+						since: new sb.Date(stream.started_at),
+						status: stream.title,
+						viewers: stream.viewer_count
+					};
 
-		// Disabled temporarily - different channel join behaviour
-		// this.data.crons[0].start();
+					if (!streamData.live) {
+						channelData.events.emit("online", {
+							event: "online",
+							stream: currentStreamData.stream,
+							channel: channelData
+						});
+					}
+
+					channelData.events.emit("online-passthrough", {
+						event: "online-passthrough",
+						stream: currentStreamData.stream,
+						channel: channelData
+					});
+
+					streamData.live = true;
+					streamData.stream = currentStreamData;
+				}
+
+				await channelData.setStreamData(streamData);
+			});
+
+			await Promise.all(channelPromises);
+		});
+
 		if (this.platform.Data.trackChannelsLiveStatus) {
-			// this.data.crons[1].start();
-			this.data.crons[0].start();
+			this.data.channelLiveStatus.start();
 		}
 	}
 

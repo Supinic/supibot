@@ -1,3 +1,5 @@
+const { CronJob } = require("cron");
+
 module.exports = {
 	Name: "subscribe",
 	Aliases: ["unsubscribe"],
@@ -15,11 +17,8 @@ module.exports = {
 		this.data.crons = new Set();
 
 		for (const def of rssSubscriptions) {
-			const cron = new sb.Cron({
-				Name: `${def.name} event subscription handler`,
-				Expression: def.cronExpression ?? "0 */5 * * * *",
-				Code: () => handleGenericSubscription(def)
-			});
+			const expression = def.cronExpression ?? "0 */5 * * * *";
+			const cron = new CronJob(expression, () => handleGenericSubscription(def));
 
 			cron.start();
 			this.data.crons.add(cron);

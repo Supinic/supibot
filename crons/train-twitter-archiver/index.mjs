@@ -1,13 +1,8 @@
 export const definition = {
-	Name: "train-twitter-archiver",
-	Expression: "0 */15 * * * *",
-	Description: "Archives @Trainwreckstv's tweets",
-	Defer: (() => ({
-		start: 0,
-		end: 600000
-	})),
-	Type: "Bot",
-	Code: (async function archiveTrainsTweets () {
+	name: "train-twitter-archiver",
+	expression: "0 */15 * * * *",
+	description: "Archives @Trainwreckstv's tweets",
+	code: (async function archiveTrainsTweets () {
 		if (!sb.Command) {
 			return;
 		}

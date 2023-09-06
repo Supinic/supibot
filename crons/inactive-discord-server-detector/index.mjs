@@ -1,10 +1,8 @@
 export const definition = {
-	Name: "inactive-discord-server-detector",
-	Expression: "0 0 12 * * 2",
-	Description: "Logs the amount of currently active chatters.",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function detectInactiveDiscordServers () {
+	name: "inactive-discord-server-detector",
+	expression: "0 0 12 * * 2",
+	description: "Logs the amount of currently active chatters.",
+	code: (async function detectInactiveDiscordServers () {
 		// Runs every Tuesday, at 12:00 (noon)
 		const discord = sb.Platform.get("discord").client;
 		const controller = sb.Platform.get("discord").controller;

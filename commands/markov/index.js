@@ -1,6 +1,32 @@
+const { CronJob } = require("cron");
+
 const MODEL_SIZE_THRESHOLD = 100;
 const WORD_LIMIT = 20;
 const DEFAULT_WORD_AMOUNT = 15;
+
+const updateMarkovWordList = async () => {
+	// early return - avoid errors during modules loading
+	if (!sb.ChatModule || !sb.Channel) {
+		return;
+	}
+
+	const module = sb.ChatModule.get("async-markov-experiment");
+	if (!module || !module.data.markovs) {
+		return;
+	}
+
+	const promises = [];
+	for (const [channelID, markov] of module.data.markovs.entries()) {
+		const words = markov.keys.sort();
+
+		promises.push(sb.Cache.setByPrefix("markov-word-list", words, {
+			keys: { channelID },
+			expiry: 864e5
+		}));
+	}
+
+	await Promise.all(promises);
+};
 
 module.exports = {
 	Name: "markov",
@@ -20,41 +46,14 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	initialize: function () {
-		const updateCron = new sb.Cron({
-			Name: "markov-word-list-updater",
-			Description: "Regularly updates the available words in $markov.",
-			Expression: "0 * * * * *",
-			Code: (async function markovUpdater () {
-				// early return - avoid errors during modules loading
-				if (!sb.ChatModule || !sb.Channel) {
-					return;
-				}
+		const updateCronJob = new CronJob("0 * * * * *", () => updateMarkovWordList());
 
-				const module = sb.ChatModule.get("async-markov-experiment");
-				if (!module || !module.data.markovs) {
-					return;
-				}
-
-				const promises = [];
-				for (const [channelID, markov] of module.data.markovs.entries()) {
-					const words = markov.keys.sort();
-
-					promises.push(sb.Cache.setByPrefix("markov-word-list", words, {
-						keys: { channelID },
-						expiry: 864e5
-					}));
-				}
-
-				await Promise.all(promises);
-			})
-		});
-
-		updateCron.start();
-		this.data.updateCron = updateCron;
+		updateCronJob.start();
+		this.data.updateCronJob = updateCronJob;
 	},
 	destroy: function () {
-		if (this.data.updateCron) {
-			this.data.updateCron.destroy();
+		if (this.data.updateCronJob) {
+			this.data.updateCronJob.stop();
 		}
 
 		const module = sb.ChatModule.get("async-markov-experiment");

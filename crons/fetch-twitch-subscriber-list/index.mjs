@@ -1,10 +1,8 @@
 export const definition = {
-	Name: "fetch-twitch-subscriber-list",
-	Expression: "0 0 * * * *",
-	Description: "Fetches the current subscriber list, then saves it to sb.Cache",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function fetchTwitchSubscriberList () {
+	name: "fetch-twitch-subscriber-list",
+	expression: "0 0 * * * *",
+	description: "Fetches the current subscriber list, then saves it to sb.Cache",
+	code: (async function fetchTwitchSubscriberList () {
 		const requiredConfigs = [
 			"TWITCH_GQL_CLIENT_ID",
 			"TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN",

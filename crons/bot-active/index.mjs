@@ -1,10 +1,8 @@
 export const definition = {
-	Name: "bot-active",
-	Expression: "0 */10 * * * *",
-	Description: "Pings the bot active API to make sure supibot is being registered as online",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function verifyBotAcitivity () {
+	name: "bot-active",
+	expression: "0 */10 * * * *",
+	description: "Pings the bot active API to make sure supibot is being registered as online",
+	code: (async function verifyBotAcitivity (cron) {
 		if (!sb.Platform || !sb.User) {
 			return;
 		}
@@ -13,14 +11,14 @@ export const definition = {
 		const userData = await sb.User.get(platform.Self_Name);
 		if (!userData) {
 			console.warn("Bot-activity refresh cron is missing bot's user data");
-			this.stop();
+			cron.job.stop();
 			return;
 		}
 
 		const authKey = await userData.getDataProperty("authKey");
 		if (!authKey) {
 			console.warn("Bot-activity refresh cron is missing bot's auth key");
-			this.stop();
+			cron.job.stop();
 			return;
 		}
 

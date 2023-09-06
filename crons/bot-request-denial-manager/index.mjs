@@ -1,19 +1,19 @@
+let isTableAvailable;
+let requestIDs;
+
 export const definition = {
-	Name: "bot-request-denial-manager",
-	Expression: "*/15 * * * *",
-	Description: "Sends out private messages whenever a bot request suggestion is denied. Only runs on Tuesdays",
-	Defer: null,
-	Type: "Bot",
-	Code: (async function botRequestDenialManager () {
-		this.data.isTableAvailable ??= await sb.Query.isTablePresent("data", "Suggestion");
-		if (this.data.isTableAvailable === false) {
-			this.stop();
+	name: "bot-request-denial-manager",
+	expression: "*/15 * * * *",
+	description: "Sends out private messages whenever a bot request suggestion is denied. Only runs on Tuesdays",
+	code: (async function botRequestDenialManager (cron) {
+		isTableAvailable ??= await sb.Query.isTablePresent("data", "Suggestion");
+		if (isTableAvailable === false) {
+			cron.job.stop();
 			return;
 		}
 
-		this.data.requestIDs ??= [];
-		if (this.data.requestIDs.length === 0) {
-			this.data.requestIDs = await sb.Query.getRecordset(rs => rs
+		if (!requestIDs) {
+			requestIDs = await sb.Query.getRecordset(rs => rs
 				.select("ID")
 				.from("data", "Suggestion")
 				.where("Category = %s", "Bot addition")
@@ -35,7 +35,7 @@ export const definition = {
 			})
 			.where("Category = %s", "Bot addition")
 			.where("Status IN %s+", ["Denied", "Dismissed"])
-			.where("Suggestion.ID IN %n+", this.data.requestIDs)
+			.where("Suggestion.ID IN %n+", requestIDs)
 		);
 
 		if (requests.length === 0) {
@@ -50,9 +50,9 @@ export const definition = {
 				request.Username
 			);
 
-			const index = this.data.requestIDs.indexOf(request.ID);
+			const index = requestIDs.indexOf(request.ID);
 			if (index !== -1) {
-				this.data.requestIDs.splice(index, 1);
+				requestIDs.splice(index, 1);
 			}
 		}
 	})
