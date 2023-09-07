@@ -30,7 +30,7 @@ export const definition = {
 				return;
 			}
 
-			const formData = new sb.Got.FormData();
+			const formData = new FormData();
 			formData.append("reqtype", "urlupload");
 			formData.append("url", `https://i.imgur.com/${link}`);
 
