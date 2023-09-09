@@ -1,3 +1,8 @@
+// @todo possibly move into some kind of config file
+const bannedCommandCombinations = [
+	["fish", "translate"]
+];
+
 module.exports = {
 	Name: "pipe",
 	Aliases: null,
@@ -58,6 +63,7 @@ module.exports = {
 
 		let hasExternalInput = false;
 		const nullCommand = sb.Command.get("null");
+		const usedCommandNames = [];
 		const { prefix } = sb.Command;
 
 		for (let i = 0; i < invocations.length; i++) {
@@ -92,6 +98,8 @@ module.exports = {
 				hasExternalInput = true;
 			}
 
+			usedCommandNames.push(commandData.Name);
+
 			const { aliasTry } = context.append;
 			if (commandData.Name === "alias" && aliasTry?.userName && (cmdArgs[0] === "run" || commandString === "$")) {
 				if (cmdArgs[0] === "run") {
@@ -99,6 +107,22 @@ module.exports = {
 				}
 
 				invocations[i] = ["alias", "try", aliasTry.userName, ...cmdArgs].join(" ");
+			}
+		}
+
+		for (const combination of bannedCommandCombinations) {
+			let index = 0;
+			for (const commandName of usedCommandNames) {
+				if (commandName === combination[index]) {
+					index++;
+				}
+
+				if (!combination[index]) {
+					return {
+						success: false,
+						reply: `Your pipe contains a combination of commands that is not allowed! Commands: ${combination.join(" → ")}`
+					};
+				}
 			}
 		}
 
