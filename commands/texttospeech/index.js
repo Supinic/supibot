@@ -1,3 +1,11 @@
+const tts = {
+	enabled: null,
+	url: null,
+	maxCooldown: null,
+	limit: null,
+	locales: []
+};
+
 module.exports = {
 	Name: "texttospeech",
 	Aliases: ["tts"],
@@ -10,263 +18,32 @@ module.exports = {
 		{ name: "speed", type: "number" }
 	],
 	Whitelist_Response: "Check out the possible voices and locales here: https://supinic.com/stream/tts",
-	Static_Data: (command => {
-		const limit = 30_000;
+	Static_Data: null,
+	initialize: function () {
+		if (!sb.Config.has("LOCAL_IP", true) || !sb.Config.has("LOCAL_PLAY_SOUNDS_PORT", true)) {
+			console.warn("$tts: Listener not configured - will be unavailable");
+			tts.enabled = false;
+		}
+		else {
+			tts.url = `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}`;
+			tts.enabled = true;
 
-		return {
-			limit,
-			maxCooldown: (command.Cooldown + (limit - 10000) * 10),
-			locales: [
-				{
-					locale: "en-gb",
-					language: "English",
-					code: "en"
-				},
-				{
-					locale: "en-us",
-					language: "English",
-					code: "en"
-				},
-				{
-					locale: "en-au",
-					language: "English",
-					code: "en"
-				},
-				{
-					locale: "en-in",
-					language: "English",
-					code: "en"
-				},
-				{
-					locale: "ar",
-					language: "Arabic",
-					code: "ar"
-				},
-				{
-					locale: "bn-bd",
-					language: "Bengali",
-					code: "bn"
-				},
-				{
-					locale: "zh-cn",
-					language: "Chinese",
-					code: "zh"
-				},
-				{
-					locale: "cs-cz",
-					language: "Czech",
-					code: "cs"
-				},
-				{
-					locale: "da-dk",
-					language: "Danish",
-					code: "da"
-				},
-				{
-					locale: "nl-nl",
-					language: "Dutch",
-					code: "nl"
-				},
-				{
-					locale: "et-ee",
-					language: "Estonian",
-					code: "et"
-				},
-				{
-					locale: "tl-ph",
-					language: "Filipino",
-					code: "tl"
-				},
-				{
-					locale: "fi-fi",
-					language: "Finnish",
-					code: "fi"
-				},
-				{
-					locale: "fr-fr",
-					language: "French",
-					code: "fr"
-				},
-				{
-					locale: "fr-ca",
-					language: "French",
-					code: "fr"
-				},
-				{
-					locale: "de-de",
-					language: "German",
-					code: "de"
-				},
-				{
-					locale: "el-gr",
-					language: "Greek",
-					code: "el"
-				},
-				{
-					locale: "hi-in",
-					language: "Hindi",
-					code: "hi"
-				},
-				{
-					locale: "hu-hu",
-					language: "Hungarian",
-					code: "hu"
-				},
-				{
-					locale: "it-it",
-					language: "Italian",
-					code: "it"
-				},
-				{
-					locale: "id-id",
-					language: "Indonesian",
-					code: "id"
-				},
-				{
-					locale: "ja-jp",
-					language: "Japanese",
-					code: "ja"
-				},
-				{
-					locale: "jw-id",
-					language: "Javanese",
-					code: "jv"
-				},
-				{
-					locale: "km-kh",
-					language: "Khmer",
-					code: "my"
-				},
-				{
-					locale: "ko-kr",
-					language: "Korean",
-					code: "ko"
-				},
-				{
-					locale: "la",
-					language: "Latin",
-					code: "la"
-				},
-				{
-					locale: "ml-in",
-					language: "Malayalam",
-					code: "ml"
-				},
-				{
-					locale: "mr-in",
-					language: "Marathi",
-					code: "mr"
-				},
-				{
-					locale: "my-mm",
-					language: "Burmese",
-					code: "my"
-				},
-				{
-					locale: "ne-np",
-					language: "Nepali",
-					code: "ne"
-				},
-				{
-					locale: "nb-no",
-					language: "Norwegian",
-					code: "no"
-				},
-				{
-					locale: "pl-pl",
-					language: "Polish",
-					code: "pl"
-				},
-				{
-					locale: "pt-pt",
-					language: "Portuguese",
-					code: "pt"
-				},
-				{
-					locale: "pt-br",
-					language: "Portuguese",
-					code: "pt"
-				},
-				{
-					locale: "ro-ro",
-					language: "Romanian",
-					code: "ro"
-				},
-				{
-					locale: "ru-ru",
-					language: "Russian",
-					code: "ru"
-				},
-				{
-					locale: "si-lk",
-					language: "Sinhala",
-					code: "si"
-				},
-				{
-					locale: "sk-sk",
-					language: "Slovak",
-					code: "sk"
-				},
-				{
-					locale: "es-es",
-					language: "Spanish",
-					code: "es"
-				},
-				{
-					locale: "es-mx",
-					language: "Spanish",
-					code: "es"
-				},
-				{
-					locale: "su-sd",
-					language: "Sundanese",
-					code: "su"
-				},
-				{
-					locale: "sv-se",
-					language: "Swedish",
-					code: "sv"
-				},
-				{
-					locale: "ta-in",
-					language: "Tamil",
-					code: "ta"
-				},
-				{
-					locale: "te-in",
-					language: "Telugu",
-					code: "te"
-				},
-				{
-					locale: "th-th",
-					language: "Thai",
-					code: "th"
-				},
-				{
-					locale: "tr-tr",
-					language: "Turkish",
-					code: "tr"
-				},
-				{
-					locale: "uk-ua",
-					language: "Ukrainian",
-					code: "uk"
-				},
-				{
-					locale: "vi-vn",
-					language: "Vietnamese",
-					code: "vi"
-				},
-				{
-					locale: "cy-gb",
-					language: "Welsh",
-					code: "cy"
-				}
-			]
-		};
-	}),
+			const { limit, locales } = require("./tts-config.json");
+			tts.limit = limit;
+			tts.maxCooldown = this.Cooldown + (limit - 10_000) * 10;
+			tts.locales = locales;
+
+			this.data.pending = false;
+		}
+	},
 	Code: (async function textToSpeech (context, ...args) {
-		if (args.length === 0) {
+		if (!tts.enabled) {
+			return {
+				success: false,
+				reply: "Local playsound listener is not configured!"
+			};
+		}
+		else if (args.length === 0) {
 			return {
 				cooldown: 5000,
 				success: false,
@@ -278,15 +55,17 @@ module.exports = {
 				reply: "Text-to-speech is currently disabled!"
 			};
 		}
-		else if (!sb.Config.get("TTS_MULTIPLE_ENABLED")) {
+
+		if (!sb.Config.get("TTS_MULTIPLE_ENABLED")) {
 			if (this.data.pending) {
 				return {
 					reply: "Someone else is using the TTS right now, and multiple TTS is not available right now!",
 					cooldown: { length: 2500 }
 				};
 			}
-
-			this.data.pending = true;
+			else {
+				this.data.pending = true;
+			}
 		}
 
 		const speed = context.params.speed ?? 1;
@@ -302,15 +81,14 @@ module.exports = {
 		let input = context.params.lang ?? "en-us";
 
 		if (input === "random") {
-			const randomItem = sb.Utils.randArray(this.staticData.locales);
+			const randomItem = sb.Utils.randArray(tts.locales);
 			input = randomItem.locale;
 		}
 		else {
 			code = sb.Utils.modules.languageISO.getCode(input);
 		}
 
-		const { locales } = this.staticData;
-		const currentLocale = locales.find(i => i.locale === input || i.code === code);
+		const currentLocale = tts.locales.find(i => i.locale === input || i.code === code);
 		if (!currentLocale) {
 			this.data.pending = false;
 			return {
@@ -320,26 +98,29 @@ module.exports = {
 
 		let messageTime;
 		let result = null;
-
 		try {
 			messageTime = process.hrtime.bigint();
 
-			// @todo refactor to use local sb.Got instance when LocalRequest is refactored
-			result = await sb.LocalRequest.playTextToSpeech({
-				tts: [{
-					locale: currentLocale.locale,
-					text: args.join(" "),
-					speed
-				}],
-				volume: sb.Config.get("TTS_VOLUME"),
-				limit: this.staticData.limit
+			const response = await sb.Got("GenericAPI", {
+				url: this.url,
+				responseType: "text",
+				searchParams: new URLSearchParams({
+					tts: JSON.stringify([{
+						locale: currentLocale.locale,
+						text: args.join(" "),
+						speed
+					}]),
+					volume: sb.Config.get("TTS_VOLUME"),
+					limit: tts.limit
+				})
 			});
 
 			messageTime = process.hrtime.bigint() - messageTime;
+			result = (response.body === "true");
 		}
 		catch (e) {
-			console.log(e);
 			await sb.Config.set("TTS_ENABLED", false);
+
 			return {
 				reply: "TTS Listener encountered an error or is turned on. Turning off text to speech!"
 			};
@@ -360,19 +141,23 @@ module.exports = {
 			? (this.Cooldown + (duration - 10000) * 10)
 			: this.Cooldown;
 
-		if (cooldown > this.staticData.maxCooldown) {
-			cooldown = this.staticData.maxCooldown;
+		if (cooldown > tts.maxCooldown) {
+			cooldown = tts.maxCooldown;
 		}
 
 		return {
-			reply: `Your message has been successfully played on TTS! It took ${duration / 1000} seconds to read out, and your cooldown is ${cooldown / 1000} seconds.`,
+			reply: sb.Utils.tag.trim `
+				Your message has been successfully played on TTS! 
+				It took ${duration / 1000} seconds to read out,
+				and your cooldown is ${cooldown / 1000} seconds.
+			`,
 			cooldown: {
 				length: cooldown
 			}
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { locales } = this.staticData;
+		const { locales } = require("./tts-config.json");
 		const list = locales.map(i => `<li><code>${i.locale}</code> - ${i.language}</li>`).join("");
 
 		return [
