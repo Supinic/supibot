@@ -102,7 +102,7 @@ module.exports = {
 			messageTime = process.hrtime.bigint();
 
 			const response = await sb.Got("GenericAPI", {
-				url: this.url,
+				url: tts.url,
 				responseType: "text",
 				searchParams: new URLSearchParams({
 					tts: JSON.stringify([{
