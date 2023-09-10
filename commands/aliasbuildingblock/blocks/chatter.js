@@ -1,3 +1,6 @@
+const BASE_CACHE_KEY = "abb-chatter";
+const getCooldownKey = (userData, channelData) => `${BASE_CACHE_KEY}-${userData.ID}-${channelData.ID}`;
+
 module.exports = {
 	name: "chatter",
 	aliases: [],
@@ -19,8 +22,9 @@ module.exports = {
 			};
 		}
 
-		const onCooldown = !sb.CooldownManager.check(context.channel.ID, context.user.ID, "abb-chatter", true);
-		if (onCooldown) {
+		const cacheKey = getCooldownKey(context.user, context.channel);
+		const cooldownKeyExists = await sb.Cache.getByPrefix(cacheKey);
+		if (cooldownKeyExists) {
 			return {
 				success: false,
 				reply: "Currently on cooldown!"
@@ -54,7 +58,10 @@ module.exports = {
 			};
 		}
 
-		sb.CooldownManager.set(context.channel.ID, context.user.ID, "abb-chatter", 10_000);
+		await sb.Cache.setByPrefix(cacheKey, true, {
+			expiry: 10_000
+		});
+
 		return {
 			reply: sb.Utils.randArray(users)
 		};
