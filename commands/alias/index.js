@@ -1,3 +1,5 @@
+const bannedCommandCombinations = require("../../config.json").modules.commands.bannedCombinations ?? [];
+
 module.exports = {
 	Name: "alias",
 	Aliases: ["$"],
@@ -1223,6 +1225,26 @@ module.exports = {
 							Please reduce the complexity first.
 						`
 					};
+				}
+
+				if (context.append.pipeList) {
+					context.append.pipeList.splice(context.append.pipeIndex, 1, commandData.Name);
+
+					for (const combination of bannedCommandCombinations) {
+						let index = 0;
+						for (const commandName of context.append.pipeList) {
+							if (commandName === combination[index]) {
+								index++;
+							}
+
+							if (!combination[index]) {
+								return {
+									success: false,
+									reply: `Your alias contains a combination of commands that is not allowed! Commands: ${combination.join(" → ")}`
+								};
+							}
+						}
+					}
 				}
 
 				const result = await sb.Command.checkAndExecute(

@@ -5,7 +5,10 @@
     "Do not add the new file to Git.",
     "If no such \"custom configuration\" file exists, this default will be used instead.",
     "The \"disableAll\" flag overrides the black/whitelists completely.",
-    "If that flag is \"false\" and both the arrays are empty, it is assumed all modules should be loaded."
+    "If that flag is \"false\" and both the arrays are empty, it is assumed all modules should be loaded.",
+    "",
+    "For commands, the \"bannedCombinations\" array contains a list of commands that cannot be executed together in one meta-command execution.",
+    "E.g. ['fish', 'translate'] would prevent those two commands from being executed in one pipe or alias combination"
   ],
   "modules": {
     "chat-modules": {
@@ -22,7 +25,8 @@
         "ping",
         "pipe",
         "reload"
-      ]
+      ],
+      "bannedCombinations": []
     },
     "crons": {
       "disableAll": true,

@@ -1,7 +1,4 @@
-// @todo possibly move into some kind of config file
-const bannedCommandCombinations = [
-	["fish", "translate"]
-];
+const bannedCommandCombinations = require("../../config.json").modules.commands.bannedCombinations ?? [];
 
 module.exports = {
 	Name: "pipe",
@@ -63,7 +60,7 @@ module.exports = {
 
 		let hasExternalInput = false;
 		const nullCommand = sb.Command.get("null");
-		const usedCommandNames = context.append.pipeList ?? [];
+		const usedCommandNames = [];
 		const { prefix } = sb.Command;
 
 		for (let i = 0; i < invocations.length; i++) {
@@ -110,9 +107,15 @@ module.exports = {
 			}
 		}
 
+		let totalUsedCommandNames = usedCommandNames;
+		if (context.append.pipeList) {
+			totalUsedCommandNames = [...context.append.pipeList];
+			totalUsedCommandNames.splice(context.append.pipeIndex, 1, ...usedCommandNames);
+		}
+
 		for (const combination of bannedCommandCombinations) {
 			let index = 0;
-			for (const commandName of usedCommandNames) {
+			for (const commandName of totalUsedCommandNames) {
 				if (commandName === combination[index]) {
 					index++;
 				}
@@ -185,7 +188,8 @@ module.exports = {
 					tee: context.tee,
 					platform: context.platform,
 					pipe: true,
-					pipeList: usedCommandNames,
+					pipeList: totalUsedCommandNames,
+					pipeIndex: i,
 					skipBanphrases: true,
 					skipPending: true,
 					skipMention: true,
