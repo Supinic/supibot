@@ -158,7 +158,7 @@ module.exports = {
 
 		if (tts.channels.includes(context.channel?.ID) && sb.Config.get("TTS_ENABLED")) {
 			await sb.Got("GenericAPI", {
-				url: this.url,
+				url: tts.url,
 				responseType: "text",
 				searchParams: new URLSearchParams({
 					specialAudio: "1",
