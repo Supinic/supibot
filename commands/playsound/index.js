@@ -1,3 +1,10 @@
+const BASE_CACHE_KEY = `playsound-cooldown`;
+const getCacheKey = (playsoundName) => `${BASE_CACHE_KEY}-${playsoundName}`;
+const tts = {
+	enabled: null,
+	url: null
+};
+
 module.exports = {
 	Name: "playsound",
 	Aliases: ["ps"],
@@ -7,21 +14,25 @@ module.exports = {
 	Flags: ["developer","mention","pipe","whitelist"],
 	Params: null,
 	Whitelist_Response: "You can't use the command here, but here's a list of supported playsounds: https://supinic.com/stream/playsound/list",
-	Static_Data: (command => {
-		command.data.cooldowns = {};
-
-		return {
-			fetch: (name) => sb.Query.getRecordset(rs => rs
-				.select("*")
-				.from("data", "Playsound")
-				.where("Name = %s", name)
-				.limit(1)
-				.single()
-			)
-		};
-	}),
+	Static_Data: null,
+	initialize: function () {
+		if (!sb.Config.has("LOCAL_IP", true) || !sb.Config.has("LOCAL_PLAY_SOUNDS_PORT", true)) {
+			console.warn("$ps: Listener not configured - will be unavailable");
+			tts.enabled = false;
+		}
+		else {
+			tts.url = `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}`;
+			tts.enabled = true;
+		}
+	},
 	Code: (async function playSound (context, playsound) {
-		if (!sb.Config.get("PLAYSOUNDS_ENABLED")) {
+		if (!tts.enabled) {
+			return {
+				success: false,
+				reply: `Local playsound listener is not configured!`
+			};
+		}
+		else if (!sb.Config.get("PLAYSOUNDS_ENABLED")) {
 			return {
 				reply: "Playsounds are currently disabled!"
 			};
@@ -31,7 +42,8 @@ module.exports = {
 				reply: "Currently available playsounds: https://supinic.com/stream/playsound/list"
 			};
 		}
-		else if (playsound === "random") {
+
+		if (playsound === "random") {
 			playsound = await sb.Query.getRecordset(rs => rs
 				.select("Name")
 				.from("data", "Playsound")
@@ -42,7 +54,14 @@ module.exports = {
 			);
 		}
 
-		const data = await this.staticData.fetch(playsound);
+		const data = await sb.Query.getRecordset(rs => rs
+			.select("*")
+			.from("data", "Playsound")
+			.where("Name = %s", playsound)
+			.limit(1)
+			.single()
+		);
+
 		if (!data) {
 			return {
 				reply: "That playsound either doesn't exist or is not available!",
@@ -50,11 +69,12 @@ module.exports = {
 			};
 		}
 
-		this.data.cooldowns[data.Name] = this.data.cooldowns[data.Name] ?? 0;
-
+		const cacheKey = getCacheKey(playsound);
+		const existingCooldown = await sb.Cache.getByPrefix(cacheKey) ?? 0;
 		const now = sb.Date.now();
-		if (this.data.cooldowns[data.Name] >= now) {
-			const delta = sb.Utils.timeDelta(this.data.cooldowns[data.Name]);
+
+		if (existingCooldown >= now) {
+			const delta = sb.Utils.timeDelta(existingCooldown);
 			return {
 				reply: `The playsound's cooldown has not passed yet! Try again in ${delta}.`
 			};
@@ -62,11 +82,16 @@ module.exports = {
 
 		let success = null;
 		try {
-			success = await sb.LocalRequest.playAudio(data.Filename);
+			const response = await sb.Got("GenericAPI", {
+				url: `${tts.url}/?audio=${data.Filename}`,
+				responseType: "text"
+			});
+
+			success = (response.ok);
 		}
 		catch (e) {
-			console.warn(e);
 			await sb.Config.set("PLAYSOUNDS_ENABLED", false);
+
 			return {
 				reply: "The desktop listener is not currently running, turning off playsounds!"
 			};
@@ -78,7 +103,11 @@ module.exports = {
 			.where("Name = %s", data.Name)
 		);
 
-		this.data.cooldowns[data.Name] = now + data.Cooldown;
+		const cooldownTimestamp = now + data.Cooldown;
+		await sb.Cache.setByPrefix(cacheKey, cooldownTimestamp, {
+			expiry: data.Cooldown
+		});
+
 		return {
 			success,
 			reply: (success)
