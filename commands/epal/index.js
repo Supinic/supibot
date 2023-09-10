@@ -1,3 +1,9 @@
+const tts = {
+	enabled: null,
+	url: null,
+	channels: []
+};
+
 module.exports = {
 	Name: "epal",
 	Aliases: ["ForeverAlone"],
@@ -12,7 +18,20 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function epal (context) {
+	initialize: function () {
+		if (!sb.Config.has("LOCAL_IP", true) || !sb.Config.has("LOCAL_PLAY_SOUNDS_PORT", true)) {
+			console.warn("$epal: TTS not configured - will be unavailable");
+			tts.enabled = false;
+		}
+		else {
+			tts.url = `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}`;
+			tts.enabled = true;
+
+			const { ttsChannels } = require("./epal-tts-config.json");
+			tts.channels = ttsChannels;
+		}
+	},
+	Code: async function epal (context) {
 		let games = await this.getCacheData({ type: "games" });
 		if (!games) {
 			const response = await sb.Got("GenericAPI", {
@@ -137,20 +156,17 @@ module.exports = {
 			price
 		} = sb.Utils.randArray(profilesData);
 
-		// @todo add channel data that determines this instead of hardcoding its ID here
-		if (context.channel?.ID === 38 && sb.Config.get("TTS_ENABLED")) {
-			const ttsCommand = sb.Command.get("tts");
-			if (ttsCommand && ttsCommand.data.pending === false) {
-				ttsCommand.data.pending = true;
-
-				await sb.LocalRequest.playSpecialAudio({
+		if (tts.channels.includes(context.channel?.ID) && sb.Config.get("TTS_ENABLED")) {
+			await sb.Got("GenericAPI", {
+				url: this.url,
+				responseType: "text",
+				searchParams: new URLSearchParams({
+					specialAudio: "1",
 					url: audioFile,
 					volume: sb.Config.get("TTS_VOLUME"),
 					limit: 20_000
-				});
-
-				ttsCommand.data.pending = false;
-			}
+				})
+			});
 		}
 
 		let type = "";
@@ -190,29 +206,30 @@ module.exports = {
 				${description}
 			`
 		};
-	}),
-	Dynamic_Description: (async function (prefix) {
+	},
+	Dynamic_Description: async function (prefix) {
 		const gameData = await this.getCacheData({ type: "games" });
 		const games = (gameData)
 			? gameData.map(i => `<li><code>${i.name}</code></li>`).sort().join("")
 			: "<li>No game data available - use the command to populate the list!</li>";
 
 		return [
-			`Fetches a random description of a user profile from <a target="_blank" href="egirl.gg">egirl.gg</a>.`,
+			`Fetches a random description of a user profile from <a target="_blank" href="//epal.gg">epal.gg</a>.`,
 			`If this command is executed in Supinic's channel and TTS is on, the user introduction audio will be played.`,
 			"",
 
+			`<code>${prefix}epal</code>`,
 			`<code>${prefix}ForeverAlone</code>`,
 			"Random user, female only",
 			"",
 
-			`<code>${prefix}ForeverAlone sex:(male/female)</code>`,
+			`<code>${prefix}epal sex:(male/female)</code>`,
 			"Random user, specified sex only",
 			"",
 
-			`<code>${prefix}ForeverAlone game:(game)</code>`,
+			`<code>${prefix}epal game:(game)</code>`,
 			"Random user, selected game only. Only uses the first word of the game you provide.",
 			`List of games: <ul>${games}</ul>`
 		];
-	})
+	}
 };
