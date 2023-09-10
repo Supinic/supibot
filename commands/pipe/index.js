@@ -63,7 +63,7 @@ module.exports = {
 
 		let hasExternalInput = false;
 		const nullCommand = sb.Command.get("null");
-		const usedCommandNames = [];
+		const usedCommandNames = context.append.pipeList ?? [];
 		const { prefix } = sb.Command;
 
 		for (let i = 0; i < invocations.length; i++) {
@@ -185,6 +185,7 @@ module.exports = {
 					tee: context.tee,
 					platform: context.platform,
 					pipe: true,
+					pipeList: usedCommandNames,
 					skipBanphrases: true,
 					skipPending: true,
 					skipMention: true,
