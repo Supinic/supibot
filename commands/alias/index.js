@@ -1075,6 +1075,73 @@ module.exports = {
 				};
 			}
 
+			case "transfer": {
+				if (!context.user.Twitch_ID) {
+					return {
+						success: false,
+						reply: `Transferring aliases currently only works for Twitch users!`
+					};
+				}
+
+				const [oldUsername] = args;
+				const oldUserData = await sb.User(oldUsername);
+				if (!oldUserData || !oldUserData.Twitch_ID) {
+					return {
+						success: false,
+						reply: `I have not seen that user on Twitch before!`
+					};
+				}
+				else if (context.user.Twitch_ID !== oldUserData.Twitch_ID) {
+					return {
+						success: false,
+						reply: `Your Twitch ID is not the same as that user's!`
+					};
+				}
+
+				const conflictingAliases = await sb.Query.getRecordset(rs => rs
+					.select("Name")
+					.from("data", "Custom_Command_Alias")
+					.join({
+						toTable: "Custom_Command_Alias",
+						alias: "Shared",
+						on: `Shared.Name = Custom_Command_Alias.Name AND Shared.User_Alias = ${oldUserData.ID}`
+					})
+					.where("Custom_Command_Alias.User_Alias = %n", context.user.ID)
+					.groupBy("Name")
+					.flat("Name")
+				);
+
+				if (conflictingAliases.length !== 0) {
+					return {
+						success: false,
+						reply: sb.Utils.tag.trim `
+							You have ${conflictingAliases.length} aliases that your previous username also has!
+							Rename or delete them first, then run this command again.
+							List: ${conflictingAliases.join(", ")}
+						`
+					};
+				}
+
+				const aliasIDs = await sb.Query.getRecordset(rs => rs
+					.select("ID")
+					.from("data", "Custom_Command_Alias")
+					.where("User_Alias = %n", oldUserData.ID)
+					.flat("ID")
+				);
+
+				for (const aliasID of aliasIDs) {
+					const row = await sb.Query.getRow("data", "Custom_Command_Alias");
+					await row.load(aliasID);
+
+					row.values.User_Alias = context.user.ID;
+					await row.save({ skipLoad: true });
+				}
+
+				return {
+					reply: `Successfully transferred ${aliasIDs.length} aliases from ${oldUserData.Name} to you.`
+				};
+			}
+
 			case "run":
 			case "try": {
 				let name;
@@ -1338,6 +1405,12 @@ module.exports = {
 		`<code>${prefix}alias link (username) (alias) (custom name)</code>`,
 		"Takes someone else's alias, and creates a link of it for you, with your own custom name for it.",
 		"This can also be used to create links to your own aliases - essentially creating aliases of your own aliases 😅",
+		"",
+
+		`<code>${prefix}alias transfer (previous username)</code>`,
+		"If you renamed on Twitch, this command will transfer all aliases (including links) from your previous username to the current one.",
+		"Only works on Twitch at the moment, by checking that it is the same account for your and the old username.",
+		"You must also not have any conflicting aliases - you will get warned first.",
 		"",
 
 		`<code>${prefix}alias check</code>`,
