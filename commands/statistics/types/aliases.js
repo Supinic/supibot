@@ -89,10 +89,10 @@ module.exports = {
 		else {
 			const [aliases, copies, users] = await Promise.all([
 				sb.Query.getRecordset(rs => rs
-					.select("MAX(ID) AS Max")
+					.select("COUNT(*) AS Count")
 					.from("data", "Custom_Command_Alias")
 					.single()
-					.flat("Max")
+					.flat("Count")
 				),
 				sb.Query.getRecordset(rs => rs
 					.select("COUNT(*) AS Count")
