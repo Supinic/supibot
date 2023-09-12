@@ -810,6 +810,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			// If channel is read-only, do not proceed with any processing
 			// Such as un-AFK message, reminders, commands, ...
 			if (channelData.Mode === "Read") {
+				this.incrementMessageMetric("read", channelData);
 				return;
 			}
 
