@@ -8,6 +8,8 @@ module.exports = (function () {
 
 	class ExternalBanphraseAPI {
 		static async pajbot (message, URL) {
+			message = message.trim().replace(/\s+/g, " ");
+
 			const options = {
 				method: "POST",
 				url: `https://${URL}/api/v1/banphrases/test`,
