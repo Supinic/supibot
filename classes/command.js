@@ -79,6 +79,7 @@ class Context {
 		let flag = sb.User.permissions.regular;
 		for (const [key, value] of Object.entries(flags)) {
 			if (value) {
+				// eslint-disable-next-line no-bitwise
 				flag |= sb.User.permissions[key];
 			}
 		}
@@ -96,6 +97,7 @@ class Context {
 					});
 				}
 
+				// eslint-disable-next-line no-bitwise
 				return ((flag & sb.User.permissions[type]) !== 0);
 			}
 		};

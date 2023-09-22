@@ -137,6 +137,7 @@ module.exports = class Filter extends require("./template.js") {
 		});
 	}
 
+	/* eslint-disable no-bitwise */
 	get priority () {
 		let priority = 0;
 		if (this.Platform) {
@@ -157,6 +158,7 @@ module.exports = class Filter extends require("./template.js") {
 
 		return priority;
 	}
+	/* eslint-enable no-bitwise */
 
 	createFilterData (data) {
 		if (data.Data) {
