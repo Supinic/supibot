@@ -1099,7 +1099,7 @@ module.exports = {
 				}
 
 				const conflictingAliases = await sb.Query.getRecordset(rs => rs
-					.select("Name")
+					.select("Custom_Command_Alias.Name")
 					.from("data", "Custom_Command_Alias")
 					.join({
 						toTable: "Custom_Command_Alias",
@@ -1107,7 +1107,7 @@ module.exports = {
 						on: `Shared.Name = Custom_Command_Alias.Name AND Shared.User_Alias = ${oldUserData.ID}`
 					})
 					.where("Custom_Command_Alias.User_Alias = %n", context.user.ID)
-					.groupBy("Name")
+					.groupBy("Custom_Command_Alias.Name")
 					.flat("Name")
 				);
 
