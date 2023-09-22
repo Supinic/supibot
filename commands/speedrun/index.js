@@ -92,14 +92,23 @@ module.exports = {
 			runsData = cachedRunsData;
 		}
 		else {
-			const freshRunsData = await sb.Got("Speedrun", {
-				url: `leaderboards/${game.id}/category/${category.id}`
-			}).json();
+			try {
+				const freshRunsData = await sb.Got("Speedrun", {
+					url: `leaderboards/${game.id}/category/${category.id}`
+				}).json();
 
-			runsData = freshRunsData.data;
-			await this.setCacheData(cacheKey, runsData, {
-				expiry: 36e5
-			});
+				runsData = freshRunsData.data;
+				await this.setCacheData(cacheKey, runsData, {
+					expiry: 36e5
+				});
+			}
+			catch (e) {
+				await sb.Logger.log("Command.Warning", JSON.stringify({ description: "$speedrun", e }));
+				return {
+					success: false,
+					reply: `Something went wrong while fetching runs data! Try providing a category, or a different one if you did.`
+				};
+			}
 		}
 
 		if (runsData.runs.length === 0) {
