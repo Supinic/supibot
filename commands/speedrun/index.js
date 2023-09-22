@@ -16,7 +16,7 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function speedrun (context, ...args) {
 		const showCategories = (context.params.showCategories === true);
-		const categoryName = context.params.categoryName ?? null;
+		const categoryName = context.params.category ?? null;
 
 		const searchParams = {};
 		if (args.length > 0) {
@@ -155,7 +155,7 @@ module.exports = {
 				reply: `No matching speedruns found!`
 			};
 		}
-		
+
 		const [run] = runnerRuns;
 		if (!runner) {
 			const { statusCode, body: runnerData } = await sb.Got("Speedrun", {
