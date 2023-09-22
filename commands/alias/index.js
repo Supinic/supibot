@@ -1084,7 +1084,7 @@ module.exports = {
 				}
 
 				const [oldUsername] = args;
-				const oldUserData = await sb.User(oldUsername);
+				const oldUserData = await sb.User.get(oldUsername);
 				if (!oldUserData || !oldUserData.Twitch_ID) {
 					return {
 						success: false,
