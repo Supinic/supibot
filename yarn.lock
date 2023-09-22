@@ -5344,7 +5344,7 @@ __metadata:
 
 supi-core@supinic/supi-core:
   version: 2.2.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=9b1b8c41566daf9ede5255b526230b0d86a8c667"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=ccbd666f6ae41d40568e6e654121d6cbe34607b4"
   dependencies:
     async-markov: "github:supinic/async-markov"
     cheerio: ^1.0.0-rc.12
@@ -5365,7 +5365,7 @@ supi-core@supinic/supi-core:
     track-link-parser: "github:supinic/track-link-parser"
     transliteration: ^2.3.5
     vm2: ^3.9.19
-  checksum: e4915df516c40475bd513f1aed745b505a3ec66371bbed2750a05750086f0e9e06b632e61f65a2e446682a8d5004baebae998a7b5e814d1e3392091d522f4c79
+  checksum: 59045eb2db6f84a96428e254518cd423fc47a9dd08f4be654ca50a680f40be6d185f389cbc1c0669e845510b5c9395009d8588615f4603479e691ea88c545745
   languageName: node
   linkType: hard
 
