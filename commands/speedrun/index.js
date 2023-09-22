@@ -59,7 +59,10 @@ module.exports = {
 		}
 		else {
 			const categories = categoryData.map(i => i.name);
-			const categoryMatch = sb.Utils.selectClosestString(categoryName, categories, { descriptor: true });
+			const categoryMatch = sb.Utils.selectClosestString(categoryName, categories, {
+				ignoreCase: true,
+				descriptor: true
+			});
 
 			category = (categoryMatch) ? categoryData[categoryMatch.index] : null;
 		}
