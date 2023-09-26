@@ -1,4 +1,9 @@
-const allowedHostTypes = ["github", "gitea", "gitlab"];
+const allowedHosts = {
+	github: "GitHub",
+	gitea: "Gitea",
+	gitlab: "GitLab"
+};
+
 const DEFAULT_HOST_TYPE = "github";
 
 module.exports = {
@@ -19,11 +24,11 @@ module.exports = {
 		let username;
 		let self = false;
 
-		const type = context.params.type ?? DEFAULT_HOST_TYPE;
-		if (!allowedHostTypes.includes(type)) {
+		const type = (context.params.type ?? DEFAULT_HOST_TYPE).toLowerCase();
+		if (!Object.keys(allowedHosts).includes(type)) {
 			return {
 				success: false,
-				reply: `Invalid host type provided! Use one of: ${allowedHostTypes.join(", ")}`
+				reply: `Invalid host type provided! Use one of: ${Object.keys(allowedHosts).join(", ")}`
 			};
 		}
 
@@ -81,7 +86,7 @@ module.exports = {
 			who = "They have";
 		}
 		else {
-			who = `GitHub user ${username} has`;
+			who = `${allowedHosts[type]} user ${username} has`;
 		}
 
 		const suffix = (result.commitCount === 1) ? "" : "s";
