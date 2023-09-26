@@ -1,3 +1,6 @@
+const allowedHostTypes = ["github", "gitea", "gitlab"];
+const DEFAULT_HOST_TYPE = "github";
+
 module.exports = {
 	Name: "commitcount",
 	Aliases: ["FarmingCommits"],
@@ -6,13 +9,23 @@ module.exports = {
 	Description: "For a given GitHub user, this command gives you the number of push events they have done in the last 24 hours. If nothing is provided, your username is used instead.",
 	Flags: ["developer","mention","non-nullable","pipe","skip-banphrase"],
 	Params: [
-		{ name: "since", type: "date" }
+		{ name: "since", type: "date" },
+		{ name: "type", type: "string" },
+		{ name: "host", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function commitCount (context, user) {
 		let username;
 		let self = false;
+
+		const type = context.params.type ?? DEFAULT_HOST_TYPE;
+		if (!allowedHostTypes.includes(type)) {
+			return {
+				success: false,
+				reply: `Invalid host type provided! Use one of: ${allowedHostTypes.join(", ")}`
+			};
+		}
 
 		if (user) {
 			const userData = await sb.User.get(user);
@@ -25,7 +38,7 @@ module.exports = {
 				username = user;
 			}
 		}
-		else {
+		else if (type === "github") {
 			const githubData = await context.user.getDataProperty("github");
 			username = githubData?.login ?? context.user.Name;
 			self = true;
@@ -39,40 +52,22 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got.gql({
-			url: "https://api.github.com/graphql",
-			token: sb.Config.get("GITHUB_PUBLIC_REPO_GQL_TOKEN"),
-			query: `query ($username: String!, $threshold: DateTime!) {
-				user (login: $username) {
-					contributionsCollection (from: $threshold) {
-						totalCommitContributions
-						restrictedContributionsCount
-						endedAt
-					}
-				}
-			}`,
-			variables: {
-				username,
-				threshold: threshold.toISOString()
-			}
-		}).json();
+		const Provider = require(`./${type}.js`);
+		const result = await Provider.execute({
+			username,
+			threshold,
+			host: context.params.host ?? null
+		});
 
-		if (response.errors) {
-			return {
-				success: false,
-				reply: response.errors.map(i => i.message).join("; ")
-			};
+		if (result.success === false) {
+			return result;
 		}
-
-		const collection = response.data.user.contributionsCollection;
-		const intervalEnd = new sb.Date(collection.endedAt);
-		const commitCount = collection.totalCommitContributions + collection.restrictedContributionsCount;
 
 		let since;
 		if (context.params.since) {
-			since = (intervalEnd >= new sb.Date())
-				? `since ${sb.Utils.timeDelta(context.params.since)}`
-				: `between ${context.params.since.format("Y-m-d")} and ${intervalEnd.format("Y-m-d")}`;
+			since = (result.intervalEnd && result.intervalEnd >= new sb.Date())
+				? `between ${context.params.since.format("Y-m-d")} and ${result.intervalEnd.format("Y-m-d")}`
+				: `since ${sb.Utils.timeDelta(context.params.since)}`;
 		}
 		else {
 			since = "in the past 24 hours";
@@ -89,14 +84,15 @@ module.exports = {
 			who = `GitHub user ${username} has`;
 		}
 
-		const suffix = (commitCount === 1) ? "" : "s";
+		const suffix = (result.commitCount === 1) ? "" : "s";
 		return {
-			reply: `${who} created ${commitCount} commit${suffix} ${since}.`
+			reply: `${who} created ${result.commitCount} commit${suffix} ${since}.`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
 		"Checks your or someone else's commit count for the past 24 hours (by default).",
 		`If you would like to connect your GitHub account to your "Supibot" (Twitch) account and save some time by not having to type your username, head to <a href="https://supinic.com/">supinic.com</a> - log in, and select <u>Github link</u>.`,
+		"This command also supports Gitea and Gitlab - along with custom hosts. Check below for proper usage",
 		"",
 
 		`<code>${prefix}commitcount</code>`,
@@ -105,6 +101,18 @@ module.exports = {
 
 		`<code>${prefix}commitcount (user)</code>`,
 		"(amount of commits of that given user in the last 24 hours)",
+		"",
+
+		`<code>${prefix}type:gitea (user)</code>`,
+		`<code>${prefix}type:gitlab (user) </code>`,
+		"Posts the amount of commits, from the default host of Gitea/Gitlab",
+		"",
+
+		`<code>${prefix}type:gitea host:(custom host) (user)</code>`,
+		`<code>${prefix}type:gitlab host:(custom host) (user) </code>`,
+		`<code>${prefix}type:gitea host:your.gitea.com (user)</code>`,
+		`<code>${prefix}type:gitlab host:your.gitlab.com (user) </code>`,
+		"Posts the amount of commits, from a custom host of Gitea/Gitlab",
 		"",
 
 		`<code>${prefix}commitcount since:(date)</code>`,
