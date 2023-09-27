@@ -723,11 +723,11 @@ module.exports = {
 			"",
 
 			`<code>${prefix}weather (place) <b>hour+X</b></code>`,
-			"weather forecast in X hour(s) - accepts 1 through 48",
+			"weather forecast in X hour(s) - accepts 0 (this hour) through 48 (in 2 days).",
 			"",
 
 			`<code>${prefix}weather (place) <b>day+X</b></code>`,
-			"weather forecast in X day(s) - accepts 1 through 7",
+			"weather forecast in X day(s) - accepts 0 (today) through 7 (next week).",
 			"",
 
 			`<code>${prefix}weather (place) alerts:true</code>`,
