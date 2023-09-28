@@ -96,7 +96,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix) => [
 		"Checks your or someone else's commit count for the past 24 hours (by default).",
-		`If you would like to connect your GitHub account to your "Supibot" (Twitch) account and save some time by not having to type your username, head to <a href="https://supinic.com/">supinic.com</a> - log in, and select <u>Github link</u>.`,
+		`If you would like to connect your GitHub account to your "Supibot" (Twitch) account and save some time by not having to type your username, head to <a href="https://supinic.com/">supinic.com</a> - log in, and select <u>GitHub link</u>.`,
 		"This command also supports Gitea and Gitlab - along with custom hosts. Check below for proper usage",
 		"",
 
