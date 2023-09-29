@@ -65,7 +65,7 @@ module.exports = {
 			}
 
 			const fileName = `markov-dump-${new sb.Date().format("Y-m-d H:i")}-channel-${channelID}.json`;
-			fs.writeFile(`/code/markovs/${fileName}`, JSON.stringify(markov));
+			fs.writeFile(`~/markovs/${fileName}`, JSON.stringify(markov));
 		}
 	},
 	Code: async function markov (context, input) {
@@ -170,14 +170,14 @@ module.exports = {
 			const fs = require("fs").promises;
 			const fileName = `markov-dump-${new sb.Date().format("Y-m-d")}-channel-${targetChannel.ID}.json`;
 			if (debug === "save") {
-				await fs.writeFile(`/code/markovs/${fileName}`, JSON.stringify(markov));
+				await fs.writeFile(`~/markovs/${fileName}`, JSON.stringify(markov));
 				return {
 					reply: `Markov module data successfully saved to file.`
 				};
 			}
 			else if (debug === "load") {
 				const loadFileName = input ?? fileName;
-				const data = await fs.readFile(`/code/markovs/${loadFileName}`);
+				const data = await fs.readFile(`~/markovs/${loadFileName}`);
 				markov.reset();
 				markov.load(data.toString());
 

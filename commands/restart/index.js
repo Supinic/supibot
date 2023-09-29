@@ -1,11 +1,11 @@
 const paths = {
 	dir: {
-		bot: "/code/supibot",
-		web: "/code/web"
+		bot: "~/supibot",
+		web: "~/website"
 	},
 	pm2: {
 		bot: "pm2 restart supibot",
-		web: "pm2 restart web"
+		web: "pm2 restart website"
 	}
 };
 
@@ -52,7 +52,7 @@ module.exports = {
 				queue.push(async () => {
 					let message;
 					try {
-						await unlink("/code/supibot/yarn.lock");
+						await unlink("~/supibot/yarn.lock");
 						message = "deleted yarn.lock";
 					}
 					catch {

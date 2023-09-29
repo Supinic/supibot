@@ -56,10 +56,10 @@ module.exports = {
 							: rawInstanceName;
 
 						if (typeof module.invalidateRequireCache === "function") {
-							module.invalidateRequireCache(`/code/supibot/${name}`, instanceName);
+							module.invalidateRequireCache(`~/supibot/${name}`, instanceName);
 						}
 
-						const path = `/code/supibot/${name}/${instanceName}`;
+						const path = `~/supibot/${name}/${instanceName}`;
 						try {
 							if (name === "commands") {
 								definitions.push(require(path));
