@@ -1,5 +1,21 @@
 const execute = async (data) => {
-	const { username, threshold } = data;
+	let self = false;
+	let username = data.username;
+	const { context, threshold } = data;
+
+	if (username) {
+		const userData = await sb.User.get(username);
+		if (userData) {
+			const githubData = await userData.getDataProperty("github");
+			username = githubData?.login ?? userData.Name;
+			self = (userData === context.user);
+		}
+	}
+	else {
+		const githubData = await context.user.getDataProperty("github");
+		username = githubData?.login ?? context.user.Name;
+		self = true;
+	}
 
 	const response = await sb.Got.gql({
 		url: "https://api.github.com/graphql",
@@ -31,6 +47,7 @@ const execute = async (data) => {
 
 	return {
 		success: true,
+		self,
 		commitCount,
 		intervalEnd
 	};

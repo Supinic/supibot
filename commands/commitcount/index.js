@@ -20,33 +20,13 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function commitCount (context, user) {
-		let username;
-		let self = false;
-
+	Code: (async function commitCount (context, username) {
 		const type = (context.params.type ?? DEFAULT_HOST_TYPE).toLowerCase();
 		if (!Object.keys(allowedHosts).includes(type)) {
 			return {
 				success: false,
 				reply: `Invalid host type provided! Use one of: ${Object.keys(allowedHosts).join(", ")}`
 			};
-		}
-
-		if (user) {
-			const userData = await sb.User.get(user);
-			if (userData) {
-				const githubData = await userData.getDataProperty("github");
-				username = githubData?.login ?? userData.Name;
-				self = (userData === context.user);
-			}
-			else {
-				username = user;
-			}
-		}
-		else if (type === "github") {
-			const githubData = await context.user.getDataProperty("github");
-			username = githubData?.login ?? context.user.Name;
-			self = true;
 		}
 
 		const threshold = context.params.since ?? new sb.Date().addHours(-24);
@@ -59,6 +39,7 @@ module.exports = {
 
 		const Provider = require(`./${type}.js`);
 		const result = await Provider.execute({
+			context,
 			username,
 			threshold,
 			host: context.params.host ?? null
@@ -79,11 +60,10 @@ module.exports = {
 		}
 
 		let who;
-		if (self) {
+		result.self ??= (context.user.Name === sb.User.normalizeUsername(username));
+
+		if (result.self) {
 			who = "You have";
-		}
-		else if (user && username !== sb.User.normalizeUsername(user)) {
-			who = "They have";
 		}
 		else {
 			who = `${allowedHosts[type]} user ${username} has`;

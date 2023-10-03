@@ -11,6 +11,12 @@ const execute = async (data) => {
 			reply: `You must provide your GitLab host name!`
 		};
 	}
+	else if (!username) {
+		return {
+			success: false,
+			reply: `You must provide a GitLab username!`
+		};
+	}
 
 	let response;
 	try {
