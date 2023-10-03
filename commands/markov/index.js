@@ -1,4 +1,5 @@
 const { CronJob } = require("cron");
+const BASE_PATH = require("../../config.json").basePath;
 
 const MODEL_SIZE_THRESHOLD = 100;
 const WORD_LIMIT = 20;
@@ -65,7 +66,7 @@ module.exports = {
 			}
 
 			const fileName = `markov-dump-${new sb.Date().format("Y-m-d H:i")}-channel-${channelID}.json`;
-			fs.writeFile(`~/markovs/${fileName}`, JSON.stringify(markov));
+			fs.writeFile(`${BASE_PATH}/markovs/${fileName}`, JSON.stringify(markov));
 		}
 	},
 	Code: async function markov (context, input) {
@@ -170,14 +171,14 @@ module.exports = {
 			const fs = require("fs").promises;
 			const fileName = `markov-dump-${new sb.Date().format("Y-m-d")}-channel-${targetChannel.ID}.json`;
 			if (debug === "save") {
-				await fs.writeFile(`~/markovs/${fileName}`, JSON.stringify(markov));
+				await fs.writeFile(`${BASE_PATH}/markovs/${fileName}`, JSON.stringify(markov));
 				return {
 					reply: `Markov module data successfully saved to file.`
 				};
 			}
 			else if (debug === "load") {
 				const loadFileName = input ?? fileName;
-				const data = await fs.readFile(`~/markovs/${loadFileName}`);
+				const data = await fs.readFile(`${BASE_PATH}/markovs/${loadFileName}`);
 				markov.reset();
 				markov.load(data.toString());
 

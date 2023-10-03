@@ -1,3 +1,5 @@
+const BASE_PATH = require("../../config.json").basePath;
+
 module.exports = {
 	Name: "reload",
 	Aliases: null,
@@ -56,10 +58,10 @@ module.exports = {
 							: rawInstanceName;
 
 						if (typeof module.invalidateRequireCache === "function") {
-							module.invalidateRequireCache(`~/supibot/${name}`, instanceName);
+							module.invalidateRequireCache(`${BASE_PATH}/${name}`, instanceName);
 						}
 
-						const path = `~/supibot/${name}/${instanceName}`;
+						const path = `${BASE_PATH}/${name}/${instanceName}`;
 						try {
 							if (name === "commands") {
 								definitions.push(require(path));

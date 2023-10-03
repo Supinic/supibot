@@ -10,6 +10,7 @@
     "For commands, the \"bannedCombinations\" array contains a list of commands that cannot be executed together in one meta-command execution.",
     "E.g. ['fish', 'translate'] would prevent those two commands from being executed in one pipe or alias combination"
   ],
+  "basePath": "ENTER_YOUR_BASE_PATH_HERE",
   "modules": {
     "chat-modules": {
       "disableAll": true,
