@@ -1,3 +1,6 @@
+const promisify = require("util").promisify;
+const exec = promisify(require("child_process").exec);
+
 module.exports = {
 	Name: "weather",
 	Aliases: null,
@@ -176,12 +179,20 @@ module.exports = {
 			}
 		}
 		else if (args[0].toLowerCase().replace(/^@/, "") === "supibot") {
-			const exec = require("child_process").execSync;
-			const temperature = `${exec("/opt/vc/bin/vcgencmd measure_temp").toString().match(/([\d.]+)/)[1]}°C`;
+			try {
+				const result = await exec("vcgencmd measure_temp");
+				const temperature = `${result.toString().match(/([\d.]+)/)[1]}°C`;
 
-			return {
-				reply: `Supibot, Supinic's LACK table, Raspberry Pi 3B: ${temperature}. No wind detected. No precipitation expected.`
-			};
+				return {
+					reply: `Supibot, Supinic's LACK table: ${temperature}. No wind detected. No precipitation expected.`
+				};
+			}
+			catch (e) {
+				return {
+					success: false,
+					reply: `Supibot, Supinic's LACK table: Unknown temperature, something is wrong with the configuration!`
+				};
+			}
 		}
 		else if (args[0].startsWith("@")) {
 			const userData = await sb.User.get(args[0]);

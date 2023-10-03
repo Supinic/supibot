@@ -1,3 +1,6 @@
+const promisify = require("util").promisify;
+const exec = promisify(require("child_process").exec);
+
 module.exports = {
 	Name: "ping",
 	Aliases: ["pang","peng","pong","pung","pyng"],
@@ -21,11 +24,8 @@ module.exports = {
 		}
 	})),
 	Code: (async function ping (context) {
-		const promisify = require("util").promisify;
-		const exec = promisify(require("child_process").exec);
-
 		const [temperatureResult] = await Promise.allSettled([
-			exec("/opt/vc/bin/vcgencmd measure_temp")
+			exec("vcgencmd measure_temp")
 		]);
 
 		const temperature = (temperatureResult.value)
