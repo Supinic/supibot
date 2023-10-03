@@ -2,7 +2,7 @@ module.exports = {
 	Name: "funfact",
 	Aliases: ["ff"],
 	Author: "supinic",
-	Cooldown: 60000,
+	Cooldown: 10000,
 	Description: "Fetches a random fun fact. Absolutely not guaranteed to be fun or fact.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
