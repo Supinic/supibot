@@ -25,7 +25,7 @@ module.exports = {
 
 		if (response.redirectUrls.length !== 0) {
 			const $ = sb.Utils.cheerio(response.body);
-			const summary = $($("#mw-content-text p")[0]).text();
+			const summary = $($("#mw-content-text > div > p")[0]).text();
 			const url = $("link[rel='canonical']")?.attr("href")?.replace("oldschool.runescape.wiki", "osrs.wiki") ?? "(no link)";
 
 			return {
