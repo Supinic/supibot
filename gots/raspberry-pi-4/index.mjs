@@ -2,7 +2,7 @@ export const definition = {
 	name: "RaspberryPi4",
 	optionsType: "object",
 	options: {
-		prefixUrl: "http://192.168.1.154:11111/proxy",
+		prefixUrl: "http://localhost:11111/proxy",
 		timeout: {
 			request: 10000
 		}
