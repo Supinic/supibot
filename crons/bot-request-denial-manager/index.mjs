@@ -1,5 +1,5 @@
 let isTableAvailable;
-let requestIDs;
+const trackedRequestIDs = new Set();
 
 export const definition = {
 	name: "bot-request-denial-manager",
@@ -12,19 +12,21 @@ export const definition = {
 			return;
 		}
 
-		if (!requestIDs) {
-			requestIDs = await sb.Query.getRecordset(rs => rs
-				.select("ID")
-				.from("data", "Suggestion")
-				.where("Category = %s", "Bot addition")
-				.where("Status IS NULL")
-				.flat("ID")
-			);
+		const unresolvedRequestIDs = await sb.Query.getRecordset(rs => rs
+			.select("ID")
+			.from("data", "Suggestion")
+			.where("Category = %s", "Bot addition")
+			.where("Status IS NULL")
+			.flat("ID")
+		);
 
-			return;
+		if (unresolvedRequestIDs.length !== 0) {
+			for (const item of unresolvedRequestIDs) {
+				trackedRequestIDs.add(item);
+			}
 		}
 
-		const requests = await sb.Query.getRecordset(rs => rs
+		const resolvedRequests = await sb.Query.getRecordset(rs => rs
 			.select("Suggestion.ID", "Suggestion.Status")
 			.select("User_Alias.Name AS Username")
 			.from("data", "Suggestion")
@@ -35,25 +37,22 @@ export const definition = {
 			})
 			.where("Category = %s", "Bot addition")
 			.where("Status IN %s+", ["Denied", "Dismissed"])
-			.where("Suggestion.ID IN %n+", requestIDs)
+			.where("Suggestion.ID IN %n+", trackedRequestIDs)
 		);
 
-		if (requests.length === 0) {
+		if (resolvedRequests.length === 0) {
 			return;
 		}
 
 		const twitchPlatform = sb.Platform.get("twitch");
-		for (const request of requests) {
+		for (const request of resolvedRequests) {
 			const url = `https://supinic.com/data/suggestion/${request.ID}`;
 			await twitchPlatform.pm(
 				`Your Supibot request (ID ${request.ID}) has been ${request.Status.toLowerCase()}! Check the suggestion detail for more info: ${url}`,
 				request.Username
 			);
 
-			const index = requestIDs.indexOf(request.ID);
-			if (index !== -1) {
-				requestIDs.splice(index, 1);
-			}
+			trackedRequestIDs.delete(request.ID);
 		}
 	})
 };
