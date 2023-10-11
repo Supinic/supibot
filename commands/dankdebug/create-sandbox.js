@@ -136,6 +136,8 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 		? advancedParse(JSON.stringify(rawCustomChannelData))
 		: null;
 
+	const userPermissions = await context.getUserPermissions();
+
 	const queryExecutions = new Set();
 	let userDataChanged = false;
 	let channelDataChanged = false;
@@ -153,6 +155,16 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 		executor: context.user.Name,
 		executorID: context.user.ID,
 		platform: context.platform.Name,
+		permissions: sb.Utils.deepFreeze({
+			get: () => userPermissions.flag,
+			is: (level) => {
+				if (!Object.hasOwn(sb.User.permissions, level)) {
+					throw new Error("Unknown permission level provided");
+				}
+
+				return userPermissions.is(level);
+			}
+		}),
 		query: sb.Utils.deepFreeze({
 			run: async (queryName, ...args) => {
 				if (!queryName) {

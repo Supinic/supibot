@@ -2,7 +2,7 @@ import type { JSONifiable, Emote } from 'supi-core/@types/globals';
 import type { Command, Parameter } from 'supi-core/@types/classes/command';
 import type { Channel } from 'supi-core/@types/classes/channel';
 import type { Platform } from 'supi-core/@types/classes/platform';
-import type { User } from 'supi-core/@types/classes/user';
+import type { User, Permissions as UserPermissions } from 'supi-core/@types/classes/user';
 import type { UtilsSingleton } from 'supi-core/@types/singletons/utils';
 // import * as Util from "util";
 
@@ -175,6 +175,11 @@ declare namespace DankDebug {
 		multi (input: Array<[commandName: string, ...args: string[]]>): Promise<PartialCommandResult[]>;
 	}
 
+	export interface SupibotPermissions {
+		get (): UserPermissions.Value;
+		is (level: UserPermissions.Level): boolean;
+	}
+
 	/**
 	 * A list of aliases that are currently "in execution" for the current user. Similar to a call stack.
 	 * The first element of the array is the "highest level" alias in the stack (the one the user typed).
@@ -236,6 +241,11 @@ declare namespace DankDebug {
 	 * Collection of database-related methods.
 	 */
 	export const query: SupibotDankDebugQuery;
+
+	/**
+	 * Collection of user/channel permissions related methods.
+	 */
+	export const permissions: SupibotPermissions;
 
 	/**
 	 * Collection of subcommand execution-related methods.
