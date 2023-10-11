@@ -11,7 +11,7 @@ export declare namespace Permissions {
         regular: 0b0000_0001;
         ambassador: 0b0000_0010;
         channelOwner: 0b0000_0100;
-        administrator: 0b0000_1000;
+        administrator: 0b1000_0000;
     };
     export type Level = keyof Descriptor;
     export type Value = Descriptor[keyof Descriptor];
