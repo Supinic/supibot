@@ -37,7 +37,7 @@ export const definition = {
 			})
 			.where("Category = %s", "Bot addition")
 			.where("Status IN %s+", ["Denied", "Dismissed"])
-			.where("Suggestion.ID IN %n+", trackedRequestIDs)
+			.where("Suggestion.ID IN %n+", [...trackedRequestIDs])
 		);
 
 		if (resolvedRequests.length === 0) {
