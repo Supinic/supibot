@@ -39,15 +39,29 @@ module.exports = {
 
 				/** @type { { Invocation: string|null }[] } */
 				const data = await sb.Query.getRecordset(rs => rs
-					.select("Invocation")
+					.select("Channel", "Invocation")
 					.from("data", "Custom_Command_Alias")
 					.where("User_Alias <> %n", userData.ID)
 					.where("Parent = %n", aliasData.ID)
 				);
 
-				const [copies, links] = sb.Utils.splitByCondition(data, i => i.Invocation);
+				let copies = 0;
+				let links = 0;
+				let publications = 0;
+				for (const item of data) {
+					if (item.Channel) {
+						publications++;
+					}
+					else if (item.Invocation) {
+						copies++;
+					}
+					else {
+						links++;
+					}
+				}
+
 				return {
-					reply: `${posPronoun} alias "${aliasName}" has been copied ${copies.length} times, and linked ${links.length} times by other users.`
+					reply: `${posPronoun} alias "${aliasName}" has been published ${publications}x, copied ${copies}x, and linked ${links}x by others.`
 				};
 			}
 			else {
