@@ -37,11 +37,11 @@ module.exports = {
 					};
 				}
 
-				/** @type { { Invocation: string|null }[] } */
+				/** @type {Object[]} */
 				const data = await sb.Query.getRecordset(rs => rs
 					.select("Channel", "Invocation")
 					.from("data", "Custom_Command_Alias")
-					.where("User_Alias <> %n", userData.ID)
+					.where("User_Alias <> %n OR User_Alias IS NULL", userData.ID)
 					.where("Parent = %n", aliasData.ID)
 				);
 
