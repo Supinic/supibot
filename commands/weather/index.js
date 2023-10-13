@@ -181,7 +181,7 @@ module.exports = {
 		else if (args[0].toLowerCase().replace(/^@/, "") === "supibot") {
 			try {
 				const result = await exec("vcgencmd measure_temp");
-				const temperature = `${result.toString().match(/([\d.]+)/)[1]}°C`;
+				const temperature = `${result.stdout.toString().match(/([\d.]+)/)[1]}°C`;
 
 				return {
 					reply: `Supibot, Supinic's LACK table: ${temperature}. No wind detected. No precipitation expected.`
