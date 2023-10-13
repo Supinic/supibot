@@ -25,33 +25,25 @@ module.exports = {
 			}
 		}
 
-		let [first, second] = args;
-		if (first && second) {
-			first = Number(first);
-			second = Number(second);
-
-			if (!Number.isInteger(first) || !Number.isInteger(second)) {
-				return {
-					success: false,
-					reply: "You must use integers as the roll boundaries!"
-				};
-			}
-			else if (first > Number.MAX_SAFE_INTEGER || second > Number.MAX_SAFE_INTEGER) {
+		const firstNum = Number(args[0]);
+		const secondNum = Number(args[1]);
+		if (args[0] && args[1] && Number.isInteger(firstNum) || Number.isInteger(secondNum)) {
+			if (firstNum > Number.MAX_SAFE_INTEGER || secondNum > Number.MAX_SAFE_INTEGER) {
 				return {
 					success: false,
 					reply: "That number is too large!"
 				};
 			}
-			else if (first < Number.MIN_SAFE_INTEGER || second < Number.MIN_SAFE_INTEGER) {
+			else if (firstNum < Number.MIN_SAFE_INTEGER || secondNum < Number.MIN_SAFE_INTEGER) {
 				return {
 					success: false,
 					reply: "That negative number is too large!"
 				};
 			}
 
-			const number = (first < second)
-				? sb.Utils.random(first, second)
-				: sb.Utils.random(second, first);
+			const number = (firstNum < secondNum)
+				? sb.Utils.random(firstNum, secondNum)
+				: sb.Utils.random(secondNum, firstNum);
 
 			if (context.params.textOnly) {
 				return {
