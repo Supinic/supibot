@@ -33,6 +33,6 @@ module.exports = [
 		],
 		type: "basic",
 		query: "topk(1, rate(supibot_messages_read_total[5m])) * 60",
-		format: (result, metric) => `The currently fastest channel Supibot is in is ${metric.channel}, with ${sb.Utils.round(result, 2)} messages per minute.`
+		format: (result, metric) => `Currently, the fastest channel with Supibot is ${metric.channel}, with ${sb.Utils.round(result, 2)} messages per minute.`
 	}
 ];
