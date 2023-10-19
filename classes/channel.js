@@ -1,3 +1,5 @@
+const Platform = require("./platform.js");
+
 module.exports = class Channel extends require("./template.js") {
 	static redisPrefix = "sb-channel";
 	static dataCache = new WeakMap();
@@ -11,7 +13,7 @@ module.exports = class Channel extends require("./template.js") {
 
 		this.ID = data.ID;
 		this.Name = data.Name;
-		this.Platform = sb.Platform.get(data.Platform);
+		this.Platform = Platform.get(data.Platform);
 		this.Specific_ID = data.Specific_ID || null;
 		this.Mode = data.Mode;
 		this.Mention = data.Mention;
@@ -240,10 +242,7 @@ module.exports = class Channel extends require("./template.js") {
 	}
 
 	destroy () {
-		if (sb.ChatModule) {
-			sb.ChatModule.detachChannelModules(this.ID);
-		}
-
+		this.events.removeAllListeners();
 		this.sessionData = null;
 	}
 
@@ -270,18 +269,12 @@ module.exports = class Channel extends require("./template.js") {
 
 		for (const row of data) {
 			const channelData = new Channel(row);
-
 			const platformMap = Channel.getPlatformMap(channelData.Platform);
 			platformMap.set(channelData.Name, channelData);
 		}
 
 		if (Channel.data.size === 0) {
 			console.warn("No channels initialized - bot will not attempt to join any channels");
-		}
-
-		// Whenever channels are reloaded, chat modules also need to be reloaded and reattached.
-		if (sb.ChatModule) {
-			await sb.ChatModule.reloadData();
 		}
 	}
 
@@ -291,7 +284,7 @@ module.exports = class Channel extends require("./template.js") {
 
 	static get (identifier, platform) {
 		if (platform) {
-			platform = sb.Platform.get(platform);
+			platform = Platform.get(platform);
 		}
 
 		if (identifier instanceof Channel) {
@@ -336,7 +329,7 @@ module.exports = class Channel extends require("./template.js") {
 	}
 
 	static getJoinableForPlatform (platform) {
-		const platformData = sb.Platform.get(platform);
+		const platformData = Platform.get(platform);
 		const platformMap = Channel.data.get(platformData);
 		if (!platformMap) {
 			return [];
@@ -398,7 +391,7 @@ module.exports = class Channel extends require("./template.js") {
 		const channelIDs = new Set([...eventChannelIDs, ...configChannelIDs, ...filterChannelIDs]);
 		let channelsData = Array.from(channelIDs).map(i => Channel.get(i)).filter(Boolean);
 		if (platform) {
-			const platformData = sb.Platform.get(platform);
+			const platformData = Platform.get(platform);
 			channelsData = channelsData.filter(i => i.Platform === platformData);
 		}
 
@@ -427,11 +420,6 @@ module.exports = class Channel extends require("./template.js") {
 		platformMap.set(channelName, channelData);
 
 		await channelData.setup();
-
-		if (sb.ChatModule) {
-			sb.ChatModule.attachChannelModules(channelData);
-		}
-
 		return channelData;
 	}
 
@@ -501,10 +489,6 @@ module.exports = class Channel extends require("./template.js") {
 
 		for (const row of data) {
 			const newChannelData = new Channel(row);
-			if (sb.ChatModule) {
-				sb.ChatModule.attachChannelModules(newChannelData);
-			}
-
 			const platformMap = Channel.getPlatformMap(newChannelData.Platform);
 			platformMap.set(newChannelData.Name, newChannelData);
 		}

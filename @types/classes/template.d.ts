@@ -1,30 +1,16 @@
-import {ColumnDefinition, Row, Table} from "../singletons/query";
+import { Config, Query } from "supi-core";
 
-import { Name as CacheName, Value as CacheValue } from "./config";
-export { Name as CacheName, Value as CacheValue } from "./config";
-
-/*
-type FailedReloadDescriptor = {
-    identifier: string;
-    reason: string; // "no-path"
-}
-type ReloadResult = {
-    failed?: FailedReloadDescriptor[],
-    success: boolean
-};
-*/
-
-export type GenericCacheMap<T extends ClassTemplate> = WeakMap<T, Map<CacheName, CacheValue>>;
+export type GenericCacheMap<T extends ClassTemplate> = WeakMap<T, Map<Config.Name, Config.Value>>;
 export type SpecificCacheOptions = {
     forceCacheReload?: boolean;
 };
 type GenericCacheOptions<T extends ClassTemplate> = {
     cacheMap: GenericCacheMap<T>;
-    databaseTable?: Table;
-    databaseProperty: ColumnDefinition["name"];
+    databaseTable?: Query.Table;
+    databaseProperty: Query.ColumnDefinition["name"];
     instance: ClassTemplate;
     options?: SpecificCacheOptions;
-    propertyName: CacheName,
+    propertyName: Config.Name,
     propertyContext?: string;
 };
 
@@ -51,9 +37,9 @@ export declare class ClassTemplate {
 
     getCacheData (key: string): Promise<any>;
     setCacheData (key: string, value: any, options: object): "OK";
-    getGenericDataProperty<T extends ClassTemplate> (inputData: GenericCacheOptions<T>): Promise<CacheValue>;
+    getGenericDataProperty<T extends ClassTemplate> (inputData: GenericCacheOptions<T>): Promise<Config.Value>;
     setGenericDataProperty<T extends ClassTemplate> (inputData: GenericCacheOptions<T>): Promise<void>;
-    saveRowProperty (row: Row, property: string, value: any, self: ClassTemplate): ReturnType<Row["save"]>;
+    saveRowProperty (row: Query.Row, property: string, value: any, self: ClassTemplate): ReturnType<Query.Row["save"]>;
 
     static initialize (): Promise<ClassTemplate>;
     static importData (definitions: GenericConstructorData[]): Promise<void>;

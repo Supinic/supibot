@@ -1,4 +1,9 @@
+const Banphrase = require("./banphrase.js");
+const Filter = require("./filter.js");
+const User = require("./user.js");
+
 const pathModule = require("path");
+const CooldownManager = require("../utils/cooldown-manager.js");
 
 class Context {
 	#command;
@@ -26,7 +31,7 @@ class Context {
 
 		this.#append.tee ??= [];
 
-		this.#userFlags = sb.Filter.getFlags({
+		this.#userFlags = Filter.getFlags({
 			command,
 			invocation: this.#invocation,
 			platform: this.#platform,
@@ -39,7 +44,7 @@ class Context {
 	setMeta (name, value) { this.#meta.set(name, value); }
 
 	getMentionStatus () {
-		return sb.Filter.getMentionStatus({
+		return Filter.getMentionStatus({
 			user: this.#user,
 			command: this.#command,
 			channel: this.#channel ?? null,
@@ -76,11 +81,11 @@ class Context {
 			ambassador: Boolean(data[2])
 		};
 
-		let flag = sb.User.permissions.regular;
+		let flag = User.permissions.regular;
 		for (const [key, value] of Object.entries(flags)) {
 			if (value) {
 				// eslint-disable-next-line no-bitwise
-				flag |= sb.User.permissions[key];
+				flag |= User.permissions[key];
 			}
 		}
 
@@ -91,14 +96,14 @@ class Context {
 			 * @returns {boolean}
 			 */
 			is: (type) => {
-				if (!sb.User.permissions[type]) {
+				if (!User.permissions[type]) {
 					throw new sb.Error({
 						message: "Invalid user permission type provided"
 					});
 				}
 
 				// eslint-disable-next-line no-bitwise
-				return ((flag & sb.User.permissions[type]) !== 0);
+				return ((flag & User.permissions[type]) !== 0);
 			}
 		};
 	}
@@ -152,6 +157,7 @@ class Command extends require("./template.js") {
 	static uniqueIdentifier = "Name";
 
 	static #privateMessageChannelID = Symbol("private-message-channel");
+	static #cooldownManager = new CooldownManager();
 
 	static privilegedCommandCharacters = ["$"];
 
@@ -528,7 +534,7 @@ class Command extends require("./template.js") {
 		// Check for cooldowns, return if it did not pass yet.
 		// If skipPending flag is set, do not check for pending status.
 		const channelID = (channelData?.ID ?? Command.#privateMessageChannelID);
-		const cooldownCheck = sb.CooldownManager.check(
+		const cooldownCheck = Command.#cooldownManager.check(
 			channelID,
 			userData.ID,
 			command.Name,
@@ -537,7 +543,7 @@ class Command extends require("./template.js") {
 
 		if (!cooldownCheck) {
 			if (!options.skipPending) {
-				const pending = sb.CooldownManager.fetchPending(userData.ID);
+				const pending = Command.#cooldownManager.fetchPending(userData.ID);
 				if (pending) {
 					return {
 						reply: (options.privateMessage) ? pending.description : null,
@@ -556,7 +562,7 @@ class Command extends require("./template.js") {
 
 		if (!options.skipPending && isAdmin !== true) {
 			const sourceName = channelData?.Name ?? `${options.platform.Name} PMs`;
-			sb.CooldownManager.setPending(
+			Command.#cooldownManager.setPending(
 				userData.ID,
 				`You have a pending command: "${identifier}" used in "${sourceName}" at ${new sb.Date().sqlDateTime()}`
 			);
@@ -604,7 +610,7 @@ class Command extends require("./template.js") {
 		}
 
 		/** @type {ExecuteResult} */
-		const filterData = await sb.Filter.execute({
+		const filterData = await Filter.execute({
 			user: userData,
 			command,
 			invocation: identifier,
@@ -626,10 +632,10 @@ class Command extends require("./template.js") {
 		);
 
 		if (!filterData.success && (!options.skipGlobalBan || !isFilterGlobalBan)) {
-			sb.CooldownManager.unsetPending(userData.ID);
+			Command.#cooldownManager.unsetPending(userData.ID);
 
 			let length = command.Cooldown;
-			const cooldownFilter = sb.Filter.getCooldownModifiers({
+			const cooldownFilter = Filter.getCooldownModifiers({
 				platform: channelData?.Platform ?? null,
 				channel: channelData,
 				command,
@@ -641,10 +647,10 @@ class Command extends require("./template.js") {
 				length = cooldownFilter.applyData(length);
 			}
 
-			sb.CooldownManager.set(channelID, userData.ID, command.Name, length);
+			Command.#cooldownManager.set(channelID, userData.ID, command.Name, length);
 
 			if (filterData.filter.Response === "Reason" && typeof filterData.reply === "string") {
-				const { string } = await sb.Banphrase.execute(filterData.reply, channelData);
+				const { string } = await Banphrase.execute(filterData.reply, channelData);
 				filterData.reply = string;
 			}
 
@@ -659,7 +665,7 @@ class Command extends require("./template.js") {
 
 		// If params parsing failed, filters were checked and none applied, return the failure result now
 		if (failedParamsParseResult) {
-			sb.CooldownManager.unsetPending(userData.ID);
+			Command.#cooldownManager.unsetPending(userData.ID);
 			return failedParamsParseResult;
 		}
 
@@ -782,7 +788,7 @@ class Command extends require("./template.js") {
 
 		// unset pending cooldown, before anything else - even read-only commands should unset it (despite not
 		// having any cooldown themselves)
-		sb.CooldownManager.unsetPending(userData.ID);
+		Command.#cooldownManager.unsetPending(userData.ID);
 
 		// Read-only commands never reply with anything - banphrases, mentions and cooldowns are not checked
 		if (command.Flags.readOnly) {
@@ -810,7 +816,7 @@ class Command extends require("./template.js") {
 			const partResult = [];
 			for (const { message, bancheck } of execution.partialReplies) {
 				if (bancheck === true) {
-					const { string } = await sb.Banphrase.execute(
+					const { string } = await Banphrase.execute(
 						message,
 						channelData
 					);
@@ -838,7 +844,7 @@ class Command extends require("./template.js") {
 				messageSlice = messageSlice.replace(whitespaceRegex, "");
 			}
 
-			const { passed, privateMessage, string } = await sb.Banphrase.execute(messageSlice, channelData);
+			const { passed, privateMessage, string } = await Banphrase.execute(messageSlice, channelData);
 			execution.reply = string;
 
 			if (
@@ -866,7 +872,7 @@ class Command extends require("./template.js") {
 
 		// Apply all unpings to the result, if it is still a string (aka the response should be sent)
 		if (typeof execution.reply === "string") {
-			execution.reply = await sb.Filter.applyUnping({
+			execution.reply = await Filter.applyUnping({
 				command,
 				channel: channelData ?? null,
 				platform: channelData?.Platform ?? null,
@@ -879,7 +885,7 @@ class Command extends require("./template.js") {
 			!options.skipMention
 			&& command.Flags.mention
 			&& channelData?.Mention
-			&& sb.Filter.getMentionStatus({
+			&& Filter.getMentionStatus({
 				user: userData,
 				command,
 				channel: channelData ?? null,
@@ -888,7 +894,7 @@ class Command extends require("./template.js") {
 		);
 
 		if (mentionUser) {
-			const { string } = await sb.Banphrase.execute(
+			const { string } = await Banphrase.execute(
 				userData.Name,
 				channelData
 			);
@@ -917,7 +923,7 @@ class Command extends require("./template.js") {
 
 		if (commandData.Flags.ownerOverride && channelData?.isUserChannelOwner(userData)) {
 			// Set a very small, only technical cooldown
-			sb.CooldownManager.set(channelID, userData.ID, commandData.Name, 500);
+			Command.#cooldownManager.set(channelID, userData.ID, commandData.Name, 500);
 		}
 		else if (typeof cooldownData !== "undefined") {
 			if (cooldownData !== null) {
@@ -940,7 +946,7 @@ class Command extends require("./template.js") {
 					} = cooldown;
 
 					if (!ignoreCooldownFilters) {
-						const cooldownFilter = sb.Filter.getCooldownModifiers({
+						const cooldownFilter = Filter.getCooldownModifiers({
 							platform: channelData?.Platform ?? null,
 							channel: channelData,
 							command: commandData,
@@ -953,7 +959,7 @@ class Command extends require("./template.js") {
 						}
 					}
 
-					sb.CooldownManager.set(channel, user, command, length, options);
+					Command.#cooldownManager.set(channel, user, command, length, options);
 				}
 			}
 			else {
@@ -962,7 +968,7 @@ class Command extends require("./template.js") {
 		}
 		else {
 			let length = commandData.Cooldown ?? 0;
-			const cooldownFilter = sb.Filter.getCooldownModifiers({
+			const cooldownFilter = Filter.getCooldownModifiers({
 				platform: channelData?.Platform ?? null,
 				channel: channelData,
 				command: commandData,
@@ -974,7 +980,7 @@ class Command extends require("./template.js") {
 				length = cooldownFilter.applyData(length);
 			}
 
-			sb.CooldownManager.set(channelID, userData.ID, commandData.Name, length);
+			Command.#cooldownManager.set(channelID, userData.ID, commandData.Name, length);
 		}
 	}
 

@@ -15,7 +15,7 @@ describe("global module suite", () => {
 				.filter(i => i.isDirectory())
 				.map(i => i.name),
 
-			validProperties: require("./properties-validation/commands.js"),
+			validProperties: require("./commands.js"),
 			definitions: []
 		},
 		{
@@ -26,18 +26,7 @@ describe("global module suite", () => {
 			fileList: fs.readdirSync("./chat-modules", { withFileTypes: true })
 				.filter(i => i.isDirectory())
 				.map(i => i.name),
-			validProperties: require("./properties-validation/chat-modules.js"),
-			definitions: []
-		},
-		{
-			name: "crons",
-			singular: "cron",
-			directory: "crons",
-			extension: "mjs",
-			fileList: fs.readdirSync("./crons", { withFileTypes: true })
-				.filter(i => i.isDirectory())
-				.map(i => i.name),
-			validProperties: require("./properties-validation/crons.js"),
+			validProperties: require("./chat-modules.js"),
 			definitions: []
 		}
 	];
@@ -46,7 +35,7 @@ describe("global module suite", () => {
 		const { extension } = specificModule;
 		specificModule.definitions = specificModule.fileList.map(dir => ({
 			name: dir,
-			filePath: `../${specificModule.directory}/${dir}/index.${extension}`,
+			filePath: `../../${specificModule.directory}/${dir}/index.${extension}`,
 			content: fs.readFileSync(`./${specificModule.directory}/${dir}/index.${extension}`)
 		}));
 	}

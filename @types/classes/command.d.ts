@@ -1,14 +1,13 @@
+import { Date, Utils } from "supi-core";
+import { PoolConnection } from "mariadb";
+import { Metric, MetricConfiguration, MetricType } from "prom-client";
+
 import { GenericFlagsObject, JSONifiable, SimpleGenericData, TypeExtract } from "../globals";
 import { ClassTemplate } from "./template";
 import { Channel } from "./channel";
 import { Platform } from "./platform";
 import { Permissions as UserPermissions, User } from "./user";
 import { Language } from "language-iso-codes";
-import { CustomDate as Date } from "../objects/date";
-import { DeepFrozen } from "../singletons/utils";
-
-import { PoolConnection } from "mariadb";
-import { Metric, MetricConfiguration, MetricType } from "prom-client";
 
 declare type DiscordEmbedDefinition = {
     title: string;
@@ -28,7 +27,7 @@ declare type DiscordEmbedDefinition = {
     image?: {
         url: string;
     };
-    timestamp?: Date;
+    timestamp?: Date.CustomDate;
     footer?: {
         text: string;
         icon_url?: string;
@@ -37,7 +36,7 @@ declare type DiscordEmbedDefinition = {
 
 export declare namespace Parameter {
     type Type = "string" | "number" | "boolean" | "date" | "object" | "regex" | "language";
-    type ParsedType = string | number | boolean | Date | SimpleGenericData | RegExp | Language;
+    type ParsedType = string | number | boolean | Date.CustomDate | SimpleGenericData | RegExp | Language;
     type Descriptor = {
         type: Type;
         name: string
@@ -453,7 +452,7 @@ export declare class Command extends ClassTemplate {
      * Data specific for the command. Usually hosts utils methods, or constants.
      * The object is deeply frozen, preventing any changes.
      */
-    private staticData: DeepFrozen<Record<string, any>>;
+    private staticData: Utils.DeepFrozen<Record<string, any>>;
 
     /**
      * Determines the author of the command. Used for updates and further command downloads.

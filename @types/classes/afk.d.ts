@@ -1,5 +1,6 @@
+import { Date } from "supi-core";
+
 import { ClassTemplate } from "./template";
-import { CustomDate } from "../objects/date";
 import { Channel } from "./channel";
 import { User } from "./user";
 import { Counter, Gauge } from "prom-client";
@@ -10,7 +11,7 @@ export declare type Like = number | AwayFromKeyboard;
 declare type ConstructorData = {
 	ID: number;
 	User_Alias: User["ID"];
-	Started: CustomDate;
+	Started: Date.CustomDate;
 	Text: string;
 	Silent: boolean;
 	Status: Status;
@@ -65,7 +66,7 @@ export declare class AwayFromKeyboard extends ClassTemplate {
 	/**
 	 * The timestamp of when the AFK status was set up
 	 */
-	readonly Started: CustomDate;
+	readonly Started: Date.CustomDate;
 
 	/**
 	 * AFK status description

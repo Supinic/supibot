@@ -1,4 +1,4 @@
-import { Got } from "../classes/got";
+import { Got } from "../../../@types/classes/got";
 
 export declare type Body = {
     success: boolean;

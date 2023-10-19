@@ -1,10 +1,18 @@
+const AwayFromKeyboard = require("./afk.js");
+const Banphrase = require("./banphrase.js");
+const Channel = require("./channel.js");
+const Command = require("./command.js");
+const Filter = require("./filter.js");
+const Platform = require("./user.js");
+const User = require("./user.js");
+
+const LongTimeout = require("../utils/long-timeout.js");
+
 /**
  * Represents a pending reminder from (usually) one user to another.
  * An active reminder will be printed into the chat once the target user is spotted.
  */
 module.exports = class Reminder extends require("./template.js") {
-	static LongTimeout = require("long-timeout");
-
 	/**
 	 * Holds all currently active reminders in a Map, keyed by the target recipient user's IDs.
 	 * The list of
@@ -41,21 +49,21 @@ module.exports = class Reminder extends require("./template.js") {
 		/**
 		 * The user who set the reminder up.
 		 * Since anonymous reminders are not supported, this cannot be null.
-		 * @type {User.ID}
+		 * @type {User["ID"]}
 		 */
 		this.User_From = data.User_From;
 
 		/**
 		 * The user who the reminder is set up for.
 		 * If none is specified, it is a reminder for the origin user themselves.
-		 * @type {User.ID}
+		 * @type {User["ID"]}
 		 */
 		this.User_To = data.User_To || data.User_From;
 
 		/**
 		 * The channel the reminder was set up in.
 		 * This is necessary for timed reminders, as otherwise it is ambiguous where the reminder should be executed.
-		 * @typeof {Channel.ID}
+		 * @type {Channel["ID"]}
 		 */
 		this.Channel = data.Channel;
 
@@ -91,7 +99,7 @@ module.exports = class Reminder extends require("./template.js") {
 		 * @type {Platform.ID|null}
 		 */
 		this.Platform = (data.Platform)
-			? sb.Platform.get(data.Platform)
+			? Platform.get(data.Platform)
 			: null;
 
 		/**
@@ -117,11 +125,10 @@ module.exports = class Reminder extends require("./template.js") {
 			return this;
 		}
 
-		/** @type {LongTimeout} */
-		this.timeout = new Reminder.LongTimeout(async () => {
-			const channelData = (this.Channel === null) ? null : sb.Channel.get(this.Channel);
-			const fromUserData = await sb.User.get(this.User_From, true);
-			const toUserData = await sb.User.get(this.User_To, true);
+		this.timeout = new LongTimeout(async () => {
+			const channelData = (this.Channel === null) ? null : Channel.get(this.Channel);
+			const fromUserData = await User.get(this.User_From, true);
+			const toUserData = await User.get(this.User_To, true);
 
 			const fromMention = await this.Platform.createUserMention(fromUserData, channelData);
 			const toMention = await this.Platform.createUserMention(toUserData, channelData);
@@ -137,9 +144,9 @@ module.exports = class Reminder extends require("./template.js") {
 				message = `${toMention}, timed reminder from ${fromMention} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
 
-			const statusAFK = sb.AwayFromKeyboard.get(toUserData);
+			const statusAFK = AwayFromKeyboard.get(toUserData);
 			if (statusAFK && channelData) {
-				await sb.Reminder.create({
+				await Reminder.create({
 					User_From: sb.Config.get("SELF_ID"),
 					User_To: toUserData.ID,
 					Platform: channelData.Platform.ID,
@@ -183,8 +190,8 @@ module.exports = class Reminder extends require("./template.js") {
 
 					const preparedMessage = await channelData.prepareMessage(message);
 					if (preparedMessage) {
-						const fixedMessage = await sb.Filter.applyUnping({
-							command: sb.Command.get("remind"),
+						const fixedMessage = await Filter.applyUnping({
+							command: Command.get("remind"),
 							channel: channelData ?? null,
 							platform: channelData?.Platform ?? null,
 							string: preparedMessage,
@@ -427,7 +434,7 @@ module.exports = class Reminder extends require("./template.js") {
 			return;
 		}
 
-		const excludedUserIDs = sb.Filter.getReminderPreventions({
+		const excludedUserIDs = Filter.getReminderPreventions({
 			platform: channelData?.Platform ?? null,
 			channel: channelData
 		});
@@ -455,18 +462,18 @@ module.exports = class Reminder extends require("./template.js") {
 
 		for (const reminder of reminders) {
 			const platformData = channelData.Platform;
-			const fromUserData = await sb.User.get(reminder.User_From);
+			const fromUserData = await User.get(reminder.User_From);
 
 			if (reminder.Type === "Pingme") {
-				const fromUserData = await sb.User.get(reminder.User_From, false);
+				const fromUserData = await User.get(reminder.User_From, false);
 				const channelName = channelData.getFullName();
 
 				let platform = null;
 				if (reminder.Channel) {
-					platform = sb.Channel.get(reminder.Channel).Platform;
+					platform = Channel.get(reminder.Channel).Platform;
 				}
 				else {
-					platform = sb.Platform.get(reminder.Platform);
+					platform = Platform.get(reminder.Platform);
 				}
 
 				const uncheckedAuthorMention = await platform.controller.createUserMention(fromUserData);
@@ -487,7 +494,7 @@ module.exports = class Reminder extends require("./template.js") {
 					await platform.pm(message, fromUserData);
 				}
 				else {
-					const channelData = sb.Channel.get(reminder.Channel);
+					const channelData = Channel.get(reminder.Channel);
 					const preparedMessage = await channelData.prepareMessage(message, {
 						returnBooleanOnFail: true,
 						skipLengthCheck: true
@@ -503,8 +510,8 @@ module.exports = class Reminder extends require("./template.js") {
 						await platform.pm(message, fromUserData.Name, channelData);
 					}
 					else {
-						const fixedMessage = await sb.Filter.applyUnping({
-							command: sb.Command.get("remind"),
+						const fixedMessage = await Filter.applyUnping({
+							command: Command.get("remind"),
 							channel: channelData ?? null,
 							platform: channelData?.Platform ?? null,
 							string: preparedMessage,
@@ -528,7 +535,7 @@ module.exports = class Reminder extends require("./template.js") {
 			}
 			else if (reminder.Text !== null) {
 				const mention = await channelData.Platform.createUserMention(fromUserData);
-				const { string } = await sb.Banphrase.execute(mention, channelData);
+				const { string } = await Banphrase.execute(mention, channelData);
 
 				reminderMessage = `${string} - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
 			}
@@ -572,8 +579,8 @@ module.exports = class Reminder extends require("./template.js") {
 				message = `${userMention} ${message}`;
 
 				// Apply unpings, governed by the reminder command itself
-				message = await sb.Filter.applyUnping({
-					command: sb.Command.get("remind"),
+				message = await Filter.applyUnping({
+					command: Command.get("remind"),
 					channel: channelData ?? null,
 					platform: channelData?.Platform ?? null,
 					string: message,

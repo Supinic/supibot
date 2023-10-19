@@ -1,3 +1,6 @@
+const Filter = require("./filter.js");
+const User = require("./user.js");
+
 // @todo eventually merge these definitions with `supibot/commands/afk.js` static data
 const afkResponses = require("./afk-responses.json");
 
@@ -143,7 +146,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 				await channelData.mirror(mirroredMessage, null, { commandUsed: false });
 			}
 
-			const unpingedMessage = await sb.Filter.applyUnping({
+			const unpingedMessage = await Filter.applyUnping({
 				command: "afk",
 				channel: channelData ?? null,
 				platform: channelData?.Platform ?? null,
@@ -162,7 +165,7 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 		if (identifier instanceof AwayFromKeyboard) {
 			return identifier;
 		}
-		else if (identifier instanceof sb.User) {
+		else if (identifier instanceof User) {
 			return AwayFromKeyboard.data.get(identifier.ID);
 		}
 		else if (typeof identifier === "number") {

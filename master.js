@@ -1,4 +1,21 @@
-const importModule = async (module, path) => {
+// Classes requires
+const Platform = require("./classes/platform.js");
+const Filter = require("./classes/filter.js");
+const Command = require("./classes/command.js");
+const User = require("./classes/user.js");
+const AwayFromKeyboard = require("./classes/afk.js");
+const Banphrase = require("./classes/banphrase.js");
+const Channel = require("./classes/channel.js");
+const Reminder = require("./classes/reminder.js");
+const ChatModule = require("./classes/chat-module.js");
+
+// Singletons requires
+const Logger = require("./singletons/logger.js");
+const Pastebin = require("./singletons/pastebin.js");
+const Sandbox = require("./singletons/sandbox.js");
+const VLCConnector = require("./singletons/vlc-connector.js");
+
+const importFileDataModule = async (module, path) => {
 	if (!config.modules[path]) {
 		throw new Error(`Missing configuration for ${path}`);
 	}
@@ -43,19 +60,56 @@ catch {
 	}
 }
 
+const databaseModuleInitializeOrder = [
+	// First batch - no dependencies
+	[Platform, Filter, Command, User, AwayFromKeyboard, Banphrase],
+	// Second batch - all depend on Platform
+	[Channel, Reminder],
+	// Third batch - depends on Platform and Channel
+	[ChatModule]
+];
+
 (async function () {
 	"use strict";
 
-	/** Database access keys are loaded here, and stored to process.env */
-	require("./db-access");
+	// Database access keys are loaded here, and stored to process.env
+	require("./db-access.js");
 
-	/**
-	 * The global bot namespace.
-	 * Used for various utilities, prototype changes and custom classes.
-	 * Assigned to global.sb upon requiring the globals module.
-	 */
+	// The global bot namespace is initialized and assigned to global.sb upon requiring the globals module
 	const initializeSbObject = require("supi-core");
 	globalThis.sb = await initializeSbObject();
+
+	// Initialize bot-specific modules with database-driven data
+	for (let i = 0; i < databaseModuleInitializeOrder.length; i++) {
+		const initOrder = databaseModuleInitializeOrder[i];
+
+		const label = `Batch #${i + 1}: ${initOrder.map(i => i.name).join(", ")}`;
+		console.time(label);
+
+		const promises = initOrder.map(async (module) => await module.initialize());
+		await Promise.all(promises);
+
+		console.timeEnd(label);
+	}
+
+	globalThis.sb = {
+		...sb,
+
+		Platform,
+		Filter,
+		Command,
+		User,
+		AwayFromKeyboard,
+		Banphrase,
+		Channel,
+		Reminder,
+		ChatModule,
+
+		Logger: new Logger(),
+		Pastebin: new Pastebin(),
+		Sandbox: new Sandbox(),
+		VLCConnector: new VLCConnector()
+	};
 
 	if (!config.modules.commands.disableAll) {
 		const { blacklist, whitelist } = config.modules.commands;
@@ -66,8 +120,8 @@ catch {
 	}
 
 	await Promise.all([
-		importModule(sb.ChatModule, "chat-modules"),
-		importModule(sb.Got, "gots")
+		importFileDataModule(sb.ChatModule, "chat-modules"),
+		importFileDataModule(sb.Got, "gots")
 	]);
 
 	const { initializeCrons } = await import("./crons/index.mjs");

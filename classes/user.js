@@ -18,8 +18,8 @@ module.exports = class User extends require("./template.js") {
 
 	static loadUserPrefix = "sb-user-high-load";
 	static loadUserPrefixExpiry = 60_000;
-	static highLoadThreshold = sb.Config.get("USER_ADD_HIGH_LOAD_THRESHOLD", false) ?? 50;
-	static criticalLoadThreshold = sb.Config.get("USER_ADD_CRITICAL_LOAD_THRESHOLD", false) ?? 200;
+	static highLoadThreshold;
+	static criticalLoadThreshold;
 
 	static highLoadUserBatch;
 	static highLoadUserInterval = setInterval(async () => {
@@ -142,6 +142,9 @@ module.exports = class User extends require("./template.js") {
 	}
 
 	static async initialize () {
+		User.highLoadThreshold = sb.Config.get("USER_ADD_HIGH_LOAD_THRESHOLD", false) ?? 50;
+		User.criticalLoadThreshold = sb.Config.get("USER_ADD_CRITICAL_LOAD_THRESHOLD", false) ?? 200;
+
 		User.bots = new Map();
 		User.data = new Map();
 

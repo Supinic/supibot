@@ -1,3 +1,6 @@
+const Platform = require("./platform.js");
+const Channel = require("./channel.js");
+
 module.exports = class ChatModule extends require("./template.js") {
 	static importable = true;
 	static uniqueIdentifier = "Name";
@@ -26,7 +29,7 @@ module.exports = class ChatModule extends require("./template.js") {
 
 		this.Code = data.Code;
 		this.Global = Boolean(data.Global);
-		this.Platform = (data.Platform) ? sb.Platform.get(data.Platform) : null;
+		this.Platform = (data.Platform) ? Platform.get(data.Platform) : null;
 	}
 
 	#initialize (attachmentData) {
@@ -42,7 +45,7 @@ module.exports = class ChatModule extends require("./template.js") {
 			}
 			else {
 				this.attach({
-					platform: sb.Platform.data
+					platform: Platform.data
 				});
 			}
 
@@ -66,7 +69,7 @@ module.exports = class ChatModule extends require("./template.js") {
 
 			this.attach({
 				args,
-				channel: sb.Channel.get(data.Channel)
+				channel: Channel.get(data.Channel)
 			});
 		}
 
@@ -132,7 +135,7 @@ module.exports = class ChatModule extends require("./template.js") {
 
 	detachAll (hard = false) {
 		const channels = this.attachmentReferences
-			.map(i => sb.Channel.get(i.channelID))
+			.map(i => Channel.get(i.channelID))
 			.filter(Boolean);
 
 		this.detach({
@@ -164,10 +167,10 @@ module.exports = class ChatModule extends require("./template.js") {
 
 		if (options.platform) {
 			if (Array.isArray(options.platform)) {
-				result.push(...options.platform.flatMap(i => sb.Channel.getJoinableForPlatform(i)));
+				result.push(...options.platform.flatMap(i => Channel.getJoinableForPlatform(i)));
 			}
 			else {
-				result.push(...sb.Channel.getJoinableForPlatform(options.platform));
+				result.push(...Channel.getJoinableForPlatform(options.platform));
 			}
 		}
 
@@ -239,7 +242,7 @@ module.exports = class ChatModule extends require("./template.js") {
 	}
 
 	static getChannelModules (channel) {
-		const channelData = sb.Channel.get(channel);
+		const channelData = Channel.get(channel);
 		const modules = [];
 
 		for (const module of ChatModule.data) {
@@ -252,8 +255,7 @@ module.exports = class ChatModule extends require("./template.js") {
 		return modules;
 	}
 
-	static detachChannelModules (channel, options = {}) {
-		const channelData = sb.Channel.get(channel);
+	static detachChannelModules (channelData, options = {}) {
 		const detachedModules = ChatModule.getChannelModules(channelData);
 		for (const module of detachedModules) {
 			module.detach({
@@ -263,8 +265,7 @@ module.exports = class ChatModule extends require("./template.js") {
 		}
 	}
 
-	static attachChannelModules (channel) {
-		const channelData = sb.Channel.get(channel);
+	static attachChannelModules (channelData) {
 		const detachedModules = ChatModule.getChannelModules(channelData);
 		for (const module of detachedModules) {
 			module.attach({
@@ -274,7 +275,7 @@ module.exports = class ChatModule extends require("./template.js") {
 	}
 
 	static async reloadChannelModules (channel) {
-		const channelData = sb.Channel.get(channel);
+		const channelData = Channel.get(channel);
 		ChatModule.detachChannelModules(channelData, { remove: true });
 
 		const attachmentData = await sb.Query.getRecordset(rs => rs

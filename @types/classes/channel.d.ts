@@ -1,16 +1,8 @@
-import {
-    Emote,
-    Message,
-    SimpleGenericData
-} from "../globals";
+import { Config, Date } from "supi-core";
+import * as EventEmitter from "events";
 
-import {
-    CacheName,
-    CacheValue,
-    ClassTemplate,
-    GenericCacheMap,
-    SpecificCacheOptions
-} from "./template";
+import { Emote, Message, SimpleGenericData } from "../globals";
+import { ClassTemplate, GenericCacheMap, SpecificCacheOptions } from "./template";
 
 import {
     APIType as BanphraseAPIType,
@@ -26,11 +18,7 @@ import {
 } from "./platform";
 
 import { User } from "./user";
-import { CustomDate } from "../objects/date";
-
-import * as EventEmitter from "events";
-
-declare type Controller = any; // @todo should be imported from github:supinic/supibot
+declare type Controller = any; // @todo should be created soon
 
 export declare type Mode = "Inactive" | "Last seen" | "Read" | "Write" | "VIP" | "Moderator";
 export declare type Like = string | number | Channel;
@@ -61,7 +49,7 @@ declare type OnlineStreamData = {
     live: true;
     stream: {
         game: string;
-        since: CustomDate;
+        since: Date.CustomDate;
         status: string;
         viewers: number;
         quality: `${number}p`;
@@ -304,12 +292,12 @@ export declare class Channel extends ClassTemplate {
     /**
      * Retrieves a channel data property value from the database.
      */
-    getDataProperty (propertyName: CacheName, options?: SpecificCacheOptions): ReturnType<ClassTemplate["getGenericDataProperty"]>;
+    getDataProperty (propertyName: Config.Name, options?: SpecificCacheOptions): ReturnType<ClassTemplate["getGenericDataProperty"]>;
 
     /**
      * Saves a channel data property value into the database.
      */
-    setDataProperty (propertyName: CacheName, value: CacheValue, options?: SpecificCacheOptions): ReturnType<ClassTemplate["setGenericDataProperty"]>;
+    setDataProperty (propertyName: Config.Name, value: Config.Value, options?: SpecificCacheOptions): ReturnType<ClassTemplate["setGenericDataProperty"]>;
 
     /**
      * Pushes a property change to the database.

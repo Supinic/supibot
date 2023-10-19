@@ -1,3 +1,6 @@
+const Channel = require("./channel.js");
+const User = require("./user.js");
+
 /**
  * Represents a filter of the bot's commands.
  */
@@ -374,7 +377,7 @@ module.exports = class Filter extends require("./template.js") {
 	 */
 	static async execute (options) {
 		const { command, targetUser, user } = options;
-		if (user instanceof sb.User && await user.getDataProperty("administrator")) {
+		if (user instanceof User && await user.getDataProperty("administrator")) {
 			return { success: true };
 		}
 
@@ -419,7 +422,7 @@ module.exports = class Filter extends require("./template.js") {
 		}
 
 		if ((command.Flags.optOut || command.Flags.block) && targetUser) {
-			userTo = await sb.User.get(targetUser);
+			userTo = await User.get(targetUser);
 		}
 
 		if (command.Flags.optOut && userTo) {
@@ -534,7 +537,7 @@ module.exports = class Filter extends require("./template.js") {
 		}
 
 		let channelLive = null;
-		if (channel instanceof sb.Channel) {
+		if (channel instanceof Channel) {
 			const streamData = await channel.getStreamData();
 			channelLive = streamData.live ?? false;
 		}
@@ -643,7 +646,7 @@ module.exports = class Filter extends require("./template.js") {
 		));
 
 		let { string } = options;
-		const unpingUsers = await sb.User.getMultiple(filters.map(i => i.User_Alias));
+		const unpingUsers = await User.getMultiple(filters.map(i => i.User_Alias));
 		for (const user of unpingUsers) {
 			// Only unping usernames if they are preceded and followed by a specific set of characters.
 			// The \b escape group isn't usable here due to usernames sometimes being parts of URLs, and unping-ing those

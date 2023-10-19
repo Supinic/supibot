@@ -1,11 +1,10 @@
+import { Date } from "supi-core";
+import { Counter, Gauge } from "prom-client";
+
 import { ClassTemplate } from "./template";
-import { CustomDate as Date } from "../objects/date";
 import { Channel } from "./channel";
 import { Platform, Like as PlatformLike } from "./platform";
 import { User } from "./user";
-
-import { LongTimeout } from "long-timeout";
-import { Counter, Gauge } from "prom-client";
 
 type ConstructorData = {
 	ID: number;
@@ -14,8 +13,8 @@ type ConstructorData = {
 	User_To: User["ID"];
 	Channel: Channel["ID"];
 	Text: string | null;
-	Created: Date;
-	Schedule: Date | null;
+	Created: Date.CustomDate;
+	Schedule: Date.CustomDate | null;
 	Private_Message: boolean;
 	Platform: PlatformLike;
 	Type: Type;
@@ -47,7 +46,6 @@ type Type = "Reminder" | "Pingme" | "Deferred";
 export declare type Like = number | Reminder;
 
 export declare class Reminder extends ClassTemplate {
-	static LongTimeout: LongTimeout;
 	static data: Map<User["ID"], Reminder[]>;
 	static available: Map<Reminder["ID"], User["ID"]>;
 	static readonly mandatoryConstructorOptions: (keyof ConstructorData)[];
@@ -66,7 +64,7 @@ export declare class Reminder extends ClassTemplate {
 	static get (identifier: Like): Reminder | null;
 	static create (data: OmittableConstructorData, skipChecks?: boolean): Promise<Result>;
 	static checkActive (targetUserData: User, channelData: Channel): Promise<void>;
-	static checkLimits (userFrom: number, userTo: number, schedule?: Date): Promise<Result>;
+	static checkLimits (userFrom: number, userTo: number, schedule?: Date.CustomDate): Promise<Result>;
 	static createRelayLink (endpoint: string, params: string): Promise<string>;
 	static clear (): void;
 	static destroy (): void;
@@ -77,13 +75,13 @@ export declare class Reminder extends ClassTemplate {
 	readonly User_To: User["ID"];
 	readonly Channel: Channel["ID"] | null;
 	readonly Text: string | null;
-	readonly Created: Date;
-	readonly Schedule: Date | null;
+	readonly Created: Date.CustomDate;
+	readonly Schedule: Date.CustomDate | null;
 	readonly Private_Message: boolean;
 	readonly Platform: Platform | null;
 	readonly Type: Type;
 
-	private timeout: LongTimeout | null;
+	private timeout: NodeJS.Timeout | null;
 
 	constructor (data: ConstructorData);
 

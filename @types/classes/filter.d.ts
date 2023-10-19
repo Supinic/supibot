@@ -1,8 +1,9 @@
+import { Query } from "supi-core";
+
 import { ClassTemplate } from "./template";
 import { Channel } from "./channel";
 import { Command } from "./command";
 import { Platform } from "./platform";
-import { Row } from "../singletons/query";
 import { User } from "./user";
 import { XOR } from "../globals";
 
@@ -93,7 +94,7 @@ export declare class Filter extends ClassTemplate {
 
 	applyData (data: Data): boolean | number;
 	createFilterData (data: Data): void;
-	toggle (): ReturnType<Row["save"]>;
+	toggle (): ReturnType<Query.Row["save"]>;
 	setReason (reason: Filter["Reason"]): Promise<void>;
 
 	get priority (): number;

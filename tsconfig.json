@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "esnext",
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "allowJs": true,
+    "alwaysStrict": true,
+    "checkJs": false,
+    "emitDeclarationOnly": true
+  },
+  "exclude": [
+    "node_modules",
+    "tests"
+  ]
+}

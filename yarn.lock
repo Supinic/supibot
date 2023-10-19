@@ -3914,15 +3914,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"message-scheduler@Supinic/message-scheduler#master":
-  version: 1.0.0
-  resolution: "message-scheduler@https://github.com/Supinic/message-scheduler.git#commit=c5ba12865e600821faafb235ab7b7211d44467fb"
-  dependencies:
-    long-timeout: "github:supinic/long-timeout"
-  checksum: f05066bd9c1a3765ed09644b7be1f9ad7ca5f3924ab0791ece985711a2b01f81a1f0412cd25f237ed1f8baa676669fc599e9a99c23f0d5cc982bff19bc0631eb
-  languageName: node
-  linkType: hard
-
 "middleware-handler@npm:^0.2.0":
   version: 0.2.0
   resolution: "middleware-handler@npm:0.2.0"
@@ -5342,9 +5333,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-supi-core@supinic/supi-core:
+supi-core@Supinic/supi-core:
   version: 2.2.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=ccbd666f6ae41d40568e6e654121d6cbe34607b4"
+  resolution: "supi-core@https://github.com/Supinic/supi-core.git#commit=3895f6aa34d282db65b16ec1f2d536e4dff43760"
   dependencies:
     async-markov: "github:supinic/async-markov"
     cheerio: ^1.0.0-rc.12
@@ -5365,7 +5356,7 @@ supi-core@supinic/supi-core:
     track-link-parser: "github:supinic/track-link-parser"
     transliteration: ^2.3.5
     vm2: ^3.9.19
-  checksum: 59045eb2db6f84a96428e254518cd423fc47a9dd08f4be654ca50a680f40be6d185f389cbc1c0669e845510b5c9395009d8588615f4603479e691ea88c545745
+  checksum: 251b9da9d17aa0697ee37960fd2c5e930a8a395e2a143db74cd8cec315783da02630002e90a8cdf9a472e20b6006ef028211ceb9865221b45e0883e46696144e
   languageName: node
   linkType: hard
 
@@ -5393,10 +5384,9 @@ supi-core@supinic/supi-core:
     eslint: ^8.44.0
     eslint-plugin-unicorn: ^47.0.0
     irc-framework: ^4.13.1
-    message-scheduler: "Supinic/message-scheduler#master"
     mocha: ^10.2.0
     nyc: ^15.1.0
-    supi-core: supinic/supi-core
+    supi-core: Supinic/supi-core
     supi-db-init: "Supinic/supi-db-init#master"
   languageName: unknown
   linkType: soft
