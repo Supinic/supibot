@@ -3,7 +3,7 @@ const Banphrase = require("./banphrase.js");
 const Channel = require("./channel.js");
 const Command = require("./command.js");
 const Filter = require("./filter.js");
-const Platform = require("./user.js");
+const Platform = require("./platform.js");
 const User = require("./user.js");
 
 const LongTimeout = require("../utils/long-timeout.js");
