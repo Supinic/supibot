@@ -1,4 +1,3 @@
-import { SingletonTemplate as Template } from "./template";
 import { Information, Node, Root, Status, VLCClient as Client } from "./vlc-client";
 import { Port, SimpleGenericData, URL } from "../globals";
 
@@ -51,10 +50,7 @@ declare type AddOptions = {
 };
 declare type Generic = SimpleGenericData;
 
-export declare class VLCSingleton implements Template {
-    static module: VLCSingleton;
-    static singleton (): VLCSingleton;
-
+export declare class VLCSingleton {
     readonly client: Client;
     readonly baseURL: string;
     private seekValues: {

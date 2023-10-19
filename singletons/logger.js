@@ -33,25 +33,11 @@ const fillObjectByPlatform = (obj, userData, platformData) => {
  * Logging module that handles all possible chat message and video logging.
  * Accesses the database so that nothing needs to be exposed in chat clients.
  */
-module.exports = class LoggerSingleton extends require("./template.js") {
+module.exports = class LoggerSingleton {
 	#crons = [];
 	#presentTables = null;
 
-	/**
-	 * @inheritDoc
-	 * @returns {LoggerSingleton}
-	 */
-	static singleton () {
-		if (!LoggerSingleton.module) {
-			LoggerSingleton.module = new LoggerSingleton();
-		}
-
-		return LoggerSingleton.module;
-	}
-
 	constructor () {
-		super();
-
 		this.videoTypes = null;
 
 		if (sb.Config.get("LOG_MESSAGE_CRON", false)) {
@@ -198,8 +184,8 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 	 * Inserts a log message into the database - `chat_data.Log` table
 	 * @param {string} tag
 	 * @param {string} [description] = null
-	 * @param {sb.Channel} [channel] = null
-	 * @param {sb.User} [user] = null
+	 * @param {{ ID: number }} [channel] = null
+	 * @param {{ ID: number }} [user] = null
 	 * @returns {Promise<number>} ID of the created database logging record
 	 */
 	async log (tag, description = null, channel = null, user = null) {
@@ -378,8 +364,8 @@ module.exports = class LoggerSingleton extends require("./template.js") {
 	 * @param {string} link
 	 * @param {string} typeIdentifier
 	 * @param {number} length
-	 * @param {sb.User} userData
-	 * @param {sb.Channel} channelData
+	 * @param {{ ID: number }} userData
+	 * @param {{ ID: number }} channelData
 	 * @returns {Promise<void>}
 	 */
 	async logVideoRequest (link, typeIdentifier, length, userData, channelData) {

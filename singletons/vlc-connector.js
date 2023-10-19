@@ -1,3 +1,5 @@
+const VLCClient = require("./vlc-client.js");
+
 const actions = [
 	"addToQueue",
 	"addToQueueAndPlay",
@@ -19,7 +21,6 @@ const actions = [
 	"seek",
 	"seekToChapter"
 ];
-
 const mandatoryConfigs = [
 	"LOCAL_VLC_IP",
 	"LOCAL_VLC_BASE_URL"
@@ -28,12 +29,11 @@ const mandatoryConfigs = [
 /**
  * VideoLANConnector (VLC) handler module - handles a VLC instance's playlist and methods.
  */
-module.exports = class VLCSingleton extends require("./template.js") {
+module.exports = class VLCSingleton {
 	/**
-	 * @inheritDoc
-	 * @returns {VLCSingleton}
+	 * @todo fit this call in the supibot repository after the migration is completed
 	 */
-	static singleton () {
+	static initialize () {
 		if (!VLCSingleton.module) {
 			const missingConfigs = mandatoryConfigs.filter(key => !sb.Config.has(key));
 			if (missingConfigs.length !== 0) {
@@ -56,10 +56,6 @@ module.exports = class VLCSingleton extends require("./template.js") {
 	}
 
 	constructor (options = {}) {
-		super();
-
-		const VLCClient = require("./vlc-client.js");
-
 		this.client = new VLCClient({
 			host: options.url,
 			port: options.port,
@@ -296,47 +292,6 @@ module.exports = class VLCSingleton extends require("./template.js") {
 		}
 		else {
 			return status.information;
-		}
-	}
-
-	/**
-	 * Deletes the last video queued by a certain user.
-	 * Used when the user queues a song they didn't want to queue.
-	 * Returns void if the user was not found or that user has no active requests.
-	 * Returns song name if the deletion was successful.
-	 * @param {number} user ID
-	 * @returns {Promise<void|string>}
-	 */
-	async wrongSong (user) {
-		const userData = await sb.User.get(user);
-		if (!userData) {
-			return { success: false, reason: "no-user" };
-		}
-
-		const userRequests = this.videoQueue.filter(i => i.user === userData.ID);
-		if (userRequests.length === 0) {
-			return { success: false, reason: "no-requests" };
-		}
-
-		const playingData = await this.currentlyPlayingData();
-		if (!playingData || !Number(playingData.vlcID)) {
-			playingData.vlcID = -Infinity;
-		}
-
-		try {
-			const [firstUserSong] = userRequests
-				.filter(i => i.vlcID >= playingData.vlcID)
-				.sort((a, b) => a.vlcID - b.vlcID);
-
-			const link = sb.Utils.linkParser.parseLink(firstUserSong.link);
-			const deletedSongData = await this.getDataByName(firstUserSong.name, link);
-			await this.delete(deletedSongData.id);
-
-			return { success: true, song: deletedSongData };
-		}
-		catch (e) {
-			console.error(e);
-			return { success: false, reason: "delete-failed" };
 		}
 	}
 

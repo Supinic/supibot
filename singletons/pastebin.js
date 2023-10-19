@@ -32,7 +32,7 @@ const allowedExpirationOptions = {
 /**
  * Pastebin module: allows easy get/post methods with potential authentication, if so desired.
  */
-module.exports = class PastebinSingleton extends require("./template.js") {
+module.exports = class PastebinSingleton {
 	#authData = null;
 	#authenticationPending = false;
 	#got = sb.Got.extend({
@@ -43,17 +43,6 @@ module.exports = class PastebinSingleton extends require("./template.js") {
 			"User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
 		}
 	});
-
-	/**
-	 * @inheritDoc
-	 * @returns {PastebinSingleton}
-	 */
-	static singleton () {
-		if (!PastebinSingleton.module) {
-			PastebinSingleton.module = new PastebinSingleton();
-		}
-		return PastebinSingleton.module;
-	}
 
 	/**
 	 * Attempts to log in and preserves authentication data.

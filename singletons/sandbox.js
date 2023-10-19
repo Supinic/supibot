@@ -1,9 +1,12 @@
+// @todo this entire class can be removed by exporting the default options and just using `vm.run`
+const vm2 = require("vm2");
+
 /**
  * Sandbox module, created with the aim of running custom user input as safely as possible.
  */
-module.exports = class SandboxSingleton extends require("./template.js") {
-	#VM;
-	#NodeVM;
+module.exports = class SandboxSingleton {
+	#VM = vm2.VM;
+	#NodeVM = vm2.NodeVM;
 	#defaultVMOptions = {
 		sandbox: {},
 		compiler: "javascript",
@@ -12,32 +15,6 @@ module.exports = class SandboxSingleton extends require("./template.js") {
 		fixAsync: true,
 		timeout: 5000
 	};
-
-	/**
-	 * @inheritDoc
-	 * @returns {SandboxSingleton}
-	 */
-	static singleton () {
-		if (!SandboxSingleton.module) {
-			let sandboxModule;
-			try {
-				sandboxModule = require("vm2");
-				SandboxSingleton.module = new SandboxSingleton(sandboxModule);
-			}
-			catch {
-				console.warn("Could not load the vm2 module for sb.Sandbox - skipping");
-				SandboxSingleton.module = {};
-			}
-		}
-
-		return SandboxSingleton.module;
-	}
-
-	constructor (sandboxModule) {
-		super();
-		this.#VM = sandboxModule.VM;
-		this.#NodeVM = sandboxModule.NodeVM;
-	}
 
 	/**
 	 * Runs given script inside of a provided secure VM
@@ -59,7 +36,7 @@ module.exports = class SandboxSingleton extends require("./template.js") {
 	get modulePath () { return "sandbox"; }
 
 	destroy () {
-		this.VM = null;
-		this.NodeVM = null;
+		this.#VM = null;
+		this.#NodeVM = null;
 	}
 };

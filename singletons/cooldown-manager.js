@@ -79,20 +79,11 @@ class Pending {
 /**
  * Manages the cooldowns between each message sent to channels.
  */
-class CooldownManagerSingleton extends require("./template.js") {
-	static singleton () {
-		if (!CooldownManagerSingleton.module) {
-			CooldownManagerSingleton.module = new CooldownManagerSingleton();
-		}
-
-		return CooldownManagerSingleton.module;
-	}
-
+class CooldownManagerSingleton {
 	/**
 	 * Creates a new Cooldown manager instance.
 	 */
 	constructor () {
-		super();
 		this.data = [];
 		this.pendingCooldownExpiration = sb.Config.get("DEFAULT_PENDING_TIMEOUT", false) ?? 300_000;
 	}

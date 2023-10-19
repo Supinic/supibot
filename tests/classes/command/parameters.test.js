@@ -1,3 +1,5 @@
+// @todo move to Supinic/Supibot repo after moving is done
+
 const assert = require("assert");
 const Command = require("../../../classes/command");
 

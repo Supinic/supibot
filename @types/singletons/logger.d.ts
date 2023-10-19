@@ -1,4 +1,3 @@
-import { SingletonTemplate as Template } from "./template";
 import { CustomDate as Date } from "../objects/date";
 import { JSONifiable, Message } from "../globals";
 import { Channel } from "../classes/channel";
@@ -40,10 +39,7 @@ declare type ErrorLogData = {
     arguments?: JSONifiable;
 };
 
-export declare class LoggerSingleton implements Template {
-    static module: LoggerSingleton;
-    static singleton (): LoggerSingleton;
-
+export declare class LoggerSingleton {
     constructor ();
 
     log (tag: LogTag, description?: string | null, channel?: HasID | null, user?: HasID | null ): Promise<number>;

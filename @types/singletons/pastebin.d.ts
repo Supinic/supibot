@@ -1,4 +1,3 @@
-import { SingletonTemplate as Template } from "./template";
 import { Got } from "../classes/got";
 
 export declare type Body = {
@@ -28,9 +27,7 @@ export declare type ExpirationObject = {
 export declare type Expiration = ExpirationObject[keyof ExpirationObject];
 export declare type AllowedExpiration = keyof ExpirationObject | Expiration;
 
-export declare class PastebinSingleton implements Template {
-    static module: PastebinSingleton;
-    static singleton (): PastebinSingleton;
+export declare class PastebinSingleton {
     static getPrivacy (mode: number | string): Privacy;
     static getExpiration (string: AllowedExpiration): Expiration;
 

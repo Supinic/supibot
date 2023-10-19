@@ -1,4 +1,3 @@
-import { SingletonTemplate as Template } from "./template";
 import { SimpleGenericData } from "../globals";
 
 export declare type Identifier = number | string | null;
@@ -45,10 +44,7 @@ export declare class Pending implements Inhibitor {
     get user (): Identifier;
 }
 
-export declare class CooldownManagerSingleton implements Template {
-    static module: CooldownManagerSingleton;
-    static singleton (): CooldownManagerSingleton;
-
+export declare class CooldownManagerSingleton {
     data: Cooldown | Pending[];
     readonly pendingCooldownExpiration: number;
 
