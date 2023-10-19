@@ -108,7 +108,9 @@ const databaseModuleInitializeOrder = [
 		Logger: new Logger(),
 		Pastebin: new Pastebin(),
 		Sandbox: new Sandbox(),
-		VLCConnector: new VLCConnector()
+		VLCConnector: new VLCConnector(),
+
+		API: require("./api")
 	};
 
 	if (!config.modules.commands.disableAll) {
@@ -116,19 +118,19 @@ const databaseModuleInitializeOrder = [
 		const { loadCommands } = await require("./commands/index.js");
 		const commands = await loadCommands({ blacklist, whitelist });
 
-		await sb.Command.importData(commands.definitions);
+		await Command.importData(commands.definitions);
 	}
 
 	await Promise.all([
-		importFileDataModule(sb.ChatModule, "chat-modules"),
+		importFileDataModule(ChatModule, "chat-modules"),
 		importFileDataModule(sb.Got, "gots")
 	]);
 
 	const { initializeCrons } = await import("./crons/index.mjs");
-	globalThis.sb.crons = initializeCrons(config.modules.crons);
+	initializeCrons(config.modules.crons);
 
 	const controllers = {};
-	const initialPlatforms = sb.Channel.getActivePlatforms();
+	const initialPlatforms = Channel.getActivePlatforms();
 
 	if (sb.Metrics) {
 		sb.Metrics.registerCounter({
@@ -166,9 +168,7 @@ const databaseModuleInitializeOrder = [
 		console.debug(`Platform ${platformData.Name} loaded successfully.`);
 	}
 
-	sb.API = require("./api");
-
-	sb.Platform.assignControllers(controllers);
+	Platform.assignControllers(controllers);
 
 	process.on("unhandledRejection", async (reason) => {
 		if (!(reason instanceof Error)) {
