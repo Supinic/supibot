@@ -58,14 +58,15 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("FakeAgent", {
-			// Zodiac signs must be lowercased as the website skips the horoscope summary if the zodiac is capitalized
-			url: `https://www.ganeshaspeaks.com/horoscopes/yesterday-horoscope/${zodiacName.toLowerCase()}`,
-			responseType: "text"
+		const response = await sb.Got("GenericAPI", {
+			responseType: "text",
+			url: `https://www.astrology.com/horoscope/daily/${zodiacName}.html`
 		});
 
-		const $ = sb.Utils.cheerio(response.body);
-		const node = $("#horo_content");
+		const html = response.body;
+		const $ = sb.Utils.cheerio(html);
+		const node = $(".horoscope-content-wrapper > #content");
+
 		if (node.length === 0) {
 			return {
 				success: false,
@@ -79,9 +80,14 @@ module.exports = {
 			};
 		}
 
+		// "Heuristic" that removes the last two sentences from the horoscope. This is aimed to slim down
+		// the response, since it's usually a bit too long (around 600 characters) for Twitch (500 chars);
+		const fullTextArray = node.text().trim().split(/\.\s/);
+		const trimmedText = fullTextArray.slice(0, -2).join(". ");
+
 		const prefix = (own) ? "Your" : "";
 		return {
-			reply: `${prefix} ${sb.Utils.capitalize(zodiacName)} horoscope for today: ${node.text()}`
+			reply: `${prefix} ${sb.Utils.capitalize(zodiacName)} horoscope for today: ${trimmedText}.`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => {
@@ -96,7 +102,7 @@ module.exports = {
 
 		return [
 			"Fetches a horoscope for either your zodiac sign, or one that you provide.",
-			`To automatically use your horoscope, you should set your birth date (only month + day) via the <a href="/bot/command/detail/set">set birthday</a> command`,
+			`To automatically use your horoscope, you should set your birthdate (only month + day) via the <a href="/bot/command/detail/set">set birthday</a> command`,
 			"",
 
 			`<code>${prefix}horoscope</code>`,
