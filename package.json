@@ -5,11 +5,11 @@
     "acorn-node": "^2.0.1",
     "bing-chat": "^0.2.3",
     "cron": "^2.4.3",
-    "cytube-connector": "Supinic/cytube-connector#master",
+    "cytube-connector": "supinic/cytube-connector#master",
     "dank-twitch-irc": "^4.3.0",
     "discord.js": "^14.11.0",
     "irc-framework": "^4.13.1",
-    "supi-core": "Supinic/supi-core"
+    "supi-core": "supinic/supi-core"
   },
   "engines": {
     "node": ">= 16.0"
