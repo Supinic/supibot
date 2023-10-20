@@ -1,4 +1,12 @@
-const bannedCommandCombinations = require("../../config.json").modules.commands.bannedCombinations ?? [];
+let config;
+try {
+	config = require("../../config.json");
+}
+catch {
+	config = require("../../config-default.json");
+}
+
+const bannedCommandCombinations = config.modules.commands.bannedCombinations ?? [];
 
 module.exports = {
 	Name: "alias",

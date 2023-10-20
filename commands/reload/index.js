@@ -1,4 +1,13 @@
-const BASE_PATH = require("../../config.json").basePath;
+let config;
+try {
+	config = require("../../config.json");
+}
+catch {
+	console.warn(`Custom config not found, $reload command will use base path "${__dirname}"`);
+	config = { basePath: __dirname };
+}
+
+const BASE_PATH = config.basePath;
 
 module.exports = {
 	Name: "reload",
