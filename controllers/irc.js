@@ -68,9 +68,9 @@ module.exports = class IRCController extends require("./template.js") {
 			}
 		});
 
-		client.on("join", async (event) => {
-			console.log("JOIN", { event });
-		});
+		// client.on("join", async (event) => {
+		// 	console.log("JOIN", { event });
+		// });
 
 		client.on("nick in use", async () => {
 			const string = sb.Utils.randomString(16);
