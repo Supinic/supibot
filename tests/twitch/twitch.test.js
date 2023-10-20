@@ -2,52 +2,48 @@
 /* eslint-disable prefer-arrow-callback */
 const assert = require("assert");
 
+const Channel = require("../../classes/channel.js");
+const Command = require("../../classes/command.js");
+const Platform = require("../../classes/platform.js");
+const User = require("../../classes/user.js");
+
 require("dank-twitch-irc");
 const MockTwitchClient = require("./mock-client.js");
 require.cache[require.resolve("dank-twitch-irc")].exports = MockTwitchClient;
 
 const initialize = (async () => {
-	globalThis.sb = await require("supi-core")({
-		whitelist: [
-			"objects/date",
-			"objects/error",
-			"classes/channel",
-			"classes/command",
-			"classes/config",
-			"classes/cron",
-			"classes/platform",
-			"classes/user"
-		],
-		skipData: [
-			"classes/channel",
-			"classes/command",
-			"classes/config",
-			"classes/cron",
-			"classes/platform",
-			"classes/user"
-		]
-	});
+	const Date = require("supi-core/objects/date.js");
+	const Config = require("supi-core/classes/config.js");
 
-	sb.Utils = {
-		wrapString: string => string
+	globalThis.sb = {
+		Date,
+		Config,
+		Utils: {
+			wrapString: string => string
+		},
+
+		User,
+		Channel,
+		Platform,
+		Command
 	};
 
 	sb.User.data = new Map([
-		["supinic", new sb.User({ Name: "supinic", Twitch_ID: "31400525" })],
-		["mm2pl", new sb.User({ Name: "mm2pl", Twitch_ID: "117691339" })],
-		["mickeyzzzz", new sb.User({ Name: "mickeyzzzz", Twitch_ID: "161967202" })]
+		["supinic", new User({ Name: "supinic", Twitch_ID: "31400525" })],
+		["mm2pl", new User({ Name: "mm2pl", Twitch_ID: "117691339" })],
+		["mickeyzzzz", new User({ Name: "mickeyzzzz", Twitch_ID: "161967202" })]
 	]);
 
 	sb.AwayFromKeyboard = { checkActive: () => void 0 };
 	sb.Reminder = { checkActive: () => void 0 };
 
-	sb.Platform.data = [new sb.Platform({
+	sb.Platform.data = [new Platform({
 		Name: "twitch",
 		Self_Name: "supibot"
 	})];
 
 	// noinspection JSConstantReassignment
-	sb.Channel.data = new Map().set(sb.Platform.data[0], new Map([
+	sb.Channel.data = new Map().set(Platform.data[0], new Map([
 		[
 			"supinic",
 			new sb.Channel({
@@ -68,17 +64,17 @@ const initialize = (async () => {
 
 	sb.Command.data = [];
 	sb.Config.data = new Map([
-		["TWITCH_OAUTH", new sb.Config({
+		["TWITCH_OAUTH", new Config({
 			Name: "TWITCH_OAUTH",
 			Value: "xd",
 			Type: "string"
 		})],
-		["TWITCH_CLIENT_ID", new sb.Config({
+		["TWITCH_CLIENT_ID", new Config({
 			Name: "TWITCH_CLIENT_ID",
 			Value: "xd",
 			Type: "string"
 		})],
-		["COMMAND_PREFIX", new sb.Config({
+		["COMMAND_PREFIX", new Config({
 			Name: "COMMAND_PREFIX",
 			Value: "$",
 			Type: "string"
@@ -95,14 +91,14 @@ const initialize = (async () => {
 		setByPrefix: () => {}
 	};
 
-	const userCheck = await sb.User.get("supinic");
-	assert.strictEqual(userCheck instanceof sb.User, true);
+	const userCheck = await User.get("supinic");
+	assert.strictEqual(userCheck instanceof User, true);
 
-	const channelCheck = sb.Channel.get("supinic");
-	assert.strictEqual(channelCheck instanceof sb.Channel, true);
+	const channelCheck = Channel.get("supinic");
+	assert.strictEqual(channelCheck instanceof Channel, true);
 
-	assert.strictEqual(sb.Command.prefix, "$");
-	assert.strictEqual(sb.Command.is("$test"), true);
+	assert.strictEqual(Command.prefix, "$");
+	assert.strictEqual(Command.is("$test"), true);
 });
 
 describe("twitch controller", function () {

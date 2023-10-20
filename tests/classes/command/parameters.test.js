@@ -3,9 +3,10 @@
 const assert = require("assert");
 const Command = require("../../../classes/command");
 
-beforeEach(() => {
+beforeEach(async() => {
+	const Date = require("supi-core/objects/date");
 	globalThis.sb = {
-		Date: require("../../../objects/date"),
+		Date,
 		Utils: {
 			parseRegExp: (input) => {
 				try {
