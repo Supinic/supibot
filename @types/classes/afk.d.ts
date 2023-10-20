@@ -1,9 +1,8 @@
-import { Date } from "supi-core";
+import { Date, Metrics } from "supi-core";
 
 import { ClassTemplate } from "./template";
 import { Channel } from "./channel";
 import { User } from "./user";
-import { Counter, Gauge } from "prom-client";
 
 export declare type Status = "afk" | "poop" | "gn" | "brb" | "shower" | "lurk" | "food" | "work" | "ppPoof" | "study";
 export declare type Like = number | AwayFromKeyboard;
@@ -28,8 +27,8 @@ declare type SetData = Omit<ConstructorData, "ID"> & {
 export declare class AwayFromKeyboard extends ClassTemplate {
 	static readonly data: Map<number, AwayFromKeyboard>;
 
-	static #activeGauge: Gauge;
-	static #totalCounter: Counter;
+	static #activeGauge: Metrics.Gauge;
+	static #totalCounter: Metrics.Counter;
 
 	/**
 	 * Reloads a specific list of AFK statuses, provided as identifiers.
