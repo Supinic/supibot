@@ -1830,9 +1830,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cytube-connector@Supinic/cytube-connector#master":
+"cytube-connector@supinic/cytube-connector#master":
   version: 2.1.0
-  resolution: "cytube-connector@https://github.com/Supinic/cytube-connector.git#commit=12e2610118af8ab575fd28b47984f07e58086611"
+  resolution: "cytube-connector@https://github.com/supinic/cytube-connector.git#commit=12e2610118af8ab575fd28b47984f07e58086611"
   dependencies:
     got: ^11.3.0
     socket.io-client: ^4.4.0
@@ -5333,9 +5333,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-supi-core@Supinic/supi-core:
+supi-core@supinic/supi-core:
   version: 2.2.0
-  resolution: "supi-core@https://github.com/Supinic/supi-core.git#commit=3895f6aa34d282db65b16ec1f2d536e4dff43760"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=3895f6aa34d282db65b16ec1f2d536e4dff43760"
   dependencies:
     async-markov: "github:supinic/async-markov"
     cheerio: ^1.0.0-rc.12
@@ -5378,7 +5378,7 @@ supi-core@Supinic/supi-core:
     acorn-node: ^2.0.1
     bing-chat: ^0.2.3
     cron: ^2.4.3
-    cytube-connector: "Supinic/cytube-connector#master"
+    cytube-connector: "supinic/cytube-connector#master"
     dank-twitch-irc: ^4.3.0
     discord.js: ^14.11.0
     eslint: ^8.44.0
@@ -5386,7 +5386,7 @@ supi-core@Supinic/supi-core:
     irc-framework: ^4.13.1
     mocha: ^10.2.0
     nyc: ^15.1.0
-    supi-core: Supinic/supi-core
+    supi-core: supinic/supi-core
     supi-db-init: "Supinic/supi-db-init#master"
   languageName: unknown
   linkType: soft
