@@ -108,7 +108,7 @@ const databaseModuleInitializeOrder = [
 		Logger: new Logger(),
 		Pastebin: new Pastebin(),
 		Sandbox: new Sandbox(),
-		VideoLANConnector: new VLCConnector(),
+		VideoLANConnector: VLCConnector.initialize(), // @todo move code from `initialize` here
 
 		API: require("./api")
 	};
