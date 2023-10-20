@@ -833,6 +833,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opentelemetry/api@npm:^1.4.0":
+  version: 1.6.0
+  resolution: "@opentelemetry/api@npm:1.6.0"
+  checksum: 3283b78b62a39f6568eaa050ac7045fcca747679e255874f6d2107cb8e1a3b2e10bfbf553c3e82a72500fb5fdca49dc07a5fe27fd6980debac24506cca638859
+  languageName: node
+  linkType: hard
+
 "@sapphire/async-queue@npm:^1.5.0":
   version: 1.5.0
   resolution: "@sapphire/async-queue@npm:1.5.0"
@@ -1069,28 +1076,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn-walk@npm:^8.2.0":
-  version: 8.2.0
-  resolution: "acorn-walk@npm:8.2.0"
-  checksum: 1715e76c01dd7b2d4ca472f9c58968516a4899378a63ad5b6c2d668bba8da21a71976c14ec5f5b75f887b6317c4ae0b897ab141c831d741dc76024d8745f1ad1
-  languageName: node
-  linkType: hard
-
 "acorn@npm:^7.0.0":
   version: 7.4.1
   resolution: "acorn@npm:7.4.1"
   bin:
     acorn: bin/acorn
   checksum: 1860f23c2107c910c6177b7b7be71be350db9e1080d814493fae143ae37605189504152d1ba8743ba3178d0b37269ce1ffc42b101547fdc1827078f82671e407
-  languageName: node
-  linkType: hard
-
-"acorn@npm:^8.7.0":
-  version: 8.8.1
-  resolution: "acorn@npm:8.8.1"
-  bin:
-    acorn: bin/acorn
-  checksum: 4079b67283b94935157698831967642f24a075c52ce3feaaaafe095776dfbe15d86a1b33b1e53860fc0d062ed6c83f4284a5c87c85b9ad51853a01173da6097f
   languageName: node
   linkType: hard
 
@@ -1240,13 +1231,6 @@ __metadata:
   version: 1.0.2
   resolution: "array-uniq@npm:1.0.2"
   checksum: 8c4beb94aa183791da1e155935aba4df3fe2eeb6f491c69e666ca7351f897b9b260fa04d016e0ce766ae8280129c16f11071e17359c81c01741289009bb5ac6d
-  languageName: node
-  linkType: hard
-
-"async-markov@github:supinic/async-markov":
-  version: 1.0.0
-  resolution: "async-markov@https://github.com/supinic/async-markov.git#commit=dc437ceb6bdc1e59c2c371b0264ec385436f0821"
-  checksum: 7fbf612d0ec20c4d0efbfac6f161c4f140e6bce78a7988003b4d8fd26d19ac4f8c3285f8cf686663ec04b621562bea11134448bccaa36c67023a6298226519fc
   languageName: node
   linkType: hard
 
@@ -1621,12 +1605,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chrono-node@npm:^2.6.3":
-  version: 2.6.3
-  resolution: "chrono-node@npm:2.6.3"
+"chrono-node@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "chrono-node@npm:2.7.0"
   dependencies:
     dayjs: ^1.10.0
-  checksum: 6f4dc453380d64cb5eb0a1d3641971d84463cea48b94f410b372e0e8a6be7cbf9aa614d252d088195409c699aee60afef85cdd9ad2a89f93ba991c3f97bb4f0f
+  checksum: e4793cc6145cff9ec05ef6a975c75a951830fbcc9b6fa49e95259d68a40662b43b9929473503b4d8de57d9eb68059ad7a9be2067ff3806e2c312e1319664fb00
   languageName: node
   linkType: hard
 
@@ -3784,13 +3768,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"long-timeout@github:supinic/long-timeout":
-  version: 1.0.0
-  resolution: "long-timeout@https://github.com/supinic/long-timeout.git#commit=0af0725d12646bfe99de59b299d81efc5a50d93d"
-  checksum: 0d8f672de8e0b9f26314e98d8ffce143e388975ad863deebd813769f564d895464e0f56ea9512c1a1300b4128a9d1b5aac06894760c6c848bb0a479d9a82e9a4
-  languageName: node
-  linkType: hard
-
 "lowercase-keys@npm:^2.0.0":
   version: 2.0.0
   resolution: "lowercase-keys@npm:2.0.0"
@@ -3802,6 +3779,13 @@ __metadata:
   version: 3.0.0
   resolution: "lowercase-keys@npm:3.0.0"
   checksum: 67a3f81409af969bc0c4ca0e76cd7d16adb1e25aa1c197229587eaf8671275c8c067cd421795dbca4c81be0098e4c426a086a05e30de8a9c587b7a13c0c7ccc5
+  languageName: node
+  linkType: hard
+
+"lru-cache@npm:^10.0.1":
+  version: 10.0.1
+  resolution: "lru-cache@npm:10.0.1"
+  checksum: 06f8d0e1ceabd76bb6f644a26dbb0b4c471b79c7b514c13c6856113879b3bf369eb7b497dad4ff2b7e2636db202412394865b33c332100876d838ad1372f0181
   languageName: node
   linkType: hard
 
@@ -3823,7 +3807,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lru-cache@npm:^7.14.0, lru-cache@npm:^7.7.1":
+"lru-cache@npm:^7.7.1":
   version: 7.14.1
   resolution: "lru-cache@npm:7.14.1"
   checksum: d72c6713c6a6d86836a7a6523b3f1ac6764768cca47ec99341c3e76db06aacd4764620e5e2cda719a36848785a52a70e531822dc2b33fb071fa709683746c104
@@ -3901,16 +3885,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mariadb@npm:^3.2.0":
-  version: 3.2.0
-  resolution: "mariadb@npm:3.2.0"
+"mariadb@npm:^3.2.2":
+  version: 3.2.2
+  resolution: "mariadb@npm:3.2.2"
   dependencies:
     "@types/geojson": ^7946.0.10
     "@types/node": ^17.0.45
     denque: ^2.1.0
     iconv-lite: ^0.6.3
-    lru-cache: ^7.14.0
-  checksum: 971a84cf42e026ddfd209450cbf98b2af00a6cf9a49fe245b2662e767196a7a8f26ab728cdc6b715aafbb40631f57754e19251f9e38e679106c7d190106d4eee
+    lru-cache: ^10.0.1
+  checksum: 87719e4092c1941b595b60e288f4a7a41d14d03d0fec24eabcf1e98715e9976986db5236861ef69c18de192ac53c47a658d754a1b55deb9ada7e3d0879b207a7
   languageName: node
   linkType: hard
 
@@ -4590,12 +4574,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prom-client@npm:^14.2.0":
-  version: 14.2.0
-  resolution: "prom-client@npm:14.2.0"
+"prom-client@npm:^15.0.0":
+  version: 15.0.0
+  resolution: "prom-client@npm:15.0.0"
   dependencies:
+    "@opentelemetry/api": ^1.4.0
     tdigest: ^0.1.1
-  checksum: d4c04e57616c72643dd02862d0d4bde09cf8869a19d0aef5e7b785e6e27d02439b66cdc165e3492f62d579fa91579183820870cc757a09b99399d2d02f46b9f1
+  checksum: a447cc4c7d87e610f9ed9c018dcbe759f06d32b6c3d401d90cafa6b15feee54e0ec5d0ee1d4925db905ea35c6e894be842de25e6bc0b5d415147a0b714c248f8
   languageName: node
   linkType: hard
 
@@ -5335,28 +5320,24 @@ __metadata:
 
 supi-core@supinic/supi-core:
   version: 2.2.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=3895f6aa34d282db65b16ec1f2d536e4dff43760"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=268f5d380794ab04198a39929141dd8a5ee6c9c2"
   dependencies:
-    async-markov: "github:supinic/async-markov"
     cheerio: ^1.0.0-rc.12
-    chrono-node: ^2.6.3
-    cron: ^2.4.3
+    chrono-node: ^2.7.0
     duration-parser: "github:supinic/duration-parser"
     ffprobe: ^1.1.2
     form-data: ^4.0.0
     got: ^13.0.0
     ioredis: ^5.3.2
     language-iso-codes: "github:supinic/language-iso-codes"
-    long-timeout: "github:supinic/long-timeout"
-    mariadb: ^3.2.0
-    prom-client: ^14.2.0
+    mariadb: ^3.2.2
+    prom-client: ^15.0.0
     random-js: ^2.1.0
     roll-dice: "npm:@jprochazk/roll-dice@^0.2.2"
     rss-parser: ^3.13.0
     track-link-parser: "github:supinic/track-link-parser"
     transliteration: ^2.3.5
-    vm2: ^3.9.19
-  checksum: 251b9da9d17aa0697ee37960fd2c5e930a8a395e2a143db74cd8cec315783da02630002e90a8cdf9a472e20b6006ef028211ceb9865221b45e0883e46696144e
+  checksum: e2ae6f1594b5dc11f80980edcd4d4b2abf551124358abe2cf8ffd5c9d2d42c54d39fa2cc9334dc6b150d41844a3936ae6ab8a7761faf751fe605748d9891e28f
   languageName: node
   linkType: hard
 
@@ -5693,18 +5674,6 @@ supi-core@supinic/supi-core:
     spdx-correct: ^3.0.0
     spdx-expression-parse: ^3.0.0
   checksum: 35703ac889d419cf2aceef63daeadbe4e77227c39ab6287eeb6c1b36a746b364f50ba22e88591f5d017bc54685d8137bc2d328d0a896e4d3fd22093c0f32a9ad
-  languageName: node
-  linkType: hard
-
-"vm2@npm:^3.9.19":
-  version: 3.9.19
-  resolution: "vm2@npm:3.9.19"
-  dependencies:
-    acorn: ^8.7.0
-    acorn-walk: ^8.2.0
-  bin:
-    vm2: bin/vm2
-  checksum: fc6cf553134145cd7bb5246985bf242b056e3fb5ea71e2eef6710b2a5d6c6119cc6bc960435ff62480ee82efb43369be8f4db07b6690916ae7d3b2e714f395d8
   languageName: node
   linkType: hard
 
