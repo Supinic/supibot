@@ -12,7 +12,6 @@ const ChatModule = require("./classes/chat-module.js");
 // Singletons requires
 const Logger = require("./singletons/logger.js");
 const Pastebin = require("./singletons/pastebin.js");
-const Sandbox = require("./singletons/sandbox.js");
 const VLCConnector = require("./singletons/vlc-connector.js");
 
 const importFileDataModule = async (module, path) => {
@@ -107,7 +106,6 @@ const databaseModuleInitializeOrder = [
 
 		Logger: new Logger(),
 		Pastebin: new Pastebin(),
-		Sandbox: new Sandbox(),
 		VideoLANConnector: VLCConnector.initialize(), // @todo move code from `initialize` here
 
 		API: require("./api")

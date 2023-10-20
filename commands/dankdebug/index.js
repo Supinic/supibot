@@ -1,3 +1,21 @@
+const { VM } = require("vm2");
+const DEFAULT_VM_OPTIONS = {
+	sandbox: {},
+	compiler: "javascript",
+	eval: false,
+	wasm: false,
+	fixAsync: true,
+	timeout: 5000
+};
+const executeScriptVm = (script, options) => {
+	const vm = new VM({
+		...DEFAULT_VM_OPTIONS,
+		...options
+	});
+
+	return vm.run(script);
+};
+
 module.exports = {
 	Name: "dankdebug",
 	Aliases: ["js"],
@@ -102,7 +120,7 @@ module.exports = {
 		const createSandbox = require("./create-sandbox");
 		const sandboxData = await createSandbox(context, scriptArgs);
 		try {
-			result = await sb.Sandbox.run(script, {
+			result = await executeScriptVm(script, {
 				fixAsync: false,
 				timeout: 2400,
 				sandbox: sandboxData.sandbox
