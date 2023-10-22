@@ -17,7 +17,7 @@ module.exports = {
 		}
 
 		const response = await sb.Got("GenericAPI", {
-			url: "https://oldschool.runescape.wiki/w/api.php",
+			url: "https://oldschool.runescape.wiki/w/Special:Search",
 			responseType: "text",
 			throwHttpErrors: false,
 			searchParams: { search }
