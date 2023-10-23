@@ -36,7 +36,7 @@ export declare class ClassTemplate {
         | Map<any, Map<string | number, ClassTemplate>>;
 
     getCacheData (key: string): Promise<any>;
-    setCacheData (key: string, value: any, options: object): "OK";
+    setCacheData (key: string, value: any, options?: object): "OK";
     getGenericDataProperty<T extends ClassTemplate> (inputData: GenericCacheOptions<T>): Promise<Config.Value>;
     setGenericDataProperty<T extends ClassTemplate> (inputData: GenericCacheOptions<T>): Promise<void>;
     saveRowProperty (row: Query.Row, property: string, value: any, self: ClassTemplate): ReturnType<Query.Row["save"]>;
