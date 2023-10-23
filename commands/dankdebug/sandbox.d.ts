@@ -1,9 +1,9 @@
-import type { JSONifiable, Emote } from 'supi-core/@types/globals';
-import type { Command, Parameter } from 'supi-core/@types/classes/command';
-import type { Channel } from 'supi-core/@types/classes/channel';
-import type { Platform } from 'supi-core/@types/classes/platform';
-import type { User, Permissions as UserPermissions } from 'supi-core/@types/classes/user';
-import type { UtilsSingleton } from 'supi-core/@types/singletons/utils';
+import type { JSONifiable, Emote } from "../../@types/globals";
+import type { Command, Parameter } from "../../@types/classes/command";
+import type { Channel } from "../../@types/classes/channel";
+import type { Platform } from "../../@types/classes/platform";
+import type { User, Permissions as UserPermissions } from "../../@types/classes/user";
+import type { UtilsSingleton } from "supi-core/@types/singletons/utils";
 // import * as Util from "util";
 
 // This file is mostly meant to be used as a form of documentation for the $js
