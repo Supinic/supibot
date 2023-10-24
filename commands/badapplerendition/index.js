@@ -1,3 +1,5 @@
+const { getLinkParser } = require("../../utils/link-parser.js");
+
 module.exports = {
 	Name: "badapplerendition",
 	Aliases: ["badapple", "bar"],
@@ -35,18 +37,19 @@ module.exports = {
 		command = command.toLowerCase();
 		switch (command) {
 			case "check": {
+				const linkParser = getLinkParser();
 				const processed = new Set();
 				const results = [];
 
 				/** @type {string[]} */
 				const fixedArgs = args.flatMap(i => i.split(/\s+/).filter(Boolean));
 				for (const input of fixedArgs) {
-					const type = sb.Utils.modules.linkParser.autoRecognize(input);
+					const type = linkParser.autoRecognize(input);
 					if (type !== "youtube") {
 						continue;
 					}
 
-					const link = sb.Utils.modules.linkParser.parseLink(input);
+					const link = linkParser.parseLink(input);
 					if (processed.has(link)) {
 						continue;
 					}
@@ -77,7 +80,7 @@ module.exports = {
 						continue;
 					}
 
-					const data = await sb.Utils.modules.linkParser.fetchData(input);
+					const data = await linkParser.fetchData(input);
 					if (!data) {
 						results.push({
 							input,

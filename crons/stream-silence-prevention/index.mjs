@@ -1,3 +1,5 @@
+import { getLinkParser } from "../../utils/link-parser.js";
+
 const repeats = [];
 const repeatAmount = 100;
 const bannedLinks = [
@@ -132,7 +134,8 @@ export const definition = {
 			await sr.execute(fakeContext, link);
 		}
 		else if (state === "cytube") {
-			const videoID = sb.Utils.modules.linkParser.parseLink(link);
+			const linkParser = getLinkParser();
+			const videoID = linkParser.parseLink(link);
 			const client = cytube.controller.clients.get(cytubeChannelData.ID);
 
 			// noinspection ES6MissingAwait

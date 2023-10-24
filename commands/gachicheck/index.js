@@ -1,3 +1,6 @@
+const { getLinkParser } = require("../../utils/link-parser.js");
+const limit = 100;
+
 module.exports = {
 	Name: "gachicheck",
 	Aliases: ["gc"],
@@ -7,9 +10,7 @@ module.exports = {
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		limit: 100
-	})),
+	Static_Data: null,
 	Code: (async function gachiCheck (context, ...args) {
 		if (args.length === 0) {
 			return {
@@ -18,6 +19,7 @@ module.exports = {
 			};
 		}
 
+		const linkParser = getLinkParser();
 		const links = [];
 		if (args[0] === "playlist") {
 			args.shift();
@@ -29,14 +31,12 @@ module.exports = {
 				};
 			}
 
-			const { amount, limit, reason, result, success } = await sb.Utils.fetchYoutubePlaylist({
+			const { amount, reason, result, success } = await sb.Utils.fetchYoutubePlaylist({
 				playlistID,
 				key: sb.Config.get("API_GOOGLE_YOUTUBE"),
-				limit: this.staticData.limit,
+				limit,
 				limitAction: "return"
 			});
-
-			console.log({ amount, limit, reason, result, success });
 
 			if (!success) {
 				if (reason === "limit-exceeded") {
@@ -64,11 +64,11 @@ module.exports = {
 		else {
 			const fixedArgs = args.flatMap(i => i.split(/\s+/).filter(Boolean));
 			for (const word of fixedArgs) {
-				const type = sb.Utils.modules.linkParser.autoRecognize(word);
+				const type = linkParser.autoRecognize(word);
 				if (type) {
 					links.push({
 						type,
-						link: sb.Utils.modules.linkParser.parseLink(word)
+						link: linkParser.parseLink(word)
 					});
 				}
 			}
@@ -101,7 +101,7 @@ module.exports = {
 		});
 
 		for (const { link, type } of uniqueLinks) {
-			const videoData = await sb.Utils.modules.linkParser.fetchData(link, type);
+			const videoData = await linkParser.fetchData(link, type);
 			if (!videoData) {
 				results.push({
 					link,
@@ -158,7 +158,7 @@ module.exports = {
 			}
 			else {
 				const tag = { todo: 20 };
-				const videoData = await sb.Utils.modules.linkParser.fetchData(link, type);
+				const videoData = await linkParser.fetchData(link, type);
 				const row = await sb.Query.getRow("music", "Track");
 
 				row.setValues({
@@ -253,8 +253,6 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { limit } = this.staticData;
-
 		return [
 			"Checks if a video is already in the gachi list.",
 			"If it isn't, it is added with the Todo tag.",

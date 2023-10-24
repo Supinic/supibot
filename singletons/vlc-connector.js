@@ -1,4 +1,5 @@
 const VLCClient = require("./vlc-client.js");
+const { getLinkParser } = require("../utils/link-parser.js");
 
 const actions = [
 	"addToQueue",
@@ -313,10 +314,11 @@ module.exports = class VLCSingleton {
 			return null;
 		}
 
-		const targetURL = sb.Utils.linkParser.parseLink(status.information.category.meta.url);
+		const linkParser = getLinkParser();
+		const targetURL = linkParser.parseLink(status.information.category.meta.url);
 		return this.videoQueue.find(songData => {
 			try {
-				const songURL = sb.Utils.linkParser.parseLink(songData.link);
+				const songURL = linkParser.parseLink(songData.link);
 				return songURL === targetURL;
 			}
 			catch {

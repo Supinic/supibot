@@ -1,3 +1,6 @@
+const { getLinkParser } = require("../../utils/link-parser.js");
+let linkParser; // re-defined locally due to multiple blocks requiring this
+
 module.exports = {
 	Name: "songrequest",
 	Aliases: ["sr"],
@@ -11,7 +14,9 @@ module.exports = {
 		{ name: "type", type: "string" }
 	],
 	Whitelist_Response: "Only available in supinic's channel.",
-	Static_Data: (() => {
+	Static_Data: (() => { // @todo refactor out staticData into either helper functions or submodules
+		linkParser = getLinkParser();
+
 		const limits = {
 			time: 900,
 			amount: 10
@@ -57,7 +62,7 @@ module.exports = {
 				},
 
 				queue: async function (link) {
-					const properLink = sb.Utils.modules.linkParser.autoRecognize(link);
+					const properLink = linkParser.autoRecognize(link);
 					if (!properLink) {
 						const [bestResult] = await sb.Utils.searchYoutube(
 							link.replace(/-/g, ""),
@@ -74,7 +79,7 @@ module.exports = {
 						link = `https://youtu.be/${bestResult.ID}`;
 					}
 
-					const linkData = await sb.Utils.modules.linkParser.fetchData(link);
+					const linkData = await linkParser.fetchData(link);
 					if (!linkData) {
 						return {
 							success: false,
@@ -159,7 +164,7 @@ module.exports = {
 			},
 
 			parseTimestamp: (string) => {
-				const type = sb.Utils.modules.linkParser.autoRecognize(string);
+				const type = linkParser.autoRecognize(string);
 				if (type === "youtube" && string.includes("t=")) {
 					const { parse } = require("url");
 					let { query } = parse(string);
@@ -310,8 +315,8 @@ module.exports = {
 			}
 		}
 
-		if (sb.Utils.modules.linkParser.autoRecognize(url)) {
-			data = await sb.Utils.modules.linkParser.fetchData(url);
+		if (linkParser.autoRecognize(url)) {
+			data = await linkParser.fetchData(url);
 
 			if (!data) {
 				return {
@@ -408,7 +413,7 @@ module.exports = {
 				};
 			}
 			else {
-				data = await sb.Utils.modules.linkParser.fetchData(lookup.link, type);
+				data = await linkParser.fetchData(lookup.link, type);
 			}
 		}
 

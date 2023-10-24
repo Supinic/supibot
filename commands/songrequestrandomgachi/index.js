@@ -1,3 +1,5 @@
+const { getLinkParser } = require("../../utils/link-parser.js");
+
 module.exports = {
 	Name: "songrequestrandomgachi",
 	Aliases: ["gsr","srg","srrg"],
@@ -14,6 +16,8 @@ module.exports = {
 	})),
 	Code: (async function songRequestRandomGachi (context, ...args) {
 		const sr = sb.Command.get("songrequest");
+		const linkParser = getLinkParser();
+
 		let hasSongRequestsAvailable = false;
 		if (sr && sr.Flags.whitelist && context.channel) {
 			const filters = sb.Filter.getLocals("Whitelist", {
@@ -33,18 +37,18 @@ module.exports = {
 				linkOnly: true
 			}
 		});
-	
+
 		while (!link && counter < this.staticData.repeatLimit) {
 			const execution = await rg.execute(passedContext, "linkOnly:true", ...args);
 			if (execution.success === false) {
 				return execution;
 			}
 
-			const data = await sb.Utils.modules.linkParser.fetchData(execution.reply);
+			const data = await linkParser.fetchData(execution.reply);
 			if (data === null) {
 				counter++;
-	
-				const videoID = sb.Utils.modules.linkParser.parseLink(execution.reply);
+
+				const videoID = linkParser.parseLink(execution.reply);
 				await sb.Query.getRecordUpdater(ru => ru
 					.update("music", "Track")
 					.set("Available", false)
@@ -55,7 +59,7 @@ module.exports = {
 				link = execution.reply;
 			}
 		}
-	
+
 		if (counter >= this.staticData.repeatLimit) {
 			return {
 				success: false,

@@ -1,4 +1,5 @@
 const LanguageCodes = require("language-iso-codes");
+const { getLinkParser } = require("../../utils/link-parser.js");
 
 module.exports = {
 	Name: "set",
@@ -134,13 +135,14 @@ module.exports = {
 		};
 
 		const fetchTrackIDs = async (tracks) => {
+			const linkParser = getLinkParser();
 			const stringIDs = tracks.map(i => {
-				const type = sb.Utils.modules.linkParser.autoRecognize(i);
+				const type = linkParser.autoRecognize(i);
 				if (!type) {
 					return null;
 				}
 
-				return sb.Utils.modules.linkParser.parseLink(i, "auto");
+				return linkParser.parseLink(i, "auto");
 			}).filter(Boolean);
 
 			if (stringIDs.length === 0) {

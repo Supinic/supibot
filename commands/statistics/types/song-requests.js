@@ -1,3 +1,5 @@
+const { getLinkParser } = require("../../../utils/link-parser.js");
+
 module.exports = {
 	name: "sr",
 	aliases: [],
@@ -72,14 +74,15 @@ module.exports = {
 			const total = sb.Utils.timeDelta(sb.Date.now() + totalLength * 1000, true);
 			return {
 				reply: sb.Utils.tag.trim `
-								Videos requested: ${requests.length} (${uniques} unique), for a total runtime of ${total}.
-								The most requested video is ${link} - queued ${currentMax} times.
-							`
+					Videos requested: ${requests.length} (${uniques} unique), for a total runtime of ${total}.
+					The most requested video is ${link} - queued ${currentMax} times.
+				`
 			};
 		},
 		fetchVideoStats: async function (videoID) {
-			if (sb.Utils.modules.linkParser.autoRecognize(videoID)) {
-				videoID = sb.Utils.modules.linkParser.parseLink(videoID);
+			const linkParser = getLinkParser();
+			if (linkParser.autoRecognize(videoID)) {
+				videoID = linkParser.parseLink(videoID);
 			}
 
 			const requests = await sb.Query.getRecordset(rs => rs
@@ -98,9 +101,9 @@ module.exports = {
 			const lastDelta = sb.Utils.timeDelta(requests[0].Added);
 			return {
 				reply: sb.Utils.tag.trim `
-								This video has been requested ${requests.length} times.
-								It was last requested ${lastDelta}.
-							`
+					This video has been requested ${requests.length} times.
+					It was last requested ${lastDelta}.
+				`
 			};
 		}
 	}
