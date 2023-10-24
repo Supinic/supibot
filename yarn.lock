@@ -5388,6 +5388,7 @@ supi-core@supinic/supi-core:
     nyc: ^15.1.0
     supi-core: supinic/supi-core
     supi-db-init: "Supinic/supi-db-init#master"
+    track-link-parser: "supinic/track-link-parser#master"
     vm2: ^3.9.19
   languageName: unknown
   linkType: soft
@@ -5497,6 +5498,16 @@ supi-core@supinic/supi-core:
     fast-xml-parser: ^3.19.0
     got: ^11.8.0
   checksum: 08d770f6cdcad027d35b1114ce2f9cc4ed64e86998b31d34c8cd76ed9633c647cf038632553fe92d36f4027285e6018c9dd5b4df8bedbc229718dfb28cd29360
+  languageName: node
+  linkType: hard
+
+"track-link-parser@supinic/track-link-parser#master":
+  version: 1.2.0
+  resolution: "track-link-parser@https://github.com/supinic/track-link-parser.git#commit=f14de95423d19636e3a61c0de12eb23b6e9fe600"
+  dependencies:
+    fast-xml-parser: ^3.19.0
+    got: ^11.8.0
+  checksum: 086d1b1059b59fe65c7bb5231a0c36b7f62ba6fdf86fcbb23540d3a195cf0bcb097b665b79c8737ec345abaebac5b71623012f53cd8ece12f4e6fd354983f870
   languageName: node
   linkType: hard
 

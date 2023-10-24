@@ -11,6 +11,7 @@
     "irc-framework": "^4.13.1",
     "language-iso-codes": "supinic/language-iso-codes#master",
     "supi-core": "supinic/supi-core",
+    "track-link-parser": "supinic/track-link-parser#master",
     "vm2": "^3.9.19"
   },
   "engines": {
