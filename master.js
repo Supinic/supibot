@@ -68,121 +68,142 @@ const databaseModuleInitializeOrder = [
 	[ChatModule]
 ];
 
-(async function () {
-	"use strict";
+// Database access keys are loaded here, and stored to process.env
+require("./db-access.js");
 
-	// Database access keys are loaded here, and stored to process.env
-	require("./db-access.js");
+const core = await import("supi-core");
+const Query = new core.Query({
+	user: process.env.MARIA_USER,
+	password: process.env.MARIA_PASSWORD,
+	host: process.env.MARIA_HOST,
+	connectionLimit: process.env.MARIA_CONNECTION_LIMIT
+});
 
-	// The global bot namespace is initialized and assigned to global.sb upon requiring the globals module
-	const initializeSbObject = require("supi-core");
-	globalThis.sb = await initializeSbObject();
+const configData = await Query.getRecordset(rs => rs
+	.select("*")
+	.from("data", "Config")
+);
 
-	// Initialize bot-specific modules with database-driven data
-	for (let i = 0; i < databaseModuleInitializeOrder.length; i++) {
-		const initOrder = databaseModuleInitializeOrder[i];
+core.Config.load(configData);
 
-		const label = `Batch #${i + 1}: ${initOrder.map(i => i.name).join(", ")}`;
-		console.time(label);
+globalThis.sb = {
+	Date: core.Date,
+	Error: core.Error,
+	Promise: core.Promise,
 
-		const promises = initOrder.map(async (module) => await module.initialize());
-		await Promise.all(promises);
+	Config: core.Config,
+	Got: core.Got,
 
-		console.timeEnd(label);
-	}
+	Query,
+	Cache: new core.Cache(core.Config.get("REDIS_CONFIGURATION")),
+	Metrics: new core.Metrics(),
+	Utils: new core.Utils()
+};
 
-	globalThis.sb = {
-		...sb,
+// Initialize bot-specific modules with database-driven data
+for (let i = 0; i < databaseModuleInitializeOrder.length; i++) {
+	const initOrder = databaseModuleInitializeOrder[i];
 
-		Platform,
-		Filter,
-		Command,
-		User,
-		AwayFromKeyboard,
-		Banphrase,
-		Channel,
-		Reminder,
-		ChatModule,
+	const label = `Batch #${i + 1}: ${initOrder.map(i => i.name).join(", ")}`;
+	console.time(label);
 
-		Logger: new Logger(),
-		Pastebin: new Pastebin(),
-		VideoLANConnector: VLCConnector.initialize(), // @todo move code from `initialize` here
+	const promises = initOrder.map(async (module) => await module.initialize());
+	await Promise.all(promises);
 
-		API: require("./api")
-	};
+	console.timeEnd(label);
+}
 
-	if (!config.modules.commands.disableAll) {
-		const { blacklist, whitelist } = config.modules.commands;
-		const { loadCommands } = await require("./commands/index.js");
-		const commands = await loadCommands({ blacklist, whitelist });
+globalThis.sb = {
+	...sb,
 
-		await Command.importData(commands.definitions);
-	}
+	Platform,
+	Filter,
+	Command,
+	User,
+	AwayFromKeyboard,
+	Banphrase,
+	Channel,
+	Reminder,
+	ChatModule,
 
-	await Promise.all([
-		importFileDataModule(ChatModule, "chat-modules"),
-		importFileDataModule(sb.Got, "gots")
-	]);
+	Logger: new Logger(),
+	Pastebin: new Pastebin(),
+	VideoLANConnector: VLCConnector.initialize(), // @todo move code from `initialize` here
 
-	const { initializeCrons } = await import("./crons/index.mjs");
-	initializeCrons(config.modules.crons);
+	API: require("./api")
+};
 
-	const controllers = {};
-	const initialPlatforms = Channel.getActivePlatforms();
+if (!config.modules.commands.disableAll) {
+	const { blacklist, whitelist } = config.modules.commands;
+	const { loadCommands } = await require("./commands/index.js");
+	const commands = await loadCommands({ blacklist, whitelist });
 
-	if (sb.Metrics) {
-		sb.Metrics.registerCounter({
-			name: "supibot_messages_sent_total",
-			help: "Total number of Twitch messages sent by the bot.",
-			labelNames: ["platform", "channel"]
-		});
+	await Command.importData(commands.definitions);
+}
 
-		sb.Metrics.registerCounter({
-			name: "supibot_messages_read_total",
-			help: "Total number of Twitch messages seen (read) by the bot.",
-			labelNames: ["platform", "channel"]
-		});
-	}
+await Promise.all([
+	importFileDataModule(ChatModule, "chat-modules"),
+	importFileDataModule(sb.Got, "gots")
+]);
 
-	for (const platformData of initialPlatforms) {
-		let Controller = null;
-		try {
-			Controller = require(`./controllers/${platformData.Name}`);
-		}
-		catch (e) {
-			console.error(`Require of ${platformData.Name} controller module failed`, e);
-			continue;
-		}
+const { initializeCrons } = await import("./crons/index.mjs");
+initializeCrons(config.modules.crons);
 
-		const options = { host: platformData.Host };
-		try {
-			controllers[platformData.Name] = new Controller(options);
-		}
-		catch (e) {
-			console.error(`Initialization of ${platformData.Name} controller module failed`, e);
-			continue;
-		}
+const controllers = {};
+const initialPlatforms = Channel.getActivePlatforms();
 
-		console.debug(`Platform ${platformData.Name} loaded successfully.`);
-	}
-
-	Platform.assignControllers(controllers);
-
-	process.on("unhandledRejection", async (reason) => {
-		if (!(reason instanceof Error)) {
-			return;
-		}
-
-		try {
-			await sb.Logger.logError("Backend", reason, {
-				origin: "Internal",
-				context: {
-					cause: "UnhandledPromiseRejection"
-				}
-			});
-		}
-		catch {
-			console.warn("Rejected the promise of promise rejection handler", { reason });
-		}
+if (sb.Metrics) {
+	sb.Metrics.registerCounter({
+		name: "supibot_messages_sent_total",
+		help: "Total number of Twitch messages sent by the bot.",
+		labelNames: ["platform", "channel"]
 	});
-})();
+
+	sb.Metrics.registerCounter({
+		name: "supibot_messages_read_total",
+		help: "Total number of Twitch messages seen (read) by the bot.",
+		labelNames: ["platform", "channel"]
+	});
+}
+
+for (const platformData of initialPlatforms) {
+	let Controller = null;
+	try {
+		Controller = require(`./controllers/${platformData.Name}`);
+	}
+	catch (e) {
+		console.error(`Require of ${platformData.Name} controller module failed`, e);
+		continue;
+	}
+
+	const options = { host: platformData.Host };
+	try {
+		controllers[platformData.Name] = new Controller(options);
+	}
+	catch (e) {
+		console.error(`Initialization of ${platformData.Name} controller module failed`, e);
+		continue;
+	}
+
+	console.debug(`Platform ${platformData.Name} loaded successfully.`);
+}
+
+Platform.assignControllers(controllers);
+
+process.on("unhandledRejection", async (reason) => {
+	if (!(reason instanceof Error)) {
+		return;
+	}
+
+	try {
+		await sb.Logger.logError("Backend", reason, {
+			origin: "Internal",
+			context: {
+				cause: "UnhandledPromiseRejection"
+			}
+		});
+	}
+	catch {
+		console.warn("Rejected the promise of promise rejection handler", { reason });
+	}
+});
