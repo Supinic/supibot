@@ -832,7 +832,7 @@
       {
         "name": "APA",
         "url": "https://apa.az",
-        "path": "az",
+        "path": null,
         "endpoints": ["rss"],
         "helpers": []
       },
