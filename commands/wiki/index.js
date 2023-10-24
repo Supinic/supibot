@@ -1,3 +1,5 @@
+const LanguageCodes = require("language-iso-codes");
+
 module.exports = {
 	Name: "wiki",
 	Aliases: null,
@@ -20,7 +22,7 @@ module.exports = {
 			};
 		}
 
-		const language = context.params.lang ?? sb.Utils.modules.languageISO.getLanguage("english");
+		const language = context.params.lang ?? LanguageCodes.getLanguage("english");
 		const languageCode = language.getIsoCode(1);
 
 		let query = args.join(" ");

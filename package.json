@@ -9,6 +9,7 @@
     "dank-twitch-irc": "^4.3.0",
     "discord.js": "^14.13.0",
     "irc-framework": "^4.13.1",
+    "language-iso-codes": "supinic/language-iso-codes#master",
     "supi-core": "supinic/supi-core",
     "vm2": "^3.9.19"
   },

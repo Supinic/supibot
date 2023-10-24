@@ -1,3 +1,5 @@
+const LanguageCodes = require("language-iso-codes");
+
 module.exports = {
 	Name: "set",
 	Aliases: ["unset"],
@@ -583,7 +585,7 @@ module.exports = {
 							};
 						}
 
-						const name = sb.Utils.modules.languageISO.getName(query);
+						const name = LanguageCodes.getName(query);
 						if (!name) {
 							return {
 								success: false,
@@ -591,7 +593,7 @@ module.exports = {
 							};
 						}
 
-						const code = sb.Utils.modules.languageISO.getCode(name) ?? null;
+						const code = LanguageCodes.getCode(name) ?? null;
 						const existing = await context.user.getDataProperty("defaultUserLanguage");
 
 						await context.user.setDataProperty("defaultUserLanguage", { code, name });
