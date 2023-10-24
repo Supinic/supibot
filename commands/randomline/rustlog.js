@@ -81,7 +81,7 @@ const getRandomUserLine = async function (channelID, userID) {
 	if (response.statusCode === 403) {
 		return {
 			success: false,
-			reason: "This channel has opted out of having their messages logged via the Rustlog third party service!"
+			reason: "This user has opted out of having their messages logged via the Rustlog third party service!"
 		};
 	}
 	else if (response.statusCode === 404) {
