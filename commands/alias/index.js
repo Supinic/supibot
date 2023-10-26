@@ -1304,7 +1304,7 @@ module.exports = {
 
 				let totalUsedCommandNames;
 				if (context.append.pipeList) {
-					totalUsedCommandNames = [...context.append.pipeList];
+					totalUsedCommandNames = context.append.pipeList;
 					totalUsedCommandNames.splice(context.append.pipeIndex, 1, commandData.Name);
 
 					for (const combination of bannedCommandCombinations) {

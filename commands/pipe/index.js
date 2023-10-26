@@ -115,10 +115,13 @@ module.exports = {
 			}
 		}
 
-		let totalUsedCommandNames = usedCommandNames;
+		let totalUsedCommandNames;
 		if (context.append.pipeList) {
-			totalUsedCommandNames = [...context.append.pipeList];
+			totalUsedCommandNames = context.append.pipeList;
 			totalUsedCommandNames.splice(context.append.pipeIndex, 1, ...usedCommandNames);
+		}
+		else {
+			totalUsedCommandNames = usedCommandNames;
 		}
 
 		for (const combination of bannedCommandCombinations) {
