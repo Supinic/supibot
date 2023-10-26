@@ -200,7 +200,7 @@ module.exports = {
 					platform: context.platform,
 					pipe: true,
 					pipeList: totalUsedCommandNames,
-					pipeIndex: i,
+					pipeIndex: i + usedCommandNames.length,
 					skipBanphrases: true,
 					skipPending: true,
 					skipMention: true,
