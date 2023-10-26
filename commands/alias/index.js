@@ -1308,7 +1308,7 @@ module.exports = {
 
 					const aliasIndex = totalUsedCommandNames.indexOf("alias");
 					if (aliasIndex !== -1) {
-						totalUsedCommandNames.splice(totalUsedCommandNames, aliasIndex, commandData.Name);
+						totalUsedCommandNames.splice(aliasIndex, 1, commandData.Name);
 					}
 					else {
 						totalUsedCommandNames.push(commandData.Name);

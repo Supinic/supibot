@@ -121,7 +121,7 @@ module.exports = {
 
 			const pipeIndex = totalUsedCommandNames.indexOf("pipe");
 			if (pipeIndex !== -1) {
-				totalUsedCommandNames.splice(totalUsedCommandNames, pipeIndex, ...usedCommandNames);
+				totalUsedCommandNames.splice(pipeIndex, 1, ...usedCommandNames);
 			}
 			else {
 				totalUsedCommandNames.push(...usedCommandNames);
