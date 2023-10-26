@@ -1309,7 +1309,7 @@ module.exports = {
 
 					for (const combination of bannedCommandCombinations) {
 						let index = 0;
-						for (const commandName of context.append.pipeList) {
+						for (const commandName of totalUsedCommandNames) {
 							if (commandName === combination[index]) {
 								index++;
 							}
