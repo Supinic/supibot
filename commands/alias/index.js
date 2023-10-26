@@ -1303,9 +1303,16 @@ module.exports = {
 				}
 
 				let totalUsedCommandNames;
-				if (context.append.pipeList) {
-					totalUsedCommandNames = context.append.pipeList;
-					totalUsedCommandNames.splice(context.append.pipeIndex, 1, commandData.Name);
+				if (context.append.commandList) {
+					totalUsedCommandNames = context.append.commandList;
+
+					const aliasIndex = totalUsedCommandNames.indexOf("alias");
+					if (aliasIndex !== -1) {
+						totalUsedCommandNames.splice(totalUsedCommandNames, aliasIndex, commandData.Name);
+					}
+					else {
+						totalUsedCommandNames.push(commandData.Name);
+					}
 
 					for (const combination of bannedCommandCombinations) {
 						let index = 0;
@@ -1339,7 +1346,7 @@ module.exports = {
 						aliasCount,
 						aliasStack: [...(context.append.aliasStack ?? []), name],
 						aliasTry,
-						pipeList: totalUsedCommandNames,
+						commandList: totalUsedCommandNames,
 						platform: context.platform,
 						skipBanphrases: true,
 						skipMention: true,

@@ -116,9 +116,16 @@ module.exports = {
 		}
 
 		let totalUsedCommandNames;
-		if (context.append.pipeList) {
-			totalUsedCommandNames = context.append.pipeList;
-			totalUsedCommandNames.splice(context.append.pipeIndex, 1, ...usedCommandNames);
+		if (context.append.commandList) {
+			totalUsedCommandNames = context.append.commandList;
+
+			const pipeIndex = totalUsedCommandNames.indexOf("pipe");
+			if (pipeIndex !== -1) {
+				totalUsedCommandNames.splice(totalUsedCommandNames, pipeIndex, ...usedCommandNames);
+			}
+			else {
+				totalUsedCommandNames.push(...usedCommandNames);
+			}
 		}
 		else {
 			totalUsedCommandNames = usedCommandNames;
@@ -198,9 +205,9 @@ module.exports = {
 					pipeCount,
 					tee: context.tee,
 					platform: context.platform,
+					commandList: totalUsedCommandNames,
 					pipe: true,
-					pipeList: totalUsedCommandNames,
-					pipeIndex: i + usedCommandNames.length,
+					pipeIndex: i,
 					skipBanphrases: true,
 					skipPending: true,
 					skipMention: true,
