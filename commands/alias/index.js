@@ -1302,8 +1302,10 @@ module.exports = {
 					};
 				}
 
+				let totalUsedCommandNames;
 				if (context.append.pipeList) {
-					context.append.pipeList.splice(context.append.pipeIndex, 1, commandData.Name);
+					totalUsedCommandNames = [...context.append.pipeList];
+					totalUsedCommandNames.splice(context.append.pipeIndex, 1, commandData.Name);
 
 					for (const combination of bannedCommandCombinations) {
 						let index = 0;
@@ -1321,6 +1323,9 @@ module.exports = {
 						}
 					}
 				}
+				else {
+					totalUsedCommandNames = [commandData.Name];
+				}
 
 				const result = await sb.Command.checkAndExecute(
 					invocation,
@@ -1334,6 +1339,7 @@ module.exports = {
 						aliasCount,
 						aliasStack: [...(context.append.aliasStack ?? []), name],
 						aliasTry,
+						pipeList: totalUsedCommandNames,
 						platform: context.platform,
 						skipBanphrases: true,
 						skipMention: true,
