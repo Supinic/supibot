@@ -47,6 +47,12 @@ module.exports = {
 				};
 			}
 			else if (isChannelSupported === false) {
+				let addendum = "";
+				const hadLogs = await context.channel.getDataProperty("logsRemovedReason");
+				if (hadLogs) {
+					addendum = "I used to log this channel, so previous chat lines can be reinstated. You can create a suggestion to let @Supinic know about this.";
+				}
+
 				return {
 					success: false,
 					cooldown: {
@@ -56,10 +62,11 @@ module.exports = {
 						cooldown: 30_000
 					},
 					reply: sb.Utils.tag.trim `
-						This channel does not currently support random lines!
-						You can enable random lines by adding the Rustlog service in this channel, 
+						Random lines are not available in this channel!
+						You can enable them by enablig the Rustlog service in this channel, 
 						which can be done via the "$bot enable-rustlog" command.
 						That command is only usable by channel owners and ambassadors.
+						${addendum}
 					 `
 				};
 			}
