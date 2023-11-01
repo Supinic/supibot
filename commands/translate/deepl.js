@@ -1,3 +1,5 @@
+const LanguageCodes = require("language-iso-codes");
+
 const supportedLanguages = [
 	"bg",
 	"cs",
@@ -42,13 +44,12 @@ const formalitySupportedLanguages = [
 ];
 
 const execute = async function (context, query) {
-	const { languageISO } = sb.Utils.modules;
 	const searchParams = {
 		text: query
 	};
 
 	if (context.params.from) {
-		const code = languageISO.getCode(context.params.from);
+		const code = LanguageCodes.getCode(context.params.from);
 		if (!code) {
 			return {
 				success: false,
@@ -74,7 +75,7 @@ const execute = async function (context, query) {
 			searchParams.target_lang = sb.Utils.randArray(supportedLanguages);
 		}
 		else {
-			targetLanguageCode = languageISO.getCode(context.params.to);
+			targetLanguageCode = LanguageCodes.getCode(context.params.to);
 		}
 	}
 	else {
@@ -91,7 +92,7 @@ const execute = async function (context, query) {
 		};
 	}
 	else if (!supportedLanguages.includes(targetLanguageCode.toLowerCase())) {
-		const languageName = sb.Utils.capitalize(languageISO.getName(targetLanguageCode));
+		const languageName = sb.Utils.capitalize(LanguageCodes.getName(targetLanguageCode));
 		return {
 			success: false,
 			reply: `Target language (${languageName}) is not supported by DeepL!`
@@ -110,7 +111,7 @@ const execute = async function (context, query) {
 		}
 		else if (!formalitySupportedLanguages.includes(targetLanguageCode.toLowerCase())) {
 			const languageNames = formalitySupportedLanguages
-				.map(i => sb.Utils.capitalize(languageISO.getName(i)))
+				.map(i => sb.Utils.capitalize(LanguageCodes.getName(i)))
 				.sort();
 
 			return {
@@ -152,8 +153,8 @@ const execute = async function (context, query) {
 	}
 
 	const [data] = response.body.translations;
-	const fromLanguageName = sb.Utils.capitalize(languageISO.getName(data.detected_source_language));
-	const toLanguageName = sb.Utils.capitalize(languageISO.getName(searchParams.target_lang));
+	const fromLanguageName = sb.Utils.capitalize(LanguageCodes.getName(data.detected_source_language));
+	const toLanguageName = sb.Utils.capitalize(LanguageCodes.getName(searchParams.target_lang));
 
 	return {
 		success: true,

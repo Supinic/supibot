@@ -68,21 +68,44 @@ const databaseModuleInitializeOrder = [
 	[ChatModule]
 ];
 
-(async function () {
-	"use strict";
+// Database access keys are loaded here, and stored to process.env
+require("./db-access.js");
 
-	// Database access keys are loaded here, and stored to process.env
-	require("./db-access.js");
+(async () => {
+	const core = await import("supi-core");
+	const Query = new core.Query({
+		user: process.env.MARIA_USER,
+		password: process.env.MARIA_PASSWORD,
+		host: process.env.MARIA_HOST,
+		connectionLimit: process.env.MARIA_CONNECTION_LIMIT
+	});
 
-	// The global bot namespace is initialized and assigned to global.sb upon requiring the globals module
-	const initializeSbObject = require("supi-core");
-	globalThis.sb = await initializeSbObject();
+	const configData = await Query.getRecordset(rs => rs
+		.select("*")
+		.from("data", "Config"));
+
+	core.Config.load(configData);
+
+	globalThis.sb = {
+		Date: core.Date,
+		Error: core.Error,
+		Promise: core.Promise,
+
+		Config: core.Config,
+		Got: core.Got,
+
+		Query,
+		Cache: new core.Cache(core.Config.get("REDIS_CONFIGURATION")),
+		Metrics: new core.Metrics(),
+		Utils: new core.Utils()
+	};
 
 	// Initialize bot-specific modules with database-driven data
 	for (let i = 0; i < databaseModuleInitializeOrder.length; i++) {
 		const initOrder = databaseModuleInitializeOrder[i];
 
-		const label = `Batch #${i + 1}: ${initOrder.map(i => i.name).join(", ")}`;
+		const label = `Batch #${i + 1}: ${initOrder.map(i => i.name)
+			.join(", ")}`;
 		console.time(label);
 
 		const promises = initOrder.map(async (module) => await module.initialize());
@@ -112,16 +135,21 @@ const databaseModuleInitializeOrder = [
 	};
 
 	if (!config.modules.commands.disableAll) {
-		const { blacklist, whitelist } = config.modules.commands;
+		const {
+			blacklist,
+			whitelist
+		} = config.modules.commands;
 		const { loadCommands } = await require("./commands/index.js");
-		const commands = await loadCommands({ blacklist, whitelist });
+		const commands = await loadCommands({
+			blacklist,
+			whitelist
+		});
 
 		await Command.importData(commands.definitions);
 	}
 
 	await Promise.all([
-		importFileDataModule(ChatModule, "chat-modules"),
-		importFileDataModule(sb.Got, "gots")
+		importFileDataModule(ChatModule, "chat-modules"), importFileDataModule(sb.Got, "gots")
 	]);
 
 	const { initializeCrons } = await import("./crons/index.mjs");

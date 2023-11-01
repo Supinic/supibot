@@ -1,3 +1,5 @@
+const LanguageCodes = require("language-iso-codes");
+
 module.exports = {
 	Name: "liveuamap",
 	Aliases: ["lum", "luam"],
@@ -18,7 +20,7 @@ module.exports = {
 		const { baseCacheKey, supportedLanguageCodes } = this.staticData;
 
 		const inputLanguage = context.params.lang ?? "en";
-		const languageCode = sb.Utils.modules.languageISO.getCode(inputLanguage);
+		const languageCode = LanguageCodes.getCode(inputLanguage); // @todo fix so that params.lang is of type `language`
 		if (!languageCode) {
 			return {
 				success: false,
@@ -26,7 +28,7 @@ module.exports = {
 			};
 		}
 		else if (!supportedLanguageCodes.includes(languageCode)) {
-			const supportedLanguageNames = supportedLanguageCodes.map(i => sb.Utils.modules.languageISO.getName(i));
+			const supportedLanguageNames = supportedLanguageCodes.map(i => LanguageCodes.getName(i));
 			return {
 				success: false,
 				reply: `Your provided language is not supported! Use one of: ${supportedLanguageNames.join(", ")}`

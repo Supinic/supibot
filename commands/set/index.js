@@ -1,3 +1,6 @@
+const LanguageCodes = require("language-iso-codes");
+const { getLinkParser } = require("../../utils/link-parser.js");
+
 module.exports = {
 	Name: "set",
 	Aliases: ["unset"],
@@ -132,13 +135,14 @@ module.exports = {
 		};
 
 		const fetchTrackIDs = async (tracks) => {
+			const linkParser = getLinkParser();
 			const stringIDs = tracks.map(i => {
-				const type = sb.Utils.modules.linkParser.autoRecognize(i);
+				const type = linkParser.autoRecognize(i);
 				if (!type) {
 					return null;
 				}
 
-				return sb.Utils.modules.linkParser.parseLink(i, "auto");
+				return linkParser.parseLink(i, "auto");
 			}).filter(Boolean);
 
 			if (stringIDs.length === 0) {
@@ -583,7 +587,7 @@ module.exports = {
 							};
 						}
 
-						const name = sb.Utils.modules.languageISO.getName(query);
+						const name = LanguageCodes.getName(query);
 						if (!name) {
 							return {
 								success: false,
@@ -591,7 +595,7 @@ module.exports = {
 							};
 						}
 
-						const code = sb.Utils.modules.languageISO.getCode(name) ?? null;
+						const code = LanguageCodes.getCode(name) ?? null;
 						const existing = await context.user.getDataProperty("defaultUserLanguage");
 
 						await context.user.setDataProperty("defaultUserLanguage", { code, name });

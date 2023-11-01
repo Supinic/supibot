@@ -1,3 +1,5 @@
+const LanguageCodes = require("language-iso-codes");
+
 module.exports = {
 	Name: "define",
 	Aliases: ["def"],
@@ -24,7 +26,7 @@ module.exports = {
 
 		let languageCode = "en";
 		if (context.params.lang) {
-			languageCode = sb.Utils.modules.languageISO.getCode(context.params.lang, "iso6391");
+			languageCode = LanguageCodes.getCode(context.params.lang, "iso6391");
 			if (!languageCode) {
 				return {
 					success: false,

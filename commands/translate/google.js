@@ -1,13 +1,13 @@
-const execute = async function (context, query) {
-	const { languageISO } = sb.Utils.modules;
+const LanguageCodes = require("language-iso-codes");
 
+const execute = async function (context, query) {
 	if (context.params.formality) {
 		return {
 			success: false,
 			reply: `You cannot use the "formality" parameter with Google! Use DeepL by using "engine:deepl".`
 		};
 	}
-	
+
 	// default: false if normal execution, true if inside of pipe
 	const textOnly = context.params.textOnly ?? context.append.pipe;
 	const options = {
@@ -39,7 +39,7 @@ const execute = async function (context, query) {
 			lang = sb.Utils.randArray(codeList);
 		}
 
-		const newLang = languageISO.get(lang);
+		const newLang = LanguageCodes.get(lang);
 		const code = newLang?.iso6391 ?? newLang?.iso6392 ?? newLang?.iso6393 ?? null;
 		if (!code) {
 			return {
@@ -76,7 +76,7 @@ const execute = async function (context, query) {
 
 	if (response.statusCode === 400) {
 		const targets = [options.from, options.to].filter(i => i !== "en" && i !== "auto");
-		const languages = targets.map(i => `${i}: ${languageISO.getName(i)}`);
+		const languages = targets.map(i => `${i}: ${LanguageCodes.getName(i)}`);
 		return {
 			success: false,
 			reply: `One or both languages are not supported! (${languages.join(", ")})`
@@ -96,7 +96,7 @@ const execute = async function (context, query) {
 	const text = data[0].map(i => i[0]).join(" ");
 
 	const languageID = data[2].replace(/-.*/, "");
-	const fromLanguageName = languageISO.getName(languageID);
+	const fromLanguageName = LanguageCodes.getName(languageID);
 	if (!fromLanguageName) {
 		console.warn("$translate - could not get language name", { data, options, languageID });
 		return {
@@ -114,7 +114,7 @@ const execute = async function (context, query) {
 			additionalInfo.push(`(${confidence})`);
 		}
 
-		const toLanguageName = sb.Utils.capitalize(languageISO.getName(options.to));
+		const toLanguageName = sb.Utils.capitalize(LanguageCodes.getName(options.to));
 		additionalInfo.push("→", `${toLanguageName}:`);
 	}
 
