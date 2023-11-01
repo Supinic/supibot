@@ -1,3 +1,5 @@
+const { fetchTimeData } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "remind",
 	Aliases: ["notify","remindme","remindprivate","privateremind"],
@@ -128,7 +130,7 @@ module.exports = {
 
 			if (!hasExplicitTimezone && !isRelative && location) {
 				const date = preCheckChronoData.component.date();
-				const response = await sb.Utils.fetchTimeData({
+				const response = await fetchTimeData({
 					date,
 					coordinates: location.coordinates,
 					key: String(sb.Config.get("API_GOOGLE_TIMEZONE"))

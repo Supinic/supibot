@@ -344,18 +344,15 @@ module.exports = {
 				};
 			}
 			else {
-				const meta = await sb.Utils.getMediaFileData(url);
-				if (meta?.duration) {
-					const name = decodeURIComponent(parsedURL.path.split("/").pop());
-					const encoded = encodeURI(decodeURI(url));
-					data = {
-						name,
-						ID: encoded,
-						link: encoded,
-						duration: meta.duration,
-						videoType: { ID: 19 }
-					};
-				}
+				const name = decodeURIComponent(parsedURL.path.split("/").pop());
+				const encoded = encodeURI(decodeURI(url));
+				data = {
+					name,
+					ID: encoded,
+					link: encoded,
+					duration: null,
+					videoType: { ID: 19 }
+				};
 			}
 		}
 

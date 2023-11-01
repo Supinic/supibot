@@ -1,3 +1,5 @@
+const { checkPictureNSFW } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "twitchlotto",
 	Aliases: ["tl"],
@@ -276,7 +278,7 @@ module.exports = {
 
 		if (image.Score === null) {
 			const link = `https://i.imgur.com/${image.Link}`;
-			const { statusCode, data } = await sb.Utils.checkPictureNSFW(link);
+			const { statusCode, data } = await checkPictureNSFW(link);
 			if (statusCode !== 200) {
 				return {
 					success: false,

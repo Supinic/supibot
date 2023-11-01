@@ -1,3 +1,5 @@
+const { checkPictureNSFW } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "randominstagram",
 	Aliases: ["rig"],
@@ -109,7 +111,7 @@ module.exports = {
 			const nsfwCacheKey = { post: post.shortcode };
 			let nsfwData = await this.getCacheData(nsfwCacheKey);
 			if (!nsfwData) {
-				const response = await sb.Utils.checkPictureNSFW(post.display_url);
+				const response = await checkPictureNSFW(post.display_url);
 				if (response.statusCode !== 200) {
 					return {
 						success: false,
