@@ -4,6 +4,7 @@ const User = require("./user.js");
 
 const pathModule = require("path");
 const CooldownManager = require("../utils/cooldown-manager.js");
+const LanguageCodes = require("language-iso-codes");
 
 class Context {
 	#command;
@@ -1040,7 +1041,7 @@ class Command extends require("./template.js") {
 			return sb.Utils.parseRegExp(value);
 		}
 		else if (type === "language") {
-			return sb.Utils.modules.languageISO.getLanguage(value);
+			return LanguageCodes.getLanguage(value);
 		}
 
 		return null;

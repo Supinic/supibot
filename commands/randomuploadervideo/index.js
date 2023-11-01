@@ -1,3 +1,5 @@
+const { getLinkParser } = require("../../utils/link-parser.js");
+
 module.exports = {
 	Name: "randomuploadervideo",
 	Aliases: ["ruv"],
@@ -12,6 +14,7 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function randomUploaderVideo (context, ...args) {
 		const link = args.shift();
+
 		if (!link) {
 			return {
 				success: false,
@@ -19,7 +22,8 @@ module.exports = {
 			};
 		}
 
-		const type = sb.Utils.modules.linkParser.autoRecognize(link);
+		const linkParser = getLinkParser();
+		const type = linkParser.autoRecognize(link);
 		if (type === null) {
 			return {
 				success: false,
@@ -33,7 +37,7 @@ module.exports = {
 			};
 		}
 
-		const linkData = await sb.Utils.modules.linkParser.fetchData(link);
+		const linkData = await linkParser.fetchData(link);
 		if (!linkData) {
 			return {
 				success: false,

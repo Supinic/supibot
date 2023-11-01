@@ -1,3 +1,5 @@
+const LanguageCodes = require("language-iso-codes");
+
 const tts = {
 	enabled: null,
 	url: null,
@@ -85,7 +87,7 @@ module.exports = {
 			input = randomItem.locale;
 		}
 		else {
-			code = sb.Utils.modules.languageISO.getCode(input);
+			code = LanguageCodes.getCode(input);
 		}
 
 		const currentLocale = tts.locales.find(i => i.locale === input || i.code === code);

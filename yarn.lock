@@ -3686,6 +3686,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"language-iso-codes@supinic/language-iso-codes#master":
+  version: 1.0.0
+  resolution: "language-iso-codes@https://github.com/supinic/language-iso-codes.git#commit=dc0e75b4f40978d5549fcf1da5243687c8445963"
+  checksum: 9527ad72058122311a166e77ec290b08e3f7fd50732d7e1f9c27b67208c48213e46262520880fb309629efe339461ac834c7be5379c1fdd5d903e285c49f8e6c
+  languageName: node
+  linkType: hard
+
 "levn@npm:^0.4.1":
   version: 0.4.1
   resolution: "levn@npm:0.4.1"
@@ -5376,10 +5383,12 @@ supi-core@supinic/supi-core:
     eslint: ^8.51.0
     eslint-plugin-unicorn: ^48.0.1
     irc-framework: ^4.13.1
+    language-iso-codes: "supinic/language-iso-codes#master"
     mocha: ^10.2.0
     nyc: ^15.1.0
     supi-core: supinic/supi-core
     supi-db-init: "Supinic/supi-db-init#master"
+    track-link-parser: "supinic/track-link-parser#master"
     vm2: ^3.9.19
   languageName: unknown
   linkType: soft
@@ -5489,6 +5498,16 @@ supi-core@supinic/supi-core:
     fast-xml-parser: ^3.19.0
     got: ^11.8.0
   checksum: 08d770f6cdcad027d35b1114ce2f9cc4ed64e86998b31d34c8cd76ed9633c647cf038632553fe92d36f4027285e6018c9dd5b4df8bedbc229718dfb28cd29360
+  languageName: node
+  linkType: hard
+
+"track-link-parser@supinic/track-link-parser#master":
+  version: 1.2.0
+  resolution: "track-link-parser@https://github.com/supinic/track-link-parser.git#commit=91fd676f1292e315c9cb6e7e10fcd062d064dec4"
+  dependencies:
+    fast-xml-parser: ^3.19.0
+    got: ^11.8.0
+  checksum: 073f4314aa3af776583e43679e8fff09c53f772c7d018d8d0cfe12e0f817cac76329c22030567452399848c76e6cfb8e5aa9a8f1819ca77e740926553b3b7851
   languageName: node
   linkType: hard
 

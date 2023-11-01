@@ -1,3 +1,5 @@
+import { getLinkParser } from "../../utils/link-parser.js";
+
 export const definition = {
 	name: "yoink-soundcloud-client-id",
 	expression: "0 */10 * * * *",
@@ -58,7 +60,9 @@ export const definition = {
 
 		if (finalClientID) {
 			console.log("Successfully updated soundcloud client-id", { finalClientID });
-			sb.Utils.modules.linkParser.reloadParser("soundcloud", { key: finalClientID });
+
+			const linkParser = getLinkParser();
+			linkParser.reloadParser("soundcloud", { key: finalClientID });
 		}
 		else {
 			console.warn("Could not fetch Soundcloud client-id!");

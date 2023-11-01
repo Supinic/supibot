@@ -1,3 +1,5 @@
+const LanguageCodes = require("language-iso-codes");
+
 module.exports = {
 	Name: "ocr",
 	Aliases: null,
@@ -14,14 +16,14 @@ module.exports = {
 	Static_Data: (() => {
 		const definitions = require("./languages.json");
 		const names = Object.keys(definitions)
-			.map(i => sb.Utils.modules.languageISO.getName(i));
+			.map(i => LanguageCodes.getName(i));
 
 		return { definitions, names };
 	}),
 	Code: (async function ocr (context, ...args) {
 		let languageCode = "eng";
 		if (context.params.lang) {
-			languageCode = sb.Utils.modules.languageISO.getCode(context.params.lang, "iso6393");
+			languageCode = LanguageCodes.getCode(context.params.lang, "iso6393");
 			if (!languageCode) {
 				return {
 					success: false,
@@ -145,7 +147,7 @@ module.exports = {
 	Dynamic_Description: (async function (prefix) {
 		const { definitions } = this.staticData;
 		const tableBody = Object.entries(definitions).map(([code, definition]) => {
-			const name = sb.Utils.modules.languageISO.getName(code);
+			const name = LanguageCodes.getName(code);
 			const engines = definition.engines.join(", ");
 			return `<tr><td>${name}</td><td>${code}</td><td>${engines}</td></tr>`;
 		}).join("");

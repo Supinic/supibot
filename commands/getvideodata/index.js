@@ -1,3 +1,5 @@
+const { getLinkParser } = require("../../utils/link-parser.js");
+
 module.exports = {
 	Name: "getvideodata",
 	Aliases: ["gvd"],
@@ -9,14 +11,16 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function getVideoData (context, link) {
+		const linkParser = getLinkParser();
+
 		let data = null;
 		try {
-			data = await sb.Utils.modules.linkParser.fetchData(link);
+			data = await linkParser.fetchData(link);
 		}
 		catch (e) {
 			return { reply: "Unable to parse link." };
 		}
-	
+
 		if (!data) {
 			return { reply: "Link has been deleted or is otherwise not available." };
 		}
@@ -33,7 +37,7 @@ module.exports = {
 					reply: paste.error ?? paste.body
 				};
 			}
-	
+
 			return {
 				reply: paste.body
 			};
