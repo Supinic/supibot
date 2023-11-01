@@ -1,3 +1,5 @@
+const executeTransliteration = require("transliteration").transliterate;
+
 module.exports = {
 	Name: "transliterate",
 	Aliases: null,
@@ -22,7 +24,7 @@ module.exports = {
 		const { lang } = context.params;
 		if (!lang) {
 			return {
-				reply: sb.Utils.transliterate(query)
+				reply: executeTransliteration(query)
 			};
 		}
 

@@ -1,3 +1,5 @@
+const { searchYoutube } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "youtubesearch",
 	Aliases: ["ys"],
@@ -86,7 +88,7 @@ module.exports = {
 		}
 
 		if (!data) {
-			const tracks = await sb.Utils.searchYoutube(
+			const tracks = await searchYoutube(
 				query,
 				/** @type {string} */
 				sb.Config.get("API_GOOGLE_YOUTUBE"),

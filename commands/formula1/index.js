@@ -1,3 +1,5 @@
+const { searchYoutube } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "formula1",
 	Aliases: ["f1"],
@@ -62,7 +64,7 @@ module.exports = {
 					const [qualiResults, raceResults, highlights] = await Promise.all([
 						fetchQualifyingResults(race.season, race.round),
 						fetchRaceResults(race.season, race.round),
-						sb.Utils.searchYoutube(
+						searchYoutube(
 							`${race.season} ${race.raceName} highlights formula 1`,
 							sb.Config.get("API_GOOGLE_YOUTUBE")
 						)

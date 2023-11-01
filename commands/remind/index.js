@@ -1,4 +1,4 @@
-const { fetchTimeData } = require("../../utils/command-utils.js");
+const { fetchTimeData, parseChrono } = require("../../utils/command-utils.js");
 
 module.exports = {
 	Name: "remind",
@@ -115,7 +115,7 @@ module.exports = {
 				.replaceAll(/(\b|\d)m(\b|\d)/g, "$1min$2")
 				.replaceAll(/(\b|\d)s(\b|\d)/g, "$1sec$2");
 
-			const preCheckChronoData = sb.Utils.parseChrono(chronoValue);
+			const preCheckChronoData = parseChrono(chronoValue);
 			if (!preCheckChronoData) {
 				return {
 					success: false,
@@ -156,7 +156,7 @@ module.exports = {
 				referenceDate.setTimezoneOffset((timeData.rawOffset + timeData.dstOffset) / 60);
 			}
 
-			const chronoData = sb.Utils.parseChrono(chronoValue, referenceDate, { forwardDate: false });
+			const chronoData = parseChrono(chronoValue, referenceDate, { forwardDate: false });
 			if (!chronoData) {
 				return {
 					success: false,

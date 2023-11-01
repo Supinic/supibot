@@ -1,3 +1,5 @@
+const { roll: diceRoll } = require("eval-dice-roll");
+
 module.exports = {
 	Name: "roll",
 	Aliases: ["dice"],
@@ -58,7 +60,7 @@ module.exports = {
 		}
 
 		const [fixedInput] = args.join(" ").split(/[a-ce-zA-Z]/);
-		const result = sb.Utils.evalDiceRoll(fixedInput, 1_000_000);
+		const result = diceRoll(fixedInput, 1_000_000);
 
 		if (result === null) {
 			return {
