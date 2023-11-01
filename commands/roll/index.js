@@ -1,4 +1,4 @@
-const { roll: diceRoll } = require("eval-dice-roll");
+const { roll: diceRoll } = require("roll-dice");
 
 module.exports = {
 	Name: "roll",
