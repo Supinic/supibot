@@ -115,10 +115,20 @@ module.exports = {
 			}
 		}
 
-		let totalUsedCommandNames = usedCommandNames;
-		if (context.append.pipeList) {
-			totalUsedCommandNames = [...context.append.pipeList];
-			totalUsedCommandNames.splice(context.append.pipeIndex, 1, ...usedCommandNames);
+		let totalUsedCommandNames;
+		if (context.append.commandList) {
+			totalUsedCommandNames = context.append.commandList;
+
+			const pipeIndex = totalUsedCommandNames.indexOf("pipe");
+			if (pipeIndex !== -1) {
+				totalUsedCommandNames.splice(pipeIndex, 1, ...usedCommandNames);
+			}
+			else {
+				totalUsedCommandNames.push(...usedCommandNames);
+			}
+		}
+		else {
+			totalUsedCommandNames = usedCommandNames;
 		}
 
 		for (const combination of bannedCommandCombinations) {
@@ -195,8 +205,8 @@ module.exports = {
 					pipeCount,
 					tee: context.tee,
 					platform: context.platform,
+					commandList: totalUsedCommandNames,
 					pipe: true,
-					pipeList: totalUsedCommandNames,
 					pipeIndex: i,
 					skipBanphrases: true,
 					skipPending: true,

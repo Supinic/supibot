@@ -1302,12 +1302,21 @@ module.exports = {
 					};
 				}
 
-				if (context.append.pipeList) {
-					context.append.pipeList.splice(context.append.pipeIndex, 1, commandData.Name);
+				let totalUsedCommandNames;
+				if (context.append.commandList) {
+					totalUsedCommandNames = context.append.commandList;
+
+					const aliasIndex = totalUsedCommandNames.indexOf("alias");
+					if (aliasIndex !== -1) {
+						totalUsedCommandNames.splice(aliasIndex, 1, commandData.Name);
+					}
+					else {
+						totalUsedCommandNames.push(commandData.Name);
+					}
 
 					for (const combination of bannedCommandCombinations) {
 						let index = 0;
-						for (const commandName of context.append.pipeList) {
+						for (const commandName of totalUsedCommandNames) {
 							if (commandName === combination[index]) {
 								index++;
 							}
@@ -1320,6 +1329,9 @@ module.exports = {
 							}
 						}
 					}
+				}
+				else {
+					totalUsedCommandNames = [commandData.Name];
 				}
 
 				const result = await sb.Command.checkAndExecute(
@@ -1334,6 +1346,7 @@ module.exports = {
 						aliasCount,
 						aliasStack: [...(context.append.aliasStack ?? []), name],
 						aliasTry,
+						commandList: totalUsedCommandNames,
 						platform: context.platform,
 						skipBanphrases: true,
 						skipMention: true,
