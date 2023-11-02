@@ -1,3 +1,5 @@
+const { parseRSS } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "mastodon",
 	Aliases: [],
@@ -108,7 +110,7 @@ module.exports = {
 			const xml = response.body;
 			let rss;
 			try {
-				rss = await sb.Utils.parseRSS(xml);
+				rss = await parseRSS(xml);
 			}
 			catch (e) {
 				await sb.Logger.log(

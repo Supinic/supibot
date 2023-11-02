@@ -1,4 +1,4 @@
-const { getPathFromURL } = require("../../utils/command-utils.js");
+const { getPathFromURL, uploadToImgur } = require("../../utils/command-utils.js");
 
 module.exports = {
 	Name: "twitchlottoexplain",
@@ -135,7 +135,7 @@ module.exports = {
 			};
 		}
 
-		const { statusCode, link: outputLink } = await sb.Utils.uploadToImgur(outputFile, link);
+		const { statusCode, link: outputLink } = await uploadToImgur(outputFile, link);
 
 		await fs.promises.unlink(`/tmp/out_${link}`);
 

@@ -152,64 +152,6 @@ module.exports = {
 	},
 
 	/**
-	 * Splits a given string into a given amount of "messages", where each contains up to `limit` characters.
-	 * Only splits on entire words
-	 * @param {string} message
-	 * @param {number} limit
-	 * @param {number} messageCount
-	 * @returns {[]}
-	 */
-	partitionString (message, limit, messageCount) {
-		if (!this.isValidInteger(limit)) {
-			throw new sb.Error({
-				message: "Limit must be a positive integer"
-			});
-		}
-
-		const words = [];
-		const regex = new RegExp(`.{1,${limit}}`, "g");
-		for (const rawWord of message.split(" ")) {
-			if (rawWord.length > limit) {
-				words.push(...rawWord.match(regex));
-			}
-			else {
-				words.push(rawWord);
-			}
-		}
-
-		const result = [];
-		let buffer = [];
-		let counter = 0;
-		let messages = 1;
-		let loopBroken = false;
-
-		for (const word of words) {
-			buffer.push(word);
-			counter += word.length + 1;
-
-			if (counter >= limit) {
-				counter = 0;
-
-				buffer.pop();
-				result.push(buffer.join(" "));
-				buffer = [word];
-				messages++;
-			}
-
-			if (messages > messageCount) {
-				loopBroken = true;
-				break;
-			}
-		}
-
-		if (!loopBroken) {
-			result.push(buffer.join(" "));
-		}
-
-		return result;
-	},
-
-	/**
 	 * Parses an RSS string into JS object format.
 	 * @param {string} xml
 	 * @returns {Promise<RSSParserResult>}
@@ -242,6 +184,11 @@ module.exports = {
 		return `${path}${url.search}`;
 	},
 
+	/**
+	 * @param {string} string
+	 * @param {Date} referenceDate
+	 * @param {Object} options
+	 */
 	parseChrono (string, referenceDate = null, options = {}) {
 		const chronoData = Chrono.parse(string, referenceDate, options);
 		if (chronoData.length === 0) {
@@ -303,7 +250,6 @@ module.exports = {
 			formatted
 		};
 	},
-
 
 	/**
 	 * Fetches info about a provided Youtube video.

@@ -1,3 +1,5 @@
+const { uploadToImgur, uploadToNuuls } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "whatanimeisit",
 	Aliases: ["tracemoe"],
@@ -95,9 +97,9 @@ module.exports = {
 				throwHttpErrors: false
 			});
 
-			let uploadResult = await sb.Utils.uploadToNuuls(videoData.rawBody ?? videoData.body, "file.mp4");
+			let uploadResult = await uploadToNuuls(videoData.rawBody ?? videoData.body, "file.mp4");
 			if (uploadResult.statusCode !== 200) {
-				uploadResult = await sb.Utils.uploadToImgur(videoData.rawBody ?? videoData.body, "file.mp4", {
+				uploadResult = await uploadToImgur(videoData.rawBody ?? videoData.body, "file.mp4", {
 					type: "video"
 				});
 			}

@@ -1,3 +1,4 @@
+const { fetchYoutubePlaylist } = require("../../utils/command-utils.js");
 const { getLinkParser } = require("../../utils/link-parser.js");
 const limit = 100;
 
@@ -31,7 +32,7 @@ module.exports = {
 				};
 			}
 
-			const { amount, reason, result, success } = await sb.Utils.fetchYoutubePlaylist({
+			const { amount, reason, result, success } = await fetchYoutubePlaylist({
 				playlistID,
 				key: sb.Config.get("API_GOOGLE_YOUTUBE"),
 				limit,

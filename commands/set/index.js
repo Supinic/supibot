@@ -1,4 +1,5 @@
 const LanguageCodes = require("language-iso-codes");
+const { fetchGeoLocationData } = require("../../utils/command-utils.js");
 const { getLinkParser } = require("../../utils/link-parser.js");
 
 module.exports = {
@@ -409,7 +410,7 @@ module.exports = {
 						}
 
 						const query = args.join(" ");
-						const { components, coordinates, formatted, location, placeID, success } = await sb.Utils.fetchGeoLocationData(
+						const { components, coordinates, formatted, location, placeID, success } = await fetchGeoLocationData(
 							/** @type {string} */
 							sb.Config.get("API_GOOGLE_GEOCODING"),
 							query

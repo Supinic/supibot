@@ -1,3 +1,5 @@
+const { parseRSS } = require("../../utils/command-utils.js");
+
 const definitions = require("./definitions.json");
 const rssCacheKey = "command-news-rss-cache";
 
@@ -37,7 +39,7 @@ module.exports = {
 					responseType: "text"
 				}).text();
 
-				feed = await sb.Utils.parseRSS(xml);
+				feed = await parseRSS(xml);
 			}
 			catch (e) {
 				await sb.Logger.logError("Command", e, {

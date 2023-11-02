@@ -1,3 +1,5 @@
+const { uploadToImgur, uploadToNuuls } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "doesnotexist",
 	Aliases: ["dne"],
@@ -99,7 +101,7 @@ module.exports = {
 							};
 						}
 
-						const { statusCode, link } = await sb.Utils.uploadToImgur(imageResponse.rawBody ?? imageResponse.body);
+						const { statusCode, link } = await uploadToImgur(imageResponse.rawBody ?? imageResponse.body);
 						if (statusCode !== 200) {
 							return {
 								success: false,
@@ -134,9 +136,9 @@ module.exports = {
 							};
 						}
 
-						let { statusCode, link } = await sb.Utils.uploadToNuuls(imageData.rawBody ?? imageData.body);
+						let { statusCode, link } = await uploadToNuuls(imageData.rawBody ?? imageData.body);
 						if (statusCode !== 200) {
-							const result = await sb.Utils.uploadToImgur(imageData.rawBody ?? imageData.body);
+							const result = await uploadToImgur(imageData.rawBody ?? imageData.body);
 							if (result.statusCode !== 200) {
 								return {
 									success: false,
@@ -240,9 +242,9 @@ module.exports = {
 						const imageSource = $("#vehicle").attr("src").replace("data:image/png;base64,", "");
 						const imageBuffer = Buffer.from(imageSource, "base64");
 
-						let result = await sb.Utils.uploadToNuuls(imageBuffer);
+						let result = await uploadToNuuls(imageBuffer);
 						if (result.statusCode !== 200) {
-							result = await sb.Utils.uploadToImgur(imageBuffer);
+							result = await uploadToImgur(imageBuffer);
 							if (result.statusCode !== 200) {
 								return {
 									success: false,

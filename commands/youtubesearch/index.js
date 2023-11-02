@@ -1,3 +1,4 @@
+const { searchYoutube } = require("../../utils/command-utils.js");
 const { getLinkParser } = require("../../utils/link-parser.js");
 
 module.exports = {
@@ -88,7 +89,7 @@ module.exports = {
 		}
 
 		if (!data) {
-			const tracks = await sb.Utils.searchYoutube(
+			const tracks = await searchYoutube(
 				query,
 				/** @type {string} */
 				sb.Config.get("API_GOOGLE_YOUTUBE"),

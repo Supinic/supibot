@@ -1,3 +1,4 @@
+const { parseRSS } = require("../../utils/command-utils.js");
 const DEFAULT_CHANNEL_ID = 38;
 
 /**
@@ -98,7 +99,7 @@ const handleSubscription = async function (subType, message, options = {}) {
  * @return {Promise<*[]|null>}
  */
 const parseRssNews = async function (xml, cacheKey) {
-	const feed = await sb.Utils.parseRSS(xml);
+	const feed = await parseRSS(xml);
 	const lastPublishDate = await sb.Cache.getByPrefix(cacheKey) ?? 0;
 	const eligibleArticles = feed.items
 		.filter(i => new sb.Date(i.pubDate) > lastPublishDate)

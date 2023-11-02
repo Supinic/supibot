@@ -1,3 +1,5 @@
+const { uploadToImgur } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "query",
 	Aliases: ["wolframalpha", "wa"],
@@ -41,7 +43,7 @@ module.exports = {
 				};
 			}
 
-			const uploadResult = await sb.Utils.uploadToImgur(response.body);
+			const uploadResult = await uploadToImgur(response.body);
 			if (!uploadResult.link) {
 				return {
 					success: false,

@@ -1,3 +1,5 @@
+const { fetchYoutubePlaylist } = require("../../utils/command-utils.js");
+
 const ascendancies = require("./ascendancies.json");
 const leagues = require("./leagues.json");
 const gems = require("./gems.json");
@@ -244,7 +246,7 @@ const subcommands = [
 
 			if (deathData.videoCache.length === 0) {
 				const playlist = sb.Utils.randArray(deathData.playlists);
-				const { result, reason, success } = await sb.Utils.fetchYoutubePlaylist({
+				const { result, reason, success } = await fetchYoutubePlaylist({
 					key: sb.Config.get("API_GOOGLE_YOUTUBE"),
 					playlistID: playlist
 				});
