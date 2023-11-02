@@ -12,9 +12,7 @@ const MockTwitchClient = require("./mock-client.js");
 require.cache[require.resolve("dank-twitch-irc")].exports = MockTwitchClient;
 
 const initialize = (async () => {
-	const Date = require("supi-core/objects/date.js");
-	const Config = require("supi-core/classes/config.js");
-
+	const { Date, Config } = await import("supi-core");
 	globalThis.sb = {
 		Date,
 		Config,

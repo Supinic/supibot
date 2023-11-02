@@ -1,12 +1,10 @@
-// @todo move to Supinic/Supibot repo after moving is done
-
 const assert = require("assert");
 const Command = require("../../../classes/command");
 
 beforeEach(async() => {
-	const Date = require("supi-core/objects/date");
+	const DateModule = await import("supi-core/objects/date.js");
 	globalThis.sb = {
-		Date,
+		Date: DateModule.default,
 		Utils: {
 			parseRegExp: (input) => {
 				try {
