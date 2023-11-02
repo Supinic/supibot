@@ -740,18 +740,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"JSONStream@npm:^1.3.5":
-  version: 1.3.5
-  resolution: "JSONStream@npm:1.3.5"
-  dependencies:
-    jsonparse: ^1.2.0
-    through: ">=2.2.7 <3"
-  bin:
-    JSONStream: ./bin.js
-  checksum: 2605fa124260c61bad38bb65eba30d2f72216a78e94d0ab19b11b4e0327d572b8d530c0c9cc3b0764f727ad26d39e00bf7ebad57781ca6368394d73169c59e46
-  languageName: node
-  linkType: hard
-
 "abbrev@npm:^2.0.0":
   version: 2.0.0
   resolution: "abbrev@npm:2.0.0"
@@ -988,17 +976,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bl@npm:^4.0.3":
-  version: 4.1.0
-  resolution: "bl@npm:4.1.0"
-  dependencies:
-    buffer: ^5.5.0
-    inherits: ^2.0.4
-    readable-stream: ^3.4.0
-  checksum: 9e8521fa7e83aa9427c6f8ccdcba6e8167ef30cc9a22df26effcc5ab682ef91d2cbc23a239f945d099289e4bbcfae7a192e9c28c84c6202e710a0dfec3722662
-  languageName: node
-  linkType: hard
-
 "boolbase@npm:^1.0.0":
   version: 1.0.0
   resolution: "boolbase@npm:1.0.0"
@@ -1052,16 +1029,6 @@ __metadata:
   bin:
     browserslist: cli.js
   checksum: 7e6b10c53f7dd5d83fd2b95b00518889096382539fed6403829d447e05df4744088de46a571071afb447046abc3c66ad06fbc790e70234ec2517452e32ffd862
-  languageName: node
-  linkType: hard
-
-"buffer@npm:^5.5.0":
-  version: 5.7.1
-  resolution: "buffer@npm:5.7.1"
-  dependencies:
-    base64-js: ^1.3.1
-    ieee754: ^1.1.13
-  checksum: e2cf8429e1c4c7b8cbd30834ac09bd61da46ce35f5c22a78e6c2f04497d6d25541b16881e30a019c6fd3154150650ccee27a308eff3e26229d788bbdeb08ab84
   languageName: node
   linkType: hard
 
@@ -1282,15 +1249,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chrono-node@npm:^2.7.0":
-  version: 2.7.0
-  resolution: "chrono-node@npm:2.7.0"
-  dependencies:
-    dayjs: ^1.10.0
-  checksum: e4793cc6145cff9ec05ef6a975c75a951830fbcc9b6fa49e95259d68a40662b43b9929473503b4d8de57d9eb68059ad7a9be2067ff3806e2c312e1319664fb00
-  languageName: node
-  linkType: hard
-
 "ci-info@npm:^3.8.0":
   version: 3.9.0
   resolution: "ci-info@npm:3.9.0"
@@ -1333,17 +1291,6 @@ __metadata:
     strip-ansi: ^6.0.0
     wrap-ansi: ^7.0.0
   checksum: ce2e8f578a4813806788ac399b9e866297740eecd4ad1823c27fd344d78b22c5f8597d548adbcc46f0573e43e21e751f39446c5a5e804a12aace402b7a315d7f
-  languageName: node
-  linkType: hard
-
-"cliui@npm:^8.0.1":
-  version: 8.0.1
-  resolution: "cliui@npm:8.0.1"
-  dependencies:
-    string-width: ^4.2.0
-    strip-ansi: ^6.0.1
-    wrap-ansi: ^7.0.0
-  checksum: 79648b3b0045f2e285b76fb2e24e207c6db44323581e421c3acbd0e86454cba1b37aea976ab50195a49e7384b871e6dfb2247ad7dec53c02454ac6497394cb56
   languageName: node
   linkType: hard
 
@@ -1512,13 +1459,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dayjs@npm:^1.10.0":
-  version: 1.11.10
-  resolution: "dayjs@npm:1.11.10"
-  checksum: a6b5a3813b8884f5cd557e2e6b7fa569f4c5d0c97aca9558e38534af4f2d60daafd3ff8c2000fed3435cfcec9e805bcebd99f90130c6d1c5ef524084ced588c4
-  languageName: node
-  linkType: hard
-
 "debug-logger@npm:^0.4.1":
   version: 0.4.1
   resolution: "debug-logger@npm:0.4.1"
@@ -1592,15 +1532,6 @@ __metadata:
   version: 2.0.1
   resolution: "defer-to-connect@npm:2.0.1"
   checksum: 8a9b50d2f25446c0bfefb55a48e90afd58f85b21bcf78e9207cd7b804354f6409032a1705c2491686e202e64fc05f147aa5aa45f9aa82627563f045937f5791b
-  languageName: node
-  linkType: hard
-
-"deferential@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "deferential@npm:1.0.0"
-  dependencies:
-    native-promise-only: ^0.8.1
-  checksum: 460527568003ae21dd92f8aa0194bfbf1f8395c3ebc60c77c672e7e4e3de9066b2d2d2fd3e08c37414b839e5fcec10b5515b00e153dc9ec8a0861f95b5fa10d3
   languageName: node
   linkType: hard
 
@@ -1794,13 +1725,6 @@ __metadata:
   version: 5.2.1
   resolution: "engine.io-parser@npm:5.2.1"
   checksum: 55b0e8e18500f50c1573675c53597c5552554ead08d3f30ff19fde6409e48f882a8e01f84e9772cd155c18a1d653d06f6bf57b4e1f8b834c63c9eaf3b657b88e
-  languageName: node
-  linkType: hard
-
-"entities@npm:^2.0.3":
-  version: 2.2.0
-  resolution: "entities@npm:2.2.0"
-  checksum: 19010dacaf0912c895ea262b4f6128574f9ccf8d4b3b65c7e8334ad0079b3706376360e28d8843ff50a78aabcb8f08f0a32dbfacdc77e47ed77ca08b713669b3
   languageName: node
   linkType: hard
 
@@ -2094,17 +2018,6 @@ __metadata:
   dependencies:
     reusify: ^1.0.4
   checksum: 0170e6bfcd5d57a70412440b8ef600da6de3b2a6c5966aeaf0a852d542daff506a0ee92d6de7679d1de82e644bce69d7a574a6c93f0b03964b5337eed75ada1a
-  languageName: node
-  linkType: hard
-
-"ffprobe@npm:^1.1.2":
-  version: 1.1.2
-  resolution: "ffprobe@npm:1.1.2"
-  dependencies:
-    JSONStream: ^1.3.5
-    bl: ^4.0.3
-    deferential: ^1.0.0
-  checksum: 0049b22e0e9844ab9ba4bf907cb4bf60b85b12687a304a9bc3b5cbe1b1519bbc55ca231c17a4078b7e9a57584b85390fab5a5630c06cfcf4394dd07b14db28e4
   languageName: node
   linkType: hard
 
@@ -2639,7 +2552,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ieee754@npm:^1.1.13, ieee754@npm:^1.2.1":
+"ieee754@npm:^1.2.1":
   version: 1.2.1
   resolution: "ieee754@npm:1.2.1"
   checksum: 5144c0c9815e54ada181d80a0b810221a253562422e7c6c3a60b1901154184f49326ec239d618c416c1c5945a2e197107aee8d986a3dd836b53dffefd99b5e7e
@@ -2687,7 +2600,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"inherits@npm:2, inherits@npm:^2.0.3, inherits@npm:^2.0.4, inherits@npm:~2.0.4":
+"inherits@npm:2, inherits@npm:^2.0.3, inherits@npm:~2.0.4":
   version: 2.0.4
   resolution: "inherits@npm:2.0.4"
   checksum: 4a48a733847879d6cf6691860a6b1e3f0f4754176e4d71494c41f3475553768b10f84b5ce1d40fbd0e34e6bfbb864ee35858ad4dd2cf31e02fc4a154b724d7f1
@@ -3090,13 +3003,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsonparse@npm:^1.2.0":
-  version: 1.3.1
-  resolution: "jsonparse@npm:1.3.1"
-  checksum: 6514a7be4674ebf407afca0eda3ba284b69b07f9958a8d3113ef1005f7ec610860c312be067e450c569aab8b89635e332cee3696789c750692bb60daba627f4d
-  languageName: node
-  linkType: hard
-
 "keyv@npm:^4.0.0, keyv@npm:^4.5.3":
   version: 4.5.4
   resolution: "keyv@npm:4.5.4"
@@ -3106,7 +3012,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"language-iso-codes@github:supinic/language-iso-codes, language-iso-codes@supinic/language-iso-codes#master":
+"language-iso-codes@supinic/language-iso-codes#master":
   version: 1.0.0
   resolution: "language-iso-codes@https://github.com/supinic/language-iso-codes.git#commit=dc0e75b4f40978d5549fcf1da5243687c8445963"
   checksum: 9527ad72058122311a166e77ec290b08e3f7fd50732d7e1f9c27b67208c48213e46262520880fb309629efe339461ac834c7be5379c1fdd5d903e285c49f8e6c
@@ -3563,13 +3469,6 @@ __metadata:
   bin:
     nanoid: bin/nanoid.cjs
   checksum: ada019402a07464a694553c61d2dca8a4353645a7d92f2830f0d487fedff403678a0bee5323a46522752b2eab95a0bc3da98b6cccaa7c0c55cd9975130e6d6f0
-  languageName: node
-  linkType: hard
-
-"native-promise-only@npm:^0.8.1":
-  version: 0.8.1
-  resolution: "native-promise-only@npm:0.8.1"
-  checksum: bb4d8416c47d1b2cef0d4eb2c7f3442a9ed04d3734287f4037dfb7ff25948612976928e5baed105081927d5337d3f657e3a42ad2e8cca38a6428a81b32cd6dc4
   languageName: node
   linkType: hard
 
@@ -4062,7 +3961,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"readable-stream@npm:^3.0.0, readable-stream@npm:^3.1.1, readable-stream@npm:^3.4.0, readable-stream@npm:^3.5.0, readable-stream@npm:^3.6.0":
+"readable-stream@npm:^3.0.0, readable-stream@npm:^3.1.1, readable-stream@npm:^3.5.0, readable-stream@npm:^3.6.0":
   version: 3.6.2
   resolution: "readable-stream@npm:3.6.2"
   dependencies:
@@ -4238,23 +4137,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"roll-dice@npm:@jprochazk/roll-dice@^0.2.2":
-  version: 0.2.2
-  resolution: "@jprochazk/roll-dice@npm:0.2.2"
-  checksum: 70c6f867b48e153cbbd01086ca0dd6435a23a224884e2dcf17d804321e061c6940163e10c149b95680421a6fadb970a9f0f4461a48dfb3730022185256f2c6cd
-  languageName: node
-  linkType: hard
-
-"rss-parser@npm:^3.13.0":
-  version: 3.13.0
-  resolution: "rss-parser@npm:3.13.0"
-  dependencies:
-    entities: ^2.0.3
-    xml2js: ^0.5.0
-  checksum: 7c6ab677386dbf14ddc0526f769ccdd5bf0b53a019dd2c0454ce80971dd4decb7ac567a4e78dffe99e87d7b595698e7f24eae45f09c49ef79ad644efb702db22
-  languageName: node
-  linkType: hard
-
 "run-parallel@npm:^1.1.9":
   version: 1.2.0
   resolution: "run-parallel@npm:1.2.0"
@@ -4275,13 +4157,6 @@ __metadata:
   version: 2.1.2
   resolution: "safer-buffer@npm:2.1.2"
   checksum: cab8f25ae6f1434abee8d80023d7e72b598cf1327164ddab31003c51215526801e40b66c5e65d658a0af1e9d6478cadcb4c745f4bd6751f97d8644786c0978b0
-  languageName: node
-  linkType: hard
-
-"sax@npm:>=0.6.0":
-  version: 1.3.0
-  resolution: "sax@npm:1.3.0"
-  checksum: 238ab3a9ba8c8f8aaf1c5ea9120386391f6ee0af52f1a6a40bbb6df78241dd05d782f2359d614ac6aae08c4c4125208b456548a6cf68625aa4fe178486e63ecd
   languageName: node
   linkType: hard
 
@@ -4553,7 +4428,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"string-width-cjs@npm:string-width@^4.2.0, string-width@npm:^4.1.0, string-width@npm:^4.2.0, string-width@npm:^4.2.3":
+"string-width-cjs@npm:string-width@^4.2.0, string-width@npm:^4.1.0, string-width@npm:^4.2.0":
   version: 4.2.3
   resolution: "string-width@npm:4.2.3"
   dependencies:
@@ -4633,25 +4508,18 @@ __metadata:
   linkType: hard
 
 supi-core@supinic/supi-core:
-  version: 3.0.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=127599f945b8c075394f61342886f674a4d293d2"
+  version: 3.1.0
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=739529e45defa83e32514425c2ea445a3b4371f9"
   dependencies:
     cheerio: ^1.0.0-rc.12
-    chrono-node: ^2.7.0
     duration-parser: "github:supinic/duration-parser"
-    ffprobe: ^1.1.2
     form-data: ^4.0.0
     got: ^13.0.0
     ioredis: ^5.3.2
-    language-iso-codes: "github:supinic/language-iso-codes"
     mariadb: ^3.2.2
     prom-client: ^15.0.0
     random-js: ^2.1.0
-    roll-dice: "npm:@jprochazk/roll-dice@^0.2.2"
-    rss-parser: ^3.13.0
-    track-link-parser: "github:supinic/track-link-parser"
-    transliteration: ^2.3.5
-  checksum: 978a621ee7bb025b37af486033abd2ea780d27cbaeafa619c0358a37af5f58f40bd9e06931afb6fa53e9abb80f26df0e69db04f0510da16d50fd69dc5890bdb4
+  checksum: a286e6518cef3625252b9d4341d24ba8bdfdbc28d2ff937d4a6f704ecc3cdc9076413ef53e321b098bcb6f2e84a55fcad4b858f366ef880d00178d12fd3bf96d
   languageName: node
   linkType: hard
 
@@ -4765,13 +4633,6 @@ supi-core@supinic/supi-core:
   languageName: node
   linkType: hard
 
-"through@npm:>=2.2.7 <3":
-  version: 2.3.8
-  resolution: "through@npm:2.3.8"
-  checksum: a38c3e059853c494af95d50c072b83f8b676a9ba2818dcc5b108ef252230735c54e0185437618596c790bbba8fcdaef5b290405981ffa09dce67b1f1bf190cbd
-  languageName: node
-  linkType: hard
-
 "to-fast-properties@npm:^2.0.0":
   version: 2.0.0
   resolution: "to-fast-properties@npm:2.0.0"
@@ -4788,25 +4649,13 @@ supi-core@supinic/supi-core:
   languageName: node
   linkType: hard
 
-"track-link-parser@github:supinic/track-link-parser, track-link-parser@supinic/track-link-parser#master":
+"track-link-parser@supinic/track-link-parser#master":
   version: 1.2.0
   resolution: "track-link-parser@https://github.com/supinic/track-link-parser.git#commit=91fd676f1292e315c9cb6e7e10fcd062d064dec4"
   dependencies:
     fast-xml-parser: ^3.19.0
     got: ^11.8.0
   checksum: 073f4314aa3af776583e43679e8fff09c53f772c7d018d8d0cfe12e0f817cac76329c22030567452399848c76e6cfb8e5aa9a8f1819ca77e740926553b3b7851
-  languageName: node
-  linkType: hard
-
-"transliteration@npm:^2.3.5":
-  version: 2.3.5
-  resolution: "transliteration@npm:2.3.5"
-  dependencies:
-    yargs: ^17.5.1
-  bin:
-    slugify: dist/bin/slugify
-    transliterate: dist/bin/transliterate
-  checksum: d8cf3af2c08235010c701f80d50d14e304582f201024e7e316de109935d2f8b0e2c7239db69eb4c02c010e921fe3ef25777c8cb9b04d640d86d1f295bc3966a7
   languageName: node
   linkType: hard
 
@@ -5124,23 +4973,6 @@ supi-core@supinic/supi-core:
   languageName: node
   linkType: hard
 
-"xml2js@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "xml2js@npm:0.5.0"
-  dependencies:
-    sax: ">=0.6.0"
-    xmlbuilder: ~11.0.0
-  checksum: 1aa71d62e5bc2d89138e3929b9ea46459157727759cbc62ef99484b778641c0cd21fb637696c052d901a22f82d092a3e740a16b4ce218e81ac59b933535124ea
-  languageName: node
-  linkType: hard
-
-"xmlbuilder@npm:~11.0.0":
-  version: 11.0.1
-  resolution: "xmlbuilder@npm:11.0.1"
-  checksum: 7152695e16f1a9976658215abab27e55d08b1b97bca901d58b048d2b6e106b5af31efccbdecf9b07af37c8377d8e7e821b494af10b3a68b0ff4ae60331b415b0
-  languageName: node
-  linkType: hard
-
 "xmlhttprequest-ssl@npm:~2.0.0":
   version: 2.0.0
   resolution: "xmlhttprequest-ssl@npm:2.0.0"
@@ -5207,13 +5039,6 @@ supi-core@supinic/supi-core:
   languageName: node
   linkType: hard
 
-"yargs-parser@npm:^21.1.1":
-  version: 21.1.1
-  resolution: "yargs-parser@npm:21.1.1"
-  checksum: ed2d96a616a9e3e1cc7d204c62ecc61f7aaab633dcbfab2c6df50f7f87b393993fe6640d017759fe112d0cb1e0119f2b4150a87305cc873fd90831c6a58ccf1c
-  languageName: node
-  linkType: hard
-
 "yargs-unparser@npm:2.0.0":
   version: 2.0.0
   resolution: "yargs-unparser@npm:2.0.0"
@@ -5257,21 +5082,6 @@ supi-core@supinic/supi-core:
     y18n: ^4.0.0
     yargs-parser: ^18.1.2
   checksum: 40b974f508d8aed28598087720e086ecd32a5fd3e945e95ea4457da04ee9bdb8bdd17fd91acff36dc5b7f0595a735929c514c40c402416bbb87c03f6fb782373
-  languageName: node
-  linkType: hard
-
-"yargs@npm:^17.5.1":
-  version: 17.7.2
-  resolution: "yargs@npm:17.7.2"
-  dependencies:
-    cliui: ^8.0.1
-    escalade: ^3.1.1
-    get-caller-file: ^2.0.5
-    require-directory: ^2.1.1
-    string-width: ^4.2.3
-    y18n: ^5.0.5
-    yargs-parser: ^21.1.1
-  checksum: 73b572e863aa4a8cbef323dd911d79d193b772defd5a51aab0aca2d446655216f5002c42c5306033968193bdbf892a7a4c110b0d77954a7fdf563e653967b56a
   languageName: node
   linkType: hard
 
