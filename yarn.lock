@@ -5337,8 +5337,8 @@ __metadata:
   linkType: hard
 
 supi-core@supinic/supi-core:
-  version: 2.2.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=268f5d380794ab04198a39929141dd8a5ee6c9c2"
+  version: 3.0.0
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=127599f945b8c075394f61342886f674a4d293d2"
   dependencies:
     cheerio: ^1.0.0-rc.12
     chrono-node: ^2.7.0
@@ -5355,7 +5355,7 @@ supi-core@supinic/supi-core:
     rss-parser: ^3.13.0
     track-link-parser: "github:supinic/track-link-parser"
     transliteration: ^2.3.5
-  checksum: e2ae6f1594b5dc11f80980edcd4d4b2abf551124358abe2cf8ffd5c9d2d42c54d39fa2cc9334dc6b150d41844a3936ae6ab8a7761faf751fe605748d9891e28f
+  checksum: 978a621ee7bb025b37af486033abd2ea780d27cbaeafa619c0358a37af5f58f40bd9e06931afb6fa53e9abb80f26df0e69db04f0510da16d50fd69dc5890bdb4
   languageName: node
   linkType: hard
 
