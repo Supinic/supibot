@@ -1,3 +1,5 @@
+const { getPathFromURL } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "twitchlottoexplain",
 	Aliases: ["tle"],
@@ -51,7 +53,7 @@ module.exports = {
 		const Explain = require("./explainer.js");
 		const coloursData = require("./colours.json");
 
-		const link = sb.Utils.getPathFromURL(inputLink) ?? inputLink;
+		const link = getPathFromURL(inputLink) ?? inputLink;
 		if (!link) {
 			return {
 				success: false,

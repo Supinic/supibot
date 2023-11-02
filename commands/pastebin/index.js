@@ -1,3 +1,5 @@
+const { getPathFromURL } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "pastebin",
 	Aliases: ["pbg", "pbp", "gist", "hbg", "hbp"],
@@ -189,7 +191,7 @@ module.exports = {
 				userInput = randomUserGist.id;
 			}
 
-			const id = sb.Utils.getPathFromURL(userInput) || userInput;
+			const id = getPathFromURL(userInput) || userInput;
 			if (!id) {
 				return {
 					success: false,
