@@ -1,3 +1,5 @@
+const { getPathFromURL } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "downloadclip",
 	Aliases: ["dlclip"],
@@ -16,7 +18,14 @@ module.exports = {
 			};
 		}
 
-		const rawSlug = sb.Utils.parseURL(input).path;
+		const rawSlug = getPathFromURL(input);
+		if (!rawSlug) {
+			return {
+				success: false,
+				reply: `No proper link provided!`
+			};
+		}
+
 		const legacyClipRegex = /[a-z0-9]+/i;
 		const modernClipRegex = /[a-z0-9]+-[-\w]{16}/i;
 

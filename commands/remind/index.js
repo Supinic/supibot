@@ -1,3 +1,5 @@
+const { fetchTimeData, parseChrono } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "remind",
 	Aliases: ["notify","remindme","remindprivate","privateremind"],
@@ -113,7 +115,7 @@ module.exports = {
 				.replaceAll(/(\b|\d)m(\b|\d)/g, "$1min$2")
 				.replaceAll(/(\b|\d)s(\b|\d)/g, "$1sec$2");
 
-			const preCheckChronoData = sb.Utils.parseChrono(chronoValue);
+			const preCheckChronoData = parseChrono(chronoValue);
 			if (!preCheckChronoData) {
 				return {
 					success: false,
@@ -128,7 +130,7 @@ module.exports = {
 
 			if (!hasExplicitTimezone && !isRelative && location) {
 				const date = preCheckChronoData.component.date();
-				const response = await sb.Utils.fetchTimeData({
+				const response = await fetchTimeData({
 					date,
 					coordinates: location.coordinates,
 					key: String(sb.Config.get("API_GOOGLE_TIMEZONE"))
@@ -154,7 +156,7 @@ module.exports = {
 				referenceDate.setTimezoneOffset((timeData.rawOffset + timeData.dstOffset) / 60);
 			}
 
-			const chronoData = sb.Utils.parseChrono(chronoValue, referenceDate, { forwardDate: false });
+			const chronoData = parseChrono(chronoValue, referenceDate, { forwardDate: false });
 			if (!chronoData) {
 				return {
 					success: false,

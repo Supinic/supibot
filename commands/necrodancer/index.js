@@ -1,3 +1,5 @@
+const { searchYoutube } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "necrodancer",
 	Aliases: ["nd","ndr","necrodancerreset"],
@@ -111,7 +113,7 @@ module.exports = {
 			link = query;
 		}
 		else {
-			const searchResult = await sb.Utils.searchYoutube(
+			const searchResult = await searchYoutube(
 				query,
 				sb.Config.get("API_GOOGLE_YOUTUBE"),
 				{ single: true }

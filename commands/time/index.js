@@ -1,3 +1,5 @@
+const { fetchTimeData } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "time",
 	Aliases: null,
@@ -62,15 +64,7 @@ module.exports = {
 				abbr: timezoneData.abbreviation,
 				name: timezoneData.name
 			};
-		},
-		fetchTimeData: async (coordinates, timestamp = sb.Date.now()) => await sb.Got("Google", {
-			url: "timezone/json",
-			searchParams: {
-				timestamp: Math.trunc(timestamp / 1000).toString(),
-				location: `${coordinates.lat},${coordinates.lng}`,
-				key: sb.Config.get("API_GOOGLE_TIMEZONE")
-			}
-		}).json()
+		}
 	})),
 	Code: (async function time (context, ...args) {
 		const zone = await this.staticData.detectTimezone(...args);
@@ -171,7 +165,7 @@ module.exports = {
 			}
 		}
 
-		const response = await sb.Utils.fetchTimeData({
+		const response = await fetchTimeData({
 			coordinates,
 			key: sb.Config.get("API_GOOGLE_TIMEZONE")
 		});

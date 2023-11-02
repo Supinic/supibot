@@ -1,4 +1,4 @@
-const { getLinkParser } = require("../../utils/link-parser.js");
+const { getLinkParser, searchYoutube } = require("../../utils/link-parser.js");
 let linkParser; // re-defined locally due to multiple blocks requiring this
 
 module.exports = {
@@ -64,7 +64,7 @@ module.exports = {
 				queue: async function (link) {
 					const properLink = linkParser.autoRecognize(link);
 					if (!properLink) {
-						const [bestResult] = await sb.Utils.searchYoutube(
+						const [bestResult] = await searchYoutube(
 							link.replace(/-/g, ""),
 							sb.Config.get("API_GOOGLE_YOUTUBE")
 						);
@@ -349,18 +349,15 @@ module.exports = {
 				};
 			}
 			else {
-				const meta = await sb.Utils.getMediaFileData(url);
-				if (meta?.duration) {
-					const name = decodeURIComponent(parsedURL.path.split("/").pop());
-					const encoded = encodeURI(decodeURI(url));
-					data = {
-						name,
-						ID: encoded,
-						link: encoded,
-						duration: meta.duration,
-						videoType: { ID: 19 }
-					};
-				}
+				const name = decodeURIComponent(parsedURL.path.split("/").pop());
+				const encoded = encodeURI(decodeURI(url));
+				data = {
+					name,
+					ID: encoded,
+					link: encoded,
+					duration: null,
+					videoType: { ID: 19 }
+				};
 			}
 		}
 
@@ -391,7 +388,7 @@ module.exports = {
 				}
 			}
 			else if (type === "youtube") {
-				const data = await sb.Utils.searchYoutube(
+				const data = await searchYoutube(
 					args.join(" "),
 					sb.Config.get("API_GOOGLE_YOUTUBE")
 				);
