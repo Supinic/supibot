@@ -1,3 +1,5 @@
+const { getLinkParser } = require("../../utils/link-parser.js");
+
 module.exports = {
 	Name: "youtubesearch",
 	Aliases: ["ys"],
@@ -71,8 +73,8 @@ module.exports = {
 
 		let data;
 		let videoID;
-		const { linkParser } = sb.Utils.modules;
-		const youtubeParser = linkParser.getParser("youtube");
+		const LinkParser = getLinkParser();
+		const youtubeParser = LinkParser.getParser("youtube");
 
 		if (youtubeParser.checkLink(query, false)) {
 			videoID = youtubeParser.parseLink(query);
