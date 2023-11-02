@@ -1249,6 +1249,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"async-markov@supinic/async-markov#master":
+  version: 1.0.0
+  resolution: "async-markov@https://github.com/supinic/async-markov.git#commit=dc437ceb6bdc1e59c2c371b0264ec385436f0821"
+  checksum: 7fbf612d0ec20c4d0efbfac6f161c4f140e6bce78a7988003b4d8fd26d19ac4f8c3285f8cf686663ec04b621562bea11134448bccaa36c67023a6298226519fc
+  languageName: node
+  linkType: hard
+
 "asynckit@npm:^0.4.0":
   version: 0.4.0
   resolution: "asynckit@npm:0.4.0"
@@ -5382,6 +5389,7 @@ supi-core@supinic/supi-core:
     "@babel/core": ^7.23.2
     "@babel/eslint-parser": ^7.22.15
     acorn-node: ^2.0.1
+    async-markov: "supinic/async-markov#master"
     bing-chat: ^0.2.3
     cron: ^3.1.6
     cytube-connector: "supinic/cytube-connector#master"

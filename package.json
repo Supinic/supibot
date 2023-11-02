@@ -3,6 +3,7 @@
   "version": "2.2.0",
   "dependencies": {
     "acorn-node": "^2.0.1",
+    "async-markov": "supinic/async-markov#master",
     "bing-chat": "^0.2.3",
     "cron": "^3.1.6",
     "cytube-connector": "supinic/cytube-connector#master",
