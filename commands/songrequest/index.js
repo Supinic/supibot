@@ -1,4 +1,6 @@
-const { getLinkParser, searchYoutube } = require("../../utils/link-parser.js");
+const { getLinkParser } = require("../../utils/link-parser.js");
+const { searchYoutube } = require("../../utils/command-utils.js");
+
 let linkParser; // re-defined locally due to multiple blocks requiring this
 
 module.exports = {
