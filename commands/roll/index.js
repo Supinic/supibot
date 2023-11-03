@@ -61,7 +61,7 @@ module.exports = {
 		}
 
 		const [fixedInput] = args.join(" ").split(/[a-ce-zA-Z]/);
-		const hexStringSeed = randomBytes(16).toString("hex");
+		const hexStringSeed = randomBytes(64).toString("hex");
 		const seed = BigInt(`0x${hexStringSeed}`);
 
 		const result = diceRoll(fixedInput, seed,1_000_000n);
