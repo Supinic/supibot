@@ -1,4 +1,5 @@
 const { roll: diceRoll } = require("roll-dice");
+const { randomBytes } = require("crypto");
 
 module.exports = {
 	Name: "roll",
@@ -60,8 +61,10 @@ module.exports = {
 		}
 
 		const [fixedInput] = args.join(" ").split(/[a-ce-zA-Z]/);
-		const result = diceRoll(fixedInput, 1_000_000);
+		const hexStringSeed = randomBytes(16).toString("hex");
+		const seed = BigInt(`0x${hexStringSeed}`);
 
+		const result = diceRoll(fixedInput, seed,1_000_000n);
 		if (result === null) {
 			return {
 				success: false,
