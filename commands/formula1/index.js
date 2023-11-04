@@ -26,10 +26,20 @@ module.exports = {
 			fetchNextRaceDetail
 		} = require("./api-wrapper.js");
 
-		const now = new sb.Date();
+		let prefetchedNextRaceData;
+		try {
+			prefetchedNextRaceData = await fetchNextRaceDetail(context);
+		}
+		catch (e) {
+			return {
+				success: false,
+				reply: `The Formula 1 Ergast API is currently unavailable! Check https://f1calendar.com for race timing in the meantime.`
+			};
+		}
 
+		const now = new sb.Date();
 		if (args.length === 0) {
-			return await fetchNextRaceDetail(context);
+			return prefetchedNextRaceData;
 		}
 
 		const type = args[0].toLowerCase();
@@ -38,7 +48,7 @@ module.exports = {
 		switch (type) {
 			case "race": {
 				if (rest.length === 0) {
-					return await fetchNextRaceDetail(context);
+					return prefetchedNextRaceData;
 				}
 
 				const year = context.params.season ?? context.params.year ?? now.year;
