@@ -32,17 +32,6 @@
       },
       "usageDivisor": 1
     },
-    "davinci": {
-      "url": "text-davinci-001",
-      "type": "string",
-      "default": false,
-      "inputLimit": 250,
-      "outputLimit": {
-        "default": 100,
-        "maximum": 100
-      },
-      "usageDivisor": 0.1
-    },
     "turbo": {
       "url": "gpt-3.5-turbo",
       "type": "messages",
@@ -55,15 +44,15 @@
       "usageDivisor": 1
     },
     "4": {
-      "url": "gpt-4",
+      "url": "gpt-4-1106-preview",
       "type": "messages",
       "default": false,
-      "inputLimit": 200,
+      "inputLimit": 500,
       "outputLimit": {
         "default": 100,
-        "maximum": 100
+        "maximum": 250
       },
-      "usageDivisor": 0.066667
+      "usageDivisor": 0.2
     }
   }
 }
