@@ -71,7 +71,22 @@ module.exports = {
 			? GptMessages
 			: GptString;
 
-		const executionResult = await Handler.execute(context, query, modelData);
+
+		let executionResult;
+		try {
+			executionResult = Handler.execute(context, query, modelData);
+		}
+		catch (e) {
+			if (sb.Got.isRequestError(e)) {
+				return {
+					success: false,
+					reply: `The OpenAI GPT service is overloaded at the moment! Try again later.`
+				};
+			}
+
+			throw e;
+		}
+
 		if (executionResult.success === false) {
 			return executionResult;
 		}
