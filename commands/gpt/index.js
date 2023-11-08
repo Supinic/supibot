@@ -71,7 +71,6 @@ module.exports = {
 			? GptMessages
 			: GptString;
 
-
 		let executionResult;
 		try {
 			executionResult = await Handler.execute(context, query, modelData);
@@ -100,7 +99,7 @@ module.exports = {
 				context.user
 			);
 
-			if (response.statusCode === 429 && response.body.error.type === "insufficient_quota") {
+			if (response.statusCode === 429 && response.body.error?.type === "insufficient_quota") {
 				const { year, month } = new sb.Date(sb.Date.getTodayUTC());
 				const nextMonthName = new sb.Date(year, month + 1, 1).format("F Y");
 				const nextMonthDelta = sb.Utils.timeDelta(sb.Date.UTC(year, month + 1, 1));
