@@ -74,7 +74,7 @@ module.exports = {
 
 		let executionResult;
 		try {
-			executionResult = Handler.execute(context, query, modelData);
+			executionResult = await Handler.execute(context, query, modelData);
 		}
 		catch (e) {
 			if (sb.Got.isRequestError(e)) {
