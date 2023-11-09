@@ -53,7 +53,7 @@ module.exports = {
 			if (command.includes("join") && channelName && channelName.toLowerCase() === context.user.Name) {
 				return {
 					success: false,
-					reply: `Cannot join your channel directly! Use this form instead: https://supinic.com/bot/request-bot/form`
+					reply: `I can't rejoin your channel, you haven't requested me yet! To request me in your channel, use this form: https://supinic.com/bot/request-bot/form`
 				};
 			}
 
