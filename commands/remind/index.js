@@ -352,6 +352,13 @@ module.exports = {
 		"There is no difference between <code>remind</code> and <code>notify</code>.",
 		"",
 
+		`<code>${prefix}unset reminder (ID)</code>`,
+		`<code>${prefix}unset reminder last</code>`,
+		"Deactivates and removes a reminder you have created (or someone has set for you), determined by its ID.",
+		"You can also deactive the \"last\" reminder you created or someone created for you by using the \"last\" keyword.",
+		`For full info, make sure to check the help article for the <a href="/bot/command/detail/unset">unset</a> command.`,
+		"",
+
 		`<code>${prefix}remindprivate (person) hello :)</code>`,
 		`<code>${prefix}remind private:true (person) hello :)</code>`,
 		"Privately reminds target person (via whispers/PMs) when they next type in a channel that has Supibot active.",
