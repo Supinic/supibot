@@ -44,7 +44,7 @@ module.exports = {
 			const { day, month } = birthdayData;
 			for (const { start, end, name } of zodiacData) {
 				if ((month === start[0] && day >= start[1]) || (month === end[0] && day <= end[1])) {
-					zodiacName = name;
+					zodiacName = name.toLowerCase();
 					own = true;
 					break;
 				}
