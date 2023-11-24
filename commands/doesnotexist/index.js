@@ -116,11 +116,12 @@ module.exports = {
 					}
 				},
 				{
+					// "cat" commented out due to SSL error on http://thiscatdoesnotexist.com/ - domain likely got jacked
 					method: "reuploading a provided random image",
-					descriptions: ["artwork", "cat"].map(i => (
+					descriptions: ["artwork"/* , "cat" */].map(i => (
 						`<code>${i}</code> - <a href="${buildURL(i)}">This ${i} does not exist</a>`
 					)),
-					types: ["artwork", "cat"],
+					types: ["artwork"/* , "cat"*/],
 					execute: async (context, type) => {
 						const imageData = await sb.Got("GenericAPI", {
 							url: buildURL(type),
