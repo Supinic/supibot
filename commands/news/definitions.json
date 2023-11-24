@@ -600,8 +600,8 @@
       {
         "name": "Delfi",
         "url": "https://www.delfi.lv",
-        "path": "rss",
-        "endpoints": ["?channel=aculiecinieks"],
+        "path": null,
+        "endpoints": ["campus/rss/index.xml"],
         "helpers": ["supinic"]
       }
     ]
