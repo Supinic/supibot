@@ -873,16 +873,15 @@ module.exports = class TwitchController extends require("./template.js") {
 		// of the current one. This is so that a possible command execution can be handled with this input.
 		let targetMessage = message;
 		if (ircTags["reply-parent-user-login"] && ircTags["reply-parent-msg-body"]) {
-			const parentUsername = ircTags["reply-parent-user-login"].toLowerCase();
-			const [mention, ...rest] = message.split(" ");
-			const username = mention.replace(/^@/, "").toLowerCase();
-			if (username === parentUsername) {
-				const parentMessageArray = ircTags["reply-parent-msg-body"].split(" ");
-				targetMessage = [...rest, ...parentMessageArray].join(" ");
-			}
+			const parentDisplayName = ircTags["reply-parent-display-name"];
+
+			// The extra length of 2 signifies one for the "@" symbol at the start of the user mention, and the other
+			// is for the space character which separates the mention from the message.
+			const remainder = message.slice(parentDisplayName.length + 2);
+			const parentMessage = ircTags["reply-parent-msg-body"];
+			targetMessage = `${remainder} ${parentMessage}`;
 		}
 
-		// Check and execute command if necessary
 		if (sb.Command.is(targetMessage)) {
 			const now = sb.Date.now();
 			const timeout = this.userCommandSpamPrevention.get(userData.ID);
