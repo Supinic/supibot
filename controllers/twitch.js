@@ -1,5 +1,5 @@
 const { CronJob } = require("cron");
-const DankTwitch = require("dank-twitch-irc");
+const DankTwitch = require("@kararty/dank-twitch-irc");
 const MessageScheduler = require("../utils/message-scheduler.js");
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68

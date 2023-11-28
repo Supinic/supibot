@@ -7,7 +7,7 @@ const Command = require("../../classes/command.js");
 const Platform = require("../../classes/platform.js");
 const User = require("../../classes/user.js");
 
-require("dank-twitch-irc");
+require("@kararty/dank-twitch-irc");
 const MockTwitchClient = require("./mock-client.js");
 require.cache[require.resolve("dank-twitch-irc")].exports = MockTwitchClient;
 
