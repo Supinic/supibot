@@ -33,7 +33,7 @@ module.exports = {
 				return "🌧️";
 			}
 			else if (type === 6) {
-				return "🌧️";
+				return "🌨️";
 			}
 			else if (type === 7) {
 				if (remainder === 1 || remainder === 21 || remainder === 41) {
