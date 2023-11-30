@@ -9,7 +9,7 @@ const User = require("../../classes/user.js");
 
 require("@kararty/dank-twitch-irc");
 const MockTwitchClient = require("./mock-client.js");
-require.cache[require.resolve("dank-twitch-irc")].exports = MockTwitchClient;
+require.cache[require.resolve("@kararty/dank-twitch-irc")].exports = MockTwitchClient;
 
 const initialize = (async () => {
 	const { Date, Config } = await import("supi-core");
