@@ -14,6 +14,7 @@ module.exports = {
 		{ name: "latitude", type: "number" },
 		{ name: "longitude", type: "number" },
 		{ name: "pollution", type: "boolean" },
+		{ name: "status", type: "string" },
 		{ name: "radar", type: "boolean" }
 	],
 	Whitelist_Response: null,
@@ -510,9 +511,15 @@ module.exports = {
 		}
 
 		const { getIcon, getWindDirection } = this.staticData;
+		const { codes } = require("./weather-codes.json");
+
+		const icon = (context.params.status === "text")
+			? codes[target.weather[0].id]
+			: getIcon(target.weather[0].id, target);
+
 		const obj = {
 			place: (skipLocation) ? "(location hidden)" : formattedAddress,
-			icon: getIcon(target.weather[0].id, target),
+			icon,
 			cloudCover: `Cloud cover: ${target.clouds}%.`,
 			humidity: `Humidity: ${target.humidity}%.`,
 			pressure: `Air pressure: ${target.pressure} hPa.`,
@@ -751,6 +758,10 @@ module.exports = {
 
 			`<code>${prefix}weather (place) radar:true</code>`,
 			"Posts a link to a weather radar for the provided location. Uses Windy.com",
+			"",
+
+			`<code>${prefix}weather (place) status:text</code>`,
+			"Instead of posting an emoji signifying the current weather state, a brief text description will be used instead.",
 			"",
 
 			`<code>${prefix}weather (place) format:(custom format)</code>`,
