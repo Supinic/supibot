@@ -8,7 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function subAge (context, user, channel) {
+	Code: async function subAge (context, user, channel) {
 		const { controller } = sb.Platform.get("twitch");
 		const userID = await controller.getUserID(user ?? context.user.Name);
 		if (!userID) {
@@ -96,6 +96,17 @@ module.exports = {
 			};
 		}
 
+		let userString;
+		if (userName === context.user.Name) {
+			userString = "You are";
+		}
+		else if (userName === context.platform.Self_Name) {
+			userString = "I am";
+		}
+		else {
+			userString = `User ${userName} is`;
+		}
+
 		const { relationship } = sub.data.targetUser;
 		if (!relationship.cumulativeTenure) {
 			const response = await sb.Got("Leppunen", {
@@ -111,32 +122,21 @@ module.exports = {
 				if (isAffiliate === false && isPartner === false) {
 					return {
 						success: false,
-						reply: `Target channel is not affiliated nor partnered!`
+						reply: `${userString} not affiliated nor partnered!`
 					};
 				}
 				else if (banned) {
 					return {
 						success: false,
-						reply: `Target channel is currently banned (${banReason})!`
+						reply: `${userString} currently banned (${banReason})!`
 					};
 				}
 			}
 
 			return {
 				success: false,
-				reply: "User has hidden their subscription status!"
+				reply: `${userString} currently hiding subscription statuses!`
 			};
-		}
-
-		let userString;
-		if (userName === context.user.Name) {
-			userString = "You are";
-		}
-		else if (userName === context.platform.Self_Name) {
-			userString = "I am";
-		}
-		else {
-			userString = `User ${userName} is`;
 		}
 
 		let channelString;
@@ -187,6 +187,24 @@ module.exports = {
 				`
 			};
 		}
-	}),
-	Dynamic_Description: null
+	},
+	Dynamic_Description: () => ([
+		"Shows the current subscription status for you or someone else to the current channel or any other provided.",
+		"",
+
+		`<code>$subage</code>`,
+		`<code>$sa</code>`,
+		"Shows your current subscription status to the channel you're using this command in.",
+		"Obviously, if used like this, will not work in whispers.",
+		"",
+
+		`<code>$subage (user)</code>`,
+		"Shows that user's current subscription status to the channel you're using this command in.",
+		"Again, won't work in whispers",
+		"",
+
+		`<code>$subage (user) (channel)</code>`,
+		"Shows that user's current subscription status to the channel you provided.",
+		"Will work in whispers as well, since you provided the channel specifically."
+	])
 };
