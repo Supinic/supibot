@@ -34,7 +34,7 @@ module.exports = {
 		const link = createGamecastLink(event.id);
 		const delta = sb.Utils.timeDelta(new sb.Date(event.date));
 		return {
-			reply: `Next match: ${event.name} ${delta}${playedAtString}.${statusString}${link}`
+			reply: `Next match: ${event.name} ${delta}${playedAtString}.${statusString} ${link}`
 		};
 	},
 	Dynamic_Description: () => ([
