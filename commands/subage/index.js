@@ -1,3 +1,15 @@
+const getTargetName = (userName, context) => {
+	if (userName === context.user.Name) {
+		return "You are";
+	}
+	else if (userName === context.platform.Self_Name) {
+		return "I am";
+	}
+	else {
+		return `User ${userName} is`;
+	}
+};
+
 module.exports = {
 	Name: "subage",
 	Aliases: ["sa"],
@@ -96,17 +108,6 @@ module.exports = {
 			};
 		}
 
-		let userString;
-		if (userName === context.user.Name) {
-			userString = "You are";
-		}
-		else if (userName === context.platform.Self_Name) {
-			userString = "I am";
-		}
-		else {
-			userString = `User ${userName} is`;
-		}
-
 		const { relationship } = sub.data.targetUser;
 		if (!relationship.cumulativeTenure) {
 			const response = await sb.Got("Leppunen", {
@@ -116,26 +117,29 @@ module.exports = {
 				}
 			});
 
+			const channelNameString = getTargetName(channelName, context);
 			if (response.statusCode === 200 && response.body.length !== 0) {
 				const [channelInfo] = response.body;
-				const { banned, banReason, isAffiliate, isPartner } = channelInfo.roles ?? {};
+				const { banned, banReason } = channelInfo;
+				const { isAffiliate, isPartner } = channelInfo.roles ?? {};
+
 				if (isAffiliate === false && isPartner === false) {
 					return {
 						success: false,
-						reply: `${userString} not affiliated nor partnered!`
+						reply: `${channelNameString} not affiliated nor partnered!`
 					};
 				}
 				else if (banned) {
 					return {
 						success: false,
-						reply: `${userString} currently banned (${banReason})!`
+						reply: `${channelNameString} currently banned (${banReason})!`
 					};
 				}
 			}
 
 			return {
 				success: false,
-				reply: `${userString} currently hiding subscription statuses!`
+				reply: `${channelNameString} currently hiding subscription statuses!`
 			};
 		}
 
@@ -156,6 +160,7 @@ module.exports = {
 			channelString = channelName;
 		}
 
+		const userString = getTargetName(userName, context);
 		const { daysRemaining, months } = relationship.cumulativeTenure;
 		if (!relationship.subscriptionBenefit) {
 			if (daysRemaining === 0 && months === 0) {
