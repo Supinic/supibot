@@ -129,7 +129,7 @@ module.exports = {
 						reply: `${channelNameString} not affiliated nor partnered!`
 					};
 				}
-				else if (banned) {
+				else if (banned === true) {
 					return {
 						success: false,
 						reply: `${channelNameString} currently banned (${banReason})!`
