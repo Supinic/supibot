@@ -1,4 +1,5 @@
 const NBA_URL = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard";
+const createGamecastLink = (gameId) => `https://www.espn.com/nba/game/_/gameId/${gameId}`;
 
 module.exports = {
 	Name: "nba",
@@ -30,14 +31,7 @@ module.exports = {
 			statusString = ` Period ${event.status.period}, ${event.status.displayClock}`;
 		}
 
-		let link = "";
-		if (event.links) {
-			const gamecast = event.links.find(i => i.text === "Gamecast");
-			if (gamecast) {
-				link = ` Gamecast: ${gamecast.href}`;
-			}
-		}
-
+		const link = createGamecastLink(event.id);
 		const delta = sb.Utils.timeDelta(new sb.Date(event.date));
 		return {
 			reply: `Next match: ${event.name} ${delta}${playedAtString}.${statusString}${link}`
