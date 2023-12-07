@@ -12,7 +12,12 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: async function nba () {
-		const response = await sb.Got("GenericAPI", { url: NBA_URL });
+		const dates = new sb.Date(sb.Date.getTodayUTC()).format("Ymd");
+		const response = await sb.Got("GenericAPI", {
+			url: NBA_URL,
+			searchParams: { dates }
+		});
+
 		const event = response.body.events
 			.sort((a, b) => new sb.Date(a.date) - new sb.Date(b.date))
 			.find(i => i.status.type.completed !== true);
