@@ -31,7 +31,8 @@ module.exports = {
 
 		let playedAtString = "";
 		if (event.competitions[0]?.venue) {
-			playedAtString = ` at ${event.competitions[0].venue.fullName}`;
+			const { venue } = event.competitions[0];
+			playedAtString = ` at ${venue.fullName} (${venue.address.city}, ${venue.address.state})`;
 		}
 
 		let statusString = "";
