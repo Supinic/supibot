@@ -13,11 +13,14 @@ module.exports = {
 	Static_Data: null,
 	Code: async function nba () {
 		const response = await sb.Got("GenericAPI", { url: NBA_URL });
-		const event = response.body.events[0];
+		const event = response.body.events
+			.sort((a, b) => new sb.Date(a.date) - new sb.Date(b.date))
+			.find(i => i.status.type.completed !== true);
+
 		if (!event) {
 			return {
 				success: false,
-				reply: `No NBA event is currently scheduled!`
+				reply: `No upcoming NBA event is currently scheduled!`
 			};
 		}
 
