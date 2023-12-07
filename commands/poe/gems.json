@@ -1138,5 +1138,685 @@
   {
     "name": "Zealotry",
     "type": "additional"
+  },
+  {
+    "name": "Absolution of Inspiring",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Animate Guardian of Smiting",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Animate Weapon of Ranged Arms",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Animate Weapon of Self Reflection",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Arc of Oscillating",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Arc of Surging",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Armageddon Brand of Recall",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Armageddon Brand of Volatility",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Ball Lightning of Orbiting",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Ball Lightning of Static",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Barrage of Volley Fire",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Blade Blast of Dagger Detonation",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Blade Blast of Unloading",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Blade Flurry of Incision",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Blade Trap of Greatswords",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Blade Trap of Laceration",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Bladefall of Impaling",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Bladefall of Volleys",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Bladestorm of Uncertainty",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Blight of Atrophy",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Blight of Contagion",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Blink Arrow of Bombarding Clones",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Blink Arrow of Prismatic Clones",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Boneshatter of Carnage",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Boneshatter of Complex Trauma",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Burning Arrow of Vigour",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Caustic Arrow of Poison",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Cleave of Rage",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Cold Snap of Power",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Consecrated Path of Endurance",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Contagion of Subsiding",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Contagion of Transference",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Crackling Lance of Branching",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Crackling Lance of Disintegration",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Cremation of Exhuming",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Cremation of the Volcano",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Cyclone of Tumult",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Detonate Dead of Chain Reaction",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Detonate Dead of Scavenging",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Discharge of Misery",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Divine Ire of Disintegration",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Divine Ire of Holy Lightning",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Dominating Blow of Inspiring",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Double Strike of Impaling",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Double Strike of Momentum",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Earthquake of Amplification",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Ethereal Knives of Lingering Blades",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Ethereal Knives of the Massacre",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Explosive Concoction of Destruction",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Explosive Trap of Magnitude",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Explosive Trap of Shrapnel",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Exsanguinate of Transmission",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Eye of Winter Of Finality",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Eye of Winter Of Transience",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Fire Trap of Blasting",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Firestorm of Meteors",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Firestorm of Pelting",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Flame Dash of Return",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Flame Surge of Combusting",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Flameblast of Celerity",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Flameblast of Contraction",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Flicker Strike of Power",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Forbidden Rite of Soul Sacrifice",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Frenzy of Onslaught",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Frost Bomb of Forthcoming",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Frost Bomb of Instability",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Frostblink of Wintry Blast",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Frozen Legion of Rallying",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Glacial Cascade of the Fissure",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Glacial Hammer of Shattering",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Ground Slam of Earthshaking",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Hexblast of Contradiction",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Hexblast of Havoc",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Holy Flame Totem of Ire",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Ice Nova of Deep Freeze",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Ice Nova of Frostbolts",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Ice Spear of Splitting",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Ice Trap of Hollowness",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Icicle Mine of Fanning",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Icicle Mine of Sabotage",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Infernal Blow of Immolation",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Lacerate of Butchering",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Lacerate of Haemorrhage",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Lancing Steel of Spraying",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Leap Slam of Groundbreaking",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Lightning Conduit of the Heavens",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Lightning Spire Trap of Overloading",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Lightning Spire Trap of Zapping",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Lightning Strike of Arcing",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Lightning Tendrils of Eccentricity",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Lightning Tendrils of Escalation",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Lightning Trap of Sparking",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Mirror Arrow of Bombarding Clones",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Mirror Arrow of Prismatic Clones",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Molten Strike of the Zenith",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Purifying Flame of Revelations",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Pyroclast Mine of Sabotage",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Rage Vortex of Berserking",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Raise Spectre of Transience",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Raise Zombie of Falling",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Raise Zombie of Slamming",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Reave of Refraction",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Scorching Ray of Immolation",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Seismic Trap of Swells",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Shattering Steel of Ammunition",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Shield Crush of the Chieftain",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Siege Ballista of Splintering",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Smite of Divine Judgement",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Soulrend of Reaping",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Soulrend of the Spiral",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Spark of the Nova",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Spark of Unpredictability",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Spectral Shield Throw of Shattering",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Spectral Throw of Materialising",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Split Arrow of Splitting",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Splitting Steel of Ammunition",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Storm Brand of Indecision",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Stormbind of Teleportation",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Chaos Golem of Hordes",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Chaos Golem of the Maelstr M",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Flame Golem of Hordes",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Flame Golem of the Meteor",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Ice Golem of Hordes",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Ice Golem of Shattering",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Raging Spirit of Enormity",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Reaper of Eviscerating",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Reaper of Revenants",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Skeletons of Archers",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Skeletons of Mages",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Sunder of Earthbreaking",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Void Sphere of Rending",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Volatile Dead of Confinement",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Volatile Dead of Seething",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Volcanic Fissure of Snaking",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Vortex of Projection",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Wild Strike of Extremes",
+    "type": "main",
+    "transfigured": true
   }
 ]
