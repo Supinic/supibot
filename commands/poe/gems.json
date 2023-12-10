@@ -1818,5 +1818,195 @@
     "name": "Wild Strike of Extremes",
     "type": "main",
     "transfigured": true
+  },
+  {
+    "name": "Bane of Condemnation",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Bear Trap of Skewers",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Blade Vortex of the Scythe",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Bodyswap of Sacrifice",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Dual Strike of Ambidexterity",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Earthshatter of Fragility",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Earthshatter of Prominence",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Essence Drain of Desperation",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Essence Drain of Wickedness",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Frost Blades of Katabasis",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Galvanic Arrow of Energy",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Galvanic Arrow of Surging",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Galvanic Field of Intensity",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Ice Crash of Cadence",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Kinetic Bolt of Fragmentation",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Lightning Arrow of Electrocution",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Penance Brand of Conduction",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Penance Brand of Dissipation",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Perforate of Bloodshed",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Perforate of Duality",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Power Siphon of the Archmage",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Rain of Arrows Of Artillery",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Rain of Arrows Of Saturation",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Righteous Fire of Arcane Devotion",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Scourge Arrow of Menace",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Shrapnel Ballista of Steel",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Storm Rain of the Conduit",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Storm Rain of the Fence",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Carrion Golem of Hordes",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Carrion Golem of Scavenging",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Lightning Golem of Hordes",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Stone Golem of Hordes",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Summon Stone Golem of Safeguarding",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Tectonic Slam of Cataclysm",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Tornado Shot of Cloudburst",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Toxic Rain of Sporeburst",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Toxic Rain of Withering",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Viper Strike of the Mamba",
+    "type": "main",
+    "transfigured": true
   }
 ]
