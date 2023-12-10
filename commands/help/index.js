@@ -41,7 +41,7 @@ module.exports = {
 				: commandString;
 
 			if (identifier.toLowerCase() === "me") {
-				const emote = context.getBestAvailableEmote(["Okayga", "supiniOkay", "FeelsOkayMan"], "🙂");
+				const emote = await context.getBestAvailableEmote(["Okayga", "supiniOkay", "FeelsOkayMan"], "🙂");
 				return {
 					reply: `I can't directly help you, but perhaps if you use one of my commands, you'll feel better? ${emote} You also might have wanted to check $help /me`
 				};
