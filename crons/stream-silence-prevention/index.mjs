@@ -61,8 +61,8 @@ export const definition = {
 
 		let link;
 		let videoID;
-		const roll = sb.Utils.random(1, 20);
-		if (roll < 20) {
+		const roll = sb.Utils.random(1, 100);
+		if (roll < 100) {
 			const videoData = await sb.Query.getRecordset(rs => rs
 				.select("Link", "Video_Type")
 				.from("personal", "Favourite_Track")
