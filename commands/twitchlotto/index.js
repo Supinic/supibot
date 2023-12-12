@@ -250,7 +250,7 @@ module.exports = {
 					image = null;
 				}
 			}
-			else if (context.param.preferUnscored && image.Score !== null && failedTries < definitions.maxRetries) {
+			else if (context.params.preferUnscored && image.Score !== null && failedTries < definitions.maxRetries) {
 				// "soft" re-attempting. only attempt again if the limit hasn't been reached.
 				// if it has, continue ahead and use the last image rolled, regardless of if it has the Score value or not
 				failedTries++;
