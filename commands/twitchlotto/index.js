@@ -325,12 +325,16 @@ module.exports = {
 			*/
 		}
 
+		let detections = [];
 		const detectionsString = [];
-		const { detections } = JSON.parse(image.Data);
-		for (const { replacement, string } of definitions.detections) {
-			const elements = detections.filter(i => i.name === string);
-			const strings = elements.map(i => `${replacement} (${Math.round(i.confidence * 100)}%)`);
-			detectionsString.push(...strings);
+		if (image.Data) {
+			detections = JSON.parse(image.Data).detections;
+
+			for (const { replacement, string } of definitions.detections) {
+				const elements = detections.filter(i => i.name === string);
+				const strings = elements.map(i => `${replacement} (${Math.round(i.confidence * 100)}%)`);
+				detectionsString.push(...strings);
+			}
 		}
 
 		await this.setCacheData(definitions.createRecentUseCacheKey(context), image.Link, {
@@ -367,7 +371,7 @@ module.exports = {
 			? `NSFW flags: ${image.Adult_Flags.join(", ")}`
 			: "";
 
-		const scoreThresholdExceeded = ((image.Score > 0.5 && detections.length > 0) || (image.Score > 0.75));
+		const scoreThresholdExceeded = ((image.Score === null) || (image.Score > 0.5 && detections.length > 0) || (image.Score > 0.75));
 		return {
 			removeEmbeds: (context.channel && !context.channel.NSFW && scoreThresholdExceeded),
 			reply: sb.Utils.tag.trim `
