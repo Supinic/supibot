@@ -151,7 +151,9 @@ module.exports = {
 			wrong: []
 		}
 	],
-	formatScore: (score) => `${sb.Utils.round(score * 100, 2)}%`,
+	formatScore: (score) => (score === null)
+		? "N/A"
+		: `${sb.Utils.round(score * 100, 2)}%`,
 	createRecentUseCacheKey: (context) => ({
 		type: "recent-use",
 		user: context.user.ID,
