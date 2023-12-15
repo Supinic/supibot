@@ -40,6 +40,8 @@ module.exports = {
 	 * Checks an image provided via URL for its NSFW score.
 	 * @param {string} link
 	 * @returns {Promise<NSFWDetectionResult>}
+	 * @deprecated DeepAI API is no longer available, since 2023-12-15 07:34:42+00:00
+	 * @todo find a replacement API with similar provided data
 	 */
 	async checkPictureNSFW (link) {
 		const { statusCode, body: data } = await sb.Got("GenericAPI", {

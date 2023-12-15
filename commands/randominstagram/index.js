@@ -1,5 +1,3 @@
-const { checkPictureNSFW } = require("../../utils/command-utils.js");
-
 module.exports = {
 	Name: "randominstagram",
 	Aliases: ["rig"],
@@ -107,7 +105,11 @@ module.exports = {
 		const commentCount = post.edge_media_to_comment.count ?? 0;
 		const likeCount = post.edge_liked_by.count ?? 0;
 
+		let appendix = "";
 		if (nsfwCheck) {
+			appendix = `(no NSFW % score available, click at your own risk)`;
+
+			/*
 			const nsfwCacheKey = { post: post.shortcode };
 			let nsfwData = await this.getCacheData(nsfwCacheKey);
 			if (!nsfwData) {
@@ -137,6 +139,7 @@ module.exports = {
 					`
 				};
 			}
+			 */
 		}
 
 		if (context.params.rawLinkOnly) {
@@ -156,6 +159,7 @@ module.exports = {
 					${description ?? ""}
 					(${commentCount} comments, ${likeCount} likes)
 					https://www.instagram.com/p/${post.shortcode}
+					${appendix}
 				`
 			};
 		}

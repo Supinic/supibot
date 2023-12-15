@@ -1,5 +1,3 @@
-const { checkPictureNSFW } = require("../../utils/command-utils.js");
-
 module.exports = {
 	Name: "twitchlotto",
 	Aliases: ["tl"],
@@ -276,7 +274,14 @@ module.exports = {
 			// Success: image is not null, and loop will terminate.
 		}
 
+		let appendix = "";
 		if (image.Score === null) {
+			// If safe-mode is enabled, the fetched picture will always have a Score value.
+			// Only with safe-mode disabled will this be `null`. So we proceed accordingly.
+
+			appendix = `(no NSFW % score available, click at your own risk)`;
+
+			/*
 			const link = `https://i.imgur.com/${image.Link}`;
 			const { statusCode, data } = await checkPictureNSFW(link);
 			if (statusCode !== 200) {
@@ -317,6 +322,7 @@ module.exports = {
 			if (legalityCheck.success === false) {
 				return legalityCheck;
 			}
+			*/
 		}
 
 		const detectionsString = [];
@@ -371,6 +377,7 @@ module.exports = {
 				https://i.imgur.com/${image.Link}
 				${channelString}
 				${descriptionString}
+				${appendix}
 			`
 		};
 	}),
