@@ -5,12 +5,14 @@ const eventTypeFileList = [
 	"deno",
 	"dotnet",
 	"ggg",
+	"msvcpp",
 	"nodejs",
 	"osrs",
 	"python",
 	"runelite",
 	"rust",
 	"suggestion",
+	"typescript",
 	"v8"
 ];
 
