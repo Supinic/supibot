@@ -399,6 +399,27 @@ module.exports = {
 			success: true,
 			result
 		};
+	},
+
+	/**
+	 * Returns the Twitch game ID for the given game name.
+	 * @param {string} name The name of the game to get the ID for.
+	 * @return {Promise<Array<{id: string, name: string}>>}
+	 */
+	async getTwitchGameID (name) {
+		const response = await sb.Got("Helix", {
+			url: "games",
+			searchParams: { name }
+		});
+
+		if (!response.ok || response.body.data.length === 0) {
+			return [];
+		}
+
+		return response.body.data.map(i => ({
+			id: i.id,
+			name: i.name
+		}));
 	}
 };
 

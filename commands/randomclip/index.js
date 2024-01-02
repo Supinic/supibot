@@ -1,3 +1,6 @@
+const { getTwitchGameID } = require("../../utils/command-utils.js");
+const EARLIEST_CLIP_DATE = new sb.Date("2011-01-01");
+
 module.exports = {
 	Name: "randomclip",
 	Aliases: ["rc"],
@@ -9,32 +12,48 @@ module.exports = {
 		{ name: "author", type: "string" },
 		{ name: "dateFrom", type: "date" },
 		{ name: "dateTo", type: "date" },
+		{ name: "game", type: "string" },
 		{ name: "limit", type: "number" },
 		{ name: "linkOnly", type: "boolean" },
 		{ name: "period", type: "string" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function randomClip (context, channelName) {
-		const channel = channelName ?? context.channel?.Name;
-		if (!channel && (context.privateMessage || context.platform.Name !== "twitch")) {
-			return {
-				success: false,
-				reply: "You must specify the target channel if you're in PMs or not on Twitch!"
-			};
+	Code: async function randomClip (context, channelName) {
+		let gameID = null;
+		let channelID = null;
+
+		if (context.params.game) {
+			const games = await getTwitchGameID(context.params.game);
+			if (games.length === 0) {
+				return {
+					success: false,
+					reply: `Provided game is not available on Twitch! You must use an exact match.`
+				};
+			}
+
+			gameID = games[0].id;
+		}
+		else {
+			const channel = channelName ?? context.channel?.Name;
+			if (!channel && (context.privateMessage || context.platform.Name !== "twitch")) {
+				return {
+					success: false,
+					reply: "You must specify the target channel if you're in PMs or not on Twitch!"
+				};
+			}
+
+			channelID = await sb.Platform.get("twitch").controller.getUserID(channel);
+			if (!channelID) {
+				return {
+					success: false,
+					reply: `No such channel exists!`
+				};
+			}
 		}
 
-		const channelID = await sb.Platform.get("twitch").controller.getUserID(channel);
-		if (!channelID) {
-			return {
-				success: false,
-				reply: `No such channel exists!`
-			};
-		}
-
-		const earliestDate = new sb.Date("2011-01-01");
 		const now = new sb.Date();
-		const dateRange = [earliestDate, now];
+		const dateRange = [EARLIEST_CLIP_DATE, now];
 
 		if (context.params.dateFrom) {
 			dateRange[0] = context.params.dateFrom;
@@ -81,7 +100,7 @@ module.exports = {
 			}
 		}
 
-		if (dateRange[0] < earliestDate || dateRange[1] < earliestDate) {
+		if (dateRange[0] < EARLIEST_CLIP_DATE || dateRange[1] < EARLIEST_CLIP_DATE) {
 			return {
 				success: false,
 				reply: `Your provided date range is out of bounds! Earliest date is 2011-01-01.`
@@ -114,12 +133,15 @@ module.exports = {
 				started_at: dateRange[0].toISOString(),
 				ended_at: dateRange[1].toISOString(),
 				first: limit,
-				broadcaster_id: channelID
+				broadcaster_id: channelID,
+				game_id: gameID
 			},
 			throwHttpErrors: false
 		});
 
 		if (response.statusCode === 404) {
+			// Once here, it is clear that this error is due to the channel not existing, and not the game
+			// since that is caught when the game name is checked.
 			return {
 				success: false,
 				reply: "That user does not exist!"
@@ -169,7 +191,7 @@ module.exports = {
 		return {
 			reply: `"${clip.title}" - ${clip.duration} sec, clipped by ${clip.creator_name}, ${delta}: ${clip.url}`
 		};
-	}),
+	},
 	Dynamic_Description: (async (prefix) => [
 		"Fetches a random clip in the current, or a provided channel.",
 		"",
@@ -182,6 +204,13 @@ module.exports = {
 		`<code>${prefix}rc <u>(channel)</u></code>`,
 		`<code>${prefix}rc <u>forsen</u></code>`,
 		"Posts a random clip out of the top 100 clips in the channel you provided.",
+		"",
+
+		`<code>${prefix}rc <u>game:(game name)</u></code>`,
+		`<code>${prefix}rc <u>game:Starfield</u></code>`,
+		`<code>${prefix}rc <u>game:"The Elder Scrolls V: Skyrim"</u></code>`,
+		"Posts a random clip where the category is set to the game that you provided.",
+		"Cannot be combined with a specific channel - this is due to how Twitch works.",
 		"",
 
 		`<code>${prefix}rc <u>linkOnly:true</u></code>`,

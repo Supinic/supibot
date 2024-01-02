@@ -1,3 +1,5 @@
+const { getTwitchGameID } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "topstreams",
 	Aliases: null,
@@ -11,20 +13,15 @@ module.exports = {
 	Code: (async function topStreams (context, ...args) {
 		const searchParams = { limit: "10" };
 		if (args.length > 0) {
-			const name = args.join(" ");
-			const response = await sb.Got("Helix", {
-				url: "games",
-				searchParams: { name }
-			});
-
-			if (response.statusCode !== 200 || response.body.data.length === 0) {
+			const games = await getTwitchGameID(args.join(" "));
+			if (games.length === 0) {
 				return {
 					success: false,
-					reply: `Provided game is not available on Twitch! Must use an exact match.`
+					reply: `Provided game is not available on Twitch! You must use an exact match.`
 				};
 			}
 
-			searchParams.game_id = response.body.data[0].id;
+			searchParams.game_id = games[0].id;
 		}
 
 		const response = await sb.Got("Helix", {
