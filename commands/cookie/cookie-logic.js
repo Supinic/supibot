@@ -201,7 +201,7 @@ const eatDailyCookie = (data, options) => {
 
 	// Only increment the total count if the user is eating their first cookie daily.
 	// This is to prevent the "additional privileged" cookies counting for statistics.
-	if (data.today.eaten.daily === 0) {
+	if (data.today.eaten.daily === 0 && data.today.donated === 0) {
 		data.total.eaten.daily++;
 	}
 

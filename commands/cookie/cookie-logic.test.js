@@ -2,14 +2,6 @@
 const assert = require("assert");
 const Logic = require("./cookie-logic.js");
 
-globalThis.sb = {
-	Date: require("supi-core/objects/date.js"),
-	Utils: {
-		timeDelta: (date) => date.toString(),
-		random: () => 0
-	}
-};
-
 // Allow proper object cloning when `structuredClone` is not available
 // E.g. in workers
 globalThis.structuredClone ??= (input) => JSON.parse(JSON.stringify(input));
@@ -18,6 +10,18 @@ const notPrivileged = Object.freeze({ hasDoubleCookieAccess: false });
 const privileged = Object.freeze({ hasDoubleCookieAccess: true });
 
 describe("cookie logic", function () {
+	beforeEach(async () => {
+		const { Date } = await import("supi-core");
+
+		globalThis.sb = {
+			Date,
+			Utils: {
+				timeDelta: (date) => date.toString(),
+				random: () => 0
+			}
+		};
+	});
+
 	describe("initial logic", function () {
 		it("can eat daily cookie", function () {
 			const data = Logic.getInitialStats();
@@ -72,6 +76,19 @@ describe("cookie logic", function () {
 			assert.strictEqual(secondResult.success, true);
 			assert.strictEqual(data.today.eaten.daily, 2);
 			assert.strictEqual(data.total.eaten.daily, 1); // Total stats do not increase after eating the second cookie
+		});
+
+		it("can donate, then eat golden cookie if privileged", function () {
+			const receiver = Logic.getInitialStats();
+			Logic.eatCookie(receiver);
+
+			const donator = Logic.getInitialStats();
+			Logic.donateCookie(donator, receiver);
+
+			const result = Logic.eatCookie(donator, privileged);
+			assert.strictEqual(result.success, true);
+			assert.strictEqual(donator.today.eaten.daily, 1);
+			assert.strictEqual(donator.total.eaten.daily, 0); // Total stats do not increase after eating the second cookie
 		});
 
 		it("can not donate golden cookie if privileged", function () {
