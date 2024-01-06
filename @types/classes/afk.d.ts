@@ -1,4 +1,5 @@
-import { Date, Metrics } from "supi-core";
+import { Date } from "supi-core";
+import { Counter, Gauge } from "supi-core/singletons/metrics";
 
 import { ClassTemplate } from "./template";
 import { Channel } from "./channel";
@@ -10,7 +11,7 @@ export declare type Like = number | AwayFromKeyboard;
 declare type ConstructorData = {
 	ID: number;
 	User_Alias: User["ID"];
-	Started: Date.CustomDate;
+	Started: Date;
 	Text: string;
 	Silent: boolean;
 	Status: Status;
@@ -27,8 +28,8 @@ declare type SetData = Omit<ConstructorData, "ID"> & {
 export declare class AwayFromKeyboard extends ClassTemplate {
 	static readonly data: Map<number, AwayFromKeyboard>;
 
-	static #activeGauge: Metrics.Gauge;
-	static #totalCounter: Metrics.Counter;
+	static #activeGauge: Gauge;
+	static #totalCounter: Counter;
 
 	/**
 	 * Reloads a specific list of AFK statuses, provided as identifiers.
@@ -65,7 +66,7 @@ export declare class AwayFromKeyboard extends ClassTemplate {
 	/**
 	 * The timestamp of when the AFK status was set up
 	 */
-	readonly Started: Date.CustomDate;
+	readonly Started: Date;
 
 	/**
 	 * AFK status description
