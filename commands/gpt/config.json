@@ -33,7 +33,7 @@
       "usageDivisor": 1
     },
     "turbo": {
-      "url": "gpt-3.5-turbo",
+      "url": "gpt-3.5-turbo-1106",
       "type": "messages",
       "default": true,
       "inputLimit": 1500,
