@@ -247,6 +247,9 @@ module.exports = {
 			// "For example: 100 tokens used in Davinci → 100 tokens used from your limit,",
 			// "but: 100 tokens used in Babbage (which is 40x cheaper) → 2.5 tokens used from your limit.",
 			// "",
+			"Models with <i>base</i> in their name are GPT-3 and are not trained to follow instructions.",
+			"This means that they will mostly generate natural language with no regards to what you actually ask.",
+			"",
 
 			`You can also check out the <a href="https://beta.openai.com/docs/models/feature-specific-models">official documentation</a> of GPT-3 models on the official site for full info.`,
 			"",
