@@ -122,6 +122,19 @@ class Context {
 		return "(no emote found)";
 	}
 
+	randomEmote (...inputEmotes) {
+		if (inputEmotes.length < 2) {
+			throw new sb.Error({
+				message: "At least two emotes are required"
+			});
+		}
+
+		const emotes = inputEmotes.slice(0, -1);
+		const fallback = inputEmotes.at(-1);
+
+		return this.getBestAvailableEmote(emotes, fallback, { shuffle: true });
+	}
+
 	get tee () { return this.#append.tee; }
 	get invocation () { return this.#invocation; }
 	get user () { return this.#user; }

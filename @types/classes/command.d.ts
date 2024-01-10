@@ -1,4 +1,6 @@
-import { Date, Utils } from "supi-core";
+import { Date as CoreDate } from "supi-core";
+import { DeepFrozen } from "supi-core/singletons/utils";
+
 import { PoolConnection } from "mariadb";
 import { Metric, MetricConfiguration, MetricType } from "prom-client";
 
@@ -27,7 +29,7 @@ declare type DiscordEmbedDefinition = {
     image?: {
         url: string;
     };
-    timestamp?: Date.CustomDate;
+    timestamp?: CoreDate;
     footer?: {
         text: string;
         icon_url?: string;
@@ -36,7 +38,7 @@ declare type DiscordEmbedDefinition = {
 
 export declare namespace Parameter {
     type Type = "string" | "number" | "boolean" | "date" | "object" | "regex" | "language";
-    type ParsedType = string | number | boolean | Date.CustomDate | SimpleGenericData | RegExp | Language;
+    type ParsedType = string | number | boolean | CoreDate | SimpleGenericData | RegExp | Language;
     type Descriptor = {
         type: Type;
         name: string
@@ -233,6 +235,12 @@ export declare class Context {
      * @param options.filter Filter function used to choose from the available emotes. Receives `Emote` as input
      */
     getBestAvailableEmote: Channel["getBestAvailableEmote"];
+
+    /**
+     * Syntactic sugar for getBestAvailableEmote, automatically shuffles and simplifies syntax.
+     */
+    randomEmote (...emotes: string[]): Promise<string>;
+
     getMentionStatus (): boolean;
 
     /**
@@ -452,7 +460,7 @@ export declare class Command extends ClassTemplate {
      * Data specific for the command. Usually hosts utils methods, or constants.
      * The object is deeply frozen, preventing any changes.
      */
-    private staticData: Utils.DeepFrozen<Record<string, any>>;
+    private staticData: DeepFrozen<Record<string, any>>;
 
     /**
      * Determines the author of the command. Used for updates and further command downloads.
