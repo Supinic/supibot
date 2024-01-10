@@ -36,6 +36,7 @@ const fillObjectByPlatform = (obj, userData, platformData) => {
 module.exports = class LoggerSingleton {
 	#crons = [];
 	#presentTables = null;
+	#lastSeenUserMap = new Map();
 
 	constructor () {
 		this.videoTypes = null;
@@ -479,11 +480,19 @@ module.exports = class LoggerSingleton {
 		}
 
 		const count = this.lastSeen.get(channelData.ID).get(userData.ID)?.count ?? 0;
+		const now = new sb.Date();
+
+		this.#lastSeenUserMap.set(userData.ID, now.valueOf());
 		this.lastSeen.get(channelData.ID).set(userData.ID, {
 			message: message.slice(0, 2000),
 			count: count + 1,
-			date: new sb.Date()
+			date: now
 		});
+	}
+
+	getUserLastSeen (userID) {
+		const result = this.#lastSeenUserMap.get(userID);
+		return (result) ? new sb.Date(result) : result;
 	}
 
 	/**
