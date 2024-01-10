@@ -4519,7 +4519,7 @@ __metadata:
 
 supi-core@supinic/supi-core:
   version: 3.1.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=739529e45defa83e32514425c2ea445a3b4371f9"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=e11fef81e41b8096d64c25918cba7cae6ab2b56b"
   dependencies:
     cheerio: ^1.0.0-rc.12
     duration-parser: "github:supinic/duration-parser"
@@ -4529,7 +4529,7 @@ supi-core@supinic/supi-core:
     mariadb: ^3.2.2
     prom-client: ^15.0.0
     random-js: ^2.1.0
-  checksum: a286e6518cef3625252b9d4341d24ba8bdfdbc28d2ff937d4a6f704ecc3cdc9076413ef53e321b098bcb6f2e84a55fcad4b858f366ef880d00178d12fd3bf96d
+  checksum: b68c3b171aa94aed4271fa0b65a44619e2d8741ea49f4c970e74c6f5648f5bc5a74d7550f8d4d0c97a0df55b140f3267dfce3dd600f1110012f4208c4af9e1e6
   languageName: node
   linkType: hard
 
