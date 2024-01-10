@@ -10,7 +10,7 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function lastSeen (context, user) {
 		if (!user) {
-			const emote = await context.getBestAvailableEmote(["FeelsDankMan"], "🙂");
+			const emote = await context.randomEmote("FeelsDankMan", "🙂");
 			return {
 				success: false,
 				reply: `${emote} You were last seen: right now!`
@@ -25,14 +25,14 @@ module.exports = {
 			};
 		}
 		else if (targetUser.ID === context.user.ID) {
-			const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "LULW", "LuL"], "😆");
+			const emote = await context.randomEmote("PepeLaugh", "pepeLaugh", "LULW", "LuL", "😆");
 			return {
 				success: false,
 				reply: `Oh wow, look at that! You were last seen: Right now! ${emote}`
 			};
 		}
 		else if (targetUser.Name === context.platform.Self_Name) {
-			const emote = await context.getBestAvailableEmote(["supiniStare", "supiniPoint", "monkaStare", "MrDestructoid"], "🤖");
+			const emote = await context.randomEmote("supiniStare", "supiniPoint", "monkaStare", "MrDestructoid", "🤖");
 			return {
 				success: false,
 				reply: `${emote} I'm always around!`
