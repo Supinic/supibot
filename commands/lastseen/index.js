@@ -39,16 +39,18 @@ module.exports = {
 			};
 		}
 
-		const date = await sb.Query.getRecordset(rs => rs
-			.select("Last_Message_Posted AS Date")
-			.from("chat_data", "Message_Meta_User_Alias")
-			.where("User_Alias = %n", targetUser.ID)
-			.orderBy("Last_Message_Posted DESC")
-			.limit(1)
-			.single()
-			.flat("Date")
-		);
-
+		let date = sb.Logger.getUserLastSeen(targetUser.ID);
+		if (!date) {
+			date = await sb.Query.getRecordset(rs => rs
+				.select("Last_Message_Posted AS Date")
+				.from("chat_data", "Message_Meta_User_Alias")
+				.where("User_Alias = %n", targetUser.ID)
+				.orderBy("Last_Message_Posted DESC")
+				.limit(1)
+				.single()
+				.flat("Date")
+			);
+		}
 		if (!date) {
 			return {
 				reply: sb.Utils.tag.trim `
