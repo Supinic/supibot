@@ -108,7 +108,7 @@ module.exports = {
 			const link = createGamecastLink(league, event.id);
 			const delta = sb.Utils.timeDelta(new sb.Date(event.date));
 			return {
-				reply: `Next match: ${event.name} ${delta}${playedAtString}.${statusString} ${link}`
+				reply: `Next ${leagueAbbr} match: ${event.name} ${delta}${playedAtString}.${statusString} ${link}`
 			};
 		}
 		else if (mode === "today") {
@@ -128,7 +128,7 @@ module.exports = {
 
 			const list = events.map(i => `${i.shortName} ${sb.Utils.timeDelta(new sb.Date(i.date))}`);
 			return {
-				reply: `Matches scheduled for today: ${list.join("; ")}`
+				reply: `Upcoming ${leagueAbbr} matches: ${list.join("; ")}`
 			};
 		}
 		else if (mode === "scores") {
@@ -154,7 +154,7 @@ module.exports = {
 			});
 
 			return {
-				reply: `Results for today: ${list.join("; ")}`
+				reply: `Latest ${leagueAbbr} match results: ${list.join("; ")}`
 			};
 		}
 	},
