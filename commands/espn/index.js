@@ -45,7 +45,16 @@ module.exports = {
 		}
 
 		const league = context.invocation;
-		const dates = new sb.Date(context.params.date ?? sb.Date.getTodayUTC()).format("Ymd");
+		const targetDate = (context.params.date)
+			? new sb.Date(context.params.date)
+			: new sb.Date(sb.Date.getTodayUTC());
+
+		if (mode === "scores") {
+			// Adjust for games that already took place in NA timezones, the previous day
+			targetDate.addDays(-1);
+		}
+
+		const dates = targetDate.format("Ymd");
 		const response = await sb.Got("GenericAPI", {
 			url: makeUrl(league),
 			searchParams: {
@@ -137,11 +146,11 @@ module.exports = {
 				};
 			}
 
-			const list = events.map(i => {
-				const gameName = i.shortName;
-				const [homeTeam, awayTeam] = sb.Utils.splitByCondition(i.competitors, (i => i.homeAway === "home"));
+			const list = events.map(event => {
+				const teams = event.competitions[0].competitors;
+				const [[homeTeam], [awayTeam]] = sb.Utils.splitByCondition(teams, (i => i.homeAway === "home"));
 
-				return `${gameName} ${homeTeam}:${awayTeam}`;
+				return `${event.shortName} ${homeTeam.score}:${awayTeam.score}`;
 			});
 
 			return {
