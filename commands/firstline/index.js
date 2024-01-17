@@ -30,6 +30,12 @@ module.exports = {
 				reply: "Provided channel not found in the database!"
 			};
 		}
+		else if (targetChannel.Mode === "Inactive") {
+			return {
+				success: false,
+				reply: `Cannot retrieve lines from an inactive channel!`
+			};
+		}
 
 		const channelArticle = (targetChannel === context.channel)
 			? "this"
