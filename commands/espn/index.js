@@ -150,7 +150,7 @@ module.exports = {
 				const teams = event.competitions[0].competitors;
 				const [[homeTeam], [awayTeam]] = sb.Utils.splitByCondition(teams, (i => i.homeAway === "home"));
 
-				return `${event.shortName} ${homeTeam.score}:${awayTeam.score}`;
+				return `${event.shortName} ${awayTeam.score}:${homeTeam.score}`;
 			});
 
 			return {
