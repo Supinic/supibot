@@ -149,6 +149,12 @@ module.exports = {
 		"If you specify a user, the line will be from that user only.",
 		"",
 
+		"Supibot only logs what is said in channels it joins in exceptional circumstances.",
+		"If you used to have Supibot logging and would like to use the Rustlog (IVR) service along with your own logs,",
+		`you can make a suggestion with the <a href="/bot/command/detail/suggest">$suggest</a> command to reinstate your logs with @Supinic's help`,
+		`You can also check the channel's logging status with the <a href="/bot/command/detail/check">$check logs</a> command.`,
+		"",
+
 		`<code>${prefix}rl</code>`,
 		`Random message from anyone, in the format "(time ago) (username): (message)"`,
 		"",
