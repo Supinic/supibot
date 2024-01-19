@@ -3,7 +3,10 @@ import type { Command, Parameter } from "../../@types/classes/command";
 import type { Channel } from "../../@types/classes/channel";
 import type { Platform } from "../../@types/classes/platform";
 import type { User, Permissions as UserPermissions } from "../../@types/classes/user";
-import type { UtilsSingleton } from "supi-core/@types/singletons/utils";
+
+import type { Utils } from "supi-core/@types/types";
+declare type UtilsSingleton = Utils.Utils;
+
 // import * as Util from "util";
 
 // This file is mostly meant to be used as a form of documentation for the $js

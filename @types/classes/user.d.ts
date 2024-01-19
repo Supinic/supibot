@@ -1,4 +1,4 @@
-import { Config } from "supi-core";
+import { Config } from "supi-core/@types/types";
 import { ClassTemplate, GenericCacheMap, SpecificCacheOptions } from "./template";
 
 export declare namespace Permissions {

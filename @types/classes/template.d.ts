@@ -1,4 +1,4 @@
-import { Config, Query } from "supi-core";
+import { Query, Config } from "supi-core/@types/types";
 
 export type GenericCacheMap<T extends ClassTemplate> = WeakMap<T, Map<Config.Name, Config.Value>>;
 export type SpecificCacheOptions = {

@@ -1,4 +1,4 @@
-import { Date } from "supi-core";
+import { Date as CoreDate } from "supi-core";
 import { Counter, Gauge } from "prom-client";
 
 import { ClassTemplate } from "./template";
@@ -13,8 +13,8 @@ type ConstructorData = {
 	User_To: User["ID"];
 	Channel: Channel["ID"];
 	Text: string | null;
-	Created: Date.CustomDate;
-	Schedule: Date.CustomDate | null;
+	Created: CoreDate;
+	Schedule: CoreDate | null;
 	Private_Message: boolean;
 	Platform: PlatformLike;
 	Type: Type;
@@ -64,7 +64,7 @@ export declare class Reminder extends ClassTemplate {
 	static get (identifier: Like): Reminder | null;
 	static create (data: OmittableConstructorData, skipChecks?: boolean): Promise<Result>;
 	static checkActive (targetUserData: User, channelData: Channel): Promise<void>;
-	static checkLimits (userFrom: number, userTo: number, schedule?: Date.CustomDate): Promise<Result>;
+	static checkLimits (userFrom: number, userTo: number, schedule?: CoreDate): Promise<Result>;
 	static createRelayLink (endpoint: string, params: string): Promise<string>;
 	static clear (): void;
 	static destroy (): void;
@@ -75,8 +75,8 @@ export declare class Reminder extends ClassTemplate {
 	readonly User_To: User["ID"];
 	readonly Channel: Channel["ID"] | null;
 	readonly Text: string | null;
-	readonly Created: Date.CustomDate;
-	readonly Schedule: Date.CustomDate | null;
+	readonly Created: CoreDate;
+	readonly Schedule: CoreDate | null;
 	readonly Private_Message: boolean;
 	readonly Platform: Platform | null;
 	readonly Type: Type;

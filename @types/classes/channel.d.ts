@@ -1,5 +1,6 @@
-import { Config, Date } from "supi-core";
-import * as EventEmitter from "events";
+import { Date as CoreDate } from "supi-core";
+import { Config } from "supi-core/@types/types";
+import { EventEmitter } from 'node:events';
 
 import { Emote, Message, SimpleGenericData } from "../globals";
 import { ClassTemplate, GenericCacheMap, SpecificCacheOptions } from "./template";
@@ -49,7 +50,7 @@ declare type OnlineStreamData = {
     live: true;
     stream: {
         game: string;
-        since: Date.CustomDate;
+        since: CoreDate;
         status: string;
         viewers: number;
         quality: `${number}p`;

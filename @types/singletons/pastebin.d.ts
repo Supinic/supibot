@@ -1,4 +1,4 @@
-import { Got } from "../../../@types/classes/got";
+import { Got } from "supi-core/@types/types";
 
 export declare type Body = {
     success: boolean;
@@ -33,7 +33,7 @@ export declare class PastebinSingleton {
 
     #authData: string | null;
     #authenticationPending: boolean;
-    #got: ReturnType<Got["extend"]>;
+    #got: ReturnType<Got.Got["extend"]>;
 
     constructor ();
 

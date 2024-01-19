@@ -1,4 +1,4 @@
-import { Query } from "supi-core";
+import { Query } from "supi-core/@types/types";
 
 import { ClassTemplate } from "./template";
 import { Channel } from "./channel";

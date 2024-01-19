@@ -1,5 +1,5 @@
 import { Date as CoreDate } from "supi-core";
-import { DeepFrozen } from "supi-core/singletons/utils";
+import { Utils } from "supi-core/@types/types";
 
 import { PoolConnection } from "mariadb";
 import { Metric, MetricConfiguration, MetricType } from "prom-client";
@@ -460,7 +460,7 @@ export declare class Command extends ClassTemplate {
      * Data specific for the command. Usually hosts utils methods, or constants.
      * The object is deeply frozen, preventing any changes.
      */
-    private staticData: DeepFrozen<Record<string, any>>;
+    private staticData: Utils.DeepFrozen<Record<string, any>>;
 
     /**
      * Determines the author of the command. Used for updates and further command downloads.
