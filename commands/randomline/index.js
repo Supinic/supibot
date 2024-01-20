@@ -63,7 +63,7 @@ module.exports = {
 					},
 					reply: sb.Utils.tag.trim `
 						Random lines are not available in this channel!
-						You can enable them by enablig the Rustlog service in this channel, 
+						You can add them by enabling the Rustlog service in this channel, 
 						which can be done via the "$bot enable-rustlog" command.
 						That command is only usable by channel owners and ambassadors.
 						${addendum}
