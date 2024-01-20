@@ -404,7 +404,7 @@ module.exports = (command) => [
 			}
 
 			const arr = [];
-			if (context.channel.Logging?.includes("Lines")) {
+			if (context.channel.Logging?.has("Lines")) {
 				arr.push("I am logging this channel's chat lines into a local database.");
 			}
 			else {
