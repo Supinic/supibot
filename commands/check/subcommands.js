@@ -418,7 +418,7 @@ module.exports = (command) => [
 			else if (oldLogsStatus) {
 				arr.push("I have logged this channel's chat lines before, and they COULD be reinstated to the IVR Rustlog service (create a $suggest if you would like to).");
 			}
-			else {
+			else if (!context.channel.Logging?.has("Lines")) {
 				arr.push("I have NOT logged this channel's chat lines before.");
 			}
 
