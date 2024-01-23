@@ -93,10 +93,10 @@ module.exports = {
 
 			filter = sb.Filter.data.find(i => (
 				i.Type === "Opt-out"
-				&& i.Command === filterData.command
-				&& i.Invocation === filterData.invocation
-				&& i.Channel === filterData.channel
-				&& i.Platform === filterData.platform
+				&& i.Command === (filterData.command ?? null)
+				&& i.Invocation === (filterData.invocation ?? null)
+				&& i.Channel === (filterData.channel ?? null)
+				&& i.Platform === (filterData.platform ?? null)
 				&& i.User_Alias === context.user.ID
 			));
 		}
