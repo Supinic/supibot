@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS `data`.`Event_Subscription` (
 	`Platform` INT(10) UNSIGNED NOT NULL,
 	`Type` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`Data` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_bin',
+	`Flags` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_bin',
 	`Active` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
 	`Created` DATETIME(3) NOT NULL DEFAULT current_timestamp(3),
 	`Last_Edit` DATETIME(3) NULL DEFAULT NULL ON UPDATE current_timestamp(3),

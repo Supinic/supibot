@@ -22,6 +22,7 @@ const fetchSubscriptionUsers = async function (subType, lastSeenThreshold = 36e5
 	const users = await sb.Query.getRecordset(rs => rs
 		.select("Event_Subscription.Channel as Reminder_Channel")
 		.select("Event_Subscription.User_Alias AS ID")
+		.select("Event_Subscription.Flags AS Flags")
 		.select("User_Alias.Name AS Username")
 		.select("MAX(Meta.Last_Message_Posted) AS Last_Seen")
 		.from("data", "Event_Subscription")
@@ -38,7 +39,14 @@ const fetchSubscriptionUsers = async function (subType, lastSeenThreshold = 36e5
 	);
 
 	const now = sb.Date.now();
-	const [activeUsers, inactiveUsers] = sb.Utils.splitByCondition(users, i => now - i.Last_Seen < lastSeenThreshold);
+	const [activeUsers, inactiveUsers] = sb.Utils.splitByCondition(users, user => {
+		if (now - user.Last_Seen < lastSeenThreshold) {
+			return true;
+		}
+
+		const flags = JSON.parse(user.Flags ?? "{}");
+		return (flags.private === false);
+	});
 
 	return {
 		activeUsers,

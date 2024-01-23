@@ -7,7 +7,9 @@ module.exports = {
 	Cooldown: 5000,
 	Description: "Subscribe or unsubscribe to a plethora of events, such as a channel going live, or a suggestion you made being updated. Check the extended help for detailed info on each event.",
 	Flags: ["mention","pipe","skip-banphrase"],
-	Params: null,
+	Params: [
+		{ name: "skipPrivateReminder", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	initialize: async function () {
@@ -79,6 +81,17 @@ module.exports = {
 		const response = (invocation === "subscribe") ? event.response.added : event.response.removed;
 		const location = (context.channel) ? "in this channel" : `in ${context.platform.Name} PMs`;
 
+		const { skipPrivateReminder } = context.params;
+		const flags = {
+			skipPrivateReminder: Boolean(skipPrivateReminder)
+		};
+
+		let flagAppendix = "";
+		if (typeof skipPrivateReminder === "boolean") {
+			const word = (skipPrivateReminder) ? "will not" : "will";
+			flagAppendix = ` Also, you ${word} receive private reminders.`;
+		}
+
 		if (subData) {
 			// If re-subscribing in a different channel/platform combination, don't error out,
 			// but rather update the channel/platform combo.
@@ -93,6 +106,7 @@ module.exports = {
 					.update("data", "Event_Subscription")
 					.set("Channel", currentChannelID)
 					.set("Platform", context.platform.ID)
+					.set("Flags", JSON.stringify(flags))
 					.where("ID = %n", subData.ID)
 				);
 
@@ -115,7 +129,7 @@ module.exports = {
 				}
 
 				return {
-					reply: `Moved your subscription to ${event.name} from ${previousString} to ${currentString}.`
+					reply: `Moved your subscription to ${event.name} from ${previousString} to ${currentString}.${flagAppendix}`
 				};
 			}
 
@@ -131,6 +145,7 @@ module.exports = {
 			await sb.Query.getRecordUpdater(rs => rs
 				.update("data", "Event_Subscription")
 				.set("Active", !subData.Active)
+				.set("Flags", JSON.stringify(flags))
 				.where("ID = %n", subData.ID)
 			);
 
@@ -152,12 +167,13 @@ module.exports = {
 				Platform: context.platform.ID,
 				Channel: context.channel?.ID ?? null,
 				Type: event.name,
+				Flags: flags,
 				Active: true
 			});
 
 			await row.save({ skipLoad: true });
 			return {
-				reply: `Successfully subscribed ${location}. ${response}`
+				reply: `Successfully subscribed ${location}. ${response}${flagAppendix}`
 			};
 		}
 	},
@@ -178,6 +194,12 @@ module.exports = {
 
 			`<code>${prefix}subscribe (type)</code>`,
 			"You will be subscribed to a given event.",
+			"You can re-subscribe in a different channel (without un-subcribing) if you want a specific event to mention you elsewhere",
+			"",
+
+			`<code>${prefix}subscribe (type) <u>skipPrivateReminder:(true|false)</u></code>`,
+			"You will be subscribed to a given event with the private reminders skipped or unskipped per your choice.",
+			"You can also use this on an existing event to change your setting without changing the subscription itself",
 			"",
 
 			`<code>${prefix}unsubscribe (type)</code>`,
