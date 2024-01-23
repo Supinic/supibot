@@ -64,14 +64,19 @@ module.exports = {
 		const hexStringSeed = randomBytes(64).toString("hex");
 		const seed = BigInt(`0x${hexStringSeed}`);
 
-		const result = diceRoll(fixedInput, seed,1_000_000n);
-		if (result === null) {
+		let result;
+		try {
+			result = diceRoll(fixedInput, seed,1_000_000n);
+		}
+		catch (e) {
+			const message = e?.message ?? String(e);
 			return {
 				success: false,
-				reply: "Cannot make this roll work! 🙁"
+				reply: `Cannot make this roll work! Error: ${message}`
 			};
 		}
-		else if (result === Infinity) {
+
+		if (result === Infinity) {
 			return {
 				reply: "INFINITY WAYTOODANK"
 			};
