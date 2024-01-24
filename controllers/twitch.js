@@ -1396,7 +1396,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			type: "7tv",
 			global: false,
 			animated: i.data.animated,
-			zeroWidth: (i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
+			zeroWidth: Boolean(i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
 		}));
 	}
 
