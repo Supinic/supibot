@@ -15,9 +15,7 @@ module.exports = {
 		{ name: "user", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		types: ["user", "command", "platform", "channel"]
-	})),
+	Static_Data: null,
 	Code: (async function block (context, ...args) {
 		let filter;
 		let filterData;
