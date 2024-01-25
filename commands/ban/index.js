@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["unban"],
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Bans/unbans any combination of channel, user, and command from being executed. Only usable by administrators, or Twitch channel owners.",
+	Description: "Bans/unbans any combination of channel, user, and command from being executed. Only usable by channel owners and Supibot ambassadors.",
 	Flags: ["mention"],
 	Params: [
 		{ name: "all", type: "boolean" },
@@ -391,8 +391,7 @@ module.exports = {
 
 		return [
 			"Bans or unbans any combination of user/channel/command.",
-			"Only usable by admins or Twitch channel owners. Channel owners can only ban combinations in their channel.",
-			"All following examples assume the command is executed by a channel owner.",
+			"Only usable by channel owners and Supibot ambassadors, who can only ban combinations specific for their respective channel.",
 			"",
 
 			`Available types: <code>${availableTypes.join(" ")}</code>`,

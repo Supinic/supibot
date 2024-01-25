@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Posts a link to a specific command's code definition on supinic.com website.",
+	Description: "Posts a link to a specific command's code definition on GitHub.",
 	Flags: ["developer","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,

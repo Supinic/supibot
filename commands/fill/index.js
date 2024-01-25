@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 20000,
-	Description: "Takes the input and scrambles it around randomly.",
+	Description: "Takes the input and scrambles it around randomly, filling the message. In live streams, there is less text and the cooldown is increased to reduce spam.",
 	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
@@ -14,7 +14,7 @@ module.exports = {
 				reply: "At least one word must be provided!"
 			};
 		}
-	
+
 		let length = 0;
 		const result = [];
 
@@ -27,13 +27,13 @@ module.exports = {
 				live = true;
 			}
 		}
-	
+
 		while (length < limit) {
 			const randomWord = sb.Utils.randArray(words);
 			result.push(randomWord);
 			length += randomWord.length + 1;
 		}
-	
+
 		let cooldown;
 		if (context.channel === null) {
 			cooldown = { length: 10000 };
@@ -47,7 +47,7 @@ module.exports = {
 					: this.Cooldown
 			};
 		}
-	
+
 		return {
 			reply: result.slice(0, -1).join(" "),
 			cooldown

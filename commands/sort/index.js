@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "Sorts the message provided alphabetically.",
+	Description: "Alphabetically sorts the message provided to this command.",
 	Flags: ["non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
@@ -15,7 +15,7 @@ module.exports = {
 				reply: "You must supply at least two words!"
 			};
 		}
-	
+
 		const reply = args.sort().join(" ");
 		return {
 			reply,

@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["cf"],
 	Author: "supinic",
 	Cooldown: 2500,
-	Description: "Flips a coin.",
+	Description: "Flips a coin, and shows you the result of it.",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: [
 		{ name: "fail", type: "boolean" }

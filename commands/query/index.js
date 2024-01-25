@@ -5,7 +5,7 @@ module.exports = {
 	Aliases: ["wolframalpha", "wa"],
 	Author: "supinic",
 	Cooldown: 30000,
-	Description: "Wolfram Alpha query",
+	Description: "Wolfram Alpha query for any kind of information, or computation.",
 	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: [
 		{ name: "imageSummary", type: "boolean" }

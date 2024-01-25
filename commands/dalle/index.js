@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: [],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Fetches a new DALL-E image based on your prompt, or fetches one that was already made.",
+	Description: "Creates a new DALL-E image based on your prompt, or links an already made one, using the search parameter.",
 	Flags: ["mention","non-nullable"],
 	Params: [
 		{ name: "id", type: "string" },

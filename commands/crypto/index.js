@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Fetches the latest price of a cryptocurrency.",
+	Description: "Fetches the latest price of a cryptocurrency. If none is provided, defaults to BTC.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,

@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["pajaCD"],
 	Author: "supinic",
 	Cooldown: 5000,
-	Description: "A random quote from the two time! 1993, 1994 back to back blockbuster video game champion!",
+	Description: "A random quote from the two time! 1993, 1994 back to back blockbuster video game champion, Guy \"DrDisrespect\" Beahm.",
 	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,

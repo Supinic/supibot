@@ -1,9 +1,32 @@
+const ALLOWED_MODES = [
+	{
+		name: "Ignore",
+		description: "Will send the message as if there was no API configured."
+	},
+	{
+		name: "Notify",
+		description: "Will send the message regardless, but adds a little warning emoji ⚠"
+	},
+	{
+		name: "Nothing",
+		description: "Will not reply at all."
+	},
+	{
+		name: "Refuse",
+		description: "Will reply with a message warning that the API did not respond."
+	},
+	{
+		name: "Whisper",
+		description: "Won't reply in the main channel at all, but the response will be private messaged to target user."
+	}
+];
+
 module.exports = {
 	Name: "bot",
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 2500,
-	Description: "Allows broadcasters to set various parameters for the bot in their own channel. Usable anywhere, but only applies to their own channel.",
+	Description: "Allows channel owners and Supibot ambadssadors to set various parameters for the bot, for their managed channel.",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: [
 		{ name: "channel", type: "string" },
@@ -11,30 +34,7 @@ module.exports = {
 		{ name: "url", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		allowedModes: [
-			{
-				name: "Ignore",
-				description: "Will send the message as if there was no API configured."
-			},
-			{
-				name: "Notify",
-				description: "Will send the message regardless, but adds a little warning emoji ⚠"
-			},
-			{
-				name: "Nothing",
-				description: "Will not reply at all."
-			},
-			{
-				name: "Refuse",
-				description: "Will reply with a message warning that the API did not respond."
-			},
-			{
-				name: "Whisper",
-				description: "Won't reply in the main channel at all, but the response will be private messaged to target user."
-			}
-		]
-	})),
+	Static_Data: null,
 	Code: (async function bot (context, command, value) {
 		const { params } = context;
 		if (!command) {
@@ -140,9 +140,9 @@ module.exports = {
 
 				if (params.mode) {
 					params.mode = sb.Utils.capitalize(params.mode.toLowerCase());
-					const found = this.staticData.allowedModes.find(i => i.name === params.mode);
+					const found = ALLOWED_MODES.find(i => i.name === params.mode);
 					if (!found) {
-						const allowedTypes = this.staticData.allowedModes.map(i => i.name).join(", ");
+						const allowedTypes = ALLOWED_MODES.map(i => i.name).join(", ");
 						return {
 							success: false,
 							reply: `Banphrase API mode is not allowed! Use one of: ${allowedTypes}`
@@ -520,8 +520,7 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { allowedModes } = this.staticData;
-		const list = allowedModes.map(i => `<li><code>${i.name}</code><br>${i.description}</li><br>`).join("");
+		const list = ALLOWED_MODES.map(i => `<li><code>${i.name}</code><br>${i.description}</li><br>`).join("");
 
 		return [
 			"Various bot configuration related commands.",

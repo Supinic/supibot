@@ -3,7 +3,7 @@ module.exports = {
 	Aliases: ["ra"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Posts a random album.",
+	Description: "Posts a random music album.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
