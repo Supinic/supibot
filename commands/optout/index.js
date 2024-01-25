@@ -1,3 +1,5 @@
+const { handleGenericFilter, parseGenericFilterOptions } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "optout",
 	Aliases: ["unoptout"],
@@ -14,157 +16,36 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
-	Code: (async function optOut (context, commandInput) {
-		const { invocation, params } = context;
-
+	Code: (async function optOut (context, ...args) {
 		let filter;
-		const filterData = {};
-
-		if (params.id) {
-			filter = sb.Filter.get(params.id);
-
-			if (!filter) {
-				return {
-					success: false,
-					reply: `There is no filter with ID ${params.id}!`
-				};
-			}
+		let filterData;
+		const parse = await parseGenericFilterOptions(context.params, args);
+		if (!parse.success) {
+			return parse;
+		}
+		else if (parse.filter) {
+			filter = parse.filter;
 		}
 		else {
-			const commandName = params.command ?? commandInput;
-			if (!commandName) {
-				return {
-					success: false,
-					reply: `A command (or "all" to optout globally) must be provided!`
-				};
-			}
-
-			if (commandName === "all") {
-				filterData.command = null;
-			}
-			else {
-				const commandData = sb.Command.get(commandName);
-				if (!commandData) {
-					return {
-						success: false,
-						reply: `Command ${commandName} does not exist!`
-					};
-				}
-
-				filterData.command = commandData.Name;
-
-				// Apply a "heuristic" - if user provided an alias to a command, automatically assume
-				// it's the base command + the alias as invocation
-				if (commandData.Name !== commandName) {
-					filterData.invocation = commandName;
-				}
-			}
-
-			if (params.channel && params.platform) {
-				return {
-					success: false,
-					reply: "Cannot specify both the channel and platform!"
-				};
-			}
-
-			if (params.channel) {
-				const channelData = sb.Channel.get(params.channel);
-				if (!channelData) {
-					return {
-						success: false,
-						reply: `Channel ${params.channel} does not exist!`
-					};
-				}
-
-				filterData.channel = channelData.ID;
-			}
-
-			if (params.platform) {
-				const platformData = sb.Platform.get(params.platform);
-				if (!platformData) {
-					return {
-						success: false,
-						reply: `Platform ${params.platform} does not exist!`
-					};
-				}
-
-				filterData.platform = platformData.ID;
-			}
-
+			filterData = parse.filterData;
 			filter = sb.Filter.data.find(i => (
-				i.Type === "Opt-out"
-				&& i.Command === (filterData.command ?? null)
-				&& i.Invocation === (filterData.invocation ?? null)
-				&& i.Channel === (filterData.channel ?? null)
-				&& i.Platform === (filterData.platform ?? null)
+				i.Type === "Unmention"
+				&& i.Channel === filterData.channel
+				&& i.Command === filterData.command
+				&& i.Platform === filterData.platform
+				&& i.Invocation === filterData.invocation
 				&& i.User_Alias === context.user.ID
 			));
 		}
 
-		let replyFn;
-		if (filter) {
-			if (filter.Issued_By !== context.user.ID) {
-				return {
-					success: false,
-					reply: "This command filter has not been created by you, so you cannot modify it!"
-				};
-			}
-			else if ((filter.Active && invocation === "optout") || (!filter.Active && invocation === "unoptout")) {
-				return {
-					success: false,
-					reply: `You are already ${invocation}ed from that combination!`
-				};
-			}
-
-			const suffix = (filter.Active) ? "" : " again";
-			await filter.toggle();
-
-			replyFn = (commandString) => `Successfully ${invocation}ed${suffix} from ${commandString} (ID ${filter.ID}).`;
-		}
-		else {
-			if (invocation === "unoptout") {
-				return {
-					success: false,
-					reply: "You haven't opted out from this combination yet, so it cannot be reversed!"
-				};
-			}
-
-			filter = await sb.Filter.create({
-				Active: true,
-				Type: "Opt-out",
-				User_Alias: context.user.ID,
-				Issued_By: context.user.ID,
-				Command: filterData.command,
-				Channel: filterData.channel,
-				Platform: filterData.platform,
-				Invocation: filterData.invocation
-			});
-
-			let location = "";
-			if (filterData.channel) {
-				location = ` in channel ${filterData.channel}`;
-			}
-			else if (filterData.platform) {
-				location = ` in platform ${filterData.platform}`;
-			}
-
-			replyFn = (commandString) => `You opted out from ${commandString} ${location} (ID ${filter.ID}).`;
-		}
-
-		let commandString;
-		const prefix = sb.Command.prefix;
-		if (filter.Command === null) {
-			commandString = "all opt-outable commands. This does not affect your other individual opt-outs for specific commands";
-		}
-		else if (filter.Invocation !== null) {
-			commandString = `command ${prefix}${filter.Command} (alias ${prefix}${filter.Invocation})`;
-		}
-		else {
-			commandString = `command ${prefix}${filter.Command}`;
-		}
-
-		const reply = replyFn(commandString);
-		return { reply };
+		return await handleGenericFilter("Unping", {
+			context,
+			filter,
+			filterData,
+			enableInvocation: this.Name,
+			disableInvocation: this.Aliases[0],
+			pastVerb: "opted out"
+		});
 	}),
 	Dynamic_Description: (async () => [
 		"Opts you out of a specific command.",
