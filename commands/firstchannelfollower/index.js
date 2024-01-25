@@ -26,26 +26,13 @@ module.exports = {
 			headers: {
 				Accept: "*/*",
 				"Accept-Language": "en-US",
-				Authorization: `OAuth ${sb.Config.get("TWITCH_GQL_OAUTH")}`,
 				"Client-ID": sb.Config.get("TWITCH_GQL_CLIENT_ID"),
 				"Client-Version": sb.Config.get("TWITCH_GQL_CLIENT_VERSION"),
 				"Content-Type": "text/plain;charset=UTF-8",
 				Referer: `https://dashboard.twitch.tv/`,
 				"X-Device-ID": sb.Config.get("TWITCH_GQL_DEVICE_ID")
 			},
-			query: ` 
-				query {
-					user(login: "${name}") {
-						followers(order: ASC, first: 10) {
-							edges {
-								followedAt
-								node {
-									login
-								}
-							}
-						}
-					}
-				}`
+			query: `{user(login:"${name}"){followers(first:1){edges{node{login}followedAt}}}}`
 		});
 
 		const who = (context.user.Name === name.toLowerCase())
