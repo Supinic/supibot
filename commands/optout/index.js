@@ -32,7 +32,7 @@ module.exports = {
 		else {
 			filterData = parse.filterData;
 			filter = sb.Filter.data.find(i => (
-				i.Type === "Unmention"
+				i.Type === "Opt-out"
 				&& i.Channel === filterData.channel
 				&& i.Command === filterData.command
 				&& i.Platform === filterData.platform
