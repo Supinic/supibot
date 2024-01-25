@@ -432,7 +432,8 @@ module.exports = {
 	 * @param {Object} options
 	 * @param {string[]} options.argsOrder
 	 * @param {boolean} [options.includeUser]
-	 * @param {boolean} [options.checkCommandBlocks]
+	 * @param {string} [options.requiredCommandFlag]
+	 * @param {string} [options.requiredCommandFlagResponse]
 	 * @return {Promise<{filterData: Object, success: true}|{filter: Filter, success: true}|{success: false, reply: string}>}
 	 */
 	async parseGenericFilterOptions (type, params, args, options = {}) {
@@ -485,10 +486,10 @@ module.exports = {
 					reply: `Command ${commandName} does not exist!`
 				};
 			}
-			if (options.checkCommandBlocks && !commandData.Flags.block) {
+			if (options.requiredCommandFlag && !commandData.Flags[options.requiredCommandFlag]) {
 				return {
 					success: false,
-					reply: `You cannot block users from this command!`
+					reply: options.requiredCommandFlagResponse
 				};
 			}
 

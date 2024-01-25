@@ -21,7 +21,8 @@ module.exports = {
 		let filterData;
 		const parse = await parseGenericFilterOptions("Block", context.params, args, {
 			argsOrder: ["user", "command"],
-			checkCommandBlocks: true,
+			requiredCommandFlag: "block",
+			requiredCommandFlagResponse: "You cannot block people from this command!",
 			includeUser: true
 		});
 

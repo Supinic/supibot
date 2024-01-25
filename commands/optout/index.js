@@ -20,7 +20,9 @@ module.exports = {
 		let filter;
 		let filterData;
 		const parse = await parseGenericFilterOptions("Opt-out", context.params, args, {
-			argsOrder: ["command"]
+			argsOrder: ["command"],
+			requiredCommandFlag: "optOut",
+			requiredCommandFlagResponse: "You cannot opt out from this command!"
 		});
 
 		if (!parse.success) {
