@@ -64,7 +64,7 @@ module.exports = {
 			));
 		}
 
-		return await handleGenericFilter("Unping", {
+		return await handleGenericFilter("Block", {
 			context,
 			filter,
 			filterData,

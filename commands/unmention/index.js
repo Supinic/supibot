@@ -35,7 +35,7 @@ module.exports = {
 			));
 		}
 
-		return await handleGenericFilter("Unping", {
+		return await handleGenericFilter("Unmention", {
 			context,
 			filter,
 			filterData,

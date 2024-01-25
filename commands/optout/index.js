@@ -41,7 +41,7 @@ module.exports = {
 			));
 		}
 
-		return await handleGenericFilter("Unping", {
+		return await handleGenericFilter("Opt-out", {
 			context,
 			filter,
 			filterData,
