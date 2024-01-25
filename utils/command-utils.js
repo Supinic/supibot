@@ -571,8 +571,8 @@ module.exports = {
 	 * @return {Promise<{reply: string, success?: boolean}>}
 	 */
 	async handleGenericFilter (type, data) {
+		let { filter } = data;
 		const {
-			filter,
 			enableInvocation,
 			disableInvocation,
 			enableVerb,
@@ -615,7 +615,7 @@ module.exports = {
 				};
 			}
 
-			const filter = await sb.Filter.create({
+			filter = await sb.Filter.create({
 				Active: true,
 				Type: type,
 				User_Alias: context.user.ID,
