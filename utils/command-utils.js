@@ -427,11 +427,14 @@ module.exports = {
 	 * Grabs platform. channel, command (additionally user too) from the context.params object
 	 * and also returns parse failures if encountered.
 	 * @param {Object} params
+	 * @param {string[]} args
 	 * @param {Object} options
+	 * @param {string[]} options.argsOrder
 	 * @param {boolean} [options.includeUser]
+	 * @param {boolean} [options.checkCommandBlocks]
 	 * @return {Promise<{filterData: Object, success: true}|{filter: Filter, success: true}|{success: false, reply: string}>}
 	 */
-	async parseGenericFilterOptions (params, options = {}) {
+	async parseGenericFilterOptions (params, args, options = {}) {
 		if (params.id) {
 			const filter = sb.Filter.get(params.id);
 			if (!filter) {
@@ -454,7 +457,9 @@ module.exports = {
 			invocation: null
 		};
 
-		const commandName = params.command;
+		const commandArgId = options.argsOrder.indexOf("command");
+		const commandName = params.command ?? args[commandArgId];
+
 		if (!commandName) {
 			return {
 				success: false,
@@ -471,6 +476,12 @@ module.exports = {
 				return {
 					success: false,
 					reply: `Command ${commandName} does not exist!`
+				};
+			}
+			if (options.checkCommandBlocks && !commandData.Flags.block) {
+				return {
+					success: false,
+					reply: `You cannot block users from this command!`
 				};
 			}
 
@@ -517,12 +528,15 @@ module.exports = {
 		if (options.includeUser) {
 			filterData.user = null;
 
-			if (params.user) {
-				const userData = await sb.User.get(params.user);
+			const userArgId = options.argsOrder.indexOf("user");
+			const userName = params.user ?? args[userArgId];
+
+			if (userName) {
+				const userData = await sb.User.get(userName);
 				if (!userData) {
 					return {
 						success: false,
-						reply: `User ${params.user} does not exist!`
+						reply: `User ${userName} does not exist!`
 					};
 				}
 
@@ -542,7 +556,8 @@ module.exports = {
 	 * @param {Filter | null} data.filter
 	 * @param {string} data.enableInvocation
 	 * @param {string} data.disableInvocation
-	 * @param {string} data.pastVerb
+	 * @param {string} data.enableVerb
+	 * @param {string} data.disableVerb
 	 * @param {Command.Context} data.context
 	 * @param {Object} data.filterData
 	 * @return {Promise<{reply: string, success?: boolean}>}
@@ -552,13 +567,15 @@ module.exports = {
 			filter,
 			enableInvocation,
 			disableInvocation,
-			pastVerb,
+			enableVerb,
+			disableVerb,
 			context,
 			filterData
 		} = data;
 
 		let replyFn;
 		const { invocation, params } = context;
+		const verb = (invocation === enableInvocation) ? enableVerb : disableVerb;
 
 		if (filter) {
 			if ((filter.Active && invocation === enableInvocation) || (!filter.Active && invocation === disableInvocation)) {
@@ -571,16 +588,15 @@ module.exports = {
 				};
 			}
 
-			const suffix = (filter.Active) ? "" : " again";
 			await filter.toggle();
 
-			replyFn = (commandString) => `Successfully ${pastVerb}${suffix} from ${commandString} (ID ${filter.ID}).`;
+			replyFn = (commandString) => `Successfully ${verb} ${commandString} (ID ${filter.ID}).`;
 		}
 		else {
 			if (invocation === disableInvocation) {
 				return {
 					success: false,
-					reply: `You have not ${pastVerb} from this combination before, so you can't ${invocation} just yet!`
+					reply: `You have not ${enableVerb} this combination before, so you can't ${invocation} just yet!`
 				};
 			}
 
@@ -604,7 +620,7 @@ module.exports = {
 				location = ` in platform ${params.platform}`;
 			}
 
-			replyFn = (commandString) => `Successfully ${pastVerb} from ${commandString} ${location} (ID ${filter.ID}).`;
+			replyFn = (commandString) => `Successfully ${verb} ${commandString} ${location} (ID ${filter.ID}).`;
 		}
 
 		let commandString;

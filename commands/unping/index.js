@@ -20,7 +20,11 @@ module.exports = {
 	Code: (async function unping (context, ...args) {
 		let filter;
 		let filterData;
-		const parse = await parseGenericFilterOptions(context.params, args, { includeUser: true });
+		const parse = await parseGenericFilterOptions(context.params, args, {
+			argsOrder: ["command"],
+			includeUser: true
+		});
+
 		if (!parse.success) {
 			return parse;
 		}
@@ -46,47 +50,55 @@ module.exports = {
 			filterData,
 			enableInvocation: this.Name,
 			disableInvocation: this.Aliases[0],
-			pastVerb: "removed pings"
+			enableVerb: "removed pings",
+			disableVerb: "returned pings"
 		});
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (async () => [
 		`Makes a specific command/channel/platform/user combination not "ping" you - the message will not be highlighted.`,
+		"This is achieved by inserting an invisible character to your username, which will \"trick\" your chat program into not highlighting the message.",
 		"",
 
-		`<code><u>Simple mode</u></code>`,
-		`<code>${prefix}unping (command)</code>`,
+		`<code>$unping (command)</code>`,
 		`Makes the given command not ping you anymore.`,
 		"",
 
-		`<code>${prefix}reping (command)</code>`,
+		`<code>$reping (command)</code>`,
 		`Returns the ping from a given command.`,
 		"",
 
-		`<code><u>Total mode</u></code>`,
-		`<code>${prefix}unping all</code>`,
-		`<code>${prefix}reping all</code>`,
+		`<code>$unping all</code>`,
+		`<code>$reping all</code>`,
 		"Removes (or adds back) pinging of your username from all current and future commands.",
+		"NOTE: <u>This command will not remove pings from each command separately!</u> It simply applies a single setting that removes them from all commands, present and future.",
+		"This means you can't <u>$unping all</u> and then separately <u>$unping</u> from other commands in particular.",
 		"",
 
-		`<code><u>Advanced mode</u></code>`,
-		`<code>${prefix}unping channel:(channel) user:(username) command:(command) platform:(platform)</code>`,
+		`<code>unping id:(ID)</code>`,
+		`<code>reping id:(ID)</code>`,
+		`You can also target your filter specifically by its ID that the bot tells you when you created it.`,
+		`Furthermore, you can list your active filters in your <a href="/user/data/list">user data list</a> as <u>activeFilters</u>.`,
+		"",
+
+		`<code>unping channel:(channel name)</code>`,
+		`<code>unping platform:(platform name)</code>`,
 		`Removes pinging of your username for a given user/channel/command/platform combination.`,
 		"E.g.:",
 		`<ul>
 				<li> 
-					<code>${prefix}unping command:rl channel:supibot</code>
+					<code>$unping command:rl channel:supibot</code>
 					Will remove the ping from command rl only in channel "supibot".
 				</li>				
 				<li> 
-					<code>${prefix}unping command:rl user:foobar</code>
+					<code>$unping command:rl user:foobar</code>
 					Will remove the ping from command rl only if used by user "foobar".
 				</li>
 				<li> 
-					<code>${prefix}unping command:rl platform:twitch</code>
+					<code>$unping command:rl platform:twitch</code>
 					Will remove the ping from command rl only in Twitch.
 				</li>
 				<li> 
-					<code>${prefix}unping channel:supibot</code>
+					<code>$unping channel:supibot</code>
 					Will remove the ping from opt-outable commands, only in channel "supibot".
 				</li>
 			</ul>`

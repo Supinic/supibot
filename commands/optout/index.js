@@ -19,7 +19,10 @@ module.exports = {
 	Code: (async function optOut (context, ...args) {
 		let filter;
 		let filterData;
-		const parse = await parseGenericFilterOptions(context.params, args);
+		const parse = await parseGenericFilterOptions(context.params, args, {
+			argsOrder: ["command"]
+		});
+
 		if (!parse.success) {
 			return parse;
 		}
@@ -44,7 +47,8 @@ module.exports = {
 			filterData,
 			enableInvocation: this.Name,
 			disableInvocation: this.Aliases[0],
-			pastVerb: "opted out"
+			enableVerb: "opted out",
+			disableVerb: "removed your opt-out"
 		});
 	}),
 	Dynamic_Description: (async () => [
@@ -61,13 +65,12 @@ module.exports = {
 		`<code>$optout all</code>`,
 		`<code>$optout command:all</code>`,
 		`Will opt you out from all current and future opt-outable commands, everywhere.`,
-		"NOTE: <u>This command will not opt you out from each command separately!</u> It simply applies a setting that opts you out from all commands, present and future.",
-		"This means you can't <u>$optout all</u> and then separately <u>$unoptout</u> from some other commands in particular.",
+		"NOTE: <u>This command will not opt you out from each command separately!</u> It simply applies a single setting that opts you out from all commands, present and future.",
+		"This means you can't <u>$optout all</u> and then separately <u>$unoptout</u> from some commands in particular.",
 		"",
 
 		`<code>$unoptout (command)</code>`,
 		`<code>$unoptout all</code>`,
-		`<code>$unoptout channel:(chn) command:(cmd) platform:(p)</code>`,
 		"To reverse an opt-out, simply use the <code>unoptout</code> command with the same parameters you used previously.",
 		"",
 
