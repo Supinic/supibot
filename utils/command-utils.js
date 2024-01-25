@@ -426,6 +426,7 @@ module.exports = {
 	 * Standard parser function for all Filter-related commands.
 	 * Grabs platform. channel, command (additionally user too) from the context.params object
 	 * and also returns parse failures if encountered.
+	 * @param {string} type
 	 * @param {Object} params
 	 * @param {string[]} args
 	 * @param {Object} options
@@ -434,13 +435,19 @@ module.exports = {
 	 * @param {boolean} [options.checkCommandBlocks]
 	 * @return {Promise<{filterData: Object, success: true}|{filter: Filter, success: true}|{success: false, reply: string}>}
 	 */
-	async parseGenericFilterOptions (params, args, options = {}) {
+	async parseGenericFilterOptions (type, params, args, options = {}) {
 		if (params.id) {
 			const filter = sb.Filter.get(params.id);
 			if (!filter) {
 				return {
 					success: false,
 					reply: `There is no filter with ID ${params.id}!`
+				};
+			}
+			else if (filter.Type !== type) {
+				return {
+					success: false,
+					reply: `Invalid filter type provided! Re-check the filter ID.`
 				};
 			}
 

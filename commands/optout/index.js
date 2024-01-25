@@ -19,7 +19,7 @@ module.exports = {
 	Code: (async function optOut (context, ...args) {
 		let filter;
 		let filterData;
-		const parse = await parseGenericFilterOptions(context.params, args, {
+		const parse = await parseGenericFilterOptions("Opt-out", context.params, args, {
 			argsOrder: ["command"]
 		});
 

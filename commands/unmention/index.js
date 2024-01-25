@@ -13,7 +13,7 @@ module.exports = {
 	Code: (async function unmention (context, ...args) {
 		let filter;
 		let filterData;
-		const parse = await parseGenericFilterOptions(context.params, args, {
+		const parse = await parseGenericFilterOptions("Unmention", context.params, args, {
 			argsOrder: ["command"]
 		});
 

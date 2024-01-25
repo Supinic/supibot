@@ -20,7 +20,7 @@ module.exports = {
 	Code: (async function unping (context, ...args) {
 		let filter;
 		let filterData;
-		const parse = await parseGenericFilterOptions(context.params, args, {
+		const parse = await parseGenericFilterOptions("Unping", context.params, args, {
 			argsOrder: ["command"],
 			includeUser: true
 		});

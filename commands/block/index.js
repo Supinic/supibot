@@ -21,7 +21,7 @@ module.exports = {
 	Code: (async function block (context, ...args) {
 		let filter;
 		let filterData;
-		const parse = await parseGenericFilterOptions(context.params, args, {
+		const parse = await parseGenericFilterOptions("Block", context.params, args, {
 			argsOrder: ["user", "command"],
 			checkCommandBlocks: true,
 			includeUser: true
