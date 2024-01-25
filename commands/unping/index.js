@@ -50,8 +50,8 @@ module.exports = {
 			filterData,
 			enableInvocation: this.Name,
 			disableInvocation: this.Aliases[0],
-			enableVerb: "removed pings",
-			disableVerb: "returned pings"
+			enableVerb: "removed pings from",
+			disableVerb: "returned pings to"
 		});
 	}),
 	Dynamic_Description: (async () => [

@@ -49,8 +49,8 @@ module.exports = {
 			filterData,
 			enableInvocation: this.Name,
 			disableInvocation: this.Aliases[0],
-			enableVerb: "opted out",
-			disableVerb: "removed your opt-out"
+			enableVerb: "opted out from",
+			disableVerb: "removed your opt-out from"
 		});
 	}),
 	Dynamic_Description: (async () => [

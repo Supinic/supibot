@@ -41,8 +41,8 @@ module.exports = {
 			filterData,
 			enableInvocation: this.Name,
 			disableInvocation: this.Aliases[0],
-			enableVerb: "removed mentions",
-			disableVerb: "returned mentions"
+			enableVerb: "removed mentions from",
+			disableVerb: "returned mentions to"
 		});
 	}),
 	Dynamic_Description: (async () => [
