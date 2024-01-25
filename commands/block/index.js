@@ -18,7 +18,7 @@ module.exports = {
 	Static_Data: (() => ({
 		types: ["user", "command", "platform", "channel"]
 	})),
-	Code: (async function block (context) {
+	Code: (async function block (context, ...args) {
 		let filter;
 		let filterData;
 		const parse = await parseGenericFilterOptions(context.params, args, {
