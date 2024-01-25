@@ -578,6 +578,13 @@ module.exports = {
 		const verb = (invocation === enableInvocation) ? enableVerb : disableVerb;
 
 		if (filter) {
+			if (filter.Issued_By !== context.user.ID) {
+				return {
+					success: false,
+					reply: `You can't edit this filter - you didn't create it!`
+				};
+			}
+
 			if ((filter.Active && invocation === enableInvocation) || (!filter.Active && invocation === disableInvocation)) {
 				const state = (invocation === enableInvocation) ? "enabled" : "disabled";
 				return {
