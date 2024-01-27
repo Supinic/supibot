@@ -420,6 +420,240 @@ module.exports = {
 			id: i.id,
 			name: i.name
 		}));
+	},
+
+	/**
+	 * Standard parser function for all Filter-related commands.
+	 * Grabs platform. channel, command (additionally user too) from the context.params object
+	 * and also returns parse failures if encountered.
+	 * @param {string} type
+	 * @param {Object} params
+	 * @param {string[]} args
+	 * @param {Object} options
+	 * @param {string[]} options.argsOrder
+	 * @param {boolean} [options.includeUser]
+	 * @param {string} [options.requiredCommandFlag]
+	 * @param {string} [options.requiredCommandFlagResponse]
+	 * @return {Promise<{filterData: Object, success: true}|{filter: Filter, success: true}|{success: false, reply: string}>}
+	 */
+	async parseGenericFilterOptions (type, params, args, options = {}) {
+		if (params.id) {
+			const filter = sb.Filter.get(params.id);
+			if (!filter) {
+				return {
+					success: false,
+					reply: `There is no filter with ID ${params.id}!`
+				};
+			}
+			else if (filter.Type !== type) {
+				return {
+					success: false,
+					reply: `Invalid filter type provided! Re-check the filter ID.`
+				};
+			}
+
+			return {
+				success: true,
+				filter
+			};
+		}
+
+		const filterData = {
+			command: null,
+			channel: null,
+			platform: null,
+			invocation: null
+		};
+
+		const commandArgId = options.argsOrder.indexOf("command");
+		const commandName = params.command ?? args[commandArgId];
+
+		if (!commandName) {
+			return {
+				success: false,
+				reply: `A command (or "all" to optout globally) must be provided!`
+			};
+		}
+
+		if (commandName === "all") {
+			filterData.command = null;
+		}
+		else {
+			const commandData = sb.Command.get(commandName);
+			if (!commandData) {
+				return {
+					success: false,
+					reply: `Command ${commandName} does not exist!`
+				};
+			}
+			if (options.requiredCommandFlag && !commandData.Flags[options.requiredCommandFlag]) {
+				return {
+					success: false,
+					reply: options.requiredCommandFlagResponse
+				};
+			}
+
+			filterData.command = commandData.Name;
+
+			// Apply a "heuristic" - if user provided an alias to a command, automatically assume
+			// it's the base command + the alias as invocation
+			if (commandData.Name !== commandName) {
+				filterData.invocation = commandName;
+			}
+		}
+
+		if (params.channel && params.platform) {
+			return {
+				success: false,
+				reply: "Cannot specify both the channel and platform!"
+			};
+		}
+
+		if (params.channel) {
+			const channelData = sb.Channel.get(params.channel);
+			if (!channelData) {
+				return {
+					success: false,
+					reply: `Channel ${params.channel} does not exist!`
+				};
+			}
+
+			filterData.channel = channelData.ID;
+		}
+
+		if (params.platform) {
+			const platformData = sb.Platform.get(params.platform);
+			if (!platformData) {
+				return {
+					success: false,
+					reply: `Platform ${params.platform} does not exist!`
+				};
+			}
+
+			filterData.platform = platformData.ID;
+		}
+
+		if (options.includeUser) {
+			filterData.user = null;
+
+			const userArgId = options.argsOrder.indexOf("user");
+			const userName = params.user ?? args[userArgId];
+
+			if (userName) {
+				const userData = await sb.User.get(userName);
+				if (!userData) {
+					return {
+						success: false,
+						reply: `User ${userName} does not exist!`
+					};
+				}
+
+				filterData.user = userData.ID;
+			}
+		}
+
+		return {
+			success: true,
+			filterData
+		};
+	},
+
+	/**
+	 * @param {string} type
+	 * @param {Object} data
+	 * @param {Filter | null} data.filter
+	 * @param {string} data.enableInvocation
+	 * @param {string} data.disableInvocation
+	 * @param {string} data.enableVerb
+	 * @param {string} data.disableVerb
+	 * @param {Command.Context} data.context
+	 * @param {Object} data.filterData
+	 * @return {Promise<{reply: string, success?: boolean}>}
+	 */
+	async handleGenericFilter (type, data) {
+		let { filter } = data;
+		const {
+			enableInvocation,
+			disableInvocation,
+			enableVerb,
+			disableVerb,
+			context,
+			filterData
+		} = data;
+
+		let replyFn;
+		const { invocation, params } = context;
+		const verb = (invocation === enableInvocation) ? enableVerb : disableVerb;
+
+		if (filter) {
+			if (filter.Issued_By !== context.user.ID) {
+				return {
+					success: false,
+					reply: `You can't edit this filter - you didn't create it!`
+				};
+			}
+
+			if ((filter.Active && invocation === enableInvocation) || (!filter.Active && invocation === disableInvocation)) {
+				const state = (invocation === enableInvocation) ? "enabled" : "disabled";
+				return {
+					success: false,
+					reply: (params.id)
+						? `Your filter ID ${params.id} is already ${state}!`
+						: `This combination is already ${state}!`
+				};
+			}
+
+			await filter.toggle();
+
+			replyFn = (commandString) => `Successfully ${verb} ${commandString} (ID ${filter.ID}).`;
+		}
+		else {
+			if (invocation === disableInvocation) {
+				return {
+					success: false,
+					reply: `You have not ${enableVerb} this combination before, so you can't ${invocation} just yet!`
+				};
+			}
+
+			filter = await sb.Filter.create({
+				Active: true,
+				Type: type,
+				User_Alias: context.user.ID,
+				Issued_By: context.user.ID,
+				Command: filterData.command,
+				Channel: filterData.channel,
+				Platform: filterData.platform,
+				Invocation: filterData.invocation,
+				Blocked_User: filterData.user ?? null
+			});
+
+			let location = "";
+			if (context.params.channel) {
+				location = ` in channel ${params.channel}`;
+			}
+			else if (params.platform) {
+				location = ` in platform ${params.platform}`;
+			}
+
+			replyFn = (commandString) => `Successfully ${verb} ${commandString} ${location} (ID ${filter.ID}).`;
+		}
+
+		let commandString;
+		const prefix = sb.Command.prefix;
+		if (filter.Command === null) {
+			commandString = `all valid commands`;
+		}
+		else if (filter.Invocation !== null) {
+			commandString = `command ${prefix}${filter.Command} (alias ${prefix}${filter.Invocation})`;
+		}
+		else {
+			commandString = `command ${prefix}${filter.Command}`;
+		}
+
+		const reply = replyFn(commandString);
+		return {
+			reply
+		};
 	}
 };
 

@@ -1,3 +1,5 @@
+const { handleGenericFilter, parseGenericFilterOptions } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "block",
 	Aliases: ["unblock"],
@@ -8,204 +10,115 @@ module.exports = {
 	Params: [
 		{ name: "channel", type: "string" },
 		{ name: "command", type: "string" },
+		{ name: "id", type: "number" },
 		{ name: "platform", type: "string" },
 		{ name: "user", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		types: ["user", "command", "platform", "channel"]
-	})),
-	Code: (async function block (context, user, command) {
-		const { invocation } = context;
-		const { types } = this.staticData;
-		const values = {
-			user: null,
-			command: null,
-			platform: null,
-			channel: null
-		};
+	Static_Data: null,
+	Code: (async function block (context, ...args) {
+		let filter;
+		let filterData;
+		const parse = await parseGenericFilterOptions("Block", context.params, args, {
+			argsOrder: ["user", "command"],
+			requiredCommandFlag: "block",
+			requiredCommandFlagResponse: "You cannot block people from this command!",
+			includeUser: true
+		});
 
-		if (user && command) {
-			values.user = user;
-			values.command = command;
+		let blockedUserData;
+		if (!parse.success) {
+			return parse;
+		}
+		else if (parse.filter) {
+			filter = parse.filter;
+			blockedUserData = await sb.User.get(filter.Blocked_User);
 		}
 		else {
-			for (const type of types) {
-				if (context.params[type]) {
-					values[type] = context.params[type];
-				}
-			}
-		}
+			filterData = parse.filterData;
 
-		let deliberateGlobalBlock = false;
-		if (values.command === "all") {
-			values.command = null;
-			deliberateGlobalBlock = true;
-		}
-
-		const names = {};
-		const filterData = {};
-		for (const [type, value] of Object.entries(values)) {
-			if (value === null) {
-				filterData[type] = null;
-				continue;
-			}
-
-			const module = sb[sb.Utils.capitalize(type)];
-			const specificData = await module.get(value);
-			if (!specificData) {
+			if (!filterData.user) {
 				return {
 					success: false,
-					reply: `Provided ${type} was not found!`
+					reply: `You must provide someone to block!`
 				};
 			}
-			else if (module === sb.Command) {
-				if (!specificData.Flags.block) {
-					return {
-						success: false,
-						reply: `You cannot block people from this command!`
-					};
-				}
-
-				names[type] = specificData.Name;
-				filterData[type] = specificData.Name;
-			}
-			else {
-				names[type] = specificData.Name;
-				filterData[type] = specificData.ID;
-			}
-		}
-
-		if (!deliberateGlobalBlock && filterData.command === null) {
-			return {
-				success: false,
-				reply: `A command (or "all" to ${invocation} globally) must be provided!`
-			};
-		}
-		else if (!filterData.user) {
-			return {
-				success: false,
-				reply: "The user to block must be specified!"
-			};
-		}
-		else if (filterData.channel && filterData.platform) {
-			return {
-				success: false,
-				reply: "Cannot specify both the channel and platform!"
-			};
-		}
-		else if (names.user === context.platform.Self_Name) {
-			return {
-				success: false,
-				reply: "I wouldn't try that."
-			};
-		}
-
-		const filter = sb.Filter.data.find(i => (
-			i.Type === "Block"
-			&& i.Blocked_User === filterData.user
-			&& i.Channel === filterData.channel
-			&& i.Command === filterData.command
-			&& i.Platform === filterData.platform
-			&& i.User_Alias === context.user.ID
-		));
-
-		if (filter) {
-			if (filter.Issued_By !== context.user.ID) {
+			else if (filterData.user === context.platform.Self_ID) {
+				const emote = await context.randomEmote("monkaStare", "supiniStare", "😬🫵");
 				return {
 					success: false,
-					reply: "This command filter has not been created by you, so you cannot modify it!"
-				};
-			}
-			else if ((filter.Active && invocation === "block") || (!filter.Active && invocation === "unblock")) {
-				return {
-					success: false,
-					reply: `That combination is already ${invocation}ed!`
+					reply: `I wouldn't try that! ${emote}`
 				};
 			}
 
-			const suffix = (filter.Active) ? "" : " again";
-			await filter.toggle();
+			blockedUserData = await sb.User.get(filterData.user);
 
-			return {
-				reply: `Successfully ${invocation}ed${suffix}!`
-			};
+			filter = sb.Filter.data.find(i => (
+				i.Type === "Block"
+				&& i.Blocked_User === filterData.user
+				&& i.Channel === filterData.channel
+				&& i.Command === filterData.command
+				&& i.Platform === filterData.platform
+				&& i.User_Alias === context.user.ID
+			));
 		}
-		else {
-			if (invocation === "unblock") {
-				return {
-					success: false,
-					reply: "This combination has not been blocked yet, so it cannot be unblocked!"
-				};
-			}
 
-			const filter = await sb.Filter.create({
-				Type: "Block",
-				User_Alias: context.user.ID,
-				Blocked_User: filterData.user,
-				Command: filterData.command,
-				Channel: filterData.channel,
-				Platform: filterData.platform,
-				Issued_By: context.user.ID
-			});
-
-			let location = "";
-			if (filterData.channel) {
-				location = ` in channel ${names.channel}`;
-			}
-			else if (filterData.platform) {
-				location = ` in platform ${names.platform}`;
-			}
-
-			const commandPrefix = sb.Config.get("COMMAND_PREFIX");
-			let commandString = `the command ${commandPrefix}${names.command}`;
-			if (filterData.command === null) {
-				commandString = "all blockable commands";
-			}
-
-			return {
-				reply: sb.Utils.tag.trim `
-					You blocked ${names.user}
-					from using ${commandString}
-					on you${location}
-					(ID ${filter.ID}).
-				`
-			};
-		}
+		return await handleGenericFilter("Block", {
+			context,
+			filter,
+			filterData,
+			enableInvocation: this.Name,
+			disableInvocation: this.Aliases[0],
+			enableVerb: `blocked ${blockedUserData.Name} from`,
+			disableVerb: `unblocked ${blockedUserData.Name} from`
+		});
 	}),
-	Dynamic_Description: (async (prefix) => [
+	Dynamic_Description: (async () => [
 		"Blocks a specified user from using the specified command with you as the parameter",
 		"",
 
-		`<code><u>Simple mode</u></code>`,
-		`<code>${prefix}block Kappa rl</code>`,
-		`Blocks the user Kappa from using the command rl on you. They can't do <code>$rl (you)</code>`,
+		`<code>$block (user) (command)</code>`,
+		`<code>$block user:(user) command:(command)</code>`,
+		`<code>$block Kappa rl</code>`,
+		`<code>$block user:Kappa command:rl</code>`,
+		`Blocks the user Kappa from using the command rl on you. Then, they can't do <code>$rl (your name)</code>`,
 		"",
 
-		`<code><u>Total mode</u></code>`,
-		`<code>${prefix}block Kappa all</code>`,
-		`Blocks user Kappa from all current and future commands that support blocking people.`,
+		`<code>$unblock (user) (command)</code>`,
+		`Unblocks the user from a given command.`,
 		"",
 
-		`<code><u>Advanced mode</u></code>`,
-		`<code>${prefix}block user:(usr) channel:(chn) command:(cmd) platform:(p)</code>`,
-		`Will opt you out from a specified combination of channel/command/platform.`,
+		`<code>$block (user) all</code>`,
+		`<code>$block user:(user) command:all</code>`,
+		`Blocks provided user from all current and future commands that support blocking people.`,
+		"NOTE: <u>This command will not block the user from each command separately!</u> It simply applies a single setting that blocks them from all blockable commands, present and future.",
+		"This means you can't <u>$block (user) all</u> and then separately <u>$unblock (user)</u> from other commands in particular.",
+		"",
+
+		`<code>$block id:(ID)</code>`,
+		`<code>$unblock id:(ID)</code>`,
+		`You can also target your filter specifically by its ID that the bot tells you when you created it.`,
+		`Furthermore, you can list your active filters in your <a href="/user/data/list">user data list</a> as <u>activeFilters</u>.`,
+		"",
+
+		`<code>$block user:(usr) channel:(chn) command:(cmd) platform:(p)</code>`,
+		`Will block given user from a specified combination of channel/command/platform.`,
 		"E.g.:",
 		`<ul>
 				<li> 
-					<code>${prefix}block command:rl user:Kappa channel:supibot</code>
+					<code>$block command:rl user:Kappa channel:supibot</code>
 					<br>
 					Blocks user Kappa from command rl only in channel "supibot".
 				</li>
 				<li> 
-					<code>${prefix}block command:rl user:Kappa platform:twitch</code>
+					<code>$block command:rl user:Kappa platform:twitch</code>
 					<br>
 					Blocks user Kappa from command rl, but only on Twitch.
 				</li>
 				<li> 
-					<code>${prefix}block user:Kappa channel:supibot</code>
+					<code>$block user:Kappa channel:supibot</code>
 					<br>
-					Blocks Kappa from all block-able commands, but only in channel "supibot".
+					Blocks Kappa from all blockable commands, but only in channel "supibot".
 				</li>
 			</ul>`
 	])
