@@ -37,6 +37,7 @@ declare interface TwitchData {
 	sendVerificationChallenge: boolean;
 	recentBanPartTimeout: number;
 	trackChannelsLiveStatus: boolean;
+	whisperMessageLimit: number;
 }
 
 export declare class TwitchPlatform extends Platform {
