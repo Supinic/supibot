@@ -6,6 +6,8 @@ const MessageScheduler = require("../utils/message-scheduler.js");
 // Flag name: EmoteFlagsZeroWidth
 const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
 
+const HELIX_WHISPER_MESSAGE_LIMIT = 5000;
+
 const specialEmoteSetMap = {
 	472873131: "300636018", // Haha emotes
 	488737509: "300819901", // Luv emotes
@@ -561,7 +563,10 @@ module.exports = class TwitchController extends require("./template.js") {
 			await userData.saveProperty("Twitch_ID", helixUserData.id);
 		}
 
-		const trimmedMessage = message.replace(/[\r\n]/g, " ").trim();
+		const trimmedMessage = message
+			.replace(/[\r\n]/g, " ")
+			.trim();
+
 		const response = await sb.Got("Helix", {
 			method: "POST",
 			url: "whispers",
@@ -570,7 +575,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				to_user_id: userData.Twitch_ID
 			},
 			json: {
-				message: trimmedMessage
+				message: sb.Utils.wrapString(trimmedMessage, HELIX_WHISPER_MESSAGE_LIMIT)
 			}
 		});
 
@@ -944,8 +949,8 @@ module.exports = class TwitchController extends require("./template.js") {
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
 			const message = await this.prepareMessage(execution.reply, null, {
 				...commandOptions,
-				extraLength: (`/w ${userData.Name} `).length,
-				skipBanphrases: true
+				skipBanphrases: true,
+				skipLengthCheck: true
 			});
 
 			await this.pm(message, userData.Name);
@@ -1201,17 +1206,6 @@ module.exports = class TwitchController extends require("./template.js") {
 	async fetchUserList (channelIdentifier) {
 		const channelData = sb.Channel.get(channelIdentifier, this.platform);
 		return await getActiveUsernamesInChannel(channelData);
-	}
-
-	async prepareMessage (message, channel, options) {
-		let preparedMessage = await super.prepareMessage(message, channel, options);
-
-		if (channel === null) {
-			const limit = this.platform.Message_Limit - options.extraLength;
-			preparedMessage = sb.Utils.wrapString(preparedMessage, limit);
-		}
-
-		return preparedMessage;
 	}
 
 	async createUserMention (userData) {
