@@ -270,13 +270,6 @@
         "path": "",
         "endpoints": ["rss"],
         "helpers": ["danolifer"]
-      },
-      {
-        "name": "Lrytas.lt",
-        "url": "https://lrytas.lt",
-        "path": "",
-        "endpoints": ["rss"],
-        "helpers": ["danolifer"]
       }
     ]
   },
