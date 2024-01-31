@@ -11,7 +11,10 @@ module.exports = {
 		}
 
 		const lower = code.toLowerCase();
-		return definitions.some(i => i.code === lower || i.alternateCodes?.includes(lower));
+		return definitions.some(i => (
+			(i.code === lower || i.alternateCodes?.includes(lower))
+			&& (i.sources.length > 0)
+		));
 	},
 	fetch: async (code, query) => {
 		if (!code) {
