@@ -5,6 +5,7 @@ module.exports = class GptNexra extends GptMessages {
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
 			throwHttpErrors: false,
+			responseType: "text",
 			url: "https://nexra.aryahcr.cc/api/chat/gpt",
 			json: {
 				model: modelData.url,
@@ -15,6 +16,23 @@ module.exports = class GptNexra extends GptMessages {
 				presence_penalty: 0
 			}
 		});
+
+		let i = 0;
+		const text = response.body;
+		while (text[i] !== "{" || i > text.length) {
+			i++;
+		}
+
+		if (text[i] !== "{") {
+			console.warn({ response, text, i });
+
+			return {
+				success: false,
+				reply: `Nexra API returned an invalid response!`
+			};
+		}
+
+		response.body = JSON.parse(text.slice(i));
 
 		return { response };
 	}
