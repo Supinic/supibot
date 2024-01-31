@@ -681,15 +681,7 @@
   {
     "code": "mn",
     "language": "mongolian",
-    "sources": [
-      {
-        "name": "News.mn",
-        "url": "https://news.mn",
-        "path": null,
-        "endpoints": ["feed"],
-        "helpers": ["supinic"]
-      }
-    ]
+    "sources": []
   },
   {
     "code": "in",
@@ -880,15 +872,7 @@
   {
     "code": "li",
     "language": "German",
-    "sources": [
-      {
-        "name": "Vaterland",
-        "url": "https://www.vaterland.li",
-        "path": "storage/rss/rss/vaterland",
-        "endpoints": ["liechtenstein.xml"],
-        "helpers": ["howtoeat6"]
-      }
-    ]
+    "sources": []
   },
   {
     "code": "sa",
