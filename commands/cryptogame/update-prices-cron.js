@@ -42,7 +42,7 @@ const cryptoGamePriceUpdate = async () => {
 
 	const totalData = {
 		...(cryptoData?.value ?? {}),
-		...(currencyData?.value.rates ?? {})
+		...(currencyData?.value?.rates ?? {})
 	};
 
 	if (goldData.status === "fulfilled") {
