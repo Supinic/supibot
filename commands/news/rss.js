@@ -39,6 +39,9 @@ module.exports = {
 			try {
 				const xml = await sb.Got("GenericAPI", {
 					url,
+					headers: {
+						"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/602.1 (KHTML, like Gecko) QuiteRss/0.19.4 Version/10.0 Safari/602.1"
+					},
 					responseType: "text"
 				}).text();
 
