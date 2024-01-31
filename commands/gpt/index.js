@@ -23,6 +23,7 @@ module.exports = {
 		const GptTemplate = require("./gpt-template.js");
 		const GptMessages = require("./gpt-messages.js");
 		const GptString = require("./gpt-string.js");
+		const GptNexra = require("./gpt-nexra.js");
 
 		const query = args.join(" ").trim();
 		const historyCommandResult = await GptTemplate.handleHistoryCommand(context, query);
@@ -67,9 +68,16 @@ module.exports = {
 			return limitCheckResult;
 		}
 
-		const Handler = (modelData.type === "messages")
-			? GptMessages
-			: GptString;
+		let Handler;
+		if (modelData.type === "messages") {
+			Handler = GptMessages;
+		}
+		else if (modelData.type === "string") {
+			Handler = GptString;
+		}
+		else if (modelData.type === "nexra") {
+			Handler = GptNexra;
+		}
 
 		let executionResult;
 		try {
@@ -140,7 +148,9 @@ module.exports = {
 			await Handler.setHistory(context, query, reply);
 
 			const { outputLimit } = Handler.determineOutputLimit(context, modelData);
-			const emoji = (response.body.usage.completion_tokens >= outputLimit)
+			const completionTokens = Handler.getCompletionTokens(response);
+
+			const emoji = (completionTokens >= outputLimit)
 				? "⏳"
 				: "🤖";
 
@@ -153,6 +163,9 @@ module.exports = {
 
 		if (this.data.isLogTablePresent) {
 			const row = await sb.Query.getRow("data", "ChatGPT_Log");
+			const inputTokens = Handler.getPromptTokens(response);
+			const completionTokens = Handler.getCompletionTokens(response);
+
 			row.setValues({
 				User_Alias: context.user.ID,
 				Channel: context.channel?.ID ?? null,
@@ -162,8 +175,8 @@ module.exports = {
 				Parameters: (Object.keys(context.params).length > 0)
 					? JSON.stringify(context.params)
 					: null,
-				Input_Tokens: response.body.usage.prompt_tokens,
-				Output_Tokens: response.body.usage.completion_tokens ?? 0,
+				Input_Tokens: inputTokens ?? 0,
+				Output_Tokens: completionTokens ?? 0,
 				Rejected: !(moderationResult.success)
 			});
 
@@ -173,6 +186,7 @@ module.exports = {
 		GptMetrics.process({
 			command: this,
 			context,
+			Handler,
 			response,
 			modelData,
 			success: moderationResult.success

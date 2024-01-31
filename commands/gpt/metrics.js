@@ -1,9 +1,7 @@
 const process = (data) => {
-	const { command, context, response, modelData, success } = data;
-	const {
-		prompt_tokens: inputTokens,
-		completion_tokens: outputTokens
-	} = response.body.usage;
+	const { Handler, response, command, context, modelData, success } = data;
+	const inputTokens = Handler.getPromptTokens(response);
+	const outputTokens = Handler.getCompletionTokens(response);
 
 	const labels = {
 		channel: context.channel?.Name ?? "(private)",
@@ -35,9 +33,9 @@ const process = (data) => {
 	outputTokensCounter.inc(labels, outputTokens);
 	usageCounter.inc({ ...labels, success }, 1);
 
-	if (response.headers["openai-processing-ms"]) {
-		const time = Number(response.headers["openai-processing-ms"]);
-		generationHistogram.observe({ model: modelData.name }, time);
+	const processingTime = Handler.getProcessingTime(response);
+	if (processingTime !== null) {
+		generationHistogram.observe({ model: modelData.name }, processingTime);
 	}
 };
 

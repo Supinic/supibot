@@ -92,6 +92,22 @@ module.exports = class GptTemplate {
 		return response.body.usage.total_tokens;
 	}
 
+	static getPromptTokens (response) {
+		return response.body.usage.prompt_tokens;
+	}
+
+	static getCompletionTokens (response) {
+		return response.body.usage.completion_tokens;
+	}
+
+	static getProcessingTime (response) {
+		if (!response.headers["openai-processing-ms"]) {
+			return null;
+		}
+
+		return Number(response.headers["openai-processing-ms"]);
+	}
+
 	static async handleHistoryCommand (context, query) {
 		if (!context.params.history) {
 			return;
