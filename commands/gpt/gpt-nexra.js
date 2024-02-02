@@ -1,7 +1,16 @@
 const GptMessages = require("./gpt-messages.js");
 
+const RESTRICTED_CHANNELS = [30, 37, 38];
+
 module.exports = class GptNexra extends GptMessages {
 	static async execute (context, query, modelData) {
+		if (!RESTRICTED_CHANNELS.includes(context.channel?.ID)) {
+			return {
+				success: false,
+				reply: `Usage of this model is restricted to specific channels!`
+			};
+		}
+
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
 			throwHttpErrors: false,
