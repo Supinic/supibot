@@ -1,8 +1,6 @@
 const GptMessages = require("./gpt-messages.js");
 const GptHistory = require("./history-control.js");
 
-const RESTRICTED_CHANNELS = [30, 37, 38];
-
 module.exports = class GptNexra extends GptMessages {
 	static async getHistory (context) {
 		const { historyMode } = await GptMessages.getHistoryMode(context);
@@ -12,6 +10,13 @@ module.exports = class GptNexra extends GptMessages {
 	}
 
 	static async execute (context, query, modelData) {
+		// !!! TEMPORARY MEASURE !!!
+		const RESTRICTED_CHANNELS = [
+			sb.Channel.get("supinic", "twitch"),
+			sb.Channel.get("pajlada", "twitch"),
+			sb.Channel.get("supibot", "twitch")
+		].map(i => i?.ID).filter(Boolean);
+
 		if (!RESTRICTED_CHANNELS.includes(context.channel?.ID)) {
 			return {
 				success: false,
