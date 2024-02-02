@@ -212,9 +212,13 @@ module.exports = {
 				return `<li><del><b>${capName}</b> (${letter})</del> - model is currently disabled: ${modelData.disableReason ?? "(N/A)"}</li>`;
 			}
 
-			const typeString = `is a <b>${modelData.type}</b> model`;
+			let type = modelData.type;
+			if (type === "nexra") {
+				type = "messages";
+			}
 
 			let priceChangeString = "";
+			const typeString = `is a <b>${type}</b> model`;
 			if (modelData !== defaultModelData) {
 				if (modelData.usageDivisor === 1) {
 					priceChangeString = ` (same price as ${basePriceModel})`;
