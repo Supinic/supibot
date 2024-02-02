@@ -1,8 +1,16 @@
 const GptMessages = require("./gpt-messages.js");
+const GptHistory = require("./history-control.js");
 
 const RESTRICTED_CHANNELS = [30, 37, 38];
 
 module.exports = class GptNexra extends GptMessages {
+	static async getHistory (context) {
+		const { historyMode } = await GptMessages.getHistoryMode(context);
+		return (historyMode === "enabled")
+			? (await GptHistory.get(context.user) ?? [])
+			: [];
+	}
+
 	static async execute (context, query, modelData) {
 		if (!RESTRICTED_CHANNELS.includes(context.channel?.ID)) {
 			return {
@@ -11,12 +19,14 @@ module.exports = class GptNexra extends GptMessages {
 			};
 		}
 
+		const messages = await this.getHistory(context);
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
 			throwHttpErrors: false,
 			responseType: "text",
 			url: "https://nexra.aryahcr.cc/api/chat/gpt",
 			json: {
+				messages,
 				model: modelData.url,
 				prompt: query,
 				markdown: false,
@@ -33,8 +43,6 @@ module.exports = class GptNexra extends GptMessages {
 		}
 
 		if (text[i] !== "{") {
-			console.warn({ response, text, i });
-
 			return {
 				success: false,
 				reply: `Nexra API returned an invalid response!`
