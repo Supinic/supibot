@@ -30,7 +30,7 @@
         "default": 100,
         "maximum": 500
       },
-      "usageDivisor": 0.4
+      "usageDivisor": 2.5
     },
     "base-davinci": {
       "url": "davinci-002",
@@ -41,10 +41,10 @@
         "default": 100,
         "maximum": 500
       },
-      "usageDivisor": 2
+      "usageDivisor": 0.5
     },
     "turbo": {
-      "url": "gpt-3.5-turbo-1106",
+      "url": "gpt-3.5-turbo-0125",
       "type": "messages",
       "default": true,
       "inputLimit": 1500,
@@ -54,16 +54,17 @@
       },
       "usageDivisor": 1
     },
-    "tester": {
+    "nexra-4": {
       "url": "gpt-4-32k",
       "type": "nexra",
-      "default": true,
-      "inputLimit": 1500,
+      "experimental": true,
+      "default": false,
+      "inputLimit": 5000,
       "outputLimit": {
-        "default": 100,
-        "maximum": 500
+        "default": 5000,
+        "maximum": 5000
       },
-      "usageDivisor": 1
+      "usageDivisor": 10
     },
     "4": {
       "url": "gpt-4-1106-preview",
