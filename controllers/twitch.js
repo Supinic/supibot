@@ -264,7 +264,7 @@ module.exports = class TwitchController extends require("./template.js") {
 						if (recipient) {
 							await this.pm(`Couldn't post reminder: ${messageText}`, recipient[1]);
 
-							defaultReply = sb.Utils.tag.trim`
+							defaultReply = sb.Utils.tag.trim `
 								@${recipient[1].replace(/^@/, "")},
 								a reminder you would have received violated this channel's moderation settings.
 								You can check your whispers, or head to https://supinic.com/bot/reminder/history 
@@ -722,7 +722,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				}
 
 				const { challenge } = await TwitchController.createAccountChallenge(userData, senderUserID);
-				const message = sb.Utils.tag.trim`
+				const message = sb.Utils.tag.trim `
 					You were found to be likely to own a Discord account with the same name as your current Twitch account.
 					If you want to use my commands on Twitch, whisper me the following command on Discord:
 					${sb.Command.prefix}link ${challenge}
@@ -744,7 +744,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			if (!channelName || (channelData && sb.Command.is(message))) {
 				const notified = await userData.getDataProperty("twitch-userid-mismatch-notification");
 				if (!notified) {
-					const message = sb.Utils.tag.trim`
+					const message = sb.Utils.tag.trim `
 						@${userData.Name}, you have been flagged as suspicious.
 						This is because I have seen your Twitch username on a different account before.
 						This is usually caused by renaming into an account that existed before.
