@@ -90,13 +90,20 @@
 	console.log("Loading database credentials & query builder...");
 	try {
 		eval(accessFileString);
-		globalThis.sb = await require("supi-core")({
-			whitelist: [
-				"objects/date",
-				"objects/error",
-				"singletons/query"
-			]
+
+		const core = await import("supi-core");
+		const Query = new core.Query({
+			user: process.env.MARIA_USER,
+			password: process.env.MARIA_PASSWORD,
+			host: process.env.MARIA_HOST,
+			connectionLimit: process.env.MARIA_CONNECTION_LIMIT
 		});
+
+		globalThis.sb = {
+			Date: core.Date,
+			Error: core.Error,
+			Query
+		};
 	}
 	catch (e) {
 		console.error("Credentials/query builder load failed, aborting...", e);
