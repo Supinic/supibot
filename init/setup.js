@@ -236,7 +236,8 @@
 				});
 
 				await channelRow.save({
-					ignore: true
+					ignore: true,
+					skipLoad: true
 				});
 
 				console.log(`Bot will now join ${platform} in channel ${channelName}.`);
