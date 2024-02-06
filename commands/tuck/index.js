@@ -111,7 +111,7 @@ module.exports = {
 			}
 
 			case "truck": {
-				const kkonaEmote = await context.channel.getBestAvailableEmote(["KKoooona", "KKonaW", "KKona"], "🤠");
+				const kkonaEmote = await context.getBestAvailableEmote(["KKoooona", "KKonaW", "KKona"], "🤠");
 				if (checkUser === context.user.Name) {
 					return {
 						reply: `The truck ran you over ${kkonaEmote}`
