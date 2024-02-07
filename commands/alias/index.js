@@ -1209,16 +1209,19 @@ module.exports = {
 
 				/** @type {EligibleAlias} */
 				let alias;
+				const who = (user === context.user) ? "You" : "They";
 				if (eligibleAliases.length <= 1) {
 					alias = eligibleAliases[0];
+
+					if (type === "try" && alias.User_Alias !== user.ID) {
+						return {
+							success: false,
+							reply: `${who} don't have the "${name}" alias!`
+						};
+					}
 				}
 				else {
-					alias = eligibleAliases.find(i => i.User_Alias === user.ID);
-				}
-
-				// Only attempt to look up channel-published aliases if `$alias run` is used, not `$alias try`
-				if (!alias && type === "run") {
-					alias = eligibleAliases.find(i => i.Channel === context.channel?.ID);
+					alias = eligibleAliases.find(i => i.User_Alias === user.ID) ?? eligibleAliases.find(i => i.Channel === context.channel?.ID);
 				}
 
 				if (!alias) {
@@ -1229,7 +1232,6 @@ module.exports = {
 						};
 					}
 
-					const who = (user === context.user) ? "You" : "They";
 					return {
 						success: false,
 						reply: `${who} don't have the "${name}" alias!`
