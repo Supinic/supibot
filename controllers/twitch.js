@@ -31,6 +31,18 @@ const emoteGot = sb.Got.get("Global")
 	});
 
 const emitRawUserMessageEvent = (username, channelName, message, messageData = {}) => {
+	if (!username || !channelName) {
+		throw new sb.Error({
+			message: "No username or channel name provided for raw event",
+			args: {
+				username,
+				channelName,
+				message,
+				messageData
+			}
+		});
+	}
+
 	const channelData = sb.Channel.get(channelName, sb.Platform.get("twitch"));
 	if (channelData) {
 		channelData.events.emit("message", {
