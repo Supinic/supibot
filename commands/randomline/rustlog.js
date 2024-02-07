@@ -61,6 +61,13 @@ const getRandomChannelLine = async function (channelID) {
 	}
 
 	const [message] = response.body.messages;
+	if (!message) {
+		return {
+			success: false,
+			reply: `Couldn't fetch a random line! Try again in a little bit.`
+		};
+	}
+	
 	return {
 		success: true,
 		date: new sb.Date(message.timestamp),
