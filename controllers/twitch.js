@@ -262,12 +262,10 @@ module.exports = class TwitchController extends require("./template.js") {
 					if (/reminders? from/i.test(messageText)) {
 						const recipient = messageText.match(/(.*), reminders? from/);
 						if (recipient) {
-							await this.pm(`Couldn't post reminder: ${messageText}`, recipient[1]);
-
 							defaultReply = sb.Utils.tag.trim `
 								@${recipient[1].replace(/^@/, "")},
-								a reminder you would have received violated this channel's moderation settings.
-								You can check your whispers, or head to https://supinic.com/bot/reminder/history 
+								a reminder you would have just received violates this channel's moderation settings.
+								Check your whispers, or head to https://supinic.com/bot/reminder/history 
 							`;
 						}
 						else {
