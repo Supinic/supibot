@@ -1213,7 +1213,12 @@ module.exports = {
 					alias = eligibleAliases[0];
 				}
 				else {
-					alias = eligibleAliases.find(i => i.User_Alias === user.ID) ?? eligibleAliases.find(i => i.Channel === context.channel?.ID);
+					alias = eligibleAliases.find(i => i.User_Alias === user.ID);
+				}
+
+				// Only attempt to look up channel-published aliases if `$alias run` is used, not `$alias try`
+				if (!alias && type === "run") {
+					alias = eligibleAliases.find(i => i.Channel === context.channel?.ID);
 				}
 
 				if (!alias) {
