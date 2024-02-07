@@ -136,7 +136,11 @@ module.exports = class Filter extends require("./template.js") {
 		}
 
 		throw new sb.Error({
-			message: "Invalid combination of input data and filter type"
+			message: "Invalid combination of input data and filter type",
+			args: {
+				filterType: this.Type,
+				inputData: data
+			}
 		});
 	}
 
