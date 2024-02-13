@@ -1213,7 +1213,7 @@ module.exports = {
 				if (eligibleAliases.length <= 1) {
 					alias = eligibleAliases[0];
 
-					if (type === "try" && alias.User_Alias !== user.ID) {
+					if (alias && type === "try" && alias.User_Alias !== user.ID) {
 						return {
 							success: false,
 							reply: `${who} don't have the "${name}" alias!`
