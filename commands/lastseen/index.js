@@ -24,7 +24,8 @@ module.exports = {
 				reply: "User not found in the database!"
 			};
 		}
-		else if (targetUser.ID === context.user.ID) {
+		else if (targetUser.ID === context.user.ID && context.channel) {
+			// Only post the "easter egg" message if used on the executing user in a channel chat
 			const emote = await context.randomEmote("PepeLaugh", "pepeLaugh", "LULW", "LuL", "😆");
 			return {
 				success: false,
@@ -60,8 +61,12 @@ module.exports = {
 			};
 		}
 
+		const who = (context.user === targetUser)
+			? "You were"
+			: "That user was";
+
 		return {
-			reply: `That user was last seen in chat ${sb.Utils.timeDelta(date)}.`
+			reply: `${who} last seen in chat ${sb.Utils.timeDelta(date)}.`
 		};
 	}),
 	Dynamic_Description: null

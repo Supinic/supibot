@@ -24,7 +24,8 @@ module.exports = {
 				reply: "User not found in the database!"
 			};
 		}
-		else if (targetUser.ID === context.user.ID) {
+		else if (targetUser.ID === context.user.ID && context.channel) {
+			// Only post the "easter egg" message if used on the executing user in a channel chat
 			const emote = await context.getBestAvailableEmote(["forsen1"], "👀");
 			return {
 				success: false,
@@ -96,14 +97,18 @@ module.exports = {
 			}
 		}
 
+		const who = (context.user === targetUser)
+			? "You were"
+			: "That user was";
+
 		return {
 			meta: {
 				skipWhitespaceCheck: true
 			},
 			reply: sb.Utils.tag.trim `
-				That user was last seen in chat ${delta}, 
+				${who} last seen in chat ${delta}, 
 				(${stalkChannelData.getFullName()})
-				their last message:
+				last message:
 				${stalkData.Text}
 			`
 		};
