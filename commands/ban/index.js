@@ -425,7 +425,7 @@ module.exports = {
 			"",
 
 			`<code>${prefix}ban type:cooldown multiplier:(number) (...)</code>`,
-			"Creates a cooldown modifiying filter - will multiply the original cooldown of any provided combination of command/user/channel by a constant.",
+			"Creates a cooldown modifying filter - will multiply the original cooldown of any provided combination of command/user/channel by a constant.",
 			"The number provided must always be above 1.0 - as to not go below the intended cooldowns.",
 			"",
 

@@ -168,7 +168,7 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async (prefix) => [
-		`Checks the currently playinyg song on Supinic's channel/stream`,
+		`Checks the currently playing song on Supinic's channel/stream`,
 		``,
 
 		`<code>${prefix}song</code>`,

@@ -60,7 +60,7 @@ const execute = async (context, operation) => {
 			await saveData(context, fishData);
 
 			return {
-				reply: `You have succesfully retrieved your traps before they filled up. You don't get any junk or fish.`
+				reply: `You have successfully retrieved your traps before they filled up. You don't get any junk or fish.`
 			};
 		}
 		else {
@@ -147,7 +147,7 @@ const execute = async (context, operation) => {
 			success: false,
 			reply: sb.Utils.tag.trim `
 				Your traps are not fully loaded yet! They will be ready to harvest ${delta}.
-				If you wish to get rid of them immediately, use "$fish trap cancel", 
+				If you wish to get rid of them immediately, use "$fish trap cancel",
 				but you will not get any catch from your traps.
 			`
 		};

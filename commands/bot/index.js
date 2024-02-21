@@ -26,7 +26,7 @@ module.exports = {
 	Aliases: null,
 	Author: "supinic",
 	Cooldown: 2500,
-	Description: "Allows channel owners and Supibot ambadssadors to set various parameters for the bot, for their managed channel.",
+	Description: "Allows channel owners and Supibot ambassadors to set various parameters for the bot, for their managed channel.",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: [
 		{ name: "channel", type: "string" },
@@ -273,7 +273,7 @@ module.exports = {
 					await channelData.saveProperty("Mode", offlineConfiguration.mode ?? "Write");
 
 					return {
-						reply: sb.Utils.tag.trim ` 
+						reply: sb.Utils.tag.trim `
 							I rejoined ${channelString} immediately.
 							It was in read-only mode because someone used "$bot disable" before.
 							Next time, you can just do "$bot enable".
@@ -488,7 +488,7 @@ module.exports = {
 				if (success) {
 					return {
 						reply: sb.Utils.tag.trim `
-							Successfully added this channel to the Rustlog service! 
+							Successfully added this channel to the Rustlog service!
 							The $rl command should be enabled within approximately one minute.
 						`
 					};
@@ -508,7 +508,7 @@ module.exports = {
 				else {
 					return {
 						success: false,
-						reply: `Unexpected error ocurred! Try again later. Status code: ${statusCode}`
+						reply: `Unexpected error occurred! Try again later. Status code: ${statusCode}`
 					};
 				}
 			}
@@ -542,7 +542,7 @@ module.exports = {
 			`<code>${prefix}bot offline-only</code>`,
 			`<code>${prefix}bot disable-offline-only</code>`,
 			`<code>${prefix}bot offline-only channel:(name)</code>`,
-			"Activates (or deactives, if used with disable-) the offline-only mode, which will make Supibot unresponsive in the channel when the streamer goes live.",
+			"Activates (or deactivates, if used with disable-) the offline-only mode, which will make Supibot unresponsive in the channel when the streamer goes live.",
 			"After the stream ends, Supibot will automatically reactivate. There might be delay up to 2 minutes for both online/offline events.",
 			"Note: The stream must go online/offline for this mode to activate. If it is already live, Supibot won't deactivate until it goes live again in the future.",
 			"",
