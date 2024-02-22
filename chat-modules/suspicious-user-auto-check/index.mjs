@@ -71,11 +71,12 @@ export const definition = {
 		await row.save({ skipLoad: true });
 
 		const resultMessage = sb.Utils.tag.trim `
-			Hey @${raw.user}, I'd like to verify whether @${data.login} is either: 
-			another account,
-			or a previous name that you have used in the past.
-			Can you confirm this for me?
-			(@Supinic has been notified)
+			Hey @${raw.user},
+			I'd like to verify whether @${data.login} is 
+			a different account/name that you used in the past,
+			or someone else that's not you.
+			Let me know with "me" or "not me".
+			@Supinic has to fix this manually, please allow for some time :)
 		`;
 
 		await channel.send(resultMessage);
