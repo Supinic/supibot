@@ -78,6 +78,13 @@ module.exports = {
 		else if (modelData.type === "nexra") {
 			Handler = GptNexra;
 		}
+		
+		if (!Handler.isAvailable()) {
+			return {
+				success: false,
+				reply: `This model is not currently available! This is most likely due to incorrect configuration.`
+			};
+		}
 
 		let executionResult;
 		try {

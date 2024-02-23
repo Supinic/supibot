@@ -53,6 +53,7 @@ module.exports = class GptNexra extends GptMessages {
 	static getCompletionTokens () { return 0; }
 	static getPromptTokens () { return 0; }
 	static getProcessingTime () { return null; }
+	static isAvailable () { return true; }
 
 	static setHistory () {}
 };

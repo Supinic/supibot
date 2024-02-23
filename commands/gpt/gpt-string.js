@@ -41,6 +41,10 @@ module.exports = class GptString extends Template {
 		return { response };
 	}
 
+	static isAvailable () {
+		return sb.Config.has("API_OPENAI_KEY", true);
+	}
+
 	static extractMessage (response) {
 		return response.body.choices[0].text.trim();
 	}

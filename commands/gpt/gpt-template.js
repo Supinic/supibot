@@ -108,6 +108,8 @@ module.exports = class GptTemplate {
 		return Number(response.headers["openai-processing-ms"]);
 	}
 
+	static isAvailable () {}
+
 	static async handleHistoryCommand (context, query) {
 		if (!context.params.history) {
 			return;

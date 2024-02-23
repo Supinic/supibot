@@ -109,6 +109,10 @@ module.exports = class GptMessages extends Template {
 		return response.body.choices[0].message.content.trim();
 	}
 
+	static isAvailable () {
+		return sb.Config.has("API_OPENAI_KEY", true);
+	}
+
 	static async setHistory (context, query, reply) {
 		const { historyMode } = await GptMessages.getHistoryMode(context);
 		if (historyMode === "enabled") {
