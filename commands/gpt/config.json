@@ -57,7 +57,6 @@
     "nexra-4": {
       "url": "gpt-4-32k",
       "type": "nexra",
-      "experimental": true,
       "default": false,
       "inputLimit": 5000,
       "outputLimit": {

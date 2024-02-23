@@ -10,20 +10,6 @@ module.exports = class GptNexra extends GptMessages {
 	}
 
 	static async execute (context, query, modelData) {
-		// !!! TEMPORARY MEASURE !!!
-		const RESTRICTED_CHANNELS = [
-			sb.Channel.get("supinic", "twitch"),
-			sb.Channel.get("pajlada", "twitch"),
-			sb.Channel.get("supibot", "twitch")
-		].map(i => i?.ID).filter(Boolean);
-
-		if (!RESTRICTED_CHANNELS.includes(context.channel?.ID)) {
-			return {
-				success: false,
-				reply: `Usage of this model is restricted to specific channels!`
-			};
-		}
-
 		const messages = await this.getHistory(context);
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
