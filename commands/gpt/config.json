@@ -75,6 +75,39 @@
         "maximum": 250
       },
       "usageDivisor": 0.2
+    },
+    "mixtral": {
+      "url": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+      "type": "deepinfra",
+      "default": false,
+      "inputLimit": 2500,
+      "outputLimit": {
+        "default": 500,
+        "maximum": 1000
+      },
+      "usageDivisor": 10
+    },
+    "mistral": {
+      "url": "mistralai/Mistral-7B-Instruct-v0.1",
+      "type": "deepinfra",
+      "default": false,
+      "inputLimit": 2500,
+      "outputLimit": {
+        "default": 500,
+        "maximum": 1000
+      },
+      "usageDivisor": 10
+    },
+    "llama": {
+      "url": "codellama/CodeLlama-70b-Instruct-hf",
+      "type": "deepinfra",
+      "default": false,
+      "inputLimit": 2500,
+      "outputLimit": {
+        "default": 500,
+        "maximum": 1000
+      },
+      "usageDivisor": 10
     }
   }
 }
