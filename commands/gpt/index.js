@@ -7,11 +7,13 @@ const GptTemplate = require("./gpt-template.js");
 const GptMessages = require("./gpt-messages.js");
 const GptString = require("./gpt-string.js");
 const GptNexra = require("./gpt-nexra.js");
+const GptDeepInfra = require("./gpt-deepinfra.js");
 
 const handlerMap = {
 	messages: GptMessages,
 	string: GptString,
-	nexra: GptNexra
+	nexra: GptNexra,
+	deepinfra: GptDeepInfra
 };
 
 module.exports = {
@@ -31,7 +33,6 @@ module.exports = {
 	Whitelist_Response: "Currently only available in these channels for testing: @pajlada @Supinic @Supibot",
 	Static_Data: null,
 	Code: (async function chatGPT (context, ...args) {
-
 		const query = args.join(" ").trim();
 		const historyCommandResult = await GptTemplate.handleHistoryCommand(context, query);
 		if (historyCommandResult) {
@@ -76,7 +77,13 @@ module.exports = {
 		}
 
 		const Handler = handlerMap[modelData.type];
-		if (!Handler.isAvailable()) {
+		if (!Handler) {
+			return {
+				success: false,
+				reply: `No GPT handler found for type ${modelData.type}! Ensure the configuration is correct.`
+			};
+		}
+		else if (!Handler.isAvailable()) {
 			return {
 				success: false,
 				reply: `This model is not currently available! This is most likely due to incorrect configuration.`
