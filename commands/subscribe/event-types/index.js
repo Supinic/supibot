@@ -4,6 +4,7 @@ const eventTypeFileList = [
 	"channel-live",
 	"deno",
 	"dotnet",
+	"factorio",
 	"ggg",
 	"msvcpp",
 	"nodejs",
