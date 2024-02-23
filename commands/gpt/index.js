@@ -1,3 +1,19 @@
+const GptCache = require("./cache-control.js");
+const GptConfig = require("./config.json");
+const GptMetrics = require("./metrics.js");
+const GptModeration = require("./moderation.js");
+
+const GptTemplate = require("./gpt-template.js");
+const GptMessages = require("./gpt-messages.js");
+const GptString = require("./gpt-string.js");
+const GptNexra = require("./gpt-nexra.js");
+
+const handlerMap = {
+	messages: GptMessages,
+	string: GptString,
+	nexra: GptNexra
+};
+
 module.exports = {
 	Name: "gpt",
 	Aliases: ["chatgpt"],
@@ -15,15 +31,6 @@ module.exports = {
 	Whitelist_Response: "Currently only available in these channels for testing: @pajlada @Supinic @Supibot",
 	Static_Data: null,
 	Code: (async function chatGPT (context, ...args) {
-		const GptCache = require("./cache-control.js");
-		const GptConfig = require("./config.json");
-		const GptMetrics = require("./metrics.js");
-		const GptModeration = require("./moderation.js");
-
-		const GptTemplate = require("./gpt-template.js");
-		const GptMessages = require("./gpt-messages.js");
-		const GptString = require("./gpt-string.js");
-		const GptNexra = require("./gpt-nexra.js");
 
 		const query = args.join(" ").trim();
 		const historyCommandResult = await GptTemplate.handleHistoryCommand(context, query);
@@ -68,17 +75,7 @@ module.exports = {
 			return limitCheckResult;
 		}
 
-		let Handler;
-		if (modelData.type === "messages") {
-			Handler = GptMessages;
-		}
-		else if (modelData.type === "string") {
-			Handler = GptString;
-		}
-		else if (modelData.type === "nexra") {
-			Handler = GptNexra;
-		}
-		
+		const Handler = handlerMap[modelData.type];
 		if (!Handler.isAvailable()) {
 			return {
 				success: false,
