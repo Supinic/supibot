@@ -12,8 +12,8 @@ const { checkLimits } = require("../../gpt/cache-control.js");
 const gptStyles = ["exciting", "spooky", "smug", "radical", "mysterious", "hilarious", "enchanting", "touching", "intriguing"];
 const createGptPrompt = (executor, resultFish, sizeString) => sb.Utils.tag.trim `
 	Write a short, ${sb.Utils.randArray(gptStyles)} fishing story
-	abpout a user named "${executor}"
-	who catches a ${resultFish} in the water and keeps it! 
+	about a user named "${executor}"
+	who catches a ${resultFish} in the water and keeps it!
 	${sizeString}
 	Make it very concise - a maximum of 150 characters.
 `;
@@ -108,7 +108,7 @@ module.exports = {
 					replyWithPrivateMessage: whisperOnFailure,
 					reply: sb.Utils.tag.trim `
 						You cannot go fishing while your traps are laid out - you would be disturbing the catch!
-						If you wish to get rid of the traps immediately, use "$fish trap cancel", 
+						If you wish to get rid of the traps immediately, use "$fish trap cancel",
 						but you will not get any catch from them.
 					`
 				};

@@ -62,7 +62,7 @@ module.exports = {
 
 		return [
 			"Posts entire emote sets on Twitch and stuff.",
-			"Useful to see if you are missing any of given emotes, or just for convience and/or novelty",
+			"Useful to see if you are missing any of given emotes, or just for convenience and/or novelty",
 			"",
 
 			`<code>${prefix}emotecheck (set name)</code>`,

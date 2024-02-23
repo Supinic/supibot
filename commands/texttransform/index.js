@@ -100,7 +100,7 @@ module.exports = {
 
 		return [
 			"Transforms some given text to different styles, according to the transform type provided.",
-			"Each type, and their aliases listed below, along with an example.",
+			"Each type and their aliases are listed below, along with an example.",
 			"",
 
 			`Note: if used within the <a href="/bot/command/detail/pipe">pipe command</a>, this command has no cooldown, and you can use it multiple times within the same pipe!`,

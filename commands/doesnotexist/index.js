@@ -105,7 +105,7 @@ module.exports = {
 						if (statusCode !== 200) {
 							return {
 								success: false,
-								reply: `Could not upload the image to either Imgur! Errors: ${statusCode}`
+								reply: `Could not upload the image to Imgur! Errors: ${statusCode}`
 							};
 						}
 

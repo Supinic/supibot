@@ -147,7 +147,7 @@ module.exports = {
 				if (alias && (type === "add" || type === "create")) {
 					return {
 						success: false,
-						reply: `Cannot ${type} alias "${name}" - you already have one! You can either "edit" its definion, "rename" it or "remove" it.`
+						reply: `Cannot ${type} alias "${name}" - you already have one! You can either "edit" its definition, "rename" it or "remove" it.`
 					};
 				}
 
@@ -246,7 +246,7 @@ module.exports = {
 						const escapedString = encodeURIComponent(firstName);
 						return {
 							reply: sb.Utils.tag.trim `
-								Special case! 
+								Special case!
 								Your alias "${firstName}": https://supinic.com/bot/user/${username}/alias/detail/${escapedString}
 								List of ${firstName}'s aliases: https://supinic.com/bot/user/${escapedString}/alias/list
 							`
@@ -1387,7 +1387,7 @@ module.exports = {
 		"",
 
 		`<h5>What's an alias?</h5>`,
-		`An alias is a word that lets you quickly use a command without typing the entirity of it.`,
+		`An alias is a word that lets you quickly use a command without typing the entirety of it.`,
 		`E.g.: You don't want to type <code>${prefix}weather New York, USA</code> every time, so you create an alias called <code>ny</code>.`,
 		`Then, you can simply use the alias like so: <code>${prefix}$ ny</code>`,
 		"",

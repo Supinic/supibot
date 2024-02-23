@@ -174,9 +174,9 @@ module.exports = {
 				const result = await createConvertTransaction(portfolioData, sourceAsset, targetAsset, sourceAmount);
 				return {
 					reply: sb.Utils.tag.trim `
-						You successfully traded 
-						${result.sourceAmount} ${sourceAsset.Code} 
-						for 
+						You successfully traded
+						${result.sourceAmount} ${sourceAsset.Code}
+						for
 						${result.targetAmount} ${targetAsset.Code}.
 					`
 				};
@@ -305,7 +305,7 @@ module.exports = {
 		`<code>${prefix}cg total (user)</code>`,
 		`<code>${prefix}cg rank</code>`,
 		`<code>${prefix}cg rank (user)</code>`,
-		`Shows the total converted cost of your (or a different users's) portfolio in euros, your/their rank and the list of their currencies.`,
+		`Shows the total converted cost of your (or a different user's) portfolio in euros, your/their rank and the list of their currencies.`,
 		"",
 
 		`<code>${prefix}cg assets</code>`,
