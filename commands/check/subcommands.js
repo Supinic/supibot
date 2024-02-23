@@ -136,73 +136,25 @@ module.exports = (command) => [
 				const startDate = new sb.Date(new sb.Date().setDate(1));
 				const endDate = new sb.Date(startDate.year, startDate.month + 1, 1);
 
-				const spendingPromise = sb.Got("GenericAPI", {
-					method: "GET",
-					url: `https://api.openai.com/dashboard/billing/usage`,
-					searchParams: {
-						start_date: startDate.format("Y-m-d"),
-						end_date: endDate.format("Y-m-d")
-					},
-					headers: {
-						Authorization: `Bearer ${sb.Config.get("API_OPENAI_SESSION_KEY")}`
-					}
-				});
-
-				const limitPromise = sb.Got("GenericAPI", {
-					method: "GET",
-					url: `https://api.openai.com/dashboard/billing/subscription`,
-					headers: {
-						Authorization: `Bearer ${sb.Config.get("API_OPENAI_SESSION_KEY")}`
-					}
-				});
-
-				const tokenDbPromise = await sb.Query.getRecordset(rs => rs
+				const tokenResponse = await sb.Query.getRecordset(rs => rs
 					.select("COUNT(*) AS Count", "SUM(Input_Tokens) AS Input", "SUM(Output_Tokens) AS Output")
 					.from("data", "ChatGPT_Log")
 					.where("Executed >= %d AND Executed <= %d", startDate, endDate)
 					.single()
 				);
 
-				const [tokenResponse, spendingResponse, limitResponse] = await Promise.all([
-					tokenDbPromise,
-					spendingPromise,
-					limitPromise
-				]);
-
 				const requests = tokenResponse.Count;
 				const inputTokens = tokenResponse.Input;
 				const outputTokens = tokenResponse.Output;
 
-				// The `total_usage` field signifies the API cost in USD cents, so a division is necessary.
-				const total = sb.Utils.round(spendingResponse.body.total_usage / 100 , 2);
 				const prettyMonthName = new sb.Date().format("F Y");
-
-				let totalString = `for a total expenditure of ${total} USD`;
-				let limitExceededString = "";
-
-				if (total === 0) {
-					totalString = "but the expenditure for this month is currently unknown";
-				}
-				else if (limitResponse.ok) {
-					const limit = sb.Utils.round(limitResponse.body.hard_limit_usd, 0);
-					totalString = `for a total expenditure of ${total} / ${limit} USD`;
-
-					if (total >= limit) {
-						const { year, month } = new sb.Date();
-						const nextMonthDate = new sb.Date(year, month + 1, 1).discardTimeUnits("h", "m", "s", "ms");
-						const nextMonthName = nextMonthDate.format("F Y");
-						const nextMonthDelta = sb.Utils.timeDelta(nextMonthDate);
-
-						limitExceededString = `The limit for this month has been exceeded, try again in ${nextMonthName}, which begins ${nextMonthDelta}.`;
-					}
-				}
-
 				return {
 					reply: sb.Utils.tag.trim `
-						So far, there have been ${sb.Utils.groupDigits(requests)} ChatGPT requests in ${prettyMonthName}. 
-						${sb.Utils.groupDigits(inputTokens)} input and ${sb.Utils.groupDigits(outputTokens)} output tokens have been processed,
-						${totalString}.
-						${limitExceededString}
+						There have been ${sb.Utils.groupDigits(requests)} 
+						ChatGPT requests in ${prettyMonthName} so far. 
+						${sb.Utils.groupDigits(inputTokens)} input
+						and ${sb.Utils.groupDigits(outputTokens)} output tokens
+						have been processed.
 					`
 				};
 			}
