@@ -167,7 +167,7 @@ module.exports = {
 				Platform: context.platform.ID,
 				Channel: context.channel?.ID ?? null,
 				Type: event.name,
-				Flags: flags,
+				Flags: JSON.stringify(flags),
 				Active: true
 			});
 
