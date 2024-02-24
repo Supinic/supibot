@@ -36,7 +36,7 @@ export const definition = {
 		latestID = Math.max(...data.map(i => i.ID));
 
 		const subscriptions = await sb.Query.getRecordset(rs => rs
-			.select("User_Alias", "Platform")
+			.select("User_Alias", "Platform", "Flags")
 			.from("data", "Event_Subscription")
 			.where("Type = %s", "Changelog")
 			.where("Active = %b", true)
@@ -71,15 +71,22 @@ export const definition = {
 			}
 
 			for (const sub of subscriptions) {
-				await sb.Reminder.create({
-					Channel: null,
-					User_From: 1127,
-					User_To: sub.User_Alias,
-					Text: message,
-					Schedule: null,
-					Private_Message: true,
-					Platform: sub.Platform ?? 1
-				}, true);
+				const flags = JSON.parse(sub.Flags ?? "{}");
+				if (flags.skipPrivateReminder === true) {
+					const platform = sb.Platform.get(sub.Platform ?? 1);
+					await platform.send(message, sub.User_Alias);
+				}
+				else {
+					await sb.Reminder.create({
+						Channel: null,
+						User_From: 1127,
+						User_To: sub.User_Alias,
+						Text: message,
+						Schedule: null,
+						Private_Message: true,
+						Platform: sub.Platform ?? 1
+					}, true);
+				}
 			}
 		}
 
