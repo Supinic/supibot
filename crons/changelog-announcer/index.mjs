@@ -33,6 +33,8 @@ export const definition = {
 			return;
 		}
 
+		latestID = Math.max(...data.map(i => i.ID));
+
 		const subscriptions = await sb.Query.getRecordset(rs => rs
 			.select("User_Alias", "Platform")
 			.from("data", "Event_Subscription")
@@ -110,7 +112,5 @@ export const definition = {
 				embeds: [embed]
 			});
 		}
-
-		latestID = Math.max(...data.map(i => i.ID));
 	})
 };
