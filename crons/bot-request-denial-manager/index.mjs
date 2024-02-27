@@ -26,6 +26,10 @@ export const definition = {
 			}
 		}
 
+		if (trackedRequestIDs.size === 0) {
+			return;
+		}
+
 		const resolvedRequests = await sb.Query.getRecordset(rs => rs
 			.select("Suggestion.ID", "Suggestion.Status")
 			.select("User_Alias.Name AS Username")
