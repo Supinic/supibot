@@ -37,7 +37,6 @@ The directory can contain more files such as JSON data, modules or tests.
         - `developer` Is not shown on the website command list, unless the logged in user is flagged as a developer.
         - `mention` Will mention users upon successful invocation.
         - `opt-out` It is possible to use the [`optout`](commands/optout/index.js)` command to stop all users from executing this command on them.
-        - `owner-override` If the command is used by the channel owner, then the cooldown will be reduced to 500ms.
         - `pipe` This command can be use in the [`pipe`](commands/pipe/index.js)` meta-command.
         - `read-only` Command has no response, and as such will set no cooldowns.
         - `rollback` A transaction will be provided to the command, and it will automatically commit or rollback based on if it succeeds or not.

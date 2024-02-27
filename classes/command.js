@@ -935,11 +935,7 @@ class Command extends require("./template.js") {
 		// Take care of private messages, where channel === null
 		const channelID = channelData?.ID ?? Command.#privateMessageChannelID;
 
-		if (commandData.Flags.ownerOverride && channelData?.isUserChannelOwner(userData)) {
-			// Set a very small, only technical cooldown
-			Command.#cooldownManager.set(channelID, userData.ID, commandData.Name, 500);
-		}
-		else if (typeof cooldownData !== "undefined") {
+		if (typeof cooldownData !== "undefined") {
 			if (cooldownData !== null) {
 				if (!Array.isArray(cooldownData)) {
 					cooldownData = [cooldownData];

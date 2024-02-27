@@ -8,7 +8,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Sets/unsets certain variables within Supibot. Check the extended help for full info.",
-	Flags: ["mention","owner-override","pipe"],
+	Flags: ["mention","pipe"],
 	Params: [
 		{ name: "from", type: "string" }
 	],

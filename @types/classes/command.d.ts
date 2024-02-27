@@ -86,7 +86,6 @@ export declare interface FlagsObject extends GenericFlagsObject {
     optOut: boolean;
     skipBanphrase: boolean;
     block: boolean;
-    ownerOverride: boolean;
     readOnly: boolean;
     whitelist: boolean;
     pipe: boolean;
@@ -106,7 +105,6 @@ export declare interface FlagsObject extends GenericFlagsObject {
      * @property {boolean} block If true, any user can "block" another user from targetting them with this command.
      * If done, the specified user will not be able to use their username as the command parameter.
      * Similar to optOut, but not global, and only applies to one user.
-     * @property {boolean} ownerOverride If true, the command's cooldown will be vastly reduced when a user invokes it in their own channel.
      * @property {boolean} readOnly If true, command is guaranteed to not reply, and as such, no banphrases, cooldowns or pings are checked.
      * @property {boolean} whitelist If true, command is only accessible to certain users or channels, or their combination.
      * @property {boolean} pipe If true, the command can be used as a part of the "pipe" command.
