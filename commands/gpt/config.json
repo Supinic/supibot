@@ -46,7 +46,7 @@
     "turbo": {
       "url": "gpt-3.5-turbo-0125",
       "type": "messages",
-      "default": true,
+      "default": false,
       "inputLimit": 1500,
       "outputLimit": {
         "default": 100,
@@ -57,7 +57,7 @@
     "nexra-4": {
       "url": "gpt-4-32k",
       "type": "nexra",
-      "default": false,
+      "default": true,
       "inputLimit": 5000,
       "outputLimit": {
         "default": 5000,
