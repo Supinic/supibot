@@ -45,7 +45,7 @@ const fetchSubscriptionUsers = async function (subType, lastSeenThreshold = 36e5
 		}
 
 		const flags = JSON.parse(user.Flags ?? "{}");
-		return (flags.private === false);
+		return (flags.skipPrivateReminder === true);
 	});
 
 	return {
