@@ -14,6 +14,8 @@ const Logger = require("./singletons/logger.js");
 const Pastebin = require("./singletons/pastebin.js");
 const VLCConnector = require("./singletons/vlc-connector.js");
 
+const Connector = require("./connector.js");
+
 const importFileDataModule = async (module, path) => {
 	if (!config.modules[path]) {
 		throw new Error(`Missing configuration for ${path}`);
@@ -172,7 +174,14 @@ require("./db-access.js");
 		});
 	}
 
+	const { connections } = config;
+
 	for (const platformData of initialPlatforms) {
+		if (!connections[platformData.Name] || connections[platformData.Name] !== "controller") {
+			console.log(`Skipped creating base controller for ${platformData.Name}`);
+			continue;
+		}
+
 		let Controller = null;
 		try {
 			Controller = require(`./controllers/${platformData.Name}`);
@@ -195,6 +204,36 @@ require("./db-access.js");
 	}
 
 	Platform.assignControllers(controllers);
+
+	const shouldStart = Object.values(config.connections).includes("connector");
+	if (shouldStart) {
+		const connector = new Connector(config.redis);
+		sb.Connector = connector;
+
+		connector.on("message", ({ /* key, */ data }) => {
+			if (connections[data.platform] !== "connector") {
+				console.warn("Non-connector platform message received", { platform: data.platform });
+				return;
+			}
+
+			const platform = Platform.get(data.platform);
+			if (!platform) {
+				console.warn("Unrecognized platform", { platform: data.platform });
+				return;
+			}
+
+			// TODO: platform-based logic for listening
+			// platform.emit("message", data.data);
+		});
+
+		await connector.connect();
+		connector.startListening();
+
+		console.log("Connector established");
+	}
+	else {
+		console.log("Connector not established, no configured platforms required it");
+	}
 
 	process.on("unhandledRejection", async (reason) => {
 		if (!(reason instanceof Error)) {

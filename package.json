@@ -10,6 +10,7 @@
     "cron": "^3.1.6",
     "cytube-connector": "supinic/cytube-connector#master",
     "discord.js": "^14.13.0",
+    "ioredis": "^5.3.2",
     "irc-framework": "^4.13.1",
     "language-iso-codes": "supinic/language-iso-codes#master",
     "roll-dice": "npm:@jprochazk/roll-dice@^0.2.2",
