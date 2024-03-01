@@ -4,13 +4,23 @@ const GptHistory = require("./history-control.js");
 module.exports = class GptNexra extends GptMessages {
 	static async getHistory (context) {
 		const { historyMode } = await GptMessages.getHistoryMode(context);
-		return (historyMode === "enabled")
+		const promptHistory = (historyMode === "enabled")
 			? (await GptHistory.get(context.user) ?? [])
 			: [];
+
+		let systemMessage = "Keep the response as short and concise as possible.";
+		if (context.params.context) {
+			systemMessage = context.params.context;
+		}
+
+		return [
+			{ role: "system", content: systemMessage },
+			...promptHistory
+		];
 	}
 
 	static async execute (context, query, modelData) {
-		const messages = await this.getHistory(context);
+		const messages = await this.getHistory(context, query);
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
 			throwHttpErrors: false,
@@ -55,5 +65,10 @@ module.exports = class GptNexra extends GptMessages {
 	static getProcessingTime () { return null; }
 	static isAvailable () { return true; }
 
-	static setHistory () {}
+	static async setHistory (context, query, reply) {
+		const { historyMode } = await GptMessages.getHistoryMode(context);
+		if (historyMode === "enabled") {
+			await GptHistory.add(context.user, query, reply);
+		}
+	}
 };
