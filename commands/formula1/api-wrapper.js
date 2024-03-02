@@ -173,10 +173,10 @@ const fetchNextRaceDetail = async (context) => {
 			nextSessionString += ` ${weatherResult}`;
 		}
 	}
-	else if (race.date) {
-		const raceDate = new sb.Date(race.date);
-		nextSessionString = `Race takes place ${sb.Utils.timeDelta(raceDate)}, but the times are not specified yet.`;
-	}
+	// else if (race.date) {
+	// 	const raceDate = new sb.Date(race.date);
+	// 	nextSessionString = `Race takes place ${sb.Utils.timeDelta(raceDate)}, but the times are not specified yet.`;
+	// }
 
 	let raceString;
 	if (now < raceStart) {
