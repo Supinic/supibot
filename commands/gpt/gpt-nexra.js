@@ -27,20 +27,23 @@ module.exports = class GptNexra extends GptMessages {
 			}
 		});
 
-		let i = 0;
-		const text = response.body;
-		while (text[i] !== "{" || i > text.length) {
-			i++;
-		}
-
-		if (text[i] !== "{") {
+		const index = response.body.indexOf("{");
+		if (index === -1) {
 			return {
 				success: false,
-				reply: `Nexra API returned an invalid response!`
+				reply: `Nexra API returned an invalid response! Try again later.`
 			};
 		}
 
-		response.body = JSON.parse(text.slice(i));
+		try {
+			response.body = JSON.parse(response.body.slice(index));
+		}
+		catch (e) {
+			return {
+				success: false,
+				reply: `Nexra API returned an invalid response! Try again later.`
+			};
+		}
 
 		return { response };
 	}
