@@ -1137,7 +1137,6 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 		}
 		else if (messageObject.isRaid()) {
-			const viewers = Number(messageObject.eventParams.viewerCount);
 			if (!eventSkipModes.includes(channelData.Mode)) {
 				channelData.events.emit("raid", {
 					event: "raid",
@@ -1146,7 +1145,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					user: userData,
 					platform: this.platform,
 					data: {
-						viewers
+						viewers: messageObject.eventParams.viewerCount
 					}
 				});
 			}
