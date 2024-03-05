@@ -1133,7 +1133,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				const name = userData?.Name ?? "(anonymous)";
 				const logMessage = `${name} gifted a subscription to ${recipientData.Name}`;
 
-				sb.Logger.log("Twitch.Giftsub", logMessage, channelData, userData);
+				await sb.Logger.log("Twitch.Giftsub", logMessage, channelData, userData);
 			}
 		}
 		else if (messageObject.isRaid()) {
@@ -1151,7 +1151,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 
 			if (this.platform.Logging.hosts && !logSkipModes.includes(channelData.Mode)) {
-				sb.Logger.log("Twitch.Host", `Raid: ${userData?.Name ?? null} => ${channelData.Name} for ${viewers} viewers`);
+				await sb.Logger.log("Twitch.Host", `Raid: ${userData?.Name ?? null} => ${channelData.Name} for ${viewers} viewers`);
 			}
 		}
 		else if (messageObject.isRitual()) {
@@ -1159,7 +1159,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				const userData = await sb.User.get(senderUsername, false);
 				const channelData = sb.Channel.get(channelName, this.platform);
 
-				sb.Logger.log("Twitch.Ritual", `${messageObject.systemMessage} ${messageText}`, channelData, userData);
+				await sb.Logger.log("Twitch.Ritual", `${messageObject.systemMessage} ${messageText}`, channelData, userData);
 			}
 		}
 		else {
