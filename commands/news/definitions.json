@@ -398,6 +398,13 @@
     "language": "romanian",
     "sources": [
       {
+        "name": "Adevarul",
+        "url": "https://adevarul.ro",
+        "path": "rss",
+        "endpoints": ["index"],
+        "helpers": ["u_pa__"]
+      },
+      {
         "name": "Mediafax",
         "url": "https://www.mediafax.ro",
         "path": null,
