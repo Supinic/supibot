@@ -946,7 +946,7 @@ class Command extends require("./template.js") {
 						cooldown = { length: cooldown };
 					}
 
-					let { length } = cooldown;
+					let { length = 0 } = cooldown;
 					const {
 						channel = channelID,
 						user = userData.ID,
