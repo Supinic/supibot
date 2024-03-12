@@ -398,13 +398,6 @@
     "language": "romanian",
     "sources": [
       {
-        "name": "HotNews",
-        "url": "https://www.hotnews.ro",
-        "path": null,
-        "endpoints": ["rss"],
-        "helpers": ["agenttud"]
-      },
-      {
         "name": "Mediafax",
         "url": "https://www.mediafax.ro",
         "path": null,
