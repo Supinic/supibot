@@ -35,7 +35,7 @@ describe("valid RSS news definitions", function () {
 								rssData = await RSS.parseString(xml);
 
 								assert.notStrictEqual(rssData.items.length, 0, "RSS feed must not be empty");
-							});
+							}, `URL: ${url}`);
 						});
 					}
 				});
