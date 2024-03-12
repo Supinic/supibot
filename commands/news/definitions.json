@@ -221,7 +221,7 @@
       {
         "name": "Origo",
         "url": "https://www.origo.hu",
-        "path": "contentpartner/rss/itthon",
+        "path": "contentpartner/rss/origoall",
         "endpoints": ["origo.xml"],
         "helpers": ["noiredayz"]
       },
