@@ -2,7 +2,6 @@ const Redis = require("ioredis");
 const EventEmitter = require("events");
 
 const CONNECTOR_REDIS_DB_ID = 1;
-const CONNECTOR_INTERVAL_TIMEOUT = 250;
 const CONNECTOR_STREAM_KEY = "supibot-stream";
 
 class Connector extends EventEmitter {
@@ -11,7 +10,6 @@ class Connector extends EventEmitter {
 	#initialConnectSuccess = false;
 	#lastId = "$";
 	#active = false;
-	#intervalTimeout = CONNECTOR_INTERVAL_TIMEOUT;
 
 	constructor (config) {
 		super();
