@@ -467,63 +467,6 @@ module.exports = (command) => [
 		}
 	},
 	{
-		name: "poll",
-		aliases: [],
-		description: `Checks the currently running Supibot-related poll, if there is any.`,
-		execute: async (context, identifier) => {
-			const ID = Number(identifier);
-			if (!ID || !sb.Utils.isValidInteger(ID)) {
-				return {
-					success: false,
-					reply: "Invalid ID provided! Check all polls here: https://supinic.com/bot/poll/list"
-				};
-			}
-
-			const poll = await sb.Query.getRecordset(rs => {
-				rs.select("Text", "Status", "End", "ID")
-					.from("chat_data", "Poll")
-					.single();
-
-				if (identifier) {
-					rs.where("ID = %n", ID);
-				}
-				else {
-					rs.orderBy("ID DESC").limit(1);
-				}
-
-				return rs;
-			});
-
-			if (!poll) {
-				return {
-					reply: "No polls match the ID provided! Check all polls here: https://supinic.com/bot/poll/list"
-				};
-			}
-
-			/** @type {Object[]} */
-			const votes = await sb.Query.getRecordset(rs => rs
-				.select("Vote")
-				.from("chat_data", "Poll_Vote")
-				.where("Poll = %n", poll.ID)
-			);
-
-			if (poll.Status === "Cancelled" || poll.Status === "Active") {
-				const delta = (poll.End < sb.Date.now())
-					? "already ended."
-					: `ends ${sb.Utils.timeDelta(poll.End)}.`;
-
-				return {
-					reply: `Poll ID ${poll.ID} ${delta} (${poll.Status}) - ${poll.Text} - Votes: ${votes.length}`
-				};
-			}
-
-			const [yes, no] = sb.Utils.splitByCondition(votes, i => i.Vote === "Yes");
-			return {
-				reply: `Poll ID ${poll.ID} (${poll.Status}) - ${poll.Text} - Votes: ${yes.length}:${no.length}`
-			};
-		}
-	},
-	{
 		name: "reminder",
 		aliases: ["reminders"],
 		description: "Check the status and info of a reminder created by you or for you. You can use \"last\" instead of an ID to check the last one you made.",
