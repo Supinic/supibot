@@ -24,7 +24,6 @@ declare type UserGetOptions = {
  * Since there can be hundreds of thousands of users loaded, a class is used to simplify the prototype, and potentially save some memory and/or processing power with V8.
  */
 export declare class User extends ClassTemplate {
-    static bots: Map<User["ID"], User>;
     static data: Map<string, User>;
 
     static readonly permissions: Permissions.Descriptor;
