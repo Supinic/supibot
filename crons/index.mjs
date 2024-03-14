@@ -1,11 +1,9 @@
 import { CronJob } from "cron";
 
 import { definition as ActiveChattersLog } from "./active-chatters-log/index.mjs";
-import { definition as ActivePoll } from "./active-poll/index.mjs";
 import { definition as BotActivity } from "./bot-active/index.mjs";
 import { definition as BotRequestDenialManager } from "./bot-request-denial-manager/index.mjs";
 import { definition as ChangelogAnnouncer } from "./changelog-announcer/index.mjs";
-import { definition as PollsCloser } from "./close-polls/index.mjs";
 import { definition as TwitchSubscribersFetcher } from "./fetch-twitch-subscriber-list/index.mjs";
 import { definition as InactiveDiscordServersDetector } from "./inactive-discord-server-detector/index.mjs";
 import { definition as LateStreamChecker } from "./late-stream-announcer/index.mjs";
@@ -20,11 +18,9 @@ import { definition as SoundcloudClientIdFetcher } from "./yoink-soundcloud-clie
 
 export const definitions = [
 	ActiveChattersLog,
-	ActivePoll,
 	BotActivity,
 	BotRequestDenialManager,
 	ChangelogAnnouncer,
-	PollsCloser,
 	TwitchSubscribersFetcher,
 	InactiveDiscordServersDetector,
 	LateStreamChecker,
