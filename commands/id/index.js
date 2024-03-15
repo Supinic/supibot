@@ -22,13 +22,9 @@ module.exports = {
 			};
 		}
 
-		let idString = "That person's ID is";
+		let idString = "That user's ID is";
 		let pronoun = "they were";
-		if (sb.User.bots.has(targetUser.ID)) {
-			idString = "That bot's ID is";
-			pronoun = "it was";
-		}
-		else if (targetUser.ID === context.user.ID) {
+		if (targetUser.ID === context.user.ID) {
 			idString = "Your ID is";
 			pronoun = "you were";
 		}
