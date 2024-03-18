@@ -58,8 +58,42 @@ export const definition = {
 			return;
 		}
 
-
 		let link;
+		const videoData = await sb.Query.getRecordset(rs => rs
+			.select("Link", "Notes")
+			.from("personal", "Favourite_Track")
+			.where("Video_Type = %n", 15)
+			.where(
+				{ condition: (repeatsArray.length !== 0) },
+				"Link NOT IN %s+",
+				repeatsArray
+			)
+			.orderBy("RAND()")
+			.limit(1)
+			.single()
+		);
+
+		const file = videoData.Link.split("\\").at(-1);
+		const vlcEligibleLink = encodeURI(`file:///${videoData.Link}`);
+		const vlcId = await sb.VideoLANConnector.add(vlcEligibleLink);
+
+		const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
+		const row = await sb.Query.getRow("chat_data", "Song_Request");
+		row.setValues({
+			VLC_ID: vlcId,
+			Link: videoData.Link,
+			Name: file,
+			Video_Type: 15,
+			Length: null,
+			Status: (queue.length === 0) ? "Current" : "Queued",
+			Started: (queue.length === 0) ? new sb.Date() : null,
+			User_Alias: 1,
+			Start_Time: null,
+			End_Time: null
+		});
+		await row.save();
+
+		/*
 		let videoID;
 		const roll = sb.Utils.random(1, 100);
 		if (roll < 100) {
@@ -91,7 +125,6 @@ export const definition = {
 			link = prefix.replace("$", videoData.Link);
 		}
 		else {
-			/** @type {string} */
 			videoID = await sb.Query.getRecordset(rs => rs
 				.select("Link")
 				.from("music", "Track")
@@ -120,6 +153,7 @@ export const definition = {
 		if (bannedLinks.includes(videoID)) {
 			return;
 		}
+		*/
 
 		if (state === "vlc") {
 			const self = await sb.User.get("supibot");
