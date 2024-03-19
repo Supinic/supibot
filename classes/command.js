@@ -858,13 +858,14 @@ class Command extends require("./template.js") {
 				messageSlice = messageSlice.replace(whitespaceRegex, "");
 			}
 
-			const { passed, privateMessage, string } = await Banphrase.execute(messageSlice, channelData);
+			const isPrivateReply = (execution.replyWithPrivateMessage === true);
+			const channelTarget = (isPrivateReply) ? null : channelData;
+			const { passed, privateMessage, string } = await Banphrase.execute(messageSlice, channelTarget);
+
 			execution.reply = string;
 
-			if (
-				(typeof execution.replyWithPrivateMessage !== "boolean")
-				&& (typeof privateMessage === "boolean")
-			) {
+			const hasPrivateFlag = (typeof execution.replyWithPrivateMessage === "boolean");
+			if (!hasPrivateFlag && typeof privateMessage === "boolean") {
 				execution.replyWithPrivateMessage = privateMessage;
 			}
 
