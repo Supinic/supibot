@@ -153,7 +153,6 @@ export const definition = {
 		if (bannedLinks.includes(videoID)) {
 			return;
 		}
-		*/
 
 		if (state === "vlc") {
 			const self = await sb.User.get("supibot");
@@ -176,5 +175,6 @@ export const definition = {
 			client.queue("yt", videoID);
 			repeatsArray.push(videoID);
 		}
+		 */
 	})
 };
