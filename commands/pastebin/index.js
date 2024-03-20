@@ -15,7 +15,7 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: (() => ({
-		allowedGistTypes: ["text/plain", "application/javascript"],
+		allowedGistTypes: ["text/plain", "text/javascript", "application/javascript"],
 		getHastebinServer: (param) => {
 			let path = param ?? "https://haste.zneix.eu";
 			if (!path.startsWith("http://") && !path.startsWith("https://")) {
