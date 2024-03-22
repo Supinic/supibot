@@ -58,5 +58,10 @@ module.exports = class GptNexra extends GptMessages {
 	static getProcessingTime () { return null; }
 	static isAvailable () { return true; }
 
-	static setHistory () {}
+	static async setHistory (context, query, reply) {
+		const { historyMode } = await GptMessages.getHistoryMode(context);
+		if (historyMode === "enabled") {
+			await GptHistory.add(context.user, query, reply);
+		}
+	}
 };
