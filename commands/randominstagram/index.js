@@ -143,8 +143,8 @@ module.exports = {
 		}
 
 		const baseUrl = (context.platform.Name === "discord")
-			? "https://ddinstagram.com/"
-			: "https://instagram.com/";
+			? "https://ddinstagram.com"
+			: "https://instagram.com";
 
 		if (context.params.rawLinkOnly) {
 			return {
