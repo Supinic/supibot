@@ -12,6 +12,7 @@
     "discord.js": "^14.13.0",
     "irc-framework": "^4.13.1",
     "language-iso-codes": "supinic/language-iso-codes#master",
+    "re2": "^1.20.10",
     "roll-dice": "npm:@jprochazk/roll-dice@^0.2.2",
     "rss-parser": "^3.13.0",
     "supi-core": "supinic/supi-core",

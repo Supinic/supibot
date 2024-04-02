@@ -2,6 +2,7 @@ const Banphrase = require("./banphrase.js");
 const Filter = require("./filter.js");
 const User = require("./user.js");
 
+const RE2 = require("re2");
 const pathModule = require("path");
 const CooldownManager = require("../utils/cooldown-manager.js");
 const LanguageCodes = require("language-iso-codes");
@@ -1048,7 +1049,16 @@ class Command extends require("./template.js") {
 			return { key, value: outputValue };
 		}
 		else if (type === "regex") {
-			return sb.Utils.parseRegExp(value);
+			const regex = sb.Utils.parseRegExp(value);
+			let re2Regex;
+			try {
+				re2Regex = new RE2(regex);
+			}
+			catch {
+				re2Regex = null;
+			}
+
+			return re2Regex;
 		}
 		else if (type === "language") {
 			return LanguageCodes.getLanguage(value);
