@@ -86,8 +86,8 @@ module.exports = {
 		let introductionString = null;
 
 		const playing = await sb.Query.getRecordset(rs => {
-			rs.select("Name", "VLC_ID", "Link", "User_Alias AS User", "Start_Time", "End_Time")
-				.select("Video_Type.Link_Prefix AS Prefix")
+			rs.select("Name", "VLC_ID", "Link", "User_Alias AS User", "Start_Time", "End_Time", "Notes")
+				.select("Video_Type.ID AS VTID", "Video_Type.Link_Prefix AS Prefix")
 				.from("chat_data", "Song_Request")
 				.join({
 					toDatabase: "data",
@@ -147,6 +147,13 @@ module.exports = {
 			const pauseString = (sb.Config.get("SONG_REQUESTS_VLC_PAUSED"))
 				? "The song request is paused at the moment."
 				: "";
+
+			if (playing.VTID === 15) {
+				const { parse } = require("path").win32;
+				const { name } = parse(playing.Name);
+
+				playing.Name = `${playing.Notes} - ${name}`;
+			}
 
 			return {
 				reply: sb.Utils.tag.trim `
