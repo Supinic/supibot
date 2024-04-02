@@ -1,5 +1,6 @@
 const assert = require("assert");
 const Command = require("../../../classes/command");
+const RE2 = require("re2");
 
 beforeEach(async() => {
 	const DateModule = await import("supi-core/objects/date.js");
@@ -40,7 +41,7 @@ describe("Command parameter parsing", () => {
 		assert.notStrictEqual(value, undefined, "Parsed param must not be undefined");
 
 		if (type === "regex") {
-			assert.strictEqual(value instanceof RegExp, true, "Regex-type param must be instanceof RegExp");
+			assert.strictEqual(value instanceof RE2, true, "Regex-type param must be instanceof RegExp");
 		}
 		else if (type === "date") {
 			assert.strictEqual(value instanceof sb.Date, true, "Date-type param must be instanceof sb.Date");
