@@ -12,7 +12,7 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function news (context, ...args) {
 		const rssNews = require("./rss.js");
-		const currentsApiNews = require("./currents-api.js");
+		const googleNews = require("./google-news.js");
 
 		let input;
 		if (context.params.country) {
@@ -46,7 +46,7 @@ module.exports = {
 			return await rssNews.fetch(code, args.join(" "));
 		}
 		else if (!rssNews.isCountryCode(input)) {
-			return await currentsApiNews.fetch(args.join(" "));
+			return await googleNews.fetch(args.join(" "));
 		}
 		else {
 			return {
