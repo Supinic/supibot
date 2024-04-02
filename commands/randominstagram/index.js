@@ -32,7 +32,7 @@ module.exports = {
 		else {
 			let rateLimited = false;
 			let response;
-			const key = await getFacebookAppID();
+			const key = getFacebookAppID();
 			if (!key) {
 				return {
 					success: false,
@@ -142,6 +142,10 @@ module.exports = {
 			 */
 		}
 
+		const baseUrl = (context.platform.Name === "discord")
+			? "https://ddinstagram.com/"
+			: "https://instagram.com/";
+
 		if (context.params.rawLinkOnly) {
 			return {
 				reply: post.display_url
@@ -149,7 +153,7 @@ module.exports = {
 		}
 		else if (context.params.postLinkOnly) {
 			return {
-				reply: `https://www.instagram.com/p/${post.shortcode}`
+				reply: `${baseUrl}/p/${post.shortcode}`
 			};
 		}
 		else {
@@ -158,7 +162,7 @@ module.exports = {
 					Random post from "${post.owner.username}":
 					${description ?? ""}
 					(${commentCount} comments, ${likeCount} likes)
-					https://www.instagram.com/p/${post.shortcode}
+					${baseUrl}/p/${post.shortcode}
 					${appendix}
 				`
 			};
