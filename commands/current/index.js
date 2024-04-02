@@ -86,7 +86,7 @@ module.exports = {
 		let introductionString = null;
 
 		const playing = await sb.Query.getRecordset(rs => {
-			rs.select("Name", "VLC_ID", "Link", "User_Alias AS User", "Start_Time", "End_Time", "Notes")
+			rs.select("Name", "VLC_ID", "Link", "User_Alias AS User", "Start_Time", "End_Time")
 				.select("Video_Type.ID AS VTID", "Video_Type.Link_Prefix AS Prefix")
 				.from("chat_data", "Song_Request")
 				.join({
@@ -149,10 +149,15 @@ module.exports = {
 				: "";
 
 			if (playing.VTID === 15) {
-				const { parse } = require("path").win32;
-				const { name } = parse(playing.Name);
-
-				playing.Name = `${playing.Notes} - ${name}`;
+				return {
+					reply: sb.Utils.tag.trim `
+						${introductionString}
+						${playing.Name}
+						(ID ${playing.VLC_ID}) - requested by ${userData.Name}.
+						${position}
+						${pauseString}
+					`
+				};
 			}
 
 			return {
