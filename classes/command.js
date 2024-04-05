@@ -2,10 +2,11 @@ const Banphrase = require("./banphrase.js");
 const Filter = require("./filter.js");
 const User = require("./user.js");
 
-const RE2 = require("re2");
 const pathModule = require("path");
 const CooldownManager = require("../utils/cooldown-manager.js");
 const LanguageCodes = require("language-iso-codes");
+
+const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 
 class Context {
 	#command;
@@ -1050,15 +1051,24 @@ class Command extends require("./template.js") {
 		}
 		else if (type === "regex") {
 			const regex = sb.Utils.parseRegExp(value);
-			let re2Regex;
-			try {
-				re2Regex = new RE2(regex);
-			}
-			catch {
-				re2Regex = null;
-			}
 
-			return re2Regex;
+			// Make sure user input regexes are executable in linear time and therefore are not evil.
+			// Only executed if the V8 flag is passed to Node.
+			if (process.execArgv.includes(LINEAR_REGEX_FLAG)) {
+				let linearRegex;
+				try {
+					// Force the "linear" regex flag
+					linearRegex = new RegExp(regex.source, `${regex.flags}l`);
+				}
+				catch {
+					return null;
+				}
+
+				return linearRegex;
+			}
+			else {
+				return regex;
+			}
 		}
 		else if (type === "language") {
 			return LanguageCodes.getLanguage(value);
