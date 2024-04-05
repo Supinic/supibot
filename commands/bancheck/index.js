@@ -96,7 +96,7 @@ module.exports = {
 
 				const punishment = (permanent)
 					? "permanent ban"
-					: `${sb.Utils.formatTime(length)} seconds timeout`;
+					: `${sb.Utils.formatTime(length)} timeout`;
 
 				return {
 					reply: sb.Utils.tag.trim `
