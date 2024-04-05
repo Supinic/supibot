@@ -36,7 +36,7 @@ module.exports = {
 		let result;
 		const dashlessTitle = title.replace(/-/g, "").replace(/\s+/g, " ");
 		if (dashlessTitle.includes(content) || content.includes(dashlessTitle)) {
-			result = `${content ?? ""} ${delta}`;
+			result = `${title ?? ""} ${delta}`;
 		}
 		else {
 			result = `${title ?? ""}${separator}${content ?? ""} ${delta}`;
