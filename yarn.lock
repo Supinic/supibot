@@ -2613,16 +2613,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"install-artifact-from-github@npm:^1.3.5":
-  version: 1.3.5
-  resolution: "install-artifact-from-github@npm:1.3.5"
-  bin:
-    install-from-cache: bin/install-from-cache.js
-    save-to-github-cache: bin/save-to-github-cache.js
-  checksum: bd4fd78f2c51f59441e524994fd59ea2a293ef252e7eccf5c37cbe303b7bdf3b7278c4b49d27432b4bdfa48a463196745f932ed8037948876428dcc2b459f529
-  languageName: node
-  linkType: hard
-
 "ioredis@npm:^5.3.2":
   version: 5.3.2
   resolution: "ioredis@npm:5.3.2"
@@ -3479,15 +3469,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nan@npm:^2.18.0":
-  version: 2.19.0
-  resolution: "nan@npm:2.19.0"
-  dependencies:
-    node-gyp: latest
-  checksum: 29a894a003c1954c250d690768c30e69cd91017e2e5eb21b294380f7cace425559508f5ffe3e329a751307140b0bd02f83af040740fa4def1a3869be6af39600
-  languageName: node
-  linkType: hard
-
 "nanoid@npm:3.3.3":
   version: 3.3.3
   resolution: "nanoid@npm:3.3.3"
@@ -3508,26 +3489,6 @@ __metadata:
   version: 0.6.3
   resolution: "negotiator@npm:0.6.3"
   checksum: b8ffeb1e262eff7968fc90a2b6767b04cfd9842582a9d0ece0af7049537266e7b2506dfb1d107a32f06dd849ab2aea834d5830f7f4d0e5cb7d36e1ae55d021d9
-  languageName: node
-  linkType: hard
-
-"node-gyp@npm:^10.0.1":
-  version: 10.1.0
-  resolution: "node-gyp@npm:10.1.0"
-  dependencies:
-    env-paths: ^2.2.0
-    exponential-backoff: ^3.1.1
-    glob: ^10.3.10
-    graceful-fs: ^4.2.6
-    make-fetch-happen: ^13.0.0
-    nopt: ^7.0.0
-    proc-log: ^3.0.0
-    semver: ^7.3.5
-    tar: ^6.1.2
-    which: ^4.0.0
-  bin:
-    node-gyp: bin/node-gyp.js
-  checksum: 72e2ab4b23fc32007a763da94018f58069fc0694bf36115d49a2b195c8831e12cf5dd1e7a3718fa85c06969aedf8fc126722d3b672ec1cb27e06ed33caee3c60
   languageName: node
   linkType: hard
 
@@ -3962,17 +3923,6 @@ __metadata:
   dependencies:
     safe-buffer: ^5.1.0
   checksum: d779499376bd4cbb435ef3ab9a957006c8682f343f14089ed5f27764e4645114196e75b7f6abf1cbd84fd247c0cb0651698444df8c9bf30e62120fbbc52269d6
-  languageName: node
-  linkType: hard
-
-"re2@npm:^1.20.10":
-  version: 1.20.10
-  resolution: "re2@npm:1.20.10"
-  dependencies:
-    install-artifact-from-github: ^1.3.5
-    nan: ^2.18.0
-    node-gyp: ^10.0.1
-  checksum: e56273f8f5cf0aab4c3a0eba42e50c29300c866ed20dc95ed1953e259eba567d4096421c61f66b9f342a561adfb5dc05d54469fb4421834cd0ac5c0d270ce665
   languageName: node
   linkType: hard
 
@@ -4612,7 +4562,6 @@ supi-core@supinic/supi-core:
     language-iso-codes: "supinic/language-iso-codes#master"
     mocha: ^10.2.0
     nyc: ^15.1.0
-    re2: ^1.20.10
     roll-dice: "npm:@jprochazk/roll-dice@^0.2.2"
     rss-parser: ^3.13.0
     supi-core: supinic/supi-core
