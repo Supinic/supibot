@@ -1,5 +1,7 @@
 const { parseRSS } = require("../../utils/command-utils.js");
 
+const cleanString = (str) => sb.Utils.fixHTML(sb.Utils.removeHTML(str)).replace(/\s+/g, " ");
+
 module.exports = {
 	fetch: async (query) => {
 		const searchParams = {
@@ -19,8 +21,8 @@ module.exports = {
 		const rss = await parseRSS(xml);
 
 		const articles = rss.items.map(i => ({
-			title: (i.title) ? i.title.trim() : null,
-			content: (i.content) ? i.content.trim() : null,
+			title: (i.title) ? cleanString(i.title.trim()) : null,
+			content: (i.content) ? cleanString(i.content.trim()) : null,
 			published: new sb.Date(i.pubDate).valueOf()
 		}));
 
@@ -32,14 +34,14 @@ module.exports = {
 			: "";
 
 		let result;
-		if (title.includes(content) || content.includes(title)) {
+		const dashlessTitle = title.replace(/-/g, "").replace(/\s+/g, " ");
+		if (dashlessTitle.includes(content) || content.includes(dashlessTitle)) {
 			result = `${content ?? ""} ${delta}`;
 		}
 		else {
 			result = `${title ?? ""}${separator}${content ?? ""} ${delta}`;
 		}
 
-		result = sb.Utils.fixHTML(sb.Utils.removeHTML(result));
 		return {
 			reply: result.replace(/\s+/g, " ")
 		};
