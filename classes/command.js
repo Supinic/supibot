@@ -1057,8 +1057,18 @@ class Command extends require("./template.js") {
 			if (process.execArgv.includes(LINEAR_REGEX_FLAG)) {
 				let linearRegex;
 				try {
+					let source = regex.source;
+					let flags = regex.flags;
+
+					// Since the "i" flag makes the regex not execute in linear time, use a hacky solution to
+					// replace all characters with a group that contains both cases. Then, also remove the "i" flag.
+					if (regex.flags.includes("i")) {
+						source = source.replaceAll(/(?<!\\)([a-z])/ig, (total, match) => `[${match.toLowerCase()}${match.toUpperCase()}]`);
+						flags = flags.replace("i", "");
+					}
+
 					// Force the "linear" regex flag
-					linearRegex = new RegExp(regex.source, `${regex.flags}l`);
+					linearRegex = new RegExp(source, `${flags}l`);
 				}
 				catch {
 					return null;
