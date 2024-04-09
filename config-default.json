@@ -45,5 +45,14 @@
       ],
       "whitelist": []
     }
+  },
+  "rustlog": {
+    "readme": "This config lets you manage your custom list of Rustlog instances for the $randomline command.",
+    "instances": {
+      "ivr": {
+        "url": "logs.ivr.fi",
+        "default": true
+      }
+    }
   }
 }

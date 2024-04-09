@@ -1,26 +1,71 @@
-const supportedChannelsCacheKey = "rustlog-supported-channels";
+const instancesCacheKey = "rustlog-supported-channels";
 
-const getSupportedChannelList = async function () {
-	let data = await sb.Cache.getByPrefix(supportedChannelsCacheKey);
+let config;
+try {
+	config = require("../../config.json");
+}
+catch {
+	config = require("../../config-default.json");
+}
+
+const { instances } = config.rustlog;
+
+const getChannelLoggingInstances = async function () {
+	const data = await sb.Cache.getByPrefix(instancesCacheKey);
 	if (data) {
 		return data;
 	}
 
-	const response = await sb.Got("GenericAPI", {
-		url: "https://logs.ivr.fi/channels",
-		throwHttpErrors: false
-	});
+	const result = {};
+	for (const [instanceKey, instance] of Object.entries(instances)) {
+		const response = await sb.Got("GenericAPI", {
+			url: `https://${instance.url}/channels`,
+			throwHttpErrors: false,
+			timeout: {
+				request: 2500
+			}
+		});
 
-	if (response.statusCode !== 200) {
-		return null;
+		if (!response.ok) {
+			continue;
+		}
+
+		const { channels } = response.body;
+		for (const channel of channels) {
+			if (instance.default === true) {
+				result[channel.userID] = instanceKey;
+			}
+			else {
+				result[channel.userID] ??= instanceKey;
+			}
+		}
 	}
 
-	data = response.body.channels;
-	await sb.Cache.setByPrefix(supportedChannelsCacheKey, data, {
-		expiry: 60_000 // 5 min
+	await sb.Cache.setByPrefix(instancesCacheKey, result, {
+		expiry: 600_000 // 10 min
 	});
 
-	return data;
+	return result;
+};
+
+const getSupportedChannelList = async function () {
+	const data = await getChannelLoggingInstances();
+	return Object.keys(data);
+};
+
+const getInstance = async function (channelID) {
+	const instanceMap = await getChannelLoggingInstances();
+	const key = instanceMap[channelID];
+
+	const instance = instances[key];
+	if (!instance) {
+		throw new sb.Error({
+			message: "Incorrect Rustlog instance definition",
+			args: { instanceMap, key, instance }
+		});
+	}
+
+	return instance;
 };
 
 const isSupported = async function (channelID) {
@@ -29,12 +74,13 @@ const isSupported = async function (channelID) {
 		return null;
 	}
 
-	return list.some(i => i.userID === channelID);
+	return list.includes(channelID);
 };
 
 const getRandomChannelLine = async function (channelID) {
+	const instance = await getInstance(channelID);
 	const response = await sb.Got("GenericAPI", {
-		url: `https://logs.ivr.fi/channelid/${channelID}/random`,
+		url: `https://${instance.url}/channelid/${channelID}/random`,
 		throwHttpErrors: false,
 		searchParams: {
 			json: "1"
@@ -67,7 +113,7 @@ const getRandomChannelLine = async function (channelID) {
 			reply: `Couldn't fetch a random line! Try again in a little bit.`
 		};
 	}
-	
+
 	return {
 		success: true,
 		date: new sb.Date(message.timestamp),
@@ -77,8 +123,9 @@ const getRandomChannelLine = async function (channelID) {
 };
 
 const getRandomUserLine = async function (channelID, userID) {
+	const instance = await getInstance(channelID);
 	const response = await sb.Got("GenericAPI", {
-		url: `https://logs.ivr.fi/channelid/${channelID}/userid/${userID}/random`,
+		url: `https://${instance.url}/channelid/${channelID}/userid/${userID}/random`,
 		throwHttpErrors: false,
 		searchParams: {
 			json: "1"
@@ -140,6 +187,9 @@ const addChannel = async function (channelID) {
 		};
 	}
 	else {
+		// Purge all rustlog instances cache after a new channel is added to IVR Rustlog
+		await sb.Cache.setByPrefix(instancesCacheKey, null);
+
 		return {
 			success: true
 		};
