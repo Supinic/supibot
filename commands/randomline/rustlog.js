@@ -42,7 +42,7 @@ const getChannelLoggingInstances = async function () {
 	}
 
 	await sb.Cache.setByPrefix(instancesCacheKey, result, {
-		expiry: 600_000 // 10 min
+		expiry: 3_600_000 // 1 hour
 	});
 
 	return result;
