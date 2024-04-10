@@ -368,7 +368,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			}
 
 			await sb.Logger.log("Discord.Error", err.toString(), null, null);
-			this.restart();
+			// this.restart();
 		});
 	}
 
