@@ -29,6 +29,9 @@ export const definition = {
 		else if (msg.includes("upgrade your stream")) {
 			reason = "upgrading your stream";
 		}
+		else if (msg.includes("cheapest viewers")) {
+			reason = "buying viewers";
+		}
 		else {
 			return;
 		}
