@@ -422,7 +422,7 @@ module.exports = class User extends require("./template.js") {
 			User.data.set(user.Name, user);
 		}
 
-		if (sb.Cache && sb.Cache.active) {
+		if (sb.Cache && sb.Cache.ready) {
 			await sb.Cache.setByPrefix(user.getCacheKey(), user, {
 				expiry: User.redisCacheExpiration
 			});
