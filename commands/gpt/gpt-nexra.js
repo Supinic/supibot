@@ -11,6 +11,12 @@ module.exports = class GptNexra extends GptMessages {
 
 	static async execute (context, query, modelData) {
 		const messages = await this.getHistory(context);
+		// noinspection BadExpressionStatementJS
+		messages.unshift[{
+			role: "user",
+			content: "Respond to the point, concisely, up to 500 characters, unless I specifically ask you for further detail."
+		}];
+
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
 			throwHttpErrors: false,
