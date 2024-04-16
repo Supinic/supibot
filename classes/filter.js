@@ -1,12 +1,32 @@
 const Channel = require("./channel.js");
 const User = require("./user.js");
 
+const propertyMap = {
+	Type: "type",
+	User_Alias: "user",
+	Channel: "channel",
+	Command: "command",
+	Platform: "platform",
+	Invocation: "invocation"
+};
+
 /**
  * Represents a filter of the bot's commands.
  */
 module.exports = class Filter extends require("./template.js") {
 	#filterData = null;
 	static uniqueIdentifier = "ID";
+
+	static propMaps = {
+		type: new Map(),
+		user: new Map(),
+		channel: new Map(),
+		command: new Map(),
+		platform: new Map(),
+		invocation: new Map()
+	};
+
+	static activeItems = new Set();
 
 	constructor (data) {
 		super();
@@ -278,10 +298,15 @@ module.exports = class Filter extends require("./template.js") {
 
 	async toggle () {
 		this.Active = !this.Active;
-		const row = await sb.Query.getRow("chat_data", "Filter");
-		await row.load(this.ID);
-		row.values.Active = this.Active;
-		await row.save();
+
+		if (this.Active) {
+			Filter.activeItems.add(this);
+		}
+		else {
+			Filter.activeItems.delete(this);
+		}
+
+		await this.saveProperty("Active", this.Active);
 	}
 
 	/**
@@ -334,13 +359,47 @@ module.exports = class Filter extends require("./template.js") {
 		}
 	}
 
+	update (filter, options) {
+		for (const [key, value] of Object.entries(options)) {
+			if (!Object.hasOwn(filter, key)) {
+				continue;
+			}
+			else if (filter[key] === value) {
+				continue;
+			}
+
+			const mapName = propertyMap[key];
+			if (mapName) {
+				const map = Filter.propertiesMap[mapName];
+
+				const originalValue = filter[key];
+				const originalSet = map.get(originalValue);
+				originalSet.delete(filter);
+
+				if (!map.has(value)) {
+					map.set(value, new Set());
+				}
+
+				const newSet = map.get(value);
+				newSet.add(filter);
+			}
+
+			filter[key] = value;
+		}
+	}
+
 	static async loadData () {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("*")
 			.from("chat_data", "Filter")
 		);
 
-		Filter.data = data.map(record => new Filter(record));
+		Filter.data = [];
+		Filter.typesMap = new Map();
+
+		for (const row of data) {
+			Filter.#assign(row);
+		}
 	}
 
 	static get (identifier) {
@@ -359,19 +418,24 @@ module.exports = class Filter extends require("./template.js") {
 	}
 
 	static getLocals (type, options) {
-		return Filter.data.filter(row => (
-			row.Active
-			&& (!type || type === row.Type)
-			&& (options.skipUserCheck || (row.User_Alias === (options.user?.ID ?? null) || row.User_Alias === null))
-			&& (row.Channel === (options.channel?.ID ?? null) || row.Channel === null)
-			&& (row.Invocation === (options.invocation ?? null) || row.Invocation === null)
-			&& (row.Platform === (options.platform?.ID ?? null) || row.Platform === null)
-			&& (
-				(typeof options.command === "string" && row.Command === options.command)
-				|| (row.Command === (options.command?.Name ?? null)
-					|| row.Command === null)
-			)
-		));
+		const result = [];
+		for (const row of Filter.activeItems) {
+			if (
+				(!type || type === row.Type)
+				&& (options.skipUserCheck || (row.User_Alias === (options.user?.ID ?? null) || row.User_Alias === null))
+				&& (row.Channel === (options.channel?.ID ?? null) || row.Channel === null)
+				&& (row.Invocation === (options.invocation ?? null) || row.Invocation === null)
+				&& (row.Platform === (options.platform?.ID ?? null) || row.Platform === null)
+				&& (
+					(typeof options.command === "string" && row.Command === options.command)
+					|| (row.Command === (options.command?.Name ?? null) || row.Command === null)
+				)
+			) {
+				result.push(row);
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -614,10 +678,8 @@ module.exports = class Filter extends require("./template.js") {
 		await row.save();
 
 		data.ID = row.values.ID;
-		const filter = new Filter(data);
-		Filter.data.push(filter);
 
-		return filter;
+		return Filter.#assign(data);
 	}
 
 	static getMentionStatus (options) {
@@ -712,6 +774,26 @@ module.exports = class Filter extends require("./template.js") {
 		}
 	}
 
+	static rebuildMapCaches () {
+		for (const map of Object.values(Filter.propMaps)) {
+			for (const key of map.keys()) {
+				const set = map.get(key);
+				set.clear();
+			}
+		}
+
+		for (const filter of Filter.data) {
+			for (const [propName, mapName] of Object.entries(propertyMap)) {
+				const map = Filter.propMaps[mapName];
+				if (!map.has(filter[propName])) {
+					map.set(filter[propName], new Set());
+				}
+
+				map.get(filter[propName]).add(filter);
+			}
+		}
+	}
+
 	static async reloadSpecific (...list) {
 		if (list.length === 0) {
 			return false;
@@ -723,7 +805,13 @@ module.exports = class Filter extends require("./template.js") {
 
 			const existingIndex = Filter.data.findIndex(i => i.ID === ID);
 			if (existingIndex !== -1) {
-				Filter.data[existingIndex].destroy();
+				const filter = Filter.data[existingIndex];
+				for (const [propName, mapName] of Object.entries(propertyMap)) {
+					const map = Filter.propMaps[mapName];
+					map.get(filter[propName]).delete(filter);
+				}
+
+				filter.destroy();
 				Filter.data.splice(existingIndex, 1);
 			}
 
@@ -731,12 +819,31 @@ module.exports = class Filter extends require("./template.js") {
 				return;
 			}
 
-			const banphrase = new Filter(row.valuesObject);
-			Filter.data.push(banphrase);
+			Filter.#assign(row.valuesObject);
 		});
 
 		await Promise.all(promises);
 		return true;
+	}
+
+	static #assign (row) {
+		const filter = new Filter(row);
+		Filter.data.push(filter);
+
+		for (const [propName, mapName] of Object.entries(propertyMap)) {
+			const map = Filter.propMaps[mapName];
+			if (!map.has(filter[propName])) {
+				map.set(filter[propName], new Set());
+			}
+
+			map.get(filter[propName]).add(filter);
+		}
+
+		if (filter.Active) {
+			Filter.activeItems.add(filter);
+		}
+
+		return filter;
 	}
 };
 
