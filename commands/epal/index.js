@@ -1,3 +1,4 @@
+const PROFILES_CACHE_KEY = "profiles";
 const tts = {
 	enabled: null,
 	url: null,
@@ -11,11 +12,7 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Fetches a random person from epal.gg - posts their description. If used on Supinic's channel with TTS on, and if they have an audio introduction, it will be played on stream.",
 	Flags: ["mention"],
-	Params: [
-		{ name: "game", type: "string" },
-		{ name: "gender", type: "string" },
-		{ name: "sex", type: "string" }
-	],
+	Params: [],
 	Whitelist_Response: null,
 	Static_Data: null,
 	initialize: function () {
@@ -32,117 +29,48 @@ module.exports = {
 		}
 	},
 	Code: async function epal (context) {
-		let games = await this.getCacheData({ type: "games" });
-		if (!games) {
-			const response = await sb.Got("GenericAPI", {
-				method: "POST",
-				responseType: "json",
-				url: "https://play.epal.gg/web/product-type/list-by-user-online-games"
-			});
-
-			games = response.body.content.map(i => ({
-				ID: i.id,
-				name: i.name,
-				gameID: i.gameNum
-			}));
-
-			await this.setCacheData({ type: "games" }, games, {
-				expiry: 7 * 864e5 // 1 day
-			});
-		}
-
-		let gameData = sb.Utils.randArray(games);
-		if (context.params.game) {
-			const gameNameList = games.map(i => i.name);
-			const [bestMatch] = sb.Utils.selectClosestString(context.params.game, gameNameList, {
-				fullResult: true,
-				ignoreCase: true
-			});
-
-			if (bestMatch.score === 0) {
-				return {
-					success: false,
-					reply: "No matching game could be found!"
-				};
-			}
-
-			gameData = games.find(i => i.name === bestMatch.original);
-		}
-
-		let selectedSex = "1";
-		if (context.params.gender || context.params.sex) {
-			const gender = (context.params.gender ?? context.params.sex).toLowerCase();
-			if (gender === "male") {
-				selectedSex = "0";
-			}
-			else if (gender === "female") {
-				selectedSex = "1";
-			}
-			else if (gender === "nonconforming") {
-				selectedSex = "2";
-			}
-			else {
-				return {
-					success: false,
-					reply: "No matching gender could be found!"
-				};
-			}
-		}
-
-		const profileKey = { gameID: gameData.ID, sex: selectedSex };
-		let profilesData = await this.getCacheData(profileKey);
+		let profilesData = await this.getCacheData(PROFILES_CACHE_KEY);
 		if (!profilesData) {
 			const response = await sb.Got("GenericAPI", {
 				method: "POST",
 				responseType: "json",
-				url: "https://play.epal.gg/web/product-search/list",
-				json: {
-					pn: 1,
-					ps: 20, // If set above 20, the resulting array is empty
-					sex: selectedSex,
-					orderField: 4,
-					productTypeId: gameData.ID,
-					clientNo: "bb203a8d12"
-				}
+				throwHttpErrors: false,
+				url: "https://h.epal.gg/web/home-rc/fy/v2",
+				json: {}
 			});
 
-			if (!response.body.content) {
+			if (!response.ok || !response.body.content) {
 				return {
 					success: false,
 					reply: `No profile data is currently available! Try again later.`
 				};
 			}
 
-			profilesData = response.body.content.map(i => ({
+			profilesData = response.body.content.list.map(i => ({
 				ID: i.userId,
-				level: i.levelDesc,
 				name: i.userName,
-				gameLevel: i.levelName,
+				intro: i.introduction,
 				description: i.introductionText,
 				audioFile: i.introductionSpeech,
+				product: i.productName,
 				profilePicture: i.cover,
+				tags: i.styleDesc ?? [],
 				revenue: (i.serveNum)
 					? sb.Utils.round(i.serveNum * i.price / 100, 2)
 					: null,
 				price: {
 					regular: (i.price / 100),
-					unit: i.priceUnitDesc ?? "hour",
-					discount: (i.discountPrice)
-						? sb.Utils.round(i.discountPrice / 100)
-						: null,
-					discountAmount: (i.discountAmount)
-						? `${sb.Utils.round((1 - i.discountAmount) * 100)}%`
-						: null
+					unit: i.priceUnitDesc ?? "hour"
 				}
 			}));
 
-			await this.setCacheData(profileKey, profilesData, { expiry: 864e5 });
+			await this.setCacheData(PROFILES_CACHE_KEY, profilesData, { expiry: 864e5 });
 		}
 
 		if (profilesData.length === 0) {
 			return {
 				success: false,
-				reply: "This game/gender combination has no active profiles!"
+				reply: "The website does not have any active profiles at the moment!? (This shouldn't really happen)"
 			};
 		}
 
@@ -150,10 +78,11 @@ module.exports = {
 			ID,
 			audioFile,
 			description,
-			gameLevel,
 			name,
 			revenue,
-			price
+			price,
+			product,
+			tags
 		} = sb.Utils.randArray(profilesData);
 
 		if (tts.channels.includes(context.channel?.ID) && sb.Config.get("TTS_ENABLED")) {
@@ -169,38 +98,18 @@ module.exports = {
 			});
 		}
 
-		let type = "";
-		if (selectedSex === "0") {
-			type = "(M)";
-		}
-		else if (selectedSex === "1") {
-			type = "(F)";
-		}
-		else if (selectedSex === "2") {
-			type = "(NC)";
-		}
-
-		const levelString = (gameLevel)
-			? `at level ${gameLevel}`
-			: "";
-
-		const priceString = (price.discount)
-			? `$${price.discount} (${price.discountAmount} discount!) per ${price.unit}`
-			: `$${price.regular} per ${price.unit}`;
-
+		const priceString = `$${price.regular} per ${price.unit}`;
+		const tagsString = (tags.length !== 0) ? `Tags: ${tags.join(", ")}` : "";
 		const revenueString = (revenue !== null && revenue > 0)
 			? `Total revenue: $${revenue}.`
-			: "";
-
-		const roleString = (gameData.role)
-			? `${gameData.role} in`
 			: "";
 
 		const profileUrl = `https://www.epal.gg/epal/${ID}`;
 
 		return {
 			reply: sb.Utils.tag.trim `
-				${name} ${type} plays ${roleString} ${gameData.name} ${levelString} for ${priceString}.
+				${name} provides "${product}" content for ${priceString}.
+				${tagsString}
 				${revenueString}
 				${profileUrl}
 				${description}
@@ -208,11 +117,6 @@ module.exports = {
 		};
 	},
 	Dynamic_Description: async function (prefix) {
-		const gameData = await this.getCacheData({ type: "games" });
-		const games = (gameData)
-			? gameData.map(i => `<li><code>${i.name}</code></li>`).sort().join("")
-			: "<li>No game data available - use the command to populate the list!</li>";
-
 		return [
 			`Fetches a random description of a user profile from <a target="_blank" href="//epal.gg">epal.gg</a>.`,
 			`If this command is executed in Supinic's channel and TTS is on, the user introduction audio will be played.`,
@@ -220,16 +124,7 @@ module.exports = {
 
 			`<code>${prefix}epal</code>`,
 			`<code>${prefix}ForeverAlone</code>`,
-			"Random user, female only",
-			"",
-
-			`<code>${prefix}epal sex:(male/female)</code>`,
-			"Random user, specified sex only",
-			"",
-
-			`<code>${prefix}epal game:(game)</code>`,
-			"Random user, selected game only. Only uses the first word of the game you provide.",
-			`List of games: <ul>${games}</ul>`
+			"Random user from the current featured/top list"
 		];
 	}
 };
