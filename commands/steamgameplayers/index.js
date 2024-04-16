@@ -40,7 +40,7 @@ module.exports = {
 			}
 
 			const response = await sb.Got("FakeAgent", {
-				url: "https://steamdb.info/static/js/instantsearch.js",
+				url: "https://steamdb.info//static/js/instantsearch.js?v=796780380df10377",
 				responseType: "text"
 			});
 
@@ -50,9 +50,9 @@ module.exports = {
 				};
 			}
 
-			const match = response.body.match(/algoliasearch\("(.*?)"\s*,\s*"(.*?)"/);
+			const match = response.body.match(/algoliasearch\("(.*?)"\s*,\s*atob\("(.*?)"\)/);
 			const appID = match[1];
-			const apiKey = match[2];
+			const apiKey = Buffer.from(match[2], "base64").toString("utf8");
 
 			await Promise.all([
 				sb.Config.set("ALGOLIA_STEAMDB_APP_ID", appID),
@@ -75,7 +75,7 @@ module.exports = {
 			}
 
 			const response = await sb.Got("GenericAPI", {
-				url: "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001",
+				url: "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1",
 				searchParams: {
 					appid: context.params.gameID
 				}
@@ -153,7 +153,8 @@ module.exports = {
 			url: "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001",
 			throwHttpErrors: false,
 			searchParams: {
-				appid: game.objectID
+				appid: game.objectID,
+				key: sb.Config.get("API_STEAM_KEY")
 			}
 		});
 
