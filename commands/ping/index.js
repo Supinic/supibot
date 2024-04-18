@@ -1,6 +1,19 @@
 const promisify = require("util").promisify;
 const exec = promisify(require("child_process").exec);
 
+const checkLatency = async (callback, ...args) => {
+	try {
+		const start = process.hrtime.bigint();
+		await callback(...args);
+
+		return sb.Utils.round(Number(process.hrtime.bigint() - start) / 1.0e6, 3);
+	}
+	catch {
+		return null;
+	}
+};
+const switchCharactersMap = { a: "e", e: "i", i: "o", o: "u", u: "y", y: "a" };
+
 module.exports = {
 	Name: "ping",
 	Aliases: ["pang","peng","pong","pung","pyng"],
@@ -10,20 +23,11 @@ module.exports = {
 	Flags: ["pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		checkLatency: async (callback, ...args) => {
-			try {
-				const start = process.hrtime.bigint();
-				await callback(...args);
-
-				return sb.Utils.round(Number(process.hrtime.bigint() - start) / 1.0e6, 3);
-			}
-			catch {
-				return null;
-			}
-		}
-	})),
-	Code: (async function ping (context) {
+	Static_Data: null,
+	/**
+	 * @param {Context} context
+	 */
+	Code: async function ping (context) {
 		const [temperatureResult] = await Promise.allSettled([
 			exec("vcgencmd measure_temp")
 		]);
@@ -63,7 +67,7 @@ module.exports = {
 		}
 
 		if (context.platform.Name === "twitch") {
-			const ping = await this.staticData.checkLatency(
+			const ping = await checkLatency(
 				async () => context.platform.client.ping()
 			);
 
@@ -72,12 +76,18 @@ module.exports = {
 				: `${Math.trunc(ping)}ms`;
 		}
 
-		const chars = { a: "e", e: "i", i: "o", o: "u", u: "y", y: "a" };
-		const pongString = `P${chars[context.invocation[1]]}ng!`;
+		const pongString = `P${switchCharactersMap[context.invocation[1]]}ng!`;
+		if (pongString === "Ping!" && sb.Utils.random(1, 10) === 1) {
+			const emote = context.randomEmote(["AlienDance", "AlienPls", "forsenPls", "SourPls", "DinoDance"]);
+			return {
+				reply: `Let's play Pong ${emote} ${emote} ${emote} https://youtu.be/cNAdtkSjSps`
+			};
+		}
+
 		return {
 			reply: `${pongString} ${Object.entries(data).map(([name, value]) => `${name}: ${value}`).join("; ")}`
 		};
-	}),
+	},
 	Dynamic_Description: (async (prefix) => [
 		"Pings the bot, checking if it's alive, and a bunch of other data, like latency and commands used this session",
 		"",
