@@ -44,7 +44,7 @@ module.exports = {
 		};
 
 		if (sb.Cache) {
-			data.Redis = (sb.Cache.active)
+			data.Redis = (sb.Cache.ready)
 				? `${String(await sb.Cache.server.dbsize())} keys`
 				: "not online";
 		}

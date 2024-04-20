@@ -192,7 +192,7 @@ module.exports = class User extends require("./template.js") {
 			}
 
 			// 2. attempt to fetch the user from medium-cache (sb.Cache)
-			if (sb.Cache && sb.Cache.active) {
+			if (sb.Cache && sb.Cache.ready) {
 				const redisCacheUser = await User.createFromCache({ name: username });
 				if (redisCacheUser) {
 					if (!User.data.has(username)) {
@@ -274,7 +274,7 @@ module.exports = class User extends require("./template.js") {
 					continue;
 				}
 
-				if (sb.Cache && sb.Cache.active) {
+				if (sb.Cache && sb.Cache.ready) {
 					const redisCacheUser = await User.createFromCache({ name: username });
 					if (redisCacheUser) {
 						User.data.set(username, redisCacheUser);
