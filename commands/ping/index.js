@@ -54,7 +54,7 @@ module.exports = {
 			const url = context.channel.Banphrase_API_URL;
 
 			if (type && url) {
-				const ping = await this.staticData.checkLatency(
+				const ping = await checkLatency(
 					async () => sb.Banphrase.executeExternalAPI("test", type, url)
 				);
 
