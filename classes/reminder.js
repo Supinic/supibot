@@ -477,11 +477,8 @@ module.exports = class Reminder extends require("./template.js") {
 				}
 
 				const uncheckedAuthorMention = await platform.controller.createUserMention(fromUserData);
-				const authorMentionCheck = await channelData.prepareMessage(uncheckedAuthorMention, {
-					returnBooleanOnFail: true,
-					skipLengthCheck: true
-				});
-				const authorMention = (authorMentionCheck === false) ? "[Banphrased username]," : `${authorMentionCheck}`;
+				const authorBanphraseCheck = await sb.Banphrase.execute(uncheckedAuthorMention, channelData);
+				const authorMention = (authorBanphraseCheck.passed) ? `${uncheckedAuthorMention},` : "[Banphrased username],";
 
 				const targetMention = await platform.controller.createUserMention(targetUserData);
 				let message = `${authorMention}, ${targetMention} just typed in channel ${channelName}`;
@@ -495,12 +492,9 @@ module.exports = class Reminder extends require("./template.js") {
 				}
 				else {
 					const channelData = Channel.get(reminder.Channel);
-					const preparedMessage = await channelData.prepareMessage(message, {
-						returnBooleanOnFail: true,
-						skipLengthCheck: true
-					});
+					const banphraseResult = await sb.Banphrase.execute(message, channelData);
 
-					if (!preparedMessage) {
+					if (!banphraseResult.passed) {
 						await channelData.send(sb.Utils.tag.trim `
 							${authorMention},
 							a user you set up a "pingme" reminder for has typed somewhere, but I can't post it here.
@@ -514,7 +508,7 @@ module.exports = class Reminder extends require("./template.js") {
 							command: Command.get("remind"),
 							channel: channelData ?? null,
 							platform: channelData?.Platform ?? null,
-							string: preparedMessage,
+							string: banphraseResult.string,
 							executor: fromUserData
 						});
 
@@ -526,55 +520,49 @@ module.exports = class Reminder extends require("./template.js") {
 				continue;
 			}
 
+			const reminderTextCheck = await Banphrase.execute(reminder.Text, channelData);
+			const reminderText = (reminderTextCheck.passed) ? reminder.Text : "[Banphrased]";
+			const delta = sb.Utils.timeDelta(reminder.Created);
+
 			let reminderMessage;
 			if (reminder.User_From === targetUserData.ID) {
-				reminderMessage = `yourself - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
+				reminderMessage = `yourself - ${reminderText} (${delta})`;
 			}
 			else if (fromUserData.Name === platformData.Self_Name) {
-				reminderMessage = `system reminder - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
+				reminderMessage = `system reminder - ${reminderText} (${delta})`;
 			}
 			else if (reminder.Text !== null) {
 				const mention = await channelData.Platform.createUserMention(fromUserData);
-				const { string } = await Banphrase.execute(mention, channelData);
+				const mentionResult = await Banphrase.execute(mention, channelData);
+				const checkedeMention = (mentionResult.passed) ? mention : "[Banphrased username]";
 
-				reminderMessage = `${string} - ${reminder.Text} (${sb.Utils.timeDelta(reminder.Created)})`;
+				reminderMessage = `${checkedeMention} - ${reminderText} (${delta})`;
 			}
 
-			if (reminderMessage) {
-				if (reminder.Private_Message) {
-					privateReply.push(reminderMessage);
-				}
-				else {
-					const checked = await channelData.prepareMessage(reminderMessage);
-					reply.push(checked);
-				}
+			if (reminder.Private_Message) {
+				privateReply.push(reminderMessage);
+			}
+			else {
+				reply.push(reminderMessage);
 			}
 		}
 
 		const targetUserMention = await channelData.Platform.createUserMention(targetUserData);
-		const checkResult = await channelData.prepareMessage(targetUserMention, {
-			returnBooleanOnFail: true,
-			skipLengthCheck: true
-		});
-
-		const userMention = (checkResult === false) ? "[Banphrased username]," : `${checkResult},`;
+		const targetUserCheck = await sb.Banphrase.execute(targetUserMention, channelData);
+		const userMention = (targetUserCheck.passed) ? `${targetUserMention},` : "[Banphrased username],";
 
 		// Handle non-private reminders
 		if (reply.length !== 0) {
-			const noun = (reply.length === 1) ? "reminder" : "reminders";
-			let message = `${noun} from: ${reply.join("; ")}`;
+			let message = `reminder(s) from: ${reply.join("; ")}`;
 
 			if (channelData.Links_Allowed === false) {
 				message = sb.Utils.replaceLinks(message, "[LINK]");
 			}
 
 			// Check banphrases and do not check length limits, because it is later split manually
-			message = await channelData.prepareMessage(message, {
-				returnBooleanOnFail: true,
-				skipLengthCheck: true
-			});
+			const messageCheck = await sb.Banphrase.execute(message, channelData);
 
-			if (typeof message === "string" && !message.includes("[LINK]")) {
+			if (messageCheck.passed && !message.includes("[LINK]")) {
 				let mirrorMessage = `${targetUserData.Name} ${message}`;
 				message = `${userMention} ${message}`;
 
@@ -625,7 +613,7 @@ module.exports = class Reminder extends require("./template.js") {
 					? await Reminder.createRelayLink("lookup", listID)
 					: "[LINK]";
 
-				const message = sb.Utils.tag.trim `
+				const resultMessage = sb.Utils.tag.trim `
 					Hey ${userMention}
 					you have ${reminderIDs.length} reminders, but they couldn't be posted.
 					Check them here: ${link}
@@ -639,7 +627,7 @@ module.exports = class Reminder extends require("./template.js") {
 				`;
 
 				await Promise.all([
-					channelData.send(message),
+					channelData.send(resultMessage),
 					channelData.mirror(mirrorMessage, null, { commandUsed: false })
 				]);
 			}
