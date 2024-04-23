@@ -183,12 +183,14 @@ module.exports = {
 
 		let publisher = "";
 		const gameData = gameDataResponse.body[game.objectID].data;
-		if (Array.isArray(gameData.publishers)) {
-			if (gameData.publishers.length === 1) {
-				publisher = `(by ${gameData.publishers[0]})`;
+		const devs = gameData.developers;
+
+		if (Array.isArray(devs)) {
+			if (devs.length === 1) {
+				publisher = `(by ${devs[0]})`;
 			}
-			else if (game.publisher.length > 1) {
-				publisher = `(by ${gameData.publishers[0]} and others)`;
+			else if (devs > 1) {
+				publisher = `(by ${devs[0]} and others)`;
 			}
 		}
 
