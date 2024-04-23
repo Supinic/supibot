@@ -1,3 +1,68 @@
+const idRegex = /"x-algolia-application-id"\s*:\s*"(.+?)"/;
+const keyRegex = /\[atob\("eC1hbGdvbGlhLWFwaS1rZXk="\)]=atob\("(.+?)"\)/;
+
+const refetchAlgoliaInfo = async () => {
+	let configRowsAdded = false;
+	if (!sb.Config.has("ALGOLIA_STEAMDB_APP_ID", false)) {
+		const row = await sb.Query.getRow("data", "Config");
+		row.setValues({
+			Name: "ALGOLIA_STEAMDB_APP_ID",
+			Type: "string",
+			Editable: true
+		});
+
+		await row.save({ skipLoad: true });
+		configRowsAdded = true;
+	}
+	if (!sb.Config.has("ALGOLIA_STEAMDB_API_KEY", false)) {
+		const row = await sb.Query.getRow("data", "Config");
+		row.setValues({
+			Name: "ALGOLIA_STEAMDB_API_KEY",
+			Type: "string",
+			Editable: true
+		});
+
+		await row.save({ skipLoad: true });
+		configRowsAdded = true;
+	}
+
+	if (configRowsAdded) {
+		await sb.Config.reloadData();
+	}
+
+	const response = await sb.Got("FakeAgent", {
+		url: "https://steamdb.info/static/js/global.js",
+		responseType: "text"
+	});
+	if (!response.ok) {
+		return {
+			success: false
+		};
+	}
+
+	const idMatch = response.body.match(idRegex);
+	const keyMatch = response.body.match(keyRegex);
+	if (!idMatch || !keyMatch) {
+		return {
+			success: false
+		};
+	}
+
+	const appID = idMatch[1];
+	const apiKey = Buffer.from(keyMatch[1], "base64").toString("utf8");
+
+	await Promise.all([
+		sb.Config.set("ALGOLIA_STEAMDB_APP_ID", appID),
+		sb.Config.set("ALGOLIA_STEAMDB_API_KEY", apiKey)
+	]);
+
+	return {
+		success: true,
+		appID,
+		apiKey
+	};
+};
+
 module.exports = {
 	Name: "steamgameplayers",
 	Aliases: ["sgp"],
@@ -9,62 +74,8 @@ module.exports = {
 		{ name: "gameID", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		refetchAlgoliaInfo: async () => {
-			let configRowsAdded = false;
-			if (!sb.Config.has("ALGOLIA_STEAMDB_APP_ID", false)) {
-				const row = await sb.Query.getRow("data", "Config");
-				row.setValues({
-					Name: "ALGOLIA_STEAMDB_APP_ID",
-					Type: "string",
-					Editable: true
-				});
-
-				await row.save({ skipLoad: true });
-				configRowsAdded = true;
-			}
-			if (!sb.Config.has("ALGOLIA_STEAMDB_API_KEY", false)) {
-				const row = await sb.Query.getRow("data", "Config");
-				row.setValues({
-					Name: "ALGOLIA_STEAMDB_API_KEY",
-					Type: "string",
-					Editable: true
-				});
-
-				await row.save({ skipLoad: true });
-				configRowsAdded = true;
-			}
-
-			if (configRowsAdded) {
-				await sb.Config.reloadData();
-			}
-
-			const response = await sb.Got("FakeAgent", {
-				url: "https://steamdb.info//static/js/instantsearch.js?v=796780380df10377",
-				responseType: "text"
-			});
-
-			if (response.statusCode !== 200) {
-				return {
-					success: false
-				};
-			}
-
-			const match = response.body.match(/algoliasearch\("(.*?)"\s*,\s*atob\("(.*?)"\)/);
-			const appID = match[1];
-			const apiKey = Buffer.from(match[2], "base64").toString("utf8");
-
-			await Promise.all([
-				sb.Config.set("ALGOLIA_STEAMDB_APP_ID", appID),
-				sb.Config.set("ALGOLIA_STEAMDB_API_KEY", apiKey)
-			]);
-
-			return {
-				success: true
-			};
-		}
-	})),
-	Code: (async function steamGamePlayers (context, ...args) {
+	Static_Data: null,
+	Code: async function steamGamePlayers (context, ...args) {
 		if (context.params.gameID) {
 			const gameID = Number(context.params.gameID);
 			if (!sb.Utils.isValidInteger(gameID)) {
@@ -121,7 +132,7 @@ module.exports = {
 		});
 
 		if (searchResponse.statusCode !== 200) {
-			const result = await this.staticData.refetchAlgoliaInfo();
+			const result = await refetchAlgoliaInfo();
 			if (result.success) {
 				return {
 					reply: `Could not fetch game data. I tried to fix it, and it seems to be okay now. Try again, please? 😊`
@@ -143,12 +154,8 @@ module.exports = {
 			};
 		}
 
-		// attempt to find an exact match by game name
-		let game = hits.find(i => i.name.toLowerCase() === query.toLowerCase());
-		if (!game) {
-			game = hits[0];
-		}
-
+		// Ignore heuristics for now, Algolia API does not include game name
+		const game = hits[0];
 		const steamResponse = await sb.Got("GenericAPI", {
 			url: "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001",
 			throwHttpErrors: false,
@@ -165,37 +172,47 @@ module.exports = {
 			};
 		}
 
-		const players = steamResponse.body.response.player_count;
+		// Could add more game IDs to do some proper string matching later
+		const gameDataResponse = await sb.Got("GenericAPI", {
+			url: "https://store.steampowered.com/api/appdetails",
+			throwHttpErrors: false,
+			searchParams: {
+				appids: game.objectID
+			}
+		});
+
 		let publisher = "";
-		if (Array.isArray(game.publisher)) {
-			if (game.publisher.length === 1) {
-				publisher = `(by ${game.publisher[0]})`;
+		const gameData = gameDataResponse.body[game.objectID].data;
+		if (Array.isArray(gameData.publishers)) {
+			if (gameData.publishers.length === 1) {
+				publisher = `(by ${gameData.publishers[0]})`;
 			}
 			else if (game.publisher.length > 1) {
-				publisher = `(by ${game.publisher[0]} and others)`;
+				publisher = `(by ${gameData.publishers[0]} and others)`;
 			}
 		}
 
+		const players = steamResponse.body.response.player_count;
 		return {
 			reply: sb.Utils.tag.trim `
-				${game.name} ${publisher}
+				${gameData.name} ${publisher}
 				currently has
 				${sb.Utils.groupDigits(players)}
 				players in-game.			
 			`
 		};
-	}),
-	Dynamic_Description: (async (prefix) => [
+	},
+	Dynamic_Description: async () => [
 		"Fetches the current amount of players for a specific Steam game.",
 		"",
 
-		`<code>${prefix}sgp (game name)</code>`,
+		`<code>$sgp (game name)</code>`,
 		"Fetches game data by its name",
 		"",
 
 
-		`<code>${prefix}sgp gameID:(game ID)</code>`,
+		`<code>$sgp gameID:(game ID)</code>`,
 		"Fetches game data by its Steam ID",
 		""
-	])
+	]
 };
