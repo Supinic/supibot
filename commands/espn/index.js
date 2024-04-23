@@ -11,6 +11,7 @@ const LEAGUES = {
 };
 const LEAGUES_LIST = Object.keys(LEAGUES);
 const ALLOWED_COMMAND_MODES = ["next", "scores", "today"];
+const GAME_RANGE_DAYS = 90;
 
 const makeUrl = (league) => `https://site.api.espn.com/apis/site/v2/sports/${LEAGUES[league]}/${league}/scoreboard`;
 const createGamecastLink = (league, gameId) => `https://www.espn.com/${league}/game/_/gameId/${gameId}`;
@@ -54,44 +55,29 @@ module.exports = {
 			targetDate.addDays(-1);
 		}
 
-		const dates = targetDate.format("Ymd");
+		const startDate = targetDate.format("Ymd");
+		const endDate = targetDate.addDays(GAME_RANGE_DAYS).format("Ymd");
 		const response = await sb.Got("GenericAPI", {
 			url: makeUrl(league),
 			searchParams: {
-				dates
+				dates: `${startDate}-${endDate}`
 			}
 		});
 
 		const leagueAbbr = league.toUpperCase();
 		if (mode === "next") {
-			let event = response.body.events
+			const event = response.body.events
 				.sort((a, b) => new sb.Date(a.date) - new sb.Date(b.date))
 				.find(i => i.status.type.completed !== true);
 
 			if (!event) {
-				// Special case - load the entire month's worth of matches to try and
-				// bridge possible gaps in the response of the API.
-				const backupResponse = await sb.Got("GenericAPI", {
-					url: makeUrl(league),
-					searchParams: {
-						dates: new sb.Date().format("Y"),
-						limit: 1000
-					}
-				});
-
-				event = backupResponse.body.events
-					.sort((a, b) => new sb.Date(a.date) - new sb.Date(b.date))
-					.find(i => i.status.type.completed !== true);
-
-				if (!event) {
-					return {
-						success: false,
-						reply: sb.Utils.tag.trim `
-							No upcoming ${leagueAbbr} match is currently scheduled! 
-							Check full info here: https://www.espn.com/${league}/scoreboard
-						`
-					};
-				}
+				return {
+					success: false,
+					reply: sb.Utils.tag.trim `
+						No upcoming ${leagueAbbr} match is currently scheduled! 
+						Check full info here: https://www.espn.com/${league}/scoreboard
+					`
+				};
 			}
 
 			let playedAtString = "";
