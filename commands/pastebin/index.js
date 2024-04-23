@@ -1,4 +1,26 @@
 const { getPathFromURL } = require("../../utils/command-utils.js");
+const validateHastebinServer = require("./validate-hastebin.js");
+
+const BASE_HASTEBIN_SERVER = "https://haste.zneix.eu";
+const ALLOWED_GIST_TYPES = ["text/plain", "text/javascript", "application/javascript"];
+const TEXT_LENGTH_LIMIT = 50_000;
+
+const getHastebinServer = (param) => {
+	let path = param ?? BASE_HASTEBIN_SERVER;
+	if (!path.startsWith("http://") && !path.startsWith("https://")) {
+		path = `https://${path}`;
+	}
+
+	let url;
+	try {
+		url = new URL(path);
+	}
+	catch {
+		return null;
+	}
+
+	return url.hostname;
+};
 
 module.exports = {
 	Name: "pastebin",
@@ -14,55 +36,42 @@ module.exports = {
 		{ name: "raw", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		allowedGistTypes: ["text/plain", "text/javascript", "application/javascript"],
-		getHastebinServer: (param) => {
-			let path = param ?? "https://haste.zneix.eu";
-			if (!path.startsWith("http://") && !path.startsWith("https://")) {
-				path = `https://${path}`;
-			}
-
-			let url;
-			try {
-				url = new URL(path);
-			}
-			catch {
-				return null;
-			}
-
-			return url.hostname;
-		},
-		textDataCharacterThreshold: 50_000,
-		validateHastebinServer: require("./validate-hastebin.js")
-	})),
-	Code: (async function pastebin (context, command, ...rest) {
+	Static_Data: null,
+	Code: async function pastebin (context, command, ...rest) {
 		let type;
 		let provider;
-		const args = [...rest];
+		const rawArgs = [...rest];
+
+		if (!command) {
+			return {
+				success: false,
+				reply: `No input provided!`
+			};
+		}
 
 		if (command === "get" || context.invocation === "pbg") {
 			provider = "pastebin";
 			type = "get";
 			if (command && command !== "get") {
-				args.unshift(command);
+				rawArgs.unshift(command);
 			}
 		}
 		else if (command === "post" || context.invocation === "pbp") {
 			provider = "pastebin";
 			type = "post";
 			if (command && command !== "post") {
-				args.unshift(command);
+				rawArgs.unshift(command);
 			}
 		}
 		else if (context.invocation === "gist") {
 			provider = "gist";
 			type = "get";
-			args.unshift(command);
+			rawArgs.unshift(command);
 		}
 		else if (context.invocation.startsWith("hb")) {
 			type = (context.invocation.endsWith("g")) ? "get" : "post";
 			provider = "hastebin";
-			args.unshift(command);
+			rawArgs.unshift(command);
 		}
 		else {
 			const prefix = sb.Command.prefix;
@@ -72,6 +81,7 @@ module.exports = {
 			};
 		}
 
+		const args = rawArgs.filter(Boolean);
 		if (args.length === 0) {
 			return {
 				success: false,
@@ -102,7 +112,7 @@ module.exports = {
 				}
 			}
 			else if (provider === "hastebin") {
-				const server = this.staticData.getHastebinServer(context.params.hasteServer);
+				const server = getHastebinServer(context.params.hasteServer);
 				if (!server) {
 					return {
 						success: false,
@@ -149,7 +159,6 @@ module.exports = {
 		}
 		else if (type === "get") {
 			let userInput = args[0];
-			const { allowedGistTypes } = this.staticData;
 			if (provider === "gist" && context.params.gistUser) {
 				const escapedUser = encodeURI(context.params.gistUser);
 				const response = await sb.Got("GitHub", {
@@ -173,7 +182,7 @@ module.exports = {
 				/** @type {Array} */
 				const gists = response.body;
 				const eligibleGists = gists.filter(gist => {
-					const eligibleFiles = Object.values(gist.files).filter(i => allowedGistTypes.includes(i.type));
+					const eligibleFiles = Object.values(gist.files).filter(i => ALLOWED_GIST_TYPES.includes(i.type));
 					return (eligibleFiles.length === 1);
 				});
 
@@ -182,7 +191,8 @@ module.exports = {
 						success: false,
 						reply: sb.Utils.tag.trim `
 							That user does not have any Gists I can use!							
-							A Gist valid for this command must use exactly one file of one of these types: ${allowedGistTypes.join(", ")}
+							A Gist valid for this command must use exactly one file of one of these types:
+							${ALLOWED_GIST_TYPES.join(", ")}
 						`
 					};
 				}
@@ -221,7 +231,7 @@ module.exports = {
 				textData = result.body;
 			}
 			else if (provider === "hastebin") {
-				const server = this.staticData.getHastebinServer(context.params.hasteServer);
+				const server = getHastebinServer(context.params.hasteServer);
 				if (!server) {
 					return {
 						success: false,
@@ -229,7 +239,7 @@ module.exports = {
 					};
 				}
 
-				const isValid = await this.staticData.validateHastebinServer(this, server);
+				const isValid = await validateHastebinServer(this, server);
 				if (isValid === false) {
 					return {
 						success: false,
@@ -288,13 +298,14 @@ module.exports = {
 					};
 				}
 
-				const eligibleFiles = Object.values(files).filter(i => allowedGistTypes.includes(i.type));
+				const eligibleFiles = Object.values(files).filter(i => ALLOWED_GIST_TYPES.includes(i.type));
 				if (eligibleFiles.length === 0) {
 					return {
 						success: false,
 						reply: sb.Utils.tag.trim `
 							No eligible files found in this Gist!
-							Use exactly one file of one of these types: ${allowedGistTypes.join(", ")}
+							Use exactly one file of one of these types:
+							${ALLOWED_GIST_TYPES.join(", ")}
 						 `
 					};
 				}
@@ -303,7 +314,8 @@ module.exports = {
 						success: false,
 						reply: sb.Utils.tag.trim `
 							Too many eligible files found in this Gist!
-							Use exactly one file of one of these types: ${allowedGistTypes.join(", ")}
+							Use exactly one file of one of these types:
+							${ALLOWED_GIST_TYPES.join(", ")}
 						`
 					};
 				}
@@ -323,12 +335,12 @@ module.exports = {
 					reply: `No text data found in your file/paste!`
 				};
 			}
-			else if (textData.length > this.staticData.textDataCharacterThreshold) {
+			else if (textData.length > TEXT_LENGTH_LIMIT) {
 				return {
 					success: false,
 					reply: sb.Utils.tag.trim `
 						File/paste character limit exceeded!
-						(${sb.Utils.groupDigits(this.staticData.textDataCharacterThreshold)} characters)
+						(${sb.Utils.groupDigits(TEXT_LENGTH_LIMIT)} characters)
 					`
 				};
 			}
@@ -347,11 +359,9 @@ module.exports = {
 				reply: `Invalid operation provided!`
 			};
 		}
-	}),
-	Dynamic_Description: (async function (prefix) {
-		const { textDataCharacterThreshold } = this.staticData;
-		const threshold = sb.Utils.groupDigits(textDataCharacterThreshold);
-
+	},
+	Dynamic_Description: async function () {
+		const threshold = sb.Utils.groupDigits(TEXT_LENGTH_LIMIT);
 		return [
 			"Gets or creates a new text paste on Pastebin or Hastebin; or fetches one from Gist.",
 			`When fetching existing text, the output must not be longer than ${threshold} characters, for performance reasons.`,
@@ -360,58 +370,58 @@ module.exports = {
 
 			"<h5> Pastebin </h5>",
 
-			`<code>${prefix}pastebin get (link)</code>`,
-			`<code>${prefix}pbg (link)</code>`,
+			`<code>$pastebin get (link)</code>`,
+			`<code>$pbg (link)</code>`,
 			"Fetches the contents of a specified Pastebin paste via ID or link.",
 			"",
 
-			`<code>${prefix}pastebin post (...text)</code>`,
-			`<code>${prefix}pbp (...text)</code>`,
+			`<code>$pastebin post (...text)</code>`,
+			`<code>$pbp (...text)</code>`,
 			"Creates a new temporary paste for you to use.",
 			"The paste is set to only be available for 10 minutes from posting, then it is deleted.",
 			"",
 
 			"<h5> Hastebin </h5>",
 
-			`<code>${prefix}hbg (link)</code>`,
-			`<code>${prefix}hbg (link) hasteServer:(custom Hastebin URL)</code>`,
+			`<code>$hbg (link)</code>`,
+			`<code>$hbg (link) hasteServer:(custom Hastebin URL)</code>`,
 			"Fetches the contents of a specified Hastebin haste via ID or link.",
 			"Uses hastebin.com by default - but can use a specific custom instance of Hastebin via the <code>hasteServer</code> parameter.",
 			"",
 
-			`<code>${prefix}hbp (...text)</code>`,
-			`<code>${prefix}hbp (...text) hasteServer:(custom Hastebin URL)</code>`,
+			`<code>$hbp (...text)</code>`,
+			`<code>$hbp (...text) hasteServer:(custom Hastebin URL)</code>`,
 			"Creates a new temporary haste for you to see.",
 			"Uses hastebin.com by default - but can use a specific custom instance of Hastebin via the <code>hasteServer</code> parameter.",
 			"",
 
 			"<h5> GitHub Gist </h5>",
 
-			`<code>${prefix}gist (gist ID)</code>`,
+			`<code>$gist (gist ID)</code>`,
 			"Fetches the contents of a specified GitHub Gist paste via its ID.",
 			"The Gist must only contain a single text/plain or Javascript file.",
 			"",
 
-			`<code>${prefix}gist gistUser:(username)</code>`,
+			`<code>$gist gistUser:(username)</code>`,
 			"Fetches the contents of a randomg GitHub Gist owned by the provided user.",
 			"This will automatically filter out all Gists that don't contain a single text/plain or Javascript file.",
 			"",
 
 			"<h5> Other arguments </h5>",
 
-			`<code>${prefix}pbp (text) raw:false</code>`,
-			`<code>${prefix}hbp (text) raw:false</code>`,
-			`<code>${prefix}hbp (text) raw:false hasteServer:(custom Hastebin URL)</code>`,
+			`<code>$pbp (text) raw:false</code>`,
+			`<code>$hbp (text) raw:false</code>`,
+			`<code>$hbp (text) raw:false hasteServer:(custom Hastebin URL)</code>`,
 			"This command will post \"raw\" paste links, which only contain the text, rather than the website's layout.",
 			"If you would like to receive a proper link, use <code>raw:false</code> as this parameter is <code>true</code> by default!",
 			"",
 
-			`<code>${prefix}pastebin get (link) force:true</code>`,
-			`<code>${prefix}pbg (link) force:true</code>`,
-			`<code>${prefix}hbg (link)</code>`,
-			`<code>${prefix}hbg (link) hasteServer:(custom Hastebin URL)</code>`,
-			`<code>${prefix}gist (gist ID) force:true</code>`,
+			`<code>$pastebin get (link) force:true</code>`,
+			`<code>$pbg (link) force:true</code>`,
+			`<code>$hbg (link)</code>`,
+			`<code>$hbg (link) hasteServer:(custom Hastebin URL)</code>`,
+			`<code>$gist (gist ID) force:true</code>`,
 			"Since the results of all fetching (pastebin, hastebin, gist) are cached, use <code>force:true</code> to forcibly fetch the current status of the paste."
 		];
-	})
+	}
 };
