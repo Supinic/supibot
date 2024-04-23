@@ -47,12 +47,6 @@ module.exports = {
 
 				return `https://thissneakerdoesnotexist.com/wp-content/plugins/sneaker-plugin/imsout2/${params[0]}-${params[1]}-${params[2]}-${id}.jpg`;
 			},
-			vessel: () => {
-				const number = sb.Utils.random(1, 2e4);
-				const padded = sb.Utils.zf(number, 7);
-
-				return `https://thisvesseldoesnotexist.s3-us-west-2.amazonaws.com/public/v2/fakes/${padded}.jpg`;
-			},
 			waifu: () => `https://www.thiswaifudoesnotexist.net/example-${sb.Utils.random(1, 1e5)}.jpg`,
 			wojak: () => `https://archive.org/download/thiswojakdoesnotexist.com/img/${sb.Utils.random(1, 1576)}.png`
 		};
@@ -158,10 +152,9 @@ module.exports = {
 				},
 				{
 					method: "rolls a random number for a static link",
-					types: ["anime", "fursona", "sneaker", "vessel", "waifu", "wojak"],
+					types: ["anime", "fursona", "sneaker", "waifu", "wojak"],
 					descriptions: [
-						`<code>fursona</code> - <a href="https://thisfursonadoesnotexist.com/">This fursona does not exist</a>`,
-						`<code>vessel</code> - <a href="https://thisvesseldoesnotexist.com/#/fakes/">This vessel does not exist</a>`
+						`<code>fursona</code> - <a href="https://thisfursonadoesnotexist.com/">This fursona does not exist</a>`
 					],
 					execute: async (context, type) => {
 						const link = staticNumberedLinkMap[type]();
