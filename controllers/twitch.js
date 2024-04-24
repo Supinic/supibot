@@ -51,6 +51,7 @@ const fetchToken = async () => {
 
 	const response = await sb.Got("GenericAPI", {
 		url: "https://id.twitch.tv/oauth2/token",
+		method: "POST",
 		searchParams: {
 			grant_type: "refresh_token",
 			refresh_token: sb.Config.get("TWITCH_REFRESH_TOKEN"),
