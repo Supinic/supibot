@@ -16,7 +16,7 @@ export const definition = {
 			prefixUrl: "https://api.twitch.tv/helix",
 			headers: {
 				"Client-ID": sb.Config.get("TWITCH_CLIENT_ID"),
-				Authorization: `Bearer ${token.replace("oauth:", "")}`
+				Authorization: `Bearer ${token}`
 			}
 		};
 	}),

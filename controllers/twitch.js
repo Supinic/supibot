@@ -149,7 +149,7 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		this.client = new DankTwitch.ChatClient({
 			username: this.platform.Self_Name,
-			password: sb.Config.get("TWITCH_OAUTH"),
+			password: `oauth:${sb.Config.get("TWITCH_OAUTH")}`,
 			rateLimits: this.platform.Data.rateLimits
 		});
 
@@ -1712,7 +1712,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			token = await fetchToken();
 		}
 
-		this.controller.client.configuration.password = token;
+		this.controller.client.configuration.password = `oauth:${token}`;
 		sb.Got.get("Helix").defaults.options.headers.autuhorization = `Bearer ${token}`;
 	}
 
