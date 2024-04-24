@@ -30,6 +30,47 @@ const emoteGot = sb.Got.get("Global")
 		}
 	});
 
+const fetchToken = async () => {
+	if (!sb.Config.has("TWITCH_REFRESH_TOKEN", true)) {
+		throw new sb.Error({
+			message: "No Twitch refresh token available!"
+		});
+	}
+
+	if (!sb.Config.has("TWITCH_OAUTH_EXPIRATION", false)) {
+		const row = await sb.Query.getRow("data", "Config");
+		row.setValues({
+			Name: "TWITCH_OAUTH_EXPIRATION",
+			Type: "number",
+			Editable: true
+		});
+
+		await row.save({ skipLoad: true });
+		await sb.Config.reloadData();
+	}
+
+	const response = await sb.Got("GenericAPI", {
+		url: "https://id.twitch.tv/oauth2/token",
+		searchParams: {
+			grant_type: "refresh_token",
+			refresh_token: sb.Config.get("TWITCH_REFRESH_TOKEN"),
+			client_id: sb.Config.get("TWITCH_CLIENT_ID"),
+			client_secret: sb.Config.get("TWITCH_CLIENT_SECRET")
+		}
+	});
+
+	const expirationTimestamp = sb.Date.now() + (response.body.expires_in * 1000);
+	const authToken = response.body.access_token;
+
+	await Promise.all([
+		sb.Config.set("TWITCH_OAUTH", authToken),
+		sb.Config.set("TWITCH_OAUTH_EXPIRATION", expirationTimestamp),
+		sb.Config.set("TWITCH_REFRESH_TOKEN", response.body.refresh_token)
+	]);
+
+	return authToken;
+};
+
 const emitRawUserMessageEvent = (username, channelName, message, messageData = {}) => {
 	if (!username || !channelName) {
 		throw new sb.Error({
@@ -76,6 +117,7 @@ const getActiveUsernamesInChannel = async (channelData) => {
 
 module.exports = class TwitchController extends require("./template.js") {
 	supportsMeAction = true;
+	tokenCheckInterval = setInterval(() => this.#checkAuthToken(), 60_000);
 
 	constructor () {
 		super();
@@ -1646,6 +1688,32 @@ module.exports = class TwitchController extends require("./template.js") {
 				login
 			}
 		};
+	}
+
+	async #checkAuthToken () {
+		const now = sb.Date.now();
+		const expiration = sb.Config.get("TWITCH_OAUTH_EXPIRATION", false);
+
+		let token = sb.Config.get("TWITCH_OAUTH");
+		if (!expiration || now > expiration) {
+			token = await fetchToken();
+		}
+
+		const response = await sb.Got("GenericAPI", {
+			url: "https://id.twitch.tv/oauth2/validate",
+			throwHttpErrors: false,
+			headers: {
+				Authorization: `OAuth ${token}`
+			}
+		});
+
+		if (!response.ok) {
+			console.warn("Invalid token validation response, fetching tokens...");
+			token = await fetchToken();
+		}
+
+		this.controller.client.configuration.password = token;
+		sb.Got.get("Helix").defaults.options.headers.autuhorization = `Bearer ${token}`;
 	}
 
 	static async fetchAccountChallengeStatus (userData, twitchID) {
