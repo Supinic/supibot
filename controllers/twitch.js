@@ -1713,7 +1713,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 
 		this.controller.client.configuration.password = `oauth:${token}`;
-		sb.Got.get("Helix").defaults.options.headers.autuhorization = `Bearer ${token}`;
+		sb.Got.get("Helix").defaults.options.headers.authorization = `Bearer ${token}`;
 	}
 
 	static async fetchAccountChallengeStatus (userData, twitchID) {
