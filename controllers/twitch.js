@@ -37,18 +37,6 @@ const fetchToken = async () => {
 		});
 	}
 
-	if (!sb.Config.has("TWITCH_OAUTH_EXPIRATION", false)) {
-		const row = await sb.Query.getRow("data", "Config");
-		row.setValues({
-			Name: "TWITCH_OAUTH_EXPIRATION",
-			Type: "number",
-			Editable: true
-		});
-
-		await row.save({ skipLoad: true });
-		await sb.Config.reloadData();
-	}
-
 	const response = await sb.Got("GenericAPI", {
 		url: "https://id.twitch.tv/oauth2/token",
 		method: "POST",
