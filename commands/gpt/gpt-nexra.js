@@ -14,7 +14,7 @@ module.exports = class GptNexra extends GptMessages {
 		// noinspection BadExpressionStatementJS
 		messages.unshift[{
 			role: "user",
-			content: "Respond to the point, concisely, up to 500 characters, unless I specifically ask you for further detail."
+			content: "Respond in a concise summary, maximum two sentences or 300 characters; unless I specifically ask you for further detail."
 		}];
 
 		const response = await sb.Got("GenericAPI", {
