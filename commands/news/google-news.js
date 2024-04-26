@@ -4,22 +4,28 @@ const cleanString = (str) => sb.Utils.fixHTML(sb.Utils.removeHTML(str)).replace(
 
 module.exports = {
 	fetch: async (query) => {
-		const searchParams = {
-			hl: "en-US",
-			q: query ?? "e", // The letter "E" is the most common letter in the English language
-			gl: "US",
-			ceid: "US:en"
-		};
-
-		const response = await sb.Got("GenericAPI", {
-			url: "https://news.google.com/rss/search",
-			searchParams,
-			responseType: "text"
-		});
+		let response;
+		if (query) {
+			response = await sb.Got("GenericAPI", {
+				url: "https://news.google.com/rss/search",
+				responseType: "text",
+				searchParams: {
+					hl: "en-US",
+					q: query ?? "e", // The letter "E" is the most common letter in the English language
+					gl: "US",
+					ceid: "US:en"
+				}
+			});
+		}
+		else {
+			response = await sb.Got("GenericAPI", {
+				url: "https://news.google.com/rss",
+				responseType: "text"
+			});
+		}
 
 		const xml = response.body;
 		const rss = await parseRSS(xml);
-
 		const articles = rss.items.map(i => ({
 			title: (i.title) ? cleanString(i.title.trim()) : null,
 			content: (i.content) ? cleanString(i.content.trim()) : null,
