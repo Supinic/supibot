@@ -1702,7 +1702,6 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 
 		this.client.configuration.password = `oauth:${token}`;
-		sb.Got.get("Helix").defaults.options.headers.authorization = `Bearer ${token}`;
 	}
 
 	static async fetchAccountChallengeStatus (userData, twitchID) {
