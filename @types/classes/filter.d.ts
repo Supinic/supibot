@@ -22,7 +22,10 @@ declare type ConstructorData = {
 	Active: boolean;
 	Issued_By: User["ID"] | null;
 };
+
 declare type CreateData = Partial<Omit<ConstructorData, "ID" | "Data" | "Active" | "Response">>;
+declare type UpdateData = Partial<Omit<ConstructorData, "ID" | "Type" | "Issued_By">>;
+
 declare type ContextOptions = {
 	skipUserCheck?: boolean;
 	user?: User | null;
@@ -64,8 +67,18 @@ export declare type Type = "Blacklist" | "Whitelist"
 	| "Offline-only" | "Online-only" | "Arguments" | "Reminder-prevention";
 
 export declare class Filter extends ClassTemplate {
+	static propMaps: {
+		type: Map<Type, Set<Filter>>,
+		user: Map<User["ID"] | null, Set<Filter>>,
+		channel: Map<Channel["ID"] | null, Set<Filter>>,
+		command: Map<Command["Name"] | null, Set<Filter>>,
+		platform: Map<Platform["Name"] | null, Set<Filter>>,
+		invocation: Map<string | null, Set<Filter>>
+	};
+
 	static get (identifier: Like): Filter | null;
-	static getLocals (type: Type, options: ContextOptions): Filter[];
+	static getLocals (type: Type | null, options: ContextOptions): Filter[];
+	static getLocalsByType (type: Type, options: ContextOptions): Filter[];
 	static execute (options: ContextOptions): Promise<ExecuteResult>;
 	static create (options: CreateData): Promise<Filter>;
 	static getMentionStatus (options: ContextOptions): boolean;
@@ -74,6 +87,8 @@ export declare class Filter extends ClassTemplate {
 	static getFlags (options: ContextOptions): FlagObject;
 	static getReminderPreventions (options: ContextOptions): Filter["User_Alias"][];
 	static getReason (options: ContextOptions): string | null;
+	static rebuildMapCaches (): void;
+	static update (filter: Filter, options: UpdateData): void;
 
 	private filterData: Data;
 	readonly ID: number;
