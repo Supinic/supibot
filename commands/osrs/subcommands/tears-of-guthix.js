@@ -1,50 +1,4 @@
-const flagEmojis = {
-	Australia: "🇦🇺",
-	Germany: "🇩🇪",
-	"United Kingdom": "🇬🇧",
-	"United States": "🇺🇸"
-};
-
-const fetchWorldLocations = async function () {
-	let data = await sb.Cache.getByPrefix("osrs-worlds-data");
-	if (!data) {
-		const response = await sb.Got("FakeAgent", {
-			url: "https://oldschool.runescape.com/slu",
-			responseType: "text"
-		});
-
-		if (!response.ok) {
-			return null;
-		}
-
-		const $ = sb.Utils.cheerio(response.body);
-		const rows = $("tr.server-list__row");
-		const worlds = {};
-
-		for (const row of rows) {
-			const [idElement] = $("td > a", row);
-			const [countryElement] = $("td.server-list__row-cell--country", row);
-			if (!idElement || !countryElement) {
-				continue;
-			}
-
-			const id = idElement.attribs.id.split("-").at(-1);
-			const country = $(countryElement).text();
-
-			worlds[id] = {
-				country,
-				flagEmoji: flagEmojis[country]
-			};
-		}
-
-		data = worlds;
-		await sb.Cache.setByPrefix("osrs-worlds-data", data, {
-			expiry: 864e5 // 1 day
-		});
-	}
-
-	return data;
-};
+const { fetchWorldsData } = require("./utils.js");
 
 module.exports = {
 	name: "guthix",
@@ -79,7 +33,7 @@ module.exports = {
 		}
 
 		let string;
-		const worldsData = await fetchWorldLocations();
+		const worldsData = await fetchWorldsData();
 		const idealWorlds = worlds
 			.filter(i => i.stream_order === "gggbbb")
 			.sort((a, b) => b.hits - a.hits);
