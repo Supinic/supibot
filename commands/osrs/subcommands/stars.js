@@ -17,7 +17,7 @@ const formatStar = (star, worldsData) => {
 	const activityString = (world.activity) ? ` (${world.activity})` : "";
 	const delta = sb.Utils.formatTime(star.remains / 1000, true);
 
-	return `${world.flagEmoji} W${star.world}${activityString}: ${star.calledLocation} (${delta})`;
+	return `${world.flagEmoji} W${star.world}${activityString}: T${star.tier} ${star.calledLocation} (${delta})`;
 };
 
 module.exports = {
