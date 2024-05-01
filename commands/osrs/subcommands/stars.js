@@ -47,7 +47,7 @@ module.exports = {
 
 		const bestStar = stars[0];
 		return {
-			reply: `Best star: ${formatStar(bestStar)}`
+			reply: `Best star: ${formatStar(bestStar, worlds)}`
 		};
 	}
 };
