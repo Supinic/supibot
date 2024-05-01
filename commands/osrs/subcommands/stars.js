@@ -15,7 +15,7 @@ const getRemaining = (star) => {
 const formatStar = (star, worldsData) => {
 	const world = worldsData[star.world];
 	const activityString = (world.activity) ? ` (${world.activity})` : "";
-	const delta = sb.Utils.formatTime(star.remains, true);
+	const delta = sb.Utils.formatTime(star.remains / 1000, true);
 
 	return `${world.flagEmoji} W${star.world}${activityString}: ${star.calledLocation} (${delta} remains)`;
 };
