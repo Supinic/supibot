@@ -36,7 +36,7 @@ const fetchWorldsData = async function () {
 			worlds[id] = {
 				country,
 				type,
-				activity,
+				activity: (activity !== "-") ? activity : null,
 				flagEmoji: flagEmojis[country]
 			};
 		}
