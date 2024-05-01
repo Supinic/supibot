@@ -6,6 +6,7 @@ const { fetchWorldsData } = require("./utils.js");
  * - {@link https://oldschool.runescape.wiki/w/Update:Forestry:_Part_Two#Shooting_Stars}
  */
 const TIME_PER_TIER = 420_000;
+const activityRegex = /(pvp|high risk|skill total)/i;
 
 const getRemaining = (star) => {
 	const fullTime = TIME_PER_TIER * (star.tier - 1);
@@ -13,9 +14,11 @@ const getRemaining = (star) => {
 	return (fullTime - elapsedTime);
 };
 const formatStar = (star, worldsData) => {
-	const world = worldsData[star.world];
-	const activityString = (world.activity) ? ` (${world.activity})` : "";
 	const delta = sb.Utils.formatTime(star.remains / 1000, true);
+	const world = worldsData[star.world];
+	const activityString = activityRegex.test(world.activity)
+		? ` (${world.activity})`
+		: "";
 
 	return `${world.flagEmoji} W${star.world}${activityString}: T${star.tier} ${star.calledLocation} (${delta})`;
 };
