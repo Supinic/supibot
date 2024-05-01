@@ -45,9 +45,10 @@ module.exports = {
 			.map(i => ({ ...i, remains: getRemaining(i) }))
 			.sort((a, b) => b.remains - a.remains);
 
-		const bestStar = stars[0];
+		const bestStars = stars.slice(0, 3);
+		const string = bestStars.map(i => formatStar(i, worlds)).join("; ");
 		return {
-			reply: `Best star: ${formatStar(bestStar, worlds)}`
+			reply: `Top 3 stars: ${string}`
 		};
 	}
 };
