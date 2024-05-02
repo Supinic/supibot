@@ -16,6 +16,9 @@ module.exports = class Platform {
 	dynamicChannelAddition = false;
 	#userMessagePromises = new Map();
 
+	/** @type {Platform[]} */
+	static list = [];
+
 	constructor (name, config, defaults = {}) {
 		this.#name = name;
 		this.#id = config.ID;
@@ -44,6 +47,8 @@ module.exports = class Platform {
 			...defaults.logging,
 			...config.logging ?? {}
 		};
+
+		Platform.list.push(this);
 	}
 
 	get ID () { return this.#id; }
@@ -419,15 +424,15 @@ module.exports = class Platform {
 			return identifier;
 		}
 		else if (typeof identifier === "number") {
-			return Platform.data.find(i => i.ID === identifier) ?? null;
+			return Platform.list.find(i => i.ID === identifier) ?? null;
 		}
 		else if (typeof identifier === "string") {
-			const eligible = Platform.data.filter(i => i.Name === identifier);
+			const eligible = Platform.list.filter(i => i.name === identifier);
 			if (eligible.length === 0) {
 				return null;
 			}
 			else if (host === null || typeof host === "string") {
-				return eligible.find(i => i.Host === host);
+				return eligible.find(i => i.host === host);
 			}
 			else {
 				if (eligible.length > 1) {
