@@ -11,10 +11,18 @@ module.exports = class GptNexra extends GptMessages {
 
 	static async execute (context, query, modelData) {
 		const messages = await this.getHistory(context);
-		messages.unshift({
-			role: "user",
-			content: "Respond concisely, to the point, maximum 300 characters; unless I ask you for further detail."
-		});
+		if (context.params.context) {
+			messages.unshift({
+				role: "user",
+				content: context.params.context
+			});
+		}
+		else {
+			messages.unshift({
+				role: "user",
+				content: "Respond concisely, to the point, maximum 300 characters; unless I ask you for further detail."
+			});
+		}
 
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
