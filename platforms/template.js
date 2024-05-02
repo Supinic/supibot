@@ -452,6 +452,35 @@ module.exports = class Platform {
 			});
 		}
 	}
+
+	static create (type, config) {
+		let InstancePlatform;
+		switch (type) {
+			case "twitch":
+				InstancePlatform = require("./twitch.js");
+				break;
+
+			case "discord":
+				InstancePlatform = require("./discord.js");
+				break;
+
+			case "cytube":
+				InstancePlatform = require("./cytube.js");
+				break;
+
+			case "irc":
+				InstancePlatform = require("./irc.js");
+				break;
+
+			default:
+				throw new sb.Error({
+					message: "Invalid platform type provided",
+					args: { type, config }
+				});
+		}
+
+		return new InstancePlatform(config);
+	}
 };
 
 /**

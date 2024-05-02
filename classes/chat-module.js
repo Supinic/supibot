@@ -1,5 +1,5 @@
-const Platform = require("./platform.js");
 const Channel = require("./channel.js");
+const Platform = require("../platforms/template.js");
 
 module.exports = class ChatModule extends require("./template.js") {
 	static importable = true;
@@ -45,7 +45,7 @@ module.exports = class ChatModule extends require("./template.js") {
 			}
 			else {
 				this.attach({
-					platform: Platform.data
+					platform: Platform.list
 				});
 			}
 

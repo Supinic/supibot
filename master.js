@@ -1,5 +1,4 @@
 // Classes requires
-const Platform = require("./classes/platform.js");
 const Filter = require("./classes/filter.js");
 const Command = require("./classes/command.js");
 const User = require("./classes/user.js");
@@ -13,6 +12,9 @@ const ChatModule = require("./classes/chat-module.js");
 const Logger = require("./singletons/logger.js");
 const Pastebin = require("./singletons/pastebin.js");
 const VLCConnector = require("./singletons/vlc-connector.js");
+
+// Platform require
+const Platform = require("./platforms/template.js");
 
 const importFileDataModule = async (module, path) => {
 	if (!config.modules[path]) {
@@ -61,10 +63,8 @@ catch {
 
 const databaseModuleInitializeOrder = [
 	// First batch - no dependencies
-	[Platform, Filter, Command, User, AwayFromKeyboard, Banphrase],
-	// Second batch - all depend on Platform
-	[Channel, Reminder],
-	// Third batch - depends on Platform and Channel
+	[Filter, Command, User, AwayFromKeyboard, Banphrase, Channel, Reminder],
+	// Second batch - depends on Channel
 	[ChatModule]
 ];
 
@@ -72,6 +72,12 @@ const databaseModuleInitializeOrder = [
 require("./db-access.js");
 
 (async () => {
+	const platformsConfig = config.platforms;
+	if (!platformsConfig || platformsConfig.length === 0) {
+		console.warn("No platforms configured! Supibot will now exit.");
+		process.exit(0);
+	}
+
 	const core = await import("supi-core");
 	const Query = new core.Query({
 		user: process.env.MARIA_USER,
@@ -118,6 +124,7 @@ require("./db-access.js");
 		...sb,
 
 		Platform,
+
 		Filter,
 		Command,
 		User,
@@ -139,6 +146,7 @@ require("./db-access.js");
 			blacklist,
 			whitelist
 		} = config.modules.commands;
+
 		const { loadCommands } = await require("./commands/index.js");
 		const commands = await loadCommands({
 			blacklist,
@@ -155,9 +163,6 @@ require("./db-access.js");
 	const { initializeCrons } = await import("./crons/index.mjs");
 	initializeCrons(config.modules.crons);
 
-	const controllers = {};
-	const initialPlatforms = Channel.getActivePlatforms();
-
 	if (sb.Metrics) {
 		sb.Metrics.registerCounter({
 			name: "supibot_messages_sent_total",
@@ -172,29 +177,9 @@ require("./db-access.js");
 		});
 	}
 
-	for (const platformData of initialPlatforms) {
-		let Controller = null;
-		try {
-			Controller = require(`./controllers/${platformData.Name}`);
-		}
-		catch (e) {
-			console.error(`Require of ${platformData.Name} controller module failed`, e);
-			continue;
-		}
-
-		const options = { host: platformData.Host };
-		try {
-			controllers[platformData.Name] = new Controller(options);
-		}
-		catch (e) {
-			console.error(`Initialization of ${platformData.Name} controller module failed`, e);
-			continue;
-		}
-
-		console.debug(`Platform ${platformData.Name} loaded successfully.`);
+	for (const definition of platformsConfig) {
+		Platform.create(definition.type, definition);
 	}
-
-	Platform.assignControllers(controllers);
 
 	process.on("unhandledRejection", async (reason) => {
 		if (!(reason instanceof Error)) {

@@ -1,4 +1,4 @@
-const Platform = require("./platform.js");
+const Platform = require("../platforms/template.js");
 
 module.exports = class Channel extends require("./template.js") {
 	static redisPrefix = "sb-channel";
