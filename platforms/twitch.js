@@ -66,19 +66,6 @@ const specialEmoteSetMap = {
 	610186276: "302778679" // 2020 emotes
 };
 
-const emoteGot = sb.Got.get("Global")
-	.extend({
-		mutableDefaults: true,
-		responseType: "json",
-		throwHttpErrors: false,
-		timeout: {
-			request: 10_000
-		},
-		retry: {
-			limit: 0
-		}
-	});
-
 const fetchToken = async () => {
 	if (!sb.Config.has("TWITCH_REFRESH_TOKEN", true)) {
 		throw new sb.Error({
@@ -262,12 +249,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			});
 		}
 
-		this.client = new DankTwitch.ChatClient({
-			username: this.selfName,
-			password: `oauth:${sb.Config.get("TWITCH_OAUTH")}`,
-			rateLimits: this.config.rateLimits
-		});
-
 		this.queues = {};
 		this.evasion = {};
 		this.rejectedMessageTimeouts = {};
@@ -276,6 +257,14 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		this.availableEmoteSets = [];
 		this.recentEmoteFetchTimeout = 0;
 		this.userCommandSpamPrevention = new Map();
+	}
+
+	async connect () {
+		this.client = new DankTwitch.ChatClient({
+			username: this.selfName,
+			password: `oauth:${sb.Config.get("TWITCH_OAUTH")}`,
+			rateLimits: this.config.rateLimits
+		});
 
 		this.initListeners();
 
@@ -283,7 +272,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		const joinOverride = this.config.joinChannelsOverride ?? [];
 		if (joinOverride.length === 0) {
-			this.client.joinAll(sb.Channel.getJoinableForPlatform(this).map(i => i.Name));
+			await this.client.joinAll(sb.Channel.getJoinableForPlatform(this).map(i => i.Name));
 		}
 		else {
 			const channelList = joinOverride
@@ -291,7 +280,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				.filter(Boolean)
 				.map(i => i.Name);
 
-			this.client.joinAll(channelList);
+			await this.client.joinAll(channelList);
 		}
 
 		if (this.config.trackChannelsLiveStatus) {

@@ -106,6 +106,11 @@ require("./db-access.js");
 		Utils: new core.Utils()
 	};
 
+	const platforms = new Set();
+	for (const definition of platformsConfig) {
+		platforms.add(Platform.create(definition.type, definition));
+	}
+
 	// Initialize bot-specific modules with database-driven data
 	for (let i = 0; i < databaseModuleInitializeOrder.length; i++) {
 		const initOrder = databaseModuleInitializeOrder[i];
@@ -163,6 +168,13 @@ require("./db-access.js");
 	const { initializeCrons } = await import("./crons/index.mjs");
 	initializeCrons(config.modules.crons);
 
+	const promises = [];
+	for (const platform of platforms) {
+		promises.push(platform.connect());
+	}
+
+	await Promise.all(promises);
+
 	if (sb.Metrics) {
 		sb.Metrics.registerCounter({
 			name: "supibot_messages_sent_total",
@@ -175,10 +187,6 @@ require("./db-access.js");
 			help: "Total number of Twitch messages seen (read) by the bot.",
 			labelNames: ["platform", "channel"]
 		});
-	}
-
-	for (const definition of platformsConfig) {
-		Platform.create(definition.type, definition);
 	}
 
 	process.on("unhandledRejection", async (reason) => {

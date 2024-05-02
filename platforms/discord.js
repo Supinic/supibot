@@ -45,11 +45,9 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 				message: "Discord bot token has not been configured"
 			});
 		}
-
-		this.#initClient();
 	}
 
-	#initClient () {
+	async connect () {
 		this.client = new Client({
 			intents: [
 				GatewayIntentBits.Guilds,
@@ -69,7 +67,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		this.initListeners();
 
 		const token = sb.Config.get("DISCORD_BOT_TOKEN");
-		this.client.login(token);
+		await this.client.login(token);
 	}
 
 	initListeners () {

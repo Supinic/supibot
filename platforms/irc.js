@@ -31,17 +31,20 @@ module.exports = class IRCPlatform extends require("./template.js") {
 				message: "Invalid IRC configuration - missing url"
 			});
 		}
+	}
 
+	async connect () {
 		this.client = new IRC.Client();
-		this.client.connect({
-			host: config.url,
-			port: config.port ?? DEFAULT_IRC_PORT,
-			nick: this.selfName,
-			tls: config.secure ?? config.tls ?? false,
-			enable_echomessage: true
-		});
 
 		this.initListeners();
+
+		await this.client.connect({
+			host: this.config.url,
+			port: this.config.port ?? DEFAULT_IRC_PORT,
+			nick: this.selfName,
+			tls: this.config.secure ?? this.config.tls ?? false,
+			enable_echomessage: true
+		});
 	}
 
 	initListeners () {

@@ -495,7 +495,9 @@ module.exports = class CytubePlatform extends require("./template.js") {
 				message: "Cytube password has not been configured"
 			});
 		}
+	}
 
+	connect () {
 		const eligibleChannels = sb.Channel.getJoinableForPlatform(this);
 		for (const channelData of eligibleChannels) {
 			this.joinChannel(channelData);
