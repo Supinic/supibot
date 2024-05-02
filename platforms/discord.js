@@ -854,18 +854,6 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 			: userData.Name;
 	}
 
-	restart () {
-		if (this.client) {
-			for (const [eventName, listener] of Object.entries(this.client._events)) {
-				this.client.off(eventName, listener);
-			}
-
-			this.client.destroy();
-		}
-
-		this.#initClient();
-	}
-
 	get permissions () { return PermissionFlagsBits; }
 
 	static removeEmoteTags (message) {
