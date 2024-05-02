@@ -243,7 +243,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	constructor (config) {
 		super("twitch", config, {
 			logging: DEFAULT_LOGGING_CONFIG,
-			platform: DEFAULT_PLATFORM_CONFIG,
+			platform: DEFAULT_PLATFORM_CONFIG
 		});
 
 		if (!this.selfName) {
@@ -1291,11 +1291,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		return null;
 	}
 
-	async fetchUserList (channelIdentifier) {
-		const channelData = sb.Channel.get(channelIdentifier, this);
-		return await getActiveUsernamesInChannel(channelData);
-	}
-
 	async createUserMention (userData) {
 		return `@${userData.Name}`;
 	}
@@ -1499,7 +1494,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 * Ideally cached for a rather long time.
 	 * @returns {Promise<TypedEmote[]>}
 	 */
-	async fetchGlobalEmotes () {
+	async populateGlobalEmotes () {
 		const [bttv, ffz, sevenTv] = await Promise.allSettled([
 			emoteGot({
 				url: "https://api.betterttv.net/3/cached/emotes/global"
@@ -1581,6 +1576,31 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		return [
 			...(bttv.value ?? []), ...(ffz.value ?? []), ...(sevenTv.value ?? [])
 		];
+	}
+
+	async populateUserList (channelIdentifier) {
+		const channelData = sb.Channel.get(channelIdentifier, this);
+		return await getActiveUsernamesInChannel(channelData);
+	}
+
+	fetchInternalPlatformIDByUsername (userData) {
+		return userData.Twitch_ID;
+	}
+
+	async fetchUsernameByUserPlatformID (userPlatformID) {
+		const response = await sb.Got("Helix", {
+			url: "users",
+			throwHttpErrors: false,
+			searchParams: {
+				id: userPlatformID
+			}
+		});
+
+		if (!response.ok || response.body.data.length === 0) {
+			return null;
+		}
+
+		return response.body.data[0].login;
 	}
 
 	// noinspection JSClosureCompilerSyntax
