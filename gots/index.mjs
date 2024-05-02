@@ -14,6 +14,7 @@ import { definition as SRA } from "./sra/index.mjs";
 import { definition as Supibot } from "./supibot/index.mjs";
 import { definition as Supinic } from "./supinic/index.mjs";
 import { definition as TwitchGQL } from "./twitch-gql/index.mjs";
+import { definition as TwitchEmotes } from "./twitch-emotes/index.mjs";
 import { definition as V5 } from "./v5/index.mjs";
 import { definition as Vimeo } from "./vimeo/index.mjs";
 
@@ -33,6 +34,7 @@ export const definitions = [
 	SRA,
 	Supibot,
 	Supinic,
+	TwitchEmotes,
 	TwitchGQL,
 	V5,
 	Vimeo

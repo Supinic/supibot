@@ -1384,23 +1384,21 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			});
 		}
 
-		const {
-			statusCode,
-			body: data
-		} = await emoteGot({
+		const response = await sb.Got("TwitchEmotes", {
 			url: `https://api.betterttv.net/3/cached/users/twitch/${channelID}`
 		});
 
-		if (statusCode !== 200) {
-			if (statusCode !== 404) {
-				await sb.Logger.log("Twitch.Warning", `BTTV emote fetch failed, code: ${statusCode}`, channelData);
+		if (!response.ok) {
+			if (response.statusCode !== 404) {
+				await sb.Logger.log("Twitch.Warning", `BTTV emote fetch failed, code: ${response.statusCode}`, channelData);
 			}
 
 			return [];
 		}
 
 		const emotes = [
-			...(data.channelEmotes ?? []), ...(data.sharedEmotes ?? [])
+			...(response.body.channelEmotes ?? []),
+			...(response.body.sharedEmotes ?? [])
 		];
 
 		return emotes.map(i => ({
@@ -1419,23 +1417,21 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	static async fetchChannelFFZEmotes (channelData) {
-		const {
-			statusCode,
-			body: data
-		} = await emoteGot({
+		const response = await sb.Got("TwitchEmotes", {
 			url: `https://api.frankerfacez.com/v1/room/${channelData.Name}`
 		});
 
-		if (statusCode !== 200) {
-			if (statusCode !== 404) {
-				await sb.Logger.log("Twitch.Warning", `FFZ emote fetch failed, code: ${statusCode}`, channelData);
+		if (!response.ok) {
+			if (response.statusCode !== 404) {
+				await sb.Logger.log("Twitch.Warning", `FFZ emote fetch failed, code: ${response.statusCode}`, channelData);
 			}
 
 			return [];
 		}
 
-		const emotes = Object.values(data.sets)
+		const emotes = Object.values(response.body.sets)
 			.flatMap(i => i.emoticons);
+
 		return emotes.map(i => ({
 			ID: i.id,
 			name: i.name,
@@ -1452,22 +1448,19 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	static async fetchChannelSevenTVEmotes (channelData) {
-		const {
-			statusCode,
-			body: data
-		} = await emoteGot({
+		const response = await sb.Got("TwitchEmotes", {
 			url: `https://7tv.io/v3/users/twitch/${channelData.Specific_ID}`
 		});
 
-		if (statusCode !== 200) {
-			if (statusCode !== 404) {
-				await sb.Logger.log("Twitch.Warning", `7TV emote fetch failed, code: ${statusCode}`, channelData);
+		if (!response.ok) {
+			if (response.statusCode !== 404) {
+				await sb.Logger.log("Twitch.Warning", `7TV emote fetch failed, code: ${response.statusCode}`, channelData);
 			}
 
 			return [];
 		}
 
-		const rawEmotes = data.emote_set?.emotes ?? [];
+		const rawEmotes = response.body.emote_set?.emotes ?? [];
 		return rawEmotes.map(i => ({
 			ID: i.id,
 			name: i.name,
@@ -1485,11 +1478,13 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 */
 	async populateGlobalEmotes () {
 		const [bttv, ffz, sevenTv] = await Promise.allSettled([
-			emoteGot({
+			sb.Got("TwitchEmotes", {
 				url: "https://api.betterttv.net/3/cached/emotes/global"
-			}), emoteGot({
+			}),
+			sb.Got("TwitchEmotes", {
 				url: "https://api.frankerfacez.com/v1/set/global"
-			}), emoteGot({
+			}),
+			sb.Got("TwitchEmotes", {
 				url: "https://7tv.io/v3/emote-sets/global"
 			})
 		]);
