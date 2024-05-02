@@ -131,7 +131,7 @@ module.exports = class Platform {
 
 		sb.Metrics.get(`supibot_messages_${type}_total`).inc({
 			channel,
-			platform: this.platform.Name
+			platform: this.name
 		});
 	}
 
@@ -196,13 +196,13 @@ module.exports = class Platform {
 		}
 
 		// Do not mirror if no identifier has been configured
-		const symbol = this.platform.Mirror_Identifier;
+		const symbol = this.mirrorIdentifier;
 		if (symbol === null) {
 			return;
 		}
 
 		// Do not mirror own messages
-		if (userData && userData.Name === channelData.Platform.Self_Name) {
+		if (userData && userData.Name === channelData.Platform.selfName) {
 			return;
 		}
 
@@ -341,7 +341,6 @@ module.exports = class Platform {
 	 * @param {string} message
 	 * @param {Channel} channel
 	 * @param {Object} options = {}
-	 * @param {Platform} [options.platform] Platform object, if necessary. Usually used for PMs.
 	 * @param {boolean} [options.skipBanphrases] If true, no banphrases will be checked
 	 * @param {boolean} [options.skipLengthCheck] If true, length will not be checked
 	 * @param {boolean} [options.keepWhitespace] If true, whitespace will not be stripped
@@ -365,7 +364,7 @@ module.exports = class Platform {
 			}
 
 			if (!options.skipLengthCheck) {
-				limit = channelData.Message_Limit ?? channelData.Platform.Message_Limit;
+				limit = channelData.Message_Limit ?? channelData.Platform.messageLimit;
 			}
 		}
 
