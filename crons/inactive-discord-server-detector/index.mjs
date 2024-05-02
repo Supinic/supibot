@@ -4,8 +4,8 @@ export const definition = {
 	description: "Logs the amount of currently active chatters.",
 	code: (async function detectInactiveDiscordServers () {
 		// Runs every Tuesday, at 12:00 (noon)
-		const discord = sb.Platform.get("discord").client;
-		const controller = sb.Platform.get("discord").controller;
+		const platform = sb.Platform.get("discord");
+		const discord = platform.client;
 		const botChannels = sb.Channel.getJoinableForPlatform("discord");
 
 		const guildThreshold = 95;
@@ -52,7 +52,7 @@ export const definition = {
 			const members = await guild.members.fetch();
 			const nonBotMembers = members.filter(i => !i.user.bot);
 			const admins = nonBotMembers
-				.filter(i => i.permissions.has(controller.data.permissions.Administrator))
+				.filter(i => i.permissions.has(platform.data.permissions.Administrator))
 				.map(i => `${sanitize(i.user.username)} (${i.user.id})`);
 
 			result.push({

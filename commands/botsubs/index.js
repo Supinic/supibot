@@ -13,7 +13,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function botSubs (context) {
-		const { availableEmotes } = sb.Platform.get("twitch").controller;
+		const { availableEmotes } = sb.Platform.get("twitch");
 		const subEmoteSets = availableEmotes
 			.filter(i => ["1", "2", "3"].includes(i.tier) && i.emotes.length > 0)
 			.sort((a, b) => Number(b.tier) - Number(a.tier));

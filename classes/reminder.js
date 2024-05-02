@@ -476,11 +476,11 @@ module.exports = class Reminder extends require("./template.js") {
 					platform = Platform.get(reminder.Platform);
 				}
 
-				const uncheckedAuthorMention = await platform.controller.createUserMention(fromUserData);
+				const uncheckedAuthorMention = await platform.createUserMention(fromUserData);
 				const authorBanphraseCheck = await sb.Banphrase.execute(uncheckedAuthorMention, channelData);
 				const authorMention = (authorBanphraseCheck.passed) ? `${uncheckedAuthorMention},` : "[Banphrased username],";
 
-				const targetMention = await platform.controller.createUserMention(targetUserData);
+				const targetMention = await platform.createUserMention(targetUserData);
 				let message = `${authorMention}, ${targetMention} just typed in channel ${channelName}`;
 
 				if (reminder.Text) {

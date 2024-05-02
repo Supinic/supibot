@@ -36,8 +36,8 @@ export const definition = {
 			return;
 		}
 
-		/** @type {TwitchController} */
-		const controller = channelData.Platform.controller;
+		/** @type {TwitchPlatform} */
+		const platform = channelData.Platform;
 		const emote = await channelData.getBestAvailableEmote(
 			["NOIDONTTHINKSO", "forsenSmug", "supiniNOIDONTTHINKSO", "RarePepe"],
 			"😅",
@@ -48,7 +48,7 @@ export const definition = {
 		const userData = context.user;
 		if (!userData && context.raw?.user) {
 			const name = context.raw.user;
-			await controller.timeout(channelData, name, null, reason);
+			await platform.timeout(channelData, name, null, reason);
 			await channelData.send(`${emote} ${reason}`);
 
 			return;
@@ -64,7 +64,7 @@ export const definition = {
 		);
 
 		if (typeof messageCount === "undefined" || messageCount <= 1) {
-			await controller.timeout(channelData, userData, null, reason);
+			await platform.timeout(channelData, userData, null, reason);
 			await channelData.send(`${emote} ${reason} again`);
 		}
 	}),

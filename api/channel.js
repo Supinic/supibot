@@ -89,14 +89,14 @@ module.exports = {
 				data: { message: "Invalid platform provided" }
 			};
 		}
-		else if (!platformData.controller.dynamicChannelAddition) {
+		else if (!platformData.dynamicChannelAddition) {
 			return {
 				statusCode: 400,
 				data: { message: "Provided platform cannot dynamically add new channels" }
 			};
 		}
 
-		const channelID = await platformData.controller.getUserID(channelName);
+		const channelID = await platformData.getUserID(channelName);
 		if (!channelID) {
 			return {
 				statusCode: 400,
