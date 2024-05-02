@@ -1,39 +1,45 @@
 const IRC = require("irc-framework");
+const DEFAULT_LOGGING_CONFIG = {
+	messages: true,
+	whispers: false
+};
+const DEFAULT_PLATFORM_CONFIG = {};
+const DEFAULT_IRC_PORT = 6667;
 
-module.exports = class IRCController extends require("./template.js") {
-	constructor (options) {
-		super();
+module.exports = class IRCPlatform extends require("./template.js") {
+	#notifiedUnregisteredUsers = new Set();
+	#nicknameChanged = false;
 
-		if (!options.host) {
+	constructor (config) {
+		super("irc", config, {
+			logging: DEFAULT_LOGGING_CONFIG,
+			platform: DEFAULT_PLATFORM_CONFIG
+		});
+
+		if (!this.host) {
 			throw new sb.Error({
-				message: "Invalid IRC platform options - missing host",
-				args: { options }
+				message: "Invalid IRC configuration - missing host"
 			});
 		}
-
-		this.platform = sb.Platform.get("irc", options.host);
-		if (!this.platform) {
+		else if (!this.selfName) {
 			throw new sb.Error({
-				message: "IRC platform has not been created"
+				message: "Invalid IRC configuration - missing bot's selfName"
 			});
 		}
-		else if (!this.platform.Self_Name) {
+		else if (!config.url) {
 			throw new sb.Error({
-				message: "IRC platform does not have the bot's name configured"
+				message: "Invalid IRC configuration - missing url"
 			});
 		}
 
 		this.client = new IRC.Client();
 		this.client.connect({
-			host: this.platform.Data.url ?? options.host,
-			port: this.platform.Data.port ?? 6667,
-			nick: this.platform.Self_Name,
-			tls: this.platform.Data.secure ?? this.platform.Data.tls ?? false,
+			host: config.url,
+			port: config.port ?? DEFAULT_IRC_PORT,
+			nick: this.selfName,
+			tls: config.secure ?? config.tls ?? false,
 			enable_echomessage: true
 		});
-
-		this.nicknameChanged = false;
-		this.data.notifiedUnregisteredUsers = [];
 
 		this.initListeners();
 	}
@@ -56,8 +62,8 @@ module.exports = class IRCController extends require("./template.js") {
 				const message = `IDENTIFY ${this.platform.Self_Name} ${key}`;
 				this.directPm(message, user);
 
-				if (this.nicknameChanged) {
-					this.nicknameChanged = false;
+				if (this.#nicknameChanged) {
+					this.#nicknameChanged = false;
 					this.directPm(`REGAIN ${this.platform.Self_Name} ${key}`, user);
 				}
 			}
@@ -75,7 +81,7 @@ module.exports = class IRCController extends require("./template.js") {
 		client.on("nick in use", async () => {
 			const string = sb.Utils.randomString(16);
 			this.client.changeNick(string);
-			this.nicknameChanged = true;
+			this.#nicknameChanged = true;
 		});
 
 		client.on("privmsg", async (event) => await this.handleMessage(event));
@@ -132,11 +138,11 @@ module.exports = class IRCController extends require("./template.js") {
 
 		if (!event.tags.account) {
 			const userName = event.nick;
-			if (sb.Command.is(message) && !this.data.notifiedUnregisteredUsers.includes(userName)) {
+			if (sb.Command.is(message) && !this.#notifiedUnregisteredUsers.has(userName)) {
 				const message = `You must register an account before using my commands!`;
 
 				this.client.say(event.target, message);
-				this.data.notifiedUnregisteredUsers.push(userName);
+				this.#notifiedUnregisteredUsers.add(userName);
 			}
 
 			return;
@@ -298,7 +304,19 @@ module.exports = class IRCController extends require("./template.js") {
 		return false;
 	}
 
-	async fetchUserList () {
-		return [];
+	async populateUserList () { return []; }
+	async populateGlobalEmotes () { return []; }
+	async fetchChannelEmotes () { return []; }
+
+	async fetchInternalPlatformIDByUsername () {
+		throw new sb.Error({
+			message: "IRC does not support user platform ID lookup by username"
+		});
+	}
+
+	async fetchUsernameByUserPlatformID () {
+		throw new sb.Error({
+			message: "IRC does not support username lookup by user platform ID"
+		});
 	}
 };

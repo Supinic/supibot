@@ -19,19 +19,25 @@ const ignoredChannelTypes = [
 	ChannelType.PublicThread
 ];
 
-module.exports = class DiscordController extends require("./template.js") {
-	constructor () {
-		super();
+const DEFAULT_LOGGING_CONFIG = {
+	messages: true,
+	whispers: true
+};
+const DEFAULT_PLATFORM_CONFIG = {
+	sendVerificationChallenge: false,
+	createReminderWhenSendingPrivateMessageFails: true
+};
 
-		this.platform = sb.Platform.get("discord");
-		if (!this.platform) {
+module.exports = class DiscordPlatform extends require("./template.js") {
+	constructor (config) {
+		super("discord", config, {
+			logging: DEFAULT_LOGGING_CONFIG,
+			platform: DEFAULT_PLATFORM_CONFIG
+		});
+
+		if (!this.selfId) {
 			throw new sb.Error({
-				message: "Discord platform has not been created"
-			});
-		}
-		else if (!this.platform.Self_ID) {
-			throw new sb.Error({
-				message: "Discord user ID (Platform/Self_ID) has not been configured"
+				message: "Discord user ID (selfId) has not been configured"
 			});
 		}
 		else if (!sb.Config.has("DISCORD_BOT_TOKEN", true)) {
@@ -41,8 +47,6 @@ module.exports = class DiscordController extends require("./template.js") {
 		}
 
 		this.#initClient();
-
-		this.data.permissions = PermissionFlagsBits;
 	}
 
 	#initClient () {
@@ -64,7 +68,6 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		this.initListeners();
 
-		/** @type {string|undefined} */
 		const token = sb.Config.get("DISCORD_BOT_TOKEN");
 		this.client.login(token);
 	}
@@ -99,7 +102,7 @@ module.exports = class DiscordController extends require("./template.js") {
 
 			// If the bot does not have SEND_MESSAGES permission in the channel, completely ignore the message.
 			// Do not process it for logging, commands, AFKs, Reminders, anything.
-			const selfPermissions = messageObject.channel.permissionsFor?.(this.platform.Self_ID);
+			const selfPermissions = messageObject.channel.permissionsFor?.(this.selfId);
 			if (selfPermissions && !selfPermissions.has(PermissionFlagsBits.SendMessages)) {
 				return;
 			}
@@ -123,7 +126,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			const userData = await sb.User.get(user, false, { Discord_ID: discordID });
 			if (userData) {
 				if (userData.Discord_ID === null && userData.Twitch_ID !== null) {
-					if (!this.platform.Data.sendVerificationChallenge) {
+					if (!this.config.sendVerificationChallenge) {
 						// No verification challenge - just assume it's correct
 						await userData.saveProperty("Discord_ID", discordID);
 					}
@@ -132,12 +135,12 @@ module.exports = class DiscordController extends require("./template.js") {
 							return;
 						}
 
-						const status = await DiscordController.fetchAccountChallengeStatus(userData, discordID);
+						const status = await DiscordPlatform.fetchAccountChallengeStatus(userData, discordID);
 						if (status === "Active") {
 							return;
 						}
 
-						const { challenge } = await DiscordController.createAccountChallenge(userData, discordID);
+						const { challenge } = await DiscordPlatform.createAccountChallenge(userData, discordID);
 						const message = sb.Utils.tag.trim `
 							You were found to be likely to own a Twitch account with the same name as your current Discord account.
 							If you want to use my commands on Discord, whisper me the following command on Twitch:
@@ -171,14 +174,14 @@ module.exports = class DiscordController extends require("./template.js") {
 			else {
 				// No user data available at this point usually means that the object is being fetched from cache.
 				// Still, fire a "raw user" message event
-				const channelData = sb.Channel.get(chan, this.platform);
+				const channelData = sb.Channel.get(chan, this);
 				if (channelData) {
 					channelData.events.emit("message", {
 						event: "message",
 						message: msg,
 						user: null,
 						channel: channelData,
-						platform: this.platform,
+						platform: this,
 						raw: { user }
 					});
 				}
@@ -187,9 +190,9 @@ module.exports = class DiscordController extends require("./template.js") {
 			}
 
 			if (!privateMessage) {
-				channelData = sb.Channel.get(chan, this.platform);
+				channelData = sb.Channel.get(chan, this);
 				if (!channelData) {
-					channelData = await sb.Channel.add(chan, this.platform);
+					channelData = await sb.Channel.add(chan, this);
 				}
 				if (guild && guild.id && channelData.Specific_ID !== guild.id) {
 					await channelData.saveProperty("Specific_ID", guild.id);
@@ -240,8 +243,8 @@ module.exports = class DiscordController extends require("./template.js") {
 						await sb.Logger.updateLastSeen({ channelData, userData, message: msg });
 					}
 				}
-				if (this.platform.Logging.messages && channelData.Logging.has("Lines")) {
-					await sb.Logger.push(sb.Utils.wrapString(msg, this.platform.Message_Limit), userData, channelData);
+				if (this.logging.messages && channelData.Logging.has("Lines")) {
+					await sb.Logger.push(sb.Utils.wrapString(msg, this.messageLimit), userData, channelData);
 				}
 
 				channelData.events.emit("message", {
@@ -249,7 +252,7 @@ module.exports = class DiscordController extends require("./template.js") {
 					message: msg,
 					user: userData,
 					channel: channelData,
-					platform: this.platform
+					platform: this
 				});
 
 				if (channelData.Mode === "Read") {
@@ -267,8 +270,8 @@ module.exports = class DiscordController extends require("./template.js") {
 				}
 			}
 			else {
-				if (this.platform.Logging.whispers) {
-					await sb.Logger.push(msg, userData, null, this.platform);
+				if (this.logging.whispers) {
+					await sb.Logger.push(msg, userData, null, this);
 				}
 
 				this.resolveUserMessage(null, userData, msg);
@@ -281,7 +284,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			}
 
 			// Own message - skip
-			if (discordID === this.platform.Self_ID) {
+			if (discordID === this.selfId) {
 				return;
 			}
 
@@ -304,7 +307,7 @@ module.exports = class DiscordController extends require("./template.js") {
 
 				await this.handleCommand({
 					command,
-					args: args.map(i => DiscordController.removeEmoteTags(i)),
+					args: args.map(i => DiscordPlatform.removeEmoteTags(i)),
 					channelData,
 					userData,
 					messageObject,
@@ -340,7 +343,7 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		// When a guild gets deleted, set all of its channels to be Inactive.
 		client.on("guildDelete", async (guild) => {
-			const platformMap = sb.Channel.data.get(this.platform);
+			const platformMap = sb.Channel.data.get(this);
 			for (const channelData of platformMap.values()) {
 				if (channelData.Specific_ID !== guild.id) {
 					continue;
@@ -380,7 +383,7 @@ module.exports = class DiscordController extends require("./template.js") {
 	 */
 	async send (message, channel, options = {}) {
 		const globalEmoteRegex = /[A-Z]/;
-		const channelData = sb.Channel.get(channel, this.platform);
+		const channelData = sb.Channel.get(channel, this);
 		const channelObject = await this.client.channels.fetch(channelData.Name);
 		if (!channelObject) {
 			return;
@@ -430,7 +433,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			};
 		}
 		else if (typeof message === "string") {
-			const limit = channelData.Message_Limit ?? this.platform.Message_Limit;
+			const limit = channelData.Message_Limit ?? this.messageLimit;
 			message = message
 				.replace(/\\/g, "\\\\")
 				.replace(/\b(?<modifier>[*_]{1,2})(?<content>[^\\]+)(\1)\b/g, (total, modifier, content) => {
@@ -550,7 +553,7 @@ module.exports = class DiscordController extends require("./template.js") {
 			this.incrementMessageMetric("sent", null);
 		}
 		catch (e) {
-			if (!this.platform.Data.createReminderWhenSendingPrivateMessageFails) {
+			if (!this.config.createReminderWhenSendingPrivateMessageFails) {
 				throw new sb.Error({
 					message: "Sending Discord private message failed",
 					args: {
@@ -573,12 +576,12 @@ module.exports = class DiscordController extends require("./template.js") {
 			});
 
 			if (result.success) {
-				const botData = await sb.User.get(this.platform.Self_Name);
+				const botData = await sb.User.get(this.selfName);
 				await sb.Reminder.create({
 					User_From: botData.ID,
 					User_To: userData.ID,
 					Channel: null,
-					Platform: this.platform.ID,
+					Platform: this.ID,
 					Schedule: null,
 					Created: new sb.Date(),
 					Private_Message: false,
@@ -646,7 +649,7 @@ module.exports = class DiscordController extends require("./template.js") {
 		} = data;
 
 		const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
-			platform: this.platform,
+			platform: this,
 			...options
 		});
 
@@ -751,13 +754,13 @@ module.exports = class DiscordController extends require("./template.js") {
 		let targetMessage = messageObject.cleanContent.replace(/\n/g, " ");
 
 		const extras = [...stickers, ...links];
-		while (targetMessage.length < this.platform.Message_Limit && index < extras.length) {
+		while (targetMessage.length < this.messageLimit && index < extras.length) {
 			targetMessage += ` ${extras[index]}`;
 			index++;
 		}
 
 		return {
-			msg: DiscordController.removeEmoteTags(targetMessage.replace(/\s+/g, " ")),
+			msg: DiscordPlatform.removeEmoteTags(targetMessage.replace(/\s+/g, " ")),
 			user: messageObject.author.username.toLowerCase().replace(/\s/g, "_"),
 			chan: messageObject.channel.id,
 			channelType: messageObject.channel.type,
@@ -788,7 +791,7 @@ module.exports = class DiscordController extends require("./template.js") {
 		);
 	}
 
-	async fetchUserList (channelIdentifier) {
+	async populateUserList (channelIdentifier) {
 		const channel = await this.client.channels.fetch(channelIdentifier);
 		const guild = await channel.guild.fetch();
 
@@ -814,7 +817,7 @@ module.exports = class DiscordController extends require("./template.js") {
 		}));
 	}
 
-	async fetchGlobalEmotes () {
+	async populateGlobalEmotes () {
 		return this.client.emojis.cache.map(i => ({
 			ID: i.id,
 			name: i.name,
@@ -822,6 +825,22 @@ module.exports = class DiscordController extends require("./template.js") {
 			global: true,
 			animated: (i.animated)
 		}));
+	}
+
+	fetchInternalPlatformIDByUsername (userData) {
+		return userData.Discord_ID;
+	}
+
+	async fetchUsernameByUserPlatformID (userPlatformID) {
+		let response;
+		try {
+			response = await this.client.users.fetch(userPlatformID);
+		}
+		catch {
+			return null;
+		}
+
+		return response.username;
 	}
 
 	async createUserMention (userData, channelData) {
@@ -848,6 +867,8 @@ module.exports = class DiscordController extends require("./template.js") {
 
 		this.#initClient();
 	}
+
+	get permissions () { return PermissionFlagsBits; }
 
 	static removeEmoteTags (message) {
 		return message.replace(/<a?:(.*?):(\d*)>/g, (total, emote) => `${emote} `).trim();

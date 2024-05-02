@@ -3,8 +3,8 @@ const CytubeConnector = require("cytube-connector");
 class CytubeClient {
 	/** @type {CytubeConnector} */
 	client = null;
-	/** @type {CytubeController} */
-	controller = null;
+	/** @type {CytubePlatform} */
+	platform = null;
 	channelData = null;
 	emotes = [];
 	playlistData = [];
@@ -17,11 +17,11 @@ class CytubeClient {
 
 	/**
 	 * @param {Channel} channelData
-	 * @param {CytubeController} controller
+	 * @param {CytubePlatform} platform
 	 */
-	constructor (channelData, controller) {
+	constructor (channelData, platform) {
 		this.channelData = channelData;
-		this.controller = controller;
+		this.platform = platform;
 
 		this.initialize();
 	}
@@ -31,6 +31,7 @@ class CytubeClient {
 			console.warn("Attempting to re-initialize a running Cytube client", {
 				channel: this.channelData.Name
 			});
+
 			return;
 		}
 
@@ -38,7 +39,7 @@ class CytubeClient {
 			host: "cytu.be",
 			port: 443,
 			secure: true,
-			user: this.controller.platform.Self_Name,
+			user: this.platform.selfName,
 			auth: sb.Config.get("CYTUBE_BOT_PASSWORD"),
 			chan: this.channelData.Name
 		});
@@ -50,7 +51,7 @@ class CytubeClient {
 			this.restarting = false;
 		});
 
-		// Userlist initialize event - save current user data
+		// User list initialize event - save current user data
 		client.on("userlist", (data = []) => {
 			for (const record of data) {
 				if (typeof record.name === "string") {
@@ -79,12 +80,12 @@ class CytubeClient {
 
 			// On login, cytube sends a couple of history messages - skip those
 			const difference = (sb.Date.now() - data.time);
-			const threshold = this.controller.platform.Data.messageDelayThreshold ?? 30_000;
+			const threshold = this.platform.config.messageDelayThreshold ?? 30_000;
 			if (data.time && difference > threshold) {
 				return;
 			}
 
-			// user is shadowbanned - do not respond or log or anything
+			// user is shadow-banned - do not respond or log or anything
 			if (data.meta.shadow) {
 				return;
 			}
@@ -108,7 +109,7 @@ class CytubeClient {
 					message: msg,
 					user: null,
 					channel: this.channelData,
-					platform: this.controller.platform,
+					platform: this.platform,
 					raw: {
 						user: data.username
 					}
@@ -128,7 +129,7 @@ class CytubeClient {
 			if (!data.meta.private) {
 				// Do not process mirrored messages
 				const identifiers = sb.Platform.data.map(i => i.Mirror_Identifier);
-				if (originalUsername === this.controller.platform.Self_Name && identifiers.includes(Array.from(msg)[0])) {
+				if (originalUsername === this.platform.selfName && identifiers.includes(Array.from(msg)[0])) {
 					return;
 				}
 
@@ -136,14 +137,14 @@ class CytubeClient {
 					this.channelData.sessionData = {};
 				}
 
-				this.controller.resolveUserMessage(this.channelData, userData, msg);
+				this.platform.resolveUserMessage(this.channelData, userData, msg);
 
 				this.channelData.events.emit("message", {
 					type: "message",
 					message: msg,
 					user: userData,
 					channel: this.channelData,
-					platform: this.controller.platform
+					platform: this.platform
 				});
 
 				if (this.channelData.Logging.has("Meta")) {
@@ -153,14 +154,14 @@ class CytubeClient {
 						message: msg
 					});
 				}
-				if (this.controller.platform.Logging.messages && this.channelData.Logging.has("Lines")) {
+				if (this.platform.logging.messages && this.channelData.Logging.has("Lines")) {
 					await sb.Logger.push(msg, userData, this.channelData);
 				}
 
 				if (this.channelData.Mode === "Read") {
 					return;
 				}
-				else if (data.username === this.controller.platform.Self_Name) {
+				else if (data.username === this.platform.selfName) {
 					return;
 				}
 
@@ -170,18 +171,18 @@ class CytubeClient {
 				]);
 
 				if (this.channelData.Mirror) {
-					this.controller.mirror(msg, userData, this.channelData, { commandUsed: false });
+					this.platform.mirror(msg, userData, this.channelData, { commandUsed: false });
 				}
 
-				this.controller.incrementMessageMetric("read", this.channelData);
+				this.platform.incrementMessageMetric("read", this.channelData);
 			}
 			else {
-				if (this.controller.platform.Logging.whispers) {
-					await sb.Logger.push(msg, userData, null, this.controller.platform);
+				if (this.platform.logging.whispers) {
+					await sb.Logger.push(msg, userData, null, this.platform);
 				}
 
-				this.controller.resolveUserMessage(null, userData, msg);
-				this.controller.incrementMessageMetric("read", null);
+				this.platform.resolveUserMessage(null, userData, msg);
+				this.platform.incrementMessageMetric("read", null);
 			}
 
 			// Handle commands if the message starts with the command prefix
@@ -214,7 +215,7 @@ class CytubeClient {
 				return;
 			}
 
-			if (this.controller.platform.Logging.videoRequests) {
+			if (this.platform.logging.videoRequests) {
 				await sb.Logger.logVideoRequest(media.id, media.type, media.seconds, userData, this.channelData);
 			}
 
@@ -322,7 +323,7 @@ class CytubeClient {
 		const channelData = this.channelData;
 		const userData = await sb.User.get(user, false);
 		const options = {
-			platform: this.controller.platform,
+			platform: this.platform,
 			privateMessage: Boolean(replyIntoPM)
 		};
 
@@ -343,7 +344,7 @@ class CytubeClient {
 				});
 			}
 
-			const message = await this.controller.prepareMessage(execution.reply, channelData, {
+			const message = await this.platform.prepareMessage(execution.reply, channelData, {
 				...commandOptions,
 				skipBanphrases: true
 			});
@@ -361,7 +362,7 @@ class CytubeClient {
 	 * @param {string} message
 	 */
 	async send (message) {
-		const messageLimit = this.controller.platform.Message_Limit;
+		const messageLimit = this.platform.messageLimit;
 		const lengthRegex = new RegExp(`.{1,${messageLimit}}`, "g");
 		let arr = message
 			.replace(/(\r?\n)/g, " ")
@@ -444,7 +445,7 @@ class CytubeClient {
 		this.userMap.clear();
 		this.playlistData = null;
 
-		this.controller = null;
+		this.platform = null;
 	}
 
 	static parseEmote (emote) {
@@ -470,27 +471,32 @@ class CytubeClient {
 	 */
 }
 
-module.exports = class CytubeController extends require("./template.js") {
+const DEFAULT_LOGGING_CONFIG = {
+	videoRequests: true,
+	whispers: true,
+	messages: true
+};
+const DEFAULT_PLATFORM_CONFIG = {
+	messageDelayThreshold: 30000
+};
+
+module.exports = class CytubePlatform extends require("./template.js") {
 	/** @type {Map<Channel, CytubeClient>} */
 	clients = new Map();
-	restartDelay = 10000;
 
-	constructor () {
-		super();
+	constructor (config) {
+		super("cytube", config, {
+			logging: DEFAULT_LOGGING_CONFIG,
+			platform: DEFAULT_PLATFORM_CONFIG
+		});
 
-		this.platform = sb.Platform.get("cytube");
-		if (!this.platform) {
-			throw new sb.Error({
-				message: "Cytube platform has not been created"
-			});
-		}
-		else if (!sb.Config.has("CYTUBE_BOT_PASSWORD", true)) {
+		if (!sb.Config.has("CYTUBE_BOT_PASSWORD", true)) {
 			throw new sb.Error({
 				message: "Cytube password has not been configured"
 			});
 		}
 
-		const eligibleChannels = sb.Channel.getJoinableForPlatform(this.platform);
+		const eligibleChannels = sb.Channel.getJoinableForPlatform(this);
 		for (const channelData of eligibleChannels) {
 			this.joinChannel(channelData);
 		}
@@ -541,7 +547,8 @@ module.exports = class CytubeController extends require("./template.js") {
 
 	/**
 	 * @override
-	 * Sets the message to be mirrored to a mirror channel.
+	 * Platform will not mirror server messages, as on Cytube,
+	 * they are considered to be identical to regular chat messages.
 	 * @param {string} message
 	 * @param {User|null} userData
 	 * @param {Channel} channelData
@@ -577,7 +584,7 @@ module.exports = class CytubeController extends require("./template.js") {
 	 * @param {string} channelIdentifier
 	 * @returns {string[]}
 	 */
-	fetchUserList (channelIdentifier) {
+	populateUserList (channelIdentifier) {
 		const channelData = sb.Channel.get(channelIdentifier, this.platform);
 		const client = this.clients.get(channelData.ID);
 		if (!client) {
@@ -607,6 +614,10 @@ module.exports = class CytubeController extends require("./template.js") {
 
 		return client.emotes;
 	}
+
+	async populateGlobalEmotes () { return []; }
+	async fetchInternalPlatformIDByUsername (userData) { return userData.Name; }
+	async fetchUsernameByUserPlatformID (userPlatformId) { return userPlatformId; }
 
 	/**
 	 * Destroys and cleans up the instance
