@@ -133,7 +133,6 @@ module.exports = class Platform {
 			channel = channelData.Name;
 		}
 
-		// @todo temporary, fix
 		const metric = sb.Metrics.get(`supibot_messages_${type}_total`);
 		if (!metric) {
 			return;

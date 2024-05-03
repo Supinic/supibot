@@ -173,13 +173,6 @@ require("./db-access.js");
 	const { initializeCrons } = await import("./crons/index.mjs");
 	initializeCrons(config.modules.crons);
 
-	const promises = [];
-	for (const platform of platforms) {
-		promises.push(platform.connect());
-	}
-
-	await Promise.all(promises);
-
 	if (sb.Metrics) {
 		sb.Metrics.registerCounter({
 			name: "supibot_messages_sent_total",
@@ -193,6 +186,13 @@ require("./db-access.js");
 			labelNames: ["platform", "channel"]
 		});
 	}
+
+	const promises = [];
+	for (const platform of platforms) {
+		promises.push(platform.connect());
+	}
+
+	await Promise.all(promises);
 
 	process.on("unhandledRejection", async (reason) => {
 		if (!(reason instanceof Error)) {
