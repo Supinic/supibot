@@ -26,7 +26,7 @@ module.exports = class IRCPlatform extends require("./template.js") {
 				message: "Invalid IRC configuration - missing bot's selfName"
 			});
 		}
-		else if (!config.url) {
+		else if (!this.config.url) {
 			throw new sb.Error({
 				message: "Invalid IRC configuration - missing url"
 			});
@@ -51,7 +51,7 @@ module.exports = class IRCPlatform extends require("./template.js") {
 		const { client } = this;
 
 		client.on("registered", () => {
-			const { authentication } = this.platform.Data ?? {};
+			const { authentication } = this.config;
 			if (authentication.type === "privmsg-identify") {
 				const { configVariable, user } = authentication;
 				const key = sb.Config.get(configVariable, false);
@@ -62,16 +62,16 @@ module.exports = class IRCPlatform extends require("./template.js") {
 					});
 				}
 
-				const message = `IDENTIFY ${this.platform.Self_Name} ${key}`;
+				const message = `IDENTIFY ${this.selfName} ${key}`;
 				this.directPm(message, user);
 
 				if (this.#nicknameChanged) {
 					this.#nicknameChanged = false;
-					this.directPm(`REGAIN ${this.platform.Self_Name} ${key}`, user);
+					this.directPm(`REGAIN ${this.selfName} ${key}`, user);
 				}
 			}
 
-			const channelsData = sb.Channel.getJoinableForPlatform(this.platform);
+			const channelsData = sb.Channel.getJoinableForPlatform(this);
 			for (const channelData of channelsData) {
 				this.client.join(channelData.Name);
 			}
@@ -91,7 +91,7 @@ module.exports = class IRCPlatform extends require("./template.js") {
 	}
 
 	async send (message, channel) {
-		const channelData = sb.Channel.get(channel, this.platform);
+		const channelData = sb.Channel.get(channel, this);
 		if (!channelData) {
 			throw new sb.Error({
 				message: "Invalid channel provided",
@@ -127,7 +127,7 @@ module.exports = class IRCPlatform extends require("./template.js") {
 			skipLengthCheck: true
 		});
 
-		const limit = (this.platform.Message_Limit * 2) - (options.extraLength ?? 0);
+		const limit = (this.messageLimit * 2) - (options.extraLength ?? 0);
 		return sb.Utils.wrapString(preparedMessage, limit);
 	}
 
@@ -137,7 +137,7 @@ module.exports = class IRCPlatform extends require("./template.js") {
 		}
 
 		const { message } = event;
-		const isPrivateMessage = (event.target === this.platform.Self_Name.toLowerCase());
+		const isPrivateMessage = (event.target === this.selfName);
 
 		if (!event.tags.account) {
 			const userName = event.nick;
@@ -158,10 +158,10 @@ module.exports = class IRCPlatform extends require("./template.js") {
 
 		let userVerificationData = await userData.getDataProperty("platformVerification");
 		userVerificationData ??= {};
-		userVerificationData[this.platform.ID] ??= {};
+		userVerificationData[this.ID] ??= {};
 
 		const isSelf = (userData.Name === this.platform.Self_Name);
-		const platformVerification = userVerificationData[this.platform.ID];
+		const platformVerification = userVerificationData[this.ID];
 		if (!isSelf && (userData.Twitch_ID || userData.Discord_ID) && !platformVerification.active) {
 			// TODO: verification challenge creation for Discord/Twitch and sending the message
 			if (!platformVerification.notificationSent) {
@@ -188,7 +188,7 @@ module.exports = class IRCPlatform extends require("./template.js") {
 
 		let channelData = null;
 		if (!isPrivateMessage) {
-			channelData = sb.Channel.get(event.target, this.platform);
+			channelData = sb.Channel.get(event.target, this);
 
 			if (!channelData) {
 				return;
@@ -206,7 +206,7 @@ module.exports = class IRCPlatform extends require("./template.js") {
 					message
 				});
 			}
-			if (this.platform.Logging.messages && channelData.Logging.has("Lines")) {
+			if (this.logging.messages && channelData.Logging.has("Lines")) {
 				await sb.Logger.push(message, userData, channelData);
 			}
 
@@ -215,7 +215,7 @@ module.exports = class IRCPlatform extends require("./template.js") {
 				message,
 				user: userData,
 				channel: channelData,
-				platform: this.platform,
+				platform: this,
 				data: {}
 			});
 
@@ -236,8 +236,8 @@ module.exports = class IRCPlatform extends require("./template.js") {
 			}
 		}
 		else {
-			if (this.platform.Logging.whispers) {
-				await sb.Logger.push(message, userData, null, this.platform);
+			if (this.logging.whispers) {
+				await sb.Logger.push(message, userData, null, this);
 			}
 
 			this.resolveUserMessage(null, userData, message);
@@ -263,7 +263,7 @@ module.exports = class IRCPlatform extends require("./template.js") {
 
 	async handleCommand (command, userData, channelData, args = [], options = {}) {
 		const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
-			platform: this.platform,
+			platform: this,
 			...options
 		});
 
