@@ -266,7 +266,8 @@ module.exports = class Platform {
 	/**
 	 * @abstract
 	 */
-	async populateGlobalEmotes () {
+	// eslint-disable-next-line no-unused-vars
+	async populateGlobalEmotes (channelData) {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Platform"
 		});

@@ -16,10 +16,9 @@ import {
     MessageAwaiter,
     Platform,
     PrepareMessageOptions
-} from "./platform";
+} from "../platforms/template";
 
 import { User } from "./user";
-declare type Controller = any; // @todo should be created soon
 
 export declare type Mode = "Inactive" | "Last seen" | "Read" | "Write" | "VIP" | "Moderator";
 export declare type Like = string | number | Channel;
@@ -313,7 +312,7 @@ export declare class Channel extends ClassTemplate {
     /**
      * Mirrors the message to the given mirror channel, if this instance has been configured to do so.
      */
-    mirror (message: Message, userData: User, options?: MirrorOptions): ReturnType<Controller["mirror"]>;
+    mirror (message: Message, userData: User, options?: MirrorOptions): ReturnType<Platform["mirror"]>;
 
     /**
      * Returns the current list of users in the provided channel instance.

@@ -1,6 +1,6 @@
 import { ClassTemplate } from "./template";
 import { Channel, Like as ChannelLike } from "./channel";
-import { Like as PlatformLike, Platform } from "./platform";
+import { Like as PlatformLike, Platform } from "../platforms/template";
 import { User } from "./user";
 import { JSONifiable, Message, SimpleGenericData, XOR } from "../globals";
 

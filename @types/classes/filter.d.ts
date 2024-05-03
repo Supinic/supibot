@@ -3,7 +3,7 @@ import { Query } from "supi-core/@types/types";
 import { ClassTemplate } from "./template";
 import { Channel } from "./channel";
 import { Command } from "./command";
-import { Platform } from "./platform";
+import { Platform } from "../platforms/template";
 import { User } from "./user";
 import { XOR } from "../globals";
 
@@ -76,11 +76,12 @@ export declare class Filter extends ClassTemplate {
 	static getReason (options: ContextOptions): string | null;
 
 	private filterData: Data;
+
 	readonly ID: number;
 	readonly User_Alias: User["ID"] | null;
 	readonly Channel: Channel["ID"] | null;
 	readonly Command: Command["Name"] | null;
-	readonly Platform: Platform["Name"] | null;
+	readonly Platform: Platform["name"] | null;
 	readonly Invocation: string | null;
 	readonly Type: Type;
 	readonly Data: Data;

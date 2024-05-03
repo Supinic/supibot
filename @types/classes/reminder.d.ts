@@ -3,7 +3,7 @@ import { Counter, Gauge } from "prom-client";
 
 import { ClassTemplate } from "./template";
 import { Channel } from "./channel";
-import { Platform, Like as PlatformLike } from "./platform";
+import { Platform, Like as PlatformLike } from "../platforms/template";
 import { User } from "./user";
 
 type ConstructorData = {
