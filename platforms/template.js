@@ -11,6 +11,8 @@ module.exports = class Platform {
 	#data;
 	#loggingConfig;
 
+	#globalEmoteCacheKey;
+
 	client;
 	supportsMeAction = false;
 	dynamicChannelAddition = false;
@@ -47,6 +49,8 @@ module.exports = class Platform {
 			...defaults.logging,
 			...config.logging ?? {}
 		};
+
+		this.#globalEmoteCacheKey = `global-emotes-${this.#id}`;
 
 		Platform.list.push(this);
 	}
@@ -129,7 +133,13 @@ module.exports = class Platform {
 			channel = channelData.Name;
 		}
 
-		sb.Metrics.get(`supibot_messages_${type}_total`).inc({
+		// @todo temporary, fix
+		const metric = sb.Metrics.get(`supibot_messages_${type}_total`);
+		if (!metric) {
+			return;
+		}
+
+		metric.inc({
 			channel,
 			platform: this.name
 		});
@@ -240,12 +250,7 @@ module.exports = class Platform {
 	}
 
 	async fetchUserList (channelData) {
-		const key = {
-			type: "channel-user-list",
-			channel: channelData.ID,
-			platform: this.#id
-		};
-
+		const key = this.#getChannelUserListKey();
 		const cacheData = await sb.Cache.getByPrefix(key);
 		if (cacheData) {
 			return cacheData;
@@ -269,11 +274,7 @@ module.exports = class Platform {
 	}
 
 	async fetchGlobalEmotes () {
-		const key = {
-			type: "global-emotes",
-			platform: this.#id
-		};
-
+		const key = this.#globalEmoteCacheKey;
 		const cacheData = await sb.Cache.getByPrefix(key);
 		if (cacheData) {
 			return cacheData;
@@ -288,11 +289,7 @@ module.exports = class Platform {
 	}
 
 	async invalidateGlobalEmotesCache () {
-		const key = {
-			type: "global-emotes",
-			platform: this.#id
-		};
-
+		const key = this.#globalEmoteCacheKey;
 		return await sb.Cache.setByPrefix(key, null);
 	}
 
@@ -412,6 +409,10 @@ module.exports = class Platform {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Platform"
 		});
+	}
+
+	#getChannelUserListKey (channelData) {
+		return `channel-user-list-${this.#id}-${channelData.ID}`;
 	}
 
 	restart () {}
