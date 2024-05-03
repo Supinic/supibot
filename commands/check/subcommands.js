@@ -300,8 +300,8 @@ module.exports = (command) => [
 				await targetUser.setDataProperty("cookie", userCookieData);
 			}
 
-			const { controller } = sb.Platform.get("twitch");
-			const hasDoubleCookieAccess = await controller.fetchUserCacheSubscription(targetUser, "supinic");
+			const platform = sb.Platform.get("twitch");
+			const hasDoubleCookieAccess = await platform.fetchUserCacheSubscription(targetUser, "supinic");
 
 			let string;
 			if (CookieLogic.canEatReceivedCookie(userCookieData)) {

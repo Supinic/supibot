@@ -99,8 +99,8 @@ const getTokenUsage = async (userData) => {
  * @returns {Promise<{hourly: number, daily: number}>}
  */
 const determineUserLimits = async (userData) => {
-	const { controller } = sb.Platform.get("twitch");
-	const isSubscribed = await controller.fetchUserCacheSubscription(userData, "supinic");
+	const platform = sb.Platform.get("twitch");
+	const isSubscribed = await platform.fetchUserCacheSubscription(userData, "supinic");
 
 	return (isSubscribed)
 		? ChatGptConfig.userTokenLimits.subscriber

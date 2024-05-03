@@ -17,8 +17,7 @@ module.exports = {
 			};
 		}
 
-		const { controller } = context.platform;
-		if (controller.supportsMeAction !== true) {
+		if (context.platform.supportsMeAction !== true) {
 			return {
 				success: false,
 				reply: `The /me action is not supported on this platform!`

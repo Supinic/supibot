@@ -357,7 +357,7 @@ module.exports = {
 					};
 				}
 
-				const { controller } = sb.Platform.get("twitch");
+				const platform = sb.Platform.get("twitch");
 				if (channelData.Name === context.user.Name) {
 					return {
 						success: false,
@@ -374,7 +374,7 @@ module.exports = {
 					};
 				}
 
-				const result = await controller.executeChannelRename(channelData);
+				const result = await platform.executeChannelRename(channelData);
 				if (result.success === true) {
 					if (result.joinFailed) {
 						return {

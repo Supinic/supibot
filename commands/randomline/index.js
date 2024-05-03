@@ -72,8 +72,8 @@ module.exports = {
 			}
 
 			if (user) {
-				const { controller } = sb.Platform.get("twitch");
-				const userID = await controller.getUserID(user);
+				const platform = sb.Platform.get("twitch");
+				const userID = await platform.getUserID(user);
 				if (!userID) {
 					return {
 						success: false,

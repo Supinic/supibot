@@ -9,10 +9,10 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function firstChannelFollower (context, target) {
-		const { controller } = sb.Platform.get("twitch");
+		const platform = sb.Platform.get("twitch");
 		const name = sb.User.normalizeUsername(target ?? context.user.Name);
 
-		const channelID = await controller.getUserID(name);
+		const channelID = await platform.getUserID(name);
 		if (!channelID) {
 			return {
 				success: false,

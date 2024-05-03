@@ -38,9 +38,9 @@ module.exports = {
 			targetChannel = sb.Channel.normalizeName(args[0]);
 		}
 
-		const { controller } = sb.Platform.get("twitch");
+		const platform = sb.Platform.get("twitch");
 		const targetData = await sb.User.get(targetChannel);
-		const channelID = targetData?.Twitch_ID ?? await controller.getUserID(targetChannel);
+		const channelID = targetData?.Twitch_ID ?? await platform.getUserID(targetChannel);
 		if (!channelID) {
 			return {
 				success: false,
