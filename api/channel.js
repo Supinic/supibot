@@ -124,6 +124,10 @@ module.exports = {
 		const platformStats = {};
 
 		for (const [platformData, platformMap] of sb.Channel.data.entries()) {
+			if (!platformData) {
+				continue;
+			}
+
 			for (const channelData of platformMap.values()) {
 				if (channelData.Mode === "Inactive") {
 					continue;
