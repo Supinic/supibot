@@ -47,4 +47,4 @@ Some of the features backend provides include:
     - `1-to-1` (channels are mirrored together)
     - `1-to-N` (channels are funneled to one aggregate channel) - This does not violate the exponential growth of messages, as an aggregate channel has its own mirror output disabled. Also, such a relationship does not yet exist in practice.
   - a classic example of this usage is mirroring a Twitch channel with the community's Discord, in a specified "mirror" channel
-  - for more info, see the [Controller template](https://github.com/Supinic/supibot/blob/master/controllers/template.js), method `mirror`
+  - for more info, see the [Platform template](https://github.com/Supinic/supibot/blob/master/platforms/template.js), method `mirror`

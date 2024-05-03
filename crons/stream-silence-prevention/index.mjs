@@ -169,7 +169,7 @@ export const definition = {
 		else if (state === "cytube") {
 			const linkParser = getLinkParser();
 			const videoID = linkParser.parseLink(link);
-			const client = cytube.controller.clients.get(cytubeChannelData.ID);
+			const client = cytube.clients.get(cytubeChannelData.ID);
 
 			// noinspection ES6MissingAwait
 			client.queue("yt", videoID);

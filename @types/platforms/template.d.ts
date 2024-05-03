@@ -56,7 +56,7 @@ export declare type AvailableEmoteOptions = {
 
 /**
  * Represents a platform - a location where the bot can be active and respond to messages.
- * It is an API to manage communication between channels and the platform controller.
+ * It is an API to manage communication between channels and the platform client..
  */
 export declare class Platform {
     static get (identifier: "Cytube" | "cytube"): CytubePlatform;
@@ -145,7 +145,7 @@ export declare class Platform {
     waitForUserMessage (channelData: Channel, userData: User, options: MessageAwaiter["Options"]): Promise<MessageAwaiter["Resolution"]>;
 
     /**
-     * For a provided channel, fetches its current user list using the platform's controller.
+     * For a provided channel, fetches its current user list..
      */
     fetchChannelUserList (channelData: Channel): Promise<string[]>;
     fetchGlobalEmotes (): Promise<Emote[]>;
