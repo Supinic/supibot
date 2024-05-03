@@ -293,7 +293,7 @@ module.exports = class Platform {
 			platform: this.#id
 		};
 
-		return await this.setCacheData(key, null);
+		return await sb.Cache.setByPrefix(key, null);
 	}
 
 	/**
