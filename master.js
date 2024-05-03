@@ -108,6 +108,11 @@ require("./db-access.js");
 
 	const platforms = new Set();
 	for (const definition of platformsConfig) {
+		if (!definition.active) {
+			console.debug(`Platform ${definition.type} (ID ${definition.ID}) is set to inactive, skipping`);
+			continue;
+		}
+
 		platforms.add(Platform.create(definition.type, definition));
 	}
 
