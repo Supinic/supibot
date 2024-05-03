@@ -36,7 +36,7 @@ module.exports = class Platform {
 		this.#host = config.host ?? null;
 		this.#messageLimit = config.messageLimit;
 		this.#selfId = config.selfId;
-		this.#selfName = config.selfName;
+		this.#selfName = config.selfName.toLowerCase();
 		this.#mirrorIdentifier = config.mirrorIdentifier ?? null;
 
 		this.#data = {
