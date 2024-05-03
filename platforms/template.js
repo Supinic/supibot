@@ -248,7 +248,7 @@ module.exports = class Platform {
 		});
 	}
 
-	async fetchUserList (channelData) {
+	async fetchChannelUserList (channelData) {
 		const key = this.#getChannelUserListKey();
 		const cacheData = await sb.Cache.getByPrefix(key);
 		if (cacheData) {
