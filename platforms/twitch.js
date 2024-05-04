@@ -88,6 +88,7 @@ const fetchToken = async () => {
 	const authToken = response.body.access_token;
 
 	await Promise.all([
+		sb.Cache.setByPrefix("TWITCH_OAUTH", authToken, { expiry: response.body.expires_in * 1000 }),
 		sb.Config.set("TWITCH_OAUTH", authToken),
 		sb.Config.set("TWITCH_OAUTH_EXPIRATION", expirationTimestamp),
 		sb.Config.set("TWITCH_REFRESH_TOKEN", response.body.refresh_token)
