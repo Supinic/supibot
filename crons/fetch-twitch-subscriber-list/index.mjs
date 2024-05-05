@@ -40,8 +40,10 @@ export const definition = {
 			sb.Config.set("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN", identityResponse.body.refresh_token)
 		]);
 
-		const subsResponse = await sb.Got("Helix", {
-			url: "subscriptions",
+		const subsResponse = await sb.Got("GenericAPI", {
+			url: "https://api.twitch.tv/helix/subscriptions",
+			responseType: "json",
+			throwHttpErrors: false,
 			headers: {
 				"Client-ID": sb.Config.get("TWITCH_CLIENT_ID"),
 				Authorization: `Bearer ${sb.Config.get("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN")}`
