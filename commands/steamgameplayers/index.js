@@ -1,3 +1,40 @@
+const { CronJob } = require("cron");
+
+const fetchGamesData = async () => {
+	let lastUpdate = await sb.Cache.getByPrefix("latest-steam-games-update");
+	if (!lastUpdate) {
+		lastUpdate = new sb.Date().addHours(-24).getTime() / 1000;
+	}
+
+	const response = await sb.Got("GenericAPI", {
+		url: "https://api.steampowered.com/IStoreService/GetAppList/v1/",
+		throwHttpErrors: false,
+		searchParams: {
+			if_modified_since: lastUpdate,
+			include_games: true,
+			max_results: 10_000,
+			key: sb.Config.get("API_STEAM_KEY")
+		}
+	});
+
+	await sb.Cache.setByPrefix("latest-steam-games-update", sb.Date.now() / 1000);
+
+	for (const game of response.body.response.apps) {
+		const row = await sb.Query.getRow("data", "Steam_Game");
+		await row.load(game.appid, true);
+		if (row.loaded) {
+			continue;
+		}
+
+		row.setValues({
+			ID: game.appid,
+			Name: game.name
+		});
+
+		await row.save({ skipLoad: true });
+	}
+};
+
 module.exports = {
 	Name: "steamgameplayers",
 	Aliases: ["sgp"],
@@ -10,6 +47,14 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
+	initialize: function () {
+		this.data.updateCronJob = new CronJob("0 0 * * * *", () => fetchGamesData());
+		this.data.updateCronJob.start();
+	},
+	destroy: function () {
+		this.data.updateCronJob.stop();
+		this.data.updateCronJob = null;
+	},
 	Code: async function steamGamePlayers (context, ...args) {
 		let gameId = context.params.gameID ?? null;
 		if (!gameId) {
@@ -26,8 +71,14 @@ module.exports = {
 				return rs;
 			});
 
-			const bestMatch = sb.Utils.selectClosestString(args.join(" "), plausibleResults.map(i => i.Name));
-			gameId = plausibleResults.find(i => i.name === bestMatch).ID;
+			const gameName = args.join(" ");
+			const plausibleNames = plausibleResults.map(i => i.Name);
+			const [bestMatch] = sb.Utils.selectClosestString(gameName, plausibleNames, {
+				ignoreCase: true,
+				fullResult: true
+			});
+
+			gameId = plausibleResults.find(i => i.Name === bestMatch.original).ID;
 		}
 
 		const steamResponse = await sb.Got("GenericAPI", {
@@ -46,17 +97,16 @@ module.exports = {
 			};
 		}
 
-		// Could add more game IDs to do some proper string matching later
 		const gameDataResponse = await sb.Got("GenericAPI", {
 			url: "https://store.steampowered.com/api/appdetails",
 			throwHttpErrors: false,
 			searchParams: {
-				appids: game.objectID
+				appids: gameId
 			}
 		});
 
 		let publisher = "";
-		const gameData = gameDataResponse.body[game.objectID].data;
+		const gameData = gameDataResponse.body[gameId].data;
 		const devs = gameData.developers;
 
 		if (Array.isArray(devs)) {
