@@ -113,7 +113,7 @@ module.exports = {
 		if (!playerCountResponse.ok) {
 			return {
 				success: false,
-				reply: "Could not find any Steam data regarding this game!"
+				reply: "Could not find this Steam game!"
 			};
 		}
 
@@ -127,8 +127,14 @@ module.exports = {
 
 		let publisher = "";
 		const gameData = gameDataResponse.body[gameId].data;
-		const devs = gameData.developers;
+		if (!gameData) {
+			return {
+				success: false,
+				reply: "This Steam game supposedly exists, but there is no data associated with it!"
+			};
+		}
 
+		const devs = gameData.developers;
 		if (Array.isArray(devs)) {
 			if (devs.length === 1) {
 				publisher = `(by ${devs[0]})`;
