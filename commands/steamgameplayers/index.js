@@ -57,38 +57,51 @@ module.exports = {
 	},
 	Code: async function steamGamePlayers (context, ...args) {
 		let gameId = context.params.gameID ?? null;
+		const gameName = args.join(" ");
 		if (!gameId) {
-			const plausibleResults = await sb.Query.getRecordset(rs => {
-				rs.select("ID", "Name");
-				rs.from("data", "Steam_Game");
-				rs.limit(25);
-				rs.orderBy("ID ASC");
-
-				for (const word of args) {
-					rs.where("Name %*like*", word);
-				}
-
-				return rs;
-			});
-			
-			if (plausibleResults.length === 0) {
+			if (!gameName) {
 				return {
 					success: false,
-					reply: `No games found for your query!`
+					reply: `No game provided!`
 				};
 			}
 
-			const gameName = args.join(" ");
-			const plausibleNames = plausibleResults.map(i => i.Name);
-			const [bestMatch] = sb.Utils.selectClosestString(gameName, plausibleNames, {
-				ignoreCase: true,
-				fullResult: true
-			});
+			const potentialUrlAppId = gameName.match(/app\/(\d+)/);
+			if (potentialUrlAppId) {
+				gameId = Number(potentialUrlAppId[1]);
+			}
+			else {
+				const plausibleResults = await sb.Query.getRecordset(rs => {
+					rs.select("ID", "Name");
+					rs.from("data", "Steam_Game");
+					rs.limit(25);
+					rs.orderBy("ID ASC");
 
-			gameId = plausibleResults.find(i => i.Name === bestMatch.original).ID;
+					for (const word of args) {
+						rs.where("Name %*like*", word);
+					}
+
+					return rs;
+				});
+
+				if (plausibleResults.length === 0) {
+					return {
+						success: false,
+						reply: `No games found for your query!`
+					};
+				}
+
+				const plausibleNames = plausibleResults.map(i => i.Name);
+				const [bestMatch] = sb.Utils.selectClosestString(gameName, plausibleNames, {
+					ignoreCase: true,
+					fullResult: true
+				});
+
+				gameId = plausibleResults.find(i => i.Name === bestMatch.original).ID;
+			}
 		}
 
-		const steamResponse = await sb.Got("GenericAPI", {
+		const playerCountResponse = await sb.Got("GenericAPI", {
 			url: "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001",
 			throwHttpErrors: false,
 			searchParams: {
@@ -97,10 +110,10 @@ module.exports = {
 			}
 		});
 
-		if (steamResponse.statusCode !== 200) {
+		if (!playerCountResponse.ok) {
 			return {
 				success: false,
-				reply: "Could not find any data regarding this game's current player count! This is probably on Steam's end."
+				reply: "Could not find any Steam data regarding this game!"
 			};
 		}
 
@@ -125,7 +138,7 @@ module.exports = {
 			}
 		}
 
-		const players = steamResponse.body.response.player_count;
+		const players = playerCountResponse.body.response.player_count;
 		return {
 			reply: sb.Utils.tag.trim `
 				${gameData.name} ${publisher}
@@ -140,11 +153,19 @@ module.exports = {
 		"",
 
 		`<code>$sgp (game name)</code>`,
+		`<code>$sgp Counter Strike</code>`,
 		"Fetches game data by its name",
 		"",
 
 
+		`<code>$sgp (steam store URL)</code>`,
+		`<code>$sgp https://store.steampowered.com/app/105600/Terraria</code>`,
+		"Fetches game data by its Steam Store URL (and some others too possibly)",
+		"",
+
+
 		`<code>$sgp gameID:(game ID)</code>`,
+		`<code>$sgp gameID:12345</code>`,
 		"Fetches game data by its Steam ID",
 		""
 	]
