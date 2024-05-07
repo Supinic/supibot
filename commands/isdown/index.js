@@ -9,7 +9,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function isDown (context, input) {
-		const { domainToASCII } = require("url");
+		const { domainToASCII } = require("node:url");
 		const fixedInput = domainToASCII(input) || input; // domainToASCII returns empty string for invalid input - hence ||
 		if (fixedInput.includes("shouldiblamecaching.com")) {
 			return {

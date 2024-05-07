@@ -1,4 +1,4 @@
-const EventEmitter = require("events");
+const EventEmitter = require("node:events");
 module.exports = class DankTwitchMock {
 	static JoinError = class extends Error {};
 	static SayError = class extends Error {};

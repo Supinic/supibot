@@ -20,7 +20,7 @@ module.exports = {
 			};
 		}
 
-		const vm = require("vm");
+		const vm = require("node:vm");
 		const string = args.join(" ");
 
 		let scriptString;

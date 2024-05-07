@@ -98,11 +98,11 @@ module.exports = {
 			};
 		}
 
-		const { promisify } = require("util");
-		const stream = require("stream");
+		const { promisify } = require("node:util");
+		const stream = require("node:stream");
 		const pipeline = promisify(stream.pipeline);
-		const shell = promisify(require("child_process").exec);
-		const fs = require("fs");
+		const shell = promisify(require("node:child_process").exec);
+		const fs = require("node:fs");
 
 		// await shell(`wget https://i.imgur.com/${link} -P /tmp`);
 

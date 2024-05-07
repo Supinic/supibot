@@ -79,7 +79,7 @@ module.exports = class GptTemplate {
 			userPlatformID = "N/A";
 		}
 
-		const { createHash } = require("crypto");
+		const { createHash } = require("node:crypto");
 		return createHash("sha1")
 			.update(context.user.Name)
 			.update(context.platform.Name)

@@ -1,8 +1,8 @@
 (async () => {
-	const fs = require("fs").promises;
-	const util = require("util");
-	const { exec } = require("child_process");
-	const readline = require("readline");
+	const fs = require("node:fs").promises;
+	const util = require("node:util");
+	const { exec } = require("node:child_process");
+	const readline = require("node:readline");
 
 	const accessFile = "./db-access.js";
 	const rl = readline.createInterface({

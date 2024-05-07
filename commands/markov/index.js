@@ -67,7 +67,7 @@ module.exports = {
 		}
 
 		const module = sb.ChatModule.get("async-markov-experiment");
-		const fs = require("fs").promises;
+		const fs = require("node:fs").promises;
 
 		for (const [channelID, markov] of module.data.markovs.entries()) {
 			if (markov.size < MODEL_SIZE_THRESHOLD) {
@@ -177,7 +177,7 @@ module.exports = {
 			}
 
 			const { debug } = context.params;
-			const fs = require("fs").promises;
+			const fs = require("node:fs").promises;
 			const fileName = `markov-dump-${new sb.Date().format("Y-m-d")}-channel-${targetChannel.ID}.json`;
 			if (debug === "save") {
 				await fs.writeFile(`${BASE_PATH}/markovs/${fileName}`, JSON.stringify(markov));

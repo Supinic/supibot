@@ -29,7 +29,7 @@ module.exports = class Channel extends require("./template.js") {
 
 		this.sessionData = {};
 
-		const EventEmitter = require("events");
+		const EventEmitter = require("node:events");
 		this.events = new EventEmitter();
 	}
 

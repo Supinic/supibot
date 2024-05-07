@@ -173,7 +173,7 @@ module.exports = {
 			return null;
 		}
 
-		const { URL } = require("url");
+		const { URL } = require("node:url");
 		let url;
 		try {
 			url = new URL(stringURL);

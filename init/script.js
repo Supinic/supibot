@@ -1,5 +1,5 @@
 const initializeDatabase = require("supi-db-init");
-const path = require("path");
+const path = require("node:path");
 
 require("../db-access.js");
 

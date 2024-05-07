@@ -1,5 +1,5 @@
 const { parseRSS } = require("../../../utils/command-utils.js");
-const { createHash } = require("crypto");
+const { createHash } = require("node:crypto");
 
 const hashArticle = (item) => createHash("sha256")
 	.update(item.title)

@@ -120,7 +120,7 @@ module.exports = {
 						result.push("Banphrase API URL has been unset.");
 					}
 					else {
-						const url = require("url");
+						const url = require("node:url");
 						const fixedURL = url.parse(params.url).hostname ?? params.url;
 						try {
 							await sb.Banphrase.executeExternalAPI("test", "pajbot", fixedURL);

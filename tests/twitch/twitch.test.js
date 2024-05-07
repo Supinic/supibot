@@ -1,6 +1,6 @@
 /* global it, describe, beforeEach, afterEach */
 /* eslint-disable prefer-arrow-callback */
-const assert = require("assert");
+const assert = require("node:assert");
 
 const Channel = require("../../classes/channel.js");
 const Command = require("../../classes/command.js");

@@ -1,7 +1,7 @@
 module.exports = (function () {
 	const secure = (sb.Config?.get("SUPIBOT_API_SECURE", false)) ?? false;
-	const httpInterface = (secure) ? require("https") : require("http");
-	const { URL } = require("url");
+	const httpInterface = (secure) ? require("node:https") : require("node:http");
+	const { URL } = require("node:url");
 
 	const port = sb.Config?.get("SUPIBOT_API_PORT", false) ?? 31337;
 	const protocol = (secure) ? "https" : "http";
