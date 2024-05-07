@@ -70,6 +70,13 @@ module.exports = {
 
 				return rs;
 			});
+			
+			if (plausibleResults.length === 0) {
+				return {
+					success: false,
+					reply: `No games found for your query!`
+				};
+			}
 
 			const gameName = args.join(" ");
 			const plausibleNames = plausibleResults.map(i => i.Name);
