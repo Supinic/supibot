@@ -1,4 +1,6 @@
 const { CronJob } = require("cron");
+const nameSymbol = Symbol.for("name");
+const definitionSymbol = Symbol.for("definition");
 
 module.exports = {
 	Name: "subscribe",
@@ -21,6 +23,10 @@ module.exports = {
 		for (const def of rssSubscriptions) {
 			const expression = def.cronExpression ?? "0 */5 * * * *";
 			const cron = new CronJob(expression, () => handleGenericSubscription(def));
+
+			// Only used for debugging purposes, simplifies inspecting each cron job
+			cron[nameSymbol] = def.name ?? null;
+			cron[definitionSymbol] = def;
 
 			cron.start();
 			this.data.crons.add(cron);
