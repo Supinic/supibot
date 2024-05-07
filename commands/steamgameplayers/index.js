@@ -2,32 +2,11 @@ const idRegex = /"x-algolia-application-id"\s*:\s*"(.+?)"/;
 const keyRegex = /\[atob\("eC1hbGdvbGlhLWFwaS1rZXk="\)]=atob\("(.+?)"\)/;
 
 const refetchAlgoliaInfo = async () => {
-	let configRowsAdded = false;
-	if (!sb.Config.has("ALGOLIA_STEAMDB_APP_ID", false)) {
-		const row = await sb.Query.getRow("data", "Config");
-		row.setValues({
-			Name: "ALGOLIA_STEAMDB_APP_ID",
-			Type: "string",
-			Editable: true
-		});
-
-		await row.save({ skipLoad: true });
-		configRowsAdded = true;
-	}
-	if (!sb.Config.has("ALGOLIA_STEAMDB_API_KEY", false)) {
-		const row = await sb.Query.getRow("data", "Config");
-		row.setValues({
-			Name: "ALGOLIA_STEAMDB_API_KEY",
-			Type: "string",
-			Editable: true
-		});
-
-		await row.save({ skipLoad: true });
-		configRowsAdded = true;
-	}
-
-	if (configRowsAdded) {
-		await sb.Config.reloadData();
+	if (!sb.Config.has("ALGOLIA_STEAMDB_APP_ID") || !sb.Config.has("ALGOLIA_STEAMDB_API_KEY", false)) {
+		return {
+			success: false,
+			reply: `Algolia config keys are not set up, cannot re-fetch`
+		};
 	}
 
 	const response = await sb.Got("FakeAgent", {
