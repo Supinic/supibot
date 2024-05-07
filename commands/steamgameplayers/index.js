@@ -1,47 +1,3 @@
-const idRegex = /"x-algolia-application-id"\s*:\s*"(.+?)"/;
-const keyRegex = /\[atob\("eC1hbGdvbGlhLWFwaS1rZXk="\)]=atob\("(.+?)"\)/;
-
-const refetchAlgoliaInfo = async () => {
-	if (!sb.Config.has("ALGOLIA_STEAMDB_APP_ID") || !sb.Config.has("ALGOLIA_STEAMDB_API_KEY", false)) {
-		return {
-			success: false,
-			reply: `Algolia config keys are not set up, cannot re-fetch`
-		};
-	}
-
-	const response = await sb.Got("FakeAgent", {
-		url: "https://steamdb.info/static/js/global.js",
-		responseType: "text"
-	});
-	if (!response.ok) {
-		return {
-			success: false
-		};
-	}
-
-	const idMatch = response.body.match(idRegex);
-	const keyMatch = response.body.match(keyRegex);
-	if (!idMatch || !keyMatch) {
-		return {
-			success: false
-		};
-	}
-
-	const appID = idMatch[1];
-	const apiKey = Buffer.from(keyMatch[1], "base64").toString("utf8");
-
-	await Promise.all([
-		sb.Config.set("ALGOLIA_STEAMDB_APP_ID", appID),
-		sb.Config.set("ALGOLIA_STEAMDB_API_KEY", apiKey)
-	]);
-
-	return {
-		success: true,
-		appID,
-		apiKey
-	};
-};
-
 module.exports = {
 	Name: "steamgameplayers",
 	Aliases: ["sgp"],
@@ -50,96 +6,35 @@ module.exports = {
 	Description: "Searches for a Steam game, and attempts to find its current player amount.",
 	Flags: ["mention","pipe"],
 	Params: [
-		{ name: "gameID", type: "string" }
+		{ name: "gameID", type: "number" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: async function steamGamePlayers (context, ...args) {
-		if (context.params.gameID) {
-			const gameID = Number(context.params.gameID);
-			if (!sb.Utils.isValidInteger(gameID)) {
-				return {
-					success: false,
-					reply: `Invalid game ID provided!`
-				};
-			}
+		let gameId = context.params.gameID ?? null;
+		if (!gameId) {
+			const plausibleResults = await sb.Query.getRecordset(rs => {
+				rs.select("ID", "Name");
+				rs.from("data", "Steam_Game");
+				rs.limit(25);
+				rs.orderBy("ID ASC");
 
-			const response = await sb.Got("GenericAPI", {
-				url: "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1",
-				searchParams: {
-					appid: context.params.gameID
+				for (const word of args) {
+					rs.where("Name %*like*", word);
 				}
+
+				return rs;
 			});
 
-			if (response.statusCode === 404) {
-				return {
-					success: false,
-					reply: `No game exists for provided ID!`
-				};
-			}
-
-			const players = response.body.response.player_count;
-			return {
-				reply: `That game currently has ${sb.Utils.groupDigits(players)} players in-game.`
-			};
+			const bestMatch = sb.Utils.selectClosestString(args.join(" "), plausibleResults.map(i => i.Name));
+			gameId = plausibleResults.find(i => i.name === bestMatch).ID;
 		}
 
-		const query = args.join(" ");
-		if (!query) {
-			return {
-				success: false,
-				reply: `No game name provided!`
-			};
-		}
-
-		const searchResponse = await sb.Got("FakeAgent", {
-			url: "https://94he6yatei-dsn.algolia.net/1/indexes/steamdb",
-			searchParams: {
-				"x-algolia-agent": "SteamDB+Autocompletion",
-				"x-algolia-application-id": sb.Config.get("ALGOLIA_STEAMDB_APP_ID", false),
-				"x-algolia-api-key": sb.Config.get("ALGOLIA_STEAMDB_API_KEY", false),
-				hitsPerPage: 50,
-				attributesToSnippet: "null",
-				attributesToHighlight: "null",
-				attributesToRetrieve: "name,publisher",
-				facetFilters: "appType:Game",
-				query
-			},
-			headers: {
-				Referer: "https://steamdb.info/"
-			}
-		});
-
-		if (searchResponse.statusCode !== 200) {
-			const result = await refetchAlgoliaInfo();
-			if (result.success) {
-				return {
-					reply: `Could not fetch game data. I tried to fix it, and it seems to be okay now. Try again, please? 😊`
-				};
-			}
-			else {
-				return {
-					success: false,
-					reply: `Could not fetch game data! The source site is probably broken 😟`
-				};
-			}
-		}
-
-		const { hits } = searchResponse.body;
-		if (hits.length === 0) {
-			return {
-				success: false,
-				reply: `No game found for your query!`
-			};
-		}
-
-		// Ignore heuristics for now, Algolia API does not include game name
-		const game = hits[0];
 		const steamResponse = await sb.Got("GenericAPI", {
 			url: "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001",
 			throwHttpErrors: false,
 			searchParams: {
-				appid: game.objectID,
+				appid: gameId,
 				key: sb.Config.get("API_STEAM_KEY")
 			}
 		});
