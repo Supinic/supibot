@@ -20,7 +20,7 @@
     "vm2": "^3.9.19"
   },
   "engines": {
-    "node": ">= 16.0"
+    "node": ">= 18.0"
   },
   "scripts": {
     "start": "node --enable-experimental-regexp-engine ./master.js",
