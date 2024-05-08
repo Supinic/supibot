@@ -249,7 +249,7 @@ module.exports = class Platform {
 	}
 
 	async fetchChannelUserList (channelData) {
-		const key = this.#getChannelUserListKey();
+		const key = this.#getChannelUserListKey(channelData);
 		const cacheData = await sb.Cache.getByPrefix(key);
 		if (cacheData) {
 			return cacheData;
