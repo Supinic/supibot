@@ -1,3 +1,5 @@
+const { randomInt } = require("node:crypto");
+
 module.exports = {
 	Name: "%",
 	Aliases: null,
@@ -9,14 +11,16 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: (async function percent () {
-		const number = (sb.Utils.random(0, 10000) / 100);
-		return { reply: `${number}%` };
+		const number = randomInt(0, 10_000);
+		return {
+			reply: `${number / 100}%`
+		};
 	}),
 	Dynamic_Description: (async (prefix) => [
-		"Rolls a random percentage number between 0% and 100%.",
+		"Rolls a random percentage!",
 		"",
-	
+
 		`<code>${prefix}%</code>`,
-		`${sb.Utils.random(0, 10000) / 100}%`
+		"Random percentage, between 0.00% to 100.00%"
 	])
 };

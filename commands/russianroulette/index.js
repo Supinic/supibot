@@ -1,3 +1,5 @@
+const { randomInt } = require("node:crypto");
+
 module.exports = {
 	Name: "russianroulette",
 	Aliases: ["rr"],
@@ -76,7 +78,7 @@ module.exports = {
 			timeoutMode = "real";
 		}
 
-		const result = sb.Utils.random(1, 6);
+		const result = randomInt(1, 6);
 		if (result === 1) {
 			if (timeoutMode === "real") {
 				try {

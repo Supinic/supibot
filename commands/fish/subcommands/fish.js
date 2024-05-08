@@ -1,3 +1,4 @@
+const { randomInt } = require("node:crypto");
 const {
 	baitTypes,
 	COIN_EMOJI,
@@ -143,9 +144,9 @@ module.exports = {
 
 		fishData.lifetime.attempts++;
 
-		const roll = sb.Utils.random(1, rollMaximum);
+		const roll = randomInt(1, rollMaximum);
 		if (roll !== 1) {
-			const fishingDelay = sb.Utils.round(sb.Utils.random(...unsuccessfulFishDelay), -3);
+			const fishingDelay = sb.Utils.round(randomInt(...unsuccessfulFishDelay), -3);
 
 			fishData.catch.dryStreak++;
 			fishData.catch.luckyStreak = 0;
@@ -157,7 +158,7 @@ module.exports = {
 
 			let message;
 			const reactions = ["🚫"];
-			const junkRoll = sb.Utils.random(1, 100);
+			const junkRoll = randomInt(1, 100);
 			if (junkRoll <= 25) {
 				const item = getWeightedCatch("junk");
 				reactions.push(item.name);
@@ -169,7 +170,7 @@ module.exports = {
 				message = `${getCatchMessage("junk")} You reel out a ${item.name}`;
 			}
 			else {
-				const missDistance = sb.Utils.random(1, 500);
+				const missDistance = randomInt(1, 500);
 				message = `Your fishing line landed ${missDistance} cm away.`;
 			}
 
@@ -217,7 +218,7 @@ module.exports = {
 
 		let sizeString = "";
 		if (caughtFishData.size) {
-			const size = sb.Utils.random(1, 100);
+			const size = randomInt(1, 100);
 			sizeString = `It is ${size} cm in length.`;
 
 			if (size > fishData.lifetime.maxFishSize) {
@@ -238,7 +239,7 @@ module.exports = {
 		}
 
 		const gptLimitResult = await checkLimits(context.user);
-		const gptRoll = sb.Utils.random(1, 3);
+		const gptRoll = randomInt(1, 3);
 
 		if (!context.params.skipStory && sb.Command.get("gpt") && gptRoll === 1 && gptLimitResult.success) {
 			const gptCommand = sb.Command.get("gpt");

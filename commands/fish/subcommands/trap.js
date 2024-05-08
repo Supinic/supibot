@@ -1,3 +1,4 @@
+const { randomInt } = require("node:crypto");
 const { addFish, addJunk, getInitialStats, rollCatch, saveData } = require("./fishing-utils.js");
 
 const FISHING_TRIP_STATIC_DURATION = 36e5; // 1 hour
@@ -87,7 +88,7 @@ const execute = async (context, operation) => {
 		};
 	}
 	else if (now > trap.end) {
-		const randomEfficiencyPercentage = sb.Utils.random(75, 90) / 100;
+		const randomEfficiencyPercentage = randomInt(75, 90) / 100;
 		const rolls = Math.floor(trap.duration / 60e3 * randomEfficiencyPercentage);
 
 		let fishAmount = 0;

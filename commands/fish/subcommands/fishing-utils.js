@@ -1,3 +1,5 @@
+const { randomInt } = require("node:crypto");
+
 const defaultFishingData = Object.freeze({
 	catch: {
 		luckyStreak: 0,
@@ -330,7 +332,7 @@ const getWeightedCatch = (type) => {
 	const totalWeight = applicableItems.reduce((acc, cur) => acc + cur.weight ?? 1, 0);
 
 	let indexedWeight = 0;
-	const roll = sb.Utils.random(1, totalWeight);
+	const roll = randomInt(1, totalWeight);
 	for (const item of applicableItems) {
 		indexedWeight += item.weight;
 
@@ -376,7 +378,7 @@ const rollCatch = (bait = null) => {
 		odds = baitData.roll;
 	}
 
-	const roll = sb.Utils.random(1, odds);
+	const roll = randomInt(1, odds);
 	if (roll === 1) {
 		return {
 			catch: getWeightedCatch("fish"),
@@ -384,7 +386,7 @@ const rollCatch = (bait = null) => {
 		};
 	}
 	else {
-		const roll = sb.Utils.random(1, 4);
+		const roll = randomInt(1, 4);
 		if (roll === 1) {
 			return {
 				catch: getWeightedCatch("junk"),

@@ -1,3 +1,4 @@
+const { randomInt } = require("node:crypto");
 const { uploadToImgur, uploadToNuuls } = require("../../utils/command-utils.js");
 
 module.exports = {
@@ -25,35 +26,35 @@ module.exports = {
 
 		const staticNumberedLinkMap = {
 			anime: () => {
-				const id = sb.Utils.random(10000, 99999);
-				const creativity = sb.Utils.random(3, 20);
+				const id = randomInt(10000, 99999);
+				const creativity = randomInt(3, 20);
 				const psi = (creativity / 10).toFixed(1);
 
 				return `https://thisanimedoesnotexist.ai/results/psi-${psi}/seed${id}.png`;
 			},
 			fursona: () => {
-				const number = sb.Utils.random(1, 99999);
+				const number = randomInt(1, 99999);
 				const padded = sb.Utils.zf(number, 5);
 
 				return `https://thisfursonadoesnotexist.com/v2/jpgs-2x/seed${padded}.jpg`;
 			},
 			sneaker: () => {
-				const id = sb.Utils.random(1, 2000);
+				const id = randomInt(1, 2000);
 				const params = [
-					sb.Utils.random(1, 5),
-					sb.Utils.random(1, 5),
-					sb.Utils.random(1, 3)
+					randomInt(1, 5),
+					randomInt(1, 5),
+					randomInt(1, 3)
 				];
 
 				return `https://thissneakerdoesnotexist.com/wp-content/plugins/sneaker-plugin/imsout2/${params[0]}-${params[1]}-${params[2]}-${id}.jpg`;
 			},
-			waifu: () => `https://www.thiswaifudoesnotexist.net/example-${sb.Utils.random(1, 1e5)}.jpg`,
-			wojak: () => `https://archive.org/download/thiswojakdoesnotexist.com/img/${sb.Utils.random(1, 1576)}.png`
+			waifu: () => `https://www.thiswaifudoesnotexist.net/example-${randomInt(1, 1e5)}.jpg`,
+			wojak: () => `https://archive.org/download/thiswojakdoesnotexist.com/img/${randomInt(1, 1576)}.png`
 		};
 
 		const staticNumberedLinkMapSummary = {
-			anime: () => `https://thisanimedoesnotexist.ai/slider.html?seed=${sb.Utils.random(10000, 99999)}`,
-			sneaker: () => `https://thissneakerdoesnotexist.com/editor/?seed=${sb.Utils.random(1, 2000)}`
+			anime: () => `https://thisanimedoesnotexist.ai/slider.html?seed=${randomInt(10000, 99999)}`,
+			sneaker: () => `https://thissneakerdoesnotexist.com/editor/?seed=${randomInt(1, 2000)}`
 		};
 
 		return {

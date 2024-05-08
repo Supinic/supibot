@@ -1,9 +1,21 @@
+const { randomInt } = require("node:crypto");
+
 const RSSParser = require("rss-parser");
 const Chrono = require("chrono-node");
 
 const rssParser = new RSSParser();
 
 module.exports = {
+	random (min, max) {
+		return new Promise((resolve, reject) => {
+			randomInt(min, max, (err, num) => (err) ? reject(err) : resolve(num));
+		});
+	},
+
+	randomSync (min, max) {
+		return randomInt(min, max);
+	},
+
 	/**
 	 * Fetches time data for given GPS coordinates and timestamp
 	 * @param {Object} data

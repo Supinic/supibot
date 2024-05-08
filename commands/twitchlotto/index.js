@@ -1,3 +1,5 @@
+const { randomInt } = require("node:crypto");
+
 module.exports = {
 	Name: "twitchlotto",
 	Aliases: ["tl"],
@@ -193,7 +195,7 @@ module.exports = {
 				}
 			}
 			else if (channel) {
-				const roll = sb.Utils.random(1, this.data.counts[channel]) - 1;
+				const roll = randomInt(1, this.data.counts[channel]) - 1;
 				image = await sb.Query.getRecordset(rs => rs
 					.select("*")
 					.from("data", "Twitch_Lotto")
@@ -204,7 +206,7 @@ module.exports = {
 				);
 			}
 			else {
-				const roll = sb.Utils.random(1, this.data.counts.total);
+				const roll = randomInt(1, this.data.counts.total);
 				const link = await sb.Query.getRecordset(rs => rs
 					.select("Link")
 					.from("data", "Twitch_Lotto")

@@ -1,3 +1,5 @@
+const { randomInt } = require("node:crypto");
+
 module.exports = {
 	Name: "funfact",
 	Aliases: ["ff"],
@@ -11,8 +13,8 @@ module.exports = {
 	Code: (async function funFact () {
 		const { year } = new sb.Date();
 		const randomDate = new sb.Date(
-			sb.Utils.random(2017, year),
-			sb.Utils.random(1, 12)
+			randomInt(2017, year),
+			randomInt(1, 12)
 		);
 
 		const response = await sb.Got("GenericAPI", {

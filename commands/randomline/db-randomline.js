@@ -1,3 +1,5 @@
+const { randomInt } = require("node:crypto");
+
 const throwOrReturn = (throwFlag, message) => {
 	if (throwFlag) {
 		throw new sb.Error({ message });
@@ -56,7 +58,7 @@ const fetchUserRandomLine = async function (userData, channelData, options = {})
 			.from("chat_line", channelName)
 			.where("Platform_ID = %s", userIdentifier)
 			.limit(1)
-			.offset(sb.Utils.random(1, userMessageCount) - 1)
+			.offset(randomInt(1, userMessageCount) - 1)
 			.single()
 			.flat("ID")
 		);
@@ -67,7 +69,7 @@ const fetchUserRandomLine = async function (userData, channelData, options = {})
 			.from("chat_line", channelName)
 			.where("User_Alias = %n", userData.ID)
 			.limit(1)
-			.offset(sb.Utils.random(1, userMessageCount) - 1)
+			.offset(randomInt(1, userMessageCount) - 1)
 			.single()
 			.flat("ID")
 		);
@@ -115,7 +117,7 @@ const fetchChannelRandomLine = async function (channelData, options = {}) {
 	const randomLine = await sb.Query.getRecordset(rs => rs
 		.select("Text", "Posted", ...specificColumns)
 		.from("chat_line", channelName)
-		.where("ID >= %n", sb.Utils.random(1, channelMessageCount))
+		.where("ID >= %n", randomInt(1, channelMessageCount))
 		.orderBy("ID ASC")
 		.limit(1)
 		.single()

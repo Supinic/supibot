@@ -1,11 +1,12 @@
-import { getLinkParser } from "../../utils/link-parser.js";
+// import { randomInt } from "node:crypto";
+// import { getLinkParser } from "../../utils/link-parser.js";
 
 const repeats = [];
 const repeatAmount = 100;
-const bannedLinks = [
-	"BaMcFghlVEU", // Gachillmuchi
-	"QO0CRvQ0WRA" // Gachillmuchi reupload by DJ Gachi
-];
+// const bannedLinks = [
+// 	"BaMcFghlVEU", // Gachillmuchi
+// 	"QO0CRvQ0WRA" // Gachillmuchi reupload by DJ Gachi
+// ];
 
 export const definition = {
 	name: "stream-silence-prevention",
@@ -95,7 +96,7 @@ export const definition = {
 
 		/*
 		let videoID;
-		const roll = sb.Utils.random(1, 100);
+		const roll = randomInt(1, 100);
 		if (roll < 100) {
 			const videoData = await sb.Query.getRecordset(rs => rs
 				.select("Link", "Video_Type")

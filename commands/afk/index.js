@@ -1,3 +1,5 @@
+const { randomInt } = require("node:crypto");
+
 module.exports = {
 	Name: "afk",
 	Aliases: ["gn","brb","shower","food","lurk","poop","💩","work","study","nap"],
@@ -41,7 +43,7 @@ module.exports = {
 						return `${text} 🚿`;
 					}
 
-					if (sb.Utils.random(1, 100) === 1) {
+					if (randomInt(1, 100) === 1) {
 						return " 🐏🏡 🤠🚿";
 					}
 					else {

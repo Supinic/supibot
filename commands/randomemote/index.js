@@ -1,3 +1,5 @@
+const { randomInt } = require("node:crypto");
+
 module.exports = {
 	Name: "randomemote",
 	Aliases: ["rem"],
@@ -162,7 +164,7 @@ module.exports = {
 				break;
 			}
 
-			const index = sb.Utils.random(0, emotes.length - 1);
+			const index = randomInt(0, emotes.length - 1);
 			result.push(emotes[index].name);
 
 			if (context.params.repeat === false) {
