@@ -1,3 +1,4 @@
+const { randomInt } = require("node:crypto");
 const promisify = require("node:util").promisify;
 const exec = promisify(require("node:child_process").exec);
 
@@ -77,7 +78,7 @@ module.exports = {
 		}
 
 		const pongString = `P${switchCharactersMap[context.invocation[1]]}ng!`;
-		if (pongString === "Ping!" && sb.Utils.random(1, 10) === 1) {
+		if (pongString === "Ping!" && randomInt(1, 10) === 1) {
 			const emote = await context.randomEmote(["AlienDance", "AlienPls", "forsenPls", "SourPls", "DinoDance"]);
 			return {
 				reply: `Let's play Pong ${emote} ${emote} ${emote} https://youtu.be/cNAdtkSjSps`

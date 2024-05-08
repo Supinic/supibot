@@ -1,3 +1,5 @@
+const { randomInt } = require("node:crypto");
+
 /** @type {CookieData} */
 const basicStats = {
 	lastTimestamp: {
@@ -253,7 +255,7 @@ const eatCookie = (data, options = {}) => {
 	else {
 		const nextUTCMidnight = new sb.Date(sb.Date.getTodayUTC()).addHours(24);
 		const delta = sb.Utils.timeDelta(nextUTCMidnight);
-		const rudeRoll = sb.Utils.random(1, 100);
+		const rudeRoll = randomInt(1, 100);
 
 		return {
 			success: false,

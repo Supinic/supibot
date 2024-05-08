@@ -1,3 +1,5 @@
+const { randomInt } = require("node:crypto");
+
 module.exports = {
 	leaderboardKeywords: ["leader", "leaders", "leaderboard", "winners"],
 	patterns: [
@@ -190,7 +192,7 @@ module.exports = {
 				}
 
 				return {
-					roll: () => sb.Utils.random(1, target),
+					roll: () => randomInt(1, target),
 					uniqueItems: target
 				};
 			},

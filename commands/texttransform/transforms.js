@@ -1,3 +1,5 @@
+const { randomInt } = require("node:crypto");
+
 const convert = {
 	method: (string, fn, context) => fn(string, context),
 	map: (string, map) => [...string].map(i => map[i] || i).join(""),
@@ -317,7 +319,7 @@ const types = [
 		description: "Randomly capitalizes and lowercases characters in the message to make it look as if mocking someone.",
 		data: (message) => Array.from(message).map(char => {
 			if (/[a-zA-Z]/.test(char)) {
-				return sb.Utils.random(0, 1) ? char.toUpperCase() : char.toLowerCase();
+				return randomInt(0, 1) ? char.toUpperCase() : char.toLowerCase();
 			}
 			else {
 				return char;
@@ -350,7 +352,7 @@ const types = [
 				const chars = word.slice(prefixThreshold, suffixThreshold).split("");
 
 				while (chars.length > 0) {
-					const randomIndex = sb.Utils.random(0, chars.length - 1);
+					const randomIndex = randomInt(0, chars.length - 1);
 					scrambled.push(chars[randomIndex]);
 					chars.splice(randomIndex, 1);
 				}

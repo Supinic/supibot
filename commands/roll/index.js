@@ -1,5 +1,5 @@
+const { randomBytes, randomInt } = require("node:crypto");
 const { roll: diceRoll } = require("roll-dice");
-const { randomBytes } = require("node:crypto");
 
 module.exports = {
 	Name: "roll",
@@ -15,7 +15,7 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function roll (context, ...args) {
 		if (args.length === 0) {
-			const result = sb.Utils.random(1, 100);
+			const result = randomInt(1, 100);
 			if (context.params.textOnly) {
 				return {
 					reply: String(result)
@@ -45,8 +45,8 @@ module.exports = {
 			}
 
 			const number = (firstNum < secondNum)
-				? sb.Utils.random(firstNum, secondNum)
-				: sb.Utils.random(secondNum, firstNum);
+				? randomInt(firstNum, secondNum)
+				: randomInt(secondNum, firstNum);
 
 			if (context.params.textOnly) {
 				return {

@@ -1,3 +1,5 @@
+const { randomInt } = require("node:crypto");
+
 module.exports = {
 	Name: "thesaurus",
 	Aliases: null,
@@ -16,7 +18,7 @@ module.exports = {
 				reply: "No message provided!"
 			};
 		}
-	
+
 		const thesaurus = Object.fromEntries(
 			(await sb.Query.getRecordset(rs => rs
 				.select("Word", "Result")
@@ -39,12 +41,12 @@ module.exports = {
 				};
 			}
 		}
-	
+
 		const result = [];
 		for (const rawWord of words) {
 			const word = rawWord.toLowerCase();
-			const roll = sb.Utils.random(1, 3);
-	
+			const roll = randomInt(1, 3);
+
 			// With a chance of 2 in 3, transmute the word into a synonym
 			if (thesaurus[word] && roll > 1) {
 				result.push(sb.Utils.randArray(thesaurus[word]));
@@ -53,7 +55,7 @@ module.exports = {
 				result.push(rawWord);
 			}
 		}
-	
+
 		return {
 			reply: result.join(" ")
 		};
