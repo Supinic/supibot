@@ -1,4 +1,4 @@
-const Platform = require("./platform.js");
+const Platform = require("../platforms/template.js");
 
 module.exports = class Channel extends require("./template.js") {
 	static redisPrefix = "sb-channel";
@@ -159,7 +159,7 @@ module.exports = class Channel extends require("./template.js") {
 			});
 		}
 
-		return await this.Platform.controller.mirror(message, userData, this, options);
+		return await this.Platform.mirror(message, userData, this, options);
 	}
 
 	async fetchUserList () {

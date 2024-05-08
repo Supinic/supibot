@@ -61,8 +61,8 @@ module.exports = {
 			};
 		}
 
-		/** @type {TwitchController} */
-		const controller = context.platform.controller;
+		/** @type {TwitchPlatform} */
+		const platform = context.platform;
 		const { userBadges } = context.append;
 
 		let timeoutMode;
@@ -80,7 +80,7 @@ module.exports = {
 		if (result === 1) {
 			if (timeoutMode === "real") {
 				try {
-					await controller.timeout(
+					await platform.timeout(
 						context.channel,
 						context.user,
 						timeoutLength,

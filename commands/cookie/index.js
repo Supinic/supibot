@@ -19,8 +19,8 @@ module.exports = {
 		}
 
 		const { transaction } = context;
-		const { controller } = sb.Platform.get("twitch");
-		const hasDoubleCookieAccess = await controller.fetchUserCacheSubscription(context.user, "supinic");
+		const platform = sb.Platform.get("twitch");
+		const hasDoubleCookieAccess = await platform.fetchUserCacheSubscription(context.user, "supinic");
 
 		const options = { hasDoubleCookieAccess };
 		if (subcommand === "eat") {
@@ -67,7 +67,7 @@ module.exports = {
 				};
 			}
 
-			const receiverHasDoubleCookieAccess = await controller.fetchUserCacheSubscription(receiverUserData);
+			const receiverHasDoubleCookieAccess = await platform.fetchUserCacheSubscription(receiverUserData);
 			const receiverOptions = {
 				hasDoubleCookieAccess: receiverHasDoubleCookieAccess
 			};

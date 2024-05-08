@@ -1,48 +1,57 @@
 const IRC = require("irc-framework");
+const DEFAULT_LOGGING_CONFIG = {
+	messages: true,
+	whispers: false
+};
+const DEFAULT_PLATFORM_CONFIG = {};
+const DEFAULT_IRC_PORT = 6667;
 
-module.exports = class IRCController extends require("./template.js") {
-	constructor (options) {
-		super();
+module.exports = class IRCPlatform extends require("./template.js") {
+	#notifiedUnregisteredUsers = new Set();
+	#nicknameChanged = false;
 
-		if (!options.host) {
-			throw new sb.Error({
-				message: "Invalid IRC platform options - missing host",
-				args: { options }
-			});
-		}
-
-		this.platform = sb.Platform.get("irc", options.host);
-		if (!this.platform) {
-			throw new sb.Error({
-				message: "IRC platform has not been created"
-			});
-		}
-		else if (!this.platform.Self_Name) {
-			throw new sb.Error({
-				message: "IRC platform does not have the bot's name configured"
-			});
-		}
-
-		this.client = new IRC.Client();
-		this.client.connect({
-			host: this.platform.Data.url ?? options.host,
-			port: this.platform.Data.port ?? 6667,
-			nick: this.platform.Self_Name,
-			tls: this.platform.Data.secure ?? this.platform.Data.tls ?? false,
-			enable_echomessage: true
+	constructor (config) {
+		super("irc", config, {
+			logging: DEFAULT_LOGGING_CONFIG,
+			platform: DEFAULT_PLATFORM_CONFIG
 		});
 
-		this.nicknameChanged = false;
-		this.data.notifiedUnregisteredUsers = [];
+		if (!this.host) {
+			throw new sb.Error({
+				message: "Invalid IRC configuration - missing host"
+			});
+		}
+		else if (!this.selfName) {
+			throw new sb.Error({
+				message: "Invalid IRC configuration - missing bot's selfName"
+			});
+		}
+		else if (!this.config.url) {
+			throw new sb.Error({
+				message: "Invalid IRC configuration - missing url"
+			});
+		}
+	}
+
+	async connect () {
+		this.client = new IRC.Client();
 
 		this.initListeners();
+
+		await this.client.connect({
+			host: this.config.url,
+			port: this.config.port ?? DEFAULT_IRC_PORT,
+			nick: this.selfName,
+			tls: this.config.secure ?? this.config.tls ?? false,
+			enable_echomessage: true
+		});
 	}
 
 	initListeners () {
 		const { client } = this;
 
 		client.on("registered", () => {
-			const { authentication } = this.platform.Data ?? {};
+			const { authentication } = this.config;
 			if (authentication.type === "privmsg-identify") {
 				const { configVariable, user } = authentication;
 				const key = sb.Config.get(configVariable, false);
@@ -53,16 +62,16 @@ module.exports = class IRCController extends require("./template.js") {
 					});
 				}
 
-				const message = `IDENTIFY ${this.platform.Self_Name} ${key}`;
+				const message = `IDENTIFY ${this.selfName} ${key}`;
 				this.directPm(message, user);
 
-				if (this.nicknameChanged) {
-					this.nicknameChanged = false;
-					this.directPm(`REGAIN ${this.platform.Self_Name} ${key}`, user);
+				if (this.#nicknameChanged) {
+					this.#nicknameChanged = false;
+					this.directPm(`REGAIN ${this.selfName} ${key}`, user);
 				}
 			}
 
-			const channelsData = sb.Channel.getJoinableForPlatform(this.platform);
+			const channelsData = sb.Channel.getJoinableForPlatform(this);
 			for (const channelData of channelsData) {
 				this.client.join(channelData.Name);
 			}
@@ -75,14 +84,14 @@ module.exports = class IRCController extends require("./template.js") {
 		client.on("nick in use", async () => {
 			const string = sb.Utils.randomString(16);
 			this.client.changeNick(string);
-			this.nicknameChanged = true;
+			this.#nicknameChanged = true;
 		});
 
 		client.on("privmsg", async (event) => await this.handleMessage(event));
 	}
 
 	async send (message, channel) {
-		const channelData = sb.Channel.get(channel, this.platform);
+		const channelData = sb.Channel.get(channel, this);
 		if (!channelData) {
 			throw new sb.Error({
 				message: "Invalid channel provided",
@@ -118,7 +127,7 @@ module.exports = class IRCController extends require("./template.js") {
 			skipLengthCheck: true
 		});
 
-		const limit = (this.platform.Message_Limit * 2) - (options.extraLength ?? 0);
+		const limit = (this.messageLimit * 2) - (options.extraLength ?? 0);
 		return sb.Utils.wrapString(preparedMessage, limit);
 	}
 
@@ -128,15 +137,15 @@ module.exports = class IRCController extends require("./template.js") {
 		}
 
 		const { message } = event;
-		const isPrivateMessage = (event.target === this.platform.Self_Name.toLowerCase());
+		const isPrivateMessage = (event.target === this.selfName);
 
 		if (!event.tags.account) {
 			const userName = event.nick;
-			if (sb.Command.is(message) && !this.data.notifiedUnregisteredUsers.includes(userName)) {
+			if (sb.Command.is(message) && !this.#notifiedUnregisteredUsers.has(userName)) {
 				const message = `You must register an account before using my commands!`;
 
 				this.client.say(event.target, message);
-				this.data.notifiedUnregisteredUsers.push(userName);
+				this.#notifiedUnregisteredUsers.add(userName);
 			}
 
 			return;
@@ -149,10 +158,10 @@ module.exports = class IRCController extends require("./template.js") {
 
 		let userVerificationData = await userData.getDataProperty("platformVerification");
 		userVerificationData ??= {};
-		userVerificationData[this.platform.ID] ??= {};
+		userVerificationData[this.ID] ??= {};
 
 		const isSelf = (userData.Name === this.platform.Self_Name);
-		const platformVerification = userVerificationData[this.platform.ID];
+		const platformVerification = userVerificationData[this.ID];
 		if (!isSelf && (userData.Twitch_ID || userData.Discord_ID) && !platformVerification.active) {
 			// TODO: verification challenge creation for Discord/Twitch and sending the message
 			if (!platformVerification.notificationSent) {
@@ -179,7 +188,7 @@ module.exports = class IRCController extends require("./template.js") {
 
 		let channelData = null;
 		if (!isPrivateMessage) {
-			channelData = sb.Channel.get(event.target, this.platform);
+			channelData = sb.Channel.get(event.target, this);
 
 			if (!channelData) {
 				return;
@@ -197,7 +206,7 @@ module.exports = class IRCController extends require("./template.js") {
 					message
 				});
 			}
-			if (this.platform.Logging.messages && channelData.Logging.has("Lines")) {
+			if (this.logging.messages && channelData.Logging.has("Lines")) {
 				await sb.Logger.push(message, userData, channelData);
 			}
 
@@ -206,7 +215,7 @@ module.exports = class IRCController extends require("./template.js") {
 				message,
 				user: userData,
 				channel: channelData,
-				platform: this.platform,
+				platform: this,
 				data: {}
 			});
 
@@ -227,8 +236,8 @@ module.exports = class IRCController extends require("./template.js") {
 			}
 		}
 		else {
-			if (this.platform.Logging.whispers) {
-				await sb.Logger.push(message, userData, null, this.platform);
+			if (this.logging.whispers) {
+				await sb.Logger.push(message, userData, null, this);
 			}
 
 			this.resolveUserMessage(null, userData, message);
@@ -254,7 +263,7 @@ module.exports = class IRCController extends require("./template.js") {
 
 	async handleCommand (command, userData, channelData, args = [], options = {}) {
 		const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
-			platform: this.platform,
+			platform: this,
 			...options
 		});
 
@@ -298,7 +307,19 @@ module.exports = class IRCController extends require("./template.js") {
 		return false;
 	}
 
-	async fetchUserList () {
-		return [];
+	async populateUserList () { return []; }
+	async populateGlobalEmotes () { return []; }
+	async fetchChannelEmotes () { return []; }
+
+	async fetchInternalPlatformIDByUsername () {
+		throw new sb.Error({
+			message: "IRC does not support user platform ID lookup by username"
+		});
+	}
+
+	async fetchUsernameByUserPlatformID () {
+		throw new sb.Error({
+			message: "IRC does not support username lookup by user platform ID"
+		});
 	}
 };

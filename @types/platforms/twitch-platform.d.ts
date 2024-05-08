@@ -1,12 +1,12 @@
-import { Log, Platform } from "../platform";
-import { Mode } from "../channel";
+import { Log, Platform } from "./template";
+import { Mode } from "../classes/channel";
 
 declare type ModQueueData = Record<Mode, { queueSize: number, cooldown: number }>;
 declare type ReconnectAnnouncementData = {
 	channels: string[];
 	string: string;
 };
-declare type Notice = string; // would be nice to have a list of all Twitch related notices from github:supinic/supibot maybe
+declare type Notice = string;
 
 declare interface TwitchLog extends Log {
 	bans: boolean;

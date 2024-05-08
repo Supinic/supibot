@@ -50,7 +50,7 @@ export const definition = {
 		}
 		else if (state === "cytube") {
 			repeatsArray = repeats;
-			isQueueEmpty = (cytube.controller.clients.get(cytubeChannelData.ID).playlistData.length === 0);
+			isQueueEmpty = (cytube.clients.get(cytubeChannelData.ID).playlistData.length === 0);
 		}
 
 		// Don't auto-request if the queue is not empty
@@ -169,7 +169,7 @@ export const definition = {
 		else if (state === "cytube") {
 			const linkParser = getLinkParser();
 			const videoID = linkParser.parseLink(link);
-			const client = cytube.controller.clients.get(cytubeChannelData.ID);
+			const client = cytube.clients.get(cytubeChannelData.ID);
 
 			// noinspection ES6MissingAwait
 			client.queue("yt", videoID);

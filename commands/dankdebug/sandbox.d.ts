@@ -1,7 +1,7 @@
 import type { JSONifiable, Emote } from "../../@types/globals";
 import type { Command, Parameter } from "../../@types/classes/command";
 import type { Channel } from "../../@types/classes/channel";
-import type { Platform } from "../../@types/classes/platform";
+import type { Platform } from "../../@types/platforms/template";
 import type { User, Permissions as UserPermissions } from "../../@types/classes/user";
 
 import type { Utils } from "supi-core/@types/types";
@@ -218,7 +218,7 @@ declare namespace DankDebug {
 	/**
 	 * The platform the command is being executed in.
 	 */
-	export const platform: Platform["Name"];
+	export const platform: Platform["name"];
 
 	/**
 	 * Readonly access to the tee, see the help for `$abb tee`.

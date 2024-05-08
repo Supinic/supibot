@@ -46,6 +46,84 @@
       "whitelist": []
     }
   },
+  "platforms": [
+    {
+      "ID": 1,
+      "active": true,
+      "type": "twitch",
+      "host": null,
+      "selfName": "(BOT_ACCOUNT_NAME_HERE)",
+      "selfId": "(BOT_ACCOUNT_ID_HERE)",
+      "messageLimit": 500,
+      "mirrorIdentifier": "(T)",
+      "platform": {
+        "modes": {
+          "Moderator": {
+            "queueSize": 1e6,
+            "cooldown": 50
+          },
+          "VIP": {
+            "queueSize": 50,
+            "cooldown": 150
+          },
+          "Write": {
+            "queueSize": 5,
+            "cooldown": 1250
+          }
+        },
+        "subscriptionPlans": {
+          "1000": "$5",
+          "2000": "$10",
+          "3000": "$25",
+          "Prime": "Prime"
+        },
+        "partChannelsOnPermaban": true,
+        "clearRecentBansTimer": 60000,
+        "recentBanThreshold": null,
+        "updateAvailableBotEmotes": false,
+        "ignoredUserNotices": [],
+        "sameMessageEvasionCharacter": "󠀀",
+        "rateLimits": "default",
+        "reconnectAnnouncement": {},
+        "emitLiveEventsOnlyForFlaggedChannels": false,
+        "suspended": false,
+        "joinChannelsOverride": [],
+        "spamPreventionThreshold": 100,
+        "sendVerificationChallenge": false,
+        "whisperMessageLimit": 500
+      },
+      "logging": {
+        "bans": false,
+        "bits": false,
+        "channelJoins": false,
+        "clearchat": false,
+        "giftSubs": false,
+        "rituals": true,
+        "messages": true,
+        "subs": false,
+        "timeouts": false,
+        "whispers": true
+      }
+    },
+    {
+      "ID": 2,
+      "active": false,
+      "type": "discord",
+      "host": null,
+      "selfName": "(BOT_ACCOUNT_NAME_HERE)",
+      "selfId": "(BOT_ACCOUNT_ID_HERE)",
+      "messageLimit": 2000,
+      "mirrorIdentifier": "(D)",
+      "platform": {
+        "sendVerificationChallenge": false,
+        "createReminderWhenSendingPrivateMessageFails": true
+      },
+      "logging": {
+        "messages": true,
+        "whispers": true
+      }
+    }
+  ],
   "rustlog": {
     "readme": "This config lets you manage your custom list of Rustlog instances for the $randomline command.",
     "instances": {

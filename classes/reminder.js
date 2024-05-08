@@ -3,9 +3,9 @@ const Banphrase = require("./banphrase.js");
 const Channel = require("./channel.js");
 const Command = require("./command.js");
 const Filter = require("./filter.js");
-const Platform = require("./platform.js");
 const User = require("./user.js");
 
+const Platform = require("../platforms/template.js");
 const LongTimeout = require("../utils/long-timeout.js");
 
 /**
@@ -96,7 +96,7 @@ module.exports = class Reminder extends require("./template.js") {
 
 		/**
 		 * Platform of the reminder. Can be independent from the channel.
-		 * @type {Platform.ID|null}
+		 * @type {Platform|null}
 		 */
 		this.Platform = (data.Platform)
 			? Platform.get(data.Platform)
@@ -476,11 +476,11 @@ module.exports = class Reminder extends require("./template.js") {
 					platform = Platform.get(reminder.Platform);
 				}
 
-				const uncheckedAuthorMention = await platform.controller.createUserMention(fromUserData);
+				const uncheckedAuthorMention = await platform.createUserMention(fromUserData);
 				const authorBanphraseCheck = await sb.Banphrase.execute(uncheckedAuthorMention, channelData);
 				const authorMention = (authorBanphraseCheck.passed) ? `${uncheckedAuthorMention},` : "[Banphrased username],";
 
-				const targetMention = await platform.controller.createUserMention(targetUserData);
+				const targetMention = await platform.createUserMention(targetUserData);
 				let message = `${authorMention}, ${targetMention} just typed in channel ${channelName}`;
 
 				if (reminder.Text) {

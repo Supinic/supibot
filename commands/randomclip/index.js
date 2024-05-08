@@ -43,7 +43,9 @@ module.exports = {
 				};
 			}
 
-			channelID = await sb.Platform.get("twitch").controller.getUserID(channel);
+			/** @type {TwitchPlatform} */
+			const twitchPlatform = await sb.Platform.get("twitch");
+			channelID = await twitchPlatform.getUserID(channel);
 			if (!channelID) {
 				return {
 					success: false,
@@ -162,8 +164,8 @@ module.exports = {
 
 		let clips = response.body.data;
 		if (context.params.author) {
-			const { controller } = sb.Platform.get("twitch");
-			const userID = await controller.getUserID(context.params.author);
+			const platform = sb.Platform.get("twitch");
+			const userID = await platform.getUserID(context.params.author);
 			if (!userID) {
 				return {
 					success: false,

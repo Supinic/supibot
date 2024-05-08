@@ -7,7 +7,7 @@ import { Metric, MetricConfiguration, MetricType } from "prom-client";
 import { GenericFlagsObject, JSONifiable, SimpleGenericData, TypeExtract } from "../globals";
 import { ClassTemplate } from "./template";
 import { Channel } from "./channel";
-import { Platform } from "./platform";
+import { Platform } from "../platforms/template";
 import { Permissions as UserPermissions, User } from "./user";
 import { Language } from "language-iso-codes";
 

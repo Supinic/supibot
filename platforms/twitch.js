@@ -8,6 +8,55 @@ const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
 
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
 
+const DEFAULT_LOGGING_CONFIG = {
+	bans: false,
+	bits: false,
+	channelJoins: false,
+	clearchat: false,
+	giftSubs: false,
+	rituals: true,
+	messages: true,
+	subs: false,
+	timeouts: false,
+	whispers: true
+};
+const DEFAULT_PLATFORM_CONFIG = {
+	modes: {
+		Moderator: {
+			queueSize: 1e6,
+			cooldown: 50
+		},
+		VIP: {
+			queueSize: 50,
+			cooldown: 150
+		},
+		Write: {
+			queueSize: 5,
+			cooldown: 1250
+		}
+	},
+	subscriptionPlans: {
+		1000: "$5",
+		2000: "$10",
+		3000: "$25",
+		Prime: "Prime"
+	},
+	partChannelsOnPermaban: true,
+	clearRecentBansTimer: 60000,
+	recentBanThreshold: null,
+	updateAvailableBotEmotes: false,
+	ignoredUserNotices: [],
+	sameMessageEvasionCharacter: "󠀀",
+	rateLimits: "default",
+	reconnectAnnouncement: {},
+	emitLiveEventsOnlyForFlaggedChannels: false,
+	suspended: false,
+	joinChannelsOverride: [],
+	spamPreventionThreshold: 100,
+	sendVerificationChallenge: false,
+	whisperMessageLimit: 500
+};
+
 const specialEmoteSetMap = {
 	472873131: "300636018", // Haha emotes
 	488737509: "300819901", // Luv emotes
@@ -16,19 +65,6 @@ const specialEmoteSetMap = {
 	592920959: "302430190", // KPOP emotes
 	610186276: "302778679" // 2020 emotes
 };
-
-const emoteGot = sb.Got.get("Global")
-	.extend({
-		mutableDefaults: true,
-		responseType: "json",
-		throwHttpErrors: false,
-		timeout: {
-			request: 10_000
-		},
-		retry: {
-			limit: 0
-		}
-	});
 
 const fetchToken = async () => {
 	if (!sb.Config.has("TWITCH_REFRESH_TOKEN", true)) {
@@ -105,23 +141,100 @@ const getActiveUsernamesInChannel = async (channelData) => {
 	return prefixes.map(i => i.replace(prefix, ""));
 };
 
-module.exports = class TwitchController extends require("./template.js") {
-	supportsMeAction = true;
-	tokenCheckInterval = setInterval(() => this.#checkAuthToken(), 60_000);
+const populateChannelsLiveStatus = async () => {
+	let counter = 0;
+	const promises = [];
+	const batchSize = 100;
+	const rawChannelList = await sb.Channel.getLiveEventSubscribedChannels("twitch");
+	const channelList = rawChannelList.filter(i => i.Specific_ID);
 
-	constructor () {
-		super();
+	while (counter < channelList.length) {
+		const sliceString = channelList
+			.slice(counter, counter + batchSize)
+			.map(i => `user_id=${i.Specific_ID}`)
+			.join("&");
 
-		this.dynamicChannelAddition = true;
+		promises.push(sb.Got("Helix", {
+			url: `streams?${sliceString}`,
+			responseType: "json"
+		}));
 
-		/** @type {TwitchPlatform} */
-		this.platform = sb.Platform.get("twitch");
-		if (!this.platform) {
-			throw new sb.Error({
-				message: "Twitch platform has not been created"
+		counter += batchSize;
+	}
+
+	const streams = [];
+	const results = await Promise.all(promises);
+	for (const partialResult of results) {
+		const streamsBlock = partialResult.body?.data ?? [];
+		streams.push(...streamsBlock);
+	}
+
+	const channelPromises = channelList.map(async (channelData) => {
+		const stream = streams.find(i => channelData.Specific_ID === String(i.user_id));
+		const streamData = await channelData.getStreamData();
+
+		if (!stream) {
+			if (streamData.live === true) {
+				channelData.events.emit("offline", {
+					event: "offline",
+					channel: channelData
+				});
+			}
+
+			channelData.events.emit("offline-passthrough", {
+				event: "offline-passthrough",
+				channel: channelData
 			});
+
+			streamData.live = false;
+			streamData.stream = {};
 		}
-		else if (!this.platform.Self_Name) {
+		else {
+			const currentStreamData = {
+				game: stream.game_name,
+				since: new sb.Date(stream.started_at),
+				status: stream.title,
+				viewers: stream.viewer_count
+			};
+
+			if (!streamData.live) {
+				channelData.events.emit("online", {
+					event: "online",
+					stream: currentStreamData.stream,
+					channel: channelData
+				});
+			}
+
+			channelData.events.emit("online-passthrough", {
+				event: "online-passthrough",
+				stream: currentStreamData.stream,
+				channel: channelData
+			});
+
+			streamData.live = true;
+			streamData.stream = currentStreamData;
+		}
+
+		await channelData.setStreamData(streamData);
+	});
+
+	await Promise.all(channelPromises);
+};
+
+module.exports = class TwitchPlatform extends require("./template.js") {
+	supportsMeAction = true;
+	dynamicChannelAddition = true;
+
+	#tokenCheckInterval = setInterval(() => this.#checkAuthToken(), 60_000);
+	#channelLiveStatusCron = new CronJob("0 */1 * * * *", () => populateChannelsLiveStatus());
+
+	constructor (config) {
+		super("twitch", config, {
+			logging: DEFAULT_LOGGING_CONFIG,
+			platform: DEFAULT_PLATFORM_CONFIG
+		});
+
+		if (!this.selfName) {
 			throw new sb.Error({
 				message: "Twitch platform does not have the bot's name configured"
 			});
@@ -137,12 +250,6 @@ module.exports = class TwitchController extends require("./template.js") {
 			});
 		}
 
-		this.client = new DankTwitch.ChatClient({
-			username: this.platform.Self_Name,
-			password: `oauth:${sb.Config.get("TWITCH_OAUTH")}`,
-			rateLimits: this.platform.Data.rateLimits
-		});
-
 		this.queues = {};
 		this.evasion = {};
 		this.rejectedMessageTimeouts = {};
@@ -151,15 +258,22 @@ module.exports = class TwitchController extends require("./template.js") {
 		this.availableEmoteSets = [];
 		this.recentEmoteFetchTimeout = 0;
 		this.userCommandSpamPrevention = new Map();
+	}
+
+	async connect () {
+		this.client = new DankTwitch.ChatClient({
+			username: this.selfName,
+			password: `oauth:${sb.Config.get("TWITCH_OAUTH")}`,
+			rateLimits: this.config.rateLimits
+		});
 
 		this.initListeners();
 
 		this.client.connect();
 
-		const joinOverride = this.platform?.Data.joinChannelsOverride ?? [];
+		const joinOverride = this.config.joinChannelsOverride ?? [];
 		if (joinOverride.length === 0) {
-			this.client.joinAll(sb.Channel.getJoinableForPlatform(this.platform)
-				.map(i => i.Name));
+			await this.client.joinAll(sb.Channel.getJoinableForPlatform(this).map(i => i.Name));
 		}
 		else {
 			const channelList = joinOverride
@@ -167,91 +281,11 @@ module.exports = class TwitchController extends require("./template.js") {
 				.filter(Boolean)
 				.map(i => i.Name);
 
-			this.client.joinAll(channelList);
+			await this.client.joinAll(channelList);
 		}
 
-		this.data.channelLiveStatus = new CronJob("0 */1 * * * *", async () => {
-			let counter = 0;
-			const promises = [];
-			const batchSize = 100;
-			const rawChannelList = await sb.Channel.getLiveEventSubscribedChannels("twitch");
-			const channelList = rawChannelList.filter(i => i.Specific_ID);
-
-			while (counter < channelList.length) {
-				const sliceString = channelList
-					.slice(counter, counter + batchSize)
-					.map(i => `user_id=${i.Specific_ID}`)
-					.join("&");
-
-				promises.push(sb.Got("Helix", {
-					url: `streams?${sliceString}`,
-					responseType: "json"
-				}));
-
-				counter += batchSize;
-			}
-
-			const streams = [];
-			const results = await Promise.all(promises);
-			for (const partialResult of results) {
-				const streamsBlock = partialResult.body?.data ?? [];
-				streams.push(...streamsBlock);
-			}
-
-			const channelPromises = channelList.map(async (channelData) => {
-				const stream = streams.find(i => channelData.Specific_ID === String(i.user_id));
-				const streamData = await channelData.getStreamData();
-
-				if (!stream) {
-					if (streamData.live === true) {
-						channelData.events.emit("offline", {
-							event: "offline",
-							channel: channelData
-						});
-					}
-
-					channelData.events.emit("offline-passthrough", {
-						event: "offline-passthrough",
-						channel: channelData
-					});
-
-					streamData.live = false;
-					streamData.stream = {};
-				}
-				else {
-					const currentStreamData = {
-						game: stream.game_name,
-						since: new sb.Date(stream.started_at),
-						status: stream.title,
-						viewers: stream.viewer_count
-					};
-
-					if (!streamData.live) {
-						channelData.events.emit("online", {
-							event: "online",
-							stream: currentStreamData.stream,
-							channel: channelData
-						});
-					}
-
-					channelData.events.emit("online-passthrough", {
-						event: "online-passthrough",
-						stream: currentStreamData.stream,
-						channel: channelData
-					});
-
-					streamData.live = true;
-					streamData.stream = currentStreamData;
-				}
-
-				await channelData.setStreamData(streamData);
-			});
-
-			await Promise.all(channelPromises);
-		});
-
-		if (this.platform.Data.trackChannelsLiveStatus) {
-			this.data.channelLiveStatus.start();
+		if (this.config.trackChannelsLiveStatus) {
+			this.#channelLiveStatusCron.start();
 		}
 	}
 
@@ -300,7 +334,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			else if (error instanceof DankTwitch.SayError && error.cause instanceof DankTwitch.MessageError) {
 				if (error.message.includes("Bad response message")) {
 					const { messageText } = error;
-					const channelData = sb.Channel.get(error.failedChannelName, this.platform);
+					const channelData = sb.Channel.get(error.failedChannelName, this);
 
 					let defaultReply;
 					if (/reminders? from/i.test(messageText)) {
@@ -325,7 +359,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					if (this.rejectedMessageTimeouts[channelData.ID] < sb.Date.now() && !messageText.includes(defaultReply)) {
 						await this.send(defaultReply, channelData);
 
-						const timeout = this.platform.Data.rejectedMessageTimeout ?? 10_000;
+						const timeout = this.config.rejectedMessageTimeout ?? 10_000;
 						this.rejectedMessageTimeouts[channelData.ID] = sb.Date.now() + timeout;
 					}
 				}
@@ -345,7 +379,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		});
 
 		client.on("JOIN", async (message) => {
-			if (message.joinedUsername !== this.platform.Self_Name.toLowerCase()) {
+			if (message.joinedUsername !== this.selfName.toLowerCase()) {
 				return;
 			}
 
@@ -358,7 +392,8 @@ module.exports = class TwitchController extends require("./template.js") {
 			const {
 				channels,
 				string
-			} = this.platform.Data.reconnectAnnouncement;
+			} = this.config.reconnectAnnouncement;
+
 			const sayPromises = [];
 			if (channels && string && channels.includes(channelName)) {
 				sayPromises.push(client.say(channelName, string));
@@ -368,7 +403,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		});
 
 		client.on("PART", (message) => {
-			if (message.partedUsername !== this.platform.Self_Name.toLowerCase()) {
+			if (message.partedUsername !== this.selfName.toLowerCase()) {
 				return;
 			}
 
@@ -380,7 +415,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		client.on("USERSTATE", async (messageObject) => {
 			const now = sb.Date.now();
 
-			if (!this.platform.Data.updateAvailableBotEmotes) {
+			if (!this.config.updateAvailableBotEmotes) {
 				return;
 			}
 			else if (this.recentEmoteFetchTimeout > now) {
@@ -393,12 +428,12 @@ module.exports = class TwitchController extends require("./template.js") {
 				.join(",")) {
 				this.availableEmoteSets = incomingEmoteSets;
 
-				const timeout = this.platform.Data.emoteFetchTimeout ?? 10_000;
+				const timeout = this.config.emoteFetchTimeout ?? 10_000;
 				this.recentEmoteFetchTimeout = now + timeout;
 
 				let emotes;
 				try {
-					emotes = await TwitchController.fetchTwitchEmotes(this.availableEmoteSets);
+					emotes = await TwitchPlatform.fetchTwitchEmotes(this.availableEmoteSets);
 				}
 				catch {
 					emotes = null;
@@ -406,7 +441,7 @@ module.exports = class TwitchController extends require("./template.js") {
 
 				if (emotes) {
 					this.availableEmotes = emotes;
-					await this.platform.invalidateGlobalEmotesCache();
+					await this.invalidateGlobalEmotesCache();
 				}
 			}
 		});
@@ -420,7 +455,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				return;
 			}
 
-			const channelData = sb.Channel.get(channelName, this.platform);
+			const channelData = sb.Channel.get(channelName, this);
 			switch (messageID) {
 				case "msg_rejected":
 				case "msg_rejected_mandatory": {
@@ -483,8 +518,8 @@ module.exports = class TwitchController extends require("./template.js") {
 			else if (messageObject.isTimeout()) {
 				this.handleBan(username, channelName, reason, messageObject.banDuration);
 			}
-			else if (messageObject.wasChatCleared() && this.platform.Logging.clearChats) {
-				const channelData = sb.Channel.get(channelName, this.platform);
+			else if (messageObject.wasChatCleared() && this.logging.clearChats) {
+				const channelData = sb.Channel.get(channelName, this);
 				sb.Logger.log("Twitch.Clearchat", null, channelData);
 			}
 		});
@@ -509,9 +544,9 @@ module.exports = class TwitchController extends require("./template.js") {
 			});
 		}
 
-		const channelData = sb.Channel.get(channel, this.platform);
-		const joinOverride = this.platform?.Data.joinChannelsOverride ?? [];
-		if (this.platform.Data.suspended || joinOverride.length !== 0 && !joinOverride.includes(channelData.ID)) {
+		const channelData = sb.Channel.get(channel, this);
+		const joinOverride = this.config.joinChannelsOverride ?? [];
+		if (this.config.suspended || joinOverride.length !== 0 && !joinOverride.includes(channelData.ID)) {
 			return;
 		}
 
@@ -531,7 +566,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				this.queues[channelName] = null;
 			}
 
-			const { modes } = this.platform.Data;
+			const { modes } = this.config;
 			const scheduler = new MessageScheduler({
 				mode: channelData.Mode,
 				channelID: channelData.ID,
@@ -555,7 +590,7 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		// Check if the bot is about to send an identical message to the last one
 		if (this.evasion[channelName] === message) {
-			const { sameMessageEvasionCharacter: char } = this.platform.Data;
+			const { sameMessageEvasionCharacter: char } = this.config;
 			if (message.includes(char)) {
 				const regex = new RegExp(`${char}$`);
 				message = message.replace(regex, "");
@@ -575,8 +610,8 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @param {string} user
 	 */
 	async pm (message, user) {
-		const joinOverride = this.platform?.Data.joinChannelsOverride ?? [];
-		if (this.platform.Data.suspended || joinOverride.length !== 0) {
+		const joinOverride = this.config.joinChannelsOverride ?? [];
+		if (this.config.suspended || joinOverride.length !== 0) {
 			return;
 		}
 
@@ -607,12 +642,12 @@ module.exports = class TwitchController extends require("./template.js") {
 			.replace(/[\r\n]/g, " ")
 			.trim();
 
-		const whisperMessageLimit = this.platform.Data.whisperMessageLimit ?? FALLBACK_WHISPER_MESSAGE_LIMIT;
+		const whisperMessageLimit = this.config.whisperMessageLimit ?? FALLBACK_WHISPER_MESSAGE_LIMIT;
 		const response = await sb.Got("Helix", {
 			method: "POST",
 			url: "whispers",
 			searchParams: {
-				from_user_id: this.platform.Self_ID,
+				from_user_id: this.selfId,
 				to_user_id: userData.Twitch_ID
 			},
 			json: {
@@ -652,7 +687,7 @@ module.exports = class TwitchController extends require("./template.js") {
 
 		let channelID;
 		if (channelData instanceof sb.Channel) {
-			if (channelData.Platform !== this.platform) {
+			if (channelData.Platform !== this) {
 				throw new sb.Error({
 					message: "Non-Twitch channel provided",
 					args: { channelData }
@@ -686,7 +721,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			url: "moderation/bans",
 			searchParams: {
 				broadcaster_id: channelID,
-				moderator_id: this.platform.Self_ID
+				moderator_id: this.selfId
 			},
 			json: {
 				data: {
@@ -750,7 +785,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			return;
 		}
 		else if (userData.Twitch_ID === null && userData.Discord_ID !== null) {
-			if (!this.platform.Data.sendVerificationChallenge) {
+			if (!this.config.sendVerificationChallenge) {
 				await userData.saveProperty("Twitch_ID", senderUserID);
 			}
 			else {
@@ -758,12 +793,12 @@ module.exports = class TwitchController extends require("./template.js") {
 					return;
 				}
 
-				const status = await TwitchController.fetchAccountChallengeStatus(userData, senderUserID);
+				const status = await TwitchPlatform.fetchAccountChallengeStatus(userData, senderUserID);
 				if (status === "Active") {
 					return;
 				}
 
-				const { challenge } = await TwitchController.createAccountChallenge(userData, senderUserID);
+				const { challenge } = await TwitchPlatform.createAccountChallenge(userData, senderUserID);
 				const message = sb.Utils.tag.trim `
 					You were found to be likely to own a Discord account with the same name as your current Twitch account.
 					If you want to use my commands on Twitch, whisper me the following command on Discord:
@@ -781,7 +816,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			// Mismatch between senderUserID and userData.Twitch_ID means someone renamed into a different
 			// user's username, or that there is a different mishap happening. This case is unfortunately exceptional
 			// for the current user-database structure and the event handler must be aborted.
-			const channelData = (channelName) ? sb.Channel.get(channelName, this.platform) : null;
+			const channelData = (channelName) ? sb.Channel.get(channelName, this) : null;
 
 			if (!channelName || (channelData && sb.Command.is(message))) {
 				const notified = await userData.getDataProperty("twitch-userid-mismatch-notification");
@@ -824,7 +859,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				await sb.Logger.log("Twitch.Error", `Missing channel in IRC message: ${JSON.stringify(messageObject)}`);
 			}
 
-			channelData = sb.Channel.get(channelName, this.platform);
+			channelData = sb.Channel.get(channelName, this);
 
 			if (!channelData || channelData.Mode === "Inactive") {
 				return;
@@ -839,7 +874,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					message
 				});
 			}
-			if (this.platform.Logging.messages && channelData.Logging.has("Lines")) {
+			if (this.logging.messages && channelData.Logging.has("Lines")) {
 				await sb.Logger.push(message, userData, channelData);
 			}
 
@@ -853,7 +888,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				message,
 				user: userData,
 				channel: channelData,
-				platform: this.platform,
+				platform: this,
 				data: messageData
 			});
 
@@ -876,8 +911,8 @@ module.exports = class TwitchController extends require("./template.js") {
 			}
 		}
 		else {
-			if (this.platform.Logging.whispers) {
-				await sb.Logger.push(message, userData, null, this.platform);
+			if (this.logging.whispers) {
+				await sb.Logger.push(message, userData, null, this);
 			}
 
 			this.resolveUserMessage(null, userData, message);
@@ -886,7 +921,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		this.incrementMessageMetric("read", channelData);
 
 		// Own message - check the regular/vip/mod/broadcaster status, and skip
-		if (userData.Name === this.platform.Self_Name && channelData) {
+		if (userData.Name === this.selfName && channelData) {
 			if (badges) {
 				const oldMode = channelData.Mode;
 
@@ -911,7 +946,7 @@ module.exports = class TwitchController extends require("./template.js") {
 			return;
 		}
 
-		if (this.platform.Logging.bits && typeof bits !== "undefined" && bits !== null) {
+		if (this.logging.bits && typeof bits !== "undefined" && bits !== null) {
 			sb.Logger.log("Twitch.Other", `${bits} bits`, channelData, userData);
 		}
 
@@ -939,7 +974,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				return;
 			}
 
-			const threshold = this.platform.Data.spamPreventionThreshold ?? 100;
+			const threshold = this.config.spamPreventionThreshold ?? 100;
 			this.userCommandSpamPrevention.set(userData.ID, now + threshold);
 
 			const [command, ...args] = targetMessage
@@ -974,9 +1009,10 @@ module.exports = class TwitchController extends require("./template.js") {
 	 */
 	async handleCommand (command, user, channel, args = [], options = {}) {
 		const userData = await sb.User.get(user, false);
-		const channelData = (channel === null) ? null : sb.Channel.get(channel, this.platform);
+		const channelData = (channel === null) ? null : sb.Channel.get(channel, this);
 		const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
-			platform: this.platform, ...options
+			platform: this,
+			...options
 		});
 
 		if (!execution || !execution.reply) {
@@ -1028,9 +1064,9 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @returns {Promise<void>}
 	 */
 	async handleBan (user, channel, reason = null, length = null) {
-		const channelData = sb.Channel.get(channel, this.platform);
+		const channelData = sb.Channel.get(channel, this);
 		if (channelData) {
-			if (user === this.platform.Self_Name && length === null && this.platform.Data.partChannelsOnPermaban) {
+			if (user === this.selfName && length === null && this.config.partChannelsOnPermaban) {
 				const previousMode = channelData.Mode;
 				await Promise.all([
 					channelData.setDataProperty("inactiveReason", "bot-banned"),
@@ -1043,7 +1079,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				channelData.sessionData.recentBans = 0;
 			}
 
-			const limit = this.platform.Data.recentBanThreshold ?? Infinity;
+			const limit = this.config.recentBanThreshold ?? Infinity;
 			if (!channelData.sessionData.parted && channelData.sessionData.recentBans > limit) {
 				channelData.sessionData.parted = true;
 
@@ -1055,7 +1091,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					console.debug(`Re-joining channel ${channelData.Name}!`);
 					channelData.sessionData.parted = false;
 					this.client.join(channelData.Name);
-				}, this.platform.Data.recentBanPartTimeout);
+				}, this.config.recentBanPartTimeout);
 
 				await this.client.part(channelData.Name);
 			}
@@ -1068,12 +1104,12 @@ module.exports = class TwitchController extends require("./template.js") {
 
 					channelData.sessionData.recentBans = 0;
 					channelData.sessionData.clearRecentBansTimeout = null;
-				}, this.platform.Data.clearRecentBansTimer);
+				}, this.config.clearRecentBansTimer);
 			}
 
 			channelData.sessionData.recentBans++;
 
-			if ((length === null && this.platform.Logging.bans) || (length !== null && this.platform.Logging.timeouts)) {
+			if ((length === null && this.logging.bans) || (length !== null && this.logging.timeouts)) {
 				sb.Logger.logBan(user, channelData, length, new sb.Date(), reason);
 			}
 		}
@@ -1088,19 +1124,19 @@ module.exports = class TwitchController extends require("./template.js") {
 		} = messageObject;
 
 		// ignore these events
-		if (this.platform.Data.ignoredUserNotices.includes(messageTypeID)) {
+		if (this.config.ignoredUserNotices.includes(messageTypeID)) {
 			return;
 		}
 
 		const userData = await sb.User.get(senderUsername);
-		const channelData = sb.Channel.get(channelName, this.platform);
+		const channelData = sb.Channel.get(channelName, this);
 		if (!channelData) {
 			return;
 		}
 
 		const eventSkipModes = ["Read", "Last seen", "Inactive"];
 		const logSkipModes = ["Inactive", "Last seen"];
-		const plans = this.platform.Data.subscriptionPlans;
+		const plans = this.config.subscriptionPlans;
 
 		if (messageObject.isSub() || messageObject.isResub()) {
 			const {
@@ -1108,13 +1144,14 @@ module.exports = class TwitchController extends require("./template.js") {
 				streakMonths,
 				subPlanName
 			} = messageObject.eventParams;
+
 			if (!eventSkipModes.includes(channelData.Mode)) {
 				channelData.events.emit("subscription", {
 					event: "subscription",
 					message: messageText,
 					user: userData,
 					channel: channelData,
-					platform: this.platform,
+					platform: this,
 					data: {
 						amount: 1,
 						gifted: false,
@@ -1126,7 +1163,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				});
 			}
 
-			if (this.platform.Logging.subs && !logSkipModes.includes(channelData.Mode)) {
+			if (this.logging.subs && !logSkipModes.includes(channelData.Mode)) {
 				await sb.Logger.log("Twitch.Sub", plans[subPlanName], channelData, userData);
 			}
 		}
@@ -1149,7 +1186,7 @@ module.exports = class TwitchController extends require("./template.js") {
 					message: messageText,
 					user: userData,
 					channel: channelData,
-					platform: this.platform,
+					platform: this,
 					data: {
 						amount: 1,
 						gifted: true,
@@ -1161,7 +1198,7 @@ module.exports = class TwitchController extends require("./template.js") {
 				});
 			}
 
-			if (this.platform.Logging.giftSubs && !logSkipModes.includes(channelData.Mode)) {
+			if (this.logging.giftSubs && !logSkipModes.includes(channelData.Mode)) {
 				const name = userData?.Name ?? "(anonymous)";
 				const logMessage = `${name} gifted a subscription to ${recipientData.Name}`;
 
@@ -1176,21 +1213,21 @@ module.exports = class TwitchController extends require("./template.js") {
 					message: messageText ?? null,
 					channel: channelData,
 					user: userData,
-					platform: this.platform,
+					platform: this,
 					data: {
 						viewers
 					}
 				});
 			}
 
-			if (this.platform.Logging.hosts && !logSkipModes.includes(channelData.Mode)) {
+			if (this.logging.hosts && !logSkipModes.includes(channelData.Mode)) {
 				await sb.Logger.log("Twitch.Host", `Raid: ${userData?.Name ?? null} => ${channelData.Name} for ${viewers} viewers`);
 			}
 		}
 		else if (messageObject.isRitual()) {
-			if (this.platform.Logging.rituals && !logSkipModes.includes(channelData.Mode)) {
+			if (this.logging.rituals && !logSkipModes.includes(channelData.Mode)) {
 				const userData = await sb.User.get(senderUsername, false);
-				const channelData = sb.Channel.get(channelName, this.platform);
+				const channelData = sb.Channel.get(channelName, this);
 
 				await sb.Logger.log("Twitch.Ritual", `${messageObject.systemMessage} ${messageText}`, channelData, userData);
 			}
@@ -1242,11 +1279,6 @@ module.exports = class TwitchController extends require("./template.js") {
 		}
 
 		return null;
-	}
-
-	async fetchUserList (channelIdentifier) {
-		const channelData = sb.Channel.get(channelIdentifier, this.platform);
-		return await getActiveUsernamesInChannel(channelData);
 	}
 
 	async createUserMention (userData) {
@@ -1345,7 +1377,7 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	static async fetchChannelBTTVEmotes (channelData) {
-		const channelID = channelData.Specific_ID ?? await channelData.platform.controller.getUserID(channelData.Name);
+		const channelID = channelData.Specific_ID;
 		if (!channelID) {
 			throw new sb.Error({
 				message: "No available ID for channel",
@@ -1353,23 +1385,21 @@ module.exports = class TwitchController extends require("./template.js") {
 			});
 		}
 
-		const {
-			statusCode,
-			body: data
-		} = await emoteGot({
+		const response = await sb.Got("TwitchEmotes", {
 			url: `https://api.betterttv.net/3/cached/users/twitch/${channelID}`
 		});
 
-		if (statusCode !== 200) {
-			if (statusCode !== 404) {
-				await sb.Logger.log("Twitch.Warning", `BTTV emote fetch failed, code: ${statusCode}`, channelData);
+		if (!response.ok) {
+			if (response.statusCode !== 404) {
+				await sb.Logger.log("Twitch.Warning", `BTTV emote fetch failed, code: ${response.statusCode}`, channelData);
 			}
 
 			return [];
 		}
 
 		const emotes = [
-			...(data.channelEmotes ?? []), ...(data.sharedEmotes ?? [])
+			...(response.body.channelEmotes ?? []),
+			...(response.body.sharedEmotes ?? [])
 		];
 
 		return emotes.map(i => ({
@@ -1388,23 +1418,21 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	static async fetchChannelFFZEmotes (channelData) {
-		const {
-			statusCode,
-			body: data
-		} = await emoteGot({
+		const response = await sb.Got("TwitchEmotes", {
 			url: `https://api.frankerfacez.com/v1/room/${channelData.Name}`
 		});
 
-		if (statusCode !== 200) {
-			if (statusCode !== 404) {
-				await sb.Logger.log("Twitch.Warning", `FFZ emote fetch failed, code: ${statusCode}`, channelData);
+		if (!response.ok) {
+			if (response.statusCode !== 404) {
+				await sb.Logger.log("Twitch.Warning", `FFZ emote fetch failed, code: ${response.statusCode}`, channelData);
 			}
 
 			return [];
 		}
 
-		const emotes = Object.values(data.sets)
+		const emotes = Object.values(response.body.sets)
 			.flatMap(i => i.emoticons);
+
 		return emotes.map(i => ({
 			ID: i.id,
 			name: i.name,
@@ -1421,22 +1449,19 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	static async fetchChannelSevenTVEmotes (channelData) {
-		const {
-			statusCode,
-			body: data
-		} = await emoteGot({
+		const response = await sb.Got("TwitchEmotes", {
 			url: `https://7tv.io/v3/users/twitch/${channelData.Specific_ID}`
 		});
 
-		if (statusCode !== 200) {
-			if (statusCode !== 404) {
-				await sb.Logger.log("Twitch.Warning", `7TV emote fetch failed, code: ${statusCode}`, channelData);
+		if (!response.ok) {
+			if (response.statusCode !== 404) {
+				await sb.Logger.log("Twitch.Warning", `7TV emote fetch failed, code: ${response.statusCode}`, channelData);
 			}
 
 			return [];
 		}
 
-		const rawEmotes = data.emote_set?.emotes ?? [];
+		const rawEmotes = response.body.emote_set?.emotes ?? [];
 		return rawEmotes.map(i => ({
 			ID: i.id,
 			name: i.name,
@@ -1452,13 +1477,15 @@ module.exports = class TwitchController extends require("./template.js") {
 	 * Ideally cached for a rather long time.
 	 * @returns {Promise<TypedEmote[]>}
 	 */
-	async fetchGlobalEmotes () {
+	async populateGlobalEmotes () {
 		const [bttv, ffz, sevenTv] = await Promise.allSettled([
-			emoteGot({
+			sb.Got("TwitchEmotes", {
 				url: "https://api.betterttv.net/3/cached/emotes/global"
-			}), emoteGot({
+			}),
+			sb.Got("TwitchEmotes", {
 				url: "https://api.frankerfacez.com/v1/set/global"
-			}), emoteGot({
+			}),
+			sb.Got("TwitchEmotes", {
 				url: "https://7tv.io/v3/emote-sets/global"
 			})
 		]);
@@ -1526,14 +1553,39 @@ module.exports = class TwitchController extends require("./template.js") {
 	 */
 	async fetchChannelEmotes (channelData) {
 		const [bttv, ffz, sevenTv] = await Promise.allSettled([
-			TwitchController.fetchChannelBTTVEmotes(channelData),
-			TwitchController.fetchChannelFFZEmotes(channelData),
-			TwitchController.fetchChannelSevenTVEmotes(channelData)
+			TwitchPlatform.fetchChannelBTTVEmotes(channelData),
+			TwitchPlatform.fetchChannelFFZEmotes(channelData),
+			TwitchPlatform.fetchChannelSevenTVEmotes(channelData)
 		]);
 
 		return [
 			...(bttv.value ?? []), ...(ffz.value ?? []), ...(sevenTv.value ?? [])
 		];
+	}
+
+	async populateUserList (channelIdentifier) {
+		const channelData = sb.Channel.get(channelIdentifier, this);
+		return await getActiveUsernamesInChannel(channelData);
+	}
+
+	fetchInternalPlatformIDByUsername (userData) {
+		return userData.Twitch_ID;
+	}
+
+	async fetchUsernameByUserPlatformID (userPlatformID) {
+		const response = await sb.Got("Helix", {
+			url: "users",
+			throwHttpErrors: false,
+			searchParams: {
+				id: userPlatformID
+			}
+		});
+
+		if (!response.ok || response.body.data.length === 0) {
+			return null;
+		}
+
+		return response.body.data[0].login;
 	}
 
 	// noinspection JSClosureCompilerSyntax
@@ -1620,7 +1672,7 @@ module.exports = class TwitchController extends require("./template.js") {
 		const otherChannelData = sb.Channel.get(login);
 		if (!otherChannelData) {
 			let joinFailed = false;
-			const joinedChannel = await sb.Channel.add(login, this.platform, previousMode, channelData.Specific_ID);
+			const joinedChannel = await sb.Channel.add(login, this, previousMode, channelData.Specific_ID);
 			try {
 				await this.client.join(login);
 			}

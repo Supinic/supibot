@@ -1,4 +1,4 @@
-import { Log, Platform } from "../platform";
+import { Log, Platform } from "./template";
 
 declare interface CytubeData {
 	messageDelayThreshold: boolean;

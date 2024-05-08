@@ -62,12 +62,12 @@ It will check whether a command exists in a given message, perform all additiona
 
 ### [`Command.checkAndExecute`](https://github.com/Supinic/supi-core/blob/master/classes/command.js)
 
-Useful for creators of new platform controllers.
+Useful for creators of new platforms.
 In short, this method will determine whether a command invocation exists, and if it does, it attempts to execute given command with provided arguments.
 It will also apply banphrases, string limits, cooldown and similar stuff.
 
-A platform controller must parse the message, determine if a command is present, and this method handles the rest.
-The controller must then send the reply based on the return value.
+A platform must parse the message, determine if a command is present, and this method handles the rest.
+It must then send the reply based on the return value.
 This can be different for each platform, hence why this level of abstraction exists. 
 
 ### Command code API
@@ -127,7 +127,7 @@ Usually used for constant data tied only to the given command, so that they don'
 
 #### Return value
 Each command must explicitly return something to signify its success or failure.
-This value is then processed by `Command.checkAndExecute`, and then used in a platform controller.
+This value is then processed by `Command.checkAndExecute`, and then used in the platform instance.
 
 Types of supported return values:
 - `{undefined|null|false}` Bot will not send any reply at all.

@@ -115,7 +115,7 @@ export const definition = {
 				});
 			}
 
-			await discord.controller.send(null, channelData, {
+			await discord.send(null, channelData, {
 				embeds: [embed]
 			});
 		}

@@ -1,7 +1,7 @@
 import { Message, OnlyKeysOfType, SimpleGenericData } from "../globals";
 import { ClassTemplate } from "./template";
 import { Channel } from "./channel";
-import { Platform } from "./platform";
+import { Platform } from "../platforms/template";
 
 declare type ConstructorData = {
     ID?: number;

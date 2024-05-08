@@ -15,7 +15,7 @@ RUN npm install
 COPY --chown=supibot:supibot master.js ./
 COPY --chown=supibot:supibot init ./init
 COPY --chown=supibot:supibot api ./api
-COPY --chown=supibot:supibot controllers ./controllers
+COPY --chown=supibot:supibot platforms ./platforms
 
 RUN touch db-access.js
 

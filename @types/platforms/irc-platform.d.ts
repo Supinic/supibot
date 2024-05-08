@@ -1,4 +1,4 @@
-import { Platform } from "../platform";
+import { Platform } from "./template";
 
 declare interface IrcData {
 	url: string;

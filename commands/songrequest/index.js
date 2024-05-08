@@ -95,14 +95,15 @@ module.exports = {
 						};
 					}
 
-					const { Self_Name: botName, controller } = sb.Platform.get("cytube");
+
+					const platform = sb.Platform.get("cytube");
 					const channelData = sb.Channel.get(49);
-					const client = controller.clients.get(channelData.ID);
+					const client = platform.clients.get(channelData.ID);
 
 					const playlist = [
 						client.currentlyPlaying,
 						...client.playlistData
-					].filter(i => i && i.queueby?.toLowerCase() === botName.toLowerCase());
+					].filter(i => i && i.queueby?.toLowerCase() === platform.selfName);
 
 					if (playlist.length > this.limits.total) {
 						return {

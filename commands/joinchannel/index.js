@@ -38,8 +38,8 @@ module.exports = {
 
 		let channelData;
 		if (platformName === "twitch") {
-			const platformData = sb.Platform.get("twitch");
-			const channelID = await platformData.controller.getUserID(channel);
+			const platform = sb.Platform.get("twitch");
+			const channelID = await platform.getUserID(channel);
 			if (!channelID) {
 				return {
 					success: false,
@@ -47,8 +47,8 @@ module.exports = {
 				};
 			}
 
-			await sb.Channel.add(channel, platformData, mode ?? "Write", channelID);
-			await platformData.client.join(channel);
+			await sb.Channel.add(channel, platform, mode ?? "Write", channelID);
+			await platform.client.join(channel);
 
 			channelData = sb.Channel.get(channel);
 		}
@@ -56,7 +56,7 @@ module.exports = {
 			const platformData = sb.Platform.get("cytube");
 
 			channelData = await sb.Channel.add(channel, platformData, mode ?? "Write");
-			await platformData.controller.joinChannel(channelData);
+			await platformData.joinChannel(channelData);
 		}
 		else {
 			return {

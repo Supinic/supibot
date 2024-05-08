@@ -13,7 +13,7 @@ module.exports = {
 		if (channel) {
 			channelName = channel;
 		}
-		else if (context.platform.Name === "twitch" && context.channel) {
+		else if (context.platform.name === "twitch" && context.channel) {
 			channelName = context.channel.Name;
 		}
 
@@ -24,8 +24,9 @@ module.exports = {
 			};
 		}
 
-		const { controller } = sb.Platform.get("twitch");
-		const channelID = await controller.getUserID(channelName);
+		/** @type {TwitchPlatform} */
+		const platform = sb.Platform.get("twitch");
+		const channelID = await platform.getUserID(channelName);
 		if (!channelID) {
 			return {
 				success: false,

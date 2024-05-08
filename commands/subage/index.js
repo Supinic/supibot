@@ -21,8 +21,8 @@ module.exports = {
 	Whitelist_Response: null,
 	Static_Data: null,
 	Code: async function subAge (context, user, channel) {
-		const { controller } = sb.Platform.get("twitch");
-		const userID = await controller.getUserID(user ?? context.user.Name);
+		const platform = sb.Platform.get("twitch");
+		const userID = await platform.getUserID(user ?? context.user.Name);
 		if (!userID) {
 			return {
 				success: false,
@@ -32,7 +32,7 @@ module.exports = {
 
 		let channelID;
 		if (channel) {
-			channelID = await controller.getUserID(channel);
+			channelID = await platform.getUserID(channel);
 		}
 		else {
 			if (context.platform.Name !== "twitch") {
@@ -48,7 +48,7 @@ module.exports = {
 				};
 			}
 
-			channelID = await controller.getUserID(context.channel.Name);
+			channelID = await platform.getUserID(context.channel.Name);
 		}
 
 		if (!channelID) {

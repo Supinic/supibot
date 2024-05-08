@@ -3,7 +3,7 @@ import { Date as CoreDate, Error as CoreError } from "supi-core";
 import { JSONifiable, Message } from "../globals";
 import { Channel } from "../classes/channel";
 import { Command } from "../classes/command";
-import { Platform } from "../classes/platform";
+import { Platform } from "../platforms/template";
 import { Like as UserLike, User } from "../classes/user";
 
 declare type PrimaryLogTag = "Command"| "Message"| "Twitch"| "Discord"| "Cytube"| "Module"| "System";
