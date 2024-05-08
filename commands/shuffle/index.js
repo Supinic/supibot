@@ -25,7 +25,7 @@ module.exports = {
 			const result = [];
 			const message = args.join(" ").split(/\b|\s/).filter(Boolean);
 			while (message.length > 0) {
-				const randomIndex = randomInt(0, message.length - 1);
+				const randomIndex = randomInt(1, message.length) - 1;
 				result.push(message[randomIndex]);
 				message.splice(randomIndex, 1);
 			}
@@ -36,7 +36,7 @@ module.exports = {
 			const result = [];
 			const message = [...args];
 			while (message.length > 0) {
-				const randomIndex = randomInt(0, message.length - 1);
+				const randomIndex = randomInt(1, message.length) - 1;
 				result.push(message[randomIndex]);
 				message.splice(randomIndex, 1);
 			}
