@@ -1,5 +1,5 @@
 const { roll: diceRoll } = require("roll-dice");
-const { randomBytes } = require("crypto");
+const { randomBytes } = require("node:crypto");
 
 module.exports = {
 	Name: "roll",

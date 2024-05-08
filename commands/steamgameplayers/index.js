@@ -1,66 +1,38 @@
-const idRegex = /"x-algolia-application-id"\s*:\s*"(.+?)"/;
-const keyRegex = /\[atob\("eC1hbGdvbGlhLWFwaS1rZXk="\)]=atob\("(.+?)"\)/;
+const { CronJob } = require("cron");
 
-const refetchAlgoliaInfo = async () => {
-	let configRowsAdded = false;
-	if (!sb.Config.has("ALGOLIA_STEAMDB_APP_ID", false)) {
-		const row = await sb.Query.getRow("data", "Config");
-		row.setValues({
-			Name: "ALGOLIA_STEAMDB_APP_ID",
-			Type: "string",
-			Editable: true
-		});
-
-		await row.save({ skipLoad: true });
-		configRowsAdded = true;
-	}
-	if (!sb.Config.has("ALGOLIA_STEAMDB_API_KEY", false)) {
-		const row = await sb.Query.getRow("data", "Config");
-		row.setValues({
-			Name: "ALGOLIA_STEAMDB_API_KEY",
-			Type: "string",
-			Editable: true
-		});
-
-		await row.save({ skipLoad: true });
-		configRowsAdded = true;
+const fetchGamesData = async () => {
+	let lastUpdate = await sb.Cache.getByPrefix("latest-steam-games-update");
+	if (!lastUpdate) {
+		lastUpdate = new sb.Date().addHours(-24).getTime() / 1000;
 	}
 
-	if (configRowsAdded) {
-		await sb.Config.reloadData();
-	}
-
-	const response = await sb.Got("FakeAgent", {
-		url: "https://steamdb.info/static/js/global.js",
-		responseType: "text"
+	const response = await sb.Got("GenericAPI", {
+		url: "https://api.steampowered.com/IStoreService/GetAppList/v1/",
+		throwHttpErrors: false,
+		searchParams: {
+			if_modified_since: lastUpdate,
+			include_games: true,
+			max_results: 10_000,
+			key: sb.Config.get("API_STEAM_KEY")
+		}
 	});
-	if (!response.ok) {
-		return {
-			success: false
-		};
+
+	await sb.Cache.setByPrefix("latest-steam-games-update", sb.Date.now() / 1000);
+
+	for (const game of response.body.response.apps) {
+		const row = await sb.Query.getRow("data", "Steam_Game");
+		await row.load(game.appid, true);
+		if (row.loaded) {
+			continue;
+		}
+
+		row.setValues({
+			ID: game.appid,
+			Name: game.name
+		});
+
+		await row.save({ skipLoad: true });
 	}
-
-	const idMatch = response.body.match(idRegex);
-	const keyMatch = response.body.match(keyRegex);
-	if (!idMatch || !keyMatch) {
-		return {
-			success: false
-		};
-	}
-
-	const appID = idMatch[1];
-	const apiKey = Buffer.from(keyMatch[1], "base64").toString("utf8");
-
-	await Promise.all([
-		sb.Config.set("ALGOLIA_STEAMDB_APP_ID", appID),
-		sb.Config.set("ALGOLIA_STEAMDB_API_KEY", apiKey)
-	]);
-
-	return {
-		success: true,
-		appID,
-		apiKey
-	};
 };
 
 module.exports = {
@@ -71,120 +43,98 @@ module.exports = {
 	Description: "Searches for a Steam game, and attempts to find its current player amount.",
 	Flags: ["mention","pipe"],
 	Params: [
-		{ name: "gameID", type: "string" }
+		{ name: "gameID", type: "number" }
 	],
 	Whitelist_Response: null,
 	Static_Data: null,
+	initialize: function () {
+		this.data.updateCronJob = new CronJob("0 0 * * * *", () => fetchGamesData());
+		this.data.updateCronJob.start();
+	},
+	destroy: function () {
+		this.data.updateCronJob.stop();
+		this.data.updateCronJob = null;
+	},
 	Code: async function steamGamePlayers (context, ...args) {
-		if (context.params.gameID) {
-			const gameID = Number(context.params.gameID);
-			if (!sb.Utils.isValidInteger(gameID)) {
+		let gameId = context.params.gameID ?? null;
+		const gameName = args.join(" ");
+		if (!gameId) {
+			if (!gameName) {
 				return {
 					success: false,
-					reply: `Invalid game ID provided!`
+					reply: `No game provided!`
 				};
 			}
 
-			const response = await sb.Got("GenericAPI", {
-				url: "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1",
-				searchParams: {
-					appid: context.params.gameID
-				}
-			});
-
-			if (response.statusCode === 404) {
-				return {
-					success: false,
-					reply: `No game exists for provided ID!`
-				};
-			}
-
-			const players = response.body.response.player_count;
-			return {
-				reply: `That game currently has ${sb.Utils.groupDigits(players)} players in-game.`
-			};
-		}
-
-		const query = args.join(" ");
-		if (!query) {
-			return {
-				success: false,
-				reply: `No game name provided!`
-			};
-		}
-
-		const searchResponse = await sb.Got("FakeAgent", {
-			url: "https://94he6yatei-dsn.algolia.net/1/indexes/steamdb",
-			searchParams: {
-				"x-algolia-agent": "SteamDB+Autocompletion",
-				"x-algolia-application-id": sb.Config.get("ALGOLIA_STEAMDB_APP_ID", false),
-				"x-algolia-api-key": sb.Config.get("ALGOLIA_STEAMDB_API_KEY", false),
-				hitsPerPage: 50,
-				attributesToSnippet: "null",
-				attributesToHighlight: "null",
-				attributesToRetrieve: "name,publisher",
-				facetFilters: "appType:Game",
-				query
-			},
-			headers: {
-				Referer: "https://steamdb.info/"
-			}
-		});
-
-		if (searchResponse.statusCode !== 200) {
-			const result = await refetchAlgoliaInfo();
-			if (result.success) {
-				return {
-					reply: `Could not fetch game data. I tried to fix it, and it seems to be okay now. Try again, please? 😊`
-				};
+			const potentialUrlAppId = gameName.match(/app\/(\d+)/);
+			if (potentialUrlAppId) {
+				gameId = Number(potentialUrlAppId[1]);
 			}
 			else {
-				return {
-					success: false,
-					reply: `Could not fetch game data! The source site is probably broken 😟`
-				};
+				const plausibleResults = await sb.Query.getRecordset(rs => {
+					rs.select("ID", "Name");
+					rs.from("data", "Steam_Game");
+					rs.limit(25);
+					rs.orderBy("ID ASC");
+
+					for (const word of args) {
+						rs.where("Name %*like*", word);
+					}
+
+					return rs;
+				});
+
+				if (plausibleResults.length === 0) {
+					return {
+						success: false,
+						reply: `No games found for your query!`
+					};
+				}
+
+				const plausibleNames = plausibleResults.map(i => i.Name);
+				const [bestMatch] = sb.Utils.selectClosestString(gameName, plausibleNames, {
+					ignoreCase: true,
+					fullResult: true
+				});
+
+				gameId = plausibleResults.find(i => i.Name === bestMatch.original).ID;
 			}
 		}
 
-		const { hits } = searchResponse.body;
-		if (hits.length === 0) {
-			return {
-				success: false,
-				reply: `No game found for your query!`
-			};
-		}
-
-		// Ignore heuristics for now, Algolia API does not include game name
-		const game = hits[0];
-		const steamResponse = await sb.Got("GenericAPI", {
+		const playerCountResponse = await sb.Got("GenericAPI", {
 			url: "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001",
 			throwHttpErrors: false,
 			searchParams: {
-				appid: game.objectID,
+				appid: gameId,
 				key: sb.Config.get("API_STEAM_KEY")
 			}
 		});
 
-		if (steamResponse.statusCode !== 200) {
+		if (!playerCountResponse.ok) {
 			return {
 				success: false,
-				reply: "Could not find any data regarding this game's current player count! This is probably on Steam's end."
+				reply: "Could not find this Steam game!"
 			};
 		}
 
-		// Could add more game IDs to do some proper string matching later
 		const gameDataResponse = await sb.Got("GenericAPI", {
 			url: "https://store.steampowered.com/api/appdetails",
 			throwHttpErrors: false,
 			searchParams: {
-				appids: game.objectID
+				appids: gameId
 			}
 		});
 
 		let publisher = "";
-		const gameData = gameDataResponse.body[game.objectID].data;
-		const devs = gameData.developers;
+		const gameData = gameDataResponse.body[gameId].data;
+		if (!gameData) {
+			return {
+				success: false,
+				reply: "This Steam game supposedly exists, but there is no data associated with it!"
+			};
+		}
 
+		const devs = gameData.developers;
 		if (Array.isArray(devs)) {
 			if (devs.length === 1) {
 				publisher = `(by ${devs[0]})`;
@@ -194,7 +144,7 @@ module.exports = {
 			}
 		}
 
-		const players = steamResponse.body.response.player_count;
+		const players = playerCountResponse.body.response.player_count;
 		return {
 			reply: sb.Utils.tag.trim `
 				${gameData.name} ${publisher}
@@ -209,11 +159,19 @@ module.exports = {
 		"",
 
 		`<code>$sgp (game name)</code>`,
+		`<code>$sgp Counter Strike</code>`,
 		"Fetches game data by its name",
 		"",
 
 
+		`<code>$sgp (steam store URL)</code>`,
+		`<code>$sgp https://store.steampowered.com/app/105600/Terraria</code>`,
+		"Fetches game data by its Steam Store URL (and some others too possibly)",
+		"",
+
+
 		`<code>$sgp gameID:(game ID)</code>`,
+		`<code>$sgp gameID:12345</code>`,
 		"Fetches game data by its Steam ID",
 		""
 	]

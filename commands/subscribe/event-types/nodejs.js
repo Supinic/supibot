@@ -9,7 +9,7 @@ module.exports = {
 	},
 	generic: true,
 	cronExpression: "0 */5 * * * *",
-	subName: "Python version",
+	subName: "Node.js version",
 	type: "custom",
 	process: async () => {
 		const response = await sb.Got("GitHub", {

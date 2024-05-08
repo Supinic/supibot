@@ -1,5 +1,5 @@
 /* eslint-disable max-nested-callbacks */
-const assert = require("assert");
+const assert = require("node:assert");
 
 describe("command: f1", () => {
 	it("should not have any duplicate copypastas", () => {

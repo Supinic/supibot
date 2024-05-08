@@ -20,8 +20,8 @@ module.exports = {
 	Whitelist_Response: "Only available to administrators or helpers!",
 	Static_Data: null,
 	Code: async function restart (context, ...types) {
-		const { promisify } = require("util");
-		const shell = promisify(require("child_process").exec);
+		const { promisify } = require("node:util");
+		const shell = promisify(require("node:child_process").exec);
 		const processType = (types.includes("web") || types.includes("site") || types.includes("website"))
 			? "web"
 			: "bot";

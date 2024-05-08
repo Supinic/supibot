@@ -1,7 +1,7 @@
 /* eslint-disable max-nested-callbacks */
-const fs = require("fs");
+const fs = require("node:fs");
 const acorn = require("acorn-node");
-const { strictEqual: equal } = require("assert");
+const { strictEqual: equal } = require("node:assert");
 const getType = (value) => (value === null) ? "null" : typeof value;
 
 describe("global module suite", () => {

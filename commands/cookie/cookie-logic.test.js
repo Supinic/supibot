@@ -1,5 +1,5 @@
 /* eslint-disable max-nested-callbacks, prefer-arrow-callback */
-const assert = require("assert");
+const assert = require("node:assert");
 const Logic = require("./cookie-logic.js");
 
 // Allow proper object cloning when `structuredClone` is not available

@@ -4,8 +4,8 @@
  * Original: {@link https://github.com/ldubos/node-vlc-http}
  */
 
-const http = require("http");
-const querystring = require("querystring");
+const http = require("node:http");
+const querystring = require("node:querystring");
 
 const get = (options) => new Promise((resolve, reject) => {
 	http.get(options, response => {
@@ -39,7 +39,7 @@ const CommandScope = {
 	PLAYLIST: "/requests/playlist.json"
 };
 
-module.exports = class VLCClient extends require("events") {
+module.exports = class VLCClient extends require("node:events") {
 	#host;
 	#port;
 	#autoUpdate = true;

@@ -169,7 +169,7 @@ module.exports = {
 			parseTimestamp: (string) => {
 				const type = linkParser.autoRecognize(string);
 				if (type === "youtube" && string.includes("t=")) {
-					const { parse } = require("url");
+					const { parse } = require("node:url");
 					let { query } = parse(string);
 
 					if (/t=\d+/.test(query)) {
@@ -246,7 +246,7 @@ module.exports = {
 			startTime = potentialTimestamp;
 		}
 
-		const parsedURL = require("url").parse(url);
+		const parsedURL = require("node:url").parse(url);
 		let data = null;
 
 		// Special URL hosts settings - blacklist, `supinic.com`
@@ -500,8 +500,8 @@ module.exports = {
 		try {
 			let vlcLink = data.link;
 			if (data.type === "bilibili") {
-				const { promisify } = require("util");
-				const shell = promisify(require("child_process").exec);
+				const { promisify } = require("node:util");
+				const shell = promisify(require("node:child_process").exec);
 				const ytdlPath = sb.Config.get("YOUTUBEDL_PATH", false);
 				if (!ytdlPath) {
 					return {

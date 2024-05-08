@@ -2,7 +2,7 @@ const Banphrase = require("./banphrase.js");
 const Filter = require("./filter.js");
 const User = require("./user.js");
 
-const pathModule = require("path");
+const pathModule = require("node:path");
 const CooldownManager = require("../utils/cooldown-manager.js");
 const LanguageCodes = require("language-iso-codes");
 
