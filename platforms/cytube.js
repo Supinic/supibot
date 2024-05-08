@@ -128,7 +128,7 @@ class CytubeClient {
 			// Only unset AFK and fire reminders if the message wasn't private
 			if (!data.meta.private) {
 				// Do not process mirrored messages
-				const identifiers = sb.Platform.data.map(i => i.Mirror_Identifier);
+				const identifiers = sb.Platform.list.map(i => i.mirrorIdentifierr);
 				if (originalUsername === this.platform.selfName && identifiers.includes(Array.from(msg)[0])) {
 					return;
 				}
