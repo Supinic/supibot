@@ -1,5 +1,6 @@
-const { randomBytes, randomInt } = require("node:crypto");
+const { randomBytes } = require("node:crypto");
 const { roll: diceRoll } = require("roll-dice");
+const { randomInt } = require("../../utils/command-utils.js");
 
 module.exports = {
 	Name: "roll",

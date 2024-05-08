@@ -1,4 +1,4 @@
-const { randomInt } = require("node:crypto");
+const { randomInt } = require("../../utils/command-utils.js");
 
 module.exports = {
 	Name: "randomemote",

@@ -6,14 +6,18 @@ const Chrono = require("chrono-node");
 const rssParser = new RSSParser();
 
 module.exports = {
-	random (min, max) {
+	randomInt (min, max) {
+		if (min === max) {
+			return min;
+		}
+
+		return randomInt(min, max);
+	},
+
+	randomIntAsync (min, max) {
 		return new Promise((resolve, reject) => {
 			randomInt(min, max, (err, num) => (err) ? reject(err) : resolve(num));
 		});
-	},
-
-	randomSync (min, max) {
-		return randomInt(min, max);
 	},
 
 	/**
