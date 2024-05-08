@@ -1,4 +1,4 @@
-const { randomInt } = require("../../utils/command-utils.js");
+const { randomInt } = require("../../../utils/command-utils.js");
 const { addFish, addJunk, getInitialStats, rollCatch, saveData } = require("./fishing-utils.js");
 
 const FISHING_TRIP_STATIC_DURATION = 36e5; // 1 hour

@@ -1,4 +1,4 @@
-const { randomInt } = require("../../utils/command-utils.js");
+const { randomInt } = require("../../../utils/command-utils.js");
 const {
 	baitTypes,
 	COIN_EMOJI,
