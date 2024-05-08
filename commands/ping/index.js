@@ -79,7 +79,7 @@ module.exports = {
 
 		const pongString = `P${switchCharactersMap[context.invocation[1]]}ng!`;
 		if (pongString === "Ping!" && randomInt(1, 10) === 1) {
-			const emote = await context.randomEmote(["AlienDance", "AlienPls", "forsenPls", "SourPls", "DinoDance"]);
+			const emote = await context.randomEmote("AlienDance", "AlienPls", "forsenPls", "SourPls", "DinoDance");
 			return {
 				reply: `Let's play Pong ${emote} ${emote} ${emote} https://youtu.be/cNAdtkSjSps`
 			};
