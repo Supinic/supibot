@@ -28,6 +28,9 @@ module.exports = {
 		const { newsItems } = response.body;
 		const previousArticleId = await sb.Cache.getByPrefix(OSRS_LAST_ARTICLE_ID) ?? 0;
 		const eligibleArticles = newsItems.filter(i => i.newsId > previousArticleId);
+		if (eligibleArticles.length === 0) {
+			return;
+		}
 
 		const latestArticleId = Math.max(...eligibleArticles.map(i => i.newsId));
 		await sb.Cache.setByPrefix(OSRS_LAST_ARTICLE_ID, latestArticleId, {
