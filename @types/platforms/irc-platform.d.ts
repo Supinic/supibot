@@ -1,12 +1,11 @@
 import { Platform } from "./template";
 
-declare interface IrcData {
+declare type IrcData = {
 	url: string;
 	port: number;
 	secure: boolean;
-}
+};
 
 export declare class IrcPlatform extends Platform {
-	readonly Defaults: Partial<IrcPlatform["Data"]>;
-	readonly Data: IrcData;
+	readonly config: IrcData;
 }

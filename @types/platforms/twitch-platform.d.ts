@@ -6,8 +6,8 @@ declare type ReconnectAnnouncementData = {
 	channels: string[];
 	string: string;
 };
-declare type Notice = string;
 
+declare type Notice = string;
 declare interface TwitchLog extends Log {
 	bans: boolean;
 	bits: boolean;
@@ -17,7 +17,8 @@ declare interface TwitchLog extends Log {
 	subs: boolean;
 	timeouts: boolean;
 }
-declare interface TwitchData {
+
+declare type TwitchData = {
 	modes: ModQueueData;
 	reconnectAnnouncement: ReconnectAnnouncementData;
 	defaultGlobalCooldown: number;
@@ -38,10 +39,9 @@ declare interface TwitchData {
 	recentBanPartTimeout: number;
 	trackChannelsLiveStatus: boolean;
 	whisperMessageLimit: number;
-}
+};
 
 export declare class TwitchPlatform extends Platform {
-	readonly Logging: TwitchLog;
-	readonly Defaults: Partial<TwitchPlatform["Data"]>;
-	readonly Data: TwitchData;
+	readonly logging: TwitchLog;
+	readonly config: TwitchData;
 }

@@ -1,14 +1,14 @@
 import { Log, Platform } from "./template";
 
-declare interface CytubeData {
+declare type CytubeData = {
 	messageDelayThreshold: boolean;
-}
+};
+
 declare interface CytubeLog extends Log {
 	videoRequests: boolean;
 }
 
 export declare class CytubePlatform extends Platform {
-	readonly Log: CytubeLog;
-	readonly Defaults: Partial<CytubePlatform["Data"]>;
-	readonly Data: CytubeData;
+	readonly log: CytubeLog;
+	readonly config: CytubeData;
 }

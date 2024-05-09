@@ -1,11 +1,10 @@
 import { Platform } from "./template";
 
-declare interface DiscordData {
+declare type DiscordData = {
 	sendVerificationChallenge: boolean;
 	createReminderWhenSendingPrivateMessageFails: boolean;
-}
+};
 
 export declare class DiscordPlatform extends Platform {
-	readonly Defaults: Partial<DiscordPlatform["Data"]>;
-	readonly Data: DiscordData;
+	readonly config: DiscordData;
 }
