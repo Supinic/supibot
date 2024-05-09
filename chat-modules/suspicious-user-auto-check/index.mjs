@@ -74,9 +74,10 @@ export const definition = {
 			Hey @${raw.user},
 			I'd like to verify whether @${data.login} is 
 			a different account/name that you used in the past,
-			or someone else that's not you.
-			Let me know with "me" or "not me".
-			@Supinic has to fix this manually, please allow for some time :)
+			or if it belongs to someone else.
+			Respond to this messge with "me" or "not me" accordingly.
+			@Supinic has to fix this manually, please stay patient :)
+			His time is currently: ${new sb.Date().format("H:i")}
 		`;
 
 		await channel.send(resultMessage);
