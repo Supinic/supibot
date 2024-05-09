@@ -304,7 +304,7 @@ class CytubeClient {
 		});
 
 		client.on("error", (err) => {
-			console.error("Cytube error", {
+			console.warn("Cytube error", {
 				err,
 				channel: this.channelData.Name
 			});
@@ -429,8 +429,8 @@ class CytubeClient {
 		}
 
 		this.restarting = true;
+
 		if (this.client) {
-			this.client.removeAllListeners();
 			this.client.destroy();
 			this.client = null;
 		}
