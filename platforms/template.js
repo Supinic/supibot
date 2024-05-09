@@ -256,11 +256,9 @@ module.exports = class Platform {
 		}
 
 		const userList = await this.populateUserList(channelData.Name);
-		await this.setByPrefix(
-			key,
-			userList,
-			{ expiry: 5 * 60e3 } // 5 minutes
-		);
+		await sb.Cache.setByPrefix(key, userList, {
+			expiry: 300_000 // 5 minutes
+		});
 	}
 
 	/**
