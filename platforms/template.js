@@ -75,6 +75,7 @@ module.exports = class Platform {
 	get logging () { return this.#loggingConfig; }
 
 	get capital () { return sb.Utils.capitalize(this.#name); }
+	get userMessagePromises () { return this.#userMessagePromises; }
 	get privateMessageLoggingTableName () {
 		const name = this.getFullName("_");
 		return `#${name}_private_messages`;
