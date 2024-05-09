@@ -22,19 +22,19 @@ module.exports = {
 
 		for (const def of rssSubscriptions) {
 			const expression = def.cronExpression ?? "0 */5 * * * *";
-			const cron = new CronJob(expression, () => handleGenericSubscription(def));
+			const cronJob = new CronJob(expression, () => handleGenericSubscription(def));
 
-			// Only used for debugging purposes, simplifies inspecting each cron job
-			cron[nameSymbol] = def.name ?? null;
-			cron[definitionSymbol] = def;
+			// These symbols are only used for debugging purposes, simplifies the inspection of each cron job
+			cronJob[nameSymbol] = def.name ?? null;
+			cronJob[definitionSymbol] = def;
 
-			cron.start();
-			this.data.crons.add(cron);
+			cronJob.start();
+			this.data.crons.add(cronJob);
 		}
 	},
 	destroy: function () {
-		for (const cron of this.data.crons) {
-			cron.destroy();
+		for (const cronJob of this.data.crons) {
+			cronJob.stop();
 		}
 
 		this.data.crons.clear();
