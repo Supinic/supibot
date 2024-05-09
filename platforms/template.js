@@ -91,6 +91,9 @@ module.exports = class Platform {
 
 	initListeners () {}
 
+	/**
+	 * @abstract
+	 */
 	// eslint-disable-next-line no-unused-vars
 	async send (message, channel, options = {}) {
 		throw new sb.Error({
@@ -98,6 +101,9 @@ module.exports = class Platform {
 		});
 	}
 
+	/**
+	 * @abstract
+	 */
 	// eslint-disable-next-line no-unused-vars
 	async pm (message, user) {
 		throw new sb.Error({
@@ -105,6 +111,9 @@ module.exports = class Platform {
 		});
 	}
 
+	/**
+	 * @abstract
+	 */
 	me () {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Platform"
