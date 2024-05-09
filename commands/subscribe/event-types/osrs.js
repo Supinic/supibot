@@ -1,15 +1,5 @@
-const { parseRSS } = require("../../../utils/command-utils.js");
-const { createHash } = require("node:crypto");
-
-const hashArticle = (item) => createHash("sha256")
-	.update(item.title)
-	.update(item.link)
-	.update(item.content)
-	.digest()
-	.toString("hex");
-
-const url = "https://secure.runescape.com/m=news/latest_news.rss?oldschool=true";
-const OSRS_LAST_ARTICLE_KEY = "osrs-last-article";
+const url = "https://secure.runescape.com/m=news/latestNews.json?oldschool=1";
+const OSRS_LAST_ARTICLE_ID = "osrs-last-article-id";
 
 module.exports = {
 	name: "OSRS",
@@ -25,35 +15,24 @@ module.exports = {
 	subName: "OSRS article",
 	type: "custom",
 	process: async () => {
-		const xml = await sb.Got("GenericAPI", {
+		const response = await sb.Got("GenericAPI", {
 			url,
-			responseType: "text"
+			responseType: "json",
+			throwHttpErrors: true
 		});
 
-		const { items } = await parseRSS(xml.body);
-
-		const eligibleArticles = [];
-		const latestArticleHash = await sb.Cache.getByPrefix(OSRS_LAST_ARTICLE_KEY);
-		if (latestArticleHash) {
-			for (const article of items) {
-				const hash = hashArticle(article);
-				if (hash === latestArticleHash) {
-					break;
-				}
-
-				eligibleArticles.push(article);
-			}
-		}
-		else {
-			eligibleArticles.push(items[0]);
-		}
-
-		if (eligibleArticles.length === 0) {
+		if (!response.ok) {
 			return;
 		}
 
-		const newHash = hashArticle(eligibleArticles[0]);
-		await sb.Cache.setByPrefix(OSRS_LAST_ARTICLE_KEY, newHash);
+		const { newsItems } = response.body;
+		const previousArticleId = await sb.Cache.getByPrefix(OSRS_LAST_ARTICLE_ID) ?? 0;
+		const eligibleArticles = newsItems.filter(i => i.newsId > previousArticleId);
+
+		const latestArticleId = Math.max(...eligibleArticles.map(i => i.newsId));
+		await sb.Cache.setByPrefix(OSRS_LAST_ARTICLE_ID, latestArticleId, {
+			expiry: 14 * 864e5 // 14 days
+		});
 
 		const articleString = eligibleArticles.map(i => `${i.title} ${i.link}`).join(" -- ");
 		const noun = (eligibleArticles.length === 0) ? "article" : "articles";
