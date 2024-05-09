@@ -14,7 +14,7 @@ export const definition = {
 		}
 
 		this.data.checkedUsernames ??= new Set();
-		this.data.keywords ??= ["sus", "username", "account", "supibot", "help", "flag"];
+		this.data.keywords ??= ["sus", "username", "account", "supibot", "help", "flag", "remedy"];
 
 		const lower = message.toLowerCase();
 		if (this.data.keywords.every(i => !lower.includes(i))) {
