@@ -259,6 +259,8 @@ module.exports = class Platform {
 		await sb.Cache.setByPrefix(key, userList, {
 			expiry: 300_000 // 5 minutes
 		});
+
+		return userList;
 	}
 
 	/**
