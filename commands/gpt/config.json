@@ -66,7 +66,7 @@
       "usageDivisor": 10
     },
     "4": {
-      "url": "gpt-4-1106-preview",
+      "url": "gpt-4o",
       "type": "messages",
       "default": false,
       "inputLimit": 500,
@@ -74,7 +74,7 @@
         "default": 100,
         "maximum": 250
       },
-      "usageDivisor": 0.2
+      "usageDivisor": 0.33
     },
     "mixtral": {
       "url": "mistralai/Mixtral-8x7B-Instruct-v0.1",
