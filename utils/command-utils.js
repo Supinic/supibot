@@ -7,16 +7,12 @@ const rssParser = new RSSParser();
 
 module.exports = {
 	randomInt (min, max) {
-		if (min === max) {
-			return min;
-		}
-
-		return randomInt(min, max);
+		return randomInt(min, max + 1);
 	},
 
 	randomIntAsync (min, max) {
 		return new Promise((resolve, reject) => {
-			randomInt(min, max, (err, num) => (err) ? reject(err) : resolve(num));
+			randomInt(min, max + 1, (err, num) => (err) ? reject(err) : resolve(num));
 		});
 	},
 
