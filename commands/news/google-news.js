@@ -26,6 +26,13 @@ module.exports = {
 
 		const xml = response.body;
 		const rss = await parseRSS(xml);
+		if (rss.items.length === 0) {
+			return {
+				success: false,
+				reply: `No news found for your query!`
+			};
+		}
+
 		const articles = rss.items.map(i => ({
 			title: (i.title) ? cleanString(i.title.trim()) : null,
 			content: (i.content) ? cleanString(i.content.trim()) : null,
