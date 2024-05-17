@@ -3,7 +3,7 @@ let tooManySubsWarningSent = false;
 
 export const definition = {
 	name: "fetch-twitch-subscriber-list",
-	expression: "0 0 * * * *",
+	expression: "0 0 0 * * *",
 	description: "Fetches the current subscriber list, then saves it to sb.Cache",
 	code: (async function fetchTwitchSubscriberList () {
 		const requiredConfigs = [
