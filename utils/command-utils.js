@@ -4,16 +4,27 @@ const RSSParser = require("rss-parser");
 const Chrono = require("chrono-node");
 
 const rssParser = new RSSParser();
+const MAX_SAFE_RANGE = 281474976710655;
 
 module.exports = {
 	randomInt (min, max) {
-		return randomInt(min, max + 1);
-	},
+		if (Math.abs(min) >= Number.MAX_SAFE_INTEGER || Math.abs(max) >= Number.MAX_SAFE_INTEGER) {
+			throw new sb.Error({
+				message: "Integer range exceeded",
+				args: { min, max }
+			});
+		}
 
-	randomIntAsync (min, max) {
-		return new Promise((resolve, reject) => {
-			randomInt(min, max + 1, (err, num) => (err) ? reject(err) : resolve(num));
-		});
+		const range = max - min;
+		if (range <= MAX_SAFE_RANGE) {
+			return randomInt(min, max + 1);
+		}
+
+		const baseRoll = randomInt(0, MAX_SAFE_RANGE);
+		const multiplier = range / MAX_SAFE_RANGE;
+		const roll = Math.trunc(baseRoll * multiplier);
+
+		return (min + roll);
 	},
 
 	/**
