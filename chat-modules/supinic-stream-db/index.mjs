@@ -3,14 +3,20 @@ export const definition = {
 	Events: ["online", "offline"],
 	Description: "Creates and updates database rows of Streams on Supinic's channel as he goes on/offline.",
 	Code: (async function supinicStreamDB (context) {
-		const { data: [stream] } = await sb.Got("Helix", {
+		const response = await sb.Got("Helix", {
 			url: "videos",
 			searchParams: {
 				user_id: "31400525",
 				first: "1"
 			}
-		}).json();
+		});
 
+		if (!response.ok || !response.body?.data) {
+			console.warn("Stream database event failed", { response });
+			return;
+		}
+
+		const [stream] = response.body.data;
 		if (stream) {
 			const start = new sb.Date(stream.created_at);
 			const date = start.clone().discardTimeUnits("h", "m", "s", "ms");
