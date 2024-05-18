@@ -16,6 +16,8 @@ const handlerMap = {
 	deepinfra: GptDeepInfra
 };
 
+let isLogTablePresent = null;
+
 module.exports = {
 	Name: "gpt",
 	Aliases: ["chatgpt"],
@@ -32,6 +34,9 @@ module.exports = {
 	],
 	Whitelist_Response: "Currently only available in these channels for testing: @pajlada @Supinic @Supibot",
 	Static_Data: null,
+	initialize: async function () {
+		isLogTablePresent = await sb.Query.isTablePresent("data", "ChatGPT_Log");
+	},
 	Code: (async function chatGPT (context, ...args) {
 		const query = args.join(" ").trim();
 		const historyCommandResult = await GptTemplate.handleHistoryCommand(context, query);
@@ -170,9 +175,7 @@ module.exports = {
 			};
 		}
 
-		this.data.isLogTablePresent ??= await sb.Query.isTablePresent("data", "ChatGPT_Log");
-
-		if (this.data.isLogTablePresent) {
+		if (isLogTablePresent) {
 			const row = await sb.Query.getRow("data", "ChatGPT_Log");
 			const inputTokens = Handler.getPromptTokens(response);
 			const completionTokens = Handler.getCompletionTokens(response);
