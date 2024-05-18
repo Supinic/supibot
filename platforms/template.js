@@ -467,30 +467,14 @@ class Platform {
 	}
 
 	static create (type, config) {
-		let InstancePlatform;
-		switch (type) {
-			case "twitch":
-				InstancePlatform = require("./twitch.js");
-				break;
-
-			case "discord":
-				InstancePlatform = require("./discord.js");
-				break;
-
-			case "cytube":
-				InstancePlatform = require("./cytube.js");
-				break;
-
-			case "irc":
-				InstancePlatform = require("./irc.js");
-				break;
-
-			default:
-				console.log(`Creating generic platform for ${config.type} (ID ${config.ID})`);
-				return new Platform(config.type, config);
+		try {
+			const InstancePlatform = require(`./${type}.js`);
+			return new InstancePlatform(config);
 		}
-
-		return new InstancePlatform(config);
+		catch (e) {
+			console.log(`No platform file found for ${type}, creating generic platform`);
+			return new Platform(config.type, config);
+		}
 	}
 }
 
