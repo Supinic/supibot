@@ -1,6 +1,6 @@
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
-module.exports = class Platform {
+class Platform {
 	#id;
 	#name;
 	#host;
@@ -10,6 +10,7 @@ module.exports = class Platform {
 	#mirrorIdentifier;
 	#data;
 	#loggingConfig;
+	#active;
 
 	#globalEmoteCacheKey;
 
@@ -36,9 +37,9 @@ module.exports = class Platform {
 		}
 
 		this.#host = config.host ?? null;
-		this.#messageLimit = config.messageLimit;
-		this.#selfId = config.selfId;
-		this.#selfName = config.selfName.toLowerCase();
+		this.#messageLimit = config.messageLimit ?? null;
+		this.#selfId = config.selfId ?? null;
+		this.#selfName = config.selfName?.toLowerCase() ?? null;
 		this.#mirrorIdentifier = config.mirrorIdentifier ?? null;
 
 		this.#data = {
@@ -51,6 +52,7 @@ module.exports = class Platform {
 		};
 
 		this.#globalEmoteCacheKey = `global-emotes-${this.#id}`;
+		this.#active = config.active ?? false;
 
 		Platform.list.push(this);
 	}
@@ -73,6 +75,7 @@ module.exports = class Platform {
 	get config () { return this.#data; }
 	get Logging () { return this.#loggingConfig; }
 	get logging () { return this.#loggingConfig; }
+	get active () { return this.#active; }
 
 	get capital () { return sb.Utils.capitalize(this.#name); }
 	get userMessagePromises () { return this.#userMessagePromises; }
@@ -483,15 +486,15 @@ module.exports = class Platform {
 				break;
 
 			default:
-				throw new sb.Error({
-					message: "Invalid platform type provided",
-					args: { type, config }
-				});
+				console.log(`Creating generic platform for ${config.type} (ID ${config.ID})`);
+				return new Platform(config.type, config);
 		}
 
 		return new InstancePlatform(config);
 	}
-};
+}
+
+module.exports = Platform;
 
 /**
  * @typedef {Object} TypedEmote Describes any emote

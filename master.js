@@ -108,11 +108,6 @@ require("./db-access.js");
 
 	const platforms = new Set();
 	for (const definition of platformsConfig) {
-		if (!definition.active) {
-			console.debug(`Platform ${definition.type} (ID ${definition.ID}) is set to inactive, skipping`);
-			continue;
-		}
-
 		platforms.add(Platform.create(definition.type, definition));
 	}
 
@@ -189,6 +184,11 @@ require("./db-access.js");
 
 	const promises = [];
 	for (const platform of platforms) {
+		if (!platform.active) {
+			console.debug(`Platform ${platform.name} (ID ${platform.ID}) is set to inactive, not connecting`);
+			continue;
+		}
+
 		promises.push(platform.connect());
 	}
 
