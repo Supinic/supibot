@@ -27,6 +27,26 @@ const DEFAULT_PLATFORM_CONFIG = {
 	sendVerificationChallenge: false,
 	createReminderWhenSendingPrivateMessageFails: true
 };
+const MARKDOWN_TESTS = {
+	ANY: /(\*{1,3}|~~|>|>>>|`|_|__)/g,
+	SOL_NO_SPACE: /^(#{1,3}|>|>>>|```)/gm,
+	SOL_SPACE: /^\s+([*-])\s+/gm
+};
+
+const fixMarkdown = (text) => {
+	let isMarkdown = false;
+	for (const regex of Object.values(MARKDOWN_TESTS)) {
+		isMarkdown ||= regex.test(text);
+	}
+
+	if (!isMarkdown) {
+		return text;
+	}
+	else {
+		const replaced = text.replace(/```/g, "`\u{200B}`\u{200B}`\u{200B}");
+		return `\`\`\`${replaced}\`\`\``;
+	}
+};
 
 module.exports = class DiscordPlatform extends require("./template.js") {
 	constructor (config) {
@@ -432,13 +452,6 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		}
 		else if (typeof message === "string") {
 			const limit = channelData.Message_Limit ?? this.messageLimit;
-			message = message
-				.replace(/\\/g, "\\\\")
-				.replace(/\b(?<modifier>[*_]{1,2})(?<content>[^\\]+)(\1)\b/g, (total, modifier, content) => {
-					const escapedModifier = [...modifier].map(i => `\\${i}`).join("");
-					return `${escapedModifier}${content}${escapedModifier}`;
-				});
-
 			sendTarget = sb.Utils.wrapString(message, limit, {
 				keepWhitespace: true
 			});
@@ -456,7 +469,8 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		}
 
 		try {
-			await channelObject.send(sendTarget);
+			const fixed = fixMarkdown(sendTarget);
+			await channelObject.send(fixed);
 			this.incrementMessageMetric("sent", channelData);
 		}
 		catch (e) {
@@ -540,7 +554,8 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 
 		try {
 			if (typeof message === "string") {
-				await discordUser.send(message);
+				const fixed = fixMarkdown(message);
+				await discordUser.send(fixed);
 			}
 			else if (options.embeds && options.embeds.length !== 0) {
 				await discordUser.send({
@@ -609,7 +624,8 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		}
 
 		try {
-			await discordUser.send(message);
+			const fixed = fixMarkdown(message);
+			await discordUser.send(fixed);
 			this.incrementMessageMetric("sent", null);
 		}
 		catch (e) {
