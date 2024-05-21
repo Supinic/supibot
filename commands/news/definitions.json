@@ -231,6 +231,20 @@
         "path": "24ora",
         "endpoints": ["rss"],
         "helpers": ["noiredayz"]
+      },
+      {
+        "name": "telex",
+        "url": "https://telex.hu",
+        "path": null,
+        "endpoints": ["rss"],
+        "helpers": ["noiredayz"]
+      },
+      {
+        "name": "444.hu",
+        "url": "https://444.hu",
+        "path": null,
+        "endpoints": ["feed"],
+        "helpers": ["noiredayz"]
       }
     ]
   },
