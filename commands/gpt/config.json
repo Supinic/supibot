@@ -30,7 +30,7 @@
         "default": 100,
         "maximum": 500
       },
-      "usageDivisor": 1
+      "pricePerMtoken": 1
     },
     "nexra-4": {
       "url": "gpt-4-32k",
@@ -41,7 +41,7 @@
         "default": 5000,
         "maximum": 5000
       },
-      "usageDivisor": 10
+      "pricePerMtoken": 0.05
     },
     "4": {
       "url": "gpt-4o",
@@ -52,7 +52,7 @@
         "default": 100,
         "maximum": 250
       },
-      "usageDivisor": 0.33
+      "pricePerMtoken": 10
     },
     "mixtral": {
       "url": "mistralai/Mixtral-8x7B-Instruct-v0.1",
@@ -63,7 +63,7 @@
         "default": 500,
         "maximum": 1000
       },
-      "usageDivisor": 10
+      "pricePerMtoken": 0.24
     },
     "mistral": {
       "url": "mistralai/Mistral-7B-Instruct-v0.1",
@@ -74,10 +74,10 @@
         "default": 500,
         "maximum": 1000
       },
-      "usageDivisor": 10
+      "pricePerMtoken": 0.65
     },
     "llama": {
-      "url": "codellama/CodeLlama-70b-Instruct-hf",
+      "url": "meta-llama/Meta-Llama-3-70B-Instruct",
       "type": "deepinfra",
       "default": false,
       "inputLimit": 2500,
@@ -85,7 +85,7 @@
         "default": 500,
         "maximum": 1000
       },
-      "usageDivisor": 10
+      "pricePerMtoken": 0.69
     }
   }
 }

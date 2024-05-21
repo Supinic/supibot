@@ -210,44 +210,40 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix) => {
 		const ChatGptConfig = require("./config.json");
-		const [defaultModelName, defaultModelData] = Object.entries(ChatGptConfig.models).find(i => i[1].default === true);
 		const { regular, subscriber } = ChatGptConfig.userTokenLimits;
 		const { outputLimit } = ChatGptConfig;
-		const basePriceModel = "Turbo";
 
+		let defaultModelName = "N/A";
 		const modelListHTML = Object.entries(ChatGptConfig.models).map(([name, modelData]) => {
-			const letter = name[0].toUpperCase();
-			const capName = sb.Utils.capitalize(name);
-			const defaultString = (modelData === defaultModelData)
-				? " (default model)"
-				: "";
-
-			if (modelData.disabled) {
-				return `<li><del><b>${capName}</b> (${letter})</del> - model is currently disabled: ${modelData.disableReason ?? "(N/A)"}</li>`;
+			let isDefaultEmoji = "❌";
+			if (modelData.default) {
+				defaultModelName = name;
+				isDefaultEmoji = "✔";
 			}
 
-			let type = modelData.type;
-			if (type === "nexra") {
-				type = "messages";
-			}
-
-			let priceChangeString = "";
-			const typeString = `is a <b>${type}</b> model`;
-			if (modelData !== defaultModelData) {
-				if (modelData.usageDivisor === 1) {
-					priceChangeString = ` (same price as ${basePriceModel})`;
-				}
-				else if (modelData.usageDivisor > 1) {
-					priceChangeString = ` (${modelData.usageDivisor}x cheaper than ${basePriceModel})`;
-				}
-				else if (modelData.usageDivisor < 1) {
-					const multiplier = sb.Utils.round(1 / modelData.usageDivisor, 2);
-					priceChangeString = ` (${multiplier}x more expensive than ${basePriceModel})`;
-				}
-			}
-
-			return `<li><b>${capName}</b> (${letter}): ${typeString} ${defaultString}${priceChangeString}</li>`;
+			return sb.Utils.tag.trim `
+				<tr>
+					<td>${name}</td>
+					<td>${modelData.type}</td>
+					<td>${modelData.pricePerMtoken}</td>
+					<td>${isDefaultEmoji}</td>
+				</tr>
+			`;
 		}).join("");
+
+		const modelsTableHTML = sb.Utils.tag.trim `
+			<table>
+				<thead>
+					<th>Name</th>
+					<th>Type</th>
+					<th>Pricing</th>
+					<th>Default</th>
+				</thead>
+				<tbody>
+					${modelListHTML}
+				</tbody>
+			</table>		
+		`;
 
 		return [
 			"Ask ChatGPT pretty much anything, and watch technology respond to you in various fun and interesting ways!",
@@ -272,18 +268,7 @@ module.exports = {
 
 			"<h5>Models</h5>",
 			"Models you can choose from:",
-			`<ul>${modelListHTML}</ul>`,
-
-			// "Each next model in succession is more powerful and more coherent than the previous, but also more expensive to use.",
-			// "When experimenting, consider using one of the lower tier models, only then moving up to higher tiers!",
-			// "For example: 100 tokens used in Davinci → 100 tokens used from your limit,",
-			// "but: 100 tokens used in Babbage (which is 40x cheaper) → 2.5 tokens used from your limit.",
-			// "",
-			"Models with <i>base</i> in their name are GPT-3 and are not trained to follow instructions.",
-			"This means that they will mostly generate natural language with no regards to what you actually ask.",
-			"",
-
-			`You can also check out the <a href="https://beta.openai.com/docs/models/feature-specific-models">official documentation</a> of GPT-3 models on the official site for full info.`,
+			`<ul>${modelsTableHTML}</ul>`,
 			"",
 
 			"<h5>Basic usage</h5>",

@@ -149,9 +149,9 @@ const checkLimits = async (userData) => {
 };
 
 const addUsageRecord = async (userData, value, modelName) => {
-	const { usageDivisor } = ChatGptConfig.models[modelName];
+	const { pricePerMtoken } = ChatGptConfig.models[modelName];
 	const cacheKey = createCacheKey(userData.ID);
-	const normalizedValue = sb.Utils.round(value / usageDivisor, 2);
+	const normalizedValue = sb.Utils.round(value * pricePerMtoken, 2);
 
 	return await sb.Cache.server.zadd(cacheKey, sb.Date.now(), normalizedValue);
 };
