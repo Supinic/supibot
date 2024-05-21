@@ -21,28 +21,6 @@
     }
   },
   "models": {
-    "base-babbage": {
-      "url": "babbage-002",
-      "type": "string",
-      "default": false,
-      "inputLimit": 2500,
-      "outputLimit": {
-        "default": 100,
-        "maximum": 500
-      },
-      "usageDivisor": 2.5
-    },
-    "base-davinci": {
-      "url": "davinci-002",
-      "type": "string",
-      "default": false,
-      "inputLimit": 1500,
-      "outputLimit": {
-        "default": 100,
-        "maximum": 500
-      },
-      "usageDivisor": 0.5
-    },
     "turbo": {
       "url": "gpt-3.5-turbo-0125",
       "type": "messages",
