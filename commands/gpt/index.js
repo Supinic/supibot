@@ -268,8 +268,7 @@ module.exports = {
 
 			"<h5>Models</h5>",
 			"Models you can choose from:",
-			`<ul>${modelsTableHTML}</ul>`,
-			"",
+			`${modelsTableHTML}`,
 
 			"<h5>Basic usage</h5>",
 			`<code>${prefix}gpt (your query)</code>`,
