@@ -2,37 +2,37 @@
   {
     "name": "Aquarius",
     "emoji": "♒",
-    "start": [1, 21],
-    "end": [2, 19]
+    "start": [1, 20],
+    "end": [2, 18]
   },
   {
     "name": "Pisces",
     "emoji": "♓",
-    "start": [2, 20],
+    "start": [2, 19],
     "end": [3, 20]
   },
   {
     "name": "Aries",
     "emoji": "♈",
     "start": [3, 21],
-    "end": [4, 20]
+    "end": [4, 19]
   },
   {
     "name": "Taurus",
     "emoji": "♉",
-    "start": [4, 21],
+    "start": [4, 20],
     "end": [5, 20]
   },
   {
     "name": "Gemini",
     "emoji": "♊",
     "start": [5, 21],
-    "end": [6, 21]
+    "end": [6, 20]
   },
   {
     "name": "Cancer",
     "emoji": "♋",
-    "start": [6, 22],
+    "start": [6, 21],
     "end": [7, 22]
   },
   {
@@ -45,30 +45,30 @@
     "name": "Virgo",
     "emoji": "♍",
     "start": [8, 23],
-    "end": [9, 21]
+    "end": [9, 22]
   },
   {
     "name": "Libra",
     "emoji": "♎",
-    "start": [9, 22],
+    "start": [9, 23],
     "end": [10, 22]
   },
   {
     "name": "Scorpio",
     "emoji": "♏",
     "start": [10, 23],
-    "end": [11, 22]
+    "end": [11, 21]
   },
   {
     "name": "Sagittarius",
     "emoji": "♐",
-    "start": [11, 23],
+    "start": [11, 22],
     "end": [12, 21]
   },
   {
     "name": "Capricorn",
     "emoji": "♑",
     "start": [12, 22],
-    "end": [1, 20]
+    "end": [1, 19]
   }
 ]
