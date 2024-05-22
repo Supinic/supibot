@@ -17,7 +17,8 @@
     "supi-core": "supinic/supi-core",
     "track-link-parser": "supinic/track-link-parser#master",
     "transliteration": "^2.3.5",
-    "vm2": "^3.9.19"
+    "vm2": "^3.9.19",
+    "ws": "^8.17.0"
   },
   "engines": {
     "node": ">= 18.0"

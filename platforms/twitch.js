@@ -2,6 +2,159 @@ const { CronJob } = require("cron");
 const DankTwitch = require("@kararty/dank-twitch-irc");
 const MessageScheduler = require("../utils/message-scheduler.js");
 
+const WebSocket = require("ws");
+const APP_ACCESS_CACHE_KEY = "twitch-app-access-token";
+const CONDUIT_ID_KEY = "twitch-conduit-id";
+
+const getAppAccessToken = async () => {
+	const cacheToken = await sb.Cache.getByPrefix(APP_ACCESS_CACHE_KEY);
+	if (cacheToken) {
+		return cacheToken;
+	}
+
+	const response = await sb.Got("GenericAPI", {
+		url: "https://id.twitch.tv/oauth2/token",
+		method: "POST",
+		searchParams: {
+			grant_type: "client_credentials",
+			client_id: sb.Config.get("TWITCH_CLIENT_ID"),
+			client_secret: sb.Config.get("TWITCH_CLIENT_SECRET")
+		}
+	});
+
+	if (!response.ok) {
+		throw new sb.Error({
+			message: "Could not fetch app access token!",
+			args: { response }
+		});
+	}
+
+	const token = response.body.access_token;
+	await sb.Cache.setByPrefix(APP_ACCESS_CACHE_KEY, token, {
+		expiry: (response.body.expires_in * 1000)
+	});
+
+	return token;
+};
+
+const getConduitId = async () => {
+	const cacheId = await sb.Cache.getByPrefix(CONDUIT_ID_KEY);
+	if (cacheId) {
+		return cacheId;
+	}
+
+	const appToken = await getAppAccessToken();
+	const response = await sb.Got("GenericAPI", {
+		url: "https://api.twitch.tv/helix/eventsub/conduits",
+		method: "POST",
+		responseType: "json",
+		throwHttpErrors: false,
+		headers: {
+			Authorization: `Bearer ${appToken}`,
+			"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+		},
+		json: { shard_count: 1 }
+	});
+
+	if (!response.ok) {
+		throw new sb.Error({
+			message: "Could not obtain conduit id",
+			args: { response }
+		});
+	}
+
+	const [shard] = response.body.data;
+	await sb.Cache.setByPrefix(CONDUIT_ID_KEY, shard.id);
+	return shard.id;
+};
+
+const assignWebsocketToConduit = async (sessionId) => {
+	const conduitId = await getConduitId();
+	const appToken = await getAppAccessToken();
+
+	const response = await sb.Got("GenericAPI", {
+		method: "PATCH",
+		url: "https://api.twitch.tv/helix/eventsub/conduits/shards",
+		responseType: "json",
+		throwHttpErrors: false,
+		headers: {
+			Authorization: `Bearer ${appToken}`,
+			"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+		},
+		json: {
+			conduit_id: conduitId,
+			shards: [{
+				id: 0,
+				transport: {
+					method: "websocket",
+					session_id: sessionId
+				}
+			}]
+		}
+	});
+
+	if (!response.ok) {
+		throw new sb.Error({
+			message: "Could not assign WS to conduit",
+			args: { response }
+		});
+	}
+};
+
+// @Todo manage Helix rate limits
+// @todo Move to TwitchPlatform and then call HandleMessage and other handlers
+const createChannelChatMessageSubscription = async (selfId, channelId) => {
+	const conduitId = await getConduitId();
+	const appToken = await getAppAccessToken();
+
+	const response = await sb.Got("GenericAPI", {
+		url: "https://api.twitch.tv/helix/eventsub/subscriptions",
+		method: "POST",
+		responseType: "json",
+		throwHttpErrors: false,
+		headers: {
+			Authorization: `Bearer ${appToken}`,
+			"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+		},
+		json: {
+			type: "channel.chat.message",
+			version: "1",
+			condition: {
+				broadcaster_user_id: channelId,
+				user_id: selfId
+			},
+			transport: {
+				method: "conduit",
+				conduit_id: conduitId
+			}
+		}
+	});
+
+	if (!response.ok) {
+		console.warn("Could not subscribe", {
+			selfId,
+			channelId,
+			response
+		});
+	}
+};
+
+// @todo move to TwitchPlatform as a new handler method
+const handleNotification = async (data) => {
+	const { event, subscription } = data.payload;
+
+	switch (subscription.type) {
+		case "channel.chat.message": {
+
+			break;
+		}
+
+		default: {
+			console.warn("Unrecognized notification", { data });
+		}
+	}
+};
+
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
 const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
@@ -261,32 +414,32 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	async connect () {
-		this.client = new DankTwitch.ChatClient({
-			username: this.selfName,
-			password: `oauth:${sb.Config.get("TWITCH_OAUTH")}`,
-			rateLimits: this.config.rateLimits
+		const ws = new WebSocket("wss://eventsub.wss.twitch.tv/ws");
+		ws.on("message", async (data) => {
+			const event = JSON.parse(data);
+			const { metadata, payload } = event;
+
+			switch (metadata.message_type) {
+				case "session_welcome": {
+					const sessionId = payload.session.id;
+					await assignWebsocketToConduit(sessionId);
+					break;
+				}
+
+				case "notification": {
+					await handleNotification(event);
+					break;
+				}
+
+				default: {
+					console.log("Unrecognized message", { event });
+				}
+			}
 		});
 
-		this.initListeners();
-
-		this.client.connect();
-
-		const joinOverride = this.config.joinChannelsOverride ?? [];
-		if (joinOverride.length === 0) {
-			await this.client.joinAll(sb.Channel.getJoinableForPlatform(this).map(i => i.Name));
-		}
-		else {
-			const channelList = joinOverride
-				.map(i => sb.Channel.get(i))
-				.filter(Boolean)
-				.map(i => i.Name);
-
-			await this.client.joinAll(channelList);
-		}
-
-		if (this.config.trackChannelsLiveStatus) {
-			this.#channelLiveStatusCron.start();
-		}
+		const channelList = sb.Channel.getJoinableForPlatform(this);
+		const joinPromises = channelList.map(async (channelData) => createChannelChatMessageSubscription(channelData.Specific_ID));
+		await Promise.all(joinPromises);
 	}
 
 	initListeners () {
@@ -745,6 +898,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 * @returns {Promise<void>}
 	 */
 	async handleMessage (messageObject) {
+		// @todo handle new EventSub message API format
 		const {
 			ircTags,
 			badges,
