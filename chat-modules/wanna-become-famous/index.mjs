@@ -29,7 +29,7 @@ export const definition = {
 		else if (msg.includes("upgrade your stream")) {
 			reason = "upgrading your stream";
 		}
-		else if (/(cheap|cheapest|best)\s*viewers?/.test(msg)) {
+		else if (/(cheap|cheapest|best)\s*viewers?/.test(msg) || msg.includes("streamboo")) {
 			reason = "buying viewers";
 		}
 		else {
