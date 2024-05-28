@@ -22,7 +22,7 @@ const getChannelLoggingInstances = async function () {
 			url: `https://${instance.url}/channels`,
 			throwHttpErrors: false,
 			timeout: {
-				request: 2500
+				request: 5000
 			}
 		});
 
