@@ -1,13 +1,13 @@
-const GptMessages = require("./gpt-messages.js");
+const GptOpenAI = require("./gpt-openai.js");
 const GptHistory = require("./history-control.js");
 
-module.exports = class GptDeepInfra extends GptMessages {
+module.exports = class GptDeepInfra extends GptOpenAI {
 	static formatQuery (query) {
 		return `[INST] ${query} [/INST]`;
 	}
 
 	static async getHistory (context) {
-		const { historyMode } = await GptMessages.getHistoryMode(context);
+		const { historyMode } = await GptOpenAI.getHistoryMode(context);
 		return (historyMode === "enabled")
 			? (await GptHistory.get(context.user) ?? [])
 			: [];

@@ -4,7 +4,7 @@ const GptHistory = require("./history-control.js");
 
 const partialInstructionRolloutChannels = [30, 37, 38];
 
-module.exports = class GptMessages extends Template {
+module.exports = class GptOpenAI extends Template {
 	static async getHistoryMode (context) {
 		let historyMode = await context.user.getDataProperty("chatGptHistoryMode") ?? Config.defaultHistoryMode;
 		if (context.params.history) {
@@ -18,7 +18,7 @@ module.exports = class GptMessages extends Template {
 	}
 
 	static async getHistory (context, query) {
-		const { historyMode } = await GptMessages.getHistoryMode(context);
+		const { historyMode } = await GptOpenAI.getHistoryMode(context);
 		const promptHistory = (historyMode === "enabled")
 			? (await GptHistory.get(context.user) ?? [])
 			: [];
@@ -49,7 +49,7 @@ module.exports = class GptMessages extends Template {
 	static async execute (context, query, modelData) {
 		let messages;
 		try {
-			messages = await GptMessages.getHistory(context, query);
+			messages = await GptOpenAI.getHistory(context, query);
 		}
 		catch (e) {
 			return {
@@ -63,7 +63,7 @@ module.exports = class GptMessages extends Template {
 		if (inputLimitCheck.success === false) {
 			await GptHistory.reset(context.user);
 
-			messages = await GptMessages.getHistory(context, query);
+			messages = await GptOpenAI.getHistory(context, query);
 			const messagesLength = messages.reduce((acc, cur) => acc + cur.content.length, 0);
 			const repeatInputLimitCheck = super.checkInputLimits(modelData, messagesLength);
 			if (repeatInputLimitCheck.success === false) {
@@ -114,7 +114,7 @@ module.exports = class GptMessages extends Template {
 	}
 
 	static async setHistory (context, query, reply) {
-		const { historyMode } = await GptMessages.getHistoryMode(context);
+		const { historyMode } = await GptOpenAI.getHistoryMode(context);
 		if (historyMode === "enabled") {
 			await GptHistory.add(context.user, query, reply);
 		}

@@ -4,14 +4,12 @@ const GptMetrics = require("./metrics.js");
 const GptModeration = require("./moderation.js");
 
 const GptTemplate = require("./gpt-template.js");
-const GptMessages = require("./gpt-messages.js");
-const GptString = require("./gpt-string.js");
+const GptOpenAI = require("./gpt-openai.js");
 const GptNexra = require("./gpt-nexra.js");
 const GptDeepInfra = require("./gpt-deepinfra.js");
 
 const handlerMap = {
-	messages: GptMessages,
-	string: GptString,
+	openai: GptOpenAI,
 	nexra: GptNexra,
 	deepinfra: GptDeepInfra
 };
@@ -297,7 +295,7 @@ module.exports = {
 			"",
 
 			"<h5>History</h5>",
-			"This command keeps the ChatGPT history for <b>messages</b> models, to allow for a conversation to happen.",
+			"This command keeps the ChatGPT history, to allow for a conversation to happen.",
 			"<b>String</b> models on the other hand, don't and can't support history.",
 			"Your history is kept for 10 minutes since your last request, or until you delete it yourself.",
 			"You can disable it, if you would like to preserve tokens or if you would prefer each prompt to be separate.",
