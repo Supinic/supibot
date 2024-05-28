@@ -1002,7 +1002,7 @@ module.exports = {
 					description: `Removes you as a possible target for the "$abb chatter" command.`,
 					pipe: true,
 					set: async (context) => {
-						const row = await sb.Query.getRow("chat_data", "User_Data_Property");
+						const row = await sb.Query.getRow("chat_data", "User_Alias_Data");
 						await row.load({
 							User_Alias: context.user.ID,
 							Property: "noAbbChatter"
@@ -1026,7 +1026,7 @@ module.exports = {
 						};
 					},
 					unset: async (context) => {
-						const row = await sb.Query.getRow("chat_data", "User_Data_Property");
+						const row = await sb.Query.getRow("chat_data", "User_Alias_Data");
 						await row.load({
 							User_Alias: context.user.ID,
 							Property: "noAbbChatter"
