@@ -3,6 +3,7 @@ import { CronJob } from "cron";
 import { definition as ActiveChattersLog } from "./active-chatters-log/index.mjs";
 import { definition as BotActivity } from "./bot-active/index.mjs";
 import { definition as BotRequestDenialManager } from "./bot-request-denial-manager/index.mjs";
+import { definition as BotScopeInfo } from "./bot-scopes-info/index.mjs";
 import { definition as ChangelogAnnouncer } from "./changelog-announcer/index.mjs";
 import { definition as TwitchSubscribersFetcher } from "./fetch-twitch-subscriber-list/index.mjs";
 import { definition as InactiveDiscordServersDetector } from "./inactive-discord-server-detector/index.mjs";
@@ -20,6 +21,7 @@ export const definitions = [
 	ActiveChattersLog,
 	BotActivity,
 	BotRequestDenialManager,
+	BotScopeInfo,
 	ChangelogAnnouncer,
 	TwitchSubscribersFetcher,
 	InactiveDiscordServersDetector,
