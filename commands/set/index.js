@@ -997,7 +997,7 @@ module.exports = {
 				},
 				{
 					name: "no-abb-chatter",
-					aliases: ["noAbbChatter"],
+					aliases: [],
 					parameter: "arguments",
 					description: `Removes you as a possible target for the "$abb chatter" command.`,
 					pipe: true,
