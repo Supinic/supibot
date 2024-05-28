@@ -17,7 +17,7 @@ const getChannelLoggingInstances = async function () {
 	}
 
 	const result = {};
-	for (const [instanceKey, instance] of Object.entries(instances)) {
+	const promises = Object.entries(instances).map(async ([instanceKey, instance]) => {
 		const response = await sb.Got("GenericAPI", {
 			url: `https://${instance.url}/channels`,
 			throwHttpErrors: false,
@@ -27,7 +27,7 @@ const getChannelLoggingInstances = async function () {
 		});
 
 		if (!response.ok) {
-			continue;
+			return;
 		}
 
 		const { channels } = response.body;
@@ -39,7 +39,9 @@ const getChannelLoggingInstances = async function () {
 				result[channel.userID] ??= instanceKey;
 			}
 		}
-	}
+	});
+
+	await Promise.allSettled(promises);
 
 	await sb.Cache.setByPrefix(instancesCacheKey, result, {
 		expiry: 3_600_000 // 1 hour
