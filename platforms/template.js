@@ -84,6 +84,22 @@ class Platform {
 		return `#${name}_private_messages`;
 	}
 
+	checkConfig () {
+		if (!this.#selfName) {
+			throw new sb.Error({
+				message: "Invalid Platform property: selfName",
+				args: { id: this.#id, name: this.#name, selfName: this.#selfName }
+			});
+		}
+
+		if (!Number.isInteger(this.#messageLimit) || this.#messageLimit <= 0) {
+			throw new sb.Error({
+				message: "Invalid Platform property: messageLimit",
+				args: { id: this.#id, name: this.#name, messageLimit: this.#messageLimit }
+			});
+		}
+	}
+
 	getFullName (separator = "-") {
 		if (this.#name === "irc") {
 			return [this.#name, this.#host].filter(Boolean).join(separator);

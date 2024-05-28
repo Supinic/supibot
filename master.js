@@ -189,6 +189,7 @@ require("./db-access.js");
 			continue;
 		}
 
+		platform.checkConfig();
 		promises.push(platform.connect());
 	}
 
