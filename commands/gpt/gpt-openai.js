@@ -39,11 +39,26 @@ module.exports = class GptOpenAI extends Template {
 			systemMessage = context.params.context;
 		}
 
-		return [
-			{ role: "system", content: systemMessage },
-			...promptHistory,
-			{ role: "user", content: query }
-		];
+		if (context.params.image) {
+			return [
+				{ role: "system", content: systemMessage },
+				...promptHistory,
+				{
+					role: "user",
+					content: [
+						{ type: "text", text: query },
+						{ type: "image_url", image_url: { url: context.params.image } }
+					]
+				}
+			];
+		}
+		else {
+			return [
+				{ role: "system", content: systemMessage },
+				...promptHistory,
+				{ role: "user", content: query }
+			];
+		}
 	}
 
 	static async execute (context, query, modelData) {
@@ -115,7 +130,14 @@ module.exports = class GptOpenAI extends Template {
 
 	static async setHistory (context, query, reply) {
 		const { historyMode } = await GptOpenAI.getHistoryMode(context);
-		if (historyMode === "enabled") {
+		if (historyMode !== "enabled") {
+			return;
+		}
+
+		if (context.params.image) {
+			await GptHistory.imageAdd(context.user, query, context.params.image, reply);
+		}
+		else {
 			await GptHistory.add(context.user, query, reply);
 		}
 	}

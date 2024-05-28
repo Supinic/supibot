@@ -26,8 +26,9 @@ module.exports = {
 	Params: [
 		{ name: "context", type: "string" },
 		{ name: "history", type: "string" },
-		{ name: "model", type: "string" },
+		{ name: "image", type: "string" },
 		{ name: "limit", type: "number" },
+		{ name: "model", type: "string" },
 		{ name: "temperature", type: "number" }
 	],
 	Whitelist_Response: "Currently only available in these channels for testing: @pajlada @Supinic @Supibot",
