@@ -994,6 +994,57 @@ module.exports = {
 							reply: `Successfully unset ${IDs.length} track(s) as your favourite.`
 						};
 					}
+				},
+				{
+					name: "no-abb-chatter",
+					aliases: [],
+					parameter: "arguments",
+					description: `Removes you as a possible target for the "$abb chatter" command.`,
+					pipe: true,
+					set: async (context) => {
+						const row = await sb.Query.getRow("chat_data", "User_Data_Property");
+						await row.load({
+							User_Alias: context.user.ID,
+							Property: "noAbbChatter"
+						}, true);
+
+						if (row.loaded) {
+							return {
+								success: false,
+								reply: `You are already exempt from the "$abb chatter" command!`
+							};
+						}
+
+						await row.setValues({
+							User_Alias: context.user.ID,
+							Property: "noAbbChatter",
+							Value: true
+						});
+
+						return {
+							reply: `You are now exempt from the "$abb chatter" command.`
+						};
+					},
+					unset: async (context) => {
+						const row = await sb.Query.getRow("chat_data", "User_Data_Property");
+						await row.load({
+							User_Alias: context.user.ID,
+							Property: "noAbbChatter"
+						}, true);
+
+						if (!row.loaded) {
+							return {
+								success: false,
+								reply: `You are not exempt from the "$abb chatter" command!`
+							};
+						}
+
+						await row.delete();
+
+						return {
+							reply: `You are no longer exempt from the "$abb chatter" command.`
+						};
+					}
 				}
 			]
 		};

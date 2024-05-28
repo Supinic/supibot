@@ -4,7 +4,7 @@ const getCooldownKey = (userData, channelData) => `${BASE_CACHE_KEY}-${userData.
 module.exports = {
 	name: "chatter",
 	aliases: [],
-	description: "Selects a random chatter within the channel, and outputs their name. Not applicable in PMs. Use the \"excludeSelf:true\" parameter to exclude yourself from the random chatter roll",
+	description: "Selects a random chatter within the channel, and outputs their name. Not applicable in PMs. Use the \"excludeSelf:true\" parameter to exclude yourself from the random chatter roll. If you want to not appear in the results, use the \"$set noAbbChatter\" command.",
 	examples: [
 		["$abb chatter", "(user)"], ["$abb chatter excludeSelf:true", "(someone who is not you)"]
 	],
@@ -31,19 +31,28 @@ module.exports = {
 			};
 		}
 
-		const users = await context.channel.fetchUserList();
-		const botIndex = users.findIndex(i => i.toLowerCase() === context.platform.Self_Name);
+		const eligibleUsernames = await context.channel.fetchUserList();
+		const botIndex = eligibleUsernames.findIndex(i => i.toLowerCase() === context.platform.Self_Name);
 		if (botIndex !== -1) {
-			users.splice(botIndex, 1);
+			eligibleUsernames.splice(botIndex, 1);
 		}
 
+		const exemptUsernames = await sb.Query.getRecordset(rs => rs
+			.select("User_Alias.Name AS Username")
+			.from("chat_data", "User_Alias_Data")
+			.join("chat_data", "User_Alias")
+			.where("Property = %s", "noAbbChatter")
+			.flat("Username")
+		);
+
+		const usernames = eligibleUsernames.filter(i => !exemptUsernames.includes(i));
 		if (context.params.excludeSelf) {
-			const index = users.findIndex(i => i.toLowerCase() === context.user.Name);
+			const index = usernames.findIndex(i => i.toLowerCase() === context.user.Name);
 			if (index !== -1) {
-				users.splice(index, 1);
+				usernames.splice(index, 1);
 			}
 
-			if (users.length === 0) {
+			if (usernames.length === 0) {
 				return {
 					success: false,
 					reply: `No users fetched! Platform provided me with no users, please try again later.`
@@ -52,7 +61,7 @@ module.exports = {
 		}
 
 		// "Mask" the outages in chatter-list APIs across platforms by "pretending" to roll the user executing the command.
-		if (users.length === 0) {
+		if (usernames.length === 0) {
 			return {
 				reply: context.user.Name
 			};
@@ -63,7 +72,7 @@ module.exports = {
 		});
 
 		return {
-			reply: sb.Utils.randArray(users)
+			reply: sb.Utils.randArray(usernames)
 		};
 	}
 };
