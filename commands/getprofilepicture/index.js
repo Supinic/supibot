@@ -13,7 +13,7 @@ module.exports = {
 	Static_Data: null,
 	Code: (async function profilePicture (context, username) {
 		const login = sb.User.normalizeUsername(username ?? context.user.Name);
-		const response = await sb.Got("Leppunen", {
+		const response = await sb.Got("IVR", {
 			url: "v2/twitch/user",
 			searchParams: {
 				login

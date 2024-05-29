@@ -1,5 +1,5 @@
 export const definition = {
-	name: "Leppunen",
+	name: "IVR",
 	optionsType: "object",
 	options: {
 		prefixUrl: "https://api.ivr.fi"

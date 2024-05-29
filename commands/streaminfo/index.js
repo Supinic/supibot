@@ -152,7 +152,7 @@ module.exports = {
 		}
 
 		if (!stream) {
-			const broadcasterResponse = await sb.Got("Leppunen", {
+			const broadcasterResponse = await sb.Got("IVR", {
 				url: "v2/twitch/user",
 				searchParams: {
 					id: channelID

@@ -71,7 +71,7 @@ module.exports = {
 		// Automated protection of the bot from being banned:
 		// Do not allow stalking of banned Twitch users in Twitch channels - available in Twitch whispers and other platforms.
 		if (targetUser.Twitch_ID && context.platform.Name === "twitch" && context.channel && stalkChannelData.Platform.Name === "twitch") {
-			const response = await sb.Got("Leppunen", {
+			const response = await sb.Got("IVR", {
 				url: "v2/twitch/user",
 				searchParams: {
 					id: targetUser.Twitch_ID

@@ -76,7 +76,7 @@ module.exports = {
 				}
 
 				if (!channelPrefix) {
-					const response = await sb.Got("Leppunen", {
+					const response = await sb.Got("IVR", {
 						url: "v2/twitch/user",
 						searchParams: {
 							login: channel

@@ -4,7 +4,7 @@ import { definition as GitHub } from "./github/index.mjs";
 import { definition as Global } from "./global/index.mjs";
 import { definition as Google } from "./google/index.mjs";
 import { definition as Helix } from "./helix/index.mjs";
-import { definition as Leppunen } from "./leppunen/index.mjs";
+import { definition as IVR } from "./ivr/index.mjs";
 import { definition as RaspberryPi4 } from "./raspberry-pi-4/index.mjs";
 import { definition as Supibot } from "./supibot/index.mjs";
 import { definition as Supinic } from "./supinic/index.mjs";
@@ -18,7 +18,7 @@ export const definitions = [
 	Global,
 	Google,
 	Helix,
-	Leppunen,
+	IVR,
 	RaspberryPi4,
 	Supibot,
 	Supinic,

@@ -1331,7 +1331,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			const {
 				statusCode,
 				body
-			} = await sb.Got("Leppunen", {
+			} = await sb.Got("IVR", {
 				url: "v2/twitch/emotes/sets",
 				searchParams: {
 					set_id: slice.join(",")

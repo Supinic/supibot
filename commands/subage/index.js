@@ -110,7 +110,7 @@ module.exports = {
 
 		const { relationship } = sub.data.targetUser;
 		if (!relationship.cumulativeTenure) {
-			const response = await sb.Got("Leppunen", {
+			const response = await sb.Got("IVR", {
 				url: "v2/twitch/user",
 				searchParams: {
 					login: channelName
