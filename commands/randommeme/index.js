@@ -1,9 +1,14 @@
-const redditGot = sb.Got.get("GenericAPI").extend({
-	prefixUrl: "https://www.reddit.com/r/",
-	headers: {
-		Cookie: "_options={%22pref_quarantine_optin%22:true,%22pref_gated_sr_optin%22:true};"
-	}
-});
+let redditGotInstance;
+const redditGot = () => {
+	redditGotInstance ??= sb.Got.get("GenericAPI").extend({
+		prefixUrl: "https://www.reddit.com/r/",
+		headers: {
+			Cookie: "_options={%22pref_quarantine_optin%22:true,%22pref_gated_sr_optin%22:true};"
+		}
+	});
+
+	return redditGotInstance;
+};
 
 module.exports = {
 	Name: "randommeme",
