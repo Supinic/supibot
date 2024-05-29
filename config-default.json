@@ -37,11 +37,9 @@
     "gots": {
       "disableAll": false,
       "blacklist": [
-        "Kraken",
         "RaspberryPi4",
         "Supinic",
-        "TwitchGQL",
-        "V5"
+        "TwitchGQL"
       ],
       "whitelist": []
     }

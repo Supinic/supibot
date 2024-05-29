@@ -48,7 +48,7 @@ module.exports = {
 		switch (type) {
 			case "bird":
 				extractor = (data) => data.fact;
-				gotPromise = sb.Got("SRA", "facts/bird");
+				gotPromise = sb.Got("GenericAPI", { url: "https://some-random-api.ml/facts/bird" });
 
 				break;
 
@@ -66,7 +66,7 @@ module.exports = {
 
 			case "fox":
 				extractor = (data) => data.fact;
-				gotPromise = sb.Got("SRA", "facts/fox");
+				gotPromise = sb.Got("GenericAPI", { url: "https://some-random-api.ml/facts/fox" });
 
 				break;
 		}

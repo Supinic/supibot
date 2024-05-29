@@ -1,3 +1,10 @@
+const speedrunGot = sb.Got.get("GenericAPI").extend({
+	prefixUrl: "https://www.speedrun.com/api/v1",
+	timeout: {
+		request: 30000
+	}
+});
+
 module.exports = {
 	Name: "speedrun",
 	Aliases: null,
@@ -33,7 +40,7 @@ module.exports = {
 			};
 		}
 
-		const { data: gameData } = await sb.Got("Speedrun", {
+		const { data: gameData } = await speedrunGot({
 			url: "games",
 			searchParams
 		}).json();
@@ -46,7 +53,7 @@ module.exports = {
 		}
 
 		const [game] = gameData;
-		const { data: categoryData } = await sb.Got("Speedrun", `games/${game.id}/categories`).json();
+		const { data: categoryData } = await speedrunGot(`games/${game.id}/categories`).json();
 		if (showCategories) {
 			return {
 				reply: `Available categories for ${game.names.international}: ${categoryData.map(i => i.name).join(", ")}.`
@@ -74,9 +81,10 @@ module.exports = {
 			};
 		}
 
-		const filtersData = await sb.Got("Speedrun", {
+		const filtersData = await speedrunGot({
 			url: `categories/${category.id}/variables`
 		}).json();
+
 		const defaultFilters = Object.fromEntries(
 			Object.values(filtersData.data).map(filter => {
 				if (filter.values.default) {
@@ -93,7 +101,7 @@ module.exports = {
 		}
 		else {
 			try {
-				const freshRunsData = await sb.Got("Speedrun", {
+				const freshRunsData = await speedrunGot({
 					url: `leaderboards/${game.id}/category/${category.id}`
 				}).json();
 
@@ -119,7 +127,7 @@ module.exports = {
 
 		let runner;
 		if (context.params.runner) {
-			const runnerData = await sb.Got("Speedrun", {
+			const runnerData = await speedrunGot({
 				url: "users",
 				searchParams: {
 					lookup: context.params.runner
@@ -170,7 +178,7 @@ module.exports = {
 
 		const [run] = runnerRuns;
 		if (!runner) {
-			const { statusCode, body: runnerData } = await sb.Got("Speedrun", {
+			const { statusCode, body: runnerData } = await speedrunGot({
 				url: `users/${run.players[0].id}`,
 				throwHttpErrors: false
 			});

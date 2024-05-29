@@ -3,6 +3,35 @@ const { searchYoutube } = require("../../utils/command-utils.js");
 
 let linkParser; // re-defined locally due to multiple blocks requiring this
 
+const fetchVimeoData = async (query) => {
+	const response = await sb.Got("GenericAPI", {
+		url: "https://api.vimeo.com/videos",
+		throwHttpErrors: false,
+		headers: {
+			Authorization: `Bearer ${sb.Config.get("VIMEO_API_KEY")}`
+		},
+		searchParams: {
+			query,
+			per_page: "1",
+			sort: "relevant",
+			direction: "desc"
+		}
+	});
+
+	if (!response.ok) {
+		return {
+			success: false,
+			reply: `Vimeo API failed with code ${response.statusCode}! Try again later.`
+		};
+	}
+	else {
+		return {
+			success: true,
+			data: response.body.data ?? []
+		};
+	}
+};
+
 module.exports = {
 	Name: "songrequest",
 	Aliases: ["sr"],
@@ -368,25 +397,12 @@ module.exports = {
 		if (!data) {
 			let lookup = null;
 			if (type === "vimeo") {
-				const { body, statusCode } = await sb.Got("Vimeo", {
-					url: "videos",
-					throwHttpErrors: false,
-					searchParams: {
-						query: args.join(" "),
-						per_page: "1",
-						sort: "relevant",
-						direction: "desc"
-					}
-				});
-
-				if (statusCode !== 200 || body.error) {
-					return {
-						success: false,
-						reply: `Vimeo API returned error ${statusCode}: ${body.error}`
-					};
+				const result = await fetchVimeoData(args.join(" "));
+				if (!result.success) {
+					return result;
 				}
-				else if (body.data.length > 0) {
-					const link = body.data[0].uri.split("/").pop();
+				else if (result.data.length > 0) {
+					const link = result.data[0].uri.split("/").pop();
 					lookup = { link };
 				}
 			}

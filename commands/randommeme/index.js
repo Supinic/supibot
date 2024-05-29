@@ -1,3 +1,10 @@
+const redditGot = sb.Got.get("GenericAPI").extend({
+	prefixUrl: "https://www.reddit.com/r/",
+	headers: {
+		Cookie: "_options={%22pref_quarantine_optin%22:true,%22pref_gated_sr_optin%22:true};"
+	}
+});
+
 module.exports = {
 	Name: "randommeme",
 	Aliases: ["rm"],
@@ -42,7 +49,7 @@ module.exports = {
 		/** @type {Subreddit} */
 		let forum = this.data.subreddits[subreddit];
 		if (!forum) {
-			const { body, statusCode } = await sb.Got("Reddit", `${subreddit}/about.json`);
+			const { body, statusCode } = await redditGot(`${subreddit}/about.json`);
 
 			if (statusCode !== 200 && statusCode !== 403 && statusCode !== 404) {
 				throw new sb.Error.GenericRequest({
@@ -80,7 +87,7 @@ module.exports = {
 		}
 
 		if (forum.posts.length === 0 || sb.Date.now() > forum.expiration) {
-			const { statusCode, body } = await sb.Got("Reddit", `${subreddit}/hot.json`);
+			const { statusCode, body } = await redditGot(`${subreddit}/hot.json`);
 			if (statusCode !== 200) {
 				throw new sb.Error.GenericRequest({
 					statusCode,
