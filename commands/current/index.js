@@ -1,3 +1,5 @@
+const ALLOWED_SONG_CHECKS = ["current", "previous", "next"];
+
 module.exports = {
 	Name: "current",
 	Aliases: ["song"],
@@ -9,9 +11,7 @@ module.exports = {
 		{ name: "linkOnly", type: "boolean" }
 	],
 	Whitelist_Response: "This command is only available in @Supinic channel on Twitch!",
-	Static_Data: (() => ({
-		types: ["current", "previous", "next"]
-	})),
+	Static_Data: null,
 	Code: (async function current (context, ...args) {
 		const linkSymbol = sb.Config.get("VIDEO_TYPE_REPLACE_PREFIX");
 		const state = sb.Config.get("SONG_REQUESTS_STATE");
@@ -78,7 +78,7 @@ module.exports = {
 			? "current"
 			: (args.shift() ?? "current");
 
-		if (!this.staticData.types.includes(type)) {
+		if (!ALLOWED_SONG_CHECKS.includes(type)) {
 			type = "current";
 		}
 

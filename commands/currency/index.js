@@ -1,3 +1,7 @@
+const SPECIAL_CURRENCY_ALIASES = {
+	RMB: "CNY"
+};
+
 module.exports = {
 	Name: "currency",
 	Aliases: ["money"],
@@ -7,11 +11,7 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		currencyAliases: {
-			RMB: "CNY"
-		}
-	})),
+	Static_Data: null,
 	Code: (async function currency (context, ...args) {
 		const query = args.join(" ");
 		if (!query) {
@@ -66,12 +66,11 @@ module.exports = {
 		first = first.toUpperCase();
 		second = second.toUpperCase();
 
-		const { currencyAliases } = this.staticData;
-		if (currencyAliases[first]) {
-			first = currencyAliases[first];
+		if (SPECIAL_CURRENCY_ALIASES[first]) {
+			first = SPECIAL_CURRENCY_ALIASES[first];
 		}
-		if (currencyAliases[second]) {
-			second = currencyAliases[second];
+		if (SPECIAL_CURRENCY_ALIASES[second]) {
+			second = SPECIAL_CURRENCY_ALIASES[second];
 		}
 
 		if (!symbolCheck.test(first) || !symbolCheck.test(second)) {

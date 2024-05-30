@@ -1,3 +1,5 @@
+const VIEWER_THRESHOLD = 100;
+
 module.exports = {
 	Name: "findraidstreams",
 	Aliases: ["frs"],
@@ -9,9 +11,7 @@ module.exports = {
 		{ name: "haste", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		viewerThreshold: 100
-	})),
+	Static_Data: null,
 	Code: (async function findRaidStreams (context) {
 		const channels = sb.Channel.getJoinableForPlatform("twitch")
 			.map(i => i.Specific_ID)
@@ -52,7 +52,7 @@ module.exports = {
 		}
 
 		const filteredRaidData = raidData
-			.filter(i => i.viewers < this.staticData.viewerThreshold)
+			.filter(i => i.viewers < VIEWER_THRESHOLD)
 			.sort((a, b) => b.viewers - a.viewers);
 
 		const data = JSON.stringify(filteredRaidData, null, 4);

@@ -31,9 +31,7 @@ module.exports = {
 		{ name: "importGist", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		customDataLimit: 1_000_000
-	})),
+	Static_Data: null,
 	Code: (async function dankDebug (context, ...args) {
 		let scriptArgs;
 		if (context.params.arguments) {
