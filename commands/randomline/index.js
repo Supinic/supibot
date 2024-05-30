@@ -1,3 +1,7 @@
+const DatabaseLogs = require("./db-randomline.js");
+const Rustlog = require("./rustlog.js");
+const { connectedChannelGroups } = require("./connected-channels.json");
+
 module.exports = {
 	Name: "randomline",
 	Aliases: ["rl","rq"],
@@ -9,14 +13,8 @@ module.exports = {
 		{ name: "textOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		optoutRerollThreshold: 5
-	})),
+	Static_Data: null,
 	Code: (async function randomLine (context, user) {
-		const DatabaseLogs = require("./db-randomline.js");
-		const Rustlog = require("./rustlog.js");
-		const { connectedChannelGroups } = require("./connected-channels.json");
-
 		if (context.channel === null) {
 			return {
 				reply: "This command cannot be used in private messages!"

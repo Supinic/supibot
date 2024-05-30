@@ -1,3 +1,11 @@
+const ANIMAL_TYPES = ["cat", "dog", "bird", "fox"];
+const INVOCATIONS_MAP = {
+	rbf: "bird",
+	rcf: "cat",
+	rdf: "dog",
+	rff: "fox"
+};
+
 module.exports = {
 	Name: "randomanimalpicture",
 	Aliases: ["rap","rbp","rcp","rdp","rfp"],
@@ -7,18 +15,9 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		types: ["cat", "dog", "bird", "fox"],
-		invocations: {
-			rbp: "bird",
-			rcp: "cat",
-			rdp: "dog",
-			rfp: "fox"
-		}
-	})),
+	Static_Data: null,
 	Code: (async function randomAnimalPicture (context, input) {
-		const { invocations, types } = this.staticData;
-		const type = invocations[context.invocation] ?? input?.toLowerCase() ?? null;
+		const type = INVOCATIONS_MAP[context.invocation] ?? input?.toLowerCase() ?? null;
 		const animalsData = await context.user.getDataProperty("animals");
 
 		if (!animalsData) {
@@ -28,12 +27,12 @@ module.exports = {
 		}
 		else if (type === null) {
 			return {
-				reply: `No type provided! Use one of: ${types.join(", ")}`
+				reply: `No type provided! Use one of: ${ANIMAL_TYPES.join(", ")}`
 			};
 		}
-		else if (!types.includes(type)) {
+		else if (!ANIMAL_TYPES.includes(type)) {
 			return {
-				reply: `That type is not supported! Use on of: ${types.join(", ")}`
+				reply: `That type is not supported! Use on of: ${ANIMAL_TYPES.join(", ")}`
 			};
 		}
 		else if (!animalsData[type]) {
@@ -67,10 +66,8 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { invocations, types } = this.staticData;
 		const list = [];
-
-		for (const [short, type] of Object.entries(invocations)) {
+		for (const [short, type] of Object.entries(INVOCATIONS_MAP)) {
 			list.push([
 				`<code>${prefix}${short}</code>`,
 				`Posts a random ${type} picture.`,
@@ -83,7 +80,7 @@ module.exports = {
 			`To verify, <code>${prefix}suggest</code> a picture of your animal and mention that you want to get verified.`,
 			"",
 
-			`<code>${prefix}randomanimalpicture ${types.join("/")}</code>`,
+			`<code>${prefix}randomanimalpicture ${ANIMAL_TYPES.join("/")}</code>`,
 			"Posts a random picture of a given animal",
 			"",
 
