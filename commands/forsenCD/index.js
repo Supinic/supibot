@@ -1,3 +1,8 @@
+const { tweets } = require("guy-beahm.json");
+
+const MAXIMUM_REPEATS = 5;
+const previousPosts = [];
+
 module.exports = {
 	Name: "forsenCD",
 	Aliases: ["pajaCD"],
@@ -7,17 +12,13 @@ module.exports = {
 	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		repeats: 5
-	})),
+	Static_Data: null,
 	Code: (async function forsenCD (context) {
-		this.data.previousPosts ??= [];
+		const eligibleTweets = tweets.filter(i => !previousPosts.includes(i));
+		const post = sb.Utils.randArray(eligibleTweets);
 
-		const { tweets } = require("./guy-beahm.json");
-		const post = sb.Utils.randArray(tweets.filter(i => !this.data.previousPosts.includes(i)));
-
-		this.data.previousPosts.unshift(post);
-		this.data.previousPosts.splice(this.staticData.repeats);
+		previousPosts.unshift(post);
+		previousPosts.splice(MAXIMUM_REPEATS);
 
 		return {
 			reply: `${post} ${context.invocation}`

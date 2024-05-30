@@ -1,3 +1,12 @@
+const createRelay = async (IDs) => await sb.Got("Supinic", {
+	method: "POST",
+	url: "relay",
+	throwHttpErrors: false,
+	json: {
+		url: `/data/origin/lookup?${IDs}`
+	}
+});
+
 module.exports = {
 	Name: "origin",
 	Aliases: null,
@@ -9,16 +18,7 @@ module.exports = {
 		{ name: "index", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		createRelay: async (IDs) => await sb.Got("Supinic", {
-			method: "POST",
-			url: "relay",
-			throwHttpErrors: false,
-			json: {
-				url: `/data/origin/lookup?${IDs}`
-			}
-		})
-	})),
+	Static_Data: null,
 	Code: (async function origin (context, emote) {
 		if (!emote) {
 			return {
@@ -64,7 +64,7 @@ module.exports = {
 			}
 			else {
 				const IDs = fallbackEmoteData.map(i => `ID=${i.ID}`).join("&");
-				const response = await this.staticData.createRelay(IDs);
+				const response = await createRelay(IDs);
 
 				if (response.statusCode !== 200) {
 					return {
@@ -84,7 +84,7 @@ module.exports = {
 		const implicitEmote = emoteData.find(i => i.Emote_ID === contextEmoteID);
 		if (emoteData.length > 1 && customIndex === null && !implicitEmote) {
 			const IDs = emoteData.map(i => `ID=${i.ID}`).join("&");
-			const response = await this.staticData.createRelay(IDs);
+			const response = await createRelay(IDs);
 
 			if (response.statusCode !== 200) {
 				return {

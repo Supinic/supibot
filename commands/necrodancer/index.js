@@ -1,4 +1,12 @@
 const { searchYoutube } = require("../../utils/command-utils.js");
+const { zones } = require("./game-data.json");
+
+const EXTRA_COOLDOWN = 600_000;
+const ZONE_COOLDOWN = 300_000;
+const createURL = (data) => {
+	const json = encodeURIComponent(JSON.stringify(data));
+	return `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}?necrodancer=${json}`;
+};
 
 module.exports = {
 	Name: "necrodancer",
@@ -11,17 +19,10 @@ module.exports = {
 		{ name: "zone", type: "string" }
 	],
 	Whitelist_Response: "Only available in supinic's channel!",
-	Static_Data: (command => {
-		command.data.cooldowns = {};
-		return {
-			extraCooldown: 600_000,
-			zoneCooldown: 300_000,
-			createURL: (data) => {
-				const json = encodeURIComponent(JSON.stringify(data));
-				return `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}?necrodancer=${json}`;
-			}
-		};
-	}),
+	Static_Data: null,
+	initialize: function () {
+		this.data.cooldowns = {};
+	},
 	Code: (async function necrodancer (context, ...args) {
 		if (!context.channel) {
 			return {
@@ -32,8 +33,6 @@ module.exports = {
 
 		const now = sb.Date.now();
 		const { invocation } = context;
-		const { zones } = require("./game-data.json");
-		const { createURL, extraCooldown, zoneCooldown } = this.staticData;
 		if (invocation === "ndr" || invocation === "necrodancerreset") {
 			const permissions = await context.getUserPermissions();
 			if (!permissions.is("administrator")) {
@@ -84,7 +83,7 @@ module.exports = {
 			for (const zoneName of zones) {
 				const cooldown = this.data.cooldowns[zoneName];
 
-				if (!cooldown || ((cooldown + extraCooldown) < now)) {
+				if (!cooldown || ((cooldown + EXTRA_COOLDOWN) < now)) {
 					zone = zoneName;
 				}
 			}
@@ -130,7 +129,7 @@ module.exports = {
 				reply: `The cooldown for zone ${zone} has not passed yet. Try again in ${delta}.`
 			};
 		}
-		this.data.cooldowns[zone] = now + zoneCooldown;
+		this.data.cooldowns[zone] = now + ZONE_COOLDOWN;
 		// be sure that the HTTP request is done after the cooldown to avoid a race condition
 
 		await context.channel.send("Download + beat mapping + saving started! Please wait...");
@@ -184,7 +183,6 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (prefix => {
-		const { zones } = require("./game-data.json");
 		return [
 			"Downloads, beatmaps and inserts a song from a link into the Crypt of the Necrodancer game.",
 			"",

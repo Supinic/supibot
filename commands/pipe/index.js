@@ -8,6 +8,20 @@ catch {
 
 const bannedCommandCombinations = config.modules.commands.bannedCombinations ?? [];
 
+// matches | and > characters if and only if they're not preceded, nor followed by another | or >.
+const PIPE_REGEX = /(?<![|>])[|>](?![|>])/;
+const NESTED_PIPE_LIMIT = 10;
+const RESULT_CHARACTER_LIMIT = 50_000;
+const ERROR_REASONS = {
+	block: "That user has blocked you from this command!",
+	cooldown: "Still on cooldown!",
+	filter: "You can't use this command here!",
+	"no-command": "Not a command!",
+	"opt-out": "That user has opted out from this command!",
+	pending: "Another command still being executed!",
+	"pipe-nsfw": "You cannot pipe NSFW results!"
+};
+
 module.exports = {
 	Name: "pipe",
 	Aliases: null,
@@ -22,21 +36,7 @@ module.exports = {
 		{ name: "_pos", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		// matches | and > characters if and only if they're not preceded, nor followed by another | or >.
-		pipeRegex: /(?<![|>])[|>](?![|>])/,
-		pipeLimit: 10,
-		resultCharacterLimit: 50_000,
-		reasons: {
-			block: "That user has blocked you from this command!",
-			cooldown: "Still on cooldown!",
-			filter: "You can't use this command here!",
-			"no-command": "Not a command!",
-			"opt-out": "That user has opted out from this command!",
-			pending: "Another command still being executed!",
-			"pipe-nsfw": "You cannot pipe NSFW results!"
-		}
-	})),
+	Static_Data: null,
 	Code: (async function pipe (context, ...args) {
 		let splitter;
 		if (context.params._char) {
@@ -48,7 +48,7 @@ module.exports = {
 			const aloneBracketCount = [...input.matchAll(/\s>\s/g)].length;
 
 			if (alonePipeCount === 0 && aloneBracketCount === 0) {
-				splitter = this.staticData.pipeRegex;
+				splitter = PIPE_REGEX;
 			}
 			else if (aloneBracketCount > alonePipeCount) {
 				splitter = /\s>\s/;
@@ -180,7 +180,7 @@ module.exports = {
 			}
 
 			const pipeCount = (context.append.pipeCount ?? 0) + 1;
-			if (pipeCount > this.staticData.pipeLimit) {
+			if (pipeCount > NESTED_PIPE_LIMIT) {
 				return {
 					success: false,
 					reply: sb.Utils.tag.trim `
@@ -236,7 +236,7 @@ module.exports = {
 							: "(no reply)";
 					}
 
-					const string = sb.Utils.wrapString(reply, this.staticData.resultCharacterLimit, {
+					const string = sb.Utils.wrapString(reply, RESULT_CHARACTER_LIMIT, {
 						keepWhitespace: true
 					});
 
@@ -256,7 +256,7 @@ module.exports = {
 					}
 				}
 				else {
-					const reply = this.staticData.reasons[result.reason] ?? result.reply ?? result.reason;
+					const reply = ERROR_REASONS[result.reason] ?? result.reply ?? result.reason;
 					return {
 						success: false,
 						replyWithPrivateMessage: privateMessageReply,
@@ -289,7 +289,7 @@ module.exports = {
 				};
 			}
 			else {
-				const string = sb.Utils.wrapString(result.reply, this.staticData.resultCharacterLimit, {
+				const string = sb.Utils.wrapString(result.reply, RESULT_CHARACTER_LIMIT, {
 					keepWhitespace: true
 				});
 

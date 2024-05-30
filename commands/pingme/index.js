@@ -1,3 +1,11 @@
+const ERROR_RESPONSES = {
+	"public-incoming": "That person has too many public reminders pending!",
+	"public-outgoing": "You have too many public reminders pending!",
+	"private-incoming": "That person has too many private reminders pending!",
+	"private-outgoing": "You have too many private reminders pending!",
+	"existing-pingme": "You already have a \"pingme\" reminder set up for that user!"
+};
+
 module.exports = {
 	Name: "pingme",
 	Aliases: ["letmeknow", "lmk"],
@@ -7,15 +15,7 @@ module.exports = {
 	Flags: ["block","mention","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		strings: {
-			"public-incoming": "That person has too many public reminders pending!",
-			"public-outgoing": "You have too many public reminders pending!",
-			"private-incoming": "That person has too many private reminders pending!",
-			"private-outgoing": "You have too many private reminders pending!",
-			"existing-pingme": "You already have a \"pingme\" reminder set up for that user!"
-		}
-	})),
+	Static_Data: null,
 	Code: (async function pingMe (context, user, ...args) {
 		if (!user) {
 			return {
@@ -64,7 +64,7 @@ module.exports = {
 		}
 		else {
 			return {
-				reply: `Could not set up a ping! ${this.staticData.strings[cause] ?? "(Unknown)"}`
+				reply: `Could not set up a ping! ${ERROR_RESPONSES[cause] ?? "(Unknown)"}`
 			};
 		}
 	}),

@@ -1,3 +1,8 @@
+const { lines } = require("./forsenE.json");
+
+const MAXIMUM_REPEATS = 5;
+const previousLines = [];
+
 module.exports = {
 	Name: "forsenE",
 	Aliases: null,
@@ -7,20 +12,16 @@ module.exports = {
 	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		repeats: 5
-	})),
-	Code: (async function forsenE () {
-		this.data.previousPosts ??= [];
+	Static_Data: null,
+	Code: (async function forsenE (context) {
+		const eligibleLines = lines.filter(i => previousLines.includes(i));
+		const line = sb.Utils.randArray(eligibleLines);
 
-		const { lines } = require("./forsenE.json");
-		const post = sb.Utils.randArray(lines.filter(i => !this.data.previousPosts.includes(i)));
-
-		this.data.previousPosts.unshift(post);
-		this.data.previousPosts.splice(this.staticData.repeats);
+		previousLines.unshift(line);
+		previousLines.splice(MAXIMUM_REPEATS);
 
 		return {
-			reply: `${post} forsenE`
+			reply: `${line} ${context.invocation}`
 		};
 	}),
 	Dynamic_Description: null
