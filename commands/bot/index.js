@@ -34,7 +34,6 @@ module.exports = {
 		{ name: "url", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function bot (context, command, value) {
 		const { params } = context;
 		if (!command) {

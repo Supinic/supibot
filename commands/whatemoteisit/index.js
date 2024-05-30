@@ -15,7 +15,6 @@ module.exports = {
 		{ name: "linkOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function whatEmoteIsIt (context, ...args) {
 		let input = args.join(" ");
 		if (!input) {

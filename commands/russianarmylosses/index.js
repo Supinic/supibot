@@ -9,7 +9,6 @@ module.exports = {
 	Flags: ["mention", "non-nullable", "pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function russianArmyLosses (context, ...args) {
 		const response = await sb.Got("GenericAPI", {
 			url: "https://russianwarship.rip/api/v1/statistics/latest"

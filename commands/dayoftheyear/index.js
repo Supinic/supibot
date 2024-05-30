@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function percent (context, ...args) {
 		if (!sb.Config.has("API_DAYS_OF_THE_YEAR", true)) {
 			return {

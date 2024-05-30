@@ -15,7 +15,6 @@ module.exports = {
 		{ name: "weather", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function formula1 (context, ...args) {
 		const {
 			fetchDriverStandings,

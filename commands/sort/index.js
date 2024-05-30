@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function sort (context, ...args) {
 		if (args.length < 2) {
 			return {

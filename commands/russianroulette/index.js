@@ -10,7 +10,6 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function russianRoulette (context, timeoutLength) {
 		if (context.channel === null) {
 			return {

@@ -11,7 +11,6 @@ module.exports = {
 		{ name: "emotesOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function botSubs (context) {
 		const { availableEmotes } = sb.Platform.get("twitch");
 		const subEmoteSets = availableEmotes

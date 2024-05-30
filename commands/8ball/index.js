@@ -30,7 +30,6 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function _8ball () {
 		return {
 			reply: sb.Utils.randArray(EIGHT_BALL_RESPONSES)

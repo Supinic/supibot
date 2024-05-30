@@ -17,7 +17,6 @@ module.exports = {
 		{ name: "textOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	initialize: async () => {
 		logTableExists = await sb.Query.isTablePresent("data", "Translate_Log");
 	},

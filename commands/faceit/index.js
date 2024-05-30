@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function faceit (context, subcommandName, ...args) {
 		const { names, commands } = require("./subcommands.js");
 		const subcommand = commands.find(i => i.name === subcommandName || i.aliases.includes(subcommandName));

@@ -11,7 +11,6 @@ module.exports = {
 		{ name: "linkOnly", type: "boolean" }
 	],
 	Whitelist_Response: "This command is only available in @Supinic channel on Twitch!",
-	Static_Data: null,
 	Code: (async function current (context, ...args) {
 		const linkSymbol = sb.Config.get("VIDEO_TYPE_REPLACE_PREFIX");
 		const state = sb.Config.get("SONG_REQUESTS_STATE");

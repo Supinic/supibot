@@ -11,7 +11,6 @@ module.exports = {
 		{ name: "lang", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function define (context, ...args) {
 		const query = args.join(" ");
 		if (!query) {

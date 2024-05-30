@@ -9,7 +9,6 @@ module.exports = {
 		{ name: "variant", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function bing (context, ...args) {
 		const query = args.join(" ");
 		if (!query) {

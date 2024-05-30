@@ -24,7 +24,6 @@ module.exports = {
 	Flags: ["external-input","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function alias (context, type, ...args) {
 		if (context.invocation === "$") {
 			args = [type, ...args]; // This the command name

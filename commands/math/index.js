@@ -10,7 +10,6 @@ module.exports = {
 		{ name: "precision", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function math (context, ...args) {
 		if (args.length === 0) {
 			return {

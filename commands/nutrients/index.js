@@ -11,7 +11,6 @@ module.exports = {
 		{ name: "specific", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function nutrients (context, ...args) {
 		if (args.length === 0) {
 			return {

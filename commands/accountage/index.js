@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function accountAge (context, user) {
 		const login = sb.User.normalizeUsername(user ?? context.user.Name).toLowerCase();
 		const { statusCode, body } = await sb.Got("Helix", {

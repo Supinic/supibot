@@ -12,7 +12,6 @@ module.exports = {
 		{ name: "syntax", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function randomPastebin (context, syntax) {
 		let data = await sb.Cache.getByPrefix("random-pastebin-paste-list");
 		if (!data) {

@@ -13,7 +13,6 @@ module.exports = {
 		{ name: "skipPrivateReminder", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	initialize: async function () {
 		const rssSubscriptions = require("./event-types/index.js").filter(i => i.generic);
 		const { handleGenericSubscription } = require("./generic-event.js");

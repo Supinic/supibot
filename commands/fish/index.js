@@ -15,7 +15,6 @@ module.exports = {
 		{ name: "skipStory", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function fish (context, ...args) {
 		const { subcommands } = require("./subcommands/index.js");
 		const [subcommandName, ...rest] = args;

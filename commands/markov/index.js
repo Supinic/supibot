@@ -54,7 +54,6 @@ module.exports = {
 		{ name: "words", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	initialize: function () {
 		const updateCronJob = new CronJob("0 * * * * *", () => updateMarkovWordList());
 

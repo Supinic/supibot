@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["block","mention","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function lastSeen (context, user) {
 		if (!user) {
 			const emote = await context.randomEmote("FeelsDankMan", "🙂");

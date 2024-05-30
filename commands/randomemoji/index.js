@@ -36,7 +36,6 @@ module.exports = {
 	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function randomEmoji (context, number = 1) {
 		let repeats = Number(number);
 		if (!sb.Utils.isValidInteger(repeats) || repeats > MAXIMUM_EMOJI_LIMIT) {

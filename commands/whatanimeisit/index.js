@@ -9,7 +9,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function whatAnimeIsIt (context, link) {
 		if (!link) {
 			return {

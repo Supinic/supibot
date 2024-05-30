@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["external-input","mention","non-nullable","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function schedule (context, channel) {
 		let channelName = null;
 		if (channel) {

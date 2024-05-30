@@ -13,7 +13,6 @@ module.exports = {
 		{ name: "wordOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function doesnotexist (context, type) {
 		if (!type) {
 			type = "person";

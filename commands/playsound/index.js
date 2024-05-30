@@ -14,7 +14,6 @@ module.exports = {
 	Flags: ["developer","mention","pipe","whitelist"],
 	Params: null,
 	Whitelist_Response: "You can't use the command here, but here's a list of supported playsounds: https://supinic.com/stream/playsound/list",
-	Static_Data: null,
 	initialize: function () {
 		if (!sb.Config.has("LOCAL_IP", true) || !sb.Config.has("LOCAL_PLAY_SOUNDS_PORT", true)) {
 			console.warn("$ps: Listener not configured - will be unavailable");

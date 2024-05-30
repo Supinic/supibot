@@ -36,7 +36,6 @@ module.exports = {
 		{ name: "_pos", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function pipe (context, ...args) {
 		let splitter;
 		if (context.params._char) {

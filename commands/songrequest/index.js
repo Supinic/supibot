@@ -87,7 +87,6 @@ module.exports = {
 		{ name: "type", type: "string" }
 	],
 	Whitelist_Response: "Only available in supinic's channel.",
-	Static_Data: null,
 	Code: (async function songRequest (context, ...args) {
 		if (args.length === 0) {
 			// If we got no args, just redirect to $current 4HEad

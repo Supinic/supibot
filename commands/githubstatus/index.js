@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["developer","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function githubStatus () {
 		const response = await sb.Got("GenericAPI", {
 			url: "https://www.githubstatus.com/history.json",

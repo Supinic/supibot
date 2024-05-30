@@ -19,7 +19,6 @@ module.exports = {
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function checkEm (context) {
 		let messageNumber;
 		if (context.platform.Name === "twitch") {

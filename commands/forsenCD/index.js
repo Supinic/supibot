@@ -12,7 +12,6 @@ module.exports = {
 	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function forsenCD (context) {
 		const eligibleTweets = tweets.filter(i => !previousPosts.includes(i));
 		const post = sb.Utils.randArray(eligibleTweets);

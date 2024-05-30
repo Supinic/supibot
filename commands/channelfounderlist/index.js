@@ -10,7 +10,6 @@ module.exports = {
 		{ name: "subStatus", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function channelFounderList (context, channelName) {
 		if (!channelName) {
 			if (context.platform.Name !== "twitch") {

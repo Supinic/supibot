@@ -10,7 +10,6 @@ module.exports = {
 	Flags: ["ping"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function supibotUpdate (context) {
 		if (context.platform.Name !== "discord") {
 			return {

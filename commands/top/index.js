@@ -9,7 +9,6 @@ module.exports = {
 		{ name: "currentOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function top (context, rawLimit) {
 		if (!context.channel) {
 			return {

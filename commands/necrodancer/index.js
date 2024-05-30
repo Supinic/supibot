@@ -19,7 +19,6 @@ module.exports = {
 		{ name: "zone", type: "string" }
 	],
 	Whitelist_Response: "Only available in supinic's channel!",
-	Static_Data: null,
 	initialize: function () {
 		this.data.cooldowns = {};
 	},

@@ -25,7 +25,6 @@ module.exports = {
 		{ name: "runner", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function speedrun (context, ...args) {
 		const showCategories = (context.params.showCategories === true);
 		const categoryName = context.params.category ?? null;

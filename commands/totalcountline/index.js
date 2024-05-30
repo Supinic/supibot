@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function totalCountLines (context, target) {
 		if (!target) {
 			target = context.user;

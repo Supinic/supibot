@@ -14,7 +14,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function randomAlbum () {
 		let data;
 		let retries = 0;

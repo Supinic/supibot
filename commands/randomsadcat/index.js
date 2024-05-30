@@ -12,7 +12,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function randomSadCat (context) {
 		const eligibleLinks = sadCats.filter(i => !previousPosts.includes(i));
 		const link = sb.Utils.randArray(eligibleLinks);

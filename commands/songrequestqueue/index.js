@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","pipe","whitelist"],
 	Params: null,
 	Whitelist_Response: "Only available in supinic's channel.",
-	Static_Data: null,
 	Code: (async function songRequestQueue (context) {
 		const state = sb.Config.get("SONG_REQUESTS_STATE");
 		if (state === "off") {

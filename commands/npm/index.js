@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["developer","mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function npm (context, ...args) {
 		if (args.length === 0) {
 			return {

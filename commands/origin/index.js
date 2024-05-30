@@ -18,7 +18,6 @@ module.exports = {
 		{ name: "index", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function origin (context, emote) {
 		if (!emote) {
 			return {

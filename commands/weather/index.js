@@ -41,7 +41,6 @@ module.exports = {
 		{ name: "radar", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function weather (context, ...args) {
 		let number = null;
 		let type = "current";

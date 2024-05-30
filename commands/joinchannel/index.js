@@ -10,7 +10,6 @@ module.exports = {
 		{ name: "silent", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function joinChannel (context, channel, mode) {
 		if (!channel.includes("#")) {
 			return {

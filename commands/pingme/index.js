@@ -15,7 +15,6 @@ module.exports = {
 	Flags: ["block","mention","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function pingMe (context, user, ...args) {
 		if (!user) {
 			return {

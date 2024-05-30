@@ -11,7 +11,6 @@ module.exports = {
 	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function afk (context, ...args) {
 		if (context.privateMessage && sb.AwayFromKeyboard.get(context.user)) {
 			return {

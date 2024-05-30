@@ -11,7 +11,6 @@ module.exports = {
 		{ name: "from", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function set (context, type, ...args) {
 		if (!type) {
 			return {

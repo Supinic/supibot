@@ -26,7 +26,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function copypasta () {
 		let copypasta;
 		for (let repeats = 0; repeats < MAXIMUM_REPEATS; repeats++) {

@@ -20,7 +20,6 @@ module.exports = {
 		{ name: "speed", type: "number" }
 	],
 	Whitelist_Response: "Check out the possible voices and locales here: https://supinic.com/stream/tts",
-	Static_Data: null,
 	initialize: function () {
 		if (!sb.Config.has("LOCAL_IP", true) || !sb.Config.has("LOCAL_PLAY_SOUNDS_PORT", true)) {
 			console.warn("$tts: Listener not configured - will be unavailable");

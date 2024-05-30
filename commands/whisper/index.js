@@ -7,7 +7,6 @@ module.exports = {
 	Flags: [],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function whisper (context, ...args) {
 		if (!context.append.pipe) {
 			return {

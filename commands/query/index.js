@@ -11,7 +11,6 @@ module.exports = {
 		{ name: "imageSummary", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function query (context, ...args) {
 		if (args.length === 0) {
 			return {

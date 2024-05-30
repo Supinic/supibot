@@ -9,7 +9,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function funFact () {
 		const { year } = new sb.Date();
 		const randomDate = new sb.Date(

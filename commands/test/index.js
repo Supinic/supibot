@@ -14,7 +14,6 @@ module.exports = {
 		{ name: "string", type: "string" }
 	],
 	Whitelist_Response: "For debugging purposes only :)",
-	Static_Data: null,
 	Code: (async function test (context) {
 		return {
 			reply: `param: ${context.params.string ?? "(none)"}`

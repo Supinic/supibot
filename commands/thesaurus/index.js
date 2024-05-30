@@ -11,7 +11,6 @@ module.exports = {
 		{ name: "singleWord", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function thesaurus (context, ...words) {
 		if (words.length === 0) {
 			return {

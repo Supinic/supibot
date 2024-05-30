@@ -19,7 +19,6 @@ module.exports = {
 		{ name: "host", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function commitCount (context, username) {
 		const type = (context.params.type ?? DEFAULT_HOST_TYPE).toLowerCase();
 		if (!Object.keys(allowedHosts).includes(type)) {

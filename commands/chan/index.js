@@ -18,7 +18,6 @@ module.exports = {
 		{ name: "textOnly", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function chan (context, identifier, ...rest) {
 		if (!identifier) {
 			return {

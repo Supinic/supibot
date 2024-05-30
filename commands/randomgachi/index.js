@@ -23,7 +23,6 @@ module.exports = {
 		{ name: "type", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function randomGachi (context) {
 		const prefixRow = await sb.Query.getRow("data", "Video_Type");
 		await prefixRow.load(1);

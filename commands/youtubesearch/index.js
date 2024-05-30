@@ -26,7 +26,6 @@ module.exports = {
 		{ name: "linkOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function youtubeSearch (context, ...args) {
 		const query = args.join(" ");
 

@@ -11,7 +11,6 @@ module.exports = {
 		{ name: "search", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Dynamic_Description: (async (prefix) => [
 		"Creates a DALL-E AI generated image, based on your prompt.",
 		"Alternatively, searches for an existing prompt someone else has created.",

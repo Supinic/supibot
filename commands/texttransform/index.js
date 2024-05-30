@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["external-input","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function textTransform (context, name, ...args) {
 		if (!name) {
 			return {

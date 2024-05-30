@@ -10,7 +10,6 @@ module.exports = {
 		{ name: "textOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function firstLine (context, user) {
 		const { channel } = context.params;
 		if (!context.channel && !channel) {

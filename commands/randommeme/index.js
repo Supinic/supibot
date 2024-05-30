@@ -27,7 +27,6 @@ module.exports = {
 		{ name: "skipVideos", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function randomMeme (context, ...args) {
 		const config = require("./config.json");
 		const Subreddit = require("./subreddit.js");

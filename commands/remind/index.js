@@ -25,7 +25,6 @@ module.exports = {
 		{ name: "private", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function remind (context, ...args) {
 		const chronoParams = Object.keys(context.params).filter(i => i !== "private");
 		if (chronoParams.length >= 2) {

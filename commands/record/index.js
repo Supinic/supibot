@@ -21,7 +21,6 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function record (context, type, target) {
 		if (!type) {
 			return {

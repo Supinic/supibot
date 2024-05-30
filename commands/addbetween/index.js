@@ -9,7 +9,6 @@ module.exports = {
 		{ name: "sentences", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function addBetween (context, word, ...args) {
 		if (!word || args.length === 0) {
 			return {

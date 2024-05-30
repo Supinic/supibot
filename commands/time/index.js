@@ -64,7 +64,6 @@ module.exports = {
 	Flags: ["block","mention","non-nullable","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function time (context, ...args) {
 		const zone = await detectTimezone(...args);
 		if (zone) {

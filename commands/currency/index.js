@@ -11,7 +11,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function currency (context, ...args) {
 		const query = args.join(" ");
 		if (!query) {

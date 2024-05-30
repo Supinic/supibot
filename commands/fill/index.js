@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function fill (context, ...words) {
 		if (words.length === 0) {
 			return {

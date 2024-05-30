@@ -27,7 +27,6 @@ module.exports = {
 		{ name: "user", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function ban (context) {
 		const { invocation } = context;
 		const type = sb.Utils.capitalize(context.params.type ?? "Blacklist");

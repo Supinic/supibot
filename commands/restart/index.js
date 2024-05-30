@@ -18,7 +18,6 @@ module.exports = {
 	Flags: ["system","whitelist"],
 	Params: null,
 	Whitelist_Response: "Only available to administrators or helpers!",
-	Static_Data: null,
 	Code: async function restart (context, ...types) {
 		const { promisify } = require("node:util");
 		const shell = promisify(require("node:child_process").exec);

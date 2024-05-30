@@ -19,7 +19,6 @@ module.exports = {
 	Flags: ["mention"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: async function subAge (context, user, channel) {
 		const platform = sb.Platform.get("twitch");
 		const userID = await platform.getUserID(user ?? context.user.Name);

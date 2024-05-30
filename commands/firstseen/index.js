@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["block","mention","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function firstSeen (context, user) {
 		const userData = (user) ? await sb.User.get(user) : context.user;
 		if (!userData) {

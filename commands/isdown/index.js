@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function isDown (context, input) {
 		const { domainToASCII } = require("node:url");
 		const fixedInput = domainToASCII(input) || input; // domainToASCII returns empty string for invalid input - hence ||

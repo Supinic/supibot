@@ -15,7 +15,6 @@ module.exports = {
 		{ name: "platform", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function optOut (context, ...args) {
 		let filter;
 		let filterData;

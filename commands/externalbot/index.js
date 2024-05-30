@@ -10,7 +10,6 @@ module.exports = {
 	Flags: ["external-input","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	initialize: async () => {
 		prefixes = await sb.Query.getRecordset(rs => rs
 			.select("Bot_Alias AS ID", "Prefix as prefix")

@@ -16,7 +16,6 @@ module.exports = {
 		{ name: "lang", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function ocr (context, ...args) {
 		let languageCode = "eng";
 		if (context.params.lang) {

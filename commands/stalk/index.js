@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["block","external-input","mention","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function stalk (context, user) {
 		if (!user) {
 			const emote = await context.getBestAvailableEmote(["forsen1"], "👀");

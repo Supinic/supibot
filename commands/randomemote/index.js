@@ -23,7 +23,6 @@ module.exports = {
 		{ name: "zeroWidth", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function randomEmote (context, number = 1) {
 		const repeats = Number(number);
 

@@ -32,7 +32,6 @@ module.exports = {
 		{ name: "temperature", type: "number" }
 	],
 	Whitelist_Response: "Currently only available in these channels for testing: @pajlada @Supinic @Supibot",
-	Static_Data: null,
 	initialize: async function () {
 		isLogTablePresent = await sb.Query.isTablePresent("data", "ChatGPT_Log");
 	},

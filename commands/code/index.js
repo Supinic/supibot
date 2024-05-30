@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["developer","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function code (context, commandString) {
 		if (!commandString) {
 			return {

@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function countLineTotal (context) {
 		const [response, chatLineAmount] = await Promise.all([
 			sb.Got("RaspberryPi4", { url: "ssd/size" }),

@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["external-input","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function discord (context) {
 		if (context.privateMessage) {
 			return {

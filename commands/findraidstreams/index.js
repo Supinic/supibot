@@ -11,7 +11,6 @@ module.exports = {
 		{ name: "haste", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function findRaidStreams (context) {
 		const channels = sb.Channel.getJoinableForPlatform("twitch")
 			.map(i => i.Specific_ID)

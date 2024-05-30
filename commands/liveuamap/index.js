@@ -14,7 +14,6 @@ module.exports = {
 		{ name: "lang", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function liveUaMap (context) {
 		const inputLanguage = context.params.lang ?? "en";
 		const languageCode = LanguageCodes.getCode(inputLanguage); // @todo fix so that params.lang is of type `language`

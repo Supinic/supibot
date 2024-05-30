@@ -14,7 +14,6 @@ module.exports = {
 		{ name: "startsWith", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function randomWord (context, number = 1) {
 		let repeats = Number(number);
 		if (!sb.Utils.isValidInteger(repeats) || repeats > MAXIMUM_WORD_AMOUNT) {

@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["developer","mention","pipe","whitelist"],
 	Params: null,
 	Whitelist_Response: "Only available for people who know what they're doing Kappa",
-	Static_Data: null,
 	Code: (async function trackReload (extra, existingID, reuploadLink) {
 		existingID = Number(existingID);
 

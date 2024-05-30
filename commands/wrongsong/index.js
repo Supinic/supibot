@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["developer","mention","pipe","whitelist"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function wrongSong (context, target) {
 		let targetID;
 		if (target) {

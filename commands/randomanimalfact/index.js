@@ -15,7 +15,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function randomAnimalFact (context, input) {
 		const type = INVOCATIONS_MAP[context.invocation] ?? input?.toLowerCase() ?? null;
 		const animalsData = await context.user.getDataProperty("animals");

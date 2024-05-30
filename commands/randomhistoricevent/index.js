@@ -11,7 +11,6 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function randomHistoricEvent (context, ...args) {
 		const date = (args.length > 0)
 			? new sb.Date(args.join(" "))

@@ -14,7 +14,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function teamFortress2 (context, subcommand, ...args) {
 		if (!subcommand) {
 			return {

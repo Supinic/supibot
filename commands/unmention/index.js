@@ -9,7 +9,6 @@ module.exports = {
 	Flags: ["mention"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function unmention (context, ...args) {
 		let filter;
 		let filterData;

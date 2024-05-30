@@ -14,7 +14,6 @@ module.exports = {
 		{ name: "preferUnscored", type: "boolean" }
 	],
 	Whitelist_Response: "This command can't be executed here!",
-	Static_Data: null,
 	Code: (async function twitchLotto (context, channel) {
 		const definitions = require("./definitions.js");
 		const checkSafety = require("./safety-check.js");

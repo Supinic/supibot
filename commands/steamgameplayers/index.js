@@ -46,7 +46,6 @@ module.exports = {
 		{ name: "gameID", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	initialize: function () {
 		this.data.updateCronJob = new CronJob("0 0 * * * *", () => fetchGamesData());
 		this.data.updateCronJob.start();

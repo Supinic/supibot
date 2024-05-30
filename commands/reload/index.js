@@ -11,7 +11,6 @@ module.exports = {
 		{ name: "skipUpgrade", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function reload (context, command, ...rest) {
 		const item = types.find(i => i.names.includes(command));
 		if (!item) {
