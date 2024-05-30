@@ -182,24 +182,22 @@ module.exports = {
 			};
 		}
 	}),
-	Dynamic_Description: (prefix => {
-		return [
-			"Downloads, beatmaps and inserts a song from a link into the Crypt of the Necrodancer game.",
-			"",
+	Dynamic_Description: ((prefix) => [
+		"Downloads, beatmaps and inserts a song from a link into the Crypt of the Necrodancer game.",
+		"",
 
-			`<code>${prefix}necrodancer (link)</code>`,
-			"From a given link, extracts the song, beatmaps it automatically and inserts it as the song to play ingame.",
-			"If you do not pass the zone (see below), the first free game zone will be used, based on a cooldown system.",
-			"",
+		`<code>${prefix}necrodancer (link)</code>`,
+		"From a given link, extracts the song, beatmaps it automatically and inserts it as the song to play ingame.",
+		"If you do not pass the zone (see below), the first free game zone will be used, based on a cooldown system.",
+		"",
 
-			`<code>${prefix}necrodancer (link) <u>zone:(zone)</u></code>`,
-			`<code>${prefix}necrodancer (link) <u>zone:1-1</u></code>`,
-			`<code>${prefix}necrodancer (link) <u>zone:coral</u></code>`,
-			"Like above, but uses a specific game zone from the list below.",
-			"",
+		`<code>${prefix}necrodancer (link) <u>zone:(zone)</u></code>`,
+		`<code>${prefix}necrodancer (link) <u>zone:1-1</u></code>`,
+		`<code>${prefix}necrodancer (link) <u>zone:coral</u></code>`,
+		"Like above, but uses a specific game zone from the list below.",
+		"",
 
-			"Zone list:",
-			`<ul>${zones.map(i => `<li><code>${i}</code></li>`).join("")}</ul>`
-		];
-	})
+		"Zone list:",
+		`<ul>${zones.map(i => `<li><code>${i}</code></li>`).join("")}</ul>`
+	])
 };
