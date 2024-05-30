@@ -1,6 +1,29 @@
 const promisify = require("node:util").promisify;
 const exec = promisify(require("node:child_process").exec);
 
+const { codes } = require("./codes.json");
+const { getIcon, getWindDirection } = require("./helpers.js");
+
+const ALLOWED_FORMAT_TYPES = [
+	"cloudCover",
+	"humidity",
+	"icon",
+	"place",
+	"precipitation",
+	"pressure",
+	"sun",
+	"temperature",
+	"windGusts",
+	"windSpeed"
+];
+const POLLUTION_INDEX_ICONS = {
+	1: "🔵",
+	2: "🟢",
+	3: "🟡",
+	4: "🟠",
+	5: "🔴"
+};
+
 module.exports = {
 	Name: "weather",
 	Aliases: null,
@@ -18,80 +41,7 @@ module.exports = {
 		{ name: "radar", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		allowedTypes: ["cloudCover", "humidity", "icon", "place", "precipitation", "pressure", "sun", "temperature", "windGusts", "windSpeed"],
-		getIcon: (code, current) => {
-			const type = Math.trunc(code / 100);
-			const remainder = code % 100;
-
-			if (type === 2) {
-				return "⛈️";
-			}
-			else if (type === 3) {
-				return "🌧️";
-			}
-			else if (type === 5) {
-				return "🌧️";
-			}
-			else if (type === 6) {
-				return "🌨️";
-			}
-			else if (type === 7) {
-				if (remainder === 1 || remainder === 21 || remainder === 41) {
-					return "🌫️";
-				}
-				else if (remainder === 11) {
-					return "🔥💨";
-				}
-				else if (remainder === 31 || remainder === 51 || remainder === 61) {
-					return "🏜️💨";
-				}
-				else if (remainder === 62) {
-					return "🌋💨";
-				}
-				else if (remainder === 71 || remainder === 81) {
-					return "🌪️";
-				}
-			}
-			else if (type === 8) {
-				if (remainder === 0) {
-					return (current?.uvi === 0) ? "🌙" : "☀️";
-				}
-				else if (remainder === 1) {
-					return "🌤️";
-				}
-				else if (remainder === 2) {
-					return "🌥️";
-				}
-				else {
-					return "️☁️";
-				}
-			}
-
-			return "";
-		},
-		getWindDirection: (degrees) => {
-			degrees %= 360;
-
-			const base = 11.25;
-			const interval = 22.5;
-			if (degrees < base || degrees >= (360 - base)) {
-				return "N";
-			}
-
-			const directions = ["NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
-			const index = Math.trunc((degrees - base) / interval);
-
-			return directions[index];
-		},
-		pollutionIndexIcons: {
-			1: "🔵",
-			2: "🟢",
-			3: "🟡",
-			4: "🟠",
-			5: "🔴"
-		}
-	})),
+	Static_Data: null,
 	Code: (async function weather (context, ...args) {
 		let number = null;
 		let type = "current";
@@ -340,9 +290,7 @@ module.exports = {
 			const index = data.main.aqi;
 			const { components } = data;
 			const place = (skipLocation) ? "(location hidden)" : formattedAddress;
-
-			const { pollutionIndexIcons } = this.staticData;
-			const icon = pollutionIndexIcons[index];
+			const icon = POLLUTION_INDEX_ICONS[index];
 
 			const componentsString = Object.entries(components)
 				.map(([type, value]) => `${type.toUpperCase().replace("_", ".")}: ${value.toFixed(3)}`)
@@ -509,9 +457,6 @@ module.exports = {
 				reply: `Cannot get any weather data! Please let @Supinic know about this via the $suggest command.`
 			};
 		}
-
-		const { getIcon, getWindDirection } = this.staticData;
-		const { codes } = require("./weather-codes.json");
 
 		const icon = (context.params.status === "text")
 			? codes[target.weather[0].id]
@@ -729,8 +674,6 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { allowedTypes } = this.staticData;
-
 		return [
 			"Checks for current weather, or for hourly/daily forecast in a given location.",
 			"If you, or a given user have set their location with the <code>set</code> command, this command supports that.",
@@ -768,7 +711,7 @@ module.exports = {
 			`<code>${prefix}weather (place) format:temperature</code>`,
 			`<code>${prefix}weather (place) format:temperature,humidity,pressure</code>`,
 			"Lets you choose specific weather elements to show in the result.",
-			`Supported elements: <code>${allowedTypes.join(", ")}</code>`,
+			`Supported elements: <code>${ALLOWED_FORMAT_TYPES.join(", ")}</code>`,
 			"",
 
 			`<code>${prefix}weather latitude:(number) longitude:(number)</code>`,
