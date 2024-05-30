@@ -1,4 +1,4 @@
-const subcommands = require("./subcommands");
+const { subcommands } = require("./subcommands");
 const subcommandNames = subcommands.map(i => i.name);
 
 module.exports = {

@@ -1,4 +1,4 @@
-const { tweets } = require("guy-beahm.json");
+const { tweets } = require("./guy-beahm.json");
 
 const MAXIMUM_REPEATS = 5;
 const previousPosts = [];

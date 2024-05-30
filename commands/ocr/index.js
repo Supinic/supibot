@@ -1,7 +1,7 @@
 const LanguageCodes = require("language-iso-codes");
 
 const OCR_LANGUAGES = require("./languages.json");
-const OCR_LANGUAGE_NAMES = OCR_LANGUAGES.map(i => LanguageCodes.getName(i));
+const OCR_LANGUAGE_NAMES = Object.keys(OCR_LANGUAGES).map(i => LanguageCodes.getName(i));
 
 module.exports = {
 	Name: "ocr",
