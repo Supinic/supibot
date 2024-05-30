@@ -1,7 +1,9 @@
 const { getLinkParser } = require("../../utils/link-parser.js");
 const { searchYoutube } = require("../../utils/command-utils.js");
+const CytubeIntegration = require("./cytube-integration.js");
 
-let linkParser; // re-defined locally due to multiple blocks requiring this
+const REQUEST_TIME_LIMIT = 900;
+const REQUEST_AMOUNT_LIMIT = 10;
 
 const fetchVimeoData = async (query) => {
 	const response = await sb.Got("GenericAPI", {
@@ -32,6 +34,46 @@ const fetchVimeoData = async (query) => {
 	}
 };
 
+const checkLimits = (userData, playlist) => {
+	const userRequests = playlist.filter(i => i.User_Alias === userData.ID);
+	if (userRequests.length >= REQUEST_AMOUNT_LIMIT) {
+		return {
+			canRequest: false,
+			reason: `Maximum amount of videos queued! (${userRequests.length}/${REQUEST_AMOUNT_LIMIT})`
+		};
+	}
+
+	let totalTime = 0;
+	for (const request of userRequests) {
+		totalTime += (request.End_Time ?? request.Length) - (request.Start_Time ?? 0);
+	}
+
+	totalTime = Math.ceil(totalTime);
+
+	return {
+		canRequest: true,
+		totalTime,
+		requests: userRequests.length,
+		reason: null,
+		time: REQUEST_TIME_LIMIT,
+		amount: REQUEST_AMOUNT_LIMIT
+	};
+};
+
+const parseTimestamp = (linkParser, string) => {
+	const type = linkParser.autoRecognize(string);
+	if (type === "youtube" && string.includes("t=")) {
+		const { parse } = require("node:url");
+		let { query } = parse(string);
+
+		if (/t=\d+/.test(query)) {
+			query = query.replace(/(t=\d+\b)/, "$1sec");
+		}
+
+		return sb.Utils.parseDuration(query, { target: "sec" });
+	}
+};
+
 module.exports = {
 	Name: "songrequest",
 	Aliases: ["sr"],
@@ -45,171 +87,7 @@ module.exports = {
 		{ name: "type", type: "string" }
 	],
 	Whitelist_Response: "Only available in supinic's channel.",
-	Static_Data: (() => { // @todo refactor out staticData into either helper functions or submodules
-		linkParser = getLinkParser();
-
-		const limits = {
-			time: 900,
-			amount: 10
-		};
-
-		return {
-			limits,
-			blacklist: {
-				sites: [
-					"grabify.link",
-					"leancoding.co",
-					"stopify.co",
-					"freegiftcards.co",
-					"joinmy.site",
-					"curiouscat.club",
-					"catsnthings.fun",
-					"catsnthing.com",
-					"iplogger.org",
-					"2no.co",
-					"iplogger.com",
-					"iplogger.ru",
-					"yip.su",
-					"iplogger.co",
-					"iplogger.info",
-					"ipgrabber.ru",
-					"ipgraber.ru",
-					"iplis.ru",
-					"02ip.ru",
-					"ezstat.ru"
-				],
-				tracks: [
-					"LVCIU5x_zIk"
-				],
-				authors: [
-					"UCeM9xfry6R09FxPZgRV1XcA"
-				]
-			},
-
-			cytubeIntegration: {
-				limits: {
-					total: 5,
-					time: 600
-				},
-
-				queue: async function (link) {
-					const properLink = linkParser.autoRecognize(link);
-					if (!properLink) {
-						const [bestResult] = await searchYoutube(
-							link.replace(/-/g, ""),
-							sb.Config.get("API_GOOGLE_YOUTUBE")
-						);
-
-						if (!bestResult) {
-							return {
-								success: false,
-								reply: `No video has been found!`
-							};
-						}
-
-						link = `https://youtu.be/${bestResult.ID}`;
-					}
-
-					const linkData = await linkParser.fetchData(link);
-					if (!linkData) {
-						return {
-							success: false,
-							reply: "Link not found!"
-						};
-					}
-					else if (linkData.duration > this.limits.time) {
-						return {
-							success: false,
-							reply: `Video too long! ${linkData.duration}sec / ${this.limits.time}sec`
-						};
-					}
-
-
-					const platform = sb.Platform.get("cytube");
-					const channelData = sb.Channel.get(49);
-					const client = platform.clients.get(channelData.ID);
-
-					const playlist = [
-						client.currentlyPlaying,
-						...client.playlistData
-					].filter(i => i && i.queueby?.toLowerCase() === platform.selfName);
-
-					if (playlist.length > this.limits.total) {
-						return {
-							success: false,
-							reply: "Too many videos queued from outside Cytube!"
-						};
-					}
-
-					const cytubeType = await sb.Query.getRecordset(rs => rs
-						.select("Type")
-						.from("data", "Video_Type")
-						.where("Parser_Name = %s", linkData.type)
-						.limit(1)
-						.single()
-						.flat("Type")
-					);
-					if (!cytubeType) {
-						return {
-							success: false,
-							reply: "Link cannot be played on Cytube!"
-						};
-					}
-
-					client.queue(cytubeType, linkData.ID);
-					return {
-						reply: `Video ${linkData.link} "${linkData.name}" added to Cytube successfully.`
-					};
-				}
-			},
-
-			checkLimits: (userData, playlist) => {
-				const userRequests = playlist.filter(i => i.User_Alias === userData.ID);
-				if (userRequests.length >= limits.amount) {
-					return {
-						canRequest: false,
-						reason: `Maximum amount of videos queued! (${userRequests.length}/${limits.amount})`
-					};
-				}
-
-				let totalTime = 0;
-				for (const request of userRequests) {
-					totalTime += (request.End_Time ?? request.Length) - (request.Start_Time ?? 0);
-				}
-
-				totalTime = Math.ceil(totalTime);
-				// if (totalTime >= limits.time) {
-				// 	return {
-				// 		canRequest: false,
-				// 		reason: `Maximum video time exceeded! (${totalTime}/${limits.time} seconds)`
-				// 	};
-				// }
-
-				return {
-					canRequest: true,
-					totalTime,
-					requests: userRequests.length,
-					reason: null,
-					time: limits.time,
-					amount: limits.amount
-				};
-			},
-
-			parseTimestamp: (string) => {
-				const type = linkParser.autoRecognize(string);
-				if (type === "youtube" && string.includes("t=")) {
-					const { parse } = require("node:url");
-					let { query } = parse(string);
-
-					if (/t=\d+/.test(query)) {
-						query = query.replace(/(t=\d+\b)/, "$1sec");
-					}
-
-					return sb.Utils.parseDuration(query, { target: "sec" });
-				}
-			}
-		};
-	}),
+	Static_Data: null,
 	Code: (async function songRequest (context, ...args) {
 		if (args.length === 0) {
 			// If we got no args, just redirect to $current 4HEad
@@ -236,12 +114,12 @@ module.exports = {
 				};
 			}
 
-			return await this.staticData.cytubeIntegration.queue(args.join(" "));
+			return await CytubeIntegration.queue(args.join(" "));
 		}
 
 		// Determine the user's and global limits - both duration and video amount
 		const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
-		const limits = await this.staticData.checkLimits(context.user, queue);
+		const limits = checkLimits(context.user, queue);
 		if (!limits.canRequest) {
 			return {
 				reply: limits.reason
@@ -269,8 +147,10 @@ module.exports = {
 
 		// Determine the video URL, based on the type of link provided
 		let url = args.join(" ");
+		const linkParser = getLinkParser();
 		const type = context.params.type ?? "youtube";
-		const potentialTimestamp = this.staticData.parseTimestamp(url);
+		const potentialTimestamp = parseTimestamp(linkParser, url);
+
 		if (potentialTimestamp && startTime === null) {
 			startTime = potentialTimestamp;
 		}
@@ -278,15 +158,7 @@ module.exports = {
 		const parsedURL = require("node:url").parse(url);
 		let data = null;
 
-		// Special URL hosts settings - blacklist, `supinic.com`
-		const { blacklist } = this.staticData;
-		if (blacklist.sites.includes(parsedURL.host)) {
-			return {
-				success: false,
-				reply: "Don't."
-			};
-		}
-		else if (parsedURL.host === "supinic.com" && parsedURL.path.includes("/track/detail")) {
+		if (parsedURL.host === "supinic.com" && parsedURL.path.includes("/track/detail")) {
 			const videoTypePrefix = sb.Config.get("VIDEO_TYPE_REPLACE_PREFIX");
 			const songID = Number(parsedURL.path.match(/(\d+)/)[1]);
 			if (!songID) {
@@ -431,13 +303,6 @@ module.exports = {
 			else {
 				data = await linkParser.fetchData(lookup.link, type);
 			}
-		}
-
-		if (blacklist.tracks.includes(data.ID) || blacklist.authors.includes(data.authorID)) {
-			return {
-				success: false,
-				reply: `Track/author has been blacklisted!`
-			};
 		}
 
 		// Put together the total length of the video, for logging purposes
