@@ -185,7 +185,7 @@ module.exports = {
 					success: false,
 					reply: sb.Utils.tag.trim `
 						Your pipe cannot continue!
-						It causes more than ${this.staticData.pipeLimit} pipe calls.
+						It causes more than ${NESTED_PIPE_LIMIT} pipe calls.
 						Please reduce the complexity first.
 					`
 				};

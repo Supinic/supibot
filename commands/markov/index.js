@@ -292,7 +292,6 @@ module.exports = {
 		};
 	},
 	Dynamic_Description: async function (prefix) {
-		const { threshold, limit } = this.staticData;
 		const channels = await sb.Query.getRecordset(rs => rs
 			.select("Channel.ID AS Channel_ID", "Name")
 			.from("chat_data", "Channel_Chat_Module")
@@ -311,7 +310,7 @@ module.exports = {
 		return [
 			`Uses a <a href="//en.wikipedia.org/wiki/Markov_model">Markov model</a> to generate "real-looking" sentences based on Twitch chat.`,
 			"Various channels are supported, and the command currently uses @Forsen's channel by default if no channel is provided.",
-			`The model is not available until ${threshold} unique words have been added to it!`,
+			`The model is not available until ${MODEL_SIZE_THRESHOLD} unique words have been added to it!`,
 			"",
 
 			`<code>${prefix}markov</code>`,
@@ -341,7 +340,7 @@ module.exports = {
 			"",
 
 			`<code>${prefix}markov words:(number)</code>`,
-			`Generates between 1-${limit} words, based on your choice.`,
+			`Generates between 1-${WORD_LIMIT} words, based on your choice.`,
 			""
 		];
 	}

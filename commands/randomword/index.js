@@ -62,13 +62,10 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { limit } = this.staticData;
-		const list = require("./words.json");
-
 		return [
-			`Returns a random word from a list of ${list.length} pre-determined words.`,
+			`Returns a random word from a list of ${fullWordList.length} pre-determined words.`,
 			"Highly recommended for its usage in pipe, for example into urban or translate...",
-			`Maximum amount of words: ${limit}`,
+			`Maximum amount of words: ${MAXIMUM_WORD_AMOUNT}`,
 			"",
 
 			`<code>${prefix}rw</code>`,

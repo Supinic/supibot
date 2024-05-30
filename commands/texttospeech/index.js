@@ -133,7 +133,7 @@ module.exports = {
 
 		if (result === null || result === false) {
 			return {
-				reply: `Your TTS was refused, because its length exceeded the limit of ${this.staticData.limit / 1000} seconds!`,
+				reply: `Your TTS was refused, because its length exceeded the limit of ${tts.limit / 1000} seconds!`,
 				cooldown: { length: 5000 }
 			};
 		}

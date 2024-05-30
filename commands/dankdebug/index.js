@@ -1,4 +1,6 @@
 const { VM } = require("vm2");
+
+const MAXIMUM_DATA_LENGTH = 1_000_000;
 const DEFAULT_VM_OPTIONS = {
 	sandbox: {},
 	compiler: "javascript",
@@ -188,12 +190,12 @@ module.exports = {
 			};
 		}
 
-		const channelDataResult = await sandboxData.handleChannelDataChange(this.staticData.limit);
+		const channelDataResult = await sandboxData.handleChannelDataChange(MAXIMUM_DATA_LENGTH);
 		if (channelDataResult.success === false) {
 			return channelDataResult;
 		}
 
-		const userDataResult = await sandboxData.handleUserDataChange(this.staticData.limit);
+		const userDataResult = await sandboxData.handleUserDataChange(MAXIMUM_DATA_LENGTH);
 		if (userDataResult.success === false) {
 			return userDataResult;
 		}
