@@ -1,0 +1,80 @@
+{
+  "comment": [
+    "While this data is provided by the API, some names are too long for chat and have been shortened.",
+    "Also, several aliases have been added for ease of use.",
+    "Ideally, each category should have a one-word name/alias - so that it is easy to use with just a single word.",
+    "Source: https://russianwarship.rip/api-documentation/v1#/Terms/getAllStatisticalTerms"
+  ],
+  "categories": [
+    {
+      "name": "Personnel",
+      "code": "personnel_units",
+      "aliases": ["Soldiers", "Units", "Personnel units"]
+    },
+    {
+      "name": "Tanks",
+      "code": "tanks",
+      "aliases": []
+    },
+    {
+      "name": "Armoured fighting vehicles",
+      "code": "armoured_fighting_vehicles",
+      "aliases": ["AFV", "AFVs", "Combat vehicles", "Fighting vehicles"]
+    },
+    {
+      "name": "Artillery",
+      "code": "artillery_systems",
+      "aliases": ["Artillery systems"]
+    },
+    {
+      "name": "MLRS",
+      "code": "mlrs",
+      "aliases": ["Multiple launch rocket systems"]
+    },
+    {
+      "name": "Anti-air systems",
+      "code": "aa_warfare_systems",
+      "aliases": ["AA", "Anti-air" ]
+    },
+    {
+      "name": "Planes",
+      "code": "planes",
+      "aliases": []
+    },
+    {
+      "name": "Helicopters",
+      "code": "helicopters",
+      "aliases": []
+    },
+    {
+      "name": "Other vehicles and fuel tanks",
+      "code": "vehicles_fuel_tanks",
+      "aliases": ["Vehicles", "Other vehicles"]
+    },
+    {
+      "name": "Warships",
+      "code": "warships_cutters",
+      "aliases": ["Ships"]
+    },
+    {
+      "name": "Missiles",
+      "code": "cruise_missiles",
+      "aliases": ["Cruise missiles"]
+    },
+    {
+      "name": "UAV",
+      "code": "uav_systems",
+      "aliases": ["UAVs"]
+    },
+    {
+      "name": "Special equipment",
+      "code": "special_military_equip",
+      "aliases": ["Other equipment", "Other"]
+    },
+    {
+      "name": "Missile systems",
+      "code": "atgm_srbm_systems",
+      "aliases": ["ATGM", "SRBM"]
+    }
+  ]
+}
