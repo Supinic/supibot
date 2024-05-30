@@ -121,9 +121,6 @@ See examples below.
 The function's `this` context is the command instance itself, parsed from how it appears in the database, with two notable changes:
 - `{Object} this.data` By default, an empty object where the command can store any sort of session data, such as caches.
 On reload, this data will always be lost.
-- `{Object} this.staticData` is the result of parsing the database's `Static_Data`.
-This object is frozen (`Object.freeze`) and thus cannot be modified at all.
-Usually used for constant data tied only to the given command, so that they don't have to be stored elsewhere, without any links. 
 
 #### Return value
 Each command must explicitly return something to signify its success or failure.

@@ -134,7 +134,6 @@ declare type ConstructorData = {
     Author: string | null;
     Code: (this: Command, context: Context, ...args: string[]) => (Result | Promise<Result>);
     Dynamic_Description: ((this: Command, prefix: string) => Promise<string[]>) | null;
-    Static_Data: (() => Record<string, any>) | null;
 };
 
 declare type AppendData = {
@@ -453,12 +452,6 @@ export declare class Command extends ClassTemplate {
      * Session-specific data for the command that can be modified at runtime.
      */
     private data: SimpleGenericData;
-
-    /**
-     * Data specific for the command. Usually hosts utils methods, or constants.
-     * The object is deeply frozen, preventing any changes.
-     */
-    private staticData: Utils.DeepFrozen<Record<string, any>>;
 
     /**
      * Determines the author of the command. Used for updates and further command downloads.

@@ -130,18 +130,6 @@ module.exports = [
 		)
 	},
 	{
-		name: "Static_Data",
-		failMessage: "null literal, non-generator FunctionExpression or ArrowFunctionExpression",
-		checkCallback: (v) => (
-			(v.type === "Literal" && v.value === null)
-			|| (
-				(v.type === "FunctionExpression" || v.type === "ArrowFunctionExpression")
-				&& v.generator === false
-				&& (typeof v.method !== "boolean" || v.method === false)
-			)
-		)
-	},
-	{
 		name: "Dynamic_Description",
 		failMessage: "null literal, non-generator FunctionExpression or ArrowFunctionExpression",
 		checkCallback: (v) => (
