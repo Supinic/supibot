@@ -1,3 +1,32 @@
+const { randomInt } = require("../../utils/command-utils.js");
+
+const MAXIMUM_EMOJI_LIMIT = 50;
+const EMOJI_RANGES = [
+	[0x1F300, 0x1F5FF],
+	[0x1F600, 0x1F64F],
+	[0x1F680, 0x1F6FF],
+	[0x1F910, 0x1F9FF]
+];
+
+const isEmojiRegex = /\p{Emoji}/u;
+const generateEmoji = () => {
+	const range = sb.Utils.randArray(EMOJI_RANGES);
+
+	let string = "";
+	let attempts = 5;
+	while (!isEmojiRegex.test(string) && attempts > 0) {
+		const point = randomInt(range[0], range[1]);
+		string = String.fromCodePoint(point);
+		attempts--;
+	}
+
+	if (attempts <= 0) {
+		string = String.fromCodePoint(range[0]);
+	}
+
+	return string;
+};
+
 module.exports = {
 	Name: "randomemoji",
 	Aliases: ["re"],
@@ -7,39 +36,33 @@ module.exports = {
 	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		limit: 10
-	})),
+	Static_Data: null,
 	Code: (async function randomEmoji (context, number = 1) {
-		const repeats = Number(number);
-		if (!repeats || repeats > this.staticData.limit || repeats < 1 || Math.trunc(repeats) !== repeats) {
-			return {
-				success: false,
-				reply: "Invalid or too high amount of emojis!"
-			};
+		let repeats = Number(number);
+		if (!sb.Utils.isValidInteger(repeats) || repeats > MAXIMUM_EMOJI_LIMIT) {
+			repeats = 1;
 		}
 
-		const emojis = sb.Config.get("EMOJI_LIST");
+		const result = new Array(repeats);
+		for (let i = 0; i < repeats; i++) {
+			result[i] = generateEmoji();
+		}
+
 		return {
-			reply: [...new Array(repeats)].map(() => sb.Utils.randArray(emojis)).join(" ")
+			reply: result.join(" ")
 		};
 	}),
-	Dynamic_Description: (async function (prefix) {
-		const { limit } = this.staticData;
-		const list = sb.Config.get("EMOJI_LIST");
+	Dynamic_Description: () => [
+		`Returns a random emoji from several pre-determined emoji ranges.`,
+		`Maximum amount of emojis per command: ${MAXIMUM_EMOJI_LIMIT}`,
+		"",
 
-		return [
-			`Returns a random word from a list of ${list.length} pre-determined emojis.`,
-			`Maximum amount of words: ${limit}`,
-			"",
+		`<code>$re</code>`,
+		"(one random emoji)",
+		"",
 
-			`<code>${prefix}re</code>`,
-			"(one random emoji)",
-			"",
-
-			`<code>${prefix}re 10</code>`,
-			"(ten random emojis)",
-			""
-		];
-	})
+		`<code>$re 10</code>`,
+		"(ten random emojis)",
+		""
+	]
 };
