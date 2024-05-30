@@ -1,3 +1,7 @@
+const formatter = new Intl.DateTimeFormat("en-GB", {
+	month: "long"
+});
+
 module.exports = {
 	Name: "randomhistoricevent",
 	Aliases: ["rhe"],
@@ -7,23 +11,19 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		formatter: new Intl.DateTimeFormat("en-GB", {
-			month: "long"
-		})
-	})),
+	Static_Data: null,
 	Code: (async function randomHistoricEvent (context, ...args) {
 		const date = (args.length > 0)
 			? new sb.Date(args.join(" "))
 			: new sb.Date();
-	
+
 		if (!date.valueOf()) {
 			return {
 				success: false,
 				reply: `Invalid date provided!`
 			};
 		}
-	
+
 		const { day, month } = date;
 		const event = await sb.Query.getRecordset(rs => rs
 			.select("Year", "Text")
@@ -34,8 +34,8 @@ module.exports = {
 			.limit(1)
 			.single()
 		);
-	
-		const fullMonth = this.staticData.formatter.format(date);
+
+		const fullMonth = formatter.format(date);
 		return {
 			reply: `${fullMonth} ${day}, ${event.Year}: ${event.Text}`
 		};

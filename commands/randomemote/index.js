@@ -1,4 +1,5 @@
 const { randomInt } = require("../../utils/command-utils.js");
+const MAXIMUM_EMOTE_LIMIT = 200;
 
 module.exports = {
 	Name: "randomemote",
@@ -22,23 +23,20 @@ module.exports = {
 		{ name: "zeroWidth", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		limit: 200
-	})),
+	Static_Data: null,
 	Code: (async function randomEmote (context, number = 1) {
 		const repeats = Number(number);
-		const { limit } = this.staticData;
 
 		if (!sb.Utils.isValidInteger(repeats, 1)) {
 			return {
 				success: false,
-				reply: `You must provide a valid number of emotes to post! Use a number between 1 and ${limit}.`
+				reply: `You must provide a valid number of emotes to post! Use a number between 1 and ${MAXIMUM_EMOTE_LIMIT}.`
 			};
 		}
-		else if (repeats > this.staticData.limit) {
+		else if (repeats > MAXIMUM_EMOTE_LIMIT) {
 			return {
 				success: false,
-				reply: `The number you provided is too large! Use a number between 1 and ${limit}.`
+				reply: `The number you provided is too large! Use a number between 1 and ${MAXIMUM_EMOTE_LIMIT}.`
 			};
 		}
 
@@ -183,11 +181,10 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { limit } = this.staticData;
 		return [
 			"Returns a random emote in the scope of the current channel.",
 			"You can use parameters to force-include or exclude several of types of emotes.",
-			`Maximum amount of words: ${limit}`,
+			`Maximum amount of emotes: ${MAXIMUM_EMOTE_LIMIT}`,
 			"",
 
 			`<code>${prefix}rem</code>`,
@@ -196,7 +193,7 @@ module.exports = {
 			"",
 
 			`<code>${prefix}rem (number)</code>`,
-			`Posts any number of emotes, in the limit from 1 to ${limit}.`,
+			`Posts any number of emotes, in the limit from 1 to ${MAXIMUM_EMOTE_LIMIT}.`,
 			"",
 
 			`<code>${prefix}rem regex:(regular expression)</code>`,

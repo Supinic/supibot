@@ -1,3 +1,6 @@
+const fullWordList = require("./words.json");
+const MAXIMUM_WORD_AMOUNT = 10;
+
 module.exports = {
 	Name: "randomword",
 	Aliases: ["rw"],
@@ -11,19 +14,13 @@ module.exports = {
 		{ name: "startsWith", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		limit: 10
-	})),
+	Static_Data: null,
 	Code: (async function randomWord (context, number = 1) {
-		const repeats = Number(number);
-		if (!repeats || repeats > this.staticData.limit || repeats < 1 || Math.trunc(repeats) !== repeats) {
-			return {
-				success: false,
-				reply: "Invalid or too high amount of words!"
-			};
+		let repeats = Number(number);
+		if (!sb.Utils.isValidInteger(repeats) || repeats > MAXIMUM_WORD_AMOUNT) {
+			repeats = 1;
 		}
 
-		const fullWordList = require("./words.json");
 		const { endsWith, regex, startsWith } = context.params;
 
 		// performance "save" - skip filtering if not needed

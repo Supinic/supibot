@@ -1,5 +1,10 @@
 const { randomInt } = require("../../utils/command-utils.js");
 
+// Borrowed from https://codepen.io/bobhami/pen/gwAJNp
+const GENIUS_ACCESS_TOKEN = "CXyFeSBw2lAdG41xkuU3LS6a_nwyxwwCz2dCkUohw-rw0C49x2HqP__6_4is5RPx";
+const ALBUM_ID_RANGE = [100, 650_000];
+const MAX_RETRIES = 5;
+
 module.exports = {
 	Name: "randomalbum",
 	Aliases: ["ra"],
@@ -9,26 +14,18 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		// Borrowed from https://codepen.io/bobhami/pen/gwAJNp
-		accessToken: "CXyFeSBw2lAdG41xkuU3LS6a_nwyxwwCz2dCkUohw-rw0C49x2HqP__6_4is5RPx",
-		minID: 100,
-		maxID: 650000,
-		maxRetries: 5
-	})),
+	Static_Data: null,
 	Code: (async function randomAlbum () {
-		const { accessToken, minID, maxID, maxRetries } = this.staticData;
-
 		let data;
 		let retries = 0;
-		while (!data && retries < maxRetries) {
-			const albumID = randomInt(minID, maxID);
+		while (!data && retries < MAX_RETRIES) {
+			const albumID = randomInt(ALBUM_ID_RANGE[0], ALBUM_ID_RANGE[1]);
 			const { statusCode, body: albumData } = await sb.Got("GenericAPI", {
 				url: `https://api.genius.com/albums/${albumID}`,
 				responseType: "json",
 				throwHttpErrors: false,
 				searchParams: {
-					access_token: accessToken
+					access_token: GENIUS_ACCESS_TOKEN
 				}
 			});
 
@@ -38,7 +35,7 @@ module.exports = {
 			}
 		}
 
-		if (retries >= maxRetries) {
+		if (retries >= MAX_RETRIES) {
 			return {
 				success: false,
 				reply: "Maximum amount of retries exceeded!"

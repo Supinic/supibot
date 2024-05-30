@@ -1,3 +1,15 @@
+const VIDEO_TYPE_IDS = {
+	youtube: 1,
+	soundcloud: 3,
+	vimeo: 4,
+	nicovideo: 21,
+	bilibili: 22,
+	"ivr-archive": 23,
+	vk: 23,
+	"bepis-archive": 25,
+	"ivr-video-archive": 26
+};
+
 module.exports = {
 	Name: "randomgachi",
 	Aliases: ["rg"],
@@ -11,19 +23,7 @@ module.exports = {
 		{ name: "type", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		types: {
-			youtube: 1,
-			soundcloud: 3,
-			vimeo: 4,
-			nicovideo: 21,
-			bilibili: 22,
-			"leppunen-archive": 23,
-			vk: 23,
-			"bepis-archive": 25,
-			"leppunen-video-archive": 26
-		}
-	})),
+	Static_Data: null,
 	Code: (async function randomGachi (context) {
 		const prefixRow = await sb.Query.getRow("data", "Video_Type");
 		await prefixRow.load(1);
@@ -40,9 +40,8 @@ module.exports = {
 			};
 		}
 
-		const { types } = this.staticData;
 		const allowedTypes = (context.params.type) ? context.params.type.split(/\W/) : ["youtube"];
-		const typeIDs = allowedTypes.map(i => types[i] ?? null).filter(Boolean);
+		const typeIDs = allowedTypes.map(i => VIDEO_TYPE_IDS[i] ?? null).filter(Boolean);
 
 		const data = await sb.Query.getRecordset(rs => {
 			rs.select("Track.ID AS TrackID, Track.Name AS TrackName, Track.Link AS TrackLink")
@@ -114,8 +113,7 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { types } = this.staticData;
-		const list = Object.keys(types).map(i => `<li>${i}</li>`).join("");
+		const list = Object.keys(VIDEO_TYPE_IDS).map(i => `<li>${i}</li>`).join("");
 
 		return [
 			`Returns a random gachimuchi track from the <a href="/track/gachi/list">track list</a> and the <a href="/track/todo/list">todo list</a>.`,

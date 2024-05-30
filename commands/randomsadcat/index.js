@@ -1,3 +1,8 @@
+const sadCats = require("./sad-cat.json");
+
+const MAXIMUM_REPEATS = 5;
+const previousPosts = [];
+
 module.exports = {
 	Name: "randomsadcat",
 	Aliases: ["rsc"],
@@ -7,21 +12,17 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		repeats: 3
-	})),
+	Static_Data: null,
 	Code: (async function randomSadCat (context) {
-		this.data.previousPosts ??= [];
+		const eligibleLinks = sadCats.filter(i => !previousPosts.includes(i));
+		const link = sb.Utils.randArray(eligibleLinks);
 
-		const sadCats = require("./sad-cat.json");
-		const post = sb.Utils.randArray(sadCats.filter(i => !this.data.previousPosts.includes(i)));
-
-		this.data.previousPosts.unshift(post);
-		this.data.previousPosts.splice(this.staticData.repeats);
+		previousPosts.unshift(link);
+		previousPosts.splice(MAXIMUM_REPEATS);
 
 		const emote = await context.getBestAvailableEmote(["SadCat", "sadCat", "mericCat"], "😿");
 		return {
-			reply: `${emote} ${post}`
+			reply: `${emote} ${link}`
 		};
 	}),
 	Dynamic_Description: null
