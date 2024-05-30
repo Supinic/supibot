@@ -1,3 +1,17 @@
+const RECORD_TYPES = [
+	{
+		name: "afk",
+		aliases: [],
+		description: "Posts the longest time you were AFK for."
+	},
+	{
+		name: "cookie",
+		aliases: [],
+		description: "Posts stats for whoever ate the most fortune cookies."
+	}
+];
+const RECORD_NAMES = RECORD_TYPES.map(i => i.name);
+
 module.exports = {
 	Name: "record",
 	Aliases: null,
@@ -7,26 +21,12 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		types: [
-			{
-				name: "afk",
-				aliases: [],
-				description: "Posts the longest time you were AFK for."
-			},
-			{
-				name: "cookie",
-				aliases: [],
-				description: "Posts stats for whoever ate the most fortune cookies."
-			}
-		]
-	})),
+	Static_Data: null,
 	Code: (async function record (context, type, target) {
-		const types = this.staticData.types.map(i => i.name);
 		if (!type) {
 			return {
 				success: false,
-				reply: `No type provided! Use one of these: ${types.join(", ")}`
+				reply: `No record type provided! Use one of these: ${RECORD_NAMES.join(", ")}`
 			};
 		}
 
@@ -38,7 +38,7 @@ module.exports = {
 			case "afk": {
 				if (userData.ID !== context.user.ID) {
 					return {
-						reply: "Cannot be checked on people other than you!"
+						reply: "Cannot be checked on people other than yourself!"
 					};
 				}
 
@@ -87,13 +87,12 @@ module.exports = {
 
 			default: return {
 				success: false,
-				reply: `Invalid type provided! Use one of these: ${types.join(", ")}`
+				reply: `Invalid type provided! Use one of these: ${RECORD_NAMES.join(", ")}`
 			};
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { types } = this.staticData;
-		const list = types.map(i => {
+		const list = RECORD_TYPES.map(i => {
 			const aliases = (i.aliases.length > 0)
 				? `(${i.aliases.join(", ")})`
 				: "";

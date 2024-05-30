@@ -1,3 +1,5 @@
+const URBAN_FAUX_ACCESS_KEY = "ab71d33b15d36506acf1e379b0ed07ee";
+
 module.exports = {
 	Name: "urban",
 	Aliases: null,
@@ -9,11 +11,7 @@ module.exports = {
 		{ name: "index", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		timeout: 10000,
-		fauxKey: "ab71d33b15d36506acf1e379b0ed07ee",
-		brokenWords: ["as", "at", "but", "by", "for", "if", "in", "into", "of", "on", "or", "this", "to", "with"]
-	})),
+	Static_Data: null,
 	Code: (async function urban (context, ...args) {
 		if (args.length === 0) {
 			return {
@@ -27,7 +25,7 @@ module.exports = {
 		const response = await sb.Got("GenericAPI", {
 			url: "https://api.urbandictionary.com/v0/define",
 			searchParams: {
-				api_key: this.staticData.fauxKey,
+				api_key: URBAN_FAUX_ACCESS_KEY,
 				term
 			},
 			throwHttpErrors: false,
@@ -35,7 +33,7 @@ module.exports = {
 				limit: 0
 			},
 			timeout: {
-				request: this.staticData.timeout
+				request: 10_000
 			}
 		});
 
@@ -43,14 +41,14 @@ module.exports = {
 			const autocompleteResponse = await sb.Got("GenericAPI", {
 				url: "https://api.urbandictionary.com/v0/autocomplete-extra",
 				searchParams: {
-					api_key: this.staticData.fauxKey,
+					api_key: URBAN_FAUX_ACCESS_KEY,
 					term
 				},
 				retry: {
 					limit: 0
 				},
 				timeout: {
-					request: this.staticData.timeout
+					request: 10_000
 				}
 			});
 

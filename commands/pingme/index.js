@@ -1,4 +1,4 @@
-const ERROR_RESPONSES = {
+const ERROR_REASONS = {
 	"public-incoming": "That person has too many public reminders pending!",
 	"public-outgoing": "You have too many public reminders pending!",
 	"private-incoming": "That person has too many private reminders pending!",
@@ -64,7 +64,7 @@ module.exports = {
 		}
 		else {
 			return {
-				reply: `Could not set up a ping! ${ERROR_RESPONSES[cause] ?? "(Unknown)"}`
+				reply: `Could not set up a ping! ${ERROR_REASONS[cause] ?? "(Unknown)"}`
 			};
 		}
 	}),

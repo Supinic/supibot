@@ -1,6 +1,19 @@
 const { searchYoutube } = require("../../utils/command-utils.js");
 const { getLinkParser } = require("../../utils/link-parser.js");
 
+const RESULTS_PER_SEARCH = 25;
+const DAILY_SEARCHES_CAP = 2000;
+
+const getClosestPacificMidnight = () => {
+	const now = new sb.Date().discardTimeUnits("m", "s", "ms");
+	const result = now.clone().discardTimeUnits("h").addHours(9);
+	if (now.hours >= 9) {
+		result.addDays(1);
+	}
+
+	return result;
+};
+
 module.exports = {
 	Name: "youtubesearch",
 	Aliases: ["ys"],
@@ -13,22 +26,8 @@ module.exports = {
 		{ name: "linkOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		indexThreshold: 25,
-		threshold: 2000,
-		getClosestPacificMidnight: () => {
-			const now = new sb.Date().discardTimeUnits("m", "s", "ms");
-			const result = now.clone().discardTimeUnits("h").addHours(9);
-
-			if (now.hours >= 9) {
-				result.addDays(1);
-			}
-
-			return result;
-		}
-	})),
+	Static_Data: null,
 	Code: (async function youtubeSearch (context, ...args) {
-		const { getClosestPacificMidnight, threshold } = this.staticData;
 		const query = args.join(" ");
 
 		if (!query) {
@@ -48,7 +47,7 @@ module.exports = {
 
 		searchAmountToday++;
 
-		if (searchAmountToday >= threshold) {
+		if (searchAmountToday >= DAILY_SEARCHES_CAP) {
 			const when = sb.Utils.timeDelta(getClosestPacificMidnight());
 			return {
 				success: false,
@@ -57,18 +56,16 @@ module.exports = {
 		}
 
 		const index = context.params.index ?? 0;
-		const { indexThreshold } = this.staticData;
-
 		if (!sb.Utils.isValidInteger(index)) {
 			return {
 				success: false,
 				reply: `Provided index must be a valid integer!`
 			};
 		}
-		else if (index > indexThreshold) {
+		else if (index > RESULTS_PER_SEARCH) {
 			return {
 				success: false,
-				reply: `Your index must be in the range <0, ${indexThreshold}>!`
+				reply: `Your index must be in the range <0, ${RESULTS_PER_SEARCH}>!`
 			};
 		}
 
@@ -94,7 +91,7 @@ module.exports = {
 				/** @type {string} */
 				sb.Config.get("API_GOOGLE_YOUTUBE"),
 				{
-					maxResults: indexThreshold
+					maxResults: RESULTS_PER_SEARCH
 				}
 			);
 

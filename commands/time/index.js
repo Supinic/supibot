@@ -1,4 +1,59 @@
 const { fetchTimeData } = require("../../utils/command-utils.js");
+const timezones = require("./timezones.json");
+
+const detectTimezone = async (...args) => {
+	const query = args.join(" ");
+	const utcRegex = /(?<base>UTC|GMT)(?<sign>[+-])(?<hours>\d{1,2})(:?(?<minutes>\d{1,2}))?/i;
+
+	if (utcRegex.test(query)) {
+		const match = query.match(utcRegex);
+		const { sign, hours, minutes } = match.groups;
+
+		const multiplier = (sign === "-") ? -1 : 1;
+		const numMinutes = (minutes) ? Number(minutes) : 0;
+
+		const offset = multiplier * (Number(hours) * 60 + numMinutes);
+
+		if (!Number.isFinite(offset)) {
+			return {
+				success: false,
+				reply: `Malformed timezone offset provided!`
+			};
+		}
+		else if (Math.abs(offset) > (14 * 60)) { // UTC[+/-]14 is the maximum offset
+			return {
+				success: false,
+				reply: `Maximum timezone offset exceeded!`
+			};
+		}
+
+		return {
+			date: new sb.Date().setTimezoneOffset(offset).format("H:i (Y-m-d)"),
+			offset: `${sign}${hours}${minutes ?? ""}`,
+			abbr: null,
+			name: null
+		};
+	}
+
+	const timezoneData = timezones.find(i => i.abbreviation === query);
+	if (!timezoneData) {
+		return null;
+	}
+
+	const extraOffset = (Math.trunc(timezoneData.offset) - timezoneData.offset) * 60;
+	let offset = `${(`00${String(Math.trunc(timezoneData.offset))}`).slice(-2)}:${(`00${extraOffset}`).slice(-2)}`;
+	if (offset[0] !== "-") {
+		offset = `+${offset}`;
+	}
+
+	const date = new sb.Date().setTimezoneOffset(timezoneData.offset * 60).format("H:i (Y-m-d)");
+	return {
+		date,
+		offset,
+		abbr: timezoneData.abbreviation,
+		name: timezoneData.name
+	};
+};
 
 module.exports = {
 	Name: "time",
@@ -9,65 +64,9 @@ module.exports = {
 	Flags: ["block","mention","non-nullable","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		detectTimezone: async (...args) => {
-			const query = args.join(" ");
-			const utcRegex = /(?<base>UTC|GMT)(?<sign>[+-])(?<hours>\d{1,2})(:?(?<minutes>\d{1,2}))?/i;
-
-			if (utcRegex.test(query)) {
-				const match = query.match(utcRegex);
-				const { sign, hours, minutes } = match.groups;
-
-				const multiplier = (sign === "-") ? -1 : 1;
-				const numMinutes = (minutes) ? Number(minutes) : 0;
-
-				const offset = multiplier * (Number(hours) * 60 + numMinutes);
-
-				if (!Number.isFinite(offset)) {
-					return {
-						success: false,
-						reply: `Malformed timezone offset provided!`
-					};
-				}
-				else if (Math.abs(offset) > (14 * 60)) { // UTC[+/-]14 is the maximum offset
-					return {
-						success: false,
-						reply: `Maximum timezone offset exceeded!`
-					};
-				}
-
-				return {
-					date: new sb.Date().setTimezoneOffset(offset).format("H:i (Y-m-d)"),
-					offset: `${sign}${hours}${minutes ?? ""}`,
-					abbr: null,
-					name: null
-				};
-			}
-
-			const timezones = require("./timezones.json");
-			const timezoneData = timezones.find(i => i.abbreviation === query);
-
-			if (!timezoneData) {
-				return null;
-			}
-
-			const extraOffset = (Math.trunc(timezoneData.offset) - timezoneData.offset) * 60;
-			let offset = `${(`00${String(Math.trunc(timezoneData.offset))}`).slice(-2)}:${(`00${extraOffset}`).slice(-2)}`;
-			if (offset[0] !== "-") {
-				offset = `+${offset}`;
-			}
-
-			const date = new sb.Date().setTimezoneOffset(timezoneData.offset * 60).format("H:i (Y-m-d)");
-			return {
-				date,
-				offset,
-				abbr: timezoneData.abbreviation,
-				name: timezoneData.name
-			};
-		}
-	})),
+	Static_Data: null,
 	Code: (async function time (context, ...args) {
-		const zone = await this.staticData.detectTimezone(...args);
+		const zone = await detectTimezone(...args);
 		if (zone) {
 			return {
 				reply: (zone.name && zone.abbr)
