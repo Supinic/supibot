@@ -1,3 +1,12 @@
+const AVAILABLE_BAN_FILTER_TYPES = [
+	"Arguments",
+	"Blacklist",
+	"Cooldown",
+	"Online-only",
+	"Offline-only",
+	"Reminder-prevention"
+];
+
 module.exports = {
 	Name: "ban",
 	Aliases: ["unban"],
@@ -18,17 +27,14 @@ module.exports = {
 		{ name: "user", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		availableTypes: ["Arguments", "Blacklist", "Cooldown", "Online-only", "Offline-only", "Reminder-prevention"]
-	})),
+	Static_Data: null,
 	Code: (async function ban (context) {
 		const { invocation } = context;
-		const { availableTypes } = this.staticData;
 		const type = sb.Utils.capitalize(context.params.type ?? "Blacklist");
-		if (!availableTypes.includes(type)) {
+		if (!AVAILABLE_BAN_FILTER_TYPES.includes(type)) {
 			return {
 				success: false,
-				reply: `Invalid ban filter type provided! Use one of ${availableTypes.join(", ")}`
+				reply: `Invalid ban filter type provided! Use one of ${AVAILABLE_BAN_FILTER_TYPES.join(", ")}`
 			};
 		}
 
@@ -387,14 +393,12 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { availableTypes } = this.staticData;
-
 		return [
 			"Bans or unbans any combination of user/channel/command.",
 			"Only usable by channel owners and Supibot ambassadors, who can only ban combinations specific for their respective channel.",
 			"",
 
-			`Available types: <code>${availableTypes.join(" ")}</code>`,
+			`Available types: <code>${AVAILABLE_BAN_FILTER_TYPES.join(" ")}</code>`,
 			`You can change the type. The default type is <code>Blacklist</code>.`,
 			"",
 

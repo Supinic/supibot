@@ -1,3 +1,10 @@
+const FOUR_CHAN_REPLACEMENTS = [
+	{ regex: /desu/ig, string: "tbh" },
+	{ regex: /baka/ig, string: "smh" },
+	{ regex: /senpai/ig, string: "fam" },
+	{ regex: /kek/ig, string: "cuck" }
+];
+
 module.exports = {
 	Name: "chan",
 	Aliases: ["4chan","textchan","filechan","imagechan"],
@@ -11,26 +18,7 @@ module.exports = {
 		{ name: "textOnly", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		replacements: [
-			{
-				regex: /desu/ig,
-				string: "tbh"
-			},
-			{
-				regex: /baka/ig,
-				string: "smh"
-			},
-			{
-				regex: /senpai/ig,
-				string: "fam"
-			},
-			{
-				regex: /kek/ig,
-				string: "cuck"
-			}
-		]
-	})),
+	Static_Data: null,
 	Code: (async function chan (context, identifier, ...rest) {
 		if (!identifier) {
 			return {
@@ -252,7 +240,7 @@ module.exports = {
 		if (post.content) {
 			post.content = post.content.replace(/>>\d+/g, "");
 
-			for (const { regex, string } of this.staticData.replacements) {
+			for (const { regex, string } of FOUR_CHAN_REPLACEMENTS) {
 				post.content = post.content.replace(regex, string);
 			}
 

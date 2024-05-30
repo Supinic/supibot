@@ -1,3 +1,15 @@
+const REPEATED_NUMBERS_NAMES = new Map([
+	[2, "dubs"],
+	[3, "trips"],
+	[4, "quads"],
+	[5, "quints"],
+	[6, "sexes"],
+	[7, "septs"],
+	[8, "octs"],
+	[9, "nons"],
+	[10, "decs"]
+]);
+
 module.exports = {
 	Name: "checkem",
 	Aliases: ["CheckEm","check'em"],
@@ -7,19 +19,7 @@ module.exports = {
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		checks: {
-			2: "dubs",
-			3: "trips",
-			4: "quads",
-			5: "quints",
-			6: "sexes",
-			7: "septs",
-			8: "octs",
-			9: "nons",
-			10: "decs"
-		}
-	})),
+	Static_Data: null,
 	Code: (async function checkEm (context) {
 		let messageNumber;
 		if (context.platform.Name === "twitch") {
@@ -29,7 +29,7 @@ module.exports = {
 					reply: `No message ID available! FeelsBadMan`
 				};
 			}
-	
+
 			messageNumber = BigInt(`0x${context.append.messageID.replace(/-/g, "")}`);
 		}
 		else if (context.platform.Name === "discord") {
@@ -39,7 +39,7 @@ module.exports = {
 					reply: `No message ID available on Discord just yet! Coming soon™`
 				};
 			}
-	
+
 			messageNumber = BigInt(context.append.messageID);
 		}
 		else {
@@ -48,44 +48,44 @@ module.exports = {
 				reply: `This command is not available on ${context.platform.capital}!`
 			};
 		}
-	
+
 		const croppedNumber = String(messageNumber).slice(-12);
 		const list = croppedNumber.split("");
 		const repeatedDigit = list.pop();
-	
+
 		let repeatsAmount = 1;
 		let currentDigit = list.pop();
 		while (currentDigit === repeatedDigit) {
 			repeatsAmount++;
 			currentDigit = list.pop();
 		}
-	
+
 		const cooldown = {
 			length: this.Cooldown,
 			user: context.user.ID,
 			channel: null,
 			platform: null
 		};
-	
+
 		if (repeatsAmount === 1) {
 			return {
 				reply: croppedNumber,
 				cooldown
 			};
 		}
-	
-		const checkEmName = this.staticData.checks[repeatsAmount];
+
+		const checkEmName = REPEATED_NUMBERS_NAMES.get(repeatsAmount);
 		if (repeatsAmount > 2) {
 			console.log(`${checkEmName}!`, new sb.Date(), context.channel.Name, context.user.Name);
 		}
-	
+
 		if (!checkEmName) {
 			return {
 				reply: `${croppedNumber} - you got more than 10 repeating digits?! Big gratz!`,
 				cooldown
 			};
 		}
-	
+
 		return {
 			reply: `${croppedNumber} - VisLaud Clap Congratulations on the ${checkEmName}!`,
 			cooldown
