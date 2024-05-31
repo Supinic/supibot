@@ -162,7 +162,7 @@ module.exports = {
 		"",
 
 		"<code>gnkiss (user)</code>",
-		"Bids t$arget user goodnight and kiss their forehead.",
+		"Bids target user goodnight and kiss their forehead.",
 		"",
 
 		"<code>$headpat (user)</code>",
