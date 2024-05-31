@@ -8,11 +8,16 @@ const sessionNames = {
 	Sprint: "Sprint race"
 };
 
-const ergastGot = sb.Got.get("GenericAPI").extend({
-	https: {
-		rejectUnauthorized: false
-	}
-});
+let ergastGotInstance;
+const ergastGot = (...args) => {
+	ergastGotInstance ??= sb.Got.get("GenericAPI").extend({
+		https: {
+			rejectUnauthorized: false
+		}
+	});
+
+	return ergastGotInstance(...args);
+};
 
 const getWeather = async (context, sessionStart, coordinates) => {
 	const weatherCommand = sb.Command.get("weather");
