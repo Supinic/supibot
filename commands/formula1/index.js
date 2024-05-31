@@ -29,8 +29,8 @@ module.exports = {
 	}),
 	Dynamic_Description: (async (prefix) => {
 		const subcommandDescriptions = subcommands.map(cmd => {
-			return [`<h6>${cmd.name}</h6>`, ...cmd.description].join("\n");
-		}).join("\n\n");
+			return [`<h6>${cmd.name}</h6>`, ...cmd.description].join("<br>");
+		}).join("<br><br>");
 
 		return [
 			"All things F1-related in a single command.",
@@ -42,7 +42,7 @@ module.exports = {
 			"Posts quick info about the upcoming race - in the current season.",
 			"",
 
-			...subcommandDescriptions
+			subcommandDescriptions
 		];
 	})
 };
