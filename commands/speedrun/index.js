@@ -1,5 +1,5 @@
 let speedrunGotInstance;
-const speedrunGot = () => {
+const speedrunGot = (...args) => {
 	speedrunGotInstance ??= sb.Got.get("GenericAPI").extend({
 		prefixUrl: "https://www.speedrun.com/api/v1",
 		timeout: {
@@ -7,7 +7,7 @@ const speedrunGot = () => {
 		}
 	});
 
-	return speedrunGotInstance;
+	return speedrunGotInstance(...args);
 };
 
 module.exports = {

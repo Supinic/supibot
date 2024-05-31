@@ -1,5 +1,5 @@
 let redditGotInstance;
-const redditGot = () => {
+const redditGot = (...args) => {
 	redditGotInstance ??= sb.Got.get("GenericAPI").extend({
 		prefixUrl: "https://www.reddit.com/r/",
 		headers: {
@@ -7,7 +7,7 @@ const redditGot = () => {
 		}
 	});
 
-	return redditGotInstance;
+	return redditGotInstance(...args);
 };
 
 module.exports = {
