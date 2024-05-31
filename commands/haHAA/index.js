@@ -9,7 +9,6 @@ module.exports = {
 		{ name: "search", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function _4head (context) {
 		let joke;
 		if (context.params.search) {

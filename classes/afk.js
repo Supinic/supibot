@@ -1,8 +1,6 @@
 const Filter = require("./filter.js");
 const User = require("./user.js");
-
-// @todo eventually merge these definitions with `supibot/commands/afk.js` static data
-const afkResponses = require("./afk-responses.json");
+const { responses } = require("./afk-definitions.json");
 
 module.exports = class AwayFromKeyboard extends require("./template.js") {
 	static data = new Map();
@@ -113,27 +111,26 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 
 		let statusMessage;
 		const status = data.Status ?? AwayFromKeyboard.defaultStatus; // Fallback for old AFKs without `Status` property
-		if (afkResponses.duration[status]) {
+		if (responses.duration[status]) {
 			const minutesDelta = (sb.Date.now() - data.Started.getTime()) / 60_000;
-			const durationDefinitions = afkResponses.duration[status];
+			const durationDefinitions = responses.duration[status];
 
 			for (const definition of durationDefinitions) {
-				const { interval, responses } = definition;
-				const minimum = interval[0] ?? 0;
-				const maximum = interval[1] ?? Infinity;
+				const minimum = definition.interval[0] ?? 0;
+				const maximum = definition.interval[1] ?? Infinity;
 
 				if (minimum < minutesDelta && minutesDelta < maximum) {
-					statusMessage = sb.Utils.randArray(responses);
+					statusMessage = sb.Utils.randArray(definition.responses);
 					break;
 				}
 			}
 
-			statusMessage ??= sb.Utils.randArray(afkResponses.static[status]);
+			statusMessage ??= sb.Utils.randArray(responses.static[status]);
 		}
 		else {
 			// Fallback for missing responses in the `afk-responses.json` file
-			const responses = afkResponses.static[status] ?? afkResponses.static[AwayFromKeyboard.defaultStatus];
-			statusMessage = sb.Utils.randArray(responses);
+			const staticResponses = responses.static[status] ?? responses.static[AwayFromKeyboard.defaultStatus];
+			statusMessage = sb.Utils.randArray(staticResponses);
 		}
 
 		// const statusMessage = sb.Utils.randArray(afkResponses[data.Status] ?? afkResponses[AwayFromKeyboard.defaultStatus]);

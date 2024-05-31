@@ -9,7 +9,6 @@ module.exports = {
 		{ name: "country", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function news (context, ...args) {
 		const rssNews = require("./rss.js");
 		const googleNews = require("./google-news.js");

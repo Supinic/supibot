@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function kanji (context, character) {
 		if (!character) {
 			return {
@@ -21,7 +20,7 @@ module.exports = {
 			url: `kanji/${encodeURIComponent(character)}`,
 			throwHttpErrors: false
 		});
-		
+
 		if (response.statusCode !== 200) {
 			return {
 				success: false,

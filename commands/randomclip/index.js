@@ -18,7 +18,6 @@ module.exports = {
 		{ name: "period", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: async function randomClip (context, channelName) {
 		let gameID = null;
 		let channelID = null;

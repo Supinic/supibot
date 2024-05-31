@@ -1,5 +1,8 @@
 const LanguageCodes = require("language-iso-codes");
 
+const OCR_LANGUAGES = require("./languages.json");
+const OCR_LANGUAGE_NAMES = Object.keys(OCR_LANGUAGES).map(i => LanguageCodes.getName(i));
+
 module.exports = {
 	Name: "ocr",
 	Aliases: null,
@@ -13,13 +16,6 @@ module.exports = {
 		{ name: "lang", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => {
-		const definitions = require("./languages.json");
-		const names = Object.keys(definitions)
-			.map(i => LanguageCodes.getName(i));
-
-		return { definitions, names };
-	}),
 	Code: (async function ocr (context, ...args) {
 		let languageCode = "eng";
 		if (context.params.lang) {
@@ -32,11 +28,11 @@ module.exports = {
 			}
 		}
 
-		const language = this.staticData.definitions[languageCode];
+		const language = OCR_LANGUAGES[languageCode];
 		if (!language) {
 			return {
 				success: false,
-				reply: `Language is not supported! Use one of these: ${this.staticData.names.join(", ")}`,
+				reply: `Language is not supported! Use one of these: ${OCR_LANGUAGE_NAMES.join(", ")}`,
 				cooldown: 2500
 			};
 		}
@@ -145,14 +141,13 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { definitions } = this.staticData;
-		const tableBody = Object.entries(definitions).map(([code, definition]) => {
+		const tableBody = Object.entries(OCR_LANGUAGES).map(([code, definition]) => {
 			const name = LanguageCodes.getName(code);
 			const engines = definition.engines.join(", ");
 			return `<tr><td>${name}</td><td>${code}</td><td>${engines}</td></tr>`;
 		}).join("");
 
-		const table = `
+		const tableHTML = `
 			<table>
 				<thead>
 					<tr>
@@ -192,7 +187,7 @@ module.exports = {
 			"",
 
 			"List of supported languages + engine versions:",
-			table
+			tableHTML
 		];
 	})
 };

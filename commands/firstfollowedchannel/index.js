@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function firstFollowedChannel (context, target) {
 		const platform = sb.Platform.get("twitch");
 		const name = sb.User.normalizeUsername(target ?? context.user.Name);

@@ -9,7 +9,6 @@ module.exports = {
 		{ name: "amend", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function suggest (context, ...args) {
 		if (args.length === 0 || context.invocation === "suggestions") {
 			return {

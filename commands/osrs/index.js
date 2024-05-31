@@ -15,7 +15,6 @@ module.exports = {
 		{ name: "virtual", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function osrs (context, first, ...args) {
 		if (!first) {
 			return {

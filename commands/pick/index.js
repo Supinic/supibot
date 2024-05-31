@@ -9,7 +9,6 @@ module.exports = {
 		{ name: "delimiter", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function pick (context, ...words) {
 		if (words.length === 0) {
 			return {

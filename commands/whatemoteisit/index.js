@@ -1,3 +1,9 @@
+const REGEXES = {
+	V1: /^\d+$/,
+	V2: /emotesv2_[a-z0-9]{32}/,
+	CDN: /emoticons\/v[12]\/([\w\d]*)\//
+};
+
 module.exports = {
 	Name: "whatemoteisit",
 	Aliases: ["weit"],
@@ -9,11 +15,6 @@ module.exports = {
 		{ name: "linkOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		regexV1: /^\d+$/,
-		regexV2: /emotesv2_[a-z0-9]{32}/,
-		regexCDN: /emoticons\/v[12]\/([\w\d]*)\//
-	})),
 	Code: (async function whatEmoteIsIt (context, ...args) {
 		let input = args.join(" ");
 		if (!input) {
@@ -27,19 +28,19 @@ module.exports = {
 			input = context.append.emotes.split(":")[0];
 		}
 
-		const { regexCDN, regexV1, regexV2 } = this.staticData;
-		const isEmoteID = (regexV1.test(input) || regexV2.test(input) || regexCDN.test(input));
+		const isEmoteID = (REGEXES.V1.test(input) || REGEXES.V2.test(input) || REGEXES.CDN.test(input));
 
 		let inputEmoteIdentifier;
 		if (isEmoteID) {
-			if (regexCDN.test(input)) {
-				inputEmoteIdentifier = input.match(regexCDN)[1];
+			// Ordering is important here, go from the most → the least specific regex
+			if (REGEXES.CDN.test(input)) {
+				inputEmoteIdentifier = input.match(REGEXES.CDN)[1];
 			}
-			else if (regexV2.test(input)) {
-				inputEmoteIdentifier = input.match(regexV2)[0];
+			else if (REGEXES.V2.test(input)) {
+				inputEmoteIdentifier = input.match(REGEXES.V2)[0];
 			}
-			else if (regexV1.test(input)) {
-				inputEmoteIdentifier = input.match(regexV1)[0];
+			else if (REGEXES.V1.test(input)) {
+				inputEmoteIdentifier = input.match(REGEXES.V1)[0];
 			}
 		}
 		else {
@@ -49,7 +50,7 @@ module.exports = {
 		const response = await sb.Got("IVR", {
 			url: `v2/twitch/emotes/${encodeURIComponent(inputEmoteIdentifier)}`,
 			searchParams: {
-				id: String(isEmoteID) // literally "true" or "false" based on if the intput is an emote ID
+				id: String(isEmoteID) // literally "true" or "false" based on if the input is an emote ID
 			},
 			throwHttpErrors: false
 		});

@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["block","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function (context, targetUser) {
 		if (!context.channel) {
 			return {

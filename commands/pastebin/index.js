@@ -36,7 +36,6 @@ module.exports = {
 		{ name: "raw", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: async function pastebin (context, command, ...rest) {
 		let type;
 		let provider;

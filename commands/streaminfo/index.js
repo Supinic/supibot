@@ -10,7 +10,6 @@ module.exports = {
 		{ name: "youtube", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function streamInfo (context, ...args) {
 		if (context.params.youtube) {
 			const handler = require("./youtube-handler.js");

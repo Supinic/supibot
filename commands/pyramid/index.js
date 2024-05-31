@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["developer","whitelist"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function pyramid (context, emote, size) {
 		if (!context.channel) {
 			return {

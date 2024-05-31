@@ -9,7 +9,6 @@ module.exports = {
 		{ name: "textOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function lastLine (context, user) {
 		if (!user) {
 			return {

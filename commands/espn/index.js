@@ -28,7 +28,6 @@ module.exports = {
 		{ name: "mode", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: async function espn (context) {
 		if (context.invocation === this.Name) {
 			return {

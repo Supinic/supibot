@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function shoutout (context, target) {
 		if (!target) {
 			return {
@@ -23,7 +22,7 @@ module.exports = {
 				login: sb.User.normalizeUsername(target.trim())
 			}
 		});
-		
+
 		if (!Array.isArray(userLookupResponse.body.data)) {
 			return {
 				success: false,

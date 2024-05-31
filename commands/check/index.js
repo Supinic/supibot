@@ -9,7 +9,6 @@ module.exports = {
 		{ name: "index", type: "number" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function check (context, type, identifier) {
 		if (!type) {
 			return {

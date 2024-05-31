@@ -9,7 +9,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	initialize: function () {
 		const { cryptoGamePriceUpdate } = require("./update-prices-cron.js");
 		this.data.updateCronJob = new CronJob("0 0 * * * *", () => cryptoGamePriceUpdate());

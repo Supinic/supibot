@@ -1,5 +1,7 @@
 const { searchYoutube } = require("../../utils/command-utils.js");
 
+const MAXIMUM_COPYPASTA_REPEATS = 5;
+
 module.exports = {
 	Name: "formula1",
 	Aliases: ["f1"],
@@ -13,9 +15,6 @@ module.exports = {
 		{ name: "weather", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		pastaRepeatThreshold: 5
-	})),
 	Code: (async function formula1 (context, ...args) {
 		const {
 			fetchDriverStandings,
@@ -174,7 +173,7 @@ module.exports = {
 
 				const pasta = sb.Utils.randArray(availablePastas);
 				this.data.repeatedPastas[channelID].unshift(pasta);
-				this.data.repeatedPastas[channelID].splice(this.staticData.pastaRepeatThreshold);
+				this.data.repeatedPastas[channelID].splice(MAXIMUM_COPYPASTA_REPEATS);
 
 				return {
 					reply: pasta
@@ -192,7 +191,7 @@ module.exports = {
 
 				const quote = sb.Utils.randArray(availableQuotes);
 				this.data.repeatedGimi[channelID].unshift(quote);
-				this.data.repeatedGimi[channelID].splice(this.staticData.pastaRepeatThreshold);
+				this.data.repeatedGimi[channelID].splice(MAXIMUM_COPYPASTA_REPEATS);
 
 				return {
 					reply: quote

@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["external-input","mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function gag (context, ...args) {
 		const options = { responseType: "json" };
 		if (args.length === 0) {

@@ -1,4 +1,7 @@
 const LanguageCodes = require("language-iso-codes");
+const BASE_CACHE_KEY = "liveuamap-data";
+const SUPPORTED_LANGUAGE_CODES = ["en", "ru", "uk", "pl"];
+const MAXIMUM_ARTICLES = 10;
 
 module.exports = {
 	Name: "liveuamap",
@@ -11,14 +14,7 @@ module.exports = {
 		{ name: "lang", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		baseCacheKey: "liveuamap-data",
-		threshold: 10,
-		supportedLanguageCodes: ["en", "ru", "uk", "pl"]
-	})),
 	Code: (async function liveUaMap (context) {
-		const { baseCacheKey, supportedLanguageCodes } = this.staticData;
-
 		const inputLanguage = context.params.lang ?? "en";
 		const languageCode = LanguageCodes.getCode(inputLanguage); // @todo fix so that params.lang is of type `language`
 		if (!languageCode) {
@@ -27,15 +23,15 @@ module.exports = {
 				reply: `Could not parse your provided language!`
 			};
 		}
-		else if (!supportedLanguageCodes.includes(languageCode)) {
-			const supportedLanguageNames = supportedLanguageCodes.map(i => LanguageCodes.getName(i));
+		else if (!SUPPORTED_LANGUAGE_CODES.includes(languageCode)) {
+			const supportedLanguageNames = SUPPORTED_LANGUAGE_CODES.map(i => LanguageCodes.getName(i));
 			return {
 				success: false,
 				reply: `Your provided language is not supported! Use one of: ${supportedLanguageNames.join(", ")}`
 			};
 		}
 
-		const cacheKey = `${baseCacheKey}-${languageCode}`;
+		const cacheKey = `${BASE_CACHE_KEY}-${languageCode}`;
 		let data = await this.getCacheData(cacheKey);
 		if (!data) {
 			let response;
@@ -62,7 +58,6 @@ module.exports = {
 				};
 			}
 
-			const { threshold } = this.staticData;
 			const result = [];
 			const $ = sb.Utils.cheerio(response.body);
 			const events = $("div.event");
@@ -94,13 +89,13 @@ module.exports = {
 					isPropaganda
 				});
 
-				if (result.length >= threshold) {
+				if (result.length >= MAXIMUM_ARTICLES) {
 					break;
 				}
 			}
 
 			data = result;
-			await this.setCacheData(cacheKey, data, {
+			await this.setCacheData(BASE_CACHE_KEY, data, {
 				expiry: 600_000 // 10 minutes
 			});
 		}

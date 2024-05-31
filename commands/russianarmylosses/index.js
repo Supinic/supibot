@@ -1,3 +1,5 @@
+const { categories } = require("./categories.json");
+
 module.exports = {
 	Name: "russianarmylosses",
 	Aliases: ["ral"],
@@ -7,84 +9,6 @@ module.exports = {
 	Flags: ["mention", "non-nullable", "pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		// While this data is provided by the API, some names are too long for chat and have been shortened.
-		// Also, several aliases have been added for ease of use.
-		// Ideally, each category should have a one-word name/alias - so that it is easy to use with just a single word.
-		// https://russianwarship.rip/api-documentation/v1#/Terms/getAllStatisticalTerms
-		categories: [
-			{
-				name: "Personnel",
-				code: "personnel_units",
-				aliases: ["Soldiers", "Units", "Personnel units"]
-			},
-			{
-				name: "Tanks",
-				code: "tanks",
-				aliases: []
-			},
-			{
-				name: "Armoured fighting vehicles",
-				code: "armoured_fighting_vehicles",
-				aliases: ["AFV", "AFVs", "Combat vehicles", "Fighting vehicles"]
-			},
-			{
-				name: "Artillery",
-				code: "artillery_systems",
-				aliases: ["Artillery systems"]
-			},
-			{
-				name: "MLRS",
-				code: "mlrs",
-				aliases: ["Multiple launch rocket systems"]
-			},
-			{
-				name: "Anti-air systems",
-				code: "aa_warfare_systems",
-				aliases: ["AA", "Anti-air"]
-			},
-			{
-				name: "Planes",
-				code: "planes",
-				aliases: []
-			},
-			{
-				name: "Helicopters",
-				code: "helicopters",
-				aliases: []
-			},
-			{
-				name: "Other vehicles and fuel tanks",
-				code: "vehicles_fuel_tanks",
-				aliases: ["Vehicles", "Other vehicles"]
-			},
-			{
-				name: "Warships",
-				code: "warships_cutters",
-				aliases: ["Ships"]
-			},
-			{
-				name: "Missiles",
-				code: "cruise_missiles",
-				aliases: ["Cruise missiles"]
-			},
-			{
-				name: "UAV",
-				code: "uav_systems",
-				aliases: ["UAVs"]
-			},
-			{
-				name: "Special equipment",
-				code: "special_military_equip",
-				aliases: ["Other equipment", "Other"]
-			},
-			{
-				name: "Missile systems",
-				code: "atgm_srbm_systems",
-				aliases: ["ATGM", "SRBM"]
-			}
-		]
-	})),
 	Code: (async function russianArmyLosses (context, ...args) {
 		const response = await sb.Got("GenericAPI", {
 			url: "https://russianwarship.rip/api/v1/statistics/latest"
@@ -92,7 +16,6 @@ module.exports = {
 
 		let reply;
 		const { increase, stats } = response.body.data;
-		const { categories } = this.staticData;
 		const inputTerm = args.join(" ").toLowerCase();
 
 		if (inputTerm) {
@@ -136,7 +59,7 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const categoriesList = this.staticData.categories.map(category => {
+		const categoriesList = categories.map(category => {
 			const aliasList = category.aliases.map(i => `<code>${i}</code>`).join("");
 			const aliasString = (aliasList) ? ` - aliases: ${aliasList}` : "";
 			return `<li>${category.name}${aliasString}</li>`;

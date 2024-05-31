@@ -1,5 +1,16 @@
 const { fetchTimeData, parseChrono } = require("../../utils/command-utils.js");
 
+const MESSAGE_LIMIT = 2000;
+const MAXIMUM_SQL_TIMESTAMP = 253_402_297_199_999; // SQL DATETIME limit - 9999-12-31 23:59:59.999
+const ERROR_REASONS = {
+	"scheduled-incoming": "That person has too many timed reminders pending for them on that day!",
+	"scheduled-outgoing": "You have too many timed reminders pending on that day!",
+	"public-incoming": "That person has too many public reminders pending!",
+	"public-outgoing": "You have too many public reminders pending!",
+	"private-incoming": "That person has too many private reminders pending!",
+	"private-outgoing": "You have too many private reminders pending!"
+};
+
 module.exports = {
 	Name: "remind",
 	Aliases: ["notify","remindme","remindprivate","privateremind"],
@@ -14,18 +25,6 @@ module.exports = {
 		{ name: "private", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		limit: 2000,
-		strings: {
-			"scheduled-incoming": "That person has too many timed reminders pending for them on that day!",
-			"scheduled-outgoing": "You have too many timed reminders pending on that day!",
-			"public-incoming": "That person has too many public reminders pending!",
-			"public-outgoing": "You have too many public reminders pending!",
-			"private-incoming": "That person has too many private reminders pending!",
-			"private-outgoing": "You have too many private reminders pending!"
-		},
-		sqlDateLimit: new sb.Date(253402297199999) // SQL DATETIME limit - 9999-12-31 23:59:59.999
-	})),
 	Code: (async function remind (context, ...args) {
 		const chronoParams = Object.keys(context.params).filter(i => i !== "private");
 		if (chronoParams.length >= 2) {
@@ -255,14 +254,14 @@ module.exports = {
 					cooldown: this.Cooldown / 2
 				};
 			}
-			else if ((sb.Date.now() + delta) > this.staticData.sqlDateLimit) {
+			else if ((sb.Date.now() + delta) > MAXIMUM_SQL_TIMESTAMP) {
 				const description = (Number.isFinite(comparison.valueOf()))
 					? `the date ${comparison.format("Y-m-d")}`
-					: `${sb.Utils.groupDigits(Math.trunc(delta / 31_536_000_000))} years in the future`;
+					: `approximately ${sb.Utils.groupDigits(Math.trunc(delta / 31_536_000_000))} years in the future`;
 
 				return {
 					success: false,
-					reply: `Your reminder was set to approximately ${description}, but the limit is 31st December 9999.`,
+					reply: `Your reminder was set to ${description}, but the limit is December 31st 9999.`,
 					cooldown: this.Cooldown / 2
 				};
 			}
@@ -296,7 +295,7 @@ module.exports = {
 
 		const type = (chronoType === "after") ? "Deferred" : "Reminder";
 		const message = (reminderText)
-			? sb.Utils.wrapString(reminderText, Number(this.staticData.limit))
+			? sb.Utils.wrapString(reminderText, MESSAGE_LIMIT)
 			: "(no message)";
 
 		const result = await sb.Reminder.create({
@@ -337,7 +336,7 @@ module.exports = {
 		else {
 			return {
 				success: false,
-				reply: this.staticData.strings[result.cause] ?? `Reminder not created - result is ${result.cause}.`
+				reply: ERROR_REASONS[result.cause] ?? `Reminder not created - result is ${result.cause}.`
 			};
 		}
 	}),

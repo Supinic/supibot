@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["developer","mention","pipe","system","whitelist"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function atop () {
 		const top = await sb.Query.getRecordset(rs => rs
 			.select("User_Alias", "SUM(Message_Count) AS Total")

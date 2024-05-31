@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","pipe","system","whitelist"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function simpleSQL (context, ...args) {
 		let query = args.join(" ");
 		try {

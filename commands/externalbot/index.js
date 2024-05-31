@@ -1,3 +1,6 @@
+const RESPONSE_TIMEOUT = 10_000;
+let prefixes;
+
 module.exports = {
 	Name: "externalbot",
 	Aliases: ["ebot"],
@@ -7,9 +10,14 @@ module.exports = {
 	Flags: ["external-input","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		responseTimeout: 10_000
-	})),
+	initialize: async () => {
+		prefixes = await sb.Query.getRecordset(rs => rs
+			.select("Bot_Alias AS ID", "Prefix as prefix")
+			.from("bot_data", "Bot")
+			.where("Prefix IS NOT NULL")
+			.orderBy("LENGTH(Prefix) DESC")
+		);
+	},
 	Code: (async function externalBot (context, ...rest) {
 		if (!context.channel) {
 			return {
@@ -22,20 +30,11 @@ module.exports = {
 			};
 		}
 
-		if (!this.data.prefixes) {
-			this.data.prefixes = await sb.Query.getRecordset(rs => rs
-				.select("Bot_Alias", "Prefix")
-				.from("bot_data", "Bot")
-				.where("Prefix IS NOT NULL")
-				.orderBy("LENGTH(Prefix) DESC")
-			);
-		}
-
 		let botData = null;
 		const message = rest.join(" ");
-		for (const { Prefix: prefix, Bot_Alias: botID } of this.data.prefixes) {
+		for (const { prefix, ID } of prefixes) {
 			if (message.startsWith(prefix)) {
-				botData = await sb.User.get(botID);
+				botData = await sb.User.get(ID);
 				break;
 			}
 		}
@@ -64,7 +63,9 @@ module.exports = {
 
 		// Sends the actual external bot's command, and wait to see if it responds
 		const safeMessage = await context.platform.prepareMessage(message, context.channel);
-		const messagePromise = context.channel.waitForUserMessage(botData);
+		const messagePromise = context.channel.waitForUserMessage(botData, {
+			timeout: RESPONSE_TIMEOUT
+		});
 
 		await context.channel.send(safeMessage);
 
@@ -72,7 +73,7 @@ module.exports = {
 		if (result === null) {
 			return {
 				reason: "bad_invocation",
-				reply: `No response from external bot after ${this.staticData.responseTimeout / 1000} seconds!`
+				reply: `No response from external bot after ${RESPONSE_TIMEOUT / 1000} seconds!`
 			};
 		}
 

@@ -9,7 +9,6 @@ module.exports = {
 		{ name: "input", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function lastCommand (context, user) {
 		const targetUser = (user)
 			? await sb.User.get(user)

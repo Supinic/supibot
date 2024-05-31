@@ -10,7 +10,6 @@ module.exports = {
 		{ name: "postLinkOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function randomInstagram (context, user) {
 		if (!user) {
 			return {

@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function stackOverflowSearch (context, ...args) {
 		const message = args.join(" ");
 		if (!message) {

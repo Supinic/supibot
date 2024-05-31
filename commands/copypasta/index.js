@@ -1,3 +1,22 @@
+const MAXIMUM_REPEATS = 5;
+
+const fetchCopypasta = async () => {
+	const html = await sb.Got("https://www.twitchquotes.com/random").text();
+	const $ = sb.Utils.cheerio(html);
+	const text = $(`div[id^="clipboard_copy_content"]`).text();
+
+	if (typeof text === "string") {
+		return sb.Utils.removeHTML(text).trim();
+	}
+	else {
+		return text;
+	}
+};
+
+const asciiRegex = /([\u2591\u2588\u2500\u2580\u2593\u2584\u2592])/g;
+const brailleRegex = /[█▄▀░▒▓\u2802-\u28ff]/g;
+const hasAsciiArt = (string) => (asciiRegex.test(string) || brailleRegex.test(string));
+
 module.exports = {
 	Name: "copypasta",
 	Aliases: null,
@@ -5,49 +24,28 @@ module.exports = {
 	Cooldown: 15000,
 	Description: "Fetches a random Twitch-related copypasta.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: [
-		{ name: "allowAsciiArt", type: "boolean" }
-	],
+	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		repeatLimit: 5,
-		fetch: async () => {
-			const html = await sb.Got("https://www.twitchquotes.com/random").text();
-			const $ = sb.Utils.cheerio(html);
-
-			return $(`div[id^="clipboard_copy_content"]`).text();
-		},
-		hasAsciiArt: (string) => {
-			const asciiRegex = sb.Config.get("ASCII_ART_REGEX");
-			const brailleRegex = /[█▄▀░▒▓\u2802-\u28ff]/g;
-
-			return brailleRegex.test(string) || asciiRegex.test(string);
-		}
-	})),
-	Code: (async function copypasta (context) {
-		const { fetch, hasAsciiArt, repeatLimit } = this.staticData;
-
+	Code: (async function copypasta () {
 		let copypasta;
-		let repeats = 0;
-		const asciiArtDisabled = context.params.allowAsciiArt ?? (context.platform.Name === "twitch");
+		for (let repeats = 0; repeats < MAXIMUM_REPEATS; repeats++) {
+			const result = await fetchCopypasta();
 
-		do {
-			copypasta = await fetch();
-			repeats++;
-		} while (asciiArtDisabled && hasAsciiArt(copypasta) && repeats < repeatLimit);
+			if (result && !hasAsciiArt(result)) {
+				copypasta = result;
+				break;
+			}
+		}
 
-		if (repeats >= repeatLimit) {
+		if (!copypasta) {
 			return {
 				success: false,
-				reply: `Could not find a fitting copypasta within ${repeats} attempts!`
+				reply: `Could not find a fitting copypasta within ${MAXIMUM_REPEATS} attempts!`
 			};
 		}
 
 		return {
-			success: Boolean(copypasta),
-			reply: (copypasta)
-				? sb.Utils.removeHTML(copypasta).trim()
-				: "No copypasta found!"
+			reply: `Your copypasta: ${copypasta}`
 		};
 	}),
 	Dynamic_Description: (async (prefix) => [
@@ -56,9 +54,6 @@ module.exports = {
 
 		`<code>${prefix}copypasta</code>`,
 		"(random copypasta)",
-		"",
-
-		`<code>${prefix}copypasta allowAsciiArt:true</code>`,
-		"(random copypasta) - includes ASCII art pastas, which are disabled on Twitch by defualt. Retries up to 5 times, if one isn't found, then fails."
+		"This automatically excludes copypastas that contain some kind of ASCII or Braille characters art"
 	])
 };

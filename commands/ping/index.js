@@ -24,7 +24,6 @@ module.exports = {
 	Flags: ["pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	/**
 	 * @param {Context} context
 	 */

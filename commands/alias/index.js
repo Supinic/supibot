@@ -8,6 +8,13 @@ catch {
 
 const bannedCommandCombinations = config.modules.commands.bannedCombinations ?? [];
 
+const AliasUtils = require("./alias-utils.js");
+
+const NESTED_ALIAS_LIMIT = 10;
+const ALIAS_DESCRIPTION_LIMIT = 250;
+const ALIAS_NAME_REGEX = /^[-\w\u00a9\u00ae\u2000-\u3300\ud83c\ud000-\udfff\ud83d\ud000-\udfff\ud83e\ud000-\udfff]{2,30}$/;
+const ALIAS_INVALID_NAME_RESPONSE = "Your alias should only contain letters, numbers and be 2-30 characters long.";
+
 module.exports = {
 	Name: "alias",
 	Aliases: ["$"],
@@ -17,85 +24,7 @@ module.exports = {
 	Flags: ["external-input","mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		aliasLimit: 10,
-		descriptionLimit: 250,
-		nameCheck: {
-			regex: /^[-\w\u00a9\u00ae\u2000-\u3300\ud83c\ud000-\udfff\ud83d\ud000-\udfff\ud83e\ud000-\udfff]{2,30}$/,
-			response: "Your alias should only contain letters, numbers and be 2-30 characters long."
-		},
-
-		applyParameters: (context, aliasArguments, commandArguments) => {
-			let errorReason;
-			const resultArguments = [];
-			const numberRegex = /(?<order>-?\d+)(\.\.(?<range>-?\d+))?(?<rest>\+?)/;
-			const strictNumberRegex = /^[\d-.+]+$/;
-
-			for (let i = 0; i < aliasArguments.length; i++) {
-				const parsed = aliasArguments[i].replace(/\${(.+?)}/g, (total, match) => {
-					const numberMatch = match.match(numberRegex);
-					if (numberMatch && strictNumberRegex.test(match)) {
-						let order = Number(numberMatch.groups.order);
-						if (order < 0) {
-							order = commandArguments.length + order;
-						}
-
-						let range = (numberMatch.groups.range) ? Number(numberMatch.groups.range) : null;
-						if (typeof range === "number") {
-							if (range < 0) {
-								range = commandArguments.length + range + 1;
-							}
-
-							if (range < order) {
-								const temp = range;
-								range = order;
-								order = temp;
-							}
-						}
-
-						const useRest = (numberMatch.groups.rest === "+");
-						if (useRest && range) {
-							errorReason = `Cannot combine both the "range" (..) and "rest" (+) argument symbols!`;
-						}
-						else if (useRest) {
-							return commandArguments.slice(order).join(" ");
-						}
-						else if (range) {
-							return commandArguments.slice(order, range).join(" ");
-						}
-						else {
-							return commandArguments[order] ?? "";
-						}
-					}
-					else if (match === "executor") {
-						return context.user.Name;
-					}
-					else if (match === "channel") {
-						return context.channel?.Description ?? context.channel?.Name ?? "[private messages]";
-					}
-					else {
-						return total;
-					}
-				});
-
-				if (errorReason) {
-					return {
-						success: false,
-						reply: errorReason
-					};
-				}
-
-				resultArguments.push(...parsed.split(" "));
-			}
-
-			return {
-				success: true,
-				resultArguments
-			};
-		}
-	})),
 	Code: (async function alias (context, type, ...args) {
-		const AliasUtils = require("./alias-utils.js");
 		if (context.invocation === "$") {
 			args = [type, ...args]; // This the command name
 			type = "run"; // This is the implicit subcommand
@@ -127,10 +56,10 @@ module.exports = {
 						reply: `You didn't provide a name, or a command! Usage: alias add (name) (command) (...arguments)"`
 					};
 				}
-				else if (!this.staticData.nameCheck.regex.test(name)) {
+				else if (!ALIAS_NAME_REGEX.test(name)) {
 					return {
 						success: false,
-						reply: `Your alias name is not valid! ${this.staticData.nameCheck.response}`
+						reply: `Your alias name is not valid! ${ALIAS_INVALID_NAME_RESPONSE}`
 					};
 				}
 
@@ -381,10 +310,10 @@ module.exports = {
 						};
 					}
 
-					if (!this.staticData.nameCheck.regex.test(aliasName)) {
+					if (!ALIAS_NAME_REGEX.test(aliasName)) {
 						return {
 							success: false,
-							reply: `Published alias name is not valid! ${this.staticData.nameCheck.response}`
+							reply: `Published alias name is not valid! ${ALIAS_INVALID_NAME_RESPONSE}`
 						};
 					}
 
@@ -476,7 +405,7 @@ module.exports = {
 						reply: "No target alias provided!"
 					};
 				}
-				else if (!this.staticData.nameCheck.regex.test(targetAliasName)) {
+				else if (!ALIAS_NAME_REGEX.test(targetAliasName)) {
 					return {
 						success: false,
 						reply: "The copied alias's name is not valid and therefore can't be copied!"
@@ -592,6 +521,13 @@ module.exports = {
 				}
 
 				const description = rest.join(" ").trim();
+				if (description.length > ALIAS_DESCRIPTION_LIMIT) {
+					return {
+						success: false,
+						reply: `Your alias description is too long! Maximum of ${ALIAS_DESCRIPTION_LIMIT} is allowed.`
+					};
+				}
+
 				const row = await sb.Query.getRow("data", "Custom_Command_Alias");
 				await row.load(alias.ID);
 
@@ -618,10 +554,10 @@ module.exports = {
 						reply: `To duplicate an alias, you must provide both existing and new alias names!`
 					};
 				}
-				else if (!this.staticData.nameCheck.regex.test(newAliasName)) {
+				else if (!ALIAS_NAME_REGEX.test(newAliasName)) {
 					return {
 						success: false,
-						reply: `Your alias name is not valid! ${this.staticData.nameCheck.response}`
+						reply: `Your alias name is not valid! ${ALIAS_INVALID_NAME_RESPONSE}`
 					};
 				}
 
@@ -868,10 +804,10 @@ module.exports = {
 						reply: `Unfortunately, it looks like the original alias has been removed!`
 					};
 				}
-				else if (!this.staticData.nameCheck.regex.test(targetAlias.Name)) {
+				else if (!ALIAS_NAME_REGEX.test(targetAlias.Name)) {
 					return {
 						success: false,
-						reply: `Linked alias name is not valid! ${this.staticData.nameCheck.response}`
+						reply: `Linked alias name is not valid! ${ALIAS_INVALID_NAME_RESPONSE}`
 					};
 				}
 
@@ -975,10 +911,10 @@ module.exports = {
 						reply: "You must provide both the current alias name and the new one!"
 					};
 				}
-				else if (!this.staticData.nameCheck.regex.test(newAliasName)) {
+				else if (!ALIAS_NAME_REGEX.test(newAliasName)) {
 					return {
 						success: false,
-						reply: `Your new alias name is not valid! ${this.staticData.nameCheck.response}`
+						reply: `Your new alias name is not valid! ${ALIAS_INVALID_NAME_RESPONSE}`
 					};
 				}
 
@@ -1225,7 +1161,7 @@ module.exports = {
 				}
 
 				if (!alias) {
-					if (!this.staticData.nameCheck.regex.test(name)) {
+					if (!ALIAS_NAME_REGEX.test(name)) {
 						return {
 							success: false,
 							reply: null
@@ -1260,7 +1196,7 @@ module.exports = {
 
 				const aliasArguments = (alias.Arguments) ? JSON.parse(alias.Arguments) : [];
 
-				const { success, reply, resultArguments } = this.staticData.applyParameters(context, aliasArguments, runArgs.slice(1));
+				const { success, reply, resultArguments } = AliasUtils.applyParameters(context, aliasArguments, runArgs.slice(1));
 				if (!success) {
 					return { success, reply };
 				}
@@ -1298,12 +1234,12 @@ module.exports = {
 				}
 
 				const aliasCount = (context.append.aliasCount ?? 0) + 1;
-				if (aliasCount > this.staticData.aliasLimit) {
+				if (aliasCount > NESTED_ALIAS_LIMIT) {
 					return {
 						success: false,
 						reply: sb.Utils.tag.trim `
 							Your alias cannot continue!
-							It causes more than ${this.staticData.aliasLimit} alias calls.
+							It causes more than ${NESTED_ALIAS_LIMIT} alias calls.
 							Please reduce the complexity first.
 						`
 					};

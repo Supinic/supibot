@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","system"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function link (context, challengeString) {
 		if (!context.privateMessage) {
 			return {

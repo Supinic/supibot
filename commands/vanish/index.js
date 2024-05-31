@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function vanish (context) {
 		if (context.platform.Name !== "twitch") {
 			return {

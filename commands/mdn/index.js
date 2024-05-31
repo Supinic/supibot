@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["developer","mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function mdn (context, ...args) {
 		const query = args.join(" ");
 		if (!query) {

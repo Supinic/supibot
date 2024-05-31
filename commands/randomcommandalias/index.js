@@ -15,7 +15,6 @@ module.exports = {
 		{ name: "user", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function randomCommandAlias (context) {
 		const targetUserAlias = (context.params.user)
 			? await sb.User.get(context.params.user)

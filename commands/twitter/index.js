@@ -14,7 +14,6 @@ module.exports = {
 		{ name: "trends", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function twitter (context, input) {
 		if (context.params.trends) {
 			return {

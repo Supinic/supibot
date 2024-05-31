@@ -1,4 +1,6 @@
-const { randomInt } = require("../../utils/command-utils.js");
+const { invocations, specialSuffix } = require("../../classes/afk-definitions.json");
+
+const STATUS_LENGTH_CHARACTER_LIMIT = 2000;
 
 module.exports = {
 	Name: "afk",
@@ -9,96 +11,6 @@ module.exports = {
 	Flags: ["pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (command => ({
-		statusLengthLimit: 2000,
-		/* eslint-disable array-element-newline */
-		foodEmojis: [
-			"🍋", "🍞", "🥐", "🥖", "🥨", "🥯", "🥞", "🧀", "🍖", "🍗", "🥩", "🥓", "🍔", "🍟", "🍕", "🌭", "🥪", "🌮", "🌯",
-			"🥙", "🍳", "🥘", "🍲", "🥣", "🥗", "🍿", "🥫", "🍱", "🍘", "🍙", "🍚", "🍛", "🍜", "🍝", "🍠", "🍢", "🍣", "🍤",
-			"🍥", "🍡", "🥟", "🥠", "🥡", "🍦", "🍧", "🍨", "🍩", "🍪", "🎂", "🍰", "🥧", "🍫", "🍬", "🍭", "🍮", "🍯"
-		],
-		/* eslint-enable array-element-newline */
-		// @todo eventually merge these definitions with `supi-core/classes/afk-responses.json`
-		invocations: [
-			{
-				name: "afk",
-				status: "now AFK",
-				text: (context, text) => text || "(no message)"
-			},
-			{
-				name: "gn",
-				status: "now sleeping",
-				text: (context, text) => (text) ? `${text} 💤` : " 🛏💤"
-			},
-			{
-				name: "brb",
-				status: "going to be right back",
-				text: async (context, text) => text || await context.getBestAvailableEmote(["ppHop", "ppSlide"], "⌛")
-			},
-			{
-				name: "shower",
-				status: "now taking a shower",
-				text: (context, text) => {
-					if (text) {
-						return `${text} 🚿`;
-					}
-
-					if (randomInt(1, 100) === 1) {
-						return " 🐏🏡 🤠🚿";
-					}
-					else {
-						return " 😏🚿";
-					}
-				}
-			},
-			{
-				name: "poop",
-				aliases: ["💩"],
-				type: "poop",
-				status: "now pooping",
-				text: async (context, text) => (text) ? `${text} 🚽` : await context.getBestAvailableEmote(["peepoPooPoo"], "💩")
-			},
-			{
-				name: "lurk",
-				status: "now lurking",
-				text: (context, text) => (text) ? `${text} 👥` : "👥"
-			},
-			{
-				name: "work",
-				status: "working",
-				text: (context, text) => (text) ? `${text} 💼` : " 👷"
-			},
-			{
-				name: "study",
-				status: "now studying",
-				text: (context, text) => `${text ?? "🤓"} 📚`
-			},
-			{
-				name: "nap",
-				status: "now taking a nap",
-				text: (context, text) => (text) ? `${text} 😴` : "😴"
-			},
-			{
-				name: "food",
-				status: "now eating",
-				text: async (context, text) => {
-					let useAutoEmoji = true;
-					for (const emoji of command.staticData.foodEmojis) {
-						if (text.includes(emoji)) {
-							useAutoEmoji = false;
-						}
-					}
-
-					const emote = await context.getBestAvailableEmote(["OpieOP"], "😋");
-					const appendText = (useAutoEmoji)
-						? sb.Utils.randArray(command.staticData.foodEmojis)
-						: "";
-
-					return (text) ? `${text} ${appendText}` : `${emote} ${appendText}`;
-				}
-			}
-		]
-	})),
 	Code: (async function afk (context, ...args) {
 		if (context.privateMessage && sb.AwayFromKeyboard.get(context.user)) {
 			return {
@@ -108,11 +20,24 @@ module.exports = {
 		}
 
 		const { invocation } = context;
-		const target = this.staticData.invocations.find(i => i.name === invocation || i.aliases?.includes(invocation));
+		const target = invocations.find(i => i.name === invocation || i.aliases?.includes(invocation));
 
-		const text = await target.text(context, args.join(" ").trim());
+		let text = args.join(" ").trim();
+		if (text.length === 0 && target.noTextString) {
+			text = target.noTextString ?? "(no message)";
+		}
+
+		if (target.textSuffix) {
+			text = `${text} ${target.textSuffix}`;
+		}
+		else if (target.specialSuffix) {
+			const suffixes = specialSuffix[target.specialSuffix] ?? [];
+			const suffix = sb.Utils.randArray(suffixes) ?? "";
+			text = `${text} ${suffix}`;
+		}
+
 		await sb.AwayFromKeyboard.set(context.user, {
-			Text: sb.Utils.wrapString(text, this.staticData.statusLengthLimit, { keepWhitespace: false }),
+			Text: sb.Utils.wrapString(text, STATUS_LENGTH_CHARACTER_LIMIT, { keepWhitespace: false }),
 			Status: target.type ?? invocation,
 			Silent: false,
 			Interrupted_ID: null
