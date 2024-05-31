@@ -122,7 +122,15 @@ const predefinedQueries = {
 				? JSON.parse(raw.Arguments)
 				: []
 		};
-	}
+	},
+	randomSongRequest: () => sb.Query.getRecordset(rs => rs
+		.select("Name", "Link", "Video_Type")
+		.from("chat_data", "Song_Request")
+		.where("Video_Type IN %n+", [1])
+		.orderBy("RAND() DESC")
+		.limit(1)
+		.single()
+	)
 };
 const restrictedCommands = ["alias", "pipe", "js"].map(i => sb.Command.get(i));
 const commandExecutionCountThreshold = 5;
