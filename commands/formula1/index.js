@@ -28,10 +28,7 @@ module.exports = {
 		return await subcommand.execute(context, type, ...rest);
 	}),
 	Dynamic_Description: (async (prefix) => {
-		const subcommandDescriptions = subcommands.map(cmd => {
-			return [`<h6>${cmd.name}</h6>`, ...cmd.description].join("<br>");
-		}).join("<br><br>");
-
+		const subcommandDescriptions = subcommands.map(cmd => cmd.description.join("<br>")).join("<br><br>");
 		return [
 			"All things F1-related in a single command.",
 			`Powered by <a href="https://ergast.com/mrd/">Ergast Developer API</a>`,
