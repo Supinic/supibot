@@ -40,48 +40,27 @@ module.exports = {
 
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
-			throwHttpErrors: false,
-			responseType: "text",
-			url: "https://nexra.aryahcr.cc/api/chat/gpt",
+			url: `https://api.deepinfra.com/v1/inference/mistralai/Mixtral-8x7B-Instruct-v0.1`,
+			headers: {
+				Authorization: `Bearer ${sb.Config.get("API_KEY_DEEPINFRA")}`
+			},
 			json: {
-				messages: [],
-				model: "gpt-4-32k",
-				prompt: sb.Utils.tag.trim `
-					Post an interesting tidbit about a chat bot Supibot's command ${command.Name}.
-					Try and generate info about a specific subcommand, along with its usage example.
-					If a command has no subcommands, generate a command summary. 
-					Don't make it quirky, don't include emojis, hashtags, that sort.
+				input: sb.Utils.tag.trim `
+					[INST] 
+					Generate a fun fact about a chat bot Supibot's command ${command.Name}.
+					Try and generate info about a single subcommand, along with its usage example.
 					Make it concise, fit within 300 characters.
 					Command documentation: ${commandDocs}
+					[/INST]
 				`,
-				markdown: false,
-				top_p: 1,
-				frequency_penalty: 0,
-				presence_penalty: 0
+				max_new_tokens: 300,
+				temperature: 0.75
 			}
 		});
 
-		const index = response.body.indexOf("{");
-		if (index === -1) {
-			return {
-				success: false,
-				reply: `Nexra API returned an invalid response! Try again later.`
-			};
-		}
-
-		try {
-			response.body = JSON.parse(response.body.slice(index));
-		}
-		catch (e) {
-			return {
-				success: false,
-				reply: `Nexra API returned an invalid response! Try again later.`
-			};
-		}
-
-
+		const text = response.body.results[0].generated_text;
 		return {
-			reply: `ℹ ${response.body.gpt}`
+			reply: `ℹ ${text}`
 		};
 	}),
 	Dynamic_Description: null
