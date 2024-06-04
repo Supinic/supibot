@@ -152,6 +152,13 @@ module.exports = {
 		await GptCache.addUsageRecord(context.user, Handler.getUsageRecord(response), modelName);
 
 		const reply = Handler.extractMessage(response);
+		if (typeof reply !== "string") {
+			return {
+				success: false,
+				reply: `Could not generate GPT response! Try again later, or try a different model.`
+			};
+		} 
+		
 		const moderationResult = await GptModeration.check(context, reply);
 
 		let result;
