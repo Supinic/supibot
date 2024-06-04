@@ -618,8 +618,8 @@ module.exports = class CytubePlatform extends require("./template.js") {
 	}
 
 	async populateGlobalEmotes () { return []; }
-	async fetchInternalPlatformIDByUsername (userData) { return userData.Name; }
-	async fetchUsernameByUserPlatformID (userPlatformId) { return userPlatformId; }
+	fetchInternalPlatformIDByUsername (userData) { return userData.Name; }
+	fetchUsernameByUserPlatformID (userPlatformId) { return userPlatformId; }
 
 	/**
 	 * Destroys and cleans up the instance

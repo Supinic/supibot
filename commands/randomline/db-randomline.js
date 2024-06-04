@@ -37,21 +37,10 @@ const fetchUserRandomLine = async function (userData, channelData, options = {})
 		const platformData = channelData.Platform;
 
 		if (typeof platformData.fetchInternalPlatformIDByUsername === "function") {
-			userIdentifier = platformData.fetchInternalPlatformIDByUsername(userData);
-		}
-		else if (platformData.Name === "twitch") {
-			userIdentifier = userData.Twitch_ID;
-		}
-		else if (platformData.Name === "discord") {
-			userIdentifier = userData.Discord_ID;
-		}
-		else if (platformData.Name === "cytube") {
-			userIdentifier = userData.Name;
+			userIdentifier = await platformData.fetchInternalPlatformIDByUsername(userData);
 		}
 
-		if (!userIdentifier) {
-			userIdentifier = userData.Name;
-		}
+		userIdentifier ??= userData.Name;
 
 		randomID = await sb.Query.getRecordset(rs => rs
 			.select("ID")
