@@ -47,9 +47,11 @@ module.exports = {
 				messages: [],
 				model: "gpt-4-32k",
 				prompt: sb.Utils.tag.trim `
-					Create a fun fact about a chat bot Supibot command ${command.Name}.
-					Make sure the fun fact is interesting and also well formatted and includes some command usages.
-					Make sure it fits within 450 characters.
+					Post an interesting tidbit about a chat bot Supibot's command ${command.Name}.
+					Try and generate info about a specific subcommand, along with its usage example.
+					If a command has no subcommands, generate a command summary. 
+					Don't make it quirky, don't include emojis, hashtags, that sort.
+					Make it concise, fit within 300 characters.
 					Command documentation: ${commandDocs}
 				`,
 				markdown: false,
