@@ -63,7 +63,7 @@ module.exports = {
 		}
 
 		const tier = sb.Utils.capitalize(data.tier.toLowerCase());
-		const winRate = sb.Utils.round(data.wins / (data.wins + data.losses), 0);
+		const winRate = sb.Utils.round(data.wins / (data.wins + data.losses) * 100, 0);
 
 		return {
 			reply: sb.Utils.tag.trim `
