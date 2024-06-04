@@ -39,6 +39,13 @@ module.exports = class GptNexra extends GptOpenAI {
 				presence_penalty: 0
 			}
 		});
+		
+		if (!response.ok) {
+			return {
+				success: false,
+				reply: `Nexra API returned an error! Try again later.`
+			};
+		}
 
 		const index = response.body.indexOf("{");
 		if (index === -1) {
