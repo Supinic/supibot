@@ -46,6 +46,12 @@ module.exports = {
 				reply: `Provided user does not have any schedule set up!`
 			};
 		}
+		else if (!response.ok) {
+			return {
+				success: false,
+				reply: `Could not check for stream schedule!`
+			};
+		}
 
 		const { segments: rawSegments, vacation } = response.body.data;
 		if (!rawSegments) {
