@@ -13,6 +13,9 @@ module.exports = {
 	description: [
 
 	],
+	flags: {
+		default: true
+	},
 	execute: async (context, type, regionName, userIdentifier) => {
 		if (!regionName || !userIdentifier) {
 			return {
