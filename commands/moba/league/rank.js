@@ -16,7 +16,8 @@ module.exports = {
 	flags: {
 		default: true
 	},
-	execute: async (context, type, regionName, userIdentifier) => {
+	execute: async (context, type, regionName, ...args) => {
+		const userIdentifier = args.join(" ");
 		if (!regionName || !userIdentifier) {
 			return {
 				success: false,
@@ -33,7 +34,7 @@ module.exports = {
 		}
 
 		const [gameName, tagLine] = userIdentifier.split("#");
-		if (!gameName || !tagLine || tagLine.length > 4) {
+		if (!gameName || !tagLine) {
 			return {
 				success: false,
 				reply: `Invalid full user name provided! It must be in format (user)#(tag)`
