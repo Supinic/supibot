@@ -31,7 +31,7 @@ module.exports = {
 			command = sb.Utils.randArray(eligibleCommands);
 		}
 
-		const longDescription = await command.Dynamic_Description();
+		const longDescription = await command.Dynamic_Description(sb.Command.prefix);
 		const commandDocs = sb.Utils.tag.trim `
 			Command: $${command.Name};
 			Summary: ${command.Description ?? "N/A"}
