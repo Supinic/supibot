@@ -154,12 +154,19 @@ module.exports = {
 			startTime = potentialTimestamp;
 		}
 
-		const parsedURL = require("node:url").parse(url);
+		let parsedURL;
+		try {
+			parsedURL = new URL(url);
+		}
+		catch {
+			parsedURL = {};
+		}
+
 		let data = null;
 
-		if (parsedURL.host === "supinic.com" && parsedURL.path.includes("/track/detail")) {
+		if (parsedURL.host === "supinic.com" && parsedURL.pathname.includes("/track/detail")) {
 			const videoTypePrefix = sb.Config.get("VIDEO_TYPE_REPLACE_PREFIX");
-			const songID = Number(parsedURL.path.match(/(\d+)/)[1]);
+			const songID = Number(parsedURL.pathname.match(/(\d+)/)[1]);
 			if (!songID) {
 				return { reply: "Invalid link!" };
 			}
@@ -252,7 +259,7 @@ module.exports = {
 				};
 			}
 			else {
-				const name = decodeURIComponent(parsedURL.path.split("/").pop());
+				const name = decodeURIComponent(parsedURL.pathname.split("/").pop());
 				const encoded = encodeURI(decodeURI(url));
 				data = {
 					name,
