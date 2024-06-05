@@ -82,6 +82,8 @@ export const definition = {
 			expiry: TIMEOUT
 		});
 
+		await channel.setDataProperty("botScopeNotificationSent", now);
+
 		// Finally, create and send the message
 		const message = createMessage(channel);
 		await channel.send(message);
