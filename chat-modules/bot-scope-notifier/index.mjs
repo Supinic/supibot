@@ -40,6 +40,10 @@ export const definition = {
 			neverCheckAgainChannels.add(channel.ID);
 			return;
 		}
+		// If user is not yet established in database -> SKIP
+		else if (!user) {
+			return;
+		}
 		// Don't check own messages
 		else if (user.Name === platform.selfName) {
 			return;
