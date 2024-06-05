@@ -12,11 +12,12 @@ const neverCheckAgainChannels = new Set();
 const timeouts = new Map();
 
 const createMessage = (channel) => sb.Utils.tag.trim `
-	Starting June 26th 2024, to stay in this channel, I have to either:
+	Starting June 26th 2024, to be able to stay in this channel, I have to either:
 	1) get permission from @${channel.Name} via Twitch,
 	or 2) get modded here. 
 	Make sure you do either or both by the deadline.
 	Twitch permission is granted here: https://supinic.com/bot/twitch-auth
+	Twitch devblog about the change: https://discuss.dev.twitch.com/t/54997
 `;
 
 export const definition = {
