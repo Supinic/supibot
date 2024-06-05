@@ -1,4 +1,4 @@
-const { invocations, specialSuffix } = require("../../classes/afk-definitions.json");
+const { invocations, specialSuffixes } = require("../../classes/afk-definitions.json");
 
 const STATUS_LENGTH_CHARACTER_LIMIT = 2000;
 
@@ -31,7 +31,7 @@ module.exports = {
 			text = `${text} ${target.textSuffix}`;
 		}
 		else if (target.specialSuffix) {
-			const suffixes = specialSuffix[target.specialSuffix] ?? [];
+			const suffixes = specialSuffixes[target.specialSuffix] ?? [];
 			const suffix = sb.Utils.randArray(suffixes) ?? "";
 			text = `${text} ${suffix}`;
 		}
