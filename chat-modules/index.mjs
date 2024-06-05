@@ -1,5 +1,6 @@
 import { definition as AsyncMarkovExperiment } from "./async-markov-experiment/index.mjs";
 import { definition as AutomaticUnscramble } from "./automatic-unscramble/index.mjs";
+import { definition as BotScopeNotifier } from "./bot-scope-notifier/index.mjs";
 import { definition as ChatSuggestionLinker } from "./chat-suggestion-linker/index.mjs";
 import { definition as ImgurLinkGatherer } from "./imgur-link-gatherer/index.mjs";
 import { definition as LiveDetection } from "./live-detection/index.mjs";
@@ -20,6 +21,7 @@ import { definition as WannaBecomeFamous } from "./wanna-become-famous/index.mjs
 export const definitions = [
 	AsyncMarkovExperiment,
 	AutomaticUnscramble,
+	BotScopeNotifier,
 	ChatSuggestionLinker,
 	ImgurLinkGatherer,
 	LiveDetection,
