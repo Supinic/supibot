@@ -15,7 +15,7 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Code: (async function formula1 (context, ...args) {
-		const type = (args[0] ?? "race").toLowerCase();
+		const type = (args[0] ?? "race");
 		const subcommand = subcommands.find(i => i.name === type || i.aliases?.includes(type));
 		if (!subcommand) {
 			return {
