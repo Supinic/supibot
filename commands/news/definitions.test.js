@@ -2,12 +2,23 @@
 const assert = require("node:assert");
 const definitions = require("./definitions.json").sort((a, b) => a.code.localeCompare(b.code));
 
+const rssFetch = async (url) => await fetch(url, {
+	headers: {
+		// "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+		// "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/602.1 (KHTML, like Gecko) QuiteRss/0.19.4 Version/10.0 Safari/602.1"
+		Accept: "application/xml,text/html,application/xhtml+xml"
+	},
+	redirect: "follow"
+});
+
 describe("valid RSS news definitions", function () {
 	if (typeof globalThis.fetch !== "function") {
 		return it.skip("Cannot test - fetch is not avilable");
 	}
 
-	const RSS = new (require("rss-parser"))();
+	const RSS = new (require("rss-parser"))({
+		defaultRSS: 0.9
+	});
 
 	for (const definition of definitions) {
 		describe(definition.code.toUpperCase(), function () {
@@ -30,7 +41,7 @@ describe("valid RSS news definitions", function () {
 
 							let rssData;
 							await assert.doesNotReject(async () => {
-								const response = await fetch(url);
+								const response = await rssFetch(url);
 								const xml = await response.text();
 								rssData = await RSS.parseString(xml);
 
