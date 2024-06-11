@@ -61,7 +61,7 @@ const getPUUIDByName = async (gameName, tagLine) => {
 
 		await sb.Cache.setByPrefix(key, puuid, {
 			expiry: 30 * 864e5 // 30 days
-		})
+		});
 	}
 
 	return puuid;
@@ -78,6 +78,18 @@ const getSummonerID = async (platform, puuid) => {
 				"X-Riot-Token": `${sb.Config.get("API_RIOT_GAMES_KEY")}`
 			}
 		});
+
+		if (response.statusCode === 404) {
+			return null;
+		}
+		else if (!response.ok) {
+			throw new sb.Error({
+				message: "Could not fetch SID",
+				args: {
+					statusCode: response.statusCode
+				}
+			});
+		}
 
 		summonerId = response.body.id;
 		await sb.Cache.setByPrefix(summonerKey, summonerId, {
