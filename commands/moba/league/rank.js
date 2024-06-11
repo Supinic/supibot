@@ -55,7 +55,7 @@ module.exports = {
 		if (!summonerId) {
 			return {
 				success: false,
-				reply: `No such account exists on ${regionName.toUpperCase()}!`
+				reply: `No such account exists in ${regionName.toUpperCase()}!`
 			};
 		}
 
