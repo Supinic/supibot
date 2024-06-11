@@ -69,7 +69,7 @@ const getPUUIDByName = async (gameName, tagLine) => {
 
 const getSummonerID = async (platform, puuid) => {
 	const summonerKey = getSummonerIdCacheKey(puuid);
-	let summonerId = await sb.Cache.getByPrefix(puuid);
+	let summonerId = await sb.Cache.getByPrefix(summonerKey);
 	if (!summonerId) {
 		const response = await sb.Got("GenericAPI", {
 			url: `https://${platform}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`,
