@@ -17,9 +17,15 @@ const PLATFORMS = {
 	vn2: ["vn", "vietnam"]
 };
 
+const GAME_RESULT = {
+	END: "GameComplete"
+};
+
 const getPUUIdCacheKey = (gameName, tagLine) => `moba-league-puuid-${gameName}-${tagLine}`;
 const getSummonerIdCacheKey = (puuid) => `moba-league-sid-${puuid}`;
-const getLeagueEntriesCacheKey = (platform, summonerId) => `mob-league-entries-${platform}-${summonerId}`;
+const getLeagueEntriesCacheKey = (platform, summonerId) => `moba-league-entries-${platform}-${summonerId}`;
+const getMatchIdsKey = (summonerId) => `moba-league-match-ids-${summonerId}`;
+const getMatchDataKey = (matchId) => `moba-league-match-data-${matchId}`;
 
 const getPlatform = (identifier) => {
 	identifier = identifier.toLowerCase();
@@ -67,7 +73,7 @@ const getPUUIDByName = async (gameName, tagLine) => {
 	return puuid;
 };
 
-const getSummonerID = async (platform, puuid) => {
+const getSummonerId = async (platform, puuid) => {
 	const summonerKey = getSummonerIdCacheKey(puuid);
 	let summonerId = await sb.Cache.getByPrefix(summonerKey);
 	if (!summonerId) {
@@ -120,9 +126,75 @@ const getLeagueEntries = async (platform, summonerId) => {
 	return data;
 };
 
+const getMatchIds = async (puuid) => {
+	const summonerMatchKey = getMatchIdsKey(puuid);
+	let matchIds = await sb.Cache.getByPrefix(summonerMatchKey);
+	if (!matchIds) {
+		const response = await sb.Got("GenericAPI", {
+			url: `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids`,
+			throwHttpErrors: false,
+			headers: {
+				"X-Riot-Token": `${sb.Config.get("API_RIOT_GAMES_KEY")}`
+			}
+		});
+
+		if (!response.ok) {
+			throw new sb.Error({
+				message: "Could not fetch match IDs",
+				args: {
+					statusCode: response.statusCode
+				}
+			});
+		}
+
+		matchIds = response.body;
+		await sb.Cache.setByPrefix(summonerMatchKey, matchIds, {
+			expiry: 300_000 // 5 minutes
+		});
+	}
+
+	return matchIds;
+};
+
+const getMatchData = async (matchId) => {
+	const matchDataKey = getMatchDataKey(matchId);
+	let matchData = await sb.Cache.getByPrefix(matchDataKey);
+	if (!matchData) {
+		const response = await sb.Got("GenericAPI", {
+			url: `https://europe.api.riotgames.com/lol/match/v5/matches/${matchId}`,
+			throwHttpErrors: false,
+			headers: {
+				"X-Riot-Token": `${sb.Config.get("API_RIOT_GAMES_KEY")}`
+			}
+		});
+
+		if (!response.ok) {
+			throw new sb.Error({
+				message: "Could not fetch match data",
+				args: {
+					statusCode: response.statusCode
+				}
+			});
+		}
+
+		matchData = response.body;
+
+		// Only cache matches that are finished
+		if (matchData.info.endOfGameResult === GAME_RESULT.END) {
+			await sb.Cache.setByPrefix(matchDataKey, matchData, {
+				expiry: 30 * 864e5 // 30 days
+			});
+		}
+	}
+
+	return matchData;
+};
+
 module.exports = {
 	getPlatform,
 	getPUUIDByName,
-	getSummonerID,
-	getLeagueEntries
+	getSummonerId,
+	getLeagueEntries,
+	getMatchIds,
+	getMatchData
 };

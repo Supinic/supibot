@@ -1,6 +1,6 @@
 const {
 	getPUUIDByName,
-	getSummonerID,
+	getSummonerId,
 	getLeagueEntries,
 	getPlatform
 } = require("./utils.js");
@@ -51,7 +51,7 @@ module.exports = {
 			};
 		}
 
-		const summonerId = await getSummonerID(region, puuid);
+		const summonerId = await getSummonerId(region, puuid);
 		if (!summonerId) {
 			return {
 				success: false,
