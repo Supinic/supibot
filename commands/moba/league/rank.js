@@ -33,12 +33,14 @@ module.exports = {
 			};
 		}
 
-		const [gameName, tagLine] = userIdentifier.split("#");
-		if (!gameName || !tagLine) {
-			return {
-				success: false,
-				reply: `Invalid full user name provided! It must be in format (user)#(tag)`
-			};
+		let gameName;
+		let tagLine;
+		if (userIdentifier.includes("#")) {
+			[gameName, tagLine] = userIdentifier.split("#");
+		}
+		else {
+			gameName = userIdentifier;
+			tagLine = regionName;
 		}
 
 		const puuid = await getPUUIDByName(gameName, tagLine);
