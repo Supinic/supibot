@@ -175,7 +175,7 @@
       {
         "name": "Vice",
         "url": "https://www.vice.com",
-        "path": "en_ca",
+        "path": "en",
         "endpoints": ["rss"],
         "helpers": []
       }
