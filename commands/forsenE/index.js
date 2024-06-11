@@ -13,7 +13,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function forsenE (context) {
-		const eligibleLines = lines.filter(i => previousLines.includes(i));
+		const eligibleLines = lines.filter(i => !previousLines.includes(i));
 		const line = sb.Utils.randArray(eligibleLines);
 
 		previousLines.unshift(line);
