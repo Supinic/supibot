@@ -35,7 +35,7 @@
     "nexra-4": {
       "url": "gpt-4-32k",
       "type": "nexra",
-      "default": true,
+      "default": false,
       "inputLimit": 5000,
       "outputLimit": {
         "default": 5000,
@@ -66,18 +66,18 @@
       "pricePerMtoken": 0.24
     },
     "mistral": {
-      "url": "mistralai/Mistral-7B-Instruct-v0.1",
+      "url": "mistralai/Mistral-7B-Instruct-v0.3",
       "type": "deepinfra",
-      "default": false,
+      "default": true,
       "inputLimit": 2500,
       "outputLimit": {
         "default": 500,
         "maximum": 1000
       },
-      "pricePerMtoken": 0.65
+      "pricePerMtoken": 0.07
     },
     "llama": {
-      "url": "meta-llama/Meta-Llama-3-70B-Instruct",
+      "url": "meta-llama/Meta-Llama-3-8B-Instruct",
       "type": "deepinfra",
       "default": false,
       "inputLimit": 2500,
@@ -85,7 +85,7 @@
         "default": 500,
         "maximum": 1000
       },
-      "pricePerMtoken": 0.69
+      "pricePerMtoken": 0.08
     }
   }
 }
