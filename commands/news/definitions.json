@@ -314,7 +314,7 @@
       {
         "name": "Obozrevatel",
         "url": "https://www.obozrevatel.com",
-        "path": "out/rss",
+        "path": "ukr/out/rss",
         "endpoints": ["lastnews.xml"],
         "helpers": ["boring_nick"]
       },
