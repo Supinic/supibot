@@ -21,6 +21,28 @@ const GAME_RESULT = {
 	END: "GameComplete"
 };
 
+const NON_STANDARD_CHAMPION_NAMES = {
+	AurelionSol: "Aurelion Sol",
+	Belveth: "Bel'Veth",
+	Chogath: "Cho'Gath",
+	DrMundo: "Dr. Mundo",
+	JarvanIV: "Jarvan IV",
+	Kaisa: "Kai'Sa",
+	Khazix: "Kha'Zix",
+	KogMaw: "Kog'Maw",
+	KSante: "K'Sante",
+	LeeSin: "Lee Sin",
+	MasterYi: "Master Yi",
+	MissFortune: "Miss Fortune",
+	Nunu: "Nunu & Willump",
+	RekSai: "Rek'Sai",
+	Renata: "Renata Glasc",
+	TahmKench: "Tahm Kench",
+	TwistedFate: "Twisted Fate",
+	Velkoz: "Vel'Koz",
+	XinZhao: "Xin Zhao"
+};
+
 const getPUUIdCacheKey = (gameName, tagLine) => `moba-league-puuid-${gameName}-${tagLine}`;
 const getSummonerIdCacheKey = (puuid) => `moba-league-sid-${puuid}`;
 const getLeagueEntriesCacheKey = (platform, summonerId) => `moba-league-entries-${platform}-${summonerId}`;
@@ -126,16 +148,26 @@ const getLeagueEntries = async (platform, summonerId) => {
 	return data;
 };
 
-const getMatchIds = async (puuid) => {
+/**
+ * @param {string} puuid
+ * @param {Object} [options]
+ * @param {number} [options.count]
+ */
+const getMatchIds = async (puuid, options = {}) => {
 	const summonerMatchKey = getMatchIdsKey(puuid);
 	let matchIds = await sb.Cache.getByPrefix(summonerMatchKey);
 	if (!matchIds) {
+		const searchParams = new URLSearchParams({
+			count: options.count ?? 20
+		});
+
 		const response = await sb.Got("GenericAPI", {
 			url: `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids`,
 			throwHttpErrors: false,
 			headers: {
 				"X-Riot-Token": `${sb.Config.get("API_RIOT_GAMES_KEY")}`
-			}
+			},
+			searchParams
 		});
 
 		if (!response.ok) {
@@ -191,6 +223,8 @@ const getMatchData = async (matchId) => {
 };
 
 module.exports = {
+	NON_STANDARD_CHAMPION_NAMES, // @todo replace by a DataDragon API call in production: https://ddragon.leagueoflegends.com/cdn/14.11.1/data/en_US/champion.json
+	GAME_RESULT,
 	getPlatform,
 	getPUUIDByName,
 	getSummonerId,
