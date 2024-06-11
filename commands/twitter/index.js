@@ -10,18 +10,10 @@ module.exports = {
 		{ name: "includeRetweets", type: "boolean" },
 		{ name: "mediaOnly", type: "boolean" },
 		{ name: "random", type: "boolean" },
-		{ name: "textOnly", type: "boolean" },
-		{ name: "trends", type: "string" }
+		{ name: "textOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Code: (async function twitter (context, input) {
-		if (context.params.trends) {
-			return {
-				success: false,
-				reply: `Trends are not supported after Twitter API change!`
-			};
-		}
-
 		const searchParams = (context.params.includeReplies)
 			? { includeReplies: true }
 			: {};
@@ -136,13 +128,6 @@ module.exports = {
 		`<code>${prefix}tweet (account)</code>`,
 		`<code>${prefix}twitter (account)</code>`,
 		"Gets the last tweet.",
-		"",
-
-		`<code>${prefix}twitter trends:(location)</code>`,
-		`<code>${prefix}twitter trends:France</code>`,
-		`<code>${prefix}twitter trends:PL</code>`,
-		`<code>${prefix}twitter trends:"United Arab Emirates"</code>`,
-		"Fetches the top 10 trending hashtags for a given country, either as full name or code.",
 		"",
 
 		`<code>${prefix}twitter random:true (account)</code>`,
