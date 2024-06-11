@@ -654,7 +654,7 @@ module.exports = class Filter extends require("./template.js") {
 		for (const user of unpingUsers) {
 			// Only unping usernames if they are not followed by a specific set of characters.
 			// This refers to "." and "@" - these are usually parts of URLs or e-mail addresses.
-			const regex = new RegExp(`\\b(${user.Name})(?![.@]\\w+)`, "gi");
+			const regex = new RegExp(`(?<![\\/=])\\b(${user.Name})(?![.@]\\w+)`, "gi");
 			string = string.replace(regex, (name) => `${name[0]}\u{E0000}${name.slice(1)}`);
 		}
 
