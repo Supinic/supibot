@@ -148,6 +148,49 @@ const getLeagueEntries = async (platform, summonerId) => {
 	return data;
 };
 
+const parseUserIdentifier = async (regionName, identifier) => {
+	if (!regionName || !identifier) {
+		return {
+			success: false,
+			reply: `You must provide the region and the full user name!`
+		};
+	}
+
+	const region = getPlatform(regionName);
+	if (!region) {
+		return {
+			success: false,
+			reply: `Invalid region provided!`
+		};
+	}
+
+	let gameName;
+	let tagLine;
+	if (identifier.includes("#")) {
+		[gameName, tagLine] = identifier.split("#");
+	}
+	else {
+		gameName = identifier;
+		tagLine = regionName;
+	}
+
+	const puuid = await getPUUIDByName(gameName, tagLine);
+	if (!puuid) {
+		return {
+			success: false,
+			reply: `No such user exists!`
+		};
+	}
+
+	return {
+		success: true,
+		puuid,
+		gameName,
+		tagLine,
+		region
+	};
+};
+
 /**
  * @param {string} puuid
  * @param {Object} [options]
@@ -230,5 +273,6 @@ module.exports = {
 	getSummonerId,
 	getLeagueEntries,
 	getMatchIds,
-	getMatchData
+	getMatchData,
+	parseUserIdentifier
 };

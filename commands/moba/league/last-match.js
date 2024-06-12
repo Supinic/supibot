@@ -1,9 +1,8 @@
 const {
 	GAME_RESULT,
 	NON_STANDARD_CHAMPION_NAMES,
-	getPUUIDByName,
+	parseUserIdentifier,
 	getMatchIds,
-	getPlatform,
 	getMatchData
 } = require("./utils.js");
 
@@ -17,40 +16,12 @@ module.exports = {
 		default: false
 	},
 	execute: async (context, type, regionName, ...args) => {
-		const userIdentifier = args.join(" ");
-		if (!regionName || !userIdentifier) {
-			return {
-				success: false,
-				reply: `You must provide the region and the full user name!`
-			};
+		const leagueUser = await parseUserIdentifier(regionName, args.join(" "));
+		if (!leagueUser.success) {
+			return leagueUser;
 		}
 
-		const region = getPlatform(regionName);
-		if (!region) {
-			return {
-				success: false,
-				reply: `Invalid region provided!`
-			};
-		}
-
-		let gameName;
-		let tagLine;
-		if (userIdentifier.includes("#")) {
-			[gameName, tagLine] = userIdentifier.split("#");
-		}
-		else {
-			gameName = userIdentifier;
-			tagLine = regionName;
-		}
-
-		const puuid = await getPUUIDByName(gameName, tagLine);
-		if (!puuid) {
-			return {
-				success: false,
-				reply: `No such user exists!`
-			};
-		}
-
+		const { puuid, gameName } = leagueUser;
 		const matchIds = await getMatchIds(puuid, { count: 1 });
 		if (matchIds.length === 0) {
 			return {

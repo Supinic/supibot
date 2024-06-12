@@ -1,8 +1,7 @@
 const {
-	getPUUIDByName,
+	parseUserIdentifier,
 	getSummonerId,
-	getLeagueEntries,
-	getPlatform
+	getLeagueEntries
 } = require("./utils.js");
 
 const TARGET_LEAGUE = "RANKED_SOLO_5x5";
@@ -17,40 +16,12 @@ module.exports = {
 		default: true
 	},
 	execute: async (context, type, regionName, ...args) => {
-		const userIdentifier = args.join(" ");
-		if (!regionName || !userIdentifier) {
-			return {
-				success: false,
-				reply: `You must provide the region and the full user name!`
-			};
+		const leagueUser = await parseUserIdentifier(regionName, args.join(" "));
+		if (!leagueUser.success) {
+			return leagueUser;
 		}
 
-		const region = getPlatform(regionName);
-		if (!region) {
-			return {
-				success: false,
-				reply: `Invalid region provided!`
-			};
-		}
-
-		let gameName;
-		let tagLine;
-		if (userIdentifier.includes("#")) {
-			[gameName, tagLine] = userIdentifier.split("#");
-		}
-		else {
-			gameName = userIdentifier;
-			tagLine = regionName;
-		}
-
-		const puuid = await getPUUIDByName(gameName, tagLine);
-		if (!puuid) {
-			return {
-				success: false,
-				reply: `No such user exists!`
-			};
-		}
-
+		const { puuid, region, gameName } = leagueUser;
 		const summonerId = await getSummonerId(region, puuid);
 		if (!summonerId) {
 			return {
