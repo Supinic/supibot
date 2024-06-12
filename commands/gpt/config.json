@@ -55,7 +55,7 @@
       "pricePerMtoken": 10
     },
     "mixtral": {
-      "url": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+      "url": "mistralai/Mixtral-8x22B-Instruct-v0.1",
       "type": "deepinfra",
       "default": false,
       "inputLimit": 2500,
@@ -63,7 +63,7 @@
         "default": 500,
         "maximum": 1000
       },
-      "pricePerMtoken": 0.24
+      "pricePerMtoken": 0.65
     },
     "mistral": {
       "url": "mistralai/Mistral-7B-Instruct-v0.3",
