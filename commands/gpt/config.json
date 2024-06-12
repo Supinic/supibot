@@ -35,7 +35,7 @@
     "nexra-4": {
       "url": "gpt-4-32k",
       "type": "nexra",
-      "default": false,
+      "default": true,
       "inputLimit": 5000,
       "outputLimit": {
         "default": 5000,
@@ -79,7 +79,7 @@
     "llama": {
       "url": "meta-llama/Meta-Llama-3-8B-Instruct",
       "type": "deepinfra",
-      "default": true,
+      "default": false,
       "inputLimit": 2500,
       "outputLimit": {
         "default": 500,
