@@ -68,7 +68,7 @@
     "mistral": {
       "url": "mistralai/Mistral-7B-Instruct-v0.3",
       "type": "deepinfra",
-      "default": true,
+      "default": false,
       "inputLimit": 2500,
       "outputLimit": {
         "default": 500,
@@ -79,7 +79,7 @@
     "llama": {
       "url": "meta-llama/Meta-Llama-3-8B-Instruct",
       "type": "deepinfra",
-      "default": false,
+      "default": true,
       "inputLimit": 2500,
       "outputLimit": {
         "default": 500,
