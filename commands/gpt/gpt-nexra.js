@@ -39,7 +39,7 @@ module.exports = class GptNexra extends GptOpenAI {
 				presence_penalty: 0
 			}
 		});
-		
+
 		if (!response.ok) {
 			return {
 				success: false,
@@ -83,5 +83,9 @@ module.exports = class GptNexra extends GptOpenAI {
 		if (historyMode === "enabled") {
 			await GptHistory.add(context.user, query, reply);
 		}
+	}
+
+	static getRequestErrorMessage () {
+		return "Nexra is currently overloaded! Try again later.";
 	}
 };

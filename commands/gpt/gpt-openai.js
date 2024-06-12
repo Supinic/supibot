@@ -141,4 +141,8 @@ module.exports = class GptOpenAI extends Template {
 			await GptHistory.add(context.user, query, reply);
 		}
 	}
+
+	static getRequestErrorMessage () {
+		return `The OpenAI service is overloaded at the moment! Try again later.`;
+	}
 };

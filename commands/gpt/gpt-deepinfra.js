@@ -2,15 +2,27 @@ const GptOpenAI = require("./gpt-openai.js");
 const GptHistory = require("./history-control.js");
 
 module.exports = class GptDeepInfra extends GptOpenAI {
-	static formatQuery (query) {
-		return `[INST] ${query} [/INST]`;
-	}
-
-	static async getHistory (context) {
+	static async getHistory (context, query) {
 		const { historyMode } = await GptOpenAI.getHistoryMode(context);
-		return (historyMode === "enabled")
+		const promptHistory = (historyMode === "enabled")
 			? (await GptHistory.get(context.user) ?? [])
 			: [];
+
+		const systemMessage = "Keep the response as short and concise as possible.";
+		return [
+			{ role: "system", content: systemMessage },
+			...promptHistory,
+			{ role: "user", content: query }
+		];
+	}
+
+	static async setHistory (context, query, reply) {
+		const { historyMode } = await GptDeepInfra.getHistoryMode(context);
+		if (historyMode !== "enabled") {
+			return;
+		}
+
+		await GptHistory.add(context.user, query, reply);
 	}
 
 	static async execute (context, query, modelData) {
@@ -27,15 +39,19 @@ module.exports = class GptDeepInfra extends GptOpenAI {
 		const { temperature } = temperatureCheck;
 		const { outputLimit } = outputLimitCheck;
 
+		const messages = await GptDeepInfra.getHistory(context, query);
+
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
-			url: `https://api.deepinfra.com/v1/inference/${modelData.url}`,
+			url: `https://api.deepinfra.com/v1/openai/chat/completions`,
 			headers: {
 				Authorization: `Bearer ${sb.Config.get("API_KEY_DEEPINFRA")}`
 			},
 			json: {
-				input: GptDeepInfra.formatQuery(query),
+				model: modelData.url,
+				messages,
 				max_new_tokens: outputLimit,
+				stream: false,
 				temperature
 			}
 		});
@@ -43,23 +59,11 @@ module.exports = class GptDeepInfra extends GptOpenAI {
 		return { response };
 	}
 
-	static extractMessage (response) {
-		return response.body.results[0].generated_text;
-	}
-
-	static getUsageRecord () { return 0; }
-	static getPromptTokens () { return 0; }
-	static setHistory () {}
-
-	static getCompletionTokens (response) {
-		return response.body.num_tokens;
-	}
-
-	static getProcessingTime (response) {
-		return response.body.inference_status.runtime_ms;
-	}
-
 	static isAvailable () {
 		return sb.Config.has("API_KEY_DEEPINFRA", true);
+	}
+
+	static getRequestErrorMessage () {
+		return `The DeepInfra service for this model is overloaded at the moment! Try again later.`;
 	}
 };

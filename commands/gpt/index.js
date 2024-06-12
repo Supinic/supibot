@@ -101,7 +101,7 @@ module.exports = {
 			if (sb.Got.isRequestError(e)) {
 				return {
 					success: false,
-					reply: `The OpenAI GPT service is overloaded at the moment! Try again later.`
+					reply: Handler.getRequestErrorMessage()
 				};
 			}
 
@@ -157,8 +157,8 @@ module.exports = {
 				success: false,
 				reply: `Could not generate GPT response! Try again later, or try a different model.`
 			};
-		} 
-		
+		}
+
 		const moderationResult = await GptModeration.check(context, reply);
 
 		let result;
