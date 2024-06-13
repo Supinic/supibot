@@ -1018,68 +1018,46 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 * @param {Channel} channelData
 	 * @param {string} message
 	 * @returns {Promise<void>}
+	 * @todo refactor to Helix or other API call
 	 */
 	async me (channelData, message) {
 		await this.client.me(channelData.Name, message);
 	}
 
 	/**
-	 * Fetches a list of emote data for a given list of emote sets.
-	 * @param {string[]} inputSets
+	 * Fetches a list of emote data available to the bot user.
 	 * @returns {Promise<TwitchEmoteSetDataObject[]>}
 	 */
-	static async fetchTwitchEmotes (inputSets) {
-		const data = [];
-		const sliceLength = 100;
-		let index = 0;
-
-		// Replace "special" emote sets that are not available with their "original" id with the one that is
-		// actually available in the emote set list
-		const sets = inputSets.map(i => specialEmoteSetMap[i] ?? i);
-
-		while (index < sets.length) {
-			const slice = sets.slice(index, index + sliceLength);
-			const {
-				statusCode,
-				body
-			} = await sb.Got("Leppunen", {
-				url: "v2/twitch/emotes/sets",
-				searchParams: {
-					set_id: slice.join(",")
-				}
-			});
-
-			if (statusCode !== 200) {
-				await sb.Logger.log("Twitch.Warning", JSON.stringify({
-					message: "Fetching Twitch emotes failed",
-					statusCode,
-					body,
-					slice,
-					sets
-				}));
-
-				return [];
+	static async fetchTwitchEmotes () {
+		const response = await sb.Got("Helix", {
+			url: "chat/emotes/user",
+			method: "GET",
+			throwHttpErrors: false,
+			searchParams: {
+				user_id: this.selfId
 			}
+		});
 
-			index += sliceLength;
-			data.push(...body);
+		const result = response.body.data;
+		if (response.body.pagination.cursor) {
+			let cursor = response.body.pagination.cursor;
+			while (cursor) {
+				const pageResponse = await sb.Got("Helix", {
+					url: "chat/emotes/user",
+					method: "GET",
+					throwHttpErrors: false,
+					searchParams: {
+						user_id: this.selfId,
+						after: cursor
+					}
+				});
+
+				result.push(...pageResponse.body.data);
+				cursor = pageResponse.body.pagination.cursor ?? null;
+			}
 		}
 
-		return data.map(set => ({
-			ID: set.setID,
-			channel: {
-				name: set.channelName,
-				login: set.channelLogin,
-				ID: set.channelID
-			},
-			tier: set.tier,
-			emotes: (set.emoteList ?? []).map(i => ({
-				ID: i.id,
-				token: i.code,
-				animated: (i.assetType === "ANIMATED"),
-				follower: (i.type === "FOLLOWER")
-			}))
-		}));
+		return result;
 	}
 
 	/**
@@ -1189,7 +1167,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	async populateGlobalEmotes () {
-		const [bttv, ffz, sevenTv] = await Promise.allSettled([
+		const [twitch, bttv, ffz, sevenTv] = await Promise.allSettled([
+			TwitchPlatform.fetchTwitchEmotes(),
 			sb.Got("TwitchEmotes", {
 				url: "https://api.betterttv.net/3/cached/emotes/global"
 			}),
@@ -1201,6 +1180,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			})
 		]);
 
+		const rawTwitchEmotes = twitch.value ?? [];
 		const rawFFZEmotes = Object.values(ffz.value?.body.sets ?? {});
 		const rawBTTVEmotes = (bttv.value?.body && typeof bttv.value?.body === "object")
 			? Object.values(bttv.value.body)
@@ -1209,26 +1189,24 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			? sevenTv.value.body?.emotes
 			: [];
 
-		const twitchEmotes = this.availableEmotes.flatMap(set => set.emotes.map(i => {
+		const twitchEmotes = rawTwitchEmotes.map(i => {
 			let type = "twitch-global";
-
-			// Massive hackfuck-workaround - animated emotes are present in their own emoteset without a tier,
-			// hence a special check must be added here. Otherwise, they will be considered as global.
-			if (i.animated || ["1", "2", "3"].includes(set.tier)) {
+			if (i.emote_type === "subscriptions") {
 				type = "twitch-subscriber";
 			}
-			else if (i.follower) {
+			else if (i.emote_type === "follower") {
 				type = "twitch-follower";
 			}
 
 			return {
-				ID: i.ID,
-				name: i.token,
+				ID: i.id,
+				name: i.name,
 				type,
 				global: true,
-				animated: i.animated
+				animated: i.format.includes("animated"),
+				channel: i.owner_id ?? null
 			};
-		}));
+		});
 		const ffzEmotes = rawFFZEmotes.flatMap(i => i.emoticons)
 			.map(i => ({
 				ID: i.id,

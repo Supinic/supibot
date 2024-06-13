@@ -1,3 +1,13 @@
+/**
+ * await sb.Got("Helix", {
+ * 	url: "subscriptions/user",
+ * 	searchParams: {
+ * 		broadcaster_id: "31400525",
+ * 		user_id: "31400525"
+ * 	}
+ * })
+ */
+
 module.exports = {
 	Name: "botsubs",
 	Aliases: null,
@@ -12,50 +22,16 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Code: (async function botSubs (context) {
-		const { availableEmotes } = sb.Platform.get("twitch");
-		const subEmoteSets = availableEmotes
-			.filter(i => ["1", "2", "3"].includes(i.tier) && i.emotes.length > 0)
-			.sort((a, b) => Number(b.tier) - Number(a.tier));
+		const twitch = sb.Platfom.get("twitch");
 
-		if (context.params.channel) {
-			const channel = context.params.channel.toLowerCase();
-			const sets = subEmoteSets.filter(i => i.channel.login === channel);
-			if (sets.length === 0) {
-				return {
-					success: false,
-					reply: `Supibot is not subscribed to #${channel}!`
-				};
-			}
-
-			const strings = sets
-				.sort((a, b) => Number(a.tier) - Number(b.tier))
-				.map(i => `T${i.tier}: ${i.emotes.map(j => j.token).sort().join(" ")}`);
-
-			return {
-				reply: strings.join(" ")
-			};
-		}
+		const globalEmotes = await twitch.fetchGlobalEmotes();
+		const subEmotes = globalEmotes.filter(i => i.type === "twitch-subscriber" && i.channel);
+		const subChannels = new Set(subEmotes.map(i => i.channel));
 
 		const result = [];
-		const encountered = new Set();
-		for (const setData of subEmoteSets) {
-			const channel = setData.channel.login;
-
-			// This happens when a channel gets suspended - all fields are `null`. Skip over in this case.
-			if (setData.channel.login === null) {
-				continue;
-			}
-			else if (encountered.has(channel)) {
-				continue;
-			}
-
-			const tierString = (setData.tier !== "1") ? ` (T${setData.tier})` : "";
-			result.push({
-				channel: `${setData.channel.login}${tierString}`,
-				emote: sb.Utils.randArray(setData.emotes).token
-			});
-
-			encountered.add(channel);
+		for (const channel of subChannels) {
+			const channelEmotes = subEmotes.filter(i => i.channel === channel);
+			result.push(sb.Utils.randArray(channelEmotes));
 		}
 
 		result.sort((a, b) => a.channel.localeCompare(b.channel));
@@ -68,13 +44,13 @@ module.exports = {
 		}
 
 		const emotes = result.map(i => i.emote).join(" ");
-		if (context.params.emoteOnly || context.params.emotesOnly) {
+		if (context.params.emotesOnly) {
 			return {
 				reply: emotes
 			};
 		}
 
-		let message = `Supibot is currently subscribed to: ${channels} - ${emotes}`;
+		let message = `I am currently subscribed to: ${channels} - ${emotes}`;
 		const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
 
 		if (message.length > limit) {
