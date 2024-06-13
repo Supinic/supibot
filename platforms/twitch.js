@@ -292,59 +292,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			}
 		});
 
-		client.on("NOTICE", async ({
-			channelName,
-			messageID,
-			...rest
-		}) => {
-			if (!messageID) {
-				return;
-			}
-
-			const channelData = sb.Channel.get(channelName, this);
-			switch (messageID) {
-				case "msg_rejected":
-				case "msg_rejected_mandatory": {
-					const json = JSON.stringify({
-						channelName,
-						messageID,
-						rest
-					});
-					await sb.Logger.log("Twitch.Warning", `Rejected message: ${json}`, channelData);
-
-					break;
-				}
-
-				case "msg_banned": {
-					if (channelData.Mode === "Inactive") {
-						break;
-					}
-
-					const previousMode = channelData.Mode;
-					await Promise.all([
-						channelData.setDataProperty("inactiveReason", "bot-banned"),
-						channelData.saveProperty("Mode", "Inactive"),
-						await sb.Logger.log("Twitch.Ban", `Bot banned in channel ${channelData.Name}. Previous mode: ${previousMode}`, channelData),
-						this.client.part(channelData.Name)
-					]);
-
-					break;
-				}
-
-				case "no_permission": {
-					channelData.send("I don't have permission to do that.");
-					break;
-				}
-
-				case "host_on":
-				case "host_off":
-				case "host_target_went_offline": {
-					// ignore these messages
-					break;
-				}
-			}
-		});
-
 		client.on("USERNOTICE", (message) => this.handleUserNotice(message));
 	}
 
