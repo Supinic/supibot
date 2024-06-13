@@ -1196,7 +1196,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			.split(/\s+/)
 			.filter(Boolean);
 
-		const result = await this.handleCommand(command, userData, null, args, {});
+		const result = await this.handleCommand(command, userData, null, args, {
+			privateMessage: true
+		});
+
 		if (!result || !result.success) {
 			if (!result?.reply && result?.reason === "filter") {
 				await this.pm(sb.Config.get("PRIVATE_MESSAGE_COMMAND_FILTERED"), senderUsername);
