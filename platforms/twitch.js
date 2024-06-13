@@ -26,10 +26,6 @@ const WRITE_MODE_MESSAGE_DELAY = 1500;
 const DEFAULT_LOGGING_CONFIG = {
 	bans: false,
 	bits: false,
-	channelJoins: false,
-	clearchat: false,
-	giftSubs: false,
-	rituals: true,
 	messages: true,
 	subs: false,
 	timeouts: false,
