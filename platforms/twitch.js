@@ -1,6 +1,5 @@
 const { CronJob } = require("cron");
 const DankTwitch = require("@kararty/dank-twitch-irc");
-const MessageScheduler = require("../utils/message-scheduler.js");
 
 const WebSocket = require("ws");
 const APP_ACCESS_CACHE_KEY = "twitch-app-access-token";
@@ -146,6 +145,48 @@ const createChannelChatMessageSubscription = async (selfId, channelId) => {
 				channelId,
 				response
 			});
+		}
+	}
+};
+
+const createWhisperMessageSubscription = async (selfId) => {
+	const conduitId = await getConduitId();
+	const appToken = await getAppAccessToken();
+
+	const response = await sb.Got("GenericAPI", {
+		url: "https://api.twitch.tv/helix/eventsub/subscriptions",
+		method: "POST",
+		responseType: "json",
+		throwHttpErrors: false,
+		headers: {
+			Authorization: `Bearer ${appToken}`,
+			"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+		},
+		json: {
+			type: "user.whisper.message",
+			version: "1",
+			condition: {
+				user_id: selfId
+			},
+			transport: {
+				method: "conduit",
+				conduit_id: conduitId
+			}
+		}
+	});
+
+	if (!response.ok) {
+		// Conflict - subscription already exists
+		if (response.statusCode === 409) {
+			/**
+			 * @todo
+			 * add some kind of Redis subscription caching or do one big request at start to
+			 * figure out all the subscriptions we have going on currently, so we don't have to
+			 * handle all the re-requesting failures here
+			 */
+		}
+		else {
+			console.warn("Could not subscribe - whispers", { selfId, response });
 		}
 	}
 };
@@ -445,8 +486,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID)
 		));
 
-
-		await Promise.all(joinPromises);
+		await Promise.all([
+			...joinPromises,
+			createWhisperMessageSubscription(this.selfId)
+		]);
 	}
 
 	async handleNotification (data) {
