@@ -131,26 +131,21 @@ const createChannelChatMessageSubscription = async (selfId, channelId) => {
 	});
 
 	if (!response.ok) {
-		console.warn("Could not subscribe", {
-			selfId,
-			channelId,
-			response
-		});
-	}
-};
-
-// @todo move to TwitchPlatform as a new handler method
-const handleNotification = async (data) => {
-	const { event, subscription } = data.payload;
-
-	switch (subscription.type) {
-		case "channel.chat.message": {
-
-			break;
+		// Conflict - subscription already exists
+		if (response.statusCode === 409) {
+			/**
+			 * @todo
+			 * add some kind of Redis subscription caching or do one big request at start to
+			 * figure out all the subscriptions we have going on currently, so we don't have to
+			 * handle all the re-requesting failures here
+			 */
 		}
-
-		default: {
-			console.warn("Unrecognized notification", { data });
+		else {
+			console.warn("Could not subscribe", {
+				selfId,
+				channelId,
+				response
+			});
 		}
 	}
 };
@@ -250,15 +245,14 @@ const fetchToken = async () => {
 	return authToken;
 };
 
-const emitRawUserMessageEvent = (username, channelName, message, messageData = {}) => {
+const emitRawUserMessageEvent = (username, channelName, message) => {
 	if (!username || !channelName) {
 		throw new sb.Error({
 			message: "No username or channel name provided for raw event",
 			args: {
 				username,
 				channelName,
-				message,
-				messageData
+				message
 			}
 		});
 	}
@@ -267,14 +261,14 @@ const emitRawUserMessageEvent = (username, channelName, message, messageData = {
 	if (channelData) {
 		channelData.events.emit("message", {
 			event: "message",
-			message,
+			message: message.text,
 			user: null,
 			channel: channelData,
 			platform: sb.Platform.get("twitch"),
 			raw: {
 				user: username
 			},
-			messageData
+			messageData: message
 		});
 	}
 };
@@ -380,6 +374,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 	#tokenCheckInterval = setInterval(() => this.#checkAuthToken(), 60_000);
 	#channelLiveStatusCron = new CronJob("0 */1 * * * *", () => populateChannelsLiveStatus());
+	#lastWebsocketKeepaliveMessage = 0;
 
 	constructor (config) {
 		super("twitch", config, {
@@ -427,7 +422,12 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				}
 
 				case "notification": {
-					await handleNotification(event);
+					await this.handleNotification(event);
+					break;
+				}
+
+				case "session_keepalive": {
+					this.#lastWebsocketKeepaliveMessage = sb.Date.now();
 					break;
 				}
 
@@ -437,9 +437,30 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			}
 		});
 
+		this.client = ws;
+
 		const channelList = sb.Channel.getJoinableForPlatform(this);
-		const joinPromises = channelList.map(async (channelData) => createChannelChatMessageSubscription(channelData.Specific_ID));
+		const joinPromises = channelList.map(async (channelData) => (
+			createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID)
+		));
+
+
 		await Promise.all(joinPromises);
+	}
+
+	async handleNotification (data) {
+		const { event, subscription } = data.payload;
+
+		switch (subscription.type) {
+			case "channel.chat.message": {
+				await this.handleMessage(event, false);
+				break;
+			}
+
+			default: {
+				console.warn("Unrecognized notification", { data });
+			}
+		}
 	}
 
 	initListeners () {
@@ -651,8 +672,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				}
 			}
 		});
-
-		client.on("PRIVMSG", async (message) => await this.handleMessage(message));
 
 		client.on("WHISPER", (message) => this.handleMessage(message));
 
@@ -894,48 +913,48 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 	/**
 	 * Handles incoming messages.
-	 * @param {DankTwitch.PrivmsgMessage|DankTwitch.WhisperMessage} messageObject
+	 * @param {Object} event
+	 * @param {boolean} isPrivate
 	 * @returns {Promise<void>}
 	 */
-	async handleMessage (messageObject) {
-		// @todo handle new EventSub message API format
+	async handleMessage (event, isPrivate) {
 		const {
-			ircTags,
+			broadcaster_user_login: channelName,
+			// broadcaster_user_id: channelId, // currently unused
+			chatter_user_login: senderUsername,
+			chatter_user_id: senderUserID,
+			/** @type {TwitchBadge[]} */
 			badges,
-			bits,
-			channelName,
-			messageText: message,
-			senderUserID,
-			senderUsername
-		} = messageObject;
-		const messageType = (messageObject instanceof DankTwitch.WhisperMessage) ? "whisper" : "message";
-
-		let channelData = null;
-		let userState = {};
-		if (messageType === "message") {
-			userState = messageObject.extractUserState();
-		}
+			color,
+			channel_points_animation_id: animationId,
+			channel_points_custom_reward_id: rewardId,
+			/** @type {{bits: number} | null} */
+			cheer,
+			/** @type {TwitchReply | null} */
+			reply
+		} = event;
 
 		const messageData = {
-			bits,
-			userBadges: userState.badges,
-			userBadgeInfo: userState.badgeInfo,
-			color: userState.color,
-			colorRaw: userState.colorRaw,
-			privateMessage: (messageType === "whisper"),
-			messageID: ircTags.id,
-			emotes: ircTags.emotes,
-			flags: ircTags.flags,
-			customRewardID: ircTags["custom-reward-id"] ?? null
+			text: event.message.text,
+			/** @type {TwitchMessageFragment[]} */
+			fragments: event.message.fragments,
+			type: event.message_type, // text, channel_points_highlighted, channel_points_sub_only, user_intro, animated, gigantified_emote
+			id: event.message_id,
+			bits: cheer,
+			badges,
+			color,
+			animationId,
+			rewardId
 		};
 
 		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserID });
+
 		if (!userData) {
-			if (messageType === "whisper") {
+			if (isPrivate) {
 				return;
 			}
 
-			emitRawUserMessageEvent(senderUsername, channelName, message, messageData);
+			emitRawUserMessageEvent(senderUsername, channelName, messageData);
 			return;
 		}
 		else if (userData.Twitch_ID === null && userData.Discord_ID !== null) {
@@ -943,7 +962,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				await userData.saveProperty("Twitch_ID", senderUserID);
 			}
 			else {
-				if (!message.startsWith(sb.Command.prefix)) {
+				if (!messageData.startsWith(sb.Command.prefix)) {
 					return;
 				}
 
@@ -972,10 +991,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			// for the current user-database structure and the event handler must be aborted.
 			const channelData = (channelName) ? sb.Channel.get(channelName, this) : null;
 
-			if (!channelName || (channelData && sb.Command.is(message))) {
+			if (!channelName || (channelData && sb.Command.is(messageData.text))) {
 				const notified = await userData.getDataProperty("twitch-userid-mismatch-notification");
 				if (!notified) {
-					const message = sb.Utils.tag.trim `
+					const replyMessage = sb.Utils.tag.trim `
 						@${userData.Name}, you have been flagged as suspicious.
 						This is because I have seen your Twitch username on a different account before.
 						This is usually caused by renaming into an account that existed before.
@@ -983,16 +1002,16 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 					`;
 
 					if (channelData) {
-						const finalMessage = await this.prepareMessage(message, channelData);
+						const finalMessage = await this.prepareMessage(replyMessage, channelData);
 						if (!finalMessage) {
-							await this.pm(message, userData.Name);
+							await this.pm(replyMessage, userData.Name);
 						}
 						else {
 							await channelData.send(finalMessage);
 						}
 					}
 					else {
-						await this.pm(message, userData.Name);
+						await this.pm(replyMessage, userData.Name);
 					}
 
 					await Promise.all([
@@ -1002,34 +1021,31 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				}
 			}
 
-			emitRawUserMessageEvent(senderUsername, channelName, message, messageData);
+			emitRawUserMessageEvent(senderUsername, channelName, messageData);
 
 			return;
 		}
 
 		// Only check channels,
-		if (messageType !== "whisper") {
-			if (!channelName) {
-				await sb.Logger.log("Twitch.Error", `Missing channel in IRC message: ${JSON.stringify(messageObject)}`);
-			}
-
+		let channelData = null;
+		if (!isPrivate) {
 			channelData = sb.Channel.get(channelName, this);
 
 			if (!channelData || channelData.Mode === "Inactive") {
 				return;
 			}
 
-			this.resolveUserMessage(channelData, userData, message);
+			this.resolveUserMessage(channelData, userData, messageData.text);
 
 			if (channelData.Logging.has("Meta")) {
 				await sb.Logger.updateLastSeen({
 					userData,
 					channelData,
-					message
+					message: messageData.text
 				});
 			}
 			if (this.logging.messages && channelData.Logging.has("Lines")) {
-				await sb.Logger.push(message, userData, channelData);
+				await sb.Logger.push(messageData.text, userData, channelData);
 			}
 
 			/**
@@ -1039,7 +1055,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			 */
 			channelData.events.emit("message", {
 				event: "message",
-				message,
+				message: messageData.text,
 				user: userData,
 				channel: channelData,
 				platform: this,
@@ -1061,47 +1077,46 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 			// Mirror messages to a linked channel, if the channel has one
 			if (channelData.Mirror) {
-				this.mirror(message, userData, channelData, { commandUsed: false });
+				this.mirror(messageData.text, userData, channelData, { commandUsed: false });
 			}
 		}
 		else {
 			if (this.logging.whispers) {
-				await sb.Logger.push(message, userData, null, this);
+				await sb.Logger.push(messageData.text, userData, null, this);
 			}
 
-			this.resolveUserMessage(null, userData, message);
+			this.resolveUserMessage(null, userData, messageData.text);
 		}
 
 		this.incrementMessageMetric("read", channelData);
 
 		// Own message - check the regular/vip/mod/broadcaster status, and skip
-		if (userData.Name === this.selfName && channelData) {
-			if (badges) {
-				const oldMode = channelData.Mode;
+		if (channelData && senderUserID === this.selfId) {
+			const flatBadges = badges.map(i => i.set_id);
+			const oldMode = channelData.Mode;
 
-				if (badges.hasModerator || badges.hasBroadcaster) {
-					channelData.Mode = "Moderator";
-				}
-				else if (badges.hasVIP) {
-					channelData.Mode = "VIP";
-				}
-				else {
-					channelData.Mode = "Write";
-				}
+			if (flatBadges.includes("moderator") || flatBadges.includes("broadcaster")) {
+				channelData.Mode = "Moderator";
+			}
+			else if (flatBadges.includes("vip")) {
+				channelData.Mode = "VIP";
+			}
+			else {
+				channelData.Mode = "Write";
+			}
 
-				if (oldMode !== channelData.Mode) {
-					const row = await sb.Query.getRow("chat_data", "Channel");
-					await row.load(channelData.ID);
-					row.values.Mode = channelData.Mode;
-					await row.save();
-				}
+			if (oldMode !== channelData.Mode) {
+				const row = await sb.Query.getRow("chat_data", "Channel");
+				await row.load(channelData.ID);
+				row.values.Mode = channelData.Mode;
+				await row.save();
 			}
 
 			return;
 		}
 
-		if (this.logging.bits && typeof bits !== "undefined" && bits !== null) {
-			sb.Logger.log("Twitch.Other", `${bits} bits`, channelData, userData);
+		if (this.logging.bits && cheer) {
+			sb.Logger.log("Twitch.Other", `${cheer.bits} bits`, channelData, userData);
 		}
 
 		if (!sb.Command.prefix) {
@@ -1110,14 +1125,12 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		// If the handled message is a reply to another, append its content without the username mention to the end
 		// of the current one. This is so that a possible command execution can be handled with this input.
-		let targetMessage = message;
-		if (ircTags["reply-parent-user-login"] && ircTags["reply-parent-msg-body"]) {
-			const parentDisplayName = ircTags["reply-parent-display-name"];
-
+		let targetMessage = messageData.text;
+		if (reply) {
 			// The extra length of 2 signifies one for the "@" symbol at the start of the user mention, and the other
 			// is for the space character which separates the mention from the message.
-			const remainder = message.slice(parentDisplayName.length + 2);
-			const parentMessage = ircTags["reply-parent-msg-body"];
+			const remainder = messageData.slice(reply.parent_user_login.length + 2);
+			const parentMessage = reply.parent_message_body;
 			targetMessage = `${remainder} ${parentMessage}`;
 		}
 
@@ -1138,7 +1151,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 			const result = await this.handleCommand(command, userData, channelData, args, messageData);
 
-			if ((!result || !result.success) && messageType === "whisper") {
+			if ((!result || !result.success) && isPrivate) {
 				if (!result?.reply && result?.reason === "filter") {
 					await this.pm(sb.Config.get("PRIVATE_MESSAGE_COMMAND_FILTERED"), userData.Name);
 				}
@@ -1147,7 +1160,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				}
 			}
 		}
-		else if (messageType === "whisper") {
+		else if (isPrivate) {
 			await this.pm(sb.Config.get("PRIVATE_MESSAGE_UNRELATED"), userData.Name);
 		}
 	}
@@ -1465,6 +1478,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	async me (channelData, message) {
 		await this.client.me(channelData.Name, message);
 	}
+
+
 
 	/**
 	 * Fetches a list of emote data for a given list of emote sets.
@@ -1965,4 +1980,43 @@ module.exports = class TwitchPlatform extends require("./template.js") {
  * @typedef {Object} EmoteDataObject
  * @property {string} ID Internal Twitch emote ID
  * @property {string} token Emote name
+ */
+
+/**
+ * @typedef {Object} TwitchReply
+ * @property {string} parent_message_body
+ * @property {string} parent_message_id
+ * @property {string} parent_user_id
+ * @property {string} parent_user_login
+ * @property {string} parent_user_name *
+ * @property {string} thread_message_id
+ * @property {string} thread_user_id
+ * @property {string} thread_user_login
+ * @property {string} thread_user_name
+ */
+
+/**
+ * @typedef {Object} TwitchBadge
+ * @property {string} set_id
+ * @property {string} id
+ * @property {string} info
+ */
+
+/**
+ * @typedef {Object} TwitchMessageFragment
+ * @property {Object|null} cheermote
+ * @property {string} cheermote.prefix
+ * @property {number} cheermote.bits
+ * @property {number} cheermote.tier
+ * @property {Object|null} emote
+ * @property {string} emote.id
+ * @property {string} emote.emote_set_id
+ * @property {string} emote.owner_id
+ * @property {Array<"animated"|"static">} emote.format
+ * @property {Object|null} mention
+ * @property {string} mention.user_id
+ * @property {string} mention.user_name
+ * @property {string} mention.user_login
+ * @property {string} text
+ * @property {"text"|"cheermote"|"emote"|"mention"} type
  */
