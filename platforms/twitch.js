@@ -760,6 +760,13 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		const messageResponse = response.body.data[0];
 		if (!messageResponse.is_sent) {
 			console.warn("JSON not sent!", { messageResponse });
+
+			if (messageResponse.drop_reason.code === "channel_settings") {
+				await this.send(
+					channel,
+					"A message that was about to be posted violated this channel's moderation settings."
+				);
+			}
 		}
 		else {
 			this.#previousMessageMeta.set(channelData.ID, {
