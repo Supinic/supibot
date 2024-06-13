@@ -153,8 +153,8 @@ const createChannelChatMessageSubscription = async (selfId, channelId) => {
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
 const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
-
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
+const WRITE_MODE_MESSAGE_DELAY = 1500;
 
 const DEFAULT_LOGGING_CONFIG = {
 	bans: false,
@@ -375,6 +375,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	#tokenCheckInterval = setInterval(() => this.#checkAuthToken(), 60_000);
 	#channelLiveStatusCron = new CronJob("0 */1 * * * *", () => populateChannelsLiveStatus());
 	#lastWebsocketKeepaliveMessage = 0;
+	#previousMessageMeta = new Map();
 
 	constructor (config) {
 		super("twitch", config, {
@@ -703,77 +704,56 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 * @param {Channel|string} channel
 	 */
 	async send (message, channel) {
-		if (typeof message !== "string") {
-			throw new sb.Error({
-				message: "Provided Twitch message is not a string",
-				args: {
-					channel,
-					message: {
-						type: typeof message,
-						constructor: message?.constructor?.name ?? "N/A"
-					}
-				}
-			});
-		}
-
 		const channelData = sb.Channel.get(channel, this);
-		const joinOverride = this.config.joinChannelsOverride ?? [];
-		if (this.config.suspended || joinOverride.length !== 0 && !joinOverride.includes(channelData.ID)) {
+		if (channelData.Mode === "Inactive" || channelData.Mode === "Read") {
 			return;
 		}
 
-		const channelName = channelData.Name;
-		message = message.replace(/\s+/g, " ")
-			.trim();
+		message = message.replace(/\s+/g, " ").trim();
 
-		if (channelData.Mode === "Inactive" || channelData.Mode === "Read" || channelData.Mode === "Last seen") {
-			return;
-		}
-
-		// Create a message scheduler for the channel if there is none
-		// OR if the queue mode does not match the current channel mode
-		if (typeof this.queues[channelName] === "undefined" || this.queues[channelName].mode !== channelData.Mode) {
-			if (this.queues[channelName]) {
-				this.queues[channelName].destroy();
-				this.queues[channelName] = null;
+		// Neither the "same message" nor "global" cooldowns apply to VIP or Moderator channels
+		if (channelData.Mode === "Write") {
+			const now = sb.Date.now();
+			const { length = 0, time = 0 } = this.#previousMessageMeta.get(channelData.ID) ?? {};
+			if (time + WRITE_MODE_MESSAGE_DELAY > now) {
+				setTimeout(() => this.send(message, channel), now - time);
+				return;
 			}
 
-			const { modes } = this.config;
-			const scheduler = new MessageScheduler({
-				mode: channelData.Mode,
-				channelID: channelData.ID,
-				timeout: modes[channelData.Mode].cooldown,
-				maxSize: modes[channelData.Mode].queueSize
+			// Ad-hoc figuring out whether the message about to be sent is the same as the previous message.
+			// Ideally, this is determined by string comparison, but keeping strings of last messages over
+			// thousands of channels isn't exactly memory friendly. So we just keep the lengths and hope it works.
+			if (message.length === length) {
+				message += ` ${this.config.sameMessageEvasionCharacter}`;
+			}
+		}
+
+		const response = await sb.Got("Helix", {
+			url: "chat/messages",
+			method: "POST",
+			throwHttpErrors: false,
+			json: {
+				broadcaster_id: channelData.Specific_ID,
+				sender_id: this.selfId,
+				message
+				// reply_parent_message_id // could be useful in the future!
+			}
+		});
+
+		if (!response.ok) {
+			console.warn("HTTP not sent!", { status: response.statusCode, body: response.body });
+		}
+
+		const messageResponse = response.body.data[0];
+		if (!messageResponse.is_sent) {
+			console.warn("JSON not sent!", { messageResponse });
+		}
+		else {
+			this.#previousMessageMeta.set(channelData.ID, {
+				length: message.length,
+				time: sb.Date.now()
 			});
-
-			const channelID = channelData.ID;
-			scheduler.on("message", async (msg) => {
-				try {
-					await this.client.say(channelName, msg);
-					this.incrementMessageMetric("sent", channelData);
-				}
-				catch (e) {
-					await sb.Logger.log("Twitch.Warning", String(e), { ID: channelID }, null);
-				}
-			});
-
-			this.queues[channelName] = scheduler;
 		}
-
-		// Check if the bot is about to send an identical message to the last one
-		if (this.evasion[channelName] === message) {
-			const { sameMessageEvasionCharacter: char } = this.config;
-			if (message.includes(char)) {
-				const regex = new RegExp(`${char}$`);
-				message = message.replace(regex, "");
-			}
-			else {
-				message += ` ${char}`;
-			}
-		}
-
-		this.evasion[channelName] = message;
-		this.queues[channelName].schedule(message);
 	}
 
 	/**
