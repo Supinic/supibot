@@ -518,6 +518,16 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				break;
 			}
 
+			case "channel.ban": {
+				await this.handleBan(event.user_login, event.broadcaster_user_login, {
+					reason: event.reason ?? null,
+					isPermanent: event.is_permanent,
+					ends: (event.ends_at) ? new sb.Date(event.ends_at) : null
+				});
+
+				break;
+			}
+
 			default: {
 				console.warn("Unrecognized notification", { data });
 			}
@@ -690,25 +700,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		});
 
 		client.on("USERNOTICE", (message) => this.handleUserNotice(message));
-
-		client.on("CLEARCHAT", (messageObject) => {
-			const {
-				targetUsername: username,
-				channelName,
-				reason = null
-			} = messageObject;
-
-			if (messageObject.isPermaban()) {
-				this.handleBan(username, channelName, reason, null);
-			}
-			else if (messageObject.isTimeout()) {
-				this.handleBan(username, channelName, reason, messageObject.banDuration);
-			}
-			else if (messageObject.wasChatCleared() && this.logging.clearChats) {
-				const channelData = sb.Channel.get(channelName, this);
-				sb.Logger.log("Twitch.Clearchat", null, channelData);
-			}
-		});
 	}
 
 	/**
@@ -1240,62 +1231,42 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	/**
-	 * Reacts to user timeouts and bans alike
+	 * Reacts to user timeouts and bans - mostly for logging
 	 * @param {string} user
 	 * @param {string} channel
-	 * @param {string|null} reason=null
-	 * @param {number|null} length=null
+	 * @param {Object} data
+	 * @param {string} data.reason
+	 * @param {boolean} data.isPermanent
+	 * @param {number} data.endsAt
 	 * @returns {Promise<void>}
 	 */
-	async handleBan (user, channel, reason = null, length = null) {
+	async handleBan (user, channel, data = {}) {
 		const channelData = sb.Channel.get(channel, this);
-		if (channelData) {
-			if (user === this.selfName && length === null && this.config.partChannelsOnPermaban) {
-				const previousMode = channelData.Mode;
-				await Promise.all([
-					channelData.setDataProperty("inactiveReason", "bot-banned"),
-					channelData.saveProperty("Mode", "Inactive"),
-					sb.Logger.log("Twitch.Ban", `Bot banned in channel ${channelData.Name}. Previous mode: ${previousMode}`, channelData)
-				]);
-			}
+		if (!channelData) {
+			return;
+		}
 
-			if (typeof channelData.sessionData.recentBans === "undefined") {
-				channelData.sessionData.recentBans = 0;
-			}
+		// @todo this probably shouldn't be necessary with Websocket + Conduits?
+		if (user === this.selfName && data.isPermanent && this.config.partChannelsOnPermaban) {
+			const previousMode = channelData.Mode;
+			await Promise.all([
+				channelData.setDataProperty("inactiveReason", "bot-banned"),
+				channelData.saveProperty("Mode", "Inactive"),
+				sb.Logger.log("Twitch.Ban", `Bot banned in channel ${channelData.Name}. Previous mode: ${previousMode}`, channelData)
+			]);
+		}
 
-			const limit = this.config.recentBanThreshold ?? Infinity;
-			if (!channelData.sessionData.parted && channelData.sessionData.recentBans > limit) {
-				channelData.sessionData.parted = true;
+		const userData = await sb.User.get(user);
+		if (!userData) {
+			return;
+		}
 
-				setTimeout(() => {
-					if (!channelData?.sessionData) {
-						return;
-					}
-
-					console.debug(`Re-joining channel ${channelData.Name}!`);
-					channelData.sessionData.parted = false;
-					this.client.join(channelData.Name);
-				}, this.config.recentBanPartTimeout);
-
-				await this.client.part(channelData.Name);
-			}
-
-			if (!channelData.sessionData.clearRecentBansTimeout) {
-				channelData.sessionData.clearRecentBansTimeout = setTimeout(() => {
-					if (!channelData?.sessionData) {
-						return;
-					}
-
-					channelData.sessionData.recentBans = 0;
-					channelData.sessionData.clearRecentBansTimeout = null;
-				}, this.config.clearRecentBansTimer);
-			}
-
-			channelData.sessionData.recentBans++;
-
-			if ((length === null && this.logging.bans) || (length !== null && this.logging.timeouts)) {
-				sb.Logger.logBan(user, channelData, length, new sb.Date(), reason);
-			}
+		const logString = JSON.stringify({ user, channel, data });
+		if (data.isPermanent && this.logging.bans) {
+			await sb.Logger.log("Twitch.Ban", `Permaban: ${logString}`, channelData, userData);
+		}
+		else if (!data.isPermanent && this.logging.timeouts) {
+			await sb.Logger.log("Twitch.Timeout", `Timeout: ${logString}`, channelData, userData);
 		}
 	}
 
