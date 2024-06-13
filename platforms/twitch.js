@@ -417,6 +417,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	#channelLiveStatusCron = new CronJob("0 */1 * * * *", () => populateChannelsLiveStatus());
 	#lastWebsocketKeepaliveMessage = 0;
 	#previousMessageMeta = new Map();
+	#userCommandSpamPrevention = new Map();
 
 	constructor (config) {
 		super("twitch", config, {
@@ -447,7 +448,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		this.availableEmotes = [];
 		this.availableEmoteSets = [];
 		this.recentEmoteFetchTimeout = 0;
-		this.userCommandSpamPrevention = new Map();
 	}
 
 	async connect () {
@@ -497,7 +497,12 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		switch (subscription.type) {
 			case "channel.chat.message": {
-				await this.handleMessage(event, false);
+				await this.handleMessage(event);
+				break;
+			}
+
+			case "user.whisper.message": {
+				await this.handlePrivateMessage(event);
 				break;
 			}
 
@@ -937,15 +942,14 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	/**
 	 * Handles incoming messages.
 	 * @param {Object} event
-	 * @param {boolean} isPrivate
 	 * @returns {Promise<void>}
 	 */
-	async handleMessage (event, isPrivate) {
+	async handleMessage (event) {
 		const {
 			broadcaster_user_login: channelName,
 			// broadcaster_user_id: channelId, // currently unused
 			chatter_user_login: senderUsername,
-			chatter_user_id: senderUserID,
+			chatter_user_id: senderUserId,
 			/** @type {TwitchBadge[]} */
 			badges,
 			color,
@@ -970,31 +974,27 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			rewardId
 		};
 
-		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserID });
+		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserId });
 
 		if (!userData) {
-			if (isPrivate) {
-				return;
-			}
-
 			emitRawUserMessageEvent(senderUsername, channelName, messageData);
 			return;
 		}
 		else if (userData.Twitch_ID === null && userData.Discord_ID !== null) {
 			if (!this.config.sendVerificationChallenge) {
-				await userData.saveProperty("Twitch_ID", senderUserID);
+				await userData.saveProperty("Twitch_ID", senderUserId);
 			}
 			else {
 				if (!messageData.startsWith(sb.Command.prefix)) {
 					return;
 				}
 
-				const status = await TwitchPlatform.fetchAccountChallengeStatus(userData, senderUserID);
+				const status = await TwitchPlatform.fetchAccountChallengeStatus(userData, senderUserId);
 				if (status === "Active") {
 					return;
 				}
 
-				const { challenge } = await TwitchPlatform.createAccountChallenge(userData, senderUserID);
+				const { challenge } = await TwitchPlatform.createAccountChallenge(userData, senderUserId);
 				const message = sb.Utils.tag.trim `
 					You were found to be likely to own a Discord account with the same name as your current Twitch account.
 					If you want to use my commands on Twitch, whisper me the following command on Discord:
@@ -1006,9 +1006,9 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			}
 		}
 		else if (userData.Twitch_ID === null && userData.Discord_ID === null) {
-			await userData.saveProperty("Twitch_ID", senderUserID);
+			await userData.saveProperty("Twitch_ID", senderUserId);
 		}
-		else if (userData.Twitch_ID !== senderUserID) {
+		else if (userData.Twitch_ID !== senderUserId) {
 			// Mismatch between senderUserID and userData.Twitch_ID means someone renamed into a different
 			// user's username, or that there is a different mishap happening. This case is unfortunately exceptional
 			// for the current user-database structure and the event handler must be aborted.
@@ -1049,72 +1049,60 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			return;
 		}
 
-		// Only check channels,
-		let channelData = null;
-		if (!isPrivate) {
-			channelData = sb.Channel.get(channelName, this);
-
-			if (!channelData || channelData.Mode === "Inactive") {
-				return;
-			}
-
-			this.resolveUserMessage(channelData, userData, messageData.text);
-
-			if (channelData.Logging.has("Meta")) {
-				await sb.Logger.updateLastSeen({
-					userData,
-					channelData,
-					message: messageData.text
-				});
-			}
-			if (this.logging.messages && channelData.Logging.has("Lines")) {
-				await sb.Logger.push(messageData.text, userData, channelData);
-			}
-
-			/**
-			 * Message events should be emitted even if the channel is in "Read" mode (see below).
-			 * This is due to the fact that chat-modules listening to this event can rely on being processed,
-			 * even if the channel is in read-only mode.
-			 */
-			channelData.events.emit("message", {
-				event: "message",
-				message: messageData.text,
-				user: userData,
-				channel: channelData,
-				platform: this,
-				data: messageData
-			});
-
-			// If channel is read-only, do not proceed with any processing
-			// Such as un-AFK message, reminders, commands, ...
-			if (channelData.Mode === "Read") {
-				this.incrementMessageMetric("read", channelData);
-				return;
-			}
-
-			await Promise.all([
-				sb.AwayFromKeyboard.checkActive(userData, channelData),
-				sb.Reminder.checkActive(userData, channelData),
-				populateUserChannelActivity(userData, channelData)
-			]);
-
-			// Mirror messages to a linked channel, if the channel has one
-			if (channelData.Mirror) {
-				this.mirror(messageData.text, userData, channelData, { commandUsed: false });
-			}
+		const channelData = sb.Channel.get(channelName, this);
+		if (!channelData || channelData.Mode === "Inactive") {
+			return;
 		}
-		else {
-			if (this.logging.whispers) {
-				await sb.Logger.push(messageData.text, userData, null, this);
-			}
 
-			this.resolveUserMessage(null, userData, messageData.text);
+		this.resolveUserMessage(channelData, userData, messageData.text);
+
+		if (channelData.Logging.has("Meta")) {
+			await sb.Logger.updateLastSeen({
+				userData,
+				channelData,
+				message: messageData.text
+			});
+		}
+		if (this.logging.messages && channelData.Logging.has("Lines")) {
+			await sb.Logger.push(messageData.text, userData, channelData);
+		}
+
+		/**
+		 * Message events should be emitted even if the channel is in "Read" mode (see below).
+		 * This is due to the fact that chat-modules listening to this event can rely on being processed,
+		 * even if the channel is in read-only mode.
+		 */
+		channelData.events.emit("message", {
+			event: "message",
+			message: messageData.text,
+			user: userData,
+			channel: channelData,
+			platform: this,
+			data: messageData
+		});
+
+		// If channel is read-only, do not proceed with any processing
+		// Such as un-AFK message, reminders, commands, ...
+		if (channelData.Mode === "Read") {
+			this.incrementMessageMetric("read", channelData);
+			return;
+		}
+
+		await Promise.all([
+			sb.AwayFromKeyboard.checkActive(userData, channelData),
+			sb.Reminder.checkActive(userData, channelData),
+			populateUserChannelActivity(userData, channelData)
+		]);
+
+		// Mirror messages to a linked channel, if the channel has one
+		if (channelData.Mirror) {
+			this.mirror(messageData.text, userData, channelData, { commandUsed: false });
 		}
 
 		this.incrementMessageMetric("read", channelData);
 
 		// Own message - check the regular/vip/mod/broadcaster status, and skip
-		if (channelData && senderUserID === this.selfId) {
+		if (channelData && senderUserId === this.selfId) {
 			const flatBadges = badges.map(i => i.set_id);
 			const oldMode = channelData.Mode;
 
@@ -1142,10 +1130,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			sb.Logger.log("Twitch.Other", `${cheer.bits} bits`, channelData, userData);
 		}
 
-		if (!sb.Command.prefix) {
-			return;
-		}
-
 		// If the handled message is a reply to another, append its content without the username mention to the end
 		// of the current one. This is so that a possible command execution can be handled with this input.
 		let targetMessage = messageData.text;
@@ -1157,34 +1141,69 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			targetMessage = `${remainder} ${parentMessage}`;
 		}
 
-		if (sb.Command.is(targetMessage)) {
-			const now = sb.Date.now();
-			const timeout = this.userCommandSpamPrevention.get(userData.ID);
-			if (typeof timeout === "number" && timeout > now) {
-				return;
-			}
-
-			const threshold = this.config.spamPreventionThreshold ?? 100;
-			this.userCommandSpamPrevention.set(userData.ID, now + threshold);
-
-			const [command, ...args] = targetMessage
-				.replace(sb.Command.prefix, "")
-				.split(/\s+/)
-				.filter(Boolean);
-
-			const result = await this.handleCommand(command, userData, channelData, args, messageData);
-
-			if ((!result || !result.success) && isPrivate) {
-				if (!result?.reply && result?.reason === "filter") {
-					await this.pm(sb.Config.get("PRIVATE_MESSAGE_COMMAND_FILTERED"), userData.Name);
-				}
-				else if (result?.reason === "no-command") {
-					await this.pm(sb.Config.get("PRIVATE_MESSAGE_NO_COMMAND"), userData.Name);
-				}
-			}
+		if (!sb.Command.is(targetMessage)) {
+			return;
 		}
-		else if (isPrivate) {
-			await this.pm(sb.Config.get("PRIVATE_MESSAGE_UNRELATED"), userData.Name);
+
+		const now = sb.Date.now();
+		const timeout = this.#userCommandSpamPrevention.get(userData.ID);
+		if (typeof timeout === "number" && timeout > now) {
+			return;
+		}
+
+		const threshold = this.config.spamPreventionThreshold ?? 100;
+		this.#userCommandSpamPrevention.set(userData.ID, now + threshold);
+
+		const [command, ...args] = targetMessage
+			.replace(sb.Command.prefix, "")
+			.split(/\s+/)
+			.filter(Boolean);
+
+		await this.handleCommand(command, userData, channelData, args, messageData);
+	}
+
+	/**
+	 * Handles incoming private messages.
+	 * Split from original single handleMessage handler, due to simplified flow for both methods.
+ 	 * @param {Object} event
+	 * @return {Promise<void>}
+	 */
+	async handlePrivateMessage (event) {
+		const {
+			from_user_login: senderUsername,
+			from_user_id: senderUserId
+		} = event;
+
+		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserId });
+		if (!userData) {
+			return;
+		}
+
+		const message = event.whisper.text;
+		if (this.logging.whispers) {
+			await sb.Logger.push(message, userData, null, this);
+		}
+
+		this.resolveUserMessage(null, userData, message);
+
+		if (!sb.Command.is(message)) {
+			await this.pm(sb.Config.get("PRIVATE_MESSAGE_UNRELATED"), senderUsername);
+			return;
+		}
+
+		const [command, ...args] = message
+			.replace(sb.Command.prefix, "")
+			.split(/\s+/)
+			.filter(Boolean);
+
+		const result = await this.handleCommand(command, userData, null, args, {});
+		if (!result || !result.success) {
+			if (!result?.reply && result?.reason === "filter") {
+				await this.pm(sb.Config.get("PRIVATE_MESSAGE_COMMAND_FILTERED"), senderUsername);
+			}
+			else if (result?.reason === "no-command") {
+				await this.pm(sb.Config.get("PRIVATE_MESSAGE_NO_COMMAND"), senderUsername);
+			}
 		}
 	}
 
