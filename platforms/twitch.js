@@ -9,6 +9,7 @@ const {
 	createWhisperMessageSubscription,
 	createChannelSubSubscription,
 	createChannelResubSubscription,
+	createChannelRaidSubscription,
 	fetchToken,
 	emitRawUserMessageEvent,
 	populateChannelsLiveStatus,
@@ -132,7 +133,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID),
 			createChannelBanSubscription(channelData.Specific_ID),
 			createChannelSubSubscription(channelData.Specific_ID),
-			createChannelResubSubscription(channelData.Specific_ID)
+			createChannelResubSubscription(channelData.Specific_ID),
+			createChannelRaidSubscription(channelData.Specific_ID)
 		]);
 
 		await Promise.all([
@@ -210,6 +212,11 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			case "channel.subscribe":
 			case "channel.subcription.message": {
 				await this.handleSub(event, subscription.type);
+				break;
+			}
+
+			case "channel.raid": {
+				await this.handleRaid(event);
 				break;
 			}
 
@@ -296,8 +303,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				}
 			}
 		});
-
-		client.on("USERNOTICE", (message) => this.handleUserNotice(message));
 	}
 
 	/**
@@ -864,6 +869,33 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	/**
+	 * @param {Object} event
+	 * @return {Promise<void>}
+	 */
+	async handleRaid (event) {
+		const targetChannelData = sb.Channel.get(event.to_broadcaster_user_id);
+		if (!targetChannelData || targetChannelData.Mode === "Read" || targetChannelData.Mode === "Inactive") {
+			return;
+		}
+
+		const fromUser = event.from_broadcaster_user_login;
+		targetChannelData.events.emit("raid", {
+			event: "raid",
+			message: null,
+			channel: targetChannelData,
+			username: fromUser,
+			platform: this,
+			data: {
+				viewers: event.viewers
+			}
+		});
+
+		if (this.logging.hosts) {
+			await sb.Logger.log("Twitch.Host", `Raid: ${fromUser} => ${targetChannelData.Name} for ${event.viewers} viewers`);
+		}
+	}
+
+	/**
 	 * Handles a command being used.
 	 * @param {string} command
 	 * @param {string} user
@@ -918,60 +950,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		}
 
 		return execution;
-	}
-
-	async handleUserNotice (messageObject) {
-		const {
-			messageText,
-			messageTypeID,
-			senderUsername,
-			channelName
-		} = messageObject;
-
-		// ignore these events
-		if (this.config.ignoredUserNotices.includes(messageTypeID)) {
-			return;
-		}
-
-		const userData = await sb.User.get(senderUsername);
-		const channelData = sb.Channel.get(channelName, this);
-		if (!channelData) {
-			return;
-		}
-
-		const eventSkipModes = ["Read", "Last seen", "Inactive"];
-		const logSkipModes = ["Inactive", "Last seen"];
-
-		if (messageObject.isRaid()) {
-			const viewers = messageObject.eventParams.viewerCount;
-			if (!eventSkipModes.includes(channelData.Mode)) {
-				channelData.events.emit("raid", {
-					event: "raid",
-					message: messageText ?? null,
-					channel: channelData,
-					user: userData,
-					platform: this,
-					data: {
-						viewers
-					}
-				});
-			}
-
-			if (this.logging.hosts && !logSkipModes.includes(channelData.Mode)) {
-				await sb.Logger.log("Twitch.Host", `Raid: ${userData?.Name ?? null} => ${channelData.Name} for ${viewers} viewers`);
-			}
-		}
-		else if (messageObject.isRitual()) {
-			if (this.logging.rituals && !logSkipModes.includes(channelData.Mode)) {
-				const userData = await sb.User.get(senderUsername, false);
-				const channelData = sb.Channel.get(channelName, this);
-
-				await sb.Logger.log("Twitch.Ritual", `${messageObject.systemMessage} ${messageText}`, channelData, userData);
-			}
-		}
-		else {
-			console.warn("Uncaught USERNOTICE event", messageObject);
-		}
 	}
 
 	/**

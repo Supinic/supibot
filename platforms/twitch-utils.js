@@ -101,9 +101,19 @@ const createSubscription = async (data = {}) => {
 	const conduitId = await getConduitId();
 	const appToken = await getAppAccessToken();
 
-	const { subscription, version, selfId, channelId } = data;
+	const {
+		subscription,
+		condition: customCondition,
+		version,
+		selfId,
+		channelId
+	} = data;
+
 	let condition;
-	if (!channelId) {
+	if (customCondition) {
+		condition = customCondition;
+	}
+	else if (!channelId) {
 		condition = { user_id: selfId };
 	}
 	else if (!selfId) {
@@ -185,6 +195,14 @@ const createChannelSubSubscription = async (channelId) => createSubscription({
 const createChannelResubSubscription = async (channelId) => createSubscription({
 	channelId,
 	subscription: "channel.subscription.message",
+	version: "1"
+});
+
+const createChannelRaidSubscription = async (channelId) => createSubscription({
+	condition: {
+		to_broadcaster_user_id: channelId
+	},
+	subscription: "channel.raid",
 	version: "1"
 });
 
@@ -348,6 +366,7 @@ module.exports = {
 	createWhisperMessageSubscription,
 	createChannelSubSubscription,
 	createChannelResubSubscription,
+	createChannelRaidSubscription,
 	fetchToken,
 	emitRawUserMessageEvent,
 	populateChannelsLiveStatus,
