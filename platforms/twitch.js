@@ -100,11 +100,24 @@ const assignWebsocketToConduit = async (sessionId) => {
 	}
 };
 
-// @Todo manage Helix rate limits
-// @todo Move to TwitchPlatform and then call HandleMessage and other handlers
-const createChannelChatMessageSubscription = async (selfId, channelId) => {
+const createSubscription = async (data = {}) => {
 	const conduitId = await getConduitId();
 	const appToken = await getAppAccessToken();
+
+	const { subscription, version, selfId, channelId } = data;
+	let condition;
+	if (!channelId) {
+		condition = { user_id: selfId };
+	}
+	else if (!selfId) {
+		condition = { broadcaster_user_id: channelId };
+	}
+	else {
+		condition = {
+			user_id: selfId,
+			broadcaster_user_id: channelId
+		};
+	}
 
 	const response = await sb.Got("GenericAPI", {
 		url: "https://api.twitch.tv/helix/eventsub/subscriptions",
@@ -116,12 +129,9 @@ const createChannelChatMessageSubscription = async (selfId, channelId) => {
 			"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
 		},
 		json: {
-			type: "channel.chat.message",
-			version: "1",
-			condition: {
-				broadcaster_user_id: channelId,
-				user_id: selfId
-			},
+			type: subscription,
+			version,
+			condition,
 			transport: {
 				method: "conduit",
 				conduit_id: conduitId
@@ -141,6 +151,7 @@ const createChannelChatMessageSubscription = async (selfId, channelId) => {
 		}
 		else {
 			console.warn("Could not subscribe", {
+				subscription: data,
 				selfId,
 				channelId,
 				response
@@ -149,47 +160,24 @@ const createChannelChatMessageSubscription = async (selfId, channelId) => {
 	}
 };
 
-const createWhisperMessageSubscription = async (selfId) => {
-	const conduitId = await getConduitId();
-	const appToken = await getAppAccessToken();
+const createChannelChatMessageSubscription = async (selfId, channelId) => createSubscription({
+	channelId,
+	selfId,
+	subscription: "channel.chat.message",
+	version: "1"
+});
 
-	const response = await sb.Got("GenericAPI", {
-		url: "https://api.twitch.tv/helix/eventsub/subscriptions",
-		method: "POST",
-		responseType: "json",
-		throwHttpErrors: false,
-		headers: {
-			Authorization: `Bearer ${appToken}`,
-			"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
-		},
-		json: {
-			type: "user.whisper.message",
-			version: "1",
-			condition: {
-				user_id: selfId
-			},
-			transport: {
-				method: "conduit",
-				conduit_id: conduitId
-			}
-		}
-	});
+const createWhisperMessageSubscription = async (selfId) => createSubscription({
+	selfId,
+	subscription: "user.whisper.message",
+	version: "1"
+});
 
-	if (!response.ok) {
-		// Conflict - subscription already exists
-		if (response.statusCode === 409) {
-			/**
-			 * @todo
-			 * add some kind of Redis subscription caching or do one big request at start to
-			 * figure out all the subscriptions we have going on currently, so we don't have to
-			 * handle all the re-requesting failures here
-			 */
-		}
-		else {
-			console.warn("Could not subscribe - whispers", { selfId, response });
-		}
-	}
-};
+const createChannelBanSubscription = async (channelId) => createSubscription({
+	channelId,
+	subscription: "channel.ban",
+	version: "1"
+});
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
@@ -413,8 +401,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	supportsMeAction = true;
 	dynamicChannelAddition = true;
 
-	#tokenCheckInterval = setInterval(() => this.#checkAuthToken(), 60_000);
+	// @todo remove this cron and replace with offline/online EventSub handlers
 	#channelLiveStatusCron = new CronJob("0 */1 * * * *", () => populateChannelsLiveStatus());
+
+	#tokenCheckInterval = setInterval(() => this.#checkAuthToken(), 60_000);
 	#lastWebsocketKeepaliveMessage = 0;
 	#previousMessageMeta = new Map();
 	#userCommandSpamPrevention = new Map();
@@ -455,9 +445,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		this.client = ws;
 
 		const channelList = sb.Channel.getJoinableForPlatform(this);
-		const joinPromises = channelList.map(async (channelData) => (
-			createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID)
-		));
+		const joinPromises = channelList.flatMap(async (channelData) => [
+			createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID),
+			createChannelBanSubscription(channelData.Specific_ID)
+		]);
 
 		await Promise.all([
 			...joinPromises,
