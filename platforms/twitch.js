@@ -135,6 +135,14 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			...joinPromises,
 			createWhisperMessageSubscription(this.selfId)
 		]);
+
+		const { channels, string } = this.config.reconnectAnnouncement;
+		for (const channel of channels) {
+			const channelData = sb.Channel.get(channel);
+			if (channelData) {
+				await channelData.send(string);
+			}
+		}
 	}
 
 	async handleWebsocketMessage (data) {
@@ -248,40 +256,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 					})}`, channelData, null);
 				}
 			}
-		});
-
-		client.on("JOIN", async (message) => {
-			if (message.joinedUsername !== this.selfName.toLowerCase()) {
-				return;
-			}
-
-			const { channelName } = message;
-			const channelData = sb.Channel.get(channelName);
-			channelData.sessionData.joined = true;
-			channelData.sessionData.parted = false;
-
-			// @todo: Could this possibly be a part of channelData? So that it is platform-independent...
-			const {
-				channels,
-				string
-			} = this.config.reconnectAnnouncement;
-
-			const sayPromises = [];
-			if (channels && string && channels.includes(channelName)) {
-				sayPromises.push(client.say(channelName, string));
-			}
-
-			await Promise.allSettled(sayPromises);
-		});
-
-		client.on("PART", (message) => {
-			if (message.partedUsername !== this.selfName.toLowerCase()) {
-				return;
-			}
-
-			const channelData = sb.Channel.get(message.channelName);
-			channelData.sessionData.joined = false;
-			channelData.sessionData.parted = true;
 		});
 
 		client.on("USERSTATE", async (messageObject) => {
