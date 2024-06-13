@@ -199,12 +199,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			}
 
 			case "channel.ban": {
-				await this.handleBan(event.user_login, event.broadcaster_user_login, {
-					reason: event.reason ?? null,
-					isPermanent: event.is_permanent,
-					ends: (event.ends_at) ? new sb.Date(event.ends_at) : null
-				});
-
+				await this.handleBan(event);
 				break;
 			}
 
@@ -768,6 +763,47 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	/**
+	 * Reacts to user timeouts and bans - mostly for logging
+	 * @param {Object} event
+	 * @returns {Promise<void>}
+	 */
+	async handleBan (event) {
+		const {
+			user_login: user,
+			broadcaster_user_login: channel,
+			is_permanent: isPermanent
+		} = event;
+
+		const channelData = sb.Channel.get(channel, this);
+		if (!channelData) {
+			return;
+		}
+
+		// @todo this probably shouldn't be necessary with Websocket + Conduits?
+		if (user === this.selfName && isPermanent && this.config.partChannelsOnPermaban) {
+			const previousMode = channelData.Mode;
+			await Promise.all([
+				channelData.setDataProperty("inactiveReason", "bot-banned"),
+				channelData.saveProperty("Mode", "Inactive"),
+				sb.Logger.log("Twitch.Ban", `Bot banned in channel ${channelData.Name}. Previous mode: ${previousMode}`, channelData)
+			]);
+		}
+
+		const userData = await sb.User.get(user);
+		if (!userData) {
+			return;
+		}
+
+		const logString = JSON.stringify({ user, channel, event });
+		if (isPermanent && this.logging.bans) {
+			await sb.Logger.log("Twitch.Ban", `Permaban: ${logString}`, channelData, userData);
+		}
+		else if (!isPermanent && this.logging.timeouts) {
+			await sb.Logger.log("Twitch.Timeout", `Timeout: ${logString}`, channelData, userData);
+		}
+	}
+
+	/**
 	 * Handles a command being used.
 	 * @param {string} command
 	 * @param {string} user
@@ -822,46 +858,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		}
 
 		return execution;
-	}
-
-	/**
-	 * Reacts to user timeouts and bans - mostly for logging
-	 * @param {string} user
-	 * @param {string} channel
-	 * @param {Object} data
-	 * @param {string} data.reason
-	 * @param {boolean} data.isPermanent
-	 * @param {number} data.endsAt
-	 * @returns {Promise<void>}
-	 */
-	async handleBan (user, channel, data = {}) {
-		const channelData = sb.Channel.get(channel, this);
-		if (!channelData) {
-			return;
-		}
-
-		// @todo this probably shouldn't be necessary with Websocket + Conduits?
-		if (user === this.selfName && data.isPermanent && this.config.partChannelsOnPermaban) {
-			const previousMode = channelData.Mode;
-			await Promise.all([
-				channelData.setDataProperty("inactiveReason", "bot-banned"),
-				channelData.saveProperty("Mode", "Inactive"),
-				sb.Logger.log("Twitch.Ban", `Bot banned in channel ${channelData.Name}. Previous mode: ${previousMode}`, channelData)
-			]);
-		}
-
-		const userData = await sb.User.get(user);
-		if (!userData) {
-			return;
-		}
-
-		const logString = JSON.stringify({ user, channel, data });
-		if (data.isPermanent && this.logging.bans) {
-			await sb.Logger.log("Twitch.Ban", `Permaban: ${logString}`, channelData, userData);
-		}
-		else if (!data.isPermanent && this.logging.timeouts) {
-			await sb.Logger.log("Twitch.Timeout", `Timeout: ${logString}`, channelData, userData);
-		}
 	}
 
 	async handleUserNotice (messageObject) {
@@ -1060,8 +1056,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	async me (channelData, message) {
 		await this.client.me(channelData.Name, message);
 	}
-
-
 
 	/**
 	 * Fetches a list of emote data for a given list of emote sets.
