@@ -19,7 +19,6 @@ module.exports = {
 	Flags: ["mention"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: async function subAge (context, user, channel) {
 		const platform = sb.Platform.get("twitch");
 		const userID = await platform.getUserID(user ?? context.user.Name);
@@ -110,7 +109,7 @@ module.exports = {
 
 		const { relationship } = sub.data.targetUser;
 		if (!relationship.cumulativeTenure) {
-			const response = await sb.Got("Leppunen", {
+			const response = await sb.Got("IVR", {
 				url: "v2/twitch/user",
 				searchParams: {
 					login: channelName

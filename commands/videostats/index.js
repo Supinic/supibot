@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe","whitelist"],
 	Params: null,
 	Whitelist_Response: "Video statistics are only available in Cytube rooms.",
-	Static_Data: null,
 	Code: (async function videoStats (context, link) {
 		if (!link) {
 			return {

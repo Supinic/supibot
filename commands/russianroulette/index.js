@@ -1,4 +1,5 @@
 const { randomInt } = require("../../utils/command-utils.js");
+const { cannotTimeoutBadges, outcomes } = require("./definitions.json");
 
 module.exports = {
 	Name: "russianroulette",
@@ -9,29 +10,6 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		cannotTimeoutBadges: ["hasModerator", "hasBroadcaster", "hasStaff", "hasAdmin"],
-		outcomes: {
-			blank: [
-				"Bang! The timeout bullet was a blank. It's not very effective.",
-				"Bang! The timeout bullet hits the ceiling. I'm not allowed to time you out monkaS",
-				"Bang! You masterfully dodge the bullet. Seems like your agility level is too high.",
-				"Bang! You stop the bullet in front of the palm of your hand. How? Are you The One?"
-			],
-			nerf: [
-				"Poof! You got hit in the face by a nerf pellet. It's not very effective.",
-				"Bonk! You got hit on the head with an inflatable hammer. It doesn't do anything.",
-				"Woosh! A splash of water gushes from the gun. Best I can do, sorry.",
-				"Pop! You got \"hit\" by my finger guns 👉👉. Nothing happens."
-			],
-			real: [
-				"Bang! It's over.",
-				"Bang! See you in a bit.",
-				"Bang! Sayonara.",
-				"Bang! Time for a bit of a break."
-			]
-		}
-	})),
 	Code: (async function russianRoulette (context, timeoutLength) {
 		if (context.channel === null) {
 			return {
@@ -71,7 +49,7 @@ module.exports = {
 		if (context.channel.Mode !== "Moderator") {
 			timeoutMode = "nerf";
 		}
-		else if (this.staticData.cannotTimeoutBadges.some(i => userBadges[i] === true)) {
+		else if (cannotTimeoutBadges.some(i => userBadges[i] === true)) {
 			timeoutMode = "blank";
 		}
 		else {
@@ -98,7 +76,7 @@ module.exports = {
 				}
 			}
 
-			let outcome = sb.Utils.randArray(this.staticData.outcomes[timeoutMode]);
+			let outcome = sb.Utils.randArray(outcomes[timeoutMode]);
 			if (timeoutMode === "nerf") {
 				outcome += ` (can't time out anyone if I'm not a moderator)`;
 			}

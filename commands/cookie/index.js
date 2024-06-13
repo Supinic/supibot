@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","pipe","rollback"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function cookie (context, type, receiver) {
 		const Logic = require("./cookie-logic.js");
 		const subcommand = Logic.parseSubcommand(type);

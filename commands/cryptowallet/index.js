@@ -9,7 +9,6 @@ module.exports = {
 		{ name: "type", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function cryptoWallet (context, address) {
 		if (!address) {
 			return {

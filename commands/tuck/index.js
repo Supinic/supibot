@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["block","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: async function tuck (context, user, ...args) {
 		user ??= context.user.Name;
 
@@ -162,8 +161,8 @@ module.exports = {
 		"Fucks target user to bed.",
 		"",
 
-		"<code>gnkiss (user)</code>",
-		"Bids t$arget user goodnight and kiss their forehead.",
+		"<code>$gnkiss (user)</code>",
+		"Bids target user goodnight and kiss their forehead.",
 		"",
 
 		"<code>$headpat (user)</code>",

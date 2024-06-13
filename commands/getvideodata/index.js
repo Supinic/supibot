@@ -9,7 +9,6 @@ module.exports = {
 	Flags: ["developer","mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function getVideoData (context, link) {
 		const linkParser = getLinkParser();
 

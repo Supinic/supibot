@@ -1,3 +1,10 @@
+const weapons = require("./weapons.json");
+
+// This definitely has to be turned into a standard subcommand structure once it gets expanded
+// I'm only leaving the definition like this because $tf2 only has one subcommand (for now).
+const SUBCOMMAND_NAMES = ["roll"].join(", ");
+const TEAM_FORTRESS_CLASSES = ["Scout", "Pyro", "Soldier", "Heavy", "Demoman", "Medic", "Spy", "Engineer", "Sniper"];
+
 module.exports = {
 	Name: "tf2",
 	Aliases: null,
@@ -7,27 +14,21 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		subcommands: ["roll"],
-		classes: ["Scout", "Pyro", "Soldier", "Heavy", "Demoman", "Medic", "Spy", "Engineer", "Sniper"]
-	})),
 	Code: (async function teamFortress2 (context, subcommand, ...args) {
 		if (!subcommand) {
-			const subcommands = this.staticData.subcommands.join(", ");
 			return {
 				success: false,
-				reply: `No subcommand provided! Use one of: ${subcommands}`
+				reply: `No subcommand provided! Use one of: ${SUBCOMMAND_NAMES}`
 			};
 		}
 
 		switch (subcommand.toLowerCase()) {
 			case "roll": {
-				const lowercaseClasses = this.staticData.classes.map(i => i.toLowerCase());
+				const lowercaseClasses = TEAM_FORTRESS_CLASSES.map(i => i.toLowerCase());
 				const playerClass = (lowercaseClasses.includes(args[0]?.toLowerCase()))
 					? sb.Utils.capitalize(args[0])
-					: sb.Utils.randArray(this.staticData.classes);
+					: sb.Utils.randArray(TEAM_FORTRESS_CLASSES);
 
-				const weapons = require("./weapons.json");
 				const classWeapons = weapons.filter(i => i.classes.includes(playerClass));
 
 				const primary = sb.Utils.randArray(classWeapons.filter(i => i.slot === "primary"));
@@ -49,10 +50,9 @@ module.exports = {
 			}
 
 			default: {
-				const subcommands = this.staticData.subcommands.join(", ");
 				return {
 					success: false,
-					reply: `Invalid subcommand provided! Use one of: ${subcommands}`
+					reply: `Invalid subcommand provided! Use one of: ${SUBCOMMAND_NAMES}`
 				};
 			}
 		}

@@ -1,3 +1,6 @@
+const DISCORD_UPDATES_ROLE_ID = "748957148439904336";
+const SUPINIC_DISCORD_GUILD_ID = "633342787869212683";
+
 module.exports = {
 	Name: "supibotupdates",
 	Aliases: null,
@@ -7,10 +10,6 @@ module.exports = {
 	Flags: ["ping"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		updatesRoleID: "748957148439904336",
-		supinicGuildID: "633342787869212683"
-	})),
 	Code: (async function supibotUpdate (context) {
 		if (context.platform.Name !== "discord") {
 			return {
@@ -20,14 +19,14 @@ module.exports = {
 		}
 
 		const { guild, member } = context.append;
-		if (!guild || guild.id !== this.staticData.supinicGuildID) {
+		if (!guild || guild.id !== SUPINIC_DISCORD_GUILD_ID) {
 			return {
 				success: false,
 				reply: "This command can only be invoked in Supinic's discord server!"
 			};
 		}
 
-		const role = guild.roles.cache.get(this.staticData.updatesRoleID);
+		const role = guild.roles.cache.get(DISCORD_UPDATES_ROLE_ID);
 		if (!role) {
 			return {
 				success: false,

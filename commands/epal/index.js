@@ -14,7 +14,6 @@ module.exports = {
 	Flags: ["mention"],
 	Params: [],
 	Whitelist_Response: null,
-	Static_Data: null,
 	initialize: function () {
 		if (!sb.Config.has("LOCAL_IP", true) || !sb.Config.has("LOCAL_PLAY_SOUNDS_PORT", true)) {
 			console.warn("$epal: TTS not configured - will be unavailable");

@@ -11,7 +11,6 @@ module.exports = {
 		{ name: "fail", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function coinflip (context) {
 		// According to Murray & Teare (1993), the probability of an American silver nickel landing on its edge is around 1 in 6000 tosses
 		const edgeRoll = randomInt(1, 6000);

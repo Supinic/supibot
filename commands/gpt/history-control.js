@@ -25,6 +25,25 @@ const add = async (userData, userMessage, assistantMessage) => {
 	});
 };
 
+const imageAdd = async (userData, userMessage, imageUrl, assistantMessage) => {
+	const history = await get(userData) ?? [];
+	history.push(
+		{
+			role: "user",
+			content: [
+				{ type: "text", userMessage },
+				{ type: "image_url", image_url: { url: imageUrl } }
+			]
+		},
+		{ role: "assistant", content: assistantMessage }
+	);
+
+	const key = createCacheKey(userData.ID);
+	await sb.Cache.setByPrefix(key, history, {
+		expiry: 600_000 // 10 minutes
+	});
+};
+
 const dump = async (userData) => {
 	const history = await get(userData);
 	if (history.length === 0) {
@@ -62,6 +81,7 @@ const dump = async (userData) => {
 
 module.exports = {
 	add,
+	imageAdd,
 	get,
 	reset,
 	dump

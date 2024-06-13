@@ -9,7 +9,6 @@ module.exports = {
 		{ name: "recalculate", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function statistics (context, type, ...args) {
 		if (!type) {
 			return {

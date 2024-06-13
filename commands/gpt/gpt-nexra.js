@@ -1,9 +1,9 @@
-const GptMessages = require("./gpt-messages.js");
+const GptOpenAI = require("./gpt-openai.js");
 const GptHistory = require("./history-control.js");
 
-module.exports = class GptNexra extends GptMessages {
+module.exports = class GptNexra extends GptOpenAI {
 	static async getHistory (context) {
-		const { historyMode } = await GptMessages.getHistoryMode(context);
+		const { historyMode } = await GptOpenAI.getHistoryMode(context);
 		return (historyMode === "enabled")
 			? (await GptHistory.get(context.user) ?? [])
 			: [];
@@ -40,6 +40,13 @@ module.exports = class GptNexra extends GptMessages {
 			}
 		});
 
+		if (!response.ok) {
+			return {
+				success: false,
+				reply: `Nexra API returned an error! Try again later.`
+			};
+		}
+
 		const index = response.body.indexOf("{");
 		if (index === -1) {
 			return {
@@ -72,9 +79,13 @@ module.exports = class GptNexra extends GptMessages {
 	static isAvailable () { return true; }
 
 	static async setHistory (context, query, reply) {
-		const { historyMode } = await GptMessages.getHistoryMode(context);
+		const { historyMode } = await GptOpenAI.getHistoryMode(context);
 		if (historyMode === "enabled") {
 			await GptHistory.add(context.user, query, reply);
 		}
+	}
+
+	static getRequestErrorMessage () {
+		return "Nexra is currently overloaded! Try again later.";
 	}
 };

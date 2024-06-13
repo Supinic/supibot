@@ -9,7 +9,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function downloadClip (context, input) {
 		if (!input) {
 			return {
@@ -38,7 +37,7 @@ module.exports = {
 		}
 
 		const [slug] = match;
-		const response = await sb.Got("Leppunen", `v2/twitch/clip/${slug}`);
+		const response = await sb.Got("IVR", `v2/twitch/clip/${slug}`);
 		if (response.statusCode === 400) {
 			return {
 				success: false,

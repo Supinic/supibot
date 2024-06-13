@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function faq (context, ...args) {
 		if (args.length > 0) {
 			const query = args.join(" ");

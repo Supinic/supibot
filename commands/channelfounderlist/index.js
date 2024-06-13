@@ -10,7 +10,6 @@ module.exports = {
 		{ name: "subStatus", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function channelFounderList (context, channelName) {
 		if (!channelName) {
 			if (context.platform.Name !== "twitch") {
@@ -30,7 +29,7 @@ module.exports = {
 		}
 
 		const channel = sb.Channel.normalizeName(channelName);
-		const response = await sb.Got("Leppunen", `v2/twitch/founders/${channel}`);
+		const response = await sb.Got("IVR", `v2/twitch/founders/${channel}`);
 
 		if (response.statusCode === 404) {
 			const { error } = response.body;

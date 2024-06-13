@@ -9,7 +9,6 @@ module.exports = {
 	Flags: ["mention"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function twitchLotto (context, inputLink) {
 		const filtered = await sb.Filter.execute({
 			user: context.user,

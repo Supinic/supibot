@@ -15,7 +15,6 @@ module.exports = {
 		{ name: "replacement", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function aliasBuildingBlock (context, type, ...args) {
 		const { blocks } = require("./blocks/index.js");
 		if (!context.append.alias && !context.append.pipe) {

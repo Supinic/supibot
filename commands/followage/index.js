@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function followAge (context, user, channel) {
 		if (!channel && user) {
 			channel = user;
@@ -49,7 +48,7 @@ module.exports = {
 			}
 		}
 
-		const response = await sb.Got("Leppunen", {
+		const response = await sb.Got("IVR", {
 			url: `v2/twitch/subage/${user}/${channel}`
 		});
 

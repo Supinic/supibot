@@ -1,3 +1,5 @@
+const KISS_EMOJIS = ["👩‍❤️‍💋‍👨", "💋", "😗", "👩‍❤️‍💋‍👨", "😙", "😚", "😽", "💋😳", "👨‍❤️‍💋‍👨"];
+
 module.exports = {
 	Name: "kiss",
 	Aliases: null,
@@ -7,9 +9,6 @@ module.exports = {
 	Flags: ["opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		emojis: ["👩‍❤️‍💋‍👨", "💋", "😗", "👩‍❤️‍💋‍👨", "😙", "😚", "😽", "💋😳", "👨‍❤️‍💋‍👨"]
-	})),
 	Code: (async function kiss (context, user, emote) {
 		if (!user || user.toLowerCase() === context.user.Name) {
 			return {
@@ -24,8 +23,8 @@ module.exports = {
 		else {
 			const string = (emote)
 				? `${emote} 💋`
-				: sb.Utils.randArray(this.staticData.emojis);
-	
+				: sb.Utils.randArray(KISS_EMOJIS);
+
 			return {
 				reply: `${context.user.Name} kisses ${user} ${string}`
 			};

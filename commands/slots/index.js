@@ -9,7 +9,6 @@ module.exports = {
 		{ name: "pattern", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function slots (context, ...args) {
 		const { leaderboardKeywords, patterns } = require("./definitions.js");
 

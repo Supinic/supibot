@@ -48,9 +48,13 @@ module.exports = {
 				feed = await parseRSS(xml);
 			}
 			catch (e) {
-				await sb.Logger.logError("Command", e, {
-					origin: "Internal",
+				const err = new sb.Error({
 					message: "RSS fetching/parsing failed",
+					cause: e
+				});
+
+				await sb.Logger.logError("Command", err, {
+					origin: "Internal",
 					context: {
 						code: news.code,
 						url,

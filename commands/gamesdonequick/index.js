@@ -7,9 +7,8 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function speedrun () {
-		const { comment } = await sb.Got("Leppunen", "gdq").json();
+		const { comment } = await sb.Got("IVR", "gdq").json();
 		return {
 			reply: comment
 		};

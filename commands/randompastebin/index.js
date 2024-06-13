@@ -1,3 +1,5 @@
+const pastebinLanguages = require("./pastebin-languages.json");
+
 module.exports = {
 	Name: "randompastebin",
 	Aliases: ["rpb"],
@@ -10,41 +12,6 @@ module.exports = {
 		{ name: "syntax", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		languages: [
-			"apache",
-			"arduino",
-			"bash",
-			"c",
-			"cpp",
-			"csharp",
-			"css",
-			"dart",
-			"html4strict",
-			"html5",
-			"java",
-			"javascript",
-			"json",
-			"kotlin",
-			"lua",
-			"make",
-			"mysql",
-			"nginx",
-			"pascal",
-			"php",
-			"postgresql",
-			"powershell",
-			"python",
-			"ruby",
-			"sql",
-			"stonescript",
-			"swift",
-			"typescript",
-			"verilog",
-			"xml",
-			"yaml"
-		]
-	})),
 	Code: (async function randomPastebin (context, syntax) {
 		let data = await sb.Cache.getByPrefix("random-pastebin-paste-list");
 		if (!data) {
@@ -56,7 +23,7 @@ module.exports = {
 					limit: "100"
 				}
 			});
-			
+
 			if (!response.ok) {
 				return {
 					success: false,
@@ -126,7 +93,6 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { languages } = this.staticData;
 		const data = await sb.Cache.getByPrefix("random-pastebin-paste-list");
 
 		let list;
@@ -142,7 +108,7 @@ module.exports = {
 			listDescription = "Currently available languages:";
 		}
 		else {
-			list = languages.map(i => `<li>${i}</li>`).join("");
+			list = pastebinLanguages.map(i => `<li>${i}</li>`).join("");
 			listDescription = "Common language list (<a href=\"//pastebin.com/languages\">full list</a>):";
 		}
 

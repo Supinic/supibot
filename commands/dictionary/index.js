@@ -9,7 +9,6 @@ module.exports = {
 		{ name: "index", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function dictionary (context, ...args) {
 		if (args.length === 0) {
 			return {

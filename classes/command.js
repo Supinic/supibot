@@ -167,7 +167,6 @@ class Command extends require("./template.js") {
 	#Author;
 
 	data = {};
-	staticData = {};
 
 	static importable = true;
 	static uniqueIdentifier = "Name";
@@ -266,40 +265,6 @@ class Command extends require("./template.js") {
 			this.Dynamic_Description = null;
 		}
 
-		if (data.Static_Data) {
-			let staticDataFn;
-
-			if (typeof data.Static_Data === "function") {
-				staticDataFn = data.Static_Data;
-			}
-			else {
-				try {
-					staticDataFn = eval(data.Static_Data);
-				}
-				catch (e) {
-					console.warn(`Command has invalid static data definition!`, { commandName: this.Name, error: e });
-					this.Code = () => ({
-						success: false,
-						reply: "Command has invalid code definition! Please make sure to let @supinic know about this!"
-					});
-				}
-			}
-
-			if (typeof staticDataFn !== "function") {
-				console.warn(`Command ${this.ID} static data is not a function`);
-				return;
-			}
-
-			const staticData = staticDataFn(this);
-			if (!staticData || staticData?.constructor?.name !== "Object") {
-				console.warn(`Command ${this.ID} has invalid static data type`);
-				return;
-			}
-			else {
-				this.staticData = staticData;
-			}
-		}
-
 		if (typeof data.initialize === "function") {
 			try {
 				const result = data.initialize.call(this);
@@ -324,8 +289,6 @@ class Command extends require("./template.js") {
 		if (typeof data.destroy === "function") {
 			this.#customDestroy = data.destroy;
 		}
-
-		sb.Utils.deepFreeze(this.staticData);
 	}
 
 	async destroy () {
@@ -337,20 +300,11 @@ class Command extends require("./template.js") {
 				console.warn("Custom command destroy method failed", { command: this.Name, error: e });
 			}
 		}
-		else if (typeof this.staticData.destroy === "function") {
-			try {
-				this.staticData.destroy(this);
-			}
-			catch (e) {
-				console.warn("command destroy failed", { command: this.Name, error: e });
-			}
-		}
 
 		this.#destroyed = true;
 
 		this.Code = null;
 		this.data = null;
-		this.staticData = null;
 	}
 
 	execute (...args) {

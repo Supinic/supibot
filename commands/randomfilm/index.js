@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function randomFilm () {
 		const html = await sb.Got("FakeAgent", {
 			url: "https://www.bestrandoms.com/random-movie-generator",

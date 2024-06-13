@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["external-input","mention","non-nullable","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function schedule (context, channel) {
 		let channelName = null;
 		if (channel) {
@@ -45,6 +44,12 @@ module.exports = {
 			return {
 				success: false,
 				reply: `Provided user does not have any schedule set up!`
+			};
+		}
+		else if (!response.ok) {
+			return {
+				success: false,
+				reply: `Could not check for stream schedule!`
 			};
 		}
 

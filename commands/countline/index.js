@@ -7,7 +7,6 @@ module.exports = {
 	Flags: ["mention","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function countLine (context, user) {
 		if (!context.channel) {
 			return {
@@ -15,7 +14,7 @@ module.exports = {
 				reply: `This command is not available here!`
 			};
 		}
-		
+
 		if (user) {
 			user = await sb.User.get(user, true);
 			if (!user) {
@@ -27,7 +26,7 @@ module.exports = {
 		else {
 			user = context.user;
 		}
-	
+
 		let lines;
 		if ([7, 8, 46].includes(context.channel.ID)) {
 			lines = (await sb.Query.getRecordset(rs => rs
@@ -50,7 +49,7 @@ module.exports = {
 				reply: "That user has sent no chat lines in this channel!"
 			};
 		}
-	
+
 		const who = (user.ID === context.user.ID) ? "You have" : "That user has";
 		return {
 			reply: `${who} sent ${sb.Utils.groupDigits(lines.Total)} chat lines in this channel so far.`

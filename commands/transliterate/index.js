@@ -11,7 +11,6 @@ module.exports = {
 		{ name: "lang", type: "language" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function transliterate (context, ...args) {
 		const query = args.join(" ");
 		if (!query) {

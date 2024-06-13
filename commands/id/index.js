@@ -1,3 +1,8 @@
+// This number represents Supibot's User_Alias ID.
+// With some assumptions, every user with a lower ID is then not considered "first seen" by Supibot,
+// since they predate Supibot - and are therefore extrapolated from logs.
+const USER_ID_BREAKPOINT = 1127;
+
 module.exports = {
 	Name: "id",
 	Aliases: ["uid"],
@@ -7,9 +12,6 @@ module.exports = {
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: (() => ({
-		threshold: 1127
-	})),
 	Code: (async function id (context, user) {
 		const targetUser = (user)
 			? await sb.User.get(user)
@@ -29,11 +31,13 @@ module.exports = {
 			pronoun = "you were";
 		}
 
-		const temporalReply = (targetUser.Name === context.platform.Self_Name)
-			? "first brought to life as an mIRC bot"
-			: ((targetUser.ID < this.staticData.botID)
-				? "first mentioned in logs (predating Supibot)"
-				: "first seen");
+		let temporalReply = "first seen";
+		if (targetUser.Name === context.platform.Self_Name) {
+			temporalReply = "first brought to life as an mIRC bot";
+		}
+		else if (targetUser.ID < USER_ID_BREAKPOINT) {
+			temporalReply = "first mentioned in logs (predating Supibot)";
+		}
 
 		const delta = sb.Utils.timeDelta(targetUser.Started_Using);
 		const now = new sb.Date();

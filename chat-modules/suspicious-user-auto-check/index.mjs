@@ -35,7 +35,7 @@ export const definition = {
 			.limit(1)
 		);
 
-		const response = await sb.Got("Leppunen", {
+		const response = await sb.Got("IVR", {
 			url: "v2/twitch/user",
 			searchParams: {
 				id: assumedUserID

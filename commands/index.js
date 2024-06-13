@@ -33,7 +33,8 @@ const loadCommands = (async (config) => {
 		try {
 			definition = require(indexPath);
 		}
-		catch {
+		catch (e) {
+			console.warn(`Could not load command ${dir.name}`, e);
 			failed.push(dir.name);
 		}
 

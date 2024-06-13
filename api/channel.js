@@ -146,5 +146,40 @@ module.exports = {
 				total
 			}
 		};
+	},
+	send: async (req, res, url) => {
+		const channelName = url.searchParams.get("name");
+		const platformName = url.searchParams.get("platform");
+		const message = url.searchParams.get("message");
+
+		if (!channelName || !platformName || !message) {
+			return {
+				statusCode: 400,
+				data: { message: "Missing one or more required params: name, platform, message" }
+			};
+		}
+
+		const platformData = sb.Platform.get(platformName);
+		if (!platformData) {
+			return {
+				statusCode: 400,
+				data: { message: "Invalid platform provided" }
+			};
+		}
+
+		const channelData = sb.Channel.get(channelName, platformData);
+		if (!channelData) {
+			return {
+				statusCode: 400,
+				data: { message: "Invalid channel provided" }
+			};
+		}
+
+		await channelData.send(message);
+
+		return {
+			statusCode: 200,
+			data: { message: "OK" }
+		};
 	}
 };

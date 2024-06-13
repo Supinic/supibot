@@ -12,7 +12,6 @@ module.exports = {
 		{ name: "linkOnly", type: "boolean" }
 	],
 	Whitelist_Response: "Only usable in Supinic's channel.",
-	Static_Data: null,
 	Code: (async function randomUploaderVideo (context, ...args) {
 		const link = args.shift();
 

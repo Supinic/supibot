@@ -8,11 +8,16 @@ const sessionNames = {
 	Sprint: "Sprint race"
 };
 
-const ergastGot = sb.Got.get("GenericAPI").extend({
-	https: {
-		rejectUnauthorized: false
-	}
-});
+let ergastGotInstance;
+const ergastGot = (...args) => {
+	ergastGotInstance ??= sb.Got.get("GenericAPI").extend({
+		https: {
+			rejectUnauthorized: false
+		}
+	});
+
+	return ergastGotInstance(...args);
+};
 
 const getWeather = async (context, sessionStart, coordinates) => {
 	const weatherCommand = sb.Command.get("weather");
@@ -172,10 +177,6 @@ const fetchNextRaceDetail = async (context) => {
 			const weatherResult = await getWeather(context, nextSessionStart, coordinates);
 			nextSessionString += ` ${weatherResult}`;
 		}
-	}
-	else if (race.date) {
-		const raceDate = new sb.Date(race.date);
-		nextSessionString = `Race takes place ${sb.Utils.timeDelta(raceDate)}, but the times are not specified yet.`;
 	}
 
 	let raceString;

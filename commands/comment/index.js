@@ -7,12 +7,11 @@ module.exports = {
 	Flags: ["mention","non-nullable","pipe"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function comment () {
 		const html = await sb.Got("http://www.randomyoutubecomment.com").text();
 		const $ = sb.Utils.cheerio(html);
 		const comment = $("#comment").text();
-	
+
 		return {
 			reply: comment ?? "No comment was available to fetch"
 		};

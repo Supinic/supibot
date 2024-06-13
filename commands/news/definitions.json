@@ -175,7 +175,7 @@
       {
         "name": "Vice",
         "url": "https://www.vice.com",
-        "path": "en_ca",
+        "path": "en",
         "endpoints": ["rss"],
         "helpers": []
       }
@@ -314,7 +314,7 @@
       {
         "name": "Obozrevatel",
         "url": "https://www.obozrevatel.com",
-        "path": "out/rss",
+        "path": "ukr/out/rss",
         "endpoints": ["lastnews.xml"],
         "helpers": ["boring_nick"]
       },
@@ -437,13 +437,6 @@
         "path": "api",
         "endpoints": ["zpoqie-kqp"],
         "helpers": ["somso2e"]
-      },
-      {
-        "name": "خبرگزاری مهر",
-        "url": "https://www.mehrnews.com",
-        "path": null,
-        "endpoints": ["rss"],
-        "helpers": ["supinic"]
       },
       {
         "name": "Voice of America",
@@ -645,10 +638,10 @@
     "language": "albanian",
     "sources": [
       {
-        "name": "Abc News",
-        "url": "https://abcnews.al",
+        "name": "Zeri.info",
+        "url": "https://zeri.info",
         "path": null,
-        "endpoints": ["feed"],
+        "endpoints": ["rss"],
         "helpers": ["supinic"]
       }
     ]
@@ -894,7 +887,7 @@
     "sources": [
       {
         "name": "Al Arabiya",
-        "url": "https://alarabiya.net",
+        "url": "https://www.alarabiya.net",
         "path": "feed/rss2/ar",
         "endpoints": ["saudi-today.xml"],
         "helpers": ["ALazyMeme"]
@@ -987,8 +980,8 @@
       {
         "name": "Diaria D'Andorra",
         "url": "https://www.diariandorra.ad",
-        "path": null,
-        "endpoints": ["rss"],
+        "path": "rss",
+        "endpoints": ["home.xml"],
         "helpers": ["howtoeat6"]
       }
     ]
@@ -1027,8 +1020,8 @@
       {
         "name": "News24",
         "specificMainPageUrl": "https://www.news24.com",
-        "url": "https://feeds.24.com",
-        "path": "articles/news24",
+        "url": "https://feeds.capi24.com",
+        "path": "v1/Search/articles/news24",
         "endpoints": ["SouthAfrica/rss"],
         "helpers": ["bananaslayer_"]
       }

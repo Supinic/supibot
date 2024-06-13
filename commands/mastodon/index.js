@@ -13,7 +13,6 @@ module.exports = {
 		{ name: "textOnly", type: "boolean" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function mastodon (context, input) {
 		if (!input) {
 			return {

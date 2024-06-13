@@ -562,7 +562,9 @@ module.exports = class Reminder extends require("./template.js") {
 			// Check banphrases and do not check length limits, because it is later split manually
 			const messageCheck = await sb.Banphrase.execute(message, channelData);
 
-			if (messageCheck.passed && !message.includes("[LINK]")) {
+			if (messageCheck.passed && !messageCheck.string.includes("[LINK]")) {
+				message = messageCheck.string;
+
 				let mirrorMessage = `${targetUserData.Name} ${message}`;
 				message = `${userMention} ${message}`;
 

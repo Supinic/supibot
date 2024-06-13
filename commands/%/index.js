@@ -9,7 +9,6 @@ module.exports = {
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function percent () {
 		const number = randomInt(0, 10_000);
 		return {

@@ -10,7 +10,6 @@ module.exports = {
 		{ name: "youtube", type: "string" }
 	],
 	Whitelist_Response: null,
-	Static_Data: null,
 	Code: (async function streamInfo (context, ...args) {
 		if (context.params.youtube) {
 			const handler = require("./youtube-handler.js");
@@ -152,7 +151,7 @@ module.exports = {
 		}
 
 		if (!stream) {
-			const broadcasterResponse = await sb.Got("Leppunen", {
+			const broadcasterResponse = await sb.Got("IVR", {
 				url: "v2/twitch/user",
 				searchParams: {
 					id: channelID

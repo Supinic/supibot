@@ -153,4 +153,8 @@ module.exports = class GptTemplate {
 	static async extractMessage () {}
 
 	static async setHistory () {}
+
+	static getRequestErrorMessage () {
+		return `The GPT service is overloaded at the moment! Try again later.`;
+	}
 };
