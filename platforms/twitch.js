@@ -441,8 +441,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			});
 		}
 
-		this.queues = {};
-		this.evasion = {};
 		this.rejectedMessageTimeouts = {};
 
 		this.availableEmotes = [];
@@ -452,32 +450,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 	async connect () {
 		const ws = new WebSocket("wss://eventsub.wss.twitch.tv/ws");
-		ws.on("message", async (data) => {
-			const event = JSON.parse(data);
-			const { metadata, payload } = event;
-
-			switch (metadata.message_type) {
-				case "session_welcome": {
-					const sessionId = payload.session.id;
-					await assignWebsocketToConduit(sessionId);
-					break;
-				}
-
-				case "notification": {
-					await this.handleNotification(event);
-					break;
-				}
-
-				case "session_keepalive": {
-					this.#lastWebsocketKeepaliveMessage = sb.Date.now();
-					break;
-				}
-
-				default: {
-					console.log("Unrecognized message", { event });
-				}
-			}
-		});
+		ws.on("message", (data) => this.handleWebsocketMessage(data));
 
 		this.client = ws;
 
@@ -492,7 +465,46 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		]);
 	}
 
-	async handleNotification (data) {
+	async handleWebsocketMessage (data) {
+		const event = JSON.parse(data);
+		const { metadata, payload } = event;
+
+		switch (metadata.message_type) {
+			case "session_welcome": {
+				const sessionId = payload.session.id;
+				await assignWebsocketToConduit(sessionId);
+				break;
+			}
+
+			case "notification": {
+				await this.handleWebsocketNotification(event);
+				break;
+			}
+
+			case "revocation": {
+				console.warn("Subscription revoked", { data });
+				await sb.Logger.log(
+					"Twitch.Warning",
+					`Subscription revoked: ${JSON.stringify(data)}`,
+					null,
+					null
+				);
+
+				break;
+			}
+
+			case "session_keepalive": {
+				this.#lastWebsocketKeepaliveMessage = sb.Date.now();
+				break;
+			}
+
+			default: {
+				console.log("Unrecognized message", { event });
+			}
+		}
+	}
+
+	async handleWebsocketNotification (data) {
 		const { event, subscription } = data.payload;
 
 		switch (subscription.type) {
@@ -553,51 +565,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 						error
 					})}`, channelData, null);
 				}
-			}
-			else if (error instanceof DankTwitch.SayError && error.cause instanceof DankTwitch.MessageError) {
-				if (error.message.includes("Bad response message")) {
-					const { messageText } = error;
-					const channelData = sb.Channel.get(error.failedChannelName, this);
-
-					let defaultReply;
-					if (/reminders? from/i.test(messageText)) {
-						const recipient = messageText.match(/(.*), reminders? from/);
-						if (recipient) {
-							defaultReply = sb.Utils.tag.trim `
-								@${recipient[1].replace(/^@/, "")},
-								a reminder you would have just received violates this channel's moderation settings.
-								Check your whispers, or head to https://supinic.com/bot/reminder/history 
-							`;
-						}
-						else {
-							defaultReply = "A reminder that was about to be posted violated this channel's moderation settings.";
-						}
-					}
-					else {
-						defaultReply = "A message that was about to be posted violated this channel's moderation settings.";
-					}
-
-					this.rejectedMessageTimeouts[channelData.ID] ??= 0;
-
-					if (this.rejectedMessageTimeouts[channelData.ID] < sb.Date.now() && !messageText.includes(defaultReply)) {
-						await this.send(defaultReply, channelData);
-
-						const timeout = this.config.rejectedMessageTimeout ?? 10_000;
-						this.rejectedMessageTimeouts[channelData.ID] = sb.Date.now() + timeout;
-					}
-				}
-				else if (error.message.includes("has been suspended")) {
-					console.warn("Attempting to send a message in banned channel", { error });
-				}
-				else if (error.message.startsWith("Failed to say")) {
-					console.debug("Failed to say message", { error });
-				}
-				else {
-					console.debug("Unknown Say/MessageError", { error });
-				}
-			}
-			else {
-				console.warn("Other Twitch error", error);
 			}
 		});
 
@@ -721,8 +688,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				}
 			}
 		});
-
-		client.on("WHISPER", (message) => this.handleMessage(message));
 
 		client.on("USERNOTICE", (message) => this.handleUserNotice(message));
 
