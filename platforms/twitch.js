@@ -7,6 +7,8 @@ const {
 	createChannelBanSubscription,
 	createChannelChatMessageSubscription,
 	createWhisperMessageSubscription,
+	createChannelSubSubscription,
+	createChannelResubSubscription,
 	fetchToken,
 	emitRawUserMessageEvent,
 	populateChannelsLiveStatus,
@@ -128,7 +130,9 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		const channelList = sb.Channel.getJoinableForPlatform(this);
 		const joinPromises = channelList.flatMap(async (channelData) => [
 			createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID),
-			createChannelBanSubscription(channelData.Specific_ID)
+			createChannelBanSubscription(channelData.Specific_ID),
+			createChannelSubSubscription(channelData.Specific_ID),
+			createChannelResubSubscription(channelData.Specific_ID)
 		]);
 
 		await Promise.all([
@@ -200,6 +204,12 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 			case "channel.ban": {
 				await this.handleBan(event);
+				break;
+			}
+
+			case "channel.subscribe":
+			case "channel.subcription.message": {
+				await this.handleSub(event, subscription.type);
 				break;
 			}
 
@@ -804,6 +814,56 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	/**
+	 * @param {Object} event
+	 * @param {string} subscription
+	 * @return {Promise<void>}
+	 */
+	async handleSub (event, subscription) {
+		const plans = this.config.subscriptionPlans;
+
+		const userData = await sb.User.get(event.user_login);
+		const channelData = sb.Channel.get(event.broadcaster_user_login);
+		if (!channelData) {
+			return;
+		}
+
+		if (subscription === "channel.subscribe") { // First time subscriber
+			channelData.events.emit("subscription", {
+				event: "subscription",
+				message: event.message.text,
+				user: userData,
+				channel: channelData,
+				platform: this,
+				data: {
+					amount: 1,
+					months: 1,
+					streak: 1,
+					gifted: event.is_gift,
+					recipient: userData,
+					plan: plans[event.tier]
+				}
+			});
+		}
+		else if (subscription === "channel.subscription.meesage") { // Resubscribe
+			channelData.events.emit("subscription", {
+				event: "subscription",
+				message: event.message.text,
+				user: userData,
+				channel: channelData,
+				platform: this,
+				data: {
+					amount: event.duration_months,
+					months: event.cumulative_months,
+					streak: event.streak_months ?? 1,
+					gifted: false,
+					recipient: userData,
+					plan: plans[event.tier]
+				}
+			});
+		}
+	}
+
+	/**
 	 * Handles a command being used.
 	 * @param {string} command
 	 * @param {string} user
@@ -881,76 +941,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		const eventSkipModes = ["Read", "Last seen", "Inactive"];
 		const logSkipModes = ["Inactive", "Last seen"];
-		const plans = this.config.subscriptionPlans;
 
-		if (messageObject.isSub() || messageObject.isResub()) {
-			const {
-				cumulativeMonths,
-				streakMonths,
-				subPlanName
-			} = messageObject.eventParams;
-
-			if (!eventSkipModes.includes(channelData.Mode)) {
-				channelData.events.emit("subscription", {
-					event: "subscription",
-					message: messageText,
-					user: userData,
-					channel: channelData,
-					platform: this,
-					data: {
-						amount: 1,
-						gifted: false,
-						recipient: userData,
-						months: cumulativeMonths,
-						streak: streakMonths ?? 1,
-						plan: plans[subPlanName]
-					}
-				});
-			}
-
-			if (this.logging.subs && !logSkipModes.includes(channelData.Mode)) {
-				await sb.Logger.log("Twitch.Sub", plans[subPlanName], channelData, userData);
-			}
-		}
-		else if (messageObject.messageID === "anonsubgift" || messageObject.isSubgift()) {
-			const {
-				cumulativeMonths,
-				recipientUsername,
-				streakMonths,
-				subPlanName
-			} = messageObject.eventParams;
-
-			const recipientData = await sb.User.get(recipientUsername);
-			if (!recipientData) {
-				return;
-			}
-
-			if (!eventSkipModes.includes(channelData.Mode)) {
-				channelData.events.emit("subscription", {
-					event: "subscription",
-					message: messageText,
-					user: userData,
-					channel: channelData,
-					platform: this,
-					data: {
-						amount: 1,
-						gifted: true,
-						recipient: recipientData,
-						months: cumulativeMonths,
-						streak: streakMonths ?? 1,
-						plan: plans[subPlanName]
-					}
-				});
-			}
-
-			if (this.logging.giftSubs && !logSkipModes.includes(channelData.Mode)) {
-				const name = userData?.Name ?? "(anonymous)";
-				const logMessage = `${name} gifted a subscription to ${recipientData.Name}`;
-
-				await sb.Logger.log("Twitch.Giftsub", logMessage, channelData, userData);
-			}
-		}
-		else if (messageObject.isRaid()) {
+		if (messageObject.isRaid()) {
 			const viewers = messageObject.eventParams.viewerCount;
 			if (!eventSkipModes.includes(channelData.Mode)) {
 				channelData.events.emit("raid", {

@@ -176,6 +176,18 @@ const createChannelBanSubscription = async (channelId) => createSubscription({
 	version: "1"
 });
 
+const createChannelSubSubscription = async (channelId) => createSubscription({
+	channelId,
+	subscription: "channel.subscribe",
+	version: "1"
+});
+
+const createChannelResubSubscription = async (channelId) => createSubscription({
+	channelId,
+	subscription: "channel.subscription.message",
+	version: "1"
+});
+
 const fetchToken = async () => {
 	if (!sb.Config.has("TWITCH_REFRESH_TOKEN", true)) {
 		throw new sb.Error({
@@ -334,6 +346,8 @@ module.exports = {
 	createChannelBanSubscription,
 	createChannelChatMessageSubscription,
 	createWhisperMessageSubscription,
+	createChannelSubSubscription,
+	createChannelResubSubscription,
 	fetchToken,
 	emitRawUserMessageEvent,
 	populateChannelsLiveStatus,
