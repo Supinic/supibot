@@ -68,15 +68,6 @@ const DEFAULT_PLATFORM_CONFIG = {
 	whisperMessageLimit: 500
 };
 
-const specialEmoteSetMap = {
-	472873131: "300636018", // Haha emotes
-	488737509: "300819901", // Luv emotes
-	537206155: "301450851", // Pride emotes
-	564265402: "301965751", // Hyper emotes
-	592920959: "302430190", // KPOP emotes
-	610186276: "302778679" // 2020 emotes
-};
-
 module.exports = class TwitchPlatform extends require("./template.js") {
 	supportsMeAction = true;
 	dynamicChannelAddition = true;
