@@ -1440,10 +1440,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		if (!response.ok) {
 			console.warn("Invalid token validation response, fetching tokens...");
-			token = await fetchToken();
+			await fetchToken();
 		}
-
-		this.client.configuration.password = `oauth:${token}`;
 	}
 
 	static async fetchAccountChallengeStatus (userData, twitchID) {
