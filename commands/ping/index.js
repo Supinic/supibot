@@ -67,12 +67,9 @@ module.exports = {
 		}
 
 		if (context.platform.Name === "twitch") {
-			const ping = await checkLatency(
-				async () => context.platform.client.ping()
-			);
-
+			const ping = context.platform.websocketLatency;
 			data["Latency to Twitch"] = (ping === null)
-				? "No response?"
+				? "(no measurement yet)"
 				: `${Math.trunc(ping)}ms`;
 		}
 
