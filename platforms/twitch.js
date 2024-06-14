@@ -107,7 +107,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		this.availableEmotes = [];
 		this.availableEmoteSets = [];
-		this.recentEmoteFetchTimeout = 0;
 	}
 
 	async connect () {
@@ -258,40 +257,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 						result,
 						error
 					})}`, channelData, null);
-				}
-			}
-		});
-
-		client.on("USERSTATE", async (messageObject) => {
-			const now = sb.Date.now();
-
-			if (!this.config.updateAvailableBotEmotes) {
-				return;
-			}
-			else if (this.recentEmoteFetchTimeout > now) {
-				return;
-			}
-
-			const incomingEmoteSets = messageObject.emoteSets;
-			if (this.availableEmotes.length === 0 || incomingEmoteSets.sort()
-				.join(",") !== this.availableEmoteSets.sort()
-				.join(",")) {
-				this.availableEmoteSets = incomingEmoteSets;
-
-				const timeout = this.config.emoteFetchTimeout ?? 10_000;
-				this.recentEmoteFetchTimeout = now + timeout;
-
-				let emotes;
-				try {
-					emotes = await TwitchPlatform.fetchTwitchEmotes(this.availableEmoteSets);
-				}
-				catch {
-					emotes = null;
-				}
-
-				if (emotes) {
-					this.availableEmotes = emotes;
-					await this.invalidateGlobalEmotesCache();
 				}
 			}
 		});
@@ -1032,13 +997,13 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 * Fetches a list of emote data available to the bot user.
 	 * @returns {Promise<TwitchEmoteSetDataObject[]>}
 	 */
-	static async fetchTwitchEmotes () {
+	static async fetchTwitchEmotes (selfId) {
 		const response = await sb.Got("Helix", {
 			url: "chat/emotes/user",
 			method: "GET",
 			throwHttpErrors: false,
 			searchParams: {
-				user_id: this.selfId
+				user_id: selfId
 			}
 		});
 
@@ -1051,7 +1016,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 					method: "GET",
 					throwHttpErrors: false,
 					searchParams: {
-						user_id: this.selfId,
+						user_id: selfId,
 						after: cursor
 					}
 				});
@@ -1172,7 +1137,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 */
 	async populateGlobalEmotes () {
 		const [twitch, bttv, ffz, sevenTv] = await Promise.allSettled([
-			TwitchPlatform.fetchTwitchEmotes(),
+			TwitchPlatform.fetchTwitchEmotes(this.selfId),
 			sb.Got("TwitchEmotes", {
 				url: "https://api.betterttv.net/3/cached/emotes/global"
 			}),
