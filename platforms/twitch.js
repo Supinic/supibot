@@ -102,11 +102,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				message: "Twitch client ID (Config/TWITCH_CLIENT_ID) has not been configured"
 			});
 		}
-
-		this.rejectedMessageTimeouts = {};
-
-		this.availableEmotes = [];
-		this.availableEmoteSets = [];
 	}
 
 	async connect () {
