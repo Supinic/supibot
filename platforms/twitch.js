@@ -86,6 +86,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 	#tokenCheckInterval = setInterval(() => this.#checkAuthToken(), 60_000);
 	#lastWebsocketKeepaliveMessage = 0;
+	#websocketLatency = null;
 	#previousMessageMeta = new Map();
 	#userCommandSpamPrevention = new Map();
 
@@ -176,6 +177,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			}
 
 			case "session_keepalive": {
+				const now = sb.Date.now();
+				const keepAliveNow = new sb.Date(metadata.message_timestamp).valueOf();
+
+				this.#websocketLatency = now - keepAliveNow;
 				this.#lastWebsocketKeepaliveMessage = sb.Date.now();
 				break;
 			}
@@ -1483,6 +1488,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			challenge
 		};
 	}
+
+	get websocketLatency () { return this.#websocketLatency; }
 
 	destroy () {
 		this.client.removeAllListeners();
