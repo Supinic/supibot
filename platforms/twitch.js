@@ -305,14 +305,24 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 * Sends a message, respecting each channel's current setup and limits
 	 * @param {string} message
 	 * @param {Channel|string} channel
+	 * @param {Object} options = {}
+	 * @param {boolean} [options.meAction] If `true`, adds a ".me" at the start of the message to create a "me action".
+	 * If not `true`, will escape all leading command characters (period "." or slash "/") by doubling them up.
 	 */
-	async send (message, channel) {
+	async send (message, channel, options = {}) {
 		const channelData = sb.Channel.get(channel, this);
 		if (channelData.Mode === "Inactive" || channelData.Mode === "Read") {
 			return;
 		}
 
 		message = message.replace(/\s+/g, " ").trim();
+
+		if (options.meAction === true) {
+			message = `.me ${message}`;
+		}
+		else {
+			message = message.replace(/^([./])/, "$1 $1");
+		}
 
 		// Neither the "same message" nor "global" cooldowns apply to VIP or Moderator channels
 		if (channelData.Mode === "Write") {
@@ -365,6 +375,14 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				time: sb.Date.now()
 			});
 		}
+	}
+
+	/**
+	 * @param {string} message
+	 * @param {Channel|string} channel
+	 */
+	async me (message, channel) {
+		return await this.send(message, channel, { meAction: true });
 	}
 
 	/**
@@ -528,7 +546,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			text: event.message.text,
 			/** @type {TwitchMessageFragment[]} */
 			fragments: event.message.fragments,
-			type: event.message_type, // text, channel_points_highlighted, channel_points_sub_only, user_intro, animated, gigantified_emote
+			type: event.message_type, // text, channel_points_highlighted, channel_points_sub_only, user_intro, animated, power_ups_gigantified_emote
 			id: event.message_id,
 			bits: cheer,
 			badges,
@@ -937,7 +955,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 			if (message) {
 				if (execution.replyWithMeAction === true) {
-					await this.me(channelData, message);
+					await this.me(message, channelData);
 				}
 				else {
 					await this.send(message, channelData);
@@ -1012,16 +1030,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		}
 
 		return subscriberList.some(i => i.user_id === userData.Twitch_ID);
-	}
-
-	/**
-	 * @param {Channel} channelData
-	 * @param {string} message
-	 * @returns {Promise<void>}
-	 * @todo refactor to Helix or other API call
-	 */
-	async me (channelData, message) {
-		await this.client.me(channelData.Name, message);
 	}
 
 	/**
