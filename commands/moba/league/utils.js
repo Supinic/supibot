@@ -171,7 +171,7 @@ const parseUserIdentifier = async (regionName, identifier) => {
 	}
 	else {
 		gameName = identifier;
-		tagLine = regionName;
+		tagLine = region;
 	}
 
 	const puuid = await getPUUIDByName(gameName, tagLine);
