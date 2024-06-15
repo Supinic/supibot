@@ -1,6 +1,6 @@
 const BASE_CACHE_KEY = "website-twitch-auth-bot";
 const DEAD_LINE = new sb.Date("2024-06-26");
-const TIMEOUT = 18 * 36e5; // 18 hours
+const TIMEOUT = 6 * 36e5; // 6 hours
 
 const createScopeKey = (channelData) => `${BASE_CACHE_KEY}-${channelData.Specific_ID}`;
 const createNotificationKey = (channelData) => `chat-module-bot-scope-notifier-channel-${channelData.ID}`;
