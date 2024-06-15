@@ -12,7 +12,8 @@ module.exports = {
 	Description: "What emote is it? Posts specifics about a given Twitch subscriber emote.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
-		{ name: "linkOnly", type: "boolean" }
+		{ name: "linkOnly", type: "boolean" },
+		{ name: "noLinks", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Code: (async function whatEmoteIsIt (context, ...args) {
@@ -125,10 +126,17 @@ module.exports = {
 			tierString = `${emoteAssetType?.toLowerCase() ?? ""} ${emoteType?.toLowerCase() ?? ""} ${channelName ?? ""} emote`;
 		}
 
-		const emoteLink = `https://emotes.raccatta.cc/twitch/emote/${emoteID}`;
-		return {
-			reply: `${emoteCode} - ID ${emoteID} - ${active} ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
-		};
+		if (context.params.noLinks) {
+			return {
+				reply: `${emoteCode} - ID ${emoteID} - ${active} ${tierString}.`
+			};
+		}
+		else {
+			const emoteLink = `https://emotes.raccatta.cc/twitch/emote/${emoteID}`;
+			return {
+				reply: `${emoteCode} - ID ${emoteID} - ${active} ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
+			};
+		}
 	}),
 	Dynamic_Description: null
 };
