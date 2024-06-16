@@ -1,3 +1,6 @@
+const basicRegex = /(get|getting|buy|buying)?\s*(cheap|cheapest|best)?\s*(viewers|followers)/gi;
+const siteRegex = /(streamboo|u\.to)/gi;
+
 export const definition = {
 	Name: "wanna-become-famous",
 	Events: ["message"],
@@ -5,8 +8,8 @@ export const definition = {
 	Code: (async function wannaBecomeFamous (context) {
 		/** @type {Channel} */
 		const channelData = context.channel;
-		if (channelData.Mode === "Read") {
-			return; // don't time out in read-only channels
+		if (channelData.Mode !== "Moderator") {
+			return; // cannot time out in non-moderated channels
 		}
 		else if (channelData.Platform.Name !== "twitch") {
 			return; // cannot time out when not on twitch
@@ -20,17 +23,14 @@ export const definition = {
 		else if (msg.includes("get raided")) {
 			reason = "getting raided";
 		}
-		else if (msg.includes("followers")) {
-			reason = "buying followers";
-		}
-		else if (/get\s+viewers\s+pro/.test(msg)) {
-			reason = "feeling more popular";
-		}
 		else if (msg.includes("upgrade your stream")) {
 			reason = "upgrading your stream";
 		}
-		else if (msg.includes("cheapest viewers") || msg.includes("streamboo") || msg.includes("best viewers")) {
-			reason = "buying viewers";
+		else if (basicRegex.test(msg)) {
+			reason = "no more spam";
+		}
+		else if (siteRegex.test(msg)) {
+			reason = "no more site spam";
 		}
 		else {
 			return;
