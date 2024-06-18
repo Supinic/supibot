@@ -10,7 +10,7 @@ module.exports = {
 	name: "lastMatch",
 	aliases: ["last"],
 	description: [
-		"TODO"
+		"Fetches quick data about the last match a given user has played (or is playing)."
 	],
 	flags: {
 		default: false
