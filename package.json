@@ -2,7 +2,6 @@
   "name": "supibot",
   "version": "2.2.0",
   "dependencies": {
-    "@kararty/dank-twitch-irc": "^6.2.0",
     "acorn-node": "^2.0.1",
     "async-markov": "supinic/async-markov#master",
     "bing-chat": "^0.2.3",
