@@ -845,6 +845,7 @@ class Command extends require("./template.js") {
 		if (typeof execution.reply === "string") {
 			execution.reply = await Filter.applyUnping({
 				command,
+				invocation: identifier,
 				channel: channelData ?? null,
 				platform: channelData?.Platform ?? null,
 				string: execution.reply,
