@@ -1,3 +1,5 @@
+const { randomInt } = require("node:crypto");
+
 const BASE_CACHE_KEY = "website-twitch-auth-bot";
 const DEAD_LINE = new sb.Date("2024-06-26");
 const TIMEOUT = 6 * 36e5; // 6 hours
@@ -49,9 +51,15 @@ export const definition = {
 		else if (user.Name === platform.selfName) {
 			return;
 		}
-		// Don't check non-command messages
-		else if (!sb.Command.is(incomingMessage)) {
-			return;
+
+		// Only send notification if the message we react to is either:
+		// a) a Supibot command - then always
+		// b) not a command e.g. any message - but only with a 1/25 chance
+		if (!sb.Command.is(incomingMessage)) {
+			const roll = randomInt(1, 26);
+			if (roll !== 1) {
+				return;
+			}
 		}
 
 		const now = sb.Date.now();
