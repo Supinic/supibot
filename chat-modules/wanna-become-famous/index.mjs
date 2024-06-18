@@ -1,5 +1,5 @@
-const basicRegex = /(get|getting|buy|buying)?\s*(cheap|cheapest|best)?\s*(viewers|followers)/gi;
-const siteRegex = /(streamboo|u\.to)/gi;
+const basicRegex = /(get|getting|buy|buying)?\s*(cheap|cheapest|best|real)?\s*(viewers|followers)/gi;
+const siteRegex = /(streamboo|u\.to|dogehype)/gi;
 
 export const definition = {
 	Name: "wanna-become-famous",
