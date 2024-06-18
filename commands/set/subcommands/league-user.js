@@ -37,7 +37,7 @@ module.exports = {
 			};
 		}
 
-		await context.user.setDataProperty("defaultUserLanguage", null);
+		await context.user.setDataProperty(DEFAULT_USER_IDENTIFIER_KEY, null);
 		return {
 			reply: `Successfully unset your default $league username.`
 		};
