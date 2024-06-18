@@ -44,6 +44,7 @@ const NON_STANDARD_CHAMPION_NAMES = {
 };
 
 const DEFAULT_USER_IDENTIFIER_KEY = "leagueDefaultUserIdentifier";
+const DEFAULT_REGION_KEY = "leagueDefaultRegion";
 
 const getPUUIdCacheKey = (gameName, tagLine) => `moba-league-puuid-${gameName}-${tagLine}`;
 const getSummonerIdCacheKey = (puuid) => `moba-league-sid-${puuid}`;
@@ -151,13 +152,41 @@ const getLeagueEntries = async (platform, summonerId) => {
 };
 
 const parseUserIdentifier = async (context, regionName, identifier) => {
-	if (!regionName) {
-		return {
-			success: false,
-			reply: `You must provide the game region!`
-		};
+	if (!regionName && !identifier) {
+		const defaultRegion = await context.user.getDataProperty(DEFAULT_REGION_KEY);
+		if (!defaultRegion) {
+			return {
+				success: false,
+				reply: `You must provide the region!`
+			};
+		}
+
+		regionName = defaultRegion;
 	}
-	else if (!identifier) {
+	else if (regionName.startsWith("@")) { // Check if the target is a user
+		const targetUserData = await sb.User.get(regionName);
+		if (!targetUserData) {
+			return {
+				reply: "Invalid user provided!"
+			};
+		}
+
+		const [defaultRegion, defaultIdentifier] = await Promise.all([
+			targetUserData.getDataProperty(DEFAULT_REGION_KEY),
+			targetUserData.getDataProperty(DEFAULT_USER_IDENTIFIER_KEY)
+		]);
+		if (!defaultRegion || !defaultIdentifier) {
+			return {
+				success: false,
+				reply: `In order to check someone else's League stats, they must have both the default region and username set up!`
+			};
+		}
+
+		regionName = defaultRegion;
+		identifier = defaultIdentifier;
+	}
+
+	if (!identifier) {
 		const defaultIdentifier = await context.user.getDataProperty(DEFAULT_USER_IDENTIFIER_KEY);
 		if (!defaultIdentifier) {
 			return {
@@ -281,6 +310,7 @@ const getMatchData = async (matchId) => {
 module.exports = {
 	NON_STANDARD_CHAMPION_NAMES, // @todo replace by a DataDragon API call in production: https://ddragon.leagueoflegends.com/cdn/14.11.1/data/en_US/champion.json
 	DEFAULT_USER_IDENTIFIER_KEY,
+	DEFAULT_REGION_KEY,
 	GAME_RESULT,
 	getPlatform,
 	getPUUIDByName,
