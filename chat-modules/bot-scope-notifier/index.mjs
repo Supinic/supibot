@@ -1,4 +1,4 @@
-const { randomInt } = require("node:crypto");
+import { randomInt } from "node:crypto";
 
 const BASE_CACHE_KEY = "website-twitch-auth-bot";
 const DEAD_LINE = new sb.Date("2024-06-26");
