@@ -43,6 +43,8 @@ const NON_STANDARD_CHAMPION_NAMES = {
 	XinZhao: "Xin Zhao"
 };
 
+const DEFAULT_USER_IDENTIFIER_KEY = "leagueDefaultUserIdentifier";
+
 const getPUUIdCacheKey = (gameName, tagLine) => `moba-league-puuid-${gameName}-${tagLine}`;
 const getSummonerIdCacheKey = (puuid) => `moba-league-sid-${puuid}`;
 const getLeagueEntriesCacheKey = (platform, summonerId) => `moba-league-entries-${platform}-${summonerId}`;
@@ -148,12 +150,23 @@ const getLeagueEntries = async (platform, summonerId) => {
 	return data;
 };
 
-const parseUserIdentifier = async (regionName, identifier) => {
-	if (!regionName || !identifier) {
+const parseUserIdentifier = async (context, regionName, identifier) => {
+	if (!regionName) {
 		return {
 			success: false,
-			reply: `You must provide the region and the full user name!`
+			reply: `You must provide the game region!`
 		};
+	}
+	else if (!identifier) {
+		const defaultIdentifier = await context.user.getDataProperty(DEFAULT_USER_IDENTIFIER_KEY);
+		if (!defaultIdentifier) {
+			return {
+				success: false,
+				reply: `You must provide the user identifier!`
+			};
+		}
+
+		identifier = defaultIdentifier;
 	}
 
 	const region = getPlatform(regionName);
@@ -267,6 +280,7 @@ const getMatchData = async (matchId) => {
 
 module.exports = {
 	NON_STANDARD_CHAMPION_NAMES, // @todo replace by a DataDragon API call in production: https://ddragon.leagueoflegends.com/cdn/14.11.1/data/en_US/champion.json
+	DEFAULT_USER_IDENTIFIER_KEY,
 	GAME_RESULT,
 	getPlatform,
 	getPUUIDByName,

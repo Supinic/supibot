@@ -16,7 +16,7 @@ module.exports = {
 		default: false
 	},
 	execute: async (context, type, regionName, ...args) => {
-		const leagueUser = await parseUserIdentifier(regionName, args.join(" "));
+		const leagueUser = await parseUserIdentifier(context, regionName, args.join(" "));
 		if (!leagueUser.success) {
 			return leagueUser;
 		}

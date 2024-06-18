@@ -5,6 +5,7 @@ module.exports = [
 	require("./discord.js"),
 	require("./gachi.js"),
 	require("./language.js"),
+	require("./league-user.js"),
 	require("./location.js"),
 	require("./no-abb-chatter.js"),
 	require("./reminder.js"),
