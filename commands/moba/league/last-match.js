@@ -37,7 +37,7 @@ module.exports = {
 		let gameResultString = "";
 
 		const player = info.participants.find(i => i.puuid === puuid);
-		if (info.endOfGameResult === GAME_RESULT.END) {
+		if (info.endOfGameResult === GAME_RESULT.END || info.gameEndTimestamp) {
 			const gameEnd = new sb.Date(info.gameEndTimestamp);
 
 			gameEndString = `(game ended ${sb.Utils.timeDelta(gameEnd)})`;
