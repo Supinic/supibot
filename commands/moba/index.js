@@ -1,4 +1,5 @@
 const SUBCOMMANDS = {
+	dota: require("./dota"),
 	league: require("./league")
 };
 
