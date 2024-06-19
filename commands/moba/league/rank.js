@@ -10,7 +10,11 @@ module.exports = {
 	name: "rank",
 	aliases: [],
 	description: [
-
+		"<code>$league (region) (username)</code>",
+		"<code>$league rank (region) (username)</code>",
+		"<code>$league EUW Username#Tag</code>",
+		"<code>$league rank EUW Username#Tag</code>",
+		"Fetches simple data about a user's tier and rank in the current league."
 	],
 	flags: {
 		default: true

@@ -7,7 +7,7 @@ module.exports = {
 	Aliases: ["league", "dota"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "WIP",
+	Description: "This command lets you check many things related to several MOBA games - League of Legends ($league).",
 	Flags: ["mention","pipe","skip-banphrase"],
 	Params: null,
 	Whitelist_Response: null,
@@ -46,5 +46,33 @@ module.exports = {
 			return await subcommand.execute(context, type, ...args);
 		}
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: async () => {
+		const list = [];
+		for (const [game, subcommands] of Object.entries(SUBCOMMANDS)) {
+			list.push(`<h5>$${game}</h5>`);
+
+			for (const subcommand of subcommands) {
+				list.push(...subcommand.description);
+			}
+		}
+
+		return [
+			"This command lets you check many things related to many MOBA games.",
+			"",
+
+			"To simplify usage for <code>$league</code>, you can use the <code>$set</code> command to set your region and username:",
+			"<code>$set league-user (username)</code>",
+			"<code>$set league-region (region)</code>",
+			`Check more info on the <a href="/bot/command/detail/set">$set command's help page</a>`,
+			"",
+
+			"Once you have both of these set up, you can omit the region and username in <code>$league</code> commands.",
+			"You can also check someone else's stats by using their username with the <code>@</code> symbol.",
+			"<code>$league</code> → Your stats",
+			"<code>$league @Username</code> → Another user's stats",
+			"",
+
+			...list
+		];
+	}
 };

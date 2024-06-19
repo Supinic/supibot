@@ -10,7 +10,9 @@ module.exports = {
 	name: "lastMatch",
 	aliases: ["last"],
 	description: [
-		"Fetches quick data about the last match a given user has played (or is playing)."
+		"<code>$league last (region) (username)</code>",
+		"<code>$league last EUW Username#Tag</code>",
+		"Fetches quick data about the last match a given user has played (or is currently playing)."
 	],
 	flags: {
 		default: false
