@@ -52,7 +52,7 @@ module.exports = {
 			list.push(`<h5>$${game}</h5>`);
 
 			for (const subcommand of subcommands) {
-				list.push(...subcommand.description);
+				list.push(...subcommand.description, "");
 			}
 		}
 
