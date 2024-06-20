@@ -373,50 +373,6 @@ module.exports = class LoggerSingleton {
 	}
 
 	/**
-	 * Saves a video link to database. Used in Cytube-like channels to log video requests
-	 * @param {string} link
-	 * @param {string} typeIdentifier
-	 * @param {number} length
-	 * @param {{ ID: number }} userData
-	 * @param {{ ID: number }} channelData
-	 * @returns {Promise<void>}
-	 */
-	async logVideoRequest (link, typeIdentifier, length, userData, channelData) {
-		if (!this.videoTypes) {
-			this.videoTypes = await sb.Query.getRecordset(rs => rs
-				.select("ID", "Type")
-				.from("data", "Video_Type")
-			);
-		}
-		else if (this.videoTypes.length === 0) {
-			return;
-		}
-
-		const type = this.videoTypes.find(i => i.Type === typeIdentifier);
-		if (!type) {
-			throw new sb.Error({
-				message: "Video type not found",
-				args: {
-					input: type,
-					supported: this.videoTypes
-				}
-			});
-		}
-
-		const row = await sb.Query.getRow("cytube", "Video_Request");
-		row.setValues({
-			User_Alias: userData.ID,
-			Posted: new sb.Date(),
-			Link: link,
-			Type: type.ID,
-			Length: length,
-			Channel: channelData.ID
-		});
-
-		await row.save();
-	}
-
-	/**
 	 * Inserts a Twitch-specific ban data to the database.
 	 * @param {string|number} identifier
 	 * @param {sb.Channel} channelData
