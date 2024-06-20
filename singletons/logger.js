@@ -27,8 +27,6 @@ module.exports = class LoggerSingleton {
 	#lastSeenUserMap = new Map();
 
 	constructor () {
-		this.videoTypes = null;
-
 		if (logging.messages.enabled) {
 			this.channels = [];
 			this.platforms = [];
