@@ -33,10 +33,10 @@ export const definition = {
 
 			const channelIDs = guildChannels.map(i => i.ID);
 			const lastCommandExecuted = await sb.Query.getRecordset(rs => rs
-				.select("MAX(Executed) AS Last_Command_Executed")
-				.from("chat_data", "Command_Execution")
+				.select("IFNULL(Last_Command_Executed, 0) AS Last")
+				.from("chat_data", "Meta_Channel_Command")
 				.where("Channel IN %n+", channelIDs)
-				.flat("Last_Command_Executed")
+				.flat("Last")
 				.single()
 			);
 
