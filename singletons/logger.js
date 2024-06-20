@@ -11,7 +11,6 @@ try {
 }
 catch {
 	config = require("../config-default.json");
-	throw new Error("No default or custom configuration found");
 }
 
 const { logging } = config;
@@ -98,7 +97,41 @@ module.exports = class LoggerSingleton {
 					return;
 				}
 
-				await this.commandBatch.insert({ ignore: true });
+				const channels = {};
+				for (const record of this.commandBatch.records) {
+					const existing = channels[record.Channel];
+					if (!existing || existing.date < record.Executed) {
+						channels[record.Channel] = {
+							date: record.Executed,
+							command: record.Command,
+							result: record.Result
+						};
+					}
+				}
+
+				const metaPromises = Object.entries(channels).map(async (data) => {
+					const [channelId, meta] = data;
+					const row = await sb.Query.getRow("chat_data", "Meta_Channel_Command");
+					await row.load(channelId, true);
+
+					if (!row.loaded) {
+						row.values.Channel = channelId;
+					}
+
+					row.setValues({
+						Last_Command_Executed: meta.command,
+						Last_Command_Posted: meta.date,
+						Last_Command_Result: meta.result
+					});
+
+					await row.save({ skipLoad: true });
+				});
+
+				await Promise.all([
+					this.commandBatch.insert({ ignore: true }),
+					...metaPromises
+				]);
+
 				this.commandCollector.clear();
 			});
 
