@@ -387,7 +387,7 @@ module.exports = class LoggerSingleton {
 	 * @param {Object} options
 	 */
 	logCommandExecution (options) {
-		if (!logging.command.enabled) {
+		if (!logging.commands.enabled) {
 			return;
 		}
 
