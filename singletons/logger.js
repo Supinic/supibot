@@ -18,30 +18,6 @@ const { logging } = config;
 const FALLBACK_WARN_LIMIT = 2500;
 
 /**
- * @param {Object} obj
- * @param {User} userData
- * @param {Platform} platformData
- */
-const fillObjectByPlatform = (obj, userData, platformData) => {
-	if (platformData.Name === "twitch") {
-		obj.Platform_ID = userData.Twitch_ID ?? userData.Name;
-		obj.Historic = !(userData.Twitch_ID); // `false` if user has a Twitch ID, true otherwise
-	}
-	else if (platformData.Name === "discord") {
-		obj.Platform_ID = userData.Discord_ID ?? userData.Name;
-		obj.Historic = !(userData.Discord_ID); // `false` if user has a Discord ID, true otherwise
-	}
-	else if (platformData.Name === "cytube") {
-		obj.Platform_ID = userData.Name;
-		obj.Historic = false; // Always false, names are unique on Cytube
-	}
-	else {
-		obj.Platform_ID = userData.Name;
-		obj.Historic = true; // Always true, undefined ID behaviour on other, unspecified platforms
-	}
-};
-
-/**
  * Logging module that handles all possible chat message and video logging.
  * Accesses the database so that nothing needs to be exposed in chat clients.
  */
@@ -314,14 +290,21 @@ module.exports = class LoggerSingleton {
 			};
 
 			const batch = this.batches[chan];
-			const hasUserAlias = batch.columns.some(i => i.name === "User_Alias");
+			const hasUserAlias = batch.columns.some(i => i.name === "User_Alias"); // legacy, should not occur anymore
 			const hasPlatformID = batch.columns.some(i => i.name === "Platform_ID");
 
 			if (hasUserAlias) {
 				lineObject.User_Alias = userData.ID;
 			}
 			if (hasPlatformID) {
-				fillObjectByPlatform(lineObject, userData, channelData.Platform);
+				try {
+					lineObject.Platform_ID = await platformData.fetchInternalPlatformIDByUsername(userData);
+					lineObject.Historic = false;
+				}
+				catch {
+					lineObject.Platform_ID = userData.Name;
+					lineObject.Historic = true;
+				}
 			}
 
 			try {
@@ -365,8 +348,16 @@ module.exports = class LoggerSingleton {
 				Posted: new sb.Date()
 			};
 
+			try {
+				lineObject.Platform_ID = await platformData.fetchInternalPlatformIDByUsername(userData);
+				lineObject.Historic = false;
+			}
+			catch {
+				lineObject.Platform_ID = userData.Name;
+				lineObject.Historic = true;
+			}
+
 			const batch = this.batches[id];
-			fillObjectByPlatform(lineObject, userData, platformData);
 
 			batch.add(lineObject);
 		}
