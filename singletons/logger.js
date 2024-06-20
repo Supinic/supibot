@@ -5,6 +5,18 @@ const notified = {
 	privatePlatformLogging: []
 };
 
+let config;
+try {
+	config = require("../config.json");
+}
+catch {
+	config = require("../config-default.json");
+	throw new Error("No default or custom configuration found");
+}
+
+const { logging } = config;
+const FALLBACK_WARN_LIMIT = 2500;
+
 /**
  * @param {Object} obj
  * @param {User} userData
@@ -41,11 +53,12 @@ module.exports = class LoggerSingleton {
 	constructor () {
 		this.videoTypes = null;
 
-		if (sb.Config.get("LOG_MESSAGE_CRON", false)) {
+		if (logging.messages.enabled) {
 			this.channels = [];
 			this.platforms = [];
 			this.batches = {};
-			this.loggingWarnLimit = sb.Config.get("LOGGING_WARN_LIMIT", false) ?? 2500;
+
+			const loggingWarnLimit = logging.messages.warnLimit ?? FALLBACK_WARN_LIMIT;
 
 			sb.Query.getRecordset(rs => rs
 				.select("TABLE_NAME")
@@ -54,19 +67,19 @@ module.exports = class LoggerSingleton {
 				.flat("TABLE_NAME")
 			).then(data => (this.#presentTables = data));
 
-			this.messageCron = new CronJob(sb.Config.get("LOG_MESSAGE_CRON"), async () => {
+			this.messageCron = new CronJob(logging.messages.cron, async () => {
 				const keys = Object.keys(this.batches);
 				for (let i = 0; i < keys.length; i++) {
 					const key = keys[i];
 					if (this.batches[key].records?.length > 0) {
-						if (this.batches[key].records.length > this.loggingWarnLimit) {
+						if (this.batches[key].records.length > loggingWarnLimit) {
 							const length = this.batches[key].records.length;
 							const channelID = Number(key.split("-")[1]);
 							const channelData = sb.Channel.get(channelID);
 
 							await sb.Logger.log(
 								"Message.Warning",
-								`Channel "${channelData.Name}" exceeded logging limit ${length}/${this.loggingWarnLimit}`,
+								`Channel "${channelData.Name}" exceeded logging limit ${length}/${loggingWarnLimit}`,
 								channelData,
 								null
 							);
@@ -87,7 +100,7 @@ module.exports = class LoggerSingleton {
 			this.#crons.push(this.messageCron);
 		}
 
-		if (sb.Config.get("LOG_COMMAND_CRON", false)) {
+		if (logging.commands.enabled) {
 			sb.Query.getBatch(
 				"chat_data",
 				"Command_Execution",
@@ -106,13 +119,12 @@ module.exports = class LoggerSingleton {
 			).then(batch => (this.commandBatch = batch));
 
 			this.commandCollector = new Set();
-			this.commandCron = new CronJob(sb.Config.get("LOG_COMMAND_CRON"), async () => {
-				if (!sb.Config.get("LOG_COMMAND_ENABLED") || !this.commandBatch?.ready) {
+			this.commandCron = new CronJob(logging.commands.cron, async () => {
+				if (!this.commandBatch?.ready) {
 					return;
 				}
 
 				await this.commandBatch.insert({ ignore: true });
-
 				this.commandCollector.clear();
 			});
 
@@ -120,12 +132,12 @@ module.exports = class LoggerSingleton {
 			this.#crons.push(this.commandCron);
 		}
 
-		if (sb.Config.get("LOG_LAST_SEEN_CRON", false)) {
+		if (logging.lastSeen.enabled) {
 			this.lastSeen = new Map();
 			this.lastSeenRunning = false;
 
-			this.lastSeenCron = new CronJob(sb.Config.get("LOG_LAST_SEEN_CRON"), async () => {
-				if (!sb.Config.get("LOG_LAST_SEEN_ENABLED", false) || this.lastSeenRunning) {
+			this.lastSeenCron = new CronJob(logging.lastSeen.cron, async () => {
+				if (this.lastSeenRunning) {
 					return;
 				}
 
@@ -218,7 +230,7 @@ module.exports = class LoggerSingleton {
 	 * @returns {Promise<number>} ID of the created database error record
 	 */
 	async logError (type, error, data = {}) {
-		if (!sb.Config.get("LOG_ERROR_ENABLED", false)) {
+		if (!logging.errors.enabled) {
 			return;
 		}
 
@@ -430,7 +442,7 @@ module.exports = class LoggerSingleton {
 	 * @param {Object} options
 	 */
 	logCommandExecution (options) {
-		if (!sb.Config.get("LOG_COMMAND_ENABLED", false)) {
+		if (!logging.command.enabled) {
 			return;
 		}
 
@@ -443,12 +455,12 @@ module.exports = class LoggerSingleton {
 	}
 
 	async updateLastSeen (options) {
-		const lastSeenEnabled = sb.Config.get("LOG_LAST_SEEN_ENABLED", false);
-		if (lastSeenEnabled === false) {
+		if (!logging.lastSeen.enabled) {
 			if (!notified.lastSeen) {
 				console.warn("Requested last-seen update, but it is not enabled", options);
 				notified.lastSeen = true;
 			}
+
 			return;
 		}
 
