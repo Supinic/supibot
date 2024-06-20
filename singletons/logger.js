@@ -296,7 +296,7 @@ module.exports = class LoggerSingleton {
 			}
 			if (hasPlatformID) {
 				try {
-					lineObject.Platform_ID = await platformData.fetchInternalPlatformIDByUsername(userData);
+					lineObject.Platform_ID = await channelData.Platform.fetchInternalPlatformIDByUsername(userData);
 					lineObject.Historic = false;
 				}
 				catch {
