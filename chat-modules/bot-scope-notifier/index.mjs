@@ -52,17 +52,6 @@ export const definition = {
 			return;
 		}
 
-		// Only send notification if the message we react to is either:
-		// a) a Supibot command - then always
-		// b) sent by the channel owner - then always
-		// c) not sent by owner nor a command - but only with a 1/25 chance
-		if (!sb.Command.is(incomingMessage) && user.Name !== channel.Name) {
-			const roll = randomInt(1, 26);
-			if (roll !== 1) {
-				return;
-			}
-		}
-
 		const now = sb.Date.now();
 
 		// Don't check anything past the deadline
