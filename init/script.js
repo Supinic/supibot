@@ -23,6 +23,7 @@ const config = {
 		"chat_data/tables/User_Alias_Data",
 		"chat_data/tables/Command",
 		"chat_data/tables/Command_Execution",
+		"chat_data/tables/Meta_Channel_Command",
 		"chat_data/tables/AFK",
 		"chat_data/tables/Banphrase",
 		"chat_data/tables/Log",

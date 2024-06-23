@@ -5,29 +5,16 @@ const notified = {
 	privatePlatformLogging: []
 };
 
-/**
- * @param {Object} obj
- * @param {User} userData
- * @param {Platform} platformData
- */
-const fillObjectByPlatform = (obj, userData, platformData) => {
-	if (platformData.Name === "twitch") {
-		obj.Platform_ID = userData.Twitch_ID ?? userData.Name;
-		obj.Historic = !(userData.Twitch_ID); // `false` if user has a Twitch ID, true otherwise
-	}
-	else if (platformData.Name === "discord") {
-		obj.Platform_ID = userData.Discord_ID ?? userData.Name;
-		obj.Historic = !(userData.Discord_ID); // `false` if user has a Discord ID, true otherwise
-	}
-	else if (platformData.Name === "cytube") {
-		obj.Platform_ID = userData.Name;
-		obj.Historic = false; // Always false, names are unique on Cytube
-	}
-	else {
-		obj.Platform_ID = userData.Name;
-		obj.Historic = true; // Always true, undefined ID behaviour on other, unspecified platforms
-	}
-};
+let config;
+try {
+	config = require("../config.json");
+}
+catch {
+	config = require("../config-default.json");
+}
+
+const { logging } = config;
+const FALLBACK_WARN_LIMIT = 2500;
 
 /**
  * Logging module that handles all possible chat message and video logging.
@@ -39,13 +26,12 @@ module.exports = class LoggerSingleton {
 	#lastSeenUserMap = new Map();
 
 	constructor () {
-		this.videoTypes = null;
-
-		if (sb.Config.get("LOG_MESSAGE_CRON", false)) {
+		if (logging.messages.enabled) {
 			this.channels = [];
 			this.platforms = [];
 			this.batches = {};
-			this.loggingWarnLimit = sb.Config.get("LOGGING_WARN_LIMIT", false) ?? 2500;
+
+			const loggingWarnLimit = logging.messages.warnLimit ?? FALLBACK_WARN_LIMIT;
 
 			sb.Query.getRecordset(rs => rs
 				.select("TABLE_NAME")
@@ -54,19 +40,19 @@ module.exports = class LoggerSingleton {
 				.flat("TABLE_NAME")
 			).then(data => (this.#presentTables = data));
 
-			this.messageCron = new CronJob(sb.Config.get("LOG_MESSAGE_CRON"), async () => {
+			this.messageCron = new CronJob(logging.messages.cron, async () => {
 				const keys = Object.keys(this.batches);
 				for (let i = 0; i < keys.length; i++) {
 					const key = keys[i];
 					if (this.batches[key].records?.length > 0) {
-						if (this.batches[key].records.length > this.loggingWarnLimit) {
+						if (this.batches[key].records.length > loggingWarnLimit) {
 							const length = this.batches[key].records.length;
 							const channelID = Number(key.split("-")[1]);
 							const channelData = sb.Channel.get(channelID);
 
 							await sb.Logger.log(
 								"Message.Warning",
-								`Channel "${channelData.Name}" exceeded logging limit ${length}/${this.loggingWarnLimit}`,
+								`Channel "${channelData.Name}" exceeded logging limit ${length}/${loggingWarnLimit}`,
 								channelData,
 								null
 							);
@@ -87,7 +73,7 @@ module.exports = class LoggerSingleton {
 			this.#crons.push(this.messageCron);
 		}
 
-		if (sb.Config.get("LOG_COMMAND_CRON", false)) {
+		if (logging.commands.enabled) {
 			sb.Query.getBatch(
 				"chat_data",
 				"Command_Execution",
@@ -106,12 +92,45 @@ module.exports = class LoggerSingleton {
 			).then(batch => (this.commandBatch = batch));
 
 			this.commandCollector = new Set();
-			this.commandCron = new CronJob(sb.Config.get("LOG_COMMAND_CRON"), async () => {
-				if (!sb.Config.get("LOG_COMMAND_ENABLED") || !this.commandBatch?.ready) {
+			this.commandCron = new CronJob(logging.commands.cron, async () => {
+				if (!this.commandBatch?.ready) {
 					return;
 				}
 
-				await this.commandBatch.insert({ ignore: true });
+				const channels = {};
+				for (const record of this.commandBatch.records) {
+					const existing = channels[record.Channel];
+					if (!existing || existing.date < record.Executed) {
+						channels[record.Channel] = {
+							date: record.Executed,
+							command: record.Command,
+							result: record.Result
+						};
+					}
+				}
+
+				const metaPromises = Object.entries(channels).map(async (data) => {
+					const [channelId, meta] = data;
+					const row = await sb.Query.getRow("chat_data", "Meta_Channel_Command");
+					await row.load(channelId, true);
+
+					if (!row.loaded) {
+						row.values.Channel = channelId;
+					}
+
+					row.setValues({
+						Last_Command_Executed: meta.command,
+						Last_Command_Posted: meta.date,
+						Last_Command_Result: meta.result
+					});
+
+					await row.save({ skipLoad: true });
+				});
+
+				await Promise.all([
+					this.commandBatch.insert({ ignore: true }),
+					...metaPromises
+				]);
 
 				this.commandCollector.clear();
 			});
@@ -120,12 +139,12 @@ module.exports = class LoggerSingleton {
 			this.#crons.push(this.commandCron);
 		}
 
-		if (sb.Config.get("LOG_LAST_SEEN_CRON", false)) {
+		if (logging.lastSeen.enabled) {
 			this.lastSeen = new Map();
 			this.lastSeenRunning = false;
 
-			this.lastSeenCron = new CronJob(sb.Config.get("LOG_LAST_SEEN_CRON"), async () => {
-				if (!sb.Config.get("LOG_LAST_SEEN_ENABLED", false) || this.lastSeenRunning) {
+			this.lastSeenCron = new CronJob(logging.lastSeen.cron, async () => {
+				if (this.lastSeenRunning) {
 					return;
 				}
 
@@ -218,7 +237,7 @@ module.exports = class LoggerSingleton {
 	 * @returns {Promise<number>} ID of the created database error record
 	 */
 	async logError (type, error, data = {}) {
-		if (!sb.Config.get("LOG_ERROR_ENABLED", false)) {
+		if (!logging.errors.enabled) {
 			return;
 		}
 
@@ -302,14 +321,21 @@ module.exports = class LoggerSingleton {
 			};
 
 			const batch = this.batches[chan];
-			const hasUserAlias = batch.columns.some(i => i.name === "User_Alias");
+			const hasUserAlias = batch.columns.some(i => i.name === "User_Alias"); // legacy, should not occur anymore
 			const hasPlatformID = batch.columns.some(i => i.name === "Platform_ID");
 
 			if (hasUserAlias) {
 				lineObject.User_Alias = userData.ID;
 			}
 			if (hasPlatformID) {
-				fillObjectByPlatform(lineObject, userData, channelData.Platform);
+				try {
+					lineObject.Platform_ID = await channelData.Platform.fetchInternalPlatformIDByUsername(userData);
+					lineObject.Historic = false;
+				}
+				catch {
+					lineObject.Platform_ID = userData.Name;
+					lineObject.Historic = true;
+				}
 			}
 
 			try {
@@ -353,55 +379,19 @@ module.exports = class LoggerSingleton {
 				Posted: new sb.Date()
 			};
 
+			try {
+				lineObject.Platform_ID = await platformData.fetchInternalPlatformIDByUsername(userData);
+				lineObject.Historic = false;
+			}
+			catch {
+				lineObject.Platform_ID = userData.Name;
+				lineObject.Historic = true;
+			}
+
 			const batch = this.batches[id];
-			fillObjectByPlatform(lineObject, userData, platformData);
 
 			batch.add(lineObject);
 		}
-	}
-
-	/**
-	 * Saves a video link to database. Used in Cytube-like channels to log video requests
-	 * @param {string} link
-	 * @param {string} typeIdentifier
-	 * @param {number} length
-	 * @param {{ ID: number }} userData
-	 * @param {{ ID: number }} channelData
-	 * @returns {Promise<void>}
-	 */
-	async logVideoRequest (link, typeIdentifier, length, userData, channelData) {
-		if (!this.videoTypes) {
-			this.videoTypes = await sb.Query.getRecordset(rs => rs
-				.select("ID", "Type")
-				.from("data", "Video_Type")
-			);
-		}
-		else if (this.videoTypes.length === 0) {
-			return;
-		}
-
-		const type = this.videoTypes.find(i => i.Type === typeIdentifier);
-		if (!type) {
-			throw new sb.Error({
-				message: "Video type not found",
-				args: {
-					input: type,
-					supported: this.videoTypes
-				}
-			});
-		}
-
-		const row = await sb.Query.getRow("cytube", "Video_Request");
-		row.setValues({
-			User_Alias: userData.ID,
-			Posted: new sb.Date(),
-			Link: link,
-			Type: type.ID,
-			Length: length,
-			Channel: channelData.ID
-		});
-
-		await row.save();
 	}
 
 	/**
@@ -430,7 +420,7 @@ module.exports = class LoggerSingleton {
 	 * @param {Object} options
 	 */
 	logCommandExecution (options) {
-		if (!sb.Config.get("LOG_COMMAND_ENABLED", false)) {
+		if (!logging.commands.enabled) {
 			return;
 		}
 
@@ -443,12 +433,12 @@ module.exports = class LoggerSingleton {
 	}
 
 	async updateLastSeen (options) {
-		const lastSeenEnabled = sb.Config.get("LOG_LAST_SEEN_ENABLED", false);
-		if (lastSeenEnabled === false) {
+		if (!logging.lastSeen.enabled) {
 			if (!notified.lastSeen) {
 				console.warn("Requested last-seen update, but it is not enabled", options);
 				notified.lastSeen = true;
 			}
+
 			return;
 		}
 

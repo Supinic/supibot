@@ -43,7 +43,6 @@ VALUES
 }'),
 ('Discord',NULL,2000,NULL,NULL,NULL),
 ('Cytube','https://cytu.be',600,NULL,'{
-    "videoRequests": false,
     "whispers": false
 }',NULL)
 
