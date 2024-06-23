@@ -99,6 +99,10 @@ module.exports = class LoggerSingleton {
 
 				const channels = {};
 				for (const record of this.commandBatch.records) {
+					if (!record.Channel) {
+						continue; // Don't meta-log private message commands
+					}
+
 					const existing = channels[record.Channel];
 					if (!existing || existing.date < record.Executed) {
 						channels[record.Channel] = {
