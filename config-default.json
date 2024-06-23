@@ -148,10 +148,6 @@
       "enabled": true,
       "cron": "0 */5 * * * *"
     },
-    "commandMeta": {
-      "enabled": true,
-      "cron": "0 */5 * * * *"
-    },
     "errors": {
       "enabled": true
     }
