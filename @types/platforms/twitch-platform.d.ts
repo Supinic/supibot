@@ -9,7 +9,6 @@ declare type ReconnectAnnouncementData = {
 
 declare type Notice = string;
 declare interface TwitchLog extends Log {
-	bans: boolean;
 	bits: boolean;
 	channelJoins: boolean;
 	clearchat: boolean;

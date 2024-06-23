@@ -9,7 +9,6 @@ const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
 
 const DEFAULT_LOGGING_CONFIG = {
-	bans: false,
 	bits: false,
 	channelJoins: false,
 	clearchat: false,
@@ -1110,10 +1109,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			}
 
 			channelData.sessionData.recentBans++;
-
-			if ((length === null && this.logging.bans) || (length !== null && this.logging.timeouts)) {
-				sb.Logger.logBan(user, channelData, length, new sb.Date(), reason);
-			}
 		}
 	}
 

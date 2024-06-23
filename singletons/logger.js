@@ -395,27 +395,6 @@ module.exports = class LoggerSingleton {
 	}
 
 	/**
-	 * Inserts a Twitch-specific ban data to the database.
-	 * @param {string|number} identifier
-	 * @param {sb.Channel} channelData
-	 * @param {number} length
-	 * @param {sb.Date} date
-	 * @param {string|null} notes
-	 */
-	logBan (identifier, channelData, length, date, notes) {
-		if (!(this.banCollector instanceof Map)) {
-			return;
-		}
-
-		this.banCollector.set(identifier, {
-			Channel: channelData.ID,
-			Length: length || null,
-			Issued: date,
-			Notes: notes || null
-		});
-	}
-
-	/**
 	 * Logs a command execution.
 	 * @param {Object} options
 	 */

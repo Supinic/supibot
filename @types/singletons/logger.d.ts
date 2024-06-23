@@ -45,7 +45,6 @@ export declare class LoggerSingleton {
     log (tag: LogTag, description?: string | null, channel?: HasID | null, user?: HasID | null ): Promise<number>;
     logError (type: ErrorType, error: Error | CoreError, data: ErrorLogData): Promise<number>;
     push (message: Message, userData: User, channelData: Channel, platformData?: Platform): Promise<void>;
-    logBan (identifier: UserLike, channelData: Channel, length: number, date: CoreDate, notes?: string | null): void;
     logCommandExecution (options: CommandExecutionOptions): void;
     updateLastSeen (options: LastSeenOptions): Promise<void>;
     getUserLastSeen (userID: number): CoreDate | undefined;
