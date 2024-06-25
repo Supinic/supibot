@@ -1,5 +1,5 @@
 const url = "https://secure.runescape.com/m=news/latestNews.json?oldschool=1";
-const OSRS_LAST_ARTICLE_ID = "osrs-last-article-id";
+const OSRS_LATEST_ARTICLE_ID = "osrs-last-article-id";
 
 module.exports = {
 	name: "OSRS",
@@ -26,14 +26,16 @@ module.exports = {
 		}
 
 		const { newsItems } = response.body;
-		const previousArticleId = await sb.Cache.getByPrefix(OSRS_LAST_ARTICLE_ID) ?? 0;
-		const eligibleArticles = newsItems.filter(i => i.newsId > previousArticleId);
-		if (eligibleArticles.length === 0) {
-			return;
-		}
+		const previousArticleId = await sb.Cache.getByPrefix(OSRS_LATEST_ARTICLE_ID) ?? 0;
 
-		const latestArticleId = Math.max(...eligibleArticles.map(i => i.newsId));
-		await sb.Cache.setByPrefix(OSRS_LAST_ARTICLE_ID, latestArticleId, {
+		// Huge assumption: Jagex will release new articles on "top" of the JSON feed
+		const previousArticleIndex = newsItems.findIndex(i => i.newsId === previousArticleId);
+		const eligibleArticles = (previousArticleIndex === -1)
+			? newsItems
+			: newsItems.slice(0, previousArticleId);
+
+		const latestArticleId = eligibleArticles[0].newsId;
+		await sb.Cache.setByPrefix(OSRS_LATEST_ARTICLE_ID, latestArticleId, {
 			expiry: 14 * 864e5 // 14 days
 		});
 
