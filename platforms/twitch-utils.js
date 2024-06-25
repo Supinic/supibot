@@ -195,32 +195,32 @@ const createSubscription = async (data = {}) => {
 	}
 };
 
-const createChannelChatMessageSubscription = async (selfId, channelId) => createSubscription({
+const createChannelChatMessageSubscription = (selfId, channelId) => createSubscription({
 	channelId,
 	selfId,
 	subscription: "channel.chat.message",
 	version: "1"
 });
 
-const createWhisperMessageSubscription = async (selfId) => createSubscription({
+const createWhisperMessageSubscription = (selfId) => createSubscription({
 	selfId,
 	subscription: "user.whisper.message",
 	version: "1"
 });
 
-const createChannelSubSubscription = async (channelId) => createSubscription({
+const createChannelSubSubscription = (channelId) => createSubscription({
 	channelId,
 	subscription: "channel.subscribe",
 	version: "1"
 });
 
-const createChannelResubSubscription = async (channelId) => createSubscription({
+const createChannelResubSubscription = (channelId) => createSubscription({
 	channelId,
 	subscription: "channel.subscription.message",
 	version: "1"
 });
 
-const createChannelRaidSubscription = async (channelId) => createSubscription({
+const createChannelRaidSubscription = (channelId) => createSubscription({
 	condition: {
 		to_broadcaster_user_id: channelId
 	},
@@ -228,13 +228,13 @@ const createChannelRaidSubscription = async (channelId) => createSubscription({
 	version: "1"
 });
 
-const createChannelOnlineSubscription = async (channelId) => createSubscription({
+const createChannelOnlineSubscription = (channelId) => createSubscription({
 	channelId,
 	subscription: "stream.online",
 	version: "1"
 });
 
-const createChannelOfflineSubscription = async (channelId) => createSubscription({
+const createChannelOfflineSubscription = (channelId) => createSubscription({
 	channelId,
 	subscription: "stream.offline",
 	version: "1"
