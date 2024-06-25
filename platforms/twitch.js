@@ -114,13 +114,22 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		this.client = ws;
 
 		if (!options.skipSubscriptions) {
-			const channelList = sb.Channel.getJoinableForPlatform(this);
-			const joinPromises = this.joinChannels(channelList);
+			await createWhisperMessageSubscription(this.selfId);
 
-			await Promise.all([
-				...joinPromises,
-				createWhisperMessageSubscription(this.selfId)
-			]);
+			console.log("Whisper sub created");
+
+			const batchSize = 100;
+			const channelList = sb.Channel.getJoinableForPlatform(this);
+			for (let index = 0; index < channelList.length; index += batchSize) {
+				console.log("Creating subs", index, index + 100);
+
+				const slice = channelList.slice(index, index + batchSize);
+				const joinPromises = this.joinChannels(slice);
+
+				await Promise.all(joinPromises);
+			}
+
+			console.log("Done creating subs");
 		}
 
 		const { channels, string } = this.config.reconnectAnnouncement;
