@@ -106,26 +106,19 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	async connect (options = {}) {
-		console.log("Getting app token");
 		await getAppAccessToken();
-		console.log("Getting conduit id");
 		await getConduitId();
 
-		console.log("Creating ws");
 		const ws = new WebSocket(options.url ?? TWITCH_WEBSOCKET_URL);
 		ws.on("message", (data) => this.handleWebsocketMessage(data));
 
 		this.client = ws;
 
 		if (!options.skipSubscriptions) {
-			console.log("Getting existing subs")
 			const existingSubs = await fetchExistingSubscriptions();
-			console.log("Existing subs", { existingSubs });
-
 			const existingWhisperSub = existingSubs.some(i => i.type === "user.whisper.message");
 
 			if (!existingWhisperSub) {
-				console.log("Whisper sub created");
 				await createWhisperMessageSubscription(this.selfId);
 			}
 
@@ -134,17 +127,12 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			const missingChannels = channelList.filter(i => !existingChannels.includes(i.Specific_ID));
 
 			const batchSize = 10;
-			console.log(`Creating ${missingChannels.length} subs`);
 			for (let index = 0; index < missingChannels.length; index += batchSize) {
-				console.log("Creating subs", index, index + batchSize);
-
 				const slice = missingChannels.slice(index, index + batchSize);
 				const joinPromises = this.joinChannels(slice);
 
 				await Promise.allSettled(joinPromises);
 			}
-
-			console.log("Done creating subs");
 		}
 
 		const { channels, string } = this.config.reconnectAnnouncement;
