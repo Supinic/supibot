@@ -289,7 +289,7 @@ const fetchExistingSubscriptions = async () => {
 			}
 		});
 
-		result.push(...response.body.data);
+		result.push(...loopResponse.body.data);
 		cursor = loopResponse.body.pagination?.cursor ?? null;
 	}
 
