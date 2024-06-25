@@ -24,6 +24,8 @@ const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
 const WRITE_MODE_MESSAGE_DELAY = 1500;
 const LIVE_STREAMS_KEY = "twitch-live-streams";
+const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
+const NO_EVENT_RECONNECT_TIMEOUT = 30_000;
 
 const DEFAULT_LOGGING_CONFIG = {
 	bans: false,
@@ -79,6 +81,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	#websocketLatency = null;
 	#previousMessageMeta = new Map();
 	#userCommandSpamPrevention = new Map();
+	#reconnectTimeout;
 
 	constructor (config) {
 		super("twitch", config, {
@@ -103,30 +106,32 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		}
 	}
 
-	async connect () {
+	async connect (options = {}) {
 		await getAppAccessToken();
 		await getConduitId();
 
-		const ws = new WebSocket("wss://eventsub.wss.twitch.tv/ws");
+		const ws = new WebSocket(options.url ?? TWITCH_WEBSOCKET_URL);
 		ws.on("message", (data) => this.handleWebsocketMessage(data));
 
 		this.client = ws;
 
-		const channelList = sb.Channel.getJoinableForPlatform(this);
-		const joinPromises = channelList.flatMap(async (channelData) => [
-			createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID),
-			createChannelBanSubscription(channelData.Specific_ID),
-			createChannelSubSubscription(channelData.Specific_ID),
-			createChannelResubSubscription(channelData.Specific_ID),
-			createChannelRaidSubscription(channelData.Specific_ID),
-			createChannelOnlineSubscription(channelData.Specific_ID),
-			createChannelOfflineSubscription(channelData.Specific_ID)
-		]);
+		if (!options.skipSubscriptions) {
+			const channelList = sb.Channel.getJoinableForPlatform(this);
+			const joinPromises = channelList.flatMap(async (channelData) => [
+				createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID),
+				createChannelBanSubscription(channelData.Specific_ID),
+				createChannelSubSubscription(channelData.Specific_ID),
+				createChannelResubSubscription(channelData.Specific_ID),
+				createChannelRaidSubscription(channelData.Specific_ID),
+				createChannelOnlineSubscription(channelData.Specific_ID),
+				createChannelOfflineSubscription(channelData.Specific_ID)
+			]);
 
-		await Promise.all([
-			...joinPromises,
-			createWhisperMessageSubscription(this.selfId)
-		]);
+			await Promise.all([
+				...joinPromises,
+				createWhisperMessageSubscription(this.selfId)
+			]);
+		}
 
 		const { channels, string } = this.config.reconnectAnnouncement;
 		for (const channel of channels) {
@@ -135,16 +140,25 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				await channelData.send(string);
 			}
 		}
+
+		this.#resetReconnectTimeout();
 	}
 
 	async handleWebsocketMessage (data) {
 		const event = JSON.parse(data);
 		const { metadata, payload } = event;
 
+		this.#resetReconnectTimeout();
+
 		switch (metadata.message_type) {
 			case "session_welcome": {
 				const sessionId = payload.session.id;
 				await assignWebsocketToConduit(sessionId);
+				break;
+			}
+
+			case "session_reconnect": {
+				await this.handleReconnect(event);
 				break;
 			}
 
@@ -171,6 +185,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 				this.#websocketLatency = now - keepAliveNow;
 				this.#lastWebsocketKeepaliveMessage = sb.Date.now();
+
 				break;
 			}
 
@@ -220,6 +235,18 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				console.warn("Unrecognized notification", { data });
 			}
 		}
+	}
+
+	async handleReconnect (event) {
+		const reconnectUrl = event.payload.sesion.reconnect_url;
+		if (this.client) {
+			this.client.close();
+		}
+
+		await this.connect({
+			url: reconnectUrl,
+			skipSubscriptions: true
+		});
 	}
 
 	/**
@@ -1403,6 +1430,14 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			console.warn("Invalid token validation response, fetching tokens...");
 			await fetchToken();
 		}
+	}
+
+	#resetReconnectTimeout () {
+		clearTimeout(this.#reconnectTimeout);
+		this.#reconnectTimeout = setTimeout(() => {
+			this.client.close();
+			this.connect({ skipSubscriptions: true });
+		}, NO_EVENT_RECONNECT_TIMEOUT);
 	}
 
 	static async fetchAccountChallengeStatus (userData, twitchID) {
