@@ -95,7 +95,6 @@
         "whisperMessageLimit": 500
       },
       "logging": {
-        "bans": false,
         "bits": false,
         "channelJoins": false,
         "clearchat": false,
@@ -103,7 +102,6 @@
         "rituals": true,
         "messages": true,
         "subs": false,
-        "timeouts": false,
         "whispers": true
       }
     },

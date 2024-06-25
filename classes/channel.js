@@ -328,6 +328,18 @@ module.exports = class Channel extends require("./template.js") {
 		}
 	}
 
+	static getBySpecificId (identifier, platform) {
+		const platformData = Platform.get(platform);
+		const channels = Channel.data.get(platformData);
+		for (const channelData of channels.values()) {
+			if (channelData.Specific_ID === identifier) {
+				return channelData;
+			}
+		}
+
+		return null;
+	}
+
 	static getJoinableForPlatform (platform) {
 		const platformData = Platform.get(platform);
 		const platformMap = Channel.data.get(platformData);

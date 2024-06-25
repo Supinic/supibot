@@ -14,7 +14,6 @@ declare interface TwitchLog extends Log {
 	clearchat: boolean;
 	giftSubs: boolean;
 	subs: boolean;
-	timeouts: boolean;
 }
 
 declare type TwitchData = {

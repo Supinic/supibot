@@ -3,6 +3,7 @@ export const definition = {
 	optionsType: "function",
 	options: (() => ({
 		responseType: "json",
+		http2: true,
 		retry: {
 			limit: 0
 		},
