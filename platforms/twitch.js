@@ -294,7 +294,14 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		});
 
 		if (!response.ok) {
-			console.warn("HTTP not sent!", { status: response.statusCode, body: response.body });
+			console.warn("HTTP not sent!", {
+				status: response.statusCode,
+				body: response.body,
+				message,
+				channel,
+				options
+			});
+
 			return;
 		}
 
