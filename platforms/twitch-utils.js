@@ -193,14 +193,29 @@ const createSubscription = async (data = {}) => {
 			});
 		}
 	}
+
+	return { response };
 };
 
-const createChannelChatMessageSubscription = (selfId, channelId) => createSubscription({
-	channelId,
-	selfId,
-	subscription: "channel.chat.message",
-	version: "1"
-});
+const createChannelChatMessageSubscription = async (selfId, channelId) => {
+	const response = await createSubscription({
+		channelId,
+		selfId,
+		subscription: "channel.chat.message",
+		version: "1"
+	});
+
+	if (!response.ok && response.statusCode === 403) {
+		/** @type {Channel} */
+		const channelData = sb.Channel.getBySpecificId(channelId);
+		await Promise.all([
+			channelData.saveProperty("Mode", "Inactive"),
+			channelData.setDataProperty("twitchNoScopeDisabled", true)
+		]);
+
+		console.log(`Set ${channelData.Name} to Inactive`);
+	}
+};
 
 const createWhisperMessageSubscription = (selfId) => createSubscription({
 	selfId,
