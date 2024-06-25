@@ -28,7 +28,6 @@ const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
 const NO_EVENT_RECONNECT_TIMEOUT = 30_000;
 
 const DEFAULT_LOGGING_CONFIG = {
-	bans: false,
 	bits: false,
 	messages: true,
 	subs: false,
@@ -732,47 +731,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	/**
-	 * Reacts to user timeouts and bans - mostly for logging
-	 * @param {Object} event
-	 * @returns {Promise<void>}
-	 */
-	async handleBan (event) {
-		const {
-			user_login: user,
-			broadcaster_user_login: channel,
-			is_permanent: isPermanent
-		} = event;
-
-		const channelData = sb.Channel.get(channel, this);
-		if (!channelData) {
-			return;
-		}
-
-		// @todo this probably shouldn't be necessary with Websocket + Conduits?
-		if (user === this.selfName && isPermanent && this.config.partChannelsOnPermaban) {
-			const previousMode = channelData.Mode;
-			await Promise.all([
-				channelData.setDataProperty("inactiveReason", "bot-banned"),
-				channelData.saveProperty("Mode", "Inactive"),
-				sb.Logger.log("Twitch.Ban", `Bot banned in channel ${channelData.Name}. Previous mode: ${previousMode}`, channelData)
-			]);
-		}
-
-		const userData = await sb.User.get(user);
-		if (!userData) {
-			return;
-		}
-
-		const logString = JSON.stringify({ user, channel, event });
-		if (isPermanent && this.logging.bans) {
-			await sb.Logger.log("Twitch.Ban", `Permaban: ${logString}`, channelData, userData);
-		}
-		else if (!isPermanent && this.logging.timeouts) {
-			await sb.Logger.log("Twitch.Timeout", `Timeout: ${logString}`, channelData, userData);
-		}
-	}
-
-	/**
 	 * @param {Object} event
 	 * @param {string} subscription
 	 * @return {Promise<void>}
@@ -1264,9 +1222,9 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		return channelsData.flatMap(async channelData => [
 			createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID),
-			createChannelBanSubscription(channelData.Specific_ID),
-			createChannelSubSubscription(channelData.Specific_ID),
-			createChannelResubSubscription(channelData.Specific_ID),
+			// createChannelBanSubscription(channelData.Specific_ID),
+			// createChannelSubSubscription(channelData.Specific_ID),
+			// createChannelResubSubscription(channelData.Specific_ID),
 			createChannelRaidSubscription(channelData.Specific_ID),
 			createChannelOnlineSubscription(channelData.Specific_ID),
 			createChannelOfflineSubscription(channelData.Specific_ID)

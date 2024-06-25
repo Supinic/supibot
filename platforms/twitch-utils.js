@@ -186,10 +186,10 @@ const createSubscription = async (data = {}) => {
 		}
 		else {
 			console.warn("Could not subscribe", {
-				subscription: data,
+				subscription,
 				selfId,
 				channelId,
-				response
+				response: response.body
 			});
 		}
 	}
@@ -205,12 +205,6 @@ const createChannelChatMessageSubscription = async (selfId, channelId) => create
 const createWhisperMessageSubscription = async (selfId) => createSubscription({
 	selfId,
 	subscription: "user.whisper.message",
-	version: "1"
-});
-
-const createChannelBanSubscription = async (channelId) => createSubscription({
-	channelId,
-	subscription: "channel.ban",
 	version: "1"
 });
 
@@ -403,7 +397,6 @@ module.exports = {
 	getConduitId,
 	getAppAccessToken,
 	assignWebsocketToConduit,
-	createChannelBanSubscription,
 	createChannelChatMessageSubscription,
 	createWhisperMessageSubscription,
 	createChannelSubSubscription,
