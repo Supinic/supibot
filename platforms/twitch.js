@@ -118,7 +118,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 			console.log("Whisper sub created");
 
-			const batchSize = 100;
+			const batchSize = 10;
 			const channelList = sb.Channel.getJoinableForPlatform(this);
 			for (let index = 0; index < channelList.length; index += batchSize) {
 				console.log("Creating subs", index, index + 100);
