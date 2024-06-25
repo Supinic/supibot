@@ -468,7 +468,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	async handleMessage (event) {
 		const {
 			broadcaster_user_login: channelName,
-			// broadcaster_user_id: channelId, // currently unused
+			broadcaster_user_id: channelId,
 			chatter_user_login: senderUsername,
 			chatter_user_id: senderUserId,
 			/** @type {TwitchBadge[]} */
@@ -570,7 +570,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			return;
 		}
 
-		const channelData = sb.Channel.get(channelName, this);
+		const channelData = sb.Channel.get(channelName, this) ?? sb.Channel.getBySpecificId(channelId, this);
 		if (!channelData || channelData.Mode === "Inactive") {
 			return;
 		}
