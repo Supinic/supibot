@@ -30,6 +30,21 @@ module.exports = {
 
 		// Huge assumption: Jagex will release new articles on "top" of the JSON feed
 		const previousArticleIndex = newsItems.findIndex(i => i.newsId === previousArticleId);
+
+		// Ignore if no previous article found - save the latest one
+		if (previousArticleIndex === -1) {
+			const topArticleId = newsItems[0].findId;
+			await sb.Cache.setByPrefix(OSRS_LATEST_ARTICLE_ID, topArticleId, {
+				expiry: 14 * 864e5 // 14 days
+			});
+
+			return;
+		}
+		// Ignore if feed head equals to the latest article (no new articles)
+		else if (previousArticleIndex === 0) {
+			return;
+		}
+
 		const eligibleArticles = (previousArticleIndex === -1)
 			? newsItems
 			: newsItems.slice(0, previousArticleId);
