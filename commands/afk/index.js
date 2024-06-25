@@ -38,7 +38,7 @@ module.exports = {
 
 		await sb.AwayFromKeyboard.set(context.user, {
 			Text: sb.Utils.wrapString(text, STATUS_LENGTH_CHARACTER_LIMIT, { keepWhitespace: false }),
-			Status: target.type ?? invocation,
+			Status: target.name ?? invocation,
 			Silent: false,
 			Interrupted_ID: null
 		});

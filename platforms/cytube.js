@@ -215,10 +215,6 @@ class CytubeClient {
 				return;
 			}
 
-			if (this.platform.logging.videoRequests) {
-				await sb.Logger.logVideoRequest(media.id, media.type, media.seconds, userData, this.channelData);
-			}
-
 			this.playlistData.push({
 				media,
 				user: who,
@@ -472,7 +468,6 @@ class CytubeClient {
 }
 
 const DEFAULT_LOGGING_CONFIG = {
-	videoRequests: true,
 	whispers: true,
 	messages: true
 };

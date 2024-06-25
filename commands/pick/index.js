@@ -6,7 +6,7 @@ module.exports = {
 	Description: "Picks a single word from the provided list of words in a message.",
 	Flags: ["mention","pipe"],
 	Params: [
-		{ name: "delimiter", type: "string" }
+		{ name: "delimiter", type: "regex" }
 	],
 	Whitelist_Response: null,
 	Code: (async function pick (context, ...words) {
@@ -16,9 +16,7 @@ module.exports = {
 			};
 		}
 
-		const splitRegex = (context.params.delimiter)
-			? new RegExp(sb.Utils.escapeRegExp(context.params.delimiter))
-			: /\s+/;
+		const splitRegex = context.params.delimiter ?? /\s+/;
 
 		// normalize input - there might be arguments with other or multiple whitespace inside them
 		const prepared = words.join(" ").split(splitRegex).filter(Boolean);

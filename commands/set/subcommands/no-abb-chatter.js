@@ -4,6 +4,9 @@ module.exports = {
 	parameter: "arguments",
 	description: `Removes you as a possible target for the "$abb chatter" command.`,
 	pipe: true,
+	flags: {
+		pipe: false
+	},
 	set: async (context) => {
 		const row = await sb.Query.getRow("chat_data", "User_Alias_Data");
 		await row.load({
