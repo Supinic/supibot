@@ -664,7 +664,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		if (reply) {
 			// The extra length of 2 signifies one for the "@" symbol at the start of the user mention, and the other
 			// is for the space character which separates the mention from the message.
-			const remainder = messageData.slice(reply.parent_user_login.length + 2);
+			const remainder = targetMessage.slice(reply.parent_user_login.length + 2);
 			const parentMessage = reply.parent_message_body;
 			targetMessage = `${remainder} ${parentMessage}`;
 		}
