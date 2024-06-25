@@ -355,71 +355,10 @@ module.exports = {
 						reply: `Adding me back to recently renamed channels is only available on Twitch!`
 					};
 				}
-
-				const platform = sb.Platform.get("twitch");
-				if (channelData.Name === context.user.Name) {
-					return {
-						success: false,
-						reply: `Use the previous username you renamed from, instead of your current one!`
-					};
-				}
-
-				const checkChannel = sb.Channel.get(context.user.Name);
-				if (checkChannel && checkChannel.Mode !== "Inactive" && checkChannel.Specific_ID === channelData.Specific_ID) {
-					const emote = await context.getBestAvailableEmote(["Okayga", "supiniOkay", "FeelsOkayMan"], "🙂");
-					return {
-						success: false,
-						reply: `I'm already active in your channel! No need to run this command ${emote}`
-					};
-				}
-
-				const result = await platform.executeChannelRename(channelData);
-				if (result.success === true) {
-					if (result.joinFailed) {
-						return {
-							reply: sb.Utils.tag.trim `
-								Successfully ${result.action}d: ${channelData.Name} => ${result.data.login}.
-								But, joining it might have failed due to Twitch.
-								Please check if I respond to commands there 🙊
-							`
-						};
-					}
-					else {
-						return {
-							reply: `Successfully ${result.action}d: ${channelData.Name} => ${result.data.login}.`
-						};
-					}
-				}
 				else {
-					let reply;
-					switch (result.reason) {
-						case "no-channel-exists":
-							reply = "No such channel exists on Twitch!";
-							break;
-
-						case "channel-suspended":
-							reply = "That channel is currently suspended!";
-							break;
-
-						case "no-rename":
-							reply = "That channel has not renamed recently!";
-							break;
-
-						case "channel-id-mismatch":
-							reply = sb.Utils.tag.trim `
-								There is a user ID mismatch between original and renamed channels!
-								${channelData.Twitch_ID} ≠ ${result.data.id}
-							`;
-							break;
-
-						case "no-action":
-						default:
-							reply = "No action was executed! Please contact @Supinic about this";
-					}
-
 					return {
 						success: false,
-						reply
+						reply: `Ideally, you should never need to do this anymore! 😊`
 					};
 				}
 			}
