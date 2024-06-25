@@ -43,7 +43,7 @@ module.exports = {
 
 		/** @type {TwitchPlatform} */
 		const platform = context.platform;
-		const badges = context.append.userBadges.map(i => i.set_id);
+		const badges = context.append.badges.map(i => i.set_id);
 
 		let timeoutMode;
 		if (context.channel.Mode !== "Moderator") {
