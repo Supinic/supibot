@@ -1,65 +1,3 @@
-const partOrJoin = async (type, url) => {
-	const platformData = sb.Platform.get(url.searchParams.get("platform") ?? "twitch");
-	const channels = url.searchParams.getAll("channel");
-	const channelsData = [];
-	const announcement = url.searchParams.get("announcement") ?? null;
-
-	if (announcement && channels.length > 1) {
-		return {
-			statusCode: 400,
-			error: { message: `Cannot use announcement when more than 1 channel is specified` }
-		};
-	}
-
-	for (const channel of channels) {
-		const channelData = sb.Channel.get(channel, platformData);
-		if (!channelData) {
-			return {
-				statusCode: 404,
-				error: { message: `Channel "${channel}" not found` }
-			};
-		}
-		else if (channelData.Platform.Name !== "twitch") {
-			return {
-				statusCode: 400,
-				error: { message: `Cannot part non-Twitch channel "${channel}"` }
-			};
-		}
-
-		const joined = channelData.sessionData?.joined ?? true;
-		if (joined === true && type === "join") {
-			return {
-				statusCode: 400,
-				error: { message: `Cannot join channel "${channel}" - already joined` }
-			};
-		}
-		else if (joined === false && type === "part") {
-			return {
-				statusCode: 400,
-				error: { message: `Cannot part channel "${channel}" - already parted` }
-			};
-		}
-
-		channelsData.push(channelData);
-	}
-
-	for (const channelData of channelsData) {
-		if (type === "join") {
-			platformData.client.join(channelData.Name);
-			setTimeout(() => channelData.send(announcement), 1000);
-		}
-		else if (type === "part") {
-			await channelData.send(announcement);
-			platformData.client.part(channelData.Name);
-		}
-	}
-
-	return {
-		statusCode: 200,
-		data: { message: "OK" }
-	};
-};
-
 // noinspection JSUnusedGlobalSymbols
 module.exports = {
 	reloadAll: async () => {
@@ -104,12 +42,11 @@ module.exports = {
 			};
 		}
 
-		await sb.Channel.add(channelName, platformData, botChannelMode, channelID);
-		await platformData.client.join(channelName);
+		const newChannelData = await sb.Channel.add(channelName, platformData, botChannelMode, channelID);
+		await Promise.all(platformData.joinChannels([newChannelData]));
 
 		if (announcement) {
-			const channelData = sb.Channel.get(channelName, platformData);
-			await channelData.send(announcement);
+			await newChannelData.send(announcement);
 		}
 
 		return {
@@ -117,8 +54,6 @@ module.exports = {
 			data: { message: "Channel joined succesfully" }
 		};
 	},
-	join: async (req, res, url) => await partOrJoin("join", url),
-	part: async (req, res, url) => await partOrJoin("part", url),
 	stats: async () => {
 		let total = 0;
 		const platformStats = {};

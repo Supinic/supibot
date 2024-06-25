@@ -117,15 +117,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		if (!options.skipSubscriptions) {
 			const channelList = sb.Channel.getJoinableForPlatform(this);
-			const joinPromises = channelList.flatMap(async (channelData) => [
-				createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID),
-				createChannelBanSubscription(channelData.Specific_ID),
-				createChannelSubSubscription(channelData.Specific_ID),
-				createChannelResubSubscription(channelData.Specific_ID),
-				createChannelRaidSubscription(channelData.Specific_ID),
-				createChannelOnlineSubscription(channelData.Specific_ID),
-				createChannelOfflineSubscription(channelData.Specific_ID)
-			]);
+			const joinPromises = this.joinChannels(channelList);
 
 			await Promise.all([
 				...joinPromises,
@@ -1409,6 +1401,18 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		};
 	}
 
+	async joinChannels (channelsData) {
+		return channelsData.flatMap(async channelData => [
+			createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID),
+			createChannelBanSubscription(channelData.Specific_ID),
+			createChannelSubSubscription(channelData.Specific_ID),
+			createChannelResubSubscription(channelData.Specific_ID),
+			createChannelRaidSubscription(channelData.Specific_ID),
+			createChannelOnlineSubscription(channelData.Specific_ID),
+			createChannelOfflineSubscription(channelData.Specific_ID)
+		]);
+	}
+
 	async #checkAuthToken () {
 		const now = sb.Date.now();
 		const expiration = sb.Config.get("TWITCH_OAUTH_EXPIRATION", false);
@@ -1475,8 +1479,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	get websocketLatency () { return this.#websocketLatency; }
 
 	destroy () {
-		this.client.removeAllListeners();
-		this.client.disconnect();
+		this.client.terminate();
 		this.client = null;
 	}
 };
