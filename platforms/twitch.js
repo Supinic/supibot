@@ -1257,7 +1257,11 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		return response.body.data[0].login;
 	}
 
-	async joinChannels (channelsData) {
+	joinChannels (channelsData) {
+		if (!Array.isArray(channelsData)) {
+			channelsData = [channelsData];
+		}
+
 		return channelsData.flatMap(async channelData => [
 			createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID),
 			createChannelBanSubscription(channelData.Specific_ID),
