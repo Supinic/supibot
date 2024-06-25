@@ -224,8 +224,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				break;
 			}
 
-			case "channel.online":
-			case "channel.offline": {
+			case "stream.online":
+			case "stream.offline": {
 				await this.handleStreamLiveChange(event, subscription.type);
 				break;
 			}
