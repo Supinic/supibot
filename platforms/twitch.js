@@ -1228,15 +1228,20 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			channelsData = [channelsData];
 		}
 
-		return channelsData.flatMap(async channelData => [
-			createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID),
-			// createChannelBanSubscription(channelData.Specific_ID),
-			// createChannelSubSubscription(channelData.Specific_ID),
-			// createChannelResubSubscription(channelData.Specific_ID),
-			createChannelRaidSubscription(channelData.Specific_ID),
-			createChannelOnlineSubscription(channelData.Specific_ID),
-			createChannelOfflineSubscription(channelData.Specific_ID)
-		]);
+		const promises = [];
+		for (const channelData of channelsData) {
+			promises.push(
+				createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID),
+				// createChannelBanSubscription(channelData.Specific_ID),
+				// createChannelSubSubscription(channelData.Specific_ID),
+				// createChannelResubSubscription(channelData.Specific_ID),
+				createChannelRaidSubscription(channelData.Specific_ID),
+				createChannelOnlineSubscription(channelData.Specific_ID),
+				createChannelOfflineSubscription(channelData.Specific_ID)
+			);
+		}
+
+		return promises;
 	}
 
 	async #checkAuthToken () {
