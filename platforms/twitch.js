@@ -106,16 +106,22 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	async connect (options = {}) {
+		console.log("Getting app token");
 		await getAppAccessToken();
+		console.log("Getting conduit id");
 		await getConduitId();
 
+		console.log("Creating ws");
 		const ws = new WebSocket(options.url ?? TWITCH_WEBSOCKET_URL);
 		ws.on("message", (data) => this.handleWebsocketMessage(data));
 
 		this.client = ws;
 
 		if (!options.skipSubscriptions) {
+			console.log("Getting existing subs")
 			const existingSubs = await fetchExistingSubscriptions();
+			console.log("Existing subs", { existingSubs });
+
 			const existingWhisperSub = existingSubs.some(i => i.type === "user.whisper.message");
 
 			if (!existingWhisperSub) {
@@ -1240,7 +1246,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		const promises = [];
 		for (const channelData of channelsData) {
 			promises.push(
-				createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID),
+				createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID, this)
 				// createChannelBanSubscription(channelData.Specific_ID),
 				// createChannelSubSubscription(channelData.Specific_ID),
 				// createChannelResubSubscription(channelData.Specific_ID),

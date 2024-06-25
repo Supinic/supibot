@@ -197,7 +197,7 @@ const createSubscription = async (data = {}) => {
 	return { response };
 };
 
-const createChannelChatMessageSubscription = async (selfId, channelId) => {
+const createChannelChatMessageSubscription = async (selfId, channelId, platform) => {
 	const { response } = await createSubscription({
 		channelId,
 		selfId,
@@ -207,7 +207,7 @@ const createChannelChatMessageSubscription = async (selfId, channelId) => {
 
 	if (!response.ok && response.statusCode === 403) {
 		/** @type {Channel} */
-		const channelData = sb.Channel.getBySpecificId(channelId);
+		const channelData = sb.Channel.getBySpecificId(channelId, platform);
 		await Promise.all([
 			channelData.saveProperty("Mode", "Inactive"),
 			channelData.setDataProperty("twitchNoScopeDisabled", true)
