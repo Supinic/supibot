@@ -367,86 +367,6 @@ const getActiveUsernamesInChannel = async (channelData) => {
 	return prefixes.map(i => i.replace(prefix, ""));
 };
 
-const populateChannelsLiveStatus = async () => {
-	let counter = 0;
-	const promises = [];
-	const batchSize = 100;
-	const rawChannelList = await sb.Channel.getLiveEventSubscribedChannels("twitch");
-	const channelList = rawChannelList.filter(i => i.Specific_ID);
-
-	while (counter < channelList.length) {
-		const sliceString = channelList
-			.slice(counter, counter + batchSize)
-			.map(i => `user_id=${i.Specific_ID}`)
-			.join("&");
-
-		promises.push(sb.Got("Helix", {
-			url: `streams?${sliceString}`,
-			responseType: "json"
-		}));
-
-		counter += batchSize;
-	}
-
-	const streams = [];
-	const results = await Promise.all(promises);
-	for (const partialResult of results) {
-		const streamsBlock = partialResult.body?.data ?? [];
-		streams.push(...streamsBlock);
-	}
-
-	const channelPromises = channelList.map(async (channelData) => {
-		const stream = streams.find(i => channelData.Specific_ID === String(i.user_id));
-		const streamData = await channelData.getStreamData();
-
-		if (!stream) {
-			if (streamData.live === true) {
-				channelData.events.emit("offline", {
-					event: "offline",
-					channel: channelData
-				});
-			}
-
-			channelData.events.emit("offline-passthrough", {
-				event: "offline-passthrough",
-				channel: channelData
-			});
-
-			streamData.live = false;
-			streamData.stream = {};
-		}
-		else {
-			const currentStreamData = {
-				game: stream.game_name,
-				since: new sb.Date(stream.started_at),
-				status: stream.title,
-				viewers: stream.viewer_count
-			};
-
-			if (!streamData.live) {
-				channelData.events.emit("online", {
-					event: "online",
-					stream: currentStreamData.stream,
-					channel: channelData
-				});
-			}
-
-			channelData.events.emit("online-passthrough", {
-				event: "online-passthrough",
-				stream: currentStreamData.stream,
-				channel: channelData
-			});
-
-			streamData.live = true;
-			streamData.stream = currentStreamData;
-		}
-
-		await channelData.setStreamData(streamData);
-	});
-
-	await Promise.all(channelPromises);
-};
-
 module.exports = {
 	getConduitId,
 	getAppAccessToken,
@@ -461,7 +381,6 @@ module.exports = {
 	createChannelOfflineSubscription,
 	fetchToken,
 	emitRawUserMessageEvent,
-	populateChannelsLiveStatus,
 	getActiveUsernamesInChannel,
 	populateUserChannelActivity
 };
