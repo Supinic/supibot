@@ -915,33 +915,19 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	async getUserID (user) {
-		const userData = await sb.User.get(user, true);
-		if (userData?.Twitch_ID) {
-			return userData.Twitch_ID;
-		}
-
-		const channelInfo = await sb.Got("Helix", {
+		const response = await sb.Got("Helix", {
 			url: "users",
 			throwHttpErrors: false,
 			searchParams: {
 				login: user
 			}
-		})
-			.json();
+		});
 
-		if (!channelInfo.error && channelInfo.data.length !== 0) {
-			const {
-				id,
-				display_name: name
-			} = channelInfo.data[0];
-			if (!userData) {
-				await sb.User.get(name, false, { Twitch_ID: id });
-			}
-
-			return id;
+		if (!response.ok) {
+			return null;
 		}
 
-		return null;
+		return response.body.data[0].id;
 	}
 
 	async createUserMention (userData) {
