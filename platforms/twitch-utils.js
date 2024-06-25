@@ -212,8 +212,6 @@ const createChannelChatMessageSubscription = async (selfId, channelId, platform)
 			channelData.saveProperty("Mode", "Inactive"),
 			channelData.setDataProperty("twitchNoScopeDisabled", true)
 		]);
-
-		console.log(`Set ${channelData.Name} to Inactive`);
 	}
 };
 
