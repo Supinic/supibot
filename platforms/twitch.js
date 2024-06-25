@@ -23,9 +23,9 @@ const {
 const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
 const WRITE_MODE_MESSAGE_DELAY = 1500;
+const NO_EVENT_RECONNECT_TIMEOUT = 5000;
 const LIVE_STREAMS_KEY = "twitch-live-streams";
 const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
-const NO_EVENT_RECONNECT_TIMEOUT = 30_000;
 
 const DEFAULT_LOGGING_CONFIG = {
 	bits: false,
@@ -76,11 +76,11 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	dynamicChannelAddition = true;
 
 	#tokenCheckInterval = setInterval(() => this.#checkAuthToken(), 60_000);
-	#lastWebsocketKeepaliveMessage = 0;
+	#reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000);
+
 	#websocketLatency = null;
 	#previousMessageMeta = new Map();
 	#userCommandSpamPrevention = new Map();
-	#reconnectTimeout;
 
 	constructor (config) {
 		super("twitch", config, {
@@ -142,15 +142,11 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				await channelData.send(string);
 			}
 		}
-
-		this.#resetReconnectTimeout();
 	}
 
 	async handleWebsocketMessage (data) {
 		const event = JSON.parse(data);
 		const { metadata, payload } = event;
-
-		this.#resetReconnectTimeout();
 
 		switch (metadata.message_type) {
 			case "session_welcome": {
@@ -182,12 +178,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			}
 
 			case "session_keepalive": {
-				const now = sb.Date.now();
-				const keepAliveNow = new sb.Date(metadata.message_timestamp).valueOf();
-
-				this.#websocketLatency = now - keepAliveNow;
-				this.#lastWebsocketKeepaliveMessage = sb.Date.now();
-
 				break;
 			}
 
@@ -1270,12 +1260,22 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		}
 	}
 
-	#resetReconnectTimeout () {
-		clearTimeout(this.#reconnectTimeout);
-		this.#reconnectTimeout = setTimeout(() => {
+	#pingWebsocket () {
+		const reconnectTimeout = setTimeout(() => {
+			console.warn(`No ping received in ${NO_EVENT_RECONNECT_TIMEOUT}ms, reconnecting...`);
 			this.client.close();
 			this.connect({ skipSubscriptions: true });
 		}, NO_EVENT_RECONNECT_TIMEOUT);
+
+		const start = new sb.Date();
+		this.client.once("pong", () => {
+			clearTimeout(reconnectTimeout);
+
+			const end = new sb.Date();
+			this.#websocketLatency = end - start;
+		});
+
+		this.client.ping();
 	}
 
 	static async fetchAccountChallengeStatus (userData, twitchID) {
