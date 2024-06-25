@@ -206,6 +206,18 @@ const createChannelRaidSubscription = async (channelId) => createSubscription({
 	version: "1"
 });
 
+const createChannelOnlineSubscription = async (channelId) => createSubscription({
+	channelId,
+	subscription: "stream.online",
+	version: "1"
+});
+
+const createChannelOfflineSubscription = async (channelId) => createSubscription({
+	channelId,
+	subscription: "stream.offline",
+	version: "1"
+});
+
 const fetchToken = async () => {
 	if (!sb.Config.has("TWITCH_REFRESH_TOKEN", true)) {
 		throw new sb.Error({
@@ -367,6 +379,8 @@ module.exports = {
 	createChannelSubSubscription,
 	createChannelResubSubscription,
 	createChannelRaidSubscription,
+	createChannelOnlineSubscription,
+	createChannelOfflineSubscription,
 	fetchToken,
 	emitRawUserMessageEvent,
 	populateChannelsLiveStatus,

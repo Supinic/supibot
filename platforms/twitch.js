@@ -1,4 +1,3 @@
-const { CronJob } = require("cron");
 const WebSocket = require("ws");
 
 const {
@@ -9,9 +8,10 @@ const {
 	createChannelSubSubscription,
 	createChannelResubSubscription,
 	createChannelRaidSubscription,
+	createChannelOnlineSubscription,
+	createChannelOfflineSubscription,
 	fetchToken,
 	emitRawUserMessageEvent,
-	populateChannelsLiveStatus,
 	getActiveUsernamesInChannel,
 	populateUserChannelActivity
 } = require("./twitch-utils.js");
@@ -21,6 +21,7 @@ const {
 const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
 const WRITE_MODE_MESSAGE_DELAY = 1500;
+const LIVE_STREAMS_KEY = "twitch-live-streams";
 
 const DEFAULT_LOGGING_CONFIG = {
 	bans: false,
@@ -71,9 +72,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	supportsMeAction = true;
 	dynamicChannelAddition = true;
 
-	// @todo remove this cron and replace with offline/online EventSub handlers
-	#channelLiveStatusCron = new CronJob("0 */1 * * * *", () => populateChannelsLiveStatus());
-
 	#tokenCheckInterval = setInterval(() => this.#checkAuthToken(), 60_000);
 	#lastWebsocketKeepaliveMessage = 0;
 	#websocketLatency = null;
@@ -115,7 +113,9 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			createChannelBanSubscription(channelData.Specific_ID),
 			createChannelSubSubscription(channelData.Specific_ID),
 			createChannelResubSubscription(channelData.Specific_ID),
-			createChannelRaidSubscription(channelData.Specific_ID)
+			createChannelRaidSubscription(channelData.Specific_ID),
+			createChannelOnlineSubscription(channelData.Specific_ID),
+			createChannelOfflineSubscription(channelData.Specific_ID)
 		]);
 
 		await Promise.all([
@@ -202,6 +202,12 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 			case "channel.raid": {
 				await this.handleRaid(event);
+				break;
+			}
+
+			case "channel.online":
+			case "channel.offline": {
+				await this.handleStreamLiveChange(event, subscription.type);
 				break;
 			}
 
@@ -819,6 +825,34 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		}
 	}
 
+	async handleStreamLiveChange (event, type) {
+		const channelId = event.broadcaster_user_id;
+		const channelData = sb.Channel.get(channelId);
+		if (!channelData) {
+			return;
+		}
+
+		if (type === "channel.online") {
+			channelData.events.emit("offline", {
+				event: "online",
+				channel: channelData
+			});
+
+			const existing = await this.getLiveChannelIdList();
+			if (!existing.includes(channelId)) {
+				await sb.Cache.server.lpush(LIVE_STREAMS_KEY, channelId);
+			}
+		}
+		else {
+			channelData.events.emit("offline", {
+				event: "offline",
+				channel: channelData
+			});
+
+			await sb.Cache.server.lrem(LIVE_STREAMS_KEY, 1, channelId);
+		}
+	}
+
 	/**
 	 * Handles a command being used.
 	 * @param {string} command
@@ -940,6 +974,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		}
 
 		return subscriberList.some(i => i.user_id === userData.Twitch_ID);
+	}
+
+	async getLiveChannelIdList () {
+		return await sb.Cache.server.lrange(LIVE_STREAMS_KEY, 0, -1);
 	}
 
 	/**
