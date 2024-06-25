@@ -198,7 +198,7 @@ const createSubscription = async (data = {}) => {
 };
 
 const createChannelChatMessageSubscription = async (selfId, channelId) => {
-	const response = await createSubscription({
+	const { response } = await createSubscription({
 		channelId,
 		selfId,
 		subscription: "channel.chat.message",
@@ -254,6 +254,47 @@ const createChannelOfflineSubscription = (channelId) => createSubscription({
 	subscription: "stream.offline",
 	version: "1"
 });
+
+const fetchExistingSubscriptions = async () => {
+	const accessToken = await getAppAccessToken();
+	const response = await sb.Got("GenericAPI", {
+		url: "https://api.twitch.tv/helix/eventsub/subscriptions",
+		method: "GET",
+		responseType: "json",
+		throwHttpErrors: false,
+		headers: {
+			Authorization: `Bearer ${accessToken}`,
+			"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+		},
+		searchParams: {
+			status: "enabled"
+		}
+	});
+
+	const result = [...response.body.data];
+	let cursor = response.body.pagination?.cursor ?? null;
+	while (cursor) {
+		const loopResponse = await sb.Got("GenericAPI", {
+			url: "https://api.twitch.tv/helix/eventsub/subscriptions",
+			method: "GET",
+			responseType: "json",
+			throwHttpErrors: false,
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+			},
+			searchParams: {
+				status: "enabled",
+				after: cursor
+			}
+		});
+
+		result.push(...response.body.data);
+		cursor = loopResponse.body.pagination?.cursor ?? null;
+	}
+
+	return result;
+};
 
 const fetchToken = async () => {
 	if (!sb.Config.has("TWITCH_REFRESH_TOKEN", true)) {
@@ -412,6 +453,7 @@ module.exports = {
 	getConduitId,
 	getAppAccessToken,
 	assignWebsocketToConduit,
+	fetchExistingSubscriptions,
 	createChannelChatMessageSubscription,
 	createWhisperMessageSubscription,
 	createChannelSubSubscription,

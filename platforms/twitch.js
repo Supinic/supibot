@@ -4,11 +4,12 @@ const {
 	assignWebsocketToConduit,
 	createChannelChatMessageSubscription,
 	createWhisperMessageSubscription,
-	createChannelSubSubscription,
-	createChannelResubSubscription,
+	// createChannelSubSubscription,
+	// createChannelResubSubscription,
 	createChannelRaidSubscription,
 	createChannelOnlineSubscription,
 	createChannelOfflineSubscription,
+	fetchExistingSubscriptions,
 	fetchToken,
 	getConduitId,
 	getAppAccessToken,
@@ -114,16 +115,24 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		this.client = ws;
 
 		if (!options.skipSubscriptions) {
-			await createWhisperMessageSubscription(this.selfId);
+			const existingSubs = await fetchExistingSubscriptions();
+			const existingWhisperSub = existingSubs.some(i => i.type === "user.whisper.message");
 
-			console.log("Whisper sub created");
+			if (!existingWhisperSub) {
+				console.log("Whisper sub created");
+				await createWhisperMessageSubscription(this.selfId);
+			}
+
+			const existingChannels = existingSubs.filter(i => i.type === "channel.chat.message").map(i => i.condition.broadcaster_user_id);
+			const channelList = sb.Channel.getJoinableForPlatform(this);
+			const missingChannels = channelList.filter(i => !existingChannels.includes(i.Specific_ID));
 
 			const batchSize = 10;
-			const channelList = sb.Channel.getJoinableForPlatform(this);
-			for (let index = 0; index < channelList.length; index += batchSize) {
+			console.log(`Creating ${missingChannels.length} subs`);
+			for (let index = 0; index < missingChannels.length; index += batchSize) {
 				console.log("Creating subs", index, index + batchSize);
 
-				const slice = channelList.slice(index, index + batchSize);
+				const slice = missingChannels.slice(index, index + batchSize);
 				const joinPromises = this.joinChannels(slice);
 
 				await Promise.allSettled(joinPromises);
@@ -1235,9 +1244,9 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				// createChannelBanSubscription(channelData.Specific_ID),
 				// createChannelSubSubscription(channelData.Specific_ID),
 				// createChannelResubSubscription(channelData.Specific_ID),
-				createChannelRaidSubscription(channelData.Specific_ID),
-				createChannelOnlineSubscription(channelData.Specific_ID),
-				createChannelOfflineSubscription(channelData.Specific_ID)
+				// createChannelRaidSubscription(channelData.Specific_ID),
+				// createChannelOnlineSubscription(channelData.Specific_ID),
+				// createChannelOfflineSubscription(channelData.Specific_ID)
 			);
 		}
 
