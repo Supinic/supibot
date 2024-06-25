@@ -2,7 +2,6 @@ const WebSocket = require("ws");
 
 const {
 	assignWebsocketToConduit,
-	createChannelBanSubscription,
 	createChannelChatMessageSubscription,
 	createWhisperMessageSubscription,
 	createChannelSubSubscription,
