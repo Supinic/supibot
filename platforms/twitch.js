@@ -11,6 +11,8 @@ const {
 	createChannelOnlineSubscription,
 	createChannelOfflineSubscription,
 	fetchToken,
+	getConduitId,
+	getAppAccessToken,
 	emitRawUserMessageEvent,
 	getActiveUsernamesInChannel,
 	populateUserChannelActivity
@@ -102,6 +104,9 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	async connect () {
+		await getAppAccessToken();
+		await getConduitId();
+
 		const ws = new WebSocket("wss://eventsub.wss.twitch.tv/ws");
 		ws.on("message", (data) => this.handleWebsocketMessage(data));
 

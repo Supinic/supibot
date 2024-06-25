@@ -33,13 +33,41 @@ const getAppAccessToken = async () => {
 	return token;
 };
 
+let conduitValidated = false;
 const getConduitId = async () => {
+	const appToken = await getAppAccessToken();
 	const cacheId = await sb.Cache.getByPrefix(CONDUIT_ID_KEY);
 	if (cacheId) {
-		return cacheId;
+		if (conduitValidated) {
+			return cacheId;
+		}
+
+		const response = await sb.Got("GenericAPI", {
+			url: "https://api.twitch.tv/helix/eventsub/conduits",
+			method: "GET",
+			responseType: "json",
+			throwHttpErrors: false,
+			headers: {
+				Authorization: `Bearer ${appToken}`,
+				"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+			}
+		});
+
+		if (response.ok) {
+			const conduitList = response.body.data.map(i => i.id);
+			if (conduitList.includes(cacheId)) {
+				conduitValidated = true;
+				return cacheId;
+			}
+			else {
+				console.log("No valid conduit found, re-making...");
+			}
+		}
+		else {
+			console.log("Could not check for conduit validity, re-making...");
+		}
 	}
 
-	const appToken = await getAppAccessToken();
 	const response = await sb.Got("GenericAPI", {
 		url: "https://api.twitch.tv/helix/eventsub/conduits",
 		method: "POST",
@@ -372,6 +400,8 @@ const populateChannelsLiveStatus = async () => {
 };
 
 module.exports = {
+	getConduitId,
+	getAppAccessToken,
 	assignWebsocketToConduit,
 	createChannelBanSubscription,
 	createChannelChatMessageSubscription,
