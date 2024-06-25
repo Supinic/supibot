@@ -1,5 +1,5 @@
 {
-  "cannotTimeoutBadges": ["hasModerator", "hasBroadcaster", "hasStaff", "hasAdmin"],
+  "cannotTimeoutBadges": ["moderator", "broadcaster", "staff"],
   "outcomes": {
     "blank": [
       "Bang! The timeout bullet was a blank. It's not very effective.",

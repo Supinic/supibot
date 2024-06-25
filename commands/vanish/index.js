@@ -26,29 +26,25 @@ module.exports = {
 				reply: "I cannot make you vanish here, as I'm not a moderator!"
 			};
 		}
-		else if (context.append.userBadges.hasModerator) {
+
+		const badges = context.append.userBadges.map(i => i.set_id);
+		if (badges.includes("moderator")) {
 			return {
 				success: false,
 				reply: "I cannot time moderators out! monkaS"
 			};
 		}
-		else if (context.append.userBadges.hasBroadcaster) {
+		else if (badges.includes("broadcaster")) {
 			const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "LuL"], "😄");
 			return {
 				success: false,
 				reply: `Why are you trying to vanish in your own channel? ${emote}`
 			};
 		}
-		else if (context.append.userBadges.hasStaff) {
+		else if (badges.includes("staff")) {
 			return {
 				success: false,
 				reply: "I cannot time Twitch staff out! monkaS"
-			};
-		}
-		else if (context.append.userBadges.hasAdmin) {
-			return {
-				success: false,
-				reply: "I cannot time Twitch administrators out! monkaS"
 			};
 		}
 
