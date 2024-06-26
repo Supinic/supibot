@@ -81,5 +81,5 @@ module.exports = [
 		},
 		set: async (context) => await setChannelFlag(context, "twitterNSFW", true),
 		unset: async (context) => await setChannelFlag(context,"twitterNSFW", false)
-	},
+	}
 ];
