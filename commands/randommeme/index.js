@@ -92,7 +92,14 @@ module.exports = {
 
 		if (forum.posts.length === 0 || sb.Date.now() > forum.expiration) {
 			const { statusCode, body } = await redditGot(`${subreddit}/hot.json`);
-			if (statusCode !== 200) {
+
+			if (statusCode === 403) {
+				return {
+					success: false,
+					reply: `Reddit is currently overloaded! Try again later.`
+				};
+			}
+			else if (statusCode !== 200) {
 				throw new sb.Error.GenericRequest({
 					statusCode,
 					hostname: "reddit.com",
