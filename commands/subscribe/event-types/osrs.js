@@ -54,6 +54,11 @@ module.exports = {
 			expiry: 14 * 864e5 // 14 days
 		});
 
+		// Safeguard for accidental multi-article notification
+		if (eligibleArticles.length > 3) {
+			return;
+		}
+
 		const articleString = eligibleArticles.map(i => `${i.title} ${i.link}`).join(" -- ");
 		const noun = (eligibleArticles.length === 0) ? "article" : "articles";
 		return {
