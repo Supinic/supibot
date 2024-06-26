@@ -25,7 +25,7 @@ module.exports = {
 			return;
 		}
 
-		const { newsItems } = response.body;
+		const newsItems = response.body.newsItems.filter(i => i.sticky === false);
 		const previousArticleId = await sb.Cache.getByPrefix(OSRS_LATEST_ARTICLE_ID) ?? 0;
 
 		// Huge assumption: Jagex will release new articles on "top" of the JSON feed
