@@ -402,6 +402,8 @@ const initSubCacheCheckInterval = () => {
 	setInterval(async () => await getExistingSubscriptions(true), SUBSCRIPTIONS_CACHE_INTERVAL / 2);
 };
 
+const sanitizeMessage = (string) => string.replace(/^\x01ACTION (.+)\x01$/, "$1");
+
 module.exports = {
 	getConduitId,
 	getAppAccessToken,
@@ -420,5 +422,6 @@ module.exports = {
 	getActiveUsernamesInChannel,
 	populateUserChannelActivity,
 	initTokenCheckInterval,
-	initSubCacheCheckInterval
+	initSubCacheCheckInterval,
+	sanitizeMessage
 };

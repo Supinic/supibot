@@ -16,7 +16,8 @@ const {
 	getActiveUsernamesInChannel,
 	populateUserChannelActivity,
 	initTokenCheckInterval,
-	initSubCacheCheckInterval
+	initSubCacheCheckInterval,
+	sanitizeMessage
 } = require("./twitch-utils.js");
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
@@ -492,7 +493,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		} = event;
 
 		const messageData = {
-			text: event.message.text,
+			text: sanitizeMessage(event.message.text),
 			/** @type {TwitchMessageFragment[]} */
 			fragments: event.message.fragments,
 			type: event.message_type, // text, channel_points_highlighted, channel_points_sub_only, user_intro, animated, power_ups_gigantified_emote
