@@ -1,5 +1,5 @@
 const RedditPost = require("./post.js");
-const defaultSubredditCacheExpiration = 3_600_000;
+const defaultSubredditCacheExpiration = 2 * 3_600_000;
 
 module.exports = class Subreddit {
 	#name;
