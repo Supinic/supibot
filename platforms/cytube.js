@@ -290,14 +290,7 @@ class CytubeClient {
 		});
 
 		// Disconnect event fired - restart and reconnect
-		client.on("disconnect", (...args) => {
-			console.log("Cytube client disconnected, restarting", {
-				args,
-				channel: this.channelData.Name
-			});
-
-			this.restart();
-		});
+		client.on("disconnect", () => this.restart());
 
 		client.on("error", (err) => {
 			console.warn("Cytube error", {
