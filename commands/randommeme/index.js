@@ -56,7 +56,13 @@ module.exports = {
 		if (!forum) {
 			const { body, statusCode } = await redditGot(`${subreddit}/about.json`);
 
-			if (statusCode !== 200 && statusCode !== 403 && statusCode !== 404) {
+			if (statusCode === 403) {
+				return {
+					success: false,
+					reply: `Reddit is currently overloaded! Try again later.`
+				};
+			}
+			else if (statusCode !== 200 && statusCode !== 404) {
 				throw new sb.Error.GenericRequest({
 					statusCode,
 					hostname: "reddit.com",
