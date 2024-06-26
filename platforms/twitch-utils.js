@@ -1,6 +1,10 @@
 const APP_ACCESS_CACHE_KEY = "twitch-app-access-token";
 const CONDUIT_ID_KEY = "twitch-conduit-id";
 const USER_CHANNEL_ACTIVITY_PREFIX = "twitch-user-activity-";
+const SUBSCRIPTIONS_CACHE_KEY = "twitch-subscriptions";
+const SUBSCRIPTIONS_CACHE_EXPIRY = 120 * 60_000; // 60 minutes
+const SUBSCRIPTIONS_CACHE_INTERVAL = 30 * 60_000; // 30 minutes, 1/4 of sub cache expiry
+const TOKEN_REGENERATE_INTERVAL = 60 * 60_000; // 60 minutes
 
 const getAppAccessToken = async () => {
 	const cacheToken = await sb.Cache.getByPrefix(APP_ACCESS_CACHE_KEY);
@@ -253,6 +257,22 @@ const createChannelOfflineSubscription = (channelId) => createSubscription({
 	version: "1"
 });
 
+const getExistingSubscriptions = async (force = false) => {
+	if (!force) {
+		const cacheData = await sb.Cache.getByPrefix(SUBSCRIPTIONS_CACHE_KEY);
+		if (cacheData) {
+			return cacheData;
+		}
+	}
+
+	const subscriptions = await fetchExistingSubscriptions();
+	await sb.Cache.setByPrefix(SUBSCRIPTIONS_CACHE_KEY, subscriptions, {
+		expiry: SUBSCRIPTIONS_CACHE_EXPIRY
+	});
+
+	return subscriptions;
+};
+
 const fetchExistingSubscriptions = async () => {
 	const accessToken = await getAppAccessToken();
 	const response = await sb.Got("GenericAPI", {
@@ -367,11 +387,27 @@ const getActiveUsernamesInChannel = async (channelData) => {
 	return prefixes.map(i => i.replace(prefix, ""));
 };
 
+const initTokenCheckInterval = async () => {
+	const now = sb.Date.now();
+	const expiration = sb.Config.get("TWITCH_OAUTH_EXPIRATION", false) ?? 0;
+
+	if (now + TOKEN_REGENERATE_INTERVAL >= expiration) {
+		await fetchToken();
+	}
+
+	setInterval(async () => await fetchToken(), TOKEN_REGENERATE_INTERVAL);
+};
+
+const initSubCacheCheckInterval = () => {
+	setInterval(async () => await getExistingSubscriptions(true), SUBSCRIPTIONS_CACHE_INTERVAL / 2);
+};
+
 module.exports = {
 	getConduitId,
 	getAppAccessToken,
 	assignWebsocketToConduit,
 	fetchExistingSubscriptions,
+	getExistingSubscriptions,
 	createChannelChatMessageSubscription,
 	createWhisperMessageSubscription,
 	createChannelSubSubscription,
@@ -382,5 +418,7 @@ module.exports = {
 	fetchToken,
 	emitRawUserMessageEvent,
 	getActiveUsernamesInChannel,
-	populateUserChannelActivity
+	populateUserChannelActivity,
+	initTokenCheckInterval,
+	initSubCacheCheckInterval
 };

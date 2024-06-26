@@ -9,13 +9,14 @@ const {
 	// createChannelRaidSubscription,
 	// createChannelOnlineSubscription,
 	// createChannelOfflineSubscription,
-	fetchExistingSubscriptions,
-	fetchToken,
+	getExistingSubscriptions,
 	getConduitId,
 	getAppAccessToken,
 	emitRawUserMessageEvent,
 	getActiveUsernamesInChannel,
-	populateUserChannelActivity
+	populateUserChannelActivity,
+	initTokenCheckInterval,
+	initSubCacheCheckInterval
 } = require("./twitch-utils.js");
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
@@ -24,7 +25,6 @@ const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
 const WRITE_MODE_MESSAGE_DELAY = 1500;
 const NO_EVENT_RECONNECT_TIMEOUT = 5000;
-const TOKEN_REGENERATE_INTERVAL = 3_600_000; // 60 minutes
 const LIVE_STREAMS_KEY = "twitch-live-streams";
 const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
 
@@ -105,8 +105,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	async connect (options = {}) {
-		await this.#initializeAuthTokenChecker();
-
+		await initTokenCheckInterval();
 		await getAppAccessToken();
 		await getConduitId();
 
@@ -116,9 +115,9 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		this.client = ws;
 
 		if (!options.skipSubscriptions) {
-			const existingSubs = await fetchExistingSubscriptions();
-			const existingWhisperSub = existingSubs.some(i => i.type === "user.whisper.message");
+			const existingSubs = await getExistingSubscriptions(false);
 
+			const existingWhisperSub = existingSubs.some(i => i.type === "user.whisper.message");
 			if (!existingWhisperSub) {
 				await createWhisperMessageSubscription(this.selfId);
 			}
@@ -135,6 +134,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				await Promise.allSettled(joinPromises);
 			}
 		}
+
+		initSubCacheCheckInterval();
 
 		const { channels, string } = this.config.reconnectAnnouncement;
 		for (const channel of channels) {
@@ -1229,17 +1230,6 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		}
 
 		return promises;
-	}
-
-	async #initializeAuthTokenChecker () {
-		const now = sb.Date.now();
-		const expiration = sb.Config.get("TWITCH_OAUTH_EXPIRATION", false) ?? 0;
-
-		if (now + TOKEN_REGENERATE_INTERVAL >= expiration) {
-			await fetchToken();
-		}
-
-		setInterval(async () => await fetchToken(), TOKEN_REGENERATE_INTERVAL);
 	}
 
 	#pingWebsocket () {
