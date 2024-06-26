@@ -24,6 +24,7 @@ const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
 const WRITE_MODE_MESSAGE_DELAY = 1500;
 const NO_EVENT_RECONNECT_TIMEOUT = 5000;
+const TOKEN_REGENERATE_INTERVAL = 3_600_000; // 60 minutes
 const LIVE_STREAMS_KEY = "twitch-live-streams";
 const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
 
@@ -75,9 +76,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	supportsMeAction = true;
 	dynamicChannelAddition = true;
 
-	#tokenCheckInterval = setInterval(() => this.#checkAuthToken(), 60_000);
 	#reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000);
-
 	#websocketLatency = null;
 	#previousMessageMeta = new Map();
 	#userCommandSpamPrevention = new Map();
@@ -106,6 +105,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	async connect (options = {}) {
+		await this.#initializeAuthTokenChecker();
+
 		await getAppAccessToken();
 		await getConduitId();
 
@@ -1230,27 +1231,15 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		return promises;
 	}
 
-	async #checkAuthToken () {
+	async #initializeAuthTokenChecker () {
 		const now = sb.Date.now();
-		const expiration = sb.Config.get("TWITCH_OAUTH_EXPIRATION", false);
+		const expiration = sb.Config.get("TWITCH_OAUTH_EXPIRATION", false) ?? 0;
 
-		let token = sb.Config.get("TWITCH_OAUTH");
-		if (!expiration || now > expiration) {
-			token = await fetchToken();
-		}
-
-		const response = await sb.Got("GenericAPI", {
-			url: "https://id.twitch.tv/oauth2/validate",
-			throwHttpErrors: false,
-			headers: {
-				Authorization: `OAuth ${token}`
-			}
-		});
-
-		if (!response.ok) {
-			console.warn("Invalid token validation response, fetching tokens...");
+		if (now + TOKEN_REGENERATE_INTERVAL >= expiration) {
 			await fetchToken();
 		}
+
+		setInterval(async () => await fetchToken(), TOKEN_REGENERATE_INTERVAL);
 	}
 
 	#pingWebsocket () {
