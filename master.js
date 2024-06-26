@@ -124,8 +124,7 @@ require("./db-access.js");
 	for (let i = 0; i < databaseModuleInitializeOrder.length; i++) {
 		const initOrder = databaseModuleInitializeOrder[i];
 
-		const label = `Batch #${i + 1}: ${initOrder.map(i => i.name)
-			.join(", ")}`;
+		const label = `Batch #${i + 1}: ${initOrder.map(i => i.name).join(", ")}`;
 		console.time(label);
 
 		const promises = initOrder.map(async (module) => await module.initialize());
