@@ -2,6 +2,7 @@ let redditGotInstance;
 const redditGot = (...args) => {
 	redditGotInstance ??= sb.Got.get("GenericAPI").extend({
 		prefixUrl: "https://www.reddit.com/r/",
+		throwHttpErrors: false,
 		headers: {
 			Cookie: "_options={%22pref_quarantine_optin%22:true,%22pref_gated_sr_optin%22:true};"
 		}
