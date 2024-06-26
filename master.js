@@ -78,6 +78,9 @@ require("./db-access.js");
 		process.exit(0);
 	}
 
+	console.group("Initialize timers");
+	console.time("supi-core");
+
 	const core = await import("supi-core");
 	const Query = new core.Query({
 		user: process.env.MARIA_USER,
@@ -106,10 +109,16 @@ require("./db-access.js");
 		Utils: new core.Utils()
 	};
 
+	console.timeEnd("supi-core");
+	console.time("platforms framework");
+
 	const platforms = new Set();
 	for (const definition of platformsConfig) {
 		platforms.add(Platform.create(definition.type, definition));
 	}
+
+	console.timeEnd("platforms framework");
+	console.time("basic bot modules");
 
 	// Initialize bot-specific modules with database-driven data
 	for (let i = 0; i < databaseModuleInitializeOrder.length; i++) {
@@ -146,6 +155,9 @@ require("./db-access.js");
 		API: require("./api")
 	};
 
+	console.timeEnd("basic bot modules");
+	console.time("commands");
+
 	if (!config.modules.commands.disableAll) {
 		const {
 			blacklist,
@@ -161,12 +173,20 @@ require("./db-access.js");
 		await Command.importData(commands.definitions);
 	}
 
+	console.timeEnd("commands");
+	console.time("chat modules");
+
 	await Promise.all([
 		importFileDataModule(ChatModule, "chat-modules"), importFileDataModule(sb.Got, "gots")
 	]);
 
+	console.timeEnd("chat modules");
+	console.time("crons");
+
 	const { initializeCrons } = await import("./crons/index.mjs");
 	initializeCrons(config.modules.crons);
+
+	console.timeEnd("crons");
 
 	if (sb.Metrics) {
 		sb.Metrics.registerCounter({
@@ -182,6 +202,8 @@ require("./db-access.js");
 		});
 	}
 
+	console.time("platform connects");
+
 	const promises = [];
 	for (const platform of platforms) {
 		if (!platform.active) {
@@ -194,6 +216,9 @@ require("./db-access.js");
 	}
 
 	await Promise.all(promises);
+
+	console.timeEnd("platform connects");
+	console.groupEnd("Initialize timers");
 
 	process.on("unhandledRejection", async (reason) => {
 		if (!(reason instanceof Error)) {
