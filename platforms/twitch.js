@@ -826,14 +826,18 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	async handleStreamLiveChange (event, type) {
-		const channelId = event.broadcaster_user_id;
-		const channelData = sb.Channel.get(channelId);
+		const {
+			broadcaster_user_id: channelId,
+			broadcaster_user_login: channelName
+		} = event;
+
+		const channelData = sb.Channel.get(channelName, this) ?? sb.Channel.getBySpecificId(channelId, this);
 		if (!channelData) {
 			return;
 		}
 
 		if (type === "channel.online") {
-			channelData.events.emit("offline", {
+			channelData.events.emit("online", {
 				event: "online",
 				channel: channelData
 			});
