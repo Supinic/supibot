@@ -37,7 +37,7 @@ module.exports = {
 		result.sort((a, b) => a.channel.localeCompare(b.channel));
 
 		const channels = result.map(i => i.channel);
-		const channelNames = channels.map(i => sb.Channel.getBySpecificId(i)?.Name ?? null).filter(Boolean);
+		const channelNames = channels.map(i => sb.Channel.getBySpecificId(i, twitch)?.Name ?? null).filter(Boolean);
 		if (context.params.channelsOnly) {
 			return {
 				reply: channelNames.join(", ")
