@@ -22,7 +22,7 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Code: (async function botSubs (context) {
-		const twitch = sb.Platfom.get("twitch");
+		const twitch = sb.Platform.get("twitch");
 
 		const globalEmotes = await twitch.fetchGlobalEmotes();
 		const subEmotes = globalEmotes.filter(i => i.type === "twitch-subscriber" && i.channel);
