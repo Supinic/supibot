@@ -169,7 +169,7 @@ export declare class Platform {
     /**
      * Determines if a given channel within this platform is currently "live", as in livestreaming.
      */
-    isChannelLive (channelData: Channel): Promise<boolean>;
+    isChannelLive (channelData: Channel): Promise<boolean|null>;
 
     mirror (message: string, userData: User, channelData: Channel, options: Object): Promise<{ success: boolean }>;
 

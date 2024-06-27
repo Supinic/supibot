@@ -457,7 +457,8 @@ class Platform {
 			});
 		}
 
-		return false;
+		// If not overloaded, return `null` - this means the platform does not support the concept of "livestreaming".
+		return null;
 	}
 
 	restart () {}

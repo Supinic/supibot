@@ -282,7 +282,7 @@ export declare class Channel extends ClassTemplate {
     /**
      * Determines if the specific channel is currently "live", as in livestreaming.
      */
-    isLive (): Promise<boolean>;
+    isLive (): Promise<boolean|null>;
 
     /**
      * Retrieves a channel data property value from the database.
