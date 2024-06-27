@@ -22,14 +22,14 @@ module.exports = {
 	Code: (async function checkEm (context) {
 		let messageNumber;
 		if (context.platform.Name === "twitch") {
-			if (!context.append.messageID) {
+			if (!context.append.id) {
 				return {
 					success: false,
 					reply: `No message ID available! FeelsBadMan`
 				};
 			}
 
-			messageNumber = BigInt(`0x${context.append.messageID.replace(/-/g, "")}`);
+			messageNumber = BigInt(`0x${context.append.id.replace(/-/g, "")}`);
 		}
 		else if (context.platform.Name === "discord") {
 			if (!context.append.messageID) {
