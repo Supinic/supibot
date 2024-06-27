@@ -1,4 +1,5 @@
 const { randomInt } = require("node:crypto");
+const { Blob } = require("node:buffer");
 
 const RSSParser = require("rss-parser");
 const Chrono = require("chrono-node");
@@ -104,13 +105,15 @@ module.exports = {
 	 * @returns {Promise<FileUploadResult>}
 	 */
 	async uploadToImgur (fileData, options = {}) {
-		const formData = new FormData();
-		formData.append("image", fileData);
-
 		const { type = "image" } = options;
-		const endpoint = (type === "image")
-			? "image"
-			: "upload";
+		const endpoint = (type === "image") ? "image" : "upload";
+		const filename = (type === "image") ? "image.jpg" : "video.mp4";
+
+		// !!! FILE NAME MUST BE SET, OR THE API NEVER RESPONDS !!!
+		const formData = new FormData();
+		formData.append("image", new Blob([fileData]), filename);
+		formData.append("type", "image");
+		formData.append("title", "Simple upload");
 
 		const { statusCode, body } = await sb.Got("GenericAPI", {
 			url: `https://api.imgur.com/3/${endpoint}`,
