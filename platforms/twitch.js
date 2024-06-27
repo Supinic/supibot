@@ -774,7 +774,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				}
 			});
 		}
-		else if (subscription === "channel.subscription.meesage") { // Resubscribe
+		else if (subscription === "channel.subscription.message") { // Resubscribe
 			channelData.events.emit("subscription", {
 				event: "subscription",
 				message: event.message.text,
