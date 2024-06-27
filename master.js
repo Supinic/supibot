@@ -78,7 +78,7 @@ require("./db-access.js");
 		process.exit(0);
 	}
 
-	console.group("Initialize timers");
+	console.groupCollapsed("Initialize timers");
 	console.time("supi-core");
 
 	const core = await import("supi-core");
