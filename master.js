@@ -127,7 +127,11 @@ require("./db-access.js");
 		const label = `Batch #${i + 1}: ${initOrder.map(i => i.name).join(", ")}`;
 		console.time(label);
 
-		const promises = initOrder.map(async (module) => await module.initialize());
+		const promises = initOrder.map(async (module) => {
+			console.time(`Init ${module.name}`);
+			await module.initialize();
+			console.timeEnd(`Init ${module.name}`);
+		});
 		await Promise.all(promises);
 
 		console.timeEnd(label);
