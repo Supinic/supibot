@@ -941,7 +941,12 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			return null;
 		}
 
-		return response.body.data[0].id;
+		const { data } = response.body;
+		if (data.length === 0) {
+			return null;
+		}
+
+		return data[0].id;
 	}
 
 	async createUserMention (userData) {
