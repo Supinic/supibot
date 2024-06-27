@@ -82,6 +82,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	#previousMessageMeta = new Map();
 	#userCommandSpamPrevention = new Map();
 
+	debug = require("./twitch-utils.js");
+
 	constructor (config) {
 		super("twitch", config, {
 			logging: DEFAULT_LOGGING_CONFIG,
