@@ -332,7 +332,7 @@ module.exports = class Channel extends require("./template.js") {
 		const platformData = Platform.get(platform);
 		const channels = Channel.data.get(platformData);
 		for (const channelData of channels.values()) {
-			if (channelData.Specific_ID === identifier) {
+			if (channelData.Mode !== "Inactive" && channelData.Specific_ID === identifier) {
 				return channelData;
 			}
 		}
