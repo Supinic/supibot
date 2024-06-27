@@ -804,7 +804,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			from_broadcaster_user_login: fromName
 		} = event;
 
-		const channelData = sb.Channel.get(channelId, this) ?? sb.Channel.getBySpecificId(channelName, this);
+		const channelData = sb.Channel.get(channelName, this) ?? sb.Channel.getBySpecificId(channelId, this);
 		if (!channelData || channelData.Mode === "Read" || channelData.Mode === "Inactive") {
 			return;
 		}
