@@ -134,7 +134,7 @@ module.exports = {
 			};
 		}
 
-		const { statusCode, link: outputLink } = await uploadToImgur(outputFile, link);
+		const { statusCode, link: outputLink } = await uploadToImgur(outputFile);
 
 		await fs.promises.unlink(`/tmp/out_${link}`);
 

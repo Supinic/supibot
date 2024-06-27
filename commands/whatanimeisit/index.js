@@ -96,9 +96,9 @@ module.exports = {
 				throwHttpErrors: false
 			});
 
-			let uploadResult = await uploadToNuuls(videoData.rawBody ?? videoData.body, "file.mp4");
+			let uploadResult = await uploadToNuuls(videoData.rawBody ?? videoData.body);
 			if (uploadResult.statusCode !== 200) {
-				uploadResult = await uploadToImgur(videoData.rawBody ?? videoData.body, "file.mp4", {
+				uploadResult = await uploadToImgur(videoData.rawBody ?? videoData.body, {
 					type: "video"
 				});
 			}
