@@ -280,14 +280,9 @@ export declare class Channel extends ClassTemplate {
     send (message: Message, options?: Object): Promise<void>;
 
     /**
-     * Returns the channel's stream-related data.
+     * Determines if the specific channel is currently "live", as in livestreaming.
      */
-    getStreamData (): Promise<StreamData | {}>;
-
-    /**
-     * Sets the channel's stream-related data.
-     */
-    setStreamData (data: any): ReturnType<ClassTemplate["setCacheData"]>;
+    isLive (): Promise<boolean>;
 
     /**
      * Retrieves a channel data property value from the database.

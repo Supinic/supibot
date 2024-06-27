@@ -4,9 +4,7 @@ export const definition = {
 	description: "Stay hydrated!",
 	code: (async function announceStayHydrated () {
 		const channelData = sb.Channel.get("supinic", "twitch");
-		const streamData = await channelData.getStreamData();
-
-		if (streamData.live) {
+		if (await channelData.isLive()) {
 			await channelData.send("OMGScoods TeaTime Don't forget to stay hydrated!");
 		}
 	})

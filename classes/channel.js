@@ -117,13 +117,8 @@ module.exports = class Channel extends require("./template.js") {
 		return this.Platform.send(message, this, options);
 	}
 
-	async getStreamData () {
-		const streamData = await this.getCacheData("stream-data");
-		return streamData ?? {};
-	}
-
-	async setStreamData (data) {
-		return await this.setCacheData("stream-data", data, { expiry: 3_600_000 });
+	async isLive () {
+		return await this.Platform.isChannelLive(this);
 	}
 
 	async toggleAmbassador (userData) {

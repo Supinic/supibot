@@ -444,6 +444,22 @@ class Platform {
 		return `channel-user-list-${this.#id}-${channelData.ID}`;
 	}
 
+	// eslint-disable-next-line no-unused-vars
+	async isChannelLive (channelData) {
+		if (channelData.Platform !== this) {
+			throw new sb.Error({
+				message: "Provided channel does not belong to this platform",
+				args: {
+					channel: channelData.ID,
+					channelPlatform: channelData.Platform?.ID ?? null,
+					currentPlatform: this.ID
+				}
+			});
+		}
+
+		return false;
+	}
+
 	restart () {}
 
 	destroy () {}

@@ -166,6 +166,11 @@ export declare class Platform {
      */
     fetchInternalPlatformIDByUsername (userData: User): string | null;
 
+    /**
+     * Determines if a given channel within this platform is currently "live", as in livestreaming.
+     */
+    isChannelLive (channelData: Channel): Promise<boolean>;
+
     mirror (message: string, userData: User, channelData: Channel, options: Object): Promise<{ success: boolean }>;
 
     get capital (): string;

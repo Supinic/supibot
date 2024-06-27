@@ -970,6 +970,14 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		return await sb.Cache.server.lrange(LIVE_STREAMS_KEY, 0, -1);
 	}
 
+	async isChannelLive (channelData) {
+		await super.isChannelLive(channelData);
+
+		const channelId = channelData.Specific_ID;
+		const liveList = await this.getLiveChannelIdList();
+		return (liveList.includes(channelId));
+	}
+
 	/**
 	 * Fetches a list of emote data available to the bot user.
 	 * @returns {Promise<TwitchEmoteSetDataObject[]>}

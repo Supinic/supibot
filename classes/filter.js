@@ -542,8 +542,7 @@ module.exports = class Filter extends require("./template.js") {
 
 		let channelLive = null;
 		if (channel instanceof Channel) {
-			const streamData = await channel.getStreamData();
-			channelLive = streamData.live ?? false;
+			channelLive = await channel.isLive();
 		}
 
 		const offlineOnly = localFilters.find(i => i.Type === "Offline-only" && (i.User_Alias === user.ID || i.User_Alias === null));

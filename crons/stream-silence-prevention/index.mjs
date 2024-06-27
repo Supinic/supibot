@@ -24,8 +24,7 @@ export const definition = {
 		const cytubeChannelData = sb.Channel.get(49);
 
 		// Don't auto-request when stream is offline
-		const streamData = await channelData.getStreamData();
-		if (!streamData.live) {
+		if (!await channelData.isLive()) {
 			return;
 		}
 
