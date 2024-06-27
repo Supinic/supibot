@@ -798,17 +798,22 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 * @return {Promise<void>}
 	 */
 	async handleRaid (event) {
-		const targetChannelData = sb.Channel.get(event.to_broadcaster_user_id);
-		if (!targetChannelData || targetChannelData.Mode === "Read" || targetChannelData.Mode === "Inactive") {
+		const {
+			to_broadcaster_user_id: channelId,
+			to_broadcaster_user_login: channelName,
+			from_broadcaster_user_login: fromName
+		} = event;
+
+		const channelData = sb.Channel.get(channelId, this) ?? sb.Channel.getBySpecificId(channelName, this);
+		if (!channelData || channelData.Mode === "Read" || channelData.Mode === "Inactive") {
 			return;
 		}
 
-		const fromUser = event.from_broadcaster_user_login;
-		targetChannelData.events.emit("raid", {
+		channelData.events.emit("raid", {
 			event: "raid",
 			message: null,
-			channel: targetChannelData,
-			username: fromUser,
+			channel: channelData,
+			username: fromName,
 			platform: this,
 			data: {
 				viewers: event.viewers
@@ -816,7 +821,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		});
 
 		if (this.logging.hosts) {
-			await sb.Logger.log("Twitch.Host", `Raid: ${fromUser} => ${targetChannelData.Name} for ${event.viewers} viewers`);
+			await sb.Logger.log("Twitch.Host", `Raid: ${fromName} => ${channelData.Name} for ${event.viewers} viewers`);
 		}
 	}
 
