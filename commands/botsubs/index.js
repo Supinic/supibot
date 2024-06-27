@@ -36,21 +36,22 @@ module.exports = {
 
 		result.sort((a, b) => a.channel.localeCompare(b.channel));
 
-		const channels = result.map(i => i.channel).join(", ");
+		const channels = result.map(i => i.channel);
+		const channelNames = channels.map(i => sb.Channel.getBySpecificId(i)?.Name ?? null).filter(Boolean);
 		if (context.params.channelsOnly) {
 			return {
-				reply: channels
+				reply: channelNames.join(", ")
 			};
 		}
 
-		const emotes = result.map(i => i.emote).join(" ");
+		const emotes = result.map(i => i.name).join(" ");
 		if (context.params.emotesOnly) {
 			return {
 				reply: emotes
 			};
 		}
 
-		let message = `I am currently subscribed to: ${channels} - ${emotes}`;
+		let message = `I am currently subscribed to: ${channelNames.join(" ")} - ${emotes}`;
 		const limit = context.channel?.Message_Limit ?? context.platform.Message_Limit;
 
 		if (message.length > limit) {
