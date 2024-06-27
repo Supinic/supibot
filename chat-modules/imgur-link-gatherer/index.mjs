@@ -31,20 +31,19 @@ export const definition = {
 			}
 
 			const formData = new FormData();
-			formData.append("reqtype", "urlupload");
-			formData.append("url", `https://i.imgur.com/${link}`);
+			formData.append("image", `https://i.imgur.com/${link}`);
 
 			let uploaded;
-			let catboxReupload;
+			let imgbbReupload;
 			try {
 				const response = await sb.Got("GenericAPI", {
 					url: "https://catbox.moe/user/api.php",
+					searchParams: {
+						key: sb.Config.get("API_KEY_IMGBB")
+					},
 					method: "POST",
 					throwHttpErrors: false,
-					headers: {
-						...formData.getHeaders()
-					},
-					body: formData.getBuffer(),
+					body: formData,
 					retry: {
 						limit: 0
 					},
@@ -54,22 +53,22 @@ export const definition = {
 				});
 
 				if (response.ok) {
-					catboxReupload = response.body.match("\.moe\/(.+)$")[1];
+					imgbbReupload = response.body.id;
 					uploaded = true;
 				}
 				else {
-					catboxReupload = null;
+					imgbbReupload = null;
 					uploaded = false;
 				}
 			}
 			catch (e) {
-				catboxReupload = null;
+				imgbbReupload = null;
 				uploaded = false;
 			}
 
 			row.setValues({
 				Imgur: link,
-				Catbox: catboxReupload,
+				Other: imgbbReupload,
 				Waiting: !uploaded,
 				Channel: context.channel.ID
 			});

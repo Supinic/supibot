@@ -99,14 +99,13 @@ module.exports = {
 	/**
 	 * Uploads a file to {@link https://imgur.com}
 	 * @param {Buffer} fileData
-	 * @param {string} [linkName]
 	 * @param {Object} [options]
 	 * @param {string} [options.type]
 	 * @returns {Promise<FileUploadResult>}
 	 */
-	async uploadToImgur (fileData, linkName = "random", options = {}) {
-		const formData = new sb.Got.FormData();
-		formData.append("image", fileData, linkName); // !!! FILE NAME MUST BE SET, OR THE API NEVER RESPONDS !!!
+	async uploadToImgur (fileData, options = {}) {
+		const formData = new FormData();
+		formData.append("image", fileData);
 
 		const { type = "image" } = options;
 		const endpoint = (type === "image")
@@ -119,10 +118,9 @@ module.exports = {
 			method: "POST",
 			throwHttpErrors: false,
 			headers: {
-				...formData.getHeaders(),
 				Authorization: "Client-ID c898c0bb848ca39"
 			},
-			body: formData.getBuffer(),
+			body: formData,
 			retry: {
 				limit: 0
 			},
@@ -146,22 +144,18 @@ module.exports = {
 	/**
 	 * Uploads a file to {@link https://i.nuuls.com}
 	 * @param {Buffer} fileData
-	 * @param {string} [fileName] custom filename, used for managing extensions
 	 * @returns {Promise<FileUploadResult>}
 	 */
-	async uploadToNuuls (fileData, fileName = "file.jpg") {
-		const form = new sb.Got.FormData();
-		form.append("attachment", fileData, fileName);
+	async uploadToNuuls (fileData) {
+		const formData = new FormData();
+		formData.append("attachment", fileData);
 
 		const response = await sb.Got("GenericAPI", {
 			method: "POST",
 			throwHttpErrors: false,
 			url: "https://i.nuuls.com/upload",
 			responseType: "text",
-			headers: {
-				...form.getHeaders()
-			},
-			body: form.getBuffer(),
+			body: formData,
 			retry: {
 				limit: 0
 			},
