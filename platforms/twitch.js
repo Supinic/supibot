@@ -1262,6 +1262,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	#pingWebsocket () {
+		if (!this.client) {
+			return;
+		}
+
 		const reconnectTimeout = setTimeout(() => {
 			console.warn(`No ping received in ${NO_EVENT_RECONNECT_TIMEOUT}ms, reconnecting...`);
 			this.client.close();
