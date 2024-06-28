@@ -825,6 +825,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		}
 	}
 
+	/**
+	 * @param {Object} event
+	 * @param {"stream.online"|"stream.offline"}type
+	 */
 	async handleStreamLiveChange (event, type) {
 		const {
 			broadcaster_user_id: channelId,
@@ -836,7 +840,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			return;
 		}
 
-		if (type === "channel.online") {
+		if (type === "stream.online") {
 			channelData.events.emit("online", {
 				event: "online",
 				channel: channelData
@@ -847,7 +851,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				await sb.Cache.server.lpush(LIVE_STREAMS_KEY, channelId);
 			}
 		}
-		else {
+		else if (type === "stream.offline") {
 			channelData.events.emit("offline", {
 				event: "offline",
 				channel: channelData
