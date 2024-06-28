@@ -53,7 +53,7 @@ export const definition = {
 				});
 
 				if (response.ok) {
-					imgbbReupload = response.body.data.url.replace("https://.i.ibb.co/", "");
+					imgbbReupload = response.body.data.url.replace("https://i.ibb.co/", "");
 					uploaded = true;
 				}
 				else {
