@@ -37,9 +37,9 @@ export const definition = {
 			let imgbbReupload;
 			try {
 				const response = await sb.Got("GenericAPI", {
-					url: "https://catbox.moe/user/api.php",
+					url: "https://api.imgbb.com/1/upload",
 					searchParams: {
-						key: sb.Config.get("API_KEY_IMGBB")
+						key: sb.Config.get("API_IMGBB")
 					},
 					method: "POST",
 					throwHttpErrors: false,
