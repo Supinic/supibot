@@ -431,7 +431,8 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 					// If not found and the word is not overly common, simply pick a random emote out of the global list
 					// Also take into account the Discord channel setting to ignore global emotes
 					if (!emote && !skipGlobalEmotes && globalEmoteRegex.test(word) && word.length > 2) {
-						emote = sb.Utils.randArray([...globalEmotes.values()]);
+						const randomKey = globalEmotes.randomKey(1);
+						emote = globalEmotes.get(randomKey);
 					}
 				}
 
