@@ -5,10 +5,10 @@
     "acorn-node": "^2.0.1",
     "async-markov": "supinic/async-markov#master",
     "bing-chat": "^0.2.3",
-    "chrono-node": "^2.7.0",
-    "cron": "^3.1.6",
+    "chrono-node": "^2.7.6",
+    "cron": "^3.1.7",
     "cytube-connector": "supinic/cytube-connector#master",
-    "discord.js": "^14.13.0",
+    "discord.js": "^14.15.3",
     "irc-framework": "^4.13.1",
     "language-iso-codes": "supinic/language-iso-codes#master",
     "roll-dice": "npm:@jprochazk/roll-dice@^0.2.2",
@@ -17,7 +17,7 @@
     "track-link-parser": "supinic/track-link-parser#master",
     "transliteration": "^2.3.5",
     "vm2": "^3.9.19",
-    "ws": "^8.17.0"
+    "ws": "^8.17.1"
   },
   "engines": {
     "node": ">= 18.0"
@@ -43,12 +43,12 @@
   "license": "AGPL-3.0",
   "description": "Multiplatform, utility & novelty chat bot.",
   "devDependencies": {
-    "@babel/core": "^7.23.2",
-    "@babel/eslint-parser": "^7.22.15",
+    "@babel/core": "^7.24.7",
+    "@babel/eslint-parser": "^7.24.7",
     "eslint": "^8.52.0",
     "eslint-plugin-unicorn": "^49.0.0",
-    "mocha": "^10.2.0",
-    "nyc": "^15.1.0",
+    "mocha": "^10.5.2",
+    "nyc": "^17.0.0",
     "supi-db-init": "Supinic/supi-db-init#master"
   },
   "nyc": {
