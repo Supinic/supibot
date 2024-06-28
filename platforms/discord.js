@@ -400,7 +400,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 	 * @param {Object} options
 	 */
 	async send (message, channel, options = {}) {
-		const globalEmoteRegex = /[A-Z]/;
+		// const globalEmoteRegex = /[A-Z]/;
 		const channelData = sb.Channel.get(channel, this);
 		const channelObject = await this.client.channels.fetch(channelData.Name);
 		if (!channelObject) {
@@ -415,27 +415,12 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 				.filter(i => i.length > 2 && emojiNameRegex.test(i));
 
 			const wordSet = new Set(words);
-			const globalEmotesMap = this.client.emojis.cache;
+			// const globalEmotesMap = this.client.emojis.cache;
 			const guildEmotesMap = channelObject.guild.emojis.cache;
-			const skipGlobalEmotes = Boolean(await channelData.getDataProperty("disableDiscordGlobalEmotes"));
+			// const skipGlobalEmotes = Boolean(await channelData.getDataProperty("disableDiscordGlobalEmotes"));
 
 			for (const word of wordSet) {
-				// First, attempt to find a unique global emoji available to the bot
-				let emote;
-				const globalEmotes = globalEmotesMap.filter(i => i.name === word);
-
-				if (globalEmotes.size > 0) {
-					// If there are multiple, try to find it in the current guild's emojis cache and use it
-					emote = guildEmotesMap.find(i => i.name === word);
-
-					// If not found and the word is not overly common, simply pick a random emote out of the global list
-					// Also take into account the Discord channel setting to ignore global emotes
-					if (!emote && !skipGlobalEmotes && globalEmoteRegex.test(word) && word.length > 2) {
-						const randomKey = globalEmotes.randomKey(1);
-						emote = globalEmotes.get(randomKey);
-					}
-				}
-
+				const emote = guildEmotesMap.find(i => i.name === word);
 				if (emote) {
 					// This regex makes sure all emotes to be replaces are not preceded or followed by a ":" (colon) character
 					// All emotes on Discord are wrapped at least by colons
