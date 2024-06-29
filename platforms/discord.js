@@ -488,6 +488,12 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		}
 	}
 
+	me () {
+		throw new sb.Error({
+			message: "Cannot use the /me action on Discord"
+		});
+	}
+
 	/**
 	 * Sends a private message.
 	 * The user in question must have their Discord ID filled out, otherwise the method fails.
