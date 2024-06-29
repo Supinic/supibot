@@ -417,18 +417,28 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 				.filter(i => i.length > 2 && emojiNameRegex.test(i));
 
 			const wordSet = new Set(words);
-			// const globalEmotesMap = this.client.emojis.cache;
-			const guildEmotesMap = channelObject.guild.emojis.cache;
-			// const skipGlobalEmotes = Boolean(await channelData.getDataProperty("disableDiscordGlobalEmotes"));
+			const globalEmotes = await this.fetchGlobalEmotes();
+			const skipGlobalEmotes = Boolean(await channelData.getDataProperty("disableDiscordGlobalEmotes"));
 
 			for (const word of wordSet) {
-				const emote = guildEmotesMap.find(i => i.name === word);
-				if (emote) {
-					// This regex makes sure all emotes to be replaces are not preceded or followed by a ":" (colon) character
-					// All emotes on Discord are wrapped at least by colons
-					const regex = new RegExp(`(?<!(:))\\b${emote.name}\\b(?!(:))`, "g");
-					message = message.replace(regex, emote.toString());
+				const eligibleEmotes = globalEmotes.filter(i => i.name === word);
+				if (eligibleEmotes.length === 0) {
+					continue;
 				}
+
+				let emote;
+				const eligibleGuildEmotes = eligibleEmotes.filter(i => i.guild === channelObject.guild.id);
+				if (eligibleGuildEmotes.length !== 0) {
+					emote = eligibleGuildEmotes[0];
+				}
+				else if (!skipGlobalEmotes && GLOBAL_EMOTE_ALLOWED_REGEX.test(word) && word.length > 2) {
+					emote = sb.Utils.randArray(eligibleEmotes);
+				}
+
+				// This regex makes sure all emotes to be replaces are not preceded or followed by a ":" (colon) character
+				// All emotes on Discord are wrapped at least by colons
+				const regex = new RegExp(`(?<!(:))\\b${emote.name}\\b(?!(:))`, "g");
+				message = message.replace(regex, emote.toString());
 			}
 		}
 
