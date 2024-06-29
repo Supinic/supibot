@@ -5,7 +5,8 @@ const {
 	GuildMember,
 	GatewayIntentBits,
 	Partials,
-	PermissionFlagsBits
+	PermissionFlagsBits,
+	Routes
 } = require("discord.js");
 
 const ignoredChannelTypes = [
@@ -19,6 +20,7 @@ const ignoredChannelTypes = [
 	ChannelType.PublicThread
 ];
 
+const GLOBAL_EMOTE_ALLOWED_REGEX = /[A-Z]/;
 const DEFAULT_LOGGING_CONFIG = {
 	messages: true,
 	whispers: true
@@ -809,28 +811,28 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		return [...channel.members.values()].map(i => i.user.username);
 	}
 
-	async fetchChannelEmotes (channelData) {
-		const discordChannel = await this.client.channels.fetch(channelData.Name);
-		const guild = await this.client.guilds.fetch(discordChannel.guild.id);
-
-		const emojis = [...guild.emojis.cache.values()];
-		return emojis.map(i => ({
-			ID: i.id,
-			name: i.name,
-			type: "discord",
-			global: false,
-			animated: (i.animated)
-		}));
-	}
+	async fetchChannelEmotes () { return []; }
 
 	async populateGlobalEmotes () {
-		return this.client.emojis.cache.map(i => ({
-			ID: i.id,
-			name: i.name,
-			type: "discord",
-			global: true,
-			animated: (i.animated)
-		}));
+		const promises = [];
+		for (const guild of this.client.guilds.values()) {
+			const promise = (async () => {
+				const result = await this.client.rest.get(Routes.guildEmojis(guild.id));
+				return result.map(i => ({
+					type: "discord",
+					ID: i.id,
+					name: i.name,
+					guild: guild.id,
+					global: true,
+					animated: (i.animated)
+				}));
+			})();
+
+			promises.push(promise);
+		}
+
+		const apiResult = await Promise.all(promises);
+		return apiResult.flat(1);
 	}
 
 	fetchInternalPlatformIDByUsername (userData) {
