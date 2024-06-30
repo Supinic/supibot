@@ -5,7 +5,8 @@ const {
 	GuildMember,
 	GatewayIntentBits,
 	Partials,
-	PermissionFlagsBits
+	PermissionFlagsBits,
+	Routes
 } = require("discord.js");
 
 const ignoredChannelTypes = [
@@ -19,6 +20,7 @@ const ignoredChannelTypes = [
 	ChannelType.PublicThread
 ];
 
+const GLOBAL_EMOTE_ALLOWED_REGEX = /[A-Z]/;
 const DEFAULT_LOGGING_CONFIG = {
 	messages: true,
 	whispers: true
@@ -33,6 +35,7 @@ const MARKDOWN_TESTS = {
 	SOL_SPACE: /^\s+([*-])\s+/gm
 };
 
+const formatEmoji = (emote) => `<:_:${emote.ID}>`;
 const fixMarkdown = (text) => {
 	let isMarkdown = false;
 	for (const regex of Object.values(MARKDOWN_TESTS)) {
@@ -400,7 +403,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 	 * @param {Object} options
 	 */
 	async send (message, channel, options = {}) {
-		const globalEmoteRegex = /[A-Z]/;
+		// const globalEmoteRegex = /[A-Z]/;
 		const channelData = sb.Channel.get(channel, this);
 		const channelObject = await this.client.channels.fetch(channelData.Name);
 		if (!channelObject) {
@@ -415,33 +418,28 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 				.filter(i => i.length > 2 && emojiNameRegex.test(i));
 
 			const wordSet = new Set(words);
-			const globalEmotesMap = this.client.emojis.cache;
-			const guildEmotesMap = channelObject.guild.emojis.cache;
+			const globalEmotes = await this.fetchGlobalEmotes();
 			const skipGlobalEmotes = Boolean(await channelData.getDataProperty("disableDiscordGlobalEmotes"));
 
 			for (const word of wordSet) {
-				// First, attempt to find a unique global emoji available to the bot
+				const eligibleEmotes = globalEmotes.filter(i => i.name === word);
+				if (eligibleEmotes.length === 0) {
+					continue;
+				}
+
 				let emote;
-				const globalEmotes = globalEmotesMap.filter(i => i.name === word);
-
-				if (globalEmotes.size > 0) {
-					// If there are multiple, try to find it in the current guild's emojis cache and use it
-					emote = guildEmotesMap.find(i => i.name === word);
-
-					// If not found and the word is not overly common, simply pick a random emote out of the global list
-					// Also take into account the Discord channel setting to ignore global emotes
-					if (!emote && !skipGlobalEmotes && globalEmoteRegex.test(word) && word.length > 2) {
-						const randomKey = globalEmotes.randomKey(1);
-						emote = globalEmotes.get(randomKey);
-					}
+				const eligibleGuildEmotes = eligibleEmotes.filter(i => i.guild === channelObject.guild.id);
+				if (eligibleGuildEmotes.length !== 0) {
+					emote = eligibleGuildEmotes[0];
+				}
+				else if (!skipGlobalEmotes && GLOBAL_EMOTE_ALLOWED_REGEX.test(word) && word.length > 2) {
+					emote = sb.Utils.randArray(eligibleEmotes);
 				}
 
-				if (emote) {
-					// This regex makes sure all emotes to be replaces are not preceded or followed by a ":" (colon) character
-					// All emotes on Discord are wrapped at least by colons
-					const regex = new RegExp(`(?<!(:))\\b${emote.name}\\b(?!(:))`, "g");
-					message = message.replace(regex, emote.toString());
-				}
+				// This regex makes sure all emotes to be replaces are not preceded or followed by a ":" (colon) character
+				// All emotes on Discord are wrapped at least by colons
+				const regex = new RegExp(`(?<!(:))\\b${emote.name}\\b(?!(:))`, "g");
+				message = message.replace(regex, formatEmoji(emote));
 			}
 		}
 
@@ -501,6 +499,12 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 				});
 			}
 		}
+	}
+
+	me () {
+		throw new sb.Error({
+			message: "Cannot use the /me action on Discord"
+		});
 	}
 
 	/**
@@ -818,28 +822,28 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		return [...channel.members.values()].map(i => i.user.username);
 	}
 
-	async fetchChannelEmotes (channelData) {
-		const discordChannel = await this.client.channels.fetch(channelData.Name);
-		const guild = await this.client.guilds.fetch(discordChannel.guild.id);
-
-		const emojis = [...guild.emojis.cache.values()];
-		return emojis.map(i => ({
-			ID: i.id,
-			name: i.name,
-			type: "discord",
-			global: false,
-			animated: (i.animated)
-		}));
-	}
+	async fetchChannelEmotes () { return []; }
 
 	async populateGlobalEmotes () {
-		return this.client.emojis.cache.map(i => ({
-			ID: i.id,
-			name: i.name,
-			type: "discord",
-			global: true,
-			animated: (i.animated)
-		}));
+		const promises = [];
+		for (const guild of this.client.guilds.values()) {
+			const promise = (async () => {
+				const result = await this.client.rest.get(Routes.guildEmojis(guild.id));
+				return result.map(i => ({
+					type: "discord",
+					ID: i.id,
+					name: i.name,
+					guild: guild.id,
+					global: true,
+					animated: (i.animated)
+				}));
+			})();
+
+			promises.push(promise);
+		}
+
+		const apiResult = await Promise.all(promises);
+		return apiResult.flat(1);
 	}
 
 	fetchInternalPlatformIDByUsername (userData) {
