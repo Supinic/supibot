@@ -825,26 +825,24 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 	async fetchChannelEmotes () { return []; }
 
 	async populateGlobalEmotes () {
-		const promises = [];
+		const result = [];
 		const guilds = await this.client.guilds.fetch();
+
 		for (const guild of guilds) {
-			const promise = (async () => {
-				const result = await this.client.rest.get(Routes.guildEmojis(guild.id));
-				return result.map(i => ({
+			const response = await this.client.rest.get(Routes.guildEmojis(guild.id));
+			for (const emote of response) {
+				result.push({
 					type: "discord",
-					ID: i.id,
-					name: i.name,
+					ID: emote.id,
+					name: emote.name,
 					guild: guild.id,
 					global: true,
-					animated: (i.animated)
-				}));
-			})();
-
-			promises.push(promise);
+					animated: (emote.animated)
+				});
+			}
 		}
 
-		const apiResult = await Promise.all(promises);
-		return apiResult.flat(1);
+		return result;
 	}
 
 	fetchInternalPlatformIDByUsername (userData) {
