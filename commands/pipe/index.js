@@ -1,12 +1,4 @@
-let config;
-try {
-	config = require("../../config.json");
-}
-catch {
-	config = require("../../config-default.json");
-}
-
-const bannedCommandCombinations = config.modules.commands.bannedCombinations ?? [];
+const bannedCommandCombinations = globalThis.botConfig.modules.commands.bannedCombinations ?? [];
 
 // matches | and > characters if and only if they're not preceded, nor followed by another | or >.
 const PIPE_REGEX = /(?<![|>])[|>](?![|>])/;

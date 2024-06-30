@@ -1,15 +1,6 @@
 const { CronJob } = require("cron");
 
-let config;
-try {
-	config = require("../../config.json");
-}
-catch {
-	console.warn(`Custom config not found, $markov command will use base path "${__dirname}"`);
-	config = { basePath: __dirname };
-}
-
-const BASE_PATH = config.basePath;
+const BASE_PATH = globalThis.botConfig.basePath ?? __dirname;
 const MODEL_SIZE_THRESHOLD = 100;
 const WORD_LIMIT = 20;
 const DEFAULT_WORD_AMOUNT = 15;
