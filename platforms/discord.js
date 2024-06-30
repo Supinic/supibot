@@ -35,6 +35,7 @@ const MARKDOWN_TESTS = {
 	SOL_SPACE: /^\s+([*-])\s+/gm
 };
 
+const formatEmoji = (emote) => `<:_:${emote.id}>`;
 const fixMarkdown = (text) => {
 	let isMarkdown = false;
 	for (const regex of Object.values(MARKDOWN_TESTS)) {
@@ -438,7 +439,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 				// This regex makes sure all emotes to be replaces are not preceded or followed by a ":" (colon) character
 				// All emotes on Discord are wrapped at least by colons
 				const regex = new RegExp(`(?<!(:))\\b${emote.name}\\b(?!(:))`, "g");
-				message = message.replace(regex, emote.toString());
+				message = message.replace(regex, formatEmoji(emote));
 			}
 		}
 
