@@ -35,7 +35,15 @@ const MARKDOWN_TESTS = {
 	SOL_SPACE: /^\s+([*-])\s+/gm
 };
 
-const formatEmoji = (emote) => `<:_:${emote.ID}>`;
+const formatEmoji = (emote) => {
+	const name = emote.name ?? "_";
+	if (emote.animated) {
+		return `<a:${name}:${emote.ID}>`;
+	}
+	else {
+		return `<:${name}:${emote.ID}>`;
+	}
+};
 const fixMarkdown = (text) => {
 	let isMarkdown = false;
 	for (const regex of Object.values(MARKDOWN_TESTS)) {
