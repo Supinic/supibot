@@ -828,14 +828,14 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		const result = [];
 		const guilds = await this.client.guilds.fetch();
 
-		for (const guild of guilds) {
-			const response = await this.client.rest.get(Routes.guildEmojis(guild.id));
+		for (const guildId of guilds.keys()) {
+			const response = await this.client.rest.get(Routes.guildEmojis(guildId));
 			for (const emote of response) {
 				result.push({
 					type: "discord",
 					ID: emote.id,
 					name: emote.name,
-					guild: guild.id,
+					guild: guildId,
 					global: true,
 					animated: (emote.animated)
 				});
