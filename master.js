@@ -17,7 +17,7 @@ const VLCConnector = require("./singletons/vlc-connector.js");
 const Platform = require("./platforms/template.js");
 
 const importFileDataModule = async (module, path) => {
-	if (!config.modules[path]) {
+	if (!globalThis.botConfig.modules[path]) {
 		throw new Error(`Missing configuration for ${path}`);
 	}
 
@@ -25,7 +25,7 @@ const importFileDataModule = async (module, path) => {
 		disableAll = true,
 		whitelist = [],
 		blacklist = []
-	} = config.modules[path];
+	} = globalThis.botConfig.modules[path];
 
 	if (whitelist.length > 0 && blacklist.length > 0) {
 		throw new Error(`Cannot combine blacklist and whitelist for ${path}`);
@@ -48,13 +48,12 @@ const importFileDataModule = async (module, path) => {
 	}
 };
 
-let config;
 try {
-	config = require("./config.json");
+	globalThis.botConfig = require("./config.json");
 }
 catch {
 	try {
-		config = require("./config-default.json");
+		globalThis.botConfig = require("./config-default.json");
 	}
 	catch {
 		throw new Error("No default or custom configuration found");
@@ -72,7 +71,7 @@ const databaseModuleInitializeOrder = [
 require("./db-access.js");
 
 (async () => {
-	const platformsConfig = config.platforms;
+	const platformsConfig = globalThis.botConfig.platforms;
 	if (!platformsConfig || platformsConfig.length === 0) {
 		console.warn("No platforms configured! Supibot will now exit.");
 		process.exit(0);
@@ -161,11 +160,8 @@ require("./db-access.js");
 	console.timeEnd("basic bot modules");
 	console.time("commands");
 
-	if (!config.modules.commands.disableAll) {
-		const {
-			blacklist,
-			whitelist
-		} = config.modules.commands;
+	if (!globalThis.botConfig.modules.commands.disableAll) {
+		const { blacklist, whitelist } = globalThis.botConfig.modules.commands;
 
 		const { loadCommands } = await require("./commands/index.js");
 		const commands = await loadCommands({
@@ -187,7 +183,7 @@ require("./db-access.js");
 	console.time("crons");
 
 	const { initializeCrons } = await import("./crons/index.mjs");
-	initializeCrons(config.modules.crons);
+	initializeCrons(globalThis.botConfig.modules.crons);
 
 	console.timeEnd("crons");
 
