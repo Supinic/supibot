@@ -826,7 +826,8 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 
 	async populateGlobalEmotes () {
 		const promises = [];
-		for (const guild of this.client.guilds.values()) {
+		const guilds = await this.client.guilds.fetch();
+		for (const guild of guilds) {
 			const promise = (async () => {
 				const result = await this.client.rest.get(Routes.guildEmojis(guild.id));
 				return result.map(i => ({
