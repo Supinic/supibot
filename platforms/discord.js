@@ -52,6 +52,8 @@ const fixMarkdown = (text) => {
 };
 
 module.exports = class DiscordPlatform extends require("./template.js") {
+	#emoteFetchingPromise = null;
+
 	constructor (config) {
 		super("discord", config, {
 			logging: DEFAULT_LOGGING_CONFIG,
@@ -825,24 +827,33 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 	async fetchChannelEmotes () { return []; }
 
 	async populateGlobalEmotes () {
-		const result = [];
-		const guilds = await this.client.guilds.fetch();
-
-		for (const guildId of guilds.keys()) {
-			const response = await this.client.rest.get(Routes.guildEmojis(guildId));
-			for (const emote of response) {
-				result.push({
-					type: "discord",
-					ID: emote.id,
-					name: emote.name,
-					guild: guildId,
-					global: true,
-					animated: (emote.animated)
-				});
-			}
+		if (this.#emoteFetchingPromise) {
+			return await this.#emoteFetchingPromise;
 		}
 
-		return result;
+		this.#emoteFetchingPromise = (async () => {
+			const result = [];
+			const guilds = await this.client.guilds.fetch();
+
+			for (const guildId of guilds.keys()) {
+				const response = await this.client.rest.get(Routes.guildEmojis(guildId));
+				for (const emote of response) {
+					result.push({
+						type: "discord",
+						ID: emote.id,
+						name: emote.name,
+						guild: guildId,
+						global: true,
+						animated: (emote.animated)
+					});
+				}
+			}
+
+			this.#emoteFetchingPromise = null;
+			return result;
+		})();
+
+		return await this.#emoteFetchingPromise;
 	}
 
 	fetchInternalPlatformIDByUsername (userData) {
