@@ -33,7 +33,7 @@ module.exports = {
 
 		// Ignore if no previous article found - save the latest one
 		if (previousArticleIndex === -1) {
-			const topArticleId = newsItems[0].findId;
+			const topArticleId = newsItems[0].newsId;
 			await sb.Cache.setByPrefix(OSRS_LATEST_ARTICLE_ID, topArticleId, {
 				expiry: 14 * 864e5 // 14 days
 			});
