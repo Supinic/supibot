@@ -767,7 +767,7 @@ class Command extends require("./template.js") {
 			};
 		}
 
-		Command.handleCooldown(channelData, userData, command, execution?.cooldown);
+		Command.handleCooldown(channelData, userData, command, execution?.cooldown, identifier);
 
 		if (!execution) {
 			return execution;
@@ -889,7 +889,7 @@ class Command extends require("./template.js") {
 		return execution;
 	}
 
-	static handleCooldown (channelData, userData, commandData, cooldownData) {
+	static handleCooldown (channelData, userData, commandData, cooldownData, identifier) {
 		// Take care of private messages, where channel === null
 		const channelID = channelData?.ID ?? Command.#privateMessageChannelID;
 
@@ -918,7 +918,7 @@ class Command extends require("./template.js") {
 							platform: channelData?.Platform ?? null,
 							channel: channelData,
 							command: commandData,
-							invocation: null, // @todo
+							invocation: identifier,
 							user: userData
 						});
 
@@ -940,7 +940,7 @@ class Command extends require("./template.js") {
 				platform: channelData?.Platform ?? null,
 				channel: channelData,
 				command: commandData,
-				invocation: null, // @todo
+				invocation: identifier,
 				user: userData
 			});
 
