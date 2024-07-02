@@ -166,7 +166,15 @@ const handleGenericSubscription = async (definition) => {
 
 	let message;
 	if (type === "rss") {
-		const response = await rssFetch(url);
+		let response;
+		try {
+			response = await rssFetch(url);
+		}
+		catch (e) {
+			console.warn("RSS fetch failed", { url, e });
+			return;
+		}
+
 		if (!response.ok) {
 			return;
 		}
