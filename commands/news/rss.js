@@ -104,15 +104,17 @@ module.exports = {
 			};
 		}
 
-		const { content, title, published } = article;
+		const { content, title, published, link } = article;
 		const separator = (title && content) ? " - " : "";
+		const linkString = (source.includeLink === true) ? link : "";
 		const delta = (published)
 			? `(published ${sb.Utils.timeDelta(new sb.Date(published))})`
 			: "";
 
-		const result = sb.Utils.fixHTML(sb.Utils.removeHTML(`${title ?? ""}${separator}${content ?? ""} ${delta}`));
+		const raw = `${title ?? ""}${separator}${content ?? ""} ${linkString} ${delta}`;
+		const result = sb.Utils.fixHTML(sb.Utils.removeHTML(raw)).replace(/\s+/g, " ");
 		return {
-			reply: result.replace(/\s+/g, " ")
+			reply: result
 		};
 	}
 };

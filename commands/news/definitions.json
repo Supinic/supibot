@@ -1039,5 +1039,19 @@
         "helpers": ["boring_nick"]
       }
     ]
+  },
+  {
+    "code": "osrs",
+    "language": "english",
+    "sources": [
+      {
+        "name": "OSRS",
+        "url": "https://secure.runescape.com",
+        "path": "m=news/a=13",
+        "endpoints": ["latest_news.rss?oldschool=true"],
+        "helpers": ["supinic"],
+        "includeLink": true
+      }
+    ]
   }
 ]
