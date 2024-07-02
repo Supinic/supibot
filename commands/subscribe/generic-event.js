@@ -1,6 +1,16 @@
 const { parseRSS } = require("../../utils/command-utils.js");
 const DEFAULT_CHANNEL_ID = 38;
 
+const rssFetch = async (url) => await fetch(url, {
+	headers: {
+		// "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+		// "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/602.1 (KHTML, like Gecko) QuiteRss/0.19.4 Version/10.0 Safari/602.1"
+		Accept: "application/xml,text/html,application/xhtml+xml"
+	},
+	redirect: "follow"
+});
+
+
 /**
  * @typedef {Object} UserSubscription
  * @property {number} ID
@@ -156,17 +166,13 @@ const handleGenericSubscription = async (definition) => {
 
 	let message;
 	if (type === "rss") {
-		const response = await sb.Got("GenericAPI", {
-			url,
-			responseType: "text",
-			http2: false
-		});
-
-		if (response.statusCode !== 200) {
+		const response = await rssFetch(url);
+		if (!response.ok) {
 			return;
 		}
 
-		const result = await parseRssNews(response.body, cacheKey);
+		const body = await response.text();
+		const result = await parseRssNews(body, cacheKey);
 		if (!result) {
 			return;
 		}
