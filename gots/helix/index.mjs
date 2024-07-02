@@ -14,6 +14,12 @@ export const definition = {
 			headers: {
 				"Client-ID": sb.Config.get("TWITCH_CLIENT_ID", true)
 			},
+			timeout: {
+				request: 5000
+			},
+			retry: {
+				limit: 3
+			},
 			hooks: {
 				beforeRequest: [
 					(options) => {
