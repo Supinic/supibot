@@ -92,12 +92,6 @@ module.exports = {
 					reply: "This channel is not currently supported!"
 				};
 			}
-			else if (this.data.counts[channel] <= 0) {
-				return {
-					success: false,
-					reply: `This channel does not have any pictures!`
-				};
-			}
 		}
 
 		// Preparation work that does not need to run more than once, so it is placed before the loop below.
@@ -115,6 +109,13 @@ module.exports = {
 			}
 
 			this.data.counts.total = total;
+		}
+
+		if (this.data.counts[channel] <= 0) {
+			return {
+				success: false,
+				reply: `This channel does not have any pictures!`
+			};
 		}
 
 		let safeMode = true;
