@@ -548,6 +548,17 @@ module.exports = (command) => [
 					.single()
 					.flat("ID")
 				);
+
+				// If no active reminder found, check the historic table
+				identifier ??= await sb.Query.getRecordset(rs => rs
+					.select("ID")
+					.from("chat_data", "Reminder_History")
+					.where("User_From = %n", context.user.ID)
+					.orderBy("ID DESC")
+					.limit(1)
+					.single()
+					.flat("ID")
+				);
 			}
 
 			const ID = Number(identifier);
