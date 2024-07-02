@@ -11,7 +11,6 @@ module.exports = [
 	require("./no-abb-chatter.js"),
 	require("./reminder.js"),
 	require("./suggestion.js"),
-	require("./timer.js"),
 	require("./track-favourite.js"),
 	...require("./twitch-lotto.js")
 ];
