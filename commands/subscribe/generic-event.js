@@ -166,14 +166,16 @@ const handleGenericSubscription = async (definition) => {
 
 	let message;
 	if (type === "rss") {
-		let response;
-		try {
-			response = await rssFetch(url);
-		}
-		catch (e) {
-			console.warn("RSS fetch failed", { url, e });
-			return;
-		}
+		const response = await sb.Got("GenericAPI", {
+			url,
+			responseType: "text",
+			timeout: {
+				request: 10_000
+			},
+			retry: {
+				limit: 5
+			}
+		});
 
 		if (!response.ok) {
 			return;
