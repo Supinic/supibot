@@ -316,8 +316,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 			if (messageResponse.drop_reason.code === "channel_settings") {
 				await this.send(
-					channel,
-					"A message that was about to be posted violated this channel's moderation settings."
+					"A message that was about to be posted violated this channel's moderation settings.",
+					channel
 				);
 			}
 		}
