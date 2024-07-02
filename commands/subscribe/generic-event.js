@@ -181,8 +181,7 @@ const handleGenericSubscription = async (definition) => {
 			return;
 		}
 
-		const body = await response.text();
-		const result = await parseRssNews(body, cacheKey);
+		const result = await parseRssNews(response.body, cacheKey);
 		if (!result) {
 			return;
 		}
