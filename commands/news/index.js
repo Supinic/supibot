@@ -6,7 +6,9 @@ module.exports = {
 	Description: "Fetches short articles. You can use a 2 uppercase letter code to get country specific news, or any other word as a search query.",
 	Flags: ["mention","non-nullable","pipe"],
 	Params: [
-		{ name: "country", type: "string" }
+		{ name: "country", type: "string" },
+		{ name: "latest", type: "boolean" },
+		{ name: "link", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	Code: (async function news (context, ...args) {
@@ -42,10 +44,10 @@ module.exports = {
 				? input
 				: args.shift();
 
-			return await rssNews.fetch(code, args.join(" "));
+			return await rssNews.fetch(context, code, args.join(" "));
 		}
 		else if (!rssNews.isCountryCode(input)) {
-			return await googleNews.fetch(args.join(" "));
+			return await googleNews.fetch(context, args.join(" "));
 		}
 		else {
 			return {
@@ -119,6 +121,16 @@ module.exports = {
 			`<code>${prefix}news <u>(special code)</u></code>`,
 			`<code>${prefix}news <u>ONION</u></code>`,
 			"Fetches special news, usually from a specific source. Consult the table below.",
+			"",
+
+			`<code>${prefix}news (code) <u>latest:true</u></code>`,
+			`<code>${prefix}news SK <u>link:true</u></code>`,
+			"Fetches the news along with a link to the article, if available.",
+			"",
+
+			`<code>${prefix}news (code) <u>link:true</u></code>`,
+			`<code>${prefix}news SK <u>link:true</u></code>`,
+			"Fetches the news along with a link to the article, if available.",
 			"",
 
 			"The following are supported country-specific codes and special codes.",

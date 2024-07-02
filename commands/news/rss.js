@@ -3,6 +3,8 @@ const { parseRSS } = require("../../utils/command-utils.js");
 const definitions = require("./definitions.json");
 const rssCacheKey = "command-news-rss-cache";
 
+const sanitize = (string) => sb.Utils.fixHTML(sb.Utils.removeHTML(string)).replace(/\s+/g, " ");
+
 module.exports = {
 	isCountryCode: (code) => /[A-Z]{2}/.test(code),
 	has: (code) => {
@@ -16,7 +18,7 @@ module.exports = {
 			&& (i.sources.length > 0)
 		));
 	},
-	fetch: async (code, query) => {
+	fetch: async (context, code, query) => {
 		if (!code) {
 			throw new sb.Error({ message: "No code provided" });
 		}
@@ -82,19 +84,25 @@ module.exports = {
 			});
 		}
 
-		let article;
+		let resultArticles;
 		if (query) {
 			query = query.toLowerCase();
 
-			const filteredArticles = articles.filter(i => (
+			resultArticles = articles.filter(i => (
 				(i.title?.toLowerCase().includes(query))
 				|| (i.content?.toLowerCase().includes(query))
 			));
-
-			article = sb.Utils.randArray(filteredArticles);
 		}
 		else {
-			article = sb.Utils.randArray(articles);
+			resultArticles = articles;
+		}
+
+		let article;
+		if (context.params.latest) {
+			article = resultArticles.sort((a, b) => b.published - a.published)[0];
+		}
+		else {
+			article = sb.Utils.randArray(resultArticles);
 		}
 
 		if (!article) {
@@ -106,13 +114,31 @@ module.exports = {
 
 		const { content, title, published, link } = article;
 		const separator = (title && content) ? " - " : "";
-		const linkString = (source.includeLink === true) ? link : "";
+		const includeLink = context.params.link ?? Boolean(source.includeLink);
+
 		const delta = (published)
 			? `(published ${sb.Utils.timeDelta(new sb.Date(published))})`
 			: "";
 
-		const raw = `${title ?? ""}${separator}${content ?? ""} ${linkString} ${delta}`;
-		const result = sb.Utils.fixHTML(sb.Utils.removeHTML(raw)).replace(/\s+/g, " ");
+		let result;
+		if (!includeLink) {
+			result = sanitize(`${title ?? ""}${separator}${content ?? ""} ${delta}`);
+		}
+		else {
+			const limit = context.channel.Message_Limit ?? context.platform.messageLimit;
+			result = sanitize(`${title ?? ""}${separator}${content ?? ""} ${link} ${delta}`);
+
+			// If the result is too long at first, skip the article content
+			if (result.length >= limit) {
+				result = sanitize(`${title ?? ""} ${link} ${delta}`);
+			}
+
+			// If the result is still too long, omit the article text completely and only include the link
+			if (result.length >= limit) {
+				result = sanitize(`${link} ${delta}`);
+			}
+		}
+
 		return {
 			reply: result
 		};

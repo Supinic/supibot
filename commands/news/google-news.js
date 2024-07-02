@@ -3,7 +3,14 @@ const { parseRSS } = require("../../utils/command-utils.js");
 const cleanString = (str) => sb.Utils.fixHTML(sb.Utils.removeHTML(str)).replace(/\s+/g, " ");
 
 module.exports = {
-	fetch: async (query) => {
+	fetch: async (context, query) => {
+		if (context.params.link) {
+			return {
+				success: false,
+				reply: `Links are only available for code-specific news!`
+			};
+		}
+
 		let response;
 		if (query) {
 			response = await sb.Got("GenericAPI", {
@@ -39,7 +46,10 @@ module.exports = {
 			published: new sb.Date(i.pubDate).valueOf()
 		}));
 
-		const article = sb.Utils.randArray(articles);
+		const article = (context.params.latest)
+			? articles.sort((a, b) => b.published - a.published)[0]
+			: sb.Utils.randArray(articles);
+
 		const { content, title, published } = article;
 		const separator = (title && content) ? " - " : "";
 		const delta = (published)
