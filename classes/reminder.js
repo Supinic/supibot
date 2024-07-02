@@ -850,10 +850,24 @@ module.exports = class Reminder extends require("./template.js") {
 			await row.load(ID, true);
 
 			if (row.loaded) {
-				row.values.Active = false;
-				row.values.Cancelled = Boolean(cancelled);
+				const historyRow = await sb.Query.getRow("chat_data", "Reminder_History");
 
-				await row.save({ skipLoad: true });
+				historyRow.setValues({
+					ID,
+					User_From: row.values.User_From,
+					User_To: row.values.User_To,
+					Channel: row.values.Channel,
+					Platform: row.values.Platform,
+					Type: row.values.Type,
+					Text: row.values.Text,
+					Created: row.values.Created,
+					Schedule: row.values.Schedule,
+					Private_Message: row.values.Private_Message,
+					Cancelled: Boolean(cancelled)
+				});
+
+				await historyRow.save({ skipLoad: true });
+				await row.delete();
 			}
 		}
 
