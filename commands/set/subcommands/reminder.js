@@ -22,17 +22,15 @@ module.exports = {
 	}),
 	unset: async (context, ID) => {
 		const row = await sb.Query.getRow("chat_data", "Reminder");
-		try {
-			await row.load(ID);
-		}
-		catch {
+		await row.load(ID, true);
+
+		if (!row.loaded) {
 			return {
 				success: false,
-				reply: "ID does not exist!"
+				reply: "That reminder does not exist!"
 			};
 		}
-
-		if (row.values.User_From !== context.user.ID && row.values.User_To !== context.user.ID) {
+		else if (row.values.User_From !== context.user.ID && row.values.User_To !== context.user.ID) {
 			return {
 				success: false,
 				reply: "That reminder was not created by you or set for you!"
