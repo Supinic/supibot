@@ -445,6 +445,9 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 				else if (!skipGlobalEmotes && GLOBAL_EMOTE_ALLOWED_REGEX.test(word) && word.length > 2) {
 					emote = sb.Utils.randArray(eligibleEmotes);
 				}
+				else {
+					continue;
+				}
 
 				// This regex makes sure all emotes to be replaces are not preceded or followed by a ":" (colon) character
 				// All emotes on Discord are wrapped at least by colons
