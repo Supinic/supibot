@@ -312,7 +312,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		const messageResponse = response.body.data[0];
 		if (!messageResponse.is_sent) {
-			console.warn("JSON not sent!", { messageResponse });
+			console.warn("JSON not sent!", { channel, messageResponse });
 
 			if (messageResponse.drop_reason.code === "channel_settings") {
 				await this.send(
