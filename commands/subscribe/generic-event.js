@@ -158,7 +158,8 @@ const handleGenericSubscription = async (definition) => {
 	if (type === "rss") {
 		const response = await sb.Got("GenericAPI", {
 			url,
-			responseType: "text"
+			responseType: "text",
+			http2: false
 		});
 
 		if (response.statusCode !== 200) {
