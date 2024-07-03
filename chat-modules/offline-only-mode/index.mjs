@@ -12,11 +12,16 @@ export const definition = {
 				mode: channel.Mode ?? "Write"
 			});
 
+			await channel.send("Stream is online, offline-only mode is kicking in! I'll be back MrDestructoid");
+
 			await channel.saveProperty("Mode", "Read");
 		}
 		else if (event === "offline" && channel.Mode === "Read" && offlineConfiguration) {
 			await context.channel.setDataProperty("offlineOnlyBot", null);
+
 			await channel.saveProperty("Mode", offlineConfiguration.mode ?? "Write");
+
+			await channel.send("Stream is offline, offline-only mode disabled! I'm back now MrDestructoid");
 		}
 	}),
 	Global: false,
