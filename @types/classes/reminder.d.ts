@@ -8,7 +8,6 @@ import { User } from "./user";
 
 type ConstructorData = {
 	ID: number;
-	Active: boolean;
 	User_From: User["ID"];
 	User_To: User["ID"];
 	Channel: Channel["ID"];
@@ -70,7 +69,6 @@ export declare class Reminder extends ClassTemplate {
 	static destroy (): void;
 
 	readonly ID: number;
-	readonly Active: boolean;
 	readonly User_From: User["ID"];
 	readonly User_To: User["ID"];
 	readonly Channel: Channel["ID"] | null;
