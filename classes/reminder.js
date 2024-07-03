@@ -108,6 +108,8 @@ module.exports = class Reminder extends require("./template.js") {
 		 * @type {LongTimeout|null}
 		 */
 		this.timeout = null;
+
+		this.deactivated = false;
 	}
 
 	activateTimeout () {
@@ -209,8 +211,6 @@ module.exports = class Reminder extends require("./template.js") {
 	 * @returns {Promise<Reminder>}
 	 */
 	async deactivate (permanent, cancelled) {
-		this.Active = false;
-
 		// Always deactivate timed reminder timeout
 		if (this.timeout) {
 			this.timeout.clear();
@@ -429,7 +429,7 @@ module.exports = class Reminder extends require("./template.js") {
 
 		const now = sb.Date.now();
 		const reminders = list.filter(i => (
-			i.Active
+			!i.deactivated
 			&& ((i.Type === "Deferred" && i.Schedule <= now) || (i.Type !== "Deferred" && !i.Schedule))
 			&& !excludedUserIDs.includes(i.User_From)
 		));
@@ -442,7 +442,7 @@ module.exports = class Reminder extends require("./template.js") {
 		// the reminders if tons of messages are being sent at the same time.
 		// The reminders will be deactivated properly at the end.
 		for (const reminder of reminders) {
-			reminder.Active = false;
+			reminder.deactivated = false;
 		}
 
 		const reply = [];
