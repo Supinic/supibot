@@ -31,7 +31,7 @@ const importFileDataModule = async (module, path) => {
 		throw new Error(`Cannot combine blacklist and whitelist for ${path}`);
 	}
 	else if (disableAll) {
-		console.log(`Module ${path} is disabled - will not load`);
+		console.warn(`Module ${path} is disabled - will not load`);
 		return;
 	}
 
@@ -67,6 +67,28 @@ const databaseModuleInitializeOrder = [
 	// Second batch - depends on Channel
 	[ChatModule]
 ];
+
+const initializeCommands = async (config) => {
+	if (config.modules.commands.disableAll) {
+		console.warn("Load commands - skipped due to `disableAll` setting");
+		return;
+	}
+
+	console.time("Load commands");
+	const {
+		blacklist,
+		whitelist
+	} = config.modules.commands;
+
+	const { loadCommands } = await require("./commands/index.js");
+	const commands = await loadCommands({
+		blacklist,
+		whitelist
+	});
+
+	await Command.importData(commands.definitions);
+	console.timeEnd("Load commands");
+};
 
 // Database access keys are loaded here, and stored to process.env
 require("./db-access.js");
@@ -110,31 +132,31 @@ require("./db-access.js");
 	};
 
 	console.timeEnd("supi-core");
-	console.time("platforms framework");
 
 	const platforms = new Set();
 	for (const definition of platformsConfig) {
 		platforms.add(Platform.create(definition.type, definition));
 	}
 
-	console.timeEnd("platforms framework");
 	console.time("basic bot modules");
 
 	// Initialize bot-specific modules with database-driven data
 	for (let i = 0; i < databaseModuleInitializeOrder.length; i++) {
+		console.debug(`Modules batch #${i + 1}`);
+
 		const initOrder = databaseModuleInitializeOrder[i];
-
-		const label = `Batch #${i + 1}: ${initOrder.map(i => i.name).join(", ")}`;
-		console.time(label);
-
 		const promises = initOrder.map(async (module) => {
 			console.time(`Init ${module.name}`);
 			await module.initialize();
 			console.timeEnd(`Init ${module.name}`);
 		});
-		await Promise.all(promises);
 
-		console.timeEnd(label);
+		if (i === 0) {
+			await Promise.all([...promises, initializeCommands(config)]);
+		}
+		else {
+			await Promise.all(promises);
+		}
 	}
 
 	globalThis.sb = {
@@ -159,24 +181,6 @@ require("./db-access.js");
 	};
 
 	console.timeEnd("basic bot modules");
-	console.time("commands");
-
-	if (!config.modules.commands.disableAll) {
-		const {
-			blacklist,
-			whitelist
-		} = config.modules.commands;
-
-		const { loadCommands } = await require("./commands/index.js");
-		const commands = await loadCommands({
-			blacklist,
-			whitelist
-		});
-
-		await Command.importData(commands.definitions);
-	}
-
-	console.timeEnd("commands");
 	console.time("chat modules");
 
 	await Promise.all([
@@ -205,8 +209,6 @@ require("./db-access.js");
 		});
 	}
 
-	console.time("platform connects");
-
 	const promises = [];
 	for (const platform of platforms) {
 		if (!platform.active) {
@@ -215,12 +217,16 @@ require("./db-access.js");
 		}
 
 		platform.checkConfig();
-		promises.push(platform.connect());
+		promises.push((async () => {
+			console.time(`Platform connect: ${platform.name}`);
+			await platform.connect();
+			console.timeEnd(`Platform connect: ${platform.name}`);
+		})());
 	}
 
 	await Promise.all(promises);
 
-	console.timeEnd("platform connects");
+	console.debug("Ready!");
 	console.groupEnd("Initialize timers");
 
 	process.on("unhandledRejection", async (reason) => {
