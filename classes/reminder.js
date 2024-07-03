@@ -442,7 +442,7 @@ module.exports = class Reminder extends require("./template.js") {
 		// the reminders if tons of messages are being sent at the same time.
 		// The reminders will be deactivated properly at the end.
 		for (const reminder of reminders) {
-			reminder.deactivated = false;
+			reminder.deactivated = true;
 		}
 
 		const reply = [];
