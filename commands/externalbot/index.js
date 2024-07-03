@@ -11,12 +11,17 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	initialize: async () => {
-		prefixes = await sb.Query.getRecordset(rs => rs
-			.select("Bot_Alias AS ID", "Prefix as prefix")
-			.from("bot_data", "Bot")
-			.where("Prefix IS NOT NULL")
-			.orderBy("LENGTH(Prefix) DESC")
-		);
+		if (!await sb.Query.isTablePresent("bot_data", "Bot")) {
+			prefixes = [];
+		}
+		else {
+			prefixes = await sb.Query.getRecordset(rs => rs
+				.select("Bot_Alias AS ID", "Prefix as prefix")
+				.from("bot_data", "Bot")
+				.where("Prefix IS NOT NULL")
+				.orderBy("LENGTH(Prefix) DESC")
+			);
+		}
 	},
 	Code: (async function externalBot (context, ...rest) {
 		if (!context.channel) {
@@ -27,6 +32,12 @@ module.exports = {
 		else if (!context.append.pipe) {
 			return {
 				reply: "Can't use this command outside of pipe!"
+			};
+		}
+		else if (prefixes.length === 0) {
+			return {
+				success: false,
+				reply: `No external bots are configured!`
 			};
 		}
 
