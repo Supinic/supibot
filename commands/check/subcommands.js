@@ -600,6 +600,7 @@ module.exports = (command) => [
 
 			let status = "";
 			if (!active) {
+				// Only applies to Reminder_History table
 				status = (reminder.Cancelled) ? "(cancelled)" : "(inactive)";
 			}
 
