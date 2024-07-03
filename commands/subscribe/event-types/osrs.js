@@ -45,11 +45,9 @@ module.exports = {
 			return;
 		}
 
-		const eligibleArticles = (previousArticleIndex === -1)
-			? newsItems
-			: newsItems.slice(0, previousArticleId);
-
+		const eligibleArticles = newsItems.slice(0, previousArticleIndex);
 		const latestArticleId = eligibleArticles[0].newsId;
+
 		await sb.Cache.setByPrefix(OSRS_LATEST_ARTICLE_ID, latestArticleId, {
 			expiry: 14 * 864e5 // 14 days
 		});
