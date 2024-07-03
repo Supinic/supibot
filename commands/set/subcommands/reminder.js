@@ -10,7 +10,6 @@ module.exports = {
 		.select("ID")
 		.from("chat_data", "Reminder")
 		.where("User_From = %n", context.user.ID)
-		.where("Active = %b", true)
 		.orderBy("ID DESC")
 		.limit(1)
 		.single()
@@ -79,7 +78,6 @@ module.exports = {
 		const reminderIDs = await sb.Query.getRecordset(rs => rs
 			.select("ID")
 			.from("chat_data", "Reminder")
-			.where("Active = %b", true)
 			.where("Schedule IS NOT NULL")
 			.where("User_From = %n", authorUserData.ID)
 			.where("User_To = %n", context.user.ID)
