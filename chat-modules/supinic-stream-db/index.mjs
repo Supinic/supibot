@@ -85,6 +85,13 @@ export const definition = {
 				row.values.End = new sb.Date().discardTimeUnits("s", "ms");
 				await row.save();
 			}
+
+			await sb.Config.set("SONG_REQUESTS_STATE", "off");
+			await sb.Query.isRecordUpdater(ru => ru
+				.from("chat_data", "Song_Request")
+				.set("Status", "Inactive")
+				.where("Status <> %s", "Inactive")
+			)
 		}
 	}),
 	Global: false,
