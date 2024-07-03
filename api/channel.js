@@ -43,7 +43,7 @@ module.exports = {
 		}
 
 		const newChannelData = await sb.Channel.add(channelName, platformData, botChannelMode, channelID);
-		await Promise.all(platformData.joinChannels([newChannelData]));
+		await platformData.joinChannel(channelID);
 
 		if (announcement) {
 			await newChannelData.send(announcement);

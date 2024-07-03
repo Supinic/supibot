@@ -7,8 +7,8 @@ const {
 	// createChannelSubSubscription,
 	// createChannelResubSubscription,
 	// createChannelRaidSubscription,
-	// createChannelOnlineSubscription,
-	// createChannelOfflineSubscription,
+	createChannelOnlineSubscription,
+	createChannelOfflineSubscription,
 	getExistingSubscriptions,
 	getConduitId,
 	getAppAccessToken,
@@ -129,10 +129,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			const channelList = sb.Channel.getJoinableForPlatform(this);
 			const missingChannels = channelList.filter(i => !existingChannels.includes(i.Specific_ID));
 
-			const batchSize = 10;
+			const batchSize = 100;
 			for (let index = 0; index < missingChannels.length; index += batchSize) {
 				const slice = missingChannels.slice(index, index + batchSize);
-				const joinPromises = this.joinChannels(slice);
+				const joinPromises = slice.map(async channel => await this.joinChannel(channel.Specific_ID));
 
 				await Promise.allSettled(joinPromises);
 			}
@@ -1240,25 +1240,12 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		return response.body.data[0].login;
 	}
 
-	joinChannels (channelsData) {
-		if (!Array.isArray(channelsData)) {
-			channelsData = [channelsData];
-		}
-
-		const promises = [];
-		for (const channelData of channelsData) {
-			promises.push(
-				createChannelChatMessageSubscription(this.selfId, channelData.Specific_ID, this)
-				// createChannelBanSubscription(channelData.Specific_ID),
-				// createChannelSubSubscription(channelData.Specific_ID),
-				// createChannelResubSubscription(channelData.Specific_ID),
-				// createChannelRaidSubscription(channelData.Specific_ID),
-				// createChannelOnlineSubscription(channelData.Specific_ID),
-				// createChannelOfflineSubscription(channelData.Specific_ID)
-			);
-		}
-
-		return promises;
+	async joinChannel (channelId) {
+		return await Promise.all([
+			createChannelChatMessageSubscription(this.selfId, channelId, this),
+			createChannelOnlineSubscription(channelId),
+			createChannelOfflineSubscription(channelId)
+		]);
 	}
 
 	#pingWebsocket () {
