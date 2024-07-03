@@ -41,12 +41,6 @@ module.exports = class Reminder extends require("./template.js") {
 		this.ID = data.ID;
 
 		/**
-		 * Whether or not the reminder is still active (primed).
-		 * @type {boolean}
-		 */
-		this.Active = data.Active;
-
-		/**
 		 * The user who set the reminder up.
 		 * Since anonymous reminders are not supported, this cannot be null.
 		 * @type {User["ID"]}
@@ -152,7 +146,6 @@ module.exports = class Reminder extends require("./template.js") {
 					Platform: channelData.Platform.ID,
 					Channel: channelData.ID,
 					Created: new sb.Date(),
-					Active: true,
 					Schedule: null,
 					Text: `You got a scheduled reminder (ID ${this.ID}) while you were AFK: ${message}`,
 					Private_Message: true
@@ -357,9 +350,6 @@ module.exports = class Reminder extends require("./template.js") {
 	/**
 	 * Creates a new Reminder, and saves it to database.
 	 * Used mostly in commands to set up reminders.
-	 * @param {Object} data {@link Reminder}-compliant data
-	 * @param {boolean} [skipChecks = false] If true, skips all reminder checks. This is done for system reminders, so they always go through.
-	 * @return {ReminderCreationResult}
 	 */
 	static async create (data, skipChecks = false) {
 		if (!skipChecks) {
