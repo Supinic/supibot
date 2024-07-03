@@ -548,6 +548,17 @@ module.exports = (command) => [
 					.single()
 					.flat("ID")
 				);
+
+				// If no active reminder found, check the historic table
+				identifier ??= await sb.Query.getRecordset(rs => rs
+					.select("ID")
+					.from("chat_data", "Reminder_History")
+					.where("User_From = %n", context.user.ID)
+					.orderBy("ID DESC")
+					.limit(1)
+					.single()
+					.flat("ID")
+				);
 			}
 
 			const ID = Number(identifier);
@@ -561,26 +572,35 @@ module.exports = (command) => [
 				};
 			}
 
-			const reminder = await sb.Query.getRecordset(rs => rs
-				.select("ID", "User_From", "User_To", "Text", "Active", "Schedule", "Cancelled")
-				.from("chat_data", "Reminder")
-				.where("ID = %n", ID)
-				.single()
-			);
+			// Load active reminder
+			let active = true;
+			let row = await sb.Query.getRow("chat_data", "Reminder");
+			await row.load(ID, true);
 
-			if (!reminder) {
+			// If active reminder does not exist, fall back to historic table
+			if (!row.loaded) {
+				active = false;
+				row = await sb.Query.getRow("chat_data", "Reminder_History");
+				await row.load(ID, true);
+			}
+
+			// If still nothing exists, error out
+			if (!row.loaded) {
 				return {
 					reply: "That reminder doesn't exist!"
 				};
 			}
-			else if (reminder.User_From !== context.user.ID && reminder.User_To !== context.user.ID) {
+
+			const reminder = row.valuesObject;
+			if (reminder.User_From !== context.user.ID && reminder.User_To !== context.user.ID) {
 				return {
 					reply: "That reminder was not created by you or for you. Stop peeking!"
 				};
 			}
 
 			let status = "";
-			if (!reminder.Active) {
+			if (!active) {
+				// Only applies to Reminder_History table
 				status = (reminder.Cancelled) ? "(cancelled)" : "(inactive)";
 			}
 

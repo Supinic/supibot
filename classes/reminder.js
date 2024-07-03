@@ -41,12 +41,6 @@ module.exports = class Reminder extends require("./template.js") {
 		this.ID = data.ID;
 
 		/**
-		 * Whether or not the reminder is still active (primed).
-		 * @type {boolean}
-		 */
-		this.Active = data.Active;
-
-		/**
 		 * The user who set the reminder up.
 		 * Since anonymous reminders are not supported, this cannot be null.
 		 * @type {User["ID"]}
@@ -76,14 +70,14 @@ module.exports = class Reminder extends require("./template.js") {
 
 		/**
 		 * Date of creation.
-		 * @type {CustomDate}
+		 * @type {CoreDate}
 		 */
 		this.Created = data.Created;
 
 		/**
 		 * Schedule date of reminder, if it's timed.
 		 * If null, reminder is tied to a user typing in chat.
-		 * @type {CustomDate|null}
+		 * @type {CoreDate|null}
 		 */
 		this.Schedule = data.Schedule;
 
@@ -152,7 +146,6 @@ module.exports = class Reminder extends require("./template.js") {
 					Platform: channelData.Platform.ID,
 					Channel: channelData.ID,
 					Created: new sb.Date(),
-					Active: true,
 					Schedule: null,
 					Text: `You got a scheduled reminder (ID ${this.ID}) while you were AFK: ${message}`,
 					Private_Message: true
@@ -266,10 +259,9 @@ module.exports = class Reminder extends require("./template.js") {
 		const data = await sb.Query.getRecordset(rs => rs
 			.select("*")
 			.from("chat_data", "Reminder")
-			.where("Active = %b", true)
 		);
 
-		const threshold = new sb.Date().addYears(1).valueOf();
+		const threshold = new sb.Date().addYears(10).valueOf();
 		for (const row of data) {
 			// Skip scheduled reminders that are set to fire more than `threshold` in the future
 			if (row.Schedule && row.Schedule.valueOf() > threshold) {
@@ -298,11 +290,11 @@ module.exports = class Reminder extends require("./template.js") {
 
 		const promises = list.map(async (ID) => {
 			const row = await sb.Query.getRow("chat_data", "Reminder");
-			await row.load(ID);
+			await row.load(ID, true);
 
-			await Reminder.#remove(ID, false);
+			await Reminder.#remove(ID);
 
-			if (!row.values.Active) {
+			if (!row.loaded) {
 				return;
 			}
 
@@ -358,9 +350,6 @@ module.exports = class Reminder extends require("./template.js") {
 	/**
 	 * Creates a new Reminder, and saves it to database.
 	 * Used mostly in commands to set up reminders.
-	 * @param {Object} data {@link Reminder}-compliant data
-	 * @param {boolean} [skipChecks = false] If true, skips all reminder checks. This is done for system reminders, so they always go through.
-	 * @return {ReminderCreationResult}
 	 */
 	static async create (data, skipChecks = false) {
 		if (!skipChecks) {
@@ -385,7 +374,6 @@ module.exports = class Reminder extends require("./template.js") {
 
 		const row = await sb.Query.getRow("chat_data", "Reminder");
 		row.setValues({
-			Active: true,
 			User_From: data.User_From,
 			User_To: data.User_To,
 			Channel: data.Channel ?? null,
@@ -674,14 +662,12 @@ module.exports = class Reminder extends require("./template.js") {
 			sb.Query.getRecordset(rs => rs
 				.select("Private_Message")
 				.from("chat_data", "Reminder")
-				.where("Active = %b", true)
 				.where("(Type = %s AND Schedule IS NULL) OR (Type = %s AND Schedule IS NOT NULL)", "Reminder", "Deferred")
 				.where("User_To = %n", userTo)
 			),
 			sb.Query.getRecordset(rs => rs
 				.select("Private_Message")
 				.from("chat_data", "Reminder")
-				.where("Active = %b", true)
 				.where("Schedule IS NULL")
 				.where("(Type = %s AND Schedule IS NULL) OR (Type = %s AND Schedule IS NOT NULL)", "Reminder", "Deferred")
 				.where("User_From = %n", userFrom)
@@ -732,7 +718,6 @@ module.exports = class Reminder extends require("./template.js") {
 				sb.Query.getRecordset(rs => rs
 					.select("COUNT(*) AS Count")
 					.from("chat_data", "Reminder")
-					.where("Active = %b", true)
 					.where("Schedule IS NOT NULL")
 					.where("User_To = %n", userTo)
 					.where("Type <> %s", "Deferred")
@@ -746,7 +731,6 @@ module.exports = class Reminder extends require("./template.js") {
 				sb.Query.getRecordset(rs => rs
 					.select("COUNT(*) AS Count")
 					.from("chat_data", "Reminder")
-					.where("Active = %b", true)
 					.where("Schedule IS NOT NULL")
 					.where("User_From = %n", userFrom)
 					.where("Type <> %s", "Deferred")
@@ -777,7 +761,6 @@ module.exports = class Reminder extends require("./template.js") {
 			const existingPingmeReminderID = await sb.Query.getRecordset(rs => rs
 				.select("ID")
 				.from("chat_data", "Reminder")
-				.where("Active = %b", true)
 				.where("Type = %s", "Pingme")
 				.where("User_From = %n", userFrom)
 				.where("User_To = %n", userTo)
@@ -850,10 +833,24 @@ module.exports = class Reminder extends require("./template.js") {
 			await row.load(ID, true);
 
 			if (row.loaded) {
-				row.values.Active = false;
-				row.values.Cancelled = Boolean(cancelled);
+				const historyRow = await sb.Query.getRow("chat_data", "Reminder_History");
 
-				await row.save({ skipLoad: true });
+				historyRow.setValues({
+					ID,
+					User_From: row.values.User_From,
+					User_To: row.values.User_To,
+					Channel: row.values.Channel,
+					Platform: row.values.Platform,
+					Type: row.values.Type,
+					Text: row.values.Text,
+					Created: row.values.Created,
+					Schedule: row.values.Schedule,
+					Private_Message: row.values.Private_Message,
+					Cancelled: Boolean(cancelled)
+				});
+
+				await historyRow.save({ skipLoad: true });
+				await row.delete();
 			}
 		}
 

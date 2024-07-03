@@ -22,26 +22,28 @@ module.exports = {
 	}),
 	unset: async (context, ID) => {
 		const row = await sb.Query.getRow("chat_data", "Reminder");
-		try {
-			await row.load(ID);
-		}
-		catch {
-			return {
-				success: false,
-				reply: "ID does not exist!"
-			};
-		}
+		await row.load(ID, true);
 
-		if (row.values.User_From !== context.user.ID && row.values.User_To !== context.user.ID) {
+		if (!row.loaded) {
+			const historyRow = await sb.Query.getRow("chat_data", "Reminder_History");
+			await historyRow.load(ID, true);
+			if (historyRow.loaded) {
+				return {
+					success: false,
+					reply: "That reminder is already deactivated!"
+				};
+			}
+			else {
+				return {
+					success: false,
+					reply: "There is no reminder with such ID!"
+				};
+			}
+		}
+		else if (row.values.User_From !== context.user.ID && row.values.User_To !== context.user.ID) {
 			return {
 				success: false,
 				reply: "That reminder was not created by you or set for you!"
-			};
-		}
-		else if (!row.values.Active) {
-			return {
-				success: false,
-				reply: "That reminder is already deactivated!"
 			};
 		}
 		else if (context.channel?.ID && !row.values.Schedule && row.values.User_To === context.user.ID) {
