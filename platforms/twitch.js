@@ -674,7 +674,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			// The original message starts with the thread author's username mention, so replace that first
 			targetMessage = targetMessage
 				.replace(/^@/, "")
-				.replace(reply.parent_user_name, "");
+				.replace(reply.parent_user_name, "")
+				.trim();
 
 			// Then append the original message body
 			targetMessage += ` ${reply.parent_message_body}`;
