@@ -667,15 +667,11 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			sb.Logger.log("Twitch.Other", `${cheer.bits} bits`, channelData, userData);
 		}
 
-		// If the handled message is a reply to another, append its content without the username mention to the end
-		// of the current one. This is so that a possible command execution can be handled with this input.
+		// If the handled message is a reply to another, append its content at the end.
+		// This is so that a possible command execution can be handled with the reply's message as input..
 		let targetMessage = messageData.text;
 		if (reply) {
-			// The extra length of 2 signifies one for the "@" symbol at the start of the user mention, and the other
-			// is for the space character which separates the mention from the message.
-			const remainder = targetMessage.slice(reply.parent_user_login.length + 2);
-			const parentMessage = reply.parent_message_body;
-			targetMessage = `${remainder} ${parentMessage}`;
+			targetMessage += ` ${reply.parent_message_body}`;
 		}
 
 		if (!sb.Command.is(targetMessage)) {
