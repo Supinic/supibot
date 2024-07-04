@@ -209,7 +209,7 @@ const createChannelChatMessageSubscription = async (selfId, channelId, platform)
 		version: "1"
 	});
 
-	if (!response.ok && response.statusCode === 403) {
+	if (response.statusCode === 403) {
 		/** @type {Channel} */
 		const channelData = sb.Channel.getBySpecificId(channelId, platform);
 		await Promise.all([
@@ -217,6 +217,8 @@ const createChannelChatMessageSubscription = async (selfId, channelId, platform)
 			channelData.setDataProperty("twitchNoScopeDisabled", true)
 		]);
 	}
+
+	return { response };
 };
 
 const createWhisperMessageSubscription = (selfId) => createSubscription({

@@ -262,7 +262,8 @@ module.exports = {
 				else if (inactiveReason === "withdrawn") {
 					return {
 						success: false,
-						reply: `I have been withdrawn from this channel and cannot be re-added back!`
+						cooldown: 60_000,
+						reply: `I have been withdrawn from this channel and cannot be re-added back manually!`
 					};
 				}
 
@@ -280,54 +281,48 @@ module.exports = {
 					};
 				}
 
-				let joinFailed = false;
-				const { client } = sb.Platform.get("twitch");
+				const twitch = sb.Platform.get("twitch");
+				const results = await twitch.joinChannel(channelData.Specific_ID);
+				const [messageResponse, onlineResponse, offlineResponse] = results.map(i => i.response);
 
-				// First round of join/part - do not track any responses
-				try {
-					await client.join(channelData.Name);
-				}
-				catch { /* skip over - we don't care about the result */ }
-				try {
-					await client.part(channelData.Name);
-				}
-				catch { /* skip over - we don't care about the result */ }
-
-				try {
-					await client.join(channelData.Name);
-				}
-				catch {
-					joinFailed = true;
-				}
-
-				if (!joinFailed) {
-					await channelData.setDataProperty("inactiveReason", null);
-					await channelData.saveProperty("Mode", "Write");
-				}
-
-				let success = true;
-				let resultString;
-				if (inactiveReason === "bot-banned") {
-					if (joinFailed) {
-						success = false;
-						resultString = sb.Utils.tag.trim `
-							Could not re-join ${channelString} - make sure I'm unbanned first!
-							Sometimes, Twitch takes several minutes to catch up, so wait ~5 minutes if this still doesn't work.
-							Then try this command again.
-						`;
+				if (messageResponse.ok) {
+					if (channelData.Mode === "Inactive") {
+						await channelData.setProperty("Mode", "Write");
 					}
-					else {
-						resultString = `Tried to re-join ${channelString} - it was probably successful. Make sure I respond to commands, and if not, try this command again in a little bit.`;
+
+					const hasNoScopeProperty = await channelData.getDataProperty("twitchNoScopeDisabled");
+					if (hasNoScopeProperty) {
+						await channelData.setDataProperty("twitchNoScopeDisabled", null);
 					}
+
+					return {
+						reply: `Rejoined channel ${channelString} successfully.`
+					};
+				}
+				else if (messageResponse.statusCode === 403) {
+					return {
+						success: false,
+						reply: `I could not rejoin channel ${channelString}! Make sure to either permit me via Supinic's website or set me as a moderator.`
+					};
+				}
+				else if (messageResponse.statusCode === 409) {
+					if (onlineResponse.statusCode === 202 || offlineResponse.statusCode === 202) {
+						return {
+							reply: `My message connection was already set up, but I set up checking for when the stream goes online or offline.`
+						};
+					}
+
+					return {
+						success: false,
+						reply: "My connections are already set up, everything should work fine!"
+					};
 				}
 				else {
-					resultString = `Re-joined ${channelString} successfully!`;
+					return {
+						success: false,
+						reply: `Something else went wrong when trying to rejoin! Try again later.`
+					};
 				}
-
-				return {
-					success,
-					reply: resultString
-				};
 			}
 
 			case "enable-links":
