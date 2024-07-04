@@ -295,6 +295,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				sender_id: this.selfId,
 				message
 				// reply_parent_message_id // could be useful in the future!
+			},
+			retry: {
+				limit: 3,
+				statusCodes: [500] // Retry when Helix returns 500 (currently unknown reasons?)
 			}
 		});
 
