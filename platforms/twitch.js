@@ -671,6 +671,12 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		// This is so that a possible command execution can be handled with the reply's message as input..
 		let targetMessage = messageData.text;
 		if (reply) {
+			// The original message starts with the thread author's username mention, so replace that first
+			targetMessage = targetMessage
+				.replace(/^@/, "")
+				.replace(reply.parent_user_name, "");
+
+			// Then append the original message body
 			targetMessage += ` ${reply.parent_message_body}`;
 		}
 
