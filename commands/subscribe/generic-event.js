@@ -173,7 +173,8 @@ const handleGenericSubscription = async (definition) => {
 				request: 10_000
 			},
 			retry: {
-				limit: 5
+				limit: 5,
+				errorCodes: ["ETIMEDOUT", "ECONNREFUSED", "ECONNRESET"]
 			}
 		});
 
