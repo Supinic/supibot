@@ -35,7 +35,7 @@ module.exports = {
 			};
 		}
 		else if (targetUser.Name === context.platform.Self_Name) {
-			const emoji = context.getBestAvailableEmote(["supiniScience", "peepoZ", ":z"], "😐");
+			const emoji = await context.getBestAvailableEmote(["supiniScience", "peepoZ", ":z"], "😐");
 			return {
 				success: false,
 				reply: `I don't eat cookies! ${emoji} 🍪 Sugar is bad for my circuits...`
