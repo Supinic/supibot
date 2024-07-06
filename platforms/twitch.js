@@ -767,7 +767,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		if (subscription === "channel.subscribe") { // First time subscriber
 			channelData.events.emit("subscription", {
 				event: "subscription",
-				message: event.message.text,
+				message: "",
 				user: userData,
 				channel: channelData,
 				platform: this,
