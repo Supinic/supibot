@@ -287,7 +287,7 @@ module.exports = {
 
 				if (messageResponse.ok) {
 					if (channelData.Mode === "Inactive") {
-						await channelData.setProperty("Mode", "Write");
+						await channelData.saveProperty("Mode", "Write");
 					}
 
 					const hasNoScopeProperty = await channelData.getDataProperty("twitchNoScopeDisabled");
