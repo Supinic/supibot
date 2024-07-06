@@ -15,6 +15,7 @@ import { definition as SubscriptionReaction } from "./subscription-react/index.m
 import { definition as SilencePreventionTrigger } from "./supinic-silence-prevention-trigger/index.mjs";
 import { definition as StreamDatabaseUpdater } from "./supinic-stream-db/index.mjs";
 import { definition as SuspiciousUserAutoChecker } from "./suspicious-user-auto-check/index.mjs";
+import { definition as TwitchBotScopeReminder } from "./twitch-bot-scope-reminder/index.mjs";
 import { definition as WannaBecomeFamous } from "./wanna-become-famous/index.mjs";
 
 export const definitions = [
@@ -36,6 +37,7 @@ export const definitions = [
 	SilencePreventionTrigger,
 	StreamDatabaseUpdater,
 	SuspiciousUserAutoChecker,
+	TwitchBotScopeReminder,
 	WannaBecomeFamous
 ];
 
