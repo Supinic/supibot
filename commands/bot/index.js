@@ -306,6 +306,10 @@ module.exports = {
 					};
 				}
 				else if (messageResponse.statusCode === 409) {
+					if (channelData.Mode === "Inactive") {
+						await channelData.saveProperty("Mode", "Write");
+					}
+
 					if (onlineResponse.statusCode === 202 || offlineResponse.statusCode === 202) {
 						return {
 							reply: `My message connection was already set up, but I set up checking for when the stream goes online or offline.`
