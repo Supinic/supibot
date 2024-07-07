@@ -135,6 +135,7 @@ const predefinedQueries = {
 		.select("ID", "Tier as tier", "Type as type", "Description as description", "Hint as hint")
 		.from("personal", "Clue_Scroll_Tag")
 		.where("Tier NOT IN %s+", ["Beginner", "Master"])
+		.orderBy("Hint ASC", "ID ASC")
 	)
 };
 const restrictedCommands = ["alias", "pipe", "js"].map(i => sb.Command.get(i));
