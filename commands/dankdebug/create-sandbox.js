@@ -130,6 +130,11 @@ const predefinedQueries = {
 		.orderBy("RAND() DESC")
 		.limit(1)
 		.single()
+	),
+	osrsClueTags: () => sb.Query.getRecordset(rs => rs
+		.select("ID", "Tier as tier", "Type as type", "Description as description", "Hint as hint")
+		.from("personal", "Clue_Scroll_Tag")
+		.where("Tier NOT IN %s+", ["Beginner", "Master"])
 	)
 };
 const restrictedCommands = ["alias", "pipe", "js"].map(i => sb.Command.get(i));

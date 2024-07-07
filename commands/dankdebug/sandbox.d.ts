@@ -137,6 +137,8 @@ declare namespace DankDebug {
 		content: { category: string | null, status: string | null; }[];
 		suscheck: string | null | undefined;
 		ownAlias: { invocation: string, arguments: string[] } | null;
+		randomSongRequest: { Name: string, Link: string, Video_Type: number }[];
+		osrsClueTag: { ID: number, tier: string; type: string; description: string; hint: string; }[];
 	};
 
 	export type PartialCommandResult = {
