@@ -3,18 +3,6 @@ const GptModeration = require("../gpt/moderation.js");
 
 const RAW_TEXT_REGEX = /^\[(?<date>[\d-\s:]+)]\s+#\w+\s+(?<username>\w+):\s+(?<message>.+?)$/;
 
-const BASE_QUERY = sb.Utils.tag.trim `
-	Concisely summarize the following messages from an online chatroom %CHANNEL_NAME%
-	(attempt to ignore chat bots replying to users' commands, and assume unfamiliar words to be emotes)
-`;
-
-const QUERIES = {
-	base: `${BASE_QUERY}`,
-	topical: `${BASE_QUERY} into a numbered list of discussion topics (maximum of 5)`,
-	single: `${BASE_QUERY} into a description of a single, most important topic being discussed - do not include any additional topics`,
-	user: `${BASE_QUERY} into a bullet point list of username-specific topics (maximum of 5, sort by importance)`
-};
-
 const addQueryContext = (query, context, channelName) => query.replace("%CHANNEL_NAME%", channelName);
 const RUSTLOG_RESPONSES = {
 	403: "That channel has opted out from being logged!",
@@ -33,6 +21,19 @@ module.exports = {
 		{ name: "type", type: "string" }
 	],
 	Whitelist_Response: null,
+	initialize: () => {
+		const BASE_QUERY = sb.Utils.tag.trim `
+			Concisely summarize the following messages from an online chatroom %CHANNEL_NAME%
+			(attempt to ignore chat bots replying to users' commands, and assume unfamiliar words to be emotes)
+		`;
+
+		this.data.queries = {
+			base: `${BASE_QUERY}`,
+			topical: `${BASE_QUERY} into a numbered list of discussion topics (maximum of 5)`,
+			single: `${BASE_QUERY} into a description of a single, most important topic being discussed - do not include any additional topics`,
+			user: `${BASE_QUERY} into a bullet point list of username-specific topics (maximum of 5, sort by importance)`
+		};
+	},
 	Code: async function chatSummary (context, channelInput) {
 		let channel = channelInput;
 		if (!channel) {
@@ -83,11 +84,11 @@ module.exports = {
 			.join("\n");
 
 		const queryType = context.params.type ?? "base";
-		const query = QUERIES[queryType];
+		const query = this.data.queries[queryType];
 		if (!query) {
 			return {
 				success: false,
-				reply: `Invalid query type provided! Use one of: ${Object.keys(QUERIES).join(", ")}`
+				reply: `Invalid query type provided! Use one of: ${Object.keys(this.data.queries).join(", ")}`
 			};
 		}
 
