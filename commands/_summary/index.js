@@ -1,4 +1,5 @@
 const GptNexra = require("../gpt/gpt-nexra.js");
+const GptModeration = require("../gpt/moderation.js");
 
 const RAW_TEXT_REGEX = /^\[(?<date>[\d-\s:]+)]\s+#\w+\s+(?<username>\w+):\s+(?<message>.+?)$/;
 
@@ -103,6 +104,11 @@ module.exports = {
 		}
 
 		const message = GptNexra.extractMessage(response);
+		const modCheck = await GptModeration.check(context, message);
+		if (!modCheck.success) {
+			return modCheck;
+		}
+
 		return {
 			reply: `${message}`,
 			cooldown: {
