@@ -3,7 +3,7 @@ const GptNexra = require("../gpt/gpt-nexra.js");
 const RAW_TEXT_REGEX = /^\[(?<date>[\d-\s:]+)]\s+#\w+\s+(?<username>\w+):\s+(?<message>.+?)$/;
 
 const BASE_QUERY = sb.Utils.tag.trim `
-	Concisely summarize the following messages from an online chatroom
+	Concisely summarize the following messages from an online chatroom %CHANNEL_NAME%
 	(attempt to ignore chat bots replying to users' commands, and assume unfamiliar words to be emotes)
 `;
 
@@ -11,9 +11,10 @@ const QUERIES = {
 	base: `${BASE_QUERY}`,
 	topical: `${BASE_QUERY} into a numbered list of discussion topics (maximum of 5)`,
 	single: `${BASE_QUERY} into a description of a single, most important topic being discussed - do not include any additional topics`,
-	user: `${BASE_QUERY} into a bullet point list of username-specific topics `
+	user: `${BASE_QUERY} into a bullet point list of username-specific topics (maximum of 5, sort by importance)`
 };
 
+const addQueryContext = (query, context, channelName) => query.replace("%CHANNEL_NAME%", channelName);
 const RUSTLOG_RESPONSES = {
 	403: "That channel has opted out from being logged!",
 	404: "That channel is not being logged at the moment!",
@@ -37,7 +38,7 @@ module.exports = {
 			if (context.platform.name !== "twitch") {
 				return {
 					success: false,
-					reply: `Pepega TODO`
+					reply: "Outside of Twitch, you must provide the channel name you want to summarize!"
 				};
 			}
 
@@ -49,7 +50,7 @@ module.exports = {
 		if (!channelId) {
 			return {
 				success: false,
-				reply: `No user TODO`
+				reply: "The channel name you provided does not exist!"
 			};
 		}
 
@@ -61,7 +62,7 @@ module.exports = {
 			responseType: "text",
 			searchParams: {
 				reverse: "1",
-				limit: "20"
+				limit: "50"
 			}
 		});
 
@@ -89,7 +90,8 @@ module.exports = {
 			};
 		}
 
-		const { response } = await GptNexra.execute(context, `${query}\n\n${gptData}`, {
+		const contextQuery = addQueryContext(query, context, channel);
+		const { response } = await GptNexra.execute(context, `${contextQuery}\n\n${gptData}`, {
 			url: "gpt-4-32k"
 		});
 
