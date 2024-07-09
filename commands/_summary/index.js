@@ -22,17 +22,17 @@ const RUSTLOG_RESPONSES = {
 };
 
 module.exports = {
-	Name: "_summary",
-	Aliases: null,
+	Name: "chatsummary",
+	Aliases: [],
 	Author: "supinic",
-	Cooldown: 10000,
-	Description: "TODO",
+	Cooldown: 5000,
+	Description: "Summarizes the last couple of messages in the current (or provided) channel via GPT. This command applies a 30s cooldown to all users in the channel it is used in.",
 	Flags: ["mention","pipe"],
 	Params: [
 		{ name: "type", type: "string" }
 	],
 	Whitelist_Response: null,
-	Code: (async function TODO (context, channelInput) {
+	Code: (async function chatSummary (context, channelInput) {
 		let channel = channelInput;
 		if (!channel) {
 			if (context.platform.name !== "twitch") {
@@ -98,14 +98,45 @@ module.exports = {
 		if (!response.ok) {
 			return {
 				success: false,
-				reply: `Nexra: oops`
+				reply: GptNexra.getRequestErrorMessage()
 			};
 		}
 
 		const message = GptNexra.extractMessage(response);
 		return {
-			reply: `Recent chat summary: ${message}`
+			reply: `${message}`,
+			cooldown: {
+				length: 30_000,
+				command: this.Name,
+				user: null,
+				channel: context.channel?.ID
+			}
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: async () => ([
+		"Fetches the last several chat messages in the current or provided channel and summarizes them using GPT.",
+		"",
+
+		"<code>$chatsummary</code>",
+		"Summarizes the latest messages in the current channel",
+		"",
+
+		"<code>$chatsummary (channel)</code>",
+		"<code>$chatsummary forsen</code>",
+		"Summarizes the latest messages in the provided channel",
+		`This supports all channels being logged by <a href="https://logs.ivr.fi/">Rustlog</a> - this means even channels that Supibot is not in at the current time.`,
+		"It also means not all channels Supibot is in are supported.",
+		"",
+
+		"<code>$chatsummary type:(query type)</code>",
+		"Summarizes the latest messages, in a different manner.",
+		sb.Utils.tag.trim `
+			<li>
+				<ul><code>base</code> baseline summary</ul>
+				<ul><code>single</code> focuses on a single most important topic</ul>
+				<ul><code>topical</code> creates a list of up to 5 topic summaries</ul>
+				<ul><code>user</code> creates a list of up to 5 summaries per user</ul>
+			</li>
+		`
+	])
 };
