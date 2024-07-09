@@ -21,7 +21,7 @@ module.exports = {
 		{ name: "type", type: "string" }
 	],
 	Whitelist_Response: null,
-	initialize: () => {
+	initialize: function () {
 		const BASE_QUERY = sb.Utils.tag.trim `
 			Concisely summarize the following messages from an online chatroom %CHANNEL_NAME%
 			(attempt to ignore chat bots replying to users' commands, and assume unfamiliar words to be emotes)
