@@ -10,7 +10,7 @@ export const definition = {
 		const relaxedRegex = /(supi|supinic(?!\.com)|bupi|супи|супик.?|супиник.?)\b/i;
 		const strictRegex = /\bsupinic(?!\.com)\b/i;
 
-		const skippedUsers = [1, 1127, 582108, 8697460, 12182780];
+		const skippedUsers = [1, 1127, 582108, 8697460, 12182780, 17865963];
 		const now = sb.Date.now();
 
 		if (now > this.data.timeout && relaxedRegex.test(message) && !skippedUsers.includes(user?.ID)) {
