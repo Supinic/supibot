@@ -85,7 +85,7 @@ const getRandomChannelLine = async function (channelID) {
 		url: `https://${instance.url}/channelid/${channelID}/random`,
 		throwHttpErrors: false,
 		searchParams: {
-			jsonBasic: "1"
+			json: "1"
 		}
 	});
 
@@ -130,7 +130,7 @@ const getRandomUserLine = async function (channelID, userID) {
 		url: `https://${instance.url}/channelid/${channelID}/userid/${userID}/random`,
 		throwHttpErrors: false,
 		searchParams: {
-			jsonBasic: "1"
+			json: "1"
 		}
 	});
 
