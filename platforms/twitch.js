@@ -28,6 +28,7 @@ const WRITE_MODE_MESSAGE_DELAY = 1500;
 const NO_EVENT_RECONNECT_TIMEOUT = 5000;
 const LIVE_STREAMS_KEY = "twitch-live-streams";
 const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
+const BAD_MESSAGE_RESPONSE = "A message that was about to be posted violated this channel's moderation settings.";
 
 const DEFAULT_LOGGING_CONFIG = {
 	bits: false,
@@ -77,6 +78,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	supportsMeAction = true;
 	dynamicChannelAddition = true;
 
+	// noinspection JSUnusedLocalSymbols
 	#reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000);
 	#websocketLatency = null;
 	#previousMessageMeta = new Map();
@@ -260,6 +262,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			return;
 		}
 
+		const baseMessage = message;
 		message = message.replace(/\s+/g, " ").trim();
 
 		if (options.meAction === true) {
@@ -316,13 +319,15 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		const messageResponse = response.body.data[0];
 		if (!messageResponse.is_sent) {
-			console.warn("JSON not sent!", { channel, messageResponse });
+			console.warn("JSON not sent!", {
+				time: new sb.Date().format("Y-m-d H:i:s"),
+				channel,
+				message,
+				messageResponse
+			});
 
-			if (messageResponse.drop_reason.code === "channel_settings") {
-				await this.send(
-					"A message that was about to be posted violated this channel's moderation settings.",
-					channel
-				);
+			if (messageResponse.drop_reason.code === "channel_settings" && baseMessage !== BAD_MESSAGE_RESPONSE) {
+				await this.send(BAD_MESSAGE_RESPONSE, channel);
 			}
 		}
 		else {
