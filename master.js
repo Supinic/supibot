@@ -227,7 +227,7 @@ require("./db-access.js");
 	await Promise.all(promises);
 
 	console.debug("Ready!");
-	console.groupEnd("Initialize timers");
+	console.groupEnd();
 
 	process.on("unhandledRejection", async (reason) => {
 		if (!(reason instanceof Error)) {
