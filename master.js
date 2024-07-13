@@ -242,8 +242,8 @@ require("./db-access.js");
 				}
 			});
 		}
-		catch {
-			console.warn("Rejected the promise of promise rejection handler", { reason });
+		catch (e) {
+			console.warn("Rejected the promise of promise rejection handler", { reason, e });
 		}
 	});
 })();
