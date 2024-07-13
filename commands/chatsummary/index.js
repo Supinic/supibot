@@ -149,7 +149,8 @@ module.exports = {
 			url: "gpt-4-32k"
 		});
 
-		if (!response.ok) {
+		// API errors can come as 200 OK with error status code in body
+		if (!response.ok || response.body.status === false) {
 			return {
 				success: false,
 				reply: GptNexra.getRequestErrorMessage()
