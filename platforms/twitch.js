@@ -237,7 +237,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	async handleReconnect (event) {
-		const reconnectUrl = event.payload.sesion.reconnect_url;
+		const reconnectUrl = event.payload.session.reconnect_url;
 		if (this.client) {
 			this.client.close();
 		}
