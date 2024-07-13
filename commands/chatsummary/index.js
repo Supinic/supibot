@@ -10,6 +10,85 @@ const RUSTLOG_RESPONSES = {
 	default: "Unspecified error occured! Try again later."
 };
 
+const getLocalLogs = async (channel, limit = 50) => {
+	const data = await sb.Query.getRecordset(rs => rs
+		.select("Platform_ID", "Text")
+		.from("chat_line", channel)
+		.orderBy("ID DESC")
+		.limit(limit)
+	);
+
+	const userIds = new Set(data.map(i => i.Platform_ID));
+	const twitch = sb.Platform.get("twitch");
+
+	const promises = [...userIds].map(async i => ({
+		id: i,
+		name: await twitch.fetchUsernameByUserPlatformID(i)
+	}));
+
+	const usersData = await Promise.all(promises);
+	const result = data
+		.reverse()
+		.map(row => {
+			const username = usersData.find(i => row.Platform_ID === i.id);
+			if (username) {
+				return `${username}: ${row.Text}`;
+			}
+			else {
+				return null;
+			}
+		})
+		.filter(Boolean);
+
+	return {
+		success: true,
+		text: result.join("\n")
+	};
+};
+
+const getRustlogLogs = async (channel, limit = 50) => {
+	const twitch = sb.Platform.get("twitch");
+	const channelId = await twitch.getUserID(channel);
+	if (!channelId) {
+		return {
+			success: false,
+			reply: "The channel name you provided does not exist!"
+		};
+	}
+
+	const { year, month, day } = new sb.Date(sb.Date.getTodayUTC());
+	const url = `https://logs.ivr.fi/channelid/${channelId}/${year}/${month}/${day}`;
+	const logsResponse = await sb.Got("GenericAPI", {
+		url,
+		throwHttpErrors: false,
+		responseType: "text",
+		searchParams: {
+			reverse: "1",
+			limit: String(limit)
+		}
+	});
+
+	if (!logsResponse.ok) {
+		return {
+			success: false,
+			reply: RUSTLOG_RESPONSES[logsResponse.statusCode] ?? RUSTLOG_RESPONSES.default
+		};
+	}
+
+	const text = logsResponse.body
+		.split(/\r?\n/)
+		.map(i => i.match(RAW_TEXT_REGEX)?.groups)
+		.filter(Boolean)
+		.sort((a, b) => new sb.Date(a.date) - new sb.Date(b.date))
+		.map(i => `${i.username}: ${i.message}`)
+		.join("\n");
+
+	return {
+		success: true,
+		text
+	};
+};
+
 module.exports = {
 	Name: "chatsummary",
 	Aliases: ["csum"],
@@ -47,41 +126,14 @@ module.exports = {
 			channel = context.channel.Name;
 		}
 
-		const twitch = sb.Platform.get("twitch");
-		const channelId = await twitch.getUserID(channel);
-		if (!channelId) {
-			return {
-				success: false,
-				reply: "The channel name you provided does not exist!"
-			};
+		const channelData = sb.Channel.get(channel);
+		const logsResult = (channelData && channelData.Logging.has("Lines"))
+			? await getLocalLogs(channel)
+			: await getRustlogLogs(channel);
+
+		if (!logsResult.success) {
+			return logsResult;
 		}
-
-		const { year, month, day } = new sb.Date(sb.Date.getTodayUTC());
-		const url = `https://logs.ivr.fi/channelid/${channelId}/${year}/${month}/${day}`;
-		const logsResponse = await sb.Got("GenericAPI", {
-			url,
-			throwHttpErrors: false,
-			responseType: "text",
-			searchParams: {
-				reverse: "1",
-				limit: "50"
-			}
-		});
-
-		if (!logsResponse.ok) {
-			return {
-				success: false,
-				reply: RUSTLOG_RESPONSES[logsResponse.statusCode] ?? RUSTLOG_RESPONSES.default
-			};
-		}
-
-		const gptData = logsResponse.body
-			.split(/\r?\n/)
-			.map(i => i.match(RAW_TEXT_REGEX)?.groups)
-			.filter(Boolean)
-			.sort((a, b) => new sb.Date(a.date) - new sb.Date(b.date))
-			.map(i => `${i.username}: ${i.message}`)
-			.join("\n");
 
 		const queryType = context.params.type ?? "base";
 		const query = this.data.queries[queryType];
@@ -93,7 +145,7 @@ module.exports = {
 		}
 
 		const contextQuery = addQueryContext(query, context, channel);
-		const { response } = await GptNexra.execute(context, `${contextQuery}\n\n${gptData}`, {
+		const { response } = await GptNexra.execute(context, `${contextQuery}\n\n${logsResult.text}`, {
 			url: "gpt-4-32k"
 		});
 
