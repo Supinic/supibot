@@ -30,9 +30,9 @@ const getLocalLogs = async (channel, limit = 50) => {
 	const result = data
 		.reverse()
 		.map(row => {
-			const username = usersData.find(i => row.Platform_ID === i.id);
-			if (username) {
-				return `${username}: ${row.Text}`;
+			const userData = usersData.find(i => row.Platform_ID === i.id);
+			if (userData) {
+				return `${userData.name}: ${row.Text}`;
 			}
 			else {
 				return null;
