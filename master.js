@@ -234,9 +234,13 @@ require("./db-access.js");
 			return;
 		}
 
+		const origin = (reason.message?.includes("RequestError: Timeout awaiting 'request'"))
+			? "External"
+			: "Internal";
+
 		try {
 			await sb.Logger.logError("Backend", reason, {
-				origin: "Internal",
+				origin,
 				context: {
 					cause: "UnhandledPromiseRejection"
 				}
