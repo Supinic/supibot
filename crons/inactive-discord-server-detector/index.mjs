@@ -40,9 +40,12 @@ export const definition = {
 				.single()
 			);
 
-			if (lastCommandExecuted && lastCommandExecuted >= messageThreshold) {
+			// Re-do the sb.Date construction, as the IFNULL function turns inputs into string.
+			const checkDate = new sb.Date(lastCommandExecuted);
+			if (checkDate >= messageThreshold) {
 				continue;
 			}
+
 			const lastMessagePosted = await sb.Query.getRecordset(rs => rs
 				.select("MAX(Last_Message_Posted) AS Last_Message_Executed")
 				.from("chat_data", "Message_Meta_User_Alias")
