@@ -70,7 +70,7 @@ module.exports = {
 
 			if (user) {
 				const platform = sb.Platform.get("twitch");
-				const userID = await platform.getUserID(user);
+				const userID = await platform.getUserID(sb.User.normalizeUsername(user));
 				if (!userID) {
 					return {
 						success: false,
