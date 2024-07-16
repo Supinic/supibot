@@ -301,6 +301,11 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			},
 			retry: {
 				limit: 3,
+				methods: ["POST"],
+				calculateDelay: (retry) => {
+					console.warn("HTTP retry failed!", retry.error);
+					return retry.computedValue;
+				},
 				statusCodes: [500] // Retry when Helix returns 500 (currently unknown reasons?)
 			}
 		});
