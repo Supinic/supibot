@@ -90,6 +90,13 @@ module.exports = {
 				IDs = [lastID];
 			}
 
+			if (IDs.length === 0 && args.length !== 0) {
+				return {
+					success: false,
+					reply: "No valid numeric IDs provided!"
+				};
+			}
+
 			if (IDs.length > 1 && invocation === "set") {
 				return {
 					success: false,
