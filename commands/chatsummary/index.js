@@ -11,16 +11,18 @@ const RUSTLOG_RESPONSES = {
 };
 
 const getLocalLogs = async (channel, limit = 50) => {
+	const twitch = sb.Platform.get("twitch");
+	const channelData = sb.Channel.get(channel, twitch);
+
+	const tableName = channelData.getDatabaseName();
 	const data = await sb.Query.getRecordset(rs => rs
 		.select("Platform_ID", "Text")
-		.from("chat_line", channel)
+		.from("chat_line", tableName)
 		.orderBy("ID DESC")
 		.limit(limit)
 	);
 
 	const userIds = new Set(data.map(i => i.Platform_ID));
-	const twitch = sb.Platform.get("twitch");
-
 	const promises = [...userIds].map(async i => ({
 		id: i,
 		name: await twitch.fetchUsernameByUserPlatformID(i)
