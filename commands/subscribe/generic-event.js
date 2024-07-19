@@ -1,6 +1,7 @@
 const { parseRSS } = require("../../utils/command-utils.js");
 const DEFAULT_CHANNEL_ID = 38;
 
+/*
 const rssFetch = async (url) => await fetch(url, {
 	headers: {
 		// "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
@@ -9,7 +10,7 @@ const rssFetch = async (url) => await fetch(url, {
 	},
 	redirect: "follow"
 });
-
+*/
 
 /**
  * @typedef {Object} UserSubscription
