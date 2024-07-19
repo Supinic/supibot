@@ -21,16 +21,16 @@
     }
   },
   "models": {
-    "turbo": {
-      "url": "gpt-3.5-turbo-0125",
+    "mini": {
+      "url": "gpt-4o-mini",
       "type": "openai",
       "default": false,
       "inputLimit": 1500,
       "outputLimit": {
-        "default": 100,
+        "default": 150,
         "maximum": 500
       },
-      "pricePerMtoken": 1
+      "pricePerMtoken": 0.40
     },
     "nexra-4": {
       "url": "gpt-4-32k",
