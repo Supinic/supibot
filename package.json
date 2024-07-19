@@ -28,7 +28,6 @@
     "init-database": "node ./init/script.js",
     "setup": "node ./init/setup.js",
     "auto-setup": "node ./init/auto-setup.js",
-    "update-yarn-v1": "git pull origin master && yarn upgrade supi-core",
     "dev-update": "git pull origin master && yarn up supi-core@supinic/supi-core",
     "prod-update": "git pull origin master && yarn workspaces focus --production -A",
     "dev-deps-push": "yarn dev-update && git commit ./yarn.lock -m \"bumped dependencies\" && git pull && git push",
@@ -58,5 +57,5 @@
       "html"
     ]
   },
-  "packageManager": "yarn@3.3.1"
+  "packageManager": "yarn@4.3.1"
 }
