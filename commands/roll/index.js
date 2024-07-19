@@ -66,7 +66,7 @@ module.exports = {
 
 		let result;
 		try {
-			result = diceRoll(fixedInput, seed,1_000_000n);
+			result = diceRoll(fixedInput, seed, 1_000_000n);
 		}
 		catch (e) {
 			const message = e?.message ?? String(e);
