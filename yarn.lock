@@ -445,6 +445,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@jprochazk/roll-dice@npm:^0.4.2":
+  version: 0.4.2
+  resolution: "@jprochazk/roll-dice@npm:0.4.2"
+  checksum: 10c0/571a3e35691f4080a588e61640b7d1fb27a46fdd603c9867dd4d93fd3673d336e3c23abcc1a0a87c183f9ae6c7380cd946fa998235e31902fd7fba00b26fe971
+  languageName: node
+  linkType: hard
+
 "@jridgewell/gen-mapping@npm:^0.3.5":
   version: 0.3.5
   resolution: "@jridgewell/gen-mapping@npm:0.3.5"
@@ -3998,13 +4005,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"roll-dice@npm:@jprochazk/roll-dice@^0.4.2":
-  version: 0.4.2
-  resolution: "@jprochazk/roll-dice@npm:0.4.2"
-  checksum: 10c0/571a3e35691f4080a588e61640b7d1fb27a46fdd603c9867dd4d93fd3673d336e3c23abcc1a0a87c183f9ae6c7380cd946fa998235e31902fd7fba00b26fe971
-  languageName: node
-  linkType: hard
-
 "rss-parser@npm:^3.13.0":
   version: 3.13.0
   resolution: "rss-parser@npm:3.13.0"
@@ -4386,6 +4386,7 @@ supi-core@supinic/supi-core:
   dependencies:
     "@babel/core": "npm:^7.24.7"
     "@babel/eslint-parser": "npm:^7.24.7"
+    "@jprochazk/roll-dice": "npm:^0.4.2"
     acorn-node: "npm:^2.0.1"
     async-markov: "supinic/async-markov#master"
     bing-chat: "npm:^0.2.3"
@@ -4399,7 +4400,6 @@ supi-core@supinic/supi-core:
     language-iso-codes: "supinic/language-iso-codes#master"
     mocha: "npm:^10.5.2"
     nyc: "npm:^17.0.0"
-    roll-dice: "npm:@jprochazk/roll-dice@^0.4.2"
     rss-parser: "npm:^3.13.0"
     supi-core: supinic/supi-core
     supi-db-init: "Supinic/supi-db-init#master"
