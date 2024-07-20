@@ -7,6 +7,7 @@
     "allowJs": true,
     "alwaysStrict": true,
     "checkJs": false,
+    "declaration": true,
     "emitDeclarationOnly": true
   },
   "exclude": [

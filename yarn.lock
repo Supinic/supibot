@@ -3998,10 +3998,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"roll-dice@npm:@jprochazk/roll-dice@^0.2.2":
-  version: 0.2.2
-  resolution: "@jprochazk/roll-dice@npm:0.2.2"
-  checksum: 10c0/a965ad013f65db12320fdc0e0331d806aa23693a73c2c43f1eca0ccf6d5ab307f6a728a84e22ca5c71debdc7c63fbae224b15d4c59412b82ab2998c6c460377f
+"roll-dice@npm:@jprochazk/roll-dice@^0.4.2":
+  version: 0.4.2
+  resolution: "@jprochazk/roll-dice@npm:0.4.2"
+  checksum: 10c0/571a3e35691f4080a588e61640b7d1fb27a46fdd603c9867dd4d93fd3673d336e3c23abcc1a0a87c183f9ae6c7380cd946fa998235e31902fd7fba00b26fe971
   languageName: node
   linkType: hard
 
@@ -4399,7 +4399,7 @@ supi-core@supinic/supi-core:
     language-iso-codes: "supinic/language-iso-codes#master"
     mocha: "npm:^10.5.2"
     nyc: "npm:^17.0.0"
-    roll-dice: "npm:@jprochazk/roll-dice@^0.2.2"
+    roll-dice: "npm:@jprochazk/roll-dice@^0.4.2"
     rss-parser: "npm:^3.13.0"
     supi-core: supinic/supi-core
     supi-db-init: "Supinic/supi-db-init#master"
