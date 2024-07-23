@@ -59,9 +59,8 @@ const getRustlogLogs = async (channel, limit = 50) => {
 	}
 
 	const { year, month, day } = new sb.Date(sb.Date.getTodayUTC());
-	const url = `https://logs.ivr.fi/channelid/${channelId}/${year}/${month}/${day}`;
-	const logsResponse = await sb.Got("GenericAPI", {
-		url,
+	let logsResponse = await sb.Got("GenericAPI", {
+		url: `https://logs.ivr.fi/channelid/${channelId}/${year}/${month}/${day}`,
 		throwHttpErrors: false,
 		responseType: "text",
 		searchParams: {
@@ -71,10 +70,22 @@ const getRustlogLogs = async (channel, limit = 50) => {
 	});
 
 	if (!logsResponse.ok) {
-		return {
-			success: false,
-			reply: RUSTLOG_RESPONSES[logsResponse.statusCode] ?? RUSTLOG_RESPONSES.default
-		};
+		logsResponse = await sb.Got("GenericAPI", {
+			url: `https://logs.zonian.dev/channelid/${channelId}/${year}/${month}/${day}`,
+			throwHttpErrors: false,
+			responseType: "text",
+			searchParams: {
+				reverse: "1",
+				limit: String(limit)
+			}
+		});
+
+		if (!logsResponse.ok) {
+			return {
+				success: false,
+				reply: RUSTLOG_RESPONSES[logsResponse.statusCode] ?? RUSTLOG_RESPONSES.default
+			};
+		}
 	}
 
 	const text = logsResponse.body
