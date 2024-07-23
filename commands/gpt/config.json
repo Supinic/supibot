@@ -24,7 +24,7 @@
     "mini": {
       "url": "gpt-4o-mini",
       "type": "openai",
-      "default": false,
+      "default": true,
       "inputLimit": 1500,
       "outputLimit": {
         "default": 150,
@@ -35,7 +35,7 @@
     "nexra-4": {
       "url": "gpt-4-32k",
       "type": "nexra",
-      "default": true,
+      "default": false,
       "inputLimit": 5000,
       "outputLimit": {
         "default": 5000,
