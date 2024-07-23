@@ -1,5 +1,5 @@
 const { randomBytes } = require("node:crypto");
-const { roll: diceRoll } = require("roll-dice");
+const { roll: diceRoll } = require("@jprochazk/roll-dice");
 const { randomInt } = require("../../utils/command-utils.js");
 
 module.exports = {
@@ -66,7 +66,7 @@ module.exports = {
 
 		let result;
 		try {
-			result = diceRoll(fixedInput, seed, 1_000_000n);
+			result = diceRoll(fixedInput, { seed, limit: 1_000_000n, strict: true });
 		}
 		catch (e) {
 			const message = e?.message ?? String(e);
@@ -76,12 +76,7 @@ module.exports = {
 			};
 		}
 
-		if (result === Infinity) {
-			return {
-				reply: "INFINITY WAYTOODANK"
-			};
-		}
-		else if (context.params.textOnly) {
+		if (context.params.textOnly) {
 			return {
 				reply: String(result)
 			};

@@ -2,6 +2,7 @@
   "name": "supibot",
   "version": "2.2.0",
   "dependencies": {
+    "@jprochazk/roll-dice": "^0.4.2",
     "acorn-node": "^2.0.1",
     "async-markov": "supinic/async-markov#master",
     "bing-chat": "^0.2.3",
@@ -11,7 +12,6 @@
     "discord.js": "^14.15.3",
     "irc-framework": "^4.13.1",
     "language-iso-codes": "supinic/language-iso-codes#master",
-    "roll-dice": "npm:@jprochazk/roll-dice@^0.4.2",
     "rss-parser": "^3.13.0",
     "supi-core": "supinic/supi-core",
     "track-link-parser": "supinic/track-link-parser#master",
