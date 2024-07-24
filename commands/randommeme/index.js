@@ -96,6 +96,12 @@ module.exports = {
 				reply: `Subreddit ${input} is flagged as 18+, and thus not safe to post here!`
 			};
 		}
+		else if (forum.nsfw && context.append.pipe) {
+			return {
+				success: false,
+				reason: "pipe-nsfw"
+			};
+		}
 
 		if (forum.posts.length === 0 || sb.Date.now() > forum.expiration) {
 			const { statusCode, body } = await redditGot(`${subreddit}/hot.json`);
