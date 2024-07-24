@@ -24,7 +24,7 @@ module.exports = class Subreddit {
 			this.#name = data.display_name;
 			this.#exists = (!data.children || data.children !== 0);
 			this.#quarantine = Boolean(data.quarantine);
-			this.#nsfw = Boolean(data.over_18);
+			this.#nsfw = Boolean(data.over18);
 		}
 		else {
 			this.#exists = false;
