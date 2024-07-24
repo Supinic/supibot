@@ -41,36 +41,63 @@ let conduitValidated = false;
 const getConduitId = async () => {
 	const appToken = await getAppAccessToken();
 	const cacheId = await sb.Cache.getByPrefix(CONDUIT_ID_KEY);
-	if (cacheId) {
-		if (conduitValidated) {
-			return cacheId;
+	if (cacheId && conduitValidated) {
+		return cacheId;
+	}
+
+	console.debug("Validating conduit...");
+
+	const checkConduitResponse = await sb.Got("GenericAPI", {
+		url: "https://api.twitch.tv/helix/eventsub/conduits",
+		method: "GET",
+		responseType: "json",
+		throwHttpErrors: false,
+		headers: {
+			Authorization: `Bearer ${appToken}`,
+			"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
 		}
+	});
 
-		const response = await sb.Got("GenericAPI", {
-			url: "https://api.twitch.tv/helix/eventsub/conduits",
-			method: "GET",
-			responseType: "json",
-			throwHttpErrors: false,
-			headers: {
-				Authorization: `Bearer ${appToken}`,
-				"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
-			}
-		});
+	if (checkConduitResponse.ok) {
+		const conduitIdList = checkConduitResponse.body.data.map(i => i.id);
+		if (conduitIdList.length === 0) {
+			console.debug("No valid conduits found");
+		}
+		else if (conduitIdList.length === 1) {
+			console.debug("Exactly one valid conduit found, all good!");
 
-		if (response.ok) {
-			const conduitList = response.body.data.map(i => i.id);
-			if (conduitList.includes(cacheId)) {
-				conduitValidated = true;
-				return cacheId;
-			}
-			else {
-				console.log("No valid conduit found, re-making...");
-			}
+			conduitValidated = true;
+			await sb.Cache.setByPrefix(CONDUIT_ID_KEY, conduitIdList[0]);
+			return conduitIdList[0];
 		}
 		else {
-			console.log("Could not check for conduit validity, re-making...");
+			console.debug("Multiple conduits found, removing to avoid conflict...");
+
+			for (const id of conduitIdList) {
+				await sb.Got("GenericAPI", {
+					url: "https://api.twitch.tv/helix/eventsub/conduits",
+					method: "DELETE",
+					responseType: "json",
+					throwHttpErrors: false,
+					headers: {
+						Authorization: `Bearer ${appToken}`,
+						"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+					},
+					searchParams: { id }
+				});
+
+				console.debug(`Deleted conduit id ${id}`);
+			}
+
+			console.debug("Clearing subscription cache...");
+			await sb.Cache.setByPrefix(SUBSCRIPTIONS_CACHE_KEY, null);
 		}
 	}
+	else {
+		console.log("Could not check for conduit validity", checkConduitResponse.body);
+	}
+
+	console.debug("Re-making conduit...");
 
 	const response = await sb.Got("GenericAPI", {
 		url: "https://api.twitch.tv/helix/eventsub/conduits",
@@ -87,12 +114,19 @@ const getConduitId = async () => {
 	if (!response.ok) {
 		throw new sb.Error({
 			message: "Could not obtain conduit id",
-			args: { response }
+			args: {
+				body: response.body,
+				statusCode: response.statusCode
+			}
 		});
 	}
 
+	console.debug("Conduit set up successfully!");
+
 	const [shard] = response.body.data;
 	await sb.Cache.setByPrefix(CONDUIT_ID_KEY, shard.id);
+	conduitValidated = true;
+
 	return shard.id;
 };
 
