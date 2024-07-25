@@ -680,20 +680,12 @@
     "type": "main"
   },
   {
-    "name": "Reckoning",
-    "type": "additional"
-  },
-  {
     "name": "Rejuvenation Totem",
     "type": "additional"
   },
   {
     "name": "Righteous Fire",
     "type": "main"
-  },
-  {
-    "name": "Riposte",
-    "type": "additional"
   },
   {
     "name": "Scorching Ray",
@@ -1066,10 +1058,6 @@
   {
     "name": "Vaal Summon Skeletons",
     "type": "main"
-  },
-  {
-    "name": "Vengeance",
-    "type": "additional"
   },
   {
     "name": "Vengeful Cry",
