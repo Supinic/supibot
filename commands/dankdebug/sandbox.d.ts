@@ -248,6 +248,17 @@ declare namespace DankDebug {
 	export const query: SupibotDankDebugQuery;
 
 	/**
+	 * Collection of database-related methods.
+	 */
+	export const request: {
+		run: (requestName: string, ...args: any[]) => (
+			{ success: false; statusCode: number | null }
+			|
+			{ success: true; data: object }
+		);
+	}
+
+	/**
 	 * Collection of user/channel permissions related methods.
 	 */
 	export const permissions: SupibotPermissions;
