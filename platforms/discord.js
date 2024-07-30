@@ -30,7 +30,7 @@ const DEFAULT_PLATFORM_CONFIG = {
 	createReminderWhenSendingPrivateMessageFails: true
 };
 const MARKDOWN_TESTS = {
-	ANY: /(\*{1,3}|~~|`|_|__)(.+?)(\1)/g,
+	ANY: /(?<!\S)(\*{1,3}|~~|`|_|__)(.+?)(\1)(?!\S)/g,
 	SOL_NO_SPACE: /^(#{1,3}|>|>>>|```)/gm,
 	SOL_SPACE: /^\s+([*-])\s+/gm
 };
