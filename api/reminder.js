@@ -31,8 +31,9 @@ module.exports = {
 			};
 		}
 
-		const id = Number(url.searchParams.get("id"));
-		if (!sb.Utils.isValidInteger(id)) {
+		const rawId = url.searchParams.get("id");
+		const id = Number(rawId);
+		if (!rawId || !sb.Utils.isValidInteger(id)) {
 			return {
 				statusCode: 400,
 				error: { message: "No or malformed reminder ID provided" }
