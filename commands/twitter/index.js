@@ -36,7 +36,7 @@ module.exports = {
 			};
 		}
 
-		let eligibleTweets = response.body.data.timeline;
+		let eligibleTweets = response.body.data.timeline.filter(i => i.probablyPinned !== true);
 		if (context.params.mediaOnly) {
 			eligibleTweets = eligibleTweets.filter(i => Array.isArray(i.entities.media) && i.entities.media.length !== 0);
 			if (eligibleTweets.length === 0) {
