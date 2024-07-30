@@ -84,7 +84,13 @@ module.exports = {
 
 		const { invocation } = context;
 		const response = (invocation === "subscribe") ? event.response.added : event.response.removed;
-		const location = (context.channel) ? "in this channel" : `in ${context.platform.Name} PMs`;
+
+		let location = "";
+		if (event.channelSpecificMention) {
+			location = (context.channel)
+				? "in this channel"
+				: `in ${context.platform.Name} PMs`;
+		}
 
 		const { skipPrivateReminder } = context.params;
 		const flags = {
