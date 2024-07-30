@@ -12,14 +12,6 @@
     "type": "additional"
   },
   {
-    "name": "Ancestral Protector",
-    "type": "main"
-  },
-  {
-    "name": "Ancestral Warchief",
-    "type": "main"
-  },
-  {
     "name": "Anger",
     "type": "additional"
   },
@@ -192,6 +184,10 @@
     "type": "main"
   },
   {
+    "name": "Crushing Fist",
+    "type": "additional"
+  },
+  {
     "name": "Cyclone",
     "type": "main"
   },
@@ -244,6 +240,10 @@
     "type": "main"
   },
   {
+    "name": "Divine Retribution",
+    "type": "additional"
+  },
+  {
     "name": "Dominating Blow",
     "type": "main"
   },
@@ -294,6 +294,10 @@
   {
     "name": "Ethereal Knives",
     "type": "main"
+  },
+  {
+    "name": "Eviscerate",
+    "type": "additional"
   },
   {
     "name": "Explosive Arrow",
@@ -410,6 +414,10 @@
   {
     "name": "Glacial Hammer",
     "type": "main"
+  },
+  {
+    "name": "Glacial Shield Swipe",
+    "type": "additional"
   },
   {
     "name": "Grace",
@@ -672,20 +680,12 @@
     "type": "main"
   },
   {
-    "name": "Reckoning",
-    "type": "additional"
-  },
-  {
     "name": "Rejuvenation Totem",
     "type": "additional"
   },
   {
     "name": "Righteous Fire",
     "type": "main"
-  },
-  {
-    "name": "Riposte",
-    "type": "additional"
   },
   {
     "name": "Scorching Ray",
@@ -1060,7 +1060,7 @@
     "type": "main"
   },
   {
-    "name": "Vengeance",
+    "name": "Vengeful Cry",
     "type": "additional"
   },
   {
@@ -1611,6 +1611,11 @@
   },
   {
     "name": "Molten Strike of the Zenith",
+    "type": "main",
+    "transfigured": true
+  },
+  {
+    "name": "Puncture of Shanking",
     "type": "main",
     "transfigured": true
   },
