@@ -138,6 +138,27 @@ const predefinedQueries = {
 		.orderBy("Hint ASC", "ID ASC")
 	)
 };
+const predefinedRequests = {
+	olympics2024: async () => {
+		const response = await sb.Got("GenericAPI", {
+			url: "https://api.olympics.kevle.xyz/medals",
+			throwHttpErrors: false
+		});
+
+		if (!response.ok) {
+			return {
+				success: false,
+				statusCode: response.statusCode
+			};
+		}
+
+		return {
+			success: true,
+			data: response.body
+		};
+	}
+};
+
 const restrictedCommands = ["alias", "pipe", "js"].map(i => sb.Command.get(i));
 const commandExecutionCountThreshold = 5;
 
@@ -153,6 +174,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 	const userPermissions = await context.getUserPermissions();
 
 	const queryExecutions = new Set();
+	const requestExecutions = new Set();
 	let userDataChanged = false;
 	let channelDataChanged = false;
 	let commandExecutionCounter = 0;
@@ -226,6 +248,30 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				}
 
 				return data;
+			}
+		}),
+		request: sb.Utils.deepFreeze({
+			run: async (requestName, ...args) => {
+				if (!requestName) {
+					throw new Error("Request name must be provided");
+				}
+				else if (typeof requestName !== "string") {
+					throw new Error("Request name must be provided as a string");
+				}
+				else if (requestExecutions.has(requestName)) {
+					throw new Error("This request has already been executed in this command before");
+				}
+
+				const callback = predefinedRequests[requestName];
+				if (!callback) {
+					throw new Error("Predefined request not found");
+				}
+				else if (args.length > 0 && (callback.length - 1) !== args.length) {
+					throw new Error("Amount of arguments provided doesn't match the request function signature");
+				}
+
+				requestExecutions.add(requestName);
+				return await callback(context, ...args);
 			}
 		}),
 		command: sb.Utils.deepFreeze({
