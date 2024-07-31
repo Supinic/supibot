@@ -48,7 +48,7 @@
     "eslint-plugin-unicorn": "^49.0.0",
     "mocha": "^10.5.2",
     "nyc": "^17.0.0",
-    "supi-db-init": "Supinic/supi-db-init#master"
+    "supi-db-init": "supinic/supi-db-init"
   },
   "nyc": {
     "all": false,

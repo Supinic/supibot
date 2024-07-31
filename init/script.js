@@ -9,9 +9,7 @@ const config = {
 		host: process.env.MARIA_HOST,
 		password: process.env.MARIA_PASSWORD
 	},
-	definitionFilePaths: [],
-	sharedDefinitionNames: [
-		"chat_data/database",
+	definitionFilePaths: [
 		"chat_data/tables/Error",
 		"chat_data/tables/Platform",
 		"chat_data/tables/Channel",
@@ -30,21 +28,18 @@ const config = {
 		"chat_data/tables/Filter",
 		"chat_data/tables/Message_Meta_User_Alias",
 		"chat_data/tables/Reminder",
+		"chat_data/triggers/add_missing_first_channel_command_after_insert",
 		"chat_data/triggers/add_missing_first_message_data_after_insert",
 
-		"data/database",
 		"data/tables/Config"
 	],
 	initialDataFilePaths: [
-		"chat_data/Platform",
+		"chat_data/Custom_Data_Property",
 		"data/Config"
-	],
-	sharedInitialDataNames: [
-		"chat_data/Custom_Data_Property"
 	],
 	meta: {
 		dataPath: path.join(__dirname, "initial-data"),
-		// definitionPath: path.join(__dirname, "definitions"), // unused currently
+		definitionPath: path.join(__dirname, "definitions"),
 		requiredMariaMajorVersion: 10
 	}
 };

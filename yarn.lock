@@ -4371,12 +4371,12 @@ supi-core@supinic/supi-core:
   languageName: node
   linkType: hard
 
-"supi-db-init@Supinic/supi-db-init#master":
+supi-db-init@supinic/supi-db-init:
   version: 1.0.0
-  resolution: "supi-db-init@https://github.com/Supinic/supi-db-init.git#commit=9fa4ab94dbee930773ee4b97ef38dfe8ddc274f5"
+  resolution: "supi-db-init@https://github.com/supinic/supi-db-init.git#commit=fdbcd58b221c495f64cf832cee4857e7c8869c15"
   dependencies:
     mariadb: "npm:^3.0.0"
-  checksum: 10c0/016422c10728c273c4d2a9fb2a40c3f3b662e93284dde0189569eeeaaf17cb17fcd8656a522fa0cf53340a851155fd265723f556ee328309218eaf2c420c7d2d
+  checksum: 10c0/f01695ae349039da171e43841e0d475cee1d95ddde4a06ddcb90fc8fc196342f3dc424c2ec3bbd2c492f43989ff69fb028f54e11bfa3251b6e09456476cf4cf3
   languageName: node
   linkType: hard
 
@@ -4402,7 +4402,7 @@ supi-core@supinic/supi-core:
     nyc: "npm:^17.0.0"
     rss-parser: "npm:^3.13.0"
     supi-core: supinic/supi-core
-    supi-db-init: "Supinic/supi-db-init#master"
+    supi-db-init: supinic/supi-db-init
     track-link-parser: "supinic/track-link-parser#master"
     transliteration: "npm:^2.3.5"
     vm2: "npm:^3.9.19"
