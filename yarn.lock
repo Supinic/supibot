@@ -899,7 +899,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"async-markov@supinic/async-markov#master":
+"async-markov@https://github.com/supinic/async-markov":
   version: 1.0.0
   resolution: "async-markov@https://github.com/supinic/async-markov.git#commit=dc437ceb6bdc1e59c2c371b0264ec385436f0821"
   checksum: 10c0/05c06fcb0d9aaba4215914c20d08eb2e71e2bb87b47622a25b1d433fb53a8efeddfcfb622f62cc5ab0cc5113e873de69589a5fd9b05ed83692478bd36fef84e5
@@ -1407,7 +1407,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cytube-connector@supinic/cytube-connector#master":
+"cytube-connector@https://github.com/supinic/cytube-connector":
   version: 2.1.0
   resolution: "cytube-connector@https://github.com/supinic/cytube-connector.git#commit=3dea28a900b9518bbd23062a80aab20c3c2ad14e"
   dependencies:
@@ -2955,7 +2955,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"language-iso-codes@supinic/language-iso-codes#master":
+"language-iso-codes@https://github.com/supinic/language-iso-codes":
   version: 1.0.0
   resolution: "language-iso-codes@https://github.com/supinic/language-iso-codes.git#commit=dc0e75b4f40978d5549fcf1da5243687c8445963"
   checksum: 10c0/5544a74ed0fcbf06cfda0168527c28c19c303e76121401da3ce5fa5af5c020349997aef9b9493a51171e53f492ca187877f1c76e5d5d1654a6b5581d18e2f5f0
@@ -4356,9 +4356,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-supi-core@supinic/supi-core:
+"supi-core@https://github.com/supinic/supi-core":
   version: 3.1.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=ba8003977cb8355e40eae3bf81f9f6e3f94a209c"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=a0230af857e3125341b1f792fd25c1aa5153bc91"
   dependencies:
     cheerio: "npm:^1.0.0-rc.12"
     duration-parser: "github:supinic/duration-parser"
@@ -4371,7 +4371,7 @@ supi-core@supinic/supi-core:
   languageName: node
   linkType: hard
 
-supi-db-init@supinic/supi-db-init:
+"supi-db-init@https://github.com/supinic/supi-db-init":
   version: 1.0.0
   resolution: "supi-db-init@https://github.com/supinic/supi-db-init.git#commit=fdbcd58b221c495f64cf832cee4857e7c8869c15"
   dependencies:
@@ -4388,22 +4388,22 @@ supi-db-init@supinic/supi-db-init:
     "@babel/eslint-parser": "npm:^7.24.7"
     "@jprochazk/roll-dice": "npm:^0.4.2"
     acorn-node: "npm:^2.0.1"
-    async-markov: "supinic/async-markov#master"
+    async-markov: "https://github.com/supinic/async-markov"
     bing-chat: "npm:^0.2.3"
     chrono-node: "npm:^2.7.6"
     cron: "npm:^3.1.7"
-    cytube-connector: "supinic/cytube-connector#master"
+    cytube-connector: "https://github.com/supinic/cytube-connector"
     discord.js: "npm:^14.15.3"
     eslint: "npm:^8.52.0"
     eslint-plugin-unicorn: "npm:^49.0.0"
     irc-framework: "npm:^4.13.1"
-    language-iso-codes: "supinic/language-iso-codes#master"
+    language-iso-codes: "https://github.com/supinic/language-iso-codes"
     mocha: "npm:^10.5.2"
     nyc: "npm:^17.0.0"
     rss-parser: "npm:^3.13.0"
-    supi-core: supinic/supi-core
-    supi-db-init: supinic/supi-db-init
-    track-link-parser: "supinic/track-link-parser#master"
+    supi-core: "https://github.com/supinic/supi-core"
+    supi-db-init: "https://github.com/supinic/supi-db-init"
+    track-link-parser: "https://github.com/supinic/track-link-parser"
     transliteration: "npm:^2.3.5"
     vm2: "npm:^3.9.19"
     ws: "npm:^8.17.1"
@@ -4501,7 +4501,7 @@ supi-db-init@supinic/supi-db-init:
   languageName: node
   linkType: hard
 
-"track-link-parser@supinic/track-link-parser#master":
+"track-link-parser@https://github.com/supinic/track-link-parser":
   version: 1.2.0
   resolution: "track-link-parser@https://github.com/supinic/track-link-parser.git#commit=91fd676f1292e315c9cb6e7e10fcd062d064dec4"
   dependencies:
