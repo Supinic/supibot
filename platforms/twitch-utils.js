@@ -293,6 +293,12 @@ const createChannelOfflineSubscription = (channelId) => createSubscription({
 	version: "1"
 });
 
+const createChannelRedemptionSubscription = (channelId) => createSubscription({
+	channelId,
+	subscription: "channel.channel_points_custom_reward_redemption.add",
+	version: "1"
+});
+
 const getExistingSubscriptions = async (force = false) => {
 	if (!force) {
 		const cacheData = await sb.Cache.getByPrefix(SUBSCRIPTIONS_CACHE_KEY);
@@ -453,6 +459,7 @@ module.exports = {
 	createChannelRaidSubscription,
 	createChannelOnlineSubscription,
 	createChannelOfflineSubscription,
+	createChannelRedemptionSubscription,
 	fetchToken,
 	emitRawUserMessageEvent,
 	getActiveUsernamesInChannel,

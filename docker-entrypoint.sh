@@ -1,4 +1,4 @@
 #!/bin/sh
-export DEFAULT_PACKAGEMANAGER=npm
-npm run auto-setup
-npm start
+export DEFAULT_PACKAGEMANAGER=yarn
+yarn run auto-setup
+yarn start
