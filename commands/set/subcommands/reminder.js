@@ -57,7 +57,6 @@ module.exports = {
 				await reminder.deactivate(true, true);
 			}
 			else {
-				row.values.Active = false;
 				await row.save({ skipLoad: true });
 			}
 

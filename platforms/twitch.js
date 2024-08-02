@@ -865,7 +865,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 			const existing = await this.getLiveChannelIdList();
 			if (!existing.includes(channelId)) {
-				await sb.Cache.server.lpush(LIVE_STREAMS_KEY, channelId);
+				await this.addLiveChannelIdList(channelId);
 			}
 		}
 		else if (type === "stream.offline") {
@@ -874,7 +874,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				channel: channelData
 			});
 
-			await sb.Cache.server.lrem(LIVE_STREAMS_KEY, 1, channelId);
+			await this.removeLiveChannelIdList(channelId);
 		}
 	}
 
@@ -994,6 +994,14 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 	async getLiveChannelIdList () {
 		return await sb.Cache.server.lrange(LIVE_STREAMS_KEY, 0, -1);
+	}
+
+	async addLiveChannelIdList (channelId) {
+		return await sb.Cache.server.lpush(LIVE_STREAMS_KEY, channelId);
+	}
+
+	async removeLiveChannelIdList (channelId) {
+		return await sb.Cache.server.lrem(LIVE_STREAMS_KEY, 1, channelId);
 	}
 
 	async isChannelLive (channelData) {
