@@ -1,5 +1,6 @@
 const subcommands = [
 	require("./banphrase-api.js"),
+	require("./check-live.js"),
 	require("./enable-rustlog.js"),
 	require("./global-emotes.js"),
 	require("./links.js"),
