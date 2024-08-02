@@ -11,6 +11,7 @@ USER supibot
 WORKDIR /home/supibot
 
 COPY --chown=supibot:supibot package.json ./
+COPY --chown=supibot:supibot tsconfig.json ./
 COPY --chown=supibot:supibot yarn.lock ./
 COPY --chown=supibot:supibot .yarnrc.yml ./
 

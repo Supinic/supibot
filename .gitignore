@@ -6,3 +6,7 @@ config.json
 .yarn
 yarn-error.log
 coverage
+
+docker-compose.yml
+docker-compose.yaml
+compose.yaml
