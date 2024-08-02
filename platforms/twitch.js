@@ -1000,7 +1000,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		return await sb.Cache.server.lpush(LIVE_STREAMS_KEY, channelId);
 	}
 
-	async removeLiveChannelIdList () {
+	async removeLiveChannelIdList (channelId) {
 		return await sb.Cache.server.lrem(LIVE_STREAMS_KEY, 1, channelId);
 	}
 
