@@ -1,4 +1,4 @@
-const subcommands = require("./subcommands/index.js");
+const { subcommands } = require("./subcommands/index.js");
 
 module.exports = {
 	Name: "bot",

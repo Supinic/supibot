@@ -1,5 +1,11 @@
 const subcommands = [
 	require("./banphrase-api.js"),
+	require("./enable-rustlog.js"),
+	require("./global-emotes.js"),
+	require("./links.js"),
+	require("./offline-only.js"),
+	require("./rejoin.js"),
+	require("./rename.js"),
 	require("./toggle.js"),
 ];
 
