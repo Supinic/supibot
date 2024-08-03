@@ -204,7 +204,8 @@
 			platformRow.setValues({
 				ID: platformList[platform].ID,
 				Name: platform,
-				Self_Name: botName
+				Self_Name: botName,
+				Message_Limit: 500 // Temporary measure
 			});
 			await platformRow.save();
 
