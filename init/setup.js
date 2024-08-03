@@ -203,6 +203,7 @@
 
 			platformRow.setValues({
 				ID: platformList[platform].ID,
+				Name: platform,
 				Self_Name: botName
 			});
 			await platformRow.save();
