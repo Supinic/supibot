@@ -4373,10 +4373,10 @@ __metadata:
 
 "supi-db-init@https://github.com/supinic/supi-db-init":
   version: 1.0.0
-  resolution: "supi-db-init@https://github.com/supinic/supi-db-init.git#commit=fdbcd58b221c495f64cf832cee4857e7c8869c15"
+  resolution: "supi-db-init@https://github.com/supinic/supi-db-init.git#commit=4633c6c83b8866aa47d409f327eff3c27ce99394"
   dependencies:
     mariadb: "npm:^3.0.0"
-  checksum: 10c0/f01695ae349039da171e43841e0d475cee1d95ddde4a06ddcb90fc8fc196342f3dc424c2ec3bbd2c492f43989ff69fb028f54e11bfa3251b6e09456476cf4cf3
+  checksum: 10c0/ed4830f9ed9369273445b6e50e4cff9355b50f342c6a496abcbedbf32927ecc39668f575a451294a105252b57608cc94c6e4e701989f13a8dd8b8ec04f60b721
   languageName: node
   linkType: hard
 
@@ -4405,6 +4405,7 @@ __metadata:
     supi-db-init: "https://github.com/supinic/supi-db-init"
     track-link-parser: "https://github.com/supinic/track-link-parser"
     transliteration: "npm:^2.3.5"
+    typescript: "npm:^5.5.4"
     vm2: "npm:^3.9.19"
     ws: "npm:^8.17.1"
   languageName: unknown
@@ -4580,6 +4581,26 @@ __metadata:
   dependencies:
     is-typedarray: "npm:^1.0.0"
   checksum: 10c0/4ac5b7a93d604edabf3ac58d3a2f7e07487e9f6e98195a080e81dbffdc4127817f470f219d794a843b87052cedef102b53ac9b539855380b8c2172054b7d5027
+  languageName: node
+  linkType: hard
+
+"typescript@npm:^5.5.4":
+  version: 5.5.4
+  resolution: "typescript@npm:5.5.4"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/422be60f89e661eab29ac488c974b6cc0a660fb2228003b297c3d10c32c90f3bcffc1009b43876a082515a3c376b1eefcce823d6e78982e6878408b9a923199c
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@npm%3A^5.5.4#optional!builtin<compat/typescript>":
+  version: 5.5.4
+  resolution: "typescript@patch:typescript@npm%3A5.5.4#optional!builtin<compat/typescript>::version=5.5.4&hash=379a07"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/73409d7b9196a5a1217b3aaad929bf76294d3ce7d6e9766dd880ece296ee91cf7d7db6b16c6c6c630ee5096eccde726c0ef17c7dfa52b01a243e57ae1f09ef07
   languageName: node
   linkType: hard
 

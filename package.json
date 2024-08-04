@@ -23,20 +23,21 @@
     "node": ">= 18.0"
   },
   "scripts": {
-    "start": "node --enable-experimental-regexp-engine ./master.js",
-    "debug": "node --enable-experimental-regexp-engine --inspect=0.0.0.0:9229 --unhandled-rejections=warn ./master.js",
-    "init-database": "node ./init/script.js",
-    "setup": "node ./init/setup.js",
-    "auto-setup": "node ./init/auto-setup.js",
-    "dev-update": "git pull origin master && yarn up supi-core@supinic/supi-core",
-    "prod-update": "git pull origin master && yarn workspaces focus --production -A",
+    "build": "tsc",
+    "start": "tsc && node --enable-experimental-regexp-engine ./build/master.js",
+    "debug": "tsc && node --enable-experimental-regexp-engine --inspect=0.0.0.0:9229 --unhandled-rejections=warn ./build/master.js",
+    "init-database": "tsc && node ./init/script.js",
+    "setup": "tsc && node ./init/setup.js",
+    "auto-setup": "tsc && node ./init/auto-setup.js",
+    "dev-update": "git pull origin master && yarn up supi-core@supinic/supi-core && tsc",
+    "prod-update": "git pull origin master && yarn workspaces focus --production -A && tsc",
     "dev-deps-push": "yarn dev-update && git commit ./yarn.lock -m \"bumped dependencies\" && git pull && git push",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "mocha ./tests --recursive --exit",
     "coverage": "nyc yarn test"
   },
-  "main": "master.js",
+  "main": "build/master.js",
   "author": "Supinic <supinic@protonmail.com>",
   "repository": "github:Supinic/supibot",
   "license": "AGPL-3.0",
@@ -48,7 +49,8 @@
     "eslint-plugin-unicorn": "^49.0.0",
     "mocha": "^10.5.2",
     "nyc": "^17.0.0",
-    "supi-db-init": "https://github.com/supinic/supi-db-init"
+    "supi-db-init": "https://github.com/supinic/supi-db-init",
+    "typescript": "^5.5.4"
   },
   "nyc": {
     "all": false,
