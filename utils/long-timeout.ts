@@ -5,10 +5,8 @@ const MAX_TIMEOUT = (2 ** 31) - 1;
  * The repository only had a single initial commit (a809345f49a2ba2b65c7c36dc70ba927b3203c10) and that's all.
  */
 module.exports = class LongTimeout {
-	/** @type {number|LongTimeout} */
-	timeout;
-	/** @type {Date} */
-	scheduleTime;
+	timeout: NodeJS.Timeout | LongTimeout | number | null;
+	scheduleTime: Date;
 
 	/**
 	 * Creates a new, flexible, long timeout object
@@ -17,7 +15,7 @@ module.exports = class LongTimeout {
 	 * @param {boolean} [useTimestamp] If true, time will be considered as a timestamp instead of as a delay
 	 * @returns {LongTimeout}
 	 */
-	constructor (callback, time, useTimestamp = false) {
+	constructor(callback: Function, time: number, useTimestamp: boolean = false) {
 		if (typeof time !== "number" || !Number.isFinite(time)) {
 			throw new Error("A finite number must be used for LongTimeout");
 		}
@@ -41,11 +39,21 @@ module.exports = class LongTimeout {
 		}
 	}
 
+
 	/**
 	 * Clears the timeout.
 	 */
-	clear () {
-		clearTimeout(this.timeout);
+	clear() {
+		// Recursively look inside to get the underlying timeout type in case this happens to be nested
+		let timeoutToClear = this.timeout;
+		while (timeoutToClear instanceof LongTimeout) {
+			timeoutToClear = timeoutToClear.timeout;
+		}
+
+		if (timeoutToClear) {
+			clearTimeout(timeoutToClear);
+		}
+
 		this.timeout = null;
 	}
 };
