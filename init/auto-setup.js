@@ -52,7 +52,7 @@
 	const platformsData = {
 		twitch: {
 			ID: 1,
-			envs: ["TWITCH_OAUTH", "TWITCH_CLIENT_ID"]
+			envs: ["TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET", "TWITCH_REFRESH_TOKEN"]
 		},
 		discord: {
 			ID: 2,
