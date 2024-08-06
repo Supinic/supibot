@@ -7,8 +7,7 @@ CREATE TABLE IF NOT EXISTS `chat_data`.`Banphrase` (
   `Priority` TINYINT(4) NOT NULL DEFAULT 0 COMMENT 'Determines the priority of a banphrase. Higher number = higher priority',
   `Description` TEXT DEFAULT NULL,
   PRIMARY KEY (`ID`),
+  INDEX `Banphrase_Platform` (`Platform`) USING BTREE,
   KEY `FK_Banphrase_Emote_chat_data.Channel` (`Channel`),
-  KEY `FK_Banphrase_Platform` (`Platform`),
-  CONSTRAINT `FK_Banphrase_Emote_chat_data.Channel` FOREIGN KEY (`Channel`) REFERENCES `Channel` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_Banphrase_Platform` FOREIGN KEY (`Platform`) REFERENCES `Platform` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_Banphrase_Emote_chat_data.Channel` FOREIGN KEY (`Channel`) REFERENCES `Channel` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -17,8 +17,7 @@ CREATE TABLE IF NOT EXISTS `chat_data`.`Channel` (
   `Data` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Specific data to be used in other places, i.e. commands',
   PRIMARY KEY (`ID`),
   UNIQUE KEY `Name_Platform` (`Name`,`Platform`),
+  INDEX `Channel_Platform` (`Platform`) USING BTREE,
   KEY `Mirror` (`Mirror`),
-  KEY `FK_Channel_Platform` (`Platform`),
-  CONSTRAINT `FK_Channel_Platform` FOREIGN KEY (`Platform`) REFERENCES `Platform` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `Mirror` FOREIGN KEY (`Mirror`) REFERENCES `Channel` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
