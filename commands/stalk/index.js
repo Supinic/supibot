@@ -44,11 +44,6 @@ module.exports = {
 			.select("Platform.Name AS Platform")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.join("chat_data", "Channel")
-			.join({
-				toDatabase: "chat_data",
-				toTable: "Platform",
-				on: "Channel.Platform = Platform.ID"
-			})
 			.where("User_Alias = %n", targetUser.ID)
 			.orderBy("Last_Message_Posted DESC")
 			.limit(1)

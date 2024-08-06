@@ -89,9 +89,6 @@
 		console.error("No initial bot name specified in env.INITIAL_BOT_NAME");
 		process.exit(1);
 	}
-	else {
-		await updateRow("chat_data", "Platform", platformData.ID, "Self_Name", botName);
-	}
 
 	console.log("Setting up initial bot name for platform...");
 	const channelName = process.env.INITIAL_CHANNEL;

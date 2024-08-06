@@ -198,19 +198,6 @@
 				}
 			}
 
-			const platformRow = await sb.Query.getRow("chat_data", "Platform");
-			await platformRow.load(platformList[platform].ID, true);
-
-			platformRow.setValues({
-				ID: platformList[platform].ID,
-				Name: platform,
-				Self_Name: botName,
-				Message_Limit: 500 // Temporary measure
-			});
-			await platformRow.save();
-
-			console.log(`Bot name for ${platform} set up successfully.`);
-
 			let done = false;
 			do {
 				let channelName = null;

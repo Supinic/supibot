@@ -50,11 +50,11 @@ module.exports = {
 				"Invocation AS invocation",
 				"Response AS response",
 				"Reason AS reason",
-				"Filter.Data AS data"
+				"Filter.Data AS data",
+				"Platform as platform"
 			)
 			.select("Channel.Name AS channelName", "Channel.Description AS channelDescription")
 			.select("User_Alias.Name AS username")
-			.select("Platform.Name AS platformnName")
 			.select("Blocked.Name AS blockedUsername")
 			.from("chat_data", "Filter")
 			.leftJoin("chat_data", "Channel")
@@ -64,16 +64,19 @@ module.exports = {
 				toTable: "User_Alias",
 				on: "Filter.Blocked_User = Blocked.ID"
 			})
-			.leftJoin({
-				toTable: "Platform",
-				on: "Channel.Platform = Platform.ID"
-			})
 			.where("Channel IS NULL OR Channel.Mode <> %s", "Inactive")
 			.where("Command = %s", commandData.Name)
 			.where("Active = %b", true)
 		);
 
 		for (const item of data) {
+			if (item.platform) {
+				const platformData = sb.Platform.get(item.platform);
+				if (platformData) {
+					item.platform = platformData.name;
+				}
+			}
+
 			if (item.data) {
 				item.data = JSON.parse(item.data);
 			}
