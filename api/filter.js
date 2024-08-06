@@ -51,7 +51,7 @@ module.exports = {
 				"Response AS response",
 				"Reason AS reason",
 				"Filter.Data AS data",
-				"Platform as platform"
+				"Filter.Platform as platform"
 			)
 			.select("Channel.Name AS channelName", "Channel.Description AS channelDescription")
 			.select("User_Alias.Name AS username")
