@@ -41,7 +41,6 @@ module.exports = {
 
 		const stalkData = await sb.Query.getRecordset(rs => rs
 			.select("Last_Message_Text AS Text", "Last_Message_Posted AS Date", "Channel.ID AS ChannelID")
-			.select("Platform.Name AS Platform")
 			.from("chat_data", "Message_Meta_User_Alias")
 			.join("chat_data", "Channel")
 			.where("User_Alias = %n", targetUser.ID)
