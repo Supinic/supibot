@@ -426,24 +426,6 @@ class Command extends require("./template.js") {
 				console.warn(`Removed duplicate command name "${dupe}" from command ${command.Name}'s aliases`);
 			}
 		}
-
-		const addMissingRowsPromises = Command.data.map(async (commandData) => {
-			const row = await sb.Query.getRow("chat_data", "Command");
-			await row.load(commandData.Name, true);
-
-			if (!row.loaded) {
-				row.setValues({
-					Name: commandData.Name,
-					Aliases: (commandData.Aliases.length !== 0)
-						? JSON.stringify(commandData.Aliases)
-						: null
-				});
-
-				await row.save({ skipLoad: true });
-			}
-		});
-
-		await Promise.all(addMissingRowsPromises);
 	}
 
 	static get (identifier) {
