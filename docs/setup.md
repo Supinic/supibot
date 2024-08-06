@@ -7,14 +7,17 @@ The easiest way to get started is to use a `docker-compose` file, which includes
 name: "supibot"
 services:
     db:
-      image: supinic/supidb
+      image: mariadb:11.4
       restart: unless-stopped
       volumes:
         - <path_to_store_db>:/var/lib/mysql
+        - type: bind
+          source: ./db-init.sql
+          target: /docker-entrypoint-initdb.d/db-init.sql
       environment:
-        - MYSQL_RANDOM_ROOT_PASSWORD=1
-        - MYSQL_PASSWORD=supibot
-        - MYSQL_USER=supibot
+        - MARIADB_RANDOM_ROOT_PASSWORD=1
+        - MARIADB_PASSWORD=supibot
+        - MARIADB_USER=supibot
     redis:
       image: redis
       restart: unless-stopped
