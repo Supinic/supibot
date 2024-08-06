@@ -264,13 +264,6 @@
 
 		const filteredCommands = ["ban", "debug", "reload"];
 		for (const command of filteredCommands) {
-			const commandRow = await sb.Query.getRow("chat_data", "Command");
-			await commandRow.load(command, true);
-			if (!commandRow.loaded) {
-				commandRow.values.Name = command;
-				await commandRow.save({ skipLoad: true });
-			}
-
 			const filterExists = await sb.Query.getRecordset(rs => rs
 				.select("ID")
 				.from("chat_data", "Filter")
