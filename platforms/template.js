@@ -514,7 +514,7 @@ class Platform {
 			instance = new InstancePlatform(config.type, config);
 		}
 		catch (e) {
-			console.log(`An error occured while instantiating platform ${type}, skipping`);
+			console.error(`An error occured while instantiating platform ${type}, skipping`, e);
 		}
 
 		return instance;
