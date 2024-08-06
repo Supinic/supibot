@@ -500,18 +500,23 @@ class Platform {
 	}
 
 	static create (type, config) {
-		console.time(`Platform framework: ${type}`);
-		let instance;
+		let InstancePlatform;
 		try {
-			const InstancePlatform = require(`./${type}.js`);
-			instance = new InstancePlatform(config);
+			InstancePlatform = require(`./${type}.js`);
 		}
 		catch (e) {
-			console.log(`No platform file found for ${type}, creating generic platform`);
-			instance = new Platform(config.type, config);
+			console.log(`No file found for ${type}.js, creating generic platform and skipping`);
+			return new Platform(config.type, config);
 		}
 
-		console.timeEnd(`Platform framework: ${type}`);
+		let instance;
+		try {
+			instance = new InstancePlatform(config.type, config);
+		}
+		catch (e) {
+			console.log(`An error occured while instantiating platform ${type}, skipping`);
+		}
+
 		return instance;
 	}
 }

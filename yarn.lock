@@ -4373,10 +4373,10 @@ __metadata:
 
 "supi-db-init@https://github.com/supinic/supi-db-init":
   version: 1.0.0
-  resolution: "supi-db-init@https://github.com/supinic/supi-db-init.git#commit=fdbcd58b221c495f64cf832cee4857e7c8869c15"
+  resolution: "supi-db-init@https://github.com/supinic/supi-db-init.git#commit=dd8cbaa62375c749b8fd221845b07b9dba5586a4"
   dependencies:
     mariadb: "npm:^3.0.0"
-  checksum: 10c0/f01695ae349039da171e43841e0d475cee1d95ddde4a06ddcb90fc8fc196342f3dc424c2ec3bbd2c492f43989ff69fb028f54e11bfa3251b6e09456476cf4cf3
+  checksum: 10c0/57f9b191317e15917cd89bbcec8265943559a5ea1a566023291dbb0d802656b42b60bf8f88e0a9cf130f82cb9e002f3d371047d28392ce2df9193afb4a90ae20
   languageName: node
   linkType: hard
 

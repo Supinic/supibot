@@ -15,19 +15,6 @@
 		process.exit(1);
 	}
 
-	console.log("Setting up initial database state...");
-	try {
-		const util = require("node:util");
-		const { exec } = require("node:child_process");
-		const shell = util.promisify(exec);
-
-		await shell(`${packageManager} run init-database`);
-	}
-	catch (e) {
-		console.error("Database structure setup failed, aborting...", e.message);
-		process.exit(1);
-	}
-
 	console.log("Setting up query builder...");
 	try {
 		const core = await import("supi-core");
@@ -71,6 +58,13 @@
 		console.error("Invalid or no initial platform specified in env.INITIAL_PLATFORM");
 		process.exit(1);
 	}
+
+	if (!process.env.REDIS_CONFIGURATION) {
+		console.error("Missing Redis configuration");
+		process.exit(1);
+	}
+	await updateRow("data", "Config", "REDIS_CONFIGURATION", "Value", process.env.REDIS_CONFIGURATION);
+	console.log("Redis configuration copied to `data`.`Config` table")
 
 	const platformData = platformsData[initialPlatform];
 	for (const envKey of platformData.envs) {

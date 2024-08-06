@@ -11,7 +11,6 @@ const config = {
 	},
 	definitionFilePaths: [
 		"chat_data/tables/Error",
-		"chat_data/tables/Platform",
 		"chat_data/tables/Channel",
 		"chat_data/tables/Chat_Module",
 		"chat_data/tables/Channel_Chat_Module",
@@ -19,7 +18,6 @@ const config = {
 		"chat_data/tables/Custom_Data_Property",
 		"chat_data/tables/Channel_Data",
 		"chat_data/tables/User_Alias_Data",
-		"chat_data/tables/Command",
 		"chat_data/tables/Command_Execution",
 		"chat_data/tables/Meta_Channel_Command",
 		"chat_data/tables/AFK",
