@@ -1,10 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 export DEFAULT_PACKAGEMANAGER=yarn
 yarn run init-database
 yarn run auto-setup
 
-if [ -z "${DEBUG_MODE}" ]; then
+if [[ -v DEBUG_MODE ]]; then
+  echo "Starting in debug mode"
   yarn debug
 else
+  echo "Starting in production mode"
   yarn start
 fi
+
