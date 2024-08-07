@@ -7,14 +7,6 @@
 		await row.save();
 	});
 
-	console.log("Setting up package manager...");
-	const allowedManagers = ["npm", "yarn"];
-	const packageManager = process.env.DEFAULT_PACKAGEMANAGER;
-	if (!packageManager || !allowedManagers.includes(packageManager)) {
-		console.error("Invalid or no package manager specified in env.DEFAULT_PACKAGEMANAGER");
-		process.exit(1);
-	}
-
 	console.log("Setting up query builder...");
 	try {
 		const core = await import("supi-core");

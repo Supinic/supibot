@@ -1,6 +1,6 @@
 #!/bin/bash
-export DEFAULT_PACKAGEMANAGER=yarn
 yarn run init-database
+
 yarn run auto-setup
 
 if [[ -v DEBUG_MODE ]]; then

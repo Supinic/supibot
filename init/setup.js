@@ -69,17 +69,9 @@
 	}
 	console.log("Database credentials setup successfully.");
 
-	let packageManager = process.env.DEFAULT_PACKAGEMANAGER;
-	if (!packageManager) {
-		do {
-			packageManager = await ask("Do you use npm or yarn as your package manager?\n");
-			packageManager = packageManager.toLowerCase();
-		} while (packageManager !== "npm" && packageManager !== "yarn");
-	}
-
 	console.log("Setting up database structure...");
 	try {
-		await shell(`${packageManager} run init-database`);
+		await shell(`yarn run init-database`);
 	}
 	catch (e) {
 		console.error("Database structure setup failed, aborting...", e);
