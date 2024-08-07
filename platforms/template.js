@@ -505,16 +505,16 @@ class Platform {
 			InstancePlatform = require(`./${type}.js`);
 		}
 		catch (e) {
-			console.log(`No file found for ${type}.js, creating generic platform and skipping`);
-			return new Platform(config.type, config);
+			console.log(`No file found for platform "${type}", creating generic platform`);
+			return new Platform(type, config);
 		}
 
 		let instance;
 		try {
-			instance = new InstancePlatform(config.type, config);
+			instance = new InstancePlatform(config);
 		}
 		catch (e) {
-			console.error(`An error occured while instantiating platform ${type}, skipping`, e);
+			console.error(`An error occured while instantiating platform "${type}", skipping:\n`, e);
 		}
 
 		return instance;
