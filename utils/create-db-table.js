@@ -8,10 +8,10 @@ const createMessageLoggingTable = async (tableName) => {
 
 	await sb.Query.raw(sb.Utils.tag.trim `
 		CREATE TABLE IF NOT EXISTS chat_line.\`${tableName}\` (
-			\`ID\` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT
+			\`ID\` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			\`Platform_ID\` VARCHAR(100) NOT NULL,
 			\`Text\` TEXT NOT NULL,
-			\`Posted\` DATETIME(3) NULL DEFAULT NULL
+			\`Posted\` DATETIME(3) NOT NULL,
 			PRIMARY KEY (\`ID\`)
 		)
 		COLLATE=\`utf8mb4_general_ci\`
