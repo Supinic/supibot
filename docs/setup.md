@@ -22,10 +22,10 @@ services:
       image: redis
       restart: unless-stopped
     supibot:
+      build: .
       links:
         - db
         - redis
-      image: supinic/supibot
       volumes:
         - type: bind
           source: <path_to_supibot_repository>/config.json
