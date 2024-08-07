@@ -119,7 +119,7 @@
         "createReminderWhenSendingPrivateMessageFails": true
       },
       "logging": {
-        "messages": true,
+        "messages": false,
         "whispers": true
       }
     }

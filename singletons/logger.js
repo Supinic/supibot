@@ -294,25 +294,26 @@ module.exports = class LoggerSingleton {
 			const chan = `channel-${channelData.ID}`;
 			if (!this.channels.includes(chan)) {
 				const name = channelData.getDatabaseName();
-				const columns = ["Text", "Posted"];
 
 				if (!this.#presentTables.includes(name)) {
-					const exists = await sb.Query.isTablePresent("chat_line", name);
-					if (!exists) {
-						await channelData.setup();
-					}
+					await channelData.setupLoggingTable();
 				}
 
-				const [hasUserAlias, hasPlatformID] = await Promise.all([
+				const [hasUserAlias, hasHistoric, hasPlatformID] = await Promise.all([
 					sb.Query.isTableColumnPresent("chat_line", name, "User_Alias"),
+					sb.Query.isTableColumnPresent("chat_line", name, "Historic"),
 					sb.Query.isTableColumnPresent("chat_line", name, "Platform_ID")
 				]);
 
+				const columns = ["Text", "Posted"];
 				if (hasUserAlias) {
-					columns.push("User_Alias");
+					columns.push("User_Alias"); // Backwards compatibility, should never occur
+				}
+				if (hasHistoric) {
+					columns.push("Historic"); // Semi-backwards compatibility, should not occur in new bot forks
 				}
 				if (hasPlatformID) {
-					columns.push("Platform_ID", "Historic");
+					columns.push("Platform_ID"); // Always present
 				}
 
 				this.batches[chan] = await sb.Query.getBatch("chat_line", name, columns);
@@ -366,12 +367,7 @@ module.exports = class LoggerSingleton {
 			if (!this.platforms.includes(id)) {
 				const name = platformData.privateMessageLoggingTableName;
 				if (!this.#presentTables.includes(name)) {
-					if (!notified.privatePlatformLogging.includes(this.Name)) {
-						console.warn(`Cannot log private messages on platform ${this.Name} - logging table (chat_line.${name}) does not exist`);
-						notified.privatePlatformLogging.push(this.Name);
-					}
-
-					return;
+					await platformData.setupLoggingTable();
 				}
 
 				this.batches[id] = await sb.Query.getBatch("chat_line", name, ["Text", "Posted", "Platform_ID", "Historic"]);

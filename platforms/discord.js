@@ -22,7 +22,7 @@ const ignoredChannelTypes = [
 
 const GLOBAL_EMOTE_ALLOWED_REGEX = /[A-Z]/;
 const DEFAULT_LOGGING_CONFIG = {
-	messages: true,
+	messages: false,
 	whispers: true
 };
 const DEFAULT_PLATFORM_CONFIG = {

@@ -1,3 +1,4 @@
+const { createMessageLoggingTable } = require("../utils/create-db-table");
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
 class Platform {
@@ -18,6 +19,8 @@ class Platform {
 	supportsMeAction = false;
 	dynamicChannelAddition = false;
 	#userMessagePromises = new Map();
+
+	#privateMessagesTablePromise = null;
 
 	/** @type {Platform[]} */
 	static list = [];
@@ -459,6 +462,16 @@ class Platform {
 
 		// If not overloaded, return `null` - this means the platform does not support the concept of "livestreaming".
 		return null;
+	}
+
+	setupLoggingTable () {
+		if (this.#privateMessagesTablePromise) {
+			return this.#privateMessagesTablePromise;
+		}
+
+		const name = this.privateMessageLoggingTableName;
+		this.#privateMessagesTablePromise = createMessageLoggingTable(name);
+		return this.#privateMessagesTablePromise;
 	}
 
 	restart () {}
