@@ -67,7 +67,9 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 			logging: DEFAULT_LOGGING_CONFIG,
 			platform: DEFAULT_PLATFORM_CONFIG
 		});
+	}
 
+	async connect () {
 		if (!this.selfId) {
 			throw new sb.Error({
 				message: "Discord user ID (selfId) has not been configured"
@@ -78,9 +80,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 				message: "Discord bot token has not been configured"
 			});
 		}
-	}
 
-	async connect () {
 		this.client = new Client({
 			intents: [
 				GatewayIntentBits.Guilds,
