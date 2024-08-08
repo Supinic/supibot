@@ -106,12 +106,6 @@
 		}
 	}
 
-	const commandPrefix = process.env.COMMAND_PREFIX;
-	if (!commandPrefix) {
-		console.error("No command prefix specified in env.COMMAND_PREFIX");
-		process.exit(1);
-	}
-
 	console.log("All done! Automatic setup will now exit.");
 	process.exit();
 })();

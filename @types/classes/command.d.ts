@@ -1,5 +1,5 @@
 import { Date as CoreDate } from "supi-core";
-import { Utils } from "supi-core/@types/types";
+// import { Utils } from "supi-core/@types/types";
 
 import { PoolConnection } from "mariadb";
 import { Metric, MetricConfiguration, MetricType } from "prom-client";
@@ -267,8 +267,6 @@ export declare class Command extends ClassTemplate {
      * @param string
      */
     static is (string: string): boolean;
-    static getPrefix (): string;
-    static setPrefix (value: string): void;
     static get (identifier: Like): Command | null;
     static validate (): void;
 
@@ -353,9 +351,10 @@ export declare class Command extends ClassTemplate {
         commandData: Command,
         cooldownData: CooldownDescriptor
     ): void;
+
     static get prefix (): string;
-    static set prefix (value: string);
     static get prefixRegex (): RegExp;
+
     static validate (): void;
 
     /**
@@ -417,7 +416,7 @@ export declare class Command extends ClassTemplate {
 
     /**
      * Command cooldown, in milliseconds.
-     * If `null`, no cooldown is set at at all (!)
+     * If `null`, no cooldown is set at all (!)
      */
     readonly Cooldown: number | null;
 

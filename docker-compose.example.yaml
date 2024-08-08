@@ -36,7 +36,6 @@ services:
       - "MARIA_USER=supibot"
       - "MARIA_PASSWORD=supibot"
       - "REDIS_CONFIGURATION=redis"
-      - "COMMAND_PREFIX=<command_prefix>"
       - "INITIAL_BOT_NAME=<bot_name>"
       - "INITIAL_PLATFORM=twitch"
       #- "INITIAL_PLATFORM=discord"

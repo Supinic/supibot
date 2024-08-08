@@ -3,7 +3,6 @@ INSERT IGNORE INTO `data`.`Config`
 VALUES
 ('COMMAND_ERROR_DEVELOPER','(errorID, error) => `Error ID ${errorID} - ${error.message}`','function',NULL,0,1,NULL),
 ('COMMAND_ERROR_GENERIC','(errorID, error) => `An error occured while executing the command!`','function',NULL,0,1,NULL),
-('COMMAND_PREFIX',NULL,'string',NULL,0,1,NULL),
 ('CYTUBE_BOT_PASSWORD',NULL,'string',NULL,1,0,NULL),
 ('DISCORD_BOT_TOKEN',NULL,'string',NULL,1,0,NULL),
 ('DEFAULT_BANPHRASE_API_RESPONSE','[Banphrased]','string',NULL,0,1,'If a banphrase API rejects a message, and no Banphrase object exists to react to that, this message will be printed instead.'),

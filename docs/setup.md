@@ -78,8 +78,7 @@ Alternatively, if `run setup` does not work or for whatever other reason, follow
 9) Fill in authentication token(s) in `data.Config`, depending on which platform to join - by editing its `Value` from `NULL` to given token
 10) Copy `config-default.json` as `config.json` and fill out your custom configuration, especially regarding desired platforms
 11) Set up at least one channel per platform to `chat_data.Channel` table, by inserting a new row, and filling the channel's `Name`, `Specific_ID` and `Platform`
-12) Edit `COMMAND_PREFIX` in `data.Config` for your preferred command prefix
-13) Run the bot as in **7)**, or `yarn run debug` for debug access
+12) Run the bot as in **7)**, or `yarn run debug` for debug access
 
 #### Adjustments
 

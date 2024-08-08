@@ -283,22 +283,6 @@
 		console.log(`Set up the "administrator" flag to "true"`);
 	}
 
-	const envCommandPrefix = process.env.COMMAND_PREFIX;
-	if (!envCommandPrefix) {
-		const commandPrefix = await ask("Select a command prefix:");
-
-		if (commandPrefix) {
-			const configRow = await sb.Query.getRow("data", "Config");
-			await configRow.load("COMMAND_PREFIX");
-			configRow.values.Value = commandPrefix;
-			await configRow.save();
-			console.log(`Command prefix set to "${commandPrefix}".`);
-		}
-		else {
-			console.log("Command prefix setup skipped!");
-		}
-	}
-
 	const internalAPIPort = process.env.SUPIBOT_API_PORT;
 	if (!internalAPIPort) {
 		let port;
