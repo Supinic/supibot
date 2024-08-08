@@ -15,6 +15,10 @@ To start off:
    - Absolute path to the freshly created `./config.json` file (`<path_to_supibot_repository>`)
    - Uncomment the `DEBUG_MODE` environment value for debugging 
 5) Run Docker: `docker compose up`
+6) For debugging:
+   1) In your host machine's browser, navigate to `chrome://inspect`
+   2) Add `localhost:9229`
+   3) Open the console via `Remote Target → inspect`
 
 ### Authentication guides
 

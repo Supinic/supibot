@@ -17,6 +17,8 @@ services:
     restart: unless-stopped
   supibot:
     build: .
+    ports:
+      - "9229:9229"
     links:
       - db
       - redis
