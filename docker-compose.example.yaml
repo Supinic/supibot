@@ -4,7 +4,7 @@ services:
     image: mariadb:11.4
     restart: unless-stopped
     volumes:
-      - ./db:/var/lib/mysql
+      - ./.db:/var/lib/mysql
       - type: bind
         source: ./db-init.sql
         target: /docker-entrypoint-initdb.d/db-init.sql
