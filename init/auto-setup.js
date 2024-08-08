@@ -70,13 +70,6 @@
 	}
 
 	console.log("Setting up initial bot name for platform...");
-	const botName = process.env.INITIAL_BOT_NAME;
-	if (!botName) {
-		console.error("No initial bot name specified in env.INITIAL_BOT_NAME");
-		process.exit(1);
-	}
-
-	console.log("Setting up initial bot name for platform...");
 	const channelName = process.env.INITIAL_CHANNEL;
 	if (!channelName) {
 		console.error("No initial channel name specified in env.INITIAL_CHANNEL");

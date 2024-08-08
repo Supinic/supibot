@@ -180,16 +180,6 @@
 				await extraRow.save();
 			}
 
-			let botName = process.env.INITIAL_BOT_NAME;
-			if (!botName) {
-				botName = await ask(`Enter bot's account name for platform "${platform}":\n`);
-
-				if (!botName) {
-					console.log(`Skipped setting up ${platform}!`);
-					continue;
-				}
-			}
-
 			let done = false;
 			do {
 				let channelName = null;

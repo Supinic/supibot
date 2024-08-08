@@ -89,4 +89,4 @@ In order to set yourself as the `administrator` of Supibot:
   - `User_Alias` is the ID you noted
   - `Property` is `administrator`
   - `Value` is `true`
-1) Changes should apply immediately, in case they don't, restart the bot
+3) Changes should apply immediately, in case they don't, restart the bot
