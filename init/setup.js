@@ -183,7 +183,7 @@
 			let done = false;
 			do {
 				let channelName = null;
-				const initialChannel = process.env.INITIAL_CHANNEL;
+				const initialChannel = process.env.INITIAL_TWITCH_CHANNEL;
 
 				if (initialChannel) {
 					// Assume the user only wants to join one channel when setting up automatically

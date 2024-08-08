@@ -69,33 +69,45 @@
 		await updateRow("data", "Config", envKey, "Value", env);
 	}
 
-	console.log("Setting up initial bot name for platform...");
-	const channelName = process.env.INITIAL_CHANNEL;
-	if (!channelName) {
-		console.error("No initial channel name specified in env.INITIAL_CHANNEL");
-		process.exit(1);
-	}
-	else {
-		const channelRow = await sb.Query.getRow("chat_data", "Channel");
-		const exists = await sb.Query.getRecordset(rs => rs
-			.select("1")
-			.from("chat_data", "Channel")
-			.where("Name = %s", channelName)
-			.where("Platform = %n", platformData.ID)
-			.flat("1")
-			.single()
-		);
+	if (initialPlatform === "twitch") {
+		console.log("Setting up initial channel for platform Twitch...");
+		const channelName = process.env.INITIAL_TWITCH_CHANNEL;
+		if (!channelName) {
+			const channels = await sb.Query.getRecordset(rs => rs
+				.select("COUNT(*) AS Count")
+				.from("chat_data", "Channel")
+				.where("Platform = %n", platformData.ID)
+				.flat("Count")
+				.single()
+			);
 
-		if (exists) {
-			console.log("Initial channel exists, skipping...");
+			if (channels.length === 0) {
+				console.error("No env.INITIAL_TWITCH_CHANNEL set up during first run");
+				process.exit(1);
+			}
 		}
 		else {
-			channelRow.setValues({
-				Name: channelName,
-				Platform: platformData.ID
-			});
+			const channelRow = await sb.Query.getRow("chat_data", "Channel");
+			const exists = await sb.Query.getRecordset(rs => rs
+				.select("1")
+				.from("chat_data", "Channel")
+				.where("Name = %s", channelName)
+				.where("Platform = %n", platformData.ID)
+				.flat("1")
+				.single()
+			);
 
-			await channelRow.save({ ignore: true });
+			if (exists) {
+				console.log("Initial twitch channel already exists, skipping...");
+			}
+			else {
+				channelRow.setValues({
+					Name: channelName,
+					Platform: platformData.ID
+				});
+
+				await channelRow.save({ ignore: true });
+			}
 		}
 	}
 

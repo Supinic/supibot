@@ -38,7 +38,7 @@ services:
       - "REDIS_CONFIGURATION=redis"
       - "INITIAL_PLATFORM=twitch"
       #- "INITIAL_PLATFORM=discord"
-      - "INITIAL_CHANNEL=<initial_channel>"
+      - "INITIAL_TWITCH_CHANNEL=<INITIAL_TWITCH_CHANNEL>"
       - "TWITCH_CLIENT_ID=<your_client_id>"
       - "TWITCH_CLIENT_SECRET=<your_client_secret>"
       - "TWITCH_REFRESH_TOKEN=<your_refresh_token>"
