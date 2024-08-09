@@ -328,6 +328,7 @@ module.exports = class LoggerSingleton {
 			const batch = this.batches[chan];
 			const hasUserAlias = batch.columns.some(i => i.name === "User_Alias"); // legacy, should not occur anymore
 			const hasPlatformID = batch.columns.some(i => i.name === "Platform_ID");
+			const hasHistoric = batch.columns.some(i => i.name === "Historic");
 
 			if (hasUserAlias) {
 				lineObject.User_Alias = userData.ID;
@@ -335,11 +336,15 @@ module.exports = class LoggerSingleton {
 			if (hasPlatformID) {
 				try {
 					lineObject.Platform_ID = await channelData.Platform.fetchInternalPlatformIDByUsername(userData);
-					lineObject.Historic = false;
+					if (hasHistoric) {
+						lineObject.Historic = false;
+					}
 				}
 				catch {
 					lineObject.Platform_ID = userData.Name;
-					lineObject.Historic = true;
+					if (hasHistoric) {
+						lineObject.Historic = true;
+					}
 				}
 			}
 
@@ -347,11 +352,7 @@ module.exports = class LoggerSingleton {
 				batch.add(lineObject);
 			}
 			catch (e) {
-				await sb.Logger.log(
-					"System.Warning",
-					"Incorrect Batch definition",
-					channelData
-				);
+				console.error("Batch addition error", e);
 
 				const index = this.channels.indexOf(chan);
 				this.channels.splice(index, 1);
