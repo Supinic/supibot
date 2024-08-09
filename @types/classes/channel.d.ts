@@ -237,7 +237,7 @@ export declare class Channel extends ClassTemplate {
      * Sets up the logging table and triggers for a newly created channel.
      * @returns True if new tables and triggers were created, false if channel already has them set up
      */
-    setup (): Promise<boolean>;
+    setupLoggingTable (): Promise<boolean>;
 
     /**
      * Waits until the user sends a message. Resolves with their response, or rejects if timed out.

@@ -395,7 +395,7 @@ module.exports = class Channel extends require("./template.js") {
 		const platformMap = Channel.getPlatformMap(channelData.Platform);
 		platformMap.set(channelName, channelData);
 
-		await channelData.setup();
+		await channelData.setupLoggingTable();
 		return channelData;
 	}
 
