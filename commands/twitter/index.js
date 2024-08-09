@@ -36,7 +36,7 @@ module.exports = {
 			};
 		}
 
-		let eligibleTweets = response.body.data.timeline.filter(i => i.probablyPinned !== true);
+		let eligibleTweets = response.body.data.timeline.filter(i => i._probably_pinned !== true);
 		if (context.params.mediaOnly) {
 			eligibleTweets = eligibleTweets.filter(i => Array.isArray(i.entities.media) && i.entities.media.length !== 0);
 			if (eligibleTweets.length === 0) {
@@ -70,7 +70,7 @@ module.exports = {
 		}
 
 		if (!isSensitiveContentAllowed) {
-			eligibleTweets = eligibleTweets.filter(i => !i.possiblySensitive);
+			eligibleTweets = eligibleTweets.filter(i => !i.possibly_sensitive);
 
 			if (eligibleTweets.length === 0) {
 				return {
@@ -94,13 +94,13 @@ module.exports = {
 			};
 		}
 
-		const replyUrl = (context.params.includeReplies) ? `https://twitter.com/${input}/status/${tweet.idStr}` : "";
-		const delta = sb.Utils.timeDelta(new sb.Date(tweet.createdAt));
-		const fullText = sb.Utils.fixHTML(tweet.fullText ?? "");
+		const replyUrl = (context.params.includeReplies) ? `https://twitter.com/${input}/status/${tweet.id_str}` : "";
+		const delta = sb.Utils.timeDelta(new sb.Date(tweet.created_at));
+		const fullText = sb.Utils.fixHTML(tweet.full_text ?? "");
 		const fixedText = `${fullText} ${replyUrl}`;
 
 		if (context.params.mediaOnly) {
-			const links = tweet.entities.media.map(i => i.mediaUrlHttps).join(" ");
+			const links = tweet.entities.media.map(i => i.media_url_https).join(" ");
 			return {
 				reply: (context.params.textOnly)
 					? links
