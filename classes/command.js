@@ -1199,7 +1199,7 @@ class Command extends require("./template.js") {
 	}
 
 	static is (string) {
-		const prefix = Command.getPrefix();
+		const prefix = Command.prefix;
 		if (prefix === null) {
 			return false;
 		}
