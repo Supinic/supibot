@@ -477,15 +477,15 @@ module.exports = class CytubePlatform extends require("./template.js") {
 			logging: DEFAULT_LOGGING_CONFIG,
 			platform: DEFAULT_PLATFORM_CONFIG
 		});
+	}
 
+	connect () {
 		if (!sb.Config.has("CYTUBE_BOT_PASSWORD", true)) {
 			throw new sb.Error({
 				message: "Cytube password has not been configured"
 			});
 		}
-	}
 
-	connect () {
 		const eligibleChannels = sb.Channel.getJoinableForPlatform(this);
 		for (const channelData of eligibleChannels) {
 			this.joinChannel(channelData);

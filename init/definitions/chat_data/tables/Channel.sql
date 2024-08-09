@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `chat_data`.`Channel` (
   `ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `Name` VARCHAR(100) NOT NULL,
   `Platform` INT(10) UNSIGNED NOT NULL,
-  `Specific_ID` VARCHAR(16) DEFAULT NULL COMMENT 'Platform-specific ID of the channel',
+  `Specific_ID` VARCHAR(64) DEFAULT NULL COMMENT 'Platform-specific ID of the channel',
   `Mode` ENUM('Inactive','Last seen','Read','Write','VIP','Moderator') DEFAULT 'Write' COMMENT 'On Twitch, the modes are updated automatically.\r\nModerator = full access, almost no message buffering\r\nVIP = high access, very small message buffering timeout\r\nWrite = behaves as a regular chatter, enforces global slow-mode and spam limiters\r\nRead = read-only access, but will join channel and log it. does not reply or send any messages in channel\r\nInactive = like Read, but will not join channel at all',
   `Mention` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'If true, will attempt to "mention" users who use commands in this channel',
   `Links_Allowed` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'If false, any links in responses will be replaced by placeholder text',

@@ -69,17 +69,9 @@
 	}
 	console.log("Database credentials setup successfully.");
 
-	let packageManager = process.env.DEFAULT_PACKAGEMANAGER;
-	if (!packageManager) {
-		do {
-			packageManager = await ask("Do you use npm or yarn as your package manager?\n");
-			packageManager = packageManager.toLowerCase();
-		} while (packageManager !== "npm" && packageManager !== "yarn");
-	}
-
 	console.log("Setting up database structure...");
 	try {
-		await shell(`${packageManager} run init-database`);
+		await shell(`yarn run init-database`);
 	}
 	catch (e) {
 		console.error("Database structure setup failed, aborting...", e);
@@ -188,20 +180,10 @@
 				await extraRow.save();
 			}
 
-			let botName = process.env.INITIAL_BOT_NAME;
-			if (!botName) {
-				botName = await ask(`Enter bot's account name for platform "${platform}":\n`);
-
-				if (!botName) {
-					console.log(`Skipped setting up ${platform}!`);
-					continue;
-				}
-			}
-
 			let done = false;
 			do {
 				let channelName = null;
-				const initialChannel = process.env.INITIAL_CHANNEL;
+				const initialChannel = process.env.INITIAL_TWITCH_CHANNEL;
 
 				if (initialChannel) {
 					// Assume the user only wants to join one channel when setting up automatically
@@ -289,22 +271,6 @@
 
 		await userDataRow.save({ ignore: true, skipLoad: true });
 		console.log(`Set up the "administrator" flag to "true"`);
-	}
-
-	const envCommandPrefix = process.env.COMMAND_PREFIX;
-	if (!envCommandPrefix) {
-		const commandPrefix = await ask("Select a command prefix:");
-
-		if (commandPrefix) {
-			const configRow = await sb.Query.getRow("data", "Config");
-			await configRow.load("COMMAND_PREFIX");
-			configRow.values.Value = commandPrefix;
-			await configRow.save();
-			console.log(`Command prefix set to "${commandPrefix}".`);
-		}
-		else {
-			console.log("Command prefix setup skipped!");
-		}
 	}
 
 	const internalAPIPort = process.env.SUPIBOT_API_PORT;

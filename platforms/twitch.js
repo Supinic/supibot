@@ -91,7 +91,9 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			logging: DEFAULT_LOGGING_CONFIG,
 			platform: DEFAULT_PLATFORM_CONFIG
 		});
+	}
 
+	async connect (options = {}) {
 		if (!this.selfName) {
 			throw new sb.Error({
 				message: "Twitch platform does not have the bot's name configured"
@@ -107,9 +109,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				message: "Twitch client ID (Config/TWITCH_CLIENT_ID) has not been configured"
 			});
 		}
-	}
 
-	async connect (options = {}) {
 		await initTokenCheckInterval();
 		await getAppAccessToken();
 		await getConduitId();

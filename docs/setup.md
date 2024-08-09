@@ -2,79 +2,51 @@
 
 ## Docker 
 
-The easiest way to get started is to use a `docker-compose` file, which includes all the needed services:
-```yaml
-name: "supibot"
-services:
-    db:
-      image: mariadb:11.4
-      restart: unless-stopped
-      volumes:
-        - <path_to_store_db>:/var/lib/mysql
-        - type: bind
-          source: ./db-init.sql
-          target: /docker-entrypoint-initdb.d/db-init.sql
-      environment:
-        - MARIADB_RANDOM_ROOT_PASSWORD=1
-        - MARIADB_PASSWORD=supibot
-        - MARIADB_USER=supibot
-    redis:
-      image: redis
-      restart: unless-stopped
-    supibot:
-      links:
-        - db
-        - redis
-      image: supinic/supibot
-      volumes:
-        - type: bind
-          source: <path_to_supibot_repository>/config.json
-          target: /home/supibot/config.json
-      restart: unless-stopped
-      environment:
-        - "MARIA_HOST=db"
-        - "MARIA_USER=supibot"
-        - "MARIA_PASSWORD=supibot"
-        - "REDIS_CONFIGURATION=redis"
-        - "COMMAND_PREFIX=<command_prefix>"
-        - "INITIAL_BOT_NAME=<bot_name>"
-        - "INITIAL_PLATFORM=twitch"
-        #- "INITIAL_PLATFORM=discord"
-        - "INITIAL_CHANNEL=<initial_channel>"
-        - "TWITCH_CLIENT_ID=<your_client_id>"
-        - "TWITCH_CLIENT_SECRET=<your_client_secret>"
-        - "TWITCH_REFRESH_TOKEN=<your_refresh_token>"
-        #- "DISCORD_BOT_TOKEN=<your_discord_token>"
-        - "SUPIBOT_API_PORT=<preferred_api_port>"
-```
-
-- Note: The database docker image currently doesn't accept any database usernames other than `supibot`.
+The easiest way to get started is to use a `docker-compose` file, which includes all the needed services.
 
 To start off:
-1) Copy `config-default.json` as `config.json`, and fill out your custom configuration - especially regarding desired platforms
-2) In the compose file, configure:
-   1) Path to the database service (`<path_to_store_db>`)
-   2) Bot environment values, and the authentication info as needed (see below for specific platform info)
-   3) Absolute path to the freshly created `./config.json` file (`<path_to_supibot_repository>`)
-3) Run Docker
+1) Copy `config-default.json` as `config.json`
+2) In the config file, configure:
+   - Your desired platform(s)
+   - Anything regarding bot behaviour: commands, chat modules, logging, ... 
+3) Copy `docker-compose.example.yaml` as `docker-compose.yaml`
+4) In the compose file, set up:
+   - Bot environment values, and the authentication info as needed (see below for specific platforms)
+   - Absolute path to the freshly created `./config.json` file (`<path_to_supibot_repository>`)
+   - Uncomment the `DEBUG_MODE` environment value for debugging 
+5) Run Docker: `docker compose up`
+6) For debugging:
+   1) In your host machine's browser, navigate to `chrome://inspect`
+   2) Add `localhost:9229`
+   3) Open the console via `Remote Target → inspect`
 
-### Authentication
+### Authentication guides
 
-For Twitch:
+#### Twitch
 
 1. Create an application: [guide on Twitch](https://dev.twitch.tv/docs/authentication/register-app/)
 2. Note your `Client ID` and `Client secret` tokens
 3. Visit [this website](https://twitchtokengenerator.com/) for token generation, pick "Custom Scope Token"
-5. Fill in the section `Use My Client Secret and Client ID` with the tokens from step 2
-6. Allow token scopes: 
+4. Fill in the section `Use My Client Secret and Client ID` with the tokens from step 2
+5. Allow token scopes: 
    - `user:bot` `user:read:chat` `user:write:chat` to read and send messages (**required**)
    - `user:read:emotes` to fetch the bot's own emotes (**suggested**)
    - `user:manage:whispers` for whispers (private messages) functionality (**suggested**)
    - `channel:moderate` for moderation actions (**optional**)
-7. Fill in the environmental values in the compose file accordingly
+6. Fill in the env values in the compose file accordingly:
    - `TWITCH_CLIENT_ID`
    - `TWITCH_CLIENT_SECRET`
    - `TWITCH_REFRESH_TOKEN`
+
+#### Discord
+
+1. Create an application: [Discord Developer Portal](https://discord.com/developers/applications)
+2. Navigate to `Application → Bot`
+3. Note the `Token` (will only be available to copy once) and `Application ID`
+4. Set up the `Privileged Gateway Intents`: `Server members` and `Message content`
+5. Fill in the `Application ID` into your `config.json`'s discord platform, as the `selfId` property
+6. Fill in the env values in the compose file with your `Token`:
+   - `DISCORD_BOT_TOKEN`
 
 ## CLI
 
@@ -106,8 +78,7 @@ Alternatively, if `run setup` does not work or for whatever other reason, follow
 9) Fill in authentication token(s) in `data.Config`, depending on which platform to join - by editing its `Value` from `NULL` to given token
 10) Copy `config-default.json` as `config.json` and fill out your custom configuration, especially regarding desired platforms
 11) Set up at least one channel per platform to `chat_data.Channel` table, by inserting a new row, and filling the channel's `Name`, `Specific_ID` and `Platform`
-12) Edit `COMMAND_PREFIX` in `data.Config` for your preferred command prefix
-13) Run the bot as in **7)**, or `yarn run debug` for debug access
+12) Run the bot as in **7)**, or `yarn run debug` for debug access
 
 #### Adjustments
 

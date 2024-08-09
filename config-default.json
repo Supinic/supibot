@@ -14,7 +14,7 @@
     "Each type is an object that contains the \"cron\" property which defines the cron expression on how often each type will be saved to database.",
     "If you would like the type to not be logged, change the \"enabled\" property to `false`."
   ],
-  "basePath": "ENTER_YOUR_BASE_PATH_HERE",
+  "basePath": "/home/supibot",
   "modules": {
     "chat-modules": {
       "disableAll": true,
@@ -22,6 +22,7 @@
       "whitelist": []
     },
     "commands": {
+      "prefix": "$",
       "disableAll": false,
       "blacklist": [],
       "whitelist": [
@@ -119,7 +120,7 @@
         "createReminderWhenSendingPrivateMessageFails": true
       },
       "logging": {
-        "messages": true,
+        "messages": false,
         "whispers": true
       }
     }

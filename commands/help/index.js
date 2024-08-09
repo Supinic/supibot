@@ -8,7 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function help (context, ...args) {
-		const prefix = sb.Config.get("COMMAND_PREFIX");
+		const { prefix } = sb.Command;
 		const [commandString] = args;
 
 		// No specified command - print all available commands in given channel for given user
@@ -36,7 +36,7 @@ module.exports = {
 		// Print specific command description
 		else {
 			const identifier = (sb.Command.is(commandString))
-				? commandString.replace(sb.Command.prefix)
+				? commandString.replace(sb.Command.prefix, "")
 				: commandString;
 
 			if (identifier.toLowerCase() === "me") {

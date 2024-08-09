@@ -7,27 +7,6 @@
 		await row.save();
 	});
 
-	console.log("Setting up package manager...");
-	const allowedManagers = ["npm", "yarn"];
-	const packageManager = process.env.DEFAULT_PACKAGEMANAGER;
-	if (!packageManager || !allowedManagers.includes(packageManager)) {
-		console.error("Invalid or no package manager specified in env.DEFAULT_PACKAGEMANAGER");
-		process.exit(1);
-	}
-
-	console.log("Setting up initial database state...");
-	try {
-		const util = require("node:util");
-		const { exec } = require("node:child_process");
-		const shell = util.promisify(exec);
-
-		await shell(`${packageManager} run init-database`);
-	}
-	catch (e) {
-		console.error("Database structure setup failed, aborting...", e.message);
-		process.exit(1);
-	}
-
 	console.log("Setting up query builder...");
 	try {
 		const core = await import("supi-core");
@@ -72,6 +51,13 @@
 		process.exit(1);
 	}
 
+	if (!process.env.REDIS_CONFIGURATION) {
+		console.error("Missing Redis configuration");
+		process.exit(1);
+	}
+	await updateRow("data", "Config", "REDIS_CONFIGURATION", "Value", process.env.REDIS_CONFIGURATION);
+	console.log("Redis configuration copied to `data`.`Config` table")
+
 	const platformData = platformsData[initialPlatform];
 	for (const envKey of platformData.envs) {
 		const env = process.env[envKey];
@@ -83,47 +69,46 @@
 		await updateRow("data", "Config", envKey, "Value", env);
 	}
 
-	console.log("Setting up initial bot name for platform...");
-	const botName = process.env.INITIAL_BOT_NAME;
-	if (!botName) {
-		console.error("No initial bot name specified in env.INITIAL_BOT_NAME");
-		process.exit(1);
-	}
+	if (initialPlatform === "twitch") {
+		console.log("Setting up initial channel for platform Twitch...");
+		const channelName = process.env.INITIAL_TWITCH_CHANNEL;
+		if (!channelName) {
+			const channels = await sb.Query.getRecordset(rs => rs
+				.select("COUNT(*) AS Count")
+				.from("chat_data", "Channel")
+				.where("Platform = %n", platformData.ID)
+				.flat("Count")
+				.single()
+			);
 
-	console.log("Setting up initial bot name for platform...");
-	const channelName = process.env.INITIAL_CHANNEL;
-	if (!channelName) {
-		console.error("No initial channel name specified in env.INITIAL_CHANNEL");
-		process.exit(1);
-	}
-	else {
-		const channelRow = await sb.Query.getRow("chat_data", "Channel");
-		const exists = await sb.Query.getRecordset(rs => rs
-			.select("1")
-			.from("chat_data", "Channel")
-			.where("Name = %s", channelName)
-			.where("Platform = %n", platformData.ID)
-			.flat("1")
-			.single()
-		);
-
-		if (exists) {
-			console.log("Initial channel exists, skipping...");
+			if (channels.length === 0) {
+				console.error("No env.INITIAL_TWITCH_CHANNEL set up during first run");
+				process.exit(1);
+			}
 		}
 		else {
-			channelRow.setValues({
-				Name: channelName,
-				Platform: platformData.ID
-			});
+			const channelRow = await sb.Query.getRow("chat_data", "Channel");
+			const exists = await sb.Query.getRecordset(rs => rs
+				.select("1")
+				.from("chat_data", "Channel")
+				.where("Name = %s", channelName)
+				.where("Platform = %n", platformData.ID)
+				.flat("1")
+				.single()
+			);
 
-			await channelRow.save({ ignore: true });
+			if (exists) {
+				console.log("Initial twitch channel already exists, skipping...");
+			}
+			else {
+				channelRow.setValues({
+					Name: channelName,
+					Platform: platformData.ID
+				});
+
+				await channelRow.save({ ignore: true });
+			}
 		}
-	}
-
-	const commandPrefix = process.env.COMMAND_PREFIX;
-	if (!commandPrefix) {
-		console.error("No command prefix specified in env.COMMAND_PREFIX");
-		process.exit(1);
 	}
 
 	console.log("All done! Automatic setup will now exit.");

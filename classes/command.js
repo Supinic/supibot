@@ -8,6 +8,15 @@ const LanguageCodes = require("language-iso-codes");
 
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 
+let config;
+try {
+	config = require("../config.json");
+}
+catch {
+	config = require("../config-default.json");
+}
+
+const COMMAND_PREFIX = config.modules.commands.prefix;
 class Context {
 	#command;
 	#invocation;
@@ -175,8 +184,9 @@ class Command extends require("./template.js") {
 	static #cooldownManager = new CooldownManager();
 
 	static privilegedCommandCharacters = ["$"];
-
 	static ignoreParametersDelimiter = "--";
+
+	static #prefixRegex;
 
 	constructor (data) {
 		super();
@@ -408,12 +418,8 @@ class Command extends require("./template.js") {
 		if (Command.data.length === 0) {
 			console.warn("No commands initialized - bot will not respond to any command queries");
 		}
-
-		if (!sb.Config) {
-			console.warn("sb.Config module missing - cannot fetch command prefix");
-		}
-		else if (Command.prefix === null) {
-			console.warn("Command prefix is configured as `null` - bot will not respond to any command queries");
+		if (!Command.prefix) {
+			console.warn("No command prefix configured - bot will not respond to any command queries");
 		}
 
 		const names = Command.data.flatMap(i => [i.Name, ...(i.Aliases ?? [])]);
@@ -1193,7 +1199,7 @@ class Command extends require("./template.js") {
 	}
 
 	static is (string) {
-		const prefix = Command.getPrefix();
+		const prefix = Command.prefix;
 		if (prefix === null) {
 			return false;
 		}
@@ -1210,6 +1216,10 @@ class Command extends require("./template.js") {
 	}
 
 	static get prefixRegex () {
+		if (Command.#prefixRegex) {
+			return Command.#prefixRegex;
+		}
+
 		const prefix = Command.prefix;
 		if (!prefix) {
 			return null;
@@ -1220,29 +1230,12 @@ class Command extends require("./template.js") {
 			: `\\${char}`
 		).join("");
 
-		return new RegExp(`^${body}`);
+		Command.#prefixRegex = new RegExp(`^${body}`);
+		return Command.#prefixRegex;
 	}
 
 	static get prefix () {
-		return Command.getPrefix();
-	}
-
-	static set prefix (value) {
-		Command.setPrefix(value);
-	}
-
-	static getPrefix () {
-		return sb.Config.get("COMMAND_PREFIX", false) ?? null;
-	}
-
-	static setPrefix (value) {
-		if (typeof value !== "string") {
-			throw new sb.Error({
-				message: "Command prefix must be a string!"
-			});
-		}
-
-		return sb.Config.set("COMMAND_PREFIX", value.trim());
+		return COMMAND_PREFIX;
 	}
 }
 
