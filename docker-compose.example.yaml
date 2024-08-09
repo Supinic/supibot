@@ -8,6 +8,8 @@ services:
       - type: bind
         source: ./db-init.sql
         target: /docker-entrypoint-initdb.d/db-init.sql
+    ports:
+      - "3333:3306"
     environment:
       - MARIADB_RANDOM_ROOT_PASSWORD=1
       - MARIADB_PASSWORD=supibot
