@@ -1,7 +1,6 @@
 module.exports = (function () {
 	const secure = (sb.Config?.get("SUPIBOT_API_SECURE", false)) ?? false;
 	const httpInterface = (secure) ? require("node:https") : require("node:http");
-	const { URL } = require("node:url");
 
 	const port = sb.Config?.get("SUPIBOT_API_PORT", false) ?? 31337;
 	const protocol = (secure) ? "https" : "http";
@@ -43,6 +42,7 @@ module.exports = (function () {
 				statusCode: 404,
 				data: null,
 				error: {
+					path,
 					message: "Endpoint not found"
 				},
 				timestamp: Date.now()
@@ -63,7 +63,9 @@ module.exports = (function () {
 		} = await target(req, res, url);
 
 		if (!skipResponseHandling) {
+			headers["Content-Type"] ??= "application/json";
 			res.writeHead(statusCode, headers);
+
 			res.end(JSON.stringify({
 				statusCode,
 				data,
