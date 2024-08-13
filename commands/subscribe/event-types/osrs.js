@@ -59,6 +59,18 @@ module.exports = {
 
 		const articleString = eligibleArticles.map(i => `${i.title} ${i.link}`).join(" -- ");
 		const noun = (eligibleArticles.length === 0) ? "article" : "articles";
+
+		await sb.Logger.log(
+			"System.Request",
+			JSON.stringify({
+				previousArticleId,
+				latestArticleId,
+				newsItems,
+				eligibleArticles,
+				articleString
+			})
+		);
+
 		return {
 			message: `New OSRS ${noun}! ${articleString}`
 		};
