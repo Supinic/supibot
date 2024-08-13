@@ -774,6 +774,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			return;
 		}
 
+		await sb.Logger.log("Twitch.Sub", JSON.stringify({ event }));
+
 		if (subscription === "channel.subscribe") { // First time subscriber
 			channelData.events.emit("subscription", {
 				event: "subscription",
