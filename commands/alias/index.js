@@ -420,7 +420,7 @@ module.exports = {
 					};
 				}
 
-				const targetAlias = await sb.Query.getRecordset(rs => rs
+				let targetAlias = await sb.Query.getRecordset(rs => rs
 					.select("ID", "Command", "Invocation", "Arguments", "Parent", "Restrictions")
 					.from("data", "Custom_Command_Alias")
 					.where("Channel IS NULL")
@@ -437,15 +437,27 @@ module.exports = {
 					};
 				}
 				else if (targetAlias.Command === null) {
-					return {
-						success: false,
-						reply: sb.Utils.tag.trim `
-							You cannot copy links to other aliases
-						 	Instead, use ${sb.Command.prefix}alias link ${targetUser.Name} ${targetAliasName}
-						`
-					};
+					const parentAlias = await sb.Query.getRecordset(rs => rs
+						.select("ID", "Command", "Invocation", "Arguments", "Parent", "Restrictions")
+						.from("data", "Custom_Command_Alias")
+						.where("ID = %n", targetAlias.Parent)
+						.limit(1)
+						.single()
+					);
+
+					if (!parentAlias) {
+						return {
+							success: false,
+							reply: sb.Utils.tag.trim `
+								You cannot copy this alias because the original it links to has been deleted!
+							`
+						};
+					}
+
+					targetAlias = parentAlias;
 				}
-				else if (context.user !== targetUser && AliasUtils.isRestricted("copy", targetAlias)) {
+
+				if (context.user !== targetUser && AliasUtils.isRestricted("copy", targetAlias)) {
 					return {
 						success: false,
 						reply: `You cannot copy this alias! Its creator has prevented new copies from being created.`
