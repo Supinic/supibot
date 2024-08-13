@@ -39,8 +39,7 @@ module.exports = {
 		}
 
 		const { execute } = require(`./${engine}.js`);
-		const boundExecute = execute.bind(this);
-		const result = await boundExecute(context, query);
+		const result = await execute(context, query);
 
 		if (logTableExists) {
 			const row = await sb.Query.getRow("data", "Translate_Log");
