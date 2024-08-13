@@ -815,6 +815,15 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 			return false;
 		}
 
+		const roles = await channel.guild.roles.fetch();
+		const ambassadorRole = roles.find(i => i.name.toLowerCase() === "supibot ambassador");
+		if (ambassadorRole) {
+			const member = await channel.guild.members.fetch(userData.Discord_ID);
+			if (member.roles.cache.has(ambassadorRole.id)) {
+				return true;
+			}
+		}
+
 		const permissions = channel.permissionsFor(userData.Discord_ID);
 		return (
 			permissions.has(PermissionFlagsBits.ManageChannels)
