@@ -246,10 +246,12 @@ const createChannelChatMessageSubscription = async (selfId, channelId, platform)
 	if (response.statusCode === 403) {
 		/** @type {Channel} */
 		const channelData = sb.Channel.getBySpecificId(channelId, platform);
-		await Promise.all([
-			channelData.saveProperty("Mode", "Inactive"),
-			channelData.setDataProperty("twitchNoScopeDisabled", true)
-		]);
+		if (channelData) {
+			await Promise.all([
+				channelData.saveProperty("Mode", "Inactive"),
+				channelData.setDataProperty("twitchNoScopeDisabled", true)
+			]);
+		}
 	}
 
 	return { response };
