@@ -194,7 +194,7 @@ module.exports = {
 		`<code>$sgp gameID:(game ID)</code>`,
 		`<code>$sgp gameID:12345</code>`,
 		"Fetches game data by its Steam ID",
-		""
+		"",
 
 		`<code>$sgp skipReviews:true (game)</code>`,
 		"If provided with the <code>skipReviews</code> parameter, the command will not show the game's reviews score.",
