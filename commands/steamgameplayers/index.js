@@ -43,7 +43,8 @@ module.exports = {
 	Description: "Searches for a Steam game, and attempts to find its current player amount.",
 	Flags: ["mention","pipe"],
 	Params: [
-		{ name: "gameID", type: "number" }
+		{ name: "gameID", type: "number" },
+		{ name: "skipReviews", type: "boolean" },
 	],
 	Whitelist_Response: null,
 	initialize: function () {
@@ -143,13 +144,36 @@ module.exports = {
 			}
 		}
 
+		let reviewsString = "";
+		if (!context.params.skipReviews) {
+			const response = await sb.Got("GenericAPI", {
+				url: `https://store.steampowered.com/appreviews/${gameId}`,
+				searchParams: {
+					json: "1",
+					filter: "all",
+					language: "all"
+				}
+			});
+
+			if (response.ok) {
+				const summary = response.body.query_summary;
+				const score = sb.Utils.round(summary.total_positive / summary.total_reviews * 100, 1);
+
+				reviewsString = `Rating: ${summary.review_score_desc} (${score}% positive)`;
+			}
+			else {
+				reviewsString = "Could not fetch reviews data";
+			}
+		}
+
 		const players = playerCountResponse.body.response.player_count;
 		return {
 			reply: sb.Utils.tag.trim `
 				${gameData.name} ${publisher}
 				currently has
 				${sb.Utils.groupDigits(players)}
-				players in-game.			
+				players in-game.
+				${reviewsString}		
 			`
 		};
 	},
@@ -162,16 +186,18 @@ module.exports = {
 		"Fetches game data by its name",
 		"",
 
-
 		`<code>$sgp (steam store URL)</code>`,
 		`<code>$sgp https://store.steampowered.com/app/105600/Terraria</code>`,
 		"Fetches game data by its Steam Store URL (and some others too possibly)",
 		"",
 
-
 		`<code>$sgp gameID:(game ID)</code>`,
 		`<code>$sgp gameID:12345</code>`,
 		"Fetches game data by its Steam ID",
+		""
+
+		`<code>$sgp skipReviews:true (game)</code>`,
+		"If provided with the <code>skipReviews</code> parameter, the command will not show the game's reviews score.",
 		""
 	]
 };
