@@ -4356,9 +4356,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supi-core@https://github.com/supinic/supi-core":
+supi-core@supinic/supi-core:
   version: 3.1.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=a0230af857e3125341b1f792fd25c1aa5153bc91"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=96361cb7d9d28855424bfd1230cf6785b7215dc1"
   dependencies:
     cheerio: "npm:^1.0.0-rc.12"
     duration-parser: "github:supinic/duration-parser"
@@ -4367,7 +4367,7 @@ __metadata:
     mariadb: "npm:^3.2.2"
     prom-client: "npm:^15.0.0"
     random-js: "npm:^2.1.0"
-  checksum: 10c0/bd6ca013ef0e83a8791c5eec3be5c65cf248a6fc861076eed4859bb8c20f3e44fa00a7857393e2edaf217bb75db5b60f00568018ced2187176824dd44b24e58a
+  checksum: 10c0/0059c46974c64faa9f0af24f92a6173c83fd1a31ef22a447dd75b28e4aed7f6625a6265d1c9efc53c09018d53ce3faea40e7cd344cb5285c3d31d994daccf313
   languageName: node
   linkType: hard
 
@@ -4401,7 +4401,7 @@ __metadata:
     mocha: "npm:^10.5.2"
     nyc: "npm:^17.0.0"
     rss-parser: "npm:^3.13.0"
-    supi-core: "https://github.com/supinic/supi-core"
+    supi-core: supinic/supi-core
     supi-db-init: "https://github.com/supinic/supi-db-init"
     track-link-parser: "https://github.com/supinic/track-link-parser"
     transliteration: "npm:^2.3.5"
