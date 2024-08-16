@@ -2,9 +2,9 @@ const assert = require("node:assert");
 const Command = require("../../../classes/command");
 
 beforeEach(async() => {
-	const DateModule = await import("supi-core/objects/date.js");
+	const { Date: DateModule } = await import("supi-core");
 	globalThis.sb = {
-		Date: DateModule.default,
+		Date: DateModule,
 		Utils: {
 			parseRegExp: (input) => {
 				try {
