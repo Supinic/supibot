@@ -44,7 +44,7 @@ module.exports = {
 	Flags: ["mention","pipe"],
 	Params: [
 		{ name: "gameID", type: "number" },
-		{ name: "skipReviews", type: "boolean" },
+		{ name: "skipReviews", type: "boolean" }
 	],
 	Whitelist_Response: null,
 	initialize: function () {

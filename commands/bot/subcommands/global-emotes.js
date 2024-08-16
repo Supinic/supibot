@@ -6,7 +6,7 @@ module.exports = {
 		`<code>$bot enable-global-emotes channel:(channel)</code>`,
 		"Disables (or re-enables, respectively) the automatic usage of global Discord emotes in the current channel.",
 		"Supibot has access to all emotes from all servers it's on, and these might prove to be annoying somewhat.",
-		"This configuration lets you disable those, only the ones from the current server will be used.",
+		"This configuration lets you disable those, only the ones from the current server will be used."
 	],
 	execute: async (context, options = {}) => {
 		const { channelData, subcommand } = options;

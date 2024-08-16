@@ -7,7 +7,7 @@ module.exports = {
 		`<code>$bot enable-links channel:(channel)</code>`,
 		`<code>$bot disable-links channel:(channel)</code>`,
 		"Disables or enables automatic replacement of all links in a channel.",
-		`If enabled, all links will be replaced by "[LINK]" or a similar placeholder.`,
+		`If enabled, all links will be replaced by "[LINK]" or a similar placeholder.`
 	],
 	execute: async (context, options = {}) => {
 		const { subcommand, channelData } = options;

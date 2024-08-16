@@ -7,7 +7,7 @@ const subcommands = [
 	require("./offline-only.js"),
 	require("./rejoin.js"),
 	require("./rename.js"),
-	require("./toggle.js"),
+	require("./toggle.js")
 ];
 
 module.exports = {

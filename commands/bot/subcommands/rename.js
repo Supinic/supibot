@@ -5,7 +5,7 @@ module.exports = {
 		`<code>$bot rename channel:(channel)</code>`,
 		`<code>$bot renamed channel:(channel)</code>`,
 		"If you recently renamed your Twitch account, you can use this command to get Supibot back immediately!",
-		"This also works for other channels that you are an ambassador in.",
+		"This also works for other channels that you are an ambassador in."
 	],
 	execute: async (context, options = {}) => {
 		const { channelData } = options;

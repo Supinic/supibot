@@ -7,7 +7,7 @@ module.exports = {
 		`<code>$bot offline-only channel:(name)</code>`,
 		"Activates (or deactivates, if used with disable-) the offline-only mode, which will make Supibot unresponsive in the channel when the streamer goes live.",
 		"After the stream ends, Supibot will automatically reactivate. There might be delay up to 2 minutes for both online/offline events.",
-		"Note: The stream must go online/offline for this mode to activate. If it is already live, Supibot won't deactivate until it goes live again in the future.",
+		"Note: The stream must go online/offline for this mode to activate. If it is already live, Supibot won't deactivate until it goes live again in the future."
 	],
 	execute: async (context, options = {}) => {
 		const { channelData, subcommand } = options;
