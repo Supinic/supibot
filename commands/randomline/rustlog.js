@@ -72,7 +72,7 @@ const getInstance = async function (channelID) {
 
 const isSupported = async function (channelID) {
 	const list = await getSupportedChannelList();
-	if (list === null) {
+	if (list === null || Object.keys(list).length === 0) {
 		return null;
 	}
 
