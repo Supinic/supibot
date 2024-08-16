@@ -157,9 +157,13 @@ module.exports = {
 
 			if (response.ok) {
 				const summary = response.body.query_summary;
-				const score = sb.Utils.round(summary.total_positive / summary.total_reviews * 100, 1);
-
-				reviewsString = `Rating: ${summary.review_score_desc} (${score}% positive)`;
+				if (summary.total_reviews > 0) {
+					const score = sb.Utils.round(summary.total_positive / summary.total_reviews * 100, 1);
+					reviewsString = `Rating: ${summary.review_score_desc} (${score}% positive)`;
+				}
+				else {
+					reviewsString = `Rating: ${summary.review_score_desc}`;
+				}
 			}
 			else {
 				reviewsString = "Could not fetch reviews data";
