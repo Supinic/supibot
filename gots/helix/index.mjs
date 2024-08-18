@@ -1,15 +1,17 @@
+const { env } = globalThis.process;
+
 export const definition = {
 	name: "Helix",
 	optionsType: "function",
 	options: (() => {
-		if (!process.env.TWITCH_CLIENT_ID) {
+		if (!env.TWITCH_CLIENT_ID) {
 			throw new Error("Helix sb.Got instance cannot initialize - missing client-id");
 		}
 
 		return {
 			prefixUrl: "https://api.twitch.tv/helix",
 			headers: {
-				"Client-ID": sb.Config.get("TWITCH_CLIENT_ID", true)
+				"Client-ID": env.TWITCH_CLIENT_ID
 			},
 			timeout: {
 				request: 5000

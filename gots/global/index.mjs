@@ -13,7 +13,7 @@ export const definition = {
 		mutableDefaults: true,
 		throwHttpErrors: false,
 		headers: {
-			"User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
+			"User-Agent": process.env.DEFAULT_USER_AGENT
 		},
 		hooks: {
 			beforeError: [

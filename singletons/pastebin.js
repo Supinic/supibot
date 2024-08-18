@@ -40,7 +40,7 @@ module.exports = class PastebinSingleton {
 		prefixUrl: "https://pastebin.com/",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded",
-			"User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
+			"User-Agent": process.env.DEFAULT_USER_AGENT
 		}
 	});
 

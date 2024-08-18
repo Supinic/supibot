@@ -7,7 +7,6 @@ VALUES
 ('DISCORD_BOT_TOKEN',NULL,'string',NULL,1,0,NULL),
 ('DEFAULT_BANPHRASE_API_RESPONSE','[Banphrased]','string',NULL,0,1,'If a banphrase API rejects a message, and no Banphrase object exists to react to that, this message will be printed instead.'),
 ('DEFAULT_PENDING_TIMEOUT',300000,'number',NULL,0,0,NULL),
-('DEFAULT_USER_AGENT','Custom fork of Supibot: github.com/supinic/supibot','string',NULL,0,0,NULL),
 ('LINK_REGEX','/(https?:\\/\\/)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&\\/\\/=]*)/gi','regex',NULL,0,1,'Determines if a message contains a website link.'),
 ('MAX_ACTIVE_INCOMING_REMINDERS','5','number',NULL,0,1,'Maximum amount of reminders someone can have pending for them at once.'),
 ('MAX_ACTIVE_OUTGOING_REMINDERS','8','number',NULL,0,1,'Maximum amount of reminders someone can have pending for others at the same time.'),
