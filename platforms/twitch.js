@@ -20,6 +20,8 @@ const {
 	sanitizeMessage
 } = require("./twitch-utils.js");
 
+const { TWITCH_ADMIN_SUBSCRIBER_LIST } = require("../utils/shared-cache-keys.json");
+
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
 const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
@@ -977,16 +979,13 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	/**
-	 * Determines whether or not a user is subscribed to a given Twitch channel.
+	 * Determines whether a user is subscribed to a given Twitch channel.
 	 * @param {sb.User} userData
-	 * @param {string} channelName
 	 * @returns {Promise<boolean>}
 	 */
-	async fetchUserCacheSubscription (userData, channelName) {
-		/**
-		 * @type {Object[]|null}
-		 */
-		const subscriberList = await sb.Cache.getByPrefix(`twitch-subscriber-list-${channelName}`);
+	async fetchUserAdminSubscription (userData) {
+		/** @type {Object[]|null} */
+		const subscriberList = await sb.Cache.getByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST);
 		if (!subscriberList || !Array.isArray(subscriberList)) {
 			return false;
 		}

@@ -1,5 +1,6 @@
 let noConfigWarningSent = false;
 let tooManySubsWarningSent = false;
+const { TWITCH_ADMIN_SUBSCRIBER_LIST } = require("../../utils/shared-cache-keys.json");
 
 export const definition = {
 	name: "fetch-twitch-subscriber-list",
@@ -62,11 +63,11 @@ export const definition = {
 		/** @type {SubscriberData[]} */
 		const data = subsResponse.body.data;
 		if (data.length >= 100 && !tooManySubsWarningSent) {
-			console.warn("Maximum subscribers reached for a single Helix call! Update to use pagination", { data });
+			console.warn("Maximum subscribers reached for a single Helix call! Update this module to use pagination", { data });
 			tooManySubsWarningSent = true;
 		}
 
-		await sb.Cache.setByPrefix("twitch-subscriber-list-supinic", data, {
+		await sb.Cache.setByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST, data, {
 			expiry: 864e5 // 1 day
 		});
 

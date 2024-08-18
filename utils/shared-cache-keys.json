@@ -6,5 +6,6 @@
   "TTS_ENABLED": "text-to-speech-state",
   "TTS_MULTIPLE_ENABLED": "text-to-speech-multiple-enabled",
   "TTS_TIME_LIMIT": "text-to-speech-time-limit",
-  "TTS_VOLUME": "text-to-speech-volume"
+  "TTS_VOLUME": "text-to-speech-volume",
+  "TWITCH_ADMIN_SUBSCRIBER_LIST": "twitch-admin-subscriber-list"
 }

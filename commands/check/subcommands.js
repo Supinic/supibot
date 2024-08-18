@@ -305,7 +305,7 @@ module.exports = (command) => [
 			}
 
 			const platform = sb.Platform.get("twitch");
-			const hasDoubleCookieAccess = await platform.fetchUserCacheSubscription(targetUser, "supinic");
+			const hasDoubleCookieAccess = await platform.fetchUserAdminSubscription(targetUser);
 
 			let string;
 			if (CookieLogic.canEatReceivedCookie(userCookieData)) {
