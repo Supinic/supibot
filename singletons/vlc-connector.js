@@ -1,5 +1,6 @@
 const VLCClient = require("./vlc-client.js");
 const { getLinkParser } = require("../utils/link-parser.js");
+const { SONG_REQUESTS_VLC_PAUSED } = require("../utils/shared-cache-keys.json");
 
 const actions = [
 	"addToQueue",
@@ -47,8 +48,8 @@ module.exports = class VLCSingleton {
 					url: sb.Config.get("LOCAL_VLC_IP", true),
 					port: 8080,
 					username: "",
-					password: "supinic",
-					running: (sb.Config.get("SONG_REQUESTS_STATE", false) === "vlc")
+					password: "supinic", // @todo set into env/config
+					running: true
 				});
 			}
 		}
@@ -113,14 +114,12 @@ module.exports = class VLCSingleton {
 		});
 
 		client.on("statuschange", async (before, after) => {
-			if (sb.Config.has("SONG_REQUESTS_VLC_PAUSED", false)) {
-				const currentPauseStatus = sb.Config.get("SONG_REQUESTS_VLC_PAUSED");
-				if (currentPauseStatus && after.state === "playing") {
-					await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", false);
-				}
-				else if (!currentPauseStatus && after.state === "paused") {
-					await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", true);
-				}
+			const currentPauseStatus = await sb.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+			if (currentPauseStatus && after.state === "playing") {
+				await sb.Cache.setByPrefix(SONG_REQUESTS_VLC_PAUSED, false);
+			}
+			else if (!currentPauseStatus && after.state === "paused") {
+				await sb.Cache.setByPrefix(SONG_REQUESTS_VLC_PAUSED, true);
 			}
 
 			const previous = before.currentplid;

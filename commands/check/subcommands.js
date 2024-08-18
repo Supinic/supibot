@@ -1,5 +1,9 @@
 const handleErrorInspection = require("./inspect-errors");
 const { isSupported } = require("../randomline/rustlog.js");
+const {
+	SONG_REQUESTS_STATE,
+	SONG_REQUESTS_VLC_PAUSED
+} = require("../../utils/shared-cache-keys.json");
 
 module.exports = (command) => [
 	{
@@ -663,8 +667,9 @@ module.exports = (command) => [
 				};
 			}
 
-			const state = sb.Config.get("SONG_REQUESTS_STATE");
-			const pauseString = (state === "vlc" && sb.Config.get("SONG_REQUESTS_VLC_PAUSED"))
+			const state = await sb.Cache.getByPrefix(SONG_REQUESTS_STATE);
+			const pauseState = await sb.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+			const pauseString = (state === "vlc" && pauseState === true)
 				? "Song requests are paused at the moment."
 				: "";
 

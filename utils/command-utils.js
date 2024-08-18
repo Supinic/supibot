@@ -6,6 +6,7 @@ const Chrono = require("chrono-node");
 
 const rssParser = new RSSParser();
 const MAX_SAFE_RANGE = 281474976710655;
+const VIDEO_TYPE_REPLACE_PREFIX = "$";
 
 module.exports = {
 	randomInt (min, max) {
@@ -674,7 +675,9 @@ module.exports = {
 		return {
 			reply
 		};
-	}
+	},
+
+	VIDEO_TYPE_REPLACE_PREFIX
 };
 
 /**

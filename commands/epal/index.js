@@ -1,3 +1,8 @@
+const {
+	TTS_ENABLED,
+	TTS_VOLUME
+} = require("../../utils/shared-cache-keys.json");
+
 const PROFILES_CACHE_KEY = "profiles";
 const tts = {
 	enabled: null,
@@ -84,14 +89,16 @@ module.exports = {
 			tags
 		} = sb.Utils.randArray(profilesData);
 
-		if (tts.channels.includes(context.channel?.ID) && sb.Config.get("TTS_ENABLED")) {
+		const ttsStatus = await sb.Cache.getByPrefix(TTS_ENABLED);
+		if (tts.channels.includes(context.channel?.ID) && ttsStatus) {
+			const ttsVolume = await sb.Cache.getByPrefix(TTS_VOLUME);
 			await sb.Got("GenericAPI", {
 				url: tts.url,
 				responseType: "text",
 				searchParams: new URLSearchParams({
 					specialAudio: "1",
 					url: audioFile,
-					volume: sb.Config.get("TTS_VOLUME"),
+					volume: ttsVolume,
 					limit: 20_000
 				})
 			});

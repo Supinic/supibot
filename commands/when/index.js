@@ -1,3 +1,5 @@
+const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = require("../../utils/shared-cache-keys.json");
+
 module.exports = {
 	Name: "when",
 	Aliases: null,
@@ -8,7 +10,8 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: "Only available in channels with VLC API configured!",
 	Code: (async function when (context) {
-		if (sb.Config.get("SONG_REQUESTS_STATE") !== "vlc") {
+		const state = await sb.Cache.getByPrefix(SONG_REQUESTS_STATE);
+		if (state !== "vlc") {
 			return {
 				reply: "Song requests are currently off or not in VLC!"
 			};
@@ -16,7 +19,6 @@ module.exports = {
 
 		const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
 		const personal = queue.filter(i => i.User_Alias === context.user.ID);
-
 		if (queue.length === 0) {
 			return {
 				reply: "The playlist is currently empty."
@@ -60,7 +62,9 @@ module.exports = {
 
 		const delta = sb.Utils.formatTime(Math.round(timeRemaining));
 		const bridge = (prepend) ? "Then," : "Your next video";
-		const pauseString = (sb.Config.get("SONG_REQUESTS_VLC_PAUSED"))
+
+		const pauseStatus = await sb.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+		const pauseString = (pauseStatus === true)
 			? "Song requests are paused at the moment."
 			: "";
 

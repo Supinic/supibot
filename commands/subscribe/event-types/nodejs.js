@@ -1,3 +1,5 @@
+const { LATEST_NODE_JS_VERSION } = require("../../../utils/shared-cache-keys.json");
+
 module.exports = {
 	name: "Node.js updates",
 	aliases: ["node", "nodejs", "node.js"],
@@ -23,11 +25,12 @@ module.exports = {
 		const data = response.body.sort((a, b) => new sb.Date(b.created_at) - new sb.Date(a.created_at));
 		const latest = data[0];
 
-		if (latest.tag_name === sb.Config.get("LATEST_NODE_JS_VERSION")) {
+		const latestCacheVersion = await sb.Cache.getByPrefix(LATEST_NODE_JS_VERSION);
+		if (latest.tag_name === latestCacheVersion) {
 			return;
 		}
 
-		await sb.Config.set("LATEST_NODE_JS_VERSION", latest.tag_name);
+		await sb.Cache.setByPrefix(LATEST_NODE_JS_VERSION, latest.tag_name);
 
 		const releaseDate = new sb.Date(latest.created_at).format("Y-m-d H:i");
 		return {

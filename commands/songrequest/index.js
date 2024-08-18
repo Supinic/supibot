@@ -1,6 +1,11 @@
 const { getLinkParser } = require("../../utils/link-parser.js");
-const { searchYoutube } = require("../../utils/command-utils.js");
+const { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } = require("../../utils/command-utils.js");
 const CytubeIntegration = require("./cytube-integration.js");
+
+const {
+	SONG_REQUESTS_STATE,
+	SONG_REQUESTS_VLC_PAUSED
+} = require("../../utils/shared-cache-keys.json");
 
 const REQUEST_TIME_LIMIT = 900;
 const REQUEST_AMOUNT_LIMIT = 10;
@@ -94,25 +99,18 @@ module.exports = {
 		}
 
 		// Figure out whether song request are available, and where specifically
-		const state = sb.Config.get("SONG_REQUESTS_STATE");
-		if (state === "off") {
-			return { reply: "Song requests are currently turned off." };
+		const state = await sb.Cache.getByPrefix(SONG_REQUESTS_STATE);
+		if (!state || state === "off") {
+			return {
+				reply: "Song requests are currently turned off."
+			};
 		}
 		else if (state === "vlc-read") {
-			return { reply: `Song requests are currently read-only. You can check what's playing with the "current" command, but not queue anything.` };
-		}
-		else if (state === "dubtrack") {
-			const dubtrack = (await sb.Command.get("dubtrack").execute(context)).reply;
-			return { reply: `Song requests are currently using dubtrack. Join here: ${dubtrack} :)` };
+			return {
+				reply: `Song requests are currently read-only. You can check what's playing with the "current" command, but not queue anything.`
+			};
 		}
 		else if (state === "cytube") {
-			if (!sb.Config.get("EXTERNAL_CYTUBE_SR_ENABLED", false)) {
-				const cytube = (await sb.Command.get("cytube").execute(context)).reply;
-				return {
-					reply: `Song requests are currently using Cytube. Join here: ${cytube} :)`
-				};
-			}
-
 			return await CytubeIntegration.queue(args.join(" "));
 		}
 
@@ -165,7 +163,6 @@ module.exports = {
 		let data = null;
 
 		if (parsedURL.host === "supinic.com" && parsedURL.pathname.includes("/track/detail")) {
-			const videoTypePrefix = sb.Config.get("VIDEO_TYPE_REPLACE_PREFIX");
 			const songID = Number(parsedURL.pathname.match(/(\d+)/)[1]);
 			if (!songID) {
 				return { reply: "Invalid link!" };
@@ -218,7 +215,7 @@ module.exports = {
 			}
 
 			if (songData) {
-				url = songData.Prefix.replace(videoTypePrefix, songData.Link);
+				url = songData.Prefix.replace(VIDEO_TYPE_REPLACE_PREFIX, songData.Link);
 			}
 			else {
 				url = null;
@@ -347,16 +344,10 @@ module.exports = {
 
 		let existsString = "";
 		if (exists) {
-			const string = `This video is already queued as ID ${exists.VLC_ID}!`;
-			if (!sb.Config.get("SONG_REQUESTS_DUPLICATE_ALLOWED", false)) {
-				return {
-					success: false,
-					reply: string
-				};
-			}
-			else {
-				existsString = string;
-			}
+			return {
+				success: false,
+				reply: `This video is already queued as ID ${exists.VLC_ID}!`
+			};
 		}
 
 		const authorString = (data.author) ? ` by ${data.author}` : "";
@@ -413,9 +404,9 @@ module.exports = {
 		}
 		catch (e) {
 			console.warn("sr error", e);
-			await sb.Config.set("SONG_REQUESTS_STATE", "off");
+			await sb.Cache.setByPrefix(SONG_REQUESTS_STATE, "off");
 			return {
-				reply: `The desktop listener is currently turned off. Turning song requests off.`
+				reply: `The desktop listener is currently turned off! Turning song requests off.`
 			};
 		}
 
@@ -473,7 +464,8 @@ module.exports = {
 			seek.push(`ending at ${sb.Utils.formatTime(endTime, true)}`);
 		}
 
-		const pauseString = (sb.Config.get("SONG_REQUESTS_VLC_PAUSED"))
+		const pauseState = await sb.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+		const pauseString = (pauseState === true)
 			? "Song requests are paused at the moment."
 			: "";
 		const seekString = (seek.length > 0)

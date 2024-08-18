@@ -1,5 +1,7 @@
-const BASE_CACHE_KEY = `playsound-cooldown`;
-const getCacheKey = (playsoundName) => `${BASE_CACHE_KEY}-${playsoundName}`;
+const { PLAYSOUNDS_ENABLED } = require("../../utils/shared-cache-keys.json");
+
+const BASE_PLAYSOUND_CACHE_KEY = "playsound-cooldown";
+const getPlaysoundCacheKey = (playsoundName) => `${BASE_PLAYSOUND_CACHE_KEY}-${playsoundName}`;
 const tts = {
 	enabled: null,
 	url: null
@@ -31,7 +33,9 @@ module.exports = {
 				reply: `Local playsound listener is not configured!`
 			};
 		}
-		else if (!sb.Config.get("PLAYSOUNDS_ENABLED")) {
+
+		const isConfigEnabled = await sb.Cache.getByPrefix(PLAYSOUNDS_ENABLED);
+		if (!isConfigEnabled) {
 			return {
 				reply: "Playsounds are currently disabled!"
 			};
@@ -68,7 +72,7 @@ module.exports = {
 			};
 		}
 
-		const cacheKey = getCacheKey(playsound);
+		const cacheKey = getPlaysoundCacheKey(playsound);
 		const existingCooldown = await sb.Cache.getByPrefix(cacheKey) ?? 0;
 		const now = sb.Date.now();
 
@@ -89,10 +93,9 @@ module.exports = {
 			success = (response.ok);
 		}
 		catch (e) {
-			await sb.Config.set("PLAYSOUNDS_ENABLED", false);
-
+			await sb.Cache.setByPrefix(PLAYSOUNDS_ENABLED, false);
 			return {
-				reply: "The desktop listener is not currently running, turning off playsounds!"
+				reply: "The desktop listener is not currently running! Turning off playsounds."
 			};
 		}
 

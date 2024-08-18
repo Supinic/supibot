@@ -1,4 +1,9 @@
 const LanguageCodes = require("language-iso-codes");
+const {
+	TTS_ENABLED,
+	TTS_MULTIPLE_ENABLED,
+	TTS_VOLUME
+} = require("../../utils/shared-cache-keys.json");
 
 const tts = {
 	enabled: null,
@@ -51,13 +56,16 @@ module.exports = {
 				reply: "Check out the possible voices and locales here: https://supinic.com/stream/tts"
 			};
 		}
-		else if (!sb.Config.get("TTS_ENABLED")) {
+
+		const state = await sb.Cache.getByPrefix(TTS_ENABLED);
+		if (!state) {
 			return {
 				reply: "Text-to-speech is currently disabled!"
 			};
 		}
 
-		if (!sb.Config.get("TTS_MULTIPLE_ENABLED")) {
+		const multiState = await sb.Cache.getByPrefix(TTS_MULTIPLE_ENABLED);
+		if (!multiState) {
 			if (this.data.pending) {
 				return {
 					reply: "Someone else is using the TTS right now, and multiple TTS is not available right now!",
@@ -80,7 +88,6 @@ module.exports = {
 
 		let code;
 		let input = context.params.lang ?? "en-us";
-
 		if (input === "random") {
 			const randomItem = sb.Utils.randArray(tts.locales);
 			input = randomItem.locale;
@@ -102,6 +109,7 @@ module.exports = {
 		try {
 			messageTime = process.hrtime.bigint();
 
+			const volume = await sb.Cache.getByPrefix(TTS_VOLUME);
 			const response = await sb.Got("GenericAPI", {
 				url: tts.url,
 				responseType: "text",
@@ -111,7 +119,7 @@ module.exports = {
 						text: args.join(" "),
 						speed
 					}]),
-					volume: sb.Config.get("TTS_VOLUME"),
+					volume,
 					limit: tts.limit
 				})
 			});
@@ -120,10 +128,9 @@ module.exports = {
 			result = (response.body === "true");
 		}
 		catch (e) {
-			await sb.Config.set("TTS_ENABLED", false);
-
+			await sb.Cache.setByPrefix(TTS_ENABLED, false);
 			return {
-				reply: "TTS Listener encountered an error or is turned on. Turning off text to speech!"
+				reply: "TTS Listener encountered an error or is turned on! Turning off text to speech."
 			};
 		}
 		finally {

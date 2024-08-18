@@ -1,3 +1,5 @@
+const { VIDEO_TYPE_REPLACE_PREFIX } = require("../../utils/command-utils.js");
+const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = require("../../utils/shared-cache-keys.json");
 const ALLOWED_SONG_CHECKS = ["current", "previous", "next"];
 
 module.exports = {
@@ -12,10 +14,10 @@ module.exports = {
 	],
 	Whitelist_Response: "This command is only available in @Supinic channel on Twitch!",
 	Code: (async function current (context, ...args) {
-		const linkSymbol = sb.Config.get("VIDEO_TYPE_REPLACE_PREFIX");
-		const state = sb.Config.get("SONG_REQUESTS_STATE");
+		const linkSymbol = VIDEO_TYPE_REPLACE_PREFIX;
+		const state = await sb.Cache.getByPrefix(SONG_REQUESTS_STATE);
 
-		if (state === "off") {
+		if (!state || state === "off") {
 			return {
 				reply: "Song requests are currently turned off."
 			};
@@ -143,7 +145,8 @@ module.exports = {
 				}
 			}
 
-			const pauseString = (sb.Config.get("SONG_REQUESTS_VLC_PAUSED"))
+			const pauseStatus = await sb.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+			const pauseString = (pauseStatus === true)
 				? "The song request is paused at the moment."
 				: "";
 

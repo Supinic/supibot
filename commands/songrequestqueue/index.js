@@ -1,3 +1,8 @@
+const {
+	SONG_REQUESTS_STATE,
+	SONG_REQUESTS_VLC_PAUSED
+} = require("../../utils/shared-cache-keys.json");
+
 module.exports = {
 	Name: "songrequestqueue",
 	Aliases: ["srq","queue"],
@@ -8,16 +13,10 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: "Only available in supinic's channel.",
 	Code: (async function songRequestQueue (context) {
-		const state = sb.Config.get("SONG_REQUESTS_STATE");
-		if (state === "off") {
+		const state = await sb.Cache.getByPrefix(SONG_REQUESTS_STATE, value);
+		if (!state || state === "off") {
 			return {
 				reply: "Song requests are currently turned off. Check out the history up to 14 days back: https://supinic.com/stream/song-request/history"
-			};
-		}
-		else if (state === "dubtrack") {
-			const dubtrack = (await sb.Command.get("dubtrack").execute(context)).reply;
-			return {
-				reply: `Song requests are currently using dubtrack. Join here: ${dubtrack} :)`
 			};
 		}
 		else if (state === "cytube") {
@@ -49,12 +48,14 @@ module.exports = {
 			}
 		}
 
-		const total = data.reduce((acc, cur) => (acc += cur.Duration), 0);
+		const total = data.reduce((acc, cur) => acc + cur.Duration, 0);
 		const current = data.find(i => i.Status === "Current");
 
 		const length = total - (current?.End_Time ?? status.time);
 		const delta = sb.Utils.timeDelta(Math.round(sb.Date.now() + length * 1000), true);
-		const pauseString = (sb.Config.get("SONG_REQUESTS_VLC_PAUSED"))
+
+		const pauseState = await sb.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+		const pauseString = (pauseState === true)
 			? "Song requests are paused at the moment."
 			: "";
 

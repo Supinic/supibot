@@ -1,6 +1,8 @@
 // import { randomInt } from "node:crypto";
 // import { getLinkParser } from "../../utils/link-parser.js";
 
+const { SONG_REQUESTS_STATE } = require("../../utils/shared-cache-keys.json");
+
 const repeats = [];
 const repeatAmount = 100;
 // const bannedLinks = [
@@ -18,7 +20,7 @@ export const definition = {
 			return;
 		}
 
-		const twitch = sb.Platform.get("twitch");
+		// const twitch = sb.Platform.get("twitch");
 		const cytube = sb.Platform.get("cytube");
 		const channelData = sb.Channel.get("supinic", "twitch");
 		const cytubeChannelData = sb.Channel.get(49);
@@ -29,7 +31,7 @@ export const definition = {
 		}
 
 		// Don't auto-request in an unsupported song-request state
-		const state = sb.Config.get("SONG_REQUESTS_STATE");
+		const state = await sb.Cache.getByPrefix(SONG_REQUESTS_STATE);
 		if (state !== "vlc" && state !== "cytube") {
 			return;
 		}
@@ -58,7 +60,7 @@ export const definition = {
 			return;
 		}
 
-		let link;
+		// let link;
 		const videoData = await sb.Query.getRecordset(rs => rs
 			.select("Link", "Notes")
 			.from("personal", "Favourite_Track")

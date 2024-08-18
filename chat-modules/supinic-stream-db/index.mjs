@@ -1,3 +1,5 @@
+const { SONG_REQUESTS_STATE } = require("../../utils/shared-cache-keys.json");
+
 export const definition = {
 	Name: "supinic-stream-db",
 	Events: ["online", "offline"],
@@ -86,7 +88,8 @@ export const definition = {
 				await row.save();
 			}
 
-			await sb.Config.set("SONG_REQUESTS_STATE", "off");
+			// Clear all pending song requests, set song request status to "off"
+			await sb.Cache.setByPrefix(SONG_REQUESTS_STATE, "off");
 			await sb.Query.isRecordUpdater(ru => ru
 				.from("chat_data", "Song_Request")
 				.set("Status", "Inactive")
