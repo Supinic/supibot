@@ -1,27 +1,29 @@
+const { env } = globalThis.process;
+const { TWITCH_ADMIN_SUBSCRIBER_LIST } = require("../../utils/shared-cache-keys.json");
+
 let noConfigWarningSent = false;
 let tooManySubsWarningSent = false;
-const { TWITCH_ADMIN_SUBSCRIBER_LIST } = require("../../utils/shared-cache-keys.json");
+const requiredEnvs = [
+	"TWITCH_CLIENT_ID",
+	"TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN",
+	"TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN",
+	"ADMIN_USER_ID"
+];
 
 export const definition = {
 	name: "fetch-twitch-subscriber-list",
 	expression: "0 0 0 * * *",
 	description: "Fetches the current subscriber list, then saves it to sb.Cache",
 	code: (async function fetchTwitchSubscriberList () {
-		const requiredConfigs = [
-			"TWITCH_CLIENT_ID",
-			"TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN",
-			"TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN",
-			"ADMIN_USER_ID"
-		];
+		for (const name of requiredEnvs) {
+			if (!env[name]) {
+				if (noConfigWarningSent) {
+					console.warn("Cannot fetch subscribers, env(s) are missing", name)
+					noConfigWarningSent = true;
+				}
 
-		const missingConfigs = requiredConfigs.filter(config => !sb.Config.has(config, true));
-		if (missingConfigs.length !== 0) {
-			if (!noConfigWarningSent) {
-				console.warn("Cannot fetch subscribers, config(s) are missing", { missingConfigs })
-				noConfigWarningSent = true;
+				return;
 			}
-
-			return;
 		}
 
 		const identityResponse = await sb.Got("GenericAPI", {
@@ -30,8 +32,8 @@ export const definition = {
 			searchParams: {
 				grant_type: "refresh_token",
 				refresh_token: sb.Config.get("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN"),
-				client_id: sb.Config.get("TWITCH_CLIENT_ID"),
-				client_secret: sb.Config.get("TWITCH_CLIENT_SECRET")
+				client_id: env.TWITCH_CLIENT_ID,
+				client_secret: env.TWITCH_CLIENT_SECRET
 			}
 		});
 
@@ -46,7 +48,7 @@ export const definition = {
 			responseType: "json",
 			throwHttpErrors: false,
 			headers: {
-				"Client-ID": sb.Config.get("TWITCH_CLIENT_ID"),
+				"Client-ID": env.TWITCH_CLIENT_ID,
 				Authorization: `Bearer ${sb.Config.get("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN")}`
 			},
 			searchParams: {

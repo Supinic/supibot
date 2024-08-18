@@ -1,3 +1,5 @@
+const { env } = globalThis.process;
+
 const APP_ACCESS_CACHE_KEY = "twitch-app-access-token";
 const CONDUIT_ID_KEY = "twitch-conduit-id";
 const USER_CHANNEL_ACTIVITY_PREFIX = "twitch-user-activity-";
@@ -17,8 +19,8 @@ const getAppAccessToken = async () => {
 		method: "POST",
 		searchParams: {
 			grant_type: "client_credentials",
-			client_id: sb.Config.get("TWITCH_CLIENT_ID"),
-			client_secret: sb.Config.get("TWITCH_CLIENT_SECRET")
+			client_id: env.TWITCH_CLIENT_ID,
+			client_secret: env.TWITCH_CLIENT_SECRET
 		}
 	});
 
@@ -54,7 +56,7 @@ const getConduitId = async () => {
 		throwHttpErrors: false,
 		headers: {
 			Authorization: `Bearer ${appToken}`,
-			"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+			"Client-Id": env.TWITCH_CLIENT_ID
 		}
 	});
 
@@ -81,7 +83,7 @@ const getConduitId = async () => {
 					throwHttpErrors: false,
 					headers: {
 						Authorization: `Bearer ${appToken}`,
-						"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+						"Client-Id": env.TWITCH_CLIENT_ID
 					},
 					searchParams: { id }
 				});
@@ -106,7 +108,7 @@ const getConduitId = async () => {
 		throwHttpErrors: false,
 		headers: {
 			Authorization: `Bearer ${appToken}`,
-			"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+			"Client-Id": env.TWITCH_CLIENT_ID
 		},
 		json: { shard_count: 1 }
 	});
@@ -141,7 +143,7 @@ const assignWebsocketToConduit = async (sessionId) => {
 		throwHttpErrors: false,
 		headers: {
 			Authorization: `Bearer ${appToken}`,
-			"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+			"Client-Id": env.TWITCH_CLIENT_ID
 		},
 		json: {
 			conduit_id: conduitId,
@@ -199,7 +201,7 @@ const createSubscription = async (data = {}) => {
 		throwHttpErrors: false,
 		headers: {
 			Authorization: `Bearer ${appToken}`,
-			"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+			"Client-Id": env.TWITCH_CLIENT_ID
 		},
 		json: {
 			type: subscription,
@@ -326,7 +328,7 @@ const fetchExistingSubscriptions = async () => {
 		throwHttpErrors: false,
 		headers: {
 			Authorization: `Bearer ${accessToken}`,
-			"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+			"Client-Id": env.TWITCH_CLIENT_ID
 		},
 		searchParams: {
 			status: "enabled"
@@ -343,7 +345,7 @@ const fetchExistingSubscriptions = async () => {
 			throwHttpErrors: false,
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
-				"Client-Id": sb.Config.get("TWITCH_CLIENT_ID")
+				"Client-Id": env.TWITCH_CLIENT_ID
 			},
 			searchParams: {
 				status: "enabled",
@@ -359,9 +361,10 @@ const fetchExistingSubscriptions = async () => {
 };
 
 const fetchToken = async () => {
-	if (!sb.Config.has("TWITCH_REFRESH_TOKEN", true)) {
+	const refreshToken = await sb.Cache.getByPrefix("TWITCH_REFRESH_TOKEN") ?? env.TWITCH_REFRESH_TOKEN;
+	if (!refreshToken) {
 		throw new sb.Error({
-			message: "No Twitch refresh token available!"
+			message: "No Twitch refresh token has been configured"
 		});
 	}
 
@@ -370,20 +373,18 @@ const fetchToken = async () => {
 		method: "POST",
 		searchParams: {
 			grant_type: "refresh_token",
-			refresh_token: sb.Config.get("TWITCH_REFRESH_TOKEN"),
-			client_id: sb.Config.get("TWITCH_CLIENT_ID"),
-			client_secret: sb.Config.get("TWITCH_CLIENT_SECRET")
+			refresh_token: refreshToken,
+			client_id: env.TWITCH_CLIENT_ID,
+			client_secret: env.TWITCH_CLIENT_SECRET
 		}
 	});
 
-	const expirationTimestamp = sb.Date.now() + (response.body.expires_in * 1000);
-	const authToken = response.body.access_token;
-
 	await Promise.all([
-		sb.Cache.setByPrefix("TWITCH_OAUTH", authToken, { expiry: response.body.expires_in * 1000 }),
-		sb.Config.set("TWITCH_OAUTH", authToken),
-		sb.Config.set("TWITCH_OAUTH_EXPIRATION", expirationTimestamp),
-		sb.Config.set("TWITCH_REFRESH_TOKEN", response.body.refresh_token)
+		sb.Cache.setByPrefix("TWITCH_REFRESH_TOKEN", response.body.refresh_token),
+		sb.Cache.setByPrefix("TWITCH_OAUTH", response.body.access_token, {
+			// Reduce expiration time by 10 seconds to allow for latency
+			expiry: (response.body.expires_in * 1000) - 10_000
+		})
 	]);
 
 	return authToken;
@@ -432,10 +433,8 @@ const getActiveUsernamesInChannel = async (channelData) => {
 };
 
 const initTokenCheckInterval = async () => {
-	const now = sb.Date.now();
-	const expiration = sb.Config.get("TWITCH_OAUTH_EXPIRATION", false) ?? 0;
-
-	if (now + TOKEN_REGENERATE_INTERVAL >= expiration) {
+	const tokenExists = await sb.Cache.getByPrefix("TWITCH_OAUTH");
+	if (!tokenExists) {
 		await fetchToken();
 	}
 

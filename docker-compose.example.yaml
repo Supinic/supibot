@@ -31,6 +31,9 @@ services:
       - type: bind
         source: <path_to_supibot_repository>/config.json
         target: /home/supibot/config.json
+      - type: bind
+        source: <path_to_supibot_repository>/.env
+        target: /home/supibot/.env
     restart: unless-stopped
     environment:
       #- "DEBUG_MODE=1"
@@ -38,11 +41,3 @@ services:
       - "MARIA_USER=supibot"
       - "MARIA_PASSWORD=supibot"
       - "REDIS_CONFIGURATION=redis"
-      - "INITIAL_PLATFORM=twitch"
-      #- "INITIAL_PLATFORM=discord"
-      - "INITIAL_TWITCH_CHANNEL=<INITIAL_TWITCH_CHANNEL>"
-      - "TWITCH_CLIENT_ID=<your_client_id>"
-      - "TWITCH_CLIENT_SECRET=<your_client_secret>"
-      - "TWITCH_REFRESH_TOKEN=<your_refresh_token>"
-      #- "DISCORD_BOT_TOKEN=<your_discord_token>"
-      - "SUPIBOT_API_PORT=<preferred_api_port>"

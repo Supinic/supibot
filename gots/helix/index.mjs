@@ -2,7 +2,7 @@ export const definition = {
 	name: "Helix",
 	optionsType: "function",
 	options: (() => {
-		if (!sb.Config.has("TWITCH_CLIENT_ID", true)) {
+		if (!process.env.TWITCH_CLIENT_ID) {
 			throw new Error("Helix sb.Got instance cannot initialize - missing client-id");
 		}
 
@@ -19,8 +19,8 @@ export const definition = {
 			},
 			hooks: {
 				beforeRequest: [
-					(options) => {
-						const token = sb.Config.get("TWITCH_OAUTH", true);
+					async (options) => {
+						const token = await sb.Cache.getByPrefix("TWITCH_OAUTH");
 						options.headers.authorization = `Bearer ${token}`;
 					}
 				]

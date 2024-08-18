@@ -1,4 +1,5 @@
 const WebSocket = require("ws");
+const { env } = globalThis.process;
 
 const {
 	assignWebsocketToConduit,
@@ -73,7 +74,8 @@ const DEFAULT_PLATFORM_CONFIG = {
 	joinChannelsOverride: [],
 	spamPreventionThreshold: 100,
 	sendVerificationChallenge: false,
-	whisperMessageLimit: 500
+	whisperMessageLimit: 500,
+	unrelatedPrivateMessageResponse: ""
 };
 
 module.exports = class TwitchPlatform extends require("./template.js") {
@@ -101,14 +103,14 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				message: "Twitch platform does not have the bot's name configured"
 			});
 		}
-		else if (!sb.Config.has("TWITCH_OAUTH", true)) {
+		else if (!env.TWITCH_CLIENT_ID) {
 			throw new sb.Error({
-				message: "Twitch oauth token (Config/TWITCH_OAUTH) has not been configured"
+				message: "Twitch client ID has not been configured"
 			});
 		}
-		else if (!sb.Config.has("TWITCH_CLIENT_ID", true)) {
+		else if (!env.TWITCH_CLIENT_SECRET) {
 			throw new sb.Error({
-				message: "Twitch client ID (Config/TWITCH_CLIENT_ID) has not been configured"
+				message: "Twitch client secret has not been configured"
 			});
 		}
 
@@ -739,7 +741,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		this.resolveUserMessage(null, userData, message);
 
 		if (!sb.Command.is(message)) {
-			await this.pm(sb.Config.get("PRIVATE_MESSAGE_UNRELATED"), senderUsername);
+			await this.pm(this.config.privateMessageResponseUnrelated, senderUsername);
 			return;
 		}
 
@@ -754,10 +756,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		if (!result || !result.success) {
 			if (!result?.reply && result?.reason === "filter") {
-				await this.pm(sb.Config.get("PRIVATE_MESSAGE_COMMAND_FILTERED"), senderUsername);
+				await this.pm(this.config.privateMessageResponseFiltered, senderUsername);
 			}
 			else if (result?.reason === "no-command") {
-				await this.pm(sb.Config.get("PRIVATE_MESSAGE_NO_COMMAND"), senderUsername);
+				await this.pm(this.config.privateMessageResponseNoCommand, senderUsername);
 			}
 		}
 	}

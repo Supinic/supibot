@@ -20,11 +20,11 @@
     "ws": "^8.17.1"
   },
   "engines": {
-    "node": ">= 18.0"
+    "node": ">= 20.0"
   },
   "scripts": {
-    "start": "node --enable-experimental-regexp-engine ./master.js",
-    "debug": "node --enable-experimental-regexp-engine --inspect=0.0.0.0:9229 --unhandled-rejections=warn ./master.js",
+    "start": "node --env-file=.env --enable-experimental-regexp-engine ./master.js",
+    "debug": "node --env-file=.env --enable-experimental-regexp-engine --inspect=0.0.0.0:9229 --unhandled-rejections=warn ./master.js",
     "init-database": "node ./init/script.js",
     "setup": "node ./init/setup.js",
     "auto-setup": "node ./init/auto-setup.js",

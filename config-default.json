@@ -93,7 +93,10 @@
         "joinChannelsOverride": [],
         "spamPreventionThreshold": 100,
         "sendVerificationChallenge": false,
-        "whisperMessageLimit": 500
+        "whisperMessageLimit": 500,
+        "privateMessageResponseUnrelated": "Your message has been logged.",
+        "privateMessageResponseFiltered": "That command is not available via private messages.",
+        "privateMessageResponseNoCommand": "That command does not exist. Please use the commands command to get a list."
       },
       "logging": {
         "bits": false,
