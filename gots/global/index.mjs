@@ -1,3 +1,6 @@
+const config = require("../../config.json");
+const { defaultUserAgent } = config.gots;
+
 export const definition = {
 	name: "Global",
 	optionsType: "function",
@@ -13,7 +16,7 @@ export const definition = {
 		mutableDefaults: true,
 		throwHttpErrors: false,
 		headers: {
-			"User-Agent": process.env.DEFAULT_USER_AGENT
+			"User-Agent": defaultUserAgent
 		},
 		hooks: {
 			beforeError: [

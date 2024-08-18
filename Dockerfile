@@ -18,7 +18,6 @@ COPY --chown=supibot:supibot .yarnrc.yml ./
 RUN yarn
 
 COPY --chown=supibot:supibot master.js ./
-COPY --chown=supibot:supibot config-default.json ./
 COPY --chown=supibot:supibot init ./init
 
 COPY --chown=supibot:supibot api ./api

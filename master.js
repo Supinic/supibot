@@ -53,12 +53,7 @@ try {
 	config = require("./config.json");
 }
 catch {
-	try {
-		config = require("./config-default.json");
-	}
-	catch {
-		throw new Error("No default or custom configuration found");
-	}
+	throw new Error("No custom configuration found! Copy `config-default.json` as `config.json` and set up your configuration");
 }
 
 const databaseModuleInitializeOrder = [

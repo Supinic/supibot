@@ -1,3 +1,6 @@
+const config = require("../config.json");
+const { defaultUserAgent } = config.gots;
+
 let loginConfigMissingNotified = false;
 const loginConfigs = [
 	"API_PASTEBIN",
@@ -40,7 +43,7 @@ module.exports = class PastebinSingleton {
 		prefixUrl: "https://pastebin.com/",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded",
-			"User-Agent": process.env.DEFAULT_USER_AGENT
+			"User-Agent": defaultUserAgent
 		}
 	});
 

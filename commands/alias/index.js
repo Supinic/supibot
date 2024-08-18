@@ -1,11 +1,4 @@
-let config;
-try {
-	config = require("../../config.json");
-}
-catch {
-	config = require("../../config-default.json");
-}
-
+const config = require("../../config.json");
 const bannedCommandCombinations = config.modules.commands.bannedCombinations ?? [];
 
 const AliasUtils = require("./alias-utils.js");

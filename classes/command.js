@@ -2,21 +2,15 @@ const Banphrase = require("./banphrase.js");
 const Filter = require("./filter.js");
 const User = require("./user.js");
 
+const config = require("../config.json");
+const COMMAND_PREFIX = config.modules.commands.prefix;
+
 const pathModule = require("node:path");
 const CooldownManager = require("../utils/cooldown-manager.js");
 const LanguageCodes = require("language-iso-codes");
 
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 
-let config;
-try {
-	config = require("../config.json");
-}
-catch {
-	config = require("../config-default.json");
-}
-
-const COMMAND_PREFIX = config.modules.commands.prefix;
 class Context {
 	#command;
 	#invocation;

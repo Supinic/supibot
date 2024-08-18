@@ -40,6 +40,7 @@
       "whitelist": []
     },
     "gots": {
+      "defaultUserAgent": "Custom fork of Supibot: github.com/supinic/supibot",
       "disableAll": false,
       "blacklist": [
         "RaspberryPi4",

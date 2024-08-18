@@ -1,14 +1,7 @@
-const instancesCacheKey = "rustlog-supported-channels";
-
-let config;
-try {
-	config = require("../../config.json");
-}
-catch {
-	config = require("../../config-default.json");
-}
-
+const config = require("../../config.json");
 const { instances } = config.rustlog;
+
+const instancesCacheKey = "rustlog-supported-channels";
 
 const getChannelLoggingInstances = async function () {
 	const data = await sb.Cache.getByPrefix(instancesCacheKey);
