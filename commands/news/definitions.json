@@ -206,10 +206,10 @@
         "helpers": ["caglapickaxe", "cgpx"]
       },
       {
-        "name": "Amerika'nın Sesi",
-        "url": "https://www.amerikaninsesi.com",
+        "name": "VOA Türkçe",
+        "url": "https://www.voaturkce.com",
         "path": "api",
-        "endpoints": ["zv$vteottq"],
+        "endpoints": ["zvbvteottq"],
         "helpers": ["caglapickaxe", "cgpx"]
       }
     ]
