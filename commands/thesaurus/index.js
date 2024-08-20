@@ -11,6 +11,20 @@ module.exports = {
 		{ name: "singleWord", type: "boolean" }
 	],
 	Whitelist_Response: null,
+	initialize: async () => {
+		const exists = await sb.Query.isTablePresent("data", "Thesaurus");
+		if (!exists) {
+			await sb.Query.raw(`
+				CREATE TABLE IF NOT EXISTS \`data\`.\`Thesaurus\` (
+					\`Word\` VARCHAR(200) NOT NULL COLLATE 'utf8mb4_general_ci' COMMENT 'Word to fetch synonyms for' ,
+					\`Result\` LONGTEXT NOT NULL DEFAULT '' COLLATE 'utf8mb4_bin' COMMENT 'JSON field with a list of strings - synonyms for the given word',
+					PRIMARY KEY (\`Word\`) USING BTREE
+				)
+				COLLATE='utf8mb4_general_ci'
+				ENGINE=InnoDB;
+			`);
+		}
+	},
 	Code: (async function thesaurus (context, ...words) {
 		if (words.length === 0) {
 			return {

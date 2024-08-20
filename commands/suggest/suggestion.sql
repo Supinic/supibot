@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `data`.`Suggestion` (
 	`ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`User_Alias` INT(10) UNSIGNED NULL DEFAULT NULL COMMENT 'Author of the suggestion',
 	`Text` TEXT NOT NULL COLLATE 'utf8mb4_general_ci' COMMENT 'Suggestion body',
-	`Date` DATETIME NOT NULL DEFAULT current_timestamp() COMMENT 'Suggestion\'s creation datetime',
+	`Date` DATETIME NOT NULL DEFAULT current_timestamp() COMMENT 'Suggestion creation datetime',
 	`Category` ENUM('Bot','Bot addition','Data','Legacy','Other','Other - code','SPM','Supi-core','Void','Website') NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`Status` ENUM('Approved','Blocked','Completed','Moved to Github','Denied','Dismissed','Dismissed by author','Duplicate','Outsourced','Quarantined') NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`Priority` SMALLINT(5) UNSIGNED NULL DEFAULT NULL,

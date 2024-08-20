@@ -134,6 +134,8 @@ declare type ConstructorData = {
     Author: string | null;
     Code: (this: Command, context: Context, ...args: string[]) => (Result | Promise<Result>);
     Dynamic_Description: ((this: Command, prefix: string) => Promise<string[]>) | null;
+    initialize: () => (void | Promise<void>);
+    destroy: () => (void | Promise<void>);
 };
 
 declare type AppendData = {
