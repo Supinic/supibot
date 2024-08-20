@@ -21,11 +21,12 @@ module.exports = {
 		const newTwitchName = await platform.fetchUsernameByUserPlatformID(channelData.Specific_ID);
 		if (!newTwitchName) {
 			return {
-			    success: false,
-			    reply: "This channel doesn't seem to exist on Twitch anymore!"
+				success: false,
+				reply: "This channel doesn't seem to exist on Twitch anymore!"
 			};
 		}
 		else if (newTwitchName !== channelData.Name) {
+			const oldName = channelData.Name;
 			const { exists } = await platform.fixChannelRename(channelData, newTwitchName, channelData.Specific_ID);
 			if (exists) {
 				return {
