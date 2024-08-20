@@ -79,6 +79,7 @@ module.exports = {
 		}
 
 		const info = {
+			prefix: sb.Command.prefix,
 			aliases: commandData.Aliases,
 			author: commandData.Author,
 			cooldown: commandData.Cooldown,
