@@ -26,24 +26,14 @@ module.exports = {
 			};
 		}
 		else if (newTwitchName !== channelData.Name) {
-			const existingChannelName = await sb.Query.getRecordset(rs => rs
-			    .select("Name")
-			    .from("chat_data", "Channel")
-				.where("Name = %s", newTwitchName)
-				.where("Platform = %n", platform.ID)
-				.single()
-				.flat("Name")
-			);
-
-			if (existingChannelName) {
+			const { exists } = await platform.fixChannelRename(channelData, newTwitchName, channelData.Specific_ID);
+			if (exists) {
 				return {
 					success: false,
 					reply: `The channel name ${newTwitchName} already exists in my database! Please contact @Supinic - this needs to be resolved manually.`
 				};
 			}
 			else {
-				const oldName = channelData.Name;
-				await channelData.saveProperty("Name", newTwitchName);
 				return {
 				    success: true,
 				    reply: `Channel succesfully renamed: ${oldName} → ${newTwitchName}`

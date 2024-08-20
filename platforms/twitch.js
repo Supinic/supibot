@@ -83,6 +83,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	#websocketLatency = null;
 	#previousMessageMeta = new Map();
 	#userCommandSpamPrevention = new Map();
+	#unsuccessfulRenameChannels = new Set();
 
 	debug = require("./twitch-utils.js");
 
@@ -596,7 +597,12 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			return;
 		}
 
+		/** @type {Channel | null} */
 		const channelData = sb.Channel.get(channelName, this) ?? sb.Channel.getBySpecificId(channelId, this);
+		if (channelData && channelData.Name !== channelName && !this.#unsuccessfulRenameChannels.has(channelId)) {
+			await this.fixChannelRename(channelName, channelData, channelId);
+		}
+
 		if (!channelData || channelData.Mode === "Inactive") {
 			return;
 		}
@@ -1295,6 +1301,37 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		});
 
 		this.client.ping();
+	}
+
+	async fixChannelRename (channelData, twitchChanelName, channelId) {
+		const existingChannelName = await sb.Query.getRecordset(rs => rs
+			.select("Name")
+			.from("chat_data", "Channel")
+			.where("Name = %s", twitchChanelName)
+			.where("Platform = %n", this.ID)
+			.single()
+			.flat("Name")
+		);
+
+		const oldName = channelData.Name;
+		if (!existingChannelName) {
+			await channelData.saveProperty("Name", twitchChanelName);
+			await sb.Logger.log(
+				"Twitch.Success",
+				`Name mismatch fixed: ${channelId}: Old=${oldName} New=${twitchChanelName}`
+			);
+		}
+		else {
+			this.#unsuccessfulRenameChannels.add(channelId);
+			await sb.Logger.log(
+				"Twitch.Warning",
+				`Name conflict detected: ${channelId}: Old=${oldName} New=${twitchChanelName}`
+			);
+		}
+
+		return {
+			exists: Boolean(existingChannelName)
+		};
 	}
 
 	static async fetchAccountChallengeStatus (userData, twitchID) {
