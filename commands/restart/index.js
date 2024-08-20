@@ -51,7 +51,8 @@ module.exports = {
 			commandsToRun.push(reloadCommand);
 		}
 
-		for (const reloadCommand of commandsToRun) {
+		for (const name of commandsToRun) {
+			const reloadCommand = methods[name];
 			await context.sendIntermediateMessage(`VisLaud 👉 ${reloadCommand.message}`);
 
 			for (const command of reloadCommand.commands) {
