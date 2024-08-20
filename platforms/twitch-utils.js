@@ -387,7 +387,7 @@ const fetchToken = async () => {
 		})
 	]);
 
-	return authToken;
+	return response.body.access_token;
 };
 
 const emitRawUserMessageEvent = (username, channelName, message) => {

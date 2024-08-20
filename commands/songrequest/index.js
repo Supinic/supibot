@@ -342,7 +342,7 @@ module.exports = {
 			&& i.End_Time === endTime
 		));
 
-		let existsString = "";
+		const existsString = "";
 		if (exists) {
 			return {
 				success: false,

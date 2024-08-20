@@ -13,7 +13,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: "Only available in supinic's channel.",
 	Code: (async function songRequestQueue (context) {
-		const state = await sb.Cache.getByPrefix(SONG_REQUESTS_STATE, value);
+		const state = await sb.Cache.getByPrefix(SONG_REQUESTS_STATE);
 		if (!state || state === "off") {
 			return {
 				reply: "Song requests are currently turned off. Check out the history up to 14 days back: https://supinic.com/stream/song-request/history"
