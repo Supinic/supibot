@@ -1,5 +1,14 @@
 // noinspection JSUnusedGlobalSymbols
 module.exports = {
+	prefix: async () => {
+		return {
+			statusCode: 200,
+			data: {
+				prefix: sb.Command.prefix
+			}
+		};
+	},
+
 	execute: async (req, res, url) => {
 		const invocation = url.searchParams.get("invocation");
 		if (!invocation) {
