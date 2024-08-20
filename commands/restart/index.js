@@ -14,16 +14,16 @@ const { basePath } = config;
 const methods = {
 	prodUpdate: {
 		message: "yarn prod-update",
-		commands: ["yarn prod-update"],
+		commands: ["yarn prod-update"]
 	},
 	pull: {
 		message: "git pull",
 		commands: [
 			`git -C ${basePath} checkout -- yarn.lock package.json`,
 			`git -C ${basePath} pull origin master`
-		],
+		]
 	}
-}
+};
 const methodNames = ["all", ...Object.keys(methods)];
 
 module.exports = {
@@ -38,8 +38,8 @@ module.exports = {
 	Code: async function restart (context, reloadCommand) {
 		if (reloadCommand && !methodNames.includes(reloadCommand)) {
 			return {
-			    success: false,
-			    reply: `Invalid command provided! Use one of: ${methodNames.join(", ")}`
+				success: false,
+				reply: `Invalid command provided! Use one of: ${methodNames.join(", ")}`
 			};
 		}
 
