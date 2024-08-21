@@ -1,5 +1,6 @@
 const { VM } = require("vm2");
 
+const PREFIX_SAFETY_CODE = `Object.defineProperty(Promise.prototype, "constructor", { writable: false }); Object.freeze(Promise.prototype); void 0;`;
 const MAXIMUM_DATA_LENGTH = 1_000_000;
 const DEFAULT_VM_OPTIONS = {
 	sandbox: {},
@@ -93,14 +94,14 @@ module.exports = {
 		const string = args.join(" ");
 
 		if (context.params.function) {
-			script = context.params.function;
+			script = `${PREFIX_SAFETY_CODE}\n${context.params.function}`;
 			scriptArgs = [...args];
 		}
 		else if (!string.includes("return")) { // @todo refactor this to use acorn heuristic for ReturnStatement
-			script = string;
+			script = `${PREFIX_SAFETY_CODE}\n${string}`;
 		}
 		else {
-			script = `(async () => {\n${string}\n})()`;
+			script = `(async () => {\n${PREFIX_SAFETY_CODE}\n${string}\n})()`;
 		}
 
 		if (importedText) {
