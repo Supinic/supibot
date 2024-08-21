@@ -23,6 +23,10 @@
     "pendingCommandTimeout": 300000,
     "pajbotBanphraseRequestTimeout": 5000
   },
+  "api": {
+    "secure": false,
+    "port": 11000
+  },
   "modules": {
     "chat-modules": {
       "disableAll": true,

@@ -7,6 +7,4 @@ VALUES
 ('MAX_ACTIVE_INCOMING_REMINDERS','5','number',NULL,0,1,'Maximum amount of reminders someone can have pending for them at once.'),
 ('MAX_ACTIVE_OUTGOING_REMINDERS','8','number',NULL,0,1,'Maximum amount of reminders someone can have pending for others at the same time.'),
 ('REDIS_CONFIGURATION',NULL,'string',NULL,0,0,NULL),
-('SUPIBOT_API_PORT',NULL,'number',NULL,0,0,NULL),
-('SUPIBOT_API_SECURE','0','boolean',NULL,0,0,NULL),
 ('WHITESPACE_REGEX','/[\\u034f\\u2800\\u{E0000}\\u180e\\ufeff\\u2000-\\u200d\\u206D]/gu','regex',NULL,0,0,NULL);
