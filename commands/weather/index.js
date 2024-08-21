@@ -47,6 +47,11 @@ module.exports = {
 				messsage: "No Google geocoding key configured (API_GOOGLE_GEOCODING)"
 			});
 		}
+		if (!process.env.API_OPEN_WEATHER_MAP) {
+			throw new sb.Error({
+				messsage: "No OpenWeatherMap key configured (API_OPEN_WEATHER_MAP)"
+			});
+		}
 
 		let number = null;
 		let type = "current";
@@ -285,8 +290,7 @@ module.exports = {
 				searchParams: {
 					lat: coords.lat,
 					lon: coords.lng,
-					/** @type {string} */
-					appid: sb.Config.get("API_OPEN_WEATHER_MAP")
+					appid: process.env.API_OPEN_WEATHER_MAP
 				}
 			});
 
@@ -322,8 +326,7 @@ module.exports = {
 					lat: coords.lat,
 					lon: coords.lng,
 					units: "metric",
-					/** @type {string} */
-					appid: sb.Config.get("API_OPEN_WEATHER_MAP")
+					appid: process.env.API_OPEN_WEATHER_MAP
 				}
 			});
 

@@ -13,7 +13,7 @@ const fetchGamesData = async () => {
 			if_modified_since: lastUpdate,
 			include_games: true,
 			max_results: 10_000,
-			key: sb.Config.get("API_STEAM_KEY")
+			key: process.env.API_STEAM_KEY
 		}
 	});
 
@@ -56,6 +56,12 @@ module.exports = {
 		this.data.updateCronJob = null;
 	},
 	Code: async function steamGamePlayers (context, ...args) {
+		if (!process.env.API_CRYPTO_COMPARE) {
+			throw new sb.Error({
+				messsage: "No Steam key configured (API_STEAM_KEY)"
+			});
+		}
+
 		let gameId = context.params.gameID ?? null;
 		const gameName = args.join(" ");
 		if (!gameId) {
@@ -106,7 +112,7 @@ module.exports = {
 			throwHttpErrors: false,
 			searchParams: {
 				appid: gameId,
-				key: sb.Config.get("API_STEAM_KEY")
+				key: process.env.API_STEAM_KEY
 			}
 		});
 

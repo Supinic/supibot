@@ -337,10 +337,16 @@ module.exports = (command) => [
 		aliases: ["DeepL"],
 		description: "Checks the current usage limits of the DeepL translation engine in $translate.",
 		execute: async () => {
+			if (!process.env.API_DEEPL_KEY) {
+				throw new sb.Error({
+					messsage: "No DeepL key configured (API_DEEPL_KEY)"
+				});
+			}
+
 			const response = await sb.Got("GenericAPI", {
 				url: "https://api-free.deepl.com/v2/usage",
 				headers: {
-					Authorization: `DeepL-Auth-Key ${sb.Config.get("API_DEEPL_KEY")}`
+					Authorization: `DeepL-Auth-Key ${process.env.API_DEEPL_KEY}`
 				}
 			});
 

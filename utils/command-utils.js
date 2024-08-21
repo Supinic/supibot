@@ -73,13 +73,19 @@ module.exports = {
 	 * @todo find a replacement API with similar provided data
 	 */
 	async checkPictureNSFW (link) {
+		if (!process.env.API_DEEP_AI) {
+			throw new sb.Error({
+				messsage: "No DeepAI key configured (API_DEEP_AI)"
+			});
+		}
+
 		const { statusCode, body: data } = await sb.Got("GenericAPI", {
 			method: "POST",
 			responseType: "json",
 			throwHttpErrors: false,
 			url: "https://api.deepai.org/api/nsfw-detector",
 			headers: {
-				"Api-Key": sb.Config.get("API_DEEP_AI")
+				"Api-Key": process.env.API_DEEP_AI
 			},
 			form: {
 				image: link

@@ -1,4 +1,4 @@
-const SUBCOMMANDS = {
+const GAMES = {
 	league: require("./league")
 };
 
@@ -19,19 +19,26 @@ module.exports = {
 			};
 		}
 
-		const subcommands = SUBCOMMANDS[context.invocation];
-		if (!subcommands) {
+		const game = GAMES[context.invocation];
+		if (!game) {
 			return {
 				success: false,
 				reply: `This game is not implemented yet!`
 			};
 		}
 
-		const subcommand = subcommands.find(i => i.name === type || i.aliases.includes(type));
+		const hasEnvs = game.requiredEnvs.every(key => process.env[key]);
+		if (!hasEnvs) {
+			throw new sb.Error({
+				messsage: `Missing key(s) for ${context.invocation} (${game.requiredEnvs.join(", ")})`
+			});
+		}
+
+		const subcommand = game.subcommands.find(i => i.name === type || i.aliases.includes(type));
 
 		// If no subcommand is found, try and find a default one for the current game invocation
 		if (!subcommand) {
-			const defaultSubcommand = subcommands.find(i => i.flags?.default === true);
+			const defaultSubcommand = game.subcommands.find(i => i.flags?.default === true);
 			if (defaultSubcommand) {
 				return await defaultSubcommand.execute(context, defaultSubcommand.name, type, ...args);
 			}
@@ -48,7 +55,7 @@ module.exports = {
 	}),
 	Dynamic_Description: async () => {
 		const list = [];
-		for (const [game, subcommands] of Object.entries(SUBCOMMANDS)) {
+		for (const [game, subcommands] of Object.entries(GAMES)) {
 			list.push(`<h5>$${game}</h5>`);
 
 			for (const subcommand of subcommands) {

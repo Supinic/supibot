@@ -2,17 +2,17 @@ export const definition = {
 	name: "GitHub",
 	optionsType: "function",
 	options: (() => {
-		if (!sb.Config.has("API_GITHUB_KEY", true)) {
+		if (!process.env.API_GITHUB_KEY) {
+			console.log("No GitHub key configured, Got will not use Authorization header (API_GITHUB_KEY)");
 			return {
 				prefixUrl: "https://api.github.com"
 			};
 		}
 
-		const token = sb.Config.get("API_GITHUB_KEY", true);
 		return {
 			prefixUrl: "https://api.github.com",
 			headers: {
-				Authorization: `Bearer ${token}`
+				Authorization: `Bearer ${process.env.API_GITHUB_KEY}`
 			}
 		};
 	}),

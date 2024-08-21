@@ -44,6 +44,12 @@ const formalitySupportedLanguages = [
 ];
 
 const execute = async function (context, query) {
+	if (!process.env.API_DEEPL_KEY) {
+		throw new sb.Error({
+			messsage: "No DeepL key configured (API_DEEPL_KEY)"
+		});
+	}
+
 	const searchParams = {
 		text: query
 	};
@@ -126,7 +132,7 @@ const execute = async function (context, query) {
 	const response = await sb.Got("GenericAPI", {
 		url: "https://api-free.deepl.com/v2/translate",
 		headers: {
-			Authorization: `DeepL-Auth-Key ${sb.Config.get("API_DEEPL_KEY")}`
+			Authorization: `DeepL-Auth-Key ${process.env.API_DEEPL_KEY}`
 		},
 		throwHttpErrors: false,
 		searchParams

@@ -12,6 +12,12 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Code: (async function nutrients (context, ...args) {
+		if (!process.env.API_NUTRITIONIX || !process.env.API_NUTRITIONIX_APP_ID) {
+			throw new sb.Error({
+				messsage: "No Nutritionix key/AppID configured (API_NUTRITIONIX, API_NUTRITIONIX_APP_ID)"
+			});
+		}
+
 		if (args.length === 0) {
 			return {
 				success: false,
@@ -28,8 +34,8 @@ module.exports = {
 			method: "POST",
 			url: "https://trackapi.nutritionix.com/v2/natural/nutrients",
 			headers: {
-				"x-app-id": sb.Config.get("API_NUTRITIONIX_APP_ID"),
-				"x-app-key": sb.Config.get("API_NUTRITIONIX"),
+				"x-app-key": process.env.API_NUTRITIONIX,
+				"x-app-id": process.env.API_NUTRITIONIX_APP_ID,
 				"x-remote-user-id": 0
 			},
 			json: { query },

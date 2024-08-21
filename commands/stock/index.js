@@ -8,6 +8,12 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function stock (context, ...args) {
+		if (!process.env.API_ALPHA_AVANTAGE) {
+			throw new sb.Error({
+				messsage: "No Alpha Avantage key configured (API_ALPHA_AVANTAGE)"
+			});
+		}
+
 		const { findPopularSymbol } = require("./stocks.js");
 		const input = args.join(" ");
 		if (!input) {
@@ -32,7 +38,7 @@ module.exports = {
 			searchParams: {
 				function: "GLOBAL_QUOTE",
 				symbol,
-				apikey: sb.Config.get("API_ALPHA_AVANTAGE")
+				apikey: process.env.API_ALPHA_AVANTAGE
 			}
 		});
 

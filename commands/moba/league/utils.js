@@ -72,7 +72,7 @@ const getPUUIDByName = async (gameName, tagLine) => {
 			url: `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
 			throwHttpErrors: false,
 			headers: {
-				"X-Riot-Token": `${sb.Config.get("API_RIOT_GAMES_KEY")}`
+				"X-Riot-Token": process.env.API_RIOT_GAMES_KEY
 			}
 		});
 
@@ -106,7 +106,7 @@ const getSummonerId = async (platform, puuid) => {
 			url: `https://${platform}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`,
 			throwHttpErrors: false,
 			headers: {
-				"X-Riot-Token": `${sb.Config.get("API_RIOT_GAMES_KEY")}`
+				"X-Riot-Token": process.env.API_RIOT_GAMES_KEY
 			}
 		});
 
@@ -138,7 +138,7 @@ const getLeagueEntries = async (platform, summonerId) => {
 		const response = await sb.Got("GenericAPI", {
 			url: `https://${platform}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}`,
 			headers: {
-				"X-Riot-Token": `${sb.Config.get("API_RIOT_GAMES_KEY")}`
+				"X-Riot-Token": process.env.API_RIOT_GAMES_KEY
 			}
 		});
 
@@ -250,7 +250,7 @@ const getMatchIds = async (puuid, options = {}) => {
 			url: `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids`,
 			throwHttpErrors: false,
 			headers: {
-				"X-Riot-Token": `${sb.Config.get("API_RIOT_GAMES_KEY")}`
+				"X-Riot-Token": process.env.API_RIOT_GAMES_KEY
 			},
 			searchParams
 		});
@@ -281,7 +281,7 @@ const getMatchData = async (matchId) => {
 			url: `https://europe.api.riotgames.com/lol/match/v5/matches/${matchId}`,
 			throwHttpErrors: false,
 			headers: {
-				"X-Riot-Token": `${sb.Config.get("API_RIOT_GAMES_KEY")}`
+				"X-Riot-Token": process.env.API_RIOT_GAMES_KEY
 			}
 		});
 
