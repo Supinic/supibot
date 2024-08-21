@@ -182,12 +182,13 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 
 	// When editing the sandbox context, make sure to update the type definitions in ./sandbox.d.ts
 	const sandbox = {
+		console: undefined,
+		Symbol: undefined,
 		aliasStack: (context.append.aliasStack)
 			? [...context.append.aliasStack]
 			: [],
 		args: scriptArgs ?? null,
 		channel: context.channel?.Name ?? "(none)",
-		console: undefined,
 		executor: context.user.Name,
 		executorID: context.user.ID,
 		platform: context.platform.Name,
