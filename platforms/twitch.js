@@ -600,7 +600,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		/** @type {Channel | null} */
 		const channelData = sb.Channel.get(channelName, this) ?? sb.Channel.getBySpecificId(channelId, this);
 		if (channelData && channelData.Name !== channelName && !this.#unsuccessfulRenameChannels.has(channelId)) {
-			await this.fixChannelRename(channelName, channelData, channelId);
+			await this.fixChannelRename(channelData, channelName, channelId);
 		}
 
 		if (!channelData || channelData.Mode === "Inactive") {
