@@ -183,16 +183,6 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 	// When editing the sandbox context, make sure to update the type definitions in ./sandbox.d.ts
 	const sandbox = {
 		console: undefined,
-		Symbol: undefined,
-		Object: new Proxy(Object, {
-			get: (target, p) => {
-				if (p.toLowerCase().includes("symbol")) {
-					return null;
-				}
-
-				return target[p];
-			}
-		}),
 		aliasStack: (context.append.aliasStack)
 			? [...context.append.aliasStack]
 			: [],
