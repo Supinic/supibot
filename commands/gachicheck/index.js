@@ -33,7 +33,6 @@ module.exports = {
 
 			const { amount, reason, result, success } = await fetchYoutubePlaylist({
 				playlistID,
-				key: sb.Config.get("API_GOOGLE_YOUTUBE"),
 				limit,
 				limitAction: "return"
 			});

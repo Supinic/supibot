@@ -11,11 +11,7 @@ module.exports = {
 		const linkParser = getLinkParser();
 		const properLink = linkParser.autoRecognize(link);
 		if (!properLink) {
-			const [bestResult] = await searchYoutube(
-				link.replace(/-/g, ""),
-				sb.Config.get("API_GOOGLE_YOUTUBE")
-			);
-
+			const [bestResult] = await searchYoutube(link.replace(/-/g, ""));
 			if (!bestResult) {
 				return {
 					success: false,

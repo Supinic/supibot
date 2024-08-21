@@ -65,6 +65,17 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function time (context, ...args) {
+		if (!process.env.API_GOOGLE_GEOCODING) {
+			throw new sb.Error({
+				messsage: "No Google geocoding API key configured (API_GOOGLE_GEOCODING)"
+			});
+		}
+		if (!process.env.API_GOOGLE_TIMEZONE) {
+			throw new sb.Error({
+				messsage: "No Google timezone API key configured (API_GOOGLE_TIMEZONE)"
+			});
+		}
+
 		const zone = await detectTimezone(...args);
 		if (zone) {
 			return {
@@ -136,7 +147,7 @@ module.exports = {
 				url: "geocode/json",
 				searchParams: {
 					address: place,
-					key: sb.Config.get("API_GOOGLE_GEOCODING")
+					key: process.env.API_GOOGLE_GEOCODING
 				}
 			}).json();
 
@@ -163,12 +174,9 @@ module.exports = {
 			}
 		}
 
-		const response = await fetchTimeData({
-			coordinates,
-			key: sb.Config.get("API_GOOGLE_TIMEZONE")
-		});
-
+		const response = await fetchTimeData({ coordinates });
 		const timeData = response.body;
+
 		if (response.statusCode !== 200) {
 			throw new sb.Error.GenericRequest({
 				statusCode: response.statusCode,

@@ -42,6 +42,12 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Code: (async function weather (context, ...args) {
+		if (!process.env.API_GOOGLE_GEOCODING) {
+			throw new sb.Error({
+				messsage: "No Google geocoding key configured (API_GOOGLE_GEOCODING)"
+			});
+		}
+
 		let number = null;
 		let type = "current";
 		const weatherRegex = /\b(hour|day)\+(\d+)$/;
@@ -194,8 +200,7 @@ module.exports = {
 					responseType: "json",
 					throwHttpErrors: false,
 					searchParams: {
-						/** @type {string} */
-						key: sb.Config.get("API_GOOGLE_GEOCODING"),
+						key: process.env.API_GOOGLE_GEOCODING,
 						address: args.join(" ")
 					}
 				});

@@ -4,11 +4,15 @@ let linkParser;
 const getLinkParser = () => {
 	if (!linkParser) {
 		const options = {};
-		if (sb.Config.has("API_GOOGLE_YOUTUBE", false)) {
+		if (process.env.API_GOOGLE_YOUTUBE) {
 			options.youtube = {
-				key: sb.Config.get("API_GOOGLE_YOUTUBE")
+				key: process.env.API_GOOGLE_YOUTUBE
 			};
 		}
+		else {
+			console.debug("Link parser: Skipping YouTube setup (API_GOOGLE_YOUTUBE)");
+		}
+
 		if (sb.Config.has("SOUNDCLOUD_CLIENT_ID", false)) {
 			options.soundcloud = {
 				key: sb.Config.get("SOUNDCLOUD_CLIENT_ID")

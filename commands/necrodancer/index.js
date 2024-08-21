@@ -111,12 +111,7 @@ module.exports = {
 			link = query;
 		}
 		else {
-			const searchResult = await searchYoutube(
-				query,
-				sb.Config.get("API_GOOGLE_YOUTUBE"),
-				{ single: true }
-			);
-
+			const searchResult = await searchYoutube(query, { single: true });
 			link = `https://youtu.be/${searchResult.ID}`;
 		}
 

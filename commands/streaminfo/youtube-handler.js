@@ -1,5 +1,11 @@
 const channelRegex = /^UC\w{22}$/;
 module.exports = async function youtubeStreamInfoHandler (context) {
+	if (!process.env.API_GOOGLE_YOUTUBE) {
+		throw new sb.Error({
+			messsage: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
+		});
+	}
+
 	let channelID;
 	const input = context.params.youtube;
 
@@ -15,7 +21,7 @@ module.exports = async function youtubeStreamInfoHandler (context) {
 				q: input,
 				order: "relevance",
 				type: "channel",
-				key: sb.Config.get("API_GOOGLE_YOUTUBE")
+				key: process.env.API_GOOGLE_YOUTUBE
 			}
 		});
 
@@ -43,7 +49,7 @@ module.exports = async function youtubeStreamInfoHandler (context) {
 			channelId: channelID,
 			eventType: "live",
 			type: "video",
-			key: sb.Config.get("API_GOOGLE_YOUTUBE")
+			key: process.env.API_GOOGLE_YOUTUBE
 		}
 	});
 

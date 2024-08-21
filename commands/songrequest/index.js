@@ -282,11 +282,7 @@ module.exports = {
 				}
 			}
 			else if (type === "youtube") {
-				const data = await searchYoutube(
-					args.join(" "),
-					sb.Config.get("API_GOOGLE_YOUTUBE")
-				);
-
+				const data = await searchYoutube(args.join(" "));
 				lookup = (data[0])
 					? { link: data[0].ID }
 					: null;

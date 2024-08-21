@@ -32,7 +32,6 @@ module.exports = {
 	/**
 	 * Fetches time data for given GPS coordinates and timestamp
 	 * @param {Object} data
-	 * @param {string} data.key
 	 * @param {Object} data.coordinates
 	 * @param {string} data.coordinates.lng
 	 * @param {string} data.coordinates.lat
@@ -40,10 +39,15 @@ module.exports = {
 	 * @returns {Promise<{body: Object, statusCode: number}>}
 	 */
 	async fetchTimeData (data = {}) {
+		if (!process.env.API_GOOGLE_TIMEZONE) {
+			throw new sb.Error({
+				messsage: "No Google timezone API key configured (API_GOOGLE_TIMEZONE)"
+			});
+		}
+
 		const {
 			coordinates,
-			date = new sb.Date(),
-			key
+			date = new sb.Date()
 		} = data;
 
 		const response = await sb.Got("Google", {
@@ -51,7 +55,7 @@ module.exports = {
 			searchParams: {
 				timestamp: Math.trunc(date.valueOf() / 1000),
 				location: `${coordinates.lat},${coordinates.lng}`,
-				key
+				key: process.env.API_GOOGLE_TIMEZONE
 			}
 		});
 
@@ -228,15 +232,20 @@ module.exports = {
 
 	/**
 	 * Returns Google Geo Data for given query
-	 * @param {string} key Google Geo API key
 	 * @param {string} query
 	 * @returns {Promise<Object>}
 	 */
-	async fetchGeoLocationData (key, query) {
+	async fetchGeoLocationData (query) {
+		if (!process.env.API_GOOGLE_GEOCODING) {
+			throw new sb.Error({
+				messsage: "No Google geolocation API key configured (API_GOOGLE_GEOCODING)"
+			});
+		}
+
 		const { results, status } = await sb.Got("GenericAPI", {
 			url: "https://maps.googleapis.com/maps/api/geocode/json",
 			searchParams: {
-				key,
+				key: process.env.API_GOOGLE_GEOCODING,
 				address: query
 			}
 		}).json();
@@ -275,15 +284,20 @@ module.exports = {
 	},
 
 	/**
-	 * Fetches info about a provided Youtube video.
+	 * Fetches info about a provided YouTube video.
 	 * @param {string} query Search string
-	 * @param {string} key Youtube API key
 	 * @param {object} options = {} additional options
 	 * @param {number} [options.maxResults]
 	 * @param {boolean} [options.single]
 	 * @returns {Promise<string>}
 	 */
-	async searchYoutube (query, key, options = {}) {
+	async searchYoutube (query, options = {}) {
+		if (!process.env.API_GOOGLE_YOUTUBE) {
+			throw new sb.Error({
+				messsage: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
+			});
+		}
+
 		const params = { ...options };
 		if (params.single) {
 			if (typeof params.maxResults !== "undefined") {
@@ -298,7 +312,7 @@ module.exports = {
 		const { items } = await sb.Got("GenericAPI", {
 			url: `https://www.googleapis.com/youtube/v3/search`,
 			searchParams: {
-				key,
+				key: process.env.API_GOOGLE_YOUTUBE,
 				q: query,
 				type: "video",
 				part: "snippet",
@@ -322,23 +336,23 @@ module.exports = {
 	},
 
 	/**
-	 * Fetches a Youtube playlist as an array of video IDs.
+	 * Fetches a YouTube playlist as an array of video IDs.
 	 * Optionally, limits the amount of videos fetched.
 	 * @param {Object} options
-	 * @params {string} options.key Google/Youtube API key
-	 * @params {string} options.playlistID Youtube playlist ID
+	 * @params {string} options.playlistID YouTube playlist ID
 	 * @params {number} [options.perPage = 50] How many videos should be fetched per page.
 	 * @params {number} [options.limit] Limit the number of videos.
 	 * @params {string} [options.limitAction]
 	 * @returns {Promise<string[]>}
 	 */
 	async fetchYoutubePlaylist (options = {}) {
-		if (!options.key) {
+		if (!process.env.API_GOOGLE_YOUTUBE) {
 			throw new sb.Error({
-				message: "No API key provided"
+				messsage: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
 			});
 		}
-		else if (!options.playlistID) {
+
+		if (!options.playlistID) {
 			throw new sb.Error({
 				message: "No playlist ID provided"
 			});
@@ -347,7 +361,7 @@ module.exports = {
 		const limit = options.limit ?? Infinity;
 		const baseParams = {
 			part: "snippet",
-			key: options.key,
+			key: process.env.API_GOOGLE_YOUTUBE,
 			maxResults: options.perPage ?? 50,
 			playlistId: options.playlistID
 		};
