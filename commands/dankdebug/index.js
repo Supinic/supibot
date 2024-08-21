@@ -101,7 +101,7 @@ module.exports = {
 			script = `${PREFIX_SAFETY_CODE}\n${string}`;
 		}
 		else {
-			script = `(async () => {\n${PREFIX_SAFETY_CODE}\n${string}\n})()`;
+			script = `${PREFIX_SAFETY_CODE} (async () => {\n${string}\n})()`;
 		}
 
 		if (importedText) {
