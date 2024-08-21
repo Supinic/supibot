@@ -1,6 +1,6 @@
 const { VM } = require("vm2");
 
-const PREFIX_SAFETY_CODE = `Object.defineProperty(Promise.prototype, "constructor", { writable: false }); void 0;`;
+const PREFIX_SAFETY_CODE = `Object.defineProperty(Promise.prototype, "constructor", { writable: false }); Object.freeze(Promise.prototype); void 0;`;
 const MAXIMUM_DATA_LENGTH = 1_000_000;
 const DEFAULT_VM_OPTIONS = {
 	sandbox: {},
