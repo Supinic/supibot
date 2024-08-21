@@ -36,15 +36,15 @@ module.exports = {
 			}
 			else {
 				return {
-				    success: true,
-				    reply: `Channel succesfully renamed: ${oldName} → ${newTwitchName}`
+					success: true,
+					reply: `Channel succesfully renamed: ${oldName} → ${newTwitchName}`
 				};
 			}
 		}
 		else {
 			return {
-			    success: true,
-			    reply: "All good, nothing needs to be done."
+				success: true,
+				reply: "All good, nothing needs to be done."
 			};
 		}
 	}
