@@ -726,9 +726,10 @@ class Command extends require("./template.js") {
 				};
 			}
 			else {
-				const prettify = (await channelData?.getDataProperty("showFullCommandErrorMessage"))
-					? sb.Config.get("COMMAND_ERROR_DEVELOPER")
-					: sb.Config.get("COMMAND_ERROR_GENERIC");
+				const channelHasFullErrorMessage = await channelData?.getDataProperty("showFullCommandErrorMessage");
+				const prettify = (channelHasFullErrorMessage)
+					? `Error ID ${errorID} - ${error.message}`
+					: config.responses.commandErrorResponse;
 
 				execution = {
 					success: false,

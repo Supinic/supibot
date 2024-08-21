@@ -16,7 +16,8 @@
   ],
   "basePath": "/home/supibot",
   "responses": {
-    "defaultBanphrase": "[Banphrased]"
+    "defaultBanphrase": "[Banphrased]",
+    "commandErrorResponse": "An error occured while executing the command!"
   },
   "values": {
     "pendingCommandTimeout": 300000,

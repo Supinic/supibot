@@ -1,8 +1,6 @@
 INSERT IGNORE INTO `data`.`Config`
 (`Name`,`Value`,`Type`,`Unit`,`Secret`,`Editable`,`Notes`)
 VALUES
-('COMMAND_ERROR_DEVELOPER','(errorID, error) => `Error ID ${errorID} - ${error.message}`','function',NULL,0,1,NULL),
-('COMMAND_ERROR_GENERIC','(errorID, error) => `An error occured while executing the command!`','function',NULL,0,1,NULL),
 ('CYTUBE_BOT_PASSWORD',NULL,'string',NULL,1,0,NULL),
 ('DISCORD_BOT_TOKEN',NULL,'string',NULL,1,0,NULL),
 ('LINK_REGEX','/(https?:\\/\\/)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&\\/\\/=]*)/gi','regex',NULL,0,1,'Determines if a message contains a website link.'),
