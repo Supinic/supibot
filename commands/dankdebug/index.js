@@ -1,4 +1,5 @@
 const { VM } = require("vm2");
+const { preventTomfoolery } = require("./anti-tomfoolery.js");
 
 const PREFIX_SAFETY_CODE = `Object.defineProperty(Promise.prototype, "constructor", { writable: false }); Object.freeze(Promise.prototype); void 0;`;
 const MAXIMUM_DATA_LENGTH = 1_000_000;
@@ -34,6 +35,9 @@ module.exports = {
 		{ name: "importGist", type: "string" }
 	],
 	Whitelist_Response: null,
+	initialize: () => {
+		preventTomfoolery();
+	},
 	Code: (async function dankDebug (context, ...args) {
 		let scriptArgs;
 		if (context.params.arguments) {
