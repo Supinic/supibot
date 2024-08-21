@@ -45,8 +45,7 @@ export declare class Pending implements Inhibitor {
 }
 
 export declare class CooldownManagerSingleton {
-    data: Cooldown | Pending[];
-    readonly pendingCooldownExpiration: number;
+    data: Inhibitor[];
 
     constructor ();
 

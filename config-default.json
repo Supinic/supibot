@@ -15,6 +15,13 @@
     "If you would like the type to not be logged, change the \"enabled\" property to `false`."
   ],
   "basePath": "/home/supibot",
+  "responses": {
+    "defaultBanphrase": "[Banphrased]"
+  },
+  "values": {
+    "pendingCommandTimeout": 300000,
+    "pajbotBanphraseRequestTimeout": 5000
+  },
   "modules": {
     "chat-modules": {
       "disableAll": true,
