@@ -27,7 +27,9 @@
     "maxIncomingActiveReminders": 10,
     "maxOutgoingActiveReminders": 10,
     "maxIncomingScheduledReminders": 5,
-    "maxOutgoingScheduledReminders": 5
+    "maxOutgoingScheduledReminders": 5,
+    "userAdditionHighLoadThreshold": 50,
+    "userAdditionCriticalLoadThreshold": 200
   },
   "api": {
     "secure": false,
