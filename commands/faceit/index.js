@@ -8,6 +8,12 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function faceit (context, subcommandName, ...args) {
+		if (!process.env.API_FACEIT_KEY) {
+			throw new sb.Error({
+				messsage: "No FaceIt key configured (API_FACEIT_KEY)"
+			});
+		}
+
 		const { names, commands } = require("./subcommands.js");
 		const subcommand = commands.find(i => i.name === subcommandName || i.aliases.includes(subcommandName));
 		if (!subcommand) {
