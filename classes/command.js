@@ -2,6 +2,7 @@ const Banphrase = require("./banphrase.js");
 const Filter = require("./filter.js");
 const User = require("./user.js");
 
+const { whitespaceRegex } = require("../utils/regexes.js");
 const config = require("../config.json");
 const COMMAND_PREFIX = config.modules.commands.prefix;
 
@@ -536,7 +537,6 @@ class Command extends require("./template.js") {
 		};
 
 		/** @type {RegExp} */
-		const whitespaceRegex = sb.Config.get("WHITESPACE_REGEX");
 		let args = argumentArray
 			.map(i => i.replace(whitespaceRegex, ""))
 			.filter(Boolean);

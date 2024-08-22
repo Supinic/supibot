@@ -1,3 +1,5 @@
+const { linkRegex } = require("../../utils/regexes.js");
+
 module.exports = {
 	Name: "bancheck",
 	Aliases: ["bc"],
@@ -42,7 +44,7 @@ module.exports = {
 		}
 
 		if (!targetChannel.Links_Allowed) {
-			const linkCheck = message.replace(sb.Config.get("LINK_REGEX"), "");
+			const linkCheck = message.replace(linkRegex, "");
 			if (linkCheck !== message) {
 				return {
 					reply: "Links are not allowed in that channel, so your message would probably get timed out."

@@ -26,12 +26,9 @@ const config = {
 		"chat_data/tables/Reminder",
 		"chat_data/triggers/add_missing_first_channel_command_after_insert",
 		"chat_data/triggers/add_missing_first_message_data_after_insert",
-
-		"data/tables/Config"
 	],
 	initialDataFilePaths: [
 		"chat_data/Custom_Data_Property",
-		"data/Config"
 	],
 	meta: {
 		dataPath: path.join(__dirname, "initial-data"),

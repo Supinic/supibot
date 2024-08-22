@@ -1,3 +1,5 @@
+const { linkRegex } = require("../../utils/regexes.js");
+
 const FOUR_CHAN_REPLACEMENTS = [
 	{ regex: /desu/ig, string: "tbh" },
 	{ regex: /baka/ig, string: "smh" },
@@ -244,7 +246,7 @@ module.exports = {
 			}
 
 			if (enabled.content.nsfw === false) {
-				post.content = post.content.replace(sb.Config.get("LINK_REGEX"), "[LINK]");
+				post.content = post.content.replace(linkRegex, "[LINK]");
 			}
 		}
 
