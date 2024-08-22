@@ -1,5 +1,3 @@
-const { env } = globalThis.process;
-
 export const definition = {
 	name: "Helix",
 	optionsType: "function",
@@ -11,7 +9,7 @@ export const definition = {
 		return {
 			prefixUrl: "https://api.twitch.tv/helix",
 			headers: {
-				"Client-ID": env.TWITCH_CLIENT_ID
+				"Client-ID": process.env.TWITCH_CLIENT_ID
 			},
 			timeout: {
 				request: 5000

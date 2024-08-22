@@ -29,18 +29,9 @@
 	}
 
 	const platformsData = {
-		twitch: {
-			ID: 1,
-			envs: ["TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET", "TWITCH_REFRESH_TOKEN"]
-		},
-		discord: {
-			ID: 2,
-			envs: ["DISCORD_BOT_TOKEN"]
-		},
-		cytube: {
-			ID: 3,
-			envs: ["CYTUBE_BOT_PASSWORD"]
-		}
+		twitch: { ID: 1, envs: [] },
+		discord: { ID: 2, envs: [] },
+		cytube: { ID: 3, envs: [] }
 	};
 	const platforms = Object.keys(platformsData);
 

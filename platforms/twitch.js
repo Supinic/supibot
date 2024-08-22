@@ -1,5 +1,4 @@
 const WebSocket = require("ws");
-const { env } = globalThis.process;
 
 const {
 	assignWebsocketToConduit,
@@ -104,12 +103,12 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				message: "Twitch platform does not have the bot's name configured"
 			});
 		}
-		else if (!env.TWITCH_CLIENT_ID) {
+		else if (!process.env.TWITCH_CLIENT_ID) {
 			throw new sb.Error({
 				message: "Twitch client ID has not been configured"
 			});
 		}
-		else if (!env.TWITCH_CLIENT_SECRET) {
+		else if (!process.env.TWITCH_CLIENT_SECRET) {
 			throw new sb.Error({
 				message: "Twitch client secret has not been configured"
 			});

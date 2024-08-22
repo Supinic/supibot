@@ -1,4 +1,3 @@
-const { env } = globalThis.process;
 const { TWITCH_ADMIN_SUBSCRIBER_LIST } = require("../../utils/shared-cache-keys.json");
 
 let noConfigWarningSent = false;
@@ -32,8 +31,8 @@ export const definition = {
 			searchParams: {
 				grant_type: "refresh_token",
 				refresh_token: sb.Config.get("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN"),
-				client_id: env.TWITCH_CLIENT_ID,
-				client_secret: env.TWITCH_CLIENT_SECRET
+				client_id: process.env.TWITCH_CLIENT_ID,
+				client_secret: process.env.TWITCH_CLIENT_SECRET
 			}
 		});
 
@@ -48,7 +47,7 @@ export const definition = {
 			responseType: "json",
 			throwHttpErrors: false,
 			headers: {
-				"Client-ID": env.TWITCH_CLIENT_ID,
+				"Client-ID": process.env.TWITCH_CLIENT_ID,
 				Authorization: `Bearer ${sb.Config.get("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN")}`
 			},
 			searchParams: {

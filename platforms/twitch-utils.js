@@ -364,7 +364,7 @@ const fetchToken = async () => {
 	const refreshToken = await sb.Cache.getByPrefix("TWITCH_REFRESH_TOKEN") ?? env.TWITCH_REFRESH_TOKEN;
 	if (!refreshToken) {
 		throw new sb.Error({
-			message: "No Twitch refresh token has been configured"
+			message: "No Twitch refresh token has been configured (TWITCH_REFRESH_TOKEN)"
 		});
 	}
 

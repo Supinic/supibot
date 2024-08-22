@@ -38,9 +38,9 @@ class CytubeClient {
 		const client = new CytubeConnector({
 			host: "cytu.be",
 			port: 443,
+			auth: process.env.CYTUBE_BOT_PASSWORD,
 			secure: true,
 			user: this.platform.selfName,
-			auth: sb.Config.get("CYTUBE_BOT_PASSWORD"),
 			chan: this.channelData.Name
 		});
 
@@ -480,9 +480,9 @@ module.exports = class CytubePlatform extends require("./template.js") {
 	}
 
 	connect () {
-		if (!sb.Config.has("CYTUBE_BOT_PASSWORD", true)) {
+		if (!process.env.CYTUBE_BOT_PASSWORD) {
 			throw new sb.Error({
-				message: "Cytube password has not been configured"
+				message: "No Cytube account password configured (CYTUBE_BOT_PASSWORD)"
 			});
 		}
 
