@@ -1,7 +1,10 @@
 // Prevents (at least attempts to prevent) some of the most popular sandbox escape methods
 const preventTomfoolery = () => {
-	Function.prototype.constructor = () => {};
-	Object.getPrototypeOf(async function () {}).constructor = () => {};
+	const NOOP = () => {};
+	Function.prototype.constructor = NOOP;
+
+	const AsyncFunctionPrototype = Object.getPrototypeOf(async function () {})
+	Object.defineProperty(AsyncFunctionPrototype, "constructor", { value: NOOP });
 };
 
 module.exports = {
