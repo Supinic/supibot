@@ -42,13 +42,6 @@
 		process.exit(1);
 	}
 
-	if (!process.env.REDIS_CONFIGURATION) {
-		console.error("Missing Redis configuration");
-		process.exit(1);
-	}
-	await updateRow("data", "Config", "REDIS_CONFIGURATION", "Value", process.env.REDIS_CONFIGURATION);
-	console.log("Redis configuration copied to `data`.`Config` table");
-
 	const platformData = platformsData[initialPlatform];
 	for (const envKey of platformData.envs) {
 		const env = process.env[envKey];

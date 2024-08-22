@@ -30,8 +30,6 @@ COPY --chown=supibot:supibot platforms ./platforms
 COPY --chown=supibot:supibot singletons ./singletons
 COPY --chown=supibot:supibot utils ./utils
 
-RUN touch db-access.js
-
 COPY docker-entrypoint.sh /usr/local/bin/
 
 CMD ["docker-entrypoint.sh"]

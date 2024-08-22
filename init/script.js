@@ -1,8 +1,6 @@
 const initializeDatabase = require("supi-db-init");
 const path = require("node:path");
 
-require("../db-access.js");
-
 const config = {
 	auth: {
 		user: process.env.MARIA_USER,

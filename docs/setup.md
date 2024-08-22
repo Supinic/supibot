@@ -70,15 +70,14 @@ Alternatively, if `run setup` does not work or for whatever other reason, follow
 1) Set up `MariaDB` of at least version `10.2.0` + credentials
 2) Set up `Redis`
 3) `git clone` or `fork` the repository
-4) Copy `db-access.js.example` as `db-access.js` (do **not** commit this file)
-5) Fill in your `MariaDB` credentials to `db-access.js`, using sockets or hosts respectively
-6) Run `yarn install`
-7) Run `yarn run init-database`
-8) Run `yarn start` to verify that the bot can start up correctly. If it does, it will not attempt to join any platforms or channels. In order to do so, continue:
-9) Fill in authentication token(s) in `data.Config`, depending on which platform to join - by editing its `Value` from `NULL` to given token
-10) Copy `config-default.json` as `config.json` and fill out your custom configuration, especially regarding desired platforms
-11) Set up at least one channel per platform to `chat_data.Channel` table, by inserting a new row, and filling the channel's `Name`, `Specific_ID` and `Platform`
-12) Run the bot as in **7)**, or `yarn run debug` for debug access
+4) Copy `.example.env` as `.env` and fill out all relevant env variables
+5) Run `yarn install`
+6) Run `yarn run init-database`
+7) Run `yarn start` to verify that the bot can start up correctly. If it does, it will not attempt to join any platforms or channels. In order to do so, continue:
+8) Fill in authentication token(s) in `data.Config`, depending on which platform to join - by editing its `Value` from `NULL` to given token
+9) Copy `config-default.json` as `config.json` and fill out your custom configuration, especially regarding desired platforms
+10) Set up at least one channel per platform to `chat_data.Channel` table, by inserting a new row, and filling the channel's `Name`, `Specific_ID` and `Platform`
+11) Run the bot as in **7)**, or `yarn run debug` for debug access
 
 #### Adjustments
 

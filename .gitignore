@@ -1,6 +1,5 @@
 .idea
 node_modules
-db-access.js
 config.json
 .nyc_output
 .yarn

@@ -85,9 +85,6 @@ const initializeCommands = async (config) => {
 	console.timeEnd("Load commands");
 };
 
-// Database access keys are loaded here, and stored to process.env
-require("./db-access.js");
-
 (async () => {
 	const platformsConfig = config.platforms;
 	if (!platformsConfig || platformsConfig.length === 0) {
@@ -121,7 +118,7 @@ require("./db-access.js");
 		Got: core.Got,
 
 		Query,
-		Cache: new core.Cache(core.Config.get("REDIS_CONFIGURATION")),
+		Cache: new core.Cache(process.env.REDIS_CONFIGURATION),
 		Metrics: new core.Metrics(),
 		Utils: new core.Utils()
 	};

@@ -25,9 +25,8 @@
   "scripts": {
     "start": "node --env-file=.env --enable-experimental-regexp-engine ./master.js",
     "debug": "node --env-file=.env --enable-experimental-regexp-engine --inspect=0.0.0.0:9229 --unhandled-rejections=warn ./master.js",
-    "init-database": "node ./init/script.js",
-    "setup": "node ./init/setup.js",
-    "auto-setup": "node ./init/auto-setup.js",
+    "init-database": "node --env-file=.env ./init/script.js",
+    "auto-setup": "node --env-file=.env ./init/auto-setup.js",
     "dev-update": "git pull origin master && yarn up supi-core@supinic/supi-core",
     "prod-update": "git pull origin master && yarn workspaces focus --production -A",
     "dev-deps-push": "yarn dev-update && git commit ./yarn.lock -m \"bumped dependencies\" && git pull && git push",
