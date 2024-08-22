@@ -21,7 +21,13 @@
   },
   "values": {
     "pendingCommandTimeout": 300000,
-    "pajbotBanphraseRequestTimeout": 5000
+    "pajbotBanphraseRequestTimeout": 5000,
+    "commandCodeUrlPrefix": "https://supinic.com/bot/command/detail",
+    "commandDetailUrlPrefix": "https://github.com/Supinic/Supibot/tree/master/commands",
+    "maxIncomingActiveReminders": 10,
+    "maxOutgoingActiveReminders": 10,
+    "maxIncomingScheduledReminders": 5,
+    "maxOutgoingScheduledReminders": 5
   },
   "api": {
     "secure": false,

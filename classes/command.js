@@ -335,7 +335,7 @@ class Command extends require("./template.js") {
 
 	getDetailURL (options = {}) {
 		if (options.useCodePath) {
-			const baseURL = sb.Config.get("COMMAND_DETAIL_CODE_URL", false);
+			const baseURL = config.values.commandCodeUrlPrefix;
 			if (!baseURL) {
 				return "N/A";
 			}
@@ -343,7 +343,7 @@ class Command extends require("./template.js") {
 			return `${baseURL}/${encodeURIComponent(this.Name)}/index.js`;
 		}
 		else {
-			const baseURL = sb.Config.get("COMMAND_DETAIL_URL", false);
+			const baseURL = config.values.commandDetailUrlPrefix;
 			if (!baseURL) {
 				return "N/A";
 			}

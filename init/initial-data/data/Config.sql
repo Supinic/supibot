@@ -4,7 +4,5 @@ VALUES
 ('CYTUBE_BOT_PASSWORD',NULL,'string',NULL,1,0,NULL),
 ('DISCORD_BOT_TOKEN',NULL,'string',NULL,1,0,NULL),
 ('LINK_REGEX','/(https?:\\/\\/)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&\\/\\/=]*)/gi','regex',NULL,0,1,'Determines if a message contains a website link.'),
-('MAX_ACTIVE_INCOMING_REMINDERS','5','number',NULL,0,1,'Maximum amount of reminders someone can have pending for them at once.'),
-('MAX_ACTIVE_OUTGOING_REMINDERS','8','number',NULL,0,1,'Maximum amount of reminders someone can have pending for others at the same time.'),
 ('REDIS_CONFIGURATION',NULL,'string',NULL,0,0,NULL),
 ('WHITESPACE_REGEX','/[\\u034f\\u2800\\u{E0000}\\u180e\\ufeff\\u2000-\\u200d\\u206D]/gu','regex',NULL,0,0,NULL);
