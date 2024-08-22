@@ -19,7 +19,7 @@ module.exports = {
 			};
 		}
 
-		const linkParser = getLinkParser();
+		const linkParser = await getLinkParser();
 		const links = [];
 		if (args[0] === "playlist") {
 			args.shift();

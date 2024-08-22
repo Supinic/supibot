@@ -10,7 +10,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function getVideoData (context, link) {
-		const linkParser = getLinkParser();
+		const linkParser = await getLinkParser();
 
 		let data = null;
 		try {

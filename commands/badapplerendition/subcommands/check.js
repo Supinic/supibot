@@ -5,7 +5,7 @@ module.exports = {
 	aliases: ["add"],
 	description: "Checks if your provided link is in the database, and creates a suggestion to add, if it isn't.",
 	execute: async (context, ...args) => {
-		const linkParser = getLinkParser();
+		const linkParser = await getLinkParser();
 		const processed = new Set();
 		const results = [];
 

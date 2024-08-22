@@ -27,7 +27,7 @@ module.exports = {
 			};
 		}
 
-		const linkParser = getLinkParser();
+		const linkParser = await getLinkParser();
 		const type = linkParser.autoRecognize(link);
 		if (type === null) {
 			return {

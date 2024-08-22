@@ -1,7 +1,7 @@
 const { getLinkParser } = require("../../../utils/link-parser.js");
 
 const fetchTrackIDs = async (tracks) => {
-	const linkParser = getLinkParser();
+	const linkParser = await getLinkParser();
 	const stringIDs = tracks.map(i => {
 		const type = linkParser.autoRecognize(i);
 		if (!type) {

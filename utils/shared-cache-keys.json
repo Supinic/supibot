@@ -2,6 +2,7 @@
   "LATEST_NODE_JS_VERSION": "nodejs-latest-version",
   "SONG_REQUESTS_STATE": "song-requests-state",
   "SONG_REQUESTS_VLC_PAUSED": "song-requests-vlc-pause-status",
+  "SOUNDCLOUD_CLIENT_ID": "soundcloud-client-id",
   "PLAYSOUNDS_ENABLED": "playsounds-enabled",
   "TTS_ENABLED": "text-to-speech-state",
   "TTS_MULTIPLE_ENABLED": "text-to-speech-multiple-enabled",

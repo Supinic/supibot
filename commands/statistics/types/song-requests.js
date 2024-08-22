@@ -80,7 +80,7 @@ module.exports = {
 			};
 		},
 		fetchVideoStats: async function (videoID) {
-			const linkParser = getLinkParser();
+			const linkParser = await getLinkParser();
 			if (linkParser.autoRecognize(videoID)) {
 				videoID = linkParser.parseLink(videoID);
 			}

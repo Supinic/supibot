@@ -8,7 +8,7 @@ const CYTUBE_LIMITS = {
 
 module.exports = {
 	queue: async function (link) {
-		const linkParser = getLinkParser();
+		const linkParser = await getLinkParser();
 		const properLink = linkParser.autoRecognize(link);
 		if (!properLink) {
 			const [bestResult] = await searchYoutube(link.replace(/-/g, ""));

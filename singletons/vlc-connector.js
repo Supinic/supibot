@@ -313,7 +313,7 @@ module.exports = class VLCSingleton {
 			return null;
 		}
 
-		const linkParser = getLinkParser();
+		const linkParser = await getLinkParser();
 		const targetURL = linkParser.parseLink(status.information.category.meta.url);
 		return this.videoQueue.find(songData => {
 			try {

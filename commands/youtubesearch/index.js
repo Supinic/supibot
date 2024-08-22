@@ -70,7 +70,7 @@ module.exports = {
 
 		let data;
 		let videoID;
-		const LinkParser = getLinkParser();
+		const LinkParser = await getLinkParser();
 		const youtubeParser = LinkParser.getParser("youtube");
 
 		if (youtubeParser.checkLink(query, false)) {

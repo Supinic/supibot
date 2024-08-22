@@ -169,7 +169,7 @@ export const definition = {
 			await sr.execute(fakeContext, link);
 		}
 		else if (state === "cytube") {
-			const linkParser = getLinkParser();
+			const linkParser = await getLinkParser();
 			const videoID = linkParser.parseLink(link);
 			const client = cytube.clients.get(cytubeChannelData.ID);
 

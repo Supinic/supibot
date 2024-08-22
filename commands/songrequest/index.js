@@ -144,7 +144,7 @@ module.exports = {
 
 		// Determine the video URL, based on the type of link provided
 		let url = args.join(" ");
-		const linkParser = getLinkParser();
+		const linkParser = await getLinkParser();
 		const type = context.params.type ?? "youtube";
 		const potentialTimestamp = parseTimestamp(linkParser, url);
 
