@@ -29,9 +29,18 @@
 	}
 
 	const platformsData = {
-		twitch: { ID: 1, envs: [] },
-		discord: { ID: 2, envs: [] },
-		cytube: { ID: 3, envs: [] }
+		twitch: {
+			ID: 1,
+			envs: []
+		},
+		discord: {
+			ID: 2,
+			envs: []
+		},
+		cytube: {
+			ID: 3,
+			envs: []
+		}
 	};
 	const platforms = Object.keys(platformsData);
 

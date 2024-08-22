@@ -728,7 +728,7 @@ class Command extends require("./template.js") {
 			else {
 				const channelHasFullErrorMessage = await channelData?.getDataProperty("showFullCommandErrorMessage");
 				const prettify = (channelHasFullErrorMessage)
-					? `Error ID ${errorID} - ${error.message}`
+					? `Error ID ${errorID} - ${e.message}`
 					: config.responses.commandErrorResponse;
 
 				execution = {

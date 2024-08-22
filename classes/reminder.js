@@ -677,7 +677,7 @@ module.exports = class Reminder extends require("./template.js") {
 		]);
 
 		const incomingLimit = config.values.maxIncomingActiveReminders;
-		const outgoingLimit = config.values.maxOutgoingActiveReminders
+		const outgoingLimit = config.values.maxOutgoingActiveReminders;
 		const [privateIncoming, publicIncoming] = sb.Utils.splitByCondition(incomingData, i => i.Private_Message);
 		const [privateOutgoing, publicOutgoing] = sb.Utils.splitByCondition(outgoingData, i => i.Private_Message);
 
