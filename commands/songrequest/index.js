@@ -11,11 +11,17 @@ const REQUEST_TIME_LIMIT = 900;
 const REQUEST_AMOUNT_LIMIT = 10;
 
 const fetchVimeoData = async (query) => {
+	if (!process.env.API_VIMEO_KEY) {
+		throw new sb.Error({
+			messsage: "No Vimeo key configured (API_VIMEO_KEY)"
+		});
+	}
+
 	const response = await sb.Got("GenericAPI", {
 		url: "https://api.vimeo.com/videos",
 		throwHttpErrors: false,
 		headers: {
-			Authorization: `Bearer ${sb.Config.get("VIMEO_API_KEY")}`
+			Authorization: `Bearer ${process.env.API_VIMEO_KEY}`
 		},
 		searchParams: {
 			query,
