@@ -156,7 +156,7 @@ const getRandomUserLine = async function (channelID, userID) {
 };
 
 const addChannel = async function (channelID) {
-	if (!sb.Config.has("RUSTLOG_ADMIN_KEY")) {
+	if (!process.env.API_RUSTLOG_ADMIN_KEY) {
 		return {
 			success: false,
 			reason: "no-key"
@@ -168,7 +168,7 @@ const addChannel = async function (channelID) {
 		method: "POST",
 		throwHttpErrors: false,
 		headers: {
-			"X-API-Key": sb.Config.get("RUSTLOG_ADMIN_KEY")
+			"X-API-Key": process.env.API_RUSTLOG_ADMIN_KEY
 		},
 		json: {
 			channels: [channelID]
