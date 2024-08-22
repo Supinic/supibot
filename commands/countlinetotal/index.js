@@ -8,22 +8,15 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function countLineTotal (context) {
-		const [response, chatLineAmount] = await Promise.all([
-			sb.Got("RaspberryPi4", { url: "ssd/size" }),
-			sb.Query.getRecordset(rs => rs
-				.select("SUM(AUTO_INCREMENT) AS Chat_Lines")
-				.from("INFORMATION_SCHEMA", "TABLES")
-				.where("TABLE_SCHEMA = %s", "chat_line")
-				.flat("Chat_Lines")
-				.single()
-			)
-		]);
+		const chatLineAmount = await sb.Query.getRecordset(rs => rs
+			.select("SUM(AUTO_INCREMENT) AS Chat_Lines")
+			.from("INFORMATION_SCHEMA", "TABLES")
+			.where("TABLE_SCHEMA = %s", "chat_line")
+			.flat("Chat_Lines")
+			.single()
+		);
 
 		let historyText = "";
-		const currentSize = sb.Utils.round(response.body.data.size / (10 ** 9), 3);
-		const maximumSize = sb.Config.get("DATA_DRIVE_MAXIMUM_SIZE_GB", false) ?? 220; // default size is hardcoded ~220 GB
-		const percentUsage = sb.Utils.round((currentSize / maximumSize) * 100, 2);
-
 		const cacheKey = "count-line-total-previous";
 		const history = await sb.Cache.getByPrefix(cacheKey);
 		if (history) {
@@ -58,8 +51,7 @@ module.exports = {
 		return {
 			cooldown,
 			reply: sb.Utils.tag.trim `
-				Currently logging ${sb.Utils.groupDigits(chatLineAmount)} lines in total across all channels,
-				taking up ~${currentSize} GB of space (${percentUsage}%).
+				Currently logging ${sb.Utils.groupDigits(chatLineAmount)} lines in total across all channels.
 				${historyText}
 			`
 		};
