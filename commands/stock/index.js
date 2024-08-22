@@ -8,9 +8,9 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function stock (context, ...args) {
-		if (!process.env.API_ALPHA_AVANTAGE) {
+		if (!process.env.API_ALPHA_VANTAGE) {
 			throw new sb.Error({
-				messsage: "No Alpha Avantage key configured (API_ALPHA_AVANTAGE)"
+				messsage: "No AlphaVantage key configured (API_ALPHA_VANTAGE)"
 			});
 		}
 
@@ -38,7 +38,7 @@ module.exports = {
 			searchParams: {
 				function: "GLOBAL_QUOTE",
 				symbol,
-				apikey: process.env.API_ALPHA_AVANTAGE
+				apikey: process.env.API_ALPHA_VANTAGE
 			}
 		});
 
