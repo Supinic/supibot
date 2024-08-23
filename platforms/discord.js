@@ -357,15 +357,20 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 				message
 			);
 
-			const announce = sb.Config.get("DISCORD_GUILD_JOIN_ANNOUNCE_CHANNEL", false);
+			const announce = this.config.guildCreateAnnounceChannel;
 			if (announce) {
 				const channelList = (Array.isArray(announce))
 					? announce
 					: [announce];
 
 				for (const channelID of channelList) {
-					const channelData = sb.Channel.get(channelID);
-					await channelData.send(message);
+					const channelData = sb.Channel.get(channelID, this);
+					if (channelData) {
+						await channelData.send(message);
+					}
+					else {
+						console.warn(`No channel found for guild create announcement: ${channelID}`);
+					}
 				}
 			}
 		});
