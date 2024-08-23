@@ -167,9 +167,15 @@ module.exports = {
 			const [broadcasterData] = broadcasterResponse.body;
 			const { banned, banReason, lastBroadcast } = broadcasterData;
 
-			const status = (banned)
-				? `banned (${banReason})`
-				: "offline";
+			let status;
+			if (banned) {
+				status = (banReason === "DEACTIVATED")
+					? `unavailable (${banReason})`
+					: `banned (${banReason})`;
+			}
+			else {
+				status = "offline";
+			}
 
 			if (lastBroadcast.startedAt === null) {
 				if (banned) {
