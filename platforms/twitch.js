@@ -25,7 +25,7 @@ const {
 const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
 const WRITE_MODE_MESSAGE_DELAY = 1500;
-const NO_EVENT_RECONNECT_TIMEOUT = 5000;
+const NO_EVENT_RECONNECT_TIMEOUT = 10000; // @todo move to config
 const LIVE_STREAMS_KEY = "twitch-live-streams";
 const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
 const BAD_MESSAGE_RESPONSE = "A message that was about to be posted violated this channel's moderation settings.";
