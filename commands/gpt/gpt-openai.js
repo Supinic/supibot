@@ -1,4 +1,4 @@
-const Config = require("./config.json");
+const config = require("./config.json");
 const Template = require("./gpt-template.js");
 const GptHistory = require("./history-control.js");
 
@@ -6,7 +6,7 @@ const partialInstructionRolloutChannels = [30, 37, 38];
 
 module.exports = class GptOpenAI extends Template {
 	static async getHistoryMode (context) {
-		let historyMode = await context.user.getDataProperty("chatGptHistoryMode") ?? Config.defaultHistoryMode;
+		let historyMode = await context.user.getDataProperty("chatGptHistoryMode") ?? config.defaultHistoryMode;
 		if (context.params.history) {
 			const command = context.params.history;
 			if (command === "ignore") {

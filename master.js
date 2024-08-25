@@ -103,18 +103,10 @@ const initializeCommands = async (config) => {
 		connectionLimit: process.env.MARIA_CONNECTION_LIMIT
 	});
 
-	const configData = await Query.getRecordset(rs => rs
-		.select("*")
-		.from("data", "Config"));
-
-	core.Config.load(configData);
-
 	globalThis.sb = {
 		Date: core.Date,
 		Error: core.Error,
 		Promise: core.Promise,
-
-		Config: core.Config,
 		Got: core.Got,
 
 		Query,

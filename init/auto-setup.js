@@ -1,12 +1,4 @@
 (async () => {
-	const updateRow = (async function (db, table, pk, key, value) {
-		const row = await sb.Query.getRow(db, table);
-		await row.load(pk);
-
-		row.values[key] = value;
-		await row.save();
-	});
-
 	console.log("Setting up query builder...");
 	try {
 		const core = await import("supi-core");
@@ -58,8 +50,6 @@
 			console.error(`Missing env.${envKey} for platform ${initialPlatform}`);
 			process.exit(1);
 		}
-
-		await updateRow("data", "Config", envKey, "Value", env);
 	}
 
 	if (initialPlatform === "twitch") {

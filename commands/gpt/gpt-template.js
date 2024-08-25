@@ -1,21 +1,21 @@
-const Config = require("./config.json");
+const config = require("./config.json");
 const History = require("./history-control.js");
 
 module.exports = class GptTemplate {
 	static checkInputLimits (modelData, queryLength) {
 		if (modelData.inputLimit && queryLength > modelData.inputLimit) {
-			const errorMessages = Config.lengthLimitExceededMessage;
+			const errorMessages = config.lengthLimitExceededMessage;
 			return {
 				success: false,
 				cooldown: 2500,
 				reply: `${errorMessages.history} ${queryLength}/${modelData.inputLimit}`
 			};
 		}
-		else if (!modelData.inputLimit && queryLength > Config.globalInputLimit) {
+		else if (!modelData.inputLimit && queryLength > config.globalInputLimit) {
 			return {
 				success: false,
 				cooldown: 2500,
-				reply: `Maximum query length exceeded! ${queryLength}/${Config.globalInputLimit}`
+				reply: `Maximum query length exceeded! ${queryLength}/${config.globalInputLimit}`
 			};
 		}
 
@@ -116,7 +116,7 @@ module.exports = class GptTemplate {
 		}
 
 		const command = context.params.history;
-		const historyMode = await context.user.getDataProperty("chatGptHistoryMode") ?? Config.defaultHistoryMode;
+		const historyMode = await context.user.getDataProperty("chatGptHistoryMode") ?? config.defaultHistoryMode;
 		if (command === "enable" || command === "disable") {
 			if (historyMode === command) {
 				return {
