@@ -24,6 +24,7 @@ const config = {
 		"chat_data/tables/Filter",
 		"chat_data/tables/Message_Meta_User_Alias",
 		"chat_data/tables/Reminder",
+		"chat_data/tables/Reminder_History",
 		"chat_data/triggers/add_missing_first_channel_command_after_insert",
 		"chat_data/triggers/add_missing_first_message_data_after_insert"
 	],

@@ -65,7 +65,7 @@ export const definition = {
 			await sb.Reminder.create({
 				Channel: null,
 				Platform: subscription.Platform,
-				User_From: sb.Config.get("SELF_ID"),
+				User_From: null,
 				User_To: oldRow.User_Alias,
 				Text: `[EVENT] Suggestion ${oldRow.ID} changed: ${oldRow.Status ?? "(pending)"} => ${newRow.Status ?? "(pending)"} ${githubLink} Check details: ${supinicLink}`,
 				Schedule: null,

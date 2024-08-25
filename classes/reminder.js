@@ -135,7 +135,7 @@ module.exports = class Reminder extends require("./template.js") {
 			if (this.User_From === this.User_To) {
 				message = `${toMention}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
-			else if (this.User_From === sb.Config.get("SELF_ID")) {
+			else if (this.User_From === null) {
 				message = `${toMention}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
 			else if (this.User_To) {
@@ -145,7 +145,7 @@ module.exports = class Reminder extends require("./template.js") {
 			const statusAFK = AwayFromKeyboard.get(toUserData);
 			if (statusAFK && channelData) {
 				await Reminder.create({
-					User_From: sb.Config.get("SELF_ID"),
+					User_From: null,
 					User_To: toUserData.ID,
 					Platform: channelData.Platform.ID,
 					Channel: channelData.ID,
@@ -175,7 +175,7 @@ module.exports = class Reminder extends require("./template.js") {
 						if (this.User_From === this.User_To) {
 							mirrorMessage = `${toUserData.Name}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
-						else if (this.User_From === sb.Config.get("SELF_ID")) {
+						else if (this.User_From === null) {
 							mirrorMessage = `${toUserData.Name}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
 						else if (this.User_To) {
