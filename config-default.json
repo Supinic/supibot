@@ -31,6 +31,21 @@
     "userAdditionHighLoadThreshold": 50,
     "userAdditionCriticalLoadThreshold": 200
   },
+  "local": {
+    "epalAudioChannels": [],
+    "listenerAddress": null,
+    "listenerPort": null,
+    "ttsVolume": null,
+    "ttsLengthLimit": null,
+    "ttsListUrl": null,
+    "playsoundListUrl": null,
+    "vlcPassword": null,
+    "vlcPort": null,
+    "vlcUrl": null,
+    "vlcUsername": null,
+    "vlcBaseUrl": null,
+    "vlcIp": null
+  },
   "api": {
     "secure": false,
     "port": 11000

@@ -3,7 +3,6 @@ const {
 	TTS_ENABLED,
 	TTS_MULTIPLE_ENABLED,
 	TTS_TIME_LIMIT,
-	TTS_VOLUME,
 	SONG_REQUESTS_STATE
 } = require("../../utils/shared-cache-keys.json");
 
@@ -48,20 +47,6 @@ module.exports = {
 				await sb.Cache.setByPrefix(TTS_TIME_LIMIT, limit);
 				return {
 					reply: `Text to speech time limit is now set to ${limit} milliseconds.`
-				};
-			}
-
-			case "ttsvolume": {
-				const volume = Number(rest.shift());
-				if (!Number.isFinite(volume) || volume < 0 || volume > 8) {
-					return {
-						reply: "Invalid value provided! Must be in the range <0, 8>."
-					};
-				}
-
-				await sb.Cache.setByPrefix(TTS_VOLUME, volume);
-				return {
-					reply: `Text to speech volume is now set to ${volume}`
 				};
 			}
 

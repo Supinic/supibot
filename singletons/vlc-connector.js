@@ -1,3 +1,6 @@
+const config = require("../config.json");
+const { vlcBaseUrl, vlcPassword, vlcPort, vlcUrl, vlcUsername } = config.local ?? {};
+
 const VLCClient = require("./vlc-client.js");
 const { getLinkParser } = require("../utils/link-parser.js");
 const { SONG_REQUESTS_VLC_PAUSED } = require("../utils/shared-cache-keys.json");
@@ -23,10 +26,6 @@ const actions = [
 	"seek",
 	"seekToChapter"
 ];
-const mandatoryConfigs = [
-	"LOCAL_VLC_IP",
-	"LOCAL_VLC_BASE_URL"
-];
 
 /**
  * VideoLANConnector (VLC) handler module - handles a VLC instance's playlist and methods.
@@ -37,18 +36,17 @@ module.exports = class VLCSingleton {
 	 */
 	static initialize () {
 		if (!VLCSingleton.module) {
-			const missingConfigs = mandatoryConfigs.filter(key => !sb.Config.has(key));
-			if (missingConfigs.length !== 0) {
-				console.debug("Missing VLC config(s), module creation skipped", { missingConfigs });
+			if (!vlcBaseUrl || !vlcUrl) {
+				console.debug("Missing VLC config(s), module creation skipped");
 				VLCSingleton.module = {};
 			}
 			else {
 				VLCSingleton.module = new VLCSingleton({
-					baseURL: sb.Config.get("LOCAL_VLC_BASE_URL", true),
-					url: sb.Config.get("LOCAL_VLC_IP", true),
-					port: 8080,
-					username: "",
-					password: "supinic", // @todo set into env/config
+					baseURL: vlcBaseUrl,
+					url: vlcUrl,
+					port: vlcPort ?? 8080,
+					username: vlcUsername ?? "",
+					password: vlcPassword ?? "",
 					running: true
 				});
 			}
