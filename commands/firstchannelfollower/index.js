@@ -7,6 +7,24 @@ module.exports = {
 	Flags: ["mention","non-nullable","opt-out","pipe"],
 	Params: null,
 	Whitelist_Response: null,
+	initialize: function () {
+		this.data.requestHeaders = {
+			Accept: "*/*",
+			"Accept-Language": "en-US",
+			"Content-Type": "text/plain;charset=UTF-8",
+			Referer: `https://dashboard.twitch.tv/`
+		};
+
+		if (process.env.TWITCH_GQL_CLIENT_ID) {
+			this.data.requestHeaders["Client-ID"] = process.env.TWITCH_GQL_CLIENT_ID;
+		}
+		if (process.env.TWITCH_GQL_CLIENT_VERSION) {
+			this.data.requestHeaders["Client-Version"] = process.env.TWITCH_GQL_CLIENT_VERSION;
+		}
+		if (process.env.TWITCH_GQL_DEVICE_ID) {
+			this.data.requestHeaders["X-Device-ID"] = process.env.TWITCH_GQL_DEVICE_ID;
+		}
+	},
 	Code: (async function firstChannelFollower (context, target) {
 		const platform = sb.Platform.get("twitch");
 		const name = sb.User.normalizeUsername(target ?? context.user.Name);
@@ -22,15 +40,7 @@ module.exports = {
 		const response = await sb.Got.gql({
 			url: "https://gql.twitch.tv/gql",
 			responseType: "json",
-			headers: {
-				Accept: "*/*",
-				"Accept-Language": "en-US",
-				"Client-ID": sb.Config.get("TWITCH_GQL_CLIENT_ID"),
-				"Client-Version": sb.Config.get("TWITCH_GQL_CLIENT_VERSION"),
-				"Content-Type": "text/plain;charset=UTF-8",
-				Referer: `https://dashboard.twitch.tv/`,
-				"X-Device-ID": sb.Config.get("TWITCH_GQL_DEVICE_ID")
-			},
+			headers: this.data.requestHeaders,
 			query: `{user(login:"${name}"){followers(first:1){edges{node{login}followedAt}}}}`
 		});
 
