@@ -379,20 +379,6 @@ module.exports = {
 		let id = null;
 		try {
 			let vlcLink = data.link;
-			if (data.type === "bilibili") {
-				const { promisify } = require("node:util");
-				const shell = promisify(require("node:child_process").exec);
-				const ytdlPath = sb.Config.get("YOUTUBEDL_PATH", false);
-				if (!ytdlPath) {
-					return {
-						success: false,
-						reply: "No youtube-dl path configured, cannot get-url for this video!"
-					};
-				}
-
-				const result = await shell(`${ytdlPath} --get-url ${data.link}`);
-				vlcLink = result.stdout;
-			}
 
 			// Extreme hard-coded exception! Apparently, some YouTube videos do not play properly in VLC if and only
 			// if they are queued with HTTPS. This is a temporary solution and should be removed as soon as a proper
