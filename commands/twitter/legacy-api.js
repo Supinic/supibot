@@ -4,7 +4,7 @@ const fetchAuthData = async () => {
 
 	if (!bearerToken) {
 		const key = process.env.API_TWITTER_CONSUMER_KEY;
-		const secret =  process.env.API_TWITTER_CONSUMER_SECRET;
+		const secret = process.env.API_TWITTER_CONSUMER_SECRET;
 		if (!key || !secret) {
 			return {
 				success: false,

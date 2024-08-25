@@ -117,10 +117,21 @@ module.exports = class ClassTemplate {
 
 		let value;
 		switch (data.Type) {
-			case "boolean": value = (data.Value === "true"); break;
-			case "string": value = String(data.Value); break;
-			case "number": value = Number(data.Value); break;
-			case "date": value = new sb.Date(data.Value); break;
+			case "boolean":
+				value = (data.Value === "true");
+				break;
+
+			case "string":
+				value = String(data.Value);
+				break;
+
+			case "number":
+				value = Number(data.Value);
+				break;
+
+			case "date":
+				value = new sb.Date(data.Value);
+				break;
 
 			case "array":
 			case "object": {
@@ -194,13 +205,11 @@ module.exports = class ClassTemplate {
 		if (value === null) {
 			row.values.Value = null;
 		}
+		else if (propertyData.Type === "array" || propertyData.Type === "object") {
+			row.values.Value = JSON.stringify(value);
+		}
 		else {
-			if (propertyData.Type === "array" || propertyData.Type === "object") {
-				row.values.Value = JSON.stringify(value);
-			}
-			else {
-				row.values.Value = String(value);
-			}
+			row.values.Value = String(value);
 		}
 
 		if (propertyData.Cached) {

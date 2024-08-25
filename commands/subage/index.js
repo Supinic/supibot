@@ -63,7 +63,7 @@ module.exports = {
 		const response = await sb.Got("TwitchGQL", {
 			responseType: "json",
 			headers: {
-				Referer: `https://www.twitch.tv/popout/${channelName}/viewercard/${userName}`,
+				Referer: `https://www.twitch.tv/popout/${channelName}/viewercard/${userName}`
 			},
 			body: JSON.stringify([{
 				operationName: "ViewerCard",

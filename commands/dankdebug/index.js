@@ -137,7 +137,7 @@ module.exports = {
 			else if (e?.message?.includes("Asynchronous execution timed out")) {
 				await sb.Logger.log(
 					"Command.Warning",
-					`$js: Async execution timed out: ${context.user.Name} exceeded async timeout in ${context.channel?.Name ?? "whispers"}`,
+					`$js: Async execution timed out: ${context.user.Name} exceeded async timeout in ${context.channel?.Name ?? "whispers"}`
 				);
 			}
 			else if (!(e instanceof Error) && e?.constructor?.name !== "Error") {
