@@ -1,28 +1,24 @@
 const { TWITCH_ADMIN_SUBSCRIBER_LIST } = require("../../utils/shared-cache-keys.json");
 
-let noConfigWarningSent = false;
 let tooManySubsWarningSent = false;
-const requiredEnvs = [
-	"TWITCH_CLIENT_ID",
-	"TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN",
-	"TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN",
-	"ADMIN_USER_ID"
-];
 
 export const definition = {
 	name: "fetch-twitch-subscriber-list",
 	expression: "0 0 0 * * *",
 	description: "Fetches the current subscriber list, then saves it to sb.Cache",
 	code: (async function fetchTwitchSubscriberList () {
-		for (const name of requiredEnvs) {
-			if (!env[name]) {
-				if (noConfigWarningSent) {
-					console.warn("Cannot fetch subscribers, env(s) are missing", name)
-					noConfigWarningSent = true;
-				}
+		if (!process.env.TWITCH_READ_SUBSCRIPTIONS_USER_ID) {
+			throw new sb.Error({
+				message: "No Twitch user ID configured for Twitch subscriptions"
+			});
+		}
 
-				return;
-			}
+		const cacheRefreshToken = sb.Cache.getByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN")
+		const envRefreshToken = process.env.TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN;
+		if (!cacheRefreshToken && !envRefreshToken) {
+			throw new sb.Error({
+				message: "No refresh token configured for Twitch subscriptions"
+			});
 		}
 
 		const identityResponse = await sb.Got("GenericAPI", {
@@ -30,16 +26,17 @@ export const definition = {
 			method: "POST",
 			searchParams: {
 				grant_type: "refresh_token",
-				refresh_token: sb.Config.get("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN"),
+				refresh_token: cacheRefreshToken ?? envRefreshToken,
 				client_id: process.env.TWITCH_CLIENT_ID,
 				client_secret: process.env.TWITCH_CLIENT_SECRET
 			}
 		});
 
-		const authToken = identityResponse.body.access_token;
+		const accessToken = identityResponse.body.access_token;
+		const newRefreshToken = identityResponse.body.refresh_token;
 		await Promise.all([
-			sb.Config.set("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN", authToken),
-			sb.Config.set("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN", identityResponse.body.refresh_token)
+			sb.Cache.setByPrefix("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN", accessToken),
+			sb.Cache.setByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN", newRefreshToken)
 		]);
 
 		const subsResponse = await sb.Got("GenericAPI", {
@@ -48,10 +45,10 @@ export const definition = {
 			throwHttpErrors: false,
 			headers: {
 				"Client-ID": process.env.TWITCH_CLIENT_ID,
-				Authorization: `Bearer ${sb.Config.get("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN")}`
+				Authorization: `Bearer ${accessToken}`
 			},
 			searchParams: {
-				broadcaster_id: sb.Config.get("ADMIN_USER_ID"),
+				broadcaster_id: process.env.TWITCH_READ_SUBSCRIPTIONS_USER_ID,
 				first: "100"
 			}
 		});
