@@ -1,3 +1,5 @@
+// Need to fetch a randomized hash to attach to the api/search endpoint
+// Reference: https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI/issues/25
 const HLTB_JS_FILE_HASH_KEY = "hltb-file-hash";
 const HLTB_ENDPOINT_HASH_KEY = "hltb-endpoint-hash";
 
