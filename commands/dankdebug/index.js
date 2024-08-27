@@ -59,7 +59,7 @@ module.exports = {
 			}
 		}
 
-		let importedText;
+		let importedText = "\n";
 		if (context.params.importGist) {
 			if (context.params.importGist.includes(" ")) {
 				return {
@@ -91,6 +91,8 @@ module.exports = {
 			if (!importedText.endsWith(";") && !importedText.endsWith(",")) {
 				importedText += ";";
 			}
+
+			importedText += "\n";
 		}
 
 		let result;
@@ -98,18 +100,14 @@ module.exports = {
 		const string = args.join(" ");
 
 		if (context.params.function) {
-			script = `${PREFIX_SAFETY_CODE}\n${context.params.function}`;
+			script = `${PREFIX_SAFETY_CODE}\n${importedText}${context.params.function}`;
 			scriptArgs = [...args];
 		}
 		else if (!string.includes("return")) { // @todo refactor this to use acorn heuristic for ReturnStatement
-			script = `${PREFIX_SAFETY_CODE}\n${string}`;
+			script = `${PREFIX_SAFETY_CODE}\n${importedText}${string}`;
 		}
 		else {
-			script = `${PREFIX_SAFETY_CODE} (async () => {\n${string}\n})()`;
-		}
-
-		if (importedText) {
-			script = `${importedText}\n${script}`;
+			script = `${PREFIX_SAFETY_CODE}\n${importedText}(async () => {\n${string}\n})()`;
 		}
 
 		const { analyze } = require("./acorn-heuristic.js");
