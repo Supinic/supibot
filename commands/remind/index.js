@@ -286,9 +286,13 @@ module.exports = {
 				isPrivate = true;
 			}
 			else {
+				const forcePrivateString = (context.params.private === false)
+					? " (no matter what you set the private parameter to)"
+					: "";
+
 				return {
 					success: false,
-					reply: "You cannot create a private timed reminder for someone else!"
+					reply: `You cannot create timed reminders${forcePrivateString} for someone else in private messages!`
 				};
 			}
 		}

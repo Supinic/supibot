@@ -36,7 +36,7 @@ module.exports = {
 		"You can also change the mode of Supibot's behaviour when the API times out.",
 		"Modes:",
 		"",
-		`<ul>${HTML_MODE_LIST}</ul>`,
+		`<ul>${HTML_MODE_LIST}</ul>`
 	],
 	execute: async (context, options = {}) => {
 		const { params } = context;

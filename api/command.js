@@ -1,5 +1,12 @@
 // noinspection JSUnusedGlobalSymbols
 module.exports = {
+	prefix: async () => ({
+		statusCode: 200,
+		data: {
+			prefix: sb.Command.prefix
+		}
+	}),
+
 	execute: async (req, res, url) => {
 		const invocation = url.searchParams.get("invocation");
 		if (!invocation) {
@@ -70,6 +77,7 @@ module.exports = {
 		}
 
 		const info = {
+			prefix: sb.Command.prefix,
 			aliases: commandData.Aliases,
 			author: commandData.Author,
 			cooldown: commandData.Cooldown,

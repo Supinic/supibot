@@ -1,5 +1,21 @@
 // noinspection JSUnusedGlobalSymbols
 module.exports = {
+	list: async () => {
+		const platforms = sb.Platform.list;
+		const data = platforms.map(i => ({
+			ID: i.ID,
+			name: i.name,
+			host: i.host,
+			active: i.active,
+			selfId: i.selfId,
+			selfName: i.selfName
+		}));
+
+		return {
+			statusCode: 200,
+			data
+		};
+	},
 	discordGuildCount: async () => {
 		const platformData = sb.Platform.get("discord");
 		if (!platformData) {

@@ -85,11 +85,11 @@ module.exports = {
 		const { invocation } = context;
 		const response = (invocation === "subscribe") ? event.response.added : event.response.removed;
 
-		let location = "";
+		let locationWithSpace = "";
 		if (event.channelSpecificMention) {
-			location = (context.channel)
-				? "in this channel"
-				: `in ${context.platform.Name} PMs`;
+			locationWithSpace = (context.channel)
+				? " in this channel"
+				: ` in ${context.platform.Name} PMs`;
 		}
 
 		const { skipPrivateReminder } = context.params;
@@ -149,7 +149,7 @@ module.exports = {
 				const preposition = (invocation === "subscribe") ? "to" : "from";
 				return {
 					success: false,
-					reply: `You are already ${invocation}d ${preposition} this event ${location}!`
+					reply: `You are already ${invocation}d ${preposition} this event${locationWithSpace}!`
 				};
 			}
 
@@ -161,7 +161,7 @@ module.exports = {
 			);
 
 			return {
-				reply: `Successfully ${invocation}d ${location}. ${response}`
+				reply: `Successfully ${invocation}d${locationWithSpace}. ${response}`
 			};
 		}
 		else {
@@ -184,7 +184,7 @@ module.exports = {
 
 			await row.save({ skipLoad: true });
 			return {
-				reply: `Successfully subscribed ${location}. ${response}${flagAppendix}`
+				reply: `Successfully subscribed${locationWithSpace}. ${response}${flagAppendix}`
 			};
 		}
 	},

@@ -5,7 +5,7 @@ module.exports = {
 		`<code>$bot enable-rustlog</code>`,
 		`<code>$bot enable-rustlog channel:(channel)</code>`,
 		"Enables the 3rd party Rustlog service in either the current, or in a provided channel.",
-		`This service gathers the chat logs in the channel, which are then used in Supibot for the <code>$randomline</code> command.`,
+		`This service gathers the chat logs in the channel, which are then used in Supibot for the <code>$randomline</code> command.`
 	],
 	execute: async (context, options = {}) => {
 		const { channelData } = options;

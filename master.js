@@ -135,7 +135,10 @@ require("./db-access.js");
 
 	const platforms = new Set();
 	for (const definition of platformsConfig) {
-		platforms.add(Platform.create(definition.type, definition));
+		const platform = Platform.create(definition.type, definition);
+		if (platform) {
+			platforms.add(platform);
+		}
 	}
 
 	console.time("basic bot modules");
@@ -222,6 +225,10 @@ require("./db-access.js");
 			await platform.connect();
 			console.timeEnd(`Platform connect: ${platform.name}`);
 		})());
+	}
+
+	if (promises.length === 0) {
+		console.warn("No platforms were successfully activated, bot will not connect to any chat service");
 	}
 
 	await Promise.all(promises);

@@ -13,8 +13,7 @@ CREATE TABLE IF NOT EXISTS `chat_data`.`Chat_Module` (
 	`Latest_Commit` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	PRIMARY KEY (`ID`) USING BTREE,
 	UNIQUE INDEX `Name` (`Name`) USING BTREE,
-	INDEX `FK_Chat_Module_Platform` (`Platform`) USING BTREE,
-	CONSTRAINT `FK_Chat_Module_Platform` FOREIGN KEY (`Platform`) REFERENCES `chat_data`.`Platform` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
+	INDEX `Chat_Module_Platform` (`Platform`) USING BTREE
 )
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB;

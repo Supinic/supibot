@@ -13,7 +13,7 @@
     "irc-framework": "^4.13.1",
     "language-iso-codes": "https://github.com/supinic/language-iso-codes",
     "rss-parser": "^3.13.0",
-    "supi-core": "https://github.com/supinic/supi-core",
+    "supi-core": "supinic/supi-core",
     "track-link-parser": "https://github.com/supinic/track-link-parser",
     "transliteration": "^2.3.5",
     "vm2": "^3.9.19",

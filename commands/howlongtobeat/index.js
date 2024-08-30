@@ -1,3 +1,67 @@
+// Need to fetch a randomized hash to attach to the api/search endpoint
+// Reference: https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI/issues/25
+const HLTB_JS_FILE_HASH_KEY = "hltb-file-hash";
+const HLTB_ENDPOINT_HASH_KEY = "hltb-endpoint-hash";
+
+const FILE_PREFIX = "_next/static/chunks/pages";
+const FILE_HASH_REGEX = /static\/chunks\/pages\/(_app-\w+?\.js)/;
+const ENDPOINT_HASH_REGEX = /\/api\/search\/".concat\("(\w+)"\)/;
+
+const fetchFileHash = async (force = false) => {
+	const existing = await sb.Cache.getByPrefix(HLTB_JS_FILE_HASH_KEY);
+	if (!force && existing) {
+		return existing;
+	}
+
+	const response = await sb.Got("FakeAgent", {
+		url: "https://howlongtobeat.com/",
+		responseType: "text"
+	});
+
+	if (!response.ok) {
+		return null;
+	}
+
+	const match = response.body.match(FILE_HASH_REGEX);
+	if (!match) {
+		return null;
+	}
+
+	await sb.Cache.setByPrefix(HLTB_JS_FILE_HASH_KEY, match[1], {
+		expiry: 864e5 // 1 day
+	});
+
+	return match[1];
+};
+
+const fetchEndpointHash = async (fileHash, force = false) => {
+	const existing = await sb.Cache.getByPrefix(HLTB_ENDPOINT_HASH_KEY);
+	if (!force && existing) {
+		return existing;
+	}
+
+	const response = await sb.Got("FakeAgent", {
+		url: `https://howlongtobeat.com/${FILE_PREFIX}/${fileHash}`,
+		responseType: "text"
+	});
+
+	if (!response.ok) {
+		await sb.Cache.setByPrefix(HLTB_JS_FILE_HASH_KEY, null);
+		return null;
+	}
+
+	const match = response.body.match(ENDPOINT_HASH_REGEX);
+	if (!match) {
+		return null;
+	}
+
+	await sb.Cache.setByPrefix(HLTB_ENDPOINT_HASH_KEY, match[1], {
+		expiry: 864e5 // 1 day
+	});
+
+	return match[1];
+};
+
 module.exports = {
 	Name: "howlongtobeat",
 	Aliases: ["hltb"],
@@ -15,9 +79,26 @@ module.exports = {
 			};
 		}
 
+		const fileHash = await fetchFileHash();
+		if (!fileHash) {
+			return {
+				success: false,
+				reply: "Cannot fetch game data - file hash!"
+			};
+		}
+
+		const endpointHash = await fetchEndpointHash(fileHash);
+		if (!endpointHash) {
+			return {
+				success: false,
+				reply: "Cannot fetch game data - endpoint hash!"
+			};
+		}
+
 		const response = await sb.Got("GenericAPI", {
-			url: "https://howlongtobeat.com/api/search",
+			url: `https://howlongtobeat.com/api/search/${endpointHash}`,
 			method: "POST",
+			throwHttpErrors: false,
 			headers: {
 				Referer: "https://howlongtobeat.com"
 			},
@@ -46,6 +127,14 @@ module.exports = {
 			}
 		});
 
+		if (!response.ok) {
+			await sb.Cache.setByPrefix(HLTB_ENDPOINT_HASH_KEY, null);
+			return {
+				success: false,
+				reply: "Could not fetch game data! Resetting cache - try again, please."
+			};
+		}
+
 		// 	main: gameData.comp_main_count,
 		// 	plus: gameData.comp_plus_count,
 		// 	full: gameData.comp_100_count,
@@ -65,7 +154,6 @@ module.exports = {
 			full: sb.Utils.round(gameData.comp_100 / 3600, 1),
 			all: sb.Utils.round(gameData.comp_all / 3600, 1)
 		};
-
 
 		const url = `https://howlongtobeat.com/game/${gameData.game_id}`;
 		return {

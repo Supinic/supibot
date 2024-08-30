@@ -1,0 +1,48 @@
+name: "supibot"
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    volumes:
+      - ./.db:/var/lib/mysql
+      - type: bind
+        source: ./db-init.sql
+        target: /docker-entrypoint-initdb.d/db-init.sql
+    ports:
+      - "3333:3306"
+    environment:
+      - MARIADB_RANDOM_ROOT_PASSWORD=1
+      - MARIADB_PASSWORD=supibot
+      - MARIADB_USER=supibot
+  redis:
+    image: redis
+    restart: unless-stopped
+  supibot:
+    build: .
+    ports:
+      - "9229:9229"
+    links:
+      - db
+      - redis
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - type: bind
+        source: <path_to_supibot_repository>/config.json
+        target: /home/supibot/config.json
+    restart: unless-stopped
+    environment:
+      #- "DEBUG_MODE=1"
+      - "MARIA_HOST=db"
+      - "MARIA_USER=supibot"
+      - "MARIA_PASSWORD=supibot"
+      - "REDIS_CONFIGURATION=redis"
+      - "INITIAL_PLATFORM=twitch"
+      #- "INITIAL_PLATFORM=discord"
+      - "INITIAL_TWITCH_CHANNEL=<INITIAL_TWITCH_CHANNEL>"
+      - "TWITCH_CLIENT_ID=<your_client_id>"
+      - "TWITCH_CLIENT_SECRET=<your_client_secret>"
+      - "TWITCH_REFRESH_TOKEN=<your_refresh_token>"
+      #- "DISCORD_BOT_TOKEN=<your_discord_token>"
+      - "SUPIBOT_API_PORT=<preferred_api_port>"

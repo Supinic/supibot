@@ -14,7 +14,7 @@ module.exports = {
 	],
 	execute: async (context, options = {}) => {
 		const { channelData, subcommand } = options;
-		
+
 		if (channelData.Platform.Name !== "twitch") {
 			return {
 				success: false,
@@ -76,7 +76,7 @@ module.exports = {
 		else if (messageResponse.statusCode === 403) {
 			return {
 				success: false,
-				reply: `I could not rejoin channel channel "${channelData.Name}"! Make sure to either permit me via Supinic's website or set me as a moderator.`
+				reply: `I could not rejoin channel channel "${channelData.Name}"! Make sure to either permit me via Supinic's website https://supinic.com/bot/twitch-auth or set me as a moderator.`
 			};
 		}
 		else if (messageResponse.statusCode === 409) {

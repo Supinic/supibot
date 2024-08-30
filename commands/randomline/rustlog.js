@@ -12,7 +12,7 @@ const { instances } = config.rustlog;
 
 const getChannelLoggingInstances = async function () {
 	const data = await sb.Cache.getByPrefix(instancesCacheKey);
-	if (data) {
+	if (data && Object.keys(data).length !== 0) {
 		return data;
 	}
 
@@ -72,7 +72,7 @@ const getInstance = async function (channelID) {
 
 const isSupported = async function (channelID) {
 	const list = await getSupportedChannelList();
-	if (list === null) {
+	if (list === null || Object.keys(list).length === 0) {
 		return null;
 	}
 

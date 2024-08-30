@@ -5,9 +5,6 @@ export const definition = {
 		if (!sb.Config.has("TWITCH_CLIENT_ID", true)) {
 			throw new Error("Helix sb.Got instance cannot initialize - missing client-id");
 		}
-		else if (!sb.Config.has("TWITCH_OAUTH", true)) {
-			throw new Error("Helix sb.Got instance cannot initialize - missing token");
-		}
 
 		return {
 			prefixUrl: "https://api.twitch.tv/helix",

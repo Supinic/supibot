@@ -4356,9 +4356,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supi-core@https://github.com/supinic/supi-core":
+supi-core@supinic/supi-core:
   version: 3.1.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=a0230af857e3125341b1f792fd25c1aa5153bc91"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=96361cb7d9d28855424bfd1230cf6785b7215dc1"
   dependencies:
     cheerio: "npm:^1.0.0-rc.12"
     duration-parser: "github:supinic/duration-parser"
@@ -4367,16 +4367,16 @@ __metadata:
     mariadb: "npm:^3.2.2"
     prom-client: "npm:^15.0.0"
     random-js: "npm:^2.1.0"
-  checksum: 10c0/bd6ca013ef0e83a8791c5eec3be5c65cf248a6fc861076eed4859bb8c20f3e44fa00a7857393e2edaf217bb75db5b60f00568018ced2187176824dd44b24e58a
+  checksum: 10c0/0059c46974c64faa9f0af24f92a6173c83fd1a31ef22a447dd75b28e4aed7f6625a6265d1c9efc53c09018d53ce3faea40e7cd344cb5285c3d31d994daccf313
   languageName: node
   linkType: hard
 
 "supi-db-init@https://github.com/supinic/supi-db-init":
   version: 1.0.0
-  resolution: "supi-db-init@https://github.com/supinic/supi-db-init.git#commit=4633c6c83b8866aa47d409f327eff3c27ce99394"
+  resolution: "supi-db-init@https://github.com/supinic/supi-db-init.git#commit=dd8cbaa62375c749b8fd221845b07b9dba5586a4"
   dependencies:
     mariadb: "npm:^3.0.0"
-  checksum: 10c0/ed4830f9ed9369273445b6e50e4cff9355b50f342c6a496abcbedbf32927ecc39668f575a451294a105252b57608cc94c6e4e701989f13a8dd8b8ec04f60b721
+  checksum: 10c0/57f9b191317e15917cd89bbcec8265943559a5ea1a566023291dbb0d802656b42b60bf8f88e0a9cf130f82cb9e002f3d371047d28392ce2df9193afb4a90ae20
   languageName: node
   linkType: hard
 
@@ -4401,11 +4401,10 @@ __metadata:
     mocha: "npm:^10.5.2"
     nyc: "npm:^17.0.0"
     rss-parser: "npm:^3.13.0"
-    supi-core: "https://github.com/supinic/supi-core"
+    supi-core: supinic/supi-core
     supi-db-init: "https://github.com/supinic/supi-db-init"
     track-link-parser: "https://github.com/supinic/track-link-parser"
     transliteration: "npm:^2.3.5"
-    typescript: "npm:^5.5.4"
     vm2: "npm:^3.9.19"
     ws: "npm:^8.17.1"
   languageName: unknown
@@ -4581,26 +4580,6 @@ __metadata:
   dependencies:
     is-typedarray: "npm:^1.0.0"
   checksum: 10c0/4ac5b7a93d604edabf3ac58d3a2f7e07487e9f6e98195a080e81dbffdc4127817f470f219d794a843b87052cedef102b53ac9b539855380b8c2172054b7d5027
-  languageName: node
-  linkType: hard
-
-"typescript@npm:^5.5.4":
-  version: 5.5.4
-  resolution: "typescript@npm:5.5.4"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 10c0/422be60f89e661eab29ac488c974b6cc0a660fb2228003b297c3d10c32c90f3bcffc1009b43876a082515a3c376b1eefcce823d6e78982e6878408b9a923199c
-  languageName: node
-  linkType: hard
-
-"typescript@patch:typescript@npm%3A^5.5.4#optional!builtin<compat/typescript>":
-  version: 5.5.4
-  resolution: "typescript@patch:typescript@npm%3A5.5.4#optional!builtin<compat/typescript>::version=5.5.4&hash=379a07"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 10c0/73409d7b9196a5a1217b3aaad929bf76294d3ce7d6e9766dd880ece296ee91cf7d7db6b16c6c6c630ee5096eccde726c0ef17c7dfa52b01a243e57ae1f09ef07
   languageName: node
   linkType: hard
 

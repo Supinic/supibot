@@ -11,3 +11,4 @@ build
 docker-compose.yml
 docker-compose.yaml
 compose.yaml
+.db

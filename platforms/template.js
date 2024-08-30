@@ -1,3 +1,4 @@
+const { createMessageLoggingTable } = require("../utils/create-db-table");
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
 class Platform {
@@ -18,6 +19,8 @@ class Platform {
 	supportsMeAction = false;
 	dynamicChannelAddition = false;
 	#userMessagePromises = new Map();
+
+	#privateMessagesTablePromise = null;
 
 	/** @type {Platform[]} */
 	static list = [];
@@ -461,6 +464,16 @@ class Platform {
 		return null;
 	}
 
+	setupLoggingTable () {
+		if (this.#privateMessagesTablePromise) {
+			return this.#privateMessagesTablePromise;
+		}
+
+		const name = this.privateMessageLoggingTableName;
+		this.#privateMessagesTablePromise = createMessageLoggingTable(name);
+		return this.#privateMessagesTablePromise;
+	}
+
 	restart () {}
 
 	destroy () {}
@@ -500,18 +513,23 @@ class Platform {
 	}
 
 	static create (type, config) {
-		console.time(`Platform framework: ${type}`);
+		let InstancePlatform;
+		try {
+			InstancePlatform = require(`./${type}.js`);
+		}
+		catch (e) {
+			console.log(`No file found for platform "${type}", creating generic platform`);
+			return new Platform(type, config);
+		}
+
 		let instance;
 		try {
-			const InstancePlatform = require(`./${type}.js`);
 			instance = new InstancePlatform(config);
 		}
 		catch (e) {
-			console.log(`No platform file found for ${type}, creating generic platform`);
-			instance = new Platform(config.type, config);
+			console.error(`An error occured while instantiating platform "${type}", skipping:\n`, e);
 		}
 
-		console.timeEnd(`Platform framework: ${type}`);
 		return instance;
 	}
 }

@@ -22,7 +22,7 @@ const ignoredChannelTypes = [
 
 const GLOBAL_EMOTE_ALLOWED_REGEX = /[A-Z]/;
 const DEFAULT_LOGGING_CONFIG = {
-	messages: true,
+	messages: false,
 	whispers: true
 };
 const DEFAULT_PLATFORM_CONFIG = {
@@ -67,7 +67,9 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 			logging: DEFAULT_LOGGING_CONFIG,
 			platform: DEFAULT_PLATFORM_CONFIG
 		});
+	}
 
+	async connect () {
 		if (!this.selfId) {
 			throw new sb.Error({
 				message: "Discord user ID (selfId) has not been configured"
@@ -78,9 +80,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 				message: "Discord bot token has not been configured"
 			});
 		}
-	}
 
-	async connect () {
 		this.client = new Client({
 			intents: [
 				GatewayIntentBits.Guilds,
@@ -813,6 +813,15 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		const channel = await this.client.channels.fetch(channelData.Name);
 		if (!channel || !channel.guild) {
 			return false;
+		}
+
+		const roles = await channel.guild.roles.fetch();
+		const ambassadorRole = roles.find(i => i.name.toLowerCase() === "supibot ambassador");
+		if (ambassadorRole) {
+			const member = await channel.guild.members.fetch(userData.Discord_ID);
+			if (member.roles.cache.has(ambassadorRole.id)) {
+				return true;
+			}
 		}
 
 		const permissions = channel.permissionsFor(userData.Discord_ID);

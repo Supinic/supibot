@@ -64,7 +64,7 @@ const cryptoGamePriceUpdate = async () => {
 
 		const row = await sb.Query.getRow("crypto_game", "Asset");
 		await row.load(code, true);
-		if (!row.values.Code) {
+		if (!row.loaded) {
 			row.values.Code = code;
 		}
 

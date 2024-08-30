@@ -1,4 +1,5 @@
 const LanguageCodes = require("language-iso-codes");
+const LANGUAGE_LIST_KEY = "google-supported-language-list";
 
 const execute = async function (context, query) {
 	if (context.params.formality) {
@@ -23,16 +24,24 @@ const execute = async function (context, query) {
 		}
 
 		if (option === "to" && lang === "random") {
-			let codeList = await this.getCacheData("supported-language-list");
+			let codeList = await sb.Cache.getByPrefix(LANGUAGE_LIST_KEY);
 			if (!codeList) {
 				const html = await sb.Got("https://translate.google.com/").text();
 				const $ = sb.Utils.cheerio(html);
+
 				const codes = Array.from($("[data-language-code]")).map(i => i.attribs["data-language-code"]);
-				const list = new Set(codes.filter(i => i !== "auto" && !i.includes("-")));
+				const list = new Set(codes.filter(i => {
+					if (i === "auto" || i.includes("-")) {
+						return false;
+					}
+
+					return Boolean(LanguageCodes.get(i));
+				}));
 
 				codeList = Array.from(list);
-				await this.setCacheData("supported-language-list", codeList, {
-					expiry: 7 * 864e5 // 7 days
+
+				await sb.Cache.setByPrefix(LANGUAGE_LIST_KEY, codeList, {
+					expiry: 864e5 // 1 day
 				});
 			}
 

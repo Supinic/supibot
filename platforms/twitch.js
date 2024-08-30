@@ -25,7 +25,7 @@ const {
 const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
 const WRITE_MODE_MESSAGE_DELAY = 1500;
-const NO_EVENT_RECONNECT_TIMEOUT = 5000;
+const NO_EVENT_RECONNECT_TIMEOUT = 10000; // @todo move to config
 const LIVE_STREAMS_KEY = "twitch-live-streams";
 const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
 const BAD_MESSAGE_RESPONSE = "A message that was about to be posted violated this channel's moderation settings.";
@@ -83,6 +83,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	#websocketLatency = null;
 	#previousMessageMeta = new Map();
 	#userCommandSpamPrevention = new Map();
+	#unsuccessfulRenameChannels = new Set();
 
 	debug = require("./twitch-utils.js");
 
@@ -91,7 +92,9 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			logging: DEFAULT_LOGGING_CONFIG,
 			platform: DEFAULT_PLATFORM_CONFIG
 		});
+	}
 
+	async connect (options = {}) {
 		if (!this.selfName) {
 			throw new sb.Error({
 				message: "Twitch platform does not have the bot's name configured"
@@ -107,9 +110,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				message: "Twitch client ID (Config/TWITCH_CLIENT_ID) has not been configured"
 			});
 		}
-	}
 
-	async connect (options = {}) {
 		await initTokenCheckInterval();
 		await getAppAccessToken();
 		await getConduitId();
@@ -596,7 +597,12 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			return;
 		}
 
+		/** @type {Channel | null} */
 		const channelData = sb.Channel.get(channelName, this) ?? sb.Channel.getBySpecificId(channelId, this);
+		if (channelData && channelData.Name !== channelName && !this.#unsuccessfulRenameChannels.has(channelId)) {
+			await this.fixChannelRename(channelData, channelName, channelId);
+		}
+
 		if (!channelData || channelData.Mode === "Inactive") {
 			return;
 		}
@@ -773,6 +779,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		if (!channelData) {
 			return;
 		}
+
+		await sb.Logger.log("Twitch.Sub", JSON.stringify({ event }));
 
 		if (subscription === "channel.subscribe") { // First time subscriber
 			channelData.events.emit("subscription", {
@@ -1293,6 +1301,37 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		});
 
 		this.client.ping();
+	}
+
+	async fixChannelRename (channelData, twitchChanelName, channelId) {
+		const existingChannelName = await sb.Query.getRecordset(rs => rs
+			.select("Name")
+			.from("chat_data", "Channel")
+			.where("Name = %s", twitchChanelName)
+			.where("Platform = %n", this.ID)
+			.single()
+			.flat("Name")
+		);
+
+		const oldName = channelData.Name;
+		if (!existingChannelName) {
+			await channelData.saveProperty("Name", twitchChanelName);
+			await sb.Logger.log(
+				"Twitch.Success",
+				`Name mismatch fixed: ${channelId}: Old=${oldName} New=${twitchChanelName}`
+			);
+		}
+		else {
+			this.#unsuccessfulRenameChannels.add(channelId);
+			await sb.Logger.log(
+				"Twitch.Warning",
+				`Name conflict detected: ${channelId}: Old=${oldName} New=${twitchChanelName}`
+			);
+		}
+
+		return {
+			exists: Boolean(existingChannelName)
+		};
 	}
 
 	static async fetchAccountChallengeStatus (userData, twitchID) {

@@ -16,7 +16,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10000,
 	Description: "Fetches the subscription data for a given user on a given channel on Twitch.",
-	Flags: ["mention"],
+	Flags: ["mention", "pipe"],
 	Params: null,
 	Whitelist_Response: null,
 	Code: async function subAge (context, user, channel) {

@@ -1,4 +1,5 @@
 const Platform = require("../platforms/template.js");
+const { createMessageLoggingTable } = require("../utils/create-db-table.js");
 
 module.exports = class Channel extends require("./template.js") {
 	static redisPrefix = "sb-channel";
@@ -6,7 +7,7 @@ module.exports = class Channel extends require("./template.js") {
 	static uniqueIdentifier = "ID";
 	static data = new Map();
 
-	#setupPromise = null;
+	#setupLoggingTablePromise = null;
 
 	constructor (data) {
 		super();
@@ -33,50 +34,18 @@ module.exports = class Channel extends require("./template.js") {
 		this.events = new EventEmitter();
 	}
 
-	setup () {
-		if (!this.Platform.Logging || !this.Platform.Logging.messages) {
-			return Promise.resolve(false);
-		}
-		else if (!this.Logging.has("Lines")) {
-			return Promise.resolve(false);
+	setupLoggingTable () {
+		if (this.#setupLoggingTablePromise) {
+			return this.#setupLoggingTablePromise;
 		}
 
-		if (this.#setupPromise) {
-			return this.#setupPromise;
-		}
+		const prefix = (this.Platform.Name === "twitch")
+			? ""
+			: `${this.Platform.getFullName("_")}_`;
 
-		this.#setupPromise = (async () => {
-			const databasePresent = await sb.Query.isDatabasePresent("chat_line");
-			if (!databasePresent) {
-				return false;
-			}
-
-			const prefix = (this.Platform.Name === "twitch")
-				? ""
-				: `${this.Platform.getFullName("_")}_`;
-
-			const name = prefix + this.Name.toLowerCase();
-			const alreadySetup = await sb.Query.isTablePresent("chat_line", name);
-			if (alreadySetup) {
-				return false;
-			}
-
-			// Set up logging table
-			await sb.Query.raw([
-				`CREATE TABLE IF NOT EXISTS chat_line.\`${name}\` (`,
-				"`ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,",
-				`\`Platform_ID\` VARCHAR(100) NOT NULL,`,
-				`\`Historic\` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,`,
-				`\`Text\` TEXT NOT NULL,`,
-				"`Posted` DATETIME(3) NULL DEFAULT NULL,",
-				"PRIMARY KEY (`ID`)",
-				") COLLATE=`utf8mb4_general_ci` ENGINE=InnoDB AUTO_INCREMENT=1 PAGE_COMPRESSED=1;"
-			].join(" "));
-
-			return true;
-		})();
-
-		return this.#setupPromise;
+		const name = `${prefix}${this.Name.toLowerCase()}`;
+		this.#setupLoggingTablePromise = createMessageLoggingTable(name);
+		return this.#setupLoggingTablePromise;
 	}
 
 	waitForUserMessage (userID, options) {
@@ -426,7 +395,7 @@ module.exports = class Channel extends require("./template.js") {
 		const platformMap = Channel.getPlatformMap(channelData.Platform);
 		platformMap.set(channelName, channelData);
 
-		await channelData.setup();
+		await channelData.setupLoggingTable();
 		return channelData;
 	}
 

@@ -29,6 +29,16 @@ Follow [the guide](docs/setup.md) if you are interested, and contact me if you h
 
 Also check out the [modules configuration file](./config-default.json) for a brief guide on how to enable/disable a specific set of commands or other modules. 
 
+## Ambassadors
+Owners of channels (or Discord servers) have elevated rights to manage Supibot. 
+They are allowed to e.g. disable specific commands, ban users from specific commands or ban them outright - all in the scope of their channel/server.
+
+If the channel/server owner wishes to delegate this power to one or more users, they should:
+- For Discord, either:
+  - appoint the user as an administrator
+  - create a role named "Supibot Ambassador" and assign the user to it
+- For other platforms: create a suggestion (`$suggest` command) explaining that they wish to assign an ambassador(s) in a channel. Make sure to list their names and your channel's name
+
 ## DankChat integration
 The [DankChat](https://github.com/flex3r/DankChat) mobile application for Twitch chat uses Supibot's API in order to hint its commands in any channel Supibot is actively in!
 It's a wonderful app to use on the go, and I endorse it.

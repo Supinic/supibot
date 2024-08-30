@@ -17,6 +17,7 @@ const analyze = (script) => {
 	const suspiciousNodes = new Set();
 	const trackedNodes = new Set(tree.body);
 
+	let hasNewPromise = false;
 	for (const node of trackedNodes) {
 		for (const potentialNode of Object.values(node)) {
 			if (potentialNode) {
@@ -24,8 +25,19 @@ const analyze = (script) => {
 			}
 		}
 
-		if (node instanceof Node && bannedAwaitStatements.includes(node.type)) {
-			suspiciousNodes.add(node);
+		if (node instanceof Node) {
+			if (bannedAwaitStatements.includes(node.type)) {
+				suspiciousNodes.add(node);
+
+				if (hasNewPromise) {
+					return { // Heuristic - using any kind of loop while creating a new Promise in the same script is suspicious
+						illegalAsync: true
+					};
+				}
+			}
+			if (node.type === "NewExpression" && node.callee?.name === "Promise") {
+				hasNewPromise = true;
+			}
 		}
 
 		trackedNodes.delete(node);
