@@ -3,7 +3,7 @@ const preventTomfoolery = () => {
 	const NOOP = () => {};
 	Function.prototype.constructor = NOOP;
 
-	const AsyncFunctionPrototype = Object.getPrototypeOf(async function () {})
+	const AsyncFunctionPrototype = Object.getPrototypeOf(async () => {});
 	Object.defineProperty(AsyncFunctionPrototype, "constructor", { value: NOOP });
 };
 
