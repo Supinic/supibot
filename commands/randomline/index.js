@@ -80,6 +80,9 @@ module.exports = {
 
 				result = await Rustlog.getRandomUserLine(channelID, userID);
 			}
+			else if (context.params.userID) {
+				result = await Rustlog.getRandomUserLine(channelID, context.params.userID);
+			}
 			else {
 				result = await Rustlog.getRandomChannelLine(channelID);
 			}
@@ -96,6 +99,9 @@ module.exports = {
 			const group = connectedChannelGroups.find(i => i.includes(context.channel.ID));
 			if (group) {
 				result = await DatabaseLogs.fetchGroupUserRandomLine(group, targetUser);
+			}
+			else if (context.params.userID) {
+				result = await DatabaseLogs.fetchUserRandomLine(channelID, context.params.userID);
 			}
 			else {
 				result = await DatabaseLogs.fetchUserRandomLine(targetUser, context.channel);
@@ -166,6 +172,10 @@ module.exports = {
 
 		`<code>${prefix}rl (user) textOnly:true</code>`,
 		`Will only reply with the message, ignoring the "(time ago) (name):" part`,
+		""
+
+		`<code>${prefix}rl userID:(user id)</code>`,
+		`Uses a user ID directly instead of providing a name. Useful for looking up messages of deactivated accounts etc.`,
 		""
 	])
 };
