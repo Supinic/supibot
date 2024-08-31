@@ -10,7 +10,7 @@ const NO_RESPONSE_FILTER_TYPES = [
 	"Arguments",
 	"Blacklist",
 	"Online-only",
-	"Offline-only",
+	"Offline-only"
 ];
 
 module.exports = {

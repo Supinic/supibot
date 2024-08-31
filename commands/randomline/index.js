@@ -96,13 +96,16 @@ module.exports = {
 					reply: "I have not seen that user before, so you cannot check their random lines!"
 				};
 			}
+			else if (context.params.userID) {
+				return {
+					success: false,
+					reply: "Cannot fetch logs by user ID in this channel!"
+				};
+			}
 
 			const group = connectedChannelGroups.find(i => i.includes(context.channel.ID));
 			if (group) {
 				result = await DatabaseLogs.fetchGroupUserRandomLine(group, targetUser);
-			}
-			else if (context.params.userID) {
-				result = await DatabaseLogs.fetchUserRandomLine(channelID, context.params.userID);
 			}
 			else {
 				result = await DatabaseLogs.fetchUserRandomLine(targetUser, context.channel);
@@ -173,7 +176,7 @@ module.exports = {
 
 		`<code>${prefix}rl (user) textOnly:true</code>`,
 		`Will only reply with the message, ignoring the "(time ago) (name):" part`,
-		""
+		"",
 
 		`<code>${prefix}rl userID:(user id)</code>`,
 		`Uses a user ID directly instead of providing a name. Useful for looking up messages of deactivated accounts etc.`,
