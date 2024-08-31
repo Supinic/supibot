@@ -10,7 +10,8 @@ module.exports = {
 	Description: "Fetches a random line from the current channel. If a user is specified, fetches a random line from that user only. \"rq\" only chooses from your own lines.",
 	Flags: ["block","external-input","opt-out","pipe"],
 	Params: [
-		{ name: "textOnly", type: "boolean" }
+		{ name: "textOnly", type: "boolean" },
+		{ name: "userID", type: "string" }
 	],
 	Whitelist_Response: null,
 	Code: (async function randomLine (context, user) {
