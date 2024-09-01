@@ -1,3 +1,5 @@
+import type * as core from "supi-core";
+
 export declare type Message = string;
 export declare type Emote = {
     ID: string;
@@ -17,7 +19,7 @@ export declare interface GenericFlagsObject {
 export declare type Without<T, U> = {
     [P in Exclude<keyof T, keyof U>]?: never
 };
-export declare type XOR <T, U> = (T | U) extends object
+export declare type XOR<T, U> = (T | U) extends object
     ? (Without<T, U> & U) | (Without<U, T> & T)
     : T | U;
 export declare type OnlyKeysOfType<T, U> = {
@@ -26,3 +28,13 @@ export declare type OnlyKeysOfType<T, U> = {
 export declare type TypeExtract<T, U> = {
     [P in OnlyKeysOfType<T, U>]: U;
 };
+
+declare var sb: {
+    Date: core.Date,
+    Error: core.Error,
+    Promise: core.Promise,
+
+    Config: core.Config,
+    Got: core.Got,
+    // TODO add others
+}

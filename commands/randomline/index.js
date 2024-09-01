@@ -10,7 +10,8 @@ module.exports = {
 	Description: "Fetches a random line from the current channel. If a user is specified, fetches a random line from that user only. \"rq\" only chooses from your own lines.",
 	Flags: ["block","external-input","opt-out","pipe"],
 	Params: [
-		{ name: "textOnly", type: "boolean" }
+		{ name: "textOnly", type: "boolean" },
+		{ name: "userID", type: "string" }
 	],
 	Whitelist_Response: null,
 	Code: (async function randomLine (context, user) {
@@ -80,6 +81,9 @@ module.exports = {
 
 				result = await Rustlog.getRandomUserLine(channelID, userID);
 			}
+			else if (context.params.userID) {
+				result = await Rustlog.getRandomUserLine(channelID, context.params.userID);
+			}
 			else {
 				result = await Rustlog.getRandomChannelLine(channelID);
 			}
@@ -90,6 +94,12 @@ module.exports = {
 				return {
 					success: false,
 					reply: "I have not seen that user before, so you cannot check their random lines!"
+				};
+			}
+			else if (context.params.userID) {
+				return {
+					success: false,
+					reply: "Cannot fetch logs by user ID in this channel!"
 				};
 			}
 
@@ -166,6 +176,10 @@ module.exports = {
 
 		`<code>${prefix}rl (user) textOnly:true</code>`,
 		`Will only reply with the message, ignoring the "(time ago) (name):" part`,
+		"",
+
+		`<code>${prefix}rl userID:(user id)</code>`,
+		`Uses a user ID directly instead of providing a name. Useful for looking up messages of deactivated accounts etc.`,
 		""
 	])
 };

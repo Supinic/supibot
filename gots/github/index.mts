@@ -1,18 +1,20 @@
+import { Config } from "supi-core";
+
 export const definition = {
 	name: "GitHub",
 	optionsType: "function",
 	options: (() => {
-		if (!process.env.API_GITHUB_KEY) {
-			console.log("No GitHub key configured, Got will not use Authorization header (API_GITHUB_KEY)");
+		if (!Config.has("API_GITHUB_KEY", true)) {
 			return {
 				prefixUrl: "https://api.github.com"
 			};
 		}
 
+		const token = Config.get("API_GITHUB_KEY", true);
 		return {
 			prefixUrl: "https://api.github.com",
 			headers: {
-				Authorization: `Bearer ${process.env.API_GITHUB_KEY}`
+				Authorization: `Bearer ${token}`
 			}
 		};
 	}),

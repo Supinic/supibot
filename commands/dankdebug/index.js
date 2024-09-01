@@ -1,4 +1,5 @@
 const { VM } = require("vm2");
+const { preventTomfoolery } = require("./anti-tomfoolery.js");
 
 const PREFIX_SAFETY_CODE = `Object.defineProperty(Promise.prototype, "constructor", { writable: false }); Object.freeze(Promise.prototype); void 0;`;
 const MAXIMUM_DATA_LENGTH = 1_000_000;
@@ -34,6 +35,9 @@ module.exports = {
 		{ name: "importGist", type: "string" }
 	],
 	Whitelist_Response: null,
+	initialize: () => {
+		preventTomfoolery();
+	},
 	Code: (async function dankDebug (context, ...args) {
 		let scriptArgs;
 		if (context.params.arguments) {
@@ -55,7 +59,7 @@ module.exports = {
 			}
 		}
 
-		let importedText;
+		let importedText = "\n";
 		if (context.params.importGist) {
 			if (context.params.importGist.includes(" ")) {
 				return {
@@ -87,6 +91,8 @@ module.exports = {
 			if (!importedText.endsWith(";") && !importedText.endsWith(",")) {
 				importedText += ";";
 			}
+
+			importedText += "\n";
 		}
 
 		let result;
@@ -94,18 +100,14 @@ module.exports = {
 		const string = args.join(" ");
 
 		if (context.params.function) {
-			script = `${PREFIX_SAFETY_CODE}\n${context.params.function}`;
+			script = `${PREFIX_SAFETY_CODE}\n${importedText}${context.params.function}`;
 			scriptArgs = [...args];
 		}
 		else if (!string.includes("return")) { // @todo refactor this to use acorn heuristic for ReturnStatement
-			script = `${PREFIX_SAFETY_CODE}\n${string}`;
+			script = `${PREFIX_SAFETY_CODE}\n${importedText}${string}`;
 		}
 		else {
-			script = `(async () => {\n${PREFIX_SAFETY_CODE}\n${string}\n})()`;
-		}
-
-		if (importedText) {
-			script = `${importedText}\n${script}`;
+			script = `${PREFIX_SAFETY_CODE}\n${importedText}(async () => {\n${string}\n})()`;
 		}
 
 		const { analyze } = require("./acorn-heuristic.js");

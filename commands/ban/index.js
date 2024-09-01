@@ -6,6 +6,12 @@ const AVAILABLE_BAN_FILTER_TYPES = [
 	"Offline-only",
 	"Reminder-prevention"
 ];
+const NO_RESPONSE_FILTER_TYPES = [
+	"Arguments",
+	"Blacklist",
+	"Online-only",
+	"Offline-only"
+];
 
 module.exports = {
 	Name: "ban",
@@ -22,6 +28,7 @@ module.exports = {
 		{ name: "index", type: "number" },
 		{ name: "invocation", type: "string" },
 		{ name: "multiplier", type: "number" },
+		{ name: "noResponse", type: "boolean" },
 		{ name: "type", type: "string" },
 		{ name: "string", type: "string" },
 		{ name: "user", type: "string" }
@@ -165,8 +172,27 @@ module.exports = {
 			}
 
 			if (channelPermissions) {
-				options.Response = "Reason";
-				options.Reason = "Banned in this channel.";
+				if (context.params.noResponse) {
+					if (!options.Channel) {
+						return {
+							success: false,
+							reply: "Cannot create a user-specific ban with no response!"
+						};
+					}
+					else if (!NO_RESPONSE_FILTER_TYPES.includes(type)) {
+						return {
+							success: false,
+							reply: `Cannot create a no-response ban of type ${type}!`
+						};
+					}
+
+					options.Response = "None";
+					options.Reason = null;
+				}
+				else {
+					options.Response = "Reason";
+					options.Reason = "Banned in this channel.";
+				}
 			}
 		}
 
@@ -416,6 +442,12 @@ module.exports = {
 
 			`<code>${prefix}ban user:test</code>`,
 			"Bans user <u>test</u> from executing <u>any</u> commands in the current channel.",
+			"",
+
+			`<code>${prefix}ban <u>noResponse:true</u> (...)</code>`,
+			`If the <code>noResponse</code> parameter is set, this will make it so that the bot will not reply in the case this ban is triggered.`,
+			"E.g. setting a offline-only ban for a command will make it so when anyone tries use the command while the channel is online, the bot will simply not rpely.",
+			"Note: This is not applicable to user-specific bans. In those cases, the user must be reminded that they are indeed banned.",
 			"",
 
 			`<code>${prefix}ban type:offline-only (...)</code>`,

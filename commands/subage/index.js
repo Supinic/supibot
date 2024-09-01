@@ -129,7 +129,7 @@ module.exports = {
 
 			return {
 				success: false,
-				reply: `${channelNameString} currently hiding subscription statuses!`
+				reply: `You are currently hiding subscription statuses!`
 			};
 		}
 
