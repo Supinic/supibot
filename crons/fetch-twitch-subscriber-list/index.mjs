@@ -36,8 +36,8 @@ export const definition = {
 
 		const authToken = identityResponse.body.access_token;
 		await Promise.all([
-			sb.Config.set("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN", authToken),
-			sb.Config.set("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN", identityResponse.body.refresh_token)
+			sb.Config.set("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN", authToken, sb.Query),
+			sb.Config.set("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN", identityResponse.body.refresh_token, sb.Query)
 		]);
 
 		const subsResponse = await sb.Got("GenericAPI", {

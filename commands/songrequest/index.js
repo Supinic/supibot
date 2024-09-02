@@ -413,7 +413,7 @@ module.exports = {
 		}
 		catch (e) {
 			console.warn("sr error", e);
-			await sb.Config.set("SONG_REQUESTS_STATE", "off");
+			await sb.Config.set("SONG_REQUESTS_STATE", "off", sb.Query);
 			return {
 				reply: `The desktop listener is currently turned off. Turning song requests off.`
 			};

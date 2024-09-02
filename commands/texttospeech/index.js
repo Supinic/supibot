@@ -120,7 +120,7 @@ module.exports = {
 			result = (response.body === "true");
 		}
 		catch (e) {
-			await sb.Config.set("TTS_ENABLED", false);
+			await sb.Config.set("TTS_ENABLED", false, sb.Query);
 
 			return {
 				reply: "TTS Listener encountered an error or is turned on. Turning off text to speech!"

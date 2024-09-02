@@ -89,7 +89,7 @@ module.exports = {
 			success = (response.ok);
 		}
 		catch (e) {
-			await sb.Config.set("PLAYSOUNDS_ENABLED", false);
+			await sb.Config.set("PLAYSOUNDS_ENABLED", false, sb.Query);
 
 			return {
 				reply: "The desktop listener is not currently running, turning off playsounds!"

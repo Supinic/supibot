@@ -53,7 +53,7 @@ export const definition = {
 
 			if (statusCode === 200) {
 				finalClientID = clientID;
-				await sb.Config.set("SOUNDCLOUD_CLIENT_ID", clientID);
+				await sb.Config.set("SOUNDCLOUD_CLIENT_ID", clientID, sb.Query);
 				break;
 			}
 		}

@@ -116,10 +116,10 @@ module.exports = class VLCSingleton {
 			if (sb.Config.has("SONG_REQUESTS_VLC_PAUSED", false)) {
 				const currentPauseStatus = sb.Config.get("SONG_REQUESTS_VLC_PAUSED");
 				if (currentPauseStatus && after.state === "playing") {
-					await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", false);
+					await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", false, sb.Query);
 				}
 				else if (!currentPauseStatus && after.state === "paused") {
-					await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", true);
+					await sb.Config.set("SONG_REQUESTS_VLC_PAUSED", true, sb.Query);
 				}
 			}
 

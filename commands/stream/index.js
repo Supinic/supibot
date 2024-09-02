@@ -19,7 +19,7 @@ module.exports = {
 		switch (type) {
 			case "tts": {
 				const value = (rest.shift() === "true");
-				sb.Config.set("TTS_ENABLED", value);
+				sb.Config.set("TTS_ENABLED", value, sb.Query);
 				return { reply: `Text to speech is now set to ${value}.` };
 			}
 
@@ -31,7 +31,7 @@ module.exports = {
 					};
 				}
 
-				sb.Config.set("TTS_TIME_LIMIT", limit);
+				sb.Config.set("TTS_TIME_LIMIT", limit, sb.Query);
 				return { reply: `Text to speech time limit is now set to ${limit} milliseconds.` };
 			}
 
@@ -43,14 +43,14 @@ module.exports = {
 					};
 				}
 
-				sb.Config.set("TTS_VOLUME", volume);
+				sb.Config.set("TTS_VOLUME", volume, sb.Query);
 				return { reply: `Text to speech volume is now set to ${volume}` };
 			}
 
 			case "ttsmulti":
 			case "multitts": {
 				const value = (rest.shift() === "true");
-				sb.Config.set("TTS_MULTIPLE_ENABLED", value);
+				sb.Config.set("TTS_MULTIPLE_ENABLED", value, sb.Query);
 				return { reply: `Concurrent text to speech is now set to ${value}` };
 			}
 
@@ -58,7 +58,7 @@ module.exports = {
 			case "playsounds":
 			case "playsound": {
 				const value = (rest.shift() === "true");
-				sb.Config.set("PLAYSOUNDS_ENABLED", value);
+				sb.Config.set("PLAYSOUNDS_ENABLED", value, sb.Query);
 				return { reply: `Play sounds are now set to ${value}` };
 			}
 
@@ -75,7 +75,7 @@ module.exports = {
 					sb.VideoLANConnector.client.stopRunning();
 				}
 
-				sb.Config.set("SONG_REQUESTS_STATE", value);
+				sb.Config.set("SONG_REQUESTS_STATE", value, sb.Query);
 				return { reply: `Song requests are now set to ${value}` };
 			}
 

@@ -27,7 +27,7 @@ module.exports = {
 			return;
 		}
 
-		await sb.Config.set("LATEST_NODE_JS_VERSION", latest.tag_name);
+		await sb.Config.set("LATEST_NODE_JS_VERSION", latest.tag_name, sb.Query);
 
 		const releaseDate = new sb.Date(latest.created_at).format("Y-m-d H:i");
 		return {

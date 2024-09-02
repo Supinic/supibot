@@ -86,7 +86,7 @@ export const definition = {
 				await row.save();
 			}
 
-			await sb.Config.set("SONG_REQUESTS_STATE", "off");
+			await sb.Config.set("SONG_REQUESTS_STATE", "off", sb.Query);
 			await sb.Query.isRecordUpdater(ru => ru
 				.from("chat_data", "Song_Request")
 				.set("Status", "Inactive")
