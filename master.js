@@ -80,7 +80,7 @@ const initializeCommands = async (config) => {
 		whitelist
 	} = config.modules.commands;
 
-	const { loadCommands } = await require("./commands/index.js");
+	const { loadCommands } = await require("./commands");
 	const commands = await loadCommands({
 		blacklist,
 		whitelist

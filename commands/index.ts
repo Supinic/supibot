@@ -1,7 +1,12 @@
-const loadCommands = (async (config) => {
-	const fs = require("fs/promises");
-	const path = require("node:path");
+import { readdir } from "fs/promises";
+import { join } from "node:path";
 
+type Config = {
+	blacklist?: string[];
+	whitelist?: string[];
+}
+
+const loadCommands = (async (config: Config) => {
 	const blacklist = config?.blacklist ?? [];
 	const whitelist = config?.whitelist ?? [];
 
@@ -9,7 +14,7 @@ const loadCommands = (async (config) => {
 		throw new Error("Cannot combine both blacklist and whitelist options");
 	}
 
-	const nodeList = await fs.readdir(__dirname, {
+	const nodeList = await readdir(__dirname, {
 		withFileTypes: true
 	});
 
@@ -29,23 +34,14 @@ const loadCommands = (async (config) => {
 		}
 
 		let definition;
-		const indexPath = path.join(__dirname, dir.name, "index.js");
+		const indexPath = join(__dirname, dir.name, "index.js");
 		try {
 			definition = require(indexPath);
+			definitions.push(definition);
 		}
 		catch (e) {
 			console.warn(`Could not load command ${dir.name}`, e);
 			failed.push(dir.name);
-		}
-
-		if (definition) {
-			const definitionFlags = definition.flags ?? definition.Flags ?? [];
-			if (config.skipArchivedCommands && definitionFlags.includes("archived")) {
-				skipped.push(definition);
-			}
-			else {
-				definitions.push(definition);
-			}
 		}
 	}
 

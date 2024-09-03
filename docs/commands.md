@@ -32,12 +32,11 @@ The directory can contain more files such as JSON data, modules or tests.
     - `null` if no flags are present
     - Otherwise, it is an array of strings, where each flag represents a flag set to true.
     - List of flags:
-        - `archived` The command has been archived and is no longer in use.
-        - `block` It is possible to use the [`block`](commands/block/index.js) command to block specific users from this command's execution on them.
+        - `block` It is possible to use the [`block`](../commands/block/index.js) command to block specific users from this command's execution on them.
         - `developer` Is not shown on the website command list, unless the logged in user is flagged as a developer.
         - `mention` Will mention users upon successful invocation.
-        - `opt-out` It is possible to use the [`optout`](commands/optout/index.js)` command to stop all users from executing this command on them.
-        - `pipe` This command can be use in the [`pipe`](commands/pipe/index.js)` meta-command.
+        - `opt-out` It is possible to use the [`optout`](../commands/optout/index.js)` command to stop all users from executing this command on them.
+        - `pipe` This command can be use in the [`pipe`](../commands/pipe/index.js)` meta-command.
         - `read-only` Command has no response, and as such will set no cooldowns.
         - `rollback` A transaction will be provided to the command, and it will automatically commit or rollback based on if it succeeds or not.
         - `skip-banphrase` Result reply will not be checked against any banphrases.
@@ -60,7 +59,7 @@ After figuring out that the user wants to invoke a command, each platform client
 This method is the backbone of (almost) all command execution performed in Supibot. 
 It will check whether a command exists in a given message, perform all additional parsing if needed, execute, handle all errors, and return to the platform client a string to reply with.
 
-### [`Command.checkAndExecute`](https://github.com/Supinic/supi-core/blob/master/classes/command.js)
+### [`Command.checkAndExecute`](../classes/command.js)
 
 Useful for creators of new platforms.
 In short, this method will determine whether a command invocation exists, and if it does, it attempts to execute given command with provided arguments.
