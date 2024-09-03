@@ -209,6 +209,17 @@
     "iso6393": "bel"
   },
   {
+    "group": "Afro-Asiatic",
+    "names": [
+      "berber",
+      "tamazight",
+      "amazigh"
+    ],
+    "iso6391": null,
+    "iso6392": "ber",
+    "iso6393": null
+  },
+  {
     "group": "Indo-European",
     "names": [
       "bengali",
