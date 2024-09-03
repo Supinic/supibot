@@ -2946,13 +2946,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"language-iso-codes@https://github.com/supinic/language-iso-codes":
-  version: 1.0.0
-  resolution: "language-iso-codes@https://github.com/supinic/language-iso-codes.git#commit=dc0e75b4f40978d5549fcf1da5243687c8445963"
-  checksum: 10c0/5544a74ed0fcbf06cfda0168527c28c19c303e76121401da3ce5fa5af5c020349997aef9b9493a51171e53f492ca187877f1c76e5d5d1654a6b5581d18e2f5f0
-  languageName: node
-  linkType: hard
-
 "levn@npm:^0.4.1":
   version: 0.4.1
   resolution: "levn@npm:0.4.1"
@@ -4397,7 +4390,6 @@ supi-core@supinic/supi-core:
     eslint: "npm:^8.52.0"
     eslint-plugin-unicorn: "npm:^49.0.0"
     irc-framework: "npm:^4.13.1"
-    language-iso-codes: "https://github.com/supinic/language-iso-codes"
     mocha: "npm:^10.5.2"
     nyc: "npm:^17.0.0"
     rss-parser: "npm:^3.13.0"

@@ -4,7 +4,7 @@ const User = require("./user.js");
 
 const pathModule = require("node:path");
 const CooldownManager = require("../utils/cooldown-manager.js");
-const LanguageCodes = require("language-iso-codes");
+const LanguageCodes = require("../utils/languages");
 
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 
