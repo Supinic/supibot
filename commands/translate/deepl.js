@@ -1,5 +1,4 @@
-const LanguageCodes = require("language-iso-codes");
-
+const LanguageCodes = require("../../utils/languages");
 const supportedLanguages = [
 	"bg",
 	"cs",

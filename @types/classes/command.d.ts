@@ -9,7 +9,7 @@ import { ClassTemplate } from "./template";
 import { Channel } from "./channel";
 import { Platform } from "../platforms/template";
 import { Permissions as UserPermissions, User } from "./user";
-import { Language } from "language-iso-codes";
+import { Language } from "../../utils/languages"
 
 declare type DiscordEmbedDefinition = {
     title: string;
