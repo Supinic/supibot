@@ -9,6 +9,7 @@ const {
 	// createChannelRaidSubscription,
 	createChannelOnlineSubscription,
 	createChannelOfflineSubscription,
+	fetchToken,
 	getExistingSubscriptions,
 	getConduitId,
 	getAppAccessToken,
@@ -101,6 +102,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			});
 		}
 		else if (!sb.Config.has("TWITCH_OAUTH", true)) {
+			await fetchToken();
+
 			throw new sb.Error({
 				message: "Twitch oauth token (Config/TWITCH_OAUTH) has not been configured"
 			});
