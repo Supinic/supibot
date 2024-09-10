@@ -1,4 +1,4 @@
-const LanguageCodes = require("language-iso-codes");
+const LanguageCodes = require("../../utils/languages");
 const { locales } = require("./tts-locales.json");
 const { TTS_ENABLED, TTS_MULTIPLE_ENABLED } = require("../../utils/shared-cache-keys.json");
 

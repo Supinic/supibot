@@ -12,16 +12,20 @@ catch {
 
 const { basePath } = config;
 const methods = {
-	prodUpdate: {
-		message: "yarn prod-update",
-		commands: ["yarn prod-update"]
-	},
 	pull: {
 		message: "git pull",
 		commands: [
 			`git -C ${basePath} checkout -- yarn.lock package.json`,
 			`git -C ${basePath} pull origin master`
 		]
+	},
+	prodUpdate: {
+		message: "yarn prod-update",
+		commands: ["yarn prod-update"]
+	},
+	build: {
+		message: "yarn build",
+		commands: ["yarn build"]
 	}
 };
 const methodNames = ["all", ...Object.keys(methods)];
@@ -68,6 +72,7 @@ module.exports = {
 	Dynamic_Description: async () => [
 		"Restarts the process of Supibot or the supinic.com website.",
 		"Only usable by administrators and whitelisted users.",
+		"The subcommands, except for \"all\" can be combined between each other",
 		"",
 
 		"<code>$restart</code>",
@@ -75,15 +80,18 @@ module.exports = {
 		"",
 
 		"<code>$restart pull</code>",
-		"Runs <code>git pull</code> first, then exits the process.",
+		"Runs <code>git pull</code>, then exits the process.",
 		"",
 
-		"<code>$restart bot upgrade</code>",
-		"Runs <code>yarn prod-update</code> first, then exits the process.",
+		"<code>$restart bot prodUpdate</code>",
+		"Runs <code>yarn prod-update</code>, then exits the process.",
+		"",
+
+		"<code>$restart bot build</code>",
+		"Runs <code>yarn build</code>, then exits the process.",
 		"",
 
 		"<code>$restart bot all</code>",
-		"<code>$restart web all</code>",
-		"Combination of pull and upgrade."
+		"Combination of all commands in this order: pull, prod-update, build, exit."
 	]
 };

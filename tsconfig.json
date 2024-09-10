@@ -62,7 +62,6 @@
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true,                                /* Skip type checking all .d.ts files. */
-    
     // This option allows the Typescript compiler to detect if the project has been built already.
     // It also enables the `incremental` option, allowing it to perform incremental builds instead of full rebuilds, reducing compile times significantly.
     "composite": true

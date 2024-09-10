@@ -1,4 +1,4 @@
-const LanguageCodes = require("language-iso-codes");
+const LanguageCodes = require("../../utils/languages");
 const BASE_CACHE_KEY = "liveuamap-data";
 const SUPPORTED_LANGUAGE_CODES = ["en", "ru", "uk", "pl"];
 const MAXIMUM_ARTICLES = 10;

@@ -1,9 +1,9 @@
 const ANIMAL_TYPES = ["cat", "dog", "bird", "fox"];
 const INVOCATIONS_MAP = {
-	rbf: "bird",
-	rcf: "cat",
-	rdf: "dog",
-	rff: "fox"
+	rbp: "bird",
+	rcp: "cat",
+	rdp: "dog",
+	rfp: "fox"
 };
 
 module.exports = {

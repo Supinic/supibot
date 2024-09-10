@@ -1,4 +1,4 @@
-const LanguageCodes = require("language-iso-codes");
+const LanguageCodes = require("../../../utils/languages");
 
 module.exports = {
 	name: "language",

@@ -1,3 +1,5 @@
+const { setTimeout } = require("node:timers/promises");
+
 module.exports = {
 	Name: "pyramid",
 	Aliases: null,
@@ -47,10 +49,12 @@ module.exports = {
 
 		for (let i = 1; i <= size; i++) {
 			context.channel.send(emote.repeat(i));
+			await setTimeout(250);
 		}
 
 		for (let i = (size - 1); i > 0; i--) {
 			context.channel.send(emote.repeat(i));
+			await setTimeout(250);
 		}
 
 		return null;

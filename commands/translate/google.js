@@ -1,4 +1,4 @@
-const LanguageCodes = require("language-iso-codes");
+const LanguageCodes = require("../../utils/languages");
 const LANGUAGE_LIST_KEY = "google-supported-language-list";
 
 const execute = async function (context, query) {
