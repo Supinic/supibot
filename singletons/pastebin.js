@@ -1,5 +1,5 @@
 const config = require("../config.json");
-const { defaultUserAgent } = config.gots;
+const { defaultUserAgent } = config.modules.gots;
 
 let loginEnvsMissingNotifier = false;
 const loginEnvs = [

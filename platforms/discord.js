@@ -75,7 +75,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 				message: "Discord user ID (selfId) has not been configured"
 			});
 		}
-		else if (process.env.DISCORD_BOT_TOKEN) {
+		else if (!process.env.DISCORD_BOT_TOKEN) {
 			throw new sb.Error({
 				message: "No Discord token configured (DISCORD_BOT_TOKEN)"
 			});
