@@ -40,6 +40,24 @@ export const definition = {
 				});
 
 				await row.save();
+
+				const latestVlcStartId = await sb.Query.getRecordset(rs => rs
+					.select("ID")
+					.from("chat_data", "Song_Request")
+					.where("VLC_ID = %n", 3) // starting point of VLC song requests
+					.orderBy("ID DESC")
+					.limit(1)
+					.flat("ID")
+					.single()
+				);
+
+				// Clear all requests that precede this VLC session
+				await sb.Query.isRecordUpdater(ru => ru
+					.from("chat_data", "Song_Request")
+					.set("Status", "Inactive")
+					.where("Status <> %s", "Inactive")
+					.where("ID < %n", latestVlcStartId)
+				)
 			}
 			// Stream just went offline + row already exists => mark the Stream as completed by setting its End property
 			else if (exists && context.event === "offline") {
