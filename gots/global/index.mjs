@@ -1,5 +1,5 @@
-const config = require("../../config.json");
-const { defaultUserAgent } = config.gots;
+import config from "../../config.json" with { type: "json" };
+const { defaultUserAgent } = config.modules.gots;
 
 export const definition = {
 	name: "Global",

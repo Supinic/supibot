@@ -1,4 +1,5 @@
-const { TWITCH_ADMIN_SUBSCRIBER_LIST } = require("../../utils/shared-cache-keys.json");
+import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+const { TWITCH_ADMIN_SUBSCRIBER_LIST } = sharedKeys;
 
 let tooManySubsWarningSent = false;
 

@@ -1,5 +1,7 @@
-const { SOUNDCLOUD_CLIENT_ID } = require("../../utils/shared-cache-keys.json");
 import { getLinkParser } from "../../utils/link-parser.js";
+
+import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+const { SOUNDCLOUD_CLIENT_ID } = sharedKeys;
 
 export const definition = {
 	name: "yoink-soundcloud-client-id",

@@ -1,7 +1,8 @@
 // import { randomInt } from "node:crypto";
 // import { getLinkParser } from "../../utils/link-parser.js";
 
-const { SONG_REQUESTS_STATE } = require("../../utils/shared-cache-keys.json");
+import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+const { SONG_REQUESTS_STATE } = sharedKeys;
 
 const repeats = [];
 const repeatAmount = 100;

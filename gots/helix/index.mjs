@@ -2,7 +2,7 @@ export const definition = {
 	name: "Helix",
 	optionsType: "function",
 	options: (() => {
-		if (!env.TWITCH_CLIENT_ID) {
+		if (!process.env.TWITCH_CLIENT_ID) {
 			throw new Error("Helix sb.Got instance cannot initialize - missing client-id");
 		}
 
