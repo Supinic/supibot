@@ -10,7 +10,6 @@ class CytubeClient {
 	playlistData = [];
 	currentlyPlaying = null;
 	restarting = false;
-	restartInterval = null;
 
 	/** @type {Map<string, CytubeUserPresence>} */
 	userMap = new Map();
@@ -26,7 +25,7 @@ class CytubeClient {
 		this.initialize();
 	}
 
-	initialize () {
+	async initialize () {
 		if (this.client) {
 			console.warn("Attempting to re-initialize a running Cytube client", {
 				channel: this.channelData.Name
@@ -45,9 +44,11 @@ class CytubeClient {
 		});
 
 		this.client = client;
+		if (typeof this.client.connect === "function") {
+			await this.client.connect();
+		}
 
 		client.on("clientready", () => {
-			clearInterval(this.restartInterval);
 			this.restarting = false;
 		});
 
@@ -479,7 +480,7 @@ module.exports = class CytubePlatform extends require("./template.js") {
 		});
 	}
 
-	connect () {
+	async connect () {
 		if (!sb.Config.has("CYTUBE_BOT_PASSWORD", true)) {
 			throw new sb.Error({
 				message: "Cytube password has not been configured"
@@ -487,9 +488,12 @@ module.exports = class CytubePlatform extends require("./template.js") {
 		}
 
 		const eligibleChannels = sb.Channel.getJoinableForPlatform(this);
+		const promises = [];
 		for (const channelData of eligibleChannels) {
-			this.joinChannel(channelData);
+			promises.push(this.joinChannel(channelData));
 		}
+
+		await Promise.all(promises);
 	}
 
 	/**
@@ -558,12 +562,14 @@ module.exports = class CytubePlatform extends require("./template.js") {
 	 * @param {Channel} channelData
 	 * @returns {boolean} True if the channel was joined, false if it was joined before.
 	 */
-	joinChannel (channelData) {
+	async joinChannel (channelData) {
 		if (this.clients.has(channelData)) {
 			return false;
 		}
 
 		const client = new CytubeClient(channelData, this);
+		await client.initialize();
+
 		this.clients.set(channelData.ID, client);
 
 		return true;
