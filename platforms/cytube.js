@@ -1,5 +1,4 @@
-const CytubeConnector = require("cytube-connector");
-
+let CytubeConnector;
 class CytubeClient {
 	/** @type {CytubeConnector} */
 	client = null;
@@ -32,6 +31,11 @@ class CytubeClient {
 			});
 
 			return;
+		}
+
+		if (!CytubeConnector) {
+			const ConnectorModule = await import("cytube-connector");
+			CytubeConnector = ConnectorModule.default;
 		}
 
 		const client = new CytubeConnector({
@@ -481,7 +485,8 @@ module.exports = class CytubePlatform extends require("./template.js") {
 	}
 
 	async connect () {
-		if (!sb.Config.has("CYTUBE_BOT_PASSWORD", true)) {
+		if (!process.env.CYTUBE_BOT_PASSWORD) {
+			console.log("xd");
 			throw new sb.Error({
 				message: "Cytube password has not been configured"
 			});
