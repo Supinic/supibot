@@ -1,5 +1,4 @@
-const CytubeConnector = require("cytube-connector");
-
+let CytubeConnector;
 class CytubeClient {
 	/** @type {CytubeConnector} */
 	client = null;
@@ -10,7 +9,6 @@ class CytubeClient {
 	playlistData = [];
 	currentlyPlaying = null;
 	restarting = false;
-	restartInterval = null;
 
 	/** @type {Map<string, CytubeUserPresence>} */
 	userMap = new Map();
@@ -26,13 +24,18 @@ class CytubeClient {
 		this.initialize();
 	}
 
-	initialize () {
+	async initialize () {
 		if (this.client) {
 			console.warn("Attempting to re-initialize a running Cytube client", {
 				channel: this.channelData.Name
 			});
 
 			return;
+		}
+
+		if (!CytubeConnector) {
+			const ConnectorModule = await import("cytube-connector");
+			CytubeConnector = ConnectorModule.default;
 		}
 
 		const client = new CytubeConnector({
@@ -45,9 +48,11 @@ class CytubeClient {
 		});
 
 		this.client = client;
+		if (typeof this.client.connect === "function") {
+			await this.client.connect();
+		}
 
 		client.on("clientready", () => {
-			clearInterval(this.restartInterval);
 			this.restarting = false;
 		});
 
@@ -479,7 +484,7 @@ module.exports = class CytubePlatform extends require("./template.js") {
 		});
 	}
 
-	connect () {
+	async connect () {
 		if (!process.env.CYTUBE_BOT_PASSWORD) {
 			throw new sb.Error({
 				message: "No Cytube account password configured (CYTUBE_BOT_PASSWORD)"
@@ -487,9 +492,12 @@ module.exports = class CytubePlatform extends require("./template.js") {
 		}
 
 		const eligibleChannels = sb.Channel.getJoinableForPlatform(this);
+		const promises = [];
 		for (const channelData of eligibleChannels) {
-			this.joinChannel(channelData);
+			promises.push(this.joinChannel(channelData));
 		}
+
+		await Promise.all(promises);
 	}
 
 	/**
@@ -558,12 +566,14 @@ module.exports = class CytubePlatform extends require("./template.js") {
 	 * @param {Channel} channelData
 	 * @returns {boolean} True if the channel was joined, false if it was joined before.
 	 */
-	joinChannel (channelData) {
+	async joinChannel (channelData) {
 		if (this.clients.has(channelData)) {
 			return false;
 		}
 
 		const client = new CytubeClient(channelData, this);
+		await client.initialize();
+
 		this.clients.set(channelData.ID, client);
 
 		return true;

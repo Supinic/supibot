@@ -8,7 +8,7 @@
     "bing-chat": "^0.2.3",
     "chrono-node": "^2.7.6",
     "cron": "^3.1.7",
-    "cytube-connector": "https://github.com/supinic/cytube-connector",
+    "cytube-connector": "supinic/cytube-connector",
     "discord.js": "^14.15.3",
     "irc-framework": "^4.13.1",
     "rss-parser": "^3.13.0",

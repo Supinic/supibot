@@ -650,6 +650,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^22.5.4":
+  version: 22.5.4
+  resolution: "@types/node@npm:22.5.4"
+  dependencies:
+    undici-types: "npm:~6.19.2"
+  checksum: 10c0/b445daa7eecd761ad4d778b882d6ff7bcc3b4baad2086ea9804db7c5d4a4ab0298b00d7f5315fc640a73b5a1d52bbf9628e09c9fec0cf44dbf9b4df674a8717d
+  languageName: node
+  linkType: hard
+
 "@types/normalize-package-data@npm:^2.4.0":
   version: 2.4.4
   resolution: "@types/normalize-package-data@npm:2.4.4"
@@ -1381,13 +1390,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cytube-connector@https://github.com/supinic/cytube-connector":
+cytube-connector@supinic/cytube-connector:
   version: 2.1.0
-  resolution: "cytube-connector@https://github.com/supinic/cytube-connector.git#commit=3dea28a900b9518bbd23062a80aab20c3c2ad14e"
+  resolution: "cytube-connector@https://github.com/supinic/cytube-connector.git#commit=4b1255530e71d84324ee40c0c0682fc22b4a7417"
   dependencies:
-    got: "npm:^11.3.0"
-    socket.io-client: "npm:^4.4.0"
-  checksum: 10c0/586a902293d9294180909f74f2d35d1a2eec10df63c466062be026bbaff97ced5b9baafb9d4dbaf7cbd6a7fca19cb76e19dd10a77e3915a9fb1465dd4cf14193
+    "@types/node": "npm:^22.5.4"
+    socket.io-client: "npm:^4.7.5"
+  checksum: 10c0/cda186a7be30084bdbc11b4c864c436ba738f47d04b3dc87024c6e9ac7bf765319fce6132bbc8ca0da1e9846ef1011a21a3cb2c407928ba07b85ecf085ceedc5
   languageName: node
   linkType: hard
 
@@ -2260,7 +2269,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"got@npm:^11.3.0, got@npm:^11.8.0":
+"got@npm:^11.8.0":
   version: 11.8.6
   resolution: "got@npm:11.8.6"
   dependencies:
@@ -4132,7 +4141,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"socket.io-client@npm:^4.4.0":
+"socket.io-client@npm:^4.7.5":
   version: 4.7.5
   resolution: "socket.io-client@npm:4.7.5"
   dependencies:
@@ -4385,7 +4394,7 @@ supi-core@supinic/supi-core:
     bing-chat: "npm:^0.2.3"
     chrono-node: "npm:^2.7.6"
     cron: "npm:^3.1.7"
-    cytube-connector: "https://github.com/supinic/cytube-connector"
+    cytube-connector: supinic/cytube-connector
     discord.js: "npm:^14.15.3"
     eslint: "npm:^8.52.0"
     eslint-plugin-unicorn: "npm:^49.0.0"
