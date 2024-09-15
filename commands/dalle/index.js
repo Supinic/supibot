@@ -1,3 +1,22 @@
+const BASE_NEGATIVE_PROMPT = [
+	"(deformed distorted disfigured:1.3)",
+	"poorly drawn",
+	"bad anatomy",
+	"wrong anatomy",
+	"extra limb",
+	"missing limb",
+	"floating limbs",
+	"(mutated hands and fingers:1.4)",
+	"disconnected limbs",
+	"mutation",
+	"mutated",
+	"ugly",
+	"disgusting",
+	"blurry",
+	"amputation",
+	"(NSFW:1.25)"
+].join(", ");
+
 module.exports = {
 	Name: "dalle",
 	Aliases: [],
@@ -11,6 +30,118 @@ module.exports = {
 		{ name: "search", type: "string" }
 	],
 	Whitelist_Response: null,
+	Code: (async function dallE (context, ...args) {
+		if (context.params.search || context.params.random || context.params.id) {
+			const { id, random, search } = context.params;
+			const image = await sb.Query.getRecordset(rs => rs
+				.select("ID", "Prompt", "Created", "Creation_Time")
+				.from("data", "DALL-E")
+				.orderBy("RAND()")
+				.where(
+					// In order to search for a prompt, `random` must be falsy and `search` must be provided
+					{ condition: Boolean(id) },
+					"ID = %s",
+					id
+				)
+				.where(
+					// In order to search for a prompt, `random` must be falsy and `search` must be provided
+					{ condition: (!id && !random && search) },
+					"Prompt %*like*",
+					search
+				)
+				.limit(1)
+				.single()
+			);
+
+			if (!image) {
+				return {
+					success: false,
+					reply: `No images found for your query!`
+				};
+			}
+			return {
+				reply: `https://supinic.com/data/dall-e/detail/${image.ID} DALL-E image set for "${image.Prompt}"`
+			};
+		}
+
+		const query = args.join(" ");
+		if (!query) {
+			return {
+				success: false,
+				reply: `No prompt provided! Check the list of images here: https://supinic.com/data/dall-e/list`
+			};
+		}
+
+		const sessionHash = sb.Utils.randomString(12);
+		await sb.Got("FakeAgent", {
+			method: "POST",
+			url: "https://ehristoforu-dalle-3-xl-lora-v2.hf.space/queue/join",
+			responseType: "json",
+			json: {
+				data: [
+					query,
+					BASE_NEGATIVE_PROMPT,
+					true,
+					2097616390,
+					1024,
+					1024,
+					6,
+					true
+				],
+				event_data: null,
+				fn_index: 3,
+				trigger_id: 6,
+				session_hash: sessionHash
+			}
+		});
+
+		const response = await sb.Got("FakeAgent", {
+			url: "https://ehristoforu-dalle-3-xl-lora-v2.hf.space/queue/data",
+			responseType: "text",
+			searchParams: {
+				session_hash: sessionHash
+			}
+		});
+
+		if (response.statusCode !== 200) {
+			if (response.statusCode === 429 || response.statusCode === 503) {
+				return {
+					success: false,
+					reply: `The service is currently overloaded! Try again later. (status code ${response.statusCode})`
+				};
+			}
+			else {
+				console.warn("DALL-E unhandled status code", { response });
+				return {
+					success: false,
+					reply: `The service failed with status code ${response.statusCode}!`
+				};
+			}
+		}
+
+		const dataSlice = response.body.split("data:").at(-1);
+		const data = JSON.parse(dataSlice.trim());
+		const url = data?.output?.data?.[0]?.[0]?.image.url;
+		if (!url) {
+			console.warn("Unexpected output", { body: response.body, data, url });
+			return {
+				success: false,
+				reply: "No image extracted SadCat"
+			};
+		}
+
+		// @todo add database column/table for new style images (also include a type column)
+
+		return {
+			cooldown: {
+				user: context.user.ID,
+				command: this.Name,
+				channel: null,
+				length: 60_000
+			},
+			reply: `${url} DALL-E image set for prompt "${query}"`
+		};
+	}),
 	Dynamic_Description: (async (prefix) => [
 		"Creates a DALL-E AI generated image, based on your prompt.",
 		"Alternatively, searches for an existing prompt someone else has created.",
@@ -42,181 +173,5 @@ module.exports = {
 
 		`<code>${prefix}dalle random:true</code>`,
 		"Posts a random image set that someone has created before."
-	]),
-	Code: (async function dallE (context, ...args) {
-		const { createEmbeds } = require("./discord-embed.js");
-
-		if (context.params.search || context.params.random || context.params.id) {
-			const { id, random, search } = context.params;
-			const image = await sb.Query.getRecordset(rs => rs
-				.select("ID", "Prompt", "Created", "Creation_Time")
-				.from("data", "DALL-E")
-				.orderBy("RAND()")
-				.where(
-					// In order to search for a prompt, `random` must be falsy and `search` must be provided
-					{ condition: Boolean(id) },
-					"ID = %s",
-					id
-				)
-				.where(
-					// In order to search for a prompt, `random` must be falsy and `search` must be provided
-					{ condition: (!id && !random && search) },
-					"Prompt %*like*",
-					search
-				)
-				.limit(1)
-				.single()
-			);
-
-			if (!image) {
-				return {
-					success: false,
-					reply: `No images found for your query!`
-				};
-			}
-
-			const discordData = {};
-			if (context.channel && context.platform.Name === "discord") {
-				const discordChannel = context.platform.client.channels.fetch(context.channel.Name);
-				if (discordChannel && discordChannel.members && discordChannel.members.size <= 1000) {
-					discordData.embeds = createEmbeds(image.ID, {
-						prompt: image.Prompt,
-						created: image.Created,
-						creationTime: image.Creation_Time
-					});
-				}
-			}
-
-			return {
-				reply: `https://supinic.com/data/dall-e/detail/${image.ID} DALL-E image set for "${image.Prompt}"`,
-				discord: discordData
-			};
-		}
-
-		const pending = require("./pending.js");
-		const query = args.join(" ");
-		if (!query) {
-			return {
-				success: false,
-				reply: `No prompt provided! Check the list of images here: https://supinic.com/data/dall-e/list`
-			};
-		}
-
-		const pendingResult = pending.check(context.user, context.channel);
-		if (!pendingResult.success) {
-			return pendingResult;
-		}
-
-		const [waitingEmote, loadingEmote] = await Promise.all([
-			context.getBestAvailableEmote(
-				["PauseChamp", "pajaPause", "CoolStoryBob", "GivePLZ"],
-				"😴",
-				{ shuffle: true }
-			),
-			context.getBestAvailableEmote(
-				["ppCircle", "supiniLoading", "dankCircle", "ppAutismo", "pajaAAAAAAAAAAA"],
-				"⌛",
-				{ shuffle: true }
-			)
-		]);
-
-		const mentionUsername = (context.getMentionStatus())
-			? `${context.user.Name},`
-			: "";
-
-		pending.set(context.user, context.channel);
-
-		const notificationTimeout = setTimeout(async (timeoutContext) => {
-			await timeoutContext.sendIntermediateMessage(sb.Utils.tag.trim `
-				${mentionUsername}
-				Processing...
-				${waitingEmote} ${loadingEmote}
-				Please wait up to 5 minutes.
-			`);
-		}, 2000, context);
-
-		const start = process.hrtime.bigint();
-		const response = await sb.Got("FakeAgent", {
-			url: "https://bf.dallemini.ai/generate",
-			method: "POST",
-			responseType: "json",
-			headers: {
-				Referer: "https://hf.space/"
-			},
-			json: {
-				prompt: query
-			},
-			timeout: {
-				request: 300_000
-			},
-			throwHttpErrors: false
-		});
-
-		pending.unset(context.user, context.channel);
-
-		const nanoExecutionTime = process.hrtime.bigint() - start;
-		if (response.statusCode !== 200) {
-			clearTimeout(notificationTimeout);
-
-			if (response.statusCode === 429 || response.statusCode === 503) {
-				pending.setOverloaded();
-				return {
-					success: false,
-					reply: `The service is currently overloaded! Try again later. (status code ${response.statusCode})`
-				};
-			}
-			else {
-				console.warn("DALL-E unhandled status code", { response });
-				return {
-					success: false,
-					reply: `The service failed with status code ${response.statusCode}!`
-				};
-			}
-		}
-
-		const { images } = response.body;
-		const hash = require("crypto").createHash("sha512");
-		for (const base64Image of images) {
-			hash.update(base64Image);
-		}
-
-		const jsonImageData = images.map(i => i.replace(/\\n/g, ""));
-		const row = await sb.Query.getRow("data", "DALL-E");
-		const ID = hash.digest().toString("hex").slice(0, 16);
-		const created = new sb.Date();
-		const creationTime = (Number(nanoExecutionTime) / 1e9);
-
-		row.setValues({
-			ID,
-			User_Alias: context.user.ID,
-			Channel: context.channel?.ID ?? null,
-			Prompt: query,
-			Created: created,
-			Creation_Time: creationTime,
-			Data: JSON.stringify(jsonImageData)
-		});
-
-		await row.save({ skipLoad: true });
-
-		const discordData = {};
-		if (context.platform.Name === "discord") {
-			discordData.embeds = createEmbeds(ID, {
-				prompt: query,
-				created,
-				creationTime
-			});
-		}
-
-		return {
-			cooldown: {
-				user: context.user.ID,
-				command: this.Name,
-				channel: null,
-				length: 60_000
-			},
-			discord: discordData,
-			reply: `https://supinic.com/data/dall-e/detail/${ID} DALL-E image set for prompt "${query}"`,
-			removeEmbeds: true
-		};
-	})
+	])
 };
