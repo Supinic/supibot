@@ -158,9 +158,14 @@ module.exports = {
 		}
 
 		const contextQuery = addQueryContext(query, context, channel);
-		const { response } = await GptNexra.execute(context, `${contextQuery}\n\n${logsResult.text}`, {
+		const nexraExecution = await GptNexra.execute(context, `${contextQuery}\n\n${logsResult.text}`, {
 			url: "gpt-4-32k"
 		});
+
+		const { response } = nexraExecution;
+		if (!response && nexraExecution.reply) {
+			return nexraExecution;
+		}
 
 		// API errors can come as 200 OK with error status code in body
 		if (!response.ok || response.body.status === false) {
