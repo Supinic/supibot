@@ -727,14 +727,14 @@ class Command extends require("./template.js") {
 			}
 			else {
 				const channelHasFullErrorMessage = await channelData?.getDataProperty("showFullCommandErrorMessage");
-				const prettify = (channelHasFullErrorMessage)
+				const reply = (channelHasFullErrorMessage)
 					? `Error ID ${errorID} - ${e.message}`
 					: config.responses.commandErrorResponse;
 
 				execution = {
 					success: false,
 					reason: "error",
-					reply: prettify(errorID, e)
+					reply
 				};
 			}
 		}
