@@ -29,7 +29,8 @@
     "maxIncomingScheduledReminders": 5,
     "maxOutgoingScheduledReminders": 5,
     "userAdditionHighLoadThreshold": 50,
-    "userAdditionCriticalLoadThreshold": 200
+    "userAdditionCriticalLoadThreshold": 200,
+    "massPingBanphraseThreshold": 10
   },
   "local": {
     "epalAudioChannels": [],

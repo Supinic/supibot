@@ -4,6 +4,12 @@ const inactiveSymbol = Symbol("banphrase-inactive");
 const availableTypes = ["API response", "Custom response", "Denial", "Inactive", "Replacement"];
 
 const { responses, values } = require("../config.json");
+const regexes = require("../utils/regexes.js");
+
+const banphraseConfigData = Object.freeze({
+	massPingBanphraseThreshold: values.massPingBanphraseThreshold,
+	...regexes
+});
 
 class ExternalBanphraseAPI {
 	static async pajbot (message, URL) {
@@ -74,7 +80,7 @@ module.exports = class Banphrase extends require("./template.js") {
 		}
 
 		try {
-			return this.Code(message);
+			return this.Code(message, banphraseConfigData);
 		}
 		catch (e) {
 			console.warn("banphrase failed", message, this, e);
