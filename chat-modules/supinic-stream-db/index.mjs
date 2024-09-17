@@ -1,4 +1,4 @@
-import { SONG_REQUESTS_STATE } from "../../utils/shared-cache-keys.json" assert { type: "json "};
+import { SONG_REQUESTS_STATE } from "../../utils/shared-cache-keys.json" with { type: "json" };
 
 export const definition = {
 	Name: "supinic-stream-db",
