@@ -1,19 +1,13 @@
 const { CronJob } = require("cron");
 
+const config = require("../config.json");
+const { logging } = config;
+
 const notified = {
 	lastSeen: false,
 	privatePlatformLogging: []
 };
 
-let config;
-try {
-	config = require("../config.json");
-}
-catch {
-	config = require("../config-default.json");
-}
-
-const { logging } = config;
 const FALLBACK_WARN_LIMIT = 2500;
 
 /**

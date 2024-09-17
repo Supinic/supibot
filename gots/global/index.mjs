@@ -1,3 +1,6 @@
+import config from "../../config.json" with { type: "json" };
+const { defaultUserAgent } = config.modules.gots;
+
 export const definition = {
 	name: "Global",
 	optionsType: "function",
@@ -13,7 +16,7 @@ export const definition = {
 		mutableDefaults: true,
 		throwHttpErrors: false,
 		headers: {
-			"User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
+			"User-Agent": defaultUserAgent
 		},
 		hooks: {
 			beforeError: [

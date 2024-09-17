@@ -12,6 +12,12 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Code: (async function query (context, ...args) {
+		if (!process.env.API_WOLFRAM_ALPHA_APPID) {
+			throw new sb.Error({
+				messsage: "No Wolfram Alpha AppID configured (API_WOLFRAM_ALPHA_APPID)"
+			});
+		}
+
 		if (args.length === 0) {
 			return {
 				reply: "No query provided!",
@@ -25,7 +31,7 @@ module.exports = {
 				throwHttpErrors: false,
 				responseType: "buffer",
 				searchParams: {
-					appid: sb.Config.get("API_WOLFRAM_ALPHA_APPID"),
+					appid: process.env.API_WOLFRAM_ALPHA_APPID,
 					i: args.join(" "),
 					width: 500,
 					units: "metric",
@@ -60,16 +66,15 @@ module.exports = {
 				throwHttpErrors: false,
 				responseType: "text",
 				searchParams: {
-					appid: sb.Config.get("API_WOLFRAM_ALPHA_APPID"),
+					appid: process.env.API_WOLFRAM_ALPHA_APPID,
 					i: args.join(" ")
 				}
 			});
 
-			const data = sb.Config.get("WOLFRAM_QUERY_CENSOR_FN")(response.body);
 			return {
 				reply: (context.platform.Name === "discord")
-					? `\`${data}\``
-					: data
+					? `\`${response.body}\``
+					: response.body
 			};
 		}
 	}),

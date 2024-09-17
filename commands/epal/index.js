@@ -1,30 +1,25 @@
-const PROFILES_CACHE_KEY = "profiles";
-const tts = {
-	enabled: null,
-	url: null,
-	channels: []
-};
+const { TTS_ENABLED } = require("../../utils/shared-cache-keys.json");
+const config = require("../../config.json");
+const { epalAudioChannels, listenerAddress, listenerPort } = config.local ?? {};
+
+const PROFILES_CACHE_KEY = "epal-profiles";
 
 module.exports = {
 	Name: "epal",
 	Aliases: ["ForeverAlone"],
 	Author: "supinic",
 	Cooldown: 10000,
-	Description: "Fetches a random person from epal.gg - posts their description. If used on Supinic's channel with TTS on, and if they have an audio introduction, it will be played on stream.",
+	Description: "Fetches a random person from epal.gg - posts their description. If used on configured channels with TTS on, and if they have an audio introduction, it will be played on stream.",
 	Flags: ["mention"],
 	Params: [],
 	Whitelist_Response: null,
 	initialize: function () {
-		if (!sb.Config.has("LOCAL_IP", true) || !sb.Config.has("LOCAL_PLAY_SOUNDS_PORT", true)) {
+		if (!listenerAddress || !listenerPort) {
 			console.warn("$epal: TTS not configured - will be unavailable");
-			tts.enabled = false;
+			this.data.listenerEnabled = false;
 		}
 		else {
-			tts.url = `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}`;
-			tts.enabled = true;
-
-			const { ttsChannels } = require("./epal-tts-config.json");
-			tts.channels = ttsChannels;
+			this.data.listenerEnabled = true;
 		}
 	},
 	Code: async function epal (context) {
@@ -84,14 +79,14 @@ module.exports = {
 			tags
 		} = sb.Utils.randArray(profilesData);
 
-		if (tts.channels.includes(context.channel?.ID) && sb.Config.get("TTS_ENABLED")) {
+		const ttsStatus = await sb.Cache.getByPrefix(TTS_ENABLED);
+		if (epalAudioChannels.includes(context.channel?.ID) && ttsStatus && this.data.listenerEnabled) {
 			await sb.Got("GenericAPI", {
-				url: tts.url,
+				url: `${listenerAddress}:${listenerPort}`,
 				responseType: "text",
 				searchParams: new URLSearchParams({
 					specialAudio: "1",
 					url: audioFile,
-					volume: sb.Config.get("TTS_VOLUME"),
 					limit: 20_000
 				})
 			});

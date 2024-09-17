@@ -1,4 +1,6 @@
-let noConfigWarningSent = false;
+import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+const { TWITCH_ADMIN_SUBSCRIBER_LIST } = sharedKeys;
+
 let tooManySubsWarningSent = false;
 
 export const definition = {
@@ -6,21 +8,18 @@ export const definition = {
 	expression: "0 0 0 * * *",
 	description: "Fetches the current subscriber list, then saves it to sb.Cache",
 	code: (async function fetchTwitchSubscriberList () {
-		const requiredConfigs = [
-			"TWITCH_CLIENT_ID",
-			"TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN",
-			"TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN",
-			"ADMIN_USER_ID"
-		];
+		if (!process.env.TWITCH_READ_SUBSCRIPTIONS_USER_ID) {
+			throw new sb.Error({
+				message: "No Twitch user ID configured for Twitch subscriptions"
+			});
+		}
 
-		const missingConfigs = requiredConfigs.filter(config => !sb.Config.has(config, true));
-		if (missingConfigs.length !== 0) {
-			if (!noConfigWarningSent) {
-				console.warn("Cannot fetch subscribers, config(s) are missing", { missingConfigs })
-				noConfigWarningSent = true;
-			}
-
-			return;
+		const cacheRefreshToken = sb.Cache.getByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN")
+		const envRefreshToken = process.env.TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN;
+		if (!cacheRefreshToken && !envRefreshToken) {
+			throw new sb.Error({
+				message: "No refresh token configured for Twitch subscriptions"
+			});
 		}
 
 		const identityResponse = await sb.Got("GenericAPI", {
@@ -28,16 +27,17 @@ export const definition = {
 			method: "POST",
 			searchParams: {
 				grant_type: "refresh_token",
-				refresh_token: sb.Config.get("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN"),
-				client_id: sb.Config.get("TWITCH_CLIENT_ID"),
-				client_secret: sb.Config.get("TWITCH_CLIENT_SECRET")
+				refresh_token: cacheRefreshToken ?? envRefreshToken,
+				client_id: process.env.TWITCH_CLIENT_ID,
+				client_secret: process.env.TWITCH_CLIENT_SECRET
 			}
 		});
 
-		const authToken = identityResponse.body.access_token;
+		const accessToken = identityResponse.body.access_token;
+		const newRefreshToken = identityResponse.body.refresh_token;
 		await Promise.all([
-			sb.Config.set("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN", authToken, sb.Query),
-			sb.Config.set("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN", identityResponse.body.refresh_token, sb.Query)
+			sb.Cache.setByPrefix("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN", accessToken),
+			sb.Cache.setByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN", newRefreshToken)
 		]);
 
 		const subsResponse = await sb.Got("GenericAPI", {
@@ -45,11 +45,11 @@ export const definition = {
 			responseType: "json",
 			throwHttpErrors: false,
 			headers: {
-				"Client-ID": sb.Config.get("TWITCH_CLIENT_ID"),
-				Authorization: `Bearer ${sb.Config.get("TWITCH_READ_SUBSCRIPTIONS_ACCESS_TOKEN")}`
+				"Client-ID": process.env.TWITCH_CLIENT_ID,
+				Authorization: `Bearer ${accessToken}`
 			},
 			searchParams: {
-				broadcaster_id: sb.Config.get("ADMIN_USER_ID"),
+				broadcaster_id: process.env.TWITCH_READ_SUBSCRIPTIONS_USER_ID,
 				first: "100"
 			}
 		});
@@ -62,11 +62,11 @@ export const definition = {
 		/** @type {SubscriberData[]} */
 		const data = subsResponse.body.data;
 		if (data.length >= 100 && !tooManySubsWarningSent) {
-			console.warn("Maximum subscribers reached for a single Helix call! Update to use pagination", { data });
+			console.warn("Maximum subscribers reached for a single Helix call! Update this module to use pagination", { data });
 			tooManySubsWarningSent = true;
 		}
 
-		await sb.Cache.setByPrefix("twitch-subscriber-list-supinic", data, {
+		await sb.Cache.setByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST, data, {
 			expiry: 864e5 // 1 day
 		});
 

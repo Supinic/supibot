@@ -1,6 +1,5 @@
 .idea
 node_modules
-db-access.js
 config.json
 .nyc_output
 .yarn
@@ -12,3 +11,4 @@ docker-compose.yml
 docker-compose.yaml
 compose.yaml
 .db
+.env

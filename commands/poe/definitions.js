@@ -36,7 +36,6 @@ const randomDeathData = [
 		playlists: [
 			"PLbpExg9_Xax24tS9rNt8IP49VFFaDghAG"
 		],
-		/** @type {PlaylistVideo[]} */
 		videoCache: []
 	},
 	{
@@ -45,7 +44,6 @@ const randomDeathData = [
 		playlists: [
 			"PLcKDsqoF983aHkqXwR1HmkE7F2u6MI_FQ"
 		],
-		/** @type {PlaylistVideo[]} */
 		videoCache: []
 	}
 ];
@@ -247,7 +245,6 @@ const subcommands = [
 			if (deathData.videoCache.length === 0) {
 				const playlist = sb.Utils.randArray(deathData.playlists);
 				const { result, reason, success } = await fetchYoutubePlaylist({
-					key: sb.Config.get("API_GOOGLE_YOUTUBE"),
 					playlistID: playlist
 				});
 
@@ -262,7 +259,6 @@ const subcommands = [
 				}
 			}
 
-			/** @type {PlaylistVideo} */
 			const video = sb.Utils.randArray(deathData.videoCache);
 			const emote = await context.getBestAvailableEmote(
 				["PepeLaugh", "pepeLaugh", "LULW", "LULE", "LuL"],

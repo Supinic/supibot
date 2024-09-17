@@ -1,6 +1,7 @@
-import { Query, Config } from "supi-core/@types/types";
+import { Query } from "supi-core/@types/types";
+import { JSONifiable } from "../globals";
 
-export type GenericCacheMap<T extends ClassTemplate> = WeakMap<T, Map<Config.Name, Config.Value>>;
+export type GenericCacheMap<T extends ClassTemplate> = WeakMap<T, Map<string, JSONifiable>>;
 export type SpecificCacheOptions = {
     forceCacheReload?: boolean;
 };
@@ -10,7 +11,7 @@ type GenericCacheOptions<T extends ClassTemplate> = {
     databaseProperty: Query.ColumnDefinition["name"];
     instance: ClassTemplate;
     options?: SpecificCacheOptions;
-    propertyName: Config.Name,
+    propertyName: string,
     propertyContext?: string;
 };
 
@@ -37,7 +38,7 @@ export declare class ClassTemplate {
 
     getCacheData (key: string): Promise<any>;
     setCacheData (key: string, value: any, options?: object): "OK";
-    getGenericDataProperty<T extends ClassTemplate> (inputData: GenericCacheOptions<T>): Promise<Config.Value>;
+    getGenericDataProperty<T extends ClassTemplate> (inputData: GenericCacheOptions<T>): Promise<JSONifiable>;
     setGenericDataProperty<T extends ClassTemplate> (inputData: GenericCacheOptions<T>): Promise<void>;
     saveRowProperty (row: Query.Row, property: string, value: any, self: ClassTemplate): ReturnType<Query.Row["save"]>;
 

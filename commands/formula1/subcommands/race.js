@@ -7,15 +7,11 @@ const {
 } = require("../api-wrapper.js");
 
 const getHighlights = async (race) => {
-	if (!sb.Config.has("API_GOOGLE_YOUTUBE", true)) {
+	if (!process.env.API_GOOGLE_YOUTUBE) {
 		return [];
 	}
-	else {
-		return await searchYoutube(
-			`${race.season} ${race.raceName} highlights formula 1`,
-			sb.Config.get("API_GOOGLE_YOUTUBE")
-		);
-	}
+
+	return await searchYoutube(`${race.season} ${race.raceName} highlights formula 1`);
 };
 
 module.exports = {

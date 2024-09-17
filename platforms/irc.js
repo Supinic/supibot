@@ -53,12 +53,12 @@ module.exports = class IRCPlatform extends require("./template.js") {
 		client.on("registered", () => {
 			const { authentication } = this.config;
 			if (authentication.type === "privmsg-identify") {
-				const { configVariable, user } = authentication;
-				const key = sb.Config.get(configVariable, false);
+				const { envVariable, user } = authentication;
+				const key = process.env[envVariable];
 				if (!key) {
 					throw new sb.Error({
-						message: "Invalid IRC authentication key exists in sb.Config",
-						args: { configVariable }
+						message: "No IRC identification configured",
+						args: { envVariable }
 					});
 				}
 
@@ -320,6 +320,12 @@ module.exports = class IRCPlatform extends require("./template.js") {
 	async fetchUsernameByUserPlatformID () {
 		throw new sb.Error({
 			message: "IRC does not support username lookup by user platform ID"
+		});
+	}
+
+	me () {
+		throw new sb.Error({
+			message: "The /me action is not supported on IRC"
 		});
 	}
 };

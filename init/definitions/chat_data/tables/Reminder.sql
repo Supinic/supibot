@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `chat_data`.`Reminder` (
   `ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `User_From` INT(10) UNSIGNED NOT NULL,
+  `User_From` INT(10) UNSIGNED NULL COMMENT 'A null value signifies a system reminder',
   `User_To` INT(10) UNSIGNED NOT NULL,
   `Channel` INT(10) UNSIGNED DEFAULT NULL,
   `Platform` INT(10) UNSIGNED DEFAULT NULL,

@@ -131,8 +131,7 @@ module.exports = {
 				const date = preCheckChronoData.component.date();
 				const response = await fetchTimeData({
 					date,
-					coordinates: location.coordinates,
-					key: String(sb.Config.get("API_GOOGLE_TIMEZONE"))
+					coordinates: location.coordinates
 				});
 
 				const timeData = response.body;

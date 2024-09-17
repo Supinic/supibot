@@ -17,17 +17,6 @@ describe("global module suite", () => {
 
 			validProperties: require("./commands.js"),
 			definitions: []
-		},
-		{
-			name: "chat modules",
-			singular: "chat module",
-			directory: "chat-modules",
-			extension: "mjs",
-			fileList: fs.readdirSync("./chat-modules", { withFileTypes: true })
-				.filter(i => i.isDirectory())
-				.map(i => i.name),
-			validProperties: require("./chat-modules.js"),
-			definitions: []
 		}
 	];
 

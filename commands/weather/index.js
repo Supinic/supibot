@@ -42,6 +42,17 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Code: (async function weather (context, ...args) {
+		if (!process.env.API_GOOGLE_GEOCODING) {
+			throw new sb.Error({
+				messsage: "No Google geocoding key configured (API_GOOGLE_GEOCODING)"
+			});
+		}
+		if (!process.env.API_OPEN_WEATHER_MAP) {
+			throw new sb.Error({
+				messsage: "No OpenWeatherMap key configured (API_OPEN_WEATHER_MAP)"
+			});
+		}
+
 		let number = null;
 		let type = "current";
 		const weatherRegex = /\b(hour|day)\+(\d+)$/;
@@ -194,8 +205,7 @@ module.exports = {
 					responseType: "json",
 					throwHttpErrors: false,
 					searchParams: {
-						/** @type {string} */
-						key: sb.Config.get("API_GOOGLE_GEOCODING"),
+						key: process.env.API_GOOGLE_GEOCODING,
 						address: args.join(" ")
 					}
 				});
@@ -280,8 +290,7 @@ module.exports = {
 				searchParams: {
 					lat: coords.lat,
 					lon: coords.lng,
-					/** @type {string} */
-					appid: sb.Config.get("API_OPEN_WEATHER_MAP")
+					appid: process.env.API_OPEN_WEATHER_MAP
 				}
 			});
 
@@ -317,8 +326,7 @@ module.exports = {
 					lat: coords.lat,
 					lon: coords.lng,
 					units: "metric",
-					/** @type {string} */
-					appid: sb.Config.get("API_OPEN_WEATHER_MAP")
+					appid: process.env.API_OPEN_WEATHER_MAP
 				}
 			});
 

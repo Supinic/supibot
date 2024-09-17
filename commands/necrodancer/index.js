@@ -1,11 +1,14 @@
 const { searchYoutube } = require("../../utils/command-utils.js");
 const { zones } = require("./game-data.json");
 
+const config = require("../../config.json");
+const { listenerAddress, listenerPort } = config.local ?? {};
+
 const EXTRA_COOLDOWN = 600_000;
 const ZONE_COOLDOWN = 300_000;
 const createURL = (data) => {
 	const json = encodeURIComponent(JSON.stringify(data));
-	return `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}?necrodancer=${json}`;
+	return `${listenerAddress}:${listenerPort}?necrodancer=${json}`;
 };
 
 module.exports = {
@@ -20,9 +23,23 @@ module.exports = {
 	],
 	Whitelist_Response: "Only available in supinic's channel!",
 	initialize: function () {
+		if (!listenerAddress || !listenerPort) {
+			console.warn("$necrodancer: Listener not configured - command will be unavailable");
+			this.data.ready = false;
+			return;
+		}
+
+		this.data.ready = true;
 		this.data.cooldowns = {};
 	},
 	Code: (async function necrodancer (context, ...args) {
+		if (!this.data.ready) {
+			return {
+				success: false,
+				reply: `Local playsound listener is not configured!`
+			};
+		}
+
 		if (!context.channel) {
 			return {
 				success: false,
@@ -111,12 +128,7 @@ module.exports = {
 			link = query;
 		}
 		else {
-			const searchResult = await searchYoutube(
-				query,
-				sb.Config.get("API_GOOGLE_YOUTUBE"),
-				{ single: true }
-			);
-
+			const searchResult = await searchYoutube(query, { single: true });
 			link = `https://youtu.be/${searchResult.ID}`;
 		}
 

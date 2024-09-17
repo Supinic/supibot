@@ -9,7 +9,6 @@ const {
 	// createChannelRaidSubscription,
 	createChannelOnlineSubscription,
 	createChannelOfflineSubscription,
-	fetchToken,
 	getExistingSubscriptions,
 	getConduitId,
 	getAppAccessToken,
@@ -20,6 +19,8 @@ const {
 	initSubCacheCheckInterval,
 	sanitizeMessage
 } = require("./twitch-utils.js");
+
+const { TWITCH_ADMIN_SUBSCRIBER_LIST } = require("../utils/shared-cache-keys.json");
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
@@ -72,7 +73,8 @@ const DEFAULT_PLATFORM_CONFIG = {
 	joinChannelsOverride: [],
 	spamPreventionThreshold: 100,
 	sendVerificationChallenge: false,
-	whisperMessageLimit: 500
+	whisperMessageLimit: 500,
+	unrelatedPrivateMessageResponse: ""
 };
 
 module.exports = class TwitchPlatform extends require("./template.js") {
@@ -101,16 +103,14 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				message: "Twitch platform does not have the bot's name configured"
 			});
 		}
-		else if (!sb.Config.has("TWITCH_OAUTH", true)) {
-			await fetchToken();
-
+		else if (!process.env.TWITCH_CLIENT_ID) {
 			throw new sb.Error({
-				message: "Twitch oauth token (Config/TWITCH_OAUTH) has not been configured"
+				message: "Twitch client ID has not been configured"
 			});
 		}
-		else if (!sb.Config.has("TWITCH_CLIENT_ID", true)) {
+		else if (!process.env.TWITCH_CLIENT_SECRET) {
 			throw new sb.Error({
-				message: "Twitch client ID (Config/TWITCH_CLIENT_ID) has not been configured"
+				message: "Twitch client secret has not been configured"
 			});
 		}
 
@@ -746,7 +746,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		this.resolveUserMessage(null, userData, message);
 
 		if (!sb.Command.is(message)) {
-			await this.pm(sb.Config.get("PRIVATE_MESSAGE_UNRELATED"), senderUsername);
+			await this.pm(this.config.privateMessageResponseUnrelated, senderUsername);
 			return;
 		}
 
@@ -761,10 +761,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		if (!result || !result.success) {
 			if (!result?.reply && result?.reason === "filter") {
-				await this.pm(sb.Config.get("PRIVATE_MESSAGE_COMMAND_FILTERED"), senderUsername);
+				await this.pm(this.config.privateMessageResponseFiltered, senderUsername);
 			}
 			else if (result?.reason === "no-command") {
-				await this.pm(sb.Config.get("PRIVATE_MESSAGE_NO_COMMAND"), senderUsername);
+				await this.pm(this.config.privateMessageResponseNoCommand, senderUsername);
 			}
 		}
 	}
@@ -986,16 +986,13 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	/**
-	 * Determines whether or not a user is subscribed to a given Twitch channel.
+	 * Determines whether a user is subscribed to a given Twitch channel.
 	 * @param {sb.User} userData
-	 * @param {string} channelName
 	 * @returns {Promise<boolean>}
 	 */
-	async fetchUserCacheSubscription (userData, channelName) {
-		/**
-		 * @type {Object[]|null}
-		 */
-		const subscriberList = await sb.Cache.getByPrefix(`twitch-subscriber-list-${channelName}`);
+	async fetchUserAdminSubscription (userData) {
+		/** @type {Object[]|null} */
+		const subscriberList = await sb.Cache.getByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST);
 		if (!subscriberList || !Array.isArray(subscriberList)) {
 			return false;
 		}

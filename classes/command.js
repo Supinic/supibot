@@ -2,21 +2,16 @@ const Banphrase = require("./banphrase.js");
 const Filter = require("./filter.js");
 const User = require("./user.js");
 
+const { whitespaceRegex } = require("../utils/regexes.js");
+const config = require("../config.json");
+const COMMAND_PREFIX = config.modules.commands.prefix;
+
 const pathModule = require("node:path");
 const CooldownManager = require("../utils/cooldown-manager.js");
 const LanguageCodes = require("../utils/languages");
 
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 
-let config;
-try {
-	config = require("../config.json");
-}
-catch {
-	config = require("../config-default.json");
-}
-
-const COMMAND_PREFIX = config.modules.commands.prefix;
 class Context {
 	#command;
 	#invocation;
@@ -341,7 +336,7 @@ class Command extends require("./template.js") {
 
 	getDetailURL (options = {}) {
 		if (options.useCodePath) {
-			const baseURL = sb.Config.get("COMMAND_DETAIL_CODE_URL", false);
+			const baseURL = config.values.commandCodeUrlPrefix;
 			if (!baseURL) {
 				return "N/A";
 			}
@@ -349,7 +344,7 @@ class Command extends require("./template.js") {
 			return `${baseURL}/${encodeURIComponent(this.Name)}/index.js`;
 		}
 		else {
-			const baseURL = sb.Config.get("COMMAND_DETAIL_URL", false);
+			const baseURL = config.values.commandDetailUrlPrefix;
 			if (!baseURL) {
 				return "N/A";
 			}
@@ -542,7 +537,6 @@ class Command extends require("./template.js") {
 		};
 
 		/** @type {RegExp} */
-		const whitespaceRegex = sb.Config.get("WHITESPACE_REGEX");
 		let args = argumentArray
 			.map(i => i.replace(whitespaceRegex, ""))
 			.filter(Boolean);
@@ -732,9 +726,10 @@ class Command extends require("./template.js") {
 				};
 			}
 			else {
-				const prettify = (await channelData?.getDataProperty("showFullCommandErrorMessage"))
-					? sb.Config.get("COMMAND_ERROR_DEVELOPER")
-					: sb.Config.get("COMMAND_ERROR_GENERIC");
+				const channelHasFullErrorMessage = await channelData?.getDataProperty("showFullCommandErrorMessage");
+				const prettify = (channelHasFullErrorMessage)
+					? `Error ID ${errorID} - ${e.message}`
+					: config.responses.commandErrorResponse;
 
 				execution = {
 					success: false,

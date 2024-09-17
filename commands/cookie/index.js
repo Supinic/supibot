@@ -19,7 +19,7 @@ module.exports = {
 
 		const { transaction } = context;
 		const platform = sb.Platform.get("twitch");
-		const hasDoubleCookieAccess = await platform.fetchUserCacheSubscription(context.user, "supinic");
+		const hasDoubleCookieAccess = await platform.fetchUserAdminSubscription(context.user);
 
 		const options = { hasDoubleCookieAccess };
 		if (subcommand === "eat") {
@@ -66,7 +66,7 @@ module.exports = {
 				};
 			}
 
-			const receiverHasDoubleCookieAccess = await platform.fetchUserCacheSubscription(receiverUserData);
+			const receiverHasDoubleCookieAccess = await platform.fetchUserAdminSubscription(receiverUserData);
 			const receiverOptions = {
 				hasDoubleCookieAccess: receiverHasDoubleCookieAccess
 			};

@@ -53,12 +53,7 @@ try {
 	config = require("./config.json");
 }
 catch {
-	try {
-		config = require("./config-default.json");
-	}
-	catch {
-		throw new Error("No default or custom configuration found");
-	}
+	throw new Error("No custom configuration found! Copy `config-default.json` as `config.json` and set up your configuration");
 }
 
 const databaseModuleInitializeOrder = [
@@ -90,9 +85,6 @@ const initializeCommands = async (config) => {
 	console.timeEnd("Load commands");
 };
 
-// Database access keys are loaded here, and stored to process.env
-require("./db-access.js");
-
 (async () => {
 	const platformsConfig = config.platforms;
 	if (!platformsConfig || platformsConfig.length === 0) {
@@ -111,22 +103,14 @@ require("./db-access.js");
 		connectionLimit: process.env.MARIA_CONNECTION_LIMIT
 	});
 
-	const configData = await Query.getRecordset(rs => rs
-		.select("*")
-		.from("data", "Config"));
-
-	core.Config.load(configData);
-
 	globalThis.sb = {
 		Date: core.Date,
 		Error: core.Error,
 		Promise: core.Promise,
-
-		Config: core.Config,
 		Got: core.Got,
 
 		Query,
-		Cache: new core.Cache(core.Config.get("REDIS_CONFIGURATION")),
+		Cache: new core.Cache(process.env.REDIS_CONFIGURATION),
 		Metrics: new core.Metrics(),
 		Utils: new core.Utils()
 	};

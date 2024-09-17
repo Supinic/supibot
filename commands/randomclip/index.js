@@ -1,5 +1,5 @@
 const { getTwitchGameID } = require("../../utils/command-utils.js");
-const EARLIEST_CLIP_DATE = new sb.Date("2011-01-01");
+const EARLIEST_CLIP_DATE = new Date("2011-01-01");
 
 module.exports = {
 	Name: "randomclip",

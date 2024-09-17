@@ -1,6 +1,16 @@
 const cryptoGamePriceUpdate = async () => {
-	const ignoredAssets = ["VEF"];
+	if (!process.env.API_CRYPTO_COMPARE) {
+		throw new sb.Error({
+			messsage: "No CryptoCompare key configured (API_CRYPTO_COMPARE)"
+		});
+	}
+	if (!process.env.API_FIXER_IO) {
+		throw new sb.Error({
+			messsage: "No FixerIO key configured (API_FIXER_IO)"
+		});
+	}
 
+	const ignoredAssets = ["VEF"];
 	const conditionalFixerIo = (async () => {
 		if (new sb.Date().hours % 12 !== 0) {
 			return { rates: {} };
@@ -12,7 +22,7 @@ const cryptoGamePriceUpdate = async () => {
 			throwHttpErrors: false,
 			responseType: "json",
 			searchParams: {
-				access_key: sb.Config.get("API_FIXER_IO")
+				access_key: process.env.API_FIXER_IO
 			}
 		}).json();
 	});
@@ -25,7 +35,7 @@ const cryptoGamePriceUpdate = async () => {
 				tsyms: "BTC,XRP,DOGE,ETH,BCH,LTC,EOS,XLM,BNB,USDT,DOT,ADA,LINK,XMR,ANAL,SHIB"
 			},
 			headers: {
-				Authorization: `Apikey ${sb.Config.get("API_CRYPTO_COMPARE")}`
+				Authorization: `Apikey ${process.env.API_CRYPTO_COMPARE}`
 			}
 		}).json(),
 

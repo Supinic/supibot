@@ -75,9 +75,9 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 				message: "Discord user ID (selfId) has not been configured"
 			});
 		}
-		else if (!sb.Config.has("DISCORD_BOT_TOKEN", true)) {
+		else if (!process.env.DISCORD_BOT_TOKEN) {
 			throw new sb.Error({
-				message: "Discord bot token has not been configured"
+				message: "No Discord token configured (DISCORD_BOT_TOKEN)"
 			});
 		}
 
@@ -98,9 +98,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		});
 
 		this.initListeners();
-
-		const token = sb.Config.get("DISCORD_BOT_TOKEN");
-		await this.client.login(token);
+		await this.client.login(process.env.DISCORD_BOT_TOKEN);
 	}
 
 	initListeners () {
@@ -359,15 +357,20 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 				message
 			);
 
-			const announce = sb.Config.get("DISCORD_GUILD_JOIN_ANNOUNCE_CHANNEL", false);
+			const announce = this.config.guildCreateAnnounceChannel;
 			if (announce) {
 				const channelList = (Array.isArray(announce))
 					? announce
 					: [announce];
 
 				for (const channelID of channelList) {
-					const channelData = sb.Channel.get(channelID);
-					await channelData.send(message);
+					const channelData = sb.Channel.get(channelID, this);
+					if (channelData) {
+						await channelData.send(message);
+					}
+					else {
+						console.warn(`No channel found for guild create announcement: ${channelID}`);
+					}
 				}
 			}
 		});

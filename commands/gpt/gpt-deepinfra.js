@@ -26,6 +26,12 @@ module.exports = class GptDeepInfra extends GptOpenAI {
 	}
 
 	static async execute (context, query, modelData) {
+		if (!process.env.API_KEY_DEEPINFRA) {
+			throw new sb.Error({
+				messsage: "No DeepInfra key configured (API_KEY_DEEPINFRA)"
+			});
+		}
+
 		const temperatureCheck = super.getTemperature(context);
 		if (temperatureCheck.success === false) {
 			return temperatureCheck;
@@ -45,7 +51,7 @@ module.exports = class GptDeepInfra extends GptOpenAI {
 			method: "POST",
 			url: `https://api.deepinfra.com/v1/openai/chat/completions`,
 			headers: {
-				Authorization: `Bearer ${sb.Config.get("API_KEY_DEEPINFRA")}`
+				Authorization: `Bearer ${process.env.API_KEY_DEEPINFRA}`
 			},
 			json: {
 				model: modelData.url,
@@ -60,7 +66,7 @@ module.exports = class GptDeepInfra extends GptOpenAI {
 	}
 
 	static isAvailable () {
-		return sb.Config.has("API_KEY_DEEPINFRA", true);
+		return Boolean(process.env.API_KEY_DEEPINFRA);
 	}
 
 	static getRequestErrorMessage () {

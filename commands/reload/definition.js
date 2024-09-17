@@ -136,10 +136,6 @@ const types = [
 		plural: ["commands"]
 	},
 	{
-		target: "Config",
-		names: ["config", "configs"]
-	},
-	{
 		target: "Filter",
 		names: ["filter", "filters"]
 	},

@@ -3,6 +3,8 @@ const apiResultSymbol = Symbol("banphrase-api-result");
 const inactiveSymbol = Symbol("banphrase-inactive");
 const availableTypes = ["API response", "Custom response", "Denial", "Inactive", "Replacement"];
 
+const { responses, values } = require("../config.json");
+
 class ExternalBanphraseAPI {
 	static async pajbot (message, URL) {
 		message = message.trim().replace(/\s+/g, " ");
@@ -12,7 +14,7 @@ class ExternalBanphraseAPI {
 			url: `https://${URL}/api/v1/banphrases/test`,
 			json: { message },
 			timeout: {
-				request: sb.Config.get("PAJBOT_API_TIMEOUT")
+				request: values.pajbotBanphraseRequestTimeout
 			},
 			retry: {
 				limit: 1
@@ -287,7 +289,7 @@ module.exports = class Banphrase extends require("./template.js") {
 				}
 
 				return {
-					string: sb.Config.get("DEFAULT_BANPHRASE_API_RESPONSE"),
+					string: responses.defaultBanphrase,
 					passed: false
 				};
 			}

@@ -1,4 +1,4 @@
-const Config = require("./config.json");
+const config = require("./config.json");
 const Template = require("./gpt-template.js");
 const GptHistory = require("./history-control.js");
 
@@ -6,7 +6,7 @@ const partialInstructionRolloutChannels = [30, 37, 38];
 
 module.exports = class GptOpenAI extends Template {
 	static async getHistoryMode (context) {
-		let historyMode = await context.user.getDataProperty("chatGptHistoryMode") ?? Config.defaultHistoryMode;
+		let historyMode = await context.user.getDataProperty("chatGptHistoryMode") ?? config.defaultHistoryMode;
 		if (context.params.history) {
 			const command = context.params.history;
 			if (command === "ignore") {
@@ -62,6 +62,12 @@ module.exports = class GptOpenAI extends Template {
 	}
 
 	static async execute (context, query, modelData) {
+		if (!process.env.API_OPENAI_KEY) {
+			throw new sb.Error({
+				messsage: "No OpenAI key configured (API_OPENAI_KEY)"
+			});
+		}
+
 		let messages;
 		try {
 			messages = await GptOpenAI.getHistory(context, query);
@@ -103,7 +109,7 @@ module.exports = class GptOpenAI extends Template {
 			throwHttpErrors: false,
 			url: `https://api.openai.com/v1/chat/completions`,
 			headers: {
-				Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
+				Authorization: `Bearer ${process.env.API_OPENAI_KEY}`
 			},
 			json: {
 				model: modelData.url,
@@ -125,7 +131,7 @@ module.exports = class GptOpenAI extends Template {
 	}
 
 	static isAvailable () {
-		return sb.Config.has("API_OPENAI_KEY", true);
+		return Boolean(process.env.API_OPENAI_KEY);
 	}
 
 	static async setHistory (context, query, reply) {

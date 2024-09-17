@@ -47,11 +47,14 @@ module.exports = {
 		}
 
 		const query = args.join(" ");
-		const { components, coordinates, formatted, location, placeID, success } = await fetchGeoLocationData(
-			/** @type {string} */
-			sb.Config.get("API_GOOGLE_GEOCODING"),
-			query
-		);
+		const {
+			components,
+			coordinates,
+			formatted,
+			location,
+			placeID,
+			success
+		} = await fetchGeoLocationData(query);
 
 		if (!success) {
 			return {

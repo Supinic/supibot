@@ -1,5 +1,5 @@
 import { Date as CoreDate } from "supi-core";
-import { Config } from "supi-core/@types/types";
+import { JSONifiable } from "../globals";
 import { EventEmitter } from 'node:events';
 
 import { Emote, Message, SimpleGenericData } from "../globals";
@@ -287,12 +287,12 @@ export declare class Channel extends ClassTemplate {
     /**
      * Retrieves a channel data property value from the database.
      */
-    getDataProperty (propertyName: Config.Name, options?: SpecificCacheOptions): ReturnType<ClassTemplate["getGenericDataProperty"]>;
+    getDataProperty (propertyName: string, options?: SpecificCacheOptions): ReturnType<ClassTemplate["getGenericDataProperty"]>;
 
     /**
      * Saves a channel data property value into the database.
      */
-    setDataProperty (propertyName: Config.Name, value: Config.Value, options?: SpecificCacheOptions): ReturnType<ClassTemplate["setGenericDataProperty"]>;
+    setDataProperty (propertyName: string, value: JSONifiable, options?: SpecificCacheOptions): ReturnType<ClassTemplate["setGenericDataProperty"]>;
 
     /**
      * Pushes a property change to the database.

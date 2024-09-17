@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `chat_data`.`Reminder_History` (
   `ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `User_From` INT(10) UNSIGNED NOT NULL,
+  `User_From` INT(10) UNSIGNED NULL COMMENT 'A null value signifies a system reminder',
   `User_To` INT(10) UNSIGNED NOT NULL,
   `Channel` INT(10) UNSIGNED DEFAULT NULL,
   `Platform` INT(10) UNSIGNED DEFAULT NULL,
@@ -12,11 +12,11 @@ CREATE TABLE IF NOT EXISTS `chat_data`.`Reminder_History` (
   `Private_Message` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`),
   INDEX `Reminder_History_Platform` (`Platform`) USING BTREE,
-  KEY `Reminder_User_Alias_From` (`User_From`),
-  KEY `FK_Reminder_Channel` (`Channel`),
-  KEY `FK_Reminder_User_Alias` (`User_To`),
+  KEY `Reminder_History_User_Alias_From` (`User_From`),
+  KEY `FK_Reminder_History_Channel` (`Channel`),
+  KEY `FK_Reminder_History_User_Alias` (`User_To`),
   KEY `Schedule_Lookup` (`Schedule`),
-  CONSTRAINT `FK_Reminder_Channel` FOREIGN KEY (`Channel`) REFERENCES `Channel` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_Reminder_User_Alias` FOREIGN KEY (`User_To`) REFERENCES `User_Alias` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `Reminder_User_Alias_From` FOREIGN KEY (`User_From`) REFERENCES `User_Alias` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_Reminder_History_Channel` FOREIGN KEY (`Channel`) REFERENCES `Channel` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_Reminder_History_User_Alias` FOREIGN KEY (`User_To`) REFERENCES `User_Alias` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `Reminder_History_User_Alias_From` FOREIGN KEY (`User_From`) REFERENCES `User_Alias` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -115,11 +115,36 @@ module.exports = class ClassTemplate {
 			});
 		}
 
-		const variable = new sb.Config({
-			Name: propertyName,
-			Value: data.Value,
-			Type: data.Type
-		});
+		let value;
+		switch (data.Type) {
+			case "boolean":
+				value = (data.Value === "true");
+				break;
+
+			case "string":
+				value = String(data.Value);
+				break;
+
+			case "number":
+				value = Number(data.Value);
+				break;
+
+			case "date":
+				value = new sb.Date(data.Value);
+				break;
+
+			case "array":
+			case "object": {
+				try {
+					value = JSON.parse(data.Value);
+				}
+				catch (e) {
+					console.warn(`Data property has invalid definition`, { data, error: e });
+					value = (data.Type === "array") ? [] : {};
+				}
+				break;
+			}
+		}
 
 		if (data.Cached) {
 			if (!cacheMap.has(instance)) {
@@ -127,10 +152,10 @@ module.exports = class ClassTemplate {
 			}
 
 			const userCache = cacheMap.get(instance);
-			userCache.set(propertyName, variable.value);
+			userCache.set(propertyName, value);
 		}
 
-		return variable.value;
+		return value;
 	}
 
 	async setGenericDataProperty (inputData = {}) {
@@ -180,14 +205,11 @@ module.exports = class ClassTemplate {
 		if (value === null) {
 			row.values.Value = null;
 		}
+		else if (propertyData.Type === "array" || propertyData.Type === "object") {
+			row.values.Value = JSON.stringify(value);
+		}
 		else {
-			const variable = sb.Config.from({
-				name: propertyName,
-				type: propertyData.Type,
-				value
-			});
-
-			row.values.Value = variable.stringValue;
+			row.values.Value = String(value);
 		}
 
 		if (propertyData.Cached) {

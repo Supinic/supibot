@@ -13,8 +13,13 @@ module.exports = {
 	],
 	Whitelist_Response: "Only usable in Supinic's channel.",
 	Code: (async function randomUploaderVideo (context, ...args) {
-		const link = args.shift();
+		if (!process.env.API_GOOGLE_YOUTUBE) {
+			throw new sb.Error({
+				messsage: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
+			});
+		}
 
+		const link = args.shift();
 		if (!link) {
 			return {
 				success: false,
@@ -22,7 +27,7 @@ module.exports = {
 			};
 		}
 
-		const linkParser = getLinkParser();
+		const linkParser = await getLinkParser();
 		const type = linkParser.autoRecognize(link);
 		if (type === null) {
 			return {
@@ -52,7 +57,7 @@ module.exports = {
 			searchParams: {
 				part: "contentDetails,snippet",
 				id: linkData.authorID,
-				key: sb.Config.get("API_GOOGLE_YOUTUBE")
+				key: process.env.API_GOOGLE_YOUTUBE
 			}
 		}).json();
 
@@ -65,7 +70,6 @@ module.exports = {
 		}
 
 		const { result } = await fetchYoutubePlaylist({
-			key: sb.Config.get("API_GOOGLE_YOUTUBE"),
 			limit: 50,
 			limitAction: null,
 			perPage: 50,

@@ -8,11 +8,10 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function percent (context, ...args) {
-		if (!sb.Config.has("API_DAYS_OF_THE_YEAR", true)) {
-			return {
-				success: false,
-				reply: `This command is not available! Configuration variable API_DAYS_OF_THE_YEAR is missing.`
-			};
+		if (!process.env.API_DAYS_OF_THE_YEAR) {
+			throw new sb.Error({
+				messsage: "No DaysOfTheYear key configured (API_DAYS_OF_THE_YEAR)"
+			});
 		}
 
 		const { invocation } = context;
@@ -42,8 +41,7 @@ module.exports = {
 			const response = await sb.Got("GenericAPI", {
 				url: `https://www.daysoftheyear.com/api/v1/date/${identifier}`,
 				headers: {
-					/** @type {string} */
-					"X-Api-Key": sb.Config.get("API_DAYS_OF_THE_YEAR")
+					"X-Api-Key": process.env.API_DAYS_OF_THE_YEAR
 				}
 			});
 

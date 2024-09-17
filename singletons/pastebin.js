@@ -1,5 +1,8 @@
-let loginConfigMissingNotified = false;
-const loginConfigs = [
+const config = require("../config.json");
+const { defaultUserAgent } = config.modules.gots;
+
+let loginEnvsMissingNotifier = false;
+const loginEnvs = [
 	"API_PASTEBIN",
 	"PASTEBIN_USER_NAME",
 	"PASTEBIN_PASSWORD"
@@ -40,7 +43,7 @@ module.exports = class PastebinSingleton {
 		prefixUrl: "https://pastebin.com/",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded",
-			"User-Agent": sb.Config.get("DEFAULT_USER_AGENT")
+			"User-Agent": defaultUserAgent
 		}
 	});
 
@@ -52,10 +55,10 @@ module.exports = class PastebinSingleton {
 		if (this.#authData || this.#authenticationPending) {
 			return;
 		}
-		else if (loginConfigs.some(key => !sb.Config.has(key))) {
-			if (!loginConfigMissingNotified) {
-				console.debug("Pastebin module is missing login configs, will not attempt to log in.");
-				loginConfigMissingNotified = true;
+		else if (loginEnvs.some(key => !process.env[key])) {
+			if (!loginEnvsMissingNotifier) {
+				console.debug("Pastebin module is missing env configs, will not attempt to log in.");
+				loginEnvsMissingNotifier = true;
 			}
 
 			return;
@@ -70,9 +73,9 @@ module.exports = class PastebinSingleton {
 				request: 5000
 			},
 			body: new URLSearchParams({
-				api_dev_key: sb.Config.get("API_PASTEBIN"),
-				api_user_name: sb.Config.get("PASTEBIN_USER_NAME"),
-				api_user_password: sb.Config.get("PASTEBIN_PASSWORD")
+				api_dev_key: process.env.API_PASTEBIN,
+				api_user_name: process.env.PASTEBIN_USER_NAME,
+				api_user_password: process.env.PASTEBIN_PASSWORD
 			}).toString()
 		});
 
@@ -131,7 +134,7 @@ module.exports = class PastebinSingleton {
 		}
 
 		const params = new URLSearchParams({
-			api_dev_key: sb.Config.get("API_PASTEBIN"),
+			api_dev_key: process.env.API_PASTEBIN,
 			api_option: "paste",
 			api_paste_code: text,
 			api_paste_name: options.name || "untitled Supibot paste",

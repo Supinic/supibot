@@ -92,8 +92,11 @@ module.exports = [
 	},
 	{
 		name: "Whitelist_Response",
-		valueKind: "Literal",
-		valueTypes: ["string", "null"]
+		failMessage: "Literal null, literal non-empty string or template string",
+		checkCallback: (v) => (
+			(v.type === "Literal" && typeof v.value === "string"))
+			|| (v.type === "TemplateLiteral")
+			|| (v.type === "Literal" && v.value === null)
 	},
 	{
 		name: "Code",

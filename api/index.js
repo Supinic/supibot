@@ -1,10 +1,10 @@
-module.exports = (function () {
-	const secure = (sb.Config?.get("SUPIBOT_API_SECURE", false)) ?? false;
-	const httpInterface = (secure) ? require("node:https") : require("node:http");
+const { api } = require("../config.json");
 
-	const port = sb.Config?.get("SUPIBOT_API_PORT", false) ?? 31337;
-	const protocol = (secure) ? "https" : "http";
-	const baseURL = `${protocol}://localhost:${port}`;
+module.exports = (function () {
+	if (!api.port || typeof api.secure !== "boolean") {
+		console.warn("Internal API port/security is not configured - internal API will not start");
+		return;
+	}
 
 	const definition = {};
 	const subroutes = [
@@ -22,6 +22,11 @@ module.exports = (function () {
 		definition[route] = require(`./${file}`);
 	}
 
+	const port = api.port;
+	const protocol = (api.secure) ? "https" : "http";
+	const baseURL = `${protocol}://localhost:${port}`;
+
+	const httpInterface = (api.secure) ? require("node:https") : require("node:http");
 	const server = httpInterface.createServer(async (req, res) => {
 		const url = new URL(req.url, baseURL);
 		const path = url.pathname.split("/").filter(Boolean);

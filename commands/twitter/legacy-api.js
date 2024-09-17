@@ -3,8 +3,8 @@ const fetchAuthData = async () => {
 	let bearerToken = await sb.Cache.getByPrefix(apiTokenKey);
 
 	if (!bearerToken) {
-		const key = sb.Config.get("TWITTER_CONSUMER_KEY", false);
-		const secret = sb.Config.get("TWITTER_CONSUMER_SECRET", false);
+		const key = process.env.API_TWITTER_CONSUMER_KEY;
+		const secret = process.env.API_TWITTER_CONSUMER_SECRET;
 		if (!key || !secret) {
 			return {
 				success: false,

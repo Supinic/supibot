@@ -20,7 +20,7 @@ module.exports = {
 				nickname: user
 			},
 			headers: {
-				Authorization: `Bearer ${sb.Config.get("FACEIT_API_KEY")}`
+				Authorization: `Bearer ${process.env.API_FACEIT_KEY}`
 			},
 			throwHttpErrors: false
 		});

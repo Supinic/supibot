@@ -605,7 +605,7 @@ module.exports = class Filter extends require("./template.js") {
 			Response: "Auto",
 			Blocked_User: options.Blocked_User ?? null,
 			Active: true,
-			Issued_By: options.Issued_By ?? sb.Config.get("ADMINISTRATOR_USER_ID")
+			Issued_By: options.Issued_By
 		};
 
 		const row = await sb.Query.getRow("chat_data", "Filter");

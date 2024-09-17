@@ -10,6 +10,12 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Code: (async function cryptoWallet (context, address) {
+		if (!process.env.API_CRYPTO_COMPARE) {
+			throw new sb.Error({
+				messsage: "No CryptoCompare key configured (API_CRYPTO_COMPARE)"
+			});
+		}
+
 		if (!address) {
 			return {
 				success: false,
@@ -74,7 +80,7 @@ module.exports = {
 				request: 10000
 			},
 			headers: {
-				Authorization: `Apikey ${sb.Config.get("API_CRYPTO_COMPARE")}`
+				Authorization: `Apikey ${process.env.API_CRYPTO_COMPARE}`
 			}
 		});
 

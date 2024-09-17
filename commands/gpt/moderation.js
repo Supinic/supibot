@@ -1,4 +1,10 @@
 const check = async (context, text) => {
+	if (!process.env.API_OPENAI_KEY) {
+		throw new sb.Error({
+			messsage: "No OpenAI key configured (API_OPENAI_KEY)"
+		});
+	}
+
 	text = text.trim();
 
 	const moderationCheck = await sb.Got("GenericAPI", {
@@ -6,7 +12,7 @@ const check = async (context, text) => {
 		throwHttpErrors: false,
 		url: `https://api.openai.com/v1/moderations`,
 		headers: {
-			Authorization: `Bearer ${sb.Config.get("API_OPENAI_KEY")}`
+			Authorization: `Bearer ${process.env.API_OPENAI_KEY}`
 		},
 		json: {
 			input: text

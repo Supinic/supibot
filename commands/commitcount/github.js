@@ -1,4 +1,11 @@
 const execute = async (data) => {
+	if (!process.env.API_GITHUB_PUBLIC_REPO_GQL_TOKEN) {
+		return {
+			success: false,
+			reply: "No GithHub public repository GQL token configured!"
+		};
+	}
+
 	let self = false;
 	let username = data.username;
 	const { context, threshold } = data;
@@ -19,7 +26,7 @@ const execute = async (data) => {
 
 	const response = await sb.Got.gql({
 		url: "https://api.github.com/graphql",
-		token: sb.Config.get("GITHUB_PUBLIC_REPO_GQL_TOKEN"),
+		token: process.env.API_GITHUB_PUBLIC_REPO_GQL_TOKEN,
 		query: `query ($username: String!, $threshold: DateTime!) {
 			user (login: $username) {
 				contributionsCollection (from: $threshold) {

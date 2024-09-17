@@ -1,12 +1,15 @@
 const LanguageCodes = require("../../utils/languages");
+const { locales } = require("./tts-locales.json");
+const { TTS_ENABLED, TTS_MULTIPLE_ENABLED } = require("../../utils/shared-cache-keys.json");
 
-const tts = {
-	enabled: null,
-	url: null,
-	maxCooldown: null,
-	limit: null,
-	locales: []
-};
+const config = require("../../config.json");
+const {
+	listenerAddress,
+	listenerPort,
+	ttsLengthLimit = 30_000,
+	ttsListUrl = "(no address configured)",
+	ttsVolume
+} = config.local ?? {};
 
 module.exports = {
 	Name: "texttospeech",
@@ -19,26 +22,20 @@ module.exports = {
 		{ name: "lang", type: "string" },
 		{ name: "speed", type: "number" }
 	],
-	Whitelist_Response: "Check out the possible voices and locales here: https://supinic.com/stream/tts",
+	Whitelist_Response: `Check out the possible voices and locales here: ${ttsListUrl}`,
 	initialize: function () {
-		if (!sb.Config.has("LOCAL_IP", true) || !sb.Config.has("LOCAL_PLAY_SOUNDS_PORT", true)) {
-			console.warn("$tts: Listener not configured - will be unavailable");
-			tts.enabled = false;
+		if (!listenerAddress || !listenerPort) {
+			console.warn("$texttospeech: Listener not configured - command will be unavailable");
+			this.data.ttsEnabled = false;
 		}
 		else {
-			tts.url = `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}`;
-			tts.enabled = true;
-
-			const { limit, locales } = require("./tts-config.json");
-			tts.limit = limit;
-			tts.maxCooldown = this.Cooldown + (limit - 10_000) * 10;
-			tts.locales = locales;
-
+			this.data.maxCooldown = this.Cooldown + (ttsLengthLimit - 10_000) * 10;
+			this.data.ttsEnabled = true;
 			this.data.pending = false;
 		}
 	},
 	Code: (async function textToSpeech (context, ...args) {
-		if (!tts.enabled) {
+		if (!this.data.pending) {
 			return {
 				success: false,
 				reply: "Local playsound listener is not configured!"
@@ -48,16 +45,19 @@ module.exports = {
 			return {
 				cooldown: 5000,
 				success: false,
-				reply: "Check out the possible voices and locales here: https://supinic.com/stream/tts"
+				reply: `Check out the possible voices and locales here: ${ttsListUrl}`
 			};
 		}
-		else if (!sb.Config.get("TTS_ENABLED")) {
+
+		const state = await sb.Cache.getByPrefix(TTS_ENABLED);
+		if (!state) {
 			return {
 				reply: "Text-to-speech is currently disabled!"
 			};
 		}
 
-		if (!sb.Config.get("TTS_MULTIPLE_ENABLED")) {
+		const multiState = await sb.Cache.getByPrefix(TTS_MULTIPLE_ENABLED);
+		if (!multiState) {
 			if (this.data.pending) {
 				return {
 					reply: "Someone else is using the TTS right now, and multiple TTS is not available right now!",
@@ -80,16 +80,15 @@ module.exports = {
 
 		let code;
 		let input = context.params.lang ?? "en-us";
-
 		if (input === "random") {
-			const randomItem = sb.Utils.randArray(tts.locales);
+			const randomItem = sb.Utils.randArray(locales);
 			input = randomItem.locale;
 		}
 		else {
 			code = LanguageCodes.getCode(input);
 		}
 
-		const currentLocale = tts.locales.find(i => i.locale === input || i.code === code);
+		const currentLocale = locales.find(i => i.locale === input || i.code === code);
 		if (!currentLocale) {
 			this.data.pending = false;
 			return {
@@ -103,7 +102,7 @@ module.exports = {
 			messageTime = process.hrtime.bigint();
 
 			const response = await sb.Got("GenericAPI", {
-				url: tts.url,
+				url: `${listenerAddress}:${listenerPort}`,
 				responseType: "text",
 				searchParams: new URLSearchParams({
 					tts: JSON.stringify([{
@@ -111,8 +110,8 @@ module.exports = {
 						text: args.join(" "),
 						speed
 					}]),
-					volume: sb.Config.get("TTS_VOLUME"),
-					limit: tts.limit
+					volume: ttsVolume,
+					limit: ttsLengthLimit
 				})
 			});
 
@@ -120,10 +119,9 @@ module.exports = {
 			result = (response.body === "true");
 		}
 		catch (e) {
-			await sb.Config.set("TTS_ENABLED", false, sb.Query);
-
+			await sb.Cache.setByPrefix(TTS_ENABLED, false);
 			return {
-				reply: "TTS Listener encountered an error or is turned on. Turning off text to speech!"
+				reply: "TTS Listener encountered an error or is turned on! Turning off text to speech."
 			};
 		}
 		finally {
@@ -132,7 +130,7 @@ module.exports = {
 
 		if (result === null || result === false) {
 			return {
-				reply: `Your TTS was refused, because its length exceeded the limit of ${tts.limit / 1000} seconds!`,
+				reply: `Your TTS was refused, because its length exceeded the limit of ${ttsLengthLimit / 1000} seconds!`,
 				cooldown: { length: 5000 }
 			};
 		}
@@ -142,8 +140,8 @@ module.exports = {
 			? (this.Cooldown + (duration - 10000) * 10)
 			: this.Cooldown;
 
-		if (cooldown > tts.maxCooldown) {
-			cooldown = tts.maxCooldown;
+		if (cooldown > this.data.maxCooldown) {
+			cooldown = this.data.maxCooldown;
 		}
 
 		return {
@@ -158,7 +156,6 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { locales } = require("./tts-config.json");
 		const list = locales.map(i => `<li><code>${i.locale}</code> - ${i.language}</li>`).join("");
 
 		return [

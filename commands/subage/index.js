@@ -60,19 +60,10 @@ module.exports = {
 		const channelName = sb.User.normalizeUsername(channel ?? context.channel.Name);
 		const userName = sb.User.normalizeUsername(user ?? context.user.Name);
 
-		const response = await sb.Got("FakeAgent", {
-			method: "POST",
-			url: "https://gql.twitch.tv/gql",
+		const response = await sb.Got("TwitchGQL", {
 			responseType: "json",
 			headers: {
-				Accept: "*/*",
-				"Accept-Language": "en-US",
-				Authorization: `OAuth ${sb.Config.get("TWITCH_GQL_OAUTH")}`,
-				"Client-ID": sb.Config.get("TWITCH_GQL_CLIENT_ID"),
-				"Client-Version": sb.Config.get("TWITCH_GQL_CLIENT_VERSION"),
-				"Content-Type": "text/plain;charset=UTF-8",
-				Referer: `https://www.twitch.tv/popout/${channelName}/viewercard/${userName}`,
-				"X-Device-ID": sb.Config.get("TWITCH_GQL_DEVICE_ID")
+				Referer: `https://www.twitch.tv/popout/${channelName}/viewercard/${userName}`
 			},
 			body: JSON.stringify([{
 				operationName: "ViewerCard",

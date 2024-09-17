@@ -1,3 +1,5 @@
+import { SONG_REQUESTS_STATE } from "../../utils/shared-cache-keys.json" assert { type: "json "};
+
 export const definition = {
 	Name: "supinic-stream-db",
 	Events: ["online", "offline"],
@@ -40,24 +42,6 @@ export const definition = {
 				});
 
 				await row.save();
-
-				const latestVlcStartId = await sb.Query.getRecordset(rs => rs
-					.select("ID")
-					.from("chat_data", "Song_Request")
-					.where("VLC_ID = %n", 3) // starting point of VLC song requests
-					.orderBy("ID DESC")
-					.limit(1)
-					.flat("ID")
-					.single()
-				);
-
-				// Clear all requests that precede this VLC session
-				await sb.Query.isRecordUpdater(ru => ru
-					.from("chat_data", "Song_Request")
-					.set("Status", "Inactive")
-					.where("Status <> %s", "Inactive")
-					.where("ID < %n", latestVlcStartId)
-				)
 			}
 			// Stream just went offline + row already exists => mark the Stream as completed by setting its End property
 			else if (exists && context.event === "offline") {
@@ -104,7 +88,8 @@ export const definition = {
 				await row.save();
 			}
 
-			await sb.Config.set("SONG_REQUESTS_STATE", "off", sb.Query);
+			// Clear all pending song requests, set song request status to "off"
+			await sb.Cache.setByPrefix(SONG_REQUESTS_STATE, "off");
 			await sb.Query.isRecordUpdater(ru => ru
 				.from("chat_data", "Song_Request")
 				.set("Status", "Inactive")

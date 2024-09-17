@@ -70,7 +70,7 @@ module.exports = {
 
 		let data;
 		let videoID;
-		const LinkParser = getLinkParser();
+		const LinkParser = await getLinkParser();
 		const youtubeParser = LinkParser.getParser("youtube");
 
 		if (youtubeParser.checkLink(query, false)) {
@@ -85,14 +85,9 @@ module.exports = {
 		}
 
 		if (!data) {
-			const tracks = await searchYoutube(
-				query,
-				/** @type {string} */
-				sb.Config.get("API_GOOGLE_YOUTUBE"),
-				{
-					maxResults: RESULTS_PER_SEARCH
-				}
-			);
+			const tracks = await searchYoutube(query, {
+				maxResults: RESULTS_PER_SEARCH
+			});
 
 			if (cacheRecordExists) {
 				await this.setCacheData("search-amount-today", searchAmountToday, {

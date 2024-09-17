@@ -15,6 +15,41 @@
     "If you would like the type to not be logged, change the \"enabled\" property to `false`."
   ],
   "basePath": "/home/supibot",
+  "responses": {
+    "defaultBanphrase": "[Banphrased]",
+    "commandErrorResponse": "An error occured while executing the command!"
+  },
+  "values": {
+    "pendingCommandTimeout": 300000,
+    "pajbotBanphraseRequestTimeout": 5000,
+    "commandCodeUrlPrefix": "https://supinic.com/bot/command/detail",
+    "commandDetailUrlPrefix": "https://github.com/Supinic/Supibot/tree/master/commands",
+    "maxIncomingActiveReminders": 10,
+    "maxOutgoingActiveReminders": 10,
+    "maxIncomingScheduledReminders": 5,
+    "maxOutgoingScheduledReminders": 5,
+    "userAdditionHighLoadThreshold": 50,
+    "userAdditionCriticalLoadThreshold": 200
+  },
+  "local": {
+    "epalAudioChannels": [],
+    "listenerAddress": null,
+    "listenerPort": null,
+    "ttsVolume": null,
+    "ttsLengthLimit": null,
+    "ttsListUrl": null,
+    "playsoundListUrl": null,
+    "vlcPassword": null,
+    "vlcPort": null,
+    "vlcUrl": null,
+    "vlcUsername": null,
+    "vlcBaseUrl": null,
+    "vlcIp": null
+  },
+  "api": {
+    "secure": false,
+    "port": 11000
+  },
   "modules": {
     "chat-modules": {
       "disableAll": true,
@@ -40,6 +75,7 @@
       "whitelist": []
     },
     "gots": {
+      "defaultUserAgent": "Custom fork of Supibot: github.com/supinic/supibot",
       "disableAll": false,
       "blacklist": [
         "RaspberryPi4",
@@ -93,7 +129,10 @@
         "joinChannelsOverride": [],
         "spamPreventionThreshold": 100,
         "sendVerificationChallenge": false,
-        "whisperMessageLimit": 500
+        "whisperMessageLimit": 500,
+        "privateMessageResponseUnrelated": "Your message has been logged.",
+        "privateMessageResponseFiltered": "That command is not available via private messages.",
+        "privateMessageResponseNoCommand": "That command does not exist. Please use the commands command to get a list."
       },
       "logging": {
         "bits": false,
@@ -117,7 +156,8 @@
       "mirrorIdentifier": "(D)",
       "platform": {
         "sendVerificationChallenge": false,
-        "createReminderWhenSendingPrivateMessageFails": true
+        "createReminderWhenSendingPrivateMessageFails": true,
+        "guildCreateAnnounceChannel": null
       },
       "logging": {
         "messages": false,

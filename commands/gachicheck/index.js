@@ -19,7 +19,7 @@ module.exports = {
 			};
 		}
 
-		const linkParser = getLinkParser();
+		const linkParser = await getLinkParser();
 		const links = [];
 		if (args[0] === "playlist") {
 			args.shift();
@@ -33,7 +33,6 @@ module.exports = {
 
 			const { amount, reason, result, success } = await fetchYoutubePlaylist({
 				playlistID,
-				key: sb.Config.get("API_GOOGLE_YOUTUBE"),
 				limit,
 				limitAction: "return"
 			});

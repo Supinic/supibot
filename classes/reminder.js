@@ -1,3 +1,5 @@
+const config = require("../config.json");
+
 const AwayFromKeyboard = require("./afk.js");
 const Banphrase = require("./banphrase.js");
 const Channel = require("./channel.js");
@@ -133,7 +135,7 @@ module.exports = class Reminder extends require("./template.js") {
 			if (this.User_From === this.User_To) {
 				message = `${toMention}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
-			else if (this.User_From === sb.Config.get("SELF_ID")) {
+			else if (this.User_From === null) {
 				message = `${toMention}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
 			else if (this.User_To) {
@@ -143,7 +145,7 @@ module.exports = class Reminder extends require("./template.js") {
 			const statusAFK = AwayFromKeyboard.get(toUserData);
 			if (statusAFK && channelData) {
 				await Reminder.create({
-					User_From: sb.Config.get("SELF_ID"),
+					User_From: null,
 					User_To: toUserData.ID,
 					Platform: channelData.Platform.ID,
 					Channel: channelData.ID,
@@ -173,7 +175,7 @@ module.exports = class Reminder extends require("./template.js") {
 						if (this.User_From === this.User_To) {
 							mirrorMessage = `${toUserData.Name}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
-						else if (this.User_From === sb.Config.get("SELF_ID")) {
+						else if (this.User_From === null) {
 							mirrorMessage = `${toUserData.Name}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
 						else if (this.User_To) {
@@ -653,7 +655,7 @@ module.exports = class Reminder extends require("./template.js") {
 	 * Used mostly in commands to set up reminders.
 	 * @param {number} userFrom
 	 * @param {number} userTo
-	 * @param {CustomDate} [schedule]
+	 * @param {sb.Date} [schedule]
 	 * @param {string} [type]
 	 * @return {ReminderCreationResult}
 	 */
@@ -674,8 +676,8 @@ module.exports = class Reminder extends require("./template.js") {
 			)
 		]);
 
-		const incomingLimit = sb.Config.get("MAX_ACTIVE_INCOMING_REMINDERS", false) ?? 10;
-		const outgoingLimit = sb.Config.get("MAX_ACTIVE_OUTGOING_REMINDERS", false) ?? 10;
+		const incomingLimit = config.values.maxIncomingActiveReminders;
+		const outgoingLimit = config.values.maxOutgoingActiveReminders;
 		const [privateIncoming, publicIncoming] = sb.Utils.splitByCondition(incomingData, i => i.Private_Message);
 		const [privateOutgoing, publicOutgoing] = sb.Utils.splitByCondition(outgoingData, i => i.Private_Message);
 
@@ -705,8 +707,8 @@ module.exports = class Reminder extends require("./template.js") {
 		}
 
 		if (schedule) {
-			const incomingScheduledLimit = sb.Config.get("MAX_ACTIVE_SCHEDULED_INCOMING_REMINDERS", false) ?? 5;
-			const outgoingScheduledLimit = sb.Config.get("MAX_ACTIVE_SCHEDULED_OUTGOING_REMINDERS", false) ?? 5;
+			const incomingScheduledLimit = config.values.maxIncomingScheduledReminders;
+			const outgoingScheduledLimit = config.values.maxOutgoingScheduledReminders;
 			if (!(schedule instanceof sb.Date)) {
 				throw new sb.Error({
 					message: "Invalid schedule provided",

@@ -1,3 +1,5 @@
+const config = require("../config.json");
+
 module.exports = class User extends require("./template.js") {
 	static mapCacheExpiration = 300_000;
 	static redisCacheExpiration = 3_600_000;
@@ -17,8 +19,6 @@ module.exports = class User extends require("./template.js") {
 
 	static loadUserPrefix = "sb-user-high-load";
 	static loadUserPrefixExpiry = 60_000;
-	static highLoadThreshold;
-	static criticalLoadThreshold;
 
 	static highLoadUserBatch;
 	static highLoadUserInterval = setInterval(async () => {
@@ -141,8 +141,6 @@ module.exports = class User extends require("./template.js") {
 	}
 
 	static async initialize () {
-		User.highLoadThreshold = sb.Config.get("USER_ADD_HIGH_LOAD_THRESHOLD", false) ?? 50;
-		User.criticalLoadThreshold = sb.Config.get("USER_ADD_CRITICAL_LOAD_THRESHOLD", false) ?? 200;
 		User.data = new Map();
 
 		await User.loadData();
@@ -356,10 +354,10 @@ module.exports = class User extends require("./template.js") {
 		}
 
 		const keys = await sb.Cache.getKeysByPrefix(`${User.loadUserPrefix}*`);
-		if (keys.length > User.criticalLoadThreshold) {
+		if (keys.length > config.values.userAdditionCriticalLoadThreshold) {
 			return null;
 		}
-		else if (keys.length > User.highLoadThreshold) {
+		else if (keys.length > config.values.userAdditionHighLoadThreshold) {
 			User.pendingNewUsers.set(preparedName, null);
 
 			if (User.highLoadUserBatch) {

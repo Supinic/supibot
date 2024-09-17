@@ -1,12 +1,4 @@
 (async () => {
-	const updateRow = (async function (db, table, pk, key, value) {
-		const row = await sb.Query.getRow(db, table);
-		await row.load(pk);
-
-		row.values[key] = value;
-		await row.save();
-	});
-
 	console.log("Setting up query builder...");
 	try {
 		const core = await import("supi-core");
@@ -31,15 +23,15 @@
 	const platformsData = {
 		twitch: {
 			ID: 1,
-			envs: ["TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET", "TWITCH_REFRESH_TOKEN"]
+			envs: []
 		},
 		discord: {
 			ID: 2,
-			envs: ["DISCORD_BOT_TOKEN"]
+			envs: []
 		},
 		cytube: {
 			ID: 3,
-			envs: ["CYTUBE_BOT_PASSWORD"]
+			envs: []
 		}
 	};
 	const platforms = Object.keys(platformsData);
@@ -51,13 +43,6 @@
 		process.exit(1);
 	}
 
-	if (!process.env.REDIS_CONFIGURATION) {
-		console.error("Missing Redis configuration");
-		process.exit(1);
-	}
-	await updateRow("data", "Config", "REDIS_CONFIGURATION", "Value", process.env.REDIS_CONFIGURATION);
-	console.log("Redis configuration copied to `data`.`Config` table");
-
 	const platformData = platformsData[initialPlatform];
 	for (const envKey of platformData.envs) {
 		const env = process.env[envKey];
@@ -65,8 +50,6 @@
 			console.error(`Missing env.${envKey} for platform ${initialPlatform}`);
 			process.exit(1);
 		}
-
-		await updateRow("data", "Config", envKey, "Value", env);
 	}
 
 	if (initialPlatform === "twitch") {

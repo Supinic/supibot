@@ -12,6 +12,12 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function currency (context, ...args) {
+		if (!process.env.API_OPEN_EXCHANGE_RATES) {
+			throw new sb.Error({
+				messsage: "No OpenExchangeRates key configured (API_OPEN_EXCHANGE_RATES)"
+			});
+		}
+
 		const query = args.join(" ");
 		if (!query) {
 			return {
@@ -86,8 +92,7 @@ module.exports = {
 				method: "GET",
 				url: "https://openexchangerates.org/api/latest.json",
 				searchParams: {
-					/** @type {string} */
-					app_id: sb.Config.get("API_OPEN_EXCHANGE_RATES")
+					app_id: process.env.API_OPEN_EXCHANGE_RATES
 				}
 			});
 

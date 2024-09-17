@@ -1,3 +1,5 @@
+const { values } = require("../config.json");
+
 class Cooldown {
 	#channel = null;
 	#user = null;
@@ -87,7 +89,6 @@ class CooldownManager {
 	 */
 	constructor () {
 		this.data = [];
-		this.pendingCooldownExpiration = 300_000;
 		this.#pruneInterval = setInterval(() => this.prune(), 60_000);
 	}
 
@@ -146,7 +147,7 @@ class CooldownManager {
 		this.data.push(new Pending({
 			user,
 			description,
-			expires: Date.now() + this.pendingCooldownExpiration
+			expires: Date.now() + values.pendingCommandTimeout
 		}));
 	}
 

@@ -16,6 +16,12 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Code: (async function ocr (context, ...args) {
+		if (!process.env.API_OCR_SPACE) {
+			throw new sb.Error({
+				messsage: "No OCR Space key configured (API_OCR_SPACE)"
+			});
+		}
+
 		let languageCode = "eng";
 		if (context.params.lang) {
 			languageCode = LanguageCodes.getCode(context.params.lang, "iso6393");
@@ -93,7 +99,7 @@ module.exports = {
 				throwHttpErrors: false,
 				url: "https://api.ocr.space/parse/imageurl",
 				headers: {
-					apikey: sb.Config.get("API_OCR_SPACE")
+					apikey: process.env.API_OCR_SPACE
 				},
 				searchParams: {
 					url: link,

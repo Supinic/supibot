@@ -1,3 +1,13 @@
+const {
+	PLAYSOUNDS_ENABLED,
+	TTS_ENABLED,
+	TTS_MULTIPLE_ENABLED,
+	TTS_TIME_LIMIT,
+	SONG_REQUESTS_STATE
+} = require("../../utils/shared-cache-keys.json");
+
+const AVAILABLE_SONG_REQUEST_STATES = ["cytube", "vlc", "off"];
+
 module.exports = {
 	Name: "stream",
 	Aliases: null,
@@ -19,8 +29,11 @@ module.exports = {
 		switch (type) {
 			case "tts": {
 				const value = (rest.shift() === "true");
-				sb.Config.set("TTS_ENABLED", value, sb.Query);
-				return { reply: `Text to speech is now set to ${value}.` };
+				await sb.Cache.setByPrefix(TTS_ENABLED, value);
+
+				return {
+					reply: `Text to speech is now set to ${value}.`
+				};
 			}
 
 			case "ttslimit": {
@@ -31,41 +44,37 @@ module.exports = {
 					};
 				}
 
-				sb.Config.set("TTS_TIME_LIMIT", limit, sb.Query);
-				return { reply: `Text to speech time limit is now set to ${limit} milliseconds.` };
-			}
-
-			case "ttsvolume": {
-				const volume = Number(rest.shift());
-				if (!Number.isFinite(volume) || volume < 0 || volume > 8) {
-					return {
-						reply: "Invalid value provided! Must be in the range <0, 8>."
-					};
-				}
-
-				sb.Config.set("TTS_VOLUME", volume, sb.Query);
-				return { reply: `Text to speech volume is now set to ${volume}` };
+				await sb.Cache.setByPrefix(TTS_TIME_LIMIT, limit);
+				return {
+					reply: `Text to speech time limit is now set to ${limit} milliseconds.`
+				};
 			}
 
 			case "ttsmulti":
 			case "multitts": {
 				const value = (rest.shift() === "true");
-				sb.Config.set("TTS_MULTIPLE_ENABLED", value, sb.Query);
-				return { reply: `Concurrent text to speech is now set to ${value}` };
+				await sb.Cache.setByPrefix(TTS_MULTIPLE_ENABLED, value);
+				return {
+					reply: `Concurrent text to speech is now set to ${value}`
+				};
 			}
 
 			case "ps":
 			case "playsounds":
 			case "playsound": {
 				const value = (rest.shift() === "true");
-				sb.Config.set("PLAYSOUNDS_ENABLED", value, sb.Query);
-				return { reply: `Play sounds are now set to ${value}` };
+				await sb.Cache.setByPrefix(PLAYSOUNDS_ENABLED, value);
+				return {
+					reply: `Play sounds are now set to ${value}`
+				};
 			}
 
 			case "sr": {
 				const value = (rest.shift() || "").toLowerCase();
-				if (!["off", "vlc", "cytube", "dubtrack", "necrodancer", "vlc-read"].includes(value)) {
-					return { reply: "Invalid song request state!" };
+				if (!AVAILABLE_SONG_REQUEST_STATES.includes(value)) {
+					return {
+						reply: "Invalid song request state!"
+					};
 				}
 
 				if (value === "vlc") {
@@ -75,8 +84,10 @@ module.exports = {
 					sb.VideoLANConnector.client.stopRunning();
 				}
 
-				sb.Config.set("SONG_REQUESTS_STATE", value, sb.Query);
-				return { reply: `Song requests are now set to ${value}` };
+				await sb.Cache.setByPrefix(SONG_REQUESTS_STATE, value);
+				return {
+					reply: `Song requests are now set to ${value}`
+				};
 			}
 
 			default: return { reply: "Unrecognized command." };

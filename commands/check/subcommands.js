@@ -1,5 +1,9 @@
 const handleErrorInspection = require("./inspect-errors");
 const { isSupported } = require("../randomline/rustlog.js");
+const {
+	SONG_REQUESTS_STATE,
+	SONG_REQUESTS_VLC_PAUSED
+} = require("../../utils/shared-cache-keys.json");
 
 module.exports = (command) => [
 	{
@@ -301,7 +305,7 @@ module.exports = (command) => [
 			}
 
 			const platform = sb.Platform.get("twitch");
-			const hasDoubleCookieAccess = await platform.fetchUserCacheSubscription(targetUser, "supinic");
+			const hasDoubleCookieAccess = await platform.fetchUserAdminSubscription(targetUser);
 
 			let string;
 			if (CookieLogic.canEatReceivedCookie(userCookieData)) {
@@ -333,10 +337,16 @@ module.exports = (command) => [
 		aliases: ["DeepL"],
 		description: "Checks the current usage limits of the DeepL translation engine in $translate.",
 		execute: async () => {
+			if (!process.env.API_DEEPL_KEY) {
+				throw new sb.Error({
+					messsage: "No DeepL key configured (API_DEEPL_KEY)"
+				});
+			}
+
 			const response = await sb.Got("GenericAPI", {
 				url: "https://api-free.deepl.com/v2/usage",
 				headers: {
-					Authorization: `DeepL-Auth-Key ${sb.Config.get("API_DEEPL_KEY")}`
+					Authorization: `DeepL-Auth-Key ${process.env.API_DEEPL_KEY}`
 				}
 			});
 
@@ -663,8 +673,9 @@ module.exports = (command) => [
 				};
 			}
 
-			const state = sb.Config.get("SONG_REQUESTS_STATE");
-			const pauseString = (state === "vlc" && sb.Config.get("SONG_REQUESTS_VLC_PAUSED"))
+			const state = await sb.Cache.getByPrefix(SONG_REQUESTS_STATE);
+			const pauseState = await sb.Cache.getByPrefix(SONG_REQUESTS_VLC_PAUSED);
+			const pauseString = (state === "vlc" && pauseState === true)
 				? "Song requests are paused at the moment."
 				: "";
 

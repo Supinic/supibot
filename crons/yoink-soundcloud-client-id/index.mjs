@@ -1,19 +1,25 @@
 import { getLinkParser } from "../../utils/link-parser.js";
 
+import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+const { SOUNDCLOUD_CLIENT_ID } = sharedKeys;
+
 export const definition = {
 	name: "yoink-soundcloud-client-id",
 	expression: "0 */10 * * * *",
 	description: "\"Borrows\" the clientside Soundcloud API key to be used for TrackLinkParser module.",
 	code: (async function yoinkSoundcloudClientID (cron) {
-		if (!sb.Config.has("SOUNDCLOUD_CLIENT_ID")) {
+		const soundcloudClientId = await sb.Cache.getByPrefix(SOUNDCLOUD_CLIENT_ID) ?? process.env.SOUNDCLOUD_CLIENT_ID;
+		if (!soundcloudClientId) {
+			console.debug("No initial Soundcloud Client ID configured - stopping cron (SOUNDCLOUD_CLIENT_ID)");
 			cron.job.stop();
+			return;
 		}
 
 		const { statusCode } = await sb.Got("GenericAPI", {
 			url: "https://api-v2.soundcloud.com/resolve",
 			throwHttpErrors: false,
 			searchParams: {
-				client_id: sb.Config.get("SOUNDCLOUD_CLIENT_ID"),
+				client_id: soundcloudClientId,
 				url: "https://soundcloud.com/terribleterrio/mararinha"
 			}
 		});
@@ -41,19 +47,19 @@ export const definition = {
 				continue;
 			}
 
-			const clientID = match[1];
+			const newClientId = match[1];
 			const { statusCode } = await sb.Got("GenericAPI", {
 				url: "https://api-v2.soundcloud.com/resolve",
 				throwHttpErrors: false,
 				searchParams: {
-					client_id: clientID,
+					client_id: newClientId,
 					url: "https://soundcloud.com/terribleterrio/mararinha"
 				}
 			});
 
 			if (statusCode === 200) {
-				finalClientID = clientID;
-				await sb.Config.set("SOUNDCLOUD_CLIENT_ID", clientID, sb.Query);
+				finalClientID = newClientId;
+				await sb.Cache.setByPrefix(SOUNDCLOUD_CLIENT_ID, newClientId);
 				break;
 			}
 		}
@@ -61,7 +67,7 @@ export const definition = {
 		if (finalClientID) {
 			console.log("Successfully updated soundcloud client-id", { finalClientID });
 
-			const linkParser = getLinkParser();
+			const linkParser = await getLinkParser();
 			linkParser.reloadParser("soundcloud", { key: finalClientID });
 		}
 		else {

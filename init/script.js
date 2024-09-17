@@ -1,8 +1,6 @@
 const initializeDatabase = require("supi-db-init");
 const path = require("node:path");
 
-require("../db-access.js");
-
 const config = {
 	auth: {
 		user: process.env.MARIA_USER,
@@ -26,14 +24,12 @@ const config = {
 		"chat_data/tables/Filter",
 		"chat_data/tables/Message_Meta_User_Alias",
 		"chat_data/tables/Reminder",
+		"chat_data/tables/Reminder_History",
 		"chat_data/triggers/add_missing_first_channel_command_after_insert",
-		"chat_data/triggers/add_missing_first_message_data_after_insert",
-
-		"data/tables/Config"
+		"chat_data/triggers/add_missing_first_message_data_after_insert"
 	],
 	initialDataFilePaths: [
-		"chat_data/Custom_Data_Property",
-		"data/Config"
+		"chat_data/Custom_Data_Property"
 	],
 	meta: {
 		dataPath: path.join(__dirname, "initial-data"),

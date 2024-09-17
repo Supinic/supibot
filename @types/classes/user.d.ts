@@ -1,4 +1,4 @@
-import { Config } from "supi-core/@types/types";
+import { JSONifiable } from "../globals";
 import { ClassTemplate, GenericCacheMap, SpecificCacheOptions } from "./template";
 
 export declare namespace Permissions {
@@ -100,9 +100,9 @@ export declare class User extends ClassTemplate {
      * - `undefined` if propertyName doesn't exist
      * - `null` or any respective primitive/object/function value as determined by the saved value
      */
-    getDataProperty (propertyName: Config.Name, options?: SpecificCacheOptions): ReturnType<ClassTemplate["getGenericDataProperty"]>;
+    getDataProperty (propertyName: string, options?: SpecificCacheOptions): ReturnType<ClassTemplate["getGenericDataProperty"]>;
     /**
      * Saves a user data property into the database.
      */
-    setDataProperty (propertyName: Config.Name, value: Config.Value, options?: SpecificCacheOptions): ReturnType<ClassTemplate["setGenericDataProperty"]>;
+    setDataProperty (propertyName: string, value: JSONifiable, options?: SpecificCacheOptions): ReturnType<ClassTemplate["setGenericDataProperty"]>;
 }

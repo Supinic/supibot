@@ -1,9 +1,13 @@
-const BASE_CACHE_KEY = `playsound-cooldown`;
-const getCacheKey = (playsoundName) => `${BASE_CACHE_KEY}-${playsoundName}`;
-const tts = {
-	enabled: null,
-	url: null
-};
+const { PLAYSOUNDS_ENABLED } = require("../../utils/shared-cache-keys.json");
+const config = require("../../config.json");
+const {
+	listenerAddress,
+	listenerPort,
+	playsoundListUrl = "(no address configured)"
+} = config.local ?? {};
+
+const BASE_PLAYSOUND_CACHE_KEY = "playsound-cooldown";
+const getPlaysoundCacheKey = (playsoundName) => `${BASE_PLAYSOUND_CACHE_KEY}-${playsoundName}`;
 
 module.exports = {
 	Name: "playsound",
@@ -13,32 +17,33 @@ module.exports = {
 	Description: "Plays a sound on Supinic's stream, if enabled. Use \"list\" as an argument to see the list of available playsounds.",
 	Flags: ["developer","mention","pipe","whitelist"],
 	Params: null,
-	Whitelist_Response: "You can't use the command here, but here's a list of supported playsounds: https://supinic.com/stream/playsound/list",
+	Whitelist_Response: `You can't use the command here, but here's a list of supported playsounds: ${playsoundListUrl}`,
 	initialize: function () {
-		if (!sb.Config.has("LOCAL_IP", true) || !sb.Config.has("LOCAL_PLAY_SOUNDS_PORT", true)) {
-			console.warn("$ps: Listener not configured - will be unavailable");
-			tts.enabled = false;
+		if (!listenerAddress || !listenerPort) {
+			console.warn("$playsound: Listener not configured - command will be unavailable");
+			this.data.ttsEnabled = false;
 		}
 		else {
-			tts.url = `${sb.Config.get("LOCAL_IP")}:${sb.Config.get("LOCAL_PLAY_SOUNDS_PORT")}`;
-			tts.enabled = true;
+			this.data.ttsEnabled = true;
 		}
 	},
 	Code: (async function playSound (context, playsound) {
-		if (!tts.enabled) {
+		if (!this.data.ttsEnabled) {
 			return {
 				success: false,
 				reply: `Local playsound listener is not configured!`
 			};
 		}
-		else if (!sb.Config.get("PLAYSOUNDS_ENABLED")) {
+
+		const isConfigEnabled = await sb.Cache.getByPrefix(PLAYSOUNDS_ENABLED);
+		if (!isConfigEnabled) {
 			return {
 				reply: "Playsounds are currently disabled!"
 			};
 		}
 		else if (!playsound || playsound === "list") {
 			return {
-				reply: "Currently available playsounds: https://supinic.com/stream/playsound/list"
+				reply: `Currently available playsounds: ${playsoundListUrl}`
 			};
 		}
 
@@ -68,7 +73,7 @@ module.exports = {
 			};
 		}
 
-		const cacheKey = getCacheKey(playsound);
+		const cacheKey = getPlaysoundCacheKey(playsound);
 		const existingCooldown = await sb.Cache.getByPrefix(cacheKey) ?? 0;
 		const now = sb.Date.now();
 
@@ -82,17 +87,16 @@ module.exports = {
 		let success = null;
 		try {
 			const response = await sb.Got("GenericAPI", {
-				url: `${tts.url}/?audio=${data.Filename}`,
+				url: `${listenerAddress}:${listenerPort}/?audio=${data.Filename}`,
 				responseType: "text"
 			});
 
 			success = (response.ok);
 		}
 		catch (e) {
-			await sb.Config.set("PLAYSOUNDS_ENABLED", false, sb.Query);
-
+			await sb.Cache.setByPrefix(PLAYSOUNDS_ENABLED, false);
 			return {
-				reply: "The desktop listener is not currently running, turning off playsounds!"
+				reply: "The desktop listener is not currently running! Turning off playsounds."
 			};
 		}
 

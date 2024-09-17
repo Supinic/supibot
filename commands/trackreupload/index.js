@@ -1,3 +1,5 @@
+const { VIDEO_TYPE_REPLACE_PREFIX } = require("../../utils/command-utils.js");
+
 module.exports = {
 	Name: "trackreupload",
 	Aliases: ["tr"],
@@ -32,7 +34,7 @@ module.exports = {
 				return { reply: "Given reupload ID does not exist!" };
 			}
 
-			reuploadLink = row.Link_Prefix.replace(sb.Config.get("VIDEO_TYPE_REPLACE_PREFIX"), row.Link);
+			reuploadLink = row.Link_Prefix.replace(VIDEO_TYPE_REPLACE_PREFIX, row.Link);
 		}
 
 		const result = await sb.Got("Supinic", {

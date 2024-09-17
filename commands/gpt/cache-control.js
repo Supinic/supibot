@@ -100,7 +100,7 @@ const getTokenUsage = async (userData) => {
  */
 const determineUserLimits = async (userData) => {
 	const platform = sb.Platform.get("twitch");
-	const isSubscribed = await platform.fetchUserCacheSubscription(userData, "supinic");
+	const isSubscribed = await platform.fetchUserAdminSubscription(userData);
 
 	return (isSubscribed)
 		? ChatGptConfig.userTokenLimits.subscriber
