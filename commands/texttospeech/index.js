@@ -35,7 +35,7 @@ module.exports = {
 		}
 	},
 	Code: (async function textToSpeech (context, ...args) {
-		if (!this.data.pending) {
+		if (!this.data.ttsEnabled) {
 			return {
 				success: false,
 				reply: "Local playsound listener is not configured!"
