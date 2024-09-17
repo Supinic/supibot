@@ -218,7 +218,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			}
 
 			case "channel.subscribe":
-			case "channel.subcription.message": {
+			case "channel.subscription.message": {
 				await this.handleSub(event, subscription.type);
 				break;
 			}
