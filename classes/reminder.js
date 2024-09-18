@@ -123,17 +123,19 @@ module.exports = class Reminder extends require("./template.js") {
 
 		this.timeout = new LongTimeout(async () => {
 			const channelData = (this.Channel === null) ? null : Channel.get(this.Channel);
-			const fromUserData = await User.get(this.User_From, true);
+			const fromUserData = (this.User_From) ? await User.get(this.User_From, true) : null;
 			const toUserData = await User.get(this.User_To, true);
 
-			const fromMention = await this.Platform.createUserMention(fromUserData, channelData);
+			const fromMention = (fromUserData)
+				? await this.Platform.createUserMention(fromUserData, channelData)
+				: null;
 			const toMention = await this.Platform.createUserMention(toUserData, channelData);
 
 			let message;
 			if (this.User_From === this.User_To) {
 				message = `${toMention}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
-			else if (this.User_From === null) {
+			else if (!this.User_From) {
 				message = `${toMention}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 			}
 			else if (this.User_To) {
@@ -173,7 +175,7 @@ module.exports = class Reminder extends require("./template.js") {
 						if (this.User_From === this.User_To) {
 							mirrorMessage = `${toUserData.Name}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
-						else if (this.User_From === null) {
+						else if (!this.User_From) {
 							mirrorMessage = `${toUserData.Name}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
 						else if (this.User_To) {
@@ -453,8 +455,9 @@ module.exports = class Reminder extends require("./template.js") {
 		const privateReply = [];
 
 		for (const reminder of reminders) {
-			const platformData = channelData.Platform;
-			const fromUserData = await User.get(reminder.User_From);
+			const fromUserData = (reminder.User_From)
+				? await User.get(reminder.User_From)
+				: null;
 
 			if (reminder.Type === "Pingme") {
 				const fromUserData = await User.get(reminder.User_From, false);
@@ -520,7 +523,7 @@ module.exports = class Reminder extends require("./template.js") {
 			if (reminder.User_From === targetUserData.ID) {
 				reminderMessage = `yourself - ${reminderText} (${delta})`;
 			}
-			else if (fromUserData.Name === platformData.Self_Name) {
+			else if (!fromUserData) {
 				reminderMessage = `system reminder - ${reminderText} (${delta})`;
 			}
 			else if (reminder.Text !== null) {
