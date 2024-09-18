@@ -26,8 +26,6 @@ module.exports = class Reminder extends require("./template.js") {
 	/* @type {Map<Reminder.ID, User.ID>} */
 	static available = new Map();
 
-	static mandatoryConstructorOptions = ["User_From", "User_To", "Platform"];
-
 	static #activeGauge;
 	static #userGauge;
 	static #limitRejectedCounter;
@@ -365,13 +363,17 @@ module.exports = class Reminder extends require("./template.js") {
 			}
 		}
 
-		for (const option of Reminder.mandatoryConstructorOptions) {
-			if (!data[option]) {
-				throw new sb.Error({
-					message: "Missing mandatory Reminder constructor option",
-					args: { data, option }
-				});
-			}
+		if (!data.User_To || !data.Platform) {
+			throw new sb.Error({
+				message: "Missing Reminder constructor option User_To and/or Platform",
+				args: { data }
+			});
+		}
+		else if (data.User_From !== null && typeof data.User_From !== "number") {
+			throw new sb.Error({
+				message: "Invalid Reminder constructor option User_From",
+				args: { data }
+			});
 		}
 
 		const row = await sb.Query.getRow("chat_data", "Reminder");
