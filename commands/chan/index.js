@@ -1,5 +1,8 @@
 const { linkRegex } = require("../../utils/regexes.js");
 
+const charToFlagfEmoji = (char) => {
+	return "\uD83C" + String.fromCharCode(56741 + char.charCodeAt(0));
+};
 const FOUR_CHAN_REPLACEMENTS = [
 	{ regex: /desu/ig, string: "tbh" },
 	{ regex: /baka/ig, string: "smh" },
@@ -219,7 +222,8 @@ module.exports = {
 						: null,
 					file: (typeof i.filename !== "undefined")
 						? `https://i.4cdn.org/${board.name}/${i.tim}${i.ext}`
-						: null
+						: null,
+					country: i.country ?? null
 				}));
 
 			await this.setCacheData(postKey, postList, {
@@ -250,18 +254,22 @@ module.exports = {
 			}
 		}
 
+		const flagEmoji = (post.country)
+			? charToFlagfEmoji(post.country[0]) + charToFlagfEmoji(post.country[1])
+			: "";
+
 		if (resultType === "file") {
 			return {
 				reply: (context.params.textOnly)
 					? `${post.file} ${post.content}`
-					: `${post.ID} (posted ${delta}): ${post.file} ${post.content ?? ""}`
+					: `${post.ID} ${flagEmoji} (posted ${delta}): ${post.file} ${post.content ?? ""}`
 			};
 		}
 		else if (resultType === "content") {
 			return {
 				reply: (context.params.textOnly)
 					? `${post.content}`
-					: `${post.ID} (posted ${delta}): ${post.content ?? ""}`
+					: `${post.ID} ${flagEmoji} (posted ${delta}): ${post.content ?? ""}`
 			};
 		}
 	}),
