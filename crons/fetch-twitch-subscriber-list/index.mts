@@ -1,4 +1,6 @@
+import { Error } from "supi-core";
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+import { sb } from "../../@types/globals.js";
 const { TWITCH_ADMIN_SUBSCRIBER_LIST } = sharedKeys;
 
 let tooManySubsWarningSent = false;
@@ -7,9 +9,9 @@ export const definition = {
 	name: "fetch-twitch-subscriber-list",
 	expression: "0 0 0 * * *",
 	description: "Fetches the current subscriber list, then saves it to sb.Cache",
-	code: (async function fetchTwitchSubscriberList () {
+	code: (async function fetchTwitchSubscriberList() {
 		if (!process.env.TWITCH_READ_SUBSCRIPTIONS_USER_ID) {
-			throw new sb.Error({
+			throw new Error({
 				message: "No Twitch user ID configured for Twitch subscriptions"
 			});
 		}
@@ -17,7 +19,7 @@ export const definition = {
 		const cacheRefreshToken = await sb.Cache.getByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN")
 		const envRefreshToken = process.env.TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN;
 		if (!cacheRefreshToken && !envRefreshToken) {
-			throw new sb.Error({
+			throw new Error({
 				message: "No refresh token configured for Twitch subscriptions"
 			});
 		}
@@ -59,8 +61,7 @@ export const definition = {
 			return;
 		}
 
-		/** @type {SubscriberData[]} */
-		const data = subsResponse.body.data;
+		const data: SubscriberData[] = subsResponse.body.data;
 		if (data.length >= 100 && !tooManySubsWarningSent) {
 			console.warn("Maximum subscribers reached for a single Helix call! Update this module to use pagination", { data });
 			tooManySubsWarningSent = true;
@@ -70,20 +71,20 @@ export const definition = {
 			expiry: 864e5 // 1 day
 		});
 
-		/**
-		 * @typedef {Object} SubscriberData
-		 * @property {string} broadcaster_id
-		 * @property {string} broadcaster_login
-		 * @property {string} broadcaster_name
-		 * @property {string} gifter_id Empty string if not a gifted sub
-		 * @property {string} gifter_login Empty string if not a gifted sub
-		 * @property {string} gifter_name Empty string if not a gifted sub
-		 * @property {boolean} is_gift
-		 * @property {string} plan_name
-		 * @property {string} tier
-		 * @property {string} user_id
-		 * @property {string} user_login
-		 * @property {string} user_name
-		 */
 	})
 };
+
+type SubscriberData = {
+	broadcaster_id: string,
+	broadcaster_login: string,
+	broadcaster_name: string,
+	gifter_id: string, // Empty string if not a gifted sub
+	gifter_login: string, // Empty string if not a gifted sub
+	gifter_name: string,  // Empty string if not a gifted sub
+	is_gift: boolean,
+	plan_name: string,
+	tier: string,
+	user_id: string,
+	user_login: string,
+	user_name: string,
+}

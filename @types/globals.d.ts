@@ -36,5 +36,6 @@ declare var sb: {
 
     Config: core.Config,
     Got: core.Got,
+    Cache: core.Cache,
     // TODO add others
 }
