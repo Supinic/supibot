@@ -1,17 +1,33 @@
-import { Error } from "supi-core";
+import { Error as SupiError } from "supi-core";
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 import { sb } from "../../@types/globals.js";
+
 const { TWITCH_ADMIN_SUBSCRIBER_LIST } = sharedKeys;
 
 let tooManySubsWarningSent = false;
+
+type SubscriberData = {
+	broadcaster_id: string,
+	broadcaster_login: string,
+	broadcaster_name: string,
+	gifter_id: string, // Empty string if not a gifted sub
+	gifter_login: string, // Empty string if not a gifted sub
+	gifter_name: string,  // Empty string if not a gifted sub
+	is_gift: boolean,
+	plan_name: string,
+	tier: string,
+	user_id: string,
+	user_login: string,
+	user_name: string,
+};
 
 export const definition = {
 	name: "fetch-twitch-subscriber-list",
 	expression: "0 0 0 * * *",
 	description: "Fetches the current subscriber list, then saves it to sb.Cache",
-	code: (async function fetchTwitchSubscriberList() {
+	code: (async function fetchTwitchSubscriberList () {
 		if (!process.env.TWITCH_READ_SUBSCRIPTIONS_USER_ID) {
-			throw new Error({
+			throw new SupiError({
 				message: "No Twitch user ID configured for Twitch subscriptions"
 			});
 		}
@@ -19,7 +35,7 @@ export const definition = {
 		const cacheRefreshToken = await sb.Cache.getByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN")
 		const envRefreshToken = process.env.TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN;
 		if (!cacheRefreshToken && !envRefreshToken) {
-			throw new Error({
+			throw new SupiError({
 				message: "No refresh token configured for Twitch subscriptions"
 			});
 		}
@@ -73,18 +89,3 @@ export const definition = {
 
 	})
 };
-
-type SubscriberData = {
-	broadcaster_id: string,
-	broadcaster_login: string,
-	broadcaster_name: string,
-	gifter_id: string, // Empty string if not a gifted sub
-	gifter_login: string, // Empty string if not a gifted sub
-	gifter_name: string,  // Empty string if not a gifted sub
-	is_gift: boolean,
-	plan_name: string,
-	tier: string,
-	user_id: string,
-	user_login: string,
-	user_name: string,
-}
