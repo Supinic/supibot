@@ -1,6 +1,6 @@
 const { linkRegex } = require("../../utils/regexes.js");
 
-const charToFlagfEmoji = (char) => {
+const charToFlagEmoji = (char) => {
 	return "\uD83C" + String.fromCharCode(56741 + char.charCodeAt(0));
 };
 const FOUR_CHAN_REPLACEMENTS = [
@@ -255,7 +255,7 @@ module.exports = {
 		}
 
 		const flagEmoji = (post.country)
-			? charToFlagfEmoji(post.country[0]) + charToFlagfEmoji(post.country[1])
+			? charToFlagEmoji(post.country[0]) + charToFlagEmoji(post.country[1])
 			: "";
 
 		if (resultType === "file") {
