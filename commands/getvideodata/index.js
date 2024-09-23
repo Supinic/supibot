@@ -1,4 +1,5 @@
 const { getLinkParser } = require("../../utils/link-parser.js");
+const { postToPastebin } = require("../../utils/command-utils.js");
 
 module.exports = {
 	Name: "getvideodata",
@@ -25,15 +26,15 @@ module.exports = {
 		}
 		else {
 			const string = JSON.stringify(data, null, 4);
-			const paste = await sb.Pastebin.post(string, {
+			const paste = await postToPastebin(string, {
 				name: `${data.name}, requested by ${context.user.Name}`,
 				format: "json"
 			});
 
-			if (paste.success !== true) {
+			if (!paste.ok) {
 				return {
 					success: false,
-					reply: paste.error ?? paste.body
+					reply: "Could not create a Pastebin paste!"
 				};
 			}
 

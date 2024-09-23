@@ -3,6 +3,7 @@ const exec = promisify(require("node:child_process").exec);
 
 const { codes } = require("./codes.json");
 const { getIcon, getWindDirection } = require("./helpers.js");
+const { postToPastebin } = require("../../utils/command-utils.js");
 
 const ALLOWED_FORMAT_TYPES = [
 	"cloudCover",
@@ -379,14 +380,14 @@ module.exports = {
 					].join("\n");
 				}).join("\n\n");
 
-				const response = await sb.Pastebin.post(text, {
+				const paste = await postToPastebin(text, {
 					name: (skipLocation)
 						? `Weather alerts - private location`
 						: `Weather alerts - ${formattedAddress}`,
 					expiration: "1H"
 				});
 
-				pastebinLink = response.body;
+				pastebinLink = paste.body;
 				await this.setCacheData(pastebinKey, pastebinLink, { expiry: 3_600_000 });
 			}
 

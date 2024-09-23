@@ -1,4 +1,4 @@
-const { getPathFromURL } = require("../../utils/command-utils.js");
+const { getPathFromURL, postToPastebin } = require("../../utils/command-utils.js");
 const validateHastebinServer = require("./validate-hastebin.js");
 
 const BASE_HASTEBIN_SERVER = "https://haste.zneix.eu";
@@ -93,11 +93,11 @@ module.exports = {
 			const text = args.join(" ");
 
 			if (provider === "pastebin") {
-				const result = await sb.Pastebin.post(text);
-				if (result.success) {
+				const paste = await postToPastebin(text);
+				if (paste.ok) {
 					const link = (rawString)
-						? result.body.replace(/\.com/, ".com/raw")
-						: result.body;
+						? paste.body.replace(/\.com/, ".com/raw")
+						: paste.body;
 
 					return {
 						reply: link
@@ -106,7 +106,7 @@ module.exports = {
 				else {
 					return {
 						success: false,
-						reply: result.error ?? result.body
+						reply: "Could not create a Pastebin paste!"
 					};
 				}
 			}
@@ -219,15 +219,25 @@ module.exports = {
 
 			let textData;
 			if (provider === "pastebin") {
-				const result = await sb.Pastebin.get(id);
-				if (result.success !== true) {
+				const response = await sb.Got("GenericAPI", {
+					url: `https://pastebin.com/raw/${id}`,
+					throwHttpErrors: false,
+					responseType: "text",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded"
+					}
+				})
+
+				if (!response.ok) {
 					return {
 						success: false,
-						reply: result.error ?? result.body
+						reply: (response.statusCode === 403)
+							? "This is a private paste or it is pending moderation!"
+							: "Error while getting the paste!"
 					};
 				}
 
-				textData = result.body;
+				textData = response.body;
 			}
 			else if (provider === "hastebin") {
 				const server = getHastebinServer(context.params.hasteServer);

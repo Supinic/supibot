@@ -1,4 +1,5 @@
 const handleErrorInspection = require("./inspect-errors");
+const { postToPastebin } = require("../../utils/command-utils.js");
 const { isSupported } = require("../randomline/rustlog.js");
 const {
 	SONG_REQUESTS_STATE,
@@ -232,7 +233,7 @@ module.exports = (command) => [
 					};
 				}
 
-				const externalLink = await sb.Pastebin.post(JSON.stringify(externalResult, null, 4), {
+				const paste = await postToPastebin(JSON.stringify(externalResult, null, 4), {
 					expiration: "10 minutes",
 					format: "json",
 					name: `${targetUser.Name}'s usage of Supibot $gpt command`,
@@ -244,7 +245,7 @@ module.exports = (command) => [
 					? `and ${dailyDigitString}/${limits.daily} tokens in the last 24 hours`
 					: "";
 
-				const externalString = (externalLink.body) ? `- full usage details: ${externalLink.body}` : "";
+				const externalString = (paste.body) ? `- full usage details: ${paste.body}` : "";
 				return {
 					reply: sb.Utils.tag.trim `
 						${pronoun} have used up
