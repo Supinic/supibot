@@ -179,7 +179,7 @@ module.exports = {
 					format: "json"
 				});
 
-				const link = (paste.ok) ? paste.body : "Could not create a Pastebin paste!";
+				const link = (paste.ok) ? paste.body : paste.reason;
 				return {
 					success: false,
 					reply: `${errorDescription} - More info: ${link}`

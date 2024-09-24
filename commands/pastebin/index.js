@@ -106,7 +106,7 @@ module.exports = {
 				else {
 					return {
 						success: false,
-						reply: "Could not create a Pastebin paste!"
+						reply: paste.reason
 					};
 				}
 			}

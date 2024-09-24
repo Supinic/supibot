@@ -93,7 +93,8 @@ module.exports = {
 			const paste = await postToPastebin(summary);
 			if (!paste.ok) {
 				return {
-					reply: `${results.length} videos processed. No summary available - could not create a Pastebin paste.`
+					success: false,
+					reply: paste.reason
 				};
 			}
 

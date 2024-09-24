@@ -49,7 +49,7 @@ module.exports = async function inspectErrorStacks (command, context, type, rawI
 		if (!paste.ok) {
 			return {
 				success: false,
-				reply: "Could not create a Pastebin paste!"
+				reply: paste.reason
 			};
 		}
 

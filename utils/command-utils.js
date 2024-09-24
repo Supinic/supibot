@@ -722,13 +722,16 @@ module.exports = {
 	 * @param {"public"|"unlisted"|"private"} [options.privacy] Paste privacy setting
 	 * @param {"N"|"10M"|"1H"|"1D"|"1W"|"2W"|"1M"|"6M"|"1Y"} [options.expiration] Paste expiration interval
 	 * @param {string} [options.format] Paste format, programming language
-	 * @returns {Promise<{ok, body, statusCode}>}
+	 * @returns {Promise<{ok: boolean, body: string | null, statusCode: number | null, reason: string | null}>}
 	 */
 	async postToPastebin (text, options = {}) {
 		if (!process.env.API_PASTEBIN) {
-			throw new sb.Error({
-				message: "Cannot upload to Pastebin - missing env variable API_PASTEBIN"
-			});
+			return {
+				ok: false,
+				statusCode: null,
+				body: null,
+				reason: "Cannot upload to Pastebin - missing env variable API_PASTEBIN"
+			};
 		}
 
 		const params = new URLSearchParams({
@@ -758,11 +761,20 @@ module.exports = {
 			}
 		});
 
-		return {
+		const result = {
 			ok: response.ok,
 			statusCode: response.statusCode,
-			body: response.body
+			body: response.body,
+			reason: null
+		};
+
+		if (!response.ok) {
+			result.reason = (response.statusCode === 422)
+				? "Your paste got rejected by Pastebin's SMART filters!"
+				: "Could not create a Pastebin paste!";
 		}
+
+		return result;
 	},
 
 	VIDEO_TYPE_REPLACE_PREFIX

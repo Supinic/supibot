@@ -34,7 +34,7 @@ module.exports = {
 			if (!paste.ok) {
 				return {
 					success: false,
-					reply: "Could not create a Pastebin paste!"
+					reply: paste.reason
 				};
 			}
 

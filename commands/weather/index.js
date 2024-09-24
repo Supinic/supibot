@@ -387,6 +387,13 @@ module.exports = {
 					expiration: "1H"
 				});
 
+				if (!paste.ok) {
+					return {
+						success: false,
+						reply: paste.reason
+					};
+				}
+
 				pastebinLink = paste.body;
 				await this.setCacheData(pastebinKey, pastebinLink, { expiry: 3_600_000 });
 			}

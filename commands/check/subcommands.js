@@ -240,6 +240,13 @@ module.exports = (command) => [
 					privacy: "unlisted"
 				});
 
+				if (!paste.ok) {
+					return {
+						success: false,
+						reply: paste.reason
+					};
+				}
+
 				const dailyDigitString = sb.Utils.groupDigits(sb.Utils.round(usage.dailyTokens, 2));
 				const dailyTokenString = (usage.dailyTokens !== usage.hourlyTokens)
 					? `and ${dailyDigitString}/${limits.daily} tokens in the last 24 hours`
