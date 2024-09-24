@@ -770,7 +770,7 @@ module.exports = {
 
 		if (!response.ok) {
 			result.reason = (response.statusCode === 422)
-				? "Your paste got rejected by Pastebin's SMART filters!"
+				? response.body
 				: "Could not create a Pastebin paste!";
 		}
 
