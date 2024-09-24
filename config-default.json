@@ -157,7 +157,6 @@
       "mirrorIdentifier": "(D)",
       "platform": {
         "sendVerificationChallenge": false,
-        "createReminderWhenSendingPrivateMessageFails": true,
         "guildCreateAnnounceChannel": null
       },
       "logging": {

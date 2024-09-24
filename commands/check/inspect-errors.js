@@ -1,3 +1,5 @@
+const { postToHastebin } = require("../../utils/command-utils.js");
+
 const getRow = {
 	error: () => sb.Query.getRow("chat_data", "Error"),
 	webError: () => sb.Query.getRow("supinic.com", "Error")
@@ -39,19 +41,19 @@ module.exports = async function inspectErrorStacks (command, context, type, rawI
 	const key = { type: `${type}-paste`, ID };
 	let link = await command.getCacheData(key);
 	if (!link) {
-		const result = await sb.Pastebin.post(stack, {
+		const paste = await postToHastebin(stack, {
 			name: `Stack of ${name[type]} ID ${ID}`,
 			expiration: "1H"
 		});
 
-		if (result.success !== true) {
+		if (!paste.ok) {
 			return {
 				success: false,
-				reply: result.error ?? result.body
+				reply: paste.reason
 			};
 		}
 
-		link = result.body;
+		link = paste.link;
 		await command.setCacheData(key, link, {
 			expiry: 36e5
 		});

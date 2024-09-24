@@ -1,4 +1,4 @@
-const { fetchYoutubePlaylist } = require("../../utils/command-utils.js");
+const { fetchYoutubePlaylist, postToHastebin } = require("../../utils/command-utils.js");
 const { getLinkParser } = require("../../utils/link-parser.js");
 const limit = 100;
 
@@ -238,16 +238,16 @@ module.exports = {
 		}
 		else {
 			const summary = results.map(i => `${i.link}\n${i.formatted}`).join("\n\n");
-			const paste = await sb.Pastebin.post(summary);
-			if (paste.success !== true) {
+			const paste = await postToHastebin(summary);
+			if (!paste.ok) {
 				return {
 					success: false,
-					reply: paste.error ?? paste.body
+					reply: paste.reason
 				};
 			}
 
 			return {
-				reply: `${results.length} videos processed. Summary: ${paste.body}`
+				reply: `${results.length} videos processed. Summary: ${paste.link}`
 			};
 		}
 	}),

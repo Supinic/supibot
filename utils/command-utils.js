@@ -8,6 +8,23 @@ const rssParser = new RSSParser();
 const MAX_SAFE_RANGE = 281474976710655;
 const VIDEO_TYPE_REPLACE_PREFIX = "$";
 
+const PASTEBIN_EXPIRATION_OPTIONS = {
+	never: "N",
+	"10 minutes": "10M",
+	"1 hour": "1H",
+	"1 day": "1D",
+	"1 week": "1W",
+	"2 weeks": "2W",
+	"1 month": "1M",
+	"6 months": "6M",
+	"1 year": "1Y"
+};
+const PASTEBIN_PRIVACY_OPTIONS = {
+	public: 0,
+	unlisted: 1,
+	private: 2
+};
+
 module.exports = {
 	randomInt (min, max) {
 		if (Math.abs(min) >= Number.MAX_SAFE_INTEGER || Math.abs(max) >= Number.MAX_SAFE_INTEGER) {
@@ -695,6 +712,105 @@ module.exports = {
 		return {
 			reply
 		};
+	},
+
+	/**
+	 * Posts the provided text to Pastebin, creating a new "paste".
+	 * @param {string} text Text to be posted to Pastebin
+	 * @param {Object} [options]
+	 * @param {string} [options.name] Paste title
+	 * @param {"public"|"unlisted"|"private"} [options.privacy] Paste privacy setting
+	 * @param {"N"|"10M"|"1H"|"1D"|"1W"|"2W"|"1M"|"6M"|"1Y"} [options.expiration] Paste expiration interval
+	 * @param {string} [options.format] Paste format, programming language
+	 * @returns {Promise<{ok: boolean, body: string | null, statusCode: number | null, reason: string | null}>}
+	 */
+	async postToPastebin (text, options = {}) {
+		if (!process.env.API_PASTEBIN) {
+			return {
+				ok: false,
+				statusCode: null,
+				body: null,
+				reason: "Cannot upload to Pastebin - missing env variable API_PASTEBIN"
+			};
+		}
+
+		const params = new URLSearchParams({
+			api_dev_key: process.env.API_PASTEBIN,
+			api_option: "paste",
+			api_paste_code: text,
+			api_paste_name: options.name || "untitled Supibot paste",
+			api_paste_private: (options.privacy) ? PASTEBIN_PRIVACY_OPTIONS[options.privacy] : "1",
+			api_paste_expire_date: (options.expiration) ? PASTEBIN_EXPIRATION_OPTIONS[options.expiration] : "10M"
+		});
+
+		if (options.format) {
+			params.append("api_paste_format", options.format);
+		}
+
+		const response = await sb.Got("GenericAPI", {
+			method: "POST",
+			url: "https://pastebin.com/api/api_post.php",
+			throwHttpErrors: false,
+			responseType: "text",
+			body: params.toString(),
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded"
+			},
+			timeout: {
+				request: 5000
+			}
+		});
+
+		const result = {
+			ok: response.ok,
+			statusCode: response.statusCode,
+			body: response.body,
+			reason: null
+		};
+
+		if (!response.ok) {
+			result.reason = (response.statusCode === 422)
+				? response.body
+				: "Could not create a Pastebin paste!";
+		}
+
+		return result;
+	},
+
+	/**
+	 * Posts the provided text to Hastebin, creating a new "paste".
+	 * @param {string} text Text to be posted to Hastebin
+	 * @param {Object} [options]
+	 * @param {string} [options.title] Title of the text, will be appended at the top of the text
+	 * @returns {Promise<{ok: boolean, link: string | null, statusCode: number | null, reason: string | null}>}
+	 */
+	async postToHastebin (text, options = {}) {
+		if (options.title) {
+			text = `${options.title}\n\n${text}`;
+		}
+
+		const response = await sb.Got("GenericAPI", {
+			method: "POST",
+			url: "https://haste.zneix.eu/documents",
+			throwHttpErrors: false,
+			body: text
+		});
+
+		const result = {
+			ok: response.ok,
+			statusCode: response.statusCode,
+			link: null,
+			reason: null
+		};
+
+		if (!response.ok) {
+			result.reason = "Could not create a Hastebin paste!";
+		}
+		else {
+			result.link = `https://haste.zneix.eu/raw/${response.body.key}`
+		}
+
+		return result;
 	},
 
 	VIDEO_TYPE_REPLACE_PREFIX

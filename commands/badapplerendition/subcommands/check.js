@@ -1,3 +1,4 @@
+const { postToHastebin } = require("../../../utils/command-utils.js");
 const { getLinkParser } = require("../../../utils/link-parser.js");
 
 module.exports = {
@@ -89,15 +90,16 @@ module.exports = {
 		}
 		else {
 			const summary = results.map(i => `${i.input}\n${i.reply}`).join("\n\n");
-			const paste = await sb.Pastebin.post(summary);
-			if (paste.success !== true) {
+			const paste = await postToHastebin(summary);
+			if (!paste.ok) {
 				return {
-					reply: `${results.length} videos processed. No summary available - ${paste.error ?? paste.body}`
+					success: false,
+					reply: paste.reason
 				};
 			}
 
 			return {
-				reply: `${results.length} videos processed. Summary: ${paste.body}`
+				reply: `${results.length} videos processed. Summary: ${paste.link}`
 			};
 		}
 	}

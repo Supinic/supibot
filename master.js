@@ -10,7 +10,6 @@ const ChatModule = require("./classes/chat-module.js");
 
 // Singletons requires
 const Logger = require("./singletons/logger.js");
-const Pastebin = require("./singletons/pastebin.js");
 const VLCConnector = require("./singletons/vlc-connector.js");
 
 // Platform require
@@ -161,7 +160,6 @@ const initializeCommands = async (config) => {
 		ChatModule,
 
 		Logger: new Logger(),
-		Pastebin: new Pastebin(),
 		VideoLANConnector: VLCConnector.initialize(), // @todo move code from `initialize` here
 
 		API: require("./api")
