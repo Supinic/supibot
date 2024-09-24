@@ -15,7 +15,7 @@ module.exports = {
 	Code: (async function randomUploaderVideo (context, ...args) {
 		if (!process.env.API_GOOGLE_YOUTUBE) {
 			throw new sb.Error({
-				messsage: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
+				message: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
 			});
 		}
 

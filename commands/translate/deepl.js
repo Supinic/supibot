@@ -45,7 +45,7 @@ const formalitySupportedLanguages = [
 const execute = async function (context, query) {
 	if (!process.env.API_DEEPL_KEY) {
 		throw new sb.Error({
-			messsage: "No DeepL key configured (API_DEEPL_KEY)"
+			message: "No DeepL key configured (API_DEEPL_KEY)"
 		});
 	}
 

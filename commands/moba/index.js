@@ -30,7 +30,7 @@ module.exports = {
 		const hasEnvs = game.requiredEnvs.every(key => process.env[key]);
 		if (!hasEnvs) {
 			throw new sb.Error({
-				messsage: `Missing key(s) for ${context.invocation} (${game.requiredEnvs.join(", ")})`
+				message: `Missing key(s) for ${context.invocation} (${game.requiredEnvs.join(", ")})`
 			});
 		}
 

@@ -44,12 +44,12 @@ module.exports = {
 	Code: (async function weather (context, ...args) {
 		if (!process.env.API_GOOGLE_GEOCODING) {
 			throw new sb.Error({
-				messsage: "No Google geocoding key configured (API_GOOGLE_GEOCODING)"
+				message: "No Google geocoding key configured (API_GOOGLE_GEOCODING)"
 			});
 		}
 		if (!process.env.API_OPEN_WEATHER_MAP) {
 			throw new sb.Error({
-				messsage: "No OpenWeatherMap key configured (API_OPEN_WEATHER_MAP)"
+				message: "No OpenWeatherMap key configured (API_OPEN_WEATHER_MAP)"
 			});
 		}
 

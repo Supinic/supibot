@@ -28,7 +28,7 @@ module.exports = class GptDeepInfra extends GptOpenAI {
 	static async execute (context, query, modelData) {
 		if (!process.env.API_KEY_DEEPINFRA) {
 			throw new sb.Error({
-				messsage: "No DeepInfra key configured (API_KEY_DEEPINFRA)"
+				message: "No DeepInfra key configured (API_KEY_DEEPINFRA)"
 			});
 		}
 

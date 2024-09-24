@@ -1,12 +1,12 @@
 const cryptoGamePriceUpdate = async () => {
 	if (!process.env.API_CRYPTO_COMPARE) {
 		throw new sb.Error({
-			messsage: "No CryptoCompare key configured (API_CRYPTO_COMPARE)"
+			message: "No CryptoCompare key configured (API_CRYPTO_COMPARE)"
 		});
 	}
 	if (!process.env.API_FIXER_IO) {
 		throw new sb.Error({
-			messsage: "No FixerIO key configured (API_FIXER_IO)"
+			message: "No FixerIO key configured (API_FIXER_IO)"
 		});
 	}
 

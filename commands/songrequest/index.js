@@ -13,7 +13,7 @@ const REQUEST_AMOUNT_LIMIT = 10;
 const fetchVimeoData = async (query) => {
 	if (!process.env.API_VIMEO_KEY) {
 		throw new sb.Error({
-			messsage: "No Vimeo key configured (API_VIMEO_KEY)"
+			message: "No Vimeo key configured (API_VIMEO_KEY)"
 		});
 	}
 

@@ -41,7 +41,7 @@ module.exports = {
 	async fetchTimeData (data = {}) {
 		if (!process.env.API_GOOGLE_TIMEZONE) {
 			throw new sb.Error({
-				messsage: "No Google timezone API key configured (API_GOOGLE_TIMEZONE)"
+				message: "No Google timezone API key configured (API_GOOGLE_TIMEZONE)"
 			});
 		}
 
@@ -75,7 +75,7 @@ module.exports = {
 	async checkPictureNSFW (link) {
 		if (!process.env.API_DEEP_AI) {
 			throw new sb.Error({
-				messsage: "No DeepAI key configured (API_DEEP_AI)"
+				message: "No DeepAI key configured (API_DEEP_AI)"
 			});
 		}
 
@@ -244,7 +244,7 @@ module.exports = {
 	async fetchGeoLocationData (query) {
 		if (!process.env.API_GOOGLE_GEOCODING) {
 			throw new sb.Error({
-				messsage: "No Google geolocation API key configured (API_GOOGLE_GEOCODING)"
+				message: "No Google geolocation API key configured (API_GOOGLE_GEOCODING)"
 			});
 		}
 
@@ -300,7 +300,7 @@ module.exports = {
 	async searchYoutube (query, options = {}) {
 		if (!process.env.API_GOOGLE_YOUTUBE) {
 			throw new sb.Error({
-				messsage: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
+				message: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
 			});
 		}
 
@@ -354,7 +354,7 @@ module.exports = {
 	async fetchYoutubePlaylist (options = {}) {
 		if (!process.env.API_GOOGLE_YOUTUBE) {
 			throw new sb.Error({
-				messsage: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
+				message: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
 			});
 		}
 

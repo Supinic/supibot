@@ -18,7 +18,7 @@ module.exports = {
 	Code: (async function ocr (context, ...args) {
 		if (!process.env.API_OCR_SPACE) {
 			throw new sb.Error({
-				messsage: "No OCR Space key configured (API_OCR_SPACE)"
+				message: "No OCR Space key configured (API_OCR_SPACE)"
 			});
 		}
 

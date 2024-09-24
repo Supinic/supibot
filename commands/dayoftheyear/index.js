@@ -10,7 +10,7 @@ module.exports = {
 	Code: (async function percent (context, ...args) {
 		if (!process.env.API_DAYS_OF_THE_YEAR) {
 			throw new sb.Error({
-				messsage: "No DaysOfTheYear key configured (API_DAYS_OF_THE_YEAR)"
+				message: "No DaysOfTheYear key configured (API_DAYS_OF_THE_YEAR)"
 			});
 		}
 

@@ -14,7 +14,7 @@ module.exports = {
 	Code: (async function currency (context, ...args) {
 		if (!process.env.API_OPEN_EXCHANGE_RATES) {
 			throw new sb.Error({
-				messsage: "No OpenExchangeRates key configured (API_OPEN_EXCHANGE_RATES)"
+				message: "No OpenExchangeRates key configured (API_OPEN_EXCHANGE_RATES)"
 			});
 		}
 

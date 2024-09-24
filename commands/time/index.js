@@ -67,12 +67,12 @@ module.exports = {
 	Code: (async function time (context, ...args) {
 		if (!process.env.API_GOOGLE_GEOCODING) {
 			throw new sb.Error({
-				messsage: "No Google geocoding API key configured (API_GOOGLE_GEOCODING)"
+				message: "No Google geocoding API key configured (API_GOOGLE_GEOCODING)"
 			});
 		}
 		if (!process.env.API_GOOGLE_TIMEZONE) {
 			throw new sb.Error({
-				messsage: "No Google timezone API key configured (API_GOOGLE_TIMEZONE)"
+				message: "No Google timezone API key configured (API_GOOGLE_TIMEZONE)"
 			});
 		}
 

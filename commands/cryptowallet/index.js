@@ -12,7 +12,7 @@ module.exports = {
 	Code: (async function cryptoWallet (context, address) {
 		if (!process.env.API_CRYPTO_COMPARE) {
 			throw new sb.Error({
-				messsage: "No CryptoCompare key configured (API_CRYPTO_COMPARE)"
+				message: "No CryptoCompare key configured (API_CRYPTO_COMPARE)"
 			});
 		}
 

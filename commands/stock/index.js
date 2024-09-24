@@ -10,7 +10,7 @@ module.exports = {
 	Code: (async function stock (context, ...args) {
 		if (!process.env.API_ALPHA_VANTAGE) {
 			throw new sb.Error({
-				messsage: "No AlphaVantage key configured (API_ALPHA_VANTAGE)"
+				message: "No AlphaVantage key configured (API_ALPHA_VANTAGE)"
 			});
 		}
 

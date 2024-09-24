@@ -58,7 +58,7 @@ module.exports = {
 	Code: async function steamGamePlayers (context, ...args) {
 		if (!process.env.API_CRYPTO_COMPARE) {
 			throw new sb.Error({
-				messsage: "No Steam key configured (API_STEAM_KEY)"
+				message: "No Steam key configured (API_STEAM_KEY)"
 			});
 		}
 

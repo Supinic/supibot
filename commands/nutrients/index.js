@@ -14,7 +14,7 @@ module.exports = {
 	Code: (async function nutrients (context, ...args) {
 		if (!process.env.API_NUTRITIONIX || !process.env.API_NUTRITIONIX_APP_ID) {
 			throw new sb.Error({
-				messsage: "No Nutritionix key/AppID configured (API_NUTRITIONIX, API_NUTRITIONIX_APP_ID)"
+				message: "No Nutritionix key/AppID configured (API_NUTRITIONIX, API_NUTRITIONIX_APP_ID)"
 			});
 		}
 

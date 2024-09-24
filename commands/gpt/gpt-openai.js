@@ -64,7 +64,7 @@ module.exports = class GptOpenAI extends Template {
 	static async execute (context, query, modelData) {
 		if (!process.env.API_OPENAI_KEY) {
 			throw new sb.Error({
-				messsage: "No OpenAI key configured (API_OPENAI_KEY)"
+				message: "No OpenAI key configured (API_OPENAI_KEY)"
 			});
 		}
 

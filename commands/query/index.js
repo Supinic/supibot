@@ -14,7 +14,7 @@ module.exports = {
 	Code: (async function query (context, ...args) {
 		if (!process.env.API_WOLFRAM_ALPHA_APPID) {
 			throw new sb.Error({
-				messsage: "No Wolfram Alpha AppID configured (API_WOLFRAM_ALPHA_APPID)"
+				message: "No Wolfram Alpha AppID configured (API_WOLFRAM_ALPHA_APPID)"
 			});
 		}
 

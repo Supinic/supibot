@@ -10,7 +10,7 @@ module.exports = {
 	Code: (async function faceit (context, subcommandName, ...args) {
 		if (!process.env.API_FACEIT_KEY) {
 			throw new sb.Error({
-				messsage: "No FaceIt key configured (API_FACEIT_KEY)"
+				message: "No FaceIt key configured (API_FACEIT_KEY)"
 			});
 		}
 
