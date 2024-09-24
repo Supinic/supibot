@@ -716,7 +716,7 @@ module.exports = {
 
 	/**
 	 * Posts the provided text to Pastebin, creating a new "paste".
-	 * @param {string} text
+	 * @param {string} text Text to be posted to Pastebin
 	 * @param {Object} [options]
 	 * @param {string} [options.name] Paste title
 	 * @param {"public"|"unlisted"|"private"} [options.privacy] Paste privacy setting
@@ -772,6 +772,42 @@ module.exports = {
 			result.reason = (response.statusCode === 422)
 				? "Your paste got rejected by Pastebin's SMART filters!"
 				: "Could not create a Pastebin paste!";
+		}
+
+		return result;
+	},
+
+	/**
+	 * Posts the provided text to Hastebin, creating a new "paste".
+	 * @param {string} text Text to be posted to Hastebin
+	 * @param {Object} [options]
+	 * @param {string} [options.title] Title of the text, will be appended at the top of the text
+	 * @returns {Promise<{ok: boolean, link: string | null, statusCode: number | null, reason: string | null}>}
+	 */
+	async postToHastebin (text, options = {}) {
+		if (options.title) {
+			text = `${options.title}\n\n${text}`;
+		}
+
+		const response = await sb.Got("GenericAPI", {
+			method: "POST",
+			url: "https://haste.zneix.eu/documents",
+			throwHttpErrors: false,
+			body: text
+		});
+
+		const result = {
+			ok: response.ok,
+			statusCode: response.statusCode,
+			link: null,
+			reason: null
+		};
+
+		if (!response.ok) {
+			result.reason = "Could not create a Hastebin paste!";
+		}
+		else {
+			result.link = `https://haste.zneix.eu/raw/${response.body.key}`
 		}
 
 		return result;

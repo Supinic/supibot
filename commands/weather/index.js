@@ -3,7 +3,7 @@ const exec = promisify(require("node:child_process").exec);
 
 const { codes } = require("./codes.json");
 const { getIcon, getWindDirection } = require("./helpers.js");
-const { postToPastebin } = require("../../utils/command-utils.js");
+const { postToHastebin } = require("../../utils/command-utils.js");
 
 const ALLOWED_FORMAT_TYPES = [
 	"cloudCover",
@@ -362,9 +362,9 @@ module.exports = {
 				};
 			}
 
-			const pastebinKey = { type: "pastebin", coords: `${coords.lat}-${coords.lng}` };
-			let pastebinLink = await this.getCacheData(pastebinKey);
-			if (!pastebinLink) {
+			const hastebinKey = { type: "hastebin", coords: `${coords.lat}-${coords.lng}` };
+			let hastebinLink = await this.getCacheData(hastebinKey);
+			if (!hastebinLink) {
 				const text = data.alerts.map(i => {
 					const start = new sb.Date(i.start * 1000).setTimezoneOffset(data.timezone_offset / 60);
 					const end = new sb.Date(i.end * 1000).setTimezoneOffset(data.timezone_offset / 60);
@@ -380,11 +380,10 @@ module.exports = {
 					].join("\n");
 				}).join("\n\n");
 
-				const paste = await postToPastebin(text, {
+				const paste = await postToHastebin(text, {
 					name: (skipLocation)
 						? `Weather alerts - private location`
-						: `Weather alerts - ${formattedAddress}`,
-					expiration: "1H"
+						: `Weather alerts - ${formattedAddress}`
 				});
 
 				if (!paste.ok) {
@@ -394,14 +393,14 @@ module.exports = {
 					};
 				}
 
-				pastebinLink = paste.body;
-				await this.setCacheData(pastebinKey, pastebinLink, { expiry: 3_600_000 });
+				hastebinLink = paste.link;
+				await this.setCacheData(hastebinKey, hastebinLink, { expiry: 3_600_000 });
 			}
 
 			if (skipLocation) {
 				if (isOwnLocation) {
 					await context.platform.pm(
-						`Your location's weather alerts: ${pastebinLink}`,
+						`Your location's weather alerts: ${hastebinLink}`,
 						context.user.Name,
 						context.channel
 					);
@@ -427,7 +426,7 @@ module.exports = {
 						- 
 						${data.alerts.length} alerts 
 						-
-						full info: ${pastebinLink}
+						full info: ${hastebinLink}
 					`
 				};
 			}

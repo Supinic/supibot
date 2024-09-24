@@ -95,12 +95,8 @@ module.exports = {
 			if (provider === "pastebin") {
 				const paste = await postToPastebin(text);
 				if (paste.ok) {
-					const link = (rawString)
-						? paste.body.replace(/\.com/, ".com/raw")
-						: paste.body;
-
 					return {
-						reply: link
+						reply: paste.link
 					};
 				}
 				else {

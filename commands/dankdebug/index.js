@@ -1,5 +1,5 @@
 const { VM } = require("vm2");
-const { postToPastebin } = require("../../utils/command-utils.js");
+const { postToHastebin } = require("../../utils/command-utils.js");
 const { preventTomfoolery } = require("./anti-tomfoolery.js");
 
 const PREFIX_SAFETY_CODE = `Object.defineProperty(Promise.prototype, "constructor", { writable: false }); Object.freeze(Promise.prototype); void 0;`;
@@ -173,13 +173,11 @@ module.exports = {
 					stack: stack.slice(0, lastLine)
 				}, null, 4);
 
-				const paste = await postToPastebin(text, {
-					name: "Full error info for $js",
-					expiration: "1H",
-					format: "json"
+				const paste = await postToHastebin(text, {
+					name: "Full error info for $js"
 				});
 
-				const link = (paste.ok) ? paste.body : paste.reason;
+				const link = (paste.ok) ? paste.link : paste.reason;
 				return {
 					success: false,
 					reply: `${errorDescription} - More info: ${link}`

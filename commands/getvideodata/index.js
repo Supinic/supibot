@@ -1,5 +1,5 @@
 const { getLinkParser } = require("../../utils/link-parser.js");
-const { postToPastebin } = require("../../utils/command-utils.js");
+const { postToHastebin } = require("../../utils/command-utils.js");
 
 module.exports = {
 	Name: "getvideodata",
@@ -26,9 +26,8 @@ module.exports = {
 		}
 		else {
 			const string = JSON.stringify(data, null, 4);
-			const paste = await postToPastebin(string, {
-				name: `${data.name}, requested by ${context.user.Name}`,
-				format: "json"
+			const paste = await postToHastebin(string, {
+				name: `${data.name}, requested by ${context.user.Name}`
 			});
 
 			if (!paste.ok) {
@@ -39,7 +38,7 @@ module.exports = {
 			}
 
 			return {
-				reply: paste.body
+				reply: paste.link
 			};
 		}
 	}),

@@ -1,4 +1,4 @@
-const { postToPastebin } = require("../../../utils/command-utils.js");
+const { postToHastebin } = require("../../../utils/command-utils.js");
 const { getLinkParser } = require("../../../utils/link-parser.js");
 
 module.exports = {
@@ -90,7 +90,7 @@ module.exports = {
 		}
 		else {
 			const summary = results.map(i => `${i.input}\n${i.reply}`).join("\n\n");
-			const paste = await postToPastebin(summary);
+			const paste = await postToHastebin(summary);
 			if (!paste.ok) {
 				return {
 					success: false,
@@ -99,7 +99,7 @@ module.exports = {
 			}
 
 			return {
-				reply: `${results.length} videos processed. Summary: ${paste.body}`
+				reply: `${results.length} videos processed. Summary: ${paste.link}`
 			};
 		}
 	}
