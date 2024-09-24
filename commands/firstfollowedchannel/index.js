@@ -26,13 +26,6 @@ module.exports = {
 		}
 	},
 	Code: (async function firstFollowedChannel (context, target) {
-		if (!this.data.enabled) {
-			return {
-				success: false,
-				reply: "This command is missing configuration!"
-			};
-		}
-
 		const platform = sb.Platform.get("twitch");
 		const name = sb.User.normalizeUsername(target ?? context.user.Name);
 
