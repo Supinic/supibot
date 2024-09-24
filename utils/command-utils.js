@@ -727,7 +727,7 @@ module.exports = {
 	async postToPastebin (text, options = {}) {
 		if (!process.env.API_PASTEBIN) {
 			throw new sb.Error({
-				messsage: "Cannot upload to Pastebin - missing env variable API_PASTEBIN"
+				message: "Cannot upload to Pastebin - missing env variable API_PASTEBIN"
 			});
 		}
 
