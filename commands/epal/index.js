@@ -25,7 +25,7 @@ module.exports = {
 	Code: async function epal (context) {
 		let profilesData = await this.getCacheData(PROFILES_CACHE_KEY);
 		if (!profilesData) {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				method: "POST",
 				responseType: "json",
 				throwHttpErrors: false,
@@ -81,7 +81,7 @@ module.exports = {
 
 		const ttsStatus = await sb.Cache.getByPrefix(TTS_ENABLED);
 		if (epalAudioChannels.includes(context.channel?.ID) && ttsStatus && this.data.listenerEnabled) {
-			await sb.Got("GenericAPI", {
+			await sb.Got.get("GenericAPI")({
 				url: `${listenerAddress}:${listenerPort}`,
 				responseType: "text",
 				searchParams: new URLSearchParams({

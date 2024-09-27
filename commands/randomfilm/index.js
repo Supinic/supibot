@@ -8,7 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function randomFilm () {
-		const html = await sb.Got("FakeAgent", {
+		const html = await sb.Got.get("FakeAgent")({
 			url: "https://www.bestrandoms.com/random-movie-generator",
 			responseType: "text"
 		}).text();

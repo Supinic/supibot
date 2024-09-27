@@ -40,7 +40,7 @@ module.exports = {
 			}
 
 			try {
-				response = await sb.Got("FakeAgent", {
+				response = await sb.Got.get("FakeAgent")({
 					url: `https://i.instagram.com/api/v1/users/web_profile_info`,
 					searchParams: {
 						username: user

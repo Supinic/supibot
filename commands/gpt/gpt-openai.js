@@ -104,7 +104,7 @@ module.exports = class GptOpenAI extends Template {
 		}
 		const { temperature } = temperatureCheck;
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			throwHttpErrors: false,
 			url: `https://api.openai.com/v1/chat/completions`,

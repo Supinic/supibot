@@ -10,7 +10,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function russianArmyLosses (context, ...args) {
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: "https://russianwarship.rip/api/v1/statistics/latest"
 		});
 

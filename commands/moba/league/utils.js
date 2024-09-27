@@ -68,7 +68,7 @@ const getPUUIDByName = async (gameName, tagLine) => {
 	const key = getPUUIdCacheKey(gameName, tagLine);
 	let puuid = await sb.Cache.getByPrefix(key);
 	if (!puuid) {
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
 			throwHttpErrors: false,
 			headers: {
@@ -102,7 +102,7 @@ const getSummonerId = async (platform, puuid) => {
 	const summonerKey = getSummonerIdCacheKey(puuid);
 	let summonerId = await sb.Cache.getByPrefix(summonerKey);
 	if (!summonerId) {
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: `https://${platform}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`,
 			throwHttpErrors: false,
 			headers: {
@@ -135,7 +135,7 @@ const getLeagueEntries = async (platform, summonerId) => {
 	const key = getLeagueEntriesCacheKey(platform, summonerId);
 	let data = await sb.Cache.getByPrefix(key);
 	if (!data) {
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: `https://${platform}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}`,
 			headers: {
 				"X-Riot-Token": process.env.API_RIOT_GAMES_KEY
@@ -246,7 +246,7 @@ const getMatchIds = async (puuid, options = {}) => {
 			count: options.count ?? 20
 		});
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids`,
 			throwHttpErrors: false,
 			headers: {
@@ -277,7 +277,7 @@ const getMatchData = async (matchId) => {
 	const matchDataKey = getMatchDataKey(matchId);
 	let matchData = await sb.Cache.getByPrefix(matchDataKey);
 	if (!matchData) {
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: `https://europe.api.riotgames.com/lol/match/v5/matches/${matchId}`,
 			throwHttpErrors: false,
 			headers: {

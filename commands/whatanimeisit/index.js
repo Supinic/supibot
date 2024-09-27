@@ -20,7 +20,7 @@ module.exports = {
 
 		// Possible future reference:
 		// POST method with FormData (name: "image") is also possible if working with files
-		const { statusCode, body: data } = await sb.Got("GenericAPI", {
+		const { statusCode, body: data } = await sb.Got.get("GenericAPI")({
 			url: "https://api.trace.moe/search",
 			searchParams: {
 				url: link
@@ -90,7 +90,7 @@ module.exports = {
 		const videoLinkKey = { type: "video-link", url: result.video };
 		let videoLink = await this.getCacheData(videoLinkKey);
 		if (!videoLink) {
-			const videoData = await sb.Got("GenericAPI", {
+			const videoData = await sb.Got.get("GenericAPI")({
 				url: result.video,
 				responseType: "buffer",
 				throwHttpErrors: false

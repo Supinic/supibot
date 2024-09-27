@@ -14,7 +14,7 @@ module.exports = {
 	subName: "Node.js version",
 	type: "custom",
 	process: async () => {
-		const response = await sb.Got("GitHub", {
+		const response = await sb.Got.get("GitHub")({
 			url: "repos/nodejs/node/releases"
 		});
 

@@ -1,5 +1,5 @@
 /**
- * await sb.Got("Helix", {
+ * await sb.Got.get("Helix")({
  * 	url: "subscriptions/user",
  * 	searchParams: {
  * 		broadcaster_id: "31400525",

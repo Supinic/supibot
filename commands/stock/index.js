@@ -29,7 +29,7 @@ module.exports = {
 			? args[0]
 			: findPopularSymbol(input) ?? args[0];
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			retry: {
 				limit: 0
 			},

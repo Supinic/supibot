@@ -13,7 +13,7 @@ const fetchAuthData = async () => {
 		}
 
 		const credentials = Buffer.from(`${key}:${secret}`, "utf-8").toString("base64");
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			url: "https://api.twitter.com/oauth2/token",
 			headers: {
@@ -40,7 +40,7 @@ const fetchLocationsData = async (bearerToken) => {
 	const trendLocationsKey = "trends-locations";
 	let locationsData = await this.getCacheData(trendLocationsKey);
 	if (!locationsData) {
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			method: "GET",
 			url: "https://api.twitter.com/1.1/trends/available.json",
 			responseType: "json",
@@ -105,7 +105,7 @@ const getTrends = async (input, bearerToken) => {
 		};
 	}
 
-	const response = await sb.Got("GenericAPI", {
+	const response = await sb.Got.get("GenericAPI")({
 		method: "GET",
 		url: "https://api.twitter.com/1.1/trends/place.json",
 		responseType: "json",
@@ -139,7 +139,7 @@ const getTrends = async (input, bearerToken) => {
 const getTweet = async (context, bearerToken, user) => {
 	// necessary to fetch this many - because deleted/suspended tweets take up space in the slice
 	const limit = (context.params.random) ? "200" : "100";
-	const response = await sb.Got("GenericAPI", {
+	const response = await sb.Got.get("GenericAPI")({
 		method: "GET",
 		url: "https://api.twitter.com/1.1/statuses/user_timeline.json",
 		responseType: "json",

@@ -128,7 +128,7 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("Helix", {
+		const response = await sb.Got.get("Helix")({
 			url: "clips",
 			searchParams: {
 				started_at: dateRange[0].toISOString(),

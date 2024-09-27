@@ -1,7 +1,8 @@
 const { linkRegex } = require("../../utils/regexes.js");
 
 const charToFlagEmoji = (char) => {
-	return "\uD83C" + String.fromCharCode(56741 + char.charCodeAt(0));
+	const emojiPart = String.fromCharCode(56741 + char.charCodeAt(0));
+	return `\uD83C${emojiPart}`;
 };
 const FOUR_CHAN_REPLACEMENTS = [
 	{ regex: /desu/ig, string: "tbh" },
@@ -73,7 +74,7 @@ module.exports = {
 
 		let boardList = await this.getCacheData({ type: "board-list" });
 		if (!boardList) {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: "https://api.4chan.org/boards.json",
 				responseType: "json"
 			});
@@ -120,7 +121,7 @@ module.exports = {
 		const threadKey = { type: "thread-list", board: identifier };
 		let threadList = await this.getCacheData(threadKey);
 		if (!threadList) {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: `https://api.4chan.org/${board.name}/catalog.json`,
 				responseType: "json"
 			});
@@ -191,7 +192,7 @@ module.exports = {
 		const postKey = { type: "post-list", board: identifier, threadID };
 		let postList = await this.getCacheData(postKey);
 		if (!postList) {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: `https://a.4cdn.org/${board.name}/thread/${threadID}.json`,
 				throwHttpErrors: false,
 				responseType: "json"

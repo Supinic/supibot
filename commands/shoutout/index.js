@@ -16,7 +16,7 @@ module.exports = {
 		}
 
 		const twitchPlatform = sb.Platform.get("twitch");
-		const userLookupResponse = await sb.Got("Helix", {
+		const userLookupResponse = await sb.Got.get("Helix")({
 			url: "users",
 			searchParams: {
 				login: sb.User.normalizeUsername(target.trim())
@@ -65,7 +65,7 @@ module.exports = {
 			game_id and game_name and title is "" when never streamed before
 			if delay is `null` the streamer is banned (?)
 		 */
-		const response = await sb.Got("Helix", {
+		const response = await sb.Got.get("Helix")({
 			url: "channels",
 			searchParams: {
 				broadcaster_id: targetUserID

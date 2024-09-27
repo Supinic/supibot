@@ -3056,7 +3056,7 @@ cytube-connector@supinic/cytube-connector:
   languageName: node
   linkType: hard
 
-"lru-cache@npm:^10.0.1, lru-cache@npm:^10.2.0":
+"lru-cache@npm:^10.0.1, lru-cache@npm:^10.2.0, lru-cache@npm:^10.3.0":
   version: 10.4.3
   resolution: "lru-cache@npm:10.4.3"
   checksum: 10c0/ebd04fbca961e6c1d6c0af3799adcc966a1babe798f685bb84e6599266599cd95d94630b10262f5424539bc4640107e8a33aa28585374abf561d30d16f4b39fb
@@ -3124,7 +3124,7 @@ cytube-connector@supinic/cytube-connector:
   languageName: node
   linkType: hard
 
-"mariadb@npm:^3.0.0, mariadb@npm:^3.2.2":
+"mariadb@npm:^3.0.0":
   version: 3.3.1
   resolution: "mariadb@npm:3.3.1"
   dependencies:
@@ -3134,6 +3134,19 @@ cytube-connector@supinic/cytube-connector:
     iconv-lite: "npm:^0.6.3"
     lru-cache: "npm:^10.2.0"
   checksum: 10c0/980358fd69be905b1f8e69a685c70bc8c7accedac3ab6aff8742e3f3dec649b7cedb060d7c834a460fc6c48f56eca2125b0fcb9e64198cbb54c69a85c3fdc9ee
+  languageName: node
+  linkType: hard
+
+"mariadb@npm:^3.2.2":
+  version: 3.3.2
+  resolution: "mariadb@npm:3.3.2"
+  dependencies:
+    "@types/geojson": "npm:^7946.0.14"
+    "@types/node": "npm:^22.5.4"
+    denque: "npm:^2.1.0"
+    iconv-lite: "npm:^0.6.3"
+    lru-cache: "npm:^10.3.0"
+  checksum: 10c0/ea4b410bedeae5d768b5e34c608edc67e02ad18b60ff44d066db8efd8431da0403637cbe231928d66ad3d443dc611ea4b48c8d66eaa912e0935a3672adbacdf3
   languageName: node
   linkType: hard
 
@@ -4360,7 +4373,7 @@ cytube-connector@supinic/cytube-connector:
 
 supi-core@supinic/supi-core:
   version: 3.1.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=3be9006f25af622d9047eb4ddb2776848bfe8734"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=8f87c54a005b7574f10be61122ff9bc6b3d84402"
   dependencies:
     cheerio: "npm:^1.0.0-rc.12"
     duration-parser: "github:supinic/duration-parser"
@@ -4369,7 +4382,7 @@ supi-core@supinic/supi-core:
     mariadb: "npm:^3.2.2"
     prom-client: "npm:^15.0.0"
     random-js: "npm:^2.1.0"
-  checksum: 10c0/8f93d44fbb06afebae14a94e6bfb8fe4ce2c0296b710639782db23f1819b9a025da31ae009470c78a8c9ce08a33ebd96048afda5c7f157f1fba63e5316950ab4
+  checksum: 10c0/8f7596f0d2a34501c52d040d8e4083e299704df4e7fca6e6b0da6fdd6ed081788c70c8865bdc3d82188218c94f2e93eda2059aefa8905e29dbfe75625ebd2607
   languageName: node
   linkType: hard
 

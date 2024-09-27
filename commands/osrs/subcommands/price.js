@@ -47,7 +47,7 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: "https://prices.runescape.wiki/api/v1/osrs/latest",
 			throwHttpErrors: false,
 			searchParams: {

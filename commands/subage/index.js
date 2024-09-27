@@ -60,7 +60,7 @@ module.exports = {
 		const channelName = sb.User.normalizeUsername(channel ?? context.channel.Name);
 		const userName = sb.User.normalizeUsername(user ?? context.user.Name);
 
-		const response = await sb.Got("TwitchGQL", {
+		const response = await sb.Got.get("TwitchGQL")({
 			responseType: "json",
 			headers: {
 				Referer: `https://www.twitch.tv/popout/${channelName}/viewercard/${userName}`
@@ -100,7 +100,7 @@ module.exports = {
 
 		const { relationship } = sub.data.targetUser;
 		if (!relationship.cumulativeTenure) {
-			const response = await sb.Got("IVR", {
+			const response = await sb.Got.get("IVR")({
 				url: "v2/twitch/user",
 				searchParams: {
 					login: channelName

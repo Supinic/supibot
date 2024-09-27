@@ -8,7 +8,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function speedrun () {
-		const { comment } = await sb.Got("IVR", "gdq").json();
+		const { comment } = await sb.Got.get("IVR")("gdq").json();
 		return {
 			reply: comment
 		};

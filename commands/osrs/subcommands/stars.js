@@ -35,7 +35,7 @@ module.exports = {
 		`Powered by the <a href="https://map.starminers.site/">Starminers API</a>.`
 	],
 	execute: async function () {
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: "https://map.starminers.site/data2",
 			searchParams: {
 				timestamp: sb.Date.now()

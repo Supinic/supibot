@@ -140,7 +140,7 @@ const predefinedQueries = {
 };
 const predefinedRequests = {
 	olympics2024: async () => {
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: "https://api.olympics.kevle.xyz/medals",
 			throwHttpErrors: false
 		});

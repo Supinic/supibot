@@ -11,14 +11,14 @@ module.exports = {
 		let data;
 
 		if (args.length === 0) {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: "https://www.themealdb.com/api/json/v1/1/random.php"
 			});
 
 			data = response.body;
 		}
 		else {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: "https://www.themealdb.com/api/json/v1/1/search.php",
 				searchParams: {
 					s: args.join(" ")

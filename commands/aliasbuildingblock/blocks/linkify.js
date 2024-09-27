@@ -22,7 +22,7 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			url: `https://haste.zneix.eu/documents`,
 			throwHttpErrors: false,

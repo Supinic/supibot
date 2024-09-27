@@ -28,7 +28,7 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("GenericAPI",{
+		const response = await sb.Got.get("GenericAPI")({
 			url: `https://sitecheck.sucuri.net/api/v3/?scan=${fixedInput}`
 		});
 

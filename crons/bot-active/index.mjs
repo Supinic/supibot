@@ -22,7 +22,7 @@ export const definition = {
 			return;
 		}
 
-		await sb.Got("Supinic", {
+		await sb.Got.get("Supinic")({
 			method: "PUT",
 			url: "bot-program/bot/active",
 			headers: {

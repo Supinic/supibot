@@ -64,7 +64,7 @@ module.exports = {
 		}
 
 		// Try and find node-info response
-		const nodeInfoResponse = await sb.Got("GenericAPI", {
+		const nodeInfoResponse = await sb.Got.get("GenericAPI")({
 			url: nodeInfoUrl
 		});
 
@@ -93,7 +93,7 @@ module.exports = {
 		const key = `${instance}-${fixedUser}`;
 		let data = await this.getCacheData(key);
 		if (!data) {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url,
 				responseType: "text",
 				throwHttpErrors: false

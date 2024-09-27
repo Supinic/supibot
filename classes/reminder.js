@@ -789,7 +789,7 @@ module.exports = class Reminder extends require("./template.js") {
 	}
 
 	static async createRelayLink (endpoint, params) {
-		const relay = await sb.Got("Supinic", {
+		const relay = await sb.Got.get("Supinic")({
 			method: "POST",
 			url: "relay",
 			throwHttpErrors: false,

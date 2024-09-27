@@ -88,7 +88,7 @@ module.exports = {
 
 		let data = await this.getCacheData("currency-rates");
 		if (!data) {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				method: "GET",
 				url: "https://openexchangerates.org/api/latest.json",
 				searchParams: {
@@ -151,7 +151,7 @@ module.exports = {
 		if (first === "IRR" || second === "IRR") {
 			let dollarExchangeRate = await this.getCacheData("irr-usd-exchange-rate");
 			if (!dollarExchangeRate) {
-				const response = await sb.Got("GenericAPI", {
+				const response = await sb.Got.get("GenericAPI")({
 					url: "https://call4.tgju.org/ajax.json",
 					throwHttpErrors: false
 				});

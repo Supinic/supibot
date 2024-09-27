@@ -15,7 +15,7 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			prefixUrl: "https://app.kanjialive.com/api",
 			url: `kanji/${encodeURIComponent(character)}`,
 			throwHttpErrors: false

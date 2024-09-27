@@ -143,7 +143,7 @@ module.exports = {
 		}
 
 		if (coordinates === null) {
-			const { results: [geoData] } = await sb.Got("Google", {
+			const { results: [geoData] } = await sb.Got.get("Google")({
 				url: "geocode/json",
 				searchParams: {
 					address: place,

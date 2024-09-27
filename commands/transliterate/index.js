@@ -29,7 +29,7 @@ module.exports = {
 
 		const isoCode = lang.getIsoCode(1);
 		if (isoCode === "ja") {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: "https://ichi.moe/cl/qr",
 				responseType: "text",
 				searchParams: {
@@ -55,7 +55,7 @@ module.exports = {
 			}
 		}
 		else if (isoCode === "he") {
-			const nakdanResponse = await sb.Got("FakeAgent", {
+			const nakdanResponse = await sb.Got.get("FakeAgent")({
 				method: "POST",
 				url: "https://nakdan-5-2.loadbalancer.dicta.org.il/api",
 				json: {
@@ -76,7 +76,7 @@ module.exports = {
 
 			let pageData = await this.getCacheData("page-data");
 			if (!pageData) {
-				const tokenResponse = await sb.Got("FakeAgent", {
+				const tokenResponse = await sb.Got.get("FakeAgent")({
 					responseType: "text",
 					url: "https://alittlehebrew.com/transliterate/"
 				});
@@ -107,7 +107,7 @@ module.exports = {
 				});
 			}
 
-			const transliterateResponse = await sb.Got("FakeAgent", {
+			const transliterateResponse = await sb.Got.get("FakeAgent")({
 				url: "https://alittlehebrew.com/transliterate/get.php",
 				headers: {
 					"X-Requested-With": "XMLHttpRequest",

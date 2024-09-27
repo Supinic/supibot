@@ -14,7 +14,7 @@ module.exports = {
 			};
 		}
 
-		const searchHTML = await sb.Got("FakeAgent", {
+		const searchHTML = await sb.Got.get("FakeAgent")({
 			url: "https://knowyourmeme.com/search",
 			searchParams: {
 				q: args.join(" ")
@@ -30,7 +30,7 @@ module.exports = {
 			};
 		}
 
-		const detailHTML = await sb.Got("FakeAgent", {
+		const detailHTML = await sb.Got.get("FakeAgent")({
 			prefixUrl: "https://knowyourmeme.com",
 			url: firstLink.replace(/^\//, ""),
 			responseType: "text"

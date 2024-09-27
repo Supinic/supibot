@@ -167,7 +167,7 @@ const handleGenericSubscription = async (definition) => {
 
 	let message;
 	if (type === "rss") {
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url,
 			responseType: "text",
 			timeout: {

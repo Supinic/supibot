@@ -11,7 +11,7 @@ const getChannelLoggingInstances = async function () {
 
 	const result = {};
 	const promises = Object.entries(instances).map(async ([instanceKey, instance]) => {
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: `https://${instance.url}/channels`,
 			throwHttpErrors: false,
 			timeout: {
@@ -74,7 +74,7 @@ const isSupported = async function (channelID) {
 
 const getRandomChannelLine = async function (channelID) {
 	const instance = await getInstance(channelID);
-	const response = await sb.Got("GenericAPI", {
+	const response = await sb.Got.get("GenericAPI")({
 		url: `https://${instance.url}/channelid/${channelID}/random`,
 		throwHttpErrors: false,
 		searchParams: {
@@ -119,7 +119,7 @@ const getRandomChannelLine = async function (channelID) {
 
 const getRandomUserLine = async function (channelID, userID) {
 	const instance = await getInstance(channelID);
-	const response = await sb.Got("GenericAPI", {
+	const response = await sb.Got.get("GenericAPI")({
 		url: `https://${instance.url}/channelid/${channelID}/userid/${userID}/random`,
 		throwHttpErrors: false,
 		searchParams: {
@@ -163,7 +163,7 @@ const addChannel = async function (channelID) {
 		};
 	}
 
-	const response = await sb.Got("GenericAPI", {
+	const response = await sb.Got.get("GenericAPI")({
 		url: "https://logs.ivr.fi/admin/channels",
 		method: "POST",
 		throwHttpErrors: false,

@@ -48,7 +48,7 @@ module.exports = {
 		}
 
 		if (context.params.summary) {
-			const response = await sb.Got("TwitchGQL", {
+			const response = await sb.Got.get("TwitchGQL")({
 				body: JSON.stringify([{
 					operationName: "HomeShelfGames",
 					extensions: {
@@ -85,7 +85,7 @@ module.exports = {
 			};
 		}
 
-		const streamResponse = await sb.Got("Helix", {
+		const streamResponse = await sb.Got.get("Helix")({
 			url: "streams",
 			searchParams: {
 				user_id: channelID
@@ -103,7 +103,7 @@ module.exports = {
 		let vodEnd;
 		const [stream] = streamResponse.body.data;
 
-		const vodResponse = await sb.Got("Helix", {
+		const vodResponse = await sb.Got.get("Helix")({
 			url: "videos",
 			searchParams: {
 				user_id: channelID
@@ -151,7 +151,7 @@ module.exports = {
 		}
 
 		if (!stream) {
-			const broadcasterResponse = await sb.Got("IVR", {
+			const broadcasterResponse = await sb.Got.get("IVR")({
 				url: "v2/twitch/user",
 				searchParams: {
 					id: channelID
@@ -220,7 +220,7 @@ module.exports = {
 				const paramsIterable = stream.tag_ids.map(i => ["tag_id", i]);
 				const searchParams = new URLSearchParams(paramsIterable);
 
-				const response = await sb.Got("Helix", {
+				const response = await sb.Got.get("Helix")({
 					url: "tags/streams",
 					searchParams
 				});

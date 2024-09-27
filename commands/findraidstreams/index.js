@@ -23,7 +23,7 @@ module.exports = {
 				.join("&");
 
 			promises.push(
-				sb.Got("Helix", {
+				sb.Got.get("Helix")({
 					url: `streams?${sliceString}`,
 					responseType: "json"
 				})
@@ -52,7 +52,7 @@ module.exports = {
 			.sort((a, b) => b.viewers - a.viewers);
 
 		const data = JSON.stringify(filteredRaidData, null, 4);
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			url: `https://haste.zneix.eu/documents`,
 			throwHttpErrors: false,

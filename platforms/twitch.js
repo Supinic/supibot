@@ -293,7 +293,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			}
 		}
 
-		const response = await sb.Got("Helix", {
+		const response = await sb.Got.get("Helix")({
 			url: "chat/messages",
 			method: "POST",
 			throwHttpErrors: false,
@@ -368,7 +368,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		const userData = await sb.User.get(user);
 		if (!userData.Twitch_ID) {
-			const response = await sb.Got("Helix", {
+			const response = await sb.Got.get("Helix")({
 				url: "users",
 				searchParams: {
 					login: userData.Name
@@ -394,7 +394,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			.trim();
 
 		const whisperMessageLimit = this.config.whisperMessageLimit ?? FALLBACK_WHISPER_MESSAGE_LIMIT;
-		const response = await sb.Got("Helix", {
+		const response = await sb.Got.get("Helix")({
 			method: "POST",
 			url: "whispers",
 			searchParams: {
@@ -467,7 +467,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			});
 		}
 
-		const response = await sb.Got("Helix", {
+		const response = await sb.Got.get("Helix")({
 			method: "POST",
 			url: "moderation/bans",
 			searchParams: {
@@ -961,7 +961,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	async getUserID (user) {
-		const response = await sb.Got("Helix", {
+		const response = await sb.Got.get("Helix")({
 			url: "users",
 			throwHttpErrors: false,
 			searchParams: {
@@ -1025,7 +1025,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 * @returns {Promise<TwitchEmoteSetDataObject[]>}
 	 */
 	static async fetchTwitchEmotes (selfId) {
-		const response = await sb.Got("Helix", {
+		const response = await sb.Got.get("Helix")({
 			url: "chat/emotes/user",
 			method: "GET",
 			throwHttpErrors: false,
@@ -1038,7 +1038,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		if (response.body.pagination.cursor) {
 			let cursor = response.body.pagination.cursor;
 			while (cursor) {
-				const pageResponse = await sb.Got("Helix", {
+				const pageResponse = await sb.Got.get("Helix")({
 					url: "chat/emotes/user",
 					method: "GET",
 					throwHttpErrors: false,
@@ -1070,7 +1070,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			});
 		}
 
-		const response = await sb.Got("TwitchEmotes", {
+		const response = await sb.Got.get("TwitchEmotes")({
 			url: `https://api.betterttv.net/3/cached/users/twitch/${channelID}`
 		});
 
@@ -1103,7 +1103,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	static async fetchChannelFFZEmotes (channelData) {
-		const response = await sb.Got("TwitchEmotes", {
+		const response = await sb.Got.get("TwitchEmotes")({
 			url: `https://api.frankerfacez.com/v1/room/${channelData.Name}`
 		});
 
@@ -1134,7 +1134,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	 * @returns {Promise<TypedEmote[]>}
 	 */
 	static async fetchChannelSevenTVEmotes (channelData) {
-		const response = await sb.Got("TwitchEmotes", {
+		const response = await sb.Got.get("TwitchEmotes")({
 			url: `https://7tv.io/v3/users/twitch/${channelData.Specific_ID}`
 		});
 
@@ -1165,13 +1165,13 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	async populateGlobalEmotes () {
 		const [twitch, bttv, ffz, sevenTv] = await Promise.allSettled([
 			TwitchPlatform.fetchTwitchEmotes(this.selfId),
-			sb.Got("TwitchEmotes", {
+			sb.Got.get("TwitchEmotes")({
 				url: "https://api.betterttv.net/3/cached/emotes/global"
 			}),
-			sb.Got("TwitchEmotes", {
+			sb.Got.get("TwitchEmotes")({
 				url: "https://api.frankerfacez.com/v1/set/global"
 			}),
-			sb.Got("TwitchEmotes", {
+			sb.Got.get("TwitchEmotes")({
 				url: "https://7tv.io/v3/emote-sets/global"
 			})
 		]);
@@ -1258,7 +1258,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	async fetchUsernameByUserPlatformID (userPlatformID) {
-		const response = await sb.Got("Helix", {
+		const response = await sb.Got.get("Helix")({
 			url: "users",
 			throwHttpErrors: false,
 			searchParams: {

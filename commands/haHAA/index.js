@@ -12,7 +12,7 @@ module.exports = {
 	Code: (async function _4head (context) {
 		let joke;
 		if (context.params.search) {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: "https://icanhazdadjoke.com/search",
 				searchParams: {
 					term: context.params.search,
@@ -31,7 +31,7 @@ module.exports = {
 			joke = sb.Utils.randArray(jokes).joke;
 		}
 		else {
-			const response = await sb.Got("GenericAPI", "https://icanhazdadjoke.com/");
+			const response = await sb.Got.get("GenericAPI")("https://icanhazdadjoke.com/");
 			joke = response.body.joke;
 		}
 

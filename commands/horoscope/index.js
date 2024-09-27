@@ -57,7 +57,7 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			responseType: "text",
 			url: `https://www.astrology.com/horoscope/daily/${zodiacName}.html`
 		});

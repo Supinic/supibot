@@ -7,7 +7,7 @@ export const definition = {
 			return;
 		}
 
-		const response = await sb.Got("Supinic", {
+		const response = await sb.Got.get("Supinic")({
 			url: `twitter/timeline/trainwreckstv`
 		});
 

@@ -86,7 +86,7 @@ module.exports = {
 
 		let success = null;
 		try {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: `${listenerAddress}:${listenerPort}/?audio=${data.Filename}`,
 				responseType: "text"
 			});

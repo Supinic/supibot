@@ -47,7 +47,7 @@ export const definition = {
 			let uploaded;
 			let imgbbReupload;
 			try {
-				const response = await sb.Got("GenericAPI", {
+				const response = await sb.Got.get("GenericAPI")({
 					url: "https://api.imgbb.com/1/upload",
 					searchParams: {
 						key: process.env.API_IMGBB

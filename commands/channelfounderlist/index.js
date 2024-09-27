@@ -29,7 +29,7 @@ module.exports = {
 		}
 
 		const channel = sb.Channel.normalizeName(channelName);
-		const response = await sb.Got("IVR", `v2/twitch/founders/${channel}`);
+		const response = await sb.Got.get("IVR")(`v2/twitch/founders/${channel}`);
 
 		if (response.statusCode === 404) {
 			const { error } = response.body;

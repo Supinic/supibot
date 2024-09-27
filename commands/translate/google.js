@@ -26,9 +26,19 @@ const execute = async function (context, query) {
 		if (option === "to" && lang === "random") {
 			let codeList = await sb.Cache.getByPrefix(LANGUAGE_LIST_KEY);
 			if (!codeList) {
-				const html = await sb.Got("https://translate.google.com/").text();
-				const $ = sb.Utils.cheerio(html);
+				const response = await sb.Got.get("FakeAgent")({
+					url: "https://translate.google.com/",
+					responseType: "text"
+				});
 
+				if (!response.ok) {
+					return {
+						success: false,
+						reply: "Could not fetch language list!"
+					};
+				}
+
+				const $ = sb.Utils.cheerio(response.body);
 				const codes = Array.from($("[data-language-code]")).map(i => i.attribs["data-language-code"]);
 				const list = new Set(codes.filter(i => {
 					if (i === "auto" || i.includes("-")) {
@@ -68,7 +78,7 @@ const execute = async function (context, query) {
 			: "en";
 	}
 
-	const response = await sb.Got("FakeAgent", {
+	const response = await sb.Got.get("FakeAgent")({
 		url: "https://translate.googleapis.com/translate_a/single",
 		responseType: "json",
 		throwHttpErrors: false,

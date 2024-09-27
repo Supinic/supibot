@@ -21,7 +21,7 @@ module.exports = {
 		}
 
 		const term = args.join(" ").toLowerCase();
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: "https://api.urbandictionary.com/v0/define",
 			searchParams: {
 				api_key: URBAN_FAUX_ACCESS_KEY,
@@ -37,7 +37,7 @@ module.exports = {
 		});
 
 		if (response.statusCode === 500) {
-			const autocompleteResponse = await sb.Got("GenericAPI", {
+			const autocompleteResponse = await sb.Got.get("GenericAPI")({
 				url: "https://api.urbandictionary.com/v0/autocomplete-extra",
 				searchParams: {
 					api_key: URBAN_FAUX_ACCESS_KEY,

@@ -18,7 +18,7 @@ module.exports = {
 			? { includeReplies: true }
 			: {};
 
-		const response = await sb.Got("Supinic", {
+		const response = await sb.Got.get("Supinic")({
 			url: `twitter/syndication/${encodeURI(input)}`,
 			searchParams
 		});

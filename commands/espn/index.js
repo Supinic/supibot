@@ -56,7 +56,7 @@ module.exports = {
 
 		const startDate = targetDate.format("Ymd");
 		const endDate = targetDate.addDays(GAME_RANGE_DAYS).format("Ymd");
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: makeUrl(league),
 			searchParams: {
 				dates: `${startDate}-${endDate}`

@@ -35,7 +35,7 @@ module.exports = {
 
 		let dictPromise;
 		if (allowedPartials.dictionary) {
-			dictPromise = sb.Got("GenericAPI", {
+			dictPromise = sb.Got.get("GenericAPI")({
 				url: `https://api.dictionaryapi.dev/api/v1/entries/en/${query}`,
 				throwHttpErrors: false,
 				responseType: "json"
@@ -45,7 +45,7 @@ module.exports = {
 		let wikiPromise;
 		let wiktionaryPromise;
 		if (allowedPartials.wiki) {
-			wikiPromise = sb.Got("GenericAPI", {
+			wikiPromise = sb.Got.get("GenericAPI")({
 				url: `https://${languageCode}.wikipedia.org/w/api.php`,
 				searchParams: {
 					format: "json",
@@ -56,7 +56,7 @@ module.exports = {
 				}
 			});
 
-			wiktionaryPromise = sb.Got("FakeAgent", {
+			wiktionaryPromise = sb.Got.get("FakeAgent")({
 				url: `https://${languageCode}.wiktionary.org/wiki/${encodeURIComponent(query)}`,
 				throwHttpErrors: false,
 				responseType: "text"
@@ -65,7 +65,7 @@ module.exports = {
 
 		let urbanPromise;
 		if (allowedPartials.urban) {
-			urbanPromise = sb.Got("GenericAPI", {
+			urbanPromise = sb.Got.get("GenericAPI")({
 				url: "https://api.urbandictionary.com/v0/define",
 				searchParams: {
 					term: query
@@ -116,7 +116,7 @@ module.exports = {
 		if (wikiData.status === "fulfilled" && wikiData.value?.statusCode === 200) {
 			const searchData = wikiData.value.body;
 			if (searchData[1].length !== 0) {
-				const data = await sb.Got("GenericAPI", {
+				const data = await sb.Got.get("GenericAPI")({
 					url: `https://${languageCode}.wikipedia.org/w/api.php`,
 					searchParams: {
 						format: "json",

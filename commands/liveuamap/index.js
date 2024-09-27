@@ -36,7 +36,7 @@ module.exports = {
 		if (!data) {
 			let response;
 			try {
-				response = await sb.Got("FakeAgent", {
+				response = await sb.Got.get("FakeAgent")({
 					url: `https://liveuamap.com/${languageCode}`,
 					responseType: "text",
 					timeout: {

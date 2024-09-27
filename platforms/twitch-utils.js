@@ -14,7 +14,7 @@ const getAppAccessToken = async () => {
 		return cacheToken;
 	}
 
-	const response = await sb.Got("GenericAPI", {
+	const response = await sb.Got.get("GenericAPI")({
 		url: "https://id.twitch.tv/oauth2/token",
 		method: "POST",
 		searchParams: {
@@ -49,7 +49,7 @@ const getConduitId = async () => {
 
 	console.debug("Validating conduit...");
 
-	const checkConduitResponse = await sb.Got("GenericAPI", {
+	const checkConduitResponse = await sb.Got.get("GenericAPI")({
 		url: "https://api.twitch.tv/helix/eventsub/conduits",
 		method: "GET",
 		responseType: "json",
@@ -76,7 +76,7 @@ const getConduitId = async () => {
 			console.debug("Multiple conduits found, removing to avoid conflict...");
 
 			for (const id of conduitIdList) {
-				await sb.Got("GenericAPI", {
+				await sb.Got.get("GenericAPI")({
 					url: "https://api.twitch.tv/helix/eventsub/conduits",
 					method: "DELETE",
 					responseType: "json",
@@ -101,7 +101,7 @@ const getConduitId = async () => {
 
 	console.debug("Re-making conduit...");
 
-	const response = await sb.Got("GenericAPI", {
+	const response = await sb.Got.get("GenericAPI")({
 		url: "https://api.twitch.tv/helix/eventsub/conduits",
 		method: "POST",
 		responseType: "json",
@@ -136,7 +136,7 @@ const assignWebsocketToConduit = async (sessionId) => {
 	const conduitId = await getConduitId();
 	const appToken = await getAppAccessToken();
 
-	const response = await sb.Got("GenericAPI", {
+	const response = await sb.Got.get("GenericAPI")({
 		method: "PATCH",
 		url: "https://api.twitch.tv/helix/eventsub/conduits/shards",
 		responseType: "json",
@@ -194,7 +194,7 @@ const createSubscription = async (data = {}) => {
 		};
 	}
 
-	const response = await sb.Got("GenericAPI", {
+	const response = await sb.Got.get("GenericAPI")({
 		url: "https://api.twitch.tv/helix/eventsub/subscriptions",
 		method: "POST",
 		responseType: "json",
@@ -321,7 +321,7 @@ const getExistingSubscriptions = async (force = false) => {
 
 const fetchExistingSubscriptions = async () => {
 	const accessToken = await getAppAccessToken();
-	const response = await sb.Got("GenericAPI", {
+	const response = await sb.Got.get("GenericAPI")({
 		url: "https://api.twitch.tv/helix/eventsub/subscriptions",
 		method: "GET",
 		responseType: "json",
@@ -338,7 +338,7 @@ const fetchExistingSubscriptions = async () => {
 	const result = [...response.body.data];
 	let cursor = response.body.pagination?.cursor ?? null;
 	while (cursor) {
-		const loopResponse = await sb.Got("GenericAPI", {
+		const loopResponse = await sb.Got.get("GenericAPI")({
 			url: "https://api.twitch.tv/helix/eventsub/subscriptions",
 			method: "GET",
 			responseType: "json",
@@ -368,7 +368,7 @@ const fetchToken = async () => {
 		});
 	}
 
-	const response = await sb.Got("GenericAPI", {
+	const response = await sb.Got.get("GenericAPI")({
 		url: "https://id.twitch.tv/oauth2/token",
 		method: "POST",
 		searchParams: {

@@ -8,7 +8,7 @@ const cacheKey = "instagram-web-desktop-fb-app-id";
 const getFacebookAppID = async () => {
 	let key = await sb.Cache.getByPrefix(cacheKey);
 	if (!key) {
-		const response = await sb.Got("FakeAgent", {
+		const response = await sb.Got.get("FakeAgent")({
 			url,
 			throwHttpErrors: false,
 			responseType: "text"

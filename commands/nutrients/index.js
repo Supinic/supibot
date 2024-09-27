@@ -30,7 +30,7 @@ module.exports = {
 			query = `100g of ${query}`;
 		}
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			url: "https://trackapi.nutritionix.com/v2/natural/nutrients",
 			headers: {

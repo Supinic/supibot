@@ -13,7 +13,7 @@ module.exports = async function youtubeStreamInfoHandler (context) {
 		channelID = input;
 	}
 	else {
-		const channelResponse = await sb.Got("GenericAPI", {
+		const channelResponse = await sb.Got.get("GenericAPI")({
 			throwHttpErrors: false,
 			responseType: "json",
 			url: "https://www.googleapis.com/youtube/v3/search",
@@ -39,7 +39,7 @@ module.exports = async function youtubeStreamInfoHandler (context) {
 		channelID = channelResponse.body.items[0].id.channelId;
 	}
 
-	const streamResponse = await sb.Got("GenericAPI", {
+	const streamResponse = await sb.Got.get("GenericAPI")({
 		throwHttpErrors: false,
 		responseType: "json",
 		url: "https://www.googleapis.com/youtube/v3/search",

@@ -16,7 +16,7 @@ module.exports = {
 			randomInt(1, 12)
 		);
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			responseType: "json",
 			throwHttpErrors: false,
 

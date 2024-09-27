@@ -101,7 +101,7 @@ module.exports = {
 		try {
 			messageTime = process.hrtime.bigint();
 
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: `${listenerAddress}:${listenerPort}`,
 				responseType: "text",
 				searchParams: new URLSearchParams({

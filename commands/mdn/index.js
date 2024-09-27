@@ -15,7 +15,7 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: "https://developer.mozilla.org/api/v1/search",
 			searchParams: {
 				q: query,

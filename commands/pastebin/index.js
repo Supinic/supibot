@@ -123,7 +123,7 @@ module.exports = {
 
 				let response;
 				try {
-					response = await sb.Got("GenericAPI", {
+					response = await sb.Got.get("GenericAPI")({
 						method: "POST",
 						url: `https://${server}/documents`,
 						throwHttpErrors: false,
@@ -156,7 +156,7 @@ module.exports = {
 			let userInput = args[0];
 			if (provider === "gist" && context.params.gistUser) {
 				const escapedUser = encodeURI(context.params.gistUser);
-				const response = await sb.Got("GitHub", {
+				const response = await sb.Got.get("GitHub")({
 					url: `users/${escapedUser}/gists`,
 					throwHttpErrors: false
 				});
@@ -215,14 +215,14 @@ module.exports = {
 
 			let textData;
 			if (provider === "pastebin") {
-				const response = await sb.Got("GenericAPI", {
+				const response = await sb.Got.get("GenericAPI")({
 					url: `https://pastebin.com/raw/${id}`,
 					throwHttpErrors: false,
 					responseType: "text",
 					headers: {
 						"Content-Type": "application/x-www-form-urlencoded"
 					}
-				})
+				});
 
 				if (!response.ok) {
 					return {
@@ -258,7 +258,7 @@ module.exports = {
 					};
 				}
 
-				const response = await sb.Got("GenericAPI", {
+				const response = await sb.Got.get("GenericAPI")({
 					method: "GET",
 					url: `https://${server}/raw/${id}`,
 					throwHttpErrors: false,
@@ -275,7 +275,7 @@ module.exports = {
 				textData = response.body;
 			}
 			else if (provider === "gist") {
-				const response = await sb.Got("GitHub", {
+				const response = await sb.Got.get("GitHub")({
 					url: `gists/${id}`
 				});
 

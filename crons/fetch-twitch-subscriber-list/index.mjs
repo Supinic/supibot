@@ -22,7 +22,7 @@ export const definition = {
 			});
 		}
 
-		const identityResponse = await sb.Got("GenericAPI", {
+		const identityResponse = await sb.Got.get("GenericAPI")({
 			url: "https://id.twitch.tv/oauth2/token",
 			method: "POST",
 			searchParams: {
@@ -40,7 +40,7 @@ export const definition = {
 			sb.Cache.setByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN", newRefreshToken)
 		]);
 
-		const subsResponse = await sb.Got("GenericAPI", {
+		const subsResponse = await sb.Got.get("GenericAPI")({
 			url: "https://api.twitch.tv/helix/subscriptions",
 			responseType: "json",
 			throwHttpErrors: false,

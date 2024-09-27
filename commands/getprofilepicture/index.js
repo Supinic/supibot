@@ -12,7 +12,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Code: (async function profilePicture (context, username) {
 		const login = sb.User.normalizeUsername(username ?? context.user.Name);
-		const response = await sb.Got("IVR", {
+		const response = await sb.Got.get("IVR")({
 			url: "v2/twitch/user",
 			searchParams: {
 				login

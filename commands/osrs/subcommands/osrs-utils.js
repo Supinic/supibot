@@ -15,12 +15,12 @@ module.exports = {
 		if (!data) {
 			let response;
 			if (!options.seasonal) {
-				response = await sb.Got("Supinic", {
+				response = await sb.Got.get("Supinic")({
 					url: `osrs/lookup/${user}`
 				});
 			}
 			else {
-				response = await sb.Got("Supinic", {
+				response = await sb.Got.get("Supinic")({
 					url: `osrs/lookup/${user}`,
 					searchParams: {
 						seasonal: "1"

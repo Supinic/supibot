@@ -6,7 +6,7 @@ const fetchGamesData = async () => {
 		lastUpdate = new sb.Date().addHours(-24).getTime() / 1000;
 	}
 
-	const response = await sb.Got("GenericAPI", {
+	const response = await sb.Got.get("GenericAPI")({
 		url: "https://api.steampowered.com/IStoreService/GetAppList/v1/",
 		throwHttpErrors: false,
 		searchParams: {
@@ -107,7 +107,7 @@ module.exports = {
 			}
 		}
 
-		const playerCountResponse = await sb.Got("GenericAPI", {
+		const playerCountResponse = await sb.Got.get("GenericAPI")({
 			url: "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001",
 			throwHttpErrors: false,
 			searchParams: {
@@ -123,7 +123,7 @@ module.exports = {
 			};
 		}
 
-		const gameDataResponse = await sb.Got("GenericAPI", {
+		const gameDataResponse = await sb.Got.get("GenericAPI")({
 			url: "https://store.steampowered.com/api/appdetails",
 			throwHttpErrors: false,
 			searchParams: {
@@ -152,7 +152,7 @@ module.exports = {
 
 		let reviewsString = "";
 		if (!context.params.skipReviews) {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: `https://store.steampowered.com/appreviews/${gameId}`,
 				searchParams: {
 					json: "1",

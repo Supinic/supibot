@@ -13,7 +13,7 @@ module.exports = {
 			return { reply: "No search text provided!" };
 		}
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: "https://api.stackexchange.com/2.2/search/advanced",
 			searchParams: {
 				order: "desc",

@@ -15,7 +15,7 @@ module.exports = {
 	Code: (async function randomPastebin (context, syntax) {
 		let data = await sb.Cache.getByPrefix("random-pastebin-paste-list");
 		if (!data) {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: "https://scrape.pastebin.com/api_scraping.php",
 				responseType: "json",
 				throwHttpErrors: false,

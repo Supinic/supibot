@@ -17,7 +17,7 @@ const fetchVimeoData = async (query) => {
 		});
 	}
 
-	const response = await sb.Got("GenericAPI", {
+	const response = await sb.Got.get("GenericAPI")({
 		url: "https://api.vimeo.com/videos",
 		throwHttpErrors: false,
 		headers: {
@@ -242,7 +242,7 @@ module.exports = {
 			if (parsedURL.host === "clips.twitch.tv") {
 				// `find(Boolean)` is meant to take the first non-empty string in the resulting split-array
 				const slug = parsedURL.path.split("/").find(Boolean);
-				const response = await sb.Got("IVR", `v2/twitch/clip/${slug}`);
+				const response = await sb.Got.get("IVR")(`v2/twitch/clip/${slug}`);
 				if (!response.ok) {
 					return {
 						success: false,

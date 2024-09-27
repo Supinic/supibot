@@ -8,7 +8,12 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function inspireMe () {
-		const link = await sb.Got("https://inspirobot.me/api?generate=true").text();
+		const response = await sb.Got.get("GenericAPI")({
+			url: "https://inspirobot.me/api?generate=true",
+			responseType: "text"
+		});
+
+		const link = response.body;
 		return {
 			reply: link
 		};

@@ -1,5 +1,5 @@
 const ANIMAL_TYPES = ["cat", "dog", "bird", "fox"];
-const INVOCATIONS_MAP = {
+const PICTURE_INVOCATIONS_MAP = {
 	rbp: "bird",
 	rcp: "cat",
 	rdp: "dog",
@@ -16,7 +16,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function randomAnimalPicture (context, input) {
-		const type = INVOCATIONS_MAP[context.invocation] ?? input?.toLowerCase() ?? null;
+		const type = PICTURE_INVOCATIONS_MAP[context.invocation] ?? input?.toLowerCase() ?? null;
 		const animalsData = await context.user.getDataProperty("animals");
 
 		if (!animalsData) {
@@ -43,21 +43,41 @@ module.exports = {
 
 		let result = null;
 		switch (type) {
-			case "bird":
-				result = (await sb.Got("GenericAPI", { url: "https://some-random-api.ml/img/birb" }).json()).link;
-				break;
+			case "bird": {
+				const response = await sb.Got.get("GenericAPI")({
+					url: "https://some-random-api.ml/img/birb"
+				});
 
-			case "cat":
-				result = (await sb.Got("https://api.thecatapi.com/v1/images/search").json())[0].url;
+				result = response.body.link;
 				break;
+			}
 
-			case "dog":
-				result = (await sb.Got("https://dog.ceo/api/breeds/image/random").json()).message;
-				break;
+			case "cat": {
+				const response = await sb.Got.get("GenericAPI")({
+					url: "https://api.thecatapi.com/v1/images/search"
+				});
 
-			case "fox":
-				result = (await sb.Got("GenericAPI", { url: "https://some-random-api.ml/img/fox" }).json()).link;
+				result = response.body[0].url;
 				break;
+			}
+
+			case "dog": {
+				const response = await sb.Got.get("GenericAPI")({
+					url: "https://dog.ceo/api/breeds/image/random"
+				});
+
+				result = response.body.message;
+				break;
+			}
+
+			case "fox": {
+				const response = await sb.Got.get("GenericAPI")({
+					url: "https://some-random-api.ml/img/fox"
+				});
+
+				result = response.body.link;
+				break;
+			}
 		}
 
 		return {
@@ -66,7 +86,7 @@ module.exports = {
 	}),
 	Dynamic_Description: (async function (prefix) {
 		const list = [];
-		for (const [short, type] of Object.entries(INVOCATIONS_MAP)) {
+		for (const [short, type] of Object.entries(PICTURE_INVOCATIONS_MAP)) {
 			list.push([
 				`<code>${prefix}${short}</code>`,
 				`Posts a random ${type} picture.`,

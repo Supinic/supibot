@@ -14,7 +14,7 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: "https://open.faceit.com/data/v4/players",
 			searchParams: {
 				nickname: user

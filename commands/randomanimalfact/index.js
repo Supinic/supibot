@@ -46,25 +46,25 @@ module.exports = {
 		switch (type) {
 			case "bird":
 				extractor = (data) => data.fact;
-				gotPromise = sb.Got("GenericAPI", { url: "https://some-random-api.ml/facts/bird" });
+				gotPromise = sb.Got.get("GenericAPI")({ url: "https://some-random-api.ml/facts/bird" });
 
 				break;
 
 			case "cat":
 				extractor = (data) => data.fact;
-				gotPromise = sb.Got("GenericAPI", "https://catfact.ninja/fact");
+				gotPromise = sb.Got.get("GenericAPI")("https://catfact.ninja/fact");
 
 				break;
 
 			case "dog":
 				extractor = (data) => data.facts[0];
-				gotPromise = sb.Got("GenericAPI", "https://dog-api.kinduff.com/api/facts");
+				gotPromise = sb.Got.get("GenericAPI")("https://dog-api.kinduff.com/api/facts");
 
 				break;
 
 			case "fox":
 				extractor = (data) => data.fact;
-				gotPromise = sb.Got("GenericAPI", { url: "https://some-random-api.ml/facts/fox" });
+				gotPromise = sb.Got.get("GenericAPI")({ url: "https://some-random-api.ml/facts/fox" });
 
 				break;
 		}

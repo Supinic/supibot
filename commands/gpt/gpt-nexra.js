@@ -24,7 +24,7 @@ module.exports = class GptNexra extends GptOpenAI {
 			});
 		}
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			throwHttpErrors: false,
 			responseType: "text",

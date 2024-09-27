@@ -25,7 +25,7 @@ module.exports = {
 		}
 
 		const channelId = channelData.Specific_ID;
-		const response = await sb.Got("Helix", {
+		const response = await sb.Got.get("Helix")({
 			url: "streams",
 			searchParams: {
 				user_id: channelId

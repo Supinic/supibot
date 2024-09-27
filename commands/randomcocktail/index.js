@@ -10,7 +10,7 @@ module.exports = {
 	Code: (async function randomCocktail (context, ...args) {
 		let data;
 		if (args.length === 0) {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: "https://www.thecocktaildb.com/api/json/v1/1/random.php",
 				responseType: "json"
 			});
@@ -18,7 +18,7 @@ module.exports = {
 			data = response.body;
 		}
 		else {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: "https://www.thecocktaildb.com/api/json/v1/1/search.php",
 				searchParams: {
 					s: args.join(" ")

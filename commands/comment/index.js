@@ -8,8 +8,11 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function comment () {
-		const html = await sb.Got("http://www.randomyoutubecomment.com").text();
-		const $ = sb.Utils.cheerio(html);
+		const response = await sb.Got.get("FakeAgent")({
+			url: "http://www.randomyoutubecomment.com"
+		});
+
+		const $ = sb.Utils.cheerio(response.body);
 		const comment = $("#comment").text();
 
 		return {

@@ -23,7 +23,7 @@ module.exports = {
 			searchParams.game_id = games[0].id;
 		}
 
-		const response = await sb.Got("Helix", {
+		const response = await sb.Got.get("Helix")({
 			url: "streams",
 			searchParams
 		});

@@ -6,7 +6,7 @@ export const definition = {
 	Events: ["online", "offline"],
 	Description: "Creates and updates database rows of Streams on Supinic's channel as he goes on/offline.",
 	Code: (async function supinicStreamDB (context) {
-		const response = await sb.Got("Helix", {
+		const response = await sb.Got.get("Helix")({
 			url: "videos",
 			searchParams: {
 				user_id: "31400525",

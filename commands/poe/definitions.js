@@ -70,7 +70,7 @@ const subcommands = [
 			}
 
 			if (!lab.images[type]) {
-				const response = await sb.Got("FakeAgent", {
+				const response = await sb.Got.get("FakeAgent")({
 					url: `https://www.poelab.com/${urlSlug}`,
 					responseType: "text"
 				});

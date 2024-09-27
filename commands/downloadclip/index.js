@@ -37,7 +37,7 @@ module.exports = {
 		}
 
 		const [slug] = match;
-		const response = await sb.Got("IVR", `v2/twitch/clip/${slug}`);
+		const response = await sb.Got.get("IVR")(`v2/twitch/clip/${slug}`);
 		if (response.statusCode === 400) {
 			return {
 				success: false,

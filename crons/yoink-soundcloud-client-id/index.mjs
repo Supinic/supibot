@@ -15,7 +15,7 @@ export const definition = {
 			return;
 		}
 
-		const { statusCode } = await sb.Got("GenericAPI", {
+		const { statusCode } = await sb.Got.get("GenericAPI")({
 			url: "https://api-v2.soundcloud.com/resolve",
 			throwHttpErrors: false,
 			searchParams: {
@@ -28,14 +28,17 @@ export const definition = {
 			return;
 		}
 
-		const mainPage = await sb.Got("https://soundcloud.com").text();
-		const $ = sb.Utils.cheerio(mainPage);
+		const mainPageResponse = await sb.Got.get("FakeAgent")({
+			url: "https://soundcloud.com"
+		});
 
-		let finalClientID;
+		const $ = sb.Utils.cheerio(mainPageResponse.body);
 		const elements = $("body > script[crossorigin]");
 		const scripts = Array.from(elements).map(i => $(i).attr("src"));
+
+		let finalClientID;
 		for (const script of scripts) {
-			const scriptResponse = await sb.Got("FakeAgent", {
+			const scriptResponse = await sb.Got.get("FakeAgent")({
 				url: script,
 				responseType: "text"
 			});
@@ -48,7 +51,7 @@ export const definition = {
 			}
 
 			const newClientId = match[1];
-			const { statusCode } = await sb.Got("GenericAPI", {
+			const { statusCode } = await sb.Got.get("GenericAPI")({
 				url: "https://api-v2.soundcloud.com/resolve",
 				throwHttpErrors: false,
 				searchParams: {

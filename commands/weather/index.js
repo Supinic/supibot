@@ -201,7 +201,7 @@ module.exports = {
 
 			let geoData = await this.getCacheData(geoKey);
 			if (!geoData) {
-				const response = await sb.Got("GenericAPI", {
+				const response = await sb.Got.get("GenericAPI")({
 					url: "https://maps.googleapis.com/maps/api/geocode/json",
 					responseType: "json",
 					throwHttpErrors: false,
@@ -281,7 +281,7 @@ module.exports = {
 		}
 
 		if (context.params.pollution) {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: "https://api.openweathermap.org/data/2.5/air_pollution",
 				responseType: "json",
 				throwHttpErrors: false,
@@ -316,7 +316,7 @@ module.exports = {
 		const weatherKey = { type: "weather", coords: `${coords.lat}-${coords.lng}` };
 		let data = await this.getCacheData(weatherKey);
 		if (!data) {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: "https://api.openweathermap.org/data/2.5/onecall",
 				responseType: "json",
 				throwHttpErrors: false,

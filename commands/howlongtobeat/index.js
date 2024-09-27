@@ -13,7 +13,7 @@ const fetchFileHash = async (force = false) => {
 		return existing;
 	}
 
-	const response = await sb.Got("FakeAgent", {
+	const response = await sb.Got.get("FakeAgent")({
 		url: "https://howlongtobeat.com/",
 		responseType: "text"
 	});
@@ -40,7 +40,7 @@ const fetchEndpointHash = async (fileHash, force = false) => {
 		return existing;
 	}
 
-	const response = await sb.Got("FakeAgent", {
+	const response = await sb.Got.get("FakeAgent")({
 		url: `https://howlongtobeat.com/${FILE_PREFIX}/${fileHash}`,
 		responseType: "text"
 	});
@@ -95,7 +95,7 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: `https://howlongtobeat.com/api/search/${endpointHash}`,
 			method: "POST",
 			throwHttpErrors: false,

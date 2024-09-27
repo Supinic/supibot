@@ -38,7 +38,7 @@ module.exports = {
 
 		let data = await this.getCacheData(identifier);
 		if (!data) {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: `https://www.daysoftheyear.com/api/v1/date/${identifier}`,
 				headers: {
 					"X-Api-Key": process.env.API_DAYS_OF_THE_YEAR

@@ -16,7 +16,7 @@ const cryptoGamePriceUpdate = async () => {
 			return { rates: {} };
 		}
 
-		return sb.Got("GenericAPI", {
+		return sb.Got.get("GenericAPI")({
 			prefixUrl: "https://data.fixer.io/api",
 			url: "latest",
 			throwHttpErrors: false,
@@ -28,7 +28,7 @@ const cryptoGamePriceUpdate = async () => {
 	});
 
 	const [cryptoData, currencyData, goldData, silverData] = await Promise.allSettled([
-		sb.Got("GenericAPI", {
+		sb.Got.get("GenericAPI")({
 			url: "https://min-api.cryptocompare.com/data/price",
 			searchParams: {
 				fsym: "EUR",
@@ -41,11 +41,11 @@ const cryptoGamePriceUpdate = async () => {
 
 		conditionalFixerIo(),
 
-		sb.Got("GenericAPI", {
+		sb.Got.get("GenericAPI")({
 			url: "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/EUR"
 		}).json(),
 
-		sb.Got("GenericAPI", {
+		sb.Got.get("GenericAPI")({
 			url: "https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAG/EUR"
 		}).json()
 	]);

@@ -33,7 +33,7 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got("Helix", {
+		const response = await sb.Got.get("Helix")({
 			url: "schedule",
 			searchParams: {
 				broadcaster_id: channelID
@@ -100,7 +100,7 @@ module.exports = {
 		else {
 			const firstSegmentStart = new sb.Date(segments[0].start_time);
 			if (firstSegmentStart < sb.Date.now()) { // First stream segment should already be underway
-				const response = await sb.Got("Helix", {
+				const response = await sb.Got.get("Helix")({
 					url: "streams",
 					searchParams: {
 						user_id: channelID

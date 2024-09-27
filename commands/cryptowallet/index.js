@@ -28,7 +28,7 @@ module.exports = {
 		const type = (context.params.type ?? "btc").toLowerCase();
 
 		if (type === "btc" || type === "bitcoin") {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: `https://blockchain.info/rawaddr/${address}`,
 				throwHttpErrors: false,
 				searchParams: {
@@ -48,7 +48,7 @@ module.exports = {
 			symbol = "BTC";
 		}
 		else if (type === "eth" || type === "ether" || type === "ethereum") {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: "https://api.etherscan.io/api",
 				searchParams: {
 					module: "account",
@@ -70,7 +70,7 @@ module.exports = {
 			symbol = "ETH";
 		}
 
-		const exchange = await sb.Got("GenericAPI", {
+		const exchange = await sb.Got.get("GenericAPI")({
 			url: "https://min-api.cryptocompare.com/data/price",
 			searchParams: {
 				fsym: symbol,

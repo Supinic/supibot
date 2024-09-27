@@ -20,7 +20,7 @@ module.exports = {
 		}
 
 		const encodedQuery = encodeURIComponent(query);
-		const response = await sb.Got("GitHub", {
+		const response = await sb.Got.get("GitHub")({
 			url: `search/code?q=${encodedQuery}+in:file+repo:supinic/supi-core+repo:supinic/supibot`
 		});
 

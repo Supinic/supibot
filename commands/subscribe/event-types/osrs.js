@@ -15,7 +15,7 @@ module.exports = {
 	subName: "OSRS article",
 	type: "custom",
 	process: async () => {
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url,
 			responseType: "json",
 			throwHttpErrors: true

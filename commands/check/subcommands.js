@@ -341,7 +341,7 @@ module.exports = (command) => [
 				});
 			}
 
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: "https://api-free.deepl.com/v2/usage",
 				headers: {
 					Authorization: `DeepL-Auth-Key ${process.env.API_DEEPL_KEY}`
@@ -468,7 +468,7 @@ module.exports = (command) => [
 		aliases: ["maria"],
 		description: "Checks for the current memory usage of the MariaDB database process, running on Supinic's Raspberry Pi 4.",
 		execute: async () => {
-			const response = await sb.Got("RaspberryPi4", {
+			const response = await sb.Got.get("RaspberryPi4")({
 				url: "maria/memoryUsage",
 				throwHttpErrors: false
 			});

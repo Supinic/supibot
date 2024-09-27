@@ -37,7 +37,7 @@ module.exports = {
 			parameters.expr = `format((${parameters.expr}), { notation: "fixed" })`;
 		}
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			responseType: "json",
 			throwHttpErrors: false,

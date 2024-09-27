@@ -28,7 +28,7 @@ class ExternalBanphraseAPI {
 		};
 
 		/** @type {PajbotBanphraseAPIResponse} */
-		const data = await sb.Got("GenericAPI", options).json();
+		const data = await sb.Got.get("GenericAPI")(options).json();
 		data[apiResultSymbol] = Boolean(data.banned ? data.banphrase_data.phrase : false);
 		data[apiDataSymbol] = data.banphrase_data;
 

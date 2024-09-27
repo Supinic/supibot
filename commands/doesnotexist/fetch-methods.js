@@ -54,7 +54,7 @@ module.exports = {
 			)),
 			types: ["person"],
 			execute: async (context, type) => {
-				const response = await sb.Got("GenericAPI", {
+				const response = await sb.Got.get("GenericAPI")({
 					url: "https://this-person-does-not-exist.com/new",
 					searchParams: {
 						new: sb.Date.now(),
@@ -72,7 +72,7 @@ module.exports = {
 				}
 
 				const { src } = response.body;
-				const imageResponse = await sb.Got("FakeAgent", {
+				const imageResponse = await sb.Got.get("FakeAgent")({
 					url: `https://this-person-does-not-exist.com${src}`,
 					responseType: "buffer"
 				});
@@ -106,7 +106,7 @@ module.exports = {
 			)),
 			types: ["artwork"/* , "cat"*/],
 			execute: async (context, type) => {
-				const imageData = await sb.Got("GenericAPI", {
+				const imageData = await sb.Got.get("GenericAPI")({
 					url: buildURL(type),
 					responseType: "buffer",
 					throwHttpErrors: false
@@ -174,7 +174,7 @@ module.exports = {
 			types: ["word"],
 			descriptions: [`<code>word</code> - <a href="https://www.thisworddoesnotexist.com/">This word does not exist</a>`],
 			execute: async (context, type) => {
-				const response = await sb.Got("FakeAgent", {
+				const response = await sb.Got.get("FakeAgent")({
 					url: "https://www.thisworddoesnotexist.com/",
 					responseType: "text",
 					throwHttpErrors: false
@@ -220,8 +220,11 @@ module.exports = {
 			types: "automobile",
 			descriptions: [`<code>automobile</code> - <a href="https://www.thisautomobiledoesnotexist.com/">This automobile does not exist</a>`],
 			execute: async (context, type) => {
-				const imageResponse = await sb.Got("https://www.thisautomobiledoesnotexist.com/");
-				const $ = sb.Utils.cheerio(imageResponse.body);
+				const response = await sb.Got.get("FakeAgent")({
+					url: "https://www.thisautomobiledoesnotexist.com"
+				});
+
+				const $ = sb.Utils.cheerio(response.body);
 				const imageSource = $("#vehicle").attr("src").replace("data:image/png;base64,", "");
 				const imageBuffer = Buffer.from(imageSource, "base64");
 
@@ -246,8 +249,11 @@ module.exports = {
 			types: "fuckeduphomer",
 			descriptions: [`<code>fuckeduphomer</code> - <a href="https://www.thisfuckeduphomerdoesnotexist.com/">This fucked up Homer does not exist</a>`],
 			execute: async () => {
-				const html = await sb.Got("https://www.thisfuckeduphomerdoesnotexist.com/").text();
-				const $ = sb.Utils.cheerio(html);
+				const response = await sb.Got.get("FakeAgent")({
+					url: "https://www.thisfuckeduphomerdoesnotexist.com"
+				});
+
+				const $ = sb.Utils.cheerio(response.body);
 				const image = $("#image-payload").attr("src");
 
 				return {
@@ -262,8 +268,11 @@ module.exports = {
 			execute: async () => {
 				let data = await sb.Cache.getByPrefix(MP_CACHE_KEY);
 				if (!data) {
-					const html = await sb.Got("https://vole.wtf/this-mp-does-not-exist/").text();
-					const $ = sb.Utils.cheerio(html);
+					const response = await sb.Got.get("FakeAgent")({
+						url: "https://vole.wtf/this-mp-does-not-exist"
+					});
+
+					const $ = sb.Utils.cheerio(response.body);
 					const list = $("section ul");
 
 					data = [...list.children()].map(item => {

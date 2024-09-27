@@ -16,7 +16,7 @@ module.exports = {
 
 		symbol = symbol.toUpperCase();
 
-		const { body: data } = await sb.Got("GenericAPI", {
+		const { body: data } = await sb.Got.get("GenericAPI")({
 			url: "https://min-api.cryptocompare.com/data/price",
 			searchParams: {
 				fsym: symbol,
@@ -44,7 +44,7 @@ module.exports = {
 			let url;
 			if (!context.channel || context.channel.Links_Allowed) {
 				try {
-					const response = await sb.Got("Global", {
+					const response = await sb.Got.get("Global")({
 						method: "HEAD",
 						url: `https://www.coindesk.com/price/${symbol.toLowerCase()}`,
 						throwHttpErrors: false,

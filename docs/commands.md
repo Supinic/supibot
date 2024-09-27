@@ -201,7 +201,7 @@ Since all command code functions are `await`ed, it doesn't really make a differe
         };
     }
 
-    const response = await sb.Got("GenericAPI", options);
+    const response = await sb.Got.get("GenericAPI")(options);
 
     const nsfw = Boolean(context.channel?.NSFW);
     const filteredPosts = (nsfw)

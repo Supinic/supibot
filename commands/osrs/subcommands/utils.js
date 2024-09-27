@@ -8,7 +8,7 @@ const flagEmojis = {
 const fetchWorldsData = async function () {
 	let data = await sb.Cache.getByPrefix("osrs-worlds-data");
 	if (!data) {
-		const response = await sb.Got("FakeAgent", {
+		const response = await sb.Got.get("FakeAgent")({
 			url: "https://oldschool.runescape.com/slu",
 			responseType: "text"
 		});

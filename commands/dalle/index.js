@@ -136,7 +136,7 @@ module.exports = {
 		}, 2000, context);
 
 		const start = process.hrtime.bigint();
-		const response = await sb.Got("FakeAgent", {
+		const response = await sb.Got.get("FakeAgent")({
 			url: "https://bf.dallemini.ai/generate",
 			method: "POST",
 			responseType: "json",

@@ -13,7 +13,7 @@ module.exports = {
 
 		let response;
 		if (query) {
-			response = await sb.Got("GenericAPI", {
+			response = await sb.Got.get("GenericAPI")({
 				url: "https://news.google.com/rss/search",
 				responseType: "text",
 				searchParams: {
@@ -25,7 +25,7 @@ module.exports = {
 			});
 		}
 		else {
-			response = await sb.Got("GenericAPI", {
+			response = await sb.Got.get("GenericAPI")({
 				url: "https://news.google.com/rss",
 				responseType: "text"
 			});

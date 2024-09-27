@@ -29,7 +29,7 @@ module.exports = {
 		}
 
 		const phrase = encodeURIComponent(args.join(" "));
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			url: `https://api.dictionaryapi.dev/api/v1/entries/en/${phrase}`,
 			throwHttpErrors: false,
 			responseType: "json"

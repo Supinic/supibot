@@ -7,7 +7,7 @@ const check = async (context, text) => {
 
 	text = text.trim();
 
-	const moderationCheck = await sb.Got("GenericAPI", {
+	const moderationCheck = await sb.Got.get("GenericAPI")({
 		method: "POST",
 		throwHttpErrors: false,
 		url: `https://api.openai.com/v1/moderations`,

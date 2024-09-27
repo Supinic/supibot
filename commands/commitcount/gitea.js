@@ -20,7 +20,7 @@ const execute = async (data) => {
 
 	let response;
 	try {
-		response = await sb.Got("GenericAPI", {
+		response = await sb.Got.get("GenericAPI")({
 			url: `https://${host}/api/v1/users/${username}/heatmap`,
 			throwHttpErrors: false
 		});

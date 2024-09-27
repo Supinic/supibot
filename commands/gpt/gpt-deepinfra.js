@@ -47,7 +47,7 @@ module.exports = class GptDeepInfra extends GptOpenAI {
 
 		const messages = await GptDeepInfra.getHistory(context, query);
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			url: `https://api.deepinfra.com/v1/openai/chat/completions`,
 			headers: {

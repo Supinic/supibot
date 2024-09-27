@@ -30,7 +30,7 @@ module.exports = {
 
 		let reply;
 		if (definition.type === "basic") {
-			const response = await sb.Got("GenericAPI", {
+			const response = await sb.Got.get("GenericAPI")({
 				url: `${baseUrl}/query`,
 				searchParams: {
 					query: definition.query

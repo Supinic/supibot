@@ -1,4 +1,4 @@
-const createRelay = async (IDs) => await sb.Got("Supinic", {
+const createRelay = async (IDs) => await sb.Got.get("Supinic")({
 	method: "POST",
 	url: "relay",
 	throwHttpErrors: false,
@@ -134,7 +134,7 @@ module.exports = {
 		const text = data.Text.replace(/\[(.+?)]\(\d+\)/g, "$1");
 		const link = `https://supinic.com/data/origin/detail/${data.ID}`;
 
-		let type = "";
+		let type;
 		const [provider, providerType = ""] = data.Type.split(" - ");
 		if (data.Type === "Twitch - Bits" && data.Tier !== null) {
 			const thousandBits = Number(data.Tier) / 1000;

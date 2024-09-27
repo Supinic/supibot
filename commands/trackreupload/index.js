@@ -37,7 +37,7 @@ module.exports = {
 			reuploadLink = row.Link_Prefix.replace(VIDEO_TYPE_REPLACE_PREFIX, row.Link);
 		}
 
-		const result = await sb.Got("Supinic", {
+		const result = await sb.Got.get("Supinic")({
 			method: "POST",
 			url: "track/reupload",
 			searchParams: { reuploadLink, existingID }

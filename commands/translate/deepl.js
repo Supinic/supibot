@@ -128,7 +128,7 @@ const execute = async function (context, query) {
 		searchParams.formality = context.params.formality;
 	}
 
-	const response = await sb.Got("GenericAPI", {
+	const response = await sb.Got.get("GenericAPI")({
 		url: "https://api-free.deepl.com/v2/translate",
 		headers: {
 			Authorization: `DeepL-Auth-Key ${process.env.API_DEEPL_KEY}`

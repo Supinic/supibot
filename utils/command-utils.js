@@ -67,7 +67,7 @@ module.exports = {
 			date = new sb.Date()
 		} = data;
 
-		const response = await sb.Got("Google", {
+		const response = await sb.Got.get("Google")({
 			url: "timezone/json",
 			searchParams: {
 				timestamp: Math.trunc(date.valueOf() / 1000),
@@ -96,7 +96,7 @@ module.exports = {
 			});
 		}
 
-		const { statusCode, body: data } = await sb.Got("GenericAPI", {
+		const { statusCode, body: data } = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			responseType: "json",
 			throwHttpErrors: false,
@@ -143,7 +143,7 @@ module.exports = {
 		formData.append("type", "image");
 		formData.append("title", "Simple upload");
 
-		const { statusCode, body } = await sb.Got("GenericAPI", {
+		const { statusCode, body } = await sb.Got.get("GenericAPI")({
 			url: `https://api.imgur.com/3/${endpoint}`,
 			responseType: "json",
 			method: "POST",
@@ -181,7 +181,7 @@ module.exports = {
 		const formData = new FormData();
 		formData.append("attachment", fileData);
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			throwHttpErrors: false,
 			url: "https://i.nuuls.com/upload",
@@ -265,7 +265,7 @@ module.exports = {
 			});
 		}
 
-		const { results, status } = await sb.Got("GenericAPI", {
+		const { results, status } = await sb.Got.get("GenericAPI")({
 			url: "https://maps.googleapis.com/maps/api/geocode/json",
 			searchParams: {
 				key: process.env.API_GOOGLE_GEOCODING,
@@ -332,7 +332,7 @@ module.exports = {
 			params.maxResults = 1;
 		}
 
-		const { items } = await sb.Got("GenericAPI", {
+		const { items } = await sb.Got.get("GenericAPI")({
 			url: `https://www.googleapis.com/youtube/v3/search`,
 			searchParams: {
 				key: process.env.API_GOOGLE_YOUTUBE,
@@ -397,7 +397,7 @@ module.exports = {
 				searchParams.pageToken = pageToken;
 			}
 
-			const { body: data, statusCode } = await sb.Got("GenericAPI", {
+			const { body: data, statusCode } = await sb.Got.get("GenericAPI")({
 				url: "https://www.googleapis.com/youtube/v3/playlistItems",
 				searchParams,
 				throwHttpErrors: false,
@@ -465,7 +465,7 @@ module.exports = {
 	 * @return {Promise<Array<{id: string, name: string}>>}
 	 */
 	async getTwitchGameID (name) {
-		const response = await sb.Got("Helix", {
+		const response = await sb.Got.get("Helix")({
 			url: "games",
 			searchParams: { name }
 		});
@@ -747,7 +747,7 @@ module.exports = {
 			params.append("api_paste_format", options.format);
 		}
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			url: "https://pastebin.com/api/api_post.php",
 			throwHttpErrors: false,
@@ -789,7 +789,7 @@ module.exports = {
 			text = `${options.title}\n\n${text}`;
 		}
 
-		const response = await sb.Got("GenericAPI", {
+		const response = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			url: "https://haste.zneix.eu/documents",
 			throwHttpErrors: false,
@@ -807,7 +807,7 @@ module.exports = {
 			result.reason = "Could not create a Hastebin paste!";
 		}
 		else {
-			result.link = `https://haste.zneix.eu/raw/${response.body.key}`
+			result.link = `https://haste.zneix.eu/raw/${response.body.key}`;
 		}
 
 		return result;

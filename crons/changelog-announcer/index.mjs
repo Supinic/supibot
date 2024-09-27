@@ -50,7 +50,7 @@ export const definition = {
 			}
 			else {
 				const params = data.map(i => `ID=${i.ID}`).join("&");
-				const relay = await sb.Got("Supinic", {
+				const relay = await sb.Got.get("Supinic")({
 					method: "POST",
 					url: "relay",
 					throwHttpErrors: false,

@@ -48,7 +48,7 @@ module.exports = {
 			}
 		}
 
-		const response = await sb.Got("IVR", {
+		const response = await sb.Got.get("IVR")({
 			url: `v2/twitch/subage/${user}/${channel}`
 		});
 
