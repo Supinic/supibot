@@ -1,17 +1,15 @@
-import { Config } from "supi-core";
+const list = [
+	"TWITCH_GQL_OAUTH",
+	"TWITCH_GQL_CLIENT_ID",
+	"TWITCH_GQL_CLIENT_VERSION",
+	"TWITCH_GQL_DEVICE_ID"
+];
 
 export const definition = {
 	name: "TwitchGQL",
 	optionsType: "function",
 	options: (() => {
-		const list = [
-			"TWITCH_GQL_OAUTH",
-			"TWITCH_GQL_CLIENT_ID",
-			"TWITCH_GQL_CLIENT_VERSION",
-			"TWITCH_GQL_DEVICE_ID"
-		];
-
-		if (list.some(i => !Config.has(i, true))) {
+		if (list.some(key => !process.env[key])) {
 			throw new Error("Twitch GQL sb.Got instance cannot initialize - missing configuration variable(s)");
 		}
 
@@ -22,12 +20,12 @@ export const definition = {
 			headers: {
 				Accept: "*/*",
 				"Accept-Language": "en-US",
-				Authorization: `OAuth ${Config.get("TWITCH_GQL_OAUTH")}`,
-				"Client-ID": Config.get("TWITCH_GQL_CLIENT_ID"),
-				"Client-Version": Config.get("TWITCH_GQL_CLIENT_VERSION"),
+				Authorization: `OAuth ${process.env.TWITCH_GQL_OAUTH}`,
+				"Client-ID": process.env.TWITCH_GQL_CLIENT_ID,
+				"Client-Version": process.env.TWITCH_GQL_CLIENT_VERSION,
 				"Content-Type": "text/plain;charset=UTF-8",
 				Referer: "https://www.twitch.tv",
-				"X-Device-ID": Config.get("TWITCH_GQL_DEVICE_ID")
+				"X-Device-ID": process.env.TWITCH_GQL_DEVICE_ID
 			}
 		};
 	}),

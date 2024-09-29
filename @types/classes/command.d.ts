@@ -488,7 +488,7 @@ export declare class Command extends ClassTemplate {
     getDynamicDescription: () => Promise<string[] | null>;
 
     /**
-     * Creates the command's detail URL based on a Configuration variable
+     * Creates the command's detail URL based on a configuration value
      * @param options
      * @param options.useCodePath If true, returns a path for the command's code description
      */

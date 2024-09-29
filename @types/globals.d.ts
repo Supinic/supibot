@@ -33,8 +33,6 @@ declare var sb: {
     Date: core.Date,
     Error: core.Error,
     Promise: core.Promise,
-
-    Config: core.Config,
     Got: core.Got,
     // TODO add others
 }
