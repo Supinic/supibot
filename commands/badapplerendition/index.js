@@ -43,7 +43,7 @@ module.exports = {
 			"Aggregate command for all things Bad Apple!! related.",
 			"",
 
-			`${subcommandList.join("")}`
+			...subcommandList
 		];
 	}
 };
