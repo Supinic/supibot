@@ -1,5 +1,6 @@
 module.exports = {
 	name: "random",
+	aliases: [],
 	description: "Rolls a random rendition from the list, and posts its details.",
 	execute: async () => {
 		const random = await sb.Query.getRecordset(rs => rs

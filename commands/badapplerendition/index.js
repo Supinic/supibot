@@ -30,7 +30,7 @@ module.exports = {
 	},
 	Dynamic_Description: () => {
 		const subcommandList = subcommands.map(i => {
-			if (i.aliases.length === 0) {
+			if (!i.aliases || i.aliases.length === 0) {
 				return `<code>$bar ${i.name}</code>\n${i.description}`;
 			}
 			else {
