@@ -29,7 +29,8 @@ module.exports = {
 		}
 
 		const data = await OsrsUtils.fetch(user, {
-			seasonal: Boolean(context.params.seasonal)
+			seasonal: Boolean(context.params.seasonal),
+			force: Boolean(context.params.force)
 		});
 
 		if (data.success === false) {
