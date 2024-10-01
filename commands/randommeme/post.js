@@ -5,6 +5,7 @@ module.exports = class RedditPost {
 	#title;
 	#url;
 	#commentsUrl;
+	#galleryLinks;
 
 	#flairs = [];
 	#crosspostOrigin = null;
@@ -40,6 +41,19 @@ module.exports = class RedditPost {
 		this.#stickied = Boolean(data.stickied);
 
 		this.#score = data.ups ?? 0;
+
+		this.#galleryLinks = [];
+		if (data.is_gallery) {
+			const meta = data.media_metadata;
+			for (const item of data.gallery_data.items) {
+				const mime = meta[item.media_id].m;
+				const ext = mime.split("/")[1];
+				const link = `https://i.redd.it/${item.media_id}.${ext}`;
+
+				this.#galleryLinks.push(link);
+			}
+		}
+
 	}
 
 	get id () { return this.#id; }
@@ -76,6 +90,14 @@ module.exports = class RedditPost {
 
 	hasVideo () {
 		return this.#url.includes("v.reddit") || this.#url.includes("youtu");
+	}
+
+	hasGalleryLinks () {
+		return (this.#galleryLinks.length > 0);
+	}
+
+	getGalleryLinks () {
+		return this.#galleryLinks;
 	}
 
 	toString () {

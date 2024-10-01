@@ -21,6 +21,7 @@ module.exports = {
 	Params: [
 		{ name: "comments", type: "boolean" },
 		{ name: "flair", type: "string" },
+		{ name: "galleryLinks", type: "boolean" },
 		{ name: "ignoreFlair", type: "string" },
 		{ name: "linkOnly", type: "boolean" },
 		{ name: "showFlairs", type: "boolean" },
@@ -54,7 +55,8 @@ module.exports = {
 		/** @type {Subreddit} */
 		let forum = this.data.subreddits[subreddit];
 		if (!forum) {
-			const { body, statusCode } = await redditGot(`${subreddit}/about.json`);
+			const response = await redditGot(`${subreddit}/about.json`);
+			const { body, statusCode } = response;
 
 			if (statusCode === 403) {
 				return {
@@ -104,7 +106,8 @@ module.exports = {
 		}
 
 		if (forum.posts.length === 0 || sb.Date.now() > forum.expiration) {
-			const { statusCode, body } = await redditGot(`${subreddit}/hot.json`);
+			const response = await redditGot(`${subreddit}/hot.json`);
+			const { statusCode, body } = response;
 
 			if (statusCode === 403) {
 				return {
@@ -238,31 +241,33 @@ module.exports = {
 				reply: `No eligible post found! This should not happen though, please contact @Supinic`
 			};
 		}
-		else {
-			// Add the currently used post ID at the beginning of the array
-			repeatedPosts.unshift(post.id);
-			// And then splice off everything over the length of 3.
-			repeatedPosts.splice(config.repeats);
 
-			if (context.params.linkOnly) {
-				return {
-					reply: post.url
-				};
-			}
+		// Add the currently used post ID at the beginning of the array
+		repeatedPosts.unshift(post.id);
+		// And then splice off everything over the length of 3.
+		repeatedPosts.splice(config.repeats);
 
-			const commentsUrl = (context.params.comments)
-				? `Thread: https://reddit.com/${post.commentsUrl}`
-				: "";
-
-			const symbol = (forum.quarantine) ? "⚠" : "";
-			const postString = (context.platform.Name === "discord" && post.isVideoPost)
-				? `https://reddit.com/${post.commentsUrl}`
-				: post.toString();
-
+		if (context.params.linkOnly) {
 			return {
-				reply: sb.Utils.fixHTML(`${symbol} r/${forum.name}: ${postString} ${commentsUrl}`)
+				reply: post.url
 			};
 		}
+
+		const galleryLinksString = (context.params.galleryLinks && post.hasGalleryLinks())
+			? post.getGalleryLinks().join(" ")
+			: "";
+		const commentsUrl = (context.params.comments)
+			? `Thread: https://reddit.com/${post.commentsUrl}`
+			: "";
+
+		const symbol = (forum.quarantine) ? "⚠" : "";
+		const postString = (context.platform.Name === "discord" && post.isVideoPost)
+			? `https://reddit.com/${post.commentsUrl}`
+			: post.toString();
+
+		return {
+			reply: sb.Utils.fixHTML(`${symbol} r/${forum.name}: ${postString} ${commentsUrl} ${galleryLinksString}`)
+		};
 	}),
 	Dynamic_Description: (async function (prefix) {
 		const { defaultMemeSubreddits } = require("./config.json");
