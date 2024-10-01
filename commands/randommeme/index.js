@@ -298,6 +298,10 @@ module.exports = {
 			"NSFW-marked posts will be filtered out in channels not marked for that content.",
 			"",
 
+			`<code>${prefix}rm (subreddit) galleryLinks:true</code>`,
+			"If this parameter is provided as `true` and a post has a gallery associated with it, the command will return a list of all images in the gallery as media posts.",
+			"",
+
 			`<code>${prefix}rm (subreddit) flair:(flair)</code>`,
 			"If a flair is provided, only the posts that contain such flair will be used (case-insensitive).",
 			"",
