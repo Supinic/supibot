@@ -56,18 +56,16 @@ export const definition = {
 			}
 
 			const supinicLink = `https://supinic.com/data/suggestion/${newRow.ID}`;
-			const githubLink = (oldRow.Github_Link === newRow.Github_Link)
-				? ""
-				: ((oldRow.values.Github_Link === null)
-					? `GitHub link added: ${newRow.Github_Link}`
-					: `GitHub link modified: ${newRow.Github_Link}`);
+			const extraInfoString = (oldRow.Notes === newRow.Notes)
+				? `Details: ${supinicLink}`
+				: `There are notes for you! Make sure you check them here: ${supinicLink}`;
 
 			await sb.Reminder.create({
 				Channel: null,
 				Platform: subscription.Platform,
 				User_From: null,
 				User_To: oldRow.User_Alias,
-				Text: `[EVENT] Suggestion ${oldRow.ID} changed: ${oldRow.Status ?? "(pending)"} => ${newRow.Status ?? "(pending)"} ${githubLink} Check details: ${supinicLink}`,
+				Text: `Your suggestion ${oldRow.ID} changed: is now ${newRow.Status ?? "(pending)"}. ${extraInfoString}`,
 				Schedule: null,
 				Created: new sb.Date(),
 				Private_Message: true
