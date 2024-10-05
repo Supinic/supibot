@@ -2,7 +2,8 @@ const MAXIMUM_REPEATS = 5;
 
 const fetchCopypasta = async () => {
 	const response = await sb.Got.get("FakeAgent")({
-		url: "https://www.twitchquotes.com/random"
+		url: "https://www.twitchquotes.com/random",
+		responseType: "text"
 	});
 
 	const $ = sb.Utils.cheerio(response.body);
