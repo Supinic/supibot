@@ -346,7 +346,7 @@ module.exports = {
 
 			data = response.body;
 			await this.setCacheData(weatherKey, data, {
-				expiry: 30 * 60_000 // 30 minutes cache
+				expiry: 10 * 60_000 // 10 minutes cache
 			});
 		}
 
