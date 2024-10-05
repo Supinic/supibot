@@ -317,7 +317,7 @@ module.exports = {
 		let data = await this.getCacheData(weatherKey);
 		if (!data) {
 			const response = await sb.Got.get("GenericAPI")({
-				url: "https://api.openweathermap.org/data/2.5/onecall",
+				url: "https://api.openweathermap.org/data/3.0/onecall",
 				responseType: "json",
 				throwHttpErrors: false,
 				timeout: {
