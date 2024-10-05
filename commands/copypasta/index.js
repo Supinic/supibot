@@ -6,7 +6,7 @@ const fetchCopypasta = async () => {
 	});
 
 	const $ = sb.Utils.cheerio(response.body);
-	const text = $(`div[id^="clipboard_copy_content"]`).text();
+	const text = $("span.-main-text").text();
 
 	if (typeof text === "string") {
 		return sb.Utils.removeHTML(text).trim();
