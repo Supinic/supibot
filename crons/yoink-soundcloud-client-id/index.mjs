@@ -29,7 +29,8 @@ export const definition = {
 		}
 
 		const mainPageResponse = await sb.Got.get("FakeAgent")({
-			url: "https://soundcloud.com"
+			url: "https://soundcloud.com",
+			responseType: "text"
 		});
 
 		const $ = sb.Utils.cheerio(mainPageResponse.body);

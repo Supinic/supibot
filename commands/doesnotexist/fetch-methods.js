@@ -221,7 +221,8 @@ module.exports = {
 			descriptions: [`<code>automobile</code> - <a href="https://www.thisautomobiledoesnotexist.com/">This automobile does not exist</a>`],
 			execute: async (context, type) => {
 				const response = await sb.Got.get("FakeAgent")({
-					url: "https://www.thisautomobiledoesnotexist.com"
+					url: "https://www.thisautomobiledoesnotexist.com",
+					responseType: "text"
 				});
 
 				const $ = sb.Utils.cheerio(response.body);
@@ -250,7 +251,8 @@ module.exports = {
 			descriptions: [`<code>fuckeduphomer</code> - <a href="https://www.thisfuckeduphomerdoesnotexist.com/">This fucked up Homer does not exist</a>`],
 			execute: async () => {
 				const response = await sb.Got.get("FakeAgent")({
-					url: "https://www.thisfuckeduphomerdoesnotexist.com"
+					url: "https://www.thisfuckeduphomerdoesnotexist.com",
+					responseType: "text"
 				});
 
 				const $ = sb.Utils.cheerio(response.body);
@@ -269,7 +271,8 @@ module.exports = {
 				let data = await sb.Cache.getByPrefix(MP_CACHE_KEY);
 				if (!data) {
 					const response = await sb.Got.get("FakeAgent")({
-						url: "https://vole.wtf/this-mp-does-not-exist"
+						url: "https://vole.wtf/this-mp-does-not-exist",
+						responseType: "text"
 					});
 
 					const $ = sb.Utils.cheerio(response.body);

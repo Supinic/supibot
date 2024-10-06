@@ -9,7 +9,8 @@ module.exports = {
 	Whitelist_Response: null,
 	Code: (async function comment () {
 		const response = await sb.Got.get("FakeAgent")({
-			url: "http://www.randomyoutubecomment.com"
+			url: "http://www.randomyoutubecomment.com",
+			responseType: "text"
 		});
 
 		const $ = sb.Utils.cheerio(response.body);
