@@ -82,8 +82,11 @@ module.exports = {
 		// "Heuristic" that removes the last two sentences from the horoscope. This is aimed to slim down
 		// the response, since it's usually a bit too long (around 600 characters) for Twitch (500 chars);
 		const fullTextArray = node.text().trim().split(/\.\s/);
-		const trimmedText = fullTextArray.slice(0, -2).join(". ");
+		const trimmedArray = (fullTextArray.length > 3)
+			? fullTextArray.slice(0, -2)
+			: fullTextArray;
 
+		const trimmedText = trimmedArray.join(". ");
 		const prefix = (own) ? "Your" : "";
 		return {
 			reply: `${prefix} ${sb.Utils.capitalize(zodiacName)} horoscope for today: ${trimmedText}.`
