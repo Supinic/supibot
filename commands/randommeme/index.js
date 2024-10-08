@@ -17,18 +17,22 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "If no parameters are provided, posts a random Reddit meme. If you provide a subreddit, a post will be chosen randomly.",
-	Flags: ["external-input","mention","non-nullable","pipe"],
+	Flags: ["allows-raw-data","external-input","mention","non-nullable","pipe"],
 	Params: [
 		{ name: "comments", type: "boolean" },
 		{ name: "flair", type: "string" },
 		{ name: "galleryLinks", type: "boolean" },
 		{ name: "ignoreFlair", type: "string" },
 		{ name: "linkOnly", type: "boolean" },
-		{ name: "rawData", type: "boolean" },
 		{ name: "showFlairs", type: "boolean" },
 		{ name: "skipGalleries", type: "boolean" },
 		{ name: "skipVideos", type: "boolean" }
 	],
+	prepareRawData: function (context, post) {
+		return {
+			post: post.toJSON()
+		};
+	},
 	Whitelist_Response: null,
 	Code: (async function randomMeme (context, ...args) {
 		const config = require("./config.json");
@@ -248,15 +252,11 @@ module.exports = {
 		// And then splice off everything over the length of 3.
 		repeatedPosts.splice(config.repeats);
 
-		if (context.params.raw) {
-			return {
-				reply: "Data is available.",
-				data: {
-					post: post.toJSON()
-				}
-			}
+		if (context.append.returnRawData) {
+			return this.prepareRawData(context, post);
 		}
-		else if (context.params.linkOnly) {
+
+		if (context.params.linkOnly) {
 			return {
 				reply: post.url
 			};

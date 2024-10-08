@@ -524,6 +524,7 @@ class Command extends require("./template.js") {
 		const appendOptions = { ...options };
 		const isPrivateMessage = (!channelData);
 
+
 		const contextOptions = {
 			platform: options.platform,
 			invocation: identifier,
@@ -547,6 +548,14 @@ class Command extends require("./template.js") {
 			contextOptions.transaction = await sb.Query.getTransaction();
 		}
 
+		const commandParams = [...command.Params];
+		if (command.Flags.allowRawData) {
+			commandParams.push({
+				name: "rawData",
+				type: "boolean"
+			});
+		}
+
 		let failedParamsParseResult;
 		if (command.Params.length > 0) {
 			const result = Command.parseParametersFromArguments(command.Params, args);
@@ -559,6 +568,13 @@ class Command extends require("./template.js") {
 				args = result.args;
 				contextOptions.params = result.parameters;
 			}
+		}
+
+		let expectRawData = false;
+		if (command.Flags.allowRawData && contextOptions.params.rawData === true) {
+			expectRawData = true;
+			contextOptions.append.returnRawData = true;
+			delete contextOptions.params.rawData;
 		}
 
 		/** @type {ExecuteResult} */
@@ -748,6 +764,10 @@ class Command extends require("./template.js") {
 			return {
 				success: execution?.success ?? true
 			};
+		}
+
+		if (expectRawData) {
+			// @todo fill this out from Command.prepareRawData somehow (create stable API)
 		}
 
 		Command.handleCooldown(channelData, userData, command, execution?.cooldown, identifier);
