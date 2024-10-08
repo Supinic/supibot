@@ -9,9 +9,11 @@ module.exports = class RedditPost {
 
 	#flairs = [];
 	#crosspostOrigin = null;
-	#isTextPost = false;
 	#nsfw = false;
 	#stickied = false;
+	#isTextPost = false;
+	#isGallery = false;
+	#isVideo = false;
 
 	#score = 0;
 
@@ -37,6 +39,8 @@ module.exports = class RedditPost {
 		// }
 
 		this.#isTextPost = Boolean(data.selftext && data.selftext_html);
+		this.#isVideo = Boolean(data.is_video);
+		this.#isGallery = Boolean(data.is_gallery);
 		this.#nsfw = Boolean(data.over_18) || crossPostNSFW;
 		this.#stickied = Boolean(data.stickied);
 
@@ -121,6 +125,8 @@ module.exports = class RedditPost {
 			nsfw: this.#nsfw,
 			stickied: this.#stickied,
 			isTextPost: this.#isTextPost,
+			isVideo: this.#isVideo,
+			isGallery: this.#isGallery,
 			score: this.#score,
 			commentsUrl: this.#commentsUrl,
 			flairs: [...this.#flairs],
