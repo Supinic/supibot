@@ -53,7 +53,6 @@ module.exports = class RedditPost {
 				this.#galleryLinks.push(link);
 			}
 		}
-
 	}
 
 	get id () { return this.#id; }
@@ -111,5 +110,21 @@ module.exports = class RedditPost {
 			: "";
 
 		return `${this.#title} ${fixedUrl} (Score: ${this.#score}, posted ${this.posted}${xpost})`;
+	}
+
+	toJSON () {
+		return {
+			id: this.#id,
+			url: this.#url,
+			created: new Date(this.#created),
+			author: this.#author,
+			nsfw: this.#nsfw,
+			stickied: this.#stickied,
+			isTextPost: this.#isTextPost,
+			score: this.#score,
+			commentsUrl: this.#commentsUrl,
+			flairs: [...this.#flairs],
+			galleryLinks: [...this.#galleryLinks]
+		};
 	}
 };

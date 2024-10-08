@@ -343,11 +343,17 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 
 				commandExecutionPending = false;
 
-				return {
+				const returnValue = {
 					success: result.success ?? true,
 					reason: result.reason ?? null,
 					reply: result.reply
 				};
+
+				if (result.data && typeof result.data === "object") {
+					returnValue.data = result.data;
+				}
+
+				return returnValue;
 			}
 		}),
 		get tee () { return Object.freeze([...context.tee]); },

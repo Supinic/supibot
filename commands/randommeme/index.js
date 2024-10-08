@@ -24,6 +24,7 @@ module.exports = {
 		{ name: "galleryLinks", type: "boolean" },
 		{ name: "ignoreFlair", type: "string" },
 		{ name: "linkOnly", type: "boolean" },
+		{ name: "rawData", type: "boolean" },
 		{ name: "showFlairs", type: "boolean" },
 		{ name: "skipGalleries", type: "boolean" },
 		{ name: "skipVideos", type: "boolean" }
@@ -247,7 +248,15 @@ module.exports = {
 		// And then splice off everything over the length of 3.
 		repeatedPosts.splice(config.repeats);
 
-		if (context.params.linkOnly) {
+		if (context.params.raw) {
+			return {
+				reply: "Data is available.",
+				data: {
+					post: post.toJSON()
+				}
+			}
+		}
+		else if (context.params.linkOnly) {
 			return {
 				reply: post.url
 			};
