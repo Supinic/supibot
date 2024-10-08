@@ -248,7 +248,7 @@ module.exports = {
 		// And then splice off everything over the length of 3.
 		repeatedPosts.splice(config.repeats);
 
-		if (context.params.raw) {
+		if (context.params.rawData) {
 			return {
 				reply: "Data is available.",
 				data: {
