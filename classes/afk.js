@@ -1,6 +1,8 @@
 const Filter = require("./filter.js");
 const User = require("./user.js");
+
 const { responses } = require("./afk-definitions.json");
+const { responses: configResponses } = require("../config.json");
 
 module.exports = class AwayFromKeyboard extends require("./template.js") {
 	static data = new Map();
@@ -133,11 +135,15 @@ module.exports = class AwayFromKeyboard extends require("./template.js") {
 			statusMessage = sb.Utils.randArray(staticResponses);
 		}
 
-		// const statusMessage = sb.Utils.randArray(afkResponses[data.Status] ?? afkResponses[AwayFromKeyboard.defaultStatus]);
+		/**
+		 * @todo Whenever the AFK table is split into AFK and AFK_History (similar to Reminder), only keep the Silent
+		 * flag in the historical table and the active one should not have it. Then remove this condition.
+ 		 */
 		if (!data.Silent) {
 			const userMention = await channelData.Platform.createUserMention(userData);
-			const message = `${userMention} ${statusMessage}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
+			const fixedReminderText = await channelData.prepareMessage(data.Text) ?? configResponses.defaultBanphrase;
 
+			const message = `${userMention} ${statusMessage}: ${fixedReminderText} (${sb.Utils.timeDelta(data.Started)})`;
 			if (channelData.Mirror) {
 				const mirroredMessage = `${userData.Name} ${statusMessage}: ${data.Text} (${sb.Utils.timeDelta(data.Started)})`;
 				await channelData.mirror(mirroredMessage, null, { commandUsed: false });
