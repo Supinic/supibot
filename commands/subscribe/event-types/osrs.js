@@ -30,6 +30,11 @@ module.exports = {
 
 		// Huge assumption: Jagex will release new articles on "top" of the JSON feed
 		const previousArticleIndex = newsItems.findIndex(i => i.newsId === previousArticleId);
+		const logObject = {
+			newsItems,
+			previousArticleId,
+			previousArticleIndex
+		};
 
 		// Ignore if no previous article found - save the latest one
 		if (previousArticleIndex === -1) {
@@ -38,10 +43,16 @@ module.exports = {
 				expiry: 14 * 864e5 // 14 days
 			});
 
+			await sb.Logger.log("System.Request", JSON.stringify({
+				...logObject,
+				topArticleId
+			}));
+
 			return;
 		}
 		// Ignore if feed head equals to the latest article (no new articles)
 		else if (previousArticleIndex === 0) {
+			await sb.Logger.log("System.Request", JSON.stringify(logObject));
 			return;
 		}
 
@@ -60,16 +71,12 @@ module.exports = {
 		const articleString = eligibleArticles.map(i => `${i.title} ${i.link}`).join(" -- ");
 		const noun = (eligibleArticles.length === 1) ? "article" : "articles";
 
-		await sb.Logger.log(
-			"System.Request",
-			JSON.stringify({
-				previousArticleId,
-				latestArticleId,
-				newsItems,
-				eligibleArticles,
-				articleString
-			})
-		);
+		await sb.Logger.log("System.Request", JSON.stringify({
+			...logObject,
+			latestArticleId,
+			eligibleArticles,
+			articleString
+		}));
 
 		return {
 			message: `New OSRS ${noun}! ${articleString}`
