@@ -11,7 +11,7 @@ module.exports = {
 		removed: "You will no longer receive pings when a new OSRS article is published."
 	},
 	generic: true,
-	cronExpression: "0 */5 * * * *",
+	cronExpression: "0 */1 * * * *",
 	subName: "OSRS article",
 	type: "custom",
 	process: async () => {
@@ -58,7 +58,7 @@ module.exports = {
 		}
 
 		const articleString = eligibleArticles.map(i => `${i.title} ${i.link}`).join(" -- ");
-		const noun = (eligibleArticles.length === 0) ? "article" : "articles";
+		const noun = (eligibleArticles.length === 1) ? "article" : "articles";
 
 		await sb.Logger.log(
 			"System.Request",
