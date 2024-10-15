@@ -49,7 +49,7 @@ module.exports = {
 
 		const commandsToRun = [];
 		if (reloadCommand === "all") {
-			commandsToRun.push(...methodNames);
+			commandsToRun.push(...Object.keys(methods));
 		}
 		else if (reloadCommand) {
 			commandsToRun.push(reloadCommand);
