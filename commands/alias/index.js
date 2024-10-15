@@ -1033,6 +1033,13 @@ module.exports = {
 				}
 
 				const [oldUsername] = args;
+				if (!oldUsername) {
+					return {
+						success: false,
+						reply: "You must provide your previous username!"
+					};
+				}
+				
 				const oldUserData = await sb.User.get(oldUsername);
 				if (!oldUserData || !oldUserData.Twitch_ID) {
 					return {
