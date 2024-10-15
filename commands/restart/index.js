@@ -36,7 +36,7 @@ module.exports = {
 	Author: "supinic",
 	Cooldown: 10_000,
 	Description: "Restarts the bot. Optionally, also pulls git changes and/or upgrades packages via yarn.",
-	Flags: ["system"],
+	Flags: ["system", "whitelist"],
 	Params: null,
 	Whitelist_Response: "Only available to administrators or helpers!",
 	Code: async function restart (context, reloadCommand) {
