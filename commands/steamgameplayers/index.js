@@ -132,7 +132,7 @@ module.exports = {
 		});
 
 		let publisher = "";
-		const gameData = gameDataResponse.body[gameId].data;
+		const gameData = gameDataResponse.body[gameId]?.data;
 		if (!gameData) {
 			return {
 				success: false,
