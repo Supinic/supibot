@@ -1,5 +1,6 @@
 const basicRegex = /(get|getting|buy|buying)?\s*(cheap|cheapest|best|real|more)?\s*(viewers|followers)/gi;
 const siteRegex = /(streamboo|u\.to|dogehype)/gi;
+const discordRegex = /(add\s*)(me|my)?(\s*on)?(discord)?/gi;
 
 export const definition = {
 	Name: "wanna-become-famous",
@@ -31,6 +32,9 @@ export const definition = {
 		}
 		else if (siteRegex.test(msg)) {
 			reason = "no more site spam";
+		}
+		else if (discordRegex.test(msg)) {
+			reason = "getting added on discord";
 		}
 		else {
 			return;
