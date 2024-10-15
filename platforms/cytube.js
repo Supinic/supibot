@@ -581,11 +581,10 @@ module.exports = class CytubePlatform extends require("./template.js") {
 
 	/**
 	 * Fetches the userlist for a given cytube client.
-	 * @param {string} channelIdentifier
+	 * @param {Channel} channelData
 	 * @returns {string[]}
 	 */
-	populateUserList (channelIdentifier) {
-		const channelData = sb.Channel.get(channelIdentifier, this.platform);
+	populateUserList (channelData) {
 		const client = this.clients.get(channelData.ID);
 		if (!client) {
 			throw new sb.Error({

@@ -809,8 +809,8 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		);
 	}
 
-	async populateUserList (channelIdentifier) {
-		const channel = await this.client.channels.fetch(channelIdentifier);
+	async populateUserList (channelData) {
+		const channel = await this.client.channels.fetch(channelData.Name);
 		const guild = await channel.guild.fetch();
 
 		await Promise.all([

@@ -287,7 +287,8 @@ class Platform {
 			return cacheData;
 		}
 
-		const userList = await this.populateUserList(channelData.Name);
+		const userList = await this.populateUserList(channelData);
+
 		await sb.Cache.setByPrefix(key, userList, {
 			expiry: 300_000 // 5 minutes
 		});

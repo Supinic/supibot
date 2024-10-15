@@ -1248,8 +1248,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		];
 	}
 
-	async populateUserList (channelIdentifier) {
-		const channelData = sb.Channel.get(channelIdentifier, this);
+	async populateUserList (channelData) {
 		return await getActiveUsernamesInChannel(channelData);
 	}
 
