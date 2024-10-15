@@ -166,6 +166,8 @@ module.exports = {
 			&& !i.isSelftext
 			&& !i.isTextPost
 			&& !repeatedPosts.includes(i.id)
+			&& !i.removed_by_category // potentially signifies deleted posts if set
+			&& !i.removal_reason // also potentially signifies removed posts if set
 		));
 
 		if (validPosts.length === 0) {
