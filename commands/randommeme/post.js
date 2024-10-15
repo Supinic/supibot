@@ -130,7 +130,9 @@ module.exports = class RedditPost {
 			score: this.#score,
 			commentsUrl: this.#commentsUrl,
 			flairs: [...this.#flairs],
-			galleryLinks: [...this.#galleryLinks]
+			galleryLinks: [...this.#galleryLinks],
+			title: this.#title,
+			crosspostOrigin: this.#crosspostOrigin
 		};
 	}
 };
