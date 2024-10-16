@@ -1,7 +1,8 @@
 {
   "repeats": 25,
   "uncached": [
-    "random"
+    "random",
+    "randnsfw"
   ],
   "banned": [
     "iranianporn",
