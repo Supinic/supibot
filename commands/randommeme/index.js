@@ -77,11 +77,13 @@ module.exports = {
 
 			forum = new Subreddit(body);
 			if (!config.uncached.includes(subreddit)) {
+				this.data.subreddits[subreddit] = forum;
+			}
+			else {
 				// override the subreddit name in case of uncached subreddits. if it isn't overridden,
 				// the original name (e.g. "random") stays, and the posts request is rolled randomly again,
 				// creating a de-synchronization between the random roll and the result.
 				subreddit = forum.name;
-				this.data.subreddits[subreddit] = forum;
 			}
 		}
 
