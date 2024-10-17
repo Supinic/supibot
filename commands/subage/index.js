@@ -149,8 +149,9 @@ module.exports = {
 		const { daysRemaining, months } = relationship.cumulativeTenure;
 		if (!relationship.subscriptionBenefit) {
 			if (daysRemaining === 0 && months === 0) {
+				const verb = (userString.startsWith("User")) ? "has" : "have";
 				return {
-					reply: `${userString} not subscribed to ${channelString}, and never has been.`
+					reply: `${userString} not subscribed to ${channelString}, and never ${verb} been.`
 				};
 			}
 			else {
