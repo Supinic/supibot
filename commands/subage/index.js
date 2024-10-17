@@ -150,7 +150,7 @@ module.exports = {
 		if (!relationship.subscriptionBenefit) {
 			if (daysRemaining === 0 && months === 0) {
 				return {
-					reply: `${userString} not subscribed to ${channelString}, and never been before.`
+					reply: `${userString} not subscribed to ${channelString}, and never has been.`
 				};
 			}
 			else {
