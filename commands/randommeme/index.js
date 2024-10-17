@@ -51,7 +51,7 @@ module.exports = {
 		}
 
 		const input = (args.shift() ?? sb.Utils.randArray(config.defaultMemeSubreddits));
-		const subreddit = encodeURIComponent(input.toLowerCase());
+		let subreddit = encodeURIComponent(input.toLowerCase());
 
 		/** @type {Subreddit} */
 		let forum = this.data.subreddits[subreddit];
@@ -77,6 +77,10 @@ module.exports = {
 
 			forum = new Subreddit(body);
 			if (!config.uncached.includes(subreddit)) {
+				// override the subreddit name in case of uncached subreddits. if it isn't overridden,
+				// the original name (e.g. "random") stays, and the posts request is rolled randomly again,
+				// creating a de-synchronization between the random roll and the result.
+				subreddit = forum.name;
 				this.data.subreddits[subreddit] = forum;
 			}
 		}
