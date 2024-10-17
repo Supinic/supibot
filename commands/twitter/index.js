@@ -48,7 +48,7 @@ module.exports = {
 		}
 
 		if (!context.params.includeRetweets) {
-			eligibleTweets = eligibleTweets.filter(i => !i.retweeted);
+			eligibleTweets = eligibleTweets.filter(i => !i.retweeted_status);
 			if (eligibleTweets.length === 0) {
 				return {
 					success: false,
