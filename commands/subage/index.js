@@ -2,7 +2,7 @@ const getTargetName = (userName, context) => {
 	if (userName === context.user.Name) {
 		return "You are";
 	}
-	else if (userName === context.platform.Self_Name) {
+	else if (userName === context.platform.selfName) {
 		return "I am";
 	}
 	else {
@@ -21,7 +21,9 @@ module.exports = {
 	Whitelist_Response: null,
 	Code: async function subAge (context, user, channel) {
 		const platform = sb.Platform.get("twitch");
-		const userID = await platform.getUserID(user ?? context.user.Name);
+		const userName = sb.User.normalizeUsername(user ?? context.user.Name);
+
+		const userID = await platform.getUserID(userName);
 		if (!userID) {
 			return {
 				success: false,
@@ -29,11 +31,7 @@ module.exports = {
 			};
 		}
 
-		let channelID;
-		if (channel) {
-			channelID = await platform.getUserID(channel);
-		}
-		else {
+		if (!channel) {
 			if (context.platform.Name !== "twitch") {
 				return {
 					success: false,
@@ -46,19 +44,16 @@ module.exports = {
 					reply: `When in private messages, a specific channel name must be provided!`
 				};
 			}
-
-			channelID = await platform.getUserID(context.channel.Name);
 		}
 
+		const channelName = sb.User.normalizeUsername(channel ?? context.channel.Name);
+		const channelID = await platform.getUserID(channelName);
 		if (!channelID) {
 			return {
 				success: false,
 				reply: `Provided channel does not exist on Twitch!`
 			};
 		}
-
-		const channelName = sb.User.normalizeUsername(channel ?? context.channel.Name);
-		const userName = sb.User.normalizeUsername(user ?? context.user.Name);
 
 		const response = await sb.Got.get("TwitchGQL")({
 			responseType: "json",
