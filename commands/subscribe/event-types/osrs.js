@@ -42,17 +42,17 @@ module.exports = {
 			await sb.Cache.setByPrefix(OSRS_LATEST_ARTICLE_ID, topArticleId, {
 				expiry: 14 * 864e5 // 14 days
 			});
-
-			await sb.Logger.log("System.Request", JSON.stringify({
-				...logObject,
-				topArticleId
-			}));
+			//
+			// await sb.Logger.log("System.Request", JSON.stringify({
+			// 	...logObject,
+			// 	topArticleId
+			// }));
 
 			return;
 		}
 		// Ignore if feed head equals to the latest article (no new articles)
 		else if (previousArticleIndex === 0) {
-			await sb.Logger.log("System.Request", JSON.stringify(logObject));
+			// await sb.Logger.log("System.Request", JSON.stringify(logObject));
 			return;
 		}
 
