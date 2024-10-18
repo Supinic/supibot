@@ -1,5 +1,7 @@
 const { randomInt } = require("../../utils/command-utils.js");
 
+const tableHistoricColumns = new Map();
+
 const throwOrReturn = (throwFlag, message) => {
 	if (throwFlag) {
 		throw new sb.Error({ message });
@@ -102,7 +104,17 @@ const fetchChannelRandomLine = async function (channelData, options = {}) {
 	}
 
 	const tableHasPlatformID = await sb.Query.isTableColumnPresent("chat_line", channelName, "Platform_ID");
-	const specificColumns = (tableHasPlatformID) ? ["Platform_ID", "Historic"] : ["User_Alias"];
+	const specificColumns = (tableHasPlatformID) ? ["Platform_ID"] : ["User_Alias"];
+
+	if (!tableHistoricColumns.has(channelName)) {
+		const hasHistoric = await sb.Query.isTableColumnPresent("chat_line", channelName, "Historic");
+		tableHistoricColumns.set(channelName, hasHistoric);
+	}
+
+	if (tableHistoricColumns.get(channelName) === true) {
+		specificColumns.push("Historic");
+	}
+
 	const randomLine = await sb.Query.getRecordset(rs => rs
 		.select("Text", "Posted", ...specificColumns)
 		.from("chat_line", channelName)
@@ -118,7 +130,7 @@ const fetchChannelRandomLine = async function (channelData, options = {}) {
 
 	let username;
 	if (randomLine.Platform_ID) {
-		username = (randomLine.Historic)
+		username = (randomLine.Historic ?? false)
 			? randomLine.Platform_ID
 			: await channelData.Platform.fetchUsernameByUserPlatformID(randomLine.Platform_ID);
 
