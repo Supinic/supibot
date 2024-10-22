@@ -2,6 +2,9 @@ const DatabaseLogs = require("./db-randomline.js");
 const Rustlog = require("./rustlog.js");
 const { connectedChannelGroups } = require("./connected-channels.json");
 
+const config = require("../../config.json");
+const { instances } = config.rustlog;
+
 module.exports = {
 	Name: "randomline",
 	Aliases: ["rl","rq"],
@@ -61,7 +64,7 @@ module.exports = {
 					},
 					reply: sb.Utils.tag.trim `
 						Random lines are not available in this channel!
-						You can add them by enabling the Rustlog service in this channel, 
+						You can add them by enabling the IVR Rustlog service in this channel, 
 						which can be done via the "$bot enable-rustlog" command.
 						That command is only usable by channel owners and ambassadors.
 						${addendum}
@@ -151,35 +154,45 @@ module.exports = {
 			partialReplies
 		};
 	}),
-	Dynamic_Description: (async (prefix) => [
-		"Fetches a random chat line from the current channel.",
-		"If you specify a user, the line will be from that user only.",
-		"",
+	Dynamic_Description: (async (prefix) => {
+		const instanceList = Object.entries(instances).map(([key, data]) => {
+			const defaultString = (data.default) ? " (default)" : "";
+			`<li><a href="//${data.url}">${key}${defaultString}</a>`
+		});
 
-		"Supibot only logs what is said in channels it joins in exceptional circumstances.",
-		"If you used to have Supibot logging and would like to use the Rustlog (IVR) service along with your own logs,",
-		`you can make a suggestion with the <a href="/bot/command/detail/suggest">$suggest</a> command to reinstate your logs with @Supinic's help`,
-		`You can also check the channel's logging status with the <a href="/bot/command/detail/check">$check logs</a> command.`,
-		"",
+		return [
+			"Fetches a random chat line from the current channel.",
+			"If you specify a user, the line will be from that user only.",
+			"",
 
-		`<code>${prefix}rl</code>`,
-		`Random message from anyone, in the format "(time ago) (username): (message)"`,
-		"",
+			"Supibot itself does not log any messages in channels it is in, unless explicitly requested.",
+			"For the purposes of this command, Supibot queries various logging services which handle the data collection themselves:",
+			`<ul>${instanceList.join("")}</ul>`,
 
-		`<code>${prefix}rl (user)</code>`,
-		"Random message from specified user only",
-		"",
+			"If you used to have Supibot logging and would like to use the Rustlog (IVR) service along with your own logs,",
+			`you can make a suggestion with the <a href="/bot/command/detail/suggest">$suggest</a> command to reinstate your logs with @Supinic's help`,
+			`You can also check the channel's logging status with the <a href="/bot/command/detail/check">$check logs</a> command.`,
+			"",
 
-		`<code>${prefix}rq</code>`,
-		"Random message from yourself only",
-		"",
+			`<code>${prefix}rl</code>`,
+			`Random message from anyone, in the format "(time ago) (username): (message)"`,
+			"",
 
-		`<code>${prefix}rl (user) textOnly:true</code>`,
-		`Will only reply with the message, ignoring the "(time ago) (name):" part`,
-		"",
+			`<code>${prefix}rl (user)</code>`,
+			"Random message from specified user only",
+			"",
 
-		`<code>${prefix}rl userID:(user id)</code>`,
-		`Uses a user ID directly instead of providing a name. Useful for looking up messages of deactivated accounts etc.`,
-		""
-	])
+			`<code>${prefix}rq</code>`,
+			"Random message from yourself only",
+			"",
+
+			`<code>${prefix}rl (user) textOnly:true</code>`,
+			`Will only reply with the message, ignoring the "(time ago) (name):" part`,
+			"",
+
+			`<code>${prefix}rl userID:(user id)</code>`,
+			`Uses a user ID directly instead of providing a name. Useful for looking up messages of deactivated accounts etc.`,
+			""
+		];
+	})
 };
