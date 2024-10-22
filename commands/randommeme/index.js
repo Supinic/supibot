@@ -262,7 +262,7 @@ module.exports = {
 				data: {
 					post: post.toJSON()
 				}
-			}
+			};
 		}
 		else if (context.params.linkOnly) {
 			return {
