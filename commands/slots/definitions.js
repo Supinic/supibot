@@ -184,7 +184,7 @@ module.exports = {
 						reply: "You must provide a proper number to roll the number slots!"
 					};
 				}
-				else if (target >= Number.MAX_SAFE_INTEGER) {
+				else if (target > Number.MAX_SAFE_INTEGER) {
 					return {
 						success: false,
 						reply: `The number must be an integer in the <2..${Number.MAX_SAFE_INTEGER}> range!`

@@ -27,7 +27,7 @@ const PASTEBIN_PRIVACY_OPTIONS = {
 
 module.exports = {
 	randomInt (min, max) {
-		if (Math.abs(min) >= Number.MAX_SAFE_INTEGER || Math.abs(max) >= Number.MAX_SAFE_INTEGER) {
+		if (Math.abs(min) > Number.MAX_SAFE_INTEGER || Math.abs(max) > Number.MAX_SAFE_INTEGER) {
 			throw new sb.Error({
 				message: "Integer range exceeded",
 				args: { min, max }
