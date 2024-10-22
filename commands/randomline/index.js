@@ -157,7 +157,7 @@ module.exports = {
 	Dynamic_Description: (async (prefix) => {
 		const instanceList = Object.entries(instances).map(([key, data]) => {
 			const defaultString = (data.default) ? " (default)" : "";
-			`<li><a href="//${data.url}">${key}${defaultString}</a>`
+			return `<li><a href="//${data.url}">${key}${defaultString}</a>`;
 		});
 
 		return [
