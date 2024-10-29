@@ -95,9 +95,11 @@ module.exports = {
 			: "That user was";
 
 		let channelString = stalkChannelData.getFullName();
+		let messageString = stalkData.Text;
 		const isStalkPrevented = stalkChannelData.getDataProperty("stalkPrevention");
 		if (isStalkPrevented) {
 			channelString = `${stalkChannelData.Platform.name}-[EXPUNGED]`;
+			messageString = "[EXPUNGED]";
 		}
 
 		return {
@@ -108,7 +110,7 @@ module.exports = {
 				${who} last seen in chat ${delta}, 
 				(${channelString})
 				last message:
-				${stalkData.Text}
+				${messageString}
 			`
 		};
 	}),
