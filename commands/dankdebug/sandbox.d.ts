@@ -114,6 +114,11 @@ declare namespace DankDebug {
 		 * Pads a number with specified number of zeroes.
 		 */
 		zf: UtilsSingleton["zf"];
+
+		/**
+		 * Returns the best fit for given string, based on Levenshtein distance.
+		 */
+		selectClosestString: UtilsSingleton["selectClosestString"];
 	}
 
 	/** Supported primitive value types, used to construct the full value types later */

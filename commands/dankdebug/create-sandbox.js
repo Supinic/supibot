@@ -5,6 +5,7 @@ const allowedUtilsMethods = [
 	"random",
 	"randomString",
 	"removeAccents",
+	"selectClosestString",
 	"shuffleArray",
 	"timeDelta",
 	"wrapString",
