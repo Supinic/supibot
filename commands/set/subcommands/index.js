@@ -10,6 +10,7 @@ module.exports = [
 	require("./location.js"),
 	require("./no-abb-chatter.js"),
 	require("./reminder.js"),
+	require("./stalk-prevention.js"),
 	require("./suggestion.js"),
 	require("./track-favourite.js"),
 	...require("./twitch-lotto.js")

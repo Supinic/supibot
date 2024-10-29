@@ -94,13 +94,19 @@ module.exports = {
 			? "You were"
 			: "That user was";
 
+		let channelString = stalkChannelData.getFullName();
+		const isStalkPrevented = stalkChannelData.getDataProperty("stalkPrevention");
+		if (isStalkPrevented) {
+			channelString = `${stalkChannelData.Platform.name}-[EXPUNGED]`;
+		}
+
 		return {
 			meta: {
 				skipWhitespaceCheck: true
 			},
 			reply: sb.Utils.tag.trim `
 				${who} last seen in chat ${delta}, 
-				(${stalkChannelData.getFullName()})
+				(${channelString})
 				last message:
 				${stalkData.Text}
 			`
