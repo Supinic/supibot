@@ -1,3 +1,5 @@
+const { setTimeout: wait } = require("timers/promises");
+
 const GptOpenAI = require("./gpt-openai.js");
 const GptHistory = require("./history-control.js");
 
@@ -24,41 +26,52 @@ module.exports = class GptNexra extends GptOpenAI {
 			});
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const initResponse = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			throwHttpErrors: false,
-			responseType: "text",
+			responseType: "json",
 			url: "https://nexra.aryahcr.cc/api/chat/gpt",
 			json: {
 				messages,
 				model: modelData.url,
 				prompt: query,
-				markdown: false,
-				top_p: 1,
-				frequency_penalty: 0,
-				presence_penalty: 0
+				markdown: false
 			}
 		});
 
-		if (!response.ok) {
+		if (!initResponse.ok) {
 			return {
 				success: false,
 				reply: `Nexra API returned an error! Try again later.`
 			};
 		}
 
-		const index = response.body.indexOf("{");
-		if (index === -1) {
-			return {
-				success: false,
-				reply: `Nexra API returned an invalid response! Try again later.`
-			};
+		let response;
+		let error;
+		const taskId = initResponse.body.id;
+		for (let i = 0; i < 30; i++) {
+			const partialResponse = await sb.Got.get("GenericAPI")({
+				method: "GET",
+				throwHttpErrors: false,
+				responseType: "json",
+				url: `https://nexra.aryahcr.cc/api/chat/task/${encodeURIComponent(taskId)}`
+			});
+
+			const { status } = partialResponse.body;
+			if (status === "pending") {
+				await wait(1000);
+			}
+			else if (status === "error" || status === "not_found") {
+				error = partialResponse;
+				break;
+			}
+			else if (status === "completed") {
+				response = partialResponse;
+				break;
+			}
 		}
 
-		try {
-			response.body = JSON.parse(response.body.slice(index));
-		}
-		catch (e) {
+		if (error) {
 			return {
 				success: false,
 				reply: `Nexra API returned an invalid response! Try again later.`
