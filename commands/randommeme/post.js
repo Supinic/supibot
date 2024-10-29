@@ -50,7 +50,12 @@ module.exports = class RedditPost {
 		if (data.is_gallery) {
 			const meta = data.media_metadata;
 			for (const item of data.gallery_data.items) {
-				const mime = meta[item.media_id].m;
+				const itemMeta = meta[item.media_id];
+				if (itemMeta.status === "failed" || !itemMeta.m) {
+					continue;
+				}
+
+				const mime = itemMeta.m;
 				const ext = mime.split("/")[1];
 				const link = `https://i.redd.it/${item.media_id}.${ext}`;
 
