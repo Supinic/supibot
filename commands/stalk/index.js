@@ -96,7 +96,7 @@ module.exports = {
 
 		let channelString = stalkChannelData.getFullName();
 		let messageString = stalkData.Text;
-		const isStalkPrevented = stalkChannelData.getDataProperty("stalkPrevention");
+		const isStalkPrevented = await stalkChannelData.getDataProperty("stalkPrevention");
 		if (isStalkPrevented) {
 			channelString = `${stalkChannelData.Platform.name}-[EXPUNGED]`;
 			messageString = "[EXPUNGED]";
