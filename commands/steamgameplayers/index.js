@@ -35,6 +35,60 @@ const fetchGamesData = async () => {
 	}
 };
 
+const fetchReviewData = async (gameId) => {
+	const response = await sb.Got.get("GenericAPI")({
+		url: `https://store.steampowered.com/appreviews/${gameId}`,
+		searchParams: {
+			json: "1",
+			filter: "all",
+			language: "all"
+		}
+	});
+
+	let reviewsString;
+	if (response.ok) {
+		const summary = response.body.query_summary;
+		if (summary.total_reviews > 0) {
+			const score = sb.Utils.round(summary.total_positive / summary.total_reviews * 100, 1);
+			reviewsString = `Rating: ${summary.review_score_desc} (${score}% positive)`;
+		}
+		else {
+			reviewsString = `Rating: ${summary.review_score_desc}`;
+		}
+	}
+	else {
+		reviewsString = "Could not fetch reviews data";
+	}
+
+	return {
+		result: reviewsString
+	};
+};
+
+const fetchRecommendationData = async (gameId) => {
+	const response = await sb.Got.get("GenericAPI")({
+		url: `https://store.steampowered.com/appreviewhistogram/${gameId}`
+	});
+
+	if (!response.ok || response.body.success !== 1) {
+		return {
+			result: "Could not fetch reviews data"
+		};
+	}
+
+	let up = 0;
+	let down = 0;
+	for (const item of response.body.results.rollups) {
+		up += item.recommendations_up;
+		down += item.recommendations_down;
+	}
+
+	const value = sb.Utils.round(up / (up + down) * 100, 2);
+	return {
+		result: `Rating: ${value}%`
+	};
+}
+
 module.exports = {
 	Name: "steamgameplayers",
 	Aliases: ["sgp"],
@@ -152,28 +206,7 @@ module.exports = {
 
 		let reviewsString = "";
 		if (!context.params.skipReviews) {
-			const response = await sb.Got.get("GenericAPI")({
-				url: `https://store.steampowered.com/appreviews/${gameId}`,
-				searchParams: {
-					json: "1",
-					filter: "all",
-					language: "all"
-				}
-			});
-
-			if (response.ok) {
-				const summary = response.body.query_summary;
-				if (summary.total_reviews > 0) {
-					const score = sb.Utils.round(summary.total_positive / summary.total_reviews * 100, 1);
-					reviewsString = `Rating: ${summary.review_score_desc} (${score}% positive)`;
-				}
-				else {
-					reviewsString = `Rating: ${summary.review_score_desc}`;
-				}
-			}
-			else {
-				reviewsString = "Could not fetch reviews data";
-			}
+			reviewsString = await fetchRecommendationData(gameId);
 		}
 
 		const players = playerCountResponse.body.response.player_count;
