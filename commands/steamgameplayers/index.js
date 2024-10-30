@@ -206,7 +206,8 @@ module.exports = {
 
 		let reviewsString = "";
 		if (!context.params.skipReviews) {
-			reviewsString = await fetchRecommendationData(gameId);
+			const { result } = await fetchRecommendationData(gameId);
+			reviewsString = result;
 		}
 
 		const players = playerCountResponse.body.response.player_count;
