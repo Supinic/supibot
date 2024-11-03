@@ -1,6 +1,6 @@
 const basicRegex = /(get|getting|buy|buying)?\s*(cheap|cheapest|best|real|more)?\s*(viewers|followers)/gi;
 const siteRegex = /(streamboo|u\.to|dogehype)/gi;
-const discordRegex = /(add\s*)(me|my)?(\s*on)?(discord)?/gi;
+const discordRegex = /(add\s*)((me on)|(my))\s*(disc(ord)?)/gi;
 
 export const definition = {
 	Name: "wanna-become-famous",
