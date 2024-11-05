@@ -75,7 +75,7 @@ const fetchRecommendationData = async (gameId) => {
 			result: "Could not fetch reviews data!"
 		};
 	}
-	else if (!response.body.results) {
+	else if (!response.body.results || !response.body.results.rollups) {
 		return {
 			result: "This game has no reviews!"
 		};
