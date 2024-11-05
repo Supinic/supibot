@@ -72,7 +72,12 @@ const fetchRecommendationData = async (gameId) => {
 
 	if (!response.ok || response.body.success !== 1) {
 		return {
-			result: "Could not fetch reviews data"
+			result: "Could not fetch reviews data!"
+		};
+	}
+	else if (!response.body.results) {
+		return {
+			result: "This game has no reviews!"
 		};
 	}
 
@@ -87,7 +92,7 @@ const fetchRecommendationData = async (gameId) => {
 	return {
 		result: `Rating: ${value}%`
 	};
-}
+};
 
 module.exports = {
 	Name: "steamgameplayers",
