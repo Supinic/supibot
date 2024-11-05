@@ -106,6 +106,13 @@ module.exports = {
 		"Both parameters can be combined together for maximum accuracy.",
 		"",
 
+		`<code>${prefix}translate engine:(translation engine)</code>`,
+		`<code>${prefix}translate engine:deepl</code>`,
+		`<code>${prefix}deepl</code>`,
+		"Allows you to choose a translation engine. Keep in mind they both support different parameters and languages!",
+		"Supported: <code>google</code> and <code>deepl</code>",
+		"",
+
 		`<code>${prefix}translate to:random (text)</code>`,
 		"Translates provided text to a randomly picked, supported language.",
 		"",
@@ -121,11 +128,6 @@ module.exports = {
 		`<code>${prefix}translate to:german (text)</code>`,
 		`<code>${prefix}translate to:German (text)</code>`,
 		"Translates the text from a auto-detected language to a provided language (German here).",
-		"",
-
-		`<code>${prefix}translate engine:(translation engine)</code>`,
-		"Allows you to choose a translation engine. Keep in mind they both support different parameters and languages!",
-		"Supported: <code>google</code> and <code>deepl</code>",
 		"",
 
 		`<code>${prefix}translate textOnly:true (text)</code>`,
