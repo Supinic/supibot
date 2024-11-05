@@ -3,7 +3,7 @@ const engines = ["deepl", "google"];
 
 module.exports = {
 	Name: "translate",
-	Aliases: null,
+	Aliases: ["deepl"],
 	Author: "supinic",
 	Cooldown: 15000,
 	Description: "Implicitly translates from auto-recognized language to English. Supports parameters 'from' and 'to'. Example: from:german to:french Guten Tag\"",
@@ -30,7 +30,21 @@ module.exports = {
 			};
 		}
 
-		const engine = context.params.engine ?? "google";
+		let engine = "google";
+		if (context.params.engine) {
+			if (context.invocation === "deepl") {
+				return {
+					success: false,
+					reply: "Don't get cheeky with me! (Can't use both the command alias and the engine parameter)"
+				};
+			}
+
+			engine = context.params.engine;
+		}
+		else if (context.invocation === "deepl") {
+			engine = "deepl";
+		}
+
 		if (!engines.includes(engine)) {
 			return {
 				success: false,
