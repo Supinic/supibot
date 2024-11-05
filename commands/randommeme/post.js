@@ -47,7 +47,7 @@ module.exports = class RedditPost {
 		this.#score = data.ups ?? 0;
 
 		this.#galleryLinks = [];
-		if (data.is_gallery) {
+		if (data.is_gallery && data.gallery_data) {
 			const meta = data.media_metadata;
 			for (const item of data.gallery_data.items) {
 				const itemMeta = meta[item.media_id];
