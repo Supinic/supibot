@@ -91,8 +91,8 @@ export const definition = {
 
 			// Clear all pending song requests, set song request status to "off"
 			await sb.Cache.setByPrefix(SONG_REQUESTS_STATE, "off");
-			await sb.Query.isRecordUpdater(ru => ru
-				.from("chat_data", "Song_Request")
+			await sb.Query.getRecordUpdater(ru => ru
+				.update("chat_data", "Song_Request")
 				.set("Status", "Inactive")
 				.where("Status <> %s", "Inactive")
 			)
