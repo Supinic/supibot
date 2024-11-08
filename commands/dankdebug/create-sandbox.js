@@ -139,7 +139,7 @@ const predefinedQueries = {
 		.orderBy("Hint ASC", "ID ASC")
 	),
 	randomSteamGames: () => sb.Query.getRecordset(rs => rs
-		.select("ID", "Name")
+		.select("ID", "Name AS name")
 		.from("data", "Steam_Game")
 		.orderBy("RAND()")
 		.limit(10)
