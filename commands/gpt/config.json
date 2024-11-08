@@ -93,6 +93,7 @@
       "default": false,
       "subscriberOnly": true,
       "noSystemRole": true,
+      "usesCompletionTokens": true,
       "inputLimit": 1000,
       "outputLimit": {
         "default": 200,

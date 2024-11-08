@@ -113,6 +113,23 @@ module.exports = class GptOpenAI extends Template {
 		}
 		const { temperature } = temperatureCheck;
 
+		const json = {
+			model: modelData.url,
+			messages,
+			temperature,
+			top_p: 1,
+			frequency_penalty: 0,
+			presence_penalty: 0,
+			user: super.getUserHash(context)
+		};
+
+		if (modelData.usesCompletionTokens === true) {
+			json.max_completion_tokens = 10_000;
+		}
+		else {
+			json.max_tokens = outputLimit;
+		}
+
 		const response = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			throwHttpErrors: false,
@@ -120,16 +137,7 @@ module.exports = class GptOpenAI extends Template {
 			headers: {
 				Authorization: `Bearer ${process.env.API_OPENAI_KEY}`
 			},
-			json: {
-				model: modelData.url,
-				messages,
-				max_tokens: outputLimit,
-				temperature,
-				top_p: 1,
-				frequency_penalty: 0,
-				presence_penalty: 0,
-				user: super.getUserHash(context)
-			}
+			json
 		});
 
 		return { response };
