@@ -137,6 +137,12 @@ const predefinedQueries = {
 		.from("personal", "Clue_Scroll_Tag")
 		.where("Tier NOT IN %s+", ["Beginner", "Master"])
 		.orderBy("Hint ASC", "ID ASC")
+	),
+	randomSteamGames: () => sb.Query.getRecordset(rs => rs
+		.select("ID", "Name")
+		.from("data", "Steam_Game")
+		.orderBy("RAND()")
+		.limit(10)
 	)
 };
 const predefinedRequests = {
