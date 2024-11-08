@@ -92,6 +92,7 @@
       "type": "openai",
       "default": false,
       "subscriberOnly": true,
+      "noSystemRole": true,
       "inputLimit": 1000,
       "outputLimit": {
         "default": 200,

@@ -17,11 +17,18 @@ module.exports = class GptOpenAI extends Template {
 		return { historyMode };
 	}
 
-	static async getHistory (context, query) {
+	static async getHistory (context, query, options) {
 		const { historyMode } = await GptOpenAI.getHistoryMode(context);
 		const promptHistory = (historyMode === "enabled")
 			? (await GptHistory.get(context.user) ?? [])
 			: [];
+
+		if (options.noSystemRole === true) {
+			return [
+				...promptHistory,
+				{ role: "user", content: query }
+			];
+		}
 
 		let systemMessage = "Keep the response as short and concise as possible.";
 		if (context.params.context) {
@@ -70,7 +77,9 @@ module.exports = class GptOpenAI extends Template {
 
 		let messages;
 		try {
-			messages = await GptOpenAI.getHistory(context, query);
+			messages = await GptOpenAI.getHistory(context, query, {
+				noSystemRole: Boolean(modelData.noSystemRole)
+			});
 		}
 		catch (e) {
 			return {
