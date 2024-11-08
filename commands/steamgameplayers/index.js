@@ -22,7 +22,7 @@ const fetchGamesData = async () => {
 	for (const game of response.body.response.apps) {
 		const row = await sb.Query.getRow("data", "Steam_Game");
 		await row.load(game.appid, true);
-		if (row.loaded) {
+		if (row.loaded && game.name === row.values.Name) {
 			continue;
 		}
 
