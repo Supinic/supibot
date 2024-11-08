@@ -43,17 +43,6 @@
       },
       "pricePerMtoken": 0.05
     },
-    "4": {
-      "url": "gpt-4o",
-      "type": "openai",
-      "default": false,
-      "inputLimit": 500,
-      "outputLimit": {
-        "default": 100,
-        "maximum": 250
-      },
-      "pricePerMtoken": 10
-    },
     "mixtral": {
       "url": "mistralai/Mixtral-8x22B-Instruct-v0.1",
       "type": "deepinfra",
