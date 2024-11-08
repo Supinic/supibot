@@ -75,7 +75,7 @@ module.exports = {
 		}
 		else if (modelData.subscriberOnly === true) {
 			const platform = sb.Platform.get("twitch");
-			const isSubscribed = await platform.fetchUserAdminSubscription(userData);
+			const isSubscribed = await platform.fetchUserAdminSubscription(context.user);
 			if (!isSubscribed) {
 				return {
 					success: false,
