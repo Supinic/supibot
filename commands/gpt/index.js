@@ -73,6 +73,16 @@ module.exports = {
 				reply: `That model is currently disabled! Reason: ${modelData.disableReason ?? "(N/A)"}`
 			};
 		}
+		else if (modelData.subscriberOnly === true) {
+			const platform = sb.Platform.get("twitch");
+			const isSubscribed = await platform.fetchUserAdminSubscription(userData);
+			if (!isSubscribed) {
+				return {
+					success: false,
+					reply: "This model is only available to subscribers!"
+				};
+			}
+		}
 
 		const limitCheckResult = await GptCache.checkLimits(context.user);
 		if (limitCheckResult.success !== true) {
@@ -226,12 +236,15 @@ module.exports = {
 				isDefaultEmoji = "✔";
 			}
 
+			const isSubscriberOnlyEmoji = (modelData.subscriberOnly === true) ? "✔" : "❌";
+
 			return sb.Utils.tag.trim `
 				<tr>
 					<td>${name}</td>
 					<td>${modelData.type}</td>
 					<td>${modelData.pricePerMtoken}</td>
 					<td>${isDefaultEmoji}</td>
+					<td>${isSubscriberOnlyEmoji}</td>
 				</tr>
 			`;
 		}).join("");
@@ -243,6 +256,7 @@ module.exports = {
 					<th>Type</th>
 					<th>Pricing</th>
 					<th>Default</th>
+					<th>Sub only</th>
 				</thead>
 				<tbody>
 					${modelListHTML}

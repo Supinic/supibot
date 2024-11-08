@@ -97,6 +97,18 @@
         "maximum": 1000
       },
       "pricePerMtoken": 0.08
+    },
+    "o1-mini": {
+      "url": "o1-mini",
+      "type": "openai",
+      "default": false,
+      "subscriberOnly": true,
+      "inputLimit": 1000,
+      "outputLimit": {
+        "default": 200,
+        "maximum": 500
+      },
+      "pricePerMtoken": 7.00
     }
   }
 }
