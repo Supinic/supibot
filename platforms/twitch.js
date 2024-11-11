@@ -330,7 +330,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		if (!messageResponse.is_sent) {
 			console.warn("JSON not sent!", {
 				time: new sb.Date().format("Y-m-d H:i:s"),
-				channel,
+				channel: {
+					ID: channel.ID,
+					Name: channel.Name,
+				},
 				message,
 				messageResponse
 			});
