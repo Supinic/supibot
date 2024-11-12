@@ -17,7 +17,7 @@ module.exports = class GptOpenAI extends Template {
 		return { historyMode };
 	}
 
-	static async getHistory (context, query, options) {
+	static async getHistory (context, query, options = {}) {
 		const { historyMode } = await GptOpenAI.getHistoryMode(context);
 		const promptHistory = (historyMode === "enabled")
 			? (await GptHistory.get(context.user) ?? [])
