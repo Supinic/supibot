@@ -33,7 +33,8 @@ To start off:
    - `user:read:emotes` to fetch the bot's own emotes (**suggested**)
    - `user:manage:whispers` for whispers (private messages) functionality (**suggested**)
    - `channel:moderate` for moderation actions (**optional**)
-6. Fill in the env values in the compose file accordingly:
+6. Generate the token, allow the Twitch authorization (make sure the account being authorized is your bot account!) and note the token
+7. Fill in the env values in the compose file accordingly:
    - `TWITCH_CLIENT_ID`
    - `TWITCH_CLIENT_SECRET`
    - `TWITCH_REFRESH_TOKEN`
