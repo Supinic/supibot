@@ -55,11 +55,12 @@ const fetchEndpointHash = async (fileHash, force = false) => {
 		return null;
 	}
 
-	await sb.Cache.setByPrefix(HLTB_ENDPOINT_HASH_KEY, match[1], {
+	const hash = (match[3]) ? `${match[1]}${match[3]}` : match[1];
+	await sb.Cache.setByPrefix(HLTB_ENDPOINT_HASH_KEY, hash, {
 		expiry: 864e5 // 1 day
 	});
 
-	return (match[3]) ? `${match[1]}${match[3]}` : match[1];
+	return hash;
 };
 
 module.exports = {
