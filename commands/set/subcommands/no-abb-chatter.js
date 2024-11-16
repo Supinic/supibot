@@ -21,11 +21,13 @@ module.exports = {
 			};
 		}
 
-		await row.setValues({
+		row.setValues({
 			User_Alias: context.user.ID,
 			Property: "noAbbChatter",
 			Value: true
 		});
+
+		await row.save({ skipLoad: true });
 
 		return {
 			reply: `You are now exempt from the "$abb chatter" command.`
