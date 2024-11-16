@@ -5,7 +5,7 @@ const HLTB_ENDPOINT_HASH_KEY = "hltb-endpoint-hash";
 
 const FILE_PREFIX = "_next/static/chunks/pages";
 const FILE_HASH_REGEX = /static\/chunks\/pages\/(_app-\w+?\.js)/;
-const ENDPOINT_HASH_REGEX = /\/api\/search\/".concat\("(\w+)"\)/;
+const ENDPOINT_HASH_REGEX = /\/api\/search\/".concat\("(\w+)"\)\s*(.concat\("(\w+)"\))?/;
 
 const fetchFileHash = async (force = false) => {
 	const existing = await sb.Cache.getByPrefix(HLTB_JS_FILE_HASH_KEY);
@@ -59,7 +59,7 @@ const fetchEndpointHash = async (fileHash, force = false) => {
 		expiry: 864e5 // 1 day
 	});
 
-	return match[1];
+	return (match[3]) ? `${match[1]}${match[3]}` : match[1];
 };
 
 module.exports = {
@@ -95,7 +95,7 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await sb.Got.get("FakeAgent")({
 			url: `https://howlongtobeat.com/api/search/${endpointHash}`,
 			method: "POST",
 			throwHttpErrors: false,
