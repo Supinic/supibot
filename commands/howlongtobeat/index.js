@@ -95,7 +95,7 @@ module.exports = {
 			};
 		}
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await sb.Got.get("FakeAgent")({
 			url: `https://howlongtobeat.com/api/search/${endpointHash}`,
 			method: "POST",
 			throwHttpErrors: false,
