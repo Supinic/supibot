@@ -1,4 +1,5 @@
 const eventTypeFileList = [
+	"brighter-shores",
 	"bun",
 	"changelog",
 	"channel-live",
