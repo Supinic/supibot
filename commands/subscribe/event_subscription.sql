@@ -12,10 +12,9 @@ CREATE TABLE IF NOT EXISTS `data`.`Event_Subscription` (
 	PRIMARY KEY (`ID`) USING BTREE,
 	UNIQUE INDEX `User_Alias_Event` (`User_Alias`, `Type`) USING BTREE,
 	INDEX `FK_Event_Subscription_Channel` (`Channel`) USING BTREE,
-	INDEX `FK_Event_Subscription_chat_data.Platform` (`Platform`) USING BTREE,
+	INDEX `Event_Subscription_chat_data.Platform` (`Platform`) USING BTREE,
 	CONSTRAINT `Event_Subscription_ibfk_1` FOREIGN KEY (`Channel`) REFERENCES `chat_data`.`Channel` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE,
-	CONSTRAINT `Event_Subscription_ibfk_2` FOREIGN KEY (`User_Alias`) REFERENCES `chat_data`.`User_Alias` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE,
-	CONSTRAINT `Event_Subscription_ibfk_3` FOREIGN KEY (`Platform`) REFERENCES `chat_data`.`Platform` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
+	CONSTRAINT `Event_Subscription_ibfk_2` FOREIGN KEY (`User_Alias`) REFERENCES `chat_data`.`User_Alias` (`ID`) ON UPDATE CASCADE ON DELETE CASCADE
 )
 CHARSET=utf8mb4
 COLLATE='utf8mb4_general_ci'
