@@ -13,7 +13,7 @@ module.exports = {
 		removed: "You will no longer receive pings when a new BS update is published."
 	},
 	generic: true,
-	cronExpression: "0 */1 * * * *",
+	cronExpression: "0 */5 * * * *",
 	subName: "BS update",
 	type: "custom",
 	process: async () => {
