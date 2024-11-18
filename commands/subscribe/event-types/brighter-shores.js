@@ -29,7 +29,7 @@ module.exports = {
 
 		const data = await parseRSS(response.body);
 		const eligibleUpdates = data.items
-			.filter(i => i.link.includes("updates"))
+			.filter(i => i.link.includes("updates") || i.link.includes("patch-notes"))
 			.sort((a, b) => new sb.Date(b.isoDate) - new sb.Date(a.isoDate));
 
 		const previousUpdateDateString = await sb.Cache.getByPrefix(BRIGHTER_SHORES_LAST_UPDATE_DATE)
