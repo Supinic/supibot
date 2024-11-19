@@ -270,9 +270,9 @@ module.exports = {
 				success: false,
 				reply: sb.Utils.tag.trim `
 					To remind yourself, you must use the word "in"!
-					Such as → in 5 minutes.
-				    Alternatively, you can use the "on" or "at" parameter.
-				    Such as → on:Sunday or at:"5:30 pm".
+					Such as: "in 5 minutes".
+				    You can also use the "on", "at" or "after" parameters
+				    Such as: "on:Sunday" or at:"5:30 pm" or "after:30min"
 				`,
 				cooldown: 2500
 			};
