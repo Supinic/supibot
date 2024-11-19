@@ -38,11 +38,11 @@ module.exports = {
 
 		return {
 			reply: sb.Utils.tag.trim `
-							The longest time ${who.toLowerCase()} been AFK for
-							is ${delta}, 
-							which started ${started}
-							and ended ${ended}.
-						`
+				The longest time ${who.toLowerCase()} been AFK for
+				is ${delta}, 
+				which started ${started}
+				and ended ${ended}.
+			`
 		};
 	}
 };
