@@ -1,6 +1,6 @@
 module.exports = {
 	Name: "poe",
-	Aliases: null,
+	Aliases: ["poe2"],
 	Author: "supinic",
 	Cooldown: 7500,
 	Description: "A collection of various Path of Exile-related commands. Check the extended help on the website for more info.",

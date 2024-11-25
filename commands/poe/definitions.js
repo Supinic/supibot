@@ -6,6 +6,8 @@ const gems = require("./gems.json");
 const additionalGems = gems.filter(i => i.type === "additional");
 const skillGems = gems.filter(i => i.type === "main");
 
+const POE2_RELEASE_DATE = "2024-12-06 21:00";
+
 const trials = {
 	normal: "A1: Lower Prison; A2: Crypt lvl 1, Chamber of Sins lvl 2; A3: Crematorium, Catacombs, Imperial Gardens",
 	cruel: "A6: Prison; A7: Crypt; A7: Chamber of Sins lvl 2",
@@ -184,8 +186,20 @@ const subcommands = [
 	{
 		name: "league",
 		aliases: [],
-		description: "Posts data about the upcoming or current league.",
-		execute: async () => {
+		description: "Posts data about the upcoming or current league. Also, supports (preliminary only!) info about Path of Exile 2 - use <code>$poe2</code>",
+		execute: async (context) => {
+			if (context.invocation === "poe2") {
+				const releaseDate = new sb.Date(POE2_RELEASE_DATE);
+				const now = new sb.Date();
+				const delta = sb.Utils.timeDelta(releaseDate);
+				const verb = (now >= releaseDate) ? "released" : "releases";
+
+				return {
+					success: true,
+					reply: `Path of Exile 2 Early Access ${verb} ${delta}.`
+				};
+			}
+
 			const result = [];
 			const now = sb.Date.now();
 
