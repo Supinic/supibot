@@ -31,6 +31,7 @@ const NO_EVENT_RECONNECT_TIMEOUT = 10000; // @todo move to config
 const LIVE_STREAMS_KEY = "twitch-live-streams";
 const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
 const BAD_MESSAGE_RESPONSE = "A message that was about to be posted violated this channel's moderation settings.";
+const MESSAGE_MODERATION_CODES = ["channel_settings", "automod_held"];
 
 const DEFAULT_LOGGING_CONFIG = {
 	bits: false,
@@ -338,7 +339,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				messageResponse
 			});
 
-			if (messageResponse.drop_reason.code === "channel_settings" && baseMessage !== BAD_MESSAGE_RESPONSE) {
+			if (MESSAGE_MODERATION_CODES.includes(messageResponse.drop_reason) && baseMessage !== BAD_MESSAGE_RESPONSE) {
 				await this.send(BAD_MESSAGE_RESPONSE, channel);
 			}
 		}
