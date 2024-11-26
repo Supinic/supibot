@@ -5,7 +5,7 @@ const definitions = require("./definitions.json").sort((a, b) => a.code.localeCo
 const rssFetch = async (url) => await fetch(url, {
 	headers: {
 		// "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
-		// "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/602.1 (KHTML, like Gecko) QuiteRss/0.19.4 Version/10.0 Safari/602.1"
+		"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/602.1 (KHTML, like Gecko) QuiteRss/0.19.4 Version/10.0 Safari/602.1",
 		Accept: "application/xml,text/html,application/xhtml+xml"
 	},
 	redirect: "follow"
@@ -39,14 +39,30 @@ describe("valid RSS news definitions", function () {
 						it(`${url} should be a valid RSS feed`, async function () {
 							this.timeout(5000);
 
-							let rssData;
-							await assert.doesNotReject(async () => {
-								const response = await rssFetch(url);
-								const xml = await response.text();
-								rssData = await RSS.parseString(xml);
+							let dataLength;
+							let response;
+							let xml;
+							let error = null;
 
-								assert.notStrictEqual(rssData.items.length, 0, "RSS feed must not be empty");
-							}, `URL: ${url}`);
+							try {
+								response = await rssFetch(url);
+								xml = await response.text();
+								const rssData = await RSS.parseString(xml);
+
+								dataLength = rssData.items.length;
+							}
+							catch (e) {
+								console.error({
+									e,
+									url,
+									// response,
+									xml
+								});
+								error = e;
+							}
+
+							assert.strictEqual(error, null, "No error must occur");
+							assert.notStrictEqual(dataLength, 0, `RSS feed must not be empty (${url})`);
 						});
 					}
 				});
