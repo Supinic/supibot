@@ -327,8 +327,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			return;
 		}
 
-		const messageResponse = response.body.data[0];
-		if (!messageResponse.is_sent) {
+		const replyData = response.body.data[0];
+		if (!replyData.is_sent) {
 			console.warn("JSON not sent!", {
 				time: new sb.Date().format("Y-m-d H:i:s"),
 				channel: {
@@ -336,10 +336,10 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 					Name: channel.Name
 				},
 				message,
-				messageResponse
+				replyData
 			});
 
-			if (MESSAGE_MODERATION_CODES.includes(messageResponse.drop_reason) && baseMessage !== BAD_MESSAGE_RESPONSE) {
+			if (MESSAGE_MODERATION_CODES.includes(replyData.drop_reason.code) && baseMessage !== BAD_MESSAGE_RESPONSE) {
 				await this.send(BAD_MESSAGE_RESPONSE, channel);
 			}
 		}
