@@ -71,18 +71,24 @@ const checkLimits = (userData, playlist) => {
 	};
 };
 
+const ARBITRARY_MAX_YOUTUBE_TIMESTAMP = 2e12;
 const parseTimestamp = (linkParser, string) => {
 	const type = linkParser.autoRecognize(string);
-	if (type === "youtube" && string.includes("t=")) {
-		const { parse } = require("node:url");
-		let { query } = parse(string);
-
-		if (/t=\d+/.test(query)) {
-			query = query.replace(/(t=\d+\b)/, "$1sec");
-		}
-
-		return sb.Utils.parseDuration(query, { target: "sec" });
+	if (type !== "youtube") {
+		return;
 	}
+
+	const url = new URL(string, "https://youtube.com");
+	if (!url.searchParams.get("t")) {
+		return;
+	}
+
+	const value = Number(url.searchParams.get("t"));
+	if (!Number.isFinite(value) || value < 0 || value > ARBITRARY_MAX_YOUTUBE_TIMESTAMP) {
+		return;
+	}
+
+	return value;
 };
 
 module.exports = {
