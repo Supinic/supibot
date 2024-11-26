@@ -1,6 +1,7 @@
 const { parseRSS } = require("../../../utils/command-utils.js");
 
 // Currently unused
+// eslint-disable-next-line no-unused-vars
 const updateViaProRss = async () => {
 	const url = "https://brightershores.pro/rss.xml";
 	const BRIGHTER_SHORES_LAST_UPDATE_DATE = "brighter-shores-last-update-date";
@@ -17,10 +18,10 @@ const updateViaProRss = async () => {
 
 	const data = await parseRSS(response.body);
 	const eligibleUpdates = data.items
-	.filter(i => i.link.includes("updates") || i.link.includes("patch-notes"))
-	.sort((a, b) => new sb.Date(b.isoDate) - new sb.Date(a.isoDate));
+		.filter(i => i.link.includes("updates") || i.link.includes("patch-notes"))
+		.sort((a, b) => new sb.Date(b.isoDate) - new sb.Date(a.isoDate));
 
-	const previousUpdateDateString = await sb.Cache.getByPrefix(BRIGHTER_SHORES_LAST_UPDATE_DATE)
+	const previousUpdateDateString = await sb.Cache.getByPrefix(BRIGHTER_SHORES_LAST_UPDATE_DATE);
 	if (!previousUpdateDateString) {
 		// If there is no date, attempt to populate the latest one, and do not post a notification (first time only)
 		if (eligibleUpdates.length === 0) { // If there are no updates, do nothing and wait for a later update
@@ -31,7 +32,7 @@ const updateViaProRss = async () => {
 		return;
 	}
 
-	const previousUpdateDate = new sb.Date(previousUpdateDateString)
+	const previousUpdateDate = new sb.Date(previousUpdateDateString);
 	const newUpdates = eligibleUpdates.filter(i => new sb.Date(i.isoDate) > previousUpdateDate);
 	if (newUpdates.length === 0) { // No new updates, do nothing
 		return;

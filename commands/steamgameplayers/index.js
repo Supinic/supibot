@@ -35,6 +35,7 @@ const fetchGamesData = async () => {
 	}
 };
 
+// eslint-disable-next-line no-unused-vars
 const fetchReviewData = async (gameId) => {
 	const response = await sb.Got.get("GenericAPI")({
 		url: `https://store.steampowered.com/appreviews/${gameId}`,

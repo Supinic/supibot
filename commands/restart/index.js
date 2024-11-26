@@ -39,7 +39,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: "Only available to administrators or helpers!",
 	Code: async function restart (context, ...commands) {
-		for (const name of commandsToRun) {
+		for (const name of commands) {
 			const reloadCommand = methods[name];
 			if (!reloadCommand) {
 				return {

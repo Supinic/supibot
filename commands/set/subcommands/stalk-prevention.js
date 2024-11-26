@@ -7,7 +7,7 @@ module.exports = {
 		pipe: false,
 		elevatedChannelAccess: true // administrative action
 	},
-	set: async (context, ...args) => {
+	set: async (context) => {
 		await context.channel.setDataProperty("stalkPrevention", true);
 		return {
 			reply: `Stalk prevention in this channel set successfully.`

@@ -333,7 +333,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				time: new sb.Date().format("Y-m-d H:i:s"),
 				channel: {
 					ID: channel.ID,
-					Name: channel.Name,
+					Name: channel.Name
 				},
 				message,
 				messageResponse
