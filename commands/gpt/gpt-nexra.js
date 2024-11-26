@@ -71,7 +71,8 @@ module.exports = class GptNexra extends GptOpenAI {
 			}
 		}
 
-		if (error) {
+		if (error || !response) {
+			console.warn("Nexra API failure", { error, response, context, query });
 			return {
 				success: false,
 				reply: `Nexra API returned an invalid response! Try again later.`
