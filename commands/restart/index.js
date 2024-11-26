@@ -28,7 +28,6 @@ const methods = {
 		commands: ["yarn build"]
 	}
 };
-const methodNames = ["all", ...Object.keys(methods)];
 
 module.exports = {
 	Name: "restart",
@@ -39,24 +38,16 @@ module.exports = {
 	Flags: ["system", "whitelist"],
 	Params: null,
 	Whitelist_Response: "Only available to administrators or helpers!",
-	Code: async function restart (context, reloadCommand) {
-		if (reloadCommand && !methodNames.includes(reloadCommand)) {
-			return {
-				success: false,
-				reply: `Invalid command provided! Use one of: ${methodNames.join(", ")}`
-			};
-		}
-
-		const commandsToRun = [];
-		if (reloadCommand === "all") {
-			commandsToRun.push(...Object.keys(methods));
-		}
-		else if (reloadCommand) {
-			commandsToRun.push(reloadCommand);
-		}
-
+	Code: async function restart (context, ...commands) {
 		for (const name of commandsToRun) {
 			const reloadCommand = methods[name];
+			if (!reloadCommand) {
+				return {
+					success: false,
+					reply: `Incorrect reload command provided! Use one of: ${Object.keys(methods).join(", ")}`
+				};
+			}
+
 			await context.sendIntermediateMessage(`VisLaud 👉 ${reloadCommand.message}`);
 
 			for (const command of reloadCommand.commands) {
