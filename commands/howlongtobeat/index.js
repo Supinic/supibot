@@ -112,7 +112,12 @@ module.exports = {
 				searchOptions: {
 					filter: "",
 					games: {
-						gameplay: { perspective: "", flow: "", genre: "" },
+						gameplay: {
+							perspective: "",
+							flow: "",
+							genre: "",
+							subGenre: " "
+						},
 						modifier: "",
 						platform: "",
 						rangeCategory: "main",
