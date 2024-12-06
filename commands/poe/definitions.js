@@ -6,7 +6,7 @@ const gems = require("./gems.json");
 const additionalGems = gems.filter(i => i.type === "additional");
 const skillGems = gems.filter(i => i.type === "main");
 
-const POE2_RELEASE_DATE = "2024-12-06 21:00";
+const POE2_RELEASE_DATE = "2024-12-06 20:00";
 
 const trials = {
 	normal: "A1: Lower Prison; A2: Crypt lvl 1, Chamber of Sins lvl 2; A3: Crematorium, Catacombs, Imperial Gardens",
