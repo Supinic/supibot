@@ -116,7 +116,7 @@ module.exports = {
 							perspective: "",
 							flow: "",
 							genre: "",
-							subGenre: " "
+							subGenre: ""
 						},
 						modifier: "",
 						platform: "",
