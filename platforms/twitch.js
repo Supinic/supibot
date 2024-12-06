@@ -750,7 +750,8 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		this.resolveUserMessage(null, userData, message);
 
 		if (!sb.Command.is(message)) {
-			await this.pm(this.config.privateMessageResponseUnrelated, senderUsername);
+			const noCommandMessage = this.config.privateMessageResponseUnrelated ?? "No command provided!";
+			await this.pm(noCommandMessage, senderUsername);
 			return;
 		}
 
