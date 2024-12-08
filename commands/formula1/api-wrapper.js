@@ -8,6 +8,13 @@ const sessionNames = {
 	Sprint: "Sprint race"
 };
 
+const BACKUP_RACE_DATA = {
+	2025: {
+		name: "Australian Grand Prix",
+		date: "2025-03-16"
+	}
+};
+
 let ergastGotInstance;
 const ergastGot = (...args) => {
 	ergastGotInstance ??= sb.Got.get("GenericAPI").extend({
@@ -129,6 +136,20 @@ const fetchNextRaceDetail = async (context) => {
 	const year = new sb.Date().year;
 	const race = await fetchRace(year, "current");
 	if (!race) {
+		const nextYear = year + 1;
+		const backupRace = BACKUP_RACE_DATA[nextYear];
+		if (backupRace) {
+			const delta = sb.Utils.timeDelta(new sb.Date(backupRace.date));
+			return {
+				success: true,
+				reply: sb.Utils.tag.trim `
+					This year's season is finished.
+					The first race of next year's season is ${backupRace.name},
+					taking place ${delta}.
+				 `
+			};
+		}
+
 		return {
 			success: false,
 			reply: `No next F1 race is currently scheduled!`
