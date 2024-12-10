@@ -65,7 +65,7 @@ module.exports = {
 
 		/** @type {{ ID: number, Active: boolean }} */
 		const subData = await sb.Query.getRecordset(rs => rs
-			.select("ID", "Active", "Channel", "Platform")
+			.select("ID", "Active", "Channel", "Platform", "Flags")
 			.from("data", "Event_Subscription")
 			.where("User_Alias = %n", context.user.ID)
 			.where("Type = %s", event.name)
@@ -144,13 +144,21 @@ module.exports = {
 				};
 			}
 
+			let invocationString = invocation;
+
 			// Error response for attempting to repeat an existing state - already (un)subscribed.
 			if ((invocation === "subscribe" && subData.Active) || (invocation === "unsubscribe" && !subData.Active)) {
-				const preposition = (invocation === "subscribe") ? "to" : "from";
-				return {
-					success: false,
-					reply: `You are already ${invocation}d ${preposition} this event${locationWithSpace}!`
-				};
+				const storedFlagValue = Boolean(JSON.parse(subData.Flags ?? {}).skipPrivateReminder);
+				if (storedFlagValue !== flags.skipPrivateReminder) {
+					invocationString = "update";
+				}
+				else {
+					const preposition = (invocation === "subscribe") ? "to" : "from";
+					return {
+						success: false,
+						reply: `You are already ${invocationString}d ${preposition} this event${locationWithSpace}!`
+					};
+				}
 			}
 
 			await sb.Query.getRecordUpdater(rs => rs
@@ -161,7 +169,7 @@ module.exports = {
 			);
 
 			return {
-				reply: `Successfully ${invocation}d${locationWithSpace}. ${response}`
+				reply: `Successfully ${invocationString}d${locationWithSpace}. ${response}`
 			};
 		}
 		else {
