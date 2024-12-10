@@ -187,10 +187,30 @@ module.exports = class VLCSingleton {
 
 			const missingIDs = previousIDs.filter(id => !nextIDs.includes(id));
 			if (missingIDs.length > 0) {
+				const noUpdateIDs = [];
+				for (const item of prev.children[0].children) {
+					if (item.duration !== -1 || !item.uri?.includes("youtu")) {
+						continue;
+					}
+
+					// Pseudo-heuristic to prevent inadvertent playlist request deletion caused by
+					// VLC creating a new request after loading a YouTube video.
+					// E.g. YouTube video is added as ID 30, and when it plays, VLC fetches the actual video data,
+					// creating a new request with ID 31, causing the ID 30 (the real video) to be deleted.
+					await sb.Query.getRecordUpdater(ru => ru
+						.update("chat_data", "Song_Request")
+						.set("VLC_ID", Number(item.id) + 1)
+						.where("VLC_ID = %n", Number(item.id))
+						.where("Status IN %s+", ["Queued", "Current"])
+					);
+					noUpdateIDs.push(item.id);
+				}
+
+				const filteredMissingIDs = missingIDs.filter(i => !noUpdateIDs.includes(i));
 				await sb.Query.getRecordUpdater(rs => rs
 					.update("chat_data", "Song_Request")
 					.set("Status", "Inactive")
-					.where("VLC_ID IN %n+", missingIDs)
+					.where("VLC_ID IN %n+", filteredMissingIDs)
 					.where("Status IN %s+", ["Queued", "Current"])
 				);
 			}
