@@ -1,11 +1,12 @@
-// Need to fetch a randomized hash to attach to the api/search endpoint
+// Need to fetch a randomized hash to attach to the ~~api/search~~ api/find endpoint
 // Reference: https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI/issues/25
+// Reference from `search` to `find`: https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI/pull/35
 const HLTB_JS_FILE_HASH_KEY = "hltb-file-hash";
 const HLTB_ENDPOINT_HASH_KEY = "hltb-endpoint-hash";
 
 const FILE_PREFIX = "_next/static/chunks/pages";
 const FILE_HASH_REGEX = /static\/chunks\/pages\/(_app-\w+?\.js)/;
-const ENDPOINT_HASH_REGEX = /\/api\/search\/".concat\("(\w+)"\)\s*(.concat\("(\w+)"\))?/;
+const ENDPOINT_HASH_REGEX = /\/api\/find\/".concat\("(\w+)"\)\s*(.concat\("(\w+)"\))?/;
 
 const fetchFileHash = async (force = false) => {
 	const existing = await sb.Cache.getByPrefix(HLTB_JS_FILE_HASH_KEY);
@@ -97,7 +98,7 @@ module.exports = {
 		}
 
 		const response = await sb.Got.get("FakeAgent")({
-			url: `https://howlongtobeat.com/api/search/${endpointHash}`,
+			url: `https://howlongtobeat.com/api/find/${endpointHash}`,
 			method: "POST",
 			throwHttpErrors: false,
 			headers: {
@@ -116,7 +117,7 @@ module.exports = {
 							perspective: "",
 							flow: "",
 							genre: "",
-							subGenre: ""
+							difficulty: ""
 						},
 						modifier: "",
 						platform: "",
