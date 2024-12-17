@@ -268,7 +268,7 @@ module.exports = class LoggerSingleton {
 	 * @returns {Promise<void>}
 	 */
 	async push (message, userData, channelData, platformData) {
-		if (!this.#presentTables === null) {
+		if (this.#presentTables === null) {
 			return;
 		}
 
