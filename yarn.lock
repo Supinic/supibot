@@ -4373,7 +4373,7 @@ cytube-connector@supinic/cytube-connector:
 
 supi-core@supinic/supi-core:
   version: 3.1.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=8f87c54a005b7574f10be61122ff9bc6b3d84402"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=d3c26f17fa6b3a72fee22485163995ee107d5d65"
   dependencies:
     cheerio: "npm:^1.0.0-rc.12"
     duration-parser: "github:supinic/duration-parser"
@@ -4382,7 +4382,7 @@ supi-core@supinic/supi-core:
     mariadb: "npm:^3.2.2"
     prom-client: "npm:^15.0.0"
     random-js: "npm:^2.1.0"
-  checksum: 10c0/8f7596f0d2a34501c52d040d8e4083e299704df4e7fca6e6b0da6fdd6ed081788c70c8865bdc3d82188218c94f2e93eda2059aefa8905e29dbfe75625ebd2607
+  checksum: 10c0/da39e444feb96c0f9eba169dff62e675c7c81c2aeae4fbd34c538baebb735623283e317e02fb59548d8bed95e1c2fd9660cb13d495a9e585f917a63de503bca6
   languageName: node
   linkType: hard
 
