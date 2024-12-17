@@ -176,7 +176,7 @@
         "name": "Vice",
         "url": "https://www.vice.com",
         "path": "en",
-        "endpoints": ["rss"],
+        "endpoints": ["feed"],
         "helpers": []
       }
     ]
@@ -394,8 +394,8 @@
       {
         "name": "La Libre",
         "url": "https://www.lalibre.be",
-        "path": "rss/section",
-        "endpoints": ["belgique.xml"],
+        "path": "arc/outboundfeeds/rss/section",
+        "endpoints": ["belgique/?outputType=xml"],
         "helpers": ["unitedfingers"]
       },
       {
