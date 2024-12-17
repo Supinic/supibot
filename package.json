@@ -6,17 +6,17 @@
     "acorn-node": "^2.0.1",
     "async-markov": "https://github.com/supinic/async-markov",
     "bing-chat": "^0.2.3",
-    "chrono-node": "^2.7.6",
-    "cron": "^3.1.7",
+    "chrono-node": "^2.7.7",
+    "cron": "^3.3.1",
     "cytube-connector": "supinic/cytube-connector",
-    "discord.js": "^14.15.3",
-    "irc-framework": "^4.13.1",
+    "discord.js": "^14.16.3",
+    "irc-framework": "^4.14.0",
     "rss-parser": "^3.13.0",
     "supi-core": "supinic/supi-core",
     "track-link-parser": "https://github.com/supinic/track-link-parser",
     "transliteration": "^2.3.5",
     "vm2": "^3.9.19",
-    "ws": "^8.17.1"
+    "ws": "^8.18.0"
   },
   "engines": {
     "node": ">= 20.0"
@@ -33,6 +33,7 @@
     "dev-deps-push": "yarn dev-update && git commit ./yarn.lock -m \"bumped dependencies\" && git pull && git push",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "ncu": "yarn dlx npm-check-updates",
     "test": "mocha ./tests --recursive --exit",
     "coverage": "nyc yarn test"
   },
@@ -42,14 +43,14 @@
   "license": "AGPL-3.0",
   "description": "Multiplatform, utility & novelty chat bot.",
   "devDependencies": {
-    "@babel/core": "^7.24.7",
-    "@babel/eslint-parser": "^7.24.7",
+    "@babel/core": "^7.26.0",
+    "@babel/eslint-parser": "^7.25.9",
     "eslint": "^8.52.0",
     "eslint-plugin-unicorn": "^49.0.0",
-    "mocha": "^10.5.2",
-    "nyc": "^17.0.0",
+    "mocha": "^11.0.1",
+    "nyc": "^17.1.0",
     "supi-db-init": "https://github.com/supinic/supi-db-init",
-    "typescript": "^5.5.4"
+    "typescript": "^5.7.2"
   },
   "nyc": {
     "all": false,
