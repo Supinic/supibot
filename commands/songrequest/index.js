@@ -125,6 +125,10 @@ module.exports = {
 		else if (state === "cytube") {
 			return await CytubeIntegration.queue(args.join(" "));
 		}
+		else if (state === "vlc") {
+			// Simply make sure the VLC client is running if a song is being requested into it
+			sb.VideoLANConnector.client.startRunning();
+		}
 
 		// Determine the user's and global limits - both duration and video amount
 		const queue = await sb.VideoLANConnector.getNormalizedPlaylist();
