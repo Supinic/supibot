@@ -1,4 +1,17 @@
 const URBAN_FAUX_ACCESS_KEY = "ab71d33b15d36506acf1e379b0ed07ee";
+const prepareItemStrings = (item) => {
+	const url = new URL(item.permalink);
+	const id = url.pathname.replace("/", "");
+	const link = `https://urbanup.com/${id}`;
+
+	const thumbs = `(+${item.thumbs_up}/-${item.thumbs_down})`;
+	const example = (item.example)
+		? ` - Example: ${item.example}`
+		: "";
+
+	const content = (item.definition + example).replace(/[\][]/g, "");
+	return { link, content, thumbs };
+};
 
 module.exports = {
 	Name: "urban",
@@ -12,11 +25,18 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Code: (async function urban (context, ...args) {
-		if (args.length === 0) {
+		if (args.length === 0 || args[0] === "random") {
+			const randomResponse = await sb.Got.get("GenericAPI")({
+				url: "https://api.urbandictionary.com/v0/random"
+			});
+
+			const { list } = randomResponse.body;
+			const firstItem = list[0];
+			const { link, thumbs, content } = prepareItemStrings(firstItem);
+
 			return {
-				success: false,
-				reply: "No term has been provided!",
-				cooldown: 2500
+				success: true,
+				reply: `${link} ${thumbs} ${content}`
 			};
 		}
 
@@ -90,26 +110,29 @@ module.exports = {
 			};
 		}
 
-		const thumbs = `(+${item.thumbs_up}/-${item.thumbs_down})`;
-		const example = (item.example)
-			? ` - Example: ${item.example}`
-			: "";
-
-		const content = (item.definition + example).replace(/[\][]/g, "");
-
-		let url = "";
-		if (typeof context.params.index !== "number" && items.length > 1) {
-			if (term.includes(" ")) {
-				url = `https://urbandictionary.com/define.php?term=${encodeURI(term)}`;
-			}
-			else {
-				url = `https://urbandictionary.com/${encodeURI(term)}`;
-			}
-		}
-
+		const { link, thumbs, content } = prepareItemStrings(item);
 		return {
-			reply: `${url} ${thumbs} ${content}`
+			reply: (typeof context.params.index !== "number" && items.length > 1)
+				? `${link} ${thumbs} ${content}`
+				: `${thumbs} ${content}`
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: async () => [
+		`Queries <a href="//urbandictionary.com">UrbanDictionary.com</a> for a definition of a word or aterm.`,
+		"If you don't provide a word or use \"random\", a random term will be rolled and posted.",
+		"",
+
+		`<code>$urban (term)</code>`,
+		`Returns the definition of a term, if it exists`,
+		"",
+
+		`<code>$urban index:(number) (term)</code>`,
+		`Returns a different definition of the same term, if there are multiple`,
+		"Indexes start with 0 (first one) and go up to 9, if there are that many definitions",
+		"",
+
+		`<code>$urban</code>`,
+		`<code>$urban random</code>`,
+		`Returns the definition of a random term`
+	]
 };
