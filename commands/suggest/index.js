@@ -100,6 +100,7 @@ module.exports = {
 
 			`You can remove a suggestion you've created via the <code><a href="/bot/command/detail/unset">$unset suggestion (ID)</a></code> command.`,
 			"For more info, check that command's help page.",
+			"",
 
 			`<code>$suggest (text)</code>`,
 			"Creates a suggestion.",
@@ -109,6 +110,7 @@ module.exports = {
 
 			`<code>$suggest amend:(ID) (text)</code>`,
 			"Amends an existing suggestion that you've made with more text.",
+			"",
 
 			`<code>$unset ${unsetSuggestion.name} (${unsetSuggestion.parameter})</code>`,
 			unsetSuggestion.description
