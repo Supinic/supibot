@@ -90,13 +90,28 @@ module.exports = {
 			reply: `Suggestion saved, and will eventually be processed (ID ${row.values.ID}) ${link} ${emote} ${subscribed}`
 		};
 	}),
-	Dynamic_Description: (() => [
-		`<code>$suggest (text)</code>`,
-		"Creates a new suggestion for Supinic to take a look at in the near future.",
-		"These should avoid all jokes, memes and such - and only focus on proper issues, bug reports, questions etc.",
-		"",
+	Dynamic_Description: () => {
+		const unsetSuggestion = require("../set/subcommands/suggestion.js");
 
-		`<code>$suggest amend:(ID) (text)</code>`,
-		"Amends an existing suggestion that you've made with more text."
-	])
+		return [
+			"Creates a new suggestion for Supinic to take a look at in the near future.",
+			"These should avoid jokes, memes and such - focus instead on proper issues, bug reports, questions, ideas etc.",
+			"",
+
+			`You can remove a suggestion you've created via the <code><a href="/bot/command/detail/unset">$unset suggestion (ID)</a></code> command.`,
+			"For more info, check that command's help page.",
+
+			`<code>$suggest (text)</code>`,
+			"Creates a suggestion.",
+			"You will provided with a tracking ID with which you can check the suggestion's progress",
+			"The first usage will subscribe you, so you will get a reminder from Supibot when the suggestion's status changes.",
+			"",
+
+			`<code>$suggest amend:(ID) (text)</code>`,
+			"Amends an existing suggestion that you've made with more text.",
+
+			`<code>$unset ${unsetSuggestion.name} (${unsetSuggestion.parameter})</code>`,
+			unsetSuggestion.description
+		];
+	}
 };
