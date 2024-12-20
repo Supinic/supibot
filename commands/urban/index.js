@@ -36,7 +36,7 @@ module.exports = {
 
 			return {
 				success: true,
-				reply: `${link} ${thumbs} ${content}`
+				reply: `${firstItem.word}: ${link} ${thumbs} ${content}`
 			};
 		}
 
