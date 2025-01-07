@@ -52,13 +52,24 @@ module.exports = {
 			};
 		}
 		else {
+			await sb.Reminder.reloadSpecific(ID);
+
 			const reminder = sb.Reminder.get(ID);
-			if (reminder) {
-				await reminder.deactivate(true, true);
+			if (!reminder) {
+				const logID = await sb.Logger.log(
+					"Command.Fail",
+					`Can't find a reminder to unset: ${ID}`,
+					context.channel,
+					context.user
+				);
+
+				return {
+					success: false,
+					reply: `Can't unset this reminder! Please let @Supinic know about this with this log id: #${logID}.`
+				};
 			}
-			else {
-				await row.save({ skipLoad: true });
-			}
+
+			await reminder.deactivate(true, true);
 
 			return {
 				reply: `Reminder ID ${ID} unset successfully.`
