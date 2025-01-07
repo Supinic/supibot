@@ -132,7 +132,7 @@ module.exports = {
 			};
 		}
 		else {
-			const emoteLink = `https://emotes.raccatta.cc/twitch/emote/${emoteID}`;
+			const emoteLink = `https://emotes.awoo.nl/twitch/emote/${emoteID}`;
 			return {
 				reply: `${emoteCode} - ID ${emoteID} - ${active} ${tierString}. ${emoteLink} ${cdnLink} ${originString}`
 			};
