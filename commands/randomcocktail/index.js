@@ -5,34 +5,57 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "Searches for a cocktail recipe by its name, or fetches a random one, if no search query was provided.",
 	Flags: ["mention","non-nullable","pipe"],
-	Params: null,
+	Params: [
+		{ name: "ingredient", type: "string" }
+	],
 	Whitelist_Response: null,
 	Code: (async function randomCocktail (context, ...args) {
-		let data;
-		if (args.length === 0) {
-			const response = await sb.Got.get("GenericAPI")({
+		let response;
+		if (context.params.ingredient) {
+			const drinkResponse = await sb.Got.get("GenericAPI")({
+				url: "https://www.thecocktaildb.com/api/json/v1/1/filter.php",
+				searchParams: {
+					i: context.params.ingredient
+				}
+			});
+
+			const ingredientDrinks = drinkResponse.body.drinks;
+			if (!ingredientDrinks || ingredientDrinks.length === 0) {
+				return {
+					success: false,
+					reply: "No drinks found for your selected ingredient!"
+				};
+			}
+
+			const randomDrink = sb.Utils.randArray(ingredientDrinks);
+			response = await sb.Got.get("GenericAPI")({
+				url: "https://www.thecocktaildb.com/api/json/v1/1/lookup.php",
+				searchParams: {
+					i: randomDrink.idDrink
+				}
+			});
+		}
+		else if (args.length === 0) {
+			response = await sb.Got.get("GenericAPI")({
 				url: "https://www.thecocktaildb.com/api/json/v1/1/random.php",
 				responseType: "json"
 			});
-
-			data = response.body;
 		}
 		else {
-			const response = await sb.Got.get("GenericAPI")({
+			response = await sb.Got.get("GenericAPI")({
 				url: "https://www.thecocktaildb.com/api/json/v1/1/search.php",
 				searchParams: {
 					s: args.join(" ")
 				}
 			});
+		}
 
-			data = response.body;
-
-			if (!data?.drinks) {
-				return {
-					success: false,
-					reply: "No cocktails found for that query!"
-				};
-			}
+		const data = response.body;
+		if (!data?.drinks) {
+			return {
+				success: false,
+				reply: "No cocktails found for that query!"
+			};
 		}
 
 		const drink = sb.Utils.randArray(data.drinks);
@@ -49,5 +72,19 @@ module.exports = {
 			reply: `${drink.strDrink} (${ingredients.join(", ")}): ${drink.strInstructions}`
 		};
 	}),
-	Dynamic_Description: null
+	Dynamic_Description: async () => ([
+		"Searches for a cocktail recipe based on its name or ingredient(s).",
+		"",
+
+		`<code>$randomcocktail (name)</code>`,
+		"Searches based on your query",
+		"",
+
+		`<code>$randomcocktail ingredient:(ingredient name)</code>`,
+		"Searches based on your ingredient name",
+		"",
+
+		`<code>$randomcocktail</code>`,
+		"Posts a completely random cocktail recipe"
+	])
 };
