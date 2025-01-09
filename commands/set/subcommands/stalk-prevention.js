@@ -2,7 +2,7 @@ module.exports = {
 	name: "stalk-prevention",
 	aliases: [],
 	parameter: "arguments",
-	description: "If you're the channel owner or a channel ambassador, you can use this setting to hide your channel from appearing in the $stalk command's results. Your channel will be displayed as [EXPUNGED], and the last message from your channel will also be obscured.",
+	description: "If you're the channel owner or a channel ambassador, you can use this setting to hide your channel from appearing in the $stalk and $pingme commands' results. The channel will be displayed as [EXPUNGED], and for $stalk, the last message from your channel will also be obscured.",
 	flags: {
 		pipe: false,
 		elevatedChannelAccess: true // administrative action

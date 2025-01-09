@@ -461,7 +461,11 @@ module.exports = class Reminder extends require("./template.js") {
 
 			if (reminder.Type === "Pingme") {
 				const fromUserData = await User.get(reminder.User_From, false);
-				const channelName = channelData.getFullName();
+				const isChannelStalkOptedOut = await channelData.getDataProperty("stalkPrevention");
+
+				const channelStringName = (isChannelStalkOptedOut === true)
+					? "[EXPUNGED]"
+					: channelData.getFullName();
 
 				let platform = null;
 				if (reminder.Channel) {
@@ -476,7 +480,7 @@ module.exports = class Reminder extends require("./template.js") {
 				const authorMention = (authorBanphraseCheck.passed) ? `${uncheckedAuthorMention}` : "[Banphrased username]";
 
 				const targetMention = await platform.createUserMention(targetUserData);
-				let message = `${authorMention}, ${targetMention} just typed in channel ${channelName}`;
+				let message = `${authorMention}, ${targetMention} just typed in channel ${channelStringName}`;
 
 				if (reminder.Text) {
 					message += `: ${reminder.Text}`;
