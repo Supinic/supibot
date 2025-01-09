@@ -39,7 +39,7 @@ module.exports = {
 		if (!data) {
 			return {
 				success: false,
-				reply: `That user has not played any ranked solo games in the current season!`
+				reply: `That user has not played enough ranked solo games in the current season to obtain a rank!`
 			};
 		}
 
