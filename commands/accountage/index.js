@@ -9,23 +9,24 @@ module.exports = {
 	Whitelist_Response: null,
 	Code: (async function accountAge (context, user) {
 		const login = sb.User.normalizeUsername(user ?? context.user.Name).toLowerCase();
-		const { statusCode, body } = await sb.Got.get("Helix")({
-			url: "users",
+		const response = await sb.Got.get("IVR")({
+			url: "v2/twitch/user",
 			searchParams: { login }
 		});
 
-		if (statusCode !== 200 || body.data.length === 0) {
+		if (response.statusCode !== 200 || response.body.length === 0) {
 			return {
 				reply: "That Twitch account has no data associated with them."
 			};
 		}
 
-		const now = new sb.Date();
-		const created = new sb.Date(body.data[0].created_at);
+		const creationDate = response.body[0].createdAt;
+		const created = new sb.Date(creationDate);
 		const delta = sb.Utils.timeDelta(created, false, true);
 		const pronoun = (login.toLowerCase() === context.user.Name) ? "Your" : "Their";
 
 		let anniversary = "";
+		const now = new sb.Date();
 		if (now.year > created.year && now.month === created.month && now.day === created.day) {
 			const who = (login === context.platform.Self_Name) ? "my" : pronoun.toLowerCase();
 
