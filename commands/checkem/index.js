@@ -50,7 +50,7 @@ module.exports = {
 		}
 
 		const croppedNumber = String(messageNumber).slice(-12);
-		const list = croppedNumber.split("");
+		const list = [...croppedNumber];
 		const repeatedDigit = list.pop();
 
 		let repeatsAmount = 1;

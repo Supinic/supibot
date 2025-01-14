@@ -70,7 +70,7 @@ module.exports = {
 		}
 
 		const speed = context.params.speed ?? 1;
-		if (!Number.isFinite(speed) || speed < 0.1 || speed > 1.0) {
+		if (!Number.isFinite(speed) || speed < 0.1 || speed > 1) {
 			this.data.pending = false;
 			return {
 				success: false,
@@ -118,7 +118,7 @@ module.exports = {
 			messageTime = process.hrtime.bigint() - messageTime;
 			result = (response.body === "true");
 		}
-		catch (e) {
+		catch {
 			await sb.Cache.setByPrefix(TTS_ENABLED, false);
 			return {
 				reply: "TTS Listener encountered an error or is turned on! Turning off text to speech."
@@ -135,7 +135,7 @@ module.exports = {
 			};
 		}
 
-		const duration = sb.Utils.round(Number(messageTime) / 1.0e6, 0);
+		const duration = sb.Utils.round(Number(messageTime) / 1_000_000, 0);
 		let cooldown = (duration > 10000)
 			? (this.Cooldown + (duration - 10000) * 10)
 			: this.Cooldown;

@@ -39,6 +39,7 @@ export default tseslint.config(
 			"unicorn/text-encoding-identifier-case": "off", // Also applies to standalone strings rather than arguments => disable
 			"unicorn/no-typeof-undefined": "off",
 			"unicorn/no-static-only-class": "off",
+			"unicorn/switch-case-braces": "off",
 
 			"unicorn/prefer-switch": ["error", {
 				minimumCases: 4

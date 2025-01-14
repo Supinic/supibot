@@ -44,16 +44,16 @@ module.exports = {
 		} = amountMatch.groups;
 
 		if (/k/i.test(amount)) {
-			multiplier = 1.0e3;
+			multiplier = 1e3;
 		}
 		else if (/m/i.test(amount)) {
-			multiplier = 1.0e6;
+			multiplier = 1e6;
 		}
 		else if (/b/i.test(amount)) {
-			multiplier = 1.0e9;
+			multiplier = 1e9;
 		}
 		else if (/t/i.test(amount)) {
-			multiplier = 1.0e12;
+			multiplier = 1e12;
 		}
 
 		amount = amount.replaceAll(/[kmbt]/gi, "").replaceAll(",", ".");

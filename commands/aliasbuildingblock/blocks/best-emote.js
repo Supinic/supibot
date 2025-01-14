@@ -14,7 +14,7 @@ module.exports = {
 			};
 		}
 
-		const bestMatch = await context.getBestAvailableEmote(args.slice(0, -1), args[args.length - 1]);
+		const bestMatch = await context.getBestAvailableEmote(args.slice(0, -1), args.at(-1));
 		return {
 			reply: bestMatch
 		};

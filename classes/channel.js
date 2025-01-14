@@ -157,6 +157,7 @@ module.exports = class Channel extends require("./template.js") {
 		const caseSensitive = options.caseSensitivity ?? true;
 		for (const emote of emoteArray) {
 			const lowerEmote = emote.toLowerCase();
+			/** @type {Object} */
 			const available = availableEmotes.find(i => (caseSensitive)
 				? (i.name === emote)
 				: (i.name.toLowerCase() === lowerEmote)
@@ -365,7 +366,7 @@ module.exports = class Channel extends require("./template.js") {
 		);
 
 		const channelIDs = new Set([...eventChannelIDs, ...configChannelIDs, ...filterChannelIDs]);
-		let channelsData = Array.from(channelIDs).map(i => Channel.get(i)).filter(Boolean);
+		let channelsData = [...channelIDs].map(i => Channel.get(i)).filter(Boolean);
 		if (platform) {
 			const platformData = Platform.get(platform);
 			channelsData = channelsData.filter(i => i.Platform === platformData);

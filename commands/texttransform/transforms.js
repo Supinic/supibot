@@ -269,7 +269,7 @@ const types = [
 				}
 			}
 
-			return String.fromCharCode(...result);
+			return String.fromCodePoint(...result);
 		}
 	},
 	{
@@ -298,8 +298,8 @@ const types = [
 		description: "Attempts to wrap letters in a box-like thing. Might not work with all fonts.",
 		data: (message) => {
 			const arr = [];
-			const combine = String.fromCharCode(0xFE0F);
-			const box = String.fromCharCode(0x20E3);
+			const combine = String.fromCodePoint(0xFE0F);
+			const box = String.fromCodePoint(0x20E3);
 
 			for (const character of message) {
 				if (character === " ") {

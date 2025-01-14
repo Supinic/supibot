@@ -1,5 +1,5 @@
 const { Node, parse } = require("acorn-node");
-const bannedAwaitStatements = ["DoWhileStatement", "ForStatement", "ForOfStatement", "WhileStatement"];
+const BANNED_AWAIT_STATEMENTS = new Set(["DoWhileStatement", "ForStatement", "ForOfStatement", "WhileStatement"]);
 
 const analyze = (script) => {
 	let tree;
@@ -26,7 +26,7 @@ const analyze = (script) => {
 		}
 
 		if (node instanceof Node) {
-			if (bannedAwaitStatements.includes(node.type)) {
+			if (BANNED_AWAIT_STATEMENTS.has(node.type)) {
 				suspiciousNodes.add(node);
 
 				if (hasNewPromise) {

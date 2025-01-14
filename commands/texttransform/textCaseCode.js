@@ -101,7 +101,7 @@ const decode = (input, codeWord) => {
 			}
 		}
 
-		output.push(String.fromCharCode(value));
+		output.push(String.fromCodePoint(value));
 		if (appendix) {
 			output.push(appendix, " ");
 		}

@@ -321,7 +321,7 @@ module.exports = class User extends require("./template.js") {
 
 	static getByProperty (property, identifier) {
 		const iterator = User.data.values();
-		let user = undefined;
+		let user;
 		let value = iterator.next().value;
 
 		while (!user && value) {

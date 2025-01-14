@@ -1,3 +1,5 @@
+const IGNORED_ASSETS = new Set(["VEF"]);
+
 const cryptoGamePriceUpdate = async () => {
 	if (!process.env.API_CRYPTO_COMPARE) {
 		throw new sb.Error({
@@ -10,7 +12,6 @@ const cryptoGamePriceUpdate = async () => {
 		});
 	}
 
-	const ignoredAssets = ["VEF"];
 	const conditionalFixerIo = (async () => {
 		if (new sb.Date().hours % 12 !== 0) {
 			return { rates: {} };
@@ -51,8 +52,8 @@ const cryptoGamePriceUpdate = async () => {
 	]);
 
 	const totalData = {
-		...(cryptoData?.value ?? {}),
-		...(currencyData?.value?.rates ?? {})
+		...cryptoData?.value,
+		...currencyData?.value?.rates
 	};
 
 	if (goldData.status === "fulfilled") {
@@ -68,7 +69,7 @@ const cryptoGamePriceUpdate = async () => {
 		if (!uppercaseOnly.test(code)) {
 			return;
 		}
-		else if (ignoredAssets.includes(code)) {
+		else if (IGNORED_ASSETS.has(code)) {
 			return;
 		}
 

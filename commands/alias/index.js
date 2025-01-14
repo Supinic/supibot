@@ -5,7 +5,7 @@ const AliasUtils = require("./alias-utils.js");
 
 const NESTED_ALIAS_LIMIT = 10;
 const ALIAS_DESCRIPTION_LIMIT = 250;
-const ALIAS_NAME_REGEX = /^[-\w\u00a9\u00ae\u2000-\u3300\ud83c\ud000-\udfff\ud83d\ud000-\udfff\ud83e\ud000-\udfff]{2,30}$/;
+const ALIAS_NAME_REGEX = /^[-\w\u00A9\u00AE\u2000-\u3300\uD83C\uD000-\uDFFF\uD83D\uD000-\uDFFF\uD83E\uD000-\uDFFF]{2,30}$/;
 const ALIAS_INVALID_NAME_RESPONSE = "Your alias should only contain letters, numbers and be 2-30 characters long.";
 
 module.exports = {
@@ -1039,7 +1039,7 @@ module.exports = {
 						reply: "You must provide your previous username!"
 					};
 				}
-				
+
 				const oldUserData = await sb.User.get(oldUsername);
 				if (!oldUserData || !oldUserData.Twitch_ID) {
 					return {

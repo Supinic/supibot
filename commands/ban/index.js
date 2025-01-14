@@ -6,12 +6,12 @@ const AVAILABLE_BAN_FILTER_TYPES = [
 	"Offline-only",
 	"Reminder-prevention"
 ];
-const NO_RESPONSE_FILTER_TYPES = [
+const NO_RESPONSE_FILTER_TYPES = new Set([
 	"Arguments",
 	"Blacklist",
 	"Online-only",
 	"Offline-only"
-];
+]);
 
 module.exports = {
 	Name: "ban",
@@ -179,7 +179,7 @@ module.exports = {
 							reply: "Cannot create a user-specific ban with no response!"
 						};
 					}
-					else if (!NO_RESPONSE_FILTER_TYPES.includes(type)) {
+					else if (!NO_RESPONSE_FILTER_TYPES.has(type)) {
 						return {
 							success: false,
 							reply: `Cannot create a no-response ban of type ${type}!`
@@ -322,7 +322,7 @@ module.exports = {
 							reply: `No multiplier provided! Use multiplier:(number) to set it.`
 						};
 					}
-					else if (multiplier < 1.0 || multiplier >= 1e6) {
+					else if (multiplier < 1 || multiplier >= 1e6) {
 						return {
 							success: false,
 							reply: `Invalid multiplier provided! Must be in range between <1, 1 000 000>.`
@@ -393,7 +393,7 @@ module.exports = {
 						reply: `No multiplier provided! Use multiplier:(number) to set it.`
 					};
 				}
-				else if (multiplier < 1.0 || multiplier >= 1e6) {
+				else if (multiplier < 1 || multiplier >= 1e6) {
 					return {
 						success: false,
 						reply: `Invalid multiplier provided! Must be in range between <1, 1 000 000>.`

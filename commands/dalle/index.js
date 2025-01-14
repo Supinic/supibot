@@ -175,7 +175,7 @@ module.exports = {
 		}
 
 		const { images } = response.body;
-		const hash = require("crypto").createHash("sha512");
+		const hash = require("node:crypto").createHash("sha512");
 		for (const base64Image of images) {
 			hash.update(base64Image);
 		}

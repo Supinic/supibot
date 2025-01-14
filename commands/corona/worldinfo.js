@@ -8,7 +8,7 @@ module.exports = async () => {
 			responseType: "text"
 		});
 	}
-	catch (e) {
+	catch {
 		return {
 			success: false
 		};

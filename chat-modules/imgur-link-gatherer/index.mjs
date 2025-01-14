@@ -1,4 +1,5 @@
 let missingEnvNotified = false;
+const SUPPORTED_EXTENSIONS = new Set(["jpg", "jpeg", "png", "gif", "mp4"]);
 
 export const definition = {
 	Name: "imgur-link-gatherer",
@@ -14,7 +15,6 @@ export const definition = {
 			return;
 		}
 
-		const supportedExtensions = ["jpg", "jpeg", "png", "gif", "mp4"];
 		const regex = /(https:\/\/)?(i\.)?imgur\.com\/(?<slug>\w{5,8})\.(?<extension>\w{3,4})/g;
 		const matches = [...context.message.matchAll(regex)];
 		if (matches.length === 0) {
@@ -25,7 +25,7 @@ export const definition = {
 
 		for (const match of matches) {
 			const { extension, slug } = match.groups;
-			if (!supportedExtensions.includes(extension)) {
+			if (!SUPPORTED_EXTENSIONS.has(extension)) {
 				return;
 			}
 			else if (this.data.processedLinks.has(slug)) {
@@ -72,7 +72,7 @@ export const definition = {
 					uploaded = false;
 				}
 			}
-			catch (e) {
+			catch {
 				imgbbReupload = null;
 				uploaded = false;
 			}
