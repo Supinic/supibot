@@ -111,31 +111,31 @@ module.exports = {
 		}
 
 		emotes = emotes.filter(i => {
-			if (animated === true && !i.animated || animated === false && i.animated) {
+			if ((animated === true && !i.animated) || (animated === false && i.animated)) {
 				return false;
 			}
-			if (zeroWidth === true && !i.zeroWidth || zeroWidth === false && i.zeroWidth) {
+			if ((zeroWidth === true && !i.zeroWidth) || (zeroWidth === false && i.zeroWidth)) {
 				return false;
 			}
-			if (bttv === true && i.type !== "bttv" || bttv === false && i.type === "bttv") {
+			if ((bttv === true && i.type !== "bttv") || (bttv === false && i.type === "bttv")) {
 				return false;
 			}
-			if (ffz === true && i.type !== "ffz" || ffz === false && i.type === "ffz") {
+			if ((ffz === true && i.type !== "ffz") || (ffz === false && i.type === "ffz")) {
 				return false;
 			}
-			if (sevenTv === true && i.type !== "7tv" || sevenTv === false && i.type === "7tv") {
+			if ((sevenTv === true && i.type !== "7tv") || (sevenTv === false && i.type === "7tv")) {
 				return false;
 			}
-			if (globalEmotes === true && !i.global || globalEmotes === false && i.global) {
+			if ((globalEmotes === true && !i.global) || (globalEmotes === false && i.global)) {
 				return false;
 			}
-			if (sub === true && i.type !== "twitch-subscriber" || sub === false && i.type === "twitch-subscriber") {
+			if ((sub === true && i.type !== "twitch-subscriber") || (sub === false && i.type === "twitch-subscriber")) {
 				return false;
 			}
-			if (follower === true && i.type !== "twitch-follower" || follower === false && i.type === "twitch-follower") {
+			if ((follower === true && i.type !== "twitch-follower") || (follower === false && i.type === "twitch-follower")) {
 				return false;
 			}
-			if (twitch === true && i.type !== "twitch-global" || twitch === false && i.type === "twitch-global") {
+			if ((twitch === true && i.type !== "twitch-global") || (twitch === false && i.type === "twitch-global")) {
 				return false;
 			}
 			if (context.params.regex && !context.params.regex.test(i.name)) {

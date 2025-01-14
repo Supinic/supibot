@@ -24,7 +24,9 @@ const { TWITCH_ADMIN_SUBSCRIBER_LIST } = require("../utils/shared-cache-keys.jso
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
-const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
+// eslint-disable-next-line no-bitwise
+const SEVEN_TV_ZERO_WIDTH_FLAG = (1 << 8);
+
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
 const WRITE_MODE_MESSAGE_DELAY = 1500;
 const NO_EVENT_RECONNECT_TIMEOUT = 10000; // @todo move to config
@@ -82,7 +84,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	supportsMeAction = true;
 	dynamicChannelAddition = true;
 
-	// noinspection JSUnusedLocalSymbols
+	// eslint-disable-next-line no-unused-private-class-members
 	#reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000);
 	#websocketLatency = null;
 	#previousMessageMeta = new Map();
@@ -1158,6 +1160,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			type: "7tv",
 			global: false,
 			animated: i.data.animated,
+			// eslint-disable-next-line no-bitwise
 			zeroWidth: Boolean(i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
 		}));
 	}
@@ -1229,6 +1232,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			type: "7tv",
 			global: true,
 			animated: i.data.animated,
+			// eslint-disable-next-line no-bitwise
 			zeroWidth: (i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
 		}));
 

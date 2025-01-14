@@ -22,7 +22,6 @@ const fetchWorldsData = async function () {
 		const worlds = {};
 
 		for (const row of rows) {
-			// eslint-disable-next-line no-unused-vars
 			const [idEl, playersEl, countryEl, typeEl, activityEl] = $("td", row);
 			const id = $("a", idEl)[0]?.attribs.id.split("-").at(-1);
 			if (!id) {

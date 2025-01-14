@@ -7,9 +7,9 @@
     "async-markov": "supinic/async-markov",
     "bing-chat": "^0.2.3",
     "chrono-node": "^2.7.7",
-    "cron": "^3.3.1",
+    "cron": "^3.5.0",
     "cytube-connector": "supinic/cytube-connector",
-    "discord.js": "^14.16.3",
+    "discord.js": "^14.17.3",
     "irc-framework": "^4.14.0",
     "rss-parser": "^3.13.0",
     "supi-core": "supinic/supi-core",
@@ -44,13 +44,15 @@
   "description": "Multiplatform, utility & novelty chat bot.",
   "devDependencies": {
     "@babel/core": "^7.26.0",
-    "@babel/eslint-parser": "^7.25.9",
-    "eslint": "^8.52.0",
-    "eslint-plugin-unicorn": "^49.0.0",
+    "@babel/eslint-parser": "^7.26.5",
+    "eslint": "^9.18.0",
+    "eslint-plugin-unicorn": "^56.0.1",
+    "globals": "^15.14.0",
     "mocha": "^11.0.1",
     "nyc": "^17.1.0",
     "supi-db-init": "https://github.com/supinic/supi-db-init",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0"
   },
   "nyc": {
     "all": false,

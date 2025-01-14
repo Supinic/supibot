@@ -29,7 +29,7 @@ export const definition = {
 		const result = [];
 		const checkedUsers = new Map();
 		for (const sub of subscriptions) {
-			const status = checkedUsers.get(sub.User_Alias)
+			const status = checkedUsers.get(sub.User_Alias);
 			if (status === "skip") {
 				continue;
 			}

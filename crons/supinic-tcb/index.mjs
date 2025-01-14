@@ -5,7 +5,7 @@ export const definition = {
 	code: (async function announceSupinicTCB () {
 		setTimeout(async () => {
 			const channelData = sb.Channel.get("supinic", "twitch");
-			await channelData.send(sb.Utils.tag.trim`
+			await channelData.send(sb.Utils.tag.trim `
 				To stay up to date with all the things regarding Supibot & co.,
 				make sure to follow Supinic on GitHub supiniThink 👉
 				https://github.com/Supinic

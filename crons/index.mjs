@@ -36,7 +36,12 @@ export const definitions = [
 ];
 
 export function initializeCrons (options = {}) {
-	const { disableAll, blacklist = [], whitelist = [] } = options;
+	const {
+		disableAll,
+		blacklist = [],
+		whitelist = []
+	} = options;
+
 	if (disableAll) {
 		return;
 	}

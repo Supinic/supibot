@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 const DIAERESIS = "\u{0308}";
 
 const encode = (input, codeWord) => {

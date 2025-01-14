@@ -95,7 +95,7 @@ export const definition = {
 				.update("chat_data", "Song_Request")
 				.set("Status", "Inactive")
 				.where("Status <> %s", "Inactive")
-			)
+			);
 		}
 	}),
 	Global: false,

@@ -329,7 +329,7 @@ const getEmote = async (context, type) => {
  */
 const getWeightedCatch = (type) => {
 	const applicableItems = itemTypes.filter(i => i.type === type);
-	const totalWeight = applicableItems.reduce((acc, cur) => acc + cur.weight ?? 1, 0);
+	const totalWeight = applicableItems.reduce((acc, cur) => acc + cur.weight, 0);
 
 	let indexedWeight = 0;
 	const roll = randomInt(1, totalWeight);

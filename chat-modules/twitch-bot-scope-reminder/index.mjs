@@ -38,7 +38,7 @@ export const definition = {
 		// 	.flat("Specific_ID")
 		// );
 
-		channelList = ["31400525"]
+		channelList = ["31400525"];
 
 		if (!channelList.includes(userId)) {
 			return;
