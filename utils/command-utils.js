@@ -292,7 +292,7 @@ module.exports = {
 			let { types, long_name: long } = row;
 			if (types.includes("political")) {
 				types = types.filter(i => i !== "political");
-				types[0] = types[0].replace(/_/g, "").replace("administrativearea", "");
+				types[0] = types[0].replaceAll("_", "").replace("administrativearea", "");
 				object[types[0]] = long;
 			}
 		}

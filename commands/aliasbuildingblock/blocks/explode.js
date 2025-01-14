@@ -6,8 +6,6 @@ module.exports = {
 		["$abb explode this is a test", "t h i s i s a t e s t"]
 	],
 	execute: (context, ...args) => ({
-		reply: Array.from(args.join(" "))
-			.join(" ")
-			.replace(/\s+/g, " ")
+		reply: [...args.join(" ")].join(" ").replaceAll(/\s+/g, " ")
 	})
 };

@@ -13,7 +13,7 @@ const banphraseConfigData = Object.freeze({
 
 class ExternalBanphraseAPI {
 	static async pajbot (message, URL) {
-		message = message.trim().replace(/\s+/g, " ");
+		message = message.trim().replaceAll(/\s+/g, " ");
 
 		const options = {
 			method: "POST",

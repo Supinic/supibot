@@ -212,7 +212,7 @@ module.exports = class Filter extends require("./template.js") {
 								obj.regex = new RegExp(arg.regex[0], arg.regex[1] ?? "");
 							}
 							else if (typeof arg.regex === "string") {
-								const string = arg.regex.replace(/^\/|\/$/g, "");
+								const string = arg.regex.replaceAll(/^\/|\/$/g, "");
 								const lastSlashIndex = string.lastIndexOf("/");
 
 								const regexBody = (lastSlashIndex !== -1) ? string.slice(0, lastSlashIndex) : string;

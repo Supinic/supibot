@@ -29,7 +29,8 @@ module.exports = {
 				};
 			}
 
-			messageNumber = BigInt(`0x${context.append.id.replace(/-/g, "")}`);
+			const pseudoUuid = context.append.id.replaceAll("-", "");
+			messageNumber = BigInt(`0x${pseudoUuid}`);
 		}
 		else if (context.platform.Name === "discord") {
 			if (!context.append.messageID) {

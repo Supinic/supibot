@@ -1,6 +1,6 @@
 const { parseRSS } = require("../../utils/command-utils.js");
 
-const cleanString = (str) => sb.Utils.fixHTML(sb.Utils.removeHTML(str)).replace(/\s+/g, " ");
+const cleanString = (str) => sb.Utils.fixHTML(sb.Utils.removeHTML(str)).replaceAll(/\s+/g, " ");
 
 module.exports = {
 	fetch: async (context, query) => {
@@ -57,7 +57,7 @@ module.exports = {
 			: "";
 
 		let result;
-		const dashlessTitle = title.replace(/-/g, "").replace(/\s+/g, " ");
+		const dashlessTitle = title.replaceAll("-", "").replaceAll(/\s+/g, " ");
 		if (dashlessTitle.includes(content) || content.includes(dashlessTitle)) {
 			result = `${title ?? ""} ${delta}`;
 		}
@@ -66,7 +66,7 @@ module.exports = {
 		}
 
 		return {
-			reply: result.replace(/\s+/g, " ")
+			reply: result.replaceAll(/\s+/g, " ")
 		};
 	}
 };

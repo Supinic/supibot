@@ -11,7 +11,7 @@ module.exports = {
 		const linkParser = await getLinkParser();
 		const properLink = linkParser.autoRecognize(link);
 		if (!properLink) {
-			const [bestResult] = await searchYoutube(link.replace(/-/g, ""));
+			const [bestResult] = await searchYoutube(link.replaceAll("-", ""));
 			if (!bestResult) {
 				return {
 					success: false,

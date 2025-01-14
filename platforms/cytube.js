@@ -98,7 +98,7 @@ class CytubeClient {
 			const originalUsername = data.username;
 			data.username = data.username.toLowerCase();
 
-			const msg = sb.Utils.fixHTML(data.msg).replace(/<(?:.|\n)*?>/gm, "");
+			const msg = sb.Utils.fixHTML(data.msg).replaceAll(/<(?:.|\n)*?>/gm, "");
 			if (!msg) {
 				return; // Ignore if the result message becomes empty string (HTML issues, seemingly)
 			}
@@ -195,7 +195,7 @@ class CytubeClient {
 				const commandPrefix = sb.Command.prefix;
 				const [command, ...arg] = msg
 					.trim()
-					.replace(/\s+/g, " ")
+					.replaceAll(/\s+/g, " ")
 					.replace(commandPrefix, "")
 					.split(" ")
 					.filter(Boolean);
@@ -359,8 +359,8 @@ class CytubeClient {
 		const messageLimit = this.platform.messageLimit;
 		const lengthRegex = new RegExp(`.{1,${messageLimit}}`, "g");
 		let arr = message
-			.replace(/(\r?\n)/g, " ")
-			.replace(/\s{2,}/g, " ")
+			.replaceAll(/(\r?\n)/g, " ")
+			.replaceAll(/\s{2,}/g, " ")
 			.match(lengthRegex) || ["<empty message>"];
 
 		if (arr.length > 3) {

@@ -1,3 +1,5 @@
+const TWITCH_ANTIPING_CHARACTER = "\u{E0000}";
+
 export const definition = {
 	Name: "async-markov-experiment",
 	Events: ["message"],
@@ -42,7 +44,7 @@ export const definition = {
 			return;
 		}
 
-		const fixedMessage = message.replace(/\u{E0000}/gu, "");
+		const fixedMessage = message.replaceAll(TWITCH_ANTIPING_CHARACTER, "");
 		if (!this.data.regex.test(fixedMessage)) {
 			return;
 		}

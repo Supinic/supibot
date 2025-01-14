@@ -339,8 +339,8 @@ module.exports = class User extends require("./template.js") {
 			.toLowerCase()
 			.replace(/^@/, "")
 			.replace(/^#/, "")
-			.replace(/:$/g, "")
-			.replace(/\s+/g, "_");
+			.replaceAll(/:$/g, "")
+			.replaceAll(/\s+/g, "_");
 	}
 
 	static async add (name, properties = {}) {

@@ -29,7 +29,7 @@ module.exports = {
 				message.splice(randomIndex, 1);
 			}
 
-			reply = result.join(" ").replace(/\s+/g, " ");
+			reply = result.join(" ").replaceAll(/\s+/g, " ");
 		}
 		else {
 			const result = [];

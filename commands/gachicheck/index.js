@@ -185,7 +185,7 @@ module.exports = {
 
 				if (videoData?.author) {
 					let authorID = null;
-					const normal = videoData.author.toLowerCase().replace(/\s+/g, "_");
+					const normal = videoData.author.toLowerCase().replaceAll(/\s+/g, "_");
 					const authorExists = await sb.Query.getRecordset(rs => rs
 						.select("ID")
 						.from("music", "Author")

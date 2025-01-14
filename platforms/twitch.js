@@ -270,7 +270,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		}
 
 		const baseMessage = message;
-		message = message.replace(/\s+/g, " ").trim();
+		message = message.replaceAll(/\s+/g, " ").trim();
 
 		if (options.meAction === true) {
 			message = `.me ${message}`;
@@ -396,7 +396,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		}
 
 		const trimmedMessage = message
-			.replace(/[\r\n]/g, " ")
+			.replaceAll(/[\r\n]/g, " ")
 			.trim();
 
 		const whisperMessageLimit = this.config.whisperMessageLimit ?? FALLBACK_WHISPER_MESSAGE_LIMIT;

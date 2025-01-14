@@ -56,7 +56,7 @@ module.exports = {
 			multiplier = 1.0e12;
 		}
 
-		amount = amount.replace(/[kmbt]/gi, "").replace(/,/g, ".");
+		amount = amount.replaceAll(/[kmbt]/gi, "").replaceAll(",", ".");
 		if (!Number(amount) || !Number.isFinite(Number(amount))) {
 			return {
 				success: false,

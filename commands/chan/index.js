@@ -244,7 +244,7 @@ module.exports = {
 		const delta = sb.Utils.timeDelta(new sb.Date(post.created));
 
 		if (post.content) {
-			post.content = post.content.replace(/>>\d+/g, "");
+			post.content = post.content.replaceAll(/>>\d+/g, "");
 
 			for (const { regex, string } of FOUR_CHAN_REPLACEMENTS) {
 				post.content = post.content.replace(regex, string);

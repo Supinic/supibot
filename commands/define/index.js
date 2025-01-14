@@ -107,7 +107,7 @@ module.exports = {
 					.sort((a, b) => b.thumbs_up - a.thumbs_up);
 
 				if (item) {
-					const definition = sb.Utils.wrapString(item.definition.replace(/[[\]]/g, ""), 150);
+					const definition = sb.Utils.wrapString(item.definition.replaceAll(/[[\]]/g, ""), 150);
 					result.push(`Urban: "${definition}"`);
 				}
 			}

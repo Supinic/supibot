@@ -61,7 +61,7 @@ module.exports = {
 		else {
 			let reply = response.body.result;
 			if (context.params.fixed !== false) {
-				reply = reply.replace(/(^")|("$)/g, "");
+				reply = reply.replaceAll(/(^")|("$)/g, "");
 			}
 
 			return {

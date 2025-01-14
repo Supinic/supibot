@@ -98,7 +98,7 @@ module.exports = {
 			};
 		}
 
-		let reminderText = args.join(" ").replace(/\s+/g, " ").trim();
+		let reminderText = args.join(" ").replaceAll(/\s+/g, " ").trim();
 
 		// const timedRegex = /\b(in|on|at)\b/i;
 		const timedRegex = /\b(in|at)\b/i;
@@ -175,7 +175,7 @@ module.exports = {
 			delta = sb.Utils.round(targetReminderDate - now, -3);
 		}
 		else if (timedRegex.test(reminderText)) {
-			reminderText = reminderText.replace(/\bhr\b/g, "hour");
+			reminderText = reminderText.replaceAll(/\bhr\b/g, "hour");
 			const timeData = sb.Utils.parseDuration(reminderText, { returnData: true });
 
 			if (timeData.ranges.length > 0) {
@@ -220,7 +220,7 @@ module.exports = {
 					}
 				}
 
-				reminderText = reminderText.replace(/\x00/g, "");
+				reminderText = reminderText.replaceAll("\u0000", "");
 			}
 		}
 

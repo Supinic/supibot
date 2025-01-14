@@ -53,7 +53,7 @@ const fixMarkdown = (text) => {
 		return text;
 	}
 	else {
-		const replaced = text.replace(/```/g, "`\u{200B}`\u{200B}`\u{200B}");
+		const replaced = text.replaceAll("```", "`\u{200B}`\u{200B}`\u{200B}");
 		return `\`\`\`${replaced}\`\`\``;
 	}
 };
@@ -742,7 +742,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 	parseMessage (messageObject) {
 		const stickers = messageObject.stickers.map(i => i.url ?? i.name);
 		const links = messageObject.attachments.map(i => i.proxyURL);
-		const content = messageObject.content.replace(/<(https?:\/\/.+?)>/g, "$1"); // Replaces all "un-embed" links' brackets
+		const content = messageObject.content.replaceAll(/<(https?:\/\/.+?)>/g, "$1"); // Replaces all "un-embed" links' brackets
 		const args = [
 			...content.split(" "),
 			...stickers,
@@ -760,7 +760,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		}
 
 		let index = 0;
-		let targetMessage = messageObject.cleanContent.replace(/\n/g, " ");
+		let targetMessage = messageObject.cleanContent.replaceAll("\n", " ");
 
 		const extras = [...stickers, ...links];
 		while (targetMessage.length < this.messageLimit && index < extras.length) {
@@ -769,8 +769,8 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		}
 
 		return {
-			msg: DiscordPlatform.removeEmoteTags(targetMessage.replace(/\s+/g, " ")),
-			user: messageObject.author.username.toLowerCase().replace(/\s/g, "_"),
+			msg: DiscordPlatform.removeEmoteTags(targetMessage.replaceAll(/\s+/g, " ")),
+			user: messageObject.author.username.toLowerCase().replaceAll(/\s/g, "_"),
 			chan: messageObject.channel.id,
 			channelType: messageObject.channel.type,
 			discordID: String(messageObject.author.id),
@@ -885,7 +885,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 	get permissions () { return PermissionFlagsBits; }
 
 	static removeEmoteTags (message) {
-		return message.replace(/<a?:(.*?):(\d*)>/g, (total, emote) => `${emote} `).trim();
+		return message.replaceAll(/<a?:(.*?):(\d*)>/g, (total, emote) => `${emote} `).trim();
 	}
 
 	static async fetchAccountChallengeStatus (userData, discordID) {
