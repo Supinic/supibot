@@ -30,6 +30,7 @@ export default tseslint.config(
 		},
 		rules: {
 			// "@typescript-eslint/no-floating-promises": "error",
+			// "@typescript-eslint/no-unused-vars": "warn",
 			"array-bracket-newline": ["warn", "consistent"],
 			"array-bracket-spacing": ["warn", "never"],
 			"array-element-newline": ["warn", "consistent"],
@@ -119,7 +120,6 @@ export default tseslint.config(
 			"no-underscore-dangle": "off",
 			"no-unneeded-ternary": "warn",
 			"no-unused-vars": "off",
-			// "@typescript-eslint/no-unused-vars": "warn",
 			"no-useless-computed-key": "warn",
 			"no-useless-constructor": "warn",
 			"no-useless-rename": "error",
