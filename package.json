@@ -4,7 +4,7 @@
   "dependencies": {
     "@jprochazk/roll-dice": "^0.4.2",
     "acorn-node": "^2.0.1",
-    "async-markov": "https://github.com/supinic/async-markov",
+    "async-markov": "supinic/async-markov",
     "bing-chat": "^0.2.3",
     "chrono-node": "^2.7.7",
     "cron": "^3.3.1",
@@ -13,7 +13,7 @@
     "irc-framework": "^4.14.0",
     "rss-parser": "^3.13.0",
     "supi-core": "supinic/supi-core",
-    "track-link-parser": "https://github.com/supinic/track-link-parser",
+    "track-link-parser": "supinic/track-link-parser",
     "transliteration": "^2.3.5",
     "vm2": "^3.9.19",
     "ws": "^8.18.0"
