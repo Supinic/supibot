@@ -42,9 +42,9 @@ module.exports = {
 			repeats = 1;
 		}
 
-		const result = new Array(repeats);
+		const result = [];
 		for (let i = 0; i < repeats; i++) {
-			result[i] = generateEmoji();
+			result.push(generateEmoji());
 		}
 
 		return {

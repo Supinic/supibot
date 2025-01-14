@@ -84,10 +84,12 @@ module.exports = {
 				};
 			}
 
-			default: return {
-				success: false,
-				reply: `Invalid type provided! Use one of these: ${RECORD_NAMES.join(", ")}`
-			};
+			default: {
+				return {
+					success: false,
+					reply: `Invalid type provided! Use one of these: ${RECORD_NAMES.join(", ")}`
+				};
+			}
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {

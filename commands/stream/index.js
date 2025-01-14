@@ -38,7 +38,7 @@ module.exports = {
 
 			case "ttslimit": {
 				const limit = Number(rest.shift());
-				if (!Number.isFinite(limit) || limit < 0 || limit > 300.0e3) {
+				if (!Number.isFinite(limit) || limit < 0 || limit > 300_000) {
 					return {
 						reply: "Invalid value provided! Must be in the range <0, 300000>."
 					};

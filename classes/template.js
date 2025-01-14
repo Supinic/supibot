@@ -106,7 +106,7 @@ module.exports = class ClassTemplate {
 		);
 
 		if (!data) {
-			return undefined;
+			return;
 		}
 		else if (!data.Type) {
 			throw new sb.Error({

@@ -246,7 +246,7 @@ module.exports = {
 					reply: "Timed reminders set in the past are only available for people that posess a time machine!"
 				};
 			}
-			else if (Math.abs(now - comparison) < 30.0e3) {
+			else if (Math.abs(now - comparison) < 30_000) {
 				return {
 					success: false,
 					reply: "You cannot set a timed reminder in less than 30 seconds!",

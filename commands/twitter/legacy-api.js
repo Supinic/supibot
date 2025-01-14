@@ -12,7 +12,7 @@ const fetchAuthData = async () => {
 			};
 		}
 
-		const credentials = Buffer.from(`${key}:${secret}`, "utf-8").toString("base64");
+		const credentials = Buffer.from(`${key}:${secret}`, "utf8").toString("base64");
 		const response = await sb.Got.get("GenericAPI")({
 			method: "POST",
 			url: "https://api.twitter.com/oauth2/token",

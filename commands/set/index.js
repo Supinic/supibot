@@ -70,7 +70,7 @@ module.exports = {
 				};
 			}
 
-			let IDs = args.map(i => Number(i)).filter(Boolean);
+			let IDs = args.map(Number).filter(Boolean);
 			if (args[0] === "last") {
 				if (typeof target.getLastID !== "function") {
 					return {

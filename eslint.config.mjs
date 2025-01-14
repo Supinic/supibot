@@ -5,6 +5,7 @@ import globals from "globals";
 
 export default tseslint.config(
 	eslintJs.configs.recommended,
+	unicornPlugin.configs["flat/recommended"],
 	// tseslint.configs.recommendedTypeChecked,
 	{
 		ignores: [".db/", "build/", "**/*.test.js", "**/*.d.ts", "**/*.d.mts"]
@@ -25,10 +26,26 @@ export default tseslint.config(
 			ecmaVersion: 2025,
 			sourceType: "module"
 		},
-		plugins: {
-			unicorn: unicornPlugin
-		},
+		// plugins: {
+		// 	unicorn: unicornPlugin
+		// },
 		rules: {
+			"unicorn/prevent-abbreviations": "off",
+			"unicorn/no-null": "off",
+			"unicorn/explicit-length-check": "off",
+			"unicorn/no-negated-condition": "off",
+			"unicorn/prefer-ternary": "off",
+			"unicorn/no-for-loop": "off",
+			"unicorn/text-encoding-identifier-case": "off", // Also applies to standalone strings rather than arguments => disable
+			"unicorn/no-typeof-undefined": "off",
+			"unicorn/no-static-only-class": "off",
+
+			"unicorn/prefer-switch": ["error", {
+				minimumCases: 4
+			}],
+
+			"unicorn/prefer-module": "off",
+
 			// "@typescript-eslint/no-floating-promises": "error",
 			// "@typescript-eslint/no-unused-vars": "warn",
 			"array-bracket-newline": ["warn", "consistent"],

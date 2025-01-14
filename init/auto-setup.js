@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-process-exit */
 (async () => {
 	console.log("Setting up query builder...");
 	try {

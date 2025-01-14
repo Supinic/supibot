@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-process-exit */
 const initializeDatabase = require("supi-db-init");
 const path = require("node:path");
 
