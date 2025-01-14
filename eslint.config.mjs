@@ -8,7 +8,7 @@ export default tseslint.config(
 	unicornPlugin.configs["flat/recommended"],
 	// tseslint.configs.recommendedTypeChecked,
 	{
-		ignores: [".db/", "build/", "**/*.test.js", "**/*.d.ts", "**/*.d.mts"]
+		ignores: [".db/", "coverage/", "build/", "**/*.test.js", "**/*.d.ts", "**/*.d.mts"]
 	},
 	{
 		languageOptions: {
