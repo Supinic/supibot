@@ -2,7 +2,7 @@ const config = require("./config.json");
 const Template = require("./gpt-template.js");
 const GptHistory = require("./history-control.js");
 
-const partialInstructionRolloutChannels = [30, 37, 38];
+const DEFAULT_SYSTEM_MESSAGE = "Keep the response as short and concise as possible.";
 
 module.exports = class GptOpenAI extends Template {
 	static async getHistoryMode (context) {
@@ -30,25 +30,9 @@ module.exports = class GptOpenAI extends Template {
 			];
 		}
 
-		let systemMessage = "Keep the response as short and concise as possible.";
-		if (context.params.context) {
-			if (!context.channel) {
-				throw new sb.Error({
-					message: `This functionality is being rolled out, and as such, it is not available in private messages!`
-				});
-			}
-			else if (!partialInstructionRolloutChannels.includes(context.channel.ID)) {
-				throw new sb.Error({
-					reply: `This functionality is being rolled out, and as such, it is not available in this channel!`
-				});
-			}
-
-			systemMessage = context.params.context;
-		}
-
 		if (context.params.image) {
 			return [
-				{ role: "system", content: systemMessage },
+				{ role: "system", content: DEFAULT_SYSTEM_MESSAGE },
 				...promptHistory,
 				{
 					role: "user",
@@ -61,7 +45,7 @@ module.exports = class GptOpenAI extends Template {
 		}
 		else {
 			return [
-				{ role: "system", content: systemMessage },
+				{ role: "system", content: DEFAULT_SYSTEM_MESSAGE },
 				...promptHistory,
 				{ role: "user", content: query }
 			];

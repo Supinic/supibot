@@ -6,7 +6,7 @@ const {
 	SONG_REQUESTS_STATE
 } = require("../../utils/shared-cache-keys.json");
 
-const AVAILABLE_SONG_REQUEST_STATES = ["cytube", "vlc", "off"];
+const AVAILABLE_SONG_REQUEST_STATES = new Set(["cytube", "vlc", "off"]);
 
 module.exports = {
 	Name: "stream",
@@ -71,7 +71,7 @@ module.exports = {
 
 			case "sr": {
 				const value = (rest.shift() || "").toLowerCase();
-				if (!AVAILABLE_SONG_REQUEST_STATES.includes(value)) {
+				if (!AVAILABLE_SONG_REQUEST_STATES.has(value)) {
 					return {
 						reply: "Invalid song request state!"
 					};

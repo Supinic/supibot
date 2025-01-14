@@ -56,8 +56,8 @@ module.exports = {
 
 		let filteredData = data;
 		if (context.params.syntax) {
-			const syntaxList = context.params.syntax.split(/\W+/).filter(Boolean);
-			filteredData = data.filter(i => syntaxList.includes(i.syntax.toLowerCase()));
+			const syntaxList = new Set(context.params.syntax.split(/\W+/).filter(Boolean));
+			filteredData = data.filter(i => syntaxList.has(i.syntax.toLowerCase()));
 		}
 		else if (syntax) {
 			filteredData = data.filter(i => i.syntax.toLowerCase() === syntax.toLowerCase());

@@ -1,5 +1,5 @@
 const loadCommands = (async (config) => {
-	const fs = require("fs/promises");
+	const fs = require("node:fs/promises");
 	const path = require("node:path");
 
 	const blacklist = config?.blacklist ?? [];

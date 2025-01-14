@@ -111,7 +111,7 @@ module.exports = {
 			try {
 				rss = await parseRSS(xml);
 			}
-			catch (e) {
+			catch {
 				await sb.Logger.log(
 					"Command.Warning",
 					`Invalid Mastodon RSS feed: ${url}`,

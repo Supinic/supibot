@@ -7,7 +7,7 @@ const checkLatency = async (callback, ...args) => {
 		const start = process.hrtime.bigint();
 		await callback(...args);
 
-		return sb.Utils.round(Number(process.hrtime.bigint() - start) / 1.0e6, 3);
+		return sb.Utils.round(Number(process.hrtime.bigint() - start) / 1_000_000, 3);
 	}
 	catch {
 		return null;
