@@ -586,6 +586,7 @@ module.exports = class Filter extends require("./template.js") {
 	 * @param {sb.Command.Name} [options.Command]
 	 * @param {sb.User.ID} [options.User_Alias]
 	 * @param {string} [options.Reason]
+	 * @param {string} [options.Response]
 	 * @param {string} [options.Invocation]
 	 * @param {Object} [options.Data]
 	 * @param {FilterType} [options.Type]
@@ -598,11 +599,11 @@ module.exports = class Filter extends require("./template.js") {
 			Channel: options.Channel ?? null,
 			Command: options.Command ?? null,
 			User_Alias: options.User_Alias ?? null,
-			Reason: options.Reason ?? null,
 			Invocation: options.Invocation ?? null,
 			Data: options.Data ?? null,
 			Type: options.Type ?? "Blacklist",
-			Response: "Auto",
+			Response: options.Response ?? "Auto",
+			Reason: options.Reason ?? null,
 			Blocked_User: options.Blocked_User ?? null,
 			Active: true,
 			Issued_By: options.Issued_By
