@@ -55,7 +55,9 @@ module.exports = {
 	}),
 	Dynamic_Description: async () => {
 		const list = [];
-		for (const [game, subcommands] of Object.entries(GAMES)) {
+		for (const [game, definition] of Object.entries(GAMES)) {
+			const { subcommands } = definition;
+
 			list.push(`<h5>$${game}</h5>`);
 
 			for (const subcommand of subcommands) {
