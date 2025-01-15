@@ -116,7 +116,8 @@ module.exports = {
 	initialize: function () {
 		const BASE_QUERY = sb.Utils.tag.trim `
 			Concisely summarize the following messages from an online chatroom %CHANNEL_NAME%
-			(attempt to ignore chat bots replying to users' commands, and assume unfamiliar words to be emotes)
+			(ignore chat bots replying to users' commands, and assume unfamiliar words to be emotes).
+			Reply only in English.
 		`;
 
 		this.data.queries = {
