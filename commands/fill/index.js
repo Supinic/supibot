@@ -42,7 +42,7 @@ module.exports = {
 				user: null,
 				channel: context.channel.ID,
 				length: (live && !context.append.pipe)
-					? 60.0e3 // 1 minute
+					? 60_000 // 1 minute
 					: this.Cooldown
 			};
 		}

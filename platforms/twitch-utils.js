@@ -445,7 +445,7 @@ const initSubCacheCheckInterval = () => {
 	setInterval(async () => await getExistingSubscriptions(true), SUBSCRIPTIONS_CACHE_INTERVAL / 2);
 };
 
-const sanitizeMessage = (string) => string.replace(/^\x01ACTION (.+)\x01$/, "$1");
+const sanitizeMessage = (string) => string.replace(/^\u0001ACTION (.+)\u0001$/, "$1");
 
 module.exports = {
 	getConduitId,

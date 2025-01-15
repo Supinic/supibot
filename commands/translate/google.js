@@ -39,7 +39,7 @@ const execute = async function (context, query) {
 				}
 
 				const $ = sb.Utils.cheerio(response.body);
-				const codes = Array.from($("[data-language-code]")).map(i => i.attribs["data-language-code"]);
+				const codes = [...$("[data-language-code]")].map(i => i.attribs["data-language-code"]);
 				const list = new Set(codes.filter(i => {
 					if (i === "auto" || i.includes("-")) {
 						return false;
@@ -48,7 +48,7 @@ const execute = async function (context, query) {
 					return Boolean(LanguageCodes.get(i));
 				}));
 
-				codeList = Array.from(list);
+				codeList = [...list];
 
 				await sb.Cache.setByPrefix(LANGUAGE_LIST_KEY, codeList, {
 					expiry: 864e5 // 1 day

@@ -45,7 +45,7 @@ module.exports = [
 				return false;
 			}
 
-			const allowedTypes = ["boolean", "date", "number", "string", "object", "regex", "language"];
+			const allowedTypes = new Set(["boolean", "date", "number", "string", "object", "regex", "language"]);
 			const paramNames = new Set();
 			const params = v.elements;
 			for (const param of params) {
@@ -70,7 +70,7 @@ module.exports = [
 					console.warn(`Duplicate parameter name "${nameProp.value.value}"`);
 					return false;
 				}
-				else if (!typeProp || typeProp.value.type !== "Literal" || !allowedTypes.includes(typeProp.value.value)) {
+				else if (!typeProp || typeProp.value.type !== "Literal" || !allowedTypes.has(typeProp.value.value)) {
 					console.warn(`Invalid type property`);
 					return false;
 				}

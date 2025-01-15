@@ -203,7 +203,8 @@ module.exports = {
 							Added_By: context.user.ID
 						});
 
-						authorID = (await authorRow.save()).insertId;
+						const result = await authorRow.save();
+						authorID = result.insertId;
 					}
 
 					const authorRow = await sb.Query.getRow("music", "Track_Author");

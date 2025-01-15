@@ -17,7 +17,7 @@ module.exports = {
 		try {
 			data = await linkParser.fetchData(link);
 		}
-		catch (e) {
+		catch {
 			return { reply: "Unable to parse link." };
 		}
 

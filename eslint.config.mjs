@@ -40,6 +40,11 @@ export default tseslint.config(
 			"unicorn/no-typeof-undefined": "off",
 			"unicorn/no-static-only-class": "off",
 			"unicorn/switch-case-braces": "off",
+			"unicorn/prefer-default-parameters": "off",
+			"unicorn/prefer-type-error": "off",
+			"unicorn/no-anonymous-default-export": "off", // Remove when refactored to imports/exports
+			"unicorn/no-array-method-this-argument": "off", // Doesn't work for custom array methods
+			"unicorn/no-array-callback-reference": "off", // Doesn't work for custom array methods either
 
 			"unicorn/prefer-switch": ["error", {
 				minimumCases: 4

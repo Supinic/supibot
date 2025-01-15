@@ -182,10 +182,11 @@ module.exports = class VLCSingleton {
 		});
 
 		client.on("playlistchange", async (prev, next) => {
+			// @todo convert to Set intersection methods when available
 			const previousIDs = prev.children[0].children.map(i => Number(i.id));
-			const nextIDs = next.children[0].children.map(i => Number(i.id));
+			const nextIDs = new Set(next.children[0].children.map(i => Number(i.id)));
 
-			const missingIDs = previousIDs.filter(id => !nextIDs.includes(id));
+			const missingIDs = previousIDs.filter(id => !nextIDs.has(id));
 			if (missingIDs.length > 0) {
 				const noUpdateIDs = [];
 				for (const item of prev.children[0].children) {
@@ -267,7 +268,8 @@ module.exports = class VLCSingleton {
 	 * @returns {Promise<Object>}
 	 */
 	async getPlaylist (command, options) {
-		return (await this.send(command, options, "playlist.json")).children[0];
+		const response = await this.send(command, options, "playlist.json");
+		return response.children[0];
 	}
 
 	async status () { return await this.getStatus(); }
@@ -300,7 +302,9 @@ module.exports = class VLCSingleton {
 			await this.getStatus("in_enqueue", { input: link });
 		}
 
-		return Math.max(...(await this.getPlaylist()).children.map(i => i.id));
+		const playlistData = await this.getPlaylist();
+		const ids = playlistData.children.map(i => i.id);
+		return Math.max(...ids);
 	}
 
 	async currentlyPlaying () {
@@ -385,7 +389,7 @@ module.exports = class VLCSingleton {
 	}
 
 	get currentPlaylistItem () {
-		const list = this.currentPlaylist.slice();
+		const list = [...this.currentPlaylist];
 		while (list.length > 0) {
 			const item = list.shift();
 			if (item.current === "current") {

@@ -33,7 +33,7 @@ const NO_EVENT_RECONNECT_TIMEOUT = 10000; // @todo move to config
 const LIVE_STREAMS_KEY = "twitch-live-streams";
 const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
 const BAD_MESSAGE_RESPONSE = "A message that was about to be posted violated this channel's moderation settings.";
-const MESSAGE_MODERATION_CODES = ["channel_settings", "automod_held"];
+const MESSAGE_MODERATION_CODES = new Set(["channel_settings", "automod_held"]);
 
 const DEFAULT_LOGGING_CONFIG = {
 	bits: false,
@@ -134,9 +134,11 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				await createWhisperMessageSubscription(this.selfId);
 			}
 
-			const existingChannels = existingSubs.filter(i => i.type === "channel.chat.message").map(i => i.condition.broadcaster_user_id);
+			const existingChannels = existingSubs.filter(i => i.type === "channel.chat.message");
+			const existingIds = new Set(existingChannels.map(i => i.condition.broadcaster_user_id));
+
 			const channelList = sb.Channel.getJoinableForPlatform(this);
-			const missingChannels = channelList.filter(i => !existingChannels.includes(i.Specific_ID));
+			const missingChannels = channelList.filter(i => !existingIds.includes(i.Specific_ID));
 
 			const batchSize = 100;
 			for (let index = 0; index < missingChannels.length; index += batchSize) {
@@ -341,7 +343,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				replyData
 			});
 
-			if (MESSAGE_MODERATION_CODES.includes(replyData.drop_reason.code) && baseMessage !== BAD_MESSAGE_RESPONSE) {
+			if (MESSAGE_MODERATION_CODES.has(replyData.drop_reason.code) && baseMessage !== BAD_MESSAGE_RESPONSE) {
 				await this.send(BAD_MESSAGE_RESPONSE, channel);
 			}
 		}
@@ -665,13 +667,13 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		// Own message - check the regular/vip/mod/broadcaster status, and skip
 		if (channelData && senderUserId === this.selfId) {
-			const flatBadges = badges.map(i => i.set_id);
+			const flatBadges = new Set(badges.map(i => i.set_id));
 			const oldMode = channelData.Mode;
 
-			if (flatBadges.includes("moderator") || flatBadges.includes("broadcaster")) {
+			if (flatBadges.has("moderator") || flatBadges.has("broadcaster")) {
 				channelData.Mode = "Moderator";
 			}
-			else if (flatBadges.includes("vip")) {
+			else if (flatBadges.has("vip")) {
 				channelData.Mode = "VIP";
 			}
 			else {
@@ -1356,7 +1358,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 	static async createAccountChallenge (userData, twitchID) {
 		const row = await sb.Query.getRow("chat_data", "User_Verification_Challenge");
-		const challenge = require("crypto")
+		const challenge = require("node:crypto")
 			.randomBytes(16)
 			.toString("hex");
 

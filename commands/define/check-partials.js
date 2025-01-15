@@ -1,4 +1,4 @@
-const filterReasons = ["blacklist", "arguments", "opt-out"];
+const FILTER_REASONS = new Set(["blacklist", "arguments", "opt-out"]);
 const checkCommand = async (context, commandData, args) => await sb.Filter.execute({
 	user: context.user,
 	command: commandData,
@@ -17,9 +17,9 @@ module.exports = {
 		]);
 
 		return {
-			dictionary: !filterReasons.includes(dictFilter.reason),
-			urban: !filterReasons.includes(urbanFilter.reason),
-			wiki: !filterReasons.includes(wikiFilter.reason)
+			dictionary: !FILTER_REASONS.has(dictFilter.reason),
+			urban: !FILTER_REASONS.has(urbanFilter.reason),
+			wiki: !FILTER_REASONS.has(wikiFilter.reason)
 		};
 	}
 };

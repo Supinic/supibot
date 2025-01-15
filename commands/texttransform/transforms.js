@@ -42,7 +42,7 @@ const convert = {
 	}
 };
 
-const textCaseCode = require("./textCaseCode.js");
+const textCaseCode = require("./text-case-code.js");
 const officialCharactersMap = require("./definitions/official-characters.json");
 
 /**
@@ -245,7 +245,7 @@ const types = [
 		name: "binary",
 		type: "method",
 		aliases: ["bin"],
-		data: (message) => [...message].map(i => ("0".repeat(8) + i.charCodeAt(0).toString(2)).slice(-8)).join(" "),
+		data: (message) => [...message].map(i => ("0".repeat(8) + i.codePointAt(0).toString(2)).slice(-8)).join(" "),
 		reverseData: (message) => {
 			const list = [...message];
 			let word = "";
@@ -350,7 +350,8 @@ const types = [
 				const suffixThreshold = -Math.max(prefixThreshold - 1, 1);
 
 				const scrambled = [];
-				const chars = word.slice(prefixThreshold, suffixThreshold).split("");
+				const slicedWord = word.slice(prefixThreshold, suffixThreshold);
+				const chars = [...slicedWord];
 
 				while (chars.length > 0) {
 					const randomIndex = randomInt(0, chars.length - 1);
@@ -403,10 +404,13 @@ const types = [
 		type: "method",
 		aliases: ["hexadecimal"],
 		description: "Transforms your input into a string of hexadecimal identifiers, based on their ASCII representation. The characters should be two-byte, separated or not.",
-		data: (string) => Array.from(new TextEncoder().encode(string)).map(i => i.toString(16)).join(""),
+		data: (string) => {
+			const encodedString = new TextEncoder().encode(string);
+			return [...encodedString].map(i => i.toString(16)).join("");
+		},
 		reverseData: (string) => {
 			const regexMatch = string.matchAll(/([a-f0-9]{2})(\W)?/gi);
-			const hexArray = Array.from(regexMatch).map(i => parseInt(i[1], 16));
+			const hexArray = [...regexMatch].map(i => Number.parseInt(i[1], 16));
 
 			return new TextDecoder().decode(new Uint8Array(hexArray));
 		}

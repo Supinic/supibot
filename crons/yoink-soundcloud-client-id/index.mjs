@@ -35,7 +35,7 @@ export const definition = {
 
 		const $ = sb.Utils.cheerio(mainPageResponse.body);
 		const elements = $("body > script[crossorigin]");
-		const scripts = Array.from(elements).map(i => $(i).attr("src"));
+		const scripts = [...elements].map(i => $(i).attr("src"));
 
 		let finalClientID;
 		for (const script of scripts) {

@@ -47,11 +47,11 @@ class Platform {
 
 		this.#data = {
 			...defaults.platform,
-			...config.platform ?? {}
+			...config.platform
 		};
 		this.#loggingConfig = {
 			...defaults.logging,
-			...config.logging ?? {}
+			...config.logging
 		};
 
 		this.#globalEmoteCacheKey = `global-emotes-${this.#id}`;
@@ -511,7 +511,7 @@ class Platform {
 		try {
 			InstancePlatform = require(`./${type}.js`);
 		}
-		catch (e) {
+		catch {
 			console.log(`No file found for platform "${type}", creating generic platform`);
 			return new Platform(type, config);
 		}

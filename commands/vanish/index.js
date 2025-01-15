@@ -27,21 +27,21 @@ module.exports = {
 			};
 		}
 
-		const badges = context.append.badges.map(i => i.set_id);
-		if (badges.includes("moderator")) {
+		const badges = new Set(context.append.badges.map(i => i.set_id));
+		if (badges.has("moderator")) {
 			return {
 				success: false,
 				reply: "I cannot time moderators out! monkaS"
 			};
 		}
-		else if (badges.includes("broadcaster")) {
+		else if (badges.has("broadcaster")) {
 			const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "LuL"], "😄");
 			return {
 				success: false,
 				reply: `Why are you trying to vanish in your own channel? ${emote}`
 			};
 		}
-		else if (badges.includes("staff")) {
+		else if (badges.has("staff")) {
 			return {
 				success: false,
 				reply: "I cannot time Twitch staff out! monkaS"

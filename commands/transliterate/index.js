@@ -40,7 +40,9 @@ module.exports = {
 
 			const html = response.body;
 			const $ = sb.Utils.cheerio(html);
-			const words = Array.from($("#div-ichiran-result span.ds-text:not(.hidden) span.ds-word")).map(i => i.firstChild.data);
+
+			const els = $("#div-ichiran-result span.ds-text:not(.hidden) span.ds-word");
+			const words = [...els].map(i => i.firstChild.data);
 
 			if (words.length > 0) {
 				return {

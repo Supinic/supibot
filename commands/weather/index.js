@@ -60,13 +60,14 @@ module.exports = {
 		const historyRegex = /-\s*\d/;
 
 		if (args.length > 0) {
-			if (historyRegex.test(args[args.length - 1])) {
+			const last = args.at(-1);
+			if (historyRegex.test(last)) {
 				return {
 					success: false,
 					reply: "Checking for weather history is not currently implemented"
 				};
 			}
-			else if (args && weatherRegex.test(args[args.length - 1])) {
+			else if (args && weatherRegex.test(last)) {
 				const match = args.pop().match(weatherRegex);
 				if (!match[1] || !match[2]) {
 					return {
@@ -149,7 +150,7 @@ module.exports = {
 					reply: `Supibot, Supinic's LACK table: ${temperature}. No wind detected. No precipitation expected.`
 				};
 			}
-			catch (e) {
+			catch {
 				return {
 					success: false,
 					reply: `Supibot, Supinic's LACK table: Unknown temperature, something is wrong with the configuration!`

@@ -134,7 +134,7 @@ class CytubeClient {
 			if (!data.meta.private) {
 				// Do not process mirrored messages
 				const identifiers = sb.Platform.list.map(i => i.mirrorIdentifierr);
-				if (originalUsername === this.platform.selfName && identifiers.includes(Array.from(msg)[0])) {
+				if (originalUsername === this.platform.selfName && identifiers.some(i => msg.startsWith(i))) {
 					return;
 				}
 
@@ -266,7 +266,7 @@ class CytubeClient {
 				return;
 			}
 
-			this.emotes = emoteList.map(CytubeClient.parseEmote);
+			this.emotes = emoteList.map(i => CytubeClient.parseEmote(i));
 		});
 
 		client.on("updateEmote", (emote) => {

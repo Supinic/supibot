@@ -205,7 +205,7 @@ module.exports = {
 					// Remove the possible preceding "in" keyword, regardless of which range it is used in
 					const keywordIndex = reminderText.slice(0, current.start).lastIndexOf("in");
 					if (current.start - keywordIndex === 3) {
-						reminderText = reminderText.slice(0, keywordIndex) + "\x00".repeat(3) + reminderText.slice(current.start);
+						reminderText = reminderText.slice(0, keywordIndex) + "\u0000".repeat(3) + reminderText.slice(current.start);
 					}
 
 					// and only continue if it matches a "time word separator", such as the word "and", space, comma, ...
@@ -215,7 +215,7 @@ module.exports = {
 					}
 					else {
 						const amount = next.start - current.start;
-						reminderText = reminderText.slice(0, current.start) + "\x00".repeat(amount) + reminderText.slice(next.start);
+						reminderText = reminderText.slice(0, current.start) + "\u0000".repeat(amount) + reminderText.slice(next.start);
 						continues = true;
 					}
 				}

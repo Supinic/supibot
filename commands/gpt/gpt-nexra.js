@@ -1,4 +1,4 @@
-const { setTimeout: wait } = require("timers/promises");
+const { setTimeout: wait } = require("node:timers/promises");
 
 const GptOpenAI = require("./gpt-openai.js");
 const GptHistory = require("./history-control.js");

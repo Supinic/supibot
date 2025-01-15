@@ -87,8 +87,9 @@ const initializeCommands = async (config) => {
 (async () => {
 	const platformsConfig = config.platforms;
 	if (!platformsConfig || platformsConfig.length === 0) {
-		console.warn("No platforms configured! Supibot will now exit.");
-		process.exit(0);
+		throw new sb.Error({
+			message: "No platforms configured! Supibot will now exit."
+		});
 	}
 
 	console.groupCollapsed("Initialize timers");

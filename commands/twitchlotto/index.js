@@ -43,8 +43,8 @@ module.exports = {
 				};
 			}
 
-			const excludedChannels = excludedInput.split(/\W/).filter(i => this.data.channels.includes(i));
-			let availableChannels = this.data.channels.filter(i => !excludedChannels.includes(i));
+			const excludedChannels = new Set(excludedInput.split(/\W/).filter(i => this.data.channels.includes(i)));
+			let availableChannels = this.data.channels.filter(i => !excludedChannels.has(i));
 
 			if (context.params.forceUnscored) {
 				const eligibleChannels = await sb.Query.getRecordset(rs => rs
