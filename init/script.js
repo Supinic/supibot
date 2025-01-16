@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-process-exit */
 const initializeDatabase = require("supi-db-init");
 const path = require("node:path");
 
@@ -39,12 +38,4 @@ const config = {
 	}
 };
 
-initializeDatabase(config)
-	.then(() => {
-		console.log("OK");
-		process.exit();
-	})
-	.catch(e => {
-		console.error(e);
-		process.exit();
-	});
+await initializeDatabase(config);

@@ -43,14 +43,13 @@ export default tseslint.config(
 			"unicorn/prefer-default-parameters": "off",
 			"unicorn/prefer-type-error": "off",
 			"unicorn/no-anonymous-default-export": "off", // Remove when refactored to imports/exports
+			"unicorn/prefer-module": "off", // Remove when refactored to imports/exports too
 			"unicorn/no-array-method-this-argument": "off", // Doesn't work for custom array methods
 			"unicorn/no-array-callback-reference": "off", // Doesn't work for custom array methods either
 
 			"unicorn/prefer-switch": ["error", {
 				minimumCases: 4
 			}],
-
-			"unicorn/prefer-module": "off",
 
 			// "@typescript-eslint/no-floating-promises": "error",
 			// "@typescript-eslint/no-unused-vars": "warn",
