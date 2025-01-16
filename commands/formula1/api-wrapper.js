@@ -135,7 +135,7 @@ const fetchRaceResults = async (year, round) => {
 const fetchNextRaceDetail = async (context) => {
 	const { month, year } = new sb.Date();
 	const race = await fetchRace(year, "current");
-	if (!race) {
+	if (!race || !race.success) {
 		// Bump season year only if we are in Nov/Dec, keep the same year otherwise
 		const nextSeason = (month >= 11) ? (year + 1) : year;
 		const backupRace = BACKUP_RACE_DATA[nextSeason];
