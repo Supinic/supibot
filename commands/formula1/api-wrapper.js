@@ -133,18 +133,19 @@ const fetchRaceResults = async (year, round) => {
 };
 
 const fetchNextRaceDetail = async (context) => {
-	const year = new sb.Date().year;
+	const { month, year } = new sb.Date();
 	const race = await fetchRace(year, "current");
 	if (!race) {
-		const nextYear = year + 1;
-		const backupRace = BACKUP_RACE_DATA[nextYear];
+		// Bump season year only if we are in Nov/Dec, keep the same year otherwise
+		const nextSeason = (month >= 11) ? (year + 1) : year;
+		const backupRace = BACKUP_RACE_DATA[nextSeason];
 		if (backupRace) {
 			const delta = sb.Utils.timeDelta(new sb.Date(backupRace.date));
 			return {
 				success: true,
 				reply: sb.Utils.tag.trim `
 					This year's season is finished.
-					The first race of next year's season is ${backupRace.name},
+					The first race of the next season is ${backupRace.name},
 					taking place ${delta}.
 				 `
 			};
