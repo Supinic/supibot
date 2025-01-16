@@ -145,7 +145,7 @@ const fetchNextRaceDetail = async (context) => {
 				success: true,
 				reply: sb.Utils.tag.trim `
 					The ${year - 1} season is finished.
-					The first race of the ${year} season} is ${backupRace.name},
+					The first race of the ${year} season is ${backupRace.name},
 					taking place ${delta}.
 				 `
 			};
