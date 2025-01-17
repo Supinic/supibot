@@ -147,7 +147,7 @@ module.exports = (command) => [
 	{
 		name: "chatgpt",
 		aliases: ["chat-gpt", "gpt"],
-		description: "Posts either: how many tokens you (or someone else) have used recently in the $gpt command; if used with \"total\", shows your total token amount overall; or, if used with \"global\", the amount of USD @Supinic has been billed so far this month.",
+		description: "Posts either: how many tokens you (or someone else) have used recently in the $gpt command; if used with \"total\", shows your total token amount overall.",
 		execute: async (context, target) => {
 			if (target === "total") {
 				const total = await sb.Query.getRecordset(rs => rs
