@@ -1,3 +1,6 @@
+const loadDefinitions = require("./statistics.js");
+const definitions = loadDefinitions();
+
 module.exports = {
 	Name: "statistics",
 	Aliases: ["stat","stats"],
@@ -19,9 +22,6 @@ module.exports = {
 			};
 		}
 
-		const loadDefinitions = require("./statistics.js");
-		const definitions = loadDefinitions();
-
 		type = type.toLowerCase();
 		const target = definitions.find(i => i.name === type || i.aliases.includes(type));
 		if (!target) {
@@ -36,9 +36,6 @@ module.exports = {
 		return await target.execute(context, type, ...args);
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const loadDefinitions = await require("./statistics.js");
-		const definitions = await loadDefinitions();
-
 		const list = definitions.map(i => {
 			const names = [i.name, ...i.aliases].sort().map(j => `<code>${j}</code>`).join(" | ");
 			return `${names}<br>${i.description}`;

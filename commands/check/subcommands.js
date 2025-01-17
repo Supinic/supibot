@@ -149,34 +149,7 @@ module.exports = (command) => [
 		aliases: ["chat-gpt", "gpt"],
 		description: "Posts either: how many tokens you (or someone else) have used recently in the $gpt command; if used with \"total\", shows your total token amount overall; or, if used with \"global\", the amount of USD @Supinic has been billed so far this month.",
 		execute: async (context, target) => {
-			if (target === "global") {
-				// `Date.prototype.setDate` returns a number (!)
-				const startDate = new sb.Date(new sb.Date().setDate(1));
-				const endDate = new sb.Date(startDate.year, startDate.month + 1, 1);
-
-				const tokenResponse = await sb.Query.getRecordset(rs => rs
-					.select("COUNT(*) AS Count", "SUM(Input_Tokens) AS Input", "SUM(Output_Tokens) AS Output")
-					.from("data", "ChatGPT_Log")
-					.where("Executed >= %d AND Executed <= %d", startDate, endDate)
-					.single()
-				);
-
-				const requests = tokenResponse.Count;
-				const inputTokens = tokenResponse.Input;
-				const outputTokens = tokenResponse.Output;
-
-				const prettyMonthName = new sb.Date().format("F Y");
-				return {
-					reply: sb.Utils.tag.trim `
-						There have been ${sb.Utils.groupDigits(requests)} 
-						ChatGPT requests in ${prettyMonthName} so far. 
-						${sb.Utils.groupDigits(inputTokens)} input
-						and ${sb.Utils.groupDigits(outputTokens)} output tokens
-						have been processed.
-					`
-				};
-			}
-			else if (target === "total") {
+			if (target === "total") {
 				const total = await sb.Query.getRecordset(rs => rs
 					.select("(SUM(Input_Tokens) + SUM(Output_Tokens)) AS Total")
 					.from("data", "ChatGPT_Log")
