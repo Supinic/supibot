@@ -7,7 +7,7 @@ module.exports = {
 		const tokenResponse = await sb.Query.getRecordset(rs => rs
 			.select("COUNT(*) AS Count", "SUM(Input_Tokens) AS Input", "SUM(Output_Tokens) AS Output")
 			.from("data", "ChatGPT_Log")
-			.where("YEAR(Executed) = %d AND MONTH(Executed) = %d", year, month)
+			.where("YEAR(Executed) = %n AND MONTH(Executed) = %n", year, month)
 			.single()
 		);
 
