@@ -1,3 +1,4 @@
+const fs = require("node:fs").promises;
 const { CronJob } = require("cron");
 
 let config;
@@ -66,8 +67,6 @@ module.exports = {
 		}
 
 		const module = sb.ChatModule.get("async-markov-experiment");
-		const fs = require("node:fs").promises;
-
 		for (const [channelID, markov] of module.data.markovs.entries()) {
 			if (markov.size < MODEL_SIZE_THRESHOLD) {
 				continue;
@@ -176,25 +175,7 @@ module.exports = {
 			}
 
 			const { debug } = context.params;
-			const fs = require("node:fs").promises;
-			const fileName = `markov-dump-${new sb.Date().format("Y-m-d")}-channel-${targetChannel.ID}.json`;
-			if (debug === "save") {
-				await fs.writeFile(`${BASE_PATH}/markovs/${fileName}`, JSON.stringify(markov));
-				return {
-					reply: `Markov module data successfully saved to file.`
-				};
-			}
-			else if (debug === "load") {
-				const loadFileName = input ?? fileName;
-				const data = await fs.readFile(`${BASE_PATH}/markovs/${loadFileName}`);
-				markov.reset();
-				markov.load(data.toString());
-
-				return {
-					reply: `Markov module data successfully loaded from file.`
-				};
-			}
-			else if (debug === "reset") {
+			if (debug === "reset") {
 				markov.reset();
 				return {
 					reply: `Markov module reset successfully.`
