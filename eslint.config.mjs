@@ -46,6 +46,7 @@ export default tseslint.config(
 			"unicorn/prefer-module": "off", // Remove when refactored to imports/exports too
 			"unicorn/no-array-method-this-argument": "off", // Doesn't work for custom array methods
 			"unicorn/no-array-callback-reference": "off", // Doesn't work for custom array methods either
+			"unicorn/prefer-event-target": "off", // Not necessary at the moment, can be considered if project moves away from Node
 
 			"unicorn/prefer-switch": ["error", {
 				minimumCases: 4
