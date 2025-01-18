@@ -23,11 +23,10 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node --env-file=.env --enable-experimental-regexp-engine ./build/master.js",
-    "debug": "tsc && node --env-file=.env --enable-experimental-regexp-engine --inspect=0.0.0.0:9229 --unhandled-rejections=warn ./build/master.js",
-    "init-database": "tsc && node ./init/script.js",
-    "setup": "tsc && node --env-file=.env ./init/setup.js",
-    "auto-setup": "tsc && node --env-file=.env ./init/auto-setup.js",
+    "start": "tsc && node --env-file=.env --enable-experimental-regexp-engine ./build/master.mjs",
+    "debug": "tsc && node --env-file=.env --enable-experimental-regexp-engine --inspect=0.0.0.0:9229 --unhandled-rejections=warn ./build/master.mjs",
+    "init-database": "tsc && node ./init/script.mjs",
+    "auto-setup": "tsc && node --env-file=.env ./init/auto-setup.mjs",
     "dev-update": "git pull origin master && yarn up supi-core@supinic/supi-core && tsc",
     "prod-update": "git pull origin master && yarn workspaces focus --production -A && tsc",
     "dev-deps-push": "yarn dev-update && git commit ./yarn.lock -m \"bumped dependencies\" && git pull && git push",
@@ -37,7 +36,7 @@
     "test": "mocha ./tests --recursive --exit",
     "coverage": "nyc yarn test"
   },
-  "main": "build/master.js",
+  "main": "build/master.mjs",
   "author": "Supinic <supinic@protonmail.com>",
   "repository": "github:Supinic/supibot",
   "license": "AGPL-3.0",
@@ -61,5 +60,5 @@
       "html"
     ]
   },
-  "packageManager": "yarn@4.5.0"
+  "packageManager": "yarn@4.6.0"
 }

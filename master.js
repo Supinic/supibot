@@ -84,6 +84,8 @@ const initializeCommands = async (config) => {
 	console.timeEnd("Load commands");
 };
 
+// @todo remove when properly refactored to ESM
+// eslint-disable-next-line unicorn/prefer-top-level-await
 (async () => {
 	const platformsConfig = config.platforms;
 	if (!platformsConfig || platformsConfig.length === 0) {

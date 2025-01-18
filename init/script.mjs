@@ -1,5 +1,5 @@
-const initializeDatabase = require("supi-db-init");
-const path = require("node:path");
+import initializeDatabase from "supi-db-init";
+import path from "node:path";
 
 const config = {
 	auth: {
