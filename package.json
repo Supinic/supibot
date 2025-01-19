@@ -23,8 +23,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node --env-file=.env --enable-experimental-regexp-engine ./build/master.mjs",
-    "debug": "tsc && node --env-file=.env --enable-experimental-regexp-engine --inspect=0.0.0.0:9229 --unhandled-rejections=warn ./build/master.mjs",
+    "start": "tsc && node --env-file=.env --enable-experimental-regexp-engine ./build/master.js",
+    "debug": "tsc && node --env-file=.env --enable-experimental-regexp-engine --inspect=0.0.0.0:9229 --unhandled-rejections=warn ./build/master.js",
     "init-database": "tsc && node ./init/script.mjs",
     "auto-setup": "tsc && node --env-file=.env ./init/auto-setup.mjs",
     "dev-update": "git pull origin master && yarn up supi-core@supinic/supi-core && tsc",
@@ -36,7 +36,7 @@
     "test": "mocha ./tests --recursive --exit",
     "coverage": "nyc yarn test"
   },
-  "main": "build/master.mjs",
+  "main": "build/master.js",
   "author": "Supinic <supinic@protonmail.com>",
   "repository": "github:Supinic/supibot",
   "license": "AGPL-3.0",
@@ -49,7 +49,7 @@
     "globals": "^15.14.0",
     "mocha": "^11.0.1",
     "nyc": "^17.1.0",
-    "supi-db-init": "https://github.com/supinic/supi-db-init",
+    "supi-db-init": "supinic/supi-db-init",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
   },
