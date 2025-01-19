@@ -1,5 +1,5 @@
-const { searchYoutube } = require("../../utils/command-utils.js");
-const { getLinkParser } = require("../../utils/link-parser.js");
+import { searchYoutube } from "../../utils/command-utils.js";
+import { getLinkParser } from "../../utils/link-parser.js";
 
 const RESULTS_PER_SEARCH = 25;
 const DAILY_SEARCHES_CAP = 2000;

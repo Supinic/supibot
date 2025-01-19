@@ -1,12 +1,12 @@
-const GptCache = require("./cache-control.js");
-const GptConfig = require("./config.json");
-const GptMetrics = require("./metrics.js");
-const GptModeration = require("./moderation.js");
+import GptCache from "./cache-control.js";
+import GptConfig from "./config.json";
+import GptMetrics from "./metrics.js";
+import GptModeration from "./moderation.js";
 
-const GptTemplate = require("./gpt-template.js");
-const GptOpenAI = require("./gpt-openai.js");
-const GptNexra = require("./gpt-nexra.js");
-const GptDeepInfra = require("./gpt-deepinfra.js");
+import GptTemplate from "./gpt-template.js";
+import GptOpenAI from "./gpt-openai.js";
+import GptNexra from "./gpt-nexra.js";
+import GptDeepInfra from "./gpt-deepinfra.js";
 
 const handlerMap = {
 	openai: GptOpenAI,
@@ -224,7 +224,7 @@ export default {
 		return result;
 	}),
 	Dynamic_Description: (async (prefix) => {
-		const ChatGptConfig = require("./config.json");
+		import ChatGptConfig from "./config.json";
 		const { regular, subscriber } = ChatGptConfig.userTokenLimits;
 		const { outputLimit } = ChatGptConfig;
 

@@ -1,5 +1,5 @@
-const Channel = require("./channel.js");
-const User = require("./user.js");
+import Channel from "./channel.js";
+import User from "./user.js";
 
 import Template from "./template.js";
 

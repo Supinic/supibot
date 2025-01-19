@@ -1,4 +1,4 @@
-const { uploadToImgur } = require("../../utils/command-utils.js");
+import { uploadToImgur } from "../../utils/command-utils.js";
 
 export default {
 	Name: "query",

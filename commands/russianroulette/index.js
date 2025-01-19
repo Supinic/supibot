@@ -1,5 +1,5 @@
-const { randomInt } = require("../../utils/command-utils.js");
-const { cannotTimeoutBadges, outcomes } = require("./definitions.json");
+import { randomInt } from "../../utils/command-utils.js";
+import { cannotTimeoutBadges, outcomes } from "./definitions.json";
 
 export default {
 	Name: "russianroulette",

@@ -1,15 +1,15 @@
-const config = require("../config.json");
+import config from "../config.json";
 
-const AwayFromKeyboard = require("./afk.js");
-const Banphrase = require("./banphrase.js");
-const Channel = require("./channel.js");
-const Command = require("./command.js");
-const Filter = require("./filter.js");
-const User = require("./user.js");
+import AwayFromKeyboard from "./afk.js";
+import Banphrase from "./banphrase.js";
+import Channel from "./channel.js";
+import Command from "./command.js";
+import Filter from "./filter.js";
+import User from "./user.js";
 import Template from "./template.js";
 
-const Platform = require("../platforms/template.js");
-const LongTimeout = require("../utils/long-timeout.js");
+import Platform from "../platforms/template.js";
+import LongTimeout from "../utils/long-timeout.js";
 
 /**
  * Represents a pending reminder from (usually) one user to another.

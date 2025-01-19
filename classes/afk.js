@@ -1,9 +1,9 @@
-const Filter = require("./filter.js");
-const User = require("./user.js");
+import Filter from "./filter.js";
+import User from "./user.js";
 import Template from "./template.js";
 
-const { responses } = require("./afk-definitions.json");
-const { responses: configResponses } = require("../config.json");
+import { responses } from "./afk-definitions.json";
+import { responses as configResponses } from "../config.json";
 
 export default class AwayFromKeyboard extends Template {
 	static data = new Map();

@@ -1,4 +1,4 @@
-const { COIN_EMOJI, itemTypeDefinitions, getInitialStats, itemTypes } = require("./fishing-utils.js");
+import { COIN_EMOJI, itemTypeDefinitions, getInitialStats, itemTypes } from "./fishing-utils.js";
 const fishEmojis = itemTypes.map(i => i.name);
 
 /**

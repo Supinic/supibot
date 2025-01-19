@@ -1,4 +1,4 @@
-const { getLinkParser } = require("../../../utils/link-parser.js");
+import { getLinkParser } from "../../../utils/link-parser.js";
 
 export default {
 	name: "sr",

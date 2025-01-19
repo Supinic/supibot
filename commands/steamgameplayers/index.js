@@ -1,4 +1,4 @@
-const { CronJob } = require("cron");
+import { CronJob } from "cron";
 
 const fetchGamesData = async () => {
 	let lastUpdate = await sb.Cache.getByPrefix("latest-steam-games-update");

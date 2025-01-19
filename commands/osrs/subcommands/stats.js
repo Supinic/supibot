@@ -1,5 +1,5 @@
-const OsrsUtils = require("./osrs-utils.js");
-const GameData = require("../game-data.json");
+import OsrsUtils from "./osrs-utils.js";
+import GameData from "../game-data.json";
 
 export default {
 	name: "stats",

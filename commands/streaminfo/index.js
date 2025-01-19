@@ -12,7 +12,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function streamInfo (context, ...args) {
 		if (context.params.youtube) {
-			const handler = require("./youtube-handler.js");
+			import handler from "./youtube-handler.js";
 			return await handler(context, ...args);
 		}
 
@@ -217,7 +217,7 @@ export default {
 		else {
 			const tags = [];
 			if (Array.isArray(stream.tag_ids) && stream.tag_ids.length !== 0) {
-				const { URLSearchParams } = require("node:url");
+				import { URLSearchParams } from "node:url";
 
 				const paramsIterable = stream.tag_ids.map(i => ["tag_id", i]);
 				const searchParams = new URLSearchParams(paramsIterable);

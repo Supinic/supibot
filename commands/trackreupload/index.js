@@ -1,4 +1,4 @@
-const { VIDEO_TYPE_REPLACE_PREFIX } = require("../../utils/command-utils.js");
+import { VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.js";
 
 export default {
 	Name: "trackreupload",

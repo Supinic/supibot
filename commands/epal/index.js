@@ -1,5 +1,5 @@
-const { TTS_ENABLED } = require("../../utils/shared-cache-keys.json");
-const config = require("../../config.json");
+import { TTS_ENABLED } from "../../utils/shared-cache-keys.json";
+import config from "../../config.json";
 const { epalAudioChannels, listenerAddress, listenerPort } = config.local ?? {};
 
 const PROFILES_CACHE_KEY = "epal-profiles";

@@ -4,8 +4,8 @@
  * Original: {@link https://github.com/ldubos/node-vlc-http}
  */
 
-const http = require("node:http");
-const querystring = require("node:querystring");
+import http from "node:http";
+import querystring from "node:querystring";
 import EventEmitter from "node:events";
 
 const get = (options) => new Promise((resolve, reject) => {

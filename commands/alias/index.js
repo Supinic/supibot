@@ -1,7 +1,7 @@
-const config = require("../../config.json");
+import config from "../../config.json";
 const bannedCommandCombinations = config.modules.commands.bannedCombinations ?? [];
 
-const AliasUtils = require("./alias-utils.js");
+import AliasUtils from "./alias-utils.js";
 
 const NESTED_ALIAS_LIMIT = 10;
 const ALIAS_DESCRIPTION_LIMIT = 250;

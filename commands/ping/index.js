@@ -1,4 +1,4 @@
-const { randomInt } = require("../../utils/command-utils.js");
+import { randomInt } from "../../utils/command-utils.js";
 const promisify = require("node:util").promisify;
 const exec = promisify(require("node:child_process").exec);
 

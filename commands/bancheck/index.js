@@ -1,4 +1,4 @@
-const { linkRegex } = require("../../utils/regexes.js");
+import { linkRegex } from "../../utils/regexes.js";
 
 export default {
 	Name: "bancheck",

@@ -1,4 +1,4 @@
-const LanguageCodes = require("../../utils/languages");
+import LanguageCodes from "../../utils/languages";
 const supportedLanguages = [
 	"bg",
 	"cs",

@@ -1,8 +1,8 @@
-const { randomInt } = require("node:crypto");
-const { Blob } = require("node:buffer");
+import { randomInt } from "node:crypto";
+import { Blob } from "node:buffer";
 
-const RSSParser = require("rss-parser");
-const Chrono = require("chrono-node");
+import RSSParser from "rss-parser";
+import Chrono from "chrono-node";
 
 const rssParser = new RSSParser();
 const MAX_SAFE_RANGE = 281474976710655;
@@ -221,7 +221,7 @@ export default {
 			return null;
 		}
 
-		const { URL } = require("node:url");
+		import { URL } from "node:url";
 		let url;
 		try {
 			url = new URL(stringURL);

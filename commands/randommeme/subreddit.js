@@ -1,4 +1,4 @@
-const RedditPost = require("./post.js");
+import RedditPost from "./post.js";
 const defaultSubredditCacheExpiration = 2 * 3_600_000;
 
 export default class Subreddit {

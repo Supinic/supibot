@@ -1,6 +1,7 @@
 /* eslint-disable max-nested-callbacks, prefer-arrow-callback */
-const assert = require("node:assert");
-const definitions = require("./definitions.json").sort((a, b) => a.code.localeCompare(b.code));
+import assert from "node:assert";
+import rawDefinitions from "./definitions.json";
+import RssParser from "rss-parser";
 
 const rssFetch = async (url) => await fetch(url, {
 	headers: {
@@ -16,7 +17,8 @@ describe("valid RSS news definitions", function () {
 		return it.skip("Cannot test - fetch is not avilable");
 	}
 
-	const RSS = new (require("rss-parser"))({
+	const definitions = rawDefinitions.sort((a, b) => a.code.localeCompare(b.code));
+	const RSS = new RssParser({
 		defaultRSS: 0.9
 	});
 

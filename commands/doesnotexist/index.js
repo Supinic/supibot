@@ -1,4 +1,4 @@
-const { methods } = require("./fetch-methods.js");
+import { methods } from "./fetch-methods.js";
 
 export default {
 	Name: "doesnotexist",

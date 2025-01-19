@@ -1,5 +1,5 @@
-const Platform = require("../platforms/template.js");
-const { createMessageLoggingTable } = require("../utils/create-db-table.js");
+import Platform from "../platforms/template.js";
+import { createMessageLoggingTable } from "../utils/create-db-table.js";
 import Template from "./template.js";
 
 export default class Channel extends Template {
@@ -31,7 +31,7 @@ export default class Channel extends Template {
 
 		this.sessionData = {};
 
-		const EventEmitter = require("node:events");
+		import EventEmitter from "node:events";
 		this.events = new EventEmitter();
 	}
 

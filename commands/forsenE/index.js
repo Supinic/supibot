@@ -1,4 +1,4 @@
-const { lines } = require("./forsenE.json");
+import { lines } from "./forsenE.json";
 
 const MAXIMUM_REPEATS = 5;
 const previousLines = [];

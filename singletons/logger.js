@@ -1,6 +1,6 @@
-const { CronJob } = require("cron");
+import { CronJob } from "cron";
 
-const config = require("../config.json");
+import config from "../config.json";
 const { logging } = config;
 
 const notified = {

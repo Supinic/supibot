@@ -1,4 +1,4 @@
-const config = require("../config.json");
+import config from "../config.json";
 import Template from "./template.js";
 
 export default class User extends Template {

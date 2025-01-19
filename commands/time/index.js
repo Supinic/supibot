@@ -1,5 +1,5 @@
-const { fetchTimeData } = require("../../utils/command-utils.js");
-const timezones = require("./timezones.json");
+import { fetchTimeData } from "../../utils/command-utils.js";
+import timezones from "./timezones.json";
 
 const detectTimezone = async (...args) => {
 	const query = args.join(" ");

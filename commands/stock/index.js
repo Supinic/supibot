@@ -14,7 +14,7 @@ export default {
 			});
 		}
 
-		const { findPopularSymbol } = require("./stocks.js");
+		import { findPopularSymbol } from "./stocks.js";
 		const input = args.join(" ");
 		if (!input) {
 			return {

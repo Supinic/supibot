@@ -1,4 +1,4 @@
-const { LATEST_NODE_JS_VERSION } = require("../../../utils/shared-cache-keys.json");
+import { LATEST_NODE_JS_VERSION } from "../../../utils/shared-cache-keys.json";
 
 export default {
 	name: "Node.js updates",

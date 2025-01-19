@@ -1,7 +1,7 @@
-const {
+import {
 	SONG_REQUESTS_STATE,
 	SONG_REQUESTS_VLC_PAUSED
-} = require("../../utils/shared-cache-keys.json");
+} from "../../utils/shared-cache-keys.json";
 
 export default {
 	Name: "songrequestqueue",

@@ -1,4 +1,4 @@
-const fetchData = require("./worldinfo.js");
+import fetchData from "./worldinfo.js";
 const group = (num) => sb.Utils.groupDigits(num, " ");
 
 export default {

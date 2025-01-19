@@ -1,4 +1,4 @@
-const { fetchConstructorStandings } = require("../api-wrapper.js");
+import { fetchConstructorStandings } from "../api-wrapper.js";
 
 export default {
 	name: "constructorStandings",

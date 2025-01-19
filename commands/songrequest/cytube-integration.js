@@ -1,5 +1,5 @@
-const { getLinkParser } = require("../../utils/link-parser.js");
-const { searchYoutube } = require("../../utils/command-utils.js");
+import { getLinkParser } from "../../utils/link-parser.js";
+import { searchYoutube } from "../../utils/command-utils.js";
 
 const CYTUBE_LIMITS = {
 	TOTAL: 5,

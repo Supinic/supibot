@@ -1,4 +1,4 @@
-const copypastaList = require("./copypasta.json");
+import copypastaList from "./copypasta.json";
 const MAXIMUM_COPYPASTA_REPEATS = 10;
 
 const repeatedPastas = {};

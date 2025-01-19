@@ -1,5 +1,5 @@
 // noinspection JSUnusedGlobalSymbols
-const { freemem, totalmem } = require("node:os");
+import { freemem, totalmem } from "node:os";
 
 export default {
 	summary: async () => {

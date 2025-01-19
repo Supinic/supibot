@@ -1,4 +1,4 @@
-const { formatScore, scoreThreshold } = require("./definitions.js");
+import { formatScore, scoreThreshold } from "./definitions.js";
 
 export default function checkSafetyStatus (safeMode, blacklistedFlags, image) {
 	if (image.Score === null) {

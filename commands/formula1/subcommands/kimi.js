@@ -1,4 +1,4 @@
-const quoteList = require("./kimi.json");
+import quoteList from "./kimi.json";
 const MAXIMUM_QUOTE_REPEATS = 10;
 
 const repeatedQuotes = {};

@@ -1,8 +1,11 @@
+import LastMatchCommand from "./last-match.js";
+import RankCommand from "./rank.js";
+
 export default {
 	requiredEnvs: ["API_RIOT_GAMES_KEY"],
 	subcommands: [
-		require("./last-match.js"),
-		require ("./rank.js")
+		LastMatchCommand,
+		RankCommand
 	],
 	addendum: [
 		"To simplify usage for <code>$league</code>, you can use the <code>$set</code> command to set your region and username:",

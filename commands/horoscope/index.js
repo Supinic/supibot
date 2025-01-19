@@ -10,7 +10,7 @@ export default {
 	Code: (async function horoscope (context, inputZodiacName) {
 		let zodiacName = null;
 		let own = false;
-		const zodiacData = require("./zodiac.json");
+		import zodiacData from "./zodiac.json";
 
 		if (inputZodiacName) {
 			const lowerInput = inputZodiacName.toLowerCase().trim();
@@ -93,7 +93,7 @@ export default {
 		};
 	}),
 	Dynamic_Description: (async (prefix) => {
-		const zodiacData = require("./zodiac.json");
+		import zodiacData from "./zodiac.json";
 		const zodiacSignList = zodiacData.map(i => {
 			const { start, end, name } = i;
 			const startString = new sb.Date(2022, ...start).format("F jS");

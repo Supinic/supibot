@@ -1,4 +1,4 @@
-const { fetchWorldsData } = require("./utils.js");
+import { fetchWorldsData } from "./utils.js";
 
 export default {
 	name: "guthix",

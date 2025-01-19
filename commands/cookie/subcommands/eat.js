@@ -1,4 +1,4 @@
-const CookieLogic = require("../cookie-logic.js");
+import CookieLogic from "../cookie-logic.js";
 
 export default {
 	name: "eat",

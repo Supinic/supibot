@@ -1,8 +1,8 @@
-const LanguageCodes = require("../../utils/languages");
-const { locales } = require("./tts-locales.json");
-const { TTS_ENABLED, TTS_MULTIPLE_ENABLED } = require("../../utils/shared-cache-keys.json");
+import LanguageCodes from "../../utils/languages";
+import { locales } from "./tts-locales.json";
+import { TTS_ENABLED, TTS_MULTIPLE_ENABLED } from "../../utils/shared-cache-keys.json";
 
-const config = require("../../config.json");
+import config from "../../config.json";
 const {
 	listenerAddress,
 	listenerPort,

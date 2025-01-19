@@ -1,4 +1,4 @@
-const { setTimeout } = require("node:timers/promises");
+import { setTimeout } from "node:timers/promises";
 
 export default {
 	Name: "pyramid",

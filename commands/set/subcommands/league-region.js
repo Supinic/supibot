@@ -1,4 +1,4 @@
-const { DEFAULT_REGION_KEY, getPlatform } = require("../../moba/league/utils.js");
+import { DEFAULT_REGION_KEY, getPlatform } from "../../moba/league/utils.js";
 
 export default {
 	name: "league-region",

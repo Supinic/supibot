@@ -1,14 +1,14 @@
-const { randomInt } = require("../../../utils/command-utils.js");
-const {
+import { randomInt } from "../../../utils/command-utils.js";
+import {
 	baitTypes,
 	COIN_EMOJI,
 	getCatchMessage,
 	getEmote,
 	getInitialStats,
 	getWeightedCatch
-} = require("./fishing-utils.js");
+} from "./fishing-utils.js";
 
-const { checkLimits } = require("../../gpt/cache-control.js");
+import { checkLimits } from "../../gpt/cache-control.js";
 
 const gptStyles = ["exciting", "spooky", "smug", "radical", "mysterious", "hilarious", "enchanting", "touching", "intriguing"];
 const createGptPrompt = (executor, resultFish, sizeString) => sb.Utils.tag.trim `

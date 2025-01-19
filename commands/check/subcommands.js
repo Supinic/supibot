@@ -1,10 +1,10 @@
-const handleErrorInspection = require("./inspect-errors");
-const { postToHastebin } = require("../../utils/command-utils.js");
-const { isSupported } = require("../randomline/rustlog.js");
-const {
+import handleErrorInspection from "./inspect-errors";
+import { postToHastebin } from "../../utils/command-utils.js";
+import { isSupported } from "../randomline/rustlog.js";
+import {
 	SONG_REQUESTS_STATE,
 	SONG_REQUESTS_VLC_PAUSED
-} = require("../../utils/shared-cache-keys.json");
+} from "../../utils/shared-cache-keys.json";
 
 export default (command) => [
 	{
@@ -835,7 +835,7 @@ export default (command) => [
 			// @todo refactor this and similar usages to a common place
 			if (link.toLowerCase() === "last") {
 				const tl = sb.Command.get("tl");
-				const definitions = require("../twitchlotto/definitions.js");
+				import definitions from "../twitchlotto/definitions.js";
 				const key = definitions.createRecentUseCacheKey(context);
 
 				// Seems like a mismatched documentation - tl.getCacheData can allow objects too

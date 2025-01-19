@@ -1,4 +1,4 @@
-const { randomInt } = require("../../utils/command-utils.js");
+import { randomInt } from "../../utils/command-utils.js";
 
 export default {
 	Name: "twitchlotto",
@@ -15,8 +15,8 @@ export default {
 	],
 	Whitelist_Response: "This command can't be executed here!",
 	Code: (async function twitchLotto (context, channel) {
-		const definitions = require("./definitions.js");
-		const checkSafety = require("./safety-check.js");
+		import definitions from "./definitions.js";
+		import checkSafety from "./safety-check.js";
 
 		if (!this.data.channels) {
 			this.data.channels = await sb.Query.getRecordset(rs => rs
@@ -394,7 +394,7 @@ export default {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { taggingGuide, flags, scoreThreshold } = require("./definitions.js");
+		import { taggingGuide, flags, scoreThreshold } from "./definitions.js";
 		const thresholdPercent = `${sb.Utils.round(scoreThreshold * 100, 2)}%`;
 
 		const countData = await sb.Query.getRecordset(rs => rs

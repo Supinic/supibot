@@ -12,8 +12,8 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function news (context, ...args) {
-		const rssNews = require("./rss.js");
-		const googleNews = require("./google-news.js");
+		import rssNews from "./rss.js";
+		import googleNews from "./google-news.js";
 
 		let input;
 		if (context.params.country) {
@@ -60,7 +60,7 @@ export default {
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const definitions = require("./definitions.json");
+		import definitions from "./definitions.json";
 		const sorted = [...definitions].sort((a, b) => a.code.localeCompare(b.code));
 
 		const extraNews = sorted.map(def => {

@@ -52,7 +52,7 @@ export default {
 			}
 		}
 
-		const { connectedChannelGroups } = require("./connected-channels.json");
+		import { connectedChannelGroups } from "./connected-channels.json";
 		const group = connectedChannelGroups.find(i => i.includes(context.channel.ID));
 		if (group) {
 			for (const channelID of group) {

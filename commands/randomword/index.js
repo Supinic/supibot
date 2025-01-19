@@ -1,4 +1,4 @@
-const fullWordList = require("./words.json");
+import fullWordList from "./words.json";
 const MAXIMUM_WORD_AMOUNT = 10;
 
 export default {

@@ -22,7 +22,7 @@ export default {
 
 		let statusCode;
 		let data;
-		const { getFacebookAppID, resetFacebookAppID } = require("./instagram-api.js");
+		import { getFacebookAppID, resetFacebookAppID } from "./instagram-api.js";
 		const profileCacheData = await this.getCacheData({ user });
 		if (profileCacheData) {
 			statusCode = profileCacheData.statusCode;

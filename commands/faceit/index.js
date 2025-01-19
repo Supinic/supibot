@@ -14,7 +14,7 @@ export default {
 			});
 		}
 
-		const { names, commands } = require("./subcommands.js");
+		import { names, commands } from "./subcommands.js";
 		const subcommand = commands.find(i => i.name === subcommandName || i.aliases.includes(subcommandName));
 		if (!subcommand) {
 			return {
@@ -26,7 +26,7 @@ export default {
 		return await subcommand.execute(context, ...args);
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { commands } = require("./subcommands.js");
+		import { commands } from "./subcommands.js";
 		const commandDescriptions = commands.flatMap(i => [
 			`<h6>${i.name}</h6>`,
 			...i.getDescription(prefix),

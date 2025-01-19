@@ -1,19 +1,19 @@
-// Classes requires
-const Filter = require("./classes/filter.js");
-const Command = require("./classes/command.js");
-const User = require("./classes/user.js");
-const AwayFromKeyboard = require("./classes/afk.js");
-const Banphrase = require("./classes/banphrase.js");
-const Channel = require("./classes/channel.js");
-const Reminder = require("./classes/reminder.js");
-const ChatModule = require("./classes/chat-module.js");
+// Classes imports
+import Filter from "./classes/filter.js";
+import Command from "./classes/command.js";
+import User from "./classes/user.js";
+import AwayFromKeyboard from "./classes/afk.js";
+import Banphrase from "./classes/banphrase.js";
+import Channel from "./classes/channel.js";
+import Reminder from "./classes/reminder.js";
+import ChatModule from "./classes/chat-module.js";
 
-// Singletons requires
-const Logger = require("./singletons/logger.js");
-const VLCConnector = require("./singletons/vlc-connector.js");
+// Singletons imports
+import Logger from "./singletons/logger.js";
+import VLCConnector from "./singletons/vlc-connector.js";
 
-// Platform require
-const Platform = require("./platforms/template.js");
+// Platform template import
+import Platform from "./platforms/template.js";
 
 import initializeInternalApi from "./api/index.js";
 
@@ -123,7 +123,7 @@ const initializeCommands = async (config) => {
 
 	const platforms = new Set();
 	for (const definition of platformsConfig) {
-		const platform = Platform.create(definition.type, definition);
+		const platform = await Platform.create(definition.type, definition);
 		if (platform) {
 			platforms.add(platform);
 		}

@@ -1,5 +1,5 @@
-const Channel = require("./channel.js");
-const Platform = require("../platforms/template.js");
+import Channel from "./channel.js";
+import Platform from "../platforms/template.js";
 import Template from "./template.js";
 
 export default class ChatModule extends Template {

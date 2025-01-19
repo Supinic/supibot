@@ -1,4 +1,4 @@
-const { Node, parse } = require("acorn-node");
+import { Node, parse } from "acorn-node";
 const BANNED_AWAIT_STATEMENTS = new Set(["DoWhileStatement", "ForStatement", "ForOfStatement", "WhileStatement"]);
 
 const analyze = (script) => {

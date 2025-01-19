@@ -91,7 +91,7 @@ export default {
 		};
 	}),
 	Dynamic_Description: () => {
-		const unsetSuggestion = require("../set/subcommands/suggestion.js");
+		import unsetSuggestion from "../set/subcommands/suggestion.js";
 
 		return [
 			"Creates a new suggestion for Supinic to take a look at in the near future.",

@@ -1,5 +1,5 @@
-const { getLinkParser } = require("../../utils/link-parser.js");
-const { postToHastebin } = require("../../utils/command-utils.js");
+import { getLinkParser } from "../../utils/link-parser.js";
+import { postToHastebin } from "../../utils/command-utils.js";
 
 export default {
 	Name: "getvideodata",

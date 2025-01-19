@@ -1,4 +1,4 @@
-const { types, upgrade } = require("./definition.js");
+import { types, upgrade } from "./definition.js";
 
 export default {
 	Name: "reload",

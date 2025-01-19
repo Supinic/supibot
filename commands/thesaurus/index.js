@@ -1,4 +1,4 @@
-const { randomInt } = require("../../utils/command-utils.js");
+import { randomInt } from "../../utils/command-utils.js";
 
 export default {
 	Name: "thesaurus",

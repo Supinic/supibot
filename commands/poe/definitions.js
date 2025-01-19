@@ -1,8 +1,8 @@
-const { fetchYoutubePlaylist } = require("../../utils/command-utils.js");
+import { fetchYoutubePlaylist } from "../../utils/command-utils.js";
 
-const ascendancies = require("./ascendancies.json");
-const leagues = require("./leagues.json");
-const gems = require("./gems.json");
+import ascendancies from "./ascendancies.json";
+import leagues from "./leagues.json";
+import gems from "./gems.json";
 const additionalGems = gems.filter(i => i.type === "additional");
 const skillGems = gems.filter(i => i.type === "main");
 

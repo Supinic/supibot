@@ -1,9 +1,9 @@
-const config = require("../config.json");
+import config from "../config.json";
 const { vlcBaseUrl, vlcPassword, vlcPort, vlcUrl, vlcUsername } = config.local ?? {};
 
-const VLCClient = require("./vlc-client.js");
-const { getLinkParser } = require("../utils/link-parser.js");
-const { SONG_REQUESTS_VLC_PAUSED } = require("../utils/shared-cache-keys.json");
+import VLCClient from "./vlc-client.js";
+import { getLinkParser } from "../utils/link-parser.js";
+import { SONG_REQUESTS_VLC_PAUSED } from "../utils/shared-cache-keys.json";
 
 const actions = [
 	"addToQueue",

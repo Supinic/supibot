@@ -36,7 +36,7 @@ export default {
 			};
 		}
 
-		const Provider = require(`./${type}.js`);
+		import Provider from `./${type}.js`;
 		const result = await Provider.execute({
 			context,
 			username,

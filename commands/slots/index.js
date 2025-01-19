@@ -10,7 +10,7 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function slots (context, ...args) {
-		const { leaderboardKeywords, patterns } = require("./definitions.js");
+		import { leaderboardKeywords, patterns } from "./definitions.js";
 
 		if (leaderboardKeywords.includes(args[0])) {
 			return {
@@ -157,7 +157,7 @@ export default {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { leaderboardKeywords, patterns } = require("./definitions.js");
+		import { leaderboardKeywords, patterns } from "./definitions.js";
 		const patternList = [...patterns]
 			.sort((a, b) => a.name.localeCompare(b.name))
 			.map(i => `<li><code>${i.name}</code><br>${i.notes}</li>`)

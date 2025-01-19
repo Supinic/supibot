@@ -1,5 +1,5 @@
-const definitions = require("./definitions.js");
-const { baseUrl } = require("./prometheus-config.json");
+import definitions from "./definitions.js";
+import { baseUrl } from "./prometheus-config.json";
 
 export default {
 	Name: "metrics",

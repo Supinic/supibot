@@ -1,5 +1,5 @@
-const config = require("./config.json");
-const History = require("./history-control.js");
+import config from "./config.json";
+import History from "./history-control.js";
 
 export default class GptTemplate {
 	static checkInputLimits (modelData, queryLength) {
@@ -79,7 +79,7 @@ export default class GptTemplate {
 			userPlatformID = "N/A";
 		}
 
-		const { createHash } = require("node:crypto");
+		import { createHash } from "node:crypto";
 		return createHash("sha1")
 			.update(context.user.Name)
 			.update(context.platform.Name)

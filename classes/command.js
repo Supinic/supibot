@@ -1,15 +1,15 @@
-const Banphrase = require("./banphrase.js");
-const Filter = require("./filter.js");
-const User = require("./user.js");
+import Banphrase from "./banphrase.js";
+import Filter from "./filter.js";
+import User from "./user.js";
 import Template from "./template.js";
 
-const { whitespaceRegex } = require("../utils/regexes.js");
-const config = require("../config.json");
+import { whitespaceRegex } from "../utils/regexes.js";
+import config from "../config.json";
 const COMMAND_PREFIX = config.modules.commands.prefix;
 
-const pathModule = require("node:path");
-const CooldownManager = require("../utils/cooldown-manager.js");
-const LanguageCodes = require("../utils/languages");
+import pathModule from "node:path";
+import CooldownManager from "../utils/cooldown-manager.js";
+import LanguageCodes from "../utils/languages";
 
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 

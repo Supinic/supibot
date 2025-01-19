@@ -1,10 +1,10 @@
-const {
+import {
 	PLAYSOUNDS_ENABLED,
 	TTS_ENABLED,
 	TTS_MULTIPLE_ENABLED,
 	TTS_TIME_LIMIT,
 	SONG_REQUESTS_STATE
-} = require("../../utils/shared-cache-keys.json");
+} from "../../utils/shared-cache-keys.json";
 
 const AVAILABLE_SONG_REQUEST_STATES = new Set(["cytube", "vlc", "off"]);
 

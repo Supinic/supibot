@@ -1,4 +1,4 @@
-const { createMessageLoggingTable } = require("../utils/create-db-table");
+import { createMessageLoggingTable } from "../utils/create-db-table";
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
 class Platform {
@@ -506,10 +506,10 @@ class Platform {
 		}
 	}
 
-	static create (type, config) {
+	static async create (type, config) {
 		let InstancePlatform;
 		try {
-			InstancePlatform = require(`./${type}.js`);
+			InstancePlatform = await import(`./${type}.js`);
 		}
 		catch {
 			console.log(`No file found for platform "${type}", creating generic platform`);

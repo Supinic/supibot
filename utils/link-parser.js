@@ -1,5 +1,5 @@
-const { SOUNDCLOUD_CLIENT_ID } = require("../utils/shared-cache-keys.json");
-const LinkParser = require("track-link-parser");
+import { SOUNDCLOUD_CLIENT_ID } from "../utils/shared-cache-keys.json";
+import LinkParser from "track-link-parser";
 let linkParser;
 
 const getLinkParser = async () => {

@@ -1,6 +1,8 @@
+import detections from "./detections.json";
+
 export default {
+	detections,
 	scoreThreshold: 0.5,
-	detections: require("./detections.json"),
 	maxRetries: 10,
 	taggingGuide: [
 		"The main idea of tagging TwitchLotto pictures is to only tag them when they contain NSFW content.",

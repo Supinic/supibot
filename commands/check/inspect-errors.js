@@ -1,4 +1,4 @@
-const { postToHastebin } = require("../../utils/command-utils.js");
+import { postToHastebin } from "../../utils/command-utils.js";
 
 const getRow = {
 	error: () => sb.Query.getRow("chat_data", "Error"),

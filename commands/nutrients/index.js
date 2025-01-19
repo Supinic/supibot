@@ -1,4 +1,4 @@
-const NUTRIENTS_DATA = require("./nutrients.json");
+import NUTRIENTS_DATA from "./nutrients.json";
 
 export default {
 	Name: "nutrients",

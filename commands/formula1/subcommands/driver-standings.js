@@ -1,4 +1,4 @@
-const { fetchDriverStandings } = require("../api-wrapper.js");
+import { fetchDriverStandings } from "../api-wrapper.js";
 
 export default {
 	name: "driverStandings",

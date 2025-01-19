@@ -1,5 +1,5 @@
-const { VIDEO_TYPE_REPLACE_PREFIX } = require("../../utils/command-utils.js");
-const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = require("../../utils/shared-cache-keys.json");
+import { VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.js";
+import { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } from "../../utils/shared-cache-keys.json";
 const ALLOWED_SONG_CHECKS = new Set(["current", "previous", "next"]);
 
 export default {

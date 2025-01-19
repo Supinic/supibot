@@ -52,7 +52,7 @@ export default {
 			};
 		}
 
-		const { execute } = require(`./${engine}.js`);
+		import { execute } from `./${engine}.js`;
 		const result = await execute(context, query);
 
 		if (logTableExists) {

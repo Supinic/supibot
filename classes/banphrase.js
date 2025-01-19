@@ -5,8 +5,8 @@ const apiResultSymbol = Symbol("banphrase-api-result");
 const inactiveSymbol = Symbol("banphrase-inactive");
 const AVAILABLE_TYPES = new Set(["API response", "Custom response", "Denial", "Inactive", "Replacement"]);
 
-const { responses, values } = require("../config.json");
-const regexes = require("../utils/regexes.js");
+import { responses, values } from "../config.json";
+import regexes from "../utils/regexes.js";
 
 const banphraseConfigData = Object.freeze({
 	massPingBanphraseThreshold: values.massPingBanphraseThreshold,

@@ -16,7 +16,7 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function fish (context, ...args) {
-		const { subcommands } = require("./subcommands/index.js");
+		import { subcommands } from "./subcommands/index.js";
 		const [subcommandName, ...rest] = args;
 
 		const subcommand = subcommands.find(i => i.name === subcommandName || i.aliases.includes(subcommandName));
@@ -29,7 +29,7 @@ export default {
 		}
 	}),
 	Dynamic_Description: (async function () {
-		const { subcommands } = require("./subcommands/index.js");
+		import { subcommands } from "./subcommands/index.js";
 		const subcommandsDescription = subcommands
 			.sort((a, b) => {
 				if (a.default) {

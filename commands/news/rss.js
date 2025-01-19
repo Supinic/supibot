@@ -1,6 +1,6 @@
-const { parseRSS } = require("../../utils/command-utils.js");
+import { parseRSS } from "../../utils/command-utils.js";
 
-const definitions = require("./definitions.json");
+import definitions from "./definitions.json";
 const rssCacheKey = "command-news-rss-cache";
 
 const sanitize = (string) => sb.Utils.fixHTML(sb.Utils.removeHTML(string)).replaceAll(/\s+/g, " ");

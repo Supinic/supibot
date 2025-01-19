@@ -1,4 +1,4 @@
-const { invocations, specialSuffixes } = require("../../classes/afk-definitions.json");
+import { invocations, specialSuffixes } from "../../classes/afk-definitions.json";
 
 const STATUS_LENGTH_CHARACTER_LIMIT = 2000;
 

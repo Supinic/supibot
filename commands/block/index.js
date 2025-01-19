@@ -1,4 +1,4 @@
-const { handleGenericFilter, parseGenericFilterOptions } = require("../../utils/command-utils.js");
+import { handleGenericFilter, parseGenericFilterOptions } from "../../utils/command-utils.js";
 
 export default {
 	Name: "block",

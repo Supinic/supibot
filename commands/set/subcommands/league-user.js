@@ -1,4 +1,4 @@
-const { DEFAULT_USER_IDENTIFIER_KEY } = require("../../moba/league/utils.js");
+import { DEFAULT_USER_IDENTIFIER_KEY } from "../../moba/league/utils.js";
 
 export default {
 	name: "league-user",

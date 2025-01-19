@@ -1,4 +1,4 @@
-const { getPathFromURL } = require("../../utils/command-utils.js");
+import { getPathFromURL } from "../../utils/command-utils.js";
 
 export default {
 	Name: "downloadclip",

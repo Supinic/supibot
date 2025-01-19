@@ -21,7 +21,7 @@ export default {
 			};
 		}
 
-		const transforms = require("./transforms.js");
+		import transforms from "./transforms.js";
 		const message = args.join(" ");
 		const transformation = transforms.types.find(i => (
 			i.name === name || (i.aliases && i.aliases.includes(name))
@@ -74,7 +74,7 @@ export default {
 	}),
 	Dynamic_Description: (async function (prefix) {
 		const lorem = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
-		const { types, convert } = require("./transforms.js");
+		import { types, convert } from "./transforms.js";
 
 		const sortedTypes = [...types].sort((a, b) => a.name.localeCompare(b.name));
 		const examples = sortedTypes.map(transform => {

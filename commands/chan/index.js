@@ -1,4 +1,4 @@
-const { linkRegex } = require("../../utils/regexes.js");
+import { linkRegex } from "../../utils/regexes.js";
 
 const charToFlagEmoji = (char) => {
 	const emojiPart = String.fromCodePoint(56741 + char.codePointAt(0));

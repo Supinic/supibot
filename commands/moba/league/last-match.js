@@ -1,10 +1,10 @@
-const {
+import {
 	GAME_RESULT,
 	NON_STANDARD_CHAMPION_NAMES,
 	parseUserIdentifier,
 	getMatchIds,
 	getMatchData
-} = require("./utils.js");
+} from "./utils.js";
 
 export default {
 	name: "lastMatch",

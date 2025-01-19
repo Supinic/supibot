@@ -41,7 +41,7 @@ export default {
 			};
 		}
 
-		const { maxPointsPerGame, skillLevelRanges } = require("./faceit-data.json");
+		import { maxPointsPerGame, skillLevelRanges } from "./faceit-data.json";
 
 		const elo = gameData.faceit_elo;
 		const skillLevel = gameData.skill_level;

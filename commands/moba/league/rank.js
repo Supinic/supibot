@@ -1,8 +1,8 @@
-const {
+import {
 	parseUserIdentifier,
 	getSummonerId,
 	getLeagueEntries
-} = require("./utils.js");
+} from "./utils.js";
 
 const TARGET_LEAGUE = "RANKED_SOLO_5x5";
 

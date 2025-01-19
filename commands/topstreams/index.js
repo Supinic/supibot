@@ -1,4 +1,4 @@
-const { getTwitchGameID } = require("../../utils/command-utils.js");
+import { getTwitchGameID } from "../../utils/command-utils.js";
 
 export default {
 	Name: "topstreams",

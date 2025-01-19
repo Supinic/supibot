@@ -1,7 +1,7 @@
-const loadCommands = (async (config) => {
-	const fs = require("node:fs/promises");
-	const path = require("node:path");
+import fs from "node:fs/promises";
+import path from "node:path";
 
+const loadCommands = (async (config) => {
 	const blacklist = config?.blacklist ?? [];
 	const whitelist = config?.whitelist ?? [];
 
@@ -31,7 +31,7 @@ const loadCommands = (async (config) => {
 		let definition;
 		const indexPath = path.join(__dirname, dir.name, "index.js");
 		try {
-			definition = require(indexPath);
+			definition = await import(indexPath);
 		}
 		catch (e) {
 			console.warn(`Could not load command ${dir.name}`, e);

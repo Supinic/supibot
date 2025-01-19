@@ -1,10 +1,10 @@
-const { searchYoutube } = require("../../../utils/command-utils.js");
-const {
+import { searchYoutube } from "../../../utils/command-utils.js";
+import {
 	fetchRace,
 	fetchNextRaceDetail,
 	fetchQualifyingResults,
 	fetchRaceResults
-} = require("../api-wrapper.js");
+} from "../api-wrapper.js";
 
 const getHighlights = async (race) => {
 	if (!process.env.API_GOOGLE_YOUTUBE) {

@@ -1,16 +1,10 @@
-const { promisify } = require("node:util");
-const shell = promisify(require("node:child_process").exec);
+import { promisify } from "node:util";
+import { exec } from "node:child_process";
+import config from "../../config.json";
 
-let config;
-try {
-	config = require("../../config.json");
-}
-catch {
-	console.warn(`Custom config not found, $restart command will use base path "${__dirname}"`);
-	config = { basePath: __dirname };
-}
-
+const shell = promisify(exec);
 const { basePath } = config;
+
 const methods = {
 	pull: {
 		message: "git pull",

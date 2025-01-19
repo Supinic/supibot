@@ -21,7 +21,7 @@ const eventTypeFileList = [
 const subscriptionTypes = [];
 for (const file of eventTypeFileList) {
 	try {
-		const definition = require(`./${file}.js`);
+		import definition from `./${file}.js`;
 		subscriptionTypes.push(definition);
 	}
 	catch (e) {

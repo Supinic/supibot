@@ -1,7 +1,8 @@
-const WebSocket = require("ws");
+import WebSocket from "ws";
 import Template from "./template.js";
+import { randomBytes } from "node:crypto";
 
-const {
+import TwitchUtils, {
 	assignWebsocketToConduit,
 	createChannelChatMessageSubscription,
 	createWhisperMessageSubscription,
@@ -19,9 +20,9 @@ const {
 	initTokenCheckInterval,
 	initSubCacheCheckInterval,
 	sanitizeMessage
-} = require("./twitch-utils.js");
+} from "./twitch-utils.js";
 
-const { TWITCH_ADMIN_SUBSCRIBER_LIST } = require("../utils/shared-cache-keys.json");
+import { TWITCH_ADMIN_SUBSCRIBER_LIST } from "../utils/shared-cache-keys.json";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
@@ -92,7 +93,7 @@ export default class TwitchPlatform extends Template {
 	#userCommandSpamPrevention = new Map();
 	#unsuccessfulRenameChannels = new Set();
 
-	debug = require("./twitch-utils.js");
+	debug = TwitchUtils;
 
 	constructor (config) {
 		super("twitch", config, {
@@ -1359,9 +1360,7 @@ export default class TwitchPlatform extends Template {
 
 	static async createAccountChallenge (userData, twitchID) {
 		const row = await sb.Query.getRow("chat_data", "User_Verification_Challenge");
-		const challenge = require("node:crypto")
-			.randomBytes(16)
-			.toString("hex");
+		const challenge = randomBytes(16).toString("hex");
 
 		row.setValues({
 			User_Alias: userData.ID,

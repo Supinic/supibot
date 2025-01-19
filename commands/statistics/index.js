@@ -1,4 +1,4 @@
-const loadDefinitions = require("./statistics.js");
+import loadDefinitions from "./statistics.js";
 const definitions = loadDefinitions();
 
 export default {

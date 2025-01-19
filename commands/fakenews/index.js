@@ -12,7 +12,7 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function fakeNews () {
-		const { headlines, parts } = require("./templates.json");
+		import { headlines, parts } from "./templates.json";
 		const eligibleHeadlines = headlines.filter(i => !headlinesRepeatArray.includes(i));
 
 		let headline = sb.Utils.randArray(eligibleHeadlines);

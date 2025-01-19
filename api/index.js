@@ -1,4 +1,28 @@
-const { api } = require("../config.json");
+import { api } from "../config.json";
+import http from "node:http";
+import https from "node:https";
+
+import AfkDefinition from "./afk.js";
+import ChannelDefinition from "./channel.js";
+import CommandDefinition from "./command.js";
+import FilterDefinition from "./filter.js";
+import HealthDefinition from "./health.js";
+import MetricsDefinition from "./metrics.js";
+import PlatformDefinition from "./platform.js";
+import ReminderDefinition from "./reminder.js";
+import UserDefinition from "./user.js";
+
+const definition = [
+	AfkDefinition,
+	ChannelDefinition,
+	CommandDefinition,
+	FilterDefinition,
+	HealthDefinition,
+	MetricsDefinition,
+	PlatformDefinition,
+	ReminderDefinition,
+	UserDefinition
+];
 
 export default function initialize () {
 	if (!api.port || typeof api.secure !== "boolean") {
@@ -6,27 +30,11 @@ export default function initialize () {
 		return;
 	}
 
-	const definition = {};
-	const subroutes = [
-		["afk", "afk.js"],
-		["channel", "channel.js"],
-		["command", "command.js"],
-		["filter", "filter.js"],
-		["health", "health.js"],
-		["metrics", "metrics.js"],
-		["platform", "platform.js"],
-		["reminder", "reminder.js"],
-		["user", "user.js"]
-	];
-	for (const [route, file] of subroutes) {
-		definition[route] = require(`./${file}`);
-	}
-
 	const port = api.port;
 	const protocol = (api.secure) ? "https" : "http";
 	const baseURL = `${protocol}://localhost:${port}`;
 
-	const httpInterface = (api.secure) ? require("node:https") : require("node:http");
+	const httpInterface = (api.secure) ? https : http;
 	const server = httpInterface.createServer(async (req, res) => {
 		const url = new URL(req.url, baseURL);
 		const path = url.pathname.split("/").filter(Boolean);

@@ -1,4 +1,4 @@
-const executeTransliteration = require("transliteration").transliterate;
+import { transliterate as executeTransliteration } from "transliteration";
 
 export default {
 	Name: "transliterate",

@@ -1,4 +1,4 @@
-const variables = require("./subcommands/index.js");
+import variables from "./subcommands/index.js";
 
 export default {
 	Name: "set",

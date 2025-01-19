@@ -1,4 +1,4 @@
-const dongers = require("./dongers.json");
+import dongers from "./dongers.json";
 
 export default {
 	Name: "randomdonger",

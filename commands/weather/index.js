@@ -1,9 +1,10 @@
-const promisify = require("node:util").promisify;
-const exec = promisify(require("node:child_process").exec);
+import { promisify } from "node:util";
+import { exec } from "node:child_process";
+const shell = promisify(exec);
 
-const { codes } = require("./codes.json");
-const { getIcon, getWindDirection } = require("./helpers.js");
-const { postToHastebin } = require("../../utils/command-utils.js");
+import { codes } from "./codes.json";
+import { getIcon, getWindDirection } from "./helpers.js";
+import { postToHastebin } from "../../utils/command-utils.js";
 
 const ALLOWED_FORMAT_TYPES = [
 	"cloudCover",
@@ -143,7 +144,7 @@ export default {
 		}
 		else if (args[0].toLowerCase().replace(/^@/, "") === "supibot") {
 			try {
-				const result = await exec("vcgencmd measure_temp");
+				const result = await shell("vcgencmd measure_temp");
 				const temperature = `${result.stdout.toString().match(/([\d.]+)/)[1]}°C`;
 
 				return {

@@ -1,4 +1,4 @@
-const { subcommands } = require("./subcommands");
+import { subcommands } from "./subcommands";
 const subcommandNames = subcommands.map(i => i.name);
 
 export default {

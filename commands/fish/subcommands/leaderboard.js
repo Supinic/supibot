@@ -1,4 +1,4 @@
-const { itemTypes } = require("./fishing-utils.js");
+import { itemTypes } from "./fishing-utils.js";
 
 const unping = (str) => `${str[0]}\u{E0000}${str.slice(1)}`;
 

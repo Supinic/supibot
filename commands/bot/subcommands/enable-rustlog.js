@@ -18,7 +18,7 @@ export default {
 
 		let Rustlog;
 		try {
-			Rustlog = require("../../randomline/rustlog.js");
+			Rustlog = await import("../../randomline/rustlog.js");
 		}
 		catch {
 			return {

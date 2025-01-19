@@ -5,7 +5,7 @@
  * See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
  */
 export default (function () {
-	const languages = require("./languages-data.json");
+	import languages from "./languages-data.json";
 	const compileNameList = (lang) => [
 		...Object.values(lang.names.english),
 		...Object.values(lang.names.native),

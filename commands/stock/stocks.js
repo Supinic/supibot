@@ -1,4 +1,4 @@
-const symbolData = require("./popular-stock-symbols.json");
+import symbolData from "./popular-stock-symbols.json";
 const findPopularSymbol = (from) => {
 	from = from.toLowerCase();
 

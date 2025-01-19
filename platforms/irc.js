@@ -1,4 +1,4 @@
-const IRC = require("irc-framework");
+import IRC from "irc-framework";
 import Template from "./template.js";
 
 const DEFAULT_LOGGING_CONFIG = {

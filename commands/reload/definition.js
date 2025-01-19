@@ -1,14 +1,8 @@
-const shell = require("node:util").promisify(require("node:child_process").exec);
+import { promisify } from "node:util";
+import { exec } from "node:child_process";
+import config from "../../config.json";
 
-let config;
-try {
-	config = require("../../config.json");
-}
-catch {
-	console.warn(`Custom config not found, $reload command will use base path "${__dirname}"`);
-	config = { basePath: __dirname };
-}
-
+const shell = promisify(exec);
 const BASE_PATH = config.basePath;
 
 const upgrade = async (context, module, name, reloadAll, ...list) => {

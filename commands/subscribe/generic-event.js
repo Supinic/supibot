@@ -1,4 +1,4 @@
-const { parseRSS } = require("../../utils/command-utils.js");
+import { parseRSS } from "../../utils/command-utils.js";
 const DEFAULT_CHANNEL_ID = 38;
 
 /*

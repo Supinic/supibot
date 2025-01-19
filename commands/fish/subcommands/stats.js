@@ -1,4 +1,4 @@
-const { hasFishedBefore } = require("./fishing-utils.js");
+import { hasFishedBefore } from "./fishing-utils.js";
 
 export default {
 	name: "stats",

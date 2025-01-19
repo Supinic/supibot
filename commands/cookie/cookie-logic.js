@@ -1,4 +1,4 @@
-const { randomInt } = require("../../utils/command-utils.js");
+import { randomInt } from "../../utils/command-utils.js";
 
 /** @type {CookieData} */
 const basicStats = {
@@ -279,7 +279,7 @@ const donateCookie = (donator, receiver, donatorOptions = {}, receiverOptions = 
 
 /* istanbul ignore next */
 const fetchRandomCookieText = async () => {
-	const cookies = require("./fortune-cookies.json");
+	import cookies from "./fortune-cookies.json";
 	const cookie = sb.Utils.randArray(cookies);
 
 	return cookie.text;

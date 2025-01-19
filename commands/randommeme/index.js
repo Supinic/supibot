@@ -40,8 +40,8 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function randomMeme (context, ...args) {
-		const config = require("./config.json");
-		const Subreddit = require("./subreddit.js");
+		import config from "./config.json";
+		import Subreddit from "./subreddit.js";
 
 		this.data.subreddits ??= {};
 
@@ -296,7 +296,7 @@ export default {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { defaultMemeSubreddits } = require("./config.json");
+		import { defaultMemeSubreddits } from "./config.json";
 		return [
 			"Posts a random Reddit meme. If a subreddit is provided, posts a random non-text post from there.",
 			"",

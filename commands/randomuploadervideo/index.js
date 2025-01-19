@@ -1,5 +1,5 @@
-const { fetchYoutubePlaylist } = require("../../utils/command-utils.js");
-const { getLinkParser } = require("../../utils/link-parser.js");
+import { fetchYoutubePlaylist } from "../../utils/command-utils.js";
+import { getLinkParser } from "../../utils/link-parser.js";
 
 export default {
 	Name: "randomuploadervideo",

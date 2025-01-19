@@ -16,7 +16,7 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function aliasBuildingBlock (context, type, ...args) {
-		const { blocks } = require("./blocks/index.js");
+		import { blocks } from "./blocks/index.js";
 		if (!context.append.alias && !context.append.pipe) {
 			if (!type) {
 				return {
@@ -64,7 +64,7 @@ export default {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { blocks } = require("./blocks/index.js");
+		import { blocks } from "./blocks/index.js";
 		const list = blocks.map(i => {
 			const aliases = (i.aliases.length > 0)
 				? `(${i.aliases.join(", ")})`

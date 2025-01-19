@@ -1,5 +1,5 @@
-const { PLAYSOUNDS_ENABLED } = require("../../utils/shared-cache-keys.json");
-const config = require("../../config.json");
+import { PLAYSOUNDS_ENABLED } from "../../utils/shared-cache-keys.json";
+import config from "../../config.json";
 const {
 	listenerAddress,
 	listenerPort,

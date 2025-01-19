@@ -8,7 +8,7 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function poe (context, type, ...args) {
-		const { subcommands } = require("./definitions.js");
+		import { subcommands } from "./definitions.js";
 
 		type = (type ?? "league").toLowerCase();
 
@@ -23,7 +23,7 @@ export default {
 		return await target.execute(context, ...args);
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { subcommands } = require("./definitions.js");
+		import { subcommands } from "./definitions.js";
 
 		return [
 			"Multiple commands related to Path of Exile.",

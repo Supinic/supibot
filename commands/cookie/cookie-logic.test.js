@@ -1,6 +1,6 @@
 /* eslint-disable max-nested-callbacks, prefer-arrow-callback */
-const assert = require("node:assert");
-const Logic = require("./cookie-logic.js");
+import assert from "node:assert";
+import Logic from "./cookie-logic.js";
 
 // Allow proper object cloning when `structuredClone` is not available
 // E.g. in workers

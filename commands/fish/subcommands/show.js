@@ -1,4 +1,4 @@
-const { COIN_EMOJI, getInitialStats, hasFishedBefore, itemTypes, itemTypeDefinitions } = require("./fishing-utils.js");
+import { COIN_EMOJI, getInitialStats, hasFishedBefore, itemTypes, itemTypeDefinitions } from "./fishing-utils.js";
 const defaultShowType = itemTypeDefinitions.find(i => i.name === "fish");
 
 export default {

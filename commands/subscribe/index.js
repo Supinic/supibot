@@ -1,4 +1,4 @@
-const { CronJob } = require("cron");
+import { CronJob } from "cron";
 const nameSymbol = Symbol.for("name");
 const definitionSymbol = Symbol.for("definition");
 
@@ -14,8 +14,8 @@ export default {
 	],
 	Whitelist_Response: null,
 	initialize: async function () {
-		const rssSubscriptions = require("./event-types/index.js").filter(i => i.generic);
-		const { handleGenericSubscription } = require("./generic-event.js");
+		import rssSubscriptions from "./event-types/index.js").filter(i => i.generic;
+		import { handleGenericSubscription } from "./generic-event.js";
 
 		this.data.crons = new Set();
 
@@ -48,7 +48,7 @@ export default {
 
 		type = type.toLowerCase();
 
-		const eventDefinitions = require("./event-types/index.js");
+		import eventDefinitions from "./event-types/index.js";
 		const event = eventDefinitions.find(i => {
 			const lowerName = i.name.toLowerCase();
 			const lowerAliases = i.aliases.map(j => j.toLowerCase());
@@ -197,7 +197,7 @@ export default {
 		}
 	},
 	Dynamic_Description: async function (prefix) {
-		const types = require("./event-types/index.js");
+		import types from "./event-types/index.js";
 		const typesList = types.map(i => sb.Utils.tag.trim `
 			<li>
 				<code>${i.name}</code>

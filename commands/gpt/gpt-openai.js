@@ -1,6 +1,6 @@
-const config = require("./config.json");
-const Template = require("./gpt-template.js");
-const GptHistory = require("./history-control.js");
+import config from "./config.json";
+import Template from "./gpt-template.js";
+import GptHistory from "./history-control.js";
 
 const DEFAULT_SYSTEM_MESSAGE = "Keep the response as short and concise as possible.";
 

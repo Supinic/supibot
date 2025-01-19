@@ -1,8 +1,8 @@
-const DatabaseLogs = require("./db-randomline.js");
-const Rustlog = require("./rustlog.js");
-const { connectedChannelGroups } = require("./connected-channels.json");
+import DatabaseLogs from "./db-randomline.js";
+import Rustlog from "./rustlog.js";
+import { connectedChannelGroups } from "./connected-channels.json";
 
-const config = require("../../config.json");
+import config from "../../config.json";
 const { instances } = config.rustlog;
 
 export default {

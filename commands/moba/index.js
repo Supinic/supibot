@@ -1,5 +1,7 @@
+import LeagueDefinition from "./league";
+
 const GAMES = {
-	league: require("./league")
+	league: LeagueDefinition
 };
 
 export default {

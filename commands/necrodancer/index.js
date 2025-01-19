@@ -1,7 +1,7 @@
-const { searchYoutube } = require("../../utils/command-utils.js");
-const { zones } = require("./game-data.json");
+import { searchYoutube } from "../../utils/command-utils.js";
+import { zones } from "./game-data.json";
 
-const config = require("../../config.json");
+import config from "../../config.json";
 const { listenerAddress, listenerPort } = config.local ?? {};
 
 const EXTRA_COOLDOWN = 600_000;

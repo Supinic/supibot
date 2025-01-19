@@ -1,4 +1,4 @@
-const { randomInt } = require("../../utils/command-utils.js");
+import { randomInt } from "../../utils/command-utils.js";
 const ANTI_PING_CHARACTER = "\u{E0000}";
 
 const convert = {
@@ -42,8 +42,8 @@ const convert = {
 	}
 };
 
-const textCaseCode = require("./text-case-code.js");
-const officialCharactersMap = require("./definitions/official-characters.json");
+import textCaseCode from "./text-case-code.js";
+import officialCharactersMap from "./definitions/official-characters.json";
 
 /**
  * @typedef {Record<string, string>} TextTransformMap
@@ -278,7 +278,7 @@ const types = [
 		aliases: [],
 		data: (message) => {
 			const arr = [];
-			const morse = require("./definitions/morse.json");
+			import morse from "./definitions/morse.json";
 			for (const character of message.toLowerCase()) {
 				if (character === " ") {
 					arr.push("/");

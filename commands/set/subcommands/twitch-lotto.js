@@ -1,7 +1,7 @@
 let availableFlags = [];
 let createRecentTwitchLottoCacheKey;
 try {
-	const definitions = require("../../twitchlotto/definitions.js");
+	import definitions from "../../twitchlotto/definitions.js";
 
 	availableFlags = definitions.flags.map(i => i.name.toLowerCase());
 	createRecentTwitchLottoCacheKey = definitions.createRecentUseCacheKey;

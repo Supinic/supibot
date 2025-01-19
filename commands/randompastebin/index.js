@@ -1,4 +1,4 @@
-const pastebinLanguages = require("./pastebin-languages.json");
+import pastebinLanguages from "./pastebin-languages.json";
 
 export default {
 	Name: "randompastebin",

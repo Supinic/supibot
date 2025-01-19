@@ -44,7 +44,7 @@ export default {
 		"Posts a random image set that someone has created before."
 	]),
 	Code: (async function dallE (context, ...args) {
-		const { createEmbeds } = require("./discord-embed.js");
+		import { createEmbeds } from "./discord-embed.js";
 
 		if (context.params.search || context.params.random || context.params.id) {
 			const { id, random, search } = context.params;
@@ -93,7 +93,7 @@ export default {
 			};
 		}
 
-		const pending = require("./pending.js");
+		import pending from "./pending.js";
 		const query = args.join(" ");
 		if (!query) {
 			return {
@@ -175,7 +175,7 @@ export default {
 		}
 
 		const { images } = response.body;
-		const hash = require("node:crypto").createHash("sha512");
+		import hash from "node:crypto").createHash("sha512";
 		for (const base64Image of images) {
 			hash.update(base64Image);
 		}

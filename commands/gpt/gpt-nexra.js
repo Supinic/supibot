@@ -1,7 +1,7 @@
-const { setTimeout: wait } = require("node:timers/promises");
+import { setTimeout as wait } from "node:timers/promises";
 
-const GptOpenAI = require("./gpt-openai.js");
-const GptHistory = require("./history-control.js");
+import GptOpenAI from "./gpt-openai.js";
+import GptHistory from "./history-control.js";
 
 export default class GptNexra extends GptOpenAI {
 	static async getHistory (context) {

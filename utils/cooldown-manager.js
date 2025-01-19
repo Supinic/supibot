@@ -1,4 +1,4 @@
-const { values } = require("../config.json");
+import { values } from "../config.json";
 
 class Cooldown {
 	#channel = null;
