@@ -1,5 +1,5 @@
 import DatabaseLogs from "./db-randomline.js";
-import Rustlog from "./rustlog.js";
+import { getRandomChannelLine, getRandomUserLine, isSupported } from "./rustlog.js";
 import { connectedChannelGroups } from "./connected-channels.json";
 
 import config from "../../config.json";
@@ -40,7 +40,7 @@ export default {
 			}
 
 			const channelID = context.channel.Specific_ID;
-			const isChannelSupported = await Rustlog.isSupported(channelID);
+			const isChannelSupported = await isSupported(channelID);
 			if (isChannelSupported === null) {
 				return {
 					success: false,
@@ -82,13 +82,13 @@ export default {
 					};
 				}
 
-				result = await Rustlog.getRandomUserLine(channelID, userID);
+				result = await getRandomUserLine(channelID, userID);
 			}
 			else if (context.params.userID) {
-				result = await Rustlog.getRandomUserLine(channelID, context.params.userID);
+				result = await getRandomUserLine(channelID, context.params.userID);
 			}
 			else {
-				result = await Rustlog.getRandomChannelLine(channelID);
+				result = await getRandomChannelLine(channelID);
 			}
 		}
 		else if (user) {
