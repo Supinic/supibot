@@ -9,7 +9,7 @@ export default async (config) => {
 		throw new Error("Cannot combine both blacklist and whitelist options");
 	}
 
-	const nodeList = await fs.readdir(__dirname, {
+	const nodeList = await fs.readdir(import.meta.dirname, {
 		withFileTypes: true
 	});
 
@@ -29,7 +29,7 @@ export default async (config) => {
 		}
 
 		let definition;
-		const indexPath = path.join(__dirname, dir.name, "index.js");
+		const indexPath = path.join(import.meta.dirname, dir.name, "index.js");
 		try {
 			definition = await import(indexPath);
 		}
