@@ -1,5 +1,4 @@
-import loadDefinitions from "./statistics.js";
-const definitions = loadDefinitions();
+import definitions from "./definitions/";
 
 export default {
 	Name: "statistics",
@@ -23,7 +22,7 @@ export default {
 		}
 
 		type = type.toLowerCase();
-		const target = definitions.find(i => i.name === type || i.aliases.includes(type));
+		const target = definitions.find(i => i.name === type || i.aliases?.includes(type));
 		if (!target) {
 			return {
 				reply: "Unrecognized statistics type provided!",

@@ -1,5 +1,5 @@
 import { fetchYoutubePlaylist, postToHastebin } from "../../utils/command-utils.js";
-import { getLinkParser } from "../../utils/link-parser.js";
+import getLinkParser from "../../utils/link-parser.js";
 const limit = 100;
 
 export default {

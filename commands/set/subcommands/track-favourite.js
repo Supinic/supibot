@@ -1,4 +1,4 @@
-import { getLinkParser } from "../../../utils/link-parser.js";
+import getLinkParser from "../../../utils/link-parser.js";
 
 const fetchTrackIDs = async (tracks) => {
 	const linkParser = await getLinkParser();

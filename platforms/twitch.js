@@ -1,6 +1,7 @@
 import WebSocket from "ws";
-import Template from "./template.js";
 import { randomBytes } from "node:crypto";
+import Template from "./template.js";
+import cacheKeys from "../utils/shared-cache-keys.json";
 
 import TwitchUtils, {
 	assignWebsocketToConduit,
@@ -22,13 +23,13 @@ import TwitchUtils, {
 	sanitizeMessage
 } from "./twitch-utils.js";
 
-import { TWITCH_ADMIN_SUBSCRIBER_LIST } from "../utils/shared-cache-keys.json";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
 // eslint-disable-next-line no-bitwise
 const SEVEN_TV_ZERO_WIDTH_FLAG = (1 << 8);
 
+const { TWITCH_ADMIN_SUBSCRIBER_LIST } = cacheKeys;
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
 const WRITE_MODE_MESSAGE_DELAY = 1500;
 const NO_EVENT_RECONNECT_TIMEOUT = 10000; // @todo move to config

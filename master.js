@@ -16,6 +16,7 @@ import VLCConnector from "./singletons/vlc-connector.js";
 import Platform from "./platforms/template.js";
 
 import initializeInternalApi from "./api/index.js";
+import loadCommands from "./commands/";
 
 const importFileDataModule = async (module, path) => {
 	if (!config.modules[path]) {
@@ -51,7 +52,7 @@ const importFileDataModule = async (module, path) => {
 
 let config;
 try {
-	config = require("./config.json");
+	config = await import("./config.json");
 }
 catch {
 	throw new Error("No custom configuration found! Copy `config-default.json` as `config.json` and set up your configuration");
@@ -76,11 +77,7 @@ const initializeCommands = async (config) => {
 		whitelist
 	} = config.modules.commands;
 
-	const { loadCommands } = await require("./commands/index.js");
-	const commands = await loadCommands({
-		blacklist,
-		whitelist
-	});
+	const commands = await loadCommands({ blacklist, whitelist });
 
 	await Command.importData(commands.definitions);
 	console.timeEnd("Load commands");
@@ -174,7 +171,8 @@ const initializeCommands = async (config) => {
 	console.time("chat modules");
 
 	await Promise.all([
-		importFileDataModule(ChatModule, "chat-modules"), importFileDataModule(sb.Got, "gots")
+		importFileDataModule(ChatModule, "chat-modules"),
+		importFileDataModule(sb.Got, "gots")
 	]);
 
 	console.timeEnd("chat modules");

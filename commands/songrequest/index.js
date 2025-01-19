@@ -1,4 +1,4 @@
-import { getLinkParser } from "../../utils/link-parser.js";
+import getLinkParser from "../../utils/link-parser.js";
 import { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.js";
 import CytubeIntegration from "./cytube-integration.js";
 

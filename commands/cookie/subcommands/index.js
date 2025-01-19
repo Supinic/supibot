@@ -1,10 +1,11 @@
-const subcommands = [
-	require("./eat.js"),
-	require("./donate.js"),
-	require("./stats.js"),
-	require("./top.js")
-];
+import EatSubcommand from "./eat.js";
+import DonateSubcommand from "./donate.js";
+import StatsSubcommand from "./stats.js";
+import TopSubcommand from "./top.js";
 
-export default {
-	subcommands
-};
+export default [
+	EatSubcommand,
+	DonateSubcommand,
+	StatsSubcommand,
+	TopSubcommand
+];

@@ -1,8 +1,10 @@
-import { SOUNDCLOUD_CLIENT_ID } from "../utils/shared-cache-keys.json";
+import cacheKeys from "../utils/shared-cache-keys.json";
 import LinkParser from "track-link-parser";
+
+const { SOUNDCLOUD_CLIENT_ID } = cacheKeys;
 let linkParser;
 
-const getLinkParser = async () => {
+export default async () => {
 	if (!linkParser) {
 		const options = {};
 		if (process.env.API_GOOGLE_YOUTUBE) {
@@ -38,8 +40,4 @@ const getLinkParser = async () => {
 	}
 
 	return linkParser;
-};
-
-export default {
-	getLinkParser
 };

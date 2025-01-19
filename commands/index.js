@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const loadCommands = (async (config) => {
+export default async (config) => {
 	const blacklist = config?.blacklist ?? [];
 	const whitelist = config?.whitelist ?? [];
 
@@ -54,8 +54,4 @@ const loadCommands = (async (config) => {
 		failed,
 		skipped
 	};
-});
-
-export default {
-	loadCommands
 };

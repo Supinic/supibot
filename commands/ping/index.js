@@ -1,7 +1,8 @@
 import { randomInt } from "../../utils/command-utils.js";
-const promisify = require("node:util").promisify;
-const exec = promisify(require("node:child_process").exec);
+import { promisify } from "node:util";
+import { exec } from "node:child_process";
 
+const shell = promisify(exec);
 const checkLatency = async (callback, ...args) => {
 	try {
 		const start = process.hrtime.bigint();
@@ -29,7 +30,7 @@ export default {
 	 */
 	Code: async function ping (context) {
 		const [temperatureResult] = await Promise.allSettled([
-			exec("vcgencmd measure_temp")
+			shell("vcgencmd measure_temp")
 		]);
 
 		const temperature = (temperatureResult.value)

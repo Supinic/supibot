@@ -1,4 +1,4 @@
-import { getLinkParser } from "../../utils/link-parser.js";
+import getLinkParser from "../../utils/link-parser.js";
 import { searchYoutube } from "../../utils/command-utils.js";
 
 const CYTUBE_LIMITS = {

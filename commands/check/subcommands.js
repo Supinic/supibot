@@ -3,6 +3,9 @@ import { postToHastebin } from "../../utils/command-utils.js";
 import { isSupported } from "../randomline/rustlog.js";
 import handleErrorInspection from "./inspect-errors.js";
 
+import GptCache from "../gpt/cache-control.js";
+import CookieLogic from "../cookie/cookie-logic.js";
+
 import cacheKeys from "../../utils/shared-cache-keys.json";
 const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
 
@@ -171,17 +174,6 @@ export default [
 				}
 			}
 			else {
-				let GptCache;
-				try {
-					GptCache = require("../gpt/cache-control.js");
-				}
-				catch {
-					return {
-						success: false,
-						reply: `ChatGPT caching module is currently not available!`
-					};
-				}
-
 				const targetUser = (target) ? await sb.User.get(target) : context.user;
 				if (!targetUser) {
 					return {
@@ -256,17 +248,6 @@ export default [
 			if (!userCookieData) {
 				return {
 					reply: `${pronoun} have never eaten a cookie before.`
-				};
-			}
-
-			let CookieLogic;
-			try {
-				CookieLogic = require("../cookie/cookie-logic.js");
-			}
-			catch {
-				return {
-					success: false,
-					reply: `Could not load the cookie logic module!`
 				};
 			}
 

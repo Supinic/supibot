@@ -56,7 +56,7 @@ const upgrade = async (context, module, name, reloadAll, ...list) => {
 				const path = `${BASE_PATH}/${name}/${instanceName}`;
 				try {
 					if (name === "commands") {
-						definitions.push(require(path));
+						definitions.push(await import(path));
 					}
 					else {
 						const { definition } = await import(`${path}/index.mjs`);

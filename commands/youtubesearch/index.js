@@ -1,5 +1,5 @@
 import { searchYoutube } from "../../utils/command-utils.js";
-import { getLinkParser } from "../../utils/link-parser.js";
+import getLinkParser from "../../utils/link-parser.js";
 
 const RESULTS_PER_SEARCH = 25;
 const DAILY_SEARCHES_CAP = 2000;

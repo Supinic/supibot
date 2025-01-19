@@ -1,4 +1,4 @@
-import { getLinkParser } from "../../utils/link-parser.js";
+import getLinkParser from "../../utils/link-parser.js";
 
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 const { SOUNDCLOUD_CLIENT_ID } = sharedKeys;

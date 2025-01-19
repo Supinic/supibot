@@ -1,4 +1,4 @@
-import CookieStatistics from "../../statistics/types/cookie-count.js";
+import CookieStatistics from "../../statistics/definitions/cookie-count.js";
 
 export default {
 	name: "stats",

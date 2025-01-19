@@ -1,5 +1,5 @@
 import { fetchYoutubePlaylist } from "../../utils/command-utils.js";
-import { getLinkParser } from "../../utils/link-parser.js";
+import getLinkParser from "../../utils/link-parser.js";
 
 export default {
 	Name: "randomuploadervideo",

@@ -1,4 +1,4 @@
-import { getLinkParser } from "../../utils/link-parser.js";
+import getLinkParser from "../../utils/link-parser.js";
 import { postToHastebin } from "../../utils/command-utils.js";
 
 export default {
