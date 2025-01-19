@@ -1,6 +1,6 @@
 const { DEFAULT_USER_IDENTIFIER_KEY } = require("../../moba/league/utils.js");
 
-module.exports = {
+export default {
 	name: "league-user",
 	aliases: [],
 	parameter: "arguments",

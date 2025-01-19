@@ -1,6 +1,6 @@
 const { formatScore, scoreThreshold } = require("./definitions.js");
 
-module.exports = function checkSafetyStatus (safeMode, blacklistedFlags, image) {
+export default function checkSafetyStatus (safeMode, blacklistedFlags, image) {
 	if (image.Score === null) {
 		return {
 			success: true

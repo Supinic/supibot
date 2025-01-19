@@ -5,7 +5,7 @@ const { connectedChannelGroups } = require("./connected-channels.json");
 const config = require("../../config.json");
 const { instances } = config.rustlog;
 
-module.exports = {
+export default {
 	Name: "randomline",
 	Aliases: ["rl","rq"],
 	Author: "supinic",

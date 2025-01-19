@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "bestavailableemote",
 	aliases: ["bae"],
 	description: "For a list of emotes, uses the first one that is actually available in the channel. The last one should be a \"fallback\", so it should be available anywhere.",

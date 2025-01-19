@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "supibot",
 	aliases: ["bot"],
 	description: "Posts the link to Supibot's stats",

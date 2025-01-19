@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "reminder",
 	aliases: ["remind", "reminders"],
 	parameter: "ID",

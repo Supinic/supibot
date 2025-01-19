@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "chatneighbour",
 	Aliases: ["cn"],
 	Author: "supinic",

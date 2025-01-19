@@ -1,6 +1,7 @@
 const config = require("../config.json");
+import Template from "./template.js";
 
-module.exports = class User extends require("./template.js") {
+export default class User extends Template {
 	static mapCacheExpiration = 300_000;
 	static redisCacheExpiration = 3_600_000;
 	static mapExpirationInterval = setInterval(() => User.data.clear(), User.mapCacheExpiration);

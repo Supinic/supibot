@@ -15,7 +15,7 @@ const ERROR_REASONS = {
 	"pipe-nsfw": "You cannot pipe NSFW results!"
 };
 
-module.exports = {
+export default {
 	Name: "pipe",
 	Aliases: null,
 	Author: "supinic",

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "markov",
 	aliases: [],
 	description: "Returns quick stats about a markov module in a given channel.",

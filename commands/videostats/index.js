@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "videostats",
 	Aliases: null,
 	Author: "supinic",

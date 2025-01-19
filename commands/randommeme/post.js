@@ -1,4 +1,4 @@
-module.exports = class RedditPost {
+export default class RedditPost {
 	#author;
 	#created;
 	#id;

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "gpt",
 	aliases: [],
 	description: "Checks how many queries, and how many tokens have been used in $gpt this month.",

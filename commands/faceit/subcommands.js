@@ -4,7 +4,7 @@ const names = [
 ];
 
 const commands = names.map(commandName => require(`./subcommands/${commandName}.js`));
-module.exports = {
+export default {
 	names,
 	commands
 };

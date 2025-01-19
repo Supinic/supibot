@@ -2,7 +2,7 @@ const SPECIAL_CURRENCY_ALIASES = {
 	RMB: "CNY"
 };
 
-module.exports = {
+export default {
 	Name: "currency",
 	Aliases: ["money"],
 	Author: "supinic",

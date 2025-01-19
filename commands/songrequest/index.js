@@ -91,7 +91,7 @@ const parseTimestamp = (linkParser, string) => {
 	return value;
 };
 
-module.exports = {
+export default {
 	Name: "songrequest",
 	Aliases: ["sr"],
 	Author: "supinic",

@@ -1,6 +1,6 @@
 const { randomInt } = require("../../utils/command-utils.js");
 
-module.exports = {
+export default {
 	Name: "funfact",
 	Aliases: ["ff"],
 	Author: "supinic",

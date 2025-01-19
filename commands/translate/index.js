@@ -1,7 +1,7 @@
 let logTableExists;
 const engines = ["deepl", "google"];
 
-module.exports = {
+export default {
 	Name: "translate",
 	Aliases: ["deepl"],
 	Author: "supinic",

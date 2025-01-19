@@ -54,6 +54,6 @@ const check = async (context, text) => {
 	};
 };
 
-module.exports = {
+export default {
 	check
 };

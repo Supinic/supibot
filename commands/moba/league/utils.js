@@ -307,7 +307,7 @@ const getMatchData = async (matchId) => {
 	return matchData;
 };
 
-module.exports = {
+export default {
 	NON_STANDARD_CHAMPION_NAMES, // @todo replace by a DataDragon API call in production: https://ddragon.leagueoflegends.com/cdn/14.11.1/data/en_US/champion.json
 	DEFAULT_USER_IDENTIFIER_KEY,
 	DEFAULT_REGION_KEY,

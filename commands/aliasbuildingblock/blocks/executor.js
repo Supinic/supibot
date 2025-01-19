@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "executor",
 	aliases: ["self"],
 	description: "Prints your username.",

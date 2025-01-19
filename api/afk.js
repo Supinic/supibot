@@ -1,5 +1,5 @@
 // noinspection JSUnusedGlobalSymbols
-module.exports = {
+export default {
 	reloadAll: async () => {
 		await sb.AwayFromKeyboard.reloadData();
 		return {

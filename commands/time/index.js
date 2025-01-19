@@ -55,7 +55,7 @@ const detectTimezone = async (...args) => {
 	};
 };
 
-module.exports = {
+export default {
 	Name: "time",
 	Aliases: null,
 	Author: "supinic",

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	subcommands: [
 		require(`./check.js`),
 		require(`./list.js`),

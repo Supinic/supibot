@@ -58,7 +58,7 @@ const unset = (user, channel) => {
 	}
 };
 
-module.exports = {
+export default {
 	setOverloaded,
 	check,
 	set,

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "addbetween",
 	Aliases: ["ab"],
 	Author: "supinic",

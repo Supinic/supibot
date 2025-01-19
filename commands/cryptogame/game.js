@@ -253,7 +253,7 @@ const createConvertTransaction = async (portfolioData, sourceAsset, targetAsset,
 	};
 };
 
-module.exports = {
+export default {
 	availableCommands,
 	baseAsset,
 	getPortfolioData,

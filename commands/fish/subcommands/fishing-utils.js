@@ -434,7 +434,7 @@ const hasFishedBefore = (fishData) => {
 
 const COIN_EMOJI = "🪙";
 
-module.exports = {
+export default {
 	COIN_EMOJI,
 	baitTypes,
 	itemTypeDefinitions,

@@ -25,7 +25,7 @@ const POLLUTION_INDEX_ICONS = {
 	5: "🔴"
 };
 
-module.exports = {
+export default {
 	Name: "weather",
 	Aliases: null,
 	Author: "supinic",

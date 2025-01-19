@@ -14,7 +14,7 @@ const getClosestPacificMidnight = () => {
 	return result;
 };
 
-module.exports = {
+export default {
 	Name: "youtubesearch",
 	Aliases: ["ys"],
 	Author: "supinic",

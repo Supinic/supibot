@@ -1,7 +1,7 @@
 const RESPONSE_TIMEOUT = 10_000;
 let prefixes;
 
-module.exports = {
+export default {
 	Name: "externalbot",
 	Aliases: ["ebot"],
 	Author: "supinic",

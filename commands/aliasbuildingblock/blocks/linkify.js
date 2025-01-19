@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "linkify",
 	aliases: [],
 	description: "If the input is longer than the default (or provided) message length limit, posts a Hastebin instead. Otherwise, just re-posts the input again",

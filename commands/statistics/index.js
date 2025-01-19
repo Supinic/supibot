@@ -1,7 +1,7 @@
 const loadDefinitions = require("./statistics.js");
 const definitions = loadDefinitions();
 
-module.exports = {
+export default {
 	Name: "statistics",
 	Aliases: ["stat","stats"],
 	Author: "supinic",

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "simplesql",
 	Aliases: ["ssql"],
 	Author: "supinic",
@@ -13,14 +13,14 @@ module.exports = {
 			if (!query.includes("AVG") && !query.includes("LIMIT 1")) {
 				query += " LIMIT 1";
 			}
-	
+
 			const result = await sb.Query.raw(query);
 			if (!result[0]) {
 				return {
 					reply: "The result has zero rows!"
 				};
 			}
-	
+
 			return { reply: String(result[0][Object.keys(result[0])[0]]) };
 		}
 		catch (e) {

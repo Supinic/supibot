@@ -1,6 +1,6 @@
 const { methods } = require("./fetch-methods.js");
 
-module.exports = {
+export default {
 	Name: "doesnotexist",
 	Aliases: ["dne"],
 	Author: "supinic",

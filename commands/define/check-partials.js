@@ -8,7 +8,7 @@ const checkCommand = async (context, commandData, args) => await sb.Filter.execu
 	args
 });
 
-module.exports = {
+export default {
 	checkPartialCommandFilters: async (context, commandArgs) => {
 		const [dictFilter, urbanFilter, wikiFilter] = await Promise.all([
 			checkCommand(context, sb.Command.get("dictionary"), commandArgs),

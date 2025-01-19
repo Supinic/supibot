@@ -447,7 +447,7 @@ const initSubCacheCheckInterval = () => {
 
 const sanitizeMessage = (string) => string.replace(/^\u0001ACTION (.+)\u0001$/, "$1");
 
-module.exports = {
+export default {
 	getConduitId,
 	getAppAccessToken,
 	assignWebsocketToConduit,

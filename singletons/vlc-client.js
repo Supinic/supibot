@@ -6,6 +6,7 @@
 
 const http = require("node:http");
 const querystring = require("node:querystring");
+import EventEmitter from "node:events";
 
 const get = (options) => new Promise((resolve, reject) => {
 	http.get(options, response => {
@@ -39,7 +40,7 @@ const CommandScope = {
 	PLAYLIST: "/requests/playlist.json"
 };
 
-module.exports = class VLCClient extends require("node:events") {
+export default class VLCClient extends EventEmitter	{
 	#host;
 	#port;
 	#autoUpdate = true;

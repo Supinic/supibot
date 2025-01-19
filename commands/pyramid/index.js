@@ -1,6 +1,6 @@
 const { setTimeout } = require("node:timers/promises");
 
-module.exports = {
+export default {
 	Name: "pyramid",
 	Aliases: null,
 	Author: "supinic",

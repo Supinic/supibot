@@ -4,7 +4,7 @@ const { epalAudioChannels, listenerAddress, listenerPort } = config.local ?? {};
 
 const PROFILES_CACHE_KEY = "epal-profiles";
 
-module.exports = {
+export default {
 	Name: "epal",
 	Aliases: ["ForeverAlone"],
 	Author: "supinic",

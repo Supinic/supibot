@@ -9,7 +9,7 @@ const {
 const BASE_PLAYSOUND_CACHE_KEY = "playsound-cooldown";
 const getPlaysoundCacheKey = (playsoundName) => `${BASE_PLAYSOUND_CACHE_KEY}-${playsoundName}`;
 
-module.exports = {
+export default {
 	Name: "playsound",
 	Aliases: ["ps"],
 	Author: "supinic",

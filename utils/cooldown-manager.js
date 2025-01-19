@@ -227,4 +227,4 @@ class CooldownManager {
 	}
 }
 
-module.exports = CooldownManager;
+export default CooldownManager;

@@ -11,7 +11,7 @@ const ERROR_REASONS = {
 	"private-outgoing": "You have too many private reminders pending!"
 };
 
-module.exports = {
+export default {
 	Name: "remind",
 	Aliases: ["notify","remindme","remindprivate","privateremind"],
 	Author: "supinic",

@@ -1,6 +1,6 @@
 const variables = require("./subcommands/index.js");
 
-module.exports = {
+export default {
 	Name: "set",
 	Aliases: ["unset"],
 	Author: "supinic",

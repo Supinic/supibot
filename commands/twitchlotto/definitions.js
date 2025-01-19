@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	scoreThreshold: 0.5,
 	detections: require("./detections.json"),
 	maxRetries: 10,

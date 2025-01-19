@@ -1,7 +1,7 @@
 const subcommands = require("./subcommands");
 const SUBCOMMAND_NAMES = subcommands.map(i => i.name).join(", ");
 
-module.exports = {
+export default {
 	Name: "formula1",
 	Aliases: ["f1"],
 	Author: "supinic",

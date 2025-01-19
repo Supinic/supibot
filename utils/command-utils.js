@@ -25,7 +25,7 @@ const PASTEBIN_PRIVACY_OPTIONS = {
 	private: 2
 };
 
-module.exports = {
+export default {
 	randomInt (min, max) {
 		if (Math.abs(min) > Number.MAX_SAFE_INTEGER || Math.abs(max) > Number.MAX_SAFE_INTEGER) {
 			throw new sb.Error({

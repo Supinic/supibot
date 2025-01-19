@@ -1,6 +1,6 @@
 const { getLinkParser } = require("../../../utils/link-parser.js");
 
-module.exports = {
+export default {
 	name: "sr",
 	aliases: [],
 	description: "Checks various song requests statistics on supinic's channel.",

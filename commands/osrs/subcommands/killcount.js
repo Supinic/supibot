@@ -1,7 +1,7 @@
 const OsrsUtils = require("./osrs-utils.js");
 const GameData = require("../game-data.json");
 
-module.exports = {
+export default {
 	name: "kc",
 	title: "Kill count",
 	aliases: ["kill-count"],

@@ -1,7 +1,7 @@
 const { randomInt } = require("../../utils/command-utils.js");
 const MAXIMUM_EMOTE_LIMIT = 200;
 
-module.exports = {
+export default {
 	Name: "randomemote",
 	Aliases: ["rem"],
 	Author: "supinic",

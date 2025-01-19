@@ -21,7 +21,7 @@ const executeScriptVm = (script, options) => {
 	return vm.run(script);
 };
 
-module.exports = {
+export default {
 	Name: "dankdebug",
 	Aliases: ["js"],
 	Author: "supinic",

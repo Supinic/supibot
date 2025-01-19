@@ -191,7 +191,7 @@ const addChannel = async function (channelID) {
 	}
 };
 
-module.exports = {
+export default {
 	addChannel,
 	isSupported,
 	getRandomChannelLine,

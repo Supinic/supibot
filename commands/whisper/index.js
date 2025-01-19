@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "whisper",
 	Aliases: ["/w", "pm"],
 	Author: "supinic",

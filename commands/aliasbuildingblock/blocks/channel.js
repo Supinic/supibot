@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "channel",
 	aliases: [],
 	description: "Prints the current channel, or \"(none\") if in PMs.",

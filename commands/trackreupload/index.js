@@ -1,6 +1,6 @@
 const { VIDEO_TYPE_REPLACE_PREFIX } = require("../../utils/command-utils.js");
 
-module.exports = {
+export default {
 	Name: "trackreupload",
 	Aliases: ["tr"],
 	Author: "supinic",

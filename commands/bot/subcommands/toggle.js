@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "toggle",
 	aliases: ["enable", "disable"],
 	description: [

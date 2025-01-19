@@ -20,7 +20,7 @@ const redditGot = (...args) => {
 	return redditGotInstance(...args);
 };
 
-module.exports = {
+export default {
 	Name: "randommeme",
 	Aliases: ["rm"],
 	Author: "supinic",

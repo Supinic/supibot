@@ -1,6 +1,6 @@
 const { CronJob } = require("cron");
 
-module.exports = {
+export default {
 	Name: "cryptogame",
 	Aliases: ["cg"],
 	Author: "supinic",

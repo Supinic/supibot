@@ -6,6 +6,6 @@ const preventTomfoolery = () => {
 	Object.defineProperty(AsyncFunctionPrototype, "constructor", { value: () => {} });
 };
 
-module.exports = {
+export default {
 	preventTomfoolery
 };

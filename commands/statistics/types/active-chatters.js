@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "active-chatters",
 	aliases: ["activechatters"],
 	description: "Checks how many chatters are active in chat in the past 5 minutes.",

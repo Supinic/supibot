@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "help",
 	Aliases: ["commands","helpgrep"],
 	Author: "supinic",

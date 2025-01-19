@@ -1,5 +1,5 @@
 // noinspection JSUnusedGlobalSymbols
-module.exports = {
+export default {
 	invalidateCache: async (req, res, url) => {
 		const names = url.searchParams.getAll("name").filter(Boolean);
 		const promises = names.map(i => sb.User.invalidateUserCache(i));

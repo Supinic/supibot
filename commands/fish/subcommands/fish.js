@@ -43,7 +43,7 @@ const successfulFishDelay = 18e5; // 18e5 - 30 min
 const unsuccessfulFishDelay = [30_000, 90_000];
 const baitDisplay = baitTypes.map(i => `<code>${i.name}</code> ${i.emoji} (${i.price} coins, 1/${i.roll})`).join(" - ");
 
-module.exports = {
+export default {
 	name: "fish",
 	default: true,
 	aliases: [],

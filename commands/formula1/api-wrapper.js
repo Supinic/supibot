@@ -235,7 +235,7 @@ const fetchConstructorStandings = async (year) => {
 	return response.body.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings ?? [];
 };
 
-module.exports = {
+export default {
 	url,
 	fetchDriverStandings,
 	fetchConstructorStandings,

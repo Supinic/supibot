@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "stackoverflowsearch",
 	Aliases: ["stackoverflow","sos"],
 	Author: "supinic",

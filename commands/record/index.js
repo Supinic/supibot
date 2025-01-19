@@ -12,7 +12,7 @@ const RECORD_TYPES = [
 ];
 const RECORD_NAMES = RECORD_TYPES.map(i => i.name);
 
-module.exports = {
+export default {
 	Name: "record",
 	Aliases: null,
 	Author: "supinic",

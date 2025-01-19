@@ -528,7 +528,7 @@ class Platform {
 	}
 }
 
-module.exports = Platform;
+export default Platform;
 
 /**
  * @typedef {Object} TypedEmote Describes any emote

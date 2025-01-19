@@ -285,7 +285,7 @@ const fetchRandomCookieText = async () => {
 	return cookie.text;
 };
 
-module.exports = {
+export default {
 	determineAvailableDailyCookieType,
 	canEatDailyCookie,
 	canEatReceivedCookie,

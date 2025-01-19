@@ -14,7 +14,7 @@ const getHighlights = async (race) => {
 	return await searchYoutube(`${race.season} ${race.raceName} highlights formula 1`);
 };
 
-module.exports = {
+export default {
 	name: "race",
 	aliases: [],
 	description: [

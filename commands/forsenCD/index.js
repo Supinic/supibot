@@ -3,7 +3,7 @@ const { tweets } = require("./guy-beahm.json");
 const MAXIMUM_REPEATS = 5;
 const previousPosts = [];
 
-module.exports = {
+export default {
 	Name: "forsenCD",
 	Aliases: ["pajaCD"],
 	Author: "supinic",

@@ -5,7 +5,7 @@ const GENIUS_ACCESS_TOKEN = "CXyFeSBw2lAdG41xkuU3LS6a_nwyxwwCz2dCkUohw-rw0C49x2H
 const ALBUM_ID_RANGE = [100, 650_000];
 const MAX_RETRIES = 5;
 
-module.exports = {
+export default {
 	Name: "randomalbum",
 	Aliases: ["ra"],
 	Author: "supinic",

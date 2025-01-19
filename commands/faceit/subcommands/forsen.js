@@ -10,7 +10,7 @@ const hasForsenWon = (gameData) => {
 	return winningPlayerIDs.includes(forsenUserID);
 };
 
-module.exports = {
+export default {
 	name: "forsen",
 	aliases: [],
 	getDescription: (prefix) => [

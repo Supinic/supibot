@@ -1,6 +1,6 @@
 const { handleGenericFilter, parseGenericFilterOptions } = require("../../utils/command-utils.js");
 
-module.exports = {
+export default {
 	Name: "unping",
 	Aliases: ["reping"],
 	Author: "supinic",

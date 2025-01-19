@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "wiki",
 	title: "Search the Wiki",
 	aliases: ["search"],

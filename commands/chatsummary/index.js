@@ -102,7 +102,7 @@ const getRustlogLogs = async (channel, limit = 50) => {
 	};
 };
 
-module.exports = {
+export default {
 	Name: "chatsummary",
 	Aliases: ["csum"],
 	Author: "supinic",

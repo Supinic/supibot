@@ -12,7 +12,7 @@ const CookieLogic = require("./cookie-logic");
 const defaultSubcommand = subcommands.find(i => i.flags?.defaultOnEmptyInput);
 const subcommandNames = subcommands.map(i => i.name).join(", ");
 
-module.exports = {
+export default {
 	Name: "cookie",
 	Aliases: null,
 	Author: "supinic",

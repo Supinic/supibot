@@ -1,7 +1,7 @@
 const { getLinkParser } = require("../../utils/link-parser.js");
 const { postToHastebin } = require("../../utils/command-utils.js");
 
-module.exports = {
+export default {
 	Name: "getvideodata",
 	Aliases: ["gvd"],
 	Author: "supinic",

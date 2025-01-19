@@ -1,6 +1,6 @@
 const dongers = require("./dongers.json");
 
-module.exports = {
+export default {
 	Name: "randomdonger",
 	Aliases: ["rd"],
 	Author: "supinic",

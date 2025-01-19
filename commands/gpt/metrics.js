@@ -39,6 +39,6 @@ const process = (data) => {
 	}
 };
 
-module.exports = {
+export default {
 	process
 };

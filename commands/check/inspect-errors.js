@@ -9,7 +9,7 @@ const name = {
 	webError: "Website error"
 };
 
-module.exports = async function inspectErrorStacks (command, context, type, rawIdentifier) {
+export default async function inspectErrorStacks (command, context, type, rawIdentifier) {
 	const inspectErrorStacks = await context.user.getDataProperty("inspectErrorStacks");
 	if (!inspectErrorStacks) {
 		return {

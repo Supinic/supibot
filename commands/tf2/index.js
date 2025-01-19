@@ -5,7 +5,7 @@ const weapons = require("./weapons.json");
 const SUBCOMMAND_NAMES = ["roll"].join(", ");
 const TEAM_FORTRESS_CLASSES = ["Scout", "Pyro", "Soldier", "Heavy", "Demoman", "Medic", "Spy", "Engineer", "Sniper"];
 
-module.exports = {
+export default {
 	Name: "tf2",
 	Aliases: null,
 	Author: "supinic",

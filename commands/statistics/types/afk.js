@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "afk",
 	aliases: ["total-afk", "gn", "brb", "food", "shower", "lurk", "poop", "work", "study", "pppoof"],
 	description: "Checks the total time you (or another user) have been afk for. Each status type is separate - you can use total-afk to check all of them combined.",

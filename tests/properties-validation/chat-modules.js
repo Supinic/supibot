@@ -1,4 +1,4 @@
-module.exports = [
+export default [
 	{
 		name: "Name",
 		failMessage: "non-empty string",

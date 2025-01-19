@@ -23,7 +23,7 @@ const formatStar = (star, worldsData) => {
 	return `${world.flagEmoji} W${star.world}${activityString}: T${star.tier} ${star.calledLocation} (${delta})`;
 };
 
-module.exports = {
+export default {
 	name: "stars",
 	title: "Shooting Stars",
 	aliases: ["star"],

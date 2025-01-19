@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "Suggestion",
 	aliases: ["suggest", "suggestions"],
 	notes: "Whenever a suggestion you've made is updated, you will receive a private system reminder about it. Changes are detected every minute.",

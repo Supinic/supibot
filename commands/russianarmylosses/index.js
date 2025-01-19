@@ -1,6 +1,6 @@
 const { categories } = require("./categories.json");
 
-module.exports = {
+export default {
 	Name: "russianarmylosses",
 	Aliases: ["ral"],
 	Author: "boring_nick",

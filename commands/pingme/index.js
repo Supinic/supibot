@@ -6,7 +6,7 @@ const ERROR_REASONS = {
 	"existing-pingme": "You already have a \"pingme\" reminder set up for that user!"
 };
 
-module.exports = {
+export default {
 	Name: "pingme",
 	Aliases: ["letmeknow", "lmk"],
 	Author: "supinic",

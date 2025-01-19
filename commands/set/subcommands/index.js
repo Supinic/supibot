@@ -1,4 +1,4 @@
-module.exports = [
+export default [
 	require("./ambassador.js"),
 	require("./birthday.js"),
 	...require("./channel-flags.js"),

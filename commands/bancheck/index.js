@@ -1,6 +1,6 @@
 const { linkRegex } = require("../../utils/regexes.js");
 
-module.exports = {
+export default {
 	Name: "bancheck",
 	Aliases: ["bc"],
 	Author: "supinic",

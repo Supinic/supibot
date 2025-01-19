@@ -1,6 +1,6 @@
 const NUTRIENTS_DATA = require("./nutrients.json");
 
-module.exports = {
+export default {
 	Name: "nutrients",
 	Aliases: null,
 	Author: "supinic",

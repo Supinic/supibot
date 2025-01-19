@@ -25,6 +25,6 @@ const createMessageLoggingTable = async (tableName) => {
 	};
 };
 
-module.exports = {
+export default {
 	createMessageLoggingTable
 };

@@ -5,7 +5,7 @@ const fishEmojis = itemTypes.map(i => i.name);
  * @todo Use `modifier` to allow selling multiple fish of a single type: $fish sell TYPE 5
  */
 
-module.exports = {
+export default {
 	name: "sell",
 	aliases: [],
 	description: [

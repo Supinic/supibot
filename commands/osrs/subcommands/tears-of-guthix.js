@@ -1,6 +1,6 @@
 const { fetchWorldsData } = require("./utils.js");
 
-module.exports = {
+export default {
 	name: "guthix",
 	title: "Tears of Guthix",
 	aliases: ["tears", "tog"],

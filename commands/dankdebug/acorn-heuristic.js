@@ -62,6 +62,6 @@ const analyze = (script) => {
 	};
 };
 
-module.exports = {
+export default {
 	analyze
 };

@@ -1,4 +1,4 @@
-module.exports = [
+export default [
 	require("./item-id.js"),
 	require("./killcount.js"),
 	require("./price.js"),

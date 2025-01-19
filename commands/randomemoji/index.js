@@ -27,7 +27,7 @@ const generateEmoji = () => {
 	return string;
 };
 
-module.exports = {
+export default {
 	Name: "randomemoji",
 	Aliases: ["re"],
 	Author: "supinic",

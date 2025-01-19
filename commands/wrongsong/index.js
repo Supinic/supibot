@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "wrongsong",
 	Aliases: ["ws"],
 	Author: "supinic",

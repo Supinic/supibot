@@ -26,6 +26,6 @@ const blocks = [
 	TeeBlock
 ];
 
-module.exports = {
+export default {
 	blocks
 };

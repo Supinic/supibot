@@ -1,6 +1,6 @@
 const { fetchConstructorStandings } = require("../api-wrapper.js");
 
-module.exports = {
+export default {
 	name: "constructorStandings",
 	aliases: ["wcc"],
 	description: [

@@ -2,7 +2,7 @@ const REPEATS = 5;
 const MAXIMUM_REPLACEMENTS = 10;
 const headlinesRepeatArray = [];
 
-module.exports = {
+export default {
 	Name: "fakenews",
 	Aliases: null,
 	Author: "supinic",

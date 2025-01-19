@@ -11,7 +11,7 @@ const {
 	ttsVolume
 } = config.local ?? {};
 
-module.exports = {
+export default {
 	Name: "texttospeech",
 	Aliases: ["tts"],
 	Author: "supinic",

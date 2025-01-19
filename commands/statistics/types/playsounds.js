@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "playsound",
 	aliases: ["ps"],
 	description: "Checks the amount of times a given playsound has been used.",

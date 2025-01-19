@@ -15,6 +15,8 @@ const VLCConnector = require("./singletons/vlc-connector.js");
 // Platform require
 const Platform = require("./platforms/template.js");
 
+import initializeInternalApi from "./api/index.js";
+
 const importFileDataModule = async (module, path) => {
 	if (!config.modules[path]) {
 		throw new Error(`Missing configuration for ${path}`);
@@ -165,7 +167,7 @@ const initializeCommands = async (config) => {
 		Logger: new Logger(),
 		VideoLANConnector: VLCConnector.initialize(), // @todo move code from `initialize` here
 
-		API: require("./api")
+		API: initializeInternalApi()
 	};
 
 	console.timeEnd("basic bot modules");

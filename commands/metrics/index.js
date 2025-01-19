@@ -1,7 +1,7 @@
 const definitions = require("./definitions.js");
 const { baseUrl } = require("./prometheus-config.json");
 
-module.exports = {
+export default {
 	Name: "metrics",
 	Aliases: [],
 	Author: "supinic",

@@ -45,7 +45,7 @@ const staticNumberedLinkMapSummary = {
 	sneaker: () => `https://thissneakerdoesnotexist.com/editor/?seed=${randomInt(1, 2000)}`
 };
 
-module.exports = {
+export default {
 	methods: [
 		{
 			method: "reuploading an API request response",

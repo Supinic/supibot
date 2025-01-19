@@ -2,7 +2,7 @@ const { parseRSS } = require("../../utils/command-utils.js");
 
 const cleanString = (str) => sb.Utils.fixHTML(sb.Utils.removeHTML(str)).replaceAll(/\s+/g, " ");
 
-module.exports = {
+export default {
 	fetch: async (context, query) => {
 		if (context.params.link) {
 			return {

@@ -13,7 +13,7 @@ const prepareItemStrings = (item) => {
 	return { link, content, thumbs };
 };
 
-module.exports = {
+export default {
 	Name: "urban",
 	Aliases: null,
 	Author: "supinic",

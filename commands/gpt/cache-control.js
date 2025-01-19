@@ -156,7 +156,7 @@ const addUsageRecord = async (userData, value, modelName) => {
 	return await sb.Cache.server.zadd(cacheKey, sb.Date.now(), normalizedValue);
 };
 
-module.exports = {
+export default {
 	getTokenUsage,
 	determineUserLimits,
 	checkLimits,

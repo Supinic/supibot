@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "randomscp",
 	Aliases: ["rscp"],
 	Author: "caglapickaxe",

@@ -155,7 +155,7 @@ const execute = async (context, operation) => {
 	}
 };
 
-module.exports = {
+export default {
 	name: "trap",
 	aliases: ["net", "trawl"],
 	description: [

@@ -1,6 +1,6 @@
 const { LATEST_NODE_JS_VERSION } = require("../../../utils/shared-cache-keys.json");
 
-module.exports = {
+export default {
 	name: "Node.js updates",
 	aliases: ["node", "nodejs", "node.js"],
 	notes: "Every hour, supibot checks for new versions of Node.js. If a change is detected, you will be notified in the channel you subscribed in.",

@@ -60,6 +60,6 @@ const execute = async (data) => {
 	};
 };
 
-module.exports = {
+export default {
 	execute
 };

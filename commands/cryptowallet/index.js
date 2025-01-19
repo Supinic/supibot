@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "cryptowallet",
 	Aliases: ["cw"],
 	Author: "supinic",

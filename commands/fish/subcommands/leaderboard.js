@@ -21,7 +21,7 @@ for (const item of itemTypes) {
 	typeProperty[item.name] = [`catch.types.${item.name}`, `${item.name} collectors`];
 }
 
-module.exports = {
+export default {
 	name: "leaderboard",
 	aliases: ["top"],
 	description: [

@@ -1,3 +1,5 @@
+import Template from "./template.js";
+
 const apiDataSymbol = Symbol.for("banphrase-api-data");
 const apiResultSymbol = Symbol("banphrase-api-result");
 const inactiveSymbol = Symbol("banphrase-inactive");
@@ -36,7 +38,7 @@ class ExternalBanphraseAPI {
 	}
 }
 
-module.exports = class Banphrase extends require("./template.js") {
+export default class Banphrase extends Template {
 	ID;
 	Code;
 	Type;

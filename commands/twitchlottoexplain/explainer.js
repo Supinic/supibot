@@ -16,6 +16,6 @@ const explainDetections = (data) => {
 	return result;
 };
 
-module.exports = {
+export default {
 	explainDetections
 };

@@ -2,7 +2,7 @@ const { CronJob } = require("cron");
 const nameSymbol = Symbol.for("name");
 const definitionSymbol = Symbol.for("definition");
 
-module.exports = {
+export default {
 	Name: "subscribe",
 	Aliases: ["unsubscribe"],
 	Author: "supinic",

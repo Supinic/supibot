@@ -1,6 +1,6 @@
 const { types, upgrade } = require("./definition.js");
 
-module.exports = {
+export default {
 	Name: "reload",
 	Aliases: null,
 	Author: "supinic",

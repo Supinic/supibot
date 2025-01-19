@@ -1,6 +1,6 @@
 const { uploadToImgur } = require("../../utils/command-utils.js");
 
-module.exports = {
+export default {
 	Name: "query",
 	Aliases: ["wolframalpha", "wa"],
 	Author: "supinic",

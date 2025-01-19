@@ -1,7 +1,8 @@
 const Platform = require("../platforms/template.js");
 const { createMessageLoggingTable } = require("../utils/create-db-table.js");
+import Template from "./template.js";
 
-module.exports = class Channel extends require("./template.js") {
+export default class Channel extends Template {
 	static redisPrefix = "sb-channel";
 	static dataCache = new WeakMap();
 	static uniqueIdentifier = "ID";

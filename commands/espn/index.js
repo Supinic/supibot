@@ -16,7 +16,7 @@ const GAME_RANGE_DAYS = 90;
 const makeUrl = (league) => `https://site.api.espn.com/apis/site/v2/sports/${LEAGUES[league]}/${league}/scoreboard`;
 const createGamecastLink = (league, gameId) => `https://www.espn.com/${league}/game/_/gameId/${gameId}`;
 
-module.exports = {
+export default {
 	Name: "espn",
 	Aliases: ["nba", "nfl", "nhl", "mlb"],
 	Author: "supinic",

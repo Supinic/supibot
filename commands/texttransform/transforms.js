@@ -442,7 +442,7 @@ const types = [
 	}
 ];
 
-module.exports = {
+export default {
 	convert,
 	types
 };

@@ -25,6 +25,6 @@ const findPopularSymbol = (from) => {
 	}
 };
 
-module.exports = {
+export default {
 	findPopularSymbol
 };

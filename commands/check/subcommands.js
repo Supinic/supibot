@@ -6,7 +6,7 @@ const {
 	SONG_REQUESTS_VLC_PAUSED
 } = require("../../utils/shared-cache-keys.json");
 
-module.exports = (command) => [
+export default (command) => [
 	{
 		name: "afk",
 		aliases: [],

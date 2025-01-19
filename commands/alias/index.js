@@ -8,7 +8,7 @@ const ALIAS_DESCRIPTION_LIMIT = 250;
 const ALIAS_NAME_REGEX = /^[-\w\u00A9\u00AE\u2000-\u3300\uD83C\uD000-\uDFFF\uD83D\uD000-\uDFFF\uD83E\uD000-\uDFFF]{2,30}$/;
 const ALIAS_INVALID_NAME_RESPONSE = "Your alias should only contain letters, numbers and be 2-30 characters long.";
 
-module.exports = {
+export default {
 	Name: "alias",
 	Aliases: ["$"],
 	Author: "supinic",

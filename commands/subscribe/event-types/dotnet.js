@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: ".NET",
 	aliases: [".net"],
 	notes: "Every five minutes, Supibot checks new devblogs on Microsoft's .NET website. If a new article is detected, you will be notified in the channel you subscribed in.",

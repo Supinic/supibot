@@ -29,7 +29,7 @@ const methods = {
 	}
 };
 
-module.exports = {
+export default {
 	Name: "restart",
 	Aliases: null,
 	Author: "supinic",

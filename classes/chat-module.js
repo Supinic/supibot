@@ -1,7 +1,8 @@
 const Channel = require("./channel.js");
 const Platform = require("../platforms/template.js");
+import Template from "./template.js";
 
-module.exports = class ChatModule extends require("./template.js") {
+export default class ChatModule extends Template {
 	static importable = true;
 	static uniqueIdentifier = "Name";
 

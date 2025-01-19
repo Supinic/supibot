@@ -174,7 +174,7 @@ const types = [
 	}
 ];
 
-module.exports = {
+export default {
 	upgrade,
 	types
 };

@@ -56,6 +56,6 @@ const loadCommands = (async (config) => {
 	};
 });
 
-module.exports = {
+export default {
 	loadCommands
 };

@@ -1,6 +1,6 @@
 const LanguageCodes = require("../../utils/languages");
 
-module.exports = {
+export default {
 	Name: "wiki",
 	Aliases: null,
 	Author: "supinic",

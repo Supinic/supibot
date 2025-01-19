@@ -6,7 +6,7 @@ const {
 	getMatchData
 } = require("./utils.js");
 
-module.exports = {
+export default {
 	name: "lastMatch",
 	aliases: ["last"],
 	description: [

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "poe",
 	Aliases: ["poe2"],
 	Author: "supinic",

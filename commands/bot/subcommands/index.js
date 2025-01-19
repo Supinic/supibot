@@ -10,6 +10,6 @@ const subcommands = [
 	require("./toggle.js")
 ];
 
-module.exports = {
+export default {
 	subcommands
 };

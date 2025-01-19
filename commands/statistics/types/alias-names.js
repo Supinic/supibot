@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "alias-names",
 	aliases: ["aliasnames"],
 	description: "Checks statistics related to custom command alias names.",

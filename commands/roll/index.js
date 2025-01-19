@@ -2,7 +2,7 @@ const { randomBytes } = require("node:crypto");
 const { roll: diceRoll } = require("@jprochazk/roll-dice");
 const { randomInt } = require("../../utils/command-utils.js");
 
-module.exports = {
+export default {
 	Name: "roll",
 	Aliases: ["dice"],
 	Author: "supinic",

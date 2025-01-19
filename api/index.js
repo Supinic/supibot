@@ -1,6 +1,6 @@
 const { api } = require("../config.json");
 
-module.exports = (function () {
+export default function initialize () {
 	if (!api.port || typeof api.secure !== "boolean") {
 		console.warn("Internal API port/security is not configured - internal API will not start");
 		return;
@@ -87,4 +87,4 @@ module.exports = (function () {
 		definition,
 		port
 	};
-})();
+};

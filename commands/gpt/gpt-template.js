@@ -1,7 +1,7 @@
 const config = require("./config.json");
 const History = require("./history-control.js");
 
-module.exports = class GptTemplate {
+export default class GptTemplate {
 	static checkInputLimits (modelData, queryLength) {
 		if (modelData.inputLimit && queryLength > modelData.inputLimit) {
 			const errorMessages = config.lengthLimitExceededMessage;

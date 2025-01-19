@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "explode",
 	aliases: [],
 	description: "Adds a space between all characters of the provided input - then, each one can be used as a specific argument.",

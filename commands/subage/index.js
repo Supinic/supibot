@@ -10,7 +10,7 @@ const getTargetName = (userName, context) => {
 	}
 };
 
-module.exports = {
+export default {
 	Name: "subage",
 	Aliases: ["sa"],
 	Author: "supinic",

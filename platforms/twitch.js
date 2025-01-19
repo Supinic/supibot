@@ -1,4 +1,5 @@
 const WebSocket = require("ws");
+import Template from "./template.js";
 
 const {
 	assignWebsocketToConduit,
@@ -80,7 +81,7 @@ const DEFAULT_PLATFORM_CONFIG = {
 	unrelatedPrivateMessageResponse: ""
 };
 
-module.exports = class TwitchPlatform extends require("./template.js") {
+export default class TwitchPlatform extends Template {
 	supportsMeAction = true;
 	dynamicChannelAddition = true;
 

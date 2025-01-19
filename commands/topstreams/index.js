@@ -1,6 +1,6 @@
 const { getTwitchGameID } = require("../../utils/command-utils.js");
 
-module.exports = {
+export default {
 	Name: "topstreams",
 	Aliases: null,
 	Author: "supinic",

@@ -1,6 +1,6 @@
 const KISS_EMOJIS = ["👩‍❤️‍💋‍👨", "💋", "😗", "👩‍❤️‍💋‍👨", "😙", "😚", "😽", "💋😳", "👨‍❤️‍💋‍👨"];
 
-module.exports = {
+export default {
 	Name: "kiss",
 	Aliases: null,
 	Author: "supinic",

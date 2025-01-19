@@ -7,7 +7,7 @@ const createRelay = async (IDs) => await sb.Got.get("Supinic")({
 	}
 });
 
-module.exports = {
+export default {
 	Name: "origin",
 	Aliases: null,
 	Author: "supinic",

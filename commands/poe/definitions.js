@@ -286,6 +286,6 @@ const subcommands = [
 	}
 ];
 
-module.exports = {
+export default {
 	subcommands
 };

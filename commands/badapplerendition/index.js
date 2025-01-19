@@ -1,7 +1,7 @@
 const { subcommands } = require("./subcommands");
 const subcommandNames = subcommands.map(i => i.name);
 
-module.exports = {
+export default {
 	Name: "badapplerendition",
 	Aliases: ["badapple", "bar"],
 	Author: "supinic",

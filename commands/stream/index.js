@@ -8,7 +8,7 @@ const {
 
 const AVAILABLE_SONG_REQUEST_STATES = new Set(["cytube", "vlc", "off"]);
 
-module.exports = {
+export default {
 	Name: "stream",
 	Aliases: null,
 	Author: "supinic",

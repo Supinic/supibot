@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "streaminfo",
 	Aliases: ["si", "uptime", "vod"],
 	Author: "supinic",

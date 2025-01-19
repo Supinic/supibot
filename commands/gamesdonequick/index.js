@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "gamesdonequick",
 	Aliases: ["gdq"],
 	Author: "supinic",

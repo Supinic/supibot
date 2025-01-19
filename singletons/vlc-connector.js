@@ -30,7 +30,7 @@ const actions = [
 /**
  * VideoLANConnector (VLC) handler module - handles a VLC instance's playlist and methods.
  */
-module.exports = class VLCSingleton {
+export default class VLCSingleton {
 	/**
 	 * @todo fit this call in the supibot repository after the migration is completed
 	 */

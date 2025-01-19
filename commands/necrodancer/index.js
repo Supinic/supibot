@@ -11,7 +11,7 @@ const createURL = (data) => {
 	return `${listenerAddress}:${listenerPort}?necrodancer=${json}`;
 };
 
-module.exports = {
+export default {
 	Name: "necrodancer",
 	Aliases: ["nd","ndr","necrodancerreset"],
 	Author: "supinic",

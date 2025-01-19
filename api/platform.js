@@ -1,5 +1,5 @@
 // noinspection JSUnusedGlobalSymbols
-module.exports = {
+export default {
 	list: async () => {
 		const platforms = sb.Platform.list;
 		const data = platforms.map(i => ({

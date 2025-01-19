@@ -1,6 +1,7 @@
 const Banphrase = require("./banphrase.js");
 const Filter = require("./filter.js");
 const User = require("./user.js");
+import Template from "./template.js";
 
 const { whitespaceRegex } = require("../utils/regexes.js");
 const config = require("../config.json");
@@ -153,7 +154,7 @@ class Context {
 	get userFlags () { return this.#userFlags; }
 }
 
-class Command extends require("./template.js") {
+class Command extends Template {
 	Name;
 	Aliases = [];
 	Description = null;
@@ -1242,4 +1243,4 @@ class Command extends require("./template.js") {
 	}
 }
 
-module.exports = Command;
+export default Command;

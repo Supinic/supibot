@@ -9,6 +9,6 @@ const subcommands = [
 	require(`./trap.js`)
 ];
 
-module.exports = {
+export default {
 	subcommands
 };

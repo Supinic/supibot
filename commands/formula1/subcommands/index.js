@@ -1,4 +1,4 @@
-module.exports = [
+export default [
 	require("./constructor-standings.js"),
 	require("./copypasta.js"),
 	require("./driver-standings.js"),

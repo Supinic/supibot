@@ -1,6 +1,6 @@
 const pastebinLanguages = require("./pastebin-languages.json");
 
-module.exports = {
+export default {
 	Name: "randompastebin",
 	Aliases: ["rpb"],
 	Author: "supinic",

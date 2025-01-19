@@ -3,7 +3,7 @@ const sadCats = require("./sad-cat.json");
 const MAXIMUM_REPEATS = 5;
 const previousPosts = [];
 
-module.exports = {
+export default {
 	Name: "randomsadcat",
 	Aliases: ["rsc"],
 	Author: "supinic",

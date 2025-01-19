@@ -1,10 +1,11 @@
 const Filter = require("./filter.js");
 const User = require("./user.js");
+import Template from "./template.js";
 
 const { responses } = require("./afk-definitions.json");
 const { responses: configResponses } = require("../config.json");
 
-module.exports = class AwayFromKeyboard extends require("./template.js") {
+export default class AwayFromKeyboard extends Template {
 	static data = new Map();
 	static defaultStatus = "afk";
 	static uniqueIdentifier = "ID";

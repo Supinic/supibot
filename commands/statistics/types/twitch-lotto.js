@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "twitchlotto",
 	aliases: ["tl"],
 	description: "Posts stats for the $twitchlotto command - globally, or for a selected channel. You can use <code>recalculate:true</code> to force an update for the statistics in a specific channel.",

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "reminder",
 	aliases: ["reminders"],
 	description: "Shows how many times you or someone else have used reminders.",

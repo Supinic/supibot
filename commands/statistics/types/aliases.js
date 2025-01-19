@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "aliases",
 	aliases: ["alias"],
 	description: "Checks the statistics of either: all aliases globally; or aliases of a provided user; or a specific alias by a provided user.",

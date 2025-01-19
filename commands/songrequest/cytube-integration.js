@@ -6,7 +6,7 @@ const CYTUBE_LIMITS = {
 	TIME: 600
 };
 
-module.exports = {
+export default {
 	queue: async function (link) {
 		const linkParser = await getLinkParser();
 		const properLink = linkParser.autoRecognize(link);

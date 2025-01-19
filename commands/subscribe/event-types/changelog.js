@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "Changelog",
 	aliases: [],
 	notes: "Every minute, Supibot checks for new changelogs. If you are subscribed, you will receive a private system reminder from Supibot.",

@@ -3,7 +3,7 @@ const MAXIMUM_COPYPASTA_REPEATS = 10;
 
 const repeatedPastas = {};
 
-module.exports = {
+export default {
 	name: "copypasta",
 	aliases: [],
 	description: [

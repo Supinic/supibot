@@ -18,7 +18,7 @@ const types = [
 ];
 
 const definitions = [];
-module.exports = function loadStatisticsTypes () {
+export default function loadStatisticsTypes () {
 	if (definitions.length !== 0) {
 		return definitions;
 	}

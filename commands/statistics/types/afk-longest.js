@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "longest-afk",
 	aliases: [],
 	description: "Checks the longest time you (or another user) have been AFK for.",

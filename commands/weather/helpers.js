@@ -54,7 +54,7 @@ const getWindDirection = (degrees) => {
 	return WIND_DIRECTIONS[index];
 };
 
-module.exports = {
+export default {
 	getIcon,
 	getWindDirection
 };

@@ -6,7 +6,7 @@ const {
 
 const TARGET_LEAGUE = "RANKED_SOLO_5x5";
 
-module.exports = {
+export default {
 	name: "rank",
 	aliases: [],
 	description: [

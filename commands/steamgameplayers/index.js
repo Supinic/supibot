@@ -94,7 +94,7 @@ const fetchRecommendationData = async (gameId) => {
 	};
 };
 
-module.exports = {
+export default {
 	Name: "steamgameplayers",
 	Aliases: ["sgp"],
 	Author: "supinic",

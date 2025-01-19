@@ -15,7 +15,7 @@ const checkLatency = async (callback, ...args) => {
 };
 const switchCharactersMap = { a: "e", e: "i", i: "o", o: "u", u: "y", y: "a" };
 
-module.exports = {
+export default {
 	Name: "ping",
 	Aliases: ["pang","peng","pong","pung","pyng"],
 	Author: "supinic",

@@ -22,7 +22,7 @@ const getHastebinServer = (param) => {
 	return url.hostname;
 };
 
-module.exports = {
+export default {
 	Name: "pastebin",
 	Aliases: ["pbg", "pbp", "gist", "hbg", "hbp"],
 	Author: "supinic",

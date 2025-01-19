@@ -272,7 +272,7 @@ const getTweet = async (context, bearerToken, user) => {
 
 const getSelloutDate = () => new sb.Date.UTC(2023, 2, 9);
 
-module.exports = {
+export default {
 	fetchAuthData,
 	getTrends,
 	// getTweet,

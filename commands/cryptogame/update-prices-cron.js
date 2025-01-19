@@ -91,6 +91,6 @@ const cryptoGamePriceUpdate = async () => {
 	await Promise.all(promises);
 };
 
-module.exports = {
+export default {
 	cryptoGamePriceUpdate
 };

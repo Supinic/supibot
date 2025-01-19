@@ -2,7 +2,7 @@ const LanguageCodes = require("../../utils/languages");
 const OCR_LANGUAGES = require("./ocr-languages.json");
 const OCR_LANGUAGE_NAMES = Object.keys(OCR_LANGUAGES).map(i => LanguageCodes.getName(i));
 
-module.exports = {
+export default {
 	Name: "ocr",
 	Aliases: null,
 	Author: "supinic",

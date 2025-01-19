@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "firstfollowedchannel",
 	Aliases: ["ffc"],
 	Author: "supinic",

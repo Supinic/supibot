@@ -201,7 +201,7 @@ const fetchGroupChannelRandomLine = async function (group) {
 	return await fetchGroupResult("channel", group);
 };
 
-module.exports = {
+export default {
 	fetchChannelRandomLine,
 	fetchUserRandomLine,
 	fetchGroupUserRandomLine,

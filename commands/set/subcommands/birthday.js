@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "birthday",
 	aliases: ["bday"],
 	parameter: "arguments",

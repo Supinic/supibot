@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "haHAA",
 	Aliases: ["4Head","4HEad","HEad"],
 	Author: "supinic",

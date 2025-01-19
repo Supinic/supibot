@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "Python",
 	aliases: ["4Head"],
 	notes: "Every five minutes, Supibot checks new versions on the Python website. If a new article is detected, you will be notified in the channel you subscribed in.",

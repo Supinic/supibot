@@ -6,7 +6,7 @@ const allowedHosts = {
 
 const DEFAULT_HOST_TYPE = "github";
 
-module.exports = {
+export default {
 	Name: "commitcount",
 	Aliases: ["FarmingCommits"],
 	Author: "supinic",

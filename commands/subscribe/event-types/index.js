@@ -29,4 +29,4 @@ for (const file of eventTypeFileList) {
 	}
 }
 
-module.exports = subscriptionTypes;
+export default subscriptionTypes;

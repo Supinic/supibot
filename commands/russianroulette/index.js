@@ -1,7 +1,7 @@
 const { randomInt } = require("../../utils/command-utils.js");
 const { cannotTimeoutBadges, outcomes } = require("./definitions.json");
 
-module.exports = {
+export default {
 	Name: "russianroulette",
 	Aliases: ["rr"],
 	Author: "supinic",

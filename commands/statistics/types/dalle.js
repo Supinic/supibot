@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "dalle",
 	aliases: ["dall-e"],
 	description: "Statistics related to the DALL-E generated images via $dalle",

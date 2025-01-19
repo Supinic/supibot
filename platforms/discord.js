@@ -8,6 +8,7 @@ const {
 	PermissionFlagsBits,
 	Routes
 } = require("discord.js");
+import Template from "./template.js";
 
 const IGNORED_CHANNEL_TYPES = new Set([
 	ChannelType.GuildAnnouncement,
@@ -58,7 +59,7 @@ const fixMarkdown = (text) => {
 	}
 };
 
-module.exports = class DiscordPlatform extends require("./template.js") {
+export default class DiscordPlatform extends Template {
 	#emoteFetchingPromise = null;
 
 	constructor (config) {

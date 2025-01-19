@@ -145,6 +145,6 @@ const execute = async function (context, query) {
 	};
 };
 
-module.exports = {
+export default {
 	execute
 };

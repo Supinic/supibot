@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "offline-only",
 	aliases: ["enable-offline-only", "disable-offline-only"],
 	description: [

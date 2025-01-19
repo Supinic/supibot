@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "suggestion",
 	aliases: ["suggest", "suggestions"],
 	description: "Posts your (or someone else's) amount of suggestions, and the percentage of total. Also posts some neat links.",

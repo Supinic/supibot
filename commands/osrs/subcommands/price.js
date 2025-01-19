@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "price",
 	title: "Item prices",
 	aliases: [],

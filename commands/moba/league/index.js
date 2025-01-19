@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	requiredEnvs: ["API_RIOT_GAMES_KEY"],
 	subcommands: [
 		require("./last-match.js"),

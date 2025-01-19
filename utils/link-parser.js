@@ -40,6 +40,6 @@ const getLinkParser = async () => {
 	return linkParser;
 };
 
-module.exports = {
+export default {
 	getLinkParser
 };

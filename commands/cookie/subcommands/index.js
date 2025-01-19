@@ -5,6 +5,6 @@ const subcommands = [
 	require("./top.js")
 ];
 
-module.exports = {
+export default {
 	subcommands
 };

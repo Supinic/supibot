@@ -1,6 +1,6 @@
 const url = "https://www.worldometers.info/coronavirus";
 
-module.exports = async () => {
+export default async () => {
 	let response = null;
 	try {
 		response = await sb.Got.get("FakeAgent")({

@@ -1,5 +1,5 @@
 // noinspection JSUnusedGlobalSymbols
-module.exports = {
+export default {
 	index: async (req, res) => {
 		const data = await sb.Metrics.registry.metrics();
 		const headers = {

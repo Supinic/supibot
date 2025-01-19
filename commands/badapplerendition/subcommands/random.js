@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "random",
 	aliases: [],
 	description: "Rolls a random rendition from the list, and posts its details.",

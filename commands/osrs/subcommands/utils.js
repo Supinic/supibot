@@ -49,7 +49,7 @@ const fetchWorldsData = async function () {
 	return data;
 };
 
-module.exports = {
+export default {
 	flagEmojis,
 	fetchWorldsData
 };

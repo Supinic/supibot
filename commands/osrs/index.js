@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "osrs",
 	Aliases: null,
 	Author: "supinic",

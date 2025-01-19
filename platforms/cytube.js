@@ -1,3 +1,5 @@
+import Template from "./template.js";
+
 let CytubeConnector;
 class CytubeClient {
 	/** @type {CytubeConnector} */
@@ -473,7 +475,7 @@ const DEFAULT_PLATFORM_CONFIG = {
 	messageDelayThreshold: 30000
 };
 
-module.exports = class CytubePlatform extends require("./template.js") {
+export default class CytubePlatform extends Template {
 	/** @type {Map<Channel, CytubeClient>} */
 	clients = new Map();
 

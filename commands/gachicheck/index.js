@@ -2,7 +2,7 @@ const { fetchYoutubePlaylist, postToHastebin } = require("../../utils/command-ut
 const { getLinkParser } = require("../../utils/link-parser.js");
 const limit = 100;
 
-module.exports = {
+export default {
 	Name: "gachicheck",
 	Aliases: ["gc"],
 	Author: "supinic",

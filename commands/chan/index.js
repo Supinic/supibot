@@ -11,7 +11,7 @@ const FOUR_CHAN_REPLACEMENTS = [
 	{ regex: /kek/ig, string: "cuck" }
 ];
 
-module.exports = {
+export default {
 	Name: "chan",
 	Aliases: ["4chan","textchan","filechan","imagechan"],
 	Author: "supinic",

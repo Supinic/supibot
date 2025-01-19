@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "comment",
 	Aliases: null,
 	Author: "supinic",

@@ -1,5 +1,5 @@
 const LanguageCodes = require("../../utils/languages");
-module.exports = {
+export default {
 	Name: "define",
 	Aliases: ["def"],
 	Author: "supinic",

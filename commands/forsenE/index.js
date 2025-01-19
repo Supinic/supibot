@@ -3,7 +3,7 @@ const { lines } = require("./forsenE.json");
 const MAXIMUM_REPEATS = 5;
 const previousLines = [];
 
-module.exports = {
+export default {
 	Name: "forsenE",
 	Aliases: null,
 	Author: "supinic",

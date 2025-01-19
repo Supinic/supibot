@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "dayoftheyear",
 	Aliases: ["doty", "monthoftheyear", "moty"],
 	Author: "supinic",

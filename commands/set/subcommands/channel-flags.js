@@ -37,7 +37,7 @@ const setChannelFlag = async (context, flagName, flagValue) => {
 	};
 };
 
-module.exports = [
+export default [
 	{
 		name: "instagram-nsfw",
 		aliases: ["rig-nsfw"],

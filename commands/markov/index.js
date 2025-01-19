@@ -39,7 +39,7 @@ const updateMarkovWordList = async () => {
 	await Promise.all(promises);
 };
 
-module.exports = {
+export default {
 	Name: "markov",
 	Aliases: null,
 	Author: "supinic",

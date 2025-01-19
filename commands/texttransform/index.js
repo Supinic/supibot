@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "texttransform",
 	Aliases: ["tt","reversetexttransform","rtt"],
 	Author: "supinic",

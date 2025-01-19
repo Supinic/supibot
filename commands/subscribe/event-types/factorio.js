@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "Factorio",
 	aliases: [],
 	notes: "Posts new Factorio blog posts",

@@ -1,6 +1,6 @@
 const { randomInt } = require("../../utils/command-utils.js");
 
-module.exports = {
+export default {
 	Name: "thesaurus",
 	Aliases: null,
 	Author: "supinic",

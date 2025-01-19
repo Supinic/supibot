@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 const { freemem, totalmem } = require("node:os");
 
-module.exports = {
+export default {
 	summary: async () => {
 		const uptime = Math.trunc(process.uptime() * 1000);
 		const started = new sb.Date().addMilliseconds(-uptime);

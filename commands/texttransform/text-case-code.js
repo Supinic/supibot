@@ -111,7 +111,7 @@ const decode = (input, codeWord) => {
 	return output;
 };
 
-module.exports = {
+export default {
 	encode,
 	decode
 };

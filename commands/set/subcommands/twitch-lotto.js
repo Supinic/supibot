@@ -11,7 +11,7 @@ catch {
 	createRecentTwitchLottoCacheKey = null;
 }
 
-module.exports = [
+export default [
 	{
 		name: "twitchlotto",
 		aliases: ["tl"],

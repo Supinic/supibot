@@ -33,6 +33,6 @@ const createEmbeds = function createDiscordEmbed (id, options = {}) {
 	return result;
 };
 
-module.exports = {
+export default {
 	createEmbeds
 };

@@ -1,6 +1,6 @@
 const { parseRSS } = require("../../utils/command-utils.js");
 
-module.exports = {
+export default {
 	Name: "mastodon",
 	Aliases: [],
 	Author: "supinic",

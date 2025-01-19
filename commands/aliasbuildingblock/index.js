@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "aliasbuildingblock",
 	Aliases: ["abb"],
 	Author: "supinic",

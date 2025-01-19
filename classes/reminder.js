@@ -6,6 +6,7 @@ const Channel = require("./channel.js");
 const Command = require("./command.js");
 const Filter = require("./filter.js");
 const User = require("./user.js");
+import Template from "./template.js";
 
 const Platform = require("../platforms/template.js");
 const LongTimeout = require("../utils/long-timeout.js");
@@ -14,7 +15,7 @@ const LongTimeout = require("../utils/long-timeout.js");
  * Represents a pending reminder from (usually) one user to another.
  * An active reminder will be printed into the chat once the target user is spotted.
  */
-module.exports = class Reminder extends require("./template.js") {
+export default class Reminder extends Template {
 	/**
 	 * Holds all currently active reminders in a Map, keyed by the target recipient user's IDs.
 	 * The list of

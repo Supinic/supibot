@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "discord",
 	aliases: [],
 	description: "Posts a summary of Discord-related statistics",
