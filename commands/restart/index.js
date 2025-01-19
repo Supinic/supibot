@@ -56,6 +56,7 @@ module.exports = {
 		}
 
 		await context.sendIntermediateMessage("Restarting...");
+		// eslint-disable-next-line unicorn/no-process-exit
 		setTimeout(() => process.exit(0), 1000);
 
 		return null;

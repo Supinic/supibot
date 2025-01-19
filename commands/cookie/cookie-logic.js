@@ -35,57 +35,6 @@ const basicStats = {
  */
 const getInitialStats = () => structuredClone(basicStats);
 
-const subcommands = [
-	{
-		name: "donate",
-		aliases: ["gift", "give"],
-		default: false,
-		hidden: false
-	},
-	{
-		name: "stats",
-		aliases: ["statistics"],
-		default: false,
-		hidden: false
-	},
-	{
-		name: "eat",
-		aliases: [],
-		default: true,
-		hidden: false
-	},
-	{
-		name: "top",
-		aliases: ["leaders", "leaderboard"],
-		default: false,
-		hidden: false
-	}
-];
-
-/**
- * @param {string} [type]
- * @returns {string|null}
- */
-const parseSubcommand = (type) => {
-	let subcommand;
-	const defaultSubcommand = subcommands.find(i => i.default);
-
-	if (!type) {
-		return defaultSubcommand.name;
-	}
-	else {
-		type = type.toLowerCase();
-		subcommand = subcommands.find(i => i.name === type || i.aliases.includes(type));
-
-		return (subcommand) ? subcommand.name : null;
-	}
-};
-
-/**
- * @returns {string}
- */
-const getValidTypeNames = () => subcommands.filter(i => !i.hidden).map(i => i.name).join(", ");
-
 /**
  * Determines if the cookie data has an outdated daily property.
  * @param {CookieData} data
@@ -337,7 +286,6 @@ const fetchRandomCookieText = async () => {
 };
 
 module.exports = {
-	subcommands,
 	determineAvailableDailyCookieType,
 	canEatDailyCookie,
 	canEatReceivedCookie,
@@ -347,10 +295,8 @@ module.exports = {
 	eatReceivedCookie,
 	fetchRandomCookieText,
 	getInitialStats,
-	getValidTypeNames,
 	hasDonatedDailyCookie,
 	hasOutdatedDailyStats,
-	parseSubcommand,
 	resetDailyStats
 };
 

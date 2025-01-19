@@ -20,7 +20,7 @@ module.exports = {
 		const cacheKey = "count-line-total-previous";
 		const history = await sb.Cache.getByPrefix(cacheKey);
 		if (history) {
-			const days = (sb.Date.now() - history.timestamp) / 864.0e5;
+			const days = (sb.Date.now() - history.timestamp) / 864e5;
 			const linesPerHour = sb.Utils.round((chatLineAmount - history.amount) / (days * 24), 0);
 
 			historyText = `Lines are added at a rate of ${sb.Utils.groupDigits(linesPerHour)} lines/hr.`;

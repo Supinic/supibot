@@ -1,3 +1,5 @@
+const TWITCH_ANTIPING_CHARACTER = "\u{E0000}";
+
 export const definition = {
 	Name: "async-markov-experiment",
 	Events: ["message"],
@@ -26,7 +28,7 @@ export const definition = {
 		}
 		if (!this.data.regex) {
 			// only allows messages consisting of just emojis, or ASCII 32-126 characters (0x20-0x7E)
-			this.data.regex = /^[\p{Emoji}\x20-\x7e]+$/ui;
+			this.data.regex = /^[\p{Emoji}\u0020-\u007E]+$/ui;
 		}
 
 		const markov = this.data.markovs.get(context.channel.ID);
@@ -42,7 +44,7 @@ export const definition = {
 			return;
 		}
 
-		const fixedMessage = message.replace(/\u{E0000}/gu, "");
+		const fixedMessage = message.replaceAll(TWITCH_ANTIPING_CHARACTER, "");
 		if (!this.data.regex.test(fixedMessage)) {
 			return;
 		}

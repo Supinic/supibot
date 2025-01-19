@@ -15,7 +15,6 @@ export const definition = {
 				or use !events to get a list of things to get binged 🔔 about
 				(e.g. going live, changing title, ...)
 			`);
-
 		}, Math.floor(Math.random() * 600_000));
 	})
 };

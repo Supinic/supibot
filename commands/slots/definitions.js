@@ -167,9 +167,7 @@ module.exports = {
 		{
 			name: "lotto",
 			pattern: () => ({
-				emotes: new Array(69)
-					.fill(0)
-					.map((i, ind) => String(ind)),
+				emotes: Array.from({ length: 69 }).map((i, ind) => String(ind)),
 				limit: 5
 			}),
 			notes: "Rolls something akin to a Lotto lottery - 5 numbers, 1 to 69 each."

@@ -35,7 +35,7 @@ export const definition = {
 
 		const response = (reply.includes("No short answer"))
 			? "That can't be unscrambled PepeLaugh Clap"
-			: reply.replace(/"/g, "");
+			: reply.replaceAll(`"`, "");
 
 		await channel.send(response);
 	}),

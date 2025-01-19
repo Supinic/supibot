@@ -9,7 +9,7 @@ const {
 	Routes
 } = require("discord.js");
 
-const ignoredChannelTypes = [
+const IGNORED_CHANNEL_TYPES = new Set([
 	ChannelType.GuildAnnouncement,
 	ChannelType.GuildCategory,
 	ChannelType.GuildNews,
@@ -18,7 +18,7 @@ const ignoredChannelTypes = [
 	ChannelType.GuildPublicThread,
 	ChannelType.PrivateThread,
 	ChannelType.PublicThread
-];
+]);
 
 const GLOBAL_EMOTE_ALLOWED_REGEX = /[A-Z]/;
 const DEFAULT_LOGGING_CONFIG = {
@@ -53,7 +53,7 @@ const fixMarkdown = (text) => {
 		return text;
 	}
 	else {
-		const replaced = text.replace(/```/g, "`\u{200B}`\u{200B}`\u{200B}");
+		const replaced = text.replaceAll("```", "`\u{200B}`\u{200B}`\u{200B}");
 		return `\`\`\`${replaced}\`\`\``;
 	}
 };
@@ -124,7 +124,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 			} = this.parseMessage(messageObject);
 
 			// Ignore all configured channel types - mostly threads and other non-discussion channels
-			if (ignoredChannelTypes.includes(channelType)) {
+			if (IGNORED_CHANNEL_TYPES.has(channelType)) {
 				return;
 			}
 
@@ -135,7 +135,8 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 				return;
 			}
 
-			if (Array.from(user).length > 32) {
+			const usernameCharacterLength = [...user].length;
+			if (usernameCharacterLength > 32) {
 				const json = JSON.stringify({
 					chan,
 					discordID,
@@ -742,7 +743,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 	parseMessage (messageObject) {
 		const stickers = messageObject.stickers.map(i => i.url ?? i.name);
 		const links = messageObject.attachments.map(i => i.proxyURL);
-		const content = messageObject.content.replace(/<(https?:\/\/.+?)>/g, "$1"); // Replaces all "un-embed" links' brackets
+		const content = messageObject.content.replaceAll(/<(https?:\/\/.+?)>/g, "$1"); // Replaces all "un-embed" links' brackets
 		const args = [
 			...content.split(" "),
 			...stickers,
@@ -760,7 +761,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		}
 
 		let index = 0;
-		let targetMessage = messageObject.cleanContent.replace(/\n/g, " ");
+		let targetMessage = messageObject.cleanContent.replaceAll("\n", " ");
 
 		const extras = [...stickers, ...links];
 		while (targetMessage.length < this.messageLimit && index < extras.length) {
@@ -769,8 +770,8 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 		}
 
 		return {
-			msg: DiscordPlatform.removeEmoteTags(targetMessage.replace(/\s+/g, " ")),
-			user: messageObject.author.username.toLowerCase().replace(/\s/g, "_"),
+			msg: DiscordPlatform.removeEmoteTags(targetMessage.replaceAll(/\s+/g, " ")),
+			user: messageObject.author.username.toLowerCase().replaceAll(/\s/g, "_"),
 			chan: messageObject.channel.id,
 			channelType: messageObject.channel.type,
 			discordID: String(messageObject.author.id),
@@ -885,7 +886,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 	get permissions () { return PermissionFlagsBits; }
 
 	static removeEmoteTags (message) {
-		return message.replace(/<a?:(.*?):(\d*)>/g, (total, emote) => `${emote} `).trim();
+		return message.replaceAll(/<a?:(.*?):(\d*)>/g, (total, emote) => `${emote} `).trim();
 	}
 
 	static async fetchAccountChallengeStatus (userData, discordID) {
@@ -903,7 +904,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 
 	static async createAccountChallenge (userData, discordID) {
 		const row = await sb.Query.getRow("chat_data", "User_Verification_Challenge");
-		const challenge = require("crypto").randomBytes(16).toString("hex");
+		const challenge = require("node:crypto").randomBytes(16).toString("hex");
 
 		row.setValues({
 			User_Alias: userData.ID,

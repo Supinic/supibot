@@ -143,7 +143,9 @@ module.exports = {
 			if (stream) {
 				const offset = 90; // Implicitly offset the VOD by several seconds, to account for inaccuracies
 				const stamp = vodDurationSeconds - offset;
-				vodString = `${data.url}?t=${(stamp < 0) ? 0 : stamp}s`;
+				const clampedTimestamp = Math.max(stamp, 0);
+
+				vodString = `${data.url}?t=${clampedTimestamp}s`;
 			}
 			else {
 				vodString = `${data.url}`;

@@ -84,11 +84,14 @@ const initializeCommands = async (config) => {
 	console.timeEnd("Load commands");
 };
 
+// @todo remove when properly refactored to ESM
+// eslint-disable-next-line unicorn/prefer-top-level-await
 (async () => {
 	const platformsConfig = config.platforms;
 	if (!platformsConfig || platformsConfig.length === 0) {
-		console.warn("No platforms configured! Supibot will now exit.");
-		process.exit(0);
+		throw new sb.Error({
+			message: "No platforms configured! Supibot will now exit."
+		});
 	}
 
 	console.groupCollapsed("Initialize timers");

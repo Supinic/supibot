@@ -93,7 +93,7 @@ module.exports = {
 
 			success = (response.ok);
 		}
-		catch (e) {
+		catch {
 			await sb.Cache.setByPrefix(PLAYSOUNDS_ENABLED, false);
 			return {
 				reply: "The desktop listener is not currently running! Turning off playsounds."

@@ -54,7 +54,7 @@ module.exports = {
 					responseType: "json"
 				});
 			}
-			catch (e) {
+			catch {
 				// Instagram API can randomly return an HTML login page as a response to the JSON api.
 				// In that case, the parsing fails due to expecting JSON instead.
 				rateLimited = true;

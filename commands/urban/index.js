@@ -9,7 +9,7 @@ const prepareItemStrings = (item) => {
 		? ` - Example: ${item.example}`
 		: "";
 
-	const content = (item.definition + example).replace(/[\][]/g, "");
+	const content = (item.definition + example).replaceAll(/[\][]/g, "");
 	return { link, content, thumbs };
 };
 

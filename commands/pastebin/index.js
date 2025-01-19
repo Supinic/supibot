@@ -130,7 +130,7 @@ module.exports = {
 						body: text
 					});
 				}
-				catch (e) {
+				catch {
 					response = null;
 				}
 

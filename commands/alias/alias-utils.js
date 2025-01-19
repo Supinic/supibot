@@ -35,7 +35,7 @@ const applyParameters = (context, aliasArguments, commandArguments) => {
 	const strictNumberRegex = /^[\d-.+]+$/;
 
 	for (let i = 0; i < aliasArguments.length; i++) {
-		const parsed = aliasArguments[i].replace(/\${(.+?)}/g, (total, match) => {
+		const parsed = aliasArguments[i].replaceAll(/\${(.+?)}/g, (total, match) => {
 			const numberMatch = match.match(numberRegex);
 			if (numberMatch && strictNumberRegex.test(match)) {
 				let order = Number(numberMatch.groups.order);

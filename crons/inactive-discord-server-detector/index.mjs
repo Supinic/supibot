@@ -1,3 +1,5 @@
+const sanitize = (string) => string.replaceAll(/\p{Emoji}/gu, (match) => escape(match).replaceAll("%", "\\"));
+
 export const definition = {
 	name: "inactive-discord-server-detector",
 	expression: "0 0 12 * * 2",
@@ -15,8 +17,6 @@ export const definition = {
 		if (guilds.size < guildThreshold) {
 			return;
 		}
-
-		const sanitize = (string) => string.replace(/\p{Emoji}/gu, (match) => escape(match).replaceAll("%", "\\"));
 
 		const messageThreshold = new sb.Date().addMonths(-3);
 		const result = [];

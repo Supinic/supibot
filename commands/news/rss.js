@@ -3,7 +3,7 @@ const { parseRSS } = require("../../utils/command-utils.js");
 const definitions = require("./definitions.json");
 const rssCacheKey = "command-news-rss-cache";
 
-const sanitize = (string) => sb.Utils.fixHTML(sb.Utils.removeHTML(string)).replace(/\s+/g, " ");
+const sanitize = (string) => sb.Utils.fixHTML(sb.Utils.removeHTML(string)).replaceAll(/\s+/g, " ");
 
 module.exports = {
 	isCountryCode: (code) => /[A-Z]{2}/.test(code),

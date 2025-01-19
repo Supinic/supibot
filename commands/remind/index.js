@@ -98,7 +98,7 @@ module.exports = {
 			};
 		}
 
-		let reminderText = args.join(" ").replace(/\s+/g, " ").trim();
+		let reminderText = args.join(" ").replaceAll(/\s+/g, " ").trim();
 
 		// const timedRegex = /\b(in|on|at)\b/i;
 		const timedRegex = /\b(in|at)\b/i;
@@ -175,7 +175,7 @@ module.exports = {
 			delta = sb.Utils.round(targetReminderDate - now, -3);
 		}
 		else if (timedRegex.test(reminderText)) {
-			reminderText = reminderText.replace(/\bhr\b/g, "hour");
+			reminderText = reminderText.replaceAll(/\bhr\b/g, "hour");
 			const timeData = sb.Utils.parseDuration(reminderText, { returnData: true });
 
 			if (timeData.ranges.length > 0) {
@@ -205,7 +205,7 @@ module.exports = {
 					// Remove the possible preceding "in" keyword, regardless of which range it is used in
 					const keywordIndex = reminderText.slice(0, current.start).lastIndexOf("in");
 					if (current.start - keywordIndex === 3) {
-						reminderText = reminderText.slice(0, keywordIndex) + "\x00".repeat(3) + reminderText.slice(current.start);
+						reminderText = reminderText.slice(0, keywordIndex) + "\u0000".repeat(3) + reminderText.slice(current.start);
 					}
 
 					// and only continue if it matches a "time word separator", such as the word "and", space, comma, ...
@@ -215,12 +215,12 @@ module.exports = {
 					}
 					else {
 						const amount = next.start - current.start;
-						reminderText = reminderText.slice(0, current.start) + "\x00".repeat(amount) + reminderText.slice(next.start);
+						reminderText = reminderText.slice(0, current.start) + "\u0000".repeat(amount) + reminderText.slice(next.start);
 						continues = true;
 					}
 				}
 
-				reminderText = reminderText.replace(/\x00/g, "");
+				reminderText = reminderText.replaceAll("\u0000", "");
 			}
 		}
 
@@ -246,7 +246,7 @@ module.exports = {
 					reply: "Timed reminders set in the past are only available for people that posess a time machine!"
 				};
 			}
-			else if (Math.abs(now - comparison) < 30.0e3) {
+			else if (Math.abs(now - comparison) < 30_000) {
 				return {
 					success: false,
 					reply: "You cannot set a timed reminder in less than 30 seconds!",

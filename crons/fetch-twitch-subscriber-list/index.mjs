@@ -14,7 +14,7 @@ export const definition = {
 			});
 		}
 
-		const cacheRefreshToken = await sb.Cache.getByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN")
+		const cacheRefreshToken = await sb.Cache.getByPrefix("TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN");
 		const envRefreshToken = process.env.TWITCH_READ_SUBSCRIPTIONS_REFRESH_TOKEN;
 		if (!cacheRefreshToken && !envRefreshToken) {
 			throw new sb.Error({

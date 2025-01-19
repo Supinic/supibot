@@ -1,4 +1,4 @@
-const allowedTypes = ["string", "number", "boolean", "date", "object", "regex"];
+const ALLOWED_PARAMETER_TYPES = new Set(["string", "number", "boolean", "date", "object", "regex"]);
 const allowedUtilsMethods = [
 	"capitalize",
 	"randArray",
@@ -61,12 +61,13 @@ const advancedParse = (string) => JSON.parse(string, (key, value) => {
 	return value;
 });
 
-const supportedPrimitiveTypes = ["number", "string", "boolean"];
-const supportedPrototypes = [Array.prototype, Object.prototype, null, Map.prototype, Set.prototype];
+const SUPPORTED_PRIMITIVE_TYPES = new Set(["number", "string", "boolean"]);
+const SUPPORTED_PROTOTYPES = new Set([Array.prototype, Object.prototype, null, Map.prototype, Set.prototype]);
+
 const isTypeSupported = (value) => {
 	const type = typeof value;
 	const prototype = (value) ? Object.getPrototypeOf(value) : undefined;
-	if (value && supportedPrototypes.includes(prototype)) {
+	if (value && SUPPORTED_PROTOTYPES.has(prototype)) {
 		let validObjectProperties = true;
 		const entries = (prototype === Map.prototype || prototype === Set.prototype)
 			? [...value.entries()]
@@ -83,7 +84,7 @@ const isTypeSupported = (value) => {
 	return (
 		value === null
 		|| value === undefined
-		|| supportedPrimitiveTypes.includes(type)
+		|| SUPPORTED_PRIMITIVE_TYPES.has(type)
 	);
 };
 
@@ -166,7 +167,7 @@ const predefinedRequests = {
 	}
 };
 
-const restrictedCommands = ["alias", "pipe", "js"].map(i => sb.Command.get(i));
+const RESTRICTED_COMMANDS = new Set(["alias", "pipe", "js"].map(i => sb.Command.get(i)));
 const commandExecutionCountThreshold = 5;
 
 module.exports = async function createDebugSandbox (context, scriptArgs) {
@@ -328,7 +329,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				if (!commandData) {
 					throw new Error("Command not found - separate command name from parameters");
 				}
-				else if (restrictedCommands.includes(commandData)) {
+				else if (RESTRICTED_COMMANDS.has(commandData)) {
 					throw new Error("Provided command is not usable in the $js execution");
 				}
 				else if (!commandData.Flags.pipe) {
@@ -451,7 +452,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				return emotes;
 			},
 			parseParameter: (value, type) => {
-				if (!allowedTypes.includes(type)) {
+				if (!ALLOWED_PARAMETER_TYPES.has(type)) {
 					throw new Error("Invalid value type provided");
 				}
 

@@ -656,7 +656,7 @@ class Command extends require("./template.js") {
 				Invocation: identifier,
 				Arguments: JSON.stringify(args.filter(Boolean)),
 				Result: result,
-				Execution_Time: sb.Utils.round(Number(end - start) / 1.0e6, 3)
+				Execution_Time: sb.Utils.round(Number(end - start) / 1_000_000, 3)
 			});
 		}
 		catch (e) {
@@ -956,70 +956,78 @@ class Command extends require("./template.js") {
 			return null;
 		}
 
-		if (type === "string") {
-			return String(value);
-		}
-		else if (type === "number") {
-			const output = Number(value);
-			if (!Number.isFinite(output)) {
-				return null;
-			}
+		switch (type) {
+			case "string": return String(value);
 
-			return output;
-		}
-		else if (type === "boolean") {
-			if (value === "true") {
-				return true;
-			}
-			else if (value === "false") {
-				return false;
-			}
-		}
-		else if (type === "date") {
-			const date = new sb.Date(value);
-			if (Number.isNaN(date.valueOf())) {
-				return null;
-			}
-
-			return date;
-		}
-		else if (type === "object") {
-			const [key, outputValue] = value.split("=");
-			return { key, value: outputValue };
-		}
-		else if (type === "regex") {
-			const regex = sb.Utils.parseRegExp(value);
-
-			// Make sure user input regexes are executable in linear time and therefore are not evil.
-			// Only executed if the V8 flag is passed to Node.
-			if (process.execArgv.includes(LINEAR_REGEX_FLAG)) {
-				let linearRegex;
-				try {
-					let source = regex.source;
-					let flags = regex.flags;
-
-					// Since the "i" flag makes the regex not execute in linear time, use a hacky solution to
-					// replace all characters with a group that contains both cases. Then, also remove the "i" flag.
-					if (regex.flags.includes("i")) {
-						source = source.replaceAll(/(?<!\\)([a-z])/ig, (total, match) => `[${match.toLowerCase()}${match.toUpperCase()}]`);
-						flags = flags.replace("i", "");
-					}
-
-					// Force the "linear" regex flag
-					linearRegex = new RegExp(source, `${flags}l`);
-				}
-				catch {
+			case "number": {
+				const output = Number(value);
+				if (!Number.isFinite(output)) {
 					return null;
 				}
 
-				return linearRegex;
+				return output;
 			}
-			else {
-				return regex;
+
+			case "boolean": {
+				if (value === "true") {
+					return true;
+				}
+				else if (value === "false") {
+					return false;
+				}
+
+				break;
 			}
-		}
-		else if (type === "language") {
-			return LanguageCodes.getLanguage(value);
+
+			case "date": {
+				const date = new sb.Date(value);
+				if (Number.isNaN(date.valueOf())) {
+					return null;
+				}
+
+				return date;
+			}
+
+			case "object": {
+				const [key, outputValue] = value.split("=");
+				return { key, value: outputValue };
+			}
+
+			case "regex": {
+				const regex = sb.Utils.parseRegExp(value);
+
+				// Make sure user input regexes are executable in linear time and therefore are not evil.
+				// Only executed if the V8 flag is passed to Node.
+				if (process.execArgv.includes(LINEAR_REGEX_FLAG)) {
+					let linearRegex;
+					try {
+						let source = regex.source;
+						let flags = regex.flags;
+
+						// Since the "i" flag makes the regex not execute in linear time, use a hacky solution to
+						// replace all characters with a group that contains both cases. Then, also remove the "i" flag.
+						if (regex.flags.includes("i")) {
+							source = source.replaceAll(/(?<!\\)([a-z])/ig, (total, match) => `[${match.toLowerCase()}${match.toUpperCase()}]`);
+							flags = flags.replace("i", "");
+						}
+
+						// Force the "linear" regex flag
+						linearRegex = new RegExp(source, `${flags}l`);
+					}
+					catch {
+						return null;
+					}
+
+					return linearRegex;
+				}
+				else {
+					return regex;
+				}
+			}
+
+			case "language": {
+				return LanguageCodes.getLanguage(value);
+			}
 		}
 
 		return null;

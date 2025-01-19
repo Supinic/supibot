@@ -20,10 +20,18 @@ module.exports = {
 			};
 		}
 		else if (state === "cytube") {
-			const cytube = (await sb.Command.get("cytube").execute(context)).reply;
-			return {
-				reply: `Song requests are currently using Cytube. Join here: ${cytube} :)`
-			};
+			const command = sb.Command.get("cytube");
+			if (command) {
+				const result = await command.execute(context);
+				return {
+					reply: `Song requests are currently using Cytube. Join here: ${result.reply} :)`
+				};
+			}
+			else {
+				return {
+					reply: `Song requests are currently using Cytube.`
+				};
+			}
 		}
 
 		const data = await sb.VideoLANConnector.getNormalizedPlaylist();

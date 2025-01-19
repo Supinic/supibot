@@ -6,7 +6,7 @@ const {
 	SONG_REQUESTS_STATE
 } = require("../../utils/shared-cache-keys.json");
 
-const AVAILABLE_SONG_REQUEST_STATES = ["cytube", "vlc", "off"];
+const AVAILABLE_SONG_REQUEST_STATES = new Set(["cytube", "vlc", "off"]);
 
 module.exports = {
 	Name: "stream",
@@ -38,7 +38,7 @@ module.exports = {
 
 			case "ttslimit": {
 				const limit = Number(rest.shift());
-				if (!Number.isFinite(limit) || limit < 0 || limit > 300.0e3) {
+				if (!Number.isFinite(limit) || limit < 0 || limit > 300_000) {
 					return {
 						reply: "Invalid value provided! Must be in the range <0, 300000>."
 					};
@@ -71,7 +71,7 @@ module.exports = {
 
 			case "sr": {
 				const value = (rest.shift() || "").toLowerCase();
-				if (!AVAILABLE_SONG_REQUEST_STATES.includes(value)) {
+				if (!AVAILABLE_SONG_REQUEST_STATES.has(value)) {
 					return {
 						reply: "Invalid song request state!"
 					};

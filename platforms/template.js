@@ -47,11 +47,11 @@ class Platform {
 
 		this.#data = {
 			...defaults.platform,
-			...config.platform ?? {}
+			...config.platform
 		};
 		this.#loggingConfig = {
 			...defaults.logging,
-			...config.logging ?? {}
+			...config.logging
 		};
 
 		this.#globalEmoteCacheKey = `global-emotes-${this.#id}`;
@@ -117,7 +117,6 @@ class Platform {
 	/**
 	 * @abstract
 	 */
-	// eslint-disable-next-line no-unused-vars
 	async send (message, channel, options = {}) {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Platform"
@@ -127,7 +126,6 @@ class Platform {
 	/**
 	 * @abstract
 	 */
-	// eslint-disable-next-line no-unused-vars
 	async pm (message, user) {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Platform"
@@ -299,7 +297,6 @@ class Platform {
 	/**
 	 * @abstract
 	 */
-	// eslint-disable-next-line no-unused-vars
 	async populateGlobalEmotes (channelData) {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Platform"
@@ -329,7 +326,6 @@ class Platform {
 	/**
 	 * @abstract
 	 */
-	// eslint-disable-next-line no-unused-vars
 	async fetchChannelEmotes () {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Platform"
@@ -427,7 +423,6 @@ class Platform {
 	/**
 	 * @abstract
 	 */
-	// eslint-disable-next-line no-unused-vars
 	fetchInternalPlatformIDByUsername (userData) {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Platform"
@@ -437,7 +432,6 @@ class Platform {
 	/**
 	 * @abstract
 	 */
-	// eslint-disable-next-line no-unused-vars
 	async fetchUsernameByUserPlatformID (userPlatformID) {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Platform"
@@ -448,7 +442,6 @@ class Platform {
 		return `channel-user-list-${this.#id}-${channelData.ID}`;
 	}
 
-	// eslint-disable-next-line no-unused-vars
 	async isChannelLive (channelData) {
 		if (channelData.Platform !== this) {
 			throw new sb.Error({
@@ -518,7 +511,7 @@ class Platform {
 		try {
 			InstancePlatform = require(`./${type}.js`);
 		}
-		catch (e) {
+		catch {
 			console.log(`No file found for platform "${type}", creating generic platform`);
 			return new Platform(type, config);
 		}

@@ -32,7 +32,7 @@ module.exports = {
 			};
 		}
 
-		const total = playedByData.reduce((acc, cur) => (acc += cur.Count), 0);
+		const total = playedByData.reduce((acc, cur) => (acc + cur.Count), 0);
 		const lastPlayedData = await sb.Query.getRecordset(rs => rs
 			.select("User_Alias.Name AS Name")
 			.select("Posted")

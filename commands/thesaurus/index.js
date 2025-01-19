@@ -18,13 +18,16 @@ module.exports = {
 			};
 		}
 
-		const thesaurus = Object.fromEntries(
-			(await sb.Query.getRecordset(rs => rs
-				.select("Word", "Result")
-				.from("data", "Thesaurus")
-				.where("Word IN %s+", words)
-			)).map(record => [record.Word, JSON.parse(record.Result)])
+		const wordsData = await sb.Query.getRecordset(rs => rs
+			.select("Word", "Result")
+			.from("data", "Thesaurus")
+			.where("Word IN %s+", words)
 		);
+
+		const thesaurus = {};
+		for (const record of wordsData) {
+			thesaurus[record.Word] = JSON.parse(record.Result);
+		}
 
 		if (context.params.singleWord) {
 			const synonyms = thesaurus[words[0]];

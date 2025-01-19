@@ -1,5 +1,5 @@
 // noinspection JSUnusedGlobalSymbols
-const { freemem, totalmem } = require("os");
+const { freemem, totalmem } = require("node:os");
 
 module.exports = {
 	summary: async () => {

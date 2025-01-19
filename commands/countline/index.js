@@ -29,20 +29,24 @@ module.exports = {
 
 		let lines;
 		if ([7, 8, 46].includes(context.channel.ID)) {
-			lines = (await sb.Query.getRecordset(rs => rs
+			lines = await sb.Query.getRecordset(rs => rs
 				.select("SUM(Message_Count) AS Total")
 				.from("chat_data", "Message_Meta_User_Alias")
 				.where("User_Alias = %n", user.ID)
 				.where("Channel IN(7, 8, 46)")
-			))[0];
+				.single()
+				.flat("Total")
+			);
 		}
 		else {
-			lines = (await sb.Query.getRecordset(rs => rs
+			lines = await sb.Query.getRecordset(rs => rs
 				.select("Message_Count AS Total")
 				.from("chat_data", "Message_Meta_User_Alias")
 				.where("User_Alias = %n", user.ID)
 				.where("Channel = %n", context.channel.ID)
-			))[0];
+				.single()
+				.flat("Total")
+			);
 		}
 		if (!lines) {
 			return {

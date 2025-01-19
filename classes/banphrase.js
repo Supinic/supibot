@@ -1,7 +1,7 @@
 const apiDataSymbol = Symbol.for("banphrase-api-data");
 const apiResultSymbol = Symbol("banphrase-api-result");
 const inactiveSymbol = Symbol("banphrase-inactive");
-const availableTypes = ["API response", "Custom response", "Denial", "Inactive", "Replacement"];
+const AVAILABLE_TYPES = new Set(["API response", "Custom response", "Denial", "Inactive", "Replacement"]);
 
 const { responses, values } = require("../config.json");
 const regexes = require("../utils/regexes.js");
@@ -13,7 +13,7 @@ const banphraseConfigData = Object.freeze({
 
 class ExternalBanphraseAPI {
 	static async pajbot (message, URL) {
-		message = message.trim().replace(/\s+/g, " ");
+		message = message.trim().replaceAll(/\s+/g, " ");
 
 		const options = {
 			method: "POST",
@@ -61,7 +61,7 @@ module.exports = class Banphrase extends require("./template.js") {
 		}
 
 		this.Type = data.Type;
-		if (!availableTypes.includes(this.Type)) {
+		if (!AVAILABLE_TYPES.has(this.Type)) {
 			throw new sb.Error({
 				message: `Banphrase ID ${this.ID} type must be one of the supported types`
 			});

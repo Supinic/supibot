@@ -190,7 +190,7 @@ module.exports = {
 				const $ = sb.Utils.cheerio(response.body);
 				const wordClass = $("div#definition-pos")
 					.text()
-					.replace(/\./g, "")
+					.replaceAll(".", "")
 					.trim();
 
 				const word = $("div#definition-word").text();
@@ -207,11 +207,11 @@ module.exports = {
 				return {
 					link: "No link available for this type!",
 					reply: sb.Utils.tag.trim `
-								This ${type} does not exist:
-								${word} (${wordClass}) -
-								${definition}.
-								Example: ${example ?? "N/A"}
-							`
+						This ${type} does not exist:
+						${word} (${wordClass}) -
+						${definition}.
+						Example: ${example ?? "N/A"}
+					`
 				};
 			}
 		},
@@ -286,7 +286,7 @@ module.exports = {
 						return { id, name, location };
 					});
 
-					await await sb.Cache.setByPrefix(MP_CACHE_KEY, data, {
+					await sb.Cache.setByPrefix(MP_CACHE_KEY, data, {
 						expiry: 30 * 864e5 // 30 days
 					});
 				}

@@ -61,7 +61,7 @@ module.exports = {
 
 					url = response.url;
 				}
-				catch (e) {
+				catch {
 					url = null;
 				}
 			}

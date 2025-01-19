@@ -131,7 +131,7 @@ module.exports = {
 			deletedString = `Removed on ${data.Emote_Deleted.format("Y-m-d")}.`;
 		}
 
-		const text = data.Text.replace(/\[(.+?)]\(\d+\)/g, "$1");
+		const text = data.Text.replaceAll(/\[(.+?)]\(\d+\)/g, "$1");
 		const link = `https://supinic.com/data/origin/detail/${data.ID}`;
 
 		let type;

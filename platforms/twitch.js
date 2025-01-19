@@ -24,14 +24,16 @@ const { TWITCH_ADMIN_SUBSCRIBER_LIST } = require("../utils/shared-cache-keys.jso
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
-const SEVEN_TV_ZERO_WIDTH_FLAG = 1 << 8;
+// eslint-disable-next-line no-bitwise
+const SEVEN_TV_ZERO_WIDTH_FLAG = (1 << 8);
+
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
 const WRITE_MODE_MESSAGE_DELAY = 1500;
 const NO_EVENT_RECONNECT_TIMEOUT = 10000; // @todo move to config
 const LIVE_STREAMS_KEY = "twitch-live-streams";
 const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
 const BAD_MESSAGE_RESPONSE = "A message that was about to be posted violated this channel's moderation settings.";
-const MESSAGE_MODERATION_CODES = ["channel_settings", "automod_held"];
+const MESSAGE_MODERATION_CODES = new Set(["channel_settings", "automod_held"]);
 
 const DEFAULT_LOGGING_CONFIG = {
 	bits: false,
@@ -82,7 +84,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	supportsMeAction = true;
 	dynamicChannelAddition = true;
 
-	// noinspection JSUnusedLocalSymbols
+	// eslint-disable-next-line no-unused-private-class-members
 	#reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000);
 	#websocketLatency = null;
 	#previousMessageMeta = new Map();
@@ -132,9 +134,11 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				await createWhisperMessageSubscription(this.selfId);
 			}
 
-			const existingChannels = existingSubs.filter(i => i.type === "channel.chat.message").map(i => i.condition.broadcaster_user_id);
+			const existingChannels = existingSubs.filter(i => i.type === "channel.chat.message");
+			const existingIds = new Set(existingChannels.map(i => i.condition.broadcaster_user_id));
+
 			const channelList = sb.Channel.getJoinableForPlatform(this);
-			const missingChannels = channelList.filter(i => !existingChannels.includes(i.Specific_ID));
+			const missingChannels = channelList.filter(i => !existingIds.has(i.Specific_ID));
 
 			const batchSize = 100;
 			for (let index = 0; index < missingChannels.length; index += batchSize) {
@@ -268,7 +272,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		}
 
 		const baseMessage = message;
-		message = message.replace(/\s+/g, " ").trim();
+		message = message.replaceAll(/\s+/g, " ").trim();
 
 		if (options.meAction === true) {
 			message = `.me ${message}`;
@@ -339,7 +343,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				replyData
 			});
 
-			if (MESSAGE_MODERATION_CODES.includes(replyData.drop_reason.code) && baseMessage !== BAD_MESSAGE_RESPONSE) {
+			if (MESSAGE_MODERATION_CODES.has(replyData.drop_reason.code) && baseMessage !== BAD_MESSAGE_RESPONSE) {
 				await this.send(BAD_MESSAGE_RESPONSE, channel);
 			}
 		}
@@ -394,7 +398,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		}
 
 		const trimmedMessage = message
-			.replace(/[\r\n]/g, " ")
+			.replaceAll(/[\r\n]/g, " ")
 			.trim();
 
 		const whisperMessageLimit = this.config.whisperMessageLimit ?? FALLBACK_WHISPER_MESSAGE_LIMIT;
@@ -663,13 +667,13 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		// Own message - check the regular/vip/mod/broadcaster status, and skip
 		if (channelData && senderUserId === this.selfId) {
-			const flatBadges = badges.map(i => i.set_id);
+			const flatBadges = new Set(badges.map(i => i.set_id));
 			const oldMode = channelData.Mode;
 
-			if (flatBadges.includes("moderator") || flatBadges.includes("broadcaster")) {
+			if (flatBadges.has("moderator") || flatBadges.has("broadcaster")) {
 				channelData.Mode = "Moderator";
 			}
-			else if (flatBadges.includes("vip")) {
+			else if (flatBadges.has("vip")) {
 				channelData.Mode = "VIP";
 			}
 			else {
@@ -1158,6 +1162,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			type: "7tv",
 			global: false,
 			animated: i.data.animated,
+			// eslint-disable-next-line no-bitwise
 			zeroWidth: Boolean(i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
 		}));
 	}
@@ -1229,6 +1234,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			type: "7tv",
 			global: true,
 			animated: i.data.animated,
+			// eslint-disable-next-line no-bitwise
 			zeroWidth: (i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
 		}));
 
@@ -1352,7 +1358,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 	static async createAccountChallenge (userData, twitchID) {
 		const row = await sb.Query.getRow("chat_data", "User_Verification_Challenge");
-		const challenge = require("crypto")
+		const challenge = require("node:crypto")
 			.randomBytes(16)
 			.toString("hex");
 

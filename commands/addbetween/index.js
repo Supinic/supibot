@@ -22,7 +22,7 @@ module.exports = {
 			nodes = args.join(" ").split(/[?!.]/);
 		}
 		else if (args.length === 1) {
-			nodes = Array.from(args[0]);
+			nodes = [...args[0]];
 		}
 
 		const result = [];

@@ -25,7 +25,7 @@ const execute = async (data) => {
 			throwHttpErrors: false
 		});
 	}
-	catch (e) {
+	catch {
 		return {
 			success: false,
 			reply: `Could not query your provided host!`

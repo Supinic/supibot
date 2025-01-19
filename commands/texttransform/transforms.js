@@ -1,4 +1,5 @@
 const { randomInt } = require("../../utils/command-utils.js");
+const ANTI_PING_CHARACTER = "\u{E0000}";
 
 const convert = {
 	method: (string, fn, context) => fn(string, context),
@@ -31,7 +32,7 @@ const convert = {
 			string = string.replace(r, to);
 		}
 
-		string = string.trim().replace(/_/g, "");
+		string = string.trim().replaceAll("_", "");
 
 		if (dictionary.endings && /[).?!]$/.test(string)) {
 			string += ` ${sb.Utils.randArray(dictionary.endings)}`;
@@ -41,7 +42,7 @@ const convert = {
 	}
 };
 
-const textCaseCode = require("./textCaseCode.js");
+const textCaseCode = require("./text-case-code.js");
 const officialCharactersMap = require("./definitions/official-characters.json");
 
 /**
@@ -168,36 +169,36 @@ const types = [
 		type: "method",
 		aliases: [],
 		description: "Replaces every \"o\" and \"0\" with the monkaOMEGA emote",
-		data: (message) => message.replace(/[oOｏＯоО]/g, " monkaOMEGA ")
+		data: (message) => message.replaceAll(/[oOｏＯоО]/g, " monkaOMEGA ")
 	},
 	{
 		name: "OMEGALUL",
 		type: "method",
 		aliases: [],
 		description: "Replaces every \"o\" and \"0\" with the OMEGALUL emote",
-		data: (message) => message.replace(/[oOｏＯоО]/g, " OMEGALUL ")
+		data: (message) => message.replaceAll(/[oOｏＯоО]/g, " OMEGALUL ")
 	},
 	{
 		name: "owoify",
 		type: "method",
 		aliases: ["owo", "uwu", "uwuify"],
-		data: (message) => message.replace(/[rl]/g, "w")
-			.replace(/[RL]/g, "W")
-			.replace(/n([aeiou])/g, "ny$1")
-			.replace(/N([aeiou])/g, "Ny$1")
-			.replace(/N([AEIOU])/g, "Ny$1")
-			.replace(/ove/g, "uv")
-			.replace(/[!?]+/g, ` ${sb.Utils.randArray(["(・`ω´・)", ";;w;;", "owo", "UwU", ">w<", "^w^"])} `)
+		data: (message) => message.replaceAll(/[rl]/g, "w")
+			.replaceAll(/[RL]/g, "W")
+			.replaceAll(/n([aeiou])/g, "ny$1")
+			.replaceAll(/N([aeiou])/g, "Ny$1")
+			.replaceAll(/N([AEIOU])/g, "Ny$1")
+			.replaceAll("ove", "uv")
+			.replaceAll(/[!?]+/g, ` ${sb.Utils.randArray(["(・`ω´・)", ";;w;;", "owo", "UwU", ">w<", "^w^"])} `)
 	},
 	{
 
 		name: "reverse",
 		type: "method",
 		aliases: [],
-		data: (message) => Array.from(message)
+		data: (message) => [...message]
 			.reverse()
 			.join("")
-			.replace(/[()]/g, (char) => (char === ")") ? "(" : ")")
+			.replaceAll(/[()]/g, (char) => (char === ")") ? "(" : ")")
 	},
 	{
 		name: "random",
@@ -222,31 +223,31 @@ const types = [
 				return word;
 			}
 		}).join(" "),
-		reverseData: (message) => message.split(" ").map(word => word.replace(/\u{E0000}/gu, "")).join(" ")
+		reverseData: (message) => message.split(" ").map(word => word.replaceAll(ANTI_PING_CHARACTER, "")).join(" ")
 	},
 	{
 		name: "trim",
 		type: "method",
 		aliases: [],
 		description: "Removes all whitespace from the message - spaces, tabs, newlines and so on.",
-		data: (message) => message.replace(/\s+/g, "")
+		data: (message) => message.replaceAll(/\s+/g, "")
 	},
 	{
 		name: "explode",
 		type: "method",
 		aliases: [],
 		description: "Opposite of trim - adds a space between every character of the message.",
-		data: (message) => Array.from(message)
+		data: (message) => [...message]
 			.join(" ")
-			.replace(/\s+/g, " ")
+			.replaceAll(/\s+/g, " ")
 	},
 	{
 		name: "binary",
 		type: "method",
 		aliases: ["bin"],
-		data: (message) => message.split("").map(i => ("0".repeat(8) + i.charCodeAt(0).toString(2)).slice(-8)).join(" "),
+		data: (message) => [...message].map(i => ("0".repeat(8) + i.codePointAt(0).toString(2)).slice(-8)).join(" "),
 		reverseData: (message) => {
-			const list = message.split("");
+			const list = [...message];
 			let word = "";
 			const result = [];
 
@@ -268,7 +269,7 @@ const types = [
 				}
 			}
 
-			return String.fromCharCode(...result);
+			return String.fromCodePoint(...result);
 		}
 	},
 	{
@@ -297,8 +298,8 @@ const types = [
 		description: "Attempts to wrap letters in a box-like thing. Might not work with all fonts.",
 		data: (message) => {
 			const arr = [];
-			const combine = String.fromCharCode(0xFE0F);
-			const box = String.fromCharCode(0x20E3);
+			const combine = String.fromCodePoint(0xFE0F);
+			const box = String.fromCodePoint(0x20E3);
 
 			for (const character of message) {
 				if (character === " ") {
@@ -317,7 +318,7 @@ const types = [
 		type: "method",
 		aliases: ["mock", "mocking", "spongemock"],
 		description: "Randomly capitalizes and lowercases characters in the message to make it look as if mocking someone.",
-		data: (message) => Array.from(message).map(char => {
+		data: (message) => [...message].map(char => {
 			if (/[a-zA-Z]/.test(char)) {
 				return randomInt(0, 1) ? char.toUpperCase() : char.toLowerCase();
 			}
@@ -349,7 +350,8 @@ const types = [
 				const suffixThreshold = -Math.max(prefixThreshold - 1, 1);
 
 				const scrambled = [];
-				const chars = word.slice(prefixThreshold, suffixThreshold).split("");
+				const slicedWord = word.slice(prefixThreshold, suffixThreshold);
+				const chars = [...slicedWord];
 
 				while (chars.length > 0) {
 					const randomIndex = randomInt(0, chars.length - 1);
@@ -377,7 +379,7 @@ const types = [
 			return `ⓘ ${result}`;
 		},
 		reverseData: (string) => {
-			const output = string.replace(/ⓘ/g, "");
+			const output = string.replaceAll("ⓘ", "");
 			return convert.unmap(output, officialCharactersMap);
 		}
 	},
@@ -402,10 +404,13 @@ const types = [
 		type: "method",
 		aliases: ["hexadecimal"],
 		description: "Transforms your input into a string of hexadecimal identifiers, based on their ASCII representation. The characters should be two-byte, separated or not.",
-		data: (string) => Array.from(new TextEncoder().encode(string)).map(i => i.toString(16)).join(""),
+		data: (string) => {
+			const encodedString = new TextEncoder().encode(string);
+			return [...encodedString].map(i => i.toString(16)).join("");
+		},
 		reverseData: (string) => {
 			const regexMatch = string.matchAll(/([a-f0-9]{2})(\W)?/gi);
-			const hexArray = Array.from(regexMatch).map(i => parseInt(i[1], 16));
+			const hexArray = [...regexMatch].map(i => Number.parseInt(i[1], 16));
 
 			return new TextDecoder().decode(new Uint8Array(hexArray));
 		}

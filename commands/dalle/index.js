@@ -175,12 +175,12 @@ module.exports = {
 		}
 
 		const { images } = response.body;
-		const hash = require("crypto").createHash("sha512");
+		const hash = require("node:crypto").createHash("sha512");
 		for (const base64Image of images) {
 			hash.update(base64Image);
 		}
 
-		const jsonImageData = images.map(i => i.replace(/\\n/g, ""));
+		const jsonImageData = images.map(i => i.replaceAll("\n", ""));
 		const row = await sb.Query.getRow("data", "DALL-E");
 		const ID = hash.digest().toString("hex").slice(0, 16);
 		const created = new sb.Date();

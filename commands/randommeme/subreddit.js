@@ -4,7 +4,7 @@ const defaultSubredditCacheExpiration = 2 * 3_600_000;
 module.exports = class Subreddit {
 	#name;
 	#error = null;
-	#errorMessage = null;
+	// #errorMessage = null;
 	#exists = false;
 	#reason = null;
 	#quarantine = null;
@@ -15,7 +15,7 @@ module.exports = class Subreddit {
 	static defaultSubredditCacheExpiration = defaultSubredditCacheExpiration;
 
 	constructor (meta) {
-		this.#errorMessage = meta.message ?? null;
+		// this.#errorMessage = meta.message ?? null;
 		this.#error = meta.error ?? null;
 		this.#reason = meta.reason ?? null;
 

@@ -1,7 +1,6 @@
 const { parseRSS } = require("../../../utils/command-utils.js");
 
 // Currently unused
-// eslint-disable-next-line no-unused-vars
 const updateViaProRss = async () => {
 	const url = "https://brightershores.pro/rss.xml";
 	const BRIGHTER_SHORES_LAST_UPDATE_DATE = "brighter-shores-last-update-date";

@@ -49,18 +49,8 @@ export const definition = {
 				const row = await sb.Query.getRow("stream", "Stream");
 				await row.load(stream.id);
 
-				let mult = 1;
 				if (stream.duration) {
-					const vodDuration = stream.duration.split(/\D/)
-						.filter(Boolean)
-						.map(Number)
-						.reverse()
-						.reduce((acc, cur) => {
-							acc += cur * mult;
-							mult *= 60;
-							return acc;
-						}, 0);
-
+					const vodDuration = sb.Utils.parseVideoDuration(stream.duration);
 					row.values.End = start.clone().addSeconds(vodDuration);
 				}
 
@@ -95,7 +85,7 @@ export const definition = {
 				.update("chat_data", "Song_Request")
 				.set("Status", "Inactive")
 				.where("Status <> %s", "Inactive")
-			)
+			);
 		}
 	}),
 	Global: false,

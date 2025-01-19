@@ -9,7 +9,7 @@ module.exports = {
 		);
 
 		if (name === "all" || name === "total") {
-			const total = data.reduce((acc, cur) => (acc += cur.Use_Count), 0);
+			const total = data.reduce((acc, cur) => (acc + cur.Use_Count), 0);
 			return {
 				reply: `Playsounds have been used a total of ${total} times.`
 			};

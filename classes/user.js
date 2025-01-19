@@ -321,7 +321,7 @@ module.exports = class User extends require("./template.js") {
 
 	static getByProperty (property, identifier) {
 		const iterator = User.data.values();
-		let user = undefined;
+		let user;
 		let value = iterator.next().value;
 
 		while (!user && value) {
@@ -339,8 +339,8 @@ module.exports = class User extends require("./template.js") {
 			.toLowerCase()
 			.replace(/^@/, "")
 			.replace(/^#/, "")
-			.replace(/:$/g, "")
-			.replace(/\s+/g, "_");
+			.replaceAll(/:$/g, "")
+			.replaceAll(/\s+/g, "_");
 	}
 
 	static async add (name, properties = {}) {

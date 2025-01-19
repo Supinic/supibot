@@ -1,6 +1,6 @@
 const { VIDEO_TYPE_REPLACE_PREFIX } = require("../../utils/command-utils.js");
 const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = require("../../utils/shared-cache-keys.json");
-const ALLOWED_SONG_CHECKS = ["current", "previous", "next"];
+const ALLOWED_SONG_CHECKS = new Set(["current", "previous", "next"]);
 
 module.exports = {
 	Name: "current",
@@ -79,7 +79,7 @@ module.exports = {
 			? "current"
 			: (args.shift() ?? "current");
 
-		if (!ALLOWED_SONG_CHECKS.includes(type)) {
+		if (!ALLOWED_SONG_CHECKS.has(type)) {
 			type = "current";
 		}
 

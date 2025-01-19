@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 const DIAERESIS = "\u{0308}";
 
 const encode = (input, codeWord) => {
@@ -12,7 +13,7 @@ const encode = (input, codeWord) => {
 	const max = Math.max(127, (1 << codeWord.length) - 1);
 
 	for (let i = 0; i < input.length; i++) {
-		const value = input.charCodeAt(i);
+		const value = input.codePointAt(i);
 		if (value > max) {
 			output.push(input[i]);
 			continue;
@@ -81,7 +82,8 @@ const decode = (input, codeWord) => {
 		for (let i = 0; i < word.length; i++) {
 			const isUpperCase = (word[i] === word[i].toUpperCase());
 			if (codeWord.length === 6 && bit === 32) {
-				const hasDiaeresis = (word[i].normalize("NFKD").split("")[1] === DIAERESIS);
+				const normalizedStringArray = [...word[i].normalize("NKFD")];
+				const hasDiaeresis = (normalizedStringArray[1] === DIAERESIS);
 				if (!hasDiaeresis) {
 					value += bit;
 				}
@@ -100,7 +102,7 @@ const decode = (input, codeWord) => {
 			}
 		}
 
-		output.push(String.fromCharCode(value));
+		output.push(String.fromCodePoint(value));
 		if (appendix) {
 			output.push(appendix, " ");
 		}

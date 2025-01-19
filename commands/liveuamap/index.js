@@ -44,7 +44,7 @@ module.exports = {
 					}
 				});
 			}
-			catch (e) {
+			catch {
 				return {
 					success: false,
 					reply: `No response received from website! Try again later.`
@@ -68,7 +68,8 @@ module.exports = {
 				};
 			}
 
-			for (let i = 0; i < Array.from(events).length; i++) {
+			const eventsLength = [...events].length;
+			for (let i = 0; i < eventsLength; i++) {
 				const node = events[i];
 				const title = [...node.children].find(i => i.attribs?.class === "title").children[0].data;
 				const timeEl = [...node.children].find(i => i.attribs?.class?.includes("time"));

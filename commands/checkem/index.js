@@ -29,7 +29,8 @@ module.exports = {
 				};
 			}
 
-			messageNumber = BigInt(`0x${context.append.id.replace(/-/g, "")}`);
+			const pseudoUuid = context.append.id.replaceAll("-", "");
+			messageNumber = BigInt(`0x${pseudoUuid}`);
 		}
 		else if (context.platform.Name === "discord") {
 			if (!context.append.messageID) {
@@ -49,7 +50,7 @@ module.exports = {
 		}
 
 		const croppedNumber = String(messageNumber).slice(-12);
-		const list = croppedNumber.split("");
+		const list = [...croppedNumber];
 		const repeatedDigit = list.pop();
 
 		let repeatsAmount = 1;
