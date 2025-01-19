@@ -1,4 +1,4 @@
-import variables from "./subcommands/index.js";
+import { subcommands } from "./subcommands/index.js";
 
 export default {
 	Name: "set",
@@ -22,7 +22,7 @@ export default {
 		const { invocation } = context;
 		type = type.toLowerCase();
 
-		const target = variables.find(i => type === i.name || i.aliases?.includes(type));
+		const target = subcommands.find(i => type === i.name || i.aliases?.includes(type));
 		if (!target) {
 			return {
 				success: false,
