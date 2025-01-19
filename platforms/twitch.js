@@ -138,7 +138,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			const existingIds = new Set(existingChannels.map(i => i.condition.broadcaster_user_id));
 
 			const channelList = sb.Channel.getJoinableForPlatform(this);
-			const missingChannels = channelList.filter(i => !existingIds.includes(i.Specific_ID));
+			const missingChannels = channelList.filter(i => !existingIds.has(i.Specific_ID));
 
 			const batchSize = 100;
 			for (let index = 0; index < missingChannels.length; index += batchSize) {
