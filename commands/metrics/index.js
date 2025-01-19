@@ -1,5 +1,7 @@
 import definitions from "./definitions.js";
-import { baseUrl } from "./prometheus-config.json";
+import prometheusConfig from "./prometheus-config.json";
+
+const { baseUrl } = prometheusConfig;
 
 export default {
 	Name: "metrics",

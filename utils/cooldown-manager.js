@@ -1,4 +1,5 @@
-import { values } from "../config.json";
+import config from "../config.json";
+const { values } = config;
 
 class Cooldown {
 	#channel = null;

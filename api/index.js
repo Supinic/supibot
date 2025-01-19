@@ -1,4 +1,4 @@
-import { api } from "../config.json";
+import config from "../config.json";
 import http from "node:http";
 import https from "node:https";
 
@@ -25,7 +25,8 @@ const definition = [
 ];
 
 export default function initialize () {
-	if (!api.port || typeof api.secure !== "boolean") {
+	const { api } = config;
+	if (!api || !api.port || typeof api.secure !== "boolean") {
 		console.warn("Internal API port/security is not configured - internal API will not start");
 		return;
 	}

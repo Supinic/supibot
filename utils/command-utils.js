@@ -6,8 +6,6 @@ import Chrono from "chrono-node";
 
 const rssParser = new RSSParser();
 const MAX_SAFE_RANGE = 281474976710655;
-export const VIDEO_TYPE_REPLACE_PREFIX = "$";
-
 const PASTEBIN_EXPIRATION_OPTIONS = {
 	never: "N",
 	"10 minutes": "10M",
@@ -24,6 +22,8 @@ const PASTEBIN_PRIVACY_OPTIONS = {
 	unlisted: 1,
 	private: 2
 };
+
+export const VIDEO_TYPE_REPLACE_PREFIX = "$";
 
 /**
  * @param {number} min

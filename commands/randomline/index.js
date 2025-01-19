@@ -1,8 +1,9 @@
 import DatabaseLogs from "./db-randomline.js";
 import { getRandomChannelLine, getRandomUserLine, isSupported } from "./rustlog.js";
-import { connectedChannelGroups } from "./connected-channels.json";
-
+import connectionData from "./connected-channels.json";
 import config from "../../config.json";
+
+const { connectedChannelGroups } = connectionData;
 const { instances } = config.rustlog;
 
 export default {

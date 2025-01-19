@@ -1,5 +1,6 @@
-import { invocations, specialSuffixes } from "../../classes/afk-definitions.json";
+import afkDefinitions from "../../classes/afk-definitions.json";
 
+const { invocations, specialSuffixes } = afkDefinitions;
 const STATUS_LENGTH_CHARACTER_LIMIT = 2000;
 
 export default {

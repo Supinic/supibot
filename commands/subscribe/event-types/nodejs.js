@@ -1,4 +1,5 @@
-import { LATEST_NODE_JS_VERSION } from "../../../utils/shared-cache-keys.json";
+import cacheKeys from "../../../utils/shared-cache-keys.json";
+const { LATEST_NODE_JS_VERSION } = cacheKeys;
 
 export default {
 	name: "Node.js updates",

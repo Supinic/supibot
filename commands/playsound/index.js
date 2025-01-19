@@ -1,5 +1,7 @@
-import { PLAYSOUNDS_ENABLED } from "../../utils/shared-cache-keys.json";
+import cacheKeys from "../../utils/shared-cache-keys.json";
 import config from "../../config.json";
+
+const { PLAYSOUNDS_ENABLED } = cacheKeys;
 const {
 	listenerAddress,
 	listenerPort,

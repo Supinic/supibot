@@ -1,4 +1,4 @@
-import { tweets } from "./guy-beahm.json";
+import beahmData from "./guy-beahm.json";
 
 const MAXIMUM_REPEATS = 5;
 const previousPosts = [];
@@ -13,7 +13,7 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function forsenCD (context) {
-		const eligibleTweets = tweets.filter(i => !previousPosts.includes(i));
+		const eligibleTweets = beahmData.tweets.filter(i => !previousPosts.includes(i));
 		const post = sb.Utils.randArray(eligibleTweets);
 
 		previousPosts.unshift(post);

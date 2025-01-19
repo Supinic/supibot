@@ -1,6 +1,8 @@
-import { TTS_ENABLED } from "../../utils/shared-cache-keys.json";
+import cacheKeys from "../../utils/shared-cache-keys.json";
 import config from "../../config.json";
+
 const { epalAudioChannels, listenerAddress, listenerPort } = config.local ?? {};
+const { TTS_ENABLED } = cacheKeys;
 
 const PROFILES_CACHE_KEY = "epal-profiles";
 

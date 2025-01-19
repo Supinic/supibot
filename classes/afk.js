@@ -2,8 +2,11 @@ import Filter from "./filter.js";
 import User from "./user.js";
 import Template from "./template.js";
 
-import { responses } from "./afk-definitions.json";
-import { responses as configResponses } from "../config.json";
+import afkDefinitions from "./afk-definitions.json";
+import config from "../config.json";
+
+const { responses } = afkDefinitions;
+const configResponses = config.responses;
 
 export default class AwayFromKeyboard extends Template {
 	static data = new Map();

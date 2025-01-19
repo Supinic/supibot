@@ -1,10 +1,12 @@
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
-const shell = promisify(exec);
 
-import { codes } from "./codes.json";
+import weatherCodeData from "./codes.json";
 import { getIcon, getWindDirection } from "./helpers.js";
 import { postToHastebin } from "../../utils/command-utils.js";
+
+const { codes } = weatherCodeData;
+const shell = promisify(exec);
 
 const ALLOWED_FORMAT_TYPES = [
 	"cloudCover",

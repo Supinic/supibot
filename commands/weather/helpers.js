@@ -20,8 +20,9 @@ const WEATHER_ICONS = {
 	803: "☁️", // Broken clouds (51-84%)
 	804: "☁️" // Overcast clouds (85-100%)
 };
+const WIND_DIRECTIONS = ["NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
 
-const getIcon = (code, current) => {
+export const getIcon = (code, current) => {
 	const type = Math.trunc(code / 100);
 	if (WEATHER_ICONS[type]) {
 		return WEATHER_ICONS[type];
@@ -39,8 +40,7 @@ const getIcon = (code, current) => {
 	}
 };
 
-const WIND_DIRECTIONS = ["NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
-const getWindDirection = (degrees) => {
+export const getWindDirection = (degrees) => {
 	degrees %= 360;
 
 	const base = 11.25;
@@ -52,9 +52,4 @@ const getWindDirection = (degrees) => {
 	const index = Math.trunc((degrees - base) / interval);
 
 	return WIND_DIRECTIONS[index];
-};
-
-export default {
-	getIcon,
-	getWindDirection
 };
