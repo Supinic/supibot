@@ -1275,9 +1275,9 @@ async-markov@supinic/async-markov:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001688":
-  version: 1.0.30001692
-  resolution: "caniuse-lite@npm:1.0.30001692"
-  checksum: 10c0/fca5105561ea12f3de593f3b0f062af82f7d07519e8dbcb97f34e7fd23349bcef1b1622a9a6cd2164d98e3d2f20059ef7e271edae46567aef88caf4c16c7708a
+  version: 1.0.30001695
+  resolution: "caniuse-lite@npm:1.0.30001695"
+  checksum: 10c0/acf90a767051fdd8083711b3ff9f07a28149c55e394115d8f874f149aa4f130e6bc50cea1dd94fe03035b9ebbe13b64f446518a6d2e19f72650962bdff44b2c5
   languageName: node
   linkType: hard
 
@@ -1709,7 +1709,7 @@ cytube-connector@supinic/cytube-connector:
   languageName: node
   linkType: hard
 
-"duration-parser@github:supinic/duration-parser":
+duration-parser@supinic/duration-parser:
   version: 1.0.0
   resolution: "duration-parser@https://github.com/supinic/duration-parser.git#commit=b61d547160c3913e620a64539ee1ef9a4f0c2afb"
   checksum: 10c0/5c4e9e21700a941c0b86dc2b3996871043b521808b1f6c87b0fde9474932bfd6e9d65f762e91f43586ed6e65dccbd484c1ebeee911274e0ddbc4b3b6aefb11f2
@@ -4540,16 +4540,16 @@ cytube-connector@supinic/cytube-connector:
 
 supi-core@supinic/supi-core:
   version: 3.1.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=2ce891f8f40712395857b5e40d56491b0d35b28c"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=c7bd15d7cf6ece218cc8c785b98d6739f15719eb"
   dependencies:
     cheerio: "npm:^1.0.0"
-    duration-parser: "github:supinic/duration-parser"
+    duration-parser: supinic/duration-parser
     got: "npm:^14.4.5"
     ioredis: "npm:^5.4.2"
     mariadb: "npm:^3.4.0"
     prom-client: "npm:^15.1.3"
     random-js: "npm:^2.1.0"
-  checksum: 10c0/696a2f9048e29abd414ed944c226ad01adb56a563a7ef672d9f559fc8b4b1861f4d9a2f7da6a80161d13117c06089de54146c50410b951e93a53bc719529c8d1
+  checksum: 10c0/27eb6a59ced5af72c3e1ed994f9f6ab4f61d1c831e583535e811c29daa557bf2d2df1471c8088818cb7e77eb1421e0b0949867d7b0167d2fa1700806bd7394d3
   languageName: node
   linkType: hard
 
