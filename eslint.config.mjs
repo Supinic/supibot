@@ -26,32 +26,7 @@ export default tseslint.config(
 			ecmaVersion: 2025,
 			sourceType: "module"
 		},
-		// plugins: {
-		// 	unicorn: unicornPlugin
-		// },
 		rules: {
-			"unicorn/prevent-abbreviations": "off",
-			"unicorn/no-null": "off",
-			"unicorn/explicit-length-check": "off",
-			"unicorn/no-negated-condition": "off",
-			"unicorn/prefer-ternary": "off",
-			"unicorn/no-for-loop": "off",
-			"unicorn/text-encoding-identifier-case": "off", // Also applies to standalone strings rather than arguments => disable
-			"unicorn/no-typeof-undefined": "off",
-			"unicorn/no-static-only-class": "off",
-			"unicorn/switch-case-braces": "off",
-			"unicorn/prefer-default-parameters": "off",
-			"unicorn/prefer-type-error": "off",
-			"unicorn/no-anonymous-default-export": "off", // Remove when refactored to imports/exports
-			"unicorn/prefer-module": "off", // Remove when refactored to imports/exports too
-			"unicorn/no-array-method-this-argument": "off", // Doesn't work for custom array methods
-			"unicorn/no-array-callback-reference": "off", // Doesn't work for custom array methods either
-			"unicorn/prefer-event-target": "off", // Not necessary at the moment, can be considered if project moves away from Node
-
-			"unicorn/prefer-switch": ["error", {
-				minimumCases: 4
-			}],
-
 			// "@typescript-eslint/no-floating-promises": "error",
 			// "@typescript-eslint/no-unused-vars": "warn",
 			"array-bracket-newline": ["warn", "consistent"],
@@ -228,6 +203,28 @@ export default tseslint.config(
 			"unicorn/prefer-string-starts-ends-with": "warn",
 			"unicorn/prefer-string-trim-start-end": "warn",
 			"unicorn/throw-new-error": "error",
+
+			"unicorn/prevent-abbreviations": "off",
+			"unicorn/no-null": "off",
+			"unicorn/explicit-length-check": "off",
+			"unicorn/no-negated-condition": "off",
+			"unicorn/prefer-ternary": "off",
+			"unicorn/no-for-loop": "off",
+			"unicorn/text-encoding-identifier-case": "off", // Also applies to standalone strings rather than arguments => disable
+			"unicorn/no-typeof-undefined": "off",
+			"unicorn/no-static-only-class": "off",
+			"unicorn/switch-case-braces": "off",
+			"unicorn/prefer-default-parameters": "off",
+			"unicorn/prefer-type-error": "off",
+			"unicorn/no-anonymous-default-export": "off", // Remove when refactored to imports/exports
+			"unicorn/prefer-module": "off", // Remove when refactored to imports/exports too
+			"unicorn/no-array-method-this-argument": "off", // Doesn't work for custom array methods
+			"unicorn/no-array-callback-reference": "off", // Doesn't work for custom array methods either
+			"unicorn/prefer-event-target": "off", // Not necessary at the moment, can be considered if project moves away from Node
+			"unicorn/prefer-switch": ["error", {
+				minimumCases: 4
+			}],
+
 			"wrap-iife": ["warn", "inside"],
 			yoda: "error"
 		}
