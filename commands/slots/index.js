@@ -1,3 +1,5 @@
+import { leaderboardKeywords, patterns } from "./definitions.js";
+
 export default {
 	Name: "slots",
 	Aliases: null,
@@ -10,8 +12,6 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function slots (context, ...args) {
-		import { leaderboardKeywords, patterns } from "./definitions.js";
-
 		if (leaderboardKeywords.includes(args[0])) {
 			return {
 				reply: "Check out all the previous slots winners here: https://supinic.com/data/slots-winner/leaderboard",
@@ -157,7 +157,6 @@ export default {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		import { leaderboardKeywords, patterns } from "./definitions.js";
 		const patternList = [...patterns]
 			.sort((a, b) => a.name.localeCompare(b.name))
 			.map(i => `<li><code>${i.name}</code><br>${i.notes}</li>`)

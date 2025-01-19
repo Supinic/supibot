@@ -1,4 +1,5 @@
 import { randomInt } from "../../utils/command-utils.js";
+import fortuneCookieData from "./fortune-cookies.json";
 
 /** @type {CookieData} */
 const basicStats = {
@@ -279,9 +280,7 @@ const donateCookie = (donator, receiver, donatorOptions = {}, receiverOptions = 
 
 /* istanbul ignore next */
 const fetchRandomCookieText = async () => {
-	import cookies from "./fortune-cookies.json";
-	const cookie = sb.Utils.randArray(cookies);
-
+	const cookie = sb.Utils.randArray(fortuneCookieData);
 	return cookie.text;
 };
 

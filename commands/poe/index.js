@@ -1,3 +1,5 @@
+import subcommands from "./subcommands.js";
+
 export default {
 	Name: "poe",
 	Aliases: ["poe2"],
@@ -8,8 +10,6 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function poe (context, type, ...args) {
-		import { subcommands } from "./definitions.js";
-
 		type = (type ?? "league").toLowerCase();
 
 		const target = subcommands.find(i => i.name === type || i.aliases.includes(type));
@@ -23,8 +23,6 @@ export default {
 		return await target.execute(context, ...args);
 	}),
 	Dynamic_Description: (async function (prefix) {
-		import { subcommands } from "./definitions.js";
-
 		return [
 			"Multiple commands related to Path of Exile.",
 			"",

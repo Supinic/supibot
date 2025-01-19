@@ -1,3 +1,5 @@
+import YoutubeStreamHandler from "./youtube-handler.js";
+
 export default {
 	Name: "streaminfo",
 	Aliases: ["si", "uptime", "vod"],
@@ -12,8 +14,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function streamInfo (context, ...args) {
 		if (context.params.youtube) {
-			import handler from "./youtube-handler.js";
-			return await handler(context, ...args);
+			return await YoutubeStreamHandler(context, ...args);
 		}
 
 		let targetChannel;
@@ -217,8 +218,6 @@ export default {
 		else {
 			const tags = [];
 			if (Array.isArray(stream.tag_ids) && stream.tag_ids.length !== 0) {
-				import { URLSearchParams } from "node:url";
-
 				const paramsIterable = stream.tag_ids.map(i => ["tag_id", i]);
 				const searchParams = new URLSearchParams(paramsIterable);
 

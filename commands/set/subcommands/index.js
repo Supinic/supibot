@@ -15,23 +15,21 @@ import TrackFavouriteSubcommand from "./track-favourite.js";
 import ChannelFlagsSubcommands from "./channel-flags.js";
 import TwitchLottoSubcommands from "./twitch-lotto.js";
 
-export default {
-	subcommands: [
-		AmbassadorSubcommand,
-		BirthdaySubcommand,
-		DiscordSubcommand,
-		GachiSubcommand,
-		LanguageSubcommand,
-		LeagueRegionSubcommand,
-		LeagueUserSubcommand,
-		LocationSubcommand,
-		NoAbbChatterSubcommand,
-		ReminderSubcommand,
-		StalkPreventionSubcommand,
-		SuggestionSubcommand,
-		TrackFavouriteSubcommand,
+export default [
+	AmbassadorSubcommand,
+	BirthdaySubcommand,
+	DiscordSubcommand,
+	GachiSubcommand,
+	LanguageSubcommand,
+	LeagueRegionSubcommand,
+	LeagueUserSubcommand,
+	LocationSubcommand,
+	NoAbbChatterSubcommand,
+	ReminderSubcommand,
+	StalkPreventionSubcommand,
+	SuggestionSubcommand,
+	TrackFavouriteSubcommand,
 
-		...ChannelFlagsSubcommands,
-		...TwitchLottoSubcommands
-	]
-};
+	...ChannelFlagsSubcommands,
+	...TwitchLottoSubcommands
+];

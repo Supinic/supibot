@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import config from "./config.json";
 import History from "./history-control.js";
 
@@ -79,7 +80,6 @@ export default class GptTemplate {
 			userPlatformID = "N/A";
 		}
 
-		import { createHash } from "node:crypto";
 		return createHash("sha1")
 			.update(context.user.Name)
 			.update(context.platform.Name)

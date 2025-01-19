@@ -1,3 +1,6 @@
+import transforms from "./transforms.js";
+const LOREM_IPSUM = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
+
 export default {
 	Name: "texttransform",
 	Aliases: ["tt","reversetexttransform","rtt"],
@@ -21,7 +24,6 @@ export default {
 			};
 		}
 
-		import transforms from "./transforms.js";
 		const message = args.join(" ");
 		const transformation = transforms.types.find(i => (
 			i.name === name || (i.aliases && i.aliases.includes(name))
@@ -73,13 +75,12 @@ export default {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const lorem = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
-		import { types, convert } from "./transforms.js";
-
+		const { types, convert } = transforms;
 		const sortedTypes = [...types].sort((a, b) => a.name.localeCompare(b.name));
+
 		const examples = sortedTypes.map(transform => {
 			const description = transform.description ?? "(no description)";
-			const message = convert[transform.type](lorem, transform.data ?? null);
+			const message = convert[transform.type](LOREM_IPSUM, transform.data ?? null);
 			const aliases = (transform.aliases.length === 0)
 				? ""
 				: ` (${transform.aliases.join(", ")})`;
@@ -109,7 +110,7 @@ export default {
 			`<code>${prefix}texttransform (type) (text)</code>`,
 			"Provided text transformed based on the type selected.",
 
-			`Example text: ${lorem}`,
+			`Example text: ${LOREM_IPSUM}`,
 			"",
 
 			`<ul>${examples.join("<br>")}</ul>`

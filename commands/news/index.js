@@ -1,3 +1,7 @@
+import rssNews from "./rss.js";
+import googleNews from "./google-news.js";
+import definitions from "./definitions.json";
+
 export default {
 	Name: "news",
 	Aliases: null,
@@ -12,9 +16,6 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function news (context, ...args) {
-		import rssNews from "./rss.js";
-		import googleNews from "./google-news.js";
-
 		let input;
 		if (context.params.country) {
 			const value = context.params.country;
@@ -60,7 +61,6 @@ export default {
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
-		import definitions from "./definitions.json";
 		const sorted = [...definitions].sort((a, b) => a.code.localeCompare(b.code));
 
 		const extraNews = sorted.map(def => {

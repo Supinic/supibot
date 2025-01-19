@@ -1,6 +1,8 @@
 import { VM } from "vm2";
 import { postToHastebin } from "../../utils/command-utils.js";
-import { preventTomfoolery } from "./anti-tomfoolery.js";
+import preventTomfoolery from "./anti-tomfoolery.js";
+import analyze from "./acorn-heuristic.js";
+import createSandbox from "./create-sandbox.js";
 
 const PREFIX_SAFETY_CODE = `Object.defineProperty(Promise.prototype, "constructor", { writable: false }); Object.freeze(Promise.prototype); void 0;`;
 const MAXIMUM_DATA_LENGTH = 1_000_000;
@@ -111,7 +113,6 @@ export default {
 			script = `${PREFIX_SAFETY_CODE}\n${importedText}(async () => {\n${string}\n})()`;
 		}
 
-		import { analyze } from "./acorn-heuristic.js";
 		const analyzeResult = analyze(script);
 		if (analyzeResult.illegalAsync) {
 			return {
@@ -120,7 +121,6 @@ export default {
 			};
 		}
 
-		import createSandbox from "./create-sandbox";
 		const sandboxData = await createSandbox(context, scriptArgs);
 		try {
 			result = await executeScriptVm(script, {

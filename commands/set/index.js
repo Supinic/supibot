@@ -1,4 +1,4 @@
-import { subcommands } from "./subcommands/index.js";
+import subcommands from "./subcommands/index.js";
 
 export default {
 	Name: "set",
@@ -145,7 +145,7 @@ export default {
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const list = variables.map(i => {
+		const list = subcommands.map(i => {
 			let names = i.name;
 			if (i.aliases.length > 0) {
 				names += `(${i.aliases.join(", ")})`;

@@ -1,10 +1,14 @@
-const allowedHosts = {
-	github: "GitHub",
-	gitea: "Gitea",
-	gitlab: "GitLab"
-};
+import GiteaHandler from "./gitea.js";
+import GithubHandler from "./github.js";
+import GitlabHandler from "./gitlab.js";
 
-const DEFAULT_HOST_TYPE = "github";
+const handlers = [
+	GiteaHandler,
+	GithubHandler,
+	GitlabHandler
+];
+const handlerNames = handlers.map(i => i.name);
+const defaultHandler = handlers.find(i => i.flags?.default);
 
 export default {
 	Name: "commitcount",
@@ -20,11 +24,14 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function commitCount (context, username) {
-		const type = (context.params.type ?? DEFAULT_HOST_TYPE).toLowerCase();
-		if (!Object.keys(allowedHosts).includes(type)) {
+		const handler = (context.params.type)
+			? handlers[context.params.type]
+			: defaultHandler;
+
+		if (!handler) {
 			return {
 				success: false,
-				reply: `Invalid host type provided! Use one of: ${Object.keys(allowedHosts).join(", ")}`
+				reply: `Invalid git host type provided! Use one of: ${handlerNames.join(", ")}`
 			};
 		}
 
@@ -32,12 +39,11 @@ export default {
 		if (threshold >= sb.Date.now()) {
 			return {
 				success: false,
-				reply: `Who knows how many commits you're capable of? (provided date is located in the future!)`
+				reply: "Provided date is in the future!"
 			};
 		}
 
-		import Provider from `./${type}.js`;
-		const result = await Provider.execute({
+		const result = await handler.execute({
 			context,
 			username,
 			threshold,
@@ -65,7 +71,7 @@ export default {
 			who = "You have";
 		}
 		else {
-			who = `${allowedHosts[type]} user ${username} has`;
+			who = `${handler.prettyName} user ${username} has`;
 		}
 
 		const suffix = (result.commitCount === 1) ? "" : "s";

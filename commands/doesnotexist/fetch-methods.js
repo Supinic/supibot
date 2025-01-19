@@ -1,5 +1,4 @@
-import { randomInt } from "../../utils/command-utils.js";
-import { uploadToImgur, uploadToNuuls } from "../../utils/command-utils.js";
+import { randomInt, uploadToImgur, uploadToNuuls } from "../../utils/command-utils.js";
 
 const MP_CACHE_KEY = `command-dne-mp-data`;
 

@@ -1,15 +1,9 @@
-let availableFlags = [];
-let createRecentTwitchLottoCacheKey;
-try {
-	import definitions from "../../twitchlotto/definitions.js";
+import {
+	flags,
+	createRecentUseCacheKey as createRecentTwitchLottoCacheKey
+} from "../../twitchlotto/definitions.js";
 
-	availableFlags = definitions.flags.map(i => i.name.toLowerCase());
-	createRecentTwitchLottoCacheKey = definitions.createRecentUseCacheKey;
-}
-catch {
-	availableFlags = [];
-	createRecentTwitchLottoCacheKey = null;
-}
+const availableFlags = flags.map(i => i.name.toLowerCase());
 
 export default [
 	{

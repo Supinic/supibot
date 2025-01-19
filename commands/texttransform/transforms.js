@@ -11,6 +11,8 @@ import RunicDefinition from "./definitions/runic.js";
 import SuperscriptDefinition from "./definitions/superscript.js";
 import VaporwaveDefinition from "./definitions/vaporwave.js";
 
+import MorseData from "./definitions/morse.json";
+
 import LingoCockneyDefinition from "./lingo-translations/cockney.json";
 import LingoCowboyDefinition from "./lingo-translations/cowboy.json";
 import LingoOutbackDefinition from "./lingo-translations/outback.json";
@@ -292,13 +294,12 @@ const types = [
 		aliases: [],
 		data: (message) => {
 			const arr = [];
-			import morse from "./definitions/morse.json";
 			for (const character of message.toLowerCase()) {
 				if (character === " ") {
 					arr.push("/");
 				}
-				else if (morse[character]) {
-					arr.push(morse[character]);
+				else if (MorseData[character]) {
+					arr.push(MorseData[character]);
 				}
 			}
 

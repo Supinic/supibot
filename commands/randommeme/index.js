@@ -1,3 +1,6 @@
+import config from "./config.json";
+import Subreddit from "./subreddit.js";
+
 let redditGotInstance;
 const redditGot = (...args) => {
 	const options = {
@@ -38,13 +41,11 @@ export default {
 		{ name: "skipGalleries", type: "boolean" },
 		{ name: "skipVideos", type: "boolean" }
 	],
+	initialize: function () {
+		this.data.subreddits = {};
+	},
 	Whitelist_Response: null,
 	Code: (async function randomMeme (context, ...args) {
-		import config from "./config.json";
-		import Subreddit from "./subreddit.js";
-
-		this.data.subreddits ??= {};
-
 		let safeSpace = false;
 		if (context.platform.Name === "twitch") {
 			if (context.channel) {
@@ -296,7 +297,6 @@ export default {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		import { defaultMemeSubreddits } from "./config.json";
 		return [
 			"Posts a random Reddit meme. If a subreddit is provided, posts a random non-text post from there.",
 			"",
@@ -314,7 +314,7 @@ export default {
 			`<code>${prefix}rm</code>`,
 			`<code>${prefix}randommeme</code>`,
 			"Posts a random post from one of the default meme subreddits.",
-			`<code>${defaultMemeSubreddits.join(" ")}</code>`,
+			`<code>${config.defaultMemeSubreddits.join(" ")}</code>`,
 			"",
 
 			`<code>${prefix}rm (subreddit)</code>`,

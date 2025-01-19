@@ -1,5 +1,5 @@
 import { CronJob } from "cron";
-import rssSubscriptions from "./event-types/index.js";
+import { subscriptions } from "./event-types";
 import { handleGenericSubscription } from "./generic-event.js";
 
 const nameSymbol = Symbol.for("name");
@@ -17,7 +17,7 @@ export default {
 	],
 	Whitelist_Response: null,
 	initialize: async function () {
-		const genericSubscriptions = rssSubscriptions.filter(i => i.generic);
+		const genericSubscriptions = subscriptions.filter(i => i.generic);
 
 		this.data.crons = new Set();
 
@@ -50,8 +50,7 @@ export default {
 
 		type = type.toLowerCase();
 
-		import eventDefinitions from "./event-types/index.js";
-		const event = eventDefinitions.find(i => {
+		const event = subscriptions.find(i => {
 			const lowerName = i.name.toLowerCase();
 			const lowerAliases = i.aliases.map(j => j.toLowerCase());
 
@@ -199,8 +198,7 @@ export default {
 		}
 	},
 	Dynamic_Description: async function (prefix) {
-		import types from "./event-types/index.js";
-		const typesList = types.map(i => sb.Utils.tag.trim `
+		const typesList = subscriptions.map(i => sb.Utils.tag.trim `
 			<li>
 				<code>${i.name}</code>
 				<br>Aliases: ${i.aliases.map(j => `<code>${j}</code>`).join(", ") || "(none)"}

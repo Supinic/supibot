@@ -55,5 +55,7 @@ const execute = async (data) => {
 };
 
 export default {
+	name: "gitea",
+	prettyName: "Gitea",
 	execute
 };

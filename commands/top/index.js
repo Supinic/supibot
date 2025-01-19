@@ -1,3 +1,5 @@
+import { connectedChannelGroups } from "./connected-channels.json";
+
 export default {
 	Name: "top",
 	Aliases: null,
@@ -52,7 +54,6 @@ export default {
 			}
 		}
 
-		import { connectedChannelGroups } from "./connected-channels.json";
 		const group = connectedChannelGroups.find(i => i.includes(context.channel.ID));
 		if (group) {
 			for (const channelID of group) {

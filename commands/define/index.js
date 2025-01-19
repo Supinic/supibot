@@ -1,4 +1,6 @@
 import LanguageCodes from "../../utils/languages";
+import checkPartialCommandFilters from "./check-partials.js";
+
 export default {
 	Name: "define",
 	Aliases: ["def"],
@@ -19,7 +21,6 @@ export default {
 			};
 		}
 
-		import { checkPartialCommandFilters } from "./check-partials.js";
 		const allowedPartials = await checkPartialCommandFilters(context, args);
 
 		let languageCode = "en";

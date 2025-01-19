@@ -1,3 +1,5 @@
+import findPopularSymbol from "./stocks.js";
+
 export default {
 	Name: "stock",
 	Aliases: ["stocks", "stonks"],
@@ -14,7 +16,6 @@ export default {
 			});
 		}
 
-		import { findPopularSymbol } from "./stocks.js";
 		const input = args.join(" ");
 		if (!input) {
 			return {

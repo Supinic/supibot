@@ -1,3 +1,6 @@
+import templates from "./templates.json";
+const { headlines, parts } = templates;
+
 const REPEATS = 5;
 const MAXIMUM_REPLACEMENTS = 10;
 const headlinesRepeatArray = [];
@@ -12,7 +15,6 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function fakeNews () {
-		import { headlines, parts } from "./templates.json";
 		const eligibleHeadlines = headlines.filter(i => !headlinesRepeatArray.includes(i));
 
 		let headline = sb.Utils.randArray(eligibleHeadlines);

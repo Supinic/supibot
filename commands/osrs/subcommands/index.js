@@ -1,10 +1,19 @@
+import ItemIdSubcommand from "./item-id.js";
+import KillcountSubcommand from "./killcount.js";
+import PriceSubcommand from "./price.js";
+import StarsSubcommand from "./stars.js";
+import StatsSubcommand from "./stats.js";
+import StatusSubcommand from "./status.js";
+import TearsOfGuthixSubcommand from "./tears-of-guthix.js";
+import WikiSubcommand from "./wiki.js";
+
 export default [
-	require("./item-id.js"),
-	require("./killcount.js"),
-	require("./price.js"),
-	require("./stars.js"),
-	require("./stats.js"),
-	require("./status.js"),
-	require("./tears-of-guthix.js"),
-	require("./wiki.js")
+	ItemIdSubcommand,
+	KillcountSubcommand,
+	PriceSubcommand,
+	StarsSubcommand,
+	StatsSubcommand,
+	StatusSubcommand,
+	TearsOfGuthixSubcommand,
+	WikiSubcommand
 ];

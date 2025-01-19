@@ -50,7 +50,7 @@ const randomDeathData = [
 	}
 ];
 
-const subcommands = [
+export default [
 	{
 		name: "labyrinth",
 		aliases: ["lab"],
@@ -285,7 +285,3 @@ const subcommands = [
 		}
 	}
 ];
-
-export default {
-	subcommands
-};

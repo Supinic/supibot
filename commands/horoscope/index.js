@@ -1,3 +1,5 @@
+import zodiacData from "./zodiac.json";
+
 export default {
 	Name: "horoscope",
 	Aliases: null,
@@ -10,7 +12,6 @@ export default {
 	Code: (async function horoscope (context, inputZodiacName) {
 		let zodiacName = null;
 		let own = false;
-		import zodiacData from "./zodiac.json";
 
 		if (inputZodiacName) {
 			const lowerInput = inputZodiacName.toLowerCase().trim();
@@ -93,7 +94,6 @@ export default {
 		};
 	}),
 	Dynamic_Description: (async (prefix) => {
-		import zodiacData from "./zodiac.json";
 		const zodiacSignList = zodiacData.map(i => {
 			const { start, end, name } = i;
 			const startString = new sb.Date(2022, ...start).format("F jS");

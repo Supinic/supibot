@@ -61,5 +61,10 @@ const execute = async (data) => {
 };
 
 export default {
+	name: "github",
+	prettyName: "GitHub",
+	flags: {
+		default: true
+	},
 	execute
 };

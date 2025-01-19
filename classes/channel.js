@@ -1,5 +1,6 @@
+import EventEmitter from "node:events";
 import Platform from "../platforms/template.js";
-import { createMessageLoggingTable } from "../utils/create-db-table.js";
+import createMessageLoggingTable from "../utils/create-db-table.js";
 import Template from "./template.js";
 
 export default class Channel extends Template {
@@ -31,7 +32,6 @@ export default class Channel extends Template {
 
 		this.sessionData = {};
 
-		import EventEmitter from "node:events";
 		this.events = new EventEmitter();
 	}
 

@@ -1,3 +1,5 @@
+import blocks from "./blocks/index.js";
+
 export default {
 	Name: "aliasbuildingblock",
 	Aliases: ["abb"],
@@ -16,7 +18,6 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function aliasBuildingBlock (context, type, ...args) {
-		import { blocks } from "./blocks/index.js";
 		if (!context.append.alias && !context.append.pipe) {
 			if (!type) {
 				return {
@@ -64,7 +65,6 @@ export default {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		import { blocks } from "./blocks/index.js";
 		const list = blocks.map(i => {
 			const aliases = (i.aliases.length > 0)
 				? `(${i.aliases.join(", ")})`

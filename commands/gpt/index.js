@@ -224,12 +224,11 @@ export default {
 		return result;
 	}),
 	Dynamic_Description: (async (prefix) => {
-		import ChatGptConfig from "./config.json";
-		const { regular, subscriber } = ChatGptConfig.userTokenLimits;
-		const { outputLimit } = ChatGptConfig;
+		const { regular, subscriber } = GptConfig.userTokenLimits;
+		const { outputLimit } = GptConfig;
 
 		let defaultModelName = "N/A";
-		const modelListHTML = Object.entries(ChatGptConfig.models).map(([name, modelData]) => {
+		const modelListHTML = Object.entries(GptConfig.models).map(([name, modelData]) => {
 			let isDefaultEmoji = "❌";
 			if (modelData.default) {
 				defaultModelName = name;
@@ -308,7 +307,7 @@ export default {
 			`Temperature is more-or-less understood to be "wildness" or "creativity" of the input.`,
 			"The lower the value, the more predictable, but factual the response is.",
 			"The higher the value, the more creative, unpredictable and wild the response becomes.",
-			`By default, the temperature value is <code>${ChatGptConfig.defaultTemperature}</code>.`,
+			`By default, the temperature value is <code>${GptConfig.defaultTemperature}</code>.`,
 			"",
 
 			"<b>Important:</b> Only temperature values between 0.0 and 1.0 are guaranteed to give you proper replies.",

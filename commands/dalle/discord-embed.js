@@ -2,11 +2,11 @@
  * @param {string} id
  * @param {Object} options
  * @param {string} options.prompt
- * @param {CustomDate} options.created
+ * @param {sb.Date} options.created
  * @param {number} options.creationTime
  * @returns {Object[]}
  */
-const createEmbeds = function createDiscordEmbed (id, options = {}) {
+export default function createDiscordEmbed (id, options = {}) {
 	const dateString = options.created.format("Y-m-d H:i:s");
 	const time = sb.Utils.round(options.creationTime);
 
@@ -31,8 +31,4 @@ const createEmbeds = function createDiscordEmbed (id, options = {}) {
 	}
 
 	return result;
-};
-
-export default {
-	createEmbeds
 };

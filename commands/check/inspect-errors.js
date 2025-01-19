@@ -9,7 +9,9 @@ const name = {
 	webError: "Website error"
 };
 
-export default async function inspectErrorStacks (command, context, type, rawIdentifier) {
+const createCacheKey = (type, ID) => `error-${type}-stack-link-${ID}`;
+
+export default async (context, type, rawIdentifier) => {
 	const inspectErrorStacks = await context.user.getDataProperty("inspectErrorStacks");
 	if (!inspectErrorStacks) {
 		return {
@@ -37,9 +39,9 @@ export default async function inspectErrorStacks (command, context, type, rawIde
 	}
 
 	const { ID, Stack: stack } = row.values;
+	const cacheKey = createCacheKey(type, ID);
 
-	const key = { type: `${type}-paste`, ID };
-	let link = await command.getCacheData(key);
+	let link = await sb.Cache.getByPrefix(cacheKey);
 	if (!link) {
 		const paste = await postToHastebin(stack, {
 			name: `Stack of ${name[type]} ID ${ID}`,
@@ -54,7 +56,7 @@ export default async function inspectErrorStacks (command, context, type, rawIde
 		}
 
 		link = paste.link;
-		await command.setCacheData(key, link, {
+		await sb.Cache.setByPrefix(cacheKey, link, {
 			expiry: 36e5
 		});
 	}

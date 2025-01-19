@@ -1,5 +1,12 @@
+import DeeplTranslate from "./deepl.js";
+import GoogleTranslate from "./google.js";
+
 let logTableExists;
-const engines = ["deepl", "google"];
+const engines = {
+	deepl: DeeplTranslate,
+	google: GoogleTranslate
+};
+const engineNames = Object.keys(engines);
 
 export default {
 	Name: "translate",
@@ -45,15 +52,15 @@ export default {
 			engine = "deepl";
 		}
 
-		if (!engines.includes(engine)) {
+		if (!engineNames.includes(engine)) {
 			return {
 				success: false,
-				reply: `Invalid translation engine provided! Use one of: ${engines.join(", ")}`
+				reply: `Invalid translation engine provided! Use one of: ${engineNames.join(", ")}`
 			};
 		}
 
-		import { execute } from `./${engine}.js`;
-		const result = await execute(context, query);
+		const engineData = engines[engine];
+		const result = await engineData.execute(context, query);
 
 		if (logTableExists) {
 			const row = await sb.Query.getRow("data", "Translate_Log");

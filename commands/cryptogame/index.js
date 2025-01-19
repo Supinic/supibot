@@ -1,4 +1,14 @@
 import { CronJob } from "cron";
+import cryptoGamePriceUpdate from "./update-prices-cron.js";
+import {
+	availableCommands,
+	baseAsset,
+	checkPortfolioAsset,
+	createConvertTransaction,
+	getPortfolioData,
+	parseArguments,
+	updatePortfolioAsset
+} from "./game.js";
 
 export default {
 	Name: "cryptogame",
@@ -10,7 +20,6 @@ export default {
 	Params: null,
 	Whitelist_Response: null,
 	initialize: function () {
-		import { cryptoGamePriceUpdate } from "./update-prices-cron.js";
 		this.data.updateCronJob = new CronJob("0 0 * * * *", () => cryptoGamePriceUpdate());
 		this.data.updateCronJob.start();
 	},
@@ -19,17 +28,8 @@ export default {
 		this.data.updateCronJob = null;
 	},
 	Code: async function cryptoGame (context, command, ...args) {
-		import {
-			availableCommands,
-			baseAsset,
-			checkPortfolioAsset,
-			createConvertTransaction,
-			getPortfolioData,
-			parseArguments,
-			updatePortfolioAsset
-		} from "./game.js";
-
 		command = command?.toLowerCase();
+
 		if (!command || !availableCommands.includes(command)) {
 			return {
 				success: false,

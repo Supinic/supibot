@@ -11,7 +11,7 @@ import ReplaceBlock from "./replace.js";
 import SayBlock from "./say.js";
 import TeeBlock from "./tee.js";
 
-const blocks = [
+export default [
 	ArgumentsBlock,
 	BestEmoteBlock,
 	ChannelBlock,
@@ -25,7 +25,3 @@ const blocks = [
 	SayBlock,
 	TeeBlock
 ];
-
-export default {
-	blocks
-};

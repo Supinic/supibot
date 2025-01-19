@@ -1,12 +1,12 @@
-import handleErrorInspection from "./inspect-errors";
+import { createRecentUseCacheKey } from "../twitchlotto/definitions.js";
 import { postToHastebin } from "../../utils/command-utils.js";
 import { isSupported } from "../randomline/rustlog.js";
-import {
-	SONG_REQUESTS_STATE,
-	SONG_REQUESTS_VLC_PAUSED
-} from "../../utils/shared-cache-keys.json";
+import handleErrorInspection from "./inspect-errors.js";
 
-export default (command) => [
+import cacheKeys from "../../utils/shared-cache-keys.json";
+const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
+
+export default [
 	{
 		name: "afk",
 		aliases: [],
@@ -66,7 +66,7 @@ export default (command) => [
 		description: "This sub-command is deprecated, check the alias command instead.",
 		execute: async () => ({
 			success: false,
-			reply: `Use the ${sb.Command.prefix}alias list command instead! Alternatively, check its help, too.`
+			reply: `Use the $alias list command instead! Alternatively, check its help, too.`
 		})
 	},
 	{
@@ -335,7 +335,7 @@ export default (command) => [
 		name: "error",
 		aliases: [],
 		description: "If you have been granted access, you can check the full text of an error within Supibot, based on its ID.",
-		execute: (context, identifier) => handleErrorInspection(command, context, "error", identifier)
+		execute: (context, identifier) => handleErrorInspection(context, "error", identifier)
 	},
 	{
 		name: "location",
@@ -835,8 +835,7 @@ export default (command) => [
 			// @todo refactor this and similar usages to a common place
 			if (link.toLowerCase() === "last") {
 				const tl = sb.Command.get("tl");
-				import definitions from "../twitchlotto/definitions.js";
-				const key = definitions.createRecentUseCacheKey(context);
+				const key = createRecentUseCacheKey(context);
 
 				// Seems like a mismatched documentation - tl.getCacheData can allow objects too
 				// noinspection JSCheckFunctionSignatures
@@ -904,6 +903,6 @@ export default (command) => [
 		name: "weberror",
 		aliases: ["web-error"],
 		description: "If you have been granted access, you can check the full text of an error within the supinic.com website, based on its ID.",
-		execute: (context, identifier) => handleErrorInspection(command, context, "webError", identifier)
+		execute: (context, identifier) => handleErrorInspection(context, "webError", identifier)
 	}
 ];

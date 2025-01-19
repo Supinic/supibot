@@ -7,7 +7,7 @@ import ShowSubcommand from "./show.js";
 import StatsSubcommand from "./stats.js";
 import TrapSubcommand from "./trap.js";
 
-const subcommands = [
+export default [
 	BuySubcommand,
 	ConfigSubcommand,
 	FishSubcommand,
@@ -17,7 +17,3 @@ const subcommands = [
 	StatsSubcommand,
 	TrapSubcommand
 ];
-
-export default {
-	subcommands
-};

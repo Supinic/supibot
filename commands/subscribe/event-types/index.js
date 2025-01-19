@@ -1,32 +1,37 @@
-const eventTypeFileList = [
-	"brighter-shores",
-	"bun",
-	"changelog",
-	"channel-live",
-	"deno",
-	"dotnet",
-	"factorio",
-	"ggg",
-	"msvcpp",
-	"nodejs",
-	"osrs",
-	"python",
-	"runelite",
-	"rust",
-	"suggestion",
-	"typescript",
-	"v8"
+import BrighterShoresSubDefinition from "./brighter-shores.js";
+import BunSubDefinition from "./bun.js";
+import ChangelogSubDefinition from "./changelog.js";
+import ChannelLiveSubDefinition from "./channel-live.js";
+import DenoSubDefinition from "./deno.js";
+import DotnetSubDefinition from "./dotnet.js";
+import FactorioSubDefinition from "./factorio.js";
+import GrindingGearGamesSubDefinition from "./ggg.js";
+import MicrosoftCppSubDefinition from "./msvcpp.js";
+import NodeSubDefinition from "./nodejs.js";
+import OsrsSubDefinition from "./osrs.js";
+import PythonSubDefinition from "./python.js";
+import RuneliteSubDefinition from "./runelite.js";
+import RustSubDefinition from "./rust.js";
+import SuggestionSubDefinition from "./suggestion.js";
+import V8SubDefinition from "./v8.js";
+
+const subscriptions = [
+	BrighterShoresSubDefinition,
+	BunSubDefinition,
+	ChangelogSubDefinition,
+	ChannelLiveSubDefinition,
+	DenoSubDefinition,
+	DotnetSubDefinition,
+	FactorioSubDefinition,
+	GrindingGearGamesSubDefinition,
+	MicrosoftCppSubDefinition,
+	NodeSubDefinition,
+	OsrsSubDefinition,
+	PythonSubDefinition,
+	RuneliteSubDefinition,
+	RustSubDefinition,
+	SuggestionSubDefinition,
+	V8SubDefinition
 ];
 
-const subscriptionTypes = [];
-for (const file of eventTypeFileList) {
-	try {
-		import definition from `./${file}.js`;
-		subscriptionTypes.push(definition);
-	}
-	catch (e) {
-		console.warn(`Could not load subscription event "${file}!`, e);
-	}
-}
-
-export default subscriptionTypes;
+export { subscriptions };

@@ -25,6 +25,4 @@ const findPopularSymbol = (from) => {
 	}
 };
 
-export default {
-	findPopularSymbol
-};
+export default findPopularSymbol;

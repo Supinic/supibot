@@ -1,9 +1,9 @@
-const baseAsset = {
+export const baseAsset = {
 	Code: "EUR",
 	Price: 1
 };
 
-const availableCommands = [
+export const availableCommands = [
 	"assets",
 	"average",
 	"buy",
@@ -17,11 +17,11 @@ const availableCommands = [
 	"total"
 ];
 
-const precisionRound = (num, precision, direction) => (
+export const precisionRound = (num, precision, direction) => (
 	Number(sb.Utils.round(num, precision, { direction }).toPrecision(precision + 1))
 );
 
-const getAssetData = async (code) => {
+export const getAssetData = async (code) => {
 	const data = await sb.Query.getRecordset(rs => rs
 		.select("Code", "Price")
 		.from("crypto_game", "Asset")
@@ -33,7 +33,7 @@ const getAssetData = async (code) => {
 	return data ?? null;
 };
 
-const getPortfolioData = async (identifier) => {
+export const getPortfolioData = async (identifier) => {
 	const portfolioID = await sb.Query.getRecordset(rs => {
 		rs.select("ID")
 			.from("crypto_game", "Portfolio")
@@ -77,7 +77,7 @@ const getPortfolioData = async (identifier) => {
 	};
 };
 
-const parseArguments = async (input) => {
+export const parseArguments = async (input) => {
 	const result = {};
 	for (const [key, value] of Object.entries(input)) {
 		if (key === "user") {
@@ -146,7 +146,7 @@ const parseArguments = async (input) => {
 	return result;
 };
 
-const checkPortfolioAsset = (portfolioData, assetData, amount) => {
+export const checkPortfolioAsset = (portfolioData, assetData, amount) => {
 	const asset = portfolioData.assets.find(i => i.Code === assetData.Code);
 	if (!asset) {
 		return `You don't have any ${assetData.Code}!`;
@@ -159,7 +159,7 @@ const checkPortfolioAsset = (portfolioData, assetData, amount) => {
 	}
 };
 
-const updatePortfolioAsset = async (portfolioData, assetData, amount) => {
+export const updatePortfolioAsset = async (portfolioData, assetData, amount) => {
 	if (typeof portfolioData === "string") {
 		portfolioData = await getPortfolioData(portfolioData);
 	}
@@ -199,7 +199,7 @@ const updatePortfolioAsset = async (portfolioData, assetData, amount) => {
 	}
 };
 
-const createTransferTransaction = async (sourcePortfolio, targetPortfolio, assetData, amount) => {
+export const createTransferTransaction = async (sourcePortfolio, targetPortfolio, assetData, amount) => {
 	const row = await sb.Query.getRow("crypto_game", "Transaction");
 	row.setValues({
 		Source_Portfolio: sourcePortfolio.ID,
@@ -218,7 +218,7 @@ const createTransferTransaction = async (sourcePortfolio, targetPortfolio, asset
 	]);
 };
 
-const createConvertTransaction = async (portfolioData, sourceAsset, targetAsset, rawSourceAmount) => {
+export const createConvertTransaction = async (portfolioData, sourceAsset, targetAsset, rawSourceAmount) => {
 	// const sourceAmount = precisionRound(rawSourceAmount, 9, "round");
 	const exchangeRate = targetAsset.Price / sourceAsset.Price;
 	const targetAmount = precisionRound(rawSourceAmount / exchangeRate, 6, "round");
@@ -251,15 +251,4 @@ const createConvertTransaction = async (portfolioData, sourceAsset, targetAsset,
 		sourceAmount,
 		targetAmount
 	};
-};
-
-export default {
-	availableCommands,
-	baseAsset,
-	getPortfolioData,
-	parseArguments,
-	checkPortfolioAsset,
-	updatePortfolioAsset,
-	createConvertTransaction,
-	createTransferTransaction
 };

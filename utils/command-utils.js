@@ -25,6 +25,11 @@ const PASTEBIN_PRIVACY_OPTIONS = {
 	private: 2
 };
 
+/**
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
+ */
 export const randomInt = (min, max) => {
 	if (Math.abs(min) > Number.MAX_SAFE_INTEGER || Math.abs(max) > Number.MAX_SAFE_INTEGER) {
 		throw new sb.Error({
@@ -205,9 +210,7 @@ export const uploadToNuuls = async (fileData) => {
  * @param {string} xml
  * @returns {Promise<RSSParserResult>}
  */
-export const parseRSS = async (xml) => {
-	return await rssParser.parseString(xml);
-};
+export const parseRSS = async (xml) => await rssParser.parseString(xml);
 
 /**
  * Returns the URL's pathname + search params, if defined.

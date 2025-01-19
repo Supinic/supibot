@@ -1,10 +1,10 @@
-import { Node, parse } from "acorn-node";
+import Acorn from "acorn-node";
 const BANNED_AWAIT_STATEMENTS = new Set(["DoWhileStatement", "ForStatement", "ForOfStatement", "WhileStatement"]);
 
-const analyze = (script) => {
+export default (script) => {
 	let tree;
 	try {
-		tree = parse(`(() => { ${script} })`, {
+		tree = Acorn.parse(`(() => { ${script} })`, {
 			ecmaVersion: 2022
 		});
 	}
@@ -25,7 +25,7 @@ const analyze = (script) => {
 			}
 		}
 
-		if (node instanceof Node) {
+		if (node instanceof Acorn.Node) {
 			if (BANNED_AWAIT_STATEMENTS.has(node.type)) {
 				suspiciousNodes.add(node);
 
@@ -50,7 +50,7 @@ const analyze = (script) => {
 			}
 		}
 
-		if (node instanceof Node && node.type === "AwaitExpression") {
+		if (node instanceof Acorn.Node && node.type === "AwaitExpression") {
 			return {
 				illegalAsync: true
 			};
@@ -60,8 +60,4 @@ const analyze = (script) => {
 	return {
 		illegalAsync: false
 	};
-};
-
-export default {
-	analyze
 };

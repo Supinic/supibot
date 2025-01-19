@@ -1,3 +1,8 @@
+import subcommands from "./subcommands/";
+import gameData from "./game-data.json";
+
+const { activities, activityAliases, skills } = gameData;
+
 export default {
 	Name: "osrs",
 	Aliases: null,
@@ -23,7 +28,6 @@ export default {
 			};
 		}
 
-		import subcommands from "./subcommands";
 		const input = first.toLowerCase();
 
 		let subcommand = subcommands.find(i => i.name === input || i.aliases.includes(input));
@@ -35,7 +39,6 @@ export default {
 		return await subcommand.execute.call(this, context, ...args);
 	}),
 	Dynamic_Description: (async function (prefix) {
-		import subcommands from "./subcommands";
 		const subcommandsDescription = subcommands.flatMap(i => [
 			`<h6>${i.title}</h6>`,
 			"",
@@ -43,7 +46,6 @@ export default {
 			""
 		]);
 
-		import { activities, activityAliases, skills } from "./game-data.json";
 		const aliases = [];
 		for (const [key, value] of Object.entries(activityAliases)) {
 			aliases.push({

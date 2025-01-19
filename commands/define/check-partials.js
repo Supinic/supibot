@@ -8,18 +8,16 @@ const checkCommand = async (context, commandData, args) => await sb.Filter.execu
 	args
 });
 
-export default {
-	checkPartialCommandFilters: async (context, commandArgs) => {
-		const [dictFilter, urbanFilter, wikiFilter] = await Promise.all([
-			checkCommand(context, sb.Command.get("dictionary"), commandArgs),
-			checkCommand(context, sb.Command.get("urban"), commandArgs),
-			checkCommand(context, sb.Command.get("wiki"), commandArgs)
-		]);
+export default async (context, commandArgs) => {
+	const [dictFilter, urbanFilter, wikiFilter] = await Promise.all([
+		checkCommand(context, sb.Command.get("dictionary"), commandArgs),
+		checkCommand(context, sb.Command.get("urban"), commandArgs),
+		checkCommand(context, sb.Command.get("wiki"), commandArgs)
+	]);
 
-		return {
-			dictionary: !FILTER_REASONS.has(dictFilter.reason),
-			urban: !FILTER_REASONS.has(urbanFilter.reason),
-			wiki: !FILTER_REASONS.has(wikiFilter.reason)
-		};
-	}
+	return {
+		dictionary: !FILTER_REASONS.has(dictFilter.reason),
+		urban: !FILTER_REASONS.has(urbanFilter.reason),
+		wiki: !FILTER_REASONS.has(wikiFilter.reason)
+	};
 };
