@@ -1,6 +1,7 @@
 {
   "name": "supibot",
   "version": "2.2.0",
+  "type": "module",
   "dependencies": {
     "@jprochazk/roll-dice": "^0.4.2",
     "acorn-node": "^2.0.1",
