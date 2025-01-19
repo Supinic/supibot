@@ -1,4 +1,20 @@
 import { randomInt } from "../../utils/command-utils.js";
+import textCaseCode from "./text-case-code.js";
+import officialCharactersMap from "./definitions/official-characters.json";
+
+import BubbleDefinition from "./definitions/bubble.js";
+import FancyDefinition from "./definitions/fancy.js";
+import UpsideDownDefinition from "./definitions/upside-down.js";
+import LeetDefinition from "./definitions/leet.js";
+import MedievalDefinition from "./definitions/medieval.js";
+import RunicDefinition from "./definitions/runic.js";
+import SuperscriptDefinition from "./definitions/superscript.js";
+import VaporwaveDefinition from "./definitions/vaporwave.js";
+
+import LingoCockneyDefinition from "./lingo-translations/cockney.json";
+import LingoCowboyDefinition from "./lingo-translations/cowboy.json";
+import LingoOutbackDefinition from "./lingo-translations/outback.json";
+
 const ANTI_PING_CHARACTER = "\u{E0000}";
 
 const convert = {
@@ -42,8 +58,6 @@ const convert = {
 	}
 };
 
-import textCaseCode from "./text-case-code.js";
-import officialCharactersMap from "./definitions/official-characters.json";
 
 /**
  * @typedef {Record<string, string>} TextTransformMap
@@ -80,67 +94,67 @@ const types = [
 		name: "bubble",
 		type: "map",
 		aliases: [],
-		data: require("./definitions/bubble.json")
+		data: BubbleDefinition
 	},
 	{
 		name: "fancy",
 		type: "map",
 		aliases: [],
-		data: require("./definitions/fancy.json")
+		data: FancyDefinition
 	},
 	{
 		name: "upside-down",
 		type: "map",
 		aliases: ["flipped", "ud", "upsidedown"],
-		data: require("./definitions/upside-down.json")
+		data: UpsideDownDefinition
 	},
 	{
 		name: "elite",
 		type: "map",
 		aliases: ["leet", "l33t", "1337"],
-		data: require("./definitions/leet.json")
+		data: LeetDefinition
 	},
 	{
 		name: "medieval",
 		type: "map",
 		aliases: [],
-		data: require("./definitions/medieval.json")
+		data: MedievalDefinition
 	},
 	{
 		name: "runic",
 		type: "map",
 		aliases: ["runes"],
-		data: require("./definitions/runic.json")
+		data: RunicDefinition
 	},
 	{
 		name: "superscript",
 		type: "map",
 		aliases: ["small", "smol", "super", "tiny"],
-		data: require("./definitions/superscript.json")
+		data: SuperscriptDefinition
 	},
 	{
 		name: "vaporwave",
 		type: "map",
 		aliases: ["vw", "vapor"],
-		data: require("./definitions/vaporwave.json")
+		data: VaporwaveDefinition
 	},
 	{
 		name: "cockney",
 		type: "translate",
 		aliases: ["3Head"],
-		data: require("./lingo-translations/cockney.json")
+		data: LingoCockneyDefinition
 	},
 	{
 		name: "cowboy",
 		type: "translate",
 		aliases: ["KKona", "KKonaW"],
-		data: require("./lingo-translations/cowboy.json")
+		data: LingoCowboyDefinition
 	},
 	{
 		name: "outback",
 		type: "translate",
 		aliases: ["KKrikey", "australian"],
-		data: require("./lingo-translations/outback.json")
+		data: LingoOutbackDefinition
 	},
 	{
 		name: "capitalize",
