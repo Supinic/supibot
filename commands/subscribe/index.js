@@ -1,4 +1,7 @@
 import { CronJob } from "cron";
+import rssSubscriptions from "./event-types/index.js";
+import { handleGenericSubscription } from "./generic-event.js";
+
 const nameSymbol = Symbol.for("name");
 const definitionSymbol = Symbol.for("definition");
 
@@ -14,12 +17,11 @@ export default {
 	],
 	Whitelist_Response: null,
 	initialize: async function () {
-		import rssSubscriptions from "./event-types/index.js").filter(i => i.generic;
-		import { handleGenericSubscription } from "./generic-event.js";
+		const genericSubscriptions = rssSubscriptions.filter(i => i.generic);
 
 		this.data.crons = new Set();
 
-		for (const def of rssSubscriptions) {
+		for (const def of genericSubscriptions) {
 			const expression = def.cronExpression ?? "0 */5 * * * *";
 			const cronJob = new CronJob(expression, () => handleGenericSubscription(def));
 

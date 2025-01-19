@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 export default {
 	Name: "dalle",
 	Aliases: [],
@@ -175,7 +177,7 @@ export default {
 		}
 
 		const { images } = response.body;
-		import hash from "node:crypto").createHash("sha512";
+		const hash = createHash("sha512");
 		for (const base64Image of images) {
 			hash.update(base64Image);
 		}

@@ -203,6 +203,6 @@ const handleGenericSubscription = async (definition) => {
 	await handleSubscription(name, message);
 };
 
-export default {
+export {
 	handleGenericSubscription
 };

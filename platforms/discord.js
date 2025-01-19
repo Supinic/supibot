@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import {
 	ChannelType,
 	Client,
@@ -905,7 +906,7 @@ export default class DiscordPlatform extends Template {
 
 	static async createAccountChallenge (userData, discordID) {
 		const row = await sb.Query.getRow("chat_data", "User_Verification_Challenge");
-		import challenge from "node:crypto").randomBytes(16).toString("hex";
+		const challenge = randomBytes(16).toString("hex");
 
 		row.setValues({
 			User_Alias: userData.ID,
