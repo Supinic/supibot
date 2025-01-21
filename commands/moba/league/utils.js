@@ -81,7 +81,13 @@ const getQueueDescription = async (queueId) => {
 			url: "https://static.developer.riotgames.com/docs/lol/queues.json"
 		});
 
-		queueData = response.body;
+		queueData = response.body.map(i => ({
+			...i,
+			shortName: (i.description)
+				? i.description.replace(/\s*\dv\d\s*/, "").replace(/\s*games\s*/, "")
+				: null
+		}));
+
 		await sb.Cache.setByPrefix(QUEUE_DATA_CACHE_KEY, queueData, {
 			expiry: 14 * 864e5 // 14 days
 		});
@@ -90,7 +96,7 @@ const getQueueDescription = async (queueId) => {
 	const queue = queueData.find(i => i.queueId === queueId);
 	if (!queue) {
 		throw new sb.Error({
-			messsage: "Queue ID not found"
+			message: "Queue ID not found"
 		});
 	}
 

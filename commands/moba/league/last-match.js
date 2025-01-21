@@ -1,5 +1,4 @@
 const {
-	GAME_RESULT,
 	NON_STANDARD_CHAMPION_NAMES,
 	parseUserIdentifier,
 	getMatchIds,
@@ -25,7 +24,8 @@ module.exports = {
 			return leagueUser;
 		}
 
-		const { puuid, region, gameName } = leagueUser;
+		const { puuid, region } = leagueUser;
+		const playerName = leagueUser.gameName;
 		const matchIds = await getMatchIds(region, puuid, { count: 1 });
 		if (matchIds.length === 0) {
 			return {
@@ -35,11 +35,6 @@ module.exports = {
 		}
 
 		const { info } = await getMatchData(region, matchIds[0]);
-
-		let gameStateString = "is currently playing";
-		let gameEndString = "";
-		let gameResultString = "";
-
 		const player = info.participants.find(i => i.puuid === puuid);
 		const gameQueue = await getQueueDescription(info.queueId);
 
@@ -60,33 +55,25 @@ module.exports = {
 			};
 		}
 
-		if (info.endOfGameResult === GAME_RESULT.END || info.gameEndTimestamp) {
-			const gameEnd = new sb.Date(info.gameEndTimestamp);
+		const gameEnd = new sb.Date(info.gameEndTimestamp);
+		const gameEndString = `Played ${sb.Utils.timeDelta(gameEnd)}`;
+		const gameResultString = (player.win) ? "won as" : "lost as";
+		const gameLengthMinutes = Math.floor(info.gameDuration / 60);
+		const gameLengthString = `in ${gameLengthMinutes}min`;
 
-			gameEndString = `(game ended ${sb.Utils.timeDelta(gameEnd)})`;
-			gameStateString = `last played`;
-
-			const gameResult = (player.win) ? "and won" : "and lost";
-			const gameLength = sb.Utils.formatTime(info.gameDuration, true);
-
-			gameResultString = `${gameResult} in ${gameLength}`;
-		}
-
-		const { challenges } = player;
 		const creepScore = player.totalMinionsKilled + player.neutralMinionsKilled;
-		const creepsBefore10Minutes = challenges.laneMinionsFirst10Minutes + challenges.jungleCsBefore10Minutes;
-		const position = TEAM_POSITIONS_MAP[player.teamPosition] ?? "(unknown)";
+		const creepsPerMinute = sb.Utils.round(creepScore / gameLengthMinutes, 1);
 
-		const gameType = gameQueue.description.replace(/\s*games\s*$/i, "");
+		const position = TEAM_POSITIONS_MAP[player.teamPosition] ?? "(unknown)";
+		const gameType = gameQueue.shortName;
 
 		const champName = NON_STANDARD_CHAMPION_NAMES[player.championName] ?? player.championName;
 		return {
 			reply: sb.Utils.tag.trim `
-				${gameName} ${gameStateString} ${champName} ${position}
-				in ${gameType}
-				${gameResultString}	
-				with KDA of ${player.kills}/${player.deaths}/${player.assists},
-				with a CS of ${creepScore} (${creepsBefore10Minutes} in the first 10min).
+				${playerName} ${gameResultString} ${champName} ${position}
+				in ${gameType} ${gameLengthString}.	
+				KDA: ${player.kills}/${player.deaths}/${player.assists},
+				${creepScore} CS (${creepsPerMinute} CS/min).
 				${gameEndString}
 			 `
 		};
