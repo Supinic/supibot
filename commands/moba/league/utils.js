@@ -58,7 +58,7 @@ const TEAM_POSITIONS_MAP = {
 const getQueueDescription = async (queueId) => {
 	let queueData = await sb.Cache.getByPrefix(QUEUE_DATA_CACHE_KEY);
 	if (!queueData) {
-		const response = await sb.Got.get("Generic")({
+		const response = await sb.Got.get("GenericAPI")({
 			url: "https://static.developer.riotgames.com/docs/lol/queues.json"
 		});
 
