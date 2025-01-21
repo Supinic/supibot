@@ -45,6 +45,38 @@ const NON_STANDARD_CHAMPION_NAMES = {
 
 const DEFAULT_USER_IDENTIFIER_KEY = "leagueDefaultUserIdentifier";
 const DEFAULT_REGION_KEY = "leagueDefaultRegion";
+const QUEUE_DATA_CACHE_KEY = "league-queues-data";
+
+const TEAM_POSITIONS_MAP = {
+	TOP: "top",
+	MIDDLE: "mid",
+	JUNGLE: "jungle",
+	BOTTOM: "ADC",
+	UTILITY: "support"
+};
+
+const getQueueDescription = async (queueId) => {
+	let queueData = await sb.Cache.getByPrefix(QUEUE_DATA_CACHE_KEY);
+	if (!queueData) {
+		const response = await sb.Got.get("Generic")({
+			url: "https://static.developer.riotgames.com/docs/lol/queues.json"
+		});
+
+		queueData = response.body;
+		await sb.Cache.setByPrefix(QUEUE_DATA_CACHE_KEY, queueData, {
+			expiry: 14 * 864e5 // 14 days
+		});
+	}
+
+	const queue = queueData.find(i => i.queueId === queueId);
+	if (!queue) {
+		throw new sb.Error({
+			messsage: "Queue ID not found"
+		});
+	}
+
+	return queue;
+};
 
 const getPUUIdCacheKey = (gameName, tagLine) => `moba-league-puuid-${gameName}-${tagLine}`;
 const getSummonerIdCacheKey = (puuid) => `moba-league-sid-${puuid}`;
@@ -312,6 +344,8 @@ module.exports = {
 	DEFAULT_USER_IDENTIFIER_KEY,
 	DEFAULT_REGION_KEY,
 	GAME_RESULT,
+	TEAM_POSITIONS_MAP,
+	getQueueDescription,
 	getPlatform,
 	getPUUIDByName,
 	getSummonerId,

@@ -3,7 +3,9 @@ const {
 	NON_STANDARD_CHAMPION_NAMES,
 	parseUserIdentifier,
 	getMatchIds,
-	getMatchData
+	getMatchData,
+	getQueueDescription,
+	TEAM_POSITIONS_MAP
 } = require("./utils.js");
 
 module.exports = {
@@ -44,17 +46,29 @@ module.exports = {
 
 			gameEndString = `(game ended ${sb.Utils.timeDelta(gameEnd)})`;
 			gameStateString = `last played`;
-			gameResultString = (player.win) ? "and won" : "and lost";
+
+			const gameResult = (player.win) ? "and won" : "and lost";
+			const gameLength = sb.Utils.formatTime(info.gameDuration, true);
+
+			gameResultString = `${gameResult} in ${gameLength}`;
 		}
 
-		// @todo include type of game (flex, ranked, aram, ...)
+		const { challenges } = player;
+		const creepScore = player.totalMinionsKilled + player.neutralMinionsKilled;
+		const creepsBefore10Minutes = challenges.laneMinionsFirst10Minutes + challenges.jungleCsBefore10Minutes;
+		const position = TEAM_POSITIONS_MAP[player.teamPosition] ?? "(unknown)";
+
+		const gameQueue = await getQueueDescription(info.queueId);
+		const gameType = gameQueue.description.replace(/\s*games\s*$/i, "");
 
 		const champName = NON_STANDARD_CHAMPION_NAMES[player.championName] ?? player.championName;
 		return {
 			reply: sb.Utils.tag.trim `
-				${gameName} ${gameStateString} ${champName}		
+				${gameName} ${gameStateString} ${champName} ${position}
+				in ${gameType}
 				${gameResultString}	
-				with KDA of ${player.kills}/${player.deaths}/${player.assists}.	
+				with KDA of ${player.kills}/${player.deaths}/${player.assists},
+				with a CS of ${creepScore} (${creepsBefore10Minutes} in the first 10min).
 				${gameEndString}
 			 `
 		};
