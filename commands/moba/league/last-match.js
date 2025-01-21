@@ -41,6 +41,25 @@ module.exports = {
 		let gameResultString = "";
 
 		const player = info.participants.find(i => i.puuid === puuid);
+		const gameQueue = await getQueueDescription(info.queueId);
+
+		if (context.params.rawData) {
+			return {
+				reply: "Data is available.",
+				data: {
+					game: {
+						duration: info.gameDuration,
+						mode: info.gameMode,
+						id: info.gameId,
+						type: info.gameType,
+						version: info.gameVersion
+					},
+					queue: gameQueue,
+					player
+				}
+			};
+		}
+
 		if (info.endOfGameResult === GAME_RESULT.END || info.gameEndTimestamp) {
 			const gameEnd = new sb.Date(info.gameEndTimestamp);
 
@@ -58,7 +77,6 @@ module.exports = {
 		const creepsBefore10Minutes = challenges.laneMinionsFirst10Minutes + challenges.jungleCsBefore10Minutes;
 		const position = TEAM_POSITIONS_MAP[player.teamPosition] ?? "(unknown)";
 
-		const gameQueue = await getQueueDescription(info.queueId);
 		const gameType = gameQueue.description.replace(/\s*games\s*$/i, "");
 
 		const champName = NON_STANDARD_CHAMPION_NAMES[player.championName] ?? player.championName;

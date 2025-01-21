@@ -9,7 +9,9 @@ module.exports = {
 	Cooldown: 10000,
 	Description: "This command lets you check many things related to several MOBA games - League of Legends ($league).",
 	Flags: ["mention","pipe","skip-banphrase"],
-	Params: null,
+	Params: [
+		{ name: "rawData", type: "boolean" }
+	],
 	Whitelist_Response: null,
 	Code: (async function moba (context, type, ...args) {
 		if (context.invocation === "moba") {
