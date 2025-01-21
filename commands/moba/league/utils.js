@@ -16,6 +16,25 @@ const PLATFORMS = {
 	tw2: ["tw", "taiwan"],
 	vn2: ["vn", "vietnam"]
 };
+const REGIONS = {
+	br: "americas",
+	eun1: "europe",
+	euw1: "europe",
+	jp1: "asia",
+	kr: "asia",
+	la1: "americas",
+	la2: "americas",
+	me: "europe",
+	na1: "americas",
+	oc1: "sea",
+	tr1: "europe",
+	ru: "europe",
+	ph2: "sea",
+	sg2: "sea",
+	th2: "sea",
+	tw2: "sea",
+	vn2: "sea"
+};
 
 const GAME_RESULT = {
 	END: "GameComplete"
@@ -266,11 +285,12 @@ const parseUserIdentifier = async (context, regionName, identifier) => {
 };
 
 /**
+ * @param {string} platform
  * @param {string} puuid
  * @param {Object} [options]
  * @param {number} [options.count]
  */
-const getMatchIds = async (puuid, options = {}) => {
+const getMatchIds = async (platform, puuid, options = {}) => {
 	const summonerMatchKey = getMatchIdsKey(puuid);
 	let matchIds = await sb.Cache.getByPrefix(summonerMatchKey);
 	if (!matchIds) {
@@ -278,8 +298,9 @@ const getMatchIds = async (puuid, options = {}) => {
 			count: options.count ?? 20
 		});
 
+		const region = REGIONS[platform];
 		const response = await sb.Got.get("GenericAPI")({
-			url: `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids`,
+			url: `https://${region}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids`,
 			throwHttpErrors: false,
 			headers: {
 				"X-Riot-Token": process.env.API_RIOT_GAMES_KEY
@@ -305,12 +326,13 @@ const getMatchIds = async (puuid, options = {}) => {
 	return matchIds;
 };
 
-const getMatchData = async (matchId) => {
+const getMatchData = async (platform, matchId) => {
 	const matchDataKey = getMatchDataKey(matchId);
 	let matchData = await sb.Cache.getByPrefix(matchDataKey);
 	if (!matchData) {
+		const region = REGIONS[platform];
 		const response = await sb.Got.get("GenericAPI")({
-			url: `https://europe.api.riotgames.com/lol/match/v5/matches/${matchId}`,
+			url: `https://${region}.api.riotgames.com/lol/match/v5/matches/${matchId}`,
 			throwHttpErrors: false,
 			headers: {
 				"X-Riot-Token": process.env.API_RIOT_GAMES_KEY

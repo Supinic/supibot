@@ -25,8 +25,8 @@ module.exports = {
 			return leagueUser;
 		}
 
-		const { puuid, gameName } = leagueUser;
-		const matchIds = await getMatchIds(puuid, { count: 1 });
+		const { puuid, region, gameName } = leagueUser;
+		const matchIds = await getMatchIds(region, puuid, { count: 1 });
 		if (matchIds.length === 0) {
 			return {
 				success: false,
@@ -34,7 +34,7 @@ module.exports = {
 			};
 		}
 
-		const { info } = await getMatchData(matchIds[0]);
+		const { info } = await getMatchData(region, matchIds[0]);
 
 		let gameStateString = "is currently playing";
 		let gameEndString = "";
