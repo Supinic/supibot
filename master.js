@@ -15,6 +15,21 @@ const VLCConnector = require("./singletons/vlc-connector.js");
 // Platform require
 const Platform = require("./platforms/template.js");
 
+let config;
+try {
+	config = require("./config.json");
+}
+catch {
+	throw new Error("No custom configuration found! Copy `config-default.json` as `config.json` and set up your configuration");
+}
+
+const databaseModuleInitializeOrder = [
+	// First batch - no dependencies
+	[Filter, Command, User, AwayFromKeyboard, Banphrase, Channel, Reminder],
+	// Second batch - depends on Channel
+	[ChatModule]
+];
+
 const importFileDataModule = async (module, path) => {
 	if (!config.modules[path]) {
 		throw new Error(`Missing configuration for ${path}`);
@@ -46,21 +61,6 @@ const importFileDataModule = async (module, path) => {
 		await module.importData(definitions);
 	}
 };
-
-let config;
-try {
-	config = require("./config.json");
-}
-catch {
-	throw new Error("No custom configuration found! Copy `config-default.json` as `config.json` and set up your configuration");
-}
-
-const databaseModuleInitializeOrder = [
-	// First batch - no dependencies
-	[Filter, Command, User, AwayFromKeyboard, Banphrase, Channel, Reminder],
-	// Second batch - depends on Channel
-	[ChatModule]
-];
 
 const initializeCommands = async (config) => {
 	if (config.modules.commands.disableAll) {
