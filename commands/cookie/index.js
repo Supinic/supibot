@@ -23,7 +23,7 @@ module.exports = {
 	Whitelist_Response: null,
 	Code: (async function cookie (context, subcommandName, receiver) {
 		const subcommand = (subcommandName)
-			? subcommands.find(i => i.name === subcommand || i.aliases?.includes(subcommand))
+			? subcommands.find(i => i.name === subcommandName || i.aliases?.includes(subcommandName))
 			: defaultSubcommand;
 
 		const cookieData = await context.user.getDataProperty("cookie") ?? CookieLogic.getInitialStats();
