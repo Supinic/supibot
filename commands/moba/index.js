@@ -1,4 +1,4 @@
-import LeagueDefinition from "./league";
+import LeagueDefinition from "./league/index.js";
 
 const GAMES = {
 	league: LeagueDefinition

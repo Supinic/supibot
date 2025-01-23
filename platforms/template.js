@@ -1,4 +1,4 @@
-import createMessageLoggingTable from "../utils/create-db-table";
+import createMessageLoggingTable from "../utils/create-db-table.js";
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
 export default class Platform {

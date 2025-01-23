@@ -1,4 +1,4 @@
-import LanguageCodes from "../../utils/languages";
+import LanguageCodes from "../../utils/languages.js";
 
 export default {
 	Name: "wiki",

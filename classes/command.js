@@ -9,7 +9,7 @@ const COMMAND_PREFIX = config.modules.commands.prefix;
 
 import pathModule from "node:path";
 import CooldownManager from "../utils/cooldown-manager.js";
-import LanguageCodes from "../utils/languages";
+import LanguageCodes from "../utils/languages.js";
 
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 

@@ -21,7 +21,7 @@ const removeRedundantSortedListValues = async (cacheKey) => {
  * }
  * }>}
  */
-const getTokenUsage = async (userData) => {
+export const getTokenUsage = async (userData) => {
 	const cacheKey = createCacheKey(userData.ID);
 	await removeRedundantSortedListValues(cacheKey);
 
@@ -98,7 +98,7 @@ const getTokenUsage = async (userData) => {
  * @param userData
  * @returns {Promise<{hourly: number, daily: number}>}
  */
-const determineUserLimits = async (userData) => {
+export const determineUserLimits = async (userData) => {
 	const platform = sb.Platform.get("twitch");
 	const isSubscribed = await platform.fetchUserAdminSubscription(userData);
 
@@ -111,7 +111,7 @@ const determineUserLimits = async (userData) => {
  * @param userData
  * @returns {Promise<{success: true}|{success: false, reply: string}>}
  */
-const checkLimits = async (userData) => {
+export const checkLimits = async (userData) => {
 	const {
 		hourlyTokens,
 		dailyTokens,
@@ -148,7 +148,7 @@ const checkLimits = async (userData) => {
 	};
 };
 
-const addUsageRecord = async (userData, value, modelName) => {
+export const addUsageRecord = async (userData, value, modelName) => {
 	const { pricePerMtoken } = ChatGptConfig.models[modelName];
 	const cacheKey = createCacheKey(userData.ID);
 	const normalizedValue = sb.Utils.round(value * pricePerMtoken, 2);

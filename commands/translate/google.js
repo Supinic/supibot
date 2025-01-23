@@ -1,4 +1,4 @@
-import LanguageCodes from "../../utils/languages";
+import LanguageCodes from "../../utils/languages.js";
 const LANGUAGE_LIST_KEY = "google-supported-language-list";
 
 const execute = async function (context, query) {

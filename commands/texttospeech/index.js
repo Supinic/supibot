@@ -1,4 +1,4 @@
-import LanguageCodes from "../../utils/languages";
+import LanguageCodes from "../../utils/languages.js";
 import { locales } from "./tts-locales.json";
 import { TTS_ENABLED, TTS_MULTIPLE_ENABLED } from "../../utils/shared-cache-keys.json";
 

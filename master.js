@@ -16,7 +16,7 @@ import VLCConnector from "./singletons/vlc-connector.js";
 import Platform from "./platforms/template.js";
 
 import initializeInternalApi from "./api/index.js";
-import loadCommands from "./commands/";
+import loadCommands from "./commands/index.js";
 
 const importFileDataModule = async (module, path) => {
 	if (!config.modules[path]) {

@@ -1,4 +1,4 @@
-import LanguageCodes from "../../utils/languages";
+import LanguageCodes from "../../utils/languages.js";
 import OCR_LANGUAGES from "./ocr-languages.json";
 const OCR_LANGUAGE_NAMES = Object.keys(OCR_LANGUAGES).map(i => LanguageCodes.getName(i));
 

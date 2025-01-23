@@ -17,11 +17,11 @@ const PLATFORMS = {
 	vn2: ["vn", "vietnam"]
 };
 
-const GAME_RESULT = {
+export const GAME_RESULT = {
 	END: "GameComplete"
 };
 
-const NON_STANDARD_CHAMPION_NAMES = {
+export const NON_STANDARD_CHAMPION_NAMES = {
 	AurelionSol: "Aurelion Sol",
 	Belveth: "Bel'Veth",
 	Chogath: "Cho'Gath",
@@ -43,8 +43,8 @@ const NON_STANDARD_CHAMPION_NAMES = {
 	XinZhao: "Xin Zhao"
 };
 
-const DEFAULT_USER_IDENTIFIER_KEY = "leagueDefaultUserIdentifier";
-const DEFAULT_REGION_KEY = "leagueDefaultRegion";
+export const DEFAULT_USER_IDENTIFIER_KEY = "leagueDefaultUserIdentifier";
+export const DEFAULT_REGION_KEY = "leagueDefaultRegion";
 
 const getPUUIdCacheKey = (gameName, tagLine) => `moba-league-puuid-${gameName}-${tagLine}`;
 const getSummonerIdCacheKey = (puuid) => `moba-league-sid-${puuid}`;
@@ -52,7 +52,7 @@ const getLeagueEntriesCacheKey = (platform, summonerId) => `moba-league-entries-
 const getMatchIdsKey = (summonerId) => `moba-league-match-ids-${summonerId}`;
 const getMatchDataKey = (matchId) => `moba-league-match-data-${matchId}`;
 
-const getPlatform = (identifier) => {
+export const getPlatform = (identifier) => {
 	identifier = identifier.toLowerCase();
 
 	for (const [platform, aliases] of Object.entries(PLATFORMS)) {
@@ -64,7 +64,7 @@ const getPlatform = (identifier) => {
 	return null;
 };
 
-const getPUUIDByName = async (gameName, tagLine) => {
+export const getPUUIDByName = async (gameName, tagLine) => {
 	const key = getPUUIdCacheKey(gameName, tagLine);
 	let puuid = await sb.Cache.getByPrefix(key);
 	if (!puuid) {
@@ -98,7 +98,7 @@ const getPUUIDByName = async (gameName, tagLine) => {
 	return puuid;
 };
 
-const getSummonerId = async (platform, puuid) => {
+export const getSummonerId = async (platform, puuid) => {
 	const summonerKey = getSummonerIdCacheKey(puuid);
 	let summonerId = await sb.Cache.getByPrefix(summonerKey);
 	if (!summonerId) {
@@ -131,7 +131,7 @@ const getSummonerId = async (platform, puuid) => {
 	return summonerId;
 };
 
-const getLeagueEntries = async (platform, summonerId) => {
+export const getLeagueEntries = async (platform, summonerId) => {
 	const key = getLeagueEntriesCacheKey(platform, summonerId);
 	let data = await sb.Cache.getByPrefix(key);
 	if (!data) {
@@ -151,7 +151,7 @@ const getLeagueEntries = async (platform, summonerId) => {
 	return data;
 };
 
-const parseUserIdentifier = async (context, regionName, identifier) => {
+export const parseUserIdentifier = async (context, regionName, identifier) => {
 	if (!regionName && !identifier) {
 		const defaultRegion = await context.user.getDataProperty(DEFAULT_REGION_KEY);
 		if (!defaultRegion) {
@@ -238,7 +238,7 @@ const parseUserIdentifier = async (context, regionName, identifier) => {
  * @param {Object} [options]
  * @param {number} [options.count]
  */
-const getMatchIds = async (puuid, options = {}) => {
+export const getMatchIds = async (puuid, options = {}) => {
 	const summonerMatchKey = getMatchIdsKey(puuid);
 	let matchIds = await sb.Cache.getByPrefix(summonerMatchKey);
 	if (!matchIds) {
@@ -273,7 +273,7 @@ const getMatchIds = async (puuid, options = {}) => {
 	return matchIds;
 };
 
-const getMatchData = async (matchId) => {
+export const getMatchData = async (matchId) => {
 	const matchDataKey = getMatchDataKey(matchId);
 	let matchData = await sb.Cache.getByPrefix(matchDataKey);
 	if (!matchData) {

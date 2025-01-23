@@ -1,4 +1,4 @@
-import subcommands from "./subcommands";
+import subcommands from "./subcommands/index.js";
 const SUBCOMMAND_NAMES = subcommands.map(i => i.name).join(", ");
 
 export default {

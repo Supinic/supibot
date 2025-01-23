@@ -1,4 +1,4 @@
-import { methods } from "./fetch-methods.js";
+import fetchMethods from "./fetch-methods.js";
 
 export default {
 	Name: "doesnotexist",
@@ -20,7 +20,7 @@ export default {
 
 		type = type.toLowerCase();
 
-		const types = [...new Set(methods.flatMap(i => i.types))].sort();
+		const types = [...new Set(fetchMethods.flatMap(i => i.types))].sort();
 		if (type === "list") {
 			return {
 				reply: `Available types: ${types.join(", ")}`
@@ -35,7 +35,7 @@ export default {
 
 		let executionMethod;
 		if (context.params.summary === true) {
-			const definition = methods.find(i => i.types.includes(type) && i.parameter === "summary");
+			const definition = fetchMethods.find(i => i.types.includes(type) && i.parameter === "summary");
 			if (!definition) {
 				return {
 					success: false,
@@ -46,7 +46,7 @@ export default {
 			executionMethod = definition.execute;
 		}
 		else {
-			executionMethod = methods.find(i => i.types.includes(type)).execute;
+			executionMethod = fetchMethods.find(i => i.types.includes(type)).execute;
 		}
 
 		const result = await executionMethod(context, type);
@@ -62,7 +62,7 @@ export default {
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const list = methods
+		const list = fetchMethods
 			.flatMap(i => i.descriptions)
 			.sort()
 			.map(i => `<li>${i}</li>`)

@@ -2,14 +2,14 @@ import { randomInt } from "../../utils/command-utils.js";
 import textCaseCode from "./text-case-code.js";
 import officialCharactersMap from "./definitions/official-characters.json";
 
-import BubbleDefinition from "./definitions/bubble.js";
-import FancyDefinition from "./definitions/fancy.js";
-import UpsideDownDefinition from "./definitions/upside-down.js";
-import LeetDefinition from "./definitions/leet.js";
-import MedievalDefinition from "./definitions/medieval.js";
-import RunicDefinition from "./definitions/runic.js";
-import SuperscriptDefinition from "./definitions/superscript.js";
-import VaporwaveDefinition from "./definitions/vaporwave.js";
+import BubbleDefinition from "./definitions/bubble.json";
+import FancyDefinition from "./definitions/fancy.json";
+import UpsideDownDefinition from "./definitions/upside-down.json";
+import LeetDefinition from "./definitions/leet.json";
+import MedievalDefinition from "./definitions/medieval.json";
+import RunicDefinition from "./definitions/runic.json";
+import SuperscriptDefinition from "./definitions/superscript.json";
+import VaporwaveDefinition from "./definitions/vaporwave.json";
 
 import MorseData from "./definitions/morse.json";
 

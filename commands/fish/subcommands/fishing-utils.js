@@ -34,7 +34,7 @@ const defaultFishingData = Object.freeze({
 	}
 });
 
-const baitTypes = [
+export const baitTypes = [
 	{
 		emoji: "🪱",
 		name: "worm",
@@ -55,7 +55,7 @@ const baitTypes = [
 	}
 ];
 
-const itemTypes = [
+export const itemTypes = [
 	{
 		name: "🥫",
 		sellable: true,
@@ -242,7 +242,7 @@ const itemTypes = [
 	}
 ];
 
-const itemTypeDefinitions = [
+export const itemTypeDefinitions = [
 	{
 		name: "fish",
 		description: "fish"
@@ -256,7 +256,7 @@ const itemTypeDefinitions = [
 /**
  * @return {UserFishData}
  */
-const getInitialStats = () => structuredClone(defaultFishingData);
+export const getInitialStats = () => structuredClone(defaultFishingData);
 
 const failureEmotes = [
 	`PoroSad`,
@@ -315,7 +315,7 @@ const successEmotes = [
  * @param {"success"|"failure"} type
  * @return {Promise<string>}
  */
-const getEmote = async (context, type) => {
+export const getEmote = async (context, type) => {
 	const list = (type === "success") ? successEmotes : failureEmotes;
 	const fallback = (type === "success") ? "😃" : "😔";
 
@@ -327,7 +327,7 @@ const getEmote = async (context, type) => {
  * @param {CatchType} type
  * @return {CatchItem}
  */
-const getWeightedCatch = (type) => {
+export const getWeightedCatch = (type) => {
 	const applicableItems = itemTypes.filter(i => i.type === type);
 	const totalWeight = applicableItems.reduce((acc, cur) => acc + cur.weight, 0);
 
@@ -358,13 +358,13 @@ const catchMessages = {
 	]
 };
 
-const getCatchMessage = (type) => sb.Utils.randArray(catchMessages[type]);
+export const getCatchMessage = (type) => sb.Utils.randArray(catchMessages[type]);
 
 /**
  * @param {string|null} [bait]
  * @return {{catch: null, type: string}|{catch: CatchItem, type: string}}
  */
-const rollCatch = (bait = null) => {
+export const rollCatch = (bait = null) => {
 	let odds = 20;
 	if (bait) {
 		const baitData = baitTypes.find(i => i.emoji === bait || i.name === bait);
@@ -402,7 +402,7 @@ const rollCatch = (bait = null) => {
 	}
 };
 
-const addFish = (fishData, emoji) => {
+export const addFish = (fishData, emoji) => {
 	fishData.catch.fish = (fishData.catch.fish ?? 0) + 1;
 	fishData.lifetime.fish = (fishData.lifetime.fish ?? 0) + 1;
 
@@ -410,7 +410,7 @@ const addFish = (fishData, emoji) => {
 	fishData.catch.types[emoji] = (fishData.catch.types[emoji] ?? 0) + 1;
 };
 
-const addJunk = (fishData, emoji) => {
+export const addJunk = (fishData, emoji) => {
 	fishData.catch.junk = (fishData.catch.junk ?? 0) + 1;
 	fishData.lifetime.junk = (fishData.lifetime.junk ?? 0) + 1;
 
@@ -418,11 +418,11 @@ const addJunk = (fishData, emoji) => {
 	fishData.catch.types[emoji] = (fishData.catch.types[emoji] ?? 0) + 1;
 };
 
-const saveData = async (context, data) => {
+export const saveData = async (context, data) => {
 	await context.user.setDataProperty("fishData", data);
 };
 
-const hasFishedBefore = (fishData) => {
+export const hasFishedBefore = (fishData) => {
 	if (!fishData) {
 		return false;
 	}
@@ -432,7 +432,7 @@ const hasFishedBefore = (fishData) => {
 	return (fishAttempts > 0 || trapAttempts > 0);
 };
 
-const COIN_EMOJI = "🪙";
+export const COIN_EMOJI = "🪙";
 
 export default {
 	COIN_EMOJI,

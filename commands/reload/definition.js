@@ -5,7 +5,7 @@ import config from "../../config.json";
 const shell = promisify(exec);
 const BASE_PATH = config.basePath;
 
-const upgrade = async (context, module, name, reloadAll, ...list) => {
+export const upgrade = async (context, module, name, reloadAll, ...list) => {
 	if (!reloadAll && list.length === 0) {
 		return {
 			success: false,
@@ -98,7 +98,7 @@ const upgrade = async (context, module, name, reloadAll, ...list) => {
 	}
 };
 
-const types = [
+export const types = [
 	{
 		target: "AwayFromKeyboard",
 		names: ["afk", "afks"]
@@ -167,8 +167,3 @@ const types = [
 		}
 	}
 ];
-
-export default {
-	upgrade,
-	types
-};

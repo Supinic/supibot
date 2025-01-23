@@ -1,5 +1,5 @@
 import { CronJob } from "cron";
-import { subscriptions } from "./event-types";
+import subscriptions from "./event-types/index.js";
 import { handleGenericSubscription } from "./generic-event.js";
 
 const nameSymbol = Symbol.for("name");

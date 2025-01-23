@@ -32,8 +32,8 @@ const config = {
 		"chat_data/Custom_Data_Property"
 	],
 	meta: {
-		dataPath: path.join(__dirname, "initial-data"),
-		definitionPath: path.join(__dirname, "definitions"),
+		dataPath: path.join(import.meta.dirname, "initial-data"),
+		definitionPath: path.join(import.meta.dirname, "definitions"),
 		requiredMariaMajorVersion: 10
 	}
 };
