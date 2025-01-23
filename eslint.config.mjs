@@ -1,14 +1,16 @@
 import tseslint from "typescript-eslint";
 import eslintJs from "@eslint/js";
+import importPlugin from "eslint-plugin-import";
 import unicornPlugin from "eslint-plugin-unicorn";
 import globals from "globals";
 
 export default tseslint.config(
 	eslintJs.configs.recommended,
+	importPlugin.flatConfigs.errors,
 	unicornPlugin.configs["flat/recommended"],
 	// tseslint.configs.recommendedTypeChecked,
 	{
-		ignores: [".db/", "coverage/", "build/", "**/*.test.js", "**/*.d.ts", "**/*.d.mts"]
+		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.test.js", "**/*.d.ts", "**/*.d.mts"]
 	},
 	{
 		languageOptions: {
@@ -47,6 +49,8 @@ export default tseslint.config(
 			"eol-last": ["warn", "always"],
 			eqeqeq: "error",
 			"function-call-argument-newline": ["warn", "consistent"],
+			"import/extensions": ["error", "always"],
+			"import/no-unresolved": "off",
 			"implicit-arrow-linebreak": ["error", "beside"],
 			indent: ["warn", "tab", {
 				SwitchCase: 1
