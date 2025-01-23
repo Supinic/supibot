@@ -56,7 +56,7 @@ module.exports = {
 
 		const who = (user.ID === context.user.ID) ? "You have" : "That user has";
 		return {
-			reply: `${who} sent ${sb.Utils.groupDigits(lines.Total)} chat lines in this channel so far.`
+			reply: `${who} sent ${sb.Utils.groupDigits(lines)} chat lines in this channel so far.`
 		};
 	}),
 	Dynamic_Description: null
