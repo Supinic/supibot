@@ -1,5 +1,5 @@
-import detectionsData from "../twitchlotto/detections.json";
-import colours from "./colours.json";
+import detectionsData from "../twitchlotto/detections.json" with { type: "json" };
+import colours from "./colours.json" with { type: "json" };
 
 const coloursData = Object.values(colours);
 

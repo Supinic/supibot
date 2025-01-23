@@ -1,6 +1,6 @@
 import rssNews from "./rss.js";
 import googleNews from "./google-news.js";
-import definitions from "./definitions.json";
+import definitions from "./definitions.json" with { type: "json" };
 
 export default {
 	Name: "news",

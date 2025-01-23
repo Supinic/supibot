@@ -1,4 +1,4 @@
-import forsenData from "./forsenE.json";
+import forsenData from "./forsenE.json" with { type: "json" };
 
 const MAXIMUM_REPEATS = 5;
 const previousLines = [];

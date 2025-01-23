@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import { CronJob } from "cron";
-import config from "../../config.json";
+import config from "../../config.json" with { type: "json" };
 
 const BASE_PATH = config.basePath;
 const MODEL_SIZE_THRESHOLD = 100;

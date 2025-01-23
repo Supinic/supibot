@@ -1,6 +1,6 @@
 import { parseRSS } from "../../utils/command-utils.js";
 
-import definitions from "./definitions.json";
+import definitions from "./definitions.json" with { type: "json" };
 const rssCacheKey = "command-news-rss-cache";
 
 const sanitize = (string) => sb.Utils.fixHTML(sb.Utils.removeHTML(string)).replaceAll(/\s+/g, " ");

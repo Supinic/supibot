@@ -2,7 +2,7 @@ import { randomInt as cryptoRandomInt } from "node:crypto";
 import { Blob } from "node:buffer";
 
 import RSSParser from "rss-parser";
-import Chrono from "chrono-node";
+import { parse as chronoParse } from "chrono-node";
 
 const rssParser = new RSSParser();
 const MAX_SAFE_RANGE = 281474976710655;
@@ -241,7 +241,7 @@ export const getPathFromURL = (stringURL) => {
  * @param {Object} options
  */
 export const parseChrono = (string, referenceDate = null, options = {}) => {
-	const chronoData = Chrono.parse(string, referenceDate, options);
+	const chronoData = chronoParse(string, referenceDate, options);
 	if (chronoData.length === 0) {
 		return null;
 	}

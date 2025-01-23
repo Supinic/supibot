@@ -1,4 +1,4 @@
-import zodiacData from "./zodiac.json";
+import zodiacData from "./zodiac.json" with { type: "json" };
 
 export default {
 	Name: "horoscope",

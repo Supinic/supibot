@@ -1,4 +1,4 @@
-export * as detections from "./detections.json";
+export * as detections from "./detections.json" with { type: "json" };
 
 export const scoreThreshold = 0.5;
 export const maxRetries = 0.5;

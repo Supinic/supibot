@@ -1,4 +1,4 @@
-import ChatGptConfig from "./config.json";
+import ChatGptConfig from "./config.json" with { type: "json" };
 const createCacheKey = (id) => `gpt-token-usage-user-${id}`;
 
 // Cull the sorted Redis set from values that are too old to keep track of

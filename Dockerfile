@@ -21,6 +21,7 @@ RUN yarn set version berry
 RUN yarn install
 
 COPY --chown=supibot:supibot master.js ./
+COPY --chown=supibot:supibot config.json ./
 COPY --chown=supibot:supibot init ./init
 
 COPY --chown=supibot:supibot api ./api

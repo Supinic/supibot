@@ -1,5 +1,5 @@
 import OsrsUtils from "./osrs-utils.js";
-import GameData from "../game-data.json";
+import GameData from "../game-data.json" with { type: "json" };
 
 export default {
 	name: "kc",

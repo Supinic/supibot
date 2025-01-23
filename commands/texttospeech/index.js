@@ -1,8 +1,8 @@
 import LanguageCodes from "../../utils/languages.js";
-import { locales } from "./tts-locales.json";
-import { TTS_ENABLED, TTS_MULTIPLE_ENABLED } from "../../utils/shared-cache-keys.json";
+import { locales } from "./tts-locales.json" with { type: "json" };
+import { TTS_ENABLED, TTS_MULTIPLE_ENABLED } from "../../utils/shared-cache-keys.json" with { type: "json" };
 
-import config from "../../config.json";
+import config from "../../config.json" with { type: "json" };
 const {
 	listenerAddress,
 	listenerPort,

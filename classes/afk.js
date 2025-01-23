@@ -2,8 +2,8 @@ import Filter from "./filter.js";
 import User from "./user.js";
 import Template from "./template.js";
 
-import afkDefinitions from "./afk-definitions.json";
-import config from "../config.json";
+import afkDefinitions from "./afk-definitions.json" with { type: "json" };
+import config from "../config.json" with { type: "json" };
 
 const { responses } = afkDefinitions;
 const configResponses = config.responses;

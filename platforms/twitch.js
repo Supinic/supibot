@@ -1,7 +1,7 @@
 import WebSocket from "ws";
 import { randomBytes } from "node:crypto";
 import Template from "./template.js";
-import cacheKeys from "../utils/shared-cache-keys.json";
+import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
 
 import TwitchUtils from "./twitch-utils.js";
 

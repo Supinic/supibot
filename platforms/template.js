@@ -509,7 +509,9 @@ export default class Platform {
 	static async create (type, config) {
 		let InstancePlatform;
 		try {
-			InstancePlatform = await import(`./${type}.js`);
+			// @todo refactor this to direct imports + platform map. return generic for platforms not in the map
+			const dynamicInstanceImport = await import(`./${type}.js`);
+			InstancePlatform = dynamicInstanceImport.default;
 		}
 		catch {
 			console.log(`No file found for platform "${type}", creating generic platform`);

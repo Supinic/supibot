@@ -1,4 +1,4 @@
-import config from "./config.json";
+import config from "./config.json" with { type: "json" };
 import Template from "./gpt-template.js";
 import GptHistory from "./history-control.js";
 

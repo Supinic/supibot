@@ -1,4 +1,4 @@
-import config from "./config.json";
+import config from "./config.json" with { type: "json" };
 import Subreddit from "./subreddit.js";
 
 let redditGotInstance;

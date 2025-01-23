@@ -1,4 +1,4 @@
-import fullWordList from "./words.json";
+import fullWordList from "./words.json" with { type: "json" };
 const MAXIMUM_WORD_AMOUNT = 10;
 
 export default {

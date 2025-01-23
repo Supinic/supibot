@@ -1,6 +1,6 @@
 /* eslint-disable max-nested-callbacks, prefer-arrow-callback */
 import assert from "node:assert";
-import rawDefinitions from "./definitions.json";
+import rawDefinitions from "./definitions.json" with { type: "json" };
 import RssParser from "rss-parser";
 
 const rssFetch = async (url) => await fetch(url, {

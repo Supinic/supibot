@@ -1,5 +1,5 @@
 import { fetchTimeData } from "../../utils/command-utils.js";
-import timezones from "./timezones.json";
+import timezones from "./timezones.json" with { type: "json" };
 
 const detectTimezone = async (...args) => {
 	const query = args.join(" ");

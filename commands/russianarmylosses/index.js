@@ -1,4 +1,4 @@
-import { categories } from "./categories.json";
+import { categories } from "./categories.json" with { type: "json" };
 
 export default {
 	Name: "russianarmylosses",

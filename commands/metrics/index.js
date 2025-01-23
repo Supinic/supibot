@@ -1,5 +1,5 @@
 import definitions from "./definitions.js";
-import prometheusConfig from "./prometheus-config.json";
+import prometheusConfig from "./prometheus-config.json" with { type: "json" };
 
 const { baseUrl } = prometheusConfig;
 

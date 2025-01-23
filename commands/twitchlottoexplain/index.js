@@ -7,7 +7,7 @@ import { getPathFromURL, uploadToImgur } from "../../utils/command-utils.js";
 import definitions from "../twitchlotto/definitions.js";
 
 import Explain from "./explainer.js";
-import coloursData from "./colours.json";
+import coloursData from "./colours.json" with { type: "json" };
 
 const pipeline = promisify(stream.pipeline);
 const shell = promisify(exec);

@@ -4,7 +4,7 @@ import User from "./user.js";
 import Template from "./template.js";
 
 import { whitespaceRegex } from "../utils/regexes.js";
-import config from "../config.json";
+import config from "../config.json" with { type: "json" };
 const COMMAND_PREFIX = config.modules.commands.prefix;
 
 import pathModule from "node:path";

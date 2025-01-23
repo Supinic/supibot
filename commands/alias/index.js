@@ -1,4 +1,4 @@
-import config from "../../config.json";
+import config from "../../config.json" with { type: "json" };
 const bannedCommandCombinations = config.modules.commands.bannedCombinations ?? [];
 
 import AliasUtils from "./alias-utils.js";

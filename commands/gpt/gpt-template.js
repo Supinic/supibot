@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import config from "./config.json";
+import config from "./config.json" with { type: "json" };
 import History from "./history-control.js";
 
 export default class GptTemplate {

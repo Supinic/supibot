@@ -1,4 +1,4 @@
-import cacheKeys from "../../../utils/shared-cache-keys.json";
+import cacheKeys from "../../../utils/shared-cache-keys.json" with { type: "json" };
 const { LATEST_NODE_JS_VERSION } = cacheKeys;
 
 export default {

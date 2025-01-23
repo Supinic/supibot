@@ -1,4 +1,4 @@
-import config from "../../config.json";
+import config from "../../config.json" with { type: "json" };
 const bannedCommandCombinations = config.modules.commands.bannedCombinations ?? [];
 
 // matches | and > characters if and only if they're not preceded, nor followed by another | or >.

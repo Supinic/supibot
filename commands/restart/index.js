@@ -1,6 +1,6 @@
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
-import config from "../../config.json";
+import config from "../../config.json" with { type: "json" };
 
 const shell = promisify(exec);
 const { basePath } = config;

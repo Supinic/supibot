@@ -1,4 +1,4 @@
-import symbolData from "./popular-stock-symbols.json";
+import symbolData from "./popular-stock-symbols.json" with { type: "json" };
 const findPopularSymbol = (from) => {
 	from = from.toLowerCase();
 

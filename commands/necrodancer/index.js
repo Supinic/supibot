@@ -1,7 +1,7 @@
 import { searchYoutube } from "../../utils/command-utils.js";
-import { zones } from "./game-data.json";
+import { zones } from "./game-data.json" with { type: "json" };
 
-import config from "../../config.json";
+import config from "../../config.json" with { type: "json" };
 const { listenerAddress, listenerPort } = config.local ?? {};
 
 const EXTRA_COOLDOWN = 600_000;

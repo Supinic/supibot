@@ -1,7 +1,7 @@
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
 
-import weatherCodeData from "./codes.json";
+import weatherCodeData from "./codes.json" with { type: "json" };
 import { getIcon, getWindDirection } from "./helpers.js";
 import { postToHastebin } from "../../utils/command-utils.js";
 

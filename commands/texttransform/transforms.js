@@ -1,21 +1,21 @@
 import { randomInt } from "../../utils/command-utils.js";
 import textCaseCode from "./text-case-code.js";
-import officialCharactersMap from "./definitions/official-characters.json";
+import officialCharactersMap from "./definitions/official-characters.json" with { type: "json" };
 
-import BubbleDefinition from "./definitions/bubble.json";
-import FancyDefinition from "./definitions/fancy.json";
-import UpsideDownDefinition from "./definitions/upside-down.json";
-import LeetDefinition from "./definitions/leet.json";
-import MedievalDefinition from "./definitions/medieval.json";
-import RunicDefinition from "./definitions/runic.json";
-import SuperscriptDefinition from "./definitions/superscript.json";
-import VaporwaveDefinition from "./definitions/vaporwave.json";
+import BubbleDefinition from "./definitions/bubble.json" with { type: "json" };
+import FancyDefinition from "./definitions/fancy.json" with { type: "json" };
+import UpsideDownDefinition from "./definitions/upside-down.json" with { type: "json" };
+import LeetDefinition from "./definitions/leet.json" with { type: "json" };
+import MedievalDefinition from "./definitions/medieval.json" with { type: "json" };
+import RunicDefinition from "./definitions/runic.json" with { type: "json" };
+import SuperscriptDefinition from "./definitions/superscript.json" with { type: "json" };
+import VaporwaveDefinition from "./definitions/vaporwave.json" with { type: "json" };
 
-import MorseData from "./definitions/morse.json";
+import MorseData from "./definitions/morse.json" with { type: "json" };
 
-import LingoCockneyDefinition from "./lingo-translations/cockney.json";
-import LingoCowboyDefinition from "./lingo-translations/cowboy.json";
-import LingoOutbackDefinition from "./lingo-translations/outback.json";
+import LingoCockneyDefinition from "./lingo-translations/cockney.json" with { type: "json" };
+import LingoCowboyDefinition from "./lingo-translations/cowboy.json" with { type: "json" };
+import LingoOutbackDefinition from "./lingo-translations/outback.json" with { type: "json" };
 
 const ANTI_PING_CHARACTER = "\u{E0000}";
 

@@ -1,4 +1,4 @@
-import cacheKeys from "../utils/shared-cache-keys.json";
+import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
 import LinkParser from "track-link-parser";
 
 const { SOUNDCLOUD_CLIENT_ID } = cacheKeys;

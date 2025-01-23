@@ -1,4 +1,4 @@
-import templates from "./templates.json";
+import templates from "./templates.json" with { type: "json" };
 const { headlines, parts } = templates;
 
 const REPEATS = 5;

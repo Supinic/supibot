@@ -1,4 +1,4 @@
-import { connectedChannelGroups } from "./connected-channels.json";
+import { connectedChannelGroups } from "./connected-channels.json" with { type: "json" };
 
 export default {
 	Name: "top",

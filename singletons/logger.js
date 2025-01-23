@@ -1,6 +1,6 @@
 import { CronJob } from "cron";
 
-import config from "../config.json";
+import config from "../config.json" with { type: "json" };
 const { logging } = config;
 
 const notified = {

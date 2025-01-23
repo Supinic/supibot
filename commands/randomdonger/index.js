@@ -1,4 +1,4 @@
-import dongers from "./dongers.json";
+import dongers from "./dongers.json" with { type: "json" };
 
 export default {
 	Name: "randomdonger",

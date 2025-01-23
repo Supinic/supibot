@@ -31,7 +31,8 @@ export default async (config) => {
 		let definition;
 		const indexPath = path.join(import.meta.dirname, dir.name, "index.js");
 		try {
-			definition = await import(indexPath);
+			const dynamicCommandImport = await import(indexPath);
+			definition = dynamicCommandImport.default;
 		}
 		catch (e) {
 			console.warn(`Could not load command ${dir.name}`, e);

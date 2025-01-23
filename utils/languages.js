@@ -1,4 +1,4 @@
-import languages from "./languages-data.json";
+import languages from "./languages-data.json" with { type: "json" };
 
 /**
  * Transformed to ES6 syntax by @supinic

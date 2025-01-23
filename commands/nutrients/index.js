@@ -1,4 +1,4 @@
-import NUTRIENTS_DATA from "./nutrients.json";
+import NUTRIENTS_DATA from "./nutrients.json" with { type: "json" };
 
 export default {
 	Name: "nutrients",

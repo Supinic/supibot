@@ -1,4 +1,4 @@
-import copypastaList from "./copypasta.json";
+import copypastaList from "./copypasta.json" with { type: "json" };
 const MAXIMUM_COPYPASTA_REPEATS = 10;
 
 const repeatedPastas = {};

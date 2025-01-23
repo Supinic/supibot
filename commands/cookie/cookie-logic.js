@@ -1,5 +1,5 @@
 import { randomInt } from "../../utils/command-utils.js";
-import fortuneCookieData from "./fortune-cookies.json";
+import fortuneCookieData from "./fortune-cookies.json" with { type: "json" };
 
 /** @type {CookieData} */
 const basicStats = {

@@ -1,5 +1,5 @@
 import GptCache from "./cache-control.js";
-import GptConfig from "./config.json";
+import GptConfig from "./config.json" with { type: "json" };
 import GptMetrics from "./metrics.js";
 import GptModeration from "./moderation.js";
 

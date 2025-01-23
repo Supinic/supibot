@@ -1,4 +1,4 @@
-import config from "../config.json";
+import config from "../config.json" with { type: "json" };
 import http from "node:http";
 import https from "node:https";
 

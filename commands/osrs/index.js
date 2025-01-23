@@ -1,5 +1,5 @@
 import subcommands from "./subcommands/index.js";
-import gameData from "./game-data.json";
+import gameData from "./game-data.json" with { type: "json" };
 
 const { activities, activityAliases, skills } = gameData;
 

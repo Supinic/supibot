@@ -1,5 +1,5 @@
 import LanguageCodes from "../../utils/languages.js";
-import OCR_LANGUAGES from "./ocr-languages.json";
+import OCR_LANGUAGES from "./ocr-languages.json" with { type: "json" };
 const OCR_LANGUAGE_NAMES = Object.keys(OCR_LANGUAGES).map(i => LanguageCodes.getName(i));
 
 export default {

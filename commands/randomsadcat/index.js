@@ -1,4 +1,4 @@
-import sadCats from "./sad-cat.json";
+import sadCats from "./sad-cat.json" with { type: "json" };
 
 const MAXIMUM_REPEATS = 5;
 const previousPosts = [];

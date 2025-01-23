@@ -1,4 +1,4 @@
-import afkDefinitions from "../../classes/afk-definitions.json";
+import afkDefinitions from "../../classes/afk-definitions.json" with { type: "json" };
 
 const { invocations, specialSuffixes } = afkDefinitions;
 const STATUS_LENGTH_CHARACTER_LIMIT = 2000;

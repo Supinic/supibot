@@ -1,5 +1,5 @@
-import cacheKeys from "../../utils/shared-cache-keys.json";
-import config from "../../config.json";
+import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+import config from "../../config.json" with { type: "json" };
 
 const { PLAYSOUNDS_ENABLED } = cacheKeys;
 const {

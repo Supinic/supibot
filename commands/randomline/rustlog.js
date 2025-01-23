@@ -1,4 +1,4 @@
-import config from "../../config.json";
+import config from "../../config.json" with { type: "json" };
 const { instances } = config.rustlog;
 
 const instancesCacheKey = "rustlog-supported-channels";

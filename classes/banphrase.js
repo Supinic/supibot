@@ -1,5 +1,5 @@
 import Template from "./template.js";
-import config from "../config.json";
+import config from "../config.json" with { type: "json" };
 import regexes from "../utils/regexes.js";
 
 const { responses, values } = config;

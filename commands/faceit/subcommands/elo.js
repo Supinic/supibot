@@ -1,4 +1,4 @@
-import faceitData from "./faceit-data.json";
+import faceitData from "./faceit-data.json" with { type: "json" };
 const { maxPointsPerGame, skillLevelRanges } = faceitData;
 
 export default {

@@ -1,4 +1,4 @@
-import beahmData from "./guy-beahm.json";
+import beahmData from "./guy-beahm.json" with { type: "json" };
 
 const MAXIMUM_REPEATS = 5;
 const previousPosts = [];

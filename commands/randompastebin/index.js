@@ -1,4 +1,4 @@
-import pastebinLanguages from "./pastebin-languages.json";
+import pastebinLanguages from "./pastebin-languages.json" with { type: "json" };
 
 export default {
 	Name: "randompastebin",
