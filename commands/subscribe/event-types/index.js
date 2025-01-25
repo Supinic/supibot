@@ -15,7 +15,7 @@ import RustSubDefinition from "./rust.js";
 import SuggestionSubDefinition from "./suggestion.js";
 import V8SubDefinition from "./v8.js";
 
-const subscriptions = [
+export default [
 	BrighterShoresSubDefinition,
 	BunSubDefinition,
 	ChangelogSubDefinition,
@@ -33,5 +33,3 @@ const subscriptions = [
 	SuggestionSubDefinition,
 	V8SubDefinition
 ];
-
-export { subscriptions };

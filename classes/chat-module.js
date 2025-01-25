@@ -200,18 +200,7 @@ export default class ChatModule extends Template {
 	}
 
 	static async importData (definitions) {
-		const hasConnectorTable = await sb.Query.isTablePresent("chat_data", "Channel_Chat_Module");
-		if (!hasConnectorTable) {
-			console.warn("Cannot load Chat_Module", {
-				reason: "missing-tables",
-				tables: "Channel_Chat_Module"
-			});
-
-			return;
-		}
-
 		const attachmentData = await ChatModule.#fetch();
-
 		for (const definition of definitions) {
 			const chatModule = new ChatModule(definition);
 			ChatModule.data.push(chatModule);

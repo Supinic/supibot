@@ -410,7 +410,7 @@ class Command extends Template {
 		});
 	}
 
-	static async validate () {
+	static validate () {
 		if (Command.data.length === 0) {
 			console.warn("No commands initialized - bot will not respond to any command queries");
 		}
