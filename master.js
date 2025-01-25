@@ -16,7 +16,6 @@ import Channel from "./classes/channel.js";
 import Reminder from "./classes/reminder.js";
 import ChatModule from "./classes/chat-module.js";
 
-// Singletons imports
 import Logger from "./singletons/logger.js";
 import VLCConnector from "./singletons/vlc-connector.js";
 import Platform from "./platforms/template.js";
@@ -43,6 +42,12 @@ const populateModuleDefinitions = async (module, definitions, config) => {
 	else if (whitelist.length > 0) {
 		await module.importData(definitions.filter(i => whitelist.includes(i[identifier])));
 	}
+};
+
+const connectToPlatform = async (platform) => {
+	console.time(`Platform connect: ${platform.name}`);
+	await platform.connect();
+	console.timeEnd(`Platform connect: ${platform.name}`);
 };
 
 const MODULE_INITIALIZE_ORDER = [
@@ -160,12 +165,10 @@ for (const platform of platforms) {
 	}
 
 	platform.checkConfig();
+
 	// eslint-disable-next-line unicorn/prefer-top-level-await
-	promises.push((async () => {
-		console.time(`Platform connect: ${platform.name}`);
-		await platform.connect();
-		console.timeEnd(`Platform connect: ${platform.name}`);
-	})());
+	const promise = connectToPlatform(platform);
+	promises.push(promise);
 }
 
 if (promises.length === 0) {
@@ -174,7 +177,7 @@ if (promises.length === 0) {
 
 await Promise.all(promises);
 
-console.debug("Ready!");
+console.debug("Connected to all platforms. Ready!");
 console.groupEnd();
 
 process.on("unhandledRejection", async (reason) => {
