@@ -1,4 +1,12 @@
-// Classes imports
+import * as core from "supi-core";
+import config from "./config.json" with { type: "json" };
+import initializeInternalApi from "./api/index.js";
+
+import commandDefinitions from "./commands/index.js";
+import chatModuleDefinitions from "./chat-modules/index.js";
+import gotDefinitions from "./gots/index.js";
+import initializeCrons from "./crons/index.js";
+
 import Filter from "./classes/filter.js";
 import Command from "./classes/command.js";
 import User from "./classes/user.js";
@@ -11,79 +19,38 @@ import ChatModule from "./classes/chat-module.js";
 // Singletons imports
 import Logger from "./singletons/logger.js";
 import VLCConnector from "./singletons/vlc-connector.js";
-
-// Platform template import
 import Platform from "./platforms/template.js";
 
-import initializeInternalApi from "./api/index.js";
-import commandDefinitions from "./commands/index.js";
-
-const importFileDataModule = async (module, path) => {
-	if (!config.modules[path]) {
-		throw new Error(`Missing configuration for ${path}`);
-	}
-
+const populateModuleDefinitions = async (module, definitions, config) => {
 	const {
 		disableAll = true,
 		whitelist = [],
 		blacklist = []
-	} = config.modules[path];
+	} = config;
 
 	if (whitelist.length > 0 && blacklist.length > 0) {
-		throw new Error(`Cannot combine blacklist and whitelist for ${path}`);
+		throw new Error(`Cannot combine blacklist and whitelist for ${module.name}`);
 	}
 	else if (disableAll) {
-		console.warn(`Module ${path} is disabled - will not load`);
+		console.warn(`Module ${module.name} is disabled - will not load`);
 		return;
 	}
 
-	const identifier = (path === "gots") ? "name" : "Name";
-	const { definitions } = await import(`./${path}/index.js`);
+	const identifier = (module === sb.Got) ? "name" : "Name";
 	if (blacklist.length > 0) {
 		await module.importData(definitions.filter(i => !blacklist.includes(i[identifier])));
 	}
 	else if (whitelist.length > 0) {
 		await module.importData(definitions.filter(i => whitelist.includes(i[identifier])));
 	}
-	else {
-		await module.importData(definitions);
-	}
 };
 
-let config;
-try {
-	const importConfig = await import("./config.json", { with: { type: "json" } });
-	config = importConfig.default;
-}
-catch (e) {
-	console.error(e);
-	throw new Error("No custom configuration found! Copy `config-default.json` as `config.json` and set up your configuration");
-}
-
-const databaseModuleInitializeOrder = [
+const MODULE_INITIALIZE_ORDER = [
 	// First batch - no dependencies
 	[Filter, Command, User, AwayFromKeyboard, Banphrase, Channel, Reminder],
 	// Second batch - depends on Channel
 	[ChatModule]
 ];
-
-const initializeCommands = async (config) => {
-	if (config.modules.commands.disableAll) {
-		console.warn("Load commands - skipped due to `disableAll` setting");
-		return;
-	}
-
-	console.time("Load commands");
-	const {
-		blacklist,
-		whitelist
-	} = config.modules.commands;
-
-	const commands = await loadCommands({ blacklist, whitelist });
-
-	await Command.importData(commands.definitions);
-	console.timeEnd("Load commands");
-};
 
 const platformsConfig = config.platforms;
 if (!platformsConfig || platformsConfig.length === 0) {
@@ -93,7 +60,6 @@ if (!platformsConfig || platformsConfig.length === 0) {
 console.groupCollapsed("Initialize timers");
 console.time("supi-core");
 
-const core = await import("supi-core");
 const Query = new core.Query({
 	user: process.env.MARIA_USER,
 	password: process.env.MARIA_PASSWORD,
@@ -126,22 +92,17 @@ for (const definition of platformsConfig) {
 console.time("basic bot modules");
 
 // Initialize bot-specific modules with database-driven data
-for (let i = 0; i < databaseModuleInitializeOrder.length; i++) {
+for (let i = 0; i < MODULE_INITIALIZE_ORDER.length; i++) {
 	console.debug(`Modules batch #${i + 1}`);
 
-	const initOrder = databaseModuleInitializeOrder[i];
+	const initOrder = MODULE_INITIALIZE_ORDER[i];
 	const promises = initOrder.map(async (module) => {
 		console.time(`Init ${module.name}`);
 		await module.initialize();
 		console.timeEnd(`Init ${module.name}`);
 	});
 
-	if (i === 0) {
-		await Promise.all([...promises, initializeCommands(config)]);
-	}
-	else {
-		await Promise.all(promises);
-	}
+	await Promise.all(promises);
 }
 
 globalThis.sb = {
@@ -167,32 +128,30 @@ globalThis.sb = {
 console.timeEnd("basic bot modules");
 console.time("chat modules");
 
+
 await Promise.all([
-	importFileDataModule(ChatModule, "chat-modules"),
-	importFileDataModule(sb.Got, "gots")
+	populateModuleDefinitions(Command, commandDefinitions, config.modules.commands),
+	populateModuleDefinitions(ChatModule, chatModuleDefinitions, config.modules["chat-modules"]),
+	populateModuleDefinitions(core.Got, gotDefinitions, config.modules.gots)
 ]);
 
 console.timeEnd("chat modules");
+
 console.time("crons");
-
-const { initializeCrons } = await import("./crons/index.js");
 initializeCrons(config.modules.crons);
-
 console.timeEnd("crons");
 
-if (sb.Metrics) {
-	sb.Metrics.registerCounter({
-		name: "supibot_messages_sent_total",
-		help: "Total number of Twitch messages sent by the bot.",
-		labelNames: ["platform", "channel"]
-	});
+sb.Metrics.registerCounter({
+	name: "supibot_messages_sent_total",
+	help: "Total number of Twitch messages sent by the bot.",
+	labelNames: ["platform", "channel"]
+});
 
-	sb.Metrics.registerCounter({
-		name: "supibot_messages_read_total",
-		help: "Total number of Twitch messages seen (read) by the bot.",
-		labelNames: ["platform", "channel"]
-	});
-}
+sb.Metrics.registerCounter({
+	name: "supibot_messages_read_total",
+	help: "Total number of Twitch messages seen (read) by the bot.",
+	labelNames: ["platform", "channel"]
+});
 
 const promises = [];
 for (const platform of platforms) {
