@@ -2,10 +2,8 @@ import getLinkParser from "../../utils/link-parser.js";
 import { searchYoutube, VIDEO_TYPE_REPLACE_PREFIX } from "../../utils/command-utils.js";
 import CytubeIntegration from "./cytube-integration.js";
 
-import {
-	SONG_REQUESTS_STATE,
-	SONG_REQUESTS_VLC_PAUSED
-} from "../../utils/shared-cache-keys.json";
+import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
 
 const REQUEST_TIME_LIMIT = 900;
 const REQUEST_AMOUNT_LIMIT = 10;

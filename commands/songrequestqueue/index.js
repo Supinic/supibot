@@ -1,7 +1,5 @@
-import {
-	SONG_REQUESTS_STATE,
-	SONG_REQUESTS_VLC_PAUSED
-} from "../../utils/shared-cache-keys.json";
+import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
 
 export default {
 	Name: "songrequestqueue",
