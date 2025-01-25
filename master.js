@@ -128,7 +128,6 @@ globalThis.sb = {
 console.timeEnd("basic bot modules");
 console.time("chat modules");
 
-
 await Promise.all([
 	populateModuleDefinitions(Command, commandDefinitions, config.modules.commands),
 	populateModuleDefinitions(ChatModule, chatModuleDefinitions, config.modules["chat-modules"]),
