@@ -40,7 +40,7 @@ export const randomInt = (min, max) => {
 
 	const range = max - min;
 	if (range <= MAX_SAFE_RANGE) {
-		return randomInt(min, max + 1);
+		return cryptoRandomInt(min, max + 1);
 	}
 
 	const baseRoll = cryptoRandomInt(0, MAX_SAFE_RANGE);
