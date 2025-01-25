@@ -1,13 +1,13 @@
-export const definition = {
-	Name: "subscription-react",
-	Events: ["subscription"],
-	Description: "According to arguments, reacts to a subscription in a Twitch channel.",
-	Code: (async function chatModuleSubscriptionReact (context, definition) {
+export default {
+	Name: "raid-react",
+	Events: ["raid"],
+	Description: "According to arguments, reacts to a Twitch channel being raided.",
+	Code: (async function chatModuleRaidReact (context, definition) {
 		const { channel, platform, user } = context;
 		if (platform.Name !== "twitch") {
 			return;
 		}
-		else if (channel.Mode === "Read") {
+		else if (channel.mode === "Read") {
 			return;
 		}
 		else if (!definition) {
@@ -15,9 +15,6 @@ export const definition = {
 		}
 
 		if (!user) {
-			return;
-		}
-		else if (user?.Name === platform.Self_Name) {
 			return;
 		}
 
@@ -29,7 +26,7 @@ export const definition = {
 			await callback(context, definition);
 		}
 		else {
-			console.warn("Incorrect chat-module response type", {
+			console.warn("Incorrect raid chat-module response type", {
 				chatModule: this.Name,
 				channel: channel.ID,
 				definition

@@ -1,4 +1,4 @@
-export const definition = {
+export default {
 	Name: "streamer-health-notification",
 	Events: ["online", "offline"],
 	Description: "Sets up a periodic \"health notification\" when the channel goes live, and removes it when going offline.",

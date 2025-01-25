@@ -7,7 +7,7 @@ const createMessage = (name) => sb.Utils.tag.trim `
 	After you're done, use this command to get me back: $bot rejoin channel:${name}
 `;
 
-export const definition = {
+export default {
 	Name: "twitch-bot-scope-reminder",
 	Events: ["message"],
 	Description: "Notifies users that used to have Supibot but didn't permit it within the crossover window.",

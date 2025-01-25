@@ -1,4 +1,4 @@
-export const definition = {
+export default {
 	Name: "ping-supi",
 	Events: ["message"],
 	Description: "This module notifies Supinic whenever he is mentioned (in any channel, across platforms) via Twitch whispers.",

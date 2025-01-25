@@ -1,7 +1,7 @@
 let missingEnvNotified = false;
 const SUPPORTED_EXTENSIONS = new Set(["jpg", "jpeg", "png", "gif", "mp4"]);
 
-export const definition = {
+export default {
 	Name: "imgur-link-gatherer",
 	Events: ["message"],
 	Description: "Gathers Imgur links across channels, and reuploads them if possible.",

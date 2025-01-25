@@ -2,7 +2,7 @@ const basicRegex = /(get|getting|buy|buying)?\s*(cheap|cheapest|best|real|more)?
 const siteRegex = /(streamboo|u\.to|dogehype)/gi;
 const discordRegex = /(add\s*)((me on)|(my))\s*(disc(ord)?)/gi;
 
-export const definition = {
+export default {
 	Name: "wanna-become-famous",
 	Events: ["message"],
 	Description: "Bans various spam or follow bots.",

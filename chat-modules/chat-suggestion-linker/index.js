@@ -1,4 +1,4 @@
-export const definition = {
+export default {
 	Name: "chat-suggestion-linker",
 	Events: ["message"],
 	Description: "If a Supibot suggestion ID format is detected, posts a link to it - plus a github link, if the suggestion has one.",

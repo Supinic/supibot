@@ -1,4 +1,4 @@
-export const definition = {
+export default {
 	Name: "suspicious-user-auto-check",
 	Events: ["message"],
 	Description: "For each user who types (a part of) the \"suspicious user\" message, this module will automatically try the $$suscheck alias.",

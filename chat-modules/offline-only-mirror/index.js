@@ -1,4 +1,4 @@
-export const definition = {
+export default {
 	Name: "offline-only-mirror",
 	Events: ["online", "offline"],
 	Description: "This module manages channel mirrors so that they are only in effect when the channel is offline.",

@@ -1,6 +1,6 @@
 const TWITCH_ANTIPING_CHARACTER = "\u{E0000}";
 
-export const definition = {
+export default {
 	Name: "async-markov-experiment",
 	Events: ["message"],
 	Description: "Super experimental automatic async markov tester thing",

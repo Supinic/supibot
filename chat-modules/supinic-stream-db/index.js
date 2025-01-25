@@ -1,7 +1,7 @@
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 const { SONG_REQUESTS_STATE } = sharedKeys;
 
-export const definition = {
+export default {
 	Name: "supinic-stream-db",
 	Events: ["online", "offline"],
 	Description: "Creates and updates database rows of Streams on Supinic's channel as he goes on/offline.",
