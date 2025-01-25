@@ -1,4 +1,4 @@
-export const definition = {
+export default {
 	name: "FakeAgent",
 	optionsType: "object",
 	options: {

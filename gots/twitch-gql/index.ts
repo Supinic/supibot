@@ -5,7 +5,7 @@ const list = [
 	"TWITCH_GQL_DEVICE_ID"
 ];
 
-export const definition = {
+export default {
 	name: "TwitchGQL",
 	optionsType: "function",
 	options: (() => {

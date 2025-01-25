@@ -1,4 +1,4 @@
-export const definition = {
+export default {
 	name: "Supibot",
 	optionsType: "function",
 	options: (() => {

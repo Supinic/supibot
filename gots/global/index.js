@@ -1,7 +1,7 @@
 import config from "../../config.json" with { type: "json" };
 const { defaultUserAgent } = config.modules.gots;
 
-export const definition = {
+export default {
 	name: "Global",
 	optionsType: "function",
 	options: (() => ({
