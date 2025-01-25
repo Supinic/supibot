@@ -1,4 +1,4 @@
-export const definition = {
+export default {
 	name: "stay-hydrated",
 	expression: "0 20 * * * *",
 	description: "Stay hydrated!",

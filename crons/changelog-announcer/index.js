@@ -1,7 +1,7 @@
 let isTableAvailable;
 let latestID;
 
-export const definition = {
+export default {
 	name: "changelog-announcer",
 	expression: "0 */30 * * * *",
 	description: "Watches for new changelogs, and if found, posts them to the specified channel(s).",

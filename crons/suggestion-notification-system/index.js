@@ -1,7 +1,7 @@
 let isTableAvailable;
 let previousSuggestions;
 
-export const definition = {
+export default {
 	name: "suggestion-notification-system",
 	expression: "0 * * * * *",
 	description: "Manages sending notifications about suggestions being changed. This is to notify users (via private system reminders) that their suggestion's status has changed.",

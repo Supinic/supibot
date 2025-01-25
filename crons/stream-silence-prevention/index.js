@@ -11,7 +11,7 @@ const repeatAmount = 100;
 // 	"QO0CRvQ0WRA" // Gachillmuchi reupload by DJ Gachi
 // ];
 
-export const definition = {
+export default {
 	name: "stream-silence-prevention",
 	expression: "*/5 * * * * *",
 	description: "Makes sure that there is not a prolonged period of song request silence on Supinic's stream while live.",

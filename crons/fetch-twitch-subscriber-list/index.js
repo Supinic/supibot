@@ -3,7 +3,7 @@ const { TWITCH_ADMIN_SUBSCRIBER_LIST } = sharedKeys;
 
 let tooManySubsWarningSent = false;
 
-export const definition = {
+export default {
 	name: "fetch-twitch-subscriber-list",
 	expression: "0 0 0 * * *",
 	description: "Fetches the current subscriber list, then saves it to sb.Cache",

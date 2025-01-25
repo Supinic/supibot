@@ -1,6 +1,6 @@
 const sanitize = (string) => string.replaceAll(/\p{Emoji}/gu, (match) => escape(match).replaceAll("%", "\\"));
 
-export const definition = {
+export default {
 	name: "inactive-discord-server-detector",
 	expression: "0 0 12 * * 2",
 	description: "Logs the amount of currently active chatters.",

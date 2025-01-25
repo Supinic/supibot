@@ -1,4 +1,4 @@
-export const definition = {
+export default {
 	name: "train-twitter-archiver",
 	expression: "0 */15 * * * *",
 	description: "Archives @Trainwreckstv's tweets",

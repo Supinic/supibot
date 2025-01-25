@@ -1,4 +1,4 @@
-export const definition = {
+export default {
 	name: "supinic-tcb",
 	expression: "0 0 * * * *",
 	description: "Posts a small help for titlechange_bot in #supinic",

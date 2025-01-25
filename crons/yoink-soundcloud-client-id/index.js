@@ -3,7 +3,7 @@ import getLinkParser from "../../utils/link-parser.js";
 import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 const { SOUNDCLOUD_CLIENT_ID } = sharedKeys;
 
-export const definition = {
+export default {
 	name: "yoink-soundcloud-client-id",
 	expression: "0 */10 * * * *",
 	description: "\"Borrows\" the clientside Soundcloud API key to be used for TrackLinkParser module.",

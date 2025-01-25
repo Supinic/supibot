@@ -11,7 +11,7 @@ const deactivate = async (sub, resultArray) => {
 	});
 };
 
-export const definition = {
+export default {
 	name: "prune-inactive-event-subscribers",
 	expression: "0 0 0 * * *",
 	description: "Removes bot event subscribers if they become inactive.",

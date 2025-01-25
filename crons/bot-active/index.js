@@ -1,4 +1,4 @@
-export const definition = {
+export default {
 	name: "bot-active",
 	expression: "0 */10 * * * *",
 	description: "Pings the bot active API to make sure supibot is being registered as online",

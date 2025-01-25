@@ -1,4 +1,4 @@
-export const definition = {
+export default {
 	name: "supinic-advert",
 	expression: "0 30 * * * *",
 	description: "Posts a reminder how to use titlechange_bot in #supinic",

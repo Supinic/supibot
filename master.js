@@ -16,7 +16,7 @@ import VLCConnector from "./singletons/vlc-connector.js";
 import Platform from "./platforms/template.js";
 
 import initializeInternalApi from "./api/index.js";
-import loadCommands from "./commands/index.js";
+import commandDefinitions from "./commands/index.js";
 
 const importFileDataModule = async (module, path) => {
 	if (!config.modules[path]) {
@@ -38,7 +38,7 @@ const importFileDataModule = async (module, path) => {
 	}
 
 	const identifier = (path === "gots") ? "name" : "Name";
-	const { definitions } = await import(`./${path}/index.mjs`);
+	const { definitions } = await import(`./${path}/index.js`);
 	if (blacklist.length > 0) {
 		await module.importData(definitions.filter(i => !blacklist.includes(i[identifier])));
 	}
@@ -175,7 +175,7 @@ await Promise.all([
 console.timeEnd("chat modules");
 console.time("crons");
 
-const { initializeCrons } = await import("./crons/index.mjs");
+const { initializeCrons } = await import("./crons/index.js");
 initializeCrons(config.modules.crons);
 
 console.timeEnd("crons");

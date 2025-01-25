@@ -1,6 +1,6 @@
 let isTableAvailable;
 
-export const definition = {
+export default {
 	name: "active-chatters-log",
 	expression: "0 */5 * * * *",
 	description: "Logs the amount of currently active chatters.",

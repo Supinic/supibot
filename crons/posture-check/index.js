@@ -1,4 +1,4 @@
-export const definition = {
+export default {
 	name: "posture-check",
 	expression: "0 50 * * * *",
 	description: "Check your posture!",

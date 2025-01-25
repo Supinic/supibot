@@ -1,4 +1,4 @@
-export const definition = {
+export default {
 	name: "late-stream-announcer",
 	expression: "30 3,33 * * * *",
 	description: "Checks if Supi is streaming when he should, and if not, posts a Weirdga TeaTime",
