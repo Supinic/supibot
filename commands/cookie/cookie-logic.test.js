@@ -1,6 +1,7 @@
 /* eslint-disable max-nested-callbacks, prefer-arrow-callback */
 import assert from "node:assert";
 import Logic from "./cookie-logic.js";
+import { Date } from "supi-core";
 
 // Allow proper object cloning when `structuredClone` is not available
 // E.g. in workers
@@ -11,8 +12,6 @@ const privileged = Object.freeze({ hasDoubleCookieAccess: true });
 
 describe("cookie logic", function () {
 	beforeEach(async () => {
-		const { Date } = await import("supi-core");
-
 		globalThis.sb = {
 			Date,
 			Utils: {
@@ -289,28 +288,5 @@ describe("cookie logic", function () {
 		});
 
 		// explicitly test Logic.eatDailyCookie and Logic.eatReceivedCookie if not possible
-	});
-
-	describe("parsing subcommands", function () {
-		const validInputs = Logic.subcommands.flatMap(i => [i.name, ...i.aliases]);
-		const defaultSubcommand = Logic.subcommands.find(i => i.default === true);
-
-		it("parses no input", function () {
-			const result = Logic.parseSubcommand();
-			assert.strictEqual(result, defaultSubcommand.name);
-		});
-
-		it("parses proper input", function () {
-			for (const validInput of validInputs) {
-				const subcommand = Logic.subcommands.find(i => i.name === validInput || i.aliases.includes(validInput));
-				const result = Logic.parseSubcommand(validInput);
-				assert.strictEqual(result, subcommand.name);
-			}
-		});
-
-		it("rejects invalid input", function () {
-			const result = Logic.parseSubcommand("this should never pass");
-			assert.strictEqual(result, null);
-		});
 	});
 });

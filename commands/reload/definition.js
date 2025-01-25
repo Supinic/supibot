@@ -1,4 +1,5 @@
 import { promisify } from "node:util";
+import { randomBytes } from "node:crypto";
 import { exec } from "node:child_process";
 import config from "../../config.json" with { type: "json" };
 
@@ -55,13 +56,9 @@ export const upgrade = async (context, module, name, reloadAll, ...list) => {
 
 				const path = `${BASE_PATH}/${name}/${instanceName}`;
 				try {
-					if (name === "commands") {
-						definitions.push(await import(path));
-					}
-					else {
-						const { definition } = await import(`${path}/index.mjs`);
-						definitions.push(definition);
-					}
+					const hash = randomBytes(16).toString("hex");
+					const dynamicImports = await import(`${path}?randomHash=${hash}`);
+					definitions.push(dynamicImports.default);
 				}
 				catch (e) {
 					result.failed.push({ e, instanceName });
