@@ -16,7 +16,7 @@ const trials = {
 trials.all = Object.values(trials).join(" -- ");
 
 const lab = {
-	date: new sb.Date(),
+	date: null,
 	slugs: {
 		uber: "wfbra",
 		merciless: "riikv",
@@ -63,6 +63,8 @@ export default [
 					reply: `Invalid labyrinth type provided! Supported types: ${Object.keys(lab.slugs).join(", ")}`
 				};
 			}
+
+			lab.date ??= new sb.Date();
 
 			// reset all image links if new day is reached
 			if (lab.date.day !== new sb.Date().day) {
