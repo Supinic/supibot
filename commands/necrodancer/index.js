@@ -1,5 +1,6 @@
 import { searchYoutube } from "../../utils/command-utils.js";
-import { zones } from "./game-data.json" with { type: "json" };
+import gameData from "./game-data.json" with { type: "json" };
+const { zones } = gameData;
 
 import config from "../../config.json" with { type: "json" };
 const { listenerAddress, listenerPort } = config.local ?? {};

@@ -1,4 +1,5 @@
-import { categories } from "./categories.json" with { type: "json" };
+import categoriesData from "./categories.json" with { type: "json" };
+const { categories } = categoriesData;
 
 export default {
 	Name: "russianarmylosses",

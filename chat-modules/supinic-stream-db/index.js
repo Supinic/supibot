@@ -1,5 +1,5 @@
-import sharedKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
-const { SONG_REQUESTS_STATE } = sharedKeys;
+import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+const { SONG_REQUESTS_STATE } = cacheKeys;
 
 export default {
 	Name: "supinic-stream-db",

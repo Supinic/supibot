@@ -1,5 +1,6 @@
 import { randomInt } from "../../utils/command-utils.js";
-import { cannotTimeoutBadges, outcomes } from "./definitions.json" with { type: "json" };
+import definitions from "./definitions.json" with { type: "json" };
+const { cannotTimeoutBadges, outcomes } = definitions;
 
 export default {
 	Name: "russianroulette",
