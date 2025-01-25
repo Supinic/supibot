@@ -1,8 +1,8 @@
 import { randomInt } from "../../utils/command-utils.js";
 
 export default {
-	Name: "%",
-	Aliases: null,
+	Name: "percent",
+	Aliases: ["%"],
 	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Rolls a random percentage between 0 and 100%.",

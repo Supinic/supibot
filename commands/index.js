@@ -1,4 +1,3 @@
-import PercentCommand from "./%/index.js";
 import EightBallCommand from "./8ball/index.js";
 import NineGagCommand from "./9gag/index.js";
 import AboutCommand from "./about/index.js";
@@ -105,6 +104,7 @@ import OptOutCommand from "./optout/index.js";
 import OriginCommand from "./origin/index.js";
 import OsrsCommand from "./osrs/index.js";
 import PastebinCommand from "./pastebin/index.js";
+import PercentCommand from "./percent/index.js";
 import PickCommand from "./pick/index.js";
 import PingCommand from "./ping/index.js";
 import PingMeCommand from "./pingme/index.js";
