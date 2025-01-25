@@ -4,7 +4,7 @@ import stream from "node:stream";
 import fs from "node:fs";
 
 import { getPathFromURL, uploadToImgur } from "../../utils/command-utils.js";
-import definitions from "../twitchlotto/definitions.js";
+import { detections } from "../twitchlotto/definitions.js";
 
 import Explain from "./explainer.js";
 import coloursData from "./colours.json" with { type: "json" };
@@ -46,7 +46,7 @@ export default {
 
 		if (inputLink === "last") {
 			const tl = sb.Command.get("tl");
-			const key = definitions.createRecentUseCacheKey(context);
+			const key = detections.createRecentUseCacheKey(context);
 			const cacheData = await tl.getCacheData(key);
 
 			if (cacheData) {
