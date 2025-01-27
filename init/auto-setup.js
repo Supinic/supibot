@@ -1,19 +1,15 @@
 /* eslint-disable unicorn/no-process-exit */
+import { Query } from "supi-core";
+
 console.log("Setting up query builder...");
+let query;
 try {
-	const core = await import("supi-core");
-	const Query = new core.Query({
+	query = new Query({
 		user: process.env.MARIA_USER,
 		password: process.env.MARIA_PASSWORD,
 		host: process.env.MARIA_HOST,
 		connectionLimit: process.env.MARIA_CONNECTION_LIMIT
 	});
-
-	globalThis.sb = {
-		Date: core.Date,
-		Error: core.Error,
-		Query
-	};
 }
 catch (e) {
 	console.error("Query builder load failed, aborting...", e.message);
@@ -56,7 +52,7 @@ if (initialPlatform === "twitch") {
 	console.log("Setting up initial channel for platform Twitch...");
 	const channelName = process.env.INITIAL_TWITCH_CHANNEL;
 	if (!channelName) {
-		const channels = await sb.Query.getRecordset(rs => rs
+		const channels = await query.getRecordset(rs => rs
 			.select("COUNT(*) AS Count")
 			.from("chat_data", "Channel")
 			.where("Platform = %n", platformData.ID)
@@ -70,8 +66,8 @@ if (initialPlatform === "twitch") {
 		}
 	}
 	else {
-		const channelRow = await sb.Query.getRow("chat_data", "Channel");
-		const exists = await sb.Query.getRecordset(rs => rs
+		const channelRow = await query.getRow("chat_data", "Channel");
+		const exists = await query.getRecordset(rs => rs
 			.select("1")
 			.from("chat_data", "Channel")
 			.where("Name = %s", channelName)
