@@ -1,6 +1,6 @@
 import Template from "./template.js";
+import CytubeConnector from "cytube-connector";
 
-let CytubeConnector;
 class CytubeClient {
 	/** @type {CytubeConnector} */
 	client = null;
@@ -33,11 +33,6 @@ class CytubeClient {
 			});
 
 			return;
-		}
-
-		if (!CytubeConnector) {
-			const ConnectorModule = await import("cytube-connector");
-			CytubeConnector = ConnectorModule.default;
 		}
 
 		const client = new CytubeConnector({
