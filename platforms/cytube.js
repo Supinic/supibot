@@ -22,8 +22,6 @@ class CytubeClient {
 	constructor (channelData, platform) {
 		this.channelData = channelData;
 		this.platform = platform;
-
-		this.initialize();
 	}
 
 	async initialize () {
