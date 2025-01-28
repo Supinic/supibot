@@ -79,7 +79,7 @@ module.exports = class GptNexraComplements extends GptOpenAI {
 		}
 
 		if (isYappingModel) {
-			const cleanupArray = response.body.message.split(/\s{2,}/);
+			const cleanupArray = response.body.message.split(/ {2,}/);
 			response.body.message = cleanupArray[0];
 		}
 
