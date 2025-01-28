@@ -7,7 +7,7 @@ module.exports = {
 	name: "check-live",
 	aliases: [],
 	description: [
-		`<code>$bot check-live/code>`,
+		`<code>$bot check-live</code>`,
 		`<code>$bot check-live channel:(channel)</code>`,
 		"Forcefully checks if a given channel is still live on Twitch.",
 		"This is useful if Supibot still thinks a channel is online/offline when the opposite is actually true."
