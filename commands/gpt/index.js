@@ -6,11 +6,13 @@ const GptModeration = require("./moderation.js");
 const GptTemplate = require("./gpt-template.js");
 const GptOpenAI = require("./gpt-openai.js");
 const GptNexra = require("./gpt-nexra.js");
+const GptNexraComplements = require("./gpt-nexra-complements.js");
 const GptDeepInfra = require("./gpt-deepinfra.js");
 
 const handlerMap = {
 	openai: GptOpenAI,
 	nexra: GptNexra,
+	"nexra-complements": GptNexraComplements,
 	deepinfra: GptDeepInfra
 };
 

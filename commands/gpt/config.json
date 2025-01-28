@@ -43,6 +43,31 @@
       },
       "pricePerMtoken": 0.05
     },
+    "blackbox": {
+      "url": "blackbox",
+      "type": "nexra-complements",
+      "default": false,
+      "inputLimit": 5000,
+      "outputLimit": {
+        "default": 5000,
+        "maximum": 5000
+      },
+      "flags": {
+        "yapping": true
+      },
+      "pricePerMtoken": 0.05
+    },
+    "qwen": {
+      "url": "qwen",
+      "type": "nexra-complements",
+      "default": false,
+      "inputLimit": 5000,
+      "outputLimit": {
+        "default": 5000,
+        "maximum": 5000
+      },
+      "pricePerMtoken": 0.05
+    },
     "mixtral": {
       "url": "mistralai/Mixtral-8x22B-Instruct-v0.1",
       "type": "deepinfra",
