@@ -16,8 +16,12 @@ const WRITE_MODE_MESSAGE_DELAY = 1500;
 const NO_EVENT_RECONNECT_TIMEOUT = 10000; // @todo move to config
 const LIVE_STREAMS_KEY = "twitch-live-streams";
 const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
-const BAD_MESSAGE_RESPONSE = "A message that was about to be posted violated this channel's moderation settings.";
 const MESSAGE_MODERATION_CODES = new Set(["channel_settings", "automod_held"]);
+
+const BAD_MESSAGE_RESPONSE = "A message that was about to be posted violated this channel's moderation settings.";
+const PRIVATE_COMMAND_FILTERED_RESPONSE = "That command is not available via private messages.";
+const PRIVATE_COMMAND_UNRELATED_RESPONSE = "No valid command provided!";
+const PRIVATE_COMMAND_NO_COMMAND_RESPONSE = "That command does not exist.";
 
 const DEFAULT_LOGGING_CONFIG = {
 	bits: false,
@@ -738,7 +742,7 @@ export default class TwitchPlatform extends Template {
 		this.resolveUserMessage(null, userData, message);
 
 		if (!sb.Command.is(message)) {
-			const noCommandMessage = this.config.privateMessageResponseUnrelated ?? "No command provided!";
+			const noCommandMessage = this.config.privateMessageResponseUnrelated ?? PRIVATE_COMMAND_UNRELATED_RESPONSE;
 			await this.pm(noCommandMessage, senderUsername);
 			return;
 		}
@@ -754,10 +758,12 @@ export default class TwitchPlatform extends Template {
 
 		if (!result || !result.success) {
 			if (!result?.reply && result?.reason === "filter") {
-				await this.pm(this.config.privateMessageResponseFiltered, senderUsername);
+				const filteredMessage = this.config.privateMessageResponseFiltered ?? PRIVATE_COMMAND_FILTERED_RESPONSE;
+				await this.pm(filteredMessage, senderUsername);
 			}
 			else if (result?.reason === "no-command") {
-				await this.pm(this.config.privateMessageResponseNoCommand, senderUsername);
+				const noCommandResponse = this.config.privateMessageResponseNoCommand ?? PRIVATE_COMMAND_NO_COMMAND_RESPONSE;
+				await this.pm(noCommandResponse, senderUsername);
 			}
 		}
 	}
