@@ -36,12 +36,15 @@ const populateModuleDefinitions = async (module, definitions, config) => {
 	}
 
 	const identifier = (module === sb.Got) ? "name" : "Name";
+	let definitionsToLoad = definitions;
 	if (blacklist.length > 0) {
-		await module.importData(definitions.filter(i => !blacklist.includes(i[identifier])));
+		definitionsToLoad = definitions.filter(i => !blacklist.includes(i[identifier]));
 	}
 	else if (whitelist.length > 0) {
-		await module.importData(definitions.filter(i => whitelist.includes(i[identifier])));
+		definitionsToLoad = definitions.filter(i => whitelist.includes(i[identifier]));
 	}
+
+	await module.importData(definitionsToLoad);
 };
 
 const connectToPlatform = async (platform) => {
