@@ -44,6 +44,7 @@ export default {
 			hasDoubleCookieAccess: receiverHasDoubleCookieAccess
 		};
 
+		const { transaction } = context;
 		/** @type {CookieData} */
 		const receiverCookieData = await receiverUserData.getDataProperty("cookie", { transaction }) ?? CookieLogic.getInitialStats();
 		if (CookieLogic.hasOutdatedDailyStats(receiverCookieData)) {
@@ -56,7 +57,6 @@ export default {
 			return result;
 		}
 
-		const { transaction } = context;
 		await Promise.all([
 			context.user.setDataProperty("cookie", cookieData, { transaction }),
 			receiverUserData.setDataProperty("cookie", receiverCookieData, { transaction })

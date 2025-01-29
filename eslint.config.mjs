@@ -128,6 +128,7 @@ export default tseslint.config(
 			"no-var": "error",
 			"no-whitespace-before-property": "warn",
 			"no-unused-private-class-members": "warn",
+			"no-use-before-define": "error",
 			"no-with": "error",
 			"object-curly-newline": ["warn", {
 				consistent: true

@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `chat_data`.`Channel_Chat_Module` (
 	`Channel` INT(10) UNSIGNED NOT NULL,
-	`Chat_Module` VARCHAR(100) UNSIGNED NOT NULL,
+	`Chat_Module` VARCHAR(100) NOT NULL,
 	`Specific_Arguments` TEXT(65535) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`Notes` TEXT(65535) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`Created` DATETIME(3) NOT NULL DEFAULT current_timestamp(3),

@@ -6,17 +6,19 @@ import GptModeration from "./moderation.js";
 import GptTemplate from "./gpt-template.js";
 import GptOpenAI from "./gpt-openai.js";
 import GptNexra from "./gpt-nexra.js";
+import GptNexraComplements from "./gpt-nexra-complements.js";
 import GptDeepInfra from "./gpt-deepinfra.js";
 
 const handlerMap = {
 	openai: GptOpenAI,
 	nexra: GptNexra,
+	"nexra-complements": GptNexraComplements,
 	deepinfra: GptDeepInfra
 };
 
 let isLogTablePresent = null;
 
-export default {
+module.exports = {
 	Name: "gpt",
 	Aliases: ["chatgpt"],
 	Author: "supinic",

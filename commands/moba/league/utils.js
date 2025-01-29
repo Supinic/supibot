@@ -16,6 +16,25 @@ const PLATFORMS = {
 	tw2: ["tw", "taiwan"],
 	vn2: ["vn", "vietnam"]
 };
+export const REGIONS = {
+	br: "americas",
+	eun1: "europe",
+	euw1: "europe",
+	jp1: "asia",
+	kr: "asia",
+	la1: "americas",
+	la2: "americas",
+	me: "europe",
+	na1: "americas",
+	oc1: "sea",
+	tr1: "europe",
+	ru: "europe",
+	ph2: "sea",
+	sg2: "sea",
+	th2: "sea",
+	tw2: "sea",
+	vn2: "sea"
+};
 
 export const GAME_RESULT = {
 	END: "GameComplete"
@@ -45,12 +64,50 @@ export const NON_STANDARD_CHAMPION_NAMES = {
 
 export const DEFAULT_USER_IDENTIFIER_KEY = "leagueDefaultUserIdentifier";
 export const DEFAULT_REGION_KEY = "leagueDefaultRegion";
+export const QUEUE_DATA_CACHE_KEY = "league-queues-data";
+
+export const TEAM_POSITIONS_MAP = {
+	TOP: "top",
+	MIDDLE: "mid",
+	JUNGLE: "jungle",
+	BOTTOM: "ADC",
+	UTILITY: "support"
+};
 
 const getPUUIdCacheKey = (gameName, tagLine) => `moba-league-puuid-${gameName}-${tagLine}`;
 const getSummonerIdCacheKey = (puuid) => `moba-league-sid-${puuid}`;
 const getLeagueEntriesCacheKey = (platform, summonerId) => `moba-league-entries-${platform}-${summonerId}`;
 const getMatchIdsKey = (summonerId) => `moba-league-match-ids-${summonerId}`;
 const getMatchDataKey = (matchId) => `moba-league-match-data-${matchId}`;
+
+export const getQueueDescription = async (queueId) => {
+	let queueData = await sb.Cache.getByPrefix(QUEUE_DATA_CACHE_KEY);
+	if (!queueData) {
+		const response = await sb.Got.get("GenericAPI")({
+			url: "https://static.developer.riotgames.com/docs/lol/queues.json"
+		});
+
+		queueData = response.body.map(i => ({
+			...i,
+			shortName: (i.description)
+				? i.description.replace(/\s*\dv\d\s*/, "").replace(/\s*games\s*/, "")
+				: null
+		}));
+
+		await sb.Cache.setByPrefix(QUEUE_DATA_CACHE_KEY, queueData, {
+			expiry: 14 * 864e5 // 14 days
+		});
+	}
+
+	const queue = queueData.find(i => i.queueId === queueId);
+	if (!queue) {
+		throw new sb.Error({
+			message: "Queue ID not found"
+		});
+	}
+
+	return queue;
+};
 
 export const getPlatform = (identifier) => {
 	identifier = identifier.toLowerCase();
@@ -234,11 +291,12 @@ export const parseUserIdentifier = async (context, regionName, identifier) => {
 };
 
 /**
+ * @param {string} platform
  * @param {string} puuid
  * @param {Object} [options]
  * @param {number} [options.count]
  */
-export const getMatchIds = async (puuid, options = {}) => {
+export const getMatchIds = async (platform, puuid, options = {}) => {
 	const summonerMatchKey = getMatchIdsKey(puuid);
 	let matchIds = await sb.Cache.getByPrefix(summonerMatchKey);
 	if (!matchIds) {
@@ -246,8 +304,9 @@ export const getMatchIds = async (puuid, options = {}) => {
 			count: options.count ?? 20
 		});
 
+		const region = REGIONS[platform];
 		const response = await sb.Got.get("GenericAPI")({
-			url: `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids`,
+			url: `https://${region}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids`,
 			throwHttpErrors: false,
 			headers: {
 				"X-Riot-Token": process.env.API_RIOT_GAMES_KEY
@@ -273,12 +332,13 @@ export const getMatchIds = async (puuid, options = {}) => {
 	return matchIds;
 };
 
-export const getMatchData = async (matchId) => {
+export const getMatchData = async (platform, matchId) => {
 	const matchDataKey = getMatchDataKey(matchId);
 	let matchData = await sb.Cache.getByPrefix(matchDataKey);
 	if (!matchData) {
+		const region = REGIONS[platform];
 		const response = await sb.Got.get("GenericAPI")({
-			url: `https://europe.api.riotgames.com/lol/match/v5/matches/${matchId}`,
+			url: `https://${region}.api.riotgames.com/lol/match/v5/matches/${matchId}`,
 			throwHttpErrors: false,
 			headers: {
 				"X-Riot-Token": process.env.API_RIOT_GAMES_KEY
@@ -312,6 +372,8 @@ export default {
 	DEFAULT_USER_IDENTIFIER_KEY,
 	DEFAULT_REGION_KEY,
 	GAME_RESULT,
+	TEAM_POSITIONS_MAP,
+	getQueueDescription,
 	getPlatform,
 	getPUUIDByName,
 	getSummonerId,

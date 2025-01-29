@@ -1,9 +1,10 @@
 import {
-	GAME_RESULT,
 	NON_STANDARD_CHAMPION_NAMES,
+	TEAM_POSITIONS_MAP,
 	parseUserIdentifier,
 	getMatchIds,
-	getMatchData
+	getMatchData,
+	getQueueDescription
 } from "./utils.js";
 
 export default {
@@ -23,8 +24,9 @@ export default {
 			return leagueUser;
 		}
 
-		const { puuid, gameName } = leagueUser;
-		const matchIds = await getMatchIds(puuid, { count: 1 });
+		const { puuid, region } = leagueUser;
+		const playerName = leagueUser.gameName;
+		const matchIds = await getMatchIds(region, puuid, { count: 1 });
 		if (matchIds.length === 0) {
 			return {
 				success: false,
@@ -32,29 +34,46 @@ export default {
 			};
 		}
 
-		const { info } = await getMatchData(matchIds[0]);
-
-		let gameStateString = "is currently playing";
-		let gameEndString = "";
-		let gameResultString = "";
-
+		const { info } = await getMatchData(region, matchIds[0]);
 		const player = info.participants.find(i => i.puuid === puuid);
-		if (info.endOfGameResult === GAME_RESULT.END || info.gameEndTimestamp) {
-			const gameEnd = new sb.Date(info.gameEndTimestamp);
+		const gameQueue = await getQueueDescription(info.queueId);
 
-			gameEndString = `(game ended ${sb.Utils.timeDelta(gameEnd)})`;
-			gameStateString = `last played`;
-			gameResultString = (player.win) ? "and won" : "and lost";
+		if (context.params.rawData) {
+			return {
+				reply: "Data is available.",
+				data: {
+					game: {
+						duration: info.gameDuration,
+						mode: info.gameMode,
+						id: info.gameId,
+						type: info.gameType,
+						version: info.gameVersion
+					},
+					queue: gameQueue,
+					player
+				}
+			};
 		}
 
-		// @todo include type of game (flex, ranked, aram, ...)
+		const gameEnd = new sb.Date(info.gameEndTimestamp);
+		const gameEndString = `Played ${sb.Utils.timeDelta(gameEnd)}`;
+		const gameResultString = (player.win) ? "won as" : "lost as";
+		const gameLengthMinutes = Math.floor(info.gameDuration / 60);
+		const gameLengthString = `in ${gameLengthMinutes}min`;
+
+		const creepScore = player.totalMinionsKilled + player.neutralMinionsKilled;
+		const creepsPerMinute = sb.Utils.round(creepScore / gameLengthMinutes, 1);
+
+		const position = TEAM_POSITIONS_MAP[player.teamPosition] ?? "(unknown)";
+		const gameType = gameQueue.shortName;
 
 		const champName = NON_STANDARD_CHAMPION_NAMES[player.championName] ?? player.championName;
 		return {
 			reply: sb.Utils.tag.trim `
-				${gameName} ${gameStateString} ${champName}		
-				${gameResultString}	
-				with KDA of ${player.kills}/${player.deaths}/${player.assists}.	
+				${playerName} ${gameResultString} ${champName} ${position}
+				in ${gameType} ${gameLengthString}.	
+				KDA: ${player.kills}/${player.deaths}/${player.assists},
+				${creepScore} CS (${creepsPerMinute} CS/min).
 				${gameEndString}
 			 `
 		};

@@ -303,22 +303,6 @@ const createChannelRedemptionSubscription = (channelId) => createSubscription({
 	version: "1"
 });
 
-const getExistingSubscriptions = async (force = false) => {
-	if (!force) {
-		const cacheData = await sb.Cache.getByPrefix(SUBSCRIPTIONS_CACHE_KEY);
-		if (cacheData) {
-			return cacheData;
-		}
-	}
-
-	const subscriptions = await fetchExistingSubscriptions();
-	await sb.Cache.setByPrefix(SUBSCRIPTIONS_CACHE_KEY, subscriptions, {
-		expiry: SUBSCRIPTIONS_CACHE_EXPIRY
-	});
-
-	return subscriptions;
-};
-
 const fetchExistingSubscriptions = async () => {
 	const accessToken = await getAppAccessToken();
 	const response = await sb.Got.get("GenericAPI")({
@@ -358,6 +342,22 @@ const fetchExistingSubscriptions = async () => {
 	}
 
 	return result;
+};
+
+const getExistingSubscriptions = async (force = false) => {
+	if (!force) {
+		const cacheData = await sb.Cache.getByPrefix(SUBSCRIPTIONS_CACHE_KEY);
+		if (cacheData) {
+			return cacheData;
+		}
+	}
+
+	const subscriptions = await fetchExistingSubscriptions();
+	await sb.Cache.setByPrefix(SUBSCRIPTIONS_CACHE_KEY, subscriptions, {
+		expiry: SUBSCRIPTIONS_CACHE_EXPIRY
+	});
+
+	return subscriptions;
 };
 
 const fetchToken = async () => {
