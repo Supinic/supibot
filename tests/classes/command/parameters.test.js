@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import Command from "../../../classes/command";
+import Command from "../../../classes/command.js";
 
 beforeEach(async() => {
 	const { Date: DateModule } = await import("supi-core");
