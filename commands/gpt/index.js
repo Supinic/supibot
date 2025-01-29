@@ -18,7 +18,7 @@ const handlerMap = {
 
 let isLogTablePresent = null;
 
-module.exports = {
+export default {
 	Name: "gpt",
 	Aliases: ["chatgpt"],
 	Author: "supinic",

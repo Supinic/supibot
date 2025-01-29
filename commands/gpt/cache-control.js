@@ -8,6 +8,19 @@ const removeRedundantSortedListValues = async (cacheKey) => {
 };
 
 /**
+ * @param userData
+ * @returns {Promise<{hourly: number, daily: number}>}
+ */
+export const determineUserLimits = async (userData) => {
+	const platform = sb.Platform.get("twitch");
+	const isSubscribed = await platform.fetchUserAdminSubscription(userData);
+
+	return (isSubscribed)
+		? ChatGptConfig.userTokenLimits.subscriber
+		: ChatGptConfig.userTokenLimits.regular;
+};
+
+/**
  * @param {User} userData
  * @returns {Promise<{
  * summary: Record<string, number>,
@@ -92,19 +105,6 @@ export const getTokenUsage = async (userData) => {
 		summary,
 		userLimits
 	};
-};
-
-/**
- * @param userData
- * @returns {Promise<{hourly: number, daily: number}>}
- */
-export const determineUserLimits = async (userData) => {
-	const platform = sb.Platform.get("twitch");
-	const isSubscribed = await platform.fetchUserAdminSubscription(userData);
-
-	return (isSubscribed)
-		? ChatGptConfig.userTokenLimits.subscriber
-		: ChatGptConfig.userTokenLimits.regular;
 };
 
 /**
