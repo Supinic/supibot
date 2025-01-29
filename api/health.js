@@ -1,4 +1,3 @@
-// noinspection JSUnusedGlobalSymbols
 import { freemem, totalmem } from "node:os";
 
 export default {

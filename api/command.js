@@ -1,4 +1,3 @@
-// noinspection JSUnusedGlobalSymbols
 export default {
 	prefix: async () => ({
 		statusCode: 200,

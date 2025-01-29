@@ -1,4 +1,3 @@
-// noinspection JSUnusedGlobalSymbols
 export default {
 	reloadAll: async () => {
 		await sb.Channel.reloadData();

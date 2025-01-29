@@ -1,4 +1,3 @@
-// noinspection JSUnusedGlobalSymbols
 export default {
 	index: async (req, res) => {
 		const data = await sb.Metrics.registry.metrics();

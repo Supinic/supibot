@@ -12,17 +12,17 @@ import PlatformDefinition from "./platform.js";
 import ReminderDefinition from "./reminder.js";
 import UserDefinition from "./user.js";
 
-const definition = [
-	AfkDefinition,
-	ChannelDefinition,
-	CommandDefinition,
-	FilterDefinition,
-	HealthDefinition,
-	MetricsDefinition,
-	PlatformDefinition,
-	ReminderDefinition,
-	UserDefinition
-];
+const routeDefinitions = {
+	afk: AfkDefinition,
+	channel: ChannelDefinition,
+	command: CommandDefinition,
+	filter: FilterDefinition,
+	health: HealthDefinition,
+	metrics: MetricsDefinition,
+	platform: PlatformDefinition,
+	reminder: ReminderDefinition,
+	user: UserDefinition
+};
 
 export default function initialize () {
 	const { api } = config;
@@ -40,7 +40,7 @@ export default function initialize () {
 		const url = new URL(req.url, baseURL);
 		const path = url.pathname.split("/").filter(Boolean);
 
-		let target = definition[path[0]];
+		let target = routeDefinitions[path[0]];
 		if (target && path.length === 1) {
 			target = target.index;
 		}
@@ -93,7 +93,7 @@ export default function initialize () {
 
 	return {
 		server,
-		definition,
+		routeDefinitions,
 		port
 	};
 };

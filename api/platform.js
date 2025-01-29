@@ -1,4 +1,3 @@
-// noinspection JSUnusedGlobalSymbols
 export default {
 	list: async () => {
 		const platforms = sb.Platform.list;
