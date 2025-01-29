@@ -1,10 +1,10 @@
 import assert from "node:assert";
 import Command from "../../../classes/command.js";
+import { Date as SupiDate } from "supi-core";
 
 beforeEach(async() => {
-	const { Date: DateModule } = await import("supi-core");
 	globalThis.sb = {
-		Date: DateModule,
+		Date: SupiDate,
 		Utils: {
 			parseRegExp: (input) => {
 				try {
@@ -52,7 +52,6 @@ describe("Command parameter parsing", () => {
 			assert.strictEqual(typeof value, type, `${type}-type param must be of the correct type`);
 		}
 	};
-
 
 	it("returns no arguments for empty input", () => {
 		const result = Command.parseParametersFromArguments(paramsDefinition, []);
