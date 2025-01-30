@@ -8,7 +8,7 @@ import RejoinSubcommand from "./rejoin.js";
 import RenameSubcommand from "./rename.js";
 import ToggleSubcommand from "./toggle.js";
 
-const subcommands = [
+export default [
 	BanphraseApiSubcommand,
 	CheckLiveSubcommand,
 	EnableRustlogSubcommand,
@@ -19,7 +19,3 @@ const subcommands = [
 	RenameSubcommand,
 	ToggleSubcommand
 ];
-
-export default {
-	subcommands
-};
