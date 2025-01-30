@@ -1,6 +1,7 @@
 import { promisify } from "node:util";
 import { randomBytes } from "node:crypto";
 import { exec } from "node:child_process";
+import path from "node:path";
 import config from "../../config.json" with { type: "json" };
 
 const shell = promisify(exec);
@@ -54,10 +55,10 @@ export const upgrade = async (context, module, name, reloadAll, ...list) => {
 					module.invalidateRequireCache(`${BASE_PATH}/${name}`, instanceName);
 				}
 
-				const path = `${BASE_PATH}/${name}/${instanceName}`;
+				const hash = randomBytes(16).toString("hex");
+				const filePath = path.join(BASE_PATH, name, instanceName, `index.js?randomHash=${hash}`);
 				try {
-					const hash = randomBytes(16).toString("hex");
-					const dynamicImports = await import(`${path}.js?randomHash=${hash}`);
+					const dynamicImports = await import(filePath);
 					definitions.push(dynamicImports.default);
 				}
 				catch (e) {
