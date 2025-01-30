@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import Template from "./template.js";
 import {
 	ChannelType,
 	Client,
@@ -9,7 +10,6 @@ import {
 	PermissionFlagsBits,
 	Routes
 } from "discord.js";
-import Template from "./template.js";
 
 const IGNORED_CHANNEL_TYPES = new Set([
 	ChannelType.GuildAnnouncement,
