@@ -57,7 +57,7 @@ export const upgrade = async (context, module, name, reloadAll, ...list) => {
 				const path = `${BASE_PATH}/${name}/${instanceName}`;
 				try {
 					const hash = randomBytes(16).toString("hex");
-					const dynamicImports = await import(`${path}?randomHash=${hash}`);
+					const dynamicImports = await import(`${path}.js?randomHash=${hash}`);
 					definitions.push(dynamicImports.default);
 				}
 				catch (e) {
