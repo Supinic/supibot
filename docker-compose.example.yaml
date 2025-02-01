@@ -30,10 +30,10 @@ services:
     volumes:
       - type: bind
         source: <path_to_supibot_repository>/config.json
-        target: /home/supibot/config.json
+        target: /home/project/supibot/config.json
       - type: bind
         source: <path_to_supibot_repository>/.env
-        target: /home/supibot/.env
+        target: /home/project/supibot/.env
     restart: unless-stopped
     environment:
       #- "DEBUG_MODE=1"

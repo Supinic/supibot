@@ -1,21 +1,16 @@
 FROM node:latest
 
-RUN corepack disable
-
+RUN corepack enable
 RUN npm install -g typescript
-RUN npm install -g yarn
 
 RUN useradd -m supibot
 USER supibot
-WORKDIR /home/supibot
+WORKDIR /home/project/supibot
 
 COPY --chown=supibot:supibot package.json ./
 COPY --chown=supibot:supibot tsconfig.json ./
 COPY --chown=supibot:supibot .yarnrc.yml ./
-COPY --chown=supibot:supibot .yarn ./.yarn
 
-RUN yarn cache clean --all
-RUN yarn set version berry
 RUN yarn install
 
 COPY --chown=supibot:supibot master.js ./
