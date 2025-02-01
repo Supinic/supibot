@@ -1,6 +1,7 @@
-const { categories } = require("./categories.json");
+import categoriesData from "./categories.json" with { type: "json" };
+const { categories } = categoriesData;
 
-module.exports = {
+export default {
 	Name: "russianarmylosses",
 	Aliases: ["ral"],
 	Author: "boring_nick",

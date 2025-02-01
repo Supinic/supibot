@@ -1,6 +1,16 @@
-const { randomInt } = require("../../utils/command-utils.js");
+import { randomInt } from "../../utils/command-utils.js";
+import checkSafety from "./safety-check.js";
+import {
+	maxRetries,
+	taggingGuide,
+	flags,
+	scoreThreshold,
+	detections as detectionsDefinitions,
+	createRecentUseCacheKey,
+	formatScore
+} from "./definitions.js";
 
-module.exports = {
+export default {
 	Name: "twitchlotto",
 	Aliases: ["tl"],
 	Author: "supinic",
@@ -15,9 +25,6 @@ module.exports = {
 	],
 	Whitelist_Response: "This command can't be executed here!",
 	Code: (async function twitchLotto (context, channel) {
-		const definitions = require("./definitions.js");
-		const checkSafety = require("./safety-check.js");
-
 		if (!this.data.channels) {
 			this.data.channels = await sb.Query.getRecordset(rs => rs
 				.select("LOWER(Name) AS Name")
@@ -256,7 +263,7 @@ module.exports = {
 					image = null;
 				}
 			}
-			else if (context.params.preferUnscored && image.Score !== null && failedTries < definitions.maxRetries) {
+			else if (context.params.preferUnscored && image.Score !== null && failedTries < maxRetries) {
 				// "soft" re-attempting. only attempt again if the limit hasn't been reached.
 				// if it has, continue ahead and use the last image rolled, regardless of if it has the Score value or not
 				failedTries++;
@@ -271,11 +278,11 @@ module.exports = {
 				}
 			}
 
-			if (failedTries > definitions.maxRetries) {
+			if (failedTries > maxRetries) {
 				// Was not able to find an image that existed.
 				return {
 					success: false,
-					reply: `Could not find an image that was still available (${definitions.maxRetries} images were checked and found to be deleted)!`,
+					reply: `Could not find an image that was still available (${maxRetries} images were checked and found to be deleted)!`,
 					cooldown: 2500
 				};
 			}
@@ -338,14 +345,14 @@ module.exports = {
 		if (image.Data) {
 			detections = JSON.parse(image.Data).detections;
 
-			for (const { replacement, string } of definitions.detections) {
+			for (const { replacement, string } of detectionsDefinitions) {
 				const elements = detections.filter(i => i.name === string);
 				const strings = elements.map(i => `${replacement} (${Math.round(i.confidence * 100)}%)`);
 				detectionsString.push(...strings);
 			}
 		}
 
-		await this.setCacheData(definitions.createRecentUseCacheKey(context), image.Link, {
+		await this.setCacheData(createRecentUseCacheKey(context), image.Link, {
 			expiry: 600_000
 		});
 
@@ -383,7 +390,7 @@ module.exports = {
 		return {
 			removeEmbeds: (context.channel && !context.channel.NSFW && scoreThresholdExceeded),
 			reply: sb.Utils.tag.trim `
-				NSFW score: ${definitions.formatScore(image.Score)}
+				NSFW score: ${formatScore(image.Score)}
 				Detections: ${detectionsString.length === 0 ? "N/A" : detectionsString.join(", ")}
 				${flagsString}
 				https://i.imgur.com/${image.Link}
@@ -394,9 +401,7 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { taggingGuide, flags, scoreThreshold } = require("./definitions.js");
 		const thresholdPercent = `${sb.Utils.round(scoreThreshold * 100, 2)}%`;
-
 		const countData = await sb.Query.getRecordset(rs => rs
 			.select("Name", "Amount", "LEAST(Amount, Scored) AS Scored")
 			.from("data", "Twitch_Lotto_Channel")

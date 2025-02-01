@@ -10,7 +10,7 @@ const REPEATED_NUMBERS_NAMES = new Map([
 	[10, "decs"]
 ]);
 
-module.exports = {
+export default {
 	Name: "checkem",
 	Aliases: ["CheckEm","check'em"],
 	Author: "supinic",

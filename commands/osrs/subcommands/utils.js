@@ -1,11 +1,11 @@
-const flagEmojis = {
+export const flagEmojis = {
 	Australia: "🇦🇺",
 	Germany: "🇩🇪",
 	"United Kingdom": "🇬🇧",
 	"United States": "🇺🇸"
 };
 
-const fetchWorldsData = async function () {
+export const fetchWorldsData = async function () {
 	let data = await sb.Cache.getByPrefix("osrs-worlds-data");
 	if (!data) {
 		const response = await sb.Got.get("FakeAgent")({
@@ -47,9 +47,4 @@ const fetchWorldsData = async function () {
 	}
 
 	return data;
-};
-
-module.exports = {
-	flagEmojis,
-	fetchWorldsData
 };

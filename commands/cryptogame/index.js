@@ -1,6 +1,16 @@
-const { CronJob } = require("cron");
+import { CronJob } from "cron";
+import cryptoGamePriceUpdate from "./update-prices-cron.js";
+import {
+	availableCommands,
+	baseAsset,
+	checkPortfolioAsset,
+	createConvertTransaction,
+	getPortfolioData,
+	parseArguments,
+	updatePortfolioAsset
+} from "./game.js";
 
-module.exports = {
+export default {
 	Name: "cryptogame",
 	Aliases: ["cg"],
 	Author: "supinic",
@@ -10,7 +20,6 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	initialize: function () {
-		const { cryptoGamePriceUpdate } = require("./update-prices-cron.js");
 		this.data.updateCronJob = new CronJob("0 0 * * * *", () => cryptoGamePriceUpdate());
 		this.data.updateCronJob.start();
 	},
@@ -19,17 +28,8 @@ module.exports = {
 		this.data.updateCronJob = null;
 	},
 	Code: async function cryptoGame (context, command, ...args) {
-		const {
-			availableCommands,
-			baseAsset,
-			checkPortfolioAsset,
-			createConvertTransaction,
-			getPortfolioData,
-			parseArguments,
-			updatePortfolioAsset
-		} = require("./game.js");
-
 		command = command?.toLowerCase();
+
 		if (!command || !availableCommands.includes(command)) {
 			return {
 				success: false,

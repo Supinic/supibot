@@ -2,7 +2,7 @@ const formatter = new Intl.DateTimeFormat("en-GB", {
 	month: "long"
 });
 
-module.exports = {
+export default {
 	Name: "randomhistoricevent",
 	Aliases: ["rhe"],
 	Author: "supinic",

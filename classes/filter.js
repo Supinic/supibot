@@ -1,10 +1,12 @@
-const Channel = require("./channel.js");
-const User = require("./user.js");
+import Channel from "./channel.js";
+import User from "./user.js";
+
+import Template from "./template.js";
 
 /**
  * Represents a filter of the bot's commands.
  */
-module.exports = class Filter extends require("./template.js") {
+export default class Filter extends Template {
 	#filterData = null;
 	static uniqueIdentifier = "ID";
 

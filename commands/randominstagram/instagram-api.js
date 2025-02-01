@@ -5,7 +5,7 @@ const cacheKey = "instagram-web-desktop-fb-app-id";
 /**
  * @returns {string|null}
  */
-const getFacebookAppID = async () => {
+export const getFacebookAppID = async () => {
 	let key = await sb.Cache.getByPrefix(cacheKey);
 	if (!key) {
 		const response = await sb.Got.get("FakeAgent")({
@@ -32,11 +32,6 @@ const getFacebookAppID = async () => {
 	return key;
 };
 
-const resetFacebookAppID = async () => {
+export const resetFacebookAppID = async () => {
 	await sb.Cache.setByPrefix(cacheKey, null);
-};
-
-module.exports = {
-	getFacebookAppID,
-	resetFacebookAppID
 };

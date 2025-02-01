@@ -1,9 +1,9 @@
-const LanguageCodes = require("../../utils/languages");
+import LanguageCodes from "../../utils/languages.js";
 const BASE_CACHE_KEY = "liveuamap-data";
 const SUPPORTED_LANGUAGE_CODES = ["en", "ru", "uk", "pl"];
 const MAXIMUM_ARTICLES = 10;
 
-module.exports = {
+export default {
 	Name: "liveuamap",
 	Aliases: ["lum", "luam"],
 	Author: "supinic",

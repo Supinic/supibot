@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "npm",
 	Aliases: null,
 	Author: "supinic",

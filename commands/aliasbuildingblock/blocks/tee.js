@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "tee",
 	aliases: [],
 	description: "Saves the output of the previous command into memory, which can be accessed later. The output is also passed on.",

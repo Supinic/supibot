@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "tuck",
 	Aliases: ["fuck","gnkiss","headpat","hug","truck"],
 	Author: "supinic",

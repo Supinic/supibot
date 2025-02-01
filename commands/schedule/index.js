@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "schedule",
 	Aliases: null,
 	Author: "supinic",

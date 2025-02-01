@@ -1,12 +1,15 @@
-const handleErrorInspection = require("./inspect-errors");
-const { postToHastebin } = require("../../utils/command-utils.js");
-const { isSupported } = require("../randomline/rustlog.js");
-const {
-	SONG_REQUESTS_STATE,
-	SONG_REQUESTS_VLC_PAUSED
-} = require("../../utils/shared-cache-keys.json");
+import { createRecentUseCacheKey } from "../twitchlotto/definitions.js";
+import { postToHastebin } from "../../utils/command-utils.js";
+import { isSupported } from "../randomline/rustlog.js";
+import handleErrorInspection from "./inspect-errors.js";
 
-module.exports = (command) => [
+import GptCache from "../gpt/cache-control.js";
+import CookieLogic from "../cookie/cookie-logic.js";
+
+import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
+
+export default [
 	{
 		name: "afk",
 		aliases: [],
@@ -66,7 +69,7 @@ module.exports = (command) => [
 		description: "This sub-command is deprecated, check the alias command instead.",
 		execute: async () => ({
 			success: false,
-			reply: `Use the ${sb.Command.prefix}alias list command instead! Alternatively, check its help, too.`
+			reply: `Use the $alias list command instead! Alternatively, check its help, too.`
 		})
 	},
 	{
@@ -171,17 +174,6 @@ module.exports = (command) => [
 				}
 			}
 			else {
-				let GptCache;
-				try {
-					GptCache = require("../gpt/cache-control.js");
-				}
-				catch {
-					return {
-						success: false,
-						reply: `ChatGPT caching module is currently not available!`
-					};
-				}
-
 				const targetUser = (target) ? await sb.User.get(target) : context.user;
 				if (!targetUser) {
 					return {
@@ -259,17 +251,6 @@ module.exports = (command) => [
 				};
 			}
 
-			let CookieLogic;
-			try {
-				CookieLogic = require("../cookie/cookie-logic.js");
-			}
-			catch {
-				return {
-					success: false,
-					reply: `Could not load the cookie logic module!`
-				};
-			}
-
 			if (CookieLogic.hasOutdatedDailyStats(userCookieData)) {
 				CookieLogic.resetDailyStats(userCookieData);
 				await targetUser.setDataProperty("cookie", userCookieData);
@@ -335,7 +316,7 @@ module.exports = (command) => [
 		name: "error",
 		aliases: [],
 		description: "If you have been granted access, you can check the full text of an error within Supibot, based on its ID.",
-		execute: (context, identifier) => handleErrorInspection(command, context, "error", identifier)
+		execute: (context, identifier) => handleErrorInspection(context, "error", identifier)
 	},
 	{
 		name: "location",
@@ -835,8 +816,7 @@ module.exports = (command) => [
 			// @todo refactor this and similar usages to a common place
 			if (link.toLowerCase() === "last") {
 				const tl = sb.Command.get("tl");
-				const definitions = require("../twitchlotto/definitions.js");
-				const key = definitions.createRecentUseCacheKey(context);
+				const key = createRecentUseCacheKey(context);
 
 				// Seems like a mismatched documentation - tl.getCacheData can allow objects too
 				// noinspection JSCheckFunctionSignatures
@@ -904,6 +884,6 @@ module.exports = (command) => [
 		name: "weberror",
 		aliases: ["web-error"],
 		description: "If you have been granted access, you can check the full text of an error within the supinic.com website, based on its ID.",
-		execute: (context, identifier) => handleErrorInspection(command, context, "webError", identifier)
+		execute: (context, identifier) => handleErrorInspection(context, "webError", identifier)
 	}
 ];

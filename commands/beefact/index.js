@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "beefact",
 	Aliases: null,
 	Author: "supinic",
@@ -16,7 +16,7 @@ module.exports = {
 			.limit(1)
 			.single()
 		);
-	
+
 		return {
 			reply: `🐝 ${fact.Text}`
 		};

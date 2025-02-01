@@ -1,4 +1,4 @@
-const { fetchWorldsData } = require("./utils.js");
+import { fetchWorldsData } from "./utils.js";
 
 /**
  * Each star tier lasts 7 minutes flat after the latest update on 2023-10-25:
@@ -23,7 +23,7 @@ const formatStar = (star, worldsData) => {
 	return `${world.flagEmoji} W${star.world}${activityString}: T${star.tier} ${star.calledLocation} (${delta})`;
 };
 
-module.exports = {
+export default {
 	name: "stars",
 	title: "Shooting Stars",
 	aliases: ["star"],

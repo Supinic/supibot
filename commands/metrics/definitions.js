@@ -1,4 +1,4 @@
-module.exports = [
+export default [
 	{
 		name: "commands-per-minute",
 		aliases: ["cpm"],

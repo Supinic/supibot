@@ -1,6 +1,6 @@
-const dongers = require("./dongers.json");
+import dongers from "./dongers.json" with { type: "json" };
 
-module.exports = {
+export default {
 	Name: "randomdonger",
 	Aliases: ["rd"],
 	Author: "supinic",

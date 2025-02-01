@@ -1,5 +1,7 @@
-const { PLAYSOUNDS_ENABLED } = require("../../utils/shared-cache-keys.json");
-const config = require("../../config.json");
+import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+import config from "../../config.json" with { type: "json" };
+
+const { PLAYSOUNDS_ENABLED } = cacheKeys;
 const {
 	listenerAddress,
 	listenerPort,
@@ -9,7 +11,7 @@ const {
 const BASE_PLAYSOUND_CACHE_KEY = "playsound-cooldown";
 const getPlaysoundCacheKey = (playsoundName) => `${BASE_PLAYSOUND_CACHE_KEY}-${playsoundName}`;
 
-module.exports = {
+export default {
 	Name: "playsound",
 	Aliases: ["ps"],
 	Author: "supinic",

@@ -1,6 +1,6 @@
 const IGNORED_ASSETS = new Set(["VEF"]);
 
-const cryptoGamePriceUpdate = async () => {
+export default async () => {
 	if (!process.env.API_CRYPTO_COMPARE) {
 		throw new sb.Error({
 			message: "No CryptoCompare key configured (API_CRYPTO_COMPARE)"
@@ -89,8 +89,4 @@ const cryptoGamePriceUpdate = async () => {
 	});
 
 	await Promise.all(promises);
-};
-
-module.exports = {
-	cryptoGamePriceUpdate
 };

@@ -4,7 +4,7 @@ const REGEXES = {
 	CDN: /emoticons\/v[12]\/([\w\d]*)\//
 };
 
-module.exports = {
+export default {
 	Name: "whatemoteisit",
 	Aliases: ["weit"],
 	Author: "supinic",

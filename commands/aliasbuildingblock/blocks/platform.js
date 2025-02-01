@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "platform",
 	aliases: [],
 	description: "Prints the name of the current platform.",

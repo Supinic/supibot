@@ -6,7 +6,7 @@ const INVOCATIONS_MAP = {
 	rff: "fox"
 };
 
-module.exports = {
+export default {
 	Name: "randomanimalfact",
 	Aliases: ["raf","rbf","rcf","rdf","rff"],
 	Author: "supinic",

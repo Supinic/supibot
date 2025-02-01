@@ -1,6 +1,6 @@
-const variables = require("./subcommands/index.js");
+import subcommands from "./subcommands/index.js";
 
-module.exports = {
+export default {
 	Name: "set",
 	Aliases: ["unset"],
 	Author: "supinic",
@@ -22,7 +22,7 @@ module.exports = {
 		const { invocation } = context;
 		type = type.toLowerCase();
 
-		const target = variables.find(i => type === i.name || i.aliases?.includes(type));
+		const target = subcommands.find(i => type === i.name || i.aliases?.includes(type));
 		if (!target) {
 			return {
 				success: false,
@@ -145,7 +145,7 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const list = variables.map(i => {
+		const list = subcommands.map(i => {
 			let names = i.name;
 			if (i.aliases.length > 0) {
 				names += `(${i.aliases.join(", ")})`;

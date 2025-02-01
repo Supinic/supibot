@@ -1,9 +1,12 @@
-module.exports = {
+import faceitData from "./faceit-data.json" with { type: "json" };
+const { maxPointsPerGame, skillLevelRanges } = faceitData;
+
+export default {
 	name: "elo",
 	aliases: ["rating"],
-	getDescription: (prefix) => [
-		`<code>${prefix}faceit elo (user)</code>`,
-		`<code>${prefix}faceit elo s1mple</code>`,
+	description: [
+		`<code>$faceit elo (user)</code>`,
+		`<code>$faceit elo s1mple</code>`,
 		"Checks the provided user's current rating (elo), level and potential change next game."
 	],
 	execute: async (context, user) => {
@@ -40,8 +43,6 @@ module.exports = {
 				reply: `That player has no CS:GO data on FACEIT!`
 			};
 		}
-
-		const { maxPointsPerGame, skillLevelRanges } = require("./faceit-data.json");
 
 		const elo = gameData.faceit_elo;
 		const skillLevel = gameData.skill_level;

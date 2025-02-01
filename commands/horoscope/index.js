@@ -1,4 +1,6 @@
-module.exports = {
+import zodiacData from "./zodiac.json" with { type: "json" };
+
+export default {
 	Name: "horoscope",
 	Aliases: null,
 	Author: "supinic",
@@ -10,7 +12,6 @@ module.exports = {
 	Code: (async function horoscope (context, inputZodiacName) {
 		let zodiacName = null;
 		let own = false;
-		const zodiacData = require("./zodiac.json");
 
 		if (inputZodiacName) {
 			const lowerInput = inputZodiacName.toLowerCase().trim();
@@ -93,7 +94,6 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async (prefix) => {
-		const zodiacData = require("./zodiac.json");
 		const zodiacSignList = zodiacData.map(i => {
 			const { start, end, name } = i;
 			const startString = new sb.Date(2022, ...start).format("F jS");

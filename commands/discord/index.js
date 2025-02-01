@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "discord",
 	Aliases: null,
 	Author: "supinic",

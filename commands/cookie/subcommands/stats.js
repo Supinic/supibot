@@ -1,6 +1,6 @@
-const CookieStatistics = require("../../statistics/types/cookie-count.js");
+import CookieStatistics from "../../statistics/definitions/cookie-count.js";
 
-module.exports = {
+export default {
 	name: "stats",
 	aliases: ["statistics"],
 	description: [

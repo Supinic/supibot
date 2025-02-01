@@ -1,39 +1,27 @@
-const WebSocket = require("ws");
+import WebSocket from "ws";
+import { randomBytes } from "node:crypto";
+import Template from "./template.js";
+import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
 
-const {
-	assignWebsocketToConduit,
-	createChannelChatMessageSubscription,
-	createWhisperMessageSubscription,
-	// createChannelSubSubscription,
-	// createChannelResubSubscription,
-	// createChannelRaidSubscription,
-	createChannelOnlineSubscription,
-	createChannelOfflineSubscription,
-	getExistingSubscriptions,
-	getConduitId,
-	getAppAccessToken,
-	emitRawUserMessageEvent,
-	getActiveUsernamesInChannel,
-	populateUserChannelActivity,
-	initTokenCheckInterval,
-	initSubCacheCheckInterval,
-	sanitizeMessage
-} = require("./twitch-utils.js");
-
-const { TWITCH_ADMIN_SUBSCRIBER_LIST } = require("../utils/shared-cache-keys.json");
+import TwitchUtils from "./twitch-utils.js";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
 // eslint-disable-next-line no-bitwise
 const SEVEN_TV_ZERO_WIDTH_FLAG = (1 << 8);
 
+const { TWITCH_ADMIN_SUBSCRIBER_LIST } = cacheKeys;
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
 const WRITE_MODE_MESSAGE_DELAY = 1500;
 const NO_EVENT_RECONNECT_TIMEOUT = 10000; // @todo move to config
 const LIVE_STREAMS_KEY = "twitch-live-streams";
 const TWITCH_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
-const BAD_MESSAGE_RESPONSE = "A message that was about to be posted violated this channel's moderation settings.";
 const MESSAGE_MODERATION_CODES = new Set(["channel_settings", "automod_held"]);
+
+const BAD_MESSAGE_RESPONSE = "A message that was about to be posted violated this channel's moderation settings.";
+const PRIVATE_COMMAND_FILTERED_RESPONSE = "That command is not available via private messages.";
+const PRIVATE_COMMAND_UNRELATED_RESPONSE = "No valid command provided!";
+const PRIVATE_COMMAND_NO_COMMAND_RESPONSE = "That command does not exist.";
 
 const DEFAULT_LOGGING_CONFIG = {
 	bits: false,
@@ -80,7 +68,7 @@ const DEFAULT_PLATFORM_CONFIG = {
 	unrelatedPrivateMessageResponse: ""
 };
 
-module.exports = class TwitchPlatform extends require("./template.js") {
+export default class TwitchPlatform extends Template {
 	supportsMeAction = true;
 	dynamicChannelAddition = true;
 
@@ -91,7 +79,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	#userCommandSpamPrevention = new Map();
 	#unsuccessfulRenameChannels = new Set();
 
-	debug = require("./twitch-utils.js");
+	debug = TwitchUtils;
 
 	constructor (config) {
 		super("twitch", config, {
@@ -117,9 +105,9 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			});
 		}
 
-		await initTokenCheckInterval();
-		await getAppAccessToken();
-		await getConduitId();
+		await TwitchUtils.initTokenCheckInterval();
+		await TwitchUtils.getAppAccessToken();
+		await TwitchUtils.getConduitId();
 
 		const ws = new WebSocket(options.url ?? TWITCH_WEBSOCKET_URL);
 		ws.on("message", (data) => this.handleWebsocketMessage(data));
@@ -127,11 +115,11 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		this.client = ws;
 
 		if (!options.skipSubscriptions) {
-			const existingSubs = await getExistingSubscriptions(false);
+			const existingSubs = await TwitchUtils.getExistingSubscriptions(false);
 
 			const existingWhisperSub = existingSubs.some(i => i.type === "user.whisper.message");
 			if (!existingWhisperSub) {
-				await createWhisperMessageSubscription(this.selfId);
+				await TwitchUtils.createWhisperMessageSubscription(this.selfId);
 			}
 
 			const existingChannels = existingSubs.filter(i => i.type === "channel.chat.message");
@@ -149,7 +137,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 			}
 		}
 
-		initSubCacheCheckInterval();
+		TwitchUtils.initSubCacheCheckInterval();
 
 		const { channels, string } = this.config.reconnectAnnouncement;
 		for (const channel of channels) {
@@ -167,7 +155,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		switch (metadata.message_type) {
 			case "session_welcome": {
 				const sessionId = payload.session.id;
-				await assignWebsocketToConduit(sessionId);
+				await TwitchUtils.assignWebsocketToConduit(sessionId);
 				break;
 			}
 
@@ -521,7 +509,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		} = event;
 
 		const messageData = {
-			text: sanitizeMessage(event.message.text),
+			text: TwitchUtils.sanitizeMessage(event.message.text),
 			/** @type {TwitchMessageFragment[]} */
 			fragments: event.message.fragments,
 			type: event.message_type, // text, channel_points_highlighted, channel_points_sub_only, user_intro, animated, power_ups_gigantified_emote
@@ -536,7 +524,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserId });
 
 		if (!userData) {
-			emitRawUserMessageEvent(senderUsername, channelName, messageData);
+			TwitchUtils.emitRawUserMessageEvent(senderUsername, channelName, messageData);
 			return;
 		}
 		else if (userData.Twitch_ID === null && userData.Discord_ID !== null) {
@@ -603,7 +591,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 				}
 			}
 
-			emitRawUserMessageEvent(senderUsername, channelName, messageData);
+			TwitchUtils.emitRawUserMessageEvent(senderUsername, channelName, messageData);
 
 			return;
 		}
@@ -655,7 +643,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		await Promise.all([
 			sb.AwayFromKeyboard.checkActive(userData, channelData),
 			sb.Reminder.checkActive(userData, channelData),
-			populateUserChannelActivity(userData, channelData)
+			TwitchUtils.populateUserChannelActivity(userData, channelData)
 		]);
 
 		// Mirror messages to a linked channel, if the channel has one
@@ -754,7 +742,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 		this.resolveUserMessage(null, userData, message);
 
 		if (!sb.Command.is(message)) {
-			const noCommandMessage = this.config.privateMessageResponseUnrelated ?? "No command provided!";
+			const noCommandMessage = this.config.privateMessageResponseUnrelated ?? PRIVATE_COMMAND_UNRELATED_RESPONSE;
 			await this.pm(noCommandMessage, senderUsername);
 			return;
 		}
@@ -770,10 +758,12 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 		if (!result || !result.success) {
 			if (!result?.reply && result?.reason === "filter") {
-				await this.pm(this.config.privateMessageResponseFiltered, senderUsername);
+				const filteredMessage = this.config.privateMessageResponseFiltered ?? PRIVATE_COMMAND_FILTERED_RESPONSE;
+				await this.pm(filteredMessage, senderUsername);
 			}
 			else if (result?.reason === "no-command") {
-				await this.pm(this.config.privateMessageResponseNoCommand, senderUsername);
+				const noCommandResponse = this.config.privateMessageResponseNoCommand ?? PRIVATE_COMMAND_NO_COMMAND_RESPONSE;
+				await this.pm(noCommandResponse, senderUsername);
 			}
 		}
 	}
@@ -1260,7 +1250,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 	}
 
 	async populateUserList (channelData) {
-		return await getActiveUsernamesInChannel(channelData);
+		return await TwitchUtils.getActiveUsernamesInChannel(channelData);
 	}
 
 	fetchInternalPlatformIDByUsername (userData) {
@@ -1285,9 +1275,9 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 	async joinChannel (channelId) {
 		return await Promise.all([
-			createChannelChatMessageSubscription(this.selfId, channelId, this),
-			createChannelOnlineSubscription(channelId),
-			createChannelOfflineSubscription(channelId)
+			TwitchUtils.createChannelChatMessageSubscription(this.selfId, channelId, this),
+			TwitchUtils.createChannelOnlineSubscription(channelId),
+			TwitchUtils.createChannelOfflineSubscription(channelId)
 		]);
 	}
 
@@ -1358,9 +1348,7 @@ module.exports = class TwitchPlatform extends require("./template.js") {
 
 	static async createAccountChallenge (userData, twitchID) {
 		const row = await sb.Query.getRow("chat_data", "User_Verification_Challenge");
-		const challenge = require("node:crypto")
-			.randomBytes(16)
-			.toString("hex");
+		const challenge = randomBytes(16).toString("hex");
 
 		row.setValues({
 			User_Alias: userData.ID,

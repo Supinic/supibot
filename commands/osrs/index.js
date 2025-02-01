@@ -1,4 +1,9 @@
-module.exports = {
+import subcommands from "./subcommands/index.js";
+import gameData from "./game-data.json" with { type: "json" };
+
+const { activities, activityAliases, skills } = gameData;
+
+export default {
 	Name: "osrs",
 	Aliases: null,
 	Author: "supinic",
@@ -23,7 +28,6 @@ module.exports = {
 			};
 		}
 
-		const subcommands = require("./subcommands");
 		const input = first.toLowerCase();
 
 		let subcommand = subcommands.find(i => i.name === input || i.aliases.includes(input));
@@ -35,7 +39,6 @@ module.exports = {
 		return await subcommand.execute.call(this, context, ...args);
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const subcommands = require("./subcommands");
 		const subcommandsDescription = subcommands.flatMap(i => [
 			`<h6>${i.title}</h6>`,
 			"",
@@ -43,7 +46,6 @@ module.exports = {
 			""
 		]);
 
-		const { activities, activityAliases, skills } = require("./game-data.json");
 		const aliases = [];
 		for (const [key, value] of Object.entries(activityAliases)) {
 			aliases.push({

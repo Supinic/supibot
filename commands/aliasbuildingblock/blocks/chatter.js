@@ -1,7 +1,7 @@
 const BASE_CACHE_KEY = "abb-chatter";
 const getCooldownKey = (userData, channelData) => `${BASE_CACHE_KEY}-${userData.ID}-${channelData.ID}`;
 
-module.exports = {
+export default {
 	name: "chatter",
 	aliases: [],
 	description: "Selects a random chatter within the channel, and outputs their name. Not applicable in PMs. Use the \"excludeSelf:true\" parameter to exclude yourself from the random chatter roll. If you want to not appear in the results, use the \"$set noAbbChatter\" command.",

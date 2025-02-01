@@ -1,6 +1,6 @@
-const { fetchGeoLocationData } = require("../../../utils/command-utils.js");
+import { fetchGeoLocationData } from "../../../utils/command-utils.js";
 
-module.exports = {
+export default {
 	name: "location",
 	aliases: [],
 	parameter: "arguments",

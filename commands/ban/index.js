@@ -13,7 +13,7 @@ const NO_RESPONSE_FILTER_TYPES = new Set([
 	"Offline-only"
 ]);
 
-module.exports = {
+export default {
 	Name: "ban",
 	Aliases: ["unban"],
 	Author: "supinic",

@@ -21,7 +21,7 @@ const EIGHT_BALL_RESPONSES = [
 	"😦 Very doubtful."
 ];
 
-module.exports = {
+export default {
 	Name: "8ball",
 	Aliases: null,
 	Author: "supinic",

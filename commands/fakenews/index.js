@@ -1,8 +1,11 @@
+import templates from "./templates.json" with { type: "json" };
+const { headlines, parts } = templates;
+
 const REPEATS = 5;
 const MAXIMUM_REPLACEMENTS = 10;
 const headlinesRepeatArray = [];
 
-module.exports = {
+export default {
 	Name: "fakenews",
 	Aliases: null,
 	Author: "supinic",
@@ -12,7 +15,6 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function fakeNews () {
-		const { headlines, parts } = require("./templates.json");
 		const eligibleHeadlines = headlines.filter(i => !headlinesRepeatArray.includes(i));
 
 		let headline = sb.Utils.randArray(eligibleHeadlines);

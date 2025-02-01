@@ -1,7 +1,6 @@
-const loadDefinitions = require("./statistics.js");
-const definitions = loadDefinitions();
+import definitions from "./definitions/index.js";
 
-module.exports = {
+export default {
 	Name: "statistics",
 	Aliases: ["stat","stats"],
 	Author: "supinic",
@@ -23,7 +22,7 @@ module.exports = {
 		}
 
 		type = type.toLowerCase();
-		const target = definitions.find(i => i.name === type || i.aliases.includes(type));
+		const target = definitions.find(i => i.name === type || i.aliases?.includes(type));
 		if (!target) {
 			return {
 				reply: "Unrecognized statistics type provided!",

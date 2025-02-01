@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "suggestion",
 	aliases: ["suggest", "suggestions"],
 	parameter: "ID",

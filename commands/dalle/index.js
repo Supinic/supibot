@@ -1,4 +1,8 @@
-module.exports = {
+import { createHash } from "node:crypto";
+import createEmbeds from "./discord-embed.js";
+import Pending from "./pending.js";
+
+export default {
 	Name: "dalle",
 	Aliases: [],
 	Author: "supinic",
@@ -44,8 +48,6 @@ module.exports = {
 		"Posts a random image set that someone has created before."
 	]),
 	Code: (async function dallE (context, ...args) {
-		const { createEmbeds } = require("./discord-embed.js");
-
 		if (context.params.search || context.params.random || context.params.id) {
 			const { id, random, search } = context.params;
 			const image = await sb.Query.getRecordset(rs => rs
@@ -93,7 +95,6 @@ module.exports = {
 			};
 		}
 
-		const pending = require("./pending.js");
 		const query = args.join(" ");
 		if (!query) {
 			return {
@@ -102,7 +103,7 @@ module.exports = {
 			};
 		}
 
-		const pendingResult = pending.check(context.user, context.channel);
+		const pendingResult = Pending.check(context.user, context.channel);
 		if (!pendingResult.success) {
 			return pendingResult;
 		}
@@ -124,7 +125,7 @@ module.exports = {
 			? `${context.user.Name},`
 			: "";
 
-		pending.set(context.user, context.channel);
+		Pending.set(context.user, context.channel);
 
 		const notificationTimeout = setTimeout(async (timeoutContext) => {
 			await timeoutContext.sendIntermediateMessage(sb.Utils.tag.trim `
@@ -152,14 +153,14 @@ module.exports = {
 			throwHttpErrors: false
 		});
 
-		pending.unset(context.user, context.channel);
+		Pending.unset(context.user, context.channel);
 
 		const nanoExecutionTime = process.hrtime.bigint() - start;
 		if (response.statusCode !== 200) {
 			clearTimeout(notificationTimeout);
 
 			if (response.statusCode === 429 || response.statusCode === 503) {
-				pending.setOverloaded();
+				Pending.setOverloaded();
 				return {
 					success: false,
 					reply: `The service is currently overloaded! Try again later. (status code ${response.statusCode})`
@@ -175,7 +176,7 @@ module.exports = {
 		}
 
 		const { images } = response.body;
-		const hash = require("node:crypto").createHash("sha512");
+		const hash = createHash("sha512");
 		for (const base64Image of images) {
 			hash.update(base64Image);
 		}

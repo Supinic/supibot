@@ -1,4 +1,4 @@
-const { getLinkParser } = require("../../../utils/link-parser.js");
+import getLinkParser from "../../../utils/link-parser.js";
 
 const fetchTrackIDs = async (tracks) => {
 	const linkParser = await getLinkParser();
@@ -43,7 +43,7 @@ const updateTrackFavouriteStatus = async (context, IDs, status) => {
 	}
 };
 
-module.exports = {
+export default {
 	name: "trackfavourite",
 	aliases: ["tf", "track-fav", "trackfavorite", "track-favourite", "track-favorite"],
 	parameter: "arguments",

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "Bun",
 	aliases: [],
 	notes: "Posts new Bun blogposts whenever one is published",

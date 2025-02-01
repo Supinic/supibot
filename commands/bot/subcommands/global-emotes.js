@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "global-emotes",
 	aliases: ["enable-global-emotes", "disable-global-emotes"],
 	description: [

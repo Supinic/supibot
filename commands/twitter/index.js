@@ -21,7 +21,7 @@ const extractMediaLinks = (mediaEntities) => {
 	return result;
 };
 
-module.exports = {
+export default {
 	Name: "twitter",
 	Aliases: ["tweet"],
 	Author: "supinic",

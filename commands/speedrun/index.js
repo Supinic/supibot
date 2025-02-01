@@ -10,7 +10,7 @@ const speedrunGot = (...args) => {
 	return speedrunGotInstance(...args);
 };
 
-module.exports = {
+export default {
 	Name: "speedrun",
 	Aliases: null,
 	Author: "supinic",

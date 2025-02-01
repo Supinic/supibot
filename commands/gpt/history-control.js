@@ -79,7 +79,7 @@ const dump = async (userData) => {
 	}
 };
 
-module.exports = {
+export default {
 	add,
 	imageAdd,
 	get,

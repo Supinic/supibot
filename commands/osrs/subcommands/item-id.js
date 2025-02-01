@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "itemid",
 	title: "Item IDs",
 	aliases: ["item-id"],

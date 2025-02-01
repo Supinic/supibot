@@ -1,8 +1,10 @@
+import LeagueDefinition from "./league/index.js";
+
 const GAMES = {
-	league: require("./league")
+	league: LeagueDefinition
 };
 
-module.exports = {
+export default {
 	Name: "moba",
 	Aliases: ["league", "dota"],
 	Author: "supinic",

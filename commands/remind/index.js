@@ -1,4 +1,4 @@
-const { fetchTimeData, parseChrono } = require("../../utils/command-utils.js");
+import { fetchTimeData, parseChrono } from "../../utils/command-utils.js";
 
 const MESSAGE_LIMIT = 2000;
 const MAXIMUM_SQL_TIMESTAMP = 253_402_297_199_999; // SQL DATETIME limit - 9999-12-31 23:59:59.999
@@ -11,7 +11,7 @@ const ERROR_REASONS = {
 	"private-outgoing": "You have too many private reminders pending!"
 };
 
-module.exports = {
+export default {
 	Name: "remind",
 	Aliases: ["notify","remindme","remindprivate","privateremind"],
 	Author: "supinic",

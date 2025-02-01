@@ -1,9 +1,10 @@
-const config = require("../config.json");
-const { vlcBaseUrl, vlcPassword, vlcPort, vlcUrl, vlcUsername } = config.local ?? {};
+import VLCClient from "./vlc-client.js";
+import getLinkParser from "../utils/link-parser.js";
+import config from "../config.json" with { type: "json" };
+import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
 
-const VLCClient = require("./vlc-client.js");
-const { getLinkParser } = require("../utils/link-parser.js");
-const { SONG_REQUESTS_VLC_PAUSED } = require("../utils/shared-cache-keys.json");
+const { SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
+const { vlcBaseUrl, vlcPassword, vlcPort, vlcUrl, vlcUsername } = config.local ?? {};
 
 const actions = [
 	"addToQueue",
@@ -30,7 +31,7 @@ const actions = [
 /**
  * VideoLANConnector (VLC) handler module - handles a VLC instance's playlist and methods.
  */
-module.exports = class VLCSingleton {
+export default class VLCSingleton {
 	/**
 	 * @todo fit this call in the supibot repository after the migration is completed
 	 */

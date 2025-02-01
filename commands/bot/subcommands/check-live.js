@@ -3,7 +3,7 @@ const LIVE_STRING = {
 	false: "offline"
 };
 
-module.exports = {
+export default {
 	name: "check-live",
 	aliases: [],
 	description: [

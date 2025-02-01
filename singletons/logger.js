@@ -1,6 +1,6 @@
-const { CronJob } = require("cron");
+import { CronJob } from "cron";
 
-const config = require("../config.json");
+import config from "../config.json" with { type: "json" };
 const { logging } = config;
 
 const notified = {
@@ -14,7 +14,7 @@ const FALLBACK_WARN_LIMIT = 2500;
  * Logging module that handles all possible chat message and video logging.
  * Accesses the database so that nothing needs to be exposed in chat clients.
  */
-module.exports = class LoggerSingleton {
+export default class LoggerSingleton {
 	#crons = [];
 	#presentTables = null;
 	#lastSeenUserMap = new Map();

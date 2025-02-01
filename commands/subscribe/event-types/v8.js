@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "V8",
 	aliases: [],
 	notes: "V8 versions",

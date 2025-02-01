@@ -1,4 +1,4 @@
-module.exports = class ClassTemplate {
+export default class ClassTemplate {
 	static importable = false;
 
 	static uniqueIdentifier;

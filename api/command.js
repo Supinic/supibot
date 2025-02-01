@@ -1,5 +1,4 @@
-// noinspection JSUnusedGlobalSymbols
-module.exports = {
+export default {
 	prefix: async () => ({
 		statusCode: 200,
 		data: {

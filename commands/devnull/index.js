@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "devnull",
 	Aliases: ["/dev/null","null"],
 	Author: "supinic",

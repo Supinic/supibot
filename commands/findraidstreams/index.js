@@ -1,7 +1,7 @@
 const VIEWER_THRESHOLD = 100;
 const BATCH_SIZE = 100;
 
-module.exports = {
+export default {
 	Name: "findraidstreams",
 	Aliases: ["frs"],
 	Author: "supinic",

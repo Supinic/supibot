@@ -1,4 +1,6 @@
-module.exports = {
+import connectedChannelGroups from "./connected-channels.json" with { type: "json" };
+
+export default {
 	Name: "top",
 	Aliases: null,
 	Author: "supinic",
@@ -52,7 +54,6 @@ module.exports = {
 			}
 		}
 
-		const { connectedChannelGroups } = require("./connected-channels.json");
 		const group = connectedChannelGroups.find(i => i.includes(context.channel.ID));
 		if (group) {
 			for (const channelID of group) {

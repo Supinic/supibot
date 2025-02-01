@@ -1,37 +1,46 @@
-const { api } = require("../config.json");
+import config from "../config.json" with { type: "json" };
+import http from "node:http";
+import https from "node:https";
 
-module.exports = (function () {
-	if (!api.port || typeof api.secure !== "boolean") {
+import AfkDefinition from "./afk.js";
+import ChannelDefinition from "./channel.js";
+import CommandDefinition from "./command.js";
+import FilterDefinition from "./filter.js";
+import HealthDefinition from "./health.js";
+import MetricsDefinition from "./metrics.js";
+import PlatformDefinition from "./platform.js";
+import ReminderDefinition from "./reminder.js";
+import UserDefinition from "./user.js";
+
+const routeDefinitions = {
+	afk: AfkDefinition,
+	channel: ChannelDefinition,
+	command: CommandDefinition,
+	filter: FilterDefinition,
+	health: HealthDefinition,
+	metrics: MetricsDefinition,
+	platform: PlatformDefinition,
+	reminder: ReminderDefinition,
+	user: UserDefinition
+};
+
+export default function initialize () {
+	const { api } = config;
+	if (!api || !api.port || typeof api.secure !== "boolean") {
 		console.warn("Internal API port/security is not configured - internal API will not start");
 		return;
-	}
-
-	const definition = {};
-	const subroutes = [
-		["afk", "afk.js"],
-		["channel", "channel.js"],
-		["command", "command.js"],
-		["filter", "filter.js"],
-		["health", "health.js"],
-		["metrics", "metrics.js"],
-		["platform", "platform.js"],
-		["reminder", "reminder.js"],
-		["user", "user.js"]
-	];
-	for (const [route, file] of subroutes) {
-		definition[route] = require(`./${file}`);
 	}
 
 	const port = api.port;
 	const protocol = (api.secure) ? "https" : "http";
 	const baseURL = `${protocol}://localhost:${port}`;
 
-	const httpInterface = (api.secure) ? require("node:https") : require("node:http");
+	const httpInterface = (api.secure) ? https : http;
 	const server = httpInterface.createServer(async (req, res) => {
 		const url = new URL(req.url, baseURL);
 		const path = url.pathname.split("/").filter(Boolean);
 
-		let target = definition[path[0]];
+		let target = routeDefinitions[path[0]];
 		if (target && path.length === 1) {
 			target = target.index;
 		}
@@ -84,7 +93,7 @@ module.exports = (function () {
 
 	return {
 		server,
-		definition,
+		routeDefinitions,
 		port
 	};
-})();
+};

@@ -1,11 +1,11 @@
-const { randomInt } = require("../../utils/command-utils.js");
+import { randomInt } from "../../utils/command-utils.js";
 
 // Borrowed from https://codepen.io/bobhami/pen/gwAJNp
 const GENIUS_ACCESS_TOKEN = "CXyFeSBw2lAdG41xkuU3LS6a_nwyxwwCz2dCkUohw-rw0C49x2HqP__6_4is5RPx";
 const ALBUM_ID_RANGE = [100, 650_000];
 const MAX_RETRIES = 5;
 
-module.exports = {
+export default {
 	Name: "randomalbum",
 	Aliases: ["ra"],
 	Author: "supinic",

@@ -10,7 +10,7 @@ const VIDEO_TYPE_IDS = {
 	"ivr-video-archive": 26
 };
 
-module.exports = {
+export default {
 	Name: "randomgachi",
 	Aliases: ["rg"],
 	Author: "supinic",

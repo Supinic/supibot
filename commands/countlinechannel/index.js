@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "countlinechannel",
 	Aliases: ["clc"],
 	Author: "supinic",
@@ -21,7 +21,7 @@ module.exports = {
 			.flat("TotalCount")
 			.single()
 		);
-		
+
 		// Works for both `undefined` (no meta rows) and `0` (no lines, but meta rows exist)
 		if (!amount) {
 			return {

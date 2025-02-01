@@ -1,9 +1,9 @@
-const quoteList = require("./kimi.json");
+import quoteList from "./kimi.json" with { type: "json" };
 const MAXIMUM_QUOTE_REPEATS = 10;
 
 const repeatedQuotes = {};
 
-module.exports = {
+export default {
 	name: "kimi",
 	aliases: ["gimi"],
 	description: [

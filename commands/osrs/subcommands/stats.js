@@ -1,7 +1,7 @@
-const OsrsUtils = require("./osrs-utils.js");
-const GameData = require("../game-data.json");
+import OsrsUtils from "./osrs-utils.js";
+import GameData from "../game-data.json" with { type: "json" };
 
-module.exports = {
+export default {
 	name: "stats",
 	title: "Skill levels",
 	aliases: [],

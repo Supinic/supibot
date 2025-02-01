@@ -35,7 +35,7 @@ const validate = async function (server) {
 	return (getResponse.body === slug);
 };
 
-module.exports = async function validateHastebinServer (command, server) {
+export default async function validateHastebinServer (command, server) {
 	const cacheKey = `valid-hastebin-${server}`;
 	let isValid = await command.getCacheData(cacheKey);
 	if (typeof isValid === "boolean") {

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "getprofilepicture",
 	Aliases: ["avatar", "pfp"],
 	Author: "supinic",

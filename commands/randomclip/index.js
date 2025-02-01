@@ -1,7 +1,7 @@
-const { getTwitchGameID } = require("../../utils/command-utils.js");
+import { getTwitchGameID } from "../../utils/command-utils.js";
 const EARLIEST_CLIP_DATE = new Date("2011-01-01");
 
-module.exports = {
+export default {
 	Name: "randomclip",
 	Aliases: ["rc"],
 	Author: "supinic",

@@ -1,8 +1,11 @@
-const { CronJob } = require("cron");
+import { CronJob } from "cron";
+import subscriptions from "./event-types/index.js";
+import { handleGenericSubscription } from "./generic-event.js";
+
 const nameSymbol = Symbol.for("name");
 const definitionSymbol = Symbol.for("definition");
 
-module.exports = {
+export default {
 	Name: "subscribe",
 	Aliases: ["unsubscribe"],
 	Author: "supinic",
@@ -14,12 +17,11 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	initialize: async function () {
-		const rssSubscriptions = require("./event-types/index.js").filter(i => i.generic);
-		const { handleGenericSubscription } = require("./generic-event.js");
+		const genericSubscriptions = subscriptions.filter(i => i.generic);
 
 		this.data.crons = new Set();
 
-		for (const def of rssSubscriptions) {
+		for (const def of genericSubscriptions) {
 			const expression = def.cronExpression ?? "0 */5 * * * *";
 			const cronJob = new CronJob(expression, () => handleGenericSubscription(def));
 
@@ -48,8 +50,7 @@ module.exports = {
 
 		type = type.toLowerCase();
 
-		const eventDefinitions = require("./event-types/index.js");
-		const event = eventDefinitions.find(i => {
+		const event = subscriptions.find(i => {
 			const lowerName = i.name.toLowerCase();
 			const lowerAliases = i.aliases.map(j => j.toLowerCase());
 
@@ -197,8 +198,7 @@ module.exports = {
 		}
 	},
 	Dynamic_Description: async function (prefix) {
-		const types = require("./event-types/index.js");
-		const typesList = types.map(i => sb.Utils.tag.trim `
+		const typesList = subscriptions.map(i => sb.Utils.tag.trim `
 			<li>
 				<code>${i.name}</code>
 				<br>Aliases: ${i.aliases.map(j => `<code>${j}</code>`).join(", ") || "(none)"}

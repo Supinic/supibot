@@ -1,7 +1,7 @@
-const fetchData = require("./worldinfo.js");
+import fetchData from "./worldinfo.js";
 const group = (num) => sb.Utils.groupDigits(num, " ");
 
-module.exports = {
+export default {
 	Name: "corona",
 	Aliases: ["covid"],
 	Author: "supinic",

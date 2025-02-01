@@ -1,8 +1,8 @@
-const LanguageCodes = require("../../utils/languages");
-const OCR_LANGUAGES = require("./ocr-languages.json");
+import LanguageCodes from "../../utils/languages.js";
+import OCR_LANGUAGES from "./ocr-languages.json" with { type: "json" };
 const OCR_LANGUAGE_NAMES = Object.keys(OCR_LANGUAGES).map(i => LanguageCodes.getName(i));
 
-module.exports = {
+export default {
 	Name: "ocr",
 	Aliases: null,
 	Author: "supinic",

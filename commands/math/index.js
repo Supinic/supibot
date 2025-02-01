@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "math",
 	Aliases: ["calculate", "calc"],
 	Author: "supinic",

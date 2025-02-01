@@ -1,6 +1,6 @@
-const LanguageCodes = require("../../../utils/languages");
+import LanguageCodes from "../../../utils/languages.js";
 
-module.exports = {
+export default {
 	name: "language",
 	aliases: ["lang"],
 	parameter: "arguments",

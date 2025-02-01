@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "rejoin",
 	aliases: ["i-will-not-ban-supibot-again"],
 	description: [

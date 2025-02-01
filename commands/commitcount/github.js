@@ -60,6 +60,11 @@ const execute = async (data) => {
 	};
 };
 
-module.exports = {
+export default {
+	name: "github",
+	prettyName: "GitHub",
+	flags: {
+		default: true
+	},
 	execute
 };

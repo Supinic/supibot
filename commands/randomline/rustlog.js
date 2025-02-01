@@ -1,4 +1,4 @@
-const config = require("../../config.json");
+import config from "../../config.json" with { type: "json" };
 const { instances } = config.rustlog;
 
 const instancesCacheKey = "rustlog-supported-channels";
@@ -63,7 +63,7 @@ const getInstance = async function (channelID) {
 	return instance;
 };
 
-const isSupported = async function (channelID) {
+export const isSupported = async function (channelID) {
 	const list = await getSupportedChannelList();
 	if (list === null || Object.keys(list).length === 0) {
 		return null;
@@ -72,7 +72,7 @@ const isSupported = async function (channelID) {
 	return list.includes(channelID);
 };
 
-const getRandomChannelLine = async function (channelID) {
+export const getRandomChannelLine = async function (channelID) {
 	const instance = await getInstance(channelID);
 	const response = await sb.Got.get("GenericAPI")({
 		url: `https://${instance.url}/channelid/${channelID}/random`,
@@ -117,7 +117,7 @@ const getRandomChannelLine = async function (channelID) {
 	};
 };
 
-const getRandomUserLine = async function (channelID, userID) {
+export const getRandomUserLine = async function (channelID, userID) {
 	const instance = await getInstance(channelID);
 	const response = await sb.Got.get("GenericAPI")({
 		url: `https://${instance.url}/channelid/${channelID}/userid/${userID}/random`,
@@ -155,7 +155,7 @@ const getRandomUserLine = async function (channelID, userID) {
 	};
 };
 
-const addChannel = async function (channelID) {
+export const addChannel = async function (channelID) {
 	if (!process.env.API_RUSTLOG_ADMIN_KEY) {
 		return {
 			success: false,
@@ -189,11 +189,4 @@ const addChannel = async function (channelID) {
 			success: true
 		};
 	}
-};
-
-module.exports = {
-	addChannel,
-	isSupported,
-	getRandomChannelLine,
-	getRandomUserLine
 };

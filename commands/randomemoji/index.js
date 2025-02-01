@@ -1,4 +1,4 @@
-const { randomInt } = require("../../utils/command-utils.js");
+import { randomInt } from "../../utils/command-utils.js";
 
 const MAXIMUM_EMOJI_LIMIT = 50;
 const EMOJI_RANGES = [
@@ -27,7 +27,7 @@ const generateEmoji = () => {
 	return string;
 };
 
-module.exports = {
+export default {
 	Name: "randomemoji",
 	Aliases: ["re"],
 	Author: "supinic",

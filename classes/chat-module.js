@@ -1,7 +1,8 @@
-const Channel = require("./channel.js");
-const Platform = require("../platforms/template.js");
+import Channel from "./channel.js";
+import Platform from "../platforms/template.js";
+import Template from "./template.js";
 
-module.exports = class ChatModule extends require("./template.js") {
+export default class ChatModule extends Template {
 	static importable = true;
 	static uniqueIdentifier = "Name";
 
@@ -199,18 +200,7 @@ module.exports = class ChatModule extends require("./template.js") {
 	}
 
 	static async importData (definitions) {
-		const hasConnectorTable = await sb.Query.isTablePresent("chat_data", "Channel_Chat_Module");
-		if (!hasConnectorTable) {
-			console.warn("Cannot load Chat_Module", {
-				reason: "missing-tables",
-				tables: "Channel_Chat_Module"
-			});
-
-			return;
-		}
-
 		const attachmentData = await ChatModule.#fetch();
-
 		for (const definition of definitions) {
 			const chatModule = new ChatModule(definition);
 			ChatModule.data.push(chatModule);

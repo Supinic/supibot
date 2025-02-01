@@ -22,7 +22,7 @@ const ALLOWED_MODES = [
 ];
 const HTML_MODE_LIST = ALLOWED_MODES.map(i => `<li><code>${i.name}</code><br>${i.description}</li><br>`).join("");
 
-module.exports = {
+export default {
 	name: "banphrase-api",
 	aliases: ["api", "banphrase"],
 	description: [

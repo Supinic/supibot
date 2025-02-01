@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "countlinetotal",
 	Aliases: ["clt"],
 	Author: "supinic",

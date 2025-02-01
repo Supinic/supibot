@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "knowyourmeme",
 	Aliases: ["kym"],
 	Author: "supinic",

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "randomfilm",
 	Aliases: ["rf"],
 	Author: "supinic",

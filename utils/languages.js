@@ -1,11 +1,12 @@
+import languages from "./languages-data.json" with { type: "json" };
+
 /**
  * Transformed to ES6 syntax by @supinic
  * Generated from https://translate.google.com *
  * The languages that Google Translate supports (as of 5/15/16) alongside with their ISO 639-1 codes
  * See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
  */
-module.exports = (function () {
-	const languages = require("./languages-data.json");
+export default (function () {
 	const compileNameList = (lang) => [
 		...Object.values(lang.names.english),
 		...Object.values(lang.names.native),

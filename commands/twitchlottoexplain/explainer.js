@@ -1,5 +1,7 @@
-const detectionsData = require("../twitchlotto/detections.json");
-const coloursData = Object.values(require("./colours.json"));
+import detectionsData from "../twitchlotto/detections.json" with { type: "json" };
+import colours from "./colours.json" with { type: "json" };
+
+const coloursData = Object.values(colours);
 
 // {"detections":[{"confidence":0.97,"bounding_box":[196,483,417,371],"name":"Female Breast - Exposed"},{"confidence":0.97,"bounding_box":[612,479,424,373],"name":"Female Breast - Exposed"}],"nsfw_score":0.9997066855430603,"explainLink":"https://i.imgur.com/Dlvy5dV.jpg"}
 const explainDetections = (data) => {
@@ -16,6 +18,6 @@ const explainDetections = (data) => {
 	return result;
 };
 
-module.exports = {
+export default {
 	explainDetections
 };

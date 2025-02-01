@@ -1,11 +1,11 @@
-const weapons = require("./weapons.json");
+import weapons from "./weapons.json" with { type: "json" };
 
 // This definitely has to be turned into a standard subcommand structure once it gets expanded
 // I'm only leaving the definition like this because $tf2 only has one subcommand (for now).
 const SUBCOMMAND_NAMES = ["roll"].join(", ");
 const TEAM_FORTRESS_CLASSES = ["Scout", "Pyro", "Soldier", "Heavy", "Demoman", "Medic", "Spy", "Engineer", "Sniper"];
 
-module.exports = {
+export default {
 	Name: "tf2",
 	Aliases: null,
 	Author: "supinic",

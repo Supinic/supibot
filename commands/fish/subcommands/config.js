@@ -23,7 +23,7 @@ const discordReactionReplies = {
 	all: `I will now react to all messages instead of replying to any kind of fishing.`
 };
 
-module.exports = {
+export default {
 	name: "config",
 	aliases: ["setup"],
 	description: [

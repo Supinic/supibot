@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "repeat",
 	aliases: [],
 	description: "For the provided word or words, they will be repeated up to provided amount of times",

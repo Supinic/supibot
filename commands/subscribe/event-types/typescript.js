@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "Typescript",
 	aliases: ["typescript", "ts"],
 	notes: "Every five minutes, Supibot checks new devblogs on Microsoft's Typescript website. If a new article is detected, you will be notified in the channel you subscribed in.",

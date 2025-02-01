@@ -1,13 +1,13 @@
-const GptCache = require("./cache-control.js");
-const GptConfig = require("./config.json");
-const GptMetrics = require("./metrics.js");
-const GptModeration = require("./moderation.js");
+import GptCache from "./cache-control.js";
+import GptConfig from "./config.json" with { type: "json" };
+import GptMetrics from "./metrics.js";
+import GptModeration from "./moderation.js";
 
-const GptTemplate = require("./gpt-template.js");
-const GptOpenAI = require("./gpt-openai.js");
-const GptNexra = require("./gpt-nexra.js");
-const GptNexraComplements = require("./gpt-nexra-complements.js");
-const GptDeepInfra = require("./gpt-deepinfra.js");
+import GptTemplate from "./gpt-template.js";
+import GptOpenAI from "./gpt-openai.js";
+import GptNexra from "./gpt-nexra.js";
+import GptNexraComplements from "./gpt-nexra-complements.js";
+import GptDeepInfra from "./gpt-deepinfra.js";
 
 const handlerMap = {
 	openai: GptOpenAI,
@@ -18,7 +18,7 @@ const handlerMap = {
 
 let isLogTablePresent = null;
 
-module.exports = {
+export default {
 	Name: "gpt",
 	Aliases: ["chatgpt"],
 	Author: "supinic",
@@ -226,12 +226,11 @@ module.exports = {
 		return result;
 	}),
 	Dynamic_Description: (async (prefix) => {
-		const ChatGptConfig = require("./config.json");
-		const { regular, subscriber } = ChatGptConfig.userTokenLimits;
-		const { outputLimit } = ChatGptConfig;
+		const { regular, subscriber } = GptConfig.userTokenLimits;
+		const { outputLimit } = GptConfig;
 
 		let defaultModelName = "N/A";
-		const modelListHTML = Object.entries(ChatGptConfig.models).map(([name, modelData]) => {
+		const modelListHTML = Object.entries(GptConfig.models).map(([name, modelData]) => {
 			let isDefaultEmoji = "❌";
 			if (modelData.default) {
 				defaultModelName = name;
@@ -310,7 +309,7 @@ module.exports = {
 			`Temperature is more-or-less understood to be "wildness" or "creativity" of the input.`,
 			"The lower the value, the more predictable, but factual the response is.",
 			"The higher the value, the more creative, unpredictable and wild the response becomes.",
-			`By default, the temperature value is <code>${ChatGptConfig.defaultTemperature}</code>.`,
+			`By default, the temperature value is <code>${GptConfig.defaultTemperature}</code>.`,
 			"",
 
 			"<b>Important:</b> Only temperature values between 0.0 and 1.0 are guaranteed to give you proper replies.",

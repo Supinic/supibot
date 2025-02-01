@@ -1,4 +1,6 @@
-module.exports = {
+import { getFacebookAppID, resetFacebookAppID } from "./instagram-api.js";
+
+export default {
 	Name: "randominstagram",
 	Aliases: ["rig"],
 	Author: "supinic",
@@ -22,7 +24,6 @@ module.exports = {
 
 		let statusCode;
 		let data;
-		const { getFacebookAppID, resetFacebookAppID } = require("./instagram-api.js");
 		const profileCacheData = await this.getCacheData({ user });
 		if (profileCacheData) {
 			statusCode = profileCacheData.statusCode;

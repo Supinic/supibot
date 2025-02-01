@@ -8,7 +8,7 @@
  * })
  */
 
-module.exports = {
+export default {
 	Name: "botsubs",
 	Aliases: null,
 	Author: "supinic",

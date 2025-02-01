@@ -1,7 +1,8 @@
-const { searchYoutube } = require("../../utils/command-utils.js");
-const { zones } = require("./game-data.json");
+import { searchYoutube } from "../../utils/command-utils.js";
+import gameData from "./game-data.json" with { type: "json" };
+const { zones } = gameData;
 
-const config = require("../../config.json");
+import config from "../../config.json" with { type: "json" };
 const { listenerAddress, listenerPort } = config.local ?? {};
 
 const EXTRA_COOLDOWN = 600_000;
@@ -11,7 +12,7 @@ const createURL = (data) => {
 	return `${listenerAddress}:${listenerPort}?necrodancer=${json}`;
 };
 
-module.exports = {
+export default {
 	Name: "necrodancer",
 	Aliases: ["nd","ndr","necrodancerreset"],
 	Author: "supinic",

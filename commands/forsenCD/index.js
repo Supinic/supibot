@@ -1,9 +1,9 @@
-const { tweets } = require("./guy-beahm.json");
+import beahmData from "./guy-beahm.json" with { type: "json" };
 
 const MAXIMUM_REPEATS = 5;
 const previousPosts = [];
 
-module.exports = {
+export default {
 	Name: "forsenCD",
 	Aliases: ["pajaCD"],
 	Author: "supinic",
@@ -13,7 +13,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function forsenCD (context) {
-		const eligibleTweets = tweets.filter(i => !previousPosts.includes(i));
+		const eligibleTweets = beahmData.tweets.filter(i => !previousPosts.includes(i));
 		const post = sb.Utils.randArray(eligibleTweets);
 
 		previousPosts.unshift(post);

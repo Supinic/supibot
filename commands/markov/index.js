@@ -1,14 +1,6 @@
-const fs = require("node:fs").promises;
-const { CronJob } = require("cron");
-
-let config;
-try {
-	config = require("../../config.json");
-}
-catch {
-	console.warn(`Custom config not found, $markov command will use base path "${__dirname}"`);
-	config = { basePath: __dirname };
-}
+import fs from "node:fs/promises";
+import { CronJob } from "cron";
+import config from "../../config.json" with { type: "json" };
 
 const BASE_PATH = config.basePath;
 const MODEL_SIZE_THRESHOLD = 100;
@@ -39,7 +31,7 @@ const updateMarkovWordList = async () => {
 	await Promise.all(promises);
 };
 
-module.exports = {
+export default {
 	Name: "markov",
 	Aliases: null,
 	Author: "supinic",

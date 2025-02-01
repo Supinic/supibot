@@ -1,21 +1,17 @@
 FROM node:latest
 
+RUN corepack enable
 RUN npm install -g typescript
 
-RUN corepack enable
-
 RUN useradd -m supibot
-
 USER supibot
-
-WORKDIR /home/supibot
+WORKDIR /home/project/supibot
 
 COPY --chown=supibot:supibot package.json ./
 COPY --chown=supibot:supibot tsconfig.json ./
-COPY --chown=supibot:supibot yarn.lock ./
 COPY --chown=supibot:supibot .yarnrc.yml ./
 
-RUN yarn
+RUN yarn install
 
 COPY --chown=supibot:supibot master.js ./
 COPY --chown=supibot:supibot init ./init
@@ -33,4 +29,3 @@ COPY --chown=supibot:supibot utils ./utils
 COPY docker-entrypoint.sh /usr/local/bin/
 
 CMD ["docker-entrypoint.sh"]
-

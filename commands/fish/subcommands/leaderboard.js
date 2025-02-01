@@ -1,4 +1,4 @@
-const { itemTypes } = require("./fishing-utils.js");
+import { itemTypes } from "./fishing-utils.js";
 
 const unping = (str) => `${str[0]}\u{E0000}${str.slice(1)}`;
 
@@ -21,7 +21,7 @@ for (const item of itemTypes) {
 	typeProperty[item.name] = [`catch.types.${item.name}`, `${item.name} collectors`];
 }
 
-module.exports = {
+export default {
 	name: "leaderboard",
 	aliases: ["top"],
 	description: [

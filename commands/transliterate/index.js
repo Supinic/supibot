@@ -1,6 +1,6 @@
-const executeTransliteration = require("transliteration").transliterate;
+import { transliterate as executeTransliteration } from "transliteration";
 
-module.exports = {
+export default {
 	Name: "transliterate",
 	Aliases: null,
 	Author: "supinic",

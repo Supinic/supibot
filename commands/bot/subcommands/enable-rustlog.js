@@ -1,4 +1,6 @@
-module.exports = {
+import { addChannel, isSupported } from "../../randomline/rustlog.js";
+
+export default {
 	name: "enable-rustlog",
 	aliases: [],
 	description: [
@@ -16,26 +18,15 @@ module.exports = {
 			};
 		}
 
-		let Rustlog;
-		try {
-			Rustlog = require("../../randomline/rustlog.js");
-		}
-		catch {
-			return {
-				success: false,
-				reply: `Could not load the Rustlog methods module!`
-			};
-		}
-
 		const channelID = channelData.Specific_ID;
-		if (await Rustlog.isSupported(channelID)) {
+		if (await isSupported(channelID)) {
 			return {
 				success: false,
 				reply: `This channel is already added and configured in Rustlog!`
 			};
 		}
 
-		const { reason, success, statusCode } = await Rustlog.addChannel(channelID);
+		const { reason, success, statusCode } = await addChannel(channelID);
 		if (success) {
 			return {
 				reply: sb.Utils.tag.trim `

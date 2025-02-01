@@ -1,9 +1,9 @@
-const copypastaList = require("./copypasta.json");
+import copypastaList from "./copypasta.json" with { type: "json" };
 const MAXIMUM_COPYPASTA_REPEATS = 10;
 
 const repeatedPastas = {};
 
-module.exports = {
+export default {
 	name: "copypasta",
 	aliases: [],
 	description: [

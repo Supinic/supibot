@@ -1,7 +1,8 @@
-const { randomInt } = require("../../utils/command-utils.js");
-const promisify = require("node:util").promisify;
-const exec = promisify(require("node:child_process").exec);
+import { randomInt } from "../../utils/command-utils.js";
+import { promisify } from "node:util";
+import { exec } from "node:child_process";
 
+const shell = promisify(exec);
 const checkLatency = async (callback, ...args) => {
 	try {
 		const start = process.hrtime.bigint();
@@ -15,7 +16,7 @@ const checkLatency = async (callback, ...args) => {
 };
 const switchCharactersMap = { a: "e", e: "i", i: "o", o: "u", u: "y", y: "a" };
 
-module.exports = {
+export default {
 	Name: "ping",
 	Aliases: ["pang","peng","pong","pung","pyng"],
 	Author: "supinic",
@@ -29,7 +30,7 @@ module.exports = {
 	 */
 	Code: async function ping (context) {
 		const [temperatureResult] = await Promise.allSettled([
-			exec("vcgencmd measure_temp")
+			shell("vcgencmd measure_temp")
 		]);
 
 		const temperature = (temperatureResult.value)

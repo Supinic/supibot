@@ -54,6 +54,8 @@ const execute = async (data) => {
 	};
 };
 
-module.exports = {
+export default {
+	name: "gitea",
+	prettyName: "Gitea",
 	execute
 };

@@ -1,6 +1,6 @@
-const CookieLogic = require("../cookie-logic.js");
+import CookieLogic from "../cookie-logic.js";
 
-module.exports = {
+export default {
 	name: "donate",
 	aliases: ["gift", "give"],
 	description: [

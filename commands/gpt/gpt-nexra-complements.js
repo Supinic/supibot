@@ -1,12 +1,11 @@
-const { setTimeout: wait } = require("node:timers/promises");
-
-const GptOpenAI = require("./gpt-openai.js");
-const GptHistory = require("./history-control.js");
+import { setTimeout as wait } from "node:timers/promises";
+import GptOpenAI from "./gpt-openai.js";
+import GptHistory from "./history-control.js";
 
 const NO_YAPPING_PREFIX = "Answer briefly and do not go on any tangents.";
 const STRONG_NO_YAPPING_PREFIX = "Answer very briefly and only what you are being asked for! Do not repeat your answer! Do not go on any tangents.";
 
-module.exports = class GptNexraComplements extends GptOpenAI {
+export default class GptNexraComplements extends GptOpenAI {
 	static async getHistory (context) {
 		const { historyMode } = await GptOpenAI.getHistoryMode(context);
 		return (historyMode === "enabled")

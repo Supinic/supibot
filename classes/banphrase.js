@@ -1,10 +1,12 @@
+import Template from "./template.js";
+import config from "../config.json" with { type: "json" };
+import regexes from "../utils/regexes.js";
+
+const { responses, values } = config;
 const apiDataSymbol = Symbol.for("banphrase-api-data");
 const apiResultSymbol = Symbol("banphrase-api-result");
 const inactiveSymbol = Symbol("banphrase-inactive");
 const AVAILABLE_TYPES = new Set(["API response", "Custom response", "Denial", "Inactive", "Replacement"]);
-
-const { responses, values } = require("../config.json");
-const regexes = require("../utils/regexes.js");
 
 const banphraseConfigData = Object.freeze({
 	massPingBanphraseThreshold: values.massPingBanphraseThreshold,
@@ -36,7 +38,7 @@ class ExternalBanphraseAPI {
 	}
 }
 
-module.exports = class Banphrase extends require("./template.js") {
+export default class Banphrase extends Template {
 	ID;
 	Code;
 	Type;

@@ -1,13 +1,13 @@
-const {
+import {
 	NON_STANDARD_CHAMPION_NAMES,
+	TEAM_POSITIONS_MAP,
 	parseUserIdentifier,
 	getMatchIds,
 	getMatchData,
-	getQueueDescription,
-	TEAM_POSITIONS_MAP
-} = require("./utils.js");
+	getQueueDescription
+} from "./utils.js";
 
-module.exports = {
+export default {
 	name: "lastMatch",
 	aliases: ["last"],
 	description: [

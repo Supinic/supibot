@@ -1,6 +1,6 @@
-const { fetchDriverStandings } = require("../api-wrapper.js");
+import { fetchDriverStandings } from "../api-wrapper.js";
 
-module.exports = {
+export default {
 	name: "driverStandings",
 	aliases: ["wdc"],
 	description: [

@@ -1,4 +1,6 @@
-module.exports = {
+import subcommands from "./subcommands.js";
+
+export default {
 	Name: "check",
 	Aliases: null,
 	Author: "supinic",
@@ -17,9 +19,7 @@ module.exports = {
 			};
 		}
 
-		this.data.subcommands ??= require("./subcommands.js")(this);
-
-		const subcommand = this.data.subcommands.find(i => i.name === type || i.aliases.includes(type));
+		const subcommand = subcommands.find(i => i.name === type || i.aliases?.includes(type));
 		if (!subcommand) {
 			return {
 				success: false,
@@ -30,10 +30,7 @@ module.exports = {
 		return await subcommand.execute(context, identifier);
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const getCommands = require("./subcommands.js");
-
 		// no need to pass the command itself as param, since no subcommands are executed
-		const subcommands = getCommands(null);
 		const list = subcommands.map(i => {
 			const aliases = (i.aliases && i.aliases.length > 0)
 				? ` (${i.aliases.join(", ")})`

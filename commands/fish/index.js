@@ -1,4 +1,6 @@
-module.exports = {
+import subcommands from "./subcommands/index.js";
+
+export default {
 	Name: "fish",
 	Aliases: [],
 	Author: [
@@ -16,7 +18,6 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Code: (async function fish (context, ...args) {
-		const { subcommands } = require("./subcommands/index.js");
 		const [subcommandName, ...rest] = args;
 
 		const subcommand = subcommands.find(i => i.name === subcommandName || i.aliases.includes(subcommandName));
@@ -29,7 +30,6 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async function () {
-		const { subcommands } = require("./subcommands/index.js");
 		const subcommandsDescription = subcommands
 			.sort((a, b) => {
 				if (a.default) {

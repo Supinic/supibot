@@ -1,4 +1,7 @@
-module.exports = {
+import subcommands from "./subcommands/index.js";
+const subcommandNames = subcommands.map(i => i.name);
+
+export default {
 	Name: "faceit",
 	Aliases: null,
 	Author: "supinic",
@@ -14,22 +17,20 @@ module.exports = {
 			});
 		}
 
-		const { names, commands } = require("./subcommands.js");
-		const subcommand = commands.find(i => i.name === subcommandName || i.aliases.includes(subcommandName));
+		const subcommand = subcommands.find(i => i.name === subcommandName || i.aliases?.includes(subcommandName));
 		if (!subcommand) {
 			return {
 				success: false,
-				reply: `Unrecognized subcommand! Use one of: ${names.join(", ")}`
+				reply: `Unrecognized subcommand! Use one of: ${subcommandNames.join(", ")}`
 			};
 		}
 
 		return await subcommand.execute(context, ...args);
 	}),
-	Dynamic_Description: (async function (prefix) {
-		const { commands } = require("./subcommands.js");
-		const commandDescriptions = commands.flatMap(i => [
+	Dynamic_Description: async function () {
+		const commandDescriptions = subcommands.flatMap(i => [
 			`<h6>${i.name}</h6>`,
-			...i.getDescription(prefix),
+			...i.description,
 			""
 		]);
 
@@ -39,5 +40,5 @@ module.exports = {
 
 			...commandDescriptions
 		];
-	})
+	}
 };

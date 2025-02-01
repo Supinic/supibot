@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "githubstatus",
 	Aliases: ["ghs"],
 	Author: "supinic",

@@ -1,4 +1,4 @@
-const { parseRSS } = require("../../../utils/command-utils.js");
+import { parseRSS } from "../../../utils/command-utils.js";
 
 // Currently unused
 const updateViaProRss = async () => {
@@ -53,7 +53,7 @@ const LATEST_STEAM_NEWS_DATE = "brighter-shores-latest-steam-update-date";
 const steamNewsUrl = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/";
 const steamGameId = "2791440";
 
-module.exports = {
+export default {
 	name: "Brighter Shores",
 	aliases: ["BS", "brighter shores"],
 	notes: "Posts update news about Brighter Shores",

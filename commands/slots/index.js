@@ -1,4 +1,6 @@
-module.exports = {
+import { leaderboardKeywords, patterns } from "./definitions.js";
+
+export default {
 	Name: "slots",
 	Aliases: null,
 	Author: "supinic",
@@ -10,8 +12,6 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Code: (async function slots (context, ...args) {
-		const { leaderboardKeywords, patterns } = require("./definitions.js");
-
 		if (leaderboardKeywords.includes(args[0])) {
 			return {
 				reply: "Check out all the previous slots winners here: https://supinic.com/data/slots-winner/leaderboard",
@@ -157,7 +157,6 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { leaderboardKeywords, patterns } = require("./definitions.js");
 		const patternList = [...patterns]
 			.sort((a, b) => a.name.localeCompare(b.name))
 			.map(i => `<li><code>${i.name}</code><br>${i.notes}</li>`)

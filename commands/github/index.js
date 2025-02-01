@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "github",
 	Aliases: null,
 	Author: "supinic",

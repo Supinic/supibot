@@ -1,4 +1,6 @@
-const { subcommands } = require("./subcommands/index.js");
+import subcommands from "./subcommands/index.js";
+import CookieLogic from "./cookie-logic.js";
+
 const subcommandDescriptions = [];
 for (const subcommand of subcommands) {
 	subcommandDescriptions.push(
@@ -7,12 +9,10 @@ for (const subcommand of subcommands) {
 	);
 }
 
-const CookieLogic = require("./cookie-logic");
-
 const defaultSubcommand = subcommands.find(i => i.flags?.defaultOnEmptyInput);
 const subcommandNames = subcommands.map(i => i.name).join(", ");
 
-module.exports = {
+export default {
 	Name: "cookie",
 	Aliases: null,
 	Author: "supinic",

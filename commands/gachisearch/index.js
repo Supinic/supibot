@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "gachisearch",
 	Aliases: ["gs","gsa","gachiauthorsearch"],
 	Author: "supinic",

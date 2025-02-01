@@ -1,14 +1,15 @@
+import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
 const {
 	PLAYSOUNDS_ENABLED,
 	TTS_ENABLED,
 	TTS_MULTIPLE_ENABLED,
 	TTS_TIME_LIMIT,
 	SONG_REQUESTS_STATE
-} = require("../../utils/shared-cache-keys.json");
+} = cacheKeys;
 
 const AVAILABLE_SONG_REQUEST_STATES = new Set(["cytube", "vlc", "off"]);
 
-module.exports = {
+export default {
 	Name: "stream",
 	Aliases: null,
 	Author: "supinic",

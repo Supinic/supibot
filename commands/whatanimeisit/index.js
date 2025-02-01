@@ -1,6 +1,6 @@
-const { uploadToImgur, uploadToNuuls } = require("../../utils/command-utils.js");
+import { uploadToImgur, uploadToNuuls } from "../../utils/command-utils.js";
 
-module.exports = {
+export default {
 	Name: "whatanimeisit",
 	Aliases: ["tracemoe"],
 	Author: "supinic",

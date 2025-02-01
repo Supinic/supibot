@@ -1,5 +1,5 @@
-const GptNexra = require("../gpt/gpt-nexra.js");
-const GptModeration = require("../gpt/moderation.js");
+import GptNexra from "../gpt/gpt-nexra.js";
+import GptModeration from "../gpt/moderation.js";
 
 const RAW_TEXT_REGEX = /^\[(?<date>[\d-\s:]+)]\s+#\w+\s+(?<username>\w+):\s+(?<message>.+?)$/;
 
@@ -102,7 +102,7 @@ const getRustlogLogs = async (channel, limit = 50) => {
 	};
 };
 
-module.exports = {
+export default {
 	Name: "chatsummary",
 	Aliases: ["csum"],
 	Author: "supinic",

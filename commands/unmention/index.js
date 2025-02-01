@@ -1,6 +1,6 @@
-const { handleGenericFilter, parseGenericFilterOptions } = require("../../utils/command-utils.js");
+import { handleGenericFilter, parseGenericFilterOptions } from "../../utils/command-utils.js";
 
-module.exports = {
+export default {
 	Name: "unmention",
 	Aliases: ["remention"],
 	Author: "supinic",

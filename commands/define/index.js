@@ -1,5 +1,7 @@
-const LanguageCodes = require("../../utils/languages");
-module.exports = {
+import LanguageCodes from "../../utils/languages.js";
+import checkPartialCommandFilters from "./check-partials.js";
+
+export default {
 	Name: "define",
 	Aliases: ["def"],
 	Author: "supinic",
@@ -19,7 +21,6 @@ module.exports = {
 			};
 		}
 
-		const { checkPartialCommandFilters } = require("./check-partials.js");
 		const allowedPartials = await checkPartialCommandFilters(context, args);
 
 		let languageCode = "en";

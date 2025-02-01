@@ -97,7 +97,7 @@ const applyParameters = (context, aliasArguments, commandArguments) => {
 	};
 };
 
-module.exports = {
+export default {
 	applyParameters,
 	isRestricted,
 	parseCommandName,

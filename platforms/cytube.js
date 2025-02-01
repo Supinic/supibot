@@ -1,4 +1,6 @@
-let CytubeConnector;
+import Template from "./template.js";
+import CytubeConnector from "cytube-connector";
+
 class CytubeClient {
 	/** @type {CytubeConnector} */
 	client = null;
@@ -20,8 +22,6 @@ class CytubeClient {
 	constructor (channelData, platform) {
 		this.channelData = channelData;
 		this.platform = platform;
-
-		this.initialize();
 	}
 
 	async initialize () {
@@ -31,11 +31,6 @@ class CytubeClient {
 			});
 
 			return;
-		}
-
-		if (!CytubeConnector) {
-			const ConnectorModule = await import("cytube-connector");
-			CytubeConnector = ConnectorModule.default;
 		}
 
 		const client = new CytubeConnector({
@@ -473,7 +468,7 @@ const DEFAULT_PLATFORM_CONFIG = {
 	messageDelayThreshold: 30000
 };
 
-module.exports = class CytubePlatform extends require("./template.js") {
+export default class CytubePlatform extends Template {
 	/** @type {Map<Channel, CytubeClient>} */
 	clients = new Map();
 

@@ -1,4 +1,6 @@
-module.exports = {
+import blocks from "./blocks/index.js";
+
+export default {
 	Name: "aliasbuildingblock",
 	Aliases: ["abb"],
 	Author: "supinic",
@@ -16,7 +18,6 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Code: (async function aliasBuildingBlock (context, type, ...args) {
-		const { blocks } = require("./blocks/index.js");
 		if (!context.append.alias && !context.append.pipe) {
 			if (!type) {
 				return {
@@ -64,7 +65,6 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { blocks } = require("./blocks/index.js");
 		const list = blocks.map(i => {
 			const aliases = (i.aliases.length > 0)
 				? `(${i.aliases.join(", ")})`

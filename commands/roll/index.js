@@ -1,8 +1,8 @@
-const { randomBytes } = require("node:crypto");
-const { roll: diceRoll } = require("@jprochazk/roll-dice");
-const { randomInt } = require("../../utils/command-utils.js");
+import { randomBytes } from "node:crypto";
+import { roll as diceRoll } from "@jprochazk/roll-dice";
+import { randomInt } from "../../utils/command-utils.js";
 
-module.exports = {
+export default {
 	Name: "roll",
 	Aliases: ["dice"],
 	Author: "supinic",

@@ -1,6 +1,6 @@
-const { types, upgrade } = require("./definition.js");
+import { types, upgrade } from "./definition.js";
 
-module.exports = {
+export default {
 	Name: "reload",
 	Aliases: null,
 	Author: "supinic",

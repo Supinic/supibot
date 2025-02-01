@@ -1,3 +1,6 @@
+import config from "./config.json" with { type: "json" };
+import Subreddit from "./subreddit.js";
+
 let redditGotInstance;
 const redditGot = (...args) => {
 	const options = {
@@ -20,7 +23,7 @@ const redditGot = (...args) => {
 	return redditGotInstance(...args);
 };
 
-module.exports = {
+export default {
 	Name: "randommeme",
 	Aliases: ["rm"],
 	Author: "supinic",
@@ -38,13 +41,11 @@ module.exports = {
 		{ name: "skipGalleries", type: "boolean" },
 		{ name: "skipVideos", type: "boolean" }
 	],
+	initialize: function () {
+		this.data.subreddits = {};
+	},
 	Whitelist_Response: null,
 	Code: (async function randomMeme (context, ...args) {
-		const config = require("./config.json");
-		const Subreddit = require("./subreddit.js");
-
-		this.data.subreddits ??= {};
-
 		let safeSpace = false;
 		if (context.platform.Name === "twitch") {
 			if (context.channel) {
@@ -296,7 +297,6 @@ module.exports = {
 		};
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { defaultMemeSubreddits } = require("./config.json");
 		return [
 			"Posts a random Reddit meme. If a subreddit is provided, posts a random non-text post from there.",
 			"",
@@ -314,7 +314,7 @@ module.exports = {
 			`<code>${prefix}rm</code>`,
 			`<code>${prefix}randommeme</code>`,
 			"Posts a random post from one of the default meme subreddits.",
-			`<code>${defaultMemeSubreddits.join(" ")}</code>`,
+			`<code>${config.defaultMemeSubreddits.join(" ")}</code>`,
 			"",
 
 			`<code>${prefix}rm (subreddit)</code>`,

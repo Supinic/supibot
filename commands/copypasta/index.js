@@ -21,7 +21,7 @@ const asciiRegex = /([\u2591\u2588\u2500\u2580\u2593\u2584\u2592])/g;
 const brailleRegex = /[█▄▀░▒▓\u2802-\u28FF]/g;
 const hasAsciiArt = (string) => (asciiRegex.test(string) || brailleRegex.test(string));
 
-module.exports = {
+export default {
 	Name: "copypasta",
 	Aliases: null,
 	Author: "supinic",

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "resumeafk",
 	Aliases: ["rafk","cafk","continueafk"],
 	Author: "supinic",

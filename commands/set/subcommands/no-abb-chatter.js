@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "no-abb-chatter",
 	aliases: [],
 	parameter: "arguments",

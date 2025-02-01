@@ -1,6 +1,18 @@
-const { getPathFromURL, uploadToImgur } = require("../../utils/command-utils.js");
+import { promisify } from "node:util";
+import { exec } from "node:child_process";
+import stream from "node:stream";
+import fs from "node:fs";
 
-module.exports = {
+import { getPathFromURL, uploadToImgur } from "../../utils/command-utils.js";
+import { detections } from "../twitchlotto/definitions.js";
+
+import Explain from "./explainer.js";
+import coloursData from "./colours.json" with { type: "json" };
+
+const pipeline = promisify(stream.pipeline);
+const shell = promisify(exec);
+
+export default {
 	Name: "twitchlottoexplain",
 	Aliases: ["tle"],
 	Author: "supinic",
@@ -34,8 +46,7 @@ module.exports = {
 
 		if (inputLink === "last") {
 			const tl = sb.Command.get("tl");
-			const definitions = require("../twitchlotto/definitions.js");
-			const key = definitions.createRecentUseCacheKey(context);
+			const key = detections.createRecentUseCacheKey(context);
 			const cacheData = await tl.getCacheData(key);
 
 			if (cacheData) {
@@ -48,9 +59,6 @@ module.exports = {
 				};
 			}
 		}
-
-		const Explain = require("./explainer.js");
-		const coloursData = require("./colours.json");
 
 		const link = getPathFromURL(inputLink) ?? inputLink;
 		if (!link) {
@@ -96,12 +104,6 @@ module.exports = {
 				removeEmbeds: true
 			};
 		}
-
-		const { promisify } = require("node:util");
-		const stream = require("node:stream");
-		const pipeline = promisify(stream.pipeline);
-		const shell = promisify(require("node:child_process").exec);
-		const fs = require("node:fs");
 
 		// await shell(`wget https://i.imgur.com/${link} -P /tmp`);
 

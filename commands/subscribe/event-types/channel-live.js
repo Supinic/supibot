@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "Channel live",
 	aliases: ["live", "online"],
 	notes: "Usage: <code>subscribe/unsubscribe live (channel)</code> Every time a channel with Supibot in their chat goes live, users with this subscription for the specific channel will be notified of this via PMs.",

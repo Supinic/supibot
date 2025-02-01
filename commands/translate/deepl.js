@@ -1,4 +1,4 @@
-const LanguageCodes = require("../../utils/languages");
+import LanguageCodes from "../../utils/languages.js";
 const supportedLanguages = [
 	"bg",
 	"cs",
@@ -168,6 +168,6 @@ const execute = async function (context, query) {
 	};
 };
 
-module.exports = {
+export default {
 	execute
 };

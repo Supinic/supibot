@@ -1,4 +1,6 @@
-module.exports = {
+import findPopularSymbol from "./stocks.js";
+
+export default {
 	Name: "stock",
 	Aliases: ["stocks", "stonks"],
 	Author: "supinic",
@@ -14,7 +16,6 @@ module.exports = {
 			});
 		}
 
-		const { findPopularSymbol } = require("./stocks.js");
 		const input = args.join(" ");
 		if (!input) {
 			return {

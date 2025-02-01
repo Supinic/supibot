@@ -64,7 +64,7 @@ const handleAmbassadors = async (type, context, ...args) => {
 	};
 };
 
-module.exports = {
+export default {
 	name: "ambassador",
 	aliases: [],
 	description: `Designates a user as an "Ambassador" in a specific channel, which grants them elevated access to some Supibot commands.`,

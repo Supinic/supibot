@@ -1,7 +1,7 @@
 const DISCORD_UPDATES_ROLE_ID = "748957148439904336";
 const SUPINIC_DISCORD_GUILD_ID = "633342787869212683";
 
-module.exports = {
+export default {
 	Name: "supibotupdates",
 	Aliases: null,
 	Author: "supinic",

@@ -1,10 +1,10 @@
-const config = require("./config.json");
-const Template = require("./gpt-template.js");
-const GptHistory = require("./history-control.js");
+import config from "./config.json" with { type: "json" };
+import Template from "./gpt-template.js";
+import GptHistory from "./history-control.js";
 
 const DEFAULT_SYSTEM_MESSAGE = "Keep the response as short and concise as possible.";
 
-module.exports = class GptOpenAI extends Template {
+export default class GptOpenAI extends Template {
 	static async getHistoryMode (context) {
 		let historyMode = await context.user.getDataProperty("chatGptHistoryMode") ?? config.defaultHistoryMode;
 		if (context.params.history) {

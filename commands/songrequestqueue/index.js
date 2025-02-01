@@ -1,9 +1,7 @@
-const {
-	SONG_REQUESTS_STATE,
-	SONG_REQUESTS_VLC_PAUSED
-} = require("../../utils/shared-cache-keys.json");
+import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+const { SONG_REQUESTS_STATE, SONG_REQUESTS_VLC_PAUSED } = cacheKeys;
 
-module.exports = {
+export default {
 	Name: "songrequestqueue",
 	Aliases: ["srq","queue"],
 	Author: "supinic",

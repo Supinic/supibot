@@ -1,7 +1,7 @@
-const { postToHastebin } = require("../../../utils/command-utils.js");
-const { getLinkParser } = require("../../../utils/link-parser.js");
+import { postToHastebin } from "../../../utils/command-utils.js";
+import getLinkParser from "../../../utils/link-parser.js";
 
-module.exports = {
+export default {
 	name: "check",
 	aliases: ["add"],
 	description: "Checks if your provided link is in the database, and creates a suggestion to add, if it isn't.",

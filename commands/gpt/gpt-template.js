@@ -1,7 +1,8 @@
-const config = require("./config.json");
-const History = require("./history-control.js");
+import { createHash } from "node:crypto";
+import config from "./config.json" with { type: "json" };
+import History from "./history-control.js";
 
-module.exports = class GptTemplate {
+export default class GptTemplate {
 	static checkInputLimits (modelData, queryLength) {
 		if (modelData.inputLimit && queryLength > modelData.inputLimit) {
 			const errorMessages = config.lengthLimitExceededMessage;
@@ -79,7 +80,6 @@ module.exports = class GptTemplate {
 			userPlatformID = "N/A";
 		}
 
-		const { createHash } = require("node:crypto");
 		return createHash("sha1")
 			.update(context.user.Name)
 			.update(context.platform.Name)

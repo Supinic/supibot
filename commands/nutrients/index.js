@@ -1,6 +1,6 @@
-const NUTRIENTS_DATA = require("./nutrients.json");
+import NUTRIENTS_DATA from "./nutrients.json" with { type: "json" };
 
-module.exports = {
+export default {
 	Name: "nutrients",
 	Aliases: null,
 	Author: "supinic",

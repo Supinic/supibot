@@ -1,4 +1,8 @@
-module.exports = {
+import rssNews from "./rss.js";
+import googleNews from "./google-news.js";
+import definitions from "./definitions.json" with { type: "json" };
+
+export default {
 	Name: "news",
 	Aliases: null,
 	Author: "supinic",
@@ -12,9 +16,6 @@ module.exports = {
 	],
 	Whitelist_Response: null,
 	Code: (async function news (context, ...args) {
-		const rssNews = require("./rss.js");
-		const googleNews = require("./google-news.js");
-
 		let input;
 		if (context.params.country) {
 			const value = context.params.country;
@@ -60,7 +61,6 @@ module.exports = {
 		}
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const definitions = require("./definitions.json");
 		const sorted = [...definitions].sort((a, b) => a.code.localeCompare(b.code));
 
 		const extraNews = sorted.map(def => {

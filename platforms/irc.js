@@ -1,4 +1,6 @@
-const IRC = require("irc-framework");
+import IRC from "irc-framework";
+import Template from "./template.js";
+
 const DEFAULT_LOGGING_CONFIG = {
 	messages: true,
 	whispers: false
@@ -6,7 +8,7 @@ const DEFAULT_LOGGING_CONFIG = {
 const DEFAULT_PLATFORM_CONFIG = {};
 const DEFAULT_IRC_PORT = 6667;
 
-module.exports = class IRCPlatform extends require("./template.js") {
+export default class IRCPlatform extends Template {
 	#notifiedUnregisteredUsers = new Set();
 	#nicknameChanged = false;
 

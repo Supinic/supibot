@@ -1,7 +1,7 @@
-const fullWordList = require("./words.json");
+import fullWordList from "./words.json" with { type: "json" };
 const MAXIMUM_WORD_AMOUNT = 10;
 
-module.exports = {
+export default {
 	Name: "randomword",
 	Aliases: ["rw"],
 	Author: "supinic",

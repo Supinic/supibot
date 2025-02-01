@@ -1,7 +1,7 @@
 const url = "https://secure.runescape.com/m=news/latestNews.json?oldschool=1";
 const OSRS_LATEST_ARTICLE_ID = "osrs-last-article-id";
 
-module.exports = {
+export default {
 	name: "OSRS",
 	aliases: [],
 	notes: "Every 5 minutes, Supibot checks for news on the Old School Runescape website. If a new article is detected, you will be notified in the channel you subscribed in.",

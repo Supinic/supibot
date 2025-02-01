@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	Name: "streamgames",
 	Aliases: ["games","sg"],
 	Author: "supinic",

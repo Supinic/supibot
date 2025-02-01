@@ -1,6 +1,6 @@
-const { hasFishedBefore } = require("./fishing-utils.js");
+import { hasFishedBefore } from "./fishing-utils.js";
 
-module.exports = {
+export default {
 	name: "stats",
 	aliases: ["statistics"],
 	description: [

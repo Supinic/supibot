@@ -1,7 +1,7 @@
-const GptOpenAI = require("./gpt-openai.js");
-const GptHistory = require("./history-control.js");
+import GptOpenAI from "./gpt-openai.js";
+import GptHistory from "./history-control.js";
 
-module.exports = class GptDeepInfra extends GptOpenAI {
+export default class GptDeepInfra extends GptOpenAI {
 	static async getHistory (context, query) {
 		const { historyMode } = await GptOpenAI.getHistoryMode(context);
 		const promptHistory = (historyMode === "enabled")

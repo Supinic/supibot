@@ -1,6 +1,6 @@
-const { getPathFromURL } = require("../../utils/command-utils.js");
+import { getPathFromURL } from "../../utils/command-utils.js";
 
-module.exports = {
+export default {
 	Name: "downloadclip",
 	Aliases: ["dlclip"],
 	Author: "supinic",

@@ -1,8 +1,10 @@
-const LanguageCodes = require("../../utils/languages");
-const { locales } = require("./tts-locales.json");
-const { TTS_ENABLED, TTS_MULTIPLE_ENABLED } = require("../../utils/shared-cache-keys.json");
+import LanguageCodes from "../../utils/languages.js";
+import locales from "./tts-locales.json" with { type: "json" };
 
-const config = require("../../config.json");
+import cacheKeys from "../../utils/shared-cache-keys.json" with { type: "json" };
+const { TTS_ENABLED, TTS_MULTIPLE_ENABLED } = cacheKeys;
+
+import config from "../../config.json" with { type: "json" };
 const {
 	listenerAddress,
 	listenerPort,
@@ -11,7 +13,7 @@ const {
 	ttsVolume
 } = config.local ?? {};
 
-module.exports = {
+export default {
 	Name: "texttospeech",
 	Aliases: ["tts"],
 	Author: "supinic",

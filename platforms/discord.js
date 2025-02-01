@@ -1,4 +1,6 @@
-const {
+import { randomBytes } from "node:crypto";
+import Template from "./template.js";
+import {
 	ChannelType,
 	Client,
 	DiscordAPIError,
@@ -7,7 +9,7 @@ const {
 	Partials,
 	PermissionFlagsBits,
 	Routes
-} = require("discord.js");
+} from "discord.js";
 
 const IGNORED_CHANNEL_TYPES = new Set([
 	ChannelType.GuildAnnouncement,
@@ -58,7 +60,7 @@ const fixMarkdown = (text) => {
 	}
 };
 
-module.exports = class DiscordPlatform extends require("./template.js") {
+export default class DiscordPlatform extends Template {
 	#emoteFetchingPromise = null;
 
 	constructor (config) {
@@ -904,7 +906,7 @@ module.exports = class DiscordPlatform extends require("./template.js") {
 
 	static async createAccountChallenge (userData, discordID) {
 		const row = await sb.Query.getRow("chat_data", "User_Verification_Challenge");
-		const challenge = require("node:crypto").randomBytes(16).toString("hex");
+		const challenge = randomBytes(16).toString("hex");
 
 		row.setValues({
 			User_Alias: userData.ID,

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "links",
 	aliases: ["enable-links", "disable-links"],
 	description: [

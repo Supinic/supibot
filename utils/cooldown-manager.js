@@ -1,4 +1,5 @@
-const { values } = require("../config.json");
+import config from "../config.json" with { type: "json" };
+const { values } = config;
 
 class Cooldown {
 	#channel = null;
@@ -227,4 +228,4 @@ class CooldownManager {
 	}
 }
 
-module.exports = CooldownManager;
+export default CooldownManager;

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "Rust",
 	aliases: [],
 	notes: "Every hour, Supibot checks for news on the Rust language RSS. If a new article is detected, you will be notified in the channel you subscribed in.",

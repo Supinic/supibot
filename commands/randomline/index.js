@@ -1,11 +1,12 @@
-const DatabaseLogs = require("./db-randomline.js");
-const Rustlog = require("./rustlog.js");
-const { connectedChannelGroups } = require("./connected-channels.json");
+import DatabaseLogs from "./db-randomline.js";
+import { getRandomChannelLine, getRandomUserLine, isSupported } from "./rustlog.js";
+import connectionData from "./connected-channels.json" with { type: "json" };
+import config from "../../config.json" with { type: "json" };
 
-const config = require("../../config.json");
+const { connectedChannelGroups } = connectionData;
 const { instances } = config.rustlog;
 
-module.exports = {
+export default {
 	Name: "randomline",
 	Aliases: ["rl","rq"],
 	Author: "supinic",
@@ -40,7 +41,7 @@ module.exports = {
 			}
 
 			const channelID = context.channel.Specific_ID;
-			const isChannelSupported = await Rustlog.isSupported(channelID);
+			const isChannelSupported = await isSupported(channelID);
 			if (isChannelSupported === null) {
 				return {
 					success: false,
@@ -82,13 +83,13 @@ module.exports = {
 					};
 				}
 
-				result = await Rustlog.getRandomUserLine(channelID, userID);
+				result = await getRandomUserLine(channelID, userID);
 			}
 			else if (context.params.userID) {
-				result = await Rustlog.getRandomUserLine(channelID, context.params.userID);
+				result = await getRandomUserLine(channelID, context.params.userID);
 			}
 			else {
-				result = await Rustlog.getRandomChannelLine(channelID);
+				result = await getRandomChannelLine(channelID);
 			}
 		}
 		else if (user) {

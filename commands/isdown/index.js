@@ -1,4 +1,6 @@
-module.exports = {
+import { domainToASCII } from "node:url";
+
+export default {
 	Name: "isdown",
 	Aliases: null,
 	Author: "supinic",
@@ -8,7 +10,6 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function isDown (context, input) {
-		const { domainToASCII } = require("node:url");
 		const fixedInput = domainToASCII(input) || input; // domainToASCII returns empty string for invalid input - hence ||
 		if (fixedInput.includes("shouldiblamecaching.com")) {
 			return {

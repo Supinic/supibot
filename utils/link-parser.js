@@ -1,8 +1,10 @@
-const { SOUNDCLOUD_CLIENT_ID } = require("../utils/shared-cache-keys.json");
-const LinkParser = require("track-link-parser");
+import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
+import LinkParser from "track-link-parser";
+
+const { SOUNDCLOUD_CLIENT_ID } = cacheKeys;
 let linkParser;
 
-const getLinkParser = async () => {
+export default async () => {
 	if (!linkParser) {
 		const options = {};
 		if (process.env.API_GOOGLE_YOUTUBE) {
@@ -38,8 +40,4 @@ const getLinkParser = async () => {
 	}
 
 	return linkParser;
-};
-
-module.exports = {
-	getLinkParser
 };

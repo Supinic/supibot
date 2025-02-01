@@ -1,17 +1,13 @@
-const shell = require("node:util").promisify(require("node:child_process").exec);
+import { promisify } from "node:util";
+import { randomBytes } from "node:crypto";
+import { exec } from "node:child_process";
+import path from "node:path";
+import config from "../../config.json" with { type: "json" };
 
-let config;
-try {
-	config = require("../../config.json");
-}
-catch {
-	console.warn(`Custom config not found, $reload command will use base path "${__dirname}"`);
-	config = { basePath: __dirname };
-}
-
+const shell = promisify(exec);
 const BASE_PATH = config.basePath;
 
-const upgrade = async (context, module, name, reloadAll, ...list) => {
+export const upgrade = async (context, module, name, reloadAll, ...list) => {
 	if (!reloadAll && list.length === 0) {
 		return {
 			success: false,
@@ -59,15 +55,11 @@ const upgrade = async (context, module, name, reloadAll, ...list) => {
 					module.invalidateRequireCache(`${BASE_PATH}/${name}`, instanceName);
 				}
 
-				const path = `${BASE_PATH}/${name}/${instanceName}`;
+				const hash = randomBytes(16).toString("hex");
+				const filePath = path.join(BASE_PATH, name, instanceName, `index.js?randomHash=${hash}`);
 				try {
-					if (name === "commands") {
-						definitions.push(require(path));
-					}
-					else {
-						const { definition } = await import(`${path}/index.mjs`);
-						definitions.push(definition);
-					}
+					const dynamicImports = await import(filePath);
+					definitions.push(dynamicImports.default);
 				}
 				catch (e) {
 					result.failed.push({ e, instanceName });
@@ -104,7 +96,7 @@ const upgrade = async (context, module, name, reloadAll, ...list) => {
 	}
 };
 
-const types = [
+export const types = [
 	{
 		target: "AwayFromKeyboard",
 		names: ["afk", "afks"]
@@ -173,8 +165,3 @@ const types = [
 		}
 	}
 ];
-
-module.exports = {
-	upgrade,
-	types
-};

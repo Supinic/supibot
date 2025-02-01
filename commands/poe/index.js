@@ -1,4 +1,6 @@
-module.exports = {
+import subcommands from "./subcommands.js";
+
+export default {
 	Name: "poe",
 	Aliases: ["poe2"],
 	Author: "supinic",
@@ -8,8 +10,6 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function poe (context, type, ...args) {
-		const { subcommands } = require("./definitions.js");
-
 		type = (type ?? "league").toLowerCase();
 
 		const target = subcommands.find(i => i.name === type || i.aliases.includes(type));
@@ -23,8 +23,6 @@ module.exports = {
 		return await target.execute(context, ...args);
 	}),
 	Dynamic_Description: (async function (prefix) {
-		const { subcommands } = require("./definitions.js");
-
 		return [
 			"Multiple commands related to Path of Exile.",
 			"",

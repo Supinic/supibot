@@ -6,7 +6,7 @@ const PICTURE_INVOCATIONS_MAP = {
 	rfp: "fox"
 };
 
-module.exports = {
+export default {
 	Name: "randomanimalpicture",
 	Aliases: ["rap","rbp","rcp","rdp","rfp"],
 	Author: "supinic",

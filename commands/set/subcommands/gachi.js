@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	name: "gc",
 	aliases: ["gachi"],
 	parameter: "ID",

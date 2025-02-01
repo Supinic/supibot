@@ -1,4 +1,4 @@
-const createMessageLoggingTable = async (tableName) => {
+export default async (tableName) => {
 	const alreadySetup = await sb.Query.isTablePresent("chat_line", tableName);
 	if (alreadySetup) {
 		return {
@@ -23,8 +23,4 @@ const createMessageLoggingTable = async (tableName) => {
 	return {
 		success: true
 	};
-};
-
-module.exports = {
-	createMessageLoggingTable
 };

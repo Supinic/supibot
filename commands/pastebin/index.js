@@ -1,5 +1,5 @@
-const { getPathFromURL, postToPastebin } = require("../../utils/command-utils.js");
-const validateHastebinServer = require("./validate-hastebin.js");
+import { getPathFromURL, postToPastebin } from "../../utils/command-utils.js";
+import validateHastebinServer from "./validate-hastebin.js";
 
 const BASE_HASTEBIN_SERVER = "https://haste.zneix.eu";
 const ALLOWED_GIST_TYPES = ["text/plain", "text/javascript", "application/javascript"];
@@ -22,7 +22,7 @@ const getHastebinServer = (param) => {
 	return url.hostname;
 };
 
-module.exports = {
+export default {
 	Name: "pastebin",
 	Aliases: ["pbg", "pbp", "gist", "hbg", "hbp"],
 	Author: "supinic",

@@ -1,6 +1,6 @@
-const { subcommands } = require("./subcommands/index.js");
+import subcommands from "./subcommands/index.js";
 
-module.exports = {
+export default {
 	Name: "bot",
 	Aliases: null,
 	Author: "supinic",

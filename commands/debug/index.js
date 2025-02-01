@@ -1,4 +1,7 @@
-module.exports = {
+import crypto from "node:crypto";
+import vm from "node:vm";
+
+export default {
 	Name: "debug",
 	Aliases: null,
 	Author: "supinic",
@@ -19,9 +22,7 @@ module.exports = {
 			};
 		}
 
-		const vm = require("node:vm");
 		const string = args.join(" ");
-
 		let scriptString;
 		let scriptArgs;
 
@@ -86,7 +87,7 @@ module.exports = {
 
 		try {
 			const scriptContext = vm.createContext({
-				crypto: require("node:crypto"),
+				crypto,
 				version: process.version,
 				context,
 				sb,

@@ -1,11 +1,11 @@
-const { parseRSS } = require("../../utils/command-utils.js");
+import { parseRSS } from "../../utils/command-utils.js";
 
-const definitions = require("./definitions.json");
+import definitions from "./definitions.json" with { type: "json" };
 const rssCacheKey = "command-news-rss-cache";
 
 const sanitize = (string) => sb.Utils.fixHTML(sb.Utils.removeHTML(string)).replaceAll(/\s+/g, " ");
 
-module.exports = {
+export default {
 	isCountryCode: (code) => /[A-Z]{2}/.test(code),
 	has: (code) => {
 		if (!code) {

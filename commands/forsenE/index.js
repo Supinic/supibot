@@ -1,9 +1,9 @@
-const { lines } = require("./forsenE.json");
+import forsenData from "./forsenE.json" with { type: "json" };
 
 const MAXIMUM_REPEATS = 5;
 const previousLines = [];
 
-module.exports = {
+export default {
 	Name: "forsenE",
 	Aliases: null,
 	Author: "supinic",
@@ -13,7 +13,7 @@ module.exports = {
 	Params: null,
 	Whitelist_Response: null,
 	Code: (async function forsenE (context) {
-		const eligibleLines = lines.filter(i => !previousLines.includes(i));
+		const eligibleLines = forsenData.lines.filter(i => !previousLines.includes(i));
 		const line = sb.Utils.randArray(eligibleLines);
 
 		previousLines.unshift(line);

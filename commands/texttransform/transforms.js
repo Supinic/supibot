@@ -1,4 +1,22 @@
-const { randomInt } = require("../../utils/command-utils.js");
+import { randomInt } from "../../utils/command-utils.js";
+import textCaseCode from "./text-case-code.js";
+import officialCharactersMap from "./definitions/official-characters.json" with { type: "json" };
+
+import BubbleDefinition from "./definitions/bubble.json" with { type: "json" };
+import FancyDefinition from "./definitions/fancy.json" with { type: "json" };
+import UpsideDownDefinition from "./definitions/upside-down.json" with { type: "json" };
+import LeetDefinition from "./definitions/leet.json" with { type: "json" };
+import MedievalDefinition from "./definitions/medieval.json" with { type: "json" };
+import RunicDefinition from "./definitions/runic.json" with { type: "json" };
+import SuperscriptDefinition from "./definitions/superscript.json" with { type: "json" };
+import VaporwaveDefinition from "./definitions/vaporwave.json" with { type: "json" };
+
+import MorseData from "./definitions/morse.json" with { type: "json" };
+
+import LingoCockneyDefinition from "./lingo-translations/cockney.json" with { type: "json" };
+import LingoCowboyDefinition from "./lingo-translations/cowboy.json" with { type: "json" };
+import LingoOutbackDefinition from "./lingo-translations/outback.json" with { type: "json" };
+
 const ANTI_PING_CHARACTER = "\u{E0000}";
 
 const convert = {
@@ -42,8 +60,6 @@ const convert = {
 	}
 };
 
-const textCaseCode = require("./text-case-code.js");
-const officialCharactersMap = require("./definitions/official-characters.json");
 
 /**
  * @typedef {Record<string, string>} TextTransformMap
@@ -80,67 +96,67 @@ const types = [
 		name: "bubble",
 		type: "map",
 		aliases: [],
-		data: require("./definitions/bubble.json")
+		data: BubbleDefinition
 	},
 	{
 		name: "fancy",
 		type: "map",
 		aliases: [],
-		data: require("./definitions/fancy.json")
+		data: FancyDefinition
 	},
 	{
 		name: "upside-down",
 		type: "map",
 		aliases: ["flipped", "ud", "upsidedown"],
-		data: require("./definitions/upside-down.json")
+		data: UpsideDownDefinition
 	},
 	{
 		name: "elite",
 		type: "map",
 		aliases: ["leet", "l33t", "1337"],
-		data: require("./definitions/leet.json")
+		data: LeetDefinition
 	},
 	{
 		name: "medieval",
 		type: "map",
 		aliases: [],
-		data: require("./definitions/medieval.json")
+		data: MedievalDefinition
 	},
 	{
 		name: "runic",
 		type: "map",
 		aliases: ["runes"],
-		data: require("./definitions/runic.json")
+		data: RunicDefinition
 	},
 	{
 		name: "superscript",
 		type: "map",
 		aliases: ["small", "smol", "super", "tiny"],
-		data: require("./definitions/superscript.json")
+		data: SuperscriptDefinition
 	},
 	{
 		name: "vaporwave",
 		type: "map",
 		aliases: ["vw", "vapor"],
-		data: require("./definitions/vaporwave.json")
+		data: VaporwaveDefinition
 	},
 	{
 		name: "cockney",
 		type: "translate",
 		aliases: ["3Head"],
-		data: require("./lingo-translations/cockney.json")
+		data: LingoCockneyDefinition
 	},
 	{
 		name: "cowboy",
 		type: "translate",
 		aliases: ["KKona", "KKonaW"],
-		data: require("./lingo-translations/cowboy.json")
+		data: LingoCowboyDefinition
 	},
 	{
 		name: "outback",
 		type: "translate",
 		aliases: ["KKrikey", "australian"],
-		data: require("./lingo-translations/outback.json")
+		data: LingoOutbackDefinition
 	},
 	{
 		name: "capitalize",
@@ -278,13 +294,12 @@ const types = [
 		aliases: [],
 		data: (message) => {
 			const arr = [];
-			const morse = require("./definitions/morse.json");
 			for (const character of message.toLowerCase()) {
 				if (character === " ") {
 					arr.push("/");
 				}
-				else if (morse[character]) {
-					arr.push(morse[character]);
+				else if (MorseData[character]) {
+					arr.push(MorseData[character]);
 				}
 			}
 
@@ -442,7 +457,7 @@ const types = [
 	}
 ];
 
-module.exports = {
+export default {
 	convert,
 	types
 };

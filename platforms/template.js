@@ -1,7 +1,7 @@
-const { createMessageLoggingTable } = require("../utils/create-db-table");
+import createMessageLoggingTable from "../utils/create-db-table.js";
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
-class Platform {
+export default class Platform {
 	#id;
 	#name;
 	#host;
@@ -506,10 +506,12 @@ class Platform {
 		}
 	}
 
-	static create (type, config) {
+	static async create (type, config) {
 		let InstancePlatform;
 		try {
-			InstancePlatform = require(`./${type}.js`);
+			// @todo refactor this to direct imports + platform map. return generic for platforms not in the map
+			const dynamicInstanceImport = await import(`./${type}.js`);
+			InstancePlatform = dynamicInstanceImport.default;
 		}
 		catch {
 			console.log(`No file found for platform "${type}", creating generic platform`);
@@ -527,8 +529,6 @@ class Platform {
 		return instance;
 	}
 }
-
-module.exports = Platform;
 
 /**
  * @typedef {Object} TypedEmote Describes any emote

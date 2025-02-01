@@ -1,4 +1,4 @@
-const { linkRegex } = require("../../utils/regexes.js");
+import { linkRegex } from "../../utils/regexes.js";
 
 const charToFlagEmoji = (char) => {
 	const emojiPart = String.fromCodePoint(56741 + char.codePointAt(0));
@@ -11,7 +11,7 @@ const FOUR_CHAN_REPLACEMENTS = [
 	{ regex: /kek/ig, string: "cuck" }
 ];
 
-module.exports = {
+export default {
 	Name: "chan",
 	Aliases: ["4chan","textchan","filechan","imagechan"],
 	Author: "supinic",

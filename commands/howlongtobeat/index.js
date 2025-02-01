@@ -65,7 +65,7 @@ const fetchEndpointHash = async (fileHash, force = false) => {
 	return hash;
 };
 
-module.exports = {
+export default {
 	Name: "howlongtobeat",
 	Aliases: ["hltb"],
 	Author: "supinic",

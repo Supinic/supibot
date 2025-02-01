@@ -167,10 +167,10 @@ const predefinedRequests = {
 	}
 };
 
-const RESTRICTED_COMMANDS = new Set(["alias", "pipe", "js"].map(i => sb.Command.get(i)));
+const RESTRICTED_COMMAND_NAMES = new Set(["alias", "pipe", "dankdebug"]);
 const commandExecutionCountThreshold = 5;
 
-module.exports = async function createDebugSandbox (context, scriptArgs) {
+export default async function createDebugSandbox (context, scriptArgs) {
 	const rawCustomUserData = await context.user.getDataProperty("customDeveloperData") ?? {};
 	const customUserData = advancedParse(JSON.stringify(rawCustomUserData));
 
@@ -329,7 +329,7 @@ module.exports = async function createDebugSandbox (context, scriptArgs) {
 				if (!commandData) {
 					throw new Error("Command not found - separate command name from parameters");
 				}
-				else if (RESTRICTED_COMMANDS.has(commandData)) {
+				else if (RESTRICTED_COMMAND_NAMES.has(commandData.Name)) {
 					throw new Error("Provided command is not usable in the $js execution");
 				}
 				else if (!commandData.Flags.pipe) {

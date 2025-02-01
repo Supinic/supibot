@@ -1,4 +1,4 @@
-const { randomInt } = require("../../utils/command-utils.js");
+import { randomInt } from "../../utils/command-utils.js";
 
 const tableHistoricColumns = new Map();
 
@@ -201,7 +201,7 @@ const fetchGroupChannelRandomLine = async function (group) {
 	return await fetchGroupResult("channel", group);
 };
 
-module.exports = {
+export default {
 	fetchChannelRandomLine,
 	fetchUserRandomLine,
 	fetchGroupUserRandomLine,

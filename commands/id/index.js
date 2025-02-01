@@ -3,7 +3,7 @@
 // since they predate Supibot - and are therefore extrapolated from logs.
 const USER_ID_BREAKPOINT = 1127;
 
-module.exports = {
+export default {
 	Name: "id",
 	Aliases: ["uid"],
 	Author: "supinic",
