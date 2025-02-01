@@ -5333,7 +5333,7 @@ duration-parser@supinic/duration-parser:
 
 supi-core@supinic/supi-core:
   version: 3.1.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=c7bd15d7cf6ece218cc8c785b98d6739f15719eb"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=96b79460dd9372812c799c798a600a9e43601bf3"
   dependencies:
     cheerio: "npm:^1.0.0"
     duration-parser: supinic/duration-parser
@@ -5342,7 +5342,7 @@ supi-core@supinic/supi-core:
     mariadb: "npm:^3.4.0"
     prom-client: "npm:^15.1.3"
     random-js: "npm:^2.1.0"
-  checksum: 10c0/27eb6a59ced5af72c3e1ed994f9f6ab4f61d1c831e583535e811c29daa557bf2d2df1471c8088818cb7e77eb1421e0b0949867d7b0167d2fa1700806bd7394d3
+  checksum: 10c0/1e1ccc7be18801accc08c087dba46be5973a20819926295a6380c109e569a2f3360a676eff26de923f2d6e585e7029bd3180a8ae0b881abcbe777c5b108bf34d
   languageName: node
   linkType: hard
 
@@ -5537,9 +5537,9 @@ track-link-parser@supinic/track-link-parser:
   linkType: hard
 
 "type-fest@npm:^4.26.1":
-  version: 4.32.0
-  resolution: "type-fest@npm:4.32.0"
-  checksum: 10c0/e2e877055487d109eba99afc58211db4a480837ff7b243c7de0b3e2ac29fdce55ab55e201c64cb1a8b2aeffce7e8f60ae3ce3a2f7e6fb68261d62743e54288ba
+  version: 4.33.0
+  resolution: "type-fest@npm:4.33.0"
+  checksum: 10c0/20015eea353605e08e3f4b967291b225fa4e7c43361de44f39b88131715e41877458af80da59c8f17e40c0e3842298996f0651219dc9823e35c7e46ecbc8a44f
   languageName: node
   linkType: hard
 
