@@ -13,7 +13,7 @@ import LanguageCodes from "../utils/languages.js";
 
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 
-class Context {
+export class Context {
 	#command;
 	#invocation;
 	#user;
@@ -154,7 +154,7 @@ class Context {
 	get userFlags () { return this.#userFlags; }
 }
 
-class Command extends Template {
+export class Command extends Template {
 	Name;
 	Aliases = [];
 	Description = null;
@@ -1242,5 +1242,3 @@ class Command extends Template {
 		return COMMAND_PREFIX;
 	}
 }
-
-export default Command;

@@ -1,11 +1,20 @@
 import { randomInt as cryptoRandomInt } from "node:crypto";
-import { Blob } from "node:buffer";
 
 import RSSParser from "rss-parser";
-import { parse as chronoParse } from "chrono-node";
+import { parse as chronoParse, ParsingOption } from "chrono-node";
+import SupiDate from "supi-core/build/objects/date.js";
+
+import Filter from "../classes/filter.js";
+import type { Command, Context as CommandContext } from "../classes/command.js";
+import type User from "../classes/user.js";
+import type Channel from "../classes/channel.js";
+import type Platform from "../platforms/template.js";
+
+type CommandContextParams = Record<string, string | number | undefined>; // @todo remove type cast when CommandContext is Typescript
 
 const rssParser = new RSSParser();
 const MAX_SAFE_RANGE = 281474976710655;
+
 const PASTEBIN_EXPIRATION_OPTIONS = {
 	never: "N",
 	"10 minutes": "10M",
@@ -16,21 +25,16 @@ const PASTEBIN_EXPIRATION_OPTIONS = {
 	"1 month": "1M",
 	"6 months": "6M",
 	"1 year": "1Y"
-};
+} as const;
 const PASTEBIN_PRIVACY_OPTIONS = {
-	public: 0,
-	unlisted: 1,
-	private: 2
-};
+	public: "0",
+	unlisted: "1",
+	private: "2"
+} as const;
 
 export const VIDEO_TYPE_REPLACE_PREFIX = "$";
 
-/**
- * @param {number} min
- * @param {number} max
- * @returns {number}
- */
-export const randomInt = (min, max) => {
+export const randomInt = (min: number, max: number): number => {
 	if (Math.abs(min) > Number.MAX_SAFE_INTEGER || Math.abs(max) > Number.MAX_SAFE_INTEGER) {
 		throw new sb.Error({
 			message: "Integer range exceeded",
@@ -51,15 +55,17 @@ export const randomInt = (min, max) => {
 };
 
 /**
- * Fetches time data for given GPS coordinates and timestamp
- * @param {Object} data
- * @param {Object} data.coordinates
- * @param {string} data.coordinates.lng
- * @param {string} data.coordinates.lat
- * @param {Date|sb.Date|number} data.date = new sb.Date()
- * @returns {Promise<{body: Object, statusCode: number}>}
+ * Fetches time data for given GPS coordinates and timestamp, if provided.
  */
-export const fetchTimeData = async (data = {}) => {
+export const fetchTimeData = async (data: { coordinates: Coordinates, date?: SupiDate } ) => {
+	type LocationTimeData = {
+		dstOffset: number;
+		rawOffset: number;
+		status: string;
+		timeZoneId: string;
+		timeZoneName: string;
+	};
+
 	if (!process.env.API_GOOGLE_TIMEZONE) {
 		throw new sb.Error({
 			message: "No Google timezone API key configured (API_GOOGLE_TIMEZONE)"
@@ -81,62 +87,15 @@ export const fetchTimeData = async (data = {}) => {
 	});
 
 	return {
-		statusCode: response.statusCode,
-		body: response.body
-	};
-};
-
-/**
- * Checks an image provided via URL for its NSFW score.
- * @param {string} link
- * @returns {Promise<NSFWDetectionResult>}
- * @deprecated DeepAI API is no longer available, since 2023-12-15 07:34:42+00:00
- * @todo find a replacement API with similar provided data
- */
-export const checkPictureNSFW = async (link) => {
-	if (!process.env.API_DEEP_AI) {
-		throw new sb.Error({
-			message: "No DeepAI key configured (API_DEEP_AI)"
-		});
-	}
-
-	const { statusCode, body: data } = await sb.Got.get("GenericAPI")({
-		method: "POST",
-		responseType: "json",
-		throwHttpErrors: false,
-		url: "https://api.deepai.org/api/nsfw-detector",
-		headers: {
-			"Api-Key": process.env.API_DEEP_AI
-		},
-		form: {
-			image: link
-		}
-	});
-
-	if (data.output?.detections) {
-		for (const item of data.output.detections) {
-			item.confidence = Number(item.confidence);
-		}
-	}
-
-	return {
-		statusCode,
-		data: {
-			id: data.id ?? null,
-			score: data.output?.nsfw_score ?? null,
-			detections: data.output?.detections ?? null
-		}
+		statusCode: response.statusCode as number,
+		body: response.body as LocationTimeData
 	};
 };
 
 /**
  * Uploads a file to {@link https://imgur.com}
- * @param {Buffer} fileData
- * @param {Object} [options]
- * @param {string} [options.type]
- * @returns {Promise<FileUploadResult>}
  */
-export const uploadToImgur = async (fileData, options = {}) => {
+export const uploadToImgur = async (fileData: Buffer, options: { type?: "image" | "video"; }) => {
 	const { type = "image" } = options;
 	const endpoint = (type === "image") ? "image" : "upload";
 	const filename = (type === "image") ? "image.jpg" : "video.mp4";
@@ -147,7 +106,7 @@ export const uploadToImgur = async (fileData, options = {}) => {
 	formData.append("type", "image");
 	formData.append("title", "Simple upload");
 
-	const { statusCode, body } = await sb.Got.get("GenericAPI")({
+	const response = await sb.Got.get("GenericAPI")({
 		url: `https://api.imgur.com/3/${endpoint}`,
 		responseType: "json",
 		method: "POST",
@@ -165,11 +124,12 @@ export const uploadToImgur = async (fileData, options = {}) => {
 	});
 
 	// Weird edge case with Imgur when uploading .webm or .mkv files will leave a "." at the end of the link
-	let link = body.data?.link ?? null;
+	let link: string | null = response.body.data?.link ?? null;
 	if (typeof link === "string" && link.endsWith(".")) {
 		link = `${link}mp4`;
 	}
 
+	const statusCode: number = response.statusCode;
 	return {
 		statusCode,
 		link
@@ -178,10 +138,8 @@ export const uploadToImgur = async (fileData, options = {}) => {
 
 /**
  * Uploads a file to {@link https://i.nuuls.com}
- * @param {Buffer} fileData
- * @returns {Promise<FileUploadResult>}
  */
-export const uploadToNuuls = async (fileData) => {
+export const uploadToNuuls = async (fileData: string) => {
 	const formData = new FormData();
 	formData.append("attachment", fileData);
 
@@ -200,25 +158,21 @@ export const uploadToNuuls = async (fileData) => {
 	});
 
 	return {
-		statusCode: response.statusCode,
-		link: response.body ?? null
+		statusCode: response.statusCode as number,
+		link: (response.body ?? null) as string | null
 	};
 };
 
 /**
  * Parses an RSS string into JS object format.
- * @param {string} xml
- * @returns {Promise<RSSParserResult>}
  */
-export const parseRSS = async (xml) => await rssParser.parseString(xml);
+export const parseRSS = async (xml: string) => await rssParser.parseString(xml);
 
 /**
  * Returns the URL's pathname + search params, if defined.
  * Returns null if it is in any way invalid.
- * @param {string} stringURL
- * @returns {null|string}
  */
-export const getPathFromURL = (stringURL) => {
+export const getPathFromURL = (stringURL: string): string | null => {
 	if (!stringURL) {
 		return null;
 	}
@@ -235,12 +189,7 @@ export const getPathFromURL = (stringURL) => {
 	return `${path}${url.search}`;
 };
 
-/**
- * @param {string} string
- * @param {Date} referenceDate
- * @param {Object} options
- */
-export const parseChrono = (string, referenceDate = null, options = {}) => {
+export const parseChrono = (string: string, referenceDate?: SupiDate, options?: ParsingOption) => {
 	const chronoData = chronoParse(string, referenceDate, options);
 	if (chronoData.length === 0) {
 		return null;
@@ -254,33 +203,57 @@ export const parseChrono = (string, referenceDate = null, options = {}) => {
 	};
 };
 
+type Coordinates = { lat: number; lng: number; };
+type GoogleAddressComponent = {
+	long_name: string;
+	short_name: string;
+	types: string[];
+};
+type GoogleGeoData = {
+	address_components: GoogleAddressComponent[];
+	formatted_address: string;
+	geometry: {
+		bounds: {
+			northeast: Coordinates;
+			southwest: Coordinates;
+		};
+		location: Coordinates;
+		location_type: string;
+		viewport: {
+			northeast: Coordinates;
+			southwest: Coordinates;
+		};
+	};
+	place_id: string;
+	types: string[]
+};
+
 /**
- * Returns Google Geo Data for given query
- * @param {string} query
- * @returns {Promise<Object>}
+ * Returns Google Geo Data for given query.
  */
-export const fetchGeoLocationData = async (query) => {
+export const fetchGeoLocationData = async (query: string) => {
 	if (!process.env.API_GOOGLE_GEOCODING) {
 		throw new sb.Error({
 			message: "No Google geolocation API key configured (API_GOOGLE_GEOCODING)"
 		});
 	}
 
-	const { results, status } = await sb.Got.get("GenericAPI")({
+	const response = await sb.Got.get("GenericAPI")({
 		url: "https://maps.googleapis.com/maps/api/geocode/json",
 		searchParams: {
 			key: process.env.API_GOOGLE_GEOCODING,
 			address: query
 		}
-	}).json();
+	});
 
-	if (status !== "OK") {
+	if (response.body.status !== "OK") {
 		return {
 			success: false,
-			cause: status
+			cause: response.body.status
 		};
 	}
 
+	const results: GoogleGeoData[] = response.body.results;
 	const {
 		address_components: components,
 		formatted_address: formatted,
@@ -288,7 +261,7 @@ export const fetchGeoLocationData = async (query) => {
 		geometry: { location }
 	} = results[0];
 
-	const object = {};
+	const object: Record<string, string> = {};
 	for (const row of components) {
 		let { types, long_name: long } = row;
 		if (types.includes("political")) {
@@ -307,15 +280,45 @@ export const fetchGeoLocationData = async (query) => {
 	};
 };
 
+type YoutubeThumbnail = "default" | "highres" | "medium" | "standard" | "high";
+type YoutubeThumbnailDetail = {
+	height: number;
+	width: number;
+	url: string;
+}
+type YoutubeSearchItem = {
+	etag: string;
+	id: {
+		kind: string;
+		videoId: string;
+	};
+	kind: string;
+	snippet: {
+		channelId: string;
+		channelTitle: string;
+		description: string;
+		liveBroadcastContent: string;
+		publishTime: string;
+		publishedAt: string;
+		thumbnails: Record<YoutubeThumbnail, YoutubeThumbnailDetail>;
+		title: string;
+	}
+};
+type YoutubeSearchResult = {
+	etag: string;
+	items: YoutubeSearchItem[];
+	kind: string;
+	nextPageToken: string;
+	pageInfo: { totalResults: number; resultsPerPage: number; };
+	regionCode: string;
+};
+
 /**
  * Fetches info about a provided YouTube video.
- * @param {string} query Search string
- * @param {object} options = {} additional options
- * @param {number} [options.maxResults]
- * @param {boolean} [options.single]
- * @returns {Promise<string>}
  */
-export const searchYoutube = async (query, options = {}) => {
+export async function searchYoutube (query: string, options: { single: true; }): Promise<{ ID: string, title: string }>;
+export async function searchYoutube (query: string, options?: { maxResults?: number; single?: false }): Promise<{ ID: string, title: string }[]>;
+export async function searchYoutube (query: string, options?: { maxResults?: number; single?: boolean; }) {
 	if (!process.env.API_GOOGLE_YOUTUBE) {
 		throw new sb.Error({
 			message: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
@@ -333,7 +336,7 @@ export const searchYoutube = async (query, options = {}) => {
 		params.maxResults = 1;
 	}
 
-	const { items } = await sb.Got.get("GenericAPI")({
+	const response = await sb.Got.get("GenericAPI")({
 		url: `https://www.googleapis.com/youtube/v3/search`,
 		searchParams: {
 			key: process.env.API_GOOGLE_YOUTUBE,
@@ -343,9 +346,10 @@ export const searchYoutube = async (query, options = {}) => {
 			maxResults: params.maxResults ?? "10",
 			sort: "relevance"
 		}
-	}).json();
+	});
 
-	const videoList = items
+	const data: YoutubeSearchResult = response.body;
+	const videoList = data.items
 		// This filtering shouldn't be necessary, but in some cases YouTube API returns playlists
 		// despite the `type` parameter being set to strictly return videos only.
 		.filter(i => i.id.kind === "youtube#video" && i.id.videoId)
@@ -357,28 +361,80 @@ export const searchYoutube = async (query, options = {}) => {
 	return (params.single)
 		? videoList[0] ?? null
 		: videoList;
+}
+
+type YoutubePlaylistOptions = {
+	playlistID: string;
+	perPage?: number;
+	limit?: number;
+	limitAction: "trim" | "return" | "error";
+};
+type YoutubePlaylistSearchParams = {
+	part: "snippet",
+	key: string;
+	maxResults: number;
+	playlistId: string;
+	pageToken?: string;
+};
+type YoutubePlaylistItem = {
+	etag: string;
+	id: string;
+	kind: "youtube#playlistItem";
+	snippet: {
+		channelId: string;
+		channelTitle: string;
+		description: string;
+		playlistId: string;
+		position: number;
+		publishedAt: string;
+		resourceId: {
+			kind: "youtube#video";
+			videoId: string;
+		};
+		thumbnails: Record<YoutubeThumbnail, YoutubeThumbnailDetail>;
+		title: string;
+		videoOwnerChannelId: string;
+		videoOwnerChannelTitle: string;
+	}
+};
+type YoutubePlaylistData = {
+	etag: string;
+	kind: "youtube#playlistItemListResponse";
+	items: YoutubePlaylistItem[];
+	nextPageToken: string;
+	pageInfo: {
+		totalResults: number;
+		resultsPerPage: number;
+	}
+};
+type YoutubePlaylistResult = {
+	ID: YoutubePlaylistItem["snippet"]["resourceId"]["videoId"];
+	title: YoutubePlaylistItem["snippet"]["title"];
+	channelTitle: YoutubePlaylistItem["snippet"]["channelTitle"];
+	published: SupiDate;
+	position: YoutubePlaylistItem["snippet"]["position"];
+};
+type YoutubePlaylistErrorResult = {
+	success: false,
+	reason: "limit-exceeded" | "not-found";
+	limit?: number;
+	amount?: number;
+};
+type YoutubePlaylistSuccessResult = {
+	success: true,
+	reason?: "limit-exceeded";
+	amount?: number;
+	result: YoutubePlaylistResult[];
 };
 
 /**
  * Fetches a YouTube playlist as an array of video IDs.
  * Optionally, limits the amount of videos fetched.
- * @param {Object} options
- * @params {string} options.playlistID YouTube playlist ID
- * @params {number} [options.perPage = 50] How many videos should be fetched per page.
- * @params {number} [options.limit] Limit the number of videos.
- * @params {string} [options.limitAction]
- * @returns {Promise<string[]>}
  */
-export const fetchYoutubePlaylist = async (options = {}) => {
+export const fetchYoutubePlaylist = async (options: YoutubePlaylistOptions): Promise<YoutubePlaylistSuccessResult | YoutubePlaylistErrorResult> => {
 	if (!process.env.API_GOOGLE_YOUTUBE) {
 		throw new sb.Error({
 			message: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
-		});
-	}
-
-	if (!options.playlistID) {
-		throw new sb.Error({
-			message: "No playlist ID provided"
 		});
 	}
 
@@ -388,31 +444,33 @@ export const fetchYoutubePlaylist = async (options = {}) => {
 		key: process.env.API_GOOGLE_YOUTUBE,
 		maxResults: options.perPage ?? 50,
 		playlistId: options.playlistID
-	};
+	} as const;
 
 	let pageToken = null;
 	const result = [];
 	do {
-		const searchParams = { ...baseParams };
+		const searchParams: YoutubePlaylistSearchParams = { ...baseParams };
 		if (pageToken) {
 			searchParams.pageToken = pageToken;
 		}
 
-		const { body: data, statusCode } = await sb.Got.get("GenericAPI")({
+		const response = await sb.Got.get("GenericAPI")({
 			url: "https://www.googleapis.com/youtube/v3/playlistItems",
 			searchParams,
 			throwHttpErrors: false,
 			responseType: "json"
 		});
 
-		if (statusCode !== 200) {
+		if (response.statusCode !== 200) {
 			return {
 				success: false,
 				reason: "not-found"
 			};
 		}
 
+		const data = response.body as YoutubePlaylistData;
 		pageToken = data.nextPageToken;
+
 		result.push(...data.items.map(i => ({
 			ID: i.snippet.resourceId.videoId,
 			title: i.snippet.title,
@@ -422,7 +480,10 @@ export const fetchYoutubePlaylist = async (options = {}) => {
 		})));
 
 		if (options.limitAction === "trim" && result.length > limit) {
-			return result.slice(0, limit);
+			return {
+				success: true,
+				result: result.slice(0, limit)
+			};
 		}
 		else if (data.pageInfo.totalResults > limit) {
 			if (options.limitAction === "error") {
@@ -447,8 +508,7 @@ export const fetchYoutubePlaylist = async (options = {}) => {
 					success: true,
 					reason: "limit-exceeded",
 					amount: data.pageInfo.totalResults,
-					result,
-					limit
+					result
 				};
 			}
 		}
@@ -460,43 +520,63 @@ export const fetchYoutubePlaylist = async (options = {}) => {
 	};
 };
 
+type TwitchGameDetail = {
+	box_art_url: string;
+	id: string;
+	igdb_id: string;
+	name: string;
+};
+
 /**
  * Returns the Twitch game ID for the given game name.
- * @param {string} name The name of the game to get the ID for.
- * @return {Promise<Array<{id: string, name: string}>>}
  */
-export const getTwitchGameID = async (name) => {
+export const getTwitchGameID = async (name: string): Promise<{ name: string; id: string; }[]> => {
 	const response = await sb.Got.get("Helix")({
 		url: "games",
 		searchParams: { name }
 	});
 
-	if (!response.ok || response.body.data.length === 0) {
+	const data = response.body.data as TwitchGameDetail[];
+	if (!response.ok || data.length === 0) {
 		return [];
 	}
 
-	return response.body.data.map(i => ({
+	return data.map(i => ({
 		id: i.id,
 		name: i.name
 	}));
 };
 
+type ParsedGenericFilterData = {
+	command: Command | null;
+	channel: Channel | null;
+	platform: Platform | null;
+	user?: User | null;
+	invocation: string | null;
+};
+type ParsedGenericFilterOptions = {
+	argsOrder: string[];
+	includeUser?: boolean;
+	requiredCommandFlag?: string;
+	requiredCommandFlagResponse?: string;
+};
+type ParsedGenericFilterResponse =
+	{ success: false; reply: string; }
+	| { success: true; filter: Filter; }
+	| { success: true; filterData: ParsedGenericFilterData; };
+
 /**
  * Standard parser function for all Filter-related commands.
  * Grabs platform. channel, command (additionally user too) from the context.params object
  * and also returns parse failures if encountered.
- * @param {string} type
- * @param {Object} params
- * @param {string[]} args
- * @param {Object} options
- * @param {string[]} options.argsOrder
- * @param {boolean} [options.includeUser]
- * @param {string} [options.requiredCommandFlag]
- * @param {string} [options.requiredCommandFlagResponse]
- * @return {Promise<{filterData: Object, success: true}|{filter: Filter, success: true}|{success: false, reply: string}>}
  */
-export const parseGenericFilterOptions = async (type, params, args, options = {}) => {
-	if (params.id) {
+export const parseGenericFilterOptions = async (
+	type: string,
+	params: CommandContextParams,
+	args: string[],
+	options: ParsedGenericFilterOptions
+): Promise<ParsedGenericFilterResponse> => {
+	if (typeof params.id === "number") {
 		const filter = sb.Filter.get(params.id);
 		if (!filter) {
 			return {
@@ -517,7 +597,7 @@ export const parseGenericFilterOptions = async (type, params, args, options = {}
 		};
 	}
 
-	const filterData = {
+	const filterData: ParsedGenericFilterData = {
 		command: null,
 		channel: null,
 		platform: null,
@@ -527,7 +607,7 @@ export const parseGenericFilterOptions = async (type, params, args, options = {}
 	const commandArgId = options.argsOrder.indexOf("command");
 	const commandName = params.command ?? args[commandArgId];
 
-	if (!commandName) {
+	if (!commandName || typeof commandName !== "string") {
 		return {
 			success: false,
 			reply: `A command (or "all" to optout globally) must be provided!`
@@ -545,7 +625,7 @@ export const parseGenericFilterOptions = async (type, params, args, options = {}
 				reply: `Command ${commandName} does not exist!`
 			};
 		}
-		if (options.requiredCommandFlag && !commandData.Flags[options.requiredCommandFlag]) {
+		if (options.requiredCommandFlag && options.requiredCommandFlagResponse && !commandData.Flags[options.requiredCommandFlag]) {
 			return {
 				success: false,
 				reply: options.requiredCommandFlagResponse
@@ -617,19 +697,24 @@ export const parseGenericFilterOptions = async (type, params, args, options = {}
 	};
 };
 
-/**
- * @param {string} type
- * @param {Object} data
- * @param {Filter | null} data.filter
- * @param {string} data.enableInvocation
- * @param {string} data.disableInvocation
- * @param {string} data.enableVerb
- * @param {string} data.disableVerb
- * @param {Command.Context} data.context
- * @param {Object} data.filterData
- * @return {Promise<{reply: string, success?: boolean}>}
- */
-export const handleGenericFilter = async (type, data) => {
+type GenericFilterData = {
+	filter: Filter | null;
+	enableInvocation: string;
+	disableInvocation: string;
+	enableVerb: string;
+	disableVerb: string;
+	context: CommandContext;
+	filterData: Partial<InstanceFilterData>;
+};
+type InstanceFilterData = {
+	command: Command | null;
+	channel: Channel | null;
+	platform: Platform | null;
+	invocation: string;
+	user: User;
+};
+
+export const handleGenericFilter = async (type: string, data: GenericFilterData): Promise<{ reply: string; success: boolean }> => {
 	let { filter } = data;
 	const {
 		enableInvocation,
@@ -640,11 +725,14 @@ export const handleGenericFilter = async (type, data) => {
 		filterData
 	} = data;
 
-	let replyFn;
-	const { invocation, params } = context;
+	let replyFn: (commandString: string, filter: Filter) => string;
+	const { invocation } = context;
+	const params = context.params as CommandContextParams;
+
 	const verb = (invocation === enableInvocation) ? enableVerb : disableVerb;
 
-	if (filter) {
+	let resultFilter: Filter;
+	if (filter !== null) {
 		if (filter.Issued_By !== context.user.ID) {
 			return {
 				success: false,
@@ -664,7 +752,8 @@ export const handleGenericFilter = async (type, data) => {
 
 		await filter.toggle();
 
-		replyFn = (commandString) => `Successfully ${verb} ${commandString} (ID ${filter.ID}).`;
+		resultFilter = filter;
+		replyFn = (commandString: string, filter: Filter) => `Successfully ${verb} ${commandString} (ID ${filter.ID}).`;
 	}
 	else {
 		if (invocation === disableInvocation) {
@@ -674,8 +763,7 @@ export const handleGenericFilter = async (type, data) => {
 			};
 		}
 
-		filter = await sb.Filter.create({
-			Active: true,
+		resultFilter = await Filter.create({
 			Type: type,
 			User_Alias: context.user.ID,
 			Issued_By: context.user.ID,
@@ -687,52 +775,67 @@ export const handleGenericFilter = async (type, data) => {
 		});
 
 		let location = "";
-		if (context.params.channel) {
+		if (params.channel) {
 			location = ` in channel ${params.channel}`;
 		}
 		else if (params.platform) {
 			location = ` in platform ${params.platform}`;
 		}
 
-		replyFn = (commandString) => `Successfully ${verb} ${commandString} ${location} (ID ${filter.ID}).`;
+		replyFn = (commandString: string, filter: Filter) => `Successfully ${verb} ${commandString} ${location} (ID ${filter.ID}).`;
 	}
 
 	let commandString;
 	const prefix = sb.Command.prefix;
-	if (filter.Command === null) {
+	if (resultFilter.Command === null) {
 		commandString = `all valid commands`;
 	}
-	else if (filter.Invocation !== null) {
-		commandString = `command ${prefix}${filter.Command} (alias ${prefix}${filter.Invocation})`;
+	else if (resultFilter.Invocation !== null) {
+		commandString = `command ${prefix}${resultFilter.Command} (alias ${prefix}${resultFilter.Invocation})`;
 	}
 	else {
-		commandString = `command ${prefix}${filter.Command}`;
+		commandString = `command ${prefix}${resultFilter.Command}`;
 	}
 
-	const reply = replyFn(commandString);
+	const reply = replyFn(commandString, resultFilter);
 	return {
+		success: true,
 		reply
 	};
 };
 
+type PastebinPostOptions = {
+	name?: string;
+	privacy?: keyof typeof PASTEBIN_PRIVACY_OPTIONS;
+	expiration?: keyof typeof PASTEBIN_EXPIRATION_OPTIONS;
+	format?: string;
+};
+
+type TextPostGenericResult = {
+	ok: boolean;
+	statusCode: number;
+};
+type TextPostResultSuccess = TextPostGenericResult & {
+	ok: true;
+	link: string;
+	reason: null;
+};
+type TextPostResultFailure = TextPostGenericResult & {
+	ok: false;
+	link: null;
+	reason: string;
+};
+type TextPostResult = TextPostResultFailure | TextPostResultSuccess;
+
 /**
  * Posts the provided text to Pastebin, creating a new "paste".
- * @param {string} text Text to be posted to Pastebin
- * @param {Object} [options]
- * @param {string} [options.name] Paste title
- * @param {"public"|"unlisted"|"private"} [options.privacy] Paste privacy setting
- * @param {"N"|"10M"|"1H"|"1D"|"1W"|"2W"|"1M"|"6M"|"1Y"} [options.expiration] Paste expiration interval
- * @param {string} [options.format] Paste format, programming language
  * @returns {Promise<{ok: boolean, link: string | null, statusCode: number | null, reason: string | null}>}
  */
-export const postToPastebin = async (text, options = {}) => {
+export const postToPastebin = async (text: string, options: PastebinPostOptions = {}): Promise<TextPostResult> => {
 	if (!process.env.API_PASTEBIN) {
-		return {
-			ok: false,
-			statusCode: null,
-			link: null,
-			reason: "Cannot upload to Pastebin - missing env variable API_PASTEBIN"
-		};
+		throw new sb.Error({
+			message: "Cannot upload to Pastebin - missing env variable API_PASTEBIN"
+		});
 	}
 
 	const params = new URLSearchParams({
@@ -762,30 +865,28 @@ export const postToPastebin = async (text, options = {}) => {
 		}
 	});
 
-	const result = {
-		ok: response.ok,
-		statusCode: response.statusCode,
-		link: response.body,
-		reason: null
-	};
-
 	if (!response.ok) {
-		result.reason = (response.statusCode === 422)
-			? response.body
-			: "Could not create a Pastebin paste!";
+		return {
+			ok: response.ok,
+			statusCode: response.statusCode,
+			link: null,
+			reason: (response.statusCode === 422) ? response.body : "Could not create a Pastebin paste!"
+		};
 	}
-
-	return result;
+	else {
+		return {
+			ok: response.ok,
+			statusCode: response.statusCode,
+			link: response.body,
+			reason: null
+		};
+	}
 };
 
 /**
  * Posts the provided text to Hastebin, creating a new "paste".
- * @param {string} text Text to be posted to Hastebin
- * @param {Object} [options]
- * @param {string} [options.title] Title of the text, will be appended at the top of the text
- * @returns {Promise<{ok: boolean, link: string | null, statusCode: number | null, reason: string | null}>}
  */
-export const postToHastebin = async (text, options = {}) => {
+export const postToHastebin = async (text: string, options: { title?: string } = {}): Promise<TextPostResult> => {
 	if (options.title) {
 		text = `${options.title}\n\n${text}`;
 	}
@@ -797,21 +898,22 @@ export const postToHastebin = async (text, options = {}) => {
 		body: text
 	});
 
-	const result = {
-		ok: response.ok,
-		statusCode: response.statusCode,
-		link: null,
-		reason: null
-	};
-
 	if (!response.ok) {
-		result.reason = "Could not create a Hastebin paste!";
+		return {
+			ok: response.ok,
+			statusCode: response.statusCode,
+			reason: "Could not create a Hastebin paste!",
+			link: null
+		};
 	}
 	else {
-		result.link = `https://haste.zneix.eu/raw/${response.body.key}`;
+		return {
+			ok: response.ok,
+			statusCode: response.statusCode,
+			link: `https://haste.zneix.eu/raw/${response.body.key}`,
+			reason: null
+		};
 	}
-
-	return result;
 };
 
 /**
@@ -836,18 +938,6 @@ export const postToHastebin = async (text, options = {}) => {
  * @property {string} link
  */
 
-/**
- * @typedef {Object} RSSParserResult
- * @property {string} description
- * @property {Object} image
- * @property {string} image.link
- * @property {string} image.title
- * @property {string} image.url
- * @property {RSSArticle[]} items
- * @property {string} language
- * @property {string} link
- * @property {string} title
- */
 
 /**
  * @typedef {Object} RSSArticle
