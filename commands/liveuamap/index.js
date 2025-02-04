@@ -1,4 +1,4 @@
-import LanguageCodes from "../../utils/languages.js";
+import { LanguageParser } from "../../utils/languages.js";
 const BASE_CACHE_KEY = "liveuamap-data";
 const SUPPORTED_LANGUAGE_CODES = ["en", "ru", "uk", "pl"];
 const MAXIMUM_ARTICLES = 10;
@@ -16,7 +16,7 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function liveUaMap (context) {
 		const inputLanguage = context.params.lang ?? "en";
-		const languageCode = LanguageCodes.getCode(inputLanguage); // @todo fix so that params.lang is of type `language`
+		const languageCode = LanguageParser.getCode(inputLanguage); // @todo fix so that params.lang is of type `language`
 		if (!languageCode) {
 			return {
 				success: false,
@@ -24,7 +24,7 @@ export default {
 			};
 		}
 		else if (!SUPPORTED_LANGUAGE_CODES.includes(languageCode)) {
-			const supportedLanguageNames = SUPPORTED_LANGUAGE_CODES.map(i => LanguageCodes.getName(i));
+			const supportedLanguageNames = SUPPORTED_LANGUAGE_CODES.map(i => LanguageParser.getName(i));
 			return {
 				success: false,
 				reply: `Your provided language is not supported! Use one of: ${supportedLanguageNames.join(", ")}`

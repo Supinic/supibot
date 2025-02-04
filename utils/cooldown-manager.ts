@@ -1,22 +1,24 @@
 import config from "../config.json" with { type: "json" };
 const { values } = config;
 
+type Identifier = string | number | null;
+type CooldownConstructorData = {
+	channel?: Identifier;
+	command?: Identifier;
+	user?: Identifier;
+	expires: number;
+};
+
 class Cooldown {
-	#channel = null;
-	#user = null;
-	#command = null;
-	#expires = null;
+	readonly #channel?: Identifier;
+	readonly #user?: Identifier;
+	readonly #command?: Identifier;
+	#expires: number;
 
 	/**
 	 * Creates a cooldown instance.
-	 * @param {Object} data
-	 * @param {number|null} data.channel
-	 * @param {number|null} data.user
-	 * @param {number|null} data.command
-	 * @param {number} data.expires
-	 * @param {boolean} [data.pending]
 	 */
-	constructor (data) {
+	constructor (data: CooldownConstructorData) {
 		this.#channel = data.channel ?? null;
 		this.#user = data.user ?? null;
 		this.#command = data.command ?? null;
@@ -25,12 +27,9 @@ class Cooldown {
 
 	/**
 	 * Checks if a given combination of parameters connects to this instance.
-	 * @param {number|null} channel
-	 * @param {number|null} user
-	 * @param {number|null} command
-	 * @returns {boolean} True if cooldown applies and is active, false otherwise.
+	 * @returns True if cooldown applies and is active, false otherwise.
 	 */
-	check (channel, user, command) {
+	check (channel: Identifier, user: Identifier, command: Identifier) {
 		return (
 			(this.#channel === null || channel === this.#channel)
 			&& (this.#user === null || user === this.#user)
@@ -52,18 +51,24 @@ class Cooldown {
 	get expires () { return this.#expires; }
 }
 
-class Pending {
-	#description;
-	#user = null;
-	#expires = null;
+type PendingConstructorData = {
+	description?: string;
+	user?: Identifier;
+	expires: number;
+};
 
-	constructor (data) {
+class Pending {
+	readonly #description;
+	readonly #user?: Identifier;
+	#expires: number;
+
+	constructor (data: PendingConstructorData) {
 		this.#user = data.user ?? null;
 		this.#description = data.description ?? "N/A";
 		this.#expires = data.expires;
 	}
 
-	check (user) {
+	check (user: Identifier) {
 		return (
 			(user === this.#user)
 			&& (Date.now() <= this.#expires)
@@ -79,29 +84,22 @@ class Pending {
 	get description () { return this.#description; }
 }
 
+type Inhibitor = Cooldown | Pending;
+const isCooldown = (input: Inhibitor): input is Cooldown => (input instanceof Cooldown);
+const isPending = (input: Inhibitor): input is Pending => (input instanceof Pending);
+
 /**
  * Manages the cooldowns between each message sent to channels.
  */
-class CooldownManager {
-	#pruneInterval;
-
-	/**
-	 * Creates a new Cooldown manager instance.
-	 */
-	constructor () {
-		this.data = [];
-		this.#pruneInterval = setInterval(() => this.prune(), 60_000);
-	}
+export default class CooldownManager {
+	data: Inhibitor[] = [];
+	#pruneInterval = setInterval(() => this.prune(), 60_000);
 
 	/**
 	 * Checks if given combination of parameters has a cooldown pending.
-	 * @param {string|number|null} channel
-	 * @param {string|number|null} user
-	 * @param {string|number|null} command
-	 * @param {boolean} skipPending If true, does not check for Pending status
-	 * @returns {boolean} True if it's safe to run the command, false if the execution should be denied.
+	 * @returns `true` if it's safe to run the command, `false` if the execution should be denied.
 	 */
-	check (channel, user, command, skipPending) {
+	check (channel: Identifier, user: Identifier, command: Identifier, skipPending: boolean) {
 		const length = this.data.length;
 		for (let i = 0; i < length; i++) {
 			const inhibitor = this.data[i];
@@ -123,19 +121,13 @@ class CooldownManager {
 
 	/**
 	 * Sets a cooldown for given combination of parameters
-	 * @param {string|number|null} channel
-	 * @param {string|number|null} user
-	 * @param {string|number|null} command
-	 * @param {number} cooldown
-	 * @param {Object} options={}
 	 */
-	set (channel, user, command, cooldown, options = {}) {
+	set (channel: Identifier, user: Identifier, command: Identifier, cooldown: number) {
 		this.data.push(new Cooldown({
 			channel,
 			user,
 			command,
 			expires: Date.now() + cooldown,
-			...options
 		}));
 	}
 
@@ -144,7 +136,7 @@ class CooldownManager {
 	 * @param {string|number} user
 	 * @param {string} [description]
 	 */
-	setPending (user, description) {
+	setPending (user: Identifier, description: string) {
 		this.data.push(new Pending({
 			user,
 			description,
@@ -154,55 +146,54 @@ class CooldownManager {
 
 	/**
 	 * Prematurely revoke a cooldown given by its parameters.
-	 * @param {string|number|null} channel
-	 * @param {string|number|null} user
-	 * @param {string|number|null} command
-	 * @param {Object} options = {}
 	 */
-	unset (channel, user, command, options = {}) {
-		const cooldowns = this.data.filter(i => (
-			(i instanceof Cooldown)
-			&& (i.channel === channel)
-			&& (i.user === user)
-			&& (i.command === command)
-			&& Object.entries(options).every(([key, value]) => i[key] === value)) // checks all options
-		);
+	unset (channel: Identifier, user: Identifier, command: Identifier) {
+		for (const inhibitor of this.data) {
+			if (!isCooldown(inhibitor)) {
+				continue;
+			}
+			if (inhibitor.channel !== channel || inhibitor.user !== user || inhibitor.command !== command) {
+				continue;
+			}
 
-		for (const cooldown of cooldowns) {
-			cooldown.revoke();
+			inhibitor.revoke();
 		}
 	}
 
 	/**
 	 * Unsets a pending cooldown for given user.
-	 * @param {string|number} user
 	 */
-	unsetPending (user) {
-		const pendings = this.data.filter(i => (
-			(i instanceof Pending)
-			&& (user === i.user)
-		));
+	unsetPending (user: Identifier) {
+		for (const inhibitor of this.data) {
+			if (!isPending(inhibitor)) {
+				continue;
+			}
+			if (inhibitor.user !== user) {
+				continue;
+			}
 
-		for (const pending of pendings) {
-			pending.revoke();
+			inhibitor.revoke();
 		}
 	}
 
 	/**
 	 * Fetches the Pending for given user. Used mostly for their description.
-	 * @param {string|number} user
-	 * @returns {Pending}
 	 */
-	fetchPending (user) {
-		return this.data.find(i => (
-			i.constructor === Pending)
-			&& (i.user === user)
-			&& (i.expires !== 0)
-		);
+	fetchPending (user: Identifier): Pending | undefined {
+		for (const inhibitor of this.data) {
+			if (!isPending(inhibitor)) {
+				continue;
+			}
+			if (inhibitor.user !== user || inhibitor.expires === 0) {
+				continue;
+			}
+
+			return inhibitor;
+		}
 	}
 
 	/**
-	 * Removes expired cooldowns from the list.
+	 * Removes expired inhibitors from the list.
 	 */
 	prune () {
 		const now = Date.now();
@@ -214,18 +205,7 @@ class CooldownManager {
 		}
 	}
 
-	get pruneInterval () { return this.#pruneInterval; }
-
-	// Exporting the classes, just in case they're needed externally
-	get Cooldown () { return Cooldown; }
-	get Pending () { return Pending; }
-
-	/**
-	 * Cleans up.
-	 */
 	destroy () {
-		this.data = null;
+		clearInterval(this.#pruneInterval);
 	}
 }
-
-export default CooldownManager;

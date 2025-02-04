@@ -1,4 +1,4 @@
-import LanguageCodes from "../../../utils/languages.js";
+import { LanguageParser } from "../../../utils/languages.js";
 
 export default {
 	name: "language",
@@ -17,7 +17,7 @@ export default {
 			};
 		}
 
-		const name = LanguageCodes.getName(query);
+		const name = LanguageParser.getName(query);
 		if (!name) {
 			return {
 				success: false,
@@ -25,7 +25,7 @@ export default {
 			};
 		}
 
-		const code = LanguageCodes.getCode(name) ?? null;
+		const code = LanguageParser.getCode(name) ?? null;
 		const existing = await context.user.getDataProperty("defaultUserLanguage");
 
 		await context.user.setDataProperty("defaultUserLanguage", { code, name });

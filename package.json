@@ -34,7 +34,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "ncu": "yarn dlx npm-check-updates",
-    "test": "mocha ./tests --recursive --exit",
+    "test": "mocha ./build/tests --recursive --exit",
     "coverage": "nyc yarn test"
   },
   "main": "build/master.js",
