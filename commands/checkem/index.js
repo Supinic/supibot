@@ -33,7 +33,7 @@ export default {
 			messageNumber = BigInt(`0x${pseudoUuid}`);
 		}
 		else if (context.platform.Name === "discord") {
-			if (!context.append.messageID) {
+			if (!context.append.append) {
 				return {
 					success: false,
 					reply: `No message ID available on Discord just yet! Coming soon™`

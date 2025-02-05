@@ -1,84 +1,139 @@
+import pathModule from "node:path";
+
 import Banphrase from "./banphrase.js";
 import Filter from "./filter.js";
 import User from "./user.js";
 import Template from "./template.js";
-
-import { whitespaceRegex } from "../utils/regexes.js";
-import config from "../config.json" with { type: "json" };
-const COMMAND_PREFIX = config.modules.commands.prefix;
-
-import pathModule from "node:path";
+import Channel from "./channel.js";
+import Platform from "../platforms/template.js";
 import CooldownManager from "../utils/cooldown-manager.js";
 import { LanguageParser } from "../utils/languages.js";
 
+import { Error as SupiError } from "supi-core"
+import type { Query } from "supi-core";
+
+import { whitespaceRegex } from "../utils/regexes.js";
+import config from "../config.json" with { type: "json" };
+import { MetricConfiguration, MetricType } from "prom-client";
+import { ContextOptions } from "../@types/classes/filter.js";
+const COMMAND_PREFIX = config.modules.commands.prefix;
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 
+type QueryTransaction = Awaited<ReturnType<Query["getTransaction"]>>;
+type Parameter = {};
+type StrictResult = {
+	success?: boolean;
+	reply?: string | null;
+};
+type Result = StrictResult & {
+	reason?: string;
+};
+
+export type Invocation = string;
+export type ContextData = {
+	invocation?: Context["invocation"];
+	user?: Context["user"]
+	channel?: Context["channel"];
+	platform?: Context["platform"];
+	transaction?: Context["transaction"];
+	privateMessage?: Context["privateMessage"];
+	append?: Context["append"];
+	params?: Context["params"];
+};
+export type ContextAppend = {
+	tee?: Invocation[];
+	pipe?: boolean;
+	aliasCount?: number;
+	commandList?: Command["Name"][];
+	aliasStack?: Array<Command["Name"] | Command["Aliases"][number]>;
+	flags?: unknown;
+	id?: string;
+	messageID?: string;
+	badges?: unknown;
+	emotes?: unknown;
+};
+
+type PermissionOptions = Pick<ContextData, "user" | "channel" | "platform">;
+type EmoteOptions = { // @todo move to Channel
+	shuffle?: boolean;
+	caseSensitivity?: boolean;
+	filter?: (emote: string) => boolean;
+};
+type BestEmoteOptions = Pick<ContextData, "channel" | "platform"> & EmoteOptions;
+
 export class Context {
-	#command;
-	#invocation;
-	#user;
-	#channel;
-	#platform;
-	#transaction = null;
-	#privateMessage = false;
-	#append = {};
-	#params = {};
-	#meta = new Map();
-	#userFlags = {};
+	readonly command: Command;
+	readonly invocation: string | null;
+	readonly user: User | null;
+	readonly channel: Channel | null;
+	readonly platform: Platform | null;
+	readonly transaction: QueryTransaction | null;
+	readonly privateMessage: boolean;
+	readonly append: ContextAppend;
+	readonly params: unknown;
 
-	constructor (command, data = {}) {
-		this.#command = command;
-		this.#invocation = data.invocation ?? null;
-		this.#user = data.user ?? null;
-		this.#channel = data.channel ?? null;
-		this.#platform = data.platform ?? null;
-		this.#transaction = data.transaction ?? null;
-		this.#privateMessage = data.privateMessage ?? false;
-		this.#append = data.append ?? this.#append;
-		this.#params = data.params ?? this.#params;
+	readonly meta: Map<string, unknown> = new Map();
+	readonly #userFlags: Record<string, boolean>;
 
-		this.#append.tee ??= [];
+	constructor (command: Command, data: Partial<ContextData> = {}) {
+		this.command = command;
+		this.invocation = data.invocation ?? null;
+		this.user = data.user ?? null;
+		this.channel = data.channel ?? null;
+		this.platform = data.platform ?? null;
+		this.transaction = data.transaction ?? null;
+		this.privateMessage = data.privateMessage ?? false;
+
+		this.append = data.append ?? { tee: [] };
+		this.append.tee ??= [];
+
+		this.params = data.params ?? {};
 
 		this.#userFlags = Filter.getFlags({
 			command,
-			invocation: this.#invocation,
-			platform: this.#platform,
-			channel: this.#channel,
-			user: this.#user
-		});
+			invocation: this.invocation,
+			platform: this.platform,
+			channel: this.channel,
+			user: this.user
+		}) as Record<string, boolean>; // @todo remove type-cast after Filter is refactored to TS
 	}
 
-	getMeta (name) { return this.#meta.get(name); }
-	setMeta (name, value) { this.#meta.set(name, value); }
+	getMeta (name: string) { return this.meta.get(name); }
+	setMeta (name: string, value: unknown) { this.meta.set(name, value); }
 
-	getMentionStatus () {
+	getMentionStatus (): boolean {
 		return Filter.getMentionStatus({
-			user: this.#user,
-			command: this.#command,
-			channel: this.#channel ?? null,
-			platform: this.#platform
+			user: this.user,
+			command: this.command,
+			channel: this.channel ?? null,
+			platform: this.platform
 		});
 	}
 
-	async sendIntermediateMessage (string) {
-		if (this.#channel) {
+	async sendIntermediateMessage (string: string) {
+		if (this.channel) {
 			await Promise.all([
-				this.#channel.send(string),
-				this.#channel.mirror(string)
+				this.channel.send(string),
+				this.channel.mirror(string)
 			]);
 		}
+		else if (this.platform && this.user) {
+			await this.platform.pm(string, this.user.Name);
+		}
 		else {
-			await this.#platform.pm(string, this.#user.Name);
+			throw new SupiError({
+				message: "Cannot send intermediate message - missing channel, platform and user"
+			});
 		}
 	}
 
-	async getUserPermissions (options = {}) {
-		const userData = options.user ?? this.#user;
-		const channelData = options.channel ?? this.#channel;
-		const platformData = options.platform ?? this.#platform;
+	async getUserPermissions (options: PermissionOptions = {}) {
+		const userData = options.user ?? this.user;
+		const channelData = options.channel ?? this.channel;
+		const platformData = options.platform ?? this.platform;
 
 		const data = await Promise.all([
-			userData.getDataProperty("administrator"),
+			userData?.getDataProperty("administrator"),
 			platformData?.isUserChannelOwner(channelData, userData),
 			channelData?.isUserAmbassador(userData)
 		]);
@@ -90,35 +145,33 @@ export class Context {
 		};
 
 		let flag = User.permissions.regular;
-		for (const [key, value] of Object.entries(flags)) {
-			if (value) {
-				// eslint-disable-next-line no-bitwise
-				flag |= User.permissions[key];
-			}
+		if (flags.administrator) {
+			flag |= User.permissions.administrator;
+		}
+		if (flags.channelOwner) {
+			flag |= User.permissions.channelOwner;
+		}
+		if (flags.ambassador) {
+			flag |= User.permissions.ambassador;
 		}
 
 		return {
 			flag,
-			/**
-			 * @param {UserPermissionLevel} type
-			 * @returns {boolean}
-			 */
-			is: (type) => {
+			is: (type: keyof typeof User.permissions): boolean => {
 				if (!User.permissions[type]) {
 					throw new sb.Error({
 						message: "Invalid user permission type provided"
 					});
 				}
 
-				// eslint-disable-next-line no-bitwise
 				return ((flag & User.permissions[type]) !== 0);
 			}
 		};
 	}
 
-	async getBestAvailableEmote (emotes, fallback, options = {}) {
-		const channelData = options.channel ?? this.#channel;
-		const platformData = options.platform ?? this.#platform;
+	async getBestAvailableEmote (emotes: string[], fallback: string, options: BestEmoteOptions = {}) {
+		const channelData = options.channel ?? this.channel;
+		const platformData = options.platform ?? this.platform;
 		if (channelData) {
 			return await channelData.getBestAvailableEmote(emotes, fallback, options);
 		}
@@ -129,156 +182,94 @@ export class Context {
 		return "(no emote found)";
 	}
 
-	randomEmote (...inputEmotes) {
+	randomEmote <T extends string> (...inputEmotes: T[]): Promise<T> {
 		if (inputEmotes.length < 2) {
 			throw new sb.Error({
 				message: "At least two emotes are required"
 			});
 		}
 
-		const emotes = inputEmotes.slice(0, -1);
-		const fallback = inputEmotes.at(-1);
+		const emotes = inputEmotes.slice(0, -1) as T[];
+		const fallback = inputEmotes.at(-1) as T;
 
 		return this.getBestAvailableEmote(emotes, fallback, { shuffle: true });
 	}
 
-	get tee () { return this.#append.tee; }
-	get invocation () { return this.#invocation; }
-	get user () { return this.#user; }
-	get channel () { return this.#channel; }
-	get platform () { return this.#platform; }
-	get transaction () { return this.#transaction; }
-	get privateMessage () { return this.#privateMessage; }
-	get append () { return this.#append; }
-	get params () { return this.#params; }
-	get userFlags () { return this.#userFlags; }
+	get tee () { return this.append.tee; }
 }
 
+export type CommandDefinition = {
+	Name: Command["Name"];
+	Aliases: Command["Aliases"];
+	Description: Command["Description"];
+	Cooldown: Command["Cooldown"];
+	Flags: Command["Flags"];
+	Params: Command["Params"];
+	Whitelist_Response: Command["Whitelist_Response"];
+	Code: Command["Code"];
+	Dynamic_Description: Command["Dynamic_Description"];
+
+	initialize?: AffixFunction;
+	destroy?: AffixFunction;
+};
+export type ExecuteFunction = (this: Command, ...args: string[]) => StrictResult | Promise<StrictResult>;
+export type DescriptionFunction = (this: Command) => string[] | Promise<string[]>;
+export type AffixFunction = (this: Command) => unknown | Promise<unknown>;
+
+type ExecuteOptions = {
+	platform: Platform;
+	skipPending?: boolean;
+	privateMessage?: boolean;
+};
+
 export class Command extends Template {
-	Name;
-	Aliases = [];
-	Description = null;
-	Cooldown;
-	Flags = {};
+	Name: string;
+	Aliases: string[] = [];
+	Description: string | null = null;
+	Cooldown: number | null;
+	Flags: Readonly<string[]>;
 	Params = [];
-	Whitelist_Response = null;
-	Code;
-	Dynamic_Description;
+	Whitelist_Response: string | null = null;
+	Code: ExecuteFunction;
+	Dynamic_Description: DescriptionFunction | null;
 
 	#ready = false;
 	#destroyed = false;
-	#customDestroy = null;
-
-	#Author;
-
+	#customDestroy: AffixFunction | null;
 	data = {};
 
 	static importable = true;
 	static uniqueIdentifier = "Name";
+	static data: Command[] = [];
 
-	static #privateMessageChannelID = Symbol("private-message-channel");
+	static readonly #privateMessageChannelID: unique symbol = Symbol("private-message-channel");
 	static #cooldownManager = new CooldownManager();
 
 	static privilegedCommandCharacters = ["$"];
 	static ignoreParametersDelimiter = "--";
 
-	static #prefixRegex;
+	static #prefixRegex: string;
 
-	constructor (data) {
+	constructor (data: CommandDefinition) {
 		super();
 
 		this.Name = data.Name;
-		if (typeof this.Name !== "string" || this.Name.length === 0) {
-			console.error(`Command ID ${this.ID} has an unusable name`, data.Name);
-			this.Name = ""; // just a precaution so that the command never gets found out
-		}
+		this.Aliases = [...data.Aliases];
+		this.Description = data.Description ?? null;
+		this.Cooldown = data.Cooldown ?? null;
+		this.Whitelist_Response = data.Whitelist_Response ?? null;
 
-		if (data.Aliases === null) {
-			this.Aliases = [];
-		}
-		else if (typeof data.Aliases === "string") {
-			try {
-				this.Aliases = JSON.parse(data.Aliases);
-			}
-			catch (e) {
-				this.Aliases = [];
-				console.warn(`Command has invalid JSON aliases definition`, {
-					command: this,
-					error: e,
-					data
-				});
-			}
-		}
-		else if (Array.isArray(data.Aliases) && data.Aliases.every(i => typeof i === "string")) {
-			this.Aliases = [...data.Aliases];
-		}
-		else {
-			this.Aliases = [];
-			console.warn(`Command has invalid aliases type`, { data });
-		}
+		this.Flags = Object.freeze(data.Flags ?? []);
+		this.Params = data.Params ?? [];
 
-		this.Description = data.Description;
-
-		this.Cooldown = data.Cooldown;
-
-		if (data.Flags !== null) {
-			let flags = data.Flags;
-			if (typeof flags === "string") {
-				flags = flags.split(",");
-			}
-			else if (flags.constructor === Object) {
-				flags = Object.keys(flags);
-			}
-
-			for (const flag of flags) {
-				const camelFlag = sb.Utils.convertCase(flag, "kebab", "camel");
-				this.Flags[camelFlag] = true;
-			}
-		}
-
-		if (data.Params !== null) {
-			let params = data.Params;
-			if (typeof params === "string") {
-				try {
-					params = JSON.parse(params);
-				}
-				catch (e) {
-					this.Params = null;
-					console.warn(`Command has invalid JSON params definition`, {
-						commandName: this.Name,
-						error: e
-					});
-				}
-			}
-
-			this.Params = params;
-		}
-
-		Object.freeze(this.Flags);
-
-		this.Whitelist_Response = data.Whitelist_Response;
-
-		this.#Author = data.Author;
-
-		if (typeof data.Code === "function") {
-			this.Code = data.Code;
-		}
-
-		if (typeof data.Dynamic_Description === "function") {
-			this.Dynamic_Description = data.Dynamic_Description;
-		}
-		else {
-			this.Dynamic_Description = null;
-		}
+		this.Code = data.Code;
+		this.Dynamic_Description = data.Dynamic_Description ?? null;
 
 		if (typeof data.initialize === "function") {
 			try {
 				const result = data.initialize.call(this);
-
 				if (result instanceof Promise) {
-					result.then(() => {
-						this.#ready = true;
-					});
+					result.then(() => { this.#ready = true; });
 				}
 				else {
 					this.#ready = true;
@@ -292,9 +283,7 @@ export class Command extends Template {
 			this.#ready = true;
 		}
 
-		if (typeof data.destroy === "function") {
-			this.#customDestroy = data.destroy;
-		}
+		this.#customDestroy = data.destroy ?? null;
 	}
 
 	async destroy () {
@@ -308,19 +297,16 @@ export class Command extends Template {
 		}
 
 		this.#destroyed = true;
-
-		this.Code = null;
-		this.data = null;
 	}
 
-	execute (...args) {
-		if (this.#ready === false) {
+	execute (...args: string[]): Result | Promise<Result> {
+		if (!this.#ready) {
 			console.warn("Attempt to run not yet initialized command", this.Name);
-			return;
+			return { reply: null };
 		}
-		else if (this.#destroyed === true) {
+		else if (this.#destroyed) {
 			console.warn("Attempt to run destroyed command", this.Name);
-			return;
+			return { reply: null };
 		}
 
 		return this.Code(...args);
@@ -331,11 +317,11 @@ export class Command extends Template {
 			return null;
 		}
 		else {
-			return await this.Dynamic_Description(Command.prefix);
+			return await this.Dynamic_Description();
 		}
 	}
 
-	getDetailURL (options = {}) {
+	getDetailURL (options: { useCodePath?: boolean } = {}) {
 		if (options.useCodePath) {
 			const baseURL = config.values.commandCodeUrlPrefix;
 			if (!baseURL) {
@@ -358,7 +344,7 @@ export class Command extends Template {
 		return `sb-command-${this.Name}`;
 	}
 
-	registerMetric (type, label, options = {}) {
+	registerMetric (type: MetricType, label: string, options: Partial<MetricConfiguration<string>>) {
 		const metricLabel = `supibot_command_${this.Name}_${label}`;
 		const metricOptions = {
 			...options,
@@ -368,46 +354,22 @@ export class Command extends Template {
 		return sb.Metrics.register(type, metricOptions);
 	}
 
-	get Author () { return this.#Author; }
-
 	static async initialize () {
-		if (sb.Metrics) {
-			sb.Metrics.registerCounter({
-				name: "supibot_command_executions_total",
-				help: "The total number of command executions.",
-				labelNames: ["name", "result", "reason"]
-			});
-		}
-
-		// Override the default template behaviour of automatically calling `loadData()` by doing nothing.
-		// This is new (experimental) behaviour, where the commands' definitions will be loaded externally!
-		return this;
-	}
-
-	static async importData (definitions) {
-		super.importData(definitions);
-		await this.validate();
-	}
-
-	static async importSpecific (...definitions) {
-		super.genericImportSpecific(...definitions);
-		await this.validate();
-	}
-
-	static invalidateRequireCache (requireBasePath, ...names) {
-		return super.genericInvalidateRequireCache({
-			names,
-			requireBasePath,
-			extraDeletionCallback: (path) => {
-				const dirPath = pathModule.parse(path).dir;
-				const mainFilePath = pathModule.join(dirPath, "index.js");
-
-				return Object.keys(require.cache).filter(filePath => {
-					const hasCorrectExtension = (filePath.endsWith(".js") || filePath.endsWith(".json"));
-					return (filePath.startsWith(dirPath) && hasCorrectExtension && filePath !== mainFilePath);
-				});
-			}
+		sb.Metrics.registerCounter({
+			name: "supibot_command_executions_total",
+			help: "The total number of command executions.",
+			labelNames: ["name", "result", "reason"]
 		});
+	}
+
+	static async importData (definitions: CommandDefinition[]) {
+		super.importData(definitions);
+		this.validate();
+	}
+
+	static async importSpecific (...definitions: CommandDefinition[]) {
+		super.genericImportSpecific(...definitions);
+		this.validate();
 	}
 
 	static validate () {
@@ -430,33 +392,25 @@ export class Command extends Template {
 		}
 	}
 
-	static get (identifier) {
+	static get (identifier: Command | string): Command | null {
 		if (identifier instanceof Command) {
 			return identifier;
 		}
-		else if (typeof identifier === "string") {
-			return Command.data.find(command => command.Name === identifier || command.Aliases.includes(identifier));
-		}
 		else {
-			throw new sb.Error({
-				message: "Invalid command identifier type",
-				args: {
-					id: String(identifier),
-					type: typeof identifier
-				}
-			});
+			const command = Command.data.find(command => command.Name === identifier || command.Aliases.includes(identifier));
+			return command ?? null;
 		}
 	}
 
-	static async checkAndExecute (identifier, argumentArray, channelData, userData, options = {}) {
+	static async checkAndExecute (
+		identifier: string,
+		argumentArray: string[],
+		channelData: Channel,
+		userData: User,
+		options: ExecuteOptions
+	): Promise<Result> {
 		if (!identifier) {
 			return { success: false, reason: "no-identifier" };
-		}
-
-		if (!Array.isArray(argumentArray)) {
-			throw new sb.Error({
-				message: "Command arguments must be provided as an array"
-			});
 		}
 
 		if (channelData?.Mode === "Inactive" || channelData?.Mode === "Read") {
@@ -468,7 +422,7 @@ export class Command extends Template {
 
 		// Special parsing of privileged characters - they can be joined with other characters, and still be usable
 		// as a separate command.
-		if (typeof identifier === "string" && Command.privilegedCommandCharacters.length > 0) {
+		if (Command.privilegedCommandCharacters.length > 0) {
 			for (const char of Command.privilegedCommandCharacters) {
 				if (identifier.startsWith(char)) {
 					argumentArray.unshift(identifier.replace(char, ""));
@@ -487,7 +441,7 @@ export class Command extends Template {
 
 		// Check for cooldowns, return if it did not pass yet.
 		// If skipPending flag is set, do not check for pending status.
-		const channelID = (channelData?.ID ?? Command.#privateMessageChannelID);
+		const channelID: number | symbol = (channelData?.ID ?? Command.#privateMessageChannelID);
 		const cooldownCheck = Command.#cooldownManager.check(
 			channelID,
 			userData.ID,
@@ -512,9 +466,9 @@ export class Command extends Template {
 		// If skipPending flag is set, do not set the pending status at all.
 		// Used in pipe command, for instance.
 		// Administrators are not affected by Pending - this is expected to be used for debugging.
-		const isAdmin = await userData.getDataProperty("administrator");
+		const isAdmin = await userData.getDataProperty("administrator") as boolean;
 
-		if (!options.skipPending && isAdmin !== true) {
+		if (!options.skipPending && !isAdmin) {
 			const sourceName = channelData?.Name ?? `${options.platform.Name} PMs`;
 			Command.#cooldownManager.setPending(
 				userData.ID,
@@ -522,29 +476,27 @@ export class Command extends Template {
 			);
 		}
 
-		const appendOptions = { ...options };
+		const appendOptions: Omit<ContextAppend, "platform"> = { ...options };
 		const isPrivateMessage = (!channelData);
 
-		const contextOptions = {
+		const contextOptions: ContextData = {
 			platform: options.platform,
 			invocation: identifier,
 			user: userData,
 			channel: channelData,
-			command,
 			transaction: null,
 			privateMessage: isPrivateMessage,
 			append: appendOptions,
 			params: {}
 		};
 
-		/** @type {RegExp} */
 		let args = argumentArray
 			.map(i => i.replace(whitespaceRegex, ""))
 			.filter(Boolean);
 
 		// If the command is rollback-able, set up a transaction.
 		// The command must use the connection in transaction - that's why it is passed to context
-		if (command.Flags.rollback) {
+		if (command.Flags.includes("rollback")) {
 			contextOptions.transaction = await sb.Query.getTransaction();
 		}
 

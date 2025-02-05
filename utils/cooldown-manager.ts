@@ -1,7 +1,7 @@
 import config from "../config.json" with { type: "json" };
 const { values } = config;
 
-type Identifier = string | number | null;
+type Identifier = string | number | symbol | null;
 type CooldownConstructorData = {
 	channel?: Identifier;
 	command?: Identifier;
