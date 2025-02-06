@@ -18,6 +18,18 @@ import { MetricConfiguration, MetricType } from "prom-client";
 const COMMAND_PREFIX = config.modules.commands.prefix;
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 
+// @todo move to Filter
+type FilterExecuteSuccess = {
+	success: true;
+}
+type FilterExecuteFailure = {
+	success: false;
+	reason: string;
+	filter: Filter;
+	reply: string | null;
+};
+type FilterExecuteResult = FilterExecuteSuccess | FilterExecuteFailure;
+
 type QueryTransaction = Awaited<ReturnType<Query["getTransaction"]>>;
 
 type ParameterValueMap = {
@@ -36,12 +48,26 @@ type ParameterDefinition = {
 	type: ParameterType;
 };
 
-type AppendedParameters = Record<string, string | number | boolean | SupiDate | RegExp| Language | Record<string, string>>;
+type AppendedParameters = Record<string, string | number | boolean | SupiDate | RegExp | Language | Record<string, string>>;
 type ResultFailure = { success: false; reply: string; };
 
 type StrictResult = {
 	success?: boolean;
 	reply?: string | null;
+	replyWithPrivateMessage?: boolean;
+	cooldown?: CooldownDefinition;
+	partialReplies?: {
+		bancheck: boolean;
+		message: string;
+	}[];
+	isChannelAlias?: boolean;
+	hasExternalInput?: boolean;
+	skipExternalPrefix?: boolean;
+	forceExternalPrefix?: boolean;
+	meta?: {
+		skipBanphrases?: boolean;
+		skipWhitespaceCheck?: boolean;
+	}
 };
 type Result = StrictResult & {
 	reason?: string;
@@ -232,15 +258,19 @@ export type CommandDefinition = {
 	initialize?: InitDestroyFunction;
 	destroy?: InitDestroyFunction;
 };
-export type ExecuteFunction = (this: Command, ...args: string[]) => StrictResult | Promise<StrictResult>;
+export type ExecuteFunction = (this: Command, context: Context, ...args: string[]) => StrictResult | Promise<StrictResult>;
 export type DescriptionFunction = (this: Command) => string[] | Promise<string[]>;
 export type InitDestroyFunction = (this: Command) => unknown | Promise<unknown>;
 
-type CommandExecution = Record<string, unknown>;
 type ExecuteOptions = {
 	platform: Platform;
 	skipPending?: boolean;
 	privateMessage?: boolean;
+	skipBanphrases?: boolean;
+	skipGlobalBan?: boolean;
+	skipMention?: boolean;
+	partialExecute?: boolean;
+	context?: Context;
 };
 
 type CooldownObject = {
@@ -329,17 +359,17 @@ export class Command extends Template {
 		this.#destroyed = true;
 	}
 
-	execute (...args: string[]): Result | Promise<Result> {
+	async execute (context: Context, ...args: string[]): Promise<StrictResult> {
 		if (!this.#ready) {
 			console.warn("Attempt to run not yet initialized command", this.Name);
-			return { reply: null };
+			return { success: false, reply: null };
 		}
 		else if (this.#destroyed) {
 			console.warn("Attempt to run destroyed command", this.Name);
-			return { reply: null };
+			return { success: false, reply: null };
 		}
 
-		return this.Code(...args);
+		return await this.Code(context, ...args);
 	}
 
 	async getDynamicDescription () {
@@ -545,8 +575,7 @@ export class Command extends Template {
 			}
 		}
 
-		/** @type {ExecuteResult} */
-		const filterData = await Filter.execute({
+		const filterData: FilterExecuteResult = await Filter.execute({
 			user: userData,
 			command,
 			invocation: identifier,
@@ -554,7 +583,7 @@ export class Command extends Template {
 			platform: channelData?.Platform ?? null,
 			targetUser: args[0] ?? null,
 			args: args ?? []
-		});
+		}) as FilterExecuteResult; /* @todo remove after Filter is in Typescript */
 
 		const isFilterGlobalBan = Boolean(
 			!filterData.success
@@ -583,7 +612,9 @@ export class Command extends Template {
 				length = cooldownFilter.applyData(length);
 			}
 
-			Command.#cooldownManager.set(channelID, userData.ID, command.Name, length);
+			if (length !== null) {
+				Command.#cooldownManager.set(channelID, userData.ID, command.Name, length);
+			}
 
 			if (filterData.filter.Response === "Reason" && typeof filterData.reply === "string") {
 				const { string } = await Banphrase.execute(filterData.reply, channelData);
@@ -605,20 +636,20 @@ export class Command extends Template {
 			return failedParamsParseResult;
 		}
 
-		let execution;
+		let execution: Result;
 		const context = options.context ?? new Context(command, contextOptions);
 
 		try {
 			const start = process.hrtime.bigint();
-			execution = await command.execute(context, ...args);
+			const commandExecution: StrictResult = await command.execute(context, ...args);
 			const end = process.hrtime.bigint();
 
-			let result = null;
-			if (execution?.reply) {
-				result = execution.reply.trim().slice(0, 300);
+			let result: string | null = null;
+			if (commandExecution.reply) {
+				result = commandExecution.reply.trim().slice(0, 300);
 			}
-			else if (execution?.partialReplies) {
-				result = execution.partialReplies
+			else if (commandExecution.partialReplies) {
+				result = commandExecution.partialReplies
 					.map(i => i.message)
 					.join(" ")
 					.trim()
@@ -627,7 +658,7 @@ export class Command extends Template {
 
 			metric.inc({
 				name: command.Name,
-				result: (execution?.success === false) ? "fail" : "success"
+				result: (commandExecution?.success === false) ? "fail" : "success"
 			});
 
 			sb.Logger.logCommandExecution({
@@ -642,6 +673,8 @@ export class Command extends Template {
 				Result: result,
 				Execution_Time: sb.Utils.round(Number(end - start) / 1_000_000, 3)
 			});
+
+			execution = commandExecution;
 		}
 		catch (e) {
 			metric.inc({
@@ -728,18 +761,15 @@ export class Command extends Template {
 		Command.#cooldownManager.unsetPending(userData.ID);
 
 		// Read-only commands never reply with anything - banphrases, mentions and cooldowns are not checked
-		if (command.Flags.readOnly) {
+		if (command.Flags.includes("readOnly")) {
 			return {
 				success: execution?.success ?? true
 			};
 		}
 
-		Command.handleCooldown(channelData, userData, command, execution?.cooldown, identifier);
+		Command.handleCooldown(channelData, userData, command, execution.cooldown, identifier);
 
-		if (!execution) {
-			return execution;
-		}
-		else if (typeof execution.reply !== "string" && !execution.partialReplies) {
+		if (typeof execution.reply !== "string" && !execution.partialReplies) {
 			return execution;
 		}
 
@@ -752,7 +782,7 @@ export class Command extends Template {
 
 			const partResult = [];
 			for (const { message, bancheck } of execution.partialReplies) {
-				if (bancheck === true) {
+				if (bancheck) {
 					const { string } = await Banphrase.execute(
 						message,
 						channelData
@@ -775,7 +805,7 @@ export class Command extends Template {
 		}
 
 		const metaSkip = Boolean(!execution.partialReplies && (options.skipBanphrases || execution?.meta?.skipBanphrases));
-		if (!command.Flags.skipBanphrase && !metaSkip) {
+		if (!command.Flags.includes("skipBanphrase") && !metaSkip) {
 			let messageSlice = execution.reply.slice(0, 2000);
 			if (!execution.meta?.skipWhitespaceCheck) {
 				messageSlice = messageSlice.replace(whitespaceRegex, "");
@@ -792,7 +822,7 @@ export class Command extends Template {
 				execution.replyWithPrivateMessage = privateMessage;
 			}
 
-			if (command.Flags.rollback) {
+			if (command.Flags.includes("rollback") && context.transaction) {
 				if (passed) {
 					await context.transaction.commit();
 				}
@@ -803,7 +833,7 @@ export class Command extends Template {
 				await context.transaction.end();
 			}
 		}
-		else if (command.Flags.rollback) {
+		else if (command.Flags.includes("rollback") && context.transaction) {
 			await context.transaction.commit();
 			await context.transaction.end();
 		}
@@ -822,7 +852,7 @@ export class Command extends Template {
 
 		const mentionUser = Boolean(
 			!options.skipMention
-			&& command.Flags.mention
+			&& command.Flags.includes("mention")
 			&& channelData?.Mention
 			&& Filter.getMentionStatus({
 				user: userData,
@@ -856,7 +886,7 @@ export class Command extends Template {
 		return execution;
 	}
 
-	static handleCooldown (channelData: Channel | null, userData: User, commandData: Command, cooldownData: CooldownDefinition, identifier: Invocation) {
+	static handleCooldown (channelData: Channel | null, userData: User, commandData: Command, cooldownData: CooldownDefinition | undefined, identifier: Invocation) {
 		// Take care of private messages, where channel === null
 		const channelID = channelData?.ID ?? Command.#privateMessageChannelID;
 
@@ -912,7 +942,7 @@ export class Command extends Template {
 		}
 	}
 
-	static extractMetaResultProperties (execution: CommandExecution): Record<string, boolean> {
+	static extractMetaResultProperties (execution: Result): Record<string, boolean> {
 		const result: Record<string, boolean> = {};
 		for (const [key, value] of Object.entries(execution)) {
 			if (typeof value === "boolean") {
