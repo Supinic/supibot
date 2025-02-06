@@ -7,20 +7,38 @@ import Template from "./template.js";
 import Channel from "./channel.js";
 import Platform from "../platforms/template.js";
 import CooldownManager from "../utils/cooldown-manager.js";
-import { LanguageParser } from "../utils/languages.js";
+import { Language, LanguageParser } from "../utils/languages.js";
 
-import { Error as SupiError } from "supi-core"
+import { Date as SupiDate, Error as SupiError } from "supi-core"
 import type { Query } from "supi-core";
 
 import { whitespaceRegex } from "../utils/regexes.js";
 import config from "../config.json" with { type: "json" };
 import { MetricConfiguration, MetricType } from "prom-client";
-import { ContextOptions } from "../@types/classes/filter.js";
 const COMMAND_PREFIX = config.modules.commands.prefix;
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 
 type QueryTransaction = Awaited<ReturnType<Query["getTransaction"]>>;
-type Parameter = {};
+
+type ParameterValueMap = {
+	string: string;
+	number: number;
+	boolean: boolean;
+	date: SupiDate;
+	object: { key: string; value: string; };
+	regex: RegExp;
+	language: Language;
+};
+type ParameterType = keyof ParameterValueMap;
+type ParameterValue = ParameterValueMap[ParameterType];
+type ParameterDefinition = {
+	name: string;
+	type: ParameterType;
+};
+
+type AppendedParameters = Record<string, string | number | boolean | SupiDate | RegExp| Language | Record<string, string>>;
+type ResultFailure = { success: false; reply: string; };
+
 type StrictResult = {
 	success?: boolean;
 	reply?: string | null;
@@ -40,7 +58,7 @@ export type ContextData = {
 	append?: Context["append"];
 	params?: Context["params"];
 };
-export type ContextAppend = {
+export type ContextAppendData = {
 	tee?: Invocation[];
 	pipe?: boolean;
 	aliasCount?: number;
@@ -51,6 +69,8 @@ export type ContextAppend = {
 	messageID?: string;
 	badges?: unknown;
 	emotes?: unknown;
+	skipPending?: boolean;
+	privateMessage?: boolean;
 };
 
 type PermissionOptions = Pick<ContextData, "user" | "channel" | "platform">;
@@ -69,7 +89,7 @@ export class Context {
 	readonly platform: Platform | null;
 	readonly transaction: QueryTransaction | null;
 	readonly privateMessage: boolean;
-	readonly append: ContextAppend;
+	readonly append: ContextAppendData;
 	readonly params: unknown;
 
 	readonly meta: Map<string, unknown> = new Map();
@@ -209,18 +229,28 @@ export type CommandDefinition = {
 	Code: Command["Code"];
 	Dynamic_Description: Command["Dynamic_Description"];
 
-	initialize?: AffixFunction;
-	destroy?: AffixFunction;
+	initialize?: InitDestroyFunction;
+	destroy?: InitDestroyFunction;
 };
 export type ExecuteFunction = (this: Command, ...args: string[]) => StrictResult | Promise<StrictResult>;
 export type DescriptionFunction = (this: Command) => string[] | Promise<string[]>;
-export type AffixFunction = (this: Command) => unknown | Promise<unknown>;
+export type InitDestroyFunction = (this: Command) => unknown | Promise<unknown>;
 
+type CommandExecution = Record<string, unknown>;
 type ExecuteOptions = {
 	platform: Platform;
 	skipPending?: boolean;
 	privateMessage?: boolean;
 };
+
+type CooldownObject = {
+	length?: number;
+	channel?: Channel["ID"],
+	user?: User["ID"]
+	command?: Command["Name"];
+	ignoreCooldownFilters?: boolean;
+};
+type CooldownDefinition = number | null | CooldownObject;
 
 export class Command extends Template {
 	Name: string;
@@ -235,20 +265,20 @@ export class Command extends Template {
 
 	#ready = false;
 	#destroyed = false;
-	#customDestroy: AffixFunction | null;
+	#customDestroy: InitDestroyFunction | null;
 	data = {};
 
-	static importable = true;
-	static uniqueIdentifier = "Name";
+	static readonly importable = true;
+	static readonly uniqueIdentifier = "Name";
 	static data: Command[] = [];
 
 	static readonly #privateMessageChannelID: unique symbol = Symbol("private-message-channel");
-	static #cooldownManager = new CooldownManager();
+	static readonly #cooldownManager = new CooldownManager();
 
-	static privilegedCommandCharacters = ["$"];
-	static ignoreParametersDelimiter = "--";
+	static readonly privilegedCommandCharacters = ["$"];
+	static readonly ignoreParametersDelimiter = "--";
 
-	static #prefixRegex: string;
+	static #prefixRegex: RegExp;
 
 	constructor (data: CommandDefinition) {
 		super();
@@ -476,7 +506,7 @@ export class Command extends Template {
 			);
 		}
 
-		const appendOptions: Omit<ContextAppend, "platform"> = { ...options };
+		const appendOptions: Omit<ContextAppendData, "platform"> = { ...options };
 		const isPrivateMessage = (!channelData);
 
 		const contextOptions: ContextData = {
@@ -505,6 +535,7 @@ export class Command extends Template {
 			const result = Command.parseParametersFromArguments(command.Params, args);
 
 			// Don't exit immediately, save the result and check filters first
+			// noinspection PointlessBooleanExpressionJS
 			if (result.success === false) {
 				failedParamsParseResult = result;
 			}
@@ -825,46 +856,39 @@ export class Command extends Template {
 		return execution;
 	}
 
-	static handleCooldown (channelData, userData, commandData, cooldownData, identifier) {
+	static handleCooldown (channelData: Channel | null, userData: User, commandData: Command, cooldownData: CooldownDefinition, identifier: Invocation) {
 		// Take care of private messages, where channel === null
 		const channelID = channelData?.ID ?? Command.#privateMessageChannelID;
 
 		if (typeof cooldownData !== "undefined") {
 			if (cooldownData !== null) {
-				if (!Array.isArray(cooldownData)) {
-					cooldownData = [cooldownData];
+				const cooldown: CooldownObject = (typeof cooldownData === "number")
+					? { length: cooldownData }
+					: cooldownData;
+
+				let { length = 0 } = cooldown;
+				const {
+					channel = channelID,
+					user = userData.ID,
+					command = commandData.Name,
+					ignoreCooldownFilters = false,
+				} = cooldown;
+
+				if (!ignoreCooldownFilters) {
+					const cooldownFilter = Filter.getCooldownModifiers({
+						platform: channelData?.Platform ?? null,
+						channel: channelData,
+						command: commandData,
+						invocation: identifier,
+						user: userData
+					});
+
+					if (cooldownFilter) {
+						length = cooldownFilter.applyData(length);
+					}
 				}
 
-				for (let cooldown of cooldownData) {
-					if (typeof cooldown === "number") {
-						cooldown = { length: cooldown };
-					}
-
-					let { length = 0 } = cooldown;
-					const {
-						channel = channelID,
-						user = userData.ID,
-						command = commandData.Name,
-						ignoreCooldownFilters = false,
-						options = {}
-					} = cooldown;
-
-					if (!ignoreCooldownFilters) {
-						const cooldownFilter = Filter.getCooldownModifiers({
-							platform: channelData?.Platform ?? null,
-							channel: channelData,
-							command: commandData,
-							invocation: identifier,
-							user: userData
-						});
-
-						if (cooldownFilter) {
-							length = cooldownFilter.applyData(length);
-						}
-					}
-
-					Command.#cooldownManager.set(channel, user, command, length, options);
-				}
+				Command.#cooldownManager.set(channel, user, command, length);
 			}
 			else {
 				// If cooldownData === null, no cooldown is set at all.
@@ -888,8 +912,8 @@ export class Command extends Template {
 		}
 	}
 
-	static extractMetaResultProperties (execution) {
-		const result = {};
+	static extractMetaResultProperties (execution: CommandExecution): Record<string, boolean> {
+		const result: Record<string, boolean> = {};
 		for (const [key, value] of Object.entries(execution)) {
 			if (typeof value === "boolean") {
 				result[key] = value;
@@ -899,9 +923,13 @@ export class Command extends Template {
 		return result;
 	}
 
-	static parseParameter (value, type, explicit) {
+	/**
+	 * Parses a string value into a proper parameter type value, as signified by the `type` argument.
+	 * Returns `null` if the value provided is somehow invalid (e.g. non-finite Number, invalid Date or RegExp)
+	 */
+	static parseParameter (value: string, type: ParameterType, explicit?: boolean): ParameterValue | null {
 		// Empty implicit string value is always invalid, since that is written as `$command param:` which is a typo/mistake
-		if (type === "string" && explicit === false && value === "") {
+		if (type === "string" && !explicit && value === "") {
 			return null;
 		}
 		// Non-string parameters are also always invalid with empty string value, regardless of implicitness
@@ -933,7 +961,7 @@ export class Command extends Template {
 			}
 
 			case "date": {
-				const date = new sb.Date(value);
+				const date = new SupiDate(value);
 				if (Number.isNaN(date.valueOf())) {
 					return null;
 				}
@@ -960,7 +988,7 @@ export class Command extends Template {
 						// Since the "i" flag makes the regex not execute in linear time, use a hacky solution to
 						// replace all characters with a group that contains both cases. Then, also remove the "i" flag.
 						if (regex.flags.includes("i")) {
-							source = source.replaceAll(/(?<!\\)([a-z])/ig, (total, match) => `[${match.toLowerCase()}${match.toUpperCase()}]`);
+							source = source.replaceAll(/(?<!\\)([a-z])/ig, (_total: string, match: string) => `[${match.toLowerCase()}${match.toUpperCase()}]`);
 							flags = flags.replace("i", "");
 						}
 
@@ -986,34 +1014,29 @@ export class Command extends Template {
 		return null;
 	}
 
-	static createFakeContext (commandData, contextData = {}, extraData = {}) {
-		if (!(commandData instanceof Command)) {
-			throw new sb.Error({
-				message: "First provided argument must be an instance of Command",
-				args: {
-					type: typeof commandData,
-					name: commandData?.constructor?.name ?? "(none)"
-				}
-			});
-		}
-
+	static createFakeContext (command: Command, contextData: ContextData = {}, extraData: ContextAppendData = {}): Context {
 		const data = {
-			invocation: contextData.invocation ?? commandData.Name,
+			invocation: contextData.invocation ?? command.Name,
 			user: contextData.user ?? null,
 			channel: contextData.channel ?? null,
 			platform: contextData.platform ?? null,
 			transaction: contextData.transaction ?? null,
-			privateMessage: contextData.isPrivateMessage ?? false,
+			privateMessage: contextData.privateMessage ?? false,
 			append: contextData.append ?? {},
 			params: contextData.params ?? {},
 			...extraData
 		};
 
-		return new Context(commandData, data);
+		return new Context(command, data);
 	}
 
-	static #parseAndAppendParameter (value, parameterDefinition, explicit, existingParameters) {
-		const parameters = { ...existingParameters };
+	static #parseAndAppendParameter (
+		value: string,
+		parameterDefinition: ParameterDefinition,
+		explicit: boolean,
+		existingParameters: AppendedParameters
+	): { success: true; newParameters: AppendedParameters; } | ResultFailure {
+		const parameters: AppendedParameters = { ...existingParameters };
 		const parsedValue = Command.parseParameter(value, parameterDefinition.type, explicit);
 		if (parsedValue === null) {
 			return {
@@ -1022,36 +1045,47 @@ export class Command extends Template {
 			};
 		}
 		else if (parameterDefinition.type === "object") {
-			if (typeof parameters[parameterDefinition.name] === "undefined") {
-				parameters[parameterDefinition.name] = {};
-			}
+			// Known type because of (parameterDefinition.type === "object")
+			const { key, value } = parsedValue as ParameterValueMap["object"];
 
-			if (typeof parameters[parameterDefinition.name][parsedValue.key] !== "undefined") {
+			parameters[parameterDefinition.name] ??= {};
+
+			// Known type because of above setup
+			const obj = parameters[parameterDefinition.name] as Record<string, string>;
+
+			// Refuse to override an already existing value
+			if (typeof obj[key] !== "undefined") {
 				return {
 					success: false,
-					reply: `Cannot use multiple values for parameter "${parameterDefinition.name}", key ${parsedValue.key}!`
+					reply: `Cannot use multiple values for parameter "${parameterDefinition.name}", key ${key}!`
 				};
 			}
 
-			parameters[parameterDefinition.name][parsedValue.key] = parsedValue.value;
+			obj[key] = value;
 		}
 		else {
 			parameters[parameterDefinition.name] = parsedValue;
 		}
 
-		return { success: true, newParameters: parameters };
+		return {
+			success: true,
+			newParameters: parameters
+		};
 	}
 
-	static parseParametersFromArguments (paramsDefinition, argsArray) {
+	static parseParametersFromArguments (
+		paramsDefinition: ParameterDefinition[],
+		argsArray: string[]
+	): { success: true; parameters: unknown; args: string[]; } | ResultFailure {
 		const argsStr = argsArray.join(" ");
-		const outputArguments = [];
-		let parameters = {};
+		const outputArguments: string[] = [];
+		let parameters: AppendedParameters = {};
 
 		// Buffer used to store read characters before we know what to do with them
 		let buffer = "";
-		/** Parameter definition of the current parameter @type {typeof paramsDefinition[0] | null} */
-		let currentParam = null;
-		// is true if currently reading inside of a parameter
+		// Parameter definition of the current parameter
+		let currentParam: ParameterDefinition | null = null;
+		// is true if currently reading inside the parameter
 		let insideParam = false;
 		// is true if the current param started using quotes
 		let quotedParam = false;
@@ -1092,7 +1126,7 @@ export class Command extends Template {
 			}
 
 			if (insideParam) {
-				if (!quotedParam && char === " ") {
+				if (currentParam && !quotedParam && char === " ") {
 					// end of unquoted param
 					const value = Command.#parseAndAppendParameter(buffer.slice(0, -1), currentParam, quotedParam, parameters);
 					if (!value.success) {
@@ -1110,7 +1144,7 @@ export class Command extends Template {
 						// remove the backslash, and add quote
 						buffer = `${buffer.slice(0, -2)}"`;
 					}
-					else {
+					else if (currentParam) {
 						// end of quoted param
 						const value = Command.#parseAndAppendParameter(buffer.slice(0, -1), currentParam, quotedParam, parameters);
 						if (!value.success) {
@@ -1131,10 +1165,10 @@ export class Command extends Template {
 			if (quotedParam) {
 				return {
 					success: false,
-					reply: `Unclosed quoted parameter "${currentParam.name}"!`
+					reply: `Unclosed quoted parameter "${currentParam?.name ?? "(N/A)"}"!`
 				};
 			}
-			else {
+			else if (currentParam) {
 				const value = Command.#parseAndAppendParameter(buffer, currentParam, quotedParam, parameters);
 				if (!value.success) {
 					return value;
@@ -1143,7 +1177,7 @@ export class Command extends Template {
 			}
 		}
 		else if (buffer !== "" && buffer !== Command.ignoreParametersDelimiter) {
-			// Ignore the last parameter if its the delimiter
+			// Ignore the last parameter if it's the delimiter
 			outputArguments.push(buffer);
 		}
 
@@ -1154,7 +1188,7 @@ export class Command extends Template {
 		};
 	}
 
-	static is (string) {
+	static is (string: string) {
 		const prefix = Command.prefix;
 		if (prefix === null) {
 			return false;
