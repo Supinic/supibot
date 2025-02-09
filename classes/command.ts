@@ -1,5 +1,3 @@
-import pathModule from "node:path";
-
 import Banphrase from "./banphrase.js";
 import Filter from "./filter.js";
 import User from "./user.js";
@@ -9,7 +7,7 @@ import Platform from "../platforms/template.js";
 import CooldownManager from "../utils/cooldown-manager.js";
 import { Language, LanguageParser } from "../utils/languages.js";
 
-import { Date as SupiDate, Error as SupiError } from "supi-core"
+import { Date as SupiDate, SupiError, isGenericRequestError, isGotRequestError } from "supi-core"
 import type { Query } from "supi-core";
 
 import { whitespaceRegex } from "../utils/regexes.js";
@@ -677,13 +675,19 @@ export class Command extends Template {
 			execution = commandExecution;
 		}
 		catch (e) {
+			if (!(e instanceof Error)) {
+				throw new SupiError({
+					message: "Invalid throw value - must be Error"
+				});
+			}
+
 			metric.inc({
 				name: command.Name,
 				result: "error"
 			});
 
 			let origin = "Internal";
-			let errorContext;
+			let errorContext: Record<string, string> = {};
 			const loggingContext = {
 				user: userData.ID,
 				command: command.Name,
@@ -694,9 +698,9 @@ export class Command extends Template {
 				isPrivateMessage
 			};
 
-			if (e instanceof sb.Error.GenericRequest) {
+			if (isGenericRequestError(e)) {
 				origin = "External";
-				const { hostname, statusCode, statusMessage } = e.args;
+				const { hostname, statusCode, statusMessage } = e.args as Record<string, string>;
 				errorContext = {
 					type: "Command request error",
 					hostname,
@@ -705,7 +709,7 @@ export class Command extends Template {
 					statusMessage
 				};
 			}
-			else if (e instanceof sb.Got.RequestError) {
+			else if (isGotRequestError(e)) {
 				origin = "External";
 				const { code, name, message, options } = e;
 				errorContext = {
@@ -727,7 +731,7 @@ export class Command extends Template {
 				arguments: args
 			});
 
-			if (e instanceof sb.Error.GenericRequest) {
+			if (isGenericRequestError(e)) {
 				const { hostname } = errorContext;
 				execution = {
 					success: false,
@@ -735,7 +739,7 @@ export class Command extends Template {
 					reply: `Third party service ${hostname} failed! 🚨 (ID ${errorID})`
 				};
 			}
-			else if (e instanceof sb.Got.RequestError) {
+			else if (isGotRequestError(e)) {
 				execution = {
 					success: false,
 					reason: "got-error",
