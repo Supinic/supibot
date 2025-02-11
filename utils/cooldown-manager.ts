@@ -9,9 +9,16 @@ type CooldownConstructorData = {
 	expires: number;
 };
 
-class Cooldown {
+abstract class Inhibitor {
+	readonly abstract user: Identifier;
+	abstract expires: number;
+	abstract check (...args: Identifier[]): boolean;
+	abstract revoke (): void;
+}
+
+class Cooldown implements Inhibitor {
 	readonly #channel?: Identifier;
-	readonly #user?: Identifier;
+	readonly #user: Identifier;
 	readonly #command?: Identifier;
 	#expires: number;
 
@@ -57,9 +64,9 @@ type PendingConstructorData = {
 	expires: number;
 };
 
-class Pending {
+class Pending implements Inhibitor {
 	readonly #description;
-	readonly #user?: Identifier;
+	readonly #user: Identifier;
 	#expires: number;
 
 	constructor (data: PendingConstructorData) {
@@ -84,7 +91,6 @@ class Pending {
 	get description () { return this.#description; }
 }
 
-type Inhibitor = Cooldown | Pending;
 const isCooldown = (input: Inhibitor): input is Cooldown => (input instanceof Cooldown);
 const isPending = (input: Inhibitor): input is Pending => (input instanceof Pending);
 
