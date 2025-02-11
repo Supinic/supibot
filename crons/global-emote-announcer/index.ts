@@ -77,7 +77,7 @@ const definition: CronDefinition = {
 		});
 
 		const now = new sb.Date();
-		const result = [];
+		const result: string[] = [];
 		const json: EmoteJsonObject = {
 			timestamp: now.valueOf(),
 			added: [],
