@@ -1,15 +1,31 @@
 import { postToHastebin } from "../../utils/command-utils.js";
+import type { CronDefinition } from "../temp-definitions.d.ts";
+
+type HelixResponse = {
+	data: {
+		id: string;
+		name: string;
+	}[];
+};
+type GotHelixResponse = {
+	ok: boolean;
+	body: HelixResponse;
+};
+type EmoteJsonObject = {
+	timestamp: number;
+	added: HelixResponse["data"];
+	deleted: HelixResponse["data"];
+};
 
 const cacheKey = "twitch-global-emotes";
-const fetchTwitchGlobalEmotes = () => sb.Got.get("Helix")({
+const fetchTwitchGlobalEmotes = (): Promise<GotHelixResponse> => sb.Got.get("Helix")({
 	url: "chat/emotes/global",
 	method: "GET",
 	throwHttpErrors: false
 });
 
-/** @type {Set<string>} */
-let previousEmoteIds;
-export default {
+let previousEmoteIds: Set<string>;
+const definition: CronDefinition = {
 	name: "global-emote-announcer",
 	expression: "0 */5 * * * *",
 	description: "Periodically checks Twitch global emotes and announce",
@@ -44,15 +60,15 @@ export default {
 			return;
 		}
 
+		type xdd = typeof cron.name;
+
 		const response = await fetchTwitchGlobalEmotes();
 		if (!response.ok) {
 			return;
 		}
 
 		const emotes = response.body.data;
-		/** @type {Set<string>} */
-		const newEmoteIds = new Set(emotes.map(i => i.id));
-		/** @type {Set<string>} */
+		const newEmoteIds: Set<string> = new Set(emotes.map(i => i.id));
 		const differentEmoteIds = previousEmoteIds.symmetricDifference(newEmoteIds);
 		if (differentEmoteIds.size === 0) {
 			return;
@@ -60,7 +76,7 @@ export default {
 
 		const now = new sb.Date();
 		const result = [];
-		const json = {
+		const json: EmoteJsonObject = {
 			timestamp: now.valueOf(),
 			added: [],
 			deleted: []
@@ -68,6 +84,10 @@ export default {
 
 		for (const emoteId of differentEmoteIds) {
 			const emote = emotes.find(i => i.id === emoteId);
+			if (!emote) {
+				continue;
+			}
+
 			if (previousEmoteIds.has(emoteId)) {
 				result.push(`deleted: ${emote.name}`);
 				json.deleted.push({
@@ -95,3 +115,5 @@ export default {
 		await channelData.send(`Global Twitch emotes changed: ${result.join("; ")} ${hastebinLink}`);
 	})
 };
+
+export default definition;
