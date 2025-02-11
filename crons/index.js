@@ -5,6 +5,7 @@ import BotActivity from "./bot-active/index.js";
 import BotRequestDenialManager from "./bot-request-denial-manager/index.js";
 import ChangelogAnnouncer from "./changelog-announcer/index.js";
 import TwitchSubscribersFetcher from "./fetch-twitch-subscriber-list/index.js";
+import GlobalEmoteAnnouncer from "./global-emote-announcer/index.js";
 import InactiveDiscordServersDetector from "./inactive-discord-server-detector/index.js";
 import LateStreamChecker from "./late-stream-announcer/index.js";
 import PostureChecker from "./posture-check/index.js";
@@ -22,6 +23,7 @@ const definitions = [
 	BotRequestDenialManager,
 	ChangelogAnnouncer,
 	TwitchSubscribersFetcher,
+	GlobalEmoteAnnouncer,
 	InactiveDiscordServersDetector,
 	LateStreamChecker,
 	PostureChecker,
