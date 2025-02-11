@@ -43,7 +43,7 @@ const definition: CronDefinition = {
 		}
 
 		if (!previousEmoteIds || previousEmoteIds.size === 0) {
-			let data = await sb.Cache.getByPrefix(cacheKey);
+			let data: string[] = await sb.Cache.getByPrefix(cacheKey);
 			if (!data) {
 				const response = await fetchTwitchGlobalEmotes();
 				if (!response.ok) {
