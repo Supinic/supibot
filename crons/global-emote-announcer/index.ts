@@ -60,8 +60,6 @@ const definition: CronDefinition = {
 			return;
 		}
 
-		type xdd = typeof cron.name;
-
 		const response = await fetchTwitchGlobalEmotes();
 		if (!response.ok) {
 			return;
