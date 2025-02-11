@@ -72,6 +72,10 @@ const definition: CronDefinition = {
 			return;
 		}
 
+		await sb.Cache.setByPrefix(cacheKey, [...newEmoteIds], {
+			expiry: 7 * 864e5 // 7 days
+		});
+
 		const now = new sb.Date();
 		const result = [];
 		const json: EmoteJsonObject = {
