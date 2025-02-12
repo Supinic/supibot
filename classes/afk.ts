@@ -1,30 +1,63 @@
+import { SupiDate, SupiError, type Recordset, type Row, type RecordUpdater, type Counter, type Gauge } from "supi-core";
+
 import Filter from "./filter.js";
 import User from "./user.js";
 import Template from "./template.js";
+import type Channel from "./channel.js";
 
 import afkDefinitions from "./afk-definitions.json" with { type: "json" };
 import config from "../config.json" with { type: "json" };
 
+export type Status = "afk" | "gn" | "brb" | "shower" | "poop" | "lurk" | "work" | "study" | "nap" | "food";
+
 const { responses } = afkDefinitions;
 const configResponses = config.responses;
 
+type DurationStatus = {
+	interval: [number, number];
+	responses: string[];
+};
+const durationStatuses = responses.duration as Partial<Record<Status, DurationStatus[]>>;
+
+const NO_TEXT_AFK = "(no message)" as const;
+const DEFAULT_AFK_STATUS = "afk" as const;
+
+type AfkConstructorData = {
+	ID: AwayFromKeyboard["ID"];
+	User_Alias: AwayFromKeyboard["User_Alias"];
+	Started: AwayFromKeyboard["Started"];
+	Text: AwayFromKeyboard["Text"];
+	Silent?: AwayFromKeyboard["Silent"];
+	Status?: AwayFromKeyboard["Status"];
+};
+type NewAfkData = AfkConstructorData & {
+	Interrupted_ID?: AwayFromKeyboard["ID"];
+};
+
+// @ts-expect-error @todo Remove this once Template is in Typescript!!
 export default class AwayFromKeyboard extends Template {
-	static data = new Map();
-	static defaultStatus = "afk";
-	static uniqueIdentifier = "ID";
+	readonly ID: number;
+	readonly User_Alias: number;
+	readonly Started: SupiDate;
+	readonly Text: string;
+	readonly Silent: boolean; // @todo change to `never`, or flat-out remove, once fully removed from code base
+	readonly Status: Status | null;
 
-	static #activeGauge;
-	static #totalCounter;
+	static readonly data: Map<User["ID"], AwayFromKeyboard> = new Map();
+	static readonly uniqueIdentifier = "ID" as const;
 
-	constructor (data) {
+	static #activeGauge: Gauge;
+	static #totalCounter: Counter;
+
+	constructor (data: AfkConstructorData) {
 		super();
 
 		this.ID = data.ID;
 		this.User_Alias = data.User_Alias;
 		this.Started = data.Started;
 		this.Text = data.Text;
-		this.Silent = data.Silent;
-		this.Status = data.Status ?? AwayFromKeyboard.defaultStatus;
+		this.Silent = data.Silent ?? false;
+		this.Status = data.Status ?? DEFAULT_AFK_STATUS;
 	}
 
 	static async initialize () {
@@ -50,23 +83,23 @@ export default class AwayFromKeyboard extends Template {
 	}
 
 	static async loadData () {
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await sb.Query.getRecordset((rs: Recordset) => rs
 			.select("*")
 			.from("chat_data", "AFK")
 			.where("Active = %b", true)
-		);
+		) as AfkConstructorData[];
 
 		for (const record of data) {
 			const afk = new AwayFromKeyboard(record);
 			AwayFromKeyboard.data.set(afk.User_Alias, afk);
 		}
 
-		if (sb.Metrics) {
+		if (AwayFromKeyboard.#activeGauge) {
 			AwayFromKeyboard.#activeGauge.set(AwayFromKeyboard.data.size);
 		}
 	}
 
-	static async reloadSpecific (...list) {
+	static async reloadSpecific (...list: AwayFromKeyboard["ID"][]) {
 		if (list.length === 0) {
 			return false;
 		}
@@ -94,32 +127,31 @@ export default class AwayFromKeyboard extends Template {
 		return true;
 	}
 
-	static async checkActive (userData, channelData) {
+	static async checkActive (userData: User, channelData: Channel) {
 		if (!AwayFromKeyboard.data.has(userData.ID)) {
 			return;
 		}
 
 		// Extract the AFK data *FIRST*, before anything else is awaited!
 		// This makes sure that no more (possibly incorrect) messages are sent before the response is put together.
-		const data = AwayFromKeyboard.data.get(userData.ID);
+
+		const data = AwayFromKeyboard.data.get(userData.ID) as AwayFromKeyboard; // Type cast due to condition above
 		AwayFromKeyboard.data.delete(userData.ID);
 
 		// This should only ever update one row, if everything is working properly.
-		await sb.Query.getRecordUpdater(rs => rs
+		await sb.Query.getRecordUpdater((ru: RecordUpdater) => ru
 			.update("chat_data", "AFK")
 			.set("Active", false)
 			.where("ID = %n", data.ID)
 		);
 
-		if (sb.Metrics) {
-			AwayFromKeyboard.#activeGauge.dec(1);
-		}
+		AwayFromKeyboard.#activeGauge.dec(1);
 
 		let statusMessage;
-		const status = data.Status ?? AwayFromKeyboard.defaultStatus; // Fallback for old AFKs without `Status` property
-		if (responses.duration[status]) {
+		const status = data.Status ?? DEFAULT_AFK_STATUS; // Fallback for old AFKs without `Status` property
+		if (durationStatuses[status]) {
 			const minutesDelta = (sb.Date.now() - data.Started.getTime()) / 60_000;
-			const durationDefinitions = responses.duration[status];
+			const durationDefinitions = durationStatuses[status];
 
 			for (const definition of durationDefinitions) {
 				const minimum = definition.interval[0] ?? 0;
@@ -135,8 +167,8 @@ export default class AwayFromKeyboard extends Template {
 		}
 		else {
 			// Fallback for missing responses in the `afk-responses.json` file
-			const staticResponses = responses.static[status] ?? responses.static[AwayFromKeyboard.defaultStatus];
-			statusMessage = sb.Utils.randArray(staticResponses);
+			const staticResponses = responses.static[status] ?? responses.static[DEFAULT_AFK_STATUS];
+			statusMessage = sb.Utils.randArray(staticResponses) as string; // @todo remove type cast when Utils are well-known
 		}
 
 		/**
@@ -144,7 +176,18 @@ export default class AwayFromKeyboard extends Template {
 		 * flag in the historical table and the active one should not have it. Then remove this condition.
  		 */
 		if (!data.Silent) {
-			const userMention = await channelData.Platform.createUserMention(userData);
+			const platform = channelData.Platform;
+			if (!platform) {
+				throw new SupiError({
+					message: "Assert error - AFK's Channel does not have a Platform",
+					args: {
+						afk: data.ID,
+						channel: channelData.ID
+					}
+				})
+			}
+
+			const userMention = await platform.createUserMention(userData);
 			const fixedReminderText = await channelData.prepareMessage(data.Text) ?? configResponses.defaultBanphrase;
 
 			const message = `${userMention} ${statusMessage}: ${fixedReminderText} (${sb.Utils.timeDelta(data.Started)})`;
@@ -168,7 +211,7 @@ export default class AwayFromKeyboard extends Template {
 		}
 	}
 
-	static get (identifier) {
+	static get (identifier: AwayFromKeyboard | User | number) {
 		if (identifier instanceof AwayFromKeyboard) {
 			return identifier;
 		}
@@ -179,16 +222,17 @@ export default class AwayFromKeyboard extends Template {
 			const values = [...AwayFromKeyboard.data.values()];
 			return values.find(i => i.ID === identifier) ?? null;
 		}
-		else {
-			throw new sb.Error({
-				message: "Unrecognized AFK identifier type",
-				args: typeof identifier
-			});
-		}
 	}
 
-	static async set (userData, data = {}) {
-		const now = new sb.Date();
+	/**
+	 * Sets a new AFK status, optionally also extending ("interrupting") an existing one by providing
+	 * an `Interrupted_ID` property. This means the ID in that property is the original AFK status,
+	 * and the new one is supposed to continue its duration.
+	 * @param userData User going AFK
+	 * @param data
+	 */
+	static async set (userData: User, data: Partial<NewAfkData> = {}) {
+		const now = new SupiDate();
 		const afkData = {
 			User_Alias: userData.ID,
 			Text: data.Text ?? null,
@@ -198,22 +242,26 @@ export default class AwayFromKeyboard extends Template {
 			Interrupted_ID: data.Interrupted_ID ?? null
 		};
 
-		const row = await sb.Query.getRow("chat_data", "AFK");
+		const row: Row = await sb.Query.getRow("chat_data", "AFK"); // @todo Remove Row cast when Query is well-known
 		row.setValues(afkData);
 
 		await row.save({ skipLoad: false });
-		afkData.ID = row.values.ID;
 
-		const afk = new AwayFromKeyboard(afkData);
+		const afk = new AwayFromKeyboard({
+			ID: row.values.ID as number,
+			User_Alias: userData.ID,
+			Text: data.Text ?? NO_TEXT_AFK,
+			Silent: Boolean(data.Silent),
+			Started: data.Started ?? now,
+			Status: data.Status ?? "afk",
+		});
+
 		AwayFromKeyboard.data.set(userData.ID, afk);
 
-		if (sb.Metrics) {
-			AwayFromKeyboard.#totalCounter.inc({
-				type: afkData.Status
-			});
-
-			AwayFromKeyboard.#activeGauge.inc(1);
-		}
+		AwayFromKeyboard.#activeGauge.inc(1);
+		AwayFromKeyboard.#totalCounter.inc({
+			type: afkData.Status
+		});
 
 		return afk;
 	}
