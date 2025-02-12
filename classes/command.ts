@@ -1,3 +1,6 @@
+import { type MetricConfiguration, type MetricType } from "prom-client";
+import { SupiDate, SupiError, isGenericRequestError, isGotRequestError, type Query } from "supi-core"
+
 import Banphrase from "./banphrase.js";
 import Filter from "./filter.js";
 import User from "./user.js";
@@ -7,12 +10,9 @@ import Platform from "../platforms/template.js";
 import CooldownManager from "../utils/cooldown-manager.js";
 import { Language, LanguageParser } from "../utils/languages.js";
 
-import { Date as SupiDate, SupiError, isGenericRequestError, isGotRequestError } from "supi-core"
-import type { Query } from "supi-core";
-
 import { whitespaceRegex } from "../utils/regexes.js";
 import config from "../config.json" with { type: "json" };
-import { MetricConfiguration, MetricType } from "prom-client";
+
 const COMMAND_PREFIX = config.modules.commands.prefix;
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 
