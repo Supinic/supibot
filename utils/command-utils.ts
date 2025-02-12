@@ -2,7 +2,7 @@ import { randomInt as cryptoRandomInt } from "node:crypto";
 
 import RSSParser from "rss-parser";
 import { parse as chronoParse, ParsingOption } from "chrono-node";
-import SupiDate from "supi-core/build/objects/date.js";
+import { SupiError, SupiDate } from "supi-core";
 
 import Filter from "../classes/filter.js";
 import type { Command, Context as CommandContext } from "../classes/command.js";
@@ -32,11 +32,11 @@ const PASTEBIN_PRIVACY_OPTIONS = {
 	private: "2"
 } as const;
 
-export const VIDEO_TYPE_REPLACE_PREFIX = "$";
+export const VIDEO_TYPE_REPLACE_PREFIX = "$" as const;
 
 export const randomInt = (min: number, max: number): number => {
 	if (Math.abs(min) > Number.MAX_SAFE_INTEGER || Math.abs(max) > Number.MAX_SAFE_INTEGER) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "Integer range exceeded",
 			args: { min, max }
 		});
@@ -67,14 +67,14 @@ export const fetchTimeData = async (data: { coordinates: Coordinates, date?: Sup
 	};
 
 	if (!process.env.API_GOOGLE_TIMEZONE) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "No Google timezone API key configured (API_GOOGLE_TIMEZONE)"
 		});
 	}
 
 	const {
 		coordinates,
-		date = new sb.Date()
+		date = new SupiDate()
 	} = data;
 
 	const response = await sb.Got.get("Google")({
@@ -233,7 +233,7 @@ type GoogleGeoData = {
  */
 export const fetchGeoLocationData = async (query: string) => {
 	if (!process.env.API_GOOGLE_GEOCODING) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "No Google geolocation API key configured (API_GOOGLE_GEOCODING)"
 		});
 	}
@@ -320,7 +320,7 @@ export async function searchYoutube (query: string, options: { single: true; }):
 export async function searchYoutube (query: string, options?: { maxResults?: number; single?: false }): Promise<{ ID: string, title: string }[]>;
 export async function searchYoutube (query: string, options?: { maxResults?: number; single?: boolean; }) {
 	if (!process.env.API_GOOGLE_YOUTUBE) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
 		});
 	}
@@ -328,7 +328,7 @@ export async function searchYoutube (query: string, options?: { maxResults?: num
 	const params = { ...options };
 	if (params.single) {
 		if (typeof params.maxResults !== "undefined") {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Cannot combine params maxResults and single"
 			});
 		}
@@ -433,7 +433,7 @@ type YoutubePlaylistSuccessResult = {
  */
 export const fetchYoutubePlaylist = async (options: YoutubePlaylistOptions): Promise<YoutubePlaylistSuccessResult | YoutubePlaylistErrorResult> => {
 	if (!process.env.API_GOOGLE_YOUTUBE) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "No YouTube API key configured (API_GOOGLE_YOUTUBE)"
 		});
 	}
@@ -475,7 +475,7 @@ export const fetchYoutubePlaylist = async (options: YoutubePlaylistOptions): Pro
 			ID: i.snippet.resourceId.videoId,
 			title: i.snippet.title,
 			channelTitle: i.snippet.channelTitle,
-			published: new sb.Date(i.snippet.publishedAt),
+			published: new SupiDate(i.snippet.publishedAt),
 			position: i.snippet.position
 		})));
 
@@ -487,7 +487,7 @@ export const fetchYoutubePlaylist = async (options: YoutubePlaylistOptions): Pro
 		}
 		else if (data.pageInfo.totalResults > limit) {
 			if (options.limitAction === "error") {
-				throw new sb.Error({
+				throw new SupiError({
 					message: "Maximum amount of videos exceeded!",
 					args: {
 						limit,
@@ -725,6 +725,12 @@ export const handleGenericFilter = async (type: string, data: GenericFilterData)
 		filterData
 	} = data;
 
+	if (!context.user) {
+		throw new SupiError({
+			message: "No user found in Context, cannot create string from Filter"
+		});
+	}
+
 	let replyFn: (commandString: string, filter: Filter) => string;
 	const { invocation } = context;
 	const params = context.params as CommandContextParams;
@@ -833,7 +839,7 @@ type TextPostResult = TextPostResultFailure | TextPostResultSuccess;
  */
 export const postToPastebin = async (text: string, options: PastebinPostOptions = {}): Promise<TextPostResult> => {
 	if (!process.env.API_PASTEBIN) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "Cannot upload to Pastebin - missing env variable API_PASTEBIN"
 		});
 	}
