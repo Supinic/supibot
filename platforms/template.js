@@ -1,6 +1,4 @@
 import createMessageLoggingTable from "../utils/create-db-table.js";
-import { Channel } from "../@types/classes/channel.js";
-import { User } from "../@types/classes/user.js";
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
 export default class Platform {
