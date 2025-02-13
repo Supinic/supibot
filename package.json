@@ -13,7 +13,7 @@
     "discord.js": "^14.17.3",
     "irc-framework": "^4.14.0",
     "rss-parser": "^3.13.0",
-    "supi-core": "supinic/supi-core",
+    "supi-core": "supinic/supi-core#exports-refactor",
     "track-link-parser": "supinic/track-link-parser",
     "transliteration": "^2.3.5",
     "vm2": "^3.9.19",
@@ -35,7 +35,8 @@
     "lint:fix": "eslint . --fix",
     "ncu": "yarn dlx npm-check-updates",
     "test": "mocha ./build/tests --recursive --exit",
-    "coverage": "nyc yarn test"
+    "coverage": "nyc yarn test",
+    "indev": "yarn remove supi-core && yarn add supi-core@supinic/supi-core#exports-refactor"
   },
   "main": "build/master.js",
   "author": "Supinic <supinic@protonmail.com>",

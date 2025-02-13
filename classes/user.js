@@ -1,7 +1,7 @@
 import config from "../config.json" with { type: "json" };
-import Template from "./template.js";
+import { TemplateWithId, getGenericDataProperty, setGenericDataProperty } from "./template.js";
 
-export default class User extends Template {
+export default class User extends TemplateWithId {
 	static mapCacheExpiration = 300_000;
 	static redisCacheExpiration = 3_600_000;
 	static mapExpirationInterval = setInterval(() => User.data.clear(), User.mapCacheExpiration);
@@ -117,7 +117,7 @@ export default class User extends Template {
 	}
 
 	async getDataProperty (propertyName, options = {}) {
-		return await super.getGenericDataProperty({
+		return await getGenericDataProperty(this, {
 			cacheMap: User.dataCache,
 			databaseProperty: "User_Alias",
 			databaseTable: "User_Alias_Data",
@@ -129,7 +129,7 @@ export default class User extends Template {
 	}
 
 	async setDataProperty (propertyName, value, options = {}) {
-		return await super.setGenericDataProperty({
+		return await setGenericDataProperty(this, {
 			cacheMap: User.dataCache,
 			databaseProperty: "User_Alias",
 			databaseTable: "User_Alias_Data",

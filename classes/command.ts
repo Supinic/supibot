@@ -1,10 +1,11 @@
-import { type MetricConfiguration, type MetricType } from "prom-client";
-import { SupiDate, SupiError, isGenericRequestError, isGotRequestError, type Query } from "supi-core"
+import { SupiDate, SupiError, isGenericRequestError, isGotRequestError,  } from "supi-core"
+import type { Query, MetricConfiguration, MetricType, StringMetricType } from "supi-core";
+
+import { TemplateWithoutId } from "./template.js";
 
 import Banphrase from "./banphrase.js";
 import Filter from "./filter.js";
 import User from "./user.js";
-import Template from "./template.js";
 import Channel from "./channel.js";
 import Platform from "../platforms/template.js";
 import CooldownManager from "../utils/cooldown-manager.js";
@@ -12,6 +13,7 @@ import { Language, LanguageParser } from "../utils/languages.js";
 
 import { whitespaceRegex } from "../utils/regexes.js";
 import config from "../config.json" with { type: "json" };
+import current from "../commands/current/index.js";
 
 const COMMAND_PREFIX = config.modules.commands.prefix;
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
@@ -280,7 +282,7 @@ type CooldownObject = {
 };
 type CooldownDefinition = number | null | CooldownObject;
 
-export class Command extends Template {
+export class Command extends TemplateWithoutId {
 	Name: string;
 	Aliases: string[] = [];
 	Description: string | null = null;
@@ -298,7 +300,7 @@ export class Command extends Template {
 
 	static readonly importable = true;
 	static readonly uniqueIdentifier = "Name";
-	static data: Command[] = [];
+	static data: Map<Command["Name"], Command> = new Map();
 
 	static readonly #privateMessageChannelID: unique symbol = Symbol("private-message-channel");
 	static readonly #cooldownManager = new CooldownManager();
@@ -402,7 +404,7 @@ export class Command extends Template {
 		return `sb-command-${this.Name}`;
 	}
 
-	registerMetric (type: MetricType, label: string, options: Partial<MetricConfiguration<string>>) {
+	registerMetric (type: MetricType | StringMetricType, label: string, options: Partial<MetricConfiguration<string>>) {
 		const metricLabel = `supibot_command_${this.Name}_${label}`;
 		const metricOptions = {
 			...options,
@@ -421,32 +423,51 @@ export class Command extends Template {
 	}
 
 	static async importData (definitions: CommandDefinition[]) {
-		super.importData(definitions);
+		super.importData(this, definitions);
 		this.validate();
 	}
 
 	static async importSpecific (...definitions: CommandDefinition[]) {
-		super.genericImportSpecific(...definitions);
+		if (definitions.length === 0) {
+			return [];
+		}
+
+		const addedInstances = [];
+		for (const definition of definitions) {
+			const commandName = definition.Name;
+			const previousInstance = Command.get(commandName);
+			if (previousInstance) {
+				Command.data.delete(commandName);
+				await previousInstance.destroy();
+			}
+
+			const currentInstance = new Command(definition);
+			Command.data.set(commandName, currentInstance);
+			addedInstances.push(currentInstance);
+		}
+
 		this.validate();
+		return addedInstances;
 	}
 
 	static validate () {
-		if (Command.data.length === 0) {
+		if (Command.data.size === 0) {
 			console.warn("No commands initialized - bot will not respond to any command queries");
 		}
 		if (!Command.prefix) {
 			console.warn("No command prefix configured - bot will not respond to any command queries");
 		}
 
-		const names = Command.data.flatMap(i => [i.Name, ...(i.Aliases ?? [])]);
-		const duplicates = names.filter((i, ind, arr) => arr.indexOf(i) !== ind);
-		for (const dupe of duplicates) {
-			const affected = Command.data.filter(i => i.Aliases.includes(dupe));
-			for (const command of affected) {
-				const index = command.Aliases.indexOf(dupe);
-				command.Aliases.splice(index, 1);
-				console.warn(`Removed duplicate command name "${dupe}" from command ${command.Name}'s aliases`);
-			}
+		const names = [];
+		for (const command of Command.data.values()) {
+			names.push(command.Name);
+			names.push(...command.Aliases);
+		}
+
+		const uniqueNames = new Set(names);
+		if (uniqueNames.size !== names.length) {
+			const duplicates = names.filter((i, ind, arr) => arr.indexOf(i) !== ind);
+			console.warn("Duplicate command names detected!", { duplicates });
 		}
 	}
 
@@ -454,9 +475,17 @@ export class Command extends Template {
 		if (identifier instanceof Command) {
 			return identifier;
 		}
+		else if (Command.data.has(identifier)) {
+			return Command.data.get(identifier) as Command; // Type cast due to above condition
+		}
 		else {
-			const command = Command.data.find(command => command.Name === identifier || command.Aliases.includes(identifier));
-			return command ?? null;
+			for (const command of Command.data.values()) {
+				if (command.Aliases.includes(identifier)) {
+					return command;
+				}
+			}
+
+			return null;
 		}
 	}
 
@@ -1232,11 +1261,9 @@ export class Command extends Template {
 	}
 
 	static destroy () {
-		for (const command of Command.data) {
-			command.destroy();
+		for (const command of Command.data.values()) {
+			void command.destroy();
 		}
-
-		super.destroy();
 	}
 
 	static get prefixRegex () {

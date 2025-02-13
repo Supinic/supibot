@@ -223,7 +223,23 @@ export default class ChatModule extends Template {
 		}
 
 		const attachmentData = await ChatModule.#fetch(definitions.map(i => i.Name));
-		const newInstances = super.genericImportSpecific(...definitions);
+		if (definitions.length === 0) {
+			return [];
+		}
+
+		const newInstances = [];
+		for (const definition of definitions) {
+			const commandName = definition.Name;
+			const previousInstance = ChatModule.get(commandName);
+			if (previousInstance) {
+				ChatModule.data.delete(commandName);
+				await previousInstance.destroy();
+			}
+
+			const currentInstance = new ChatModule(definition);
+			ChatModule.data.set(commandName, currentInstance);
+			newInstances.push(currentInstance);
+		}
 
 		for (const instance of newInstances) {
 			const moduleAttachmentData = attachmentData.filter(i => i.Chat_Module === instance.Name);

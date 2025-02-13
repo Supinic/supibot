@@ -1,7 +1,7 @@
 import EventEmitter from "node:events";
 import Platform from "../platforms/template.js";
 import createMessageLoggingTable from "../utils/create-db-table.js";
-import Template from "./template.js";
+import { Template, setGenericDataProperty, getGenericDataProperty } from "./template.js";
 
 export default class Channel extends Template {
 	static redisPrefix = "sb-channel";
@@ -179,7 +179,7 @@ export default class Channel extends Template {
 	}
 
 	async getDataProperty (propertyName, options = {}) {
-		return await super.getGenericDataProperty({
+		return await getGenericDataProperty(this, {
 			cacheMap: Channel.dataCache,
 			databaseProperty: "Channel",
 			databaseTable: "Channel_Data",
@@ -191,7 +191,7 @@ export default class Channel extends Template {
 	}
 
 	async setDataProperty (propertyName, value, options = {}) {
-		return await super.setGenericDataProperty({
+		return await setGenericDataProperty(this, {
 			cacheMap: Channel.dataCache,
 			databaseProperty: "Channel",
 			databaseTable: "Channel_Data",

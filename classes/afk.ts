@@ -1,8 +1,10 @@
-import { SupiDate, SupiError, type Recordset, type Row, type RecordUpdater, type Counter, type Gauge } from "supi-core";
+import { SupiDate, SupiError } from "supi-core";
+import type { Recordset, Row, RecordUpdater, Counter, Gauge } from "supi-core";
+
+import { TemplateWithId } from "./template.js";
 
 import Filter from "./filter.js";
 import User from "./user.js";
-import Template from "./template.js";
 import type Channel from "./channel.js";
 
 import afkDefinitions from "./afk-definitions.json" with { type: "json" };
@@ -34,8 +36,7 @@ type NewAfkData = AfkConstructorData & {
 	Interrupted_ID?: AwayFromKeyboard["ID"];
 };
 
-// @ts-expect-error @todo Remove this once Template is in Typescript!!
-export default class AwayFromKeyboard extends Template {
+export default class AwayFromKeyboard extends TemplateWithId {
 	readonly ID: number;
 	readonly User_Alias: number;
 	readonly Started: SupiDate;
@@ -43,7 +44,7 @@ export default class AwayFromKeyboard extends Template {
 	readonly Silent: boolean; // @todo change to `never`, or flat-out remove, once fully removed from code base
 	readonly Status: Status | null;
 
-	static readonly data: Map<User["ID"], AwayFromKeyboard> = new Map();
+	static readonly data: Map<number, AwayFromKeyboard> = new Map();
 	static readonly uniqueIdentifier = "ID" as const;
 
 	static #activeGauge: Gauge;
@@ -58,6 +59,13 @@ export default class AwayFromKeyboard extends Template {
 		this.Text = data.Text;
 		this.Silent = data.Silent ?? false;
 		this.Status = data.Status ?? DEFAULT_AFK_STATUS;
+	}
+
+	destroy () {}
+	getCacheKey (): never {
+		throw new SupiError({
+			message: "AwayFromKeyboard module does not support `getCacheKey`"
+		});
 	}
 
 	static async initialize () {
