@@ -32,10 +32,13 @@ type GenericDataPropertyValue = string | number | boolean | null | SupiDate | Ge
 	[P: string]: GenericDataPropertyValue;
 };
 
-export type TemplateDefinition = {
-	ID: number;
+export interface TemplateDefinition {
 	[P: string]: unknown;
-};
+}
+export interface TemplateWithIdDefinition extends TemplateDefinition {
+	ID: number;
+}
+
 export type Constructable<T extends Template> = {
 	new (definition: TemplateDefinition): T;
 	importable: (typeof Template)["importable"];
@@ -43,14 +46,7 @@ export type Constructable<T extends Template> = {
 	get: (...args: unknown[]) => T | null;
 };
 
-export const getGenericDataProperty = async <T extends Template>(self: T, inputData: GenericDataPropertyObject<T>) => {
-	const ID = self.ID;
-	if (typeof ID !== "number") {
-		throw new SupiError({
-			message: "Cannot get properties of a module without ID"
-		});
-	}
-
+export const getGenericDataProperty = async <T extends TemplateWithId>(self: T, inputData: GenericDataPropertyObject<T>) => {
 	const {
 		cacheMap,
 		databaseProperty,
@@ -75,7 +71,7 @@ export const getGenericDataProperty = async <T extends Template>(self: T, inputD
 				toTable: "Custom_Data_Property",
 				on: `Custom_Data_Property.Name = ${databaseTable}.Property`
 			})
-			.where(`${databaseProperty} = %n`, ID)
+			.where(`${databaseProperty} = %n`, self.ID)
 			.where("Property = %s", propertyName)
 			.limit(1)
 			.single(),
@@ -135,7 +131,7 @@ export const getGenericDataProperty = async <T extends Template>(self: T, inputD
 	return value;
 };
 
-export const setGenericDataProperty = async <T extends Template>(self: T, inputData: SetGenericDataPropertyObject<T>) => {
+export const setGenericDataProperty = async <T extends TemplateWithId>(self: T, inputData: SetGenericDataPropertyObject<T>) => {
 	const {
 		cacheMap,
 		databaseProperty,
@@ -200,7 +196,6 @@ export const setGenericDataProperty = async <T extends Template>(self: T, inputD
 };
 
 abstract class Template {
-	abstract ID?: number;
 	abstract getCacheKey (): string | never;
 	abstract destroy (): void;
 
@@ -273,6 +268,16 @@ abstract class Template {
 		await this.loadData();
 	}
 
+	static clearData () {
+		if (this.data.size !== 0) {
+			for (const instance of this.data.values()) {
+				instance.destroy();
+			}
+
+			this.data.clear();
+		}
+	}
+
 	/**
 	 * @abstract
 	 */
@@ -313,30 +318,8 @@ abstract class Template {
 export abstract class TemplateWithId extends Template {
 	abstract ID: number;
 	static data: Map<number, TemplateWithId>;
-
-	static importData <T extends TemplateWithId> (self: Constructable<T>, definitions: TemplateDefinition[]) {
-		if (!this.importable) {
-			throw new sb.Error({
-				message: "This class does not support importing definitions"
-			});
-		}
-
-		if (this.data.size !== 0) {
-			for (const instance of this.data.values()) {
-				instance.destroy();
-			}
-
-			this.data.clear();
-		}
-
-		for (const definition of definitions) {
-			const instance = new self(definition);
-			this.data.set(definition.ID, instance);
-		}
-	}
 }
 
 export abstract class TemplateWithoutId extends Template {
-	abstract ID: never;
 	static data: Map<string, TemplateWithoutId>;
 }

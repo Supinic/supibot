@@ -1,7 +1,7 @@
 import { SupiDate, SupiError, isGenericRequestError, isGotRequestError,  } from "supi-core"
 import type { Query, MetricConfiguration, MetricType, StringMetricType } from "supi-core";
 
-import { TemplateWithoutId } from "./template.js";
+import { TemplateWithoutId, TemplateDefinition } from "./template.js";
 
 import Banphrase from "./banphrase.js";
 import Filter from "./filter.js";
@@ -13,7 +13,6 @@ import { Language, LanguageParser } from "../utils/languages.js";
 
 import { whitespaceRegex } from "../utils/regexes.js";
 import config from "../config.json" with { type: "json" };
-import current from "../commands/current/index.js";
 
 const COMMAND_PREFIX = config.modules.commands.prefix;
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
@@ -244,7 +243,7 @@ export class Context {
 	get tee () { return this.append.tee; }
 }
 
-export type CommandDefinition = {
+export interface CommandDefinition extends TemplateDefinition {
 	Name: Command["Name"];
 	Aliases: Command["Aliases"];
 	Description: Command["Description"];
@@ -257,7 +256,7 @@ export type CommandDefinition = {
 
 	initialize?: InitDestroyFunction;
 	destroy?: InitDestroyFunction;
-};
+}
 export type ExecuteFunction = (this: Command, context: Context, ...args: string[]) => StrictResult | Promise<StrictResult>;
 export type DescriptionFunction = (this: Command) => string[] | Promise<string[]>;
 export type InitDestroyFunction = (this: Command) => unknown | Promise<unknown>;
@@ -423,7 +422,13 @@ export class Command extends TemplateWithoutId {
 	}
 
 	static async importData (definitions: CommandDefinition[]) {
-		super.importData(this, definitions);
+		this.clearData();
+
+		for (const definition of definitions) {
+			const instance = new Command(definition);
+			this.data.set(definition.Name, instance);
+		}
+
 		this.validate();
 	}
 
