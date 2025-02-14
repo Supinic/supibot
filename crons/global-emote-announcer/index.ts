@@ -115,7 +115,7 @@ const definition: CronDefinition = {
 			? hastebinResult.link
 			: "(Hastebin link N/A)";
 
-		await channelData.send(`Global Twitch emotes changed: ${result.join("; ")} ${hastebinLink}`);
+		await channelData.send(`Global Twitch emotes changed: ${result.join(" ")} ${hastebinLink}`);
 	})
 };
 
