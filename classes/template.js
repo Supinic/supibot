@@ -228,7 +228,6 @@ export default class ClassTemplate {
 
 	static async initialize () {
 		await this.loadData();
-		return this;
 	}
 
 	static async loadData () {
@@ -351,11 +350,15 @@ export default class ClassTemplate {
 		return (this.reloadSpecific !== ClassTemplate.reloadSpecific);
 	}
 
-	static async get () {
-		throw new sb.Error({
-			message: "get method must be implemented in module"
-		});
-	}
+	// /**
+	//  * @abstract
+	//  * @todo reinstate in typescript
+	//  */
+	// static async get () {
+	// 	throw new sb.Error({
+	// 		message: "get method must be implemented in module"
+	// 	});
+	// }
 
 	/**
 	 * Cleans up the module.

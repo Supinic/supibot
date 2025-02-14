@@ -3,7 +3,7 @@ import config from "../config.json" with { type: "json" };
 import AwayFromKeyboard from "./afk.js";
 import Banphrase from "./banphrase.js";
 import Channel from "./channel.js";
-import Command from "./command.js";
+import { Command } from "./command.js";
 import Filter from "./filter.js";
 import User from "./user.js";
 import Template from "./template.js";
