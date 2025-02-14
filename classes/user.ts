@@ -1,27 +1,47 @@
-import config from "../config.json" with { type: "json" };
+import { SupiDate } from "supi-core";
+import type { Batch, Recordset } from "supi-core";
 import { TemplateWithId, getGenericDataProperty, setGenericDataProperty } from "./template.js";
+import type { GenericDataPropertyObject, SetGenericDataPropertyObject } from "./template.js";
+
+import config from "../config.json" with { type: "json" };
+
+type ConstructorData = {
+	ID: User["ID"];
+	Name: User["Name"];
+	Twitch_ID: User["Twitch_ID"];
+	Discord_ID: User["Discord_ID"];
+	Started_Using: User["Started_Using"] | null;
+};
+type GenericFetchData = GenericDataPropertyObject<User>["options"];
+type GetOptions = Partial<Pick<ConstructorData, "Twitch_ID" | "Discord_ID">>;
 
 export default class User extends TemplateWithId {
-	static mapCacheExpiration = 300_000;
-	static redisCacheExpiration = 3_600_000;
-	static mapExpirationInterval = setInterval(() => User.data.clear(), User.mapCacheExpiration);
+	readonly ID: number;
+	readonly Discord_ID: string | null;
+	readonly Twitch_ID: string | null;
+	readonly Name: string;
+	readonly Started_Using: SupiDate;
+
+	static readonly mapCacheExpiration = 300_000 as const;
+	static readonly redisCacheExpiration = 3_600_000 as const;
+	static readonly mapExpirationInterval = setInterval(() => User.data.clear(), User.mapCacheExpiration);
 
 	static data = new Map();
 	static dataCache = new WeakMap();
 	static pendingNewUsers = new Map();
 	static uniqueIdentifier = "ID";
 
-	static permissions = {
+	static readonly permissions = {
 		regular: 0b0000_0001,
 		ambassador: 0b0000_0010,
 		channelOwner: 0b0000_0100,
 		administrator: 0b1000_0000
-	};
+	} as const;
 
 	static loadUserPrefix = "sb-user-high-load";
 	static loadUserPrefixExpiry = 60_000;
 
-	static highLoadUserBatch;
+	static highLoadUserBatch: Batch;
 	static highLoadUserInterval = setInterval(async () => {
 		User.highLoadUserBatch ??= await sb.Query.getBatch(
 			"chat_data",
@@ -41,65 +61,16 @@ export default class User extends TemplateWithId {
 		}
 	}, User.loadUserPrefixExpiry);
 
-	constructor (data) {
+	constructor (data: ConstructorData) {
 		super();
 
-		/**
-		 * Unique numeric ID.
-		 * @type {number}.
-		 */
 		this.ID = data.ID;
-
-		/**
-		 * Unique Discord identifier.
-		 * Only verified users (non-null Discord ID value) can use the bot on Discord.
-		 * @type {number}
-		 */
 		this.Discord_ID = data.Discord_ID;
-
-		/**
-		 * Unique Twitch identifier.
-		 * @type {number}
-		 */
 		this.Twitch_ID = data.Twitch_ID;
-
-		/**
-		 * Unique name.
-		 * @type {string}
-		 */
 		this.Name = data.Name;
-
-		/**
-		 * Date of first sighting.
-		 * @type {sb.Date}
-		 */
-		this.Started_Using = (data.Started_Using instanceof sb.Date)
-			? data.Started_Using
-			: new sb.Date(data.Started_Using);
-
-		/**
-		 * Extra data given to each user.
-		 * @type {Object}
-		 */
-		if (!data.Data) {
-			this.Data = {};
-		}
-		else if (typeof data.Data === "string") {
-			try {
-				this.Data = JSON.parse(data.Data);
-			}
-			catch (e) {
-				console.warn("User.Data parse error", { error: e, user: this, data });
-				this.Data = {};
-			}
-		}
-		else if (typeof data.Data === "object") {
-			this.Data = { ...data.Data };
-		}
-		else {
-			console.warn("User.Data invalid type", { user: this, data });
-			this.Data = {};
-		}
+		this.Started_Using = (data.Started_Using === null)
+			? new sb.Date(data.Started_Using)
+			: data.Started_Using;
 	}
 
 	getCacheKey () {
@@ -116,8 +87,8 @@ export default class User extends TemplateWithId {
 		await User.populateCaches(this);
 	}
 
-	async getDataProperty (propertyName, options = {}) {
-		return await getGenericDataProperty(this, {
+	async getDataProperty (propertyName: keyof ConstructorData, options: GenericFetchData) {
+		return await getGenericDataProperty({
 			cacheMap: User.dataCache,
 			databaseProperty: "User_Alias",
 			databaseTable: "User_Alias_Data",
@@ -128,7 +99,7 @@ export default class User extends TemplateWithId {
 		});
 	}
 
-	async setDataProperty (propertyName, value, options = {}) {
+	async setDataProperty (propertyName: keyof ConstructorData, value: ConstructorData[keyof ConstructorData], options: GenericFetchData) {
 		return await setGenericDataProperty(this, {
 			cacheMap: User.dataCache,
 			databaseProperty: "User_Alias",
@@ -141,11 +112,11 @@ export default class User extends TemplateWithId {
 		});
 	}
 
+	destroy () {}
+
 	static async initialize () {
 		User.data = new Map();
-
 		await User.loadData();
-		return User;
 	}
 
 	static async loadData () {
@@ -158,7 +129,7 @@ export default class User extends TemplateWithId {
 		await User.loadData();
 	}
 
-	static async get (identifier, strict = true, options = {}) {
+	static async get (identifier: User | number | string, strict = true, options: GetOptions = {}): Promise<User | null> {
 		if (identifier instanceof User) {
 			return identifier;
 		}
@@ -168,20 +139,21 @@ export default class User extends TemplateWithId {
 				return mapCacheUser;
 			}
 
-			const name = await sb.Query.getRecordset(rs => rs
+			const name = await sb.Query.getRecordset((rs: Recordset) => rs
 				.select("Name")
 				.from("chat_data", "User_Alias")
 				.where("ID = %n", identifier)
 				.single()
 				.flat("Name")
-			);
+			) as string | undefined;
+
 			if (!name) {
 				return null;
 			}
 
 			return User.get(name, strict, options);
 		}
-		else if (typeof identifier === "string") {
+		else {
 			const username = User.normalizeUsername(identifier);
 
 			// 1. attempt to fetch the user from low-cache (User.data)
@@ -203,12 +175,12 @@ export default class User extends TemplateWithId {
 			}
 
 			// 3. attempt to get the user out of the database
-			const dbUserData = await sb.Query.getRecordset(rs => rs
+			const dbUserData = await sb.Query.getRecordset((rs: Recordset) => rs
 				.select("*")
 				.from("chat_data", "User_Alias")
 				.where("Name = %s", username)
 				.single()
-			);
+			) as ConstructorData | undefined;
 
 			let userData;
 			if (dbUserData) {
@@ -235,17 +207,11 @@ export default class User extends TemplateWithId {
 			await User.populateCaches(userData);
 			return userData;
 		}
-		else {
-			throw new sb.Error({
-				message: "Invalid user identifier type",
-				args: { id: identifier, type: typeof identifier }
-			});
-		}
 	}
 
-	static async getMultiple (identifiers) {
-		const result = [];
-		const toFetch = [];
+	static async getMultiple (identifiers: Array<User | number | string>) {
+		const result: User[] = [];
+		const toFetch: (string | number)[] = [];
 		let userMapValues;
 
 		for (const identifier of identifiers) {
@@ -265,7 +231,7 @@ export default class User extends TemplateWithId {
 					toFetch.push(identifier);
 				}
 			}
-			else if (typeof identifier === "string") {
+			else {
 				const username = User.normalizeUsername(identifier);
 				const mapCacheUser = User.data.get(username);
 				if (mapCacheUser) {
@@ -284,18 +250,15 @@ export default class User extends TemplateWithId {
 
 				toFetch.push(username);
 			}
-			else {
-				throw new sb.Error({
-					message: "Invalid user identifier type",
-					args: { id: identifier, type: typeof identifier }
-				});
-			}
 		}
 
 		if (toFetch.length > 0) {
-			const [strings, numbers] = sb.Utils.splitByCondition(toFetch, i => typeof i === "string");
-			const fetched = await sb.Query.getRecordset(rs => {
-				rs.select("*").from("chat_data", "User_Alias");
+			// @todo remove type casts when Utils is well-known
+			const [strings, numbers] = sb.Utils.splitByCondition(toFetch, (i: string | number) => typeof i === "string") as [string[], number[]];
+			const fetched = await sb.Query.getRecordset((rs: Recordset) => {
+				rs.select("*");
+				rs.from("chat_data", "User_Alias");
+
 				if (strings.length > 0 && numbers.length > 0) {
 					rs.where("Name IN %s+ OR ID IN %n+", strings, numbers);
 				}
@@ -305,7 +268,7 @@ export default class User extends TemplateWithId {
 				else if (numbers.length > 0) {
 					rs.where("ID IN %n+", numbers);
 				}
-			});
+			}) as ConstructorData[];
 
 			const cachePromises = [];
 			for (const rawUserData of fetched) {

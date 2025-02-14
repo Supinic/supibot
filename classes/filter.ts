@@ -1,99 +1,86 @@
+import type { Recordset } from "supi-core";
+import { TemplateWithId } from "./template.js";
+
 import Channel from "./channel.js";
 import User from "./user.js";
+import type Platform from "./user.js";
+import type { Command } from "./command.js";
+import { XOR } from "../@types/globals.js";
+import { ArgumentDescriptor } from "../@types/classes/filter.js";
 
-import Template from "./template.js";
+type Type =
+	"Blacklist" | "Whitelist" | "Opt-out" | "Block" | "Unping" | "Unmention" |
+	"Cooldown" | "Flags" | "Offline-only" | "Online-only" | "Arguments" | "Reminder-prevention";
+
+type CooldownData = XOR<{ multiplier: number }, { override: number }>;
+type ArgumentsData = {
+	args: ArgumentDescriptor[];
+};
+
+type ConstructorData = {
+	ID: Filter["ID"];
+	User_Alias: Filter["User_Alias"];
+	Channel: Filter["Channel"];
+	Command: Filter["Command"];
+	Platform: Filter["Platform"];
+	Invocation: Filter["Invocation"];
+	Type: Filter["Type"];
+	Response: Filter["Response"];
+	Reason: Filter["Reason"];
+	Blocked_User: Filter["Blocked_User"];
+	Active: Filter["Active"];
+	Issued_By: Filter["Issued_By"];
+};
+type CreateData = Partial<Omit<ConstructorData, "ID" | "Data" | "Active" | "Response">>;
 
 /**
  * Represents a filter of the bot's commands.
  */
-export default class Filter extends Template {
-	#filterData = null;
-	static uniqueIdentifier = "ID";
+export default class Filter extends TemplateWithId {
+	readonly ID: number;
+	readonly User_Alias: User["ID"] | null;
+	readonly Channel: Channel["ID"] | null;
+	readonly Command: Command["Name"] | null;
+	readonly Platform: Platform["ID"] | null;
+	readonly Invocation: Command["Name"] | Command["Aliases"][number] | null;
+	readonly Response: "None" | "Auto" | "Reason";
+	readonly Reason: string | null;
+	readonly Blocked_User: User["ID"] |  null;
+	Active: boolean;
+	readonly Issued_By: User["ID"];
+	/**
+	 * Filter type.
+	 * Blacklist disallows the usage for given combination of User_Alias/Channel/Command.
+	 * Whitelist disallows the usage of a command everywhere BUT the given combination of User_Alias/Channel.
+	 * Opt-out disallows the usage of given user as the parameter for given command.
+	 */
+	readonly Type: Type;
+	/**
+	 * Specific filter data |  usually only applicable to Cooldown and Arguments filter types.
+	 */
+	readonly Data: CooldownData | ArgumentsData | null;
 
-	constructor (data) {
+	#filterData = null;
+	static data: Map<Filter["ID"], Filter>;
+
+	constructor (data: ConstructorData) {
 		super();
 
-		/**
-		 * Unique numeric identifier
-		 * @type {number}
-		 */
 		this.ID = data.ID;
-
-		/**
-		 * Unique numeric user identifier
-		 * @type {sb.User.ID|null}
-		 */
 		this.User_Alias = data.User_Alias;
-
-		/**
-		 * Unique numeric channel identifier
-		 * @type {sb.Channel.ID|null}
-		 */
 		this.Channel = data.Channel;
-
-		/**
-		 * Unique string command identifier - name
-		 * @type {sb.Command.Name|null}
-		 */
 		this.Command = data.Command;
-
-		/**
-		 * Unique numeric platform identifier
-		 * @type {sb.Platform.ID|null}
-		 */
 		this.Platform = data.Platform;
-
-		/**
-		 * Specific command identifier - a possible command alias
-		 * @type {string|null}
-		 */
 		this.Invocation = data.Invocation;
-
-		/**
-		 * Filter type.
-		 * Blacklist disallows the usage for given combination of User_Alias/Channel/Command.
-		 * Whitelist disallows the usage of a command everywhere BUT the given combination of User_Alias/Channel.
-		 * Opt-out disallows the usage of given user as the parameter for given command.
-		 * @type {FilterType}
-		 */
 		this.Type = data.Type;
+		this.Response = data.Response;
+		this.Reason = data.Reason;
+		this.Blocked_User = data.Blocked_User;
+		this.Active = data.Active;
+		this.Issued_By = data.Issued_By;
 
-		/**
-		 * Specific filter data, usually only applicable to Cooldown and Arguments filter types.
-		 * @type {CooldownFilterData|ArgumentsFilterData}
-		 */
 		this.Data = null;
 		this.createFilterData(data);
-
-		/**
-		 * Response type to respond with if a filter is found.
-		 * @type {"None"|"Auto"|"Reason"}
-		 */
-		this.Response = data.Response;
-
-		/**
-		 * The reason a filter was issued.
-		 * @type {string|null}
-		 */
-		this.Reason = data.Reason;
-
-		/**
-		 * If the filter is a block, this is the user who is being blocked from targetting someone with a command.
-		 * @type {sb.User.ID|null}
-		 */
-		this.Blocked_User = data.Blocked_User;
-
-		/**
-		 * Whether or not the filter is currently being enforced.
-		 * @type {boolean}
-		 */
-		this.Active = data.Active;
-
-		/**
-		 * Unique numeric user identifier of the person who created the filter.
-		 * @type {sb.User.ID|null}
-		 */
-		this.Issued_By = data.Issued_By;
 	}
 
 	/**
@@ -169,7 +156,7 @@ export default class Filter extends Template {
 	}
 	/* eslint-enable no-bitwise */
 
-	createFilterData (data) {
+	createFilterData (data: Filter["Data"]) {
 		if (data.Data) {
 			if (typeof data.Data === "string") {
 				try {
@@ -286,46 +273,7 @@ export default class Filter extends Template {
 		await row.save();
 	}
 
-	/**
-	 * Changes the reason and response fields of a Filter accordingly.
-	 * @param {string|null} reason Changes the reason of the filter and the type to "Reason" if set to string.
-	 * Unsets the response (NULL) and sets the type to "Auto"
-	 * @returns {Promise<void>}
-	 */
-	async setReason (reason) {
-		if (typeof reason === "string") {
-			this.Reason = reason;
-			this.Response = "Reason";
-		}
-		else if (reason === null) {
-			this.Reason = null;
-			this.Response = "Auto";
-		}
-		else {
-			throw new sb.Error({
-				message: "Invalid reason type",
-				args: {
-					type: typeof reason
-				}
-			});
-		}
-
-		const row = await sb.Query.getRow("chat_data", "Filter");
-		await row.load(this.ID);
-
-		row.values.Reason = this.Reason;
-		row.values.Response = this.Response;
-
-		await row.save();
-	}
-
-	/**
-	 * Pushes a property change to the dataabse.
-	 * @param {string} property
-	 * @param {*} [value]
-	 * @returns {Promise<void>}
-	 */
-	async saveProperty (property, value) {
+	async saveProperty (property: keyof Filter, value: Filter[keyof Filter]) {
 		const row = await sb.Query.getRow("chat_data", "Filter");
 		await row.load(this.ID);
 
@@ -337,30 +285,28 @@ export default class Filter extends Template {
 	}
 
 	static async loadData () {
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await sb.Query.getRecordset((rs: Recordset) => rs
 			.select("*")
 			.from("chat_data", "Filter")
-		);
+		) as ConstructorData[];
 
-		Filter.data = data.map(record => new Filter(record));
+		for (const definition of data) {
+			const instance = new Filter(definition);
+			Filter.data.set(instance.ID, instance);
+		}
 	}
 
-	static get (identifier) {
+	static get (identifier: Filter | number) {
 		if (identifier instanceof Filter) {
 			return identifier;
 		}
-		else if (typeof identifier === "number") {
-			return Filter.data.find(i => i.ID === identifier);
-		}
 		else {
-			throw new sb.Error({
-				message: "Unrecognized filter identifier type",
-				args: typeof identifier
-			});
+			return Filter.data.get(identifier);
 		}
 	}
 
-	static getLocals (type, options) {
+	static getLocals (type: Type, options) {
+		// @todo needs refactoring per Filter type
 		return Filter.data.filter(row => (
 			row.Active
 			&& (!type || type === row.Type)
@@ -591,11 +537,11 @@ export default class Filter extends Template {
 	 * @param {string} [options.Response]
 	 * @param {string} [options.Invocation]
 	 * @param {Object} [options.Data]
-	 * @param {FilterType} [options.Type]
+	 * @param {Type} [options.Type]
 	 * @param {sb.User.ID} [options.Blocked_User]
 	 * @param {sb.User.ID} [options.Issued_By]
 	 */
-	static async create (options) {
+	static async create (options: unknown) {
 		const data = {
 			Platform: options.Platform ?? null,
 			Channel: options.Channel ?? null,
@@ -736,23 +682,3 @@ export default class Filter extends Template {
 		return true;
 	}
 };
-
-/**
- * @typedef {Object} CooldownFilterData
- * @property {number} multiplier - mutually exclusive with `override`
- * @property {number} override - mutually exclusive with `multiplier`
- */
-
-/**
- * @typedef {Object} ArgumentsFilterData
- * @todo
- */
-
-/**
- * @typedef {
- *   "Blacklist","Whitelist","Opt-out","Block",
- *   "Unping","Unmention","Cooldown","Flags",
- *   "Offline-only","Online-only","Arguments",
- *   "Reminder-prevention"
- * } FilterType
- */

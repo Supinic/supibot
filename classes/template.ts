@@ -4,20 +4,19 @@ type PoolConnection = Awaited<ReturnType<Query["getTransaction"]>>;
 
 type KeyLike = string | Record<string, string>;
 type SetCacheOptions = Pick<KeyObject, "expiry" | "expiresAt" | "keepTTL">;
-type GenericDataPropertyObject<T extends Template> = {
+export type GenericDataPropertyObject<T extends Template> = {
 	cacheMap: WeakMap<T, Map<string, GenericDataPropertyValue>>;
 	databaseProperty: string;
 	databaseTable: string;
 	propertyName: string;
 	propertyContext: string;
 	instance: T;
-	object: unknown;
 	options: {
 		forceCacheReload?: boolean;
 		transaction?: PoolConnection;
 	}
 };
-type SetGenericDataPropertyObject<T extends Template> = GenericDataPropertyObject<T> & {
+export type SetGenericDataPropertyObject<T extends Template> = GenericDataPropertyObject<T> & {
 	value: GenericDataPropertyValue;
 };
 type SetGenericDataPropertyResult = {
@@ -46,7 +45,7 @@ export type Constructable<T extends Template> = {
 	get: (...args: unknown[]) => T | null;
 };
 
-export const getGenericDataProperty = async <T extends TemplateWithId>(self: T, inputData: GenericDataPropertyObject<T>) => {
+export const getGenericDataProperty = async <T extends TemplateWithId>(inputData: GenericDataPropertyObject<T>) => {
 	const {
 		cacheMap,
 		databaseProperty,
@@ -71,7 +70,7 @@ export const getGenericDataProperty = async <T extends TemplateWithId>(self: T, 
 				toTable: "Custom_Data_Property",
 				on: `Custom_Data_Property.Name = ${databaseTable}.Property`
 			})
-			.where(`${databaseProperty} = %n`, self.ID)
+			.where(`${databaseProperty} = %n`, instance.ID)
 			.where("Property = %s", propertyName)
 			.limit(1)
 			.single(),
