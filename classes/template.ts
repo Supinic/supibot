@@ -319,6 +319,11 @@ export abstract class TemplateWithId extends Template {
 	static data: Map<number, TemplateWithId>;
 }
 
+export abstract class TemplateWithIdString extends Template {
+	abstract ID: number;
+	static data: Map<string, TemplateWithIdString>;
+}
+
 export abstract class TemplateWithoutId extends Template {
 	static data: Map<string, TemplateWithoutId>;
 }
