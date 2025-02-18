@@ -16,10 +16,10 @@ type Success = {
 };
 
 export default {
-	name: "league-user",
+	name: "osrs-username",
 	aliases: [],
 	parameter: "arguments",
-	description: "Lets you set a default user identifier for the purposes of the $league command.",
+	description: "Lets you set a default user identifier for the purposes of the $osrs command.",
 	flags: {
 		pipe: false
 	},
