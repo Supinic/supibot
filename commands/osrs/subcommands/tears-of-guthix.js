@@ -1,4 +1,4 @@
-import { fetchWorldsData } from "./utils.js";
+import { fetchWorldsData } from "./osrs-utils.js";
 
 export default {
 	name: "guthix",

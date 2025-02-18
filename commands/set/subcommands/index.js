@@ -7,6 +7,7 @@ import LeagueRegionSubcommand from "./league-region.js";
 import LeagueUserSubcommand from "./league-user.js";
 import LocationSubcommand from "./location.js";
 import NoAbbChatterSubcommand from "./no-abb-chatter.js";
+import OSRSUsernameSubcommand from "./osrs-username.js";
 import ReminderSubcommand from "./reminder.js";
 import StalkPreventionSubcommand from "./stalk-prevention.js";
 import SuggestionSubcommand from "./suggestion.js";
@@ -25,6 +26,7 @@ export default [
 	LeagueUserSubcommand,
 	LocationSubcommand,
 	NoAbbChatterSubcommand,
+	OSRSUsernameSubcommand,
 	ReminderSubcommand,
 	StalkPreventionSubcommand,
 	SuggestionSubcommand,

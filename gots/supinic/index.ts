@@ -2,7 +2,7 @@ export default {
 	name: "Supinic",
 	optionsType: "object",
 	options: {
-		prefixUrl: "http://localhost/api",
+		prefixUrl: "https://supinic.com/api",
 		timeout: {
 			request: 30000
 		}

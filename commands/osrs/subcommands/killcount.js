@@ -1,4 +1,4 @@
-import OsrsUtils from "./osrs-utils.js";
+import { fetchUserData, parseUserIdentifier, getIronman } from "./osrs-utils.js";
 import GameData from "../game-data.json" with { type: "json" };
 
 export default {
@@ -12,14 +12,13 @@ export default {
 		"For given user and activity, prints their kill-count and ranking."
 	],
 	execute: async function (context, ...args) {
-		const user = args.join(" ");
-		if (!user) {
-			return {
-				success: false,
-				reply: `No user provided!`
-			};
+		const identifier = args.join(" ");
+		const parsedUserData = await parseUserIdentifier(context, identifier);
+		if (!parsedUserData.success) {
+			return parsedUserData;
 		}
 
+		const user = parsedUserData.username;
 		let activity = context.params.activity ?? context.params.boss;
 		if (!activity) {
 			return {
@@ -28,19 +27,20 @@ export default {
 			};
 		}
 
-		const data = await OsrsUtils.fetch(user, {
+		const userStats = await fetchUserData(user, {
 			seasonal: Boolean(context.params.seasonal),
 			force: Boolean(context.params.force)
 		});
 
-		if (data.success === false) {
-			return data;
+		if (userStats.success === false) {
+			return userStats;
 		}
 
 		if (GameData.activityAliases[activity.toLowerCase()]) {
 			activity = GameData.activityAliases[activity.toLowerCase()];
 		}
 
+		const { data } = userStats;
 		const activities = data.activities.map(i => i.name.toLowerCase());
 		const bestMatch = sb.Utils.selectClosestString(activity.toLowerCase(), activities, { ignoreCase: true });
 		if (!bestMatch) {
@@ -53,7 +53,7 @@ export default {
 		const { name, rank, value } = data.activities.find(i => i.name.toLowerCase() === bestMatch.toLowerCase());
 		const ironman = (context.params.seasonal)
 			? "Seasonal user"
-			: sb.Utils.capitalize(OsrsUtils.getIronman(data, Boolean(context.params.rude)));
+			: sb.Utils.capitalize(getIronman(data, Boolean(context.params.rude)));
 
 		return {
 			reply: (rank === null)

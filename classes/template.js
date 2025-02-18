@@ -114,6 +114,9 @@ export default class ClassTemplate {
 				args: { options, property: propertyName }
 			});
 		}
+		else if (data.Value === null) {
+			return null;
+		}
 
 		let value;
 		switch (data.Type) {
