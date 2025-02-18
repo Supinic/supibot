@@ -27,19 +27,20 @@ export default {
 			};
 		}
 
-		const data = await fetchUserData(user, {
+		const userStats = await fetchUserData(user, {
 			seasonal: Boolean(context.params.seasonal),
 			force: Boolean(context.params.force)
 		});
 
-		if (data.success === false) {
-			return data;
+		if (userStats.success === false) {
+			return userStats;
 		}
 
 		if (GameData.activityAliases[activity.toLowerCase()]) {
 			activity = GameData.activityAliases[activity.toLowerCase()];
 		}
 
+		const { data } = userStats;
 		const activities = data.activities.map(i => i.name.toLowerCase());
 		const bestMatch = sb.Utils.selectClosestString(activity.toLowerCase(), activities, { ignoreCase: true });
 		if (!bestMatch) {

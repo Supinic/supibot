@@ -44,9 +44,10 @@ export default {
 			return userStats;
 		}
 
+		const { data } = userStats;
 		const accountType = (context.params.seasonal)
 			? "seasonal user"
-			: getIronman(userStats, Boolean(context.params.rude));
+			: getIronman(data, Boolean(context.params.rude));
 
 		if (context.params.skill) {
 			const skillName = context.params.skill.toLowerCase();
@@ -59,7 +60,7 @@ export default {
 			}
 
 			const { name, emoji } = skillData;
-			const skill = userStats.skills.find(i => i.name.toLowerCase() === name);
+			const skill = data.skills.find(i => i.name.toLowerCase() === name);
 			if (!skill) {
 				return {
 					success: false,
@@ -89,7 +90,7 @@ export default {
 
 		const strings = [];
 		for (const { emoji, name } of GameData.skills) {
-			const found = userStats.skills.find(i => i.name.toLowerCase() === name.toLowerCase());
+			const found = data.skills.find(i => i.name.toLowerCase() === name.toLowerCase());
 			if (found && found.level !== null) {
 				const level = (context.params.virtual)
 					? (found.virtualLevel ?? found.level)
@@ -105,13 +106,13 @@ export default {
 			};
 		}
 		else {
-			const total = userStats.skills.find(i => i.name.toLowerCase() === "overall");
+			const total = data.skills.find(i => i.name.toLowerCase() === "overall");
 			const totalXPString = (total)
 				? `XP: ${sb.Utils.groupDigits(total.experience)}`
 				: "";
 
-			const combatLevelString = (userStats.combatLevel !== null)
-				? `Combat level: ${userStats.combatLevel}`
+			const combatLevelString = (data.combatLevel !== null)
+				? `Combat level: ${data.combatLevel}`
 				: "";
 
 			return {

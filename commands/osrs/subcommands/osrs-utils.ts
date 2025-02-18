@@ -58,6 +58,10 @@ type UsernameSuccess = {
 	success: true;
 	username: string;
 };
+type FetchUserSuccess = {
+	success: true;
+	data: FetchData;
+};
 
 export const flagEmojis = {
 	Australia: "🇦🇺",
@@ -81,7 +85,7 @@ interface Context {
 	user: User;
 }
 
-const DB_GAME_USERNAME = "osrsGameUsername";
+export const OSRS_GAME_USERNAME_KEY = "osrsGameUsername";
 
 export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
 	let data: GameWorlds | null = await sb.Cache.getByPrefix("osrs-worlds-data");
@@ -128,7 +132,7 @@ export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
 	return data;
 };
 
-export const fetchUserData = async (user: string, options: FetchOptions = {}): Promise<FetchData | Failure> => {
+export const fetchUserData = async (user: string, options: FetchOptions = {}): Promise<FetchUserSuccess | Failure> => {
 	const key = (options.seasonal)
 		? `osrs-user-data-${user}`
 		: `osrs-user-data-${user}-seasonal`;
@@ -182,7 +186,10 @@ export const fetchUserData = async (user: string, options: FetchOptions = {}): P
 		});
 	}
 
-	return data;
+	return {
+		success: true,
+		data
+	};
 };
 
 export const getIronman = (data: FetchData, rude: boolean) => {
@@ -229,7 +236,7 @@ export const parseUserIdentifier = async (context: Context, identifier: string):
 		}
 	}
 
-	const gameUsername = await targetUser.getDataProperty(DB_GAME_USERNAME) as null | string;
+	const gameUsername = await targetUser.getDataProperty(OSRS_GAME_USERNAME_KEY) as null | string;
 	if (!gameUsername) {
 		const verb = (targetUser === context.user) ? "You" : "They"
 		return {
