@@ -6,7 +6,7 @@ import { TemplateWithoutId, TemplateDefinition } from "./template.js";
 import Banphrase from "./banphrase.js";
 import Filter from "./filter.js";
 import User from "./user.js";
-import Channel from "./channel.js";
+import { Channel, privateMessageChannelSymbol } from "./channel.js";
 import Platform from "../platforms/template.js";
 import CooldownManager from "../utils/cooldown-manager.js";
 import { Language, LanguageParser } from "../utils/languages.js";
@@ -42,9 +42,13 @@ type ParameterValueMap = {
 };
 type ParameterType = keyof ParameterValueMap;
 type ParameterValue = ParameterValueMap[ParameterType];
-type ParameterDefinition = {
+export type ParameterDefinition = {
 	name: string;
 	type: ParameterType;
+};
+
+type ParamFromDefinition<T extends readonly ParameterDefinition[]> = {
+	[P in T[number] as P["name"]]: ParameterValueMap[P["type"]];
 };
 
 type AppendedParameters = Record<string, string | number | boolean | SupiDate | RegExp | Language | Record<string, string>>;
@@ -73,15 +77,15 @@ type Result = StrictResult & {
 };
 
 export type Invocation = string;
-export type ContextData = {
-	invocation?: Context["invocation"];
-	user?: Context["user"]
-	channel?: Context["channel"];
-	platform?: Context["platform"];
-	transaction?: Context["transaction"];
-	privateMessage?: Context["privateMessage"];
-	append?: Context["append"];
-	params?: Context["params"];
+export type ContextData<T extends ParameterDefinition[] = ParameterDefinition[]> = {
+	user: Context<T>["user"]
+	invocation?: Context<T>["invocation"];
+	channel?: Context<T>["channel"];
+	platform?: Context<T>["platform"];
+	transaction?: Context<T>["transaction"];
+	privateMessage?: Context<T>["privateMessage"];
+	append?: Context<T>["append"];
+	params?: Context<T>["params"];
 };
 export type ContextAppendData = {
 	tee?: Invocation[];
@@ -106,7 +110,7 @@ type EmoteOptions = { // @todo move to Channel
 };
 type BestEmoteOptions = Pick<ContextData, "channel" | "platform"> & EmoteOptions;
 
-export class Context {
+export class Context<T extends ParameterDefinition[] = ParameterDefinition[]> {
 	readonly command: Command;
 	readonly invocation: string | null;
 	readonly user: User | null;
@@ -115,12 +119,12 @@ export class Context {
 	readonly transaction: QueryTransaction | null;
 	readonly privateMessage: boolean;
 	readonly append: ContextAppendData;
-	readonly params: unknown;
+	readonly params: ParamFromDefinition<T>;
 
 	readonly meta: Map<string, unknown> = new Map();
 	readonly #userFlags: Record<string, boolean>;
 
-	constructor (command: Command, data: Partial<ContextData> = {}) {
+	constructor (command: Command, data: ContextData<T> = {}) {
 		this.command = command;
 		this.invocation = data.invocation ?? null;
 		this.user = data.user ?? null;
@@ -132,7 +136,7 @@ export class Context {
 		this.append = data.append ?? { tee: [] };
 		this.append.tee ??= [];
 
-		this.params = data.params ?? {};
+		this.params = (data.params ?? {}) as ParamFromDefinition<T>;
 
 		this.#userFlags = Filter.getFlags({
 			command,
@@ -147,6 +151,12 @@ export class Context {
 	setMeta (name: string, value: unknown) { this.meta.set(name, value); }
 
 	getMentionStatus (): boolean {
+		if (!this.user) {
+			throw new SupiError({
+				message: "Cannot get the mention status of Context without User"
+			});
+		}
+
 		return Filter.getMentionStatus({
 			user: this.user,
 			command: this.command,
@@ -261,7 +271,7 @@ export type ExecuteFunction = (this: Command, context: Context, ...args: string[
 export type DescriptionFunction = (this: Command) => string[] | Promise<string[]>;
 export type InitDestroyFunction = (this: Command) => unknown | Promise<unknown>;
 
-type ExecuteOptions = {
+type ExecuteOptions<T extends ParameterDefinition[]> = {
 	platform: Platform;
 	skipPending?: boolean;
 	privateMessage?: boolean;
@@ -287,9 +297,9 @@ export class Command extends TemplateWithoutId {
 	Description: string | null = null;
 	Cooldown: number | null;
 	Flags: Readonly<string[]>;
-	Params = [];
+	Params: ParameterDefinition[] = [];
 	Whitelist_Response: string | null = null;
-	Code: ExecuteFunction;
+	Code: ExecuteFunction<T>;
 	Dynamic_Description: DescriptionFunction | null;
 
 	#ready = false;
@@ -301,9 +311,7 @@ export class Command extends TemplateWithoutId {
 	static readonly uniqueIdentifier = "Name";
 	static data: Map<Command["Name"], Command> = new Map();
 
-	static readonly #privateMessageChannelID: unique symbol = Symbol("private-message-channel");
 	static readonly #cooldownManager = new CooldownManager();
-
 	static readonly privilegedCommandCharacters = ["$"];
 	static readonly ignoreParametersDelimiter = "--";
 
@@ -533,7 +541,7 @@ export class Command extends TemplateWithoutId {
 
 		// Check for cooldowns, return if it did not pass yet.
 		// If skipPending flag is set, do not check for pending status.
-		const channelID: number | symbol = (channelData?.ID ?? Command.#privateMessageChannelID);
+		const channelID: number | symbol = (channelData?.ID ?? privateMessageChannelSymbol);
 		const cooldownCheck = Command.#cooldownManager.check(
 			channelID,
 			userData.ID,
@@ -926,7 +934,7 @@ export class Command extends TemplateWithoutId {
 
 	static handleCooldown (channelData: Channel | null, userData: User, commandData: Command, cooldownData: CooldownDefinition | undefined, identifier: Invocation) {
 		// Take care of private messages, where channel === null
-		const channelID = channelData?.ID ?? Command.#privateMessageChannelID;
+		const channelID = channelData?.ID ?? privateMessageChannelSymbol;
 
 		if (typeof cooldownData !== "undefined") {
 			if (cooldownData !== null) {

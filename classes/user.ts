@@ -1,5 +1,5 @@
 import { SupiDate } from "supi-core";
-import type { Batch, Recordset, Row } from "supi-core";
+import type { CacheValue, Batch, Recordset, Row } from "supi-core";
 import { TemplateWithIdString, getGenericDataProperty, setGenericDataProperty } from "./template.js";
 import type { GenericDataPropertyObject, SetGenericDataPropertyObject } from "./template.js";
 
@@ -15,7 +15,7 @@ type ConstructorData = {
 type GenericFetchData = GenericDataPropertyObject<User>["options"];
 type GetOptions = Partial<Pick<ConstructorData, "Twitch_ID" | "Discord_ID">>;
 
-type UserLike = User | string | number;
+type UserLike = User | User["Name"] | User["ID"];
 type NameObject = {
 	name?: User["Name"];
 	Name?: User["Name"];
@@ -92,7 +92,7 @@ export default class User extends TemplateWithIdString {
 		await User.populateCaches(this);
 	}
 
-	async getDataProperty (propertyName: keyof ConstructorData, options: GenericFetchData) {
+	async getDataProperty (propertyName: string, options: GenericFetchData = {}) {
 		return await getGenericDataProperty({
 			cacheMap: User.dataCache,
 			databaseProperty: "User_Alias",
@@ -104,7 +104,7 @@ export default class User extends TemplateWithIdString {
 		});
 	}
 
-	async setDataProperty (propertyName: keyof ConstructorData, value: ConstructorData[keyof ConstructorData], options: GenericFetchData) {
+	async setDataProperty (propertyName: string, value: CacheValue, options: GenericFetchData) {
 		return await setGenericDataProperty(this, {
 			cacheMap: User.dataCache,
 			databaseProperty: "User_Alias",

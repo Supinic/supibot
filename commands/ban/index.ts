@@ -1,40 +1,44 @@
-const AVAILABLE_BAN_FILTER_TYPES = [
+import type { Type as FilterType } from "../../classes/filter.js";
+import type { Context, CommandDefinition, ParameterDefinition } from "../../classes/command.js";
+
+const AVAILABLE_BAN_FILTER_TYPES: FilterType[] = [
 	"Arguments",
 	"Blacklist",
 	"Cooldown",
 	"Online-only",
 	"Offline-only",
 	"Reminder-prevention"
-];
-const NO_RESPONSE_FILTER_TYPES = new Set([
+] as const;
+const NO_RESPONSE_FILTER_TYPES: Set<FilterType> = new Set([
 	"Arguments",
 	"Blacklist",
 	"Online-only",
 	"Offline-only"
 ]);
 
-export default {
+const paramsDefinition: ParameterDefinition[] = [
+	{ name: "all", type: "boolean" },
+	{ name: "channel", type: "string" },
+	{ name: "clear", type: "boolean" },
+	{ name: "command", type: "string" },
+	{ name: "index", type: "number" },
+	{ name: "invocation", type: "string" },
+	{ name: "multiplier", type: "number" },
+	{ name: "noResponse", type: "boolean" },
+	{ name: "type", type: "string" },
+	{ name: "string", type: "string" },
+	{ name: "user", type: "string" }
+];
+
+const definition: CommandDefinition = {
 	Name: "ban",
 	Aliases: ["unban"],
-	Author: "supinic",
 	Cooldown: 5000,
 	Description: "Bans/unbans any combination of channel, user, and command from being executed. Only usable by channel owners and Supibot ambassadors.",
 	Flags: ["mention"],
-	Params: [
-		{ name: "all", type: "boolean" },
-		{ name: "channel", type: "string" },
-		{ name: "clear", type: "boolean" },
-		{ name: "command", type: "string" },
-		{ name: "index", type: "number" },
-		{ name: "invocation", type: "string" },
-		{ name: "multiplier", type: "number" },
-		{ name: "noResponse", type: "boolean" },
-		{ name: "type", type: "string" },
-		{ name: "string", type: "string" },
-		{ name: "user", type: "string" }
-	],
+	Params: paramsDefinition,
 	Whitelist_Response: null,
-	Code: (async function ban (context) {
+	Code: (async function ban (context: Context<typeof paramsDefinition>) {
 		const { invocation } = context;
 		const type = sb.Utils.capitalize(context.params.type ?? "Blacklist");
 		if (!AVAILABLE_BAN_FILTER_TYPES.includes(type)) {
@@ -504,3 +508,5 @@ export default {
 		];
 	})
 };
+
+export default definition;

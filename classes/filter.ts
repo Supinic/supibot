@@ -1,14 +1,14 @@
-import type { Recordset } from "supi-core";
+import { Recordset, SupiError } from "supi-core";
 import { TemplateWithId } from "./template.js";
 
-import Channel from "./channel.js";
+import { Channel, privateMessageChannelSymbol } from "./channel.js";
 import User from "./user.js";
-import type Platform from "./user.js";
+import type Platform from "../platforms/template.js";
 import type { Command } from "./command.js";
 import { XOR } from "../@types/globals.js";
 import { ArgumentDescriptor } from "../@types/classes/filter.js";
 
-type Type =
+export type Type =
 	"Blacklist" | "Whitelist" | "Opt-out" | "Block" | "Unping" | "Unmention" |
 	"Cooldown" | "Flags" | "Offline-only" | "Online-only" | "Arguments" | "Reminder-prevention";
 
@@ -30,13 +30,46 @@ type ConstructorData = {
 	Blocked_User: Filter["Blocked_User"];
 	Active: Filter["Active"];
 	Issued_By: Filter["Issued_By"];
+	Data: unknown;
 };
-type CreateData = Partial<Omit<ConstructorData, "ID" | "Data" | "Active" | "Response">>;
+type CreateData = Partial<Omit<ConstructorData, "ID" | "Active">>;
+type ReasonObject = {
+	string: string;
+	response: Filter["Response"];
+	reason: Filter["Reason"]
+};
+type LocalsOptions = {
+	channel?: Channel | symbol | null;
+	user?: User | null;
+	platform?: Platform | null;
+	invocation?: Command["Name"] | Command["Aliases"][number] | null;
+	command?: Command | Command["Name"] | null;
+	skipUserCheck?: boolean;
+};
+type ExecuteOptions = Omit<LocalsOptions, "skipUserCheck"> & {
+	user: User;
+	command: Command;
+	invocation?: Command["Name"] | Command["Aliases"][number];
+	targetUser?: string;
+	args: string[];
+};
+
+type ExecuteFailure = {
+	success: false,
+	reason: string;
+	reply: string | null;
+	filter: Filter | { Reason: Filter["Reason"]; };
+};
+type ExecuteSuccess = {
+	success: true;
+}
+type ExecuteResult = ExecuteFailure | ExecuteSuccess;
 
 /**
  * Represents a filter of the bot's commands.
  */
 export default class Filter extends TemplateWithId {
+	Active: boolean;
 	readonly ID: number;
 	readonly User_Alias: User["ID"] | null;
 	readonly Channel: Channel["ID"] | null;
@@ -46,7 +79,6 @@ export default class Filter extends TemplateWithId {
 	readonly Response: "None" | "Auto" | "Reason";
 	readonly Reason: string | null;
 	readonly Blocked_User: User["ID"] |  null;
-	Active: boolean;
 	readonly Issued_By: User["ID"];
 	/**
 	 * Filter type.
@@ -61,7 +93,21 @@ export default class Filter extends TemplateWithId {
 	readonly Data: CooldownData | ArgumentsData | null;
 
 	#filterData = null;
-	static data: Map<Filter["ID"], Filter>;
+	static data: Map<Filter["ID"], Filter> = new Map();
+	static types: Record<Filter["Type"], Set<Filter>> = {
+		Arguments: new Set(),
+		Blacklist: new Set(),
+		Block: new Set(),
+		Cooldown: new Set(),
+		Flags: new Set(),
+		"Offline-only": new Set(),
+		"Online-only": new Set(),
+		"Opt-out": new Set(),
+		"Reminder-prevention": new Set(),
+		Unmention: new Set(),
+		Whitelist: new Set(),
+		Unping: new Set(),
+	};
 
 	constructor (data: ConstructorData) {
 		super();
@@ -156,7 +202,7 @@ export default class Filter extends TemplateWithId {
 	}
 	/* eslint-enable no-bitwise */
 
-	createFilterData (data: Filter["Data"]) {
+	createFilterData (data: ConstructorData) {
 		if (data.Data) {
 			if (typeof data.Data === "string") {
 				try {
@@ -284,6 +330,14 @@ export default class Filter extends TemplateWithId {
 		}
 	}
 
+	destroy () {}
+
+	getCacheKey (): never {
+		throw new SupiError({
+			message: "Filter module does not support `getCacheKey`"
+		});
+	}
+
 	static async loadData () {
 		const data = await sb.Query.getRecordset((rs: Recordset) => rs
 			.select("*")
@@ -296,7 +350,7 @@ export default class Filter extends TemplateWithId {
 		}
 	}
 
-	static get (identifier: Filter | number) {
+	static get (identifier: Filter | Filter["ID"]) {
 		if (identifier instanceof Filter) {
 			return identifier;
 		}
@@ -305,42 +359,63 @@ export default class Filter extends TemplateWithId {
 		}
 	}
 
-	static getLocals (type: Type, options) {
-		// @todo needs refactoring per Filter type
-		return Filter.data.filter(row => (
-			row.Active
-			&& (!type || type === row.Type)
-			&& (options.skipUserCheck || (row.User_Alias === (options.user?.ID ?? null) || row.User_Alias === null))
-			&& (row.Channel === (options.channel?.ID ?? null) || row.Channel === null)
-			&& (row.Invocation === (options.invocation ?? null) || row.Invocation === null)
-			&& (row.Platform === (options.platform?.ID ?? null) || row.Platform === null)
-			&& (
-				(typeof options.command === "string" && row.Command === options.command)
-				|| (row.Command === (options.command?.Name ?? null)
-					|| row.Command === null)
-			)
-		));
+	static getLocals (type: Filter["Type"] | "all", options: LocalsOptions) {
+		const result: Filter[] = [];
+		const set: Iterable<Filter> = (type === "all")
+			? Filter.data.values()
+			: Filter.types[type];
+
+		const { channel, user, invocation = null, platform, command = null } = options;
+		const channelId = channel?.ID ?? null;
+		const userId = user?.ID ?? null;
+		const platformId = platform?.ID ?? null;
+		const commandName = (typeof command === "string")
+			? command
+			: command?.Name ?? null;
+
+		for (const filter of set) {
+			if (!filter.Active) {
+				continue;
+			}
+			else if (!options.skipUserCheck && filter.User_Alias === userId) {
+				continue;
+			}
+			else if (filter.Channel !== channelId) {
+				continue;
+			}
+			else if (filter.Platform !== platformId) {
+				continue;
+			}
+			else if (filter.Invocation !== invocation) {
+				continue;
+			}
+			else if (filter.Command !== commandName) {
+				continue;
+			}
+
+			result.push(filter);
+		}
+
+		return result;
 	}
 
 	/**
 	 * Executes all possible filters for the incoming combination of parameters
-	 * @param options
-	 * @returns {Promise<Object>}
 	 */
-	static async execute (options) {
+	static async execute (options: ExecuteOptions): Promise<ExecuteResult> {
 		const { command, targetUser, user } = options;
-		if (user instanceof User && await user.getDataProperty("administrator")) {
+		if (await user.getDataProperty("administrator")) {
 			return { success: true };
 		}
 
-		let userTo = null;
-		const channel = options.channel ?? Symbol("private-message");
-		const localFilters = Filter.getLocals(null, {
+		let userTo: User | null = null;
+		const channel = options.channel ?? privateMessageChannelSymbol;
+		const localFilters = Filter.getLocals("all", {
 			...options,
 			skipUserCheck: true
 		});
 
-		if (command.Flags.whitelist) {
+		if (command.Flags.includes("whitelist")) {
 			const whitelist = localFilters.find((
 				i => i.Type === "Whitelist"
 				&& (i.User_Alias === user.ID || i.User_Alias === null)
@@ -373,11 +448,11 @@ export default class Filter extends TemplateWithId {
 			};
 		}
 
-		if ((command.Flags.optOut || command.Flags.block) && targetUser) {
+		if ((command.Flags.includes("optOut") || command.Flags.includes("block")) && targetUser) {
 			userTo = await User.get(targetUser);
 		}
 
-		if (command.Flags.optOut && userTo) {
+		if (command.Flags.includes("optOut") && userTo) {
 			const optout = localFilters.find(i => i.Type === "Opt-out"
 				&& i.User_Alias === userTo.ID
 			);
@@ -407,7 +482,7 @@ export default class Filter extends TemplateWithId {
 			}
 		}
 
-		if (command.Flags.block && userTo) {
+		if (command.Flags.includes("block") && userTo) {
 			const userFrom = user;
 			const block = localFilters.find(i => (
 				i.Type === "Block"
@@ -526,22 +601,7 @@ export default class Filter extends TemplateWithId {
 		return { success: true };
 	}
 
-	/**
-	 * Creates a new filter record.
-	 * @param {Object} options
-	 * @param {sb.Platform.ID} [options.Platform]
-	 * @param {sb.Channel.ID} [options.Channel]
-	 * @param {sb.Command.Name} [options.Command]
-	 * @param {sb.User.ID} [options.User_Alias]
-	 * @param {string} [options.Reason]
-	 * @param {string} [options.Response]
-	 * @param {string} [options.Invocation]
-	 * @param {Object} [options.Data]
-	 * @param {Type} [options.Type]
-	 * @param {sb.User.ID} [options.Blocked_User]
-	 * @param {sb.User.ID} [options.Issued_By]
-	 */
-	static async create (options: unknown) {
+	static async create (options: CreateData) {
 		const data = {
 			Platform: options.Platform ?? null,
 			Channel: options.Channel ?? null,
@@ -561,17 +621,19 @@ export default class Filter extends TemplateWithId {
 		row.setValues(data);
 		await row.save();
 
-		data.ID = row.values.ID;
-		const filter = new Filter(data);
+		const filter = new Filter({
+			...data,
+			ID: row.values.ID as number;
+		});
 		Filter.data.push(filter);
 
 		return filter;
 	}
 
-	static getMentionStatus (options) {
+	static getMentionStatus (options: Partial<ExecuteOptions>) {
 		const filters = Filter.getLocals("Unmention", {
 			...options,
-			channel: options.channel ?? Symbol("private-message")
+			channel: options.channel ?? privateMessageChannelSymbol
 		});
 
 		return (filters.length === 0);
@@ -642,7 +704,7 @@ export default class Filter extends TemplateWithId {
 	 * @param {string} [options.reason]
 	 * @returns {null|string}
 	 */
-	static getReason (options = {}) {
+	static getReason (options: ReasonObject) {
 		const { string, response, reason } = options;
 		if (response === "Auto") {
 			return string;
@@ -655,7 +717,7 @@ export default class Filter extends TemplateWithId {
 		}
 	}
 
-	static async reloadSpecific (...list) {
+	static async reloadSpecific (...list: Filter["ID"][]) {
 		if (list.length === 0) {
 			return false;
 		}
@@ -664,18 +726,18 @@ export default class Filter extends TemplateWithId {
 			const row = await sb.Query.getRow("chat_data", "Filter");
 			await row.load(ID);
 
-			const existingIndex = Filter.data.findIndex(i => i.ID === ID);
-			if (existingIndex !== -1) {
-				Filter.data[existingIndex].destroy();
-				Filter.data.splice(existingIndex, 1);
+			const existingFilter = Filter.data.get(ID);
+			if (existingFilter) {
+				existingFilter.destroy();
+				Filter.data.delete(ID);
 			}
 
 			if (!row.values.Active) {
 				return;
 			}
 
-			const banphrase = new Filter(row.valuesObject);
-			Filter.data.push(banphrase);
+			const newFilter = new Filter(row.valuesObject);
+			Filter.data.set(ID, newFilter);
 		});
 
 		await Promise.all(promises);
