@@ -28,14 +28,13 @@ export default {
 		"Will take into account virtual levels."
 	],
 	execute: async function (context, ...args) {
-		const user = args.join(" ");
-		if (!user) {
-			return {
-				success: false,
-				reply: `No player name provided!`
-			};
+		const identifier = args.join(" ");
+		const parsedUserData = await OsrsUtils.parseUserIdentifier(context, identifier);
+		if (!parsedUserData.success) {
+			return parsedUserData;
 		}
 
+		const user = parsedUserData.username;
 		const userStats = await OsrsUtils.fetch(user, {
 			seasonal: Boolean(context.params.seasonal),
 			force: Boolean(context.params.force)

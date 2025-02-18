@@ -12,14 +12,13 @@ export default {
 		"For given user and activity, prints their kill-count and ranking."
 	],
 	execute: async function (context, ...args) {
-		const user = args.join(" ");
-		if (!user) {
-			return {
-				success: false,
-				reply: `No user provided!`
-			};
+		const identifier = args.join(" ");
+		const parsedUserData = await OsrsUtils.parseUserIdentifier(context, identifier);
+		if (!parsedUserData.success) {
+			return parsedUserData;
 		}
 
+		const user = parsedUserData.username;
 		let activity = context.params.activity ?? context.params.boss;
 		if (!activity) {
 			return {
