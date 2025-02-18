@@ -21,15 +21,7 @@ export default {
 	],
 	Whitelist_Response: null,
 	Code: (async function osrs (context, first, ...args) {
-		if (!first) {
-			return {
-				success: false,
-				reply: `Not enough arguments provided! Check the command help here: ${this.getDetailURL()}`
-			};
-		}
-
-		const input = first.toLowerCase();
-
+		const input = (first) ? first.toLowerCase() : null;
 		let subcommand = subcommands.find(i => i.name === input || i.aliases.includes(input));
 		if (!subcommand) {
 			args.unshift(first);
