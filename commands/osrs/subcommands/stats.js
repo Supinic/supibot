@@ -1,4 +1,4 @@
-import OsrsUtils from "./osrs-utils.js";
+import { fetchUserData, parseUserIdentifier, getIronman } from "./osrs-utils.js";
 import GameData from "../game-data.json" with { type: "json" };
 
 export default {
@@ -29,13 +29,13 @@ export default {
 	],
 	execute: async function (context, ...args) {
 		const identifier = args.join(" ");
-		const parsedUserData = await OsrsUtils.parseUserIdentifier(context, identifier);
+		const parsedUserData = await parseUserIdentifier(context, identifier);
 		if (!parsedUserData.success) {
 			return parsedUserData;
 		}
 
 		const user = parsedUserData.username;
-		const userStats = await OsrsUtils.fetch(user, {
+		const userStats = await fetchUserData(user, {
 			seasonal: Boolean(context.params.seasonal),
 			force: Boolean(context.params.force)
 		});
@@ -46,7 +46,7 @@ export default {
 
 		const accountType = (context.params.seasonal)
 			? "seasonal user"
-			: OsrsUtils.getIronman(userStats, Boolean(context.params.rude));
+			: getIronman(userStats, Boolean(context.params.rude));
 
 		if (context.params.skill) {
 			const skillName = context.params.skill.toLowerCase();

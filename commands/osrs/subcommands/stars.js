@@ -1,4 +1,4 @@
-import { fetchWorldsData } from "./utils.js";
+import { fetchWorldsData } from "./osrs-utils.js";
 
 /**
  * Each star tier lasts 7 minutes flat after the latest update on 2023-10-25:

@@ -1,4 +1,4 @@
-import OsrsUtils from "./osrs-utils.js";
+import { fetchUserData, parseUserIdentifier, getIronman } from "./osrs-utils.js";
 import GameData from "../game-data.json" with { type: "json" };
 
 export default {
@@ -13,7 +13,7 @@ export default {
 	],
 	execute: async function (context, ...args) {
 		const identifier = args.join(" ");
-		const parsedUserData = await OsrsUtils.parseUserIdentifier(context, identifier);
+		const parsedUserData = await parseUserIdentifier(context, identifier);
 		if (!parsedUserData.success) {
 			return parsedUserData;
 		}
@@ -27,7 +27,7 @@ export default {
 			};
 		}
 
-		const data = await OsrsUtils.fetch(user, {
+		const data = await fetchUserData(user, {
 			seasonal: Boolean(context.params.seasonal),
 			force: Boolean(context.params.force)
 		});
@@ -52,7 +52,7 @@ export default {
 		const { name, rank, value } = data.activities.find(i => i.name.toLowerCase() === bestMatch.toLowerCase());
 		const ironman = (context.params.seasonal)
 			? "Seasonal user"
-			: sb.Utils.capitalize(OsrsUtils.getIronman(data, Boolean(context.params.rude)));
+			: sb.Utils.capitalize(getIronman(data, Boolean(context.params.rude)));
 
 		return {
 			reply: (rank === null)
