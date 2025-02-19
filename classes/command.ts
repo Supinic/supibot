@@ -1,5 +1,5 @@
 import { SupiDate, SupiError, isGenericRequestError, isGotRequestError,  } from "supi-core"
-import type { Query, MetricConfiguration, MetricType, StringMetricType } from "supi-core";
+import type { Query, MetricConfiguration, MetricType } from "supi-core";
 
 import { TemplateWithoutId, TemplateDefinition } from "./template.js";
 
@@ -36,7 +36,7 @@ type ParameterValueMap = {
 	number: number;
 	boolean: boolean;
 	date: SupiDate;
-	object: { key: string; value: string; };
+	object: Record<string, string>;
 	regex: RegExp;
 	language: Language;
 };
@@ -51,7 +51,7 @@ type ParamFromDefinition<T extends readonly ParameterDefinition[]> = {
 	[P in T[number] as P["name"]]: ParameterValueMap[P["type"]];
 };
 
-type AppendedParameters = Record<string, string | number | boolean | SupiDate | RegExp | Language | Record<string, string>>;
+type AppendedParameters = Record<string, ParameterValue>;
 type ResultFailure = { success: false; reply: string; };
 
 type StrictResult = {
@@ -102,7 +102,7 @@ export type ContextAppendData = {
 	privateMessage?: boolean;
 };
 
-type PermissionOptions = Pick<ContextData, "user" | "channel" | "platform">;
+type PermissionOptions = Partial<Pick<ContextData, "user" | "channel" | "platform">>;
 type EmoteOptions = { // @todo move to Channel
 	shuffle?: boolean;
 	caseSensitivity?: boolean;
@@ -112,8 +112,8 @@ type BestEmoteOptions = Pick<ContextData, "channel" | "platform"> & EmoteOptions
 
 export class Context<T extends ParameterDefinition[] = ParameterDefinition[]> {
 	readonly command: Command;
-	readonly invocation: string | null;
-	readonly user: User | null;
+	readonly user: User;
+	readonly invocation: string;
 	readonly channel: Channel | null;
 	readonly platform: Platform | null;
 	readonly transaction: QueryTransaction | null;
@@ -124,10 +124,10 @@ export class Context<T extends ParameterDefinition[] = ParameterDefinition[]> {
 	readonly meta: Map<string, unknown> = new Map();
 	readonly #userFlags: Record<string, boolean>;
 
-	constructor (command: Command, data: ContextData<T> = {}) {
+	constructor (command: Command, data: ContextData<T>) {
 		this.command = command;
-		this.invocation = data.invocation ?? null;
-		this.user = data.user ?? null;
+		this.user = data.user;
+		this.invocation = data.invocation ?? command.Name;
 		this.channel = data.channel ?? null;
 		this.platform = data.platform ?? null;
 		this.transaction = data.transaction ?? null;
@@ -187,7 +187,7 @@ export class Context<T extends ParameterDefinition[] = ParameterDefinition[]> {
 		const channelData = options.channel ?? this.channel;
 		const platformData = options.platform ?? this.platform;
 
-		const data = await Promise.all([
+		const data: Array<boolean | undefined> = await Promise.all([
 			userData?.getDataProperty("administrator"),
 			platformData?.isUserChannelOwner(channelData, userData),
 			channelData?.isUserAmbassador(userData)
@@ -271,7 +271,7 @@ export type ExecuteFunction = (this: Command, context: Context, ...args: string[
 export type DescriptionFunction = (this: Command) => string[] | Promise<string[]>;
 export type InitDestroyFunction = (this: Command) => unknown | Promise<unknown>;
 
-type ExecuteOptions<T extends ParameterDefinition[]> = {
+type ExecuteOptions = {
 	platform: Platform;
 	skipPending?: boolean;
 	privateMessage?: boolean;
@@ -299,7 +299,7 @@ export class Command extends TemplateWithoutId {
 	Flags: Readonly<string[]>;
 	Params: ParameterDefinition[] = [];
 	Whitelist_Response: string | null = null;
-	Code: ExecuteFunction<T>;
+	Code: ExecuteFunction;
 	Dynamic_Description: DescriptionFunction | null;
 
 	#ready = false;
@@ -411,7 +411,7 @@ export class Command extends TemplateWithoutId {
 		return `sb-command-${this.Name}`;
 	}
 
-	registerMetric (type: MetricType | StringMetricType, label: string, options: Partial<MetricConfiguration<string>>) {
+	registerMetric (type: MetricType, label: string, options: Partial<MetricConfiguration<string>>) {
 		const metricLabel = `supibot_command_${this.Name}_${label}`;
 		const metricOptions = {
 			...options,
@@ -605,13 +605,12 @@ export class Command extends TemplateWithoutId {
 			const result = Command.parseParametersFromArguments(command.Params, args);
 
 			// Don't exit immediately, save the result and check filters first
-			// noinspection PointlessBooleanExpressionJS
-			if (result.success === false) {
+			if (!result.success) {
 				failedParamsParseResult = result;
 			}
 			else {
 				args = result.args;
-				contextOptions.params = result.parameters;
+				contextOptions.params = result.parameters as ParamFromDefinition<typeof command.Params>;
 			}
 		}
 
@@ -1090,17 +1089,16 @@ export class Command extends TemplateWithoutId {
 		return null;
 	}
 
-	static createFakeContext (command: Command, contextData: ContextData = {}, extraData: ContextAppendData = {}): Context {
+	static createFakeContext (command: Command, contextData: ContextData): Context {
 		const data = {
+			user: contextData.user,
 			invocation: contextData.invocation ?? command.Name,
-			user: contextData.user ?? null,
 			channel: contextData.channel ?? null,
 			platform: contextData.platform ?? null,
 			transaction: contextData.transaction ?? null,
 			privateMessage: contextData.privateMessage ?? false,
 			append: contextData.append ?? {},
-			params: contextData.params ?? {},
-			...extraData
+			params: contextData.params ?? {}
 		};
 
 		return new Context(command, data);
@@ -1152,10 +1150,10 @@ export class Command extends TemplateWithoutId {
 	static parseParametersFromArguments (
 		paramsDefinition: ParameterDefinition[],
 		argsArray: string[]
-	): { success: true; parameters: unknown; args: string[]; } | ResultFailure {
+	): { success: true; parameters: Record<string, ParameterValue>; args: string[]; } | ResultFailure {
 		const argsStr = argsArray.join(" ");
 		const outputArguments: string[] = [];
-		let parameters: AppendedParameters = {};
+		let parameters: Record<string, ParameterValue> = {};
 
 		// Buffer used to store read characters before we know what to do with them
 		let buffer = "";
