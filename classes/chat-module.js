@@ -1,6 +1,6 @@
 import Channel from "./channel.js";
 import Platform from "../platforms/template.js";
-import Template from "./template.js";
+import { Template } from "./template.js";
 
 export default class ChatModule extends Template {
 	static importable = true;

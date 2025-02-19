@@ -1,7 +1,7 @@
 import { SupiDate } from "supi-core";
 import type { CacheValue, Batch, Recordset, Row } from "supi-core";
 import { TemplateWithIdString, getGenericDataProperty, setGenericDataProperty } from "./template.js";
-import type { GenericDataPropertyObject, SetGenericDataPropertyObject } from "./template.js";
+import type { GenericDataPropertyObject } from "./template.js";
 
 import config from "../config.json" with { type: "json" };
 

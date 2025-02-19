@@ -6,7 +6,7 @@ import Channel from "./channel.js";
 import { Command } from "./command.js";
 import Filter from "./filter.js";
 import User from "./user.js";
-import Template from "./template.js";
+import { Template } from "./template.js";
 
 import Platform from "../platforms/template.js";
 import LongTimeout from "../utils/long-timeout.js";
