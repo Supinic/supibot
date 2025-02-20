@@ -959,7 +959,10 @@ export class Command extends TemplateWithoutId {
 					});
 
 					if (cooldownFilter) {
-						length = cooldownFilter.applyData(length);
+						const filterResult = cooldownFilter.applyData(length);
+						if (filterResult !== null) {
+							length = filterResult;
+						}
 					}
 				}
 
@@ -980,7 +983,10 @@ export class Command extends TemplateWithoutId {
 			});
 
 			if (cooldownFilter) {
-				length = cooldownFilter.applyData(length);
+				const filterResult = cooldownFilter.applyData(length);
+				if (filterResult !== null) {
+					length = filterResult;
+				}
 			}
 
 			Command.#cooldownManager.set(channelID, userData.ID, commandData.Name, length);

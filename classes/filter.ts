@@ -6,16 +6,22 @@ import User from "./user.js";
 import type Platform from "../platforms/template.js";
 import type { Command } from "./command.js";
 import { XOR } from "../@types/globals.js";
-import { ArgumentDescriptor } from "../@types/classes/filter.js";
 
 export type Type =
 	"Blacklist" | "Whitelist" | "Opt-out" | "Block" | "Unping" | "Unmention" |
 	"Cooldown" | "Flags" | "Offline-only" | "Online-only" | "Arguments" | "Reminder-prevention";
 
-type CooldownData = XOR<{ multiplier: number }, { override: number }>;
-type ArgumentsData = {
-	args: ArgumentDescriptor[];
+type CooldownData = XOR<{ multiplier: number }, { override: number, respect?: boolean }>;
+type DbArgumentDescriptor = {
+	index?: number | string;
+	range?: number[] | string[] | string;
+	regex?: string | string[] | RegExp;
+	string?: string;
 };
+
+type StringArgumentDescriptor = XOR<{ string: string; }, { regex: RegExp; }>;
+type NumberArgumentDescriptor = XOR<{ index: number; }, { range: [number, number]; }>;
+type ArgumentDescriptor = StringArgumentDescriptor & NumberArgumentDescriptor;
 
 type ConstructorData = {
 	ID: Filter["ID"];
@@ -30,9 +36,9 @@ type ConstructorData = {
 	Blocked_User: Filter["Blocked_User"];
 	Active: Filter["Active"];
 	Issued_By: Filter["Issued_By"];
-	Data: unknown;
+	Data: string | null;
 };
-type CreateData = Partial<Omit<ConstructorData, "ID" | "Active">>;
+export type CreateData = Partial<Omit<ConstructorData, "ID" | "Active">> & { Issued_By: number; };
 type ReasonObject = {
 	string: string;
 	response: Filter["Response"];
@@ -53,6 +59,10 @@ type ExecuteOptions = Omit<LocalsOptions, "skipUserCheck"> & {
 	targetUser?: string;
 	args: string[];
 };
+type UnpingContextOptions = LocalsOptions & {
+	string: string;
+	executor: User | null;
+};
 
 type ExecuteFailure = {
 	success: false,
@@ -65,11 +75,23 @@ type ExecuteSuccess = {
 }
 type ExecuteResult = ExecuteFailure | ExecuteSuccess;
 
+const isCooldownData = (input: Filter["Data"]): input is CooldownData => {
+	if (!input || Array.isArray(input)) {
+		return false;
+	}
+
+	return (typeof input.multiplier === "number" || typeof input.override === "number");
+};
+
+// @todo move to Channel
+const isChannel = (input: unknown): input is Channel => {
+	return Boolean(input && input instanceof Channel);
+};
+
 /**
  * Represents a filter of the bot's commands.
  */
-export default class Filter extends TemplateWithId {
-	Active: boolean;
+export class Filter extends TemplateWithId {
 	readonly ID: number;
 	readonly User_Alias: User["ID"] | null;
 	readonly Channel: Channel["ID"] | null;
@@ -81,18 +103,20 @@ export default class Filter extends TemplateWithId {
 	readonly Blocked_User: User["ID"] |  null;
 	readonly Issued_By: User["ID"];
 	/**
-	 * Filter type.
-	 * Blacklist disallows the usage for given combination of User_Alias/Channel/Command.
-	 * Whitelist disallows the usage of a command everywhere BUT the given combination of User_Alias/Channel.
-	 * Opt-out disallows the usage of given user as the parameter for given command.
+	 * Filter type:
+	 * - "Blacklist" disallows the usage for given combination of User_Alias/Channel/Command.
+	 * - "Whitelist" disallows the usage of a command everywhere BUT the given combination of User_Alias/Channel.
+	 * - "Opt-out" disallows the usage of given user as the parameter for given command.
+	 * @todo documentation of all the other types
 	 */
 	readonly Type: Type;
+
+	Active: boolean;
 	/**
 	 * Specific filter data |  usually only applicable to Cooldown and Arguments filter types.
 	 */
-	readonly Data: CooldownData | ArgumentsData | null;
+	Data: CooldownData | ArgumentDescriptor[] | null;
 
-	#filterData = null;
 	static data: Map<Filter["ID"], Filter> = new Map();
 	static types: Record<Filter["Type"], Set<Filter>> = {
 		Arguments: new Set(),
@@ -125,22 +149,29 @@ export default class Filter extends TemplateWithId {
 		this.Active = data.Active;
 		this.Issued_By = data.Issued_By;
 
-		this.Data = null;
-		this.createFilterData(data);
+		this.Data = this.createFilterData(data.Data);
 	}
 
 	/**
 	 * For custom-data-related Filters, this method applies filter data to the provided data object.
-	 * @param {Array|number} data
-	 * @returns {*} Returned type depends on filter type - Args {boolean} or Cooldown {number}
+	 * @returns Returned type depends on filter type - Args {boolean} or Cooldown {number}
 	 */
-	applyData (data) {
+	applyData (data: number | null): number | null;
+	applyData (data: string[]): boolean;
+	applyData (data: number | null | string[]): number | boolean | null {
 		if (this.Type === "Arguments" && Array.isArray(data)) {
-			for (const item of this.#filterData) {
+			const argsData = this.Data as ArgumentDescriptor[];
+			for (const item of argsData) {
 				const { index, range, regex, string } = item;
 				for (let i = 0; i < data.length; i++) {
-					const positionCheck = (i === index || (range[0] <= i && i <= range[1]));
-					const valueCheck = ((string && data[i] === string) || (regex && regex.test(data[i])));
+					const positionCheck = (typeof index === "number")
+						? (i === index)
+						: (range[0] <= i && i <= range[1]);
+
+					const valueCheck = (typeof string === "string")
+						? (data[i] === string)
+						: regex.test(data[i]);
+
 					if (positionCheck && valueCheck) {
 						return true;
 					}
@@ -149,16 +180,16 @@ export default class Filter extends TemplateWithId {
 
 			return false;
 		}
-		else if (this.Type === "Cooldown" && (data === null || typeof data === "number")) {
+		else if (this.Type === "Cooldown" && isCooldownData(this.Data) && (data === null || typeof data === "number")) {
 			const value = data ?? 0; // `null` cooldowns are treated as zero
-			const { multiplier, override, respect } = this.#filterData;
+			const { multiplier, override, respect } = this.Data;
 
 			if (typeof override === "number") {
 				if (respect === false) {
 					return override;
 				}
 				else {
-					return (override > value) ? data : override;
+					return (override > value) ? value : override;
 				}
 			}
 			else if (typeof multiplier === "number") {
@@ -202,113 +233,103 @@ export default class Filter extends TemplateWithId {
 	}
 	/* eslint-enable no-bitwise */
 
-	createFilterData (data: ConstructorData) {
-		if (data.Data) {
-			if (typeof data.Data === "string") {
-				try {
-					this.Data = JSON.parse(data.Data);
-				}
-				catch (e) {
-					console.warn("Could not parse filter data", {
-						error: e,
-						filter: this.ID
-					});
-					this.Data = {};
-				}
-			}
-			else if (typeof data.Data === "object") {
-				this.Data = { ...data.Data };
-			}
-			else {
-				console.warn("Unexpected filter data type", {
-					data: data.Data,
-					type: typeof data.Data,
-					filter: this.ID
-				});
-				this.Data = {};
-			}
+	createFilterData (rawData: string | null): ArgumentDescriptor[] | CooldownData | null {
+		if (!rawData) {
+			return null;
 		}
 
-		if (this.Data) {
-			if (this.Type === "Arguments") {
-				this.#filterData = [];
+		let data: Record<string, unknown>;
+		try {
+			data = JSON.parse(rawData);
+		}
+		catch {
+			return null;
+		}
 
-				if (!this.Data.args) {
-					console.warn("Invalid Args filter - missing args object");
-				}
-				else {
-					for (const arg of this.Data.args) {
-						const obj = {};
-						if (arg.regex) {
-							if (arg.regex instanceof RegExp) {
-								obj.regex = arg.regex;
-							}
-							else if (Array.isArray(arg.regex) && arg.regex.every(i => typeof i === "string")) {
-								obj.regex = new RegExp(arg.regex[0], arg.regex[1] ?? "");
-							}
-							else if (typeof arg.regex === "string") {
-								const string = arg.regex.replaceAll(/^\/|\/$/g, "");
-								const lastSlashIndex = string.lastIndexOf("/");
+		if (this.Type === "Arguments") {
+			const { args } = data as { args?: DbArgumentDescriptor[] };
+			if (!args) {
+				console.warn("Invalid Args filter - missing args object");
+				return null;
+			}
 
-								const regexBody = (lastSlashIndex !== -1) ? string.slice(0, lastSlashIndex) : string;
-								const flags = (lastSlashIndex !== -1) ? string.slice(lastSlashIndex + 1) : "";
+			const result: ArgumentDescriptor[] = [];
+			for (const arg of args) {
+				const obj: ArgumentDescriptor = {} as ArgumentDescriptor;
+				if (arg.regex) {
+					if (arg.regex instanceof RegExp) {
+						obj.regex = arg.regex;
+					}
+					else if (Array.isArray(arg.regex)) {
+						obj.regex = new RegExp(arg.regex[0], arg.regex[1] ?? "");
+					}
+					else {
+						const string = arg.regex.replaceAll(/^\/|\/$/g, "");
+						const lastSlashIndex = string.lastIndexOf("/");
 
-								try {
-									obj.regex = new RegExp(regexBody, flags);
-								}
-								catch (e) {
-									console.warn("Invalid string regex representation", e);
-									continue;
-								}
-							}
+						const regexBody = (lastSlashIndex !== -1) ? string.slice(0, lastSlashIndex) : string;
+						const flags = (lastSlashIndex !== -1) ? string.slice(lastSlashIndex + 1) : "";
+
+						try {
+							obj.regex = new RegExp(regexBody, flags);
 						}
-						else if (arg.string) {
-							obj.string = arg.string;
-						}
-						else {
-							console.warn("Invalid filter Args item - type", { arg, filter: this.ID });
+						catch (e) {
+							console.warn("Invalid string regex representation", e);
 							continue;
 						}
-
-						if (typeof arg.index === "number") {
-							obj.index = arg.index;
-							obj.range = [];
-						}
-						else if (Array.isArray(arg.range) && arg.range.every(i => typeof i === "number")) {
-							obj.range = [...arg.range].slice(0, 2);
-						}
-						else if (typeof arg.range === "string") {
-							obj.range = arg.range.split("..").map(Number).slice(0, 2);
-						}
-						else {
-							console.warn("Invalid filter Args item - index", { arg, filter: this.ID });
-							continue;
-						}
-
-						// Infinity is allowed specifically because it matches the <x, ..> range identifier
-						const allowed = obj.range.every(i => sb.Utils.isValidInteger(i) || i === Infinity);
-						if (!allowed) {
-							console.warn("Invalid numbers provided for filter Args range", { arg, filter: this.ID });
-							continue;
-						}
-
-						this.#filterData.push(obj);
 					}
 				}
-			}
-			else if (this.Type === "Cooldown") {
-				const { multiplier, override } = this.Data;
-				if (typeof multiplier !== "number" && typeof override !== "number") {
-					console.warn("Invalid Cooldown filter - missing multiplier/override");
-				}
-				else if (typeof multiplier === "number" && typeof override === "number") {
-					console.warn("Invalid Cooldown filter - using both multiplier and override");
+				else if (arg.string) {
+					obj.string = arg.string;
 				}
 				else {
-					this.#filterData = { ...this.Data };
+					console.warn("Invalid filter Args item - type", { arg, filter: this.ID });
+					continue;
 				}
+
+				if (typeof arg.index === "number") {
+					obj.index = arg.index;
+				}
+				else if (Array.isArray(arg.range)) {
+					const [first, second] = [...arg.range].slice(0, 2).map(Number) as number[];
+					obj.range = [first, second];
+				}
+				else if (typeof arg.range === "string") {
+					const [first, second] = arg.range.split("..").map(Number).slice(0, 2) as number[];
+					obj.range = [first, second];
+				}
+
+				if (obj.range && Array.isArray(obj.range)) {
+					// `Infinity` is allowed specifically because it matches the <x, ..> range identifier
+					const allowed = obj.range.every(i => sb.Utils.isValidInteger(i) || i === Infinity);
+					if (!allowed) {
+						console.warn("Invalid numbers provided for filter Args range", { arg, filter: this.ID });
+						continue;
+					}
+				}
+
+				result.push(obj);
+			}
+
+			return result;
+		}
+		else if (this.Type === "Cooldown") {
+			const { multiplier, override, respect } = data as Partial<CooldownData>;
+			if (typeof multiplier === "number" && typeof override === "undefined") {
+				return { multiplier };
+			}
+			else if (typeof multiplier === "undefined" && typeof override === "number") {
+				return { override, respect };
+			}
+			else {
+				console.warn("Invalid Cooldown filter - incorrect combination of multiplier/override", {
+					multiplier,
+					override
+				});
 			}
 		}
+
+		return null;
 	}
 
 	async toggle () {
@@ -326,7 +347,7 @@ export default class Filter extends TemplateWithId {
 		await super.saveRowProperty(row, property, value, this);
 
 		if (property === "Data") {
-			this.createFilterData(this.Data);
+			this.Data = this.createFilterData(row.values.Data as string);
 		}
 	}
 
@@ -366,7 +387,7 @@ export default class Filter extends TemplateWithId {
 			: Filter.types[type];
 
 		const { channel, user, invocation = null, platform, command = null } = options;
-		const channelId = channel?.ID ?? null;
+		const channelId = (isChannel(channel)) ? channel.ID : null;
 		const userId = user?.ID ?? null;
 		const platformId = platform?.ID ?? null;
 		const commandName = (typeof command === "string")
@@ -623,10 +644,10 @@ export default class Filter extends TemplateWithId {
 
 		const filter = new Filter({
 			...data,
-			ID: row.values.ID as number;
+			ID: row.values.ID
 		});
-		Filter.data.push(filter);
 
+		Filter.data.set(filter.ID, filter);
 		return filter;
 	}
 
@@ -646,7 +667,7 @@ export default class Filter extends TemplateWithId {
 	 * "pinged", aka notified based on a regex.
 	 * @param {Object} options
 	 */
-	static async applyUnping (options) {
+	static async applyUnping (options: UnpingContextOptions) {
 		const rawFilters = Filter.getLocals("Unping", {
 			...options,
 			skipUserCheck: true
@@ -660,23 +681,25 @@ export default class Filter extends TemplateWithId {
 		));
 
 		let { string } = options;
-		const unpingUsers = await User.getMultiple(filters.map(i => i.User_Alias));
+		const userIds = filters.map(i => i.User_Alias).filter(Boolean) as number[]; // Known because of filter(Boolean)
+		const unpingUsers = await User.getMultiple(userIds);
+
 		for (const user of unpingUsers) {
 			// Only unping usernames if they are not followed by a specific set of characters.
 			// This refers to "." and "@" - these are usually parts of URLs or e-mail addresses.
 			const regex = new RegExp(`(?<![\\/=])\\b(${user.Name})(?![.@]\\w+)`, "gi");
-			string = string.replace(regex, (name) => `${name[0]}\u{E0000}${name.slice(1)}`);
+			string = string.replace(regex, (name: string) => `${name[0]}\u{E0000}${name.slice(1)}`);
 		}
 
 		return string;
 	}
 
-	static getCooldownModifiers (options) {
+	static getCooldownModifiers (options: LocalsOptions) {
 		const filters = Filter.getLocals("Cooldown", options).sort((a, b) => b.priority - a.priority);
 		return filters[0] ?? null;
 	}
 
-	static getFlags (options) {
+	static getFlags (options: LocalsOptions) {
 		const flags = {};
 		const flagData = Filter.getLocals("Flags", options).sort((a, b) => a.priority - b.priority);
 
@@ -687,7 +710,7 @@ export default class Filter extends TemplateWithId {
 		return flags;
 	}
 
-	static getReminderPreventions (options) {
+	static getReminderPreventions (options: LocalsOptions) {
 		const filters = Filter.getLocals("Reminder-prevention", {
 			...options,
 			skipUserCheck: true
@@ -744,3 +767,5 @@ export default class Filter extends TemplateWithId {
 		return true;
 	}
 };
+
+export default Filter;
