@@ -72,10 +72,6 @@ const definition: CronDefinition = {
 			return;
 		}
 
-		await sb.Cache.setByPrefix(cacheKey, [...newEmoteIds], {
-			expiry: 7 * 864e5 // 7 days
-		});
-
 		const now = new sb.Date();
 		const result: string[] = [];
 		const json: EmoteJsonObject = {
@@ -106,6 +102,11 @@ const definition: CronDefinition = {
 			}
 		}
 
+		previousEmoteIds = newEmoteIds;
+		await sb.Cache.setByPrefix(cacheKey, [...newEmoteIds], {
+			expiry: 7 * 864e5 // 7 days
+		});
+
 		const hastebinResult = await postToHastebin(JSON.stringify(json, null, 4), {
 			title: `Twitch global emote change ${now.sqlDateTime()}`
 		});
@@ -114,7 +115,7 @@ const definition: CronDefinition = {
 			? hastebinResult.link
 			: "(Hastebin link N/A)";
 
-		await channelData.send(`Global Twitch emotes changed: ${result.join("; ")} ${hastebinLink}`);
+		await channelData.send(`Global Twitch emotes changed: ${result.join(" ")} ${hastebinLink}`);
 	})
 };
 

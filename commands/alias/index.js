@@ -969,7 +969,7 @@ export default {
 				if (!name || !restriction || (restriction !== "link" && restriction !== "copy")) {
 					return {
 						success: false,
-						reply: `You didn't provide a name or a correct restriction type! Use: "$alias ${restriction} (alias name) (copy/link)"`
+						reply: `You didn't provide a name or a correct restriction type! Use: "$alias ${type} (alias name) (copy/link)"`
 					};
 				}
 
