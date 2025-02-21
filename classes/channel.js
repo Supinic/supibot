@@ -3,7 +3,7 @@ import Platform from "../platforms/template.js";
 import createMessageLoggingTable from "../utils/create-db-table.js";
 import { Template, setGenericDataProperty, getGenericDataProperty } from "./template.js";
 
-export const privateMessageChannelSymbol /*: unique symbol */ = Symbol("private-message-channel");
+export const privateMessageChannelSymbol /* : unique symbol */ = Symbol("private-message-channel");
 
 export class Channel extends Template {
 	static redisPrefix = "sb-channel";

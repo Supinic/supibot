@@ -1,5 +1,8 @@
-import type { Type as FilterType } from "../../classes/filter.js";
-import type { Context, CommandDefinition, ParameterDefinition } from "../../classes/command.js";
+import { SupiError } from "supi-core";
+
+import { isArgumentsData } from "../../classes/filter.js";
+import type { Filter, CreateData as FilterCreateData, DbArgumentDescriptor, Type as FilterType } from "../../classes/filter.js";
+import type { Context, CommandDefinition, StrictResult } from "../../classes/command.js";
 
 const AVAILABLE_BAN_FILTER_TYPES: FilterType[] = [
 	"Arguments",
@@ -16,7 +19,7 @@ const NO_RESPONSE_FILTER_TYPES: Set<FilterType> = new Set([
 	"Offline-only"
 ]);
 
-const paramsDefinition: ParameterDefinition[] = [
+const paramsDefinition = [
 	{ name: "all", type: "boolean" },
 	{ name: "channel", type: "string" },
 	{ name: "clear", type: "boolean" },
@@ -28,7 +31,7 @@ const paramsDefinition: ParameterDefinition[] = [
 	{ name: "type", type: "string" },
 	{ name: "string", type: "string" },
 	{ name: "user", type: "string" }
-];
+] as const;
 
 const definition: CommandDefinition = {
 	Name: "ban",
@@ -38,7 +41,7 @@ const definition: CommandDefinition = {
 	Flags: ["mention"],
 	Params: paramsDefinition,
 	Whitelist_Response: null,
-	Code: (async function ban (context: Context<typeof paramsDefinition>) {
+	Code: (async function ban (context: Context<typeof paramsDefinition>): Promise<StrictResult> {
 		const { invocation } = context;
 		const type = sb.Utils.capitalize(context.params.type ?? "Blacklist");
 		if (!AVAILABLE_BAN_FILTER_TYPES.includes(type)) {
@@ -48,12 +51,11 @@ const definition: CommandDefinition = {
 			};
 		}
 
-		const options = {
+		const options: FilterCreateData = {
 			Channel: null,
 			User_Alias: null,
 			Command: null,
 			Invocation: null,
-			/** @type {"Arguments" | "Blacklist" | "Cooldown" | "Online-only" | "Offline-only" | "Reminder-prevention"} */
 			Type: type,
 			Response: "None",
 			Reason: null,
@@ -143,7 +145,7 @@ const definition: CommandDefinition = {
 
 		const isAdmin = await context.user.getDataProperty("administrator");
 		if (!options.Channel && !isAdmin) {
-			if (context.privateMessage) {
+			if (!context.channel) {
 				return {
 					success: false,
 					reply: `When using this command in private messages, you must provide a channel with the "channel:(name)" parameter!`
@@ -214,13 +216,12 @@ const definition: CommandDefinition = {
 			};
 		}
 
-		const existing = sb.Filter.data.find(i => (
-			i.Type === type
-			&& i.Channel === options.Channel
-			&& i.Command === options.Command
-			&& i.Invocation === options.Invocation
-			&& i.User_Alias === options.User_Alias
-		));
+		const [existing] = sb.Filter.getLocals(type, {
+			channel: options.Channel,
+			command: options.Command,
+			invocation: options.Invocation,
+			user: options.User_Alias
+		}) as Filter[];
 
 		if (existing) {
 			if (existing.Issued_By !== context.user.ID && !isAdmin) {
@@ -230,13 +231,25 @@ const definition: CommandDefinition = {
 				};
 			}
 			else if (type === "Arguments") {
+				if (!existing.Data) {
+					throw new SupiError({
+						message: `Invalid filter definition - missing Data`
+					});
+				}
+				else if (!isArgumentsData(existing.Data)) {
+					throw new SupiError({
+						message: `Invalid filter definition - invalid Cooldown data`
+					});
+				}
+
 				const { clear = false, index, string } = context.params;
 				if (invocation === "ban") {
 					if (!existing.Active) {
 						await existing.toggle();
 					}
 
-					for (const item of existing.Data.args) {
+					let newData: DbArgumentDescriptor[] = [...existing.Data];
+					for (const item of existing.Data) {
 						if (item.index === index && item.string === string) {
 							return {
 								success: false,
@@ -249,16 +262,17 @@ const definition: CommandDefinition = {
 						let changed = false;
 						if (context.params.all === true) {
 							changed = true;
-							existing.Data.args.push({ range: "0..Infinity", string });
+							newData.push({ range: [0, Infinity], string });
 						}
 						else if (sb.Utils.isValidInteger(index)) {
 							changed = true;
-							existing.Data.args.push({ index, string });
+							newData.push({ index, string });
 						}
 
 						if (changed) {
-							await existing.saveProperty("Data");
+							await existing.saveProperty("Data", JSON.stringify(newData));
 							return {
+								success: true,
 								reply: `Successfully added a new item to Arguments filter (ID ${existing.ID})`
 							};
 						}
@@ -271,17 +285,18 @@ const definition: CommandDefinition = {
 				}
 				else if (invocation === "unban") {
 					if ((sb.Utils.isValidInteger(index) || context.params.all === true) && typeof string === "string") {
-						for (let i = 0; i < existing.Data.args.length; i++) {
-							const item = existing.Data.args[i];
+						for (let i = 0; i < existing.Data.length; i++) {
+							const item = existing.Data[i];
 							const condition = (context.params.all === true)
-								? (item.range === "0..Infinity")
+								? (item.range && item.range[0] === 0 && item.range[1] === Infinity)
 								: (item.index === index);
 
 							if (condition && item.string === string) {
-								existing.Data.args.splice(i, 1);
+								existing.Data.splice(i, 1);
 								await existing.saveProperty("Data");
 
 								return {
+									success: true,
 									reply: `Successfully removed an item from the Arguments filter (ID ${existing.ID})`
 								};
 							}
@@ -293,16 +308,16 @@ const definition: CommandDefinition = {
 						};
 					}
 					else if (clear) {
-						existing.Data.args = [];
-						await existing.saveProperty("Data");
-
+						await existing.saveProperty("Data", "[]");
 						return {
+							success: true,
 							reply: `Successfully cleared all items from the Arguments filter (ID ${existing.ID})`
 						};
 					}
 					else if (existing.Active) {
 						await existing.toggle();
 						return {
+							success: false,
 							reply: `Successfully disabled Arguments filter (ID ${existing.ID}). Its items are still available, it just isn't active.`
 						};
 					}
@@ -311,6 +326,12 @@ const definition: CommandDefinition = {
 						success: false,
 						reply: `Invalid combination of parameters for the Argument type provided!`
 					};
+				}
+				else {
+					throw new SupiError({
+						message: "Invalid invocation - this should never happen",
+						args: { invocation }
+					});
 				}
 			}
 			else if (type === "Cooldown") {
@@ -337,14 +358,22 @@ const definition: CommandDefinition = {
 					await existing.saveProperty("Data");
 
 					return {
+						success: true,
 						reply: `Successfully updated the cooldown filter!`
 					};
 				}
 				else if (invocation === "unban") {
 					await existing.toggle();
 					return {
+						success: false,
 						reply: `Successfully disabled Cooldown filter (ID ${existing.ID}).`
 					};
+				}
+				else {
+					throw new SupiError({
+						message: "Invalid invocation - this should never happen",
+						args: { invocation }
+					});
 				}
 			}
 			else if ((existing.Active && invocation === "ban") || (!existing.Active && invocation === "unban")) {
@@ -358,6 +387,7 @@ const definition: CommandDefinition = {
 
 				const [prefix, suffix] = (existing.Active) ? ["", " again"] : ["un", ""];
 				return {
+					success: true,
 					reply: `Successfully ${prefix}banned${suffix}.`
 				};
 			}
@@ -417,11 +447,12 @@ const definition: CommandDefinition = {
 			].filter(Boolean).join(", ");
 
 			return {
+				success: true,
 				reply: `Successfully banned (ID ${ban.ID}). Summary: you created a ${summary}`
 			};
 		}
 	}),
-	Dynamic_Description: (async function (prefix) {
+	Dynamic_Description: (function () {
 		return [
 			"Bans or unbans any combination of user/channel/command.",
 			"Only usable by channel owners and Supibot ambassadors, who can only ban combinations specific for their respective channel.",
@@ -431,78 +462,78 @@ const definition: CommandDefinition = {
 			`You can change the type. The default type is <code>Blacklist</code>.`,
 			"",
 
-			`<code>${prefix}ban user:test command:remind</code>`,
-			`<code>${prefix}ban user:test command:remind type:blacklist</code>`,
+			`<code>$ban user:test command:remind</code>`,
+			`<code>$ban user:test command:remind type:blacklist</code>`,
 			"Bans user <u>test</u> from executing the command <u>remind</u> in the current channel.",
 			"",
 
-			`<code>${prefix}ban command:remind</code>`,
+			`<code>$ban command:remind</code>`,
 			"Bans <u>everyone</u> from executing the command <u>remind</u> in the current channel.",
 			"",
 
-			`<code>${prefix}ban invocation:rq</code>`,
+			`<code>$ban invocation:rq</code>`,
 			"Bans <u>everyone</u> from executing the command invocation <u>rq</u> (but! not rl, or randomline) in the current channel.",
 			"",
 
-			`<code>${prefix}ban user:test</code>`,
+			`<code>$ban user:test</code>`,
 			"Bans user <u>test</u> from executing <u>any</u> commands in the current channel.",
 			"",
 
-			`<code>${prefix}ban <u>noResponse:true</u> (...)</code>`,
+			`<code>$ban <u>noResponse:true</u> (...)</code>`,
 			`If the <code>noResponse</code> parameter is set, this will make it so that the bot will not reply in the case this ban is triggered.`,
 			"E.g. setting a offline-only ban for a command will make it so when anyone tries use the command while the channel is online, the bot will simply not rpely.",
 			"Note: This is not applicable to user-specific bans. In those cases, the user must be reminded that they are indeed banned.",
 			"",
 
-			`<code>${prefix}ban type:offline-only (...)</code>`,
+			`<code>$ban type:offline-only (...)</code>`,
 			"For any previously mentioned combination, the combination will only be available when the channel is offline.",
 			"You can still specify any combination of invocation/command/user/channel to be more or less specific.",
 			"",
 
-			`<code>${prefix}ban type:online-only (...)</code>`,
+			`<code>$ban type:online-only (...)</code>`,
 			"Just like <code>offline-only</code>, but reverse - result will be available only in online channels.",
 			"",
 
-			`<code>${prefix}ban type:cooldown multiplier:(number) (...)</code>`,
+			`<code>$ban type:cooldown multiplier:(number) (...)</code>`,
 			"Creates a cooldown modifying filter - will multiply the original cooldown of any provided combination of command/user/channel by a constant.",
 			"The number provided must always be above 1.0 - as to not go below the intended cooldowns.",
 			"",
 
-			`<code>${prefix}ban type:reminder-prevention user:(user)</code>`,
-			`<code>${prefix}ban type:reminder-prevention user:(user) channel:(channel)</code>`,
+			`<code>$ban type:reminder-prevention user:(user)</code>`,
+			`<code>$ban type:reminder-prevention user:(user) channel:(channel)</code>`,
 			"Reminders created by provided user will no longer fire in the specified channel.",
 			"The reminders will still exist, they will simply not trigger.",
 			"",
 
-			`<code>${prefix}ban type:arguments index:(number) string:(text)</code>`,
-			`<code>${prefix}ban type:arguments all:true string:(text)</code>`,
+			`<code>$ban type:arguments index:(number) string:(text)</code>`,
+			`<code>$ban type:arguments all:true string:(text)</code>`,
 			"Disables the use of a specific argument position for given text, or any position if <code>all:true</code> is used.",
-			`If you use <code>${prefix}ban type:arguments</code> again with the same combination of channel/command/user, then the arguments will stack. To remove or disable, see the help for <code>${prefix}unban type:arguments</code> below.`,
-			`Example: <code>${prefix}ban type:arguments command:rm index:0 string:livestreamfail</code> will ban the use of <code>${prefix}rm livestreamfail</code>. This is because the first argument (index 0) is the subreddit name and it matches the text exactly.`,
-			`Example: <code>${prefix}ban type:arguments command:remind index:1 string:hello</code> will ban the use of <code>${prefix}remind (anyone) hello</code>. This is because "hello" is the second argument (index 1) and it matches.`,
+			`If you use <code>$ban type:arguments</code> again with the same combination of channel/command/user, then the arguments will stack. To remove or disable, see the help for <code>$unban type:arguments</code> below.`,
+			`Example: <code>$ban type:arguments command:rm index:0 string:livestreamfail</code> will ban the use of <code>$rm livestreamfail</code>. This is because the first argument (index 0) is the subreddit name and it matches the text exactly.`,
+			`Example: <code>$ban type:arguments command:remind index:1 string:hello</code> will ban the use of <code>$remind (anyone) hello</code>. This is because "hello" is the second argument (index 1) and it matches.`,
 			"",
 
 			"---",
 			"",
 
-			`<code>${prefix}unban (...)</code>`,
-			`<code>${prefix}unban type:blacklist (...)</code>`,
-			`<code>${prefix}unban type:cooldown (...)</code>`,
-			`<code>${prefix}unban type:offline-only (...)</code>`,
-			`<code>${prefix}unban type:online-only (...)</code>`,
+			`<code>$unban (...)</code>`,
+			`<code>$unban type:blacklist (...)</code>`,
+			`<code>$unban type:cooldown (...)</code>`,
+			`<code>$unban type:offline-only (...)</code>`,
+			`<code>$unban type:online-only (...)</code>`,
 			"Unbans any previously mentioned combination.",
 			"Make sure to use the correct type - <code>Blacklist</code> is again default.",
 			"",
 
-			`<code>${prefix}unban type:arguments index:(number) string:(string) (...)</code>`,
+			`<code>$unban type:arguments index:(number) string:(string) (...)</code>`,
 			`Removes a single item from a previously added Arguments-type filter - if it exists.`,
 			"",
 
-			`<code>${prefix}unban type:arguments (...)</code>`,
-			`Disables the Arguments-type filter, leaving its items intact. You can re-enable it by simply using <code>${prefix}ban</code> with the same channel/command/user combination.`,
+			`<code>$unban type:arguments (...)</code>`,
+			`Disables the Arguments-type filter, leaving its items intact. You can re-enable it by simply using <code>$ban</code> with the same channel/command/user combination.`,
 			"",
 
-			`<code>${prefix}unban type:arguments clear:true (...)</code>`,
+			`<code>$unban type:arguments clear:true (...)</code>`,
 			`Instead of disabling the Arguments filter, this will remove all of its items.`,
 			""
 		];

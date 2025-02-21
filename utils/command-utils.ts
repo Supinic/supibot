@@ -4,7 +4,7 @@ import RSSParser from "rss-parser";
 import { parse as chronoParse, ParsingOption } from "chrono-node";
 import { SupiError, SupiDate } from "supi-core";
 
-import Filter from "../classes/filter.js";
+import { Filter, type Type as FilterType } from "../classes/filter.js";
 import type { Command, Context as CommandContext } from "../classes/command.js";
 import type User from "../classes/user.js";
 import type Channel from "../classes/channel.js";
@@ -548,10 +548,10 @@ export const getTwitchGameID = async (name: string): Promise<{ name: string; id:
 };
 
 type ParsedGenericFilterData = {
-	command: Command | null;
-	channel: Channel | null;
-	platform: Platform | null;
-	user?: User | null;
+	command: Command["Name"] | null;
+	channel: Channel["ID"] | null;
+	platform: Platform["ID"] | null;
+	user?: User["ID"] | null;
 	invocation: string | null;
 };
 type ParsedGenericFilterOptions = {
@@ -704,17 +704,10 @@ type GenericFilterData = {
 	enableVerb: string;
 	disableVerb: string;
 	context: CommandContext;
-	filterData: Partial<InstanceFilterData>;
-};
-type InstanceFilterData = {
-	command: Command | null;
-	channel: Channel | null;
-	platform: Platform | null;
-	invocation: string;
-	user: User;
+	filterData: Partial<ParsedGenericFilterData>;
 };
 
-export const handleGenericFilter = async (type: string, data: GenericFilterData): Promise<{ reply: string; success: boolean }> => {
+export const handleGenericFilter = async (type: FilterType, data: GenericFilterData): Promise<{ reply: string; success: boolean }> => {
 	let { filter } = data;
 	const {
 		enableInvocation,

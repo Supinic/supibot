@@ -42,19 +42,20 @@ type ParameterValueMap = {
 };
 type ParameterType = keyof ParameterValueMap;
 type ParameterValue = ParameterValueMap[ParameterType];
-export type ParameterDefinition = {
-	name: string;
-	type: ParameterType;
+type ParameterDefinition = {
+	readonly name: string;
+	readonly type: ParameterType;
 };
+type ParameterDefinitions = readonly ParameterDefinition[];
 
-type ParamFromDefinition<T extends readonly ParameterDefinition[]> = {
+type ParamFromDefinition<T extends ParameterDefinitions> = {
 	[P in T[number] as P["name"]]: ParameterValueMap[P["type"]];
 };
 
 type AppendedParameters = Record<string, ParameterValue>;
 type ResultFailure = { success: false; reply: string; };
 
-type StrictResult = {
+export type StrictResult = {
 	success?: boolean;
 	reply?: string | null;
 	replyWithPrivateMessage?: boolean;
@@ -77,11 +78,11 @@ type Result = StrictResult & {
 };
 
 export type Invocation = string;
-export type ContextData<T extends ParameterDefinition[] = ParameterDefinition[]> = {
+export type ContextData<T extends ParameterDefinitions = ParameterDefinitions> = {
 	user: Context<T>["user"]
+	platform: Context<T>["platform"];
 	invocation?: Context<T>["invocation"];
 	channel?: Context<T>["channel"];
-	platform?: Context<T>["platform"];
 	transaction?: Context<T>["transaction"];
 	privateMessage?: Context<T>["privateMessage"];
 	append?: Context<T>["append"];
@@ -103,33 +104,32 @@ export type ContextAppendData = {
 };
 
 type PermissionOptions = Partial<Pick<ContextData, "user" | "channel" | "platform">>;
-type EmoteOptions = { // @todo move to Channel
+type EmoteOptions =  { // @todo move to Channel
 	shuffle?: boolean;
 	caseSensitivity?: boolean;
 	filter?: (emote: string) => boolean;
 };
-type BestEmoteOptions = Pick<ContextData, "channel" | "platform"> & EmoteOptions;
+type BestEmoteOptions = Partial<Pick<ContextData, "channel" | "platform"> & EmoteOptions>;
 
-export class Context<T extends ParameterDefinition[] = ParameterDefinition[]> {
+export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 	readonly command: Command;
-	readonly user: User;
 	readonly invocation: string;
+	readonly user: User;
+	readonly platform: Platform;
 	readonly channel: Channel | null;
-	readonly platform: Platform | null;
 	readonly transaction: QueryTransaction | null;
 	readonly privateMessage: boolean;
 	readonly append: ContextAppendData;
 	readonly params: ParamFromDefinition<T>;
 
 	readonly meta: Map<string, unknown> = new Map();
-	readonly #userFlags: Record<string, boolean>;
 
 	constructor (command: Command, data: ContextData<T>) {
 		this.command = command;
 		this.user = data.user;
 		this.invocation = data.invocation ?? command.Name;
 		this.channel = data.channel ?? null;
-		this.platform = data.platform ?? null;
+		this.platform = data.platform;
 		this.transaction = data.transaction ?? null;
 		this.privateMessage = data.privateMessage ?? false;
 
@@ -137,14 +137,6 @@ export class Context<T extends ParameterDefinition[] = ParameterDefinition[]> {
 		this.append.tee ??= [];
 
 		this.params = (data.params ?? {}) as ParamFromDefinition<T>;
-
-		this.#userFlags = Filter.getFlags({
-			command,
-			invocation: this.invocation,
-			platform: this.platform,
-			channel: this.channel,
-			user: this.user
-		}) as Record<string, boolean>; // @todo remove type-cast after Filter is refactored to TS
 	}
 
 	getMeta (name: string) { return this.meta.get(name); }
@@ -292,20 +284,20 @@ type CooldownObject = {
 type CooldownDefinition = number | null | CooldownObject;
 
 export class Command extends TemplateWithoutId {
-	Name: string;
-	Aliases: string[] = [];
-	Description: string | null = null;
-	Cooldown: number | null;
-	Flags: Readonly<string[]>;
-	Params: ParameterDefinition[] = [];
-	Whitelist_Response: string | null = null;
-	Code: ExecuteFunction;
-	Dynamic_Description: DescriptionFunction | null;
+	readonly Name: string;
+	readonly Aliases: string[] = [];
+	readonly Description: string | null = null;
+	readonly Cooldown: number | null;
+	readonly Flags: Readonly<string[]>;
+	readonly Params: ParameterDefinitions = [];
+	readonly Whitelist_Response: string | null = null;
+	readonly Code: ExecuteFunction;
+	readonly Dynamic_Description: DescriptionFunction | null;
 
 	#ready = false;
 	#destroyed = false;
-	#customDestroy: InitDestroyFunction | null;
-	data = {};
+	readonly #customDestroy: InitDestroyFunction | null;
+	readonly data = {};
 
 	static readonly importable = true;
 	static readonly uniqueIdentifier = "Name";
@@ -1112,7 +1104,7 @@ export class Command extends TemplateWithoutId {
 
 	static #parseAndAppendParameter (
 		value: string,
-		parameterDefinition: ParameterDefinition,
+		parameterDefinition: ParameterDefinitions[number],
 		explicit: boolean,
 		existingParameters: AppendedParameters
 	): { success: true; newParameters: AppendedParameters; } | ResultFailure {
@@ -1154,7 +1146,7 @@ export class Command extends TemplateWithoutId {
 	}
 
 	static parseParametersFromArguments (
-		paramsDefinition: ParameterDefinition[],
+		paramsDefinition: ParameterDefinitions,
 		argsArray: string[]
 	): { success: true; parameters: Record<string, ParameterValue>; args: string[]; } | ResultFailure {
 		const argsStr = argsArray.join(" ");

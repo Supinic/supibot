@@ -12,7 +12,7 @@ export type Type =
 	"Cooldown" | "Flags" | "Offline-only" | "Online-only" | "Arguments" | "Reminder-prevention";
 
 type CooldownData = XOR<{ multiplier: number }, { override: number, respect?: boolean }>;
-type DbArgumentDescriptor = {
+export type DbArgumentDescriptor = {
 	index?: number | string;
 	range?: number[] | string[] | string;
 	regex?: string | string[] | RegExp;
@@ -75,12 +75,22 @@ type ExecuteSuccess = {
 }
 type ExecuteResult = ExecuteFailure | ExecuteSuccess;
 
-const isCooldownData = (input: Filter["Data"]): input is CooldownData => {
+export const isCooldownData = (input: Filter["Data"]): input is CooldownData => {
 	if (!input || Array.isArray(input)) {
 		return false;
 	}
 
 	return (typeof input.multiplier === "number" || typeof input.override === "number");
+};
+export const isArgumentsData = (input: Filter["Data"]): input is ArgumentDescriptor[] => {
+	if (!input || !Array.isArray(input)) {
+		return false;
+	}
+
+	return input.every(i => (
+		(typeof i.string === "string" || i.regex instanceof RegExp)
+		&& ((Array.isArray(i.range) && i.range.length === 2) || typeof i.index === "number")
+	));
 };
 
 // @todo move to Channel
@@ -340,7 +350,7 @@ export class Filter extends TemplateWithId {
 		await row.save();
 	}
 
-	async saveProperty (property: keyof Filter, value: Filter[keyof Filter]) {
+	async saveProperty (property: keyof Filter, value?: Filter[keyof Filter]) {
 		const row = await sb.Query.getRow("chat_data", "Filter");
 		await row.load(this.ID);
 
