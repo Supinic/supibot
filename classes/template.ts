@@ -1,4 +1,3 @@
-import { SupiError } from "supi-core";
 import type { CacheValue, KeyObject, Recordset, Row, JavascriptValue as RowValue, Query, SupiDate } from "supi-core";
 type PoolConnection = Awaited<ReturnType<Query["getTransaction"]>>;
 
@@ -34,16 +33,6 @@ type GenericDataPropertyValue = string | number | boolean | null | SupiDate | Ge
 export interface TemplateDefinition {
 	[P: string]: unknown;
 }
-export interface TemplateWithIdDefinition extends TemplateDefinition {
-	ID: number;
-}
-
-export type Constructable<T extends Template> = {
-	new (definition: TemplateDefinition): T;
-	importable: (typeof Template)["importable"];
-	data: (typeof Template)["data"];
-	get: (...args: unknown[]) => T | null;
-};
 
 export const getGenericDataProperty = async <T extends TemplateWithId>(inputData: GenericDataPropertyObject<T>) => {
 	const {
