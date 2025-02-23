@@ -189,7 +189,7 @@ abstract class Template {
 
 	static importable: boolean = false;
 	static uniqueIdentifier: string;
-	static data: Map<number, Template> | Map<string, Template>;
+	static data: Map<number, Template> | Map<string, Template> | Map<number, Template[]>;
 
 	async getCacheData (key: KeyLike): Promise<CacheValue> {
 		if (typeof key === "string") {
@@ -259,7 +259,14 @@ abstract class Template {
 	static clearData () {
 		if (this.data.size !== 0) {
 			for (const instance of this.data.values()) {
-				instance.destroy();
+				if (Array.isArray(instance)) {
+					for (const item of instance) {
+						item.destroy();
+					}
+				}
+				else {
+					instance.destroy();
+				}
 			}
 
 			this.data.clear();
@@ -306,6 +313,11 @@ abstract class Template {
 export abstract class TemplateWithId extends Template {
 	abstract ID: number;
 	static data: Map<number, TemplateWithId>;
+}
+
+export abstract class TemplateWithIdArrayData extends Template {
+	abstract ID: number;
+	static data: Map<number, TemplateWithIdArrayData[]>;
 }
 
 export abstract class TemplateWithIdString extends Template {

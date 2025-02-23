@@ -36,7 +36,7 @@ type NewAfkData = AfkConstructorData & {
 	Interrupted_ID?: AwayFromKeyboard["ID"];
 };
 
-export default class AwayFromKeyboard extends TemplateWithId {
+export class AwayFromKeyboard extends TemplateWithId {
 	readonly ID: number;
 	readonly User_Alias: number;
 	readonly Started: SupiDate;
@@ -273,4 +273,6 @@ export default class AwayFromKeyboard extends TemplateWithId {
 
 		return afk;
 	}
-};
+}
+
+export default AwayFromKeyboard;

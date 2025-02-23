@@ -595,7 +595,7 @@ export class Filter extends TemplateWithId {
 		}
 
 		let channelLive = null;
-		if (channel instanceof Channel) {
+		if (isChannel(channel)) {
 			channelLive = await channel.isLive();
 		}
 
@@ -671,11 +671,10 @@ export class Filter extends TemplateWithId {
 	}
 
 	/**
-	 * Executes a unping process on a given string for a given command.
+	 * Executes an unping process on a given string for a given command.
 	 * For each user that has decided to "unping" from a given command, their name will be replaced by a string
 	 * where on the second position a zero-width character is inserted. This makes sure that they won't be so-called
 	 * "pinged", aka notified based on a regex.
-	 * @param {Object} options
 	 */
 	static async applyUnping (options: UnpingContextOptions) {
 		const rawFilters = Filter.getLocals("Unping", {
@@ -730,12 +729,7 @@ export class Filter extends TemplateWithId {
 	}
 
 	/**
-	 * Picks the correct response type, based on the type provided
-	 * @param {Object} options
-	 * @param {string} options.string
-	 * @param {sb.Filter.Response} options.response
-	 * @param {string} [options.reason]
-	 * @returns {null|string}
+	 * Picks the correct response string, based on the type provided
 	 */
 	static getReason (options: ReasonObject) {
 		const { string, response, reason } = options;
@@ -776,6 +770,6 @@ export class Filter extends TemplateWithId {
 		await Promise.all(promises);
 		return true;
 	}
-};
+}
 
 export default Filter;

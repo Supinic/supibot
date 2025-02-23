@@ -126,7 +126,7 @@ export default class Platform {
 	/**
 	 * @abstract
 	 */
-	async pm (message, user) {
+	async pm (message, user, channel) {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Platform"
 		});
@@ -423,7 +423,7 @@ export default class Platform {
 		return message;
 	}
 
-	async createUserMention (userData) {
+	async createUserMention (userData, channelData) {
 		return userData.Name;
 	}
 

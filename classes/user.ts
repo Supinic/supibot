@@ -24,7 +24,7 @@ type NameObject = {
 const HIGH_LOAD_CACHE_PREFIX = "sb-user-high-load" as const;
 const HIGH_LOAD_CACHE_EXPIRY = 60_000 as const;
 
-export default class User extends TemplateWithIdString {
+export class User extends TemplateWithIdString {
 	readonly ID: number;
 	readonly Discord_ID: string | null;
 	readonly Twitch_ID: string | null;
@@ -414,7 +414,9 @@ export default class User extends TemplateWithIdString {
 		clearInterval(User.mapExpirationInterval);
 		User.data.clear();
 	}
-};
+}
+
+export default User;
 
 /**
  * @typedef {"admin"|"owner"|"ambassador"} UserPermissionLevel

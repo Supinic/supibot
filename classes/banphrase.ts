@@ -100,7 +100,7 @@ class ExternalBanphraseAPI {
 	}
 }
 
-export default class Banphrase extends TemplateWithId {
+export class Banphrase extends TemplateWithId {
 	readonly ID: number;
 	readonly Type: Type;
 	readonly Platform: Platform["ID"] | null = null;
@@ -407,4 +407,6 @@ export default class Banphrase extends TemplateWithId {
 			return (result.banned) ? result.banphrase_data.phrase : false;
 		}
 	}
-};
+}
+
+export default Banphrase;
