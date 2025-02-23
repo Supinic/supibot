@@ -1,3 +1,6 @@
+import { SupiDate, SupiError } from "supi-core";
+import type { Recordset, Counter, Gauge } from "supi-core";
+
 import config from "../config.json" with { type: "json" };
 
 import AwayFromKeyboard from "./afk.js";
@@ -6,111 +9,120 @@ import Channel from "./channel.js";
 import { Command } from "./command.js";
 import Filter from "./filter.js";
 import User from "./user.js";
-import { Template } from "./template.js";
+import { TemplateWithIdArrayData } from "./template.js";
 
 import Platform from "../platforms/template.js";
 import LongTimeout from "../utils/long-timeout.js";
+
+type Type = "Reminder" | "Pingme" | "Deferred";
+type ConstructorData = Pick<Reminder, "ID" | "User_From" | "User_To" | "Channel" | "Text" | "Created" | "Schedule" | "Private_Message" | "Type"> & {
+	Platform: number | null;
+};
+type CreateData = Omit<ConstructorData, "ID">;
+type CreateResult = {
+	success: boolean;
+	cause: string | null,
+	ID?: Reminder["ID"] | null;
+};
+type LimitCheckResult = { success: true; } | { success: false; cause: string; };
 
 /**
  * Represents a pending reminder from (usually) one user to another.
  * An active reminder will be printed into the chat once the target user is spotted.
  */
-export default class Reminder extends Template {
+export class Reminder extends TemplateWithIdArrayData {
+	/**
+	 * Unique numeric ID.
+	 */
+	readonly ID: number;
+	/**
+	 * The user who set the reminder up.
+	 * When `null`, the User_From property signifies the instance is a system reminder.
+	 */
+	readonly User_From: User["ID"] | null;
+	/**
+	 * The user who the reminder is set up for.
+	 * If none is specified, it is a reminder for the origin user themselves.
+	 */
+	readonly User_To: User["ID"];
+	/**
+	 * The channel the reminder was set up in.
+	 * This is necessary for timed reminders, as otherwise it is ambiguous where the reminder should be executed.
+	 */
+	readonly Channel: Channel["ID"] | null;
+	/**
+	 * The text of the reminder.
+	 * Can also be null, if the reminder is set up as "ping From when To types a message".
+	 */
+	readonly Text: string | null;
+	/**
+	 * Date of creation.
+	 */
+	readonly Created: SupiDate;
+	/**
+	 * Schedule date of reminder, if it's timed.
+	 * If null, reminder is tied to a user typing in chat.
+	 */
+	readonly Schedule: SupiDate | null;
+	/**
+	 * If `true`, the reminder is set to be fired into the user's PMs on the platform they next type in.
+	 * If `false`, regular behaviour is expected.
+	 */
+	readonly Private_Message: boolean;
+	/**
+	 * Platform of the reminder. Can be independent of the channel.
+	 */
+	readonly Platform: Platform;
+	/**
+	 * The type of the reminder:
+	 * - "Reminder" reminds the target when they type in chat, or after some time
+	 * - "Pingme" reminds the author when the target types in chat
+	 * - "Deferred" reminds the target when they type after some time passed
+	 */
+	readonly Type: Type;
+
+	/**
+	 * If the reminder is a timed one, a timeout will be active that holds the info about the activation.
+	 */
+	timeout: LongTimeout | null = null;
+	deactivated: boolean = false;
+
 	/**
 	 * Holds all currently active reminders in a Map, keyed by the target recipient user's IDs.
-	 * The list of
-	 * @type {Map<User.ID, Reminder[]>}
 	 */
-	static data = new Map();
+	static data: Map<User["ID"], Reminder[]> = new Map();
 	static uniqueIdentifier = "ID";
 
 	/* @type {Map<Reminder.ID, User.ID>} */
-	static available = new Map();
+	static available: Map<Reminder["ID"], User["ID"]> = new Map();
 
-	static #activeGauge;
-	static #userGauge;
-	static #limitRejectedCounter;
-	static #totalCounter;
+	static #activeGauge: Gauge;
+	static #userGauge: Gauge;
+	static #limitRejectedCounter: Counter<"cause">;
+	static #totalCounter: Counter<"type" | "scheduled" | "system">;
 
-	constructor (data) {
+	constructor (data: ConstructorData) {
 		super();
 
-		/**
-		 * Unique numeric ID.
-		 * @type {number}
-		 */
 		this.ID = data.ID;
-
-		/**
-		 * The user who set the reminder up.
-		 * Since anonymous reminders are not supported, this cannot be null.
-		 * @type {User["ID"]}
-		 */
 		this.User_From = data.User_From;
-
-		/**
-		 * The user who the reminder is set up for.
-		 * If none is specified, it is a reminder for the origin user themselves.
-		 * @type {User["ID"]}
-		 */
-		this.User_To = data.User_To || data.User_From;
-
-		/**
-		 * The channel the reminder was set up in.
-		 * This is necessary for timed reminders, as otherwise it is ambiguous where the reminder should be executed.
-		 * @type {Channel["ID"]}
-		 */
+		this.User_To = data.User_To;
 		this.Channel = data.Channel;
-
-		/**
-		 * The text of the reminder.
-		 * Can also be null, if the reminder is set up as "ping From when To types a message".
-		 * @type {string|null}
-		 */
 		this.Text = data.Text;
-
-		/**
-		 * Date of creation.
-		 * @type {CoreDate}
-		 */
 		this.Created = data.Created;
-
-		/**
-		 * Schedule date of reminder, if it's timed.
-		 * If null, reminder is tied to a user typing in chat.
-		 * @type {CoreDate|null}
-		 */
 		this.Schedule = data.Schedule;
-
-		/**
-		 * If true, the reminder is set to be fired into the user's PMs on the platform they next type in.
-		 * If false, regular behaviour is expected
-		 * @type {boolean}
-		 */
 		this.Private_Message = data.Private_Message;
-
-		/**
-		 * Platform of the reminder. Can be independent from the channel.
-		 * @type {Platform|null}
-		 */
-		this.Platform = (data.Platform)
-			? Platform.get(data.Platform)
-			: null;
-
-		/**
-		 * The type of the reminder, whether it reminds the target ("regular reminder") or the author
-		 * ("pingme reminder" - the author will be pinged when the target user types somewhere)
-		 * @type {"Reminder"|"Pingme"}
-		 */
 		this.Type = data.Type;
 
-		/**
-		 * If the reminder is a timed one, a timeout will be active that holds the info about the activation.
-		 * @type {LongTimeout|null}
-		 */
-		this.timeout = null;
+		const platformData = Platform.get(data.Platform);
+		if (!platformData) {
+			throw new SupiError({
+				message: "Unknown platform provided for Reminder",
+				args: { data }
+			});
+		}
 
-		this.deactivated = false;
+		this.Platform = platformData;
 	}
 
 	activateTimeout () {
@@ -118,7 +130,7 @@ export default class Reminder extends Template {
 			return this;
 		}
 		else if (new sb.Date() > this.Schedule) {
-			this.deactivate(true);
+			void this.deactivate(true, false);
 			return this;
 		}
 
@@ -126,6 +138,12 @@ export default class Reminder extends Template {
 			const channelData = (this.Channel === null) ? null : Channel.get(this.Channel);
 			const fromUserData = (this.User_From) ? await User.get(this.User_From, true) : null;
 			const toUserData = await User.get(this.User_To, true);
+			if (!toUserData) {
+				throw new SupiError({
+					message: "Reminder has no valid target user set up",
+					args: { user: this.User_To }
+				});
+			}
 
 			const fromMention = (fromUserData)
 				? await this.Platform.createUserMention(fromUserData, channelData)
@@ -152,6 +170,7 @@ export default class Reminder extends Template {
 					Channel: channelData.ID,
 					Created: new sb.Date(),
 					Schedule: null,
+					Type: "Reminder",
 					Text: `You got a scheduled reminder (ID ${this.ID}) while you were AFK: ${message}`,
 					Private_Message: true
 				}, true);
@@ -179,7 +198,7 @@ export default class Reminder extends Template {
 						else if (!this.User_From) {
 							mirrorMessage = `${toUserData.Name}, system reminder (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
-						else if (this.User_To) {
+						else if (this.User_To && fromUserData) {
 							mirrorMessage = `${toUserData.Name}, timed reminder from ${fromUserData.Name} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
 
@@ -201,7 +220,7 @@ export default class Reminder extends Template {
 				}
 			}
 
-			await this.deactivate(true);
+			await this.deactivate(true, false);
 		}, Number(this.Schedule), true);
 
 		return this;
@@ -209,11 +228,10 @@ export default class Reminder extends Template {
 
 	/**
 	 * Deactivates a reminder. Also deactivates it in database if required.
-	 * @param {boolean} cancelled If true, the reminder will be flagged as cancelled
-	 * @param {boolean} permanent If true, the reminder was completed, and can be removed in database.
-	 * @returns {Promise<Reminder>}
+	 * @param cancelled If true, the reminder will be flagged as cancelled
+	 * @param permanent If true, the reminder was completed, and can be removed in database.
 	 */
-	async deactivate (permanent, cancelled) {
+	async deactivate (permanent: boolean, cancelled: boolean) {
 		// Always deactivate timed reminder timeout
 		if (this.timeout) {
 			this.timeout.clear();
@@ -221,6 +239,12 @@ export default class Reminder extends Template {
 
 		await Reminder.#remove(this.ID, { cancelled, permanent });
 		return this;
+	}
+
+	getCacheKey (): never {
+		throw new SupiError({
+			message: "Reminder module does not support `getCacheKey`"
+		});
 	}
 
 	destroy () {
@@ -231,38 +255,36 @@ export default class Reminder extends Template {
 	}
 
 	static async initialize () {
-		if (sb.Metrics) {
-			Reminder.#limitRejectedCounter = sb.Metrics.registerCounter({
-				name: "supibot_reminders_limit_rejected_total",
-				help: "Total amount of all reminders that have not been registered due to a limit being hit.",
-				labelNames: ["cause"]
-			});
+		Reminder.#limitRejectedCounter = sb.Metrics.registerCounter({
+			name: "supibot_reminders_limit_rejected_total",
+			help: "Total amount of all reminders that have not been registered due to a limit being hit.",
+			labelNames: ["cause"] as const
+		});
 
-			Reminder.#totalCounter = sb.Metrics.registerCounter({
-				name: "supibot_reminders_created_total",
-				help: "Total amount of all reminders created.",
-				labelNames: ["type", "scheduled", "system"]
-			});
+		Reminder.#totalCounter = sb.Metrics.registerCounter({
+			name: "supibot_reminders_created_total",
+			help: "Total amount of all reminders created.",
+			labelNames: ["type", "scheduled", "system"] as const
+		});
 
-			Reminder.#activeGauge = sb.Metrics.registerGauge({
-				name: "supibot_active_reminders_count",
-				help: "Total amount of currently active reminders."
-			});
+		Reminder.#activeGauge = sb.Metrics.registerGauge({
+			name: "supibot_active_reminders_count",
+			help: "Total amount of currently active reminders."
+		});
 
-			Reminder.#userGauge = sb.Metrics.registerGauge({
-				name: "supibot_reminder_recipient_user_count",
-				help: "Total amount of users that currently have at least one reminder pending for them."
-			});
-		}
+		Reminder.#userGauge = sb.Metrics.registerGauge({
+			name: "supibot_reminder_recipient_user_count",
+			help: "Total amount of users that currently have at least one reminder pending for them."
+		});
 
 		return await super.initialize();
 	}
 
 	static async loadData () {
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await sb.Query.getRecordset((rs: Recordset) => rs
 			.select("*")
 			.from("chat_data", "Reminder")
-		);
+		) as ConstructorData[];
 
 		const threshold = new sb.Date().addYears(10).valueOf();
 		for (const row of data) {
@@ -286,7 +308,7 @@ export default class Reminder extends Template {
 		return await this.loadData();
 	}
 
-	static async reloadSpecific (...list) {
+	static async reloadSpecific (...list: Reminder["ID"][]) {
 		if (list.length === 0) {
 			return false;
 		}
@@ -309,28 +331,22 @@ export default class Reminder extends Template {
 		return true;
 	}
 
-	static get (identifier) {
+	static get (identifier: Reminder | Reminder["ID"]) {
 		if (identifier instanceof Reminder) {
 			return identifier;
 		}
-		else if (typeof identifier === "number") {
-			if (!Reminder.available.has(identifier)) {
+		else {
+			const userID = Reminder.available.get(identifier);
+			if (typeof userID !== "number") {
 				return null;
 			}
 
-			const userID = Reminder.available.get(identifier);
 			const list = Reminder.data.get(userID);
 			if (!list) {
 				return null;
 			}
 
 			return list.find(i => i.ID === identifier) ?? null;
-		}
-		else {
-			throw new sb.Error({
-				message: "Unrecognized reminder identifier type",
-				args: typeof identifier
-			});
 		}
 	}
 
@@ -347,36 +363,24 @@ export default class Reminder extends Template {
 
 	static destroy () {
 		this.clear();
-		super.destroy();
 	}
 
 	/**
 	 * Creates a new Reminder, and saves it to database.
 	 * Used mostly in commands to set up reminders.
 	 */
-	static async create (data, skipChecks = false) {
-		if (!skipChecks) {
-			const { success, cause } = await Reminder.checkLimits(data.User_From, data.User_To, data.Schedule, data.Type);
-			if (!success) {
+	static async create (data: CreateData, skipChecks = false): Promise<CreateResult> {
+		if (!skipChecks && data.User_From !== null) {
+			const limitResult = await Reminder.checkLimits(data.User_From, data.User_To, data.Schedule, data.Type);
+			if (!limitResult.success) {
 				if (sb.Metrics) {
-					Reminder.#limitRejectedCounter.inc({ cause });
+					Reminder.#limitRejectedCounter.inc({
+						cause: limitResult.cause
+					});
 				}
 
-				return { success, cause };
+				return limitResult;
 			}
-		}
-
-		if (!data.User_To || !data.Platform) {
-			throw new sb.Error({
-				message: "Missing Reminder constructor option User_To and/or Platform",
-				args: { data }
-			});
-		}
-		else if (data.User_From !== null && typeof data.User_From !== "number") {
-			throw new sb.Error({
-				message: "Invalid Reminder constructor option User_From",
-				args: { data }
-			});
 		}
 
 		const row = await sb.Query.getRow("chat_data", "Reminder");
@@ -399,9 +403,9 @@ export default class Reminder extends Template {
 
 		if (sb.Metrics) {
 			Reminder.#totalCounter.inc({
-				type: row.values.Type,
-				scheduled: Boolean(row.values.Schedule),
-				system: skipChecks
+				type: row.values.Type as Type,
+				scheduled: String(Boolean(row.values.Schedule)),
+				system: String(skipChecks)
 			});
 
 			Reminder.#activeGauge.set(Reminder.available.size);
@@ -419,13 +423,9 @@ export default class Reminder extends Template {
 	 * @param {User} targetUserData The user ID to check for
 	 * @param {Channel} channelData The channel where the reminder was fired
 	 */
-	static async checkActive (targetUserData, channelData) {
-		if (!Reminder.data.has(targetUserData.ID)) {
-			return;
-		}
-
+	static async checkActive (targetUserData: User, channelData: Channel) {
 		const list = Reminder.data.get(targetUserData.ID);
-		if (list.length === 0) {
+		if (!list || list.length === 0) {
 			return;
 		}
 
@@ -437,7 +437,7 @@ export default class Reminder extends Template {
 		const now = sb.Date.now();
 		const reminders = list.filter(i => (
 			!i.deactivated
-			&& ((i.Type === "Deferred" && i.Schedule <= now) || (i.Type !== "Deferred" && !i.Schedule))
+			&& ((i.Type === "Deferred" && i.Schedule && i.Schedule <= now) || (i.Type !== "Deferred" && !i.Schedule))
 			&& !excludedUserIDs.includes(i.User_From)
 		));
 
@@ -454,6 +454,13 @@ export default class Reminder extends Template {
 
 		const reply = [];
 		const privateReply = [];
+		const platformData = channelData.Platform;
+		if (!platformData) {
+			// @todo Remove check after Channel has well-known Platform
+			throw new SupiError({
+				message: "Missing platform'"
+			});
+		}
 
 		for (const reminder of reminders) {
 			const fromUserData = (reminder.User_From)
@@ -461,9 +468,20 @@ export default class Reminder extends Template {
 				: null;
 
 			if (reminder.Type === "Pingme") {
-				const fromUserData = await User.get(reminder.User_From, false);
-				const isChannelStalkOptedOut = await channelData.getDataProperty("stalkPrevention");
+				if (!reminder.User_From) {
+					throw new SupiError({
+						message: "Missing User_From property in Pingme reminder"
+					});
+				}
 
+				const fromUserData = await User.get(reminder.User_From, false);
+				if (!fromUserData) {
+					throw new SupiError({
+						message: "Invalid User_From value in Pingme reminder"
+					});
+				}
+
+				const isChannelStalkOptedOut = await channelData.getDataProperty("stalkPrevention");
 				const channelStringName = (isChannelStalkOptedOut === true)
 					? "[EXPUNGED]"
 					: channelData.getFullName();
@@ -520,6 +538,12 @@ export default class Reminder extends Template {
 				continue;
 			}
 
+			if (reminder.Text === null) {
+				throw new SupiError({
+					message: "Missing Text property in non-Pingme reminder"
+				});
+			}
+
 			const reminderTextCheck = await Banphrase.execute(reminder.Text, channelData);
 			const reminderText = (reminderTextCheck.passed) ? reminder.Text : "[Banphrased]";
 			const delta = sb.Utils.timeDelta(reminder.Created);
@@ -531,8 +555,8 @@ export default class Reminder extends Template {
 			else if (!fromUserData) {
 				reminderMessage = `system reminder - ${reminderText} (${delta})`;
 			}
-			else if (reminder.Text !== null) {
-				const mention = await channelData.Platform.createUserMention(fromUserData);
+			else {
+				const mention = await platformData.createUserMention(fromUserData);
 				const mentionResult = await Banphrase.execute(mention, channelData);
 				const checkedeMention = (mentionResult.passed) ? mention : "[Banphrased username]";
 
@@ -547,7 +571,7 @@ export default class Reminder extends Template {
 			}
 		}
 
-		const targetUserMention = await channelData.Platform.createUserMention(targetUserData);
+		const targetUserMention = await platformData.createUserMention(targetUserData);
 		const targetUserCheck = await sb.Banphrase.execute(targetUserMention, channelData);
 		const userMention = (targetUserCheck.passed) ? `${targetUserMention},` : "[Banphrased username],";
 
@@ -577,7 +601,7 @@ export default class Reminder extends Template {
 					executor: targetUserData
 				});
 
-				const limit = channelData.Message_Limit ?? channelData.Platform.Message_Limit;
+				const limit = channelData.Message_Limit ?? platformData.Message_Limit;
 
 				// If the result message would be longer than twice the channel limit, post a list of reminder IDs
 				// instead along with a link to the website, where the user can check them out.
@@ -638,7 +662,7 @@ export default class Reminder extends Template {
 		// Handle private reminders
 		if (privateReply.length !== 0) {
 			for (const privateReminder of privateReply) {
-				await channelData.Platform.pm(`Private reminder: ${privateReminder}`, targetUserData, channelData);
+				await platformData.pm(`Private reminder: ${privateReminder}`, targetUserData, channelData);
 			}
 
 			const publicMessage = `Hey ${userMention} - I just private messaged you ${privateReply.length} private reminder(s) - make sure to check them out!`;
@@ -651,7 +675,7 @@ export default class Reminder extends Template {
 		}
 
 		// Properly deactivate all reminders here - after all work has been done.
-		const deactivatePromises = reminders.map(reminder => reminder.deactivate(true));
+		const deactivatePromises = reminders.map(reminder => reminder.deactivate(true, false));
 		await Promise.all(deactivatePromises);
 
 		if (sb.Metrics) {
@@ -661,35 +685,31 @@ export default class Reminder extends Template {
 	}
 
 	/**
-	 * Checks whether or not it is possible to set up a reminder for given user, respecting limits.
+	 * Checks whether it is possible to set up a reminder for given user, respecting limits.
 	 * Used mostly in commands to set up reminders.
-	 * @param {number} userFrom
-	 * @param {number} userTo
-	 * @param {sb.Date} [schedule]
-	 * @param {string} [type]
-	 * @return {ReminderCreationResult}
 	 */
-	static async checkLimits (userFrom, userTo, schedule, type = "Reminder") {
+	static async checkLimits (userFrom: User["ID"], userTo: User["ID"], schedule: Reminder["Schedule"], type: Type = "Reminder"): Promise<LimitCheckResult> {
+		type Item = { Private_Message: Reminder["Private_Message"]; };
 		const [incomingData, outgoingData] = await Promise.all([
-			sb.Query.getRecordset(rs => rs
+			sb.Query.getRecordset((rs: Recordset) => rs
 				.select("Private_Message")
 				.from("chat_data", "Reminder")
 				.where("(Type = %s AND Schedule IS NULL) OR (Type = %s AND Schedule IS NOT NULL)", "Reminder", "Deferred")
 				.where("User_To = %n", userTo)
 			),
-			sb.Query.getRecordset(rs => rs
+			sb.Query.getRecordset((rs: Recordset) => rs
 				.select("Private_Message")
 				.from("chat_data", "Reminder")
 				.where("Schedule IS NULL")
 				.where("(Type = %s AND Schedule IS NULL) OR (Type = %s AND Schedule IS NOT NULL)", "Reminder", "Deferred")
 				.where("User_From = %n", userFrom)
 			)
-		]);
+		]) as [Item[], Item[]];
 
 		const incomingLimit = config.values.maxIncomingActiveReminders;
 		const outgoingLimit = config.values.maxOutgoingActiveReminders;
-		const [privateIncoming, publicIncoming] = sb.Utils.splitByCondition(incomingData, i => i.Private_Message);
-		const [privateOutgoing, publicOutgoing] = sb.Utils.splitByCondition(outgoingData, i => i.Private_Message);
+		const [privateIncoming, publicIncoming] = sb.Utils.splitByCondition(incomingData, (i: Item) => i.Private_Message);
+		const [privateOutgoing, publicOutgoing] = sb.Utils.splitByCondition(outgoingData, (i: Item) => i.Private_Message);
 
 		if (publicIncoming.length >= incomingLimit) {
 			return {
@@ -719,15 +739,9 @@ export default class Reminder extends Template {
 		if (schedule) {
 			const incomingScheduledLimit = config.values.maxIncomingScheduledReminders;
 			const outgoingScheduledLimit = config.values.maxOutgoingScheduledReminders;
-			if (!(schedule instanceof sb.Date)) {
-				throw new sb.Error({
-					message: "Invalid schedule provided",
-					args: { schedule, userFrom, userTo }
-				});
-			}
 
 			const [scheduledIncoming, scheduledOutgoing] = await Promise.all([
-				sb.Query.getRecordset(rs => rs
+				sb.Query.getRecordset((rs: Recordset) => rs
 					.select("COUNT(*) AS Count")
 					.from("chat_data", "Reminder")
 					.where("Schedule IS NOT NULL")
@@ -740,7 +754,7 @@ export default class Reminder extends Template {
 					.single()
 					.flat("Count")
 				),
-				sb.Query.getRecordset(rs => rs
+				sb.Query.getRecordset((rs: Recordset) => rs
 					.select("COUNT(*) AS Count")
 					.from("chat_data", "Reminder")
 					.where("Schedule IS NOT NULL")
@@ -753,7 +767,7 @@ export default class Reminder extends Template {
 					.single()
 					.flat("Count")
 				)
-			]);
+			]) as [number, number];
 
 			if (scheduledIncoming >= incomingScheduledLimit) {
 				return {
@@ -770,7 +784,7 @@ export default class Reminder extends Template {
 		}
 
 		if (type === "Pingme") {
-			const existingPingmeReminderID = await sb.Query.getRecordset(rs => rs
+			const existingPingmeReminderID = await sb.Query.getRecordset((rs: Recordset) => rs
 				.select("ID")
 				.from("chat_data", "Reminder")
 				.where("Type = %s", "Pingme")
@@ -778,7 +792,7 @@ export default class Reminder extends Template {
 				.where("User_To = %n", userTo)
 				.flat("ID")
 				.single()
-			);
+			) as number | undefined;
 
 			if (existingPingmeReminderID) {
 				return {
@@ -793,7 +807,7 @@ export default class Reminder extends Template {
 		};
 	}
 
-	static async createRelayLink (endpoint, params) {
+	static async createRelayLink (endpoint: string, params: string) {
 		const relay = await sb.Got.get("Supinic")({
 			method: "POST",
 			url: "relay",
@@ -803,7 +817,7 @@ export default class Reminder extends Template {
 			}
 		});
 
-		let link;
+		let link: string;
 		if (relay.statusCode === 200) {
 			link = relay.body.data.link;
 		}
@@ -819,26 +833,26 @@ export default class Reminder extends Template {
 	 * @private
 	 * @param {Reminder} reminder
 	 */
-	static #add (reminder) {
+	static #add (reminder: Reminder) {
 		if (!Reminder.data.has(reminder.User_To)) {
 			Reminder.data.set(reminder.User_To, []);
 		}
 
 		Reminder.available.set(reminder.ID, reminder.User_To);
-		Reminder.data.get(reminder.User_To).push(reminder);
+
+		const array = Reminder.data.get(reminder.User_To) as Reminder[]; // Type cast due to condition above
+		array.push(reminder);
 
 		reminder.activateTimeout();
 	}
 
 	/**
 	 * @private
-	 * @param {number} ID
-	 * @param {Object} options
-	 * @param {boolean} [options.cancelled] If `true`, the reminder will be flagged as "Cancelled"
-	 * @param {boolean} [options.permanent] If `true`, the reminder will also be removed/deactivated in the database as well
-	 * @returns {Promise<boolean>} whether or not the changes were applied
+	 * @param [options.cancelled] If `true`, the reminder will be flagged as "Cancelled"
+	 * @param [options.permanent] If `true`, the reminder will also be removed/deactivated in the database as well
+	 * @returns Whether the changes were applied
 	 */
-	static async #remove (ID, options = {}) {
+	static async #remove (ID: Reminder["ID"], options: { cancelled?: boolean; permanent?: boolean; } = {}) {
 		const { cancelled, permanent } = options;
 		if (permanent) {
 			const row = await sb.Query.getRow("chat_data", "Reminder");
@@ -866,11 +880,11 @@ export default class Reminder extends Template {
 			}
 		}
 
-		if (!Reminder.available.has(ID)) {
+		const targetUserID = Reminder.available.get(ID);
+		if (!targetUserID) {
 			return false;
 		}
 
-		const targetUserID = Reminder.available.get(ID);
 		const list = Reminder.data.get(targetUserID);
 		if (!list) {
 			return false;
@@ -889,11 +903,6 @@ export default class Reminder extends Template {
 
 		return true;
 	}
-};
+}
 
-/**
- * @typedef {Object} ReminderCreationResult
- * @property {boolean} success Whether or not the reminder was created .
- * @property {number} [ID] If successful, this is the new reminder ID.
- * @property {string} [cause] If not successful, this is a string specifying what went wrong.
- */
+export default Reminder;
