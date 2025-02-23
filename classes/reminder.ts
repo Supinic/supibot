@@ -9,7 +9,7 @@ import Channel from "./channel.js";
 import { Command } from "./command.js";
 import Filter from "./filter.js";
 import User from "./user.js";
-import { TemplateWithIdArrayData } from "./template.js";
+import { TemplateWithId } from "./template.js";
 
 import Platform from "../platforms/template.js";
 import LongTimeout from "../utils/long-timeout.js";
@@ -30,7 +30,7 @@ type LimitCheckResult = { success: true; } | { success: false; cause: string; };
  * Represents a pending reminder from (usually) one user to another.
  * An active reminder will be printed into the chat once the target user is spotted.
  */
-export class Reminder extends TemplateWithIdArrayData {
+export class Reminder extends TemplateWithId {
 	/**
 	 * Unique numeric ID.
 	 */
@@ -52,7 +52,7 @@ export class Reminder extends TemplateWithIdArrayData {
 	readonly Channel: Channel["ID"] | null;
 	/**
 	 * The text of the reminder.
-	 * Can also be null, if the reminder is set up as "ping From when To types a message".
+	 * Can also be null, if the reminder is set up as "ping `From` when `To` types a message".
 	 */
 	readonly Text: string | null;
 	/**
@@ -181,7 +181,7 @@ export class Reminder extends TemplateWithIdArrayData {
 					await this.Platform.pm(message, toUserData);
 				}
 				else {
-					if (channelData === null) {
+					if (!channelData) {
 						throw new sb.Error({
 							message: "Cannot post a non-private reminder in an unspecified channel!",
 							args: {
@@ -191,7 +191,7 @@ export class Reminder extends TemplateWithIdArrayData {
 					}
 
 					if (channelData.Mirror) {
-						let mirrorMessage;
+						let mirrorMessage: string;
 						if (this.User_From === this.User_To) {
 							mirrorMessage = `${toUserData.Name}, reminder from yourself (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
@@ -201,11 +201,16 @@ export class Reminder extends TemplateWithIdArrayData {
 						else if (this.User_To && fromUserData) {
 							mirrorMessage = `${toUserData.Name}, timed reminder from ${fromUserData.Name} (${sb.Utils.timeDelta(this.Created)}): ${this.Text}`;
 						}
+						else {
+							throw new SupiError({
+								message: "Invalid combination of parameters in Reminder"
+							})
+						}
 
 						await channelData.mirror(mirrorMessage, null, { commandUsed: false });
 					}
 
-					const preparedMessage = await channelData.prepareMessage(message);
+					const preparedMessage = await channelData.prepareMessage(message) as string | false; // @todo remove type cast when Platform is TS
 					if (preparedMessage) {
 						const fixedMessage = await Filter.applyUnping({
 							command: Command.get("remind"),
@@ -486,19 +491,32 @@ export class Reminder extends TemplateWithIdArrayData {
 					? "[EXPUNGED]"
 					: channelData.getFullName();
 
-				let platform = null;
+				let reminderPlatform: Platform | null = null;
 				if (reminder.Channel) {
-					platform = Channel.get(reminder.Channel).Platform;
+					const channelData = Channel.get(reminder.Channel);
+					if (!channelData) {
+						throw new SupiError({
+							message: "Invalid Channel in Reminder"
+						});
+					}
+
+					reminderPlatform = channelData.Platform;
 				}
 				else {
-					platform = Platform.get(reminder.Platform);
+					reminderPlatform = Platform.get(reminder.Platform) as Platform | null; // @todo remove type cast when Platform is TS
 				}
 
-				const uncheckedAuthorMention = await platform.createUserMention(fromUserData);
+				if (!reminderPlatform) {
+					throw new SupiError({
+						message: "Unknown Platform in Reminder"
+					});
+				}
+
+				const uncheckedAuthorMention = await reminderPlatform.createUserMention(fromUserData);
 				const authorBanphraseCheck = await sb.Banphrase.execute(uncheckedAuthorMention, channelData);
 				const authorMention = (authorBanphraseCheck.passed) ? `${uncheckedAuthorMention}` : "[Banphrased username]";
 
-				const targetMention = await platform.createUserMention(targetUserData);
+				const targetMention = await reminderPlatform.createUserMention(targetUserData);
 				let message = `${authorMention}, ${targetMention} just typed in channel ${channelStringName}`;
 
 				if (reminder.Text) {
@@ -506,12 +524,17 @@ export class Reminder extends TemplateWithIdArrayData {
 				}
 
 				if (reminder.Private_Message) {
-					await platform.pm(message, fromUserData);
+					await reminderPlatform.pm(message, fromUserData);
 				}
-				else {
+				else if (reminder.Channel) {
 					const channelData = Channel.get(reminder.Channel);
-					const banphraseResult = await sb.Banphrase.execute(message, channelData);
+					if (!channelData) {
+						throw new SupiError({
+							message: "Invalid Channel in Reminder"
+						});
+					}
 
+					const banphraseResult = await sb.Banphrase.execute(message, channelData);
 					if (!banphraseResult.passed) {
 						await channelData.send(sb.Utils.tag.trim `
 							${authorMention},
@@ -519,7 +542,7 @@ export class Reminder extends TemplateWithIdArrayData {
 							I have whispered you the result instead.
 						`);
 
-						await platform.pm(message, fromUserData.Name, channelData);
+						await reminderPlatform.pm(message, fromUserData.Name, channelData);
 					}
 					else {
 						const fixedMessage = await Filter.applyUnping({
@@ -534,7 +557,7 @@ export class Reminder extends TemplateWithIdArrayData {
 					}
 				}
 
-				// Pingme reminders do not follow the regular reminder logic, so continue to next iteration.
+				// `Pingme` reminders do not follow the regular reminder logic, so continue to next iteration.
 				continue;
 			}
 
@@ -578,8 +601,7 @@ export class Reminder extends TemplateWithIdArrayData {
 		// Handle non-private reminders
 		if (reply.length !== 0) {
 			let message = `reminder(s) from: ${reply.join("; ")}`;
-
-			if (channelData.Links_Allowed === false) {
+			if (!channelData.Links_Allowed) {
 				message = sb.Utils.replaceLinks(message, "[LINK]");
 			}
 

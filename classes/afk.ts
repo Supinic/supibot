@@ -226,7 +226,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 		else if (identifier instanceof User) {
 			return AwayFromKeyboard.data.get(identifier.ID);
 		}
-		else if (typeof identifier === "number") {
+		else {
 			const values = [...AwayFromKeyboard.data.values()];
 			return values.find(i => i.ID === identifier) ?? null;
 		}

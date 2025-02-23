@@ -6,7 +6,7 @@ import { TemplateWithoutId, TemplateDefinition } from "./template.js";
 import Banphrase from "./banphrase.js";
 import Filter from "./filter.js";
 import User from "./user.js";
-import { Channel, privateMessageChannelSymbol } from "./channel.js";
+import { Channel, privateMessageChannelSymbol, type GetEmoteOptions, Emote } from "./channel.js";
 import Platform from "../platforms/template.js";
 import CooldownManager from "../utils/cooldown-manager.js";
 import { Language, LanguageParser } from "../utils/languages.js";
@@ -103,13 +103,12 @@ export type ContextAppendData = {
 	privateMessage?: boolean;
 };
 
-type PermissionOptions = Partial<Pick<ContextData, "user" | "channel" | "platform">>;
-type EmoteOptions =  { // @todo move to Channel
-	shuffle?: boolean;
-	caseSensitivity?: boolean;
-	filter?: (emote: string) => boolean;
+type PermissionOptions = {
+	user?: User | null;
+	channel?: Channel | null;
+	platform?: Platform | null;
 };
-type BestEmoteOptions = Partial<Pick<ContextData, "channel" | "platform"> & EmoteOptions>;
+type BestEmoteOptions = Partial<Pick<ContextData, "channel" | "platform"> & GetEmoteOptions>;
 
 export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 	readonly command: Command;
@@ -161,7 +160,7 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		if (this.channel) {
 			await Promise.all([
 				this.channel.send(string),
-				this.channel.mirror(string)
+				this.channel.mirror(string, null)
 			]);
 		}
 		else if (this.platform && this.user) {
@@ -179,11 +178,11 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		const channelData = options.channel ?? this.channel;
 		const platformData = options.platform ?? this.platform;
 
-		const data: Array<boolean | undefined> = await Promise.all([
+		const data = await Promise.all([
 			userData?.getDataProperty("administrator"),
 			platformData?.isUserChannelOwner(channelData, userData),
 			channelData?.isUserAmbassador(userData)
-		]);
+		]) as [boolean | undefined, boolean | undefined, boolean | undefined];
 
 		const flags = {
 			administrator: (data[0] === true),
@@ -216,7 +215,7 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		};
 	}
 
-	async getBestAvailableEmote (emotes: string[], fallback: string, options: BestEmoteOptions = {}) {
+	async getBestAvailableEmote <T extends string> (emotes: T[], fallback: T, options: BestEmoteOptions = {}): Promise<Emote | T> {
 		const channelData = options.channel ?? this.channel;
 		const platformData = options.platform ?? this.platform;
 		if (channelData) {
@@ -226,10 +225,10 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 			return await platformData.getBestAvailableEmote(null, emotes, fallback, options);
 		}
 
-		return "(no emote found)";
+		return fallback;
 	}
 
-	randomEmote <T extends string> (...inputEmotes: T[]): Promise<T> {
+	async randomEmote <T extends string> (...inputEmotes: T[]): Promise<T> {
 		if (inputEmotes.length < 2) {
 			throw new sb.Error({
 				message: "At least two emotes are required"
@@ -239,7 +238,10 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		const emotes = inputEmotes.slice(0, -1) as T[];
 		const fallback = inputEmotes.at(-1) as T;
 
-		return this.getBestAvailableEmote(emotes, fallback, { shuffle: true });
+		return await this.getBestAvailableEmote(emotes, fallback, {
+			shuffle: true,
+			returnEmoteObject: false
+		}) as T;
 	}
 
 	get tee () { return this.append.tee; }
@@ -422,8 +424,6 @@ export class Command extends TemplateWithoutId {
 	}
 
 	static async importData (definitions: CommandDefinition[]) {
-		this.clearData();
-
 		for (const definition of definitions) {
 			const instance = new Command(definition);
 			this.data.set(definition.Name, instance);

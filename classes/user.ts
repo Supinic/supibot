@@ -82,7 +82,7 @@ export class User extends TemplateWithIdString {
 		return `sb-user-${this.Name}`;
 	}
 
-	async saveProperty<T extends keyof ConstructorData> (property: T, value: User[T]) {
+	async saveProperty<T extends keyof ConstructorData> (property: T, value: this[T]) {
 		const row: Row = await sb.Query.getRow("chat_data", "User_Alias");
 		await row.load(this.ID);
 

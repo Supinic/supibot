@@ -1,7 +1,7 @@
 import createMessageLoggingTable from "../utils/create-db-table.js";
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
-export default class Platform {
+export class Platform {
 	#id;
 	#name;
 	#host;
@@ -333,7 +333,7 @@ export default class Platform {
 	/**
 	 * @abstract
 	 */
-	async fetchChannelEmotes () {
+	async fetchChannelEmotes (channelData) {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Platform"
 		});
@@ -536,6 +536,8 @@ export default class Platform {
 		return instance;
 	}
 }
+
+export default Platform;
 
 /**
  * @typedef {Object} TypedEmote Describes any emote

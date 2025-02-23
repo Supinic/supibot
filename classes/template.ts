@@ -26,7 +26,7 @@ type GenericDataPropertyResult = SetGenericDataPropertyResult & {
 	Property: string;
 	Value: string;
 };
-type GenericDataPropertyValue = string | number | boolean | null | SupiDate | GenericDataPropertyValue[] | {
+export type GenericDataPropertyValue = string | number | boolean | null | SupiDate | GenericDataPropertyValue[] | {
 	[P: string]: GenericDataPropertyValue;
 };
 
@@ -189,7 +189,7 @@ abstract class Template {
 
 	static importable: boolean = false;
 	static uniqueIdentifier: string;
-	static data: Map<number, Template> | Map<string, Template> | Map<number, Template[]>;
+	static data: Map<unknown, unknown>;
 
 	async getCacheData (key: KeyLike): Promise<CacheValue> {
 		if (typeof key === "string") {
@@ -218,7 +218,7 @@ abstract class Template {
 		});
 	}
 
-	async saveRowProperty<T extends Template, K extends keyof T> (row: Row, property: K, value: T[K] | undefined, self: T) {
+	async saveRowProperty<T extends keyof this> (row: Row, property: T, value: this[T] | undefined, self: this) {
 		if (!row.hasProperty(property as string)) {
 			throw new sb.Error({
 				message: "Row does not have provided property",
@@ -234,7 +234,7 @@ abstract class Template {
 			});
 		}
 
-		let newValue: T[K];
+		let newValue: this[T];
 		if (typeof value !== "undefined") {
 			self[property] = value;
 			newValue = value;
@@ -254,23 +254,6 @@ abstract class Template {
 
 	static async initialize () {
 		await this.loadData();
-	}
-
-	static clearData () {
-		if (this.data.size !== 0) {
-			for (const instance of this.data.values()) {
-				if (Array.isArray(instance)) {
-					for (const item of instance) {
-						item.destroy();
-					}
-				}
-				else {
-					instance.destroy();
-				}
-			}
-
-			this.data.clear();
-		}
 	}
 
 	/**
@@ -312,19 +295,10 @@ abstract class Template {
 
 export abstract class TemplateWithId extends Template {
 	abstract ID: number;
-	static data: Map<number, TemplateWithId>;
-}
-
-export abstract class TemplateWithIdArrayData extends Template {
-	abstract ID: number;
-	static data: Map<number, TemplateWithIdArrayData[]>;
 }
 
 export abstract class TemplateWithIdString extends Template {
 	abstract ID: number;
-	static data: Map<string, TemplateWithIdString>;
 }
 
-export abstract class TemplateWithoutId extends Template {
-	static data: Map<string, TemplateWithoutId>;
-}
+export abstract class TemplateWithoutId extends Template {}

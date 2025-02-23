@@ -17,7 +17,7 @@ const banphraseConfigData = {
 	...regexes
 } as const;
 
-type Type = "Denial" | "API response" | "Custom response" | "Replacement" | "Inactive";
+export type Type = "Denial" | "API response" | "Custom response" | "Replacement" | "Inactive";
 type ConstructorData = {
 	ID: Banphrase["ID"];
 	Type: Banphrase["Type"];
