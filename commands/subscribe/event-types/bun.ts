@@ -1,3 +1,5 @@
+import { RssEventDefinition } from "../generic-event.js";
+
 export default {
 	name: "Bun",
 	aliases: [],
@@ -9,8 +11,8 @@ export default {
 	},
 	generic: true,
 	cronExpression: "0 */5 * * * *",
-	cacheKey: "bun-blogpost-last-publish-date",
 	subName: "Bun blogpost",
 	type: "rss",
+	cacheKey: "bun-blogpost-last-publish-date",
 	url: "https://bun.sh/rss.xml"
-};
+} satisfies RssEventDefinition;

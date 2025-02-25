@@ -1,3 +1,5 @@
+import { RssEventDefinition } from "../generic-event.js";
+
 export default {
 	name: "Rust",
 	aliases: [],
@@ -13,4 +15,4 @@ export default {
 	subName: "Rust article",
 	type: "rss",
 	url: "https://blog.rust-lang.org/feed.xml"
-};
+} satisfies RssEventDefinition;

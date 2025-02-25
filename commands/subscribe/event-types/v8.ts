@@ -1,3 +1,5 @@
+import { RssEventDefinition } from "../generic-event.js";
+
 export default {
 	name: "V8",
 	aliases: [],
@@ -13,4 +15,4 @@ export default {
 	subName: "V8 version",
 	type: "rss",
 	url: "https://v8.dev/blog.atom"
-};
+} as RssEventDefinition;

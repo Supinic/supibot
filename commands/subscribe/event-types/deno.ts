@@ -1,3 +1,5 @@
+import { RssEventDefinition } from "../generic-event.js";
+
 export default {
 	name: "Deno",
 	aliases: [],
@@ -13,4 +15,4 @@ export default {
 	subName: "Deno article",
 	type: "rss",
 	url: "https://deno.com/feed"
-};
+} satisfies RssEventDefinition;

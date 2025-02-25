@@ -1,3 +1,5 @@
+import { SpecialEventDefinition } from "../generic-event.js";
+
 export default {
 	name: "Suggestion",
 	aliases: ["suggest", "suggestions"],
@@ -7,4 +9,4 @@ export default {
 		added: "You will now receive private system reminders whenever a suggestion you made changes.",
 		removed: "You will no longer receive suggestion reminders."
 	}
-};
+} satisfies SpecialEventDefinition;

@@ -1,5 +1,21 @@
+import { CustomEventDefinition } from "../generic-event.js";
+
 const url = "https://secure.runescape.com/m=news/latestNews.json?oldschool=1";
 const OSRS_LATEST_ARTICLE_ID = "osrs-last-article-id";
+
+type FauxRssOsrsResponse = {
+	ok: boolean;
+	body: {
+		newsItems: {
+			newsId: number;
+			link: string;
+			summary: string;
+			time: string;
+			title: string;
+			sticky: boolean;
+		}[];
+	};
+};
 
 export default {
 	name: "OSRS",
@@ -19,14 +35,14 @@ export default {
 			url,
 			responseType: "json",
 			throwHttpErrors: true
-		});
+		}) as FauxRssOsrsResponse;
 
 		if (!response.ok) {
 			return;
 		}
 
-		const newsItems = response.body.newsItems.filter(i => i.sticky === false);
-		const previousArticleId = await sb.Cache.getByPrefix(OSRS_LATEST_ARTICLE_ID) ?? 0;
+		const newsItems = response.body.newsItems.filter(i => !i.sticky);
+		const previousArticleId = (await sb.Cache.getByPrefix(OSRS_LATEST_ARTICLE_ID) as number | null) ?? 0;
 
 		// Huge assumption: Jagex will release new articles on "top" of the JSON feed
 		const previousArticleIndex = newsItems.findIndex(i => i.newsId === previousArticleId);
@@ -82,4 +98,4 @@ export default {
 			message: `New OSRS ${noun}! ${articleString}`
 		};
 	}
-};
+} satisfies CustomEventDefinition;

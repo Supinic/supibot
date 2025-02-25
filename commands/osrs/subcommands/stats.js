@@ -1,4 +1,4 @@
-import OsrsUtils from "./osrs-utils.js";
+import { fetchUserData, parseUserIdentifier, getIronman } from "./osrs-utils.js";
 import GameData from "../game-data.json" with { type: "json" };
 
 export default {
@@ -28,15 +28,14 @@ export default {
 		"Will take into account virtual levels."
 	],
 	execute: async function (context, ...args) {
-		const user = args.join(" ");
-		if (!user) {
-			return {
-				success: false,
-				reply: `No player name provided!`
-			};
+		const identifier = args.join(" ");
+		const parsedUserData = await parseUserIdentifier(context, identifier);
+		if (!parsedUserData.success) {
+			return parsedUserData;
 		}
 
-		const userStats = await OsrsUtils.fetch(user, {
+		const user = parsedUserData.username;
+		const userStats = await fetchUserData(user, {
 			seasonal: Boolean(context.params.seasonal),
 			force: Boolean(context.params.force)
 		});
@@ -45,9 +44,10 @@ export default {
 			return userStats;
 		}
 
+		const { data } = userStats;
 		const accountType = (context.params.seasonal)
 			? "seasonal user"
-			: OsrsUtils.getIronman(userStats, Boolean(context.params.rude));
+			: getIronman(data, Boolean(context.params.rude));
 
 		if (context.params.skill) {
 			const skillName = context.params.skill.toLowerCase();
@@ -60,7 +60,7 @@ export default {
 			}
 
 			const { name, emoji } = skillData;
-			const skill = userStats.skills.find(i => i.name.toLowerCase() === name);
+			const skill = data.skills.find(i => i.name.toLowerCase() === name);
 			if (!skill) {
 				return {
 					success: false,
@@ -90,7 +90,7 @@ export default {
 
 		const strings = [];
 		for (const { emoji, name } of GameData.skills) {
-			const found = userStats.skills.find(i => i.name.toLowerCase() === name.toLowerCase());
+			const found = data.skills.find(i => i.name.toLowerCase() === name.toLowerCase());
 			if (found && found.level !== null) {
 				const level = (context.params.virtual)
 					? (found.virtualLevel ?? found.level)
@@ -106,13 +106,13 @@ export default {
 			};
 		}
 		else {
-			const total = userStats.skills.find(i => i.name.toLowerCase() === "overall");
+			const total = data.skills.find(i => i.name.toLowerCase() === "overall");
 			const totalXPString = (total)
 				? `XP: ${sb.Utils.groupDigits(total.experience)}`
 				: "";
 
-			const combatLevelString = (userStats.combatLevel !== null)
-				? `Combat level: ${userStats.combatLevel}`
+			const combatLevelString = (data.combatLevel !== null)
+				? `Combat level: ${data.combatLevel}`
 				: "";
 
 			return {
