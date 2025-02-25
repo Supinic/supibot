@@ -1,6 +1,24 @@
 import { fetchUserData, parseUserIdentifier, getIronman } from "./osrs-utils.js";
 import GameData from "../game-data.json" with { type: "json" };
 
+import type User from "../../../classes/user.js";
+
+// @todo Import from Command when done in Typescript
+interface Context {
+	user: User;
+	params: {
+		activity?: string;
+		boss?: string;
+		seasonal?: boolean;
+		force?: boolean;
+	};
+}
+
+const ActivityAlias = typeof GameData;
+const isValidActivityAlias: (input: string): input is keyof typeof GameData.activityAliases => {
+
+}
+
 export default {
 	name: "kc",
 	title: "Kill count",
@@ -11,7 +29,7 @@ export default {
 		`<code>$osrs kc boss:"(activity name)" (username)</code>`,
 		"For given user and activity, prints their kill-count and ranking."
 	],
-	execute: async function (context, ...args) {
+	execute: async function (context: Context, ...args: string[]) {
 		const identifier = args.join(" ");
 		const parsedUserData = await parseUserIdentifier(context, identifier);
 		if (!parsedUserData.success) {
@@ -30,6 +48,8 @@ export default {
 		if (!activity) {
 			return {
 				success: false,
+				// @todo should be fixed when Command is in TS
+				// @ts-ignore
 				reply: `No activity provided! Use activity:"boss name" - for a list, check here: ${this.getDetailURL()}`
 			};
 		}
@@ -39,13 +59,14 @@ export default {
 			force: Boolean(context.params.force)
 		});
 
-		if (userStats.success === false) {
+		if (!userStats.success) {
 			return userStats;
 		}
 
-		if (GameData.activityAliases[activity.toLowerCase()]) {
-			activity = GameData.activityAliases[activity.toLowerCase()];
+		if (GameData.activityAliases.hasOwnProperty(activity)) {
+			activity = GameData.activityAliases[activity as keyof GameData.activityAliases];
 		}
+
 
 		const { data } = userStats;
 		const activities = data.activities.map(i => i.name.toLowerCase());

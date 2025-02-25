@@ -58,7 +58,7 @@ type UsernameSuccess = {
 	success: true;
 	username: string;
 	type: "string" | "username";
-	remainingArgs?: string[];
+	remainingArgs: string[];
 };
 type FetchUserSuccess = {
 	success: true;
@@ -221,7 +221,8 @@ export const parseUserIdentifier = async (context: Context, identifier: string):
 		return {
 			success: true,
 			username: identifier,
-			type: "string"
+			type: "string",
+			remainingArgs: []
 		};
 	}
 
