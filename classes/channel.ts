@@ -11,7 +11,6 @@ import {
 	setGenericDataProperty,
 	TemplateWithId
 } from "./template.js";
-import { ContextData } from "./command.js";
 
 export const privateMessageChannelSymbol /* : unique symbol */ = Symbol("private-message-channel");
 
@@ -37,8 +36,10 @@ export type GetEmoteOptions = {
 	returnEmoteObject?: boolean;
 	filter?: (emote: Emote) => boolean;
 };
-type GetObjectEmoteOptions = GetEmoteOptions & { returnEmoteObject: true; };
-type GetStringEmoteOptions = GetEmoteOptions & { returnEmoteObject?: false; };
+// type GetObjectEmoteOptions = GetEmoteOptions & { returnEmoteObject: true; };
+// type GetStringEmoteOptions = GetEmoteOptions & { returnEmoteObject?: false; };
+
+export type Like = string | number | Channel;
 
 export type Emote = { // @todo move to Platform
 	type: "discord" | "twitch" | "bttv" | "7tv";
@@ -321,7 +322,7 @@ export class Channel extends TemplateWithId {
 		await Channel.loadData();
 	}
 
-	static get (identifier: Channel | number | string, platformIdentifier?: Platform | string | number) {
+	static get (identifier: Like, platformIdentifier?: Platform | string | number) {
 		let platform: Platform | undefined;
 		if (platformIdentifier) {
 			const platformData = Platform.get(platformIdentifier);

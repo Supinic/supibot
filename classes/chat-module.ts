@@ -1,39 +1,89 @@
-import Channel from "./channel.js";
-import Platform from "../platforms/template.js";
-import { Template } from "./template.js";
+import { SupiError, type Recordset } from "supi-core";
 
-export default class ChatModule extends Template {
+import { TemplateWithoutId } from "./template.js";
+import { Channel, Like as ChannelLike } from "./channel.js";
+import { User } from "./user.js";
+
+import { Platform } from "../platforms/template.js";
+import { Message, SimpleGenericData, XOR } from "../@types/globals.js";
+
+type ConstructorData = Pick<ChatModule, "Name" | "Events" | "Global" | "Code"> & {
+	Platform: Platform["ID"];
+};
+
+export type Event = "message" | "online" | "offline" | "raid" | "subscription";
+export type Argument = SimpleGenericData;
+export type AttachmentReference = {
+	channelID: Channel["ID"];
+	active: boolean;
+	listener: (context: ModuleContext, ...args: Argument[]) => void;
+};
+export type ModuleContext = {
+	channel: Channel;
+	data: SimpleGenericData;
+	event: Event;
+	specificArguments: Argument[];
+	message?: Message | null;
+	user?: User | null;
+};
+export type Descriptor = {
+	Channel: Channel["ID"];
+	Chat_Module: ChatModule["Name"];
+	Args: string | null;
+};
+export type Like = number | string | ChatModule;
+
+type PlatformLike = number | string | Platform; // @todo move to Platform
+type PlatformOption = {
+	platform: PlatformLike | PlatformLike[];
+}
+type ChannelOption = {
+	channel: ChannelLike | ChannelLike[];
+}
+type AttachOptions = XOR<PlatformOption, ChannelOption> & { args?: SimpleGenericData[]; };
+type DetachOptions = AttachOptions & {
+	remove: boolean;
+};
+
+export default class ChatModule extends TemplateWithoutId {
+	readonly Name: string;
+	readonly Events: string[];
+	readonly Active: boolean = true;
+	readonly Code: unknown;
+	readonly Global: boolean; // @todo refactor out into attachment table
+	readonly Platform: Platform | null; // @todo refactor out into attachment table
+
+	attachmentReferences: AttachmentReference[] = [];
+	data = {};
+
+	static data: Map<ChatModule["Name"], ChatModule> = new Map();
 	static importable = true;
 	static uniqueIdentifier = "Name";
 
-	Name;
-	Events;
-	Active = true;
-	Code;
-	Global; // @todo refactor out into attachment table
-	Platform; // @todo refactor out into attachment table
-	attachmentReferences = [];
-	data = {};
-
-	static data = [];
-
-	constructor (data) {
+	constructor (data: ConstructorData) {
 		super();
 
 		this.Name = data.Name;
-
-		this.Events = data.Events;
-		if (!Array.isArray(this.Events)) {
-			console.warn("Chat module has invalid events - not Array");
-			this.Events = [];
-		}
-
 		this.Code = data.Code;
+		this.Events = data.Events;
 		this.Global = Boolean(data.Global);
-		this.Platform = (data.Platform) ? Platform.get(data.Platform) : null;
+
+		if (data.Platform) {
+			const platform = Platform.get(data.Platform);
+			if (!platform) {
+				throw new SupiError({
+					message: "Invalid Platform provided in ChatModule"
+				});
+			}
+
+			this.Platform = platform;
+		}
+		else {
+			this.Platform = null;
+		}
 	}
 
-	#initialize (attachmentData) {
+	#initialize (attachmentData: Descriptor[]) {
 		if (this.Global) {
 			if (this.attachmentReferences.length !== 0) {
 				return;
@@ -68,20 +118,21 @@ export default class ChatModule extends Template {
 				continue;
 			}
 
-			this.attach({
-				args,
-				channel: Channel.get(data.Channel)
-			});
+			const channel = Channel.get(data.Channel);
+			if (!channel) {
+				throw new SupiError({
+					message: "Invalid Channel in ChatModule definition"
+				});
+			}
+
+			this.attach({ args, channel });
 		}
 
 		return this;
 	}
 
-	attach (options) {
-		if (!options.args) {
-			options.args = [];
-		}
-
+	attach (options: AttachOptions) {
+		const args = options.args ?? [];
 		for (const event of this.Events) {
 			for (const channelData of ChatModule.getTargets(options)) {
 				const reference = this.attachmentReferences.find(i => i.channelID === channelData.ID);
@@ -90,14 +141,14 @@ export default class ChatModule extends Template {
 					reference.active = true;
 				}
 				else {
-					const listener = (function chatModuleBinding (context) {
+					const listener = (function chatModuleBinding (this: ChatModule, context: ModuleContext) {
 						if (typeof this.Code !== "function") {
 							console.warn("Destroyed chat module's code invoked! Module was automatically detached", { context, chatModule: this });
 							channelData.events.off(event, listener);
 							return;
 						}
 
-						this.Code(context, ...options.args);
+						this.Code(context, ...args);
 					}).bind(this);
 
 					channelData.events.on(event, listener);
@@ -112,7 +163,7 @@ export default class ChatModule extends Template {
 		}
 	}
 
-	detach (options) {
+	detach (options: DetachOptions) {
 		for (const event of this.Events) {
 			for (const channelData of ChatModule.getTargets(options)) {
 				const index = this.attachmentReferences.findIndex(i => i.channelID === channelData.ID);
@@ -124,7 +175,6 @@ export default class ChatModule extends Template {
 				channelData.events.off(event, reference.listener);
 
 				if (options.remove) {
-					reference.listener = null;
 					this.attachmentReferences.splice(index, 1);
 				}
 				else {
@@ -134,10 +184,10 @@ export default class ChatModule extends Template {
 		}
 	}
 
-	detachAll (hard = false) {
+	detachAll (hard: boolean = false) {
 		const channels = this.attachmentReferences
 			.map(i => Channel.get(i.channelID))
-			.filter(Boolean);
+			.filter(Boolean) as Channel[]; // Type cast due to filter(Boolean)
 
 		this.detach({
 			channel: channels,
@@ -145,18 +195,18 @@ export default class ChatModule extends Template {
 		});
 	}
 
-	destroy () {
-		this.detachAll(true);
-
-		this.data = null;
-		this.attachmentReferences = null;
-
-		this.Events = null;
-		this.Code = null;
+	getCacheKey (): never {
+		throw new SupiError({
+			message: "ChatModule module does not support `getCacheKey`"
+		});
 	}
 
-	static getTargets (options) {
-		const result = [];
+	destroy () {
+		this.detachAll(true);
+	}
+
+	static getTargets (options: AttachOptions): Channel[] {
+		const result: Channel[] = [];
 		if (options.channel) {
 			if (Array.isArray(options.channel)) {
 				result.push(...options.channel);
@@ -168,7 +218,7 @@ export default class ChatModule extends Template {
 
 		if (options.platform) {
 			if (Array.isArray(options.platform)) {
-				result.push(...options.platform.flatMap(i => Channel.getJoinableForPlatform(i)));
+				result.push(...options.platform.flatMap((i: Platform) => Channel.getJoinableForPlatform(i)));
 			}
 			else {
 				result.push(...Channel.getJoinableForPlatform(options.platform));
@@ -178,41 +228,34 @@ export default class ChatModule extends Template {
 		return result;
 	}
 
-	static get (identifier) {
+	static get (identifier: ChatModule | ChatModule["Name"]) {
 		if (identifier instanceof ChatModule) {
 			return identifier;
 		}
-		else if (typeof identifier === "string") {
-			const target = ChatModule.data.find(i => i.Name === identifier);
-			return target ?? null;
-		}
 		else {
-			throw new sb.Error({
-				message: "Invalid chat module identifier type",
-				args: { id: identifier, type: typeof identifier }
-			});
+			return ChatModule.data.get(identifier) ?? null;
 		}
 	}
 
 	static async initialize () {
-		// Override default behaviour of automatically loading module's data on initialization
-		return this;
+		// Overrides default behaviour of automatically loading module's data on initialization
+		return;
 	}
 
-	static async importData (definitions) {
+	static async importData (definitions: ConstructorData[]) {
 		const attachmentData = await ChatModule.#fetch();
 		for (const definition of definitions) {
 			const chatModule = new ChatModule(definition);
-			ChatModule.data.push(chatModule);
+			ChatModule.data.set(chatModule.Name, chatModule);
 
 			const moduleAttachmentData = attachmentData.filter(i => i.Chat_Module === chatModule.Name);
 			chatModule.#initialize(moduleAttachmentData);
 		}
 	}
 
-	static async importSpecific (...definitions) {
+	static async importSpecific (...definitions: ConstructorData[]): Promise<ChatModule[]> {
 		if (definitions.length === 0) {
-			return;
+			return [];
 		}
 
 		const hasConnectorTable = await sb.Query.isTablePresent("chat_data", "Channel_Chat_Module");
@@ -227,7 +270,7 @@ export default class ChatModule extends Template {
 			return [];
 		}
 
-		const newInstances = [];
+		const newInstances: ChatModule[] = [];
 		for (const definition of definitions) {
 			const commandName = definition.Name;
 			const previousInstance = ChatModule.get(commandName);
@@ -245,13 +288,13 @@ export default class ChatModule extends Template {
 			const moduleAttachmentData = attachmentData.filter(i => i.Chat_Module === instance.Name);
 			instance.#initialize(moduleAttachmentData);
 		}
+
+		return newInstances;
 	}
 
-	static getChannelModules (channel) {
-		const channelData = Channel.get(channel);
+	static getChannelModules (channelData: Channel) {
 		const modules = [];
-
-		for (const module of ChatModule.data) {
+		for (const module of ChatModule.data.values()) {
 			const hasChannel = module.attachmentReferences.find(i => i.channelID === channelData.ID);
 			if (hasChannel) {
 				modules.push(module);
@@ -261,7 +304,7 @@ export default class ChatModule extends Template {
 		return modules;
 	}
 
-	static detachChannelModules (channelData, options = {}) {
+	static detachChannelModules (channelData: Channel, options: DetachOptions = {}) {
 		const detachedModules = ChatModule.getChannelModules(channelData);
 		for (const module of detachedModules) {
 			module.detach({
@@ -271,7 +314,7 @@ export default class ChatModule extends Template {
 		}
 	}
 
-	static attachChannelModules (channelData) {
+	static attachChannelModules (channelData: Channel) {
 		const detachedModules = ChatModule.getChannelModules(channelData);
 		for (const module of detachedModules) {
 			module.attach({
@@ -280,15 +323,22 @@ export default class ChatModule extends Template {
 		}
 	}
 
-	static async reloadChannelModules (channel) {
+	static async reloadChannelModules (channel: Channel) {
 		const channelData = Channel.get(channel);
+		if (!channelData) {
+			throw new SupiError({
+				message: "Invalid Channel in ChatModule"
+			});
+		}
+
 		ChatModule.detachChannelModules(channelData, { remove: true });
 
-		const attachmentData = await sb.Query.getRecordset(rs => rs
+		type PartialDescriptor = Pick<Descriptor, "Args" | "Chat_Module">;
+		const attachmentData = await sb.Query.getRecordset((rs: Recordset) => rs
 			.select("Chat_Module", "Specific_Arguments AS Args")
 			.from("chat_data", "Channel_Chat_Module")
 			.where("Channel = %n", channelData.ID)
-		);
+		) as PartialDescriptor[];
 
 		for (const attachment of attachmentData) {
 			const module = ChatModule.get(attachment.Chat_Module);
@@ -315,17 +365,19 @@ export default class ChatModule extends Template {
 		}
 	}
 
-	static parseModuleArgs (rawArgs) {
-		let args = [];
-		if (rawArgs !== null) {
-			try {
-				args = eval(rawArgs);
-			}
-			catch (e) {
-				console.warn(e);
-				return null;
-			}
+	static parseModuleArgs (rawArgs: string | null): Argument[] | null {
+		if (rawArgs === null) {
+			return [];
 		}
+
+		let args = [];
+		try {
+			args = eval(rawArgs);
+		}
+		catch (e) {
+			console.warn(e);
+			return null;
+			}
 
 		if (!Array.isArray(args)) {
 			console.warn("Invalid chat module arguments type", args);
@@ -335,10 +387,10 @@ export default class ChatModule extends Template {
 		return args;
 	}
 
-	static async #fetch (specificNames) {
-		return await sb.Query.getRecordset(rs => {
-			rs.select("Channel", "Chat_Module", "Specific_Arguments as Args")
-				.from("chat_data", "Channel_Chat_Module");
+	static async #fetch (specificNames: string | string[]): Promise<Descriptor[]> {
+		return await sb.Query.getRecordset((rs: Recordset) => {
+			rs.select("Channel", "Chat_Module", "Specific_Arguments as Args");
+			rs.from("chat_data", "Channel_Chat_Module");
 
 			if (typeof specificNames === "string") {
 				rs.where("Chat_Module = %s", specificNames);
@@ -348,14 +400,12 @@ export default class ChatModule extends Template {
 			}
 
 			return rs;
-		});
+		}) as Descriptor[];
 	}
 
 	static destroy () {
-		for (const chatModule of ChatModule.data) {
+		for (const chatModule of ChatModule.data.values()) {
 			chatModule.destroy();
 		}
-
-		super.destroy();
 	}
 };
