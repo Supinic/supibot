@@ -1,3 +1,5 @@
+import { SpecialEventDefinition } from "../generic-event.js";
+
 export default {
 	name: "Changelog",
 	aliases: [],
@@ -7,4 +9,4 @@ export default {
 		added: "You will now receive a reminder whenever a new changelog is posted.",
 		removed: "You will no longer receive changelog reminders."
 	}
-};
+} satisfies SpecialEventDefinition;

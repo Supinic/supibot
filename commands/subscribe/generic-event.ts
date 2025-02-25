@@ -133,6 +133,11 @@ const parseRssNews = async function (xml: string, cacheKey: string): Promise<str
 	return result;
 };
 
+type CommandResult = { // @todo import from Command when supi-core has type exports
+	success: boolean;
+	reply: string;
+};
+
 type BaseEventDefinition = {
 	type: "rss" | "custom";
 	name: string;
@@ -147,6 +152,18 @@ type BaseEventDefinition = {
 	generic: boolean;
 	cronExpression: string;
 };
+export type SpecialEventDefinition = {
+	name: string;
+	aliases: string[];
+	notes: string;
+	channelSpecificMention: boolean;
+	response?: {
+		added: string;
+		removed: string;
+	};
+	// @todo change context to Context and subscription to Row after supi-core exports types
+	handler?: (context: any, subscription: any, ...args: string[]) => Promise<CommandResult>;
+};
 export type RssEventDefinition = BaseEventDefinition & {
 	type: "rss";
 	url: string;
@@ -156,7 +173,7 @@ export type CustomEventDefinition = BaseEventDefinition & {
 	type: "custom";
 	process: () => Promise<void | { message: string }>;
 };
-type GenericEventDefinition = RssEventDefinition | CustomEventDefinition;
+export type GenericEventDefinition = RssEventDefinition | CustomEventDefinition;
 
 /**
  * For a given definition of a subscription event, fetches the newest item and handles the subscription if a new is found.

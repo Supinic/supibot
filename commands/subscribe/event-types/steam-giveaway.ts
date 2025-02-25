@@ -1,3 +1,5 @@
+import { RssEventDefinition } from "../generic-event.js";
+
 export default {
 	name: "Steam Giveaways",
 	aliases: ["steam-giveaway"],
@@ -13,4 +15,4 @@ export default {
 	subName: "Steam giveaway",
 	type: "rss",
 	url: "https://www.gamerpower.com/rss/steam"
-};
+} as RssEventDefinition;

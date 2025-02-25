@@ -1,3 +1,5 @@
+import { GenericEventDefinition, SpecialEventDefinition } from "../generic-event.js";
+
 import BrighterShoresSubDefinition from "./brighter-shores.js";
 import BunSubDefinition from "./bun.js";
 import ChangelogSubDefinition from "./changelog.js";
@@ -34,4 +36,4 @@ export default [
 	SteamGiveawayDefinition,
 	SuggestionSubDefinition,
 	V8SubDefinition
-];
+] satisfies Array<GenericEventDefinition | SpecialEventDefinition>;

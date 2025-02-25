@@ -1,3 +1,5 @@
+import { RssEventDefinition } from "../generic-event.js";
+
 export default {
 	name: ".NET",
 	aliases: [".net"],
@@ -13,4 +15,4 @@ export default {
 	subName: ".NET devblog",
 	type: "rss",
 	url: "https://devblogs.microsoft.com/dotnet/feed"
-};
+} satisfies RssEventDefinition;

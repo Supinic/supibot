@@ -1,3 +1,5 @@
+import { RssEventDefinition } from "../generic-event.js";
+
 export default {
 	name: "Python",
 	aliases: ["4Head"],
@@ -13,4 +15,4 @@ export default {
 	subName: "Python version",
 	type: "rss",
 	url: "https://blog.python.org/feeds/posts/default"
-};
+} satisfies RssEventDefinition;

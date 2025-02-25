@@ -42,11 +42,13 @@ export default {
 				await subscription.save();
 
 				return {
+					success: true,
 					reply: "Successfully unsubscribed from all channels going live."
 				};
 			}
 			else if (args.length === 0) {
 				return {
+					success: true,
 					reply: (data.channels.length === 0)
 						? "You're not subscribed to any channels."
 						: `You're subscribed to these ${data.channels.length} channels: ${data.channels.map(i => sb.Channel.get(i).Name).join(", ")}`
@@ -70,7 +72,7 @@ export default {
 				? `Successfully subscribed to ${data.channels.length - lengthBefore} channels going live.`
 				: "You did not subscribe to any new channels.";
 		}
-		else if (invocation === "unsubscribe") {
+		else {
 			data.channels = data.channels.filter(i => !channels.includes(i));
 
 			response = (data.channels.length < lengthBefore)
@@ -83,6 +85,7 @@ export default {
 		await subscription.save();
 
 		return {
+			success: true,
 			reply: response
 		};
 	}

@@ -1,5 +1,16 @@
+import { CustomEventDefinition } from "../generic-event.js";
+
 import cacheKeys from "../../../utils/shared-cache-keys.json" with { type: "json" };
 const { LATEST_NODE_JS_VERSION } = cacheKeys;
+
+type GithubRepoResponse = {
+	ok: boolean;
+	body: {
+		created_at: string;
+		tag_name: string;
+		html_url: string;
+	}[];
+};
 
 export default {
 	name: "Node.js updates",
@@ -17,7 +28,7 @@ export default {
 	process: async () => {
 		const response = await sb.Got.get("GitHub")({
 			url: "repos/nodejs/node/releases"
-		});
+		}) as GithubRepoResponse;
 
 		if (!response.ok) {
 			return;
@@ -43,4 +54,4 @@ export default {
 			`
 		};
 	}
-};
+} satisfies CustomEventDefinition;
