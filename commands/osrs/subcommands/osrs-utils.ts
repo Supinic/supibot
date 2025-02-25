@@ -1,5 +1,17 @@
 import type User from "../../../classes/user.js";
 // import type { CheerioNode } from "supi-core";
+import GameData from "../game-data.json" with { type: "json" };
+
+// export type ActivityName = typeof GameData["activities"][number];
+// export type SkillName = typeof GameData["skills"][number]["name"];
+export type ActivityAlias = keyof typeof GameData["activityAliases"];
+
+export const isValidActivityAlias = (input: string): input is ActivityAlias => {
+	return Object.keys(GameData.activityAliases).includes(input);
+};
+export const getActivityFromAlias = (input: ActivityAlias): string => {
+	return GameData.activityAliases[input];
+};
 
 type Activity = {
 	name: string;
@@ -57,6 +69,7 @@ type Failure = {
 type UsernameSuccess = {
 	success: true;
 	username: string;
+	type: "string" | "username";
 };
 type FetchUserSuccess = {
 	success: true;
@@ -218,7 +231,8 @@ export const parseUserIdentifier = async (context: Context, identifier: string):
 	if (identifier.length !== 0 && !identifier.startsWith("@")) {
 		return {
 			success: true,
-			username: identifier
+			username: identifier,
+			type: "string",
 		};
 	}
 
@@ -247,6 +261,7 @@ export const parseUserIdentifier = async (context: Context, identifier: string):
 
 	return {
 		success: true,
-		username: gameUsername
+		username: gameUsername,
+		type: "username"
 	};
 };
