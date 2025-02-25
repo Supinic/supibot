@@ -1,5 +1,17 @@
 import type User from "../../../classes/user.js";
 // import type { CheerioNode } from "supi-core";
+import GameData from "../game-data.json" with { type: "json" };
+
+// export type ActivityName = typeof GameData["activities"][number];
+// export type SkillName = typeof GameData["skills"][number]["name"];
+export type ActivityAlias = keyof typeof GameData["activityAliases"];
+
+export const isValidActivityAlias = (input: string): input is ActivityAlias => {
+	return Object.keys(GameData.activityAliases).includes(input);
+};
+export const getActivityFromAlias = (input: ActivityAlias): string => {
+	return GameData.activityAliases[input];
+};
 
 type Activity = {
 	name: string;

@@ -1,5 +1,10 @@
-import { fetchUserData, parseUserIdentifier, getIronman } from "./osrs-utils.js";
-import GameData from "../game-data.json" with { type: "json" };
+import {
+	fetchUserData,
+	parseUserIdentifier,
+	getIronman,
+	getActivityFromAlias,
+	isValidActivityAlias
+} from "./osrs-utils.js";
 
 import type User from "../../../classes/user.js";
 
@@ -11,12 +16,8 @@ interface Context {
 		boss?: string;
 		seasonal?: boolean;
 		force?: boolean;
+		rude?: boolean;
 	};
-}
-
-const ActivityAlias = typeof GameData;
-const isValidActivityAlias: (input: string): input is keyof typeof GameData.activityAliases => {
-
 }
 
 export default {
@@ -63,22 +64,28 @@ export default {
 			return userStats;
 		}
 
-		if (GameData.activityAliases.hasOwnProperty(activity)) {
-			activity = GameData.activityAliases[activity as keyof GameData.activityAliases];
+		if (isValidActivityAlias(activity)) {
+			activity = getActivityFromAlias(activity);
 		}
-
 
 		const { data } = userStats;
 		const activities = data.activities.map(i => i.name.toLowerCase());
-		const bestMatch = sb.Utils.selectClosestString(activity.toLowerCase(), activities, { ignoreCase: true });
+		const bestMatch = sb.Utils.selectClosestString(activity.toLowerCase(), activities, { ignoreCase: true })
 		if (!bestMatch) {
 			return {
 				success: false,
+				// @todo should be fixed when Command is in TS
+				// @ts-ignore
 				reply: `Invalid activity was not found! Check the list here: ${this.getDetailURL()}`
 			};
 		}
 
-		const { name, rank, value } = data.activities.find(i => i.name.toLowerCase() === bestMatch.toLowerCase());
+		const bestActivity = data.activities.find(i => i.name.toLowerCase() === bestMatch.toLowerCase());
+		if (!bestActivity) {
+			throw new Error("Assert: Activity not found"); //@todo change to SupiError
+		}
+
+		const { name, rank, value } = bestActivity
 		const ironman = (context.params.seasonal)
 			? "Seasonal user"
 			: sb.Utils.capitalize(getIronman(data, Boolean(context.params.rude)));
