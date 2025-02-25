@@ -57,6 +57,8 @@ type Failure = {
 type UsernameSuccess = {
 	success: true;
 	username: string;
+	type: "string" | "username";
+	remainingArgs?: string[];
 };
 type FetchUserSuccess = {
 	success: true;
@@ -218,22 +220,28 @@ export const parseUserIdentifier = async (context: Context, identifier: string):
 	if (identifier.length !== 0 && !identifier.startsWith("@")) {
 		return {
 			success: true,
-			username: identifier
+			username: identifier,
+			type: "string"
 		};
 	}
 
 	let targetUser: User;
+	let remainingArgs: string[] = [];
 	if (identifier.length === 0) {
 		targetUser = context.user;
 	}
 	else {
-		targetUser = await sb.User.get(identifier);
+		const [extractedUsername, ...rest] = identifier.split(" ");
+		targetUser = await sb.User.get(extractedUsername);
+
 		if (!targetUser) {
 			return {
 				success: false,
 				reply: "No such user exists!"
 			};
 		}
+
+		remainingArgs = rest;
 	}
 
 	const gameUsername = await targetUser.getDataProperty(OSRS_GAME_USERNAME_KEY) as null | string;
@@ -247,6 +255,8 @@ export const parseUserIdentifier = async (context: Context, identifier: string):
 
 	return {
 		success: true,
-		username: gameUsername
+		username: gameUsername,
+		type: "username",
+		remainingArgs
 	};
 };

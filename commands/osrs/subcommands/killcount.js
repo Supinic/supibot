@@ -19,7 +19,14 @@ export default {
 		}
 
 		const user = parsedUserData.username;
-		let activity = context.params.activity ?? context.params.boss;
+		let activity;
+		if (context.params.activity ?? context.params.boss) {
+			activity = context.params.activity ?? context.params.boss;
+		}
+		if (!activity && parsedUserData.remainingArgs.length !== 0) {
+			activity = parsedUserData.remainingArgs.join(" ");
+		}
+
 		if (!activity) {
 			return {
 				success: false,
