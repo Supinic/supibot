@@ -101,7 +101,7 @@ const handleSubscription = async function (subType: SubscriptionType, message: s
 };
 
 /**
- * Parses RSS xml into a object definition, caching and uncaching it as required.
+ * Parses RSS xml into an object definition, caching and uncaching it as required.
  */
 const parseRssNews = async function (xml: string, cacheKey: string): Promise<string[] | null> {
 	const feed = await parseRSS(xml);
@@ -139,18 +139,18 @@ type BaseEventDefinition = {
 	subName: string;
 	aliases: string[];
 	notes: string;
-	channelSpecification?: boolean;
+	channelSpecificMention?: boolean;
 	response: {
 		added: string;
 		removed: string;
 	};
 	generic: boolean;
 	cronExpression: string;
-	cacheKey: string;
 };
 export type RssEventDefinition = BaseEventDefinition & {
 	type: "rss";
 	url: string;
+	cacheKey: string;
 };
 export type CustomEventDefinition = BaseEventDefinition & {
 	type: "custom";
@@ -162,11 +162,11 @@ type GenericEventDefinition = RssEventDefinition | CustomEventDefinition;
  * For a given definition of a subscription event, fetches the newest item and handles the subscription if a new is found.
  */
 export const handleGenericSubscription = async (definition: GenericEventDefinition) => {
-	const { cacheKey, name, subName, type } = definition;
+	const { name, subName, type } = definition;
 
 	let message;
 	if (type === "rss") {
-		const { url } = definition;
+		const { cacheKey, url } = definition;
 		const response = await sb.Got.get("GenericAPI")({
 			url,
 			responseType: "text",
