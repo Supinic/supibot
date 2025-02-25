@@ -1,3 +1,5 @@
+import { RssEventDefinition } from "../generic-event.js";
+
 export default {
 	name: "Runelite",
 	aliases: [],
@@ -13,4 +15,4 @@ export default {
 	subName: "Runelite version",
 	type: "rss",
 	url: "https://runelite.net/atom.xml"
-};
+} satisfies RssEventDefinition;

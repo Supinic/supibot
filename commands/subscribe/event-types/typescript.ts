@@ -1,3 +1,5 @@
+import { RssEventDefinition } from "../generic-event.js";
+
 export default {
 	name: "Typescript",
 	aliases: ["typescript", "ts"],
@@ -13,4 +15,4 @@ export default {
 	subName: "Typescript devblog",
 	type: "rss",
 	url: "https://devblogs.microsoft.com/typescript/feed"
-};
+} satisfies RssEventDefinition;

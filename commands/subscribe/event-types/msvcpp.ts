@@ -1,3 +1,5 @@
+import { RssEventDefinition } from "../generic-event.js";
+
 export default {
 	name: "MSVC++",
 	aliases: ["msvc++", "MSVCPP", "msvcpp"],
@@ -13,4 +15,4 @@ export default {
 	subName: "MSVC++ devblog",
 	type: "rss",
 	url: "https://devblogs.microsoft.com/cppblog/feed"
-};
+} satisfies RssEventDefinition;

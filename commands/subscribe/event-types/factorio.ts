@@ -1,3 +1,5 @@
+import { RssEventDefinition } from "../generic-event.js";
+
 export default {
 	name: "Factorio",
 	aliases: [],
@@ -13,4 +15,4 @@ export default {
 	subName: "Factorio blogpost",
 	type: "rss",
 	url: "https://factorio.com/blog/rss"
-};
+} satisfies RssEventDefinition;

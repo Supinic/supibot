@@ -1,3 +1,5 @@
+import { SpecialEventDefinition } from "../generic-event.js";
+
 export default {
 	name: "GGG tracker",
 	aliases: ["ggg", "poe"],
@@ -7,4 +9,4 @@ export default {
 		added: "You will now be pinged whenever GGG staff posts.",
 		removed: "You will no longer be pinged when GGG staff posts."
 	}
-};
+} satisfies SpecialEventDefinition;
