@@ -1,36 +1,27 @@
+// import { type Recordset } from "supi-core";
+import { Date as SupiDate } from "supi-core";
+type Recordset = any; // @todo uncomment above lines when supi-core exports refactor is finished
+
 import { parseRSS } from "../../utils/command-utils.js";
+
 const DEFAULT_CHANNEL_ID = 38;
 
-/*
-const rssFetch = async (url) => await fetch(url, {
-	headers: {
-		// "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
-		// "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/602.1 (KHTML, like Gecko) QuiteRss/0.19.4 Version/10.0 Safari/602.1"
-		Accept: "application/xml,text/html,application/xhtml+xml"
-	},
-	redirect: "follow"
-});
-*/
+type SubscriptionType = string;
+type UserSubscription = {
+	ID: number;
+	Reminder_Channel: number | null;
+	Username: string;
+	Last_Seen: SupiDate;
+	Flags: string | null;
+};
 
-/**
- * @typedef {Object} UserSubscription
- * @property {number} ID
- * @property {number|null} Reminder_Channel
- * @property {string} Username
- * @property {Date} Last_Seen
- */
+type FetchUsersResult = {
+	activeUsers: UserSubscription[];
+	inactiveUsers: UserSubscription[];
+};
 
-/**
- * @param {string} subType
- * @param {number} [lastSeenThreshold]
- * @returns {Promise<{
- * 	inactiveUsers: UserSubscription[],
- * 	activeUsers: UserSubscription[]
- * 	}>}
- */
-const fetchSubscriptionUsers = async function (subType, lastSeenThreshold = 36e5) {
-	/** @type {Object[]} */
-	const users = await sb.Query.getRecordset(rs => rs
+const fetchSubscriptionUsers = async function (subType: SubscriptionType, lastSeenThreshold = 36e5): Promise<FetchUsersResult> {
+	const users = await sb.Query.getRecordset((rs: Recordset) => rs
 		.select("Event_Subscription.Channel as Reminder_Channel")
 		.select("Event_Subscription.User_Alias AS ID")
 		.select("Event_Subscription.Flags AS Flags")
@@ -47,11 +38,12 @@ const fetchSubscriptionUsers = async function (subType, lastSeenThreshold = 36e5
 		.groupBy("Meta.User_Alias")
 		.where("Type = %s", subType)
 		.where("Active = %b", true)
-	);
+	) as UserSubscription[];
 
-	const now = sb.Date.now();
-	const [activeUsers, inactiveUsers] = sb.Utils.splitByCondition(users, user => {
-		if (now - user.Last_Seen < lastSeenThreshold) {
+	const now: number = sb.Date.now();
+	const [activeUsers, inactiveUsers] = sb.Utils.splitByCondition(users, (user: UserSubscription): boolean => {
+		const lastSeen = now - user.Last_Seen.valueOf();
+		if (lastSeen < lastSeenThreshold) {
 			return true;
 		}
 
@@ -65,12 +57,14 @@ const fetchSubscriptionUsers = async function (subType, lastSeenThreshold = 36e5
 	};
 };
 
-/**
- * @param {UserSubscription[]} users
- * @param {string} message
- * @returns {Promise<Array>}
- */
-const createReminders = async function (users, message) {
+// @todo remove when Reminder is well-known
+type ReminderCreateResult = {
+	success: boolean;
+	cause: string | null;
+	ID?: number;
+};
+
+const createReminders = async function (users: UserSubscription[], message: string): Promise<ReminderCreateResult[]> {
 	return await Promise.all(users.map(user => (
 		sb.Reminder.create({
 			Channel: null,
@@ -84,19 +78,14 @@ const createReminders = async function (users, message) {
 	)));
 };
 
-/**
- * @param {string} subType
- * @param {string} message
- * @param {Object} [options]
- * @param {number} [options.lastSeenThreshold]
- * @returns {Promise<void>}
- */
-const handleSubscription = async function (subType, message, options = {}) {
+type HandleOptions = { lastSeenThreshold?: number; };
+
+const handleSubscription = async function (subType: SubscriptionType, message: string, options: HandleOptions = {}) {
 	const { activeUsers, inactiveUsers } = await fetchSubscriptionUsers(subType, options.lastSeenThreshold);
 
 	await createReminders(inactiveUsers, message);
 
-	const channelUsers = {};
+	const channelUsers: Record<string, UserSubscription[]> = {};
 	for (const user of [...activeUsers, ...inactiveUsers]) {
 		const channelID = user.Reminder_Channel ?? DEFAULT_CHANNEL_ID;
 		channelUsers[channelID] ??= [];
@@ -113,11 +102,8 @@ const handleSubscription = async function (subType, message, options = {}) {
 
 /**
  * Parses RSS xml into a object definition, caching and uncaching it as required.
- * @param {string} xml
- * @param {string} cacheKey
- * @return {Promise<*[]|null>}
  */
-const parseRssNews = async function (xml, cacheKey) {
+const parseRssNews = async function (xml: string, cacheKey: string): Promise<string[] | null> {
 	const feed = await parseRSS(xml);
 	const lastPublishDate = await sb.Cache.getByPrefix(cacheKey) ?? 0;
 	const eligibleArticles = feed.items
@@ -147,26 +133,40 @@ const parseRssNews = async function (xml, cacheKey) {
 	return result;
 };
 
-/**
- * @typedef {Object} GenericEventDefinition
- * @property {string} cacheKey
- * @property {string} eventName
- * @property {string} url
- * @property {string} subName
- * @property {"rss"|"custom"} type
- * @property {Function} [process]
- */
+type BaseEventDefinition = {
+	type: "rss" | "custom";
+	name: string;
+	subName: string;
+	aliases: string[];
+	notes: string;
+	channelSpecification?: boolean;
+	response: {
+		added: string;
+		removed: string;
+	};
+	generic: boolean;
+	cronExpression: string;
+	cacheKey: string;
+};
+export type RssEventDefinition = BaseEventDefinition & {
+	type: "rss";
+	url: string;
+};
+export type CustomEventDefinition = BaseEventDefinition & {
+	type: "custom";
+	process: () => Promise<void | { message: string }>;
+};
+type GenericEventDefinition = RssEventDefinition | CustomEventDefinition;
 
 /**
  * For a given definition of a subscription event, fetches the newest item and handles the subscription if a new is found.
- * @param {GenericEventDefinition} definition
- * @return {Promise<void>}
  */
-const handleGenericSubscription = async (definition) => {
-	const { cacheKey, name, process, url, subName, type } = definition;
+export const handleGenericSubscription = async (definition: GenericEventDefinition) => {
+	const { cacheKey, name, subName, type } = definition;
 
 	let message;
 	if (type === "rss") {
+		const { url } = definition;
 		const response = await sb.Got.get("GenericAPI")({
 			url,
 			responseType: "text",
@@ -192,7 +192,8 @@ const handleGenericSubscription = async (definition) => {
 		message = `New ${subName}${suffix}! PagChomp 👉 ${result.join(" -- ")}`;
 	}
 	else {
-		const result = await process(url);
+		const { process } = definition;
+		const result = await process();
 		if (!result || !result.message) {
 			return;
 		}
@@ -201,8 +202,4 @@ const handleGenericSubscription = async (definition) => {
 	}
 
 	await handleSubscription(name, message);
-};
-
-export {
-	handleGenericSubscription
 };
