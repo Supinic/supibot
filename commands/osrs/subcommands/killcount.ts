@@ -6,10 +6,12 @@ import {
 	isValidActivityAlias
 } from "./osrs-utils.js";
 
+import SetCommand from "../../set/subcommands/osrs-username.js";
+
 import type User from "../../../classes/user.js";
 
 // @todo Import from Command when done in Typescript
-interface Context {
+type Context = {
 	user: User;
 	params: {
 		activity?: string;
@@ -18,7 +20,7 @@ interface Context {
 		force?: boolean;
 		rude?: boolean;
 	};
-}
+};
 
 export default {
 	name: "kc",
@@ -28,25 +30,41 @@ export default {
 		`<code>$osrs kc activity:"(activity name)" (username)</code>`,
 		`<code>$osrs kill-count activity:"(activity name)" (username)</code>`,
 		`<code>$osrs kc boss:"(activity name)" (username)</code>`,
-		"For given user and activity, prints their kill-count and ranking."
+		"For given user and activity, prints their kill-count and ranking.",
+		"",
+
+		`<code>$osrs kc (activity)`,
+		`<code>$osrs kc jad`,
+		`If you have set up your username via the <code>$set ${SetCommand.name}</code>, you can use the name of the activity directly!`,
+		"",
+
+		`<code>$osrs kc @Username (activity)</code>`,
+		`<code>$osrs kc @Supinic Corrupted Gauntlet</code>`,
+		"Same as above, but if the target has their OSRS username set, you can use the command like this."
 	],
-	execute: async function (context: Context, ...args: string[]) {
-		const identifier = args.join(" ");
-		const parsedUserData = await parseUserIdentifier(context, identifier);
+	execute: async function (/* @todo add this: Command */ context: Context, ...args: string[]) {
+		let parsedUserData;
+		let activity;
+		if (!context.params.activity && !context.params.boss) {
+			if (args[0].startsWith("@")) {
+				parsedUserData = await parseUserIdentifier(context, args[0]);
+				activity = args.slice(1).join(" ");
+			}
+			else {
+				parsedUserData = await parseUserIdentifier(context, "");
+				activity = args.join(" ");
+			}
+		}
+		else {
+			const identifier = args.join(" ");
+			parsedUserData = await parseUserIdentifier(context, identifier);
+			activity = context.params.activity ?? context.params.boss;
+		}
+
 		if (!parsedUserData.success) {
 			return parsedUserData;
 		}
-
-		const user = parsedUserData.username;
-		let activity;
-		if (context.params.activity ?? context.params.boss) {
-			activity = context.params.activity ?? context.params.boss;
-		}
-		if (!activity && parsedUserData.remainingArgs.length !== 0) {
-			activity = parsedUserData.remainingArgs.join(" ");
-		}
-
-		if (!activity) {
+		else if (!activity) {
 			return {
 				success: false,
 				// @todo should be fixed when Command is in TS
@@ -55,7 +73,8 @@ export default {
 			};
 		}
 
-		const userStats = await fetchUserData(user, {
+		const { username } = parsedUserData;
+		const userStats = await fetchUserData(username, {
 			seasonal: Boolean(context.params.seasonal),
 			force: Boolean(context.params.force)
 		});
@@ -92,8 +111,8 @@ export default {
 
 		return {
 			reply: (rank === null)
-				? `${ironman} ${user} is not ranked for ${name}.`
-				: `${ironman} ${user}'s KC for ${name}: ${value} - rank #${rank}.`
+				? `${ironman} ${username} is not ranked for ${name}.`
+				: `${ironman} ${username}'s KC for ${name}: ${value} - rank #${rank}.`
 		};
 	}
 };
