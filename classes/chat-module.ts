@@ -284,7 +284,7 @@ export default class ChatModule extends TemplateWithoutId {
 			const previousInstance = ChatModule.get(commandName);
 			if (previousInstance) {
 				ChatModule.data.delete(commandName);
-				await previousInstance.destroy();
+				previousInstance.destroy();
 			}
 
 			const currentInstance = new ChatModule(definition);
@@ -312,7 +312,7 @@ export default class ChatModule extends TemplateWithoutId {
 		return modules;
 	}
 
-	static detachChannelModules (channelData: Channel, options: DetachOptions) {
+	static detachChannelModules (channelData: Channel, options: { remove?: boolean; }) {
 		const detachedModules = ChatModule.getChannelModules(channelData);
 		for (const module of detachedModules) {
 			module.detach({
