@@ -2,7 +2,7 @@ import EventEmitter from "node:events";
 
 import { type Recordset, type RecordDeleter, SupiError } from "supi-core";
 
-import { Platform } from "../platforms/template.js";
+import { type GetEmoteOptions, Platform } from "../platforms/template.js";
 import { User } from "./user.js";
 import createMessageLoggingTable from "../utils/create-db-table.js";
 import {
@@ -30,12 +30,7 @@ type MirrorOptions = {
 	commandUsed?: boolean; // @todo move to Platform
 };
 
-export type GetEmoteOptions = {
-	shuffle?: boolean;
-	caseSensitivity?: boolean;
-	returnEmoteObject?: boolean;
-	filter?: (emote: Emote) => boolean;
-};
+
 // type GetObjectEmoteOptions = GetEmoteOptions & { returnEmoteObject: true; };
 // type GetStringEmoteOptions = GetEmoteOptions & { returnEmoteObject?: false; };
 
@@ -125,8 +120,8 @@ export class Channel extends TemplateWithId {
 		return this.#setupLoggingTablePromise;
 	}
 
-	waitForUserMessage (userID: User["ID"], options: { timeout?: number; }) {
-		return this.Platform.waitForUserMessage(this, userID, options);
+	waitForUserMessage (userData: User, options: { timeout?: number; }) {
+		return this.Platform.waitForUserMessage(this, userData, options);
 	}
 
 	getDatabaseName () {
