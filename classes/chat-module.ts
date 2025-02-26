@@ -209,19 +209,27 @@ export default class ChatModule extends TemplateWithoutId {
 		const result: Channel[] = [];
 		if (options.channel) {
 			if (Array.isArray(options.channel)) {
-				result.push(...options.channel);
+				const channels = options.channel.map(i => Channel.get(i)).filter(Boolean) as Channel[];
+				result.push(...channels);
 			}
 			else {
-				result.push(options.channel);
+				const channelData = Channel.get(options.channel);
+				if (channelData) {
+					result.push(channelData);
+				}
 			}
 		}
 
 		if (options.platform) {
 			if (Array.isArray(options.platform)) {
-				result.push(...options.platform.flatMap((i: Platform) => Channel.getJoinableForPlatform(i)));
+				for (const platform of options.platform) {
+					const platformChannels = Channel.getJoinableForPlatform(platform);
+					result.push(...platformChannels);
+				}
 			}
 			else {
-				result.push(...Channel.getJoinableForPlatform(options.platform));
+				const platformChannels = Channel.getJoinableForPlatform(options.platform);
+				result.push(...platformChannels);
 			}
 		}
 
@@ -304,7 +312,7 @@ export default class ChatModule extends TemplateWithoutId {
 		return modules;
 	}
 
-	static detachChannelModules (channelData: Channel, options: DetachOptions = {}) {
+	static detachChannelModules (channelData: Channel, options: DetachOptions) {
 		const detachedModules = ChatModule.getChannelModules(channelData);
 		for (const module of detachedModules) {
 			module.detach({
@@ -387,7 +395,7 @@ export default class ChatModule extends TemplateWithoutId {
 		return args;
 	}
 
-	static async #fetch (specificNames: string | string[]): Promise<Descriptor[]> {
+	static async #fetch (specificNames?: string | string[]): Promise<Descriptor[]> {
 		return await sb.Query.getRecordset((rs: Recordset) => {
 			rs.select("Channel", "Chat_Module", "Specific_Arguments as Args");
 			rs.from("chat_data", "Channel_Chat_Module");
