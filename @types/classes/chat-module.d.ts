@@ -10,38 +10,7 @@ declare type ConstructorData = {
 	Active?: boolean;
 	Code: string; // string that can be eval() and results in a function
 };
-declare type PlatformOption = {
-	platform: PlatformLike | PlatformLike[];
-}
-declare type ChannelOption = {
-	channel: ChannelLike | ChannelLike[];
-}
-declare type AttachOptions = XOR<PlatformOption, ChannelOption>;
-declare type DetachOptions = AttachOptions & {
-	remove: boolean;
-};
 
-export declare type Event = "message" | "online" | "offline" | "raid" | "subscription";
-export declare type Argument = SimpleGenericData;
-export declare type AttachmentReference = {
-	channelID: Channel["ID"];
-	active: boolean;
-	listener: (context: Context, ...args: Argument[]) => void;
-};
-export declare type Context = {
-	channel: Channel;
-	data: SimpleGenericData;
-	event: Event;
-	specificArguments: Argument[];
-	message?: Message | null;
-	user?: User | null;
-};
-export declare type Descriptor = {
-	Channel: Channel["ID"];
-	Chat_Module: ChatModule["Name"];
-	Args: string | null;
-};
-export declare type Like = number | string | ChatModule;
 
 /**
  * Represents a custom hook-like function that gets invoked every time a specified event

@@ -1,7 +1,7 @@
 import createMessageLoggingTable from "../utils/create-db-table.js";
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
-export default class Platform {
+export class Platform {
 	#id;
 	#name;
 	#host;
@@ -126,7 +126,7 @@ export default class Platform {
 	/**
 	 * @abstract
 	 */
-	async pm (message, user) {
+	async pm (message, user, channel) {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Platform"
 		});
@@ -139,6 +139,13 @@ export default class Platform {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Platform"
 		});
+	}
+
+	/**
+	 * @abstract
+	 */
+	isUserChannelOwner (channelData, userData) {
+		throw new Error("Abstract method not implemented");
 	}
 
 	incrementMessageMetric (type, channelIdentifier) {
@@ -326,7 +333,7 @@ export default class Platform {
 	/**
 	 * @abstract
 	 */
-	async fetchChannelEmotes () {
+	async fetchChannelEmotes (channelData) {
 		throw new sb.Error({
 			message: "This method is not implemented by the derived Platform"
 		});
@@ -416,7 +423,7 @@ export default class Platform {
 		return message;
 	}
 
-	async createUserMention (userData) {
+	async createUserMention (userData, channelData) {
 		return userData.Name;
 	}
 
@@ -529,6 +536,8 @@ export default class Platform {
 		return instance;
 	}
 }
+
+export default Platform;
 
 /**
  * @typedef {Object} TypedEmote Describes any emote

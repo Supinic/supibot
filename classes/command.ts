@@ -1,87 +1,188 @@
+import { SupiDate, SupiError, isGenericRequestError, isGotRequestError,  } from "supi-core"
+import type { Query, MetricConfiguration, MetricType } from "supi-core";
+
+import { TemplateWithoutId, TemplateDefinition } from "./template.js";
+
 import Banphrase from "./banphrase.js";
 import Filter from "./filter.js";
 import User from "./user.js";
-import Template from "./template.js";
+import { Channel, privateMessageChannelSymbol, type GetEmoteOptions, Emote } from "./channel.js";
+import Platform from "../platforms/template.js";
+import CooldownManager from "../utils/cooldown-manager.js";
+import { Language, LanguageParser } from "../utils/languages.js";
 
 import { whitespaceRegex } from "../utils/regexes.js";
 import config from "../config.json" with { type: "json" };
+
 const COMMAND_PREFIX = config.modules.commands.prefix;
-
-import pathModule from "node:path";
-import CooldownManager from "../utils/cooldown-manager.js";
-import LanguageCodes from "../utils/languages.js";
-
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
 
-class Context {
-	#command;
-	#invocation;
-	#user;
-	#channel;
-	#platform;
-	#transaction = null;
-	#privateMessage = false;
-	#append = {};
-	#params = {};
-	#meta = new Map();
-	#userFlags = {};
+// @todo move to Filter
+type FilterExecuteSuccess = {
+	success: true;
+}
+type FilterExecuteFailure = {
+	success: false;
+	reason: string;
+	filter: Filter;
+	reply: string | null;
+};
+type FilterExecuteResult = FilterExecuteSuccess | FilterExecuteFailure;
 
-	constructor (command, data = {}) {
-		this.#command = command;
-		this.#invocation = data.invocation ?? null;
-		this.#user = data.user ?? null;
-		this.#channel = data.channel ?? null;
-		this.#platform = data.platform ?? null;
-		this.#transaction = data.transaction ?? null;
-		this.#privateMessage = data.privateMessage ?? false;
-		this.#append = data.append ?? this.#append;
-		this.#params = data.params ?? this.#params;
+type QueryTransaction = Awaited<ReturnType<Query["getTransaction"]>>;
 
-		this.#append.tee ??= [];
+type ParameterValueMap = {
+	string: string;
+	number: number;
+	boolean: boolean;
+	date: SupiDate;
+	object: Record<string, string>;
+	regex: RegExp;
+	language: Language;
+};
+type ParameterType = keyof ParameterValueMap;
+type ParameterValue = ParameterValueMap[ParameterType];
+type ParameterDefinition = {
+	readonly name: string;
+	readonly type: ParameterType;
+};
+type ParameterDefinitions = readonly ParameterDefinition[];
 
-		this.#userFlags = Filter.getFlags({
-			command,
-			invocation: this.#invocation,
-			platform: this.#platform,
-			channel: this.#channel,
-			user: this.#user
-		});
+type ParamFromDefinition<T extends ParameterDefinitions> = {
+	[P in T[number] as P["name"]]: ParameterValueMap[P["type"]];
+};
+
+type AppendedParameters = Record<string, ParameterValue>;
+type ResultFailure = { success: false; reply: string; };
+
+export type StrictResult = {
+	success?: boolean;
+	reply?: string | null;
+	replyWithPrivateMessage?: boolean;
+	cooldown?: CooldownDefinition;
+	partialReplies?: {
+		bancheck: boolean;
+		message: string;
+	}[];
+	isChannelAlias?: boolean;
+	hasExternalInput?: boolean;
+	skipExternalPrefix?: boolean;
+	forceExternalPrefix?: boolean;
+	meta?: {
+		skipBanphrases?: boolean;
+		skipWhitespaceCheck?: boolean;
+	}
+};
+type Result = StrictResult & {
+	reason?: string;
+};
+
+export type Invocation = string;
+export type ContextData<T extends ParameterDefinitions = ParameterDefinitions> = {
+	user: Context<T>["user"]
+	platform: Context<T>["platform"];
+	invocation?: Context<T>["invocation"];
+	channel?: Context<T>["channel"];
+	transaction?: Context<T>["transaction"];
+	privateMessage?: Context<T>["privateMessage"];
+	append?: Context<T>["append"];
+	params?: Context<T>["params"];
+};
+export type ContextAppendData = {
+	tee?: Invocation[];
+	pipe?: boolean;
+	aliasCount?: number;
+	commandList?: Command["Name"][];
+	aliasStack?: Array<Command["Name"] | Command["Aliases"][number]>;
+	flags?: unknown;
+	id?: string;
+	messageID?: string;
+	badges?: unknown;
+	emotes?: unknown;
+	skipPending?: boolean;
+	privateMessage?: boolean;
+};
+
+type PermissionOptions = {
+	user?: User | null;
+	channel?: Channel | null;
+	platform?: Platform | null;
+};
+type BestEmoteOptions = Partial<Pick<ContextData, "channel" | "platform"> & GetEmoteOptions>;
+
+export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
+	readonly command: Command;
+	readonly invocation: string;
+	readonly user: User;
+	readonly platform: Platform;
+	readonly channel: Channel | null;
+	readonly transaction: QueryTransaction | null;
+	readonly privateMessage: boolean;
+	readonly append: ContextAppendData;
+	readonly params: ParamFromDefinition<T>;
+
+	readonly meta: Map<string, unknown> = new Map();
+
+	constructor (command: Command, data: ContextData<T>) {
+		this.command = command;
+		this.user = data.user;
+		this.invocation = data.invocation ?? command.Name;
+		this.channel = data.channel ?? null;
+		this.platform = data.platform;
+		this.transaction = data.transaction ?? null;
+		this.privateMessage = data.privateMessage ?? false;
+
+		this.append = data.append ?? { tee: [] };
+		this.append.tee ??= [];
+
+		this.params = (data.params ?? {}) as ParamFromDefinition<T>;
 	}
 
-	getMeta (name) { return this.#meta.get(name); }
-	setMeta (name, value) { this.#meta.set(name, value); }
+	getMeta (name: string) { return this.meta.get(name); }
+	setMeta (name: string, value: unknown) { this.meta.set(name, value); }
 
-	getMentionStatus () {
+	getMentionStatus (): boolean {
+		if (!this.user) {
+			throw new SupiError({
+				message: "Cannot get the mention status of Context without User"
+			});
+		}
+
 		return Filter.getMentionStatus({
-			user: this.#user,
-			command: this.#command,
-			channel: this.#channel ?? null,
-			platform: this.#platform
+			user: this.user,
+			command: this.command,
+			channel: this.channel ?? null,
+			platform: this.platform
 		});
 	}
 
-	async sendIntermediateMessage (string) {
-		if (this.#channel) {
+	async sendIntermediateMessage (string: string) {
+		if (this.channel) {
 			await Promise.all([
-				this.#channel.send(string),
-				this.#channel.mirror(string)
+				this.channel.send(string),
+				this.channel.mirror(string, null)
 			]);
 		}
+		else if (this.platform && this.user) {
+			await this.platform.pm(string, this.user.Name);
+		}
 		else {
-			await this.#platform.pm(string, this.#user.Name);
+			throw new SupiError({
+				message: "Cannot send intermediate message - missing channel, platform and user"
+			});
 		}
 	}
 
-	async getUserPermissions (options = {}) {
-		const userData = options.user ?? this.#user;
-		const channelData = options.channel ?? this.#channel;
-		const platformData = options.platform ?? this.#platform;
+	async getUserPermissions (options: PermissionOptions = {}) {
+		const userData = options.user ?? this.user;
+		const channelData = options.channel ?? this.channel;
+		const platformData = options.platform ?? this.platform;
 
 		const data = await Promise.all([
-			userData.getDataProperty("administrator"),
+			userData?.getDataProperty("administrator"),
 			platformData?.isUserChannelOwner(channelData, userData),
 			channelData?.isUserAmbassador(userData)
-		]);
+		]) as [boolean | undefined, boolean | undefined, boolean | undefined];
 
 		const flags = {
 			administrator: (data[0] === true),
@@ -90,35 +191,33 @@ class Context {
 		};
 
 		let flag = User.permissions.regular;
-		for (const [key, value] of Object.entries(flags)) {
-			if (value) {
-				// eslint-disable-next-line no-bitwise
-				flag |= User.permissions[key];
-			}
+		if (flags.administrator) {
+			flag |= User.permissions.administrator;
+		}
+		if (flags.channelOwner) {
+			flag |= User.permissions.channelOwner;
+		}
+		if (flags.ambassador) {
+			flag |= User.permissions.ambassador;
 		}
 
 		return {
 			flag,
-			/**
-			 * @param {UserPermissionLevel} type
-			 * @returns {boolean}
-			 */
-			is: (type) => {
+			is: (type: keyof typeof User.permissions): boolean => {
 				if (!User.permissions[type]) {
 					throw new sb.Error({
 						message: "Invalid user permission type provided"
 					});
 				}
 
-				// eslint-disable-next-line no-bitwise
 				return ((flag & User.permissions[type]) !== 0);
 			}
 		};
 	}
 
-	async getBestAvailableEmote (emotes, fallback, options = {}) {
-		const channelData = options.channel ?? this.#channel;
-		const platformData = options.platform ?? this.#platform;
+	async getBestAvailableEmote <T extends string> (emotes: T[], fallback: T, options: BestEmoteOptions = {}): Promise<Emote | T> {
+		const channelData = options.channel ?? this.channel;
+		const platformData = options.platform ?? this.platform;
 		if (channelData) {
 			return await channelData.getBestAvailableEmote(emotes, fallback, options);
 		}
@@ -126,159 +225,112 @@ class Context {
 			return await platformData.getBestAvailableEmote(null, emotes, fallback, options);
 		}
 
-		return "(no emote found)";
+		return fallback;
 	}
 
-	randomEmote (...inputEmotes) {
+	async randomEmote <T extends string> (...inputEmotes: T[]): Promise<T> {
 		if (inputEmotes.length < 2) {
 			throw new sb.Error({
 				message: "At least two emotes are required"
 			});
 		}
 
-		const emotes = inputEmotes.slice(0, -1);
-		const fallback = inputEmotes.at(-1);
+		const emotes = inputEmotes.slice(0, -1) as T[];
+		const fallback = inputEmotes.at(-1) as T;
 
-		return this.getBestAvailableEmote(emotes, fallback, { shuffle: true });
+		return await this.getBestAvailableEmote(emotes, fallback, {
+			shuffle: true,
+			returnEmoteObject: false
+		}) as T;
 	}
 
-	get tee () { return this.#append.tee; }
-	get invocation () { return this.#invocation; }
-	get user () { return this.#user; }
-	get channel () { return this.#channel; }
-	get platform () { return this.#platform; }
-	get transaction () { return this.#transaction; }
-	get privateMessage () { return this.#privateMessage; }
-	get append () { return this.#append; }
-	get params () { return this.#params; }
-	get userFlags () { return this.#userFlags; }
+	get tee () { return this.append.tee; }
 }
 
-class Command extends Template {
-	Name;
-	Aliases = [];
-	Description = null;
-	Cooldown;
-	Flags = {};
-	Params = [];
-	Whitelist_Response = null;
-	Code;
-	Dynamic_Description;
+export interface CommandDefinition extends TemplateDefinition {
+	Name: Command["Name"];
+	Aliases: Command["Aliases"];
+	Description: Command["Description"];
+	Cooldown: Command["Cooldown"];
+	Flags: Command["Flags"];
+	Params: Command["Params"];
+	Whitelist_Response: Command["Whitelist_Response"];
+	Code: Command["Code"];
+	Dynamic_Description: Command["Dynamic_Description"];
+
+	initialize?: InitDestroyFunction;
+	destroy?: InitDestroyFunction;
+}
+export type ExecuteFunction = (this: Command, context: Context, ...args: string[]) => StrictResult | Promise<StrictResult>;
+export type DescriptionFunction = (this: Command) => string[] | Promise<string[]>;
+export type InitDestroyFunction = (this: Command) => unknown | Promise<unknown>;
+
+type ExecuteOptions = {
+	platform: Platform;
+	skipPending?: boolean;
+	privateMessage?: boolean;
+	skipBanphrases?: boolean;
+	skipGlobalBan?: boolean;
+	skipMention?: boolean;
+	partialExecute?: boolean;
+	context?: Context;
+};
+
+type CooldownObject = {
+	length?: number;
+	channel?: Channel["ID"],
+	user?: User["ID"]
+	command?: Command["Name"];
+	ignoreCooldownFilters?: boolean;
+};
+type CooldownDefinition = number | null | CooldownObject;
+
+export class Command extends TemplateWithoutId {
+	readonly Name: string;
+	readonly Aliases: string[] = [];
+	readonly Description: string | null = null;
+	readonly Cooldown: number | null;
+	readonly Flags: Readonly<string[]>;
+	readonly Params: ParameterDefinitions = [];
+	readonly Whitelist_Response: string | null = null;
+	readonly Code: ExecuteFunction;
+	readonly Dynamic_Description: DescriptionFunction | null;
 
 	#ready = false;
 	#destroyed = false;
-	#customDestroy = null;
+	readonly #customDestroy: InitDestroyFunction | null;
+	readonly data = {};
 
-	#Author;
+	static readonly importable = true;
+	static readonly uniqueIdentifier = "Name";
+	static data: Map<Command["Name"], Command> = new Map();
 
-	data = {};
+	static readonly #cooldownManager = new CooldownManager();
+	static readonly privilegedCommandCharacters = ["$"];
+	static readonly ignoreParametersDelimiter = "--";
 
-	static importable = true;
-	static uniqueIdentifier = "Name";
+	static #prefixRegex: RegExp;
 
-	static #privateMessageChannelID = Symbol("private-message-channel");
-	static #cooldownManager = new CooldownManager();
-
-	static privilegedCommandCharacters = ["$"];
-	static ignoreParametersDelimiter = "--";
-
-	static #prefixRegex;
-
-	constructor (data) {
+	constructor (data: CommandDefinition) {
 		super();
 
 		this.Name = data.Name;
-		if (typeof this.Name !== "string" || this.Name.length === 0) {
-			console.error(`Command ID ${this.ID} has an unusable name`, data.Name);
-			this.Name = ""; // just a precaution so that the command never gets found out
-		}
+		this.Aliases = [...data.Aliases];
+		this.Description = data.Description ?? null;
+		this.Cooldown = data.Cooldown ?? null;
+		this.Whitelist_Response = data.Whitelist_Response ?? null;
 
-		if (data.Aliases === null) {
-			this.Aliases = [];
-		}
-		else if (typeof data.Aliases === "string") {
-			try {
-				this.Aliases = JSON.parse(data.Aliases);
-			}
-			catch (e) {
-				this.Aliases = [];
-				console.warn(`Command has invalid JSON aliases definition`, {
-					command: this,
-					error: e,
-					data
-				});
-			}
-		}
-		else if (Array.isArray(data.Aliases) && data.Aliases.every(i => typeof i === "string")) {
-			this.Aliases = [...data.Aliases];
-		}
-		else {
-			this.Aliases = [];
-			console.warn(`Command has invalid aliases type`, { data });
-		}
+		this.Flags = Object.freeze(data.Flags ?? []);
+		this.Params = data.Params ?? [];
 
-		this.Description = data.Description;
-
-		this.Cooldown = data.Cooldown;
-
-		if (data.Flags !== null) {
-			let flags = data.Flags;
-			if (typeof flags === "string") {
-				flags = flags.split(",");
-			}
-			else if (flags.constructor === Object) {
-				flags = Object.keys(flags);
-			}
-
-			for (const flag of flags) {
-				const camelFlag = sb.Utils.convertCase(flag, "kebab", "camel");
-				this.Flags[camelFlag] = true;
-			}
-		}
-
-		if (data.Params !== null) {
-			let params = data.Params;
-			if (typeof params === "string") {
-				try {
-					params = JSON.parse(params);
-				}
-				catch (e) {
-					this.Params = null;
-					console.warn(`Command has invalid JSON params definition`, {
-						commandName: this.Name,
-						error: e
-					});
-				}
-			}
-
-			this.Params = params;
-		}
-
-		Object.freeze(this.Flags);
-
-		this.Whitelist_Response = data.Whitelist_Response;
-
-		this.#Author = data.Author;
-
-		if (typeof data.Code === "function") {
-			this.Code = data.Code;
-		}
-
-		if (typeof data.Dynamic_Description === "function") {
-			this.Dynamic_Description = data.Dynamic_Description;
-		}
-		else {
-			this.Dynamic_Description = null;
-		}
+		this.Code = data.Code;
+		this.Dynamic_Description = data.Dynamic_Description ?? null;
 
 		if (typeof data.initialize === "function") {
 			try {
 				const result = data.initialize.call(this);
-
 				if (result instanceof Promise) {
-					result.then(() => {
-						this.#ready = true;
-					});
+					result.then(() => { this.#ready = true; });
 				}
 				else {
 					this.#ready = true;
@@ -292,9 +344,7 @@ class Command extends Template {
 			this.#ready = true;
 		}
 
-		if (typeof data.destroy === "function") {
-			this.#customDestroy = data.destroy;
-		}
+		this.#customDestroy = data.destroy ?? null;
 	}
 
 	async destroy () {
@@ -308,22 +358,19 @@ class Command extends Template {
 		}
 
 		this.#destroyed = true;
-
-		this.Code = null;
-		this.data = null;
 	}
 
-	execute (...args) {
-		if (this.#ready === false) {
+	async execute (context: Context, ...args: string[]): Promise<StrictResult> {
+		if (!this.#ready) {
 			console.warn("Attempt to run not yet initialized command", this.Name);
-			return;
+			return { success: false, reply: null };
 		}
-		else if (this.#destroyed === true) {
+		else if (this.#destroyed) {
 			console.warn("Attempt to run destroyed command", this.Name);
-			return;
+			return { success: false, reply: null };
 		}
 
-		return this.Code(...args);
+		return await this.Code(context, ...args);
 	}
 
 	async getDynamicDescription () {
@@ -331,11 +378,11 @@ class Command extends Template {
 			return null;
 		}
 		else {
-			return await this.Dynamic_Description(Command.prefix);
+			return await this.Dynamic_Description();
 		}
 	}
 
-	getDetailURL (options = {}) {
+	getDetailURL (options: { useCodePath?: boolean } = {}) {
 		if (options.useCodePath) {
 			const baseURL = config.values.commandCodeUrlPrefix;
 			if (!baseURL) {
@@ -358,7 +405,7 @@ class Command extends Template {
 		return `sb-command-${this.Name}`;
 	}
 
-	registerMetric (type, label, options = {}) {
+	registerMetric (type: MetricType, label: string, options: Partial<MetricConfiguration<string>>) {
 		const metricLabel = `supibot_command_${this.Name}_${label}`;
 		const metricOptions = {
 			...options,
@@ -368,95 +415,94 @@ class Command extends Template {
 		return sb.Metrics.register(type, metricOptions);
 	}
 
-	get Author () { return this.#Author; }
-
 	static async initialize () {
-		if (sb.Metrics) {
-			sb.Metrics.registerCounter({
-				name: "supibot_command_executions_total",
-				help: "The total number of command executions.",
-				labelNames: ["name", "result", "reason"]
-			});
-		}
-
-		// Override the default template behaviour of automatically calling `loadData()` by doing nothing.
-		// This is new (experimental) behaviour, where the commands' definitions will be loaded externally!
-		return this;
-	}
-
-	static async importData (definitions) {
-		super.importData(definitions);
-		await this.validate();
-	}
-
-	static async importSpecific (...definitions) {
-		super.genericImportSpecific(...definitions);
-		await this.validate();
-	}
-
-	static invalidateRequireCache (requireBasePath, ...names) {
-		return super.genericInvalidateRequireCache({
-			names,
-			requireBasePath,
-			extraDeletionCallback: (path) => {
-				const dirPath = pathModule.parse(path).dir;
-				const mainFilePath = pathModule.join(dirPath, "index.js");
-
-				return Object.keys(require.cache).filter(filePath => {
-					const hasCorrectExtension = (filePath.endsWith(".js") || filePath.endsWith(".json"));
-					return (filePath.startsWith(dirPath) && hasCorrectExtension && filePath !== mainFilePath);
-				});
-			}
+		sb.Metrics.registerCounter({
+			name: "supibot_command_executions_total",
+			help: "The total number of command executions.",
+			labelNames: ["name", "result", "reason"]
 		});
 	}
 
+	static async importData (definitions: CommandDefinition[]) {
+		for (const definition of definitions) {
+			const instance = new Command(definition);
+			this.data.set(definition.Name, instance);
+		}
+
+		this.validate();
+	}
+
+	static async importSpecific (...definitions: CommandDefinition[]) {
+		if (definitions.length === 0) {
+			return [];
+		}
+
+		const addedInstances = [];
+		for (const definition of definitions) {
+			const commandName = definition.Name;
+			const previousInstance = Command.get(commandName);
+			if (previousInstance) {
+				Command.data.delete(commandName);
+				await previousInstance.destroy();
+			}
+
+			const currentInstance = new Command(definition);
+			Command.data.set(commandName, currentInstance);
+			addedInstances.push(currentInstance);
+		}
+
+		this.validate();
+		return addedInstances;
+	}
+
 	static validate () {
-		if (Command.data.length === 0) {
+		if (Command.data.size === 0) {
 			console.warn("No commands initialized - bot will not respond to any command queries");
 		}
 		if (!Command.prefix) {
 			console.warn("No command prefix configured - bot will not respond to any command queries");
 		}
 
-		const names = Command.data.flatMap(i => [i.Name, ...(i.Aliases ?? [])]);
-		const duplicates = names.filter((i, ind, arr) => arr.indexOf(i) !== ind);
-		for (const dupe of duplicates) {
-			const affected = Command.data.filter(i => i.Aliases.includes(dupe));
-			for (const command of affected) {
-				const index = command.Aliases.indexOf(dupe);
-				command.Aliases.splice(index, 1);
-				console.warn(`Removed duplicate command name "${dupe}" from command ${command.Name}'s aliases`);
-			}
+		const names = [];
+		for (const command of Command.data.values()) {
+			names.push(command.Name);
+			names.push(...command.Aliases);
+		}
+
+		const uniqueNames = new Set(names);
+		if (uniqueNames.size !== names.length) {
+			const duplicates = names.filter((i, ind, arr) => arr.indexOf(i) !== ind);
+			console.warn("Duplicate command names detected!", { duplicates });
 		}
 	}
 
-	static get (identifier) {
+	static get (identifier: Command | string): Command | null {
 		if (identifier instanceof Command) {
 			return identifier;
 		}
-		else if (typeof identifier === "string") {
-			return Command.data.find(command => command.Name === identifier || command.Aliases.includes(identifier));
+		else if (Command.data.has(identifier)) {
+			return Command.data.get(identifier) as Command; // Type cast due to above condition
 		}
 		else {
-			throw new sb.Error({
-				message: "Invalid command identifier type",
-				args: {
-					id: String(identifier),
-					type: typeof identifier
+			for (const command of Command.data.values()) {
+				if (command.Aliases.includes(identifier)) {
+					return command;
 				}
-			});
+			}
+
+			return null;
 		}
 	}
 
-	static async checkAndExecute (identifier, argumentArray, channelData, userData, options = {}) {
+	static async checkAndExecute (
+		identifier: string,
+		argumentArray: string[],
+		channelData: Channel,
+		userData: User,
+		options: ExecuteOptions
+	): Promise<Result> {
 		if (!identifier) {
 			return { success: false, reason: "no-identifier" };
-		}
-
-		if (!Array.isArray(argumentArray)) {
-			throw new sb.Error({
-				message: "Command arguments must be provided as an array"
-			});
 		}
 
 		if (channelData?.Mode === "Inactive" || channelData?.Mode === "Read") {
@@ -468,7 +514,7 @@ class Command extends Template {
 
 		// Special parsing of privileged characters - they can be joined with other characters, and still be usable
 		// as a separate command.
-		if (typeof identifier === "string" && Command.privilegedCommandCharacters.length > 0) {
+		if (Command.privilegedCommandCharacters.length > 0) {
 			for (const char of Command.privilegedCommandCharacters) {
 				if (identifier.startsWith(char)) {
 					argumentArray.unshift(identifier.replace(char, ""));
@@ -487,7 +533,7 @@ class Command extends Template {
 
 		// Check for cooldowns, return if it did not pass yet.
 		// If skipPending flag is set, do not check for pending status.
-		const channelID = (channelData?.ID ?? Command.#privateMessageChannelID);
+		const channelID: number | symbol = (channelData?.ID ?? privateMessageChannelSymbol);
 		const cooldownCheck = Command.#cooldownManager.check(
 			channelID,
 			userData.ID,
@@ -512,9 +558,9 @@ class Command extends Template {
 		// If skipPending flag is set, do not set the pending status at all.
 		// Used in pipe command, for instance.
 		// Administrators are not affected by Pending - this is expected to be used for debugging.
-		const isAdmin = await userData.getDataProperty("administrator");
+		const isAdmin = await userData.getDataProperty("administrator") as boolean;
 
-		if (!options.skipPending && isAdmin !== true) {
+		if (!options.skipPending && !isAdmin) {
 			const sourceName = channelData?.Name ?? `${options.platform.Name} PMs`;
 			Command.#cooldownManager.setPending(
 				userData.ID,
@@ -522,29 +568,27 @@ class Command extends Template {
 			);
 		}
 
-		const appendOptions = { ...options };
+		const appendOptions: Omit<ContextAppendData, "platform"> = { ...options };
 		const isPrivateMessage = (!channelData);
 
-		const contextOptions = {
+		const contextOptions: ContextData = {
 			platform: options.platform,
 			invocation: identifier,
 			user: userData,
 			channel: channelData,
-			command,
 			transaction: null,
 			privateMessage: isPrivateMessage,
 			append: appendOptions,
 			params: {}
 		};
 
-		/** @type {RegExp} */
 		let args = argumentArray
 			.map(i => i.replace(whitespaceRegex, ""))
 			.filter(Boolean);
 
 		// If the command is rollback-able, set up a transaction.
 		// The command must use the connection in transaction - that's why it is passed to context
-		if (command.Flags.rollback) {
+		if (command.Flags.includes("rollback")) {
 			contextOptions.transaction = await sb.Query.getTransaction();
 		}
 
@@ -553,17 +597,16 @@ class Command extends Template {
 			const result = Command.parseParametersFromArguments(command.Params, args);
 
 			// Don't exit immediately, save the result and check filters first
-			if (result.success === false) {
+			if (!result.success) {
 				failedParamsParseResult = result;
 			}
 			else {
 				args = result.args;
-				contextOptions.params = result.parameters;
+				contextOptions.params = result.parameters as ParamFromDefinition<typeof command.Params>;
 			}
 		}
 
-		/** @type {ExecuteResult} */
-		const filterData = await Filter.execute({
+		const filterData: FilterExecuteResult = await Filter.execute({
 			user: userData,
 			command,
 			invocation: identifier,
@@ -571,7 +614,7 @@ class Command extends Template {
 			platform: channelData?.Platform ?? null,
 			targetUser: args[0] ?? null,
 			args: args ?? []
-		});
+		}) as FilterExecuteResult; /* @todo remove after Filter is in Typescript */
 
 		const isFilterGlobalBan = Boolean(
 			!filterData.success
@@ -600,7 +643,9 @@ class Command extends Template {
 				length = cooldownFilter.applyData(length);
 			}
 
-			Command.#cooldownManager.set(channelID, userData.ID, command.Name, length);
+			if (length !== null) {
+				Command.#cooldownManager.set(channelID, userData.ID, command.Name, length);
+			}
 
 			if (filterData.filter.Response === "Reason" && typeof filterData.reply === "string") {
 				const { string } = await Banphrase.execute(filterData.reply, channelData);
@@ -622,20 +667,20 @@ class Command extends Template {
 			return failedParamsParseResult;
 		}
 
-		let execution;
+		let execution: Result;
 		const context = options.context ?? new Context(command, contextOptions);
 
 		try {
 			const start = process.hrtime.bigint();
-			execution = await command.execute(context, ...args);
+			const commandExecution: StrictResult = await command.execute(context, ...args);
 			const end = process.hrtime.bigint();
 
-			let result = null;
-			if (execution?.reply) {
-				result = execution.reply.trim().slice(0, 300);
+			let result: string | null = null;
+			if (commandExecution.reply) {
+				result = commandExecution.reply.trim().slice(0, 300);
 			}
-			else if (execution?.partialReplies) {
-				result = execution.partialReplies
+			else if (commandExecution.partialReplies) {
+				result = commandExecution.partialReplies
 					.map(i => i.message)
 					.join(" ")
 					.trim()
@@ -644,7 +689,7 @@ class Command extends Template {
 
 			metric.inc({
 				name: command.Name,
-				result: (execution?.success === false) ? "fail" : "success"
+				result: (commandExecution?.success === false) ? "fail" : "success"
 			});
 
 			sb.Logger.logCommandExecution({
@@ -659,15 +704,23 @@ class Command extends Template {
 				Result: result,
 				Execution_Time: sb.Utils.round(Number(end - start) / 1_000_000, 3)
 			});
+
+			execution = commandExecution;
 		}
 		catch (e) {
+			if (!(e instanceof Error)) {
+				throw new SupiError({
+					message: "Invalid throw value - must be Error"
+				});
+			}
+
 			metric.inc({
 				name: command.Name,
 				result: "error"
 			});
 
 			let origin = "Internal";
-			let errorContext;
+			let errorContext: Record<string, string> = {};
 			const loggingContext = {
 				user: userData.ID,
 				command: command.Name,
@@ -678,9 +731,9 @@ class Command extends Template {
 				isPrivateMessage
 			};
 
-			if (e instanceof sb.Error.GenericRequest) {
+			if (isGenericRequestError(e)) {
 				origin = "External";
-				const { hostname, statusCode, statusMessage } = e.args;
+				const { hostname, statusCode, statusMessage } = e.args as Record<string, string>;
 				errorContext = {
 					type: "Command request error",
 					hostname,
@@ -689,7 +742,7 @@ class Command extends Template {
 					statusMessage
 				};
 			}
-			else if (e instanceof sb.Got.RequestError) {
+			else if (isGotRequestError(e)) {
 				origin = "External";
 				const { code, name, message, options } = e;
 				errorContext = {
@@ -711,7 +764,7 @@ class Command extends Template {
 				arguments: args
 			});
 
-			if (e instanceof sb.Error.GenericRequest) {
+			if (isGenericRequestError(e)) {
 				const { hostname } = errorContext;
 				execution = {
 					success: false,
@@ -719,7 +772,7 @@ class Command extends Template {
 					reply: `Third party service ${hostname} failed! 🚨 (ID ${errorID})`
 				};
 			}
-			else if (e instanceof sb.Got.RequestError) {
+			else if (isGotRequestError(e)) {
 				execution = {
 					success: false,
 					reason: "got-error",
@@ -745,18 +798,15 @@ class Command extends Template {
 		Command.#cooldownManager.unsetPending(userData.ID);
 
 		// Read-only commands never reply with anything - banphrases, mentions and cooldowns are not checked
-		if (command.Flags.readOnly) {
+		if (command.Flags.includes("readOnly")) {
 			return {
 				success: execution?.success ?? true
 			};
 		}
 
-		Command.handleCooldown(channelData, userData, command, execution?.cooldown, identifier);
+		Command.handleCooldown(channelData, userData, command, execution.cooldown, identifier);
 
-		if (!execution) {
-			return execution;
-		}
-		else if (typeof execution.reply !== "string" && !execution.partialReplies) {
+		if (typeof execution.reply !== "string" && !execution.partialReplies) {
 			return execution;
 		}
 
@@ -769,7 +819,7 @@ class Command extends Template {
 
 			const partResult = [];
 			for (const { message, bancheck } of execution.partialReplies) {
-				if (bancheck === true) {
+				if (bancheck) {
 					const { string } = await Banphrase.execute(
 						message,
 						channelData
@@ -792,7 +842,7 @@ class Command extends Template {
 		}
 
 		const metaSkip = Boolean(!execution.partialReplies && (options.skipBanphrases || execution?.meta?.skipBanphrases));
-		if (!command.Flags.skipBanphrase && !metaSkip) {
+		if (!command.Flags.includes("skipBanphrase") && !metaSkip) {
 			let messageSlice = execution.reply.slice(0, 2000);
 			if (!execution.meta?.skipWhitespaceCheck) {
 				messageSlice = messageSlice.replace(whitespaceRegex, "");
@@ -809,7 +859,7 @@ class Command extends Template {
 				execution.replyWithPrivateMessage = privateMessage;
 			}
 
-			if (command.Flags.rollback) {
+			if (command.Flags.includes("rollback") && context.transaction) {
 				if (passed) {
 					await context.transaction.commit();
 				}
@@ -820,7 +870,7 @@ class Command extends Template {
 				await context.transaction.end();
 			}
 		}
-		else if (command.Flags.rollback) {
+		else if (command.Flags.includes("rollback") && context.transaction) {
 			await context.transaction.commit();
 			await context.transaction.end();
 		}
@@ -839,7 +889,7 @@ class Command extends Template {
 
 		const mentionUser = Boolean(
 			!options.skipMention
-			&& command.Flags.mention
+			&& command.Flags.includes("mention")
 			&& channelData?.Mention
 			&& Filter.getMentionStatus({
 				user: userData,
@@ -873,46 +923,42 @@ class Command extends Template {
 		return execution;
 	}
 
-	static handleCooldown (channelData, userData, commandData, cooldownData, identifier) {
+	static handleCooldown (channelData: Channel | null, userData: User, commandData: Command, cooldownData: CooldownDefinition | undefined, identifier: Invocation) {
 		// Take care of private messages, where channel === null
-		const channelID = channelData?.ID ?? Command.#privateMessageChannelID;
+		const channelID = channelData?.ID ?? privateMessageChannelSymbol;
 
 		if (typeof cooldownData !== "undefined") {
 			if (cooldownData !== null) {
-				if (!Array.isArray(cooldownData)) {
-					cooldownData = [cooldownData];
-				}
+				const cooldown: CooldownObject = (typeof cooldownData === "number")
+					? { length: cooldownData }
+					: cooldownData;
 
-				for (let cooldown of cooldownData) {
-					if (typeof cooldown === "number") {
-						cooldown = { length: cooldown };
-					}
+				let { length = 0 } = cooldown;
+				const {
+					channel = channelID,
+					user = userData.ID,
+					command = commandData.Name,
+					ignoreCooldownFilters = false,
+				} = cooldown;
 
-					let { length = 0 } = cooldown;
-					const {
-						channel = channelID,
-						user = userData.ID,
-						command = commandData.Name,
-						ignoreCooldownFilters = false,
-						options = {}
-					} = cooldown;
+				if (!ignoreCooldownFilters) {
+					const cooldownFilter = Filter.getCooldownModifiers({
+						platform: channelData?.Platform ?? null,
+						channel: channelData,
+						command: commandData,
+						invocation: identifier,
+						user: userData
+					});
 
-					if (!ignoreCooldownFilters) {
-						const cooldownFilter = Filter.getCooldownModifiers({
-							platform: channelData?.Platform ?? null,
-							channel: channelData,
-							command: commandData,
-							invocation: identifier,
-							user: userData
-						});
-
-						if (cooldownFilter) {
-							length = cooldownFilter.applyData(length);
+					if (cooldownFilter) {
+						const filterResult = cooldownFilter.applyData(length);
+						if (filterResult !== null) {
+							length = filterResult;
 						}
 					}
-
-					Command.#cooldownManager.set(channel, user, command, length, options);
 				}
+
+				Command.#cooldownManager.set(channel, user, command, length);
 			}
 			else {
 				// If cooldownData === null, no cooldown is set at all.
@@ -929,15 +975,18 @@ class Command extends Template {
 			});
 
 			if (cooldownFilter) {
-				length = cooldownFilter.applyData(length);
+				const filterResult = cooldownFilter.applyData(length);
+				if (filterResult !== null) {
+					length = filterResult;
+				}
 			}
 
 			Command.#cooldownManager.set(channelID, userData.ID, commandData.Name, length);
 		}
 	}
 
-	static extractMetaResultProperties (execution) {
-		const result = {};
+	static extractMetaResultProperties (execution: Result): Record<string, boolean> {
+		const result: Record<string, boolean> = {};
 		for (const [key, value] of Object.entries(execution)) {
 			if (typeof value === "boolean") {
 				result[key] = value;
@@ -947,9 +996,13 @@ class Command extends Template {
 		return result;
 	}
 
-	static parseParameter (value, type, explicit) {
+	/**
+	 * Parses a string value into a proper parameter type value, as signified by the `type` argument.
+	 * Returns `null` if the value provided is somehow invalid (e.g. non-finite Number, invalid Date or RegExp)
+	 */
+	static parseParameter (value: string, type: ParameterType, explicit?: boolean): ParameterValue | null {
 		// Empty implicit string value is always invalid, since that is written as `$command param:` which is a typo/mistake
-		if (type === "string" && explicit === false && value === "") {
+		if (type === "string" && !explicit && value === "") {
 			return null;
 		}
 		// Non-string parameters are also always invalid with empty string value, regardless of implicitness
@@ -981,7 +1034,7 @@ class Command extends Template {
 			}
 
 			case "date": {
-				const date = new sb.Date(value);
+				const date = new SupiDate(value);
 				if (Number.isNaN(date.valueOf())) {
 					return null;
 				}
@@ -1008,7 +1061,7 @@ class Command extends Template {
 						// Since the "i" flag makes the regex not execute in linear time, use a hacky solution to
 						// replace all characters with a group that contains both cases. Then, also remove the "i" flag.
 						if (regex.flags.includes("i")) {
-							source = source.replaceAll(/(?<!\\)([a-z])/ig, (total, match) => `[${match.toLowerCase()}${match.toUpperCase()}]`);
+							source = source.replaceAll(/(?<!\\)([a-z])/ig, (_total: string, match: string) => `[${match.toLowerCase()}${match.toUpperCase()}]`);
 							flags = flags.replace("i", "");
 						}
 
@@ -1027,41 +1080,35 @@ class Command extends Template {
 			}
 
 			case "language": {
-				return LanguageCodes.getLanguage(value);
+				return LanguageParser.getLanguage(value);
 			}
 		}
 
 		return null;
 	}
 
-	static createFakeContext (commandData, contextData = {}, extraData = {}) {
-		if (!(commandData instanceof Command)) {
-			throw new sb.Error({
-				message: "First provided argument must be an instance of Command",
-				args: {
-					type: typeof commandData,
-					name: commandData?.constructor?.name ?? "(none)"
-				}
-			});
-		}
-
+	static createFakeContext (command: Command, contextData: ContextData): Context {
 		const data = {
-			invocation: contextData.invocation ?? commandData.Name,
-			user: contextData.user ?? null,
+			user: contextData.user,
+			invocation: contextData.invocation ?? command.Name,
 			channel: contextData.channel ?? null,
 			platform: contextData.platform ?? null,
 			transaction: contextData.transaction ?? null,
-			privateMessage: contextData.isPrivateMessage ?? false,
+			privateMessage: contextData.privateMessage ?? false,
 			append: contextData.append ?? {},
-			params: contextData.params ?? {},
-			...extraData
+			params: contextData.params ?? {}
 		};
 
-		return new Context(commandData, data);
+		return new Context(command, data);
 	}
 
-	static #parseAndAppendParameter (value, parameterDefinition, explicit, existingParameters) {
-		const parameters = { ...existingParameters };
+	static #parseAndAppendParameter (
+		value: string,
+		parameterDefinition: ParameterDefinitions[number],
+		explicit: boolean,
+		existingParameters: AppendedParameters
+	): { success: true; newParameters: AppendedParameters; } | ResultFailure {
+		const parameters: AppendedParameters = { ...existingParameters };
 		const parsedValue = Command.parseParameter(value, parameterDefinition.type, explicit);
 		if (parsedValue === null) {
 			return {
@@ -1070,36 +1117,47 @@ class Command extends Template {
 			};
 		}
 		else if (parameterDefinition.type === "object") {
-			if (typeof parameters[parameterDefinition.name] === "undefined") {
-				parameters[parameterDefinition.name] = {};
-			}
+			// Known type because of (parameterDefinition.type === "object")
+			const { key, value } = parsedValue as ParameterValueMap["object"];
 
-			if (typeof parameters[parameterDefinition.name][parsedValue.key] !== "undefined") {
+			parameters[parameterDefinition.name] ??= {};
+
+			// Known type because of above setup
+			const obj = parameters[parameterDefinition.name] as Record<string, string>;
+
+			// Refuse to override an already existing value
+			if (typeof obj[key] !== "undefined") {
 				return {
 					success: false,
-					reply: `Cannot use multiple values for parameter "${parameterDefinition.name}", key ${parsedValue.key}!`
+					reply: `Cannot use multiple values for parameter "${parameterDefinition.name}", key ${key}!`
 				};
 			}
 
-			parameters[parameterDefinition.name][parsedValue.key] = parsedValue.value;
+			obj[key] = value;
 		}
 		else {
 			parameters[parameterDefinition.name] = parsedValue;
 		}
 
-		return { success: true, newParameters: parameters };
+		return {
+			success: true,
+			newParameters: parameters
+		};
 	}
 
-	static parseParametersFromArguments (paramsDefinition, argsArray) {
+	static parseParametersFromArguments (
+		paramsDefinition: ParameterDefinitions,
+		argsArray: string[]
+	): { success: true; parameters: Record<string, ParameterValue>; args: string[]; } | ResultFailure {
 		const argsStr = argsArray.join(" ");
-		const outputArguments = [];
-		let parameters = {};
+		const outputArguments: string[] = [];
+		let parameters: Record<string, ParameterValue> = {};
 
 		// Buffer used to store read characters before we know what to do with them
 		let buffer = "";
-		/** Parameter definition of the current parameter @type {typeof paramsDefinition[0] | null} */
-		let currentParam = null;
-		// is true if currently reading inside of a parameter
+		// Parameter definition of the current parameter
+		let currentParam: ParameterDefinition | null = null;
+		// is true if currently reading inside the parameter
 		let insideParam = false;
 		// is true if the current param started using quotes
 		let quotedParam = false;
@@ -1140,7 +1198,7 @@ class Command extends Template {
 			}
 
 			if (insideParam) {
-				if (!quotedParam && char === " ") {
+				if (currentParam && !quotedParam && char === " ") {
 					// end of unquoted param
 					const value = Command.#parseAndAppendParameter(buffer.slice(0, -1), currentParam, quotedParam, parameters);
 					if (!value.success) {
@@ -1158,7 +1216,7 @@ class Command extends Template {
 						// remove the backslash, and add quote
 						buffer = `${buffer.slice(0, -2)}"`;
 					}
-					else {
+					else if (currentParam) {
 						// end of quoted param
 						const value = Command.#parseAndAppendParameter(buffer.slice(0, -1), currentParam, quotedParam, parameters);
 						if (!value.success) {
@@ -1179,10 +1237,10 @@ class Command extends Template {
 			if (quotedParam) {
 				return {
 					success: false,
-					reply: `Unclosed quoted parameter "${currentParam.name}"!`
+					reply: `Unclosed quoted parameter "${currentParam?.name ?? "(N/A)"}"!`
 				};
 			}
-			else {
+			else if (currentParam) {
 				const value = Command.#parseAndAppendParameter(buffer, currentParam, quotedParam, parameters);
 				if (!value.success) {
 					return value;
@@ -1191,7 +1249,7 @@ class Command extends Template {
 			}
 		}
 		else if (buffer !== "" && buffer !== Command.ignoreParametersDelimiter) {
-			// Ignore the last parameter if its the delimiter
+			// Ignore the last parameter if it's the delimiter
 			outputArguments.push(buffer);
 		}
 
@@ -1202,7 +1260,7 @@ class Command extends Template {
 		};
 	}
 
-	static is (string) {
+	static is (string: string) {
 		const prefix = Command.prefix;
 		if (prefix === null) {
 			return false;
@@ -1212,11 +1270,9 @@ class Command extends Template {
 	}
 
 	static destroy () {
-		for (const command of Command.data) {
-			command.destroy();
+		for (const command of Command.data.values()) {
+			void command.destroy();
 		}
-
-		super.destroy();
 	}
 
 	static get prefixRegex () {
@@ -1242,5 +1298,3 @@ class Command extends Template {
 		return COMMAND_PREFIX;
 	}
 }
-
-export default Command;
