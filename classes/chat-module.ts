@@ -96,7 +96,7 @@ export default class ChatModule extends TemplateWithoutId {
 			}
 			else {
 				this.attach({
-					platform: Platform.list
+					platform: Platform.getList()
 				});
 			}
 

@@ -214,7 +214,7 @@ export class Banphrase extends TemplateWithId {
 	static async execute (message: string, channelData: Channel | null, options: ExecuteOptions = {}): Promise<ExecuteResult> {
 		let resultMessage = message;
 		const channelId = channelData?.ID ?? null;
-		const platformId = channelData?.Platform?.ID ?? null; // @todo Platform should always be defined, fix after Channel is in Typescript
+		const platformId = channelData?.Platform.ID ?? null;
 
 		for (const banphrase of Banphrase.data.values()) {
 			if (!banphrase.Active) {
@@ -272,7 +272,7 @@ export class Banphrase extends TemplateWithId {
 				row.setValues({
 					API: channelData.Banphrase_API_URL,
 					Channel: channelData.ID,
-					Platform: channelData.Platform?.ID, // @todo Platform should always be defined, fix after Channel is in Typescript
+					Platform: channelData.Platform.ID,
 					Message: message,
 					Response: JSON.stringify(responseData[apiDataSymbol])
 				});

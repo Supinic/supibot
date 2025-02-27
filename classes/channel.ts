@@ -1,6 +1,6 @@
 import EventEmitter from "node:events";
 
-import { type Recordset, type RecordDeleter, SupiError } from "supi-core";
+import { type Recordset, type RecordDeleter, SupiError, type Row } from "supi-core";
 
 import { type GetEmoteOptions, Platform } from "../platforms/template.js";
 import { User } from "./user.js";
@@ -176,7 +176,7 @@ export class Channel extends TemplateWithId {
 	}
 
 	async saveProperty <T extends EditableProperty>(property: T, value: this[T]) {
-		const row = await sb.Query.getRow("chat_data", "Channel");
+		const row = await sb.Query.getRow("chat_data", "Channel") as Row;
 		await row.load(this.ID);
 
 		await super.saveRowProperty(row, property, value, this);

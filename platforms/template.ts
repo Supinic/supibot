@@ -52,25 +52,25 @@ type MessageAwaiterOptions = { timeout?: number; };
 export type GenericSendOptions = Record<string, unknown>;
 
 export abstract class Platform <T extends BaseConfig = BaseConfig> {
-	readonly ID: T["ID"];
-	readonly name: T["name"];
-	readonly host: T["host"];
-	readonly messageLimit: T["messageLimit"];
-	readonly selfId: T["selfId"];
-	readonly selfName: T["selfName"];
-	readonly mirrorIdentifier: T["mirrorIdentifier"];
-	readonly platform: T["platform"];
-	readonly logging: T["logging"];
-	readonly active: T["active"];
+	public readonly ID: T["ID"];
+	public readonly name: T["name"];
+	public readonly host: T["host"];
+	public readonly messageLimit: T["messageLimit"];
+	public readonly selfId: T["selfId"];
+	public readonly selfName: T["selfName"];
+	public readonly mirrorIdentifier: T["mirrorIdentifier"];
+	protected readonly platform: T["platform"];
+	protected readonly logging: T["logging"];
+	protected readonly active: T["active"];
 
-	readonly globalEmoteCacheKey: string;
-	readonly #userMessagePromises: Map<Channel["ID"] | null, Map<User["ID"], MessageAwaiterObject>> = new Map();
-	#privateMessagesTablePromise: Promise<{ success: boolean; }> | null = null;
+	public readonly supportsMeAction = false;
+	public readonly dynamicChannelAddition = false;
+	public readonly userMessagePromises: Map<Channel["ID"] | null, Map<User["ID"], MessageAwaiterObject>> = new Map();
 
-	readonly supportsMeAction = false;
-	readonly dynamicChannelAddition = false;
+	private readonly globalEmoteCacheKey: string;
+	private privateMessagesTablePromise: Promise<{ success: boolean; }> | null = null;
 
-	static list: Platform[] = [];
+	protected static readonly list: Platform[] = [];
 
 	protected constructor (name: string, config: T) {
 		this.name = name;
@@ -99,10 +99,12 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		this.globalEmoteCacheKey = `global-emotes-${this.id}`;
 		this.active = config.active ?? false;
 
+		this.checkConfig();
+
 		Platform.list.push(this);
 	}
 
-	checkConfig () {
+	private checkConfig () {
 		if (!this.selfName) {
 			throw new sb.Error({
 				message: "Invalid Platform property: selfName",
@@ -118,39 +120,31 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		}
 	}
 
-	getFullName (separator: string = "-"): string {
-		if (this.name === "irc") {
-			return [this.name, this.host].filter(Boolean).join(separator);
-		}
-		else {
-			return this.name;
-		}
-	}
-
-	abstract initListeners (): void;
-	abstract send (message: string, channel: ChannelLike, options?: GenericSendOptions): Promise<void>;
-	abstract pm (message: string, user: UserLike, channel?: ChannelLike): Promise<void>;
-	abstract isUserChannelOwner (channelData: Channel, userData: User): Promise<boolean | null>;
-	abstract populateUserList (channelData: Channel): Promise<string[]>;
-	abstract populateGlobalEmotes (): Promise<Emote[]>;
-	abstract fetchChannelEmotes (channelData: Channel): Promise<Emote[]>;
-	abstract createUserMention (userData: User, channelData?: Channel | null): Promise<string>;
+	protected abstract initListeners (): void;
+	protected abstract connect (): Promise<void>;
+	public abstract send (message: string, channel: ChannelLike, options?: GenericSendOptions): Promise<void>;
+	public abstract pm (message: string, user: UserLike, channel?: ChannelLike): Promise<void>;
+	public abstract isUserChannelOwner (channelData: Channel, userData: User): Promise<boolean | null>;
+	public abstract populateUserList (channelData: Channel): Promise<string[]>;
+	public abstract populateGlobalEmotes (): Promise<Emote[]>;
+	public abstract fetchChannelEmotes (channelData: Channel): Promise<Emote[]>;
+	public abstract createUserMention (userData: User, channelData?: Channel | null): Promise<string>;
 	/**
 	 * Fetches the platform ID for a given user object, depending on which platform instance is used.
 	 * Does not use the platforms' API for fetching, simply uses the internal sb.User data - and hence should not
 	 * be used long-term (more specifically, after the User_Alias refactor).
 	 */
-	abstract fetchInternalPlatformIDByUsername (userData: User): string | null;
+	public abstract fetchInternalPlatformIDByUsername (userData: User): string | null;
 	/**
 	 * Fetches the username for a given user platform ID, depending on which platform instance is used.
 	 */
-	abstract fetchUsernameByUserPlatformID (userPlatformID: string): Promise<string | null>;
+	public abstract fetchUsernameByUserPlatformID (userPlatformID: string): Promise<string | null>;
 	/**
 	 * Determines if a given channel within this platform is currently "live", as in livestreaming.
 	 */
-	abstract isChannelLive (channelData: Channel): Promise<boolean> | null;
+	public abstract isChannelLive (channelData: Channel): Promise<boolean> | null;
 
-	incrementMessageMetric (type: "read" | "sent", channelIdentifier: ChannelLike | null) {
+	protected incrementMessageMetric (type: "read" | "sent", channelIdentifier: ChannelLike | null) {
 		let channel = "(private)";
 		if (channelIdentifier) {
 			const channelData = Channel.get(channelIdentifier);
@@ -181,14 +175,14 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	 * Whenever the user sends a message the bot is supposed to react to, that SupiPromise will be resolved
 	 * "externally" from the Platform instance - see the `resolveUserMessage` method.
 	 */
-	waitForUserMessage (channelData: Channel, userData: User, options: MessageAwaiterOptions = {}): SupiPromise<MessageAwaiterResolution> {
+	public waitForUserMessage (channelData: Channel, userData: User, options: MessageAwaiterOptions = {}): SupiPromise<MessageAwaiterResolution> {
 		const delay = options.timeout ?? DEFAULT_MESSAGE_WAIT_TIMEOUT;
 		const promise = new SupiPromise<MessageAwaiterResolution | null>();
 
-		let userMap = this.#userMessagePromises.get(channelData.ID);
+		let userMap = this.userMessagePromises.get(channelData.ID);
 		if (!userMap) {
 			userMap = new Map();
-			this.#userMessagePromises.set(channelData.ID, userMap);
+			this.userMessagePromises.set(channelData.ID, userMap);
 		}
 
 		if (userMap.has(userData.ID)) {
@@ -212,8 +206,8 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	 * This is done by "remotely" resolving a referenced `SupiPromise` instance, which is created
 	 * when calling the `waitForUserMessage` method.
 	 */
-	resolveUserMessage (channelData: Channel | null, userData: User, message: string): void {
-		const userMap = this.#userMessagePromises.get(channelData?.ID ?? null);
+	protected resolveUserMessage (channelData: Channel | null, userData: User, message: string): void {
+		const userMap = this.userMessagePromises.get(channelData?.ID ?? null);
 		if (!userMap) {
 			return;
 		}
@@ -240,7 +234,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	 * @param [options]
 	 * @param [options.commandUsed] = false If a command was used, do not include the username of who issued the command.
 	 */
-	async mirror (message: string, userData: User | null, channelData: Channel, options: MirrorOptions = {}): Promise<void> {
+	public async mirror (message: string, userData: User | null, channelData: Channel, options: MirrorOptions = {}): Promise<void> {
 		// Do not mirror at all if the Platform has no mirror identifier configured
 		const symbol = this.mirrorIdentifier;
 		if (symbol === null) {
@@ -275,8 +269,8 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		}
 	}
 
-	async fetchChannelUserList (channelData: Channel): Promise<string[]> {
-		const key = this.#getChannelUserListKey(channelData);
+	public async fetchChannelUserList (channelData: Channel): Promise<string[]> {
+		const key = this.getChannelUserListKey(channelData);
 		const cacheData = await sb.Cache.getByPrefix(key) as string[] | null;
 		if (cacheData) {
 			return cacheData;
@@ -291,7 +285,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		return userList;
 	}
 
-	async fetchGlobalEmotes (): Promise<Emote[]> {
+	public async fetchGlobalEmotes (): Promise<Emote[]> {
 		const key = this.globalEmoteCacheKey;
 		const cacheData = await sb.Cache.getByPrefix(key) as Emote[] | null;
 		if (cacheData) {
@@ -306,12 +300,17 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		return data;
 	}
 
-	async invalidateGlobalEmotesCache (): Promise<void> {
+	public async invalidateGlobalEmotesCache (): Promise<void> {
 		const key = this.globalEmoteCacheKey;
 		await sb.Cache.setByPrefix(key, null);
 	}
 
-	async getBestAvailableEmote <T extends string> (channelData: Channel | null, emotes: T[], fallbackEmote: T, options: GetEmoteOptions = {}): Promise<T | Emote> {
+	public async getBestAvailableEmote<T extends string> (
+		channelData: Channel | null,
+		emotes: T[],
+		fallbackEmote: T,
+		options: GetEmoteOptions = {}
+	): Promise<T | Emote> {
 		if (channelData) {
 			return channelData.getBestAvailableEmote(emotes, fallbackEmote, options);
 		}
@@ -349,7 +348,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	 * @param [options.skipLengthCheck] If true, length will not be checked
 	 * @param [options.keepWhitespace] If true, whitespace will not be stripped
 	 */
-	async prepareMessage (message: string, channel: Channel | null, options: PrepareMessageOptions = {}): Promise<string | false> {
+	public async prepareMessage (message: string, channel: Channel | null, options: PrepareMessageOptions = {}): Promise<string | false> {
 		let channelData: Channel | null = null;
 		let limit = Infinity;
 
@@ -393,23 +392,28 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		return resultMessage;
 	}
 
-	#getChannelUserListKey (channelData: Channel) {
+	private getChannelUserListKey (channelData: Channel) {
 		return `channel-user-list-${this.id}-${channelData.ID}`;
 	}
 
-	setupLoggingTable (): Promise<{ success: boolean; }> {
-		if (this.#privateMessagesTablePromise) {
-			return this.#privateMessagesTablePromise;
+	public setupLoggingTable (): Promise<{ success: boolean; }> {
+		if (this.privateMessagesTablePromise) {
+			return this.privateMessagesTablePromise;
 		}
 
 		const name = this.privateMessageLoggingTableName;
-		this.#privateMessagesTablePromise = createMessageLoggingTable(name);
-		return this.#privateMessagesTablePromise;
+		this.privateMessagesTablePromise = createMessageLoggingTable(name);
+		return this.privateMessagesTablePromise;
 	}
 
-	restart () {}
-
-	destroy () {}
+	public getFullName (separator: string = "-"): string {
+		if (this.name === "irc") {
+			return [this.name, this.host].filter(Boolean).join(separator);
+		}
+		else {
+			return this.name;
+		}
+	}
 
 	get id () { return this.ID; }
 	get Name () { return this.name; }
@@ -424,13 +428,12 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	get Logging () { return this.logging; }
 
 	get capital () { return sb.Utils.capitalize(this.name); }
-	get userMessagePromises () { return this.#userMessagePromises; }
 	get privateMessageLoggingTableName () {
 		const name = this.getFullName("_");
 		return `#${name}_private_messages`;
 	}
 
-	static get (identifier: Like, host?: string | null) {
+	public static get (identifier: Like, host?: string | null) {
 		if (identifier instanceof Platform) {
 			return identifier;
 		}
@@ -458,7 +461,11 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		}
 	}
 
-	static async create (type: string, config: BaseConfig) {
+	public static getList () {
+		return [...Platform.list];
+	}
+
+	public static async create (type: string, config: BaseConfig) {
 		let InstancePlatform;
 		try {
 			// @todo refactor this to direct imports + platform map. return generic for platforms not in the map
@@ -484,7 +491,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 
 class GenericPlatform extends Platform {
 	initListeners (): void {}
-
+	connect (): never { throw new SupiError({ message: "Method unavailable in GenericPlatform" }); }
 	createUserMention (): never { throw new SupiError({ message: "Method unavailable in GenericPlatform" }); }
 	fetchChannelEmotes (): never { throw new SupiError({ message: "Method unavailable in GenericPlatform" }); }
 	fetchInternalPlatformIDByUsername (): never { throw new SupiError({ message: "Method unavailable in GenericPlatform" }); }

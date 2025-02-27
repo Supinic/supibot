@@ -167,8 +167,6 @@ for (const platform of platforms) {
 		continue;
 	}
 
-	platform.checkConfig();
-
 	// eslint-disable-next-line unicorn/prefer-top-level-await
 	const promise = connectToPlatform(platform);
 	promises.push(promise);
