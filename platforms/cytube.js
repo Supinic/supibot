@@ -468,7 +468,7 @@ const DEFAULT_PLATFORM_CONFIG = {
 	messageDelayThreshold: 30000
 };
 
-export default class CytubePlatform extends Template {
+export class CytubePlatform extends Template {
 	/** @type {Map<Channel, CytubeClient>} */
 	clients = new Map();
 
@@ -623,4 +623,6 @@ export default class CytubePlatform extends Template {
 
 		this.clients.clear();
 	}
-};
+}
+
+export default CytubePlatform;

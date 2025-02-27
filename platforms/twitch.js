@@ -68,7 +68,7 @@ const DEFAULT_PLATFORM_CONFIG = {
 	unrelatedPrivateMessageResponse: ""
 };
 
-export default class TwitchPlatform extends Template {
+export class TwitchPlatform extends Template {
 	supportsMeAction = true;
 	dynamicChannelAddition = true;
 
@@ -1370,7 +1370,9 @@ export default class TwitchPlatform extends Template {
 		this.client.terminate();
 		this.client = null;
 	}
-};
+}
+
+export default TwitchPlatform;
 
 /**
  * @typedef {Object} TwitchEmoteSetDataObject Describes a Twitch emote set.
