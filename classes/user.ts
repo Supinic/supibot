@@ -15,7 +15,7 @@ type ConstructorData = {
 type GenericFetchData = GenericDataPropertyObject<User>["options"];
 type GetOptions = Partial<Pick<ConstructorData, "Twitch_ID" | "Discord_ID">>;
 
-type UserLike = User | User["Name"] | User["ID"];
+export type Like = User | User["Name"] | User["ID"];
 type NameObject = {
 	name?: User["Name"];
 	Name?: User["Name"];
@@ -104,7 +104,7 @@ export class User extends TemplateWithIdString {
 		});
 	}
 
-	async setDataProperty (propertyName: string, value: CacheValue, options: GenericFetchData) {
+	async setDataProperty (propertyName: string, value: CacheValue, options: GenericFetchData = {}) {
 		return await setGenericDataProperty(this, {
 			cacheMap: User.dataCache,
 			databaseProperty: "User_Alias",
@@ -119,7 +119,7 @@ export class User extends TemplateWithIdString {
 
 	destroy () {}
 
-	static async get (identifier: UserLike, strict: boolean = true, options: GetOptions = {}): Promise<User | null> {
+	static async get (identifier: Like, strict: boolean = true, options: GetOptions = {}): Promise<User | null> {
 		if (identifier instanceof User) {
 			return identifier;
 		}
@@ -199,7 +199,7 @@ export class User extends TemplateWithIdString {
 		}
 	}
 
-	static async getMultiple (identifiers: UserLike[]) {
+	static async getMultiple (identifiers: Like[]) {
 		const result: User[] = [];
 		const toFetch: (string | number)[] = [];
 		let userMapValues;

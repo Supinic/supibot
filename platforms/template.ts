@@ -1,27 +1,27 @@
 import { SupiError, SupiPromise } from "supi-core";
 
-import { User } from "../classes/user.js";
-import { Channel, Emote, type Like as ChannelLike } from "../classes/channel.js";
+import { User, Like as UserLike } from "../classes/user.js";
+import { Channel, Emote, Like as ChannelLike } from "../classes/channel.js";
 import { Banphrase } from "../classes/banphrase.js";
 
 import createMessageLoggingTable from "../utils/create-db-table.js";
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
-type Like = Platform | number | string;
+export type Like = Platform | number | string;
+export interface BaseConfig {
+	ID: number;
+	name: string;
+	host?: string | null;
+	messageLimit: number;
+	selfId: string | null;
+	selfName: string;
+	mirrorIdentifier: string | null;
+	active: boolean;
+	platform: unknown;
+	logging: unknown;
+}
 
-export type GenericDataConfiguration = Record<string, unknown>;
-export type GenericLoggingConfiguration = Record<string, unknown>;
-
-type PlatformConfiguration = Pick<
-	Platform,
-	"name" | "host" | "messageLimit" | "selfName" | "selfId" | "mirrorIdentifier" | "active"
-> & {
-	ID: Platform["ID"];
-	platform: Platform["data"];
-	logging: Platform["loggingConfig"];
-};
-
-type PrepareMessageOptions = {
+export type PrepareMessageOptions = {
 	extraLength?: number;
 	removeEmbeds?: boolean;
 	skipLengthCheck?: boolean;
@@ -35,6 +35,10 @@ export type GetEmoteOptions = {
 	returnEmoteObject?: boolean;
 	filter?: (emote: Emote) => boolean;
 };
+export type PlatformVerification = {
+	active?: boolean;
+	notificationSent?: boolean;
+};
 
 type MirrorOptions = PrepareMessageOptions & { commandUsed?: boolean; };
 
@@ -47,38 +51,37 @@ type MessageAwaiterOptions = { timeout?: number; };
 
 export type GenericSendOptions = Record<string, unknown>;
 
-export abstract class Platform {
-	readonly id: number;
-	readonly name: string;
-	readonly host: string | null;
-	readonly messageLimit: number;
-	readonly selfId: string | null;
-	readonly selfName: string;
-	readonly mirrorIdentifier: string | null;
-	readonly data: GenericDataConfiguration;
-	readonly loggingConfig: GenericLoggingConfiguration;
-	readonly active: boolean;
+export abstract class Platform <T extends BaseConfig = BaseConfig> {
+	readonly ID: T["ID"];
+	readonly name: T["name"];
+	readonly host: T["host"];
+	readonly messageLimit: T["messageLimit"];
+	readonly selfId: T["selfId"];
+	readonly selfName: T["selfName"];
+	readonly mirrorIdentifier: T["mirrorIdentifier"];
+	readonly platform: T["platform"];
+	readonly logging: T["logging"];
+	readonly active: T["active"];
 
 	readonly globalEmoteCacheKey: string;
-	readonly #userMessagePromises: Map<Channel["ID"], Map<User["ID"], MessageAwaiterObject>> = new Map();
+	readonly #userMessagePromises: Map<Channel["ID"] | null, Map<User["ID"], MessageAwaiterObject>> = new Map();
 	#privateMessagesTablePromise: Promise<{ success: boolean; }> | null = null;
-
 
 	readonly supportsMeAction = false;
 	readonly dynamicChannelAddition = false;
 
 	static list: Platform[] = [];
 
-	constructor (name: string, config: PlatformConfiguration, defaults = {}) {
+	protected constructor (name: string, config: T) {
 		this.name = name;
-		this.id = config.ID;
+		this.ID = config.ID;
 
-		if (!this.id) {
+		if (!this.ID) {
 			throw new sb.Error({
 				message: "Platform ID must be configured"
 			});
 		}
-		else if (!Number.isInteger(this.id)) {
+		else if (!Number.isInteger(this.ID)) {
 			throw new sb.Error({
 				message: "Platform ID must be an integer"
 			});
@@ -90,14 +93,8 @@ export abstract class Platform {
 		this.selfName = config.selfName?.toLowerCase() ?? null;
 		this.mirrorIdentifier = config.mirrorIdentifier ?? null;
 
-		this.data = {
-			...defaults.platform,
-			...config.platform
-		};
-		this.loggingConfig = {
-			...defaults.logging,
-			...config.logging
-		};
+		this.platform = config.platform;
+		this.logging = config.logging;
 
 		this.globalEmoteCacheKey = `global-emotes-${this.id}`;
 		this.active = config.active ?? false;
@@ -131,8 +128,8 @@ export abstract class Platform {
 	}
 
 	abstract initListeners (): void;
-	abstract send (message: string, channel: Channel, options?: GenericSendOptions): Promise<void>;
-	abstract pm (message: string, user: User, channel: Channel): Promise<void>;
+	abstract send (message: string, channel: ChannelLike, options?: GenericSendOptions): Promise<void>;
+	abstract pm (message: string, user: UserLike, channel?: ChannelLike): Promise<void>;
 	abstract isUserChannelOwner (channelData: Channel, userData: User): Promise<boolean | null>;
 	abstract populateUserList (channelData: Channel): Promise<string[]>;
 	abstract populateGlobalEmotes (): Promise<Emote[]>;
@@ -215,8 +212,8 @@ export abstract class Platform {
 	 * This is done by "remotely" resolving a referenced `SupiPromise` instance, which is created
 	 * when calling the `waitForUserMessage` method.
 	 */
-	resolveUserMessage (channelData: Channel, userData: User, message: string): void {
-		const userMap = this.#userMessagePromises.get(channelData.ID);
+	resolveUserMessage (channelData: Channel | null, userData: User, message: string): void {
+		const userMap = this.#userMessagePromises.get(channelData?.ID ?? null);
 		if (!userMap) {
 			return;
 		}
@@ -314,7 +311,7 @@ export abstract class Platform {
 		await sb.Cache.setByPrefix(key, null);
 	}
 
-	async getBestAvailableEmote (channelData: Channel, emotes: string[], fallbackEmote: string, options: GetEmoteOptions = {}) {
+	async getBestAvailableEmote <T extends string> (channelData: Channel | null, emotes: T[], fallbackEmote: T, options: GetEmoteOptions = {}): Promise<T | Emote> {
 		if (channelData) {
 			return channelData.getBestAvailableEmote(emotes, fallbackEmote, options);
 		}
@@ -335,7 +332,7 @@ export abstract class Platform {
 			if (available && (typeof options.filter !== "function" || options.filter(available))) {
 				return (options.returnEmoteObject)
 					? available
-					: available.name;
+					: available.name as T;
 			}
 		}
 
@@ -414,17 +411,17 @@ export abstract class Platform {
 
 	destroy () {}
 
-	get ID () { return this.id; }
+	get id () { return this.ID; }
 	get Name () { return this.name; }
 	get Host () { return this.host; }
 	get Message_Limit () { return this.messageLimit; }
 	get Self_Name () { return this.selfName; }
 	get Self_ID () { return this.selfId; }
 	get Mirror_Identifier () { return this.mirrorIdentifier; }
-	get Data () { return this.data; }
-	get config () { return this.data; }
-	get Logging () { return this.loggingConfig; }
-	get logging () { return this.loggingConfig; }
+	get data () { return this.platform; }
+	get Data () { return this.platform; }
+	get config () { return this.platform; }
+	get Logging () { return this.logging; }
 
 	get capital () { return sb.Utils.capitalize(this.name); }
 	get userMessagePromises () { return this.#userMessagePromises; }
@@ -446,7 +443,7 @@ export abstract class Platform {
 				return null;
 			}
 			else if (host === null || typeof host === "string") {
-				return eligible.find(i => i.host === host);
+				return eligible.find(i => i.host === host) ?? null;
 			}
 			else {
 				if (eligible.length > 1) {
@@ -461,7 +458,7 @@ export abstract class Platform {
 		}
 	}
 
-	static async create (type, config) {
+	static async create (type: string, config: BaseConfig) {
 		let InstancePlatform;
 		try {
 			// @todo refactor this to direct imports + platform map. return generic for platforms not in the map

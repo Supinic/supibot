@@ -350,7 +350,7 @@ export class Filter extends TemplateWithId {
 		await row.save();
 	}
 
-	async saveProperty (property: keyof Filter, value?: Filter[keyof Filter]) {
+	async saveProperty (property: keyof this, value?: this[keyof Filter]) {
 		const row = await sb.Query.getRow("chat_data", "Filter");
 		await row.load(this.ID);
 

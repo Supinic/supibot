@@ -6,8 +6,8 @@ import { TemplateWithoutId, TemplateDefinition } from "./template.js";
 import Banphrase from "./banphrase.js";
 import Filter from "./filter.js";
 import User from "./user.js";
-import { Channel, privateMessageChannelSymbol, type GetEmoteOptions, Emote } from "./channel.js";
-import Platform from "../platforms/template.js";
+import { Channel, privateMessageChannelSymbol, type Emote } from "./channel.js";
+import { Platform, type GetEmoteOptions } from "../platforms/template.js";
 import CooldownManager from "../utils/cooldown-manager.js";
 import { Language, LanguageParser } from "../utils/languages.js";
 
@@ -178,16 +178,19 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		const channelData = options.channel ?? this.channel;
 		const platformData = options.platform ?? this.platform;
 
-		const data = await Promise.all([
+		const promises = [
 			userData?.getDataProperty("administrator"),
-			platformData?.isUserChannelOwner(channelData, userData),
 			channelData?.isUserAmbassador(userData)
-		]) as [boolean | undefined, boolean | undefined, boolean | undefined];
+		];
+		if (platformData && userData && channelData) {
+			promises.push(platformData.isUserChannelOwner(channelData, userData));
+		}
 
+		const data = await Promise.all(promises) as [boolean | undefined, boolean | undefined, boolean | undefined];
 		const flags = {
 			administrator: (data[0] === true),
-			channelOwner: Boolean(data[1]),
-			ambassador: Boolean(data[2])
+			ambassador: Boolean(data[1]),
+			channelOwner: Boolean(data[2])
 		};
 
 		let flag = User.permissions.regular;
@@ -497,7 +500,7 @@ export class Command extends TemplateWithoutId {
 	static async checkAndExecute (
 		identifier: string,
 		argumentArray: string[],
-		channelData: Channel,
+		channelData: Channel | null,
 		userData: User,
 		options: ExecuteOptions
 	): Promise<Result> {

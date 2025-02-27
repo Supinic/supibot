@@ -1,22 +1,81 @@
+// @ts-ignore Module has no @types repository associated with it. Will use local interface as definition
 import IRC from "irc-framework";
-import Template from "./template.js";
+import { EventEmitter } from "node:events";
+
+import { Platform, BaseConfig, PrepareMessageOptions, PlatformVerification } from "./template.js";
+import { User, Like as UserLike } from "../classes/user.js";
+import { Channel, Like as ChannelLike } from "../classes/channel.js";
+import { SupiError } from "supi-core";
+import { Command } from "../classes/command.js";
 
 const DEFAULT_LOGGING_CONFIG = {
 	messages: true,
 	whispers: false
 };
-const DEFAULT_PLATFORM_CONFIG = {};
 const DEFAULT_IRC_PORT = 6667;
 
-export default class IRCPlatform extends Template {
+type HandleCommandData = {
+	privateMessage: boolean;
+};
+
+interface IrcConfig extends BaseConfig {
+	platform: {
+		url: string;
+		port?: number;
+		secure?: boolean;
+		tls?: boolean;
+		authentication: {
+			type: string;
+			envVariable: string;
+			user: string;
+		};
+	};
+	logging: {
+		messages?: boolean;
+		whispers?: boolean;
+	};
+}
+
+type IrcConnectOptions = {
+	nick: string;
+	host: string;
+	port?: number | null;
+	tls?: boolean;
+	enable_echomessage: boolean,
+};
+type IrcMessageEvent = {
+	from_server?: boolean;
+	message: string;
+	target: string;
+	nick: string;
+	tags: {
+		account: string;
+	}
+};
+
+interface FauxIrcClient extends EventEmitter {
+	connect (options: IrcConnectOptions): Promise<unknown>;
+	changeNick (nick: string): unknown;
+	say (username: string, message: string): unknown;
+	join (channel: string): unknown;
+}
+
+export class IrcPlatform extends Platform<IrcConfig> {
 	#notifiedUnregisteredUsers = new Set();
 	#nicknameChanged = false;
 
-	constructor (config) {
-		super("irc", config, {
-			logging: DEFAULT_LOGGING_CONFIG,
-			platform: DEFAULT_PLATFORM_CONFIG
-		});
+	readonly client: FauxIrcClient;
+
+	constructor (config: IrcConfig) {
+		const resultConfig = { ...config };
+		if (typeof resultConfig.logging.messages !== "boolean") {
+			resultConfig.logging.messages = DEFAULT_LOGGING_CONFIG.messages;
+		}
+		if (typeof resultConfig.logging.whispers !== "boolean") {
+			resultConfig.logging.whispers = DEFAULT_LOGGING_CONFIG.whispers;
+		}
+
+		super("irc", resultConfig);
 
 		if (!this.host) {
 			throw new sb.Error({
@@ -33,15 +92,15 @@ export default class IRCPlatform extends Template {
 				message: "Invalid IRC configuration - missing url"
 			});
 		}
+
+		this.client = new IRC.Client() as FauxIrcClient;
 	}
 
 	async connect () {
-		this.client = new IRC.Client();
-
 		this.initListeners();
 
 		await this.client.connect({
-			host: this.config.url,
+			host: this.data.url,
 			port: this.config.port ?? DEFAULT_IRC_PORT,
 			nick: this.selfName,
 			tls: this.config.secure ?? this.config.tls ?? false,
@@ -92,14 +151,14 @@ export default class IRCPlatform extends Template {
 		client.on("privmsg", async (event) => await this.handleMessage(event));
 	}
 
-	async send (message, channel) {
-		const channelData = sb.Channel.get(channel, this);
+	async send (message: string, channel: ChannelLike) {
+		const channelData = Channel.get(channel, this);
 		if (!channelData) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Invalid channel provided",
 				args: {
 					message,
-					channel
+					channel: String(channel)
 				}
 			});
 		}
@@ -108,8 +167,8 @@ export default class IRCPlatform extends Template {
 		this.incrementMessageMetric("sent", channelData);
 	}
 
-	async pm (message, user) {
-		const userData = await sb.User.get(user);
+	async pm (message: string, user: UserLike) {
+		const userData = await User.get(user);
 		if (!userData) {
 			return;
 		}
@@ -118,12 +177,12 @@ export default class IRCPlatform extends Template {
 		this.incrementMessageMetric("sent", null);
 	}
 
-	async directPm (message, userName) {
+	directPm (message: string, userName: string) {
 		this.client.say(userName, message);
 		this.incrementMessageMetric("sent", null);
 	}
 
-	async prepareMessage (message, channel, options = {}) {
+	async prepareMessage (message: string, channel: Channel | null, options: PrepareMessageOptions = {}) {
 		const preparedMessage = await super.prepareMessage(message, channel, {
 			...options,
 			skipLengthCheck: true
@@ -133,7 +192,7 @@ export default class IRCPlatform extends Template {
 		return sb.Utils.wrapString(preparedMessage, limit);
 	}
 
-	async handleMessage (event) {
+	async handleMessage (event: IrcMessageEvent) {
 		if (event.from_server) {
 			return;
 		}
@@ -143,7 +202,7 @@ export default class IRCPlatform extends Template {
 
 		if (!event.tags.account) {
 			const userName = event.nick;
-			if (sb.Command.is(message) && !this.#notifiedUnregisteredUsers.has(userName)) {
+			if (Command.is(message) && !this.#notifiedUnregisteredUsers.has(userName)) {
 				const message = `You must register an account before using my commands!`;
 
 				this.client.say(event.target, message);
@@ -153,16 +212,15 @@ export default class IRCPlatform extends Template {
 			return;
 		}
 
-		const userData = await sb.User.get(event.tags.account, false);
+		const userData = await User.get(event.tags.account, false);
 		if (!userData) {
 			return;
 		}
 
-		let userVerificationData = await userData.getDataProperty("platformVerification");
-		userVerificationData ??= {};
+		let userVerificationData = (await userData.getDataProperty("platformVerification") ?? {}) as Record<number, PlatformVerification>;
 		userVerificationData[this.ID] ??= {};
 
-		const isSelf = (userData.Name === this.platform.Self_Name);
+		const isSelf = (userData.Name === this.selfName);
 		const platformVerification = userVerificationData[this.ID];
 		if (!isSelf && (userData.Twitch_ID || userData.Discord_ID) && !platformVerification.active) {
 			// TODO: verification challenge creation for Discord/Twitch and sending the message
@@ -247,11 +305,11 @@ export default class IRCPlatform extends Template {
 
 		this.incrementMessageMetric("read", channelData);
 
-		if (!sb.Command.prefix) {
+		if (!Command.prefix) {
 			return;
 		}
 
-		if (sb.Command.is(message)) {
+		if (Command.is(message)) {
 			const [command, ...args] = message
 				.replace(sb.Command.prefix, "")
 				.split(/\s+/)
@@ -263,8 +321,8 @@ export default class IRCPlatform extends Template {
 		}
 	}
 
-	async handleCommand (command, userData, channelData, args = [], options = {}) {
-		const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
+	async handleCommand (command: string, userData: User, channelData: Channel | null, args: string[] = [], options: HandleCommandData) {
+		const execution = await Command.checkAndExecute(command, args, channelData, userData, {
 			platform: this,
 			...options
 		});
@@ -283,7 +341,7 @@ export default class IRCPlatform extends Template {
 
 			await this.pm(message, userData.Name);
 		}
-		else {
+		else if (channelData) {
 			if (channelData?.Mirror) {
 				await this.mirror(execution.reply, userData, channelData, {
 					...commandOptions,
@@ -305,6 +363,14 @@ export default class IRCPlatform extends Template {
 		return execution;
 	}
 
+	async createUserMention (userData: User): Promise<string> {
+		return userData.Name;
+	}
+
+	async isChannelLive (): Promise<boolean> {
+		return false;
+	}
+
 	async isUserChannelOwner () {
 		return false;
 	}
@@ -313,21 +379,17 @@ export default class IRCPlatform extends Template {
 	async populateGlobalEmotes () { return []; }
 	async fetchChannelEmotes () { return []; }
 
-	async fetchInternalPlatformIDByUsername () {
+	fetchInternalPlatformIDByUsername (): never {
 		throw new sb.Error({
 			message: "IRC does not support user platform ID lookup by username"
 		});
 	}
 
-	async fetchUsernameByUserPlatformID () {
+	fetchUsernameByUserPlatformID (): never {
 		throw new sb.Error({
 			message: "IRC does not support username lookup by user platform ID"
 		});
 	}
+}
 
-	me () {
-		throw new sb.Error({
-			message: "The /me action is not supported on IRC"
-		});
-	}
-};
+export default IrcPlatform;

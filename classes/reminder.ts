@@ -16,7 +16,7 @@ import LongTimeout from "../utils/long-timeout.js";
 
 type Type = "Reminder" | "Pingme" | "Deferred";
 type ConstructorData = Pick<Reminder, "ID" | "User_From" | "User_To" | "Channel" | "Text" | "Created" | "Schedule" | "Private_Message" | "Type"> & {
-	Platform: number | null;
+	Platform: number;
 };
 type CreateData = Omit<ConstructorData, "ID">;
 type CreateResult = {
