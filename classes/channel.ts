@@ -37,7 +37,7 @@ type MirrorOptions = {
 export type Like = string | number | Channel;
 
 export type Emote = { // @todo move to Platform
-	type: "discord" | "twitch" | "bttv" | "7tv";
+	type: "discord" | "twitch" | "bttv" | "7tv" | "cytube";
 	ID: string | number;
 	name: string;
 	global: boolean;

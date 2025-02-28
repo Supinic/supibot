@@ -40,7 +40,7 @@ export type PlatformVerification = {
 	notificationSent?: boolean;
 };
 
-type MirrorOptions = PrepareMessageOptions & { commandUsed?: boolean; };
+export type MirrorOptions = PrepareMessageOptions & { commandUsed?: boolean; };
 
 type MessageAwaiterResolution = { message: string; } | null;
 type MessageAwaiterObject = {
@@ -60,7 +60,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	public readonly selfName: T["selfName"];
 	public readonly mirrorIdentifier: T["mirrorIdentifier"];
 	protected readonly platform: T["platform"];
-	protected readonly logging: T["logging"];
+	public readonly logging: T["logging"];
 	protected readonly active: T["active"];
 
 	public readonly supportsMeAction = false;
@@ -124,7 +124,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	protected abstract connect (): Promise<void>;
 	public abstract send (message: string, channel: ChannelLike, options?: GenericSendOptions): Promise<void>;
 	public abstract pm (message: string, user: UserLike, channel?: ChannelLike): Promise<void>;
-	public abstract isUserChannelOwner (channelData: Channel, userData: User): Promise<boolean | null>;
+	public abstract isUserChannelOwner (channelData: Channel, userData: User): Promise<boolean> | null;
 	public abstract populateUserList (channelData: Channel): Promise<string[]>;
 	public abstract populateGlobalEmotes (): Promise<Emote[]>;
 	public abstract fetchChannelEmotes (channelData: Channel): Promise<Emote[]>;
@@ -144,7 +144,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	 */
 	public abstract isChannelLive (channelData: Channel): Promise<boolean> | null;
 
-	protected incrementMessageMetric (type: "read" | "sent", channelIdentifier: ChannelLike | null) {
+	public incrementMessageMetric (type: "read" | "sent", channelIdentifier: ChannelLike | null) {
 		let channel = "(private)";
 		if (channelIdentifier) {
 			const channelData = Channel.get(channelIdentifier);
@@ -206,7 +206,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	 * This is done by "remotely" resolving a referenced `SupiPromise` instance, which is created
 	 * when calling the `waitForUserMessage` method.
 	 */
-	protected resolveUserMessage (channelData: Channel | null, userData: User, message: string): void {
+	public resolveUserMessage (channelData: Channel | null, userData: User, message: string): void {
 		const userMap = this.userMessagePromises.get(channelData?.ID ?? null);
 		if (!userMap) {
 			return;

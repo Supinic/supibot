@@ -1,39 +1,40 @@
-import Template from "./template.js";
-import CytubeConnector from "cytube-connector";
+import { CytubeConnector, EmoteObject, UserObject, QueueObject, VideoObject } from "cytube-connector";
+
+import { Platform, BaseConfig, MirrorOptions } from "./template.js";
+import { Channel, Emote } from "../classes/channel.js";
+import User from "../classes/user.js";
+import { SupiDate, SupiError } from "supi-core";
+import { Command } from "../classes/command.js";
+
+type PlaylistObject = VideoObject | {
+	media: VideoObject["media"];
+	user: UserObject["name"];
+	uid: VideoObject["uid"];
+	after: QueueObject["after"];
+};
 
 class CytubeClient {
-	/** @type {CytubeConnector} */
-	client = null;
-	/** @type {CytubePlatform} */
-	platform = null;
-	channelData = null;
-	emotes = [];
-	playlistData = [];
-	currentlyPlaying = null;
-	restarting = false;
+	readonly client: CytubeConnector;
+	readonly platform: CytubePlatform;
+	readonly channelData: Channel;
 
-	/** @type {Map<string, CytubeUserPresence>} */
-	userMap = new Map();
+	private readonly playlistData: PlaylistObject[] = [];
+	private readonly userMap: Map<UserObject["name"], UserObject> = new Map();
+
+	public currentlyPlaying: PlaylistObject | null = null;
+	private restarting = false;
+
+	private _emotes: Emote[] = [];
 
 	/**
 	 * @param {Channel} channelData
 	 * @param {CytubePlatform} platform
 	 */
-	constructor (channelData, platform) {
+	constructor (channelData: Channel, platform: CytubePlatform) {
 		this.channelData = channelData;
 		this.platform = platform;
-	}
 
-	async initialize () {
-		if (this.client) {
-			console.warn("Attempting to re-initialize a running Cytube client", {
-				channel: this.channelData.Name
-			});
-
-			return;
-		}
-
-		const client = new CytubeConnector({
+		this.client = new CytubeConnector({
 			host: "cytu.be",
 			port: 443,
 			auth: process.env.CYTUBE_BOT_PASSWORD,
@@ -41,45 +42,38 @@ class CytubeClient {
 			user: this.platform.selfName,
 			chan: this.channelData.Name
 		});
+	}
 
-		this.client = client;
-		if (typeof this.client.connect === "function") {
-			await this.client.connect();
-		}
+	async initialize () {
+		const client = this.client;
 
 		client.on("clientready", () => {
 			this.restarting = false;
 		});
 
 		// User list initialize event - save current user data
-		client.on("userlist", (data = []) => {
+		client.on("userlist", (data) => {
 			for (const record of data) {
-				if (typeof record.name === "string") {
-					record.name = record.name.toLowerCase();
-					this.userMap.set(record.name, record);
-				}
+				record.name = record.name.toLowerCase();
+				this.userMap.set(record.name, record);
 			}
 		});
 
 		// Playlist initialize event - save current playlist data
-		client.on("playlist", (data = []) => {
+		client.on("playlist", (data) => {
 			for (const video of data) {
 				this.playlistData.push(video);
 			}
 		});
 
 		// Handle chat message, log it if needed, handle command if needed
-		// { username: 'KUNszg',
-		//   msg: '$wiki tunguska event',
-		//   meta: {},
-		//   time: 1550780467657 }
 		client.on("chatMsg", async (data) => {
 			// Problem: Sometimes, cytube sends messages in batches, as if it was lagging.
 			// This block of code then removes legitimate messages.
 			// Need to figure out a good limit, or a better solution overall.
 
 			// On login, cytube sends a couple of history messages - skip those
-			const difference = (sb.Date.now() - data.time);
+			const difference = (SupiDate.now() - data.time);
 			const threshold = this.platform.config.messageDelayThreshold ?? 30_000;
 			if (data.time && difference > threshold) {
 				return;
@@ -98,7 +92,7 @@ class CytubeClient {
 				return; // Ignore if the result message becomes empty string (HTML issues, seemingly)
 			}
 
-			const userData = await sb.User.get(data.username, false);
+			const userData = await User.get(data.username, false);
 			const platformUserData = (data.username === "[server]")
 				? { rank: -1 }
 				: this.userMap.get(data.username);
@@ -128,13 +122,9 @@ class CytubeClient {
 			// Only unset AFK and fire reminders if the message wasn't private
 			if (!data.meta.private) {
 				// Do not process mirrored messages
-				const identifiers = sb.Platform.list.map(i => i.mirrorIdentifierr);
+				const identifiers = Platform.getList().map(i => i.mirrorIdentifier);
 				if (originalUsername === this.platform.selfName && identifiers.some(i => msg.startsWith(i))) {
 					return;
-				}
-
-				if (!this.channelData.sessionData) {
-					this.channelData.sessionData = {};
 				}
 
 				this.platform.resolveUserMessage(this.channelData, userData, msg);
@@ -171,7 +161,7 @@ class CytubeClient {
 				]);
 
 				if (this.channelData.Mirror) {
-					this.platform.mirror(msg, userData, this.channelData, { commandUsed: false });
+					void this.platform.mirror(msg, userData, this.channelData, { commandUsed: false });
 				}
 
 				this.platform.incrementMessageMetric("read", this.channelData);
@@ -205,7 +195,6 @@ class CytubeClient {
 			client.emit("chatMsg", data);
 		});
 
-		// { item: { media: { id, title, seconds, duration, type, meta: {} }, uid, temp, queueby }, after }
 		client.on("queue", async (data) => {
 			const who = data.item.queueby.toLowerCase();
 			const { media } = data.item;
@@ -225,10 +214,8 @@ class CytubeClient {
 
 		// User joined channel
 		client.on("addUser", async (data) => {
-			if (typeof data.name === "string") {
-				data.name = data.name.toLowerCase();
-				this.userMap.set(data.name, data);
-			}
+			data.name = data.name.toLowerCase();
+			this.userMap.set(data.name, data);
 		});
 
 		// User left channel
@@ -261,14 +248,14 @@ class CytubeClient {
 				return;
 			}
 
-			this.emotes = emoteList.map(i => CytubeClient.parseEmote(i));
+			this._emotes = emoteList.map(i => CytubeClient.parseEmote(i));
 		});
 
 		client.on("updateEmote", (emote) => {
-			const exists = this.emotes.find(i => i.name === emote.name);
+			const exists = this._emotes.find(i => i.name === emote.name);
 			if (!exists) {
 				const emoteData = CytubeClient.parseEmote(emote);
-				this.emotes.push(emoteData);
+				this._emotes.push(emoteData);
 			}
 			else {
 				exists.animated = Boolean(emote.image && emote.image.includes(".gif"));
@@ -276,16 +263,16 @@ class CytubeClient {
 		});
 
 		client.on("renameEmote", (emote) => {
-			const exists = this.emotes.find(i => i.name === emote.old);
+			const exists = this._emotes.find(i => i.name === emote.old);
 			if (exists) {
 				exists.name = emote.name;
 			}
 		});
 
 		client.on("removeEmote", (emote) => {
-			const index = this.emotes.findIndex(i => i.name === emote.namw);
+			const index = this._emotes.findIndex(i => i.name === emote.name);
 			if (index !== -1) {
-				this.emotes.splice(index, 1);
+				this._emotes.splice(index, 1);
 			}
 		});
 
@@ -298,17 +285,18 @@ class CytubeClient {
 				channel: this.channelData.Name
 			});
 		});
+
+		await client.connect();
 	}
 
 	/**
 	 * Handles the execution of a command and the reply should it be successful.
-	 * @param {string} command Command name - will be parsed
-	 * @param {string} user User who executed the command
-	 * @param {string[]} [args] Possible arguments for the command
-	 * @param {boolean} [replyIntoPM] If true, the command result will be sent via PM
-	 * @returns {Promise<void>}
+	 * @param command Command name - will be parsed
+	 * @param user User who executed the command
+	 * @param [args] Possible arguments for the command
+	 * @param [replyIntoPM] If true, the command result will be sent via PM
 	 */
-	async handleCommand (command, user, args = [], replyIntoPM) {
+	async handleCommand (command: string, user: User, args: string[] = [], replyIntoPM: boolean = false)  {
 		const channelData = this.channelData;
 		const userData = await sb.User.get(user, false);
 		const options = {
@@ -316,7 +304,7 @@ class CytubeClient {
 			privateMessage: Boolean(replyIntoPM)
 		};
 
-		const execution = await sb.Command.checkAndExecute(command, args, this.channelData, userData, options);
+		const execution = await Command.checkAndExecute(command, args, this.channelData, userData, options);
 		if (!execution || !execution.reply) {
 			return;
 		}
@@ -327,7 +315,7 @@ class CytubeClient {
 		}
 		else {
 			if (this.channelData.Mirror) {
-				await this.mirror(execution.reply, userData, {
+				await this.platform.mirror(execution.reply, userData, {
 					...commandOptions,
 					commandUsed: true
 				});
@@ -348,12 +336,11 @@ class CytubeClient {
 	 * Sends a message to current channel bound to this instance.
 	 * Works by splitting the message into 200 character chunks and sending them repeatedly in order.
 	 * This is done because (for whatever reason) Cytube implements a tiny character limit, at least compared to other clients.
-	 * @param {string} message
 	 */
-	async send (message) {
+	async send (message: string) {
 		const messageLimit = this.platform.messageLimit;
 		const lengthRegex = new RegExp(`.{1,${messageLimit}}`, "g");
-		let arr = message
+		let arr: string[] = message
 			.replaceAll(/(\r?\n)/g, " ")
 			.replaceAll(/\s{2,}/g, " ")
 			.match(lengthRegex) || ["<empty message>"];
@@ -376,24 +363,17 @@ class CytubeClient {
 
 	/**
 	 * Sends a private message in the context of current channel bound to this instance
-	 * @param {string} message Private message
-	 * @param {string} user User the private message will be sent to
+	 * @param message Private message
+	 * @param userData User the private message will be sent to
 	 */
-	async pm (message, user) {
-		const userData = await sb.User.get(user);
+	async pm (message: string, userData: User) {
 		this.client.pm({
 			msg: message,
 			to: userData.Name
 		});
 	}
 
-	/**
-	 * Queues a video.
-	 * @param {string} type
-	 * @param {string} videoID
-	 * @returns {Promise<void>}
-	 */
-	async queue (type, videoID) {
+	async queue (type: string, videoID: string) {
 		this.client.socket.emit("queue", {
 			id: videoID,
 			type,
@@ -406,58 +386,40 @@ class CytubeClient {
 
 	/**
 	 * Returns a list of currently present chatters/viewers.
-	 * @returns {string[]}
 	 */
-	fetchUserList () {
+	fetchUserList (): string[] {
 		return [...this.userMap.keys()];
 	}
 
-	restart () {
+	async restart () {
 		if (this.restarting) {
 			return;
 		}
 
 		this.restarting = true;
 
-		if (this.client) {
-			this.client.destroy();
-			this.client = null;
-		}
+		await this.client.connect();
+		await this.initialize();
 
-		this.initialize();
+		this.restarting = false;
 	}
 
 	destroy () {
 		this.client.destroy();
-		this.client = null;
-
 		this.userMap.clear();
-		this.playlistData = null;
-
-		this.platform = null;
 	}
 
-	static parseEmote (emote) {
+	get emotes () { return [...this._emotes]; }
+
+	static parseEmote (emote: EmoteObject): Emote {
 		return {
-			ID: null,
+			ID: emote.name,
 			name: emote.name,
 			type: "cytube",
 			global: false,
 			animated: Boolean(emote.image && emote.image.includes(".gif"))
 		};
 	}
-	/**
-	 * @typedef {Object} CytubeUserPresence
-	 * @property {string} name User name
-	 * @property {Object} meta
-	 * @property {boolean} meta.afk
-	 * @property {string[]} meta.aliases Any additional user name aliases
-	 * @property {boolean} meta.muted Mute flag
-	 * @property {boolean} meta.smuted Shadowmute flag
-	 * @property {Object} profile
-	 * @property {string} profile.image Link to user profile picture
-	 * @property {string} profile.text Any additional user profile description
-	 */
 }
 
 const DEFAULT_LOGGING_CONFIG = {
@@ -468,25 +430,42 @@ const DEFAULT_PLATFORM_CONFIG = {
 	messageDelayThreshold: 30000
 };
 
-export class CytubePlatform extends Template {
-	/** @type {Map<Channel, CytubeClient>} */
-	clients = new Map();
+interface CytubeConfig extends BaseConfig {
+	platform: {
+		messageDelayThreshold?: number;
+	};
+	logging: {
+		messages?: boolean;
+		whispers?: boolean;
+	};
+}
 
-	constructor (config) {
-		super("cytube", config, {
-			logging: DEFAULT_LOGGING_CONFIG,
-			platform: DEFAULT_PLATFORM_CONFIG
-		});
+export class CytubePlatform extends Platform<CytubeConfig> {
+	private readonly clients: Map<Channel["ID"], CytubeClient> = new Map();
+
+	constructor (config: CytubeConfig) {
+		const resultConfig = { ...config };
+		if (typeof resultConfig.logging.messages !== "boolean") {
+			resultConfig.logging.messages = DEFAULT_LOGGING_CONFIG.messages;
+		}
+		if (typeof resultConfig.logging.whispers !== "boolean") {
+			resultConfig.logging.whispers = DEFAULT_LOGGING_CONFIG.whispers;
+		}
+		if (typeof resultConfig.platform.messageDelayThreshold !== "number") {
+			resultConfig.platform.messageDelayThreshold = DEFAULT_PLATFORM_CONFIG.messageDelayThreshold;
+		}
+
+		super("cytube", resultConfig);
 	}
 
 	async connect () {
 		if (!process.env.CYTUBE_BOT_PASSWORD) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No Cytube account password configured (CYTUBE_BOT_PASSWORD)"
 			});
 		}
 
-		const eligibleChannels = sb.Channel.getJoinableForPlatform(this);
+		const eligibleChannels = Channel.getJoinableForPlatform(this);
 		const promises = [];
 		for (const channelData of eligibleChannels) {
 			promises.push(this.joinChannel(channelData));
@@ -497,13 +476,11 @@ export class CytubePlatform extends Template {
 
 	/**
 	 * Sends a message through a client specified by provided channel data.
-	 * @param {string} message
-	 * @param {Channel} channelData
 	 */
-	async send (message, channelData) {
+	async send (message: string, channelData: Channel) {
 		const client = this.clients.get(channelData.ID);
 		if (!client) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No client found for Cytube channel",
 				args: {
 					channelID: channelData.ID,
@@ -518,14 +495,11 @@ export class CytubePlatform extends Template {
 
 	/**
 	 * Sends a private message through a client specified by provided channel data.
-	 * @param {string} message Private message
-	 * @param {string} user User the private message will be sent to
-	 * @param {Channel} channelData
 	 */
-	async pm (message, user, channelData) {
+	async pm (message: string, user: User, channelData: Channel) {
 		const client = this.clients.get(channelData.ID);
 		if (!client) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No client found for Cytube channel",
 				args: {
 					channelID: channelData.ID,
@@ -548,7 +522,7 @@ export class CytubePlatform extends Template {
 	 * @param {Object} [options]
 	 * @param {boolean} [options.commandUsed] = false
 	 */
-	mirror (message, userData, channelData, options = {}) {
+	async mirror (message: string, userData: User, channelData: Channel, options: MirrorOptions = {}) {
 		if (userData && userData.Name === "[server]") {
 			return;
 		}
@@ -558,11 +532,10 @@ export class CytubePlatform extends Template {
 
 	/**
 	 * Joins a Cytube room.
-	 * @param {Channel} channelData
-	 * @returns {boolean} True if the channel was joined, false if it was joined before.
+	 * @returns True if the channel was joined, false if it was already joined before.
 	 */
-	async joinChannel (channelData) {
-		if (this.clients.has(channelData)) {
+	async joinChannel (channelData: Channel) {
+		if (this.clients.has(channelData.ID)) {
 			return false;
 		}
 
@@ -574,15 +547,10 @@ export class CytubePlatform extends Template {
 		return true;
 	}
 
-	/**
-	 * Fetches the userlist for a given cytube client.
-	 * @param {Channel} channelData
-	 * @returns {string[]}
-	 */
-	populateUserList (channelData) {
+	async populateUserList (channelData: Channel): Promise<string[]> {
 		const client = this.clients.get(channelData.ID);
 		if (!client) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No client found for Cytube channel",
 				args: {
 					channelID: channelData.ID,
@@ -594,10 +562,10 @@ export class CytubePlatform extends Template {
 		return client.fetchUserList();
 	}
 
-	async fetchChannelEmotes (channelData) {
+	async fetchChannelEmotes (channelData: Channel): Promise<Emote[]> {
 		const client = this.clients.get(channelData.ID);
 		if (!client) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No client found for Cytube channel",
 				args: {
 					channelID: channelData.ID,
@@ -609,13 +577,6 @@ export class CytubePlatform extends Template {
 		return client.emotes;
 	}
 
-	async populateGlobalEmotes () { return []; }
-	fetchInternalPlatformIDByUsername (userData) { return userData.Name; }
-	fetchUsernameByUserPlatformID (userPlatformId) { return userPlatformId; }
-
-	/**
-	 * Destroys and cleans up the instance
-	 */
 	destroy () {
 		for (const client of this.clients.values()) {
 			client.destroy();
@@ -623,6 +584,14 @@ export class CytubePlatform extends Template {
 
 		this.clients.clear();
 	}
+
+	async populateGlobalEmotes () { return []; }
+	fetchInternalPlatformIDByUsername (userData: User) { return userData.Name; }
+	async fetchUsernameByUserPlatformID (userPlatformId: string) { return userPlatformId; }
+	async createUserMention (userData: User) { return userData.Name; }
+	initListeners () {}
+	isChannelLive () { return null; }
+	isUserChannelOwner () { return null; }
 }
 
 export default CytubePlatform;
