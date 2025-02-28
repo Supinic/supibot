@@ -5,7 +5,7 @@ import { Channel, Like as ChannelLike } from "./channel.js";
 import { User } from "./user.js";
 
 import { Platform } from "../platforms/template.js";
-import { Message, SimpleGenericData, XOR } from "../@types/globals.js";
+import type { Message, SimpleGenericData, XOR } from "../@types/globals.d.ts";
 
 type ConstructorData = Pick<ChatModule, "Name" | "Events" | "Global" | "Code"> & {
 	Platform: Platform["ID"];

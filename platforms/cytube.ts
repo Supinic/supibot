@@ -1,7 +1,8 @@
 import { SupiDate, SupiError } from "supi-core";
 import { CytubeConnector, EmoteObject, UserObject, QueueObject, VideoObject } from "cytube-connector"
 
-import { sb } from "../@types/globals.js";
+// @todo figure this out
+import { sb } from "../@types/globals.d.ts";
 
 import { Platform, BaseConfig, MirrorOptions } from "./template.js";
 import type { AwayFromKeyboard } from "../classes/afk.js"

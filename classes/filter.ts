@@ -5,7 +5,7 @@ import { Channel, privateMessageChannelSymbol } from "./channel.js";
 import User from "./user.js";
 import type Platform from "../platforms/template.js";
 import type { Command } from "./command.js";
-import { XOR } from "../@types/globals.js";
+import type { XOR } from "../@types/globals.d.ts";
 
 export type Type =
 	"Blacklist" | "Whitelist" | "Opt-out" | "Block" | "Unping" | "Unmention" |

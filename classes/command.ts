@@ -178,15 +178,17 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		const channelData = options.channel ?? this.channel;
 		const platformData = options.platform ?? this.platform;
 
-		const promises = [
-			userData?.getDataProperty("administrator"),
-			channelData?.isUserAmbassador(userData)
+		const promises: (Promise<boolean | null> | null)[] = [
+			userData.getDataProperty("administrator") as Promise<boolean | null>
 		];
+		if (channelData) {
+			promises.push(channelData.isUserAmbassador(userData));
+		}
 		if (platformData && userData && channelData) {
 			promises.push(platformData.isUserChannelOwner(channelData, userData));
 		}
 
-		const data = await Promise.all(promises) as [boolean | undefined, boolean | undefined, boolean | undefined];
+		const data = await Promise.all(promises);
 		const flags = {
 			administrator: (data[0] === true),
 			ambassador: Boolean(data[1]),

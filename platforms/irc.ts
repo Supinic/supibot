@@ -1,11 +1,13 @@
 // @ts-ignore Module has no @types repository associated with it. Will use local interface as definition
 import IRC from "irc-framework";
 import { EventEmitter } from "node:events";
+import { SupiError } from "supi-core";
+
+import { sb } from "../@types/globals.d.ts";
 
 import { Platform, BaseConfig, PrepareMessageOptions, PlatformVerification } from "./template.js";
 import { User, Like as UserLike } from "../classes/user.js";
 import { Channel, Like as ChannelLike } from "../classes/channel.js";
-import { SupiError } from "supi-core";
 import { Command } from "../classes/command.js";
 
 const DEFAULT_LOGGING_CONFIG = {
@@ -78,17 +80,17 @@ export class IrcPlatform extends Platform<IrcConfig> {
 		super("irc", resultConfig);
 
 		if (!this.host) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Invalid IRC configuration - missing host"
 			});
 		}
 		else if (!this.selfName) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Invalid IRC configuration - missing bot's selfName"
 			});
 		}
 		else if (!this.config.url) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Invalid IRC configuration - missing url"
 			});
 		}
@@ -117,7 +119,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 				const { envVariable, user } = authentication;
 				const key = process.env[envVariable];
 				if (!key) {
-					throw new sb.Error({
+					throw new SupiError({
 						message: "No IRC identification configured",
 						args: { envVariable }
 					});
@@ -187,6 +189,10 @@ export class IrcPlatform extends Platform<IrcConfig> {
 			...options,
 			skipLengthCheck: true
 		});
+
+		if (!preparedMessage) {
+			return false;
+		}
 
 		const limit = (this.messageLimit * 2) - (options.extraLength ?? 0);
 		return sb.Utils.wrapString(preparedMessage, limit);
@@ -339,6 +345,10 @@ export class IrcPlatform extends Platform<IrcConfig> {
 				skipBanphrases: true
 			});
 
+			if (!message) {
+				return;
+			}
+
 			await this.pm(message, userData.Name);
 		}
 		else if (channelData) {
@@ -380,13 +390,13 @@ export class IrcPlatform extends Platform<IrcConfig> {
 	async fetchChannelEmotes () { return []; }
 
 	fetchInternalPlatformIDByUsername (): never {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "IRC does not support user platform ID lookup by username"
 		});
 	}
 
 	fetchUsernameByUserPlatformID (): never {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "IRC does not support username lookup by user platform ID"
 		});
 	}
