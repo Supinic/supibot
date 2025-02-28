@@ -1,10 +1,14 @@
-import { CytubeConnector, EmoteObject, UserObject, QueueObject, VideoObject } from "cytube-connector";
+import { SupiDate, SupiError } from "supi-core";
+import { CytubeConnector, EmoteObject, UserObject, QueueObject, VideoObject } from "cytube-connector"
+
+import { sb } from "../@types/globals.js";
 
 import { Platform, BaseConfig, MirrorOptions } from "./template.js";
-import { Channel, Emote } from "../classes/channel.js";
-import User from "../classes/user.js";
-import { SupiDate, SupiError } from "supi-core";
-import { Command } from "../classes/command.js";
+import type { AwayFromKeyboard } from "../classes/afk.js"
+import type { Channel, Emote } from "../classes/channel.js";
+import type { Command } from "../classes/command.js";
+import type { Reminder } from "../classes/reminder.js";
+import type { User } from "../classes/user.js";
 
 type PlaylistObject = VideoObject | {
 	media: VideoObject["media"];
@@ -92,7 +96,7 @@ class CytubeClient {
 				return; // Ignore if the result message becomes empty string (HTML issues, seemingly)
 			}
 
-			const userData = await User.get(data.username, false);
+			const userData = await sb.User.get(data.username, false);
 			const platformUserData = (data.username === "[server]")
 				? { rank: -1 }
 				: this.userMap.get(data.username);
@@ -122,7 +126,10 @@ class CytubeClient {
 			// Only unset AFK and fire reminders if the message wasn't private
 			if (!data.meta.private) {
 				// Do not process mirrored messages
-				const identifiers = Platform.getList().map(i => i.mirrorIdentifier);
+				const identifiers = (<typeof Platform>sb.Platform).getList()
+					.map(i => i.mirrorIdentifier)
+					.filter(Boolean) as string[];
+
 				if (originalUsername === this.platform.selfName && identifiers.some(i => msg.startsWith(i))) {
 					return;
 				}
@@ -304,18 +311,18 @@ class CytubeClient {
 			privateMessage: Boolean(replyIntoPM)
 		};
 
-		const execution = await Command.checkAndExecute(command, args, this.channelData, userData, options);
+		const execution = await sb.Command.checkAndExecute(command, args, this.channelData, userData, options);
 		if (!execution || !execution.reply) {
 			return;
 		}
 
 		const commandOptions = sb.Command.extractMetaResultProperties(execution);
 		if (execution.replyWithPrivateMessage || replyIntoPM) {
-			await this.pm(execution.reply, userData.Name);
+			await this.pm(execution.reply, userData);
 		}
 		else {
 			if (this.channelData.Mirror) {
-				await this.platform.mirror(execution.reply, userData, {
+				await this.platform.mirror(execution.reply, userData, this.channelData, {
 					...commandOptions,
 					commandUsed: true
 				});
@@ -465,7 +472,7 @@ export class CytubePlatform extends Platform<CytubeConfig> {
 			});
 		}
 
-		const eligibleChannels = Channel.getJoinableForPlatform(this);
+		const eligibleChannels = sb.Channel.getJoinableForPlatform(this);
 		const promises = [];
 		for (const channelData of eligibleChannels) {
 			promises.push(this.joinChannel(channelData));

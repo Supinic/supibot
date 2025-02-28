@@ -461,7 +461,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		}
 	}
 
-	public static getList () {
+	public static getList (): Platform[] {
 		return [...Platform.list];
 	}
 
