@@ -1,4 +1,4 @@
-import { SupiDate } from "supi-core";
+import { SupiDate, SupiError } from "supi-core";
 import type { CacheValue, Batch, Recordset, Row } from "supi-core";
 import { TemplateWithIdString, getGenericDataProperty, setGenericDataProperty } from "./template.js";
 import type { GenericDataPropertyObject } from "./template.js";
@@ -10,8 +10,12 @@ type ConstructorData = {
 	Name: User["Name"];
 	Twitch_ID: User["Twitch_ID"];
 	Discord_ID: User["Discord_ID"];
-	Started_Using: User["Started_Using"] | null;
+	Started_Using: User["Started_Using"] | number | null;
 };
+type UserCacheData = ConstructorData & {
+	Started_Using: number | null;
+};
+
 type GenericFetchData = GenericDataPropertyObject<User>["options"];
 type GetOptions = Partial<Pick<ConstructorData, "Twitch_ID" | "Discord_ID">>;
 
@@ -73,9 +77,10 @@ export class User extends TemplateWithIdString {
 		this.Discord_ID = data.Discord_ID;
 		this.Twitch_ID = data.Twitch_ID;
 		this.Name = data.Name;
+
 		this.Started_Using = (data.Started_Using === null)
-			? new sb.Date(data.Started_Using)
-			: data.Started_Using;
+			? new SupiDate()
+			: new SupiDate(data.Started_Using);
 	}
 
 	getCacheKey () {
@@ -83,7 +88,7 @@ export class User extends TemplateWithIdString {
 	}
 
 	async saveProperty<T extends keyof ConstructorData> (property: T, value: this[T]) {
-		const row: Row = await sb.Query.getRow("chat_data", "User_Alias");
+		const row: Row = await sb.Query.getRow<ConstructorData>("chat_data", "User_Alias");
 		await row.load(this.ID);
 
 		await super.saveRowProperty(row, property, value, this);
@@ -117,6 +122,16 @@ export class User extends TemplateWithIdString {
 		});
 	}
 
+	getCacheProperties (): UserCacheData {
+		return {
+			ID: this.ID,
+			Name: this.Name,
+			Twitch_ID: this.Twitch_ID,
+			Discord_ID: this.Discord_ID,
+			Started_Using: this.Started_Using.valueOf()
+		};
+	}
+
 	destroy () {}
 
 	static async get (identifier: Like, strict: false, options?: GetOptions): Promise<User>;
@@ -131,13 +146,13 @@ export class User extends TemplateWithIdString {
 				return mapCacheUser;
 			}
 
-			const name = await sb.Query.getRecordset((rs: Recordset) => rs
+			const name = await sb.Query.getRecordset<string | undefined>(rs => rs
 				.select("Name")
 				.from("chat_data", "User_Alias")
 				.where("ID = %n", identifier)
 				.single()
 				.flat("Name")
-			) as string | undefined;
+			);
 
 			if (!name) {
 				return null;
@@ -167,12 +182,12 @@ export class User extends TemplateWithIdString {
 			}
 
 			// 3. attempt to get the user out of the database
-			const dbUserData = await sb.Query.getRecordset((rs: Recordset) => rs
+			const dbUserData = await sb.Query.getRecordset<ConstructorData | undefined>(rs => rs
 				.select("*")
 				.from("chat_data", "User_Alias")
 				.where("Name = %s", username)
 				.single()
-			) as ConstructorData | undefined;
+			);
 
 			let userData;
 			if (dbUserData) {
@@ -245,9 +260,8 @@ export class User extends TemplateWithIdString {
 		}
 
 		if (toFetch.length > 0) {
-			// @todo remove type casts when Utils is well-known
 			const [strings, numbers] = sb.Utils.splitByCondition(toFetch, (i: string | number) => typeof i === "string") as [string[], number[]];
-			const fetched = await sb.Query.getRecordset((rs: Recordset) => {
+			const fetched = await sb.Query.getRecordset<ConstructorData[]>(rs => {
 				rs.select("*");
 				rs.from("chat_data", "User_Alias");
 
@@ -260,7 +274,9 @@ export class User extends TemplateWithIdString {
 				else if (numbers.length > 0) {
 					rs.where("ID IN %n+", numbers);
 				}
-			}) as ConstructorData[];
+
+				return rs;
+			});
 
 			const cachePromises = [];
 			for (const rawUserData of fetched) {
@@ -320,14 +336,14 @@ export class User extends TemplateWithIdString {
 		}
 		else {
 			const promise = (async () => {
-				const existingName = await sb.Query.getRecordset((rs: Recordset) => rs
+				const existingName = await sb.Query.getRecordset<string | undefined>(rs => rs
 					.select("Name")
 					.from("chat_data", "User_Alias")
 					.where("Name = %s", preparedName)
 					.limit(1)
 					.flat("Name")
 					.single()
-				) as string | undefined;
+				);
 
 				if (existingName) {
 					User.pendingNewUsers.delete(preparedName);
@@ -343,7 +359,7 @@ export class User extends TemplateWithIdString {
 	}
 
 	static async #add (name: string, properties: GetOptions) {
-		const row = await sb.Query.getRow("chat_data", "User_Alias");
+		const row = await sb.Query.getRow<ConstructorData>("chat_data", "User_Alias");
 		row.values.Name = name;
 
 		if (properties.Twitch_ID) {
@@ -370,8 +386,8 @@ export class User extends TemplateWithIdString {
 			User.data.set(user.Name, user);
 		}
 
-		if (sb.Cache && sb.Cache.ready) {
-			await sb.Cache.setByPrefix(user.getCacheKey(), user, {
+		if (sb.Cache.ready) {
+			await sb.Cache.setByPrefix(user.getCacheKey(), user.getCacheProperties(), {
 				expiry: User.redisCacheExpiration
 			});
 		}
@@ -379,7 +395,7 @@ export class User extends TemplateWithIdString {
 
 	static async createFromCache (options: NameObject) {
 		const key = User.createCacheKey(options);
-		const cacheData = await sb.Cache.getByPrefix(key) as ConstructorData | undefined;
+		const cacheData = await sb.Cache.getByPrefix(key) as UserCacheData | undefined;
 		if (!cacheData) {
 			return null;
 		}
@@ -403,7 +419,7 @@ export class User extends TemplateWithIdString {
 	static createCacheKey (options: NameObject = {}) {
 		const name = options.name ?? options.Name;
 		if (typeof name !== "string") {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "User name for Cache must be a string",
 				args: options
 			});

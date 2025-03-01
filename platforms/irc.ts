@@ -3,8 +3,6 @@ import IRC from "irc-framework";
 import { EventEmitter } from "node:events";
 import { SupiError } from "supi-core";
 
-import { sb } from "../@types/globals.d.ts";
-
 import { Platform, BaseConfig, PrepareMessageOptions, PlatformVerification } from "./template.js";
 import { User, Like as UserLike } from "../classes/user.js";
 import { Channel, Like as ChannelLike } from "../classes/channel.js";
@@ -252,7 +250,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 			return;
 		}
 
-		let channelData = null;
+		let channelData: Channel | null = null;
 		if (!isPrivateMessage) {
 			channelData = sb.Channel.get(event.target, this);
 
@@ -263,7 +261,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 				return;
 			}
 
-			await this.resolveUserMessage(channelData, userData, message);
+			this.resolveUserMessage(channelData, userData, message);
 
 			if (channelData.Logging.has("Meta")) {
 				await sb.Logger.updateLastSeen({

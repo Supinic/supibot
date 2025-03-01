@@ -1,10 +1,10 @@
-import { SupiDate, SupiError, isGenericRequestError, isGotRequestError,  } from "supi-core"
+import { SupiDate, SupiError, isGenericRequestError, isGotRequestError, Counter, } from "supi-core"
 import type { Query, MetricConfiguration, MetricType } from "supi-core";
 
 import { TemplateWithoutId, TemplateDefinition } from "./template.js";
 
 import Banphrase from "./banphrase.js";
-import Filter from "./filter.js";
+import { Filter, ExecuteResult as FilterExecuteResult } from "./filter.js";
 import User from "./user.js";
 import { Channel, privateMessageChannelSymbol, type Emote } from "./channel.js";
 import { Platform, type GetEmoteOptions } from "../platforms/template.js";
@@ -16,18 +16,6 @@ import config from "../config.json" with { type: "json" };
 
 const COMMAND_PREFIX = config.modules.commands.prefix;
 const LINEAR_REGEX_FLAG = "--enable-experimental-regexp-engine";
-
-// @todo move to Filter
-type FilterExecuteSuccess = {
-	success: true;
-}
-type FilterExecuteFailure = {
-	success: false;
-	reason: string;
-	filter: Filter;
-	reply: string | null;
-};
-type FilterExecuteResult = FilterExecuteSuccess | FilterExecuteFailure;
 
 type QueryTransaction = Awaited<ReturnType<Query["getTransaction"]>>;
 
@@ -210,7 +198,7 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 			flag,
 			is: (type: keyof typeof User.permissions): boolean => {
 				if (!User.permissions[type]) {
-					throw new sb.Error({
+					throw new SupiError({
 						message: "Invalid user permission type provided"
 					});
 				}
@@ -235,7 +223,7 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 
 	async randomEmote <T extends string> (...inputEmotes: T[]): Promise<T> {
 		if (inputEmotes.length < 2) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "At least two emotes are required"
 			});
 		}
@@ -414,6 +402,7 @@ export class Command extends TemplateWithoutId {
 		const metricLabel = `supibot_command_${this.Name}_${label}`;
 		const metricOptions = {
 			...options,
+			help: options.help ?? "Unnamed command metric",
 			name: metricLabel
 		};
 
@@ -534,7 +523,7 @@ export class Command extends TemplateWithoutId {
 			return { success: false, reason: "no-command" };
 		}
 
-		const metric = sb.Metrics.get("supibot_command_executions_total");
+		const metric = sb.Metrics.get("supibot_command_executions_total") as Counter; // Always defined
 
 		// Check for cooldowns, return if it did not pass yet.
 		// If skipPending flag is set, do not check for pending status.
@@ -569,7 +558,7 @@ export class Command extends TemplateWithoutId {
 			const sourceName = channelData?.Name ?? `${options.platform.Name} PMs`;
 			Command.#cooldownManager.setPending(
 				userData.ID,
-				`You have a pending command: "${identifier}" used in "${sourceName}" at ${new sb.Date().sqlDateTime()}`
+				`You have a pending command: "${identifier}" used in "${sourceName}" at ${new SupiDate().sqlDateTime()}`
 			);
 		}
 
@@ -611,7 +600,7 @@ export class Command extends TemplateWithoutId {
 			}
 		}
 
-		const filterData: FilterExecuteResult = await Filter.execute({
+		const filterData = await Filter.execute({
 			user: userData,
 			command,
 			invocation: identifier,
@@ -619,7 +608,7 @@ export class Command extends TemplateWithoutId {
 			platform: channelData?.Platform ?? null,
 			targetUser: args[0] ?? null,
 			args: args ?? []
-		}) as FilterExecuteResult; /* @todo remove after Filter is in Typescript */
+		});
 
 		const isFilterGlobalBan = Boolean(
 			!filterData.success
@@ -652,8 +641,9 @@ export class Command extends TemplateWithoutId {
 				Command.#cooldownManager.set(channelID, userData.ID, command.Name, length);
 			}
 
-			if (filterData.filter.Response === "Reason" && typeof filterData.reply === "string") {
-				const { string } = await Banphrase.execute(filterData.reply, channelData);
+			const { filter, reply } = filterData;
+			if (filter instanceof Filter && filter.Response === "Reason" && reply !== null) {
+				const { string } = await Banphrase.execute(reply, channelData);
 				filterData.reply = string;
 			}
 
@@ -701,7 +691,7 @@ export class Command extends TemplateWithoutId {
 				User_Alias: userData.ID,
 				Command: command.Name,
 				Platform: options.platform.ID,
-				Executed: new sb.Date(),
+				Executed: new SupiDate(),
 				Channel: channelData?.ID ?? null,
 				Success: true,
 				Invocation: identifier,
@@ -724,7 +714,7 @@ export class Command extends TemplateWithoutId {
 				result: "error"
 			});
 
-			let origin = "Internal";
+			let origin: "Internal" | "External" = "Internal";
 			let errorContext: Record<string, string> = {};
 			const loggingContext = {
 				user: userData.ID,
@@ -817,7 +807,7 @@ export class Command extends TemplateWithoutId {
 
 		if (Array.isArray(execution.partialReplies)) {
 			if (execution.partialReplies.some(i => i && i.constructor !== Object)) {
-				throw new sb.Error({
+				throw new SupiError({
 					message: "If set, partialReplies must be an Array of Objects"
 				});
 			}
@@ -1054,6 +1044,9 @@ export class Command extends TemplateWithoutId {
 
 			case "regex": {
 				const regex = sb.Utils.parseRegExp(value);
+				if (!regex) {
+					return null;
+				}
 
 				// Make sure user input regexes are executable in linear time and therefore are not evil.
 				// Only executed if the V8 flag is passed to Node.

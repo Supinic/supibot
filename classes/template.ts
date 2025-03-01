@@ -1,4 +1,6 @@
-import type { CacheValue, KeyObject, Recordset, Row, JavascriptValue as RowValue, Query, SupiDate } from "supi-core";
+import type { CacheValue, KeyObject, Row, JavascriptValue as RowValue, Query } from "supi-core";
+import { SupiDate, SupiError } from "supi-core";
+
 type PoolConnection = Awaited<ReturnType<Query["getTransaction"]>>;
 
 type KeyLike = string | Record<string, string>;
@@ -49,9 +51,9 @@ export const getGenericDataProperty = async <T extends TemplateWithId>(inputData
 		return cache.get(propertyName);
 	}
 
-	const { transaction = null } = options;
-	const data = await sb.Query.getRecordset(
-		(rs: Recordset) => rs
+	const rsOptions = (options.transaction) ? { transaction: options.transaction } : {};
+	const data = await sb.Query.getRecordset<GenericDataPropertyResult | undefined>(
+		rs => rs
 			.select("Property", "Value")
 			.select("Custom_Data_Property.Type AS Type", "Custom_Data_Property.Cached AS Cached")
 			.from("chat_data", databaseTable)
@@ -63,16 +65,16 @@ export const getGenericDataProperty = async <T extends TemplateWithId>(inputData
 			.where("Property = %s", propertyName)
 			.limit(1)
 			.single(),
-		{ transaction }
-	) as GenericDataPropertyResult | undefined;
+		rsOptions
+	);
 
 	if (!data) {
 		return;
 	}
 	else if (!data.Type) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "No type is associated with self variable",
-			args: { options, property: propertyName }
+			args: { property: propertyName }
 		});
 	}
 
@@ -91,7 +93,7 @@ export const getGenericDataProperty = async <T extends TemplateWithId>(inputData
 			break;
 
 		case "date":
-			value = new sb.Date(data.Value);
+			value = new SupiDate(data.Value);
 			break;
 
 		case "array":
@@ -130,25 +132,25 @@ export const setGenericDataProperty = async <T extends TemplateWithId>(self: T, 
 		value
 	} = inputData;
 
-	const { transaction = null } = options;
-	const propertyData = await sb.Query.getRecordset(
-		(rs: Recordset) => rs
+	const transactionOptions = (options.transaction) ? { transaction: options.transaction } : {};
+	const propertyData = await sb.Query.getRecordset<SetGenericDataPropertyResult>(
+		rs => rs
 			.select("Type", "Cached")
 			.from("chat_data", "Custom_Data_Property")
 			.where("Name = %s", propertyName)
 			.limit(1)
 			.single(),
-		{ transaction }
-	) as SetGenericDataPropertyResult;
+		transactionOptions
+	);
 
 	if (!propertyData.Type) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "Data property has no type associated with it",
-			args: { options, propertyName, propertyData }
+			args: { propertyName, propertyData }
 		});
 	}
 
-	const row = await sb.Query.getRow("chat_data", databaseTable, { transaction });
+	const row = await sb.Query.getRow("chat_data", databaseTable, transactionOptions);
 	await row.load({
 		[databaseProperty]: self.ID,
 		Property: propertyName
@@ -176,8 +178,8 @@ export const setGenericDataProperty = async <T extends TemplateWithId>(self: T, 
 			cacheMap.set(instance, new Map());
 		}
 
-		const instanceCache = cacheMap.get(instance) as Map<string, GenericDataPropertyValue>; // Type known because of condition above
-		instanceCache.set(propertyName, value) ;
+		const instanceCache = cacheMap.get(instance);
+		instanceCache!.set(propertyName, value); // Type known because of condition above
 	}
 
 	await row.save({ skipLoad: true });
@@ -203,7 +205,7 @@ abstract class Template {
 
 	async setCacheData (key: KeyLike, value: CacheValue, options: SetCacheOptions = {}) {
 		if (typeof value === "undefined") {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Value must be passed to cache"
 			});
 		}
@@ -220,16 +222,16 @@ abstract class Template {
 
 	async saveRowProperty<T extends keyof this> (row: Row, property: T, value: this[T] | undefined, self: this) {
 		if (!row.hasProperty(property as string)) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Row does not have provided property",
 				args: {
-					property,
+					property: property as string,
 					properties: Object.keys(row.valuesObject)
 				}
 			});
 		}
 		else if (!row.loaded) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Row must be loaded before any properties can be saved"
 			});
 		}
@@ -260,7 +262,7 @@ abstract class Template {
 	 * @abstract
 	 */
 	static async loadData () {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "loadData method must be implemented in module",
 			args: {
 				name: this.name
@@ -277,7 +279,7 @@ abstract class Template {
 	 * @abstract
 	 */
 	static importSpecific (...definitions: TemplateDefinition[]): Promise<Template[]> {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "This method must be implemented by derived classes"
 		});
 	}
@@ -287,7 +289,7 @@ abstract class Template {
 	//  * @todo reinstate in typescript
 	//  */
 	// static async get () {
-	// 	throw new sb.Error({
+	// 	throw new SupiError({
 	// 		message: "get method must be implemented in module"
 	// 	});
 	// }

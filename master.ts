@@ -1,4 +1,5 @@
-import * as core from "supi-core";
+import * as supiCore from "supi-core";
+
 import config from "./config.json" with { type: "json" };
 import initializeInternalApi from "./api/index.js";
 
@@ -15,12 +16,64 @@ import Banphrase from "./classes/banphrase.js";
 import Channel from "./classes/channel.js";
 import Reminder from "./classes/reminder.js";
 import ChatModule from "./classes/chat-module.js";
+import VLCSingleton from "./singletons/vlc-connector.js";
 
 import Logger from "./singletons/logger.js";
 import VLCConnector from "./singletons/vlc-connector.js";
-import Platform from "./platforms/template.js";
+import { Platform } from "./platforms/template.js";
 
-const populateModuleDefinitions = async (module, definitions, config) => {
+type PopulateOptions = {
+	blacklist?: string[];
+	whitelist?: string[];
+	disableAll?: boolean;
+};
+interface IdentifiableModule {
+	name: string;
+	Name: string;
+}
+interface ImportableModule<T> {
+	name: string;
+	importData: (definitions: T[]) => Promise<void>;
+}
+
+interface GlobalSb {
+	Date: typeof supiCore.SupiDate;
+	Error: typeof supiCore.SupiError;
+	Promise: typeof supiCore.SupiPromise;
+	Got: typeof supiCore.Got;
+
+	Metrics: supiCore.Metrics;
+	Cache: supiCore.Cache;
+	Query: supiCore.Query;
+	Utils: supiCore.Utils;
+
+	API: ReturnType<typeof initializeInternalApi>;
+	AwayFromKeyboard: typeof AwayFromKeyboard;
+	Banphrase: typeof Banphrase;
+	Channel: typeof Channel;
+	ChatModule: typeof ChatModule;
+	Command: typeof Command;
+	Filter: typeof Filter;
+	Logger: Logger;
+	Platform: typeof Platform;
+	Reminder: typeof Reminder;
+	User: typeof User;
+	VideoLANConnector: typeof VLCSingleton;
+}
+interface GlobalCore {
+	Got: typeof supiCore.Got;
+	Metrics: supiCore.Metrics;
+	Cache: supiCore.Cache;
+	Query: supiCore.Query;
+	Utils: supiCore.Utils;
+}
+
+declare global {
+	var sb: GlobalSb;
+	var core: GlobalCore;
+}
+
+const populateModuleDefinitions = async <T> (definitions: T[], config: PopulateOptions) => {
 	const {
 		disableAll = true,
 		whitelist = [],
@@ -35,7 +88,7 @@ const populateModuleDefinitions = async (module, definitions, config) => {
 		return;
 	}
 
-	const identifier = (module === sb.Got) ? "name" : "Name";
+	const identifier = (module === supiCore.Got) ? "name" : "Name";
 	let definitionsToLoad = definitions;
 	if (blacklist.length > 0) {
 		definitionsToLoad = definitions.filter(i => !blacklist.includes(i[identifier]));
@@ -44,10 +97,10 @@ const populateModuleDefinitions = async (module, definitions, config) => {
 		definitionsToLoad = definitions.filter(i => whitelist.includes(i[identifier]));
 	}
 
-	await module.importData(definitionsToLoad);
+	return definitionsToLoad;
 };
 
-const connectToPlatform = async (platform) => {
+const connectToPlatform = async (platform: Platform) => {
 	console.time(`Platform connect: ${platform.name}`);
 	await platform.connect();
 	console.timeEnd(`Platform connect: ${platform.name}`);
@@ -58,7 +111,7 @@ const MODULE_INITIALIZE_ORDER = [
 	[Filter, Command, User, AwayFromKeyboard, Banphrase, Channel, Reminder],
 	// Second batch - depends on Channel
 	[ChatModule]
-];
+] as const;
 
 const platformsConfig = config.platforms;
 if (!platformsConfig || platformsConfig.length === 0) {
@@ -68,28 +121,41 @@ if (!platformsConfig || platformsConfig.length === 0) {
 console.groupCollapsed("Initialize timers");
 console.time("supi-core");
 
-const Query = new core.Query({
-	user: process.env.MARIA_USER,
-	password: process.env.MARIA_PASSWORD,
-	host: process.env.MARIA_HOST,
-	connectionLimit: process.env.MARIA_CONNECTION_LIMIT
-});
+if (!process.env.MARIA_USER || !process.env.MARIA_PASSWORD || !process.env.MARIA_HOST) {
+	throw new Error("Missing database connection configuration");
+}
+if (!process.env.REDIS_CONFIGURATION) {
+	throw new Error("Missing Redis connection configuration");
+}
 
+globalThis.core = {
+	Got: supiCore.Got,
+	Metrics: new supiCore.Metrics(),
+	Cache: new supiCore.Cache(process.env.REDIS_CONFIGURATION),
+	Query: new supiCore.Query({
+		user: process.env.MARIA_USER,
+		password: process.env.MARIA_PASSWORD,
+		host: process.env.MARIA_HOST,
+		connectionLimit: (process.env.MARIA_CONNECTION_LIMIT) ? Number(process.env.MARIA_CONNECTION_LIMIT) : null
+	}),
+	Utils: new supiCore.Utils()
+};
+/** @ts-ignore Assignment is partial due to legacy globals split */
 globalThis.sb = {
-	Date: core.Date,
-	Error: core.Error,
-	Promise: core.Promise,
-	Got: core.Got,
+	Date: supiCore.Date,
+	Error: supiCore.Error,
+	Promise: supiCore.Promise,
+	Got: supiCore.Got,
 
-	Query,
-	Cache: new core.Cache(process.env.REDIS_CONFIGURATION),
-	Metrics: new core.Metrics(),
-	Utils: new core.Utils()
+	get Query () { return core.Query; },
+	get Cache () { return core.Cache; },
+	get Metrics () { return core.Metrics; },
+	get Utils () { return core.Utils; }
 };
 
 console.timeEnd("supi-core");
 
-const platforms = new Set();
+const platforms: Set<Platform> = new Set();
 for (const definition of platformsConfig) {
 	const platform = await Platform.create(definition.type, definition);
 	if (platform) {
@@ -139,7 +205,7 @@ console.time("chat modules");
 await Promise.all([
 	populateModuleDefinitions(Command, commandDefinitions, config.modules.commands),
 	populateModuleDefinitions(ChatModule, chatModuleDefinitions, config.modules["chat-modules"]),
-	populateModuleDefinitions(core.Got, gotDefinitions, config.modules.gots)
+	populateModuleDefinitions(supiCore.Got, gotDefinitions, config.modules.gots)
 ]);
 
 console.timeEnd("chat modules");

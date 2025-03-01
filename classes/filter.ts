@@ -64,16 +64,22 @@ type UnpingContextOptions = LocalsOptions & {
 	executor: User | null;
 };
 
-type ExecuteFailure = {
+type ExecuteFailureGeneral = {
 	success: false,
 	reason: string;
 	reply: string | null;
-	filter: Filter | { Reason: Filter["Reason"]; };
+	filter: Filter
+};
+type ExecuteFailureWhitelist = {
+	success: false,
+	reason: "whitelist",
+	filter: { Reason: "Reply" },
+	reply: string;
 };
 type ExecuteSuccess = {
 	success: true;
-}
-type ExecuteResult = ExecuteFailure | ExecuteSuccess;
+};
+export type ExecuteResult = ExecuteFailureGeneral | ExecuteFailureWhitelist | ExecuteSuccess;
 
 export const isCooldownData = (input: Filter["Data"]): input is CooldownData => {
 	if (!input || Array.isArray(input)) {
@@ -211,7 +217,7 @@ export class Filter extends TemplateWithId {
 			}
 		}
 
-		throw new sb.Error({
+		throw new SupiError({
 			message: "Invalid combination of input data and filter type",
 			args: {
 				filterType: this.Type,
@@ -344,14 +350,15 @@ export class Filter extends TemplateWithId {
 
 	async toggle () {
 		this.Active = !this.Active;
-		const row = await sb.Query.getRow("chat_data", "Filter");
+		const row = await sb.Query.getRow<ConstructorData>("chat_data", "Filter");
 		await row.load(this.ID);
+
 		row.values.Active = this.Active;
 		await row.save();
 	}
 
 	async saveProperty (property: keyof this, value?: this[keyof Filter]) {
-		const row = await sb.Query.getRow("chat_data", "Filter");
+		const row = await sb.Query.getRow<ConstructorData>("chat_data", "Filter");
 		await row.load(this.ID);
 
 		await super.saveRowProperty(row, property, value, this);
@@ -370,10 +377,10 @@ export class Filter extends TemplateWithId {
 	}
 
 	static async loadData () {
-		const data = await sb.Query.getRecordset((rs: Recordset) => rs
+		const data = await sb.Query.getRecordset<ConstructorData[]>(rs => rs
 			.select("*")
 			.from("chat_data", "Filter")
-		) as ConstructorData[];
+		);
 
 		for (const definition of data) {
 			const instance = new Filter(definition);
@@ -580,8 +587,9 @@ export class Filter extends TemplateWithId {
 					reply = "No commands can be executed in this channel.";
 				}
 				else {
-					throw new sb.Error({
-						message: "Unrecognized filter configuration", args: blacklist
+					throw new SupiError({
+						message: "Unrecognized filter configuration",
+						args: { ID: blacklist.ID }
 					});
 				}
 			}
@@ -648,7 +656,7 @@ export class Filter extends TemplateWithId {
 			Issued_By: options.Issued_By
 		};
 
-		const row = await sb.Query.getRow("chat_data", "Filter");
+		const row = await sb.Query.getRow<ConstructorData>("chat_data", "Filter");
 		row.setValues(data);
 		await row.save();
 
@@ -750,7 +758,7 @@ export class Filter extends TemplateWithId {
 		}
 
 		const promises = list.map(async (ID) => {
-			const row = await sb.Query.getRow("chat_data", "Filter");
+			const row = await sb.Query.getRow<ConstructorData>("chat_data", "Filter");
 			await row.load(ID);
 
 			const existingFilter = Filter.data.get(ID);

@@ -1,4 +1,4 @@
-import { SupiError, SupiPromise } from "supi-core";
+import { Counter, SupiError, SupiPromise } from "supi-core";
 
 import { User, Like as UserLike } from "../classes/user.js";
 import { Channel, Emote, Like as ChannelLike } from "../classes/channel.js";
@@ -10,15 +10,14 @@ const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 export type Like = Platform | number | string;
 export interface BaseConfig {
 	ID: number;
-	name: string;
 	host?: string | null;
 	messageLimit: number;
 	selfId: string | null;
 	selfName: string;
-	mirrorIdentifier: string | null;
 	active: boolean;
 	platform: unknown;
 	logging: unknown;
+	mirrorIdentifier?: string | null;
 }
 
 export type PrepareMessageOptions = {
@@ -52,8 +51,9 @@ type MessageAwaiterOptions = { timeout?: number; };
 export type GenericSendOptions = Record<string, unknown>;
 
 export abstract class Platform <T extends BaseConfig = BaseConfig> {
+	public readonly name: string;
+
 	public readonly ID: T["ID"];
-	public readonly name: T["name"];
 	public readonly host: T["host"];
 	public readonly messageLimit: T["messageLimit"];
 	public readonly selfId: T["selfId"];
@@ -61,7 +61,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	public readonly mirrorIdentifier: T["mirrorIdentifier"];
 	protected readonly platform: T["platform"];
 	public readonly logging: T["logging"];
-	protected readonly active: T["active"];
+	public readonly active: T["active"];
 
 	public readonly supportsMeAction = false;
 	public readonly dynamicChannelAddition = false;
@@ -77,12 +77,12 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		this.ID = config.ID;
 
 		if (!this.ID) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Platform ID must be configured"
 			});
 		}
 		else if (!Number.isInteger(this.ID)) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Platform ID must be an integer"
 			});
 		}
@@ -106,14 +106,14 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 
 	private checkConfig () {
 		if (!this.selfName) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Invalid Platform property: selfName",
 				args: { id: this.id, name: this.name, selfName: this.selfName }
 			});
 		}
 
 		if (!Number.isInteger(this.messageLimit) || this.messageLimit <= 0) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Invalid Platform property: messageLimit",
 				args: { id: this.id, name: this.name, messageLimit: this.messageLimit }
 			});
@@ -121,7 +121,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	}
 
 	protected abstract initListeners (): void;
-	protected abstract connect (): Promise<void>;
+	public abstract connect (): Promise<void>;
 	public abstract send (message: string, channel: ChannelLike, options?: GenericSendOptions): Promise<void>;
 	public abstract pm (message: string, user: UserLike, channel?: ChannelLike): Promise<void>;
 	public abstract isUserChannelOwner (channelData: Channel, userData: User): Promise<boolean> | null;
@@ -155,7 +155,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 			channel = channelData.Name;
 		}
 
-		const metric = sb.Metrics.get(`supibot_messages_${type}_total`);
+		const metric = sb.Metrics.get(`supibot_messages_${type}_total`) as Counter | undefined;
 		if (!metric) {
 			return;
 		}
@@ -186,7 +186,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		}
 
 		if (userMap.has(userData.ID)) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "User already has a pending promise in the provided channel!"
 			});
 		}
@@ -370,7 +370,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 			}
 		}
 
-		let resultMessage = sb.Utils.wrapString(message, limit, {
+		let resultMessage: string | null = sb.Utils.wrapString(message, limit, {
 			keepWhitespace: Boolean(options.keepWhitespace)
 		});
 
@@ -450,7 +450,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 			}
 			else {
 				if (eligible.length > 1) {
-					throw new sb.Error({
+					throw new SupiError({
 						message: "Ambiguous platform name - use host as second parameter",
 						args: { identifier }
 					});

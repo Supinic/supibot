@@ -18,6 +18,8 @@ type Type = "Reminder" | "Pingme" | "Deferred";
 type ConstructorData = Pick<Reminder, "ID" | "User_From" | "User_To" | "Channel" | "Text" | "Created" | "Schedule" | "Private_Message" | "Type"> & {
 	Platform: number;
 };
+type HistoryConstructorData = ConstructorData & { Cancelled: boolean; };
+
 type CreateData = Omit<ConstructorData, "ID">;
 type CreateResult = {
 	success: boolean;
@@ -129,7 +131,7 @@ export class Reminder extends TemplateWithId {
 		if (!this.Schedule || this.Type === "Deferred") {
 			return this;
 		}
-		else if (new sb.Date() > this.Schedule) {
+		else if (new SupiDate() > this.Schedule) {
 			void this.deactivate(true, false);
 			return this;
 		}
@@ -168,7 +170,7 @@ export class Reminder extends TemplateWithId {
 					User_To: toUserData.ID,
 					Platform: channelData.Platform.ID,
 					Channel: channelData.ID,
-					Created: new sb.Date(),
+					Created: new SupiDate(),
 					Schedule: null,
 					Type: "Reminder",
 					Text: `You got a scheduled reminder (ID ${this.ID}) while you were AFK: ${message}`,
@@ -182,7 +184,7 @@ export class Reminder extends TemplateWithId {
 				}
 				else {
 					if (!channelData) {
-						throw new sb.Error({
+						throw new SupiError({
 							message: "Cannot post a non-private reminder in an unspecified channel!",
 							args: {
 								reminderID: this.ID
@@ -286,12 +288,12 @@ export class Reminder extends TemplateWithId {
 	}
 
 	static async loadData () {
-		const data = await sb.Query.getRecordset((rs: Recordset) => rs
+		const data = await sb.Query.getRecordset<ConstructorData[]>(rs => rs
 			.select("*")
 			.from("chat_data", "Reminder")
-		) as ConstructorData[];
+		);
 
-		const threshold = new sb.Date().addYears(10).valueOf();
+		const threshold = new SupiDate().addYears(10).valueOf();
 		for (const row of data) {
 			// Skip scheduled reminders that are set to fire more than `threshold` in the future
 			if (row.Schedule && row.Schedule.valueOf() > threshold) {
@@ -319,7 +321,7 @@ export class Reminder extends TemplateWithId {
 		}
 
 		const promises = list.map(async (ID) => {
-			const row = await sb.Query.getRow("chat_data", "Reminder");
+			const row = await sb.Query.getRow<ConstructorData>("chat_data", "Reminder");
 			await row.load(ID, true);
 
 			await Reminder.#remove(ID);
@@ -388,13 +390,13 @@ export class Reminder extends TemplateWithId {
 			}
 		}
 
-		const row = await sb.Query.getRow("chat_data", "Reminder");
+		const row = await sb.Query.getRow<ConstructorData>("chat_data", "Reminder");
 		row.setValues({
 			User_From: data.User_From,
 			User_To: data.User_To,
 			Channel: data.Channel ?? null,
 			Text: data.Text ?? null,
-			Created: new sb.Date(),
+			Created: new SupiDate(),
 			Schedule: data.Schedule ?? null,
 			Private_Message: data.Private_Message ?? false,
 			Platform: data.Platform,
@@ -439,10 +441,10 @@ export class Reminder extends TemplateWithId {
 			channel: channelData
 		});
 
-		const now = sb.Date.now();
+		const now = SupiDate.now();
 		const reminders = list.filter(i => (
 			!i.deactivated
-			&& ((i.Type === "Deferred" && i.Schedule && i.Schedule <= now) || (i.Type !== "Deferred" && !i.Schedule))
+			&& ((i.Type === "Deferred" && i.Schedule && i.Schedule.valueOf() <= now) || (i.Type !== "Deferred" && !i.Schedule))
 			&& !excludedUserIDs.includes(i.User_From)
 		));
 
@@ -713,20 +715,20 @@ export class Reminder extends TemplateWithId {
 	static async checkLimits (userFrom: User["ID"], userTo: User["ID"], schedule: Reminder["Schedule"], type: Type = "Reminder"): Promise<LimitCheckResult> {
 		type Item = { Private_Message: Reminder["Private_Message"]; };
 		const [incomingData, outgoingData] = await Promise.all([
-			sb.Query.getRecordset((rs: Recordset) => rs
+			sb.Query.getRecordset<Item[]>(rs => rs
 				.select("Private_Message")
 				.from("chat_data", "Reminder")
 				.where("(Type = %s AND Schedule IS NULL) OR (Type = %s AND Schedule IS NOT NULL)", "Reminder", "Deferred")
 				.where("User_To = %n", userTo)
 			),
-			sb.Query.getRecordset((rs: Recordset) => rs
+			sb.Query.getRecordset<Item[]>(rs => rs
 				.select("Private_Message")
 				.from("chat_data", "Reminder")
 				.where("Schedule IS NULL")
 				.where("(Type = %s AND Schedule IS NULL) OR (Type = %s AND Schedule IS NOT NULL)", "Reminder", "Deferred")
 				.where("User_From = %n", userFrom)
 			)
-		]) as [Item[], Item[]];
+		]);
 
 		const incomingLimit = config.values.maxIncomingActiveReminders;
 		const outgoingLimit = config.values.maxOutgoingActiveReminders;
@@ -763,7 +765,7 @@ export class Reminder extends TemplateWithId {
 			const outgoingScheduledLimit = config.values.maxOutgoingScheduledReminders;
 
 			const [scheduledIncoming, scheduledOutgoing] = await Promise.all([
-				sb.Query.getRecordset((rs: Recordset) => rs
+				sb.Query.getRecordset<number>(rs => rs
 					.select("COUNT(*) AS Count")
 					.from("chat_data", "Reminder")
 					.where("Schedule IS NOT NULL")
@@ -776,7 +778,7 @@ export class Reminder extends TemplateWithId {
 					.single()
 					.flat("Count")
 				),
-				sb.Query.getRecordset((rs: Recordset) => rs
+				sb.Query.getRecordset<number>(rs => rs
 					.select("COUNT(*) AS Count")
 					.from("chat_data", "Reminder")
 					.where("Schedule IS NOT NULL")
@@ -789,7 +791,7 @@ export class Reminder extends TemplateWithId {
 					.single()
 					.flat("Count")
 				)
-			]) as [number, number];
+			]);
 
 			if (scheduledIncoming >= incomingScheduledLimit) {
 				return {
@@ -806,7 +808,7 @@ export class Reminder extends TemplateWithId {
 		}
 
 		if (type === "Pingme") {
-			const existingPingmeReminderID = await sb.Query.getRecordset((rs: Recordset) => rs
+			const existingPingmeReminderID = await sb.Query.getRecordset<number | undefined>(rs => rs
 				.select("ID")
 				.from("chat_data", "Reminder")
 				.where("Type = %s", "Pingme")
@@ -814,7 +816,7 @@ export class Reminder extends TemplateWithId {
 				.where("User_To = %n", userTo)
 				.flat("ID")
 				.single()
-			) as number | undefined;
+			);
 
 			if (existingPingmeReminderID) {
 				return {
@@ -851,10 +853,6 @@ export class Reminder extends TemplateWithId {
 		return link;
 	}
 
-	/**
-	 * @private
-	 * @param {Reminder} reminder
-	 */
 	static #add (reminder: Reminder) {
 		if (!Reminder.data.has(reminder.User_To)) {
 			Reminder.data.set(reminder.User_To, []);
@@ -877,11 +875,11 @@ export class Reminder extends TemplateWithId {
 	static async #remove (ID: Reminder["ID"], options: { cancelled?: boolean; permanent?: boolean; } = {}) {
 		const { cancelled, permanent } = options;
 		if (permanent) {
-			const row = await sb.Query.getRow("chat_data", "Reminder");
+			const row = await sb.Query.getRow<ConstructorData>("chat_data", "Reminder");
 			await row.load(ID, true);
 
 			if (row.loaded) {
-				const historyRow = await sb.Query.getRow("chat_data", "Reminder_History");
+				const historyRow = await sb.Query.getRow<HistoryConstructorData>("chat_data", "Reminder_History");
 
 				historyRow.setValues({
 					ID,

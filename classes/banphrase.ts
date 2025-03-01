@@ -49,16 +49,30 @@ type PajbotResponse = PajbotFailure | PajbotSuccess;
 
 type ExternalApiResponse = PajbotResponse & {
 	[apiResultSymbol]: boolean;
-	[apiDataSymbol]: Record<string, string | number | null> | undefined;
+	[apiDataSymbol]: Record<string, string | number | boolean | null> | undefined;
 };
 type ExecuteOptions = {
 	skipBanphraseAPI?: boolean;
 };
-type ExecuteResult = {
-	string: string | null;
-	passed: boolean;
+type BanphraseExecuteSuccess = {
+	passed: true;
+	string: string;
 	warn?: boolean;
 	privateMessage?: boolean;
+};
+type BanphraseExecuteFailure = {
+	passed: false;
+	string: string | null;
+	warn?: boolean;
+};
+type BanphraseExecuteResult = BanphraseExecuteFailure | BanphraseExecuteSuccess;
+
+type BanphraseApiDenialLog = {
+	Channel: Channel["ID"];
+	Platform: Platform["ID"];
+	API: NonNullable<Channel["Banphrase_API_URL"]>;
+	Message: string,
+	Response: string;
 };
 
 type ExternalExecuteOptions = {
@@ -70,7 +84,7 @@ class ExternalBanphraseAPI {
 	static async pajbot (message: string, url: string) {
 		message = message.trim().replaceAll(/\s+/g, " ");
 
-		const response = await sb.Got.get("GenericAPI")({
+		const response = await sb.Got.get("GenericAPI")<PajbotResponse>({
 			method: "POST",
 			url: `https://${url}/api/v1/banphrases/test`,
 			json: { message },
@@ -91,9 +105,9 @@ class ExternalBanphraseAPI {
 
 		const { body } = response;
 		const data: ExternalApiResponse = {
-			...body as PajbotResponse,
+			...body,
 			[apiResultSymbol]: Boolean(body.banned ? body.banphrase_data.phrase : false),
-			[apiDataSymbol]: body.banphrase_data
+			[apiDataSymbol]: (body.banned) ? body.banphrase_data : undefined
 		};
 
 		return data;
@@ -123,7 +137,7 @@ export class Banphrase extends TemplateWithId {
 
 		this.Code = eval(data.Code);
 		if (typeof this.Code !== "function") {
-			throw new sb.Error({
+			throw new SupiError({
 				message: `Banphrase ID ${this.ID} code must be a function`
 			});
 		}
@@ -161,12 +175,12 @@ export class Banphrase extends TemplateWithId {
 	}
 
 	static async loadData () {
-		const data = await sb.Query.getRecordset((rs: Recordset) => rs
+		const data = await sb.Query.getRecordset<ConstructorData[]>(rs => rs
 			.select("Banphrase.*")
 			.from("chat_data", "Banphrase")
 			.where("Type <> %s", "Inactive")
 			.orderBy("Priority DESC")
-		) as ConstructorData[];
+		);
 
 		for (const record of data) {
 			const banphrase = new Banphrase(record);
@@ -180,7 +194,7 @@ export class Banphrase extends TemplateWithId {
 		}
 
 		const promises = list.map(async (ID) => {
-			const row = await sb.Query.getRow("chat_data", "Banphrase");
+			const row = await sb.Query.getRow<ConstructorData>("chat_data", "Banphrase");
 			await row.load(ID);
 
 			const existing = Banphrase.data.get(ID);
@@ -211,7 +225,7 @@ export class Banphrase extends TemplateWithId {
 		}
 	}
 
-	static async execute (message: string, channelData: Channel | null, options: ExecuteOptions = {}): Promise<ExecuteResult> {
+	static async execute (message: string, channelData: Channel | null, options: ExecuteOptions = {}): Promise<BanphraseExecuteResult> {
 		let resultMessage = message;
 		const channelId = channelData?.ID ?? null;
 		const platformId = channelData?.Platform.ID ?? null;
@@ -268,7 +282,7 @@ export class Banphrase extends TemplateWithId {
 			response = responseData[apiResultSymbol];
 
 			if (response !== false) { // @todo platform-specific logging flag
-				const row = await sb.Query.getRow("chat_data", "Banphrase_API_Denial_Log");
+				const row = await sb.Query.getRow<BanphraseApiDenialLog>("chat_data", "Banphrase_API_Denial_Log");
 				row.setValues({
 					API: channelData.Banphrase_API_URL,
 					Channel: channelData.ID,
@@ -288,8 +302,7 @@ export class Banphrase extends TemplateWithId {
 			await sb.Logger.log(
 				"System.Warning",
 				`Banphrase API fail - code: ${e.code ?? "N/A"}, message: ${e.message ?? "N/A"}`,
-				channelData,
-				null
+				channelData
 			);
 
 			switch (channelData.Banphrase_API_Downtime) {

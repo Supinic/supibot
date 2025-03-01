@@ -625,7 +625,7 @@ export const parseGenericFilterOptions = async (
 				reply: `Command ${commandName} does not exist!`
 			};
 		}
-		if (options.requiredCommandFlag && options.requiredCommandFlagResponse && !commandData.Flags[options.requiredCommandFlag]) {
+		if (options.requiredCommandFlag && options.requiredCommandFlagResponse && !commandData.Flags.includes(options.requiredCommandFlag)) {
 			return {
 				success: false,
 				reply: options.requiredCommandFlagResponse

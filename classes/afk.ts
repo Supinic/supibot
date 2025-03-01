@@ -1,5 +1,5 @@
 import { SupiDate, SupiError } from "supi-core";
-import type { Recordset, Row, RecordUpdater, Counter, Gauge } from "supi-core";
+import type { Row, RecordUpdater, Counter, Gauge } from "supi-core";
 
 import { TemplateWithId } from "./template.js";
 
@@ -24,15 +24,17 @@ const durationStatuses = responses.duration as Partial<Record<Status, DurationSt
 const NO_TEXT_AFK = "(no message)" as const;
 const DEFAULT_AFK_STATUS = "afk" as const;
 
-type AfkConstructorData = {
+type ConstructorData = {
 	ID: AwayFromKeyboard["ID"];
 	User_Alias: AwayFromKeyboard["User_Alias"];
 	Started: AwayFromKeyboard["Started"];
-	Text: AwayFromKeyboard["Text"];
+	Text: AwayFromKeyboard["Text"] | null;
 	Silent?: AwayFromKeyboard["Silent"];
 	Status?: AwayFromKeyboard["Status"];
 };
-type NewAfkData = AfkConstructorData & {
+type DatabaseConstructorData = ConstructorData & { Active: boolean; };
+
+type NewAfkData = ConstructorData & {
 	Interrupted_ID?: AwayFromKeyboard["ID"];
 };
 
@@ -50,13 +52,13 @@ export class AwayFromKeyboard extends TemplateWithId {
 	static #activeGauge: Gauge;
 	static #totalCounter: Counter;
 
-	constructor (data: AfkConstructorData) {
+	constructor (data: ConstructorData) {
 		super();
 
 		this.ID = data.ID;
 		this.User_Alias = data.User_Alias;
 		this.Started = data.Started;
-		this.Text = data.Text;
+		this.Text = data.Text ?? "(no message)";
 		this.Silent = data.Silent ?? false;
 		this.Status = data.Status ?? DEFAULT_AFK_STATUS;
 	}
@@ -91,11 +93,11 @@ export class AwayFromKeyboard extends TemplateWithId {
 	}
 
 	static async loadData () {
-		const data = await sb.Query.getRecordset((rs: Recordset) => rs
+		const data = await sb.Query.getRecordset<ConstructorData[]>(rs => rs
 			.select("*")
 			.from("chat_data", "AFK")
 			.where("Active = %b", true)
-		) as AfkConstructorData[];
+		);
 
 		for (const record of data) {
 			const afk = new AwayFromKeyboard(record);
@@ -115,7 +117,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 		const values = [...AwayFromKeyboard.data.values()];
 
 		const promises = list.map(async (ID) => {
-			const row = await sb.Query.getRow("chat_data", "AFK");
+			const row = await sb.Query.getRow<DatabaseConstructorData>("chat_data", "AFK");
 			await row.load(ID);
 
 			const existing = values.find(i => i.ID === ID);
@@ -158,7 +160,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 		let statusMessage;
 		const status = data.Status ?? DEFAULT_AFK_STATUS; // Fallback for old AFKs without `Status` property
 		if (durationStatuses[status]) {
-			const minutesDelta = (sb.Date.now() - data.Started.getTime()) / 60_000;
+			const minutesDelta = (SupiDate.now() - data.Started.getTime()) / 60_000;
 			const durationDefinitions = durationStatuses[status];
 
 			for (const definition of durationDefinitions) {
@@ -248,9 +250,9 @@ export class AwayFromKeyboard extends TemplateWithId {
 			Started: data.Started ?? now,
 			Status: data.Status ?? "afk",
 			Interrupted_ID: data.Interrupted_ID ?? null
-		};
+		} as const;
 
-		const row: Row = await sb.Query.getRow("chat_data", "AFK"); // @todo Remove Row cast when Query is well-known
+		const row = await sb.Query.getRow<ConstructorData>("chat_data", "AFK");
 		row.setValues(afkData);
 
 		await row.save({ skipLoad: false });

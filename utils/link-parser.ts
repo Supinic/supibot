@@ -20,7 +20,7 @@ export default async () => {
 			console.debug("Link parser: Skipping YouTube setup (API_GOOGLE_YOUTUBE)");
 		}
 
-		const soundcloudClientId = await sb.Cache.getByPrefix(SOUNDCLOUD_CLIENT_ID) ?? process.env.SOUNDCLOUD_CLIENT_ID;
+		const soundcloudClientId = (await sb.Cache.getByPrefix(SOUNDCLOUD_CLIENT_ID) ?? process.env.SOUNDCLOUD_CLIENT_ID) as string | undefined;
 		if (soundcloudClientId) {
 			options.soundcloud = {
 				key: soundcloudClientId
