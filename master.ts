@@ -5,36 +5,29 @@ import initializeInternalApi from "./api/index.js";
 
 import commandDefinitions from "./commands/index.js";
 import chatModuleDefinitions from "./chat-modules/index.js";
-import gotDefinitions from "./gots/index.js";
+import { definitions as gotDefinitions, GotDefinition } from "./gots/index.js";
 import initializeCrons from "./crons/index.js";
 
 import Filter from "./classes/filter.js";
-import { Command } from "./classes/command.js";
+import { Command, CommandDefinition } from "./classes/command.js";
 import User from "./classes/user.js";
 import AwayFromKeyboard from "./classes/afk.js";
 import Banphrase from "./classes/banphrase.js";
 import Channel from "./classes/channel.js";
 import Reminder from "./classes/reminder.js";
-import ChatModule from "./classes/chat-module.js";
+import { ChatModule, ChatModuleDefinition } from "./classes/chat-module.js";
 import VLCSingleton from "./singletons/vlc-connector.js";
 
 import Logger from "./singletons/logger.js";
 import VLCConnector from "./singletons/vlc-connector.js";
 import { Platform } from "./platforms/template.js";
+import { GotInstanceDefinition } from "supi-core";
 
 type PopulateOptions = {
 	blacklist?: string[];
 	whitelist?: string[];
 	disableAll?: boolean;
 };
-interface IdentifiableModule {
-	name: string;
-	Name: string;
-}
-interface ImportableModule<T> {
-	name: string;
-	importData: (definitions: T[]) => Promise<void>;
-}
 
 interface GlobalSb {
 	Date: typeof supiCore.SupiDate;
@@ -73,7 +66,11 @@ declare global {
 	var core: GlobalCore;
 }
 
-const populateModuleDefinitions = async <T> (definitions: T[], config: PopulateOptions) => {
+function filterModuleDefinitions <T extends "name" | "Name", U extends { [K in T]: string; }> (
+	property: T,
+	definitions: U[],
+	config: PopulateOptions
+): U[] {
 	const {
 		disableAll = true,
 		whitelist = [],
@@ -81,24 +78,16 @@ const populateModuleDefinitions = async <T> (definitions: T[], config: PopulateO
 	} = config;
 
 	if (whitelist.length > 0 && blacklist.length > 0) {
-		throw new Error(`Cannot combine blacklist and whitelist for ${module.name}`);
+		throw new Error(`Cannot combine blacklist and whitelist`);
 	}
 	else if (disableAll) {
-		console.warn(`Module ${module.name} is disabled - will not load`);
-		return;
+		return [];
 	}
 
-	const identifier = (module === supiCore.Got) ? "name" : "Name";
-	let definitionsToLoad = definitions;
-	if (blacklist.length > 0) {
-		definitionsToLoad = definitions.filter(i => !blacklist.includes(i[identifier]));
-	}
-	else if (whitelist.length > 0) {
-		definitionsToLoad = definitions.filter(i => whitelist.includes(i[identifier]));
-	}
-
-	return definitionsToLoad;
-};
+	return (blacklist.length > 0)
+		? definitions.filter(i => !blacklist.includes(i[property]))
+		: definitions.filter(i => whitelist.includes(i[property]));
+}
 
 const connectToPlatform = async (platform: Platform) => {
 	console.time(`Platform connect: ${platform.name}`);
@@ -202,10 +191,11 @@ globalThis.sb = {
 console.timeEnd("basic bot modules");
 console.time("chat modules");
 
+supiCore.Got.importData(filterModuleDefinitions("name", gotDefinitions as GotInstanceDefinition[], config.modules.gots));
+
 await Promise.all([
-	populateModuleDefinitions(Command, commandDefinitions, config.modules.commands),
-	populateModuleDefinitions(ChatModule, chatModuleDefinitions, config.modules["chat-modules"]),
-	populateModuleDefinitions(supiCore.Got, gotDefinitions, config.modules.gots)
+	Command.importData(filterModuleDefinitions("Name", commandDefinitions as CommandDefinition[], config.modules.commands)),
+	ChatModule.importData(filterModuleDefinitions("Name", chatModuleDefinitions as ChatModuleDefinition[], config.modules["chat-modules"])),
 ]);
 
 console.timeEnd("chat modules");

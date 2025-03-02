@@ -845,13 +845,15 @@ export class Command extends TemplateWithoutId {
 
 			const isPrivateReply = (execution.replyWithPrivateMessage === true);
 			const channelTarget = (isPrivateReply) ? null : channelData;
-			const { passed, privateMessage, string } = await Banphrase.execute(messageSlice, channelTarget);
+
+			const banphraseResult = await Banphrase.execute(messageSlice, channelTarget);
+			const { passed, string } = banphraseResult;
 
 			execution.reply = string;
 
 			const hasPrivateFlag = (typeof execution.replyWithPrivateMessage === "boolean");
-			if (!hasPrivateFlag && typeof privateMessage === "boolean") {
-				execution.replyWithPrivateMessage = privateMessage;
+			if (banphraseResult.passed && !hasPrivateFlag && typeof banphraseResult.privateMessage === "boolean") {
+				execution.replyWithPrivateMessage = banphraseResult.privateMessage;
 			}
 
 			if (command.Flags.includes("rollback") && context.transaction) {

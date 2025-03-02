@@ -3,8 +3,10 @@ import { SupiError } from "supi-core";
 import { isArgumentsData } from "../../classes/filter.js";
 import type { Filter, CreateData as FilterCreateData, DbArgumentDescriptor, Type as FilterType } from "../../classes/filter.js";
 import type { Context, CommandDefinition, StrictResult } from "../../classes/command.js";
+import type { Channel } from "../../classes/channel.js";
+import type { User } from "../../classes/user.js";
 
-const AVAILABLE_BAN_FILTER_TYPES: FilterType[] = [
+const AVAILABLE_BAN_FILTER_TYPES: string[] = [
 	"Arguments",
 	"Blacklist",
 	"Cooldown",
@@ -18,6 +20,10 @@ const NO_RESPONSE_FILTER_TYPES: Set<FilterType> = new Set([
 	"Online-only",
 	"Offline-only"
 ]);
+
+const isFilterType = (input: string): input is FilterType => {
+	return AVAILABLE_BAN_FILTER_TYPES.includes(input);
+}
 
 const paramsDefinition = [
 	{ name: "all", type: "boolean" },
@@ -33,7 +39,7 @@ const paramsDefinition = [
 	{ name: "user", type: "string" }
 ] as const;
 
-const definition: CommandDefinition = {
+export default {
 	Name: "ban",
 	Aliases: ["unban"],
 	Cooldown: 5000,
@@ -44,7 +50,7 @@ const definition: CommandDefinition = {
 	Code: (async function ban (context: Context<typeof paramsDefinition>): Promise<StrictResult> {
 		const { invocation } = context;
 		const type = sb.Utils.capitalize(context.params.type ?? "Blacklist");
-		if (!AVAILABLE_BAN_FILTER_TYPES.includes(type)) {
+		if (!isFilterType(type)) {
 			return {
 				success: false,
 				reply: `Invalid ban filter type provided! Use one of ${AVAILABLE_BAN_FILTER_TYPES.join(", ")}`
@@ -216,12 +222,22 @@ const definition: CommandDefinition = {
 			};
 		}
 
+		let channelData: Channel | null = null;
+		if (options.Channel) {
+			channelData = sb.Channel.get(options.Channel);
+		}
+
+		let userData: User | null = null;
+		if (options.User_Alias) {
+			userData = await sb.User.get(options.User_Alias);
+		}
+
 		const [existing] = sb.Filter.getLocals(type, {
-			channel: options.Channel,
+			channel: channelData,
+			user: userData,
 			command: options.Command,
 			invocation: options.Invocation,
-			user: options.User_Alias
-		}) as Filter[];
+		});
 
 		if (existing) {
 			if (existing.Issued_By !== context.user.ID && !isAdmin) {
@@ -538,6 +554,5 @@ const definition: CommandDefinition = {
 			""
 		];
 	})
-};
+} satisfies CommandDefinition;
 
-export default definition;

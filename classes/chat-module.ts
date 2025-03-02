@@ -7,8 +7,8 @@ import { User } from "./user.js";
 import { Platform } from "../platforms/template.js";
 import type { Message, SimpleGenericData, XOR } from "../@types/globals.d.ts";
 
-export type ConstructorData = Pick<ChatModule, "Name" | "Events" | "Global" | "Code"> & {
-	Platform: Platform["ID"];
+export type ChatModuleDefinition = Pick<ChatModule, "Name" | "Events" | "Global" | "Code"> & {
+	Platform: Platform["ID"] | null;
 };
 
 export type Event = "message" | "online" | "offline" | "raid" | "subscription";
@@ -45,7 +45,7 @@ type DetachOptions = AttachOptions & {
 	remove: boolean;
 };
 
-export default class ChatModule extends TemplateWithoutId {
+export class ChatModule extends TemplateWithoutId {
 	readonly Name: string;
 	readonly Events: string[];
 	readonly Active: boolean = true;
@@ -60,7 +60,7 @@ export default class ChatModule extends TemplateWithoutId {
 	static importable = true;
 	static uniqueIdentifier = "Name";
 
-	constructor (data: ConstructorData) {
+	constructor (data: ChatModuleDefinition) {
 		super();
 
 		this.Name = data.Name;
@@ -250,7 +250,7 @@ export default class ChatModule extends TemplateWithoutId {
 		return;
 	}
 
-	static async importData (definitions: ConstructorData[]) {
+	static async importData (definitions: ChatModuleDefinition[]) {
 		const attachmentData = await ChatModule.#fetch();
 		for (const definition of definitions) {
 			const chatModule = new ChatModule(definition);
@@ -261,7 +261,7 @@ export default class ChatModule extends TemplateWithoutId {
 		}
 	}
 
-	static async importSpecific (...definitions: ConstructorData[]): Promise<ChatModule[]> {
+	static async importSpecific (...definitions: ChatModuleDefinition[]): Promise<ChatModule[]> {
 		if (definitions.length === 0) {
 			return [];
 		}
@@ -416,4 +416,6 @@ export default class ChatModule extends TemplateWithoutId {
 			chatModule.destroy();
 		}
 	}
-};
+}
+
+export default ChatModule;

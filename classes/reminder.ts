@@ -832,7 +832,8 @@ export class Reminder extends TemplateWithId {
 	}
 
 	static async createRelayLink (endpoint: string, params: string) {
-		const relay = await sb.Got.get("Supinic")({
+		type RelayResponse = { data: { link: string; }; };
+		const relay = await sb.Got.get("Supinic")<RelayResponse>({
 			method: "POST",
 			url: "relay",
 			throwHttpErrors: false,

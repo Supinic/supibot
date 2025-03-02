@@ -1,6 +1,7 @@
 import { CustomEventDefinition } from "../generic-event.js";
 
 import cacheKeys from "../../../utils/shared-cache-keys.json" with { type: "json" };
+import { SupiDate } from "supi-core";
 const { LATEST_NODE_JS_VERSION } = cacheKeys;
 
 type GithubRepoResponse = {
@@ -34,7 +35,7 @@ export default {
 			return;
 		}
 
-		const data = response.body.sort((a, b) => new sb.Date(b.created_at) - new sb.Date(a.created_at));
+		const data = response.body.sort((a, b) => new SupiDate(b.created_at).valueOf() - new SupiDate(a.created_at).valueOf());
 		const latest = data[0];
 
 		const latestCacheVersion = await sb.Cache.getByPrefix(LATEST_NODE_JS_VERSION);
@@ -44,7 +45,7 @@ export default {
 
 		await sb.Cache.setByPrefix(LATEST_NODE_JS_VERSION, latest.tag_name);
 
-		const releaseDate = new sb.Date(latest.created_at).format("Y-m-d H:i");
+		const releaseDate = new SupiDate(latest.created_at).format("Y-m-d H:i");
 		return {
 			message: sb.Utils.tag.trim `
 				New Node.js version detected! 

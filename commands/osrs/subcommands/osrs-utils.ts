@@ -45,20 +45,12 @@ type FetchData = {
 };
 
 type FetchSuccess = {
-	ok: true;
-	statusCode: 200;
-	body: {
-		data: FetchData;
-		error: null;
-	};
+	data: FetchData;
+	error: null;
 };
 type FetchFailure = {
-	ok: false;
-	statusCode: 404 | 502 | 503;
-	body: {
-		data: null;
-		error: { message: string; };
-	};
+	data: null;
+	error: { message: string; };
 };
 type FetchResult = FetchSuccess | FetchFailure;
 
@@ -101,7 +93,7 @@ interface Context {
 export const OSRS_GAME_USERNAME_KEY = "osrsGameUsername";
 
 export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
-	let data: GameWorlds | null = await sb.Cache.getByPrefix("osrs-worlds-data");
+	let data = await sb.Cache.getByPrefix("osrs-worlds-data") as GameWorlds | null;
 	if (!data) {
 		const response = await sb.Got.get("FakeAgent")({
 			url: "https://oldschool.runescape.com/slu",
@@ -150,54 +142,59 @@ export const fetchUserData = async (user: string, options: FetchOptions = {}): P
 		? `osrs-user-data-${user}`
 		: `osrs-user-data-${user}-seasonal`;
 
-	let data: FetchData | null = (options.force)
-		? null
-		: await sb.Cache.getByPrefix(key);
-
-	if (!data) {
-		let response: FetchResult;
-		if (!options.seasonal) {
-			response = await sb.Got.get("Supinic")({
-				url: `osrs/lookup/${user}`
-			}) as FetchResult;
+	if (!options.force) {
+		const cacheData = await sb.Cache.getByPrefix(key) as FetchData | null;
+		if (cacheData) {
+			return {
+				success: true,
+				data: cacheData
+			};
 		}
-		else {
-			response = await sb.Got.get("Supinic")({
-				url: `osrs/lookup/${user}`,
-				searchParams: {
-					seasonal: "1"
-				}
-			});
-		}
+	}
 
-		if (!response.ok) {
-			if (response.statusCode === 404) {
-				return {
-					success: false,
-					reply: `No data found for player name "${user}"!`
-				};
-			}
-			else if (response.statusCode === 502 || response.statusCode === 503) {
-				const { message } = response.body.error;
-				return {
-					success: false,
-					reply: `Could not reach the OSRS API: ${response.statusCode} ${message}`
-				};
-			}
-			else {
-				const { message } = response.body.error;
-				return {
-					success: false,
-					reply: `Supinic OSRS API has failed: ${response.statusCode} ${message}`
-				};
-			}
-		}
-
-		data = response.body.data;
-		await sb.Cache.setByPrefix(key, data, {
-			expiry: 600_000
+	let response;
+	if (!options.seasonal) {
+		response = await sb.Got.get("Supinic")<FetchResult>({
+			url: `osrs/lookup/${user}`
 		});
 	}
+	else {
+		response = await sb.Got.get("Supinic")<FetchResult>({
+			url: `osrs/lookup/${user}`,
+			searchParams: {
+				seasonal: "1"
+			}
+		});
+	}
+
+	const { body, ok, statusCode } = response;
+	if (!ok && body.error) {
+		if (statusCode === 404) {
+			return {
+				success: false,
+				reply: `No data found for player name "${user}"!`
+			};
+		}
+		else if (statusCode === 502 || statusCode === 503) {
+			const { message } = body.error;
+			return {
+				success: false,
+				reply: `Could not reach the OSRS API: ${statusCode} ${message}`
+			};
+		}
+		else {
+			const { message } = body.error;
+			return {
+				success: false,
+				reply: `Supinic OSRS API has failed: ${statusCode} ${message}`
+			};
+		}
+	}
+
+	const data = body.data as FetchData;
+	await sb.Cache.setByPrefix(key, data, {
+		expiry: 600_000
+	});
 
 	return {
 		success: true,
@@ -241,13 +238,15 @@ export const parseUserIdentifier = async (context: Context, identifier: string):
 		targetUser = context.user;
 	}
 	else {
-		targetUser = await sb.User.get(identifier);
-		if (!targetUser) {
+		const userData = await sb.User.get(identifier);
+		if (!userData) {
 			return {
 				success: false,
 				reply: "No such user exists!"
 			};
 		}
+
+		targetUser = userData;
 	}
 
 	const gameUsername = await targetUser.getDataProperty(OSRS_GAME_USERNAME_KEY) as null | string;

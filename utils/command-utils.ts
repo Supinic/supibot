@@ -77,7 +77,7 @@ export const fetchTimeData = async (data: { coordinates: Coordinates, date?: Sup
 		date = new SupiDate()
 	} = data;
 
-	const response = await sb.Got.get("Google")({
+	const response = await sb.Got.get("Google")<LocationTimeData>({
 		url: "timezone/json",
 		searchParams: {
 			timestamp: Math.trunc(date.valueOf() / 1000),
@@ -87,15 +87,20 @@ export const fetchTimeData = async (data: { coordinates: Coordinates, date?: Sup
 	});
 
 	return {
-		statusCode: response.statusCode as number,
-		body: response.body as LocationTimeData
+		statusCode: response.statusCode,
+		body: response.body
 	};
+};
+
+type ImageUploadResult = {
+	statusCode: number;
+	link: string | null;
 };
 
 /**
  * Uploads a file to {@link https://imgur.com}
  */
-export const uploadToImgur = async (fileData: Buffer, options: { type?: "image" | "video"; }) => {
+export const uploadToImgur = async (fileData: Buffer, options: { type?: "image" | "video"; }): Promise<ImageUploadResult> => {
 	const { type = "image" } = options;
 	const endpoint = (type === "image") ? "image" : "upload";
 	const filename = (type === "image") ? "image.jpg" : "video.mp4";
@@ -106,7 +111,8 @@ export const uploadToImgur = async (fileData: Buffer, options: { type?: "image" 
 	formData.append("type", "image");
 	formData.append("title", "Simple upload");
 
-	const response = await sb.Got.get("GenericAPI")({
+	type ImgurResponse = { data: { link: string; } | null; };
+	const response = await sb.Got.get("GenericAPI")<ImgurResponse>({
 		url: `https://api.imgur.com/3/${endpoint}`,
 		responseType: "json",
 		method: "POST",
@@ -139,7 +145,7 @@ export const uploadToImgur = async (fileData: Buffer, options: { type?: "image" 
 /**
  * Uploads a file to {@link https://i.nuuls.com}
  */
-export const uploadToNuuls = async (fileData: string) => {
+export const uploadToNuuls = async (fileData: string): Promise<ImageUploadResult> => {
 	const formData = new FormData();
 	formData.append("attachment", fileData);
 
@@ -158,8 +164,8 @@ export const uploadToNuuls = async (fileData: string) => {
 	});
 
 	return {
-		statusCode: response.statusCode as number,
-		link: (response.body ?? null) as string | null
+		statusCode: response.statusCode,
+		link: (response.body ?? null)
 	};
 };
 
@@ -238,7 +244,12 @@ export const fetchGeoLocationData = async (query: string) => {
 		});
 	}
 
-	const response = await sb.Got.get("GenericAPI")({
+	type GeoApiResponse = {
+		status: string;
+		results: GoogleGeoData[];
+	};
+
+	const response = await sb.Got.get("GenericAPI")<GeoApiResponse>({
 		url: "https://maps.googleapis.com/maps/api/geocode/json",
 		searchParams: {
 			key: process.env.API_GOOGLE_GEOCODING,
@@ -253,7 +264,7 @@ export const fetchGeoLocationData = async (query: string) => {
 		};
 	}
 
-	const results: GoogleGeoData[] = response.body.results;
+	const results = response.body.results;
 	const {
 		address_components: components,
 		formatted_address: formatted,
@@ -336,7 +347,7 @@ export async function searchYoutube (query: string, options?: { maxResults?: num
 		params.maxResults = 1;
 	}
 
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await sb.Got.get("GenericAPI")<YoutubeSearchResult>({
 		url: `https://www.googleapis.com/youtube/v3/search`,
 		searchParams: {
 			key: process.env.API_GOOGLE_YOUTUBE,
@@ -348,7 +359,7 @@ export async function searchYoutube (query: string, options?: { maxResults?: num
 		}
 	});
 
-	const data: YoutubeSearchResult = response.body;
+	const data = response.body;
 	const videoList = data.items
 		// This filtering shouldn't be necessary, but in some cases YouTube API returns playlists
 		// despite the `type` parameter being set to strictly return videos only.
@@ -531,12 +542,12 @@ type TwitchGameDetail = {
  * Returns the Twitch game ID for the given game name.
  */
 export const getTwitchGameID = async (name: string): Promise<{ name: string; id: string; }[]> => {
-	const response = await sb.Got.get("Helix")({
+	const response = await sb.Got.get("Helix")<{ data: TwitchGameDetail[]; }>({
 		url: "games",
 		searchParams: { name }
 	});
 
-	const data = response.body.data as TwitchGameDetail[];
+	const { data } = response.body;
 	if (!response.ok || data.length === 0) {
 		return [];
 	}
@@ -890,7 +901,8 @@ export const postToHastebin = async (text: string, options: { title?: string } =
 		text = `${options.title}\n\n${text}`;
 	}
 
-	const response = await sb.Got.get("GenericAPI")({
+	type HastebinApiResponse = { key: string; };
+	const response = await sb.Got.get("GenericAPI")<HastebinApiResponse>({
 		method: "POST",
 		url: "https://haste.zneix.eu/documents",
 		throwHttpErrors: false,
@@ -914,39 +926,3 @@ export const postToHastebin = async (text: string, options: { title?: string } =
 		};
 	}
 };
-
-/**
- * @typedef {Object} NSFWDetectionResult
- * @property {number} statusCode
- * @property {Object} data
- * @property {string} data.id
- * @property {number} data.score
- * @property {NSFWDetectionItem[]} data.detections
- */
-
-/**
- * @typedef {Object} NSFWDetectionItem
- * @property {number[]} bounding_box Array of four numbers determining the bounding box coordinates
- * @property {number} confidence
- * @property {string} name
- */
-
-/**
- * @typedef {Object} FileUploadResult
- * @property {number} statusCode
- * @property {string} link
- */
-
-
-/**
- * @typedef {Object} RSSArticle
- * @property {string} author
- * @property {string[]} categories
- * @property {string} content
- * @property {string} contentSnippet
- * @property {string} creator
- * @property {string} isoDate
- * @property {string} link
- * @property {string} pubDate
- * @property {string} title
- */
