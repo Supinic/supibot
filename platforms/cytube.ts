@@ -1,14 +1,8 @@
 import { SupiDate, SupiError } from "supi-core";
 import { CytubeConnector, EmoteObject, UserObject, QueueObject, VideoObject } from "cytube-connector"
 
-// @todo figure this out
-// import { sb } from "../@types/globals.d.ts";
-
 import { Platform, BaseConfig, MirrorOptions } from "./template.js";
-import type { AwayFromKeyboard } from "../classes/afk.js"
 import type { Channel, Emote } from "../classes/channel.js";
-import type { Command } from "../classes/command.js";
-import type { Reminder } from "../classes/reminder.js";
 import type { User } from "../classes/user.js";
 
 type PlaylistObject = VideoObject | {

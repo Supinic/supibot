@@ -134,6 +134,8 @@ export class User extends TemplateWithIdString {
 
 	destroy () {}
 
+	static async initialize () {}
+
 	static async get (identifier: Like, strict: false, options?: GetOptions): Promise<User>;
 	static async get (identifier: Like, strict?: boolean, options?: GetOptions): Promise<User | null>;
 	static async get (identifier: Like, strict: boolean = true, options: GetOptions = {}): Promise<User | null> {

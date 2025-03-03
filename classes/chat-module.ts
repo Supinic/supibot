@@ -1,4 +1,4 @@
-import { SupiError, type Recordset } from "supi-core";
+import { SupiError } from "supi-core";
 
 import { TemplateWithoutId } from "./template.js";
 import { Channel, Like as ChannelLike } from "./channel.js";
