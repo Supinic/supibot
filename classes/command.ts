@@ -242,7 +242,7 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 
 export interface CommandDefinition extends TemplateDefinition {
 	Name: Command["Name"];
-	Aliases: Command["Aliases"];
+	Aliases: Command["Aliases"] | null;
 	Description: Command["Description"];
 	Cooldown: Command["Cooldown"];
 	Flags: Command["Flags"];
@@ -280,12 +280,12 @@ type CooldownDefinition = number | null | CooldownObject;
 
 export class Command extends TemplateWithoutId {
 	readonly Name: string;
-	readonly Aliases: string[] = [];
-	readonly Description: string | null = null;
+	readonly Aliases: string[];
+	readonly Description: string | null;
 	readonly Cooldown: number | null;
 	readonly Flags: Readonly<string[]>;
 	readonly Params: ParameterDefinitions = [];
-	readonly Whitelist_Response: string | null = null;
+	readonly Whitelist_Response: string | null;
 	readonly Code: ExecuteFunction;
 	readonly Dynamic_Description: DescriptionFunction | null;
 
@@ -308,7 +308,7 @@ export class Command extends TemplateWithoutId {
 		super();
 
 		this.Name = data.Name;
-		this.Aliases = [...data.Aliases];
+		this.Aliases = data.Aliases ?? [];
 		this.Description = data.Description ?? null;
 		this.Cooldown = data.Cooldown ?? null;
 		this.Whitelist_Response = data.Whitelist_Response ?? null;

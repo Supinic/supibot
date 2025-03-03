@@ -1012,8 +1012,6 @@ export class TwitchPlatform extends Template {
 	}
 
 	async isChannelLive (channelData) {
-		await super.isChannelLive(channelData);
-
 		const channelId = channelData.Specific_ID;
 		const liveList = await this.getLiveChannelIdList();
 		return (liveList.includes(channelId));

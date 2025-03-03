@@ -173,8 +173,8 @@ export class Channel extends TemplateWithId {
 		return this.Platform.send(message, this, options);
 	}
 
-	async isLive (): Promise<boolean> {
-		return await this.Platform.isChannelLive(this) as unknown as boolean; //@todo remove cast after platforms are Typescript
+	async isLive (): Promise<boolean | null> {
+		return await this.Platform.isChannelLive(this);
 	}
 
 	async toggleAmbassador (userData: User): Promise<void> {

@@ -602,7 +602,7 @@ export class Filter extends TemplateWithId {
 			};
 		}
 
-		let channelLive = null;
+		let channelLive: boolean | null = null;
 		if (isChannel(channel)) {
 			channelLive = await channel.isLive();
 		}
