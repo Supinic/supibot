@@ -92,9 +92,12 @@ export default {
 		for (const { emoji, name } of GameData.skills) {
 			const found = data.skills.find(i => i.name.toLowerCase() === name.toLowerCase());
 			if (found && found.level !== null) {
-				const level = (context.params.virtual)
-					? (found.virtualLevel ?? found.level)
-					: found.level;
+				let level = found.level;
+				if (context.params.virtual) {
+					level = (name === "overall")
+					 	? `${found.level} (virtual: ${found.virtualLevel})`
+						: (found.virtualLevel ?? found.level);
+				}
 
 				strings.push(`${emoji} ${level}`);
 			}
