@@ -13,7 +13,7 @@ COPY --chown=supibot:supibot .yarnrc.yml ./
 
 RUN yarn install
 
-COPY --chown=supibot:supibot master.js ./
+COPY --chown=supibot:supibot master.ts ./
 COPY --chown=supibot:supibot init ./init
 
 COPY --chown=supibot:supibot api ./api
