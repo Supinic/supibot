@@ -2,8 +2,9 @@ import { SupiDate, SupiError } from "supi-core";
 import { CytubeConnector, EmoteObject, UserObject, QueueObject, VideoObject } from "cytube-connector"
 
 import { Platform, BaseConfig, MirrorOptions } from "./template.js";
-import type { Channel, Emote } from "../classes/channel.js";
+import type { Channel } from "../classes/channel.js";
 import type { User } from "../classes/user.js";
+import { Emote } from "../@types/globals.js";
 
 type PlaylistObject = VideoObject | {
 	media: VideoObject["media"];

@@ -1,10 +1,11 @@
 import { Counter, SupiError, SupiPromise } from "supi-core";
 
 import { User, Like as UserLike } from "../classes/user.js";
-import { Channel, Emote, Like as ChannelLike } from "../classes/channel.js";
+import { Channel, Like as ChannelLike } from "../classes/channel.js";
 import { Banphrase } from "../classes/banphrase.js";
 
 import createMessageLoggingTable from "../utils/create-db-table.js";
+import { Emote } from "../@types/globals.js";
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
 export type Like = Platform | number | string;
@@ -38,6 +39,8 @@ export type PlatformVerification = {
 	active?: boolean;
 	notificationSent?: boolean;
 };
+
+export type PlatformVerificationStatus = "Active" | "Completed" | "Cancelled";
 
 export type MirrorOptions = PrepareMessageOptions & { commandUsed?: boolean; };
 
@@ -123,7 +126,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	protected abstract initListeners (): void;
 	public abstract connect (): Promise<void>;
 	public abstract send (message: string, channel: ChannelLike, options?: GenericSendOptions): Promise<void>;
-	public abstract pm (message: string, user: UserLike, channel?: ChannelLike): Promise<void>;
+	public abstract pm (message: string, user: UserLike, channel?: ChannelLike | Record<string, unknown>): Promise<void>;
 	public abstract isUserChannelOwner (channelData: Channel, userData: User): Promise<boolean> | null;
 	public abstract populateUserList (channelData: Channel): Promise<string[]>;
 	public abstract populateGlobalEmotes (): Promise<Emote[]>;

@@ -202,8 +202,8 @@ export default class LoggerSingleton {
 	 * Inserts a log message into the database - `chat_data.Log` table
 	 * @param {string} tag
 	 * @param {string} [description] = null
-	 * @param {{ ID: number }} [channel] = null
-	 * @param {{ ID: number }} [user] = null
+	 * @param {{ ID: number } | null} [channel] = null
+	 * @param {{ ID: number } | null} [user] = null
 	 * @returns {Promise<number>} ID of the created database logging record
 	 */
 	async log (tag, description = null, channel = null, user = null) {

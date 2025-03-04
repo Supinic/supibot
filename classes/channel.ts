@@ -16,6 +16,7 @@ import {
 	setGenericDataProperty,
 	TemplateWithId
 } from "./template.js";
+import { Emote } from "../@types/globals.js";
 
 export const privateMessageChannelSymbol /* : unique symbol */ = Symbol("private-message-channel");
 
@@ -50,16 +51,6 @@ type DatabaseChannelData = {
 // type GetStringEmoteOptions = GetEmoteOptions & { returnEmoteObject?: false; };
 
 export type Like = string | number | Channel;
-
-export type Emote = { // @todo move to Platform
-	type: "discord" | "twitch" | "bttv" | "7tv" | "cytube";
-	ID: string | number;
-	name: string;
-	global: boolean;
-	guild?: string;
-	animated: boolean;
-	zeroWidth?: boolean;
-};
 
 type MoveDataOptions = {
 	deleteOriginalValues?: boolean;
@@ -214,14 +205,12 @@ export class Channel extends TemplateWithId {
 	}
 
 	async fetchUserList (): Promise<string[]> {
-		return await this.Platform.fetchChannelUserList(this) as string[]; // @todo remove type cast when Platform is TS
+		return await this.Platform.fetchChannelUserList(this);
 	}
 
 	async fetchEmotes (): Promise<Emote[]> {
-		let channelEmotes = await this.getCacheData("emotes") as Emote[] | null;
-		if (!channelEmotes) {
-			channelEmotes = await this.Platform.fetchChannelEmotes(this) as unknown as Emote[]; // @todo remove force cast when Platform is TS
-		}
+		const channelEmotes = (await this.getCacheData("emotes") as Emote[] | null)
+			?? await this.Platform.fetchChannelEmotes(this);
 
 		await this.setCacheData("emotes", channelEmotes, {
 			expiry: 3_600_000 // 1 hour channel emotes cache
