@@ -31,7 +31,7 @@ export default {
 		const subcommandDescriptions = subcommands.map(cmd => cmd.description.join("<br>")).join("<br><br>");
 		return [
 			"All things F1-related in a single command.",
-			`Powered by <a href="https://ergast.com/mrd/">Ergast Developer API</a>`,
+			`Powered by <a href="https://api.jolpi.ca/ergast/">Jolpica Developer API</a>`,
 			`If you have any suggestions, addition ideas or anything else, make sure to let me know via the <a href="https://supinic.com/bot/command/detail/suggest">$suggest</a> command!`,
 			"",
 

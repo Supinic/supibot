@@ -1,4 +1,4 @@
-export const url = "https://ergast.com/api/f1/";
+export const url = "https://api.jolpi.ca/ergast/f1/";
 const sessionTypes = ["FirstPractice", "SecondPractice", "ThirdPractice", "Qualifying", "Sprint"];
 const sessionNames = {
 	FirstPractice: "First practice",
@@ -15,15 +15,15 @@ const BACKUP_RACE_DATA = {
 	}
 };
 
-let ergastGotInstance;
-const ergastGot = (...args) => {
-	ergastGotInstance ??= sb.Got.get("GenericAPI").extend({
+let jolpicaGotInstance;
+const jolpicaGot = (...args) => {
+	jolpicaGotInstance ??= sb.Got.get("GenericAPI").extend({
 		https: {
 			rejectUnauthorized: false
 		}
 	});
 
-	return ergastGotInstance(...args);
+	return jolpicaGotInstance(...args);
 };
 
 export const getWeather = async (context, sessionStart, coordinates) => {
@@ -63,7 +63,7 @@ export const getWeather = async (context, sessionStart, coordinates) => {
 };
 
 export const fetchRace = async (year, searchType, searchValue) => {
-	const response = await ergastGot(`${url}${year}.json`);
+	const response = await jolpicaGot(`${url}${year}.json`);
 	const races = response.body.MRData?.RaceTable?.Races ?? [];
 	if (races.length === 0) {
 		return {
@@ -123,19 +123,19 @@ export const fetchRace = async (year, searchType, searchValue) => {
 };
 
 export const fetchQualifyingResults = async (year, round) => {
-	const response = await ergastGot(`${url}${year}/${round}/qualifying.json`);
+	const response = await jolpicaGot(`${url}${year}/${round}/qualifying.json`);
 	return response.body.MRData?.RaceTable?.Races?.[0]?.QualifyingResults ?? [];
 };
 
 export const fetchRaceResults = async (year, round) => {
-	const response = await ergastGot(`${url}${year}/${round}/results.json`);
+	const response = await jolpicaGot(`${url}${year}/${round}/results.json`);
 	return response.body.MRData?.RaceTable?.Races?.[0]?.Results ?? [];
 };
 
 export const fetchNextRaceDetail = async (context) => {
 	const { month, year } = new sb.Date();
 	const race = await fetchRace(year, "current");
-	if (!race || !race.success) {
+	if (!race || race.success === false) {
 		// Bump season year only if we are in Nov/Dec, keep the same year otherwise
 		const nextSeason = (month >= 11) ? (year + 1) : year;
 		const backupRace = BACKUP_RACE_DATA[nextSeason];
@@ -226,12 +226,12 @@ export const fetchNextRaceDetail = async (context) => {
 };
 
 export const fetchDriverStandings = async (year) => {
-	const response = await ergastGot(`${url}${year}/driverStandings.json`);
+	const response = await jolpicaGot(`${url}${year}/driverStandings.json`);
 	return response.body.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings ?? [];
 };
 
 export const fetchConstructorStandings = async (year) => {
-	const response = await ergastGot(`${url}${year}/constructorStandings.json`);
+	const response = await jolpicaGot(`${url}${year}/constructorStandings.json`);
 	return response.body.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings ?? [];
 };
 
