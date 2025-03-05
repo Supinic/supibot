@@ -1,3 +1,8 @@
+import { TwitchPlatform } from "./twitch.js";
+import { SupiError } from "supi-core";
+import User from "../classes/user.js";
+import Channel from "../classes/channel.js";
+
 const { env } = globalThis.process;
 
 const APP_ACCESS_CACHE_KEY = "twitch-app-access-token";
@@ -8,13 +13,38 @@ const SUBSCRIPTIONS_CACHE_EXPIRY = 120 * 60_000; // 60 minutes
 const SUBSCRIPTIONS_CACHE_INTERVAL = 30 * 60_000; // 30 minutes, 1/4 of sub cache expiry
 const TOKEN_REGENERATE_INTERVAL = 60 * 60_000; // 60 minutes
 
-const getAppAccessToken = async () => {
-	const cacheToken = await sb.Cache.getByPrefix(APP_ACCESS_CACHE_KEY);
+// @todo create specific type extensions for specific subscriptions (might not be needed)
+type SubscriptionCondition = string
+	| { user_id: string; }
+	| { broadcaster_user_id: string; }
+	| { to_broadcaster_user_id: string; }
+	| { user_id: string; broadcaster_user_id: string; };
+
+type Subscription = {
+	id: string;
+	status: string;
+	type: string;
+	version: string;
+	cost: number;
+	condition: SubscriptionCondition;
+	created_at: string;
+	transport: { method: string; callback: string; };
+};
+type AccessTokenData = {
+	access_token: string;
+	refresh_token: string;
+	expires_in: number;
+	scope: string | string[];
+	token_type: string;
+};
+
+const getAppAccessToken = async (): Promise<string> => {
+	const cacheToken = await sb.Cache.getByPrefix(APP_ACCESS_CACHE_KEY) as string | undefined;
 	if (cacheToken) {
 		return cacheToken;
 	}
 
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await sb.Got.get("GenericAPI")<AccessTokenData>({
 		url: "https://id.twitch.tv/oauth2/token",
 		method: "POST",
 		searchParams: {
@@ -27,7 +57,7 @@ const getAppAccessToken = async () => {
 	if (!response.ok) {
 		throw new sb.Error({
 			message: "Could not fetch app access token!",
-			args: { response }
+			args: { body: response.body }
 		});
 	}
 
@@ -40,16 +70,19 @@ const getAppAccessToken = async () => {
 };
 
 let conduitValidated = false;
-const getConduitId = async () => {
+const getConduitId = async (): Promise<string> => {
 	const appToken = await getAppAccessToken();
-	const cacheId = await sb.Cache.getByPrefix(CONDUIT_ID_KEY);
+	const cacheId = await sb.Cache.getByPrefix(CONDUIT_ID_KEY) as string | undefined;
 	if (cacheId && conduitValidated) {
 		return cacheId;
 	}
 
 	console.debug("Validating conduit...");
 
-	const checkConduitResponse = await sb.Got.get("GenericAPI")({
+	type ConduitData = {
+		data: { id: string; shard_count: number; }[];
+	};
+	const checkConduitResponse = await sb.Got.get("GenericAPI")<ConduitData>({
 		url: "https://api.twitch.tv/helix/eventsub/conduits",
 		method: "GET",
 		responseType: "json",
@@ -101,7 +134,7 @@ const getConduitId = async () => {
 
 	console.debug("Re-making conduit...");
 
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await sb.Got.get("GenericAPI")<ConduitData>({
 		url: "https://api.twitch.tv/helix/eventsub/conduits",
 		method: "POST",
 		responseType: "json",
@@ -132,11 +165,18 @@ const getConduitId = async () => {
 	return shard.id;
 };
 
-const assignWebsocketToConduit = async (sessionId) => {
+const assignWebsocketToConduit = async (sessionId: string): Promise<void> => {
 	const conduitId = await getConduitId();
 	const appToken = await getAppAccessToken();
 
-	const response = await sb.Got.get("GenericAPI")({
+	type ShardAssignmentData = {
+		data: {
+			id: string;
+			status: string;
+			transport: { method: string; callback: string; };
+		}[];
+	};
+	const response = await sb.Got.get("GenericAPI")<ShardAssignmentData>({
 		method: "PATCH",
 		url: "https://api.twitch.tv/helix/eventsub/conduits/shards",
 		responseType: "json",
@@ -160,12 +200,29 @@ const assignWebsocketToConduit = async (sessionId) => {
 	if (!response.ok) {
 		throw new sb.Error({
 			message: "Could not assign WS to conduit",
-			args: { response }
+			args: { body: response.body }
 		});
 	}
 };
 
-const createSubscription = async (data = {}) => {
+type CreateSubscriptionData = {
+	subscription: string;
+	condition?: string | { to_broadcaster_user_id: string; };
+	version: string;
+	selfId?: string;
+	channelId?: string;
+};
+type CreateSubscriptionResponse = {
+	data: Subscription[];
+	total: number;
+	total_cost: number;
+	max_total_cost: number;
+};
+type ListSubscriptionsResponse = CreateSubscriptionResponse & {
+	pagination: { cursor?: string; };
+};
+
+const createSubscription = async (data: CreateSubscriptionData) => {
 	const conduitId = await getConduitId();
 	const appToken = await getAppAccessToken();
 
@@ -177,24 +234,29 @@ const createSubscription = async (data = {}) => {
 		channelId
 	} = data;
 
-	let condition;
+	let condition: SubscriptionCondition;
 	if (customCondition) {
 		condition = customCondition;
 	}
-	else if (!channelId) {
+	else if (!channelId && typeof selfId === "string") {
 		condition = { user_id: selfId };
 	}
-	else if (!selfId) {
+	else if (!selfId && typeof channelId === "string") {
 		condition = { broadcaster_user_id: channelId };
 	}
-	else {
+	else if (typeof selfId === "string" && typeof channelId === "string") {
 		condition = {
 			user_id: selfId,
 			broadcaster_user_id: channelId
 		};
 	}
+	else {
+		throw new SupiError({
+			message: "Invalid combination of arguments"
+		})
+	}
 
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await sb.Got.get("GenericAPI")<CreateSubscriptionResponse>({
 		url: "https://api.twitch.tv/helix/eventsub/subscriptions",
 		method: "POST",
 		responseType: "json",
@@ -237,7 +299,7 @@ const createSubscription = async (data = {}) => {
 	return { response };
 };
 
-const createChannelChatMessageSubscription = async (selfId, channelId, platform) => {
+const createChannelChatMessageSubscription = async (selfId: string, channelId: string, platform: TwitchPlatform) => {
 	const { response } = await createSubscription({
 		channelId,
 		selfId,
@@ -246,7 +308,6 @@ const createChannelChatMessageSubscription = async (selfId, channelId, platform)
 	});
 
 	if (response.statusCode === 403) {
-		/** @type {Channel} */
 		const channelData = sb.Channel.getBySpecificId(channelId, platform);
 		if (channelData) {
 			await Promise.all([
@@ -259,25 +320,25 @@ const createChannelChatMessageSubscription = async (selfId, channelId, platform)
 	return { response };
 };
 
-const createWhisperMessageSubscription = (selfId) => createSubscription({
+const createWhisperMessageSubscription = (selfId: string) => createSubscription({
 	selfId,
 	subscription: "user.whisper.message",
 	version: "1"
 });
 
-const createChannelSubSubscription = (channelId) => createSubscription({
+const createChannelSubSubscription = (channelId: string) => createSubscription({
 	channelId,
 	subscription: "channel.subscribe",
 	version: "1"
 });
 
-const createChannelResubSubscription = (channelId) => createSubscription({
+const createChannelResubSubscription = (channelId: string) => createSubscription({
 	channelId,
 	subscription: "channel.subscription.message",
 	version: "1"
 });
 
-const createChannelRaidSubscription = (channelId) => createSubscription({
+const createChannelRaidSubscription = (channelId: string) => createSubscription({
 	condition: {
 		to_broadcaster_user_id: channelId
 	},
@@ -285,27 +346,27 @@ const createChannelRaidSubscription = (channelId) => createSubscription({
 	version: "1"
 });
 
-const createChannelOnlineSubscription = (channelId) => createSubscription({
+const createChannelOnlineSubscription = (channelId: string) => createSubscription({
 	channelId,
 	subscription: "stream.online",
 	version: "1"
 });
 
-const createChannelOfflineSubscription = (channelId) => createSubscription({
+const createChannelOfflineSubscription = (channelId: string) => createSubscription({
 	channelId,
 	subscription: "stream.offline",
 	version: "1"
 });
 
-const createChannelRedemptionSubscription = (channelId) => createSubscription({
+const createChannelRedemptionSubscription = (channelId: string) => createSubscription({
 	channelId,
 	subscription: "channel.channel_points_custom_reward_redemption.add",
 	version: "1"
 });
 
-const fetchExistingSubscriptions = async () => {
+const fetchExistingSubscriptions = async (): Promise<Subscription[]> => {
 	const accessToken = await getAppAccessToken();
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await sb.Got.get("GenericAPI")<ListSubscriptionsResponse>({
 		url: "https://api.twitch.tv/helix/eventsub/subscriptions",
 		method: "GET",
 		responseType: "json",
@@ -319,10 +380,10 @@ const fetchExistingSubscriptions = async () => {
 		}
 	});
 
-	const result = [...response.body.data];
-	let cursor = response.body.pagination?.cursor ?? null;
+	const result: Subscription[] = [...response.body.data];
+	let cursor: string | null = response.body.pagination?.cursor ?? null;
 	while (cursor) {
-		const loopResponse = await sb.Got.get("GenericAPI")({
+		const loopResponse = await sb.Got.get("GenericAPI")<ListSubscriptionsResponse>({
 			url: "https://api.twitch.tv/helix/eventsub/subscriptions",
 			method: "GET",
 			responseType: "json",
@@ -344,9 +405,9 @@ const fetchExistingSubscriptions = async () => {
 	return result;
 };
 
-const getExistingSubscriptions = async (force = false) => {
+const getExistingSubscriptions = async (force = false): Promise<Subscription[]> => {
 	if (!force) {
-		const cacheData = await sb.Cache.getByPrefix(SUBSCRIPTIONS_CACHE_KEY);
+		const cacheData = await sb.Cache.getByPrefix(SUBSCRIPTIONS_CACHE_KEY) as Subscription[] | undefined;
 		if (cacheData) {
 			return cacheData;
 		}
@@ -361,14 +422,16 @@ const getExistingSubscriptions = async (force = false) => {
 };
 
 const fetchToken = async () => {
-	const refreshToken = await sb.Cache.getByPrefix("TWITCH_REFRESH_TOKEN") ?? env.TWITCH_REFRESH_TOKEN;
+	const refreshToken = (await sb.Cache.getByPrefix("TWITCH_REFRESH_TOKEN") as string | undefined)
+		?? env.TWITCH_REFRESH_TOKEN;
+
 	if (!refreshToken) {
 		throw new sb.Error({
 			message: "No Twitch refresh token has been configured (TWITCH_REFRESH_TOKEN)"
 		});
 	}
 
-	const response = await sb.Got.get("GenericAPI")({
+	const response = await sb.Got.get("GenericAPI")<AccessTokenData>({
 		url: "https://id.twitch.tv/oauth2/token",
 		method: "POST",
 		searchParams: {
@@ -390,7 +453,7 @@ const fetchToken = async () => {
 	return response.body.access_token;
 };
 
-const emitRawUserMessageEvent = (username, channelName, message) => {
+const emitRawUserMessageEvent = (username: string, channelName: string, platform: TwitchPlatform, message: unknown) => {
 	if (!username || !channelName) {
 		throw new sb.Error({
 			message: "No username or channel name provided for raw event",
@@ -402,14 +465,14 @@ const emitRawUserMessageEvent = (username, channelName, message) => {
 		});
 	}
 
-	const channelData = sb.Channel.get(channelName, sb.Platform.get("twitch"));
+	const channelData = sb.Channel.get(channelName, platform);
 	if (channelData) {
 		channelData.events.emit("message", {
 			event: "message",
 			message: message.text,
 			user: null,
 			channel: channelData,
-			platform: sb.Platform.get("twitch"),
+			platform,
 			raw: {
 				user: username
 			},
@@ -418,14 +481,14 @@ const emitRawUserMessageEvent = (username, channelName, message) => {
 	}
 };
 
-const populateUserChannelActivity = async (userData, channelData) => {
+const populateUserChannelActivity = async (userData: User, channelData: Channel) => {
 	const key = `${USER_CHANNEL_ACTIVITY_PREFIX}-${channelData.ID}-${userData.Name}`;
 	await sb.Cache.setByPrefix(key, "1", {
 		expiry: 36e5 // 60 minutes
 	});
 };
 
-const getActiveUsernamesInChannel = async (channelData) => {
+const getActiveUsernamesInChannel = async (channelData: Channel) => {
 	const prefix = `${USER_CHANNEL_ACTIVITY_PREFIX}-${channelData.ID}-`;
 	const prefixes = await sb.Cache.getKeysByPrefix(`${prefix}*`, {});
 
@@ -445,7 +508,7 @@ const initSubCacheCheckInterval = () => {
 	setInterval(async () => await getExistingSubscriptions(true), SUBSCRIPTIONS_CACHE_INTERVAL / 2);
 };
 
-const sanitizeMessage = (string) => string.replace(/^\u0001ACTION (.+)\u0001$/, "$1");
+const sanitizeMessage = (string: string) => string.replace(/^\u0001ACTION (.+)\u0001$/, "$1");
 
 export default {
 	getConduitId,

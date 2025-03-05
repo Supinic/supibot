@@ -66,8 +66,8 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	public readonly logging: T["logging"];
 	public readonly active: T["active"];
 
-	public readonly supportsMeAction = false;
-	public readonly dynamicChannelAddition = false;
+	public readonly supportsMeAction: boolean = false;
+	public readonly dynamicChannelAddition: boolean = false;
 	public readonly userMessagePromises: Map<Channel["ID"] | null, Map<User["ID"], MessageAwaiterObject>> = new Map();
 
 	private readonly globalEmoteCacheKey: string;

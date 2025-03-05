@@ -949,7 +949,7 @@ export class TwitchPlatform extends Template {
 	 * Determines if a user is an owner of a given channel.
 	 * @param {Channel} channelData
 	 * @param {User} userData
-	 * @returns {boolean}
+	 * @returns {Promise<boolean>}
 	 */
 	async isUserChannelOwner (channelData, userData) {
 		if (userData === null || channelData === null) {
