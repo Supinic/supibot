@@ -60,7 +60,7 @@ const fixMarkdown = (text) => {
 	}
 };
 
-export default class DiscordPlatform extends Template {
+export class DiscordPlatform extends Template {
 	#emoteFetchingPromise = null;
 
 	constructor (config) {
@@ -232,8 +232,7 @@ export default class DiscordPlatform extends Template {
 				// If a message comes from a channel set as "Inactive", this means it is active again.
 				// Change its mode back to active.
 				if (channelData.Mode === "Inactive") {
-					channelData.Mode = "Write";
-					await channelData.saveProperty("Mode", channelData.Mode);
+					await channelData.saveProperty("Mode", 123);
 				}
 
 				if (!messageObject.channel) {
@@ -921,4 +920,6 @@ export default class DiscordPlatform extends Template {
 			challenge
 		};
 	}
-};
+}
+
+export default DiscordPlatform;

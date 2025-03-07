@@ -1,3 +1,11 @@
+export type GotDefinition = {
+	name: string;
+	optionsType: "object" | "function";
+	options: Record<string, unknown> | (() => Record<string, unknown>);
+	parent: string | null;
+	description: string | null;
+};
+
 import FakeAgentGot from "./fake-agent/index.js";
 import GenericAPIGot from "./generic-api/index.js";
 import GitHubGot from "./github/index.js";
@@ -11,7 +19,7 @@ import SupinicGot from "./supinic/index.js";
 import TwitchGQLGot from "./twitch-gql/index.js";
 import TwitchEmotesGot from "./twitch-emotes/index.js";
 
-export default [
+export const definitions = [
 	FakeAgentGot,
 	GenericAPIGot,
 	GitHubGot,
@@ -24,4 +32,4 @@ export default [
 	SupinicGot,
 	TwitchEmotesGot,
 	TwitchGQLGot
-];
+] as GotDefinition[]; // @todo change to `satisfies` when gots are fully TS

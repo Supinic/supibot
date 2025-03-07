@@ -1,5 +1,3 @@
-import type * as core from "supi-core";
-
 export declare type Message = string;
 export declare type Emote = {
     ID: string;
@@ -28,11 +26,3 @@ export declare type OnlyKeysOfType<T, U> = {
 export declare type TypeExtract<T, U> = {
     [P in OnlyKeysOfType<T, U>]: U;
 };
-
-declare var sb: {
-    Date: core.Date,
-    Error: core.Error,
-    Promise: core.Promise,
-    Got: core.Got,
-    // TODO add others
-}
