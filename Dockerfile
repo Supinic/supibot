@@ -10,6 +10,7 @@ WORKDIR /home/project/supibot
 COPY --chown=supibot:supibot package.json ./
 COPY --chown=supibot:supibot tsconfig.json ./
 COPY --chown=supibot:supibot .yarnrc.yml ./
+COPY --chown=supibot:supibot yarn.lock ./
 
 RUN yarn install
 
