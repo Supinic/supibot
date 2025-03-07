@@ -24,7 +24,7 @@ type BanphraseDowntimeBehaviour = "Ignore" | "Notify" | "Nothing" | "Refuse" | "
 type Mode = "Inactive" | "Last seen" | "Read" | "Write" | "VIP" | "Moderator";
 type LogType = "Lines" | "Meta";
 
-type EditableProperty = "Mode" | "Mention"  | "NSFW" | "Mirror" | "Description"
+type EditableProperty = "Name" | "Mode" | "Mention"  | "NSFW" | "Mirror" | "Description"
 	| "Links_Allowed" | "Banphrase_API_Downtime" | "Banphrase_API_Type" | "Banphrase_API_URL";
 type ConstructorData = Pick<Channel,
 	"ID" | "Name" | "Specific_ID" | "Mode" | "Mention" | "Message_Limit"
@@ -62,7 +62,7 @@ export class Channel extends TemplateWithId {
 	readonly Name: string;
 	readonly Platform: Platform;
 	readonly Specific_ID: string | null;
-	readonly Mode: Mode;
+	Mode: Mode;
 	readonly Mention: boolean;
 	readonly Links_Allowed: boolean;
 	readonly Banphrase_API_Type: "Pajbot";

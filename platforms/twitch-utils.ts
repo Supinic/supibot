@@ -1,4 +1,4 @@
-import { TwitchPlatform } from "./twitch.js";
+import { Subscription, SubscriptionCondition, TwitchPlatform, MessageSubscriptionData } from "./twitch.js";
 import { SupiError } from "supi-core";
 import User from "../classes/user.js";
 import Channel from "../classes/channel.js";
@@ -14,22 +14,8 @@ const SUBSCRIPTIONS_CACHE_INTERVAL = 30 * 60_000; // 30 minutes, 1/4 of sub cach
 const TOKEN_REGENERATE_INTERVAL = 60 * 60_000; // 60 minutes
 
 // @todo create specific type extensions for specific subscriptions (might not be needed)
-type SubscriptionCondition = string
-	| { user_id: string; }
-	| { broadcaster_user_id: string; }
-	| { to_broadcaster_user_id: string; }
-	| { user_id: string; broadcaster_user_id: string; };
 
-type Subscription = {
-	id: string;
-	status: string;
-	type: string;
-	version: string;
-	cost: number;
-	condition: SubscriptionCondition;
-	created_at: string;
-	transport: { method: string; callback: string; };
-};
+
 type AccessTokenData = {
 	access_token: string;
 	refresh_token: string;
@@ -453,7 +439,8 @@ const fetchToken = async () => {
 	return response.body.access_token;
 };
 
-const emitRawUserMessageEvent = (username: string, channelName: string, platform: TwitchPlatform, message: unknown) => {
+type MessageData = MessageSubscriptionData["payload"]["event"]["message"];
+const emitRawUserMessageEvent = (username: string, channelName: string, platform: TwitchPlatform, message: MessageData) => {
 	if (!username || !channelName) {
 		throw new sb.Error({
 			message: "No username or channel name provided for raw event",

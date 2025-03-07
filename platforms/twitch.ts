@@ -1,9 +1,14 @@
 import WebSocket from "ws";
 import { randomBytes } from "node:crypto";
-import Template from "./template.js";
+
+import { Platform, BaseConfig } from "./template.js";
 import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
 
 import TwitchUtils from "./twitch-utils.js";
+import { Channel } from "../classes/channel.js";
+import { User } from "../classes/user.js";
+import { Emote } from "../@types/globals.js";
+import { SupiDate, SupiError } from "supi-core";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
@@ -28,8 +33,9 @@ const DEFAULT_LOGGING_CONFIG = {
 	messages: true,
 	subs: false,
 	timeouts: false,
-	whispers: true
-};
+	whispers: true,
+	hosts: false
+} as const;
 const DEFAULT_PLATFORM_CONFIG = {
 	modes: {
 		Moderator: {
@@ -58,7 +64,7 @@ const DEFAULT_PLATFORM_CONFIG = {
 	ignoredUserNotices: [],
 	sameMessageEvasionCharacter: "󠀀",
 	rateLimits: "default",
-	reconnectAnnouncement: {},
+	reconnectAnnouncement: null,
 	emitLiveEventsOnlyForFlaggedChannels: false,
 	suspended: false,
 	joinChannelsOverride: [],
@@ -66,41 +72,212 @@ const DEFAULT_PLATFORM_CONFIG = {
 	sendVerificationChallenge: false,
 	whisperMessageLimit: 500,
 	unrelatedPrivateMessageResponse: ""
+} as const;
+
+type SubscriptionMeta = {
+	message_id: string;
+	message_timestamp: string;
+	message_type: "notification";
+	subscription_type: string;
+	subscription_version: string;
+};
+export type SubscriptionCondition = string
+	| { user_id: string; }
+	| { broadcaster_user_id: string; }
+	| { to_broadcaster_user_id: string; }
+	| { user_id: string; broadcaster_user_id: string; };
+
+export type Subscription = {
+	id: string;
+	status: string;
+	type: string;
+	version: string;
+	cost: number;
+	condition: SubscriptionCondition;
+	created_at: string;
+	transport: { method: string; callback: string; };
 };
 
-export class TwitchPlatform extends Template {
+interface GenericSubscriptionData {
+	metadata: SubscriptionMeta
+	payload: {
+		event: Record<string, unknown>;
+		subscription: Subscription;
+	}
+}
+
+type MessageBadge = {
+	set_id: string;
+	id: string;
+	info: string;
+};
+
+export interface MessageSubscriptionData extends GenericSubscriptionData {
+	metadata: SubscriptionMeta & {
+		subscription_type: "channel.chat.message";
+	};
+	payload: {
+		event: {
+			badges: MessageBadge[];
+			broadcaster_user_id: string;
+			broadcaster_user_login: string;
+			broadcaster_user_name: string;
+			channel_points_animation_id: string | null;
+			channel_points_custom_reward_id: string | null;
+			chatter_user_id: string;
+			chatter_user_login: string;
+			chatter_user_name: string;
+			cheer: {
+				bits: number;
+			} | null;
+			color: string;
+			message: {
+				fragments: {
+					type: "text" | "cheermote" | "emote" | "mention";
+					text: string;
+					cheermote: {
+						prefix: string;
+						bits: number;
+						tier: number;
+					} | null;
+					emote: {
+						id: string;
+						emote_set_id: string;
+						owner_id: string;
+						format: ("animated" | "static")[];
+					} | null;
+					mention: {
+						user_id: string;
+						user_name: string;
+						user_login: string;
+					} | null;
+				}[];
+				text: string;
+			};
+			message_id: string;
+			message_type: "text" | "channel_points_highlighted" | "channel_points_sub_only"
+				| "user_intro" | "power_ups_message_effect" | "power_ups_gigantified_emote";
+			reply: {
+				parent_message_id: string;
+				parent_message_body: string;
+				parent_user_id: string;
+				parent_user_name: string;
+				parent_user_login: string;
+				thread_message_id: string;
+				thread_user_id: string;
+				thread_user_name: string;
+				thread_user_login: string;
+			} | null;
+			source_badges: MessageBadge[] | null;
+			source_broadcaster_user_id: string | null;
+			source_broadcaster_user_name: string | null;
+			source_broadcaster_user_login: string | null;
+			source_message_id: string | null;
+		};
+		subscription: Subscription & {
+			condition: {
+				user_id: string;
+				broadcaster_user_id: string;
+			};
+		}
+	}
+}
+
+class ConfigurableWebsocket {
+	private instance: WebSocket | null = null;
+	connect (url: string) {
+		this.instance = new WebSocket(url);
+	}
+}
+
+type ConnectOptions = {
+	url?: string;
+	skipSubscriptions?: boolean;
+};
+
+interface TwitchConfig extends BaseConfig {
+	selfId: string;
+	logging: {
+		bits?: boolean,
+		messages?: boolean,
+		subs?: boolean,
+		timeouts?: boolean,
+		whispers?: boolean
+		hosts?: boolean;
+	};
+	platform: {
+		modes?: Record<"Write" | "VIP" | "Moderator", {
+			queueSize?: number;
+			cooldown?: number;
+		}>;
+		reconnectAnnouncement?: {
+			channels: string[];
+			string: string;
+		} | null;
+		subscriptionPlans?: Record<string, string>;
+		partChannelsOnPermaban?: boolean;
+		clearRecentBansTimer?: number;
+		recentBanThreshold?: number | null;
+		updateAvailableBotEmotes?: boolean;
+		ignoredUserNotices?: readonly string[];
+		sameMessageEvasionCharacter?: string;
+		rateLimits?: "default" | "knownBot" | "verifiedBot",
+		emitLiveEventsOnlyForFlaggedChannels?: boolean;
+		suspended?: boolean;
+		joinChannelsOverride?: readonly string[];
+		spamPreventionThreshold?: number;
+		sendVerificationChallenge?: boolean;
+		recentBanPartTimeout?: number;
+		trackChannelsLiveStatus?: boolean;
+		whisperMessageLimit?: number;
+		privateMessageResponseFiltered?: string;
+		privateMessageResponseNoCommand?: string;
+	}
+}
+
+export class TwitchPlatform extends Platform<TwitchConfig> {
 	supportsMeAction = true;
 	dynamicChannelAddition = true;
 
 	// eslint-disable-next-line no-unused-private-class-members
 	#reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000);
-	#websocketLatency = null;
+	#websocketLatency: number | null = null;
 	#previousMessageMeta = new Map();
 	#userCommandSpamPrevention = new Map();
 	#unsuccessfulRenameChannels = new Set();
 
 	debug = TwitchUtils;
+	client: WebSocket | null = null;
 
-	constructor (config) {
-		super("twitch", config, {
-			logging: DEFAULT_LOGGING_CONFIG,
-			platform: DEFAULT_PLATFORM_CONFIG
-		});
+	constructor (config: TwitchConfig) {
+		const resultConfig = {
+			...config,
+			platform: {
+				...DEFAULT_PLATFORM_CONFIG,
+				...config.platform
+			},
+			logging: {
+				...DEFAULT_LOGGING_CONFIG,
+				...config.logging
+			}
+		};
+
+		super("twitch", resultConfig);
 	}
 
-	async connect (options = {}) {
+	async connect (options: ConnectOptions = {}) {
 		if (!this.selfName) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Twitch platform does not have the bot's name configured"
 			});
 		}
 		else if (!process.env.TWITCH_CLIENT_ID) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Twitch client ID has not been configured"
 			});
 		}
 		else if (!process.env.TWITCH_CLIENT_SECRET) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Twitch client secret has not been configured"
 			});
 		}
@@ -131,7 +308,13 @@ export class TwitchPlatform extends Template {
 			const batchSize = 100;
 			for (let index = 0; index < missingChannels.length; index += batchSize) {
 				const slice = missingChannels.slice(index, index + batchSize);
-				const joinPromises = slice.map(async channel => await this.joinChannel(channel.Specific_ID));
+				const joinPromises = slice.map(async channel => {
+					if (!channel.Specific_ID) {
+						return;
+					}
+
+					await this.joinChannel(channel.Specific_ID)
+				});
 
 				await Promise.allSettled(joinPromises);
 			}
@@ -139,11 +322,13 @@ export class TwitchPlatform extends Template {
 
 		TwitchUtils.initSubCacheCheckInterval();
 
-		const { channels, string } = this.config.reconnectAnnouncement;
-		for (const channel of channels) {
-			const channelData = sb.Channel.get(channel);
-			if (channelData) {
-				await channelData.send(string);
+		const { channels, string } = this.config.reconnectAnnouncement ?? {};
+		if (channels && string) {
+			for (const channel of channels) {
+				const channelData = sb.Channel.get(channel);
+				if (channelData) {
+					await channelData.send(string);
+				}
 			}
 		}
 	}
@@ -191,7 +376,7 @@ export class TwitchPlatform extends Template {
 		}
 	}
 
-	async handleWebsocketNotification (data) {
+	async handleWebsocketNotification (data: GenericSubscriptionData) {
 		const { event, subscription } = data.payload;
 
 		switch (subscription.type) {
@@ -247,14 +432,10 @@ export class TwitchPlatform extends Template {
 
 	/**
 	 * Sends a message, respecting each channel's current setup and limits
-	 * @param {string} message
-	 * @param {Channel|string} channel
-	 * @param {Object} options = {}
-	 * @param {boolean} [options.meAction] If `true`, adds a ".me" at the start of the message to create a "me action".
+	 * @param [options.meAction] If `true`, adds a ".me" at the start of the message to create a "me action".
 	 * If not `true`, will escape all leading command characters (period "." or slash "/") by doubling them up.
 	 */
-	async send (message, channel, options = {}) {
-		const channelData = sb.Channel.get(channel, this);
+	async send (message: string, channelData: Channel, options: { meAction?: boolean; } = {}) {
 		if (channelData.Mode === "Inactive" || channelData.Mode === "Read") {
 			return;
 		}
@@ -271,7 +452,7 @@ export class TwitchPlatform extends Template {
 
 		// Neither the "same message" nor "global" cooldowns apply to VIP or Moderator channels
 		if (channelData.Mode === "Write") {
-			const now = sb.Date.now();
+			const now = SupiDate.now();
 			const { length = 0, time = 0 } = this.#previousMessageMeta.get(channelData.ID) ?? {};
 			if (time + WRITE_MODE_MESSAGE_DELAY > now) {
 				setTimeout(() => this.send(message, channel), now - time);
@@ -312,7 +493,7 @@ export class TwitchPlatform extends Template {
 				status: response.statusCode,
 				body: response.body,
 				message,
-				channel,
+				channel: channelData.Name,
 				options
 			});
 
@@ -322,47 +503,37 @@ export class TwitchPlatform extends Template {
 		const replyData = response.body.data[0];
 		if (!replyData.is_sent) {
 			console.warn("JSON not sent!", {
-				time: new sb.Date().format("Y-m-d H:i:s"),
+				time: new SupiDate().format("Y-m-d H:i:s"),
 				channel: {
-					ID: channel.ID,
-					Name: channel.Name
+					ID: channelData.ID,
+					Name: channelData.Name
 				},
 				message,
 				replyData
 			});
 
 			if (MESSAGE_MODERATION_CODES.has(replyData.drop_reason.code) && baseMessage !== BAD_MESSAGE_RESPONSE) {
-				await this.send(BAD_MESSAGE_RESPONSE, channel);
+				await this.send(BAD_MESSAGE_RESPONSE, channelData);
 			}
 		}
 		else {
 			this.#previousMessageMeta.set(channelData.ID, {
 				length: message.length,
-				time: sb.Date.now()
+				time: SupiDate.now()
 			});
 		}
 	}
 
-	/**
-	 * @param {string} message
-	 * @param {Channel|string} channel
-	 */
-	async me (message, channel) {
+	async me (message: string, channel: Channel) {
 		return await this.send(message, channel, { meAction: true });
 	}
 
-	/**
-	 * Sends a private message to given user.
-	 * @param {string} message
-	 * @param {string} user
-	 */
-	async pm (message, user) {
+	async pm (message: string, userData: User) {
 		const joinOverride = this.config.joinChannelsOverride ?? [];
 		if (this.config.suspended || joinOverride.length !== 0) {
 			return;
 		}
 
-		const userData = await sb.User.get(user);
 		if (!userData.Twitch_ID) {
 			const response = await sb.Got.get("Helix")({
 				url: "users",
@@ -373,7 +544,7 @@ export class TwitchPlatform extends Template {
 
 			const helixUserData = response.body?.data?.[0];
 			if (!response.ok || !helixUserData) {
-				throw new sb.Error({
+				throw new SupiError({
 					message: "No Helix data found for user",
 					args: {
 						ID: userData.ID,
@@ -414,55 +585,41 @@ export class TwitchPlatform extends Template {
 		}
 	}
 
-	/**
-	 * @param {Channel|string} channelData
-	 * @param {User|string} userData
-	 * @param {number|null} duration If number = timeout, if null = permaban
-	 * @param {string|null} reason
-	 * @returns {Promise<{ ok: boolean, statusCode: number, body: Object[] }>}
-	 */
-	async timeout (channelData, userData, duration = 1, reason = null) {
-		if (!channelData || !userData) {
-			throw new sb.Error({
+	async timeout (channelData: Channel, user: User | string, duration = 1, reason: string | null = null) {
+		if (!channelData || !user) {
+			throw new SupiError({
 				message: "Missing user or channel",
 				args: {
-					channelData,
-					userData
+					channel: channelData.Name,
+					user: (typeof user === "string") ? user : user.Name
+				}
+			});
+		}
+		else if (channelData.Platform !== this) {
+			throw new SupiError({
+				message: "Non-Twitch channel provided",
+				args: { channel: channelData.Name }
+			});
+		}
+
+		const channelID = channelData.Specific_ID ?? await this.getUserID(channelData);
+		if (!channelID) {
+			throw new SupiError({
+				message: "Invalid channel provided"
+			});
+		}
+
+		const userID = (user instanceof sb.User) ? user.Twitch_ID : await this.getUserID(user);
+		if (!userID) {
+			throw new SupiError({
+				message: "Invalid user provided",
+				args: {
+					user: (typeof user === "string") ? user : user.Name
 				}
 			});
 		}
 
-		let channelID;
-		if (channelData instanceof sb.Channel) {
-			if (channelData.Platform !== this) {
-				throw new sb.Error({
-					message: "Non-Twitch channel provided",
-					args: { channelData }
-				});
-			}
-
-			channelID = channelData.Specific_ID;
-		}
-		else {
-			channelID = await this.getUserID(channelData);
-		}
-
-		if (!channelID) {
-			throw new sb.Error({
-				message: "Invalid channel provided",
-				args: { userData }
-			});
-		}
-
-		const userID = (userData instanceof sb.User) ? userData.Twitch_ID : await this.getUserID(userData);
-
-		if (!userID) {
-			throw new sb.Error({
-				message: "Invalid user provided",
-				args: { userData }
-			});
-		}
-
+		// @todo add types for moderation Helix API
 		const response = await sb.Got.get("Helix")({
 			method: "POST",
 			url: "moderation/bans",
@@ -486,33 +643,24 @@ export class TwitchPlatform extends Template {
 		};
 	}
 
-	/**
-	 * Handles incoming messages.
-	 * @param {Object} event
-	 * @returns {Promise<void>}
-	 */
-	async handleMessage (event) {
+	async handleMessage (event: MessageSubscriptionData["payload"]["event"]) {
 		const {
 			broadcaster_user_login: channelName,
 			broadcaster_user_id: channelId,
 			chatter_user_login: senderUsername,
 			chatter_user_id: senderUserId,
-			/** @type {TwitchBadge[]} */
 			badges,
 			color,
 			channel_points_animation_id: animationId,
 			channel_points_custom_reward_id: rewardId,
-			/** @type {{bits: number} | null} */
 			cheer,
-			/** @type {TwitchReply | null} */
 			reply
 		} = event;
 
 		const messageData = {
 			text: TwitchUtils.sanitizeMessage(event.message.text),
-			/** @type {TwitchMessageFragment[]} */
 			fragments: event.message.fragments,
-			type: event.message_type, // text, channel_points_highlighted, channel_points_sub_only, user_intro, animated, power_ups_gigantified_emote
+			type: event.message_type,
 			id: event.message_id,
 			bits: cheer,
 			badges,
@@ -524,7 +672,7 @@ export class TwitchPlatform extends Template {
 		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserId });
 
 		if (!userData) {
-			TwitchUtils.emitRawUserMessageEvent(senderUsername, channelName, messageData);
+			TwitchUtils.emitRawUserMessageEvent(senderUsername, channelName, this, messageData);
 			return;
 		}
 		else if (userData.Twitch_ID === null && userData.Discord_ID !== null) {
@@ -532,7 +680,7 @@ export class TwitchPlatform extends Template {
 				await userData.saveProperty("Twitch_ID", senderUserId);
 			}
 			else {
-				if (!messageData.startsWith(sb.Command.prefix)) {
+				if (!messageData.text.startsWith(sb.Command.prefix)) {
 					return;
 				}
 
@@ -548,7 +696,7 @@ export class TwitchPlatform extends Template {
 					${sb.Command.prefix}link ${challenge}
 				 `;
 
-				await this.pm(userData.Name, message);
+				await this.pm(message, userData);
 				return;
 			}
 		}
@@ -562,7 +710,7 @@ export class TwitchPlatform extends Template {
 			const channelData = (channelName) ? sb.Channel.get(channelName, this) : null;
 
 			if (!channelName || (channelData && sb.Command.is(messageData.text))) {
-				const notified = await userData.getDataProperty("twitch-userid-mismatch-notification");
+				const notified = await userData.getDataProperty("twitch-userid-mismatch-notification") as boolean | undefined;
 				if (!notified) {
 					const replyMessage = sb.Utils.tag.trim `
 						@${userData.Name}, you have been flagged as suspicious.
@@ -574,14 +722,14 @@ export class TwitchPlatform extends Template {
 					if (channelData) {
 						const finalMessage = await this.prepareMessage(replyMessage, channelData);
 						if (!finalMessage) {
-							await this.pm(replyMessage, userData.Name);
+							await this.pm(replyMessage, userData);
 						}
 						else {
 							await channelData.send(finalMessage);
 						}
 					}
 					else {
-						await this.pm(replyMessage, userData.Name);
+						await this.pm(replyMessage, userData);
 					}
 
 					await Promise.all([
@@ -591,7 +739,7 @@ export class TwitchPlatform extends Template {
 				}
 			}
 
-			TwitchUtils.emitRawUserMessageEvent(senderUsername, channelName, messageData);
+			TwitchUtils.emitRawUserMessageEvent(senderUsername, channelName, this, messageData);
 
 			return;
 		}
@@ -700,7 +848,7 @@ export class TwitchPlatform extends Template {
 			return;
 		}
 
-		const now = sb.Date.now();
+		const now = SupiDate.now();
 		const timeout = this.#userCommandSpamPrevention.get(userData.ID);
 		if (typeof timeout === "number" && timeout > now) {
 			return;
@@ -897,7 +1045,7 @@ export class TwitchPlatform extends Template {
 	 * @param {Object} options = {}
 	 * @returns {Promise<boolean>} Whether or not a command has been executed.
 	 */
-	async handleCommand (command, user, channel, args = [], options = {}) {
+	async handleCommand (command: string, user: User, channel: Channel, args: string[] = [], options = {}) {
 		const userData = await sb.User.get(user, false);
 		const channelData = (channel === null) ? null : sb.Channel.get(channel, this);
 		const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
@@ -945,21 +1093,12 @@ export class TwitchPlatform extends Template {
 		return execution;
 	}
 
-	/**
-	 * Determines if a user is an owner of a given channel.
-	 * @param {Channel} channelData
-	 * @param {User} userData
-	 * @returns {Promise<boolean>}
-	 */
-	async isUserChannelOwner (channelData, userData) {
-		if (userData === null || channelData === null) {
-			return false;
-		}
-
+	async isUserChannelOwner (channelData: Channel, userData: User) {
 		return (channelData.Specific_ID === userData.Twitch_ID);
 	}
 
-	async getUserID (user) {
+	async getUserID (user: string): Promise<string | null> {
+		// @todo type: Helix User API
 		const response = await sb.Got.get("Helix")({
 			url: "users",
 			throwHttpErrors: false,
@@ -980,7 +1119,7 @@ export class TwitchPlatform extends Template {
 		return data[0].id;
 	}
 
-	async createUserMention (userData) {
+	async createUserMention (userData: User) {
 		return `@${userData.Name}`;
 	}
 
@@ -989,7 +1128,7 @@ export class TwitchPlatform extends Template {
 	 * @param {sb.User} userData
 	 * @returns {Promise<boolean>}
 	 */
-	async fetchUserAdminSubscription (userData) {
+	async fetchUserAdminSubscription (userData: User) {
 		/** @type {Object[]|null} */
 		const subscriberList = await sb.Cache.getByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST);
 		if (!subscriberList || !Array.isArray(subscriberList)) {
@@ -1003,16 +1142,22 @@ export class TwitchPlatform extends Template {
 		return await sb.Cache.server.lrange(LIVE_STREAMS_KEY, 0, -1);
 	}
 
-	async addLiveChannelIdList (channelId) {
+	async addLiveChannelIdList (channelId: string) {
 		return await sb.Cache.server.lpush(LIVE_STREAMS_KEY, channelId);
 	}
 
-	async removeLiveChannelIdList (channelId) {
+	async removeLiveChannelIdList (channelId: string) {
 		return await sb.Cache.server.lrem(LIVE_STREAMS_KEY, 1, channelId);
 	}
 
-	async isChannelLive (channelData) {
+	async isChannelLive (channelData: Channel) {
 		const channelId = channelData.Specific_ID;
+		if (!channelId) {
+			throw new SupiError({
+				message: "Channel has no Twitch ID specified"
+			});
+		}
+
 		const liveList = await this.getLiveChannelIdList();
 		return (liveList.includes(channelId));
 	}
@@ -1021,7 +1166,8 @@ export class TwitchPlatform extends Template {
 	 * Fetches a list of emote data available to the bot user.
 	 * @returns {Promise<TwitchEmoteSetDataObject[]>}
 	 */
-	static async fetchTwitchEmotes (selfId) {
+	static async fetchTwitchEmotes (selfId: string) {
+		// @todo Helix API type
 		const response = await sb.Got.get("Helix")({
 			url: "chat/emotes/user",
 			method: "GET",
@@ -1053,20 +1199,16 @@ export class TwitchPlatform extends Template {
 		return result;
 	}
 
-	/**
-	 * Fetches a list of BTTV emote data for a given channel
-	 * @param {Channel} channelData
-	 * @returns {Promise<TypedEmote[]>}
-	 */
-	static async fetchChannelBTTVEmotes (channelData) {
+	static async fetchChannelBTTVEmotes (channelData: Channel): Promise<Emote[]> {
 		const channelID = channelData.Specific_ID;
 		if (!channelID) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "No available ID for channel",
 				args: { channel: channelData.Name }
 			});
 		}
 
+		// @todo BTTV API type
 		const response = await sb.Got.get("TwitchEmotes")({
 			url: `https://api.betterttv.net/3/cached/users/twitch/${channelID}`
 		});
@@ -1094,12 +1236,8 @@ export class TwitchPlatform extends Template {
 		}));
 	}
 
-	/**
-	 * Fetches a list of FFZ emote data for a given channel
-	 * @param {Channel} channelData
-	 * @returns {Promise<TypedEmote[]>}
-	 */
-	static async fetchChannelFFZEmotes (channelData) {
+	static async fetchChannelFFZEmotes (channelData: Channel): Promise<Emote[]> {
+		// @todo FFZ API type
 		const response = await sb.Got.get("TwitchEmotes")({
 			url: `https://api.frankerfacez.com/v1/room/${channelData.Name}`
 		});
@@ -1125,12 +1263,8 @@ export class TwitchPlatform extends Template {
 		}));
 	}
 
-	/**
-	 * Fetches a list of 7TV emote data for a given channel
-	 * @param {Channel} channelData
-	 * @returns {Promise<TypedEmote[]>}
-	 */
-	static async fetchChannelSevenTVEmotes (channelData) {
+	static async fetchChannelSevenTVEmotes (channelData: Channel): Promise<Emote[]> {
+		// @todo 7TV API type
 		const response = await sb.Got.get("TwitchEmotes")({
 			url: `https://7tv.io/v3/users/twitch/${channelData.Specific_ID}`
 		});
@@ -1150,17 +1284,12 @@ export class TwitchPlatform extends Template {
 			type: "7tv",
 			global: false,
 			animated: i.data.animated,
-			// eslint-disable-next-line no-bitwise
 			zeroWidth: Boolean(i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
 		}));
 	}
 
-	/**
-	 * Fetches all global emotes for any context.
-	 * Ideally cached for a rather long time.
-	 * @returns {Promise<TypedEmote[]>}
-	 */
-	async populateGlobalEmotes () {
+	async populateGlobalEmotes (): Promise<Emote[]> {
+		// @todo Types for Twitch/Helix, BTTV, FFZ, 7TV APIs
 		const [twitch, bttv, ffz, sevenTv] = await Promise.allSettled([
 			TwitchPlatform.fetchTwitchEmotes(this.selfId),
 			sb.Got.get("TwitchEmotes")({
@@ -1174,13 +1303,13 @@ export class TwitchPlatform extends Template {
 			})
 		]);
 
-		const rawTwitchEmotes = twitch.value ?? [];
-		const rawFFZEmotes = Object.values(ffz.value?.body.sets ?? {});
-		const rawBTTVEmotes = (bttv.value?.body && typeof bttv.value?.body === "object")
+		const rawTwitchEmotes = (twitch.status === "fulfilled") ? twitch.value : [];
+		const rawFFZEmotes = (ffz.status === "fulfilled") ? Object.values(ffz.value.body.sets) : {};
+		const rawBTTVEmotes = (bttv.status === "fulfilled" && typeof bttv.value?.body === "object")
 			? Object.values(bttv.value.body)
 			: [];
-		const rawSevenTvEmotes = (sevenTv.value?.body && Array.isArray(sevenTv.value?.body?.emotes))
-			? sevenTv.value.body?.emotes
+		const rawSevenTvEmotes = (sevenTv.status === "fulfilled" && Array.isArray(sevenTv.value?.body?.emotes))
+			? sevenTv.value.body.emotes
 			: [];
 
 		const twitchEmotes = rawTwitchEmotes.map(i => {
@@ -1231,11 +1360,7 @@ export class TwitchPlatform extends Template {
 		];
 	}
 
-	/**
-	 * @param {Channel} channelData
-	 * @returns {Promise<TypedEmote[]>}
-	 */
-	async fetchChannelEmotes (channelData) {
+	async fetchChannelEmotes (channelData: Channel): Promise<Emote[]> {
 		const [bttv, ffz, sevenTv] = await Promise.allSettled([
 			TwitchPlatform.fetchChannelBTTVEmotes(channelData),
 			TwitchPlatform.fetchChannelFFZEmotes(channelData),
@@ -1243,19 +1368,21 @@ export class TwitchPlatform extends Template {
 		]);
 
 		return [
-			...(bttv.value ?? []), ...(ffz.value ?? []), ...(sevenTv.value ?? [])
+			...((bttv.status === "fulfilled") ? bttv.value : []),
+			...((ffz.status === "fulfilled") ? ffz.value : []),
+			...((sevenTv.status === "fulfilled") ? sevenTv.value : []),
 		];
 	}
 
-	async populateUserList (channelData) {
+	async populateUserList (channelData: Channel) {
 		return await TwitchUtils.getActiveUsernamesInChannel(channelData);
 	}
 
-	fetchInternalPlatformIDByUsername (userData) {
+	fetchInternalPlatformIDByUsername (userData: User): string | null {
 		return userData.Twitch_ID;
 	}
 
-	async fetchUsernameByUserPlatformID (userPlatformID) {
+	async fetchUsernameByUserPlatformID (userPlatformID: string): Promise<string | null> {
 		const response = await sb.Got.get("Helix")({
 			url: "users",
 			throwHttpErrors: false,
@@ -1271,7 +1398,7 @@ export class TwitchPlatform extends Template {
 		return response.body.data[0].login;
 	}
 
-	async joinChannel (channelId) {
+	async joinChannel (channelId: string) {
 		return await Promise.all([
 			TwitchUtils.createChannelChatMessageSubscription(this.selfId, channelId, this),
 			TwitchUtils.createChannelOnlineSubscription(channelId),
@@ -1286,23 +1413,23 @@ export class TwitchPlatform extends Template {
 
 		const reconnectTimeout = setTimeout(() => {
 			console.warn(`No ping received in ${NO_EVENT_RECONNECT_TIMEOUT}ms, reconnecting...`);
-			this.client.close();
-			this.connect({ skipSubscriptions: true });
+			this.client!.close();
+			void this.connect({ skipSubscriptions: true });
 		}, NO_EVENT_RECONNECT_TIMEOUT);
 
-		const start = new sb.Date();
+		const start = SupiDate.now();
 		this.client.once("pong", () => {
 			clearTimeout(reconnectTimeout);
 
-			const end = new sb.Date();
+			const end = SupiDate.now();
 			this.#websocketLatency = end - start;
 		});
 
 		this.client.ping();
 	}
 
-	async fixChannelRename (channelData, twitchChanelName, channelId) {
-		const existingChannelName = await sb.Query.getRecordset(rs => rs
+	async fixChannelRename (channelData: Channel, twitchChanelName: string, channelId: string) {
+		const existingChannelName = await sb.Query.getRecordset<string | undefined>(rs => rs
 			.select("Name")
 			.from("chat_data", "Channel")
 			.where("Name = %s", twitchChanelName)
@@ -1332,8 +1459,20 @@ export class TwitchPlatform extends Template {
 		};
 	}
 
-	static async fetchAccountChallengeStatus (userData, twitchID) {
-		return await sb.Query.getRecordset(rs => rs
+	initListeners (): void {}
+
+	destroy () {
+		if (this.client) {
+			this.client.terminate();
+		}
+
+		this.client = null;
+	}
+
+	get websocketLatency () { return this.#websocketLatency; }
+
+	static async fetchAccountChallengeStatus (userData: User, twitchID: string) {
+		return await sb.Query.getRecordset<string | undefined>(rs => rs
 			.select("Status")
 			.from("chat_data", "User_Verification_Challenge")
 			.where("User_Alias = %n", userData.ID)
@@ -1341,32 +1480,33 @@ export class TwitchPlatform extends Template {
 			.orderBy("ID DESC")
 			.limit(1)
 			.single()
-			.flat("Status"));
+			.flat("Status")
+		);
 	}
 
-	static async createAccountChallenge (userData, twitchID) {
+	static async createAccountChallenge (userData: User, twitchID: string) {
 		const row = await sb.Query.getRow("chat_data", "User_Verification_Challenge");
 		const challenge = randomBytes(16).toString("hex");
 
+		const discordPlatform = Platform.get("discord");
+		const twitchPlatform = Platform.get("twitch");
+		if (!discordPlatform || !twitchPlatform) {
+			throw new SupiError({
+				message: "Missing platform(s) to create a verification challenge"
+			});
+		}
 		row.setValues({
 			User_Alias: userData.ID,
 			Specific_ID: twitchID,
 			Challenge: challenge,
-			Platform_From: sb.Platform.get("twitch").ID,
-			Platform_To: sb.Platform.get("discord").ID
+			Platform_From: twitchPlatform.ID,
+			Platform_To: discordPlatform.ID
 		});
 
 		await row.save();
 		return {
 			challenge
 		};
-	}
-
-	get websocketLatency () { return this.#websocketLatency; }
-
-	destroy () {
-		this.client.terminate();
-		this.client = null;
 	}
 }
 
@@ -1387,43 +1527,4 @@ export default TwitchPlatform;
  * @typedef {Object} EmoteDataObject
  * @property {string} ID Internal Twitch emote ID
  * @property {string} token Emote name
- */
-
-/**
- * @typedef {Object} TwitchReply
- * @property {string} parent_message_body
- * @property {string} parent_message_id
- * @property {string} parent_user_id
- * @property {string} parent_user_login
- * @property {string} parent_user_name *
- * @property {string} thread_message_id
- * @property {string} thread_user_id
- * @property {string} thread_user_login
- * @property {string} thread_user_name
- */
-
-/**
- * @typedef {Object} TwitchBadge
- * @property {string} set_id
- * @property {string} id
- * @property {string} info
- */
-
-/**
- * @typedef {Object} TwitchMessageFragment
- * @property {Object|null} cheermote
- * @property {string} cheermote.prefix
- * @property {number} cheermote.bits
- * @property {number} cheermote.tier
- * @property {Object|null} emote
- * @property {string} emote.id
- * @property {string} emote.emote_set_id
- * @property {string} emote.owner_id
- * @property {Array<"animated"|"static">} emote.format
- * @property {Object|null} mention
- * @property {string} mention.user_id
- * @property {string} mention.user_name
- * @property {string} mention.user_login
- * @property {string} text
- * @property {"text"|"cheermote"|"emote"|"mention"} type
  */
