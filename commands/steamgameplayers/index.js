@@ -215,6 +215,7 @@ export default {
 			reviewsString = result;
 		}
 
+		const steamLink = `https://store.steampowered.com/app/${gameId}`;
 		const players = playerCountResponse.body.response.player_count;
 		return {
 			reply: sb.Utils.tag.trim `
@@ -222,7 +223,8 @@ export default {
 				currently has
 				${sb.Utils.groupDigits(players)}
 				players in-game.
-				${reviewsString}		
+				${reviewsString}	
+				${steamLink}	
 			`
 		};
 	},
