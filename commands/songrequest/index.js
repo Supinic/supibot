@@ -77,11 +77,12 @@ const parseTimestamp = (linkParser, string) => {
 	}
 
 	const url = new URL(string, "https://youtube.com");
-	if (!url.searchParams.get("t")) {
+	const timestamp = url.searchParams.get("t");
+	if (!timestamp) {
 		return;
 	}
 
-	const value = Number(url.searchParams.get("t"));
+	const value = Number(timestamp.replace(/s$/, ""));
 	if (!Number.isFinite(value) || value < 0 || value > ARBITRARY_MAX_YOUTUBE_TIMESTAMP) {
 		return;
 	}
