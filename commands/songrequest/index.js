@@ -245,6 +245,12 @@ export default {
 					reply: `The video link you posted is currently unavailable!`
 				};
 			}
+			else if (data.type === "nicovideo") {
+				return {
+					success: false,
+					reply: "Nicovideo links are currently not supported!"
+				};
+			}
 		}
 		else if (parsedURL.host) {
 			if (parsedURL.host === "clips.twitch.tv") {
