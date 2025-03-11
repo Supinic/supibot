@@ -67,6 +67,7 @@ export type StrictResult = {
 };
 type Result = StrictResult & {
 	reason?: string;
+	replyWithMeAction?: boolean;
 	discord?: {
 		embeds?: DiscordEmbeds;
 		reactions: string[] | { emoji: string; }[];

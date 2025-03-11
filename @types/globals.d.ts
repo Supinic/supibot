@@ -2,7 +2,7 @@ export type Message = string;
 export type Emote = {
     ID: string | number;
     name: string;
-    type: "twitch-subscriber" | "twitch-global" | "ffz" | "bttv" | "7tv" | "discord" | "cytube";
+    type: "twitch-subscriber" | "twitch-global" | "twitch-follower" | "ffz" | "bttv" | "7tv" | "discord" | "cytube";
     global: boolean;
     animated: boolean | null;
     guild?: string;

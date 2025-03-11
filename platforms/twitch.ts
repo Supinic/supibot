@@ -4,7 +4,25 @@ import { randomBytes } from "node:crypto";
 import { Platform, BaseConfig } from "./template.js";
 import cacheKeys from "../utils/shared-cache-keys.json" with { type: "json" };
 
-import TwitchUtils from "./twitch-utils.js";
+import TwitchUtils, {
+	MessageNotification,
+	isMessageNotification,
+	TwitchWebsocketMessage,
+	isWelcomeMessage,
+	isReconnectMessage,
+	isRevocationMessage,
+	isNotificationMessage,
+	NotificationMessage,
+	SessionReconnectMessage,
+	isWhisperNotification,
+	isRaidNotification,
+	isSubscribeNotification,
+	isStreamChangeNotification,
+	WhisperNotification,
+	SubscribeMessageNotification,
+	RaidNotification, StreamOnlineNotification, StreamOfflineNotification, BroadcasterSubscription
+} from "./twitch-utils.js";
+
 import { Channel } from "../classes/channel.js";
 import { User } from "../classes/user.js";
 import { Emote } from "../@types/globals.js";
@@ -12,7 +30,6 @@ import { SupiDate, SupiError } from "supi-core";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
-// eslint-disable-next-line no-bitwise
 const SEVEN_TV_ZERO_WIDTH_FLAG = (1 << 8);
 
 const { TWITCH_ADMIN_SUBSCRIBER_LIST } = cacheKeys;
@@ -73,301 +90,124 @@ const DEFAULT_PLATFORM_CONFIG = {
 	whisperMessageLimit: 500,
 	unrelatedPrivateMessageResponse: ""
 } as const;
+const TWITCH_SUBSCRIPTION_PLANS = {
+	"1000": "$5",
+	"2000": "$10",
+	"3000": "$25",
+	"Prime": "Prime"
+} as const;
 
-export type SubscriptionCondition = string
-	| { user_id: string; }
-	| { broadcaster_user_id: string; }
-	| { to_broadcaster_user_id: string; }
-	| { user_id: string; broadcaster_user_id: string; };
-
-export type Subscription = {
+type UserLookupResponse = {
+	data: {
+		id: string;
+		login: string;
+		display_name: string;
+		type: "" | "staff" | "global_mod" | "admin";
+		broadcaster_type: "" | "affliate" | "partner";
+		description: string;
+		profile_image_url: string;
+		offline_image_url: string;
+		/** @deprecated This field has been deprecated. Any data in this field is not valid and should not be used */
+		view_count: number;
+		created_at: string;
+	}[];
+};
+type HelixEmote = {
 	id: string;
-	status: string;
-	type: string;
-	version: string;
-	cost: number;
-	condition: SubscriptionCondition;
+	name: string;
+	emote_type:
+		| "none" | "bitstier" | "follower" | "subscriptions" | "channelpoints"
+		| "rewards" | "hypetrain" | "prime" | "turbo" | "smilies"
+		| "owl2019" | "twofactor" | "limitedtime";
+	emote_set_id: string;
+	owner_id: string;
+	format: ("animated" | "static")[];
+	scale: ("1.0" | "2.0" | "3.0")[];
+	theme_mode: ("dark" | "light")[];
+};
+type HelixEmoteResponse = {
+	data: HelixEmote[];
+	template: string;
+	pagination: { cursor?: string; };
+};
+
+type BttvEmote = {
+	id: string;
+	code: string;
+	imageType: "gif" | "png";
+	animated: boolean;
+	userId: string;
+	height?: number;
+	width?: number;
+};
+type BttvEmoteResponse = {
+	id: string;
+	bots: string[];
+	avatar: string;
+	channelEmotes: BttvEmote[];
+	sharedEmotes: BttvEmote[];
+};
+
+type FfzEmote = {
+	id: number;
+	name: string;
+	height: number;
+	width: number;
+	public: boolean;
+	hidden: boolean;
+	modifier: boolean;
+	modifier_flags: number;
+	offset: unknown | null;
+	margins: unknown | null;
+	css: unknown | null;
+	owner: {
+		_id: number;
+		name: string;
+		display_name: string;
+	};
+	artist: unknown | null;
+	urls: {
+		1: string;
+		2: string;
+		4: string;
+	};
+	status: number;
+	usage_count: number;
 	created_at: string;
-	transport: { method: string; callback: string; };
+	last_updated: string;
+}
+type FfzEmoteResponse = {
+	sets: Record<string, {
+		id: string;
+		icon: string | null;
+		title: string;
+		emoticons: FfzEmote[];
+	}>;
 };
-type EnabledSubscription = Subscription & {
-	status: "enabled";
-};
-type RevokedSubscription = Subscription & {
-	status: "user_removed" | "authorization_revoked" | "version_removed";
-}
 
-interface BaseWebsocketMessage {
-	metadata: {
-		message_id: string;
-		message_type: string;
-		message_timestamp: string;
-	};
-	payload: Record<string, unknown>;
-}
-interface SessionWelcomeMessage extends BaseWebsocketMessage {
-	metadata: {
-		message_id: string;
-		message_type: "session_welcome";
-		message_timestamp: string;
-	}
-	payload: {
-		session: {
-			id: string;
-			status: string;
-			connected_at: string;
-			keepalive_timeout_seconds: number;
-			reconnect_url: null;
-		};
-	};
-}
-interface SessionKeepaliveMessage extends BaseWebsocketMessage {
-	metadata: {
-		message_id: string;
-		message_type: "session_keepalive";
-		message_timestamp: string;
-	};
-	payload: {};
-}
-interface SessionReconnectMessage extends BaseWebsocketMessage {
-	metadata: {
-		message_id: string;
-		message_type: "session_reconnect";
-		message_timestamp: string;
-	};
-	payload: {
-		session: {
-			id: string;
-			status: string;
-			connected_at: string;
-			keepalive_timeout_seconds: number;
-			reconnect_url: string;
-		}
-	};
-}
-interface RevocationMessage extends BaseWebsocketMessage {
-	metadata: {
-		message_id: string;
-		message_type: "revocation";
-		message_timestamp: string;
-		subscription_type: string;
-		subscription_verison: string;
-	};
-	payload: {
-		subscription: RevokedSubscription;
-	};
-}
-interface NotificationMessage extends BaseWebsocketMessage {
-	metadata: {
-		message_id: string;
-		message_type: "notification";
-		message_timestamp: string;
-		subscription_type: string;
-		subscription_verison: string;
-	};
-	payload: {
-		subscription: EnabledSubscription;
-		event: Record<string, unknown>;
-	};
-}
-
-const isWelcomeMessage = (input: TwitchWebsocketMessage): input is SessionWelcomeMessage => (input.metadata.message_type === "session_welcome");
-const isReconnectMessage = (input: TwitchWebsocketMessage): input is SessionReconnectMessage => (input.metadata.message_type === "session_reconnect");
-const isRevocationMessage = (input: TwitchWebsocketMessage): input is RevocationMessage => (input.metadata.message_type === "revocation");
-const isNotificationMessage = (input: TwitchWebsocketMessage): input is NotificationMessage => (input.metadata.message_type === "notification");
-
-type TwitchWebsocketMessage =
-	| SessionWelcomeMessage
-	| SessionKeepaliveMessage
-	| SessionReconnectMessage
-	| RevocationMessage
-	| NotificationMessage;
-
-type MessageBadge = {
-	set_id: string;
+type SevenTvEmote = {
 	id: string;
-	info: string;
+	name: string;
+	animated: boolean;
+	data: {
+		flags: number;
+		animated: boolean;
+	};
 };
-interface MessageNotification extends NotificationMessage {
-	payload: {
-		subscription: NotificationMessage["payload"]["subscription"] & {
-			type: "channel.chat.message";
-			condition: {
-				user_id: string;
-				broadcaster_user_id: string;
-			},
-		};
-		event: {
-			badges: MessageBadge[];
-			broadcaster_user_id: string;
-			broadcaster_user_login: string;
-			broadcaster_user_name: string;
-			channel_points_animation_id: string | null;
-			channel_points_custom_reward_id: string | null;
-			chatter_user_id: string;
-			chatter_user_login: string;
-			chatter_user_name: string;
-			cheer: {
-				bits: number;
-			} | null;
-			color: string;
-			message: {
-				fragments: {
-					type: "text" | "cheermote" | "emote" | "mention";
-					text: string;
-					cheermote: {
-						prefix: string;
-						bits: number;
-						tier: number;
-					} | null;
-					emote: {
-						id: string;
-						emote_set_id: string;
-						owner_id: string;
-						format: ("animated" | "static")[];
-					} | null;
-					mention: {
-						user_id: string;
-						user_name: string;
-						user_login: string;
-					} | null;
-				}[];
-				text: string;
-			};
-			message_id: string;
-			message_type: "text" | "channel_points_highlighted" | "channel_points_sub_only"
-				| "user_intro" | "power_ups_message_effect" | "power_ups_gigantified_emote";
-			reply: {
-				parent_message_id: string;
-				parent_message_body: string;
-				parent_user_id: string;
-				parent_user_name: string;
-				parent_user_login: string;
-				thread_message_id: string;
-				thread_user_id: string;
-				thread_user_name: string;
-				thread_user_login: string;
-			} | null;
-			source_badges: MessageBadge[] | null;
-			source_broadcaster_user_id: string | null;
-			source_broadcaster_user_name: string | null;
-			source_broadcaster_user_login: string | null;
-			source_message_id: string | null;
-		};
-	}
-}
-interface WhisperNotification extends NotificationMessage {
-	payload: {
-		subscription: NotificationMessage["payload"]["subscription"] & {
-			type: "user.whisper.message";
-			condition: {
-				user_id: string;
-			},
-		};
-		event: {
-			from_user_id: string;
-			from_user_login: string;
-			from_user_name: string;
-			to_user_id: string;
-			to_user_login: string;
-			to_user_name: string;
-			whisper_id: string;
-			whisper: { text: string; }
-		};
-	}
-}
-interface SubscribeMessageNotification extends NotificationMessage {
-	payload: {
-		subscription: NotificationMessage["payload"]["subscription"] & {
-			type: "channel.subscription.message";
-			condition: {
-				broadcaster_user_id: string;
-			},
-		};
-		event: {
-			user_id: string;
-			user_login: string;
-			user_name: string;
-			broadcaster_user_id: string;
-			broadcaster_user_login: string;
-			broadcaster_user_name: string;
-			tier: string;
-			message: {
-				text: string;
-				emotes: {
-					begin: number;
-					end: number;
-					id: string;
-				}[];
-			};
-			cumulative_months: number;
-			streak_months: number | null;
-			duration_months: number;
-		};
-	}
-}
-interface RaidNotification extends NotificationMessage {
-	payload: {
-		subscription: NotificationMessage["payload"]["subscription"] & {
-			type: "channel.raid";
-			condition: {
-				to_broadcaster_user_id: string;
-			},
-		};
-		event: {
-			from_broadcaster_user_id: string;
-			from_broadcaster_user_login: string;
-			from_broadcaster_user_name: string;
-			to_broadcaster_user_id: string;
-			to_broadcaster_user_login: string;
-			to_broadcaster_user_name: string;
-			viewers: number;
-		};
+type SevenTvEmoteResponse = {
+	id: string;
+	platform: string;
+	username: string;
+	display_name: string;
+	emote_set: {
+		id: string;
+		name: string;
+		emotes?: SevenTvEmote[];
 	};
-}
-interface StreamOnlineNotification extends NotificationMessage {
-	payload: {
-		subscription: NotificationMessage["payload"]["subscription"] & {
-			type: "stream.online";
-			condition: {
-				broadcaster_user_id: string;
-			},
-		};
-		event: {
-			id: string;
-			broadcaster_user_id: string;
-			broadcaster_user_login: string;
-			broadcaster_user_name: string;
-			started_at: string;
-			type: "live" | "playlist" | "watch_party" | "premiere" | "rerun";
-		};
-	};
-}
-interface StreamOfflineNotification extends NotificationMessage {
-	payload: {
-		subscription: NotificationMessage["payload"]["subscription"] & {
-			type: "stream.offline";
-			condition: {
-				broadcaster_user_id: string;
-			},
-		};
-		event: {
-			broadcaster_user_id: string;
-			broadcaster_user_login: string;
-			broadcaster_user_name: string;
-		};
-	};
-}
-
-const isMessageNotification = (input: NotificationMessage): input is MessageNotification => (input.payload.subscription.type === "channel.chat.message");
-const isWhisperNotification = (input: NotificationMessage): input is WhisperNotification => (input.payload.subscription.type === "user.whisper.message");
-const isSubscribeNotification = (input: NotificationMessage): input is SubscribeMessageNotification => (input.payload.subscription.type === "channel.subscription.message");
-const isRaidNotification = (input: NotificationMessage): input is RaidNotification => (input.payload.subscription.type === "channel.raid");
-const isStreamChangeNotification = (input: NotificationMessage): input is StreamOnlineNotification | StreamOfflineNotification => (
-	input.payload.subscription.type === "stream.offline" || input.payload.subscription.type === "stream.online"
-);
-
-type ExtractEvent<T extends NotificationMessage> = T["payload"]["event"];
+};
+type GlobalSevenTvEmoteResponse = SevenTvEmoteResponse["emote_set"] & {
+	emotes: SevenTvEmote[];
+};
 
 class ConfigurableWebsocket {
 	private instance: WebSocket | null = null;
@@ -400,7 +240,6 @@ interface TwitchConfig extends BaseConfig {
 			channels: string[];
 			string: string;
 		} | null;
-		subscriptionPlans?: Record<string, string>;
 		partChannelsOnPermaban?: boolean;
 		clearRecentBansTimer?: number;
 		recentBanThreshold?: number | null;
@@ -486,11 +325,18 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				await TwitchUtils.createWhisperMessageSubscription(this.selfId);
 			}
 
-			const existingChannels = existingSubs.filter(i => i.type === "channel.chat.message");
-			const existingIds = new Set(existingChannels.map(i => i.condition.broadcaster_user_id));
+			type ChatMessageSubscription = MessageNotification["payload"]["subscription"];
+			const existingChannelSubs = existingSubs.filter(i => i.type === "channel.chat.message") as ChatMessageSubscription[];
+			const existingChannelIds = new Set(existingChannelSubs.map(i => i.condition.broadcaster_user_id));
 
 			const channelList = sb.Channel.getJoinableForPlatform(this);
-			const missingChannels = channelList.filter(i => !existingIds.has(i.Specific_ID));
+			const missingChannels = channelList.filter(i => {
+				if (!i.Specific_ID) {
+					return false;
+				}
+
+				return !existingChannelIds.has(i.Specific_ID);
+			});
 
 			const batchSize = 100;
 			for (let index = 0; index < missingChannels.length; index += batchSize) {
@@ -550,16 +396,16 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 	async handleWebsocketNotification (data: NotificationMessage) {
 		if (isMessageNotification(data)) {
-			await this.handleMessage(data.payload.event);
+			await this.handleMessage(data);
 		}
 		else if (isWhisperNotification(data)) {
-			await this.handlePrivateMessage(data.payload.event);
+			await this.handlePrivateMessage(data);
 		}
 		else if (isSubscribeNotification(data)) {
-			await this.handleSub(data.payload.event);
+			await this.handleSub(data);
 		}
 		else if (isRaidNotification(data)) {
-			await this.handleRaid(data.payload.event);
+			await this.handleRaid(data);
 		}
 		else if (isStreamChangeNotification(data)) {
 			await this.handleStreamLiveChange(data);
@@ -606,7 +452,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			const now = SupiDate.now();
 			const { length = 0, time = 0 } = this.#previousMessageMeta.get(channelData.ID) ?? {};
 			if (time + WRITE_MODE_MESSAGE_DELAY > now) {
-				setTimeout(() => this.send(message, channel), now - time);
+				setTimeout(() => this.send(message, channelData), now - time);
 				return;
 			}
 
@@ -618,7 +464,21 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			}
 		}
 
-		const response = await sb.Got.get("Helix")({
+		type MessageSendSuccess = {
+			message_id: string;
+			is_sent: true;
+			drop_reason: null
+		};
+		type MessageSendFailure = {
+			message_id: "";
+			is_sent: false;
+			drop_reason: { code: string; message: string; };
+		};
+		type SendMessageResponse = {
+			data: (MessageSendSuccess | MessageSendFailure)[];
+		};
+
+		const response = await sb.Got.get("Helix")<SendMessageResponse>({
 			url: "chat/messages",
 			method: "POST",
 			throwHttpErrors: false,
@@ -685,9 +545,9 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			return;
 		}
 
-		if (!userData.Twitch_ID) {
-			// @todo API response type
-			const response = await sb.Got.get("Helix")({
+		let targetUserId = userData.Twitch_ID;
+		if (!targetUserId) {
+			const response = await sb.Got.get("Helix")<UserLookupResponse>({
 				url: "users",
 				searchParams: {
 					login: userData.Name
@@ -706,6 +566,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			}
 
 			await userData.saveProperty("Twitch_ID", helixUserData.id);
+			targetUserId = helixUserData.id;
 		}
 
 		const trimmedMessage = message
@@ -718,7 +579,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			url: "whispers",
 			searchParams: {
 				from_user_id: this.selfId,
-				to_user_id: userData.Twitch_ID
+				to_user_id: targetUserId
 			},
 			json: {
 				message: sb.Utils.wrapString(trimmedMessage, whisperMessageLimit)
@@ -771,8 +632,16 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			});
 		}
 
-		// @todo add types for moderation Helix API
-		const response = await sb.Got.get("Helix")({
+		type ModerationBanResponse = {
+			data: {
+				broadcaster_id: string;
+				moderator_id: string;
+				user_id: string;
+				created_at: string;
+				end_time: string;
+			}[];
+		};
+		const response = await sb.Got.get("Helix")<ModerationBanResponse>({
 			method: "POST",
 			url: "moderation/bans",
 			searchParams: {
@@ -795,7 +664,8 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		};
 	}
 
-	async handleMessage (event: ExtractEvent<MessageNotification>) {
+	async handleMessage (notification: MessageNotification) {
+		const { event } = notification.payload;
 		const {
 			broadcaster_user_login: channelName,
 			broadcaster_user_id: channelId,
@@ -1014,25 +884,23 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			.split(/\s+/)
 			.filter(Boolean);
 
+		// @todo figure out the "any data" messageData coming into Command.checkAndExecute
 		await this.handleCommand(command, userData, channelData, args, messageData);
 	}
 
-	/**
-	 * Handles incoming private messages.
-	 * Split from original single handleMessage handler, due to simplified flow for both methods.
-	 */
-	async handlePrivateMessage (event: ExtractEvent<WhisperNotification>) {
+	async handlePrivateMessage (notification: WhisperNotification) {
 		const {
 			from_user_login: senderUsername,
-			from_user_id: senderUserId
-		} = event;
+			from_user_id: senderUserId,
+			whisper
+		} = notification.payload.event;
 
 		const userData = await sb.User.get(senderUsername, false, { Twitch_ID: senderUserId });
 		if (!userData) {
 			return;
 		}
 
-		const message = event.whisper.text;
+		const message = whisper.text;
 		if (this.logging.whispers) {
 			await sb.Logger.push(message, userData, null, this);
 		}
@@ -1066,7 +934,9 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 	}
 
-	async handleSub (event: ExtractEvent<SubscribeMessageNotification>) {
+	async handleSub (notification: SubscribeMessageNotification) {
+		const { event } = notification.payload;
+
 		const userData = await sb.User.get(event.user_login);
 		const channelData = sb.Channel.get(event.broadcaster_user_login);
 		if (!channelData) {
@@ -1074,7 +944,6 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 
 		await sb.Logger.log("Twitch.Sub", JSON.stringify({ event }));
-		const plans = this.config.subscriptionPlans;
 
 		channelData.events.emit("subscription", {
 			event: "subscription",
@@ -1088,17 +957,18 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				streak: event.streak_months ?? 1,
 				gifted: false,
 				recipient: userData,
-				plan: plans[event.tier]
+				plan: TWITCH_SUBSCRIPTION_PLANS[event.tier]
 			}
 		});
 	}
 
-	async handleRaid (event: ExtractEvent<RaidNotification>) {
+	async handleRaid (notification: RaidNotification) {
 		const {
 			to_broadcaster_user_id: channelId,
 			to_broadcaster_user_login: channelName,
-			from_broadcaster_user_login: fromName
-		} = event;
+			from_broadcaster_user_login: fromName,
+			viewers
+		} = notification.payload.event;
 
 		const channelData = sb.Channel.get(channelName, this) ?? sb.Channel.getBySpecificId(channelId, this);
 		if (!channelData || channelData.Mode === "Read" || channelData.Mode === "Inactive") {
@@ -1112,12 +982,12 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			username: fromName,
 			platform: this,
 			data: {
-				viewers: event.viewers
+				viewers
 			}
 		});
 
 		if (this.logging.hosts) {
-			await sb.Logger.log("Twitch.Host", `Raid: ${fromName} => ${channelData.Name} for ${event.viewers} viewers`);
+			await sb.Logger.log("Twitch.Host", `Raid: ${fromName} => ${channelData.Name} for ${viewers} viewers`);
 		}
 	}
 
@@ -1154,7 +1024,13 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 	}
 
-	async handleCommand (command: string, user: User, channel: Channel | null, args: string[] = [], options = {}) {
+	async handleCommand (
+		command: string,
+		user: User,
+		channel: Channel | null,
+		args: string[] = [],
+		options: { privateMessage?: boolean; } = {}
+	) {
 		const userData = await sb.User.get(user, false);
 		const channelData = (channel === null) ? null : sb.Channel.get(channel, this);
 		const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
@@ -1174,10 +1050,18 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				skipLengthCheck: true
 			});
 
-			await this.pm(message, userData.Name);
+			if (message) {
+				await this.pm(message, userData);
+			}
 		}
 		else {
-			if (channelData?.Mirror) {
+			if (!channelData) {
+				throw new SupiError({
+					message: "Assert error - No Channel in public command response"
+				});
+			}
+
+			if (channelData.Mirror) {
 				await this.mirror(execution.reply, userData, channelData, {
 					...commandOptions,
 					commandUsed: true
@@ -1207,8 +1091,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	async getUserID (user: string): Promise<string | null> {
-		// @todo type: Helix User API
-		const response = await sb.Got.get("Helix")({
+		const response = await sb.Got.get("Helix")<UserLookupResponse>({
 			url: "users",
 			throwHttpErrors: false,
 			searchParams: {
@@ -1234,12 +1117,9 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 	/**
 	 * Determines whether a user is subscribed to a given Twitch channel.
-	 * @param {sb.User} userData
-	 * @returns {Promise<boolean>}
 	 */
 	async fetchUserAdminSubscription (userData: User) {
-		/** @type {Object[]|null} */
-		const subscriberList = await sb.Cache.getByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST);
+		const subscriberList = await sb.Cache.getByPrefix(TWITCH_ADMIN_SUBSCRIBER_LIST) as BroadcasterSubscription[] | null;
 		if (!subscriberList || !Array.isArray(subscriberList)) {
 			return false;
 		}
@@ -1247,15 +1127,15 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		return subscriberList.some(i => i.user_id === userData.Twitch_ID);
 	}
 
-	async getLiveChannelIdList () {
+	async getLiveChannelIdList (): Promise<string[]> {
 		return await sb.Cache.server.lrange(LIVE_STREAMS_KEY, 0, -1);
 	}
 
-	async addLiveChannelIdList (channelId: string) {
+	async addLiveChannelIdList (channelId: string): Promise<number> {
 		return await sb.Cache.server.lpush(LIVE_STREAMS_KEY, channelId);
 	}
 
-	async removeLiveChannelIdList (channelId: string) {
+	async removeLiveChannelIdList (channelId: string): Promise<number> {
 		return await sb.Cache.server.lrem(LIVE_STREAMS_KEY, 1, channelId);
 	}
 
@@ -1271,13 +1151,8 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		return (liveList.includes(channelId));
 	}
 
-	/**
-	 * Fetches a list of emote data available to the bot user.
-	 * @returns {Promise<TwitchEmoteSetDataObject[]>}
-	 */
 	static async fetchTwitchEmotes (selfId: string) {
-		// @todo Helix API type
-		const response = await sb.Got.get("Helix")({
+		const response = await sb.Got.get("Helix")<HelixEmoteResponse>({
 			url: "chat/emotes/user",
 			method: "GET",
 			throwHttpErrors: false,
@@ -1287,22 +1162,20 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		});
 
 		const result = response.body.data;
-		if (response.body.pagination.cursor) {
-			let cursor = response.body.pagination.cursor;
-			while (cursor) {
-				const pageResponse = await sb.Got.get("Helix")({
-					url: "chat/emotes/user",
-					method: "GET",
-					throwHttpErrors: false,
-					searchParams: {
-						user_id: selfId,
-						after: cursor
-					}
-				});
+		let { cursor } = response.body.pagination;
+		while (cursor) {
+			const pageResponse = await sb.Got.get("Helix")<HelixEmoteResponse>({
+				url: "chat/emotes/user",
+				method: "GET",
+				throwHttpErrors: false,
+				searchParams: {
+					user_id: selfId,
+					after: cursor
+				}
+			});
 
-				result.push(...pageResponse.body.data);
-				cursor = pageResponse.body.pagination.cursor ?? null;
-			}
+			result.push(...pageResponse.body.data);
+			cursor = pageResponse.body.pagination.cursor;
 		}
 
 		return result;
@@ -1317,8 +1190,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			});
 		}
 
-		// @todo BTTV API type
-		const response = await sb.Got.get("TwitchEmotes")({
+		const response = await sb.Got.get("TwitchEmotes")<BttvEmoteResponse>({
 			url: `https://api.betterttv.net/3/cached/users/twitch/${channelID}`
 		});
 
@@ -1340,14 +1212,13 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			name: i.code,
 			type: "bttv",
 			global: false,
-			animated: (i.imageType === "gif"),
+			animated: i.animated ?? (i.imageType === "gif"),
 			zeroWidth: false
 		}));
 	}
 
 	static async fetchChannelFFZEmotes (channelData: Channel): Promise<Emote[]> {
-		// @todo FFZ API type
-		const response = await sb.Got.get("TwitchEmotes")({
+		const response = await sb.Got.get("TwitchEmotes")<FfzEmoteResponse>({
 			url: `https://api.frankerfacez.com/v1/room/${channelData.Name}`
 		});
 
@@ -1359,8 +1230,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			return [];
 		}
 
-		const emotes = Object.values(response.body.sets)
-			.flatMap(i => i.emoticons);
+		const emotes = Object.values(response.body.sets).flatMap(i => i.emoticons);
 
 		return emotes.map(i => ({
 			ID: i.id,
@@ -1373,8 +1243,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	static async fetchChannelSevenTVEmotes (channelData: Channel): Promise<Emote[]> {
-		// @todo 7TV API type
-		const response = await sb.Got.get("TwitchEmotes")({
+		const response = await sb.Got.get("TwitchEmotes")<SevenTvEmoteResponse>({
 			url: `https://7tv.io/v3/users/twitch/${channelData.Specific_ID}`
 		});
 
@@ -1398,22 +1267,21 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	async populateGlobalEmotes (): Promise<Emote[]> {
-		// @todo Types for Twitch/Helix, BTTV, FFZ, 7TV APIs
 		const [twitch, bttv, ffz, sevenTv] = await Promise.allSettled([
 			TwitchPlatform.fetchTwitchEmotes(this.selfId),
-			sb.Got.get("TwitchEmotes")({
+			sb.Got.get("TwitchEmotes")<BttvEmote[]>({
 				url: "https://api.betterttv.net/3/cached/emotes/global"
 			}),
-			sb.Got.get("TwitchEmotes")({
+			sb.Got.get("TwitchEmotes")<FfzEmoteResponse>({
 				url: "https://api.frankerfacez.com/v1/set/global"
 			}),
-			sb.Got.get("TwitchEmotes")({
+			sb.Got.get("TwitchEmotes")<GlobalSevenTvEmoteResponse>({
 				url: "https://7tv.io/v3/emote-sets/global"
 			})
 		]);
 
 		const rawTwitchEmotes = (twitch.status === "fulfilled") ? twitch.value : [];
-		const rawFFZEmotes = (ffz.status === "fulfilled") ? Object.values(ffz.value.body.sets) : {};
+		const rawFFZEmotes = (ffz.status === "fulfilled") ? Object.values(ffz.value.body.sets) : [];
 		const rawBTTVEmotes = (bttv.status === "fulfilled" && typeof bttv.value?.body === "object")
 			? Object.values(bttv.value.body)
 			: [];
@@ -1422,7 +1290,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			: [];
 
 		const twitchEmotes = rawTwitchEmotes.map(i => {
-			let type = "twitch-global";
+			let type: "twitch-global" | "twitch-subscriber" | "twitch-follower" = "twitch-global";
 			if (i.emote_type === "subscriptions") {
 				type = "twitch-subscriber";
 			}
@@ -1439,33 +1307,34 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 				channel: i.owner_id ?? null
 			};
 		});
-		const ffzEmotes = rawFFZEmotes.flatMap(i => i.emoticons)
-			.map(i => ({
-				ID: i.id,
-				name: i.name,
-				type: "ffz",
-				global: true,
-				animated: false
-			}));
+		const ffzEmotes = rawFFZEmotes.flatMap(i => i.emoticons).map(i => ({
+			ID: i.id,
+			name: i.name,
+			type: "ffz" as const,
+			global: true,
+			animated: false
+		}));
 		const bttvEmotes = rawBTTVEmotes.map(i => ({
 			ID: i.id,
 			name: i.code,
-			type: "bttv",
+			type: "bttv" as const,
 			global: true,
 			animated: (i.imageType === "gif")
 		}));
 		const sevenTvEmotes = rawSevenTvEmotes.map(i => ({
 			ID: i.id,
 			name: i.name,
-			type: "7tv",
+			type: "7tv" as const,
 			global: true,
 			animated: i.data.animated,
-			// eslint-disable-next-line no-bitwise
-			zeroWidth: (i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
+			zeroWidth: Boolean(i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
 		}));
 
 		return [
-			...twitchEmotes, ...ffzEmotes, ...bttvEmotes, ...sevenTvEmotes
+			...twitchEmotes,
+			...ffzEmotes,
+			...bttvEmotes,
+			...sevenTvEmotes
 		];
 	}
 
@@ -1492,7 +1361,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	}
 
 	async fetchUsernameByUserPlatformID (userPlatformID: string): Promise<string | null> {
-		const response = await sb.Got.get("Helix")({
+		const response = await sb.Got.get("Helix")<UserLookupResponse>({
 			url: "users",
 			throwHttpErrors: false,
 			searchParams: {

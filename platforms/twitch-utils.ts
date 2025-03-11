@@ -1,4 +1,4 @@
-import { Subscription, SubscriptionCondition, TwitchPlatform, MessageSubscriptionData } from "./twitch.js";
+import { TwitchPlatform } from "./twitch.js";
 import { SupiError } from "supi-core";
 import User from "../classes/user.js";
 import Channel from "../classes/channel.js";
@@ -13,8 +13,313 @@ const SUBSCRIPTIONS_CACHE_EXPIRY = 120 * 60_000; // 60 minutes
 const SUBSCRIPTIONS_CACHE_INTERVAL = 30 * 60_000; // 30 minutes, 1/4 of sub cache expiry
 const TOKEN_REGENERATE_INTERVAL = 60 * 60_000; // 60 minutes
 
-// @todo create specific type extensions for specific subscriptions (might not be needed)
+export type SubscriptionCondition = string
+	| { user_id: string; }
+	| { broadcaster_user_id: string; }
+	| { to_broadcaster_user_id: string; }
+	| { user_id: string; broadcaster_user_id: string; };
 
+export type Subscription = {
+	id: string;
+	status: string;
+	type: string;
+	version: string;
+	cost: number;
+	condition: SubscriptionCondition;
+	created_at: string;
+	transport: { method: string; callback: string; };
+};
+export type EnabledSubscription = Subscription & {
+	status: "enabled";
+};
+export type RevokedSubscription = Subscription & {
+	status: "user_removed" | "authorization_revoked" | "version_removed";
+}
+export type SubscriptionTier = "1000" | "2000" | "3000" | "Prime";
+export type BroadcasterSubscription = {
+	broadcaster_id: string;
+	broadcaster_login: string;
+	broadcaster_name: string;
+	gifter_id: string;
+	gifter_login: string;
+	gifter_name: string;
+	is_gift: boolean;
+	plan_name: string;
+	tier: Omit<SubscriptionTier, "Prime">;
+	user_id: string;
+	user_name: string;
+	user_login: string;
+};
+
+export interface BaseWebsocketMessage {
+	metadata: {
+		message_id: string;
+		message_type: string;
+		message_timestamp: string;
+	};
+	payload: Record<string, unknown>;
+}
+export interface SessionWelcomeMessage extends BaseWebsocketMessage {
+	metadata: {
+		message_id: string;
+		message_type: "session_welcome";
+		message_timestamp: string;
+	}
+	payload: {
+		session: {
+			id: string;
+			status: string;
+			connected_at: string;
+			keepalive_timeout_seconds: number;
+			reconnect_url: null;
+		};
+	};
+}
+export interface SessionKeepaliveMessage extends BaseWebsocketMessage {
+	metadata: {
+		message_id: string;
+		message_type: "session_keepalive";
+		message_timestamp: string;
+	};
+	payload: {};
+}
+export interface SessionReconnectMessage extends BaseWebsocketMessage {
+	metadata: {
+		message_id: string;
+		message_type: "session_reconnect";
+		message_timestamp: string;
+	};
+	payload: {
+		session: {
+			id: string;
+			status: string;
+			connected_at: string;
+			keepalive_timeout_seconds: number;
+			reconnect_url: string;
+		}
+	};
+}
+export interface RevocationMessage extends BaseWebsocketMessage {
+	metadata: {
+		message_id: string;
+		message_type: "revocation";
+		message_timestamp: string;
+		subscription_type: string;
+		subscription_verison: string;
+	};
+	payload: {
+		subscription: RevokedSubscription;
+	};
+}
+export interface NotificationMessage extends BaseWebsocketMessage {
+	metadata: {
+		message_id: string;
+		message_type: "notification";
+		message_timestamp: string;
+		subscription_type: string;
+		subscription_verison: string;
+	};
+	payload: {
+		subscription: EnabledSubscription;
+		event: Record<string, unknown>;
+	};
+}
+
+export const isWelcomeMessage = (input: TwitchWebsocketMessage): input is SessionWelcomeMessage => (input.metadata.message_type === "session_welcome");
+export const isReconnectMessage = (input: TwitchWebsocketMessage): input is SessionReconnectMessage => (input.metadata.message_type === "session_reconnect");
+export const isRevocationMessage = (input: TwitchWebsocketMessage): input is RevocationMessage => (input.metadata.message_type === "revocation");
+export const isNotificationMessage = (input: TwitchWebsocketMessage): input is NotificationMessage => (input.metadata.message_type === "notification");
+
+export type TwitchWebsocketMessage =
+	| SessionWelcomeMessage
+	| SessionKeepaliveMessage
+	| SessionReconnectMessage
+	| RevocationMessage
+	| NotificationMessage;
+
+export type MessageBadge = {
+	set_id: string;
+	id: string;
+	info: string;
+};
+export interface MessageNotification extends NotificationMessage {
+	payload: {
+		subscription: NotificationMessage["payload"]["subscription"] & {
+			type: "channel.chat.message";
+			condition: {
+				user_id: string;
+				broadcaster_user_id: string;
+			},
+		};
+		event: {
+			badges: MessageBadge[];
+			broadcaster_user_id: string;
+			broadcaster_user_login: string;
+			broadcaster_user_name: string;
+			channel_points_animation_id: string | null;
+			channel_points_custom_reward_id: string | null;
+			chatter_user_id: string;
+			chatter_user_login: string;
+			chatter_user_name: string;
+			cheer: {
+				bits: number;
+			} | null;
+			color: string;
+			message: {
+				fragments: {
+					type: "text" | "cheermote" | "emote" | "mention";
+					text: string;
+					cheermote: {
+						prefix: string;
+						bits: number;
+						tier: number;
+					} | null;
+					emote: {
+						id: string;
+						emote_set_id: string;
+						owner_id: string;
+						format: ("animated" | "static")[];
+					} | null;
+					mention: {
+						user_id: string;
+						user_name: string;
+						user_login: string;
+					} | null;
+				}[];
+				text: string;
+			};
+			message_id: string;
+			message_type: "text" | "channel_points_highlighted" | "channel_points_sub_only"
+				| "user_intro" | "power_ups_message_effect" | "power_ups_gigantified_emote";
+			reply: {
+				parent_message_id: string;
+				parent_message_body: string;
+				parent_user_id: string;
+				parent_user_name: string;
+				parent_user_login: string;
+				thread_message_id: string;
+				thread_user_id: string;
+				thread_user_name: string;
+				thread_user_login: string;
+			} | null;
+			source_badges: MessageBadge[] | null;
+			source_broadcaster_user_id: string | null;
+			source_broadcaster_user_name: string | null;
+			source_broadcaster_user_login: string | null;
+			source_message_id: string | null;
+		};
+	}
+}
+export interface WhisperNotification extends NotificationMessage {
+	payload: {
+		subscription: NotificationMessage["payload"]["subscription"] & {
+			type: "user.whisper.message";
+			condition: {
+				user_id: string;
+			},
+		};
+		event: {
+			from_user_id: string;
+			from_user_login: string;
+			from_user_name: string;
+			to_user_id: string;
+			to_user_login: string;
+			to_user_name: string;
+			whisper_id: string;
+			whisper: { text: string; }
+		};
+	}
+}
+export interface SubscribeMessageNotification extends NotificationMessage {
+	payload: {
+		subscription: NotificationMessage["payload"]["subscription"] & {
+			type: "channel.subscription.message";
+			condition: {
+				broadcaster_user_id: string;
+			},
+		};
+		event: {
+			user_id: string;
+			user_login: string;
+			user_name: string;
+			broadcaster_user_id: string;
+			broadcaster_user_login: string;
+			broadcaster_user_name: string;
+			tier: SubscriptionTier;
+			message: {
+				text: string;
+				emotes: {
+					begin: number;
+					end: number;
+					id: string;
+				}[];
+			};
+			cumulative_months: number;
+			streak_months: number | null;
+			duration_months: number;
+		};
+	}
+}
+export interface RaidNotification extends NotificationMessage {
+	payload: {
+		subscription: NotificationMessage["payload"]["subscription"] & {
+			type: "channel.raid";
+			condition: {
+				to_broadcaster_user_id: string;
+			},
+		};
+		event: {
+			from_broadcaster_user_id: string;
+			from_broadcaster_user_login: string;
+			from_broadcaster_user_name: string;
+			to_broadcaster_user_id: string;
+			to_broadcaster_user_login: string;
+			to_broadcaster_user_name: string;
+			viewers: number;
+		};
+	};
+}
+export interface StreamOnlineNotification extends NotificationMessage {
+	payload: {
+		subscription: NotificationMessage["payload"]["subscription"] & {
+			type: "stream.online";
+			condition: {
+				broadcaster_user_id: string;
+			},
+		};
+		event: {
+			id: string;
+			broadcaster_user_id: string;
+			broadcaster_user_login: string;
+			broadcaster_user_name: string;
+			started_at: string;
+			type: "live" | "playlist" | "watch_party" | "premiere" | "rerun";
+		};
+	};
+}
+export interface StreamOfflineNotification extends NotificationMessage {
+	payload: {
+		subscription: NotificationMessage["payload"]["subscription"] & {
+			type: "stream.offline";
+			condition: {
+				broadcaster_user_id: string;
+			},
+		};
+		event: {
+			broadcaster_user_id: string;
+			broadcaster_user_login: string;
+			broadcaster_user_name: string;
+		};
+	};
+}
+
+export const isMessageNotification = (input: NotificationMessage): input is MessageNotification => (input.payload.subscription.type === "channel.chat.message");
+export const isWhisperNotification = (input: NotificationMessage): input is WhisperNotification => (input.payload.subscription.type === "user.whisper.message");
+export const isSubscribeNotification = (input: NotificationMessage): input is SubscribeMessageNotification => (input.payload.subscription.type === "channel.subscription.message");
+export const isRaidNotification = (input: NotificationMessage): input is RaidNotification => (input.payload.subscription.type === "channel.raid");
+export const isStreamChangeNotification = (input: NotificationMessage): input is StreamOnlineNotification | StreamOfflineNotification => (
+	input.payload.subscription.type === "stream.offline" || input.payload.subscription.type === "stream.online"
+);
 
 type AccessTokenData = {
 	access_token: string;
@@ -199,7 +504,7 @@ type CreateSubscriptionData = {
 	channelId?: string;
 };
 type CreateSubscriptionResponse = {
-	data: Subscription[];
+	data: EnabledSubscription[];
 	total: number;
 	total_cost: number;
 	max_total_cost: number;
@@ -350,7 +655,7 @@ const createChannelRedemptionSubscription = (channelId: string) => createSubscri
 	version: "1"
 });
 
-const fetchExistingSubscriptions = async (): Promise<Subscription[]> => {
+const fetchExistingSubscriptions = async (): Promise<EnabledSubscription[]> => {
 	const accessToken = await getAppAccessToken();
 	const response = await sb.Got.get("GenericAPI")<ListSubscriptionsResponse>({
 		url: "https://api.twitch.tv/helix/eventsub/subscriptions",
@@ -366,7 +671,7 @@ const fetchExistingSubscriptions = async (): Promise<Subscription[]> => {
 		}
 	});
 
-	const result: Subscription[] = [...response.body.data];
+	const result: EnabledSubscription[] = [...response.body.data];
 	let cursor: string | null = response.body.pagination?.cursor ?? null;
 	while (cursor) {
 		const loopResponse = await sb.Got.get("GenericAPI")<ListSubscriptionsResponse>({
@@ -391,9 +696,9 @@ const fetchExistingSubscriptions = async (): Promise<Subscription[]> => {
 	return result;
 };
 
-const getExistingSubscriptions = async (force = false): Promise<Subscription[]> => {
+const getExistingSubscriptions = async (force = false): Promise<EnabledSubscription[]> => {
 	if (!force) {
-		const cacheData = await sb.Cache.getByPrefix(SUBSCRIPTIONS_CACHE_KEY) as Subscription[] | undefined;
+		const cacheData = await sb.Cache.getByPrefix(SUBSCRIPTIONS_CACHE_KEY) as EnabledSubscription[] | undefined;
 		if (cacheData) {
 			return cacheData;
 		}
@@ -439,7 +744,7 @@ const fetchToken = async () => {
 	return response.body.access_token;
 };
 
-type MessageData = MessageSubscriptionData["payload"]["event"]["message"];
+type MessageData = MessageNotification["payload"]["event"]["message"];
 const emitRawUserMessageEvent = (username: string, channelName: string, platform: TwitchPlatform, message: MessageData) => {
 	if (!username || !channelName) {
 		throw new sb.Error({
