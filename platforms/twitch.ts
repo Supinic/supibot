@@ -1,4 +1,4 @@
-import WebSocket from "ws";
+import WebSocket, { RawData as WebsocketRawData } from "ws";
 import { randomBytes } from "node:crypto";
 
 import { Platform, BaseConfig } from "./template.js";
@@ -74,13 +74,6 @@ const DEFAULT_PLATFORM_CONFIG = {
 	unrelatedPrivateMessageResponse: ""
 } as const;
 
-type SubscriptionMeta = {
-	message_id: string;
-	message_timestamp: string;
-	message_type: "notification";
-	subscription_type: string;
-	subscription_version: string;
-};
 export type SubscriptionCondition = string
 	| { user_id: string; }
 	| { broadcaster_user_id: string; }
@@ -97,26 +90,113 @@ export type Subscription = {
 	created_at: string;
 	transport: { method: string; callback: string; };
 };
-
-interface GenericSubscriptionData {
-	metadata: SubscriptionMeta
-	payload: {
-		event: Record<string, unknown>;
-		subscription: Subscription;
-	}
+type EnabledSubscription = Subscription & {
+	status: "enabled";
+};
+type RevokedSubscription = Subscription & {
+	status: "user_removed" | "authorization_revoked" | "version_removed";
 }
+
+interface BaseWebsocketMessage {
+	metadata: {
+		message_id: string;
+		message_type: string;
+		message_timestamp: string;
+	};
+	payload: Record<string, unknown>;
+}
+interface SessionWelcomeMessage extends BaseWebsocketMessage {
+	metadata: {
+		message_id: string;
+		message_type: "session_welcome";
+		message_timestamp: string;
+	}
+	payload: {
+		session: {
+			id: string;
+			status: string;
+			connected_at: string;
+			keepalive_timeout_seconds: number;
+			reconnect_url: null;
+		};
+	};
+}
+interface SessionKeepaliveMessage extends BaseWebsocketMessage {
+	metadata: {
+		message_id: string;
+		message_type: "session_keepalive";
+		message_timestamp: string;
+	};
+	payload: {};
+}
+interface SessionReconnectMessage extends BaseWebsocketMessage {
+	metadata: {
+		message_id: string;
+		message_type: "session_reconnect";
+		message_timestamp: string;
+	};
+	payload: {
+		session: {
+			id: string;
+			status: string;
+			connected_at: string;
+			keepalive_timeout_seconds: number;
+			reconnect_url: string;
+		}
+	};
+}
+interface RevocationMessage extends BaseWebsocketMessage {
+	metadata: {
+		message_id: string;
+		message_type: "revocation";
+		message_timestamp: string;
+		subscription_type: string;
+		subscription_verison: string;
+	};
+	payload: {
+		subscription: RevokedSubscription;
+	};
+}
+interface NotificationMessage extends BaseWebsocketMessage {
+	metadata: {
+		message_id: string;
+		message_type: "notification";
+		message_timestamp: string;
+		subscription_type: string;
+		subscription_verison: string;
+	};
+	payload: {
+		subscription: EnabledSubscription;
+		event: Record<string, unknown>;
+	};
+}
+
+const isWelcomeMessage = (input: TwitchWebsocketMessage): input is SessionWelcomeMessage => (input.metadata.message_type === "session_welcome");
+const isReconnectMessage = (input: TwitchWebsocketMessage): input is SessionReconnectMessage => (input.metadata.message_type === "session_reconnect");
+const isRevocationMessage = (input: TwitchWebsocketMessage): input is RevocationMessage => (input.metadata.message_type === "revocation");
+const isNotificationMessage = (input: TwitchWebsocketMessage): input is NotificationMessage => (input.metadata.message_type === "notification");
+
+type TwitchWebsocketMessage =
+	| SessionWelcomeMessage
+	| SessionKeepaliveMessage
+	| SessionReconnectMessage
+	| RevocationMessage
+	| NotificationMessage;
 
 type MessageBadge = {
 	set_id: string;
 	id: string;
 	info: string;
 };
-
-export interface MessageSubscriptionData extends GenericSubscriptionData {
-	metadata: SubscriptionMeta & {
-		subscription_type: "channel.chat.message";
-	};
+interface MessageNotification extends NotificationMessage {
 	payload: {
+		subscription: NotificationMessage["payload"]["subscription"] & {
+			type: "channel.chat.message";
+			condition: {
+				user_id: string;
+				broadcaster_user_id: string;
+			},
+		};
 		event: {
 			badges: MessageBadge[];
 			broadcaster_user_id: string;
@@ -174,14 +254,120 @@ export interface MessageSubscriptionData extends GenericSubscriptionData {
 			source_broadcaster_user_login: string | null;
 			source_message_id: string | null;
 		};
-		subscription: Subscription & {
-			condition: {
-				user_id: string;
-				broadcaster_user_id: string;
-			};
-		}
 	}
 }
+interface WhisperNotification extends NotificationMessage {
+	payload: {
+		subscription: NotificationMessage["payload"]["subscription"] & {
+			type: "user.whisper.message";
+			condition: {
+				user_id: string;
+			},
+		};
+		event: {
+			from_user_id: string;
+			from_user_login: string;
+			from_user_name: string;
+			to_user_id: string;
+			to_user_login: string;
+			to_user_name: string;
+			whisper_id: string;
+			whisper: { text: string; }
+		};
+	}
+}
+interface SubscribeMessageNotification extends NotificationMessage {
+	payload: {
+		subscription: NotificationMessage["payload"]["subscription"] & {
+			type: "channel.subscription.message";
+			condition: {
+				broadcaster_user_id: string;
+			},
+		};
+		event: {
+			user_id: string;
+			user_login: string;
+			user_name: string;
+			broadcaster_user_id: string;
+			broadcaster_user_login: string;
+			broadcaster_user_name: string;
+			tier: string;
+			message: {
+				text: string;
+				emotes: {
+					begin: number;
+					end: number;
+					id: string;
+				}[];
+			};
+			cumulative_months: number;
+			streak_months: number | null;
+			duration_months: number;
+		};
+	}
+}
+interface RaidNotification extends NotificationMessage {
+	payload: {
+		subscription: NotificationMessage["payload"]["subscription"] & {
+			type: "channel.raid";
+			condition: {
+				to_broadcaster_user_id: string;
+			},
+		};
+		event: {
+			from_broadcaster_user_id: string;
+			from_broadcaster_user_login: string;
+			from_broadcaster_user_name: string;
+			to_broadcaster_user_id: string;
+			to_broadcaster_user_login: string;
+			to_broadcaster_user_name: string;
+			viewers: number;
+		};
+	};
+}
+interface StreamOnlineNotification extends NotificationMessage {
+	payload: {
+		subscription: NotificationMessage["payload"]["subscription"] & {
+			type: "stream.online";
+			condition: {
+				broadcaster_user_id: string;
+			},
+		};
+		event: {
+			id: string;
+			broadcaster_user_id: string;
+			broadcaster_user_login: string;
+			broadcaster_user_name: string;
+			started_at: string;
+			type: "live" | "playlist" | "watch_party" | "premiere" | "rerun";
+		};
+	};
+}
+interface StreamOfflineNotification extends NotificationMessage {
+	payload: {
+		subscription: NotificationMessage["payload"]["subscription"] & {
+			type: "stream.offline";
+			condition: {
+				broadcaster_user_id: string;
+			},
+		};
+		event: {
+			broadcaster_user_id: string;
+			broadcaster_user_login: string;
+			broadcaster_user_name: string;
+		};
+	};
+}
+
+const isMessageNotification = (input: NotificationMessage): input is MessageNotification => (input.payload.subscription.type === "channel.chat.message");
+const isWhisperNotification = (input: NotificationMessage): input is WhisperNotification => (input.payload.subscription.type === "user.whisper.message");
+const isSubscribeNotification = (input: NotificationMessage): input is SubscribeMessageNotification => (input.payload.subscription.type === "channel.subscription.message");
+const isRaidNotification = (input: NotificationMessage): input is RaidNotification => (input.payload.subscription.type === "channel.raid");
+const isStreamChangeNotification = (input: NotificationMessage): input is StreamOnlineNotification | StreamOfflineNotification => (
+	input.payload.subscription.type === "stream.offline" || input.payload.subscription.type === "stream.online"
+);
+
+type ExtractEvent<T extends NotificationMessage> = T["payload"]["event"];
 
 class ConfigurableWebsocket {
 	private instance: WebSocket | null = null;
@@ -232,7 +418,8 @@ interface TwitchConfig extends BaseConfig {
 		whisperMessageLimit?: number;
 		privateMessageResponseFiltered?: string;
 		privateMessageResponseNoCommand?: string;
-	}
+		privateMessageResponseUnrelated?: string;
+	};
 }
 
 export class TwitchPlatform extends Platform<TwitchConfig> {
@@ -333,92 +520,56 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 	}
 
-	async handleWebsocketMessage (data) {
-		const event = JSON.parse(data);
-		const { metadata, payload } = event;
+	async handleWebsocketMessage (data: WebsocketRawData) {
+		const message: TwitchWebsocketMessage = JSON.parse(data.toString());
 
-		switch (metadata.message_type) {
-			case "session_welcome": {
-				const sessionId = payload.session.id;
-				await TwitchUtils.assignWebsocketToConduit(sessionId);
-				break;
-			}
+		if (isWelcomeMessage(message)) {
+			const sessionId = message.payload.session.id;
+			await TwitchUtils.assignWebsocketToConduit(sessionId);
+		}
+		else if (isReconnectMessage(message)) {
+			await this.handleReconnect(message);
+		}
+		else if (isRevocationMessage(message)) {
+			console.warn("Subscription revoked", { data });
 
-			case "session_reconnect": {
-				await this.handleReconnect(event);
-				break;
-			}
-
-			case "notification": {
-				await this.handleWebsocketNotification(event);
-				break;
-			}
-
-			case "revocation": {
-				console.warn("Subscription revoked", { data });
-				await sb.Logger.log(
-					"Twitch.Warning",
-					`Subscription revoked: ${JSON.stringify(data)}`,
-					null,
-					null
-				);
-
-				break;
-			}
-
-			case "session_keepalive": {
-				break;
-			}
-
-			default: {
-				console.log("Unrecognized message", { event });
-			}
+			await sb.Logger.log(
+				"Twitch.Warning",
+				`Subscription revoked: ${JSON.stringify(data)}`,
+				null,
+				null
+			);
+		}
+		else if (isNotificationMessage(message)) {
+			await this.handleWebsocketNotification(message);
+		}
+		else {
+			console.log("Unrecognized message", { message });
 		}
 	}
 
-	async handleWebsocketNotification (data: GenericSubscriptionData) {
-		const { event, subscription } = data.payload;
-
-		switch (subscription.type) {
-			case "channel.chat.message": {
-				await this.handleMessage(event);
-				break;
-			}
-
-			case "user.whisper.message": {
-				await this.handlePrivateMessage(event);
-				break;
-			}
-
-			case "channel.ban": {
-				await this.handleBan(event);
-				break;
-			}
-
-			case "channel.subscribe":
-			case "channel.subscription.message": {
-				await this.handleSub(event, subscription.type);
-				break;
-			}
-
-			case "channel.raid": {
-				await this.handleRaid(event);
-				break;
-			}
-
-			case "stream.online":
-			case "stream.offline": {
-				await this.handleStreamLiveChange(event, subscription.type);
-				break;
-			}
-
-			default: {
-				console.warn("Unrecognized notification", { data });
-			}
+	async handleWebsocketNotification (data: NotificationMessage) {
+		if (isMessageNotification(data)) {
+			await this.handleMessage(data.payload.event);
+		}
+		else if (isWhisperNotification(data)) {
+			await this.handlePrivateMessage(data.payload.event);
+		}
+		else if (isSubscribeNotification(data)) {
+			await this.handleSub(data.payload.event);
+		}
+		else if (isRaidNotification(data)) {
+			await this.handleRaid(data.payload.event);
+		}
+		else if (isStreamChangeNotification(data)) {
+			await this.handleStreamLiveChange(data);
+		}
+		else {
+			console.warn("Unrecognized notification", { data });
 		}
 	}
 
-	async handleReconnect (event) {
+	async handleReconnect (event: SessionReconnectMessage) {
 		const reconnectUrl = event.payload.session.reconnect_url;
 		if (this.client) {
 			this.client.close();
@@ -535,6 +686,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 
 		if (!userData.Twitch_ID) {
+			// @todo API response type
 			const response = await sb.Got.get("Helix")({
 				url: "users",
 				searchParams: {
@@ -585,7 +737,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 	}
 
-	async timeout (channelData: Channel, user: User | string, duration = 1, reason: string | null = null) {
+	async timeout (channelData: Channel, user: User | string, duration: number = 1, reason: string | null = null) {
 		if (!channelData || !user) {
 			throw new SupiError({
 				message: "Missing user or channel",
@@ -602,7 +754,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			});
 		}
 
-		const channelID = channelData.Specific_ID ?? await this.getUserID(channelData);
+		const channelID = channelData.Specific_ID ?? await this.getUserID(channelData.Name);
 		if (!channelID) {
 			throw new SupiError({
 				message: "Invalid channel provided"
@@ -643,7 +795,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		};
 	}
 
-	async handleMessage (event: MessageSubscriptionData["payload"]["event"]) {
+	async handleMessage (event: ExtractEvent<MessageNotification>) {
 		const {
 			broadcaster_user_login: channelName,
 			broadcaster_user_id: channelId,
@@ -868,10 +1020,8 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 	/**
 	 * Handles incoming private messages.
 	 * Split from original single handleMessage handler, due to simplified flow for both methods.
- 	 * @param {Object} event
-	 * @return {Promise<void>}
 	 */
-	async handlePrivateMessage (event) {
+	async handlePrivateMessage (event: ExtractEvent<WhisperNotification>) {
 		const {
 			from_user_login: senderUsername,
 			from_user_id: senderUserId
@@ -891,7 +1041,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		if (!sb.Command.is(message)) {
 			const noCommandMessage = this.config.privateMessageResponseUnrelated ?? PRIVATE_COMMAND_UNRELATED_RESPONSE;
-			await this.pm(noCommandMessage, senderUsername);
+			await this.pm(noCommandMessage, userData);
 			return;
 		}
 
@@ -907,23 +1057,16 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		if (!result || !result.success) {
 			if (!result?.reply && result?.reason === "filter") {
 				const filteredMessage = this.config.privateMessageResponseFiltered ?? PRIVATE_COMMAND_FILTERED_RESPONSE;
-				await this.pm(filteredMessage, senderUsername);
+				await this.pm(filteredMessage, userData);
 			}
 			else if (result?.reason === "no-command") {
 				const noCommandResponse = this.config.privateMessageResponseNoCommand ?? PRIVATE_COMMAND_NO_COMMAND_RESPONSE;
-				await this.pm(noCommandResponse, senderUsername);
+				await this.pm(noCommandResponse, userData);
 			}
 		}
 	}
 
-	/**
-	 * @param {Object} event
-	 * @param {string} subscription
-	 * @return {Promise<void>}
-	 */
-	async handleSub (event, subscription) {
-		const plans = this.config.subscriptionPlans;
-
+	async handleSub (event: ExtractEvent<SubscribeMessageNotification>) {
 		const userData = await sb.User.get(event.user_login);
 		const channelData = sb.Channel.get(event.broadcaster_user_login);
 		if (!channelData) {
@@ -931,48 +1074,26 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 
 		await sb.Logger.log("Twitch.Sub", JSON.stringify({ event }));
+		const plans = this.config.subscriptionPlans;
 
-		if (subscription === "channel.subscribe") { // First time subscriber
-			channelData.events.emit("subscription", {
-				event: "subscription",
-				message: "",
-				user: userData,
-				channel: channelData,
-				platform: this,
-				data: {
-					amount: 1,
-					months: 1,
-					streak: 1,
-					gifted: event.is_gift,
-					recipient: userData,
-					plan: plans[event.tier]
-				}
-			});
-		}
-		else if (subscription === "channel.subscription.message") { // Resubscribe
-			channelData.events.emit("subscription", {
-				event: "subscription",
-				message: event.message.text,
-				user: userData,
-				channel: channelData,
-				platform: this,
-				data: {
-					amount: event.duration_months,
-					months: event.cumulative_months,
-					streak: event.streak_months ?? 1,
-					gifted: false,
-					recipient: userData,
-					plan: plans[event.tier]
-				}
-			});
-		}
+		channelData.events.emit("subscription", {
+			event: "subscription",
+			message: event.message.text,
+			user: userData,
+			channel: channelData,
+			platform: this,
+			data: {
+				amount: event.duration_months,
+				months: event.cumulative_months,
+				streak: event.streak_months ?? 1,
+				gifted: false,
+				recipient: userData,
+				plan: plans[event.tier]
+			}
+		});
 	}
 
-	/**
-	 * @param {Object} event
-	 * @return {Promise<void>}
-	 */
-	async handleRaid (event) {
+	async handleRaid (event: ExtractEvent<RaidNotification>) {
 		const {
 			to_broadcaster_user_id: channelId,
 			to_broadcaster_user_login: channelName,
@@ -1000,15 +1121,12 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 	}
 
-	/**
-	 * @param {Object} event
-	 * @param {"stream.online"|"stream.offline"}type
-	 */
-	async handleStreamLiveChange (event, type) {
+	async handleStreamLiveChange (event: StreamOnlineNotification | StreamOfflineNotification) {
+		const { type } = event.payload.subscription;
 		const {
 			broadcaster_user_id: channelId,
 			broadcaster_user_login: channelName
-		} = event;
+		} = event.payload.event;
 
 		const channelData = sb.Channel.get(channelName, this) ?? sb.Channel.getBySpecificId(channelId, this);
 		if (!channelData) {
@@ -1036,16 +1154,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 	}
 
-	/**
-	 * Handles a command being used.
-	 * @param {string} command
-	 * @param {string} user
-	 * @param {string} channel
-	 * @param {string[]} [args]
-	 * @param {Object} options = {}
-	 * @returns {Promise<boolean>} Whether or not a command has been executed.
-	 */
-	async handleCommand (command: string, user: User, channel: Channel, args: string[] = [], options = {}) {
+	async handleCommand (command: string, user: User, channel: Channel | null, args: string[] = [], options = {}) {
 		const userData = await sb.User.get(user, false);
 		const channelData = (channel === null) ? null : sb.Channel.get(channel, this);
 		const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
