@@ -1,7 +1,5 @@
 // import { type Recordset } from "supi-core";
 import { Date as SupiDate } from "supi-core";
-type Recordset = any; // @todo uncomment above lines when supi-core exports refactor is finished
-
 import { parseRSS } from "../../utils/command-utils.js";
 
 const DEFAULT_CHANNEL_ID = 38;
@@ -21,7 +19,7 @@ type FetchUsersResult = {
 };
 
 const fetchSubscriptionUsers = async function (subType: SubscriptionType, lastSeenThreshold = 36e5): Promise<FetchUsersResult> {
-	const users = await sb.Query.getRecordset((rs: Recordset) => rs
+	const users = await sb.Query.getRecordset<UserSubscription[]>(rs => rs
 		.select("Event_Subscription.Channel as Reminder_Channel")
 		.select("Event_Subscription.User_Alias AS ID")
 		.select("Event_Subscription.Flags AS Flags")
@@ -38,9 +36,9 @@ const fetchSubscriptionUsers = async function (subType: SubscriptionType, lastSe
 		.groupBy("Meta.User_Alias")
 		.where("Type = %s", subType)
 		.where("Active = %b", true)
-	) as UserSubscription[];
+	);
 
-	const now: number = sb.Date.now();
+	const now: number = SupiDate.now();
 	const [activeUsers, inactiveUsers] = sb.Utils.splitByCondition(users, (user: UserSubscription): boolean => {
 		const lastSeen = now - user.Last_Seen.valueOf();
 		if (lastSeen < lastSeenThreshold) {
@@ -57,14 +55,7 @@ const fetchSubscriptionUsers = async function (subType: SubscriptionType, lastSe
 	};
 };
 
-// @todo remove when Reminder is well-known
-type ReminderCreateResult = {
-	success: boolean;
-	cause: string | null;
-	ID?: number;
-};
-
-const createReminders = async function (users: UserSubscription[], message: string): Promise<ReminderCreateResult[]> {
+const createReminders = async function (users: UserSubscription[], message: string) {
 	return await Promise.all(users.map(user => (
 		sb.Reminder.create({
 			Channel: null,
@@ -73,7 +64,9 @@ const createReminders = async function (users: UserSubscription[], message: stri
 			Text: `${message} (you were not around when it was announced)`,
 			Schedule: null,
 			Private_Message: true,
-			Platform: 1
+			Platform: 1,
+			Type: "Reminder",
+			Created: new SupiDate()
 		}, true)
 	)));
 };
@@ -95,6 +88,9 @@ const handleSubscription = async function (subType: SubscriptionType, message: s
 	for (const [channelID, userDataList] of Object.entries(channelUsers)) {
 		const chatPing = userDataList.map(i => `@${i.Username}`).join(" ");
 		const channelData = sb.Channel.get(Number(channelID));
+		if (!channelData) {
+			continue;
+		}
 
 		await channelData.send(`${chatPing} ${message}`);
 	}
@@ -105,17 +101,17 @@ const handleSubscription = async function (subType: SubscriptionType, message: s
  */
 const parseRssNews = async function (xml: string, cacheKey: string): Promise<string[] | null> {
 	const feed = await parseRSS(xml);
-	const lastPublishDate = await sb.Cache.getByPrefix(cacheKey) ?? 0;
+	const lastPublishDate = (await sb.Cache.getByPrefix(cacheKey) ?? 0) as number;
 	const eligibleArticles = feed.items
-		.filter(i => new sb.Date(i.pubDate) > lastPublishDate)
-		.sort((a, b) => new sb.Date(b.pubDate) - new sb.Date(a.pubDate));
+		.filter(i => new SupiDate(i.pubDate).valueOf() > lastPublishDate)
+		.sort((a, b) => new SupiDate(b.pubDate).valueOf() - new SupiDate(a.pubDate).valueOf());
 
 	if (eligibleArticles.length === 0) {
 		return null;
 	}
 
 	const [topArticle] = eligibleArticles;
-	await sb.Cache.setByPrefix(cacheKey, new sb.Date(topArticle.pubDate).valueOf(), {
+	await sb.Cache.setByPrefix(cacheKey, new SupiDate(topArticle.pubDate).valueOf(), {
 		expiry: 7 * 864e5 // 7 days
 	});
 

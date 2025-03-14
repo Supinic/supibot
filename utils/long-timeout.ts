@@ -1,4 +1,6 @@
-const MAX_TIMEOUT = (2 ** 31) - 1;
+import { SupiError } from "supi-core";
+
+const MAX_TIMEOUT = 2147483647 as const;
 
 /**
  * Originally hosted in a separate repository (`Supinic/long-timeout`) but moved to Supibot due to no other places using this module.
@@ -6,18 +8,19 @@ const MAX_TIMEOUT = (2 ** 31) - 1;
  */
 export default class LongTimeout {
 	timeout: NodeJS.Timeout | LongTimeout | number | null;
-	scheduleTime: Date;
+	readonly scheduleTime: Date;
 
 	/**
 	 * Creates a new, flexible, long timeout object
-	 * @param {Function} callback Function to fire
-	 * @param {number} time Delay or timestamp
-	 * @param {boolean} [useTimestamp] If true, time will be considered as a timestamp instead of as a delay
-	 * @returns {LongTimeout}
+	 * @param callback Function to fire
+	 * @param time Delay or timestamp
+	 * @param [useTimestamp] If true, time will be considered as a timestamp instead of as a delay
 	 */
-	constructor(callback: Function, time: number, useTimestamp: boolean = false) {
+	constructor (callback: () => void, time: number, useTimestamp: boolean = false) {
 		if (!Number.isFinite(time)) {
-			throw new Error("A finite number must be used for LongTimeout");
+			throw new SupiError({
+				message: "A finite number must be used for LongTimeout"
+			});
 		}
 
 		if (useTimestamp) {
@@ -38,7 +41,6 @@ export default class LongTimeout {
 			}, MAX_TIMEOUT);
 		}
 	}
-
 
 	/**
 	 * Clears the timeout.

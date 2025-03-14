@@ -1,15 +1,12 @@
 import { postToHastebin } from "../../utils/command-utils.js";
 import type { CronDefinition } from "../temp-definitions.d.ts";
+import { SupiDate } from "supi-core";
 
 type HelixResponse = {
 	data: {
 		id: string;
 		name: string;
 	}[];
-};
-type GotHelixResponse = {
-	ok: boolean;
-	body: HelixResponse;
 };
 type EmoteJsonObject = {
 	timestamp: number;
@@ -18,7 +15,7 @@ type EmoteJsonObject = {
 };
 
 const cacheKey = "twitch-global-emotes";
-const fetchTwitchGlobalEmotes = (): Promise<GotHelixResponse> => sb.Got.get("Helix")({
+const fetchTwitchGlobalEmotes = () => sb.Got.get("Helix")<HelixResponse>({
 	url: "chat/emotes/global",
 	method: "GET",
 	throwHttpErrors: false
@@ -43,7 +40,7 @@ const definition: CronDefinition = {
 		}
 
 		if (!previousEmoteIds || previousEmoteIds.size === 0) {
-			let data: string[] = await sb.Cache.getByPrefix(cacheKey);
+			let data = await sb.Cache.getByPrefix(cacheKey) as string[] | null;
 			if (!data) {
 				const response = await fetchTwitchGlobalEmotes();
 				if (!response.ok) {
@@ -66,13 +63,13 @@ const definition: CronDefinition = {
 		}
 
 		const emotes = response.body.data;
-		const newEmoteIds: Set<string> = new Set(emotes.map(i => i.id));
+		const newEmoteIds = new Set(emotes.map(i => i.id));
 		const differentEmoteIds = previousEmoteIds.symmetricDifference(newEmoteIds);
 		if (differentEmoteIds.size === 0) {
 			return;
 		}
 
-		const now = new sb.Date();
+		const now = new SupiDate();
 		const result: string[] = [];
 		const json: EmoteJsonObject = {
 			timestamp: now.valueOf(),

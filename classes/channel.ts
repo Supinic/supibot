@@ -1,23 +1,95 @@
 import EventEmitter from "node:events";
-import Platform from "../platforms/template.js";
-import createMessageLoggingTable from "../utils/create-db-table.js";
-import Template from "./template.js";
+import { SupiError, SupiDate } from "supi-core";
 
-export default class Channel extends Template {
+import {
+	type GetEmoteOptions,
+	Platform,
+	Like as PlatformLike,
+	GenericSendOptions,
+	PrepareMessageOptions
+} from "../platforms/template.js";
+import { User } from "./user.js";
+import createMessageLoggingTable from "../utils/create-db-table.js";
+import {
+	GenericDataPropertyValue,
+	getGenericDataProperty,
+	setGenericDataProperty,
+	TemplateWithId
+} from "./template.js";
+import { Emote } from "../@types/globals.js";
+
+export const privateMessageChannelSymbol /* : unique symbol */ = Symbol("private-message-channel");
+
+type BanphraseDowntimeBehaviour = "Ignore" | "Notify" | "Nothing" | "Refuse" | "Whisper";
+type Mode = "Inactive" | "Last seen" | "Read" | "Write" | "VIP" | "Moderator";
+type LogType = "Lines" | "Meta";
+
+type EditableProperty = "Name" | "Mode" | "Mention"  | "NSFW" | "Mirror" | "Description"
+	| "Links_Allowed" | "Banphrase_API_Downtime" | "Banphrase_API_Type" | "Banphrase_API_URL";
+type ConstructorData = Pick<Channel,
+	"ID" | "Name" | "Specific_ID" | "Mode" | "Mention" | "Message_Limit"
+	| "NSFW" | "Mirror" | "Description" | "Links_Allowed"
+	| "Banphrase_API_Downtime" | "Banphrase_API_Type" | "Banphrase_API_URL"
+> & {
+	Logging: LogType[];
+	Platform: number;
+};
+
+type MirrorOptions = {
+	commandUsed?: boolean; // @todo move to Platform
+};
+
+type DatabaseChannelData = {
+	Channel: number;
+	Property: string;
+	Value: string;
+	Created: SupiDate;
+	Edited: SupiDate | null;
+};
+
+// type GetObjectEmoteOptions = GetEmoteOptions & { returnEmoteObject: true; };
+// type GetStringEmoteOptions = GetEmoteOptions & { returnEmoteObject?: false; };
+
+export type Like = string | number | Channel;
+
+type MoveDataOptions = {
+	deleteOriginalValues?: boolean;
+	skipProperties?: string[];
+};
+
+export class Channel extends TemplateWithId {
+	readonly ID: number;
+	readonly Name: string;
+	readonly Platform: Platform;
+	readonly Specific_ID: string | null;
+	Mode: Mode;
+	readonly Mention: boolean;
+	readonly Links_Allowed: boolean;
+	readonly Banphrase_API_Type: "Pajbot";
+	readonly Banphrase_API_URL: string;
+	readonly Banphrase_API_Downtime: BanphraseDowntimeBehaviour;
+	readonly Message_Limit: number | null;
+	readonly NSFW: boolean;
+	readonly Logging: Set<LogType>;
+	readonly Mirror: Channel["ID"] | null;
+	readonly Description: string | null;
+
+	readonly sessionData: Record<string, string> = {};
+	readonly events: EventEmitter = new EventEmitter();
+
 	static redisPrefix = "sb-channel";
 	static dataCache = new WeakMap();
 	static uniqueIdentifier = "ID";
-	static data = new Map();
+	static data: Map<Platform, Map<Channel["Name"], Channel>> = new Map();
 
-	#setupLoggingTablePromise = null;
+	#setupLoggingTablePromise: Promise<{ success: boolean }> | null = null;
 
-	constructor (data) {
+	constructor (data: ConstructorData) {
 		super();
 
 		this.ID = data.ID;
 		this.Name = data.Name;
-		this.Platform = Platform.get(data.Platform);
-		this.Specific_ID = data.Specific_ID || null;
+		this.Specific_ID = data.Specific_ID ?? null;
 		this.Mode = data.Mode;
 		this.Mention = data.Mention;
 		this.Links_Allowed = data.Links_Allowed;
@@ -30,9 +102,14 @@ export default class Channel extends Template {
 		this.Mirror = data.Mirror;
 		this.Description = data.Description ?? null;
 
-		this.sessionData = {};
+		const platformData = Platform.get(data.Platform);
+		if (!platformData) {
+			throw new SupiError({
+				message: "Invalid Platform provided for Channel"
+			})
+		}
 
-		this.events = new EventEmitter();
+		this.Platform = platformData;
 	}
 
 	setupLoggingTable () {
@@ -49,8 +126,8 @@ export default class Channel extends Template {
 		return this.#setupLoggingTablePromise;
 	}
 
-	waitForUserMessage (userID, options) {
-		return this.Platform.waitForUserMessage(this, userID, options);
+	waitForUserMessage (userData: User, options: { timeout?: number; }) {
+		return this.Platform.waitForUserMessage(this, userData, options);
 	}
 
 	getDatabaseName () {
@@ -74,25 +151,25 @@ export default class Channel extends Template {
 		}
 	}
 
-	isUserChannelOwner (userData) {
+	isUserChannelOwner (userData: User) {
 		return this.Platform.isUserChannelOwner(this, userData);
 	}
 
-	async isUserAmbassador (userData) {
-		const ambassadors = await this.getDataProperty("ambassadors") ?? [];
+	async isUserAmbassador (userData: User): Promise<boolean> {
+		const ambassadors = (await this.getDataProperty("ambassadors") ?? []) as User["ID"][];
 		return ambassadors.includes(userData.ID);
 	}
 
-	send (message, options = {}) {
+	send (message: string, options: GenericSendOptions = {}): Promise<void> {
 		return this.Platform.send(message, this, options);
 	}
 
-	async isLive () {
+	async isLive (): Promise<boolean | null> {
 		return await this.Platform.isChannelLive(this);
 	}
 
-	async toggleAmbassador (userData) {
-		const ambassadors = await this.getDataProperty("ambassadors", { forceCacheReload: true }) ?? [];
+	async toggleAmbassador (userData: User): Promise<void> {
+		const ambassadors = <number[]> await this.getDataProperty("ambassadors", { forceCacheReload: true }) ?? [];
 		if (ambassadors.includes(userData.ID)) {
 			const index = ambassadors.indexOf(userData.ID);
 			ambassadors.splice(index, 1);
@@ -104,38 +181,36 @@ export default class Channel extends Template {
 		await this.setDataProperty("ambassadors", ambassadors);
 	}
 
-	async saveProperty (property, value) {
-		const row = await sb.Query.getRow("chat_data", "Channel");
+	async saveProperty <T extends EditableProperty>(property: T, value: this[T]) {
+		const row = await sb.Query.getRow<ConstructorData>("chat_data", "Channel");
 		await row.load(this.ID);
 
 		await super.saveRowProperty(row, property, value, this);
 	}
 
-	async mirror (message, userData, options = {}) {
+	async mirror (message: string, userData: User | null, options: MirrorOptions = {}) {
 		if (this.Mirror === null) {
 			return;
 		}
 
 		const targetChannel = Channel.get(this.Mirror);
 		if (!targetChannel) {
-			throw new sb.Error({
+			throw new SupiError({
 				message: "Invalid channel mirror configuration",
-				args: { sourceChannel: this }
+				args: { sourceChannel: this.ID }
 			});
 		}
 
 		return await this.Platform.mirror(message, userData, this, options);
 	}
 
-	async fetchUserList () {
+	async fetchUserList (): Promise<string[]> {
 		return await this.Platform.fetchChannelUserList(this);
 	}
 
-	async fetchEmotes () {
-		let channelEmotes = await this.getCacheData("emotes");
-		if (!channelEmotes) {
-			channelEmotes = await this.Platform.fetchChannelEmotes(this);
-		}
+	async fetchEmotes (): Promise<Emote[]> {
+		const channelEmotes = (await this.getCacheData("emotes") as Emote[] | null)
+			?? await this.Platform.fetchChannelEmotes(this);
 
 		await this.setCacheData("emotes", channelEmotes, {
 			expiry: 3_600_000 // 1 hour channel emotes cache
@@ -145,11 +220,13 @@ export default class Channel extends Template {
 		return [...globalEmotes, ...channelEmotes];
 	}
 
-	async invalidateEmotesCache () {
-		return await this.setCacheData("emotes", null);
+	async invalidateEmotesCache (): Promise<void> {
+		await this.setCacheData("emotes", null);
 	}
 
-	async getBestAvailableEmote (emotes, fallbackEmote, options = {}) {
+	// async getBestAvailableEmote (emotes: string[], fallbackEmote: string, options: GetStringEmoteOptions): Promise<string>;
+	// async getBestAvailableEmote (emotes: string[], fallbackEmote: string, options: GetObjectEmoteOptions): Promise<Emote>;
+	async getBestAvailableEmote <T extends string> (emotes: T[], fallbackEmote: T, options: GetEmoteOptions = {}): Promise<Emote | T> {
 		const availableEmotes = await this.fetchEmotes();
 		const emoteArray = (options.shuffle)
 			? sb.Utils.shuffleArray(emotes)
@@ -158,7 +235,6 @@ export default class Channel extends Template {
 		const caseSensitive = options.caseSensitivity ?? true;
 		for (const emote of emoteArray) {
 			const lowerEmote = emote.toLowerCase();
-			/** @type {Object} */
 			const available = availableEmotes.find(i => (caseSensitive)
 				? (i.name === emote)
 				: (i.name.toLowerCase() === lowerEmote)
@@ -167,19 +243,19 @@ export default class Channel extends Template {
 			if (available && (typeof options.filter !== "function" || options.filter(available))) {
 				return (options.returnEmoteObject)
 					? available
-					: available.name;
+					: available.name as T;
 			}
 		}
 
 		return fallbackEmote;
 	}
 
-	async prepareMessage (message, options = {}) {
+	async prepareMessage (message: string, options: PrepareMessageOptions = {}): Promise<string | false> {
 		return await this.Platform.prepareMessage(message, this, options);
 	}
 
-	async getDataProperty (propertyName, options = {}) {
-		return await super.getGenericDataProperty({
+	async getDataProperty (propertyName: string, options = {}) {
+		return await getGenericDataProperty({
 			cacheMap: Channel.dataCache,
 			databaseProperty: "Channel",
 			databaseTable: "Channel_Data",
@@ -190,8 +266,8 @@ export default class Channel extends Template {
 		});
 	}
 
-	async setDataProperty (propertyName, value, options = {}) {
-		return await super.setGenericDataProperty({
+	async setDataProperty (propertyName: string, value: GenericDataPropertyValue, options = {}) {
+		return await setGenericDataProperty(this, {
 			cacheMap: Channel.dataCache,
 			databaseProperty: "Channel",
 			databaseTable: "Channel_Data",
@@ -209,18 +285,14 @@ export default class Channel extends Template {
 
 	destroy () {
 		this.events.removeAllListeners();
-		this.sessionData = null;
 	}
 
 	static async initialize () {
-		Channel.data = new Map();
 		await Channel.loadData();
-
-		return Channel;
 	}
 
 	static async loadData () {
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await sb.Query.getRecordset<ConstructorData[]>((rs) => rs
 			.select("*")
 			.from("chat_data", "Channel")
 		);
@@ -248,9 +320,17 @@ export default class Channel extends Template {
 		await Channel.loadData();
 	}
 
-	static get (identifier, platform) {
-		if (platform) {
-			platform = Platform.get(platform);
+	static get (identifier: Like, platformIdentifier?: Platform | string | number): Channel | null {
+		let platform: Platform | undefined;
+		if (platformIdentifier) {
+			const platformData = Platform.get(platformIdentifier);
+			if (!platformData) {
+				throw new SupiError({
+					message: "Invalid platform provided"
+				});
+			}
+
+			platform = platformData;
 		}
 
 		if (identifier instanceof Channel) {
@@ -269,13 +349,14 @@ export default class Channel extends Template {
 			}
 			else {
 				for (const platformMap of Channel.data.values()) {
-					if (platformMap.has(channelName)) {
-						return platformMap.get(channelName);
+					const channelData = platformMap.get(channelName);
+					if (channelData) {
+						return channelData;
 					}
 				}
 			}
 		}
-		else if (typeof identifier === "number") {
+		else {
 			for (const platformMap of Channel.data.values()) {
 				for (const channelData of platformMap.values()) {
 					if (channelData.ID === identifier) {
@@ -283,20 +364,21 @@ export default class Channel extends Template {
 					}
 				}
 			}
+		}
 
-			return null;
-		}
-		else {
-			throw new sb.Error({
-				message: "Invalid channel identifier type",
-				args: { id: identifier, type: typeof identifier }
-			});
-		}
+		return null;
 	}
 
-	static getBySpecificId (identifier, platform) {
+	static getBySpecificId (identifier: Channel["Specific_ID"], platform: Platform | string | number) {
 		const platformData = Platform.get(platform);
-		const channels = Channel.data.get(platformData);
+		if (!platformData) {
+			throw new SupiError({
+				message: "Invalid platform provided",
+				args: { identifier }
+			});
+		}
+
+		const channels = Channel.getPlatformMap(platformData);
 		for (const channelData of channels.values()) {
 			if (channelData.Mode !== "Inactive" && channelData.Specific_ID === identifier) {
 				return channelData;
@@ -306,8 +388,14 @@ export default class Channel extends Template {
 		return null;
 	}
 
-	static getJoinableForPlatform (platform) {
+	static getJoinableForPlatform (platform: PlatformLike) {
 		const platformData = Platform.get(platform);
+		if (!platformData) {
+			throw new SupiError({
+				message: "Invalid platform provided"
+			});
+		}
+
 		const platformMap = Channel.data.get(platformData);
 		if (!platformMap) {
 			return [];
@@ -338,7 +426,7 @@ export default class Channel extends Template {
 	}
 
 	static async getLiveEventSubscribedChannels (platform = null) {
-		const eventChannelIDs = await sb.Query.getRecordset(rs => rs
+		const eventChannelIDs = await sb.Query.getRecordset<Channel["ID"][]>(rs => rs
 			.select("Channel")
 			.from("chat_data", "Channel_Chat_Module")
 			.where("Chat_Module IN %s+", ["offline-only-mode", "offline-only-mirror"])
@@ -347,7 +435,7 @@ export default class Channel extends Template {
 			.flat("Channel")
 		);
 
-		const configChannelIDs = await sb.Query.getRecordset(rs => rs
+		const configChannelIDs = await sb.Query.getRecordset<Channel["ID"][]>(rs => rs
 			.select("Channel")
 			.from("chat_data", "Channel_Data")
 			.where("Property = %s", "offlineOnlyBot")
@@ -356,7 +444,7 @@ export default class Channel extends Template {
 			.flat("Channel")
 		);
 
-		const filterChannelIDs = await sb.Query.getRecordset(rs => rs
+		const filterChannelIDs = await sb.Query.getRecordset<Channel["ID"][]>(rs => rs
 			.select("Channel")
 			.from("chat_data", "Filter")
 			.where("Type IN %s+", ["Online-only", "Offline-only"])
@@ -367,16 +455,22 @@ export default class Channel extends Template {
 		);
 
 		const channelIDs = new Set([...eventChannelIDs, ...configChannelIDs, ...filterChannelIDs]);
-		let channelsData = [...channelIDs].map(i => Channel.get(i)).filter(Boolean);
+		let channelsData = [...channelIDs].map(i => Channel.get(i)).filter(Boolean) as Channel[];
 		if (platform) {
 			const platformData = Platform.get(platform);
+			if (!platformData) {
+				throw new SupiError({
+					message: "Invalid platform provided"
+				});
+			}
+
 			channelsData = channelsData.filter(i => i.Platform === platformData);
 		}
 
 		return channelsData;
 	}
 
-	static async add (name, platformData, mode = "Write", specificID) {
+	static async add (name: Channel["Name"], platformData: Platform, mode: Mode = "Write", specificID: Channel["Specific_ID"]) {
 		const channelName = Channel.normalizeName(name);
 		const existing = Channel.get(channelName);
 		if (existing) {
@@ -384,7 +478,7 @@ export default class Channel extends Template {
 		}
 
 		// Creates Channel row
-		const row = await sb.Query.getRow("chat_data", "Channel");
+		const row = await sb.Query.getRow<ConstructorData>("chat_data", "Channel");
 		row.setValues({
 			Name: channelName,
 			Platform: platformData.ID,
@@ -401,8 +495,9 @@ export default class Channel extends Template {
 		return channelData;
 	}
 
-	static async moveData (oldChannelData, newChannelData, options = {}) {
-		const properties = await sb.Query.getRecordset(rs => rs
+	static async moveData (oldChannelData: Channel, newChannelData: Channel, options: MoveDataOptions = {}) {
+		type MoveData = { Property: string; Value: string; };
+		const properties = await sb.Query.getRecordset<MoveData[]>((rs) => rs
 			.select("Property", "Value")
 			.from("chat_data", "Channel_Data")
 			.where("Channel = %n", oldChannelData.ID)
@@ -415,7 +510,7 @@ export default class Channel extends Template {
 				continue;
 			}
 
-			const propertyRow = await sb.Query.getRow("chat_data", "Channel_Data");
+			const propertyRow = await sb.Query.getRow<DatabaseChannelData>("chat_data", "Channel_Data");
 			await propertyRow.load({
 				Channel: newChannelData.ID,
 				Property: row.Property
@@ -445,20 +540,20 @@ export default class Channel extends Template {
 		}
 	}
 
-	static async reloadSpecific (...list) {
-		const channelsData = list.map(i => Channel.get(i)).filter(Boolean);
+	static async reloadSpecific (...list: Channel["Name"][]) {
+		const channelsData = list.map(i => Channel.get(i)).filter(Boolean) as Channel[];
 		if (channelsData.length === 0) {
 			return false;
 		}
 
-		const data = await sb.Query.getRecordset(rs => rs
+		const data = await sb.Query.getRecordset<ConstructorData[]>(rs => rs
 			.select("*")
 			.from("chat_data", "Channel")
 			.where("ID IN %n+", channelsData.map(i => i.ID))
 		);
 
 		for (const channelData of channelsData) {
-			const platformMap = Channel.data.get(channelData.Platform);
+			const platformMap = Channel.getPlatformMap(channelData.Platform);
 			const channelName = channelData.Name;
 
 			channelData.destroy();
@@ -474,17 +569,18 @@ export default class Channel extends Template {
 		return true;
 	}
 
-	static getPlatformMap (platformData) {
+	static getPlatformMap (platformData: Platform): Map<Channel["Name"], Channel> {
 		if (!Channel.data.has(platformData)) {
 			Channel.data.set(platformData, new Map());
 		}
 
-		return Channel.data.get(platformData);
+		// type cast due to condition above
+		return Channel.data.get(platformData) as Map<Channel["Name"], Channel>;
 	}
 
-	static normalizeName (username) {
-		return username
-			.toLowerCase()
-			.replace(/^@/, "");
+	static normalizeName (username: string): string {
+		return username.toLowerCase().replace(/^@/, "");
 	}
-};
+}
+
+export default Channel;
