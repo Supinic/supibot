@@ -69,10 +69,7 @@ export const getGenericDataProperty = async <T extends TemplateWithId>(inputData
 	);
 
 	if (!data) {
-		throw new SupiError({
-			message: "Data property does not exist",
-			args: { propertyName }
-		});
+		return;
 	}
 
 	let value: GenericDataPropertyValue;
