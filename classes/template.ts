@@ -133,7 +133,7 @@ export const setGenericDataProperty = async <T extends TemplateWithId>(self: T, 
 	} = inputData;
 
 	const transactionOptions = (options.transaction) ? { transaction: options.transaction } : {};
-	const propertyData = await sb.Query.getRecordset<SetGenericDataPropertyResult>(
+	const propertyData = await sb.Query.getRecordset<SetGenericDataPropertyResult | undefined>(
 		rs => rs
 			.select("Type", "Cached")
 			.from("chat_data", "Custom_Data_Property")
@@ -143,9 +143,9 @@ export const setGenericDataProperty = async <T extends TemplateWithId>(self: T, 
 		transactionOptions
 	);
 
-	if (!propertyData.Type) {
+	if (!propertyData || propertyData.Type) {
 		throw new SupiError({
-			message: "Data property has no type associated with it",
+			message: "Data property does not exist or has no type associated with it",
 			args: { propertyName, propertyData }
 		});
 	}
