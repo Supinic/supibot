@@ -21,7 +21,7 @@ export type SetGenericDataPropertyObject<T extends Template> = GenericDataProper
 	value: GenericDataPropertyValue;
 };
 type SetGenericDataPropertyResult = {
-	Type?: "string" | "boolean" | "number" | "date" | "array" | "object";
+	Type: "string" | "boolean" | "number" | "date" | "array" | "object";
 	Cached: boolean;
 };
 type GenericDataPropertyResult = SetGenericDataPropertyResult & {
@@ -69,12 +69,9 @@ export const getGenericDataProperty = async <T extends TemplateWithId>(inputData
 	);
 
 	if (!data) {
-		return;
-	}
-	else if (!data.Type) {
 		throw new SupiError({
-			message: "No type is associated with self variable",
-			args: { property: propertyName }
+			message: "Data property does not exist",
+			args: { propertyName }
 		});
 	}
 
@@ -143,9 +140,9 @@ export const setGenericDataProperty = async <T extends TemplateWithId>(self: T, 
 		transactionOptions
 	);
 
-	if (!propertyData || !propertyData.Type) {
+	if (!propertyData) {
 		throw new SupiError({
-			message: "Data property does not exist or has no type associated with it",
+			message: "Data property does not exist",
 			args: { propertyName, propertyData }
 		});
 	}
