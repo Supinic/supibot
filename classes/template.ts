@@ -143,7 +143,7 @@ export const setGenericDataProperty = async <T extends TemplateWithId>(self: T, 
 		transactionOptions
 	);
 
-	if (!propertyData || propertyData.Type) {
+	if (!propertyData || !propertyData.Type) {
 		throw new SupiError({
 			message: "Data property does not exist or has no type associated with it",
 			args: { propertyName, propertyData }
