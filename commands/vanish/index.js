@@ -27,7 +27,14 @@ export default {
 			};
 		}
 
-		const badges = new Set(context.append.badges.map(i => i.set_id));
+		const messageData = context.platformSpecificData;
+		if (!messageData || !Array.isArray(messageData.badges)) {
+			throw new sb.Error({
+				message: "Assert error: No badges available on Twitch platform"
+			});
+		}
+
+		const badges = new Set(messageData.badges.map(i => i.set_id));
 		if (badges.has("moderator")) {
 			return {
 				success: false,

@@ -21,26 +21,10 @@ export default {
 	Whitelist_Response: null,
 	Code: (async function checkEm (context) {
 		let messageNumber;
-		if (context.platform.Name === "twitch") {
-			if (!context.append.id) {
-				return {
-					success: false,
-					reply: `No message ID available! FeelsBadMan`
-				};
-			}
-
-			const pseudoUuid = context.append.id.replaceAll("-", "");
+		const messageData = context.platformSpecificData;
+		if (typeof messageData?.id === "string") {
+			const pseudoUuid = messageData.id.replaceAll("-", "");
 			messageNumber = BigInt(`0x${pseudoUuid}`);
-		}
-		else if (context.platform.Name === "discord") {
-			if (!context.append.append) {
-				return {
-					success: false,
-					reply: `No message ID available on Discord just yet! Coming soon™`
-				};
-			}
-
-			messageNumber = BigInt(context.append.messageID);
 		}
 		else {
 			return {

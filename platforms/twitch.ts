@@ -12,6 +12,7 @@ import TwitchUtils, {
 	isReconnectMessage,
 	isRevocationMessage,
 	isNotificationMessage,
+	isKeepaliveMessage,
 	NotificationMessage,
 	SessionReconnectMessage,
 	isWhisperNotification,
@@ -27,6 +28,7 @@ import { Channel } from "../classes/channel.js";
 import { User } from "../classes/user.js";
 import { Emote } from "../@types/globals.js";
 import { SupiDate, SupiError } from "supi-core";
+import id from "../commands/id/index.js";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
@@ -216,6 +218,18 @@ class ConfigurableWebsocket {
 	}
 }
 
+export type MessageData = {
+	text: string;
+	fragments: MessageNotification["payload"]["event"]["message"]["fragments"];
+	type: MessageNotification["payload"]["event"]["message_type"];
+	id: MessageNotification["payload"]["event"]["message_id"];
+	bits: MessageNotification["payload"]["event"]["cheer"];
+	badges: MessageNotification["payload"]["event"]["badges"];
+	color: MessageNotification["payload"]["event"]["color"];
+	animationId: MessageNotification["payload"]["event"]["channel_points_animation_id"];
+	rewardId: MessageNotification["payload"]["event"]["channel_points_custom_reward_id"];
+};
+
 type ConnectOptions = {
 	url?: string;
 	skipSubscriptions?: boolean;
@@ -388,6 +402,9 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 		else if (isNotificationMessage(message)) {
 			await this.handleWebsocketNotification(message);
+		}
+		else if (isKeepaliveMessage(message)) {
+			// Do nothing
 		}
 		else {
 			console.log("Unrecognized message", { message });
@@ -679,7 +696,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			reply
 		} = event;
 
-		const messageData = {
+		const messageData: MessageData = {
 			text: TwitchUtils.sanitizeMessage(event.message.text),
 			fragments: event.message.fragments,
 			type: event.message_type,
@@ -884,8 +901,14 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			.split(/\s+/)
 			.filter(Boolean);
 
-		// @todo figure out the "any data" messageData coming into Command.checkAndExecute
-		await this.handleCommand(command, userData, channelData, args, messageData);
+		await this.handleCommand(
+			command,
+			userData,
+			channelData,
+			args,
+			{ privateMessage: false },
+			messageData
+		);
 	}
 
 	async handlePrivateMessage (notification: WhisperNotification) {
@@ -918,9 +941,14 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			.split(/\s+/)
 			.filter(Boolean);
 
-		const result = await this.handleCommand(command, userData, null, args, {
-			privateMessage: true
-		});
+		const result = await this.handleCommand(
+			command,
+			userData,
+			null,
+			args,
+			{ privateMessage: true },
+			null
+		);
 
 		if (!result || !result.success) {
 			if (!result?.reply && result?.reason === "filter") {
@@ -1029,14 +1057,21 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		user: User,
 		channel: Channel | null,
 		args: string[] = [],
-		options: { privateMessage?: boolean; } = {}
+		options: { privateMessage: boolean; },
+		specificData: MessageData | null
 	) {
 		const userData = await sb.User.get(user, false);
 		const channelData = (channel === null) ? null : sb.Channel.get(channel, this);
-		const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
-			platform: this,
-			...options
-		});
+
+		const { privateMessage } = options;
+		const execution = await sb.Command.checkAndExecute(
+			command,
+			args,
+			channelData,
+			userData,
+			{ platform: this, privateMessage },
+			specificData
+		);
 
 		if (!execution || !execution.reply) {
 			return execution;

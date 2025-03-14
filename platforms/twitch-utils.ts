@@ -127,6 +127,7 @@ export interface NotificationMessage extends BaseWebsocketMessage {
 
 export const isWelcomeMessage = (input: TwitchWebsocketMessage): input is SessionWelcomeMessage => (input.metadata.message_type === "session_welcome");
 export const isReconnectMessage = (input: TwitchWebsocketMessage): input is SessionReconnectMessage => (input.metadata.message_type === "session_reconnect");
+export const isKeepaliveMessage = (input: TwitchWebsocketMessage): input is SessionKeepaliveMessage => (input.metadata.message_type === "session_keepalive");
 export const isRevocationMessage = (input: TwitchWebsocketMessage): input is RevocationMessage => (input.metadata.message_type === "revocation");
 export const isNotificationMessage = (input: TwitchWebsocketMessage): input is NotificationMessage => (input.metadata.message_type === "notification");
 

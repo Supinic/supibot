@@ -7,12 +7,15 @@ type DiscordEmbeds = BaseMessageOptions["embeds"];
 import { TemplateWithoutId, TemplateDefinition } from "./template.js";
 
 import Banphrase from "./banphrase.js";
-import { Filter, ExecuteResult as FilterExecuteResult } from "./filter.js";
+import { Filter } from "./filter.js";
 import User from "./user.js";
 import { Channel, privateMessageChannelSymbol } from "./channel.js";
 import { Platform, type GetEmoteOptions } from "../platforms/template.js";
 import CooldownManager from "../utils/cooldown-manager.js";
 import { Language, LanguageParser } from "../utils/languages.js";
+
+import type { MessageData as TwitchAppendData } from "../platforms/twitch.js";
+import type { MessageData as DiscordAppendData } from "../platforms/discord.js";
 
 import { whitespaceRegex } from "../utils/regexes.js";
 import config from "../config.json" with { type: "json" };
@@ -83,6 +86,7 @@ export type ContextData<T extends ParameterDefinitions = ParameterDefinitions> =
 	transaction?: Context<T>["transaction"];
 	privateMessage?: Context<T>["privateMessage"];
 	append?: Context<T>["append"];
+	platformSpecificData: Context<T>["platformSpecificData"];
 	params?: Context<T>["params"];
 };
 export type ContextAppendData = {
@@ -99,6 +103,7 @@ export type ContextAppendData = {
 	skipPending?: boolean;
 	privateMessage?: boolean;
 };
+export type ContextPlatformSpecificData = TwitchAppendData | DiscordAppendData | null;
 
 type PermissionOptions = {
 	user?: User | null;
@@ -116,6 +121,7 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 	readonly transaction: QueryTransaction | null;
 	readonly privateMessage: boolean;
 	readonly append: ContextAppendData;
+	readonly platformSpecificData: ContextPlatformSpecificData;
 	readonly params: ParamFromDefinition<T>;
 
 	readonly meta: Map<string, unknown> = new Map();
@@ -131,6 +137,8 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 
 		this.append = data.append ?? { tee: [] };
 		this.append.tee ??= [];
+
+		this.platformSpecificData = data.platformSpecificData ?? null;
 
 		this.params = (data.params ?? {}) as ParamFromDefinition<T>;
 	}
@@ -502,7 +510,8 @@ export class Command extends TemplateWithoutId {
 		argumentArray: string[],
 		channelData: Channel | null,
 		userData: User,
-		options: ExecuteOptions
+		options: ExecuteOptions,
+		platformSpecificData: ContextPlatformSpecificData = null
 	): Promise<Result> {
 		if (!identifier) {
 			return { success: false, reason: "no-identifier" };
@@ -582,6 +591,7 @@ export class Command extends TemplateWithoutId {
 			transaction: null,
 			privateMessage: isPrivateMessage,
 			append: appendOptions,
+			platformSpecificData,
 			params: {}
 		};
 
@@ -1105,7 +1115,8 @@ export class Command extends TemplateWithoutId {
 			transaction: contextData.transaction ?? null,
 			privateMessage: contextData.privateMessage ?? false,
 			append: contextData.append ?? {},
-			params: contextData.params ?? {}
+			params: contextData.params ?? {},
+			platformSpecificData: contextData.platformSpecificData ?? null
 		};
 
 		return new Context(command, data);

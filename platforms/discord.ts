@@ -48,6 +48,7 @@ type HandleCommandData = {
 		member: GuildMember | null;
 	};
 };
+export type MessageData = Omit<HandleCommandData["options"], "privateMessage">;
 
 const IGNORED_CHANNEL_TYPES = new Set([
 	ChannelType.GuildAnnouncement,
@@ -674,9 +675,15 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			options
 		} = data;
 
-		const execution = await sb.Command.checkAndExecute(command, args, channelData, userData, {
-			platform: this
-		});
+		const { member, guild, mentions } = options;
+		const execution = await sb.Command.checkAndExecute(
+			command,
+			args,
+			channelData,
+			userData,
+			{ platform: this },
+			{ member, guild, mentions }
+		);
 
 		if (!execution) {
 			return;

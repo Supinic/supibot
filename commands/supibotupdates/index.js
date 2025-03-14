@@ -18,7 +18,14 @@ export default {
 			};
 		}
 
-		const { guild, member } = context.append;
+		const messageData = context.platformSpecificData;
+		if (!messageData || !messageData.guild || !messageData.member) {
+			throw new sb.Error({
+				message: "Assert error: No guild/member available on Discord platform"
+			});
+		}
+
+		const { guild, member } = messageData;
 		if (!guild || guild.id !== SUPINIC_DISCORD_GUILD_ID) {
 			return {
 				success: false,
@@ -36,10 +43,10 @@ export default {
 
 		const hasRole = member.roles.cache.has(role.id);
 		if (hasRole) {
-			member.roles.remove(role, `Bot unassigned role on ${sb.Date.now()} in channel ${context.channel?.ID ?? null}.`);
+			await member.roles.remove(role, `Bot unassigned role on ${sb.Date.now()} in channel ${context.channel?.ID ?? null}.`);
 		}
 		else {
-			member.roles.add(role, `Bot assigned the role on ${sb.Date.now()} in channel ${context.channel?.ID ?? null}.`);
+			await member.roles.add(role, `Bot assigned the role on ${sb.Date.now()} in channel ${context.channel?.ID ?? null}.`);
 		}
 
 		const [string, emoji] = (hasRole) ? ["no longer", "☹"] : ["", "😊"];
