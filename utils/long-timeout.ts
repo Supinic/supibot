@@ -1,6 +1,6 @@
 import { SupiError } from "supi-core";
 
-const MAX_TIMEOUT = 2147483647 as const;
+const MAX_TIMEOUT = 2147483647;
 
 /**
  * Originally hosted in a separate repository (`Supinic/long-timeout`) but moved to Supibot due to no other places using this module.
@@ -16,7 +16,7 @@ export default class LongTimeout {
 	 * @param time Delay or timestamp
 	 * @param [useTimestamp] If true, time will be considered as a timestamp instead of as a delay
 	 */
-	constructor (callback: () => void, time: number, useTimestamp: boolean = false) {
+	constructor (callback: () => unknown, time: number, useTimestamp: boolean = false) {
 		if (!Number.isFinite(time)) {
 			throw new SupiError({
 				message: "A finite number must be used for LongTimeout"
@@ -45,7 +45,7 @@ export default class LongTimeout {
 	/**
 	 * Clears the timeout.
 	 */
-	clear() {
+	clear () {
 		// Recursively look inside to get the underlying timeout type in case this happens to be nested
 		let timeoutToClear = this.timeout;
 		while (timeoutToClear instanceof LongTimeout) {

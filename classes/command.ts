@@ -1,5 +1,13 @@
-import { SupiDate, SupiError, isGenericRequestError, isGotRequestError, Counter, } from "supi-core"
-import type { Query, MetricConfiguration, MetricType } from "supi-core";
+import {
+	SupiDate,
+	SupiError,
+	isGenericRequestError,
+	isGotRequestError,
+	type Counter,
+	type Query,
+	type MetricConfiguration,
+	type MetricType
+} from "supi-core";
 import type { BaseMessageOptions } from "discord.js";
 
 type DiscordEmbeds = BaseMessageOptions["embeds"];
@@ -94,7 +102,7 @@ export type ContextAppendData = {
 	pipe?: boolean;
 	aliasCount?: number;
 	commandList?: Command["Name"][];
-	aliasStack?: Array<Command["Name"] | Command["Aliases"][number]>;
+	aliasStack?: Command["Name"][];
 	flags?: unknown;
 	id?: string;
 	messageID?: string;
@@ -135,7 +143,10 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		this.transaction = data.transaction ?? null;
 		this.privateMessage = data.privateMessage ?? false;
 
-		this.append = data.append ?? { tee: [] };
+		this.append = data.append ?? {
+			tee: []
+		};
+
 		this.append.tee ??= [];
 
 		this.platformSpecificData = data.platformSpecificData ?? null;
@@ -143,8 +154,8 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 		this.params = (data.params ?? {}) as ParamFromDefinition<T>;
 	}
 
-	getMeta (name: string) { return this.meta.get(name); }
-	setMeta (name: string, value: unknown) { this.meta.set(name, value); }
+	// getMeta (name: string) { return this.meta.get(name); }
+	// setMeta (name: string, value: unknown) { this.meta.set(name, value); }
 
 	getMentionStatus (): boolean {
 		if (!this.user) {
@@ -202,12 +213,15 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 
 		let flag = User.permissions.regular;
 		if (flags.administrator) {
+			// eslint-disable-next-line no-bitwise
 			flag |= User.permissions.administrator;
 		}
 		if (flags.channelOwner) {
+			// eslint-disable-next-line no-bitwise
 			flag |= User.permissions.channelOwner;
 		}
 		if (flags.ambassador) {
+			// eslint-disable-next-line no-bitwise
 			flag |= User.permissions.ambassador;
 		}
 
@@ -220,6 +234,7 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 					});
 				}
 
+				// eslint-disable-next-line no-bitwise
 				return ((flag & User.permissions[type]) !== 0);
 			}
 		};
@@ -245,8 +260,8 @@ export class Context<T extends ParameterDefinitions = ParameterDefinitions> {
 			});
 		}
 
-		const emotes = inputEmotes.slice(0, -1) as T[];
-		const fallback = inputEmotes.at(-1) as T;
+		const emotes = inputEmotes.slice(0, -1);
+		const fallback = inputEmotes.at(-1) as T; // Guaranteed because of the above condition checking for length >= 2
 
 		return await this.getBestAvailableEmote(emotes, fallback, {
 			shuffle: true,
@@ -268,12 +283,13 @@ export interface CommandDefinition extends TemplateDefinition {
 	Code: Command["Code"];
 	Dynamic_Description: Command["Dynamic_Description"];
 
-	initialize?: InitDestroyFunction;
-	destroy?: InitDestroyFunction;
+	initialize?: CustomInitFunction;
+	destroy?: CustomDestroyFunction;
 }
 export type ExecuteFunction = (this: Command, context: Context, ...args: string[]) => StrictResult | Promise<StrictResult>;
 export type DescriptionFunction = (this: Command) => string[] | Promise<string[]>;
-export type InitDestroyFunction = (this: Command) => unknown | Promise<unknown>;
+export type CustomInitFunction = (this: Command) => Promise<void> | void;
+export type CustomDestroyFunction = (this: Command) => void;
 
 type ExecuteOptions = {
 	platform: Platform;
@@ -308,7 +324,7 @@ export class Command extends TemplateWithoutId {
 
 	#ready = false;
 	#destroyed = false;
-	readonly #customDestroy: InitDestroyFunction | null;
+	readonly #customDestroy: CustomDestroyFunction | null;
 	readonly data = {};
 
 	static readonly importable = true;
@@ -340,7 +356,9 @@ export class Command extends TemplateWithoutId {
 			try {
 				const result = data.initialize.call(this);
 				if (result instanceof Promise) {
-					result.then(() => { this.#ready = true; });
+					result
+						.then(() => { this.#ready = true; })
+						.catch(() => { this.#ready = false; });
 				}
 				else {
 					this.#ready = true;
@@ -357,10 +375,10 @@ export class Command extends TemplateWithoutId {
 		this.#customDestroy = data.destroy ?? null;
 	}
 
-	async destroy () {
+	destroy () {
 		if (typeof this.#customDestroy === "function") {
 			try {
-				await this.#customDestroy();
+				this.#customDestroy();
 			}
 			catch (e) {
 				console.warn("Custom command destroy method failed", { command: this.Name, error: e });
@@ -426,15 +444,17 @@ export class Command extends TemplateWithoutId {
 		return sb.Metrics.register(type, metricOptions);
 	}
 
-	static async initialize () {
+	static initialize () {
 		sb.Metrics.registerCounter({
 			name: "supibot_command_executions_total",
 			help: "The total number of command executions.",
 			labelNames: ["name", "result", "reason"]
 		});
+
+		return Promise.resolve();
 	}
 
-	static async importData (definitions: CommandDefinition[]) {
+	static importData (definitions: CommandDefinition[]) {
 		for (const definition of definitions) {
 			const instance = new Command(definition);
 			this.data.set(definition.Name, instance);
@@ -443,7 +463,7 @@ export class Command extends TemplateWithoutId {
 		this.validate();
 	}
 
-	static async importSpecific (...definitions: CommandDefinition[]) {
+	static importSpecific (...definitions: CommandDefinition[]) {
 		if (definitions.length === 0) {
 			return [];
 		}
@@ -454,7 +474,7 @@ export class Command extends TemplateWithoutId {
 			const previousInstance = Command.get(commandName);
 			if (previousInstance) {
 				Command.data.delete(commandName);
-				await previousInstance.destroy();
+				previousInstance.destroy();
 			}
 
 			const currentInstance = new Command(definition);
@@ -476,8 +496,7 @@ export class Command extends TemplateWithoutId {
 
 		const names = [];
 		for (const command of Command.data.values()) {
-			names.push(command.Name);
-			names.push(...command.Aliases);
+			names.push(command.Name, ...command.Aliases);
 		}
 
 		const uniqueNames = new Set(names);
@@ -505,6 +524,8 @@ export class Command extends TemplateWithoutId {
 		}
 	}
 
+	// @todo refactor to not have THIS many arguments
+	// eslint-disable-next-line max-params
 	static async checkAndExecute (
 		identifier: string,
 		argumentArray: string[],
@@ -954,7 +975,7 @@ export class Command extends TemplateWithoutId {
 					channel = channelID,
 					user = userData.ID,
 					command = commandData.Name,
-					ignoreCooldownFilters = false,
+					ignoreCooldownFilters = false
 				} = cooldown;
 
 				if (!ignoreCooldownFilters) {

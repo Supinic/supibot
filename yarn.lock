@@ -1544,11 +1544,11 @@ async-markov@supinic/async-markov:
 
 cytube-connector@supinic/cytube-connector:
   version: 2.1.0
-  resolution: "cytube-connector@https://github.com/supinic/cytube-connector.git#commit=fdd81df11775e71d53bf381c1779b86c6fd82235"
+  resolution: "cytube-connector@https://github.com/supinic/cytube-connector.git#commit=40f5ef12b29e2138b5aac18e98f4934157b1a78a"
   dependencies:
     "@types/node": "npm:^22.5.4"
     socket.io-client: "npm:^4.7.5"
-  checksum: 10c0/f2084026d4ac4ee3f742a00349b95fa4325500b82a7acfb255d154f378a139d68ee1df2e71c968ac0058d9b2361aa49d9af3fea8539e3a666c1f6ba616103b42
+  checksum: 10c0/c38cc556a1a8e8240c7ab584b6e52c0e8470415d6cc96f70e0bbc9e58a761b005cb19f6f9b0ad9abfbedb5ec9ab2ac1011c8aac9dc158255d706a3cee877379d
   languageName: node
   linkType: hard
 
@@ -2929,8 +2929,8 @@ duration-parser@supinic/duration-parser:
   linkType: hard
 
 "ioredis@npm:^5.4.2":
-  version: 5.5.0
-  resolution: "ioredis@npm:5.5.0"
+  version: 5.6.0
+  resolution: "ioredis@npm:5.6.0"
   dependencies:
     "@ioredis/commands": "npm:^1.1.1"
     cluster-key-slot: "npm:^1.1.0"
@@ -2941,7 +2941,7 @@ duration-parser@supinic/duration-parser:
     redis-errors: "npm:^1.2.0"
     redis-parser: "npm:^3.0.0"
     standard-as-callback: "npm:^2.1.0"
-  checksum: 10c0/ba64502fc92d9e05465793fafcd0568cb668af6e2350462b61daadfd499e3a48239d9a723d3ce08b08c93f3f745d05dda91136cdc597d4d485604e6730305305
+  checksum: 10c0/a885e5146640fc448706871290ef424ffa39af561f7ee3cf1590085209a509f85e99082bdaaf3cd32fa66758aea3fc2055d1109648ddca96fac4944bf2092c30
   languageName: node
   linkType: hard
 
@@ -5144,7 +5144,7 @@ duration-parser@supinic/duration-parser:
 
 "supi-core@supinic/supi-core#exports-refactor":
   version: 3.1.0
-  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=f63dff02ef86066bbc0f2b79c0e7dfc6c860bb85"
+  resolution: "supi-core@https://github.com/supinic/supi-core.git#commit=68cb1a99c10b5c87150d69ed544a1caecc26d177"
   dependencies:
     cheerio: "npm:^1.0.0"
     duration-parser: supinic/duration-parser
@@ -5153,7 +5153,7 @@ duration-parser@supinic/duration-parser:
     mariadb: "npm:^3.4.0"
     prom-client: "npm:^15.1.3"
     random-js: "npm:^2.1.0"
-  checksum: 10c0/34dbe3a2bb020e6072bffef87e1f978ed3a4719e46a9b71fe9c912a317691dfeb0c9c3860eed846350337ad3b407ecb5d669d22849670bb1509ad9b2418bb3d1
+  checksum: 10c0/4c7ccc264137a198d83558b20e83e37f7d46ef473a7d969bcc51a3e8da3664a327b749ed28f7027f68bd66b7130cc4ec356e5db36f6a8d53f95d784333f38074
   languageName: node
   linkType: hard
 
@@ -5466,10 +5466,17 @@ track-link-parser@supinic/track-link-parser:
   languageName: node
   linkType: hard
 
-"undici@npm:6.21.1, undici@npm:^6.19.5":
+"undici@npm:6.21.1":
   version: 6.21.1
   resolution: "undici@npm:6.21.1"
   checksum: 10c0/d604080e4f8db89b35a63b483b5f96a5f8b19ec9f716e934639345449405809d2997e1dd7212d67048f210e54534143384d712bd9075e4394f0788895ef9ca8e
+  languageName: node
+  linkType: hard
+
+"undici@npm:^6.19.5":
+  version: 6.21.2
+  resolution: "undici@npm:6.21.2"
+  checksum: 10c0/799bbc02b77dda9b6b12d56d2620a3a4d4cf087908d6a548acc3ce32f21b5c27467f75c2c4b30fab281daf341210be3d685e8fe99854288de541715ae5735027
   languageName: node
   linkType: hard
 

@@ -1,14 +1,14 @@
 import { randomInt as cryptoRandomInt } from "node:crypto";
 
 import RSSParser from "rss-parser";
-import { parse as chronoParse, ParsingOption } from "chrono-node";
+import { parse as chronoParse, type ParsingOption } from "chrono-node";
 import { SupiError, SupiDate } from "supi-core";
 
 import { Filter, type Type as FilterType } from "../classes/filter.js";
 import type { Command, Context as CommandContext } from "../classes/command.js";
-import type User from "../classes/user.js";
-import type Channel from "../classes/channel.js";
-import type Platform from "../platforms/template.js";
+import type { User } from "../classes/user.js";
+import type { Channel } from "../classes/channel.js";
+import type { Platform } from "../platforms/template.js";
 
 type CommandContextParams = Record<string, string | number | undefined>; // @todo remove type cast when CommandContext is Typescript
 
@@ -32,7 +32,7 @@ const PASTEBIN_PRIVACY_OPTIONS = {
 	private: "2"
 } as const;
 
-export const VIDEO_TYPE_REPLACE_PREFIX = "$" as const;
+export const VIDEO_TYPE_REPLACE_PREFIX = "$";
 
 export const randomInt = (min: number, max: number): number => {
 	if (Math.abs(min) > Number.MAX_SAFE_INTEGER || Math.abs(max) > Number.MAX_SAFE_INTEGER) {
@@ -54,10 +54,11 @@ export const randomInt = (min: number, max: number): number => {
 	return (min + roll);
 };
 
+type Coordinates = { lat: number; lng: number; };
 /**
  * Fetches time data for given GPS coordinates and timestamp, if provided.
  */
-export const fetchTimeData = async (data: { coordinates: Coordinates, date?: SupiDate } ) => {
+export const fetchTimeData = async (data: { coordinates: Coordinates, date?: SupiDate }) => {
 	type LocationTimeData = {
 		dstOffset: number;
 		rawOffset: number;
@@ -209,7 +210,6 @@ export const parseChrono = (string: string, referenceDate?: SupiDate, options?: 
 	};
 };
 
-type Coordinates = { lat: number; lng: number; };
 type GoogleAddressComponent = {
 	long_name: string;
 	short_name: string;
@@ -719,8 +719,8 @@ type GenericFilterData = {
 };
 
 export const handleGenericFilter = async (type: FilterType, data: GenericFilterData): Promise<{ reply: string; success: boolean }> => {
-	let { filter } = data;
 	const {
+		filter,
 		enableInvocation,
 		disableInvocation,
 		enableVerb,

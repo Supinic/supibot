@@ -1,7 +1,8 @@
-import { TwitchPlatform } from "./twitch.js";
 import { SupiError } from "supi-core";
-import User from "../classes/user.js";
-import Channel from "../classes/channel.js";
+
+import { TwitchPlatform } from "./twitch.js";
+import { User } from "../classes/user.js";
+import { Channel } from "../classes/channel.js";
 
 const { env } = globalThis.process;
 
@@ -81,7 +82,7 @@ export interface SessionKeepaliveMessage extends BaseWebsocketMessage {
 		message_type: "session_keepalive";
 		message_timestamp: string;
 	};
-	payload: {};
+	payload: Record<string, never>;
 }
 export interface SessionReconnectMessage extends BaseWebsocketMessage {
 	metadata: {
@@ -125,18 +126,18 @@ export interface NotificationMessage extends BaseWebsocketMessage {
 	};
 }
 
-export const isWelcomeMessage = (input: TwitchWebsocketMessage): input is SessionWelcomeMessage => (input.metadata.message_type === "session_welcome");
-export const isReconnectMessage = (input: TwitchWebsocketMessage): input is SessionReconnectMessage => (input.metadata.message_type === "session_reconnect");
-export const isKeepaliveMessage = (input: TwitchWebsocketMessage): input is SessionKeepaliveMessage => (input.metadata.message_type === "session_keepalive");
-export const isRevocationMessage = (input: TwitchWebsocketMessage): input is RevocationMessage => (input.metadata.message_type === "revocation");
-export const isNotificationMessage = (input: TwitchWebsocketMessage): input is NotificationMessage => (input.metadata.message_type === "notification");
-
 export type TwitchWebsocketMessage =
 	| SessionWelcomeMessage
 	| SessionKeepaliveMessage
 	| SessionReconnectMessage
 	| RevocationMessage
 	| NotificationMessage;
+
+export const isWelcomeMessage = (input: TwitchWebsocketMessage): input is SessionWelcomeMessage => (input.metadata.message_type === "session_welcome");
+export const isReconnectMessage = (input: TwitchWebsocketMessage): input is SessionReconnectMessage => (input.metadata.message_type === "session_reconnect");
+export const isKeepaliveMessage = (input: TwitchWebsocketMessage): input is SessionKeepaliveMessage => (input.metadata.message_type === "session_keepalive");
+export const isRevocationMessage = (input: TwitchWebsocketMessage): input is RevocationMessage => (input.metadata.message_type === "revocation");
+export const isNotificationMessage = (input: TwitchWebsocketMessage): input is NotificationMessage => (input.metadata.message_type === "notification");
 
 export type MessageBadge = {
 	set_id: string;
@@ -347,7 +348,7 @@ const getAppAccessToken = async (): Promise<string> => {
 	});
 
 	if (!response.ok) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "Could not fetch app access token!",
 			args: { body: response.body }
 		});
@@ -439,7 +440,7 @@ const getConduitId = async (): Promise<string> => {
 	});
 
 	if (!response.ok) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "Could not obtain conduit id",
 			args: {
 				body: response.body,
@@ -490,7 +491,7 @@ const assignWebsocketToConduit = async (sessionId: string): Promise<void> => {
 	});
 
 	if (!response.ok) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "Could not assign WS to conduit",
 			args: { body: response.body }
 		});
@@ -545,7 +546,7 @@ const createSubscription = async (data: CreateSubscriptionData) => {
 	else {
 		throw new SupiError({
 			message: "Invalid combination of arguments"
-		})
+		});
 	}
 
 	const response = await sb.Got.get("GenericAPI")<CreateSubscriptionResponse>({
@@ -718,7 +719,7 @@ const fetchToken = async () => {
 		?? env.TWITCH_REFRESH_TOKEN;
 
 	if (!refreshToken) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "No Twitch refresh token has been configured (TWITCH_REFRESH_TOKEN)"
 		});
 	}
@@ -748,7 +749,7 @@ const fetchToken = async () => {
 type MessageData = MessageNotification["payload"]["event"]["message"];
 const emitRawUserMessageEvent = (username: string, channelName: string, platform: TwitchPlatform, message: MessageData) => {
 	if (!username || !channelName) {
-		throw new sb.Error({
+		throw new SupiError({
 			message: "No username or channel name provided for raw event",
 			args: {
 				username,
@@ -794,11 +795,11 @@ const initTokenCheckInterval = async () => {
 		await fetchToken();
 	}
 
-	setInterval(async () => await fetchToken(), TOKEN_REGENERATE_INTERVAL);
+	setInterval(() => void fetchToken(), TOKEN_REGENERATE_INTERVAL);
 };
 
 const initSubCacheCheckInterval = () => {
-	setInterval(async () => await getExistingSubscriptions(true), SUBSCRIPTIONS_CACHE_INTERVAL / 2);
+	setInterval(() => void getExistingSubscriptions(true), SUBSCRIPTIONS_CACHE_INTERVAL / 2);
 };
 
 const sanitizeMessage = (string: string) => string.replace(/^\u0001ACTION (.+)\u0001$/, "$1");

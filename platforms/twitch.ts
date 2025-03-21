@@ -1,4 +1,4 @@
-import WebSocket, { RawData as WebsocketRawData } from "ws";
+import WebSocket from "ws";
 import { randomBytes } from "node:crypto";
 
 import { Platform, BaseConfig } from "./template.js";
@@ -26,13 +26,12 @@ import TwitchUtils, {
 
 import { Channel } from "../classes/channel.js";
 import { User } from "../classes/user.js";
-import { Emote } from "../@types/globals.js";
 import { SupiDate, SupiError } from "supi-core";
-import id from "../commands/id/index.js";
+import type { Emote } from "../@types/globals.d.ts";
 
 // Reference: https://github.com/SevenTV/API/blob/master/data/model/emote.model.go#L68
 // Flag name: EmoteFlagsZeroWidth
-const SEVEN_TV_ZERO_WIDTH_FLAG = (1 << 8);
+const SEVEN_TV_ZERO_WIDTH_FLAG = 0b100000000;
 
 const { TWITCH_ADMIN_SUBSCRIBER_LIST } = cacheKeys;
 const FALLBACK_WHISPER_MESSAGE_LIMIT = 2500;
@@ -93,10 +92,10 @@ const DEFAULT_PLATFORM_CONFIG = {
 	unrelatedPrivateMessageResponse: ""
 } as const;
 const TWITCH_SUBSCRIPTION_PLANS = {
-	"1000": "$5",
-	"2000": "$10",
-	"3000": "$25",
-	"Prime": "Prime"
+	1000: "$5",
+	2000: "$10",
+	3000: "$25",
+	Prime: "Prime"
 } as const;
 
 type UserLookupResponse = {
@@ -159,15 +158,15 @@ type FfzEmote = {
 	hidden: boolean;
 	modifier: boolean;
 	modifier_flags: number;
-	offset: unknown | null;
-	margins: unknown | null;
-	css: unknown | null;
+	offset: unknown;
+	margins: unknown;
+	css: unknown;
 	owner: {
 		_id: number;
 		name: string;
 		display_name: string;
 	};
-	artist: unknown | null;
+	artist: unknown;
 	urls: {
 		1: string;
 		2: string;
@@ -211,13 +210,6 @@ type GlobalSevenTvEmoteResponse = SevenTvEmoteResponse["emote_set"] & {
 	emotes: SevenTvEmote[];
 };
 
-class ConfigurableWebsocket {
-	private instance: WebSocket | null = null;
-	connect (url: string) {
-		this.instance = new WebSocket(url);
-	}
-}
-
 export type MessageData = {
 	text: string;
 	fragments: MessageNotification["payload"]["event"]["message"]["fragments"];
@@ -235,7 +227,7 @@ type ConnectOptions = {
 	skipSubscriptions?: boolean;
 };
 
-interface TwitchConfig extends BaseConfig {
+export interface TwitchConfig extends BaseConfig {
 	selfId: string;
 	logging: {
 		bits?: boolean,
@@ -276,18 +268,17 @@ interface TwitchConfig extends BaseConfig {
 }
 
 export class TwitchPlatform extends Platform<TwitchConfig> {
-	supportsMeAction = true;
-	dynamicChannelAddition = true;
+	public readonly supportsMeAction = true;
+	public readonly dynamicChannelAddition = true;
+	private readonly reconnectCheck: NodeJS.Timeout;
+	private readonly previousMessageMeta: Map<Channel["ID"], { time: number; length: number; }> = new Map();
+	private readonly userCommandSpamPrevention: Map<User["ID"], number> = new Map();
 
-	// eslint-disable-next-line no-unused-private-class-members
-	#reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000);
 	#websocketLatency: number | null = null;
-	#previousMessageMeta = new Map();
-	#userCommandSpamPrevention = new Map();
 	#unsuccessfulRenameChannels = new Set();
 
-	debug = TwitchUtils;
-	client: WebSocket | null = null;
+	public readonly debug = TwitchUtils;
+	private client: WebSocket | null = null;
 
 	constructor (config: TwitchConfig) {
 		const resultConfig = {
@@ -303,6 +294,8 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		};
 
 		super("twitch", resultConfig);
+
+		this.reconnectCheck = setInterval(() => this.#pingWebsocket(), 30_000);
 	}
 
 	async connect (options: ConnectOptions = {}) {
@@ -327,7 +320,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		await TwitchUtils.getConduitId();
 
 		const ws = new WebSocket(options.url ?? TWITCH_WEBSOCKET_URL);
-		ws.on("message", (data) => this.handleWebsocketMessage(data));
+		ws.on("message", (data: Buffer) => void this.handleWebsocketMessage(data));
 
 		this.client = ws;
 
@@ -360,7 +353,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 						return;
 					}
 
-					await this.joinChannel(channel.Specific_ID)
+					await this.joinChannel(channel.Specific_ID);
 				});
 
 				await Promise.allSettled(joinPromises);
@@ -380,8 +373,8 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 	}
 
-	async handleWebsocketMessage (data: WebsocketRawData) {
-		const message: TwitchWebsocketMessage = JSON.parse(data.toString());
+	async handleWebsocketMessage (data: Buffer) {
+		const message: TwitchWebsocketMessage = JSON.parse(data.toString()) as TwitchWebsocketMessage;
 
 		if (isWelcomeMessage(message)) {
 			const sessionId = message.payload.session.id;
@@ -467,9 +460,9 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		// Neither the "same message" nor "global" cooldowns apply to VIP or Moderator channels
 		if (channelData.Mode === "Write") {
 			const now = SupiDate.now();
-			const { length = 0, time = 0 } = this.#previousMessageMeta.get(channelData.ID) ?? {};
+			const { length = 0, time = 0 } = this.previousMessageMeta.get(channelData.ID) ?? {};
 			if (time + WRITE_MODE_MESSAGE_DELAY > now) {
-				setTimeout(() => this.send(message, channelData), now - time);
+				setTimeout(() => void this.send(message, channelData), now - time);
 				return;
 			}
 
@@ -545,7 +538,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			}
 		}
 		else {
-			this.#previousMessageMeta.set(channelData.ID, {
+			this.previousMessageMeta.set(channelData.ID, {
 				length: message.length,
 				time: SupiDate.now()
 			});
@@ -835,7 +828,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 
 		// Mirror messages to a linked channel, if the channel has one
 		if (channelData.Mirror) {
-			this.mirror(messageData.text, userData, channelData, { commandUsed: false });
+			void this.mirror(messageData.text, userData, channelData, { commandUsed: false });
 		}
 
 		this.incrementMessageMetric("read", channelData);
@@ -866,7 +859,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 
 		if (this.logging.bits && cheer) {
-			sb.Logger.log("Twitch.Other", `${cheer.bits} bits`, channelData, userData);
+			void sb.Logger.log("Twitch.Other", `${cheer.bits} bits`, channelData, userData);
 		}
 
 		// If the handled message is a reply to another, append its content at the end.
@@ -888,13 +881,13 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 
 		const now = SupiDate.now();
-		const timeout = this.#userCommandSpamPrevention.get(userData.ID);
+		const timeout = this.userCommandSpamPrevention.get(userData.ID);
 		if (typeof timeout === "number" && timeout > now) {
 			return;
 		}
 
 		const threshold = this.config.spamPreventionThreshold ?? 100;
-		this.#userCommandSpamPrevention.set(userData.ID, now + threshold);
+		this.userCommandSpamPrevention.set(userData.ID, now + threshold);
 
 		const [command, ...args] = targetMessage
 			.replace(sb.Command.prefix, "")
@@ -1052,6 +1045,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		}
 	}
 
+	// eslint-disable-next-line max-params
 	async handleCommand (
 		command: string,
 		user: User,
@@ -1121,8 +1115,8 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		return execution;
 	}
 
-	async isUserChannelOwner (channelData: Channel, userData: User) {
-		return (channelData.Specific_ID === userData.Twitch_ID);
+	isUserChannelOwner (channelData: Channel, userData: User) {
+		return Promise.resolve(channelData.Specific_ID === userData.Twitch_ID);
 	}
 
 	async getUserID (user: string): Promise<string | null> {
@@ -1146,8 +1140,8 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		return data[0].id;
 	}
 
-	async createUserMention (userData: User) {
-		return `@${userData.Name}`;
+	createUserMention (userData: User) {
+		return Promise.resolve(`@${userData.Name}`);
 	}
 
 	/**
@@ -1297,6 +1291,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			type: "7tv",
 			global: false,
 			animated: i.data.animated,
+			// eslint-disable-next-line no-bitwise
 			zeroWidth: Boolean(i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
 		}));
 	}
@@ -1362,6 +1357,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			type: "7tv" as const,
 			global: true,
 			animated: i.data.animated,
+			// eslint-disable-next-line no-bitwise
 			zeroWidth: Boolean(i.data.flags & SEVEN_TV_ZERO_WIDTH_FLAG)
 		}));
 
@@ -1383,7 +1379,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		return [
 			...((bttv.status === "fulfilled") ? bttv.value : []),
 			...((ffz.status === "fulfilled") ? ffz.value : []),
-			...((sevenTv.status === "fulfilled") ? sevenTv.value : []),
+			...((sevenTv.status === "fulfilled") ? sevenTv.value : [])
 		];
 	}
 

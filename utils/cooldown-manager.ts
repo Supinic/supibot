@@ -98,8 +98,12 @@ const isPending = (input: Inhibitor): input is Pending => (input instanceof Pend
  * Manages the cooldowns between each message sent to channels.
  */
 export default class CooldownManager {
-	data: Inhibitor[] = [];
-	#pruneInterval = setInterval(() => this.prune(), 60_000);
+	private readonly data: Inhibitor[] = [];
+	private readonly pruneInterval: NodeJS.Timeout;
+
+	constructor () {
+		this.pruneInterval = setInterval(() => this.prune(), 60_000);
+	}
 
 	/**
 	 * Checks if given combination of parameters has a cooldown pending.
@@ -133,7 +137,7 @@ export default class CooldownManager {
 			channel,
 			user,
 			command,
-			expires: Date.now() + cooldown,
+			expires: Date.now() + cooldown
 		}));
 	}
 
@@ -212,6 +216,6 @@ export default class CooldownManager {
 	}
 
 	destroy () {
-		clearInterval(this.#pruneInterval);
+		clearInterval(this.pruneInterval);
 	}
 }

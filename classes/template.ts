@@ -1,5 +1,12 @@
-import type { CacheValue, KeyObject, Row, JavascriptValue as RowValue, Query } from "supi-core";
-import { SupiDate, SupiError } from "supi-core";
+import {
+	SupiDate,
+	SupiError,
+	type CacheValue,
+	type KeyObject,
+	type Row,
+	type JavascriptValue as RowValue,
+	type Query
+} from "supi-core";
 
 type PoolConnection = Awaited<ReturnType<Query["getTransaction"]>>;
 
@@ -43,7 +50,7 @@ export const getGenericDataProperty = async <T extends TemplateWithId>(inputData
 		databaseTable,
 		instance,
 		options,
-		propertyName,
+		propertyName
 	} = inputData;
 
 	const cache = cacheMap.get(instance);
@@ -93,7 +100,7 @@ export const getGenericDataProperty = async <T extends TemplateWithId>(inputData
 		case "array":
 		case "object": {
 			try {
-				value = JSON.parse(data.Value);
+				value = JSON.parse(data.Value) as GenericDataPropertyValue[] | { [p: string]: GenericDataPropertyValue };
 			}
 			catch (e) {
 				console.warn(`Data property has invalid definition`, { data, error: e });
@@ -163,8 +170,17 @@ export const setGenericDataProperty = async <T extends TemplateWithId>(self: T, 
 	else if (propertyData.Type === "array" || propertyData.Type === "object") {
 		row.values.Value = JSON.stringify(value);
 	}
-	else {
+	else if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
 		row.values.Value = String(value);
+	}
+	else {
+		throw new SupiError({
+			message: "Assert error: Generic property type/value mismatch",
+			args: {
+				propertyType: propertyData.Type,
+				valueType: typeof value
+			}
+		});
 	}
 
 	if (propertyData.Cached) {
@@ -239,7 +255,7 @@ abstract class Template {
 			newValue = self[property];
 		}
 
-		let storedValue: RowValue = newValue as any;
+		let storedValue: RowValue = newValue as RowValue;
 		if (newValue && typeof newValue === "object" && newValue.constructor === Object) {
 			storedValue = JSON.stringify(newValue);
 		}
@@ -255,38 +271,22 @@ abstract class Template {
 	/**
 	 * @abstract
 	 */
-	static async loadData () {
+	static loadData (): Promise<void> {
 		throw new SupiError({
-			message: "loadData method must be implemented in module",
-			args: {
-				name: this.name
-			}
+			message: `Class ${this.name} must implement the static loadData method`
 		});
-	}
-
-	static async reloadData () {
-		this.data.clear();
-		await this.loadData();
 	}
 
 	/**
 	 * @abstract
 	 */
-	static importSpecific (...definitions: TemplateDefinition[]): Promise<Template[]> {
+	// Ignore eslint due to an "abstract" signature, unused `identifier`
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	static get (identifier: unknown): Template | null | Promise<Template | null> {
 		throw new SupiError({
-			message: "This method must be implemented by derived classes"
+			message: `Class ${this.name} must implement the static get method`
 		});
 	}
-
-	// /**
-	//  * @abstract
-	//  * @todo reinstate in typescript
-	//  */
-	// static async get () {
-	// 	throw new SupiError({
-	// 		message: "get method must be implemented in module"
-	// 	});
-	// }
 }
 
 export abstract class TemplateWithId extends Template {

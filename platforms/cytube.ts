@@ -1,5 +1,5 @@
 import { SupiDate, SupiError } from "supi-core";
-import { CytubeConnector, EmoteObject, UserObject, QueueObject, VideoObject } from "cytube-connector"
+import { CytubeConnector, type EmoteObject, type UserObject, type QueueObject, type VideoObject } from "cytube-connector";
 
 import { Platform, BaseConfig, MirrorOptions } from "./template.js";
 import type { Channel } from "../classes/channel.js";
@@ -122,7 +122,7 @@ class CytubeClient {
 			// Only unset AFK and fire reminders if the message wasn't private
 			if (!data.meta.private) {
 				// Do not process mirrored messages
-				const identifiers = (<typeof Platform>sb.Platform).getList()
+				const identifiers = sb.Platform.getList()
 					.map(i => i.mirrorIdentifier)
 					.filter(Boolean) as string[];
 
@@ -216,7 +216,7 @@ class CytubeClient {
 		});
 
 		// User joined channel
-		client.on("addUser", async (data) => {
+		client.on("addUser", (data) => {
 			data.name = data.name.toLowerCase();
 			this.userMap.set(data.name, data);
 		});
@@ -299,7 +299,7 @@ class CytubeClient {
 	 * @param [args] Possible arguments for the command
 	 * @param [replyIntoPM] If true, the command result will be sent via PM
 	 */
-	async handleCommand (command: string, user: User, args: string[] = [], replyIntoPM: boolean = false)  {
+	async handleCommand (command: string, user: User, args: string[] = [], replyIntoPM: boolean = false) {
 		const channelData = this.channelData;
 		const userData = await sb.User.get(user, false);
 		const options = {
@@ -314,7 +314,7 @@ class CytubeClient {
 
 		const commandOptions = sb.Command.extractMetaResultProperties(execution);
 		if (execution.replyWithPrivateMessage || replyIntoPM) {
-			await this.pm(execution.reply, userData);
+			this.pm(execution.reply, userData);
 		}
 		else {
 			if (this.channelData.Mirror) {
@@ -330,7 +330,7 @@ class CytubeClient {
 			});
 
 			if (message) {
-				await this.send(message);
+				this.send(message);
 			}
 		}
 	}
@@ -340,7 +340,7 @@ class CytubeClient {
 	 * Works by splitting the message into 200 character chunks and sending them repeatedly in order.
 	 * This is done because (for whatever reason) Cytube implements a tiny character limit, at least compared to other clients.
 	 */
-	async send (message: string) {
+	send (message: string) {
 		const messageLimit = this.platform.messageLimit;
 		const lengthRegex = new RegExp(`.{1,${messageLimit}}`, "g");
 		let arr: string[] = message
@@ -369,14 +369,14 @@ class CytubeClient {
 	 * @param message Private message
 	 * @param userData User the private message will be sent to
 	 */
-	async pm (message: string, userData: User) {
+	pm (message: string, userData: User) {
 		this.client.pm({
 			msg: message,
 			to: userData.Name
 		});
 	}
 
-	async queue (type: string, videoID: string) {
+	queue (type: string, videoID: string) {
 		this.client.socket.emit("queue", {
 			id: videoID,
 			type,
@@ -433,7 +433,7 @@ const DEFAULT_PLATFORM_CONFIG = {
 	messageDelayThreshold: 30000
 };
 
-interface CytubeConfig extends BaseConfig {
+export interface CytubeConfig extends BaseConfig {
 	platform: {
 		messageDelayThreshold?: number;
 	};
@@ -480,7 +480,7 @@ export class CytubePlatform extends Platform<CytubeConfig> {
 	/**
 	 * Sends a message through a client specified by provided channel data.
 	 */
-	async send (message: string, channelData: Channel) {
+	send (message: string, channelData: Channel) {
 		const client = this.clients.get(channelData.ID);
 		if (!client) {
 			throw new SupiError({
@@ -492,14 +492,16 @@ export class CytubePlatform extends Platform<CytubeConfig> {
 			});
 		}
 
-		await client.send(message);
+		client.send(message);
 		this.incrementMessageMetric("sent", channelData);
+
+		return Promise.resolve();
 	}
 
 	/**
 	 * Sends a private message through a client specified by provided channel data.
 	 */
-	async pm (message: string, user: User, channelData: Channel) {
+	pm (message: string, user: User, channelData: Channel) {
 		const client = this.clients.get(channelData.ID);
 		if (!client) {
 			throw new SupiError({
@@ -511,8 +513,10 @@ export class CytubePlatform extends Platform<CytubeConfig> {
 			});
 		}
 
-		await client.pm(message, user);
+		client.pm(message, user);
 		this.incrementMessageMetric("sent", null);
+
+		return Promise.resolve();
 	}
 
 	/**
@@ -550,7 +554,7 @@ export class CytubePlatform extends Platform<CytubeConfig> {
 		return true;
 	}
 
-	async populateUserList (channelData: Channel): Promise<string[]> {
+	populateUserList (channelData: Channel): Promise<string[]> {
 		const client = this.clients.get(channelData.ID);
 		if (!client) {
 			throw new SupiError({
@@ -562,10 +566,10 @@ export class CytubePlatform extends Platform<CytubeConfig> {
 			});
 		}
 
-		return client.fetchUserList();
+		return Promise.resolve(client.fetchUserList());
 	}
 
-	async fetchChannelEmotes (channelData: Channel): Promise<Emote[]> {
+	fetchChannelEmotes (channelData: Channel): Promise<Emote[]> {
 		const client = this.clients.get(channelData.ID);
 		if (!client) {
 			throw new SupiError({
@@ -577,7 +581,7 @@ export class CytubePlatform extends Platform<CytubeConfig> {
 			});
 		}
 
-		return client.emotes;
+		return Promise.resolve(client.emotes);
 	}
 
 	destroy () {
@@ -588,10 +592,10 @@ export class CytubePlatform extends Platform<CytubeConfig> {
 		this.clients.clear();
 	}
 
-	async populateGlobalEmotes () { return []; }
+	populateGlobalEmotes () { return []; }
 	fetchInternalPlatformIDByUsername (userData: User) { return userData.Name; }
-	async fetchUsernameByUserPlatformID (userPlatformId: string) { return userPlatformId; }
-	async createUserMention (userData: User) { return userData.Name; }
+	fetchUsernameByUserPlatformID (userPlatformId: string) { return Promise.resolve(userPlatformId); }
+	createUserMention (userData: User) { return Promise.resolve(userData.Name); }
 	initListeners () {}
 	isChannelLive () { return null; }
 	isUserChannelOwner () { return null; }

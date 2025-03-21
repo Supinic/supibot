@@ -1,7 +1,11 @@
-import { SupiDate, SupiError } from "supi-core";
-import type { CacheValue, Batch, Recordset, Row } from "supi-core";
-import { TemplateWithIdString, getGenericDataProperty, setGenericDataProperty } from "./template.js";
-import type { GenericDataPropertyObject } from "./template.js";
+import { SupiDate, SupiError, type CacheValue, type Batch, type Row } from "supi-core";
+import {
+	TemplateWithIdString,
+	getGenericDataProperty,
+	setGenericDataProperty,
+	type GenericDataPropertyObject,
+	type GenericDataPropertyValue
+} from "./template.js";
 
 import config from "../config.json" with { type: "json" };
 
@@ -25,8 +29,8 @@ type NameObject = {
 	Name?: User["Name"];
 };
 
-const HIGH_LOAD_CACHE_PREFIX = "sb-user-high-load" as const;
-const HIGH_LOAD_CACHE_EXPIRY = 60_000 as const;
+const HIGH_LOAD_CACHE_PREFIX = "sb-user-high-load";
+const HIGH_LOAD_CACHE_EXPIRY = 60_000;
 
 export class User extends TemplateWithIdString {
 	readonly ID: number;
@@ -35,13 +39,13 @@ export class User extends TemplateWithIdString {
 	readonly Name: string;
 	readonly Started_Using: SupiDate;
 
-	static readonly mapCacheExpiration = 300_000 as const;
-	static readonly redisCacheExpiration = 3_600_000 as const;
+	static readonly mapCacheExpiration = 300_000;
+	static readonly redisCacheExpiration = 3_600_000;
 	static readonly mapExpirationInterval = setInterval(() => User.data.clear(), User.mapCacheExpiration);
 
 	static data: Map<string, User> = new Map();
-	static readonly dataCache = new WeakMap();
-	static readonly pendingNewUsers = new Map();
+	static readonly dataCache: WeakMap<User, Map<string, GenericDataPropertyValue>> = new WeakMap();
+	static readonly pendingNewUsers: Map<User["Name"], Promise<User> | null> = new Map();
 
 	static readonly permissions = {
 		regular: 0b0000_0001,
@@ -62,7 +66,7 @@ export class User extends TemplateWithIdString {
 			return;
 		}
 
-		const users = User.highLoadUserBatch.records.map(i => i.Name);
+		const users = User.highLoadUserBatch.records.map(i => i.Name) as User["Name"][];
 		await User.highLoadUserBatch.insert();
 
 		for (const user of users) {
@@ -191,22 +195,24 @@ export class User extends TemplateWithIdString {
 				.single()
 			);
 
-			let userData;
+			let userData: User;
 			if (dbUserData) {
 				userData = new User(dbUserData);
 			}
 			// 4. If strict mode is off, create the user and return the instance immediately
 			else if (!strict) {
-				userData = await User.add(username, {
+				const newlyAddedUserData = await User.add(username, {
 					Discord_ID: options.Discord_ID ?? null,
 					Twitch_ID: options.Twitch_ID ?? null
 				});
 
 				// 4-1. If high-load (batching) or critical-load (no inserts) are enabled,
 				// don't populate caches and immediately return `null`.
-				if (!userData) {
+				if (!newlyAddedUserData) {
 					return null;
 				}
+
+				userData = newlyAddedUserData;
 			}
 			// 5. If strict mode is on and the user does not exist, return null and exit
 			else {
@@ -321,9 +327,12 @@ export class User extends TemplateWithIdString {
 		}
 
 		const keys = await sb.Cache.getKeysByPrefix(`${HIGH_LOAD_CACHE_PREFIX}*`);
+
+		// If there are too many new users queued (above criticalLoadThreshold), all new users being added are skipped
 		if (keys.length > config.values.userAdditionCriticalLoadThreshold) {
 			return null;
 		}
+		// If there are many new users queued (above highLoadThreshold), new users will be batched instead
 		else if (keys.length > config.values.userAdditionHighLoadThreshold) {
 			User.pendingNewUsers.set(preparedName, null);
 
@@ -336,6 +345,7 @@ export class User extends TemplateWithIdString {
 
 			return null;
 		}
+		// If the number of new users is manageable, immediately add the new user and return the User object
 		else {
 			const promise = (async () => {
 				const existingName = await sb.Query.getRecordset<string | undefined>(rs => rs
@@ -349,7 +359,7 @@ export class User extends TemplateWithIdString {
 
 				if (existingName) {
 					User.pendingNewUsers.delete(preparedName);
-					return await User.get(existingName);
+					return await User.get(existingName) as User; // Guaranteed because of the condition above
 				}
 
 				return await User.#add(preparedName, properties);
@@ -437,7 +447,3 @@ export class User extends TemplateWithIdString {
 }
 
 export default User;
-
-/**
- * @typedef {"admin"|"owner"|"ambassador"} UserPermissionLevel
- */

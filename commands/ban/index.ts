@@ -1,7 +1,12 @@
 import { SupiError } from "supi-core";
 
-import { isArgumentsData } from "../../classes/filter.js";
-import type { Filter, CreateData as FilterCreateData, DbArgumentDescriptor, Type as FilterType } from "../../classes/filter.js";
+import {
+	isArgumentsData,
+	type CreateData as FilterCreateData,
+	type DbArgumentDescriptor,
+	type Type as FilterType
+} from "../../classes/filter.js";
+
 import type { Context, CommandDefinition, StrictResult } from "../../classes/command.js";
 import type { Channel } from "../../classes/channel.js";
 import type { User } from "../../classes/user.js";
@@ -21,9 +26,7 @@ const NO_RESPONSE_FILTER_TYPES: Set<FilterType> = new Set([
 	"Offline-only"
 ]);
 
-const isFilterType = (input: string): input is FilterType => {
-	return AVAILABLE_BAN_FILTER_TYPES.includes(input);
-}
+const isFilterType = (input: string): input is FilterType => AVAILABLE_BAN_FILTER_TYPES.includes(input);
 
 const paramsDefinition = [
 	{ name: "all", type: "boolean" },
@@ -88,7 +91,8 @@ export default {
 				};
 			}
 			else if (commandData === this) {
-				const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "4Head"], "😅");
+				// @todo remove type cast by properly overloading the getEmote method
+				const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "4Head"], "😅") as string;
 				return {
 					success: false,
 					reply: `You can't ${invocation} the ${commandData.Name} command! ${emote}`
@@ -106,7 +110,8 @@ export default {
 				};
 			}
 			else if (commandData === this) {
-				const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "4Head"], "😅");
+				// @todo remove type cast by properly overloading the getEmote method
+				const emote = await context.getBestAvailableEmote(["PepeLaugh", "pepeLaugh", "4Head"], "😅") as string;
 				return {
 					success: false,
 					reply: `You can't ${invocation} the ${commandData.Name} command's invocation! ${emote}`
@@ -236,7 +241,7 @@ export default {
 			channel: channelData,
 			user: userData,
 			command: options.Command,
-			invocation: options.Invocation,
+			invocation: options.Invocation
 		});
 
 		if (existing) {
@@ -264,7 +269,7 @@ export default {
 						await existing.toggle();
 					}
 
-					let newData: DbArgumentDescriptor[] = [...existing.Data];
+					const newData: DbArgumentDescriptor[] = [...existing.Data];
 					for (const item of existing.Data) {
 						if (item.index === index && item.string === string) {
 							return {
@@ -555,4 +560,3 @@ export default {
 		];
 	})
 } satisfies CommandDefinition;
-

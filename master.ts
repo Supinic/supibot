@@ -1,11 +1,12 @@
 import * as supiCore from "supi-core";
+import type { GotInstanceDefinition } from "supi-core";
 
 import config from "./config.json" with { type: "json" };
 import initializeInternalApi from "./api/index.js";
 
 import commandDefinitions from "./commands/index.js";
 import chatModuleDefinitions from "./chat-modules/index.js";
-import { definitions as gotDefinitions, GotDefinition } from "./gots/index.js";
+import { definitions as gotDefinitions } from "./gots/index.js";
 import initializeCrons from "./crons/index.js";
 
 import Filter from "./classes/filter.js";
@@ -19,9 +20,7 @@ import { ChatModule, ChatModuleDefinition } from "./classes/chat-module.js";
 import VLCSingleton from "./singletons/vlc-connector.js";
 
 import Logger from "./singletons/logger.js";
-import VLCConnector from "./singletons/vlc-connector.js";
 import { Platform } from "./platforms/template.js";
-import { GotInstanceDefinition } from "supi-core";
 
 type PopulateOptions = {
 	blacklist?: string[];
@@ -62,7 +61,9 @@ interface GlobalCore {
 }
 
 declare global {
+	// eslint-disable-next-line no-var
 	var sb: GlobalSb;
+	// eslint-disable-next-line no-var
 	var core: GlobalCore;
 }
 
@@ -129,7 +130,8 @@ globalThis.core = {
 	}),
 	Utils: new supiCore.Utils()
 };
-/** @ts-ignore Assignment is partial due to legacy globals split */
+
+// @ts-expect-error Assignment is partial due to legacy globals split */
 globalThis.sb = {
 	Date: supiCore.Date,
 	Error: supiCore.Error,
@@ -183,7 +185,9 @@ globalThis.sb = {
 	ChatModule,
 
 	Logger: new Logger(),
-	VideoLANConnector: VLCConnector.initialize(), // @todo move code from `initialize` here
+	// @todo after VLCSingleton is TS, properly use initialize() code here
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+	VideoLANConnector: VLCSingleton.initialize(), // @todo move code from `initialize` here
 
 	API: initializeInternalApi()
 };
@@ -195,7 +199,7 @@ supiCore.Got.importData(filterModuleDefinitions("name", gotDefinitions as GotIns
 
 await Promise.all([
 	Command.importData(filterModuleDefinitions("Name", commandDefinitions as CommandDefinition[], config.modules.commands)),
-	ChatModule.importData(filterModuleDefinitions("Name", chatModuleDefinitions as ChatModuleDefinition[], config.modules["chat-modules"])),
+	ChatModule.importData(filterModuleDefinitions("Name", chatModuleDefinitions as ChatModuleDefinition[], config.modules["chat-modules"]))
 ]);
 
 console.timeEnd("chat modules");
@@ -223,7 +227,6 @@ for (const platform of platforms) {
 		continue;
 	}
 
-	// eslint-disable-next-line unicorn/prefer-top-level-await
 	const promise = connectToPlatform(platform);
 	promises.push(promise);
 }
@@ -237,7 +240,7 @@ await Promise.all(promises);
 console.debug("Connected to all platforms. Ready!");
 console.groupEnd();
 
-process.on("unhandledRejection", async (reason) => {
+process.on("unhandledRejection", (reason) => {
 	if (!(reason instanceof Error)) {
 		return;
 	}
@@ -246,15 +249,10 @@ process.on("unhandledRejection", async (reason) => {
 		? "External"
 		: "Internal";
 
-	try {
-		await sb.Logger.logError("Backend", reason, {
-			origin,
-			context: {
-				cause: "UnhandledPromiseRejection"
-			}
-		});
-	}
-	catch (e) {
-		console.warn("Rejected the promise of promise rejection handler", { reason, e });
-	}
+	void sb.Logger.logError("Backend", reason, {
+		origin,
+		context: {
+			cause: "UnhandledPromiseRejection"
+		}
+	});
 });

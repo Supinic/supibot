@@ -1,5 +1,5 @@
-// import { type Recordset } from "supi-core";
-import { Date as SupiDate } from "supi-core";
+import { type Context } from "../../classes/command.js";
+import { Date as SupiDate, type Row } from "supi-core";
 import { parseRSS } from "../../utils/command-utils.js";
 
 const DEFAULT_CHANNEL_ID = 38;
@@ -45,7 +45,7 @@ const fetchSubscriptionUsers = async function (subType: SubscriptionType, lastSe
 			return true;
 		}
 
-		const flags = JSON.parse(user.Flags ?? "{}");
+		const flags = JSON.parse(user.Flags ?? "{}") as { skipPrivateReminder?: boolean; };
 		return (flags.skipPrivateReminder === true);
 	});
 
@@ -157,8 +157,8 @@ export type SpecialEventDefinition = {
 		added: string;
 		removed: string;
 	};
-	// @todo change context to Context and subscription to Row after supi-core exports types
-	handler?: (context: any, subscription: any, ...args: string[]) => Promise<CommandResult>;
+	// @todo perhaps specify the Context by typing it with the $subscribe command params?
+	handler?: (context: Context, subscription: Row<UserSubscription>, ...args: string[]) => Promise<CommandResult>;
 };
 export type RssEventDefinition = BaseEventDefinition & {
 	type: "rss";

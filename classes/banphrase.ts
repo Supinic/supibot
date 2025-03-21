@@ -1,11 +1,10 @@
 import { TemplateWithId } from "./template.js";
-import type { Channel } from "./channel.js"
+import type { Channel } from "./channel.js";
 import type Platform from "../platforms/template.js";
 
 import config from "../config.json" with { type: "json" };
 import regexes from "../utils/regexes.js";
-import { isGotRequestError, SupiError } from "supi-core";
-import type { Recordset, RecordUpdater } from "supi-core";
+import { isGotRequestError, SupiError, type RecordUpdater } from "supi-core";
 
 const { responses, values } = config;
 const apiDataSymbol: unique symbol = Symbol("banphrase-api-data");
@@ -80,6 +79,12 @@ type ExternalExecuteOptions = {
 };
 type ExternalApiType = "Pajbot";
 
+type ReplacementFunction = (message: string, configData?: typeof banphraseConfigData) => string | Promise<string>;
+type CustomResponseFunction = (message: string, configData?: typeof banphraseConfigData) => string | null | Promise<string | null>;
+type BanphraseCodeFunction = ReplacementFunction | CustomResponseFunction;
+
+const isBanphraseFunction = (input: unknown): input is Banphrase["Code"] => (typeof input === "function");
+
 class ExternalBanphraseAPI {
 	static async pajbot (message: string, url: string) {
 		message = message.trim().replaceAll(/\s+/g, " ");
@@ -119,7 +124,7 @@ export class Banphrase extends TemplateWithId {
 	readonly Type: Type;
 	readonly Platform: Platform["ID"] | null = null;
 	readonly Channel: Channel["ID"] | null = null;
-	readonly Code: (message: string, configData: typeof banphraseConfigData) => string;
+	readonly Code: BanphraseCodeFunction;
 	Active: boolean;
 	data = {};
 
@@ -135,15 +140,21 @@ export class Banphrase extends TemplateWithId {
 		this.Platform = data.Platform;
 		this.Channel = data.Channel;
 
-		this.Code = eval(data.Code);
-		if (typeof this.Code !== "function") {
+		const code: unknown = eval(data.Code);
+		if (!isBanphraseFunction(code)) {
 			throw new SupiError({
-				message: `Banphrase ID ${this.ID} code must be a function`
+				message: "Invalid function definition passed to Banphrase",
+				args: {
+					ID: this.ID,
+					type: typeof code
+				}
 			});
 		}
+
+		this.Code = code;
 	}
 
-	async execute (message: string): Promise<string | typeof inactiveSymbol> {
+	async execute (message: string): Promise<string | null | typeof inactiveSymbol> {
 		if (!this.Active) {
 			return inactiveSymbol;
 		}
@@ -219,7 +230,7 @@ export class Banphrase extends TemplateWithId {
 		if (identifier instanceof Banphrase) {
 			return identifier;
 		}
-		else  {
+		else {
 			const result = Banphrase.data.get(identifier);
 			return result ?? null;
 		}
@@ -256,6 +267,12 @@ export class Banphrase extends TemplateWithId {
 				}
 				// Otherwise, keep replacing the banphrases in a message
 				else {
+					if (typeof result !== "string") {
+						throw new SupiError({
+							message: "Assert error: Non-string result of a Replacement Banphrase",
+							args: { result }
+						});
+					}
 					resultMessage = result;
 				}
 			}

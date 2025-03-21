@@ -1,5 +1,4 @@
-import { SupiDate, SupiError } from "supi-core";
-import type { Recordset, Counter, Gauge } from "supi-core";
+import { SupiDate, SupiError, type Counter, type Gauge } from "supi-core";
 
 import config from "../config.json" with { type: "json" };
 
@@ -206,13 +205,13 @@ export class Reminder extends TemplateWithId {
 						else {
 							throw new SupiError({
 								message: "Invalid combination of parameters in Reminder"
-							})
+							});
 						}
 
 						await channelData.mirror(mirrorMessage, null, { commandUsed: false });
 					}
 
-					const preparedMessage = await channelData.prepareMessage(message) as string | false; // @todo remove type cast when Platform is TS
+					const preparedMessage = await channelData.prepareMessage(message);
 					if (preparedMessage) {
 						const fixedMessage = await Filter.applyUnping({
 							command: Command.get("remind"),
@@ -410,7 +409,7 @@ export class Reminder extends TemplateWithId {
 
 		if (sb.Metrics) {
 			Reminder.#totalCounter.inc({
-				type: row.values.Type as Type,
+				type: row.values.Type,
 				scheduled: String(Boolean(row.values.Schedule)),
 				system: String(skipChecks)
 			});
@@ -505,7 +504,7 @@ export class Reminder extends TemplateWithId {
 					reminderPlatform = channelData.Platform;
 				}
 				else {
-					reminderPlatform = Platform.get(reminder.Platform) as Platform | null; // @todo remove type cast when Platform is TS
+					reminderPlatform = Platform.get(reminder.Platform);
 				}
 
 				if (!reminderPlatform) {

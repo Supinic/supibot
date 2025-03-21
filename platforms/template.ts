@@ -1,11 +1,17 @@
-import { Counter, SupiError, SupiPromise } from "supi-core";
+import { type Counter, SupiError, SupiPromise } from "supi-core";
 
 import { User, Like as UserLike } from "../classes/user.js";
 import { Channel, Like as ChannelLike } from "../classes/channel.js";
 import { Banphrase } from "../classes/banphrase.js";
 
 import createMessageLoggingTable from "../utils/create-db-table.js";
-import { Emote } from "../@types/globals.js";
+
+import type { TwitchConfig, TwitchPlatform } from "./twitch.js";
+import type { DiscordConfig, DiscordPlatform } from "./discord.js";
+import type { CytubeConfig, CytubePlatform } from "./cytube.js";
+import type { IrcConfig, IrcPlatform } from "./irc.js";
+
+import type { Emote } from "../@types/globals.d.ts";
 const DEFAULT_MESSAGE_WAIT_TIMEOUT = 10_000;
 
 export type Like = Platform | number | string;
@@ -128,9 +134,9 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 	public abstract send (message: string, channel: ChannelLike, options?: GenericSendOptions): Promise<void>;
 	public abstract pm (message: string, user: UserLike, channel?: ChannelLike | Record<string, unknown>): Promise<void>;
 	public abstract isUserChannelOwner (channelData: Channel, userData: User): Promise<boolean> | null;
-	public abstract populateUserList (channelData: Channel): Promise<string[]>;
-	public abstract populateGlobalEmotes (): Promise<Emote[]>;
-	public abstract fetchChannelEmotes (channelData: Channel): Promise<Emote[]>;
+	public abstract populateUserList (channelData: Channel): never[] | Promise<string[]>;
+	public abstract populateGlobalEmotes (): never[] | Promise<Emote[]>;
+	public abstract fetchChannelEmotes (channelData: Channel): never[] | Promise<Emote[]>;
 	public abstract createUserMention (userData: User, channelData?: Channel | null): Promise<string>;
 	/**
 	 * Fetches the platform ID for a given user object, depending on which platform instance is used.
@@ -195,6 +201,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		}
 
 		const timeout = setTimeout(() => {
+			// @todo replace SupiPromise usage with Promise.withResolvers
 			promise.resolve(null);
 			userMap.delete(userData.ID);
 		}, delay);
@@ -224,6 +231,7 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		clearTimeout(timeout);
 
 		userMap.delete(userData.ID);
+		// @todo replace SupiPromise usage with Promise.withResolvers
 		promise.resolve({ message });
 	}
 
@@ -468,27 +476,34 @@ export abstract class Platform <T extends BaseConfig = BaseConfig> {
 		return [...Platform.list];
 	}
 
+	public static async create (type: "twitch", config: TwitchConfig): Promise<TwitchPlatform>;
+	public static async create (type: "discord", config: DiscordConfig): Promise<DiscordPlatform>;
+	public static async create (type: "cytube", config: CytubeConfig): Promise<CytubePlatform>;
+	public static async create (type: "irc", config: IrcConfig): Promise<IrcPlatform>;
+	public static async create (type: string, config: BaseConfig): Promise<GenericPlatform>;
 	public static async create (type: string, config: BaseConfig) {
-		let InstancePlatform;
-		try {
-			// @todo refactor this to direct imports + platform map. return generic for platforms not in the map
-			const dynamicInstanceImport = await import(`./${type}.js`);
-			InstancePlatform = dynamicInstanceImport.default;
+		switch (type) {
+			case "twitch": {
+				const Instance = await import("./twitch.js");
+				return new Instance.default(config as TwitchConfig);
+			}
+			case "discord": {
+				const Instance = await import("./discord.js");
+				return new Instance.default(config as DiscordConfig);
+			}
+			case "cytube": {
+				const Instance = await import("./cytube.js");
+				return new Instance.default(config as CytubeConfig);
+			}
+			case "irc": {
+				const Instance = await import("./irc.js");
+				return new Instance.default(config as IrcConfig);
+			}
+			default: {
+				console.log(`No file found for platform "${type}", creating generic platform`);
+				return new GenericPlatform(type, config);
+			}
 		}
-		catch {
-			console.log(`No file found for platform "${type}", creating generic platform`);
-			return new GenericPlatform(type, config);
-		}
-
-		let instance;
-		try {
-			instance = new InstancePlatform(config);
-		}
-		catch (e) {
-			console.error(`An error occured while instantiating platform "${type}", skipping:\n`, e);
-		}
-
-		return instance;
 	}
 }
 

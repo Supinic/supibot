@@ -1,4 +1,4 @@
-import { Recordset, SupiError } from "supi-core";
+import { SupiError } from "supi-core";
 import { TemplateWithId } from "./template.js";
 
 import { Channel, privateMessageChannelSymbol } from "./channel.js";
@@ -48,14 +48,14 @@ type LocalsOptions = {
 	channel?: Channel | symbol | null;
 	user?: User | null;
 	platform?: Platform | null;
-	invocation?: Command["Name"] | Command["Aliases"][number] | null;
+	invocation?: Command["Name"] | null;
 	command?: Command | Command["Name"] | null;
 	skipUserCheck?: boolean;
 };
 type ExecuteOptions = Omit<LocalsOptions, "skipUserCheck"> & {
 	user: User;
 	command: Command;
-	invocation?: Command["Name"] | Command["Aliases"][number];
+	invocation?: Command["Name"] | null;
 	targetUser?: string;
 	args: string[];
 };
@@ -113,10 +113,10 @@ export class Filter extends TemplateWithId {
 	readonly Channel: Channel["ID"] | null;
 	readonly Command: Command["Name"] | null;
 	readonly Platform: Platform["ID"] | null;
-	readonly Invocation: Command["Name"] | Command["Aliases"][number] | null;
+	readonly Invocation: Command["Name"] | null;
 	readonly Response: "None" | "Auto" | "Reason";
 	readonly Reason: string | null;
-	readonly Blocked_User: User["ID"] |  null;
+	readonly Blocked_User: User["ID"] | null;
 	readonly Issued_By: User["ID"];
 	/**
 	 * Filter type:
@@ -146,7 +146,7 @@ export class Filter extends TemplateWithId {
 		"Reminder-prevention": new Set(),
 		Unmention: new Set(),
 		Whitelist: new Set(),
-		Unping: new Set(),
+		Unping: new Set()
 	};
 
 	constructor (data: ConstructorData) {
@@ -205,7 +205,7 @@ export class Filter extends TemplateWithId {
 					return override;
 				}
 				else {
-					return (override > value) ? value : override;
+					return Math.min(override, value);
 				}
 			}
 			else if (typeof multiplier === "number") {
@@ -256,7 +256,7 @@ export class Filter extends TemplateWithId {
 
 		let data: Record<string, unknown>;
 		try {
-			data = JSON.parse(rawData);
+			data = JSON.parse(rawData) as Record<string, unknown>;
 		}
 		catch {
 			return null;
@@ -307,11 +307,11 @@ export class Filter extends TemplateWithId {
 					obj.index = arg.index;
 				}
 				else if (Array.isArray(arg.range)) {
-					const [first, second] = [...arg.range].slice(0, 2).map(Number) as number[];
+					const [first, second] = [...arg.range].slice(0, 2).map(Number);
 					obj.range = [first, second];
 				}
 				else if (typeof arg.range === "string") {
-					const [first, second] = arg.range.split("..").map(Number).slice(0, 2) as number[];
+					const [first, second] = arg.range.split("..").map(Number).slice(0, 2);
 					obj.range = [first, second];
 				}
 
@@ -388,12 +388,14 @@ export class Filter extends TemplateWithId {
 		}
 	}
 
+	static get (identifier: Filter): Filter;
+	static get (identifier: Filter["ID"]): Filter | null;
 	static get (identifier: Filter | Filter["ID"]) {
 		if (identifier instanceof Filter) {
 			return identifier;
 		}
 		else {
-			return Filter.data.get(identifier);
+			return Filter.data.get(identifier) ?? null;
 		}
 	}
 

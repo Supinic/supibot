@@ -6,12 +6,10 @@ import GameData from "../game-data.json" with { type: "json" };
 // export type SkillName = typeof GameData["skills"][number]["name"];
 export type ActivityAlias = keyof typeof GameData["activityAliases"];
 
-export const isValidActivityAlias = (input: string): input is ActivityAlias => {
-	return Object.keys(GameData.activityAliases).includes(input);
-};
-export const getActivityFromAlias = (input: ActivityAlias): string => {
-	return GameData.activityAliases[input];
-};
+export const isValidActivityAlias = (input: string): input is ActivityAlias => (
+	Object.keys(GameData.activityAliases).includes(input)
+);
+export const getActivityFromAlias = (input: ActivityAlias) => GameData.activityAliases[input];
 
 type Activity = {
 	name: string;
@@ -109,16 +107,18 @@ export const fetchWorldsData = async (): Promise<GameWorlds | null> => {
 		const worlds: GameWorlds = {};
 
 		for (const row of rows) {
-			// @todo check with Cheerio types when supi-core#exports-refactor is merged
-			const [idEl, playersEl, countryEl, typeEl, activityEl] = $("td", row);
-			const id = $("a", idEl)[0]?.attribs.id.split("-").at(-1)
+			const list = $("td", row);
+			const [idEl] = list;
+			const [countryEl, typeEl, activityEl] = list.slice(1);
+
+			const id = $("a", idEl)[0]?.attribs.id.split("-").at(-1);
 			if (!id) {
 				continue;
 			}
 
 			const country = $(countryEl).text() as GameCountry;
 			const type = $(typeEl).text().toLowerCase() as "free" | "members";
-			const activity = $(activityEl).text() as string;
+			const activity = $(activityEl).text();
 
 			worlds[id] = {
 				country,
@@ -229,7 +229,7 @@ export const parseUserIdentifier = async (context: Context, identifier: string):
 		return {
 			success: true,
 			username: identifier,
-			type: "string",
+			type: "string"
 		};
 	}
 
@@ -251,7 +251,7 @@ export const parseUserIdentifier = async (context: Context, identifier: string):
 
 	const gameUsername = await targetUser.getDataProperty(OSRS_GAME_USERNAME_KEY) as null | string;
 	if (!gameUsername) {
-		const verb = (targetUser === context.user) ? "You" : "They"
+		const verb = (targetUser === context.user) ? "You" : "They";
 		return {
 			success: false,
 			reply: `${verb} don't have an OSRS username set up!`

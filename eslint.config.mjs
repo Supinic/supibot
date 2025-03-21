@@ -8,9 +8,10 @@ export default tseslint.config(
 	eslintJs.configs.recommended,
 	importPlugin.flatConfigs.errors,
 	unicornPlugin.configs["flat/recommended"],
-	// tseslint.configs.recommendedTypeChecked,
+	tseslint.configs.recommendedTypeChecked,
+	// tseslint.configs.strictTypeChecked,
 	{
-		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.test.js", "**/*.d.ts", "**/*.d.mts"]
+		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.d.mts"]
 	},
 	{
 		languageOptions: {
@@ -128,7 +129,7 @@ export default tseslint.config(
 			"no-var": "error",
 			"no-whitespace-before-property": "warn",
 			"no-unused-private-class-members": "warn",
-			"no-use-before-define": "error",
+			// "no-use-before-define": "error",
 			"no-with": "error",
 			"object-curly-newline": ["warn", {
 				consistent: true

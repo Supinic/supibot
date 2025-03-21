@@ -94,7 +94,7 @@ const fixMarkdown = (text: string) => {
 	}
 };
 
-interface DiscordConfig extends BaseConfig {
+export interface DiscordConfig extends BaseConfig {
 	selfId: string;
 	platform: {
 		sendVerificationChallenge?: boolean;
@@ -109,7 +109,7 @@ interface DiscordConfig extends BaseConfig {
 export class DiscordPlatform extends Platform<DiscordConfig> {
 	#emoteFetchingPromise: Promise<Emote[]> | null = null;
 
-	private readonly client: Client;
+	public readonly client: Client;
 
 	constructor (config: DiscordConfig) {
 		const resultConfig = { ...config };
@@ -157,60 +157,23 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 	initListeners () {
 		const client = this.client;
 
-		client.on("messageCreate", (messageObject) => this.handleMessage(messageObject));
+		client.on("messageCreate", (messageObject) => void this.handleMessage(messageObject));
 
-		client.on("guildCreate", async (guild) => {
-			const message = `Joined guild ${guild.name}  - ID ${guild.id} - ${guild.memberCount} members`;
-			await sb.Logger.log("Discord.Join", message);
-
-			const announce = this.config.guildCreateAnnounceChannel;
-			if (announce) {
-				const channelList = (Array.isArray(announce))
-					? announce
-					: [announce];
-
-				for (const channelID of channelList) {
-					const channelData = sb.Channel.get(channelID, this);
-					if (channelData) {
-						await channelData.send(message);
-					}
-					else {
-						console.warn(`No channel found for guild create announcement: ${channelID}`);
-					}
-				}
-			}
-		});
+		client.on("guildCreate", (guild) => void this.handleGuildCreate(guild));
 
 		// When a guild gets deleted, set all of its channels to be Inactive.
-		client.on("guildDelete", async (guild) => {
-			const platformMap = sb.Channel.data.get(this);
-			for (const channelData of platformMap!.values()) {
-				if (channelData.Specific_ID !== guild.id) {
-					continue;
-				}
-				else if (channelData.Mode === "Inactive") {
-					continue;
-				}
-
-				await channelData.saveProperty("Mode", "Inactive");
-			}
-		});
+		client.on("guildDelete", (guild) => void this.handleGuildDelete(guild));
 
 		// Set a channel to be Inactive in case it gets deleted.
-		client.on("channelDelete", async (channel) => {
-			const channelData = sb.Channel.get(channel.id);
-			if (channelData && channelData.Mode !== "Inactive") {
-				await channelData.saveProperty("Mode", "Inactive");
-			}
-		});
+		client.on("channelDelete", (channel) => void this.handleChannelDelete(channel));
 
-		client.on("error", async (err) => {
+		client.on("error", (err) => {
 			// Don't restart on errors stemming from sending messages (usually caused by Discord API being momentarily down)
 			if (err.toString().includes("TextChannel.send")) {
 				return;
 			}
 
-			await sb.Logger.log("Discord.Error", err.toString(), null, null);
+			void sb.Logger.log("Discord.Error", err.toString(), null, null);
 		});
 	}
 
@@ -738,7 +701,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 				throw new SupiError(({
 					message: "Assert error: Discord reply is not string",
 					args: { type: typeof reply }
-				}))
+				}));
 			}
 
 			if (channelData?.Mirror) {
@@ -758,6 +721,49 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 					keepWhitespace: Boolean(commandOptions.keepWhitespace)
 				});
 			}
+		}
+	}
+
+	async handleGuildCreate (guild: Guild) {
+		const message = `Joined guild ${guild.name}  - ID ${guild.id} - ${guild.memberCount} members`;
+		await sb.Logger.log("Discord.Join", message);
+
+		const announce = this.config.guildCreateAnnounceChannel;
+		if (announce) {
+			const channelList = (Array.isArray(announce))
+				? announce
+				: [announce];
+
+			for (const channelID of channelList) {
+				const channelData = sb.Channel.get(channelID, this);
+				if (channelData) {
+					await channelData.send(message);
+				}
+				else {
+					console.warn(`No channel found for guild create announcement: ${channelID}`);
+				}
+			}
+		}
+	}
+
+	async handleGuildDelete (guild: Guild) {
+		const platformMap = sb.Channel.data.get(this);
+		for (const channelData of platformMap!.values()) {
+			if (channelData.Specific_ID !== guild.id) {
+				continue;
+			}
+			else if (channelData.Mode === "Inactive") {
+				continue;
+			}
+
+			await channelData.saveProperty("Mode", "Inactive");
+		}
+	}
+
+	async handleChannelDelete (channel: DiscordChannel) {
+		const channelData = sb.Channel.get(channel.id);
+		if (channelData && channelData.Mode !== "Inactive") {
+			await channelData.saveProperty("Mode", "Inactive");
 		}
 	}
 
@@ -874,7 +880,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 		return list;
 	}
 
-	async fetchChannelEmotes () { return []; }
+	fetchChannelEmotes () { return []; }
 
 	async populateGlobalEmotes () {
 		if (this.#emoteFetchingPromise) {
@@ -905,7 +911,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 
 			this.#emoteFetchingPromise = null;
 			return result;
-		})()
+		})();
 
 		return await this.#emoteFetchingPromise;
 	}

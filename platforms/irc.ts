@@ -1,5 +1,5 @@
-// @ts-ignore Module has no @types repository associated with it. Will use local interface as definition
-import IRC from "irc-framework";
+// @ts-expect-error Module has no @types repository associated with it. Will use local interface as definition
+import { Client as IrcClient } from "irc-framework";
 import { EventEmitter } from "node:events";
 import { SupiError } from "supi-core";
 
@@ -18,7 +18,7 @@ type HandleCommandData = {
 	privateMessage: boolean;
 };
 
-interface IrcConfig extends BaseConfig {
+export interface IrcConfig extends BaseConfig {
 	platform: {
 		url: string;
 		port?: number;
@@ -93,7 +93,8 @@ export class IrcPlatform extends Platform<IrcConfig> {
 			});
 		}
 
-		this.client = new IRC.Client() as FauxIrcClient;
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+		this.client = new IrcClient() as FauxIrcClient;
 	}
 
 	async connect () {
@@ -142,29 +143,31 @@ export class IrcPlatform extends Platform<IrcConfig> {
 		// 	console.log("JOIN", { event });
 		// });
 
-		client.on("nick in use", async () => {
+		client.on("nick in use", () => {
 			const string = sb.Utils.randomString(16);
 			this.client.changeNick(string);
 			this.#nicknameChanged = true;
 		});
 
-		client.on("privmsg", async (event) => await this.handleMessage(event));
+		client.on("privmsg", (event: IrcMessageEvent) => void this.handleMessage(event));
 	}
 
-	async send (message: string, channel: ChannelLike) {
+	send (message: string, channel: ChannelLike) {
 		const channelData = Channel.get(channel, this);
 		if (!channelData) {
 			throw new SupiError({
 				message: "Invalid channel provided",
 				args: {
 					message,
-					channel: String(channel)
+					channel: (typeof channel === "string") ? channel : null
 				}
 			});
 		}
 
 		this.client.say(channelData.Name, message);
 		this.incrementMessageMetric("sent", channelData);
+
+		return Promise.resolve();
 	}
 
 	async pm (message: string, user: UserLike) {
@@ -221,7 +224,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 			return;
 		}
 
-		let userVerificationData = (await userData.getDataProperty("platformVerification") ?? {}) as Record<number, PlatformVerification>;
+		const userVerificationData = (await userData.getDataProperty("platformVerification") ?? {}) as Record<number, PlatformVerification>;
 		userVerificationData[this.ID] ??= {};
 
 		const isSelf = (userData.Name === this.selfName);
@@ -371,21 +374,15 @@ export class IrcPlatform extends Platform<IrcConfig> {
 		return execution;
 	}
 
-	async createUserMention (userData: User): Promise<string> {
-		return userData.Name;
+	createUserMention (userData: User): Promise<string> {
+		return Promise.resolve(userData.Name);
 	}
 
-	async isChannelLive (): Promise<boolean> {
-		return false;
-	}
-
-	async isUserChannelOwner () {
-		return false;
-	}
-
-	async populateUserList () { return []; }
-	async populateGlobalEmotes () { return []; }
-	async fetchChannelEmotes () { return []; }
+	isChannelLive () { return null; }
+	isUserChannelOwner () { return null; }
+	populateUserList () { return []; }
+	populateGlobalEmotes () { return []; }
+	fetchChannelEmotes () { return []; }
 
 	fetchInternalPlatformIDByUsername (): never {
 		throw new SupiError({
