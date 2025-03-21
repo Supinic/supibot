@@ -1,4 +1,4 @@
-import LanguageCodes from "../../utils/languages.js";
+import { LanguageParser } from "../../utils/languages.js";
 
 export default {
 	Name: "wiki",
@@ -21,7 +21,7 @@ export default {
 			};
 		}
 
-		const language = context.params.lang ?? LanguageCodes.getLanguage("english");
+		const language = context.params.lang ?? LanguageParser.getLanguage("english");
 		const languageCode = language.getIsoCode(1);
 
 		let query = args.join(" ");

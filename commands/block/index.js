@@ -42,7 +42,7 @@ export default {
 					reply: `You must provide someone to block!`
 				};
 			}
-			else if (filterData.user === context.platform.Self_ID) {
+			else if (filterData.user === context.platform.Self_ID) { // @todo this condition is wrong, please fix
 				const emote = await context.randomEmote("monkaStare", "supiniStare", "😬🫵");
 				return {
 					success: false,

@@ -42,11 +42,15 @@ export default {
 			};
 		}
 
-		/** @type {TwitchPlatform} */
-		const platform = context.platform;
-		const badges = context.append.badges.map(i => i.set_id);
+		const messageData = context.platformSpecificData;
+		if (!messageData || !Array.isArray(messageData.badges)) {
+			throw new sb.Error({
+				message: "Assert error: No badges available on Twitch platform"
+			});
+		}
 
 		let timeoutMode;
+		const badges = messageData.badges.map(i => i.set_id);
 		if (context.channel.Mode !== "Moderator") {
 			timeoutMode = "nerf";
 		}
@@ -57,6 +61,7 @@ export default {
 			timeoutMode = "real";
 		}
 
+		const platform = context.platform;
 		const result = randomInt(1, 6);
 		if (result === 1) {
 			if (timeoutMode === "real") {
