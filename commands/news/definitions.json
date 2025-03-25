@@ -927,8 +927,8 @@
       {
         "name": "Oslobodjenje",
         "url": "https://www.oslobodjenje.ba",
-        "path": "feed/category",
-        "endpoints": ["1"],
+        "path": null,
+        "endpoints": ["rss.xml"],
         "helpers": ["supinic"]
       },
       {
