@@ -1221,7 +1221,7 @@ export default {
 						reply: `Your alias contains the command ${invocation} which has been archived, retired, or removed!`
 					};
 				}
-				else if (context.append.pipe && !commandData.Flags.pipe) {
+				else if (context.append.pipe && !commandData.Flags.includes("pipe")) {
 					return {
 						success: false,
 						reply: `Cannot use the ${invocation} command inside of a pipe, despite being wrapped in an alias!`
@@ -1314,7 +1314,7 @@ export default {
 				return {
 					...result,
 					cooldown: (context.append.pipe) ? null : this.Cooldown,
-					hasExternalInput: Boolean(result?.hasExternalInput ?? commandData.Flags.externalInput),
+					hasExternalInput: Boolean(result?.hasExternalInput ?? commandData.Flags.includes("externalInput")),
 					isChannelAlias: Boolean(alias.Channel)
 				};
 			}

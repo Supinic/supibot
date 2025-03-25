@@ -332,7 +332,7 @@ export default async function createDebugSandbox (context, scriptArgs) {
 				else if (RESTRICTED_COMMAND_NAMES.has(commandData.Name)) {
 					throw new Error("Provided command is not usable in the $js execution");
 				}
-				else if (!commandData.Flags.pipe) {
+				else if (!commandData.Flags.includes("pipe")) {
 					throw new Error("This command cannot be used directly within this sandbox");
 				}
 

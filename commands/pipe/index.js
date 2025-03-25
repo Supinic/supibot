@@ -75,13 +75,13 @@ export default {
 					reply: `Command "${commandString}" does not exist!`
 				};
 			}
-			else if (!commandData.Flags.pipe && invocations[i + 1]) {
+			else if (!commandData.Flags.includes("pipe") && invocations[i + 1]) {
 				return {
 					success: false,
 					reply: `Output of command "${commandString}" cannot be piped!`
 				};
 			}
-			else if (nullCommand && commandData.Flags.nonNullable && invocations[i + 1]) {
+			else if (nullCommand && commandData.Flags.includes("nonNullable") && invocations[i + 1]) {
 				const [nextCommandString] = invocations[i + 1].split(" ");
 				const nextCommand = sb.Command.get(nextCommandString.replace(sb.Command.prefixRegex, ""));
 				if (nextCommand && nextCommand.Name === nullCommand.Name) {
@@ -91,7 +91,7 @@ export default {
 					};
 				}
 			}
-			else if (commandData.Flags.externalInput) {
+			else if (commandData.Flags.includes("externalInput")) {
 				hasExternalInput = true;
 			}
 
@@ -295,7 +295,7 @@ export default {
 		return {
 			cooldown: (context.append.pipe) ? null : this.Cooldown,
 			hasExternalInput,
-			// skipExternalPrefix: Boolean(lastCommand.Flags.skipBanphrase),
+			// skipExternalPrefix: Boolean(lastCommand.Flags.includes("skipBanphrase")),
 			replyWithPrivateMessage: privateMessageReply,
 			replyWithMeAction: meActionReply,
 			reply: currentArgs.join(" ")
