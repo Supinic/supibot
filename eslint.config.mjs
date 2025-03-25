@@ -11,7 +11,7 @@ export default tseslint.config(
 	tseslint.configs.recommendedTypeChecked,
 	// tseslint.configs.strictTypeChecked,
 	{
-		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.d.mts"]
+		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.mjs"]
 	},
 	{
 		languageOptions: {

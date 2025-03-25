@@ -24,7 +24,7 @@ type BanphraseDowntimeBehaviour = "Ignore" | "Notify" | "Nothing" | "Refuse" | "
 type Mode = "Inactive" | "Last seen" | "Read" | "Write" | "VIP" | "Moderator";
 type LogType = "Lines" | "Meta";
 
-type EditableProperty = "Name" | "Mode" | "Mention"  | "NSFW" | "Mirror" | "Description"
+type EditableProperty = "Name" | "Mode" | "Mention" | "NSFW" | "Mirror" | "Description"
 	| "Links_Allowed" | "Banphrase_API_Downtime" | "Banphrase_API_Type" | "Banphrase_API_URL";
 type ConstructorData = Pick<Channel,
 	"ID" | "Name" | "Specific_ID" | "Mode" | "Mention" | "Message_Limit"
@@ -57,6 +57,8 @@ type MoveDataOptions = {
 	skipProperties?: string[];
 };
 
+export const isChannel = (input: unknown): input is Channel => Boolean(input && input instanceof Channel);
+
 export class Channel extends TemplateWithId {
 	readonly ID: number;
 	readonly Name: string;
@@ -78,7 +80,7 @@ export class Channel extends TemplateWithId {
 	readonly events: EventEmitter = new EventEmitter();
 
 	static redisPrefix = "sb-channel";
-	static dataCache = new WeakMap();
+	static dataCache: WeakMap<Channel, Map<string, GenericDataPropertyValue>> = new WeakMap();
 	static uniqueIdentifier = "ID";
 	static data: Map<Platform, Map<Channel["Name"], Channel>> = new Map();
 
@@ -106,7 +108,7 @@ export class Channel extends TemplateWithId {
 		if (!platformData) {
 			throw new SupiError({
 				message: "Invalid Platform provided for Channel"
-			})
+			});
 		}
 
 		this.Platform = platformData;
@@ -181,7 +183,7 @@ export class Channel extends TemplateWithId {
 		await this.setDataProperty("ambassadors", ambassadors);
 	}
 
-	async saveProperty <T extends EditableProperty>(property: T, value: this[T]) {
+	async saveProperty <T extends EditableProperty> (property: T, value: this[T]) {
 		const row = await sb.Query.getRow<ConstructorData>("chat_data", "Channel");
 		await row.load(this.ID);
 

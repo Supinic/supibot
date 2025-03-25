@@ -282,8 +282,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 				message,
 				user: userData,
 				channel: channelData,
-				platform: this,
-				data: {}
+				platform: this
 			});
 
 			// If channel is read-only, do not proceed with any processing

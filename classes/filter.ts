@@ -1,7 +1,7 @@
 import { SupiError } from "supi-core";
 import { TemplateWithId } from "./template.js";
 
-import { Channel, privateMessageChannelSymbol } from "./channel.js";
+import { Channel, isChannel, privateMessageChannelSymbol } from "./channel.js";
 import User from "./user.js";
 import type Platform from "../platforms/template.js";
 import type { Command } from "./command.js";
@@ -97,11 +97,6 @@ export const isArgumentsData = (input: Filter["Data"]): input is ArgumentDescrip
 		(typeof i.string === "string" || i.regex instanceof RegExp)
 		&& ((Array.isArray(i.range) && i.range.length === 2) || typeof i.index === "number")
 	));
-};
-
-// @todo move to Channel
-const isChannel = (input: unknown): input is Channel => {
-	return Boolean(input && input instanceof Channel);
 };
 
 /**

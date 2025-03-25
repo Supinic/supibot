@@ -54,25 +54,11 @@ export class User extends TemplateWithIdString {
 		administrator: 0b1000_0000
 	} as const;
 
-	static highLoadUserBatch: Batch;
-	static highLoadUserInterval = setInterval(async () => {
-		User.highLoadUserBatch ??= await sb.Query.getBatch(
-			"chat_data",
-			"User_Alias",
-			["Name", "Twitch_ID", "Discord_ID"]
-		);
-
-		if (!User.highLoadUserBatch.ready) {
-			return;
-		}
-
-		const users = User.highLoadUserBatch.records.map(i => i.Name) as User["Name"][];
-		await User.highLoadUserBatch.insert();
-
-		for (const user of users) {
-			User.pendingNewUsers.delete(user);
-		}
-	}, HIGH_LOAD_CACHE_EXPIRY);
+	static highLoadUserBatch: Batch | undefined;
+	static highLoadUserInterval: NodeJS.Timeout;
+	static {
+		User.highLoadUserInterval = setInterval(() => void User.handleHighLoad(), HIGH_LOAD_CACHE_EXPIRY);
+	}
 
 	constructor (data: ConstructorData) {
 		super();
@@ -316,14 +302,15 @@ export class User extends TemplateWithIdString {
 			.replaceAll(/\s+/g, "_");
 	}
 
-	static async add (name: string, properties = {}) {
+	static async add (name: string, properties = {}): Promise<User | null> {
 		await sb.Cache.setByPrefix(`${HIGH_LOAD_CACHE_PREFIX}-${name}`, "1", {
 			expiry: HIGH_LOAD_CACHE_EXPIRY
 		});
 
 		const preparedName = User.normalizeUsername(name);
-		if (User.pendingNewUsers.has(preparedName)) {
-			return User.pendingNewUsers.get(preparedName);
+		const pendingNewUser = User.pendingNewUsers.get(preparedName);
+		if (pendingNewUser) {
+			return pendingNewUser;
 		}
 
 		const keys = await sb.Cache.getKeysByPrefix(`${HIGH_LOAD_CACHE_PREFIX}*`);
@@ -425,6 +412,25 @@ export class User extends TemplateWithIdString {
 
 			const cacheKey = User.createCacheKey({ name: identifier });
 			await sb.Cache.delete(cacheKey);
+		}
+	}
+
+	static async handleHighLoad () {
+		User.highLoadUserBatch ??= await sb.Query.getBatch(
+			"chat_data",
+			"User_Alias",
+			["Name", "Twitch_ID", "Discord_ID"]
+		);
+
+		if (!User.highLoadUserBatch.ready) {
+			return;
+		}
+
+		const users = User.highLoadUserBatch.records.map(i => i.Name) as User["Name"][];
+		await User.highLoadUserBatch.insert();
+
+		for (const user of users) {
+			User.pendingNewUsers.delete(user);
 		}
 	}
 

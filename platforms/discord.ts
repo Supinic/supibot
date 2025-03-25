@@ -553,7 +553,7 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			}
 
 			channelData.events.emit("message", {
-				type: "message",
+				event: "message",
 				message: msg,
 				user: userData,
 				channel: channelData,

@@ -5,33 +5,36 @@ import { Channel, Like as ChannelLike } from "./channel.js";
 import { User } from "./user.js";
 
 import { Platform } from "../platforms/template.js";
-import type { Message, SimpleGenericData, XOR } from "../@types/globals.d.ts";
+import type { SimpleGenericData, XOR } from "../@types/globals.d.ts";
 
 export type ChatModuleDefinition = Pick<ChatModule, "Name" | "Events" | "Global" | "Code"> & {
 	Platform: Platform["ID"] | null;
 };
 
 export type Event = "message" | "online" | "offline" | "raid" | "subscription";
-export type Argument = SimpleGenericData;
+export type EventArgument = SimpleGenericData;
 export type AttachmentReference = {
 	channelID: Channel["ID"];
 	active: boolean;
-	listener: (context: ModuleContext, ...args: Argument[]) => void;
+	listener: (context: EventData, ...args: EventArgument[]) => void;
 };
-export type ModuleContext = {
-	channel: Channel;
-	data: SimpleGenericData;
-	event: Event;
-	specificArguments: Argument[];
-	message?: Message | null;
-	user?: User | null;
-};
+
 export type Descriptor = {
 	Channel: Channel["ID"];
 	Chat_Module: ChatModule["Name"];
 	Args: string | null;
 };
 export type Like = number | string | ChatModule;
+
+type SubscriptionEventData = {
+	event: "message";
+	message: string;
+	user: User | null;
+	channel: Channel | null;
+	platform: Platform;
+	raw?: { user: string; };
+};
+type EventData = SubscriptionEventData;
 
 type PlatformLike = number | string | Platform; // @todo move to Platform
 type PlatformOption = {
@@ -40,7 +43,7 @@ type PlatformOption = {
 type ChannelOption = {
 	channel: ChannelLike | ChannelLike[];
 }
-type AttachOptions = XOR<PlatformOption, ChannelOption> & { args?: SimpleGenericData[]; };
+type AttachOptions = XOR<PlatformOption, ChannelOption> & { args?: EventArgument[]; };
 type DetachOptions = AttachOptions & {
 	remove: boolean;
 };
@@ -49,7 +52,7 @@ export class ChatModule extends TemplateWithoutId {
 	readonly Name: string;
 	readonly Events: string[];
 	readonly Active: boolean = true;
-	readonly Code: unknown;
+	readonly Code: (this: ChatModule, context: EventData, ...args: EventArgument[]) => Promise<void>;
 	readonly Global: boolean; // @todo refactor out into attachment table
 	readonly Platform: Platform | null; // @todo refactor out into attachment table
 
@@ -141,14 +144,14 @@ export class ChatModule extends TemplateWithoutId {
 					reference.active = true;
 				}
 				else {
-					const listener = (function chatModuleBinding (this: ChatModule, context: ModuleContext) {
+					const listener = (function chatModuleBinding (this: ChatModule, context: EventData) {
 						if (typeof this.Code !== "function") {
 							console.warn("Destroyed chat module's code invoked! Module was automatically detached", { context, chatModule: this });
 							channelData.events.off(event, listener);
 							return;
 						}
 
-						this.Code(context, ...args);
+						void this.Code(context, ...args);
 					}).bind(this);
 
 					channelData.events.on(event, listener);
@@ -245,9 +248,9 @@ export class ChatModule extends TemplateWithoutId {
 		}
 	}
 
-	static async initialize () {
+	static initialize () {
 		// Overrides default behaviour of automatically loading module's data on initialization
-		return;
+		return Promise.resolve();
 	}
 
 	static async importData (definitions: ChatModuleDefinition[]) {
@@ -373,19 +376,19 @@ export class ChatModule extends TemplateWithoutId {
 		}
 	}
 
-	static parseModuleArgs (rawArgs: string | null): Argument[] | null {
+	static parseModuleArgs (rawArgs: string | null): EventArgument[] | null {
 		if (rawArgs === null) {
 			return [];
 		}
 
-		let args = [];
+		let args: EventArgument[] = [];
 		try {
-			args = eval(rawArgs);
+			args = eval(rawArgs) as EventArgument[];
 		}
 		catch (e) {
 			console.warn(e);
 			return null;
-			}
+		}
 
 		if (!Array.isArray(args)) {
 			console.warn("Invalid chat module arguments type", args);
@@ -396,7 +399,7 @@ export class ChatModule extends TemplateWithoutId {
 	}
 
 	static async #fetch (specificNames?: string | string[]): Promise<Descriptor[]> {
-		return await await sb.Query.getRecordset<Descriptor[]>(rs => {
+		return await sb.Query.getRecordset<Descriptor[]>(rs => {
 			rs.select("Channel", "Chat_Module", "Specific_Arguments as Args");
 			rs.from("chat_data", "Channel_Chat_Module");
 

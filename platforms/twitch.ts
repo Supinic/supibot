@@ -809,8 +809,7 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			message: messageData.text,
 			user: userData,
 			channel: channelData,
-			platform: this,
-			data: messageData
+			platform: this
 		});
 
 		// If channel is read-only, do not proceed with any processing

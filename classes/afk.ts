@@ -1,5 +1,4 @@
-import { SupiDate, SupiError } from "supi-core";
-import type { Row, RecordUpdater, Counter, Gauge } from "supi-core";
+import { SupiDate, SupiError, type Counter, type Gauge } from "supi-core";
 
 import { TemplateWithId } from "./template.js";
 
@@ -21,8 +20,8 @@ type DurationStatus = {
 };
 const durationStatuses = responses.duration as Partial<Record<Status, DurationStatus[]>>;
 
-const NO_TEXT_AFK = "(no message)" as const;
-const DEFAULT_AFK_STATUS = "afk" as const;
+const NO_TEXT_AFK = "(no message)";
+const DEFAULT_AFK_STATUS = "afk";
 
 type ConstructorData = {
 	ID: AwayFromKeyboard["ID"];
@@ -47,7 +46,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 	readonly Status: Status | null;
 
 	static readonly data: Map<number, AwayFromKeyboard> = new Map();
-	static readonly uniqueIdentifier = "ID" as const;
+	static readonly uniqueIdentifier = "ID";
 
 	static #activeGauge: Gauge;
 	static #totalCounter: Counter;
@@ -149,7 +148,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 		AwayFromKeyboard.data.delete(userData.ID);
 
 		// This should only ever update one row, if everything is working properly.
-		await sb.Query.getRecordUpdater((ru: RecordUpdater) => ru
+		await sb.Query.getRecordUpdater(ru => ru
 			.update("chat_data", "AFK")
 			.set("Active", false)
 			.where("ID = %n", data.ID)
@@ -178,7 +177,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 		else {
 			// Fallback for missing responses in the `afk-responses.json` file
 			const staticResponses = responses.static[status] ?? responses.static[DEFAULT_AFK_STATUS];
-			statusMessage = sb.Utils.randArray(staticResponses) as string; // @todo remove type cast when Utils are well-known
+			statusMessage = sb.Utils.randArray(staticResponses);
 		}
 
 		/**
@@ -194,7 +193,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 						afk: data.ID,
 						channel: channelData.ID
 					}
-				})
+				});
 			}
 
 			const userMention = await platform.createUserMention(userData);
@@ -226,7 +225,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 			return identifier;
 		}
 		else if (identifier instanceof User) {
-			return AwayFromKeyboard.data.get(identifier.ID);
+			return AwayFromKeyboard.data.get(identifier.ID) ?? null;
 		}
 		else {
 			const values = [...AwayFromKeyboard.data.values()];
@@ -258,12 +257,12 @@ export class AwayFromKeyboard extends TemplateWithId {
 		await row.save({ skipLoad: false });
 
 		const afk = new AwayFromKeyboard({
-			ID: row.values.ID as number,
+			ID: row.values.ID,
 			User_Alias: userData.ID,
 			Text: data.Text ?? NO_TEXT_AFK,
 			Silent: Boolean(data.Silent),
 			Started: data.Started ?? now,
-			Status: data.Status ?? "afk",
+			Status: data.Status ?? "afk"
 		});
 
 		AwayFromKeyboard.data.set(userData.ID, afk);

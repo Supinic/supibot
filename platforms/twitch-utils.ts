@@ -769,8 +769,7 @@ const emitRawUserMessageEvent = (username: string, channelName: string, platform
 			platform,
 			raw: {
 				user: username
-			},
-			messageData: message
+			}
 		});
 	}
 };
