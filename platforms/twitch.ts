@@ -1053,18 +1053,15 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 		options: { privateMessage: boolean; },
 		specificData: MessageData | null
 	) {
-		const userData = await sb.User.get(user, false);
-		const channelData = (channel === null) ? null : sb.Channel.get(channel, this);
-
-		const { privateMessage } = options;
-		const execution = await sb.Command.checkAndExecute(
+		const execution = await sb.Command.checkAndExecute({
 			command,
 			args,
-			channelData,
-			userData,
-			{ platform: this, privateMessage },
-			specificData
-		);
+			user,
+			channel,
+			platform: this,
+			options,
+			platformSpecificData: specificData
+		});
 
 		if (!execution || !execution.reply) {
 			return execution;
@@ -1079,34 +1076,34 @@ export class TwitchPlatform extends Platform<TwitchConfig> {
 			});
 
 			if (message) {
-				await this.pm(message, userData);
+				await this.pm(message, user);
 			}
 		}
 		else {
-			if (!channelData) {
+			if (!channel) {
 				throw new SupiError({
 					message: "Assert error - No Channel in public command response"
 				});
 			}
 
-			if (channelData.Mirror) {
-				await this.mirror(execution.reply, userData, channelData, {
+			if (channel.Mirror) {
+				await this.mirror(execution.reply, user, channel, {
 					...commandOptions,
 					commandUsed: true
 				});
 			}
 
-			const message = await this.prepareMessage(execution.reply, channelData, {
+			const message = await this.prepareMessage(execution.reply, channel, {
 				...commandOptions,
 				skipBanphrases: true
 			});
 
 			if (message) {
 				if (execution.replyWithMeAction === true) {
-					await this.me(message, channelData);
+					await this.me(message, channel);
 				}
 				else {
-					await this.send(message, channelData);
+					await this.send(message, channel);
 				}
 			}
 		}

@@ -339,26 +339,34 @@ export default async function createDebugSandbox (context, scriptArgs) {
 				commandExecutionPending = true;
 				commandExecutionCounter++;
 
-				const result = await sb.Command.checkAndExecute(command, args, context.channel, context.user, {
-					...context.append,
-					partialExecute: true,
-					pipe: true,
-					skipPending: true,
-					skipMention: true,
-					skipBanphrases: true,
-					tee: context.tee
+				const execution = await sb.Command.checkAndExecute({
+					command,
+					args,
+					user: context.user,
+					channel: context.channel,
+					platform: context.platform,
+					platformSpecificData: context.platformSpecificData,
+					options: {
+						...context.append,
+						partialExecute: true,
+						pipe: true,
+						skipPending: true,
+						skipMention: true,
+						skipBanphrases: true,
+						tee: context.tee
+					}
 				});
 
 				commandExecutionPending = false;
 
 				const returnValue = {
-					success: result.success ?? true,
-					reason: result.reason ?? null,
-					reply: result.reply
+					success: execution.success ?? true,
+					reason: execution.reason ?? null,
+					reply: execution.reply
 				};
 
-				if (result.data && typeof result.data === "object") {
-					returnValue.data = result.data;
+				if (execution.data && typeof execution.data === "object") {
+					returnValue.data = execution.data;
 				}
 
 				return returnValue;

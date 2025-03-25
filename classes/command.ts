@@ -110,6 +110,7 @@ export type ContextAppendData = {
 	emotes?: unknown;
 	skipPending?: boolean;
 	privateMessage?: boolean;
+	platform?: never; // @todo this is a temporary check for refactor purposes
 };
 export type ContextPlatformSpecificData = TwitchAppendData | DiscordAppendData | null;
 
@@ -292,7 +293,6 @@ export type CustomInitFunction = (this: Command) => Promise<void> | void;
 export type CustomDestroyFunction = (this: Command) => void;
 
 type ExecuteOptions = {
-	platform: Platform;
 	skipPending?: boolean;
 	privateMessage?: boolean;
 	skipBanphrases?: boolean;
@@ -524,16 +524,25 @@ export class Command extends TemplateWithoutId {
 		}
 	}
 
-	// @todo refactor to not have THIS many arguments
-	// eslint-disable-next-line max-params
-	static async checkAndExecute (
-		identifier: string,
-		argumentArray: string[],
-		channelData: Channel | null,
-		userData: User,
-		options: ExecuteOptions,
-		platformSpecificData: ContextPlatformSpecificData = null
-	): Promise<Result> {
+	static async checkAndExecute (data: {
+		  command: string, // @todo consider renaming `command` to `invocation` here
+		  args: string[],
+		  user: User,
+		  channel: Channel | null,
+		  platform: Platform,
+		  options: ExecuteOptions,
+		  platformSpecificData: ContextPlatformSpecificData
+	}): Promise<Result> {
+		let { command: identifier } = data;
+		const {
+			args: argumentArray,
+			channel: channelData,
+			user: userData,
+			platform: platformData,
+			options,
+			platformSpecificData = null
+		} = data;
+
 		if (!identifier) {
 			return { success: false, reason: "no-identifier" };
 		}
@@ -594,18 +603,18 @@ export class Command extends TemplateWithoutId {
 		const isAdmin = await userData.getDataProperty("administrator") as boolean;
 
 		if (!options.skipPending && !isAdmin) {
-			const sourceName = channelData?.Name ?? `${options.platform.Name} PMs`;
+			const sourceName = channelData?.Name ?? `${platformData.name} PMs`;
 			Command.#cooldownManager.setPending(
 				userData.ID,
 				`You have a pending command: "${identifier}" used in "${sourceName}" at ${new SupiDate().sqlDateTime()}`
 			);
 		}
 
-		const appendOptions: Omit<ContextAppendData, "platform"> = { ...options };
+		const appendOptions: ContextAppendData = { ...options };
 		const isPrivateMessage = (!channelData);
 
 		const contextOptions: ContextData = {
-			platform: options.platform,
+			platform: platformData,
 			invocation: identifier,
 			user: userData,
 			channel: channelData,
@@ -730,7 +739,7 @@ export class Command extends TemplateWithoutId {
 			sb.Logger.logCommandExecution({
 				User_Alias: userData.ID,
 				Command: command.Name,
-				Platform: options.platform.ID,
+				Platform: platformData.ID,
 				Executed: new SupiDate(),
 				Channel: channelData?.ID ?? null,
 				Success: true,
@@ -761,7 +770,7 @@ export class Command extends TemplateWithoutId {
 				command: command.Name,
 				invocation: identifier,
 				channel: channelData?.ID ?? null,
-				platform: options.platform.ID,
+				Platform: platformData.ID,
 				params: context.params ?? {},
 				isPrivateMessage
 			};

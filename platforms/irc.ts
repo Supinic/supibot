@@ -327,10 +327,15 @@ export class IrcPlatform extends Platform<IrcConfig> {
 		}
 	}
 
-	async handleCommand (command: string, userData: User, channelData: Channel | null, args: string[] = [], options: HandleCommandData) {
-		const execution = await Command.checkAndExecute(command, args, channelData, userData, {
+	async handleCommand (command: string, user: User, channel: Channel | null, args: string[] = [], options: HandleCommandData) {
+		const execution = await Command.checkAndExecute({
+			command,
+			args,
+			user,
+			channel,
 			platform: this,
-			...options
+			platformSpecificData: null,
+			options
 		});
 
 		if (!execution || !execution.reply) {
@@ -341,7 +346,7 @@ export class IrcPlatform extends Platform<IrcConfig> {
 		if (options.privateMessage || execution.replyWithPrivateMessage) {
 			const message = await this.prepareMessage(execution.reply, null, {
 				...commandOptions,
-				extraLength: (`PRIVMSG ${userData.Name} `).length,
+				extraLength: (`PRIVMSG ${user.Name} `).length,
 				skipBanphrases: true
 			});
 
@@ -349,24 +354,24 @@ export class IrcPlatform extends Platform<IrcConfig> {
 				return;
 			}
 
-			await this.pm(message, userData.Name);
+			await this.pm(message, user.Name);
 		}
-		else if (channelData) {
-			if (channelData?.Mirror) {
-				await this.mirror(execution.reply, userData, channelData, {
+		else if (channel) {
+			if (channel?.Mirror) {
+				await this.mirror(execution.reply, user, channel, {
 					...commandOptions,
 					commandUsed: true
 				});
 			}
 
-			const message = await this.prepareMessage(execution.reply, channelData, {
+			const message = await this.prepareMessage(execution.reply, channel, {
 				...commandOptions,
-				extraLength: (`PRIVMSG ${channelData.Name} `).length,
+				extraLength: (`PRIVMSG ${channel.Name} `).length,
 				skipBanphrases: true
 			});
 
 			if (message) {
-				await this.send(message, channelData);
+				await this.send(message, channel);
 			}
 		}
 

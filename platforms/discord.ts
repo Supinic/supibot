@@ -638,15 +638,16 @@ export class DiscordPlatform extends Platform<DiscordConfig> {
 			options
 		} = data;
 
-		const { member, guild, mentions } = options;
-		const execution = await sb.Command.checkAndExecute(
+		const { member, guild, mentions, privateMessage } = options;
+		const execution = await sb.Command.checkAndExecute({
 			command,
 			args,
-			channelData,
-			userData,
-			{ platform: this },
-			{ member, guild, mentions }
-		);
+			channel: channelData,
+			user: userData,
+			platform: this,
+			platformSpecificData: { member, guild, mentions },
+			options: { privateMessage }
+		});
 
 		if (!execution) {
 			return;

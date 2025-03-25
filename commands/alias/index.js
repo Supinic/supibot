@@ -1289,32 +1289,36 @@ export default {
 					totalUsedCommandNames = [commandData.Name];
 				}
 
-				const result = await sb.Command.checkAndExecute(
-					invocation,
-					resultArguments,
-					context.channel,
-					context.user,
-					{
+				const execution = await sb.Command.checkAndExecute({
+					command: invocation,
+					args: resultArguments,
+					user: context.user,
+					channel: context.channel,
+					platform: context.platform,
+					platformSpecificData: context.platformSpecificData,
+					options: {
 						...context.append,
 						alias: true,
 						aliasArgs: Object.freeze(runArgs.slice(1)),
 						aliasCount,
-						aliasStack: [...(context.append.aliasStack ?? []), name],
+						aliasStack: [
+							...(context.append.aliasStack ?? []),
+							name
+						],
 						aliasTry,
 						commandList: totalUsedCommandNames,
-						platform: context.platform,
 						skipBanphrases: true,
 						skipMention: true,
 						skipPending: true,
 						partialExecute: true,
 						tee: context.tee
 					}
-				);
+				});
 
 				return {
-					...result,
+					...execution,
 					cooldown: (context.append.pipe) ? null : this.Cooldown,
-					hasExternalInput: Boolean(result?.hasExternalInput ?? commandData.Flags.includes("externalInput")),
+					hasExternalInput: Boolean(execution?.hasExternalInput ?? commandData.Flags.includes("externalInput")),
 					isChannelAlias: Boolean(alias.Channel)
 				};
 			}

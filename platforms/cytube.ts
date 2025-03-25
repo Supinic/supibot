@@ -294,20 +294,20 @@ class CytubeClient {
 
 	/**
 	 * Handles the execution of a command and the reply should it be successful.
-	 * @param command Command name - will be parsed
-	 * @param user User who executed the command
-	 * @param [args] Possible arguments for the command
-	 * @param [replyIntoPM] If true, the command result will be sent via PM
 	 */
 	async handleCommand (command: string, user: User, args: string[] = [], replyIntoPM: boolean = false) {
 		const channelData = this.channelData;
 		const userData = await sb.User.get(user, false);
-		const options = {
-			platform: this.platform,
-			privateMessage: Boolean(replyIntoPM)
-		};
 
-		const execution = await sb.Command.checkAndExecute(command, args, this.channelData, userData, options);
+		const execution = await sb.Command.checkAndExecute({
+			command,
+			args,
+			user,
+			channel: this.channelData,
+			platform: this.platform,
+			platformSpecificData: null,
+			options: { privateMessage: Boolean(replyIntoPM) }
+		});
 		if (!execution || !execution.reply) {
 			return;
 		}
