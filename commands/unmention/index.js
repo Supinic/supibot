@@ -24,13 +24,16 @@ export default {
 		}
 		else {
 			filterData = parse.filterData;
-			filter = sb.Filter.data.find(i => (
-				i.Type === "Unmention"
-				&& i.Channel === filterData.channel
-				&& i.Command === filterData.command
+
+			const unmentionFilters = sb.Filter.getLocals("Unmention", {
+				user: context.User,
+				command: filterData.command,
+				invocation: filterData.invocation
+			});
+
+			filter = unmentionFilters.find(i => (
+				i.Channel === filterData.channel
 				&& i.Platform === filterData.platform
-				&& i.Invocation === filterData.invocation
-				&& i.User_Alias === context.user.ID
 			));
 		}
 

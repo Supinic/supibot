@@ -412,19 +412,19 @@ export class Filter extends TemplateWithId {
 			if (!filter.Active) {
 				continue;
 			}
-			else if (!options.skipUserCheck && filter.User_Alias === userId) {
+			else if (!options.skipUserCheck && filter.User_Alias !== null && filter.User_Alias === userId) {
 				continue;
 			}
-			else if (filter.Channel !== channelId) {
+			else if (filter.Channel !== null && filter.Channel !== channelId) {
 				continue;
 			}
-			else if (filter.Platform !== platformId) {
+			else if (filter.Platform !== null && filter.Platform !== platformId) {
 				continue;
 			}
-			else if (filter.Invocation !== invocation) {
+			else if (filter.Invocation !== null && filter.Invocation !== invocation) {
 				continue;
 			}
-			else if (filter.Command !== commandName) {
+			else if (filter.Command !== null && filter.Command !== commandName) {
 				continue;
 			}
 

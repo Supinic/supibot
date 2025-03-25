@@ -207,8 +207,8 @@ export default {
 					options.Reason = null;
 				}
 				else {
-					options.Response = "Reason";
-					options.Reason = "Banned in this channel.";
+					options.Response = "Auto";
+					options.Reason = null;
 				}
 			}
 		}
