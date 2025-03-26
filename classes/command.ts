@@ -763,6 +763,19 @@ export class Command extends TemplateWithoutId {
 				result: "error"
 			});
 
+			sb.Logger.logCommandExecution({
+				User_Alias: userData.ID,
+				Command: command.Name,
+				Platform: platformData.ID,
+				Executed: new SupiDate(),
+				Channel: channelData?.ID ?? null,
+				Success: false,
+				Invocation: identifier,
+				Arguments: JSON.stringify(args.filter(Boolean)),
+				Result: null,
+				Execution_Time: null
+			});
+
 			let origin: "Internal" | "External" = "Internal";
 			let errorContext: Record<string, string> = {};
 			const loggingContext = {
