@@ -32,14 +32,17 @@ export default {
 		}
 		else {
 			filterData = parse.filterData;
-			filter = sb.Filter.data.find(i => (
-				i.Type === "Unping"
-				&& i.Channel === filterData.channel
-				&& i.Command === filterData.command
+
+			const optOutFilters = sb.Filter.getLocals("Unping", {
+				user: context.User,
+				command: filterData.command,
+				invocation: filterData.invocation
+			});
+
+			filter = optOutFilters.find(i => (
+				i.Channel === filterData.channel
 				&& i.Platform === filterData.platform
-				&& i.Invocation === filterData.invocation
 				&& i.Blocked_User === filterData.user
-				&& i.User_Alias === context.user.ID
 			));
 		}
 

@@ -1,3 +1,4 @@
+import { SupiError } from "supi-core";
 import {
 	fetchUserData,
 	parseUserIdentifier,
@@ -8,7 +9,8 @@ import {
 
 import SetCommand from "../../set/subcommands/osrs-username.js";
 
-import type User from "../../../classes/user.js";
+import type { Command } from "../../../classes/command.js";
+import type { User } from "../../../classes/user.js";
 
 // @todo Import from Command when done in Typescript
 type Context = {
@@ -42,7 +44,7 @@ export default {
 		`<code>$osrs kc @Supinic Corrupted Gauntlet</code>`,
 		"Same as above, but if the target has their OSRS username set, you can use the command like this."
 	],
-	execute: async function (/* @todo add this: Command */ context: Context, ...args: string[]) {
+	execute: async function (this: Command, context: Context, ...args: string[]) {
 		let parsedUserData;
 		let activity;
 		if (!context.params.activity && !context.params.boss) {
@@ -67,8 +69,6 @@ export default {
 		else if (!activity) {
 			return {
 				success: false,
-				// @todo should be fixed when Command is in TS
-				// @ts-ignore
 				reply: `No activity provided! Use activity:"boss name" - for a list, check here: ${this.getDetailURL()}`
 			};
 		}
@@ -89,22 +89,22 @@ export default {
 
 		const { data } = userStats;
 		const activities = data.activities.map(i => i.name.toLowerCase());
-		const bestMatch = sb.Utils.selectClosestString(activity.toLowerCase(), activities, { ignoreCase: true })
+		const bestMatch = sb.Utils.selectClosestString(activity.toLowerCase(), activities, { ignoreCase: true });
 		if (!bestMatch) {
 			return {
 				success: false,
-				// @todo should be fixed when Command is in TS
-				// @ts-ignore
 				reply: `Invalid activity was not found! Check the list here: ${this.getDetailURL()}`
 			};
 		}
 
 		const bestActivity = data.activities.find(i => i.name.toLowerCase() === bestMatch.toLowerCase());
 		if (!bestActivity) {
-			throw new Error("Assert: Activity not found"); //@todo change to SupiError
+			throw new SupiError({
+				message: "Assert: Activity not found"
+			});
 		}
 
-		const { name, rank, value } = bestActivity
+		const { name, rank, value } = bestActivity;
 		const ironman = (context.params.seasonal)
 			? "Seasonal user"
 			: sb.Utils.capitalize(getIronman(data, Boolean(context.params.rude)));

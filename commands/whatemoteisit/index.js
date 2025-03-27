@@ -25,8 +25,9 @@ export default {
 			};
 		}
 
-		if (context.platform.Name === "twitch" && context.append.emotes) {
-			input = context.append.emotes.split(":")[0];
+		const messageData = context.platformSpecificData;
+		if (messageData?.emotes) {
+			input = messageData.emotes.split(":")[0];
 		}
 
 		const isEmoteID = (REGEXES.V1.test(input) || REGEXES.V2.test(input) || REGEXES.CDN.test(input));

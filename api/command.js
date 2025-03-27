@@ -39,21 +39,22 @@ export default {
 			};
 		}
 
-		const result = await sb.Command.checkAndExecute(
-			invocation,
+		const execution = await sb.Command.checkAndExecute({
+			command: invocation,
 			args,
-			channelData,
-			userData,
-			{
-				platform: platformData,
+			channel: channelData,
+			user: userData,
+			platform: platformData,
+			platformSpecificData: null,
+			options: {
 				skipGlobalBan: url.searchParams.has("skipGlobalBan")
 			}
-		);
+		});
 
 		return {
 			statusCode: 200,
 			data: {
-				result
+				result: execution
 			}
 		};
 	},

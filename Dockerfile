@@ -10,12 +10,14 @@ WORKDIR /home/project/supibot
 COPY --chown=supibot:supibot package.json ./
 COPY --chown=supibot:supibot tsconfig.json ./
 COPY --chown=supibot:supibot .yarnrc.yml ./
+COPY --chown=supibot:supibot yarn.lock ./
 
 RUN yarn install
 
-COPY --chown=supibot:supibot master.js ./
+COPY --chown=supibot:supibot master.ts ./
 COPY --chown=supibot:supibot init ./init
 
+COPY --chown=supibot:supibot @types ./@types
 COPY --chown=supibot:supibot api ./api
 COPY --chown=supibot:supibot chat-modules ./chat-modules
 COPY --chown=supibot:supibot classes ./classes

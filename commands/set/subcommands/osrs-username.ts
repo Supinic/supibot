@@ -40,11 +40,11 @@ export default {
 			};
 		}
 
-		const existing = await context.user.getDataProperty(OSRS_GAME_USERNAME_KEY);
+		const previous = await context.user.getDataProperty(OSRS_GAME_USERNAME_KEY) as string | undefined;
 		await context.user.setDataProperty(OSRS_GAME_USERNAME_KEY, identifier);
 
-		const string = (existing)
-			? `changed your default $osrs username from ${existing} to ${identifier}`
+		const string = (previous)
+			? `changed your default $osrs username from ${previous} to ${identifier}`
 			: `set your default $osrs username to ${identifier}`;
 
 		return {
@@ -53,7 +53,7 @@ export default {
 		};
 	},
 	unset: async (context: Context): Promise<Failure | Success> => {
-		const existing = await context.user.getDataProperty(OSRS_GAME_USERNAME_KEY);
+		const existing = await context.user.getDataProperty(OSRS_GAME_USERNAME_KEY) as string | undefined;
 		if (!existing) {
 			return {
 				success: false,

@@ -75,13 +75,13 @@ export default {
 					reply: `Command "${commandString}" does not exist!`
 				};
 			}
-			else if (!commandData.Flags.pipe && invocations[i + 1]) {
+			else if (!commandData.Flags.includes("pipe") && invocations[i + 1]) {
 				return {
 					success: false,
 					reply: `Output of command "${commandString}" cannot be piped!`
 				};
 			}
-			else if (nullCommand && commandData.Flags.nonNullable && invocations[i + 1]) {
+			else if (nullCommand && commandData.Flags.includes("nonNullable") && invocations[i + 1]) {
 				const [nextCommandString] = invocations[i + 1].split(" ");
 				const nextCommand = sb.Command.get(nextCommandString.replace(sb.Command.prefixRegex, ""));
 				if (nextCommand && nextCommand.Name === nullCommand.Name) {
@@ -91,7 +91,7 @@ export default {
 					};
 				}
 			}
-			else if (commandData.Flags.externalInput) {
+			else if (commandData.Flags.includes("externalInput")) {
 				hasExternalInput = true;
 			}
 
@@ -187,16 +187,19 @@ export default {
 				? rawCmd.slice(prefix.length)
 				: rawCmd;
 
-			const result = await sb.Command.checkAndExecute(
-				cmd,
-				cmdArgs,
-				context.channel,
-				context.user,
-				{
+			const execution = await sb.Command.checkAndExecute({
+				command: cmd,
+				args: cmdArgs,
+				user: context.user,
+				channel: context.channel,
+				platform: context.platform,
+				platformSpecificData: context.platformSpecificData,
+				options: {
 					...context.append,
 					pipeCount,
 					tee: context.tee,
 					platform: context.platform,
+					platformSpecificData: context.platformSpecificData,
 					commandList: totalUsedCommandNames,
 					pipe: true,
 					pipeIndex: i,
@@ -205,25 +208,25 @@ export default {
 					skipMention: true,
 					partialExecute: true
 				}
-			);
+			});
 
-			if (result) {
-				if (typeof result.replyWithPrivateMessage === "boolean") {
-					privateMessageReply = result.replyWithPrivateMessage;
+			if (execution) {
+				if (typeof execution.replyWithPrivateMessage === "boolean") {
+					privateMessageReply = execution.replyWithPrivateMessage;
 				}
-				else if (typeof result.replyWithMeAction === "boolean") {
-					meActionReply = result.replyWithMeAction;
+				else if (typeof execution.replyWithMeAction === "boolean") {
+					meActionReply = execution.replyWithMeAction;
 				}
 			}
 
-			if (!result) { // Banphrase result: Do not reply
+			if (!execution) { // Banphrase result: Do not reply
 				currentArgs = [];
 			}
-			else if (result.success === false) {
+			else if (execution.success === false) {
 				if (context.params._force) {
-					let reply = result.reply;
+					let reply = execution.reply;
 					if (!reply) {
-						reply = (result.reason === "cooldown")
+						reply = (execution.reason === "cooldown")
 							? `Your pipe failed because the "${cmd}" command is currently on cooldown!`
 							: "(no reply)";
 					}
@@ -234,21 +237,21 @@ export default {
 
 					currentArgs = string.split(" ");
 				}
-				else if (result.reason === "cooldown") {
+				else if (execution.reason === "cooldown") {
 					if (i === 0) { // Short-circuit if the command is the last one in pipe
-						return result;
+						return execution;
 					}
 					else {
 						return {
-							...result,
+							...execution,
 							replyWithPrivateMessage: privateMessageReply,
 							replyWithMeAction: meActionReply,
-							reply: result.reply ?? `Your pipe failed because the "${cmd}" command is currently on cooldown!`
+							reply: execution.reply ?? `Your pipe failed because the "${cmd}" command is currently on cooldown!`
 						};
 					}
 				}
 				else {
-					const reply = ERROR_REASONS[result.reason] ?? result.reply ?? result.reason;
+					const reply = ERROR_REASONS[execution.reason] ?? execution.reply ?? execution.reason;
 					return {
 						success: false,
 						replyWithPrivateMessage: privateMessageReply,
@@ -257,31 +260,31 @@ export default {
 					};
 				}
 			}
-			else if (!result.reply && i < invocations.length - 1) { // Only applies to commands that aren't last in the sequence
+			else if (!execution.reply && i < invocations.length - 1) { // Only applies to commands that aren't last in the sequence
 				currentArgs = [];
 			}
-			else if (result.reply === null && result.success !== false) { // "Special" case for successful `null` results - pretend as if nothing happened
-				return result;
+			else if (execution.reply === null && execution.success !== false) { // "Special" case for successful `null` results - pretend as if nothing happened
+				return execution;
 			}
-			else if (typeof result !== "object") { // Banphrase result: Reply with message
+			else if (typeof execution !== "object") { // Banphrase result: Reply with message
 				return {
-					reply: result
+					reply: execution
 				};
 			}
-			else if (result.reason === "bad_invocation" && result.reply) {
+			else if (execution.reason === "bad_invocation" && execution.reply) {
 				return {
 					success: false,
-					reply: `Command "${cmd}" failed: ${result.reply}`
+					reply: `Command "${cmd}" failed: ${execution.reply}`
 				};
 			}
-			else if (result.reason === "error" && result.reply) {
+			else if (execution.reason === "error" && execution.reply) {
 				return {
 					success: false,
-					reply: result.reply
+					reply: execution.reply
 				};
 			}
 			else {
-				const string = sb.Utils.wrapString(result.reply, RESULT_CHARACTER_LIMIT, {
+				const string = sb.Utils.wrapString(execution.reply, RESULT_CHARACTER_LIMIT, {
 					keepWhitespace: true
 				});
 
@@ -295,7 +298,7 @@ export default {
 		return {
 			cooldown: (context.append.pipe) ? null : this.Cooldown,
 			hasExternalInput,
-			// skipExternalPrefix: Boolean(lastCommand.Flags.skipBanphrase),
+			// skipExternalPrefix: Boolean(lastCommand.Flags.includes("skipBanphrase")),
 			replyWithPrivateMessage: privateMessageReply,
 			replyWithMeAction: meActionReply,
 			reply: currentArgs.join(" ")

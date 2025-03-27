@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import Command from "../../../classes/command.js";
+import { Command } from "../../../classes/command.js";
 import { Date as SupiDate } from "supi-core";
 
 beforeEach(async() => {
