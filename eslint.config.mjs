@@ -8,8 +8,8 @@ export default tseslint.config(
 	eslintJs.configs.recommended,
 	importPlugin.flatConfigs.errors,
 	unicornPlugin.configs["flat/recommended"],
-	tseslint.configs.recommendedTypeChecked,
-	// tseslint.configs.strictTypeChecked,
+	// tseslint.configs.recommendedTypeChecked,
+	tseslint.configs.strictTypeChecked,
 	{
 		ignores: [".db/", ".yarn/", "coverage/", "build/", "**/*.js", "**/*.test.js", "**/*.d.ts", "**/*.mjs"]
 	},

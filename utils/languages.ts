@@ -1,5 +1,5 @@
 import rawLanguages from "./languages-data.json" with { type: "json" };
-const languages = rawLanguages as LanguageDefinition[];
+export const languages = rawLanguages as LanguageDefinition[];
 
 type NameDescriptor = {
 	native: {
@@ -80,78 +80,78 @@ export class Language {
 	get glottolog () { return this.#glottolog; }
 }
 
-export class LanguageParser {
-	static getCode (string: string, targetCode: IsoCode = "iso6391") {
-		const target = LanguageParser.get(string);
-		if (!target) {
-			return null;
-		}
-		else if (targetCode) {
-			return target[targetCode];
-		}
+export const getCode = (string: string, targetCode: IsoCode = "iso6391") => {
+	const target = get(string);
+	if (!target) {
+		return null;
+	}
+	else {
+		return target[targetCode];
+	}
+};
+
+export const getName = (string: string) => {
+	const target = get(string);
+	if (!target) {
+		return null;
+	}
+	else {
+		return (!target.name && Array.isArray(target.names))
+			? target.names[0]
+			: target.name;
+	}
+};
+
+/**
+ * Fetches a Language class instance for provided input
+ * @param string language-like code, name or ISO code
+ */
+export const getLanguage = (string: string) => {
+	const result = get(string);
+	if (!result) {
+		return null;
 	}
 
-	static getName (string: string) {
-		const target = LanguageParser.get(string);
-		if (!target) {
-			return null;
-		}
-		else {
-			return (!target.name && Array.isArray(target.names))
-				? target.names[0]
-				: target.name;
-		}
-	}
+	return new Language(result);
+};
 
-	/**
-	 * Fetches a Language class instance for provided input
-	 * @param string language-like code, name or ISO code
-	 */
-	static getLanguage (string: string) {
-		const result = LanguageParser.get(string);
-		if (!result) {
-			return null;
-		}
+/**
+ * Returns the full definition of language, or null if none was found
+ * @param string name or the code of the desired language
+ */
+export const get = (string: string) => {
+	const target = string.toLowerCase();
+	return languages.find(i => (
+		(i.iso6391 === target)
+		|| (i.iso6392 === target)
+		|| (i.iso6393 === target)
+		|| (Array.isArray(i.names) && i.names.includes(target))
+		|| (i.deprecated && Object.values(i.deprecated).includes(target))
+	));
+};
 
-		return new Language(result);
-	}
+/**
+ * Searches by all names in a language.
+ */
+export const search = (string: string) => {
+	const target = string.toLowerCase();
+	const result = languages.find(lang => {
+		const names = (Array.isArray(lang.names))
+			? lang.names
+			: compileNameList(lang.names);
 
-	/**
-	 * Returns the full definition of language, or null if none was found
-	 * @param string name or the code of the desired language
-	 */
-	static get (string: string) {
-		const target = string.toLowerCase();
-		return LanguageParser.languages.find(i => (
-			(i.iso6391 === target)
-			|| (i.iso6392 === target)
-			|| (i.iso6393 === target)
-			|| (Array.isArray(i.names) && i.names.includes(target))
-			|| (i.deprecated && Object.values(i.deprecated).includes(target))
-		));
-	}
+		return names.includes(target);
+	});
 
-	/**
-	 * Searches by all names in a language.
-	 */
-	static search (string: string) {
-		const target = string.toLowerCase();
-		const result = LanguageParser.languages.find(lang => {
-			const names = (Array.isArray(lang.names))
-				? lang.names
-				: compileNameList(lang.names);
+	return result ?? null;
+};
 
-			return names.includes(target);
-		});
-
-		return result ?? null;
-	}
-
-	/**
-	 * Supported languages and their ISO codes
-	 * @returns {Language[]}
-	 */
-	static get languages (): LanguageDefinition[] {
-		return languages;
-	}
-}
+export default {
+	Language,
+	languages,
+	search,
+	get,
+	getCode,
+	getLanguage,
+	getName
+};

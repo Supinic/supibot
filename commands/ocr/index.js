@@ -1,6 +1,6 @@
-import { LanguageParser } from "../../utils/languages.js";
+import { getCode, getName } from "../../utils/languages.js";
 import OCR_LANGUAGES from "./ocr-languages.json" with { type: "json" };
-const OCR_LANGUAGE_NAMES = Object.keys(OCR_LANGUAGES).map(i => LanguageParser.getName(i));
+const OCR_LANGUAGE_NAMES = Object.keys(OCR_LANGUAGES).map(i => getName(i));
 
 export default {
 	Name: "ocr",
@@ -24,7 +24,7 @@ export default {
 
 		let languageCode = "eng";
 		if (context.params.lang) {
-			languageCode = LanguageParser.getCode(context.params.lang, "iso6393");
+			languageCode = getCode(context.params.lang, "iso6393");
 			if (!languageCode) {
 				return {
 					success: false,
@@ -147,7 +147,7 @@ export default {
 	}),
 	Dynamic_Description: (async function (prefix) {
 		const tableBody = Object.entries(OCR_LANGUAGES).map(([code, definition]) => {
-			const name = LanguageParser.getName(code);
+			const name = getName(code);
 			const engines = definition.engines.join(", ");
 			return `<tr><td>${name}</td><td>${code}</td><td>${engines}</td></tr>`;
 		}).join("");

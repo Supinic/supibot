@@ -7,8 +7,8 @@ type ParserOptions = {
 	soundcloud?: KeyOptions;
 };
 
-let linkParser: LinkParser;
-export default async () => {
+let linkParser: LinkParser | null = null;
+export default async (): Promise<LinkParser> => {
 	if (!linkParser) {
 		const options: ParserOptions = {};
 		if (process.env.API_GOOGLE_YOUTUBE) {

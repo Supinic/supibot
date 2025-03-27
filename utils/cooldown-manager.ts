@@ -102,7 +102,9 @@ export default class CooldownManager {
 	private readonly pruneInterval: NodeJS.Timeout;
 
 	constructor () {
-		this.pruneInterval = setInterval(() => this.prune(), 60_000);
+		this.pruneInterval = setInterval(() => {
+			this.prune();
+		}, 60_000);
 	}
 
 	/**

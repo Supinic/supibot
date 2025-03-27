@@ -20,7 +20,7 @@ import User from "./user.js";
 import { Channel, privateMessageChannelSymbol } from "./channel.js";
 import { Platform, type GetEmoteOptions } from "../platforms/template.js";
 import CooldownManager from "../utils/cooldown-manager.js";
-import { Language, LanguageParser } from "../utils/languages.js";
+import { type Language, getLanguage } from "../utils/languages.js";
 
 import type { MessageData as TwitchAppendData } from "../platforms/twitch.js";
 import type { MessageData as DiscordAppendData } from "../platforms/discord.js";
@@ -1142,7 +1142,7 @@ export class Command extends TemplateWithoutId {
 			}
 
 			case "language": {
-				return LanguageParser.getLanguage(value);
+				return getLanguage(value);
 			}
 		}
 

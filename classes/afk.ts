@@ -15,7 +15,7 @@ const { responses } = afkDefinitions;
 const configResponses = config.responses;
 
 type DurationStatus = {
-	interval: [number, number];
+	interval: [number, number | null];
 	responses: string[];
 };
 const durationStatuses = responses.duration as Partial<Record<Status, DurationStatus[]>>;
@@ -70,25 +70,23 @@ export class AwayFromKeyboard extends TemplateWithId {
 	}
 
 	static async initialize () {
-		if (sb.Metrics) {
-			AwayFromKeyboard.#totalCounter = sb.Metrics.registerCounter({
-				name: "supibot_afk_statuses_created_total",
-				help: "Total amount of all AFK statuses created.",
-				labelNames: ["type"]
-			});
+		AwayFromKeyboard.#totalCounter = sb.Metrics.registerCounter({
+			name: "supibot_afk_statuses_created_total",
+			help: "Total amount of all AFK statuses created.",
+			labelNames: ["type"]
+		});
 
-			AwayFromKeyboard.#activeGauge = sb.Metrics.registerGauge({
-				name: "supibot_active_afk_statuses_count",
-				help: "Total amount of currently active AFK status."
-			});
-		}
+		AwayFromKeyboard.#activeGauge = sb.Metrics.registerGauge({
+			name: "supibot_active_afk_statuses_count",
+			help: "Total amount of currently active AFK status."
+		});
 
-		return await super.initialize();
+		await super.initialize();
 	}
 
 	static async reloadData () {
 		AwayFromKeyboard.data.clear();
-		return await this.loadData();
+		await this.loadData();
 	}
 
 	static async loadData () {
@@ -103,9 +101,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 			AwayFromKeyboard.data.set(afk.User_Alias, afk);
 		}
 
-		if (AwayFromKeyboard.#activeGauge) {
-			AwayFromKeyboard.#activeGauge.set(AwayFromKeyboard.data.size);
-		}
+		AwayFromKeyboard.#activeGauge.set(AwayFromKeyboard.data.size);
 	}
 
 	static async reloadSpecific (...list: AwayFromKeyboard["ID"][]) {
@@ -163,7 +159,7 @@ export class AwayFromKeyboard extends TemplateWithId {
 			const durationDefinitions = durationStatuses[status];
 
 			for (const definition of durationDefinitions) {
-				const minimum = definition.interval[0] ?? 0;
+				const minimum = definition.interval[0];
 				const maximum = definition.interval[1] ?? Infinity;
 
 				if (minimum < minutesDelta && minutesDelta < maximum) {
@@ -176,6 +172,8 @@ export class AwayFromKeyboard extends TemplateWithId {
 		}
 		else {
 			// Fallback for missing responses in the `afk-responses.json` file
+			// This check exists for the potential new AFK type being added and missing in the responses JSON
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 			const staticResponses = responses.static[status] ?? responses.static[DEFAULT_AFK_STATUS];
 			statusMessage = sb.Utils.randArray(staticResponses);
 		}
@@ -186,18 +184,9 @@ export class AwayFromKeyboard extends TemplateWithId {
  		 */
 		if (!data.Silent) {
 			const platform = channelData.Platform;
-			if (!platform) {
-				throw new SupiError({
-					message: "Assert error - AFK's Channel does not have a Platform",
-					args: {
-						afk: data.ID,
-						channel: channelData.ID
-					}
-				});
-			}
-
 			const userMention = await platform.createUserMention(userData);
-			const fixedReminderText = await channelData.prepareMessage(data.Text) ?? configResponses.defaultBanphrase;
+			const preparedMessage = await channelData.prepareMessage(data.Text);
+			const fixedReminderText = (preparedMessage !== false) ? preparedMessage : configResponses.defaultBanphrase;
 
 			const message = `${userMention} ${statusMessage}: ${fixedReminderText} (${sb.Utils.timeDelta(data.Started)})`;
 			if (channelData.Mirror) {
@@ -207,8 +196,8 @@ export class AwayFromKeyboard extends TemplateWithId {
 
 			const unpingedMessage = await Filter.applyUnping({
 				command: "afk",
-				channel: channelData ?? null,
-				platform: channelData?.Platform ?? null,
+				channel: channelData,
+				platform: channelData.Platform,
 				string: message,
 				executor: userData
 			});

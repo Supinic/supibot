@@ -1,4 +1,4 @@
-import { LanguageParser } from "../../utils/languages.js";
+import { getCode } from "../../utils/languages.js";
 import checkPartialCommandFilters from "./check-partials.js";
 
 export default {
@@ -25,7 +25,7 @@ export default {
 
 		let languageCode = "en";
 		if (context.params.lang) {
-			languageCode = LanguageParser.getCode(context.params.lang, "iso6391");
+			languageCode = getCode(context.params.lang, "iso6391");
 			if (!languageCode) {
 				return {
 					success: false,
